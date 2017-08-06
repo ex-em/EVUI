@@ -1,0 +1,19 @@
+{
+  "name": "evui",
+  "version": "1.0.0",
+  "description": "Exem Visualization UI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ex-em/EVUI.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ex-em/EVUI/issues"
+  },
+  "homepage": "https://github.com/ex-em/EVUI#readme"
+}
