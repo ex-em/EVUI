@@ -13,7 +13,7 @@ module.exports = {
     entry: path.resolve(dir_js, 'main.js'),
     output: {
         path: dir_build,
-        filename: 'bundle.js'
+        filename: 'evui.js'
     },
     devServer: {
         contentBase: dir_build,
@@ -32,7 +32,12 @@ module.exports = {
             { from: dir_html } // to: output.path
         ]),
         // Avoid publishing files when compilation fails
-        new webpack.NoErrorsPlugin()
+        new webpack.NoErrorsPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('profuction')
+            }
+        })
     ],
     stats: {
         // Nice colored output

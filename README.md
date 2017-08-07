@@ -1,11 +1,10 @@
-# webpack Babel demo
-
-Demonstrates how to use webpack with Babel.
+# EVUI
 
 Installation:
 
 ```
-cd webpack-babel-demo/
+npm -g install eslint
+cd evui
 npm install
 ```
 

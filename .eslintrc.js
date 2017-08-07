@@ -23,6 +23,9 @@ module.exports = {
         "semi": [
             "error",
             "always"
+        ],
+        "no-var": [
+            "error"
         ]
     }
 };
