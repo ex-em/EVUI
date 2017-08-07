@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ex-em/EVUI/issues"
   },
-  "homepage": "https://github.com/ex-em/EVUI#readme"
+  "homepage": "https://github.com/ex-em/EVUI#readme",
+  "dependencies": {
+    "vue": "^2.4.2"
+  }
 }
