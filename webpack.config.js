@@ -1,48 +1,73 @@
-/* global __dirname */
-
-var path = require('path');
-
-var webpack = require('webpack');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-
-var dir_js = path.resolve(__dirname, 'js');
-var dir_html = path.resolve(__dirname, 'html');
-var dir_build = path.resolve(__dirname, 'build');
+var path = require('path')
+var webpack = require('webpack')
 
 module.exports = {
-    entry: path.resolve(dir_js, 'main.js'),
-    output: {
-        path: dir_build,
-        filename: 'evui.js'
-    },
-    devServer: {
-        contentBase: dir_build,
-    },
-    module: {
-        loaders: [
-            {
-                loader: 'babel-loader',
-                test: dir_js,
-            }
-        ]
-    },
-    plugins: [
-        // Simply copies the files over
-        new CopyWebpackPlugin([
-            { from: dir_html } // to: output.path
-        ]),
-        // Avoid publishing files when compilation fails
-        new webpack.NoErrorsPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('profuction')
-            }
-        })
-    ],
-    stats: {
-        // Nice colored output
-        colors: true
-    },
-    // Create Sourcemaps for the bundle
-    devtool: 'source-map',
-};
+  entry: {
+    dev: './src/dev.js',
+    evui: './src/evui.js'
+  },
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    publicPath: '/dist/',
+    filename: '[name].js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+          }
+          // other vue-loader options go here
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]?[hash]'
+        }
+      }
+    ]
+  },
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    }
+  },
+  devServer: {
+    historyApiFallback: true,
+    noInfo: true
+  },
+  performance: {
+    hints: false
+  },
+  devtool: '#eval-source-map'
+}
+
+if (process.env.NODE_ENV === 'production') {
+  module.exports.devtool = '#source-map'
+  // http://vue-loader.vuejs.org/en/workflow/production.html
+  module.exports.plugins = (module.exports.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"'
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      compress: {
+        warnings: false
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  ])
+}
