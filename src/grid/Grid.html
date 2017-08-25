@@ -1,0 +1,16 @@
+<table>
+    <thead>
+    <tr>
+        <th v-for="key in columns">
+            {{ key }}
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr v-for="key in data">
+            <td v-for="key2 in key">
+                {{ key2 }}
+            </td>
+        </tr>
+    </tbody>
+</table>
