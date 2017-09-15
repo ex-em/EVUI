@@ -1,15 +1,18 @@
 <table>
     <thead>
     <tr>
-        <th v-for="key in columns">
+        <th v-for="key in columns"
+            @click="sortBy(key)"
+            :class="{ active: sortKey == key }">
             {{ key }}
+            <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
         </th>
     </tr>
     </thead>
     <tbody>
-        <tr v-for="key in data">
-            <td v-for="key2 in key">
-                {{ key2 }}
+        <tr v-for="entry in filteredData">
+            <td v-for="key in entry">
+                {{ key }}
             </td>
         </tr>
     </tbody>

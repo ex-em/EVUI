@@ -12,9 +12,9 @@
                 gridColumns: ['column1', 'column2', 'column3'],
                 rowData : [
                     ['data1', 'data2', 'data3'],
-                    ['data4', 'data2', 'data3'],
-                    ['data2', 'data2', 'data3'],
-                    ['data5', 'data2', 'data3']
+                    ['data4', 'data4', 'data1'],
+                    ['data2', 'data6', 'data2'],
+                    ['data5', 'data7', 'data3']
                 ]
             }
         },
