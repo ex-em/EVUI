@@ -10,7 +10,7 @@
     </tr>
     </thead>
     <tbody>
-        <tr v-for="entry in filteredData">
+        <tr v-for="(entry, index) in filteredData" :class="index % 2 ? 'row-even' : 'row-old'">
             <td v-for="key in entry">
                 {{ key }}
             </td>

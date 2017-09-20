@@ -15,7 +15,7 @@ th {
 }
 
 td {
-    background-color: #f9f9f9;
+    /*background-color: #f9f9f9;*/
 }
 
 th, td {
@@ -50,4 +50,12 @@ th.active .arrow {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     border-top: 4px solid #fff;
+}
+
+.row-even {
+    background-color: #ffffff;
+}
+
+.row-old {
+    background-color: #e9e9e9;
 }
