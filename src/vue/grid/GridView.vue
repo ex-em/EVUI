@@ -1,5 +1,6 @@
 <template>
-    <grid :columns="gridColumns"
+    <grid :gridInfo="gridInfo"
+          :columns="gridColumns"
           :data="rowData">
     </grid>
 </template>
@@ -9,12 +10,22 @@
     export default {
         data () {
             return {
-                gridColumns: ['column1', 'column2', 'column3'],
+                gridInfo: {
+                    title : 'EVUI-Grid-Title',
+                    titleAlign : 'center',
+                    width : 700,
+                    height : 500
+                },
+                gridColumns: [
+                    {cId: 'col1', cName: 'column1', cWidth: 300, cVisible: true},
+                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: false},
+                    {cId: 'col3', cName: 'column3', cWidth: 100, cVisible: true}
+                ],
                 rowData : [
-                    ['data1', 'data2', 'data3'],
-                    ['data4', 'data4', 'data1'],
-                    ['data2', 'data6', 'data2'],
-                    ['data5', 'data7', 'data3']
+                    ['data1', 100, 'data3'],
+                    ['data4', 200, 'data1'],
+                    ['data2', 150, 'data2'],
+                    ['data5', 300, 'data3']
                 ]
             }
         },

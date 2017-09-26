@@ -1,3 +1,3 @@
-<template src="../../grid/Grid.html"></template>
-<script src="../../grid/Grid.js"></script>
-<style scoped src="../../grid/Grid.css"></style>
+<template src="./Grid.html"></template>
+<script src="./Grid.js"></script>
+<style scoped src="./Grid.css"></style>

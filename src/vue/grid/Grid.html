@@ -1,0 +1,34 @@
+<div class="evui-grid-wrapper"
+     :style="{width : gridInfo.width ? gridInfo.width + 'px' : '100%',
+              height: gridInfo.height ? gridInfo.height + 'px' : '100%'}">
+    <div class="evui-grid-header">
+        <span class="title"
+              :style="{display : gridInfo.title ? 'block' : 'none', 'text-align': gridInfo.titleAlign}">
+            {{gridInfo.title}}
+        </span>
+    </div>
+    <div class="evui-grid-body">
+        <table>
+            <thead>
+            <tr>
+                <th v-for="key in columns"
+                    @click="sortBy(key.cId)"
+                    :width="key.cWidth ? key.cWidth : '80'"
+                    :class="{ active: sortKey == key.cId }"
+                    :style="{display: key.cVisible ? 'table-cell' : 'none'}">
+                    {{ key.cName }}
+                    <span class="arrow" :class="sortOrders[key.cId] > 0 ? 'asc' : 'dsc'"></span>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(entry, rowIdx) in sortedData" :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+                <td v-for="(key, colIdx) in entry" :style="{display: columns[colIdx].cVisible ? 'table-cell' : 'none'} ">
+                    {{ key }}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="evui-grid-footer"></div>
+</div>

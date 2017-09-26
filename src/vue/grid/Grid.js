@@ -1,12 +1,13 @@
 export default {
     props : {
+        gridInfo : Object,
         columns : Array,
         data: Array
     },
     data: function () {
-        var sortOrders = {};
+        let sortOrders = {};
         this.columns.forEach(function (key) {
-            sortOrders[key] = 1;
+            sortOrders[key.cId] = 1;
         });
         return {
             sortKey: '',
@@ -14,21 +15,29 @@ export default {
         }
     },
     computed: {
-        filteredData: function () {
-            var sortKey = this.sortKey;
-            var sortIndex = this.columns.indexOf(sortKey);
-            var order = this.sortOrders[sortKey] || 1;
-            var data = this.data;
+        sortedData: function () {
+            let sortKey = this.sortKey;
+            let sortIndex;
+
+            for(let ix=0, ixLen=this.columns.length; ix<ixLen; ix++) {
+                if(this.columns[ix].cId.indexOf(sortKey) > -1) {
+                    sortIndex = ix;
+                    break;
+                }
+            }
+
+            let order = this.sortOrders[sortKey] || 1;
+            let sortedData = this.data;
 
             if (sortKey) {
-                data = data.slice().sort(function (a, b) {
+                sortedData = sortedData.slice().sort(function (a, b) {
                     a = a[sortIndex];
                     b = b[sortIndex];
                     return (a === b ? 0 : a > b ? 1 : -1) * order;
                 });
             }
 
-            return data;
+            return sortedData;
         }
     },
     methods: {
@@ -37,7 +46,7 @@ export default {
             this.sortOrders[key] = this.sortOrders[key] * -1;
         }
     },
-    created(){
+    created() {
         console.log(this);
     }
 };
