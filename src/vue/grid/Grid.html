@@ -11,19 +11,19 @@
         <table>
             <thead>
             <tr>
-                <th v-for="key in columns"
-                    @click="sortBy(key.cId)"
-                    :width="key.cWidth ? key.cWidth : '80'"
-                    :class="{ active: sortKey == key.cId }"
-                    :style="{display: key.cVisible ? 'table-cell' : 'none'}">
-                    {{ key.cName }}
-                    <span class="arrow" :class="sortOrders[key.cId] > 0 ? 'asc' : 'dsc'"></span>
+                <th v-for="col in columnOptions"
+                    v-show="col.cVisible"
+                    @click="sortBy(col.cId)"
+                    :width="col.cWidth"
+                    :class="{ active: sortKey == col.cId }">
+                    {{ col.cName }}
+                    <span class="arrow" :class="sortOrders[col.cId] > 0 ? 'asc' : 'dsc'"></span>
                 </th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(entry, rowIdx) in sortedData" :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                <td v-for="(key, colIdx) in entry" :style="{display: columns[colIdx].cVisible ? 'table-cell' : 'none'} ">
+                <td v-for="(key, colIdx) in entry" :style="{display: columnOptions[colIdx].cVisible ? 'table-cell' : 'none'} ">
                     {{ key }}
                 </td>
             </tr>

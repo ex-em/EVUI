@@ -12,13 +12,13 @@
             return {
                 gridInfo: {
                     title : 'EVUI-Grid-Title',
-                    width : 700,
+                    width : 1500,
                     height : 500
                 },
                 gridColumns: [
                     {cId: 'col1', cName: 'column1', cWidth: 300, cVisible: true},
-                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: false},
-                    {cId: 'col3', cName: 'column3', cWidth: 100, cVisible: true}
+                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: true},
+                    {cId: 'col3', cName: 'column3', cWidth: 150, cVisible: true}
                 ],
                 rowData : [
                     ['data1', 100, 'data3'],

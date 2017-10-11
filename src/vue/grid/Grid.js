@@ -5,15 +5,11 @@ export default {
         data: Array
     },
     data: function () {
-        let sortOrders = {};
-        this.columns.forEach(function (key) {
-            sortOrders[key.cId] = 1;
-        });
         return {
             gridStyle : null,
             titleStyle: null,
             sortKey: '',
-            sortOrders: sortOrders
+            sortOrders: null,
         }
     },
     computed: {
@@ -25,13 +21,26 @@ export default {
                 height    : '100%'
             }, this.gridInfo);
         },
-        
+
+        columnOptions() {
+            let defColumns = [];
+            for(let ix=0, ixLen=this.columns.length; ix<ixLen; ix++) {
+                defColumns[ix] = Object.assign({
+                    cId : 'def_cId_' + ix,
+                    cName : '',
+                    cWidth : 50,
+                    cVisible : false
+                }, this.columns[ix]);
+            }
+            return defColumns;
+        },
+
         sortedData: function () {
             let sortKey = this.sortKey;
             let sortIndex;
 
-            for(let ix=0, ixLen=this.columns.length; ix<ixLen; ix++) {
-                if(this.columns[ix].cId.indexOf(sortKey) > -1) {
+            for(let ix=0, ixLen=this.columnOptions.length; ix<ixLen; ix++) {
+                if(this.columnOptions[ix].cId.indexOf(sortKey) > -1) {
                     sortIndex = ix;
                     break;
                 }
@@ -68,5 +77,11 @@ export default {
             'text-align' : this.gridOptions.titleAlign,
             'display'    : 'block'
         };
+
+        let sortOrders = {};
+        this.columnOptions.forEach(function (key) {
+            sortOrders[key.cId] = 1;
+        });
+        this.sortOrders = sortOrders;
     }
 };
