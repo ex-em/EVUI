@@ -1,10 +1,10 @@
 <div class="evui-grid-wrapper"
-     :style="{width : gridInfo.width ? gridInfo.width + 'px' : '100%',
-              height: gridInfo.height ? gridInfo.height + 'px' : '100%'}">
+     :style="gridStyle">
     <div class="evui-grid-header">
         <span class="title"
-              :style="{display : gridInfo.title ? 'block' : 'none', 'text-align': gridInfo.titleAlign}">
-            {{gridInfo.title}}
+              v-show="gridOptions.title"
+              :style="titleStyle">
+            {{gridOptions.title}}
         </span>
     </div>
     <div class="evui-grid-body">

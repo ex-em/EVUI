@@ -12,7 +12,6 @@
             return {
                 gridInfo: {
                     title : 'EVUI-Grid-Title',
-                    titleAlign : 'center',
                     width : 700,
                     height : 500
                 },
