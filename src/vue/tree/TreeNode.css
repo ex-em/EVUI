@@ -1,0 +1,24 @@
+td {
+    font-size : 12px;
+}
+
+.evui-tree-node {
+    display: inline-block;
+    vertical-align: middle;
+
+}
+
+.evui-tree-node-expand {
+    cursor: pointer;
+    margin: 0 5px 0 10px;
+    border: 6px solid transparent;
+    border-right-width: 0;
+    border-left-color: #97a8be;
+    border-left-width: 7px;
+    transform: rotate(0);
+    transition: transform .3s ease-in-out;
+}
+
+.evui-tree-node-expand.collapse{
+    transform: rotate(90deg);
+}
