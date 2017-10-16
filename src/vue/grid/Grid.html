@@ -14,6 +14,7 @@
                 <th v-for="col in columnOptions"
                     v-show="col.cVisible"
                     @click="sortBy(col.cId)"
+                    :data-column-name="col.cId"
                     :width="col.cWidth"
                     :class="{ active: sortKey == col.cId }">
                     {{ col.cName }}

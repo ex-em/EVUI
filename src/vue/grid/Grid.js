@@ -10,7 +10,7 @@ export default {
             titleStyle: null,
             sortKey: '',
             sortOrders: null,
-        }
+        };
     },
     computed: {
         gridOptions() {
@@ -64,7 +64,63 @@ export default {
         sortBy: function (key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
+        },
+
+        setResizeGrips () {
+            const vm = this;
+            const headerCols = Array.from(vm.$el.getElementsByTagName('th'));
+            headerCols.forEach((th) => {
+                th.style.position = 'relative';
+                const grip = document.createElement('div');
+                grip.className = 'grip';
+                // grip.innerHTML = '&nbsp';
+                grip.style.top = 0;
+                grip.style.right = 0;
+                grip.style.bottom = 0;
+                grip.style.width = '5px';
+                grip.style.position = 'absolute';
+                grip.style.cursor = 'col-resize';
+                grip.addEventListener('mousedown', this.onMouseDown);
+                th.appendChild(grip);
+                vm.grips.push(grip);
+            });
+            document.addEventListener('mousemove', this.onMouseMove);
+            document.addEventListener('mouseup', this.onMouseUp);
+        },
+
+        onMouseDown (e) {
+            const vm = this;
+            vm.thElm = e.target.parentNode;
+            vm.startOffset = vm.thElm.offsetWidth - e.pageX;
+        },
+
+        onMouseMove (e) {
+            const vm = this;
+            if (vm.thElm) {
+                // const colName = vm.thElm.getAttribute('data-column-name');
+                const width = vm.startOffset + e.pageX;
+                vm.thElm.width = width + 'px';
+            }
+        },
+
+        onMouseUp () {
+            const vm = this;
+            vm.thElm = undefined;
+        },
+
+        beforeDestory () {
+            const vm = this;
+            vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
+            document.removeEventListener('mousemove', vm.onMouseMove);
+            document.removeEventListener('mouseup', vm.onMouseUp);
         }
+
+    },
+
+    mounted() {
+        const vm = this;
+        vm.grips = [];
+        vm.setResizeGrips();
     },
     created() {
         // set grid default style
