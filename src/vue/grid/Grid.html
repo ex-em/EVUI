@@ -19,6 +19,7 @@
                     :class="{ active: sortKey == col.cId }">
                     {{ col.cName }}
                     <span class="arrow" :class="sortOrders[col.cId] > 0 ? 'asc' : 'dsc'"></span>
+                    <div class="grip"></div>
                 </th>
             </tr>
             </thead>

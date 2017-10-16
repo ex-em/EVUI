@@ -68,20 +68,9 @@ export default {
 
         setResizeGrips () {
             const vm = this;
-            const headerCols = Array.from(vm.$el.getElementsByTagName('th'));
-            headerCols.forEach((th) => {
-                th.style.position = 'relative';
-                const grip = document.createElement('div');
-                grip.className = 'grip';
-                // grip.innerHTML = '&nbsp';
-                grip.style.top = 0;
-                grip.style.right = 0;
-                grip.style.bottom = 0;
-                grip.style.width = '5px';
-                grip.style.position = 'absolute';
-                grip.style.cursor = 'col-resize';
+            const headerCols = Array.from(vm.$el.getElementsByClassName('grip'));
+            headerCols.forEach((grip) => {
                 grip.addEventListener('mousedown', this.onMouseDown);
-                th.appendChild(grip);
                 vm.grips.push(grip);
             });
             document.addEventListener('mousemove', this.onMouseMove);
