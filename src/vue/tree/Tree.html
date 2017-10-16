@@ -1,0 +1,32 @@
+<div class="evui-tree-wrapper"
+     :style="treeStyle">
+    <div class="evui-tree-header">
+        <span class="title"
+              v-show="treeOptions.title"
+              :style="titleStyle">
+            {{treeOptions.title}}
+        </span>
+    </div>
+    <div class="evui-tree-body">
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="col in columnOptions"
+                        v-show="col.cVisible"
+                        :width="col.cWidth">
+                        {{ col.cName }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tree-node
+                        v-for="node in treeNode"
+                        key="node[treeColumnIndex]"
+                        :columns="columnOptions"
+                        :node="node">
+                </tree-node>
+            </tbody>
+        </table>
+    </div>
+    <div class="evui-tree-footer"></div>
+</div>
