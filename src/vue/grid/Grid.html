@@ -14,10 +14,12 @@
                 <th v-for="col in columnOptions"
                     v-show="col.cVisible"
                     @click="sortBy(col.cId)"
+                    :data-column-name="col.cId"
                     :width="col.cWidth"
                     :class="{ active: sortKey == col.cId }">
                     {{ col.cName }}
                     <span class="arrow" :class="sortOrders[col.cId] > 0 ? 'asc' : 'dsc'"></span>
+                    <div class="grip"></div>
                 </th>
             </tr>
             </thead>

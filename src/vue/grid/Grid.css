@@ -12,13 +12,12 @@ th {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    min-width: 120px;
+    padding: 10px 0px 10px 0px;
+    position: relative;
 }
 
 td {
-    /*background-color: #f9f9f9;*/
-}
-
-th, td {
     min-width: 120px;
     padding: 10px 20px;
 }
@@ -29,6 +28,15 @@ th.active {
 
 th.active .arrow {
     opacity: 1;
+}
+
+.grip {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    position: absolute;
+    cursor: col-resize;
 }
 
 .arrow {
