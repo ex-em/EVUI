@@ -1,11 +1,11 @@
-<tr>
-    <td :style="{'padding-left' : ( node.content[0] -1 ) * 50 + 'px' }">
+<tr v-show="node.data[0] == 1 || node.visible">
+    <td :style="{'padding-left' : ( node.data[0] -1 ) * 50 + 'px' }">
         <span class="evui-tree-node"
-              :class="{ 'evui-tree-node-expand': !node.isLeaf }"></span>
-        <span>{{ node.content[1] }}</span>
+              @click="toggleExpandNode"
+              :class="{ 'evui-tree-node-expand': !node.isLeaf, 'node-collapse' : !node.isLeaf && node.expanded }"></span>
+        <span>{{ node.data[1] }}</span>
     </td>
     <template v-for="(col,index) in columns.slice(2)">
-        <td v-show="col.cVisible">{{ node.content[index+2] }}</td>
+        <td v-show="col.cVisible">{{ node.data[index+2] }}</td>
     </template>
 </tr>
-

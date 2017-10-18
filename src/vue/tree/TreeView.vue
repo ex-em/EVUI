@@ -18,7 +18,7 @@
                     height: 500     // number or '%' (percent)
                 },
                 treeColumns: [
-                    {cId: 'lvl',  cName: 'lvl',         cWidth: 100, cVisible: false},
+                    {cId: 'lvl',  cName: 'lvl',         cWidth: 100, cVisible: false},  // min value : 1
                     {cId: 'col1', cName: 'class_name',  cWidth: 500, cVisible: true, treecolumn: true},
                     {cId: 'col2', cName: 'method_name', cWidth: 400, cVisible: true},
                     {cId: 'col3', cName: 'elapse_time', cWidth: 100, cVisible: true},
@@ -43,4 +43,4 @@
         }
     }
 </script>
-<style></style>
+<style></style> currlevel = 6  ix는 xmtxn

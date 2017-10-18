@@ -1,4 +1,5 @@
 import TreeNode from './TreeNode.vue';
+import TreeStore from './TreeStore.js';
 
 export default {
     props : {
@@ -10,8 +11,9 @@ export default {
         return {
             treeStyle      : null,
             titleStyle     : null,
-            treeColumnIndex: null
-        }
+            treeColumnIndex: null,
+            store          : null
+        };
     },
     computed: {
         // set default options
@@ -38,24 +40,17 @@ export default {
             return defColumns;
         },
 
-        treeNode() {
-            let treeNode = [];
-
-            for(let ix=0, ixLen=this.rows.length-1; ix<ixLen; ix++) {
-                let currRow = this.rows[ix];
-                let nextRow = this.rows[ix+1];
-                let isLeaf = null;
-
-                isLeaf = currRow[0] >= nextRow[0];
-
-                treeNode.push({isLeaf : isLeaf , content : this.rows[ix]});
-            }
-
-            return treeNode;
+        treeMap() {
+            this.store.setLeafInfo();
+            return this.store.treeMap;
         }
     },
     methods: {
+        toggleNodeExpand(key, mode) {
+            // node = tree-node
+            this.store.expandChildrenNode(key, mode);
 
+        }
     },
     created() {
         let isFindTreeColumn = false;
@@ -83,6 +78,11 @@ export default {
         if(!isFindTreeColumn) {
             this.treeColumnIndex = 0;    //default set
         }
+
+        this.store = new TreeStore({
+            data   : this.rows,
+            columns : this.columns
+        });
     },
     components: {
         TreeNode
