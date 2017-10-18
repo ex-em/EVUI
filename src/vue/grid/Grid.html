@@ -25,7 +25,9 @@
             </thead>
             <tbody>
             <tr v-for="(entry, rowIdx) in sortedData" :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                <td v-for="(key, colIdx) in entry" :style="{display: columnOptions[colIdx].cVisible ? 'table-cell' : 'none'} ">
+                <td v-for="(key, colIdx) in entry"
+                    :class="cls(columnOptions[colIdx].cType)"
+                    :style="{display: columnOptions[colIdx].cVisible ? 'table-cell' : 'none'} ">
                     {{ key }}
                 </td>
             </tr>

@@ -10,9 +10,11 @@ export default {
             titleStyle: null,
             sortKey: '',
             sortOrders: null,
+            columnType: null
         };
     },
     computed: {
+
         gridOptions() {
             return Object.assign({
                 title     : null,
@@ -64,6 +66,20 @@ export default {
         sortBy: function (key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
+        },
+        cls(cType) {
+            switch (cType) {
+            case 'number':
+            case 'integer':
+            case 'numeric':
+            case 'float':
+                return 'cell-align-right';
+            case 'date':
+            case 'datetime':
+                return '';
+            default:
+                return '';
+            }
         },
 
         setResizeGrips () {

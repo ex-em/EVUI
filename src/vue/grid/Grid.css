@@ -67,3 +67,7 @@ th.active .arrow {
 .row-odd {
     background-color: #e9e9e9;
 }
+
+.cell-align-right {
+    text-align: right;
+}

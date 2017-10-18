@@ -16,9 +16,9 @@
                     height : 500
                 },
                 gridColumns: [
-                    {cId: 'col1', cName: 'column1', cWidth: 300, cVisible: true},
-                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: true},
-                    {cId: 'col3', cName: 'column3', cWidth: 150, cVisible: true}
+                    {cId: 'col1', cName: 'column1', cWidth: 300, cVisible: true, cType: 'string'},
+                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: true, cType: 'number'},
+                    {cId: 'col3', cName: 'column3', cWidth: 150, cVisible: true, cType: 'string'}
                 ],
                 rowData : [
                     ['data1', 100, 'data3'],
