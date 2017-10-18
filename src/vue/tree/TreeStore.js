@@ -102,26 +102,14 @@ export default class TreeStore {
                         }
                     }
                     else {
-                        if(childNode.visible) {
-                            childNode.expanded = false;
-                            childNode.visible = false;
-                        }
-                        else {
-                            childNode.expanded = false;
-                            childNode.visible = false;
-                        }
+                        childNode.expanded = false;
+                        childNode.visible = false;
                     }
                 }
                 else {
                     if(childNode.expanded) {
-                        if(childNode.visible) {
-                            childNode.expanded = true;
-                            childNode.visible = true;
-                        }
-                        else {
-                            childNode.expanded = true;
-                            childNode.visible = true;
-                        }
+                        childNode.expanded = true;
+                        childNode.visible = true;
                     }
                     else {
                         if(childNode.visible) {
