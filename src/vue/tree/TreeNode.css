@@ -19,6 +19,6 @@ td {
     transition: transform .3s ease-in-out;
 }
 
-.evui-tree-node-expand.collapse{
+.evui-tree-node-expand.node-collapse {
     transform: rotate(90deg);
 }

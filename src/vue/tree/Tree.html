@@ -20,10 +20,11 @@
             </thead>
             <tbody>
                 <tree-node
-                        v-for="node in treeNode"
-                        key="node[treeColumnIndex]"
+                        v-for="node in treeMap"
+                        key="node.key"
+                        @node-expand="toggleNodeExpand"
                         :columns="columnOptions"
-                        :node="node">
+                        :nodeObj="node">
                 </tree-node>
             </tbody>
         </table>
