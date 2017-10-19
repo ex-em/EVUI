@@ -11,6 +11,10 @@
         <table>
             <thead>
             <tr>
+                <th v-show="gridOptions.useCheckbox"><input type="checkbox"
+                           @click="toggleSelect"
+                           :checked="selectAll">
+                </th>
                 <th v-for="col in columnOptions"
                     v-show="col.cVisible"
                     @click="sortBy(col.cId)"
@@ -19,13 +23,16 @@
                     :class="{ active: sortKey == col.cId }">
                     {{ col.cName }}
                     <span class="arrow" :class="sortOrders[col.cId] > 0 ? 'asc' : 'dsc'"></span>
-                    <div class="grip"></div>
+                    <div v-show="gridOptions.useReszie" class="grip"></div>
                 </th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(entry, rowIdx) in sortedData" :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+            <tr v-for="(entry, rowIdx) in sortedData"
+                :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+                <td v-show="gridOptions.useCheckbox" class="text-align-center"><input type="checkbox" v-model="selected" @click="checkBoxClick(entry, $event)" :id="entry[0]" :value="rowIdx"></td>
                 <td v-for="(key, colIdx) in entry"
+                    @click="cellClick(key, colIdx, entry, rowIdx, $event)"
                     :class="cls(columnOptions[colIdx].cType)"
                     :style="{display: columnOptions[colIdx].cVisible ? 'table-cell' : 'none'} ">
                     {{ key }}
@@ -33,6 +40,11 @@
             </tr>
             </tbody>
         </table>
+
+        <pre>
+        {{ selected  }}
+        </pre>
+
     </div>
     <div class="evui-grid-footer"></div>
 </div>

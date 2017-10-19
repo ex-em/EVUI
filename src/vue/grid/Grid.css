@@ -4,6 +4,7 @@ table {
     background-color: #fff;
 }
 
+
 th {
     background-color: #42b983;
     color: rgba(255,255,255,0.66);
@@ -12,13 +13,13 @@ th {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    min-width: 120px;
+    min-width: 50px;
     padding: 10px 0px 10px 0px;
     position: relative;
 }
 
 td {
-    min-width: 120px;
+    min-width: 50px;
     padding: 10px 20px;
 }
 
@@ -68,6 +69,14 @@ th.active .arrow {
     background-color: #e9e9e9;
 }
 
-.cell-align-right {
+.text-align-right {
     text-align: right;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+input[type="checkbox"] {
+    cursor:pointer;
 }

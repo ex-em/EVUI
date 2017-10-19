@@ -10,10 +10,27 @@ export default {
             titleStyle: null,
             sortKey: '',
             sortOrders: null,
-            columnType: null
+            columnType: null,
+            selected: []
         };
     },
     computed: {
+
+        selectAll: {
+            get: function() {
+                return this.data ? this.selected.length == this.data.length : false;
+            }
+            // },
+            // set: function(value) {
+            //     let selected = [];
+            //     if (value) {
+            //         this.data.forEach(function(data, idx) {
+            //             selected.push(idx);
+            //         });
+            //     }
+            //     this.selected = selected;
+            // }
+        },
 
         gridOptions() {
             return Object.assign({
@@ -31,7 +48,8 @@ export default {
                     cId : 'def_cId_' + ix,
                     cName : '',
                     cWidth : 50,
-                    cVisible : false
+                    cVisible : false,
+                    cType: ''
                 }, this.columns[ix]);
             }
             return defColumns;
@@ -63,17 +81,41 @@ export default {
         }
     },
     methods: {
+
+        cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
+            alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
+        },
+
+        checkBoxClick: function() {
+
+        },
+
+        toggleSelect: function() {
+            let value = this.selectAll;
+            if (!value) {
+                let selected = [];
+                this.data.forEach(function(data, idx) {
+                    selected.push(idx);
+                });
+                this.selected = selected;
+            } else {
+                this.selected = [];
+            }
+
+        },
+
         sortBy: function (key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
         },
+
         cls(cType) {
             switch (cType) {
             case 'number':
             case 'integer':
             case 'numeric':
             case 'float':
-                return 'cell-align-right';
+                return 'text-align-right';
             case 'date':
             case 'datetime':
                 return '';
