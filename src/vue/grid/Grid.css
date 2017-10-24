@@ -8,11 +8,11 @@ table {
 th {
     background-color: #42b983;
     color: rgba(255,255,255,0.66);
-    cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    cursor: pointer;
     min-width: 50px;
     padding: 10px 0px 10px 0px;
     position: relative;
@@ -32,12 +32,12 @@ th.active .arrow {
 }
 
 .grip {
-    top: 0;
-    right: 0;
-    bottom: 0;
     width: 5px;
-    position: absolute;
+    right:0;
+    top: 0;
+    bottom:0;
     cursor: col-resize;
+    position: absolute;
 }
 
 .arrow {
@@ -76,6 +76,7 @@ th.active .arrow {
 .text-align-center {
     text-align: center;
 }
+
 
 input[type="checkbox"] {
     cursor:pointer;

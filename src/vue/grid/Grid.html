@@ -11,18 +11,21 @@
         <table>
             <thead>
             <tr>
-                <th v-show="gridOptions.useCheckbox"><input type="checkbox"
+                <th v-show="gridOptions.useCheckbox">
+                    <input type="checkbox"
                            @click="toggleSelect"
                            :checked="selectAll">
                 </th>
                 <th v-for="col in columnOptions"
-                    v-show="col.cVisible"
-                    @click="sortBy(col.cId)"
-                    :data-column-name="col.cId"
-                    :width="col.cWidth"
-                    :class="{ active: sortKey == col.cId }">
-                    {{ col.cName }}
-                    <span class="arrow" :class="sortOrders[col.cId] > 0 ? 'asc' : 'dsc'"></span>
+                    v-show="col.visible && col.type != 'checkbox'"
+                    :width="col.width">
+                    <div class="grid-column-sort"
+                         @click="sortBy(col.dataIndex)"
+                         :data-column-name="col.dataIndex"
+                         :class="{ active: sortKey == col.dataIndex }">
+                        {{ col.name }}
+                        <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
+                    </div>
                     <div v-show="gridOptions.useReszie" class="grip"></div>
                 </th>
             </tr>
@@ -30,12 +33,19 @@
             <tbody>
             <tr v-for="(entry, rowIdx) in sortedData"
                 :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                <td v-show="gridOptions.useCheckbox" class="text-align-center"><input type="checkbox" v-model="selected" @click="checkBoxClick(entry, $event)" :id="entry[0]" :value="rowIdx"></td>
-                <td v-for="(key, colIdx) in entry"
-                    @click="cellClick(key, colIdx, entry, rowIdx, $event)"
-                    :class="cls(columnOptions[colIdx].cType)"
-                    :style="{display: columnOptions[colIdx].cVisible ? 'table-cell' : 'none'} ">
-                    {{ key }}
+                <td v-show="gridOptions.useCheckbox"
+                    class="text-align-center">
+                    <input type="checkbox"
+                           v-model="entry.checked"
+                           :id="entry.dataIndex"
+                           :value="entry.dataIndex">
+                           <!--@click="checkBoxClick(entry.dataIndex, $event)"-->
+                </td>
+                <td v-for="(value, key, colIdx) in entry"
+                    @click="cellClick(value, colIdx, entry, rowIdx, $event)"
+                    :class="cls(columnOptions[colIdx].type)"
+                    :style="{display: columnOptions[colIdx].visible && columnOptions[colIdx].type != 'checkbox' ? 'table-cell' : 'none'} ">
+                    {{ value }}
                 </td>
             </tr>
             </tbody>

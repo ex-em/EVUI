@@ -15,21 +15,16 @@ export default {
         };
     },
     computed: {
-
         selectAll: {
-            get: function() {
-                return this.data ? this.selected.length == this.data.length : false;
+            get() {
+                return this.data.every(function(d){
+                    return d.checked;
+                });
+            },
+            set() {
+                this.selected = [];
+
             }
-            // },
-            // set: function(value) {
-            //     let selected = [];
-            //     if (value) {
-            //         this.data.forEach(function(data, idx) {
-            //             selected.push(idx);
-            //         });
-            //     }
-            //     this.selected = selected;
-            // }
         },
 
         gridOptions() {
@@ -45,11 +40,11 @@ export default {
             let defColumns = [];
             for(let ix=0, ixLen=this.columns.length; ix<ixLen; ix++) {
                 defColumns[ix] = Object.assign({
-                    cId : 'def_cId_' + ix,
-                    cName : '',
-                    cWidth : 50,
-                    cVisible : false,
-                    cType: ''
+                    dataIndex : 'def_dataIndex_' + ix,
+                    name : '',
+                    width : 50,
+                    visible : false,
+                    type: ''
                 }, this.columns[ix]);
             }
             return defColumns;
@@ -57,22 +52,14 @@ export default {
 
         sortedData: function () {
             let sortKey = this.sortKey;
-            let sortIndex;
-
-            for(let ix=0, ixLen=this.columnOptions.length; ix<ixLen; ix++) {
-                if(this.columnOptions[ix].cId.indexOf(sortKey) > -1) {
-                    sortIndex = ix;
-                    break;
-                }
-            }
 
             let order = this.sortOrders[sortKey] || 1;
             let sortedData = this.data;
 
             if (sortKey) {
                 sortedData = sortedData.slice().sort(function (a, b) {
-                    a = a[sortIndex];
-                    b = b[sortIndex];
+                    a = a[sortKey];
+                    b = b[sortKey];
                     return (a === b ? 0 : a > b ? 1 : -1) * order;
                 });
             }
@@ -91,17 +78,11 @@ export default {
         },
 
         toggleSelect: function() {
-            let value = this.selectAll;
-            if (!value) {
-                let selected = [];
-                this.data.forEach(function(data, idx) {
-                    selected.push(idx);
-                });
-                this.selected = selected;
-            } else {
-                this.selected = [];
-            }
-
+            let select = this.selectAll;
+            this.data.forEach(function(d) {
+                d.checked = !select;
+            });
+            this.selectAll = !select;
         },
 
         sortBy: function (key) {
@@ -109,8 +90,8 @@ export default {
             this.sortOrders[key] = this.sortOrders[key] * -1;
         },
 
-        cls(cType) {
-            switch (cType) {
+        cls(type) {
+            switch (type) {
             case 'number':
             case 'integer':
             case 'numeric':
@@ -118,6 +99,8 @@ export default {
                 return 'text-align-right';
             case 'date':
             case 'datetime':
+                return '';
+            case 'checkbox' :
                 return '';
             default:
                 return '';
@@ -139,6 +122,7 @@ export default {
             const vm = this;
             vm.thElm = e.target.parentNode;
             vm.startOffset = vm.thElm.offsetWidth - e.pageX;
+            return false;
         },
 
         onMouseMove (e) {
@@ -183,7 +167,7 @@ export default {
 
         let sortOrders = {};
         this.columnOptions.forEach(function (key) {
-            sortOrders[key.cId] = 1;
+            sortOrders[key.dataIndex] = 1;
         });
         this.sortOrders = sortOrders;
     }

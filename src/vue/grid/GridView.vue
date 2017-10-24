@@ -18,19 +18,20 @@
                     useReszie: true
                 },
                 gridColumns: [
-                    {cId: 'col1', cName: 'column1', cWidth: 300, cVisible: true, cType: 'string'},
-                    {cId: 'col2', cName: 'column2', cWidth: 200, cVisible: true, cType: 'number'},
-                    {cId: 'col3', cName: 'column3', cWidth: 150, cVisible: true, cType: 'string'},
-                    {cId: 'col4', cName: 'column4', cWidth: 150, cVisible: true, cType: 'string'},
-                    {cId: 'col5', cName: 'column5', cWidth: 150, cVisible: true, cType: 'string'}
+                    {dataIndex: 'checked', name: 'CheckBox', width: 80, visible: true, type: 'checkbox'},
+                    {dataIndex: 'col1', name: 'column1', width: 300, visible: true, type: 'string'},
+                    {dataIndex: 'col2', name: 'column2', width: 200, visible: true, type: 'number'},
+                    {dataIndex: 'col3', name: 'column3', width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col4', name: 'column4', width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col5', name: 'column5', width: 150, visible: true, type: 'string'}
                 ],
                 rowData : [
-                    ['data1', 100, 'data3', 'aa', 'zz'],
-                    ['data4', 200, 'data1', 'bb', 'xx'],
-                    ['data2', 150, 'data6', 'ff', 'dd'],
-                    ['data7', 300, 'data4', 'cc', 'ss'],
-                    ['data6', 500, 'data5', 'dd', 'yy'],
-                    ['data5', 220, 'data2', 'ee', 'll']
+                    {checked: false, col1: 'data1', col2: 100, col3: 'data3', col4: 'aa', col5:'zz'},
+                    {checked: false, col1: 'data4', col2: 200, col3: 'data1', col4: 'bb', col5:'xx'},
+                    {checked: false, col1: 'data2', col2: 150, col3: 'data6', col4: 'ff', col5:'dd'},
+                    {checked: false, col1: 'data7', col2: 300, col3: 'data4', col4: 'cc', col5:'ss'},
+                    {checked: false, col1: 'data6', col2: 500, col3: 'data5', col4: 'dd', col5:'yy'},
+                    {checked: false, col1: 'data5', col2: 220, col3: 'data2', col4: 'ee', col5:'ll'}
                 ]
             }
         },
