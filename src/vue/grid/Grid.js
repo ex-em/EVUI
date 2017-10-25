@@ -22,7 +22,6 @@ export default {
                 });
             },
             set() {
-                this.selected = [];
 
             }
         },
@@ -74,7 +73,9 @@ export default {
         },
 
         checkBoxClick: function() {
+            const selected = this.selected;
 
+            console.log('checkboxClick ==> ', arguments);
         },
 
         toggleSelect: function() {

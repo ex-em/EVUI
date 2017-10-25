@@ -7,7 +7,8 @@ table {
 
 th {
     background-color: #42b983;
-    color: rgba(255,255,255,0.66);
+    /*color: rgba(255,255,255,0.66);*/
+    color: #FFF;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -23,11 +24,7 @@ td {
     padding: 10px 20px;
 }
 
-th.active {
-    color: #fff;
-}
-
-th.active .arrow {
+.active .arrow {
     opacity: 1;
 }
 
@@ -46,7 +43,7 @@ th.active .arrow {
     width: 0;
     height: 0;
     margin-left: 5px;
-    opacity: 0.66;
+    opacity: 0;
 }
 
 .arrow.asc {

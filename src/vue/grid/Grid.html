@@ -17,7 +17,7 @@
                            :checked="selectAll">
                 </th>
                 <th v-for="col in columnOptions"
-                    v-show="col.visible && col.type != 'checkbox'"
+                    v-show="col.visible"
                     :width="col.width">
                     <div class="grid-column-sort"
                          @click="sortBy(col.dataIndex)"
@@ -36,16 +36,13 @@
                 <td v-show="gridOptions.useCheckbox"
                     class="text-align-center">
                     <input type="checkbox"
-                           v-model="entry.checked"
-                           :id="entry.dataIndex"
-                           :value="entry.dataIndex">
-                           <!--@click="checkBoxClick(entry.dataIndex, $event)"-->
+                           v-model="entry.checked">
                 </td>
-                <td v-for="(value, key, colIdx) in entry"
-                    @click="cellClick(value, colIdx, entry, rowIdx, $event)"
-                    :class="cls(columnOptions[colIdx].type)"
-                    :style="{display: columnOptions[colIdx].visible && columnOptions[colIdx].type != 'checkbox' ? 'table-cell' : 'none'} ">
-                    {{ value }}
+                <td v-for="col in columnOptions"
+                    :class="cls(col.type)"
+                    :style="{display: col.visible ? 'table-cell' : 'none'}"
+                    @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
+                    {{ entry[col.dataIndex] }}
                 </td>
             </tr>
             </tbody>
