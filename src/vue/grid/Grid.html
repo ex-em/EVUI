@@ -1,13 +1,13 @@
 <div class="evui-grid-wrapper"
      :style="gridStyle">
-    <div class="evui-grid-header">
+    <div class="evui-grid-title">
         <span class="title"
               v-show="gridOptions.title"
               :style="titleStyle">
             {{gridOptions.title}}
         </span>
     </div>
-    <div class="evui-grid-body">
+    <div class="evui-grid-header">
         <table>
             <thead>
             <tr>
@@ -26,10 +26,14 @@
                         {{ col.name }}
                         <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
                     </div>
-                    <div v-show="gridOptions.useReszie" class="grip"></div>
+                    <div v-show="gridOptions.useColumnResize" class="grip"></div>
                 </th>
             </tr>
             </thead>
+        </table>
+    </div>
+    <div class="evui-grid-body">
+        <table>
             <tbody>
             <tr v-for="(entry, rowIdx) in sortedData"
                 :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
@@ -39,19 +43,20 @@
                            v-model="entry.checked">
                 </td>
                 <td v-for="col in columnOptions"
+                    class="evui-grid-cell"
                     :class="cls(col.type)"
                     :style="{display: col.visible ? 'table-cell' : 'none'}"
                     @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
+                    <!--:style="{display: col.visible ? 'table-cell' : 'none', width: col.width+'px'}"-->
+                    <!--:width="col.width"-->
                     {{ entry[col.dataIndex] }}
                 </td>
             </tr>
             </tbody>
         </table>
-
         <pre>
         {{ selected  }}
         </pre>
-
     </div>
     <div class="evui-grid-footer"></div>
 </div>
