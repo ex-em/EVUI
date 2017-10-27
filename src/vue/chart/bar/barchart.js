@@ -12,7 +12,8 @@ export default {
         columns: Array,
         width: Number,
         height: Number,
-        data: Array
+        data: Array,
+        stacked: Boolean
     },
     data: function() {
         return {
@@ -20,27 +21,33 @@ export default {
     },
     computed: {
         range() {
-            let min = Infinity, max = -Infinity,
-                stackedMin = Infinity, stackedMax = -Infinity; // 얘를 어쩐다;;
+            let min = Infinity, max = -Infinity;
             this.data.forEach(row => {
-                row.forEach(v => {
-                    min = Math.min(min, v);
-                    max = Math.max(max, v);
-                });
-
-                const rowsum = row.reduce((p, v) => p + v, 0);
-
-                stackedMax = Math.max(stackedMax, rowsum);
-                stackedMin = Math.min(stackedMin, rowsum);
+                if(this.stacked) {
+                    max = Math.max(max, row.filter(v => v>0).reduce((p, v) => p+v, 0));
+                    min = Math.min(min, row.filter(v => v<0).reduce((p, v) => p+v, 0));
+                } else {
+                    row.forEach(v => {
+                        min = Math.min(min, v);
+                        max = Math.max(max, v);
+                    });
+                }
             });
 
             const
                 scale = (this.height-TITLE_HEIGHT-MARGIN_Y*2) / (max - min),
-                blockwidth = (this.width-MARGIN_X*2) / this.data.length,
-                offset = (blockwidth - MARGIN_BETWEEN*2)/this.columns.length;
+                rowGroupWidth = (this.width-MARGIN_X*2) / this.data.length,
+                rowBlockWidth = rowgroupwidth - MARGIN_BETWEEN*2,
+                rowBlockOffset = blockwidth/this.columns.length;
 
-
-            return { max, min, scale, blockwidth, offset };
+            return {
+                max,
+                min,
+                scale,
+                rowGroupWidth,
+                rowBlockWidth,
+                rowBlockOffset
+            };
         },
 
         cols() {
