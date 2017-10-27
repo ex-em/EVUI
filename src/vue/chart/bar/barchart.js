@@ -1,5 +1,11 @@
 import colgroup from 'colgroup.vue';
 
+const
+    MARGIN_X = 32,
+    MARGIN_Y = 20,
+    MARGIN_BETWEEN = 8,
+    TITLE_HEIGHT = 64,
+
 export default {
     props: {
         title: String,
@@ -14,17 +20,27 @@ export default {
     },
     computed: {
         range() {
-            let min = Infinity, max = -Infinity;
-            this.data.forEach(row => row.forEach(v => {
-                min = Math.min(min, v);
-                max = Math.max(max, v);
-            }));
+            let min = Infinity, max = -Infinity,
+                stackedMin = Infinity, stackedMax = -Infinity; // 얘를 어쩐다;;
+            this.data.forEach(row => {
+                row.forEach(v => {
+                    min = Math.min(min, v);
+                    max = Math.max(max, v);
+                });
 
-            return {
-                max: max,
-                min: min,
-                scale: this.height / (max - min)
-            };
+                const rowsum = row.reduce((p, v) => p + v, 0);
+
+                stackedMax = Math.max(stackedMax, rowsum);
+                stackedMin = Math.min(stackedMin, rowsum);
+            });
+
+            const
+                scale = (this.height-TITLE_HEIGHT-MARGIN_Y*2) / (max - min),
+                blockwidth = (this.width-MARGIN_X*2) / this.data.length,
+                offset = (blockwidth - MARGIN_BETWEEN*2)/this.columns.length;
+
+
+            return { max, min, scale, blockwidth, offset };
         },
 
         cols() {
