@@ -119,6 +119,18 @@ export default {
             document.addEventListener('mouseup', this.onMouseUp);
         },
 
+        syncColumnWidths () {
+            const vm = this;
+            const headerCols = Array.from(vm.$el.getElementsByTagName('th'));
+            const widths = headerCols.map((h) => h.width ? h.width : h.clientWidth);
+            // this.columnOptions[1].width = +widths[1];
+            const bodyCols = Array.from(vm.$el.querySelectorAll('tr:first-child>td'))
+            bodyCols.forEach((c, i) => {
+                c.width = widths[i] + 'px';
+            });
+            console.log(this.columnOptions)
+        },
+
         onMouseDown (e) {
             const vm = this;
             vm.thElm = e.target.parentNode;
@@ -131,13 +143,14 @@ export default {
             if (vm.thElm) {
                 // const colName = vm.thElm.getAttribute('data-column-name');
                 const width = vm.startOffset + e.pageX;
-                vm.thElm.width = width + 'px';
+                vm.thElm.width = width;
             }
         },
 
         onMouseUp () {
             const vm = this;
             vm.thElm = undefined;
+            vm.syncColumnWidths();
         },
 
         beforeDestory () {
@@ -153,6 +166,7 @@ export default {
         const vm = this;
         vm.grips = [];
         vm.setResizeGrips();
+        vm.syncColumnWidths();
     },
     created() {
         // set grid default style

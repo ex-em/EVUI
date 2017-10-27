@@ -1,9 +1,16 @@
-table {
+.evui-grid-header table {
     border: 2px solid #42b983;
-    border-radius: 3px;
+    border-bottom: 0px;
+    border-radius: 3px 3px 0px 0px;
     background-color: #fff;
 }
 
+.evui-grid-body table {
+    border: 2px solid #42b983;
+    border-radius: 0px 0px 3px 3px;
+    background-color: #fff;
+    overflow:scroll;
+}
 
 th {
     background-color: #42b983;
@@ -15,13 +22,13 @@ th {
     user-select: none;
     cursor: pointer;
     min-width: 50px;
-    padding: 10px 0px 10px 0px;
+    padding: 5px 0 5px 0;
     position: relative;
 }
 
 td {
     min-width: 50px;
-    padding: 10px 20px;
+    padding: 5px 0 5px 0;
 }
 
 .active .arrow {
@@ -74,6 +81,9 @@ td {
     text-align: center;
 }
 
+.evui-grid-cell {
+    /*padding: 0 25px 0 25px;*/
+}
 
 input[type="checkbox"] {
     cursor:pointer;
