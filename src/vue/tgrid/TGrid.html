@@ -1,0 +1,60 @@
+<div class="evui-grid-wrapper"
+     :style="gridStyle">
+    <div class="evui-grid-header">
+        <span class="title"
+              v-show="gridOptions.title"
+              :style="titleStyle">
+            {{gridOptions.title}}
+        </span>
+    </div>
+    <div class="evui-grid-body">
+        <table :style="{width:gridOptions.width+'px'}">
+            <thead :style="{width:gridOptions.width+'px'}">
+            <tr>
+                <!--<th v-show="gridOptions.useCheckbox">-->
+                    <!--<input type="checkbox"-->
+                           <!--@click="toggleSelect"-->
+                           <!--:checked="selectAll">-->
+                <!--</th>-->
+                <th v-for="col in columnOptions"
+                    v-show="col.visible">
+                    <!--:style="{width:col.width+'px'}">-->
+                    <div class="grid-column-sort"
+                         @click="sortBy(col.dataIndex)"
+                         :data-column-name="col.dataIndex"
+                         :class="{ active: sortKey == col.dataIndex }">
+                        {{ col.name }}
+                        <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
+                    </div>
+                    <div v-show="gridOptions.useColumnResize" class="grip"></div>
+                </th>
+            </tr>
+            </thead>
+            <tbody @scroll="gridBodyScroll"
+                   :style="{width:gridOptions.width+'px'}">
+            <tr v-for="(entry, rowIdx) in sortedData"
+                :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+                <!--<td v-show="gridOptions.useCheckbox"-->
+                    <!--class="text-align-center">-->
+                    <!--<input type="checkbox"-->
+                           <!--v-model="entry.checked">-->
+                <!--</td>-->
+                <td v-for="col in columnOptions"
+                    :style="{display: col.visible ? 'table-cell' : 'none'}">
+                    <div class="evui-grid-cell"
+                         :class="cls(col.type)"
+                         @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
+                        {{ entry[col.dataIndex] }}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <pre>
+        {{ selected  }}
+        </pre>
+
+    </div>
+    <div class="evui-grid-footer"></div>
+</div>

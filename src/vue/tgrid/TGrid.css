@@ -1,0 +1,131 @@
+.evui-grid-header {
+
+}
+
+.evui-grid-body {
+
+}
+
+.evui-grid-body table {
+    border: 2px solid #42b983;
+    border-radius: 3px;
+    background-color: #fff;
+}
+
+th {
+    background-color: #42b983;
+    /*color: rgba(255,255,255,0.66);*/
+    color: #FFF;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+}
+
+table {
+    /*overflow-x: auto;*/
+    /*display:block;*/
+    /*width: 700px;*/
+    position:relative;
+    background-color:#aaa;
+    overflow:hidden;
+    border-collapse: collapse;
+}
+
+thead {
+    position: relative;
+    display:block;
+    /*width: 700px;*/
+    overflow: visible;
+}
+
+thead th {
+    background-color:#99a;
+    min-width: 120px;
+    height:35px;
+    border: 1px solid #222;
+}
+
+thead, tbody {
+    /*display:block;*/
+}
+
+tbody {
+    /*overflow-y: auto;*/
+    /*overflow-x: hidden;*/
+    position:relative;
+    display:block;
+    overflow:auto;
+    /*width: 700px;*/
+    height: 300px;
+}
+
+tbody td {
+    min-width: 120px;
+    /*padding: 5px 0 5px 0;*/
+    background-color:#bbc;
+    border:1px solid #222;
+    /*overflow: hidden;*/
+}
+
+
+.active .arrow {
+    opacity: 1;
+}
+
+.grip {
+    width: 5px;
+    right:0;
+    top: 0;
+    bottom:0;
+    cursor: col-resize;
+    /*position: absolute;*/
+    /*display: inline-block;*/
+}
+
+.arrow {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    opacity: 0;
+}
+
+.arrow.asc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #fff;
+}
+
+.row-even {
+    background-color: #ffffff;
+}
+
+.row-odd {
+    background-color: #e9e9e9;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.evui-grid-cell {
+    /*padding: 0 5px 0 5px;*/
+}
+
+input[type="checkbox"] {
+    cursor:pointer;
+}
