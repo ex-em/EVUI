@@ -18,9 +18,9 @@
                 <!--</th>-->
                 <th v-for="col in columnOptions"
                     v-show="col.visible">
-                    <!--:style="{width:col.width+'px'}">-->
                     <div class="grid-column-sort"
                          @click="sortBy(col.dataIndex)"
+                         :style="{width:col.width+'px'}"
                          :data-column-name="col.dataIndex"
                          :class="{ active: sortKey == col.dataIndex }">
                         {{ col.name }}
@@ -31,7 +31,7 @@
             </tr>
             </thead>
             <tbody @scroll="gridBodyScroll"
-                   :style="{width:gridOptions.width+'px'}">
+                   :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
             <tr v-for="(entry, rowIdx) in sortedData"
                 :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
                 <!--<td v-show="gridOptions.useCheckbox"-->
@@ -43,6 +43,7 @@
                     :style="{display: col.visible ? 'table-cell' : 'none'}">
                     <div class="evui-grid-cell"
                          :class="cls(col.type)"
+                         :style="{width:col.width+'px'}"
                          @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
                         {{ entry[col.dataIndex] }}
                     </div>

@@ -43,7 +43,7 @@ thead {
 
 thead th {
     background-color:#99a;
-    min-width: 120px;
+    min-width: 50px;
     height:35px;
     border: 1px solid #222;
 }
@@ -53,17 +53,14 @@ thead, tbody {
 }
 
 tbody {
-    /*overflow-y: auto;*/
-    /*overflow-x: hidden;*/
     position:relative;
     display:block;
     overflow:auto;
-    /*width: 700px;*/
-    height: 300px;
+
 }
 
 tbody td {
-    min-width: 120px;
+    min-width: 50px;
     /*padding: 5px 0 5px 0;*/
     background-color:#bbc;
     border:1px solid #222;
