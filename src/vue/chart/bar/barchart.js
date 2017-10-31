@@ -1,10 +1,10 @@
-import colgroup from 'colgroup.vue';
+import ColumnGroup from './colgroup.vue';
 
 const
     MARGIN_X = 32,
     MARGIN_Y = 20,
     MARGIN_BETWEEN = 8,
-    TITLE_HEIGHT = 64,
+    TITLE_HEIGHT = 64;
 
 export default {
     props: {
@@ -16,6 +16,7 @@ export default {
     },
     data: function() {
         return {
+            rowGroup: null
         };
     },
     computed: {
@@ -39,7 +40,6 @@ export default {
                 blockwidth = (this.width-MARGIN_X*2) / this.data.length,
                 offset = (blockwidth - MARGIN_BETWEEN*2)/this.columns.length;
 
-
             return { max, min, scale, blockwidth, offset };
         },
 
@@ -48,10 +48,14 @@ export default {
         }
     },
     methods: {
+        renderChart (chartData, options) {
+            console.log("render data => ", chartData)
+            console.log("render options =>", options)
+        },
     },
     created: function() {
     },
     components: {
-        colgroup
+        ColumnGroup
     }
 } ;
