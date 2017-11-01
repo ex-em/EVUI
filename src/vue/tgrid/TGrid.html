@@ -8,18 +8,14 @@
         </span>
     </div>
     <div class="evui-grid-body">
-        <table :style="{width:gridOptions.width+'px'}">
+        <table ref="gridTable" :style="{width:gridOptions.width+'px'}">
             <thead :style="{width:gridOptions.width+'px'}">
             <tr>
-                <!--<th v-show="gridOptions.useCheckbox">-->
-                    <!--<input type="checkbox"-->
-                           <!--@click="toggleSelect"-->
-                           <!--:checked="selectAll">-->
-                <!--</th>-->
                 <th v-for="col in columnOptions"
                     v-show="col.visible">
                     <div class="grid-column-sort"
                          @click="sortBy(col.dataIndex)"
+                         :draggable="col.draggable"
                          :style="{width:col.width+'px'}"
                          :data-column-name="col.dataIndex"
                          :class="{ active: sortKey == col.dataIndex }">
@@ -32,30 +28,21 @@
             </thead>
             <tbody @scroll="gridBodyScroll"
                    :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
-            <tr v-for="(entry, rowIdx) in sortedData"
-                :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                <!--<td v-show="gridOptions.useCheckbox"-->
-                    <!--class="text-align-center">-->
-                    <!--<input type="checkbox"-->
-                           <!--v-model="entry.checked">-->
-                <!--</td>-->
-                <td v-for="col in columnOptions"
-                    :style="{display: col.visible ? 'table-cell' : 'none'}">
-                    <div class="evui-grid-cell"
-                         :class="cls(col.type)"
-                         :style="{width:col.width+'px'}"
-                         @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
-                        {{ entry[col.dataIndex] }}
-                    </div>
-                </td>
-            </tr>
+                <tr v-for="(entry, rowIdx) in sortedData"
+                    :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+                    <td v-for="col in columnOptions"
+                        :style="{display: col.visible ? 'table-cell' : 'none'}">
+                        <div class="evui-grid-cell"
+                             :class="cls(col.type)"
+                             :style="{width:col.width+'px'}"
+                             @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
+                            {{ entry[col.dataIndex] }}
+                        </div>
+                    </td>
+                </tr>
             </tbody>
+            <div ref="dragLine" class="grid-drag-line"></div>
         </table>
-
-        <pre>
-        {{ selected  }}
-        </pre>
-
     </div>
     <div class="evui-grid-footer"></div>
 </div>

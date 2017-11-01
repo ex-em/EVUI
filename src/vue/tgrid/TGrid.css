@@ -126,3 +126,11 @@ tbody td {
 input[type="checkbox"] {
     cursor:pointer;
 }
+
+.grid-drag-line {
+    position: fixed;
+    display: none;
+    z-index: 3;
+    width: 3px;
+    background-color: rgba(51, 122, 183, 0.5);
+}

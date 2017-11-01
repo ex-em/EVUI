@@ -12,7 +12,9 @@ export default {
             sortOrders: null,
             columnType: null,
             gridWidth: 0,
-            selected: []
+            selected: [],
+            dragTargetPos:null,
+            dragTarget : null
         };
     },
     computed: {
@@ -37,18 +39,29 @@ export default {
             }, this.gridInfo);
         },
 
-        columnOptions() {
-            let defColumns = [];
-            for(let ix=0, ixLen=this.columns.length; ix<ixLen; ix++) {
-                defColumns[ix] = Object.assign({
-                    dataIndex : 'def_dataIndex_' + ix,
-                    name : '',
-                    width : 50,
-                    visible : false,
-                    type: ''
-                }, this.columns[ix]);
+        columnOptions:{
+            get() {
+                let defColumns = [];
+                for (let ix = 0, ixLen = this.columns.length; ix < ixLen; ix++) {
+                    defColumns[ix] = Object.assign({
+                        dataIndex: 'def_dataIndex_' + ix,
+                        name: '',
+                        width: 50,
+                        visible: false,
+                        draggable: false,
+                        type: ''
+                    }, this.columns[ix]);
+                }
+                return defColumns;
+            },
+            set(data) {
+                
+                //드래그 드랍 이벤트 값변경시 탑니다
+                if(data.type === 'drag') {
+                    this.columns.splice(data.dragIdx, 1);
+                    this.columns.splice(data.dropIdx, 0, data.targetCol);
+                }
             }
-            return defColumns;
         },
 
         gridTotalWidth() {
@@ -80,7 +93,7 @@ export default {
     methods: {
 
         cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
-            alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
+            // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
         },
 
         checkBoxClick: function() {
@@ -171,21 +184,136 @@ export default {
             vm.syncColumnWidths();
         },
 
-        beforeDestory () {
+
+        /**
+         * 드래그 이벤트 세팅
+         */
+        setDragColumnEvent() {
+            var columns = document.querySelectorAll('.grid-column-sort');
             const vm = this;
-            vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
-            document.removeEventListener('mousemove', vm.onMouseMove);
-            document.removeEventListener('mouseup', vm.onMouseUp);
+
+            for(let ix=0, ixLen=columns.length; ix<ixLen; ix++){
+
+                columns[ix].addEventListener('dragstart', handleDragStart, false);
+
+                columns[ix].addEventListener('dragenter', handleDragEnter, false);
+                columns[ix].addEventListener('dragover', handleDragOver, false);
+                columns[ix].addEventListener('drop', handleDragDrop, false);
+                columns[ix].addEventListener('dragend', handleDragEnd, false);
+                // columns[ix].addEventListener('dragleave', handleDragLeave, false);
+
+            }
+
+
+            //드래그 시작시
+            function handleDragStart(e) {
+                this.style.opacity = '0.4';
+                this.classList.add('dragItem')
+
+                vm.dragTargetPos = this.parentElement.getBoundingClientRect();
+                vm.dragTarget = this;
+            }
+
+            //드래그가 타겟 엔터시
+            function handleDragEnter(e) {
+
+                const targetEl = e.target;
+
+                if(this.classList.contains('grid-column-sort') && !this.classList.contains('dragItem')){
+                    let targetPos = this.parentElement.getBoundingClientRect();
+                    let dragX = (targetPos.left) + 'px';
+                    let dragY = (targetPos.top) + 'px';
+
+                    //드래그 타겟보다 오른쪽컬럼들
+                    if(vm.dragTargetPos.left < targetPos.left){
+                        dragX = (targetPos.right) + 'px';
+                    }
+
+                    vm.$refs.dragLine.style.top = dragY;
+                    vm.$refs.dragLine.style.left =  dragX;
+
+                    vm.$refs.dragLine.style.display = 'block';
+
+
+
+                }
+            }
+
+            //드래그후 오버시
+            function handleDragOver(e) {
+                if (e.preventDefault) {
+                    e.preventDefault(); // Necessary. Allows us to drop.
+                }
+                e.dataTransfer.dropEffect= "move"
+
+                return false;
+            }
+
+            //드랍시
+            function handleDragDrop(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation(); // stops the browser from redirecting.
+                }
+                let dragIdx = vm.dragTarget.parentElement.cellIndex;
+                let dropIdx = this.parentElement.cellIndex;
+
+                if(vm.gridOptions.useCheckbox){
+                    dragIdx -= 1;
+                    dropIdx -= 1;
+                }
+
+                let targetCol = vm.columnOptions[dragIdx]
+                let data ={
+                    type: 'drag',
+                    dropIdx :dropIdx,
+                    dragIdx :dragIdx,
+                    targetCol : targetCol
+                };
+
+
+                vm.columnOptions = data
+
+
+
+
+                return false;
+
+            }
+
+            //드래그 드랍 이벤트 끝날때
+            function handleDragEnd(e) {
+                vm.dragTarget.classList.remove('dragItem');
+                vm.dragTarget.style.opacity = null;
+                vm.$refs.dragLine.style.display = 'none';
+                vm.dragTarget = null;
+                vm.dragTargetPos = null;
+            }
+
+            //드래그 타겟 떠날시
+            //차후 삭제 예정
+            function handleDragLeave(e) {
+            }
+
+
         }
 
     },
 
     mounted() {
-        const vm = this;
-        vm.grips = [];
-        vm.setResizeGrips();
-        vm.syncColumnWidths();
+        // const vm = this;
+        // vm.grips = [];
+        // vm.setResizeGrips();
+        // vm.syncColumnWidths();
+
+        //컬럼 드래그 선 높이 설정
+        // debugger;
+
+        this.$refs.dragLine.style.height = this.$refs.gridTable.clientHeight + 'px';
+
+        //Drag Column Event setting
+        this.setDragColumnEvent();
     },
+
     created() {
         // set grid default style
         this.gridStyle = {
@@ -203,5 +331,12 @@ export default {
             sortOrders[key.dataIndex] = 1;
         });
         this.sortOrders = sortOrders;
+    },
+
+    beforeDestory () {
+        const vm = this;
+        vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
+        document.removeEventListener('mousemove', vm.onMouseMove);
+        document.removeEventListener('mouseup', vm.onMouseUp);
     }
 };
