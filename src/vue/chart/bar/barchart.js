@@ -1,4 +1,4 @@
-import colgroup from 'colgroup.vue';
+import rowgroup from 'rowgroup.vue';
 
 const
     MARGIN_X = 32,
@@ -26,18 +26,16 @@ export default {
                 if(this.stacked) {
                     max = Math.max(max, row.filter(v => v>0).reduce((p, v) => p+v, 0));
                     min = Math.min(min, row.filter(v => v<0).reduce((p, v) => p+v, 0));
-                } else {
-                    row.forEach(v => {
-                        min = Math.min(min, v);
-                        max = Math.max(max, v);
-                    });
-                }
+                } else row.forEach(v => {
+                    min = Math.min(min, v);
+                    max = Math.max(max, v);
+                });
             });
 
             const
                 scale = (this.height-TITLE_HEIGHT-MARGIN_Y*2) / (max - min),
                 rowGroupWidth = (this.width-MARGIN_X*2) / this.data.length,
-                rowBlockWidth = rowgroupwidth - MARGIN_BETWEEN*2,
+                rowBlockWidth = rowGroupWidth - MARGIN_BETWEEN*2,
                 rowBlockOffset = blockwidth/this.columns.length;
 
             return {
@@ -61,4 +59,4 @@ export default {
     components: {
         colgroup
     }
-} ;
+};
