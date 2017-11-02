@@ -1,12 +1,10 @@
-import rowgroup from 'rowgroup.vue';
+import Chart from '../chart.vue';
+import CONST from '../common/const.vue';
 
-const
-    MARGIN_X = 32,
-    MARGIN_Y = 20,
-    MARGIN_BETWEEN = 8,
-    TITLE_HEIGHT = 64,
+import ColumnGroup from 'colgroup.vue';
 
 export default {
+    extends: Chart,
     props: {
         title: String,
         columns: Array,
@@ -20,7 +18,7 @@ export default {
         };
     },
     computed: {
-        range() {
+        scale() {
             let min = Infinity, max = -Infinity;
             this.data.forEach(row => {
                 if(this.stacked) {
@@ -32,16 +30,16 @@ export default {
                 });
             });
 
+            return (this.height-CONST.TITLE_HEIGHT-CONST.MARGIN_Y*2) / (max - min);
+        },
+
+        geometry() {
             const
-                scale = (this.height-TITLE_HEIGHT-MARGIN_Y*2) / (max - min),
-                rowGroupWidth = (this.width-MARGIN_X*2) / this.data.length,
-                rowBlockWidth = rowGroupWidth - MARGIN_BETWEEN*2,
-                rowBlockOffset = blockwidth/this.columns.length;
+                rowGroupWidth = (this.width-CONST.MARGIN_X*2) / this.data.length,
+                rowBlockWidth = rowGroupWidth - CONST.MARGIN_BETWEEN*2,
+                rowBlockOffset = rowBlockWidth/this.columns.length;
 
             return {
-                max,
-                min,
-                scale,
                 rowGroupWidth,
                 rowBlockWidth,
                 rowBlockOffset
@@ -57,6 +55,6 @@ export default {
     created: function() {
     },
     components: {
-        colgroup
+        ColumnGroup
     }
-};
+ };
