@@ -14,7 +14,11 @@ export default {
             gridWidth: 0,
             selected: [],
             dragTargetPos:null,
-            dragTarget : null
+            dragTarget : null,
+            filterCol : {},
+            beforeFilterCol: null,
+            beforeFilterList :null,
+            filterList : this.data
         };
     },
     computed: {
@@ -59,7 +63,7 @@ export default {
                 return defColumns;
             },
             set(data) {
-                
+
                 //드래그 드랍 이벤트 값변경시 탑니다
                 if(data.type === 'drag') {
                     this.columns.splice(data.dragIdx, 1);
@@ -88,6 +92,7 @@ export default {
             let order = this.sortOrders[sortKey] || 1;
             let sortedData = this.data;
 
+
             if (sortKey) {
                 sortedData = sortedData.slice().sort(function (a, b) {
                     a = a[sortKey];
@@ -96,7 +101,68 @@ export default {
                 });
             }
 
+
             return sortedData;
+        },
+
+        filteredData: {
+            get() {
+                return this.filterList;
+            },
+            set(filterData) {
+                console.log("FSDFS", this.filterList)
+                console.log("filterData", filterData)
+                let filteredTemp
+
+                //입력 필터 컬럼 비교
+                if(this.beforeFilterCol!== filterData.colIndex){
+                    this.beforeFilterCol = filterData.colIndex;
+                    let result = this.data.slice();
+
+                    for(let col in this.filterCol){
+                        if(this.filterCol[col]!==undefined && col!==filterData.colIndex){
+
+                            result = result.filter((data) =>{
+                                return data[col].toString().indexOf(this.filterCol[col]) >= 0
+                            })
+                        }
+                    }
+
+
+                    this.beforeFilterList = result;
+                    // this.filterList = result;
+
+                }else{
+
+                }
+
+                this.filterList = this.beforeFilterList.filter((data) => {
+                    console.log('1111', filterData.colIndex)
+                    return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                });
+
+
+                // for(let item in this.filterCol){
+                //     console.log('2222',item)
+                //     if(this.filterCol[item] !== undefined){
+                //
+                //     }
+                // }
+
+                //기존 필터 걸려있는지 확인후 분기
+                // if(this.filterList.length === this.data.length) {
+                //     this.filterList = this.data.filter((data) => {
+                //         console.log('0000', filterData.colIndex)
+                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                //     })
+                // }else {
+                //     this.filterList = this.data.filter((data) => {
+                //         console.log('1111', filterData.colIndex)
+                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                //     })
+                // }
+                console.log(this.filterList)
+            }
         }
     },
     methods: {
@@ -164,6 +230,7 @@ export default {
                 if (e.preventDefault) {
                     e.preventDefault(); //
                 }
+                vm.$emit('test', 323232)
                 console.log('마우스 다운 이벤트',e)
                 thElm = e.target.parentNode;
                 startOffset = thElm.offsetWidth - e.pageX;
@@ -198,7 +265,7 @@ export default {
          * 드래그앤드랩 컬럼 이벤트 세팅
          */
         setDragColumnEvent() {
-            var columns = document.querySelectorAll('.grid-column-sort');
+            var columns = this.$el.querySelectorAll('.grid-column-sort');
             const vm = this;
 
             for(let ix=0, ixLen=columns.length; ix<ixLen; ix++){
@@ -303,6 +370,35 @@ export default {
             }
 
 
+        },
+
+        /**
+         * 필터 input 이벤트
+         * @param data : col (컬럼 정보)
+         * @param e (input 이벤트)
+         */
+        filterGrid(data,e) {
+            let colIndex = data.dataIndex;
+            let value = e.target.value;
+            console.log('@@@@',data)
+            // console.log('@@@@',e.target)
+            console.log("#####",e.target.value)
+
+            if(value ===''){
+                this.filterCol[colIndex] = undefined;
+            }else{
+                this.filterCol[colIndex] = value;
+            }
+
+            this.filteredData = {
+                colIndex: colIndex,
+                value : value
+            };
+
+            // this.data[0].col1 = 222
+            // for(let ix=)
+
+
         }
 
     },
@@ -314,6 +410,8 @@ export default {
         // vm.syncColumnWidths();
 
         console.log(this.gridOptions.useColumnResize)
+
+
         //Resize Column Event setting
         if(this.gridOptions.useColumnResize) {
             this.setResizeColumnEvent();
@@ -342,12 +440,12 @@ export default {
             sortOrders[key.dataIndex] = 1;
         });
         this.sortOrders = sortOrders;
-    },
 
-    beforeDestory () {
-        const vm = this;
-        vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
-        document.removeEventListener('mousemove', vm.onMouseMove);
-        document.removeEventListener('mouseup', vm.onMouseUp);
+        //filter 컬럼 객체 생성(추후 조건문 추가)
+        for(let ix=0, ixLen=this.columns.length; ix<ixLen ;ix++){
+            this.filterCol[this.columns[ix].dataIndex] = undefined;
+        }
+
+
     }
 };
