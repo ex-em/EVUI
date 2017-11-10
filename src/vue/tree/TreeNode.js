@@ -1,12 +1,8 @@
 export default {
-    props : {
-        columns: Array,
-        nodeObj: Object
-    },
-    data: function() {
-        return {
-            tree : null,
-        };
+    props: {
+        columns   : Array,
+        nodeObj   : Object,
+        treeColumn: String
     },
     computed: {
         node() {
@@ -19,16 +15,8 @@ export default {
                 return;
             }
 
-            if(this.node.expanded) {
-                this.node.expanded = false;
-                this.$emit('node-expand', this.node.key, 'collapse');
-            }
-            else {
-                this.node.expanded = true;
-                this.$emit('node-expand', this.node.key, 'expand');
-            }
-
-
+            let expandMode = !this.node.expanded;
+            this.$emit('node-expand', this.node, expandMode);
         }
     }
 };

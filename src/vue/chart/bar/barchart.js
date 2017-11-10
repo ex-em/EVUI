@@ -1,46 +1,49 @@
-import ColumnGroup from './colgroup.vue';
+import Chart from '../chart.vue';
+import CONST from '../common/const.vue';
 
-const
-    MARGIN_X = 32,
-    MARGIN_Y = 20,
-    MARGIN_BETWEEN = 8,
-    TITLE_HEIGHT = 64;
+import ColumnGroup from 'colgroup.vue';
 
 export default {
+    extends: Chart,
     props: {
         title: String,
         columns: Array,
         width: Number,
         height: Number,
-        data: Array
+        data: Array,
+        stacked: Boolean
     },
     data: function() {
         return {
-            rowGroup: null
         };
     },
     computed: {
-        range() {
-            let min = Infinity, max = -Infinity,
-                stackedMin = Infinity, stackedMax = -Infinity; // 얘를 어쩐다;;
+        scale() {
+            let min = Infinity, max = -Infinity;
             this.data.forEach(row => {
-                row.forEach(v => {
+                if(this.stacked) {
+                    max = Math.max(max, row.filter(v => v>0).reduce((p, v) => p+v, 0));
+                    min = Math.min(min, row.filter(v => v<0).reduce((p, v) => p+v, 0));
+                } else row.forEach(v => {
                     min = Math.min(min, v);
                     max = Math.max(max, v);
                 });
-
-                const rowsum = row.reduce((p, v) => p + v, 0);
-
-                stackedMax = Math.max(stackedMax, rowsum);
-                stackedMin = Math.min(stackedMin, rowsum);
             });
 
-            const
-                scale = (this.height-TITLE_HEIGHT-MARGIN_Y*2) / (max - min),
-                blockwidth = (this.width-MARGIN_X*2) / this.data.length,
-                offset = (blockwidth - MARGIN_BETWEEN*2)/this.columns.length;
+            return (this.height-CONST.TITLE_HEIGHT-CONST.MARGIN_Y*2) / (max - min);
+        },
 
-            return { max, min, scale, blockwidth, offset };
+        geometry() {
+            const
+                rowGroupWidth = (this.width-CONST.MARGIN_X*2) / this.data.length,
+                rowBlockWidth = rowGroupWidth - CONST.MARGIN_BETWEEN*2,
+                rowBlockOffset = rowBlockWidth/this.columns.length;
+
+            return {
+                rowGroupWidth,
+                rowBlockWidth,
+                rowBlockOffset
+            };
         },
 
         cols() {
@@ -48,14 +51,10 @@ export default {
         }
     },
     methods: {
-        renderChart (chartData, options) {
-            console.log("render data => ", chartData)
-            console.log("render options =>", options)
-        },
     },
     created: function() {
     },
     components: {
         ColumnGroup
     }
-} ;
+ };

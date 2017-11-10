@@ -13,7 +13,7 @@
             let tempData = [];
 
             for (let ix = 0; ix < 5000; ix++) {
-                tempData.push({checked: false, col2: ix+1,  col4: 'aa', col1: 'data'+(ix+1), col3: 'data_'+(ix+1), col5:'zz'});
+                tempData.push({checked: false, col2: ix+1,  col4: 'aa', col1: 'data'+(ix+1), col3: 'data_'+(ix+1), col5:'zz', col6:'66', col7:'77', col8:'88'});
             }
 
             return {

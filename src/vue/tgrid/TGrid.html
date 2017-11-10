@@ -22,7 +22,13 @@
                         {{ col.name }}
                         <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
                     </div>
+                    <span class="filter-icon">
+
+                    </span>
                     <div v-show="gridOptions.useColumnResize" class="grip"></div>
+                    <div class='filter-popover'>
+                        <input type='text' class='filter-input' @input="filterGrid(col,$event)">
+                    </div>
                 </th>
             </tr>
             </thead>
@@ -46,8 +52,5 @@
             <div ref="dragLine" class="grid-drag-line"></div>
         </table>
     </div>
-
-    <div id="debugInfo"></div>
-
     <div class="evui-grid-footer"></div>
 </div>
