@@ -1,62 +1,49 @@
 <div class="evui-grid-wrapper"
      :style="gridStyle">
-    <div class="evui-grid-title">
+    <div class="evui-grid-header">
         <span class="title"
               v-show="gridOptions.title"
               :style="titleStyle">
             {{gridOptions.title}}
         </span>
     </div>
-    <div class="evui-grid-header">
-        <table>
-            <thead>
+    <div class="evui-grid-body">
+        <table ref="gridTable" :style="{width:gridOptions.width+'px'}">
+            <thead :style="{width:gridOptions.width+'px'}">
             <tr>
-                <th v-show="gridOptions.useCheckbox">
-                    <input type="checkbox"
-                           @click="toggleSelect"
-                           :checked="selectAll">
-                </th>
-                <th v-for="col in columnOptions"
-                    v-show="col.visible"
-                    :width="col.width">
-                    <div class="grid-column-sort"
-                         @click="sortBy(col.dataIndex)"
-                         :data-column-name="col.dataIndex"
-                         :class="{ active: sortKey == col.dataIndex }">
-                        {{ col.name }}
-                        <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
-                    </div>
-                    <div v-show="gridOptions.useColumnResize" class="grip"></div>
-                </th>
+                <header-cell v-for="col in columnOptions"
+                             :dataIndex         ="col.dataIndex"
+                             :sortKey           ="sortKey"
+                             :width             ="col.width"
+                             :text              ="col.name"
+                             :render            ="col.render"
+                             :draggable         ="col.draggable"
+                             :value             ="isAllChecked"
+                             @cellClick         ="onHeaderCellClick"
+                             @allCheckChange    ="onAllCheckChange"
+                ></header-cell>
             </tr>
             </thead>
-        </table>
-    </div>
-    <div class="evui-grid-body">
-        <table>
-            <tbody>
-            <tr v-for="(entry, rowIdx) in sortedData"
+            <tbody @scroll="gridBodyScroll"
+                   :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
+                <tr id="evui_grid_row_top"><td colspan="200"></td></tr>
+                <tr v-for="(entry, rowIdx) in bufferedData"
                 :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                <td v-show="gridOptions.useCheckbox"
-                    class="text-align-center">
-                    <input type="checkbox"
-                           v-model="entry.checked">
-                </td>
-                <td v-for="col in columnOptions"
-                    class="evui-grid-cell"
-                    :class="cls(col.type)"
-                    :style="{display: col.visible ? 'table-cell' : 'none'}"
-                    @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
-                    <!--:style="{display: col.visible ? 'table-cell' : 'none', width: col.width+'px'}"-->
-                    <!--:width="col.width"-->
-                    {{ entry[col.dataIndex] }}
-                </td>
-            </tr>
+                    <cell v-for         = "col in columnOptions"
+                          :dataIndex    = "col.dataIndex"
+                          :width        = "col.width"
+                          :visible      = "col.visible"
+                          :render       = "col.render"
+                          :class        = "cls(col.type)"
+                          :value        = "entry[col.dataIndex]"
+                          @checkChange  ="onCheckChange"
+                    ></cell>
+                </tr>
+                <tr id="evui_grid_row_bottom"><td colspan="200"></td></tr>
             </tbody>
+            <div ref="dragLine" class="grid-drag-line"></div>
         </table>
-        <pre>
-        {{ selected  }}
-        </pre>
     </div>
+    <div id="debugInfo"></div>
     <div class="evui-grid-footer"></div>
 </div>

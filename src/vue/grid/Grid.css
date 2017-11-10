@@ -1,15 +1,15 @@
-.evui-grid-header table {
-    border: 2px solid #42b983;
-    border-bottom: 0px;
-    border-radius: 3px 3px 0px 0px;
-    background-color: #fff;
+.evui-grid-header {
+
+}
+
+.evui-grid-body {
+
 }
 
 .evui-grid-body table {
     border: 2px solid #42b983;
-    border-radius: 0px 0px 3px 3px;
+    border-radius: 3px;
     background-color: #fff;
-    overflow:scroll;
 }
 
 th {
@@ -21,48 +21,54 @@ th {
     -ms-user-select: none;
     user-select: none;
     cursor: pointer;
-    min-width: 50px;
-    padding: 5px 0 5px 0;
     position: relative;
 }
 
-td {
+table {
+    /*overflow-x: auto;*/
+    /*display:block;*/
+    /*width: 700px;*/
+    border-spacing: 0px;
+    position:relative;
+    background-color:#42b983;
+    overflow:hidden;
+    border-collapse: collapse;
+}
+
+thead {
+    position: relative;
+    display:block;
+    /*width: 700px;*/
+    overflow: visible;
+}
+
+thead th {
+    background-color:#99a;
     min-width: 50px;
-    padding: 5px 0 5px 0;
+    height:35px;
+    border: 1px solid #222;
+    padding: 0px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-.active .arrow {
-    opacity: 1;
+thead, tbody {
+    /*display:block;*/
 }
 
-.grip {
-    width: 5px;
-    right:0;
-    top: 0;
-    bottom:0;
-    cursor: col-resize;
-    position: absolute;
+tbody {
+    position:relative;
+    display:block;
+    overflow:auto;
+
 }
 
-.arrow {
-    display: inline-block;
-    vertical-align: middle;
-    width: 0;
-    height: 0;
-    margin-left: 5px;
-    opacity: 0;
-}
-
-.arrow.asc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid #fff;
-}
-
-.arrow.dsc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid #fff;
+tbody td {
+    min-width: 50px;
+    border-left:1px solid #222;
+    border-right:1px solid #222;
+    padding: 0px;
 }
 
 .row-even {
@@ -82,9 +88,29 @@ td {
 }
 
 .evui-grid-cell {
-    /*padding: 0 25px 0 25px;*/
+    border-spacing: 0;
+    padding: 0 2px 0 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 input[type="checkbox"] {
     cursor:pointer;
+}
+
+#evui_grid_row_top > td, #evui_grid_row_bottom > td{
+    padding:0px;
+    border:0px;
+}
+
+.grid-drag-line {
+    position: fixed;
+    display: none;
+    z-index: 3;
+    width: 3px;
+    background-color: rgba(51, 122, 183, 0.5);
 }
