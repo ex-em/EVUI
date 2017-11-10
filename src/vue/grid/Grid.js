@@ -21,7 +21,7 @@ export default {
                     return d.checked;
                 });
             },
-            set() {
+            set(v) {
 
             }
         },

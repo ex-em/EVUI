@@ -1,7 +1,8 @@
 import Chart from '../chart.vue';
-import CONST from '../common/const.vue';
+import CONST from '../common/const.js';
 
-import ColumnGroup from 'colgroup.vue';
+import RowGroup from './rowgroup.vue';
+//import ColumnGroup from './colgroup.vue';
 
 export default {
     extends: Chart,
@@ -14,38 +15,18 @@ export default {
         stacked: Boolean
     },
     data: function() {
-        return {
-        };
-    },
+        return {};
+    }, 
     computed: {
-        scale() {
-            let min = Infinity, max = -Infinity;
-            this.data.forEach(row => {
-                if(this.stacked) {
-                    max = Math.max(max, row.filter(v => v>0).reduce((p, v) => p+v, 0));
-                    min = Math.min(min, row.filter(v => v<0).reduce((p, v) => p+v, 0));
-                } else row.forEach(v => {
-                    min = Math.min(min, v);
-                    max = Math.max(max, v);
-                });
-            });
-
-            return (this.height-CONST.TITLE_HEIGHT-CONST.MARGIN_Y*2) / (max - min);
+        rowGroupWidth() {
+            return (this.width-CONST.MARGIN_X*2)/this.data.length;
         },
-
-        geometry() {
-            const
-                rowGroupWidth = (this.width-CONST.MARGIN_X*2) / this.data.length,
-                rowBlockWidth = rowGroupWidth - CONST.MARGIN_BETWEEN*2,
-                rowBlockOffset = rowBlockWidth/this.columns.length;
-
-            return {
-                rowGroupWidth,
-                rowBlockWidth,
-                rowBlockOffset
-            };
+        rowBlockWidth() {
+            return this.rowGroupWidth - CONST.MARGIN_BETWEEN*2;
         },
-
+        rowBlockOffset() {
+            return this.rowBlockWidth/this.columns.length;
+        },
         cols() {
             return this.columns.map((c, i) => this.data.map(v => v[i]));
         }
@@ -53,8 +34,10 @@ export default {
     methods: {
     },
     created: function() {
+        window.test = this;
     },
     components: {
-        ColumnGroup
+        RowGroup
+        //ColumnGroup
     }
- };
+};
