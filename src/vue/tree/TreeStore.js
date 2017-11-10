@@ -32,12 +32,12 @@ export default class TreeStore {
 
                     let nodeObj = treeData.splice(index, 1)[0];
 
+                    store.vm.$set(nodeObj, 'isLeaf', true);
+                    store.vm.$set(nodeObj, 'show', true);
+                    store.vm.$set(nodeObj, 'expanded', true);
+
                     nodeObj.lvl = 0;
                     nodeObj.key = store.nodeKey++;
-
-                    nodeObj.isLeaf = true;
-                    nodeObj.show = true;
-                    nodeObj.expanded = true;
 
                     treeMap.push(nodeObj);
                     return treeObj.push(nodeObj);
@@ -62,9 +62,9 @@ export default class TreeStore {
                 treeMap[ix].isLeaf = false;
                 nodeObj.key = this.nodeKey++;
 
-                nodeObj.isLeaf = true;
-                nodeObj.show = true;
-                nodeObj.expanded = true;
+                this.vm.$set(nodeObj, 'isLeaf', true);
+                this.vm.$set(nodeObj, 'show', true);
+                this.vm.$set(nodeObj, 'expanded', true);
 
                 treeMap.push(nodeObj);
                 return treeMap[ix].children.push(nodeObj);

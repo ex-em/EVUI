@@ -61,6 +61,7 @@ export default {
         };
 
         this.store = new TreeStore({
+            vm          : this,
             treeData    : this.rows,
             columns     : this.columns,
             treeColumnId: this.treeOptions.treeColumnId
