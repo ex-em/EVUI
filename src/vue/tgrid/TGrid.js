@@ -1,27 +1,38 @@
 export default {
-    props : {
-        gridInfo : Object,
-        columns : Array,
+    props: {
+        gridInfo: Object,
+        columns: Array,
         data: Array
     },
     data: function () {
         return {
-            gridStyle : null,
+            gridStyle: null,
             titleStyle: null,
             sortKey: '',
             sortOrders: null,
             columnType: null,
             gridWidth: 0,
             selected: [],
-            dragTargetPos:null,
-            dragTarget : null
+            dragTargetPos: null,
+            dragTarget: null,
+            nodeList: [],
+            scroll: {
+                bufferSize: 100,
+                bufferDataIdx: 0,
+                top: 0,
+                rowHeight: 20,
+                prevScrollTop: 0,
+                page: 0,
+                offset: 0,
+                prevUpdateScrollTop: 0
+            }
         };
     },
     computed: {
 
         selectAll: {
             get() {
-                return this.data.every(function(d){
+                return this.data.every(function (d) {
                     return d.checked;
                 });
             },
@@ -32,14 +43,14 @@ export default {
 
         gridOptions() {
             return Object.assign({
-                title     : null,
+                title: null,
                 titleAlign: 'center',
-                width     : '100%',
-                height    : '100%'
+                width: '100%',
+                height: '100%'
             }, this.gridInfo);
         },
 
-        columnOptions:{
+        columnOptions: {
             get() {
                 let defColumns = [];
                 for (let ix = 0, ixLen = this.columns.length; ix < ixLen; ix++) {
@@ -47,6 +58,7 @@ export default {
                         dataIndex: 'def_dataIndex_' + ix,
                         name: '',
                         width: 50,
+                        height: 20,
                         visible: false,
                         draggable: false,
                         type: ''
@@ -55,9 +67,9 @@ export default {
                 return defColumns;
             },
             set(data) {
-                
+
                 //드래그 드랍 이벤트 값변경시 탑니다
-                if(data.type === 'drag') {
+                if (data.type === 'drag') {
                     this.columns.splice(data.dragIdx, 1);
                     this.columns.splice(data.dropIdx, 0, data.targetCol);
                 }
@@ -66,7 +78,7 @@ export default {
 
         gridTotalWidth() {
             let totalWidth = this.gridWidth;
-            this.columns.forEach(function(column) {
+            this.columns.forEach(function (column) {
                 totalWidth += column.width;
             });
 
@@ -88,36 +100,165 @@ export default {
             }
 
             return sortedData;
+        },
+
+        bufferedData: function () {
+            // return this.sortedData.slice(0, 100);
+            return this.sortedData.slice(this.scroll.bufferDataIdx, this.scroll.bufferSize + this.scroll.bufferDataIdx);
+            // return this.sortedData;
         }
     },
     methods: {
-
-        cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
+        cellClick: function (columnData, colIdx, rowData, rowIdx, e) {
             // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
         },
 
-        checkBoxClick: function() {
+        checkBoxClick: function () {
             const selected = this.selected;
 
             console.log('checkboxClick ==> ', arguments);
         },
 
-        gridBodyScroll: function(e) {
-            this.$el.getElementsByTagName('thead')[0].style.left = (-e.target.scrollLeft) + 'px';
-            // $('thead').css("left", -$("tbody").scrollLeft()); //fix the thead relative to the body scrolling
-            // $('thead th:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first cell of the header
-            // $('tbody td:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first column of tdbody
+        bufferHeightCalc: function () {
+            let rowTopEl = document.getElementById('evui_grid_row_top');
+            let rowBottomEl = document.getElementById('evui_grid_row_bottom');
+            let dataLength = this.sortedData.length;
+            let rowHeight = this.scroll.rowHeight;
+            let vh = dataLength * rowHeight;
+            let top = 0;
+            if (vh > this.scroll.bufferSize * rowHeight) {
+                top = this.scroll.bufferDataIdx * rowHeight - this.scroll.offset;
+                if (top > vh - this.scroll.bufferSize * rowHeight) {
+                    top = vh - this.scroll.bufferSize * rowHeight;
+                }
+
+                rowTopEl.style.height = top + 'px';
+                rowBottomEl.style.height = (vh - (this.scroll.bufferSize * rowHeight) - top) + 'px';
+
+                // console.log('topHeight --> ', top, 'bottomHeight --> ', vh - (this.scroll.bufferSize * rowHeight) - top);
+            }
         },
 
-        toggleSelect: function() {
+        gridBodyScroll: function (e) {
+            this.$el.getElementsByTagName('thead')[0].style.left = (-e.target.scrollLeft) + 'px';
+            // $('thead th:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first cell of the header
+            // $('tbody td:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first column of tdbody
+            let bufferSize = 100;
+            let dataLength = this.sortedData.length;
+            // let rowHeight = this.columnOptions[0].height;
+            let rowHeight = this.scroll.rowHeight;
+
+            let th = rowHeight * dataLength; // virtual height
+            let ph = bufferSize * rowHeight; // page height
+            let h = ph * 100;
+            let n = Math.ceil(th / ph);
+            let vp = this.gridOptions.height;
+
+            let cj = (th - h) / (n - 1);
+            this.scroll.page;
+            this.scroll.offset;
+            let viewport = e.target;
+            let scrollTop = viewport.scrollTop;
+
+
+            console.log('SCROLL TOP ##### ', scrollTop);
+                if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
+                    // onJump
+                    this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
+                    // this.scroll.offset = Math.round(this.scroll.page * cj);
+                    // this.scroll.prevScrollTop = scrollTop;
+
+                    console.log('onJump');
+                } else {
+                    // onNearScroll
+                    console.log('onNearScroll');
+                    // next page
+                    if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
+                        this.scroll.page++;
+                        // this.scroll.offset = Math.round(this.scroll.page * cj);
+                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop - cj);
+                    }
+                    // prev page
+                    else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
+                        this.scroll.page--;
+                        // this.scroll.offset = Math.round(this.scroll.page * cj);
+                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop + cj);
+                    }
+                    else {
+                        this.scroll.prevScrollTop = scrollTop;
+                    }
+            }
+            this.scroll.prevScrollTop = scrollTop;
+
+
+                // calculate the viewport + buffer
+            var y = viewport.scrollTop + this.scroll.offset,
+                buffer = vp,
+                top = Math.floor((y - buffer) / rowHeight),
+                bottom = Math.ceil((y + vp + buffer) / rowHeight);
+
+            top = Math.max(0, top);
+            bottom = Math.min(th / rowHeight, bottom);
+
+            // console.log("top --> ", top, "bottom --> ", bottom, "prev scroll top --> ", this.scroll.prevScrollTop);
+            // if ((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight == 75) {
+            // if (this.scroll.testFlag) {
+
+            // if (scrollTop - this.scroll.prevUpdateScrollTop > ph * 0.7) {
+            //     this.scroll.prevUpdateScrollTop = scrollTop;
+                this.scroll.bufferDataIdx = parseInt((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight);
+                this.bufferHeightCalc();
+            // }
+
+            // this.scroll.testFlag = !this.scroll.testFlag;
+
+            // }
+
+            // if (this.scroll.top < top || this.scroll.top > bottom) {
+            //     this.scroll.top = top;
+            // }
+
+            let debugEl = document.getElementById('debugInfo');
+
+            if (this.nodeList.length == 0) {
+                for (let ix = 0; ix < 8; ix++) {
+                    this.nodeList[ix] = document.createElement("div");
+                }
+
+                for (let ix = 0; ix < this.nodeList.length; ix++) {
+                    debugEl.appendChild(this.nodeList[ix]);
+                }
+            }
+
+            this.nodeList[0].innerHTML = "n = " + n + "<br>";
+            this.nodeList[1].innerHTML = "ph = " + ph + "<br>";
+            this.nodeList[2].innerHTML = "cj = " + cj + "<br>";
+            this.nodeList[3].innerHTML = "page = " + this.scroll.page + "<br>";
+            this.nodeList[4].innerHTML = "offset = " + this.scroll.offset + "<br>";
+            this.nodeList[5].innerHTML = "virtual y = " + (this.scroll.prevScrollTop + this.scroll.offset) + "<br>";
+            this.nodeList[6].innerHTML = "real y = " + this.scroll.prevScrollTop + "<br>";
+            this.nodeList[7].innerHTML = "bufferDataIdx = " + this.scroll.bufferDataIdx + "<br>";
+
+        },
+
+        onJump: function () {
+
+        },
+
+        onNearScroll: function () {
+
+        },
+
+
+        toggleSelect: function () {
             let select = this.selectAll;
-            this.data.forEach(function(d) {
+            this.data.forEach(function (d) {
                 d.checked = !select;
             });
             this.selectAll = !select;
         },
 
-        sortBy: function(key) {
+        sortBy: function (key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
         },
@@ -192,7 +333,7 @@ export default {
             var columns = document.querySelectorAll('.grid-column-sort');
             const vm = this;
 
-            for(let ix=0, ixLen=columns.length; ix<ixLen; ix++){
+            for (let ix = 0, ixLen = columns.length; ix < ixLen; ix++) {
 
                 columns[ix].addEventListener('dragstart', handleDragStart, false);
 
@@ -219,21 +360,20 @@ export default {
 
                 const targetEl = e.target;
 
-                if(this.classList.contains('grid-column-sort') && !this.classList.contains('dragItem')){
+                if (this.classList.contains('grid-column-sort') && !this.classList.contains('dragItem')) {
                     let targetPos = this.parentElement.getBoundingClientRect();
                     let dragX = (targetPos.left) + 'px';
                     let dragY = (targetPos.top) + 'px';
 
                     //드래그 타겟보다 오른쪽컬럼들
-                    if(vm.dragTargetPos.left < targetPos.left){
+                    if (vm.dragTargetPos.left < targetPos.left) {
                         dragX = (targetPos.right) + 'px';
                     }
 
                     vm.$refs.dragLine.style.top = dragY;
-                    vm.$refs.dragLine.style.left =  dragX;
+                    vm.$refs.dragLine.style.left = dragX;
 
                     vm.$refs.dragLine.style.display = 'block';
-
 
 
                 }
@@ -244,7 +384,7 @@ export default {
                 if (e.preventDefault) {
                     e.preventDefault(); // Necessary. Allows us to drop.
                 }
-                e.dataTransfer.dropEffect= "move"
+                e.dataTransfer.dropEffect = "move"
 
                 return false;
             }
@@ -257,23 +397,21 @@ export default {
                 let dragIdx = vm.dragTarget.parentElement.cellIndex;
                 let dropIdx = this.parentElement.cellIndex;
 
-                if(vm.gridOptions.useCheckbox){
+                if (vm.gridOptions.useCheckbox) {
                     dragIdx -= 1;
                     dropIdx -= 1;
                 }
 
                 let targetCol = vm.columnOptions[dragIdx]
-                let data ={
+                let data = {
                     type: 'drag',
-                    dropIdx :dropIdx,
-                    dragIdx :dragIdx,
-                    targetCol : targetCol
+                    dropIdx: dropIdx,
+                    dragIdx: dragIdx,
+                    targetCol: targetCol
                 };
 
 
                 vm.columnOptions = data
-
-
 
 
                 return false;
@@ -312,18 +450,20 @@ export default {
 
         //Drag Column Event setting
         this.setDragColumnEvent();
+
+        this.bufferHeightCalc();
     },
 
     created() {
         // set grid default style
         this.gridStyle = {
-            'width' : typeof this.gridOptions.width === 'number' ? this.gridOptions.width + 'px' : this.gridOptions.width,
+            'width': typeof this.gridOptions.width === 'number' ? this.gridOptions.width + 'px' : this.gridOptions.width,
             'height': typeof this.gridOptions.height === 'number' ? this.gridOptions.height + 'px' : this.gridOptions.height
         };
 
         this.titleStyle = {
-            'text-align' : this.gridOptions.titleAlign,
-            'display'    : 'block'
+            'text-align': this.gridOptions.titleAlign,
+            'display': 'block'
         };
 
         let sortOrders = {};
@@ -333,7 +473,7 @@ export default {
         this.sortOrders = sortOrders;
     },
 
-    beforeDestory () {
+    beforeDestory() {
         const vm = this;
         vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
         document.removeEventListener('mousemove', vm.onMouseMove);

@@ -28,8 +28,9 @@ table {
     /*overflow-x: auto;*/
     /*display:block;*/
     /*width: 700px;*/
+    border-spacing: 0px;
     position:relative;
-    background-color:#aaa;
+    background-color:#42b983;
     overflow:hidden;
     border-collapse: collapse;
 }
@@ -46,6 +47,10 @@ thead th {
     min-width: 50px;
     height:35px;
     border: 1px solid #222;
+    padding: 0px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 thead, tbody {
@@ -61,10 +66,9 @@ tbody {
 
 tbody td {
     min-width: 50px;
-    /*padding: 5px 0 5px 0;*/
-    background-color:#bbc;
-    border:1px solid #222;
-    /*overflow: hidden;*/
+    border-left:1px solid #222;
+    border-right:1px solid #222;
+    padding: 0px;
 }
 
 
@@ -120,11 +124,23 @@ tbody td {
 }
 
 .evui-grid-cell {
-    /*padding: 0 5px 0 5px;*/
+    border-spacing: 0;
+    padding: 0 2px 0 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 input[type="checkbox"] {
     cursor:pointer;
+}
+
+#evui_grid_row_top > td, #evui_grid_row_bottom > td{
+    padding:0px;
+    border:0px;
 }
 
 .grid-drag-line {
