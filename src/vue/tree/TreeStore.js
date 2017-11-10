@@ -5,133 +5,101 @@ export default class TreeStore {
             this[prop] = props[prop];
         }
 
-        if(this.data && this.data.length) {
-            this.treeNode = [this.createNode(-1, 0, null, null)];
+        if(this.treeData) {
+            if(!this.treeData.length) {
+                throw new Error('[EVUI][TreeStore]-Store has not TreeData Object');
+            }
+            this.nodeKey = 0;
             this.treeMap = [];
-            this.createTreeSet(this.data);
-        }
-    }
-
-    createNode(key, lvl, parent, data) {
-        return {
-            key     : key,
-            lvl     : lvl,
-            parent  : parent,
-            children: [],
-            data    : data,
-            expanded: true,
-            visible : true
-        };
-    }
-
-    createTreeSet() {
-        let treeData = this.data;
-        let currLvl = this.treeNode[0].lvl;
-        let currNode = this.treeNode[0];
-
-        for(let ix=0, ixLen=treeData.length; ix<ixLen; ix++) {
-            let hasSibling = false;
-            // check has children
-            // check has sibling
-
-
-            //check has children
-            if(currLvl <= treeData[ix][0]) {
-
-                // check has sibling
-                for(let jx=ix+1; jx<ixLen; jx++) {
-                    if(treeData[ix][0] === treeData[jx][0]) {
-                        hasSibling = true;
-                    }
-                    break;
-                }
-
-                let newNode = this.createNode(ix, treeData[ix][0], currNode, treeData[ix]);
-                currNode.children.push(newNode);
-                this.treeMap[ix] = currNode.children[currNode.children.length -1];
-                currLvl = treeData[ix][0];
-
-                if(!hasSibling) {
-                    currNode = newNode;
-                }
-
-            }
-            else if(currLvl > treeData[ix][0]) {
-                for(let jx=ix-1; jx>0; jx--) {
-                    if(treeData[ix][0] > treeData[jx][0]) {
-                        let newNode = this.createNode(ix, treeData[ix][0], this.treeMap[jx], treeData[ix]);
-                        this.treeMap[jx].children.push(newNode);
-                        this.treeMap[ix] = this.treeMap[jx].children[this.treeMap[jx].children.length -1];
-                        currLvl = treeData[ix][0];
-                        currNode = newNode;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    setLeafInfo() {
-        for(let ix=0, ixLen=this.treeMap.length; ix<ixLen; ix++) {
-            let isLeaf = !this.treeMap[ix].children.length;
-
-            this.treeMap[ix].isLeaf = isLeaf;
-        }
-    }
-
-    expandChildrenNode(key, mode) {
-        let currNode = this.treeMap[key];
-        let childrenLen = currNode.children.length;
-        // expand, collapse
-        if(currNode.isLeaf) {
-            return;
+            this.treeNode = this.createTreeModel(null);
         }
         else {
-            for(let ix=0; ix<childrenLen; ix++) {
-                let childNode = currNode.children[ix];
+            throw new Error('[EVUI][TreeStore]-Store has not Data');
+        }
+    }
 
-                if(mode === 'collapse') {
-                    if(childNode.expanded) {
-                        if(childNode.visible) {
-                            childNode.expanded = true;
-                            childNode.visible = false;
-                        }
-                        else {
-                            childNode.expanded = false;
-                            childNode.visible = false;
-                        }
-                    }
-                    else {
-                        childNode.expanded = false;
-                        childNode.visible = false;
-                    }
-                }
-                else {
-                    if(childNode.expanded) {
-                        childNode.expanded = true;
-                        childNode.visible = true;
-                    }
-                    else {
-                        if(childNode.visible) {
-                            childNode.expanded = false;
-                            childNode.visible = false;
-                        }
-                        else {
-                            childNode.expanded = false;
-                            childNode.visible = true;
-                        }
-                    }
+    createTreeModel(rootId) {
+        const store  = this;
+        let treeObj = [];
+
+        let treeData = this.treeData;
+        let treeMap = this.treeMap;
+
+
+        while (treeData.length > 0) {
+            treeData.some(function (item, index) {
+                if (item.parentId === rootId) {
+
+                    let nodeObj = treeData.splice(index, 1)[0];
+
+                    nodeObj.lvl = 0;
+                    nodeObj.key = store.nodeKey++;
+
+                    nodeObj.isLeaf = true;
+                    nodeObj.show = true;
+                    nodeObj.expanded = true;
+
+                    treeMap.push(nodeObj);
+                    return treeObj.push(nodeObj);
                 }
 
-                if(!childNode.parent.expanded) {
-                    childNode.visible = false;
-                }
+                return store.traversalTreeInfo(item, index);
+            });
+        }
+        return treeObj;
+    }
 
-                this.expandChildrenNode(currNode.children[ix].key, mode);
+    traversalTreeInfo(item ,index) {
+        let treeMap = this.treeMap;
+
+        for(let ix=treeMap.length-1; ix>=0; ix--) {
+            if(treeMap[ix].id === item.parentId) {
+                treeMap[ix].children = treeMap[ix].children || [];
+
+                let nodeObj = this.treeData.splice(index, 1)[0];
+                nodeObj.lvl = treeMap[ix].lvl+1;
+
+                treeMap[ix].isLeaf = false;
+                nodeObj.key = this.nodeKey++;
+
+                nodeObj.isLeaf = true;
+                nodeObj.show = true;
+                nodeObj.expanded = true;
+
+                treeMap.push(nodeObj);
+                return treeMap[ix].children.push(nodeObj);
             }
+        }
+    }
+
+    handleExpandNode(node, expandMode) {
+
+        node.expanded = expandMode;
+
+        for(let ix=0, ixLen=node.children.length; ix<ixLen; ix++) {
+            this.traversalDFS(node.children[ix], expandMode, node);
+        }
+    }
+
+    traversalDFS(item, expandMode, parent) {
+
+        if(item.isLeaf) {
+            item.show = parent.show ? parent.expanded : parent.show;
+            return;
+        }
+
+        if(expandMode) {
+            if(parent.expanded && parent.show) {
+                item.show = expandMode;
+            }
+        }
+        else {
+            item.show = expandMode;
+        }
+
+
+        for(let ix=0, ixLen=item.children.length; ix<ixLen; ix++) {
+            this.traversalDFS(item.children[ix], expandMode, item);
         }
     }
 }
-
-
-

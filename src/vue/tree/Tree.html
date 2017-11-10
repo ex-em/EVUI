@@ -8,22 +8,23 @@
         </span>
     </div>
     <div class="evui-tree-body">
-        <table>
+        <table class="evui-tree-table">
             <thead>
                 <tr>
                     <th v-for="col in columnOptions"
-                        v-show="col.cVisible"
-                        :width="col.cWidth">
-                        {{ col.cName }}
+                        v-show="col.visible"
+                        :width="col.width">
+                        {{ col.name }}
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tree-node
                         v-for="node in treeMap"
-                        key="node.key"
-                        @node-expand="toggleNodeExpand"
+                        key="node.id"
+                        @node-expand="setExpandNode"
                         :columns="columnOptions"
+                        :treeColumn="treeColumn"
                         :nodeObj="node">
                 </tree-node>
             </tbody>
