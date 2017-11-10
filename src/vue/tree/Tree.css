@@ -1,13 +1,24 @@
 table.evui-tree-table {
     color: #333;
     font-family: Helvetica, Arial, sans-serif;
-    border-collapse: collapse; border-spacing: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
+
 th {
+    position:relative;
     border: 1px solid transparent;
     height: 25px;
     background: #DFDFDF;
     font-weight: bold;
     font-size:14px;
+}
+
+.tree-drag-line {
+    position: fixed;
+    display: none;
+    z-index: 3;
+    width: 3px;
+    background-color: rgba(51, 122, 183, 0.5);
 }
