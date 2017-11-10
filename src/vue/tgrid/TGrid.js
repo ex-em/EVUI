@@ -13,6 +13,7 @@ export default {
             columnType: null,
             gridWidth: 0,
             selected: [],
+            nodeList: [],
             dragTargetPos:null,
             dragTarget : null,
             filterCol : {},
