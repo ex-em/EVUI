@@ -22,27 +22,36 @@
                         {{ col.name }}
                         <span class="arrow" :class="sortOrders[col.dataIndex] > 0 ? 'asc' : 'dsc'"></span>
                     </div>
+                    <span class="filter-icon">
+
+                    </span>
                     <div v-show="gridOptions.useColumnResize" class="grip"></div>
+                    <div class='filter-popover'>
+                        <input type='text' class='filter-input' @input="filterGrid(col,$event)">
+                    </div>
                 </th>
             </tr>
             </thead>
             <tbody @scroll="gridBodyScroll"
                    :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
-                <tr v-for="(entry, rowIdx) in sortedData"
-                    :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
-                    <td v-for="col in columnOptions"
-                        :style="{display: col.visible ? 'table-cell' : 'none'}">
-                        <div class="evui-grid-cell"
-                             :class="cls(col.type)"
-                             :style="{width:col.width+'px'}"
-                             @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
-                            {{ entry[col.dataIndex] }}
-                        </div>
-                    </td>
-                </tr>
+            <tr id="evui_grid_row_top"><td colspan="200"></td></tr>
+            <tr v-for="(entry, rowIdx) in bufferedData"
+                :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
+                <td v-for="col in columnOptions"
+                    :style="{display: col.visible ? 'table-cell' : 'none'}">
+                    <div class="evui-grid-cell"
+                         :class="cls(col.type)"
+                         :style="{width: col.width+'px', height: col.height+'px'}"
+                         @click="cellClick(entry[col.dataIndex], col.dataIndex, entry, $event)">
+                        {{ entry[col.dataIndex] }}
+                    </div>
+                </td>
+            </tr>
+            <tr id="evui_grid_row_bottom"><td colspan="200"></td></tr>
             </tbody>
             <div ref="dragLine" class="grid-drag-line"></div>
         </table>
     </div>
+    <div id="debugInfo"></div>
     <div class="evui-grid-footer"></div>
 </div>

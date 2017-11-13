@@ -2,10 +2,10 @@
     <!-- title -->
     <!-- axis -->
     <!-- bars -->
-    <row-group v-for="row in data" :scale="range.scale" v-bind="">
+    <row-group v-for="i in data" :row="data[i]" :scale="scale">
     </row-group>
     <!-- legends -->
 
 
-    <column-group></column-group>
+    <!--column-group v-for="row in data" :scale="scale"></column-group-->
 </svg>

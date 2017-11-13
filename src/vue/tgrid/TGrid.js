@@ -13,8 +13,23 @@ export default {
             columnType: null,
             gridWidth: 0,
             selected: [],
+            nodeList: [],
             dragTargetPos:null,
-            dragTarget : null
+            dragTarget : null,
+            filterCol : {},
+            beforeFilterCol: null,
+            beforeFilterList :null,
+            filterList : this.data,
+            scroll: {
+                bufferSize: 100,
+                bufferDataIdx: 0,
+                top: 0,
+                rowHeight: 20,
+                prevScrollTop: 0,
+                page: 0,
+                offset: 0,
+                prevUpdateScrollTop: 0
+            }
         };
     },
     computed: {
@@ -51,6 +66,7 @@ export default {
                         dataIndex: 'def_dataIndex_' + ix,
                         name: '',
                         width: 50,
+                        height: 20,
                         visible: false,
                         draggable: false,
                         type: ''
@@ -97,6 +113,72 @@ export default {
             }
 
             return sortedData;
+        },
+
+        bufferedData: function () {
+            // return this.sortedData.slice(0, 100);
+            return this.sortedData.slice(this.scroll.bufferDataIdx, this.scroll.bufferSize + this.scroll.bufferDataIdx);
+            // return this.sortedData;
+        },
+
+        filteredData: {
+            get() {
+                return this.filterList;
+            },
+            set(filterData) {
+                console.log("FSDFS", this.filterList)
+                console.log("filterData", filterData)
+                let filteredTemp
+
+                //입력 필터 컬럼 비교
+                if(this.beforeFilterCol!== filterData.colIndex){
+                    this.beforeFilterCol = filterData.colIndex;
+                    let result = this.data.slice();
+
+                    for(let col in this.filterCol){
+                        if(this.filterCol[col]!==undefined && col!==filterData.colIndex){
+
+                            result = result.filter((data) =>{
+                                return data[col].toString().indexOf(this.filterCol[col]) >= 0
+                            })
+                        }
+                    }
+
+
+                    this.beforeFilterList = result;
+                    // this.filterList = result;
+
+                }else{
+
+                }
+
+                this.filterList = this.beforeFilterList.filter((data) => {
+                    console.log('1111', filterData.colIndex)
+                    return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                });
+
+
+                // for(let item in this.filterCol){
+                //     console.log('2222',item)
+                //     if(this.filterCol[item] !== undefined){
+                //
+                //     }
+                // }
+
+                //기존 필터 걸려있는지 확인후 분기
+                // if(this.filterList.length === this.data.length) {
+                //     this.filterList = this.data.filter((data) => {
+                //         console.log('0000', filterData.colIndex)
+                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                //     })
+                // }else {
+                //     this.filterList = this.data.filter((data) => {
+                //         console.log('1111', filterData.colIndex)
+                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
+                //     })
+                // }
+                console.log(this.filterList)
+            }
         }
     },
     methods: {
@@ -111,11 +193,127 @@ export default {
             console.log('checkboxClick ==> ', arguments);
         },
 
-        gridBodyScroll: function(e) {
+        bufferHeightCalc: function () {
+            let rowTopEl = document.getElementById('evui_grid_row_top');
+            let rowBottomEl = document.getElementById('evui_grid_row_bottom');
+            let dataLength = this.sortedData.length;
+            let rowHeight = this.scroll.rowHeight;
+            let vh = dataLength * rowHeight;
+            let top = 0;
+            if (vh > this.scroll.bufferSize * rowHeight) {
+                top = this.scroll.bufferDataIdx * rowHeight - this.scroll.offset;
+                if (top > vh - this.scroll.bufferSize * rowHeight) {
+                    top = vh - this.scroll.bufferSize * rowHeight;
+                }
+
+                rowTopEl.style.height = top + 'px';
+                rowBottomEl.style.height = (vh - (this.scroll.bufferSize * rowHeight) - top) + 'px';
+
+                // console.log('topHeight --> ', top, 'bottomHeight --> ', vh - (this.scroll.bufferSize * rowHeight) - top);
+            }
+        },
+
+        gridBodyScroll: function (e) {
             this.$el.getElementsByTagName('thead')[0].style.left = (-e.target.scrollLeft) + 'px';
             // $('thead').css("left", -$("tbody").scrollLeft()); //fix the thead relative to the body scrolling
             // $('thead th:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first cell of the header
             // $('tbody td:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first column of tdbody
+            let bufferSize = 100;
+            let dataLength = this.sortedData.length;
+            // let rowHeight = this.columnOptions[0].height;
+            let rowHeight = this.scroll.rowHeight;
+
+            let th = rowHeight * dataLength; // virtual height
+            let ph = bufferSize * rowHeight; // page height
+            let h = ph * 100;
+            let n = Math.ceil(th / ph);
+            let vp = this.gridOptions.height;
+
+            let cj = (th - h) / (n - 1);
+            this.scroll.page;
+            this.scroll.offset;
+            let viewport = e.target;
+            let scrollTop = viewport.scrollTop;
+
+
+            console.log('SCROLL TOP ##### ', scrollTop);
+                if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
+                    // onJump
+                    this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
+                    // this.scroll.offset = Math.round(this.scroll.page * cj);
+                    // this.scroll.prevScrollTop = scrollTop;
+
+                    console.log('onJump');
+                } else {
+                    // onNearScroll
+                    console.log('onNearScroll');
+                    // next page
+                    if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
+                        this.scroll.page++;
+                        // this.scroll.offset = Math.round(this.scroll.page * cj);
+                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop - cj);
+                    }
+                    // prev page
+                    else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
+                        this.scroll.page--;
+                        // this.scroll.offset = Math.round(this.scroll.page * cj);
+                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop + cj);
+                    }
+                    else {
+                        this.scroll.prevScrollTop = scrollTop;
+                    }
+            }
+            this.scroll.prevScrollTop = scrollTop;
+
+
+                // calculate the viewport + buffer
+            var y = viewport.scrollTop + this.scroll.offset,
+                buffer = vp,
+                top = Math.floor((y - buffer) / rowHeight),
+                bottom = Math.ceil((y + vp + buffer) / rowHeight);
+
+            top = Math.max(0, top);
+            bottom = Math.min(th / rowHeight, bottom);
+
+            // console.log("top --> ", top, "bottom --> ", bottom, "prev scroll top --> ", this.scroll.prevScrollTop);
+            // if ((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight == 75) {
+            // if (this.scroll.testFlag) {
+
+            // if (scrollTop - this.scroll.prevUpdateScrollTop > ph * 0.7) {
+            //     this.scroll.prevUpdateScrollTop = scrollTop;
+                this.scroll.bufferDataIdx = parseInt((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight);
+                this.bufferHeightCalc();
+            // }
+
+            // this.scroll.testFlag = !this.scroll.testFlag;
+
+            // }
+
+            // if (this.scroll.top < top || this.scroll.top > bottom) {
+            //     this.scroll.top = top;
+            // }
+
+            let debugEl = document.getElementById('debugInfo');
+
+            if (this.nodeList.length == 0) {
+                for (let ix = 0; ix < 8; ix++) {
+                    this.nodeList[ix] = document.createElement("div");
+                }
+
+                for (let ix = 0; ix < this.nodeList.length; ix++) {
+                    debugEl.appendChild(this.nodeList[ix]);
+                }
+            }
+
+            this.nodeList[0].innerHTML = "n = " + n + "<br>";
+            this.nodeList[1].innerHTML = "ph = " + ph + "<br>";
+            this.nodeList[2].innerHTML = "cj = " + cj + "<br>";
+            this.nodeList[3].innerHTML = "page = " + this.scroll.page + "<br>";
+            this.nodeList[4].innerHTML = "offset = " + this.scroll.offset + "<br>";
+            this.nodeList[5].innerHTML = "virtual y = " + (this.scroll.prevScrollTop + this.scroll.offset) + "<br>";
+            this.nodeList[6].innerHTML = "real y = " + this.scroll.prevScrollTop + "<br>";
+            this.nodeList[7].innerHTML = "bufferDataIdx = " + this.scroll.bufferDataIdx + "<br>";
+
         },
 
         toggleSelect: function() {
@@ -164,6 +362,7 @@ export default {
                 if (e.preventDefault) {
                     e.preventDefault(); //
                 }
+                vm.$emit('test', 323232)
                 console.log('마우스 다운 이벤트',e)
                 thElm = e.target.parentNode;
                 startOffset = thElm.offsetWidth - e.pageX;
@@ -198,7 +397,7 @@ export default {
          * 드래그앤드랩 컬럼 이벤트 세팅
          */
         setDragColumnEvent() {
-            var columns = document.querySelectorAll('.grid-column-sort');
+            var columns = this.$el.querySelectorAll('.grid-column-sort');
             const vm = this;
 
             for(let ix=0, ixLen=columns.length; ix<ixLen; ix++){
@@ -303,6 +502,35 @@ export default {
             }
 
 
+        },
+
+        /**
+         * 필터 input 이벤트
+         * @param data : col (컬럼 정보)
+         * @param e (input 이벤트)
+         */
+        filterGrid(data,e) {
+            let colIndex = data.dataIndex;
+            let value = e.target.value;
+            console.log('@@@@',data)
+            // console.log('@@@@',e.target)
+            console.log("#####",e.target.value)
+
+            if(value ===''){
+                this.filterCol[colIndex] = undefined;
+            }else{
+                this.filterCol[colIndex] = value;
+            }
+
+            this.filteredData = {
+                colIndex: colIndex,
+                value : value
+            };
+
+            // this.data[0].col1 = 222
+            // for(let ix=)
+
+
         }
 
     },
@@ -314,6 +542,8 @@ export default {
         // vm.syncColumnWidths();
 
         console.log(this.gridOptions.useColumnResize)
+
+
         //Resize Column Event setting
         if(this.gridOptions.useColumnResize) {
             this.setResizeColumnEvent();
@@ -323,6 +553,8 @@ export default {
         //Drag Column Event setting
         this.$refs.dragLine.style.height = this.$refs.gridTable.clientHeight + 'px';
         this.setDragColumnEvent();
+
+        this.bufferHeightCalc();
     },
 
     created() {
@@ -342,12 +574,12 @@ export default {
             sortOrders[key.dataIndex] = 1;
         });
         this.sortOrders = sortOrders;
-    },
 
-    beforeDestory () {
-        const vm = this;
-        vm.grips.forEach((grip) => grip.removeEventListener('mousedown', vm.onMouseDown));
-        document.removeEventListener('mousemove', vm.onMouseMove);
-        document.removeEventListener('mouseup', vm.onMouseUp);
+        //filter 컬럼 객체 생성(추후 조건문 추가)
+        for(let ix=0, ixLen=this.columns.length; ix<ixLen ;ix++){
+            this.filterCol[this.columns[ix].dataIndex] = undefined;
+        }
+
+
     }
 };

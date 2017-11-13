@@ -9,6 +9,13 @@
 
     export default {
         data () {
+
+            let tempData = [];
+
+            for (let ix = 0; ix < 5000; ix++) {
+                tempData.push({checked: false, col2: ix+1,  col4: 'aa', col1: 'data'+(ix+1), col3: 'data_'+(ix+1), col5:'zz', col6:'66', col7:'77', col8:'88'});
+            }
+
             return {
                 gridInfo: {
                     title : 'EVUI-Grid-Title',
@@ -28,32 +35,9 @@
                     {dataIndex: 'col7', name: 'column7', width: 150, visible: true, type: 'string', draggable: true},
                     {dataIndex: 'col8', name: 'column8', width: 150, visible: true, type: 'string', draggable: true}
                 ],
-                rowData : [
-                    {checked: false, col2: 100,  col4: 'aa', col1: 'data1', col3: 'data3', col5:'zz'},
-                    {checked: false, col2: 200,  col4: 'bb', col1: 'data4', col3: 'data1', col5:'xx'},
-                    {checked: false, col2: 150,  col4: 'ff', col1: 'data2', col3: 'data6', col5:'dd'},
-                    {checked: false, col2: 300,  col4: 'cc', col1: 'data7', col3: 'data4', col5:'ss'},
-                    {checked: false, col2: 500,  col4: 'dd', col1: 'data6', col3: 'data5', col5:'yy'},
-                    {checked: false, col2: 220,  col4: 'ee', col1: 'data5', col3: 'data2', col5:'ll'},
-                    {checked: false, col2: 100,  col4: 'aa', col1: 'data1', col3: 'data3', col5:'zz'},
-                    {checked: false, col2: 200,  col4: 'bb', col1: 'data4', col3: 'data1', col5:'xx'},
-                    {checked: false, col2: 150,  col4: 'ff', col1: 'data2', col3: 'data6', col5:'dd'},
-                    {checked: false, col2: 300,  col4: 'cc', col1: 'data7', col3: 'data4', col5:'ss'},
-                    {checked: false, col2: 500,  col4: 'dd', col1: 'data6', col3: 'data5', col5:'yy'},
-                    {checked: false, col2: 220,  col4: 'ee', col1: 'data5', col3: 'data2', col5:'ll'},
-                    {checked: false, col2: 100,  col4: 'aa', col1: 'data1', col3: 'data3', col5:'zz'},
-                    {checked: false, col2: 200,  col4: 'bb', col1: 'data4', col3: 'data1', col5:'xx'},
-                    {checked: false, col2: 150,  col4: 'ff', col1: 'data2', col3: 'data6', col5:'dd'},
-                    {checked: false, col2: 300,  col4: 'cc', col1: 'data7', col3: 'data4', col5:'ss'},
-                    {checked: false, col2: 500,  col4: 'dd', col1: 'data6', col3: 'data5', col5:'yy'},
-                    {checked: false, col2: 220,  col4: 'ee', col1: 'data5', col3: 'data2', col5:'ll'},
-                    {checked: false, col2: 100,  col4: 'aa', col1: 'data1', col3: 'data3', col5:'zz'},
-                    {checked: false, col2: 200,  col4: 'bb', col1: 'data4', col3: 'data1', col5:'xx'},
-                    {checked: false, col2: 150,  col4: 'ff', col1: 'data2', col3: 'data6', col5:'dd'},
-                    {checked: false, col2: 300,  col4: 'cc', col1: 'data7', col3: 'data4', col5:'ss'},
-                    {checked: false, col2: 500,  col4: 'dd', col1: 'data6', col3: 'data5', col5:'yy'},
-                    {checked: false, col2: 220,  col4: 'ee', col1: 'data5', col3: 'data2', col5:'ll'}
-                ]
+                rowData :
+                    tempData
+
             }
         },
         components: {

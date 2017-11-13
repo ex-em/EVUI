@@ -8,25 +8,33 @@
         </span>
     </div>
     <div class="evui-tree-body">
-        <table>
+        <table ref="treeTable" :style="{width:treeOptions.width+'px'}" class="evui-tree-table">
             <thead>
                 <tr>
-                    <th v-for="col in columnOptions"
-                        v-show="col.cVisible"
-                        :width="col.cWidth">
-                        {{ col.cName }}
-                    </th>
+                    <header-cell v-for="col in columnOptions"
+                                 :dataIndex         ="col.dataIndex"
+                                 :width             ="col.width"
+                                 :text              ="col.name"
+                                 :draggable         ="col.draggable"
+                    ></header-cell>
+                    <!--<th v-for="col in columnOptions"-->
+                        <!--v-show="col.visible"-->
+                        <!--:width="col.width">-->
+                        <!--{{ col.name }}-->
+                    <!--</th>-->
                 </tr>
             </thead>
             <tbody>
                 <tree-node
                         v-for="node in treeMap"
-                        key="node.key"
-                        @node-expand="toggleNodeExpand"
+                        key="node.id"
+                        @node-expand="setExpandNode"
                         :columns="columnOptions"
+                        :treeColumn="treeColumn"
                         :nodeObj="node">
                 </tree-node>
             </tbody>
+            <div ref="dragLine" class="tree-drag-line"></div>
         </table>
     </div>
     <div class="evui-tree-footer"></div>
