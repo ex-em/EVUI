@@ -4,7 +4,7 @@ import Navi from './vue/Navigation.vue';
 import Grid from './vue/grid/GridView.vue';
 import TGrid from './vue/tgrid/TGridView.vue';
 import Tree from './vue/tree/TreeView.vue';
-import Chart from './vue/chart/examples/BarExample.vue';
+import Chart from './vue/chartT/ChartView.vue';
 
 
 
