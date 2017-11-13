@@ -3,7 +3,7 @@ import Util from "../common/Util"
 import StepAxis from "../common/axis/StepAxis"
 import AutoScaleAxis from "../common/axis/AutoScaleAxis"
 import BaseChart from "./BaseChart"
-import Core from '../common/Core'
+import { color } from "../common/Constant"
 
 class BarChart extends BaseChart {
 
@@ -24,7 +24,9 @@ class BarChart extends BaseChart {
             this.createLegend(null);
         }
 
-        this.tooltip = this.createTooltip(this.svg, this.options);
+        if (this.options.tooltip.show) {
+            this.tooltip = this.createTooltip(this.svg, this.options);
+        }
     }
 
     createAxis() {
@@ -106,7 +108,8 @@ class BarChart extends BaseChart {
                     y1: baseYPos,
                     y2: yPos,
                     class: 'ct-bar',
-                    'ct:value': [rowData.x, rowData.y].filter(Core.isNumeric).join(','),
+                    style: 'stroke: ' + color[ix],
+                    'ct:value': [rowData.x, rowData.y].join(','),
                     'ct:meta': seriesNames[ix],
                     'data-index': jx
                 };

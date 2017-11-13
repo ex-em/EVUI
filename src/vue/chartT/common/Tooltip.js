@@ -16,11 +16,11 @@ export default {
         options = Util.extend(null, this.defaultOptions, options);
 
         tooltipSelector = (options.type == 'Line') ? 'ct-point' : 'ct-bar';
-        $toolTip = document.querySelector('.chartist-tooltip');
+        $toolTip = document.querySelector('.ct-tooltip');
 
         if (!$toolTip) {
             $toolTip = document.createElement('div');
-            $toolTip.className = 'chartist-tooltip';
+            $toolTip.className = 'ct-tooltip';
             document.body.appendChild($toolTip);
         }
 
@@ -39,17 +39,17 @@ export default {
                 time;
 
             if(options.tooltip.xFormat){
-                time = options.tooltip.xFormat(parseInt(value.split(',')[0]))
+                time = options.tooltip.xFormat(value.split(',')[0])
             }else{
                 time = value.split(',')[0]
             }
 
-            tooltipText += '<div class="chartist-tooltip-meta">' + time + '</div>';
+            tooltipText += '<div class="ct-tooltip-meta">' + time + '</div>';
 
             tooltipText += '<div style="float:left;">';
-            tooltipText += '    <div class="chartist-tooltip-series">' + seriesName;
-            tooltipText += '        <span class="chartist-tooltip-series-color" style="background: ' + event.target.style.stroke + '"></span>'
-            tooltipText += '        <span class="chartist-tooltip-series-text"> : </span>'
+            tooltipText += '    <div class="ct-tooltip-series">' + seriesName;
+            tooltipText += '        <span class="ct-tooltip-series-color" style="background: ' + event.target.style.stroke + '"></span>'
+            tooltipText += '        <span class="ct-tooltip-series-text"> : </span>'
             tooltipText += '    </div>';
             tooltipText += '</div>';
 
@@ -59,7 +59,7 @@ export default {
                 value = value.split(',')[1]
             }
 
-            tooltipText += '<div class="chartist-tooltip-value">';
+            tooltipText += '<div class="ct-tooltip-value">';
             tooltipText += '    <div>' + value + '</div>';
             tooltipText += '</div>';
 

@@ -5,6 +5,7 @@ import Core from '../common/Core'
 import Tooltip from "../common/Tooltip"
 import AutoScaleAxis from "../common/axis/AutoScaleAxis";
 import FixedScaleAxis from "../common/axis/FixedScaleAxis";
+import { color } from "../common/Constant"
 
 class LineChart extends BaseChart {
 
@@ -91,7 +92,8 @@ class LineChart extends BaseChart {
             if (!isScatter) {
                 pathElement = Svg.createElement(seriesElement, 'path', {
                     d: Svg.stringify(computedPathInfo),
-                    class: 'ct-line'
+                    class: 'ct-line',
+                    style: 'stroke: ' + color[ix]
                 }, null);
             }
 
@@ -103,6 +105,7 @@ class LineChart extends BaseChart {
                     x2: pathData.x + 0.01,
                     y2: pathData.y,
                     class: 'ct-point',
+                    style: 'stroke: ' + color[ix],
                     'ct:value': [seriesData[jx].x, seriesData[jx].y].filter(Core.isNumeric).join(','),
                     'ct:meta': seriesNames[ix]
                 }, null);

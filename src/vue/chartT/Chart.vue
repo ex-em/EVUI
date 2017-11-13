@@ -186,7 +186,8 @@
 
     .ct-point {
         stroke-width: 10px;
-        stroke-linecap: round; }
+        stroke-linecap: round;
+        cursor: pointer; }
 
     .ct-line {
         fill: none;
@@ -208,96 +209,6 @@
     .ct-slice-donut {
         fill: none;
         stroke-width: 60px; }
-
-    .ct-series-0 .ct-point, .ct-series-0 .ct-line, .ct-series-0 .ct-bar, .ct-series-a .ct-slice-donut {
-        stroke: #d70206; }
-
-    .ct-series-a .ct-slice-pie, .ct-series-a .ct-slice-donut-solid, .ct-series-a .ct-area {
-        fill: #d70206; }
-
-    .ct-series-1 .ct-point, .ct-series-1 .ct-line, .ct-series-1 .ct-bar, .ct-series-b .ct-slice-donut {
-        stroke: #f05b4f; }
-
-    .ct-series-b .ct-slice-pie, .ct-series-b .ct-slice-donut-solid, .ct-series-b .ct-area {
-        fill: #f05b4f; }
-
-    .ct-series-c .ct-point, .ct-series-c .ct-line, .ct-series-c .ct-bar, .ct-series-c .ct-slice-donut {
-        stroke: #f4c63d; }
-
-    .ct-series-c .ct-slice-pie, .ct-series-c .ct-slice-donut-solid, .ct-series-c .ct-area {
-        fill: #f4c63d; }
-
-    .ct-series-d .ct-point, .ct-series-d .ct-line, .ct-series-d .ct-bar, .ct-series-d .ct-slice-donut {
-        stroke: #d17905; }
-
-    .ct-series-d .ct-slice-pie, .ct-series-d .ct-slice-donut-solid, .ct-series-d .ct-area {
-        fill: #d17905; }
-
-    .ct-series-e .ct-point, .ct-series-e .ct-line, .ct-series-e .ct-bar, .ct-series-e .ct-slice-donut {
-        stroke: #453d3f; }
-
-    .ct-series-e .ct-slice-pie, .ct-series-e .ct-slice-donut-solid, .ct-series-e .ct-area {
-        fill: #453d3f; }
-
-    .ct-series-f .ct-point, .ct-series-f .ct-line, .ct-series-f .ct-bar, .ct-series-f .ct-slice-donut {
-        stroke: #59922b; }
-
-    .ct-series-f .ct-slice-pie, .ct-series-f .ct-slice-donut-solid, .ct-series-f .ct-area {
-        fill: #59922b; }
-
-    .ct-series-g .ct-point, .ct-series-g .ct-line, .ct-series-g .ct-bar, .ct-series-g .ct-slice-donut {
-        stroke: #0544d3; }
-
-    .ct-series-g .ct-slice-pie, .ct-series-g .ct-slice-donut-solid, .ct-series-g .ct-area {
-        fill: #0544d3; }
-
-    .ct-series-h .ct-point, .ct-series-h .ct-line, .ct-series-h .ct-bar, .ct-series-h .ct-slice-donut {
-        stroke: #6b0392; }
-
-    .ct-series-h .ct-slice-pie, .ct-series-h .ct-slice-donut-solid, .ct-series-h .ct-area {
-        fill: #6b0392; }
-
-    .ct-series-i .ct-point, .ct-series-i .ct-line, .ct-series-i .ct-bar, .ct-series-i .ct-slice-donut {
-        stroke: #f05b4f; }
-
-    .ct-series-i .ct-slice-pie, .ct-series-i .ct-slice-donut-solid, .ct-series-i .ct-area {
-        fill: #f05b4f; }
-
-    .ct-series-j .ct-point, .ct-series-j .ct-line, .ct-series-j .ct-bar, .ct-series-j .ct-slice-donut {
-        stroke: #dda458; }
-
-    .ct-series-j .ct-slice-pie, .ct-series-j .ct-slice-donut-solid, .ct-series-j .ct-area {
-        fill: #dda458; }
-
-    .ct-series-k .ct-point, .ct-series-k .ct-line, .ct-series-k .ct-bar, .ct-series-k .ct-slice-donut {
-        stroke: #eacf7d; }
-
-    .ct-series-k .ct-slice-pie, .ct-series-k .ct-slice-donut-solid, .ct-series-k .ct-area {
-        fill: #eacf7d; }
-
-    .ct-series-l .ct-point, .ct-series-l .ct-line, .ct-series-l .ct-bar, .ct-series-l .ct-slice-donut {
-        stroke: #86797d; }
-
-    .ct-series-l .ct-slice-pie, .ct-series-l .ct-slice-donut-solid, .ct-series-l .ct-area {
-        fill: #86797d; }
-
-    .ct-series-m .ct-point, .ct-series-m .ct-line, .ct-series-m .ct-bar, .ct-series-m .ct-slice-donut {
-        stroke: #b2c326; }
-
-    .ct-series-m .ct-slice-pie, .ct-series-m .ct-slice-donut-solid, .ct-series-m .ct-area {
-        fill: #b2c326; }
-
-    .ct-series-n .ct-point, .ct-series-n .ct-line, .ct-series-n .ct-bar, .ct-series-n .ct-slice-donut {
-        stroke: #6188e2; }
-
-    .ct-series-n .ct-slice-pie, .ct-series-n .ct-slice-donut-solid, .ct-series-n .ct-area {
-        fill: #6188e2; }
-
-    .ct-series-o .ct-point, .ct-series-o .ct-line, .ct-series-o .ct-bar, .ct-series-o .ct-slice-donut {
-        stroke: #a748ca; }
-
-    .ct-series-o .ct-slice-pie, .ct-series-o .ct-slice-donut-solid, .ct-series-o .ct-area {
-        fill: #a748ca; }
 
     .ct-square {
         display: block;
@@ -656,7 +567,7 @@
         top: 0;
         left: 0; }
 
-    .chartist-tooltip {
+    .ct-tooltip {
         position: absolute;
         display: inline-block;
         opacity: 0;
@@ -673,7 +584,7 @@
         -o-transition: opacity .2s linear;
         transition: opacity .2s linear; }
 
-    .chartist-tooltip:before {
+    .ct-tooltip:before {
         content: "";
         position: absolute;
         top: 100%;
@@ -684,23 +595,23 @@
         border: 15px solid transparent;
         border-top-color: #eeeeee; }
 
-    .chartist-tooltip.tooltip-show {
+    .ct-tooltip.tooltip-show {
         opacity: 1; }
 
-    .chartist-tooltip-meta {
+    .ct-tooltip-meta {
         font-size:13px;
         margin-bottom: 6px;
         padding-bottom: 2px;
         border-bottom: 1px solid #D2D2D2; }
 
-    .chartist-tooltip-series {
+    .ct-tooltip-series {
         font-size:12px;
         position: relative;
         text-indent: 12px;
         height: 14px;
         display: block; }
 
-    .chartist-tooltip-series-color {
+    .ct-tooltip-series-color {
         position:absolute;
         left:0px;
         top:2px;
@@ -708,11 +619,11 @@
         width: 7px;
         height: 9px; }
 
-    .chartist-tooltip-series-text {
+    .ct-tooltip-series-text {
         float:right;
         margin-left:8px; }
 
-    .chartist-tooltip-value {
+    .ct-tooltip-value {
         font-size:12px;
         position: relative;
         text-indent: 12px;

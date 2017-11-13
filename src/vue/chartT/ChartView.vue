@@ -121,13 +121,20 @@
                                 }
 
                                 return (date.getHours()   < 10 ? '0' : '') + date.getHours()   + ":" +
-                                    (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-//                                + ":" +
-//                                (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+                                       (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
                             }
                         },
                         axisY: {
                             showGrid: true,
+                        },
+                        tooltip: {
+                            xFormat: function(value){
+                                let date = new Date(parseInt(value));
+
+                                return (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
+                                       (date.getMinutes() < 10 ? '0' : '') + date.getMinutes()+ ":" +
+                                       (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+                            }
                         }
                     }
                 },
@@ -192,13 +199,20 @@
                                 }
 
                                 return (date.getHours()   < 10 ? '0' : '') + date.getHours()   + ":" +
-                                    (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-//                                + ":" +
-//                                (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+                                       (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
                             }
                         },
                         axisY: {
                             showGrid: true,
+                        },
+                        tooltip: {
+                            xFormat: function(value){
+                                let date = new Date(parseInt(value));
+
+                                return (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
+                                    (date.getMinutes() < 10 ? '0' : '') + date.getMinutes()+ ":" +
+                                    (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+                            }
                         }
                     }
                 }
