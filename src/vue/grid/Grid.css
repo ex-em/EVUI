@@ -69,6 +69,9 @@ tbody td {
     border-left:1px solid #222;
     border-right:1px solid #222;
     padding: 0px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .row-even {
@@ -87,24 +90,14 @@ tbody td {
     text-align: center;
 }
 
-.evui-grid-cell {
-    border-spacing: 0;
-    padding: 0 2px 0 2px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
 input[type="checkbox"] {
     cursor:pointer;
 }
 
-#evui_grid_row_top > td, #evui_grid_row_bottom > td{
+#evui_grid_item_container > div, #evui_grid_item > div{
     padding:0px;
     border:0px;
+    position:absolute;
 }
 
 .grid-drag-line {
