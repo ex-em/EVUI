@@ -1,20 +1,20 @@
 import TreeNode from './TreeNode.vue';
 import TreeStore from './TreeStore.js';
-import headerCell from '../grid/GridHeaderCell.vue';
+import headerCell from './TreeHeaderCell.vue';
 
 
 export default {
     props : {
-        treeInfo: Object,
-        columns : Array,
-        rows    : Array
+        treeInfo   : Object,
+        columns    : Array,
+        rows       : Array
     },
     data: function() {
         return {
-            treeStyle : null,
-            titleStyle: null,
-            store     : null,
-            treeColumn: this.treeInfo.treeColumnId
+            treeStyle  : null,
+            titleStyle : null,
+            store      : null,
+            treeColumn : this.treeInfo.treeColumnId
         };
     },
     computed: {
@@ -45,13 +45,11 @@ export default {
                 return defColumns;
             },
             set(data) {
-                //드래그 드랍 이벤트 값변경시 탑니다
                 if(data.type === 'drag') {
                     this.columns.splice(data.dragIdx, 1);
                     this.columns.splice(data.dropIdx, 0, data.targetCol);
                 }
 
-                //컬럼 리사이즈 이벤트시 값을 변경합니다.
                 if(data.type ==='resize'){
                     this.columns[data.cellIndex].width = data.width;
                 }
@@ -66,9 +64,10 @@ export default {
             this.store.handleExpandNode(node, expandMode);
         },
 
-        /**
-         * 리사이즈 컬럼 이벤트  세팅
-         */
+        setCheckNode(node, checkValue) {
+            this.store.handleCheckNode(node, checkValue);
+        },
+
         setResizeColumnEvent() {
             const vm = this;
             const headerCols = Array.from(vm.$el.getElementsByClassName('grip'));
@@ -80,10 +79,8 @@ export default {
 
             function onMouseDown(e) {
                 if (e.preventDefault) {
-                    e.preventDefault(); //
+                    e.preventDefault();
                 }
-                vm.$emit('test', 323232)
-                console.log('마우스 다운 이벤트',e)
                 thElm = e.target.parentNode;
                 startOffset = thElm.offsetWidth - e.pageX;
                 document.addEventListener('mousemove', onMouseMove);
@@ -96,14 +93,8 @@ export default {
                     type : 'resize',
                     width: startOffset + e.pageX,
                     cellIndex : thElm.cellIndex
-                }
+                };
                 vm.columnOptions = data;
-                /*if (vm.thElm) {
-                    // const colName = vm.thElm.getAttribute('data-column-name');
-                    const width = vm.startOffset + e.pageX;
-                    vm.thElm.width = width;
-                }*/
-
             }
 
             function onMouseUp(e) {
@@ -129,7 +120,8 @@ export default {
             vm          : this,
             treeData    : this.rows,
             columns     : this.columns,
-            treeColumnId: this.treeOptions.treeColumnId
+            treeColumnId: this.treeOptions.treeColumnId,
+            useCheckBox : this.treeOptions.useCheckBox
         });
 
     },

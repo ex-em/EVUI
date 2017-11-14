@@ -36,8 +36,13 @@ export default class TreeStore {
                     store.vm.$set(nodeObj, 'show', true);
                     store.vm.$set(nodeObj, 'expanded', true);
 
+                    if(store.useCheckBox) {
+                        store.vm.$set(nodeObj, 'checked', false);
+                    }
+
                     nodeObj.lvl = 0;
                     nodeObj.key = store.nodeKey++;
+                    nodeObj.parent = null;
 
                     treeMap.push(nodeObj);
                     return treeObj.push(nodeObj);
@@ -65,6 +70,12 @@ export default class TreeStore {
                 this.vm.$set(nodeObj, 'isLeaf', true);
                 this.vm.$set(nodeObj, 'show', true);
                 this.vm.$set(nodeObj, 'expanded', true);
+
+                if(this.useCheckBox) {
+                    this.vm.$set(nodeObj, 'checked', false);
+                }
+
+                nodeObj.parent = treeMap[ix];
 
                 treeMap.push(nodeObj);
                 return treeMap[ix].children.push(nodeObj);
@@ -100,6 +111,54 @@ export default class TreeStore {
 
         for(let ix=0, ixLen=item.children.length; ix<ixLen; ix++) {
             this.traversalDFS(item.children[ix], expandMode, item);
+        }
+    }
+
+    handleCheckNode(node, checkValue) {
+        node.checked = checkValue;
+
+        if(node.isLeaf) {
+            this.traversalParentChecked(node.parent, checkValue);
+        }
+        else {
+
+            for(let ix=0, ixLen=node.children.length; ix<ixLen; ix++) {
+                this.traversalChildrenChecked(node.children[ix], checkValue);
+                if(node.parent) {
+                    this.traversalParentChecked(node.parent, checkValue);
+                }
+            }
+
+
+        }
+
+    }
+
+    traversalParentChecked(item, checkValue) {
+        let isAllChecked = true;
+        for(let ix=0, ixLen=item.children.length; ix<ixLen; ix++) {
+            if(!item.children[ix].checked) {
+                isAllChecked = false;
+            }
+        }
+
+        item.checked = isAllChecked;
+
+        if (item.parentId === null || item.parent === null) {
+            return;
+        }
+        this.traversalParentChecked(item.parent, checkValue);
+    }
+
+    traversalChildrenChecked(item, checkValue) {
+        item.checked = checkValue;
+
+        if(item.isLeaf) {
+            return;
+        }
+
+        for(let ix=0, ixLen=item.children.length; ix<ixLen; ix++) {
+            this.traversalChildrenChecked(item.children[ix], checkValue);
         }
     }
 }
