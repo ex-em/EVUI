@@ -7,32 +7,16 @@
 }
 
 .evui-grid-body table {
-    border: 2px solid #42b983;
-    border-radius: 3px;
-    background-color: #fff;
-}
-
-th {
-    background-color: #42b983;
-    /*color: rgba(255,255,255,0.66);*/
-    color: #FFF;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
-    position: relative;
+    border-spacing: 0px;
+    position:relative;
+    overflow:hidden;
+    color: #333;
+    font-family: Helvetica, Arial, sans-serif;
+    border-collapse: collapse;
 }
 
 table {
-    /*overflow-x: auto;*/
-    /*display:block;*/
-    /*width: 700px;*/
-    border-spacing: 0px;
-    position:relative;
-    background-color:#42b983;
-    overflow:hidden;
-    border-collapse: collapse;
+
 }
 
 thead {
@@ -43,18 +27,23 @@ thead {
 }
 
 thead th {
-    background-color:#99a;
     min-width: 50px;
-    height:35px;
-    border: 1px solid #222;
+    height:25px;
+    background-color:#DFDFDF;
+    border: 1px solid transparent;
     padding: 0px;
+    font-weight:bold;
+    font-size:14px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
     box-sizing: border-box;
-}
-
-thead, tbody {
-    /*display:block;*/
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    position: relative;
 }
 
 tbody {
@@ -66,17 +55,22 @@ tbody {
 
 tbody td {
     min-width: 50px;
-    border-left:1px solid #222;
-    border-right:1px solid #222;
+    border-left:1px solid transparent;
+    border-right:1px solid transparent;
     padding: 0px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
+tr:hover td{ background: #666; color: #FFF; }
+
 .row-even {
-    background-color: #ffffff;
+    background-color: #F8F8F8;
 }
 
 .row-odd {
-    background-color: #e9e9e9;
+    background-color: #FEFEFE;
 }
 
 .text-align-right {
@@ -87,24 +81,14 @@ tbody td {
     text-align: center;
 }
 
-.evui-grid-cell {
-    border-spacing: 0;
-    padding: 0 2px 0 2px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
 input[type="checkbox"] {
     cursor:pointer;
 }
 
-#evui_grid_row_top > td, #evui_grid_row_bottom > td{
+.evui-grid-item-container > div, .evui-grid-item > div{
     padding:0px;
     border:0px;
+    position:absolute;
 }
 
 .grid-drag-line {

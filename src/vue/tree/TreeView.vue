@@ -17,7 +17,9 @@
                     width : 1200,   // number or '%' (percent)
                     height: '100%',     // number or '%' (percent)
                     treeColumnId: 'class_name',
-                    useColumnResize: true
+                    useColumnResize: true,
+                    useCheckBox: true,
+                    useFilter: false
                 },
                 treeColumns: [
                     {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: true, visible: true},

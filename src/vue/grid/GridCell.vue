@@ -145,11 +145,21 @@
 <style>
     .evui-grid-cell-wrap{
         position: relative;
-        width:100%;
-        height:100%;
         overflow: hidden;
     }
-    .evui-grid-cell{
-        height:20px;
+
+    .evui-grid-cell {
+        border-spacing: 0;
+        vertical-align: middle;
+        padding: 0 2px 0 2px;
+        font-size:12px;
+        height: 19px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
     }
+
 </style>
