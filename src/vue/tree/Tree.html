@@ -2,7 +2,7 @@
      :style="treeStyle">
     <div class="evui-tree-header">
         <span class="title"
-              v-show="treeOptions.title"
+              v-if="treeOptions.title"
               :style="titleStyle">
             {{treeOptions.title}}
         </span>
@@ -12,26 +12,25 @@
             <thead>
                 <tr>
                     <header-cell v-for="col in columnOptions"
-                                 :dataIndex         ="col.dataIndex"
-                                 :width             ="col.width"
-                                 :text              ="col.name"
-                                 :draggable         ="col.draggable"
-                    ></header-cell>
-                    <!--<th v-for="col in columnOptions"-->
-                        <!--v-show="col.visible"-->
-                        <!--:width="col.width">-->
-                        <!--{{ col.name }}-->
-                    <!--</th>-->
+                                 :dataIndex="col.dataIndex"
+                                 :width="col.width"
+                                 :text="col.name"
+                                 :visible="col.visible"
+                                 :draggable="col.draggable"
+                                 :useFilter="treeOptions.useFilter"
+                                 :useResize="treeOptions.useColumnResize">
+                    </header-cell>
                 </tr>
             </thead>
             <tbody>
-                <tree-node
-                        v-for="node in treeMap"
-                        key="node.id"
-                        @node-expand="setExpandNode"
-                        :columns="columnOptions"
-                        :treeColumn="treeColumn"
-                        :nodeObj="node">
+                <tree-node v-for="node in treeMap"
+                           key="node.id"
+                           @node-expand="setExpandNode"
+                           @node-checked="setCheckNode"
+                           :columns="columnOptions"
+                           :treeColumn="treeColumn"
+                           :nodeObj="node"
+                           :useCheckBox="treeOptions.useCheckBox">
                 </tree-node>
             </tbody>
             <div ref="dragLine" class="tree-drag-line"></div>

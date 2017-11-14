@@ -24,6 +24,11 @@ td {
     background: #FAFAFA;
     font-size:12px;
     height:22px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    padding : 0;
 }
 
 tr:nth-child(even) td { background: #F8F8F8; }

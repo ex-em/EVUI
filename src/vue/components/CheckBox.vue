@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="evui-comp-checkbox">
         <input  type="checkbox"
                 :id="id"
                 :name="name"
@@ -63,6 +63,46 @@
     }
 </script>
 
-<style>
+<style scoped>
+    .evui-comp-checkbox {
+        position: relative;
+        display:inline-block;
+    }
 
+    .evui-comp-checkbox label {
+        width: 11px;
+        height: 11px;
+        cursor: pointer;
+        position: absolute;
+        top: 6px;
+        left: 4px;
+        background-color: #ffffff;
+        border-radius: 2px;
+        border : 1px solid #bfcbd9;
+    }
+
+    .evui-comp-checkbox label:after {
+        content: '';
+        width: 7px;
+        height: 3px;
+        position: absolute;
+        top: 2px;
+        left: 1px;
+        border: 2px solid #333;
+        border-top: none;
+        border-right: none;
+        background: transparent;
+        opacity: 0;
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+    }
+    .evui-comp-checkbox label:hover::after {
+        opacity: 0.5;
+    }
+    .evui-comp-checkbox input[type=checkbox] {
+        visibility: hidden;
+    }
+    .evui-comp-checkbox input[type=checkbox]:checked + label:after {
+        opacity: 1;
+    }
 </style>
