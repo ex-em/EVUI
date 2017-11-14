@@ -144,7 +144,7 @@ export default class TreeStore {
 
         item.checked = isAllChecked;
 
-        if (item.parentId === null || item.parent === null) {
+        if (item.parent === null || isAllChecked !== checkValue) {
             return;
         }
         this.traversalParentChecked(item.parent, checkValue);
