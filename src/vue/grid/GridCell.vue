@@ -150,11 +150,10 @@
 
     .evui-grid-cell {
         border-spacing: 0;
-        display:table-cell;
         vertical-align: middle;
         padding: 0 2px 0 2px;
         font-size:12px;
-        height: 22px;
+        height: 19px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
