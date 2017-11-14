@@ -131,7 +131,7 @@ export default {
 
             let rowTopEl = this.$refs.evuiTreeItemContainer;
             let rowBottomEl = this.$refs.evuiTreeItem;
-            let dataLength = this.sortedData.length;
+            let dataLength = this.treeMap.length;
             let rowHeight = this.scroll.rowHeight;
             let vh = dataLength * rowHeight;
             let top = 0;

@@ -25,16 +25,17 @@
             <tbody @scroll="treeBodyScroll"
                    :style="{width:treeOptions.width+'px', height:treeOptions.height+'px'}">
                 <div ref="evuiTreeItemContainer" class="evui-tree-item-container">
-                    <div ref="evuiTreeItem" class="evui-tree-item"></div>
-                    <tree-node v-for="node in treeMap"
-                               key="node.id"
-                               @node-expand="setExpandNode"
-                               @node-checked="setCheckNode"
-                               :columns="columnOptions"
-                               :treeColumn="treeColumn"
-                               :nodeObj="node"
-                               :useCheckBox="treeOptions.useCheckBox">
-                    </tree-node>
+                    <div ref="evuiTreeItem" class="evui-tree-item">
+                        <tree-node v-for="node in bufferedData"
+                                   key="node.id"
+                                   @node-expand="setExpandNode"
+                                   @node-checked="setCheckNode"
+                                   :columns="columnOptions"
+                                   :treeColumn="treeColumn"
+                                   :nodeObj="node"
+                                   :useCheckBox="treeOptions.useCheckBox">
+                        </tree-node>
+                    </div>
                 </div>
             </tbody>
             <div ref="dragLine" class="tree-drag-line"></div>

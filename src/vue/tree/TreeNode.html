@@ -1,16 +1,23 @@
 <tr v-show="node.show">
-    <td :style="{'padding-left' : (node.lvl*30) + 'px', width : columns[0].width + 'px'}">
-        <span class="evui-tree-node"
-              @click="toggleExpandNode"
-              :class="{ 'evui-tree-node-expand': !node.isLeaf, 'node-collapse' : !node.isLeaf && node.expanded }">
-        </span>
-        <checkbox v-if="useCheckBox"
-                  v-model="node.checked"
-                  @onChange="onChange">
-        </checkbox>
-        <span>{{ node.data[treeColumn] }}</span>
+    <td>
+        <div class='evui-tree-node-box' :style="{width : columns[0].width + 'px', 'padding-left' : (node.lvl*30) + 'px'}">
+            <span class="evui-tree-node"
+                  @click="toggleExpandNode"
+                  :class="{ 'evui-tree-node-expand': !node.isLeaf, 'node-collapse' : !node.isLeaf && node.expanded }">
+            </span>
+            <checkbox v-if="useCheckBox"
+                      v-model="node.checked"
+                      @onChange="onChange">
+            </checkbox>
+            <span>{{ node.data[treeColumn] }}</span>
+
+        </div>
     </td>
     <template v-for="(col,index) in columns.slice(1)">
-        <td v-show="col.visible" :style="{width : col.width + 'px'}">{{ node.data[col.dataIndex] }}</td>
+        <td v-show="col.visible">
+            <div :style="{width : col.width + 'px'}">
+                {{ node.data[col.dataIndex] }}
+            </div>
+        </td>
     </template>
 </tr>

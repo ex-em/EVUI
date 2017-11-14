@@ -22,7 +22,7 @@
                     }
                 };
             }
-            debugger;
+
             for(let jx=1, jxLen=tempData.length; jx<jxLen; jx++) {
                 if(jx === 1) {
                     tempData[jx].parentId = null;
@@ -39,7 +39,7 @@
 
             }
             tempData.splice(0,1);
-            debugger;
+
 
             return {
                 // tree option & tree node data
