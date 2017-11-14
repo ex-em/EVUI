@@ -3,37 +3,37 @@ import Util from "../common/Util"
 export default {
     defaultOptions : {
         tooltipOffset: {
-            x: 0,
-            y: -20
+            x: 10,
+            y: 0
         }
     },
 
-    getTooltip: function($chart, options){
+    getTooltip: function(chartElement, options){
         let tooltipSelector,
-            $toolTip,
+            toolTipElement,
             width, height;
 
         options = Util.extend(null, this.defaultOptions, options);
 
         tooltipSelector = (options.type == 'Line') ? 'ct-point' : 'ct-bar';
-        $toolTip = document.querySelector('.ct-tooltip');
+        toolTipElement = document.querySelector('.ct-tooltip');
 
-        if (!$toolTip) {
-            $toolTip = document.createElement('div');
-            $toolTip.className = 'ct-tooltip';
-            document.body.appendChild($toolTip);
+        if (!toolTipElement) {
+            toolTipElement = document.createElement('div');
+            toolTipElement.className = 'ct-tooltip';
+            document.body.appendChild(toolTipElement);
         }
 
-        width = $toolTip.offsetWidth;
-        height = $toolTip.offsetHeight;
+        width = toolTipElement.offsetWidth;
+        height = toolTipElement.offsetHeight;
 
-        hide($toolTip);
+        hide(toolTipElement);
 
         on('mouseover', tooltipSelector, function (event) {
             if(!options.tooltip) { return ; }
 
             let $point = event.target,
-                tooltipText = '',
+                tooltipText,
                 seriesName = $point.getAttribute('ct:meta'),
                 value = $point.getAttribute('ct:value'),
                 time;
@@ -44,36 +44,35 @@ export default {
                 time = value.split(',')[0]
             }
 
-            tooltipText += '<div class="ct-tooltip-meta">' + time + '</div>';
-
-            tooltipText += '<div style="float:left;">';
-            tooltipText += '    <div class="ct-tooltip-series">' + seriesName;
-            tooltipText += '        <span class="ct-tooltip-series-color" style="background: ' + event.target.style.stroke + '"></span>'
-            tooltipText += '        <span class="ct-tooltip-series-text"> : </span>'
-            tooltipText += '    </div>';
-            tooltipText += '</div>';
-
             if(options.tooltip.yFormat){
                 value = options.tooltip.yFormat(parseInt(value.split(',')[1]))
             }else{
-                value = value.split(',')[1]
+                value = value.split(',')[1];
             }
 
-            tooltipText += '<div class="ct-tooltip-value">';
-            tooltipText += '    <div>' + value + '</div>';
-            tooltipText += '</div>';
+            tooltipText = `
+                <div class="ct-tooltip-meta"> ${ time } </div>
+                <div class="ct-tooltip-series" >
+                    <div> ${ seriesName }
+                       <span class="ct-tooltip-series-color" style="background: ${ event.target.style.stroke }"></span>
+                       <span class="ct-tooltip-series-text"> : </span>
+                    </div>
+                </div>
+                <div class="ct-tooltip-value">
+                    <div> ${ value } </div>
+                </div>`;
 
-            $toolTip.innerHTML = tooltipText;
+            toolTipElement.innerHTML = tooltipText;
             setPosition(event);
-            show($toolTip);
+            show(toolTipElement);
 
             // Remember height and width to avoid wrong position in IE
-            height = $toolTip.offsetHeight;
-            width = $toolTip.offsetWidth;
+            height = toolTipElement.offsetHeight;
+            width = toolTipElement.offsetWidth;
         });
 
         on('mouseout', tooltipSelector, function () {
-            hide($toolTip);
+            hide(toolTipElement);
         });
 
         on('mousemove', null, function (event) {
@@ -81,28 +80,37 @@ export default {
         });
 
         function on(event, selector, callback) {
-            $chart.addEventListener(event, function (e) {
+            chartElement.addEventListener(event, function (e) {
                 if (!selector || hasClass(e.target, selector))
                     callback(e);
             });
         }
 
         function setPosition(event) {
-            height = height || $toolTip.offsetHeight;
-            width = width || $toolTip.offsetWidth;
-            let offsetX = - width / 2 + options.tooltipOffset.x,
-                offsetY = - height + options.tooltipOffset.y,
-                anchorX, anchorY;
+            height = height || toolTipElement.offsetHeight;
+            width = width || toolTipElement.offsetWidth;
 
-            var box = $chart.getBoundingClientRect();
+            let offsetX = options.tooltipOffset.x,
+                offsetY = - height / 2 + options.tooltipOffset.y,
+                anchorX, anchorY, left, top,
+                box = chartElement.getBoundingClientRect(),
+                halfBoxWidth = box.width / 2;
 
             if(event.target.x2 && event.target.y2){
                 anchorX = parseInt(event.target.x2.baseVal.value);
                 anchorY = parseInt(event.target.y2.baseVal.value);
             }
 
-            $toolTip.style.top = box.top + anchorY + window.pageYOffset + offsetY + 'px';
-            $toolTip.style.left = box.left + anchorX + window.pageXOffset + offsetX + 'px';
+            left = box.left + anchorX + window.pageXOffset;
+            top = box.top + anchorY + window.pageYOffset;
+
+            if(anchorX > halfBoxWidth) {
+                toolTipElement.style.left = left - offsetX - toolTipElement.clientWidth + 'px';
+            }else{
+                toolTipElement.style.left = left + offsetX + 'px';
+            }
+
+            toolTipElement.style.top = top + offsetY + 'px';
         }
 
         function show(element) {
@@ -112,7 +120,7 @@ export default {
         }
 
         function hide(element) {
-            var regex = new RegExp('tooltip-show' + '\\s*', 'gi');
+            let regex = new RegExp('tooltip-show' + '\\s*', 'gi');
             element.className = element.className.replace(regex, '').trim();
         }
 

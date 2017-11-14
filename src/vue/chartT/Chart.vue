@@ -199,7 +199,8 @@
 
     .ct-bar {
         fill: none;
-        stroke-width: 10px; }
+        stroke-width: 10px;
+        cursor: pointer; }
 
     .ct-bar.ct-unchecked,
     .ct-line.ct-unchecked,
@@ -584,17 +585,6 @@
         -o-transition: opacity .2s linear;
         transition: opacity .2s linear; }
 
-    .ct-tooltip:before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        margin-left: -15px;
-        border: 15px solid transparent;
-        border-top-color: #eeeeee; }
-
     .ct-tooltip.tooltip-show {
         opacity: 1; }
 
@@ -605,6 +595,7 @@
         border-bottom: 1px solid #D2D2D2; }
 
     .ct-tooltip-series {
+        float:left;
         font-size:12px;
         position: relative;
         text-indent: 12px;
