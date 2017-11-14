@@ -1,7 +1,6 @@
 .evui-tree-node {
     display: inline-block;
     vertical-align: middle;
-
 }
 
 .evui-tree-node-expand {
@@ -20,15 +19,24 @@
 }
 
 
-td {
+tbody td {
+    min-width: 50px;
     background: #FAFAFA;
     font-size:12px;
     height:22px;
+    border-left:1px solid transparent;
+    border-right:1px solid transparent;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     box-sizing: border-box;
     padding : 0;
+}
+
+tbody tr {
+    display:inline-flex;
+    border-left:1px solid transparent;
+    border-right:1px solid transparent;
 }
 
 tr:nth-child(even) td { background: #F8F8F8; }
