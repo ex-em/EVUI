@@ -262,7 +262,8 @@ class BaseChart {
         if (seriesIndex !== 0 && !seriesIndex) {
             seriesIndex = -1;
         }
-        else if (itemIndex !== 0 && !itemIndex) {
+
+        if (itemIndex !== 0 && !itemIndex) {
             itemIndex = -1;
         }
 
