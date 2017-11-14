@@ -29,7 +29,7 @@ export default {
             filterList          : this.data,
             scroll: {
                 bufferSize      : 100,
-                rowHeight       : 20,
+                rowHeight       : null,
                 prevScrollTop   : 0,
                 page            : 0,
                 offset          : 0,
@@ -226,8 +226,17 @@ export default {
         },
 
         bufferHeightCalc: function () {
-            let rowTopEl = document.getElementById('evui_grid_item_container');
-            let rowBottomEl = document.getElementById('evui_grid_item');
+
+            if (this.$refs.evuiGridItem.firstElementChild) {
+                if (!this.scroll.rowHeight) {
+                    this.scroll.rowHeight = this.$refs.evuiGridItem.firstElementChild.offsetHeight;
+                }
+            } else {
+                return;
+            }
+
+            let rowTopEl = this.$refs.evuiGridItemContainer;
+            let rowBottomEl = this.$refs.evuiGridItem;
             let dataLength = this.sortedData.length;
             let rowHeight = this.scroll.rowHeight;
             let vh = dataLength * rowHeight;
@@ -241,48 +250,49 @@ export default {
         },
 
         gridBodyScroll: function (e) {
-            this.$el.getElementsByTagName('thead')[0].style.left = (-e.target.scrollLeft) + 'px';
-            let bufferSize = this.scroll.bufferSize;
-            let dataLength = this.sortedData.length;
-            let rowHeight = this.scroll.rowHeight;
-            let th = rowHeight * dataLength; // virtual height
-            let ph = bufferSize * rowHeight; // page height
-            let h = ph * 100;
-            let n = Math.ceil(th / ph);
-            let vp = this.gridOptions.height;
-            let cj = (th - h) / (n - 1);
-            let viewport = e.target;
-            let scrollTop = viewport.scrollTop;
-
-            if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
-                // onJump
-                this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
-            } else {
-                // onNearScroll
-                // next page
-                if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
-                    this.scroll.page++;
-                }
-                // prev page
-                else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
-                    this.scroll.page--;
-                }
-            }
-            this.scroll.prevScrollTop = scrollTop;
-
-            // calculate the viewport + buffer
-            var y = viewport.scrollTop + this.scroll.offset,
-                buffer = ph > vp ? ph - vp : vp,
-                top = Math.floor((y - buffer/2) / rowHeight),
-                bottom = Math.ceil((y + vp + buffer/2) / rowHeight);
-
-            top = Math.max(0, top);
-            bottom = Math.min(th / rowHeight, bottom);
-
-            console.log('TOP --> ', top, 'Bottom --> ', bottom);
+            this.$refs.evuiGridThead.style.left = (-e.target.scrollLeft) + 'px';
 
             clearTimeout(this.scroll.timeOut);
             this.scroll.timeOut = setTimeout(function() {
+                let bufferSize = this.scroll.bufferSize;
+                let dataLength = this.sortedData.length;
+                let rowHeight = this.scroll.rowHeight;
+                let th = rowHeight * dataLength; // virtual height
+                let ph = bufferSize * rowHeight; // page height
+                let h = ph * 100;
+                let n = Math.ceil(th / ph);
+                let vp = this.gridOptions.height;
+                let cj = (th - h) / (n - 1);
+                let viewport = e.target;
+                let scrollTop = viewport.scrollTop;
+
+                if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
+                    // onJump
+                    this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
+                } else {
+                    // onNearScroll
+                    // next page
+                    if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
+                        this.scroll.page++;
+                    }
+                    // prev page
+                    else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
+                        this.scroll.page--;
+                    }
+                }
+                this.scroll.prevScrollTop = scrollTop;
+
+                // calculate the viewport + buffer
+                var y = viewport.scrollTop + this.scroll.offset,
+                    buffer = ph > vp ? ph - vp : vp,
+                    top = Math.floor((y - buffer/2) / rowHeight),
+                    bottom = Math.ceil((y + vp + buffer/2) / rowHeight);
+
+                top = Math.max(0, top);
+                bottom = Math.min(th / rowHeight, bottom);
+
+                console.log('TOP --> ', top, 'Bottom --> ', bottom);
+
                 this.scroll.top = top;
                 this.scroll.bottom = bottom;
                 this.bufferHeightCalc();
@@ -526,7 +536,6 @@ export default {
         //Drag Column Event setting
         this.$refs.dragLine.style.height = this.$refs.gridTable.clientHeight + 'px';
         this.setDragColumnEvent();
-
         this.bufferHeightCalc();
     },
 

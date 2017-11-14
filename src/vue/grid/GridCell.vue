@@ -4,14 +4,14 @@
         @click="onClick()"
     >
         <div v-if="readOnly || render == null || render == ''"
-             :style="{width:width+'px', height:height+'px'}"
+             :style="{width:width+'px'}"
              class="evui-grid-cell">
             {{ this.cellValue }}
         </div>
         <template v-else>
             <div v-if="render=='checkbox'"
                  class="evui-grid-cell"
-                 :style="{width:width+'px', height:height+'px'}"
+                 :style="{width:width+'px'}"
             >
                 <checkbox  v-model="cellValue"
                            @onChange="onChange"
@@ -20,14 +20,14 @@
             <template v-else>
                 <div v-if="! isClicked"
                      class="evui-grid-cell"
-                     :style="{width:width+'px', height:height+'px'}"
+                     :style="{width:width+'px'}"
                 > {{ this.cellValue }} </div>
                 <div v-else
                      class="evui-grid-cell"
-                     :style="{width:width+'px', height:height+'px'}"
+                     :style="{width:width+'px'}"
                 >
                     <component :is="render"
-                               :style="{width:width+'px', height:height+'px'}"
+                               :style="{width:width+'px'}"
                                v-model="cellValue"
                                v-focus
                                @input="onInput"
@@ -63,7 +63,6 @@
         },
         props : {
             width: null,
-            height: null,
             dataIndex: {
                 type: String,
                 default: null,
@@ -146,21 +145,22 @@
 <style>
     .evui-grid-cell-wrap{
         position: relative;
-        width:100%;
-        height:100%;
         overflow: hidden;
     }
 
     .evui-grid-cell {
         border-spacing: 0;
+        display:table-cell;
+        vertical-align: middle;
         padding: 0 2px 0 2px;
+        font-size:12px;
+        height: 22px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
-        font-size:12px;
     }
 
 </style>

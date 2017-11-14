@@ -9,7 +9,7 @@
     </div>
     <div class="evui-grid-body">
         <table ref="gridTable" :style="{width:gridOptions.width+'px'}">
-            <thead :style="{width:gridOptions.width+'px'}">
+            <thead ref="evuiGridThead" class="evui-grid-thead" :style="{width:gridOptions.width+'px'}">
             <tr>
                 <header-cell v-for="col in columnOptions"
                              :dataIndex         ="col.dataIndex"
@@ -26,14 +26,13 @@
             </thead>
             <tbody @scroll="gridBodyScroll"
                    :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
-                <div id="evui_grid_item_container">
-                    <div id="evui_grid_item">
+                <div ref="evuiGridItemContainer" class="evui-grid-item-container">
+                    <div ref="evuiGridItem" class="evui-grid-item">
                     <tr v-for="(entry, rowIdx) in bufferedData"
                     :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
                         <cell v-for         = "col in columnOptions"
                               :dataIndex    = "col.dataIndex"
                               :width        = "col.width"
-                              :height       = "col.height"
                               :visible      = "col.visible"
                               :render       = "col.render"
                               :class        = "cls(col.type)"

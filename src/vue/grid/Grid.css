@@ -85,7 +85,7 @@ input[type="checkbox"] {
     cursor:pointer;
 }
 
-#evui_grid_item_container > div, #evui_grid_item > div{
+.evui-grid-item-container > div, .evui-grid-item > div{
     padding:0px;
     border:0px;
     position:absolute;
