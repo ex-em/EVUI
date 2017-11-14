@@ -11,7 +11,7 @@
         <template v-else>
             <div v-if="render=='checkbox'"
                  class="evui-grid-cell"
-                 :style="{width:width+'px'}"
+                 :style="{display:'inline-block', width:'100%'}"
             >
                 <checkbox  v-model="cellValue"
                            @onChange="onChange"
@@ -24,7 +24,7 @@
                 > {{ this.cellValue }} </div>
                 <div v-else
                      class="evui-grid-cell"
-                     :style="{width:width+'px'}"
+                     :style="{display:'inline-block', width:'100%'}"
                 >
                     <component :is="render"
                                :style="{width:width+'px'}"

@@ -1,5 +1,5 @@
 <template>
-    <div class="evui-comp-checkbox">
+    <div class="evui-comp-checkbox" style="text-align: center">
         <input  type="checkbox"
                 :id="id"
                 :name="name"
