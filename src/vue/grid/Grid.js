@@ -228,7 +228,7 @@ export default {
 
             let rowTopEl = this.$refs.evuiGridItemContainer;
             let rowBottomEl = this.$refs.evuiGridItem;
-            let dataLength = this.sortedData.length;
+            let dataLength = this.filteredData.length;
             let rowHeight = this.scroll.rowHeight;
             let vh = dataLength * rowHeight;
             let top = 0;
@@ -246,7 +246,7 @@ export default {
             clearTimeout(this.scroll.timeOut);
             this.scroll.timeOut = setTimeout(function() {
                 let bufferSize = this.scroll.bufferSize;
-                let dataLength = this.sortedData.length;
+                let dataLength = this.filteredData.length;
                 let rowHeight = this.scroll.rowHeight;
                 let th = rowHeight * dataLength; // virtual height
                 let ph = bufferSize * rowHeight; // page height
