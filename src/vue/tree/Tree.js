@@ -14,7 +14,17 @@ export default {
             treeStyle  : null,
             titleStyle : null,
             store      : null,
-            treeColumn : this.treeInfo.treeColumnId
+            treeColumn : this.treeInfo.treeColumnId,
+            scroll: {
+                bufferSize      : 100,
+                rowHeight       : null,
+                prevScrollTop   : 0,
+                page            : 0,
+                offset          : 0,
+                top             : 0,
+                bottom          : 0,
+                timeOut         : null
+            }
         };
     },
     computed: {
@@ -55,8 +65,13 @@ export default {
                 }
             }
         },
+
         treeMap() {
             return this.store.treeMap;
+        },
+
+        bufferedData: function () {
+            return this.treeMap.slice(this.scroll.top, Math.max(this.scroll.bottom, this.scroll.bufferSize));
         }
     },
     methods: {
@@ -102,6 +117,80 @@ export default {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             }
+        },
+
+        bufferHeightCalc: function () {
+
+            if (this.$refs.evuiTreeItem.firstElementChild) {
+                if (!this.scroll.rowHeight) {
+                    this.scroll.rowHeight = this.$refs.evuiTreeItem.firstElementChild.offsetHeight;
+                }
+            } else {
+                return;
+            }
+
+            let rowTopEl = this.$refs.evuiTreeItemContainer;
+            let rowBottomEl = this.$refs.evuiTreeItem;
+            let dataLength = this.treeMap.length;
+            let rowHeight = this.scroll.rowHeight;
+            let vh = dataLength * rowHeight;
+            let top = 0;
+
+            if (vh > this.scroll.top * rowHeight) {
+                top = this.scroll.top * rowHeight - this.scroll.offset;
+                rowTopEl.style.height = vh + 'px';
+                rowBottomEl.style.top = top + 'px';
+            }
+        },
+
+        treeBodyScroll: function (e) {
+            this.$refs.evuiTreeThead.style.left = (-e.target.scrollLeft) + 'px';
+
+            clearTimeout(this.scroll.timeOut);
+            this.scroll.timeOut = setTimeout(function() {
+                let bufferSize = this.scroll.bufferSize;
+                let dataLength = this.treeMap.length;
+                let rowHeight = this.scroll.rowHeight;
+                let th = rowHeight * dataLength; // virtual height
+                let ph = bufferSize * rowHeight; // page height
+                let h = ph * 100;
+                let n = Math.ceil(th / ph);
+                let vp = this.treeOptions.height;
+                let cj = (th - h) / (n - 1);
+                let viewport = e.target;
+                let scrollTop = viewport.scrollTop;
+
+                if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
+                    // onJump
+                    this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
+                } else {
+                    // onNearScroll
+                    // next page
+                    if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
+                        this.scroll.page++;
+                    }
+                    // prev page
+                    else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
+                        this.scroll.page--;
+                    }
+                }
+                this.scroll.prevScrollTop = scrollTop;
+
+                // calculate the viewport + buffer
+                var y = viewport.scrollTop + this.scroll.offset,
+                    buffer = ph > vp ? ph - vp : vp,
+                    top = Math.floor((y - buffer/2) / rowHeight),
+                    bottom = Math.ceil((y + vp + buffer/2) / rowHeight);
+
+                top = Math.max(0, top);
+                bottom = Math.min(th / rowHeight, bottom);
+
+                console.log('TOP --> ', top, 'Bottom --> ', bottom);
+
+                this.scroll.top = top;
+                this.scroll.bottom = bottom;
+                this.bufferHeightCalc();
+            }.bind(this), 40);
         }
     },
     created() {
@@ -131,6 +220,7 @@ export default {
         }
 
         this.$refs.dragLine.style.height = this.$refs.treeTable.clientHeight + 'px';
+        this.bufferHeightCalc();
 
     },
     components: {

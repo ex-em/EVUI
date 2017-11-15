@@ -4,7 +4,7 @@
     >
         <div v-if="render=='checkbox'"
              :draggable="draggable"
-             :style="{ width:width+'px' }"
+             :style="{ display:'inline-block',width:'100%' }"
         >
             <checkbox  v-model="cellValue"
                        @onChange="onChange"
@@ -22,12 +22,12 @@
                   :class="order">
             </span>
         </div>
-        <span class="filter-icon"></span>
+        <span class="filter-icon"  @click="clickFilter" v-if="filter!=='none'"></span>
         <div v-if="useResize"
              class="grip"
         ></div>
-        <div class='filter-popover'>
-            <input type='text' class='filter-input' @input="filterGrid(col,$event)">
+        <div class='filter-popover' v-if="filter!=='none'">
+            <input type='text' class='filter-input' @input="filterGrid(dataIndex,$event)">
         </div>
     </th>
 </template>
@@ -81,6 +81,10 @@
                 type: Boolean,
                 default: true,
             },
+            filter: {
+                type: String,
+                default : 'none'
+            }
         },
         data: function () {
             return {
@@ -134,6 +138,22 @@
             },
             onInput(){
             },
+
+            clickFilter(e){
+                if (e.stopPropagation) {
+                    e.stopPropagation(); // stops the browser from redirecting.
+                }
+                this.$emit('clickFilterIcon', e)
+            },
+
+            /**
+             * 필터 input 이벤트
+             * @param data : col (컬럼 정보)
+             * @param e (input 이벤트)
+             */
+            filterGrid(data,e){
+                this.$emit('filterGrid',data,e)
+            }
 
         },
 
@@ -208,6 +228,7 @@
         word-break: break-all;
         font-size: 14px;
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+        display : none;
         /*  width: 400px;
          top: 472px;
          left: 835px;

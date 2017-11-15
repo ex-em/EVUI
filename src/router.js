@@ -5,6 +5,7 @@ import Grid from './vue/grid/GridView.vue';
 import TGrid from './vue/tgrid/TGridView.vue';
 import Tree from './vue/tree/TreeView.vue';
 import Chart from './vue/chartT/ChartView.vue';
+import ChartTest from './vue/chartT/ChartTest.vue';
 
 
 
@@ -28,6 +29,9 @@ export default new Router({
         }, {
             path: '/chart',
             component: Chart
+        }, {
+            path: '/chartTest',
+            component: ChartTest
         }
     ]
 });

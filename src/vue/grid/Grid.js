@@ -27,6 +27,8 @@ export default {
             beforeFilterCol     : null,
             beforeFilterList    :null,
             filterList          : this.data,
+            sortedList          : this.data,
+            sortclick           : false,
             scroll: {
                 bufferSize      : 100,
                 rowHeight       : null,
@@ -94,7 +96,59 @@ export default {
             return totalWidth;
         },
 
-        sortedData: function () {
+        bufferedData: function () {
+            return this.filteredData.slice(this.scroll.top, Math.max(this.scroll.bottom, this.scroll.bufferSize));
+        },
+
+        filteredData: {
+            get() {
+                return this.filterList;
+            },
+            set(filterData) {
+
+                if (filterData.type ==='sort') {
+
+                    let sortKey = this.sortKey;
+
+                    let order = this.sortOrders[sortKey] || 1;
+                    let sortedData;
+                    if (sortKey) {
+                        sortedData = this.filterList.slice().sort(function (a, b) {
+                            a = a[sortKey];
+                            b = b[sortKey];
+                            return (a === b ? 0 : a > b ? 1 : -1) * order;
+                        });
+                    }
+                    this.filterList = sortedData;
+                }
+
+                //filter event
+                if(filterData.type ==='filter') {
+                    //입력 필터 컬럼 비교
+                    if (this.beforeFilterCol !== filterData.colIndex) {
+                        this.beforeFilterCol = filterData.colIndex;
+                        let result = this.sortedList.slice();
+
+                        for (let col in this.filterCol) {
+                            if (this.filterCol[col] !== undefined && col !== filterData.colIndex) {
+
+                                result = result.filter((data) => {
+                                    return data[col].toString().indexOf(this.filterCol[col]) >= 0
+                                })
+                            }
+                        }
+                        this.beforeFilterList = result;
+                    }
+                    this.filterList = this.beforeFilterList.filter((data) => {
+                        return data[filterData.colIndex].toString().indexOf(filterData.value) >= 0
+                    });
+                }
+            }
+        }
+    },
+
+    watch: {
+        sortclick(){
             let sortKey = this.sortKey;
 
             let order = this.sortOrders[sortKey] || 1;
@@ -107,74 +161,10 @@ export default {
                     return (a === b ? 0 : a > b ? 1 : -1) * order;
                 });
             }
-
-            return sortedData;
-        },
-
-        bufferedData: function () {
-            return this.sortedData.slice(this.scroll.top, Math.max(this.scroll.bottom, this.scroll.bufferSize));
-        },
-
-        filteredData: {
-            get() {
-                return this.filterList;
-            },
-            set(filterData) {
-                console.log("FSDFS", this.filterList)
-                console.log("filterData", filterData)
-                let filteredTemp
-
-                //입력 필터 컬럼 비교
-                if(this.beforeFilterCol!== filterData.colIndex){
-                    this.beforeFilterCol = filterData.colIndex;
-                    let result = this.data.slice();
-
-                    for(let col in this.filterCol){
-                        if(this.filterCol[col]!==undefined && col!==filterData.colIndex){
-
-                            result = result.filter((data) =>{
-                                return data[col].toString().indexOf(this.filterCol[col]) >= 0
-                            })
-                        }
-                    }
-
-
-                    this.beforeFilterList = result;
-                    // this.filterList = result;
-
-                }else{
-
-                }
-
-                this.filterList = this.beforeFilterList.filter((data) => {
-                    console.log('1111', filterData.colIndex)
-                    return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
-                });
-
-
-                // for(let item in this.filterCol){
-                //     console.log('2222',item)
-                //     if(this.filterCol[item] !== undefined){
-                //
-                //     }
-                // }
-
-                //기존 필터 걸려있는지 확인후 분기
-                // if(this.filterList.length === this.data.length) {
-                //     this.filterList = this.data.filter((data) => {
-                //         console.log('0000', filterData.colIndex)
-                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
-                //     })
-                // }else {
-                //     this.filterList = this.data.filter((data) => {
-                //         console.log('1111', filterData.colIndex)
-                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
-                //     })
-                // }
-                console.log(this.filterList)
-            }
+            this.sortedList = sortedData;
         }
     },
+
     methods: {
         onHeaderCellClick(header, dataIndex) {
             this.sortBy(dataIndex);
@@ -202,8 +192,6 @@ export default {
             }else{
                 this.checkedCount--;
             }
-
-            debugger
 
             if(this.data.length == this.checkedCount){
                 this.isAllChecked = true;
@@ -237,7 +225,7 @@ export default {
 
             let rowTopEl = this.$refs.evuiGridItemContainer;
             let rowBottomEl = this.$refs.evuiGridItem;
-            let dataLength = this.sortedData.length;
+            let dataLength = this.filteredData.length;
             let rowHeight = this.scroll.rowHeight;
             let vh = dataLength * rowHeight;
             let top = 0;
@@ -255,7 +243,7 @@ export default {
             clearTimeout(this.scroll.timeOut);
             this.scroll.timeOut = setTimeout(function() {
                 let bufferSize = this.scroll.bufferSize;
-                let dataLength = this.sortedData.length;
+                let dataLength = this.filteredData.length;
                 let rowHeight = this.scroll.rowHeight;
                 let th = rowHeight * dataLength; // virtual height
                 let ph = bufferSize * rowHeight; // page height
@@ -310,6 +298,9 @@ export default {
         sortBy: function(key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
+            console.log("12312", this.sortclick)
+            this.sortclick = !this.sortclick;
+            this.filteredData = {type:'sort'}
         },
 
         cls(type) {
@@ -345,8 +336,6 @@ export default {
                 if (e.preventDefault) {
                     e.preventDefault(); //
                 }
-                vm.$emit('test', 323232)
-                console.log('마우스 다운 이벤트',e)
                 thElm = e.target.parentNode;
                 startOffset = thElm.offsetWidth - e.pageX;
                 document.addEventListener('mousemove', onMouseMove);
@@ -408,7 +397,7 @@ export default {
             //드래그가 타겟 엔터시
             function handleDragEnter(e) {
 
-                console.log('드래그 엔터 ',e)
+
                 if(this.classList.contains('grid-column-sort') && !this.classList.contains('dragItem')){
                     let targetPos = this.parentElement.getBoundingClientRect();
                     let dragX = (targetPos.left) + 'px';
@@ -447,12 +436,9 @@ export default {
                 let dragIdx = vm.dragTarget.parentElement.cellIndex;
                 let dropIdx = this.parentElement.cellIndex;
 
-                if(vm.gridOptions.useCheckbox){
-                    dragIdx -= 1;
-                    dropIdx -= 1;
-                }
 
                 let targetCol = vm.columnOptions[dragIdx]
+
                 let data ={
                     type: 'drag',
                     dropIdx :dropIdx,
@@ -460,11 +446,7 @@ export default {
                     targetCol : targetCol
                 };
 
-
                 vm.columnOptions = data
-
-
-
 
                 return false;
 
@@ -493,11 +475,8 @@ export default {
          * @param e (input 이벤트)
          */
         filterGrid(data,e) {
-            let colIndex = data.dataIndex;
+            let colIndex = data;
             let value = e.target.value;
-            console.log('@@@@',data)
-            // console.log('@@@@',e.target)
-            console.log("#####",e.target.value)
 
             if(value ===''){
                 this.filterCol[colIndex] = undefined;
@@ -506,26 +485,29 @@ export default {
             }
 
             this.filteredData = {
+                type: 'filter',
                 colIndex: colIndex,
                 value : value
             };
+        },
 
-            // this.data[0].col1 = 222
-            // for(let ix=)
+        clickFilter(e){
+            let thEle = e.target.parentElement;
+            let popover = thEle.getElementsByClassName('filter-popover')[0]
 
+            if(popover.style.display===''|| popover.style.display==='none') {
+                popover.style.display = 'block'
+            }else{
+                popover.style.display = 'none'
+            }
+
+            popover.style.left = e.target.offsetLeft+'px';
 
         }
 
     },
 
     mounted() {
-        // const vm = this;
-        // vm.grips = [];
-        // vm.setResizeGrips();
-        // vm.syncColumnWidths();
-
-        console.log(this.gridOptions.useColumnResize)
-
 
         //Resize Column Event setting
         if(this.gridOptions.useColumnResize) {

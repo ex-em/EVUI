@@ -19,8 +19,11 @@
                              :render            ="col.render"
                              :draggable         ="col.draggable"
                              :value             ="isAllChecked"
+                             :filter            ="col.filter"
                              @cellClick         ="onHeaderCellClick"
                              @allCheckChange    ="onAllCheckChange"
+                             @clickFilterIcon   ="clickFilter"
+                             @filterGrid        ="filterGrid"
                 ></header-cell>
             </tr>
             </thead>
