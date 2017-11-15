@@ -11,7 +11,7 @@
     border-left-color: #97a8be;
     border-left-width: 7px;
     transform: rotate(0);
-    transition: transform .3s ease-in-out;
+    /*transition: transform .3s ease-in-out;*/
 }
 
 .evui-tree-node-expand.node-collapse {

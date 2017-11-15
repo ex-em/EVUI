@@ -11,7 +11,7 @@
         data () {
             let tempData = [];
 
-            for (let ix = 1; ix <= 1000; ix++) {
+            for (let ix = 1; ix <= 2000; ix++) {
                 tempData[ix] = {
                     'id' : ix,
                     'data' : {
@@ -30,7 +30,7 @@
                 else if(jx % 10 === 1) {
                     tempData[jx].parentId = null;
                 }
-                else if(jx % 10 === 8) {
+                else if(jx % 10 === 7) {
                     tempData[jx].parentId = jx - 5;
                 }
                 else {
