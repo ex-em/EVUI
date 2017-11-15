@@ -112,7 +112,6 @@ export default {
 
                     let order = this.sortOrders[sortKey] || 1;
                     let sortedData;
-                    console.log("##@##@", this.filterList)
                     if (sortKey) {
                         sortedData = this.filterList.slice().sort(function (a, b) {
                             a = a[sortKey];
@@ -150,7 +149,6 @@ export default {
 
     watch: {
         sortclick(){
-            console.log("타냥ㄴ럼나ㅣㅇ;런미아ㅗ런ㅁㅇ;ㅣㅗㄹㄴㅁ아ㅣ;ㅗㅁㄴ;ㅐ")
             let sortKey = this.sortKey;
 
             let order = this.sortOrders[sortKey] || 1;
@@ -169,7 +167,6 @@ export default {
 
     methods: {
         onHeaderCellClick(header, dataIndex) {
-            console.log("@@@@@")
             this.sortBy(dataIndex);
         },
         onAllCheckChange(dataIndex, value) {
