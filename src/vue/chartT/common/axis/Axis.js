@@ -21,16 +21,14 @@ class Axis {
         attribute[this.counterUnits.pos] = labelOffset[this.counterUnits.pos];
         attribute[this.units.len] = length;
         attribute[this.counterUnits.len] = Math.max(0, axisOffset - 10);
-        attribute['overflow']= 'visible';
+        attribute['overflow'] = 'visible';
 
         content = document.createElement('span');
         content.setAttribute('xmlns', 'http://www.w3.org/2000/xmlns/');
-        content.innerText = label;
+        content.className = 'label';
+        content.textContent = label;
         content.style[this.units.len] = Math.round(attribute[this.units.len]) + 'px';
         content.style[this.counterUnits.len] = Math.round(attribute[this.counterUnits.len]) + 'px';
-        content.style['vertical-align'] = 'middle';
-        content.style['text-align'] = 'center';
-        content.style['display'] = 'block';
 
         labelElement = Svg.createElement(labelGroup, 'foreignObject', attribute, null);
         labelElement.appendChild(content);
@@ -43,7 +41,7 @@ class Axis {
         attribute[this.units.pos + '2'] = position;
         attribute[this.counterUnits.pos + '1'] = this.gridOffset;
         attribute[this.counterUnits.pos + '2'] = this.gridOffset + length;
-        attribute['class'] = 'ct-grid';
+        attribute['class'] = 'grid-line';
 
         Svg.createElement(gridGroup, 'line', attribute, null);
     }

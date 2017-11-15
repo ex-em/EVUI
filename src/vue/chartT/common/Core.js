@@ -640,7 +640,7 @@ export default {
             var content = document.createElement('span');
             content.className = classes.join(' ');
             content.setAttribute('xmlns', this.namespaces.xhtml);
-            content.innerText = labels[index];
+            content.textContent = labels[index];
             content.style[axis.units.len] = Math.round(positionalData[axis.units.len]) + 'px';
             content.style[axis.counterUnits.len] = Math.round(positionalData[axis.counterUnits.len]) + 'px';
 

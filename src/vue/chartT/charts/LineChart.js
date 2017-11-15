@@ -60,7 +60,7 @@ class LineChart extends BaseChart {
             seriesListener = Svg.createElement(seriesGroup, 'rect', {
                 width: this.options.width,
                 height: this.options.height,
-                style: 'opacity:0;'
+                class: 'series-listener'
             }),
             chartRect = this.chartRect,
             axisX = this.axis.axisX,
@@ -94,7 +94,7 @@ class LineChart extends BaseChart {
             if (!isScatter) {
                 pathElement = Svg.createElement(seriesElement, 'path', {
                     d: Svg.stringify(computedPathInfo),
-                    class: 'ct-line',
+                    class: 'line',
                     style: 'stroke: ' + color[ix]
                 }, null);
             }
@@ -106,7 +106,7 @@ class LineChart extends BaseChart {
                     y1: pathData.y,
                     x2: pathData.x + 0.01,
                     y2: pathData.y,
-                    class: 'ct-point',
+                    class: 'point',
                     style: 'stroke: ' + color[ix],
                     'ct:value': [seriesData[jx].x, seriesData[jx].y].filter(Core.isNumeric).join(','),
                     'ct:meta': seriesNames[ix]

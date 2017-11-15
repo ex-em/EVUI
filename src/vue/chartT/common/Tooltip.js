@@ -15,12 +15,12 @@ export default {
 
         options = Util.extend(null, this.defaultOptions, options);
 
-        tooltipSelector = (options.type == 'Line') ? 'ct-point' : 'ct-bar';
-        toolTipElement = document.querySelector('.ct-tooltip');
+        tooltipSelector = (options.type == 'Line') ? 'point' : 'bar';
+        toolTipElement = document.querySelector('.tooltip');
 
         if (!toolTipElement) {
             toolTipElement = document.createElement('div');
-            toolTipElement.className = 'ct-tooltip';
+            toolTipElement.className = 'tooltip';
             document.body.appendChild(toolTipElement);
         }
 
@@ -51,14 +51,14 @@ export default {
             }
 
             tooltipText = `
-                <div class="ct-tooltip-meta"> ${ time } </div>
-                <div class="ct-tooltip-series" >
+                <div class="tooltip-meta"> ${ time } </div>
+                <div class="tooltip-series" >
                     <div> ${ seriesName }
-                       <span class="ct-tooltip-series-color" style="background: ${ event.target.style.stroke }"></span>
-                       <span class="ct-tooltip-series-text"> : </span>
+                       <span class="tooltip-series-color" style="background: ${ event.target.style.stroke }"></span>
+                       <span class="tooltip-series-text"> : </span>
                     </div>
                 </div>
-                <div class="ct-tooltip-value">
+                <div class="tooltip-value">
                     <div> ${ value } </div>
                 </div>`;
 

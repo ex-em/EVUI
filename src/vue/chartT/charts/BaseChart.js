@@ -1,6 +1,7 @@
 import Svg from "../common/Svg"
 import Util from "../common/Util"
 import Tooltip from "../common/Tooltip"
+import { color } from "../common/Constant"
 
 class BaseChart {
     constructor(target, data, options) {
@@ -50,32 +51,35 @@ class BaseChart {
         this.container = target;
         this.data = data;
 
-        this.createSvg(target);
+
+        this.container.width = this.options.width;
+        this.container.height = this.options.height;
+        this.container.style = 'overflow:hidden';
 
         this.chartRect = this.getChartRect();
+
+        this.createSvg(target);
+
         this.categories = data.categories || [];
-        this.seriesInfo = this.getSeriesInfo(data.series);
         this.seriesStatus = [];
 
-        let ix, ixLen;
-        for (ix = 0, ixLen = data.series.length; ix < ixLen; ix++) {
+        for (let ix = 0, ixLen = data.series.length; ix < ixLen; ix++) {
             this.seriesStatus[ix] = true;
         }
 
-        window.addEventListener('resize', function(){
-            this.updateChart(this.data, this.options);
-        }.bind(this));
+        this.seriesInfo = this.getSeriesInfo(data.series);
     }
 
     createSvg(target) {
         this.svg = Svg.createElement(target, 'svg', {
-            width: this.options.width,
-            height: this.options.height
+            width: this.chartRect.chartWidth,
+            height: this.chartRect.chartHeight,
+            class: 'chart'
         });
     }
 
     onLegend(event) {
-        let clickElement = event.target,
+        let clickElement = event.target.parentElement,
             seriesIndex = parseInt(clickElement.getAttribute('data-index')),
             className = clickElement.className,
             isActive = !className.includes('inactive'),
@@ -100,12 +104,13 @@ class BaseChart {
     createLegend(clickFn) {
         let parentElement = document.createElement('ul'),
             seriesNames = this.seriesInfo.seriesNames,
+            series = this.seriesInfo.series,
             baseElement = this.container,
             position = this.options.legend.position,
-            childElement,
+            childElement, legendBox, legendName, legendValue, className, legendColor,
             ix, ixLen;
 
-        parentElement.className = 'ct-legend';
+        parentElement.className = 'legend';
 
         if (position === 'bottom') {
             baseElement.appendChild(parentElement);
@@ -114,35 +119,55 @@ class BaseChart {
             baseElement.insertBefore(parentElement, baseElement.childNodes[0]);
         }
         else if (position === 'right') {
-            parentElement.className += ' ct-legend-inside';
+            baseElement.appendChild(parentElement);
+            parentElement.className += ' right';
         }
 
         for (ix = 0, ixLen = seriesNames.length; ix < ixLen; ix++) {
             childElement = document.createElement('li');
+            legendBox = document.createElement('div');
+            legendName = document.createElement('div');
+            legendValue = document.createElement('div');
 
             childElement.setAttribute('data-index', ix);
-            childElement.className = 'ct-series-' + ix;
+            className = 'series-' + ix;
+
+
             if (!this.seriesStatus[ix]) {
-                childElement.className += ' inactive';
+                className += ' inactive';
             }
 
-            childElement.textContent = seriesNames[ix];
+            childElement.className = className;
+            legendBox.className = 'legend-box';
+            legendName.className = 'legend-name';
+            legendValue.className = 'legend-value';
+
+            legendName.textContent = seriesNames[ix];
+            // if (this.options.type === 'Pie') {
+            //     legendValue.textContent = series[ix];
+            // }
+
+            legendColor = color[ix];
+            legendBox.style = `background-color: ${legendColor}; border: 2px solid ${legendColor};`;
+
+            childElement.appendChild(legendBox);
+            childElement.appendChild(legendName);
+            childElement.appendChild(legendValue);
 
             parentElement.appendChild(childElement);
+        }
 
-            if (clickFn) {
-                childElement.addEventListener('click', clickFn);
-            }
-            else {
-                childElement.addEventListener('click', this.onLegend.bind(this));
-            }
+        if (clickFn) {
+            parentElement.addEventListener('click', clickFn);
+        }
+        else {
+            parentElement.addEventListener('click', this.onLegend.bind(this));
         }
     }
 
     getSeriesInfo(data) {
         let series = [],
             seriesNames = [],
-            seriesStatus = [],
             categories = this.categories,
             seriesData, tempRawData, tempSeriesData, tempData,
             ix, ixLen, jx, jxLen, value, seriesName;
@@ -176,7 +201,7 @@ class BaseChart {
             }
 
             series.push(tempSeriesData);
-            seriesNames.push(seriesName || 'ct-series-' + ix);
+            seriesNames.push(seriesName || 'series-' + ix);
         }
 
         return {
@@ -186,19 +211,64 @@ class BaseChart {
     }
 
     getChartRect() {
-        let width = this.svg.getBoundingClientRect().width || Util.quantity(this.options.width).value || 0,
-            height = this.svg.getBoundingClientRect().height || Util.quantity(this.options.height).value || 0,
+        let width = this.container.getBoundingClientRect().width || Util.quantity(this.options.width).value || 0,
+            height = this.container.getBoundingClientRect().height || Util.quantity(this.options.height).value || 0,
             padding = this.getPadding(this.options.padding),
             hasAxis = !!(this.options.axisX || this.options.axisY),
             yAxisOffset = hasAxis ? this.options.axisY.offset : 0,
             xAxisOffset = hasAxis ? this.options.axisX.offset : 0,
-            chartRect;
+            legendPos = this.options.legend.position,
+            chartWidth, chartHeight, legendWidth, legendHeight, x1, x2, y1, y2;
 
-        width = Math.max(width, padding.left + padding.right);
-        height = Math.max(height, padding.top + padding.bottom);
+        if (legendPos === 'right') {
+            legendWidth = Util.quantity(this.options.legend.width).value || 150;
+            legendHeight = Math.max(height, padding.top + padding.bottom);
+            chartWidth = width - legendWidth - (padding.left + padding.right);
+            chartHeight = legendHeight;
+        }
+        else {
+            legendWidth = Math.max(width, padding.left + padding.right);
+            legendHeight = (Util.quantity(this.options.legend.height).value || 40);
+            chartWidth = legendWidth;
+            chartHeight = height - legendHeight - (padding.top + padding.bottom);
+        }
 
-        chartRect = {
+        if (hasAxis) {
+            if (this.options.axisX.position === 'start') {
+                y2 = padding.top + xAxisOffset;
+                y1 = Math.max(chartHeight - padding.bottom, y2 + 1);
+            }
+            else {
+                y2 = padding.top;
+                y1 = Math.max(chartHeight - padding.bottom - xAxisOffset, y2 + 1);
+            }
+
+            if (this.options.axisY.position === 'start') {
+                x1 = padding.left + yAxisOffset;
+                x2 = Math.max(chartWidth - padding.right, x1 + 1);
+            }
+            else {
+                x1 = padding.left;
+                x2 = Math.max(chartWidth - padding.right - yAxisOffset, x1 + 1);
+            }
+        }
+        else {
+            x1 = padding.left;
+            x2 = Math.max(chartWidth - padding.right, x1 + 1);
+            y2 = padding.top;
+            y1 = Math.max(chartHeight - padding.bottom, y2 + 1);
+        }
+
+        return {
+            x1: x1,
+            x2: x2,
+            y1: y1,
+            y2: y2,
             padding: padding,
+            chartWidth: chartWidth,
+            chartHeight: chartHeight,
+            legendWidth: legendWidth,
+            legendHeight: legendHeight,
             width: function () {
                 return this.x2 - this.x1;
             },
@@ -206,34 +276,6 @@ class BaseChart {
                 return this.y1 - this.y2;
             }
         };
-
-        if (hasAxis) {
-            if (this.options.axisX.position === 'start') {
-                chartRect.y2 = padding.top + xAxisOffset;
-                chartRect.y1 = Math.max(height - padding.bottom, chartRect.y2 + 1);
-            }
-            else {
-                chartRect.y2 = padding.top;
-                chartRect.y1 = Math.max(height - padding.bottom - xAxisOffset, chartRect.y2 + 1);
-            }
-
-            if (this.options.axisY.position === 'start') {
-                chartRect.x1 = padding.left + yAxisOffset;
-                chartRect.x2 = Math.max(width - padding.right, chartRect.x1 + 1);
-            }
-            else {
-                chartRect.x1 = padding.left;
-                chartRect.x2 = Math.max(width - padding.right - yAxisOffset, chartRect.x1 + 1);
-            }
-        }
-        else {
-            chartRect.x1 = padding.left;
-            chartRect.x2 = Math.max(width - padding.right, chartRect.x1 + 1);
-            chartRect.y2 = padding.top;
-            chartRect.y1 = Math.max(height - padding.bottom, chartRect.y2 + 1);
-        }
-
-        return chartRect;
     }
 
     updateChart(data, options) {
@@ -246,8 +288,10 @@ class BaseChart {
 
         this.options = Util.extend(null, this.options, options);
 
-        this.createSvg(this.container);
         this.chartRect = this.getChartRect();
+
+        this.createSvg(this.container);
+
         this.categories = data.categories || [];
         this.seriesInfo = this.getSeriesInfo(data.series);
 
@@ -280,15 +324,15 @@ class BaseChart {
             series = seriesElement.childNodes;
             for (jx = 0, jxLen = series.length; jx < jxLen; jx++) {
                 svgElement = series[jx];
-                Svg.removeClassName(svgElement, 'ct-unchecked');
+                Svg.removeClassName(svgElement, 'lowlight');
                 if (this.options.type === 'Bar') {
                     if (itemIndex !== -1 && parseInt(svgElement.getAttribute('data-index')) !== itemIndex) {
-                        Svg.addClassName(svgElement, 'ct-unchecked');
+                        Svg.addClassName(svgElement, 'lowlight');
                     }
                 }
                 else {
                     if (seriesIndex !== -1 && parseInt(seriesElement.getAttribute('data-index')) !== seriesIndex) {
-                        Svg.addClassName(svgElement, 'ct-unchecked');
+                        Svg.addClassName(svgElement, 'lowlight');
                     }
                 }
             }

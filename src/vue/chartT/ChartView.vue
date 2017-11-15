@@ -1,19 +1,24 @@
 <template>
-    <div >
+    <div>
         <div>
             <chart :data="Line.chartData"
                    :options="Line.chartOptions">
             </chart>
-            <chart :data="Scatter.chartData"
-                   :options="Scatter.chartOptions">
-            </chart>
+            <!--<chart :data="Scatter.chartData"-->
+                   <!--:options="Scatter.chartOptions">-->
+            <!--</chart>-->
         </div>
         <div>
             <chart :data="Bar.chartData"
                    :options="Bar.chartOptions">
             </chart>
-            <chart :data="StackedBar.chartData"
-                   :options="StackedBar.chartOptions">
+            <!--<chart :data="StackedBar.chartData"-->
+                   <!--:options="StackedBar.chartOptions">-->
+            <!--</chart>-->
+        </div>
+        <div>
+            <chart :data="Pie.chartData"
+                   :options="Pie.chartOptions">
             </chart>
         </div>
     </div>
@@ -24,6 +29,20 @@
     export default {
         data() {
             return {
+                Pie: {
+                    chartData: {
+//                        categories: ['Jan', 'Feb', 'Mar'],//, 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        series: [5, 4, 3]
+                    },
+                    chartOptions: {
+                        type: "Pie",
+//                        width: "800px",
+                        height: "400px",
+                        legend: {
+                            show: true
+                        }
+                    }
+                },
                 StackedBar: {
                     chartData: {
                         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -104,7 +123,7 @@
                     },
                     chartOptions: {
                         type: "Line",
-//                        width: "800px",
+                        width: "500px",
                         height: "400px",
                         axisX: {
                             divisor: 5,

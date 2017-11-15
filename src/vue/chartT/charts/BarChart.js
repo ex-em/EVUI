@@ -66,7 +66,7 @@ class BarChart extends BaseChart {
             seriesListener = Svg.createElement(seriesGroup, 'rect', {
                 width: this.options.width,
                 height: this.options.height,
-                style: 'opacity:0;',
+                class: 'series-listener'
             }),
             chartRect = this.chartRect,
             axisX = this.axis.axisX,
@@ -107,7 +107,7 @@ class BarChart extends BaseChart {
                     x2: xPos,
                     y1: baseYPos,
                     y2: yPos,
-                    class: 'ct-bar',
+                    class: 'bar',
                     style: 'stroke: ' + color[ix],
                     'ct:value': [rowData.x, rowData.y].join(','),
                     'ct:meta': seriesNames[ix],
