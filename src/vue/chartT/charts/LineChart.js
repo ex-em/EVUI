@@ -25,7 +25,9 @@ class LineChart extends BaseChart {
             this.createLegend(null);
         }
 
-        this.tooltip = Tooltip.getTooltip(this.svg, this.options);
+        if (this.options.tooltip.show) {
+            this.tooltip = this.createTooltip(this.svg, this.options);
+        }
     }
 
     createAxis() {

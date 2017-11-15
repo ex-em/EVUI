@@ -61,6 +61,10 @@ class BaseChart {
         for (ix = 0, ixLen = data.series.length; ix < ixLen; ix++) {
             this.seriesStatus[ix] = true;
         }
+
+        window.addEventListener('resize', function(){
+            this.updateChart(this.data, this.options);
+        }.bind(this));
     }
 
     createSvg(target) {
@@ -125,13 +129,13 @@ class BaseChart {
             childElement.textContent = seriesNames[ix];
 
             parentElement.appendChild(childElement);
-        }
 
-        if (clickFn) {
-            parentElement.addEventListener('click', clickFn);
-        }
-        else {
-            parentElement.addEventListener('click', this.onLegend.bind(this));
+            if (clickFn) {
+                childElement.addEventListener('click', clickFn);
+            }
+            else {
+                childElement.addEventListener('click', this.onLegend.bind(this));
+            }
         }
     }
 
