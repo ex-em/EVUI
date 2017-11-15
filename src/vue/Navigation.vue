@@ -7,6 +7,12 @@
             <li class="evui-main-comp"><router-link to="/tree">TREE</router-link></li>
             <li class="evui-main-comp"><router-link to="/chart">CHART</router-link></li>
         </ul>
+        <ul class="navigation">
+            <li class="evui-test-comp">GRID:TEST</li>
+            <li class="evui-test-comp">T.GRID:TEST</li>
+            <li class="evui-test-comp">TREE:TEST</li>
+            <li class="evui-test-comp"><router-link to="/chartTest">CHART:TEST</router-link></li>
+        </ul>
     </div>
 </template>
 
@@ -56,4 +62,25 @@
         text-decoration: none;
         color: #35495E;
     }
+
+    .evui-test-comp {
+        width: 300px;
+        min-height: 100px;
+        background-color: rgba(209, 209, 209, 0.24);
+        box-shadow: none;
+        border: 0;
+        margin : 0 15px 0 15px;
+        display: inline-block;
+        text-align: center;
+        vertical-align : middle;
+        line-height:100px;
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    .evui-test-comp a {
+        text-decoration: none;
+        color: #35495E;
+    }
+
 </style>
