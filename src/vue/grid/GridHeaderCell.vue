@@ -26,7 +26,7 @@
         <div v-if="useResize"
              class="grip"
         ></div>
-        <div class='filter-popover' v-if="filter!=='none'">
+        <div class='filter-popover' v-if="filter!=='none'" @click="clickPopover">
             <input type='text' class='filter-input' @input="filterGrid(dataIndex,$event)">
         </div>
     </th>
@@ -119,7 +119,8 @@
 
                 return true;
             },
-            onClick() {
+            onClick(e) {
+
                 if(this.render == 'checkbox'){
                     return;
                 }
@@ -143,6 +144,8 @@
                 if (e.stopPropagation) {
                     e.stopPropagation(); // stops the browser from redirecting.
                 }
+
+
                 this.$emit('clickFilterIcon', e)
             },
 
@@ -153,6 +156,11 @@
              */
             filterGrid(data,e){
                 this.$emit('filterGrid',data,e)
+            },
+
+            //th 클릭시 이벤트 버블링 막아줘
+            clickPopover(e){
+                e.stopPropagation();
             }
 
         },
@@ -229,6 +237,7 @@
         font-size: 14px;
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
         display : none;
+        cursor: default;
         /*  width: 400px;
          top: 472px;
          left: 835px;
