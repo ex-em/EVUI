@@ -37,7 +37,7 @@ class BaseChart {
             },
             legend: {
                 show: true,
-                position: 'top'
+                position: 'bottom'
             },
             padding: {
                 top: 15,
@@ -51,9 +51,6 @@ class BaseChart {
         this.container = target;
         this.data = data;
 
-
-        // this.container.width = this.options.width;
-        // this.container.height = this.options.height;
         this.container.style = `overflow:hidden; width: ${this.options.width}; height: ${this.options.height};`;
 
         this.chartRect = this.getChartRect();
