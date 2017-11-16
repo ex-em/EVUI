@@ -37,7 +37,7 @@ class BaseChart {
             },
             legend: {
                 show: true,
-                position: 'bottom'
+                position: 'top'
             },
             padding: {
                 top: 15,
@@ -52,13 +52,13 @@ class BaseChart {
         this.data = data;
 
 
-        this.container.width = this.options.width;
-        this.container.height = this.options.height;
-        this.container.style = 'overflow:hidden';
+        // this.container.width = this.options.width;
+        // this.container.height = this.options.height;
+        this.container.style = `overflow:hidden; width: ${this.options.width}; height: ${this.options.height};`;
 
         this.chartRect = this.getChartRect();
 
-        this.createSvg(target);
+        this.createSvg(this.container);
 
         this.categories = data.categories || [];
         this.seriesStatus = [];
@@ -132,7 +132,6 @@ class BaseChart {
             childElement.setAttribute('data-index', ix);
             className = 'series-' + ix;
 
-
             if (!this.seriesStatus[ix]) {
                 className += ' inactive';
             }
@@ -156,6 +155,8 @@ class BaseChart {
 
             parentElement.appendChild(childElement);
         }
+
+        parentElement.style = `width: ${this.chartRect.legendWidth}px; height: ${this.chartRect.legendHeight}px;`;
 
         if (clickFn) {
             parentElement.addEventListener('click', clickFn);
