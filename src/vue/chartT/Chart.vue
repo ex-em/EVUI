@@ -1,4 +1,5 @@
 <template>
+    <div></div>
 </template>
 <script>
     import BarChart from "./charts/BarChart.js"
@@ -89,10 +90,14 @@
     }
 
     .legend {
+        float: left;
+        display: block;
         position: relative;
         z-index: 10;
         list-style: none;
         text-align: center;
+        margin: 0px;
+        padding: 0px;
     }
 
     .legend li {
@@ -135,9 +140,11 @@
     .legend.right {
         float: none;
         overflow: hidden;
+        text-align: left;
     }
 
     .legend.right li{
+        width: 100%;
         margin: 0;
     }
 
