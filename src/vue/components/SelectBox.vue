@@ -29,7 +29,6 @@
         },
         methods: {
             onInput() {
-                console.log(arguments)
             },
             onBlur() {
                 this.$emit('blur', this.inputValue);

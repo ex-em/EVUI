@@ -88,15 +88,6 @@ export default {
             }
         },
 
-        gridTotalWidth() {
-            let totalWidth = this.gridWidth;
-            this.columns.forEach(function(column) {
-                totalWidth += column.width;
-            });
-
-            return totalWidth;
-        },
-
         /**
          * 버퍼스크롤을 위한 데이터
          * @returns {Blob|ArrayBuffer|Array.<T>|string|*}
@@ -135,16 +126,21 @@ export default {
                         this.beforeFilterCol = filterData.colIndex;
                         let result = this.sortedList.slice();
 
+                        //filter 입력 값이 있는 컬럼수 만큼 돌아라
                         for (let col in this.filterCol) {
+                            //현재 필터 컬럼이랑 필터 값이 없는 놈은 제외 한다.
+                            //왜냐면 현재 필터까지 해버리면 다른 컬럼으로가서 검색값을 지웠을경우 알수가 없음
                             if (this.filterCol[col] !== undefined && col !== filterData.colIndex) {
-
                                 result = result.filter((data) => {
                                     return data[col].toString().indexOf(this.filterCol[col]) >= 0
                                 })
                             }
                         }
+                        //필터 현재컬럼의 값은 필터링 안했으니 이전 필터리스트에 저장
                         this.beforeFilterList = result;
                     }
+
+                    //이전 필터리스트에서 이제 현재컬럼 필터 값을 필터링해보자
                     this.filterList = this.beforeFilterList.filter((data) => {
                         return data[filterData.colIndex].toString().indexOf(filterData.value) >= 0
                     });
@@ -176,7 +172,6 @@ export default {
             this.sortBy(dataIndex);
         },
         onAllCheckChange(dataIndex, value) {
-            console.log('onAllCheckChange', arguments)
 
             this.isAllChecked = value;
 
@@ -191,7 +186,6 @@ export default {
             }
         },
         onCheckChange(dataIndex, value) {
-            console.log('onCheckChange', arguments)
 
             if(value){
                 this.checkedCount++;
@@ -211,12 +205,6 @@ export default {
         cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
 
             // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
-        },
-
-        checkBoxClick: function() {
-            const selected = this.selected;
-
-            console.log('checkboxClick ==> ', arguments);
         },
 
         bufferHeightCalc: function () {
@@ -260,6 +248,10 @@ export default {
                 let viewport = e.target;
                 let scrollTop = viewport.scrollTop;
 
+                if (this.scroll.prevScrollTop == scrollTop) {
+                    return;
+                }
+
                 if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
                     // onJump
                     this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
@@ -285,7 +277,6 @@ export default {
                 top = Math.max(0, top);
                 bottom = Math.min(th / rowHeight, bottom);
 
-                console.log('TOP --> ', top, 'Bottom --> ', bottom);
 
                 this.scroll.top = top;
                 this.scroll.bottom = bottom;
@@ -304,7 +295,6 @@ export default {
         sortBy: function(key) {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
-            console.log("12312", this.sortclick)
             this.sortclick = !this.sortclick;
             this.filteredData = {type:'sort'}
         },
@@ -467,12 +457,6 @@ export default {
                 vm.dragTargetPos = null;
             }
 
-            //드래그 타겟 떠날시
-            //차후 삭제 예정
-            function handleDragLeave(e) {
-            }
-
-
         },
 
         /**
@@ -497,6 +481,10 @@ export default {
             };
         },
 
+        /**
+         * filter icon 클릭시 이벤트 popover 이벤트 처리
+         * @param e : 아이콘 클리 이벤트 (span)
+         */
         clickFilter(e){
             let target = e.target;
             let thEle = e.target.parentElement;
@@ -549,9 +537,11 @@ export default {
                 popover.style.display = 'none';
                 this.popoverCol = null;
             }
-
+        },
+        initScrollWidth () {
+            this.$refs.evuiGridItemContainer.style.width = this.$refs.evuiGridThead.firstChild.offsetWidth + 'px';
+            this.$refs.evuiGridItemContainer.style.height = '1px';
         }
-
     },
 
     mounted() {
@@ -561,10 +551,14 @@ export default {
             this.setResizeColumnEvent();
         }
 
-
         //Drag Column Event setting
         this.$refs.dragLine.style.height = this.$refs.gridTable.clientHeight + 'px';
         this.setDragColumnEvent();
+
+        //tbody horizen scroll init calc
+        this.initScrollWidth();
+
+        //buffer scroll calculate
         this.bufferHeightCalc();
     },
 

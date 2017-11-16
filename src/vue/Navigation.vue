@@ -6,6 +6,7 @@
             <li class="evui-main-comp"><router-link to="/tgrid">TABLE GRID</router-link></li>
             <li class="evui-main-comp"><router-link to="/tree">TREE</router-link></li>
             <li class="evui-main-comp"><router-link to="/chart">CHART</router-link></li>
+            <li class="evui-main-comp"><router-link to="/dgrid">DATA GRID</router-link></li>
         </ul>
         <ul class="navigation">
             <li class="evui-test-comp">GRID:TEST</li>

@@ -175,6 +175,7 @@ input[type="checkbox"] {
     word-break: break-all;
     font-size: 14px;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    display: none;
     /*  width: 400px;
      top: 472px;
      left: 835px;

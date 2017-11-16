@@ -29,7 +29,8 @@ export default {
                 page: 0,
                 offset: 0,
                 prevUpdateScrollTop: 0
-            }
+            },
+            bufferedData: []
         };
     },
     computed: {
@@ -115,20 +116,17 @@ export default {
             return sortedData;
         },
 
-        bufferedData: function () {
-            // return this.sortedData.slice(0, 100);
-            return this.sortedData.slice(this.scroll.bufferDataIdx, this.scroll.bufferSize + this.scroll.bufferDataIdx);
-            // return this.sortedData;
-        },
+        // bufferedData: function () {
+        //     // return this.sortedData.slice(0, 100);
+        //     return this.sortedData.slice(this.scroll.bufferDataIdx, this.scroll.bufferSize + this.scroll.bufferDataIdx);
+        //     // return this.sortedData;
+        // },
 
         filteredData: {
             get() {
                 return this.filterList;
             },
             set(filterData) {
-                console.log("FSDFS", this.filterList)
-                console.log("filterData", filterData)
-                let filteredTemp
 
                 //입력 필터 컬럼 비교
                 if(this.beforeFilterCol!== filterData.colIndex){
@@ -148,36 +146,10 @@ export default {
                     this.beforeFilterList = result;
                     // this.filterList = result;
 
-                }else{
-
                 }
-
                 this.filterList = this.beforeFilterList.filter((data) => {
-                    console.log('1111', filterData.colIndex)
                     return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
                 });
-
-
-                // for(let item in this.filterCol){
-                //     console.log('2222',item)
-                //     if(this.filterCol[item] !== undefined){
-                //
-                //     }
-                // }
-
-                //기존 필터 걸려있는지 확인후 분기
-                // if(this.filterList.length === this.data.length) {
-                //     this.filterList = this.data.filter((data) => {
-                //         console.log('0000', filterData.colIndex)
-                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
-                //     })
-                // }else {
-                //     this.filterList = this.data.filter((data) => {
-                //         console.log('1111', filterData.colIndex)
-                //         return data[filterData.colIndex].toString().indexOf(filterData.value)>=0
-                //     })
-                // }
-                console.log(this.filterList)
             }
         }
     },
@@ -226,6 +198,8 @@ export default {
             let th = rowHeight * dataLength; // virtual height
             let ph = bufferSize * rowHeight; // page height
             let h = ph * 100;
+            // let h = bufferSize*rowHeight;
+            // let ph = h/100;
             let n = Math.ceil(th / ph);
             let vp = this.gridOptions.height;
 
@@ -242,6 +216,10 @@ export default {
                     this.scroll.page = Math.floor(scrollTop * ((th - vp) / (h - vp)) * (1 / ph));
                     // this.scroll.offset = Math.round(this.scroll.page * cj);
                     // this.scroll.prevScrollTop = scrollTop;
+                    // this.scroll.bufferDataIdx = parseInt((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight);
+                    this.scroll.offset = Math.round(this.scroll.page * cj);
+                    this.scroll.prevScrollTop = scrollTop;
+
 
                     console.log('onJump');
                 } else {
@@ -250,30 +228,33 @@ export default {
                     // next page
                     if (scrollTop + this.scroll.offset > (this.scroll.page + 1) * ph) {
                         this.scroll.page++;
-                        // this.scroll.offset = Math.round(this.scroll.page * cj);
-                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop - cj);
+                        this.scroll.offset = Math.round(this.scroll.page * cj);
+                        viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop - cj);
                     }
                     // prev page
                     else if (scrollTop + this.scroll.offset < this.scroll.page * ph) {
                         this.scroll.page--;
-                        // this.scroll.offset = Math.round(this.scroll.page * cj);
-                        // viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop + cj);
+                        this.scroll.offset = Math.round(this.scroll.page * cj);
+                        viewport.scrollTop = (this.scroll.prevScrollTop = scrollTop + cj);
                     }
                     else {
                         this.scroll.prevScrollTop = scrollTop;
                     }
             }
-            this.scroll.prevScrollTop = scrollTop;
+
+
+            // this.bufferHeightCalc();
+            // this.scroll.prevScrollTop = scrollTop;
 
 
                 // calculate the viewport + buffer
-            var y = viewport.scrollTop + this.scroll.offset,
-                buffer = vp,
-                top = Math.floor((y - buffer) / rowHeight),
-                bottom = Math.ceil((y + vp + buffer) / rowHeight);
+            // var y = viewport.scrollTop + this.scroll.offset,
+            //     buffer = vp,
+                // top = Math.floor((y - buffer) / rowHeight),
+                // bottom = Math.ceil((y + vp + buffer) / rowHeight);
 
-            top = Math.max(0, top);
-            bottom = Math.min(th / rowHeight, bottom);
+            // top = Math.max(0, top);
+            // bottom = Math.min(th / rowHeight, bottom);
 
             // console.log("top --> ", top, "bottom --> ", bottom, "prev scroll top --> ", this.scroll.prevScrollTop);
             // if ((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight == 75) {
@@ -281,8 +262,8 @@ export default {
 
             // if (scrollTop - this.scroll.prevUpdateScrollTop > ph * 0.7) {
             //     this.scroll.prevUpdateScrollTop = scrollTop;
-                this.scroll.bufferDataIdx = parseInt((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight);
-                this.bufferHeightCalc();
+            //     this.scroll.bufferDataIdx = parseInt((this.scroll.prevScrollTop + this.scroll.offset) / rowHeight);
+            //     this.bufferHeightCalc();
             // }
 
             // this.scroll.testFlag = !this.scroll.testFlag;
@@ -495,13 +476,6 @@ export default {
                 vm.dragTarget = null;
                 vm.dragTargetPos = null;
             }
-
-            //드래그 타겟 떠날시
-            //차후 삭제 예정
-            function handleDragLeave(e) {
-            }
-
-
         },
 
         /**
@@ -512,9 +486,6 @@ export default {
         filterGrid(data,e) {
             let colIndex = data.dataIndex;
             let value = e.target.value;
-            console.log('@@@@',data)
-            // console.log('@@@@',e.target)
-            console.log("#####",e.target.value)
 
             if(value ===''){
                 this.filterCol[colIndex] = undefined;
@@ -526,24 +497,26 @@ export default {
                 colIndex: colIndex,
                 value : value
             };
+        },
 
-            // this.data[0].col1 = 222
-            // for(let ix=)
+        clickFilter(e){
+            console.log(e)
+            let thEle = e.target.parentElement;
+            let popover = thEle.getElementsByClassName('filter-popover')[0]
 
+            if(popover.style.display===''|| popover.style.display==='none') {
+                popover.style.display = 'block'
+            }else{
+                popover.style.display = 'none'
+            }
+
+            popover.style.left = e.target.offsetLeft+'px';
 
         }
 
     },
 
     mounted() {
-        // const vm = this;
-        // vm.grips = [];
-        // vm.setResizeGrips();
-        // vm.syncColumnWidths();
-
-        console.log(this.gridOptions.useColumnResize)
-
-
         //Resize Column Event setting
         if(this.gridOptions.useColumnResize) {
             this.setResizeColumnEvent();
@@ -579,6 +552,8 @@ export default {
         for(let ix=0, ixLen=this.columns.length; ix<ixLen ;ix++){
             this.filterCol[this.columns[ix].dataIndex] = undefined;
         }
+
+        this.bufferedData = this.sortedData.slice(this.scroll.bufferDataIdx, this.scroll.bufferSize + this.scroll.bufferDataIdx);
 
 
     }
