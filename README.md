@@ -8,6 +8,7 @@ Or if you want to use it directly in the browser add
 
 ```html
 <script src="https://unpkg.com/evui@0.1.2/dist/evui.js"></script>
+```
 
 ### Browser
 You can use `evui` directly in the browser without any build setup. For this case, please use the `evui.min.js` which is the minified version. You also need to add the evui CDN script.
