@@ -11,7 +11,7 @@ Or if you want to use it directly in the browser add
 ```
 
 ### Browser
-You can use `evui` directly in the browser without any build setup. For this case, please use the `evui.min.js` which is the minified version. You also need to add the evui CDN script.
+You can use `evui` directly in the browser without any build setup. You also need to add the evui CDN script.
 
 You can then simply use it your app:
 
@@ -140,7 +140,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 
 ## Contributing
 
-1. Fork it ( https://github.com/apertureless/vue-chartjs/fork )
+1. Fork it ( https://github.com/ex-em/EVUI/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
