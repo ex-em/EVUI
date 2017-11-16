@@ -29,6 +29,7 @@ export default {
             filterList          : this.data,
             sortedList          : this.data,
             sortclick           : false,
+            popoverCol           : null,
             scroll: {
                 bufferSize      : 100,
                 rowHeight       : null,
@@ -96,6 +97,10 @@ export default {
             return totalWidth;
         },
 
+        /**
+         * 버퍼스크롤을 위한 데이터
+         * @returns {Blob|ArrayBuffer|Array.<T>|string|*}
+         */
         bufferedData: function () {
             return this.filteredData.slice(this.scroll.top, Math.max(this.scroll.bottom, this.scroll.bufferSize));
         },
@@ -124,7 +129,8 @@ export default {
 
                 //filter event
                 if(filterData.type ==='filter') {
-                    //입력 필터 컬럼 비교
+                    //입력 필터 컬럼 비교 
+                    //필터가 처음탈때 beforeFilterList에 값을 넣어준다 멀티 필터 대응
                     if (this.beforeFilterCol !== filterData.colIndex) {
                         this.beforeFilterCol = filterData.colIndex;
                         let result = this.sortedList.slice();
@@ -492,16 +498,57 @@ export default {
         },
 
         clickFilter(e){
+            let target = e.target;
             let thEle = e.target.parentElement;
-            let popover = thEle.getElementsByClassName('filter-popover')[0]
+            let popover = thEle.getElementsByClassName('filter-popover')[0];
 
-            if(popover.style.display===''|| popover.style.display==='none') {
-                popover.style.display = 'block'
+            //filter-icon 다른거 클릭시
+            if(this.popoverCol !== target) {
+
+                //filter 아이콘을 제외한  아무대나 눌러도 꺼진다
+                document.addEventListener('click',function (event){
+                    //켜져있는 popover 빠이
+                    let popeverlist = this.querySelectorAll('.filter-popover.active')
+                    for(let i=0,iLen=popeverlist.length;i<iLen;i++){
+                        popeverlist[i].style.display = 'none';
+                        popeverlist[i].classList.remove('active');
+                    }
+
+                },false);
+
+                if(this.popoverCol === null){
+                    //filter 버트 처음 눌렀을때 popover 켜져라
+                    popover.style.display = 'block';
+                    popover.classList.add('active');
+                    popover.style.left = target.offsetLeft+'px';
+                    popover.getElementsByClassName('filter-input')[0].focus();
+
+
+
+                }else{
+                    let exThEle = this.popoverCol.parentElement;
+                    let exPopover = exThEle.getElementsByClassName('filter-popover')[0];
+
+                    //이전 popover 사라져라
+                    exPopover.style.display = 'none';
+                    exPopover.classList.remove('active');
+
+
+                    //현재 popover 보여라
+                    popover.style.display = 'block';
+                    popover.classList.add('active');
+                    popover.style.left = target.offsetLeft+'px';
+                    popover.getElementsByClassName('filter-input')[0].focus();
+
+                }
+                //현재 타겟을 가지고 있어라 비교할때 쓰게
+                this.popoverCol = target;
+
+
             }else{
-                popover.style.display = 'none'
+                popover.style.display = 'none';
+                this.popoverCol = null;
             }
-
-            popover.style.left = e.target.offsetLeft+'px';
 
         }
 
