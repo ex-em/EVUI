@@ -88,15 +88,6 @@ export default {
             }
         },
 
-        gridTotalWidth() {
-            let totalWidth = this.gridWidth;
-            this.columns.forEach(function(column) {
-                totalWidth += column.width;
-            });
-
-            return totalWidth;
-        },
-
         /**
          * 버퍼스크롤을 위한 데이터
          * @returns {Blob|ArrayBuffer|Array.<T>|string|*}
@@ -213,12 +204,6 @@ export default {
             // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
         },
 
-        checkBoxClick: function() {
-            const selected = this.selected;
-
-            console.log('checkboxClick ==> ', arguments);
-        },
-
         bufferHeightCalc: function () {
 
             if (this.$refs.evuiGridItem.firstElementChild) {
@@ -259,6 +244,10 @@ export default {
                 let cj = (th - h) / (n - 1);
                 let viewport = e.target;
                 let scrollTop = viewport.scrollTop;
+
+                if (this.scroll.prevScrollTop == scrollTop) {
+                    return;
+                }
 
                 if (Math.abs(scrollTop - this.scroll.prevScrollTop) > vp) {
                     // onJump
@@ -549,9 +538,11 @@ export default {
                 popover.style.display = 'none';
                 this.popoverCol = null;
             }
-
+        },
+        initScrollWidth () {
+            this.$refs.evuiGridItemContainer.style.width = this.$refs.evuiGridThead.firstChild.offsetWidth + 'px';
+            this.$refs.evuiGridItemContainer.style.height = '1px';
         }
-
     },
 
     mounted() {
@@ -561,10 +552,13 @@ export default {
             this.setResizeColumnEvent();
         }
 
-
         //Drag Column Event setting
         this.$refs.dragLine.style.height = this.$refs.gridTable.clientHeight + 'px';
         this.setDragColumnEvent();
+
+        //tbody horizen scroll init calc
+        this.initScrollWidth();
+
         this.bufferHeightCalc();
     },
 
