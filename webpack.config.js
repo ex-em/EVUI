@@ -2,14 +2,13 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    entry: {
-        dev: './src/dev.js',
-        evui: './src/evui.js'
-    },
+    entry: './src/evui.js',
     output: {
         path: path.resolve(__dirname, './dist'),
         publicPath: '/dist/',
-        filename: '[name].js'
+        filename: 'evui.js',
+        library:'evui',
+        libraryTarget: 'umd'
     },
     module: {
         rules: [
