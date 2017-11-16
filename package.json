@@ -1,9 +1,10 @@
 {
   "name": "evui",
   "description": "EXEM Visualization UI Framework",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "EXEM (evui@ex-em.com)",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
@@ -11,6 +12,20 @@
   "main": "dist/evui.js",
   "files": [
     "dist"
+  ],
+  "repository": {
+    "type":"git",
+    "url":"https://github.com/ex-em/EVUI.git"
+  },
+  "bugs": {
+    "url":"https://github.com/ex-em/EVUI/issues"
+  },
+  "keywords": [
+    "Vue",
+    "Visualisation",
+    "Charts",
+    "Grid",
+    "Tree"
   ],
   "dependencies": {
     "mock-generator": "^1.1.0",
