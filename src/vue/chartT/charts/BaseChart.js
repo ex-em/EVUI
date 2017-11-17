@@ -51,7 +51,7 @@ class BaseChart {
         this.container = target;
         this.data = data;
 
-        this.container.style = `overflow:hidden; width: ${this.options.width}; height: ${this.options.height};`;
+        this.container.style = `overflow:hidden; width: ${this.options.width}; height: ${this.options.height}; float:left;`;
 
         this.chartRect = this.getChartRect();
 
@@ -65,6 +65,10 @@ class BaseChart {
         }
 
         this.seriesInfo = this.getSeriesInfo(data.series);
+
+        window.addEventListener('resize', function(){
+            this.updateChart(this.data, this.options);
+        }.bind(this));
     }
 
     createSvg(target) {

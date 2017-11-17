@@ -1,26 +1,20 @@
 <template>
     <div>
-        <div>
-            <chart :data="Line.chartData"
-                   :options="Line.chartOptions">
-            </chart>
-            <!--<chart :data="Scatter.chartData"-->
-                   <!--:options="Scatter.chartOptions">-->
-            <!--</chart>-->
-        </div>
-        <div>
-            <chart :data="Bar.chartData"
-                   :options="Bar.chartOptions">
-            </chart>
-            <!--<chart :data="StackedBar.chartData"-->
-                   <!--:options="StackedBar.chartOptions">-->
-            <!--</chart>-->
-        </div>
-        <div>
-            <chart :data="Pie.chartData"
-                   :options="Pie.chartOptions">
-            </chart>
-        </div>
+        <chart :data="Line.chartData"
+               :options="Line.chartOptions">
+        </chart>
+        <!--<chart :data="Scatter.chartData"-->
+               <!--:options="Scatter.chartOptions">-->
+        <!--</chart>-->
+        <chart :data="Bar.chartData"
+               :options="Bar.chartOptions">
+        </chart>
+        <!--<chart :data="StackedBar.chartData"-->
+               <!--:options="StackedBar.chartOptions">-->
+        <!--</chart>-->
+        <chart :data="Pie.chartData"
+               :options="Pie.chartOptions">
+        </chart>
     </div>
 </template>
 <script>
@@ -123,7 +117,7 @@
                     },
                     chartOptions: {
                         type: "Line",
-                        width: "500px",
+//                        width: "500px",
                         height: "400px",
                         axisX: {
                             divisor: 5,
@@ -147,6 +141,7 @@
                             showGrid: true,
                         },
                         tooltip: {
+                            show: true,
                             xFormat: function(value){
                                 let date = new Date(parseInt(value));
 

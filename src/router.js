@@ -4,7 +4,7 @@ import Navi from './vue/Navigation.vue';
 import Grid from './vue/grid/GridView.vue';
 import Tree from './vue/tree/TreeView.vue';
 import Chart from './vue/chartT/ChartView.vue';
-import ChartTest from './vue/chartT/ChartTest.vue';
+import ChartTest from './vue/chartT/ChartTest2.vue';
 
 Vue.use(Router);
 
