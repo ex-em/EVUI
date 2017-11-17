@@ -4,6 +4,7 @@ import headerCell from './TreeHeaderCell.vue';
 
 
 export default {
+    name  : 'evui-tree',
     props : {
         treeInfo   : Object,
         columns    : Array,
