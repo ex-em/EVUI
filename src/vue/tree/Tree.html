@@ -12,6 +12,7 @@
             <thead ref="evuiTreeThead" class="evui-tree-thead" :style="{width:treeOptions.width+'px'}">
                 <tr>
                     <header-cell v-for="col in columnOptions"
+                                 :key="col.id"
                                  :dataIndex="col.dataIndex"
                                  :width="col.width"
                                  :text="col.name"
@@ -27,7 +28,7 @@
                 <div ref="evuiTreeItemContainer" class="evui-tree-item-container">
                     <div ref="evuiTreeItem" class="evui-tree-item">
                         <tree-node v-for="node in bufferedData"
-                                   key="node.id"
+                                   :key="node.id"
                                    @node-expand="setExpandNode"
                                    @node-checked="setCheckNode"
                                    :columns="columnOptions"

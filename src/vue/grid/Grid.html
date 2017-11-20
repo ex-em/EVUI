@@ -12,6 +12,7 @@
             <thead ref="evuiGridThead" class="evui-grid-thead" :style="{width:gridOptions.width+'px'}">
             <tr>
                 <header-cell v-for="col in columnOptions"
+                             :key="col.id"
                              :dataIndex         ="col.dataIndex"
                              :sortKey           ="sortKey"
                              :width             ="col.width"
@@ -34,6 +35,7 @@
                     <tr v-for="(entry, rowIdx) in bufferedData"
                     :class="rowIdx % 2 ? 'row-even' : 'row-odd'">
                         <cell v-for         = "col in columnOptions"
+                              :key="col.id"
                               :dataIndex    = "col.dataIndex"
                               :width        = "col.width"
                               :visible      = "col.visible"
