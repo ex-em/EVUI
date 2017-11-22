@@ -67,7 +67,7 @@ class BaseChart {
         this.seriesInfo = this.getSeriesInfo(data.series);
 
         window.addEventListener('resize', function(){
-            this.updateChart(this.data, this.options);
+            this.updateChart();
         }.bind(this));
     }
 
@@ -99,7 +99,7 @@ class BaseChart {
 
         this.seriesStatus[seriesIndex] = !isActive;
 
-        this.updateChart(this.data, this.options);
+        this.updateChart();
     }
 
     createLegend(clickFn) {
@@ -280,7 +280,7 @@ class BaseChart {
         };
     }
 
-    updateChart(data, options) {
+    updateChart(data = this.data, options = this.options) {
         let childNodes = this.container.childNodes,
             ix, ixLen;
 

@@ -64,8 +64,8 @@ class BarChart extends BaseChart {
             seriesNames = this.seriesInfo.seriesNames,
             seriesGroup = Svg.createElement(this.svg, 'g'),
             seriesListener = Svg.createElement(seriesGroup, 'rect', {
-                width: this.options.width,
-                height: this.options.height,
+                width: this.chartRect.chartWidth,
+                height: this.chartRect.chartHeight,
                 class: 'series-listener'
             }),
             chartRect = this.chartRect,
