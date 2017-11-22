@@ -1,18 +1,13 @@
 <template>
     <div>
-        <div style="height:400px;">
+        <div style="height:400px; display: block;">
             <div style="margin:15px; font-size: 0.75rem">
                 <span>Data Record : </span>
                 <button @click="dataRecordChange(1000)">1K</button>
                 <button @click="dataRecordChange(10000)">10K</button>
             </div>
 
-            <chart ref="stress"
-                   :data="Line.chartData"
-                   :options="Line.chartOptions">
-            </chart>
-
-            <div style="float:left; width:25%; height:360px; padding:2%;">
+            <div style="float:left; width:25%; padding:2%;">
                 <span>Performance</span>
                 <ul>
                     <li>Data Parsing :
@@ -23,9 +18,16 @@
                     </li>
                 </ul>
             </div>
+
+            <chart ref="stress"
+                   :data="Line.chartData"
+                   :options="Line.chartOptions">
+            </chart>
+
         </div>
+        <br/>
         <div>
-            <div style="margin:15px; font-size: 0.75rem">
+            <div style="margin:15px; font-size: 0.75rem; display: block;">
                 <span>Legend Position :</span>
                 <button @click="legendPositionChange('top')">Top</button>
                 <button @click="legendPositionChange('right')">Right</button>
@@ -125,7 +127,7 @@
                     },
                     chartOptions: {
                         type: "Line",
-                        width: "70%",
+                        width: "40960px",
                         height: "400px",
                         axisX: {
                             divisor: 5,
@@ -369,16 +371,13 @@
                         })
                     }
                 });
-
-                console.log(this.Line.chartData.series);
+                this.Line.chartOptions.width = dataCnt * 4 + 'px';
 
                 let parseTime = new Date();
 
                 this.parseTime = parseTime - startTime;
 
                 this.$refs.stress.chart.updateChart(this.Line.chartData, this.Line.chartOptions);
-
-                console.log(this.$refs);
 
                 let renderTime = new Date();
                 this.renderTime = renderTime - parseTime;
