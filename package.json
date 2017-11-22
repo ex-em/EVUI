@@ -1,7 +1,7 @@
 {
   "name": "evui",
   "description": "EXEM Visualization UI Framework",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "author": "EXEM (evui@ex-em.com)",
   "private": true,
   "license": "MIT",
