@@ -9,6 +9,8 @@ import Tree from './vue/tree/TreeView.vue';
 import Chart from './vue/chartT/ChartView.vue';
 import ChartTest from './vue/chartT/ChartTest2.vue';
 
+import PerformanceApp from './test/PerformanceApp.vue';
+import PerformanceTest from './test/PerformanceTest.vue';
 import GridPerformnace from './test/GridPerformance.vue';
 import TreePerformnace from './test/TreePerformance.vue';
 
@@ -50,7 +52,7 @@ export default new Router({
                 },
                 {
                     path: 'tree',
-                    component: TreePerformnace
+                    component: Tree
                 },
                 {
                     path: 'chart',
@@ -64,12 +66,12 @@ export default new Router({
         },
         {
             path: '/test',
-            component: GridPerformnace,
+            component: PerformanceApp,
             props: true,
             children: [
                 {
                     path: '',
-                    component: GridPerformnace
+                    component: PerformanceTest
                 },
                 {
                     path: 'grid',
