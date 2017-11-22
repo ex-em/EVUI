@@ -10,6 +10,7 @@ import Chart from './vue/chartT/ChartView.vue';
 import ChartTest from './vue/chartT/ChartTest2.vue';
 
 import GridPerformnace from './test/GridPerformance.vue';
+import TreePerformnace from './test/TreePerformance.vue';
 
 Vue.use(Router);
 
@@ -49,7 +50,7 @@ export default new Router({
                 },
                 {
                     path: 'tree',
-                    component: Tree
+                    component: TreePerformnace
                 },
                 {
                     path: 'chart',
