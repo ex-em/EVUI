@@ -3,11 +3,12 @@
         <div style="height:400px;">
             <div style="margin:15px; font-size: 0.75rem">
                 <span>Data Record : </span>
-                <button @click="dataRecordChange('1k')">1K</button>
-                <button @click="dataRecordChange('10k')">10K</button>
+                <button @click="dataRecordChange(1000)">1K</button>
+                <button @click="dataRecordChange(10000)">10K</button>
             </div>
 
-            <chart :data="Line.chartData"
+            <chart ref="stress"
+                   :data="Line.chartData"
                    :options="Line.chartOptions">
             </chart>
 
@@ -15,10 +16,10 @@
                 <span>Performance</span>
                 <ul>
                     <li>Data Parsing :
-                        <span>xxx</span> ms
+                        <span>{{parseTime}}</span> ms
                     </li>
                     <li>Render :
-                        <span>xxx</span> ms
+                        <span>{{renderTime}}</span> ms
                     </li>
                 </ul>
             </div>
@@ -63,13 +64,19 @@
 
     export default {
         data() {
+            let startTime = new Date();
+
             let rslt = mock0.map(v => [v.n01, v.n02, v.n03, v.n04, v.n05, v.n06, v.n07, v.n08, v.n09, v.n10, v.n11, v.n12]);
 
+            let parseTime = new Date();
+
             return {
+                parseTime: parseTime - startTime,
+                renderTime: '-',
                 Bar: {
                     chartData: {
                         categories: ['Jan', 'Feb'],
-                        series: rslt.slice(0, 2)
+                        series: rslt.slice(0, 14)
                     },
                     chartOptions: {
                         type: "Bar",
@@ -299,7 +306,7 @@
                 Pie: {
                     chartData: {
 //                        categories: ['Jan', 'Feb', 'Mar'],//, 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        series: [5, 4, 3]
+                        series: rslt.slice(0, 15).map(v => v[0])//[5, 4, 3]
                     },
                     chartOptions: {
                         type: "Pie",
@@ -346,7 +353,34 @@
             },
 
             dataRecordChange: function(dataCnt){
-                alert("준비중")
+                let startTime = new Date();
+
+                let rslt = mock0.map(v => [v.n01, v.n02, v.n03, v.n04, v.n05, v.n06, v.n07, v.n08, v.n09, v.n10, v.n11, v.n12]).slice(0, dataCnt);
+
+
+                this.Line.chartData.series = rslt.map(row => {
+                    return {
+                        data: row.map((col, i) => {
+                            return {
+                                x: new Date(143134652600 + 100000000*i),
+                                y: col
+                            }
+                        })
+                    }
+                });
+
+                console.log(this.Line.chartData.series);
+
+                let parseTime = new Date();
+
+                this.parseTime = parseTime - startTime;
+
+                this.$refs.stress.chart.updateChart(this.Line.chartData, this.Line.chartOptions);
+
+                console.log(this.$refs);
+
+                let renderTime = new Date();
+                this.renderTime = renderTime - parseTime;
             }
         }
     }
