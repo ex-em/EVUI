@@ -355,9 +355,10 @@
             dataRecordChange: function(dataCnt){
                 let startTime = new Date();
 
-                let rslt = mock0.map(v => [v.n01, v.n02, v.n03, v.n04, v.n05, v.n06, v.n07, v.n08, v.n09, v.n10, v.n11, v.n12]).slice(0, dataCnt);
+                //let rslt = mock0.map(v => [v.n01, v.n02, v.n03, v.n04, v.n05, v.n06, v.n07, v.n08, v.n09, v.n10, v.n11, v.n12]).slice(0, dataCnt);
 
-
+                let rslt = ['n01', 'n02'].map(row => new Array(dataCnt).fill(0).map((zero, x) => mock0[x][row]));
+                
                 this.Line.chartData.series = rslt.map(row => {
                     return {
                         data: row.map((col, i) => {
