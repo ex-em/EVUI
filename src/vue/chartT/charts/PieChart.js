@@ -14,15 +14,15 @@ class PieChart extends BaseChart {
         };
 
         super(target, data, Util.extend(null, defaultOptions, options));
+    }
 
+    createChart() {
         this.radius = Math.min(this.chartRect.width() / 2, this.chartRect.height() / 2);
         this.center = {
             x: this.chartRect.x1 + this.chartRect.width() / 2,
             y: this.chartRect.y2 + this.chartRect.height() / 2
         };
-    }
 
-    createChart() {
         this.createSeries();
 
         if (this.options.legend.show) {
