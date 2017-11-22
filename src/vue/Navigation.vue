@@ -2,14 +2,22 @@
     <div id="navi">
         <h1>{{ msg }}</h1>
         <ul class="navigation">
-            <li class="evui-main-comp"><router-link to="/grid">GRID</router-link></li>
-            <li class="evui-main-comp"><router-link to="/tree">TREE</router-link></li>
-            <li class="evui-main-comp"><router-link to="/chart">CHART</router-link></li>
+            <li class="evui-main-comp">
+                <router-link to="/component/grid">GRID</router-link>
+            </li>
+            <li class="evui-main-comp">
+                <router-link to="/component/tree">TREE</router-link>
+            </li>
+            <li class="evui-main-comp">
+                <router-link to="/component/chart">CHART</router-link>
+            </li>
         </ul>
         <ul class="navigation">
             <li class="evui-test-comp">GRID:TEST</li>
             <li class="evui-test-comp">TREE:TEST</li>
-            <li class="evui-test-comp"><router-link to="/chartTest">CHART:TEST</router-link></li>
+            <li class="evui-test-comp">
+                <router-link to="/component/chartTest">CHART:TEST</router-link>
+            </li>
         </ul>
     </div>
 </template>
