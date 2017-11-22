@@ -3,20 +3,13 @@
         <h1>{{ msg }}</h1>
         <ul class="navigation">
             <li class="evui-main-comp">
-                <router-link to="/component/grid">GRID</router-link>
+                <router-link to="/test/grid">GRID</router-link>
             </li>
             <li class="evui-main-comp">
-                <router-link to="/component/tree">TREE</router-link>
+                <router-link to="/test/tree">TREE</router-link>
             </li>
             <li class="evui-main-comp">
-                <router-link to="/component/chart">CHART</router-link>
-            </li>
-        </ul>
-        <ul class="navigation">
-            <li class="evui-test-comp">GRID:TEST</li>
-            <li class="evui-test-comp">TREE:TEST</li>
-            <li class="evui-test-comp">
-                <router-link to="/component/chartTest">CHART:TEST</router-link>
+                <router-link to="/test/chart">CHART</router-link>
             </li>
         </ul>
     </div>

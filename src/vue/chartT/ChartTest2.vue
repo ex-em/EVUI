@@ -4,6 +4,7 @@
             <div style="margin:15px; font-size: 0.75rem">
                 <span>Data Record : </span>
                 <button @click="dataRecordChange(1000)">1K</button>
+                <button @click="dataRecordChange(5000)">5K</button>
                 <button @click="dataRecordChange(10000)">10K</button>
             </div>
 
@@ -11,10 +12,10 @@
                 <span>Performance</span>
                 <ul>
                     <li>Data Parsing :
-                        <span>{{parseTime}}</span> ms
+                        <span>{{ parseTime }}</span> ms
                     </li>
                     <li>Render :
-                        <span>{{renderTime}}</span> ms
+                        <span>{{ renderTime }}</span> ms
                     </li>
                 </ul>
             </div>
@@ -53,6 +54,18 @@
             </chart>
 
             <chart
+                    ref="column"
+                    :data="Column.chartData"
+                    :options="Column.chartOptions">
+            </chart>
+
+            <chart
+                    ref="stackBar"
+                    :data="StackBar.chartData"
+                    :options="StackBar.chartOptions">
+            </chart>
+
+            <chart
                    ref="pie"
                    :data="Pie.chartData"
                    :options="Pie.chartOptions">
@@ -75,6 +88,7 @@
             return {
                 parseTime: parseTime - startTime,
                 renderTime: '-',
+                minVal : 143134652600,
                 Bar: {
                     chartData: {
                         categories: ['Jan', 'Feb'],
@@ -82,7 +96,7 @@
                     },
                     chartOptions: {
                         type: "Bar",
-                        width: "25%",
+                        width: "33%",
                         height: "400px",
                         isHorizontalBar: true,
                         seriesBarDistance: 10,
@@ -94,45 +108,160 @@
                             divisor: 5,
                             showGrid: true,
                         }
-                    }
+                    },
+                },
+
+                Column: {
+                    chartData: {
+                        categories: ['Jan', 'Feb'],
+                        series: rslt.slice(0, 14)
+                    },
+                    chartOptions: {
+                        type: "Bar",
+                        width: "33%",
+                        height: "400px",
+                        isHorizontalBar: true,
+                        seriesBarDistance: 10,
+                        axisX: {
+                            showGrid: true,
+                            labelAlign: 'between',
+                        },
+                        axisY: {
+                            divisor: 5,
+                            showGrid: true,
+                        }
+                    },
+                },
+
+                StackBar: {
+                    chartData: {
+                        categories: ['Jan', 'Feb'],
+                        series: rslt.slice(0, 14)
+                    },
+                    chartOptions: {
+                        type: "Bar",
+                        width: "33%",
+                        height: "400px",
+                        isHorizontalBar: true,
+                        seriesBarDistance: 10,
+                        axisX: {
+                            showGrid: true,
+                            labelAlign: 'between',
+                        },
+                        axisY: {
+                            divisor: 5,
+                            showGrid: true,
+                        }
+                    },
                 },
 
                 Line: {
                     chartData: {
                         series: [
                             {
-//                                name: 'series-1',
                                 data: [
                                     {x: new Date(143134652600), y: rslt[0][0]},
-                                    {x: new Date(143234652600), y: rslt[0][1]},
-                                    {x: new Date(143340052600), y: rslt[0][2]},
-                                    {x: new Date(143366652600), y: rslt[0][3]},
-                                    {x: new Date(143410652600), y: rslt[0][4]},
-                                    {x: new Date(143508652600), y: rslt[0][5]},
-                                    {x: new Date(143569652600), y: rslt[0][6]},
-                                    {x: new Date(143579652600), y: rslt[0][7]}
+                                    {x: new Date(143136652600), y: rslt[0][1]},
+                                    {x: new Date(143138652600), y: rslt[0][2]},
+                                    {x: new Date(143140652600), y: rslt[0][3]},
+                                    {x: new Date(143144652600), y: rslt[0][4]},
                                 ]
                             },
                             {
-//                                name: 'series-2',
                                 data: [
                                     {x: new Date(143134652600), y: rslt[1][0]},
-                                    {x: new Date(143234652600), y: rslt[1][1]},
-                                    {x: new Date(143334652600), y: rslt[1][2]},
-                                    {x: new Date(143384652600), y: rslt[1][3]},
-                                    {x: new Date(143568652600), y: rslt[1][4]}
+                                    {x: new Date(143136652600), y: rslt[1][1]},
+                                    {x: new Date(143138652600), y: rslt[1][2]},
+                                    {x: new Date(143140652600), y: rslt[1][3]},
+                                    {x: new Date(143144652600), y: rslt[1][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[2][0]},
+                                    {x: new Date(143136652600), y: rslt[2][1]},
+                                    {x: new Date(143138652600), y: rslt[2][2]},
+                                    {x: new Date(143140652600), y: rslt[2][3]},
+                                    {x: new Date(143144652600), y: rslt[2][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[3][0]},
+                                    {x: new Date(143136652600), y: rslt[3][1]},
+                                    {x: new Date(143138652600), y: rslt[3][2]},
+                                    {x: new Date(143140652600), y: rslt[3][3]},
+                                    {x: new Date(143144652600), y: rslt[3][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[4][0]},
+                                    {x: new Date(143136652600), y: rslt[4][1]},
+                                    {x: new Date(143138652600), y: rslt[4][2]},
+                                    {x: new Date(143140652600), y: rslt[4][3]},
+                                    {x: new Date(143144652600), y: rslt[4][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[5][0]},
+                                    {x: new Date(143136652600), y: rslt[5][1]},
+                                    {x: new Date(143138652600), y: rslt[5][2]},
+                                    {x: new Date(143140652600), y: rslt[5][3]},
+                                    {x: new Date(143144652600), y: rslt[5][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[6][0]},
+                                    {x: new Date(143136652600), y: rslt[6][1]},
+                                    {x: new Date(143138652600), y: rslt[6][2]},
+                                    {x: new Date(143140652600), y: rslt[6][3]},
+                                    {x: new Date(143144652600), y: rslt[6][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[7][0]},
+                                    {x: new Date(143134852600), y: rslt[7][1]},
+                                    {x: new Date(143135052600), y: rslt[7][2]},
+                                    {x: new Date(143135252600), y: rslt[7][3]},
+                                    {x: new Date(143144652600), y: rslt[7][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[8][0]},
+                                    {x: new Date(143134852600), y: rslt[8][1]},
+                                    {x: new Date(143135052600), y: rslt[8][2]},
+                                    {x: new Date(143135252600), y: rslt[8][3]},
+                                    {x: new Date(143144652600), y: rslt[8][4]}
+                                ]
+                            },
+                            {
+                                data: [
+                                    {x: new Date(143134652600), y: rslt[9][0]},
+                                    {x: new Date(143134852600), y: rslt[9][1]},
+                                    {x: new Date(143135052600), y: rslt[9][2]},
+                                    {x: new Date(143135252600), y: rslt[9][3]},
+                                    {x: new Date(143144652600), y: rslt[9][4]}
                                 ]
                             }
                         ]
                     },
                     chartOptions: {
                         type: "Line",
-                        width: "40960px",
+                        width: "100%",
                         height: "400px",
                         axisX: {
                             divisor: 5,
                             showGrid: true,
                             labelAlign: 'line',
+                            highLow: {
+                                high : 143144652600,
+                                low : 143134652600
+                            },
                             tickFormat: function(value) {
                                 let date;
 
@@ -190,7 +319,7 @@
                     },
                     chartOptions2: {
                         type: "Line",
-                        width: "25%",
+                        width: "33%",
                         height: "400px",
                         axisX: {
                             divisor: 5,
@@ -269,7 +398,7 @@
                     },
                     chartOptions: {
                         type: "Line",
-                        width: "25%",
+                        width: "33%",
                         height: "400px",
                         isScatter: true,
                         axisX: {
@@ -312,7 +441,7 @@
                     },
                     chartOptions: {
                         type: "Pie",
-                        width: "25%",
+                        width: "33%",
                         height: "400px",
                         legend: {
                             show: true
@@ -355,28 +484,25 @@
             },
 
             dataRecordChange: function(dataCnt){
-                let startTime = new Date();
+                let startTime = new Date(),
+                    mockArray = ['n01', 'n02', 'n03', 'n04', 'n05', 'n06', 'n07', 'n08', 'n09', 'n10'];
 
-                //let rslt = mock0.map(v => [v.n01, v.n02, v.n03, v.n04, v.n05, v.n06, v.n07, v.n08, v.n09, v.n10, v.n11, v.n12]).slice(0, dataCnt);
-
-                let rslt = ['n01', 'n02'].map(row => new Array(dataCnt).fill(0).map((zero, x) => mock0[x][row]));
-                
+                dataCnt = parseInt(dataCnt / mockArray.length)
+                let rslt = mockArray.map(row => new Array(dataCnt).fill(0).map((zero, x) => mock0[x][row]));
                 this.Line.chartData.series = rslt.map(row => {
                     return {
                         data: row.map((col, i) => {
                             return {
-                                x: new Date(143134652600 + 100000000*i),
+                                x: new Date(143134652600 + 1000 * i),
                                 y: col
                             }
                         })
                     }
                 });
-                this.Line.chartOptions.width = dataCnt * 4 + 'px';
 
                 let parseTime = new Date();
-
                 this.parseTime = parseTime - startTime;
-
+                this.Line.chartOptions.axisX.highLow.high = 143134652600 + 1000 * rslt[0].length
                 this.$refs.stress.chart.updateChart(this.Line.chartData, this.Line.chartOptions);
 
                 let renderTime = new Date();
@@ -385,3 +511,12 @@
         }
     }
 </script>
+<style>
+    .line {
+        stroke-width: 1px !important;
+    }
+
+    .point {
+        stroke-width: 4px !important;
+    }
+</style>

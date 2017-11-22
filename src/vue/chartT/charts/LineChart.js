@@ -2,7 +2,6 @@ import BaseChart from "./BaseChart"
 import Svg from "../common/Svg"
 import Intrpl from '../common/Interpolation'
 import Core from '../common/Core'
-import Tooltip from "../common/Tooltip"
 import AutoScaleAxis from "../common/axis/AutoScaleAxis";
 import FixedScaleAxis from "../common/axis/FixedScaleAxis";
 import { color } from "../common/Constant"
