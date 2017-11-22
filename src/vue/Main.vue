@@ -6,12 +6,11 @@
                 <li class="row">
                     <router-link to="/guide">Guide Page</router-link>
                 </li>
-            </ul>
-        </div>
-        <div>
-            <ul>
                 <li class="row">
                     <router-link to="/component">Component</router-link>
+                </li>
+                <li class="row">
+                    <router-link to="/test">Performance Test</router-link>
                 </li>
             </ul>
         </div>
