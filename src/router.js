@@ -77,7 +77,7 @@ export default new Router({
                 },
                 {
                     path: 'tree',
-                    component: Tree
+                    component: TreePerformnace
                 },
                 {
                     path: 'chart',
