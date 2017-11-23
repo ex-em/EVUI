@@ -6,6 +6,7 @@
         </div>
         <div v-if="useFilter"
              class="filter-icon">
+          <icon name="filter"></icon>
         </div>
         <div v-if="useFilter"
              class='filter-popover'>

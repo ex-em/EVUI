@@ -120,7 +120,7 @@ export default {
 
                 //filter event
                 if(filterData.type ==='filter') {
-                    //입력 필터 컬럼 비교 
+                    //입력 필터 컬럼 비교
                     //필터가 처음탈때 beforeFilterList에 값을 넣어준다 멀티 필터 대응
                     if (this.beforeFilterCol !== filterData.colIndex) {
                         this.beforeFilterCol = filterData.colIndex;
@@ -486,8 +486,8 @@ export default {
          * @param e : 아이콘 클리 이벤트 (span)
          */
         clickFilter(e){
-            let target = e.target;
-            let thEle = e.target.parentElement;
+            let target = e.target.parentElement.parentElement;
+            let thEle = target.parentElement;
             let popover = thEle.getElementsByClassName('filter-popover')[0];
 
             //filter-icon 다른거 클릭시

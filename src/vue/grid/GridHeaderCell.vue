@@ -22,7 +22,9 @@
                   :class="order">
             </span>
         </div>
-        <span class="filter-icon"  @click="clickFilter" v-if="filter!=='none'"></span>
+        <span class="filter-icon"  @click="clickFilter" v-if="filter!=='none'">
+          <icon name="filter"></icon>
+        </span>
         <div v-if="useResize"
              class="grip"
         ></div>
@@ -213,7 +215,7 @@
     }
 
     .filter-icon {
-        background-image: url("/src/images/filter-black.png");
+        /*background-image: url("/src/images/filter-black.png");*/
         width: 16px;
         height: 16px;
         position: absolute;
