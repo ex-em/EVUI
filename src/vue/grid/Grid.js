@@ -9,7 +9,13 @@ export default {
     props : {
         gridInfo : Object,
         columns : Array,
-        data: Array
+        data: Array,
+
+        cellClick: null,
+        cellDblClick: null,
+        rowClick: null,
+        rowDblClick: null,
+        sortChange: null
     },
     data: function () {
         return {
@@ -40,7 +46,8 @@ export default {
                 bottom          : 0,
                 timeOut         : null
             },
-            dataChangeFlag : false
+            beforeUpdateTime: null,
+            updatedTime: null,
         };
     },
     computed: {
@@ -117,6 +124,10 @@ export default {
                         });
                     }
                     this.filterList = sortedData;
+
+                    if(this.sortChange){
+                        this.sortChange(this, this.sortKey, order == -1 ? 'DESC' : 'ASC');
+                    }
                 }
 
                 //filter event
@@ -210,9 +221,29 @@ export default {
         cellChange: function(){
 
         },
-        cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
+        onCellClick: function() {
+            // console.log('cell click event', arguments);
 
-            // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
+            if(this.cellClick){
+                this.cellClick(arguments);
+            }
+
+            if(this.rowClick){
+                this.rowClick(arguments);
+            }
+
+
+        },
+        onCellDblClick: function() {
+            // console.log('cell double click event', arguments);
+
+            if(this.cellDblClick){
+                this.cellDblClick(arguments);
+            }
+
+            if(this.rowDblClick){
+                this.rowDblClick(arguments);
+            }
         },
 
         bufferHeightCalc: function () {
@@ -594,14 +625,13 @@ export default {
 
 
     },
-    updated(){
-        //데이터 변경후 돔이 변경 완료후 탐
-        if(this.dataChangeFlag===true){
-            //스크롤 탑으로 보내기
-            this.$refs.evuiGridBody.scrollTop = 0;
-            this.bufferHeightCalc();
-            this.dataChangeFlag = false;
-        }
+
+    beforeUpdate() {
+        this.beforeUpdateTime = performance.now();
+    },
+
+    updated() {
+        this.updatedTime = performance.now();
 
 
     }

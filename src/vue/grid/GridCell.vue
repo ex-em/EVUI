@@ -2,11 +2,12 @@
     <td v-if="visible"
         class="evui-grid-cell-wrap"
         @click="onClick()"
+        @dblclick="onDblClick()"
     >
         <div v-if="readOnly || cellRender == null || cellRender == ''"
              :style="{width:width+'px'}"
              class="evui-grid-cell">
-            {{ this.cellValue }}
+            {{ valueFormat }}
         </div>
         <template v-else>
             <div v-if="cellRender=='checkbox'"
@@ -21,7 +22,7 @@
                 <div v-if="! isClicked"
                      class="evui-grid-cell"
                      :style="{width:width+'px'}"
-                > {{ this.cellValue }} </div>
+                > {{ valueFormat }} </div>
                 <div v-else
                      class="evui-grid-cell"
                      :style="{display:'inline-block', width:width+'px'}"
@@ -79,7 +80,14 @@
             value: {
                 default: null
             },
+            dataType: 'string',
             toFixed: 0,
+
+            cellClick: null,
+            cellDblClick: null,
+            rowClick: null,
+            rowDblClick: null,
+            dataUpdated: null,
 
         },
         data: function () {
@@ -94,14 +102,33 @@
             }
         },
         computed: {
-            valueFormat(value){
+            valueFormat(){
+                let value;
+                switch(this.dataType){
+                    case 'integer':
+                        value =  ~~this.cellValue.toLocaleString();
+                        break;
+                    case 'float':
+                        value =  this.cellValue.toLocaleString(undefined, { minimumFractionDigits: this.toFixed });
+                    case 'date':
+                    case 'datetime':
+                        break;
+                    default:
+                        value = this.cellValue;
+                        break;
 
-            }
+                }
+                return value;
+            },
         },
         methods: {
             onClick() {
                 this.isClicked = true;
-                this.$emit('cellClick');
+                this.$emit('cellClick', this.cellValue);
+            },
+            onDblClick() {
+                this.isClicked = true;
+                this.$emit('cellDblClick', this.cellValue);
             },
             onBlur(value) {
                 this.isClicked = false;
