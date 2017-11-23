@@ -12,7 +12,6 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
     evui: './src/evui.js',
-    dev: './src/dev.js'
   },
   output: {
     path: config.build.assetsRoot,
@@ -40,7 +39,8 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test'), resolve('node_modules/vue-awesome')]
+        include: [resolve('src'), resolve('test'), resolve('node_modules/vue-awesome')],
+        exclude: /node_modules/
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

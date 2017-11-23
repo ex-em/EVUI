@@ -121,7 +121,10 @@
 
                 return true;
             },
-            onClick() {
+            onClick(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation(); // stops the browser from redirecting.
+                }
 
                 if(this.cellRender == 'checkbox'){
                     return;
@@ -225,12 +228,12 @@
     }
 
     .filter-popover {
-        position: absolute;
+        position: fixed;
         background: #fff;
         min-width: 150px;
         border-radius: 4px;
         border: 1px solid #e6ebf5;
-        padding: 12px;
+        padding: 5px;
         z-index: 2000;
         color: #5a5e66;
         line-height: 1.4;
@@ -240,10 +243,6 @@
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
         display : none;
         cursor: default;
-        /*  width: 400px;
-         top: 472px;
-         left: 835px;
-         position: absolute; */
     }
 
     .filter-input {
