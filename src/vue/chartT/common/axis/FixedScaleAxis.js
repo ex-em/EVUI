@@ -10,7 +10,7 @@ class FixedScaleAxis extends Axis {
             divisor = options.divisor || 1,
             ticks;
 
-        highLow.high = highLow.high + ((highLow.high - highLow.low) * 0.05);
+        highLow.high = highLow.high + ((highLow.high - highLow.low) * 0.01);
         ticks = options.ticks || Core.times(divisor).map(function(value, index) {
             return highLow.low + (highLow.high - highLow.low) / divisor * index;
         });
