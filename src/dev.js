@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import 'vue-awesome/icons'
+import 'vue-awesome/icons/filter'
 import Icon from 'vue-awesome/components/Icon.vue'
 import Axios from 'axios'
 import App from './vue/App.vue'
