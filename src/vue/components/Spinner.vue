@@ -12,10 +12,7 @@
         props: {
             value: {
                 type: Number,
-                default: '',
-                validator(value) {
-                    return value;
-                }
+                default: 0
             }
         },
         computed: {

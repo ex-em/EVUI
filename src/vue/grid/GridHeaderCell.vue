@@ -2,7 +2,7 @@
     <th v-if="visible"
         @click="onClick"
     >
-        <div v-if="render=='checkbox'"
+        <div v-if="cellRender=='checkbox'"
              :draggable="draggable"
              :style="{ display:'inline-block',width:'100%' }"
         >
@@ -78,7 +78,7 @@
             value: {
                 default: null
             },
-            render: String,
+            cellRender: String,
             draggable: {
                 type: Boolean,
                 default: true,
@@ -121,9 +121,9 @@
 
                 return true;
             },
-            onClick(e) {
+            onClick() {
 
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     return;
                 }
                 this.checkOrder(this.order);
@@ -131,7 +131,7 @@
                 this.$emit('cellClick', this, this.dataIndex);
             },
             onChange(value){
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     this.$emit('allCheckChange', this.dataIndex, value);
                 }else{
                     this.$emit('cellHeaderChange', this.dataIndex, value);
