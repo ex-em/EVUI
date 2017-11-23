@@ -39,7 +39,8 @@ export default {
                 top             : 0,
                 bottom          : 0,
                 timeOut         : null
-            }
+            },
+            dataChangeFlag : false
         };
     },
     computed: {
@@ -164,6 +165,13 @@ export default {
                 });
             }
             this.sortedList = sortedData;
+        },
+
+        //props넘어온 데이터가 변경됐을때 타는 함수임
+        data(){
+            this.dataChangeFlag =true;
+            //자 데이터 바꼇으니 너도 바껴라
+            this.filterList = this.data;
         }
     },
 
@@ -213,8 +221,6 @@ export default {
                 if (!this.scroll.rowHeight) {
                     this.scroll.rowHeight = this.$refs.evuiGridItem.firstElementChild.offsetHeight;
                 }
-            } else {
-                return;
             }
 
             let rowTopEl = this.$refs.evuiGridItemContainer;
@@ -584,6 +590,17 @@ export default {
         //filter 컬럼 객체 생성(추후 조건문 추가)
         for(let ix=0, ixLen=this.columns.length; ix<ixLen ;ix++){
             this.filterCol[this.columns[ix].dataIndex] = undefined;
+        }
+
+
+    },
+    updated(){
+        //데이터 변경후 돔이 변경 완료후 탐
+        if(this.dataChangeFlag===true){
+            //스크롤 탑으로 보내기
+            this.$refs.evuiGridBody.scrollTop = 0;
+            this.bufferHeightCalc();
+            this.dataChangeFlag = false;
         }
 
 

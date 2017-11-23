@@ -29,6 +29,7 @@
             </tr>
             </thead>
             <tbody @scroll="gridBodyScroll"
+                   ref="evuiGridBody"
                    :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
                 <div ref="evuiGridItemContainer" class="evui-grid-item-container">
                     <div ref="evuiGridItem" class="evui-grid-item">
