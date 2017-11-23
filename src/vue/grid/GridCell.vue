@@ -80,7 +80,6 @@
                 default: null
             },
             toFixed: 0,
-            dataType:
 
         },
         data: function () {
