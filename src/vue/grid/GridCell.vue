@@ -80,8 +80,8 @@
             value: {
                 default: null
             },
-            dataType: 'string',
-            toFixed: 0,
+            dataType: null,
+            toFixed: null,
 
             cellClick: null,
             cellDblClick: null,
@@ -105,11 +105,13 @@
             valueFormat(){
                 let value;
                 switch(this.dataType){
+                    case 'number':
                     case 'integer':
                         value =  ~~this.cellValue.toLocaleString();
                         break;
                     case 'float':
-                        value =  this.cellValue.toLocaleString(undefined, { minimumFractionDigits: this.toFixed });
+//                        value =  this.cellValue.toLocaleString(undefined, { minimumFractionDigits: this.toFixed });
+                        value =  (+this.cellValue.toFixed(this.toFixed)).toLocaleString();
                     case 'date':
                     case 'datetime':
                         break;

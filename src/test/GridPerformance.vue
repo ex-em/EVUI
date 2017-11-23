@@ -22,7 +22,6 @@
                   :data="rowData"
                   ref="grid"
 
-                  :cellClick="onClick"
             >
             </grid>
 
@@ -49,7 +48,7 @@
                 let column = [
                     {dataIndex: 'column', name: 'column' ,      draggable: true, width: 20, visible: true, type: 'boolean', cellrender: 'checkbox'},
                     {dataIndex: 'column2', name: 'column2'    , draggable: true, width: 300, visible: true, type: 'string', cellrender: 'textbox'},
-                    {dataIndex: 'column3', name: 'column3'    , draggable: true, width: 200, visible: true, type: 'number', cellrender: 'spinner', toFixed:2},
+                    {dataIndex: 'column3', name: 'column3'    , draggable: true, width: 200, visible: true, type: 'float', cellrender: 'spinner', toFixed:2},
                     {dataIndex: 'column4', name: 'column4'    , draggable: true, width: 150, visible: true, type: 'string'},
                     {dataIndex: 'column5', name: 'column5'    , draggable: true, width: 150, visible: true, type: 'string'}
                 ];
@@ -94,7 +93,7 @@
                 let row = {
                     column : Math.round(Math.random()) ? true : false,
                     column2 : 'index_' + index,
-                    column3 : (Math.random() * 1000000).toFixed(3),
+                    column3 : +(Math.random() * 1000000).toFixed(3),
                     column4 : 'data_' + index,
                     column5 : 'vue_' + index + '@ex-em.com',
                 };
