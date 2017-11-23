@@ -6,11 +6,6 @@
                 <button @click="generateData(1001)">1k Records</button>
                 <button @click="generateData(10001)">10k Records</button>
             </div>
-
-            <div>
-                <!--<input type="checkbox" :checked="useBuffer" @change="(val) => { useBuffer = val }">-->
-                <label>Data Buffer Size : <input type="number" :value="treeBufferSize" width="60" min="10" :readOnly="!useBuffer"/></label>
-            </div>
             <tree :treeInfo="treeInfo"
                   :columns="treeColumns"
                   :rows="treeData"
