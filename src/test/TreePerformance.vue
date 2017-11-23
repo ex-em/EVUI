@@ -35,7 +35,7 @@
             tree
         },
         methods: {
-            generateData(count = 1000){
+            generateData(count = 1001){
                 let before = performance.now();
                 this.recordCount = 0;
                 let tempData = new Array(count);
