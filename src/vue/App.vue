@@ -136,7 +136,7 @@
     #main-content {
         width : 100%;
         margin-top : 70px;
-        background-color : #def2f1;
+        background-color : #fff;
         color : #000;
     }
 
