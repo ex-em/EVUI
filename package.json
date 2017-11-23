@@ -12,7 +12,7 @@
   },
   "main": "dist/evui.js",
   "files": [
-    "dist"
+    "dist/evui.js"
   ],
   "repository": {
     "type": "git",

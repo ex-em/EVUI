@@ -11,7 +11,8 @@ function resolve (dir) {
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    evui: './src/evui.js'
+    evui: './src/evui.js',
+    dev: './src/dev.js'
   },
   output: {
     path: config.build.assetsRoot,
