@@ -3,13 +3,13 @@
         class="evui-grid-cell-wrap"
         @click="onClick()"
     >
-        <div v-if="readOnly || render == null || render == ''"
+        <div v-if="readOnly || cellRender == null || cellRender == ''"
              :style="{width:width+'px'}"
              class="evui-grid-cell">
             {{ this.cellValue }}
         </div>
         <template v-else>
-            <div v-if="render=='checkbox'"
+            <div v-if="cellRender=='checkbox'"
                  class="evui-grid-cell"
                  :style="{display:'inline-block', width:'100%', textAlign:'center'}"
             >
@@ -24,9 +24,9 @@
                 > {{ this.cellValue }} </div>
                 <div v-else
                      class="evui-grid-cell"
-                     :style="{display:'inline-block', width:'100%'}"
+                     :style="{display:'inline-block', width:width+'px'}"
                 >
-                    <component :is="render"
+                    <component :is="cellRender"
                                :style="{width:width+'px'}"
                                v-model="cellValue"
                                v-focus
@@ -67,7 +67,7 @@
                 type: String,
                 default: null,
             },
-            render: String,
+            cellRender: String,
             readOnly: {
                 type: Boolean,
                 default: false,
@@ -78,7 +78,9 @@
             },
             value: {
                 default: null
-            }
+            },
+            toFixed: 0,
+
         },
         data: function () {
             return {
@@ -92,7 +94,9 @@
             }
         },
         computed: {
+            valueFormat(value){
 
+            }
         },
         methods: {
             onClick() {
@@ -108,7 +112,7 @@
                 this.cellValue = value;
             },
             onChange(value) {
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     this.$emit('checkChange', this.dataIndex, value);
                 }else{
                     this.$emit('cellChange', this.dataIndex, value);

@@ -17,7 +17,7 @@
                              :sortKey           ="sortKey"
                              :width             ="col.width"
                              :text              ="col.name"
-                             :render            ="col.render"
+                             :cellRender        ="col.cellrender"
                              :draggable         ="col.draggable"
                              :value             ="isAllChecked"
                              :filter            ="col.filter"
@@ -29,6 +29,7 @@
             </tr>
             </thead>
             <tbody @scroll="gridBodyScroll"
+                   ref="evuiGridBody"
                    :style="{width:gridOptions.width+'px', height:gridOptions.height+'px'}">
                 <div ref="evuiGridItemContainer" class="evui-grid-item-container">
                     <div ref="evuiGridItem" class="evui-grid-item">
@@ -39,7 +40,7 @@
                               :dataIndex    = "col.dataIndex"
                               :width        = "col.width"
                               :visible      = "col.visible"
-                              :render       = "col.render"
+                              :cellRender   = "col.cellrender"
                               :class        = "cls(col.type)"
                               :value        = "entry[col.dataIndex]"
                               @checkChange  ="onCheckChange"

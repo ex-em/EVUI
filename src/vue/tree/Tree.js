@@ -143,8 +143,6 @@ export default {
                 if (!this.scroll.rowHeight) {
                     this.scroll.rowHeight = this.$refs.evuiTreeItem.firstElementChild.offsetHeight;
                 }
-            } else {
-                return;
             }
 
             let rowTopEl = this.$refs.evuiTreeItemContainer;
