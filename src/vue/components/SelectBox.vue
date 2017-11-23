@@ -1,10 +1,11 @@
 <template>
-    <input
-        type="search"
+    <select id="id"
         v-model="inputValue"
         @input="onInput"
         @blur="onBlur"
     >
+        <options v-for="item in options" :key="item.value" :value="item.value">{{item.display}}</options>
+    </select>
 </template>
 
 <script>
@@ -22,7 +23,8 @@
             },
             value: {
                 default: null,
-            }
+            },
+            options: []
         },
         computed: {
 
@@ -36,7 +38,8 @@
         },
         data(){
             return {
-                inputValue: this.value
+                inputValue: this.value,
+                options: []
             };
         }
     }

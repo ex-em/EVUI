@@ -2,14 +2,15 @@
     <td v-if="visible"
         class="evui-grid-cell-wrap"
         @click="onClick()"
+        @dblclick="onDblClick()"
     >
-        <div v-if="readOnly || render == null || render == ''"
+        <div v-if="readOnly || cellRender == null || cellRender == ''"
              :style="{width:width+'px'}"
              class="evui-grid-cell">
-            {{ this.cellValue }}
+            {{ valueFormat }}
         </div>
         <template v-else>
-            <div v-if="render=='checkbox'"
+            <div v-if="cellRender=='checkbox'"
                  class="evui-grid-cell"
                  :style="{display:'inline-block', width:'100%', textAlign:'center'}"
             >
@@ -21,12 +22,12 @@
                 <div v-if="! isClicked"
                      class="evui-grid-cell"
                      :style="{width:width+'px'}"
-                > {{ this.cellValue }} </div>
+                > {{ valueFormat }} </div>
                 <div v-else
                      class="evui-grid-cell"
-                     :style="{display:'inline-block', width:'100%'}"
+                     :style="{display:'inline-block', width:width+'px'}"
                 >
-                    <component :is="render"
+                    <component :is="cellRender"
                                :style="{width:width+'px'}"
                                v-model="cellValue"
                                v-focus
@@ -67,7 +68,7 @@
                 type: String,
                 default: null,
             },
-            render: String,
+            cellRender: String,
             readOnly: {
                 type: Boolean,
                 default: false,
@@ -78,7 +79,16 @@
             },
             value: {
                 default: null
-            }
+            },
+            dataType: 'string',
+            toFixed: 0,
+
+            cellClick: null,
+            cellDblClick: null,
+            rowClick: null,
+            rowDblClick: null,
+            dataUpdated: null,
+
         },
         data: function () {
             return {
@@ -92,12 +102,33 @@
             }
         },
         computed: {
+            valueFormat(){
+                let value;
+                switch(this.dataType){
+                    case 'integer':
+                        value =  ~~this.cellValue.toLocaleString();
+                        break;
+                    case 'float':
+                        value =  this.cellValue.toLocaleString(undefined, { minimumFractionDigits: this.toFixed });
+                    case 'date':
+                    case 'datetime':
+                        break;
+                    default:
+                        value = this.cellValue;
+                        break;
 
+                }
+                return value;
+            },
         },
         methods: {
             onClick() {
                 this.isClicked = true;
-                this.$emit('cellClick');
+                this.$emit('cellClick', this.cellValue);
+            },
+            onDblClick() {
+                this.isClicked = true;
+                this.$emit('cellDblClick', this.cellValue);
             },
             onBlur(value) {
                 this.isClicked = false;
@@ -108,7 +139,7 @@
                 this.cellValue = value;
             },
             onChange(value) {
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     this.$emit('checkChange', this.dataIndex, value);
                 }else{
                     this.$emit('cellChange', this.dataIndex, value);

@@ -9,7 +9,13 @@ export default {
     props : {
         gridInfo : Object,
         columns : Array,
-        data: Array
+        data: Array,
+
+        cellClick: null,
+        cellDblClick: null,
+        rowClick: null,
+        rowDblClick: null,
+        sortChange: null
     },
     data: function () {
         return {
@@ -39,7 +45,9 @@ export default {
                 top             : 0,
                 bottom          : 0,
                 timeOut         : null
-            }
+            },
+            beforeUpdateTime: null,
+            updatedTime: null,
         };
     },
     computed: {
@@ -116,6 +124,10 @@ export default {
                         });
                     }
                     this.filterList = sortedData;
+
+                    if(this.sortChange){
+                        this.sortChange(this, this.sortKey, order == -1 ? 'DESC' : 'ASC');
+                    }
                 }
 
                 //filter event
@@ -164,6 +176,13 @@ export default {
                 });
             }
             this.sortedList = sortedData;
+        },
+
+        //props넘어온 데이터가 변경됐을때 타는 함수임
+        data(){
+            this.dataChangeFlag =true;
+            //자 데이터 바꼇으니 너도 바껴라
+            this.filterList = this.data;
         }
     },
 
@@ -202,9 +221,29 @@ export default {
         cellChange: function(){
 
         },
-        cellClick: function(columnData, colIdx, rowData, rowIdx, e) {
+        onCellClick: function() {
+            // console.log('cell click event', arguments);
 
-            // alert('Col Info -> '+ columnData + '\nCol Idx -> ' + colIdx + '\nRow Info -> '+ rowData + '\nRow Idx -> ' + rowIdx);
+            if(this.cellClick){
+                this.cellClick(arguments);
+            }
+
+            if(this.rowClick){
+                this.rowClick(arguments);
+            }
+
+
+        },
+        onCellDblClick: function() {
+            // console.log('cell double click event', arguments);
+
+            if(this.cellDblClick){
+                this.cellDblClick(arguments);
+            }
+
+            if(this.rowDblClick){
+                this.rowDblClick(arguments);
+            }
         },
 
         bufferHeightCalc: function () {
@@ -213,8 +252,6 @@ export default {
                 if (!this.scroll.rowHeight) {
                     this.scroll.rowHeight = this.$refs.evuiGridItem.firstElementChild.offsetHeight;
                 }
-            } else {
-                return;
             }
 
             let rowTopEl = this.$refs.evuiGridItemContainer;
@@ -486,10 +523,11 @@ export default {
          * @param e : 아이콘 클리 이벤트 (span)
          */
         clickFilter(e){
-            let target = e.target.parentElement.parentElement;
+            let target = e.currentTarget;
             let thEle = target.parentElement;
             let popover = thEle.getElementsByClassName('filter-popover')[0];
 
+            // debugger;
             //filter-icon 다른거 클릭시
             if(this.popoverCol !== target) {
 
@@ -508,7 +546,7 @@ export default {
                     //filter 버트 처음 눌렀을때 popover 켜져라
                     popover.style.display = 'block';
                     popover.classList.add('active');
-                    popover.style.left = target.offsetLeft+'px';
+                    popover.style.left = target.getBoundingClientRect().x +'px';
                     popover.getElementsByClassName('filter-input')[0].focus();
 
 
@@ -525,7 +563,7 @@ export default {
                     //현재 popover 보여라
                     popover.style.display = 'block';
                     popover.classList.add('active');
-                    popover.style.left = target.offsetLeft+'px';
+                    popover.style.left = target.getBoundingClientRect().x +'px';
                     popover.getElementsByClassName('filter-input')[0].focus();
 
                 }
@@ -584,6 +622,16 @@ export default {
         for(let ix=0, ixLen=this.columns.length; ix<ixLen ;ix++){
             this.filterCol[this.columns[ix].dataIndex] = undefined;
         }
+
+
+    },
+
+    beforeUpdate() {
+        this.beforeUpdateTime = performance.now();
+    },
+
+    updated() {
+        this.updatedTime = performance.now();
 
 
     }
