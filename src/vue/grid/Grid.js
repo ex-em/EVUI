@@ -486,10 +486,11 @@ export default {
          * @param e : 아이콘 클리 이벤트 (span)
          */
         clickFilter(e){
-            let target = e.target.parentElement.parentElement;
+            let target = e.currentTarget;
             let thEle = target.parentElement;
             let popover = thEle.getElementsByClassName('filter-popover')[0];
 
+            // debugger;
             //filter-icon 다른거 클릭시
             if(this.popoverCol !== target) {
 
@@ -508,7 +509,7 @@ export default {
                     //filter 버트 처음 눌렀을때 popover 켜져라
                     popover.style.display = 'block';
                     popover.classList.add('active');
-                    popover.style.left = target.offsetLeft+'px';
+                    popover.style.left = target.getBoundingClientRect().x +'px';
                     popover.getElementsByClassName('filter-input')[0].focus();
 
 
@@ -525,7 +526,7 @@ export default {
                     //현재 popover 보여라
                     popover.style.display = 'block';
                     popover.classList.add('active');
-                    popover.style.left = target.offsetLeft+'px';
+                    popover.style.left = target.getBoundingClientRect().x +'px';
                     popover.getElementsByClassName('filter-input')[0].focus();
 
                 }
