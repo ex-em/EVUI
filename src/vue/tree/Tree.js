@@ -12,6 +12,7 @@ export default {
     },
     data: function() {
         return {
+            isInit     : false,
             treeStyle  : null,
             titleStyle : null,
             store      : null,
@@ -68,7 +69,23 @@ export default {
         },
 
         treeMap() {
+            if(this.$refs.evuiTreeBody) {
+                this.$refs.evuiTreeBody.scrollTop = 0;
+                this.store = null;
+            }
+
+            this.store = new TreeStore({
+                vm          : this,
+                treeData    : this.rawData,
+                columns     : this.columns,
+                treeColumnId: this.treeOptions.treeColumnId,
+                useCheckBox : this.treeOptions.useCheckBox
+            });
             return this.store.treeMap;
+        },
+
+        rawData() {
+            return this.rows;
         },
 
         bufferedData: function () {
@@ -205,14 +222,6 @@ export default {
             'width' : typeof this.treeOptions.width === 'number' ? this.treeOptions.width + 'px' : this.treeOptions.width,
             'height': typeof this.treeOptions.height === 'number' ? this.treeOptions.height + 'px' : this.treeOptions.height
         };
-
-        this.store = new TreeStore({
-            vm          : this,
-            treeData    : this.rows,
-            columns     : this.columns,
-            treeColumnId: this.treeOptions.treeColumnId,
-            useCheckBox : this.treeOptions.useCheckBox
-        });
 
     },
     mounted() {
