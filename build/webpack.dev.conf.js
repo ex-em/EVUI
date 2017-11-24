@@ -10,7 +10,7 @@ const portfinder = require('portfinder')
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   entry: {
-    dev: './src/dev.js'
+    dev: ['./src/dev.js', 'webpack/hot/only-dev-server']
   },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })

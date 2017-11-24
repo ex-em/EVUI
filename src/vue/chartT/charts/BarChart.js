@@ -3,7 +3,6 @@ import Util from "../common/Util"
 import StepAxis from "../common/axis/StepAxis"
 import AutoScaleAxis from "../common/axis/AutoScaleAxis"
 import BaseChart from "./BaseChart"
-import { color } from "../common/Constant"
 
 class BarChart extends BaseChart {
 
@@ -74,7 +73,7 @@ class BarChart extends BaseChart {
             baseYPos = chartRect.y1 - axisY.getValue(0),
             stackedValues = [],
             seriesElement, lineElement, seriesData, positions, rowData, biPol, prevYPos,
-            ix, ixLen, jx, jxLen, xPos, yPos;
+            ix, ixLen, jx, jxLen, xPos, yPos, color;
 
 
         for (ix = 0, ixLen = series.length; ix < ixLen; ix++) {
@@ -87,6 +86,7 @@ class BarChart extends BaseChart {
             });
 
             seriesData = series[ix];
+            color = Util.getColor(ix);
             biPol = ix - (ixLen - 1) / 2;
 
             for (jx = 0, jxLen = seriesData.length; jx < jxLen; jx++) {
@@ -108,7 +108,7 @@ class BarChart extends BaseChart {
                     y1: baseYPos,
                     y2: yPos,
                     class: 'bar',
-                    style: 'stroke: ' + color[ix],
+                    style: 'stroke: ' + color,
                     'ct:value': [rowData.x, rowData.y].join(','),
                     'ct:meta': seriesNames[ix],
                     'data-index': jx

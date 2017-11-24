@@ -1,7 +1,7 @@
 import Chart from './vue/chartT/Chart.vue'
 import Grid from './vue/grid/Grid.vue'
 import Tree from './vue/tree/Tree.vue'
-import 'vue-awesome/icons'
+import 'vue-awesome/icons/filter'
 import Icon from 'vue-awesome/components/Icon.vue'
 const EVUI = {};
 
