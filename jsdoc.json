@@ -1,0 +1,22 @@
+{
+  "plugins": [
+    "node_modules/jsdoc-vuejs"
+  ],
+  "recurseDepth": 10,
+  "source": {
+    "include": [
+      "README.md",
+      "src/vue"
+    ],
+    "includePattern": ".(vue|js)$",
+    "excludePattern": ""
+  },
+  "opts": {
+    "destination": "./src/docs",
+    "encoding": "utf8",
+    "recurse": true
+  },
+  "jsdoc-vuejs": {
+    "followImports": true
+  }
+}
