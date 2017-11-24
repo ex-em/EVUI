@@ -20,7 +20,6 @@
 </template>
 
 <script>
-    //import CodeParser from './../codeParser.js';
     import Nav from './GuideNav.vue';
     import Content from './GuideContent.vue';
     import Result from './GuideResult.vue';
@@ -40,7 +39,8 @@
         },
         methods: {
             getVueFile: function (path) {
-                const baseURI = '../../static/';
+                const baseURI = `../../static/`;
+                const fileExtension = `txt`;
                 var vm = this;
                 var fileName = path;
 
@@ -48,7 +48,7 @@
                     return;
                 }
 
-                this.$http.get(`${baseURI}${fileName}.vue`)
+                this.$http.get(`${baseURI}${fileName}.${fileExtension}`)
                 .then((result) => {
                     let tmpObj = vm.codeParser(result.data);
                 if(tmpObj){
@@ -58,14 +58,17 @@
     },
     codeParser: function(data = null , ...rest){
         let ix, ixLen;
-        let startTag, endTag;
+        let startTagName, endTagName;
         let startIndex, endIndex;
         let keyList;
-
+        let preRe = '\<[\ ]*';
+        let proRe = '[0-9a-zA-Z\ \:\'\"\@\=\{\}]*\>';
+        let re;
+        let matchStr;
         let obj = {
-            template: '',
-            style: '',
-            script: ''
+            template: ``,
+            script: ``,
+            style: ``
         };
 
         if(!data){
@@ -75,18 +78,24 @@
         keyList = Object.keys(obj);
 
         for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
-            startTag = `<${keyList[ix]}>`;
-            endTag = `</${keyList[ix]}>`;
-            keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
-            endIndex = data.lastIndexOf(endTag);
-            obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
+            startTagName = `${keyList[ix]}`;
+            endTagName = `/${keyList[ix]}`;
+            re = new RegExp(`${preRe}(${keyList[ix]}|${keyList[ix].toUpperCase()})${proRe}`);
+            matchStr = data.match(re);
+            if(matchStr == null){
+                obj[keyList[ix]] = 'Failed to parse the string data. Check running code.';
+                continue;
+            }
+            startIndex = matchStr.index + matchStr[0].length + 1;
+            data.includes(endTagName) ? endIndex = data.lastIndexOf(endTagName) : endIndex = data.lastIndexOf(endTagName.toUpperCase());
+            obj[keyList[ix]] = data.substring(startIndex, endIndex - 1).trim();
         }
 
         return obj;
     }
     },
     mounted: function(){
-        this.getVueFile('ContentA');
+        this.getVueFile(`ContentA`);
     }
     }
 </script>
