@@ -100,15 +100,15 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: #2c3e50;
+        position: absolute;
     }
 
     .guide-app .center {
         position: relative;
-        top: 70px;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        height: calc(100% - 70px);
+        height: 100%;
     }
 
     .center .content-area {

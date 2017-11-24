@@ -39,13 +39,9 @@
 </script>
 
 <style>
-    html {
-        height: 100%;
-    }
     /* Reset */
     body {
         margin: 0;
-        min-height: 100%;
     }
 
     /* Top Navigation Div */
@@ -139,10 +135,9 @@
     /* Contents */
     #main-content {
         width : 100%;
+        margin-top : 70px;
         background-color : #fff;
         color : #000;
-        height: 100%;
-        top : 80px;
     }
 
     /* Links */
@@ -170,10 +165,4 @@
         -o-transition: color 0.1s ease-in, background 0.1s ease-in;
         transition: color 0.1s ease-in, background 0.1s ease-in;
     }
-
-  #app {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-  }
 </style>
