@@ -3,15 +3,6 @@
         <div class="loading" v-if="isLoading">Loading...</div>
         <div class="error" v-if="isError">{{ isError }}</div>
 
-        <div class="header">
-            <div class="logo">
-                <img src="../images/exem-logo.png"/>
-            </div>
-            <div class="top">
-                <p>Exem Guide Sample</p>
-            </div>
-        </div>
-
         <div class="center">
             <cmp-nav v-on:getVueFile="getVueFile"></cmp-nav>
             <cmp-content class="content-area" :fileList="vueFileList"></cmp-content>
@@ -110,44 +101,14 @@
         -moz-osx-font-smoothing: grayscale;
         color: #2c3e50;
     }
-    .guide-app .header {
-        position:absolute;
-        left: 0px;
-        top: 0px;
-        bottom: 0px;
-        height: 59px;
-        right: 0px;
-        margin: 0 auto;
-        text-align: center;
-        background: white;
-        border: 1px solid #e5e5e5;
-    }
-    .guide-app .header .logo {
-        position: relative;
-        float: left;
-        width: 90px;
-        z-index: 1;
-        padding-top: 20px;
-    }
-    .guide-app .header .logo > img {
-        max-width: 80%;
-        cursor: pointer;
-    }
-    .guide-app .header .top {
-        position: relative;
-    }
-    .guide-app .header .top > p {
-        font-size: 20px;
-    }
 
     .guide-app .center {
         position: relative;
-        top: 60px;
+        top: 70px;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        height: calc(100% - 60px);
-
+        height: calc(100% - 70px);
     }
 
     .center .content-area {
