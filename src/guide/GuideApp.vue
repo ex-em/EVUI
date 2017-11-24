@@ -55,39 +55,39 @@
                     vm.$set(vm.vueFileList, fileName, tmpObj);
                 }
             }, (err) => {});
-    },
-    codeParser: function(data = null , ...rest){
-        let ix, ixLen;
-        let startTag, endTag;
-        let startIndex, endIndex;
-        let keyList;
+        },
+        codeParser: function(data = null , ...rest){
+            let ix, ixLen;
+            let startTag, endTag;
+            let startIndex, endIndex;
+            let keyList;
 
-        let obj = {
-            template: '',
-            style: '',
-            script: ''
-        };
+            let obj = {
+                template: '',
+                style: '',
+                script: ''
+            };
 
-        if(!data){
-            return data;
+            if(!data){
+                return data;
+            }
+
+            keyList = Object.keys(obj);
+
+            for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
+                startTag = `<${keyList[ix]}>`;
+                endTag = `</${keyList[ix]}>`;
+                keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
+                endIndex = data.lastIndexOf(endTag);
+                obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
+            }
+
+            return obj;
         }
-
-        keyList = Object.keys(obj);
-
-        for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
-            startTag = `<${keyList[ix]}>`;
-            endTag = `</${keyList[ix]}>`;
-            keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
-            endIndex = data.lastIndexOf(endTag);
-            obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
+        },
+        mounted: function(){
+            this.getVueFile('ContentA');
         }
-
-        return obj;
-    }
-    },
-    mounted: function(){
-        this.getVueFile('ContentA');
-    }
     }
 </script>
 
@@ -130,13 +130,14 @@
         font-size: 20px;
     }
 
-    .center {
-        position: absolute;
+    .guide-app .center {
+        position: relative;
         top: 60px;
         left: 0px;
         right: 0px;
         bottom: 0px;
-        height: auto !important;
+        height: calc(100% - 60px);
+
     }
 
     .center .content-area {
