@@ -30,12 +30,12 @@
     "Tree"
   ],
   "dependencies": {
-    "jsdoc": "^3.5.5",
     "vue": "^2.5.0",
-    "vue-awesome": "^2.3.4",
-    "vue-router": "^2.8.0"
+    "vue-awesome": "^2.3.4"
   },
   "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "vue-router": "^2.8.0",
     "autoprefixer": "^7.1.2",
     "axios": "^0.17.1",
     "babel-core": "^6.26.0",
