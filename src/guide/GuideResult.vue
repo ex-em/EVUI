@@ -12,6 +12,8 @@
 <script>
   import ContentA from './components/ContentA.vue';
   import ContentB from './components/ContentB.vue';
+  import DocumentA from './components/DocumentA.vue';
+  import DocumentB from './components/DocumentB.vue';
 
   export default {
     props: [
@@ -19,7 +21,9 @@
     ],
     components: {
       ContentA,
-      ContentB
+      ContentB,
+      DocumentA,
+      DocumentB
     },
     computed:{
       content(){
@@ -74,8 +78,6 @@
   .result .resultCenter {
     position: absolute;
     top: 51px;
-    height: calc(100% - 50px);
-    width: 100%;
     padding: 20px 20px 20px 20px;
   }
 </style>
