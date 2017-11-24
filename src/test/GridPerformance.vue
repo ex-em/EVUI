@@ -100,7 +100,7 @@
 
                 this.selectStore.push('data_' + index);
 
-                for(let ix = 6; ix < this.gridColumns.length; ix++){
+                for(let ix = 6; ix <= this.gridColumns.length; ix++){
                     row[ 'column' + ix ] = 'column' + ix;
                 }
                 return row;
