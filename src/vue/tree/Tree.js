@@ -26,7 +26,12 @@ export default {
                 top             : 0,
                 bottom          : 0,
                 timeOut         : null
-            }
+            },
+            beforeUpdateTime: null,
+            updatedTime: null,
+            beforeTreeParseTime : null,
+            updateTreeParseTime : null
+
         };
     },
     computed: {
@@ -73,7 +78,7 @@ export default {
                 this.$refs.evuiTreeBody.scrollTop = 0;
                 this.store = null;
             }
-
+            this.beforeTreeParseTime = performance.now();
             this.store = new TreeStore({
                 vm          : this,
                 treeData    : this.rawData,
@@ -81,6 +86,7 @@ export default {
                 treeColumnId: this.treeOptions.treeColumnId,
                 useCheckBox : this.treeOptions.useCheckBox
             });
+            this.updateTreeParseTime = performance.now();
             return this.store.treeMap;
         },
 
@@ -231,6 +237,15 @@ export default {
         this.bufferHeightCalc();
 
     },
+
+    beforeUpdate() {
+        this.beforeUpdateTime = performance.now();
+    },
+
+    updated() {
+        this.updatedTime = performance.now();
+    },
+
     components: {
         TreeNode,
         headerCell
