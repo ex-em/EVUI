@@ -10,6 +10,15 @@ Vue.component('icon', Icon);
 
 Vue.prototype.$http = Axios;
 
+var EventBus = new Vue();
+Object.defineProperties(Vue.prototype, {
+    $eventBus: {
+        get: function () {
+            return EventBus;
+        }
+    }
+});
+
 new Vue({
     el: '#index-app',
     router,
