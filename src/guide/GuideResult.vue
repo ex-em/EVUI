@@ -4,7 +4,7 @@
       <p>Result</p>
     </div>
     <div class="resultCenter">
-      <component ref="cmpContent" :is="content"></component>
+      <component ref="cmpContent" :is="contentName"></component>
     </div>
   </div>
 </template>
@@ -14,30 +14,19 @@
   import ContentB from './components/ContentB.vue';
 
   export default {
-    props: [
-      'fileList'
-    ],
+    props: {
+      fileList: Object,
+      contentName: {
+        type: String,
+        default: ''
+      }
+    },
     components: {
       ContentA,
       ContentB
     },
-    computed:{
-      content(){
-        let content = 'ContentA';
-        let routePath = this.$route.path;
-        let contentIdx = routePath.indexOf('guide/');
-
-        if ( contentIdx > 0 ) {
-          content = routePath.slice(contentIdx+6);
-        }
-
-        return content;
-      }
-    },
     data() {
       return {
-        name: 'ContentA',
-        cnt: 1,
         htmlTxt: '<p class="red">It\'s magic!</p>',
         jsTxt: 'console.log("hi");',
         cssTxt: 'p {font-family: Helvetica, Arial; }'

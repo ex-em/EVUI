@@ -34,7 +34,10 @@
     methods: {
       toMove: function(name){
         this.$router.push({
-          path: '/guide/' + name
+          path: '/guide/' + name,
+          params: {
+            contentName: name
+          }
         });
         this.$emit('getVueFile', name);
 

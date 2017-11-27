@@ -1,8 +1,8 @@
 <template>
   <div id="content" class="content">
     <cmp-Summary v-show="isMainView"></cmp-Summary>
-    <cmp-source v-show="!isMainView" :fileList="fileList"></cmp-source>
-    <cmp-result v-show="!isMainView" :fileList="fileList"></cmp-result>
+    <cmp-source v-show="!isMainView" :fileList="fileList" :contentName="contentName"></cmp-source>
+    <cmp-result v-show="!isMainView" :fileList="fileList" :contentName="contentName"></cmp-result>
   </div>
 </template>
 
@@ -17,13 +17,18 @@
       'cmpSource': GuideSource,
       'cmpResult': GuideResult
     },
-    props: [
-      'fileList'
-    ],
+    props: {
+      fileList: Object,
+      contentName: {
+        type: String,
+        default: ''
+      }
+    },
     data() {
       return {
-
       }
+    },
+    methods: {
     },
     computed:{
       initText: function(){
@@ -34,18 +39,12 @@
         }
       },
       isMainView(){
-        let delimiter = '/guide';
-        let routePath = this.$route.path;
-        let findIdx   = routePath.indexOf(delimiter);
-
-        routePath = routePath.slice(findIdx+delimiter.length, routePath.length);
-
-        return  routePath.length == 0 || routePath == '/' ? true : false;
+        return !this.contentName ? true : false;
       }
     },
-    methods: {
-    },
     mounted() {
+    },
+    created: function() {
     }
   }
 </script>

@@ -26,6 +26,7 @@ export default new Router({
         {
             path: '/guide',
             component: GuideApp,
+            props: true,
             children: [
                 {
                     path: '',

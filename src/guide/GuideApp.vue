@@ -14,13 +14,12 @@
 
         <div class="center">
             <cmp-nav v-on:getVueFile="getVueFile"></cmp-nav>
-            <cmp-content class="content-area" :fileList="vueFileList"></cmp-content>
+            <cmp-content class="content-area" :fileList="vueFileList" :contentName="contentName"></cmp-content>
         </div>
     </div>
 </template>
 
 <script>
-    //import CodeParser from './../codeParser.js';
     import Nav from './GuideNav.vue';
     import Content from './GuideContent.vue';
     import Result from './GuideResult.vue';
@@ -35,59 +34,71 @@
             return {
                 isLoading: false,
                 isError: false,
-                vueFileList: {}
+                vueFileList: {},
+                contentName: ''
             }
         },
         methods: {
             getVueFile: function (path) {
-                const baseURI = '../../static/';
+                const baseURI = `../../static/`;
+                const fileExtension = `txt`;
                 var vm = this;
                 var fileName = path;
 
                 if(this.vueFileList[fileName]){
+                    vm.$root.$eventBus.$emit('update');
                     return;
                 }
 
-                this.$http.get(`${baseURI}${fileName}.vue`)
-                .then((result) => {
-                    let tmpObj = vm.codeParser(result.data);
-                if(tmpObj){
-                    vm.$set(vm.vueFileList, fileName, tmpObj);
+                this.$http.get(`${baseURI}${fileName}.${fileExtension}`)
+                    .then((result) => {
+                        let tmpObj = vm.codeParser(result.data);
+                    if(tmpObj){
+                        vm.$set(vm.vueFileList, fileName, tmpObj);
+                        vm.$root.$eventBus.$emit('update');
+                    }
+                }, (err) => {});
+            },
+            codeParser: function(data = null , ...rest){
+                let ix, ixLen;
+                let startTag, endTag;
+                let startIndex, endIndex;
+                let keyList;
+
+                let obj = {
+                    template: '',
+                    style: '',
+                    script: ''
+                };
+
+                if(!data){
+                    return data;
                 }
-            }, (err) => {});
-    },
-    codeParser: function(data = null , ...rest){
-        let ix, ixLen;
-        let startTag, endTag;
-        let startIndex, endIndex;
-        let keyList;
 
-        let obj = {
-            template: '',
-            style: '',
-            script: ''
-        };
+                keyList = Object.keys(obj);
 
-        if(!data){
-            return data;
+                for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
+                    startTag = `<${keyList[ix]}>`;
+                    endTag = `</${keyList[ix]}>`;
+                    keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
+                    endIndex = data.lastIndexOf(endTag);
+                    obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
+                }
+
+                return obj;
+            }
+        },
+        created: function() {
+        },
+        mounted: function(){
+            this.contentName = this.$route.params.contentName;
+            this.getVueFile('ContentA');
+        },
+        watch: {
+          $route: function ( route ) {
+              this.contentName = route.params.contentName;
+          }
         }
-
-        keyList = Object.keys(obj);
-
-        for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
-            startTag = `<${keyList[ix]}>`;
-            endTag = `</${keyList[ix]}>`;
-            keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
-            endIndex = data.lastIndexOf(endTag);
-            obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
-        }
-
-        return obj;
-    }
-    },
-    mounted: function(){
-        this.getVueFile('ContentA');
-    }
     }
 </script>
 
