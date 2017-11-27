@@ -9,7 +9,7 @@
     "dev": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
     "build": "node build/build.js",
     "start": "npm run dev",
-    "docs": "jsdoc -c jsdoc.json"
+    "docs": "(if exist .\\src\\docs\\ (del /s /q /f .\\src\\docs\\*)) && jsdoc -c jsdoc.json"
   },
   "main": "dist/evui.js",
   "files": [
