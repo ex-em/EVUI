@@ -73,12 +73,16 @@ tr:hover td{ background: #666; color: #FFF; }
     background-color: #FEFEFE;
 }
 
-.text-align-right {
+.cell-align-right {
     text-align: right;
 }
 
-.text-align-center {
+.cell-align-center {
     text-align: center;
+}
+
+.cell-align-left {
+    text-align: left;
 }
 
 input[type="checkbox"] {

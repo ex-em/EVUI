@@ -146,23 +146,6 @@
                 }else{
                     this.$emit('cellChange', this.dataIndex, value);
                 }
-            },
-
-            cls(type) {
-                switch (type) {
-                    case 'number':
-                    case 'integer':
-                    case 'numeric':
-                    case 'float':
-                        return 'text-align-right';
-                    case 'date':
-                    case 'datetime':
-                        return '';
-                    case 'checkbox' :
-                        return '';
-                    default:
-                        return '';
-                }
             }
         },
 
