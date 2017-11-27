@@ -2,18 +2,21 @@ import BaseChart from "./BaseChart"
 import Svg from "../common/Svg"
 import Intrpl from '../common/Interpolation'
 import Core from '../common/Core'
+import Util from '../common/Util'
 import AutoScaleAxis from "../common/axis/AutoScaleAxis";
 import FixedScaleAxis from "../common/axis/FixedScaleAxis";
-import { color } from "../common/Constant"
+
 
 class LineChart extends BaseChart {
 
     constructor(target, data, options) {
         let defaultOptions = {
-            isScatter: false
+            isScatter: false,
+            lineWidth: 4,
+            pointSize: 10,
         };
 
-        super(target, data, options);
+        super(target, data, Util.extend(null, defaultOptions, options));
     }
 
     createChart() {
@@ -33,13 +36,17 @@ class LineChart extends BaseChart {
         let labelGroup = Svg.createElement(this.svg, 'g'),
             gridGroup = Svg.createElement(this.svg, 'g'),
             series = this.seriesInfo.series.slice(0),
-            axisX, axisY, ix, ixLen;
+            bounds, axisX, axisY, ix, ixLen;
 
         for (ix = 0, ixLen = series.length; ix < ixLen; ix++) {
             if (!this.seriesStatus[ix]) {
                 series.splice(ix, 1);
             }
         }
+
+        bounds = this.getBounds('x', series);
+        this.options.axisX.high = bounds.max;
+        this.options.axisX.low = bounds.min;
 
         axisX = new FixedScaleAxis('x', series, this.chartRect, this.options.axisX);
         axisY = new AutoScaleAxis('y', series, this.chartRect, this.options.axisY);
@@ -66,8 +73,10 @@ class LineChart extends BaseChart {
             axisY = this.axis.axisY,
             seriesNames = this.seriesInfo.seriesNames,
             isScatter = this.options.isScatter,
+            lineWidth = Util.quantity(this.options.lineWidth).value,
+            pointSize = Util.quantity(this.options.pointSize).value,
             seriesElement, seriesData, pathInfo, computedPathInfo, pathData, pathElement,
-            pointElement,
+            pointElement, color,
             ix, ixLen, jx, jxLen;
 
         for (ix = 0, ixLen = series.length; ix < ixLen; ix++) {
@@ -81,6 +90,7 @@ class LineChart extends BaseChart {
             });
 
             seriesData = series[ix];
+            color = Util.getColor(ix);
             pathInfo = [];
 
             for (jx = 0, jxLen = seriesData.length; jx < jxLen; jx++) {
@@ -94,7 +104,7 @@ class LineChart extends BaseChart {
                 pathElement = Svg.createElement(seriesElement, 'path', {
                     d: Svg.stringify(computedPathInfo),
                     class: 'line',
-                    style: 'stroke: ' + color[ix]
+                    style: `stroke: ${color}; stroke-width: ${lineWidth}px;`
                 }, null);
             }
 
@@ -106,20 +116,51 @@ class LineChart extends BaseChart {
                     x2: pathData.x + 0.01,
                     y2: pathData.y,
                     class: 'point',
-                    style: 'stroke: ' + color[ix],
+                    style: `stroke: ${color}; stroke-width: ${pointSize}px;`,
                     'ct:value': [seriesData[jx].x, seriesData[jx].y].filter(Core.isNumeric).join(','),
                     'ct:meta': seriesNames[ix]
                 }, null);
 
-                if (!isScatter) {
-                    pointElement.addEventListener('click', this.onHighlight.bind(this));
-                }
+
+                pointElement.addEventListener('click', this.onHighlight.bind(this));
+
             }
 
         }
 
-        if (!isScatter) {
-            seriesListener.addEventListener('click', this.onHighlight.bind(this));
+        seriesListener.addEventListener('click', this.onHighlight.bind(this));
+    }
+
+    getBounds(pos, data) {
+        let max, min, rowData,
+            ix, ixLen, jx, jxLen, value;
+
+        if (!data || data.length === 0) {
+            return {
+                min: 0,
+                max: 1
+            }
+        }
+
+        min = data[0][0][pos];
+        max = min;
+
+        for (ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+            rowData = data[ix];
+            for (jx = 0, jxLen = rowData.length; jx < jxLen; jx++) {
+                value = +rowData[jx][pos] || 0;
+                if (max < value) {
+                    max = value;
+                }
+                else if (min > value) {
+                    min = value;
+                }
+            }
+        }
+
+        return {
+            min: min || 0,
+            max: max || 1
         }
     }
 

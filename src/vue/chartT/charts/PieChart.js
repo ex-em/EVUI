@@ -2,7 +2,6 @@ import Svg from "../common/Svg"
 import Util from "../common/Util"
 import BaseChart from "./BaseChart"
 import Core from '../common/Core'
-import { color } from "../common/Constant"
 
 class PieChart extends BaseChart {
 
@@ -28,6 +27,10 @@ class PieChart extends BaseChart {
         if (this.options.legend.show) {
             this.createLegend(null);
         }
+
+        if (this.options.tooltip.show) {
+            this.tooltip = this.createTooltip(this.svg, this.options);
+        }
     }
 
     createSeries() {
@@ -40,7 +43,7 @@ class PieChart extends BaseChart {
             radius = this.radius,
             valueRadius = radius / 2,
             seriesElement, pathInfo, pathElement, textElement,
-            startPos, endPos, endAngle, position, value,
+            startPos, endPos, endAngle, position, value, color,
             ix, ixLen;
 
         for (ix = 0, ixLen = series.length; ix < ixLen; ix++) {
@@ -52,7 +55,12 @@ class PieChart extends BaseChart {
                 class: seriesName[ix]
             });
 
+            color = Util.getColor(ix);
             endAngle = totalValue > 0 ? startAngle + series[ix] / totalValue * 360 : 0;
+            if (endAngle === 360) {
+                endAngle = 359.99;
+            }
+
             startPos = Core.polarToCartesian(center.x, center.y, radius, startAngle);
             endPos = Core.polarToCartesian(center.x, center.y, radius, endAngle);
 
@@ -64,17 +72,28 @@ class PieChart extends BaseChart {
             pathElement = Svg.createElement(seriesElement, 'path', {
                 d: Svg.stringify(pathInfo),
                 class: 'slice-pie',
-                style: 'fill: ' + color[ix]
+                style: 'fill: ' + color
             }, null);
 
             if (this.options.showValue) {
                 value = this.options.valueFormat(series[ix]);
-                position = Core.polarToCartesian(center.x, center.y, valueRadius, startAngle + (endAngle - startAngle) / 2);
+                if (totalValue === value) {
+                    position = {
+                        x: center.x,
+                        y: center.y
+                    }
+                }
+                else {
+                    position = Core.polarToCartesian(center.x, center.y, valueRadius, startAngle + (endAngle - startAngle) / 2);
+                }
+
                 textElement = Svg.createElement(seriesElement, 'text', {
                     dx: position.x,
                     dy: position.y,
                     class: 'label pie-label',
-                    'text-anchor': 'middle'
+                    'text-anchor': 'middle',
+                    'ct:value': [seriesName[ix], value].join(','),
+                    'ct:meta': seriesName[ix],
                 }, null);
 
                 textElement.appendChild(document.createTextNode(value));
@@ -115,6 +134,40 @@ class PieChart extends BaseChart {
         }
 
         return total;
+    }
+
+    updateChart(data = this.data, options = this.options) {
+        let childNodes = this.container.childNodes,
+            newSeriesStatus, ix, ixLen;
+
+        for (ix = 0, ixLen = childNodes.length; ix < ixLen; ix++) {
+            this.container.removeChild(this.container.firstChild);
+        }
+
+        this.options = Util.extend(null, this.options, options);
+
+        this.chartRect = this.getChartRect();
+
+        this.createSvg(this.container);
+
+        this.categories = data.categories || [];
+
+        newSeriesStatus = [];
+        for (ix = 0, ixLen = data.series.length; ix < ixLen; ix++) {
+            newSeriesStatus[ix] = this.seriesStatus[ix] === undefined ? true : this.seriesStatus[ix];
+        }
+
+        this.seriesStatus = newSeriesStatus;
+
+        this.seriesInfo = this.getSeriesInfo(data.series);
+
+        this.radius = Math.min(this.chartRect.width() / 2, this.chartRect.height() / 2);
+        this.center = {
+            x: this.chartRect.x1 + this.chartRect.width() / 2,
+            y: this.chartRect.y2 + this.chartRect.height() / 2
+        };
+
+        this.createChart();
     }
 
 }

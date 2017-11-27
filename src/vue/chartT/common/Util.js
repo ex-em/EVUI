@@ -1,4 +1,9 @@
 export default {
+    defaultColor: ['#3ca0ff','#90db3b','#00c4c5','#ffde00','#0052ff','#ff7781','#3191c8','#5048c1', '#5bc89e',
+        '#28776f','#17becf','#beaa3c','#cedc96','#c86ebd','#5e5e5e','#969696','#709d34','#24456b','#dace90','#888bd7'],
+
+    extraColor: [],
+
     quantity: function(input) {
         if (typeof input === 'string') {
             let match = (/^(\d+)\s*(.*)$/g).exec(input);
@@ -82,5 +87,46 @@ export default {
 
     hasClass: function(element, className) {
         return (' ' + element.getAttribute('class') + ' ').indexOf(' ' + className + ' ') > -1;
+    },
+
+    /**
+     * 임의의 색상 Hex 코드값을 반환.
+     *
+     * 입력된 색상 코드값을 기준으로 임의의 색상 코드값을 반환하고,
+     * 입력된 값이 없는 경우 임의의 값을 반환한다.
+     *
+     * 예) decimalToHex('#3ca0ff')
+     *
+     * @param {String} h
+     * @return {String}
+     */
+    decimalToHex: function(h) {
+        if (!h) {
+            return '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+
+        h = h.split('#')[1];
+        if (!h || '' === h) {
+            return h;
+        }
+        let d = parseInt(h, 16) + 100,
+            hex = Number(d).toString(16);
+
+        hex = "000000".substr(0, 6 - hex.length) + hex;
+
+        return '#'+hex;
+    },
+
+    getColor: function(index) {
+        let color = this.defaultColor;
+
+        if (index >= color.length) {
+            color.push(this.decimalToHex(color[index % 20]));
+
+            return color[index];
+        } else {
+            return color[index];
+        }
     }
+
 }

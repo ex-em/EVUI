@@ -6,11 +6,6 @@
                 <button @click="generateData(1001)">1k Records</button>
                 <button @click="generateData(10001)">10k Records</button>
             </div>
-
-            <div>
-                <!--<input type="checkbox" :checked="useBuffer" @change="(val) => { useBuffer = val }">-->
-                <label>Data Buffer Size : <input type="number" :value="treeBufferSize" width="60" min="10" :readOnly="!useBuffer"/></label>
-            </div>
             <tree :treeInfo="treeInfo"
                   :columns="treeColumns"
                   :rows="treeData"
@@ -22,6 +17,7 @@
         <div class="result">
             <h4>Data Record :  {{ recordCount }}</h4>
             <h4>Data Generate :  {{ generateTime }} milli second</h4>
+            <h4>Tree Data Parse : {{ checkTreeParseTime() }} milli second</h4>
             <h4>Render & Patch :  {{ checkRenderTime() }} milli second</h4>
         </div>
     </div>
@@ -90,6 +86,14 @@
                 }
 
                 return Math.round(this.$refs.tree.updatedTime - this.$refs.tree.beforeUpdateTime);
+            },
+
+            checkTreeParseTime() {
+                if(this.$refs.tree == null || this.$refs.tree.beforeTreeParseTime == null || this.$refs.tree.updateTreeParseTime == null){
+                    return 0;
+                }
+
+                return Math.round(this.$refs.tree.updateTreeParseTime - this.$refs.tree.beforeTreeParseTime);
             }
         },
         data () {
@@ -128,7 +132,6 @@
 
 <style scoped>
     .home{
-        position: absolute;
         top:0px;
         left:0px;
         width: 100%;

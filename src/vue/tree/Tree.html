@@ -24,6 +24,7 @@
                 </tr>
             </thead>
             <tbody @scroll="treeBodyScroll"
+                   ref="evuiTreeBody"
                    :style="{width:treeOptions.width+'px', height:treeOptions.height+'px'}">
                 <div ref="evuiTreeItemContainer" class="evui-tree-item-container">
                     <div ref="evuiTreeItem" class="evui-tree-item">

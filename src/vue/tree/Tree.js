@@ -12,6 +12,7 @@ export default {
     },
     data: function() {
         return {
+            isInit     : false,
             treeStyle  : null,
             titleStyle : null,
             store      : null,
@@ -25,7 +26,12 @@ export default {
                 top             : 0,
                 bottom          : 0,
                 timeOut         : null
-            }
+            },
+            beforeUpdateTime: null,
+            updatedTime: null,
+            beforeTreeParseTime : null,
+            updateTreeParseTime : null
+
         };
     },
     computed: {
@@ -68,7 +74,24 @@ export default {
         },
 
         treeMap() {
+            if(this.$refs.evuiTreeBody) {
+                this.$refs.evuiTreeBody.scrollTop = 0;
+                this.store = null;
+            }
+            this.beforeTreeParseTime = performance.now();
+            this.store = new TreeStore({
+                vm          : this,
+                treeData    : this.rawData,
+                columns     : this.columns,
+                treeColumnId: this.treeOptions.treeColumnId,
+                useCheckBox : this.treeOptions.useCheckBox
+            });
+            this.updateTreeParseTime = performance.now();
             return this.store.treeMap;
+        },
+
+        rawData() {
+            return this.rows;
         },
 
         bufferedData: function () {
@@ -126,8 +149,6 @@ export default {
                 if (!this.scroll.rowHeight) {
                     this.scroll.rowHeight = this.$refs.evuiTreeItem.firstElementChild.offsetHeight;
                 }
-            } else {
-                return;
             }
 
             let rowTopEl = this.$refs.evuiTreeItemContainer;
@@ -206,14 +227,6 @@ export default {
             'height': typeof this.treeOptions.height === 'number' ? this.treeOptions.height + 'px' : this.treeOptions.height
         };
 
-        this.store = new TreeStore({
-            vm          : this,
-            treeData    : this.rows,
-            columns     : this.columns,
-            treeColumnId: this.treeOptions.treeColumnId,
-            useCheckBox : this.treeOptions.useCheckBox
-        });
-
     },
     mounted() {
         if(this.treeOptions.useColumnResize) {
@@ -224,6 +237,15 @@ export default {
         this.bufferHeightCalc();
 
     },
+
+    beforeUpdate() {
+        this.beforeUpdateTime = performance.now();
+    },
+
+    updated() {
+        this.updatedTime = performance.now();
+    },
+
     components: {
         TreeNode,
         headerCell

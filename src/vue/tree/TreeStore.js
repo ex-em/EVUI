@@ -51,6 +51,8 @@ export default class TreeStore {
                 return store.traversalTreeInfo(item, index);
             });
         }
+
+        console.log('#### Created Tree Model ####');
         return treeObj;
     }
 

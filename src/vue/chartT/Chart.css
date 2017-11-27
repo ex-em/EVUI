@@ -1,3 +1,7 @@
+body {
+    margin: 0px;
+}
+
 .chart {
     float: left;
 }
@@ -10,11 +14,9 @@
 
 .line {
     fill: none;
-    stroke-width: 4px;
 }
 
 .point {
-    stroke-width: 10px;
     stroke-linecap: round;
     cursor: pointer;
 }
@@ -58,6 +60,7 @@
     text-align: center;
     margin: 0px;
     padding: 0px;
+    overflow-y: auto;
 }
 
 .legend li {

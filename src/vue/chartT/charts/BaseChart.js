@@ -99,7 +99,7 @@ class BaseChart {
 
         this.seriesStatus[seriesIndex] = !isActive;
 
-        this.updateChart();
+        this.updateChart(this.data, this.options);
     }
 
     createLegend(clickFn) {
@@ -147,7 +147,7 @@ class BaseChart {
             //     legendValue.textContent = series[ix];
             // }
 
-            legendColor = color[ix];
+            legendColor = Util.getColor(ix);
             legendBox.style = `background-color: ${legendColor}; border: 2px solid ${legendColor};`;
 
             childElement.appendChild(legendBox);
@@ -282,7 +282,7 @@ class BaseChart {
 
     updateChart(data = this.data, options = this.options) {
         let childNodes = this.container.childNodes,
-            ix, ixLen;
+            newSeriesStatus, ix, ixLen;
 
         for (ix = 0, ixLen = childNodes.length; ix < ixLen; ix++) {
             this.container.removeChild(this.container.firstChild);
@@ -295,6 +295,14 @@ class BaseChart {
         this.createSvg(this.container);
 
         this.categories = data.categories || [];
+
+        newSeriesStatus = [];
+        for (ix = 0, ixLen = data.series.length; ix < ixLen; ix++) {
+            newSeriesStatus[ix] = this.seriesStatus[ix] === undefined ? true : this.seriesStatus[ix];
+        }
+
+        this.seriesStatus = newSeriesStatus;
+
         this.seriesInfo = this.getSeriesInfo(data.series);
 
         this.createChart();

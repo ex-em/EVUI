@@ -2,7 +2,7 @@
     <th v-if="visible"
         @click="onClick"
     >
-        <div v-if="render=='checkbox'"
+        <div v-if="cellRender=='checkbox'"
              :draggable="draggable"
              :style="{ display:'inline-block',width:'100%' }"
         >
@@ -78,7 +78,7 @@
             value: {
                 default: null
             },
-            render: String,
+            cellRender: String,
             draggable: {
                 type: Boolean,
                 default: true,
@@ -122,8 +122,11 @@
                 return true;
             },
             onClick(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation(); // stops the browser from redirecting.
+                }
 
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     return;
                 }
                 this.checkOrder(this.order);
@@ -131,7 +134,7 @@
                 this.$emit('cellClick', this, this.dataIndex);
             },
             onChange(value){
-                if(this.render == 'checkbox'){
+                if(this.cellRender == 'checkbox'){
                     this.$emit('allCheckChange', this.dataIndex, value);
                 }else{
                     this.$emit('cellHeaderChange', this.dataIndex, value);
@@ -225,12 +228,12 @@
     }
 
     .filter-popover {
-        position: absolute;
+        position: fixed;
         background: #fff;
         min-width: 150px;
         border-radius: 4px;
         border: 1px solid #e6ebf5;
-        padding: 12px;
+        padding: 5px;
         z-index: 2000;
         color: #5a5e66;
         line-height: 1.4;
@@ -240,10 +243,6 @@
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
         display : none;
         cursor: default;
-        /*  width: 400px;
-         top: 472px;
-         left: 835px;
-         position: absolute; */
     }
 
     .filter-input {
