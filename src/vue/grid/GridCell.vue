@@ -185,6 +185,7 @@
                     this.$emit('cellChange', this.dataIndex, value);
                 }
             },
+
             cls(type) {
                 switch (type) {
                     case 'number':

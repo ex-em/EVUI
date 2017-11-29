@@ -4,7 +4,7 @@
       <p>Result</p>
     </div>
     <div class="resultCenter">
-      <component ref="cmpContent" :is="content"></component>
+      <component ref="cmpContent" :is="contentName"></component>
     </div>
   </div>
 </template>
@@ -12,32 +12,25 @@
 <script>
   import ContentA from './components/ContentA.vue';
   import ContentB from './components/ContentB.vue';
+  import DocumentA from './components/DocumentA.vue';
+  import DocumentB from './components/DocumentB.vue';
 
   export default {
-    props: [
-      'fileList'
-    ],
+    props: {
+      fileList: Object,
+      contentName: {
+        type: String,
+        default: ''
+      }
+    },
     components: {
       ContentA,
-      ContentB
-    },
-    computed:{
-      content(){
-        let content = 'ContentA';
-        let routePath = this.$route.path;
-        let contentIdx = routePath.indexOf('guide/');
-
-        if ( contentIdx > 0 ) {
-          content = routePath.slice(contentIdx+6);
-        }
-
-        return content;
-      }
+      ContentB,
+      DocumentA,
+      DocumentB
     },
     data() {
       return {
-        name: 'ContentA',
-        cnt: 1,
         htmlTxt: '<p class="red">It\'s magic!</p>',
         jsTxt: 'console.log("hi");',
         cssTxt: 'p {font-family: Helvetica, Arial; }'
@@ -74,8 +67,6 @@
   .result .resultCenter {
     position: absolute;
     top: 51px;
-    height: calc(100% - 50px);
-    width: 100%;
     padding: 20px 20px 20px 20px;
   }
 </style>

@@ -342,14 +342,13 @@ export default {
                 case 'integer':
                 case 'numeric':
                 case 'float':
-                    return 'text-align-right';
+                    return 'cell-align-right';
+                case 'checkbox' :
+                    return 'cell-align-center';
                 case 'date':
                 case 'datetime':
-                    return '';
-                case 'checkbox' :
-                    return '';
                 default:
-                    return '';
+                    return 'cell-align-left';
             }
         },
 

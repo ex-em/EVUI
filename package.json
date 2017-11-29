@@ -9,7 +9,8 @@
     "dev": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
     "build": "node build/build.js",
     "start": "npm run dev",
-    "docs": "jsdoc -c jsdoc.json"
+    "docs": "vue-styleguidist build",
+    "docs:server": "vue-styleguidist server"
   },
   "main": "dist/evui.js",
   "files": [
@@ -56,7 +57,6 @@
     "file-loader": "^1.1.4",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
-    "jsdoc-vuejs": "^1.0.11",
     "node-notifier": "^5.1.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
@@ -69,6 +69,7 @@
     "url-loader": "^0.5.8",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
+    "vue-styleguidist": "^1.3.5",
     "vue-template-compiler": "^2.5.2",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
