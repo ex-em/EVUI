@@ -13,13 +13,11 @@
 <script>
     import Nav from './GuideNav.vue';
     import Content from './GuideContent.vue';
-    import Result from './GuideResult.vue';
 
     export default {
         components: {
             'cmpNav': Nav,
             'cmpContent': Content,
-            'cmpResult': Result
         },
         data: function () {
             return {
@@ -31,25 +29,27 @@
         },
         methods: {
             getVueFile: function (path) {
-                const baseURI = `../../static/`;
-                const fileExtension = `txt`;
-                var vm = this;
-                var fileName = path;
+                if(path) {
+                    const baseURI = `../../static/`;
+                    const fileExtension = `txt`;
+                    var vm = this;
+                    var fileName = path;
 
-                if(this.vueFileList[fileName]){
-                    vm.$root.$eventBus.$emit('update');
-                    return;
-                }
-
-                this.$http.get(`${baseURI}${fileName}.${fileExtension}`)
-
-                    .then((result) => {
-                        let tmpObj = vm.codeParser(result.data);
-                    if(tmpObj){
-                        vm.$set(vm.vueFileList, fileName, tmpObj);
+                    if(this.vueFileList[fileName]){
                         vm.$root.$eventBus.$emit('update');
+                        return;
                     }
-                }, (err) => {});
+
+                    this.$http.get(`${baseURI}${fileName}.${fileExtension}`)
+
+                        .then((result) => {
+                            let tmpObj = vm.codeParser(result.data);
+                            if(tmpObj){
+                                vm.$set(vm.vueFileList, fileName, tmpObj);
+                                vm.$root.$eventBus.$emit('update');
+                            }
+                        }, (err) => {});
+                }
             },
             codeParser: function(data = null , ...rest){
                 let ix, ixLen;
