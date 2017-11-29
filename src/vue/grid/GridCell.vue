@@ -42,7 +42,6 @@
 </template>
 
 <script>
-
     import textbox from '../components/TextBox.vue';
     import selectbox from '../components/SelectBox.vue';
     import checkbox from '../components/CheckBox.vue';
@@ -63,31 +62,70 @@
             spinner
         },
         props : {
+            /**
+             * cell 넓이를 설정합니다.
+             */
             width: null,
+            /**
+             * cell 키 값을 지정합니다.
+             */
             dataIndex: {
                 type: String,
                 default: null,
             },
+            /**
+             * cell 표현 방식을 변경 할 수 있습니다.
+             * checkbox | textbox | spinner | selectbox
+             */
             cellRender: String,
+            /**
+             * cell 값의 수정 여부를 결정합니다.
+             */
             readOnly: {
                 type: Boolean,
                 default: false,
             },
+            /**
+             *  cell을 보여줄지 여부를 결정합니다.
+             *  true: show, false: hide
+             */
             visible: {
                 type: Boolean,
                 default: true
             },
+            /**
+             * cell 값입니다.
+             */
             value: {
                 default: null
             },
+            /**
+             * cell 값의 데이터 타입을 정의합니다.
+             */
             dataType: null,
-            toFixed: null,
-
+            /**
+             * cell 값의 소수점 자릿수를 결정합니다.
+             */
+            toFixed: {
+                type: Number,
+                default: 0
+            },
+            /**
+             * cell을 클릭하였을 때 이벤트가 발생됩니다.
+             */
             cellClick: null,
+            /**
+             * cell 더블 클릭하였을 때 이벤트가 발생됩니다.
+             */
             cellDblClick: null,
+            /**
+             * row를 클릭하였을 때 이벤트가 발생됩니다.
+             */
             rowClick: null,
-            rowDblClick: null,
-            dataUpdated: null,
+            /**
+             * row 더블 클릭하였을 때 이벤트가 발생됩니다.
+             */
+            rowDblClick: null
 
         },
         data: function () {
@@ -147,7 +185,6 @@
                     this.$emit('cellChange', this.dataIndex, value);
                 }
             },
-
             cls(type) {
                 switch (type) {
                     case 'number':
