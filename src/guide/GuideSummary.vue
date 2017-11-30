@@ -2,6 +2,7 @@
     <div class="guide-summary">
         <h1>Examples</h1>
         {{ evuiDesc }}
+
         <div v-for="item, i in summaryBoxItems" :key="item.name">
             <div class="summary-title" >
                 <div class="summary-title-name" @click.stop="toggledItem(i)" :class="{ active: item.openToggle }"><div>{{item.name}}</div></div>
@@ -92,10 +93,10 @@
                        EVUI Grid와 Chart는 HTML/CSS/JS 및 SVG로 구현되어 있어 다양한 환경에 적용이 가능하며,
                        Vue.JS를 기반으로 구현되어 대량의 데이터를 고속으로 처리합니다.`,
                 noImageURL: '/src/images/summary/noImage.png',
-                summaryBoxItems: '' // eventBus를 사용하여 GuiddNav.vue의 storeItem값을 저장하는 data
+                summaryBoxItems: '', // eventBus를 사용하여 GuiddNav.vue의 storeItem값을 저장하는 data
             }
         },
-        watch: {
+        computed: {
         },
         methods: {
             toggledItem(index) {
@@ -117,12 +118,35 @@
                         contentName: name
                     }
                 });
+            },
+            initSummaryBoxItems: function() {
+                if(this.summaryBoxItems) {
+                    let imgRootUrl = '/src/images/summary/';
+                    let imgExtention = '.png';
+                    let storeItem, name, i, j;
+                    for(i = 0; i < this.summaryBoxItems.length; i++) {
+                        storeItem = this.summaryBoxItems[i];
+                        if(storeItem.children) {
+                            // 동적 바인딩을 하기위해 $set 사용
+                            this.$set(this.summaryBoxItems[i], 'openToggle', false);
+                            // 정적으로 해주기위해 hard setting
+                            for(j = 0; j < storeItem.children.length; j++) {
+                                name = storeItem.children[j].name;
+                                storeItem.children[j].imgSrc = imgRootUrl + name + imgExtention;
+                            }
+                        }
+                    }
+                }
             }
         },
         created() {
+            // eventBus를 사용해서 다른 컴포넌트에서 $emit('guideNavData')한 데이터를 가져옴
             this.$root.$eventBus.$on('guideNavData', function(storeItem) {
                 this.summaryBoxItems = storeItem;
             }.bind(this));
+        },
+        mounted() {
+            this.initSummaryBoxItems();
         }
     }
 </script>

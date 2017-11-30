@@ -17,7 +17,7 @@
     treeTemplate +=             '<span v-if="isFolder && open">[-]</span>'
     treeTemplate +=             '<span v-else-if="isFolder && !open">[+]</span>'
     treeTemplate +=             '<span v-else>[ ]</span> '
-    treeTemplate +=             '{{treeProps.name}}'
+    treeTemplate +=             '<span>{{treeProps.name}}</span>'
     treeTemplate +=         '</div>'
     treeTemplate +=         '<ul v-show="open">';
     treeTemplate +=             '<tree-tag v-for=\"childProps in treeProps.children\" v-bind:key="childProps.name" v-bind:treeProps=\"childProps\"></tree-tag>';
@@ -28,8 +28,6 @@
         name: 'guideNavName',
         data: function () {
             return {
-                imgRootURL: '/src/images/summary/',
-                imgExtention: '.png',
                 storeItem: [
                     {
                         name: 'Content',
@@ -47,7 +45,6 @@
                                 content: 'ContentC is Temporary Content Component'
                             },
                         ],
-//                        openToggle: false
                     },
                     {
                         name: 'Document',
@@ -58,10 +55,9 @@
                             },
                             {
                                 name: 'DocumentB',
-                                content: 'DocumentB is Temporary Document Component'
+                                content: 'DocumentB is Complicated Document Component'
                             },
                         ],
-//                        openToggle: false
                     },
                     {
                         name: 'Test'
@@ -79,31 +75,9 @@
                 });
                 this.$emit('getVueFile', name);
             },
-            /**
-             * @vue this.data.storeItem의 컨텐츠 중에서 children이 있을 경우 children의 imgSrc속성, openToggle속성을 set
-             */
-            setStoreItemImgSrc: function() {
-                if(this.storeItem) {
-                    let storeItem;
-                    let name;
-                    let imgRootUrl = this.imgRootURL;
-                    let imgExtention = this.imgExtention;
-                    for(let i = 0; i < this.storeItem.length; i++) {
-                        storeItem = this.storeItem[i];
-                        if(storeItem.children) {
-                            this.$set(this.storeItem[i], 'openToggle', false);
-                            for(let j = 0; j < storeItem.children.length; j++) {
-                                name = storeItem.children[j].name;
-                                storeItem.children[j].imgSrc = imgRootUrl + name + imgExtention;
-                            }
-                        }
-                    }
-                }
-            },
         },
         mounted() {
             this.$root.$eventBus.$emit('guideNavData', this.storeItem);
-            this.setStoreItemImgSrc();
         }
     }
 
