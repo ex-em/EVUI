@@ -68,16 +68,18 @@ You can import the whole package.
 
 Use it in your vue app.
 
-```javascript
+```html
 import Vue from 'vue'
 import evui from 'evui'
 
 Vue.use(evui)
 ```
 
-```javascript
+```html
 <template>
-  <grid :gridInfo="gridInfo"
+  <grid :width="800"
+        :height="300"
+        :useColumnResize="true"
         :columns="gridColumns"
         :data="rowData">
   </grid>
@@ -86,10 +88,6 @@ Vue.use(evui)
   export default {
     data () {
       return {
-        gridInfo: {
-          width : 800,
-          height : 300,
-        },
         gridColumns: [
           {dataIndex: 'col1', name: 'column1', width: 300, visible: true, type: 'string', render: 'text'},
           {dataIndex: 'col2', name: 'column2', width: 200, visible: true, type: 'string', render: 'text'},

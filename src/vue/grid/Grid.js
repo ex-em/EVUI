@@ -1,24 +1,104 @@
 import cell from './GridCell.vue';
 import headerCell from './GridHeaderCell.vue';
 
+/**
+ *  The Evui Grid.
+ */
 export default {
+    name: 'evui-grid',
     components: {
         cell,
         headerCell
     },
     props : {
-        gridInfo : Object,
+        /**
+         * Grid 타이틀을 지정합니다.
+         */
+        title: {
+            type: String,
+            default: null
+        },
+        /**
+         * Grid 전체의 넓이를 설정합니다.
+         */
+        width: {
+            type: Number,
+            default: null
+        },
+        /**
+         * Grid 전체의 높이를 설정합니다.
+         */
+        height: {
+            type: Number,
+            default: null
+        },
+        /**
+         * Grid Buffer Data Size 를 결정합니다.
+         */
+        bufferSize: {
+            type: Number,
+            default: 100
+        },
+        /**
+         * Column Resize 사용 여부를 결정합니다.
+         */
+        useColumnResize: {
+            type: Boolean,
+            default: true
+        },
+        /**
+         * @ignore
+         */
         columns : Array,
+        /**
+         * @ignore
+         */
         data: Array,
 
-        cellClick: null,
-        cellDblClick: null,
-        rowClick: null,
-        rowDblClick: null,
-        sortChange: null
+        /**
+         * Cell Click Event를 넘겨받습니다.
+         * @type {func}
+         */
+        cellClick: {
+            type: Function,
+            default: null
+        },
+        /**
+         * Cell Double Click Event를 넘겨받습니다.
+         * @type {func}
+         */
+        cellDblClick: {
+            type: Function,
+            default: null
+        },
+        /**
+         * Row Click Event를 넘겨받습니다.
+         * @type {func}
+         */
+        rowClick: {
+            type: Function,
+            default: null
+        },
+        /**
+         * Row Double Click Event를 넘겨받습니다.
+         * @type {func}
+         */
+        rowDblClick: {
+            type: Function,
+            default: null
+        },
+        /**
+         * Sort Change Event를 넘겨받습니다.
+         * @type {func}
+         */
+        sortChange: {
+            type: Function,
+            default: null
+        }
     },
     data: function () {
         return {
+            gridInfo : {},
             gridStyle           : null,
             titleStyle          : null,
             sortKey             : '',
@@ -35,9 +115,9 @@ export default {
             filterList          : this.data,
             sortedList          : this.data,
             sortclick           : false,
-            popoverCol           : null,
+            popoverCol          : null,
             scroll: {
-                bufferSize      : 100,
+                bufferSize      : this.bufferSize,
                 rowHeight       : null,
                 prevScrollTop   : 0,
                 page            : 0,
@@ -54,10 +134,11 @@ export default {
 
         gridOptions() {
             return Object.assign({
-                title     : null,
+                title     : this.title,
                 titleAlign: 'center',
-                width     : '100%',
-                height    : '100%'
+                width     : this.width,
+                height    : this.height,
+                useColumnResize: this.useColumnResize
             }, this.gridInfo);
         },
 

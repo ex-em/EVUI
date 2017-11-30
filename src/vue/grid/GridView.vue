@@ -1,8 +1,10 @@
 <template>
-    <grid :gridInfo="gridInfo"
+    <grid :title="'EVUI-Grid-Title'"
+          :width="800"
+          :height="300"
+          :useColumnResize="true"
           :columns="gridColumns"
           :data="rowData"
-
           :cellClick="onCellClick"
           :cellDblClick="onCellDblClick"
           :rowClick="onRowClick"
@@ -45,14 +47,6 @@
             }
 
             return {
-                gridInfo: {
-                    title : 'EVUI-Grid-Title',
-                    width : 800,
-                    height : 300,
-                    useCheckbox: true,
-                    useColumnResize: true,
-                    useColumnFixing: true // 추후 Context 제공 여부
-                },
                 gridColumns: [
                     {dataIndex: 'checked', name: 'column2' , draggable: false, width: 20, visible: true, type: 'number', cellrender: 'checkbox'},
                     {dataIndex: 'col1', name: 'column1'    , draggable: true, width: 300, visible: true, type: 'string', cellrender: 'textbox', filter: 'text'},
