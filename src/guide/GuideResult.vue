@@ -1,72 +1,84 @@
 <template>
-  <div id="result" class="result">
-    <div class="resultTop">
-      <p>Result</p>
+    <div id="result" class="result">
+        <div class="resultTop">
+            <p>Result</p>
+        </div>
+        <div class="resultCenter">
+            <component ref="cmpContent" :is="contentName"></component>
+        </div>
     </div>
-    <div class="resultCenter">
-      <component ref="cmpContent" :is="contentName"></component>
-    </div>
-  </div>
 </template>
 
 <script>
-  import ContentA from './components/ContentA.vue';
-  import ContentB from './components/ContentB.vue';
-  import DocumentA from './components/DocumentA.vue';
-  import DocumentB from './components/DocumentB.vue';
+    import ColumnOrder from './components/ColumnFilter.vue';
+    import ColumnVisible from './components/ColumnVisible.vue';
+    import ColumnResize from './components/ColumnResize.vue';
+    import ColumnMove from './components/ColumnMove.vue';
+    import ColumnFilter from './components/ColumnFilter.vue';
+    import ContentA from './components/ContentA.vue';
+    import ContentB from './components/ContentB.vue';
+    import DocumentA from './components/DocumentA.vue';
+    import DocumentB from './components/DocumentB.vue';
 
-  export default {
-    props: {
-      fileList: Object,
-      contentName: {
-        type: String,
-        default: ''
-      }
-    },
-    components: {
-      ContentA,
-      ContentB,
-      DocumentA,
-      DocumentB
-    },
-    data() {
-      return {
-        htmlTxt: '<p class="red">It\'s magic!</p>',
-        jsTxt: 'console.log("hi");',
-        cssTxt: 'p {font-family: Helvetica, Arial; }'
-      };
-    },
-    methods: {
-    },
-    mounted() {
+    export default {
+        props: {
+            fileList: Object,
+            contentName: {
+                type: String,
+                default: ''
+            }
+        },
+        components: {
+            ColumnOrder,
+            ColumnVisible,
+            ColumnResize,
+            ColumnMove,
+            ColumnFilter,
+            ContentA,
+            ContentB,
+            DocumentA,
+            DocumentB
+        },
+        data() {
+            return {
+                htmlTxt: '<p class="red">It\'s magic!</p>',
+                jsTxt: 'console.log("hi");',
+                cssTxt: 'p {font-family: Helvetica, Arial; }'
+            };
+        },
+        methods: {},
+        mounted() {
+        }
     }
-  }
 </script>
 
 
 <style scoped>
-  .result {
-    position: absolute;
-    left: 50%;
-    top: 0px;
-    bottom: 0px;
-    right: 0px;
-    border: 1px solid #e5e5e5;
-  }
-  .result .resultTop {
-    position: absolute;
-    height: 50px;
-    width: 100%;
-    border-bottom: 1px solid #e5e5e5;
-  }
-  .result .resultTop > p {
-    font-size: 20px;
-    font-weight: bold;
-    padding: 0 0 0 20px;
-  }
-  .result .resultCenter {
-    position: absolute;
-    top: 51px;
-    padding: 20px 20px 20px 20px;
-  }
+    .result {
+        position: absolute;
+        left: 50%;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        border: 1px solid #e5e5e5;
+    }
+
+    .result .resultTop {
+        position: absolute;
+        height: 50px;
+        width: 100%;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .result .resultTop > p {
+        font-size: 20px;
+        font-weight: bold;
+        padding: 0 0 0 20px;
+    }
+
+    .result .resultCenter {
+        position: absolute;
+        top: 51px;
+        padding: 20px 20px 20px 20px;
+    }
 </style>

@@ -64,6 +64,7 @@
              */
             dataIndex: {
                 type: String,
+                require: true,
                 default: null,
             },
             /**
