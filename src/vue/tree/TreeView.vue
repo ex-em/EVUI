@@ -1,5 +1,13 @@
 <template>
-    <tree :treeInfo="treeInfo"
+    <tree
+          :title="'tree-test-title'"
+          :width="900"
+          :height="300"
+          :useCheckbox="true"
+          :treeColumnId="'class_name'"
+          :useColumnResize="true"
+          :useFilter="false"
+
           :columns="treeColumns"
           :rows="treeData">
     </tree>
