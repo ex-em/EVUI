@@ -53,16 +53,18 @@
             },
             codeParser: function(data = null , ...rest){
                 let ix, ixLen;
-                let startTag, endTag;
+                let startTagName, endTagName;
                 let startIndex, endIndex;
                 let keyList;
-
+                let preRe = '\<[\ ]*';
+                let proRe = '[0-9a-zA-Z\ \:\'\"\@\=\{\}]*\>';
+                let re;
+                let matchStr;
                 let obj = {
-                    template: '',
-                    style: '',
-                    script: ''
+                    template: ``,
+                    script: ``,
+                    style: ``
                 };
-
 
                 if(!data){
                     return data;
@@ -70,13 +72,18 @@
 
                 keyList = Object.keys(obj);
 
-
                 for(ix = 0, ixLen = keyList.length; ix < ixLen; ix++){
-                    startTag = `<${keyList[ix]}>`;
-                    endTag = `</${keyList[ix]}>`;
-                    keyList[ix] === 'style' ? startIndex = data.lastIndexOf(startTag) : startIndex = data.indexOf(startTag);
-                    endIndex = data.lastIndexOf(endTag);
-                    obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
+                    startTagName = `${keyList[ix]}`;
+                    endTagName = `/${keyList[ix]}`;
+                    re = new RegExp(`${preRe}(${keyList[ix]}|${keyList[ix].toUpperCase()})${proRe}`);
+                    matchStr = data.match(re);
+                    if(matchStr == null){
+                        obj[keyList[ix]] = 'Failed to parse the string data. Check running code.';
+                        continue;
+                    }
+                    startIndex = matchStr.index + matchStr[0].length;
+                    data.includes(endTagName) ? endIndex = data.lastIndexOf(endTagName) : endIndex = data.lastIndexOf(endTagName.toUpperCase());
+                    obj[keyList[ix]] = data.substring(startIndex, endIndex - 1).trim();
                 }
 
                 return obj;

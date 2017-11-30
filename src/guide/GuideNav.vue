@@ -34,20 +34,30 @@
                         name: 'Content',
                         children: [
                             {
-                                name: 'ContentA',
-                                fileName: 'ContentA',
-                                content: 'ContentA is Simple Content Component'
+                                name: 'Column Order',
+                                fileName: 'ColumnOrder',
+                                content: 'Column Order Option'
                             },
                             {
-                                name: 'ContentB',
-                                fileName: 'ContentB',
-                                content: 'ContentB is Complicated Content Component'
+                                name: 'Column Visible',
+                                fileName: 'ColumnVisible',
+                                content: 'Column Visible Option'
                             },
                             {
-                                name: 'ContentC',
-                                fileName: 'ContentC',
-                                content: 'ContentC is Temporary Content Component'
+                                name: 'Column Resize',
+                                fileName: 'ColumnResize',
+                                content: 'Column Resize Option'
                             },
+                            {
+                                name: 'Column Move',
+                                fileName: 'ColumnMove',
+                                content: 'Column Move Option'
+                            },
+                            {
+                                name: 'Column Filter',
+                                fileName: 'ColumnFilter',
+                                content: 'Column Filter Option'
+                            }
                         ],
                     },
                     {
