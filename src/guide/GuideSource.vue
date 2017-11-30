@@ -146,6 +146,7 @@
         bottom: 0px;
         width: 50%;
         border-bottom: 1px solid #e5e5e5;
+        height: calc(100% - 55px);
     }
 
     .tab-title {

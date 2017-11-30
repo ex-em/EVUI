@@ -13,7 +13,7 @@
 
 <script>
     var treeTemplate =  '<li>';
-    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.name)" v-bind:class="{ active: open }">';
+    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.fileName)" v-bind:class="{ active: open }">';
     treeTemplate +=             '<span v-if="isFolder && open">[-]</span>'
     treeTemplate +=             '<span v-else-if="isFolder && !open">[+]</span>'
     treeTemplate +=             '<span v-else>[ ]</span> '
@@ -34,14 +34,17 @@
                         children: [
                             {
                                 name: 'ContentA',
+                                fileName: 'ContentA',
                                 content: 'ContentA is Simple Content Component'
                             },
                             {
                                 name: 'ContentB',
+                                fileName: 'ContentB',
                                 content: 'ContentB is Complicated Content Component'
                             },
                             {
                                 name: 'ContentC',
+                                fileName: 'ContentC',
                                 content: 'ContentC is Temporary Content Component'
                             },
                         ],
@@ -51,10 +54,12 @@
                         children: [
                             {
                                 name: 'DocumentA',
+                                fileName: 'DocumentA',
                                 content: 'DocumentA is Simple Document Component'
                             },
                             {
                                 name: 'DocumentB',
+                                fileName: 'DocumentB',
                                 content: 'DocumentB is Complicated Document Component'
                             },
                         ],
@@ -97,20 +102,21 @@
             }
         },
         methods: {
-            showHideToggle: function (name) {
-                if (event.path[1] && event.path[1].localName == 'li' && event.path[1].children[1].localName == 'ul') {
-                    var tagDisplay = event.path[1].children[1].style.display;
+            showHideToggle: function (fileName) {
+                if(event && event.currentTarget.parentElement.children[1].localName == 'ul') {
+                    let tag = event.currentTarget.parentElement.children[1];
+                    let tagDisplay = tag.style.display;
+
                     if (tagDisplay == 'none') {
-                        event.path[1].children[1].style.display = 'block'
+                        event.currentTarget.parentElement.children[1].style.display = 'block';
                     } else {
-                        event.path[1].children[1].style.display = 'none'
+                        event.currentTarget.parentElement.children[1].style.display = 'none';
                     }
                 }
 
                 this.changeActive();
                 if (this.$parent.$parent.toMove) {
-//                    this.$root.$children[0].$children[0].$children[0].toMove(name);
-                    this.$parent.$parent.toMove(name);
+                    this.$parent.$parent.toMove(fileName);
                 }
             },
             changeActive: function () {
@@ -148,6 +154,7 @@
         list-style: none;
         margin: 0;
         padding: 0;
+
     }
 
     .navigate li {
@@ -155,10 +162,19 @@
         padding: 0;
     }
 
+    .navigate > ul > li > div {
+        background-color: #eeeeee;
+        background-image: -webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
+        border: 1px solid #eeeeee;
+    }
+
+    .navigate > ul > li > div > span {
+        font-weight: bold;
+    }
+
     .navigate div {
         display: block;
         cursor: pointer;
-        background-color: #22aa99;
     }
 
     .navigate div.active {
