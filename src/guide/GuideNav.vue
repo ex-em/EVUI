@@ -13,10 +13,10 @@
 
 <script>
     var treeTemplate =  '<li>';
-    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.fileName)" v-bind:class="{ active: open }">';
-    treeTemplate +=             '<span v-if="isFolder && open">[-]</span>'
-    treeTemplate +=             '<span v-else-if="isFolder && !open">[+]</span>'
-    treeTemplate +=             '<span v-else>[ ]</span> '
+    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.name, treeProps.fileName)" v-bind:class="{ active: open }">';
+    treeTemplate +=             '<div v-if="isFolder && open" class="minusFolder"></div>'
+    treeTemplate +=             '<div v-else-if="isFolder && !open" class="plusFolder"></div>'
+    treeTemplate +=             '<div v-else class="endFolder"></div>'
     treeTemplate +=             '<span>{{treeProps.name}}</span>'
     treeTemplate +=         '</div>'
     treeTemplate +=         '<ul v-show="open">';
@@ -28,6 +28,7 @@
         name: 'guideNavName',
         data: function () {
             return {
+                selectedMenu: '',
                 storeItem: [
                     {
                         name: 'Content',
@@ -70,6 +71,13 @@
                 ],
             }
         },
+        computed: {
+            classActive: {
+                get: function() {
+                    return
+                }
+            }
+        },
         methods: {
             toMove: function (name) {
                 this.$router.push({
@@ -102,7 +110,7 @@
             }
         },
         methods: {
-            showHideToggle: function (fileName) {
+            showHideToggle: function (name, fileName) {
                 if(event && event.currentTarget.parentElement.children[1].localName == 'ul') {
                     let tag = event.currentTarget.parentElement.children[1];
                     let tagDisplay = tag.style.display;
@@ -112,12 +120,20 @@
                     } else {
                         event.currentTarget.parentElement.children[1].style.display = 'none';
                     }
+
+                    if(tag.children.length > 0) { // 선택된 div가 마지막 노드가 아닐때
+                        this.changeActive();
+                    } else { // 선택된 div가 마지막 노드일 때
+                        this.$parent.selectedMenu = name;
+                    }
                 }
 
-                this.changeActive();
+
                 if (this.$parent.$parent.toMove) {
                     this.$parent.$parent.toMove(fileName);
                 }
+
+//                this.$parent.selectedMenu = name;
             },
             changeActive: function () {
                 this.open = !this.open;
@@ -162,6 +178,9 @@
         padding: 0;
     }
 
+
+
+
     .navigate > ul > li > div {
         background-color: #eeeeee;
         background-image: -webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
@@ -172,24 +191,73 @@
         font-weight: bold;
     }
 
-    .navigate div {
-        display: block;
-        cursor: pointer;
-    }
-
-    .navigate div.active {
+    .navigate > ul > li > ul > li:hover {
+        background-color: #eeeeee;
         cursor: default;
     }
 
+    .navigate > ul > li > ul > li.active {
+        font-weight: bold;
+    }
+
+    .navigate div {
+        display: block;
+        cursor: pointer;
+        height: 30px;
+    }
+
+    .navigate div.active {
+
+    }
+
     .navigate li div {
-        padding: 10px 0 10px 10px;
+        padding: 0px 0 0px 10px;
     }
 
     .navigate li li div {
-        padding: 10px 0px 10px 30px;
+        padding: 0px 0px 0px 30px;
     }
 
     .navigate li li li div {
-        padding: 10px 0px 10px 50px;
+        padding: 0px 0px 0px 50px;
+    }
+
+    .minusFolder {
+        background-image: url("/src/images/xm_icon_v1.png");
+        background-position: -250px -223px;
+        position: relative;
+        top: 5px;
+        width: 15px;
+        height: 19px !important;
+        padding: 0 10px 0 0 !important;
+        display: inline-block !important;
+        -webkit-transform: rotate(270deg);
+        -moz-transform: rotate(270deg);
+        -ms-transform: rotate(270deg);
+        -o-transform: rotate(270deg);
+        transform: rotate(270deg);
+    }
+    .plusFolder {
+        background-image: url("/src/images/xm_icon_v1.png");
+        background-position: -254px -216px;
+        position: relative;
+        top: 5px;
+        width: 15px;
+        height: 20px !important;
+        /*padding: 0 10px 0 0 !important;*/
+        padding: 0 0px 0 0 !important;
+        margin-right: 10px;
+        display: inline-block !important;
+    }
+    .endFolder {
+        background-image: url("/src/images/xm_icon_v1.png");
+        background-position: -93px -687px;
+        position: relative;
+        top: 5px;
+        width: 15px;
+        height: 20px !important;
+        padding: 0px !important;
+        margin-right: 10px;
+        display: inline-block !important;
     }
 </style>
