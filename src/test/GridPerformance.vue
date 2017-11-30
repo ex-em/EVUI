@@ -17,12 +17,13 @@
                 <!--<label>Data Buffer Size : <input type="number" :value="gridBufferSize" width="60" min="10" :readOnly="!useBuffer"/></label>-->
             </div>
 
-            <grid :gridInfo="gridInfo"
+            <grid :title="'EVUI-Grid-Title'"
+                  :width="800"
+                  :height="300"
+                  :useColumnResize="true"
                   :columns="gridColumns"
                   :data="rowData"
-                  ref="grid"
-
-            >
+                  ref="grid">
             </grid>
 
 
@@ -123,14 +124,6 @@
                 beforeUpdateTime: 0,
                 updatedTime: 0,
                 recordCount: 15000,
-                gridInfo: {
-                    title : 'EVUI-Grid-Title',
-                    width : 800,
-                    height : 300,
-                    useCheckbox: true,
-                    useColumnResize: true,
-                    useColumnFixing: true // 추후 Context 제공 여부
-                },
                 gridColumns: [],
                 rowData : [],
                 selectStore: []

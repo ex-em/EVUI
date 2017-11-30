@@ -39,50 +39,93 @@
     import checkbox from '../components/CheckBox.vue';
 
     export default {
+        name: 'evui-grid-header-cell',
         components: {
             checkbox
         },
         props : {
+            /**
+             * Column의 넓이를 지정합니다.
+             */
             width: {
                 type: Number,
                 default: null
             },
+            /**
+             * Column의 높이를 지정합니다.
+             * @ignore
+             */
             height: {
                 type: Number,
                 default: null
             },
+            /**
+             * Column을 구분하는 키 값이며, 필수사항 입니다.
+             */
             dataIndex: {
                 type: String,
                 default: null,
             },
+            /**
+             * Column에 들어갈 문자열 입니다.
+             */
             text: {
                 type: String,
                 default: null,
             },
+            /**
+             * Column의 Order 기능 사용 여부 입니다.
+             */
             useOrder: {
                 type: Boolean,
                 default: true,
             },
+            /**
+             * @ignore
+             */
             sortKey: {
                 type: String,
                 default: null,
             },
+            /**
+             * Column의 Resize 기능 사용 여부 입니다.
+             */
             useResize: {
                 type: Boolean,
                 default: true,
             },
+            /**
+             * Column의 show/hide 기능 사용 여부 입니다.
+             */
             visible: {
                 type: Boolean,
                 default: true
             },
+            /**
+             * @ignore
+             */
             value: {
                 default: null
             },
-            cellRender: String,
+            /**
+             * Column의 표현 방식을 변경 할 수 있습니다.
+             * checkbox | textbox | spinner | selectbox
+             */
+            cellRender: {
+                type: String,
+                default: null
+            },
+            /**
+             * Column의 Move 기능 사용 여부 입니다.
+             */
             draggable: {
                 type: Boolean,
                 default: true,
             },
+            /**
+             * Column의 Filter 기능 사용 여부 입니다.
+             * none | text
+             */
             filter: {
                 type: String,
                 default : 'none'

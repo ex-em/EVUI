@@ -2,13 +2,91 @@ import TreeNode from './TreeNode.vue';
 import TreeStore from './TreeStore.js';
 import headerCell from './TreeHeaderCell.vue';
 
-
+/**
+ * 다양한 옵션과 설정으로 데이터를 트리 테이블 형태로 보여줍니다.
+ */
 export default {
-    name  : 'evui-tree',
+    name  : 'evui-ree',
     props : {
-        treeInfo   : Object,
+
+
+        /**
+         * 타이틀을 정렬합니다.  left center right
+         */
+        titleAlign :{
+            type: String,
+            default:'center'
+        },
+
+        /**
+         * 타이틀명을 설정합니다.
+         */
+        title :{
+            type: String,
+            default :''
+        },
+
+
+        /**
+         * 트리로 만들 노드 컬럼명을 설정합니다.( data 객체의 첫번째에 위치해야 합니다 )
+         */
+        treeColumnId : {
+            type: String,
+            required: true
+        },
+
+        /**
+         * 트리의 width를 설정합니다.(단위 px)
+         */
+        width : {
+            type: [String,Number],
+            default:'100%'
+        },
+
+        /**
+         * 트리의 height를 설정합니다.(단위 px)
+         */
+        height : {
+            type: [String,Number],
+            default:'100%'
+        },
+
+        /**
+         * 컬럼 리사이즈 기능을 추가합니다.
+         */
+        useColumnResize:{
+            type: Boolean,
+            default : false
+        },
+
+        /**
+         * 컬럼 체크박스 기능을 추가합니다.
+         */
+        useCheckBox:{
+            type:Boolean,
+            default: false
+        },
+
+        /**
+         * 컬럼 필터 기능을 추가합니다.
+         */
+        useFilter:{
+            type:Boolean,
+            default:false
+        },
+
+        /**
+         * @ignore
+         */
         columns    : Array,
-        rows       : Array
+        /**
+         * @ignore
+         */
+        rows       : Array,
+
+
+
+
     },
     data: function() {
         return {
@@ -16,7 +94,7 @@ export default {
             treeStyle  : null,
             titleStyle : null,
             store      : null,
-            treeColumn : this.treeInfo.treeColumnId,
+            treeColumn : this.treeColumnId,
             scroll: {
                 bufferSize      : 100,
                 rowHeight       : null,
@@ -35,14 +113,12 @@ export default {
         };
     },
     computed: {
-        // set default options
-        treeOptions() {
-            return Object.assign({
-                title     : null,
-                titleAlign: 'center',
-                width     : '100%',
-                height    : '100%'
-            }, this.treeInfo);
+        //binding unit px
+        unitWidth(){
+            return typeof this.width === 'number' ? this.width+'px' : this.width
+        },
+        unitHeight(){
+            return typeof this.height === 'number' ? this.height+'px' : this.height
         },
 
         columnOptions: {
@@ -83,8 +159,8 @@ export default {
                 vm          : this,
                 treeData    : this.rawData,
                 columns     : this.columns,
-                treeColumnId: this.treeOptions.treeColumnId,
-                useCheckBox : this.treeOptions.useCheckBox
+                treeColumnId: this.treeColumnId,
+                useCheckBox : this.useCheckBox
             });
             this.updateTreeParseTime = performance.now();
             return this.store.treeMap;
@@ -177,7 +253,7 @@ export default {
                 let ph = bufferSize * rowHeight; // page height
                 let h = ph * 100;
                 let n = Math.ceil(th / ph);
-                let vp = this.treeOptions.height;
+                let vp = this.height;
                 let cj = (th - h) / (n - 1);
                 let viewport = e.target;
                 let scrollTop = viewport.scrollTop;
@@ -218,18 +294,18 @@ export default {
     created() {
         // set tree default style
         this.titleStyle = {
-            'text-align': this.treeOptions.titleAlign,
+            'text-align': this.titleAlign,
             'display'   : 'block'
         };
 
         this.treeStyle = {
-            'width' : typeof this.treeOptions.width === 'number' ? this.treeOptions.width + 'px' : this.treeOptions.width,
-            'height': typeof this.treeOptions.height === 'number' ? this.treeOptions.height + 'px' : this.treeOptions.height
+            'width' : this.unitWidth,
+            'height': this.unitHeight
         };
 
     },
     mounted() {
-        if(this.treeOptions.useColumnResize) {
+        if(this.useColumnResize) {
             this.setResizeColumnEvent();
         }
 

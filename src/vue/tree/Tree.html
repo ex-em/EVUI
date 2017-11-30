@@ -2,14 +2,15 @@
      :style="treeStyle">
     <div class="evui-tree-header">
         <span class="title"
-              v-if="treeOptions.title"
-              :style="titleStyle">
-            {{treeOptions.title}}
+              v-if="title"
+              style="display: block;"
+              :style="{textAlign: titleAlign}">
+            {{title}}
         </span>
     </div>
     <div class="evui-tree-body">
-        <table ref="treeTable" :style="{width:treeOptions.width+'px'}" class="evui-tree-table">
-            <thead ref="evuiTreeThead" class="evui-tree-thead" :style="{width:treeOptions.width+'px'}">
+        <table ref="treeTable" :style="{width:unitWidth}" class="evui-tree-table">
+            <thead ref="evuiTreeThead" class="evui-tree-thead" :style="{width:unitWidth}">
                 <tr>
                     <header-cell v-for="col in columnOptions"
                                  :key="col.id"
@@ -18,14 +19,14 @@
                                  :text="col.name"
                                  :visible="col.visible"
                                  :draggable="col.draggable"
-                                 :useFilter="treeOptions.useFilter"
-                                 :useResize="treeOptions.useColumnResize">
+                                 :useFilter="useFilter"
+                                 :useResize="useColumnResize">
                     </header-cell>
                 </tr>
             </thead>
             <tbody @scroll="treeBodyScroll"
                    ref="evuiTreeBody"
-                   :style="{width:treeOptions.width+'px', height:treeOptions.height+'px'}">
+                   :style="{width:unitWidth, height:unitHeight}">
                 <div ref="evuiTreeItemContainer" class="evui-tree-item-container">
                     <div ref="evuiTreeItem" class="evui-tree-item">
                         <tree-node v-for="node in bufferedData"
@@ -35,7 +36,7 @@
                                    :columns="columnOptions"
                                    :treeColumn="treeColumn"
                                    :nodeObj="node"
-                                   :useCheckBox="treeOptions.useCheckBox">
+                                   :useCheckBox="useCheckBox">
                         </tree-node>
                     </div>
                 </div>
