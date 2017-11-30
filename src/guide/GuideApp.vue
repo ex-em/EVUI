@@ -81,7 +81,7 @@
                         obj[keyList[ix]] = 'Failed to parse the string data. Check running code.';
                         continue;
                     }
-                    startIndex = matchStr.index + matchStr[0].length + 1;
+                    startIndex = matchStr.index + matchStr[0].length;
                     data.includes(endTagName) ? endIndex = data.lastIndexOf(endTagName) : endIndex = data.lastIndexOf(endTagName.toUpperCase());
                     obj[keyList[ix]] = data.substring(startIndex, endIndex - 1).trim();
                 }
