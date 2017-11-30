@@ -4,8 +4,7 @@ const { theme, styles } = require('./docStyles')
 
 module.exports = {
     title: 'Evui Docs',
-    styleguideDir: 'src/docs',
-    highlightTheme: 'dracula',
+    styleguideDir: 'src/docs',    
     theme: theme,
     styles: styles,
     webpackConfig: merge(baseConfig, {
@@ -40,7 +39,7 @@ module.exports = {
         {
             name: 'Grid',
             content: '',
-            components: 'src/vue/grid/*.vue'
+            components: function(){return['src/vue/grid/Grid.vue','src/vue/grid/GridHeaderCell.vue']}
         },
         {
             name: 'Tree',
@@ -48,9 +47,4 @@ module.exports = {
             components: 'src/vue/tree/*.vue'
         }
     ]
-    //propsParser: function(file) {
-    //    const doc = vueDocs.parse(file);
-    //    doc.displayName = doc.displayName.replace(/([A-Z])/g, function ($1) { return '-' + $1.toLowerCase() });
-    //    return doc;
-    //}
 }
