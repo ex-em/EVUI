@@ -110,7 +110,7 @@
     .guide-app {
         width: 100%;
         height: 100%;
-        font: normal 12px/14px Helvetica, Arial, sans-serif;
+        font: normal 12px/14px Tahoma, Geneva, sans-serif;;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: #2c3e50;
