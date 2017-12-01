@@ -90,10 +90,12 @@
             }
         },
         created: function() {
+            this.$root.$eventBus.$on('getBusFile', this.getVueFile(name));
         },
         mounted: function(){
             this.contentName = this.$route.params.contentName;
             this.getVueFile('ContentA');
+
         },
         watch: {
           $route: function ( route ) {
