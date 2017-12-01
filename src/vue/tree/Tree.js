@@ -6,7 +6,7 @@ import headerCell from './TreeHeaderCell.vue';
  * 다양한 옵션과 설정으로 데이터를 트리 테이블 형태로 보여줍니다.
  */
 export default {
-    name  : 'evui-ree',
+    name  : 'evui-tree',
     props : {
 
 
@@ -23,7 +23,7 @@ export default {
          */
         title :{
             type: String,
-            default :''
+            default :null
         },
 
 
