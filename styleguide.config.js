@@ -4,7 +4,8 @@ const { theme, styles } = require('./docStyles')
 
 module.exports = {
     title: 'Evui Docs',
-    styleguideDir: 'src/docs',    
+    styleguideDir: 'src/docs',
+    showUsage:true,
     theme: theme,
     styles: styles,
     webpackConfig: merge(baseConfig, {
@@ -19,23 +20,23 @@ module.exports = {
     }),
     sections: [
         {
-            content: 'README.md'
+            // content: 'README.md'
         },
-        {
+        /*{
             name: 'Components',
             content: '',
-            components: 'src/vue/components/*.vue'
+            components: 'src/vue/components/!*.vue'
         },
         {
             name: 'Chart',
             content: '',
-            components: 'src/vue/chart/*.vue'
+            components: 'src/vue/chart/!*.vue'
         },
         {
             name: 'ChartT',
             content: '',
-            components: 'src/vue/chartT/*.vue'
-        },
+            components: 'src/vue/chartT/!*.vue'
+        },*/
         {
             name: 'Grid',
             content: '',
@@ -44,7 +45,7 @@ module.exports = {
         {
             name: 'Tree',
             content: '',
-            components: 'src/vue/tree/*.vue'
+            components: 'src/vue/tree/Tree.vue'
         }
     ]
 }
