@@ -157,7 +157,7 @@
         height: 100%;
         overflow: auto;
         border-right: 1px solid #eeeeee;
-        background-color: #353A42;
+        background-color: #3e444d;
     }
 
     .navigate .naviTitle {
@@ -213,7 +213,7 @@
     }
 
     .navigate > ul > li > ul > li:hover {
-        background-color: #4E2E28;
+        background-color: #333640;
         cursor: default;
     }
 
