@@ -11,7 +11,7 @@ export default {
 
 
         /**
-         * 타이틀을 정렬합니다.  left center right
+         * 타이틀을 정렬합니다.  left | center | right
          */
         titleAlign :{
             type: String,

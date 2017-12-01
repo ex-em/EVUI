@@ -45,7 +45,7 @@ module.exports = {
         {
             name: 'Tree',
             content: '',
-            components: 'src/vue/tree/Tree.vue'
+            components: function(){return['src/vue/tree/Tree.vue', 'src/vue/tree/TreeHeaderCell.vue']}
         }
     ]
 }

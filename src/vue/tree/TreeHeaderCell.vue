@@ -20,15 +20,59 @@
 
 <script>
     export default {
+        name: 'evui-tree-header-cell',
         props: {
-            width    : Number,
-            height   : Number,
-            dataIndex: String,
-            text     : String,
-            useResize: Boolean,
-            visible  : Boolean,
-            draggable: Boolean,
-            useFilter: Boolean
+            /**
+             * Column의 넓이를 지정합니다.
+             */
+            width: {
+                type: Number,
+                default: null
+            },
+            /**
+             * Column의 높이를 지정합니다.
+             * @ignore
+             */
+            height: {
+                type: Number,
+                default: null
+            },
+            /**
+             * Column을 구분하는 키 값이며, 필수사항 입니다.
+             */
+            dataIndex: {
+                type: String,
+                require: true,
+                default: null,
+            },
+            /**
+             * Column에 들어갈 문자열 입니다.
+             */
+            text: {
+                type: String,
+                default: null,
+            },
+            /**
+             * Column의 show/hide 기능 사용 여부 입니다.
+             */
+            visible: {
+                type: Boolean,
+                default: true
+            },
+            /**
+             * Column의 Move 기능 사용 여부 입니다.
+             */
+            draggable: {
+                type: Boolean,
+                default: true,
+            },
+            /**
+             * Column의 Filter 기능 사용 여부입니다.
+             */
+            useFilter: {
+                type: Boolean,
+                default : false
+            }
         }
     };
 
