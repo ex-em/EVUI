@@ -5,11 +5,11 @@
           :useColumnResize="true"
           :columns="gridColumns"
           :data="rowData"
-          :cellClick="onCellClick"
-          :cellDblClick="onCellDblClick"
-          :rowClick="onRowClick"
-          :rowDblClick="onRowDblClick"
-          :sortChange="onSortChange"
+          @cellClick="onCellClick"
+          @cellDblClick="onCellDblClick"
+          @rowClick="onRowClick"
+          @rowDblClick="onRowDblClick"
+          @sortChange="onSortChange"
     >
     </grid>
 </template>
@@ -32,7 +32,8 @@
             },
             onSortChange(){
                 console.log('grid sort change event: ', arguments);
-            },
+            }
+
         },
         data () {
             let tempData = [];

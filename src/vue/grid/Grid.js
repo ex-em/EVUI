@@ -55,46 +55,46 @@ export default {
          */
         data: Array,
 
-        /**
+        /*
          * Cell Click Event를 넘겨받습니다.
          * @type {func}
          */
-        cellClick: {
-            type: Function,
-            default: null
-        },
-        /**
+        // cellClick: {
+        //     type: Function,
+        //     default: null
+        // },
+        /*
          * Cell Double Click Event를 넘겨받습니다.
          * @type {func}
          */
-        cellDblClick: {
-            type: Function,
-            default: null
-        },
-        /**
+        // cellDblClick: {
+        //     type: Function,
+        //     default: null
+        // },
+        /*
          * Row Click Event를 넘겨받습니다.
          * @type {func}
          */
-        rowClick: {
-            type: Function,
-            default: null
-        },
-        /**
+        // rowClick: {
+        //     type: Function,
+        //     default: null
+        // },
+        /*
          * Row Double Click Event를 넘겨받습니다.
          * @type {func}
          */
-        rowDblClick: {
-            type: Function,
-            default: null
-        },
-        /**
+        // rowDblClick: {
+        //     type: Function,
+        //     default: null
+        // },
+        /*
          * Sort Change Event를 넘겨받습니다.
          * @type {func}
          */
-        sortChange: {
-            type: Function,
-            default: null
-        }
+        // sortChange: {
+        //     type: Function,
+        //     default: null
+        // }
     },
     data: function () {
         return {
@@ -206,9 +206,17 @@ export default {
                     }
                     this.filterList = sortedData;
 
-                    if(this.sortChange){
-                        this.sortChange(this, this.sortKey, order == -1 ? 'DESC' : 'ASC');
-                    }
+
+                    //sort change Event 발생
+                    /**
+                     * sort 변경시 발생 하는 이벤트 (param : this, sortKey, order)
+                     * @event sortChange
+                     * @type {function}
+                     */
+                    this.$emit('sortChange', this,this.sortKey, order == -1 ? 'DESC' : 'ASC');
+                    // if(this.sortChange){
+                    //     this.sortChange(this, this.sortKey, order == -1 ? 'DESC' : 'ASC');
+                    // }
                 }
 
                 //filter event
@@ -302,29 +310,40 @@ export default {
         cellChange: function(){
 
         },
-        onCellClick: function() {
+        onCellClick: function(value, event) {
             // console.log('cell click event', arguments);
 
-            if(this.cellClick){
-                this.cellClick(arguments);
-            }
+            /**
+             * cell 클릭시 발생 하는 이벤트 (param : value, event)
+             * @event cellClick
+             * @type {function}
+             */
+            this.$emit('cellClick',value,event);
 
-            if(this.rowClick){
-                this.rowClick(arguments);
-            }
-
+            /**
+             * row 클릭시 발생 하는 이벤트 (param : value, event)
+             * @event rowClick
+             * @type {function}
+             */
+            this.$emit('rowClick',value,event);
 
         },
-        onCellDblClick: function() {
+        onCellDblClick: function(value, event) {
             // console.log('cell double click event', arguments);
 
-            if(this.cellDblClick){
-                this.cellDblClick(arguments);
-            }
+            /**
+             * cell 더블 클릭시 발생 하는 이벤트 (param : value, event)
+             * @event cellDblClick
+             * @type {function}
+             */
+            this.$emit('cellDblClick',value,event)
 
-            if(this.rowDblClick){
-                this.rowDblClick(arguments);
-            }
+            /**
+             * row 더블 클릭시 발생 하는 이벤트 (param : value, event)
+             * @event rowDblClick
+             * @type {function}
+             */
+            this.$emit('rowDblClick',value,event)
         },
 
         bufferHeightCalc: function () {
