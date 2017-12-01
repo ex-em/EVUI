@@ -13,10 +13,10 @@
 
 <script>
     var treeTemplate =  '<li>';
-    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.name, treeProps.fileName)" v-bind:class="{ active: open }">';
-    treeTemplate +=             '<div v-if="isFolder && open" class="minusFolder"></div>'
-    treeTemplate +=             '<div v-else-if="isFolder && !open" class="plusFolder"></div>'
-    treeTemplate +=             '<div v-else class="endFolder"></div>'
+    treeTemplate +=         '<div v-on:click.stop="showHideToggle(treeProps.name, treeProps.fileName)" v-bind:class="{ active: open, selected: select }">';
+//    treeTemplate +=             '<div v-if="isFolder && open" class="minusFolder"></div>'
+//    treeTemplate +=             '<div v-else-if="isFolder && !open" class="plusFolder"></div>'
+//    treeTemplate +=             '<div v-else class="endFolder"></div>'
     treeTemplate +=             '<span>{{treeProps.name}}</span>'
     treeTemplate +=         '</div>'
     treeTemplate +=         '<ul v-show="open">';
@@ -28,7 +28,6 @@
         name: 'guideNavName',
         data: function () {
             return {
-                selectedMenu: '',
                 storeItem: [
                     {
                         name: 'Content',
@@ -82,11 +81,6 @@
             }
         },
         computed: {
-            classActive: {
-                get: function() {
-                    return
-                }
-            }
         },
         methods: {
             toMove: function (name) {
@@ -109,7 +103,8 @@
     Vue.component('treeTag', {
         data: function () {
             return {
-                open: false,
+                open: true,
+                select: false
             }
         },
         template: treeTemplate,
@@ -117,37 +112,36 @@
         computed: {
             isFolder: function () {
                 return this.$props.treeProps.children && this.$props.treeProps.children.length;
-            }
+            },
         },
         methods: {
             showHideToggle: function (name, fileName) {
                 if(event && event.currentTarget.parentElement.children[1].localName == 'ul') {
                     let tag = event.currentTarget.parentElement.children[1];
-                    let tagDisplay = tag.style.display;
+                    if(tag.children.length > 0) {
+                        // 선택된 div가 마지막 노드가 아닐때
+                        let tagDisplay = tag.style.display;
 
-                    if (tagDisplay == 'none') {
-                        event.currentTarget.parentElement.children[1].style.display = 'block';
-                    } else {
-                        event.currentTarget.parentElement.children[1].style.display = 'none';
-                    }
-
-                    if(tag.children.length > 0) { // 선택된 div가 마지막 노드가 아닐때
+                        if (tagDisplay == 'none') {
+                            event.currentTarget.parentElement.children[1].style.display = 'block';
+                        } else {
+                            event.currentTarget.parentElement.children[1].style.display = 'none';
+                        }
                         this.changeActive();
-                    } else { // 선택된 div가 마지막 노드일 때
-                        this.$parent.selectedMenu = name;
+                    } else {
+                        // 선택된 div가 마지막 노드일 때
                     }
                 }
-
 
                 if (this.$parent.$parent.toMove) {
                     this.$parent.$parent.toMove(fileName);
                 }
-
-//                this.$parent.selectedMenu = name;
             },
             changeActive: function () {
                 this.open = !this.open;
             },
+        },
+        mounted() {
         }
     })
 </script>
@@ -163,12 +157,14 @@
         height: 100%;
         overflow: auto;
         border-right: 1px solid #eeeeee;
+        background-color: #3e444d;
     }
 
     .navigate .naviTitle {
         height: 50px;
-        border: 1px solid #00baff;
-        background: #00baff;
+        border: 1px solid #0095eb;
+        background-color: #0095eb;
+        border-bottom: 1px solid #3e4148;
     }
 
     .navigate .naviTitle > p {
@@ -192,17 +188,32 @@
 
 
     .navigate > ul > li > div {
-        background-color: #eeeeee;
-        background-image: -webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);
-        border: 1px solid #eeeeee;
+        background-image: -webkit-linear-gradient(top, #2f2f2f 0%, #333640 100%);
+        border: 1px solid #303030;
     }
 
     .navigate > ul > li > div > span {
         font-weight: bold;
+        line-height: 35px;
+        color: white;
+        vertical-align: middle;
+    }
+
+    .navigate ul li div span {
+        line-height: 35px;
+        vertical-align: middle;
+    }
+
+    .navigate > ul > li > ul > li {
+        border-bottom: 1px solid #3e4148;
+    }
+
+    .navigate > ul > li > ul > li > div > span {
+        color: white;
     }
 
     .navigate > ul > li > ul > li:hover {
-        background-color: #eeeeee;
+        background-color: #333640;
         cursor: default;
     }
 
@@ -213,7 +224,7 @@
     .navigate div {
         display: block;
         cursor: pointer;
-        height: 30px;
+        height: 35px;
     }
 
     .navigate div.active {

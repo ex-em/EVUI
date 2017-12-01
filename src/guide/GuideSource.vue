@@ -51,14 +51,14 @@
                             value: ''
                         },
                         javascript: {
-//              theme: 'ace/theme/monokai',
+//                            theme: 'ace/theme/monokai',
                             theme: 'ace/theme/textmate',
                             mode: 'ace/mode/javascript',
                             readOnly: true,
                             value: ''
                         },
                         css: {
-//              theme: 'ace/theme/monokai',
+//                            theme: 'ace/theme/monokai',
                             theme: 'ace/theme/textmate',
                             mode: 'ace/mode/javascript',
                             readOnly: true,
@@ -69,71 +69,73 @@
             }
         },
         data() {
-        return {
-            active: 'default',
-            tabList: ['HTML', 'JAVASCRIPT', 'CSS'],
-            editor: null,
-            result: ''
-        }
-    },
-    watch: {
-        $route: function () {
-            this.refreshEditor();
-        }
-    },
-    methods: {
-        refreshEditor() {
-            if(this.fileList[this.contentName]){
-                this.editorInfo.html.value = this.fileList[this.contentName].template;
-                this.editorInfo.javascript.value = this.fileList[this.contentName].script;
-                this.editorInfo.css.value = this.fileList[this.contentName].style;
-            }
-            this.tabChange();
-        },
-        /**
-         * settings after change tab
-         * @param {string} name - Tab Title
-         */
-        tabChange(name) {
-            this.active = name || 'HTML';
-
-            switch (this.active) {
-                case 'HTML'      : this.setEditor(this.editorInfo.html); break;
-                case 'JAVASCRIPT': this.setEditor(this.editorInfo.javascript); break;
-                case 'CSS'       : this.setEditor(this.editorInfo.css); break;
-                default: break;
+            return {
+                active: 'default',
+                tabList: ['HTML', 'JAVASCRIPT', 'CSS'],
+                editor: null,
+                result: ''
             }
         },
-        setEditor(paramObj) {
-            var defaultObj = {
-                theme: 'ace/theme/textmate',
-                mode: 'ace/mode/javascript',
-                readOnly: true,
-                value: ''
-            };
-
-            Object.assign( defaultObj, paramObj );
-
-            this.editor.setTheme(defaultObj.theme);
-            this.editor.getSession().setMode(defaultObj.mode);
-            this.editor.setReadOnly(defaultObj.readOnly);
-            this.editor.setValue(defaultObj.value);
+        watch: {
+            $route: function () {
+                this.refreshEditor();
+            }
         },
-        tryIt() {
-            document.getElementById('resultForm').submit();
+        methods: {
+            refreshEditor() {
+                if(this.fileList[this.contentName]){
+                    this.editorInfo.html.value = this.fileList[this.contentName].template;
+                    this.editorInfo.javascript.value = this.fileList[this.contentName].script;
+                    this.editorInfo.css.value = this.fileList[this.contentName].style;
+                }
+                this.tabChange();
+            },
+            /**
+             * settings after change tab
+             * @param {string} name - Tab Title
+             */
+            tabChange(name) {
+                this.active = name || 'HTML';
+
+                switch (this.active) {
+                    case 'HTML'      : this.setEditor(this.editorInfo.html); break;
+                    case 'JAVASCRIPT': this.setEditor(this.editorInfo.javascript); break;
+                    case 'CSS'       : this.setEditor(this.editorInfo.css); break;
+                    default: break;
+                }
+            },
+            setEditor(paramObj) {
+                var defaultObj = {
+                    theme: 'ace/theme/textmate',
+                    mode: 'ace/mode/javascript',
+                    readOnly: true,
+                    value: ''
+                };
+
+                Object.assign( defaultObj, paramObj );
+
+                this.editor.setTheme(defaultObj.theme);
+                this.editor.getSession().setMode(defaultObj.mode);
+                this.editor.setReadOnly(defaultObj.readOnly);
+                this.editor.setValue(defaultObj.value);
+
+                this.editor.clearSelection(); // editor의 selection 없애기
+            },
+            tryIt() {
+                document.getElementById('resultForm').submit();
+            }
+        },
+        mounted() {
+            var ace = require('brace');
+            require('brace/mode/javascript');
+            require('brace/theme/monokai');
+
+            this.editor = ace.edit('editor');
+            this.editor.$blockScrolling = Infinity; // ace.js 현재버전에서 warning 문제 해결을 위함
+            this.editor.setShowPrintMargin(false); // editor의 vertical line 숨기기
+
+            this.$root.$eventBus.$on('update', this.refreshEditor);
         }
-    },
-    mounted() {
-        var ace = require('brace');
-        require('brace/mode/javascript');
-        require('brace/theme/monokai');
-
-        this.editor = ace.edit('editor');
-        this.editor.$blockScrolling = Infinity; // ace.js 현재버전에서 warning 문제 해결을 위함
-        this.editor.setShowPrintMargin(false); // editor의 vertical line 숨기기
-
-        this.$root.$eventBus.$on('update', this.refreshEditor);
-    }
     }
 </script>
 

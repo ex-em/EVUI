@@ -64,8 +64,8 @@
              */
             dataIndex: {
                 type: String,
-                require: true,
-                default: null,
+                required: true,
+                default: null
             },
             /**
              * Column에 들어갈 문자열 입니다.
