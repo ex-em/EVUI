@@ -19,69 +19,6 @@
             </ul>
         </div>
 
-        <div class="summary-list">
-            <div class="summary-title">
-                <div class="summary-title-name"><div>Example List</div></div>
-            </div>
-
-            <ul class="summary-box-ul">
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-                <li class="summary-box-li">
-                    <div class="summary-box-image">
-                        <img src="/src/images/logo.png" alt="logo">
-                    </div>
-                    <h3>LOGO</h3>
-                </li>
-            </ul>
-        </div>
-
     </div>
 </template>
 
@@ -129,6 +66,7 @@
                         if(storeItem.children) {
                             // 동적 바인딩을 하기위해 $set 사용
                             this.$set(this.summaryBoxItems[i], 'openToggle', false);
+
                             // 정적으로 해주기위해 hard setting
                             for(j = 0; j < storeItem.children.length; j++) {
                                 name = storeItem.children[j].fileName;
