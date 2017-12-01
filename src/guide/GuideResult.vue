@@ -10,16 +10,16 @@
 </template>
 
 <script>
-    import ColumnOrder from './components/ColumnFilter.vue';
-    import ColumnVisible from './components/ColumnVisible.vue';
-    import ColumnResize from './components/ColumnResize.vue';
-    import ColumnMove from './components/ColumnMove.vue';
-    import ColumnFilter from './components/ColumnFilter.vue';
-    import ContentA from './components/ContentA.vue';
-    import ContentB from './components/ContentB.vue';
-    import DocumentA from './components/DocumentA.vue';
-    import DocumentB from './components/DocumentB.vue';
+    import GridColumnOrder from './components/GridColumnOrder.vue';
+    import GridColumnVisible from './components/GridColumnVisible.vue';
+    import GridColumnResize from './components/GridColumnResize.vue';
+    import GridColumnMove from './components/GridColumnMove.vue';
+    import GridColumnFilter from './components/GridColumnFilter.vue';
 
+//    import TreeColumnVisible from './components/TreeColumnVisible.vue';
+    import TreeColumnResize from './components/TreeColumnResize.vue';
+//    import TreeColumnMove from './components/TreeColumnMove.vue';
+//    import TreeColumnFilter from './components/TreeColumnFilter.vue';
     export default {
         props: {
             fileList: Object,
@@ -29,15 +29,16 @@
             }
         },
         components: {
-            ColumnOrder,
-            ColumnVisible,
-            ColumnResize,
-            ColumnMove,
-            ColumnFilter,
-            ContentA,
-            ContentB,
-            DocumentA,
-            DocumentB
+            GridColumnOrder,
+            GridColumnVisible,
+            GridColumnResize,
+            GridColumnMove,
+            GridColumnFilter,
+
+//            TreeColumnVisible,
+            TreeColumnResize,
+//            TreeColumnMove,
+//            TreeColumnFilter
         },
         data() {
             return {

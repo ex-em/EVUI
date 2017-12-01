@@ -1,6 +1,6 @@
 <template>
     <grid :title="'EVUI-Grid-Title'"
-          :width="700"
+          :width="750"
           :height="300"
           :useColumnResize="false"
           :columns="gridColumns"
@@ -49,9 +49,9 @@
 
             return {
                 gridColumns: [
-                    {dataIndex: 'checked', name: 'column2' , useOrder:false, draggable: false, width: 20,  visible: false, type: 'number', cellrender: 'checkbox'},
+                    {dataIndex: 'checked', name: 'column2' , useOrder:true, draggable: false, width: 20,  visible: false, type: 'number', cellrender: 'checkbox'},
                     {dataIndex: 'col1', name: 'column1'    , useOrder:true, draggable: false, width: 150, visible: true, type: 'string', cellrender: 'textbox'},
-                    {dataIndex: 'col2', name: 'column2'    , useOrder:true, draggable: false, width: 200, visible: false, type: 'number', cellrender: 'spinner'},
+                    {dataIndex: 'col2', name: 'column2'    , useOrder:true, draggable: false, width: 150, visible: true, type: 'number', cellrender: 'spinner'},
                     {dataIndex: 'col3', name: 'column3'    , useOrder:true, draggable: false, width: 150, visible: true, type: 'string', cellrender: 'selectbox'},
                     {dataIndex: 'col4', name: 'column4'    , useOrder:true, draggable: false, width: 150, visible: true, type: 'string'},
                     {dataIndex: 'col5', name: 'column5'    , useOrder:false, draggable: false, width: 150, visible: true, type: 'string'},

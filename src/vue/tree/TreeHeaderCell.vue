@@ -67,7 +67,14 @@
                 default: true,
             },
             /**
-             * Column의 Filter 기능 사용 여부입니다.
+             * Column의 Resize 기능 사용 여부 입니다.
+             */
+            useResize: {
+                type: Boolean,
+                default : true
+            },
+            /**
+             * Column의 Filter 기능 사용 여부 입니다.
              */
             useFilter: {
                 type: Boolean,

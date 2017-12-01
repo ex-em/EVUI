@@ -1,6 +1,6 @@
 <template>
     <grid :title="'EVUI-Grid-Title'"
-          :width="700"
+          :width="750"
           :height="300"
           :useColumnResize="true"
           :columns="gridColumns"
@@ -49,15 +49,15 @@
 
             return {
                 gridColumns: [
-                    {dataIndex: 'checked', name: 'column2' , draggable: false, width: 20,  visible: false, type: 'number', cellrender: 'checkbox'},
-                    {dataIndex: 'col1', name: 'column1'    , draggable: false, width: 150, visible: true, type: 'string', cellrender: 'textbox'},
-                    {dataIndex: 'col2', name: 'column2'    , draggable: false, width: 200, visible: false, type: 'number', cellrender: 'spinner'},
-                    {dataIndex: 'col3', name: 'column3'    , draggable: false, width: 150, visible: true, type: 'string', cellrender: 'selectbox'},
-                    {dataIndex: 'col4', name: 'column4'    , draggable: false, width: 150, visible: true, type: 'string'},
-                    {dataIndex: 'col5', name: 'column5'    , draggable: false, width: 150, visible: true, type: 'string'},
-                    {dataIndex: 'col6', name: 'column6'    , draggable: false, width: 150, visible: true, type: 'string'},
-                    {dataIndex: 'col7', name: 'column7'    , draggable: false, width: 150, visible: true, type: 'string'},
-                    {dataIndex: 'col8', name: 'column8'    , draggable: false, width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'checked', name: 'column2' , draggable: false, width: 20, visible: true, type: 'number', cellrender: 'checkbox'},
+                    {dataIndex: 'col1', name: 'column1'    , draggable: true, width: 150, visible: true, type: 'string', cellrender: 'textbox'},
+                    {dataIndex: 'col2', name: 'column2'    , draggable: true, width: 150, visible: true, type: 'number', cellrender: 'spinner'},
+                    {dataIndex: 'col3', name: 'column3'    , draggable: true, width: 150, visible: true, type: 'string', cellrender: 'selectbox'},
+                    {dataIndex: 'col4', name: 'column4'    , draggable: true, width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col5', name: 'column5'    , draggable: true, width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col6', name: 'column6'    , draggable: true, width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col7', name: 'column7'    , draggable: true, width: 150, visible: true, type: 'string'},
+                    {dataIndex: 'col8', name: 'column8'    , draggable: true, width: 150, visible: true, type: 'string'},
                 ],
                 rowData : tempData
             }

@@ -30,53 +30,64 @@
             return {
                 storeItem: [
                     {
-                        name: 'Content',
+                        name: 'Grid',
                         children: [
                             {
                                 name: 'Column Order',
-                                fileName: 'ColumnOrder',
+                                fileName: 'GridColumnOrder',
                                 content: 'Column Order Option'
                             },
                             {
                                 name: 'Column Visible',
-                                fileName: 'ColumnVisible',
+                                fileName: 'GridColumnVisible',
                                 content: 'Column Visible Option'
                             },
                             {
                                 name: 'Column Resize',
-                                fileName: 'ColumnResize',
+                                fileName: 'GridColumnResize',
                                 content: 'Column Resize Option'
                             },
                             {
                                 name: 'Column Move',
-                                fileName: 'ColumnMove',
+                                fileName: 'GridColumnMove',
                                 content: 'Column Move Option'
                             },
                             {
                                 name: 'Column Filter',
-                                fileName: 'ColumnFilter',
+                                fileName: 'GridColumnFilter',
                                 content: 'Column Filter Option'
                             }
                         ],
                     },
                     {
-                        name: 'Document',
+                        name: 'Tree',
                         children: [
+//                            {
+//                                name: 'Column Visible',
+//                                fileName: 'TreeColumnVisible',
+//                                content: 'Column Visible Option'
+//                            },
                             {
-                                name: 'DocumentA',
-                                fileName: 'DocumentA',
-                                content: 'DocumentA is Simple Document Component'
-                            },
-                            {
-                                name: 'DocumentB',
-                                fileName: 'DocumentB',
-                                content: 'DocumentB is Complicated Document Component'
-                            },
+                                name: 'Column Resize',
+                                fileName: 'TreeColumnResize',
+                                content: 'Column Resize Option'
+                            }
+//                            {
+//                                name: 'Column Move',
+//                                fileName: 'TreeColumnMove',
+//                                content: 'Column Move Option'
+//                            },
+//                            {
+//                                name: 'Column Filter',
+//                                fileName: 'TreeColumnFilter',
+//                                content: 'Column Filter Option'
+//                            }
                         ],
-                    },
-                    {
-                        name: 'Test'
                     }
+//                    ,
+//                    {
+//                        name: 'Chart'
+//                    }
                 ],
             }
         },
@@ -213,7 +224,7 @@
     }
 
     .navigate > ul > li > ul > li:hover {
-        background-color: #333640;
+        background-color: #0095eb;
         cursor: default;
     }
 
