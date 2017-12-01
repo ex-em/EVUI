@@ -9,7 +9,7 @@
             </div>
 
             <ul class="summary-box-ul" v-show="item.children">
-                <li class="summary-box-li" v-for="subItem in item.children" @click.stop="toMove(subItem.name)">
+                <li class="summary-box-li" v-for="subItem in item.children" @click.stop="toMove(subItem.fileName)">
                     <div class="summary-box-image">
                         <img v-bind:src="subItem.imgSrc" onerror="this.src='/src/images/summary/noImage.png';" alt="logo">
                     </div>
@@ -131,7 +131,7 @@
                             this.$set(this.summaryBoxItems[i], 'openToggle', false);
                             // 정적으로 해주기위해 hard setting
                             for(j = 0; j < storeItem.children.length; j++) {
-                                name = storeItem.children[j].name;
+                                name = storeItem.children[j].fileName;
                                 storeItem.children[j].imgSrc = imgRootUrl + name + imgExtention;
                             }
                         }
