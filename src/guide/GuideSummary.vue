@@ -9,7 +9,7 @@
             </div>
 
             <ul class="summary-box-ul" v-show="item.children">
-                <li class="summary-box-li" v-for="subItem in item.children" @click.stop="toMove(subItem.fileName)">
+                <li class="summary-box-li" v-for="subItem in item.children" @click.stop="goMove(subItem.fileName)">
                     <div class="summary-box-image">
                         <img v-bind:src="subItem.imgSrc" onerror="this.src='/src/images/summary/noImage.png';" alt="logo">
                     </div>
@@ -48,13 +48,33 @@
             changeActive: function(index) {
                 this.summaryBoxItems[index].openToggle = !this.summaryBoxItems[index].openToggle;
             },
-            toMove: function(name) {
+            goMove: function(name) {
                 this.$router.push({
                     path: '/guide/' + name,
                     params: {
                         contentName: name
                     }
                 });
+
+                const baseURI = `../../static/`;
+                const fileExtension = `txt`;
+                var vm = this.$parent.$parent;
+                var fileName = name;
+
+                if(this.$parent.$parent.vueFileList[fileName]){
+                    vm.$root.$eventBus.$emit('update');
+                    return;
+                }
+
+                this.$http.get(`${baseURI}${fileName}.${fileExtension}`)
+
+                    .then((result) => {
+                        let tmpObj = vm.codeParser(result.data);
+                        if(tmpObj){
+                            vm.$set(vm.vueFileList, fileName, tmpObj);
+                            vm.$root.$eventBus.$emit('update');
+                        }
+                    }, (err) => {});
             },
             initSummaryBoxItems: function() {
                 if(this.summaryBoxItems) {
