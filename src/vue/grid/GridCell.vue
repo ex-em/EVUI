@@ -1,8 +1,8 @@
 <template>
     <td v-if="visible"
         class="evui-grid-cell-wrap"
-        @click="onClick()"
-        @dblclick="onDblClick()"
+        @click="onClick"
+        @dblclick="onDblClick"
     >
         <div v-if="readOnly || cellRender == null || cellRender == ''"
              :style="{width:width+'px'}"
@@ -162,13 +162,13 @@
             },
         },
         methods: {
-            onClick() {
+            onClick(e) {
                 this.isClicked = true;
-                this.$emit('cellClick', this.cellValue);
+                this.$emit('cellClick', this.cellValue,e);
             },
-            onDblClick() {
+            onDblClick(e) {
                 this.isClicked = true;
-                this.$emit('cellDblClick', this.cellValue);
+                this.$emit('cellDblClick', this.cellValue,e);
             },
             onBlur(value) {
                 this.isClicked = false;
@@ -202,13 +202,6 @@
                         return '';
                 }
             }
-        },
-
-        mounted() {
-
-        },
-        created() {
-
         }
     };
 
