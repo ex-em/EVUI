@@ -1,13 +1,11 @@
 <template>
     <tree
         :title="'tree-test-title'"
-        :width="900"
+        :width="750"
         :height="300"
-        :useCheckbox="true"
         :treeColumnId="'class_name'"
-        :useColumnResize="true"
+        :useColumnResize="false"
         :useFilter="false"
-
         :columns="treeColumns"
         :rows="treeData">
     </tree>
@@ -19,7 +17,7 @@
         data () {
             let tempData = [];
 
-            for (let ix = 1; ix <= 2000; ix++) {
+            for (let ix = 1; ix <= 500; ix++) {
                 tempData[ix] = {
                     'id' : ix,
                     'data' : {
@@ -52,20 +50,11 @@
             return {
                 // tree option & tree node data
                 // first column set tree level
-                treeInfo: {
-                    title : 'tree-test-title',
-                    width : 900,   // number or '%' (percent)
-                    height : 300,    // number or '%' (percent)
-                    treeColumnId: 'class_name',
-                    useColumnResize: true,
-                    useCheckBox: true,
-                    useFilter: false
-                },
                 treeColumns: [
-                    {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: true, visible: true},
-                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: true, visible: true},
-                    {id: 'col3', dataIndex: 'elapse_time', name: '수행시간', width: 150, draggable: true, visible: true},
-                    {id: 'col4', dataIndex: 'exec_count',  name: '수행건수', width: 120, draggable: true, visible: true}
+                    {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: false, visible: true},
+                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: false, visible: false},
+                    {id: 'col3', dataIndex: 'elapse_time', name: '수행시간', width: 150, draggable: false, visible: true},
+                    {id: 'col4', dataIndex: 'exec_count',  name: '수행건수', width: 120, draggable: false, visible: true}
                 ],
                 treeData : tempData
             }

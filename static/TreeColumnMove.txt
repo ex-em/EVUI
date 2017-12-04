@@ -1,13 +1,11 @@
 <template>
     <tree
         :title="'tree-test-title'"
-        :width="900"
+        :width="750"
         :height="300"
-        :useCheckbox="true"
         :treeColumnId="'class_name'"
         :useColumnResize="true"
         :useFilter="false"
-
         :columns="treeColumns"
         :rows="treeData">
     </tree>
@@ -19,7 +17,7 @@
         data () {
             let tempData = [];
 
-            for (let ix = 1; ix <= 2000; ix++) {
+            for (let ix = 1; ix <= 500; ix++) {
                 tempData[ix] = {
                     'id' : ix,
                     'data' : {
@@ -52,15 +50,6 @@
             return {
                 // tree option & tree node data
                 // first column set tree level
-                treeInfo: {
-                    title : 'tree-test-title',
-                    width : 900,   // number or '%' (percent)
-                    height : 300,    // number or '%' (percent)
-                    treeColumnId: 'class_name',
-                    useColumnResize: true,
-                    useCheckBox: true,
-                    useFilter: false
-                },
                 treeColumns: [
                     {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: true, visible: true},
                     {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: true, visible: true},

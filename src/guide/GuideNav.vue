@@ -62,27 +62,27 @@
                     {
                         name: 'Tree',
                         children: [
-//                            {
-//                                name: 'Column Visible',
-//                                fileName: 'TreeColumnVisible',
-//                                content: 'Column Visible Option'
-//                            },
+                            {
+                                name: 'Column Visible',
+                                fileName: 'TreeColumnVisible',
+                                content: 'Column Visible Option'
+                            },
                             {
                                 name: 'Column Resize',
                                 fileName: 'TreeColumnResize',
                                 content: 'Column Resize Option'
+                            },
+                            {
+                                name: 'Column Move',
+                                fileName: 'TreeColumnMove',
+                                content: 'Column Move Option'
                             }
-//                            {
-//                                name: 'Column Move',
-//                                fileName: 'TreeColumnMove',
-//                                content: 'Column Move Option'
-//                            },
 //                            {
 //                                name: 'Column Filter',
 //                                fileName: 'TreeColumnFilter',
 //                                content: 'Column Filter Option'
 //                            }
-                        ],
+                        ]
                     }
 //                    ,
 //                    {

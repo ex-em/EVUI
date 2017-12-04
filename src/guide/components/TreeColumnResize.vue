@@ -3,7 +3,6 @@
         :title="'tree-test-title'"
         :width="750"
         :height="300"
-        :useCheckbox="true"
         :treeColumnId="'class_name'"
         :useColumnResize="true"
         :useFilter="false"
@@ -18,7 +17,7 @@
         data () {
             let tempData = [];
 
-            for (let ix = 1; ix <= 2000; ix++) {
+            for (let ix = 1; ix <= 500; ix++) {
                 tempData[ix] = {
                     'id' : ix,
                     'data' : {
