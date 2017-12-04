@@ -283,7 +283,7 @@ export default {
                 top = Math.max(0, top);
                 bottom = Math.min(th / rowHeight, bottom);
 
-                console.log('TOP --> ', top, 'Bottom --> ', bottom);
+                // console.log('TOP --> ', top, 'Bottom --> ', bottom);
 
                 this.scroll.top = top;
                 this.scroll.bottom = bottom;

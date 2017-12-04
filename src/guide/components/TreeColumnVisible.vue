@@ -3,7 +3,6 @@
         :title="'tree-test-title'"
         :width="750"
         :height="300"
-        :useCheckbox="true"
         :treeColumnId="'class_name'"
         :useColumnResize="false"
         :useFilter="false"
@@ -53,7 +52,7 @@
                 // first column set tree level
                 treeColumns: [
                     {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: false, visible: true},
-                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: false, visible: true},
+                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: false, visible: false},
                     {id: 'col3', dataIndex: 'elapse_time', name: '수행시간', width: 150, draggable: false, visible: true},
                     {id: 'col4', dataIndex: 'exec_count',  name: '수행건수', width: 120, draggable: false, visible: true}
                 ],

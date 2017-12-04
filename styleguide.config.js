@@ -22,6 +22,16 @@ module.exports = {
         {
             // content: 'README.md'
         },
+        {
+            name: 'Chart',
+            content: '',
+            components: function(){
+                return['src/forDocs/EvuiChart.vue',
+                    'src/forDocs/EvuiChartBar.vue',
+                    'src/forDocs/EvuiChartLine.vue',
+                    'src/forDocs/EvuiChartPie.vue']
+            }
+        },
         /*{
             name: 'Components',
             content: '',

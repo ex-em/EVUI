@@ -35,42 +35,42 @@
                             {
                                 name: 'Column Order',
                                 fileName: 'GridColumnOrder',
-                                content: 'Column Order Option'
+                                content: '선택한 컬럼을 기준으로 오름차순/내림차순 정렬 기능을 제공합니다.'
                             },
                             {
                                 name: 'Column Visible',
                                 fileName: 'GridColumnVisible',
-                                content: 'Column Visible Option'
+                                content: '컬럼 별 show/hide 기능을 제공합니다.'
                             },
                             {
                                 name: 'Column Resize',
                                 fileName: 'GridColumnResize',
-                                content: 'Column Resize Option'
+                                content: '컬럼의 넓이를 변경할 수 있는 기능을 제공합니다.'
                             },
                             {
                                 name: 'Column Move',
                                 fileName: 'GridColumnMove',
-                                content: 'Column Move Option'
+                                content: '컬럼 간의 위치를 이동할 수 있는 기능을 제공합니다.'
                             },
                             {
                                 name: 'Column Filter',
                                 fileName: 'GridColumnFilter',
-                                content: 'Column Filter Option'
+                                content: '컬럼 별 Filter 기능을 제공합니다.'
                             }
                         ],
                     },
                     {
                         name: 'Tree',
                         children: [
-//                            {
-//                                name: 'Column Visible',
-//                                fileName: 'TreeColumnVisible',
-//                                content: 'Column Visible Option'
-//                            },
+                            {
+                                name: 'Column Visible',
+                                fileName: 'TreeColumnVisible',
+                                content: '컬럼 별 show/hide 기능을 제공합니다.'
+                            },
                             {
                                 name: 'Column Resize',
                                 fileName: 'TreeColumnResize',
-                                content: 'Column Resize Option'
+                                content: '컬럼의 넓이를 변경할 수 있는 기능을 제공합니다.'
                             }
 //                            {
 //                                name: 'Column Move',
@@ -119,7 +119,7 @@
                             }
                         ]
                     }
-                ],
+                ]
             }
         },
         methods: {

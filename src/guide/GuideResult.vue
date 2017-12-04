@@ -16,7 +16,7 @@
     import GridColumnMove from './components/GridColumnMove.vue';
     import GridColumnFilter from './components/GridColumnFilter.vue';
 
-//    import TreeColumnVisible from './components/TreeColumnVisible.vue';
+    import TreeColumnVisible from './components/TreeColumnVisible.vue';
     import TreeColumnResize from './components/TreeColumnResize.vue';
 //    import TreeColumnMove from './components/TreeColumnMove.vue';
 //    import TreeColumnFilter from './components/TreeColumnFilter.vue';
@@ -43,9 +43,9 @@
             GridColumnMove,
             GridColumnFilter,
 
-//            TreeColumnVisible,
+            TreeColumnVisible,
             TreeColumnResize,
-//            TreeColumnMove,
+//            TreeColumnMove
 //            TreeColumnFilter
             ChartLine,
             ChartScatter,
