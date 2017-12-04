@@ -18,7 +18,7 @@
 
     import TreeColumnVisible from './components/TreeColumnVisible.vue';
     import TreeColumnResize from './components/TreeColumnResize.vue';
-    import TreeColumnMove from './components/TreeColumnMove.vue';
+//    import TreeColumnMove from './components/TreeColumnMove.vue';
 //    import TreeColumnFilter from './components/TreeColumnFilter.vue';
     export default {
         props: {
@@ -37,7 +37,7 @@
 
             TreeColumnVisible,
             TreeColumnResize,
-            TreeColumnMove
+//            TreeColumnMove
 //            TreeColumnFilter
         },
         data() {
