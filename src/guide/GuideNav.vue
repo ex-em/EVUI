@@ -83,15 +83,44 @@
 //                                content: 'Column Filter Option'
 //                            }
                         ],
+                    },
+                    {
+                        name: 'Chart',
+                        children: [
+                            {
+                                name: 'Line Chart',
+                                fileName: 'ChartLine',
+                                content: 'DocumentA is Simple Document Component'
+                            },
+                            {
+                                name: 'Scatter Chart',
+                                fileName: 'ChartScatter',
+                                content: 'DocumentB is Complicated Document Component'
+                            },
+                            {
+                                name: 'Bar Chart',
+                                fileName: 'ChartBar',
+                                content: 'DocumentB is Complicated Document Component'
+                            },
+                            {
+                                name: 'Stack Bar Chart',
+                                fileName: 'ChartStackBar',
+                                content: 'DocumentB is Complicated Document Component'
+                            },
+                            {
+                                name: 'Order Bar Chart',
+                                fileName: 'ChartOrderBar',
+                                content: 'DocumentB is Complicated Document Component'
+                            },
+                            {
+                                name: 'Pie Chart',
+                                fileName: 'ChartPie',
+                                content: 'DocumentB is Complicated Document Component'
+                            }
+                        ]
                     }
-//                    ,
-//                    {
-//                        name: 'Chart'
-//                    }
                 ],
             }
-        },
-        computed: {
         },
         methods: {
             toMove: function (name) {
