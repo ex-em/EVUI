@@ -90,32 +90,32 @@
                             {
                                 name: 'Line Chart',
                                 fileName: 'ChartLine',
-                                content: 'DocumentA is Simple Document Component'
+                                content: '꺽은 선형 차트는 일정한 시간의 흐름이나 간격으로 연속적 데이터를 표현합니다.'
                             },
                             {
                                 name: 'Scatter Chart',
                                 fileName: 'ChartScatter',
-                                content: 'DocumentB is Complicated Document Component'
+                                content: '분산형 차트는 데이터 집합 간의 유사점 및 차이를 표현합니다.'
                             },
                             {
                                 name: 'Bar Chart',
                                 fileName: 'ChartBar',
-                                content: 'DocumentB is Complicated Document Component'
+                                content: '세로 막대형 차트는 개별 데이터 값을 시간의 흐름이나 여러 범주의 추세를 표현합니다. '
                             },
                             {
                                 name: 'Stack Bar Chart',
                                 fileName: 'ChartStackBar',
-                                content: 'DocumentB is Complicated Document Component'
+                                content: '누적 세로 막대형 차트는 데이터의 합계를 표현합니다.'
                             },
                             {
-                                name: 'Order Bar Chart',
+                                name: 'Column Bar Chart',
                                 fileName: 'ChartOrderBar',
-                                content: 'DocumentB is Complicated Document Component'
+                                content: '묶은 세로 막대형 차트는 여러 데이터 계열를 한 범주에 묶어 표현합니다.'
                             },
                             {
                                 name: 'Pie Chart',
                                 fileName: 'ChartPie',
-                                content: 'DocumentB is Complicated Document Component'
+                                content: '원형 차트는 각 값이 합계에서 차지하는 비율을 표현합니다.'
                             }
                         ]
                     }

@@ -21,7 +21,7 @@
                 },
                 option : {
                     type: 'Bar',
-                    width: '400px',
+                    width: '500px',
                     height: '400px',
                     isHorizontalBar: true,
                     seriesBarDistance: 10,
