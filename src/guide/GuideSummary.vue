@@ -111,7 +111,7 @@
 
 <style scoped>
     .guide-summary{
-        padding: 20px;
+        padding: 12px;
     }
     .summary-list{
         margin-top: 10px;

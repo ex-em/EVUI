@@ -20,6 +20,14 @@
     import TreeColumnResize from './components/TreeColumnResize.vue';
 //    import TreeColumnMove from './components/TreeColumnMove.vue';
 //    import TreeColumnFilter from './components/TreeColumnFilter.vue';
+
+    import ChartLine from './components/ChartLine.vue';
+    import ChartScatter from './components/ChartScatter.vue';
+    import ChartBar from './components/ChartBar.vue';
+    import ChartStackBar from './components/ChartStackBar.vue';
+    import ChartOrderBar from './components/ChartOrderBar.vue';
+    import ChartPie from './components/ChartPie.vue';
+
     export default {
         props: {
             fileList: Object,
@@ -39,6 +47,12 @@
             TreeColumnResize,
 //            TreeColumnMove
 //            TreeColumnFilter
+            ChartLine,
+            ChartScatter,
+            ChartBar,
+            ChartStackBar,
+            ChartOrderBar,
+            ChartPie
         },
         data() {
             return {

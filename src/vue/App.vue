@@ -39,9 +39,21 @@
 </script>
 
 <style>
+    * {
+        box-sizing: border-box;
+    }
     /* Reset */
     body {
+        position: absolute;
+        width: 100%;
+        height:100%;
         margin: 0;
+    }
+
+    #app {
+        position: absolute;
+        width: 100%;
+        height:100%;
     }
 
     /* Top Navigation Div */
@@ -136,8 +148,10 @@
 
     /* Contents */
     #main-content {
+        position: relative;
         width : 100%;
-        margin-top : 70px;
+        height: 100%;
+        padding-top: 70px;
         background-color : #fff;
         color : #000;
     }
