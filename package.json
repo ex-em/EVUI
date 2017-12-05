@@ -1,9 +1,9 @@
 {
   "name": "evui",
   "description": "EXEM Visualization UI Framework",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "EXEM (evui@ex-em.com)",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --progress --config build/webpack.dev.conf.js",

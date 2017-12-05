@@ -7,7 +7,7 @@ Simply run `npm install evui --save`
 Or if you want to use it directly in the browser add
 
 ```html
-<script src="https://unpkg.com/evui@0.1.2/dist/evui.js"></script>
+<script src="https://unpkg.com/evui@0.1.4/dist/evui.js"></script>
 ```
 
 ### Browser
@@ -21,25 +21,23 @@ You can then simply use it your app:
 <head>   
     <meta charset="UTF-8">
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script type="https://unpkg.com/evui@0.1.2/dist/evui.js"></script>
+    <script type="https://unpkg.com/evui@0.1.4/dist/evui.js"></script>
     
     <title>EVUI</title>
 </head>
 <body>
     <div id="evui">
-        <grid :gridInfo="gridInfo"
+        <grid :width="800"
+              :height="300"
+              :useColumnResize="false"
               :columns="gridColumns"
-            :data="rowData">
+              :data="rowData">
         </grid>
     <div>
     <script type="text/javascript">
       new Vue({
         el: '#evui',
         data: {
-          gridInfo: {
-            width : 800,
-            height : 300,
-          },
           gridColumns: [
             {dataIndex: 'col1', name: 'column1', width: 300, visible: true, type: 'string', render: 'text'},
             {dataIndex: 'col2', name: 'column2', width: 200, visible: true, type: 'string', render: 'text'},
@@ -80,6 +78,7 @@ Vue.use(evui)
   <grid :width="800"
         :height="300"
         :useColumnResize="true"
+        :treeColumnId="'col1'"
         :columns="gridColumns"
         :data="rowData">
   </grid>
@@ -88,7 +87,7 @@ Vue.use(evui)
   export default {
     data () {
       return {
-        gridColumns: [
+        treeColumns: [
           {dataIndex: 'col1', name: 'column1', width: 300, visible: true, type: 'string', render: 'text'},
           {dataIndex: 'col2', name: 'column2', width: 200, visible: true, type: 'string', render: 'text'},
           {dataIndex: 'col3', name: 'column3', width: 150, visible: true, type: 'string', render: 'text'},
