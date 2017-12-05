@@ -110,30 +110,28 @@
 
 <style>
     .guide-app {
+        position: relative;
         width: 100%;
         height: 100%;
         font: normal 12px/14px Tahoma, Geneva, sans-serif;;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: #2c3e50;
-        position: absolute;
     }
 
     .guide-app .center {
         position: relative;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
+        width: 100%;
         height: 100%;
+        padding-left: 250px;
     }
 
     .center .content-area {
+        position: relative;
+        width:100%;
+        height:100%;
         padding: 0 !important;
-        position: absolute;
-        top:0px;
-        right:0px;
-        left:250px;
-        bottom:0px;
+        overflow: auto;
     }
 
     p {
