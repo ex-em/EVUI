@@ -1,16 +1,16 @@
-import Svg from "../common/Svg"
-import Util from "../common/Util"
-import StepAxis from "../common/axis/StepAxis"
-import AutoScaleAxis from "../common/axis/AutoScaleAxis"
-import BaseChart from "./BaseChart"
+import Svg from '../common/Svg';
+import Util from '../common/Util';
+import StepAxis from '../common/axis/StepAxis';
+import AutoScaleAxis from '../common/axis/AutoScaleAxis';
+import BaseChart from './BaseChart';
 
 class BarChart extends BaseChart {
 
     constructor(target, data, options) {
         let defaultOptions = {
-                isStacked: false,
-                isHorizontal: false
-            };
+            isStacked: false,
+            isHorizontal: false
+        };
 
         super(target, data, Util.extend(null, defaultOptions, options));
     }
@@ -136,7 +136,7 @@ class BarChart extends BaseChart {
             return {
                 min: min,
                 max: max
-            }
+            };
         }
 
         for (ix = 0, ixLen = data[0].length; ix < ixLen; ix++) {
@@ -157,7 +157,7 @@ class BarChart extends BaseChart {
         return {
             min: min,
             max: max
-        }
+        };
     }
 
 }

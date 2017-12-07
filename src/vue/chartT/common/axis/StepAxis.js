@@ -1,4 +1,4 @@
-import Axis from './Axis'
+import Axis from './Axis';
 
 class StepAxis extends Axis {
 

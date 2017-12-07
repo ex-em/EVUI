@@ -1,6 +1,6 @@
-import Axis from './Axis'
-import Core from '../Core'
-import { AXIS_UNITS } from '../Constant'
+import Axis from './Axis';
+import Core from '../Core';
+import { AXIS_UNITS } from '../Constant';
 
 class AutoScaleAxis extends Axis {
 

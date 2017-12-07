@@ -1,10 +1,10 @@
-import BaseChart from "./BaseChart"
-import Svg from "../common/Svg"
-import Intrpl from '../common/Interpolation'
-import Core from '../common/Core'
-import Util from '../common/Util'
-import AutoScaleAxis from "../common/axis/AutoScaleAxis";
-import FixedScaleAxis from "../common/axis/FixedScaleAxis";
+import BaseChart from './BaseChart';
+import Svg from '../common/Svg';
+import Intrpl from '../common/Interpolation';
+import Core from '../common/Core';
+import Util from '../common/Util';
+import AutoScaleAxis from '../common/axis/AutoScaleAxis';
+import FixedScaleAxis from '../common/axis/FixedScaleAxis';
 
 
 class LineChart extends BaseChart {
@@ -139,7 +139,7 @@ class LineChart extends BaseChart {
             return {
                 min: 0,
                 max: 1
-            }
+            };
         }
 
         min = data[0][0][pos];
@@ -161,7 +161,7 @@ class LineChart extends BaseChart {
         return {
             min: min || 0,
             max: max || 1
-        }
+        };
     }
 
 

@@ -1,7 +1,7 @@
-import Svg from "../common/Svg"
-import Util from "../common/Util"
-import Tooltip from "../common/Tooltip"
-import { color } from "../common/Constant"
+import Svg from '../common/Svg';
+import Util from '../common/Util';
+import Tooltip from '../common/Tooltip';
+
 
 class BaseChart {
     constructor(target, data, options) {
@@ -105,7 +105,6 @@ class BaseChart {
     createLegend(clickFn) {
         let parentElement = document.createElement('ul'),
             seriesNames = this.seriesInfo.seriesNames,
-            series = this.seriesInfo.series,
             baseElement = this.container,
             position = this.options.legend.position,
             childElement, legendBox, legendName, legendValue, className, legendColor,

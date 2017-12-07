@@ -1,7 +1,7 @@
-import Svg from "../common/Svg"
-import Util from "../common/Util"
-import BaseChart from "./BaseChart"
-import Core from '../common/Core'
+import Svg from '../common/Svg';
+import Util from '../common/Util';
+import BaseChart from './BaseChart';
+import Core from '../common/Core';
 
 class PieChart extends BaseChart {
 
@@ -81,7 +81,7 @@ class PieChart extends BaseChart {
                     position = {
                         x: center.x,
                         y: center.y
-                    }
+                    };
                 }
                 else {
                     position = Core.polarToCartesian(center.x, center.y, valueRadius, startAngle + (endAngle - startAngle) / 2);

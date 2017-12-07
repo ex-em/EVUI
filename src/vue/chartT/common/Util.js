@@ -47,9 +47,9 @@ export default {
     getDateFormat: function(dateOrg) {
         let date = new Date(dateOrg);
 
-        return String(date.getFullYear()) + "-" +
+        return String(date.getFullYear()) + '-' +
             (date.getMonth()+1 < 10 ? '0' : '') +
-            String(date.getMonth()+1) + "-" +
+            String(date.getMonth()+1) + '-' +
             (date.getDate() < 10 ? '0' : '') + String(date.getDate());
     },
 
@@ -64,8 +64,8 @@ export default {
             date = new Date(time);
         }
 
-        return (date.getHours()   < 10 ? '0' : '') + date.getHours()   + ":" +
-            (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ":" +
+        return (date.getHours()   < 10 ? '0' : '') + date.getHours()   + ':' +
+            (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + ':' +
             (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
     },
 
@@ -112,7 +112,7 @@ export default {
         let d = parseInt(h, 16) + 100,
             hex = Number(d).toString(16);
 
-        hex = "000000".substr(0, 6 - hex.length) + hex;
+        hex = '000000'.substr(0, 6 - hex.length) + hex;
 
         return '#'+hex;
     },
@@ -129,4 +129,4 @@ export default {
         }
     }
 
-}
+};

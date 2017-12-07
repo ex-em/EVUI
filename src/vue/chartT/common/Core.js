@@ -18,12 +18,12 @@ export default {
     },
 
     extend: function (target) {
-        var i, source, sourceProp;
+        let i, source, sourceProp;
         target = target || {};
 
         for (i = 1; i < arguments.length; i++) {
             source = arguments[i];
-            for (var prop in source) {
+            for (let prop in source) {
                 sourceProp = source[prop];
                 if (typeof sourceProp === 'object' && sourceProp !== null && !(sourceProp instanceof Array)) {
                     target[prop] = this.extend(target[prop], sourceProp);
@@ -50,7 +50,7 @@ export default {
 
     quantity: function(input) {
         if (typeof input === 'string') {
-            var match = (/^(\d+)\s*(.*)$/g).exec(input);
+            let match = (/^(\d+)\s*(.*)$/g).exec(input);
             return {
                 value : +match[1],
                 unit: match[2] || undefined
@@ -84,13 +84,13 @@ export default {
     },
 
     serialMap: function(arr, cb) {
-        var result = [],
+        let result = [],
             length = Math.max.apply(null, arr.map(function(e) {
                 return e.length;
             }));
 
         this.times(length).forEach(function(e, index) {
-            var args = arr.map(function(e) {
+            let args = arr.map(function(e) {
                 return e[index];
             });
 
@@ -101,7 +101,7 @@ export default {
     },
 
     roundWithPrecision: function(value, digits) {
-        var precision = Math.pow(10, digits || this.precision);
+        let precision = Math.pow(10, digits || this.precision);
         return Math.round(value * precision) / precision;
     },
 
@@ -141,13 +141,13 @@ export default {
         try {
             data = JSON.parse(data);
             data = data.data !== undefined ? data.data : data;
-        } catch(e) {}
+        }
 
         return data;
     },
 
     createSvg: function (container, width, height, className) {
-        var svg;
+        let svg;
 
         width = width || '100%';
         height = height || '100%';
@@ -176,8 +176,8 @@ export default {
     },
 
     normalizeData: function(data, reverse, multi) {
-        var labelCount;
-        var output = {
+        let labelCount;
+        let output = {
             raw: data,
             normalized: {}
         };
@@ -232,7 +232,7 @@ export default {
     reverseData: function(data) {
         data.labels.reverse();
         data.series.reverse();
-        for (var i = 0; i < data.series.length; i++) {
+        for (let i = 0; i < data.series.length; i++) {
             if(typeof(data.series[i]) === 'object' && data.series[i].data !== undefined) {
                 data.series[i].data.reverse();
             } else if(data.series[i] instanceof Array) {
@@ -262,7 +262,7 @@ export default {
             } else {
                 // We need to prepare multi value output (x and y data)
                 if(multi) {
-                    var multiValue = {};
+                    let multiValue = {};
 
                     // Single series value arrays are assumed to specify the Y-Axis value
                     // For example: [1, 2] => [{x: undefined, y: 1}, {x: undefined, y: 2}]
@@ -305,7 +305,7 @@ export default {
     },
 
     getMetaData: function(series, index) {
-        var value = series.data ? series.data[index] : series[index];
+        let value = series.data ? series.data[index] : series[index];
         return value ? value.meta : undefined;
     },
 
@@ -325,23 +325,23 @@ export default {
         // TODO: Remove workaround for deprecated global high / low config. Axis high / low configuration is preferred
         options = this.extend({}, options, dimension ? options['axis' + dimension.toUpperCase()] : {});
 
-        var highLow = {
+        let highLow = {
             high: options.high === undefined ? -Number.MAX_VALUE : +options.high,
             low: options.low === undefined ? Number.MAX_VALUE : +options.low
         };
-        var findHigh = options.high === undefined;
-        var findLow = options.low === undefined;
+        let findHigh = options.high === undefined;
+        let findLow = options.low === undefined;
 
         // Function to recursively walk through arrays and find highest and lowest number
         function recursiveHighLow(data) {
             if(data === undefined) {
                 return undefined;
             } else if(data instanceof Array) {
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     recursiveHighLow(data[i]);
                 }
             } else {
-                var value = dimension ? +data[dimension] : +data;
+                let value = dimension ? +data[dimension] : +data;
 
                 if (findHigh && value > highLow.high) {
                     highLow.high = value;
@@ -429,7 +429,7 @@ export default {
             return x * x + 1;
         }
 
-        var x1 = 2, x2 = 2, divisor;
+        let x1 = 2, x2 = 2, divisor;
         if (num % 2 === 0) {
             return 2;
         }
@@ -444,7 +444,7 @@ export default {
     },
 
     getBounds: function (axisLength, highLow, scaleMinSpace, onlyInteger) {
-        var i,
+        let i,
             optimizationCounter = 0,
             newMin,
             newMax,
@@ -463,9 +463,9 @@ export default {
 
         // Optimize scale step by checking if subdivision is possible based on horizontalGridMinSpace
         // If we are already below the scaleMinSpace value we will scale up
-        var length = this.projectLength(axisLength, bounds.step, bounds);
-        var scaleUp = length < scaleMinSpace;
-        var smallestFactor = onlyInteger ? Chartist.rho(bounds.range) : 0;
+        let length = this.projectLength(axisLength, bounds.step, bounds);
+        let scaleUp = length < scaleMinSpace;
+        let smallestFactor = onlyInteger ? Chartist.rho(bounds.range) : 0;
 
         // First check if we should only use integer steps and if step 1 is still larger than scaleMinSpace so we can use 1
         if(onlyInteger && this.projectLength(axisLength, 1, bounds) >= scaleMinSpace) {
@@ -496,7 +496,7 @@ export default {
             }
         }
 
-        var EPSILON = 2.221E-16;
+        let EPSILON = 2.221E-16;
         bounds.step = Math.max(bounds.step, EPSILON);
         function safeIncrement(value, increment) {
             // If increment is too small use *= (1+EPSILON) as a simple nextafter
@@ -519,9 +519,9 @@ export default {
         bounds.max = newMax;
         bounds.range = bounds.max - bounds.min;
 
-        var values = [];
+        let values = [];
         for (i = bounds.min; i <= bounds.max; i = safeIncrement(i, bounds.step)) {
-            var value = this.roundWithPrecision(i);
+            let value = this.roundWithPrecision(i);
             if (value !== values[values.length - 1]) {
                 values.push(value);
             }
@@ -531,7 +531,7 @@ export default {
     },
 
     polarToCartesian: function (centerX, centerY, radius, angleInDegrees) {
-        var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+        let angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
 
         return {
             x: centerX + (radius * Math.cos(angleInRadians)),
@@ -540,19 +540,19 @@ export default {
     },
 
     createChartRect: function (svg, options, fallbackPadding) {
-        var hasAxis = !!(options.axisX || options.axisY);
-        var yAxisOffset = hasAxis ? options.axisY.offset : 0;
-        var xAxisOffset = hasAxis ? options.axisX.offset : 0;
+        let hasAxis = !!(options.axisX || options.axisY);
+        let yAxisOffset = hasAxis ? options.axisY.offset : 0;
+        let xAxisOffset = hasAxis ? options.axisX.offset : 0;
         // If width or height results in invalid value (including 0) we fallback to the unitless settings or even 0
-        var width = svg.width() || this.quantity(options.width).value || 0;
-        var height = svg.height() || this.quantity(options.height).value || 0;
-        var normalizedPadding = this.normalizePadding(options.chartPadding, fallbackPadding);
+        let width = svg.width() || this.quantity(options.width).value || 0;
+        let height = svg.height() || this.quantity(options.height).value || 0;
+        let normalizedPadding = this.normalizePadding(options.chartPadding, fallbackPadding);
 
         // If settings were to small to cope with offset (legacy) and padding, we'll adjust
         width = Math.max(width, yAxisOffset + normalizedPadding.left + normalizedPadding.right);
         height = Math.max(height, xAxisOffset + normalizedPadding.top + normalizedPadding.bottom);
 
-        var chartRect = {
+        let chartRect = {
             padding: normalizedPadding,
             width: function () {
                 return this.x2 - this.x1;
@@ -589,13 +589,13 @@ export default {
     },
 
     createGrid: function(position, index, axis, offset, length, group, classes, eventEmitter) {
-        var positionalData = {};
+        let positionalData = {};
         positionalData[axis.units.pos + '1'] = position;
         positionalData[axis.units.pos + '2'] = position;
         positionalData[axis.counterUnits.pos + '1'] = offset;
         positionalData[axis.counterUnits.pos + '2'] = offset + length;
 
-        var gridElement = group.elem('line', positionalData, classes.join(' '));
+        let gridElement = group.elem('line', positionalData, classes.join(' '));
 
         // Event for grid draw
         eventEmitter.emit('draw',
@@ -610,7 +610,7 @@ export default {
     },
 
     createGridBackground: function (gridGroup, chartRect, className, eventEmitter) {
-        var gridBackground = gridGroup.elem('rect', {
+        let gridBackground = gridGroup.elem('rect', {
             x: chartRect.x1,
             y: chartRect.y2,
             width: chartRect.width(),
@@ -626,8 +626,8 @@ export default {
     },
 
     createLabel: function(position, length, index, labels, axis, axisOffset, labelOffset, group, classes, useForeignObject, eventEmitter) {
-        var labelElement;
-        var positionalData = {};
+        let labelElement;
+        let positionalData = {};
 
         positionalData[axis.units.pos] = position + labelOffset[axis.units.pos];
         positionalData[axis.counterUnits.pos] = labelOffset[axis.counterUnits.pos];
@@ -637,7 +637,7 @@ export default {
         if(useForeignObject) {
             // We need to set width and height explicitly to px as span will not expand with width and height being
             // 100% in all browsers
-            var content = document.createElement('span');
+            let content = document.createElement('span');
             content.className = classes.join(' ');
             content.setAttribute('xmlns', this.namespaces.xhtml);
             content.textContent = labels[index];
@@ -663,7 +663,7 @@ export default {
 
     getSeriesOption: function(series, options, key) {
         if(series.name && options.series && options.series[series.name]) {
-            var seriesOptions = options.series[series.name];
+            let seriesOptions = options.series[series.name];
             return seriesOptions.hasOwnProperty(key) ? seriesOptions[key] : options[key];
         } else {
             return options[key];
@@ -671,18 +671,18 @@ export default {
     },
 
     optionsProvider: function (options, responsiveOptions, eventEmitter) {
-        var baseOptions = this.extend({}, options),
+        let baseOptions = this.extend({}, options),
             currentOptions,
             mediaQueryListeners = [],
             i, self = this;
 
         function updateCurrentOptions(mediaEvent) {
-            var previousOptions = currentOptions;
+            let previousOptions = currentOptions;
             currentOptions = self.extend({}, baseOptions);
 
             if (responsiveOptions) {
                 for (i = 0; i < responsiveOptions.length; i++) {
-                    var mql = window.matchMedia(responsiveOptions[i][0]);
+                    let mql = window.matchMedia(responsiveOptions[i][0]);
                     if (mql.matches) {
                         currentOptions = self.extend(currentOptions, responsiveOptions[i][1]);
                     }
@@ -708,7 +708,7 @@ export default {
         } else if (responsiveOptions) {
 
             for (i = 0; i < responsiveOptions.length; i++) {
-                var mql = window.matchMedia(responsiveOptions[i][0]);
+                let mql = window.matchMedia(responsiveOptions[i][0]);
                 mql.addListener(updateCurrentOptions);
                 mediaQueryListeners.push(mql);
             }
@@ -725,17 +725,17 @@ export default {
     },
 
     splitIntoSegments: function(pathCoordinates, valueData, options) {
-        var defaultOptions = {
+        let defaultOptions = {
             increasingX: false,
             fillHoles: false
         };
 
         options = this.extend({}, defaultOptions, options);
 
-        var segments = [];
-        var hole = true;
+        let segments = [];
+        let hole = true;
 
-        for(var i = 0; i < pathCoordinates.length; i += 2) {
+        for(let i = 0; i < pathCoordinates.length; i += 2) {
             // If this value is a "hole" we set the hole flag
             if(this.getMultiValue(valueData[i / 2].value) === undefined) {
                 // if(valueData[i / 2].value === undefined) {

@@ -1,5 +1,5 @@
-import Svg from '../Svg'
-import { AXIS_UNITS } from '../Constant'
+import Svg from '../Svg';
+import { AXIS_UNITS } from '../Constant';
 
 class Axis {
 

@@ -1,4 +1,4 @@
-import { PATH_COMMAND } from './Constant'
+import { PATH_COMMAND } from './Constant';
 
 export default {
 
