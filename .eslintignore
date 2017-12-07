@@ -7,5 +7,9 @@
 /src/mock/**
 /src/test/**
 /src/vue/chart/**
+/src/dev.js
+/src/router.js
 /static/**
 .eslintrc.js
+docStyles.js
+styleguide.config.js
