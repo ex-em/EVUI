@@ -1,0 +1,11 @@
+/build/**
+/config/**
+/dist/**
+/src/forDocs/**
+/src/guide/**
+/src/images/**
+/src/mock/**
+/src/test/**
+/src/vue/chart/**
+/static/**
+.eslintrc.js
