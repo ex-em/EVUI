@@ -42,7 +42,7 @@ class PieChart extends BaseChart {
             center = this.center,
             radius = this.radius,
             valueRadius = radius / 2,
-            seriesElement, pathInfo, pathElement, textElement,
+            seriesElement, pathInfo, textElement,
             startPos, endPos, endAngle, position, value, color,
             ix, ixLen;
 
@@ -69,7 +69,7 @@ class PieChart extends BaseChart {
             pathInfo.push(Svg.arcElement(radius, radius, 0, endAngle - startAngle > 180, 0, startPos.x, startPos.y));
             pathInfo.push(Svg.lineElement(center.x, center.y));
 
-            pathElement = Svg.createElement(seriesElement, 'path', {
+            Svg.createElement(seriesElement, 'path', {
                 d: Svg.stringify(pathInfo),
                 class: 'slice-pie',
                 style: 'fill: ' + color

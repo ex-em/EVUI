@@ -25,6 +25,9 @@ module.exports = {
         ],
         "no-var": [
             "error"
+        ],
+        "no-constant-condition": [
+            "off"
         ]
     }
 };

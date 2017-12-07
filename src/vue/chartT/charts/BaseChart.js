@@ -359,10 +359,10 @@ class BaseChart {
             bottom: padding,
             left: padding
         } : {
-            top: typeof padding.top === 'number' ? padding.top : fallback,
-            right: typeof padding.right === 'number' ? padding.right : fallback,
-            bottom: typeof padding.bottom === 'number' ? padding.bottom : fallback,
-            left: typeof padding.left === 'number' ? padding.left : fallback
+            top: padding.top,
+            right: padding.right,
+            bottom: padding.bottom,
+            left: padding.left
         };
     }
 

@@ -1,3 +1,10 @@
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/interpolation.js
+ * modified by jykim
+ */
+
 import Svg from './Svg';
 
 export default {

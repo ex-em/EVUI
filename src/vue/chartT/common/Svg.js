@@ -1,3 +1,11 @@
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/svg.js
+ * chartist-js/src/scripts/svg-path.js
+ * modified by jykim
+ */
+
 import { PATH_COMMAND } from './Constant';
 
 export default {

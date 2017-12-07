@@ -1,3 +1,11 @@
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/svg-path.js
+ * chartist-js/src/scripts/axes/axis.js
+ * modified by jykim
+ */
+
 export const PATH_COMMAND = {
     m: ['x', 'y'],
     l: ['x', 'y'],

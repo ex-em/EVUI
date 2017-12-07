@@ -1,3 +1,9 @@
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/core.js
+ */
+
 export default {
 
     namespaces: {
@@ -144,35 +150,6 @@ export default {
 
 
         return data;
-    },
-
-    createSvg: function (container, width, height, className) {
-        let svg;
-
-        width = width || '100%';
-        height = height || '100%';
-
-        // Check if there is a previous SVG element in the container that contains the Chartist XML namespace and remove it
-        // Since the DOM API does not support namespaces we need to manually search the returned list http://www.w3.org/TR/selectors-api/
-        Array.prototype.slice.call(container.querySelectorAll('svg')).filter(function filterChartistSvgObjects(svg) {
-            return svg.getAttributeNS(this.namespaces.xmlns, 'ct');
-        }).forEach(function removePreviousElement(svg) {
-            container.removeChild(svg);
-        });
-
-        // Create svg object with width and height or use 100% as default
-        svg = new Chartist.Svg('svg').attr({
-            width: width,
-            height: height
-        }).addClass(className);
-
-        svg._node.style.width = width;
-        svg._node.style.height = height;
-
-        // Add the DOM node to our container
-        container.appendChild(svg._node);
-
-        return svg;
     },
 
     normalizeData: function(data, reverse, multi) {
@@ -465,7 +442,7 @@ export default {
         // If we are already below the scaleMinSpace value we will scale up
         let length = this.projectLength(axisLength, bounds.step, bounds);
         let scaleUp = length < scaleMinSpace;
-        let smallestFactor = onlyInteger ? Chartist.rho(bounds.range) : 0;
+        let smallestFactor = onlyInteger ? this.rho(bounds.range) : 0;
 
         // First check if we should only use integer steps and if step 1 is still larger than scaleMinSpace so we can use 1
         if(onlyInteger && this.projectLength(axisLength, 1, bounds) >= scaleMinSpace) {

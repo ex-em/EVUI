@@ -1,3 +1,10 @@
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/axes/auto-scale-axis.js
+ * modified by jykim
+ */
+
 import Axis from './Axis';
 import Core from '../Core';
 import { AXIS_UNITS } from '../Constant';
