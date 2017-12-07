@@ -138,10 +138,10 @@ export default {
             return this.replaceAll(result, this.escapingMap[key], key);
         }, data);
 
-        try {
-            data = JSON.parse(data);
-            data = data.data !== undefined ? data.data : data;
-        }
+
+        data = JSON.parse(data);
+        data = data.data !== undefined ? data.data : data;
+
 
         return data;
     },
@@ -190,8 +190,8 @@ export default {
         // If all elements of the normalized data array are arrays we're dealing with
         // multi series data and we need to find the largest series if they are un-even
         if (output.normalized.series.every(function(value) {
-                return value instanceof Array;
-            })) {
+            return value instanceof Array;
+        })) {
             // Getting the series with the the most elements
             labelCount = Math.max.apply(null, output.normalized.series.map(function(series) {
                 return series.length;
@@ -767,4 +767,4 @@ export default {
 
         return segments;
     },
-}
+};

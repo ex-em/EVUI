@@ -349,7 +349,7 @@ class BaseChart {
     }
 
     createTooltip($chart, options) {
-        return Tooltip.getTooltip($chart, options)
+        return Tooltip.getTooltip($chart, options);
     }
 
     getPadding(padding) {

@@ -3,7 +3,7 @@ import { PATH_COMMAND } from './Constant';
 export default {
 
     createElement: function(parent, tagName, attr, clsName) {
-        let xmlns = "http://www.w3.org/2000/svg",
+        let xmlns = 'http://www.w3.org/2000/svg',
             element;
 
         element = document.createElementNS(xmlns, tagName);
@@ -132,4 +132,4 @@ export default {
 
         return resultString;
     }
-}
+};
