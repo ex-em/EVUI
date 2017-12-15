@@ -7,7 +7,7 @@
             <div class="navbar-nav-menu navbar-navi-box">
                 <ul class="navbar-navi-outer">
                     <li>
-                        <router-link to="/guide">Guide Page</router-link>
+                        <router-link to="/guide">Demo</router-link>
                     </li>
                     <li>
                         <a href="#">Component</a>

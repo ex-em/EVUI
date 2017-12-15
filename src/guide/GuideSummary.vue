@@ -1,6 +1,6 @@
 <template>
     <div class="guide-summary">
-        <h1>Examples</h1>
+        <h1>EVUI - Demo</h1>
         {{ evuiDesc }}
 
         <div v-for="item, i in summaryBoxItems" :key="item.name">
