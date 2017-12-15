@@ -1,7 +1,7 @@
 <template>
     <div class="navigate">
         <div class="naviTitle" v-on:click="toMove('')">
-            <p>EVUI - Demo</p>
+            <p>Component</p>
         </div>
 
         <ul v-for="item in this.storeItem">
