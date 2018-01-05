@@ -9,9 +9,9 @@
         <chart :data="Bar.chartData"
                :options="Bar.chartOptions">
         </chart>
-        <!--<chart :data="StackedBar.chartData"-->
-               <!--:options="StackedBar.chartOptions">-->
-        <!--</chart>-->
+        <chart :data="StackedBar.chartData"
+               :options="StackedBar.chartOptions">
+        </chart>
         <chart :data="Pie.chartData"
                :options="Pie.chartOptions">
         </chart>
@@ -51,7 +51,7 @@
                         height: "400px",
                         isHorizontalBar: false,
                         isStacked: true,
-                        seriesBarDistance: 10,
+//                        barWidth: '10px',
                         axisX: {
 
                             showGrid: true,
@@ -69,6 +69,26 @@
                         series: [
                             [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
                             [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4]
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+//                            [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+//                            [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4]
                         ]
                     },
                     chartOptions: {
@@ -76,7 +96,7 @@
 //                        width: "800px",
                         height: "400px",
                         isHorizontalBar: false,
-                        seriesBarDistance: 10,
+//                        barWidth: '10px',
                         axisX: {
                             showGrid: true,
                             labelAlign: 'between',
