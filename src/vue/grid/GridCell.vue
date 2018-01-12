@@ -15,7 +15,7 @@
                  :style="{display:'inline-block', width:'100%', textAlign:'center'}"
             >
                 <checkbox  v-model="cellValue"
-                           @onChange="onChange"
+                           @onChange="onChange(record, $event)"
                 ></checkbox>
             </div>
             <template v-else>
@@ -111,6 +111,10 @@
                 default: 0
             },
             /**
+             *  checkChange 이벤트 발생 시 넘겨받는 Row 정보 입니다.
+             */
+            record: null,
+            /**
              * cell을 클릭하였을 때 이벤트가 발생됩니다.
              */
             cellClick: null,
@@ -178,9 +182,9 @@
             onInput(value) {
                 this.cellValue = value;
             },
-            onChange(value) {
+            onChange(record, value) {
                 if(this.cellRender == 'checkbox'){
-                    this.$emit('checkChange', this.dataIndex, value);
+                    this.$emit('checkChange', record, this.dataIndex, value);
                 }else{
                     this.$emit('cellChange', this.dataIndex, value);
                 }

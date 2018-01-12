@@ -293,7 +293,9 @@ export default {
                 this.checkedCount = 0;
             }
         },
-        onCheckChange(dataIndex, value) {
+        onCheckChange(record, dataIndex, value) {
+
+            record[dataIndex] = value;
 
             if(value){
                 this.checkedCount++;
