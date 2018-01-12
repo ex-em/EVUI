@@ -6,13 +6,18 @@
                 <button @click="generateData(1001)">1k Records</button>
                 <button @click="generateData(10001)">10k Records</button>
             </div>
-            <tree :treeInfo="treeInfo"
+            <tree :title="'Evui-Tree-Title'"
+                  :width="800"
+                  :height="300"
+                  :treeColumnId="'column1'"
+                  :useCheckBox="true"
+                  :useColumnResize="true"
+                  :useFilter="false"
+
                   :columns="treeColumns"
                   :rows="treeData"
                   ref="tree">
             </tree>
-
-
         </div>
         <div class="result">
             <h4>Data Record :  {{ recordCount }}</h4>

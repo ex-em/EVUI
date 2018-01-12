@@ -3,7 +3,7 @@
           :title="'tree-test-title'"
           :width="900"
           :height="300"
-          :useCheckbox="true"
+          :useCheckBox="true"
           :treeColumnId="'class_name'"
           :useColumnResize="true"
           :useFilter="false"

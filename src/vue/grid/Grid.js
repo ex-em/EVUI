@@ -233,8 +233,8 @@ export default {
                             //왜냐면 현재 필터까지 해버리면 다른 컬럼으로가서 검색값을 지웠을경우 알수가 없음
                             if (this.filterCol[col] !== undefined && col !== filterData.colIndex) {
                                 result = result.filter((data) => {
-                                    return data[col].toString().indexOf(this.filterCol[col]) >= 0
-                                })
+                                    return data[col].toString().indexOf(this.filterCol[col]) >= 0;
+                                });
                             }
                         }
                         //필터 현재컬럼의 값은 필터링 안했으니 이전 필터리스트에 저장
@@ -243,7 +243,7 @@ export default {
 
                     //이전 필터리스트에서 이제 현재컬럼 필터 값을 필터링해보자
                     this.filterList = this.beforeFilterList.filter((data) => {
-                        return data[filterData.colIndex].toString().indexOf(filterData.value) >= 0
+                        return data[filterData.colIndex].toString().indexOf(filterData.value) >= 0;
                     });
                 }
             }
@@ -338,14 +338,14 @@ export default {
              * @event cellDblClick
              * @type {function}
              */
-            this.$emit('cellDblClick',value,event)
+            this.$emit('cellDblClick',value,event);
 
             /**
              * row 더블 클릭시 발생 하는 이벤트 (param : value, event)
              * @event rowDblClick
              * @type {function}
              */
-            this.$emit('rowDblClick',value,event)
+            this.$emit('rowDblClick',value,event);
         },
 
         bufferHeightCalc: function () {
@@ -381,9 +381,9 @@ export default {
                 let th = rowHeight * dataLength; // virtual height
                 let ph = bufferSize * rowHeight; // page height
                 let h = ph * 100;
-                let n = Math.ceil(th / ph);
+                // let n = Math.ceil(th / ph);
                 let vp = this.gridOptions.height;
-                let cj = (th - h) / (n - 1);
+                // let cj = (th - h) / (n - 1);
                 let viewport = e.target;
                 let scrollTop = viewport.scrollTop;
 
@@ -408,7 +408,7 @@ export default {
                 this.scroll.prevScrollTop = scrollTop;
 
                 // calculate the viewport + buffer
-                var y = viewport.scrollTop + this.scroll.offset,
+                let y = viewport.scrollTop + this.scroll.offset,
                     buffer = ph > vp ? ph - vp : vp,
                     top = Math.floor((y - buffer/2) / rowHeight),
                     bottom = Math.ceil((y + vp + buffer/2) / rowHeight);
@@ -435,22 +435,22 @@ export default {
             this.sortKey = key;
             this.sortOrders[key] = this.sortOrders[key] * -1;
             this.sortclick = !this.sortclick;
-            this.filteredData = {type:'sort'}
+            this.filteredData = {type:'sort'};
         },
 
         cls(type) {
             switch (type) {
-                case 'number':
-                case 'integer':
-                case 'numeric':
-                case 'float':
-                    return 'cell-align-right';
-                case 'checkbox' :
-                    return 'cell-align-center';
-                case 'date':
-                case 'datetime':
-                default:
-                    return 'cell-align-left';
+            case 'number':
+            case 'integer':
+            case 'numeric':
+            case 'float':
+                return 'cell-align-right';
+            case 'checkbox' :
+                return 'cell-align-center';
+            case 'date':
+            case 'datetime':
+            default:
+                return 'cell-align-left';
             }
         },
 
@@ -482,7 +482,7 @@ export default {
                     type : 'resize',
                     width: startOffset + e.pageX,
                     cellIndex : thElm.cellIndex
-                }
+                };
                 vm.columnOptions = data;
                 /*if (vm.thElm) {
                     // const colName = vm.thElm.getAttribute('data-column-name');
@@ -492,8 +492,7 @@ export default {
 
             }
 
-            function onMouseUp(e) {
-
+            function onMouseUp() {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             }
@@ -503,7 +502,7 @@ export default {
          * 드래그앤드랩 컬럼 이벤트 세팅
          */
         setDragColumnEvent() {
-            var columns = this.$el.querySelectorAll('.grid-column-sort');
+            let columns = this.$el.querySelectorAll('.grid-column-sort');
             const vm = this;
 
             for(let ix=0, ixLen=columns.length; ix<ixLen; ix++){
@@ -520,16 +519,16 @@ export default {
 
 
             //드래그 시작시
-            function handleDragStart(e) {
+            function handleDragStart() {
                 this.style.opacity = '0.4';
-                this.classList.add('dragItem')
+                this.classList.add('dragItem');
 
                 vm.dragTargetPos = this.parentElement.getBoundingClientRect();
                 vm.dragTarget = this;
             }
 
             //드래그가 타겟 엔터시
-            function handleDragEnter(e) {
+            function handleDragEnter() {
 
 
                 if(this.classList.contains('grid-column-sort') && !this.classList.contains('dragItem')){
@@ -557,7 +556,7 @@ export default {
                 if (e.preventDefault) {
                     e.preventDefault(); // Necessary. Allows us to drop.
                 }
-                e.dataTransfer.dropEffect= "move"
+                e.dataTransfer.dropEffect= 'move';
 
                 return false;
             }
@@ -571,7 +570,7 @@ export default {
                 let dropIdx = this.parentElement.cellIndex;
 
 
-                let targetCol = vm.columnOptions[dragIdx]
+                let targetCol = vm.columnOptions[dragIdx];
 
                 let data ={
                     type: 'drag',
@@ -580,14 +579,14 @@ export default {
                     targetCol : targetCol
                 };
 
-                vm.columnOptions = data
+                vm.columnOptions = data;
 
                 return false;
 
             }
 
             //드래그 드랍 이벤트 끝날때
-            function handleDragEnd(e) {
+            function handleDragEnd() {
                 vm.dragTarget.classList.remove('dragItem');
                 vm.dragTarget.style.opacity = null;
                 vm.$refs.dragLine.style.display = 'none';
@@ -633,9 +632,9 @@ export default {
             if(this.popoverCol !== target) {
 
                 //filter 아이콘을 제외한  아무대나 눌러도 꺼진다
-                document.addEventListener('click',function (event){
+                document.addEventListener('click',function (){
                     //켜져있는 popover 빠이
-                    let popeverlist = this.querySelectorAll('.filter-popover.active')
+                    let popeverlist = this.querySelectorAll('.filter-popover.active');
                     for(let i=0,iLen=popeverlist.length;i<iLen;i++){
                         popeverlist[i].style.display = 'none';
                         popeverlist[i].classList.remove('active');

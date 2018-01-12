@@ -52,7 +52,6 @@ export default class TreeStore {
             });
         }
 
-        console.log('#### Created Tree Model ####');
         return treeObj;
     }
 

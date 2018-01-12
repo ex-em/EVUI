@@ -1,7 +1,7 @@
-import Svg from "../common/Svg"
-import Util from "../common/Util"
-import Tooltip from "../common/Tooltip"
-import { color } from "../common/Constant"
+import Svg from '../common/Svg';
+import Util from '../common/Util';
+import Tooltip from '../common/Tooltip';
+
 
 class BaseChart {
     constructor(target, data, options) {
@@ -105,7 +105,6 @@ class BaseChart {
     createLegend(clickFn) {
         let parentElement = document.createElement('ul'),
             seriesNames = this.seriesInfo.seriesNames,
-            series = this.seriesInfo.series,
             baseElement = this.container,
             position = this.options.legend.position,
             childElement, legendBox, legendName, legendValue, className, legendColor,
@@ -350,7 +349,7 @@ class BaseChart {
     }
 
     createTooltip($chart, options) {
-        return Tooltip.getTooltip($chart, options)
+        return Tooltip.getTooltip($chart, options);
     }
 
     getPadding(padding) {
@@ -360,10 +359,10 @@ class BaseChart {
             bottom: padding,
             left: padding
         } : {
-            top: typeof padding.top === 'number' ? padding.top : fallback,
-            right: typeof padding.right === 'number' ? padding.right : fallback,
-            bottom: typeof padding.bottom === 'number' ? padding.bottom : fallback,
-            left: typeof padding.left === 'number' ? padding.left : fallback
+            top: padding.top,
+            right: padding.right,
+            bottom: padding.bottom,
+            left: padding.left
         };
     }
 

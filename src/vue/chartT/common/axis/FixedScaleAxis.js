@@ -1,6 +1,13 @@
-import Axis from './Axis'
-import Core from '../Core'
-import { AXIS_UNITS } from '../Constant'
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/axes/fixed-scale-axis.js
+ * modified by jykim
+ */
+
+import Axis from './Axis';
+import Core from '../Core';
+import { AXIS_UNITS } from '../Constant';
 
 class FixedScaleAxis extends Axis {
 

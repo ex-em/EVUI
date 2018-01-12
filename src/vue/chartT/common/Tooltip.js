@@ -1,4 +1,4 @@
-import Util from "../common/Util"
+import Util from '../common/Util';
 
 export default {
     defaultOptions : {
@@ -39,13 +39,13 @@ export default {
                 time;
 
             if(options.tooltip.xFormat){
-                time = options.tooltip.xFormat(value.split(',')[0])
+                time = options.tooltip.xFormat(value.split(',')[0]);
             }else{
-                time = value.split(',')[0]
+                time = value.split(',')[0];
             }
 
             if(options.tooltip.yFormat){
-                value = options.tooltip.yFormat(parseInt(value.split(',')[1]))
+                value = options.tooltip.yFormat(parseInt(value.split(',')[1]));
             }else{
                 value = value.split(',')[1];
             }
@@ -128,4 +128,4 @@ export default {
             return (' ' + element.getAttribute('class') + ' ').indexOf(' ' + className + ' ') > -1;
         }
     }
-}
+};

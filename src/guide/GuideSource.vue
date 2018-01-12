@@ -25,7 +25,7 @@
 
         <div class="editor" id="editor"></div>
 
-        <div class="tryItDiv"><button @click="tryIt()">Try it</button></div>
+        <!--<div class="tryItDiv"><button @click="tryIt()">Try it</button></div>-->
 
         <!--<div class="test">{{ fileList }}</div>-->
 

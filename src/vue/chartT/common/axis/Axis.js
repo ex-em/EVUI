@@ -1,5 +1,12 @@
-import Svg from '../Svg'
-import { AXIS_UNITS } from '../Constant'
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/axes/axis.js
+ * modified by jykim
+ */
+
+import Svg from '../Svg';
+import { AXIS_UNITS } from '../Constant';
 
 class Axis {
 

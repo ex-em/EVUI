@@ -1,4 +1,11 @@
-import Axis from './Axis'
+/**
+ * Original Code
+ * https://github.com/gionkunz/chartist-js.git
+ * chartist-js/src/scripts/axes/step-axis.js
+ * modified by jykim
+ */
+
+import Axis from './Axis';
 
 class StepAxis extends Axis {
 

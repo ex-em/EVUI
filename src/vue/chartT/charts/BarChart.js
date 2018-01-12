@@ -1,16 +1,16 @@
-import Svg from "../common/Svg"
-import Util from "../common/Util"
-import StepAxis from "../common/axis/StepAxis"
-import AutoScaleAxis from "../common/axis/AutoScaleAxis"
-import BaseChart from "./BaseChart"
+import Svg from '../common/Svg';
+import Util from '../common/Util';
+import StepAxis from '../common/axis/StepAxis';
+import AutoScaleAxis from '../common/axis/AutoScaleAxis';
+import BaseChart from './BaseChart';
 
 class BarChart extends BaseChart {
 
     constructor(target, data, options) {
         let defaultOptions = {
-                isStacked: false,
-                isHorizontal: false
-            };
+            isStacked: false,
+            isHorizontal: false
+        };
 
         super(target, data, Util.extend(null, defaultOptions, options));
     }
@@ -72,9 +72,9 @@ class BarChart extends BaseChart {
             axisY = this.axis.axisY,
             baseYPos = chartRect.y1 - axisY.getValue(0),
             stackedValues = [],
+            barWidth = this.options.barWidth ? Util.quantity(this.options.barWidth).value : (axisX.stepLength - 20) / series.length,
             seriesElement, lineElement, seriesData, positions, rowData, biPol, prevYPos,
             ix, ixLen, jx, jxLen, xPos, yPos, color;
-
 
         for (ix = 0, ixLen = series.length; ix < ixLen; ix++) {
             if (!this.seriesStatus[ix]) {
@@ -90,6 +90,10 @@ class BarChart extends BaseChart {
             biPol = ix - (ixLen - 1) / 2;
 
             for (jx = 0, jxLen = seriesData.length; jx < jxLen; jx++) {
+                if (jx === this.categories.length) {
+                    break;
+                }
+
                 rowData = seriesData[jx];
 
                 xPos = chartRect.x1 + axisX.getValue(seriesData[jx], jx, seriesData) + axisX.stepLength / 2;
@@ -99,7 +103,7 @@ class BarChart extends BaseChart {
                 stackedValues[jx] = prevYPos - (baseYPos - yPos);
 
                 if (axisX.type === 'step') {
-                    xPos += this.options.isStacked ? 0 : biPol * this.options.seriesBarDistance;
+                    xPos += this.options.isStacked ? 0 : biPol * barWidth;
                 }
 
                 positions = {
@@ -108,7 +112,7 @@ class BarChart extends BaseChart {
                     y1: baseYPos,
                     y2: yPos,
                     class: 'bar',
-                    style: 'stroke: ' + color,
+                    style: `stroke: ${color}; stroke-width: ${barWidth}px;`,
                     'ct:value': [rowData.x, rowData.y].join(','),
                     'ct:meta': seriesNames[ix],
                     'data-index': jx
@@ -136,7 +140,7 @@ class BarChart extends BaseChart {
             return {
                 min: min,
                 max: max
-            }
+            };
         }
 
         for (ix = 0, ixLen = data[0].length; ix < ixLen; ix++) {
@@ -157,7 +161,7 @@ class BarChart extends BaseChart {
         return {
             min: min,
             max: max
-        }
+        };
     }
 
 }

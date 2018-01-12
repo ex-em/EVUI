@@ -115,10 +115,10 @@ export default {
     computed: {
         //binding unit px
         unitWidth(){
-            return typeof this.width === 'number' ? this.width+'px' : this.width
+            return typeof this.width === 'number' ? this.width+'px' : this.width;
         },
         unitHeight(){
-            return typeof this.height === 'number' ? this.height+'px' : this.height
+            return typeof this.height === 'number' ? this.height+'px' : this.height;
         },
 
         columnOptions: {
@@ -212,7 +212,7 @@ export default {
                 vm.columnOptions = data;
             }
 
-            function onMouseUp(e) {
+            function onMouseUp() {
 
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
@@ -252,9 +252,7 @@ export default {
                 let th = rowHeight * dataLength; // virtual height
                 let ph = bufferSize * rowHeight; // page height
                 let h = ph * 100;
-                let n = Math.ceil(th / ph);
                 let vp = this.height;
-                let cj = (th - h) / (n - 1);
                 let viewport = e.target;
                 let scrollTop = viewport.scrollTop;
 
@@ -275,7 +273,7 @@ export default {
                 this.scroll.prevScrollTop = scrollTop;
 
                 // calculate the viewport + buffer
-                var y = viewport.scrollTop + this.scroll.offset,
+                let y = viewport.scrollTop + this.scroll.offset,
                     buffer = ph > vp ? ph - vp : vp,
                     top = Math.floor((y - buffer/2) / rowHeight),
                     bottom = Math.ceil((y + vp + buffer/2) / rowHeight);

@@ -1,10 +1,10 @@
-import BaseChart from "./BaseChart"
-import Svg from "../common/Svg"
-import Intrpl from '../common/Interpolation'
-import Core from '../common/Core'
-import Util from '../common/Util'
-import AutoScaleAxis from "../common/axis/AutoScaleAxis";
-import FixedScaleAxis from "../common/axis/FixedScaleAxis";
+import BaseChart from './BaseChart';
+import Svg from '../common/Svg';
+import Intrpl from '../common/Interpolation';
+import Core from '../common/Core';
+import Util from '../common/Util';
+import AutoScaleAxis from '../common/axis/AutoScaleAxis';
+import FixedScaleAxis from '../common/axis/FixedScaleAxis';
 
 
 class LineChart extends BaseChart {
@@ -75,7 +75,7 @@ class LineChart extends BaseChart {
             isScatter = this.options.isScatter,
             lineWidth = Util.quantity(this.options.lineWidth).value,
             pointSize = Util.quantity(this.options.pointSize).value,
-            seriesElement, seriesData, pathInfo, computedPathInfo, pathData, pathElement,
+            seriesElement, seriesData, pathInfo, computedPathInfo, pathData,
             pointElement, color,
             ix, ixLen, jx, jxLen;
 
@@ -101,7 +101,7 @@ class LineChart extends BaseChart {
             computedPathInfo = Intrpl.none(pathInfo);
 
             if (!isScatter) {
-                pathElement = Svg.createElement(seriesElement, 'path', {
+                Svg.createElement(seriesElement, 'path', {
                     d: Svg.stringify(computedPathInfo),
                     class: 'line',
                     style: `stroke: ${color}; stroke-width: ${lineWidth}px;`
@@ -139,7 +139,7 @@ class LineChart extends BaseChart {
             return {
                 min: 0,
                 max: 1
-            }
+            };
         }
 
         min = data[0][0][pos];
@@ -161,7 +161,7 @@ class LineChart extends BaseChart {
         return {
             min: min || 0,
             max: max || 1
-        }
+        };
     }
 
 
