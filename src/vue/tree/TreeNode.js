@@ -24,6 +24,22 @@ export default {
 
         onChange(checkValue) {
             this.$emit('node-checked', this.node, checkValue);
+        },
+
+        cls(type) {
+            switch (type) {
+            case 'number':
+            case 'integer':
+            case 'numeric':
+            case 'float':
+                return 'cell-align-right';
+            case 'checkbox' :
+                return 'cell-align-center';
+            case 'date':
+            case 'datetime':
+            default:
+                return 'cell-align-left';
+            }
         }
     },
     components: {

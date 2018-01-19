@@ -14,7 +14,8 @@
         </div>
     </td>
     <template v-for="(col,index) in columns.slice(1)">
-        <td v-show="col.visible">
+        <td v-show="col.visible"
+            :class="cls(col.type)">
             <div :style="{width : col.width + 'px'}">
                 {{ node.data[col.dataIndex] }}
             </div>

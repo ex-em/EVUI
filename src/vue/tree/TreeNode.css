@@ -49,3 +49,15 @@ tr:nth-child(odd) td { background: #FEFEFE; }
 
 tr:hover td{ background: #666; color: #FFF; }
 
+.cell-align-right {
+    text-align: right;
+}
+
+.cell-align-center {
+    text-align: center;
+}
+
+.cell-align-left {
+    text-align: left;
+}
+

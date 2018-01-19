@@ -120,10 +120,10 @@
                     useFilter: false
                 },
                 treeColumns: [
-                    {id: 'col1', dataIndex: 'column1', name: 'column1', width: 500, draggable: true, visible: true},
-                    {id: 'col2', dataIndex: 'column2', name: 'column2', width: 400, draggable: true, visible: true},
-                    {id: 'col3', dataIndex: 'column3', name: 'column3', width: 150, draggable: true, visible: true},
-                    {id: 'col4', dataIndex: 'column4', name: 'column4', width: 120, draggable: true, visible: true}
+                    {id: 'col1', dataIndex: 'column1', name: 'column1', width: 500, type: 'string',  draggable: true, visible: true},
+                    {id: 'col2', dataIndex: 'column2', name: 'column2', width: 400, type: 'string',  draggable: true, visible: true},
+                    {id: 'col3', dataIndex: 'column3', name: 'column3', width: 150, type: 'integer', draggable: true, visible: true},
+                    {id: 'col4', dataIndex: 'column4', name: 'column4', width: 120, type: 'string',  draggable: true, visible: true}
                 ],
                 treeData : this.generateData()
             }

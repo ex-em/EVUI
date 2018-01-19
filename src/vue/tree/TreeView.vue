@@ -62,10 +62,10 @@
                     useFilter: false
                 },
                 treeColumns: [
-                    {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, draggable: true, visible: true},
-                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, draggable: true, visible: true},
-                    {id: 'col3', dataIndex: 'elapse_time', name: '수행시간', width: 150, draggable: true, visible: true},
-                    {id: 'col4', dataIndex: 'exec_count',  name: '수행건수', width: 120, draggable: true, visible: true}
+                    {id: 'col1', dataIndex: 'class_name',  name: '클래스명', width: 500, type: 'string',  draggable: true, visible: true},
+                    {id: 'col2', dataIndex: 'method_name', name: '메소드명', width: 400, type: 'string',  draggable: true, visible: true},
+                    {id: 'col3', dataIndex: 'elapse_time', name: '수행시간', width: 150, type: 'float',   draggable: true, visible: true},
+                    {id: 'col4', dataIndex: 'exec_count',  name: '수행건수', width: 120, type: 'integer', draggable: true, visible: true}
                 ],
                 treeData : tempData
             }
