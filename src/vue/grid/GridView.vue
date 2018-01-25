@@ -37,9 +37,18 @@
         },
         data () {
             let tempData = [];
+            let optionData = [];
+
+            for(let ix =0; ix < 5000; ix++){
+                let obj = {
+                    value : 'data_'+(ix+1),
+                    display : 'data_'+(ix+1)
+                }
+                optionData.push(obj)
+            }
 
             for (let ix = 0; ix < 5000; ix++) {
-                tempData.push({checked: false,  col2: ix+1,  col4: 'aa', col1: 'data'+(ix+1), col3: 'data_'+(ix+1), col5:'zz', col6:randomNumber(30), col7:randomNumber(10), col8:randomNumber(100)});
+                tempData.push({checked: false,  col2: ix+1,  col4: 'aa', col1: 'data'+(ix+1), col3: 'data_'+(ix+1), col5:'zz', col6:randomNumber(30), col7:randomNumber(10), col8:randomNumber(100), options:optionData});
             }
 
             //1~n 랜덤 숫자 리턴

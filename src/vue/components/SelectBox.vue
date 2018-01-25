@@ -4,7 +4,7 @@
         @input="onInput"
         @blur="onBlur"
     >
-        <options v-for="item in optionItems" :key="item.value" :value="item.value">{{item.display}}</options>
+        <option v-for="item in optionItems" :key="item.value" :value="item.value">{{item.display}}</option>
     </select>
 </template>
 
@@ -24,7 +24,7 @@
             value: {
                 default: null,
             },
-            options: []
+            options: null
         },
         computed: {
 

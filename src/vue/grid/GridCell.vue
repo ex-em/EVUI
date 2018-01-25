@@ -31,6 +31,7 @@
                                :style="{width:width+'px'}"
                                v-model="cellValue"
                                v-focus
+                               :options="options"
                                @input="onInput"
                                @blur="onBlur"
                     >
@@ -129,7 +130,9 @@
             /**
              * row 더블 클릭하였을 때 이벤트가 발생됩니다.
              */
-            rowDblClick: null
+            rowDblClick: null,
+
+            options: null
 
         },
         data: function () {
