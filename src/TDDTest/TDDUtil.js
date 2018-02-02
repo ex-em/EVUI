@@ -102,4 +102,3 @@ exports.waitForIt = function waitForIt(condition, callback) {
 // exports.promissedTick = component => new Promise((resolve, reject) => {
 //   component.$nextTick(resolve);
 // });
-

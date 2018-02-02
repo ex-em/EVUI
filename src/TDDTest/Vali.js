@@ -7,4 +7,3 @@ Validate.prototype = {
   },
 };
 module.exports = Validate;
-

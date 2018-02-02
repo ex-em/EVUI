@@ -42,6 +42,7 @@ module.exports = {
         'e' // for e.returnvalue
       ]
     }],
+    'linebreak-style': 0,
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
       optionalDependencies: ['test/unit/index.js']
