@@ -47,3 +47,4 @@ describe('Counter', () => {
     expect(wrapper.find('.count').html()).to.include(1);
   });
 });
+
