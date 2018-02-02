@@ -7,6 +7,7 @@ const webpackBaseConfig = require('./webpack.base.conf.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 
+
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }

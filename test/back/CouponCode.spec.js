@@ -51,3 +51,4 @@ describe('CouponCode', () => {
     expect(wrapper.emitted().applied[0]).to.includes(50);
   });
 });
+

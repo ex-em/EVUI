@@ -6,6 +6,7 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const CompressionPlugin = require('compression-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
+
 const webpackConfig = merge(baseWebpackConfig, {
   entry: {
     app: './src/index.js'
