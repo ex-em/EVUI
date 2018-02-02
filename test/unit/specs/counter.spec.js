@@ -1,7 +1,7 @@
 import { mount } from 'vue-test-utils';
 import Counter from '../../../src//TDDTest/Counter2';
 
-// 카운터 vue
+// 카운터 vue 파일
 describe('Counter', () => {
   let wrapper;
 
