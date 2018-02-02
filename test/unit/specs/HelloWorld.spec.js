@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import HelloWorld from '../../../src/components/HelloWorld.vue';
+import HelloWorld from '@/components/HelloWorld/HelloWorld';
 
 describe('HelloWorld.vue', () => {
   it('should render correct contents', () => {

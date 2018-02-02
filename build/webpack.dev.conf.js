@@ -1,6 +1,5 @@
 'use strict'
 const path = require('path');
-const config = require('../config')
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
@@ -14,7 +13,7 @@ function resolve (dir) {
 
 module.exports = merge(webpackBaseConfig, {
   entry: {
-    app: './samples/main.js',
+    app: './examples/main.js',
     vendors: ['vue', 'vue-router']
   },
   output: {
@@ -29,6 +28,12 @@ module.exports = merge(webpackBaseConfig, {
       '@': resolve('src')
     }
   },
+  devServer: {
+    historyApiFallback: true,
+    noInfo: true,
+    contentBase: './dist'
+  },
+  devtool: '#cheap-module-eval-source-map',
   module: {
     rules:[
       {
@@ -38,7 +43,7 @@ module.exports = merge(webpackBaseConfig, {
         include: [resolve('src'), resolve('test')],
         options: {
           formatter: require('eslint-friendly-formatter'),
-          emitWarning: !config.dev.showEslintErrorsInOverlay
+          emitWarning: true,
         }
       }
     ]
@@ -52,13 +57,13 @@ module.exports = merge(webpackBaseConfig, {
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
-      filename: 'index.html',
-      template: 'index.html',
+      filename: './index.html',
+      template: './examples/index.html',
     }),
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../static'),
-        to: config.dev.assetsSubDirectory,
+        to: 'static',
         ignore: ['.*']
       }
     ]),
