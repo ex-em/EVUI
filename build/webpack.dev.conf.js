@@ -28,11 +28,6 @@ module.exports = merge(webpackBaseConfig, {
       '@': resolve('src')
     }
   },
-  devServer: {
-    historyApiFallback: true,
-    noInfo: true,
-    contentBase: './dist'
-  },
   devtool: '#cheap-module-eval-source-map',
   module: {
     rules:[
@@ -44,9 +39,21 @@ module.exports = merge(webpackBaseConfig, {
         options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
+          failOnError: true,
+          failOnWarning : true,
         }
       }
     ]
+  },
+  devServer: {
+    historyApiFallback: true,
+    noInfo: true,
+    contentBase: './dist',
+    open: true,
+    hot: true,
+    inline: true,
+    host: 'localhost',
+    port: '8888'
   },
   plugins: [
     new webpack.DefinePlugin({
