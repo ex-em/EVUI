@@ -1,5 +1,5 @@
 import { mount } from 'vue-test-utils';
-import Counter from '../../../src//TDDTest/Counter2';
+import Counter from '../../../src/TDDTest/Counter2';
 
 // 카운터 vue
 describe('Counter', () => {
