@@ -1,0 +1,10 @@
+.DS_Store
+/node_modules
+/src/TDDTest
+npm-debug.log*
+/examples
+/test
+/config
+/build
+/.idea
+/.git

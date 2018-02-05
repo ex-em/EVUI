@@ -4,6 +4,7 @@
   "description": "A EXEM Library project",
   "author": "jwlee <jwlee@ex-em.com>",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
@@ -12,6 +13,26 @@
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "webpack --config build/webpack.prod.conf.js"
   },
+  "main": "dist/evui.min.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ex-em/EVUI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ex-em/EVUI/issues"
+  },
+  "keywords": [
+    "Vue",
+    "Visualisation",
+    "Charts",
+    "Grid",
+    "Tree",
+    "EVUI"
+  ],
   "dependencies": {
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
