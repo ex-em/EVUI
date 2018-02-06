@@ -1,9 +1,10 @@
 {
-  "env": { 
+  "env": {
     "mocha": true
   },
-  "globals": { 
+  "globals": {
     "expect": true,
     "sinon": true
-  }
+  },
+  "extends": "eslint:recommended"
 }
