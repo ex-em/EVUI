@@ -3,7 +3,9 @@
     <nav>
       <ul>
         <li>
-          <router-link to="/test1">TEXT BOX</router-link>
+          <router-link to="/">Index</router-link>
+          <router-link to="/helloworld">Hello World</router-link>
+          <router-link to="/textbox">Text Box</router-link>
         </li>
       </ul>
     </nav>
