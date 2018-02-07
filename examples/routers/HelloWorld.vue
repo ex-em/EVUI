@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ value1 }}
     <hello-world></hello-world>
   </div>
 </template>
