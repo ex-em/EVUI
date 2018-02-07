@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './App';
@@ -12,11 +11,11 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     {
-      path: '/',
+      path: '/helloworld',
       component: resolve => require(['./routers/HelloWorld'], resolve),
     },
     {
-      path: '/test1',
+      path: '/textbox',
       component: resolve => require(['./routers/TextBox'], resolve),
     },
   ],
