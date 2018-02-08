@@ -22,7 +22,7 @@ module.exports = merge(webpackBaseConfig, {
     publicPath: '/',
     filename: '[name].js',
   },
-  devtool: '#cheap-module-eval-source-map',
+  devtool: '#eval-source-map',
   module: {
     rules:[
       {

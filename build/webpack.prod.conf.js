@@ -26,7 +26,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       amd: 'vue'
     }
   },
-  devtool: '#source-map',
+  devtool: '#eval-source-map',
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
