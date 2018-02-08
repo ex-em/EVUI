@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "(.js|.vue|.jsx)$" )
+echo "Start Pre-commit Hook"
+
+if [[ "$STAGED_FILES" = "" ]]; then
+  echo "Not found Staged Files.."
+  exit 0
+fi
+
+PASS=true
+
+echo "Validating Javascript..."
+
+# Check for eslint
+which ./node_modules/.bin/eslint &> /dev/null
+if [[ "$?" == 1 ]]; then
+  echo "Please install ESlint"
+  exit 1
+fi
+
+for FILE in $STAGED_FILES
+do
+  ./node_modules/.bin/eslint "$FILE"
+
+  if [[ "$?" == 0 ]]; then
+    echo "ESLint Passed: $FILE"
+  else
+    echo "ESLint Failed: $FILE"
+    PASS=false
+  fi
+done
+
+echo "Javascript validation completed!"
+
+if ! $PASS; then
+  echo "COMMIT FAILED: Your commit contains files that should pass ESLint but do not. Please fix the ESLint errors and try again."
+  exit 1
+else
+  echo "COMMIT SUCCEEDED"
+fi
+
+exit $?

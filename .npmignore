@@ -17,3 +17,4 @@ examples/
 src/TDDTest/
 test/
 config/
+githooks/
