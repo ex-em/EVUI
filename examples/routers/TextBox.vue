@@ -13,7 +13,7 @@
     },
     data () {
       return {
-        value1: 'value55'
+        value1: 'Pull Request Test'
       }
     }
   }
