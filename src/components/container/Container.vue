@@ -106,7 +106,7 @@
        return  typeof this.width === 'number' ? this.width + 'px' : this.width;
       },
       ContainerHeight(){
-        console.log( this.$data.Parentlayout , this ,  this.$data.SumFlex )
+        // console.log( this.$data.Parentlayout , this ,  this.$data.SumFlex )
         if(this.$data.Parentlayout === LAYOUT_VERTICAL && this.$data.SumFlex !== 0){
           let flexdata =new ContainerFlex({
             vm              : this,
@@ -139,7 +139,7 @@
             this.$data.ParentWidth  = this.$parent.$el.style.width.split('px')[0];
             this.$data.ParentHeight = this.$parent.$el.style.height.split('px')[0];
             this.$data.Parentlayout =  this.$parent.layout;
-            console.log(this.$data.Parentlayout);
+            // console.log(this.$data.Parentlayout);
             let childrenObj = this.$parent.$children;
             let Sumflex = 0;
 
