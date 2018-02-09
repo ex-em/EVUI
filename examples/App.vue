@@ -7,6 +7,9 @@
           <router-link to="/helloworld">Hello World</router-link>
           <router-link to="/textbox">Text Box</router-link>
         </li>
+        <li>
+          <router-link to="/Container">Container</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>

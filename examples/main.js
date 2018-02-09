@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import App from './App';
 import EVUI from '../src/index';
 
+
 Vue.use(VueRouter);
 Vue.use(EVUI);
 Vue.config.debug = true;
@@ -18,6 +19,10 @@ const router = new VueRouter({
       path: '/textbox',
       component: resolve => require(['./routers/TextBox'], resolve),
     },
+    {
+      path: '/Container',
+      component: resolve => require(['./routers/Container'], resolve),
+    }
   ],
 });
 

@@ -1,5 +1,5 @@
 import { mount } from 'vue-test-utils';
-import Reminders from '../../../src/TDDTest/Reminders';
+import Reminders from '../../../../src/TDDTest/Reminders';
 
 describe('Reminders', () => {
   let wrapper;
@@ -11,6 +11,7 @@ describe('Reminders', () => {
 
   // 메모추가
   function addReminder(body) {
+
     // VUE에서 클래스를 찾는다.
     const newReminder = wrapper.find('.new-reminder');
 
@@ -47,6 +48,11 @@ describe('Reminders', () => {
 
     expect(remindersList()).not.to.include('메모1');
     expect(remindersList()).to.include('메모2');
+  });
+
+  after(() => {
+    // TDD 진행 전에 vue 객체를 인터스화 시킨다.
+    wrapper.destroy();
   });
 });
 

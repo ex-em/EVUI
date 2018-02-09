@@ -1,8 +1,7 @@
 <template>
   <input
     type="text"
-    v-model="inputValue"
-  >
+    v-model="inputValue"  :id ="id" :name ="name" >
 </template>
 
 <script>
@@ -16,17 +15,18 @@
       },
       name: {
         type: String,
-        default: null,
+        default: "A",
       },
       value: {
-        default: null,
+        type: String,
+        default:  null ,
       }
     },
     computed: {},
     methods: {},
     data() {
       return {
-        inputValue: this.value
+        inputValue: this.value+ this._uid
       };
     }
   }

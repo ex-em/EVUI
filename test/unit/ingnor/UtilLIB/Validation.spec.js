@@ -54,8 +54,9 @@ describe('#Validation Check', () => {
     const arr = [1, 2, 5, 3, 4];
 
     expect(arr).to.have.lengthOf(5); // array length
-    expect(arr).to.be.not.empty; // empty
+    expect(arr).to.be.not.empty; // eslint-disable-line no-unused-expressions
     expect(arr).to.have.ordered.members([1, 2, 5, 3, 4]); // arr === members
+    expect(arr).be.not.empty;
   });
 
   it('expect - String', () => {
@@ -80,7 +81,7 @@ describe('#Validation Check', () => {
     const arr = [1, 2, 5, 3, 4];
 
     arr.should.have.lengthOf(5); // array length
-    arr.should.be.not.empty; // empty
+    arr.should.be.not.empty;
     arr.should.have.ordered.members([1, 2, 5, 3, 4]); // arr === members
   });
 });

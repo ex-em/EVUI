@@ -22,6 +22,7 @@ module.exports = function karmaConfig(config) {
     webpackMiddleware: {
       noInfo: true,
     },
+    singleRun: false, //  테스트 수행이 끝난 뒤 Karma와 브라우저가 종료되게 설정하려면, 파일 하단의 singleRun을 true로 변경하면 된다
     coverageReporter: {
       dir: './coverage',
       reporters: [

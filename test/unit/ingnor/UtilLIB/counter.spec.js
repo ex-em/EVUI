@@ -1,5 +1,5 @@
 import { mount } from 'vue-test-utils';
-import Counter from '../../../src/TDDTest/Counter2';
+import Counter from '../../../../src/TDDTest/Counter2';
 
 // 카운터 vue
 describe('Counter', () => {
@@ -23,6 +23,7 @@ describe('Counter', () => {
   });
 
   it('decrements button click 감소체크', () => {
+
     wrapper.setData({ count: 5 });
 
     wrapper.find('.decrement').trigger('click'); // 4

@@ -12,7 +12,7 @@
     },
     data () {
       return {
-        value1: 'value1'
+        value1: 'value3'
       }
     }
   }
