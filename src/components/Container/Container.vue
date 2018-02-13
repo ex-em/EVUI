@@ -212,8 +212,4 @@
     /*flex-direction: row;*/
   }
 
-  /*.multipane > div {*/
-  /*position: relative;*/
-  /*z-index: 1;*/
-  /*}*/
 </style>
