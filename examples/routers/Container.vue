@@ -176,19 +176,16 @@
       <div>1</div>
       <div>2</div>
       <div>3</div>
-      <text-box/>
-      <text-box/>
-      <text-box/>
     </container>
   </div>
 </template>
 <script>
   import Container from '@/components/Container';
-  import TextBox from '@/components/TextBox';
+
 // horizontal vertical
   export default {
     components: {
-      Container, TextBox,
+      Container,
     },
     data() {
       return {
