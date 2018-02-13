@@ -1,9 +1,7 @@
-import TextBox from '@/components/TextBox';
-import HelloWorld from '@/components/HelloWorld';
+import Container from '@/components/Container';
 
 const components = {
-  TextBox,
-  HelloWorld,
+  Container,
 };
 
 const evui = {
