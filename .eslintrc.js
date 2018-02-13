@@ -43,6 +43,7 @@ module.exports = {
         'e' // for e.returnvalue
       ]
     }],
+    'indent': 'off',
     'linebreak-style': 0,
     'indent': 'off',
     // allow optionalDependencies
