@@ -48,8 +48,8 @@ describe('Container Component', () => {
 
   it('props 검증', (done) => {
 
-    expect(wrapper.props().id).to.be.equal("evui-"+ "Container-" + wrapper.vm._uid)
-    expect(wrapper.props().layout).to.be.equal("Vbox")
+    expect(wrapper.props().id).to.be.equal("evui-"+ "container-" + wrapper.vm._uid)
+    expect(wrapper.props().layout).to.be.equal("vBox")
     expect(wrapper.props().wrapperStyles).to.be.equal(null)
     expect(wrapper.props().width).to.be.equal("100%")
     expect(wrapper.props().height).to.be.equal("100%")
@@ -62,7 +62,7 @@ describe('Container Component', () => {
 
     const wrapper2 = shallow(Container, {
       propsData: {
-        layout: "Hbox",
+        layout: "hBox",
         wrapperStyles : {'background-color':'red'},
         width : "400px",
         height : "400px",
@@ -70,7 +70,7 @@ describe('Container Component', () => {
       }
     })
 
-    expect(wrapper2.props().layout).to.be.equal("Hbox")
+    expect(wrapper2.props().layout).to.be.equal("hBox")
     expect(wrapper2.props().wrapperStyles).to.include({'background-color':'red'})
     expect(wrapper2.props().width).to.be.equal("400px")
     expect(wrapper2.props().height).to.be.equal("400px")
@@ -106,7 +106,7 @@ describe('Container Component', () => {
   it('Computed 체크', (done) => {
     const wrapper2 = shallow(Container);
 
-    wrapper2.setProps({  layout: "Hbox",
+    wrapper2.setProps({  layout: "hBox",
       wrapperStyles : {'background-color':'red'},
       width : "400px",
       height : "400px",
@@ -141,7 +141,6 @@ describe('ContainerFlex script', () => {
 
     expect(flexProps).to.be.a('object');
 
-    flexProps = null;
   });
 
   it('ContainerFlex constructor 값 셋팅', () => {
@@ -150,7 +149,7 @@ describe('ContainerFlex script', () => {
       vm              : {},
       flexTotalVal    : 2.2,
       parentWidth     : 800,
-      layout          : "Hbox",
+      layout          : "hBox",
       flex            : 0.5
     });
 
@@ -172,7 +171,7 @@ describe('ContainerFlex script', () => {
         vm              : {},
         flexTotalVal    : 2.2,
         parentWidth     : 800,
-        layout          : "Hbox",
+        layout          : "hBox",
         flex            : 0.5
       });
 
@@ -210,7 +209,7 @@ describe('ContainerFlex script', () => {
         vm              : {},
         flexTotalVal    : 2.2,
         parentHeight     : 800,
-        layout          : "Vbox",
+        layout          : "vBox",
         flex            : 0.5
       });
       it('FlexHeight 메서드 확인 ', () => {
@@ -236,7 +235,7 @@ describe('ContainerFlex script', () => {
         expect(VueVm).to.include({});
         expect(flexTotalVal).to.equal(2.2);
         expect(parentHeight).to.equal(800);
-        expect(layout).to.equal("Vbox");
+        expect(layout).to.equal("vBox");
         expect(flex).to.equal(0.5);
 
 
@@ -274,12 +273,12 @@ describe('ContainerFlex script', () => {
 //     // vue 인스턴트 활성화
 //   });
 //
-//   const LAYOUT_HORIZONTAL = 'Hbox';
-//   const LAYOUT_VERTICAL = 'Vbox';
+//   const LAYOUT_HORIZONTAL = 'hBox';
+//   const LAYOUT_VERTICAL = 'vBox';
 //   it(' shallowed hooks call ', () => {
 //
 //
-//     // const LAYOUT_VERTICAL = 'Vbox';
+//     // const LAYOUT_VERTICAL = 'vBox';
 //
 //     const wrapper_shallow = shallow(Container, {
 //
@@ -293,7 +292,7 @@ describe('ContainerFlex script', () => {
 //         id: {
 //           type: String,
 //           default: function () {
-//             return 'evui-'+ 'Container-' + this._uid;
+//             return 'evui-'+ 'container-' + this._uid;
 //           },
 //         },
 //         /**
@@ -341,7 +340,7 @@ describe('ContainerFlex script', () => {
 //           ParentHeight: null,
 //           ParentWidth: null,
 //           Parentlayout: null,
-//           SumFlex: 0,
+//           sumFlex: 0,
 //         };
 //       },
 //
@@ -364,10 +363,10 @@ describe('ContainerFlex script', () => {
 //         },
 //         ContainerWidth(){
 //
-//           if(this.$data.Parentlayout=== LAYOUT_HORIZONTAL && this.$data.SumFlex !== 0){
+//           if(this.$data.Parentlayout=== LAYOUT_HORIZONTAL && this.$data.sumFlex !== 0){
 //             let flexdata =new ContainerFlex({
 //               vm              : this,
-//               flexTotalVal    : this.$data.SumFlex,
+//               flexTotalVal    : this.$data.sumFlex,
 //               parentWidth     : this.$data.ParentWidth,
 //               layout          : this.$data.Parentlayout,
 //               flex            : this.flex
@@ -377,10 +376,10 @@ describe('ContainerFlex script', () => {
 //           return  typeof this.width === 'number' ? this.width + 'px' : this.width.toString();
 //         },
 //         ContainerHeight(){
-//           if(this.$data.Parentlayout === LAYOUT_VERTICAL && this.$data.SumFlex !== 0){
+//           if(this.$data.Parentlayout === LAYOUT_VERTICAL && this.$data.sumFlex !== 0){
 //             let flexdata =new ContainerFlex({
 //               vm              : this,
-//               flexTotalVal    : this.$data.SumFlex,
+//               flexTotalVal    : this.$data.sumFlex,
 //               parentHeight    : this.$data.ParentHeight,
 //               layout          : this.$data.Parentlayout,
 //               flex            : this.flex

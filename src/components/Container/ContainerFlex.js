@@ -10,7 +10,7 @@ export default class ContainerFlex {
     const layout = this.layout || '';
     const flex = this.flex || 1;
 
-    if (layout === 'Hbox') {
+    if (layout === 'hBox') {
     // 컨테이너 비율 넓이 값 계산
       let containerRatioWidth = parentWidth / flexTotalVal;
       containerRatioWidth = Math.floor(containerRatioWidth);
@@ -28,7 +28,7 @@ export default class ContainerFlex {
     const layout = this.layout || '';
     const flex = this.flex || 1;
 
-    if (layout === 'Vbox') {
+    if (layout === 'vBox') {
       // 컨테이너 비율 높이 값 계산
       let containerRatioHeight = parentHeight / flexTotalVal;
       containerRatioHeight = Math.floor(containerRatioHeight);
