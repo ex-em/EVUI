@@ -23,7 +23,8 @@ module.exports = {
       webpack: {
         config: 'build/webpack.base.conf.js'
       }
-    }
+    },
+    'html/html-extensions': ['.html'],  // don't include .vue
   },
   // add your custom rules here
   rules: {
@@ -43,6 +44,7 @@ module.exports = {
       ]
     }],
     'linebreak-style': 0,
+    'indent': 'off',
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
       optionalDependencies: ['test/unit/index.js']
