@@ -48,7 +48,6 @@ describe('Container Component', () => {
 
   it('props 검증', (done) => {
 
-    expect(wrapper.props().id).to.be.equal("evui-"+ "container-" + wrapper.vm._uid)
     expect(wrapper.props().layout).to.be.equal("vBox")
     expect(wrapper.props().wrapperStyles).to.be.equal(null)
     expect(wrapper.props().width).to.be.equal("100%")
@@ -286,15 +285,6 @@ describe('ContainerFlex script', () => {
 //       name: 'Container',
 //
 //       props: {
-//         /**
-//          * Container  ID를 지정합니다.
-//          */
-//         id: {
-//           type: String,
-//           default: function () {
-//             return 'evui-'+ 'container-' + this._uid;
-//           },
-//         },
 //         /**
 //          * Container 세로, 수직  지정합니다.
 //          */
