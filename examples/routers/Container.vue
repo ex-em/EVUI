@@ -1,236 +1,223 @@
 <template>
-<div style="height: 400px; widht:100%" >
-   <container
-          layout='hBox'
-          :wrapperStyles ='costomstyle'
-          :height = "400"
-          @onClickDiv="M_click"
-   >
-         <container
-           layout='vBox'
-           :wrapperStyles ='costomstyle2'
-           :width = "400"
-           :height = "height"
-         >
-                     <container
-                       layout='vBox'
-                       :wrapperStyles ='costomstyle3'
-                       :width = "50"
-                       :height = "50"
-                       :flex = 0.3
-                     >
-                       0.3
-                     </container>
-                     <container
-                       layout='hBox'
-                       :wrapperStyles ='costomstyle4'
-                       :width = "50"
-                       :height = "50"
-                       :flex = 0.8
-                     >
-                       0.8
-                     </container>
-                       <container
-                         layout='hBox'
-                         :wrapperStyles ='costomstyle5'
-                         :width = "50"
-                         :height = "50"
-                         :flex = 0.4
-                       >
-                         0.4
-                       </container>
-         </container>
-
-     <container
-       layout='vBox'
-       :wrapperStyles ='costomstyle2'
-       :width = "100"
-       :height = "100"
-     >
-         <container
-           layout='hBox'
-           :wrapperStyles ='costomstyle3'
-           :width = "50"
-           :height = "50"
-         >
-         </container>
-         <container
-           layout='hBox'
-           :wrapperStyles ='costomstyle4'
-           :width = "50"
-           :height = "50"
-         >
-         </container>
-
-    </container>
-
-     <container
-       layout='hBox'
-       :wrapperStyles ='costomstyle2'
-       :width = "100"
-       :height = "100"
-     >
-       <container
-         layout='vBox'
-         :wrapperStyles ='costomstyle3'
-         :width = "50"
-         :height = "50"
-       >
-       </container>
-       <container
-         layout='vBox'
-         :wrapperStyles ='costomstyle4'
-         :width = "50"
-         :height = "50"
-       >
-       </container>
-
-     </container>
-
-     <container
-       layout='vBox'
-       :wrapperStyles ='costomstyle2'
-       :width = "100"
-       :height = "100"
-     >
-       <container
-         layout='hBox'
-         :wrapperStyles ='costomstyle3'
-         :width = "50"
-         :height = "50"
-       >
-       </container>
-       <container
-         layout='hBox'
-     :wrapperStyles ='costomstyle4'
-     :width = "50"
-     :height = "50"
-     >
-   </container>
-  </container>
-
-
-
-  <container
-    layout='hBox'
-    :wrapperStyles ='costomstyle2'
-    :width = "300"
-    :height = "100"
-  >
-      <container
-        layout='vBox'
-        :wrapperStyles ='costomstyle3'
-        :width = "50"
-        :height = "50"
-        :flex = 0.2
-      >
-        0.2
-      </container>
-      <container
-        layout='vBox'
-        :wrapperStyles ='costomstyle4'
-        :width = "50"
-        :height = "50"
-        :flex = 1.5
-      >
-        1.5
-      </container>
+  <div style="height: 400px; widht:100%">
     <container
-      layout='vBox'
-      :wrapperStyles ='costomstyle5'
-      :width = "50"
-      :height = "50"
-      :flex = 0.5
-    >0.5
+      layout="hBox"
+      :wrapper-styles="costomstyle"
+      :height="400"
+      @onClickDiv="M_click"
+    >
+      <container
+        layout="vBox"
+        :wrapper-styles="costomstyle2"
+        :width="400"
+        :height="height"
+      >
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+          :flex="0.3"
+        >
+          0.3
+        </container>
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+          :flex="0.8"
+        >
+          0.8
+        </container>
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle5"
+          :width="50"
+          :height="50"
+          :flex="0.4"
+        >
+          0.4
+        </container>
+      </container>
+
+      <container
+        layout="vBox"
+        :wrapper-styles="costomstyle2"
+        :width="100"
+        :height="100"
+      >
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+        />
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+        />
+
+      </container>
+
+      <container
+        layout="hBox"
+        :wrapper-styles="costomstyle2"
+        :width="100"
+        :height="100"
+      >
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+        />
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+        />
+
+      </container>
+
+      <container
+        layout="vBox"
+        :wrapper-styles="costomstyle2"
+        :width="100"
+        :height="100"
+      >
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+        />
+        <container
+          layout="hBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+        />
+      </container>
+
+
+      <container
+        layout="hBox"
+        :wrapper-styles="costomstyle2"
+        :width="300"
+        :height="100"
+      >
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+          :flex="0.2"
+        >
+          0.2
+        </container>
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+          :flex="1.5"
+        >
+          1.5
+        </container>
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle5"
+          :width="50"
+          :height="50"
+          :flex="0.5"
+        >0.5
+        </container>
+      </container>
+
+
+      <container
+        layout="hBox"
+        :wrapper-styles="costomstyle2"
+        :width="800"
+        :height="100"
+      >
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle3"
+          :width="50"
+          :height="50"
+          :flex="0.3"
+        >
+          0.3
+        </container>
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle4"
+          :width="50"
+          :height="50"
+          :flex="0.8"
+        >
+          0.8
+        </container>
+        <container
+          layout="vBox"
+          :wrapper-styles="costomstyle5"
+          :width="50"
+          :height="50"
+          :flex="0.5"
+        >
+          0.5
+        </container>
+      </container>
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <text-box/>
+      <text-box/>
+      <text-box/>
     </container>
-  </container>
-
-
-     <container
-       layout='hBox'
-       :wrapperStyles ='costomstyle2'
-       :width = "800"
-       :height = "100"
-     >
-       <container
-         layout='vBox'
-         :wrapperStyles ='costomstyle3'
-         :width = "50"
-         :height = "50"
-         :flex = 0.3
-       >
-         0.3
-       </container>
-       <container
-         layout='vBox'
-         :wrapperStyles ='costomstyle4'
-         :width = "50"
-         :height = "50"
-         :flex = 0.8
-       >
-         0.8
-       </container>
-       <container
-         layout='vBox'
-         :wrapperStyles ='costomstyle5'
-         :width = "50"
-         :height = 50
-         :flex = 0.5
-       >
-         0.5
-       </container>
-     </container>
-     <div>1</div>
-     <div>2</div>
-     <div>3</div>
-     <text-box></text-box>
-     <text-box></text-box>
-     <text-box></text-box>
-   </container>
-</div>
+  </div>
 </template>
 <script>
-  import  Container from '@/components/Container';
+  import Container from '@/components/Container';
   import TextBox from '@/components/TextBox';
-//horizontal vertical
+// horizontal vertical
   export default {
     components: {
-      Container,TextBox
+      Container, TextBox,
     },
     data() {
       return {
-        height: '30%'
-      }
-    },
-    methods: {
-    }
-    ,
-    methods: {
-      M_click : function(){
-
-      }
+        height: '30%',
+      };
     },
     computed: {
       costomstyle() {
-        return  { 'background-color' : '#FFCDD2'};
+        return { 'background-color': '#FFCDD2' };
       },
       costomstyle1() {
-        return  { 'background-color' : '#FFF59D'};
+        return { 'background-color': '#FFF59D' };
       },
       costomstyle2() {
-        return  { 'background-color' : '#C5CAE9'};
+        return { 'background-color': '#C5CAE9' };
       },
       costomstyle3() {
-        return  { 'background-color' : '#EF6C00'};
+        return { 'background-color': '#EF6C00' };
       },
       costomstyle4() {
-        return  { 'background-color' : '#A1887F'};
+        return { 'background-color': '#A1887F' };
       },
       costomstyle5() {
-        return  { 'background-color' : 'orange'};
-      }
+        return { 'background-color': 'orange' };
+      },
     },
-  }
+    methods: {
+    },
+  };
 </script>
 <style>
   .custom-resizer {
