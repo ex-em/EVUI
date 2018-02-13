@@ -1,10 +1,10 @@
 <template>
   <div
-    :class="classnames"
+    :class="classNames"
     :style="userSelectStyle"
     :flex="flexVal"
-    :id ="c_id"
-    @click="OnCantainerClick">
+    :id ="cId "
+    @click="onCantainerClick">
     <slot></slot>
   </div>
 </template>
@@ -12,8 +12,8 @@
 <script>
   import ContainerFlex from './ContainerFlex.js';
 
-  const LAYOUT_HORIZONTAL = 'Hbox';
-  const LAYOUT_VERTICAL = 'Vbox';
+  const LAYOUT_HORIZONTAL = 'hBox';
+  const LAYOUT_VERTICAL = 'vBox';
 
   export default {
     name: 'Container',
@@ -25,7 +25,7 @@
       id: {
         type: String,
         default: function () {
-          return 'evui-'+ 'Container-' + this._uid;
+          return 'evui-'+ 'container-' + this._uid;
         },
       },
       /**
@@ -70,15 +70,15 @@
         parentHeight: null,
         parentWidth: null,
         parentLayout: null,
-        sumflex: 0,
+        sumFlex: 0,
       };
     },
 
     computed: {
-      c_id(){
+      cId (){
         return this.id;
       },
-      classnames() {
+      classNames() {
         return [
           'Container'
           // `layout-${this.layout.slice(0, 1)}`
@@ -86,33 +86,44 @@
       },
       userSelectStyle() {
         this.wrapperStyles =  typeof  this.wrapperStyles === 'object' ? this.wrapperStyles : null;
+        // let objs = [
+        //     {
+        //       width: this.containerWidth,
+        //       height: this.containerHeight,
+        //     }, this.wrapperStyles
+        //   ],
+        //   result =  objs.reduce(function (r, o) {
+        //     Object.keys(o).forEach(function (k) {
+        //       r[k] = o[k];
+        //     });
+        //     return r;
+        //   }, {});
         return Object.assign({
-          width     : this.containerWidth,
-          height    : this.containerHeight,
+          width: this.containerWidth,
+          height: this.containerHeight,
         }, this.wrapperStyles);
       },
       containerWidth(){
-
-      if(this.$data.parentLayout=== LAYOUT_HORIZONTAL && this.$data.sumflex !== 0){
-          let flexdata =new ContainerFlex({
-            vm              : this,
-            FlexTotalVal    : this.$data.sumflex,
-            parentWidth     : this.$data.parentWidth,
-            layout          : this.$data.parentLayout,
-            flex            : this.flex
+      if(this.$data.parentLayout === LAYOUT_HORIZONTAL && this.$data.sumFlex !== 0){
+          let flexdata = new ContainerFlex({
+            vm: this,
+            flexTotalVal: this.$data.sumFlex,
+            parentWidth: this.$data.parentWidth,
+            layout: this.$data.parentLayout,
+            flex: this.flex
           });
           return flexdata.FlexWidth()+'px';
         };
         return  typeof this.width === 'number' ? this.width + 'px' : this.width.toString();
       },
       containerHeight(){
-        if(this.$data.parentLayout === LAYOUT_VERTICAL && this.$data.sumflex !== 0){
-          let flexdata =new ContainerFlex({
-            vm              : this,
-            FlexTotalVal    : this.$data.sumflex,
-            parentHeight    : this.$data.parentHeight,
-            layout          : this.$data.parentLayout,
-            flex            : this.flex
+        if(this.$data.parentLayout === LAYOUT_VERTICAL && this.$data.sumFlex !== 0){
+          let flexdata = new ContainerFlex({
+            vm: this,
+            flexTotalVal: this.$data.sumFlex,
+            parentHeight: this.$data.parentHeight,
+            layout: this.$data.parentLayout,
+            flex: this.flex
           });
 
           return flexdata.FlexHeight()+'px';
@@ -125,34 +136,34 @@
     },
     mounted(){
       if(this.$children.length !== 0){
-          for(let ix= 0, ixLen = this.$children.length-1; ix<=ixLen; ix++){
+          for(let ix = 0, ixLen = this.$children.length-1; ix<=ixLen; ix++){
             let slotobj = this.$children[ix];
             // 컨테이너가 아닌 dom은 class 반영 하지않는다.
-            if( slotobj.id.indexOf('evui-Container') === -1)continue;
+            if(slotobj.id.indexOf('evui-container') === -1)continue;
             // 부모가 수직 수평인지에 따라 자식 class를 변경한다.
             slotobj.$el.className = this.layout === LAYOUT_VERTICAL ? 'layout-v' : 'layout-h'
           }
         }
       // 보모 존재 하면 부모 넓이/높이 값 추출
       if(this.$parent !== undefined && this.$parent.$el !== undefined){
-        if(this.$parent.$el.id.indexOf('evui-Container') !== -1 ){
-          //% 넓이 인경우 환산 필요
+        if(this.$parent.$el.id.indexOf('evui-container') !== -1){
+          // % 넓이 인경우 환산 필요
           let ClientRect = this.$parent.$el.getBoundingClientRect();
           this.$data.parentWidth  = ClientRect.width;
           this.$data.parentHeight = ClientRect.height;
           this.$data.parentLayout =  this.$parent.layout;
-
           let childrenObj = this.$parent.$children;
-          let sumflex = 0;
+          let sumFlex = 0;
 
-          for(let ix =0 , ixlen = childrenObj.length; ix < ixlen; ix++ ){
+          for(let ix = 0 , ixlen = childrenObj.length; ix < ixlen; ix++ ){
+            debugger;
             if(childrenObj[ix].flex === null || childrenObj[ix].flex === 0){
-              sumflex = 0;  //초기화처리
+              sumFlex = 0;  //초기화처리
               break;
             }
-            sumflex += childrenObj[ix].flex;
+            sumFlex += childrenObj[ix].flex;
           }
-          this.$data.sumflex = sumflex;
+          this.$data.sumFlex = sumFlex;
         }
       }
 
@@ -165,8 +176,8 @@
       // };
     },
     methods: {
-      OnCantainerClick(e) {
-        this.$emit('onClickDiv',e);
+      onCantainerClick(e) {
+        this.$emit('onClickDiv', e);
       },
 
       childrenCnt() {
