@@ -3,30 +3,28 @@
     :class="classNames"
     :style="userSelectStyle"
     :flex="flexVal"
-    :id ="cId "
     @click="onCantainerClick">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 
 <script>
-  import ContainerFlex from './ContainerFlex.js';
+  import ContainerFlex from './ContainerFlex';
 
   const LAYOUT_HORIZONTAL = 'hBox';
   const LAYOUT_VERTICAL = 'vBox';
 
   export default {
-    name: 'Container',
+
 
     props: {
-      /**
-       * Container  ID를 지정합니다.
-       */
-      id: {
+      /** *
+       *  Container 이름을 지정한다.
+       *
+       * */
+      name: {
         type: String,
-        default: function () {
-          return 'evui-'+ 'container-' + this._uid;
-        },
+        default: 'Container',
       },
       /**
        * Container 세로, 수직  지정합니다.
@@ -46,15 +44,15 @@
        * Container 넓이 설정합니다.
        */
       width: {
-        type: [String,Number],
-        default: '100%'
+        type: [String, Number],
+        default: '100%',
       },
       /**
        * Container 높이를 설정합니다.
        */
       height: {
-        type: [Number,String],
-        default: '100%'
+        type: [Number, String],
+        default: '100%',
       },
       /**
        * Container flex 비율로 넓이/높이를 지정합니다.
@@ -62,7 +60,7 @@
       flex: {
         type: Number,
         default: null,
-      }
+      },
     },
 
     data() {
@@ -75,17 +73,13 @@
     },
 
     computed: {
-      cId (){
-        return this.id;
-      },
       classNames() {
         return [
-          'Container'
-          // `layout-${this.layout.slice(0, 1)}`
+          'Container',
         ];
       },
       userSelectStyle() {
-        this.wrapperStyles =  typeof  this.wrapperStyles === 'object' ? this.wrapperStyles : null;
+        const wrapperObj = typeof this.wrapperStyles === 'object' ? this.wrapperStyles : null;
         // let objs = [
         //     {
         //       width: this.containerWidth,
@@ -101,64 +95,65 @@
         return Object.assign({
           width: this.containerWidth,
           height: this.containerHeight,
-        }, this.wrapperStyles);
+        }, wrapperObj);
       },
-      containerWidth(){
-      if(this.$data.parentLayout === LAYOUT_HORIZONTAL && this.$data.sumFlex !== 0){
-          let flexdata = new ContainerFlex({
+      containerWidth() {
+      if (this.$data.parentLayout === LAYOUT_HORIZONTAL && this.$data.sumFlex !== 0) {
+          const flexdata = new ContainerFlex({
             vm: this,
             flexTotalVal: this.$data.sumFlex,
             parentWidth: this.$data.parentWidth,
             layout: this.$data.parentLayout,
-            flex: this.flex
+            flex: this.flex,
           });
-          return flexdata.FlexWidth()+'px';
-        };
-        return  typeof this.width === 'number' ? this.width + 'px' : this.width.toString();
+          return `${flexdata.FlexWidth()}px`;
+        }
+        return typeof this.width === 'number' ? `${this.width}px` : this.width.toString();
       },
-      containerHeight(){
-        if(this.$data.parentLayout === LAYOUT_VERTICAL && this.$data.sumFlex !== 0){
-          let flexdata = new ContainerFlex({
+      containerHeight() {
+        if (this.$data.parentLayout === LAYOUT_VERTICAL && this.$data.sumFlex !== 0) {
+          const flexdata = new ContainerFlex({
             vm: this,
             flexTotalVal: this.$data.sumFlex,
             parentHeight: this.$data.parentHeight,
             layout: this.$data.parentLayout,
-            flex: this.flex
+            flex: this.flex,
           });
 
-          return flexdata.FlexHeight()+'px';
+          return `${flexdata.FlexHeight()}px`;
         }
-        return  typeof this.height === 'number' ? this.height + 'px' : this.height;
+        return typeof this.height === 'number' ? `${this.height}px` : this.height;
       },
-      flexVal(){
-        return typeof this.flex === 'null' ? null : this.flex;
-      }
+      flexVal() {
+        return typeof this.flex === typeof null ? null : this.flex;
+      },
     },
-    mounted(){
-      if(this.$children.length !== 0){
-          for(let ix = 0, ixLen = this.$children.length-1; ix<=ixLen; ix++){
-            let slotobj = this.$children[ix];
+    mounted() {
+      if (this.$children.length !== 0) {
+          for (let ix = 0, ixLen = this.$children.length - 1; ix <= ixLen; ix += 1) {
+            const slotobj = this.$children[ix];
             // 컨테이너가 아닌 dom은 class 반영 하지않는다.
-            if(slotobj.id.indexOf('evui-container') === -1)continue;
-            // 부모가 수직 수평인지에 따라 자식 class를 변경한다.
-            slotobj.$el.className = this.layout === LAYOUT_VERTICAL ? 'layout-v' : 'layout-h'
+            if (slotobj.name.indexOf('Container') !== -1) {
+              // 부모가 수직 수평인지에 따라 자식 class를 변경한다.
+              slotobj.$el.className = this.layout === LAYOUT_VERTICAL ? 'layout-v' : 'layout-h';
+            }
           }
         }
       // 보모 존재 하면 부모 넓이/높이 값 추출
-      if(this.$parent !== undefined && this.$parent.$el !== undefined){
-        if(this.$parent.$el.id.indexOf('evui-container') !== -1){
+      if (this.$parent !== undefined && this.$parent.$el !== undefined
+           && this.$parent.name !== undefined) {
+        if (this.$parent.name.indexOf('Container') !== -1) {
           // % 넓이 인경우 환산 필요
-          let ClientRect = this.$parent.$el.getBoundingClientRect();
-          this.$data.parentWidth  = ClientRect.width;
+          const ClientRect = this.$parent.$el.getBoundingClientRect();
+          this.$data.parentWidth = ClientRect.width;
           this.$data.parentHeight = ClientRect.height;
-          this.$data.parentLayout =  this.$parent.layout;
-          let childrenObj = this.$parent.$children;
+          this.$data.parentLayout = this.$parent.layout;
+          const childrenObj = this.$parent.$children;
           let sumFlex = 0;
 
-          for(let ix = 0 , ixlen = childrenObj.length; ix < ixlen; ix++ ){
-            debugger;
-            if(childrenObj[ix].flex === null || childrenObj[ix].flex === 0){
-              sumFlex = 0;  //초기화처리
+          for (let ix = 0, ixlen = childrenObj.length; ix < ixlen; ix += 1) {
+            if (childrenObj[ix].flex === null || childrenObj[ix].flex === 0) {
+              sumFlex = 0; // 초기화처리
               break;
             }
             sumFlex += childrenObj[ix].flex;
@@ -166,8 +161,6 @@
           this.$data.sumFlex = sumFlex;
         }
       }
-
-
     },
     created() {
       // this.cantainerSize = {
@@ -183,7 +176,7 @@
       childrenCnt() {
        return this.$children.length;
       },
-      testCase(obj,param) {
+      testCase() {
         return this.$children.length;
       },
       // findSider () {
@@ -191,7 +184,7 @@
       //     return child.$options.name === 'Sider';
       //   });
       // },
-    }
+    },
   };
 
 </script>
