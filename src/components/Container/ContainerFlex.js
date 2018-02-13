@@ -5,17 +5,17 @@ export default class ContainerFlex {
     });
   }
   FlexWidth() {
-    const FlexTotalVal = this.FlexTotalVal || 1; // 값이 없으면 1 셋팅
+    const flexTotalVal = this.flexTotalVal || 1; // 값이 없으면 1 셋팅
     const parentWidth = this.parentWidth || 0;
     const layout = this.layout || '';
     const flex = this.flex || 1;
 
     if (layout === 'Hbox') {
     // 컨테이너 비율 넓이 값 계산
-      let ContainerRatioWidth = parentWidth / FlexTotalVal;
-      ContainerRatioWidth = Math.floor(ContainerRatioWidth);
+      let containerRatioWidth = parentWidth / flexTotalVal;
+      containerRatioWidth = Math.floor(containerRatioWidth);
       // 컨테이너 안에 box flex 넓이 값 계산
-      const flexWidth = ContainerRatioWidth * flex;
+      const flexWidth = containerRatioWidth * flex;
 
       return flexWidth;
     }
@@ -23,17 +23,17 @@ export default class ContainerFlex {
   }
 
   FlexHeight() {
-    const FlexTotalVal = this.FlexTotalVal || 1; // 값이 없으면 1 셋팅
+    const flexTotalVal = this.flexTotalVal || 1; // 값이 없으면 1 셋팅
     const parentHeight = this.parentHeight || 0;
     const layout = this.layout || '';
     const flex = this.flex || 1;
 
     if (layout === 'Vbox') {
       // 컨테이너 비율 높이 값 계산
-      let ContainerRatioHeight = parentHeight / FlexTotalVal;
-      ContainerRatioHeight = Math.floor(ContainerRatioHeight);
+      let containerRatioHeight = parentHeight / flexTotalVal;
+      containerRatioHeight = Math.floor(containerRatioHeight);
       // 컨테이너 안에 box flex 높이 값 계산
-      const flexHeight = ContainerRatioHeight * flex;
+      const flexHeight = containerRatioHeight * flex;
 
       return flexHeight;
     }
