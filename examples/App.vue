@@ -4,8 +4,6 @@
       <ul>
         <li>
           <router-link to="/">Index</router-link>
-          <router-link to="/helloworld">Hello World</router-link>
-          <router-link to="/textbox">Text Box</router-link>
         </li>
         <li>
           <router-link to="/Container">Container</router-link>
