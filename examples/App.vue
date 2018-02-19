@@ -8,6 +8,9 @@
         <li>
           <router-link to="/Container">Container</router-link>
         </li>
+        <li>
+          <router-link to="/Chart">Chart</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>
