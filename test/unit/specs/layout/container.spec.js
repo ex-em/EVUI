@@ -1,6 +1,6 @@
 import { shallow } from 'vue-test-utils';
-import Container from '@/components/Container/Container';
-import ContainerFlex from '@/components/Container/ContainerFlex';
+import Container from '@/components/container/container';
+import ContainerFlex from '@/components/container/container_flex';
 
 
 

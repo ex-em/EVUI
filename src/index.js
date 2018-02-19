@@ -1,5 +1,5 @@
-import Container from '@/components/Container';
-import Chart from '@/components/Chart';
+import Chart from '@/components/chart';
+import Container from '@/components/container';
 
 const components = {
   Container,

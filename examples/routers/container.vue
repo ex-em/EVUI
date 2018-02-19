@@ -180,7 +180,7 @@
   </div>
 </template>
 <script>
-  import Container from '@/components/Container';
+  import Container from '@/components/container';
 
 // horizontal vertical
   export default {

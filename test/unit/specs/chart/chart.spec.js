@@ -1,5 +1,5 @@
 import { shallow } from 'vue-test-utils';
-import Chart from '@/components/Chart/Chart';
+import Chart from '@/components/chart/chart';
 
 describe('Create Chart', () => {
   let wrapper;
