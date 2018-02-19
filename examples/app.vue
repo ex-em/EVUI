@@ -9,7 +9,7 @@
           <router-link to="/container">Container</router-link>
         </li>
         <li>
-          <router-link to="/Chart">Chart</router-link>
+          <router-link to="/chart">Chart</router-link>
         </li>
       </ul>
     </nav>
