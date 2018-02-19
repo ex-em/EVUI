@@ -1,27 +1,26 @@
 <template>
   <div class="evui-chart-container">
-    <canvas></canvas>
+    <canvas/>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'evui-chart',
+    data() {
+      return {
+        value: 'canvas',
+      };
+    },
     computed: {},
     methods: {
       checkBrowserSupport() {
         const vm = this;
-        let canvasDOM = vm.$el.getElementById('sample-canvas');
+        const canvasDOM = vm.$el.getElementById('sample-canvas');
 
         return canvasDOM && canvasDOM.getContext();
-      }
+      },
     },
-    data() {
-      return {
-        value : 'canvas'
-      };
-    }
-  }
+  };
 </script>
 <style>
 </style>

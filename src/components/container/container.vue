@@ -9,7 +9,7 @@
 </template>
 
 <script>
-  import ContainerFlex from './ContainerFlex';
+  import ContainerFlex from './container_flex';
 
   const LAYOUT_HORIZONTAL = 'hBox';
   const LAYOUT_VERTICAL = 'vBox';
