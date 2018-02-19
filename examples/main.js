@@ -13,11 +13,11 @@ const router = new VueRouter({
   routes: [
     {
       path: '/container',
-      component: resolve => require(['./routers/Container'], resolve),
+      component: resolve => require(['./routers/container'], resolve),
     },
     {
-      path: '/Chart',
-      component: resolve => require(['./routers/Chart'], resolve),
+      path: '/chart',
+      component: resolve => require(['./routers/chart'], resolve),
     }
   ],
 });
