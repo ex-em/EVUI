@@ -1,38 +1,25 @@
-import { mount } from 'vue-test-utils';
+import { shallow } from 'vue-test-utils';
 import Chart from '@/components/chart/chart';
 
 describe('Create Chart', () => {
-  const wrapper = mount(Chart);
-  const chart = wrapper.vm;
+  let wrapper;
 
-  it('Mounted chart Vue Component', () => {
-    expect(chart.$el.getElementsByClassName('evui-chart-container')).to.exist;
+  beforeEach(() => {
+    // vue 인스턴트 활성화
+    wrapper = shallow(Chart);
   });
 
-  it('Created Canvas Element', () => {
-    expect(wrapper.contains('canvas')).to.exist;
+  it('DOM 생성 확인', () => {
+    // vue 인스턴스 생성 확인여부
+    expect(wrapper.isVueInstance()).to.be.true;
+
+    //마운트한 wrapper 존재여부
+    expect(wrapper.exists()).to.be.true;
+
+    // el요소 확인
+    expect(wrapper.element).to.be.ok;
+
+    //컴포넌트 Contain 확인
+    expect(wrapper.contains('div.evui-chart-container')).to.be.true;
   });
-
-
-
-
-  // it('is Exist Chart.vue file?', () => {
-  //   let vueFile = require('@/components/Chart/Chart');
-  //   expect(vueFile.default.name).to.be.equal('sample-canvas');
-  // });
-  //
-  // it('Create Canvas Object', () => {
-  //   const canvas = chart.find('#sample-canvas');
-  //   expect(canvas.contains('canvas')).toBe(true);
-  // });
-  //
-  // it('Check Browser support', () => {
-  //   expect(chart.vm.checkBrowserSupport).to.exist;
-  // });
-  //
-  // it('Check typeof Browser support', () => {
-  //   expect(typeof chart.vm.checkBrowserSupport).to.equal('function');
-  // });
-
-
 });

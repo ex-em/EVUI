@@ -1,7 +1,9 @@
+import Chart from '@/components/chart';
 import Container from '@/components/container';
 
 const components = {
   Container,
+  Chart,
 };
 
 const evui = {

@@ -45,7 +45,6 @@ module.exports = {
     }],
     'indent': 'off',
     'linebreak-style': 0,
-    'indent': 'off',
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
       optionalDependencies: ['test/unit/index.js']
