@@ -1,3 +1,4 @@
 import Container from './container';
+import ResizeBar from './resizebar';
 
-export default Container;
+export { Container, ResizeBar };
