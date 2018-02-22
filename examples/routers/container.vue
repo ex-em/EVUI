@@ -1,191 +1,157 @@
 <template>
-  <div style="height: 400px; widht:100%">
+  <div style="height: 100%; widht:100%">
     <container
       layout="hBox"
-      :wrapper-styles="costomstyle"
-      :height="400"
-      @onClickDiv="M_click"
+      :wrapper-styles="customstyle"
+      :height="100"
     >
-      <container
-        layout="vBox"
-        :wrapper-styles="costomstyle2"
-        :width="400"
-        :height="height"
-      >
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
-          :height="50"
-          :flex="0.3"
-        >
-          0.3
-        </container>
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
-          :height="50"
-          :flex="0.8"
-        >
-          0.8
-        </container>
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle5"
-          :width="50"
-          :height="50"
-          :flex="0.4"
-        >
-          0.4
-        </container>
-      </container>
 
       <container
-        layout="vBox"
-        :wrapper-styles="costomstyle2"
-        :width="100"
+        :wrapper-styles="customstyle"
         :height="100"
+        :width="195"
       >
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
-          :height="50"
-        />
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
-          :height="50"
-        />
-
+        <header class="container-title">
+          title 1
+        </header>
+        <button>A</button>
       </container>
+      <resizebar/>
+      <container
+        :wrapper-styles="customstyle"
+        :height="100"
+        :width="195"
+      >
+        <header class="container-title">
+          title 2
+        </header>
+      </container>
+      <container
+        :wrapper-styles="customstyle"
+        :height="100"
+        :width="200"
+        :flex="1"
+      >
+        <header class="container-title">
+          title 3
+        </header>
+      </container>
+    </container>
+
+    <br><br>
+    <!-- Vbox -->
+    <container
+      layout="vBox"
+      :wrapper-styles="customstyle"
+      :height="400"
+    >
 
       <container
         layout="hBox"
-        :wrapper-styles="costomstyle2"
-        :width="100"
+        :wrapper-styles="customstyle1"
         :height="100"
+        :width="200"
       >
         <container
-          layout="vBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
+          :wrapper-styles="customstyle"
           :height="50"
-        />
+          :width="50"
+        >
+          <header class="container-title">
+            title 1
+          </header>
+        </container>
         <container
-          layout="vBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
+          :wrapper-styles="customstyle"
           :height="50"
-        />
+          :width="50"
+        >
+          <header class="container-title">
+            title 2
+          </header>
+        </container>
+        <container
+          :wrapper-styles="customstyle"
+          :height="50"
+          :width="50"
+        >
+          <header class="container-title">
+            title 3
+          </header>
+        </container>
 
       </container>
-
+      <resizebar/>
       <container
-        layout="vBox"
-        :wrapper-styles="costomstyle2"
-        :width="100"
-        :height="100"
-      >
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
-          :height="50"
-        />
-        <container
-          layout="hBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
-          :height="50"
-        />
-      </container>
-
-
-      <container
-        layout="hBox"
-        :wrapper-styles="costomstyle2"
+        :wrapper-styles="customstyle"
+        :height="300"
         :width="300"
-        :height="100"
+        :flex="1"
       >
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
-          :height="50"
-          :flex="0.2"
-        >
-          0.2
-        </container>
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
-          :height="50"
-          :flex="1.5"
-        >
-          1.5
-        </container>
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle5"
-          :width="50"
-          :height="50"
-          :flex="0.5"
-        >0.5
-        </container>
+        <header class="container-title">
+          title 2
+        </header>
       </container>
+      <container
+        :wrapper-styles="customstyle"
+        :height="300"
+        :width="300"
+        :flex="3"
+      >
+        <header class="container-title">
+          title 3
+        </header>
+      </container>
+    </container>
 
+    <br><br>
+
+    <container
+      layout="hBox"
+      :wrapper-styles="customstyle"
+      :height="300"
+    >
 
       <container
-        layout="hBox"
-        :wrapper-styles="costomstyle2"
-        :width="800"
-        :height="100"
+        :wrapper-styles="customstyle"
+        :height="300"
+        :width="195"
+        :min-width="300"
       >
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle3"
-          :width="50"
-          :height="50"
-          :flex="0.3"
-        >
-          0.3
-        </container>
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle4"
-          :width="50"
-          :height="50"
-          :flex="0.8"
-        >
-          0.8
-        </container>
-        <container
-          layout="vBox"
-          :wrapper-styles="costomstyle5"
-          :width="50"
-          :height="50"
-          :flex="0.5"
-        >
-          0.5
-        </container>
+        <header class="container-title">
+          title 1
+        </header>
       </container>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
+      <resizebar/>
+      <container
+        :wrapper-styles="customstyle"
+        :height="300"
+        :width="195"
+        :flex="2"
+      >
+        <header class="container-title">
+          title 2
+        </header>
+      </container>
+      <container
+        :wrapper-styles="customstyle"
+        :height="300"
+        :width="200"
+      >
+        <header class="container-title">
+          title 3
+        </header>
+      </container>
     </container>
   </div>
 </template>
 <script>
-  import Container from '@/components/container';
+  import { Container, Resizebar } from '@/components/container';
 
 // horizontal vertical
   export default {
     components: {
-      Container,
+      Container, Resizebar,
     },
     data() {
       return {
@@ -193,22 +159,22 @@
       };
     },
     computed: {
-      costomstyle() {
-        return { 'background-color': '#FFCDD2' };
+      customstyle() {
+        return { 'background-color': '#fff' };
       },
-      costomstyle1() {
-        return { 'background-color': '#FFF59D' };
+      customstyle1() {
+        return { 'background-color': '#fff' };
       },
-      costomstyle2() {
+      customstyle2() {
         return { 'background-color': '#C5CAE9' };
       },
-      costomstyle3() {
+      customstyle3() {
         return { 'background-color': '#EF6C00' };
       },
-      costomstyle4() {
+      customstyle4() {
         return { 'background-color': '#A1887F' };
       },
-      costomstyle5() {
+      customstyle5() {
         return { 'background-color': 'orange' };
       },
     },
@@ -217,12 +183,12 @@
   };
 </script>
 <style>
-  .custom-resizer {
-    width: 100%;
-    height: 400px;
-  }
+  /*.custom-resizer {*/
+    /*width: 100%;*/
+    /*height: 400px;*/
+  /*}*/
 
-  .custom-resizer > .pane {
+  .Container > .pane {
     text-align: left;
     padding: 15px;
     overflow: hidden;
@@ -230,46 +196,49 @@
     border: 1px solid #ccc;
   }
 
+  /*.Container > .resizebar {*/
+    /*z-index: 3;*/
+    /*margin: 0;*/
+    /*left: 0;*/
+    /*position: relative;*/
+  /*}*/
+  /*.Container > .resizebar:before {*/
+    /*display: block;*/
+    /*content: "● ● ●";*/
+    /*color: #999999;*/
+    /*width: 3px;*/
+    /*height: 100%;*/
+    /*position: absolute;*/
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*!*margin-top: -20px;*!*/
+    /*!*margin-left: -5px;*!*/
+    /*!*border-left: 1px solid #ccc;*!*/
+    /*!*border-right: 1px solid #ccc;*!*/
+  /*}*/
+  /*.Container > .resizebar:hover:before {*/
+    /*color: #333333;*/
+  /*}*/
 
-  .custom-resizer > .multipane-resizer {
-    margin: 0;
-    left: 0;
-    position: relative;
-  }
-  .custom-resizer > .multipane-resizer:before {
-    display: block;
-    content: "● ● ●";
-    color: #999999;
-    width: 3px;
-    height: 40px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -20px;
-    margin-left: -5px;
+  /*.vertical-panes {*/
+    /*width: 100%;*/
+    /*height: 400px;*/
+    /*border: 1px solid #ccc;*/
+  /*}*/
+
+  /*.vertical-panes > .pane {*/
+    /*text-align: left;*/
+    /*padding: 15px;*/
+    /*overflow: hidden;*/
+    /*background: #eee;*/
+  /*}*/
+
+  /*.vertical-panes > .pane ~ .pane {*/
     /*border-left: 1px solid #ccc;*/
-    /*border-right: 1px solid #ccc;*/
-  }
-  .custom-resizer > .multipane-resizer:hover:before {
-    color: #333333;
-  }
+  /*}*/
 
-  .vertical-panes {
-    width: 100%;
-    height: 400px;
-    border: 1px solid #ccc;
+  .container-title{
+   background-color: #f1f1f1!important;
   }
-
-  .vertical-panes > .pane {
-    text-align: left;
-    padding: 15px;
-    overflow: hidden;
-    background: #eee;
-  }
-
-  .vertical-panes > .pane ~ .pane {
-    border-left: 1px solid #ccc;
-  }
-
 </style>
 
