@@ -35,7 +35,8 @@
   ],
   "dependencies": {
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "lodash": "^4.17.5"
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.11",
@@ -56,6 +57,7 @@
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.0",
+    "style-loader": "^0.20.2",
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^11.3.0",
     "eslint-friendly-formatter": "^3.0.0",
