@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
 
-
 Vue.use(VueRouter);
 Vue.use(EVUI);
 Vue.config.debug = true;
@@ -18,6 +17,10 @@ const router = new VueRouter({
     {
       path: '/chart',
       component: resolve => require(['./routers/chart'], resolve),
+    },
+    {
+      path: '/table',
+      component: resolve => require(['./routers/table'], resolve),
     }
   ],
 });

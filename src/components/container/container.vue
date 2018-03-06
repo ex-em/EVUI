@@ -227,7 +227,6 @@
     },
     methods: {
       onMouseDown({ target: resizer, pageX: initialPageX, pageY: initialPageY }) {
-        console.log('실행');
         // 마우스 클릭 이벤트 발생
         /** *
          *  resizer : 사이즈 변경 되는 타켓 리사이즈 div 바
