@@ -1,5 +1,8 @@
 @charset "UTF-8";
 
+/************************************************************************************
+ common
+************************************************************************************/
 *{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -10,6 +13,9 @@
 /************************************************************************************
  Checkbox
 ************************************************************************************/
+.evui-checkbox{
+  display: inline-block;
+}
 
 .evui-checkbox input[type=checkbox]{
   display: none;
@@ -19,9 +25,17 @@
   display: inline-block;
   position: relative;
   padding-left: 25px;
-  margin-right: 15px;
   font-size: 13px;
   cursor: pointer;
+}
+
+.evui-checkbox.evui-diabled input[type=checkbox]+label{
+  color: #c1c1c1;
+  cursor: not-allowed;
+}
+
+div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
+  background-color: #c1c1c1;
 }
 
 .evui-checkbox input[type=checkbox]+label:before{

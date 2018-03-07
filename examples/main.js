@@ -18,6 +18,10 @@ const router = new VueRouter({
     {
       path: '/chart',
       component: resolve => require(['./routers/chart'], resolve),
+    },
+    {
+      path: '/checkbox',
+      component: resolve => require(['./routers/checkbox'], resolve),
     }
   ],
 });

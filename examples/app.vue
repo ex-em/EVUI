@@ -11,6 +11,9 @@
         <li>
           <router-link to="/chart">Chart</router-link>
         </li>
+        <li>
+          <router-link to="/checkbox">Chart</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>
