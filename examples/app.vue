@@ -12,7 +12,7 @@
           <router-link to="/chart">Chart</router-link>
         </li>
         <li>
-          <router-link to="/checkbox">Chart</router-link>
+          <router-link to="/checkbox">Checkbox</router-link>
         </li>
       </ul>
     </nav>
