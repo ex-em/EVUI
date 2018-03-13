@@ -231,8 +231,12 @@
             } else {
               // 새로 누른거니가 소트 아이콘 기존거 다 지우자
               for (let ix = 0, ixLen = this.sortColumns.length; ix < ixLen; ix++) {
+                // up 모양 삭제
                 this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
                   .children[0].classList.remove('evui-sort-up');
+                // down 모양 삭제
+                this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
+                  .children[0].classList.remove('evui-sort-down');
               }
               // 소트 컬럼 초기화 한번해주자
               this.sortColumns = [];
