@@ -1,4 +1,7 @@
-import Container from './container';
+import mainContainer from './mainContainer';
 import ResizeBar from './resizebar';
+import boxPanel from './boxPanel';
+// Default styling
+import './container.css';
 
-export { Container, ResizeBar };
+export { mainContainer, ResizeBar, boxPanel };
