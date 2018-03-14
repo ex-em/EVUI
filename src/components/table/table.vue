@@ -24,7 +24,6 @@
                   style="border-right: 0px; width: 0px;"/>
                 <template v-for="(column, index) in columns">
                   <td
-                    :ref="column.field"
                     :key="index"
                     :col="index"
                     class="evui-head "
@@ -38,7 +37,7 @@
                       @mouseup.stop.prevent="resize(column,$event)"
                       :style="{ height: '25px', marginLeft: (parseInt(column.size)-4)+'px' }"/>
                     <div class="evui-col-header">
-                      <div/>
+                      <div :ref="`${column.field}_sort`"/>
                       {{ column.caption }}
                     </div>
                   </td>
@@ -194,7 +193,7 @@
 
     methods: {
       sort(column, event) {
-        const targetEl = this.$refs[column.field][0].getElementsByClassName('evui-col-header')[0];
+        const sortTargelCls = this.$refs[`${column.field}_sort`][0].classList;
 
         // sort 된적이 없다면 무조건 sort 기능 실행시켜야지
         if (!this.isSort) {
@@ -215,7 +214,7 @@
           this.resultData = _.cloneDeep(this.sortedData);
 
           // 이제 css를 변경해줘야겠지?
-          targetEl.children[0].classList.add('evui-sort-up');
+          sortTargelCls.add('evui-sort-up');
         } else {
           const sortedColumnIndex = _.findIndex(this.sortColumns, ['field', column.field]);
           const isMultiSort = event.ctrlKey;
@@ -229,14 +228,12 @@
                 direction: 'asc',
               });
             } else {
-              // 새로 누른거니가 소트 아이콘 기존거 다 지우자
+              // 새로 누른거니까 소트 아이콘 기존거 다 지우자
               for (let ix = 0, ixLen = this.sortColumns.length; ix < ixLen; ix++) {
                 // up 모양 삭제
-                this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
-                  .children[0].classList.remove('evui-sort-up');
+                this.$refs[`${this.sortColumns[ix].field}_sort`][0].classList.remove('evui-sort-up');
                 // down 모양 삭제
-                this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
-                  .children[0].classList.remove('evui-sort-down');
+                this.$refs[`${this.sortColumns[ix].field}_sort`][0].classList.remove('evui-sort-down');
               }
               // 소트 컬럼 초기화 한번해주자
               this.sortColumns = [];
@@ -259,7 +256,7 @@
             this.resultData = _.cloneDeep(this.sortedData);
 
             // 이제 css를 변경해줘야겠지?
-            targetEl.children[0].classList.add('evui-sort-up');
+            sortTargelCls.add('evui-sort-up');
           } else {
             // 소트 된 컬럼을 눌렀을 경우 여기를 탄다.
             const direction = this.sortColumns[sortedColumnIndex].direction;
@@ -271,12 +268,19 @@
                 this.sortColumns[sortedColumnIndex].direction = 'desc';
 
                 // 스타일을 입혀보자
-                targetEl.children[0].classList.remove('evui-sort-up');
-                targetEl.children[0].classList.add('evui-sort-down');
+                sortTargelCls.remove('evui-sort-up');
+                sortTargelCls.add('evui-sort-down');
               } else {
                 // desc 인경우 빼버림
                 this.sortColumns.splice(sortedColumnIndex, 1);
-                targetEl.children[0].classList.remove('evui-sort-down');
+
+                // sortcolumn 배열 크기가 0이면 소트 된게 없다
+                if (this.sortColumns.length === 0) {
+                  this.isSort = false;
+                }
+
+                // css 제거
+                sortTargelCls.remove('evui-sort-down');
               }
 
               // sortedData 초기화 안전빵
@@ -295,11 +299,9 @@
               // 새로 누른거니가 소트 아이콘 기존거 다 지우자
               for (let ix = 0, ixLen = this.sortColumns.length; ix < ixLen; ix++) {
                 // up 모양 삭제
-                this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
-                  .children[0].classList.remove('evui-sort-up');
+                this.$refs[`${this.sortColumns[ix].field}_sort`][0].classList.remove('evui-sort-up');
                 // down 모양 삭제
-                this.$refs[this.sortColumns[ix].field][0].getElementsByClassName('evui-col-header')[0]
-                  .children[0].classList.remove('evui-sort-down');
+                this.$refs[`${this.sortColumns[ix].field}_sort`][0].classList.remove('evui-sort-down');
               }
 
               // asc->desc로 변경
@@ -317,12 +319,16 @@
                 this.sortedData = _.orderBy(this.sortedData, column.field, 'desc');
 
                 // 스타일을 입혀보자
-                targetEl.children[0].classList.remove('evui-sort-up');
-                targetEl.children[0].classList.add('evui-sort-down');
+                sortTargelCls.remove('evui-sort-up');
+                sortTargelCls.add('evui-sort-down');
               } else {
                 // desc 인경우 빼버림
                 this.sortColumns = [];
-                targetEl.children[0].classList.remove('evui-sort-down');
+
+                // 소트 안된거임
+                this.isSort = false;
+
+                sortTargelCls.remove('evui-sort-down');
               }
               // 정렬 값을 resultData에 넣어주자
               this.resultData = _.cloneDeep(this.sortedData);
