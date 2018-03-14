@@ -1,8 +1,8 @@
 <template>
   <div
     ref="MainContainer"
-    :class="classNames"
     :style="userSelectStyle"
+    class="evui-container"
     @mousedown="onMouseDown"
   >
     <slot/>
@@ -10,6 +10,7 @@
 </template>
 
 <script>
+  import utils from '@/common/container.utils';
 
   const LAYOUT_HORIZONTAL = 'hBox';
   const LAYOUT_VERTICAL = 'vBox';
@@ -59,14 +60,14 @@
        */
       maxWidth: {
         type: [String, Number],
-        default: '100%',
+        default: '800px',
       },
       /**
        * mainContinaer 높이를 설정합니다.
        */
       height: {
         type: [Number, String],
-        default: '100%',
+        default: '800px',
       },
       /**
        * mainContinaer 최소높이 설정합니다.
@@ -107,13 +108,13 @@
     },
 
     computed: {
-      classNames() {
-        return [
-          'evui-container',
-        ];
-      },
       userSelectStyle() {
-        const wrapperObj = typeof this.wrapperStyles === 'object' ? this.wrapperStyles : null;
+        let wrapperObj;
+        if (this.wrapperStyles !== null && typeof this.wrapperStyles === 'object') {
+          wrapperObj = this.wrapperStyles;
+        } else {
+          wrapperObj = null;
+        }
         const styleObject = Object.assign({
           width: this.widthVal,
           height: this.heightVal,
@@ -129,7 +130,7 @@
           return typeof this.panelWidth === 'number' ? `${this.panelWidth}px` : this.panelWidth;
         },
         set(cData) {
-          this.panelWidth = this.styleSizeValue(cData);
+          this.panelWidth = utils.styleSizeValue(cData);
         },
       },
       minWidthVal: {
@@ -137,7 +138,7 @@
           return typeof this.panelMinWidth === 'number' ? `${this.panelMinWidth}px` : this.panelMinWidth;
         },
         set(cData) {
-          this.panelMinWidth = this.styleSizeValue(cData);
+          this.panelMinWidth = utils.styleSizeValue(cData);
         },
       },
       maxWidthVal: {
@@ -145,7 +146,7 @@
           return typeof this.panelMaxWidth === 'number' ? `${this.panelMaxWidth}px` : this.panelMaxWidth;
         },
         set(cData) {
-          this.panelMaxWidth = this.styleSizeValue(cData);
+          this.panelMaxWidth = utils.styleSizeValue(cData);
         },
       },
       heightVal: {
@@ -153,7 +154,7 @@
           return typeof this.panelHeight === 'number' ? `${this.panelHeight}px` : this.panelHeight;
         },
         set(cData) {
-          this.panelHeight = this.styleSizeValue(cData);
+          this.panelHeight = utils.styleSizeValue(cData);
         },
       },
       maxHeightVal: {
@@ -161,7 +162,7 @@
           return typeof this.panelMaxHeight === 'number' ? `${this.panelMaxHeight}px` : this.panelMaxHeight;
         },
         set(cData) {
-          this.panelMaxHeight = this.styleSizeValue(cData);
+          this.panelMaxHeight = utils.styleSizeValue(cData);
         },
       },
       minHeightVal: {
@@ -169,7 +170,7 @@
           return typeof this.panelMinHeight === 'number' ? `${this.panelMinHeight}px` : this.panelMinHeight;
         },
         set(cData) {
-          this.panelMinHeight = this.styleSizeValue(cData);
+          this.panelMinHeight = utils.styleSizeValue(cData);
         },
       },
 
@@ -223,8 +224,8 @@
               const preWidth = `${prePanelSize.width + mouseMoveXY}px`;
               const nextWidth = `${nextPanelSize.width - mouseMoveXY}px`;
               if (prePanelSize.width + mouseMoveXY > 0 && nextPanelSize.width - mouseMoveXY > 0) {
-                if (self.quantity(nextMinWidth).value < self.quantity(nextWidth).value
-                  && self.quantity(prevMinWidth).value < self.quantity(preWidth).value) {
+                if (utils.quantity(nextMinWidth).value < utils.quantity(nextWidth).value
+                  && utils.quantity(prevMinWidth).value < utils.quantity(preWidth).value) {
                   preResizeContainer.style.width = preWidth;
                   nextResizeContainer.style.width = nextWidth;
                 }
@@ -234,8 +235,8 @@
               const preHeight = `${prePanelSize.height + mouseMoveXY}px`;
               const nextHeight = `${nextPanelSize.height - mouseMoveXY}px`;
               if (prePanelSize.height + mouseMoveXY > 0 && nextPanelSize.height - mouseMoveXY > 0) {
-                if (self.quantity(nextMinheight).value < self.quantity(nextHeight).value
-                  && self.quantity(prevMinheight).value < self.quantity(preHeight).value) {
+                if (utils.quantity(nextMinheight).value < utils.quantity(nextHeight).value
+                  && utils.quantity(prevMinheight).value < utils.quantity(preHeight).value) {
                   preResizeContainer.style.height = preHeight;
                   nextResizeContainer.style.height = nextHeight;
                 }
@@ -369,36 +370,17 @@
         const flexSizeRatio = parentSize / totalFlex;
         return `${flexSizeRatio * flex}px`;
       },
-      quantity(input) {
-        let output;
-        if (typeof input === 'string' || typeof input === 'number') {
-          const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
-          output = match ? { value: +match[2], unit: match[3] || undefined } : null;
-        } else {
-          output = null;
-        }
-        return output;
-      },
-      styleSizeValue(gData) {
-      if (typeof gData === 'number' || !isNaN(gData)) {
-        return Number(gData);
-      } else if (gData.match(/^(normal|(\d+(?:\.\d+)?)(%)?)$/)) {
-        // .match(/^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/);
-        return gData;
-      }
-      throw new Error('[EVUI][ERROR][Container]-styleData');
-    },
     getWidth() {
       return this.widthVal;
     },
     setWidth(cWidth) {
-      this.widthVal = this.styleSizeValue(cWidth);
+      this.widthVal = utils.styleSizeValue(cWidth);
     },
     getHeight() {
       return this.heightVal;
     },
     setHeight(cHeight) {
-      this.heightVal = this.styleSizeValue(cHeight);
+      this.heightVal = utils.styleSizeValue(cHeight);
     },
     getName() {
       return this.name;
@@ -419,25 +401,25 @@
       return this.minWidthVal;
     },
     setMinWidth(cMinWidth) {
-      this.minWidthVal = this.styleSizeValue(cMinWidth);
+      this.minWidthVal = utils.styleSizeValue(cMinWidth);
     },
     getMinHeight() {
       return this.minWidthVal;
     },
     setMinHeight(cMinHeight) {
-      this.minHeightVal = this.styleSizeValue(cMinHeight);
+      this.minHeightVal = utils.styleSizeValue(cMinHeight);
     },
     getMaxWidth() {
       return this.maxWidthVal;
     },
     setMaxWidth(cMaxWidth) {
-      this.minWidthVal = this.styleSizeValue(cMaxWidth);
+      this.minWidthVal = utils.styleSizeValue(cMaxWidth);
     },
     getMaxHeight() {
       return this.maxHeightVal;
     },
     setMaxHeight(cMaxHeight) {
-      this.maxHeightVal = this.styleSizeValue(cMaxHeight);
+      this.maxHeightVal = utils.styleSizeValue(cMaxHeight);
     },
     deleteFlex() {
       // removeProperty

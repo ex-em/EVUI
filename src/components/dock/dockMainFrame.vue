@@ -15,7 +15,8 @@
 </template>
 
 <script>
-  // import _ from 'lodash';
+  import utils from '@/common/container.utils';
+
   const LAYOUT_HORIZONTAL = 'hBox';
   const LAYOUT_VERTICAL = 'vBox';
 
@@ -117,7 +118,12 @@
         ];
       },
       userSelectStyle() {
-        const wrapperObj = typeof this.wrapperStyles === 'object' ? this.wrapperStyles : null;
+        let wrapperObj;
+        if (this.wrapperStyles !== null && typeof this.wrapperStyles === 'object') {
+          wrapperObj = this.wrapperStyles;
+        } else {
+          wrapperObj = null;
+        }
         const styleObject = Object.assign({
           width: this.widthVal,
           height: this.heightVal,
@@ -133,7 +139,7 @@
           return typeof this.panelWidth === 'number' ? `${this.panelWidth}px` : this.panelWidth;
         },
         set(cData) {
-          this.panelWidth = this.styleSizeValue(cData);
+          this.panelWidth = utils.styleSizeValue(cData);
         },
       },
       minWidthVal: {
@@ -141,7 +147,7 @@
           return typeof this.panelMinWidth === 'number' ? `${this.panelMinWidth}px` : this.panelMinWidth;
         },
         set(cData) {
-          this.panelMinWidth = this.styleSizeValue(cData);
+          this.panelMinWidth = utils.styleSizeValue(cData);
         },
       },
       maxWidthVal: {
@@ -149,7 +155,7 @@
           return typeof this.panelMaxWidth === 'number' ? `${this.panelMaxWidth}px` : this.panelMaxWidth;
         },
         set(cData) {
-          this.panelMaxWidth = this.styleSizeValue(cData);
+          this.panelMaxWidth = utils.styleSizeValue(cData);
         },
       },
       heightVal: {
@@ -157,7 +163,7 @@
           return typeof this.panelHeight === 'number' ? `${this.panelHeight}px` : this.panelHeight;
         },
         set(cData) {
-          this.panelHeight = this.styleSizeValue(cData);
+          this.panelHeight = utils.styleSizeValue(cData);
         },
       },
       maxHeightVal: {
@@ -165,7 +171,7 @@
           return typeof this.panelMaxHeight === 'number' ? `${this.panelMaxHeight}px` : this.panelMaxHeight;
         },
         set(cData) {
-          this.panelMaxHeight = this.styleSizeValue(cData);
+          this.panelMaxHeight = utils.styleSizeValue(cData);
         },
       },
       minHeightVal: {
@@ -173,7 +179,7 @@
           return typeof this.panelMinHeight === 'number' ? `${this.panelMinHeight}px` : this.panelMinHeight;
         },
         set(cData) {
-          this.panelMinHeight = this.styleSizeValue(cData);
+          this.panelMinHeight = utils.styleSizeValue(cData);
         },
       },
     },
@@ -696,26 +702,17 @@
           }
         }
       },
-    styleSizeValue(gData) {
-      if (typeof gData === 'number' || !isNaN(gData)) {
-        return Number(gData);
-      } else if (gData.match(/^(normal|(\d+(?:\.\d+)?)(%)?)$/)) {
-        // .match(/^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/);
-        return gData;
-      }
-      throw new Error('[EVUI][ERROR][Container]-styleData');
-    },
     getWidth() {
       return this.widthVal;
     },
     setWidth(cWidth) {
-      this.widthVal = this.styleSizeValue(cWidth);
+      this.widthVal = utils.styleSizeValue(cWidth);
     },
     getHeight() {
       return this.heightVal;
     },
     setHeight(cHeight) {
-      this.heightVal = this.styleSizeValue(cHeight);
+      this.heightVal = utils.styleSizeValue(cHeight);
     },
     getName() {
       return this.name;
@@ -724,25 +721,25 @@
       return this.minWidthVal;
     },
     setMinWidth(cMinWidth) {
-      this.minWidthVal = this.styleSizeValue(cMinWidth);
+      this.minWidthVal = utils.styleSizeValue(cMinWidth);
     },
     getMinHeight() {
       return this.minWidthVal;
     },
     setMinHeight(cMinHeight) {
-      this.minHeightVal = this.styleSizeValue(cMinHeight);
+      this.minHeightVal = utils.styleSizeValue(cMinHeight);
     },
     getMaxWidth() {
       return this.maxWidthVal;
     },
     setMaxWidth(cMaxWidth) {
-      this.minWidthVal = this.styleSizeValue(cMaxWidth);
+      this.minWidthVal = utils.styleSizeValue(cMaxWidth);
     },
     getMaxHeight() {
       return this.maxHeightVal;
     },
     setMaxHeight(cMaxHeight) {
-      this.maxHeightVal = this.styleSizeValue(cMaxHeight);
+      this.maxHeightVal = utils.styleSizeValue(cMaxHeight);
     },
   },
   };
