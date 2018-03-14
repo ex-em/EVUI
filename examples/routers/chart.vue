@@ -1,11 +1,9 @@
 <template>
   <div style="width: 800px; height: 600px;">
     <Chart
-      :width="width"
-      :height="height"
-      :chart-type="'line'"
-      :chart-data="data"
-      :margin="margin"
+      :chart-data="chartData"
+      :chart-props="chartProps"
+      :chart-styles="chartStyles"
     />
   </div>
 </template>
@@ -18,27 +16,47 @@
     },
     data() {
       return {
-        width: '100%',
-        height: '100%',
-        data: [
-          { x: '1790', y: 3.9 },
-          { x: '1810', y: 7.2 },
-          { x: '1850', y: 23.1 },
-          { x: '1830', y: 12.8 },
-          { x: '1870', y: 36.5 },
-          { x: '1890', y: 62.9 },
-          { x: '1910', y: 92.2 },
-          { x: '1930', y: 123.2 },
-          { x: '1950', y: 151.3 },
-          { x: '1970', y: 203.2 },
-          { x: '1990', y: 248.7 },
-          { x: '2010', y: 308.7 },
-        ],
-        margin: { top: 40, left: 75, right: 0, bottom: 75 },
+        chartStyles: {
+          width: '100%',
+          height: '100%',
+          background: '#AAFFEE',
+        },
+        chartProps: {
+          title: {
+            text: 'TEST TITLE',
+            style: '20px Arial',
+            color: '#000000',
+            showTitle: true,
+          },
+          xAxis: [{
+            unit: 'time',
+            format: 'MM-DD',
+          }],
+          yAxis: [{
+            position: 'left',
+            axisTitle: 'Temp Y Axis',
+            unit: 'number',
+            showAxisTitle: false,
+          }],
+        },
+        chartData: [{
+          id: 'txn_elapse',
+          label: 'Transaction Elapse',
+          use: true,
+          data: [
+            { x: '2018-05-24', y: 10 },
+            { x: '2018-05-25', y: 20 },
+            { x: '2018-05-26', y: 10 },
+            { x: '2018-05-27', y: 40 },
+            { x: '2018-05-28', y: 20 },
+            { x: '2018-05-29', y: 50 },
+            { x: '2018-05-30', y: 30 },
+            { x: '2018-05-31', y: 70 },
+          ],
+        }],
       };
     },
   };
 </script>
 <style>
 </style>
-
