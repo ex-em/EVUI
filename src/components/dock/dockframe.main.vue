@@ -116,14 +116,14 @@
       },
     },
     mounted() {
-        const DataObj = this.dockDataSet;
-        if (DataObj.content !== undefined) {
-         DataObj.id = 'dockMainFrameRoot';
-         this.BFTData(DataObj);
-        } else {
-          this.childDomSize(this.$el);
-        }
-      },
+      const DataObj = this.dockDataSet;
+      if (DataObj.content !== undefined) {
+        DataObj.id = 'dockMainFrameRoot';
+        this.BFTData(DataObj);
+      } else {
+        this.childDomSize(this.$el);
+      }
+    },
     created() {
 
     },
@@ -164,10 +164,10 @@
             if (layout === LAYOUT_HORIZONTAL) {
               // 리사이즈 최소 값 100 , 최대값 100 픽셀로 고정 그 이하로는 리사이즈 안됨
               mouseMoveXY = moveEventPageXY - downEventPageXY;
-            const preMinSizeWidth = preResizeContainer.getBoundingClientRect().width
-              + mouseMoveXY;
-            const nextMaxSizeWidth = nextResizeContainer.getBoundingClientRect().width
-              - mouseMoveXY;
+              const preMinSizeWidth = preResizeContainer.getBoundingClientRect().width
+                + mouseMoveXY;
+              const nextMaxSizeWidth = nextResizeContainer.getBoundingClientRect().width
+                - mouseMoveXY;
               if (preMinSizeWidth > 100 && nextMaxSizeWidth > 100) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
@@ -179,11 +179,11 @@
               }
             }
             if (layout === LAYOUT_VERTICAL) {
-               mouseMoveXY = moveEventPageXY - downEventPageXY;
-          const preMinSizeHeight = preResizeContainer.getBoundingClientRect().height
-            + mouseMoveXY;
-          const nextMaxSizeHeight = nextResizeContainer.getBoundingClientRect().height
-            - mouseMoveXY;
+              mouseMoveXY = moveEventPageXY - downEventPageXY;
+              const preMinSizeHeight = preResizeContainer.getBoundingClientRect().height
+                + mouseMoveXY;
+              const nextMaxSizeHeight = nextResizeContainer.getBoundingClientRect().height
+                - mouseMoveXY;
               if (preMinSizeHeight > 100 && nextMaxSizeHeight > 100) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
@@ -257,8 +257,8 @@
           };
 
           const onMouseUp = function onMouseUp(e) {
-             const mousePageX = e.pageX;
-             const mousePageY = e.pageY;
+            const mousePageX = e.pageX;
+            const mousePageY = e.pageY;
 
             if (initialPageX !== mousePageX || initialPageY !== mousePageY) {
               resize(preResizeContainer, nextResizeContainer);
@@ -283,18 +283,18 @@
         const subClassName = this.layoutTypeSubBoxClass(layoutType);
         let parentDomSize = null;
         let DomLayout = null;
-       if (parentId === 'dockMainFrameRoot') {
-           parentDomSize = this.$refs.dockMainFrameRoot.getBoundingClientRect();
-           DomLayout = this.layout;
-       } else {
+        if (parentId === 'dockMainFrameRoot') {
+          parentDomSize = this.$refs.dockMainFrameRoot.getBoundingClientRect();
+          DomLayout = this.layout;
+        } else {
           parentDomSize = document.getElementById(parentId).getBoundingClientRect();
           DomLayout = parentLayout;
-       }
+        }
         // 높이 넓이가 50px 이하면 null 처리
         if (parentDomSize.width < 50 || parentDomSize.height < 50) {
-         return null;
+          return null;
         }
-       this.domLayoutTypeSize(subDiv, parentDomSize, childCnt, DomLayout);
+        this.domLayoutTypeSize(subDiv, parentDomSize, childCnt, DomLayout);
         subDiv.setAttribute('id', childId);
         subDiv.className = subClassName;
         return subDiv;
@@ -354,13 +354,13 @@
                 for (let ix = 0; ix <= arraylength - 1; ix++) {
                   // content 배열 div create 작업실행
                   // root container에 vBox hBox인지 prop 값을 할당
-                 if (parentJsonData.id === 'dockMainFrameRoot') {
-                   self.panelLayout = parentJsonData.layout;
-                 }
+                  if (parentJsonData.id === 'dockMainFrameRoot') {
+                    self.panelLayout = parentJsonData.layout;
+                  }
 
                   // layout type, 자식 ID, 부모 ID, div 박스
                   const subDiv = this.domEleDiv(arrayObj[ix].layout,
-                  arrayObj[ix].id, parentJsonData.layout, parentJsonData.id, arraylength);
+                    arrayObj[ix].id, parentJsonData.layout, parentJsonData.id, arraylength);
                   subDiv.style.backgroundColor = arrayObj[ix].bgcolor;
                   let leafDiv = null;
 
@@ -388,88 +388,88 @@
               }
             }
           });
-    }
-   },
-    layoutAppendDom(subDiv, leafDiv, pId) {
-      if (pId === 'dockMainFrameRoot') {
-        this.$refs.dockMainFrameRoot.appendChild(subDiv);
-      } else {
-        const parentDomObj = document.getElementById(pId);
-        parentDomObj.appendChild(subDiv);
-      }
-    },
-    layoutTypeSubBoxClass(layoutType) {
-      switch (layoutType) {
-        case 'vBox':
-          return 'evui-Dock-container layout-vBox';
-        case 'hBox':
-          return 'evui-Dock-container layout-hBox';
-        case 'DockForm':
-          return 'subDockFrame';
-        case 'tab': // tab은 아직 구상이 되지 않음.
-          return '';
-        default :
+        }
+      },
+      layoutAppendDom(subDiv, leafDiv, pId) {
+        if (pId === 'dockMainFrameRoot') {
+          this.$refs.dockMainFrameRoot.appendChild(subDiv);
+        } else {
+          const parentDomObj = document.getElementById(pId);
+          parentDomObj.appendChild(subDiv);
+        }
+      },
+      layoutTypeSubBoxClass(layoutType) {
+        switch (layoutType) {
+          case 'vBox':
+            return 'evui-Dock-container layout-vBox';
+          case 'hBox':
+            return 'evui-Dock-container layout-hBox';
+          case 'DockForm':
+            return 'subDockFrame';
+          case 'tab': // tab은 아직 구상이 되지 않음.
+            return '';
+          default :
             return null;
-      }
-    },
-    JsonLoop(json, addId) {
-      Object.keys(json).forEach((key) => {
+        }
+      },
+      JsonLoop(json, addId) {
+        Object.keys(json).forEach((key) => {
 //          this[key] = json[key];
 
-        if (key === 'id') {
-          if (json[key] === addId) {
-            this.arrayLoop(json[key]);
+          if (key === 'id') {
+            if (json[key] === addId) {
+              this.arrayLoop(json[key]);
+            }
           }
-        }
-        if (key === 'content') {
-          if (Array.isArray(json[key])) {
-            this.arrayLoop(json[key]);
+          if (key === 'content') {
+            if (Array.isArray(json[key])) {
+              this.arrayLoop(json[key]);
+            }
           }
+        });
+      },
+      arrayLoop(array) {
+        const arrayObj = array;
+        const arraylength = array.length;
+        for (let ix = 0; ix <= arraylength - 1; ix++) {
+          this.JsonLoop(arrayObj[ix]);
         }
-      });
-    },
-    arrayLoop(array) {
-      const arrayObj = array;
-      const arraylength = array.length;
-      for (let ix = 0; ix <= arraylength - 1; ix++) {
-        this.JsonLoop(arrayObj[ix]);
-      }
-    },
-    addDockFrame(pId, layout, id) {
-      const parentSelectDom = document.getElementById(pId).parentElement;
-      const selectDom = document.getElementById(pId);
-      const selectDomSize = selectDom.getBoundingClientRect();
-      // 높이 넓이가 50px 이하면 null 처리
-      if (selectDomSize.width < 50 || selectDomSize.height < 50) {
-        return null;
-      }
-      // div create
-      const subDiv = document.createElement('div');
-      subDiv.id = id;
-      subDiv.className = `evui-Dock-container layout-${layout}`;
-      subDiv.style.width = `${selectDomSize.width}px`;
-      subDiv.style.height = `${selectDomSize.height}px`;
+      },
+      addDockFrame(pId, layout, id) {
+        const parentSelectDom = document.getElementById(pId).parentElement;
+        const selectDom = document.getElementById(pId);
+        const selectDomSize = selectDom.getBoundingClientRect();
+        // 높이 넓이가 50px 이하면 null 처리
+        if (selectDomSize.width < 50 || selectDomSize.height < 50) {
+          return null;
+        }
+        // div create
+        const subDiv = document.createElement('div');
+        subDiv.id = id;
+        subDiv.className = `evui-Dock-container layout-${layout}`;
+        subDiv.style.width = `${selectDomSize.width}px`;
+        subDiv.style.height = `${selectDomSize.height}px`;
 
-      parentSelectDom.appendChild(subDiv);
+        parentSelectDom.appendChild(subDiv);
 
-      // Dom 이동 시킨다
-      const addDom = document.getElementById(id);
-      addDom.appendChild(selectDom);
-      // dockContainer
-      this.domLayoutTypeSize(selectDom.children[0], selectDomSize, 2, layout);
-      // subdock
-      this.domLayoutTypeSize(selectDom, selectDomSize, 2, layout);
+        // Dom 이동 시킨다
+        const addDom = document.getElementById(id);
+        addDom.appendChild(selectDom);
+        // dockContainer
+        this.domLayoutTypeSize(selectDom.children[0], selectDomSize, 2, layout);
+        // subdock
+        this.domLayoutTypeSize(selectDom, selectDomSize, 2, layout);
 
 
-      const cln = selectDom.cloneNode(true);
-      addDom.appendChild(cln);
-      cln.id = `${id}_sub`;
-      cln.children[0].id = `${id}_DockContainer`;
+        const cln = selectDom.cloneNode(true);
+        addDom.appendChild(cln);
+        cln.id = `${id}_sub`;
+        cln.children[0].id = `${id}_DockContainer`;
 
-      return 0;
+        return 0;
         // this.nodeSearch(AddObj, pId);
-    },
-    childDomSize(target, layout) {
+      },
+      childDomSize(target, layout) {
         const targetDom = target.children;
         const targetDomLength = targetDom.length;
 
@@ -575,13 +575,13 @@
         for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
           const childDom = targetDom[ix];
           const childSize = childDom.getBoundingClientRect();
-            // box에 리사이즈 바 개수
+          // box에 리사이즈 바 개수
           const splitterCnt = (targetDomLength - 1) / 2;
           // 총 스플릿 사이즈에 dock 개수 많큼 나눔
           const divSize = splitSize / (splitterCnt + 1);
           // root
           if (layout === undefined && !childDom.className.match('guidLine')
-              && !childDom.className.match('container-title')) {
+            && !childDom.className.match('container-title')) {
             childDom.style.width = `${resizeWidth}px`;
             childDom.style.height = `${resizeHeight}px`;
           } else if (childDom.className.match('vBox') ||
@@ -652,22 +652,22 @@
           }
         }
       },
-    getWidth() {
-      return this.widthVal;
+      getWidth() {
+        return this.widthVal;
+      },
+      setWidth(cWidth) {
+        this.widthVal = utils.styleSizeValue(cWidth);
+      },
+      getHeight() {
+        return this.heightVal;
+      },
+      setHeight(cHeight) {
+        this.heightVal = utils.styleSizeValue(cHeight);
+      },
+      getName() {
+        return this.name;
+      },
     },
-    setWidth(cWidth) {
-      this.widthVal = utils.styleSizeValue(cWidth);
-    },
-    getHeight() {
-      return this.heightVal;
-    },
-    setHeight(cHeight) {
-      this.heightVal = utils.styleSizeValue(cHeight);
-    },
-    getName() {
-      return this.name;
-    },
-  },
   };
 </script>
 

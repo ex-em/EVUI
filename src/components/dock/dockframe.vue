@@ -88,6 +88,7 @@
           wrapperObj = null;
         }
         const styleObject = Object.assign({
+          'max-height': '100%',
         }, wrapperObj);
         return styleObject;
       },

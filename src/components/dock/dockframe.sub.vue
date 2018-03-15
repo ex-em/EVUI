@@ -61,14 +61,14 @@
 
     computed: {
       dockclassName() {
-          if (this.panelLayout === LAYOUT_HORIZONTAL) {
-            return 'evui-Dock-container layout-hBox';
-          } else if (this.panelLayout === LAYOUT_VERTICAL) {
-            return 'evui-Dock-container layout-vBox';
-          } else if (this.panelLayout === LAYOUT_SUB) {
-            return 'subDockFrame';
-          }
-            return null;
+        if (this.panelLayout === LAYOUT_HORIZONTAL) {
+          return 'evui-Dock-container layout-hBox';
+        } else if (this.panelLayout === LAYOUT_VERTICAL) {
+          return 'evui-Dock-container layout-vBox';
+        } else if (this.panelLayout === LAYOUT_SUB) {
+          return 'subDockFrame';
+        }
+        return null;
       },
       userSelectStyle() {
         let wrapperObj;
@@ -78,9 +78,10 @@
           wrapperObj = null;
         }
 
-        // const styleObject = Object.assign({
-        // }, wrapperObj);
-        return wrapperObj;
+        const styleObject = Object.assign({
+          'max-height': '100%',
+        }, wrapperObj);
+        return styleObject;
       },
       widthVal: {
         get() {

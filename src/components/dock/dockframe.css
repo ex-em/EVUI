@@ -39,9 +39,9 @@
 }
 .DockContainer {
   /*margin: 4px 4px 4px 4px;*/
- user-select: none;
- overflow: auto;
- background-color : #333333;
+  user-select: none;
+  overflow: auto;
+  background-color : #333333;
 }
 .layout-hBox >.DockContainer {
   /*margin: 4px 4px 4px 4px;*/
