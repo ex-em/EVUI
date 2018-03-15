@@ -58,7 +58,7 @@
        */
       minWidth: {
         type: [String, Number],
-        default: '50px',
+        default: '100px',
       },
       /**
        * dockMainFrame 최대넓이 설정합니다.
@@ -127,9 +127,9 @@
         const styleObject = Object.assign({
           width: this.widthVal,
           height: this.heightVal,
-          'min-width': this.minWidthVal,
+          // 'min-width': this.minWidthVal,
           'max-width': this.maxWidthVal,
-          'min-height': this.minHeightVal,
+          // 'min-height': this.minHeightVal,
           'max-height': this.maxHeightVal,
         }, wrapperObj);
         return styleObject;
@@ -223,27 +223,43 @@
           const { addEventListener, removeEventListener } = resizer;
 
           // 좌우측 늘어난 수 많큼 높이 넓이 반환
+          // 마우스 move 좌표 위치값
           let mouseMoveXY = null;
-
+          // 마우스 move 좌표 위치값 (넓이 높이 구할 때 사용)
+          let sizeMouseMoveXY = null;
 
           const resizeMove = (downEventPageXY, moveEventPageXY) => {
             if (layout === LAYOUT_HORIZONTAL) {
+              // 리사이즈 최소 값 100 , 최대값 100 픽셀로 고정 그 이하로는 리사이즈 안됨
               mouseMoveXY = moveEventPageXY - downEventPageXY;
+            const preMinSizeWidth = preResizeContainer.getBoundingClientRect().width
+              + mouseMoveXY;
+            const nextMaxSizeWidth = nextResizeContainer.getBoundingClientRect().width
+              - mouseMoveXY;
+              if (preMinSizeWidth > 100 && nextMaxSizeWidth > 100) {
+                // 가이드라인바
+                sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
 
-              // 가이드라인바
-              guidLineDom.style.left = `${moveEventPageXY - parentOffsetLeft}px`;
-              guidLineDom.style.top = '0px';
-              guidLineDom.classList.add('guidLineBar-hBox');
-              guidLineDom.style.display = 'block';
+                guidLineDom.style.left = `${moveEventPageXY - parentOffsetLeft}px`;
+                guidLineDom.style.top = '0px';
+                guidLineDom.classList.add('guidLineBar-hBox');
+                guidLineDom.style.display = 'block';
+              }
             }
             if (layout === LAYOUT_VERTICAL) {
                mouseMoveXY = moveEventPageXY - downEventPageXY;
-
-              // 가이드라인바
-              guidLineDom.style.top = `${moveEventPageXY - parentOffsetTop}px`;
-              guidLineDom.style.left = 'auto';
-              guidLineDom.classList.add('guidLineBar-vBox');
-              guidLineDom.style.display = 'block';
+          const preMinSizeHeight = preResizeContainer.getBoundingClientRect().height
+            + mouseMoveXY;
+          const nextMaxSizeHeight = nextResizeContainer.getBoundingClientRect().height
+            - mouseMoveXY;
+              if (preMinSizeHeight > 100 && nextMaxSizeHeight > 100) {
+                // 가이드라인바
+                sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
+                guidLineDom.style.top = `${moveEventPageXY - parentOffsetTop}px`;
+                guidLineDom.style.left = 'auto';
+                guidLineDom.classList.add('guidLineBar-vBox');
+                guidLineDom.style.display = 'block';
+              }
             }
           };
 
@@ -253,15 +269,19 @@
             const nextPanelSize = nextInitial.getBoundingClientRect();
             const prePanelinfo = preInitial;
             const nextPanelinfo = nextInitial;
-            if (layout === LAYOUT_HORIZONTAL) {
-              const preWidth = `${prePanelSize.width + mouseMoveXY}px`;
-              const nextWidth = `${nextPanelSize.width - mouseMoveXY}px`;
-              prePanelinfo.style.width = preWidth;
-              nextPanelinfo.style.width = nextWidth;
 
+            if (layout === LAYOUT_HORIZONTAL) {
+              const preWidth = `${prePanelSize.width + sizeMouseMoveXY}px`;
+              const nextWidth = `${nextPanelSize.width - sizeMouseMoveXY}px`;
+
+
+              // 순서
+              prePanelinfo.style.width = preWidth;
               // 자식 Dom resize
-              this.domResizing(prePanelinfo, mouseMoveXY, layout);
-              this.domResizing(nextPanelinfo, -mouseMoveXY, layout);
+              this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
+              nextPanelinfo.style.width = nextWidth;
+              this.domResizing(nextPanelinfo, -sizeMouseMoveXY, layout);
+
 
               targetBar.style.left = `${preWidth}`;
               guidLineDom.style.removeProperty('left');
@@ -269,15 +289,15 @@
               guidLineDom.classList.remove('guidLineBar-hBox');
             }
             if (layout === LAYOUT_VERTICAL) {
-              const preHeight = `${prePanelSize.height + mouseMoveXY}px`;
-              const nextHeight = `${nextPanelSize.height - mouseMoveXY}px`;
+              const preHeight = `${prePanelSize.height + sizeMouseMoveXY}px`;
+              const nextHeight = `${nextPanelSize.height - sizeMouseMoveXY}px`;
+
               prePanelinfo.style.height = preHeight;
-              nextPanelinfo.style.height = nextHeight;
-
               // 자식 Dom resize
-              this.domResizing(prePanelinfo, mouseMoveXY, layout);
-              this.domResizing(nextPanelinfo, -mouseMoveXY, layout);
-
+              this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
+              nextPanelinfo.style.height = nextHeight;
+              this.domResizing(nextPanelinfo, -sizeMouseMoveXY, layout);
+              // 순서
               targetBar.style.top = `${prePanelSize.height}px`;
               guidLineDom.style.removeProperty('top');
               guidLineDom.style.display = 'none';

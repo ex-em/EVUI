@@ -1,7 +1,7 @@
-import dockMainFrame from './dockMainFrame';
-import dockSubFrame from './dockSubFrame';
-import dockFrame from './dockFrame';
-import dockspliter from './dockspliter';
+import dockMainFrame from './dockframe.main';
+import dockSubFrame from './dockframe.sub';
+import dockFrame from './dockframe';
+import dockspliter from './dockframe.spliter';
 // Default styling
 import './dockframe.css';
 

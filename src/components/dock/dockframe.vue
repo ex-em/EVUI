@@ -4,8 +4,12 @@
     :flex="flexVal"
     class="DockContainer"
   >
-    <header class="container-title">
-      <label class="dockTitle">{{ title }}</label>
+    <header
+      class="container-title"
+    >
+      <label
+        class="dockTitle"
+      >{{ title }}</label>
     </header>
     <slot/>
   </div>
@@ -54,7 +58,7 @@
        */
       minWidth: {
         type: [String, Number],
-        default: '50px',
+        default: '100px',
       },
       /**
        * DockFrame 최대넓이 설정합니다.
@@ -116,9 +120,9 @@
           wrapperObj = null;
         }
         const styleObject = Object.assign({
-          'min-width': this.minWidthVal,
+          // 'min-width': this.minWidthVal,
           'max-width': this.maxWidthVal,
-          'min-height': this.minHeightVal,
+          // 'min-height': this.minHeightVal,
           'max-height': this.maxHeightVal,
         }, wrapperObj);
         return styleObject;
@@ -181,10 +185,12 @@
       },
       flexVal: {
         get() {
-          if (!isNaN(this.panelFlex)) {
-            return this.panelFlex;
+          const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(this.panelFlex);
+
+          if (match === null) {
+            return '';
           }
-          return '';
+          return this.panelFlex;
         },
         set(cData) {
           if (!cData && typeof cData === 'object') {

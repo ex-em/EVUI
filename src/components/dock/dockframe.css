@@ -16,18 +16,19 @@
 }
 .layout-hBox {
   float:left;
-  min-height: 50px;
-  min-width: 50px;
 
 }
 
 .layout-vBox {
-  min-height: 50px;
-  min-width: 50px;
 
 }
 .subDockFrame {
-
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .layout-hBox >.subDockFrame {
   /*margin: 4px 4px 4px 4px;*/
@@ -38,6 +39,7 @@
 }
 .DockContainer {
   /*margin: 4px 4px 4px 4px;*/
+ user-select: none;
  overflow: auto;
  background-color : #333333;
 }
@@ -53,9 +55,21 @@
 
 }
 .resizebar {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .guidLine {
   z-index: 999;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .guidLineBar-vBox {
   position: absolute;
@@ -98,10 +112,20 @@
   background-color: #42555F;
   /*background-color: #42555F;*/
   width: 100%;
-  height: 21px;
+  height: 25px;
   padding-left: 13px;
+  line-height: 25px;
+  vertical-align: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  min-width: 100px;
 }
 .dockTitle {
+  min-width: 100px;
   color: white;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

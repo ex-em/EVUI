@@ -173,10 +173,12 @@
       },
       flexVal: {
         get() {
-          if (!isNaN(this.panelFlex)) {
-            return this.panelFlex;
+          const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(this.panelFlex);
+
+          if (match === null) {
+            return '';
           }
-          return '';
+          return this.panelFlex;
         },
         set(cData) {
           if (!cData && typeof cData === 'object') {

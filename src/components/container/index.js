@@ -1,6 +1,6 @@
-import mainContainer from './mainContainer';
-import ResizeBar from './resizebar';
-import boxPanel from './boxPanel';
+import mainContainer from './container.main';
+import ResizeBar from './container.spliter';
+import boxPanel from './container.panel';
 // Default styling
 import './container.css';
 
