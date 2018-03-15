@@ -109,7 +109,7 @@
         },
         set(cData) {
           if (!cData && typeof cData === 'object') {
-            throw new Error('[EVUI][ERROR][dockframe.sub]-flex Data');
+            throw new Error('[EVUI][ERROR][DockframeSub]-flex Data');
           } else {
             this.panelFlex = cData;
           }
