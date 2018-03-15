@@ -11,7 +11,7 @@ const Utils = {
       // .match(/^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/);
       return gData;
     }
-    throw new Error('[EVUI][ERROR][BoxPanel]-styleData');
+    throw new Error('[EVUI][ERROR] - styleData');
   },
 /**
  * width/ height px 값넣으면 숫자 , 단위 분리해여 리턴
@@ -26,6 +26,31 @@ const Utils = {
     }
     return output;
   },
-};
 
+/** *
+ *  예외처리 함수
+ */
+_throw(type, content, component) {
+  const upperCaseType = type.toUpperCase();
+  switch (upperCaseType) {
+    case 'ERROR':
+      console.error(`[EVUI][${type}][${component}] - ${content}`); // eslint-disable-line
+      break;
+    // throw new Error(`[EVUI][${type}][${component}] - ${content}`);
+    case 'WARN':
+      console.warn(`[EVUI][${type}][${component}] - ${content}`); // eslint-disable-line
+      break;
+    // throw new Error(`[EVUI][${type}][${component}] - ${content}`);
+    case 'INFO':
+      console.info(`[EVUI][${type}][${component}] - ${content}`); // eslint-disable-line
+      break;
+    // throw new Error(`[EVUI][${type}][${component}] - ${content}`);
+    // log
+    default :
+      console.log(`[EVUI][${type}][${component}] - ${content}`); // eslint-disable-line
+      // throw new Error(`[EVUI][${type}][${component}] - ${content}`);
+  }
+},
+
+};
 export default Utils;

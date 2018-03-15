@@ -182,7 +182,7 @@
         },
         set(cData) {
           if (!cData && typeof cData === 'object') {
-            throw new Error('[EVUI][ERROR][BoxPanel]-flex Data');
+            throw new Error('[EVUI][ERROR][container.panel]-flex Data');
           } else {
             this.panelFlex = cData;
           }
