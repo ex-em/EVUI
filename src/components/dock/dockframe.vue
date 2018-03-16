@@ -61,6 +61,20 @@
         default: '100%',
       },
       /**
+       * DockFrame 최소넓이 설정합니다.
+       */
+      minWidth: {
+        type: [String, Number],
+        default: '100',
+      },
+      /**
+       * DockFrame 최소높이 설정합니다.
+       */
+      minHeight: {
+        type: [String, Number],
+        default: '100',
+      },
+      /**
        * DockFrame flex 비율로 넓이/높이를 지정합니다.
        */
       flex: {
@@ -75,6 +89,8 @@
         panelHeight: this.height,
         panelFlex: this.flex,
         panelTitle: this.title,
+        panelMinWidth: this.minWidth,
+        panelMinHeight: this.minHeight,
         isResizing: false,
       };
     },
@@ -88,7 +104,7 @@
           wrapperObj = null;
         }
         const styleObject = Object.assign({
-          'max-height': '100%',
+          // 'max-height': '100%',
         }, wrapperObj);
         return styleObject;
       },
@@ -110,10 +126,26 @@
       },
       heightVal: {
         get() {
-          return typeof this.panelHeight === 'number' ? `${this.panelHeight}px` : this.panelHeight;
+          return this.panelHeight;
         },
         set(cData) {
           this.panelHeight = utils.styleSizeValue(cData);
+        },
+      },
+      minWidthVal: {
+        get() {
+          return this.panelMinWidth;
+        },
+        set(cData) {
+          this.panelMinWidth = utils.styleSizeValue(cData);
+        },
+      },
+      minHeightVal: {
+        get() {
+          return this.panelMinHeight;
+        },
+        set(cData) {
+          this.panelMinHeight = utils.styleSizeValue(cData);
         },
       },
       flexVal: {

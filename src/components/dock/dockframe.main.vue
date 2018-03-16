@@ -224,12 +224,13 @@
               const preHeight = `${prePanelSize.height + sizeMouseMoveXY}px`;
               const nextHeight = `${nextPanelSize.height - sizeMouseMoveXY}px`;
 
-              prePanelinfo.style.height = preHeight;
+              console.log(preHeight);
               // 자식 Dom resize
+              prePanelinfo.style.height = preHeight;
               this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
               nextPanelinfo.style.height = nextHeight;
               this.domResizing(nextPanelinfo, -sizeMouseMoveXY, layout);
-              // 순서
+
               targetBar.style.top = `${prePanelSize.height}px`;
               guidLineDom.style.removeProperty('top');
               guidLineDom.style.display = 'none';
@@ -452,7 +453,7 @@
 
         parentSelectDom.appendChild(subDiv);
 
-        // Dom 이동 시킨다
+        // Dom 이동 시킨다d
         const addDom = document.getElementById(id);
         addDom.appendChild(selectDom);
         // dockContainer
@@ -469,6 +470,30 @@
         return 0;
         // this.nodeSearch(AddObj, pId);
       },
+      // dockDomMinSize(target, parentlayout, childLayout) {
+      //   const targetDom = target.children;
+      //   const targetDomLength = targetDom.length;
+      //   let boxCnt = 0;
+      //   for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
+      //     const childDom = targetDom[ix];
+      //
+      //     // 자식 dom이 있다면 재귀 호출 실행
+      //     if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
+      //       if (childDom.className.match('vBox')) {
+      //         this.dockDomMinSize(childDom, parentlayout, 'vBox');
+      //       } else if (childDom.className.match('hBox')) {
+      //         this.dockDomMinSize(childDom, parentlayout, 'hBox');
+      //       } else if (childDom.className.match('subDockFrame')) {
+      //         // sub일때
+      //         this.dockDomMinSize(childDom, parentlayout, 'subDockFrame');
+      //       }
+      //     } else if (!childDom.className.match('resizebar')) {
+      //        if (parentlayout === childLayout) {
+      //          boxCnt += 1;
+      //        }
+      //       }
+      //   }
+      // },
       childDomSize(target, layout) {
         const targetDom = target.children;
         const targetDomLength = targetDom.length;
@@ -495,7 +520,9 @@
               if (layout === 'vBox') {
                 childDom.style.width = '100%';
                 childDom.style.height = '4px';
+                // this.dockDomMinSize(childDom.nextElementSibling, layout);
               } else if (layout === 'hBox') {
+               // this.dockDomMinSize(childDom.nextElementSibling, layout);
                 childDom.style.width = '4px';
                 childDom.style.height = '100%';
               }
@@ -568,86 +595,74 @@
         const targetDom = target.children;
         const targetDomLength = targetDom.length;
         const parentSize = target.getBoundingClientRect();
-        const resizeWidth = parentSize.width;
-        const resizeHeight = parentSize.height;
+        const resizeWidth = parentSize.width; // 부모 넓이
+        const resizeHeight = parentSize.height; // 부모 높이
 
-
-        for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
-          const childDom = targetDom[ix];
-          const childSize = childDom.getBoundingClientRect();
-          // box에 리사이즈 바 개수
-          const splitterCnt = (targetDomLength - 1) / 2;
-          // 총 스플릿 사이즈에 dock 개수 많큼 나눔
-          const divSize = splitSize / (splitterCnt + 1);
-          // root
-          if (layout === undefined && !childDom.className.match('guidLine')
-            && !childDom.className.match('container-title')) {
-            childDom.style.width = `${resizeWidth}px`;
-            childDom.style.height = `${resizeHeight}px`;
-          } else if (childDom.className.match('vBox') ||
-            childDom.className.match('hBox') || childDom.className.match('subDockFrame')
-            || childDom.className.match('DockContainer')) {
-            // getBoundingClientRect 사용시 부모 div가 미리 작아지면 실제 사이즈도 작게 나옴
-            let chilDomWdith = 0;
-            let chilDomHeight = 0;
-
-            if (splitSize > 0) {
-              chilDomHeight = childSize.height + splitSize;
-              chilDomWdith = childSize.width + splitSize;
-            } else {
-              chilDomHeight = childSize.height;
-              chilDomWdith = childSize.width;
-            }
-
-            if (rootLayout === 'vBox') {
-              // 부모 Dom Layout
-              // 스플릿터
-              switch (layout) {
-                case 'hBox':
-                  childDom.style.height = `${chilDomHeight}px`;
-                  break;
-                case 'vBox':
-                  // N / 1 사이즈
-                  childDom.style.height = `${childSize.height + divSize}px`;
-                  break;
-                case 'subDockFrame':
-                  childDom.style.width = `${resizeWidth}px`;
-                  childDom.style.height = `${resizeHeight}px`;
-                  break;
-                case 'tab': // tab은 아직 구상이 되지 않음.
-                  break;
-                default :
-              }
-            } else {
-              // 스플릿터
-              switch (layout) {
-                case 'hBox':
-                  childDom.style.width = `${childSize.width + divSize}px`;
-                  break;
-                case 'vBox':
-                  // N / 1 사이즈
-                  childDom.style.width = `${chilDomWdith}px`;
-                  break;
-                case 'subDockFrame':
-                  childDom.style.width = `${resizeWidth}px`;
-                  childDom.style.height = `${resizeHeight}px`;
-                  break;
-                case 'tab': // tab은 아직 구상이 되지 않음.
-                  break;
-                default :
+        if (!target.className.match('DockContainer')) {
+          for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
+            const childDom = targetDom[ix];
+            const childSize = childDom.getBoundingClientRect();
+            // box에 리사이즈 바 개수
+            const splitterCnt = (targetDomLength - 1) / 2;
+            // 총 스플릿 사이즈에 dock 개수 많큼 나눔
+            const divSize = splitSize / (splitterCnt + 1);
+            // root
+            if (layout === undefined) {
+              childDom.style.width = `${resizeWidth}px`;
+              childDom.style.height = `${resizeHeight}px`;
+            } else if (!childDom.className.match('resizebar')) {
+              if (rootLayout === 'vBox') {
+                // 스플릿 상단 부모가 vbox Height만 resize된다.
+                // 부모 Dom Layout
+                // 자식 스플릿터
+                console.log(`${target.clientHeight} @@ ${resizeHeight}`);
+                switch (layout) {
+                  case 'hBox':
+                    childDom.style.height = `${resizeHeight}px`;
+                    break;
+                  case 'vBox':
+                    // N / 1 사이즈
+                    childDom.style.height = `${childSize.height + divSize}px`;
+                    break;
+                  case 'subDockFrame':
+                    childDom.style.width = `${resizeWidth}px`;
+                    childDom.style.height = `${resizeHeight}px`;
+                    break;
+                  case 'tab': // tab은 아직 구상이 되지 않음.
+                    break;
+                  default :
+                }
+              } else {
+                // 스플릿터
+                switch (layout) {
+                  case 'hBox':
+                    childDom.style.width = `${childSize.width + divSize}px`;
+                    break;
+                  case 'vBox':
+                    // N / 1 사이즈
+                    // 부모 넓이 따라간다.
+                    childDom.style.width = `${resizeWidth}px`;
+                    break;
+                  case 'subDockFrame':
+                    childDom.style.width = `${resizeWidth}px`;
+                    childDom.style.height = `${resizeHeight}px`;
+                    break;
+                  case 'tab': // tab은 아직 구상이 되지 않음.
+                    break;
+                  default :
+                }
               }
             }
-          }
-
-          // 자식 dom이 있다면 재귀 호출 실행
-          if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
-            if (childDom.className.match('vBox')) {
-              this.domResizing(childDom, splitSize, rootLayout, 'vBox');
-            } else if (childDom.className.match('hBox')) {
-              this.domResizing(childDom, splitSize, rootLayout, 'hBox');
-            } else if (childDom.className.match('subDockFrame')) {
-              // sub일때
-              this.domResizing(childDom, splitSize, rootLayout, 'subDockFrame');
+            // 자식 dom이 있다면 재귀 호출 실행
+            if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
+              if (childDom.className.match('vBox')) {
+                this.domResizing(childDom, splitSize, rootLayout, 'vBox');
+              } else if (childDom.className.match('hBox')) {
+                this.domResizing(childDom, splitSize, rootLayout, 'hBox');
+              } else if (childDom.className.match('subDockFrame')) {
+                // sub일때
+                this.domResizing(childDom, splitSize, rootLayout, 'subDockFrame');
+              }
             }
           }
         }
