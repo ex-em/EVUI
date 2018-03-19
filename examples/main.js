@@ -15,6 +15,10 @@ const router = new VueRouter({
       component: resolve => require(['./routers/container'], resolve),
     },
     {
+      path: '/dock/dockframeSample',
+      component: resolve => require(['./routers/dock/dockframeSample'], resolve),
+    },
+    {
       path: '/chart',
       component: resolve => require(['./routers/chart'], resolve),
     },

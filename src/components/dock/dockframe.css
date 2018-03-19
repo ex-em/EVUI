@@ -1,0 +1,137 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.evui-Dock-container {
+  display:block;
+  background-color : #333333;
+}
+.evui-dockFrame-root {
+  display:block;
+  background-color: black;
+  position: relative;
+  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), 0 4px 20px 0 rgba(0,0,0,0.19);
+}
+.layout-hBox {
+  float:left;
+
+}
+
+.layout-vBox {
+
+}
+.subDockFrame {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.layout-hBox >.subDockFrame {
+  /*margin: 4px 4px 4px 4px;*/
+  float:left;
+}
+.layout-vBox >.subDockFrame {
+  /*margin: 4px 4px 4px 4px;*/
+}
+.DockContainer {
+  /*margin: 4px 4px 4px 4px;*/
+  user-select: none;
+  overflow: auto;
+  background-color : #333333;
+}
+.layout-hBox >.DockContainer {
+  /*margin: 4px 4px 4px 4px;*/
+  float:left;
+}
+.layout-vBox >.DockContainer {
+  /*margin: 4px 4px 4px 4px;*/
+}
+.movebar {
+  position: absolute;
+
+}
+.resizebar {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.guidLine {
+  z-index: 999;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.guidLineBar-vBox {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  cursor: row-resize;
+  background-color: #999999;
+}
+.guidLineBar-hBox {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background-color: #999999;
+}
+.layout-hBox >.resizebar {
+  cursor: col-resize;
+  float:left;
+  background-color: #ffffff;
+}
+.layout-hBox >.resizebar:hover {
+  background-color: #e4e4e4;
+}
+.layout-hBox >.resizebar:active {
+  background-color: #e4e4e4;
+}
+
+
+.layout-vBox >.resizebar {
+  cursor: row-resize;
+  background-color: #ffffff;
+}
+.layout-vBox >.resizebar:hover {
+  background-color: #e4e4e4;
+}
+.layout-vBox >.resizebar:active {
+  background-color: #e4e4e4;
+}
+.container-title {
+  background-color: #42555F;
+  /*background-color: #42555F;*/
+  width: 100%;
+  height: 25px;
+  padding-left: 13px;
+  line-height: 25px;
+  vertical-align: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  min-width: 100px;
+}
+.dockTitle {
+  min-width: 100px;
+  color: white;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
