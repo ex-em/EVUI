@@ -2,6 +2,8 @@
   <div
     :style="userSelectStyle"
     :flex="flexVal"
+    :minWidth="minWidthVal"
+    :minHeight="minHeightVal"
     class="DockContainer"
   >
     <header

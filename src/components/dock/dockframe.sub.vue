@@ -156,24 +156,24 @@
          let totalWidth = 0;
          let totalHeight = 0;
          // 기본값은 0
-         const BoxSize = [0];
+         const boxSize = [0];
         for (let ix = 0, ixLen = this.$children.length - 1; ix <= ixLen; ix += 1) {
           const slotobj = this.$children[ix];
           if (this.layout === 'hBox') {
             if (slotobj.$el.className !== 'resizebar') {
               totalWidth += parseInt(slotobj.panelMinWidth, 10);
-              BoxSize.push(parseInt(slotobj.panelMinHeight, 10));
+              boxSize.push(parseInt(slotobj.panelMinHeight, 10));
             }
           } else if (this.layout === 'vBox') {
             // vBox
             if (slotobj.$el.className !== 'resizebar') {
-              BoxSize.push(parseInt(slotobj.panelMinWidth, 10));
+              boxSize.push(parseInt(slotobj.panelMinWidth, 10));
               totalHeight += parseInt(slotobj.panelMinHeight, 10);
             }
           }
         }
         // max 값을 가져온다.
-         const MaxSize = BoxSize.reduce((previous, current) =>
+         const MaxSize = boxSize.reduce((previous, current) =>
            (previous >= current ? previous : current));
          if (this.$el.className === 'subDockFrame') {
            // 해당 container 최소 넓이/높이 지정

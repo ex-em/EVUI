@@ -161,6 +161,10 @@
           let sizeMouseMoveXY = null;
 
           const resizeMove = (downEventPageXY, moveEventPageXY) => {
+            const preMinWidth = preResizeContainer.getAttribute('minWidth');
+            const nextMinWidth = nextResizeContainer.getAttribute('minWidth');
+            const preMinHeight = preResizeContainer.getAttribute('minHeight');
+            const nextMinHeight = nextResizeContainer.getAttribute('minHeight');
             if (layout === LAYOUT_HORIZONTAL) {
               // 리사이즈 최소 값 100 , 최대값 100 픽셀로 고정 그 이하로는 리사이즈 안됨
               mouseMoveXY = moveEventPageXY - downEventPageXY;
@@ -168,7 +172,7 @@
                 + mouseMoveXY;
               const nextMaxSizeWidth = nextResizeContainer.getBoundingClientRect().width
                 - mouseMoveXY;
-              if (preMinSizeWidth > 100 && nextMaxSizeWidth > 100) {
+              if (preMinSizeWidth > preMinWidth && nextMaxSizeWidth > nextMinWidth) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
 
@@ -184,7 +188,7 @@
                 + mouseMoveXY;
               const nextMaxSizeHeight = nextResizeContainer.getBoundingClientRect().height
                 - mouseMoveXY;
-              if (preMinSizeHeight > 100 && nextMaxSizeHeight > 100) {
+              if (preMinSizeHeight > preMinHeight && nextMaxSizeHeight > nextMinHeight) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
                 guidLineDom.style.top = `${moveEventPageXY - parentOffsetTop}px`;
@@ -224,7 +228,6 @@
               const preHeight = `${prePanelSize.height + sizeMouseMoveXY}px`;
               const nextHeight = `${nextPanelSize.height - sizeMouseMoveXY}px`;
 
-              console.log(preHeight);
               // 자식 Dom resize
               prePanelinfo.style.height = preHeight;
               this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
@@ -615,7 +618,6 @@
                 // 스플릿 상단 부모가 vbox Height만 resize된다.
                 // 부모 Dom Layout
                 // 자식 스플릿터
-                console.log(`${target.clientHeight} @@ ${resizeHeight}`);
                 switch (layout) {
                   case 'hBox':
                     childDom.style.height = `${resizeHeight}px`;
