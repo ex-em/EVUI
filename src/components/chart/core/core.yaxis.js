@@ -1,9 +1,11 @@
-import Axis from './core.axis';
+import _ from 'lodash';
 import Util from './core.util';
 
-export default class YAxis extends Axis {
+export default class YAxis {
   constructor(props) {
-    super(props);
+    Object.keys(props).forEach((key) => {
+      this[key] = props[key];
+    });
 
     this.width = this.sizeInfo.width;
     this.height = this.sizeInfo.height;
@@ -83,5 +85,10 @@ export default class YAxis extends Axis {
     }
 
     this.ctx.stroke();
+  }
+
+  getAxisMinValue() {
+    const result = _.minBy(this.yAxes, 'min').min;
+    return result ? result.min : 0;
   }
 }

@@ -1,9 +1,10 @@
-import Axis from './core.axis';
-import Util from '../core/core.util';
+import Util from './core.util';
 
-export default class XAxis extends Axis {
+export default class XAxis {
   constructor(props) {
-    super(props);
+    Object.keys(props).forEach((key) => {
+      this[key] = props[key];
+    });
 
     this.width = this.sizeInfo.width;
     this.height = this.sizeInfo.height;
@@ -70,7 +71,7 @@ export default class XAxis extends Axis {
     if ((this.valuesMaxCount - 1) % step !== 0 && this.valuesMaxCount % step === 0) {
       // 마지막 x축 label 그리기
       if (standardSeries.data[this.valuesMaxCount - 1]) {
-        this.ctx.fillText(this.xLabelFormat(
+        this.ctx.fillText(Util.xLabelFormat(
           standardSeries.data[standardSeries.data.length - 1].x), point[this.valuesMaxCount - 1],
           this.offset.yAxis.endPoint + 8);
       }
