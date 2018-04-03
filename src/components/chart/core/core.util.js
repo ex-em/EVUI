@@ -1,6 +1,8 @@
 export default {
-  defaultColor: ['#3ca0ff', '#90db3b', '#00c4c5', '#ffde00', '#0052ff', '#ff7781', '#3191c8', '#5048c1', '#5bc89e',
-    '#28776f', '#17becf', '#beaa3c', '#cedc96', '#c86ebd', '#5e5e5e', '#969696', '#709d34', '#24456b', '#dace90', '#888bd7'],
+  defaultColor: ['#2b99f0', '#8ac449', '#009697', '#959c2c', '#004ae7', '#01cc00', '#15679a',
+    '#43bcd7', '#e76627', '#5C8558', '#A8A5A3', '#498700', '#832C2D', '#C98C5A', '#3478BE',
+    '#BCF061', '#B26600', '#27358F', '#A4534D', '#B89630', '#A865B4', '#254763', '#536859',
+    '#E9F378', '#888A79', '#D67D4B', '#2BEC69', '#4A2BEC', '#2BBEEC', '#DDACDF'],
 
   extraColor: [],
 
@@ -14,5 +16,40 @@ export default {
       output = undefined;
     }
     return output;
+  },
+
+  hexToRgb(hex) {
+    if (!hex) {
+      return false;
+    }
+
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    const r = parseInt(result[1], 16);
+    const g = parseInt(result[2], 16);
+    const b = parseInt(result[3], 16);
+
+    return `${r},${g},${b}`;
+  },
+
+  calculateMagnitude(val) {
+    return Math.floor(Math.log(val) / Math.LN10);
+  },
+
+  xLabelFormat(value) {
+    return value;
+  },
+
+  yLabelFormat(value) {
+    return value;
+  },
+
+  aliasPixel(pixelWidth) {
+    return (pixelWidth % 2 === 0) ? 0 : 0.5;
+  },
+
+  getLabelStyle(axis) {
+    const style = axis.labelStyle;
+    return `normal ${style.fontSize}px ${style.fontFamily}`;
   },
 };

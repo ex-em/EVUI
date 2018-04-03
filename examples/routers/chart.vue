@@ -4,6 +4,7 @@
       :chart-data="chartData"
       :chart-props="chartProps"
       :chart-styles="chartStyles"
+      :chart-type="chartType"
     />
   </div>
 </template>
@@ -16,6 +17,7 @@
     },
     data() {
       return {
+        chartType: 'line',
         chartStyles: {
           width: '100%',
           height: '100%',
@@ -26,34 +28,51 @@
             text: 'TEST TITLE',
             style: '20px Arial',
             color: '#000000',
-            showTitle: true,
+            show: true,
           },
-          xAxis: [{
-            unit: 'time',
-            format: 'MM-DD',
-          }],
-          yAxis: [{
+          yAxes: [{
             position: 'left',
             axisTitle: 'Temp Y Axis',
             unit: 'number',
             showAxisTitle: false,
           }],
         },
-        chartData: [{
-          id: 'txn_elapse',
-          label: 'Transaction Elapse',
-          use: true,
-          data: [
-            { x: '2018-05-24', y: 10 },
-            { x: '2018-05-25', y: 20 },
-            { x: '2018-05-26', y: 10 },
-            { x: '2018-05-27', y: 40 },
-            { x: '2018-05-28', y: 20 },
-            { x: '2018-05-29', y: 50 },
-            { x: '2018-05-30', y: 30 },
-            { x: '2018-05-31', y: 70 },
+        chartData: {
+          series: [
+            {
+              id: 'series1',
+              label: 'first series',
+              color: '#5a5dc0',
+              visible: true,
+              line: true,
+              point: true,
+            },
+            {
+              id: 'series2',
+              label: 'second series',
+              color: '#76d0a9',
+              visible: true,
+              line: true,
+              point: true,
+            },
           ],
-        }],
+          data: {
+            series1: [
+              { x: '2018-05-25', y: 20 },
+              { x: '2018-05-26', y: 10 },
+              { x: '2018-05-27', y: 40 },
+              { x: '2018-05-28', y: 20 },
+              { x: '2018-05-29', y: 50 },
+            ],
+            series2: [
+              { x: '2018-05-25', y: 50 },
+              { x: '2018-05-26', y: 20 },
+              { x: '2018-05-27', y: 30 },
+              { x: '2018-05-28', y: 30 },
+              { x: '2018-05-29', y: 50 },
+            ],
+          },
+        },
       };
     },
   };

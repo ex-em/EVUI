@@ -1,15 +1,9 @@
 <template>
   <div
     ref="wrapper"
-    class="evui-chart"
     :style="wrapperSize"
-  >
-    <canvas
-      ref="canvas"
-    >
-      Please Check this Browser Support Canvas element
-    </canvas>
-  </div>
+    class="evui-chart"
+  />
 </template>
 <script>
   import Util from './core/core.util';
@@ -17,10 +11,14 @@
 
   export default {
     props: {
+      chartType: {
+        type: String,
+        default: 'line',
+      },
       chartData: {
-        type: Array,
+        type: Object,
         default() {
-          return [];
+          return {};
         },
       },
       chartProps: {
@@ -41,14 +39,7 @@
     },
     data() {
       return {
-        chartHeight: null,
-        chartWidth: null,
-        xMax: null,
-        yMax: null,
-        ratio: null,
-        ctx: null,
-        canvas: null,
-        maxYValue: 0,
+        chart: null,
       };
     },
     created() {
@@ -59,23 +50,15 @@
       };
     },
     mounted() {
-      if (!this.checkCanvasElement()) {
-        throw new Error('[EVUI][ERROR][Chart]-Cannot get canvas. Please Check this Browser Support Canvas element');
-      } else {
-        const canvas = this.$refs.canvas;
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = this.$refs.wrapper.getClientRects()[0].width;
-        canvas.height = this.$refs.wrapper.getClientRects()[0].height;
-
-        this.chart = new Chart(canvas, ctx, {
-          vm: this,
-          data: this.chartData,
-          props: this.chartProps,
-          styles: this.chartStyles,
-        });
-        this.chart.init();
-      }
+      this.chart = new Chart({
+        target: this.$refs.wrapper,
+        vm: this,
+        data: this.chartData,
+        props: this.chartProps,
+        styles: this.chartStyles,
+        type: this.chartType,
+      });
+      this.chart.init();
     },
     methods: {
       getChartSize(size) {
@@ -88,14 +71,34 @@
         }
         return sizeValue;
       },
-      checkCanvasElement() {
-        const vm = this;
-        const canvas = vm.$refs.canvas;
-
-        return !!(canvas && canvas.getContext('2d'));
-      },
     },
   };
 </script>
 <style>
+  .evui-chart-outer{
+    position:relative;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+  }
+
+  .evui-chart-inner{
+    position:relative;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+  }
+
+  .evui-chart-title{
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    padding-left: 10px;
+    word-wrap: normal;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 </style>
