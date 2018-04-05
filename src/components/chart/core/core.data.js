@@ -31,38 +31,35 @@ export default class ChartDataStore {
     }
 
     const series = this.chartData.series;
-    const data = this.chartData.data;
-    const keys = Object.keys(data);
 
     for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
       this.addSeries(series[ix]);
-    }
-
-    for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
-      this.addValues(ix, data[keys[ix]]);
+      this.addValues(ix, series[ix].data);
     }
   }
 
   addSeries(param) {
     const series = {
       id: param.id,
-      label: param.label,
+      name: param.name,
       color: param.color,
-      min: undefined,
+      show: param.show === undefined ? true : param.show,
+      point: param.point,
+      pointSize: param.pointSize === undefined ? 4 : param.pointSize,
+      axisIndex: {
+        x: param.xAxisIndex === undefined ? 0 : param.xAxisIndex,
+        y: param.yAxisIndex === undefined ? 0 : param.yAxisIndex,
+      },
+      min: null,
+      max: null,
       minIndex: undefined,
-      max: undefined,
       maxIndex: undefined,
       seriesIndex: this.seriesList.length,
       data: [],
-      visible: param.visible === undefined ? true : param.visible,
       lineWidth: 2,
-      line: param.line === undefined ? true : param.line,
       fill: param.fill,
       fillColor: param.fillColor,
-      point: param.point,
       toolTip: {},
-      yPoint: [],
-
       insertIndex: -1,
       dataIndex: 0,
       startPoint: 0,
@@ -89,7 +86,7 @@ export default class ChartDataStore {
 
     series.data[dataIdx] = value;
 
-    if (series.visible) {
+    if (series.show) {
       this.setMinMaxValue(series, value, dataIdx);
       this.setMaxLabelWidth(value);
     }
@@ -156,7 +153,7 @@ export default class ChartDataStore {
     let temp = 0;
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].visible) {
+      if (this.seriesList[ix].show) {
         temp = Math.max(temp, this.seriesList[ix].data.length);
       }
     }
@@ -189,7 +186,7 @@ export default class ChartDataStore {
     };
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].visible && this.seriesList[ix].max !== null) {
+      if (this.seriesList[ix].show && this.seriesList[ix].max !== null) {
         if (this.seriesList[ix].max >= result.y) {
           result.x = this.seriesList[ix].data[this.seriesList[ix].maxIndex].x;
           result.y = this.seriesList[ix].max;
@@ -210,7 +207,7 @@ export default class ChartDataStore {
       seriesIndex: null,
     };
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].visible && this.seriesList[ix].min !== null) {
+      if (this.seriesList[ix].show && this.seriesList[ix].min !== null) {
         if (result.value === null) {
           result.x = this.seriesList[ix].data[this.seriesList[ix].minIndex].x;
           result.y = this.seriesList[ix].min;
@@ -229,19 +226,25 @@ export default class ChartDataStore {
 
   getXMaxValue() {
     const result = {
-      value: '',
+      x: null,
+      y: null,
       seriesIndex: null,
       dataIndex: null,
     };
 
     let data = null;
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].visible) {
-        data = this.seriesList[ix].data[this.seriesList[ix].data.length - 1];
-        if (data && data.x !== null) {
-          if (data.x > result.value) {
+      if (this.seriesList[ix].show) {
+        for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
+          data = this.seriesList[ix].data[jx];
+
+          if (result.value === null) {
             result.value = data.x;
-            result.dataIndex = this.seriesList[ix].data.length - 1;
+            result.dataIndex = jx;
+            result.seriesIndex = ix;
+          } else if (data.x && (data.x > result.value)) {
+            result.value = data.x;
+            result.dataIndex = jx;
             result.seriesIndex = ix;
           }
         }
@@ -249,5 +252,66 @@ export default class ChartDataStore {
     }
 
     return result;
+  }
+
+  getXMinValue() {
+    const result = {
+      x: null,
+      y: null,
+      seriesIndex: null,
+      dataIndex: null,
+    };
+
+    let data = null;
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      if (this.seriesList[ix].show) {
+        for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
+          data = this.seriesList[ix].data[jx];
+
+          if (result.value === null) {
+            result.value = data.x;
+            result.dataIndex = jx;
+            result.seriesIndex = ix;
+          } else if (data.x && (data.x < result.value)) {
+            result.value = data.x;
+            result.dataIndex = jx;
+            result.seriesIndex = ix;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  getAxisMinMaxValuePerSeries(type, index) {
+    // let data = null;
+    let min = null;
+    let max = null;
+
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      if (this.seriesList[ix].axisIndex[type] === index) {
+        if (min === null || this.seriesList[ix].min < min) {
+          min = this.seriesList[ix].min;
+        }
+
+        if (max === null || this.seriesList[ix].max > max) {
+          max = this.seriesList[ix].max;
+        }
+        // for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
+        //   data = this.seriesList[ix].data[jx];
+        //
+        //   if (min === null || data[type] < min) {
+        //     min = data[type];
+        //   }
+        //
+        //   if (max === null || data[type] > max) {
+        //     max = data[type];
+        //   }
+        // }
+      }
+    }
+
+    return { min, max };
   }
 }
