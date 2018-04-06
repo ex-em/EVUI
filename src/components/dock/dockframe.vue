@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="id"
     :style="userSelectStyle"
     :flex="flexVal"
     :minWidth="minWidthVal"
@@ -14,6 +15,59 @@
       >{{ title }}</label>
     </header>
     <slot/>
+    <!-- Dock 도킹 선택 이미지 -->
+    <div
+      :class="{
+        selectlayerShow: isPosImage,
+        selectlayerHide: !isPosImage,
+      }"
+      class="evui-direct">
+      <div class="wrap">
+        <div class="evui-direct-background"/>
+        <div class="top"><span
+          class="top"
+          pos="top"
+          @mouseover.stop="MouseOverPos"
+          @mouseout.stop="MouseOutPos"
+        /></div>
+        <div class="evui-direct-center-wrap">
+          <div
+            class="right"
+            pos="right"
+            @mouseover.stop="MouseOverPos"
+            @mouseout.stop="MouseOutPos"
+          />
+          <div
+            class="left"
+            pos="left"
+            @mouseover.stop="MouseOverPos"
+            @mouseout.stop="MouseOutPos"
+          />
+          <div
+            class="center"
+            pos="tab"
+            @mouseover.stop="MouseOverPos"
+            @mouseout.stop="MouseOutPos"
+          />
+        </div>
+        <div class="bottom"><span
+          class="bottom"
+          pos="bottom"
+          @mouseover.stop="MouseOverPos"
+          @mouseout.stop="MouseOutPos"
+        /></div>
+      </div>
+    </div>
+    <!--도킹 히든 영역 표시 레이어-->
+    <div
+      ref="hiddenLayer"
+      :style="hiddenLayerSize"
+      :class="{
+        selectlayerShow: isViewLayer,
+        selectlayerHide: !isViewLayer,
+      }"
+      class="evui-selectDockingLayer"
+    />
   </div>
 </template>
 
@@ -27,6 +81,16 @@
     name: 'DockFrame',
     props: {
       /** *
+       *  dockMainFrame ID을 지정한다.
+       *
+       * */
+      id: {
+        type: String,
+        default() {
+          return `evui-dockframe-${this._uid}`;
+        },
+      },
+      /** *
        *  DockFrame 이름을 지정한다.
        *
        * */
@@ -35,7 +99,7 @@
         default: 'DockFrame',
       },
       /**
-       * DockFrame css style를 적용합니다.
+       * DockFrame title를 적용합니다.
        */
       title: {
         type: String,
@@ -83,6 +147,27 @@
         type: [String, Number],
         default: '',
       },
+      /**
+       * DockFrame add  위치정보
+       */
+      pos: {
+        type: String,
+        default: '',
+      },
+      /**
+       * DockMainFrame vm
+       */
+      vmMain: {
+        type: Object,
+        default: null,
+      },
+      /**
+       * DockFrame adddcok type
+       */
+      type: {
+        type: String,
+        default: '',
+      },
     },
 
     data() {
@@ -94,10 +179,22 @@
         panelMinWidth: this.minWidth,
         panelMinHeight: this.minHeight,
         isResizing: false,
+        isSelectLayerPopup: false,
+        hiddenLayerStyle: null,
+        isViewLayer: false,
+        addPos: this.pos,
+        addType: this.type,
+        vmMainFrame: this.vmMain, // 해당 Dock  Vm 객체 담는다.
       };
     },
 
     computed: {
+      isPosImage() {
+        return this.isSelectLayerPopup;
+      },
+      hiddenLayerSize() {
+        return this.hiddenLayerStyle;
+      },
       userSelectStyle() {
         let wrapperObj;
         if (this.wrapperStyles !== null && typeof this.wrapperStyles === 'object') {
@@ -106,7 +203,8 @@
           wrapperObj = null;
         }
         const styleObject = Object.assign({
-          // 'max-height': '100%',
+          width: `${utils.quantity(this.widthVal).value}px`,
+          height: `${utils.quantity(this.heightVal).value}px`,
         }, wrapperObj);
         return styleObject;
       },
@@ -175,7 +273,105 @@
     created() {
 
     },
+    activated() {
+      // root 도킹이 아닐때
+      if (this.addType === 'root') {
+        if (!this.$el.parentElement.className.match('root')) {
+          this.sizeRootDockFrame();
+        }
+      } else if (this.$el.parentElement.parentElement.id === 'rootDock') {
+         // 제일 처음 도킹은 사이즈 줄이지 않는다.
+        this.sizeDockFrame();
+      } else {
+        // inner Dock
+        this.sizeDockFrame();
+      }
+    },
     methods: {
+      sizeDockFrame() {
+        const dockframeSize = this.$el.getBoundingClientRect();
+        let resizebar;
+        if (this.addPos !== '') {
+          switch (this.addPos) {
+            case 'left':
+              // 이진트리 하부 3개.
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = '4px';
+              resizebar.style.height = '100%';
+              this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'right':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = '4px';
+              resizebar.style.height = '100%';
+              this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'top':
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = '100%';
+              resizebar.style.height = '4px';
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
+              break;
+            case 'bottom':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = '100%';
+              resizebar.style.height = '4px';
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
+              break;
+            default :
+          }
+          this.addPos = '';
+        }
+      },
+      sizeRootDockFrame() {
+        if (this.addPos !== '') {
+          const dockframeSize = this.$el.getBoundingClientRect();
+          let resizebar;
+          switch (this.addPos) {
+            case 'left':
+              // 이진트리 하부 3개.
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = '4px';
+              resizebar.style.height = '100%';
+              this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'right':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = '4px';
+              resizebar.style.height = '100%';
+              this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'top':
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = '100%';
+              resizebar.style.height = '4px';
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
+              break;
+            case 'bottom':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = '100%';
+              resizebar.style.height = '4px';
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
+              break;
+            default :
+          }
+          this.addPos = '';
+        }
+      },
+      MouseOverPos() {
+        this.isViewLayer = true;
+      },
+      MouseOutPos() {
+        this.isViewLayer = false;
+      },
       getWidth() {
         return this.widthVal;
       },

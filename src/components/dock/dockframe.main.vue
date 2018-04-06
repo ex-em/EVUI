@@ -1,28 +1,417 @@
 <template>
   <div
-    ref="dockMainFrameRoot"
-    :class="classNames"
     :style="userSelectStyle"
-    @mousedown="onMouseDown"
+    class="overFlowDiv"
   >
-    <slot/>
     <div
-      ref="guidLine"
-      style="display:none;"
-      class="guidLine"
-    />
+      id="rootDock"
+      ref="dockMainFrameRoot"
+      :class="classNames"
+      :style="userSelectStyle"
+      @mousedown="onMouseDown"
+    >
+      <keep-alive
+        v-for="item in arrayLayoutData"
+        :key = "item.id"
+      >
+        <compoenet
+          :is="item"
+          :dock-frame-title="DockTitle"
+          :dock-pos = "addDockLayoutPos"
+          :dock-size="dockFrameSize"
+          :rootframe = "vmMain"
+          :compnentpopup = "addEvuiCompent"
+        />
+      </keep-alive>
+      <slot/>
+      <!--가상 스플렛 바-->
+      <div
+        ref="guideLine"
+        style="display:none;"
+        class="guideLine"
+      />
+      <!--도킹 히든 영역 표시 레이어-->
+      <div
+        ref="hiddenLayer"
+        :style="hiddenLayerSize"
+        :class="{
+          selectlayerShow: isViewLayer,
+          selectlayerHide: !isViewLayer,
+        }"
+        class="evui-selectDockingLayer root"
+      />
+      <!--top drop-->
+      <div
+        :class="{
+          selectlayerShow: isSelectLayerPopup,
+          selectlayerHide: !isSelectLayerPopup,
+        }"
+        class="evui-root-direct top"
+        pos="top"
+        @mouseover.stop="MouseOverPos"
+        @mouseout.stop="MouseOutPos"
+      />
+      <!--right drop-->
+      <div
+        :class="{
+          selectlayerShow: isSelectLayerPopup,
+          selectlayerHide: !isSelectLayerPopup,
+        }"
+        class="evui-root-direct right"
+        pos="right"
+        @mouseover.stop="MouseOverPos"
+        @mouseout.stop="MouseOutPos"
+      />
+      <!--left drop-->
+      <div
+        :class="{
+          selectlayerShow: isSelectLayerPopup,
+          selectlayerHide: !isSelectLayerPopup,
+        }"
+        class="evui-root-direct left"
+        pos="left"
+        @mouseover.stop="MouseOverPos"
+        @mouseout.stop="MouseOutPos"
+      />
+      <!--bottom drop-->
+      <div
+        :class="{
+          selectlayerShow: isSelectLayerPopup,
+          selectlayerHide: !isSelectLayerPopup,
+        }"
+        class="evui-root-direct bottom"
+        pos="bottom"
+        @mouseover.stop="MouseOverPos"
+        @mouseout.stop="MouseOutPos"
+      />
+    </div>
   </div>
+
 </template>
 
 <script>
   import utils from '@/common/container.utils';
+  import dockSubFrame from './dockframe.sub';
+  import dockFrame from './dockframe';
+  import dockspliter from './dockspliter';
 
   const LAYOUT_HORIZONTAL = 'hBox';
   const LAYOUT_VERTICAL = 'vBox';
 
-  export default {
+  const addDockFirstBox = {
+    name: 'addDockFirstBox',
+    components: {
+      dockSubFrame, dockFrame, dockspliter,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        title: this.dockFrameTitle,
+        width: this.dockSize.width,
+        height: this.dockSize.height,
+        vmRoot: this.rootframe,
+        addType: 'root',
+      };
+    },
+    template:
+    '            <dock-frame' +
+    '              flex="1"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :type="addType"' +
+    '              :title="title"/>',
+    created() {
+    },
+    methods: {
+    },
+  };
 
+  const addDockRightBox = {
+    name: 'addDockRightBox',
+    components: {
+      dockSubFrame, dockFrame, dockspliter,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      dockPos: {
+        type: String,
+        default: '',
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        title: this.dockFrameTitle,
+        width: this.dockSize.width,
+        height: this.dockSize.height,
+        pos: this.dockPos,
+        vmRoot: this.rootframe,
+        addType: this.dockSize.type,
+        addDockFrameId: this.dockSize.newDockFrameId,
+        insertTargetId: this.dockSize.insertTargetId,
+      };
+    },
+    template:
+    '              <dock-sub-frame' +
+    '               flex="1"' +
+    '                layout="hBox"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '                :insertId="insertTargetId"' +
+    '                :addId="addDockFrameId"' +
+    '>' +
+    '            <dockspliter/>' +
+    '            <dock-frame' +
+    '             flex="1"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '              :title="title"/>' +
+    '            </dock-sub-frame>',
+    created() {
+    },
+    methods: {
+    },
+  };
+  const addDockLeftBox = {
+    name: 'addDockLeftBox',
+    components: {
+      dockSubFrame, dockFrame, dockspliter,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      dockPos: {
+        type: String,
+        default: '',
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+      compnentpopup: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        title: this.dockFrameTitle,
+        width: this.dockSize.width,
+        height: this.dockSize.height,
+        pos: this.dockPos,
+        vmRoot: this.rootframe,
+        evuiCompnent: this.compnentpopup,
+        addType: this.dockSize.type,
+        addDockFrameId: this.dockSize.newDockFrameId,
+        insertTargetId: this.dockSize.insertTargetId,
+      };
+    },
+    template:
+    '              <dock-sub-frame' +
+    '               flex="1"' +
+    '                layout="hBox"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '                :insertId="insertTargetId"' +
+    '                :addId="addDockFrameId"' +
+    '>' +
+    '            <dock-frame' +
+    '             flex="1"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '              :title="title">' +
+    '             <keep-alive>' +
+    '              <compoenet :is="addComponent"/>' +
+    '             </keep-alive>' +
+    '              </dock-frame>' +
+    '            <dockspliter/>' +
+    '            </dock-sub-frame>',
+    computed: {
+      addComponent() {
+        return this.evuiCompnent;
+      },
+    },
+    created() {
+    },
+    methods: {
+    },
+  };
+  const addDockTopBox = {
+    name: 'addDockTopBox',
+    components: {
+      dockSubFrame, dockFrame, dockspliter,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      dockPos: {
+        type: String,
+        default: '',
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        title: this.dockFrameTitle,
+        width: this.dockSize.width,
+        height: this.dockSize.height,
+        pos: this.dockPos,
+        vmRoot: this.rootframe,
+        addType: this.dockSize.type,
+        addDockFrameId: this.dockSize.newDockFrameId,
+        insertTargetId: this.dockSize.insertTargetId,
+      };
+    },
+    template:
+    '              <dock-sub-frame' +
+    '                flex="1"' +
+    '                layout="vBox"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '                :insertId="insertTargetId"' +
+    '                :addId="addDockFrameId"' +
+    '>' +
+    '            <dock-frame' +
+    '              flex="1"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '              :title="title"/>' +
+    '            <dockspliter/>' +
+    '            </dock-sub-frame>',
+    created() {
+    },
+    methods: {
+    },
+  };
+  const addDockBottomBox = {
+    name: 'addDockBottomBox',
+    components: {
+      dockSubFrame, dockFrame, dockspliter,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      dockPos: {
+        type: String,
+        default: '',
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        title: this.dockFrameTitle,
+        width: this.dockSize.width,
+        height: this.dockSize.height,
+        pos: this.dockPos,
+        vmRoot: this.rootframe,
+        addType: this.dockSize.type,
+        addDockFrameId: this.dockSize.newDockFrameId,
+        insertTargetId: this.dockSize.insertTargetId,
+      };
+    },
+    template:
+    '              <dock-sub-frame' +
+    '                flex="1"' +
+    '                layout="vBox"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :vmMain="vmRoot"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '                :insertId="insertTargetId"' +
+    '                :addId="addDockFrameId"' +
+    '>' +
+    '            <dockspliter/>' +
+    '            <dock-frame' +
+    '              flex="1"' +
+    '                :width="width"' +
+    '                :height="height"' +
+    '                :pos="pos"' +
+    '                :type="addType"' +
+    '                :vmMain="vmRoot"' +
+    '              :title="title"/>' +
+    '            </dock-sub-frame>',
+    created() {
+    },
+    methods: {
+    },
+  };
+
+  export default {
     name: 'DockMainFrame',
+    components: {
+      addDockFirstBox,
+      addDockRightBox,
+      addDockTopBox,
+      addDockBottomBox,
+      addDockLeftBox,
+    },
     props: {
       /** *
        *  dockMainFrame 이름을 지정한다.
@@ -61,6 +450,13 @@
         default: '100%',
       },
       /**
+       *  dockMinaFrame 레이아웃 데이타
+       * */
+      layoutdata: {
+        type: Object,
+        default: null,
+      },
+      /**
        * dockMainFrame layout Data
        */
       dockDataSet: {
@@ -76,10 +472,60 @@
         panelWidth: this.width,
         panelHeight: this.height,
         panelLayout: this.layout,
+        isSelectLayerPopup: false,
+        isViewLayer: false,
+        addRootDockLayout: '',
+        addDockTitle: '',
+        addDockSize: null,
+        evuiComponent: null,
+        addDockList: [],
+        hiddenLayerStyle: null,
+        dockDataMap: [],
       };
     },
-
     computed: {
+      addEvuiCompent: {
+        get() {
+          return this.evuiComponent;
+        },
+        set(cData) {
+          this.evuiComponent = cData;
+        },
+      },
+      vmMain() {
+        return this;
+      },
+      hiddenLayerSize() {
+        return this.hiddenLayerStyle;
+      },
+      arrayLayoutData() {
+        // 새로운 레아아웃 데이타 로드
+      return this.addDockList;
+      },
+      dockFrameSize: {
+        get() {
+          return this.addDockSize;
+        },
+        set(cData) {
+          this.addDockSize = cData;
+        },
+      },
+      addDockLayoutPos: {
+        get() {
+          return this.addRootDockLayout;
+        },
+        set(cData) {
+          this.addRootDockLayout = cData;
+        },
+      },
+      DockTitle: {
+        get() {
+          return this.addDockTitle;
+        },
+        set(cData) {
+          this.addDockTitle = cData;
+        },
+      },
       classNames() {
         return [
           'evui-dockFrame-root',
@@ -115,19 +561,70 @@
         },
       },
     },
+    updated() {
+      this.$nextTick(() => {
+      });
+    },
     mounted() {
-      const DataObj = this.dockDataSet;
-      if (DataObj.content !== undefined) {
-        DataObj.id = 'dockMainFrameRoot';
-        this.BFTData(DataObj);
-      } else {
-        this.childDomSize(this.$el);
-      }
+      // 데이타 맵에 첫 rootFrame 미리 넣어준다.
+      this.dockDataMap.push({ id: 'root', width: this.panelWidth, height: this.panelHeight });
     },
     created() {
 
     },
     methods: {
+      // inner docking
+      addDockFrame(pos) {
+        switch (pos) {
+          case 'top':
+            this.addDockList.push(addDockTopBox);
+            break;
+          case 'left':
+            this.addDockList.push(addDockLeftBox);
+            break;
+          case 'right':
+            this.addDockList.push(addDockRightBox);
+            break;
+          case 'bottom':
+            this.addDockList.push(addDockBottomBox);
+            break;
+          case 'root':
+            this.addDockList.push(addDockLeftBox);
+            break;
+          case 'tab': // 아직 구상 되지 않음
+            break;
+          default :
+            break;
+        }
+      },
+      // root docking
+      addRootDockFrame(pos) {
+        switch (pos) {
+          case 'top':
+            this.addDockList.push(addDockTopBox);
+          break;
+          case 'left':
+            this.addDockList.push(addDockLeftBox);
+            break;
+          case 'right':
+            this.addDockList.push(addDockRightBox);
+            break;
+          case 'bottom':
+            this.addDockList.push(addDockBottomBox);
+            break;
+          case 'root':
+            this.addDockList.push(addDockFirstBox);
+            break;
+          default :
+            break;
+        }
+      },
+      MouseOverPos() {
+        this.isViewLayer = true;
+      },
+      MouseOutPos() {
+        this.isViewLayer = false;
+      },
       onMouseDown({ target: resizer, pageX: initialPageX, pageY: initialPageY }) {
         // 마우스 클릭 이벤트 발생
         /** *
@@ -147,10 +644,10 @@
           const parentOffsetLeft = self.$el.offsetLeft;
           const parentOffsetTop = self.$el.offsetTop;
           const targetBar = resizer;
-          const preResizeContainer = resizer.previousElementSibling;
+          const prevResizeContainer = resizer.previousElementSibling;
           const nextResizeContainer = resizer.nextElementSibling;
 
-          const guidLineDom = this.$refs.guidLine;
+          const guideLineDom = this.$refs.guideLine;
 
           const { addEventListener, removeEventListener } = resizer;
 
@@ -161,83 +658,84 @@
           let sizeMouseMoveXY = null;
 
           const resizeMove = (downEventPageXY, moveEventPageXY) => {
-            const preMinWidth = preResizeContainer.getAttribute('minWidth');
+            const prevMinWidth = prevResizeContainer.getAttribute('minWidth');
             const nextMinWidth = nextResizeContainer.getAttribute('minWidth');
-            const preMinHeight = preResizeContainer.getAttribute('minHeight');
+            const prevMinHeight = prevResizeContainer.getAttribute('minHeight');
             const nextMinHeight = nextResizeContainer.getAttribute('minHeight');
             if (layout === LAYOUT_HORIZONTAL) {
-              // 리사이즈 최소 값 100 , 최대값 100 픽셀로 고정 그 이하로는 리사이즈 안됨
               mouseMoveXY = moveEventPageXY - downEventPageXY;
-              const preMinSizeWidth = preResizeContainer.getBoundingClientRect().width
+              const prevMinSizeWidth = prevResizeContainer.getBoundingClientRect().width
                 + mouseMoveXY;
               const nextMaxSizeWidth = nextResizeContainer.getBoundingClientRect().width
                 - mouseMoveXY;
-              if (preMinSizeWidth > preMinWidth && nextMaxSizeWidth > nextMinWidth) {
+              // 최소 사이즈 까지만 가이드라인 이동가능
+              if (prevMinSizeWidth > prevMinWidth || nextMaxSizeWidth > nextMinWidth) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
 
-                guidLineDom.style.left = `${moveEventPageXY - parentOffsetLeft}px`;
-                guidLineDom.style.top = '0px';
-                guidLineDom.classList.add('guidLineBar-hBox');
-                guidLineDom.style.display = 'block';
+                guideLineDom.style.left = `${moveEventPageXY - parentOffsetLeft}px`;
+                guideLineDom.style.top = '0px';
+                guideLineDom.classList.add('guideLineBar-hBox');
+                guideLineDom.style.display = 'block';
               }
             }
             if (layout === LAYOUT_VERTICAL) {
               mouseMoveXY = moveEventPageXY - downEventPageXY;
-              const preMinSizeHeight = preResizeContainer.getBoundingClientRect().height
+              const prevMinSizeHeight = prevResizeContainer.getBoundingClientRect().height
                 + mouseMoveXY;
               const nextMaxSizeHeight = nextResizeContainer.getBoundingClientRect().height
                 - mouseMoveXY;
-              if (preMinSizeHeight > preMinHeight && nextMaxSizeHeight > nextMinHeight) {
+              // 최소 사이즈 까지만 가이드라인 이동가능
+              if (prevMinSizeHeight > prevMinHeight || nextMaxSizeHeight > nextMinHeight) {
                 // 가이드라인바
                 sizeMouseMoveXY = moveEventPageXY - downEventPageXY;
-                guidLineDom.style.top = `${moveEventPageXY - parentOffsetTop}px`;
-                guidLineDom.style.left = 'auto';
-                guidLineDom.classList.add('guidLineBar-vBox');
-                guidLineDom.style.display = 'block';
+                guideLineDom.style.top = `${moveEventPageXY - parentOffsetTop}px`;
+                guideLineDom.style.left = 'auto';
+                guideLineDom.classList.add('guideLineBar-vBox');
+                guideLineDom.style.display = 'block';
               }
             }
           };
 
           // 리사이즈 함수 생성
-          const resize = (preInitial, nextInitial) => {
-            const prePanelSize = preInitial.getBoundingClientRect();
+          const resize = (prevInitial, nextInitial) => {
+            const prevPanelSize = prevInitial.getBoundingClientRect();
             const nextPanelSize = nextInitial.getBoundingClientRect();
-            const prePanelinfo = preInitial;
+            const prevPanelinfo = prevInitial;
             const nextPanelinfo = nextInitial;
 
             if (layout === LAYOUT_HORIZONTAL) {
-              const preWidth = `${prePanelSize.width + sizeMouseMoveXY}px`;
+              const prevWidth = `${prevPanelSize.width + sizeMouseMoveXY}px`;
               const nextWidth = `${nextPanelSize.width - sizeMouseMoveXY}px`;
 
 
               // 순서
-              prePanelinfo.style.width = preWidth;
+              prevPanelinfo.style.width = prevWidth;
               // 자식 Dom resize
-              this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
+              this.domResizing(prevPanelinfo, sizeMouseMoveXY, layout);
               nextPanelinfo.style.width = nextWidth;
               this.domResizing(nextPanelinfo, -sizeMouseMoveXY, layout);
 
 
-              targetBar.style.left = `${preWidth}`;
-              guidLineDom.style.removeProperty('left');
-              guidLineDom.style.display = 'none';
-              guidLineDom.classList.remove('guidLineBar-hBox');
+              targetBar.style.left = `${prevWidth}`;
+              guideLineDom.style.removeProperty('left');
+              guideLineDom.style.display = 'none';
+              guideLineDom.classList.remove('guideLineBar-hBox');
             }
             if (layout === LAYOUT_VERTICAL) {
-              const preHeight = `${prePanelSize.height + sizeMouseMoveXY}px`;
+              const prevHeight = `${prevPanelSize.height + sizeMouseMoveXY}px`;
               const nextHeight = `${nextPanelSize.height - sizeMouseMoveXY}px`;
 
               // 자식 Dom resize
-              prePanelinfo.style.height = preHeight;
-              this.domResizing(prePanelinfo, sizeMouseMoveXY, layout);
+              prevPanelinfo.style.height = prevHeight;
+              this.domResizing(prevPanelinfo, sizeMouseMoveXY, layout);
               nextPanelinfo.style.height = nextHeight;
               this.domResizing(nextPanelinfo, -sizeMouseMoveXY, layout);
 
-              targetBar.style.top = `${prePanelSize.height}px`;
-              guidLineDom.style.removeProperty('top');
-              guidLineDom.style.display = 'none';
-              guidLineDom.classList.remove('guidLineBar-vBox');
+              targetBar.style.top = `${prevPanelSize.height}px`;
+              guideLineDom.style.removeProperty('top');
+              guideLineDom.style.display = 'none';
+              guideLineDom.classList.remove('guideLineBar-vBox');
             }
           };
 
@@ -265,7 +763,7 @@
             const mousePageY = e.pageY;
 
             if (initialPageX !== mousePageX || initialPageY !== mousePageY) {
-              resize(preResizeContainer, nextResizeContainer);
+              resize(prevResizeContainer, nextResizeContainer);
             }
 
             removeEventListener('mousemove', onMouseMove);
@@ -282,29 +780,6 @@
           addEventListener('mouseup', onMouseUp);
         }
       },
-      domEleDiv(layoutType, childId, parentLayout, parentId, childCnt) {
-        const subDiv = document.createElement('div');
-        const subClassName = this.layoutTypeSubBoxClass(layoutType);
-        let parentDomSize = null;
-        let DomLayout = null;
-        if (parentId === 'dockMainFrameRoot') {
-          parentDomSize = this.$refs.dockMainFrameRoot.getBoundingClientRect();
-          DomLayout = this.layout;
-        } else {
-          parentDomSize = document.getElementById(parentId).getBoundingClientRect();
-          DomLayout = parentLayout;
-        }
-        // 높이 넓이가 50px 이하면 null 처리
-        if (parentDomSize.width < 50 || parentDomSize.height < 50) {
-          return null;
-        }
-        this.domLayoutTypeSize(subDiv, parentDomSize, childCnt, DomLayout);
-        subDiv.setAttribute('id', childId);
-        subDiv.className = subClassName;
-        return subDiv;
-        // node.appendChild(textnode);
-        // document.getElementById("myList").appendChild(node);
-      },
       domLayoutTypeSize(selectDiv, domcliRect, cnt, DomLayout) {
         const domSelect = selectDiv;
         switch (DomLayout) {
@@ -316,7 +791,7 @@
             domSelect.style.width = `${domcliRect.width / cnt}px`;
             domSelect.style.height = `${domcliRect.height}px`;
             break;
-          case 'DockForm':
+          case 'DockFrame':
             domSelect.style.width = `${domcliRect.width}px`;
             domSelect.style.height = `${domcliRect.height}px`;
             break;
@@ -324,102 +799,8 @@
           default :
         }
       },
-      leafDomDiv(subDiv, childId) {
-        const leafdiv = document.createElement('div');
-        const subClassName = 'DockContainer';
-        const DockId = `${childId}_DockContainer`;
-        const parentDomSize = subDiv.getBoundingClientRect();
-
-        // 부모 layout 따른다
-        leafdiv.style.width = `${parentDomSize.width - 1}px`;
-        leafdiv.style.height = `${parentDomSize.height - 1}px`;
-
-
-        leafdiv.setAttribute('id', DockId);
-        leafdiv.className = subClassName;
-        return leafdiv;
-        // node.appendChild(textnode);
-        // document.getElementById("myList").appendChild(node);
-      },
-      BFTData(json) {
-        const self = this;
-        const queue = [];
-        queue.push(json);
-        while (queue.length !== 0) {
-          let parentJsonData = null;
-          parentJsonData = queue[0];
-          Object.keys(parentJsonData).forEach((key) => {
-            // 배열인지 확인
-            if (key === 'content') {
-              if (Array.isArray(parentJsonData[key])) {
-                const arrayObj = parentJsonData[key];
-                const arraylength = parentJsonData[key].length;
-                // div 생성
-                for (let ix = 0; ix <= arraylength - 1; ix++) {
-                  // content 배열 div create 작업실행
-                  // root container에 vBox hBox인지 prop 값을 할당
-                  if (parentJsonData.id === 'dockMainFrameRoot') {
-                    self.panelLayout = parentJsonData.layout;
-                  }
-
-                  // layout type, 자식 ID, 부모 ID, div 박스
-                  const subDiv = this.domEleDiv(arrayObj[ix].layout,
-                    arrayObj[ix].id, parentJsonData.layout, parentJsonData.id, arraylength);
-                  subDiv.style.backgroundColor = arrayObj[ix].bgcolor;
-                  let leafDiv = null;
-
-
-                  this.layoutAppendDom(subDiv, leafDiv, parentJsonData.id);
-
-                  if (arrayObj[ix].layout === 'DockForm' || arrayObj[ix].layout === 'Tab') {
-                    // layout이 DockForm or tab 이면 제일 하위 Leaf div 하나 더 생성한다.
-                    leafDiv = this.leafDomDiv(subDiv, arrayObj[ix].id);
-                    if (leafDiv !== null && leafDiv !== undefined) {
-                      subDiv.appendChild(leafDiv);
-                    }
-                  }
-
-                  if (arrayObj[ix].content !== undefined) {
-                    // 부모 id를 넣어서 큐에 담는다.7
-                    arrayObj[ix].pid = parentJsonData.id;
-                    queue.push(arrayObj[ix]);
-                    // for (let i = 0; i <= arrayObj[ix].content.length - 1; i++) {
-                    //   queue.push(arrayObj[ix].content[0]);
-                    // }
-                  }
-                }
-                queue.shift();
-              }
-            }
-          });
-        }
-      },
-      layoutAppendDom(subDiv, leafDiv, pId) {
-        if (pId === 'dockMainFrameRoot') {
-          this.$refs.dockMainFrameRoot.appendChild(subDiv);
-        } else {
-          const parentDomObj = document.getElementById(pId);
-          parentDomObj.appendChild(subDiv);
-        }
-      },
-      layoutTypeSubBoxClass(layoutType) {
-        switch (layoutType) {
-          case 'vBox':
-            return 'evui-Dock-container layout-vBox';
-          case 'hBox':
-            return 'evui-Dock-container layout-hBox';
-          case 'DockForm':
-            return 'subDockFrame';
-          case 'tab': // tab은 아직 구상이 되지 않음.
-            return '';
-          default :
-            return null;
-        }
-      },
       JsonLoop(json, addId) {
         Object.keys(json).forEach((key) => {
-//          this[key] = json[key];
-
           if (key === 'id') {
             if (json[key] === addId) {
               this.arrayLoop(json[key]);
@@ -439,172 +820,21 @@
           this.JsonLoop(arrayObj[ix]);
         }
       },
-      addDockFrame(pId, layout, id) {
-        const parentSelectDom = document.getElementById(pId).parentElement;
-        const selectDom = document.getElementById(pId);
-        const selectDomSize = selectDom.getBoundingClientRect();
-        // 높이 넓이가 50px 이하면 null 처리
-        if (selectDomSize.width < 50 || selectDomSize.height < 50) {
-          return null;
-        }
-        // div create
-        const subDiv = document.createElement('div');
-        subDiv.id = id;
-        subDiv.className = `evui-Dock-container layout-${layout}`;
-        subDiv.style.width = `${selectDomSize.width}px`;
-        subDiv.style.height = `${selectDomSize.height}px`;
-
-        parentSelectDom.appendChild(subDiv);
-
-        // Dom 이동 시킨다d
-        const addDom = document.getElementById(id);
-        addDom.appendChild(selectDom);
-        // dockContainer
-        this.domLayoutTypeSize(selectDom.children[0], selectDomSize, 2, layout);
-        // subdock
-        this.domLayoutTypeSize(selectDom, selectDomSize, 2, layout);
-
-
-        const cln = selectDom.cloneNode(true);
-        addDom.appendChild(cln);
-        cln.id = `${id}_sub`;
-        cln.children[0].id = `${id}_DockContainer`;
-
-        return 0;
-        // this.nodeSearch(AddObj, pId);
-      },
-      // dockDomMinSize(target, parentlayout, childLayout) {
-      //   const targetDom = target.children;
-      //   const targetDomLength = targetDom.length;
-      //   let boxCnt = 0;
-      //   for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
-      //     const childDom = targetDom[ix];
-      //
-      //     // 자식 dom이 있다면 재귀 호출 실행
-      //     if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
-      //       if (childDom.className.match('vBox')) {
-      //         this.dockDomMinSize(childDom, parentlayout, 'vBox');
-      //       } else if (childDom.className.match('hBox')) {
-      //         this.dockDomMinSize(childDom, parentlayout, 'hBox');
-      //       } else if (childDom.className.match('subDockFrame')) {
-      //         // sub일때
-      //         this.dockDomMinSize(childDom, parentlayout, 'subDockFrame');
-      //       }
-      //     } else if (!childDom.className.match('resizebar')) {
-      //        if (parentlayout === childLayout) {
-      //          boxCnt += 1;
-      //        }
-      //       }
-      //   }
-      // },
-      childDomSize(target, layout) {
-        const targetDom = target.children;
-        const targetDomLength = targetDom.length;
-
-        const parentSize = target.getBoundingClientRect();
-        const totalFlex = this.totalFlex(target);
-
-        for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
-          const childDom = targetDom[ix];
-
-          // root
-          if (layout === undefined && !childDom.className.match('guidLine')) {
-            childDom.style.width = `${parentSize.width}px`;
-            childDom.style.height = `${parentSize.height}px`;
-          } else {
-            // box에 리사이즈 바 개수
-            const splitterCnt = (targetDomLength - 1) / 2;
-            // 리사이즈 총 합계 (  높이 , 넓이 )
-            const splitterTotalSize = 4 * splitterCnt;
-            // 부모 Dom Layout
-
-            // 스플릿터
-            if (childDom.className.match('resizebar')) {
-              if (layout === 'vBox') {
-                childDom.style.width = '100%';
-                childDom.style.height = '4px';
-                // this.dockDomMinSize(childDom.nextElementSibling, layout);
-              } else if (layout === 'hBox') {
-               // this.dockDomMinSize(childDom.nextElementSibling, layout);
-                childDom.style.width = '4px';
-                childDom.style.height = '100%';
-              }
-            } else {
-              const childFlex = childDom.getAttribute('flex') || 1;
-              let parentFlexSzie = 0;
-              switch (layout) {
-                case 'hBox':
-//       childDom.style.width = `${(parentSize.width - splitterTotalSize) / (splitterCnt + 1)}px`;
-                  parentFlexSzie = parentSize.width - splitterTotalSize;
-                  childDom.style.width = this.flexSzie(totalFlex, childFlex, parentFlexSzie);
-                  childDom.style.height = `${parentSize.height}px`;
-                  break;
-                case 'vBox':
-                  parentFlexSzie = parentSize.height - splitterTotalSize;
-                  childDom.style.width = `${parentSize.width}px`;
-                  childDom.style.height = this.flexSzie(totalFlex, childFlex, parentFlexSzie);
-//       childDom.style.height = `${(parentSize.height - splitterTotalSize) / (splitterCnt + 1)}px`;
-                  break;
-                case 'subDockFrame':
-                  childDom.style.width = `${parentSize.width}px`;
-                  childDom.style.height = `${parentSize.height}px`;
-                  break;
-                case 'tab': // tab은 아직 구상이 되지 않음.
-                default :
-              }
-            }
-          }
-          // 자식 dom이 있다면 재귀 호출 실행
-          if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
-            if (childDom.className.match('vBox')) {
-              this.childDomSize(childDom, 'vBox');
-            } else if (childDom.className.match('hBox')) {
-              this.childDomSize(childDom, 'hBox');
-            } else if (childDom.className.match('subDockFrame')) {
-              // sub일때
-              this.childDomSize(childDom, 'subDockFrame');
-            }
-          }
-        }
-      },
-      totalFlex(domNode) {
-        const selectDom = domNode.children;
-        const childrenArray = Array.from(selectDom);
-        let totalFlex = 0;
-        childrenArray.forEach(
-          (currentValue) => {
-            // (currentValue, currentIndex, listObj) => {
-            // flex 값이 안들어가는 dom은 제외
-            if (!currentValue.className.match('resizebar') && !currentValue.className.match('guidLine')) {
-              const flexValue = currentValue.getAttribute('flex') || 1;
-              totalFlex += parseInt(flexValue, 10);
-            }
-          });
-        return totalFlex;
-      },
-      flexSzie(totalFlex, flex, parentSize) {
-        const flexSizeRatio = parentSize / totalFlex;
-        return `${flexSizeRatio * flex}px`;
-//             switch (layout) {
-//               case 'hBox':
-//                 return flexSizeRatio * flex;
-//               case 'vBox':
-//                 return flexSizeRatio * flex;
-//             case 'tab': // tab은 아직 구상이 되지 않음.
-//               default : return null;
-//             }
-      },
       domResizing(target, splitSize, rootLayout, layout) {
         const targetDom = target.children;
         const targetDomLength = targetDom.length;
         const parentSize = target.getBoundingClientRect();
         const resizeWidth = parentSize.width; // 부모 넓이
         const resizeHeight = parentSize.height; // 부모 높이
+        let isResize = false;
 
         if (!target.className.match('DockContainer')) {
           for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
             const childDom = targetDom[ix];
             const childSize = childDom.getBoundingClientRect();
+            // -3 마우스 무브 이벤트  값 보정처리
+            const minWidth = childDom.getAttribute('minWidth') - 3;
+            const minHeight = childDom.getAttribute('minHeight') - 3;
             // box에 리사이즈 바 개수
             const splitterCnt = (targetDomLength - 1) / 2;
             // 총 스플릿 사이즈에 dock 개수 많큼 나눔
@@ -620,11 +850,19 @@
                 // 자식 스플릿터
                 switch (layout) {
                   case 'hBox':
-                    childDom.style.height = `${resizeHeight}px`;
+                    if (minHeight < resizeHeight && !isResize) {
+                      childDom.style.height = `${resizeHeight}px`;
+                    } else {
+                     isResize = true;
+                    }
                     break;
                   case 'vBox':
                     // N / 1 사이즈
-                    childDom.style.height = `${childSize.height + divSize}px`;
+                    if (minHeight < childSize.height + divSize && !isResize) {
+                      childDom.style.height = `${childSize.height + divSize}px`;
+                    } else {
+                      isResize = true;
+                    }
                     break;
                   case 'subDockFrame':
                     childDom.style.width = `${resizeWidth}px`;
@@ -638,12 +876,20 @@
                 // 스플릿터
                 switch (layout) {
                   case 'hBox':
-                    childDom.style.width = `${childSize.width + divSize}px`;
+                    if (minWidth < childSize.width + divSize && !isResize) {
+                      childDom.style.width = `${childSize.width + divSize}px`;
+                    } else {
+                     isResize = true;
+                    }
                     break;
                   case 'vBox':
                     // N / 1 사이즈
                     // 부모 넓이 따라간다.
-                    childDom.style.width = `${resizeWidth}px`;
+                    if (minWidth < resizeWidth && !isResize) {
+                      childDom.style.width = `${resizeWidth}px`;
+                    } else {
+                      isResize = true;
+                    }
                     break;
                   case 'subDockFrame':
                     childDom.style.width = `${resizeWidth}px`;
@@ -655,6 +901,12 @@
                 }
               }
             }
+            // 스플릿을 통한 사이즈 변경 진행시 컨테이너가 최소 사이즈보다 작아지면 일정 비율 사이즈로
+            // 계산해서 반영한다. 큰거에서 작은 박스쪽으로 사이즈를 사용자가 다시 조절해야함.
+            if (isResize) {
+              this.resizeSetting(target, layout);
+            }
+
             // 자식 dom이 있다면 재귀 호출 실행
             if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
               if (childDom.className.match('vBox')) {
@@ -665,6 +917,58 @@
                 // sub일때
                 this.domResizing(childDom, splitSize, rootLayout, 'subDockFrame');
               }
+            }
+          }
+          isResize = false;
+        }
+      },
+      resizeSetting(target, layout) {
+        const targetDom = target.children;
+        const targetDomLength = targetDom.length;
+
+        const parentSize = target.getBoundingClientRect();
+        for (let ix = 0, ixlen = targetDomLength - 1; ix <= ixlen; ix++) {
+          const childDom = targetDom[ix];
+
+            // box에 리사이즈 바 개수
+            const splitterCnt = (targetDomLength - 1) / 2;
+            // 리사이즈 총 합계 (  높이 , 넓이 )
+            const splitterTotalSize = 4 * splitterCnt;
+            // flex 1 로 고정
+            const totalFlex = splitterCnt + 1;
+
+            // 스플릿터
+            if (!childDom.className.match('resizebar')) {
+              const childFlex = 1;
+              let parentFlexSzie = 0;
+              switch (layout) {
+                case 'hBox':
+                  parentFlexSzie = parentSize.width - splitterTotalSize;
+                  childDom.style.width = this.flexSzie(totalFlex, childFlex, parentFlexSzie);
+                  childDom.style.height = `${parentSize.height}px`;
+                  break;
+                case 'vBox':
+                  parentFlexSzie = parentSize.height - splitterTotalSize;
+                  childDom.style.width = `${parentSize.width}px`;
+                  childDom.style.height = this.flexSzie(totalFlex, childFlex, parentFlexSzie);
+                  break;
+                case 'subDockFrame':
+                  childDom.style.width = `${parentSize.width}px`;
+                  childDom.style.height = `${parentSize.height}px`;
+                  break;
+                case 'tab': // tab은 아직 구상이 되지 않음.
+                default :
+              }
+            }
+          // 자식 dom이 있다면 재귀 호출 실행
+          if (childDom.childElementCount !== 0 && !childDom.className.match('DockContainer')) {
+            if (childDom.className.match('vBox')) {
+              this.resizeSetting(childDom, 'vBox');
+            } else if (childDom.className.match('hBox')) {
+              this.resizeSetting(childDom, 'hBox');
+            } else if (childDom.className.match('subDockFrame')) {
+              // sub일때
+              this.resizeSetting(childDom, 'subDockFrame');
             }
           }
         }
