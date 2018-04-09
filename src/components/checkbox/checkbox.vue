@@ -1,16 +1,16 @@
 <template>
   <div
-    class="evui-checkbox"
     :class="wrapClasses"
+    class="evui-checkbox"
   >
     <input
-      type="checkbox"
       :id="id"
       :name="name"
       :class="cls"
       :checked="checked"
       :disabled="disabled"
       :value="value"
+      type="checkbox"
       @change="onChange"
     >
     <label
