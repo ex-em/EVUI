@@ -46,7 +46,7 @@ export default {
     let result;
     if (typeof val !== 'string') {
       result = false;
-    } else if (val.indexOf('%') > 0) {
+    } else if (val.indexOf('%') === (val.length - 1)) {
       result = true;
     } else {
       result = false;
