@@ -154,7 +154,7 @@ class BaseChart {
     let labelSize;
 
     for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
-      maxValue = this.dataSet.getAxisMinMaxValuePerSeries('y', ix).max || 0;
+      maxValue = this.dataSet.getYValueAxisPerSeries(ix).max || 0;
       if (this.options.yAxes[ix].tickFormat !== undefined &&
         this.options.yAxes[ix].type === 'time') {
         maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);

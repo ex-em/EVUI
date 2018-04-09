@@ -238,11 +238,7 @@ export default class ChartDataStore {
         for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
           data = this.seriesList[ix].data[jx];
 
-          if (result.value === null) {
-            result.value = data.x;
-            result.dataIndex = jx;
-            result.seriesIndex = ix;
-          } else if (data.x && (data.x > result.value)) {
+          if (result.x === null || (data.x && (data.x > result.x))) {
             result.value = data.x;
             result.dataIndex = jx;
             result.seriesIndex = ix;
@@ -268,11 +264,7 @@ export default class ChartDataStore {
         for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
           data = this.seriesList[ix].data[jx];
 
-          if (result.value === null) {
-            result.value = data.x;
-            result.dataIndex = jx;
-            result.seriesIndex = ix;
-          } else if (data.x && (data.x < result.value)) {
+          if (result.x === null || (data.x && (data.x < result.x))) {
             result.value = data.x;
             result.dataIndex = jx;
             result.seriesIndex = ix;
@@ -284,13 +276,12 @@ export default class ChartDataStore {
     return result;
   }
 
-  getAxisMinMaxValuePerSeries(type, index) {
-    // let data = null;
+  getYValueAxisPerSeries(index) {
     let min = null;
     let max = null;
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].axisIndex[type] === index) {
+      if (this.seriesList[ix].axisIndex.y === index) {
         if (min === null || this.seriesList[ix].min < min) {
           min = this.seriesList[ix].min;
         }
@@ -298,17 +289,30 @@ export default class ChartDataStore {
         if (max === null || this.seriesList[ix].max > max) {
           max = this.seriesList[ix].max;
         }
-        // for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
-        //   data = this.seriesList[ix].data[jx];
-        //
-        //   if (min === null || data[type] < min) {
-        //     min = data[type];
-        //   }
-        //
-        //   if (max === null || data[type] > max) {
-        //     max = data[type];
-        //   }
-        // }
+      }
+    }
+
+    return { min, max };
+  }
+
+  getXValueAxisPerSeries(index) {
+    let data;
+    let min = null;
+    let max = null;
+
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      if (this.seriesList[ix].axisIndex.x === index) {
+        data = this.seriesList[ix].data;
+
+        for (let jx = 0, jxLen = data.length; jx < jxLen; jx++) {
+          if (min === null || data[jx].x < min) {
+            min = data[jx].x;
+          }
+
+          if (max === null || data[jx].x > max) {
+            max = data[jx].x;
+          }
+        }
       }
     }
 

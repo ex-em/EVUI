@@ -3,6 +3,7 @@ import moment from 'moment';
 import BaseChart from './chart.base';
 import Util from '../core/core.util';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
+import AxisFixedScale from '../core/axis/axis.scale.fixed';
 
 export default class LineChart extends BaseChart {
   constructor(target, data, options) {
@@ -26,19 +27,62 @@ export default class LineChart extends BaseChart {
   }
 
   createAxis() {
+    let xAxisObj;
+    let yAxisObj;
+
     this.xAxes = [];
     this.yAxes = [];
 
     for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
-      if (this.options.xAxes[ix].type !== null && this.options.xAxes[ix].max !== null) {
-        this.xAxes.push(new AxisAutoScale('x', this.dataSet, this.chartRect,
-          this.options.xAxes[ix], this.bufferCtx, this.labelOffset));
+      if (this.options.xAxes[ix].interval) {
+        xAxisObj = new AxisFixedScale({
+          type: 'x',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.xAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      } else {
+        xAxisObj = new AxisAutoScale({
+          type: 'x',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.xAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
       }
+
+      this.xAxes.push(xAxisObj);
     }
 
     for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
-      this.yAxes.push(new AxisAutoScale('y', this.dataSet, this.chartRect,
-        this.options.yAxes[ix], this.bufferCtx, this.labelOffset));
+      if (this.options.yAxes[ix].interval) {
+        yAxisObj = new AxisFixedScale({
+          type: 'y',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.yAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      } else {
+        yAxisObj = new AxisAutoScale({
+          type: 'y',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.yAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      }
+
+      this.yAxes.push(yAxisObj);
     }
 
     for (let ix = 0, ixLen = this.xAxes.length; ix < ixLen; ix++) {
@@ -71,7 +115,7 @@ export default class LineChart extends BaseChart {
 
     if (series.fillStyle === undefined) {
       series.fillStyle = series.fill === undefined ? '' :
-        `rgba(${Util.hexToRgb(series.color || this.colors[seriesIndex])},${series.fill})`;
+        `rgba(${Util.hexToRgb(color)},${series.fill})`;
     }
 
     if (series.fill !== null) {
@@ -90,8 +134,8 @@ export default class LineChart extends BaseChart {
     for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
       data = series.data[ix];
 
-      x = data.x === null ? null : this.calculateX(data.x, series.axisIndex.x);
-      y = data.y === null ? null : this.calculateY(data.y, series.axisIndex.y);
+      x = this.calculateX(data.x, series.axisIndex.x);
+      y = this.calculateY(data.y, series.axisIndex.y);
 
       // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
       // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
@@ -131,14 +175,18 @@ export default class LineChart extends BaseChart {
     const minValue = this.xAxes[xAxisIndex].axisMin;
     let convertValue;
 
-    if (value === undefined) {
-      return undefined;
+    if (value === null) {
+      return null;
     }
 
     if (this.options.xAxes[xAxisIndex].type === 'time') {
       convertValue = +moment(value)._d;
     } else {
       convertValue = value;
+    }
+
+    if (convertValue > maxValue || convertValue < minValue) {
+      return undefined;
     }
 
     const scalingFactor = this.drawingXArea() / (maxValue - minValue);
@@ -151,14 +199,18 @@ export default class LineChart extends BaseChart {
     const minValue = this.yAxes[yAxisIndex].axisMin;
     let convertValue;
 
-    if (value === undefined) {
-      return undefined;
+    if (value === null) {
+      return null;
     }
 
     if (this.options.yAxes[yAxisIndex].type === 'time') {
       convertValue = +moment(value)._d;
     } else {
       convertValue = value;
+    }
+
+    if (convertValue > maxValue || convertValue < minValue) {
+      return undefined;
     }
 
     const scalingFactor = this.drawingYArea() / (maxValue - minValue);

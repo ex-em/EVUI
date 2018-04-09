@@ -28,7 +28,7 @@
               data: [
                 { x: '2018-05-25 00:10:00', y: 20 },
                 { x: '2018-05-25 00:11:00', y: 10 },
-                { x: '2018-05-25 00:13:00', y: 20 },
+                { x: '2018-05-25 00:12:00', y: 20 },
                 { x: '2018-05-25 00:14:00', y: 50 },
               ],
             },
@@ -37,7 +37,6 @@
               name: 'series-2',
               show: true,
               point: true,
-              pointSize: 6,
               xAxisIndex: 0,
               yAxisIndex: 0,
               data: [
@@ -45,7 +44,7 @@
                 { x: '2018-05-25 00:10:20', y: 42 },
                 { x: '2018-05-25 00:11:00', y: null },
                 { x: '2018-05-25 00:12:20', y: 15 },
-                { x: '2018-05-25 00:14:00', y: 32 },
+                { x: '2018-05-25 00:18:00', y: 32 },
               ],
             },
             {
@@ -53,7 +52,6 @@
               name: 'series-3',
               show: true,
               point: true,
-              pointSize: 4,
               xAxisIndex: 0,
               yAxisIndex: 0,
               data: [
@@ -86,6 +84,18 @@
             min: '2018-05-25 00:10:00',
             max: '2018-05-25 00:14:00',
           }],
+          // yAxes: [{
+          //   type: 'linear',
+          //   showGrid: true,
+          //   min: 10,
+          //   max: 50,
+          // }],
+          // xAxes: [{
+          //   type: 'time', // linear, step, time
+          //   tickFormat: 'hh:mm:ss',
+          //   showGrid: true,
+          //   interval: 'minute',
+          // }],
           yAxes: [{
             type: 'linear',
             showGrid: true,
