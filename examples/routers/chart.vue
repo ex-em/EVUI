@@ -82,7 +82,7 @@
             type: 'time', // linear, step, time
             tickFormat: 'hh:mm:ss',
             showGrid: true,
-            position: 'top',
+            position: 'bottom',
             min: '2018-05-25 00:10:00',
             max: '2018-05-25 00:14:00',
           }],
