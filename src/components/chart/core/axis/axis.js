@@ -111,9 +111,9 @@ class Axis {
 
     if (this.units.pos === 'x') {
       this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'top';
+      this.ctx.textBaseline = options.position === 'top' ? 'bottom' : 'top';
     } else if (this.units.pos === 'y') {
-      this.ctx.textAlign = 'right';
+      this.ctx.textAlign = options.position === 'left' ? 'right' : 'left';
       this.ctx.textBaseline = 'middle';
     }
     this.ctx.fillStyle = options.labelStyle.color;
@@ -168,15 +168,19 @@ class Axis {
       linePosition = labelCenter + aliasPixel;
       labelText = this.labelFormat(options.ticks[ix]);
 
+      let labelPoint;
+
       if (this.units.pos === 'x') {
-        this.ctx.fillText(labelText, labelCenter, offsetPoint + 10);
+        labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+        this.ctx.fillText(labelText, labelCenter, labelPoint);
 
         if (ix !== 0 && this.options.showGrid) {
           this.ctx.moveTo(linePosition, offsetPoint);
           this.ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
-        this.ctx.fillText(labelText, endPoint + 20, labelCenter);
+        labelPoint = options.position === 'left' ? endPoint - 10 : offsetPoint + 10;
+        this.ctx.fillText(labelText, labelPoint, labelCenter);
 
         if (ix !== 0 && this.options.showGrid) {
           this.ctx.moveTo(offsetPoint, linePosition);

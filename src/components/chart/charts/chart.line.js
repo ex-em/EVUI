@@ -127,6 +127,9 @@ export default class LineChart extends BaseChart {
     const xPoint = [];
     const yPoint = [];
 
+    // const xAreaPoint = [];
+    let startFillIndex = 0;
+    const endPoint = this.chartRect.y2 - this.labelOffset.bottom;
     let x = null;
     let y = null;
     let data;
@@ -137,9 +140,25 @@ export default class LineChart extends BaseChart {
       x = this.calculateX(data.x, series.axisIndex.x);
       y = this.calculateY(data.y, series.axisIndex.y);
 
-      // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
-      // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-      if (ix === 0 || series.data[ix - 1].y === null || series.data[ix].y === null ||
+      if (y === null) {
+        if (ix - 1 >= 0) {
+          if (series.fill && series.data[ix - 1].y !== null) {
+            ctx.stroke();
+            ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
+            ctx.lineTo(xPoint[ix - 1], endPoint);
+            ctx.lineTo(xPoint[startFillIndex], endPoint);
+            // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
+            // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
+
+            ctx.fill();
+            ctx.beginPath();
+          }
+        }
+
+        startFillIndex = ix + 1;
+      } else if (ix === 0 || series.data[ix - 1].y === null || series.data[ix].y === null ||
+        // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
+        // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
         series.data[ix - 1].x === null || series.data[ix].x === null) {
         ctx.moveTo(x, y);
       } else {
@@ -151,14 +170,24 @@ export default class LineChart extends BaseChart {
     }
 
     ctx.stroke();
+    if (series.fill && series.data[series.data.length - 1].y !== null) {
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
+      ctx.lineTo(xPoint[series.data.length - 1], endPoint);
+      ctx.lineTo(xPoint[startFillIndex], endPoint);
+      // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
+      // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
+
+      ctx.fill();
+    }
 
     // 포인트 효과를 마지막에 다시 그리는 이유는 마지막에 그려야 다른 그림과 겹치지 않음.
-    const pointOption = true;
     if (series.point) {
       ctx.beginPath();
       ctx.strokeStyle = color;
-      ctx.fillStyle = series.fillColor || pointOption.fillColor || '#fff';
-      ctx.lineWidth = pointOption.lineWidth;
+      ctx.fillStyle = series.fillColor || '#fff';
+      ctx.lineWidth = series.lineWidth;
       for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
         if (xPoint[ix] !== null && yPoint[ix] !== null) {
           ctx.moveTo(xPoint[ix], yPoint[ix]);
@@ -210,7 +239,7 @@ export default class LineChart extends BaseChart {
     }
 
     if (convertValue > maxValue || convertValue < minValue) {
-      return undefined;
+      return null;
     }
 
     const scalingFactor = this.drawingYArea() / (maxValue - minValue);

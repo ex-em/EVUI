@@ -20,9 +20,9 @@
             {
               id: 'series1',
               name: 'series-1',
-              color: '#ee15aa',
               show: true,
               point: true,
+              fill: false,
               xAxisIndex: 0,
               yAxisIndex: 0,
               data: [
@@ -41,10 +41,10 @@
               yAxisIndex: 0,
               data: [
                 { x: '2018-05-25 00:10:00', y: 22 },
-                { x: '2018-05-25 00:10:20', y: 42 },
+                { x: '2018-05-25 00:10:30', y: 42 },
                 { x: '2018-05-25 00:11:00', y: null },
-                { x: '2018-05-25 00:12:20', y: 15 },
-                { x: '2018-05-25 00:18:00', y: 32 },
+                { x: '2018-05-25 00:12:20', y: 48 },
+                { x: '2018-05-25 00:13:10', y: 32 },
               ],
             },
             {
@@ -52,6 +52,7 @@
               name: 'series-3',
               show: true,
               point: true,
+              fill: true,
               xAxisIndex: 0,
               yAxisIndex: 0,
               data: [
@@ -81,8 +82,16 @@
             type: 'time', // linear, step, time
             tickFormat: 'hh:mm:ss',
             showGrid: true,
+            position: 'top',
             min: '2018-05-25 00:10:00',
             max: '2018-05-25 00:14:00',
+          }],
+          yAxes: [{
+            type: 'linear',
+            showGrid: false,
+            position: 'left',
+            min: 10,
+            max: 50,
           }],
           // yAxes: [{
           //   type: 'linear',
@@ -96,12 +105,6 @@
           //   showGrid: true,
           //   interval: 'minute',
           // }],
-          yAxes: [{
-            type: 'linear',
-            showGrid: true,
-            min: 10,
-            max: 50,
-          }],
         },
       };
     },

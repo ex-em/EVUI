@@ -18,54 +18,6 @@ class BaseChart {
         height: 40,
         show: false,
       },
-      xAxes: [{
-        position: 'bottom',
-        type: 'linear',
-        show: true,
-        color: '#eeeeee',
-        min: null,
-        max: null,
-        minIndex: undefined,
-        maxIndex: undefined,
-        autoScaleRatio: null,
-        showGrid: true,
-        axisLineColor: '#b4b6ba',
-        gridLineColor: '#e7e9ed',
-        gridLineWidth: 1,
-        ticks: undefined,
-        tickFormat: undefined,
-        tickSize: null,
-        labelHeight: 20,
-        labelStyle: {
-          fontSize: 13,
-          color: '#333',
-          fontFamily: 'normal',
-        },
-      }],
-      yAxes: [{
-        position: 'left',
-        type: 'linear',
-        show: true,
-        color: '#eeeeee',
-        min: 0,
-        max: null,
-        minIndex: undefined,
-        maxIndex: undefined,
-        autoScaleRatio: 0.1,
-        showGrid: true,
-        axisLineColor: '#b4b6ba',
-        gridLineColor: '#e7e9ed',
-        gridLineWidth: 1,
-        ticks: undefined,
-        tickFormat: undefined,
-        tickSize: null,
-        labelWidth: undefined,
-        labelStyle: {
-          fontSize: 13,
-          color: '#333',
-          fontFamily: 'normal',
-        },
-      }],
       padding: {
         top: 5,
         right: 5,
@@ -90,7 +42,7 @@ class BaseChart {
     }
 
     this.createCanvas();
-
+    this.createAxesOptions();
 
     this.dataSet = new DataStore({
       chartData: this.data,
@@ -98,8 +50,77 @@ class BaseChart {
 
     this.dataSet.init();
     this.chartRect = this.getChartRect();
+  }
 
-    // this.initChartData();
+  createAxesOptions() {
+    const paramXAxes = this.options.xAxes;
+    const paramYAxes = this.options.yAxes;
+
+    const defaultXAxis = {
+      position: 'bottom',
+      type: 'linear',
+      show: true,
+      color: '#eeeeee',
+      min: null,
+      max: null,
+      minIndex: undefined,
+      maxIndex: undefined,
+      autoScaleRatio: null,
+      showGrid: true,
+      axisLineColor: '#b4b6ba',
+      gridLineColor: '#e7e9ed',
+      gridLineWidth: 1,
+      ticks: undefined,
+      tickFormat: undefined,
+      tickSize: null,
+      labelHeight: 20,
+      labelStyle: {
+        fontSize: 13,
+        color: '#333',
+        fontFamily: 'normal',
+      },
+    };
+
+    const defaultYAxis = {
+      position: 'left',
+      type: 'linear',
+      show: true,
+      color: '#eeeeee',
+      min: 0,
+      max: null,
+      minIndex: undefined,
+      maxIndex: undefined,
+      autoScaleRatio: 0.1,
+      showGrid: true,
+      axisLineColor: '#b4b6ba',
+      gridLineColor: '#e7e9ed',
+      gridLineWidth: 1,
+      ticks: undefined,
+      tickFormat: undefined,
+      tickSize: null,
+      labelWidth: undefined,
+      labelStyle: {
+        fontSize: 13,
+        color: '#333',
+        fontFamily: 'normal',
+      },
+    };
+
+    if (paramXAxes && paramXAxes.length) {
+      for (let ix = 0, ixLen = paramXAxes.length; ix < ixLen; ix++) {
+        paramXAxes[ix] = _.merge({}, defaultXAxis, paramXAxes[ix]);
+      }
+    } else {
+      this.options.xAxes = [defaultXAxis];
+    }
+
+    if (paramYAxes && paramYAxes.length) {
+      for (let ix = 0, ixLen = paramYAxes.length; ix < ixLen; ix++) {
+        paramYAxes[ix] = _.merge({}, defaultYAxis, paramYAxes[ix]);
+      }
+    } else {
+      this.options.yAxes = [defaultYAxis];
+    }
   }
 
   createCanvas() {
