@@ -7,33 +7,20 @@
 </template>
 <script>
   import Util from './core/core.util';
-  import Chart from './charts/chart.base';
+  import LineChart from './charts/chart.line';
 
   export default {
     props: {
-      chartType: {
-        type: String,
-        default: 'line',
-      },
-      chartData: {
+      options: {
         type: Object,
         default() {
           return {};
         },
       },
-      chartProps: {
+      data: {
         type: Object,
         default() {
           return {};
-        },
-      },
-      chartStyles: {
-        type: Object,
-        default() {
-          return {
-            width: '100%',
-            height: '100%',
-          };
         },
       },
     },
@@ -45,20 +32,13 @@
     created() {
       // using wrapper div
       this.wrapperSize = {
-        width: this.getChartSize(Util.quantity(this.chartStyles.width)),
-        height: this.getChartSize(Util.quantity(this.chartStyles.height)),
+        width: this.getChartSize(Util.quantity(this.options.width)),
+        height: this.getChartSize(Util.quantity(this.options.height)),
       };
     },
     mounted() {
-      this.chart = new Chart({
-        target: this.$refs.wrapper,
-        vm: this,
-        data: this.chartData,
-        props: this.chartProps,
-        styles: this.chartStyles,
-        type: this.chartType,
-      });
-      this.chart.init();
+      this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+      this.chart.createChart();
     },
     methods: {
       getChartSize(size) {
@@ -75,18 +55,10 @@
   };
 </script>
 <style>
-  .evui-chart-outer{
-    position:relative;
-    top:0px;
-    left:0px;
-    width:100%;
-    height:100%;
-  }
-
   .evui-chart-inner{
     position:relative;
-    top:0px;
-    left:0px;
+    top:0;
+    left:0;
     width:100%;
     height:100%;
   }
