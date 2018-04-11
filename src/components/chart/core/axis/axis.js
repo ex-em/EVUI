@@ -179,7 +179,7 @@ class Axis {
           this.ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
-        labelPoint = options.position === 'left' ? endPoint - 10 : offsetPoint + 10;
+        labelPoint = options.position === 'left' ? endPoint + 20 : offsetPoint + 10;
         this.ctx.fillText(labelText, labelPoint, labelCenter);
 
         if (ix !== 0 && this.options.showGrid) {
