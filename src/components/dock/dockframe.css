@@ -4,32 +4,37 @@
   margin: 0;
 }
 
-.evui-Dock-container {
-  display:block;
-  background-color : #333333;
+.evui-dock-container {
+  display: block;
+  background-color: #333333;
 }
-.evui-dockFrame-root {
-  display:block;
+
+.evui-dockframe-root {
+  display: block;
   background-color: black;
   position: relative;
-  box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), 0 4px 20px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.overFlowDiv {
+
+.overflowdiv {
   overflow: auto;
   background-color: black;
 }
-.layout-hBox {
-  float:left;
+
+.layout-hbox {
+  float: left;
 
 }
-.layout-hBox > .layout-vBox{
-  float:left;
+
+.layout-hbox > .layout-vbox {
+  float: left;
 }
 
-.layout-vBox {
-
+.layout-vbox > .layout-vbox {
+  float: left;
 }
-.subDockFrame {
+
+.subdockframe {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -37,32 +42,39 @@
   -ms-user-select: none;
   user-select: none;
 }
-.layout-hBox >.subDockFrame {
+
+.layout-hbox > .subdockframe {
   /*margin: 4px 4px 4px 4px;*/
-  float:left;
+  float: left;
 }
-.layout-vBox >.subDockFrame {
+
+.layout-vbox > .subdockframe {
   /*margin: 4px 4px 4px 4px;*/
 }
-.DockContainer {
+
+.dockcontainer {
   /*margin: 4px 4px 4px 4px;*/
   user-select: none;
   overflow: auto;
-  background-color : #333333;
+  background-color: #333333;
 }
-.layout-hBox >.DockContainer {
+
+.layout-hbox > .dockcontainer {
   /*margin: 4px 4px 4px 4px;*/
   position: relative;
-  float:left;
+  float: left;
 }
-.layout-vBox >.DockContainer {
+
+.layout-vbox > .dockcontainer {
   position: relative;
   /*margin: 4px 4px 4px 4px;*/
 }
+
 .movebar {
   position: absolute;
 
 }
+
 .resizebar {
   float: left;
   -webkit-touch-callout: none;
@@ -72,7 +84,8 @@
   -ms-user-select: none;
   user-select: none;
 }
-.guideLine {
+
+.guideline {
   z-index: 999;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -81,43 +94,50 @@
   -ms-user-select: none;
   user-select: none;
 }
-.guideLineBar-vBox {
+
+.guidelinebar-vbox {
   position: absolute;
   width: 100%;
   height: 4px;
   cursor: row-resize;
   background-color: #999999;
 }
-.guideLineBar-hBox {
+
+.guidelinebar-hbox {
   position: absolute;
   width: 4px;
   height: 100%;
   cursor: col-resize;
   background-color: #999999;
 }
-.layout-hBox >.resizebar {
+
+.layout-hbox > .resizebar {
   cursor: col-resize;
-  float:left;
+  float: left;
   background-color: #ffffff;
 }
-.layout-hBox >.resizebar:hover {
-  background-color: #e4e4e4;
-}
-.layout-hBox >.resizebar:active {
+
+.layout-hbox > .resizebar:hover {
   background-color: #e4e4e4;
 }
 
+.layout-hbox > .resizebar:active {
+  background-color: #e4e4e4;
+}
 
-.layout-vBox >.resizebar {
+.layout-vbox > .resizebar {
   cursor: row-resize;
   background-color: #ffffff;
 }
-.layout-vBox >.resizebar:hover {
+
+.layout-vbox > .resizebar:hover {
   background-color: #e4e4e4;
 }
-.layout-vBox >.resizebar:active {
+
+.layout-vbox > .resizebar:active {
   background-color: #e4e4e4;
 }
+
 .container-title {
   background-color: #42555F;
   /*background-color: #42555F;*/
@@ -134,7 +154,8 @@
   user-select: none;
   /*min-width: 100px;*/
 }
-.dockTitle {
+
+.docktitle {
   color: white;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -143,8 +164,9 @@
   -ms-user-select: none;
   user-select: none;
 }
+
 /******************** child direct **********************/
-div.evui-direct{
+div.evui-direct {
   position: absolute;
   height: 100px;
   z-index: 300000;
@@ -159,7 +181,7 @@ div.evui-direct{
   user-select: none;
 }
 
-div.evui-direct .wrap{
+div.evui-direct .wrap {
   margin: 0 auto;
   width: 105px;
   height: 105px;
@@ -171,7 +193,7 @@ div.evui-direct .wrap{
   user-select: none;
 }
 
-div.evui-direct .wrap .evui-direct-background{
+div.evui-direct .wrap .evui-direct-background {
   position: absolute;
   top: 14px;
   left: 14px;
@@ -182,13 +204,13 @@ div.evui-direct .wrap .evui-direct-background{
   z-index: -1;
 }
 
-div.evui-direct .top{
+div.evui-direct .top {
   width: 100%;
   height: 35px;
   text-align: center;
 }
 
-div.evui-direct .top span{
+div.evui-direct .top span {
   display: inline-block;
   width: 35px;
   height: 35px;
@@ -196,17 +218,17 @@ div.evui-direct .top span{
   background-position: -286px -5px;
 }
 
-div.evui-direct .top span:hover{
+div.evui-direct .top span:hover {
   background-position: -322px -5px;
 }
 
-div.evui-direct .bottom{
+div.evui-direct .bottom {
   width: 100%;
   height: 35px;
   text-align: center;
 }
 
-div.evui-direct .bottom span{
+div.evui-direct .bottom span {
   display: inline-block;
   width: 35px;
   height: 35px;
@@ -214,11 +236,11 @@ div.evui-direct .bottom span{
   background-position: -286px -41px;
 }
 
-div.evui-direct .bottom span:hover{
+div.evui-direct .bottom span:hover {
   background-position: -322px -41px;
 }
 
-div.evui-direct .evui-direct-center-wrap{
+div.evui-direct .evui-direct-center-wrap {
   width: 100%;
   height: 35px;
   -webkit-touch-callout: none;
@@ -229,7 +251,7 @@ div.evui-direct .evui-direct-center-wrap{
   user-select: none;
 }
 
-div.evui-direct .left{
+div.evui-direct .left {
   width: 35px;
   height: 35px;
   float: left;
@@ -237,11 +259,11 @@ div.evui-direct .left{
   background-position: -286px -113px;
 }
 
-div.evui-direct .left:hover{
+div.evui-direct .left:hover {
   background-position: -322px -113px;
 }
 
-div.evui-direct .right{
+div.evui-direct .right {
   width: 35px;
   height: 35px;
   float: right;
@@ -249,11 +271,11 @@ div.evui-direct .right{
   background-position: -286px -149px;
 }
 
-div.evui-direct .right:hover{
+div.evui-direct .right:hover {
   background-position: -322px -149px;
 }
 
-div.evui-direct .center{
+div.evui-direct .center {
   float: left;
   width: 35px;
   height: 35px;
@@ -261,40 +283,45 @@ div.evui-direct .center{
   background-position: -286px -77px;
 }
 
-div.evui-direct .center:hover{
+div.evui-direct .center:hover {
   background-position: -322px -77px;
 }
 
-div.evui-direct.evui-dock-tab .right{
+div.evui-direct.evui-dock-tab .right {
   visibility: hidden;
 }
 
-div.evui-direct.evui-dock-tab .left{
+div.evui-direct.evui-dock-tab .left {
   visibility: hidden;
 }
 
-div.evui-direct.evui-dock-tab .top{
+div.evui-direct.evui-dock-tab .top {
   visibility: hidden;
 }
 
-div.evui-direct.evui-dock-tab .bottom{
+div.evui-direct.evui-dock-tab .bottom {
   visibility: hidden;
 }
-.selectlayerShow{
+
+.selectlayerShow {
   display: block;
 }
-.selectlayerHide{
+
+.selectlayerHide {
   display: none;
 }
-.select-Dock-border{
+
+.select-Dock-border {
   border: 3px dashed dodgerblue;
   overflow: hidden;
 
 }
-div.evui-root-direct{
+
+div.evui-root-direct {
   position: absolute;
   width: 35px;
   height: 35px;
+  transform: translateY(-50%) translateX(-50%);
   background-image: url(./dock_image.png);
   z-index: 300000;
   -webkit-touch-callout: none;
@@ -305,50 +332,51 @@ div.evui-root-direct{
   user-select: none;
 }
 
-div.evui-root-direct.top{
+div.evui-root-direct.top {
   top: 20px;
   left: 50%;
   background-position: -286px -5px;
 }
 
-div.evui-root-direct.top:hover{
+div.evui-root-direct.top:hover {
   background-position: -322px -5px;
 }
 
-div.evui-root-direct.bottom{
+div.evui-root-direct.bottom {
   bottom: 20px;
   left: 50%;
   background-position: -286px -41px;
 }
 
-div.evui-root-direct.bottom:hover{
+div.evui-root-direct.bottom:hover {
   background-position: -322px -41px;
 }
 
-div.evui-root-direct.left{
+div.evui-root-direct.left {
   left: 20px;
   top: 50%;
   background-position: -286px -113px;
 }
 
-div.evui-root-direct.left:hover{
+div.evui-root-direct.left:hover {
   background-position: -322px -113px;
 }
 
-div.evui-root-direct.right{
+div.evui-root-direct.right {
   right: 20px;
   top: 50%;
   background-position: -286px -149px;
 }
 
-div.evui-root-direct.right:hover{
+div.evui-root-direct.right:hover {
   background-position: -322px -149px;
 }
-div.evui-selectDockingLayer{
-  position:absolute;
-  opacity:0.45;
-  background-color:#448CCB;
-  z-index:200000;
+
+div.evui-selectDockingLayer {
+  position: absolute;
+  opacity: 0.45;
+  background-color: #448CCB;
+  z-index: 200000;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

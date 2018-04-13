@@ -1,26 +1,23 @@
 <template>
   <div
-    :id="id"
+    :data-ref="dataRef"
     :style="userSelectStyle"
     :flex="flexVal"
     :minWidth="minWidthVal"
     :minHeight="minHeightVal"
-    class="DockContainer"
+    class="dockcontainer"
   >
     <header
       class="container-title"
     >
       <label
-        class="dockTitle"
+        class="docktitle"
       >{{ title }}</label>
     </header>
     <slot/>
     <!-- Dock 도킹 선택 이미지 -->
     <div
-      :class="{
-        selectlayerShow: isPosImage,
-        selectlayerHide: !isPosImage,
-      }"
+      :class="isPosImage ? 'selectlayerShow' : 'selectlayerHide'"
       class="evui-direct">
       <div class="wrap">
         <div class="evui-direct-background"/>
@@ -62,10 +59,7 @@
     <div
       ref="hiddenLayer"
       :style="hiddenLayerSize"
-      :class="{
-        selectlayerShow: isViewLayer,
-        selectlayerHide: !isViewLayer,
-      }"
+      :class="isViewLayer ? 'selectlayerShow': 'selectlayerHide'"
       class="evui-selectDockingLayer"
     />
   </div>
@@ -84,7 +78,7 @@
        *  dockMainFrame ID을 지정한다.
        *
        * */
-      id: {
+      dataRef: {
         type: String,
         default() {
           return `evui-dockframe-${this._uid}`;
@@ -185,6 +179,7 @@
         addPos: this.pos,
         addType: this.type,
         vmMainFrame: this.vmMain, // 해당 Dock  Vm 객체 담는다.
+        resizebarSize: ['4px', '100%'],
       };
     },
 
@@ -279,9 +274,6 @@
         if (!this.$el.parentElement.className.match('root')) {
           this.sizeRootDockFrame();
         }
-      } else if (this.$el.parentElement.parentElement.id === 'rootDock') {
-         // 제일 처음 도킹은 사이즈 줄이지 않는다.
-        this.sizeDockFrame();
       } else {
         // inner Dock
         this.sizeDockFrame();
@@ -296,29 +288,29 @@
             case 'left':
               // 이진트리 하부 3개.
               resizebar = this.$el.nextElementSibling;
-              resizebar.style.width = '4px';
-              resizebar.style.height = '100%';
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
               this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
               this.$el.style.height = `${dockframeSize.height}px`;
               break;
             case 'right':
               resizebar = this.$el.previousElementSibling;
-              resizebar.style.width = '4px';
-              resizebar.style.height = '100%';
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
               this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
               this.$el.style.height = `${dockframeSize.height}px`;
               break;
             case 'top':
               resizebar = this.$el.nextElementSibling;
-              resizebar.style.width = '100%';
-              resizebar.style.height = '4px';
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
               this.$el.style.width = `${dockframeSize.width}px`;
               this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
               break;
             case 'bottom':
               resizebar = this.$el.previousElementSibling;
-              resizebar.style.width = '100%';
-              resizebar.style.height = '4px';
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
               this.$el.style.width = `${dockframeSize.width}px`;
               this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
               break;
@@ -335,29 +327,29 @@
             case 'left':
               // 이진트리 하부 3개.
               resizebar = this.$el.nextElementSibling;
-              resizebar.style.width = '4px';
-              resizebar.style.height = '100%';
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
               this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
               this.$el.style.height = `${dockframeSize.height}px`;
               break;
             case 'right':
               resizebar = this.$el.previousElementSibling;
-              resizebar.style.width = '4px';
-              resizebar.style.height = '100%';
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
               this.$el.style.width = `${(dockframeSize.width / 2) - 2}px`;
               this.$el.style.height = `${dockframeSize.height}px`;
               break;
             case 'top':
               resizebar = this.$el.nextElementSibling;
-              resizebar.style.width = '100%';
-              resizebar.style.height = '4px';
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
               this.$el.style.width = `${dockframeSize.width}px`;
               this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
               break;
             case 'bottom':
               resizebar = this.$el.previousElementSibling;
-              resizebar.style.width = '100%';
-              resizebar.style.height = '4px';
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
               this.$el.style.width = `${dockframeSize.width}px`;
               this.$el.style.height = `${(dockframeSize.height / 2) - 2}px`;
               break;

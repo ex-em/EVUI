@@ -1,13 +1,13 @@
 <template>
   <div
-    ref="evui-layerPopup"
+    ref="evuiLayerPopup"
     :style="style"
     :class="{
       active: enabled,
       dragging: dragging,
       resizing: resizing,
     }"
-    class="evui-layerPopup"
+    class="evui-layerpopup"
     @mousedown.stop="layerEleDown"
   >
     <div v-if="resizable">
@@ -16,18 +16,15 @@
         :key="handle"
         :style="{ display: enabled ? 'block' : 'none'}"
         :class="'reszie-' + handle"
-        class="evui-popupResize"
+        class="evui-popup-resize"
         @mousedown.stop.prevent="handleDown(handle, $event)"
       />
 
     </div>
     <div
       :style="popupguideSize"
-      :class="{
-        divguideShow: isguideLine,
-        divguideHide: !isguideLine,
-      }"
-      class="evui-popupResizeguide"/>
+      :class="isGuideLine ? 'div-guide-show': 'div-guide-hide'"
+      class="evui-popup-resize-guide"/>
     <div
       :style="popupSize"
       class="evui-popup-all-layout"
@@ -286,7 +283,7 @@ export default {
       maximizeWidth: 0,
       maximizeHeight: 0,
       isMaximize: true,
-      isguideLine: false,
+      isGuideLine: false,
       guideTop: this.gy,
       guideLeft: this.gx,
       guideWidth: this.gw,
@@ -395,19 +392,19 @@ export default {
   },
 
   methods: {
-    vmSelectId(ParentVm, id) {
-     const parentObject = ParentVm.$children;
+    vmSelectId(parentVm, id) {
+     const parentObject = parentVm.$children;
      const parentLength = parentObject.length;
        for (let ix = 0; ix < parentLength; ix++) {
-         const vminstance = parentObject[ix];
+         const vmInstance = parentObject[ix];
             // 같은 id를 찾으면 빠져나옴
-              if (vminstance.id === id) {
-                this.vmDock = vminstance;
+              if (vmInstance.dataRef === id) {
+                this.vmDock = vmInstance;
               }
-           if (vminstance.$children.length !== 0) {
+           if (vmInstance.$children.length !== 0) {
                 // Dock 인 vm만 돌린다  가장 겉에만 잡고 찾기
-                if (vminstance.$el.className.match('Dock') !== null) {
-                  this.vmSelectId(vminstance, id);
+                if (vmInstance.$el.className.match('dock') !== null) {
+                  this.vmSelectId(vmInstance, id);
                 }
            }
        }
@@ -488,15 +485,15 @@ export default {
       this.handle = handle;
       this.handleX = e.pageX;
       this.handleY = e.pageY;
-      if (!this.isguideLine) {
+      if (!this.isGuideLine) {
         this.guideLeft = -1;
         this.guideTop = -1;
       }
       // layerPopup 가이드 라인 활성화
-      this.isguideLine = true;
+      this.isGuideLine = true;
 
-      if (e.stopPropagation) e.stopPropagation();
-      if (e.preventDefault) e.preventDefault();
+      // if (e.stopPropagation) e.stopPropagation();
+      // if (e.preventDefault) e.preventDefault();
       // resize 여부
       this.resizing = true;
     },
@@ -655,7 +652,8 @@ export default {
               });
             }
             this.$el.hidden = false;
-            const droppableBelow = elemBelow.closest('.DockContainer');
+            const droppableBelow = elemBelow.closest('.dockcontainer');
+            const resizeBelow = elemBelow.closest('.resizebar');
             // ============== 팝업 아래 Dom찾기 끝 ==============
 
 
@@ -674,14 +672,16 @@ export default {
             }
             // dockframe 객체를 담는다.
             if (droppableBelow !== null && this.vmDock === null) {
-              this.vmSelectId(this.vmMainFrame, droppableBelow.getAttribute('id'));
+              this.vmSelectId(this.vmMainFrame, droppableBelow.getAttribute('data-ref'));
               this.isSelectLayer(true, this.vmDock);
             }
             // 이미 존재하지만 마우스 업버튼으로 false가 된경우 다시 true 만들어준다
             if (this.vmDock !== null && !this.vmDock.isSelectLayerPopup) {
               this.isSelectLayer(true, this.vmDock);
             }
-
+            // if (resizeBelow !== null && this.addDockPosition !== null && this.vmDock !== null) {
+            //   this.isSelectLayer(true, this.vmDock);
+            // }
             // addDocking pos 값 추출  && hidden layer 영역 표시
             const addDockPos = dockPosAttr.getAttribute('pos');
             if (addDockPos !== null) {
@@ -691,7 +691,7 @@ export default {
               } else {
                 this.isRootPos = false;
               }
-              this.dockPostionLayerSize(addDockPos, droppableBelow);
+              this.dockPostionLayerSize(addDockPos, droppableBelow, resizeBelow);
             } else {
               // 초기화 처리
               this.addDockPosition = null;
@@ -714,7 +714,7 @@ export default {
       // 리사이즈  마우스 업이벤트.
       if (this.resizing) {
         // layerPopup 가이드 라인 비활성화
-        this.isguideLine = false;
+        this.isGuideLine = false;
 
         // guide resize 변경
         // layerPopup 사이즈/좌표 적용
@@ -759,7 +759,7 @@ export default {
 
           // 추후 도킹 추가 될떄마다 data Map 생성
         if (this.isRootPos !== null && this.addDockPosition !== null) { // 도킹을 선택했다.
-          if (this.currentDroppable === null) { // 제일 처음 도킹
+          if (this.vmMainFrame.$children.length === 0) { // 제일 처음 도킹
             this.rootCreateDockFrame('root');
           } else if (this.isRootPos) {
             // root 도킹 여부 판단
@@ -782,7 +782,7 @@ export default {
       this.elmX = this.left;
       this.elmY = this.top;
     },
-    dockPostionLayerSize(pos, isDockContainer) {
+    dockPostionLayerSize(pos, isDockContainer, isResizeBelow) {
       let rootObject = this.vmMainFrame;
       // root에서 도킹인제 dock에서 도킹인지 확인
       if (!this.isRootPos) {
@@ -790,7 +790,7 @@ export default {
       }
       const rootFrameSize = rootObject.$el.getBoundingClientRect();
       let hiddenLayerStyle = null;
-      if (isDockContainer === null) {
+      if (isDockContainer === null && isResizeBelow === null) {
         switch (pos) {
           case 'top':
             hiddenLayerStyle = { width: '100%', height: '100%', top: '0px', left: '0px' };
@@ -851,6 +851,7 @@ export default {
       if (type === 'root') {
         rootFrameVm.addRootDockLayout = 'root';
         rootFrameVm.addDockTitle = this.popupTitle;
+        rootFrameVm.evuiComponent = this.evuiComponent;
         rootFrameVm.addDockSize = wrapperSize;
         rootFrameVm.addRootDockFrame('root');
       }
@@ -864,7 +865,7 @@ export default {
       const rootFrameVm = this.vmMainFrame;
       const dockFrame = this.vmDock;
       // subDockFrame 객체 반환
-      this.vmSelectId(rootFrameVm, dockFrame.$el.parentNode.getAttribute('id'));
+      this.vmSelectId(rootFrameVm, dockFrame.$el.parentNode.getAttribute('data-ref'));
       const subDockFrame = this.vmDock;
       const dockPosition = this.addDockPosition;
       // const targetDock = this.vmDock;
@@ -877,6 +878,7 @@ export default {
         case 'top':
           rootFrameVm.addRootDockLayout = 'top';
           rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiComponent;
           // wrapperSize.height /= 2;
           // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
@@ -906,6 +908,7 @@ export default {
         case 'bottom':
           rootFrameVm.addRootDockLayout = 'bottom';
           rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiComponent;
           // wrapperSize.height /= 2;
           // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
@@ -935,6 +938,7 @@ export default {
           rootFrameVm.addRootDockLayout = 'top';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
+          rootFrameVm.evuiComponent = this.evuiComponent;
           break;
         case 'left':
           rootFrameVm.addRootDockLayout = 'left';
@@ -946,11 +950,13 @@ export default {
           rootFrameVm.addRootDockLayout = 'right';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
+          rootFrameVm.evuiComponent = this.evuiComponent;
           break;
         case 'bottom':
           rootFrameVm.addRootDockLayout = 'bottom';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
+          rootFrameVm.evuiComponent = this.evuiComponent;
           break;
         default :
       }
@@ -968,7 +974,7 @@ export default {
     },
     // 레어어 팝업이 여러개 있을때 클릭한 팝업 zindex 값을 수정한다.
     allLayerPopUpzindex() {
-      const popUp = document.documentElement.getElementsByClassName('evui-layerPopup');
+      const popUp = document.documentElement.getElementsByClassName('evui-layerpopup');
       const popUpLength = popUp.length;
       for (let ix = 0; ix < popUpLength; ix++) {
         const popUpDom = popUp[ix];
@@ -985,7 +991,7 @@ export default {
 </script>
 
 <style scoped>
-  .evui-layerPopup {
+  .evui-layerpopup {
     position: absolute;
     box-sizing: border-box;
     z-index: 500;
@@ -1001,7 +1007,7 @@ export default {
   bl - 왼쪽 하단
   ml - 왼쪽 중간
   */
-  .evui-popupResize {
+  .evui-popup-resize {
     box-sizing: border-box;
     display: none;
     position: absolute;
@@ -1020,6 +1026,7 @@ export default {
     top: -6px;
     left: -6px;
     cursor: nw-resize;
+    z-index: 11;
   }
   .reszie-tm {
     width: 100%;
@@ -1028,6 +1035,7 @@ export default {
     /*left: 50%;*/
     /*margin-left: -5px;*/
     cursor: n-resize;
+    z-index: 11;
   }
   .reszie-tr {
     width: 5px;
@@ -1035,6 +1043,7 @@ export default {
     top: -6px;
     right: -6px;
     cursor: ne-resize;
+    z-index: 11;
   }
   .reszie-ml {
     width: 5px;
@@ -1043,6 +1052,7 @@ export default {
     /*margin-top: -5px;*/
     left: -6px;
     cursor: w-resize;
+    z-index: 11;
   }
   .reszie-mr {
     width: 5px;
@@ -1051,6 +1061,7 @@ export default {
     /*margin-top: -5px;*/
     right: -6px;
     cursor: e-resize;
+    z-index: 11;
   }
   .reszie-bl {
     width: 5px;
@@ -1058,6 +1069,7 @@ export default {
     bottom: -6px;
     left: -6px;
     cursor: sw-resize;
+    z-index: 11;
   }
   .reszie-bm {
     width: 100%;
@@ -1066,6 +1078,7 @@ export default {
     /*left: 50%;*/
     /*margin-left: -5px;*/
     cursor: s-resize;
+    z-index: 11;
   }
   .reszie-br {
     width: 5px;
@@ -1073,6 +1086,7 @@ export default {
     bottom: -6px;
     right: -6px;
     cursor: se-resize;
+    z-index: 11;
   }
   /*전체 레이아웃*/
   .evui-popup-all-layout{
@@ -1201,17 +1215,17 @@ export default {
     -ms-user-select: none;
     user-select: none;
   }
-  .evui-popupResizeguide{
+  .evui-popup-resize-guide{
     border: 1px dashed #3b5a82;
     position: absolute;
     overflow: hidden;
 
   }
-  .divguideShow{
+  .div-guide-show{
     display: block;
     z-index: 10;
   }
-  .divguideHide{
+  .div-guide-hide{
     display: none;
   }
   .dragging{

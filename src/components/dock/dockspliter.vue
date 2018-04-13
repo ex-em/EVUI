@@ -1,6 +1,6 @@
 <template>
   <div
-    :id="id"
+    :data-ref="dataRef"
     class="resizebar"
   />
 </template>
@@ -10,7 +10,7 @@
 
 
     props: {
-      id: {
+      dataRef: {
         type: String,
         default() {
           return `evui-${this._uid}`;
