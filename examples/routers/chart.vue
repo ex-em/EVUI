@@ -1,44 +1,114 @@
 <template>
   <div style="width: 800px; height: 600px;">
-    <Chart
-      :width="width"
-      :height="height"
-      :chart-type="'line'"
-      :chart-data="data"
-      :margin="margin"
+    <chart
+      :data="chartData"
+      :options="chartOptions"
     />
   </div>
 </template>
 <script>
-  import Chart from '@/components/chart';
+  import chart from '@/components/chart';
 
   export default {
     components: {
-      Chart,
+      chart,
     },
     data() {
       return {
-        width: '100%',
-        height: '100%',
-        data: [
-          { x: '1790', y: 3.9 },
-          { x: '1810', y: 7.2 },
-          { x: '1850', y: 23.1 },
-          { x: '1830', y: 12.8 },
-          { x: '1870', y: 36.5 },
-          { x: '1890', y: 62.9 },
-          { x: '1910', y: 92.2 },
-          { x: '1930', y: 123.2 },
-          { x: '1950', y: 151.3 },
-          { x: '1970', y: 203.2 },
-          { x: '1990', y: 248.7 },
-          { x: '2010', y: 308.7 },
-        ],
-        margin: { top: 40, left: 75, right: 0, bottom: 75 },
+        chartData: {
+          series: [
+            {
+              id: 'series1',
+              name: 'series-1',
+              show: true,
+              point: true,
+              fill: false,
+              xAxisIndex: 0,
+              yAxisIndex: 0,
+              data: [
+                { x: '2018-05-25 00:10:00', y: 20 },
+                { x: '2018-05-25 00:11:00', y: 10 },
+                { x: '2018-05-25 00:12:00', y: 20 },
+                { x: '2018-05-25 00:14:00', y: 50 },
+              ],
+            },
+            {
+              id: 'series2',
+              name: 'series-2',
+              show: true,
+              point: true,
+              xAxisIndex: 0,
+              yAxisIndex: 0,
+              data: [
+                { x: '2018-05-25 00:10:00', y: 22 },
+                { x: '2018-05-25 00:10:30', y: 42 },
+                { x: '2018-05-25 00:11:00', y: null },
+                { x: '2018-05-25 00:12:20', y: 48 },
+                { x: '2018-05-25 00:13:10', y: 32 },
+              ],
+            },
+            {
+              id: 'series3',
+              name: 'series-3',
+              show: true,
+              point: true,
+              fill: true,
+              xAxisIndex: 0,
+              yAxisIndex: 0,
+              data: [
+                { x: '2018-05-25 00:10:00', y: 25 },
+                { x: '2018-05-25 00:11:00', y: 18 },
+                { x: '2018-05-25 00:12:00', y: 37 },
+                { x: '2018-05-25 00:12:10', y: 31 },
+                { x: '2018-05-25 00:12:15', y: 33 },
+                { x: '2018-05-25 00:13:00', y: 15 },
+                { x: '2018-05-25 00:14:00', y: 10 },
+              ],
+            },
+          ],
+        },
+        chartOptions: {
+          type: 'LINE',
+          width: '100%',
+          height: '100%',
+          title: {
+            text: 'EVUI CHART 2.0 (LINE)',
+            style: '20px Arial',
+            color: '#000000',
+            height: 50,
+            show: true,
+          },
+          xAxes: [{
+            type: 'time', // linear, step, time
+            tickFormat: 'hh:mm:ss',
+            showGrid: true,
+            position: 'bottom',
+            min: '2018-05-25 00:10:00',
+            max: '2018-05-25 00:14:00',
+          }],
+          yAxes: [{
+            type: 'linear',
+            showGrid: false,
+            position: 'left',
+            min: 10,
+            max: 50,
+          }],
+          // yAxes: [{
+          //   type: 'linear',
+          //   showGrid: true,
+          //   min: 10,
+          //   max: 50,
+          // }],
+          // xAxes: [{
+          //   type: 'time', // linear, step, time
+          //   tickFormat: 'hh:mm:ss',
+          //   showGrid: true,
+          //   interval: 'minute',
+          // }],
+        },
       };
     },
   };
 </script>
 <style>
 </style>
-

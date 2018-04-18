@@ -1,9 +1,11 @@
 import Chart from '@/components/chart';
 import Container from '@/components/container';
+import Table from '@/components/table';
 
 const components = {
   Container,
   Chart,
+  Table,
 };
 
 const evui = {
