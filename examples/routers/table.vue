@@ -1,7 +1,7 @@
 <template>
   <div style="width:100%">
     <Table
-      :width="'100%'"
+      :width="'40%'"
       :height="'350px'"
     />
   </div>
@@ -9,6 +9,7 @@
 
 <script>
   import Table from '@/components/table';
+  // import '@/components/table/table.css';
 
   export default {
     components: {
