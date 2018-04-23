@@ -1,17 +1,15 @@
 <template>
   <div style="width: 100%;height: 100%;">
     <div>
-      <input type="text">
-      <button @click="addDock">레이아웃변경</button>
-      <button @click="adddockData">docking data Add</button>
+      <h3> 닷킹 컴포넌트</h3>
+      <br>
+      <button @click="adddockData">dockingLayerPopup 추가</button>
+      <button>TreeData</button>
     </div>
-    <!--<div-->
-    <!--style="width:600px;height:600px;background-color:red;"-->
-    <!--/>-->
     <dock-main-frame
       ref="minFrame"
       :width="1840"
-      :height="1000"
+      :height="900"
     />
     <component
       v-for="(item, index) in LayerPopupList"
@@ -24,13 +22,13 @@
 <style scoped>
 </style>
 <script>
-  import { dockMainFrame, dockSubFrame, dockFrame, dockspliter, DockFrameLayerPopup } from '@/components/dock';
+  import { dockMainFrame, dockSubFrame, dockFrame, dockspliter, dockFrameLayerPopup, DockFrameTab } from '@/components/dock';
   import chart from '../chart';
 
 
   const chartlist = {
     components: {
-      dockMainFrame, dockSubFrame, dockFrame, dockspliter, DockFrameLayerPopup, chart,
+      dockMainFrame, dockSubFrame, dockFrame, dockspliter, dockFrameLayerPopup, chart,
     },
     data() {
       return {
@@ -57,7 +55,7 @@
   };
   const LayerPopup = {
     components: {
-      DockFrameLayerPopup, chart,
+      dockFrameLayerPopup, chart,
     },
     props: {
       titleid: {
@@ -85,7 +83,7 @@
     'style="border: 1px solid black;" :exemComponent="exemComponent" :title="popuptitle"' +
     ' :vmMain="vmRoot" :x="40" :y="88" >' +
     '<p>X: {{ x }} / Y: {{ y }} - Width: {{ width }} / Height: {{ height }}</p>' +
-      '<chart/>' +
+       '<chart/>' +
    '</dock-frame-layer-popup>',
     created() {
     },
@@ -109,7 +107,7 @@
   };
   const LayerPopup2 = {
     components: {
-      DockFrameLayerPopup,
+      dockFrameLayerPopup,
     },
     template: '<dock-frame-layer-popup @dragging="onDrag" @resizing="onResize" :resizable="false" :parent="true"' +
     'style="border: 1px solid black;">' +
@@ -131,12 +129,13 @@
   // let count = 0;
   export default {
     components: {
+      DockFrameTab,
       dockMainFrame,
       dockSubFrame,
       dockFrame,
       dockspliter,
       chart,
-      DockFrameLayerPopup,
+      dockFrameLayerPopup,
       LayerPopup,
       LayerPopup2,
     },
@@ -180,55 +179,106 @@
         // this.LayerPopup = 'LayerPopup2';
         this.LayerPopupList.push('LayerPopup');
       },
-      JsonLoop(json) {
-        Object.keys(json).forEach((key) => {
-          if (key === 'content') {
-            if (Array.isArray(json[key])) {
-              this.arrayLoop(json[key]);
-            }
-          }
-        });
-      },
-      addDock() {
-      },
-      arrayLoop(array) {
-        const arrayObj = array;
-        const arraylength = array.length;
-        for (let ix = 0; ix <= arraylength - 1; ix++) {
-          this.JsonLoop(arrayObj[ix]);
-        }
-      },
-      BFTData(json) {
-        const queue = [];
-        queue.push(json);
-         while (queue.length !== 0) {
-           let JsonData = null;
-           JsonData = queue[0];
-          Object.keys(JsonData).forEach((key) => {
-            // 배열인지 확인
-            if (key === 'content') {
-              if (Array.isArray(JsonData[key])) {
-                const arrayObj = JsonData[key];
-                const arraylength = JsonData[key].length;
-                // div 생성
-                for (let ix = 0; ix <= arraylength - 1; ix++) {
-                  // content 배열 div create 작업실행
-                  if (arrayObj[ix].content !== undefined) {
-                    // 부모 id를 넣어서 큐에 담는다.7
-                    arrayObj[ix].pid = JsonData.id;
-                     queue.push(arrayObj[ix]);
-                    // for (let i = 0; i <= arrayObj[ix].content.length - 1; i++) {
-                    //   queue.push(arrayObj[ix].content[0]);
-                    // }
-                  }
-                }
-                queue.shift();
-              }
-            }
-          });
-        }
-        // }
-      },
+//      TreeData() {
+//        const _list = this.$refs.minFrame.dockDataMap;
+//        const _rootId = 'root';
+//        // 최종적인 트리 데이터
+//        const _treeModel = [];
+//
+//        // 전체 데이터 길이
+//        const _listLength = _list.length;
+//
+//        // 트리 크기
+//        let _treeLength = 0;
+//
+//        // 반복 횟수
+//        let _loopLength = 0;
+//
+//        // 재귀 호출
+//        function getParentNode(_children, item) {
+//          // 전체 리스트를 탐색
+//          // for (let i = 0, child; child = _children[i]; i++) {
+//            for (let i = 0, iLen = _children.length; i < iLen; i++) {
+//            // 부모를 찾았으면,
+//            if (child.id === item.pid) {
+//              const view =
+//                {
+//                  id: item.id,
+//                  label: item.label,
+//                  children: [],
+//                };
+//
+//              // 현재 요소를 추가하고
+//              child.children.push(view);
+//
+//              // 트리 크기를 반영하고,
+//              _treeLength++;
+//
+//              // 데이터상에서는 삭제
+//              _list.splice(_list.indexOf(item), 1);
+//
+//              // 현재 트리 계층을 정렬
+//              // child.children.sort((a, b) =>
+//              // const orderA = a;
+//              // const orderB = b;
+//              //   if (orderA.order < orderB.order) {
+//              //   return   -1;
+//              //   } else if (orderA.order > orderB.order) {
+//              //     return 1;
+//              //   } else {
+//              //     return  0;
+//              //   }
+//              //   );
+//
+//
+//              break;
+//            }
+//
+//            // 부모가 아니면,
+//            else if (child.children.length) {
+//                getParentNode(child.children, item);
+//              }
+//          }
+//        }
+//
+//
+//        // 트리 변환 여부 + 무한 루프 방지
+//        do {
+//          // 전체 리스트를 탐색
+//          for (let ix = 0, item; item = _list[ix]; ix++) {
+//            // 최상위 객체면,
+//            if (item.pid === _rootId) {
+//              const view =
+//                {
+//                  id: item.id,
+//                  children: [],
+//                };
+//
+//              // 현재 요소를 추가하고,
+//              _treeModel.push(view);
+//
+//              // 트리 크기를 반영하고,
+//              _treeLength++;
+//
+//              // 데이터상에서는 삭제
+//              _list.splice(ix, 1);
+//
+//              // 현재 트리 계층을 정렬
+//              // _treeModel.sort((a, b) =>
+//              //   (a.order < b.order ? -1 : a.order > b.order ? 1 : 0));
+//
+//              break;
+//            }
+//
+//            // 하위 객체면,
+//            else {
+//              //
+//              getParentNode(_treeModel, item);
+//            }
+//          }
+//        } while ((_treeLength !== _listLength) && (_listLength !== _loopLength++));
+//
+//      },
     },
   };
 </script>

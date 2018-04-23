@@ -759,7 +759,7 @@ export default {
 
           // 추후 도킹 추가 될떄마다 data Map 생성
         if (this.isRootPos !== null && this.addDockPosition !== null) { // 도킹을 선택했다.
-          if (this.vmMainFrame.$children.length === 0) { // 제일 처음 도킹
+          if (this.vmMainFrame.$el.children[0].querySelector('.dockcontainer') === null) { // 제일 처음 도킹
             this.rootCreateDockFrame('root');
           } else if (this.isRootPos) {
             // root 도킹 여부 판단

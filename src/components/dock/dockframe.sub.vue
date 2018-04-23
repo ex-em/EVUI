@@ -279,14 +279,6 @@
           prevDom.style.width = `${Math.ceil(prevDom.getBoundingClientRect().width)}px`;
           nextDom.style.width = `${Math.floor(nextDom.getBoundingClientRect().width)}px`;
         }
-        const debugerSize = prevDom.getBoundingClientRect();
-        const debugerSize2 = nextDom.getBoundingClientRect();
-        const pDebugerSize2 = this.$el.getBoundingClientRect();
-        if (this.layout === 'hbox') {
-          if (debugerSize.widht + debugerSize2.widht > pDebugerSize2.width) {
-            debugger;
-          }
-        }
       },
       setDockFrameMinSize() {
         // subDockFrame 필요
@@ -412,7 +404,7 @@
         this.addId.$el.style.width = this.$el.children[childIndex].style.width;
         this.addId.$el.style.height = this.$el.children[childIndex].style.height;
       },
-      // inner ID 연결고리변경
+      // 삭제
       nodeDataDelete(id) {
         const arrayDataMap = this.vmMainFrame.dockDataMap;
         for (let ix = 0; ix < arrayDataMap.length; ix++) {
@@ -489,6 +481,7 @@
         }
       },
       addChildDataMap(subDockFrameEl, subDockFrameElLength, parentId, parentLayout) {
+          const isDup = this.vmMainFrame.dockDataMap.length;
         for (let ix = 0; ix < subDockFrameElLength; ix++) {
           const childDom = subDockFrameEl.children[ix];
           const subDock = {};
@@ -500,7 +493,7 @@
           subDock.minwidth = childDom.getAttribute('minwidth');
           subDock.minheight = childDom.getAttribute('minheight');
           // subdock가 두개 생기는 시점부터 중복 된 노드 값은 추가하지 않는다.
-          if (this.vmMainFrame.dockDataMap.length > 2) {
+          if (isDup > 2) {
             if (this.pos === 'right' || this.pos === 'bottom') {
               if (ix !== 0) {
                 this.vmMainFrame.dockDataMap.push(subDock);
