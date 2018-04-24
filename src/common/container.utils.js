@@ -51,6 +51,17 @@ _throw(type, content, component) {
       // throw new Error(`[EVUI][${type}][${component}] - ${content}`);
   }
 },
+matchesSelectorToParentElements(el, selector, baseNode) {
+    let node = el;
+    // 타겟 대상자 존제 유무 체크
+    do {
+      if (node.matches(selector)) return true;
+      if (node === baseNode) return false;
+      node = node.parentNode;
+    } while (node);
+
+    return false;
+  },
 
 };
 export default Utils;
