@@ -133,6 +133,8 @@ export default class LineChart extends BaseChart {
     let x = null;
     let y = null;
     let data;
+    let convX;
+    let convY;
 
     for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
       data = series.data[ix];
@@ -145,8 +147,19 @@ export default class LineChart extends BaseChart {
           if (series.fill && series.data[ix - 1].y !== null) {
             ctx.stroke();
             ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
-            ctx.lineTo(xPoint[ix - 1], endPoint);
-            ctx.lineTo(xPoint[startFillIndex], endPoint);
+
+            if (series.stack && series.hasAccumulate) {
+              for (let jx = ix; jx >= startFillIndex; jx--) {
+                for (let kx = series.data[jx].b.length - 1; kx >= 0; kx--) {
+                  convX = this.calculateX(series.data[jx].b[kx].x, series.axisIndex.x);
+                  convY = this.calculateY(series.data[jx].b[kx].y, series.axisIndex.y);
+                  ctx.lineTo(convX, convY);
+                }
+              }
+            } else {
+              ctx.lineTo(xPoint[ix - 1], endPoint);
+              ctx.lineTo(xPoint[startFillIndex], endPoint);
+            }
             // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
             // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
 
@@ -174,8 +187,20 @@ export default class LineChart extends BaseChart {
       ctx.stroke();
 
       ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
-      ctx.lineTo(xPoint[series.data.length - 1], endPoint);
-      ctx.lineTo(xPoint[startFillIndex], endPoint);
+
+      if (series.stack && series.hasAccumulate) {
+        for (let ix = series.data.length - 1; ix >= startFillIndex; ix--) {
+          for (let jx = series.data[ix].b.length - 1; jx >= 0; jx--) {
+            this.tmp = series.data[ix];
+            convX = this.calculateX(series.data[ix].b[jx].x, series.axisIndex.x);
+            convY = this.calculateY(series.data[ix].b[jx].y, series.axisIndex.y);
+            ctx.lineTo(convX, convY);
+          }
+        }
+      } else {
+        ctx.lineTo(xPoint[series.data.length - 1], endPoint);
+        ctx.lineTo(xPoint[startFillIndex], endPoint);
+      }
       // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
       // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
 
@@ -189,7 +214,7 @@ export default class LineChart extends BaseChart {
       ctx.fillStyle = series.fillColor || '#fff';
       ctx.lineWidth = series.lineWidth;
       for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
-        if (xPoint[ix] !== null && yPoint[ix] !== null) {
+        if (xPoint[ix] !== null && yPoint[ix] !== null && series.data[ix].point) {
           ctx.moveTo(xPoint[ix], yPoint[ix]);
           ctx.arc(xPoint[ix], yPoint[ix], series.pointSize, 0, Math.PI * 2);
         }

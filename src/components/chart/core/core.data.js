@@ -54,6 +54,9 @@ export default class ChartDataStore {
       max: null,
       minIndex: undefined,
       maxIndex: undefined,
+      stack: param.stack !== undefined ? param.stack : false,
+      stackArr: [],
+      stackOffsetIndex: 0,
       seriesIndex: this.seriesList.length,
       data: [],
       lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
@@ -64,6 +67,7 @@ export default class ChartDataStore {
       insertIndex: -1,
       dataIndex: 0,
       startPoint: 0,
+      horizontal: param.horizontal !== undefined ? param.horizontal : false, // 현재 미사용
     };
 
     this.seriesList.push(series);
@@ -86,6 +90,7 @@ export default class ChartDataStore {
     }
 
     series.data[dataIdx] = value;
+    series.data[dataIdx].point = series.point;
 
     if (series.show) {
       this.setMinMaxValue(series, value, dataIdx);
@@ -93,9 +98,158 @@ export default class ChartDataStore {
     }
   }
 
+  static calculateBaseValue(series, index, value, comp) {
+    if (series.data[index + comp].y === null) {
+      return null;
+    }
+
+    const x1 = +new Date(series.data[index + comp].x);
+    const y1 = series.data[index + comp].y;
+    const x2 = +new Date(series.data[index].x);
+    const y2 = series.data[index].y;
+
+    const slope = (y2 - y1) / (x2 - x1);
+
+    return ((slope * +new Date(value)) - (slope * x1)) + y1;
+  }
+
+  findBaseSeries(seriesId) {
+    const rawSeries = this.chartData.series;
+    let res = null;
+
+    for (let ix = 0; ix < rawSeries.length; ++ix) {
+      if (seriesId === rawSeries[ix].id) {
+        break;
+      }
+
+      if (rawSeries[ix].stack) {
+        res = ix;
+      }
+    }
+
+    return res;
+  }
+
+  addStackValue(currSeriesIndex, value, baseSeriesIndex, dataIndex) {
+    // Base값을 Series에 배열로 하나로 안달고, 각 Value에다가 집어넣은 이유는
+    // 나중에 RTM용 차트에서 각 Value값을 넣고 빼고 하기 때문에...그를 대비함.
+    // Base 데이터가 null이 들어갈 때 혹은 X값의 좌표가 일치 하지 않을 때
+    // 하나의 값에 여러개의 Base Stack이 붙기 때문.
+    // 1차원 배열에 X Y를 달아 처리하면 어디까지 지워야하는지 찾아야함
+    if (this.seriesList === undefined) {
+      return;
+    }
+    let dataIdx = dataIndex;
+    const cSeries = this.seriesList[currSeriesIndex];
+    const bSeries = this.seriesList[baseSeriesIndex];
+
+    if (!cSeries || !bSeries) {
+      return;
+    }
+
+    if (!dataIdx) {
+      dataIdx = cSeries.data.length;
+    }
+    dataIdx += cSeries.stackOffsetIndex;
+
+    const base = bSeries.data[dataIdx];
+    const basePrev = bSeries.data[dataIdx - 1];
+    const lastCurrValue = dataIdx === 0 ? cSeries.data[0] : cSeries.data[dataIdx];
+    const stackValue = {
+      x: value.x,
+      y: value.y + base.y,
+      b: [],
+      point: true,
+    };
+
+    const stackBase = stackValue.b;
+    if (value.x === base.x) {
+      if (value.y !== null) {
+        if (dataIdx > 0 && base.y === null) {
+          stackValue.y = value.y;
+          lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
+          stackBase.push({ x: value.x, y: 0 });
+        } else if (dataIdx > 0 && basePrev.y === null) {
+          stackBase.push({ x: value.x, y: 0 });
+          stackBase.push({ x: value.x, y: base.y });
+        } else {
+          stackBase.push({ x: value.x, y: base.y });
+        }
+      } else {
+        stackValue.y = null;
+      }
+    } else if (value.x < base.x) {
+      if (basePrev.y !== null) {
+        const convertBase = this.constructor.calculateBaseValue(bSeries, dataIdx, value.x, -1);
+        cSeries.stackOffsetIndex -= 1;
+
+        if (value.y !== null) {
+          if (dataIdx > 0 && base.y === null) {
+            stackValue.y = value.y;
+            lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
+            stackBase.push({ x: value.x, y: 0 });
+          } else if (dataIdx > 0 && basePrev.y === null) {
+            stackBase.push({ x: value.x, y: 0 });
+          } else {
+            stackBase.push({ x: value.x, y: convertBase });
+          }
+        } else {
+          stackValue.y = null;
+        }
+      } else {
+        lastCurrValue.b.push({ x: value.x, y: 0 });
+      }
+    } else if (value.x > base.x) {
+      cSeries.data.push({
+        x: base.x,
+        y: base.y,
+        b: [{ x: base.x, y: base.y }],
+        point: false,
+      });
+
+      if (basePrev.y !== null) {
+        if (value.y !== null) {
+          stackValue.y = bSeries.data[dataIdx + 1].y + value.y;
+          if (dataIdx > 0 && base.y === null) {
+            lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
+            stackBase.push({ x: value.x, y: 0 });
+          } else if (dataIdx > 0 && basePrev.y === null) {
+            stackBase.push({ x: value.x, y: 0 });
+            stackBase.push({ x: value.x, y: base.y });
+          } else {
+            stackBase.push({ x: base.x, y: base.y });
+            if (bSeries.data[dataIdx + 1].y === null) {
+              stackBase.push({ x: base.x, y: 0 });
+              stackBase.push({ x: value.x, y: 0 });
+            } else {
+              stackBase.push({ x: value.x, y: bSeries.data[dataIdx + 1].y });
+            }
+          }
+        } else {
+          stackValue.y = null;
+        }
+      } else {
+        lastCurrValue.b.push({ x: value.x, y: 0 });
+      }
+    }
+
+    cSeries.data.push(stackValue);
+    cSeries.hasAccumulate = true;
+    if (cSeries.show) {
+      this.setMinMaxValue(cSeries, stackValue, dataIdx);
+      this.setMaxLabelWidth(stackValue);
+    }
+  }
+
   addValues(seriesIndex, values) {
+    const baseIndex = this.findBaseSeries(this.seriesList[seriesIndex].id);
+
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
-      this.addValue(seriesIndex, values[ix]);
+      if (this.seriesList[seriesIndex].stack && baseIndex !== null) {
+        this.addStackValue(seriesIndex, values[ix], baseIndex);
+      } else {
+        this.addValue(seriesIndex, values[ix]);
+      }
     }
   }
 
@@ -106,12 +260,7 @@ export default class ChartDataStore {
     const x = value.x;
     const y = (+value.y);
 
-    if (this.minValueInfo.y === undefined) {
-      this.minValueInfo.x = x;
-      this.minValueInfo.y = y;
-      this.minValueInfo.index = index;
-      this.minValueInfo.seriesIndex = series.seriesIndex;
-    } else if (this.minValueInfo.y > y) {
+    if (this.minValueInfo.y === undefined || this.minValueInfo.y > y) {
       this.minValueInfo.x = x;
       this.minValueInfo.y = y;
       this.minValueInfo.index = index;
@@ -209,12 +358,7 @@ export default class ChartDataStore {
     };
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
       if (this.seriesList[ix].show && this.seriesList[ix].min !== null) {
-        if (result.value === null) {
-          result.x = this.seriesList[ix].data[this.seriesList[ix].minIndex].x;
-          result.y = this.seriesList[ix].min;
-          result.index = this.seriesList[ix].minIndex;
-          result.seriesIndex = ix;
-        } else if (this.seriesList[ix].min < result.y) {
+        if (result.value === null || this.seriesList[ix].min < result.y) {
           result.x = this.seriesList[ix].data[this.seriesList[ix].minIndex].x;
           result.y = this.seriesList[ix].min;
           result.index = this.seriesList[ix].minIndex;
