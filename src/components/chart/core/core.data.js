@@ -1,3 +1,5 @@
+import Util from '@/common/utils';
+
 export default class ChartDataStore {
   constructor(props) {
     Object.keys(props).forEach((key) => {
@@ -6,16 +8,16 @@ export default class ChartDataStore {
 
     this.seriesList = [];
     this.maxValueInfo = {
-      x: undefined,
-      y: undefined,
-      index: undefined,
-      seriesIndex: undefined,
+      x: null,
+      y: null,
+      index: null,
+      seriesIndex: null,
     };
     this.minValueInfo = {
-      x: undefined,
-      y: undefined,
-      index: undefined,
-      seriesIndex: undefined,
+      x: null,
+      y: null,
+      index: null,
+      seriesIndex: null,
     };
     this.labelTextMaxInfo = {
       xLen: 0,
@@ -40,34 +42,35 @@ export default class ChartDataStore {
 
   addSeries(param) {
     const series = {
-      id: param.id,
-      name: param.name,
+      id: param.id === undefined ? `series-${Util.getId()}` : param.id,
+      name: param.name === undefined ? 'unknown' : param.name,
       color: param.color,
       show: param.show === undefined ? true : param.show,
-      point: param.point,
+      point: param.point === undefined ? false : param.point,
       pointSize: param.pointSize === undefined ? 4 : param.pointSize,
+      pointStyle: param.pointStyle === undefined ? '' : param.pointStyle,
       axisIndex: {
         x: param.xAxisIndex === undefined ? 0 : param.xAxisIndex,
         y: param.yAxisIndex === undefined ? 0 : param.yAxisIndex,
       },
       min: null,
       max: null,
-      minIndex: undefined,
-      maxIndex: undefined,
-      stack: param.stack !== undefined ? param.stack : false,
+      minIndex: null,
+      maxIndex: null,
+      stack: param.stack === undefined ? false : param.stack,
       stackArr: [],
       stackOffsetIndex: 0,
       seriesIndex: this.seriesList.length,
       data: [],
       lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
-      fill: param.fill !== undefined ? param.fill : false,
-      fillColor: param.fillColor === undefined ? undefined : param.fillColor,
+      fill: param.fill === undefined ? false : param.fill,
+      fillColor: param.fillColor,
       fillOpacity: param.fillOpacity === undefined ? 0.4 : param.fillOpacity,
       toolTip: {},
       insertIndex: -1,
       dataIndex: 0,
       startPoint: 0,
-      horizontal: param.horizontal !== undefined ? param.horizontal : false, // 현재 미사용
+      horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
     };
 
     this.seriesList.push(series);
@@ -244,6 +247,10 @@ export default class ChartDataStore {
   addValues(seriesIndex, values) {
     const baseIndex = this.findBaseSeries(this.seriesList[seriesIndex].id);
 
+    if (!values) {
+      return;
+    }
+
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
       if (this.seriesList[seriesIndex].stack && baseIndex !== null) {
         this.addStackValue(seriesIndex, values[ix], baseIndex);
@@ -260,40 +267,40 @@ export default class ChartDataStore {
     const x = value.x;
     const y = (+value.y);
 
-    if (this.minValueInfo.y === undefined || this.minValueInfo.y > y) {
+    if (this.minValueInfo.y === null || this.minValueInfo.y > y) {
       this.minValueInfo.x = x;
       this.minValueInfo.y = y;
       this.minValueInfo.index = index;
       this.minValueInfo.seriesIndex = series.seriesIndex;
     }
 
-    if (series.min === undefined) {
+    if (series.min === null) {
       series.min = y;
       series.minIndex = index;
     } else if (series.min > y) {
-      series.min = x;
+      series.min = y;
       series.minIndex = index;
     }
 
-    if (this.maxValueInfo.y === undefined || y >= this.maxValueInfo.y) {
+    if (this.maxValueInfo.y === null || y >= this.maxValueInfo.y) {
       this.maxValueInfo.x = x;
       this.maxValueInfo.y = y;
       this.maxValueInfo.index = index;
       this.maxValueInfo.seriesIndex = series.seriesIndex;
     }
 
-    if (y >= (series.max === undefined ? null : series.max)) {
+    if (y >= (series.max === null ? null : series.max)) {
       series.max = y;
       series.maxIndex = index;
     }
   }
 
   setMaxLabelWidth(value) {
-    if ((`${value.x}`).length > this.labelTextMaxInfo.xLen) {
+    if (value.x !== null && (`${value.x}`).length > this.labelTextMaxInfo.xLen) {
       this.labelTextMaxInfo.xText = `${value.x}`;
       this.labelTextMaxInfo.xLen = (`${value.x}`).length;
     }
-    if ((`${value.y}`).length > this.labelTextMaxInfo.yLen) {
+    if (value.y !== null && (`${value.y}`).length > this.labelTextMaxInfo.yLen) {
       this.labelTextMaxInfo.yText = `${value.y}`;
       this.labelTextMaxInfo.yLen = (`${value.y}`).length;
     }

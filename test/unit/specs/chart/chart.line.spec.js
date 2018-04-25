@@ -15,7 +15,7 @@ describe('Create Line Chart Default', () => {
   it('Base Class Constructor Property', () => {
     expect(chart).to.be.ok;
     expect(chart.xAxes.length).to.be.equal(1);
-    expect(chart.xYxes.length).to.be.equal(1);
+    expect(chart.yAxes.length).to.be.equal(1);
   });
 });
 
