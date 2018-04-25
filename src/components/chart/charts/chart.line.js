@@ -135,8 +135,7 @@ export default class LineChart extends BaseChart {
       ctx.lineWidth = series.lineWidth;
       for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
         if (xPoint[ix] !== null && yPoint[ix] !== null && series.data[ix].point) {
-          ctx.moveTo(xPoint[ix], yPoint[ix]);
-          ctx.arc(xPoint[ix], yPoint[ix], series.pointSize, 0, Math.PI * 2);
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
         }
       }
       ctx.stroke();
