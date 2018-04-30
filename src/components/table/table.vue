@@ -2,11 +2,10 @@
   <div
     ref="evuiGrid"
     :style="{} | gridStyleFilter({width: width, height: height})"
-    class="evui-reset evui-grid"
-    @resize="test">
+    class="evui-reset evui-grid">
     <div
-      :style="{} | gridBoxFilter({width: width, height: height})"
-      class="evui-grid-box">
+      class="evui-grid-box"
+      style="width:100%;height:100%;">
       <div
         class="evui-grid-body"
         style="top: 0px; bottom: 0px; left: 0px; right: 0px;">
@@ -28,19 +27,20 @@
                     :col="index"
                     :style="{width: column.width}"
                     :ref="`${column.field}_col`"
-                    draggable="true"
-                    class="evui-head "
-                    @mouseup="column.sortable? sort(column, $event) : null"
-                    @drag="test">
+                    class="evui-head"
+                    @mouseup="columnSort(column, $event)"
+                    @mousedown.stop.prevent="columnMove(column, index, $event)">
                     <div
                       :style="{
                         height: '25px',
-                        marginLeft: `${(parseFloat(column.width)-5)}px`
+                        marginLeft: `${(parseFloat(column.width)-6)}px`
                       }"
                       class="evui-resizer"
-                      @mousedown="resize(column, index, $event)"/>
+                      @mousedown.stop.prevent="columnResize(column, index, $event)"/>
                     <div class="evui-col-header">
-                      <div :ref="`${column.field}_sort`"/>
+                      <div
+                        v-if="column.sortable"
+                        :ref="`${column.field}_sort`"/>
                       {{ column.caption }}
                     </div>
                   </td>
@@ -58,7 +58,7 @@
         <div
           id="grid_grid_records"
           class="evui-grid-records"
-          style="top: 25px; overflow-x: auto; overflow-y: auto;;"
+          style="top: 25px; overflow-x: auto; overflow-y: auto;"
           @scroll="scrollColumns">
           <table>
             <tbody>
@@ -132,6 +132,15 @@
           </table>
         </div>
       </div>
+    </div>
+    <div
+      ref="headGhost"
+      class="evui-head-ghost"/>
+    <div
+      ref="marker"
+      class="col-intersection-marker">
+      <div class="top-marker"/>
+      <div class="bottom-marker"/>
     </div>
   </div>
 
@@ -256,7 +265,6 @@
         // 이벤트 관련 flag 값
         resizeFlag: false,
 
-
       };
     },
 
@@ -278,7 +286,6 @@
       this.sortedData = this.records.slice();
       this.resultData = this.records.slice();
     },
-
     mounted() {
       // 그리드박스 높이 너비 가져오기
       this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
@@ -336,10 +343,15 @@
     },
 
     methods: {
-      sort(column, event) {
-        if (this.resizeFlag) {
+      columnSort(column, event) {
+        if (this.columnTimeout) {
+          clearTimeout(this.columnTimeout);
+        }
+
+        if (!column.sortable || this.resizeFlag) {
           return;
         }
+
         const sortTargetCls = this.$refs[`${column.field}_sort`][0].classList;
 
         // sort 된적이 없다면 무조건 sort 기능 실행시켜야지
@@ -483,7 +495,7 @@
           }
         }
       },
-      resize(column, index, event) {
+      columnResize(column, index, event) {
         // 리사이즈 이벤트  처리
         const vm = this;
         // sort랑 이벤트 충돌때문에 flag값으로 처리
@@ -520,9 +532,86 @@
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
       },
-      test() {
-        // 드래그 이벤트 처리
-        // this.width = this.$refs.evuiGrid.offsetWidth;
+      columnMove(column, index, event) {
+        // 컬럼 무브 처리
+        event.stopPropagation();
+        event.preventDefault();
+        const vm = this;
+        const startOffsetY = this.$refs.evuiGrid.offsetTop - 20; // 기본 Y 고스트 위치용
+        const startOffsetX = this.$refs.evuiGrid.offsetLeft - 15; // 기본 X 고스트 위치용
+
+        let colIndex; // 드랍 할 컬럼 인덱스
+
+        // 컬럼 고스트 무브
+        function moveAt(pageX, pageY) {
+          // debugger;
+          vm.$refs.headGhost.style.left = `${pageX - startOffsetX}px`;
+          vm.$refs.headGhost.style.top = `${pageY - startOffsetY}px`;
+        }
+
+        // 컬럼 배열 변경
+        function changeColumn(dragCol, dropCol, comlumnData) {
+          if (dragCol !== dropCol) {
+            vm.columns.splice(dragCol, 1);
+            vm.columns.splice(dropCol, 0, comlumnData);
+          }
+        }
+
+        // 마우스 이동할때 이벤트
+        function onMouseMove(e) {
+          moveAt(e.pageX, e.pageY);
+
+          const targetEl = e.target;
+          if (!targetEl) {
+            return;
+          }
+
+          const targetCol = targetEl.closest('.evui-head');
+
+          if (!targetCol) {
+            return;
+          }
+
+
+          if (targetCol.getAttribute('col') === 'start' || targetCol.getAttribute('col') === 'end') {
+            return;
+          }
+
+          colIndex = +targetCol.getAttribute('col');
+          const targetColHalfWidth = targetCol.offsetWidth / 2;
+          const targetColPoint = e.pageX - targetCol.getBoundingClientRect().x;
+
+          if (targetColHalfWidth > targetColPoint) {
+            vm.$refs.marker.style.left = `${targetCol.offsetLeft}px`;
+            // targetCol.style.borderLeft = '1px solid #72b2ff';
+          } else {
+            vm.$refs.marker.style.left = `${targetCol.offsetLeft + targetCol.offsetWidth}px`;
+            // targetCol.style.borderRightColor = '#72b2ff';
+          }
+        }
+
+        // 마우스 업 이벤트
+        function onMouseUp(e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          changeColumn(index, colIndex, vm.columns[index]);
+          vm.$refs.headGhost.style.display = 'none';
+          vm.$refs.marker.style.display = 'none';
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp, true);
+        }
+
+        // sort랑 이벤트 충돌을 피하기 위해
+        this.columnTimeout = setTimeout(() => {
+          this.$refs.headGhost.style.display = 'block';
+          this.$refs.marker.style.display = 'block';
+          this.$refs.headGhost.textContent = column.caption;
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp, true);
+
+          moveAt(event.pageX, event.pageY);
+        }, 100);
       },
       scrollColumns(e) {
         this.$refs.gridColumns.scrollLeft = e.currentTarget.scrollLeft;
