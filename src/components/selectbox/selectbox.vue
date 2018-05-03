@@ -1,8 +1,8 @@
 <template>
   <div
-    class="evui-selectbox"
     :class="wrapClasses"
     :style="style"
+    class="evui-selectbox"
   >
     <div
       v-if="!multiple"
@@ -26,27 +26,27 @@
     <transition name="fade">
       <listbox
         v-show="dropToggle"
-        class="evui-select-dropdown"
         :style="listStyle"
         :items="options"
+        class="evui-select-dropdown"
         @select="onItemClick"
         @change="onChange"
       >
         <div style="padding:6px 6px;">
           <input
-            class="evui-select-search"
-            type="text"
+            ref="search"
             :style="searchStyle"
             :disabled="disabled"
-            ref="search"
+            class="evui-select-search"
+            type="text"
           >
         </div>
       </listbox>
     </transition>
     <input
-      type="hidden"
       :name="name"
       :value="value"
+      type="hidden"
     >
   </div>
 </template>
