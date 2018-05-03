@@ -16,6 +16,9 @@
           <router-link to="/checkbox">Checkbox</router-link>
         </li>
         <li>
+          <router-link to="/selectbox">Selectbox</router-link>
+        </li>
+        <li>
           <router-link to="/table">Table</router-link>
         </li>
       </ul>
@@ -29,7 +32,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   nav { margin-bottom: 40px; }
   ul { display: flex; flex-wrap: wrap; }
   li { display: inline-block; }
