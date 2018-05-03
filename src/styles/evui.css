@@ -11,6 +11,26 @@
 }
 
 /************************************************************************************
+ Icon
+************************************************************************************/
+.evui-select-arrow{
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  line-height: 3px;
+  font-size: 16px;
+  color: #888888;
+  transition: all .2s ease-in-out;
+}
+
+.evui-select-arrow.select-down{
+  transform: rotate(180deg);
+}
+
+/************************************************************************************
  Checkbox
 ************************************************************************************/
 .evui-checkbox{
@@ -65,4 +85,126 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   color: #fff;
   background: #2f87c1;
   font-weight: 800;
+}
+
+/************************************************************************************
+ Selectbox
+************************************************************************************/
+.evui-box-small{
+  height: 22px;
+}
+.evui-box-normal{
+  height: 30px;
+}
+.evui-box-large{
+  height: 34px;
+}
+
+.evui-selectbox{
+  display: inline-block;
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid #dddeee;
+  vertical-align: middle;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.evui-selectbox:hover{
+  background-color: #eeeeee;
+  border-color: #bbb;
+  cursor: pointer;
+}
+
+.evui-selectbox-display{
+  width: 100%;
+  height: 100%;
+  padding: 3px 20px 3px 10px;
+}
+
+.evui-selectbox-dropdown{
+  position: absolute;
+  margin: 5px 0;
+  padding: 5px 0;
+  overflow: auto;
+  border-radius: 4px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.2);
+  background-color: #fff;
+}
+
+.evui-listbox{
+  position: relative;
+  list-style-type: none;
+  padding: 2px 0px;
+  overflow: auto;
+}
+
+.evui-listbox-item{
+  display: block;
+  list-style: none;
+  padding: 7px 16px;
+  color: #495060;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .1s ease-in-out;
+}
+
+.evui-listbox-item:hover {
+  background-color: #eeeeee;
+}
+
+.evui-listbox-item.selected {
+  color: #fff;
+  background-color: #337ab6;
+}
+
+.evui-listbox-search::-webkit-input-placeholder {
+  font-family: FontAwesome;
+  font-weight: normal;
+  overflow: visible;
+  vertical-align: top;
+  display: inline-block !important;
+  padding-left: 5px;
+  padding-top: 2px;
+  color: hsl(9, 40%, 60%);
+  content: "\F21F";
+}
+
+.evui-select-dropdown{
+  position: absolute;
+  width: 100%;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 0 6px 12px #ccc;
+  box-shadow: 0 6px 12px #ccc;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.evui-select-search{
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+  -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.evui-select-search:focus{
+  border-color: #66afe8;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
 }
