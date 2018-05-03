@@ -2,15 +2,15 @@
   <div>
     <slot/>
     <ul
-      class="evui-listbox"
       :style="style"
+      class="evui-listbox"
       @click.stop="onClick"
     >
       <li
-        class="evui-listbox-item"
         v-for="(item, index) in items"
         :key="index"
         :data-index="index"
+        class="evui-listbox-item"
       >{{ item.name }}</li>
     </ul>
   </div>
