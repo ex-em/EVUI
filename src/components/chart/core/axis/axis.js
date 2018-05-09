@@ -130,7 +130,7 @@ class Axis {
 
     this.ticks = [];
 
-    if (options.ticks === undefined) {
+    if (options.ticks === null) {
       options.ticks = [];
     } else {
       options.ticks.length = 0;

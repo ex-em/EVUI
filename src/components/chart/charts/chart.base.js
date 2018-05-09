@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 import DataStore from '../core/core.data';
+import AxisAutoScale from '../core/axis/axis.scale.auto';
+import AxisFixedScale from '../core/axis/axis.scale.fixed';
 
 class BaseChart {
   constructor(target, data, options) {
@@ -63,15 +65,15 @@ class BaseChart {
       color: '#eeeeee',
       min: null,
       max: null,
-      minIndex: undefined,
-      maxIndex: undefined,
+      minIndex: null,
+      maxIndex: null,
       autoScaleRatio: null,
       showGrid: true,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
       gridLineWidth: 1,
-      ticks: undefined,
-      tickFormat: undefined,
+      ticks: null,
+      tickFormat: null,
       tickSize: null,
       labelHeight: 20,
       labelStyle: {
@@ -88,17 +90,17 @@ class BaseChart {
       color: '#eeeeee',
       min: 0,
       max: null,
-      minIndex: undefined,
-      maxIndex: undefined,
+      minIndex: null,
+      maxIndex: null,
       autoScaleRatio: 0.1,
       showGrid: true,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
       gridLineWidth: 1,
-      ticks: undefined,
-      tickFormat: undefined,
+      ticks: null,
+      tickFormat: null,
       tickSize: null,
-      labelWidth: undefined,
+      labelWidth: null,
       labelStyle: {
         fontSize: 13,
         color: '#333',
@@ -143,8 +145,8 @@ class BaseChart {
   }
 
   getChartRect() {
-    const width = this.container.getBoundingClientRect().width || 0;
-    const height = this.container.getBoundingClientRect().height || 0;
+    const width = this.container.getBoundingClientRect().width || 10;
+    const height = this.container.getBoundingClientRect().height || 10;
     this.setWidth(width);
     this.setHeight(height);
 
@@ -176,7 +178,7 @@ class BaseChart {
 
     for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
       maxValue = this.dataSet.getYValueAxisPerSeries(ix).max || 0;
-      if (this.options.yAxes[ix].tickFormat !== undefined &&
+      if (this.options.yAxes[ix].tickFormat !== null &&
         this.options.yAxes[ix].type === 'time') {
         maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);
       }
@@ -196,7 +198,7 @@ class BaseChart {
       // X축 라벨 넓이의 반이 right offset을 넘는다면
       // 아직 X축의 위치 (left, right) 에 따른 로직은 미완성 상태.
       maxValue = this.dataSet.getLabelTextMaxInfo().xText;
-      if (this.options.xAxes[ix].tickFormat !== undefined &&
+      if (this.options.xAxes[ix].tickFormat !== null &&
         this.options.xAxes[ix].type === 'time') {
         maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);
         labelSize = this.bufferCtx.measureText(maxValue).width;
@@ -255,6 +257,241 @@ class BaseChart {
     this.displayCanvas.style.height = `${height}px`;
     this.bufferCanvas.height = height * this.pixelRatio;
     this.bufferCanvas.style.height = `${height}px`;
+  }
+
+  createAxis() {
+    let xAxisObj;
+    let yAxisObj;
+
+    this.xAxes = [];
+    this.yAxes = [];
+
+    for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
+      if (this.options.xAxes[ix].interval) {
+        xAxisObj = new AxisFixedScale({
+          type: 'x',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.xAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      } else {
+        xAxisObj = new AxisAutoScale({
+          type: 'x',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.xAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      }
+
+      this.xAxes.push(xAxisObj);
+    }
+
+    for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
+      if (this.options.yAxes[ix].interval) {
+        yAxisObj = new AxisFixedScale({
+          type: 'y',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.yAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      } else {
+        yAxisObj = new AxisAutoScale({
+          type: 'y',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.yAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+        });
+      }
+
+      this.yAxes.push(yAxisObj);
+    }
+
+    for (let ix = 0, ixLen = this.xAxes.length; ix < ixLen; ix++) {
+      this.xAxes[ix].createAxis();
+    }
+
+    for (let ix = 0, ixLen = this.yAxes.length; ix < ixLen; ix++) {
+      this.yAxes[ix].createAxis();
+    }
+
+    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+  }
+
+  calculateX(value, xAxisIndex) {
+    const maxValue = this.xAxes[xAxisIndex].axisMax;
+    const minValue = this.xAxes[xAxisIndex].axisMin;
+    let convertValue;
+
+    if (value === null) {
+      return null;
+    }
+
+    if (this.options.xAxes[xAxisIndex].type === 'time') {
+      convertValue = +moment(value)._d;
+    } else {
+      convertValue = value;
+    }
+
+    if (convertValue > maxValue || convertValue < minValue) {
+      return undefined;
+    }
+
+    const scalingFactor = this.drawingXArea() / (maxValue - minValue);
+    return (this.chartRect.x1 + this.labelOffset.left) +
+      (scalingFactor * (convertValue - (minValue || 0)));
+  }
+
+  calculateY(value, yAxisIndex) {
+    const maxValue = this.yAxes[yAxisIndex].axisMax;
+    const minValue = this.yAxes[yAxisIndex].axisMin;
+    let convertValue;
+
+    if (value === null) {
+      return null;
+    }
+
+    if (this.options.yAxes[yAxisIndex].type === 'time') {
+      convertValue = +moment(value)._d;
+    } else {
+      convertValue = value;
+    }
+
+    if (convertValue > maxValue || convertValue < minValue) {
+      return null;
+    }
+
+    const scalingFactor = this.drawingYArea() / (maxValue - minValue);
+    return (this.chartRect.y2 - this.labelOffset.bottom) -
+      (scalingFactor * (convertValue - (minValue || 0)));
+  }
+
+  drawingXArea() {
+    return this.chartRect.chartWidth - (this.labelOffset.left + this.labelOffset.right);
+  }
+
+  drawingYArea() {
+    return this.chartRect.chartHeight - (this.labelOffset.top + this.labelOffset.bottom);
+  }
+
+  drawPoint(ctx, style, radius, x, y) {
+    let edgeLength;
+    let xOffset;
+    let yOffset;
+    let height;
+    let size;
+
+    if (isNaN(radius) || radius <= 0) {
+      return;
+    }
+
+    let offset;
+    let leftX;
+    let topY;
+    let sideSize;
+
+    switch (style) {
+      // Default includes circle
+      case 'triangle':
+        ctx.beginPath();
+        edgeLength = (3 * radius) / Math.sqrt(3);
+        height = (edgeLength * Math.sqrt(3)) / 2;
+        ctx.moveTo(x - (edgeLength / 2), y + (height / 3));
+        ctx.lineTo(x + (edgeLength / 2), y + (height / 3));
+        ctx.lineTo(x, y - ((2 * height) / 3));
+        ctx.closePath();
+        ctx.fill();
+        break;
+      case 'rect':
+        size = (1 / Math.SQRT2) * radius;
+        ctx.beginPath();
+        ctx.fillRect(x - size, y - size, 2 * size, 2 * size);
+        ctx.strokeRect(x - size, y - size, 2 * size, 2 * size);
+        break;
+      case 'rectRounded':
+        offset = radius / Math.SQRT2;
+        leftX = x - offset;
+        topY = y - offset;
+        sideSize = Math.SQRT2 * radius;
+        ctx.beginPath();
+        this.roundedRect(ctx, leftX, topY, sideSize, sideSize, radius / 2);
+        ctx.closePath();
+        ctx.fill();
+        break;
+      case 'rectRot':
+        size = (1 / Math.SQRT2) * radius;
+        ctx.beginPath();
+        ctx.moveTo(x - size, y);
+        ctx.lineTo(x, y + size);
+        ctx.lineTo(x + size, y);
+        ctx.lineTo(x, y - size);
+        ctx.closePath();
+        ctx.fill();
+        break;
+      case 'cross':
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y - radius);
+        ctx.moveTo(x - radius, y);
+        ctx.lineTo(x + radius, y);
+        ctx.closePath();
+        break;
+      case 'crossRot':
+        ctx.beginPath();
+        xOffset = Math.cos(Math.PI / 4) * radius;
+        yOffset = Math.sin(Math.PI / 4) * radius;
+        ctx.moveTo(x - xOffset, y - yOffset);
+        ctx.lineTo(x + xOffset, y + yOffset);
+        ctx.moveTo(x - xOffset, y + yOffset);
+        ctx.lineTo(x + xOffset, y - yOffset);
+        ctx.closePath();
+        break;
+      case 'star':
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y - radius);
+        ctx.moveTo(x - radius, y);
+        ctx.lineTo(x + radius, y);
+        xOffset = Math.cos(Math.PI / 4) * radius;
+        yOffset = Math.sin(Math.PI / 4) * radius;
+        ctx.moveTo(x - xOffset, y - yOffset);
+        ctx.lineTo(x + xOffset, y + yOffset);
+        ctx.moveTo(x - xOffset, y + yOffset);
+        ctx.lineTo(x + xOffset, y - yOffset);
+        ctx.closePath();
+        break;
+      case 'line':
+        ctx.beginPath();
+        ctx.moveTo(x - radius, y);
+        ctx.lineTo(x + radius, y);
+        ctx.closePath();
+        break;
+      case 'dash':
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + radius, y);
+        ctx.closePath();
+        break;
+      default:
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
+        break;
+    }
+
+    ctx.stroke();
   }
 
   static getPadding(padding) {

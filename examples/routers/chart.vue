@@ -24,6 +24,7 @@
               point: true,
               fill: true,
               stack: true,
+              pointStyle: 'rectRot',
               xAxisIndex: 0,
               yAxisIndex: 0,
               data: [
@@ -44,6 +45,7 @@
               name: 'series-2',
               show: true,
               point: true,
+              pointStyle: 'crossRot',
               fill: true,
               stack: true,
               xAxisIndex: 0,
@@ -64,7 +66,7 @@
           ],
         },
         chartOptions: {
-          type: 'LINE',
+          type: 'scatter',
           width: '100%',
           height: '100%',
           title: {
