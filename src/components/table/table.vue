@@ -7,6 +7,7 @@
       class="evui-grid-box"
       style="width:100%;height:100%;">
       <div
+        ref="evuiGridBody"
         class="evui-grid-body"
         style="top: 0px; bottom: 0px; left: 0px; right: 0px;">
         <div
@@ -132,6 +133,30 @@
           </table>
         </div>
       </div>
+      <div
+        v-if="pagination"
+        class="evui-grid-footer"
+        style="bottom: 0px; left: 0px; right: 0px;">
+        <div>
+          <div class="evui-footer-left"/>
+          <div class="evui-footer-right">
+            <button @click="movePage('start')">
+              <i class="fas fa-angle-double-left"/>
+            </button>
+            <button @click="movePage('before')">
+              <i class="fas fa-angle-left"/>
+            </button>
+            {{ currentPageInput }} / {{ lastPage }}
+            <button @click="movePage('next')">
+              <i class="fas fa-angle-right"/>
+            </button>
+            <button @click="movePage('end')">
+              <i class="fas fa-angle-double-right"/>
+            </button>
+          </div>
+          <div class="evui-footer-center"/>
+        </div>
+      </div>
     </div>
     <div
       ref="headGhost"
@@ -150,9 +175,10 @@
   import '@/components/table/table2.css';
   import util from '@/common/utils.table';
   import _ from 'lodash';
+  import '@/styles/all.css';
+  import rowdata from './data.json';
 
   export default {
-
     filters: {
       gridStyleFilter(obj, style) {
         const styleObj = _.defaults(obj, style);
@@ -191,6 +217,14 @@
       height: {
         type: [String, Number],
         default: '100%',
+      },
+      pagination: {
+        type: Boolean,
+        default: false,
+      },
+      pageSize: {
+        type: Number,
+        default: 50,
       },
     },
 
@@ -237,6 +271,7 @@
         // 넓이 계산용
         gridBoxWidth: 0,
         gridBoxHeight: 0,
+        footerHeight: 24,
 
         // 컬럼들값보다 그리드가 클때 마지막 추가 컬럼 크기
         endColWidth: 0,
@@ -261,21 +296,43 @@
 
         verticalScroll: false,
 
-
         // 이벤트 관련 flag 값
         resizeFlag: false,
 
+        // 현재페이지, 마지막페이지
+        currentPage: 0,
+        lastPage: 0,
       };
     },
-
     computed: {
       columnsInfo() {
         return this.columns;
+      },
+      currentPageInput: {
+        get() {
+          return this.currentPage;
+        },
+        set(value) {
+          if (value === 0 || value > this.lastPage) {
+            return;
+          }
+          this.currentPage = value;
+          const start = (this.currentPage - 1) * this.pageSize;
+          const end = this.currentPage * this.pageSize;
+
+          if (this.isSort) {
+            this.resultData = this.sortedData.slice(start, end);
+          } else {
+            this.resultData = this.records.slice(start, end);
+          }
+        },
       },
     },
 
     // 초기데이터는 다 생성시 정의해보자
     created() {
+      // debugger;
+      this.records = rowdata; // 임시 데이터
       // window.addEventListener('resize',this.test);
       // this.width = util.numberToPixel(this.width);
 
@@ -284,12 +341,25 @@
       // 객체 안의 내용 바뀔거 같은면 깊은 복사로 변경 필요.
       // 일단 가즈아!!
       this.sortedData = this.records.slice();
-      this.resultData = this.records.slice();
+      if (this.pagination) {
+        this.currentPage = 1;
+        this.lastPage = Math.ceil(this.records.length / this.pageSize);
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = this.currentPage * this.pageSize;
+        this.resultData = this.records.slice(start, end);
+      } else {
+        this.resultData = this.records.slice();
+      }
     },
     mounted() {
       // 그리드박스 높이 너비 가져오기
       this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
       this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
+
+      if (this.pagination) {
+        const gridBody = this.$refs.evuiGridBody;
+        gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
+      }
 
       // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
       for (let ix = 0, ixLen = this.columns.length; ix < ixLen; ix++) {
@@ -341,7 +411,6 @@
       }
       this.$forceUpdate();
     },
-
     methods: {
       columnSort(column, event) {
         if (this.columnTimeout) {
@@ -370,7 +439,14 @@
           this.sortedData = _.orderBy(this.sortedData, column.field, 'asc');
 
           // 정렬 값을 resultData에 넣어주자
-          this.resultData = _.cloneDeep(this.sortedData);
+          // pagination 조거 추가됨
+          if (this.pagination) {
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = this.currentPage * this.pageSize;
+            this.resultData = this.sortedData.slice(start, end);
+          } else {
+            this.resultData = this.sortedData.slice(); // 깊은 복사에서 얕은 복사로 변경
+          }
 
           // 이제 css를 변경해줘야겠지?
           sortTargetCls.add('evui-sort-up');
@@ -412,7 +488,14 @@
             this.sortedData = _.orderBy(this.sortedData, filedList, directionList);
 
             // 정렬 값을 resultData에 넣어주자
-            this.resultData = _.cloneDeep(this.sortedData);
+            // pagination 조거 추가됨
+            if (this.pagination) {
+              const start = (this.currentPage - 1) * this.pageSize;
+              const end = this.currentPage * this.pageSize;
+              this.resultData = this.sortedData.slice(start, end);
+            } else {
+              this.resultData = this.sortedData.slice(); // 깊은 복사에서 얕은 복사로 변경
+            }
 
             // 이제 css를 변경해줘야겠지?
             sortTargetCls.add('evui-sort-up');
@@ -451,7 +534,14 @@
               this.sortedData = _.orderBy(this.sortedData, filedList, directionList);
 
               // 정렬 값을 resultData에 넣어주자
-              this.resultData = _.cloneDeep(this.sortedData);
+              // pagination 조거 추가됨
+              if (this.pagination) {
+                const start = (this.currentPage - 1) * this.pageSize;
+                const end = this.currentPage * this.pageSize;
+                this.resultData = this.sortedData.slice(start, end);
+              } else {
+                this.resultData = this.sortedData.slice(); // 깊은 복사에서 얕은 복사로 변경
+              }
             } else {
               this.sortedData = this.records.slice();
 
@@ -490,7 +580,14 @@
                 sortTargetCls.remove('evui-sort-down');
               }
               // 정렬 값을 resultData에 넣어주자
-              this.resultData = _.cloneDeep(this.sortedData);
+              // pagination 조거 추가됨
+              if (this.pagination) {
+                const start = (this.currentPage - 1) * this.pageSize;
+                const end = this.currentPage * this.pageSize;
+                this.resultData = this.sortedData.slice(start, end);
+              } else {
+                this.resultData = this.sortedData.slice(); // 깊은 복사에서 얕은 복사로 변경
+              }
             }
           }
         }
@@ -578,6 +675,7 @@
           }
 
           colIndex = +targetCol.getAttribute('col');
+
           const targetColHalfWidth = targetCol.offsetWidth / 2;
           const targetColPoint = e.pageX - targetCol.getBoundingClientRect().x;
 
@@ -594,12 +692,14 @@
         function onMouseUp(e) {
           e.stopPropagation();
           e.preventDefault();
-
-          changeColumn(index, colIndex, vm.columns[index]);
           vm.$refs.headGhost.style.display = 'none';
           vm.$refs.marker.style.display = 'none';
           document.removeEventListener('mousemove', onMouseMove);
           document.removeEventListener('mouseup', onMouseUp, true);
+
+          if (colIndex !== undefined) {
+            changeColumn(index, colIndex, vm.columns[index]);
+          }
         }
 
         // sort랑 이벤트 충돌을 피하기 위해
@@ -609,13 +709,35 @@
           this.$refs.headGhost.textContent = column.caption;
           document.addEventListener('mousemove', onMouseMove);
           document.addEventListener('mouseup', onMouseUp, true);
-
           moveAt(event.pageX, event.pageY);
-        }, 100);
+        }, 200);
       },
       scrollColumns(e) {
         this.$refs.gridColumns.scrollLeft = e.currentTarget.scrollLeft;
       },
+      movePage(value) {
+        switch (value) {
+          case 'start' :
+                this.currentPageInput = 1;
+                break;
+          case 'before' :
+                this.currentPageInput -= 1;
+                break;
+          case 'next' :
+                this.currentPageInput += 1;
+                break;
+          case 'end' :
+                this.currentPageInput = this.lastPage;
+                break;
+          default:
+                break;
+        }
+      },
     },
   };
 </script>
+<style scoped>
+  button{
+    user-select: none;
+  }
+</style>

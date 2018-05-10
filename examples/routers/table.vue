@@ -3,6 +3,7 @@
     <Table
       :width="'40%'"
       :height="'350px'"
+      :pagination="true"
     />
   </div>
 </template>
