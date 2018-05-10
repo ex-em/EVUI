@@ -247,8 +247,42 @@
         this.setRootDockFrameMinSize();
         // DataMap Push
         this.addDataMapCrt();
-        // id가 같으면 제일 첫 도킹 시도
-      } else if (this.addId.dataRef === this.insertId.dataRef) {
+      } else if (this.addType === 'redocking') {
+          // target 도킹이 mainDockFrame 일때
+          if (this.insertId.dataRef === undefined) {
+            // 50% 사이즈 줄인다. 사이즈 값
+            if (moveDockFrame.className.match('vbox')) {
+              this.dockDomSize(moveDockFrame, 'vBox');
+            } else if (moveDockFrame.className.match('hbox')) {
+              this.dockDomSize(moveDockFrame, 'hBox');
+            } else {
+              this.firstDockFrameSize(moveDockFrame);
+            }
+            // DockFrame 배치 한다.
+            this.insertRootDockFrame(moveDockFrame);
+            // 최소 넓이 높이 데이타 셋팅
+            this.setRootDockFrameMinSize();
+            // DataMap Push
+            this.addDataMapCrt();
+          } else {
+            // DockFrame 배치 한다.
+            this.insertDockFrame(this.insertId.$el);
+            // 소수점 사이즈 날린다.
+            this.dockFrameSizeRound();
+            // 최소 넓이 높이 데이타 셋팅
+            this.setDockFrameMinSize();
+            // DataMpa 구성
+            this.addInnerDataMapCrt();
+          }
+        // 50% 사이즈를 줄인다.
+//        this.innerFirstDockFrameSize();
+        // DockFrame 배치 한다.
+//        this.insertRootDockFrame(moveDockFrame);
+        // 최소 넓이 높이 데이타 셋팅
+//        this.setRootDockFrameMinSize();
+        // DataMpa 구성
+//        this.addDataMapCrt();
+      } else if (this.addId.dataRef === this.insertId.dataRef) { // id가 같으면 제일 첫 도킹 시도
         // 50% 사이즈를 줄인다.
         this.innerFirstDockFrameSize();
         // DockFrame 배치 한다.
@@ -481,7 +515,7 @@
         }
       },
       addChildDataMap(subDockFrameEl, subDockFrameElLength, parentId, parentLayout) {
-          const isDup = this.vmMainFrame.dockDataMap.length;
+          const sizeDup = this.vmMainFrame.dockDataMap.length;
         for (let ix = 0; ix < subDockFrameElLength; ix++) {
           const childDom = subDockFrameEl.children[ix];
           const subDock = {};
@@ -493,7 +527,7 @@
           subDock.minwidth = childDom.getAttribute('minwidth');
           subDock.minheight = childDom.getAttribute('minheight');
           // subdock가 두개 생기는 시점부터 중복 된 노드 값은 추가하지 않는다.
-          if (isDup > 2) {
+          if (sizeDup > 2) {
             if (this.pos === 'right' || this.pos === 'bottom') {
               if (ix !== 0) {
                 this.vmMainFrame.dockDataMap.push(subDock);
@@ -627,7 +661,7 @@
                   // DockFrame 부모 넓이에서 절반 한다 이진트리 각 노드 Dock 2개 고정
                   // - 2처리 하지않음
                     if (ix === 0) {
-                      childRatioWidth = Math.ceil(childRatioWidth);
+                      childRatioWidth = Math.ceil(childRatioWidth - 2);
                     } else {
                       childRatioWidth = this.parentDefSize(targetEl, targetDom[0], 'w');
                     }
@@ -657,7 +691,7 @@
                     // `${Math.ceil(parentDockEl.width)}px`;
 
                     if (ix === 0) {
-                      childRatioHeight = Math.ceil(childRatioHeight);
+                      childRatioHeight = Math.ceil(childRatioHeight - 2);
                     } else {
                       childRatioHeight = this.parentDefSize(targetEl, targetDom[0], 'h');
                     }
@@ -674,7 +708,7 @@
               }
             } else {
                 childRatioWidth = ((childDomSize.width / ((parentDockEl.width) * 2))
-                  * parentDockEl.width);
+                  * (parentDockEl.width));
               childRatioHeight = ((childDomSize.height / (parentDockEl.height))
                 * parentDockEl.height);
               // 넓이만 절반 줄어든다.
@@ -683,7 +717,7 @@
                   // childDom.style.width = `${(parentDockEl.width / 2) - 2}px`;
                   // childDom.style.height = `${parentDockEl.height}px`;
                     if (ix === 0) {
-                      childRatioWidth = Math.ceil(childRatioWidth);
+                      childRatioWidth = Math.ceil(childRatioWidth - 2);
                     } else {
                       // 자식 넓이 합이 부모 넓이로 값을 보정한다.
                       childRatioWidth = this.parentDefSize(targetEl, targetDom[0], 'w');
@@ -712,7 +746,7 @@
                   // ix === 0 ? `${Math.ceil(parentDockEl.width)}px` :
                     // `${Math.ceil(parentDockEl.width)}px`;
                     if (ix === 0) {
-                      childRatioHeight = Math.ceil(childRatioHeight);
+                      childRatioHeight = Math.ceil(childRatioHeight - 2);
                     } else {
                       childRatioHeight = this.parentDefSize(targetEl, targetDom[0], 'h');
                     }

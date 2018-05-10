@@ -139,7 +139,7 @@
 }
 
 .container-title {
-  background-color: #42555F;
+  background-color: #444444;
   /*background-color: #42555F;*/
   width: 100%;
   height: 25px;
@@ -275,6 +275,17 @@ div.evui-direct .right:hover {
   background-position: -322px -149px;
 }
 
+div.evui-direct .tab-center {
+  float: left;
+  width: 35px;
+  height: 35px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -77px;
+  position: relative;
+  top: 32%;
+  left: 32%;
+}
+
 div.evui-direct .center {
   float: left;
   width: 35px;
@@ -283,6 +294,9 @@ div.evui-direct .center {
   background-position: -286px -77px;
 }
 
+div.evui-direct .tab-center:hover {
+  background-position: -322px -77px;
+}
 div.evui-direct .center:hover {
   background-position: -322px -77px;
 }

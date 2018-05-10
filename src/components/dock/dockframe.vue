@@ -9,60 +9,154 @@
     @mouseenter="overHeaderIcon"
     @mouseleave="outHeaderIcon"
   >
+    <!-- tab 제목 영역 -->
     <header
       class="container-title"
+      @dblclick="openLayerPopup"
     >
-      <label
-        class="docktitle"
-      >{{ title }}</label>
       <div
-        ref="headerIcon"
-        class="evui-header-dock"
+        v-if="isTabActive"
       >
+        <ul
+          ref="tabGroup"
+          class="nav-tabs">
+          <tab-nav
+            v-for="(title, index) in tabHeadInfo"
+            :key="index"
+            :tab-index="index"
+            :tab-len="tabHeadInfo.length"
+            :title="title"
+            @tabNavClick="tabNavDown"/>
+        </ul>
         <div
-          class="delete-btn"
-          @click="deleteDockFrame"/>
+          class="evui-header-dock"
+        >
+          <div
+            ref="headerIcon"
+            class="delete-btn"
+            @click="deleteDockFrame"/>
+          <button
+            class="evui-frame-menu"
+          >▼
+          </button>
+          <div
+            class="dropdown-content">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+      </div>
+      <div
+        v-else>
+        <label
+          class="docktitle"
+        >{{ title }}</label>
+        <div
+          class="evui-header-dock"
+        >
+          <div
+            ref="headerIcon"
+            class="delete-btn"
+            @click="deleteDockFrame"/>
+          <button
+            class="evui-frame-menu"
+          >▼
+          </button>
+          <div
+            class="dropdown-content">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
       </div>
     </header>
-    <slot/>
+    <!-- tab 컴포넌트 영역 -->
+    <div
+      v-if="isTabActive"
+      ref="tabGroupPanel"
+      class="tab-content">
+      <tab-panel
+        v-for="(body, index) in tabBodyInfo"
+        :key="index"
+        :tab-index="index"
+        :tab-len="tabHeadInfo.length"
+        :evui-component="body"
+      />
+    </div>
+    <div
+      v-else>
+      <slot/>
+    </div>
     <!-- Dock 도킹 선택 이미지 -->
     <div
+      v-if="isTabActive"
+      :id="dataRef"
       :class="isPosImage ? 'selectlayerShow' : 'selectlayerHide'"
       class="evui-direct">
       <div class="wrap">
         <div class="evui-direct-background"/>
-        <div class="top"><span
-          class="top"
-          pos="top"
-          @mouseover.stop="MouseOverPos"
-          @mouseout.stop="MouseOutPos"
-        /></div>
+        <div
+          class="tab-center"
+          pos="tab"
+          @mouseover.stop="mouseOverPos"
+          @mouseup.stop="mouseUpPos"
+          @mouseout.stop="mouseUpPos"
+        />
+      </div>
+    </div>
+
+    <div
+      v-else
+      :id="dataRef"
+      :class="isPosImage ? 'selectlayerShow' : 'selectlayerHide'"
+      class="evui-direct">
+      <div class="wrap">
+        <div class="evui-direct-background"/>
+        <div
+          class="top">
+          <span
+            class="top"
+            pos="top"
+            @mouseover.stop="mouseOverPos"
+            @mouseup="mouseUpPos"
+            @mouseout.stop="mouseUpPos"
+          />
+        </div>
         <div class="evui-direct-center-wrap">
           <div
             class="right"
             pos="right"
-            @mouseover.stop="MouseOverPos"
-            @mouseout.stop="MouseOutPos"
+            @mouseover.stop="mouseOverPos"
+            @mouseup="mouseUpPos"
+            @mouseout.stop="mouseUpPos"
           />
           <div
             class="left"
             pos="left"
-            @mouseover.stop="MouseOverPos"
-            @mouseout.stop="MouseOutPos"
+            @mouseover.stop="mouseOverPos"
+            @mouseup="mouseUpPos"
+            @mouseout.stop="mouseUpPos"
           />
           <div
             class="center"
             pos="tab"
-            @mouseover.stop="MouseOverPos"
-            @mouseout.stop="MouseOutPos"
+            @mouseover.stop="mouseOverPos"
+            @mouseup="mouseUpPos"
+            @mouseout.stop="mouseUpPos"
           />
         </div>
-        <div class="bottom"><span
-          class="bottom"
-          pos="bottom"
-          @mouseover.stop="MouseOverPos"
-          @mouseout.stop="MouseOutPos"
-        /></div>
+        <div
+          class="bottom">
+          <span
+            class="bottom"
+            pos="bottom"
+            @mouseover.stop="mouseOverPos"
+            @mouseup="mouseUpPos"
+            @mouseout.stop="mouseUpPos"
+          />
+        </div>
       </div>
     </div>
     <!--도킹 히든 영역 표시 레이어-->
@@ -77,12 +171,15 @@
 
 <script>
   import utils from '@/common/container.utils';
-
-  // const LAYOUT_Tab = 'Tab';
+  import TabNav from './dockframe.tab.nav';
+  import TabPanel from './dockframe.tab.panel';
 
   export default {
 
     name: 'DockFrameTab',
+    components: {
+        TabNav, TabPanel,
+    },
     props: {
       /** *
        *  dockMainFrame ID을 지정한다.
@@ -166,6 +263,20 @@
         default: null,
       },
       /**
+       * DockFrame content Component
+       */
+      content: {
+        type: Object,
+        default: null,
+      },
+      /**
+       * target DockFrame Obj
+       */
+      targetVm: {
+        type: Object,
+        default: null,
+      },
+      /**
        * DockFrame adddcok type
        */
       type: {
@@ -188,12 +299,24 @@
         isViewLayer: false,
         addPos: this.pos,
         addType: this.type,
-        vmMainFrame: this.vmMain, // 해당 Dock  Vm 객체 담는다.
+        vmMainFrame: this.vmMain, // 해당 Dock  Vm 객체 담는다.\
+        vmTarget: this.targetVm, // 도킹된 타겟 vm 담는다.
+        isTabActive: false,
+        tabNavData: [],
+        tabPanelData: [],
+        selectTabIndex: 0,
+        componentContent: this.content,
         resizebarSize: ['4px', '100%'],
       };
     },
 
     computed: {
+      tabBodyInfo() {
+        return this.tabPanelData;
+      },
+      tabHeadInfo() {
+          return this.tabNavData;
+      },
       isPosImage() {
         return this.isSelectLayerPopup;
       },
@@ -273,7 +396,24 @@
 
 
     },
+    watch: {
+//      tabNavData(val) {
+//         this.selectTabIndex = val.length - 1;
+//      },
+    },
     mounted() {
+      // DockFrame 생기면서 제목과 내용을 배열에 넣어둔다.
+      // 텝이 동적으로 생기기 때문에 인덱스로 제어를 한다.
+      this.tabNavData.push(this.panelTitle);
+      this.tabPanelData.push(this.componentContent);
+    },
+    updated() {
+        // 텝데이타가 존재  하면 true
+      if (this.tabNavData.length > 1) {
+        this.isTabActive = true;
+      } else {
+        this.isTabActive = false;
+      }
     },
     created() {
 
@@ -283,13 +423,82 @@
       if (this.addType === 'root') {
         if (!this.$el.parentElement.className.match('root')) {
           this.sizeRootDockFrame();
+        } else {
+            // restore 시 type을 변경 해준다. 예외처리
+          this.addType = 'noroot';
         }
+      } else if (this.addType === 'redocking') {
+        this.reSizeDockFrame();
       } else {
         // inner Dock
         this.sizeDockFrame();
       }
     },
     methods: {
+      tabNavDown(event, tabNav) {
+        // 선택된 텝 class 주기
+        const groupTab = this.$refs.tabGroup;
+        const groupTabPanel = this.$refs.tabGroupPanel;
+        groupTab.children[this.selectTabIndex].classList.remove('active');
+        groupTabPanel.children[this.selectTabIndex].classList.remove('active');
+        // 선택된 텝 인덱스 값 설정
+        this.selectTabIndex = tabNav.index;
+        groupTab.children[this.selectTabIndex].classList.add('active');
+        groupTabPanel.children[this.selectTabIndex].classList.add('active');
+        event.stopPropagation();
+      },
+      openLayerPopup() {
+        // dockFrame을 Layer팝업으로 전환
+        // 동적 팝업 만들어주는 배열 변수 layerPopupList 하드코딩 네이밍 고정으로 되어있음.
+        // 나중에 변환해야함..
+        const siblingDomId = this.siblingId();
+        this.vmMainFrame.selfVm.popupTitle = this.tabNavData[this.selectTabIndex];
+        this.vmMainFrame.selfVm.evuiContent = this.tabPanelData[this.selectTabIndex];
+        const dockFrameInfo = {};
+        dockFrameInfo.vm = siblingDomId;
+        dockFrameInfo.type = this.addType === 'root' ? 'root' : this.addType;
+        dockFrameInfo.type = this.addType === 'root' ? 'root' : 'redocking';
+        dockFrameInfo.pos = this.addPos;
+        // 스플릿바 사이즈 뺀 사이즈로 전달
+        dockFrameInfo.width = this.$el.getBoundingClientRect().width;
+        dockFrameInfo.height = this.$el.getBoundingClientRect().height;
+        this.vmMainFrame.selfVm.reDockInfo = dockFrameInfo;
+//        this.vmMainFrame.selfVm.layerPopupList.push(LayerPopup); // 동적으로 할수 있는방법..
+        this.vmMainFrame.selfVm.dynamicAddDock(this.tabPanelData[this.selectTabIndex]);
+        // dockFrame 삭제
+        this.deleteDockFrame();
+      },
+      siblingId() {
+        const parentDom = this.$el.parentElement;
+        const subDockLayout = parentDom.className.match('vbox') ? 'vBox' : 'hBox';
+        let targetDom;
+        if (parentDom.id === 'rootDock') {
+            // 제일 처음 도킹일때 pos값은 root
+          targetDom = parentDom.id;
+          this.addPos = 'root';
+        } else {
+          for (let ix = 0; ix < parentDom.childElementCount; ix++) {
+            const childDom = this.$el.parentElement.children[ix];
+            if (childDom.dataset.ref !== this.dataRef && !childDom.className.match('resizebar')) {
+              targetDom = childDom.dataset.ref;
+              if (subDockLayout === 'vBox') {
+                if (ix === 0) { // pos : right , bottom ix가 0이면
+                  this.addPos = 'bottom'; // 반대로 생각 즉 삽입되는 위치
+                } else { // ix가 1이면 pos : left , top
+                  this.addPos = 'top'; // 반대로 생각 즉 삽입되는 위치
+                }
+              } else if (subDockLayout === 'hBox') {
+                if (ix === 0) { // pos : right , bottom ix가 0이면
+                  this.addPos = 'right'; // 반대로 생각 즉 삽입되는 위치
+                } else { // ix가 1이면 pos : left , top
+                  this.addPos = 'left'; // 반대로 생각 즉 삽입되는 위치
+                }
+              }
+            }
+          }
+        }
+        return targetDom;
+      },
       deleteDockDataMap(delId) {
         const arrayDataMap = this.vmMainFrame.dockDataMap;
         for (let ix = 0; ix < arrayDataMap.length; ix++) {
@@ -324,39 +533,65 @@
       },
       overHeaderIcon(e) {
         this.$refs.headerIcon.classList.add('show');
-        const shiftY = event.clientY - this.$el.getBoundingClientRect().top;
-        this.$refs.headerIcon.children[0].style.top = `${e.pageY - shiftY - 24}px`;
+        const shiftY = e.clientY - this.$el.getBoundingClientRect().top;
+//        const shiftX = e.clientX - this.$el.getBoundingClientRect().left;
+        this.$refs.headerIcon.style.top = `${e.pageY - shiftY - 24}px`;
+//        this.$refs.headerIcon.style.left = `${shiftX}px`;
       },
       outHeaderIcon() {
         this.$refs.headerIcon.classList.remove('show');
-        this.$refs.headerIcon.children[0].style.top = `${0}px`;
+        this.$refs.headerIcon.style.top = `${0}px`;
       },
       deleteDockFrame() {
-        const parentDockFrame = this.$el.parentElement; // 부모 Dom
-        const parentDockFrameSize = parentDockFrame.getBoundingClientRect();
-        const parentDockLayout = parentDockFrame.className.match('vbox') ? 'vBox' : 'hBox';
-        if (parentDockFrame.className.match('root')) {
-          // root 밑에 dock 하나 밖에 없는 경우
-          // DataMap에서 삭제 한다
-          this.deleteDockDataMap(this.dataRef);
-          parentDockFrame.removeChild(this.$el);
-        } else {
-          const alivedDockFrame = this.delTargetDockFrame(parentDockFrame);
-          const dockSize = alivedDockFrame.getBoundingClientRect();
-          alivedDockFrame.style.width = `${parentDockFrameSize.width}px`;
-          alivedDockFrame.style.height = `${parentDockFrameSize.height}px`;
-          if (alivedDockFrame.className.match('evui-dock-container')) {
-            // 사이즈가 늘어났으니 자식들도 사이즈 일괄변경 차리
-            // const dockLayout = alivedDockFrame.className.match('vbox') ? 'vBox' : 'hBox';
-            let increaseSize;
-            if (parentDockLayout === 'vBox') {
-              increaseSize = parentDockFrameSize.height - dockSize.height;
+          if (this.tabNavData.length === 0 || this.tabNavData.length === 1) {
+            const parentDockFrame = this.$el.parentElement; // 부모 Dom
+            const parentDockFrameSize = parentDockFrame.getBoundingClientRect();
+            const parentDockLayout = parentDockFrame.className.match('vbox') ? 'vBox' : 'hBox';
+            if (parentDockFrame.className.match('root')) {
+              // root 밑에 dock 하나 밖에 없는 경우
+              // DataMap에서 삭제 한다
+              this.deleteDockDataMap(this.dataRef);
+              parentDockFrame.removeChild(this.$el);
             } else {
-              increaseSize = parentDockFrameSize.width - dockSize.width;
+              const alivedDockFrame = this.delTargetDockFrame(parentDockFrame);
+              const dockSize = alivedDockFrame.getBoundingClientRect();
+              alivedDockFrame.style.width = `${parentDockFrameSize.width}px`;
+              alivedDockFrame.style.height = `${parentDockFrameSize.height}px`;
+              if (alivedDockFrame.className.match('evui-dock-container')) {
+                // 사이즈가 늘어났으니 자식들도 사이즈 일괄변경 차리
+                // const dockLayout = alivedDockFrame.className.match('vbox') ? 'vBox' : 'hBox';
+                let increaseSize;
+                if (parentDockLayout === 'vBox') {
+                  increaseSize = parentDockFrameSize.height - dockSize.height;
+                } else {
+                  increaseSize = parentDockFrameSize.width - dockSize.width;
+                }
+                this.deleteDockDomSize(alivedDockFrame, increaseSize, parentDockLayout);
+              }
             }
-            this.deleteDockDomSize(alivedDockFrame, increaseSize, parentDockLayout);
+          } else {
+              // 선택된 tabindex 만 제거
+            this.tabNavData.splice(this.selectTabIndex, 1);
+            this.tabPanelData.splice(this.selectTabIndex, 1);
+            const el = this.$refs.tabGroup.children[this.tabNavData.length - 1].children[0]; // a 태그
+            const lastLi = this.$refs.tabGroup.children[this.tabNavData.length]; // li 태그
+            // 마지막 tab이 선택된게 아니라면 트리거 하지 않는다.
+            if (lastLi.className.match('active')) {
+              this.selectTabIndex = this.tabNavData.length - 1;
+              const event = document.createEvent('HTMLEvents');
+              event.initEvent('mousedown', true, false);
+              el.dispatchEvent(event);
+            } else {
+                // 셀렉트된 텝 인덱스 값 변경
+              const ulList = this.$refs.tabGroup.children;
+              for (let ix = 0; ix < ulList.length; ix++) {
+                const liDom = ulList[ix];
+                if (liDom.className.match('active')) {
+                  this.selectTabIndex = ix;
+                }
+              }
+            }
           }
-        }
       },
       delTargetDockFrame(parentDom) {
         const parentDockFrame = parentDom;
@@ -566,7 +801,46 @@
               break;
             default :
           }
-          this.addPos = '';
+//          this.addPos = '';
+        }
+      },
+      reSizeDockFrame() {
+        const dockframeSize = this.$el.getBoundingClientRect();
+        let resizebar;
+        if (this.addPos !== '') {
+          switch (this.addPos) {
+            case 'left':
+              // 이진트리 하부 3개.
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
+              this.$el.style.width = `${(dockframeSize.width)}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'right':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = this.resizebarSize[0];
+              resizebar.style.height = this.resizebarSize[1];
+              this.$el.style.width = `${(dockframeSize.width)}px`;
+              this.$el.style.height = `${dockframeSize.height}px`;
+              break;
+            case 'top':
+              resizebar = this.$el.nextElementSibling;
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height)}px`;
+              break;
+            case 'bottom':
+              resizebar = this.$el.previousElementSibling;
+              resizebar.style.width = this.resizebarSize[1];
+              resizebar.style.height = this.resizebarSize[0];
+              this.$el.style.width = `${dockframeSize.width}px`;
+              this.$el.style.height = `${(dockframeSize.height)}px`;
+              break;
+            default :
+          }
+//          this.addPos = '';
         }
       },
       sizeRootDockFrame() {
@@ -605,13 +879,13 @@
               break;
             default :
           }
-          this.addPos = '';
+//          this.addPos = '';
         }
       },
-      MouseOverPos() {
+      mouseOverPos() {
         this.isViewLayer = true;
       },
-      MouseOutPos() {
+      mouseUpPos() {
         this.isViewLayer = false;
       },
       getWidth() {
@@ -645,15 +919,73 @@
     height: 25px;
     padding: 0px 2px;
     border: none;
-    position: fixed;
     cursor: pointer;
+    position: fixed;
+    display: none;
   }
   .evui-header-dock {
     width: 60px;
-    height: 25px;
+    /*height: 25px;*/
     float:right;
     z-index: 10000;
-    display: none;
   }
   .show {display:block;}
+  .nav-tabs > li {
+    float: left;
+    cursor:pointer;
+    position:relative;
+  }
+  .nav-tabs > .active > a, .nav-tabs > .active > a:hover, .nav-tabs > .active > a:focus {
+    color: #555555;
+    cursor: default;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+  }
+  .nav-tabs > li > a {
+    display: inline-block;
+  }
+  .nav-tabs > li > a {
+    line-height: 20px;
+    border: 1px solid transparent;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+  }
+  .link-tag {
+    color:#000000;
+  }
+  A:link {text-decoration:none;}
+  A:visited {text-decoration:none;}
+  A:active {text-decoration:none;}
+  A:hover {text-decoration:none;}
+  .tab-content {
+    overflow: auto;
+    margin: 10px 10px 10px 10px;
+  }
+  .tab-content > .tab-pane {
+    display: none;
+  }
+  .tab-content > .active {
+    display: block;
+  }
+
+  .evui-frame-menu {
+    background-color: #333333;
+    color: white;
+    padding: 7px;
+    font-size: 5px;
+    border: none;
+    cursor: pointer;
+    display: none;
+    float:right;
+    text-align: center;
+  }
+  .dropdown-content {
+    display: none;
+  }
+  .evui-frame-menu:hover, .evui-frame-menu:focus {
+    background-color: #2980B9;
+    text-align: center;
+  }
 </style>

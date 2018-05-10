@@ -30,8 +30,13 @@
       class="evui-popup-all-layout"
     >
       <div class="evui-popup-container">
-        <div class="evui-popup-head">
-          <div class="evui-pop-container-title">
+        <div
+          class="evui-popup-head"
+        >
+          <div
+            class="evui-pop-container-title"
+            @dblclick="reDocking"
+          >
             <label
               class="popup-title"
             >{{ title }}</label>
@@ -44,7 +49,7 @@
           <a
             href="#"
             class="evui-popup-close"
-            @click="removePopup">Χ</a>
+            @click="removePopup(dynamicIndex)">Χ</a>
         </div>
         <div class="evui-popup-content">
           <slot/>
@@ -62,9 +67,9 @@ export default {
   name: 'DockFrameLayerPopup',
   props: {
     /**
-     *  exemComponent
+     *  evuiComponent
      * */
-    exemComponent: {
+    evuiComponent: {
       type: Object,
       default: null,
     },
@@ -257,6 +262,12 @@ export default {
       type: Boolean, default: true,
     },
     /**
+     * 동적 팝업 인덱스 값
+     */
+    arrayIndex: {
+      type: Number, default: 0,
+    },
+    /**
      *최대 크기 설정
      */
     maximize: {
@@ -264,6 +275,12 @@ export default {
     },
     // 필수 속성 없으면 구동안됨
     vmMain: {
+      type: Object, default: null,
+    },
+    /**
+     * reDocking
+     */
+    reDockInfo: {
       type: Object, default: null,
     },
   },
@@ -288,13 +305,15 @@ export default {
       guideLeft: this.gx,
       guideWidth: this.gw,
       guideHeight: this.gh,
+      dynamicIndex: this.arrayIndex, // 동적으로 팝업생성시 발생되는 인덱스 값
       currentDroppable: null, // 팝업창 드레이그 위치에 해당되는 DockFrame Dom 담는다.
       popupTitle: this.title, // 팝업 제목을 add dock 제목으로 전달한다.
       addDockPosition: null, // addDock 위치 정보를 담는다.
       vmDock: null, // 해당 Dock  Vm 객체 담는다.
       vmMainFrame: this.vmMain, // 해당 Dock  Vm 객체 담는다.
       isRootPos: null, // maindockframe에 위치를 선택하면 true  , Dockframe 위치를 선택하면 false  , 초기값 null
-      evuiComponent: this.exemComponent, // 팝업에 있는 컴포넌트 obj
+      evuiContent: this.evuiComponent, // 팝업에 있는 컴포넌트 obj
+      infoDockFrame: this.reDockInfo,
     };
   },
 
@@ -369,9 +388,9 @@ export default {
     // document.documentElement.addEventListener('mouseup', this.layerUp, true);
     // Capturing 방식 이벤트 전달 최상위 부모부터 target element까지 순차적으로 내려오면서 이벤트
     // 전달 한다.
-    this.$el.parentNode.addEventListener('mousemove', this.layerMove, true);
-    this.$el.parentNode.addEventListener('mousedown', this.layerDown, true);
-    this.$el.parentNode.addEventListener('mouseup', this.layerUp, true);
+//    this.$el.parentNode.addEventListener('mousedown', this.layerDown, false);
+//    this.$el.parentNode.addEventListener('mouseup', this.layerUp, false);
+
     // layer Dom 초기 좌표 셋팅
     this.elmX = parseInt(this.$el.style.left, 10);
     this.elmY = parseInt(this.$el.style.top, 10);
@@ -383,15 +402,30 @@ export default {
     this.init();
   },
   beforeDestroy() {
-    this.$el.parentNode.removeEventListener('mousemove', this.layerMove, true);
-    this.$el.parentNode.removeEventListener('mousedown', this.layerDown, true);
-    this.$el.parentNode.removeEventListener('mouseup', this.layerUp, true);
+//    this.$el.parentNode.removeEventListener('mousedown', this.layerDown, false);
+//    this.$el.parentNode.removeEventListener('mouseup', this.layerUp, false);
     // document.documentElement.removeEventListener('mousemove', this.layerMove, true);
     // document.documentElement.removeEventListener('mousedown', this.layerDown, true);
     // document.documentElement.removeEventListener('mouseup', this.layerUp, true);
   },
 
   methods: {
+    reDocking() {
+      const type = this.infoDockFrame.type;
+
+      if (type === 'root') {
+            this.reRootAddDockFrame();
+      } else if (type === 'redocking') {
+          this.reAddDockFrame();
+      } else if (type === 'noroot') {
+        // 예외처리 첫 도킹 하자마자 떼고 다시넣는 경우
+        if (this.vmDock === null) {
+          this.rootCreateDockFrame('root');
+        } else {
+          this.reAddDockFrame();
+        }
+      }
+    },
     vmSelectId(parentVm, id) {
      const parentObject = parentVm.$children;
      const parentLength = parentObject.length;
@@ -444,6 +478,14 @@ export default {
     },
     layerEleDown(e) {
       const target = e.target || e.srcElement;
+      document.addEventListener('mousemove', this.layerMove, false);
+      document.addEventListener('mouseup', this.layerUp, false);
+      this.mouseX = e.pageX || e.clientX + this.$el.parentNode.scrollLeft;
+      this.mouseY = e.pageY || e.clientY + this.$el.parentNode.scrollTop;
+
+      // 마우스 다운 지점 정보저장
+      this.lastMouseX = this.mouseX;
+      this.lastMouseY = this.mouseY;
       if (this.$el.contains(target)) {
         if (
           // dragHandle  체크
@@ -458,6 +500,7 @@ export default {
         // if (this.draggable) {
            this.dragging = true;
         // }
+        this.layerMove(event);
       }
     },
     layerDown(e) {
@@ -632,28 +675,55 @@ export default {
           this.isSelectLayer(true, this.vmMainFrame);
           // this.vmMainFrame.isSelectLayerPopup = true;
             // ============== 팝업 아래 Dom 찾기 시작 ==============
-            // 순간 숨겨버려서 위치값 가져온다.
+            // 순간 숨겨버려서 위치값 가져온다. getElementsByClassName
             this.$el.hidden = true;
-            const dockPos = document.querySelectorAll('.selectlayerShow');
-            // 해당 dom obj는 top , left , bottom , right 이미지에 대한 dom이다
-            const dockPosAttr = document.elementFromPoint(e.clientX, e.clientY);
-            if (dockPos.length) {
-              [].forEach.call(dockPos, (el) => {
-                const hiddenDom = el;
-                hiddenDom.style.display = 'none';
-              });
-            }
-            // 해당 dom은 hidden dev 뺀 속성들이다.
-            const elemBelow = document.elementFromPoint(e.clientX, e.clientY);
-            if (dockPos.length) {
-              [].forEach.call(dockPos, (el) => {
-                const hiddenDom = el;
-                hiddenDom.style.display = null;
-              });
-            }
+//            const dockPos = document.querySelectorAll('.selectlayerShow');
+            let dockPosAttr = null;
+            let elemBelow = null;
+            let dockPos = null;
+            let droppableBelow = null;
+            let resizeBelow = null;
+            let addDockPos = null;
+//            if (this.vmDock !== null) {
+//              dockPos = document.getElementById(this.vmDock.dataRef);
+              // querySelectoreALl 함수 바꿔야함.. 성능 저하 됨.
+              // 다른 걸로 Dom 정보 가져오는 방법  생각필요.
+              dockPos = document.querySelectorAll('.selectlayerShow');
+
+              // 해당 dom obj는 top , left , bottom , right 이미지에 대한 dom이다
+               dockPosAttr = document.elementFromPoint(e.clientX, e.clientY);
+              if (dockPos.length) {
+                [].forEach.call(dockPos, (el) => {
+                  const hiddenDom = el;
+                  hiddenDom.style.display = 'none';
+                });
+              }
+//              dockPos.style.display = 'none';
+              // 해당 dom은 hidden dev 뺀 속성들이다.
+               elemBelow = document.elementFromPoint(e.clientX, e.clientY);
+//              dockPos.style.display = null;
+              if (dockPos.length) {
+                [].forEach.call(dockPos, (el) => {
+                  const hiddenDom = el;
+                  hiddenDom.style.display = null;
+                });
+              }
+              droppableBelow = elemBelow.closest('.dockcontainer');
+              resizeBelow = elemBelow.closest('.resizebar');
+              // addDocking pos 값 추출  && hidden layer 영역 표시
+              addDockPos = dockPosAttr.getAttribute('pos');
+//            } else {
+//                // root에서 도킹 시도
+//              dockPos = document.querySelectorAll('.selectlayerShow');
+//              dockPosAttr = document.elementFromPoint(e.clientX, e.clientY);
+//              elemBelow = document.elementFromPoint(e.clientX, e.clientY);
+//              droppableBelow = elemBelow.closest('.dockcontainer');
+//              resizeBelow = elemBelow.closest('.resizebar');
+//              addDockPos = dockPosAttr.getAttribute('pos');
+//            }
+
             this.$el.hidden = false;
-            const droppableBelow = elemBelow.closest('.dockcontainer');
-            const resizeBelow = elemBelow.closest('.resizebar');
+
             // ============== 팝업 아래 Dom찾기 끝 ==============
 
 
@@ -682,8 +752,7 @@ export default {
             // if (resizeBelow !== null && this.addDockPosition !== null && this.vmDock !== null) {
             //   this.isSelectLayer(true, this.vmDock);
             // }
-            // addDocking pos 값 추출  && hidden layer 영역 표시
-            const addDockPos = dockPosAttr.getAttribute('pos');
+
             if (addDockPos !== null) {
               this.addDockPosition = addDockPos;
               if (dockPosAttr.className.match('root')) {
@@ -781,6 +850,8 @@ export default {
       this.handle = null;
       this.elmX = this.left;
       this.elmY = this.top;
+      document.removeEventListener('mousemove', this.layerMove, false);
+      document.removeEventListener('mouseup', this.layerUp, false);
     },
     dockPostionLayerSize(pos, isDockContainer, isResizeBelow) {
       let rootObject = this.vmMainFrame;
@@ -851,14 +922,191 @@ export default {
       if (type === 'root') {
         rootFrameVm.addRootDockLayout = 'root';
         rootFrameVm.addDockTitle = this.popupTitle;
-        rootFrameVm.evuiComponent = this.evuiComponent;
+        rootFrameVm.evuiComponent = this.evuiContent;
         rootFrameVm.addDockSize = wrapperSize;
         rootFrameVm.addRootDockFrame('root');
       }
       // 드래이그 무빙 끝나면 도킹상태 flag 다시 변경  root 바로 밑 자식
       this.isSelectLayer(false, this.vmMainFrame);
       // 도킹 완료되면 팝업을 삭제한다.
-      this.removePopup();
+      this.removePopup(this.dynamicIndex);
+    },
+    // Dockframe 추가
+    reRootAddDockFrame() {
+      const rootFrameVm = this.vmMainFrame;
+      // subDockFrame 객체 반환
+      this.vmSelectId(rootFrameVm, this.infoDockFrame.vm);
+      const subDockFrame = this.vmDock;
+      this.vmSelectId(rootFrameVm, subDockFrame.$el.parentElement.dataset.ref);
+      const targetDockFrame = this.vmDock;
+      const dockPosition = this.infoDockFrame.pos;
+      const targetSize = subDockFrame.$el.parentElement.getBoundingClientRect(); // 보무 사이즈
+      // 도킹에 필요한 정보
+      // 형제 였던 dom의 사이즈 정보
+      const wrapperSize = { width: `${targetSize.width}`, height: `${targetSize.height}`, type: 'redocking' };
+      wrapperSize.newDockFrameId = subDockFrame;
+      wrapperSize.insertTargetId = targetDockFrame;
+      wrapperSize.subWidth = `${targetSize.width}`;
+      wrapperSize.subHeight = `${targetSize.height}`;
+      switch (dockPosition) {
+        case 'top':
+          rootFrameVm.addRootDockLayout = 'top';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          // wrapperSize.height /= 2;
+          // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
+          wrapperSize.height = `${this.infoDockFrame.height}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          subDockFrame.$el.style.width = `${wrapperSize.width}px`;
+          subDockFrame.$el.style.height = `${(targetSize.height - this.infoDockFrame.height) - 4}px`;
+          break;
+        case 'left':
+          rootFrameVm.addRootDockLayout = 'left';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          wrapperSize.width = `${this.infoDockFrame.width}`;
+          rootFrameVm.addDockSize = wrapperSize;
+//          subDockFrame.$el.style.width = `${(wrapperSize.width / 2) - 2}px`;
+//          subDockFrame.$el.style.height = `${wrapperSize.height}px`;
+          subDockFrame.$el.style.width = `${(targetSize.width - this.infoDockFrame.width) - 4}px`;
+          subDockFrame.$el.style.height = `${wrapperSize.height}px`;
+          break;
+        case 'right':
+          rootFrameVm.addRootDockLayout = 'right';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          // wrapperSize.width /= 2;
+          // wrapperSize.width -= 2; // 리사이즈 바 빼준다.
+          wrapperSize.width = `${this.infoDockFrame.width}`;
+          rootFrameVm.addDockSize = wrapperSize;
+//          subDockFrame.$el.style.width = `${(wrapperSize.width / 2) - 2}px`;
+//          subDockFrame.$el.style.height = `${wrapperSize.height}px`;
+          subDockFrame.$el.style.width = `${(targetSize.width - this.infoDockFrame.width) - 4}px`;
+          subDockFrame.$el.style.height = `${wrapperSize.height}px`;
+          break;
+        case 'bottom':
+          rootFrameVm.addRootDockLayout = 'bottom';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          // wrapperSize.height /= 2;
+          // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
+          wrapperSize.height = `${this.infoDockFrame.height}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          subDockFrame.$el.style.width = `${wrapperSize.width}px`;
+          subDockFrame.$el.style.height = `${(targetSize.height - this.infoDockFrame.height) - 4}px`;
+          break;
+        case 'tab':
+          // tab 제목 및 컴포넌트 셋팅
+          // 활성화 텝 class 전부 삭제
+//          if (dockFrame.tabNavData.length > 1) {
+//            const ulList = dockFrame.$refs.tabGroup.children;
+//            const divList = dockFrame.$refs.tabGroupPanel.children;
+//            for (let ix = 0; ix < ulList.length; ix++) {
+//              const liDom = ulList[ix];
+//              const divDom = divList[ix];
+//              liDom.classList.remove('active');
+//              divDom.classList.remove('active');
+//            }
+//          }
+//          dockFrame.tabNavData.push(this.popupTitle);
+//          dockFrame.tabPanelData.push(this.evuiContent);
+//          dockFrame.selectTabIndex = dockFrame.tabNavData.length - 1; // 텝 도킹시 제일 마지막 tab index 셋팅
+          break;
+        default :
+      }
+      // 동적 컴포넌트 추가
+      rootFrameVm.addDockFrame(dockPosition);
+      // 드래이그 무빙 끝나면 도킹상태 flag  변경 도킹 top,left,right,bottom 이미지 view
+      this.isSelectLayer(false, this.vmMainFrame);
+      // 도킹 완료되면 팝업을 삭제한다.
+      this.removePopup(this.dynamicIndex);
+    },
+    // Dockframe 추가
+    reAddDockFrame() {
+        debugger;
+      const rootFrameVm = this.vmMainFrame;
+      // subDockFrame 객체 반환
+      this.vmSelectId(rootFrameVm, this.infoDockFrame.vm);
+      const subDockFrame = this.vmDock;
+      this.vmSelectId(rootFrameVm, subDockFrame.$el.parentElement.dataset.ref);
+      const targetDockFrame = this.vmDock;
+      const dockPosition = this.infoDockFrame.pos;
+      const targetSize = subDockFrame.$el.getBoundingClientRect(); // 보무 사이즈
+      // 도킹에 필요한 정보
+      // 형제 였던 dom의 사이즈 정보
+      const wrapperSize = {};
+      wrapperSize.type = 'redocking';
+      wrapperSize.newDockFrameId = subDockFrame;
+      wrapperSize.insertTargetId = targetDockFrame;
+      wrapperSize.width = `${targetSize.width}`;
+      wrapperSize.height = `${targetSize.height}`;
+      wrapperSize.subWidth = `${targetSize.width}`;
+      wrapperSize.subHeight = `${targetSize.height}`;
+      // -4 이유는 부모는 dom에는 스플릿 사이즈가 빠져있지않아서 -4 처리함
+      switch (dockPosition) {
+        case 'top':
+          rootFrameVm.addRootDockLayout = 'top';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          subDockFrame.$el.style.width = `${targetSize.width}px`;
+          subDockFrame.$el.style.height = `${(targetSize.height - this.infoDockFrame.height) - 4}px`;
+          wrapperSize.height = `${this.infoDockFrame.height}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          break;
+        case 'left':
+          rootFrameVm.addRootDockLayout = 'left';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          subDockFrame.$el.style.width = `${(targetSize.width - this.infoDockFrame.width) - 4}px`;
+          subDockFrame.$el.style.height = `${targetSize.height}px`;
+          wrapperSize.width = `${this.infoDockFrame.width}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          break;
+        case 'right':
+          rootFrameVm.addRootDockLayout = 'right';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+//          subDockFrame.$el.style.width = `${(targetSize.width / 2) - 2}px`;
+//          subDockFrame.$el.style.height = `${targetSize.height}px`;
+          subDockFrame.$el.style.width = `${(targetSize.width - this.infoDockFrame.width) - 4}px`;
+          subDockFrame.$el.style.height = `${targetSize.height}px`;
+          wrapperSize.width = `${this.infoDockFrame.width}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          break;
+        case 'bottom':
+          rootFrameVm.addRootDockLayout = 'bottom';
+          rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          subDockFrame.$el.style.width = `${targetSize.width}px`;
+          subDockFrame.$el.style.height = `${(targetSize.height - this.infoDockFrame.height) - 4}px`;
+          wrapperSize.height = `${this.infoDockFrame.height}`;
+          rootFrameVm.addDockSize = wrapperSize;
+          break;
+        case 'tab':
+          // tab 제목 및 컴포넌트 셋팅
+          // 활성화 텝 class 전부 삭제
+//          if (dockFrame.tabNavData.length > 1) {
+//            const ulList = dockFrame.$refs.tabGroup.children;
+//            const divList = dockFrame.$refs.tabGroupPanel.children;
+//            for (let ix = 0; ix < ulList.length; ix++) {
+//              const liDom = ulList[ix];
+//              const divDom = divList[ix];
+//              liDom.classList.remove('active');
+//              divDom.classList.remove('active');
+//            }
+//          }
+//          dockFrame.tabNavData.push(this.popupTitle);
+//          dockFrame.tabPanelData.push(this.evuiContent);
+//          dockFrame.selectTabIndex = dockFrame.tabNavData.length - 1; // 텝 도킹시 제일 마지막 tab index 셋팅
+          break;
+        default :
+      }
+      // 동적 컴포넌트 추가
+      rootFrameVm.addDockFrame(dockPosition);
+      // 드래이그 무빙 끝나면 도킹상태 flag  변경 도킹 top,left,right,bottom 이미지 view
+      this.isSelectLayer(false, this.vmMainFrame);
+      // 도킹 완료되면 팝업을 삭제한다.
+      this.removePopup(this.dynamicIndex);
     },
     // Dockframe 추가
     addDockFrame() {
@@ -874,11 +1122,14 @@ export default {
       const wrapperSize = { width: `${targetSize.width}`, height: `${targetSize.height}`, type: 'inner' };
       wrapperSize.newDockFrameId = dockFrame;
       wrapperSize.insertTargetId = subDockFrame;
+      wrapperSize.subWidth = `${targetSize.width}`;
+      wrapperSize.subHeight = `${targetSize.height}`;
       switch (dockPosition) {
         case 'top':
           rootFrameVm.addRootDockLayout = 'top';
           rootFrameVm.addDockTitle = this.popupTitle;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          rootFrameVm.addDockFrameVm = dockFrame; // 다시 도킹으로 집어넣을때 필요
           // wrapperSize.height /= 2;
           // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
@@ -888,34 +1139,52 @@ export default {
         case 'left':
           rootFrameVm.addRootDockLayout = 'left';
           rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.addDockFrameVm = dockFrame; // 다시 도킹으로 집어넣을때 필요
           // wrapperSize.width /= 2;
           // wrapperSize.width -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           dockFrame.$el.style.width = `${(wrapperSize.width / 2) - 2}px`;
           dockFrame.$el.style.height = `${wrapperSize.height}px`;
           break;
         case 'right':
           rootFrameVm.addRootDockLayout = 'right';
           rootFrameVm.addDockTitle = this.popupTitle;
+          rootFrameVm.addDockFrameVm = dockFrame; // 다시 도킹으로 집어넣을때 필요
           // wrapperSize.width /= 2;
           // wrapperSize.width -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           dockFrame.$el.style.width = `${(wrapperSize.width / 2) - 2}px`;
           dockFrame.$el.style.height = `${wrapperSize.height}px`;
           break;
         case 'bottom':
           rootFrameVm.addRootDockLayout = 'bottom';
           rootFrameVm.addDockTitle = this.popupTitle;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
+          rootFrameVm.addDockFrameVm = dockFrame; // 다시 도킹으로 집어넣을때 필요
           // wrapperSize.height /= 2;
           // wrapperSize.height -= 2; // 리사이즈 바 빼준다.
           rootFrameVm.addDockSize = wrapperSize;
           dockFrame.$el.style.width = `${wrapperSize.width}px`;
           dockFrame.$el.style.height = `${(wrapperSize.height / 2) - 2}px`;
           break;
-        case 'tab': // tab 아직 구상되지 않음.
+        case 'tab':
+          // tab 제목 및 컴포넌트 셋팅
+          // 활성화 텝 class 전부 삭제
+          if (dockFrame.tabNavData.length > 1) {
+            const ulList = dockFrame.$refs.tabGroup.children;
+            const divList = dockFrame.$refs.tabGroupPanel.children;
+            for (let ix = 0; ix < ulList.length; ix++) {
+              const liDom = ulList[ix];
+              const divDom = divList[ix];
+              liDom.classList.remove('active');
+              divDom.classList.remove('active');
+            }
+          }
+          dockFrame.tabNavData.push(this.popupTitle);
+          dockFrame.tabPanelData.push(this.evuiContent);
+          dockFrame.selectTabIndex = dockFrame.tabNavData.length - 1; // 텝 도킹시 제일 마지막 tab index 셋팅
           break;
         default :
       }
@@ -924,7 +1193,7 @@ export default {
       // 드래이그 무빙 끝나면 도킹상태 flag  변경 도킹 top,left,right,bottom 이미지 view
       this.isSelectLayer(false, this.vmMainFrame);
       // 도킹 완료되면 팝업을 삭제한다.
-      this.removePopup();
+      this.removePopup(this.dynamicIndex);
     },
     // Root Dockfrmae 추가 함수 dockframe.main.vue와 연동 되어있다.
     addRootDockFrame() {
@@ -933,30 +1202,32 @@ export default {
       // const targetDock = this.vmDock;
       const targetSize = rootFrameVm.$el.getBoundingClientRect();
       const wrapperSize = { width: `${targetSize.width}`, height: `${targetSize.height}`, type: 'root' };
+      wrapperSize.subWidth = `${targetSize.width}`;
+      wrapperSize.subHeight = `${targetSize.height}`;
       switch (dockPosition) {
         case 'top':
           rootFrameVm.addRootDockLayout = 'top';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           break;
         case 'left':
           rootFrameVm.addRootDockLayout = 'left';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           break;
         case 'right':
           rootFrameVm.addRootDockLayout = 'right';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           break;
         case 'bottom':
           rootFrameVm.addRootDockLayout = 'bottom';
           rootFrameVm.addDockTitle = this.popupTitle;
           rootFrameVm.addDockSize = wrapperSize;
-          rootFrameVm.evuiComponent = this.evuiComponent;
+          rootFrameVm.evuiComponent = this.evuiContent;
           break;
         default :
       }
@@ -965,7 +1236,7 @@ export default {
       // 드래이그 무빙 끝나면 도킹상태 flag  변경 도킹 top,left,right,bottom 이미지 view
       this.isSelectLayer(false, this.vmMainFrame);
       // 도킹 완료되면 팝업을 삭제한다.
-      this.removePopup();
+      this.removePopup(this.dynamicIndex);
     },
     // 도킹이미지 show or hide
     isSelectLayer(flag, vm) {
@@ -982,7 +1253,9 @@ export default {
       }
     },
     // 레이어팝업 소멸 시킨다.
-    removePopup() {
+    removePopup(index) {
+        // 뷰에 vfor문 배열 돌릴때 splice 쓰면 인덱스가  삭제가 안됨 왜이러는건지.. 모르겟음
+      this.vmMainFrame.selfVm.layerPopupList.splice(index, 1);
       this.$destroy();
       this.$el.parentNode.removeChild(this.$el);
     },
