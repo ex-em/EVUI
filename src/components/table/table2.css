@@ -428,12 +428,12 @@
 }
 .evui-grid .evui-grid-footer .evui-footer-left {
   float: left;
-  padding-top: 5px;
+  padding-top: 3px;
   padding-left: 5px;
 }
 .evui-grid .evui-grid-footer .evui-footer-right {
   float: right;
-  padding-top: 5px;
+  padding-top: 3px;
   padding-right: 5px;
 }
 .evui-grid .evui-grid-footer .evui-footer-center {
