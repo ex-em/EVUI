@@ -3,20 +3,28 @@
     <div>
       <h3> 닷킹 컴포넌트</h3>
       <br>
-      <button @click="adddockData">dockingLayerPopup 추가</button>
+      <button @click="adddockData">dockingLayerPopup 추가1</button>
+      <button @click="adddockData2">dockingLayerPopup 추가2</button>
       <button>TreeData</button>
     </div>
     <dock-main-frame
       ref="minFrame"
       :width="1840"
       :height="900"
+      :self-component="selfVm"
     />
+    <!-- 동적 레이어 팝업 필수 속성들 -->
     <component
-      v-for="(item, index) in LayerPopupList"
+      v-for="(item, index) in layerPopupList"
+      ref="mainLayerPopup"
       :key = "item.id"
       :titleid = "index"
+      :layer-title = "popupTitle"
       :rootframe = "vmMain"
+      :re-dock-info = "_reDockInfo"
+      :evui-content = "_evuiContent"
       :is="item"/>
+
   </div>
 </template>
 <style scoped>
@@ -24,35 +32,16 @@
 <script>
   import { dockMainFrame, dockSubFrame, dockFrame, dockspliter, dockFrameLayerPopup, DockFrameTab } from '@/components/dock';
   import chart from '../chart';
-
-
-  const chartlist = {
-    components: {
-      dockMainFrame, dockSubFrame, dockFrame, dockspliter, dockFrameLayerPopup, chart,
-    },
-    data() {
-      return {
-      };
-    },
-    template:
-    '            <dock-sub-frame' +
-    '              flex="1"' +
-    '              layout="sub">' +
-    '              <dock-sub-frame' +
-    '                flex="1"' +
-    '                layout="hBox">' +
-    '            <dock-frame' +
-    '              flex="1"' +
-    '              title="test79"/>' +
-    '            <dockspliter/>' +
-    '            <dock-frame' +
-    '              flex="1"' +
-    '              title="test80"/>' +
-    '              </dock-sub-frame>' +
-    '            </dock-sub-frame>',
-    methods: {
-    },
-  };
+  import evuitable from '../table';
+//
+//  const chartComponet = {
+//    components: {
+//      chart,
+//    },
+//    template: '<chart/>',
+//    methods: {
+//    },
+//  };
   const LayerPopup = {
     components: {
       dockFrameLayerPopup, chart,
@@ -62,7 +51,20 @@
         type: [String, Number],
         default: '',
       },
+      layerTitle: {
+        type: String,
+        default: '',
+      },
       rootframe: {
+        type: Object,
+        default: null,
+      },
+      // 기능별로 정의된 컴포넌트를 받아서 셋팅 해준다.
+      evuiContent: {
+        type: Object,
+        default: null,
+      },
+      reDockInfo: {
         type: Object,
         default: null,
       },
@@ -73,45 +75,32 @@
         height: 0,
         x: 0,
         y: 0,
-        ElementDock: chartlist,
         titleIndex: this.titleid,
+        title: this.layerTitle,
         vmRoot: this.rootframe,
-        exemComponent: null, //  chart,
+        evuiComponent: this.evuiContent, //  chart,
+        dockInfo: this.reDockInfo,
       };
     },
-    template: '<dock-frame-layer-popup @dragging="onDrag" @resizing="onResize"' +
-    'style="border: 1px solid black;" :exemComponent="exemComponent" :title="popuptitle"' +
-    ' :vmMain="vmRoot" :x="40" :y="88" >' +
+    // 팝업 필수 속성들
+    template: '<dock-frame-layer-popup @dragging="onDrag" @resizing="onResize" :arrayIndex="titleIndex"' +
+    'style="border: 1px solid black;" :evuiComponent="evuiComponent" :title="_title" :re-dock-info = "_reDockInfo"' +
+    ' :vmMain="vmRoot" :x="140" :y="188" >' +
     '<p>X: {{ x }} / Y: {{ y }} - Width: {{ width }} / Height: {{ height }}</p>' +
-       '<chart/>' +
+    '            <component' +
+    '              :is="evuiComponent"' +
+    '              />' +
    '</dock-frame-layer-popup>',
     created() {
     },
     computed: {
-      popuptitle() {
-        return `제목 ${this.titleIndex}`;
+      _title() {
+        return `${this.title}`;
+      },
+      _reDockInfo() {
+        return this.dockInfo;
       },
     },
-    methods: {
-      onResize(x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-      },
-      onDrag(x, y) {
-        this.x = x;
-        this.y = y;
-      },
-    },
-  };
-  const LayerPopup2 = {
-    components: {
-      dockFrameLayerPopup,
-    },
-    template: '<dock-frame-layer-popup @dragging="onDrag" @resizing="onResize" :resizable="false" :parent="true"' +
-    'style="border: 1px solid black;">' +
-    '</dock-frame-layer-popup>',
     methods: {
       onResize(x, y, width, height) {
         this.x = x;
@@ -137,29 +126,66 @@
       chart,
       dockFrameLayerPopup,
       LayerPopup,
-      LayerPopup2,
+      evuitable,
+    },
+    props: {
+      dockFrameTitle: {
+        type: String,
+        default: '',
+      },
+      dockSize: {
+        type: Object,
+        default: null,
+      },
+      dockPos: {
+        type: String,
+        default: '',
+      },
+      rootframe: {
+        type: Object,
+        default: null,
+      },
+      /**
+       *  필수 정보
+       */
+      layerDockInfo: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         layoutChk: true,
-        LayerPopupList: [],
+        layerPopupList: [], // 하드코딩 필수
+        evuiContent: chart, // 하드코딩 필수
+        popupTitle: '',
         width: 0,
-         height: 0,
+        height: 0,
         x: 0,
         y: 0,
+        testtitle: [1, 2, 3, 4, 5],
+        reDockInfo: this.layerDockInfo,
       };
     },
     computed: {
+      parktest() {
+        return this.testtitle;
+      },
+      // 필수 속성
+      selfVm() {
+          return this;
+      },
+      // 필수 속성
      vmMain() {
           return this.$refs.minFrame;
       },
-      layerobj: {
-        get() {
-          return this.Layer;
-        },
-        set(cData) {
-          this.Layer = cData;
-        },
+      // 팝업 안 컴포넌트 내용
+      _evuiContent() {
+        return this.evuiContent;
+      },
+      // 팝업 안 컴포넌트 내용
+      _reDockInfo() {
+        return this.reDockInfo;
       },
      },
     mounted() {
@@ -177,7 +203,21 @@
       },
       adddockData() {
         // this.LayerPopup = 'LayerPopup2';
-        this.LayerPopupList.push('LayerPopup');
+        this.popupTitle = '차트';
+        this.evuiContent = null;
+        this.layerPopupList.push(LayerPopup);
+      },
+      adddockData2() {
+        // this.LayerPopup = 'LayerPopup2';
+        this.popupTitle = '테이블';
+        this.evuiContent = null;
+        this.layerPopupList.push(LayerPopup);
+      },
+      dynamicAddDock(component) {
+        // this.LayerPopup = 'LayerPopup2';
+        this.popupTitle = '테이블';
+        this.evuiContent = component;
+        this.layerPopupList.push(LayerPopup);
       },
 //      TreeData() {
 //        const _list = this.$refs.minFrame.dockDataMap;
