@@ -80,8 +80,10 @@ export default class ChartDataStore {
     if (this.seriesList === undefined) {
       return;
     }
-
+    // category 형태의 데이터냐 아니냐에 따라 x,y 처리
     const series = this.seriesList[seriesIndex];
+    const tempValue = {};
+    const category = this.chartData.category;
     let dataIdx = dataIndex;
 
     if (!series) {
@@ -92,12 +94,19 @@ export default class ChartDataStore {
       dataIdx = series.data.length;
     }
 
-    series.data[dataIdx] = value;
+    if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
+      tempValue.x = Object.hasOwnProperty.call(value, 'x') ? value.x : null;
+      tempValue.y = Object.hasOwnProperty.call(value, 'y') ? value.y : null;
+    } else {
+      tempValue.x = category[dataIdx] ? category[dataIdx] : null;
+      tempValue.y = value;
+    }
+    series.data[dataIdx] = tempValue;
     series.data[dataIdx].point = series.point;
 
     if (series.show) {
-      this.setMinMaxValue(series, value, dataIdx);
-      this.setMaxLabelWidth(value);
+      this.setMinMaxValue(series, tempValue, dataIdx);
+      this.setMaxLabelWidth(tempValue);
     }
   }
 
@@ -131,6 +140,40 @@ export default class ChartDataStore {
     }
 
     return res;
+  }
+
+  addCategoryStackValue(currSeriesIndex, value, baseSeriesIndex, dataIndex) {
+    if (this.seriesList === undefined) {
+      return;
+    }
+
+    let dataIdx = dataIndex;
+    const cSeries = this.seriesList[currSeriesIndex];
+    const bSeries = this.seriesList[baseSeriesIndex];
+    const category = this.chartData.category;
+
+    if (!cSeries || !bSeries) {
+      return;
+    }
+
+    if (!dataIdx) {
+      dataIdx = cSeries.data.length;
+    }
+
+    const base = bSeries.data[dataIdx];
+    const stackValue = {
+      x: category[dataIdx],
+      y: value + base.y,
+      b: base.y || 0,
+      point: true,
+    };
+
+    cSeries.data.push(stackValue);
+    cSeries.hasAccumulate = true;
+    if (cSeries.show) {
+      this.setMinMaxValue(cSeries, stackValue, dataIdx);
+      this.setMaxLabelWidth(stackValue);
+    }
   }
 
   addStackValue(currSeriesIndex, value, baseSeriesIndex, dataIndex) {
@@ -253,7 +296,11 @@ export default class ChartDataStore {
 
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
       if (this.seriesList[seriesIndex].stack && baseIndex !== null) {
-        this.addStackValue(seriesIndex, values[ix], baseIndex);
+        if (this.chartData.category) {
+          this.addCategoryStackValue(seriesIndex, values[ix], baseIndex);
+        } else {
+          this.addStackValue(seriesIndex, values[ix], baseIndex);
+        }
       } else {
         this.addValue(seriesIndex, values[ix]);
       }
@@ -274,10 +321,7 @@ export default class ChartDataStore {
       this.minValueInfo.seriesIndex = series.seriesIndex;
     }
 
-    if (series.min === null) {
-      series.min = y;
-      series.minIndex = index;
-    } else if (series.min > y) {
+    if (series.min === null || series.min > y) {
       series.min = y;
       series.minIndex = index;
     }

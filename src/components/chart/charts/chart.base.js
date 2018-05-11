@@ -3,6 +3,7 @@ import moment from 'moment';
 import DataStore from '../core/core.data';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
+import AxisStepsScale from '../core/axis/axis.scale.steps';
 
 class BaseChart {
   constructor(target, data, options) {
@@ -197,12 +198,19 @@ class BaseChart {
     for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
       // X축 라벨 넓이의 반이 right offset을 넘는다면
       // 아직 X축의 위치 (left, right) 에 따른 로직은 미완성 상태.
+      // 기존에는 time일 경우에만 labelOffset.right 처리가 되어있었음 해당 코드 수정
+      // 이 부분은 축 개선때마다 변경 예정.
       maxValue = this.dataSet.getLabelTextMaxInfo().xText;
       if (this.options.xAxes[ix].tickFormat !== null &&
         this.options.xAxes[ix].type === 'time') {
         maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);
         labelSize = this.bufferCtx.measureText(maxValue).width;
 
+        if (Math.round(labelSize / 2) > this.labelOffset.right) {
+          this.labelOffset.right = Math.round(labelSize / 2);
+        }
+      } else {
+        labelSize = this.bufferCtx.measureText(maxValue).width;
         if (Math.round(labelSize / 2) > this.labelOffset.right) {
           this.labelOffset.right = Math.round(labelSize / 2);
         }
@@ -267,7 +275,18 @@ class BaseChart {
     this.yAxes = [];
 
     for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
-      if (this.options.xAxes[ix].interval) {
+      if (this.data.category) {
+        xAxisObj = new AxisStepsScale({
+          type: 'x',
+          dataSet: this.dataSet,
+          chartRect: this.chartRect,
+          options: this.options.xAxes[ix],
+          ctx: this.bufferCtx,
+          labelOffset: this.labelOffset,
+          axisIndex: ix,
+          category: this.data.category,
+        });
+      } else if (this.options.xAxes[ix].interval) {
         xAxisObj = new AxisFixedScale({
           type: 'x',
           dataSet: this.dataSet,
@@ -353,10 +372,11 @@ class BaseChart {
       (scalingFactor * (convertValue - (minValue || 0)));
   }
 
-  calculateY(value, yAxisIndex) {
+  calculateY(value, yAxisIndex, invert) {
     const maxValue = this.yAxes[yAxisIndex].axisMax;
     const minValue = this.yAxes[yAxisIndex].axisMin;
     let convertValue;
+    let calcY;
 
     if (value === null) {
       return null;
@@ -371,10 +391,16 @@ class BaseChart {
     if (convertValue > maxValue || convertValue < minValue) {
       return null;
     }
-
+    // Bar차트의 fillRect처리를 위해 invert값 추가 하여 Y값을 처리
     const scalingFactor = this.drawingYArea() / (maxValue - minValue);
-    return (this.chartRect.y2 - this.labelOffset.bottom) -
-      (scalingFactor * (convertValue - (minValue || 0)));
+    if (invert) {
+      calcY = -(scalingFactor * (convertValue - (minValue || 0)));
+    } else {
+      calcY = (this.chartRect.y2 - this.labelOffset.bottom) -
+        (scalingFactor * (convertValue - (minValue || 0)));
+    }
+
+    return calcY;
   }
 
   drawingXArea() {

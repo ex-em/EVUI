@@ -46,7 +46,7 @@ export default class ScatterChart extends BaseChart {
       data = series.data[ix];
 
       x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y);
+      y = this.calculateY(data.y, series.axisIndex.y, false);
 
       xPoint.push(x);
       yPoint.push(y);
