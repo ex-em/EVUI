@@ -60,7 +60,7 @@ export default class LineChart extends BaseChart {
       data = series.data[ix];
 
       x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y);
+      y = this.calculateY(data.y, series.axisIndex.y, false);
 
       if (y === null) {
         if (ix - 1 >= 0) {

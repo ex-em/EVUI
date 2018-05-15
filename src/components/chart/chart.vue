@@ -9,6 +9,7 @@
   import Util from './core/core.util';
   import LineChart from './charts/chart.line';
   import ScatterChart from './charts/chart.scatter';
+  import BarChart from './charts/chart.bar';
 
   export default {
     props: {
@@ -52,6 +53,9 @@
           break;
         case 'scatter':
           this.chart = new ScatterChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'bar':
+          this.chart = new BarChart(this.$refs.wrapper, this.$props.data, this.$props.options);
           break;
         default:
           this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
