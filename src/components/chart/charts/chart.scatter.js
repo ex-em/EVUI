@@ -13,6 +13,8 @@ export default class ScatterChart extends BaseChart {
     this.setLabelOffset();
     this.createAxis();
     this.createScatter();
+
+    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   createScatter() {

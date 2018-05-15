@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import DataStore from '../core/core.data';
+import Util from '../core/core.util';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
 import AxisStepsScale from '../core/axis/axis.scale.steps';
@@ -16,7 +17,7 @@ class BaseChart {
       ],
       title: {
         text: '',
-        font: '15px Arial',
+        font: '15px Droid Sans',
         color: '#000000',
         height: 40,
         show: false,
@@ -27,6 +28,7 @@ class BaseChart {
         bottom: 5,
         left: 5,
       },
+      horizontal: false,
     };
 
     this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
@@ -49,6 +51,7 @@ class BaseChart {
 
     this.dataSet = new DataStore({
       chartData: this.data,
+      horizontal: this.options.horizontal,
     });
 
     this.dataSet.init();
@@ -80,7 +83,7 @@ class BaseChart {
       labelStyle: {
         fontSize: 13,
         color: '#333',
-        fontFamily: 'normal',
+        fontFamily: 'Droid Sans',
       },
     };
 
@@ -105,7 +108,7 @@ class BaseChart {
       labelStyle: {
         fontSize: 13,
         color: '#333',
-        fontFamily: 'normal',
+        fontFamily: 'Droid Sans',
       },
     };
 
@@ -141,7 +144,7 @@ class BaseChart {
       this.displayCtx.backingStorePixelRatio || 1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
-
+    // 완성 뒤 displayCanvas를 append하도록 변경 필요. (중요**)
     this.container.appendChild(this.bufferCanvas);
   }
 
@@ -174,54 +177,64 @@ class BaseChart {
   }
 
   setLabelOffset() {
-    let maxValue;
+    let labelText;
     let labelSize;
 
-    for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
-      maxValue = this.dataSet.getYValueAxisPerSeries(ix).max || 0;
-      if (this.options.yAxes[ix].tickFormat !== null &&
-        this.options.yAxes[ix].type === 'time') {
-        maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);
-      }
-      labelSize = this.bufferCtx.measureText(`${maxValue}`).width;
-      if (this.options.yAxes[ix].position === 'left') {
-        if (labelSize > this.labelOffset.left) {
-          this.labelOffset.left = labelSize + 20; // 20은 buffer value.
+    const labelBuffer = 20;
+    const xAxes = this.options.xAxes;
+    const yAxes = this.options.yAxes;
+
+    // 축의 Label 길이 중 가장 큰 value를 기준으로 label offset을 계산.
+    // label offset의 buffer size 20px
+    for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
+      this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
+      labelText = this.dataSet.getLabelTextMaxInfo(ix).yText || '';
+      labelSize = this.bufferCtx.measureText(`${labelText}`).width || 0;
+
+      if (yAxes[ix].labelType === 'time') {
+        labelSize = moment(labelText);
+
+        if (yAxes[ix].tickFormat) {
+          labelSize = labelSize.format(yAxes[ix].tickFormat);
         }
-      } else if (this.options.yAxes[ix].position === 'right') {
+      }
+
+      if (yAxes[ix].position === 'left') {
+        if (labelSize > this.labelOffset.left) {
+          this.labelOffset.left = labelSize + labelBuffer;
+        }
+      } else if (yAxes[ix].position === 'right') {
         if (labelSize > this.labelOffset.right) {
-          this.labelOffset.right = labelSize + 20; // 20은 buffer value.
+          this.labelOffset.right = labelSize + labelBuffer;
         }
       }
     }
 
-    for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
-      // X축 라벨 넓이의 반이 right offset을 넘는다면
-      // 아직 X축의 위치 (left, right) 에 따른 로직은 미완성 상태.
-      // 기존에는 time일 경우에만 labelOffset.right 처리가 되어있었음 해당 코드 수정
-      // 이 부분은 축 개선때마다 변경 예정.
-      maxValue = this.dataSet.getLabelTextMaxInfo().xText;
-      if (this.options.xAxes[ix].tickFormat !== null &&
-        this.options.xAxes[ix].type === 'time') {
-        maxValue = moment(maxValue).format(this.options.yAxes[ix].tickFormat);
-        labelSize = this.bufferCtx.measureText(maxValue).width;
-
-        if (Math.round(labelSize / 2) > this.labelOffset.right) {
-          this.labelOffset.right = Math.round(labelSize / 2);
-        }
-      } else {
-        labelSize = this.bufferCtx.measureText(maxValue).width;
-        if (Math.round(labelSize / 2) > this.labelOffset.right) {
-          this.labelOffset.right = Math.round(labelSize / 2);
+    for (let ix = 0, ixLen = xAxes.length; ix < ixLen; ix++) {
+      this.bufferCtx.font = Util.getLabelStyle(xAxes[ix]);
+      labelText = this.dataSet.getLabelTextMaxInfo(ix).xText || '';
+      if (xAxes[ix].labelType === 'time') {
+        labelText = moment(labelText);
+        if (xAxes[ix].tickFormat) {
+          labelText = labelText.format(xAxes[ix].tickFormat);
         }
       }
 
-      labelSize = this.options.xAxes[ix].labelStyle.fontSize * 2 || 0;
-      if (this.options.xAxes[ix].position === 'bottom') {
+      labelSize = this.bufferCtx.measureText(`${labelText}`).width || 0;
+      if (Math.round(labelSize / 2) > this.labelOffset.right) {
+        this.labelOffset.right = Math.round(labelSize / 2) + labelBuffer;
+      }
+
+      if (Math.round(labelSize / 2) > this.labelOffset.left) {
+        this.labelOffset.left = Math.round(labelSize / 2) + labelBuffer;
+      }
+
+      labelSize = this.options.xAxes[ix].labelStyle.fontSize * 2 || 2;
+      if (xAxes[ix].position === 'bottom') {
         if (labelSize > this.labelOffset.bottom) {
           this.labelOffset.bottom = labelSize;
         }
-      } else if (this.options.xAxes[ix].position === 'top') {
+      } else if (xAxes[ix].position === 'top') {
         if (labelSize > this.labelOffset.top) {
           this.labelOffset.top = labelSize;
         }
@@ -232,6 +245,7 @@ class BaseChart {
   createTitle() {
     const titleObj = this.options.title;
     this.titleContainer = document.createElement('div');
+    this.titleContainer.style.font = titleObj.style;
     this.titleContainer.textContent = titleObj.text;
 
     if (titleObj.show) {
@@ -275,63 +289,90 @@ class BaseChart {
     this.yAxes = [];
 
     for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
-      if (this.data.category) {
-        xAxisObj = new AxisStepsScale({
-          type: 'x',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.xAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-          category: this.data.category,
-        });
-      } else if (this.options.xAxes[ix].interval) {
-        xAxisObj = new AxisFixedScale({
-          type: 'x',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.xAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      } else {
-        xAxisObj = new AxisAutoScale({
-          type: 'x',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.xAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
+      switch (this.options.xAxes[ix].scaleType) {
+        case 'fix':
+          xAxisObj = new AxisFixedScale({
+            type: 'x',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.xAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            horizontal: this.options.horizontal,
+          });
+          break;
+        case 'step':
+          xAxisObj = new AxisStepsScale({
+            type: 'x',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.xAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            category: this.data.category,
+            horizontal: this.options.horizontal,
+          });
+          break;
+        case 'auto':
+        default:
+          xAxisObj = new AxisAutoScale({
+            type: 'x',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.xAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            horizontal: this.options.horizontal,
+          });
+          break;
       }
 
       this.xAxes.push(xAxisObj);
     }
 
     for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
-      if (this.options.yAxes[ix].interval) {
-        yAxisObj = new AxisFixedScale({
-          type: 'y',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.yAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      } else {
-        yAxisObj = new AxisAutoScale({
-          type: 'y',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.yAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
+      switch (this.options.yAxes[ix].scaleType) {
+        case 'fix':
+          yAxisObj = new AxisFixedScale({
+            type: 'y',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.yAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            horizontal: this.options.horizontal,
+          });
+          break;
+        case 'step':
+          yAxisObj = new AxisStepsScale({
+            type: 'y',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.yAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            category: this.data.category,
+            horizontal: this.options.horizontal,
+          });
+          break;
+        case 'auto':
+        default:
+          yAxisObj = new AxisAutoScale({
+            type: 'y',
+            dataSet: this.dataSet,
+            chartRect: this.chartRect,
+            options: this.options.yAxes[ix],
+            ctx: this.bufferCtx,
+            labelOffset: this.labelOffset,
+            axisIndex: ix,
+            horizontal: this.options.horizontal,
+          });
+          break;
       }
 
       this.yAxes.push(yAxisObj);
@@ -344,8 +385,6 @@ class BaseChart {
     for (let ix = 0, ixLen = this.yAxes.length; ix < ixLen; ix++) {
       this.yAxes[ix].createAxis();
     }
-
-    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   calculateX(value, xAxisIndex) {
@@ -357,7 +396,7 @@ class BaseChart {
       return null;
     }
 
-    if (this.options.xAxes[xAxisIndex].type === 'time') {
+    if (this.options.xAxes[xAxisIndex].labelType === 'time') {
       convertValue = +moment(value)._d;
     } else {
       convertValue = value;
@@ -382,7 +421,7 @@ class BaseChart {
       return null;
     }
 
-    if (this.options.yAxes[yAxisIndex].type === 'time') {
+    if (this.options.yAxes[yAxisIndex].labelType === 'time') {
       convertValue = +moment(value)._d;
     } else {
       convertValue = value;

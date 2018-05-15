@@ -151,14 +151,25 @@ class AxisStepsScale extends Axis {
       labelText = this.labelFormat(options.ticks[ix]);
 
       let labelPoint;
+      if (this.units.pos === 'x') {
+        if (ix % this.stepValue === 0 || ix === ixLen) {
+          labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          this.ctx.fillText(labelText, labelCenter + labelPos, labelPoint);
 
-      if ((this.units.pos === 'x' && ix % this.stepValue === 0) || ix === ixLen) {
-        labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        this.ctx.fillText(labelText, labelCenter + labelPos, labelPoint);
+          if (this.options.showGrid) {
+            this.ctx.moveTo(linePosition, offsetPoint);
+            this.ctx.lineTo(linePosition, offsetCounterPoint);
+          }
+        }
+      } else if (this.units.pos === 'y') {
+        if (ix % this.stepValue === 0 || ix === ixLen) {
+          labelPoint = options.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          this.ctx.fillText(labelText, labelPoint, labelCenter + labelPos);
 
-        if (this.options.showGrid) {
-          this.ctx.moveTo(linePosition, offsetPoint);
-          this.ctx.lineTo(linePosition, offsetCounterPoint);
+          if (ix !== 0 && this.options.showGrid) {
+            this.ctx.moveTo(offsetPoint, linePosition);
+            this.ctx.lineTo(offsetCounterPoint, linePosition);
+          }
         }
       }
     }

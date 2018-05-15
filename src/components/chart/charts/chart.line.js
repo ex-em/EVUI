@@ -14,6 +14,8 @@ export default class LineChart extends BaseChart {
     this.setLabelOffset();
     this.createAxis();
     this.createLine();
+
+    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   createLine() {
