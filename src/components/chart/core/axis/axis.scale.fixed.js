@@ -5,7 +5,7 @@ class AxisFixedScale extends Axis {
   constructor(props) {
     super(props);
 
-    if (this.options.type === 'time') {
+    if (this.options.labelType === 'time') {
       this.interval = TIME_INTERVALS[this.options.interval].size;
     } else {
       this.interval = +this.options.interval;

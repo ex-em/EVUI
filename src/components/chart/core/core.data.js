@@ -97,10 +97,14 @@ export default class ChartDataStore {
     if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
       tempValue.x = Object.hasOwnProperty.call(value, 'x') ? value.x : null;
       tempValue.y = Object.hasOwnProperty.call(value, 'y') ? value.y : null;
+    } else if (this.horizontal) {
+        tempValue.x = value;
+        tempValue.y = category[dataIdx] ? category[dataIdx] : null;
     } else {
       tempValue.x = category[dataIdx] ? category[dataIdx] : null;
       tempValue.y = value;
     }
+
     series.data[dataIdx] = tempValue;
     series.data[dataIdx].point = series.point;
 
@@ -162,9 +166,9 @@ export default class ChartDataStore {
 
     const base = bSeries.data[dataIdx];
     const stackValue = {
-      x: category[dataIdx],
-      y: value + base.y,
-      b: base.y || 0,
+      x: this.horizontal ? value + base.x : category[dataIdx],
+      y: this.horizontal ? category[dataIdx] : value + base.y,
+      b: this.horizontal ? (base.x || 0) : (base.y || 0),
       point: true,
     };
 
@@ -311,8 +315,8 @@ export default class ChartDataStore {
     const series = seriesObj;
     const value = valueObj;
 
-    const x = value.x;
-    const y = (+value.y);
+    const x = this.horizontal ? +value.x : value.x;
+    const y = this.horizontal ? value.y : +value.y;
 
     if (this.minValueInfo.y === null || this.minValueInfo.y > y) {
       this.minValueInfo.x = x;
