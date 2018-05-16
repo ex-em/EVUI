@@ -187,7 +187,7 @@
       _reDockInfo() {
         return this.reDockInfo;
       },
-     },
+    },
     mounted() {
     },
     methods: {
