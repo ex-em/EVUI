@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Util from '@/common/utils';
 
 export default class ChartDataStore {
@@ -7,6 +8,7 @@ export default class ChartDataStore {
     });
 
     this.seriesList = [];
+    this.seriesGroupList = [];
     this.maxValueInfo = {
       x: null,
       y: null,
@@ -94,19 +96,30 @@ export default class ChartDataStore {
       dataIdx = series.data.length;
     }
 
-    if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
-      tempValue.x = Object.hasOwnProperty.call(value, 'x') ? value.x : null;
-      tempValue.y = Object.hasOwnProperty.call(value, 'y') ? value.y : null;
-    } else if (this.horizontal) {
+    if (this.chartAxisType === 'axis') {
+      if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
+        tempValue.x = Object.hasOwnProperty.call(value, 'x') ? value.x : null;
+        tempValue.y = Object.hasOwnProperty.call(value, 'y') ? value.y : null;
+      } else if (this.horizontal) {
         tempValue.x = value;
         tempValue.y = category[dataIdx] ? category[dataIdx] : null;
+      } else {
+        tempValue.x = category[dataIdx] ? category[dataIdx] : null;
+        tempValue.y = value;
+      }
     } else {
-      tempValue.x = category[dataIdx] ? category[dataIdx] : null;
-      tempValue.y = value;
+      if (!this.seriesGroupList[dataIdx]) {
+        this.seriesGroupList[dataIdx] = [];
+      }
+      this.seriesGroupList[dataIdx].push({ seriesIndex, data: value });
     }
 
-    series.data[dataIdx] = tempValue;
-    series.data[dataIdx].point = series.point;
+    if (this.chartAxisType === 'axis') {
+      series.data[dataIdx] = tempValue;
+      series.data[dataIdx].point = series.point;
+    } else {
+      series.data[dataIdx] = value;
+    }
 
     if (series.show) {
       this.setMinMaxValue(series, tempValue, dataIdx);
@@ -370,6 +383,10 @@ export default class ChartDataStore {
     return this.seriesList;
   }
 
+  getSeriesGroupList() {
+    return this.seriesGroupList;
+  }
+
   getMaxValueInfo() {
     return this.maxValueInfo;
   }
@@ -380,6 +397,23 @@ export default class ChartDataStore {
 
   getLabelTextMaxInfo() {
     return this.labelTextMaxInfo;
+  }
+
+  sortingDescGroupData(groupIndex) {
+    this.seriesGroupList[groupIndex] = _.orderBy(this.seriesGroupList[groupIndex], 'data', 'desc');
+  }
+
+  getGroupTotalValue(groupIndex) {
+    const group = this.seriesGroupList[groupIndex];
+    let totalValue = 0;
+
+    for (let ix = 0, ixLen = group.length; ix < ixLen; ix++) {
+      if (group[ix].data) {
+        totalValue += group[ix].data;
+      }
+    }
+
+    return totalValue;
   }
 
   getYMaxValue() {

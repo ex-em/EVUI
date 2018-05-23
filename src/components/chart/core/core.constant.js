@@ -27,6 +27,13 @@ export const AXIS_UNITS = {
   },
 };
 
+export const CHART_AXIS_TYPE = {
+  bar: 'axis',
+  line: 'axis',
+  scatter: 'axis',
+  pie: 'axisless',
+};
+
 export const TIME_INTERVALS = {
   millisecond: {
     common: true,
