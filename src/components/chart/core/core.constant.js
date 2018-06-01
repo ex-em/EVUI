@@ -32,6 +32,7 @@ export const CHART_AXIS_TYPE = {
   line: 'axis',
   scatter: 'axis',
   pie: 'axisless',
+  sunburst: 'axisless',
 };
 
 export const TIME_INTERVALS = {

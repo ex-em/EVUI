@@ -35,10 +35,107 @@ export default class ChartDataStore {
     }
 
     const series = this.chartData.series;
+    if (this.structureType === 'tree') {
+      this.initTreeData();
+      this.createTreeDummy();
+    } else {
+      for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
+        this.addSeries(series[ix]);
+        this.addValues(ix, series[ix].data);
+      }
+    }
+  }
+
+  initTreeData() {
+    const series = this.chartData.series;
+    const lvl = 0;
 
     for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
       this.addSeries(series[ix]);
-      this.addValues(ix, series[ix].data);
+
+      const seriesNode = this.seriesList[this.seriesList.length - 1];
+      seriesNode.lvl = lvl;
+      seriesNode.parentIndex = -1;
+      seriesNode.data = series[ix].data;
+
+      const pIndex = seriesNode.parentIndex;
+
+      if (!this.seriesGroupList[lvl]) {
+        // this.seriesGroupList[lvl] = { totalValue: 0, nodeList: [], lvl };
+        this.seriesGroupList[lvl] = {};
+      }
+
+      if (!this.seriesGroupList[lvl][pIndex]) {
+        this.seriesGroupList[lvl][pIndex] = { totalValue: 0, node: [] };
+      }
+
+      this.seriesGroupList[lvl][pIndex].totalValue += seriesNode.data;
+      this.seriesGroupList[lvl][pIndex].node.push({
+        parentIndex: seriesNode.parentIndex,
+        seriesIndex: seriesNode.seriesIndex,
+        data: seriesNode.data,
+        hasChild: !!seriesNode.children.length,
+      });
+
+      for (let jx = 0, jxLen = seriesNode.children.length; jx < jxLen; jx++) {
+        this.traversalDFS(seriesNode.children[jx], seriesNode.seriesIndex);
+      }
+    }
+  }
+
+  traversalDFS(item, parentIndex) {
+    this.addSeries(item);
+    const seriesNode = this.seriesList[this.seriesList.length - 1];
+    const lvl = this.seriesList[parentIndex].lvl + 1;
+
+    seriesNode.lvl = lvl;
+    seriesNode.parentIndex = parentIndex;
+    seriesNode.data = item.data;
+
+    if (!this.seriesGroupList[lvl]) {
+      this.seriesGroupList[lvl] = {};
+    }
+    if (!this.seriesGroupList[lvl][parentIndex]) {
+      this.seriesGroupList[lvl][parentIndex] = { totalValue: 0, node: [] };
+    }
+
+    this.seriesGroupList[lvl][parentIndex].totalValue += seriesNode.data;
+    this.seriesGroupList[lvl][parentIndex].node.push({
+      parentIndex: seriesNode.parentIndex,
+      seriesIndex: seriesNode.seriesIndex,
+      data: seriesNode.data,
+      hasChild: !!seriesNode.children.length,
+    });
+
+    for (let ix = 0, ixLen = seriesNode.children.length; ix < ixLen; ix++) {
+      this.traversalDFS(seriesNode.children[ix], seriesNode.seriesIndex);
+    }
+  }
+
+  createTreeDummy() {
+    let node;
+    let keys;
+
+    for (let ix = 0, ixLen = this.seriesGroupList.length - 1; ix < ixLen; ix++) {
+      keys = Object.keys(this.seriesGroupList[ix]);
+      for (let jx = 0, jxLen = keys.length; jx < jxLen; jx++) {
+        node = this.seriesGroupList[ix][keys[jx]].node;
+
+        for (let kx = 0, kxLen = node.length; kx < kxLen; kx++) {
+          if (!node[kx].hasChild) {
+            this.seriesGroupList[ix + 1][node[kx].seriesIndex] = {
+              totalValue: node[kx].data,
+              node: [{
+                parentIndex: node[kx].seriesIndex,
+                seriesIndex: this.seriesList.length,
+                data: node[kx].data,
+                hasChild: false,
+                isDummy: true,
+              }],
+            };
+          }
+        }
+      }
     }
   }
 
@@ -73,6 +170,8 @@ export default class ChartDataStore {
       dataIndex: 0,
       startPoint: 0,
       horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
+      children: param.children === undefined ? [] : param.children,
+      parentIndex: null,
     };
 
     this.seriesList.push(series);
@@ -367,32 +466,12 @@ export default class ChartDataStore {
     }
   }
 
-  getMaxDataCount() {
-    let temp = 0;
-
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        temp = Math.max(temp, this.seriesList[ix].data.length);
-      }
-    }
-
-    return temp;
-  }
-
   getSeriesList() {
     return this.seriesList;
   }
 
   getSeriesGroupList() {
     return this.seriesGroupList;
-  }
-
-  getMaxValueInfo() {
-    return this.maxValueInfo;
-  }
-
-  getMinValueInfo() {
-    return this.minValueInfo;
   }
 
   getLabelTextMaxInfo() {
@@ -414,100 +493,6 @@ export default class ChartDataStore {
     }
 
     return totalValue;
-  }
-
-  getYMaxValue() {
-    const result = {
-      x: null,
-      y: null,
-      index: null,
-      seriesIndex: null,
-    };
-
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show && this.seriesList[ix].max !== null) {
-        if (this.seriesList[ix].max >= result.y) {
-          result.x = this.seriesList[ix].data[this.seriesList[ix].maxIndex].x;
-          result.y = this.seriesList[ix].max;
-          result.index = this.seriesList[ix].maxIndex;
-          result.seriesIndex = ix;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  getYMinValue() {
-    const result = {
-      x: null,
-      y: null,
-      index: null,
-      seriesIndex: null,
-    };
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show && this.seriesList[ix].min !== null) {
-        if (result.value === null || this.seriesList[ix].min < result.y) {
-          result.x = this.seriesList[ix].data[this.seriesList[ix].minIndex].x;
-          result.y = this.seriesList[ix].min;
-          result.index = this.seriesList[ix].minIndex;
-          result.seriesIndex = ix;
-        }
-      }
-    }
-    return result;
-  }
-
-  getXMaxValue() {
-    const result = {
-      x: null,
-      y: null,
-      seriesIndex: null,
-      dataIndex: null,
-    };
-
-    let data = null;
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
-          data = this.seriesList[ix].data[jx];
-
-          if (result.x === null || (data.x && (data.x > result.x))) {
-            result.value = data.x;
-            result.dataIndex = jx;
-            result.seriesIndex = ix;
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  getXMinValue() {
-    const result = {
-      x: null,
-      y: null,
-      seriesIndex: null,
-      dataIndex: null,
-    };
-
-    let data = null;
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        for (let jx = 0, jxLen = this.seriesList[ix].data.length; jx < jxLen; jx++) {
-          data = this.seriesList[ix].data[jx];
-
-          if (result.x === null || (data.x && (data.x < result.x))) {
-            result.value = data.x;
-            result.dataIndex = jx;
-            result.seriesIndex = ix;
-          }
-        }
-      }
-    }
-
-    return result;
   }
 
   getYValueAxisPerSeries(index) {

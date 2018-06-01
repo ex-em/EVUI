@@ -32,6 +32,7 @@ class BaseChart {
       horizontal: false,
       border: 2,
       doughnutHoleSize: 0,
+      reverse: false,
     };
 
     this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
@@ -57,6 +58,7 @@ class BaseChart {
 
     this.dataSet = new DataStore({
       chartData: this.data,
+      structureType: this.options.type.toLowerCase() === 'sunburst' ? 'tree' : 'array',
       horizontal: this.options.horizontal,
       chartAxisType,
     });
