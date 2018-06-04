@@ -30,6 +30,10 @@ const router = new VueRouter({
       path: '/table',
       component: resolve => require(['./routers/table'], resolve),
     },
+    {
+      path: '/input',
+      component: resolve => require(['./routers/input'], resolve),
+    },
   ],
 });
 
