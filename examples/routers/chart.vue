@@ -1,9 +1,11 @@
 <template>
-  <div style="width: 800px; height: 600px;">
-    <chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+  <div style="width: 100%; height: 100%;">
+    <div style="width: 400px; height: 400px; position: absolute;">
+      <chart
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -18,93 +20,114 @@
         chartData: {
           series: [
             {
-              id: 'series1',
-              name: 'series-1',
+              id: 'series_0',
+              name: 'series_0',
               show: true,
-              point: true,
-              fill: false,
-              xAxisIndex: 0,
-              yAxisIndex: 0,
-              data: [
-                { x: '2018-05-25 00:10:00', y: 20 },
-                { x: '2018-05-25 00:11:00', y: 10 },
-                { x: '2018-05-25 00:12:00', y: 20 },
-                { x: '2018-05-25 00:14:00', y: 50 },
+              data: 15,
+              children: [
+                {
+                  id: 'series_0_0',
+                  name: 'series_0_0',
+                  show: true,
+                  data: 10,
+                },
+                {
+                  id: 'series_0_1',
+                  name: 'series_0_1',
+                  show: true,
+                  data: 12,
+                },
               ],
             },
             {
-              id: 'series2',
-              name: 'series-2',
+              id: 'series_1',
+              name: 'series_1',
               show: true,
-              point: true,
-              xAxisIndex: 0,
-              yAxisIndex: 0,
-              data: [
-                { x: '2018-05-25 00:10:00', y: 22 },
-                { x: '2018-05-25 00:10:30', y: 42 },
-                { x: '2018-05-25 00:11:00', y: null },
-                { x: '2018-05-25 00:12:20', y: 48 },
-                { x: '2018-05-25 00:13:10', y: 32 },
+              data: 10,
+              children: [
+                {
+                  id: 'series_1_0',
+                  name: 'series_1_0',
+                  show: true,
+                  data: 17,
+                },
+                {
+                  id: 'series_1_1',
+                  name: 'series_1_1',
+                  show: true,
+                  data: 13,
+                  children: [
+                    {
+                      id: 'series_1_1_0',
+                      name: 'series_1_1_0',
+                      show: true,
+                      data: 17,
+                    },
+                    {
+                      id: 'series_1_1_1',
+                      name: 'series_1_1_1',
+                      show: true,
+                      data: 10,
+                    },
+                  ],
+                },
+                {
+                  id: 'series_1_2',
+                  name: 'series_1_3',
+                  show: true,
+                  data: 30,
+                  children: [
+                    {
+                      id: 'series_1_2_0',
+                      name: 'series_1_2_0',
+                      show: true,
+                      data: 17,
+                      children: [
+                        {
+                          id: 'series_1_2_0',
+                          name: 'series_1_2_0',
+                          show: true,
+                          data: 10,
+                        },
+                        {
+                          id: 'series_1_2_0',
+                          name: 'series_1_2_0',
+                          show: true,
+                          data: 10,
+                        },
+                        {
+                          id: 'series_1_2_0',
+                          name: 'series_1_2_0',
+                          show: true,
+                          data: 15,
+                        },
+                      ],
+                    },
+                  ],
+                },
               ],
             },
             {
-              id: 'series3',
-              name: 'series-3',
+              id: 'series_2',
+              name: 'series_2',
               show: true,
-              point: true,
-              fill: true,
-              xAxisIndex: 0,
-              yAxisIndex: 0,
-              data: [
-                { x: '2018-05-25 00:10:00', y: 25 },
-                { x: '2018-05-25 00:11:00', y: 18 },
-                { x: '2018-05-25 00:12:00', y: 37 },
-                { x: '2018-05-25 00:12:10', y: 31 },
-                { x: '2018-05-25 00:12:15', y: 33 },
-                { x: '2018-05-25 00:13:00', y: 15 },
-                { x: '2018-05-25 00:14:00', y: 10 },
-              ],
+              data: 12,
             },
           ],
         },
         chartOptions: {
-          type: 'LINE',
+          type: 'sunburst',
           width: '100%',
           height: '100%',
+          border: 2,
+          doughnutHoleSize: 0.4,
           title: {
-            text: 'EVUI CHART 2.0 (LINE)',
-            style: '20px Arial',
+            text: 'EVUI CHART 2.0',
+            style: '20px Droid Sans',
             color: '#000000',
             height: 50,
             show: true,
           },
-          xAxes: [{
-            type: 'time', // linear, step, time
-            tickFormat: 'hh:mm:ss',
-            showGrid: true,
-            position: 'bottom',
-            min: '2018-05-25 00:10:00',
-            max: '2018-05-25 00:14:00',
-          }],
-          yAxes: [{
-            type: 'linear',
-            showGrid: false,
-            position: 'left',
-            min: 10,
-            max: 50,
-          }],
-          // yAxes: [{
-          //   type: 'linear',
-          //   showGrid: true,
-          //   min: 10,
-          //   max: 50,
-          // }],
-          // xAxes: [{
-          //   type: 'time', // linear, step, time
-          //   tickFormat: 'hh:mm:ss',
-          //   showGrid: true,
-          //   interval: 'minute',
-          // }],
         },
       };
     },

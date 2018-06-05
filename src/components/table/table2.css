@@ -293,43 +293,9 @@
   overflow: hidden;
   position: relative;
 }
-.evui-grid .evui-grid-body table .evui-head.evui-col-intersection {
-  border-right-color: #72b2ff;
-}
+
 .evui-grid .evui-grid-body table .evui-head.evui-reorder-cols-head:hover {
   cursor: move;
-}
-.evui-grid .evui-grid-body table .evui-head .col-intersection-marker {
-  padding: 0;
-  position: absolute;
-  height: 100%;
-  top: 0;
-}
-.evui-grid .evui-grid-body table .evui-head .col-intersection-marker.left {
-  left: 0;
-  margin-left: -5px;
-}
-.evui-grid .evui-grid-body table .evui-head .col-intersection-marker.right {
-  right: 0;
-  margin-right: -5px;
-}
-.evui-grid .evui-grid-body table .evui-head .col-intersection-marker .top-marker {
-  position: absolute;
-  top: 0;
-  height: 0;
-  width: 0;
-  border-top: 5px solid #72b2ff;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-}
-.evui-grid .evui-grid-body table .evui-head .col-intersection-marker .bottom-marker {
-  position: absolute;
-  bottom: 0;
-  height: 0;
-  width: 0;
-  border-bottom: 5px solid #72b2ff;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
 }
 .evui-grid .evui-grid-body table td {
   border-right: 1px solid #d6d5d7;
@@ -462,12 +428,12 @@
 }
 .evui-grid .evui-grid-footer .evui-footer-left {
   float: left;
-  padding-top: 5px;
+  padding-top: 3px;
   padding-left: 5px;
 }
 .evui-grid .evui-grid-footer .evui-footer-right {
   float: right;
-  padding-top: 5px;
+  padding-top: 3px;
   padding-right: 5px;
 }
 .evui-grid .evui-grid-footer .evui-footer-center {
@@ -510,4 +476,43 @@
   border-top: 1px solid #ddd;
   border-right: 1px solid #ddd;
   background-color: #FAFAFA;
+}
+.evui-head-ghost {
+  width: 100px;
+  height: 25px;
+  border-right: 1px solid #c5c5c5;
+  border-bottom: 1px solid #c5c5c5;
+  z-index: 9999;
+  background-image: linear-gradient(#f9f9f9, #e4e4e4);
+  opacity: 0.8;
+  padding: 6px 3px;
+  display: none;
+}
+.col-intersection-marker {
+  padding: 0;
+  position: absolute;
+  height: 25px;
+  top: 0;
+  left: 0;
+  margin-left: -5px;
+  z-index: 9999;
+  display: none;
+}
+.col-intersection-marker .top-marker {
+  position: relative;
+  top: 0;
+  height: 0;
+  width: 0;
+  border-top: 5px solid #72b2ff;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.col-intersection-marker .bottom-marker {
+  position: absolute;
+  bottom: 0;
+  height: 0;
+  width: 0;
+  border-bottom: 5px solid #72b2ff;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
 }
