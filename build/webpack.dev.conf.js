@@ -6,12 +6,9 @@ const merge = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.conf.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-
-
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
-
 module.exports = merge(webpackBaseConfig, {
   entry: {
     app: './examples/main.js',
@@ -46,7 +43,7 @@ module.exports = merge(webpackBaseConfig, {
     open: true,
     hot: true,
     inline: true,
-    host: '10.10.102.67',
+    //host: HOST || 'localhost',
     port: '8888'
   },
   plugins: [

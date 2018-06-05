@@ -16,7 +16,7 @@
     <label
       :for="id"
     >
-      {{ labelData }}
+      {{ label }}
     </label>
   </div>
 </template>
@@ -63,14 +63,13 @@
     },
     data() {
       return {
-        labelData: this.label,
       };
     },
     computed: {
       wrapClasses() {
         return [
           {
-            'evui-diabled': this.disabled,
+            'evui-disabled': this.disabled,
           },
         ];
       },
