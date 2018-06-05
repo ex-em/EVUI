@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import { CHART_AXIS_TYPE } from '../core/core.constant';
 import DataStore from '../core/core.data';
 import Util from '../core/core.util';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
@@ -29,6 +30,9 @@ class BaseChart {
         left: 5,
       },
       horizontal: false,
+      border: 2,
+      doughnutHoleSize: 0,
+      reverse: false,
     };
 
     this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
@@ -39,6 +43,7 @@ class BaseChart {
     this.container = document.createElement('div');
     this.container.className = 'evui-chart-inner';
 
+    const chartAxisType = CHART_AXIS_TYPE[this.options.type];
 
     if (target === null) {
       throw new Error('[EVUI][ERROR][Chart]-Not found Target for rendering Chart');
@@ -47,11 +52,15 @@ class BaseChart {
     }
 
     this.createCanvas();
-    this.createAxesOptions();
+    if (chartAxisType === 'axis') {
+      this.createAxesOptions();
+    }
 
     this.dataSet = new DataStore({
       chartData: this.data,
+      structureType: this.options.type.toLowerCase() === 'sunburst' ? 'tree' : 'array',
       horizontal: this.options.horizontal,
+      chartAxisType,
     });
 
     this.dataSet.init();

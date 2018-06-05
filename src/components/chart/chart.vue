@@ -10,6 +10,8 @@
   import LineChart from './charts/chart.line';
   import ScatterChart from './charts/chart.scatter';
   import BarChart from './charts/chart.bar';
+  import PieChart from './charts/chart.pie';
+  import SunburstChart from './charts/chart.sunburst';
 
   export default {
     props: {
@@ -56,6 +58,12 @@
           break;
         case 'bar':
           this.chart = new BarChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'pie':
+          this.chart = new PieChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'sunburst':
+          this.chart = new SunburstChart(this.$refs.wrapper, this.$props.data, this.$props.options);
           break;
         default:
           this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
