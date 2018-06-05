@@ -1,32 +1,7 @@
-import moment from 'moment';
-import { AXIS_UNITS } from '../core.constant';
+import Axis from './axis';
 import Util from '../core.util';
 
-class Axis {
-  constructor(props) {
-    Object.keys(props).forEach((key) => {
-      this[key] = props[key];
-    });
-
-    if (!this.options.scaleType) {
-      this.options.scaleType = 'auto';
-    }
-
-    if (!this.options.labelType) {
-      this.options.labelType = 'linear';
-    }
-
-    this.units = AXIS_UNITS[this.type];
-    this.startFromZero = false;
-    this.skipFitting = false;
-    this.integersOnly = true;
-  }
-
-  createAxis() {
-    this.calculateRange();
-    this.drawAxis();
-  }
-
+class AxisStepsScale extends Axis {
   calculateRange() {
     // init variable
     const options = this.options;
@@ -56,7 +31,7 @@ class Axis {
       // tickSize는 실제 step을 구하기 위해 각 축의 Label중 가장 큰 값을 기준으로 Size를 구한다.
       tickSize = this.ctx.measureText(this.labelFormat(maxLabelInfo.xText)).width + 20;
     } else {
-     // Y축의 경우 글자의 높이로 전체 영역을 나누기 위함.
+      // Y축의 경우 글자의 높이로 전체 영역을 나누기 위함.
       tickSize = options.labelStyle.fontSize * 2;
     }
 
@@ -65,47 +40,41 @@ class Axis {
 
     this.skipFitting = minSteps >= maxSteps;
 
-    let maxValue;
-    let minValue;
-    let minMaxValue;
+    this.calculateSteps(maxSteps, minSteps);
+  }
 
-    if (this.units.pos === 'x') {
-      minMaxValue = this.dataSet.getXValueAxisPerSeries(this.axisIndex);
-    } else {
-      minMaxValue = this.dataSet.getYValueAxisPerSeries(this.axisIndex);
+  calculateSteps(maxSteps, minSteps) {
+    const graphMax = this.category[this.category.length - 1];
+    const graphMin = this.category[0];
+    const graphRange = this.category.length;
+
+    let stepValue = 1;
+    let numberOfSteps = Math.round(graphRange / stepValue);
+
+    if (graphMax === 1) {
+      stepValue = 1;
+      numberOfSteps = 1;
     }
 
-    if (options.labelType === 'time') {
-      // axis option의 label type이 time일 경우 moment로 date객체 생성 후 long type으로 변환
-      maxValue = +moment(options.max || minMaxValue.max)._d;
-      minValue = +moment(options.min || minMaxValue.min)._d;
-    } else {
-      maxValue = options.max || minMaxValue.max;
-      minValue = options.min || minMaxValue.min;
-    }
+    while (numberOfSteps > maxSteps && !this.skipFitting) {
+      stepValue *= 2;
+      numberOfSteps = Math.round(graphRange / stepValue);
 
-    if (options.autoScaleRatio !== null) {
-      maxValue *= (options.autoScaleRatio + 1);
-    }
-
-    if (options.labelType === 'linear' && minValue <= 10) {
-      this.startFromZero = true;
-    }
-
-    if (maxValue < 1) {
-      maxValue = 1;
-    }
-
-    if (maxValue === minValue) {
-      maxValue += 0.5;
-      if (minValue >= 0.5 && !this.startFromZero) {
-        minValue -= 0.5;
-      } else {
-        maxValue += 0.5;
+      if (numberOfSteps % 1 !== 0) {
+        this.skipFitting = true;
       }
     }
 
-    this.calculateSteps(maxValue, minValue, maxSteps, minSteps);
+    if (this.skipFitting) {
+      numberOfSteps = minSteps;
+      stepValue = graphRange / numberOfSteps;
+    }
+
+    this.steps = numberOfSteps;
+    this.stepValue = stepValue;
+    this.isStepValueFloat = false;
+    this.axisMin = graphMin;
+    this.axisMax = graphMax;
   }
 
   drawAxis() {
@@ -119,7 +88,7 @@ class Axis {
     this.ctx.font = Util.getLabelStyle(options);
 
     if (this.units.pos === 'x') {
-      this.ctx.textAlign = 'center';
+      this.ctx.textAlign = this.stepValue > 1 ? 'start' : 'center';
       this.ctx.textBaseline = options.position === 'top' ? 'bottom' : 'top';
     } else if (this.units.pos === 'y') {
       this.ctx.textAlign = options.position === 'left' ? 'right' : 'left';
@@ -132,7 +101,7 @@ class Axis {
     }
 
     // 각 라벨간 간격
-    const labelGap = (endPoint - startPoint) / this.steps;
+    const labelGap = (endPoint - startPoint) / this.category.length;
 
     let labelCenter = null;
     let linePosition = null;
@@ -166,51 +135,47 @@ class Axis {
     this.ctx.strokeStyle = options.gridLineColor;
 
     let labelText;
-    for (let ix = 0, ixLen = this.steps; ix <= ixLen; ix++) {
-      if (this.isStepValueFloat) {
-        options.ticks[ix] = Math.round(this.axisMin + ((ix * this.stepValue) * 10)) / 10;
+    let labelPos;
+
+    for (let ix = 0, ixLen = this.category.length; ix <= ixLen; ix++) {
+      if (this.category[ix]) {
+        options.ticks[ix] = this.category[ix];
       } else {
-        options.ticks[ix] = this.axisMin + (ix * this.stepValue);
+        options.ticks[ix] = '';
       }
+      // step Skip이 존재할 때 label 위치 보정
+      labelPos = this.stepValue > 1 ? 0 : labelGap / 2;
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel;
       labelText = this.labelFormat(options.ticks[ix]);
 
       let labelPoint;
-
       if (this.units.pos === 'x') {
-        labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        this.ctx.fillText(labelText, labelCenter, labelPoint);
+        if (ix % this.stepValue === 0 || ix === ixLen) {
+          labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          this.ctx.fillText(labelText, labelCenter + labelPos, labelPoint);
 
-        if (ix !== 0 && this.options.showGrid) {
-          this.ctx.moveTo(linePosition, offsetPoint);
-          this.ctx.lineTo(linePosition, offsetCounterPoint);
+          if (this.options.showGrid) {
+            this.ctx.moveTo(linePosition, offsetPoint);
+            this.ctx.lineTo(linePosition, offsetCounterPoint);
+          }
         }
-      } else {
-        labelPoint = options.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        this.ctx.fillText(labelText, labelPoint, labelCenter);
+      } else if (this.units.pos === 'y') {
+        if (ix % this.stepValue === 0 || ix === ixLen) {
+          labelPoint = options.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          this.ctx.fillText(labelText, labelPoint, labelCenter + labelPos);
 
-        if (ix !== 0 && this.options.showGrid) {
-          this.ctx.moveTo(offsetPoint, linePosition);
-          this.ctx.lineTo(offsetCounterPoint, linePosition);
+          if (ix !== 0 && this.options.showGrid) {
+            this.ctx.moveTo(offsetPoint, linePosition);
+            this.ctx.lineTo(offsetCounterPoint, linePosition);
+          }
         }
       }
     }
 
     this.ctx.stroke();
   }
-
-  labelFormat(value) {
-    let formattingValue;
-    if (this.options.labelType === 'time') {
-      formattingValue = moment(value).format(this.options.tickFormat);
-    } else {
-      formattingValue = value;
-    }
-
-    return formattingValue;
-  }
 }
 
-export default Axis;
+export default AxisStepsScale;

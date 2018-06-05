@@ -8,19 +8,29 @@
 <script>
   import Util from './core/core.util';
   import LineChart from './charts/chart.line';
+  import ScatterChart from './charts/chart.scatter';
+  import BarChart from './charts/chart.bar';
+  import PieChart from './charts/chart.pie';
+  import SunburstChart from './charts/chart.sunburst';
 
   export default {
     props: {
       options: {
         type: Object,
         default() {
-          return {};
+          return {
+            type: 'line',
+            xAxes: [],
+            yAxes: [],
+          };
         },
       },
       data: {
         type: Object,
         default() {
-          return {};
+          return {
+            series: [],
+          };
         },
       },
     },
@@ -37,7 +47,29 @@
       };
     },
     mounted() {
-      this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+      const chartType = this.$props.options.type || '';
+
+      switch (chartType.toLowerCase()) {
+        case 'line':
+          this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'scatter':
+          this.chart = new ScatterChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'bar':
+          this.chart = new BarChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'pie':
+          this.chart = new PieChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        case 'sunburst':
+          this.chart = new SunburstChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+        default:
+          this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          break;
+      }
+
       this.chart.createChart();
     },
     methods: {

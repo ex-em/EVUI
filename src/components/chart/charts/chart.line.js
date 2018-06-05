@@ -1,19 +1,9 @@
-import _ from 'lodash';
-import moment from 'moment';
 import BaseChart from './chart.base';
 import Util from '../core/core.util';
-import AxisAutoScale from '../core/axis/axis.scale.auto';
-import AxisFixedScale from '../core/axis/axis.scale.fixed';
 
 export default class LineChart extends BaseChart {
   constructor(target, data, options) {
-    const defaultOptions = {
-      isScatter: false,
-      lineWidth: 2,
-      pointSize: 5,
-    };
-
-    super(target, data, _.merge({}, defaultOptions, options));
+    super(target, data, options);
     this.seriesList = this.dataSet.getSeriesList();
   }
 
@@ -24,74 +14,6 @@ export default class LineChart extends BaseChart {
     this.setLabelOffset();
     this.createAxis();
     this.createLine();
-  }
-
-  createAxis() {
-    let xAxisObj;
-    let yAxisObj;
-
-    this.xAxes = [];
-    this.yAxes = [];
-
-    for (let ix = 0, ixLen = this.options.xAxes.length; ix < ixLen; ix++) {
-      if (this.options.xAxes[ix].interval) {
-        xAxisObj = new AxisFixedScale({
-          type: 'x',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.xAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      } else {
-        xAxisObj = new AxisAutoScale({
-          type: 'x',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.xAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      }
-
-      this.xAxes.push(xAxisObj);
-    }
-
-    for (let ix = 0, ixLen = this.options.yAxes.length; ix < ixLen; ix++) {
-      if (this.options.yAxes[ix].interval) {
-        yAxisObj = new AxisFixedScale({
-          type: 'y',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.yAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      } else {
-        yAxisObj = new AxisAutoScale({
-          type: 'y',
-          dataSet: this.dataSet,
-          chartRect: this.chartRect,
-          options: this.options.yAxes[ix],
-          ctx: this.bufferCtx,
-          labelOffset: this.labelOffset,
-          axisIndex: ix,
-        });
-      }
-
-      this.yAxes.push(yAxisObj);
-    }
-
-    for (let ix = 0, ixLen = this.xAxes.length; ix < ixLen; ix++) {
-      this.xAxes[ix].createAxis();
-    }
-
-    for (let ix = 0, ixLen = this.yAxes.length; ix < ixLen; ix++) {
-      this.yAxes[ix].createAxis();
-    }
 
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
@@ -133,20 +55,33 @@ export default class LineChart extends BaseChart {
     let x = null;
     let y = null;
     let data;
+    let convX;
+    let convY;
 
     for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
       data = series.data[ix];
 
       x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y);
+      y = this.calculateY(data.y, series.axisIndex.y, false);
 
       if (y === null) {
         if (ix - 1 >= 0) {
           if (series.fill && series.data[ix - 1].y !== null) {
             ctx.stroke();
             ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
-            ctx.lineTo(xPoint[ix - 1], endPoint);
-            ctx.lineTo(xPoint[startFillIndex], endPoint);
+
+            if (series.stack && series.hasAccumulate) {
+              for (let jx = ix; jx >= startFillIndex; jx--) {
+                for (let kx = series.data[jx].b.length - 1; kx >= 0; kx--) {
+                  convX = this.calculateX(series.data[jx].b[kx].x, series.axisIndex.x);
+                  convY = this.calculateY(series.data[jx].b[kx].y, series.axisIndex.y);
+                  ctx.lineTo(convX, convY);
+                }
+              }
+            } else {
+              ctx.lineTo(xPoint[ix - 1], endPoint);
+              ctx.lineTo(xPoint[startFillIndex], endPoint);
+            }
             // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
             // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
 
@@ -174,8 +109,20 @@ export default class LineChart extends BaseChart {
       ctx.stroke();
 
       ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
-      ctx.lineTo(xPoint[series.data.length - 1], endPoint);
-      ctx.lineTo(xPoint[startFillIndex], endPoint);
+
+      if (series.stack && series.hasAccumulate) {
+        for (let ix = series.data.length - 1; ix >= startFillIndex; ix--) {
+          for (let jx = series.data[ix].b.length - 1; jx >= 0; jx--) {
+            this.tmp = series.data[ix];
+            convX = this.calculateX(series.data[ix].b[jx].x, series.axisIndex.x);
+            convY = this.calculateY(series.data[ix].b[jx].y, series.axisIndex.y);
+            ctx.lineTo(convX, convY);
+          }
+        }
+      } else {
+        ctx.lineTo(xPoint[series.data.length - 1], endPoint);
+        ctx.lineTo(xPoint[startFillIndex], endPoint);
+      }
       // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
       // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
 
@@ -189,69 +136,12 @@ export default class LineChart extends BaseChart {
       ctx.fillStyle = series.fillColor || '#fff';
       ctx.lineWidth = series.lineWidth;
       for (let ix = 0, ixLen = series.data.length; ix < ixLen; ix++) {
-        if (xPoint[ix] !== null && yPoint[ix] !== null) {
-          ctx.moveTo(xPoint[ix], yPoint[ix]);
-          ctx.arc(xPoint[ix], yPoint[ix], series.pointSize, 0, Math.PI * 2);
+        if (xPoint[ix] !== null && yPoint[ix] !== null && series.data[ix].point) {
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
         }
       }
       ctx.stroke();
       ctx.fill();
     }
-  }
-
-  calculateX(value, xAxisIndex) {
-    const maxValue = this.xAxes[xAxisIndex].axisMax;
-    const minValue = this.xAxes[xAxisIndex].axisMin;
-    let convertValue;
-
-    if (value === null) {
-      return null;
-    }
-
-    if (this.options.xAxes[xAxisIndex].type === 'time') {
-      convertValue = +moment(value)._d;
-    } else {
-      convertValue = value;
-    }
-
-    if (convertValue > maxValue || convertValue < minValue) {
-      return undefined;
-    }
-
-    const scalingFactor = this.drawingXArea() / (maxValue - minValue);
-    return (this.chartRect.x1 + this.labelOffset.left) +
-      (scalingFactor * (convertValue - (minValue || 0)));
-  }
-
-  calculateY(value, yAxisIndex) {
-    const maxValue = this.yAxes[yAxisIndex].axisMax;
-    const minValue = this.yAxes[yAxisIndex].axisMin;
-    let convertValue;
-
-    if (value === null) {
-      return null;
-    }
-
-    if (this.options.yAxes[yAxisIndex].type === 'time') {
-      convertValue = +moment(value)._d;
-    } else {
-      convertValue = value;
-    }
-
-    if (convertValue > maxValue || convertValue < minValue) {
-      return null;
-    }
-
-    const scalingFactor = this.drawingYArea() / (maxValue - minValue);
-    return (this.chartRect.y2 - this.labelOffset.bottom) -
-      (scalingFactor * (convertValue - (minValue || 0)));
-  }
-
-  drawingXArea() {
-    return this.chartRect.chartWidth - (this.labelOffset.left + this.labelOffset.right);
-  }
-
-  drawingYArea() {
-    return this.chartRect.chartHeight - (this.labelOffset.top + this.labelOffset.bottom);
   }
 }
