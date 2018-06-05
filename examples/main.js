@@ -34,6 +34,10 @@ const router = new VueRouter({
       path: '/table',
       component: resolve => require(['./routers/table'], resolve),
     },
+    {
+      path: '/table2',
+      component: resolve => require(['./routers/table2'], resolve),
+    },
   ],
 });
 

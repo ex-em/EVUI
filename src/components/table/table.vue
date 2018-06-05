@@ -57,80 +57,69 @@
           </table>
         </div>
         <div
-          id="grid_grid_records"
+          ref="evuiGridRecords"
           class="evui-grid-records"
           style="top: 25px; overflow-x: auto; overflow-y: auto;"
           @scroll="scrollColumns">
-          <table>
-            <tbody>
-              <tr line="0">
-                <td
-                  class="evui-grid-data evui-grid-data-spacer"
-                  col="start"
-                  style="height: 0px; width: 0px;"/>
-
-                <template v-for="(column, index) in columnsInfo">
+          <div
+            ref="evuiRecordsTable">
+            <table>
+              <tbody>
+                <tr line="0">
                   <td
-                    :key="index"
-                    :col="index"
-                    :style="{height: '0px', width: column.width}"
-                    class="evui-grid-data"/>
-                </template>
-              </tr>
-              <tr
-                id="grid_grid_rec_top"
-                line="top"
-                style="height: 0px">
-                <td colspan="2000"/>
-              </tr>
-
-              <template v-for="(row, rowIndex) in resultData">
-                <tr
-                  :key="rowIndex"
-                  :line="(rowIndex+1)"
-                  :index="rowIndex"
-                  :class="(rowIndex+1)%2 !== 0 ? 'evui-odd' : 'evui-even'"
-                  style="height: 24px; ">
-                  <td
-                    class="evui-grid-data-spacer"
+                    class="evui-grid-data evui-grid-data-spacer"
                     col="start"
-                    style="border-right: 0"/>
+                    style="height: 0px; width: 0px;"/>
 
-                  <template v-for="(col, colIndex) in columnsInfo">
+                  <template v-for="(column, index) in columnsInfo">
                     <td
-                      :key="colIndex"
-                      :col="colIndex"
-                      class="evui-grid-data "
-                      style="">
-                      <div style="max-height: 24px;">
-                        {{ row[col.field] }}
-                      </div>
-                    </td>
+                      :key="index"
+                      :col="index"
+                      :style="{height: '0px', width: column.width}"
+                      class="evui-grid-data"/>
                   </template>
-
-                  <td
-                    class="evui-grid-data-last"
-                    col="end"/>
                 </tr>
-              </template>
 
-              <tr
-                id="grid_grid_rec_bottom"
-                line="bottom"
-                style="height: 0px">
-                <td
-                  colspan="2000"
-                  style="border: 0"/>
-              </tr>
-              <tr
-                id="grid_grid_rec_more"
-                style="display: none">
-                <td
-                  colspan="2000"
-                  class="evui-load-more"/>
-              </tr>
-            </tbody>
-          </table>
+                <template v-for="(row, rowIndex) in resultData">
+                  <tr
+                    :key="rowIndex"
+                    :line="(rowIndex+1)"
+                    :index="rowIndex"
+                    :class="(rowIndex+1)%2 !== 0 ? 'evui-odd' : 'evui-even'"
+                    :style="{height: `${rowHeight}px`}">
+                    <td
+                      class="evui-grid-data-spacer"
+                      col="start"
+                      style="border-right: 0"/>
+
+                    <template v-for="(col, colIndex) in columnsInfo">
+                      <td
+                        :key="colIndex"
+                        :col="colIndex"
+                        class="evui-grid-data "
+                        style="">
+                        <div style="max-height: 24px;">
+                          {{ row[col.field] }}
+                        </div>
+                      </td>
+                    </template>
+
+                    <td
+                      class="evui-grid-data-last"
+                      col="end"/>
+                  </tr>
+                </template>
+
+                <tr
+                  id="grid_grid_rec_more"
+                  style="display: none">
+                  <td
+                    colspan="2000"
+                    class="evui-load-more"/>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <div
@@ -226,6 +215,10 @@
         type: Number,
         default: 50,
       },
+      virtualScroll: {
+        type: Boolean,
+        default: false,
+      },
     },
 
     data() {
@@ -258,6 +251,20 @@
           { recid: 200, fname: 'Manny', lname: 'Zilver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
           { recid: 14, fname: 'Manny', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
           { recid: 15, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 16, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 17, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 18, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 19, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 20, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 21, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 22, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 23, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 24, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 25, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 26, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 27, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 28, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
+          { recid: 29, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
         ],
 
         // sort 관련 데이터들
@@ -271,6 +278,7 @@
         // 넓이 계산용
         gridBoxWidth: 0,
         gridBoxHeight: 0,
+        gridRecordsHeight: 0,
         footerHeight: 24,
 
         // 컬럼들값보다 그리드가 클때 마지막 추가 컬럼 크기
@@ -285,6 +293,13 @@
           width: 0,
           sortable: false,
         },
+        rowHeight: 24,
+
+        // 가상 스크롤 관련
+        virtualRowCount: 0,
+        virtualTop: 0,
+        virtualBottom: 0,
+        prevScrollTop: 0,
 
         // 그리드가 퍼센트인지 확인용
         isPercentSize: false,
@@ -355,10 +370,19 @@
       // 그리드박스 높이 너비 가져오기
       this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
       this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
+      this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
 
       if (this.pagination) {
         const gridBody = this.$refs.evuiGridBody;
         gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
+      } else if (this.virtualScroll) {
+        this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
+        // this.s
+        this.virtualBottom = this.virtualRowCount;
+        this.$refs.evuiRecordsTable.style.height = `${this.records.length * this.rowHeight}px`;
+
+        this.resultData = this.records.slice(this.virtualTop, this.virtualBottom);
+        // debugger;
       }
 
       // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
@@ -384,7 +408,7 @@
         }
       }
 
-      this.verticalScroll = (this.gridBoxHeight - 25) < (this.records.length * 24);
+      this.verticalScroll = this.gridRecordsHeight < (this.records.length * this.rowHeight);
       let leftSize;
       if (this.verticalScroll) {
         leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
@@ -533,8 +557,8 @@
               const directionList = _.map(this.sortColumns, 'direction');
               this.sortedData = _.orderBy(this.sortedData, filedList, directionList);
 
-              // 정렬 값을 resultData에 넣어주자
-              // pagination 조거 추가됨
+              // 정렬 값을 result Data에 넣어주자
+              // pagination 조건 추가됨
               if (this.pagination) {
                 const start = (this.currentPage - 1) * this.pageSize;
                 const end = this.currentPage * this.pageSize;
@@ -713,7 +737,50 @@
         }, 200);
       },
       scrollColumns(e) {
+        // horizontal 스크롤용
+        const vm = this;
         this.$refs.gridColumns.scrollLeft = e.currentTarget.scrollLeft;
+
+        if (!this.virtualScroll) {
+          return;
+        }
+        // vertical 스크롤용
+        const scrollTop = this.$refs.evuiGridRecords.scrollTop;
+
+        function onJump() {
+          vm.virtualTop = parseInt(scrollTop / vm.rowHeight, 10);
+          vm.virtualBottom = vm.virtualTop + vm.virtualRowCount;
+          vm.$refs.evuiRecordsTable.style.paddingTop = `${vm.virtualTop * vm.rowHeight}px`;
+          if (vm.isSort) {
+            vm.resultData = vm.sortedData.slice(vm.virtualTop, vm.virtualBottom);
+          } else {
+            vm.resultData = vm.records.slice(vm.virtualTop, vm.virtualBottom);
+          }
+          vm.prevScrollTop = scrollTop;
+        }
+
+        function onNearScroll() {
+          // 현재 스크롤된양
+          const nextTop = parseInt(scrollTop / vm.rowHeight, 10);
+
+          if (vm.virtualTop !== nextTop) {
+            vm.virtualTop = nextTop;
+            vm.virtualBottom = vm.virtualTop + vm.virtualRowCount;
+          }
+          vm.$refs.evuiRecordsTable.style.paddingTop = `${vm.virtualTop * vm.rowHeight}px`;
+          if (vm.isSort) {
+            vm.resultData = vm.sortedData.slice(vm.virtualTop, vm.virtualBottom);
+          } else {
+            vm.resultData = vm.records.slice(vm.virtualTop, vm.virtualBottom);
+          }
+          vm.prevScrollTop = scrollTop;
+        }
+
+        if (Math.abs(scrollTop - vm.prevScrollTop) > vm.gridRecordsHeight) {
+          onJump();
+        } else {
+          onNearScroll();
+        }
       },
       movePage(value) {
         switch (value) {
@@ -737,7 +804,7 @@
   };
 </script>
 <style scoped>
-  button{
-    user-select: none;
-  }
+   button {
+     user-select: none;
+   }
 </style>
