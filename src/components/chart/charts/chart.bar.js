@@ -27,7 +27,7 @@ export default class BarChart extends BaseChart {
   drawSeries(seriesIndex) {
     // 해당 series 정보 및 ctx 등 확인
     const series = this.seriesList[seriesIndex];
-    const category = this.data.category;
+    const category = this.data.category || [];
     const ctx = this.bufferCtx;
     // series에 특정한 color 값이 없다면, options의 colors 참조
 
@@ -37,7 +37,7 @@ export default class BarChart extends BaseChart {
 
     // bar 차트는 category가 중심이 되며 축의 넓이를 category의 수로 나눠 각 cateogory의 넓이를 구함.
     const drawingArea = this.options.horizontal ? this.drawingYArea() : this.drawingXArea();
-    const categoryArea = drawingArea / category.length;
+    const categoryArea = drawingArea / (category.length || 1);
     // category간 padding값 (left, right)
     const categoryPadding = 2;
     let barArea;
