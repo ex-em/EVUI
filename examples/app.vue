@@ -19,7 +19,10 @@
           <router-link to="/selectbox">Selectbox</router-link>
         </li>
         <li>
-          <router-link to="/table">Table</router-link>
+          <router-link to="/table">Table(page)</router-link>
+        </li>
+        <li>
+          <router-link to="/table2">Table(virtualScroll)</router-link>
         </li>
       </ul>
     </nav>

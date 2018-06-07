@@ -14,13 +14,14 @@
         v-for="item in arrayLayoutData"
         :key = "item.id"
       >
-        <compoenet
+        <component
           :is="item"
           :dock-frame-title="DockTitle"
-          :dock-pos = "addDockLayoutPos"
+          :dock-pos="addDockLayoutPos"
           :dock-size="dockFrameSize"
-          :rootframe = "vmMain"
-          :compnentpopup = "addEvuiCompent"
+          :rootframe="vmMain"
+          :compnentpopup="addEvuiCompent"
+          :add-dock-vm="_addDockFrameVm"
         />
       </keep-alive>
       <slot/>
@@ -129,9 +130,10 @@
     '                :vmMain="vmRoot"' +
     '                :type="addType"' +
     '                :pos="pos"' +
+    '                :content="addComponent"' +
     '              :title="title">' +
     '             <keep-alive>' +
-    '              <compoenet :is="addComponent"/>' +
+    '              <component  :is="addComponent"/>' +
     '             </keep-alive>' +
     '              </dock-frame>',
     computed: {
@@ -171,26 +173,33 @@
         type: Object,
         default: null,
       },
+      addDockVm: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         title: this.dockFrameTitle,
         width: this.dockSize.width,
         height: this.dockSize.height,
+        subWidth: this.dockSize.subWidth,
+        subHeight: this.dockSize.subHeight,
         pos: this.dockPos,
         vmRoot: this.rootframe,
         evuiCompnent: this.compnentpopup,
         addType: this.dockSize.type,
         addDockFrameId: this.dockSize.newDockFrameId,
         insertTargetId: this.dockSize.insertTargetId,
+        targetVm: this.addDockVm, // 레이어팝업 갔다가 다시 도킹 할때 target객체
       };
     },
     template:
     '              <dock-sub-frame' +
     '               flex="1"' +
     '                layout="hBox"' +
-    '                :width="width"' +
-    '                :height="height"' +
+    '                :width="subWidth"' +
+    '                :height="subHeight"' +
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
@@ -199,15 +208,17 @@
     '>' +
     '            <dockspliter/>' +
     '            <dock-frame' +
-    '             flex="1"' +
+    '                flex="1"' +
     '                :width="width"' +
     '                :height="height"' +
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
+    '                :targetVm="targetVm"' +
+    '                :content="addComponent"' +
     '              :title="title">' +
     '             <keep-alive>' +
-    '              <compoenet :is="addComponent"/>' +
+    '              <component  :is="addComponent"/>' +
     '             </keep-alive>' +
     '              </dock-frame>' +
     '            </dock-sub-frame>',
@@ -247,26 +258,33 @@
         type: Object,
         default: null,
       },
+      addDockVm: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         title: this.dockFrameTitle,
         width: this.dockSize.width,
         height: this.dockSize.height,
+        subWidth: this.dockSize.subWidth,
+        subHeight: this.dockSize.subHeight,
         pos: this.dockPos,
         vmRoot: this.rootframe,
         evuiCompnent: this.compnentpopup,
         addType: this.dockSize.type,
         addDockFrameId: this.dockSize.newDockFrameId,
         insertTargetId: this.dockSize.insertTargetId,
+        targetVm: this.addDockVm, // 레이어팝업 갔다가 다시 도킹 할때 target객체
       };
     },
     template:
     '              <dock-sub-frame' +
     '               flex="1"' +
     '                layout="hBox"' +
-    '                :width="width"' +
-    '                :height="height"' +
+    '                :width="subWidth"' +
+    '                :height="subHeight"' +
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
@@ -280,9 +298,11 @@
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
+    '                :targetVm="targetVm"' +
+    '                :content="addComponent"' +
     '              :title="title">' +
     '             <keep-alive>' +
-    '              <compoenet :is="addComponent"/>' +
+    '              <component  :is="addComponent"/>' +
     '             </keep-alive>' +
     '              </dock-frame>' +
     '            <dockspliter/>' +
@@ -323,26 +343,33 @@
         type: Object,
         default: null,
       },
+      addDockVm: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         title: this.dockFrameTitle,
         width: this.dockSize.width,
         height: this.dockSize.height,
+        subWidth: this.dockSize.subWidth,
+        subHeight: this.dockSize.subHeight,
         pos: this.dockPos,
         vmRoot: this.rootframe,
         evuiCompnent: this.compnentpopup,
         addType: this.dockSize.type,
         addDockFrameId: this.dockSize.newDockFrameId,
         insertTargetId: this.dockSize.insertTargetId,
+        targetVm: this.addDockVm, // 레이어팝업 갔다가 다시 도킹 할때 target객체
       };
     },
     template:
     '              <dock-sub-frame' +
     '                flex="1"' +
     '                layout="vBox"' +
-    '                :width="width"' +
-    '                :height="height"' +
+    '                :width="subWidth"' +
+    '                :height="subHeight"' +
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
@@ -356,9 +383,11 @@
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
+    '                :targetVm="targetVm"' +
+    '                :content="addComponent"' +
     '              :title="title">' +
     '             <keep-alive>' +
-    '              <compoenet :is="addComponent"/>' +
+    '              <component  :is="addComponent"/>' +
     '             </keep-alive>' +
     '              </dock-frame>' +
     '            <dockspliter/>' +
@@ -399,26 +428,33 @@
         type: Object,
         default: null,
       },
+      addDockVm: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
         title: this.dockFrameTitle,
         width: this.dockSize.width,
         height: this.dockSize.height,
+        subWidth: this.dockSize.subWidth,
+        subHeight: this.dockSize.subHeight,
         pos: this.dockPos,
         vmRoot: this.rootframe,
         evuiCompnent: this.compnentpopup,
         addType: this.dockSize.type,
         addDockFrameId: this.dockSize.newDockFrameId,
         insertTargetId: this.dockSize.insertTargetId,
+        targetVm: this.addDockVm, // 레이어팝업 갔다가 다시 도킹 할때 target객체
       };
     },
     template:
     '              <dock-sub-frame' +
     '                flex="1"' +
     '                layout="vBox"' +
-    '                :width="width"' +
-    '                :height="height"' +
+    '                :width="subWidth"' +
+    '                :height="subHeight"' +
     '                :vmMain="vmRoot"' +
     '                :pos="pos"' +
     '                :type="addType"' +
@@ -433,9 +469,11 @@
     '                :pos="pos"' +
     '                :type="addType"' +
     '                :vmMain="vmRoot"' +
+    '                :targetVm="targetVm"' +
+    '                :content="addComponent"' +
     '              :title="title">' +
     '             <keep-alive>' +
-    '              <compoenet :is="addComponent"/>' +
+    '              <component  :is="addComponent"/>' +
     '             </keep-alive>' +
     '              </dock-frame>' +
     '            </dock-sub-frame>',
@@ -466,7 +504,7 @@
        * */
       name: {
         type: String,
-        default: 'Container',
+        default: 'DockMainFrame',
       },
       /**
        * dockMainFrame 세로, 수직  지정합니다.
@@ -504,6 +542,13 @@
         default: null,
       },
       /**
+       *  도킹 컴포넌트를 사용한 vm 객체
+       * */
+      selfComponent: {
+        type: Object,
+        default: null,
+      },
+      /**
        * dockMainFrame layout Data
        */
       dockDataSet: {
@@ -525,12 +570,17 @@
         addDockTitle: '',
         addDockSize: null,
         evuiComponent: null,
-        addDockList: [],
+        addDockList: [], // 도킹되는 vm 리스트
         hiddenLayerStyle: null,
-        dockDataMap: [],
+        dockDataMap: [], // 데이타 맵
+        selfVm: this.selfComponent, // 사용되는 화면 vm 객체
+        addDockFrameVm: null, // 도킹되는 target vm 객체
       };
     },
     computed: {
+        _addDockFrameVm() {
+           return this.addDockFrameVm;
+        },
       addEvuiCompent: {
         get() {
           return this.evuiComponent;
