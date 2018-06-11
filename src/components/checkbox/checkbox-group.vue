@@ -3,7 +3,7 @@
     <div>
       <CheckBox
         v-if="useAllCheck"
-        :label="'Check All'"
+        :label="wrappedLabel"
         :value="'all'"
         :click-event="changeAll"
       />
@@ -41,6 +41,10 @@ export default {
         return [];
       },
     },
+    label: {
+      type: String,
+      default: 'Check All',
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -57,8 +61,8 @@ export default {
   data() {
     return {
       currentValue: this.value,
+      dataLabel: this.label,
       childrenList: {},
-      chkAll: false,
     };
   },
   computed: {
@@ -78,13 +82,8 @@ export default {
       }
       return this.list;
     },
-    chkAllProp: {
-      get: function get() {
-        return this.chkAll;
-      },
-      set: function set(value) {
-        this.chkAll = value;
-      },
+    wrappedLabel: function wrappedLabel() {
+      return this.dataLabel;
     },
   },
   methods: {

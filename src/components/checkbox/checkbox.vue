@@ -8,6 +8,7 @@
       :disabled="disabled"
       :value="value"
       :checked="wrapperedCheck"
+      :checkboxType="checkboxType"
       type="checkbox"
       @click="checkPropsEvent"
     >
@@ -49,6 +50,10 @@ export default {
     value: {
       type: [String, Number, Boolean],
       default: null,
+    },
+    checkboxType: {
+      type: String,
+      default: 'normal',
     },
     clickEvent: {
       type: Function,

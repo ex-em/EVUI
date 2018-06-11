@@ -1,10 +1,12 @@
 <template>
   <div>
     <checkbox
-      :label="label"
+      :label="label2"
     />
-    <checkboxGroup :list="list"/>
-    <checkboxGroup>
+    <checkboxGroup
+      :list="list"
+      :label="label2"/>
+    <checkboxGroup :label="label2">
       <checkbox
         :label="'check01'"
         :value="'check01'"
@@ -42,7 +44,7 @@
     data() {
       return {
         visible: true,
-        label: 'test',
+        label2: 'test',
         checkBoxGroup: [],
         buttonLabel: 'visible',
         list: [
@@ -62,6 +64,5 @@
     },
   };
 </script>
-
 <style scoped>
 </style>
