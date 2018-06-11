@@ -1,20 +1,19 @@
 <template>
   <div
-    :class="wrapClasses"
-    class="evui-checkbox"
+    :class="wrappedClasses"
   >
     <input
-      :id="id"
-      :name="name"
+      :id="createId"
       :class="cls"
-      :checked="checked"
       :disabled="disabled"
       :value="value"
+      :checked="wrapperedCheck"
       type="checkbox"
-      @change="onChange"
+      @click="checkPropsEvent"
     >
     <label
-      :for="id"
+      :for="createId"
+      :class="labelClasses"
     >
       {{ label }}
     </label>
@@ -22,62 +21,78 @@
 </template>
 
 <script>
-  import utils from '@/common/utils';
+const prefixCls = 'evui-checkbox';
 
-  export default {
-    model: {
-      prop: 'checked',
-      event: 'onChange',
+export default {
+  name: 'CheckBox',
+  model: {
+    prop: 'checked',
+    event: 'onChange',
+  },
+  props: {
+    cls: {
+      type: String,
+      default: null,
     },
-    props: {
-      id: {
-        type: String,
-        default() {
-          return utils.getId();
+    label: {
+      type: String,
+      default: null,
+    },
+    checked: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: [String, Number, Boolean],
+      default: null,
+    },
+    clickEvent: {
+      type: Function,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      currentChecked: null,
+      wrapperedCheck: this.checked,
+    };
+  },
+  computed: {
+    wrappedClasses() {
+      return [
+        `${prefixCls}`,
+        {
+          'evui-disabled': this.disabled,
         },
-      },
-      name: {
-        type: String,
-        default: null,
-      },
-      cls: {
-        type: String,
-        default: null,
-      },
-      label: {
-        type: String,
-        default: null,
-      },
-      checked: {
-        type: Boolean,
-        default: false,
-      },
-      disabled: {
-        type: Boolean,
-        default: false,
-      },
-      value: {
-        type: [String, Number, Boolean],
-        default: null,
-      },
+      ];
     },
-    data() {
-      return {
-      };
+    labelClasses() {
+      return [
+        `${prefixCls}-label`,
+      ];
     },
-    computed: {
-      wrapClasses() {
-        return [
-          {
-            'evui-disabled': this.disabled,
-          },
-        ];
-      },
+    checkPropsEvent() {
+      return this.clickEvent ? this.clickEvent : this.onChange;
     },
-    methods: {
-      onChange(event) {
-        this.$emit('change', event.target.checked);
-      },
+    createId() {
+      return this._uid;
     },
-  };
+  },
+  methods: {
+    onChange(e) {
+    if (this.$parent && this.$parent.change) {
+        this.$parent.change(e, this.currentChecked);
+      }
+    },
+    updateValue(newValue) {
+      this.wrapperedCheck = newValue;
+    },
+  },
+};
 </script>
+<style scoped>
+</style>

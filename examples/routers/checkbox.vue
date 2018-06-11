@@ -2,29 +2,28 @@
   <div>
     <checkbox
       :label="label"
-      :checked="true"
-      :disabled="visible"
-      :value="'test'"
     />
-    <button
-      @click="visible = !visible"
-    > {{ visible ? 'visible' : 'invisible' }}</button>
-    {{ visible }}
-    <checkboxGroup
-      :value="checkBoxGroup"
-      @change="onChange"
-    >
+    <checkboxGroup :list="list"/>
+    <checkboxGroup>
       <checkbox
         :label="'check01'"
-        :checked="true"
+        :value="'check01'"
       />
       <checkbox
         :label="'check02'"
-        :checked="true"
+        :value="'check02'"
       />
       <checkbox
         :label="'check03'"
-        :checked="true"
+        :value="'check03'"
+      />
+      <checkbox
+        :label="'check04'"
+        :value="'check04'"
+      />
+      <checkbox
+        :label="'check05'"
+        :value="'check05'"
       />
     </checkboxGroup>
   </div>
@@ -46,12 +45,20 @@
         label: 'test',
         checkBoxGroup: [],
         buttonLabel: 'visible',
+        list: [
+          {
+            label: 'name1',
+          },
+          {
+            label: 'name2',
+          },
+          {
+            label: 'name3',
+          },
+        ],
       };
     },
     methods: {
-      onChange(value) {
-        console.log(value);
-      },
     },
   };
 </script>

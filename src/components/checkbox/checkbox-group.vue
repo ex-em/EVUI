@@ -1,53 +1,111 @@
 <template>
-  <div class="wrapClasses">
+  <div :class="wrapClasses">
+    <div>
+      <CheckBox
+        v-if="useAllCheck"
+        :label="'Check All'"
+        :value="'all'"
+        :click-event="changeAll"
+      />
+    </div>
+    <div v-if="list">
+      <template
+        v-for="item in computedList"
+      >
+        <CheckBox
+          :label="item.label"
+          :checked.sync="item.checked"
+          :key="item.id"
+          :value="item.value"
+        />
+      </template>
+    </div>
     <slot/>
   </div>
 </template>
 <script>
-  const prefixCls = 'evui-checkbox-group';
+import CheckBox from './checkbox';
+import { getMatchedComponentsDownward } from '../../common/utils';
 
-  export default {
-    name: 'CheckboxGroup',
-    props: {
-      value: {
-        type: Array,
-        default() {
-          return [];
+const prefixCls = 'evui-checkbox-group';
+
+export default {
+  name: 'CheckboxGroup',
+  components: {
+    CheckBox,
+  },
+  props: {
+    value: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    useAllCheck: {
+      type: Boolean,
+      default: true,
+    },
+    list: {
+      type: [String, Number, Object, Array, Boolean],
+      default: null,
+    },
+  },
+  data() {
+    return {
+      currentValue: this.value,
+      childrenList: {},
+      chkAll: false,
+    };
+  },
+  computed: {
+    wrapClasses: function wrapClasses() {
+      return [
+        `${prefixCls}`,
+        {
+          [`${prefixCls}-disabled`]: this.disabled,
         },
-      },
-      disabled: {
-        type: Boolean,
-        default: false,
-      },
+      ];
     },
-    data() {
-      return {
-        currentValue: this.value,
-        children: [],
-      };
+    computedList: function computedList() {
+      if (this.list) {
+        this.list.forEach((v) => {
+          const value = v; if (v && !v.clickEvent) { value.clickEvent = this.change; }
+        });
+      }
+      return this.list;
     },
-    computed: {
-      wrapClasses: function wrapClasses() {
-        return [
-          `${prefixCls}`,
-          {
-            [`${prefixCls}-disabled`]: this.disabled,
-          },
-        ];
+    chkAllProp: {
+      get: function get() {
+        return this.chkAll;
+      },
+      set: function set(value) {
+        this.chkAll = value;
       },
     },
-    mounted() {
-      this.updateModel(true);
+  },
+  methods: {
+    change: function change() {
     },
-    methods: {
-      updateModel() {
+    changeAll: function changeAll(e) {
+      const children = getMatchedComponentsDownward(this, 'CheckBox');
+      const isChecked = e.target.checked;
+      children.unshift();
+      if (children) {
+        children.forEach((v) => {
+          const value = v;
+          value.updateValue(isChecked);
+        });
+      }
 
-      },
-
+      return {};
     },
-  };
+  },
+};
 </script>
 
 <style scoped>
-
 </style>
