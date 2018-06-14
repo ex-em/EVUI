@@ -77,7 +77,7 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
  Time Picker
 ************************************************************************************/
 
-.evui-timePicker input[type=text]{
+.evui-timepicker input[type=text]{
   background-color: #ffffff;
   background-image: none;
   border-radius: 4px;
@@ -88,12 +88,12 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   height: 100%;
 }
 
-.evui-timePicker input[type=text]:focus{
+.evui-timepicker input[type=text]:focus{
   outline: none;
   border-color: #409eff;
 }
 
-.evui-timePicker div.prefix{
+.evui-timepicker div.prefix{
   width: 26px;
   height: 26px;
   position: absolute;
@@ -102,7 +102,7 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   background-position: -196px -102px;
 }
 
-.evui-timePicker div.suffix{
+.evui-timepicker div.suffix{
   width: 26px;
   height: 10px;
   position: absolute;

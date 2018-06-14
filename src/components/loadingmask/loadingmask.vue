@@ -4,8 +4,24 @@
     class="spinner"
   >
     <div
+      v-show="barCount"
       class="spinnerCenter"
-    />
+    >
+      <div
+        v-for="(item, index) in barData"
+        :key="index"
+        :style="{
+          position: 'absolute',
+          width: item.width,
+          height: item.height,
+          borderRadius: item.borderRadius,
+          background: item.barColor,
+          transform: item.transform,
+          animation: item.animation,
+          animationDelay: item.animDelay,
+        }"
+      />
+    </div>
   </div>
 </template>
 
@@ -55,34 +71,31 @@
     },
     data() {
       return {
+        barData: [],
       };
     },
+    created() {
+      if (this.barCount && this.barCount > 0) {
+        let obj;
+        let deg;
+        for (let ix = 0, ixLen = this.barCount; ix < ixLen; ix++) {
+          obj = {};
+          deg = Math.round(360 * (ix / ixLen));
+          obj.position = 'absolute';
+          obj.width = this.width;
+          obj.height = this.height;
+          obj.borderRadius = this.borderRadius;
+          obj.barColor = this.barColor;
+          obj.transform = `rotate(${deg}deg) translate(${this.fadebarRadius}, 0px)`;
+          obj.animation = `fadeDelay ${this.animInterval}s infinite ease-in-out`;
+          obj.animDelay = `${(this.animInterval * (ix / ixLen)).toFixed(3)}s`;
+          this.barData.push(obj);
+        }
+      }
+    },
     mounted() {
-      this.createFadebar();
     },
     methods: {
-      createFadebar() {
-        let ix;
-        let ixLen;
-        let divBar;
-        let rotatedDeg;
-        let animDelay;
-        const center = this.$el.childNodes[0];
-        for (ix = 0, ixLen = this.barCount; ix < ixLen; ix++) {
-          divBar = document.createElement('div');
-          divBar.style.position = 'absolute';
-          divBar.style.width = this.width;
-          divBar.style.height = this.height;
-          divBar.style.borderRadius = this.borderRadius;
-          divBar.style.background = this.barColor;
-          rotatedDeg = Math.round(360 * (+ix / ixLen));
-          divBar.style.transform = `rotate(${rotatedDeg}deg) translate(${this.fadebarRadius}, 0px)`;
-          divBar.style.animation = `fadeDelay ${this.animInterval}s infinite ease-in-out`;
-          animDelay = (this.animInterval * (+ix / ixLen)).toFixed(3);
-          divBar.style.animationDelay = `${animDelay}s`;
-          center.appendChild(divBar);
-        }
-      },
     },
   };
 </script>

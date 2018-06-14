@@ -20,7 +20,7 @@
       return {
         obj: [
           { from: 0, to: 23, selectedNumber: '11' },
-          { from: 0, to: 59, mid: true, selectedNumber: '05' },
+          { from: 0, to: 59, selectedNumber: '05' },
           { from: 0, to: 59, selectedNumber: '23' },
         ],
       };

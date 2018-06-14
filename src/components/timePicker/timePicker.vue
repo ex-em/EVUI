@@ -1,6 +1,6 @@
 <template>
   <div
-    class="evui-timePicker"
+    class="evui-timepicker"
     @click.stop.prevent="showTimePicker"
     @mouseover="showSuffix"
     @mouseleave="hideSuffix"
@@ -34,7 +34,7 @@
             :key="index"
             :from="item.from"
             :to="item.to"
-            :mid="item.mid"
+            :mid="(index === 0 || index === spinnerArr.length - 1) ? false : true"
             :selected-number="item.selectedNumber"
             :selection-start-index="index"
           />

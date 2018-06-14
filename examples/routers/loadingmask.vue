@@ -1,5 +1,6 @@
 <template>
   <loadingmask
+    :bar-count="13"
     class="loadingBackground"
   />
 </template>

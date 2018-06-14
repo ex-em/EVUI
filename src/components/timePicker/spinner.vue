@@ -69,7 +69,7 @@
       selectedNumber(number) {
         if (number) {
           const idx = this.findIndexToValue(number);
-          if (idx != null) {
+          if (idx !== null) {
             // move scroll
             this.$el.childNodes[0].scrollTop
               = this.$el.childNodes[0].childNodes[0].childNodes[idx].offsetTop - 76;
@@ -87,7 +87,7 @@
       if (this.selectedNumber) {
         const number = this.selectedNumber;
         const idx = this.findIndexToValue(number);
-        if (idx != null) {
+        if (idx !== null) {
           // move scroll
           this.$el.childNodes[0].scrollTop
             = this.$el.childNodes[0].childNodes[0].childNodes[idx].offsetTop - 76;
@@ -105,9 +105,7 @@
     },
     methods: {
       makeNumber() {
-        let ix = this.from;
-        const ixLen = this.to;
-        for (; ix <= ixLen; ix++) {
+        for (let ix = this.from, ixLen = this.to; ix <= ixLen; ix++) {
           this.number.push(this.lpad10(ix));
         }
       },
@@ -130,7 +128,7 @@
       },
       liClick(number) {
         const idx = this.findIndexToValue(number);
-        if (idx != null) {
+        if (idx !== null) {
           // move scroll
           this.$el.childNodes[0].scrollTop
             = this.$el.childNodes[0].childNodes[0].childNodes[idx].offsetTop - 76;
@@ -151,15 +149,19 @@
         return findIndex;
       },
       initAllClass() {
-        for (let ix = 0; ix < this.number.length; ix++) {
-          this.$el.childNodes[0].childNodes[0].childNodes[ix].className = 'spinner-item';
+        if (this.number) {
+          for (let ix = 0, ixLen = this.number.length; ix < ixLen; ix++) {
+            this.$el.childNodes[0].childNodes[0].childNodes[ix].className = 'spinner-item';
+          }
         }
       },
       activeClass(number) {
-        const ul = this.$el.childNodes[0].childNodes[0];
-        for (let ix = 0; ix < this.number.length; ix++) {
-          if (ul.childNodes[ix].innerText.toString() === number.toString()) {
-            this.$el.childNodes[0].childNodes[0].childNodes[ix].classList.add('active');
+        if (this.number) {
+          const ul = this.$el.childNodes[0].childNodes[0];
+          for (let ix = 0, ixLen = this.number.length; ix < ixLen; ix++) {
+            if (ul.childNodes[ix].innerText.toString() === number.toString()) {
+              this.$el.childNodes[0].childNodes[0].childNodes[ix].classList.add('active');
+            }
           }
         }
       },
