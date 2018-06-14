@@ -364,61 +364,61 @@
 
 <style scoped>
   .timePickerDetail {
+    position: absolute;
+    z-index: 300;
     width: 180px;
     height: 224px;
-    position: absolute;
+    margin: 12px 0 0 0;
     border: 1px solid #dcdfe6;
+    border-radius: 4px;
     background-color: #ffffff;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
-    z-index: 300;
-    border-radius: 4px;
-    margin: 12px 0 0 0;
   }
   .timePickerPanelContent {
-    height: 188px;
     display: block;
-    position: relative;
     overflow: hidden;
+    position: relative;
+    height: 188px;
   }
   .timePickerPanelContent .timeThreeSpinnerArea {
     width: 100%;
     height: 100%;
-    white-space: nowrap;
-    font-size: 0; /*필수 width:33.3%*/
     padding-left: 5px;
+    font-size: 0; /*필수 width:33.3%*/
+    white-space: nowrap;
   }
   .timePickerPanelContent .timeThreeSpinnerArea .timeSpinnerArea {
+    display: inline-block;
     width: 33.3%;
     max-height: 185px;
-    display: inline-block;
   }
 
   .timePickerPanelFooter {
+    display: block;
     height: 34px;
     background-color: #f5f7fa;
-    display: block;
     text-align: right;
   }
   .timePickerPanelFooter .timePicker-btn-cancel {
-    border: none;
     padding: 8px 8px 0 0;
-    cursor: pointer;
+    border: none;
     background-color: transparent;
     font-size: 12px;
+    cursor: pointer;
   }
   .timePickerPanelFooter .timePicker-btn-ok {
-    border: none;
     padding: 8px 8px 0 0;
-    cursor: pointer;
+    border: none;
     background-color: transparent;
-    font-size: 12px;
     color: #409eff;
+    font-size: 12px;
+    cursor: pointer;
   }
   .timePickerPanelTopArrow {
-    margin-top: -6px;
-    margin-left: 35px;
     width: 12px;
     height: 6px;
+    margin-top: -6px;
+    margin-left: 35px;
   }
   .timePickerPanelTopArrow:after {
     width: 0;

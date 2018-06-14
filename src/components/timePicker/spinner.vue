@@ -171,20 +171,20 @@
 
 <style scoped>
   .midSpinnerArea {
+    display: inline-block;
     width: 33.2%;
     max-height: 185px;
-    display: inline-block;
   }
   .timeSpinnerArea {
+    display: inline-block;
     width: 33.3%;
     max-height: 185px;
-    display: inline-block;
   }
 
   .timeSpinnerContent{
-    max-height: inherit;
     overflow: scroll;
     height: 100%;
+    max-height: inherit;
     font-size: 0px; /*width 33.3% inline-block 시 필요*/
   }
   .timeSpinnerContent::-webkit-scrollbar
@@ -207,14 +207,14 @@
   .timeSpinnerContent:hover::-webkit-scrollbar-thumb
   {
     border-radius: 4px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.1);
     background-color: rgba(0,0,0,.1);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.1);
   }
 
   .spinner-list {
+    list-style: none;
     margin: 0;
     padding: 76px 0 78px 0;
-    list-style: none;
     text-align: center;
     cursor: pointer;
   }
@@ -222,10 +222,10 @@
     margin-left: 5px;
   }
   .spinner-list .spinner-item {
+    display: list-item;
     height: 32px;
     line-height: 32px;
     font-size: 12px;
-    display: list-item;
     user-select: none; /* prevent text drag */
   }
 
