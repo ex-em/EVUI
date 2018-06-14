@@ -1,113 +1,96 @@
 import { shallow } from 'vue-test-utils';
 import Chart from '@/components/chart/chart';
 
-describe('Create Chart', () => {
-  let wrapper;
+describe('Verification Chart Vue Component', () => {
+  let defaultChart;
 
   beforeEach(() => {
-    // vue 인스턴트 활성화
-    wrapper = shallow(Chart);
+    defaultChart = shallow(Chart);
+  });
+  // 1. Vue Component 검증
+  it('Create Vue Component and HTML DOM', () => {
+    expect(defaultChart.isVueInstance()).to.be.true;
+    expect(defaultChart.exists()).to.be.true;
+    expect(defaultChart.element).to.be.ok;
+    expect(defaultChart.contains('div.evui-chart')).to.be.true;
+    expect(defaultChart.find('canvas')).to.be.ok;
+  });
+  // 2. 기본 Vue Copmpoennt Props 검증
+  it('Verifying property default value', () => {
+    expect(defaultChart.props().data).to.be.eql({ series: [] });
+    expect(defaultChart.props().options).to.be.eql({ type: 'line', xAxes: [], yAxes: [] });
   });
 
-  it('create Vue Component and HTML DOM', () => {
-    expect(wrapper.isVueInstance()).to.be.true;
-    expect(wrapper.exists()).to.be.true;
-    expect(wrapper.element).to.be.ok;
-    expect(wrapper.contains('div.evui-chart-wrapper')).to.be.true;
-    expect(wrapper.find('canvas')).to.be.ok;
-  });
-
-  it('props default value', () => {
-    expect(wrapper.props().name).to.be.equal('Chart');
-    expect(wrapper.props().width).to.be.equal('100%');
-    expect(wrapper.props().height).to.be.equal('100%');
-    expect(wrapper.props().chartData).to.be.eql([]);
-    expect(wrapper.props().margin).to.be.eql({ top: 0, left: 0, right: 0, bottom: 0 });
-  });
-
-  it('props custom value', () => {
-    const sampleData = [
-      { x: '2000', y: 5.0 },
-      { x: '2010', y: 6.0 },
-      { x: '2020', y: 4.5 }
-    ];
-
-    const customWrapper = shallow(Chart, {
+  // 3. 사용자 정의 Vue Component Props 검증
+  it('Verifying property custom value', () => {
+    const customChart = shallow(Chart, {
       propsData: {
-        name: 'Test Name',
-        width : 500,
-        height: 600,
-        chartData: sampleData
+        options: {
+          type: 'LINE',
+          width: '100%',
+          height: '100%',
+          title: {
+            text: 'BDD Title',
+            style: '20px Arial',
+            color: '#000000',
+            height: 50,
+            show: true,
+          },
+          xAxes: [{
+            type: 'time',
+            tickFormat: 'hh:mm:ss',
+            showGrid: true,
+            position: 'bottom',
+            interval: 'minute',
+          }],
+          yAxes: [{
+            type: 'linear',
+            showGrid: false,
+            position: 'left',
+          }],
+        },
+        data: {
+          series: [
+            {
+              id: 'series1',
+              name: 'series-1',
+              show: true,
+              point: true,
+              fill: true,
+              stack: true,
+              xAxisIndex: 0,
+              yAxisIndex: 0,
+              data: [
+                { x: '2018-05-25 05:10:00', y: 15 },
+                { x: '2018-05-25 05:11:00', y: 10 },
+                { x: '2018-05-25 05:13:00', y: 10 },
+                { x: '2018-05-25 05:14:00', y: 13 },
+                { x: '2018-05-25 05:15:00', y: 20 },
+              ],
+            },
+          ],
+        },
       }
     });
 
-    expect(customWrapper.props().name).to.be.equal('Test Name');
-    expect(customWrapper.props().width).to.be.equal(500);
-    expect(customWrapper.props().height).to.be.equal(600);
-    expect(customWrapper.props().chartData).to.be.eql(sampleData);
+    expect(customChart.props().options.type).to.be.equal('LINE');
+    expect(customChart.props().options.width).to.be.equal('100%');
+    expect(customChart.props().options.title.text).to.be.equal('BDD Title');
+    expect(customChart.props().options.xAxes[0].type).to.be.equal('time');
+    expect(customChart.props().options.yAxes[0].type).to.be.equal('linear');
 
-    customWrapper.destroy();
+    expect(customChart.props().data.series[0].id).to.be.equal('series1');
+    expect(customChart.props().data.series[0].point).to.be.equal(true);
+    expect(customChart.props().data.series[0].data[0].y).to.be.equal(15);
+
+    customChart.destroy();
   });
 
-  it('exist method', () => {
-    expect(wrapper.vm.checkCanvasElement).to.be.a('function');
-    expect(wrapper.vm.getMaxDataYValue).to.be.a('function');
-    expect(wrapper.vm.render).to.be.a('function');
-    expect(wrapper.vm.renderChart).to.be.a('function');
-    expect(wrapper.vm.renderBackground).to.be.a('function');
-    expect(wrapper.vm.renderText).to.be.a('function');
-    expect(wrapper.vm.renderLinesAndLabels).to.be.a('function');
-    expect(wrapper.vm.drawLine).to.be.a('function');
-    expect(wrapper.vm.renderData).to.be.a('function');
-    expect(wrapper.vm.getXInc).to.be.a('function');
-  });
-
-  it('check computed', () => {
-    let customWrapper = shallow(Chart, {
-      propsData: {
-        width : 800,
-        height: 600
-      }
-    });
-
-    expect(customWrapper.vm.chartStyle.width).to.be.equal('800px');
-    expect(customWrapper.vm.chartStyle.height).to.be.equal('600px');
-
-    customWrapper = shallow(Chart, {
-      propsData: {
-        width : 50,
-        height: '100%'
-      }
-    });
-
-    expect(customWrapper.vm.chartStyle.width).to.be.equal('50px');
-    expect(customWrapper.vm.chartStyle.height).to.be.equal('100%');
-
-    customWrapper.destroy();
-  });
-
-  it('Check Method Output', () => {
-    const sampleData = [
-      { x: '2000', y: 5.0 },
-      { x: '2010', y: 6.0 },
-      { x: '2020', y: 4.5 }
-    ];
-
-    const customWrapper = shallow(Chart, {
-      propsData: {
-        name: 'Test Name',
-        width : 800,
-        height: 600,
-        chartData: sampleData,
-        margin: { top: 40, left: 75, right: 0, bottom: 75 }
-      }
-    });
-
-    expect(customWrapper.vm.getXInc()).to.be.equal(-26);
-    expect(customWrapper.vm.maxYValue).to.be.equal(6.0);
+  it('Verifying Vue Method', () => {
+    expect(defaultChart.vm.getChartSize).to.be.a('function');
   });
 
   after(() => {
-    wrapper.destroy();
+    defaultChart.destroy();
   });
 });

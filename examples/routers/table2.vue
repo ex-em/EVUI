@@ -3,7 +3,7 @@
     <Table
       :width="'40%'"
       :height="'350px'"
-      :pagination="true"
+      :virtualScroll="true"
     />
   </div>
 </template>
