@@ -3,6 +3,12 @@
 /************************************************************************************
  common
 ************************************************************************************/
+
+html,body {
+  height: 100%;
+  overflow: hidden;
+}
+
 *{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -65,4 +71,43 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   color: #fff;
   background: #2f87c1;
   font-weight: 800;
+}
+
+/************************************************************************************
+ Time Picker
+************************************************************************************/
+
+.evui-timePicker input[type=text]{
+  background-color: #ffffff;
+  background-image: none;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  display: inline-block;
+  padding: 0 30px 0 30px;
+  width: 100%;
+  height: 100%;
+}
+
+.evui-timePicker input[type=text]:focus{
+  outline: none;
+  border-color: #409eff;
+}
+
+.evui-timePicker div.prefix{
+  width: 26px;
+  height: 26px;
+  position: absolute;
+  margin: 7px 3px 7px 3px;
+  background-image: url(../images/evui_icon.png);
+  background-position: -196px -102px;
+}
+
+.evui-timePicker div.suffix{
+  width: 26px;
+  height: 10px;
+  position: absolute;
+  margin: 15px 3px 15px 3px;
+  background-image: url(../images/evui_icon.png);
+  background-position: 7px -362px;
+  left: 228px;
 }
