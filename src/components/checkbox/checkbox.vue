@@ -4,13 +4,14 @@
   >
     <input
       :id="createId"
-      :class="cls"
+      :class="wrappedInnerClasses"
       :disabled="disabled"
       :value="value"
       :checked="wrapperedCheck"
       :checkboxType="checkboxType"
+      v-model="model"
       type="checkbox"
-      @click="checkPropsEvent"
+      @click="clickDefaultEvent"
     >
     <label
       :for="createId"
@@ -49,21 +50,21 @@ export default {
     },
     value: {
       type: [String, Number, Boolean],
-      default: null,
+      default: false,
     },
     checkboxType: {
       type: String,
       default: 'normal',
     },
-    clickEvent: {
-      type: Function,
-      default: null,
-    },
   },
   data() {
     return {
+      model: [],
       currentChecked: null,
       wrapperedCheck: this.checked,
+      wrapperedDisabled: this.disabled,
+      wrapperedValue: this.value,
+      wrapperedInnerClass: this.cls,
     };
   },
   computed: {
@@ -71,7 +72,7 @@ export default {
       return [
         `${prefixCls}`,
         {
-          'evui-disabled': this.disabled,
+          'evui-disabled': this.wrapperedDisabled,
         },
       ];
     },
@@ -80,21 +81,26 @@ export default {
         `${prefixCls}-label`,
       ];
     },
-    checkPropsEvent() {
-      return this.clickEvent ? this.clickEvent : this.onChange;
-    },
     createId() {
       return this._uid;
     },
+    wrappedInnerClasses() {
+      return this.wrapperedInnerClass;
+    },
   },
   methods: {
-    onChange(e) {
-    if (this.$parent && this.$parent.change) {
-        this.$parent.change(e, this.currentChecked);
+    clickDefaultEvent(e) {
+      this.wrapperedCheck = e.target.checked;
+      if (this.$parent && this.$parent.changeCheckValue) {
+        this.$parent.changeCheckValue(this.model);
+        this.$emit('on-change', this.model);
       }
     },
     updateValue(newValue) {
       this.wrapperedCheck = newValue;
+    },
+    setDisabled(newValue) {
+      this.wrapperedDisabled = newValue;
     },
   },
 };

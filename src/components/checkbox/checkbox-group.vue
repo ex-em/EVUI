@@ -1,26 +1,21 @@
 <template>
-  <div :class="wrapClasses">
-    <div>
-      <CheckBox
-        v-if="useAllCheck"
-        :label="wrappedLabel"
-        :value="'all'"
-        :click-event="changeAll"
-      />
-    </div>
+  <div
+    :class="wrapClasses"
+  >
     <div v-if="list">
       <template
         v-for="item in computedList"
       >
         <CheckBox
           :label="item.label"
-          :checked.sync="item.checked"
+          :checked="item.checked"
           :key="item.id"
           :value="item.value"
+          :disabled="item.disabled"
         />
       </template>
     </div>
-    <slot/>
+    <slot v-if="!list"/>
   </div>
 </template>
 <script>
@@ -41,17 +36,9 @@ export default {
         return [];
       },
     },
-    label: {
-      type: String,
-      default: 'Check All',
-    },
     disabled: {
       type: Boolean,
       default: false,
-    },
-    useAllCheck: {
-      type: Boolean,
-      default: true,
     },
     list: {
       type: [String, Number, Object, Array, Boolean],
@@ -61,46 +48,58 @@ export default {
   data() {
     return {
       currentValue: this.value,
-      dataLabel: this.label,
-      childrenList: {},
+      children: [],
     };
   },
   computed: {
     wrapClasses: function wrapClasses() {
       return [
         `${prefixCls}`,
-        {
-          [`${prefixCls}-disabled`]: this.disabled,
-        },
       ];
     },
     computedList: function computedList() {
       if (this.list) {
         this.list.forEach((v) => {
-          const value = v; if (v && !v.clickEvent) { value.clickEvent = this.change; }
+          const value = v;
+          if (v && !v.clickEvent) {
+            value.clickEvent = this.change;
+          }
+          if (v && !v.disabled) {
+            value.disabled = this.disabled;
+          }
         });
       }
       return this.list;
     },
-    wrappedLabel: function wrappedLabel() {
-      return this.dataLabel;
+  },
+  watch: {
+    value(v) {
+      console.log('watch', v);
     },
   },
+  mounted() {
+    this.updateModel(true);
+  },
   methods: {
-    change: function change() {
+    changeCheckValue: function change(data) {
+      this.$emit('on-change', data);
     },
-    changeAll: function changeAll(e) {
+    updateModel: function updateModel(update) {
       const children = getMatchedComponentsDownward(this, 'CheckBox');
-      const isChecked = e.target.checked;
-      children.unshift();
       if (children) {
+        const model = this.value;
         children.forEach((v) => {
           const value = v;
-          value.updateValue(isChecked);
+          value.model = model;
+          if (this.disabled) {
+            value.setDisabled(this.disabled);
+          }
+          if (update) {
+            console.log('update', update);
+          }
         });
       }
-
-      return {};
+      this.children = children;
     },
   },
 };
