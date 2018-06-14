@@ -30,6 +30,14 @@ const router = new VueRouter({
       path: '/table',
       component: resolve => require(['./routers/table'], resolve),
     },
+    {
+      path: '/loadingmask',
+      component: resolve => require(['./routers/loadingmask'], resolve),
+    },
+    {
+      path: '/timePicker',
+      component: resolve => require(['./routers/timePicker'], resolve),
+    },
   ],
 });
 
