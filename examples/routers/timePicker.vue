@@ -2,7 +2,14 @@
   <div>
     <timePicker
       :spinner-arr="obj"
-      style="width: 220px; height: 40px;"
+    />
+    <br><br><br>
+    <timePicker
+      :spinner-arr="obj2"
+    />
+    <br><br><br>
+    <timePicker
+      :spinner-arr="obj3"
     />
   </div>
 </template>
@@ -19,9 +26,19 @@
     data() {
       return {
         obj: [
-          { from: 0, to: 23, selectedNumber: '11' },
-          { from: 0, to: 59, selectedNumber: '05' },
-          { from: 0, to: 59, selectedNumber: '23' },
+          { from: 0, to: 23, initNumber: '11' },
+          { from: 0, to: 59, initNumber: '05' },
+          { from: 0, to: 59, initNumber: '23' },
+        ],
+        obj2: [
+          { from: 0, to: 23 },
+          { from: 0, to: 59 },
+          { from: 0, to: 59 },
+        ],
+        obj3: [
+          { from: 0, to: 23, initNumber: 5 },
+          { from: 0, to: 59, initNumber: 53 },
+          { from: 0, to: 59, initNumber: 7 },
         ],
       };
     },
@@ -31,6 +48,3 @@
     },
   };
 </script>
-
-<style scoped>
-</style>

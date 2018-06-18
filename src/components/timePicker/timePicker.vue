@@ -1,17 +1,19 @@
 <template>
   <div
+    v-click-outside="hideTimePicker"
+    ref="timePickerDiv"
     class="evui-timepicker"
-    @click.stop.prevent="showTimePicker"
-    @mouseover="showSuffix"
-    @mouseleave="hideSuffix"
+    @click="showTimePicker"
+    @mouseover="suffixFadeFlag = true"
+    @mouseleave="suffixFadeFlag = false"
   >
     <div
-      class="prefix"
+      class="evui-timepicker-prefix"
     />
     <div
       ref="suffix"
-      :class="suffixFadeFlag ? 'suffixFadein' : 'suffixFadeout'"
-      class="suffix"
+      :class="suffixFadeFlag ? 'suffix-fadein' : 'suffix-fadeout'"
+      class="evui-timepicker-suffix"
       @click.stop="hideTimePicker"
     />
     <input
@@ -23,56 +25,73 @@
     >
     <div
       ref="timePickerPanel"
-      :class="timePickerFadeFlag ? 'fadein' : 'fadeout'"
-      class="timePickerDetail"
+      class="evui-timepicker-panel"
     >
-      <div class="timePickerPanelContent">
-        <div class="timeThreeSpinnerArea">
+      <div class="evui-timepicker-content">
+        <div class="evui-timepicker-spinner">
           <spinner
             v-for="(item, index) in spinnerArr"
             v-show="spinnerArr"
+            ref="timePickerSpinner"
             :key="index"
             :from="item.from"
             :to="item.to"
             :mid="(index === 0 || index === spinnerArr.length - 1) ? false : true"
-            :selected-number="item.selectedNumber"
+            :selected-number="lpad10(item.initNumber)"
             :selection-start-index="index"
+            @setInput="setInputText"
+            @setRange="selectionRangeWord"
+            @setFocus="timePickerFirstFocus"
           />
         </div>
       </div>
-      <div class="timePickerPanelFooter">
-        <button class="timePicker-btn-cancel">Cancel</button>
-        <button class="timePicker-btn-ok">OK</button>
+      <div class="evui-timepicker-footer">
+        <button class="evui-timepicker-btn-cancel">Cancel</button>
+        <button class="evui-timepicker-btn-ok">OK</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import utils from '@/common/utils';
   import spinner from '@/components/timePicker/spinner';
 
   export default {
     components: {
       spinner,
     },
-    props: {
-      id: {
-        type: String,
-        default() {
-          return utils.getId();
+    directives: {
+      // 해당 element 외의 클릭 시
+      'click-outside': {
+        bind(el, binding) {
+          const element = el;
+          const bind = binding;
+          // Define Handler and cache it on the element
+          const bubble = bind.modifiers.bubble;
+          const handler = (e) => {
+            if (bubble || (!element.contains(e.target) && element !== e.target)) {
+              bind.value(e);
+            }
+          };
+          element.__vueClickOutside__ = handler;
+          // add Event Listeners
+          document.addEventListener('click', handler);
+        },
+        unbind(el) {
+          const element = el;
+          // Remove Event Listeners
+          document.removeEventListener('click', element.__vueClickOutside__);
+          element.__vueClickOutside__ = null;
         },
       },
+    },
+    props: {
       name: {
         type: String,
         default: null,
       },
       spinnerArr: {
         type: Array,
-        default: null,
-      },
-      initTime: {
-        type: String,
         default: null,
       },
     },
@@ -173,27 +192,20 @@
     created() {
     },
     mounted() {
-      document.addEventListener('click', this.hideTimePicker);
     },
     beforeDestroy() {
-      document.removeEventListener('click', this.hideTimePicker);
-    },
-    activated() {
     },
     methods: {
       showTimePicker() {
         this.$refs.timePickerPanel.style.display = 'block';
+        for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
+          this.$refs.timePickerSpinner[ix].liClick(true);
+        }
         this.timePickerFadeFlag = true;
       },
       hideTimePicker() {
         this.$refs.timePickerPanel.style.display = 'none';
         this.timePickerFadeFlag = false;
-      },
-      showSuffix() {
-        this.suffixFadeFlag = true;
-      },
-      hideSuffix() {
-        this.suffixFadeFlag = false;
       },
       removeColon(val) {
         if (val && val.indexOf(':') > -1) {
@@ -306,10 +318,10 @@
        * @param number : li의 값
        * @notes ul li에서 선택된 hh:mi:ss를 input text에 적용
        */
-      setInputText(ulIdx, number) {
+      setInputText(ulIdx, liNumber) {
         let numberText = '000000';
-        const lpadNumber = this.lpad10(number);
-        this.selectedLiIndex = ulIdx;
+        const lpadNumber = this.lpad10(liNumber) || '00';
+        this.selectedLiIndex = ulIdx || 0;
         if (this.timeText) {
           numberText = this.removeColon(this.timeText);
         }
@@ -337,6 +349,8 @@
           } else {
             value = `0${value}`;
           }
+        } else {
+          value = `${value}`;
         }
         return value;
       },
@@ -363,7 +377,58 @@
 </script>
 
 <style scoped>
-  .timePickerDetail {
+
+  .evui-timepicker {
+    width: 220px;
+    height: 40px;
+  }
+
+  .evui-timepicker input[type=text]{
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding: 0 30px 0 30px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background-color: #ffffff;
+    background-image: none;
+  }
+
+  .evui-timepicker input[type=text]:focus,
+  .evui-timepicker input[type=text]:hover{
+    outline: none;
+    border-color: #409eff;
+  }
+
+  .evui-timepicker div.evui-timepicker-prefix {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    margin: 7px 3px 7px 3px;
+    background-image: url(../../images/evui_icon.png);
+    background-position: -196px -102px;
+  }
+
+  .evui-timepicker div.evui-timepicker-suffix {
+    position: absolute;
+    left: 228px;
+    width: 26px;
+    height: 10px;
+    margin: 15px 3px 15px 3px;
+    background-image: url(../../images/evui_icon.png);
+    background-position: 7px -362px;
+  }
+  .evui-timepicker div.evui-timepicker-suffix.suffix-fadein {
+    display: block;
+    cursor: pointer;
+  }
+  .evui-timepicker div.evui-timepicker-suffix.suffix-fadeout {
+    display: none;
+    cursor: default;
+  }
+
+  .evui-timepicker-panel {
+    display: none;
     position: absolute;
     z-index: 300;
     width: 180px;
@@ -374,78 +439,39 @@
     background-color: #ffffff;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   }
-  .timePickerPanelContent {
+
+  .evui-timepicker-content {
     display: block;
     overflow: hidden;
     position: relative;
     height: 188px;
   }
-  .timePickerPanelContent .timeThreeSpinnerArea {
+  .evui-timepicker-content .evui-timepicker-spinner {
     width: 100%;
     height: 100%;
     padding-left: 5px;
     font-size: 0; /*필수 width:33.3%*/
     white-space: nowrap;
   }
-  .timePickerPanelContent .timeThreeSpinnerArea .timeSpinnerArea {
-    display: inline-block;
-    width: 33.3%;
-    max-height: 185px;
-  }
-
-  .timePickerPanelFooter {
+  .evui-timepicker-footer {
     display: block;
     height: 34px;
     background-color: #f5f7fa;
     text-align: right;
   }
-  .timePickerPanelFooter .timePicker-btn-cancel {
+  .evui-timepicker-footer .evui-timepicker-btn-cancel {
     padding: 8px 8px 0 0;
     border: none;
     background-color: transparent;
     font-size: 12px;
     cursor: pointer;
   }
-  .timePickerPanelFooter .timePicker-btn-ok {
+  .evui-timepicker-footer .evui-timepicker-btn-ok {
     padding: 8px 8px 0 0;
     border: none;
     background-color: transparent;
     color: #409eff;
     font-size: 12px;
-    cursor: pointer;
-  }
-  .timePickerPanelTopArrow {
-    width: 12px;
-    height: 6px;
-    margin-top: -6px;
-    margin-left: 35px;
-  }
-  .timePickerPanelTopArrow:after {
-    width: 0;
-    height: 0;
-    border-top: 1px solid #00f;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-  }
-
-  .fadein, .fadeout {
-    opacity: 0;
-    -moz-transition: opacity .4s ease-in-out;
-    -o-transition: opacity .4s ease-in-out;
-    -webkit-transition: opacity .4s ease-in-out;
-    transition: opacity .4s ease-in-out;
-  }
-  .fadein {
-    opacity: 1;
-  }
-
-  .suffixFadeout {
-    display: none;
-    cursor: default;
-  }
-  .suffixFadein {
-    display: block;
     cursor: pointer;
   }
 </style>

@@ -1,11 +1,10 @@
 <template>
   <div
-    v-show="true"
-    class="spinner"
+    class="evui-loadingmask"
   >
     <div
       v-show="barCount"
-      class="spinnerCenter"
+      class="evui-loadingmask-center"
     >
       <div
         v-for="(item, index) in barData"
@@ -26,20 +25,8 @@
 </template>
 
 <script>
-  import utils from '@/common/utils';
-
   export default {
     props: {
-      id: {
-        type: String,
-        default() {
-          return utils.getId();
-        },
-      },
-      name: {
-        type: String,
-        default: null,
-      },
       width: { // 바 너비
         type: String,
         default: '30px',
@@ -75,22 +62,18 @@
       };
     },
     created() {
-      if (this.barCount && this.barCount > 0) {
-        let obj;
-        let deg;
-        for (let ix = 0, ixLen = this.barCount; ix < ixLen; ix++) {
-          obj = {};
-          deg = Math.round(360 * (ix / ixLen));
-          obj.position = 'absolute';
-          obj.width = this.width;
-          obj.height = this.height;
-          obj.borderRadius = this.borderRadius;
-          obj.barColor = this.barColor;
-          obj.transform = `rotate(${deg}deg) translate(${this.fadebarRadius}, 0px)`;
-          obj.animation = `fadeDelay ${this.animInterval}s infinite ease-in-out`;
-          obj.animDelay = `${(this.animInterval * (ix / ixLen)).toFixed(3)}s`;
-          this.barData.push(obj);
-        }
+      for (let ix = 0, ixLen = this.barCount; ix < ixLen; ix++) {
+        const obj = {};
+        const deg = Math.round(360 * (ix / ixLen));
+        obj.position = 'absolute';
+        obj.width = this.width;
+        obj.height = this.height;
+        obj.borderRadius = this.borderRadius;
+        obj.barColor = this.barColor;
+        obj.transform = `rotate(${deg}deg) translate(${this.fadebarRadius}, 0px)`;
+        obj.animation = `evui-loadingmask-fadedelay ${this.animInterval}s infinite ease-in-out`;
+        obj.animDelay = `${(this.animInterval * (ix / ixLen)).toFixed(3)}s`;
+        this.barData.push(obj);
       }
     },
     mounted() {
@@ -101,21 +84,22 @@
 </script>
 
 <style>
-  .spinner
+  .evui-loadingmask
   {
-    position: absolute;
+    position: relative;
+    background-color: #172027;
     width: 100%;
     height: 100%;
     z-index: 18000;
   }
-  .spinnerCenter
+  .evui-loadingmask-center
   {
-    position: absolute;
+    position: relative;
     top: 45%;
     left: 50%;
     transform: translate3d(0px, 0px, 0px);
   }
-  @keyframes fadeDelay
+  @keyframes evui-loadingmask-fadedelay
   {
     80%
     {

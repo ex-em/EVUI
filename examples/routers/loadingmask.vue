@@ -1,8 +1,10 @@
 <template>
-  <loadingmask
-    :bar-count="13"
-    class="loadingBackground"
-  />
+  <div style="width: 500px; height: 500px;">
+    <loadingmask
+      v-show="true"
+      :bar-count="13"
+    />
+  </div>
 </template>
 
 <script>
@@ -22,10 +24,3 @@
     },
   };
 </script>
-
-<style scoped>
-  .loadingBackground
-  {
-    background-color: #172027;
-  }
-</style>
