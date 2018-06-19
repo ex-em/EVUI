@@ -24,6 +24,9 @@
         <li>
           <router-link to="/table2">Table(virtualScroll)</router-link>
         </li>
+        <li>
+          <router-link to="/table3">Table(normal)</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>
