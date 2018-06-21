@@ -6,13 +6,17 @@
       <template
         v-for="item in computedList"
       >
-        <CheckBox
-          :label="item.label"
-          :checked="item.checked"
+        <div
           :key="item.id"
-          :value="item.value"
-          :disabled="item.disabled"
-        />
+          :class="computedInnerDiv"
+        >
+          <CheckBox
+            :label = "item.name"
+            :disabled="computedDisabled"
+            type="checkbox"
+          />
+        </div>
+        {{ item.checked }}
       </template>
     </div>
     <slot v-if="!list"/>
@@ -44,6 +48,24 @@ export default {
       type: [String, Number, Object, Array, Boolean],
       default: null,
     },
+    groupAlign: {
+      type: String,
+      default: 'hbox',
+      validator(value) {
+        let result = '';
+        if (value === 'hbox' || value === 'vbox') {
+          result = value;
+        } else {
+          result = '';
+        }
+
+        return result;
+      },
+    },
+    changeFn: {
+      type: Function,
+      default: null,
+    },
   },
   data() {
     return {
@@ -71,39 +93,51 @@ export default {
       }
       return this.list;
     },
+    computedInnerDiv: function computedInnerDiv() {
+      const classArr = [];
+      if (this.groupAlign === 'hbox') {
+        classArr.push(`${prefixCls}-inner`);
+      }
+      return classArr;
+    },
+    computedDisabled: function computedDisabled() {
+      return this.disabled;
+    },
   },
   watch: {
-    value(v) {
-      console.log('watch', v);
+    value() {
+      this.updateModel(true);
     },
   },
   mounted() {
     this.updateModel(true);
   },
   methods: {
-    changeCheckValue: function change(data) {
+    change: function change(data) {
+      this.currentValue = data;
+      this.$emit('input', data);
       this.$emit('on-change', data);
     },
     updateModel: function updateModel(update) {
-      const children = getMatchedComponentsDownward(this, 'CheckBox');
-      if (children) {
-        const model = this.value;
-        children.forEach((v) => {
-          const value = v;
-          value.model = model;
-          if (this.disabled) {
-            value.setDisabled(this.disabled);
-          }
+      this.children = getMatchedComponentsDownward(this, 'CheckBox');
+      if (this.children) {
+        const { value } = this;
+        this.children.forEach((v) => {
+          const child = v;
+          child.model = value;
           if (update) {
-            console.log('update', update);
+            child.currentValue = value.indexOf(child.label) >= 0;
+            child.group = true;
           }
         });
       }
-      this.children = children;
     },
   },
 };
 </script>
 
 <style scoped>
+  .evui-checkbox-group-inner {
+    display: inline-block;
+  }
 </style>
