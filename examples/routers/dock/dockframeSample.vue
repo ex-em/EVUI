@@ -9,7 +9,7 @@
     </div>
     <dock-main-frame
       ref="minFrame"
-      :width="1840"
+      :width="1200"
       :height="900"
       :self-component="selfVm"
     />

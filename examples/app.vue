@@ -1,37 +1,20 @@
 <template>
-  <div class="container">
-    <nav>
-      <ul>
-        <li>
-          <router-link to="/">Index</router-link>
-        </li>
-        <li>
-          <router-link to="/container">Container</router-link>
-          <router-link to="/dock/dockframeSample">dockframeSample</router-link>
-        </li>
-        <li>
-          <router-link to="/chart">Chart</router-link>
-        </li>
-        <li>
-          <router-link to="/checkbox">Checkbox</router-link>
-        </li>
-        <li>
-          <router-link to="/selectbox">Selectbox</router-link>
-        </li>
-        <li>
-          <router-link to="/table">Table(page)</router-link>
-        </li>
-        <li>
-          <router-link to="/table2">Table(virtualScroll)</router-link>
-        </li>
-      </ul>
-    </nav>
-    <router-view/>
+  <div>
+    <main-header/>
+    <main-content/>
   </div>
 </template>
 <script>
+  import '@/styles/evui.css';
+  import mainHeader from '@/webcontents/common/header';
+  import mainContent from '@/webcontents/common/content';
+
   export default {
     name: 'App',
+    components: {
+      mainHeader,
+      mainContent,
+    },
   };
 </script>
 
