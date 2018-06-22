@@ -3,44 +3,68 @@
     <div class="evui-left-navigation">
       <ul class="evui-menu">
         <li class="evui-menu-group">
-          <div class="evui-menu-group-title">Form</div>
+          <div class="evui-menu-group-title">
+            <i class="fas fa-th-large"/> Form
+          </div>
           <ul>
-            <li class="evui-menu-item active">
-              <router-link to="/container">Container</router-link>
-            </li>
-            <li class="evui-menu-item">
-              <router-link to="/dock/dockframeSample">dockframeSample</router-link>
-            </li>
-            <li class="evui-menu-item">
-              <router-link to="/checkbox">Checkbox</router-link>
-            </li>
-            <li class="evui-menu-item">
-              <router-link to="/selectbox">Selectbox</router-link>
-            </li>
-            <li class="evui-menu-item">
-              <router-link to="/table">Table(page)</router-link>
-            </li>
-            <li class="evui-menu-item">
-              <router-link to="/table2">Table(virtualScroll)</router-link>
-            </li>
+            <router-link to="/container">
+              <li class="evui-menu-item active">
+                Container
+              </li>
+            </router-link>
+            <router-link to="/dock/dockframeSample">
+              <li class="evui-menu-item">
+                Docking
+              </li>
+            </router-link>
+            <router-link to="/checkbox">
+              <li class="evui-menu-item">
+                Checkbox
+              </li>
+            </router-link>
+            <router-link to="/selectbox">
+              <li class="evui-menu-item">
+                Selectbox
+              </li>
+            </router-link>
+            <router-link to="/table">
+              <li class="evui-menu-item">
+                Table(page)
+              </li>
+            </router-link>
+            <router-link to="/table2">
+              <li class="evui-menu-item">
+                Table(virtualScroll)
+              </li>
+            </router-link>
           </ul>
         </li>
         <li class="evui-menu-group">
           <div class="evui-menu-group-title">
-            <router-link to="/chart">Chart</router-link>
+            <i class="fas fa-chart-bar"/> Chart
           </div>
           <ul>
-            <li class="evui-menu-item">
-              <router-link to="/chart">Chart</router-link>
-            </li>
+            <router-link to="/chart">
+              <li class="evui-menu-item">
+                Chart
+              </li>
+            </router-link>
           </ul>
         </li>
         <li class="evui-menu-group">
-          <div class="evui-menu-group-title">group</div>
+          <div class="evui-menu-group-title">
+            <i class="fas fa-bars"/> Navigation
+          </div>
           <ul>
-            <li class="evui-menu-item">7</li>
-            <li class="evui-menu-item">8</li>
-            <li class="evui-menu-item">9</li>
+            <li class="evui-menu-item">Menu</li>
+          </ul>
+        </li>
+        <li class="evui-menu-group">
+          <div class="evui-menu-group-title">
+            <i class="fas fa-ellipsis-h"/> Other
+          </div>
+          <ul>
+            <li class="evui-menu-item">Spin</li>
           </ul>
         </li>
       </ul>
@@ -53,6 +77,8 @@
 </template>
 
 <script>
+  import '@/styles/all.css';
+
   export default {
     model: {
     },
@@ -140,18 +166,22 @@
     line-height: 48px;
     padding-left: 20px;
   }
+  .evui-menu-group-title i {
+    margin-right: 10px;
+  }
   .evui-menu-item {
     height: 48px;
     line-height: 48px;
     cursor: pointer;
     z-index: 1;
-    padding-left: 35px;
+    padding-left: 30px;
     color: #c5c5c5;
     border-right: 2px solid transparent;
   }
   .evui-menu-item:hover {
     border-right: 2px solid #2d8cf0;
     background: #f3f3f3;
+    color: #2d8cf0;
   }
   .evui-menu-item.active {
     z-index: 2;

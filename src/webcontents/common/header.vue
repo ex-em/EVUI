@@ -3,7 +3,7 @@
     <div class="evui-header-title">
       <a href="/">
         <img src="http://evui.ex-em.com/wp-content/uploads/2017/11/evui_1.png">
-        <span>EXEM Visualization UI</span>
+        <div>EXEM Visualization UI</div>
       </a>
     </div>
   </div>
@@ -41,5 +41,19 @@
   .evui-header-title {
     vertical-align: middle;
     display: table-cell;
+  }
+  .evui-header-title > a {
+    display: table;
+  }
+  .evui-header-title > a > img{
+    display: table-cell;
+  }
+  .evui-header-title > a > div{
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 17px;
+    padding-left: 10px;
+    font-weight: bold;
+    color: #555;
   }
 </style>
