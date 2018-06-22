@@ -11,6 +11,10 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     {
+      path: '/',
+      component: resolve => require(['./routers/summary'], resolve),
+    },
+    {
       path: '/container',
       component: resolve => require(['./routers/container'], resolve),
     },

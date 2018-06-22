@@ -70,7 +70,6 @@
       </ul>
     </div>
     <div class="evui-right-content">
-      main content
       <router-view/>
     </div>
   </div>
