@@ -22,7 +22,7 @@
                   class="evui-head"
                   col="start"
                   style="border-right: 0px; width: 0px;"/>
-                <template v-for="(column, index) in columnsInfo">
+                <template v-for="(column, index) in originColumns">
                   <td
                     :key="index"
                     :col="index"
@@ -71,7 +71,7 @@
                     col="start"
                     style="height: 0px; width: 0px;"/>
 
-                  <template v-for="(column, index) in columnsInfo">
+                  <template v-for="(column, index) in originColumns">
                     <td
                       :key="index"
                       :col="index"
@@ -92,7 +92,7 @@
                       col="start"
                       style="border-right: 0"/>
 
-                    <template v-for="(col, colIndex) in columnsInfo">
+                    <template v-for="(col, colIndex) in originColumns">
                       <td
                         :key="colIndex"
                         :col="colIndex"
@@ -165,7 +165,6 @@
   import util from '@/common/utils.table';
   import _ from 'lodash';
   import '@/styles/all.css';
-  import rowdata from './data.json';
 
   export default {
     filters: {
@@ -176,26 +175,26 @@
 
         return styleObj;
       },
-      gridBoxFilter(obj, style) {
-        const styleObj = _.defaults(obj, style);
-
-        // %면 그냥  넣어주고 px이면 -2 해서 넣어준다. 양쪽 border 크기
-        if (util.isPercentValue(style.width)) {
-          styleObj.width = util.numberToPixel(style.width);
-        } else {
-          const boxWidth = `${util.quantity(style.width).value - 2}px`;
-          styleObj.width = util.numberToPixel(boxWidth);
-        }
-
-        if (util.isPercentValue(style.height)) {
-          styleObj.height = util.numberToPixel(style.height);
-        } else {
-          const boxHeight = `${util.quantity(style.height).value - 2}px`;
-          styleObj.height = util.numberToPixel(boxHeight);
-        }
-
-        return styleObj;
-      },
+      // gridBoxFilter(obj, style) {
+      //   const styleObj = _.defaults(obj, style);
+      //
+      //   // %면 그냥  넣어주고 px이면 -2 해서 넣어준다. 양쪽 border 크기
+      //   if (util.isPercentValue(style.width)) {
+      //     styleObj.width = util.numberToPixel(style.width);
+      //   } else {
+      //     const boxWidth = `${util.quantity(style.width).value - 2}px`;
+      //     styleObj.width = util.numberToPixel(boxWidth);
+      //   }
+      //
+      //   if (util.isPercentValue(style.height)) {
+      //     styleObj.height = util.numberToPixel(style.height);
+      //   } else {
+      //     const boxHeight = `${util.quantity(style.height).value - 2}px`;
+      //     styleObj.height = util.numberToPixel(boxHeight);
+      //   }
+      //
+      //   return styleObj;
+      // },
     },
 
     props: {
@@ -219,53 +218,25 @@
         type: Boolean,
         default: false,
       },
+      columns: {
+        type: Array,
+        default() {
+         return [];
+        },
+      },
+      records: {
+        type: Array,
+        default() {
+         return [];
+        },
+      },
     },
 
     data() {
       return {
-        columns: [
-          { field: 'recid', caption: 'ID', size: '50px', sortable: true },
-          // { field: 'fname', caption: 'First Name', size: '30%', sortable: true },
-          // { field: 'lname', caption: 'Last Name', size: '30%', sortable: true },
-          // { field: 'email', caption: 'Email', size: '40%' },
-          { field: 'fname', caption: 'First Name', size: '169px', sortable: true },
-          { field: 'lname', caption: 'Last Name', size: '168px', sortable: true },
-          { field: 'email', caption: 'Email', size: '104px' },
-          { field: 'sdate', caption: 'Start Date' },
-          { field: 'edate', caption: 'End Date' },
-        ],
-        records: [
-          { recid: 1, fname: 'John', lname: 'doe', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 2, fname: 'Stuart', lname: 'Motzart', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 3, fname: 'Jin', lname: 'Franson', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 4, fname: 'Susan', lname: 'Ottie', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 5, fname: 'Kelly', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 6, fname: 'Francis', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 7, fname: 'Mark', lname: 'Welldo', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 8, fname: 'Thomas', lname: 'Bahh', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 9, fname: 'Sergei', lname: 'Rachmaninov', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 10, fname: 'Jill', lname: 'Doe', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 11, fname: 'Frank', lname: 'Motzart', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 12, fname: 'Peter', lname: 'Franson', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 13, fname: 'Andrew', lname: 'Ottie', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 200, fname: 'Manny', lname: 'Zilver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 14, fname: 'Manny', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 15, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 16, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 17, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 18, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 19, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 20, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 21, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 22, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 23, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 24, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 25, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 26, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 27, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 28, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-          { recid: 29, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
-        ],
+        // originData
+        originData: _.cloneDeep(this.records),
+        originColumns: this.columns,
 
         // sort 관련 데이터들
         sortColumns: [],
@@ -320,9 +291,10 @@
       };
     },
     computed: {
-      columnsInfo() {
-        return this.columns;
-      },
+      // columnsInfo() {
+      //   console.log("ttt")
+      //   return this.columns;
+      // },
       currentPageInput: {
         get() {
           return this.currentPage;
@@ -338,7 +310,7 @@
           if (this.isSort) {
             this.resultData = this.sortedData.slice(start, end);
           } else {
-            this.resultData = this.records.slice(start, end);
+            this.resultData = this.originData.slice(start, end);
           }
         },
       },
@@ -346,8 +318,7 @@
 
     // 초기데이터는 다 생성시 정의해보자
     created() {
-      // debugger;
-      this.records = rowdata; // 임시 데이터
+      // this.records = rowdata; // 임시 데이터
       // window.addEventListener('resize',this.test);
       // this.width = util.numberToPixel(this.width);
 
@@ -355,15 +326,15 @@
       // 얕은 복사 객체 내용은 안바뀔거 같아서 얕은 복사함.
       // 객체 안의 내용 바뀔거 같은면 깊은 복사로 변경 필요.
       // 일단 가즈아!!
-      this.sortedData = this.records.slice();
+      this.sortedData = this.originData.slice();
       if (this.pagination) {
         this.currentPage = 1;
-        this.lastPage = Math.ceil(this.records.length / this.pageSize);
+        this.lastPage = Math.ceil(this.originData.length / this.pageSize);
         const start = (this.currentPage - 1) * this.pageSize;
         const end = this.currentPage * this.pageSize;
-        this.resultData = this.records.slice(start, end);
+        this.resultData = this.originData.slice(start, end);
       } else {
-        this.resultData = this.records.slice();
+        this.resultData = this.originData.slice();
       }
     },
     mounted() {
@@ -379,36 +350,37 @@
         this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
         // this.s
         this.virtualBottom = this.virtualRowCount;
-        this.$refs.evuiRecordsTable.style.height = `${this.records.length * this.rowHeight}px`;
+        this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
 
-        this.resultData = this.records.slice(this.virtualTop, this.virtualBottom);
+        this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
         // debugger;
       }
 
       // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
-      for (let ix = 0, ixLen = this.columns.length; ix < ixLen; ix++) {
-        // 초기화 한번 시켜주고요
-        _.defaults(this.columns[ix], this.columnDefaultProperty);
+      for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
+        // 초기화 먼저
+        _.defaults(this.originColumns[ix], this.columnDefaultProperty);
         // 컬럼 너비랑, % 값인지를 가지고 있자
-        const colWidth = util.quantity(this.columns[ix].size);
+        const colWidth = util.quantity(this.originColumns[ix].size);
         const isPercentValue = colWidth ? colWidth.unit === '%' : false;
-        const min = util.quantity(this.columns[ix].min).value;
-        const max = this.columns[ix].max ? util.quantity(this.columns[ix].max).value : undefined;
+        const min = util.quantity(this.originColumns[ix].min).value;
+        const max = this.originColumns[ix].max ?
+          util.quantity(this.originColumns[ix].max).value : undefined;
 
         // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
         if (isPercentValue) {
-          const percentToPixel = this.gridBoxWidth * (colWidth.value / 100);
-          this.columns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
+          const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
+          this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
           this.sizeColSum += util.checkColSize(percentToPixel, min, max);
         } else if (colWidth === undefined) {
-          this.noSizeColList.push(this.columns[ix]); // 얕은복사 % 숫자 px도 아닐때
+          this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
         } else {
-          this.columns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
+          this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
           this.sizeColSum += util.checkColSize(colWidth.value, min, max);
         }
       }
 
-      this.verticalScroll = this.gridRecordsHeight < (this.records.length * this.rowHeight);
+      this.verticalScroll = this.gridRecordsHeight < (this.originData.length * this.rowHeight);
       let leftSize;
       if (this.verticalScroll) {
         leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
@@ -420,20 +392,30 @@
 
 
       // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
-      const colSize = leftSize / this.noSizeColList.length;
+      const colSize = Math.floor(leftSize / this.noSizeColList.length);
       if (this.noSizeColList.length > 0) {
         for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
           // debugger;
           const min = util.quantity(this.noSizeColList[ix].min).value;
           const max = this.noSizeColList[ix].max ?
             util.quantity(this.noSizeColList[ix].max).value : undefined;
-          this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+          const isLastIndex = (ix + 1) === ixLen;
+          if (!isLastIndex) {
+            leftSize -= util.checkColSize(colSize, min, max);
+            this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+          } else {
+            this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
+          }
+
           this.sizeColSum += util.checkColSize(colSize, min, max);
         }
       } else if (leftSize > 0) {
         this.endColWidth = this.gridBoxWidth - this.sizeColSum;
       }
-      this.$forceUpdate();
+      // this.$forceUpdate();
+    },
+    beforeDestroy() {
+      // this.records = [];
     },
     methods: {
       columnSort(column, event) {
@@ -497,7 +479,7 @@
               // 소트 컬럼 초기화 한번해주자
               this.sortColumns = [];
               // 새로 누르는거니까 데이터도 초기화 해줘야겠지?
-              this.sortedData = this.records.slice();
+              this.sortedData = this.originData.slice();
 
               // 소트 컬럼 추가 해주고
               this.sortColumns.push({
@@ -550,7 +532,7 @@
               }
 
               // sortedData 초기화 안전빵
-              this.sortedData = this.records.slice();
+              this.sortedData = this.originData.slice();
 
               // 정렬을 해보자.
               const filedList = _.map(this.sortColumns, 'field');
@@ -567,7 +549,7 @@
                 this.resultData = this.sortedData.slice(); // 깊은 복사에서 얕은 복사로 변경
               }
             } else {
-              this.sortedData = this.records.slice();
+              this.sortedData = this.originData.slice();
 
               // 새로 누른거니가 소트 아이콘 기존거 다 지우자
               for (let ix = 0, ixLen = this.sortColumns.length; ix < ixLen; ix++) {
@@ -621,17 +603,18 @@
         const vm = this;
         // sort랑 이벤트 충돌때문에 flag값으로 처리
         this.resizeFlag = true;
-        const startOffset = util.quantity(vm.columns[index].width).value - event.screenX;
-        const min = util.quantity(vm.columns[index].min).value;
-        const max = vm.columns[index].max ? util.quantity(vm.columns[index].max).value : undefined;
+        const startOffset = util.quantity(vm.originColumns[index].width).value - event.screenX;
+        const min = util.quantity(vm.originColumns[index].min).value;
+        const max = vm.originColumns[index].max ?
+          util.quantity(vm.originColumns[index].max).value : undefined;
 
         function onMouseMove(e) {
           e.stopPropagation();
           e.preventDefault();
           const colWidth = util.checkColSize((e.screenX + startOffset), min, max);
-          vm.sizeColSum -= util.quantity(vm.columns[index].width).value;
+          vm.sizeColSum -= util.quantity(vm.originColumns[index].width).value;
           vm.sizeColSum += colWidth;
-          vm.columns[index].width = `${colWidth}px`;
+          vm.originColumns[index].width = `${colWidth}px`;
           if (vm.gridBoxWidth > vm.sizeColSum) {
             vm.endColWidth = vm.gridBoxWidth - vm.sizeColSum;
           } else if (vm.verticalScroll) {
@@ -672,9 +655,15 @@
 
         // 컬럼 배열 변경
         function changeColumn(dragCol, dropCol, comlumnData) {
-          if (dragCol !== dropCol) {
-            vm.columns.splice(dragCol, 1);
-            vm.columns.splice(dropCol, 0, comlumnData);
+          if (dragCol === dropCol) {
+            return;
+          }
+          if (dragCol < dropCol) {
+            vm.originColumns.splice(dropCol, 0, comlumnData);
+            vm.originColumns.splice(dragCol, 1);
+          } else {
+            vm.originColumns.splice(dragCol, 1);
+            vm.originColumns.splice(dropCol, 0, comlumnData);
           }
         }
 
@@ -705,10 +694,9 @@
 
           if (targetColHalfWidth > targetColPoint) {
             vm.$refs.marker.style.left = `${targetCol.offsetLeft}px`;
-            // targetCol.style.borderLeft = '1px solid #72b2ff';
           } else {
             vm.$refs.marker.style.left = `${targetCol.offsetLeft + targetCol.offsetWidth}px`;
-            // targetCol.style.borderRightColor = '#72b2ff';
+            colIndex += 1;
           }
         }
 
@@ -722,7 +710,7 @@
           document.removeEventListener('mouseup', onMouseUp, true);
 
           if (colIndex !== undefined) {
-            changeColumn(index, colIndex, vm.columns[index]);
+            changeColumn(index, colIndex, vm.originColumns[index]);
           }
         }
 
@@ -754,7 +742,7 @@
           if (vm.isSort) {
             vm.resultData = vm.sortedData.slice(vm.virtualTop, vm.virtualBottom);
           } else {
-            vm.resultData = vm.records.slice(vm.virtualTop, vm.virtualBottom);
+            vm.resultData = vm.originData.slice(vm.virtualTop, vm.virtualBottom);
           }
           vm.prevScrollTop = scrollTop;
         }
@@ -771,7 +759,7 @@
           if (vm.isSort) {
             vm.resultData = vm.sortedData.slice(vm.virtualTop, vm.virtualBottom);
           } else {
-            vm.resultData = vm.records.slice(vm.virtualTop, vm.virtualBottom);
+            vm.resultData = vm.originData.slice(vm.virtualTop, vm.virtualBottom);
           }
           vm.prevScrollTop = scrollTop;
         }
@@ -799,6 +787,109 @@
           default:
                 break;
         }
+      },
+      addRow(row, pos) {
+        if (pos === 'start') {
+          this.originData.unshift(row);
+          this.originData.slice();
+          this.draw();
+        } else if (pos === 'end') {
+          this.originData.push(row);
+          // this.records.slice();
+        } else {
+          this.originData.push(row);
+          // this.records.slice();
+        }
+      },
+      draw() {
+        // 그리드박스 높이 너비 가져오기
+        // this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
+        // this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
+        // this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
+        // 초기화
+        this.sizeColSum = 0;
+        this.noSizeColList = [];
+        this.endColWidth = 0;
+
+
+        if (this.pagination) {
+          const gridBody = this.$refs.evuiGridBody;
+          // resize 대비해서 추가 resize 개발 후 검토 필요
+          if ((this.gridBoxHeight - this.footerHeight) !== gridBody.offsetHeight) {
+            gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
+          }
+
+          this.lastPage = Math.ceil(this.originData.length / this.pageSize);
+          const start = (this.currentPage - 1) * this.pageSize;
+          const end = this.currentPage * this.pageSize;
+          this.resultData = this.originData.slice(start, end);
+        } else if (this.virtualScroll) {
+          this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
+          this.virtualBottom = this.virtualRowCount;
+          this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
+
+          this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
+        } else {
+          this.resultData = this.originData.slice();
+        }
+
+        // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
+        for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
+          // 초기화 한번 시켜주고요
+          _.defaults(this.originColumns[ix], this.columnDefaultProperty);
+          // 컬럼 너비랑, % 값인지를 가지고 있자
+          const colWidth = util.quantity(this.originColumns[ix].size);
+          const isPercentValue = colWidth ? colWidth.unit === '%' : false;
+          const min = util.quantity(this.originColumns[ix].min).value;
+          const max = this.originColumns[ix].max ?
+            util.quantity(this.originColumns[ix].max).value : undefined;
+
+          // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
+          if (isPercentValue) {
+            const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
+            this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
+            this.sizeColSum += util.checkColSize(percentToPixel, min, max);
+          } else if (colWidth === undefined) {
+            this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
+          } else {
+            this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
+            this.sizeColSum += util.checkColSize(colWidth.value, min, max);
+          }
+        }
+
+        this.verticalScroll = this.gridRecordsHeight < (this.originData.length * this.rowHeight);
+        let leftSize;
+        if (this.verticalScroll) {
+          leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
+          this.endColWidth = this.scrollBarSize;
+        } else {
+          leftSize = this.gridBoxWidth - this.sizeColSum;
+          this.endColWidth = 0;
+        }
+
+
+        // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
+        const colSize = Math.floor(leftSize / this.noSizeColList.length);
+        if (this.noSizeColList.length > 0) {
+          for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
+            // debugger;
+            const min = util.quantity(this.noSizeColList[ix].min).value;
+            const max = this.noSizeColList[ix].max ?
+              util.quantity(this.noSizeColList[ix].max).value : undefined;
+            const isLastIndex = (ix + 1) === ixLen;
+            if (!isLastIndex) {
+              leftSize -= util.checkColSize(colSize, min, max);
+              this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+            } else {
+              this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
+            }
+
+            this.sizeColSum += util.checkColSize(colSize, min, max);
+          }
+        } else if (leftSize > 0) {
+          this.endColWidth = this.gridBoxWidth - this.sizeColSum;
+        }
+        // this.$forceUpdate();
       },
     },
   };

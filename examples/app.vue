@@ -25,6 +25,8 @@
           <router-link to="/table2">Table(virtualScroll)</router-link>
         </li>
         <li>
+          <router-link to="/table3">Table(normal)</router-link>
+        <li>
           <router-link to="/loadingmask">Loadingmask</router-link>
         </li>
         <li>
