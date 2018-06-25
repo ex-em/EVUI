@@ -7,8 +7,8 @@
         class="evui-menu-group"
       >
         <router-link
-          v-if="menu.routerLink"
-          :to="menu.routerLink"
+          v-if="menu.routerLink === '/'"
+          :to="{ path: menu.routerLink }"
         >
           <div
             class="evui-menu-group-title"

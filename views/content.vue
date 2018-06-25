@@ -1,10 +1,15 @@
 <template>
   <div class="evui-main-content">
     <menuNav
+      ref="menuNav"
       :store="menuStore"
+      :selectedMenu="submenu"
     />
     <div class="evui-right-content">
-      <router-view/>
+      <router-view
+        :store="$route.path === '/' ? menuStore : ''"
+        @selectedSummary="getSelectedSummary"
+      />
     </div>
   </div>
 </template>
@@ -36,22 +41,24 @@
               {
                 name: 'Container',
                 routerLink: '/container',
-                content: 'Container',
+                content: '컨테이너',
+                imgUrl: '../static/images/container.png',
               },
               {
                 name: 'Docking',
                 routerLink: '/dock/dockframeSample',
-                content: 'docking',
+                content: '닥 컨테이너 샘플',
+                imgUrl: '../static/images/dockContainer.png',
               },
               {
                 name: 'Checkbox',
                 routerLink: '/checkbox',
-                content: 'checkbox',
+                content: '체크박스',
               },
               {
                 name: 'Selectbox',
                 routerLink: '/selectbox',
-                content: 'selectbox',
+                content: '셀렉트 박스',
               },
               {
                 name: 'Table(page)',
@@ -73,6 +80,7 @@
                 name: 'Chart',
                 routerLink: '/chart',
                 content: 'chart',
+                imgUrl: '../static/images/chart.png',
               },
             ],
           },
@@ -104,11 +112,16 @@
             ],
           },
         ],
+        submenu: {},
       };
     },
     created() {
     },
     methods: {
+      getSelectedSummary(parentMenu, childMenu, childIndex) {
+        this.$refs.menuNav.initSelectedMenu();
+        this.$refs.menuNav.setSelectedMenu(parentMenu, childMenu, childIndex);
+      },
     },
   };
 </script>

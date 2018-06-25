@@ -1,46 +1,32 @@
 <template>
-  <div class="evui-summary-content">
-    <div
-      v-for="menu in totalStore"
-      v-show="menu.routerLink !== '/'"
-      class="evui-summary-thumbnail-content"
-    >
-      <div
-        class="evui-summary-thumbnail-title"
-      >
-        <i class="fas fa-angle-down"/> &nbsp; {{ menu.name }}
-      </div>
-      <ul class="evui-summary-thumbnail-ul">
-        <li
-          v-for="(submenu, index) in menu.children"
-          class="evui-summary-thumbnail-li"
-          @click.stop="$emit('clickSummary', menu.name, submenu.name, index)"
-        >
-          <router-link :to="submenu.routerLink">
-            <div class="evui-summary-thumbnail-box-image">
-              <img
-                class="evui-summary-thumbnail-img"
-                :src="submenu.imgUrl || '../static/images/noImage.png'"
-                :alt="submenu.name"
-              >
-            </div>
-            <div>
-              <h3> {{ submenu.name }} </h3>
-              <h4> {{ submenu.content }} </h4>
-            </div>
-          </router-link>
-        </li>
-      </ul>
+  <div class="evui-summary">
+    <div class="evui-summary-header">
+      <h1>
+        <i class="far fa-list-alt"/> Guide Summary
+      </h1>
+      <br>
+      <p>
+        EVUI는 웹페이지의 핵심 구성요소인 Grid/Chart 컴포넌트를 제공하는 UI 프레임워크입니다.<br>
+        EVUI Grid와 Chart는 HTML/CSS/JS 및 SVG로 구현되어 있어 다양한 환경에 적용이 가능하며,
+        Vue.JS를 기반으로 구현되어 대량의 데이터를 고속으로 처리합니다.
+      </p>
     </div>
+    <thumb-summary
+      :totalStore="store"
+      @clickSummary="selectedSummary"
+    />
   </div>
 </template>
 
 <script>
+  import thumbSummary from '../views/summary';
+
   export default {
     components: {
+      thumbSummary,
     },
     props: {
-      totalStore: {
+      store: {
         type: Array,
         default: () => [],
       },
@@ -52,6 +38,9 @@
     computed: {
     },
     methods: {
+      selectedSummary(parentName, childName, index) {
+        this.$emit('selectedSummary', parentName, childName, index);
+      },
     },
   };
 </script>
@@ -71,8 +60,8 @@
   }
   .evui-summary-thumbnail-title {
     height: 25px;
-    width: calc(100% - 150px);
-    border-bottom: 2px solid #EBF4FE;
+    width: calc(100% - 100px);
+    border-bottom: 2px solid #2d8cf0;
     cursor: pointer;
     margin-bottom: 10px;
     font-size: 16px;
@@ -82,7 +71,7 @@
     display: flex;
     flex-wrap: wrap;
     margin: 0;
-    padding: 0 150px 0 10px;
+    padding: 0 0px 0 10px;
   }
   .evui-summary-thumbnail-ul:after {
     flex: auto;
@@ -108,8 +97,11 @@
   }
   .evui-summary-thumbnail-box-image img {
     border: 1px solid #eeeeee;
+    object-fit: cover;
     width: 100%;
     height: 150px;
+    margin-left: -1px;
+    margin-top: -1px;
   }
 
   @media all and (max-width: 1400px) {
