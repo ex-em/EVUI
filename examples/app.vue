@@ -6,8 +6,8 @@
 </template>
 <script>
   import '@/styles/evui.css';
-  import mainHeader from '@/webcontents/header';
-  import mainContent from '@/webcontents/content';
+  import mainHeader from '../views/header';
+  import mainContent from '../views/content';
 
   export default {
     name: 'App',
