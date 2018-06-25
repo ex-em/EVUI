@@ -1,8 +1,9 @@
 <template>
   <div class="evui-summary-content">
     <div
-      v-for="menu in totalStore"
+      v-for="(menu, index) in totalStore"
       v-show="menu.routerLink !== '/'"
+      :key="menu+index"
       class="evui-summary-thumbnail-content"
     >
       <div
@@ -13,15 +14,16 @@
       <ul class="evui-summary-thumbnail-ul">
         <li
           v-for="(submenu, index) in menu.children"
+          :key="submenu+index"
           class="evui-summary-thumbnail-li"
           @click.stop="$emit('clickSummary', menu.name, submenu.name, index)"
         >
           <router-link :to="submenu.routerLink">
             <div class="evui-summary-thumbnail-box-image">
               <img
-                class="evui-summary-thumbnail-img"
-                :src="submenu.imgUrl || '../static/images/noImage.png'"
                 :alt="submenu.name"
+                :src="submenu.imgUrl || '../static/images/noImage.png'"
+                class="evui-summary-thumbnail-img"
               >
             </div>
             <div>
@@ -47,7 +49,7 @@
     },
     data() {
       return {
-      }
+      };
     },
     computed: {
     },
@@ -57,12 +59,6 @@
 </script>
 
 <style>
-  .evui-summary-header {
-    height: 50px;
-  }
-  .evui-summary-header h1 {
-    font-size: 20px;
-  }
   .evui-summary-content {
     margin-top: 50px;
   }

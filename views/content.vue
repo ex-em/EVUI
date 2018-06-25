@@ -35,7 +35,7 @@
             routerLink: '/',
           },
           {
-            name: 'Form',
+            name: 'Component',
             cls: 'far fa-clone',
             children: [
               {
@@ -50,6 +50,12 @@
                 content: '닥 컨테이너 샘플',
                 imgUrl: '../static/images/dockContainer.png',
               },
+            ],
+          },
+          {
+            name: 'Form',
+            cls: 'fab fa-elementor',
+            children: [
               {
                 name: 'Checkbox',
                 routerLink: '/checkbox',
@@ -69,6 +75,11 @@
                 name: 'Table(virtualScroll)',
                 routerLink: '/table2',
                 content: 'Table(virtualScroll)',
+              },
+              {
+                name: 'Timepicker',
+                routerLink: '',
+                content: 'timepicker',
               },
             ],
           },
@@ -105,9 +116,9 @@
             cls: 'fas fa-ellipsis-h',
             children: [
               {
-                name: 'spin',
+                name: 'Loadingmask',
                 routerLink: '',
-                content: 'spin',
+                content: 'loadingmask',
               },
             ],
           },
