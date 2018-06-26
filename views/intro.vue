@@ -4,7 +4,7 @@
       <h1>
         <i class="far fa-list-alt"/> Guide Summary
       </h1>
-      <br>
+      <br><br>
       <p>
         EVUI는 웹페이지의 핵심 구성요소인 Grid/Chart 컴포넌트를 제공하는 UI 프레임워크입니다.<br><br>
         EVUI Grid와 Chart는 HTML/CSS/JS 및 SVG로 구현되어 있어 다양한 환경에 적용이 가능하며,
@@ -12,7 +12,7 @@
       </p>
     </div>
     <thumb-summary
-      :totalStore="store"
+      :total-store="store"
       @clickSummary="selectedSummary"
     />
   </div>
@@ -33,7 +33,7 @@
     },
     data() {
       return {
-      }
+      };
     },
     computed: {
     },

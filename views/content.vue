@@ -3,7 +3,6 @@
     <menuNav
       ref="menuNav"
       :store="menuStore"
-      :selectedMenu="submenu"
     />
     <div class="evui-right-content">
       <router-view
@@ -33,10 +32,12 @@
             name: 'Introduce',
             cls: 'fas fa-th-large',
             routerLink: '/',
+//            openFlag: true,
           },
           {
             name: 'Component',
             cls: 'far fa-clone',
+//            openFlag: true,
             children: [
               {
                 name: 'Container',
@@ -55,6 +56,7 @@
           {
             name: 'Form',
             cls: 'fab fa-elementor',
+//            openFlag: true,
             children: [
               {
                 name: 'Checkbox',
@@ -84,11 +86,18 @@
                 content: 'timepicker',
                 imgUrl: '../static/images/timepicker.png',
               },
+              {
+                name: 'Codebox',
+                routerLink: '/codebox',
+                content: 'codebox',
+                imgUrl: '',
+              },
             ],
           },
           {
             name: 'Chart',
             cls: 'fas fa-chart-bar',
+//            openFlag: true,
             children: [
               {
                 name: 'Chart',
@@ -101,6 +110,7 @@
           {
             name: 'Navigation',
             cls: 'fas fa-bars',
+//            openFlag: true,
             children: [
               {
                 name: 'Menu',
@@ -118,6 +128,7 @@
           {
             name: 'Other',
             cls: 'fas fa-ellipsis-h',
+//            openFlag: true,
             children: [
               {
                 name: 'Loadingmask',
@@ -128,7 +139,6 @@
             ],
           },
         ],
-        submenu: {},
       };
     },
     created() {

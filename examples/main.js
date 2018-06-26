@@ -46,6 +46,10 @@ const router = new VueRouter({
       path: '/menu',
       component: resolve => require(['./routers/menu'], resolve),
     },
+    {
+      path: '/codebox',
+      component: resolve => require(['./routers/codebox'], resolve),
+    },
   ],
 });
 
