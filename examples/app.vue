@@ -6,6 +6,9 @@
           <router-link to="/">Index</router-link>
         </li>
         <li>
+          <router-link to="/button">Button</router-link>
+        </li>
+        <li>
           <router-link to="/container">Container</router-link>
           <router-link to="/dock/dockframeSample">dockframeSample</router-link>
         </li>
