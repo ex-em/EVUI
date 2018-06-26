@@ -125,6 +125,12 @@
                 content: 'loadingmask',
                 imgUrl: '../static/images/loadingmask.png',
               },
+              {
+                name: 'Code',
+                routerLink: '/code',
+                content: 'codeView',
+                imgUrl: '../static/images/code.png',
+              },
             ],
           },
         ],

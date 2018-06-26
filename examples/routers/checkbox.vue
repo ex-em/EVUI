@@ -11,17 +11,23 @@
       @click="visible = !visible"
     > {{ visible ? 'visible' : 'invisible' }}</button>
     {{ valueData }}
+    <code-view>
+      {{ code.text }}
+    </code-view>
   </div>
 </template>
 
 <script>
   import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
+  import codeView from '@/components/codeview/code';
+  import Code from '../../src/code/checkbox';
 
   export default {
     name: 'Checkbox',
     components: {
       checkbox,
+      codeView,
     },
     data() {
       return {
@@ -29,6 +35,8 @@
         label: 'test',
         valueData: null,
         buttonLabel: 'visible',
+        text: 'testtest',
+        code: Code,
       };
     },
     methods: {

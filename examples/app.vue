@@ -19,6 +19,7 @@
 </script>
 
 <style scoped>
+  @import "../src/styles/common.css";
   nav { margin-bottom: 40px; }
   ul { display: flex; flex-wrap: wrap; }
   li { display: inline-block; }
