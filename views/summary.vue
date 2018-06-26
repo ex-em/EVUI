@@ -1,17 +1,22 @@
 <template>
   <div class="evui-summary-content">
     <div
-      v-for="(menu, index) in totalStore"
+      v-for="(menu, index) in computedStore"
       v-show="menu.routerLink !== '/'"
       :key="menu+index"
       class="evui-summary-thumbnail-content"
     >
       <div
+        :class="{active: menu.openFlag}"
         class="evui-summary-thumbnail-title"
+        @click.stop="openSummaryThumbnail(index)"
       >
         <i class="fas fa-angle-down"/> &nbsp; {{ menu.name }}
       </div>
-      <ul class="evui-summary-thumbnail-ul">
+      <ul
+        :class="{active: menu.openFlag}"
+        class="evui-summary-thumbnail-ul"
+      >
         <li
           v-for="(submenu, index) in menu.children"
           :key="submenu+index"
@@ -52,8 +57,29 @@
       };
     },
     computed: {
+      computedStore: {
+        get() {
+          return this.totalStore;
+        },
+        set(store) {
+          this.totalStore = store;
+        },
+      },
+    },
+    watch: {
+    },
+    created() {
     },
     methods: {
+      openSummaryThumbnail(idx) {
+        this.computedStore = this.computedStore.filter((item, index) => {
+          if (index === idx) {
+            const i = item;
+            i.openFlag = !item.openFlag;
+          }
+          return item;
+        });
+      },
     },
   };
 </script>
@@ -73,6 +99,14 @@
     margin-bottom: 10px;
     font-size: 16px;
     font-weight: 800;
+    user-select: none;
+  }
+  .evui-summary-thumbnail-title > i {
+    transition: transform .2s ease-in-out;
+  }
+  .evui-summary-thumbnail-title.active > i {
+    transform: rotate(180deg);
+    transition: transform .2s ease-in-out;
   }
   .evui-summary-thumbnail-ul {
     display: flex;
@@ -82,6 +116,11 @@
   }
   .evui-summary-thumbnail-ul:after {
     flex: auto;
+  }
+  .evui-summary-thumbnail-ul.active {
+    display: none;
+    height: 0px;
+    transition: height 0.5s ease-in-out, display 1s ease-in-out;
   }
   .evui-summary-thumbnail-li {
     list-style: none;
