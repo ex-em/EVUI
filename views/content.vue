@@ -70,16 +70,19 @@
                 name: 'Table(page)',
                 routerLink: '/table',
                 content: 'table(page)',
+                imgUrl: '../static/images/tablePage.png',
               },
               {
                 name: 'Table(virtualScroll)',
                 routerLink: '/table2',
                 content: 'Table(virtualScroll)',
+                imgUrl: '../static/images/tableVirtualscroll.png',
               },
               {
                 name: 'Timepicker',
                 routerLink: '',
                 content: 'timepicker',
+                imgUrl: '../static/images/timepicker.png',
               },
             ],
           },
@@ -101,8 +104,9 @@
             children: [
               {
                 name: 'Menu',
-                routerLink: '',
+                routerLink: '/menu',
                 content: 'menu',
+                imgUrl: '../static/images/menu.png',
               },
               {
                 name: 'Summary',
@@ -119,6 +123,7 @@
                 name: 'Loadingmask',
                 routerLink: '',
                 content: 'loadingmask',
+                imgUrl: '../static/images/loadingmask.png',
               },
             ],
           },

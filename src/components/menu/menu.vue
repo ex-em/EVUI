@@ -6,22 +6,7 @@
         :key="menu.name + index"
         class="evui-menu-group"
       >
-        <router-link
-          v-if="menu.routerLink === '/'"
-          :to="{ path: menu.routerLink }"
-        >
-          <div
-            class="evui-menu-group-title"
-            @click="initSelectedMenu"
-          >
-              <i
-                v-show="menu.cls"
-                :class="menu.cls"
-              /> {{ menu.name }}
-          </div>
-        </router-link>
         <div
-          v-else
           class="evui-menu-group-title"
         >
           <i
@@ -35,15 +20,13 @@
           :key="submenu.name + index"
           class="evui-menu-group-sub"
         >
-          <router-link :to="submenu.routerLink">
-            <li
-              :class="selectedMenu.name === submenu.name ? 'active' : ''"
-              class="evui-menu-item"
-              @click="setSelectedMenu(menu.name, submenu.name, index)"
-            >
-              {{ submenu.name }}
-            </li>
-          </router-link>
+          <li
+            :class="selectedMenu.name === submenu.name ? 'active' : ''"
+            class="evui-menu-item"
+            @click="setSelectedMenu(menu.name, submenu.name, index)"
+          >
+            {{ submenu.name }}
+          </li>
         </ul>
       </li>
     </ul>
