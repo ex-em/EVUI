@@ -1,7 +1,7 @@
 <template>
-  <div class="cmp-btn">
+  <div class="evui-btn">
     <button
-      :type="type"
+      :type="htmlType"
       :name="name"
       :disabled="disabled"
       :class="classes"
@@ -41,7 +41,7 @@
   export default {
     name: 'Button',
     props: {
-      type: {
+      htmlType: {
         type: String,
         default: 'button',
         validator(value) {
@@ -53,17 +53,17 @@
         type: String,
         default: null,
       },
-      customCls: {
-        type: String,
-        default: null,
-      },
       clsType: {
         type: String,
-        default: 'default',
+        default: 'primary',
         validator(value) {
           const list = ['primary', 'ghost', 'dashed', 'text', 'info', 'success', 'warning', 'error', 'default'];
           return list.indexOf(value) > -1;
         },
+      },
+      customCls: {
+        type: String,
+        default: null,
       },
       shape: {
         type: String,
@@ -77,28 +77,6 @@
         type: String,
         default: '',
       },
-      menuList: {
-        type: Array,
-        default() {
-          return [];
-        },
-        // validator(list) {
-        //   let menuInfo;
-        //   let isValid = true;
-        //   const menuList = list || [];
-
-        //   for (let ix = 0, ixLen = menuList.length; ix < ixLen; ix++) {
-        //     menuInfo = menuList[ix];
-
-        //     if (!menuInfo || menuInfo.constructor !== 'Object' || !menuInfo.text) {
-        //       isValid = false;
-        //       break;
-        //     }
-        //   }
-
-        //   return isValid;
-        // },
-      },
       disabled: {
         type: Boolean,
         default: false,
@@ -107,17 +85,41 @@
         type: Boolean,
         default: false,
       },
+      menuList: {
+        type: Array,
+        default() {
+          return [];
+        },
+        validator(menuList) {
+          let menuInfo;
+          let isValid = true;
+          const list = menuList || [];
+
+          for (let ix = 0, ixLen = list.length; ix < ixLen; ix++) {
+            menuInfo = list[ix];
+
+            if (!menuInfo || menuInfo.constructor !== Object || !menuInfo.text) {
+              isValid = false;
+              break;
+            }
+          }
+
+          return isValid;
+        },
+      },
+    },
+    data() {
+      return {
+      };
     },
     computed: {
       classes() {
-        const prefixCls = 'evui-btn';
         const classList = [];
 
         if (typeof this.customCls === 'string') {
           return this.customCls;
         }
 
-        classList.push(prefixCls);
         classList.push(this.clsType);
 
         if (this.shape) {

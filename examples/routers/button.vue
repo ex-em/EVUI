@@ -2,12 +2,12 @@
   <div>
     <Button
       v-for="btnInfo in btnInfoList"
-      :key="btnInfo.itemId"
-      :name="btnInfo.itemId"
-      :customCls="btnInfo.customCls"
+      :key="btnInfo.name"
+      :name="btnInfo.name"
       :cls-type="btnInfo.clsType"
+      :custom-cls="btnInfo.customCls"
       :shape="btnInfo.shape"
-      :text="btnInfo.value"
+      :text="btnInfo.text"
       :menu-list="btnInfo.menuList"
       :disabled="btnInfo.disabled"
       :isLoading="btnInfo.isLoading"
@@ -27,15 +27,15 @@
     data() {
       return {
         btnInfoList: [
-          { itemId: 'originBtn', value: 'origin', customCls: '' },
-          { itemId: 'textBtn', value: 'text', clsType: 'text' },
-          { itemId: 'defaultBtn', value: 'default' },
-          { itemId: 'disabledBtn', value: 'disabled', disabled: true },
-          { itemId: 'loadingBtn', value: 'loading', isLoading: true },
-          { itemId: 'circleBtn', value: 'circle', shape: 'circle' },
+          { name: 'originBtn', text: 'origin', customCls: '' },
+          { name: 'textBtn', text: 'text', clsType: 'text' },
+          { name: 'defaultBtn', text: 'default' },
+          { name: 'disabledBtn', text: 'disabled', disabled: true },
+          { name: 'loadingBtn', text: 'loading', isLoading: true },
+          { name: 'circleBtn', text: 'circle', shape: 'circle' },
           {
-            itemId: 'menuBtn',
-            value: 'menu',
+            name: 'menuBtn',
+            text: 'menu',
             menuList: [
               { text: 'First' },
               { text: 'Second' },
