@@ -1,84 +1,147 @@
 <template>
   <div
-    :class="wrapClasses"
-    class="evui-checkbox"
+    :class="wrappedClasses"
   >
     <input
-      :id="id"
-      :name="name"
-      :class="cls"
-      :checked="checked"
+      v-if="group"
+      v-model="model"
+      :value="label"
       :disabled="disabled"
-      :value="value"
+      :checked="currentValue"
+      :id="createId"
+      :class="wrappedInnerClasses"
       type="checkbox"
-      @change="onChange"
+      @change="change"
+    >
+    <input
+      v-else
+      :id="createId"
+      :class="wrappedInnerClasses"
+      :disabled="disabled"
+      :checked="currentValue"
+      type="checkbox"
+      @change="change"
     >
     <label
-      :for="id"
+      :for="createId"
+      :class="labelClasses"
     >
-      {{ labelData }}
+      {{ label }}
     </label>
   </div>
 </template>
 
 <script>
-  import utils from '@/common/utils';
+  import { getMatchedComponentUpward } from '../../common/utils';
+
+  const prefixCls = 'evui-checkbox';
 
   export default {
-    model: {
-      prop: 'checked',
-      event: 'onChange',
-    },
+    name: 'CheckBox',
     props: {
-      id: {
-        type: String,
-        default() {
-          return utils.getId();
-        },
-      },
-      name: {
-        type: String,
-        default: null,
-      },
       cls: {
         type: String,
         default: null,
-      },
-      label: {
-        type: String,
-        default: null,
-      },
-      checked: {
-        type: Boolean,
-        default: false,
       },
       disabled: {
         type: Boolean,
         default: false,
       },
-      value: {
+      indeterminate: {
+        type: Boolean,
+        default: false,
+      },
+      label: {
         type: [String, Number, Boolean],
         default: null,
+      },
+      value: {
+        type: [String, Number, Boolean],
+        default: false,
+      },
+      trueValue: {
+        type: [String, Number, Boolean],
+        default: true,
+      },
+      falseValue: {
+        type: [String, Number, Boolean],
+        default: false,
       },
     },
     data() {
       return {
-        labelData: this.label,
+        model: [],
+        group: false,
+        currentValue: this.value,
+        wrapperedInnerClass: this.cls,
+        parent: getMatchedComponentUpward(this, 'CheckboxGroup'),
       };
     },
     computed: {
-      wrapClasses() {
+      wrappedClasses() {
         return [
+          `${prefixCls}`,
           {
-            'evui-diabled': this.disabled,
+            'evui-disabled': this.disabled,
           },
         ];
       },
+      labelClasses() {
+        return [
+          `${prefixCls}-label`,
+        ];
+      },
+      createId() {
+        return this._uid;
+      },
+      wrappedInnerClasses() {
+        return this.wrapperedInnerClass;
+      },
+    },
+    watch: {
+      value(value) {
+        if (value === this.trueValue || value === this.falseValue) {
+          this.updateModel();
+        }
+      },
+    },
+    mounted() {
+      this.parent = getMatchedComponentUpward(this, 'CheckboxGroup');
+
+      if (this.parent) {
+        this.group = true;
+      }
+
+      if (this.group) {
+        this.parent.updateModel(true);
+      } else {
+        this.updateModel();
+      }
     },
     methods: {
-      onChange(event) {
-        this.$emit('change', event.target.checked);
+      change(e) {
+        if (this.disabled) {
+          return;
+        }
+        const checked = e.target.checked;
+        this.currentValue = checked;
+        const value = checked ? this.trueValue : this.falseValue;
+
+        this.$emit('input', value);
+        if (this.group) {
+          this.parent.change(this.model);
+        } else {
+          this.$emit('on-change', value);
+        }
+      },
+      updateModel() {
+        this.currentValue = this.value === this.trueValue;
+      },
+      setDisabled(newValue) {
+        this.wrapperedDisabled = newValue;
       },
     },
   };
 </script>
+<style scoped>
+</style>
