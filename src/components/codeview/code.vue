@@ -5,28 +5,20 @@
       :class="isActive"
       class="guide-content-example"
     >
-      <div class="show-box">
-        <div
-          class="guide-content-example-layer"
-        >
-          <slot/>
-        </div>
-        <div class="guide-content-split-layer"/>
-        <div
-          ref="codeBox"
-          class="guide-content-code-layer"
-        >
-          <codemirror
-            :value="rawCode"
-            :options="{
-              tabSize: 4,
-              lineNumbers: false,
-              lineWrapping: true,
-              line: true,
-              lint: false,
-            }"
-          />
-        </div>
+      <div
+        class="guide-content-example-layer"
+      >
+        <slot/>
+      </div>
+      <div class="guide-content-split-layer"/>
+      <div
+        ref="codeBox"
+        class="guide-content-code-layer"
+      >
+        <codemirror
+          :value="rawCode"
+          :options="codeOption"
+        />
       </div>
       <div
         class="guide-content-example-bar"
@@ -70,20 +62,13 @@
         boxHeight: this.height,
         txtBottomBar: 'Expand',
         isExpand: false,
-        cmOption: {
+        codeOption: {
+          mode: 'vue',
           tabSize: 4,
-          styleActiveLine: true,
-          lineNumbers: true,
-          line: true,
-          foldGutter: true,
-          styleSelectedText: true,
-          mode: 'text/javascript',
-          keyMap: 'sublime',
-          matchBrackets: true,
-          showCursorWhenSelecting: true,
-          hintOptions: {
-            completeSingle: false,
-          },
+          lineNumbers: false,
+          lineWrapping: true,
+          scrollbarStyle: null,
+          readOnly: true,
         },
       };
     },
@@ -94,15 +79,6 @@
             expand: this.isExpand,
           },
         ];
-      },
-      templateClass() {
-        return 'html';
-      },
-      scriptClass() {
-        return 'javascript';
-      },
-      styleClass() {
-        return 'css';
       },
       selectIconClasses() {
         return [
@@ -123,7 +99,7 @@
       onBottomClick: function onBottomClick() {
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
-          this.boxHeight = this.$refs.codeBox.getBoundingClientRect().height + 60;
+          this.boxHeight = this.$refs.codeBox.getBoundingClientRect().height + 300;
         } else {
           this.txtBottomBar = 'Expand';
           this.boxHeight = this.height;
@@ -164,7 +140,9 @@
 <style scoped>
   .guide-content-example{
     position: relative;
-    height: 150px;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
     border: 2px solid #dfe6e9;
     padding: 10px 10px 40px 10px;
     border-radius: 6px;
@@ -177,13 +155,13 @@
   .guide-content-example-layer{
     margin-top: 5px;
     padding-bottom: 10px;
-    hieght: 100%;
   }
   .guide-content-split-layer{
     border-bottom: 1px solid #dfe6e9;
   }
   .guide-content-code-layer{
-    hieght: 100%;
+    width: 100%;
+    height: 100%;
   }
   .guide-content-example-bar{
     position: absolute;
@@ -237,9 +215,5 @@
   }
   .guide-content-example-jsfiddle:hover{
     color: #0984e3;
-  }
-
-  .CodeMirror-code {
-    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
 </style>

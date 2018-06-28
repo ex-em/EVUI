@@ -5,6 +5,8 @@ import App from './app';
 import EVUI from '../src/index';
 import 'codemirror/lib/codemirror.css';
 
+require('codemirror/mode/vue/vue');
+
 Vue.use(VueRouter);
 Vue.use(EVUI);
 Vue.prototype.$http = Axios;
