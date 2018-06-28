@@ -75,4 +75,10 @@
 </script>
 
 <style scoped>
+  h4 {
+    color: mediumseagreen;
+  }
+  h5 {
+    color: darkorange;
+  }
 </style>

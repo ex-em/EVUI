@@ -3,7 +3,6 @@ import Axios from 'axios';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
-import 'codemirror/lib/codemirror.css';
 
 require('codemirror/mode/vue/vue');
 
@@ -21,39 +20,39 @@ const router = new VueRouter({
     },
     {
       path: '/container',
-      component: resolve => require(['./guide/components/container'], resolve),
+      component: resolve => require(['./guide/examples/container'], resolve),
     },
     {
       path: '/dock/dockframeSample',
-      component: resolve => require(['./guide/components/dock/dockframeSample'], resolve),
+      component: resolve => require(['./guide/examples/dock/dockframeSample'], resolve),
     },
     {
       path: '/chart',
-      component: resolve => require(['./guide/components/chart'], resolve),
+      component: resolve => require(['./guide/examples/chart'], resolve),
     },
     {
       path: '/checkbox',
-      component: resolve => require(['./guide/components/checkbox'], resolve),
+      component: resolve => require(['./guide/views/guidepages/examples/checkbox/checkbox-view'], resolve),
     },
     {
       path: '/selectbox',
-      component: resolve => require(['./guide/components/selectbox'], resolve),
+      component: resolve => require(['./guide/examples/selectbox'], resolve),
     },
     {
       path: '/table',
-      component: resolve => require(['./guide/components/table'], resolve),
+      component: resolve => require(['./guide/examples/table'], resolve),
     },
     {
       path: '/table2',
-      component: resolve => require(['./guide/components/table2'], resolve),
+      component: resolve => require(['./guide/examples/table2'], resolve),
     },
     {
       path: '/menu',
-      component: resolve => require(['./guide/components/menu'], resolve),
+      component: resolve => require(['./guide/examples/menu'], resolve),
     },
     {
       path: '/code',
-      component: resolve => require(['./guide/components/code'], resolve),
+      component: resolve => require(['./guide/examples/code'], resolve),
     },
   ],
 });

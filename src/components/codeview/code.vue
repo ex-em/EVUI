@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="outer">
     <div
       :style="{height: boxHeight + 'px'}"
       :class="isActive"
@@ -138,6 +138,9 @@
   };
 </script>
 <style scoped>
+  .outer{
+    padding: 5px;
+  }
   .guide-content-example{
     position: relative;
     width: 100%;
@@ -162,6 +165,7 @@
   .guide-content-code-layer{
     width: 100%;
     height: 100%;
+    font-size: 8px;
   }
   .guide-content-example-bar{
     position: absolute;

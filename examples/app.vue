@@ -6,7 +6,6 @@
 </template>
 <script>
   import '@/styles/evui.css';
-  import '@/styles/codemirror.css';
   import mainHeader from '../home/guide/views/header';
   import mainContent from '../home/guide/views/content';
 
