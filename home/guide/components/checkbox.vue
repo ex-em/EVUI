@@ -10,20 +10,17 @@
     <button
       @click="visible = !visible"
     > {{ visible ? 'visible' : 'invisible' }}</button>
-    {{ valueData }}
   </div>
 </template>
 
 <script>
   import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
-  import codeView from '@/components/codeview/code';
 
   export default {
     name: 'Checkbox',
     components: {
       checkbox,
-      codeView,
     },
     data() {
       return {
@@ -31,6 +28,7 @@
         label: 'test',
         valueData: null,
         buttonLabel: 'visible',
+        text: 'testtest',
       };
     },
     methods: {
@@ -42,4 +40,7 @@
 </script>
 
 <style scoped>
+  .class {
+    flex-wrap: wrap;
+  }
 </style>

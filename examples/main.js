@@ -14,7 +14,7 @@ const router = new VueRouter({
   routes: [
     {
       path: '/',
-      component: resolve => require(['../views/intro'], resolve),
+      component: resolve => require(['../home/guide/views/intro'], resolve),
     },
     {
       path: '/container',

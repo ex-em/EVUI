@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import thumbSummary from '../views/summary';
+  import thumbSummary from './summary';
 
   export default {
     components: {

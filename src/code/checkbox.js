@@ -9,9 +9,4 @@
  */
 
 const code = {};
-
-code.text = `
-js fiddle text
-`;
-
 export default code;

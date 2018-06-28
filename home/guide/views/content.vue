@@ -15,15 +15,17 @@
 
 <script>
   import '@/styles/all.css';
-  import menuNav from '../views/menu';
+  import menuNav from './menu';
 
   export default {
     components: {
       menuNav,
     },
-    model: {
-    },
     props: {
+      imgUrl: {
+        type: String,
+        default: './guide/images/',
+      },
     },
     data() {
       return {
@@ -43,13 +45,13 @@
                 name: 'Container',
                 routerLink: '/container',
                 content: '컨테이너',
-                imgUrl: '../static/images/container.png',
+                imgUrl: `${this.imgUrl}/container.png`,
               },
               {
                 name: 'Docking',
                 routerLink: '/dock/dockframeSample',
                 content: '닥 컨테이너 샘플',
-                imgUrl: '../static/images/dockContainer.png',
+                imgUrl: `${this.imgUrl}/dockContainer.png`,
               },
             ],
           },
@@ -60,37 +62,31 @@
             children: [
               {
                 name: 'Checkbox',
-                routerLink: '/checkbox',
+                routerLink: `${this.imgUrl}/checkbox.png`,
                 content: '체크박스',
               },
               {
                 name: 'Selectbox',
-                routerLink: '/selectbox',
+                routerLink: `${this.imgUrl}/selectbox.png`,
                 content: '셀렉트 박스',
               },
               {
                 name: 'Table(page)',
                 routerLink: '/table',
                 content: 'table(page)',
-                imgUrl: '../static/images/tablePage.png',
+                imgUrl: `${this.imgUrl}/tablePage.png`,
               },
               {
                 name: 'Table(virtualScroll)',
                 routerLink: '/table2',
                 content: 'Table(virtualScroll)',
-                imgUrl: '../static/images/tableVirtualscroll.png',
+                imgUrl: `${this.imgUrl}/tableVirtualscroll.png`,
               },
               {
                 name: 'Timepicker',
                 routerLink: '',
                 content: 'timepicker',
-                imgUrl: '../static/images/timepicker.png',
-              },
-              {
-                name: 'Codebox',
-                routerLink: '/codebox',
-                content: 'codebox',
-                imgUrl: '',
+                imgUrl: `${this.imgUrl}/timepicker.png`,
               },
             ],
           },
@@ -103,7 +99,7 @@
                 name: 'Chart',
                 routerLink: '/chart',
                 content: 'chart',
-                imgUrl: '../static/images/chart.png',
+                imgUrl: `${this.imgUrl}/chart.png`,
               },
             ],
           },
@@ -116,7 +112,7 @@
                 name: 'Menu',
                 routerLink: '/menu',
                 content: 'menu',
-                imgUrl: '../static/images/menu.png',
+                imgUrl: `${this.imgUrl}/menu.png`,
               },
               {
                 name: 'Summary',
@@ -134,13 +130,13 @@
                 name: 'Loadingmask',
                 routerLink: '',
                 content: 'loadingmask',
-                imgUrl: '../static/images/loadingmask.png',
+                imgUrl: `${this.imgUrl}/loadingmask.png`,
               },
               {
                 name: 'Code',
                 routerLink: '/code',
                 content: 'codeView',
-                imgUrl: '../static/images/code.png',
+                imgUrl: `${this.imgUrl}/code.png`,
               },
             ],
           },

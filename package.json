@@ -11,7 +11,9 @@
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
-    "build": "webpack --config build/webpack.prod.conf.js"
+    "build": "webpack --config build/webpack.prod.conf.js",
+    "home": "webpack-dev-server --progress --config build/webpack.home.conf.js",
+    "home_build": "webpack --config build/webpack.home.conf.js"
   },
   "main": "dist/evui.min.js",
   "files": [
@@ -56,6 +58,7 @@
     "babel-preset-stage-2": "^6.22.0",
     "chai": "^4.1.2",
     "chalk": "^2.0.1",
+    "clean-webpack-plugin": "^0.1.19",
     "compression-webpack-plugin": "^1.1.6",
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^5.0.1",
@@ -100,12 +103,14 @@
     "style-loader": "^0.20.2",
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
+    "vue-codemirror-lite": "^1.0.4",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.5.2",
     "vue-test-utils": "^1.0.0-beta.11",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
+    "webpack-clean-plugin": "^0.2.3",
     "webpack-dev-server": "^2.9.1",
     "webpack-merge": "^4.1.0"
   },

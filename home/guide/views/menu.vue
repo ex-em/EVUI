@@ -14,10 +14,11 @@
             class="evui-menu-group-title"
             @click="initSelectedMenu"
           >
-              <i
-                v-show="menu.cls"
-                :class="menu.cls"
-              /> {{ menu.name }}
+            <i
+              v-show="menu.cls"
+              :class="menu.cls"
+            />
+            {{ menu.name }}
           </div>
         </router-link>
         <div
