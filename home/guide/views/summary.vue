@@ -27,7 +27,7 @@
             <div class="evui-summary-thumbnail-box-image">
               <img
                 :alt="submenu.name"
-                :src="submenu.imgUrl || '../static/images/noImage.png'"
+                :src="submenu.imgUrl || './guide/images/noImage.png'"
                 class="evui-summary-thumbnail-img"
               >
             </div>
@@ -64,6 +64,17 @@
         set(store) {
           this.totalStore = store;
         },
+      },
+      computedSubMenu(url) {
+        const noImage = '';
+        let result = '';
+        if (!url) {
+          result = noImage;
+        } else {
+          result = url;
+        }
+
+        return result;
       },
     },
     watch: {

@@ -30,9 +30,9 @@
   .evui-main-header {
     display: table;
     position: fixed;
-    background: #999;
+    background:rgba(45,137,239, 0.8);
     width: 100%;
-    height: 70px;
+    height: 55px;
     top: 0;
     right: 0;
     z-index: 1000;
@@ -51,9 +51,9 @@
   .evui-header-title > a > div{
     display: table-cell;
     vertical-align: middle;
-    font-size: 17px;
+    font-size: 15px;
     padding-left: 10px;
     font-weight: bold;
-    color: #555;
+    color: rgb(43,87,151);
   }
 </style>
