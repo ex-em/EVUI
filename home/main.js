@@ -20,39 +20,31 @@ const router = new VueRouter({
     },
     {
       path: '/container',
-      component: resolve => require(['./guide/examples/container'], resolve),
+      component: resolve => require(['./guide/views/examples/container/container-view'], resolve),
     },
     {
-      path: '/dock/dockframeSample',
-      component: resolve => require(['./guide/examples/dock/dockframeSample'], resolve),
+      path: '/dock',
+      component: resolve => require(['./guide/views/examples/dock/dockframe-view'], resolve),
     },
     {
       path: '/chart',
-      component: resolve => require(['./guide/examples/chart'], resolve),
+      component: resolve => require(['./guide/views/examples/chart/chart-view'], resolve),
     },
     {
       path: '/checkbox',
-      component: resolve => require(['./guide/views/guidepages/examples/checkbox/checkbox-view'], resolve),
+      component: resolve => require(['./guide/views/examples/checkbox/checkbox-view'], resolve),
     },
     {
       path: '/selectbox',
-      component: resolve => require(['./guide/examples/selectbox'], resolve),
+      component: resolve => require(['./guide/views/examples/selectbox/selectbox-view'], resolve),
     },
     {
       path: '/table',
-      component: resolve => require(['./guide/examples/table'], resolve),
-    },
-    {
-      path: '/table2',
-      component: resolve => require(['./guide/examples/table2'], resolve),
+      component: resolve => require(['./guide/views/examples/table/table-view'], resolve),
     },
     {
       path: '/menu',
-      component: resolve => require(['./guide/examples/menu'], resolve),
-    },
-    {
-      path: '/code',
-      component: resolve => require(['./guide/examples/code'], resolve),
+      component: resolve => require(['./guide/views/examples/menu/menu-view'], resolve),
     },
   ],
 });

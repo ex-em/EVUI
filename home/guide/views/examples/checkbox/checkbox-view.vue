@@ -37,22 +37,22 @@
         buttonLabel: 'visible',
         componentList: [
           {
-            url: './guide/views/guidepages/examples/checkbox/checkbox-default.vue',
+            url: './guide/views/examples/checkbox/checkbox-default.vue',
             component: checkboxDefault,
             title: 'Check Box Default',
           },
           {
-            url: './guide/views/guidepages/examples/checkbox/checkbox-advanced.vue',
+            url: './guide/views/examples/checkbox/checkbox-advanced.vue',
             component: checkboxAdvanced,
             title: 'Check Box Status & Custom Bind Event',
           },
           {
-            url: './guide/views/guidepages/examples/checkbox/checkbox-group-default.vue',
+            url: './guide/views/examples/checkbox/checkbox-group-default.vue',
             component: checkboxGroupDefault,
             title: 'Check Box Group Default',
           },
           {
-            url: './guide/views/guidepages/examples/checkbox/checkbox-group-advanced.vue',
+            url: './guide/views/examples/checkbox/checkbox-group-advanced.vue',
             component: checkboxGroupAdvanced,
             title: 'Check Box Group List Handling & Custom Bind Event',
             height: 500,

@@ -49,7 +49,7 @@
               },
               {
                 name: 'Docking',
-                routerLink: '/dock/dockframeSample',
+                routerLink: '/dock',
                 content: '닥 컨테이너 샘플',
                 imgUrl: `${this.imgUrl}/dockContainer.png`,
               },
@@ -62,25 +62,21 @@
             children: [
               {
                 name: 'Checkbox',
-                routerLink: `${this.imgUrl}/checkbox.png`,
+                routerLink: '/checkbox',
                 content: '체크박스',
+                imgUrl: `${this.imgUrl}/checkbox.png`,
               },
               {
                 name: 'Selectbox',
-                routerLink: `${this.imgUrl}/selectbox.png`,
+                routerLink: '/selectbox',
                 content: '셀렉트 박스',
+                imgUrl: `${this.imgUrl}/selectbox.png`,
               },
               {
                 name: 'Table(page)',
                 routerLink: '/table',
                 content: 'table(page)',
                 imgUrl: `${this.imgUrl}/tablePage.png`,
-              },
-              {
-                name: 'Table(virtualScroll)',
-                routerLink: '/table2',
-                content: 'Table(virtualScroll)',
-                imgUrl: `${this.imgUrl}/tableVirtualscroll.png`,
               },
               {
                 name: 'Timepicker',
@@ -134,7 +130,7 @@
               },
               {
                 name: 'Code',
-                routerLink: '/code',
+                routerLink: '',
                 content: 'codeView',
                 imgUrl: `${this.imgUrl}/code.png`,
               },
@@ -156,7 +152,7 @@
 
 <style scoped>
   .evui-main-content {
-    display: flex;
+    display: inline-flex;
     margin-top: 70px;
   }
   .evui-right-content {

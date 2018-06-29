@@ -6,9 +6,9 @@
   </div>
 </template>
 <script>
-  import LineChart from './charts/chart.line';
-  import BarChart from './charts/chart.bar';
-  import PieChart from './charts/chart.pie';
+  import LineChart from '@/components/chart/charts/chart.line';
+  import BarChart from '@/components/chart/charts/chart.bar';
+  import PieChart from '@/components/chart/charts/chart.pie';
 
   export default {
     components: {

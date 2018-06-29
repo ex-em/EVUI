@@ -31,8 +31,8 @@
 </style>
 <script>
   import { dockMainFrame, dockSubFrame, dockFrame, dockspliter, dockFrameLayerPopup, DockFrameTab } from '@/components/dock';
-  import chart from '../chart';
-  import evuitable from '../table';
+  import chart from '@/components/chart/chart';
+  import evuitable from '@/components/table/table';
 //
 //  const chartComponet = {
 //    components: {

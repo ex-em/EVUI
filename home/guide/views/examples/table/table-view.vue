@@ -3,14 +3,13 @@
     <Table
       :width="'40%'"
       :height="'350px'"
-      :virtualScroll="true"
+      :pagination="true"
     />
   </div>
 </template>
 
 <script>
-  import Table from '@/components/table';
-  // import '@/components/table/table.css';
+  import Table from '@/components/table/table';
 
   export default {
     components: {

@@ -58,7 +58,7 @@
 </template>
 <script>
   import { mainContainer, ResizeBar, boxPanel } from '@/components/container';
-  import chart from './chart';
+  import chart from '@/components/chart/chart';
 // horizontal vertical
   export default {
     components: {
