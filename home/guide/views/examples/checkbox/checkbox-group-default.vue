@@ -49,7 +49,6 @@
 <style scoped>
   div{
     display: inline-block;
-    padding: 3px;
   }
   p{
     padding: 5px;

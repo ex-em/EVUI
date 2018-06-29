@@ -74,9 +74,6 @@
   };
 </script>
 <style scoped>
-  div {
-    padding: 3px;
-  }
   p {
     padding: 3px;
   }

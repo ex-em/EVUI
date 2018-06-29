@@ -30,7 +30,7 @@
   .evui-main-header {
     display: table;
     position: fixed;
-    background:rgba(45,137,239, 0.8);
+    background: #67A1F4;
     width: 100%;
     height: 55px;
     top: 0;

@@ -69,15 +69,7 @@
 </script>
 
 <style scoped>
-  h5 {
-    margin: 10px;
-  }
-
   div {
     font-family: 'NanumGothic', Helvetica
-  }
-
-  .inner-article {
-    margin: 10px;
   }
 </style>

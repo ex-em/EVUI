@@ -48,6 +48,7 @@ a:visited {
 ************************************************************************************/
 .evui-checkbox{
   display: inline-block;
+  user-select: none;
 }
 
 .evui-checkbox input[type=checkbox]{

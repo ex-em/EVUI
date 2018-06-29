@@ -145,12 +145,10 @@
 </script>
 <style scoped>
   .group-slot-demo {
-    padding: 3px;
     width: 300px;
     display: inline-block;
   }
   .group-list-demo {
-    padding: 3px;
     width: 300px;
     display: inline-block;
   }

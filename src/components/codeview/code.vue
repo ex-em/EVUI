@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
     <div
-      :style="{ height: !isExpand ? '300px' : boxHeight+'px' }"
+      :style="{ height: boxHeight+'px' }"
       :class="isActive"
       class="guide-content-example"
     >
@@ -53,7 +53,7 @@
       },
       height: {
         type: Number,
-        default: 100,
+        default: 200,
       },
     },
     data() {
@@ -101,7 +101,7 @@
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
           this.boxHeight = this.$refs.codeLayer.getBoundingClientRect().height +
-            this.$refs.exampleLayer.getBoundingClientRect().height + 40;
+            this.$refs.exampleLayer.getBoundingClientRect().height + 30;
         } else {
           this.txtBottomBar = 'Expand';
           this.boxHeight = this.height;
@@ -149,7 +149,7 @@
     flex-direction: column;
     width: 100%;
     border: 2px solid #dfe6e9;
-    padding: 10px 10px 40px 10px;
+    padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
     transition: height 1s ease-in-out;
@@ -174,12 +174,13 @@
     left: 0px;
     bottom: 0px;
     width: 100%;
-    height: 40px;
+    height: 37px;
     padding: 6px;
     z-index: 10;
   }
   .guide-content-example-bar:hover{
     cursor: pointer;
+    background-color: rgba(237,241,244, 0.45);
   }
   .guide-content-example:hover{
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
@@ -187,7 +188,7 @@
   .guide-content-example-bar-icon{
     width: 100%;
     height: 100%;
-    line-height: 28px;
+    line-height: 25px;
     text-align: center;
   }
   .guide-content-example-bar-icon i{
@@ -195,14 +196,14 @@
     height: 100%;
     line-height: 18px;
     font-size: 15px;
-    /*transition: all .2s ease-in-out;*/
+    transition: all .2s ease-in-out;
   }
   .guide-content-example-bar-icon.select-down i{
     transform: rotate(180deg);
   }
   .guide-content-example-bar-icon span{
     opacity: 0;
-    /*transition: opacity 0.5s ease-in-out;*/
+    transition: opacity 0.5s ease-in-out;
   }
   .guide-content-example-bar:hover .guide-content-example-jsfiddle,
   .guide-content-example-bar:hover .guide-content-example-bar-icon span{
