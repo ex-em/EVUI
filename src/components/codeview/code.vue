@@ -1,17 +1,19 @@
 <template>
   <div class="outer">
     <div
+      :style="{ height: !isExpand ? '300px' : boxHeight+'px' }"
       :class="isActive"
       class="guide-content-example"
     >
       <div
+        ref="exampleLayer"
         class="guide-content-example-layer"
       >
         <slot/>
       </div>
       <div class="guide-content-split-layer"/>
       <div
-        ref="codeBox"
+        ref="codeLayer"
         class="guide-content-code-layer"
       >
         <codemirror
@@ -98,7 +100,8 @@
       onBottomClick: function onBottomClick() {
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
-          this.boxHeight = this.$refs.codeBox.getBoundingClientRect().height + 300;
+          this.boxHeight = this.$refs.codeLayer.getBoundingClientRect().height +
+            this.$refs.exampleLayer.getBoundingClientRect().height + 40;
         } else {
           this.txtBottomBar = 'Expand';
           this.boxHeight = this.height;
@@ -142,18 +145,17 @@
   }
   .guide-content-example{
     position: relative;
-    display: flex;
+    display: block;
     flex-direction: column;
     width: 100%;
-    min-height: 200px;
     border: 2px solid #dfe6e9;
     padding: 10px 10px 40px 10px;
     border-radius: 6px;
     overflow: hidden;
-    transition: all 1s ease;
+    transition: height 1s ease-in-out;
   }
   .guide-content-example.expand{
-    transition: all 1s ease;
+    transition: height 1s ease-in-out;
   }
   .guide-content-example-layer{
     position: relative;
@@ -164,19 +166,11 @@
   }
   .guide-content-code-layer{
     position: relative;
-    flex: 1;
-    height: calc(100% - 60px);
     width: 100%;
     font-size: 8px;
   }
-  .guide-content-code-layer > div {
-    height: 100%;
-  }
-  .guide-content-code-layer > div > div {
-    height: 100% !important;
-  }
   .guide-content-example-bar{
-    position: relative;
+    position: absolute;
     left: 0px;
     bottom: 0px;
     width: 100%;
@@ -201,14 +195,14 @@
     height: 100%;
     line-height: 18px;
     font-size: 15px;
-    transition: all .2s ease-in-out;
+    /*transition: all .2s ease-in-out;*/
   }
   .guide-content-example-bar-icon.select-down i{
     transform: rotate(180deg);
   }
   .guide-content-example-bar-icon span{
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    /*transition: opacity 0.5s ease-in-out;*/
   }
   .guide-content-example-bar:hover .guide-content-example-jsfiddle,
   .guide-content-example-bar:hover .guide-content-example-bar-icon span{
@@ -221,7 +215,7 @@
     font-weight: bold;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    /*transition: opacity 0.5s ease-in-out;*/
   }
   .guide-content-example-jsfiddle:hover{
     color: #0984e3;
