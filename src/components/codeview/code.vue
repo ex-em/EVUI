@@ -1,7 +1,6 @@
 <template>
   <div class="outer">
     <div
-      :style="{height: boxHeight + 'px'}"
       :class="isActive"
       class="guide-content-example"
     >
@@ -143,8 +142,9 @@
   }
   .guide-content-example{
     position: relative;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: 100%;
     min-height: 200px;
     border: 2px solid #dfe6e9;
     padding: 10px 10px 40px 10px;
@@ -156,19 +156,27 @@
     transition: all 1s ease;
   }
   .guide-content-example-layer{
-    margin-top: 5px;
-    padding-bottom: 10px;
+    position: relative;
   }
   .guide-content-split-layer{
+    position: relative;
     border-bottom: 1px solid #dfe6e9;
   }
   .guide-content-code-layer{
+    position: relative;
+    flex: 1;
+    height: calc(100% - 60px);
     width: 100%;
-    height: 100%;
     font-size: 8px;
   }
+  .guide-content-code-layer > div {
+    height: 100%;
+  }
+  .guide-content-code-layer > div > div {
+    height: 100% !important;
+  }
   .guide-content-example-bar{
-    position: absolute;
+    position: relative;
     left: 0px;
     bottom: 0px;
     width: 100%;
@@ -179,11 +187,9 @@
   .guide-content-example-bar:hover{
     cursor: pointer;
   }
-
   .guide-content-example:hover{
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   }
-
   .guide-content-example-bar-icon{
     width: 100%;
     height: 100%;
