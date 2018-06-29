@@ -13,8 +13,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'NanumGothic', Helvetica;
-  font-size: 14px;
 }
 a, span {
   text-decoration: none !important;
@@ -229,6 +227,7 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
 ************************************************************************************/
 
 .CodeMirror {
+  font-size: 13px;
   height: 100% !important;
 }
 .vue-codemirror-wrap {

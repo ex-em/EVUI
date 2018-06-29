@@ -5,7 +5,7 @@
       :key="item.id"
     >
       <div class="inner-article">
-        <h5># {{ item.title }}</h5>
+        <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
           :height="item.height"

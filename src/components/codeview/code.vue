@@ -37,7 +37,6 @@
 </template>
 
 <script>
-  /* eslint-disable no-useless-escape */
   import { codemirror } from 'vue-codemirror-lite';
   import icon from '@/components/icon/icon';
 
@@ -93,48 +92,24 @@
       this.$http.get(this.codeUrl)
         .then((result) => {
           this.rawCode = result.data;
-          this.resource = this.codeParser(this.rawCode);
-        }, () => {});
+        }, (error) => {
+          throw new Error(error);
+        });
     },
     methods: {
       onBottomClick: function onBottomClick() {
+        const codeLayerHeight = this.$refs.codeLayer.getBoundingClientRect().height;
+        const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
+
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
-          this.boxHeight = this.$refs.codeLayer.getBoundingClientRect().height +
-            this.$refs.exampleLayer.getBoundingClientRect().height + 30;
+          this.boxHeight = codeLayerHeight + exampleLayerHeight + 33;
         } else {
           this.txtBottomBar = 'Expand';
           this.boxHeight = this.height;
         }
 
         this.isExpand = !this.isExpand;
-      },
-      codeParser(data = '') {
-        let startTag;
-        let endTag;
-        let startIndex;
-        let endIndex;
-
-        const obj = {
-          template: '',
-          style: '',
-          script: '',
-        };
-
-        const keyList = Object.keys(obj);
-
-        for (let ix = 0, ixLen = keyList.length; ix < ixLen; ix++) {
-          startTag = `<${keyList[ix]}>`;
-          endTag = `</${keyList[ix]}>`;
-          startIndex =
-            keyList[ix] === 'style' ? data.lastIndexOf(startTag) : data.indexOf(startTag);
-          if (startIndex > -1) {
-            endIndex = data.lastIndexOf(endTag);
-            obj[keyList[ix]] = data.substring(startIndex + startTag.length, endIndex).trim();
-          }
-        }
-
-        return obj;
       },
     },
   };

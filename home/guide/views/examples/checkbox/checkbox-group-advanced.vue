@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
     <div class="group-slot-demo">
-      <h5># Use Slot</h5>
+      <h4># Use Slot</h4>
       <checkbox-group
         v-model="itemNameList"
       >
@@ -18,7 +18,7 @@
       <p>value List : {{ itemNameList }}</p>
     </div>
     <div class="group-list-demo">
-      <h5># Use List</h5>
+      <h4># Use List</h4>
       <checkbox-group
         :list="groupName"
         v-model="itemNameList"
@@ -27,14 +27,14 @@
     </div>
     <hr>
     <div class="box-demo">
-      <h5># V-Box</h5>
+      <h4># V-Box</h4>
       <checkbox-group
         :list="groupNameTheOhter"
         :group-align="'vbox'"
         v-model="itemNameListTheOhter"
       />
       <p>value List : {{ itemNameListTheOhter }}</p>
-      <h5># H-Box</h5>
+      <h4># H-Box</h4>
       <checkbox-group
         :list="groupNameTheOhter"
         v-model="itemNameListTheOhter"
@@ -43,7 +43,7 @@
     </div>
     <hr>
     <div class="custom-event-demo">
-      <h5># custom event</h5>
+      <h4># custom event</h4>
       <checkbox
         v-model="checkAll"
         :label="'all check'"
@@ -58,7 +58,7 @@
     </div>
     <hr>
     <div class="custom-event-demo">
-      <h5># disabled</h5>
+      <h4># disabled</h4>
       <checkbox-group
         :list="groupNameAnother"
         :disabled="isDisabled"
