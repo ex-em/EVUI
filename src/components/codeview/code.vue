@@ -158,7 +158,7 @@
     background-color: rgba(237,241,244, 0.45);
   }
   .guide-content-example:hover{
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2);
   }
   .guide-content-example-bar-icon{
     width: 100%;
@@ -171,7 +171,11 @@
     height: 100%;
     line-height: 18px;
     font-size: 15px;
+    opacity: 0;
     transition: all .2s ease-in-out;
+  }
+  .guide-content-example-bar-icon:hover i{
+    opacity: 1;
   }
   .guide-content-example-bar-icon.select-down i{
     transform: rotate(180deg);
@@ -180,8 +184,7 @@
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
   }
-  .guide-content-example-bar:hover .guide-content-example-jsfiddle,
-  .guide-content-example-bar:hover .guide-content-example-bar-icon span{
+  .guide-content-example-jsfiddle, .guide-content-example-bar-icon span{
     opacity: 1;
   }
   .guide-content-example-jsfiddle{

@@ -67,6 +67,12 @@
                 imgUrl: `${this.imgUrl}/checkbox.png`,
               },
               {
+                name: 'Radio',
+                routerLink: '/radio',
+                content: '라디오버튼',
+                imgUrl: `${this.imgUrl}/radio.png`,
+              },
+              {
                 name: 'Selectbox',
                 routerLink: '/selectbox',
                 content: '셀렉트 박스',

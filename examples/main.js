@@ -33,6 +33,10 @@ const router = new VueRouter({
       component: resolve => require(['./routers/checkbox'], resolve),
     },
     {
+      path: '/radio',
+      component: resolve => require(['./routers/radio'], resolve),
+    },
+    {
       path: '/selectbox',
       component: resolve => require(['./routers/selectbox'], resolve),
     },
