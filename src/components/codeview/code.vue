@@ -123,14 +123,14 @@
     display: block;
     flex-direction: column;
     width: 100%;
-    border: 2px solid #dfe6e9;
+    border: 1px solid #dfe6e9;
     padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
-    transition: height 1s ease-in-out;
+    transition: height .8s ease-in-out;
   }
   .guide-content-example.expand{
-    transition: height 1s ease-in-out;
+    transition: height .8s ease-in-out;
   }
   .guide-content-example-layer{
     position: relative;
@@ -155,10 +155,10 @@
   }
   .guide-content-example-bar:hover{
     cursor: pointer;
-    background-color: rgba(237,241,244, 0.45);
+    background-color: rgba(231,231,231, 0.3);
   }
   .guide-content-example:hover{
-    box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
   }
   .guide-content-example-bar-icon{
     width: 100%;
@@ -170,7 +170,8 @@
     display: inline-block;
     height: 100%;
     line-height: 18px;
-    font-size: 15px;
+    font-size: 16px;
+    color: #0055aa;
     opacity: 0;
     transition: all .2s ease-in-out;
   }

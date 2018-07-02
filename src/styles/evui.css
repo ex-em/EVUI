@@ -65,11 +65,13 @@ a:visited {
 .evui-checkbox.evui-disabled input[type="checkbox"] + label{
   color: #c1c1c1;
   cursor: not-allowed;
+  transition: all .2s;
 }
 
 div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   border: 1px solid #c1c1c1;
   color: #c1c1c1;
+  transition: all .2s;
 }
 
 .evui-checkbox input[type="checkbox"] + label:before{
@@ -119,7 +121,8 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .evui-radio [type="radio"]:not(:checked) + label {
   position: relative;
   display: inline-block;
-  padding-left: 24px;
+  padding-left: 21px;
+  padding-right: 5px;
   cursor: pointer;
   line-height: 16px;
   user-select: none;

@@ -10,6 +10,7 @@
         @selectedSummary="getSelectedSummary"
       />
     </div>
+    <div class="evui-page-anchor"/>
   </div>
 </template>
 
@@ -164,6 +165,9 @@
   }
   .evui-right-content {
     margin: 20px;
+    flex: 4;
+  }
+  .evui-page-anchor {
     flex: 1;
   }
 </style>
