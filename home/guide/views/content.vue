@@ -153,6 +153,7 @@
 <style scoped>
   .evui-main-content {
     display: inline-flex;
+    width: 100%;
     margin-top: 55px;
   }
   .evui-right-content {

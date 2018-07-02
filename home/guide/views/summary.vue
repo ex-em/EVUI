@@ -29,6 +29,7 @@
                 :alt="submenu.name"
                 :src="submenu.imgUrl || './guide/images/noImage.png'"
                 class="evui-summary-thumbnail-img"
+                @onerror="'../home/guide/images/noImage.png'"
               >
             </div>
             <div>
@@ -54,27 +55,17 @@
     },
     data() {
       return {
+        menuStore: this.totalStore,
       };
     },
     computed: {
       computedStore: {
         get() {
-          return this.totalStore;
+          return this.menuStore;
         },
         set(store) {
-          this.totalStore = store;
+          this.menuStore = store;
         },
-      },
-      computedSubMenu(url) {
-        const noImage = '';
-        let result = '';
-        if (!url) {
-          result = noImage;
-        } else {
-          result = url;
-        }
-
-        return result;
       },
     },
     watch: {
@@ -90,6 +81,19 @@
           }
           return item;
         });
+      },
+      computedSubMenu(url) {
+        const noImage = './guide/images/noImage.png';
+        let result = '';
+        if (!url || url === undefined) {
+          /*eslint-disable*/
+          console.log('123');
+          result = noImage;
+        } else {
+          result = url;
+        }
+
+        return result;
       },
     },
   };
@@ -125,13 +129,10 @@
     margin: 0;
     padding: 0 150px 0 10px;
   }
-  .evui-summary-thumbnail-ul:after {
-    flex: auto;
-  }
   .evui-summary-thumbnail-ul.active {
     display: none;
     height: 0px;
-    transition: height 0.5s ease-in-out, display 1s ease-in-out;
+    transition: all 0.5s ease-in-out;
   }
   .evui-summary-thumbnail-li {
     list-style: none;
@@ -140,6 +141,7 @@
     margin: 10px;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.1);
     word-wrap: break-word;
+    transition: opacity 0.5s ease-in-out;
   }
   .evui-summary-thumbnail-li:hover {
     -webkit-transform: scale(1.05);
