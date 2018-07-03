@@ -38,6 +38,18 @@ const router = new VueRouter({
       path: '/table2',
       component: resolve => require(['./routers/table2'], resolve),
     },
+    {
+      path: '/table3',
+      component: resolve => require(['./routers/table3'], resolve),
+    },
+    {
+      path: '/loadingmask',
+      component: resolve => require(['./routers/loadingmask'], resolve),
+    },
+    {
+      path: '/timePicker',
+      component: resolve => require(['./routers/timePicker'], resolve),
+    },
   ],
 });
 
