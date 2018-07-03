@@ -1,9 +1,9 @@
 <template>
   <div class="evui-summary">
     <div class="evui-summary-header">
-      <h1>
+      <h3>
         <i class="far fa-list-alt"/> Guide Summary
-      </h1>
+      </h3>
       <br><br>
       <p>
         EVUI는 웹페이지의 핵심 구성요소인 Grid/Chart 컴포넌트를 제공하는 UI 프레임워크입니다.<br><br>
@@ -48,9 +48,6 @@
 <style>
   .evui-summary-header {
     height: auto;
-  }
-  .evui-summary-header h1 {
-    font-size: 20px;
   }
 </style>
 

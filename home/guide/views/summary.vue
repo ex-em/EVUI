@@ -33,8 +33,8 @@
               >
             </div>
             <div>
-              <h3> {{ submenu.name }} </h3>
-              <h4> {{ submenu.content }} </h4>
+              <h4> {{ submenu.name }} </h4>
+              <h5> {{ submenu.content }} </h5>
             </div>
           </router-link>
         </li>
@@ -148,10 +148,10 @@
     transform: scale(1.05);
     cursor: pointer;
   }
-  .evui-summary-thumbnail-li h3 {
+  .evui-summary-thumbnail-li h4 {
     padding: 5px 10px 5px 10px;
   }
-  .evui-summary-thumbnail-li h4 {
+  .evui-summary-thumbnail-li h5 {
     padding: 5px 10px 5px 10px;
   }
   .evui-summary-thumbnail-box-image img {

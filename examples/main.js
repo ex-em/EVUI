@@ -13,10 +13,6 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     {
-      path: '/',
-      component: resolve => require(['../home/guide/views/intro'], resolve),
-    },
-    {
       path: '/container',
       component: resolve => require(['./routers/container'], resolve),
     },
@@ -31,10 +27,6 @@ const router = new VueRouter({
     {
       path: '/checkbox',
       component: resolve => require(['./routers/checkbox'], resolve),
-    },
-    {
-      path: '/radio',
-      component: resolve => require(['./routers/radio'], resolve),
     },
     {
       path: '/selectbox',

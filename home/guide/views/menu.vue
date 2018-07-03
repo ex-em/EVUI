@@ -88,6 +88,12 @@
 </script>
 
 <style scoped>
+  a, span {
+    text-decoration: none !important;
+  }
+  a:visited {
+    color: #000;
+  }
   .evui-left-navigation {
     width: 240px;
     border-right: 1px solid #dddee0;

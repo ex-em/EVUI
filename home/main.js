@@ -50,6 +50,22 @@ const router = new VueRouter({
       path: '/menu',
       component: resolve => require(['./guide/views/examples/menu/menu-view'], resolve),
     },
+    {
+      path: '/table2',
+      component: resolve => require(['../examples/routers/table2'], resolve),
+    },
+    {
+      path: '/table3',
+      component: resolve => require(['../examples/routers/table3'], resolve),
+    },
+    {
+      path: '/loadingmask',
+      component: resolve => require(['../examples/routers/loadingmask'], resolve),
+    },
+    {
+      path: '/timePicker',
+      component: resolve => require(['../examples/routers/timePicker'], resolve),
+    },
   ],
 });
 

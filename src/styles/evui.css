@@ -7,18 +7,11 @@
   font-family:'NanumGothic';
   src:url('../webfonts/NanumGothic.ttf') format('truetype');
 }
-
 *{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-a, span {
-  text-decoration: none !important;
-}
-a:visited {
-  color: #000;
 }
 
 /************************************************************************************
