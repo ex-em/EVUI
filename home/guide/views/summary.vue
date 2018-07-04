@@ -121,11 +121,11 @@
     user-select: none;
   }
   .evui-summary-thumbnail-title > i {
-    transition: transform .2s ease-in-out;
+    transition: transform .1s ease-in-out;
   }
   .evui-summary-thumbnail-title.active > i {
     transform: rotate(180deg);
-    transition: transform .2s ease-in-out;
+    transition: transform .1s ease-in-out;
   }
   .evui-summary-thumbnail-ul {
     display: flex;
