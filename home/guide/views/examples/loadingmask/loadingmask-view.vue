@@ -35,11 +35,13 @@
             url: './guide/views/examples/loadingmask/loadingmask-default.vue',
             component: loadingmaskDefault,
             title: 'Loadingmask Default',
+            height: 350,
           },
           {
             url: './guide/views/examples/loadingmask/loadingmask-custom.vue',
             component: loadingmaskCustom,
             title: 'Loadingmask Custom Setting',
+            height: 350,
           },
         ],
       };

@@ -112,7 +112,7 @@
   }
   .evui-summary-thumbnail-title {
     height: 25px;
-    width: calc(100% - 150px);
+    width: calc(100% - 100px);
     border-bottom: 2px solid #EBF4FE;
     cursor: pointer;
     margin-bottom: 10px;
@@ -143,7 +143,7 @@
     float: left;
     width: calc(16.6% - 23px);
     margin: 10px;
-    box-shadow: 0 0 4px 4px rgba(0,0,0,0.1);
+    /*box-shadow: 0 0 4px 4px rgba(0,0,0,0.1);*/
     word-wrap: break-word;
     transition: opacity 0.5s ease-in-out;
   }

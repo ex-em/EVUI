@@ -33,6 +33,7 @@
         </div>
       </div>
     </div>
+    <br>
   </div>
 </template>
 
@@ -116,7 +117,7 @@
 </script>
 <style scoped>
   .evui-codeview{
-    padding: 5px;
+    padding: 10px 5px 10px 5px;
   }
   .evui-codeview-example{
     position: relative;
@@ -138,6 +139,7 @@
   .evui-codeview-split-layer{
     position: relative;
     border-bottom: 1px solid #dfe6e9;
+    padding: 5px 0 5px 0;
   }
   .evui-codeview-code-layer{
     position: relative;

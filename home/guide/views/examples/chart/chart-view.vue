@@ -35,11 +35,13 @@
             url: './guide/views/examples/chart/chart-bar-default.vue',
             component: chartBarDefault,
             title: 'Bar Chart Default',
+            height: 500,
           },
           {
             url: './guide/views/examples/chart/chart-bar-stack-default.vue',
             component: chartBarStackDefault,
             title: 'Stack Bar Chart',
+            height: 500,
           },
         ],
       };

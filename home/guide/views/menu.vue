@@ -91,6 +91,9 @@
   a, span {
     text-decoration: none !important;
   }
+  a:hover {
+    color: #2D89EF;
+  }
   a:visited {
     color: #000;
   }
@@ -138,8 +141,5 @@
     border-right: 4px solid #2D89EF;
     background-color: #2D89EF;
     transition: background-color 600ms ease;
-  }
-  a:hover {
-    color: #2D89EF;
   }
 </style>
