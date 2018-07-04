@@ -19,20 +19,27 @@
 
 <script>
   import codeView from '@/components/codeview/code';
-  import menuDefault from './menu-default';
+  import loadingmaskDefault from './loadingmask-default';
+  import loadingmaskCustom from './loadingmask-custom';
 
   export default {
     components: {
       codeView,
-      menuDefault,
+      loadingmaskDefault,
+      loadingmaskCustom,
     },
     data() {
       return {
         componentList: [
           {
-            url: './guide/views/examples/menu/menu-default.vue',
-            component: menuDefault,
-            title: 'Menu Default',
+            url: './guide/views/examples/loadingmask/loadingmask-default.vue',
+            component: loadingmaskDefault,
+            title: 'Loadingmask Default',
+          },
+          {
+            url: './guide/views/examples/loadingmask/loadingmask-custom.vue',
+            component: loadingmaskCustom,
+            title: 'Loadingmask Custom Setting',
           },
         ],
       };

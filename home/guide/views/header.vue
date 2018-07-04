@@ -27,6 +27,12 @@
 </script>
 
 <style scoped>
+  a, span {
+    text-decoration: none !important;
+  }
+  a:visited {
+    color: #000;
+  }
   .evui-main-header {
     display: table;
     position: fixed;

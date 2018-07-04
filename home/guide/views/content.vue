@@ -83,7 +83,7 @@
               },
               {
                 name: 'Timepicker',
-                routerLink: '',
+                routerLink: '/timepicker',
                 content: 'timepicker',
                 imgUrl: `${this.imgUrl}/timepicker.png`,
               },
@@ -111,11 +111,6 @@
                 content: 'menu',
                 imgUrl: `${this.imgUrl}/menu.png`,
               },
-              {
-                name: 'Summary',
-                routerLink: '',
-                content: 'summary',
-              },
             ],
           },
           {
@@ -124,7 +119,7 @@
             children: [
               {
                 name: 'Loadingmask',
-                routerLink: '',
+                routerLink: '/loadingmask',
                 content: 'loadingmask',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
               },

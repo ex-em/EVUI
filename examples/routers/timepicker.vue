@@ -1,14 +1,14 @@
 <template>
   <div>
-    <timePicker
+    <timepicker
       :spinner-arr="obj"
     />
     <br><br><br>
-    <timePicker
+    <timepicker
       :spinner-arr="obj2"
     />
     <br><br><br>
-    <timePicker
+    <timepicker
       :spinner-arr="obj3"
     />
   </div>
@@ -16,12 +16,12 @@
 
 <script>
   import '@/styles/evui.css';
-  import timePicker from '@/components/timePicker/timePicker';
+  import timepicker from '@/components/timepicker/timepicker';
 
   export default {
-    name: 'TimePicker',
+    name: 'Timepicker',
     components: {
-      timePicker,
+      timepicker,
     },
     data() {
       return {

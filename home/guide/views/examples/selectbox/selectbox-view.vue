@@ -1,52 +1,34 @@
 <template>
   <div>
-    <div>time: {{ time }}</div>
-
-    <selectbox
-      :options="options"
-    />
+    <div
+      v-for="item in componentList"
+      :key="item.id"
+    >
+      <div class="inner-article">
+        <h4># {{ item.title }}</h4>
+        <code-view
+          :code-url="item.url"
+          :height="item.height"
+        >
+          <component :is="item.component"/>
+        </code-view>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import selectbox from '@/components/selectbox/selectbox';
+  import codeView from '@/components/codeview/code';
 
   export default {
     components: {
-      selectbox,
+      codeView,
     },
     data() {
-      const opt = [];
-      for (let ix = 0, ixLen = 500; ix < ixLen; ix++) {
-        opt[ix] = { name: `name + ${ix}`, value: ix };
-      }
-
       return {
-        visible: false,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
-        options: opt,
-        start: null,
-        end: null,
-        time: null,
+        componentList: [
+        ],
       };
-    },
-    created() {
-      this.start = performance.now();
-    },
-    mounted() {
-      this.end = performance.now();
-      this.time = this.end - this.start;
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>
-
-<style scoped>
-</style>

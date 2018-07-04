@@ -19,20 +19,27 @@
 
 <script>
   import codeView from '@/components/codeview/code';
-  import menuDefault from './menu-default';
+  import timepickerDefault from './timepicker-default';
+  import timepickerInit from './timepicker-init';
 
   export default {
     components: {
       codeView,
-      menuDefault,
+      timepickerDefault,
+      timepickerInit,
     },
     data() {
       return {
         componentList: [
           {
-            url: './guide/views/examples/menu/menu-default.vue',
-            component: menuDefault,
-            title: 'Menu Default',
+            url: './guide/views/examples/timepicker/timepicker-default.vue',
+            component: timepickerDefault,
+            title: 'Timepicker Default',
+          },
+          {
+            url: './guide/views/examples/timepicker/timepicker-init.vue',
+            component: timepickerInit,
+            title: 'Timepicker Setting Init Values',
           },
         ],
       };

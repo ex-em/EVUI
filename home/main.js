@@ -24,7 +24,7 @@ const router = new VueRouter({
     },
     {
       path: '/dock',
-      component: resolve => require(['./guide/views/examples/dock/dockframe-view'], resolve),
+      component: resolve => require(['./guide/views/examples/dock/dock-view'], resolve),
     },
     {
       path: '/chart',
@@ -51,20 +51,12 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/menu/menu-view'], resolve),
     },
     {
-      path: '/table2',
-      component: resolve => require(['../examples/routers/table2'], resolve),
-    },
-    {
-      path: '/table3',
-      component: resolve => require(['../examples/routers/table3'], resolve),
-    },
-    {
       path: '/loadingmask',
-      component: resolve => require(['../examples/routers/loadingmask'], resolve),
+      component: resolve => require(['./guide/views/examples/loadingmask/loadingmask-view'], resolve),
     },
     {
-      path: '/timePicker',
-      component: resolve => require(['../examples/routers/timePicker'], resolve),
+      path: '/timepicker',
+      component: resolve => require(['./guide/views/examples/timepicker/timepicker-view'], resolve),
     },
   ],
 });

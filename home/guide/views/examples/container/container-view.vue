@@ -1,97 +1,34 @@
 <template>
-  <div style="height: 100%; widht:100%">
-    <main-container
-      :wrapper-styles="customstyle"
-      :height="600"
-      :width="600"
-      layout="hBox"
+  <div>
+    <div
+      v-for="item in componentList"
+      :key="item.id"
     >
-      <box-panel
-        :height="height"
-        :width="width"
-        flex="1"
-      >
-        <chart/>
-      </box-panel>
-      <resize-bar/>
-      <box-panel
-        :height="height"
-        :width="width"
-        flex="1"
-      />
-      <resize-bar/>
-      <box-panel
-        :height="height"
-        :width="width"
-        flex="1"
-      />
-    </main-container>
-
-    <br>
-
-    <main-container
-      :wrapper-styles="customstyle"
-      :height="600"
-      :width="600"
-      layout="vBox"
-    >
-      <box-panel
-        :height="height"
-        :width="width"
-      />
-      <resize-bar/>
-      <box-panel
-        :height="height"
-        :width="width"
-      />
-      <resize-bar/>
-      <box-panel
-        :height="height"
-        :width="width"
-      />
-      <box-panel
-        :height="height"
-        :width="width"
-      />
-    </main-container>
+      <div class="inner-article">
+        <h4># {{ item.title }}</h4>
+        <code-view
+          :code-url="item.url"
+          :height="item.height"
+        >
+          <component :is="item.component"/>
+        </code-view>
+      </div>
+    </div>
   </div>
 </template>
+
 <script>
-  import { mainContainer, ResizeBar, boxPanel } from '@/components/container';
-  import chart from '@/components/chart/chart';
-// horizontal vertical
+  import codeView from '@/components/codeview/code';
+
   export default {
     components: {
-      mainContainer, ResizeBar, boxPanel, chart,
+      codeView,
     },
     data() {
       return {
-        height: '25%',
-        width: '100%',
-        width2: '25%',
+        componentList: [
+        ],
       };
-    },
-    computed: {
-      customstyle() {
-        return { 'background-color': '#fff' };
-      },
-      customstyle1() {
-        return { 'background-color': '#fff' };
-      },
-      customstyle2() {
-        return { 'background-color': '#C5CAE9' };
-      },
-      customstyle3() {
-        return { 'background-color': '#EF6C00' };
-      },
-      customstyle4() {
-        return { 'background-color': '#A1887F' };
-      },
-      customstyle5() {
-        return { 'background-color': 'orange' };
-      },
-    },
-    methods: {
     },
   };
 </script>

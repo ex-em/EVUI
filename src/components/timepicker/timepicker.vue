@@ -11,6 +11,7 @@
       class="evui-timepicker-prefix"
     />
     <div
+      v-show="suffixShowFlag"
       ref="suffix"
       :class="suffixFadeFlag ? 'suffix-fadein' : 'suffix-fadeout'"
       class="evui-timepicker-suffix"
@@ -54,7 +55,7 @@
 </template>
 
 <script>
-  import spinner from '@/components/timePicker/spinner';
+  import spinner from '@/components/timepicker/spinner';
 
   export default {
     components: {
@@ -105,6 +106,7 @@
         cursorPosition: 0,
         suffixFadeFlag: false,
         timePickerFadeFlag: false,
+        suffixShowFlag: false,
       };
     },
     computed: {
@@ -411,7 +413,7 @@
 
   .evui-timepicker div.evui-timepicker-suffix {
     position: absolute;
-    left: 228px;
+    left: 190px;
     width: 26px;
     height: 10px;
     margin: 15px 3px 15px 3px;

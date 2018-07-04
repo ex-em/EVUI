@@ -19,7 +19,7 @@
 </script>
 
 <style scoped>
-  body {
+  * {
     font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;
   }
 </style>

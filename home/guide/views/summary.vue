@@ -86,8 +86,6 @@
         const noImage = './guide/images/noImage.png';
         let result = '';
         if (!url || url === undefined) {
-          /*eslint-disable*/
-          console.log('123');
           result = noImage;
         } else {
           result = url;
@@ -100,6 +98,12 @@
 </script>
 
 <style>
+  a, span {
+    text-decoration: none !important;
+  }
+  a:visited {
+    color: #000;
+  }
   .evui-summary-content {
     margin-top: 50px;
   }

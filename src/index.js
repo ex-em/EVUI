@@ -2,7 +2,7 @@ import Chart from '@/components/chart';
 import Container from '@/components/container';
 import Table from '@/components/table';
 import Loadingmask from '@/components/loadingmask';
-import TimePicker from '@/components/timePicker';
+import TimePicker from '@/components/timepicker';
 
 const components = {
   Container,

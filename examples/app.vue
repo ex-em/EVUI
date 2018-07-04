@@ -31,7 +31,7 @@
           <router-link to="/loadingmask">Loadingmask</router-link>
         </li>
         <li>
-          <router-link to="/timePicker">TimePicker</router-link>
+          <router-link to="/timepicker">Timepicker</router-link>
         </li>
       </ul>
     </nav>

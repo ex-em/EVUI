@@ -57,8 +57,8 @@ const router = new VueRouter({
       component: resolve => require(['./routers/loadingmask'], resolve),
     },
     {
-      path: '/timePicker',
-      component: resolve => require(['./routers/timePicker'], resolve),
+      path: '/timepicker',
+      component: resolve => require(['./routers/timepicker'], resolve),
     },
   ],
 });
