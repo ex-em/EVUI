@@ -120,12 +120,12 @@
     padding: 10px 5px 10px 5px;
   }
   .evui-codeview-example{
-    position: relative;
     display: block;
+    position: relative;
     flex-direction: column;
     width: 100%;
-    border: 1px solid #dfe6e9;
     padding: 10px 10px 20px 10px;
+    border: 1px solid #dfe6e9;
     border-radius: 6px;
     overflow: hidden;
     transition: height .8s ease-in-out;
@@ -156,8 +156,8 @@
     z-index: 10;
   }
   .evui-codeview-example-bar:hover{
-    cursor: pointer;
     background-color: rgba(231,231,231, 0.3);
+    cursor: pointer;
   }
   .evui-codeview-example:hover{
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
@@ -172,8 +172,8 @@
     display: inline-block;
     height: 100%;
     line-height: 18px;
-    font-size: 16px;
     color: #0055aa;
+    font-size: 16px;
     opacity: 0;
     transition: all .2s ease-in-out;
   }
@@ -195,8 +195,8 @@
     top: 10px;
     right: 30px;
     font-weight: bold;
-    cursor: pointer;
     opacity: 0;
+    cursor: pointer;
     /*transition: opacity 0.5s ease-in-out;*/
   }
   .evui-codeview-example-jsfiddle:hover{

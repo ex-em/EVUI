@@ -109,7 +109,7 @@
               {
                 name: 'Menu',
                 routerLink: '/menu',
-                content: 'menu',
+                content: '메뉴',
                 imgUrl: `${this.imgUrl}/menu.png`,
               },
             ],
@@ -121,7 +121,7 @@
               {
                 name: 'Loadingmask',
                 routerLink: '/loadingmask',
-                content: 'loadingmask',
+                content: '로딩마스크',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
               },
             ],
@@ -143,8 +143,8 @@
 <style scoped>
   .evui-main-content {
     display: inline-flex;
-    width: 100%;
     margin-top: 55px;
+    width: 100%;
   }
   .evui-right-content {
     margin: 20px;

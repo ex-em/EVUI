@@ -68,21 +68,20 @@
 
 <style scoped>
   .evui-toggle {
-    height: 24px;
-    width: 60px;
+    display: inline-block;
+    position: relative;
     left: 1px;
+    width: 60px;
+    height: 24px;
     line-height: 24px;
     vertical-align: middle;
     border: 1px solid #cccccc;
-    background-color: #cccccc;
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-    transition: all .2s ease-in-out;
-    border-radius: 0px;
-    display: inline-block;
     border-radius: 24px;
+    background-color: #cccccc;
     color: #000000;
+    transition: all .2s ease-in-out;
+    user-select: none;
+    cursor: pointer;
   }
   .evui-toggle.active {
     border: 1px solid #2d8cf0;
@@ -90,26 +89,26 @@
     color: #ffffff;
   }
   .evui-toggle-button {
-    content: '';
-    height: 20px;
+    position: absolute;
+    top: 1px;
+    left: 1px;
     width: 20px;
+    height: 20px;
     border-radius: 50%;
     background-color: #ffffff;
-    position: absolute;
-    left: 1px;
-    top: 1px;
-    cursor: pointer;
     transition: all .2s ease-in-out;
+    cursor: pointer;
+    content: '';
   }
   .evui-toggle-button.active {
-    content: '';
+    position: absolute;
+    top: 1px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     background-color: #ffffff;
-    position: absolute;
-    top: 1px;
-    cursor: pointer;
     transition: all .2s ease-in-out;
+    cursor: pointer;
+    content: '';
   }
 </style>

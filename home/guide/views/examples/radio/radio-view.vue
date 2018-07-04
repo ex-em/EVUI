@@ -46,6 +46,6 @@
 </script>
 <style scoped>
   div {
-    font-family: 'NanumGothic', Helvetica
+    font-family: 'NanumGothic', Helvetica;
   }
 </style>

@@ -3,12 +3,12 @@
     <div style="width: 400px; height: 200px;">
       <loadingmask
         v-show="true"
+        :bar-count="10"
         :width="'40px'"
         :height="'7px'"
-        :bar-count="10"
         :border-radius="'5px'"
         :bar-color="'rgba(0, 155, 155, 0.5)'"
-        :fadebar-radius="'55px'"
+        :fadebar-radius="'45px'"
         :anim-interval="3"
       />
     </div>
@@ -26,12 +26,6 @@
     },
     data() {
       return {
-        loadingMaskData: {
-          borderRadius: '10px',
-          barColor: 'rgba(255, 0, 0, 0.5)',
-          fadebarRadius: '20px',
-          animInterval: 2,
-        },
       };
     },
     methods: {

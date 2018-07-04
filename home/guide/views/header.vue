@@ -36,17 +36,17 @@
   .evui-main-header {
     display: table;
     position: fixed;
-    background: #67A1F4;
-    width: 100%;
-    height: 55px;
     top: 0;
     right: 0;
+    width: 100%;
+    height: 55px;
+    background: #67A1F4;
     z-index: 30000;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   }
   .evui-header-title {
-    vertical-align: middle;
     display: table-cell;
+    vertical-align: middle;
   }
   .evui-header-title > a {
     display: table;
@@ -57,9 +57,9 @@
   .evui-header-title > a > div{
     display: table-cell;
     vertical-align: middle;
-    font-size: 15px;
     padding-left: 10px;
-    font-weight: bold;
     color: rgb(43,87,151);
+    font-size: 15px;
+    font-weight: bold;
   }
 </style>
