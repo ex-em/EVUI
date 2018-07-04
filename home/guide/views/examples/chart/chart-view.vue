@@ -19,14 +19,28 @@
 
 <script>
   import codeView from '@/components/codeview/code';
+  import chartBarDefault from './chart-bar-default';
+  import chartBarStackDefault from './chart-bar-stack-default';
 
   export default {
     components: {
       codeView,
+      chartBarDefault,
+      chartBarStackDefault,
     },
     data() {
       return {
         componentList: [
+          {
+            url: './guide/views/examples/chart/chart-bar-default.vue',
+            component: chartBarDefault,
+            title: 'Bar Chart Default',
+          },
+          {
+            url: './guide/views/examples/chart/chart-bar-stack-default.vue',
+            component: chartBarStackDefault,
+            title: 'Stack Bar Chart',
+          },
         ],
       };
     },

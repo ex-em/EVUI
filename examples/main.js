@@ -2,11 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
-import Axios from 'axios';
 
 Vue.use(VueRouter);
 Vue.use(EVUI);
-Vue.prototype.$http = Axios;
 Vue.config.debug = true;
 
 const router = new VueRouter({

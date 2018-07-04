@@ -1,20 +1,20 @@
 <template>
-  <div class="outer">
+  <div class="evui-codeview">
     <div
       :style="{ height: boxHeight+'px' }"
       :class="isActive"
-      class="guide-content-example"
+      class="evui-codeview-example"
     >
       <div
         ref="exampleLayer"
-        class="guide-content-example-layer"
+        class="evui-codeview-example-layer"
       >
         <slot/>
       </div>
-      <div class="guide-content-split-layer"/>
+      <div class="evui-codeview-split-layer"/>
       <div
         ref="codeLayer"
-        class="guide-content-code-layer"
+        class="evui-codeview-code-layer"
       >
         <codemirror
           :value="rawCode"
@@ -22,12 +22,12 @@
         />
       </div>
       <div
-        class="guide-content-example-bar"
+        class="evui-codeview-example-bar"
         @click.stop="onBottomClick"
       >
         <div
           :class="selectIconClasses"
-          class="guide-content-example-bar-icon"
+          class="evui-codeview-example-bar-icon"
         >
           <icon class="fa-sort-down"/>
         </div>
@@ -115,10 +115,10 @@
   };
 </script>
 <style scoped>
-  .outer{
+  .evui-codeview{
     padding: 5px;
   }
-  .guide-content-example{
+  .evui-codeview-example{
     position: relative;
     display: block;
     flex-direction: column;
@@ -129,22 +129,22 @@
     overflow: hidden;
     transition: height 1s ease-in-out;
   }
-  .guide-content-example.expand{
+  .evui-codeview-example.expand{
     transition: height 1s ease-in-out;
   }
-  .guide-content-example-layer{
+  .evui-codeview-example-layer{
     position: relative;
   }
-  .guide-content-split-layer{
+  .evui-codeview-split-layer{
     position: relative;
     border-bottom: 1px solid #dfe6e9;
   }
-  .guide-content-code-layer{
+  .evui-codeview-code-layer{
     position: relative;
     width: 100%;
     font-size: 8px;
   }
-  .guide-content-example-bar{
+  .evui-codeview-example-bar{
     position: absolute;
     left: 0px;
     bottom: 0px;
@@ -153,20 +153,20 @@
     padding: 6px;
     z-index: 10;
   }
-  .guide-content-example-bar:hover{
+  .evui-codeview-example-bar:hover{
     cursor: pointer;
     background-color: rgba(237,241,244, 0.45);
   }
-  .guide-content-example:hover{
+  .evui-codeview-example:hover{
     box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.2);
   }
-  .guide-content-example-bar-icon{
+  .evui-codeview-example-bar-icon{
     width: 100%;
     height: 100%;
     line-height: 25px;
     text-align: center;
   }
-  .guide-content-example-bar-icon i{
+  .evui-codeview-example-bar-icon i{
     display: inline-block;
     height: 100%;
     line-height: 18px;
@@ -174,20 +174,20 @@
     opacity: 0;
     transition: all .2s ease-in-out;
   }
-  .guide-content-example-bar-icon:hover i{
+  .evui-codeview-example-bar-icon:hover i{
     opacity: 1;
   }
-  .guide-content-example-bar-icon.select-down i{
+  .evui-codeview-example-bar-icon.select-down i{
     transform: rotate(180deg);
   }
-  .guide-content-example-bar-icon span{
+  .evui-codeview-example-bar-icon span{
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
   }
-  .guide-content-example-jsfiddle, .guide-content-example-bar-icon span{
+  .evui-codeview-example-jsfiddle, .evui-codeview-example-bar-icon span{
     opacity: 1;
   }
-  .guide-content-example-jsfiddle{
+  .evui-codeview-example-jsfiddle{
     position: absolute;
     top: 10px;
     right: 30px;
@@ -196,7 +196,7 @@
     opacity: 0;
     /*transition: opacity 0.5s ease-in-out;*/
   }
-  .guide-content-example-jsfiddle:hover{
+  .evui-codeview-example-jsfiddle:hover{
     color: #0984e3;
   }
 </style>
