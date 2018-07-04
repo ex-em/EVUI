@@ -35,12 +35,10 @@
             name: 'Introduce',
             cls: 'fas fa-th-large',
             routerLink: '/',
-//            openFlag: true,
           },
           {
             name: 'Component',
             cls: 'far fa-clone',
-//            openFlag: true,
             children: [
               {
                 name: 'Container',
@@ -59,25 +57,24 @@
           {
             name: 'Form',
             cls: 'fab fa-elementor',
-//            openFlag: true,
             children: [
               {
                 name: 'Checkbox',
                 routerLink: '/checkbox',
                 content: '체크박스',
-                imgUrl: `${this.imgUrl}/checkbox.png`,
+//                imgUrl: `${this.imgUrl}/checkbox.png`,
               },
               {
                 name: 'Radio',
                 routerLink: '/radio',
                 content: '라디오버튼',
-                imgUrl: `${this.imgUrl}/radio.png`,
+//                imgUrl: `${this.imgUrl}/radio.png`,
               },
               {
                 name: 'Selectbox',
                 routerLink: '/selectbox',
                 content: '셀렉트 박스',
-                imgUrl: `${this.imgUrl}/selectbox.png`,
+//                imgUrl: `${this.imgUrl}/selectbox.png`,
               },
               {
                 name: 'Table(page)',
@@ -96,7 +93,6 @@
           {
             name: 'Chart',
             cls: 'fas fa-chart-bar',
-//            openFlag: true,
             children: [
               {
                 name: 'Chart',
@@ -109,7 +105,6 @@
           {
             name: 'Navigation',
             cls: 'fas fa-bars',
-//            openFlag: true,
             children: [
               {
                 name: 'Menu',
@@ -127,19 +122,12 @@
           {
             name: 'Other',
             cls: 'fas fa-ellipsis-h',
-//            openFlag: true,
             children: [
               {
                 name: 'Loadingmask',
                 routerLink: '',
                 content: 'loadingmask',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
-              },
-              {
-                name: 'Code',
-                routerLink: '',
-                content: 'codeView',
-                imgUrl: `${this.imgUrl}/code.png`,
               },
             ],
           },

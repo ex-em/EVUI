@@ -1,11 +1,15 @@
 import Chart from '@/components/chart';
 import Container from '@/components/container';
 import Table from '@/components/table';
+import Loadingmask from '@/components/loadingmask';
+import TimePicker from '@/components/timePicker';
 
 const components = {
   Container,
   Chart,
   Table,
+  Loadingmask,
+  TimePicker,
 };
 
 const evui = {
