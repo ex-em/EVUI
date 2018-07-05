@@ -1,20 +1,21 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { CHART_AXIS_TYPE } from '../core/core.constant';
+import { CHART_AXIS_TYPE, CHART_DATA_STRUCT } from '../core/core.constant';
 import DataStore from '../core/core.data';
 import Util from '../core/core.util';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
 import AxisStepsScale from '../core/axis/axis.scale.steps';
+import Legend from '../core/core.legend';
 
 class BaseChart {
   constructor(target, data, options) {
     // default chart info
     const defaultOptions = {
-      colors: ['#2b99f0', '#8ac449', '#009697', '#959c2c', '#004ae7', '#01cc00', '#15679a',
-        '#43bcd7', '#e76627', '#5C8558', '#A8A5A3', '#498700', '#832C2D', '#C98C5A', '#3478BE',
-        '#BCF061', '#B26600', '#27358F', '#A4534D', '#B89630', '#A865B4', '#254763', '#536859',
-        '#E9F378', '#888A79', '#D67D4B', '#2BEC69', '#4A2BEC', '#2BBEEC', '#DDACDF',
+      colors: ['#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
+        '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d', '#ff7d40',
+        '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd', '#009bc7', '#cacaff',
+        '#ffc125', '#df6264',
       ],
       title: {
         text: '',
@@ -33,38 +34,83 @@ class BaseChart {
       border: 2,
       doughnutHoleSize: 0,
       reverse: false,
+      isRTM: false,
+      bufferSize: 10,
+      legend: {
+        show: true,
+        position: 'right',
+      },
     };
 
     this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
 
+    // set chart properties
     this.options = _.merge({}, defaultOptions, options);
     this.data = data;
 
-    this.container = document.createElement('div');
-    this.container.className = 'evui-chart-inner';
+    this.seriesList = [];
+    this.seriesGroupList = [];
 
-    const chartAxisType = CHART_AXIS_TYPE[this.options.type];
+    const type = this.options.type.toLowerCase();
+    const axisType = CHART_AXIS_TYPE[type];
+    const structType = CHART_DATA_STRUCT[type];
+
+    // set chart element layout
+    this.wrapperDOM = document.createElement('div');
+    this.wrapperDOM.className = 'evui-chart-wrapper';
+    this.chartDOM = document.createElement('div');
+    this.chartDOM.className = 'evui-chart-container';
 
     if (target === null) {
       throw new Error('[EVUI][ERROR][Chart]-Not found Target for rendering Chart');
     } else {
-      target.appendChild(this.container);
+      this.wrapperDOM.appendChild(this.chartDOM);
+      target.appendChild(this.wrapperDOM);
     }
 
     this.createCanvas();
-    if (chartAxisType === 'axis') {
-      this.createAxesOptions();
-    }
 
+    // create chart DataStore & Series Data.
     this.dataSet = new DataStore({
       chartData: this.data,
-      structureType: this.options.type.toLowerCase() === 'sunburst' ? 'tree' : 'array',
       horizontal: this.options.horizontal,
-      chartAxisType,
+      seriesList: this.seriesList,
+      seriesGroupList: this.seriesGroupList,
+      structType,
+      axisType,
+      isRTM: this.options.isRTM,
+      bufferSize: this.options.bufferSize,
     });
 
     this.dataSet.init();
+
+    // create chart component
+    // 1. axis
+    if (axisType === 'axis') {
+      this.createAxesOptions();
+    }
+
+    // 2. title
+    if (this.options.title.show) {
+      this.createTitle();
+    }
+
+    // 3. legend
+    this.legend = new Legend({
+      wrapperDOM: this.wrapperDOM,
+      chartDOM: this.chartDOM,
+      chartOptions: this.options,
+      seriesList: this.seriesList,
+      resize: this.resize.bind(this),
+      redraw: this.redraw.bind(this),
+    });
+
+    this.legend.init();
+
+    // calculate Chart Size
     this.chartRect = this.getChartRect();
+
+    window.addEventListener('resize', this.resize.bind(this));
   }
 
   createAxesOptions() {
@@ -90,7 +136,7 @@ class BaseChart {
       tickSize: null,
       labelHeight: 20,
       labelStyle: {
-        fontSize: 13,
+        fontSize: 12,
         color: '#333',
         fontFamily: 'Droid Sans',
       },
@@ -115,7 +161,7 @@ class BaseChart {
       tickSize: null,
       labelWidth: null,
       labelStyle: {
-        fontSize: 13,
+        fontSize: 12,
         color: '#333',
         fontFamily: 'Droid Sans',
       },
@@ -140,8 +186,10 @@ class BaseChart {
 
   createCanvas() {
     this.displayCanvas = document.createElement('canvas');
+    this.displayCanvas.setAttribute('style', 'display: block;');
     this.displayCtx = this.displayCanvas.getContext('2d');
     this.bufferCanvas = document.createElement('canvas');
+    this.bufferCanvas.setAttribute('style', 'display: block;');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
 
     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -153,21 +201,43 @@ class BaseChart {
       this.displayCtx.backingStorePixelRatio || 1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
+    this.oldPixelRatio = this.pixelRatio;
     // 완성 뒤 displayCanvas를 append하도록 변경 필요. (중요**)
-    this.container.appendChild(this.bufferCanvas);
+    this.chartDOM.appendChild(this.displayCanvas);
   }
 
   getChartRect() {
-    const width = this.container.getBoundingClientRect().width || 10;
-    const height = this.container.getBoundingClientRect().height || 10;
+    const padding = this.constructor.getPadding(this.options.padding);
+
+    let width = this.chartDOM.getClientRects()[0].width || 10;
+    let height = this.chartDOM.getClientRects()[0].height || 10;
+
+    const legendOption = this.options.legend;
+
+    if (legendOption.show) {
+      switch (legendOption.position) {
+        case 'top':
+        case 'bottom':
+          height -= this.legend.legendHeight;
+          break;
+        case 'left':
+        case 'right':
+          width -= this.legend.legendWidth;
+          this.legend.legendDOM.style.height = `${height}px`;
+          this.legend.resizeDOM.style.height = `${height}px`;
+          break;
+        default:
+          break;
+      }
+    }
+
     this.setWidth(width);
     this.setHeight(height);
 
-    const padding = this.constructor.getPadding(this.options.padding);
     const chartWidth = width - (padding.left + padding.right);
     const chartHeight = height - (padding.top + padding.bottom);
 
-    const x1 = padding.left;
+    const x1 = 0;
     const x2 = Math.max(width - padding.right, x1 + 1);
     const y1 = padding.top;
     const y2 = Math.max(height - padding.bottom, y1 + 1);
@@ -253,21 +323,22 @@ class BaseChart {
 
   createTitle() {
     const titleObj = this.options.title;
-    this.titleContainer = document.createElement('div');
-    this.titleContainer.style.font = titleObj.style;
-    this.titleContainer.textContent = titleObj.text;
+    this.titleDOM = document.createElement('div');
+    this.titleDOM.style.font = titleObj.style;
+    this.titleDOM.textContent = titleObj.text;
 
     if (titleObj.show) {
-      this.titleContainer.style.display = 'block';
-      this.container.style.paddingTop = `${titleObj.height}px`;
+      this.titleDOM.style.display = 'block';
+      this.wrapperDOM.style.paddingTop = `${titleObj.height}px`;
     } else {
-      this.titleContainer.style.display = 'none';
-      this.container.style.paddingTop = '0';
+      this.titleDOM.style.display = 'none';
+      this.wrapperDOM.style.paddingTop = '0';
     }
 
-    this.titleContainer.className = 'evui-chart-title';
-    this.titleContainer.style.height = `${titleObj.height}px`;
-    this.container.appendChild(this.titleContainer);
+    this.titleDOM.className = 'evui-chart-title';
+    this.titleDOM.style.height = `${titleObj.height}px`;
+    this.titleDOM.style.lineHeight = `${titleObj.height}px`;
+    this.wrapperDOM.appendChild(this.titleDOM);
   }
 
   setWidth(width) {
@@ -566,6 +637,69 @@ class BaseChart {
     }
 
     ctx.stroke();
+  }
+
+  initScale() {
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const backingStoreRatio =
+      this.displayCtx.webkitBackingStorePixelRatio ||
+      this.displayCtx.mozBackingStorePixelRatio ||
+      this.displayCtx.msBackingStorePixelRatio ||
+      this.displayCtx.oBackingStorePixelRatio ||
+      this.displayCtx.backingStorePixelRatio || 1;
+
+    this.pixelRatio = devicePixelRatio / backingStoreRatio;
+
+    if (this.oldPixelRatio !== this.pixelRatio) {
+      this.oldPixelRatio = this.pixelRatio;
+      this.resize();
+    }
+    if (devicePixelRatio !== backingStoreRatio) {
+      this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
+      // this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+    }
+  }
+
+  resize() {
+    if (!this.chartDOM) {
+      return;
+    }
+
+    const offset = this.chartDOM.getBoundingClientRect();
+    const ctx = this.bufferCtx;
+
+    if (offset) {
+      ctx.restore();
+      ctx.save();
+      ctx.scale(this.pixelRatio, this.pixelRatio);
+
+      if (this.resizeTimer) {
+        clearTimeout(this.resizeTimer);
+      }
+      this.resizeTimer = setTimeout(this.redraw.bind(this), 50);
+    }
+  }
+
+  redraw() {
+    if (!this.chartRect.width && !this.chartRect.height) {
+      return;
+    }
+
+    this.dataSet.updateData();
+    this.chartRect = this.getChartRect();
+    this.initScale();
+
+    this.clearDraw();
+    this.drawChart();
+  }
+
+  clearDraw() {
+    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+
+    this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
+      this.displayCanvas.height / this.clearRectRatio);
+    this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
+      this.bufferCanvas.height / this.clearRectRatio);
   }
 
   static getPadding(padding) {

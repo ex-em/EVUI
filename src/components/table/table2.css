@@ -59,8 +59,8 @@
   padding: 0px 10px;
   text-align: center;
 }
-.evui-disabled,
-.evui-readonly {
+.evui_table.evui-disabled,
+.evui_table.evui-readonly {
   background-color: #f1f1f1 !important;
   color: #777 !important;
 }

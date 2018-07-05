@@ -6,6 +6,9 @@
           <router-link to="/">Index</router-link>
         </li>
         <li>
+          <router-link to="/button">Button</router-link>
+        </li>
+        <li>
           <router-link to="/container">Container</router-link>
           <router-link to="/dock/dockframeSample">dockframeSample</router-link>
         </li>
@@ -19,7 +22,22 @@
           <router-link to="/selectbox">Selectbox</router-link>
         </li>
         <li>
-          <router-link to="/table">Table</router-link>
+          <router-link to="/table">Table(page)</router-link>
+        </li>
+        <li>
+          <router-link to="/table2">Table(virtualScroll)</router-link>
+        </li>
+        <li>
+          <router-link to="/table3">Table(normal)</router-link>
+        </li>
+        <li>
+          <router-link to="/loadingmask">Loadingmask</router-link>
+        </li>
+        <li>
+          <router-link to="/timepicker">Timepicker</router-link>
+        </li>
+        <li>
+          <router-link to="/toggle">Toggle</router-link>
         </li>
       </ul>
     </nav>
