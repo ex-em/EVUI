@@ -35,6 +35,234 @@
 }
 
 /************************************************************************************
+ Button Component
+************************************************************************************/
+
+/** evui-btn **/
+
+.evui-btn {
+  display: inline-block;
+}
+
+/** evui-btn > button**/
+
+.evui-btn>button {
+  margin: 0px 2px 0px 2px;
+  padding: 5px 10px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  cursor: pointer;
+  user-select: none;
+  transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+}
+.evui-btn>button:hover {
+  color:#57a3f3;
+  background-color:#fff;
+  border-color:#57a3f3;
+}
+.evui-btn>button.active,
+.evui-btn>button:active {
+  color:#2b85e4;
+  background-color:#fff;
+  border-color:#2b85e4;
+}
+.evui-btn>button>.evui-icon{
+  line-height:1;
+}
+.evui-btn>button>.evui-icon+span,
+.evui-btn>button>span+.evui-icon {
+  margin-left:4px;
+}
+.evui-btn>button.disabled>*,
+.evui-btn>button[disabled]>* {
+  pointer-events: none;
+}
+.evui-btn>button.disabled,
+.evui-btn>button.disabled.active,
+.evui-btn>button.disabled:active,
+.evui-btn>button.disabled:hover,
+.evui-btn>button[disabled],
+.evui-btn>button[disabled].active,
+.evui-btn>button[disabled]:active,
+.evui-btn>button[disabled]:hover {
+  color:#bbbec4;
+  background-color:#f7f7f7;
+  border-color:#dddee1;
+}
+
+/** evui-btn > button > clsType(primary) **/
+
+.evui-btn>button.primary {
+  color:#fff;
+  background-color:#2d8cf0;
+  border-color:#2d8cf0;
+}
+.evui-btn>button.primary:hover {
+  background-color:#50A5F0;
+  border-color:#50A5F0;
+}
+.evui-btn>button.primary.active,
+.evui-btn>button.primary:active {
+  background-color:#2b85e4;
+  border-color:#2b85e4;
+}
+.evui-btn>button.primary.disabled,
+.evui-btn>button.primary.disabled.active,
+.evui-btn>button.primary.disabled:active,
+.evui-btn>button.primary.disabled:hover,
+.evui-btn>button.primary[disabled],
+.evui-btn>button.primary[disabled].active,
+.evui-btn>button.primary[disabled]:active,
+.evui-btn>button.primary[disabled]:hover {
+  color:#bbbec4;
+  background-color:#f7f7f7;
+  border-color:#dddee1;
+}
+
+/** Button > clsType > text **/
+
+.evui-btn>button.text {
+  columns: #000000;
+  background-color: transparent;
+  border-color: transparent;
+}
+.evui-btn>button.text:hover {
+  color: #6d7380;
+  background-color: rgba(255,255,255,.2);
+  border-color: rgba(255,255,255,.2)
+}
+.evui-btn>button.text.active,
+.evui-btn>button.text:active {
+  color: #454c5b;
+  background-color: rgba(0,0,0,.05);
+  border-color: rgba(0,0,0,.05)
+}
+.evui-btn>button.text:hover {
+  color: #57a3f3;
+  background-color: transparent;
+  border-color: transparent;
+}
+.evui-btn>button.text.active,
+.evui-btn>button.text:active {
+  color:#2b85e4;
+  background-color:transparent;
+  border-color:transparent
+}
+.evui-btn>button.text.disabled,
+.evui-btn>button.text.disabled.active,
+.evui-btn>button.text.disabled:active,
+.evui-btn>button.text.disabled:hover,
+.evui-btn>button.text[disabled],
+.evui-btn>button.text[disabled].active,
+.evui-btn>button.text[disabled]:active,
+.evui-btn>button.text[disabled]:hover {
+  color: #bbbec4;
+  background-color: #f7f7f7;
+  border-color: #dddee1
+}
+
+/** Button > shape > circle **/
+
+.evui-btn>button.circle {
+  border-radius: 32px;
+}
+.evui-btn>button.circle.icon-only{
+  width:32px;
+  height:32px;
+  padding:0;
+  border-radius:50%;
+  font-size:16px;
+}
+
+/** Button > Menu Button **/
+
+.evui-btn>button .menu-btn {
+  display: inline-block;
+}
+.evui-btn>button .menu-btn.arrow-up {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid #FFFFFF;
+}
+.evui-btn>button .menu-btn.arrow-down {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #FFFFFF;
+}
+
+/** Button > Menu List Area **/
+
+.evui-btn .menu-area {
+  visibility: hidden;
+  position: absolute;
+  padding: 1px;
+  border-radius: 4px;
+  text-align: center;
+  background: #FFFFFF;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+.evui-btn .menu-area.on {
+  /* on activation */
+  visibility: visible;
+}
+.evui-btn .menu-area ul {
+  display: block;
+  list-style: none;
+}
+.evui-btn .menu-area li {
+  padding: 3px 13px 3px 13px;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  color: #000000;
+  transition: all .1s;
+  cursor: pointer;
+}
+.evui-btn .menu-area li:hover {
+  background: #2d8cf0;
+  color: #FFFFFF;
+}
+
+/** Button > loading **/
+
+.evui-btn>button .loading {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 2px;
+  border-width: 2px;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: #FFFFFF;
+  border-top-color: #dddddd;
+  vertical-align: middle;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+.evui-btn>button.primary .loading {
+  border-color: #FFFFFF;
+  border-top-color: #2d8cf0;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes grdAiguille{
+  0%{-webkit-transform:rotate(0deg);}
+  100%{-webkit-transform:rotate(360deg);}
+}
+@keyframes grdAiguille{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
+/************************************************************************************
  Checkbox
 ************************************************************************************/
 .evui-checkbox{
