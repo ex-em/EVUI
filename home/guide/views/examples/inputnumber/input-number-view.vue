@@ -11,7 +11,6 @@
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
-          :height="item.height"
         >
           <component :is="item.component"/>
         </code-view>

@@ -51,6 +51,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/inputnumber/input-number-view'], resolve),
     },
     {
+      path: '/button',
+      component: resolve => require(['./guide/views/examples/button/button-view'], resolve),
+    },
+    {
       path: '/selectbox',
       component: resolve => require(['./guide/views/examples/selectbox/selectbox-view'], resolve),
     },
