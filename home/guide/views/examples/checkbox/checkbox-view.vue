@@ -114,10 +114,6 @@
 </script>
 
 <style scoped>
-  .article-title {
-    color: #0055aa;
-    padding: 4px 0px 8px 0px;
-  }
   .split {
     margin: 40px;
   }

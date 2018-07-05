@@ -71,6 +71,12 @@
                 imgUrl: `${this.imgUrl}/radio.png`,
               },
               {
+                name: 'InputNumber',
+                routerLink: '/inputnumber',
+                content: '숫자입력',
+                imgUrl: `${this.imgUrl}/inputnumber.png`,
+              },
+              {
                 name: 'Selectbox',
                 routerLink: '/selectbox',
                 content: '셀렉트 박스',

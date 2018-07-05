@@ -310,3 +310,12 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .vue-codemirror-wrap {
   height: 100% !important;
 }
+
+/************************************************************************************
+ Guide Page
+************************************************************************************/
+
+.article-title {
+  color: #0055aa;
+  padding: 4px 0px 8px 0px;
+}

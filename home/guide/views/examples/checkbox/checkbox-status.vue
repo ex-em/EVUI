@@ -1,18 +1,30 @@
 <template>
   <div>
-    <div class="disable-demo">
+    <div class="box-demo">
+      <h5># status list</h5>
       <checkbox
         v-model="checkedList[0]"
+        :label="'Normal'"
+      />
+      <checkbox
+        v-model="checkedList[1]"
+        :label="'Checked'"
+      />
+      <checkbox
+        v-model="checkedList[2]"
         :label="'Disable - On'"
         :disabled="isDisabled"
       />
       <checkbox
-        v-model="checkedList[1]"
+        v-model="checkedList[3]"
         :label="'Disable - Off'"
         :disabled="!isDisabled"
       />
+    </div>
+    <div class="box-demo">
+      <h5># change event</h5>
       <checkbox
-        v-model="checkedList[2]"
+        v-model="checkedList[4]"
         :label="'Disable'"
         :disabled="changeDisabled"
       />
@@ -20,13 +32,12 @@
         {{ itemButtonName1 }}
       </button>
       <checkbox
-        v-model="checkedList[3]"
+        v-model="checkedList[5]"
         :label="'Value'"
       />
       <button @click="changeStatus">
         {{ itemButtonName2 }}
       </button>
-      <div>checkedList : {{ checkedList }}</div>
     </div>
   </div>
 </template>
@@ -44,7 +55,7 @@
         changeDisabled: true,
         isDisabled: true,
         checkedList: [
-          false, false, false, false,
+          false, true, false, false, false, false,
         ],
       };
     },
@@ -59,8 +70,16 @@
   };
 </script>
 <style scoped>
- .disable-demo{
-   display: inline-block;
-   margin: 3px;
- }
+  .box-demo {
+    padding-top: 2px;
+    padding-left: 1px;
+  }
+  .value-view {
+    padding-top: 5px;
+    padding-left: 1px;
+  }
+  h5 {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
 </style>
