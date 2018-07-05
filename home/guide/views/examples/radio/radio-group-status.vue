@@ -1,41 +1,46 @@
 <template>
   <div>
-    <div
-      v-for="item in baseRadioList"
-      :key="item.id"
-    >
-      <radio
-        v-model="item.bool"
-        :label="item.name"
-      />
-      <p>{{ item.bool }}</p>
+    <div class="bind-model">
+      <h5># Bind  Model</h5>
+      <radio-group
+        v-model="value"
+      >
+        <radio
+          :label="radioList[0].name"
+        />
+        <radio
+          :label="radioList[1].name"
+        />
+        <radio
+          :label="radioList[2].name"
+        />
+      </radio-group>
     </div>
   </div>
 </template>
 <script>
   import radio from '@/components/radio/radio';
+  import radioGroup from '@/components/radio/radio-group';
 
   export default {
     components: {
       radio,
+      radioGroup,
     },
     data() {
       return {
-        baseRadioList: [
+        value: null,
+        radioList: [
           {
-            bool: false,
             name: 'value01',
           },
           {
-            bool: true,
             name: 'value02',
           },
           {
-            bool: false,
             name: 'value03',
           },
         ],
-        reset: [false, true, false],
       };
     },
   };
