@@ -89,7 +89,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: #172027;
     z-index: 18000;
   }
   .evui-loadingmask-center
@@ -103,13 +102,13 @@
   {
     80%
     {
-      -webkit-opacity: 0.1;
-      opacity: 0.1;
+      -webkit-opacity: 0.2;
+      opacity: 0.2;
     }
     100%
     {
-      -webkit-opacity: 0.5;
-      opacity: 0.5;
+      -webkit-opacity: 0.9;
+      opacity: 0.9;
     }
   }
 </style>
