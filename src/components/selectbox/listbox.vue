@@ -1,30 +1,32 @@
 <template>
-  <div>
-    <slot/>
+  <div
+    :style="listboxStyle"
+    class="evui-listbox"
+  >
     <ul
-      :style="style"
-      class="evui-listbox"
+      class="evui-listbox-ul"
       @click.stop="onClick"
     >
       <li
         v-for="(item, index) in items"
         :key="index"
         :data-index="index"
-        class="evui-listbox-item"
-      >{{ item.name }}</li>
+        :class="getLiClass(item)"
+      >
+        {{ item.name }}
+      </li>
     </ul>
   </div>
 </template>
+
 <script>
   export default {
     props: {
-      height: {
-        type: Number,
-        default: 200,
-      },
-      multiple: {
-        type: Boolean,
-        default: false,
+      listboxStyle: {
+        type: Object,
+        default() {
+          return {};
+        },
       },
       items: {
         type: Array,
@@ -32,53 +34,37 @@
           return [];
         },
       },
-    },
-    data() {
-      return {
-        style: {
-          height: `${this.height}px`,
+      selectedItems: {
+        type: Array,
+        default() {
+          return [];
         },
-        beforeSelectedTarget: null,
-        selectedValues: [],
-      };
+      },
     },
     methods: {
       onClick(event) {
         const target = event.target;
         const index = +(target.dataset.index);
-        const data = this.items[index];
+        const item = this.items[index];
 
         switch (target.tagName) {
           case 'LI':
-            this.$emit('beforedselect', data, target, index);
-
-            if (target.classList.contains('selected')) {
-              target.classList.remove('selected');
-            } else {
-              target.classList.add('selected');
-            }
-
-            this.$emit('select', data, target, index);
-
-            if (this.beforeSelectedTarget !== target) {
-              this.$emit('change', data, target, index);
-            }
-
-            if (
-              !this.multiple
-              && this.beforeSelectedTarget
-              && this.beforeSelectedTarget !== target
-            ) {
-              this.beforeSelectedTarget.classList.remove('selected');
-            }
-            this.beforeSelectedTarget = target;
-
+            this.$emit('beforedselect', item, target, index);
+            this.$emit('select', item, target, index);
             break;
-          default: break;
+          default:
+            break;
         }
       },
-      getItem() {
+      getLiClass(item) {
+        const classList = ['evui-listbox-li'];
+        const findedItem = this.selectedItems.find(obj => obj.name === item.name);
 
+        if (findedItem) {
+          classList.push('selected');
+        }
+
+        return classList;
       },
     },
   };
