@@ -107,10 +107,22 @@
             cls: 'fas fa-chart-bar',
             children: [
               {
-                name: 'Chart',
-                routerLink: '/chart',
+                name: 'Bar Chart',
+                routerLink: '/barchart',
                 content: '차트',
-                imgUrl: `${this.imgUrl}/chart.png`,
+                imgUrl: `${this.imgUrl}/chart-bar.png`,
+              },
+              {
+                name: 'Line Chart',
+                routerLink: '/linechart',
+                content: '차트',
+                imgUrl: `${this.imgUrl}/chart-line.png`,
+              },
+              {
+                name: 'Pie Chart',
+                routerLink: '/piechart',
+                content: '차트',
+                imgUrl: `${this.imgUrl}/chart-pie.png`,
               },
             ],
           },

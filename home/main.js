@@ -27,8 +27,16 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/dock/dock-view'], resolve),
     },
     {
-      path: '/chart',
-      component: resolve => require(['./guide/views/examples/chart/chart-view'], resolve),
+      path: '/barchart',
+      component: resolve => require(['./guide/views/examples/chart/chart-bar-view'], resolve),
+    },
+    {
+      path: '/linechart',
+      component: resolve => require(['./guide/views/examples/chart/chart-line-view'], resolve),
+    },
+    {
+      path: '/piechart',
+      component: resolve => require(['./guide/views/examples/chart/chart-pie-view'], resolve),
     },
     {
       path: '/checkbox',
