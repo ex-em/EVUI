@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
     <div class="group-demo">
-      <h5># Disable Selected Item</h5>
+      <h5># Disable Items</h5>
       <checkbox-group
         v-model="itemNameList"
       >
@@ -15,8 +15,15 @@
           :label="groupName[2].name"
           :disabled="true"
         />
+        <checkbox
+          :label="groupName[3].name"
+        />
+        <checkbox
+          :label="groupName[4].name"
+          :disabled="true"
+        />
       </checkbox-group>
-      <p>value List : {{ itemNameList }}</p>
+      <p>Selected List : {{ itemNameList }}</p>
     </div>
     <div class="group-demo-disabled">
       <h5># Disable All</h5>
@@ -36,7 +43,7 @@
           :disabled="true"
         />
       </checkbox-group>
-      <p>value List : {{ disabledList }}</p>
+      <p>Selected List : {{ disabledList }}</p>
     </div>
   </div>
 </template>
@@ -60,6 +67,12 @@
           },
           {
             name: 'slice',
+          },
+          {
+            name: 'filter',
+          },
+          {
+            name: 'iterator',
           },
         ],
         itemNameList: ['reduce'],

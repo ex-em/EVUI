@@ -35,14 +35,9 @@
         buttonLabel: 'visible',
         inputList: [
           {
-            url: './guide/views/examples/radio/radio-default.vue',
+            url: './guide/views/examples/your-source-code',
             component: '',
             title: 'Default',
-          },
-          {
-            url: './guide/views/examples/radio/radio-status.vue',
-            component: '',
-            title: 'Status',
           },
         ],
       };

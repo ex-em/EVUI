@@ -6,13 +6,13 @@
         v-model="itemNameList"
       >
         <checkbox
-          :label="groupName[0].name"
+          :label="groupName[0].label"
         />
         <checkbox
-          :label="groupName[1].name"
+          :label="groupName[1].label"
         />
         <checkbox
-          :label="groupName[2].name"
+          :label="groupName[2].label"
         />
       </checkbox-group>
     </div>
@@ -23,7 +23,7 @@
         v-model="itemNameList"
       />
     </div>
-    <p>value List : {{ itemNameList }}</p>
+    <p>Selected List : {{ itemNameList }}</p>
   </div>
 </template>
 <script>
@@ -39,13 +39,13 @@
       return {
         groupName: [
           {
-            name: 'Short Black',
+            label: 'Short Black',
           },
           {
-            name: 'Latte',
+            label: 'Latte',
           },
           {
-            name: 'Flat White',
+            label: 'Flat White',
           },
         ],
         itemNameList: [],

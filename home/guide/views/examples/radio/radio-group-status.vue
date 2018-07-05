@@ -1,20 +1,49 @@
 <template>
-  <div>
-    <div class="bind-model">
-      <h5># Bind  Model</h5>
+  <div class="outer">
+    <div class="group-demo">
+      <h5># Disable Items</h5>
       <radio-group
-        v-model="value"
+        v-model="selectedItem"
       >
         <radio
-          :label="radioList[0].name"
+          :label="groupName[0].name"
+          :disabled="true"
         />
         <radio
-          :label="radioList[1].name"
+          :label="groupName[1].name"
         />
         <radio
-          :label="radioList[2].name"
+          :label="groupName[2].name"
+          :disabled="true"
+        />
+        <radio
+          :label="groupName[3].name"
+        />
+        <radio
+          :label="groupName[4].name"
         />
       </radio-group>
+      <p>Selected Item : {{ selectedItem }}</p>
+    </div>
+    <div class="group-demo-disabled">
+      <h5># Disable All</h5>
+      <radio-group
+        v-model="disabledItem"
+      >
+        <radio
+          :label="disabledGroupName[0].name"
+          :disabled="true"
+        />
+        <radio
+          :label="disabledGroupName[1].name"
+          :disabled="true"
+        />
+        <radio
+          :label="disabledGroupName[2].name"
+          :disabled="true"
+        />
+      </radio-group>
+      <p>Selected Item : {{ disabledItem }}</p>
     </div>
   </div>
 </template>
@@ -29,27 +58,47 @@
     },
     data() {
       return {
-        value: null,
-        radioList: [
+        groupName: [
           {
-            name: 'value01',
+            name: 'map',
           },
           {
-            name: 'value02',
+            name: 'reduce',
           },
           {
-            name: 'value03',
+            name: 'slice',
+          },
+          {
+            name: 'filter',
+          },
+          {
+            name: 'iterator',
           },
         ],
+        selectedItem: 'iterator',
+        disabledGroupName: [
+          {
+            name: 'pizza',
+          },
+          {
+            name: 'chicken',
+          },
+          {
+            name: 'steak',
+          },
+        ],
+        disabledItem: 'steak',
       };
     },
   };
 </script>
 <style scoped>
-  div{
-    display: inline-block;
+  .group-demo, .group-demo-disabled {
+    padding-top: 2px;
+    padding-left: 1px;
   }
-  p{
-    margin-left: 30px;
+  h5 {
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 </style>

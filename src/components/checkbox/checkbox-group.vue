@@ -11,7 +11,7 @@
           :class="computedInnerDiv"
         >
           <CheckBox
-            :label = "item.name"
+            :label = "item.label"
             :disabled="computedDisabled"
             type="checkbox"
           />

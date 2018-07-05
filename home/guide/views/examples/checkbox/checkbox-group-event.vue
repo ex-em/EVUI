@@ -17,13 +17,12 @@
         />
         <h5># Disable All</h5>
         <button @click="changeDisabled">change disabled</button>
-        <p>value List : {{ modelList }}</p>
+        <p>Selected List : {{ modelList }}</p>
       </div>
     </div>
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
   import checkboxGroup from '@/components/checkbox/checkbox-group';
 

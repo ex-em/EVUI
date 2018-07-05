@@ -14,7 +14,7 @@
           :label="groupName[2].name"
         />
       </checkbox-group>
-      <p>value List : {{ itemNameList }}</p>
+      <p>Selected List : {{ itemNameList }}</p>
     </div>
   </div>
 </template>

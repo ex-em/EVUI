@@ -1,15 +1,10 @@
 <template>
   <div>
-    <div
-      v-for="item in baseRadioList"
-      :key="item.id"
-    >
-      <radio
-        v-model="item.bool"
-        :label="item.name"
-      />
-      <p>{{ item.bool }}</p>
-    </div>
+    <radio
+      v-model="baseRadio.bool"
+      :label="baseRadio.label"
+    />
+    <p>{{ baseRadio.bool }}</p>
   </div>
 </template>
 <script>
@@ -21,21 +16,10 @@
     },
     data() {
       return {
-        baseRadioList: [
-          {
+        baseRadio: {
             bool: false,
-            name: 'value01',
+            label: 'Normal',
           },
-          {
-            bool: true,
-            name: 'value02',
-          },
-          {
-            bool: false,
-            name: 'value03',
-          },
-        ],
-        reset: [false, true, false],
       };
     },
   };

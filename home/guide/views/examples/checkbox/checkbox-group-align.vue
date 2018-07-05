@@ -16,7 +16,6 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
   import checkboxGroup from '@/components/checkbox/checkbox-group';
 
