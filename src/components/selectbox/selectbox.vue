@@ -1,98 +1,103 @@
 <template>
   <div
+    :style="selectboxStyle"
     class="evui-selectbox"
-    :class="wrapClasses"
-    :style="style"
   >
     <div
-      v-if="!multiple"
-      class="evui-selectbox-display arrow-down"
-      @click.stop="onClick"
+      class="selectbox-field"
+      @click="onClick"
     >
-      {{ output }}<icon :class="selectIconClasses"/>
-    </div>
-    <div
-      v-else
-      class="evui-selectbox-display"
-      @click.stop="onClick"
-    >
-      <span
-        v-for="item in selectedMultiple"
-        :key="item.name"
+      <div
+        v-if="multiple"
+        class="multiple-tag-view"
       >
-        <span class="evui-selectbox-tag">{{ item.name }}</span>
-      </span>
+        <div
+          v-for="item in selectedItems"
+          :key="item.name"
+          class="evui-select-tag checked"
+        >
+          <span class="text">
+            {{ item.name }}
+          </span>
+          <i
+            class="close"
+            @click="removeTag(item, $event)"
+          />
+        </div>
+      </div>
+      <input
+        v-else
+        type="text"
+        :disabled="disabled"
+        :value="inputText"
+        class="input-text"
+        @keyup="onKeyUpInputTxt"
+      >
+      <i :class="selectBoxIconCls"/>
     </div>
     <transition name="fade">
-      <listbox
-        v-show="dropToggle"
-        class="evui-select-dropdown"
-        :style="listStyle"
-        :items="options"
-        @select="onItemClick"
-        @change="onChange"
-      >
-        <div style="padding:6px 6px;">
-          <input
-            class="evui-select-search"
-            type="text"
-            :style="searchStyle"
-            :disabled="disabled"
-            ref="search"
-          >
-        </div>
-      </listbox>
+      <dropdown
+        v-show="dropDownState"
+        :dropdown-style="dropdownStyle"
+        :is-group="isGroup"
+        :disabled="disabled"
+        :listbox-style="listboxStyle"
+        :multiple="multiple"
+        :items="listboxItems"
+        :selected-items="selectedItems"
+        @select="onSelect"
+        @keyup="onKeyUpInputTxt"
+      />
     </transition>
-    <input
-      type="hidden"
-      :name="name"
-      :value="value"
-    >
   </div>
 </template>
-<script>
-  import '@/styles/evui.css';
-  import icon from '@/components/icon/icon';
-  import listbox from '@/components/selectbox/listbox';
 
-  const boxSize = {
-    small: {
-      height: 22,
-      fontSize: 12,
-    },
-    normal: {
-      height: 30,
-      fontSize: 14,
-    },
-    large: {
-      height: 34,
-      fontSize: 16,
-    },
-  };
+<script>
+  import '@/styles/all.css';
+  import '@/styles/evui.css';
+  import dropdown from '@/components/selectbox/dropdown';
+
+  // const boxSize = {
+  //   small: {
+  //     height: 22,
+  //     fontSize: 12,
+  //   },
+  //   normal: {
+  //     height: 30,
+  //     fontSize: 14,
+  //   },
+  //   large: {
+  //     height: 34,
+  //     fontSize: 16,
+  //   },
+  // };
 
   export default {
     components: {
-      icon,
-      listbox,
+      dropdown,
     },
     props: {
       name: {
         type: String,
         default: null,
       },
-      width: {
-        type: Number,
-        default: 200,
+      selectboxStyle: {
+        type: Object,
+        default() {
+          return {};
+        },
       },
       size: {
         type: String,
         default: 'normal',
       },
-      value: {
-        type: [String, Number, Array],
-        default: '',
+      dropdownStyle: {
+        type: Object,
+        default() {
+          return {};
+        },
       },
-      multiple: {
+      isGroup: {
         type: Boolean,
         default: false,
       },
@@ -100,11 +105,17 @@
         type: Boolean,
         default: false,
       },
-      placeholder: {
-        type: String,
-        default: '',
+      listboxStyle: {
+        type: Object,
+        default() {
+          return {};
+        },
       },
-      options: {
+      multiple: {
+        type: Boolean,
+        default: false,
+      },
+      items: {
         type: Array,
         default() {
           return [];
@@ -113,49 +124,32 @@
     },
     data() {
       return {
-        dropVisible: false,
-        selectedItem: {},
-        selectedSingle: null,
-        selectedMultiple: [],
-        style: {
-          width: `${this.width}px`,
-          height: `${boxSize[this.size].height}px`,
-        },
-        listStyle: {
-          top: `${boxSize[this.size].height + 2}px`,
-        },
-        searchStyle: {
-          width: '100%',
-          height: `${boxSize[this.size].height}px`,
-        },
+        dropDownState: false,
+        inputText: '',
+        listboxItems: [],
+        selectedItems: [],
       };
     },
     computed: {
-      dropToggle() {
-        return this.dropVisible;
-      },
-      wrapClasses() {
-        return [
-          `evui-box-${this.size}`,
-          {
-            'evui-diabled': this.disabled,
-          },
-        ];
-      },
-      selectIconClasses() {
-        return [
-          'fa-sort-down',
-          'evui-select-arrow',
-          {
-            'select-down': this.dropVisible,
-          },
-        ];
-      },
-      output() {
-        return this.selectedItem.name;
+      selectBoxIconCls() {
+        const classList = ['arrow-icon'];
+
+        if (this.dropDownState) {
+          classList.push('rotate-180');
+        }
+
+        return classList;
       },
     },
     mounted() {
+      this.listboxItems = this.items.slice();
+
+      if (this.selectboxStyle.height) {
+        this.dropdownStyle.height = this.selectboxStyle.height;
+      }
+      if (!this.multiple) {
+        this.dropdownStyle.border = 0;
+      }
     },
     methods: {
       onClick() {
@@ -163,22 +157,93 @@
           return;
         }
 
-        this.dropVisible = !this.dropVisible;
+        this.dropDownState = !this.dropDownState;
+      },
+      onSelect(item, target, index) {
+        let findedItem;
+        const itemName = item.name;
 
-        if (this.dropVisible) {
-          this.$nextTick(() => {
-            this.$refs.search.focus();
-          });
+        if (this.multiple) {
+          findedItem = this.selectedItems.find(obj => obj.name === itemName);
+
+          if (findedItem) {
+            this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
+          } else {
+            this.selectedItems.push(item);
+          }
+        } else {
+          this.inputText = itemName;
+          this.selectedItems.length = 0;
+          this.selectedItems.push(item);
+          this.filterItems(itemName);
         }
-      },
-      onItemClick(data) {
-        this.selectedItem = data;
-        this.dropVisible = !this.dropVisible;
-      },
-      onChange() {
 
+        // if (!this.multiple) {
+        this.dropDownState = false;
+        // }
+
+        this.$emit('select', item, target, index);
+      },
+      onKeyUpInputTxt(e) {
+        let findedItem;
+        const value = e.target.value;
+
+        this.filterItems(value);
+
+        if (!this.isGroup && !this.multiple) {
+          this.inputText = value;
+          this.selectedItems.length = 0;
+
+          findedItem = this.items.find(obj => obj.name === value);
+
+          if (findedItem) {
+            this.selectedItems.push(findedItem);
+          }
+        }
+
+        this.$emit('keyup', e);
+      },
+      removeTag(item, event) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
+      },
+      filterItems(value) {
+        let ix;
+        let ixLen;
+        let jx;
+        let jxLen;
+        let groupObj;
+        let itemList;
+        let item;
+
+        if (value && value.length > 0) {
+          if (this.isGroup) {
+            this.listboxItems = [];
+
+            for (ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+              groupObj = this.items[ix];
+              itemList = groupObj.items;
+
+              for (jx = 0, jxLen = itemList.length; jx < jxLen; jx++) {
+                item = itemList[jx];
+
+                if (item.name.indexOf(value) === 0) {
+                  this.listboxItems.push(groupObj);
+                  break;
+                }
+              }
+            }
+          } else {
+            this.listboxItems = this.items.filter(obj => obj && obj.name.indexOf(value) === 0);
+          }
+        } else {
+          this.listboxItems = this.items.slice();
+        }
       },
     },
   };
 </script>
-
