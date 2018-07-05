@@ -1,8 +1,46 @@
 <template>
-  <div class="outer"/>
+  <div class="outer">
+    <div class="group-demo">
+      <h5># Disable Selected Item</h5>
+      <checkbox-group
+        v-model="itemNameList"
+      >
+        <checkbox
+          :label="groupName[0].name"
+        />
+        <checkbox
+          :label="groupName[1].name"
+        />
+        <checkbox
+          :label="groupName[2].name"
+          :disabled="true"
+        />
+      </checkbox-group>
+      <p>value List : {{ itemNameList }}</p>
+    </div>
+    <div class="group-demo-disabled">
+      <h5># Disable All</h5>
+      <checkbox-group
+        v-model="disabledList"
+      >
+        <checkbox
+          :label="disabledGroupName[0].name"
+          :disabled="true"
+        />
+        <checkbox
+          :label="disabledGroupName[1].name"
+          :disabled="true"
+        />
+        <checkbox
+          :label="disabledGroupName[2].name"
+          :disabled="true"
+        />
+      </checkbox-group>
+      <p>value List : {{ disabledList }}</p>
+    </div>
+  </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
   import checkboxGroup from '@/components/checkbox/checkbox-group';
 
@@ -13,21 +51,7 @@
     },
     data() {
       return {
-        checkAll: false,
-        isDisabled: true,
         groupName: [
-          {
-            name: 'apple',
-          },
-          {
-            name: 'orange',
-          },
-          {
-            name: 'banana',
-          },
-        ],
-        itemNameList: [],
-        groupNameAnother: [
           {
             name: 'map',
           },
@@ -38,49 +62,30 @@
             name: 'slice',
           },
         ],
-        itemNameListAnother: [],
-        groupNameTheOhter: [
+        itemNameList: ['reduce'],
+        disabledGroupName: [
           {
-            name: 'cheese',
+            name: 'pizza',
           },
           {
-            name: 'ham',
+            name: 'chicken',
           },
           {
-            name: 'egg',
+            name: 'steak',
           },
         ],
-        itemNameListTheOhter: ['cheese', 'ham'],
+        disabledList: ['steak'],
       };
-    },
-    methods: {
-      handleCheckAll() {
-        if (this.checkAll) {
-          this.itemNameListAnother = ['map', 'reduce', 'slice'];
-        } else {
-          this.itemNameListAnother = [];
-        }
-      },
-      checkAllGroupChange(data) {
-        if (data.length === this.groupNameAnother.length) {
-          this.checkAll = true;
-        } else {
-          this.checkAll = false;
-        }
-      },
-      clickEvent() {
-        this.isDisabled = !this.isDisabled;
-      },
     },
   };
 </script>
 <style scoped>
-  .group-slot-demo {
-    width: 300px;
-    display: inline-block;
+  .group-demo, .group-demo-disabled {
+    padding-top: 2px;
+    padding-left: 1px;
   }
-  .group-list-demo {
-    width: 300px;
-    display: inline-block;
+  h5 {
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 </style>

@@ -39,7 +39,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import codeView from '@/components/codeview/code';
   import checkboxDefault from './checkbox-default';
   import checkboxStatus from './checkbox-status';
@@ -115,9 +114,6 @@
 </script>
 
 <style scoped>
-  div {
-    font-family: 'NanumGothic', Helvetica
-  }
   .article-title {
     color: #0055aa;
     padding: 4px 0px 8px 0px;

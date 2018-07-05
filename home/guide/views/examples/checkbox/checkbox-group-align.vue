@@ -1,72 +1,17 @@
 <template>
   <div class="outer">
-    <div class="group-slot-demo">
-      <h4># Use Slot</h4>
+    <div class="box-demo">
+      <h5># V-Box</h5>
       <checkbox-group
+        :list="groupName"
+        :group-align="'vbox'"
         v-model="itemNameList"
-      >
-        <checkbox
-          :label="groupName[0].name"
-        />
-        <checkbox
-          :label="groupName[1].name"
-        />
-        <checkbox
-          :label="groupName[2].name"
-        />
-      </checkbox-group>
-      <p>value List : {{ itemNameList }}</p>
-    </div>
-    <div class="group-list-demo">
-      <h4># Use List</h4>
+      />
+      <h5># H-Box</h5>
       <checkbox-group
         :list="groupName"
         v-model="itemNameList"
       />
-      <p>value List : {{ itemNameList }}</p>
-    </div>
-    <hr>
-    <div class="box-demo">
-      <h4># V-Box</h4>
-      <checkbox-group
-        :list="groupNameTheOhter"
-        :group-align="'vbox'"
-        v-model="itemNameListTheOhter"
-      />
-      <p>value List : {{ itemNameListTheOhter }}</p>
-      <h4># H-Box</h4>
-      <checkbox-group
-        :list="groupNameTheOhter"
-        v-model="itemNameListTheOhter"
-      />
-      <p>value List : {{ itemNameListTheOhter }}</p>
-    </div>
-    <hr>
-    <div class="custom-event-demo">
-      <h4># custom event</h4>
-      <checkbox
-        v-model="checkAll"
-        :label="'all check'"
-        @on-change="handleCheckAll"
-      />
-      <checkbox-group
-        :list="groupNameAnother"
-        v-model="itemNameListAnother"
-        @on-change="checkAllGroupChange"
-      />
-      <p>value List : {{ itemNameListAnother }}</p>
-    </div>
-    <hr>
-    <div class="custom-event-demo">
-      <h4># disabled</h4>
-      <checkbox-group
-        :list="groupNameAnother"
-        :disabled="isDisabled"
-        v-model="itemNameListAnother"
-        @on-change="checkAllGroupChange"
-      />
-      <button @click="clickEvent">change status</button>
-      <p>value List : {{ itemNameListAnother }}</p>
     </div>
   </div>
 </template>
@@ -82,74 +27,29 @@
     },
     data() {
       return {
-        checkAll: false,
-        isDisabled: true,
         groupName: [
           {
-            name: 'apple',
+            name: 'Mac Book Pro',
           },
           {
-            name: 'orange',
+            name: 'Mac Pro',
           },
           {
-            name: 'banana',
+            name: 'Mac Book Air',
           },
         ],
-        itemNameList: [],
-        groupNameAnother: [
-          {
-            name: 'map',
-          },
-          {
-            name: 'reduce',
-          },
-          {
-            name: 'slice',
-          },
-        ],
-        itemNameListAnother: [],
-        groupNameTheOhter: [
-          {
-            name: 'cheese',
-          },
-          {
-            name: 'ham',
-          },
-          {
-            name: 'egg',
-          },
-        ],
-        itemNameListTheOhter: ['cheese', 'ham'],
+        itemNameList: ['Mac Book Pro', 'Mac Pro'],
       };
-    },
-    methods: {
-      handleCheckAll() {
-        if (this.checkAll) {
-          this.itemNameListAnother = ['map', 'reduce', 'slice'];
-        } else {
-          this.itemNameListAnother = [];
-        }
-      },
-      checkAllGroupChange(data) {
-        if (data.length === this.groupNameAnother.length) {
-          this.checkAll = true;
-        } else {
-          this.checkAll = false;
-        }
-      },
-      clickEvent() {
-        this.isDisabled = !this.isDisabled;
-      },
     },
   };
 </script>
 <style scoped>
-  .group-slot-demo {
-    width: 300px;
-    display: inline-block;
+  .box-demo {
+    padding-top: 2px;
+    padding-left: 1px;
   }
-  .group-list-demo {
-    width: 300px;
-    display: inline-block;
+  h5 {
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 </style>

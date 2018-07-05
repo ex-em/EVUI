@@ -1,5 +1,26 @@
 <template>
-  <div class="outer"/>
+  <div class="outer">
+    <div class="custom-event-demo">
+      <div class="inner-event-demo">
+        <h5># All Check Box</h5>
+        <checkbox
+          v-model="allChecked"
+          :label="'all check'"
+          :disabled="isDisabled"
+          @on-change="handleModelList"
+        />
+        <checkbox-group
+          :list="eventGroupList"
+          v-model="modelList"
+          :disabled="isDisabled"
+          @on-change="changeAllChecked"
+        />
+        <h5># Disable All</h5>
+        <button @click="changeDisabled">change disabled</button>
+        <p>value List : {{ modelList }}</p>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
   import '@/styles/evui.css';
@@ -13,21 +34,9 @@
     },
     data() {
       return {
-        checkAll: false,
-        isDisabled: true,
-        groupName: [
-          {
-            name: 'apple',
-          },
-          {
-            name: 'orange',
-          },
-          {
-            name: 'banana',
-          },
-        ],
-        itemNameList: [],
-        groupNameAnother: [
+        allChecked: false,
+        modelList: [],
+        eventGroupList: [
           {
             name: 'map',
           },
@@ -38,49 +47,37 @@
             name: 'slice',
           },
         ],
-        itemNameListAnother: [],
-        groupNameTheOhter: [
-          {
-            name: 'cheese',
-          },
-          {
-            name: 'ham',
-          },
-          {
-            name: 'egg',
-          },
-        ],
-        itemNameListTheOhter: ['cheese', 'ham'],
+        isDisabled: false,
       };
     },
     methods: {
-      handleCheckAll() {
-        if (this.checkAll) {
-          this.itemNameListAnother = ['map', 'reduce', 'slice'];
+      handleModelList() {
+        if (this.allChecked) {
+          this.modelList = ['map', 'reduce', 'slice'];
         } else {
-          this.itemNameListAnother = [];
+          this.modelList = [];
         }
       },
-      checkAllGroupChange(data) {
-        if (data.length === this.groupNameAnother.length) {
-          this.checkAll = true;
+      changeAllChecked(data) {
+        if (data.length === this.eventGroupList.length) {
+          this.allChecked = true;
         } else {
-          this.checkAll = false;
+          this.allChecked = false;
         }
       },
-      clickEvent() {
+      changeDisabled() {
         this.isDisabled = !this.isDisabled;
       },
     },
   };
 </script>
 <style scoped>
-  .group-slot-demo {
-    width: 300px;
-    display: inline-block;
+  .inner-event-demo {
+    padding-top: 2px;
+    padding-left: 1px;
   }
-  .group-list-demo {
-    width: 300px;
-    display: inline-block;
+  h5 {
+    padding-top: 3px;
+    padding-bottom: 3px;
   }
 </style>
