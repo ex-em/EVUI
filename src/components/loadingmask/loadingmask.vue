@@ -87,7 +87,6 @@
   .evui-loadingmask
   {
     position: relative;
-    background-color: #172027;
     width: 100%;
     height: 100%;
     z-index: 18000;
@@ -96,20 +95,20 @@
   {
     position: relative;
     top: 45%;
-    left: 50%;
+    left: calc(50% - 15px);
     transform: translate3d(0px, 0px, 0px);
   }
   @keyframes evui-loadingmask-fadedelay
   {
     80%
     {
-      -webkit-opacity: 0.1;
-      opacity: 0.1;
+      -webkit-opacity: 0.2;
+      opacity: 0.2;
     }
     100%
     {
-      -webkit-opacity: 0.5;
-      opacity: 0.5;
+      -webkit-opacity: 0.9;
+      opacity: 0.9;
     }
   }
 </style>

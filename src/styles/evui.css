@@ -3,7 +3,10 @@
 /************************************************************************************
  common
 ************************************************************************************/
-
+@font-face {
+  font-family:'NanumGothic';
+  src:url('../webfonts/NanumGothic.ttf') format('truetype');
+}
 *{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -266,54 +269,139 @@
   display: inline-block;
 }
 
-.evui-checkbox input[type=checkbox]{
+.evui-checkbox input[type="checkbox"]{
   display: none;
 }
 
-.evui-checkbox input[type=checkbox]+label{
+.evui-checkbox input[type="checkbox"] + label{
   display: inline-block;
   position: relative;
-  padding-left: 25px;
+  padding-left: 19px;
+  padding-right: 5px;
   font-size: 13px;
   cursor: pointer;
+  user-select: none;
 }
 
-.evui-checkbox.evui-diabled input[type=checkbox]+label{
+.evui-checkbox.evui-disabled input[type="checkbox"] + label{
   color: #c1c1c1;
   cursor: not-allowed;
+  transition: all .2s;
 }
 
-div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
-  background-color: #c1c1c1;
+div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
+  border: 1px solid #c1c1c1;
+  color: #c1c1c1;
+  transition: all .2s;
 }
 
-.evui-checkbox input[type=checkbox]+label:before{
+.evui-checkbox input[type="checkbox"] + label:before{
   content:"";
   display: inline-block;
   position: absolute;
   left: 0px;
   bottom: 0px;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   margin-right: 10px;
-  background-color: #ccc;
-  border-radius: 4px;
-  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 11px;
   text-aligh: center;
   text-indent: 2px;
-  line-height: 15px;
+  line-height: 13px;
 }
 
-.evui-checkbox input[type=checkbox]:hover + label:before{
+.evui-checkbox input[type="checkbox"]:hover + label:before{
   content: "\2713";
   color: #ddd;
 }
 
-.evui-checkbox input[type=checkbox]:checked+label:before{
+.evui-checkbox input[type="checkbox"]:checked + label:before{
   content: "\2713";
-  color: #fff;
-  background: #2f87c1;
+  border: 1px solid #2f87c1;
+  color: #2f87c1;
   font-weight: 800;
+  transition: all .2s;
+}
+.evui-checkbox-group-inner {
+  display: inline-block;
+}
+
+/************************************************************************************
+ Radio
+************************************************************************************/
+.evui-radio {
+  display: inline-block;
+}
+.evui-radio [type="radio"]:checked,
+.evui-radio [type="radio"]:not(:checked) {
+  display: none;
+}
+.evui-radio [type="radio"]:checked + label,
+.evui-radio [type="radio"]:not(:checked) + label {
+  position: relative;
+  display: inline-block;
+  padding-left: 21px;
+  padding-right: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 16px;
+  user-select: none;
+}
+.evui-radio [type="radio"]:checked + label:before,
+.evui-radio [type="radio"]:not(:checked) + label:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ddd;
+  border-radius: 100%;
+  background: #fff;
+
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label {
+  color: #c1c1c1;
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label:before,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label:before {
+  background: #f1f1f1;
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label:after,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label:after {
+  background: #c1c1c1;
+}
+.evui-radio [type="radio"]:checked + label:after,
+.evui-radio [type="radio"]:not(:checked) + label:after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #337ab6;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  border-radius: 100%;
+  -webkit-transition: all 0.1s ease;
+  transition: all 0.1s ease;
+}
+.evui-radio [type="radio"]:not(:checked) + label:after {
+  opacity: 0;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+}
+.evui-radio [type="radio"]:checked + label:after {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+.evui-radio.evui-disabled input[type="radio"] + label {
+  cursor: not-allowed;
+}
+.evui-radio-group-inner {
+  display: inline-block;
 }
 
 /************************************************************************************
@@ -436,4 +524,26 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   outline: 0;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+
+
+/************************************************************************************
+ Code Mirror
+************************************************************************************/
+
+.CodeMirror {
+  font-size: 13px;
+  height: 100% !important;
+}
+.vue-codemirror-wrap {
+  height: 100% !important;
+}
+
+/************************************************************************************
+ Guide Page
+************************************************************************************/
+
+.article-title {
+  color: #0055aa;
+  padding: 4px 0px 8px 0px;
 }
