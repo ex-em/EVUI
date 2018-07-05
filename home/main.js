@@ -58,6 +58,10 @@ const router = new VueRouter({
       path: '/timepicker',
       component: resolve => require(['./guide/views/examples/timepicker/timepicker-view'], resolve),
     },
+    {
+      path: '/toggle',
+      component: resolve => require(['./guide/views/examples/toggle/toggle-view'], resolve),
+    },
   ],
 });
 

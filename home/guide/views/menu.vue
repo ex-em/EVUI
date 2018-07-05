@@ -99,7 +99,7 @@
   }
   .evui-left-navigation {
     width: 240px;
-    border-right: 1px solid #dddee0;
+    height: 500px; /*fix px*/
   }
   .evui-menu {
     display: block;
