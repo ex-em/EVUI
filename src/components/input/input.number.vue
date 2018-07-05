@@ -13,6 +13,9 @@
           :class="innerUpClasses"
           @click="preventDefault"
         />
+        <icon
+          class="fa-sort-up"
+        />
       </a>
       <a
         :class="downClasses"
@@ -23,6 +26,7 @@
           :class="innerDownClasses"
           @click="preventDefault"
         />
+        <icon class="fa-sort-down"/>
       </a>
     </div>
     <div
@@ -50,6 +54,8 @@
 </template>
 
 <script>
+  import icon from '@/components/icon/icon';
+
   const prefixCls = 'evui-input-number';
 
   function parsedStyle(value) {
@@ -84,7 +90,8 @@
 
   export default {
       name: 'InputNumber',
-      model: {
+      components: {
+        icon,
       },
       props: {
         max: {
@@ -389,6 +396,11 @@
     border-color : #2d8cf0;
     opacity: 1;
   }
+
+  .evui-input-number:hover i{
+    color : #2d8cf0;
+  }
+
   /*inner input div class*/
   .evui-input-number-input-wrap {
     overflow: hidden;
@@ -463,7 +475,8 @@
   .evui-input-number-handler-down-inner {
   }
   /*TODO SET ICON CLASS*/
-  .evui-icon-arrow-down {
+  .fa-sort-up {
+    margin-top: 4px;
   }
   .evui-icon-arrow-up {
   }

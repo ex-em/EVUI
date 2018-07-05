@@ -15,7 +15,6 @@
           :label="radioList[2].name"
         />
       </radio-group>
-      <p>v-model: {{ value }}</p>
     </div>
   </div>
 </template>
@@ -33,13 +32,13 @@
         value: null,
         radioList: [
           {
-            name: 'value01',
+            name: 'apple',
           },
           {
-            name: 'value02',
+            name: 'orange',
           },
           {
-            name: 'value03',
+            name: 'banana',
           },
         ],
       };
