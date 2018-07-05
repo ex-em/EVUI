@@ -8,11 +8,7 @@ export default class PieChart extends BaseChart {
   }
 
   drawChart() {
-    if (this.options.title.show) {
-      this.createTitle();
-    }
     this.createPie();
-
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 

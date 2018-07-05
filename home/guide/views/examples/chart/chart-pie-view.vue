@@ -17,20 +17,26 @@
 </template>
 
 <script>
-  import codeView from '@/components/codeview/code';
-  import chartBarDefault from './chart-bar-default';
+  import CodeView from '@/components/codeview/code';
+  import DefaultPieChart from './chart.pie.default';
+  import DoughnutChart from './chart.pie.doughnut';
 
   export default {
     components: {
-      codeView,
+      CodeView,
     },
     data() {
       return {
         componentList: [
           {
-            url: './guide/views/examples/chart/chart-bar-default.vue',
-            component: chartBarDefault,
-            title: 'Pie Chart Default',
+            url: './guide/views/examples/chart/chart.pie.default.vue',
+            component: DefaultPieChart,
+            title: 'Default Pie Chart',
+          },
+          {
+            url: './guide/views/examples/chart/chart.pie.doughnut.vue',
+            component: DoughnutChart,
+            title: 'Doughnut Chart',
           },
         ],
       };

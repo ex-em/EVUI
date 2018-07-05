@@ -226,7 +226,7 @@ export default class ChartDataStore {
       this.seriesGroupList[dataIdx].push({ seriesIndex, data: value, show: series.show });
     }
 
-    if (this.isRTM && this.bufferSize) {
+    if (this.bufferSize) {
       if (series.data.length > this.bufferSize) {
         series.data.shift();
         series.inputData.shift();
@@ -339,7 +339,7 @@ export default class ChartDataStore {
       return;
     }
 
-    if (this.isRTM && this.bufferSize) {
+    if (this.bufferSize) {
       if (cSeries.data.length > this.bufferSize) {
         cSeries.data.shift();
         cSeries.inputData.shift();

@@ -17,20 +17,38 @@
 </template>
 
 <script>
-  import codeView from '@/components/codeview/code';
-  import chartBarDefault from './chart-bar-default';
+  import CodeView from '@/components/codeview/code';
+  import DefaultLineChart from './chart.line.default';
+  import FillLineChart from './chart.line.fill';
+  import StackLinechart from './chart.line.stack';
+  import ScatterChart from './chart.line.scatter';
 
   export default {
     components: {
-      codeView,
+      CodeView,
     },
     data() {
       return {
         componentList: [
           {
-            url: './guide/views/examples/chart/chart-bar-default.vue',
-            component: chartBarDefault,
-            title: 'Line Chart Default',
+            url: './guide/views/examples/chart/chart.line.default.vue',
+            component: DefaultLineChart,
+            title: 'Default Line Chart',
+          },
+          {
+            url: './guide/views/examples/chart/chart.line.fill.vue',
+            component: FillLineChart,
+            title: 'Fill Line Chart',
+          },
+          {
+            url: './guide/views/examples/chart/chart.line.fill.vue',
+            component: StackLinechart,
+            title: 'Stack Line Chart',
+          },
+          {
+            url: './guide/views/examples/chart/chart.line.scatter.vue',
+            component: ScatterChart,
+            title: 'Scatter Chart',
           },
         ],
       };

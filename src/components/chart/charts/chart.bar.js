@@ -8,9 +8,6 @@ export default class BarChart extends BaseChart {
   }
 
   drawChart() {
-    if (this.options.title.show) {
-      this.createTitle();
-    }
     this.setLabelOffset();
     this.createAxis();
     this.createBar();
