@@ -19,6 +19,9 @@
 
 <script>
   import codeView from '@/components/codeview/code';
+  import tableDefault from './table-default';
+  import tablePage from './table-page';
+  import tableBuffer from './table-buffer';
 
   export default {
     components: {
@@ -27,6 +30,21 @@
     data() {
       return {
         componentList: [
+          {
+            url: './guide/views/examples/table/table-default.vue',
+            component: tableDefault,
+            title: 'Default',
+          },
+          {
+            url: './guide/views/examples/table/table-page.vue',
+            component: tablePage,
+            title: 'Page',
+          },
+          {
+            url: './guide/views/examples/table/table-buffer.vue',
+            component: tableBuffer,
+            title: 'Buffer(Virtual Scroll)',
+          },
         ],
       };
     },
