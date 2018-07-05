@@ -59,6 +59,12 @@
             cls: 'fab fa-elementor',
             children: [
               {
+                name: 'Button',
+                routerLink: '/button',
+                content: '버튼',
+                imgUrl: `${this.imgUrl}/button.png`,
+              },
+              {
                 name: 'Checkbox',
                 routerLink: '/checkbox',
                 content: '체크박스',
