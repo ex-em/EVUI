@@ -91,6 +91,9 @@
   a, span {
     text-decoration: none !important;
   }
+  a:hover {
+    color: #2D89EF;
+  }
   a:visited {
     color: #000;
   }
@@ -99,9 +102,9 @@
     border-right: 1px solid #dddee0;
   }
   .evui-menu {
+    display: block;
     width: 100%;
     background: #fff;
-    display: block;
     z-index: 900;
   }
   .evui-menu-group {
@@ -121,25 +124,22 @@
   .evui-menu-item {
     height: 35px;
     line-height: 35px;
-    cursor: pointer;
-    z-index: 1;
     padding-left: 30px;
-    color: #888888;
     border-right: 2px solid transparent;
+    color: #888888;
     background-color: #ffffff;
+    z-index: 1;
+    cursor: pointer;
   }
   .evui-menu-item:hover {
     border-right: 4px solid #2D89EF;
     color: #2d8cf0;
   }
   .evui-menu-item.active {
-    z-index: 2;
-    color: #f1f1f1;
     border-right: 4px solid #2D89EF;
+    color: #f1f1f1;
     background-color: #2D89EF;
     transition: background-color 600ms ease;
-  }
-  a:hover {
-    color: #2D89EF;
+    z-index: 2;
   }
 </style>

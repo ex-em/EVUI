@@ -62,13 +62,13 @@
                 name: 'Checkbox',
                 routerLink: '/checkbox',
                 content: '체크박스',
-//                imgUrl: `${this.imgUrl}/checkbox.png`,
+                imgUrl: `${this.imgUrl}/checkbox.png`,
               },
               {
                 name: 'Radio',
                 routerLink: '/radio',
                 content: '라디오버튼',
-//                imgUrl: `${this.imgUrl}/radio.png`,
+                imgUrl: `${this.imgUrl}/radio.png`,
               },
               {
                 name: 'Selectbox',
@@ -77,15 +77,15 @@
 //                imgUrl: `${this.imgUrl}/selectbox.png`,
               },
               {
-                name: 'Table(page)',
+                name: 'Table',
                 routerLink: '/table',
-                content: 'table(page)',
+                content: '테이블 - 그리드',
                 imgUrl: `${this.imgUrl}/tablePage.png`,
               },
               {
                 name: 'Timepicker',
                 routerLink: '/timepicker',
-                content: 'timepicker',
+                content: '타임 피커',
                 imgUrl: `${this.imgUrl}/timepicker.png`,
               },
             ],
@@ -97,7 +97,7 @@
               {
                 name: 'Chart',
                 routerLink: '/chart',
-                content: 'chart',
+                content: '차트',
                 imgUrl: `${this.imgUrl}/chart.png`,
               },
             ],
@@ -109,7 +109,7 @@
               {
                 name: 'Menu',
                 routerLink: '/menu',
-                content: 'menu',
+                content: '메뉴',
                 imgUrl: `${this.imgUrl}/menu.png`,
               },
             ],
@@ -121,7 +121,7 @@
               {
                 name: 'Loadingmask',
                 routerLink: '/loadingmask',
-                content: 'loadingmask',
+                content: '로딩마스크',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
               },
             ],
@@ -143,14 +143,14 @@
 <style scoped>
   .evui-main-content {
     display: inline-flex;
-    width: 100%;
     margin-top: 55px;
+    width: 100%;
   }
   .evui-right-content {
     margin: 20px;
-    flex: 4;
+    flex: 1;
   }
   .evui-page-anchor {
-    flex: 1;
+    width: 240px;
   }
 </style>

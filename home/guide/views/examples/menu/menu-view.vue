@@ -33,6 +33,7 @@
             url: './guide/views/examples/menu/menu-default.vue',
             component: menuDefault,
             title: 'Menu Default',
+            height: 500,
           },
         ],
       };

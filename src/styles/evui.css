@@ -116,6 +116,7 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   display: inline-block;
   padding-left: 21px;
   padding-right: 5px;
+  font-size: 13px;
   cursor: pointer;
   line-height: 16px;
   user-select: none;
