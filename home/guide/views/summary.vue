@@ -82,17 +82,6 @@
           return item;
         });
       },
-      computedSubMenu(url) {
-        const noImage = './guide/images/noImage.png';
-        let result = '';
-        if (!url || url === undefined) {
-          result = noImage;
-        } else {
-          result = url;
-        }
-
-        return result;
-      },
     },
   };
 </script>

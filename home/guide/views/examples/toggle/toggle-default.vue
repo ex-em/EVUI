@@ -2,6 +2,11 @@
   <div>
     <toggle
     />
+    <br>
+    <br>
+    <toggle
+      :toggle-on="true"
+    />
   </div>
 </template>
 

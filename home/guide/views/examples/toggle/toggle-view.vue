@@ -20,11 +20,11 @@
 <script>
   import codeView from '@/components/codeview/code';
   import toggleDefault from './toggle-default';
+  import toggleCustom from './toggle-custom';
 
   export default {
     components: {
       codeView,
-      toggleDefault,
     },
     data() {
       return {
@@ -33,6 +33,11 @@
             url: './guide/views/examples/toggle/toggle-default.vue',
             component: toggleDefault,
             title: 'Toggle Default',
+          },
+          {
+            url: './guide/views/examples/toggle/toggle-custom.vue',
+            component: toggleCustom,
+            title: 'Toggle Custom',
           },
         ],
       };
