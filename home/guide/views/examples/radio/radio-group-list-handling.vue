@@ -2,38 +2,38 @@
   <div class="outer">
     <div class="group-slot-demo">
       <h5># Use Slot</h5>
-      <checkbox-group
-        v-model="itemNameList"
+      <radio-group
+        v-model="SelectedItem"
       >
-        <checkbox
+        <radio
           :label="groupName[0].label"
         />
-        <checkbox
+        <radio
           :label="groupName[1].label"
         />
-        <checkbox
+        <radio
           :label="groupName[2].label"
         />
-      </checkbox-group>
+      </radio-group>
     </div>
     <div class="group-list-demo">
       <h5># Use List</h5>
-      <checkbox-group
+      <radio-group
         :list="groupName"
-        v-model="itemNameList"
+        v-model="SelectedItem"
       />
     </div>
-    <p>Selected List : {{ itemNameList }}</p>
+    <p>Selected Item : {{ SelectedItem }}</p>
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
-  import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import radio from '@/components/radio/radio';
+  import radioGroup from '@/components/radio/radio-group';
 
   export default {
     components: {
-      checkbox,
-      checkboxGroup,
+      radio,
+      radioGroup,
     },
     data() {
       return {
@@ -48,7 +48,7 @@
             label: 'Flat White',
           },
         ],
-        itemNameList: [],
+        SelectedItem: 'Latte',
       };
     },
   };

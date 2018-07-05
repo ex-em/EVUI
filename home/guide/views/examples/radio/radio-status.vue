@@ -2,20 +2,20 @@
   <div>
     <div class="box-demo">
       <h5># status list</h5>
-      <checkbox
+      <radio
         v-model="checkedList[0]"
         :label="'Normal'"
       />
-      <checkbox
+      <radio
         v-model="checkedList[1]"
         :label="'Checked'"
       />
-      <checkbox
+      <radio
         v-model="checkedList[2]"
         :label="'Disable - On'"
         :disabled="isDisabled"
       />
-      <checkbox
+      <radio
         v-model="checkedList[3]"
         :label="'Disable - Off'"
         :disabled="!isDisabled"
@@ -23,7 +23,7 @@
     </div>
     <div class="box-demo">
       <h5># change event</h5>
-      <checkbox
+      <radio
         v-model="checkedList[4]"
         :label="'Disable'"
         :disabled="changeDisabled"
@@ -31,7 +31,7 @@
       <button @click="changeDisabledItem">
         {{ itemButtonName1 }}
       </button>
-      <checkbox
+      <radio
         v-model="checkedList[5]"
         :label="'Value'"
       />
@@ -42,11 +42,11 @@
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
+  import radio from '@/components/radio/radio';
 
   export default {
     components: {
-      checkbox,
+      radio,
     },
     data() {
       return {

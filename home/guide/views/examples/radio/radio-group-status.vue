@@ -2,59 +2,59 @@
   <div class="outer">
     <div class="group-demo">
       <h5># Disable Items</h5>
-      <checkbox-group
-        v-model="itemNameList"
+      <radio-group
+        v-model="selectedItem"
       >
-        <checkbox
+        <radio
           :label="groupName[0].name"
+          :disabled="true"
         />
-        <checkbox
+        <radio
           :label="groupName[1].name"
         />
-        <checkbox
+        <radio
           :label="groupName[2].name"
           :disabled="true"
         />
-        <checkbox
+        <radio
           :label="groupName[3].name"
         />
-        <checkbox
+        <radio
           :label="groupName[4].name"
-          :disabled="true"
         />
-      </checkbox-group>
-      <p>Selected List : {{ itemNameList }}</p>
+      </radio-group>
+      <p>Selected Item : {{ selectedItem }}</p>
     </div>
     <div class="group-demo-disabled">
       <h5># Disable All</h5>
-      <checkbox-group
-        v-model="disabledList"
+      <radio-group
+        v-model="disabledItem"
       >
-        <checkbox
+        <radio
           :label="disabledGroupName[0].name"
           :disabled="true"
         />
-        <checkbox
+        <radio
           :label="disabledGroupName[1].name"
           :disabled="true"
         />
-        <checkbox
+        <radio
           :label="disabledGroupName[2].name"
           :disabled="true"
         />
-      </checkbox-group>
-      <p>Selected List : {{ disabledList }}</p>
+      </radio-group>
+      <p>Selected Item : {{ disabledItem }}</p>
     </div>
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
-  import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import radio from '@/components/radio/radio';
+  import radioGroup from '@/components/radio/radio-group';
 
   export default {
     components: {
-      checkbox,
-      checkboxGroup,
+      radio,
+      radioGroup,
     },
     data() {
       return {
@@ -75,7 +75,7 @@
             name: 'iterator',
           },
         ],
-        itemNameList: ['reduce'],
+        selectedItem: 'iterator',
         disabledGroupName: [
           {
             name: 'pizza',
@@ -87,7 +87,7 @@
             name: 'steak',
           },
         ],
-        disabledList: ['steak'],
+        disabledItem: 'steak',
       };
     },
   };

@@ -16,25 +16,25 @@
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
-  import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import radio from '@/components/radio/radio';
+  import radioGroup from '@/components/radio/radio-group';
 
   export default {
     components: {
-      checkbox,
-      checkboxGroup,
+      radio,
+      radioGroup,
     },
     data() {
       return {
         groupName: [
           {
-            name: 'Mac Book Pro',
+            label: 'Mac Book Pro',
           },
           {
-            name: 'Mac Pro',
+            label: 'Mac Pro',
           },
           {
-            name: 'Mac Book Air',
+            label: 'Mac Book Air',
           },
         ],
         itemNameList: ['Mac Book Pro', 'Mac Pro'],

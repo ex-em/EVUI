@@ -27,6 +27,14 @@ export const AXIS_UNITS = {
   },
 };
 
+export const CHART_DATA_STRUCT = {
+  bar: 'array',
+  line: 'array',
+  scatter: 'array',
+  pie: 'array',
+  sunburst: 'tree',
+};
+
 export const CHART_AXIS_TYPE = {
   bar: 'axis',
   line: 'axis',

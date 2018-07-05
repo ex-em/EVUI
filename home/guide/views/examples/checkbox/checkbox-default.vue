@@ -24,15 +24,7 @@
         baseCheckList: [
           {
             bool: true,
-            name: 'value01',
-          },
-          {
-            bool: true,
-            name: 'value02',
-          },
-          {
-            bool: false,
-            name: 'value03',
+            name: 'Normal',
           },
         ],
       };

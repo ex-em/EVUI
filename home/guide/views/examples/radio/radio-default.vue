@@ -1,19 +1,13 @@
 <template>
   <div>
-    <div
-      v-for="item in baseCheckList"
-      :key="item.id"
-    >
-      <radio
-        v-model="item.bool"
-        :label="item.name"
-      />
-      <p>{{ item.bool }}</p>
-    </div>
+    <radio
+      v-model="baseRadio.bool"
+      :label="baseRadio.label"
+    />
+    <p>{{ baseRadio.bool }}</p>
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import radio from '@/components/radio/radio';
 
   export default {
@@ -22,20 +16,10 @@
     },
     data() {
       return {
-        baseCheckList: [
-          {
-            bool: true,
-            name: 'value01',
-          },
-          {
-            bool: true,
-            name: 'value02',
-          },
-          {
+        baseRadio: {
             bool: false,
-            name: 'value03',
+            label: 'Normal',
           },
-        ],
       };
     },
   };

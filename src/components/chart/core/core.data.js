@@ -7,8 +7,6 @@ export default class ChartDataStore {
       this[key] = props[key];
     });
 
-    this.seriesList = [];
-    this.seriesGroupList = [];
     this.maxValueInfo = {
       x: null,
       y: null,
@@ -27,23 +25,37 @@ export default class ChartDataStore {
       yLen: 0,
       yText: '',
     };
+
+    if (!this.chartData || !this.chartData.series) {
+      throw new Error('[EVUI][ERROR][ChartDataStore]-Not found raw data');
+    }
   }
 
   init() {
-    if (!this.chartData) {
-      throw new Error('[EVUI][ERROR][ChartDataStore]-Not found raw data');
-    }
-
-    const series = this.chartData.series;
-    if (this.structureType === 'tree') {
-      this.initTreeData();
-      this.createTreeDummy();
+    if (this.structType === 'array') {
+      this.createArraySeries();
     } else {
-      for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
-        this.addSeries(series[ix]);
-        this.addValues(ix, series[ix].data);
+      this.createTreeSeries();
+    }
+  }
+
+  createArraySeries() {
+    const series = this.chartData.series;
+
+    for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
+      this.addSeries(series[ix]);
+
+      // 초기 데이터가 존재할 경우 addValues로 데이터 처리.
+      if (series[ix].data && series[ix].data.length) {
+        this.addValues(ix);
       }
     }
+  }
+
+  createTreeSeries() {
+    // 나중에 refactoring. (sunburst chart용)
+    this.initTreeData();
+    this.createTreeDummy();
   }
 
   initTreeData() {
@@ -61,7 +73,6 @@ export default class ChartDataStore {
       const pIndex = seriesNode.parentIndex;
 
       if (!this.seriesGroupList[lvl]) {
-        // this.seriesGroupList[lvl] = { totalValue: 0, nodeList: [], lvl };
         this.seriesGroupList[lvl] = {};
       }
 
@@ -172,6 +183,8 @@ export default class ChartDataStore {
       horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
       children: param.children === undefined ? [] : param.children,
       parentIndex: null,
+      inputData: param.data || [],
+      hasAccumulate: false,
     };
 
     this.seriesList.push(series);
@@ -191,11 +204,11 @@ export default class ChartDataStore {
       return;
     }
 
-    if (!dataIdx) {
+    if (dataIndex === null || dataIndex === undefined) {
       dataIdx = series.data.length;
     }
 
-    if (this.chartAxisType === 'axis') {
+    if (this.axisType === 'axis') {
       if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
         tempValue.x = Object.hasOwnProperty.call(value, 'x') ? value.x : null;
         tempValue.y = Object.hasOwnProperty.call(value, 'y') ? value.y : null;
@@ -210,14 +223,29 @@ export default class ChartDataStore {
       if (!this.seriesGroupList[dataIdx]) {
         this.seriesGroupList[dataIdx] = [];
       }
-      this.seriesGroupList[dataIdx].push({ seriesIndex, data: value });
+      this.seriesGroupList[dataIdx].push({ seriesIndex, data: value, show: series.show });
     }
 
-    if (this.chartAxisType === 'axis') {
+    if (this.isRTM && this.bufferSize) {
+      if (series.data.length > this.bufferSize) {
+        series.data.shift();
+        series.inputData.shift();
+
+        --dataIdx;
+        --series.maxIndex;
+        --series.minIndex;
+      }
+    }
+
+    if (this.axisType === 'axis') {
       series.data[dataIdx] = tempValue;
       series.data[dataIdx].point = series.point;
+
+      series.inputData[dataIdx] = value;
     } else {
       series.data[dataIdx] = value;
+
+      series.inputData[dataIdx] = value;
     }
 
     if (series.show) {
@@ -242,15 +270,16 @@ export default class ChartDataStore {
   }
 
   findBaseSeries(seriesId) {
-    const rawSeries = this.chartData.series;
+    // const rawSeries = this.chartData.series;
     let res = null;
 
-    for (let ix = 0; ix < rawSeries.length; ++ix) {
-      if (seriesId === rawSeries[ix].id) {
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      if (seriesId === this.seriesList[ix].id) {
+        res = this.seriesList[ix].show ? res : null;
         break;
       }
 
-      if (rawSeries[ix].stack) {
+      if (this.seriesList[ix].stack && this.seriesList[ix].show) {
         res = ix;
       }
     }
@@ -272,7 +301,7 @@ export default class ChartDataStore {
       return;
     }
 
-    if (!dataIdx) {
+    if (dataIdx === null || dataIdx === undefined) {
       dataIdx = cSeries.data.length;
     }
 
@@ -284,7 +313,8 @@ export default class ChartDataStore {
       point: true,
     };
 
-    cSeries.data.push(stackValue);
+    cSeries.data[dataIdx] = stackValue;
+    cSeries.inputData[dataIdx] = value;
     cSeries.hasAccumulate = true;
     if (cSeries.show) {
       this.setMinMaxValue(cSeries, stackValue, dataIdx);
@@ -309,7 +339,18 @@ export default class ChartDataStore {
       return;
     }
 
-    if (!dataIdx) {
+    if (this.isRTM && this.bufferSize) {
+      if (cSeries.data.length > this.bufferSize) {
+        cSeries.data.shift();
+        cSeries.inputData.shift();
+
+        --dataIdx;
+        --cSeries.maxIndex;
+        --cSeries.minIndex;
+      }
+    }
+
+    if (dataIndex === null || dataIndex === undefined) {
       dataIdx = cSeries.data.length;
     }
     dataIdx += cSeries.stackOffsetIndex;
@@ -395,7 +436,8 @@ export default class ChartDataStore {
       }
     }
 
-    cSeries.data.push(stackValue);
+    cSeries.data[dataIdx] = stackValue;
+    cSeries.inputData[dataIdx] = value;
     cSeries.hasAccumulate = true;
     if (cSeries.show) {
       this.setMinMaxValue(cSeries, stackValue, dataIdx);
@@ -403,12 +445,9 @@ export default class ChartDataStore {
     }
   }
 
-  addValues(seriesIndex, values) {
+  addValues(seriesIndex) {
     const baseIndex = this.findBaseSeries(this.seriesList[seriesIndex].id);
-
-    if (!values) {
-      return;
-    }
+    const values = this.seriesList[seriesIndex].inputData;
 
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
       if (this.seriesList[seriesIndex].stack && baseIndex !== null) {
@@ -487,7 +526,7 @@ export default class ChartDataStore {
     let totalValue = 0;
 
     for (let ix = 0, ixLen = group.length; ix < ixLen; ix++) {
-      if (group[ix].data) {
+      if (group[ix].data && group[ix].show) {
         totalValue += group[ix].data;
       }
     }
@@ -500,7 +539,7 @@ export default class ChartDataStore {
     let max = null;
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].axisIndex.y === index) {
+      if (this.seriesList[ix].axisIndex.y === index && this.seriesList[ix].show) {
         if (min === null || this.seriesList[ix].min < min) {
           min = this.seriesList[ix].min;
         }
@@ -520,7 +559,7 @@ export default class ChartDataStore {
     let max = null;
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].axisIndex.x === index) {
+      if (this.seriesList[ix].axisIndex.x === index && this.seriesList[ix].show) {
         data = this.seriesList[ix].data;
 
         for (let jx = 0, jxLen = data.length; jx < jxLen; jx++) {
@@ -536,5 +575,47 @@ export default class ChartDataStore {
     }
 
     return { min, max };
+  }
+
+  updateData() {
+    this.maxValueInfo = {
+      x: null,
+      y: null,
+      index: null,
+      seriesIndex: null,
+    };
+    this.minValueInfo = {
+      x: null,
+      y: null,
+      index: null,
+      seriesIndex: null,
+    };
+    this.labelTextMaxInfo = {
+      xLen: 0,
+      xText: '',
+      yLen: 0,
+      yText: '',
+    };
+    this.seriesGroupList.length = 0;
+
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      this.initializeSeries(ix);
+      const series = this.seriesList[ix];
+
+      if (series.inputData && series.inputData.length) {
+        this.addValues(ix);
+      }
+    }
+  }
+
+  initializeSeries(seriesIndex) {
+    const series = this.seriesList[seriesIndex];
+
+    series.data.length = 0;
+    series.hasAccumulate = false;
+    series.min = null;
+    series.minIndex = null;
+    series.max = null;
+    series.maxIndex = null;
   }
 }

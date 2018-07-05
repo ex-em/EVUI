@@ -49,7 +49,4 @@
   p {
     padding: 3px;
   }
- .disable-demo{
-   display: inline-block;
- }
 </style>

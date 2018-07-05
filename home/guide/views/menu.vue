@@ -114,9 +114,10 @@
     list-style-type: none;
   }
   .evui-menu-group-title {
-    height: 48px;
-    line-height: 48px;
+    height: 40px;
+    line-height: 40px;
     padding-left: 20px;
+    font-weight: bold;
   }
   .evui-menu-group-title i {
     margin-right: 10px;

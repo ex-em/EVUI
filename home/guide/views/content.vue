@@ -59,6 +59,12 @@
             cls: 'fab fa-elementor',
             children: [
               {
+                name: 'Button',
+                routerLink: '/button',
+                content: '버튼',
+                imgUrl: `${this.imgUrl}/button.png`,
+              },
+              {
                 name: 'Checkbox',
                 routerLink: '/checkbox',
                 content: '체크박스',
@@ -69,6 +75,12 @@
                 routerLink: '/radio',
                 content: '라디오버튼',
                 imgUrl: `${this.imgUrl}/radio.png`,
+              },
+              {
+                name: 'InputNumber',
+                routerLink: '/inputnumber',
+                content: '숫자입력',
+                imgUrl: `${this.imgUrl}/inputnumber.png`,
               },
               {
                 name: 'Selectbox',
@@ -101,10 +113,22 @@
             cls: 'fas fa-chart-bar',
             children: [
               {
-                name: 'Chart',
-                routerLink: '/chart',
+                name: 'Bar Chart',
+                routerLink: '/barchart',
                 content: '차트',
-                imgUrl: `${this.imgUrl}/chart.png`,
+                imgUrl: `${this.imgUrl}/chart-bar.png`,
+              },
+              {
+                name: 'Line Chart',
+                routerLink: '/linechart',
+                content: '차트',
+                imgUrl: `${this.imgUrl}/chart-line.png`,
+              },
+              {
+                name: 'Pie Chart',
+                routerLink: '/piechart',
+                content: '차트',
+                imgUrl: `${this.imgUrl}/chart-pie.png`,
               },
             ],
           },

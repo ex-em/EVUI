@@ -34,7 +34,6 @@
             </div>
             <div>
               <h4> {{ submenu.name }} </h4>
-              <h5> {{ submenu.content }} </h5>
             </div>
           </router-link>
         </li>

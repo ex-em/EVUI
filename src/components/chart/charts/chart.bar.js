@@ -7,7 +7,7 @@ export default class BarChart extends BaseChart {
     this.seriesList = this.dataSet.getSeriesList();
   }
 
-  createChart() {
+  drawChart() {
     if (this.options.title.show) {
       this.createTitle();
     }
@@ -20,7 +20,9 @@ export default class BarChart extends BaseChart {
 
   createBar() {
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-     this.drawSeries(ix);
+      if (this.seriesList[ix].show) {
+        this.drawSeries(ix);
+      }
     }
   }
 
