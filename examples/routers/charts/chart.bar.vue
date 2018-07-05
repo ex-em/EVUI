@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%; display: inline-flex;">
+  <div style="width: 33%; display: inline; overflow: auto;">
     <chart
       :data="simpleData"
       :options="chartOptions"
@@ -29,13 +29,10 @@
             {
               id: 'simple1',
               name: 'simple1',
-              data: [5, 3, 6, 8, 9],
             },
             {
               id: 'simple2',
               name: 'simple2',
-              point: true,
-              data: [3, 8, 10, 5, 3],
             },
           ],
         },
@@ -46,20 +43,18 @@
               id: 'simple1',
               name: 'simple1',
               stack: true,
-              data: [5, 3, 6, 8, 9],
             },
             {
               id: 'simple2',
               name: 'simple2',
               stack: true,
-              data: [3, 8, 10, 5, 3],
             },
           ],
         },
         chartOptions: {
           type: 'bar',
-          width: '400px',
-          height: '350px',
+          width: '800px',
+          height: '230px',
           tickness: 0.8,
           xAxes: [{
             scaleType: 'step', // auto, fix, step
@@ -78,8 +73,8 @@
         },
         horizontalOptions: {
           type: 'bar',
-          width: '400px',
-          height: '350px',
+          width: '800px',
+          height: '230px',
           tickness: 0.8,
           horizontal: true,
           xAxes: [{
@@ -98,6 +93,61 @@
           }],
         },
       };
+    },
+    mounted() {
+      this.addData();
+    },
+    methods: {
+      addData() {
+        this.interval = setInterval(this.barAddData.bind(this), 1000);
+      },
+      barAddData() {
+        const randomData1 = Math.floor((Math.random() * 30) + 1);
+        const randomData2 = Math.floor((Math.random() * 30) + 1);
+        const randomData3 = Math.floor((Math.random() * 30) + 1);
+        const randomData4 = Math.floor((Math.random() * 20) + 1);
+        const randomData5 = Math.floor((Math.random() * 50) + 1);
+
+        this.$children[0].addValue(0, randomData1, 0);
+        this.$children[0].addValue(0, randomData2, 1);
+        this.$children[0].addValue(0, randomData3, 2);
+        this.$children[0].addValue(0, randomData4, 3);
+        this.$children[0].addValue(0, randomData5, 4);
+
+        this.$children[0].addValue(1, randomData5, 0);
+        this.$children[0].addValue(1, randomData4, 1);
+        this.$children[0].addValue(1, randomData3, 2);
+        this.$children[0].addValue(1, randomData2, 3);
+        this.$children[0].addValue(1, randomData1, 4);
+
+        this.$children[1].addValue(0, randomData1, 0);
+        this.$children[1].addValue(0, randomData2, 1);
+        this.$children[1].addValue(0, randomData3, 2);
+        this.$children[1].addValue(0, randomData4, 3);
+        this.$children[1].addValue(0, randomData5, 4);
+
+        this.$children[1].addValue(1, randomData5, 0);
+        this.$children[1].addValue(1, randomData4, 1);
+        this.$children[1].addValue(1, randomData3, 2);
+        this.$children[1].addValue(1, randomData2, 3);
+        this.$children[1].addValue(1, randomData1, 4);
+
+        this.$children[2].addValue(0, randomData1, 0);
+        this.$children[2].addValue(0, randomData2, 1);
+        this.$children[2].addValue(0, randomData3, 2);
+        this.$children[2].addValue(0, randomData4, 3);
+        this.$children[2].addValue(0, randomData5, 4);
+
+        this.$children[2].addValue(1, randomData5, 0);
+        this.$children[2].addValue(1, randomData4, 1);
+        this.$children[2].addValue(1, randomData3, 2);
+        this.$children[2].addValue(1, randomData2, 3);
+        this.$children[2].addValue(1, randomData1, 4);
+
+        this.$children[0].chart.redraw();
+        this.$children[1].chart.redraw();
+        this.$children[2].chart.redraw();
+      },
     },
   };
 </script>

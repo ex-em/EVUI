@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="display: flex; overflow: auto;">
     <line-chart/>
     <bar-chart/>
     <pie-chart/>

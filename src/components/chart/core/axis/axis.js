@@ -88,7 +88,7 @@ class Axis {
       maxValue *= (options.autoScaleRatio + 1);
     }
 
-    if (options.labelType === 'linear' && minValue <= 10) {
+    if (options.labelType === 'linear' && maxValue <= 100) {
       this.startFromZero = true;
     }
 
