@@ -7,7 +7,7 @@ export default class PieChart extends BaseChart {
     this.seriesGroupList = this.dataSet.getSeriesGroupList();
   }
 
-  createChart() {
+  drawChart() {
     if (this.options.title.show) {
       this.createTitle();
     }
@@ -48,14 +48,16 @@ export default class PieChart extends BaseChart {
     const totalValue = this.dataSet.getGroupTotalValue(groupIndex);
     for (let ix = 0, ixLen = this.seriesGroupList[groupIndex].length; ix < ixLen; ix++) {
       group = this.seriesGroupList[groupIndex][ix];
-      val = group.data;
-      sliceAngle = 2 * Math.PI * (val / totalValue);
+      if (group.show) {
+        val = group.data;
+        sliceAngle = 2 * Math.PI * (val / totalValue);
 
-      color = this.seriesList[group.seriesIndex].color || this.options.colors[group.seriesIndex];
-      if (val) {
-        this.drawPieSlice(centerX, centerY, radius, startAngle,
-startAngle + sliceAngle, color, ixLen === 1);
-        startAngle += sliceAngle;
+        color = this.seriesList[group.seriesIndex].color || this.options.colors[group.seriesIndex];
+        if (val) {
+          this.drawPieSlice(centerX, centerY, radius, startAngle,
+            startAngle + sliceAngle, color, ixLen === 1);
+          startAngle += sliceAngle;
+        }
       }
     }
     // 시작지점 stroke 추가.
