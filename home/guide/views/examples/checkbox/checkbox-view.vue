@@ -55,10 +55,6 @@
     },
     data() {
       return {
-        visible: true,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
         checkList: [
           {
             url: './guide/views/examples/checkbox/checkbox-default.vue',
@@ -104,11 +100,6 @@
           },
         ],
       };
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>

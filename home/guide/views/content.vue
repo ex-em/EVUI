@@ -104,7 +104,7 @@
                 name: 'Toggle',
                 routerLink: '/toggle',
                 content: '토글',
-//                imgUrl: `${this.imgUrl}/timepicker.png`,
+                imgUrl: `${this.imgUrl}/toggle.png`,
               },
             ],
           },

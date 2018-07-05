@@ -21,6 +21,7 @@
 
 <script>
   import codeView from '@/components/codeview/code';
+  import inputNumberDefault from './input-number-default';
 
   export default {
     components: {
@@ -28,23 +29,14 @@
     },
     data() {
       return {
-        visible: true,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
         inputList: [
           {
-            url: './guide/views/examples/your-source-code',
-            component: 'your-imported-component-object',
+            url: './guide/views/examples/inputnumber/input-number-default',
+            component: inputNumberDefault,
             title: 'Default',
           },
         ],
       };
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>

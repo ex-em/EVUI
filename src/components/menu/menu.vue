@@ -90,8 +90,10 @@
     height: 48px;
     line-height: 48px;
     padding-left: 20px;
+    font-weight: bold;
+    user-select: none;
   }
-  .evui-menu-group-title i {
+  .evui-menu-group-title > i {
     margin-right: 10px;
   }
   .evui-menu-item {

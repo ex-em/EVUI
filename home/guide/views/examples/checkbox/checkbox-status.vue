@@ -28,25 +28,29 @@
         :label="'Disable'"
         :disabled="changeDisabled"
       />
-      <button @click="changeDisabledItem">
-        {{ itemButtonName1 }}
-      </button>
+      <Button
+        :text="itemButtonName1"
+        @click="changeDisabledItem"
+      />
       <checkbox
         v-model="checkedList[5]"
         :label="'Value'"
       />
-      <button @click="changeStatus">
-        {{ itemButtonName2 }}
-      </button>
+      <Button
+        :text="itemButtonName2"
+        @click="changeStatus"
+      />
     </div>
   </div>
 </template>
 <script>
   import checkbox from '@/components/checkbox/checkbox';
+  import Button from '@/components/button';
 
   export default {
     components: {
       checkbox,
+      Button,
     },
     data() {
       return {
