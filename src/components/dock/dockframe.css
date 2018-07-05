@@ -1,0 +1,401 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.evui-dock-container {
+  display: block;
+  background-color: #333333;
+}
+
+.evui-dockframe-root {
+  display: block;
+  background-color: black;
+  position: relative;
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.overflowdiv {
+  overflow: auto;
+  background-color: black;
+}
+
+.layout-hbox {
+  float: left;
+
+}
+
+.layout-hbox > .layout-vbox {
+  float: left;
+}
+
+.layout-vbox > .layout-vbox {
+  float: left;
+}
+
+.subdockframe {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.layout-hbox > .subdockframe {
+  /*margin: 4px 4px 4px 4px;*/
+  float: left;
+}
+
+.layout-vbox > .subdockframe {
+  /*margin: 4px 4px 4px 4px;*/
+}
+
+.dockcontainer {
+  /*margin: 4px 4px 4px 4px;*/
+  user-select: none;
+  overflow: auto;
+  background-color: #333333;
+}
+
+.layout-hbox > .dockcontainer {
+  /*margin: 4px 4px 4px 4px;*/
+  position: relative;
+  float: left;
+}
+
+.layout-vbox > .dockcontainer {
+  position: relative;
+  /*margin: 4px 4px 4px 4px;*/
+}
+
+.movebar {
+  position: absolute;
+
+}
+
+.resizebar {
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.guideline {
+  z-index: 999;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.guidelinebar-vbox {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  cursor: row-resize;
+  background-color: #999999;
+}
+
+.guidelinebar-hbox {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background-color: #999999;
+}
+
+.layout-hbox > .resizebar {
+  cursor: col-resize;
+  float: left;
+  background-color: #ffffff;
+}
+
+.layout-hbox > .resizebar:hover {
+  background-color: #e4e4e4;
+}
+
+.layout-hbox > .resizebar:active {
+  background-color: #e4e4e4;
+}
+
+.layout-vbox > .resizebar {
+  cursor: row-resize;
+  background-color: #ffffff;
+}
+
+.layout-vbox > .resizebar:hover {
+  background-color: #e4e4e4;
+}
+
+.layout-vbox > .resizebar:active {
+  background-color: #e4e4e4;
+}
+
+.container-title {
+  background-color: #444444;
+  /*background-color: #42555F;*/
+  width: 100%;
+  height: 25px;
+  padding-left: 13px;
+  line-height: 25px;
+  vertical-align: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /*min-width: 100px;*/
+}
+
+.docktitle {
+  color: white;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/******************** child direct **********************/
+div.evui-direct {
+  position: absolute;
+  height: 100px;
+  z-index: 300000;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+div.evui-direct .wrap {
+  margin: 0 auto;
+  width: 105px;
+  height: 105px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+div.evui-direct .wrap .evui-direct-background {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 76px;
+  height: 74px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -185px;
+  z-index: -1;
+}
+
+div.evui-direct .top {
+  width: 100%;
+  height: 35px;
+  text-align: center;
+}
+
+div.evui-direct .top span {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -5px;
+}
+
+div.evui-direct .top span:hover {
+  background-position: -322px -5px;
+}
+
+div.evui-direct .bottom {
+  width: 100%;
+  height: 35px;
+  text-align: center;
+}
+
+div.evui-direct .bottom span {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -41px;
+}
+
+div.evui-direct .bottom span:hover {
+  background-position: -322px -41px;
+}
+
+div.evui-direct .evui-direct-center-wrap {
+  width: 100%;
+  height: 35px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+div.evui-direct .left {
+  width: 35px;
+  height: 35px;
+  float: left;
+  background-image: url(./dock_image.png);
+  background-position: -286px -113px;
+}
+
+div.evui-direct .left:hover {
+  background-position: -322px -113px;
+}
+
+div.evui-direct .right {
+  width: 35px;
+  height: 35px;
+  float: right;
+  background-image: url(./dock_image.png);
+  background-position: -286px -149px;
+}
+
+div.evui-direct .right:hover {
+  background-position: -322px -149px;
+}
+
+div.evui-direct .tab-center {
+  float: left;
+  width: 35px;
+  height: 35px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -77px;
+  position: relative;
+  top: 32%;
+  left: 32%;
+}
+
+div.evui-direct .center {
+  float: left;
+  width: 35px;
+  height: 35px;
+  background-image: url(./dock_image.png);
+  background-position: -286px -77px;
+}
+
+div.evui-direct .tab-center:hover {
+  background-position: -322px -77px;
+}
+div.evui-direct .center:hover {
+  background-position: -322px -77px;
+}
+
+div.evui-direct.evui-dock-tab .right {
+  visibility: hidden;
+}
+
+div.evui-direct.evui-dock-tab .left {
+  visibility: hidden;
+}
+
+div.evui-direct.evui-dock-tab .top {
+  visibility: hidden;
+}
+
+div.evui-direct.evui-dock-tab .bottom {
+  visibility: hidden;
+}
+
+.selectlayerShow {
+  display: block;
+}
+
+.selectlayerHide {
+  display: none;
+}
+
+.select-Dock-border {
+  border: 3px dashed dodgerblue;
+  overflow: hidden;
+
+}
+
+div.evui-root-direct {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  transform: translateY(-50%) translateX(-50%);
+  background-image: url(./dock_image.png);
+  z-index: 300000;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+div.evui-root-direct.top {
+  top: 20px;
+  left: 50%;
+  background-position: -286px -5px;
+}
+
+div.evui-root-direct.top:hover {
+  background-position: -322px -5px;
+}
+
+div.evui-root-direct.bottom {
+  bottom: 20px;
+  left: 50%;
+  background-position: -286px -41px;
+}
+
+div.evui-root-direct.bottom:hover {
+  background-position: -322px -41px;
+}
+
+div.evui-root-direct.left {
+  left: 20px;
+  top: 50%;
+  background-position: -286px -113px;
+}
+
+div.evui-root-direct.left:hover {
+  background-position: -322px -113px;
+}
+
+div.evui-root-direct.right {
+  right: 20px;
+  top: 50%;
+  background-position: -286px -149px;
+}
+
+div.evui-root-direct.right:hover {
+  background-position: -322px -149px;
+}
+
+div.evui-selectDockingLayer {
+  position: absolute;
+  opacity: 0.45;
+  background-color: #448CCB;
+  z-index: 200000;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+

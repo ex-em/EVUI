@@ -3,6 +3,10 @@
 /************************************************************************************
  common
 ************************************************************************************/
+@font-face {
+  font-family:'NanumGothic';
+  src:url('../webfonts/NanumGothic.ttf') format('truetype');
+}
 *{
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -10,14 +14,24 @@
   padding: 0;
 }
 
-.evui-size-small{
-  height: 22px;
+/************************************************************************************
+ Icon
+************************************************************************************/
+.evui-select-arrow{
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  line-height: 3px;
+  font-size: 16px;
+  color: #888888;
+  transition: all .2s ease-in-out;
 }
-.evui-size-normal{
-  height: 30px;
-}
-.evui-size-large{
-  height: 34px;
+
+.evui-select-arrow.select-down{
+  transform: rotate(180deg);
 }
 
 .fade-enter,
@@ -30,64 +44,377 @@
 }
 
 /************************************************************************************
+ Button Component
+************************************************************************************/
+
+/** evui-btn **/
+
+.evui-btn {
+  display: inline-block;
+}
+
+/** evui-btn > button**/
+
+.evui-btn>button {
+  margin: 0px 2px 0px 2px;
+  padding: 5px 10px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  cursor: pointer;
+  user-select: none;
+  transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+}
+.evui-btn>button:hover {
+  color:#57a3f3;
+  background-color:#fff;
+  border-color:#57a3f3;
+}
+.evui-btn>button.active,
+.evui-btn>button:active {
+  color:#2b85e4;
+  background-color:#fff;
+  border-color:#2b85e4;
+}
+.evui-btn>button>.evui-icon{
+  line-height:1;
+}
+.evui-btn>button>.evui-icon+span,
+.evui-btn>button>span+.evui-icon {
+  margin-left:4px;
+}
+.evui-btn>button.disabled>*,
+.evui-btn>button[disabled]>* {
+  pointer-events: none;
+}
+.evui-btn>button.disabled,
+.evui-btn>button.disabled.active,
+.evui-btn>button.disabled:active,
+.evui-btn>button.disabled:hover,
+.evui-btn>button[disabled],
+.evui-btn>button[disabled].active,
+.evui-btn>button[disabled]:active,
+.evui-btn>button[disabled]:hover {
+  color:#bbbec4;
+  background-color:#f7f7f7;
+  border-color:#dddee1;
+}
+
+/** evui-btn > button > clsType(primary) **/
+
+.evui-btn>button.primary {
+  color:#fff;
+  background-color:#2d8cf0;
+  border-color:#2d8cf0;
+}
+.evui-btn>button.primary:hover {
+  background-color:#50A5F0;
+  border-color:#50A5F0;
+}
+.evui-btn>button.primary.active,
+.evui-btn>button.primary:active {
+  background-color:#2b85e4;
+  border-color:#2b85e4;
+}
+.evui-btn>button.primary.disabled,
+.evui-btn>button.primary.disabled.active,
+.evui-btn>button.primary.disabled:active,
+.evui-btn>button.primary.disabled:hover,
+.evui-btn>button.primary[disabled],
+.evui-btn>button.primary[disabled].active,
+.evui-btn>button.primary[disabled]:active,
+.evui-btn>button.primary[disabled]:hover {
+  color:#bbbec4;
+  background-color:#f7f7f7;
+  border-color:#dddee1;
+}
+
+/** Button > clsType > text **/
+
+.evui-btn>button.text {
+  columns: #000000;
+  background-color: transparent;
+  border-color: transparent;
+}
+.evui-btn>button.text:hover {
+  color: #6d7380;
+  background-color: rgba(255,255,255,.2);
+  border-color: rgba(255,255,255,.2)
+}
+.evui-btn>button.text.active,
+.evui-btn>button.text:active {
+  color: #454c5b;
+  background-color: rgba(0,0,0,.05);
+  border-color: rgba(0,0,0,.05)
+}
+.evui-btn>button.text:hover {
+  color: #57a3f3;
+  background-color: transparent;
+  border-color: transparent;
+}
+.evui-btn>button.text.active,
+.evui-btn>button.text:active {
+  color:#2b85e4;
+  background-color:transparent;
+  border-color:transparent
+}
+.evui-btn>button.text.disabled,
+.evui-btn>button.text.disabled.active,
+.evui-btn>button.text.disabled:active,
+.evui-btn>button.text.disabled:hover,
+.evui-btn>button.text[disabled],
+.evui-btn>button.text[disabled].active,
+.evui-btn>button.text[disabled]:active,
+.evui-btn>button.text[disabled]:hover {
+  color: #bbbec4;
+  background-color: #f7f7f7;
+  border-color: #dddee1
+}
+
+/** Button > shape > circle **/
+
+.evui-btn>button.circle {
+  border-radius: 32px;
+}
+.evui-btn>button.circle.icon-only{
+  width:32px;
+  height:32px;
+  padding:0;
+  border-radius:50%;
+  font-size:16px;
+}
+
+/** Button > Menu Button **/
+
+.evui-btn>button .menu-btn {
+  display: inline-block;
+}
+.evui-btn>button .menu-btn.arrow-up {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid #FFFFFF;
+}
+.evui-btn>button .menu-btn.arrow-down {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #FFFFFF;
+}
+
+/** Button > Menu List Area **/
+
+.evui-btn .menu-area {
+  visibility: hidden;
+  position: absolute;
+  padding: 1px;
+  border-radius: 4px;
+  text-align: center;
+  background: #FFFFFF;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+.evui-btn .menu-area.on {
+  /* on activation */
+  visibility: visible;
+}
+.evui-btn .menu-area ul {
+  display: block;
+  list-style: none;
+}
+.evui-btn .menu-area li {
+  padding: 3px 13px 3px 13px;
+  font-size: 12px;
+  font-family: Roboto Condensed;
+  color: #000000;
+  transition: all .1s;
+  cursor: pointer;
+}
+.evui-btn .menu-area li:hover {
+  background: #2d8cf0;
+  color: #FFFFFF;
+}
+
+/** Button > loading **/
+
+.evui-btn>button .loading {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 2px;
+  border-width: 2px;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: #FFFFFF;
+  border-top-color: #dddddd;
+  vertical-align: middle;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+.evui-btn>button.primary .loading {
+  border-color: #FFFFFF;
+  border-top-color: #2d8cf0;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes grdAiguille{
+  0%{-webkit-transform:rotate(0deg);}
+  100%{-webkit-transform:rotate(360deg);}
+}
+@keyframes grdAiguille{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
+/************************************************************************************
  Checkbox
 ************************************************************************************/
 .evui-checkbox{
   display: inline-block;
 }
 
-.evui-checkbox input[type=checkbox]{
+.evui-checkbox input[type="checkbox"]{
   display: none;
 }
 
-.evui-checkbox input[type=checkbox]+label{
+.evui-checkbox input[type="checkbox"] + label{
   display: inline-block;
   position: relative;
-  padding-left: 25px;
+  padding-left: 19px;
+  padding-right: 5px;
   font-size: 13px;
   cursor: pointer;
+  user-select: none;
 }
 
-.evui-checkbox.evui-diabled input[type=checkbox]+label{
+.evui-checkbox.evui-disabled input[type="checkbox"] + label{
   color: #c1c1c1;
   cursor: not-allowed;
+  transition: all .2s;
 }
 
-div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
-  background-color: #c1c1c1;
+div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
+  border: 1px solid #c1c1c1;
+  color: #c1c1c1;
+  transition: all .2s;
 }
 
-.evui-checkbox input[type=checkbox]+label:before{
+.evui-checkbox input[type="checkbox"] + label:before{
   content:"";
   display: inline-block;
   position: absolute;
   left: 0px;
   bottom: 0px;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   margin-right: 10px;
-  background-color: #ccc;
-  border-radius: 4px;
-  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 11px;
   text-aligh: center;
   text-indent: 2px;
-  line-height: 15px;
+  line-height: 13px;
 }
 
-.evui-checkbox input[type=checkbox]:hover + label:before{
+.evui-checkbox input[type="checkbox"]:hover + label:before{
   content: "\2713";
   color: #ddd;
 }
 
-.evui-checkbox input[type=checkbox]:checked+label:before{
+.evui-checkbox input[type="checkbox"]:checked + label:before{
   content: "\2713";
-  color: #fff;
-  background: #2f87c1;
+  border: 1px solid #2f87c1;
+  color: #2f87c1;
   font-weight: 800;
+  transition: all .2s;
+}
+.evui-checkbox-group-inner {
+  display: inline-block;
 }
 
 /************************************************************************************
- SelectBox
+ Radio
+************************************************************************************/
+.evui-radio {
+  display: inline-block;
+}
+.evui-radio [type="radio"]:checked,
+.evui-radio [type="radio"]:not(:checked) {
+  display: none;
+}
+.evui-radio [type="radio"]:checked + label,
+.evui-radio [type="radio"]:not(:checked) + label {
+  position: relative;
+  display: inline-block;
+  padding-left: 21px;
+  padding-right: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 16px;
+  user-select: none;
+}
+.evui-radio [type="radio"]:checked + label:before,
+.evui-radio [type="radio"]:not(:checked) + label:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ddd;
+  border-radius: 100%;
+  background: #fff;
+
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label {
+  color: #c1c1c1;
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label:before,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label:before {
+  background: #f1f1f1;
+}
+.evui-radio.evui-disabled [type="radio"]:checked + label:after,
+.evui-radio.evui-disabled [type="radio"]:not(:checked) + label:after {
+  background: #c1c1c1;
+}
+.evui-radio [type="radio"]:checked + label:after,
+.evui-radio [type="radio"]:not(:checked) + label:after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #337ab6;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  border-radius: 100%;
+  -webkit-transition: all 0.1s ease;
+  transition: all 0.1s ease;
+}
+.evui-radio [type="radio"]:not(:checked) + label:after {
+  opacity: 0;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+}
+.evui-radio [type="radio"]:checked + label:after {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+.evui-radio.evui-disabled input[type="radio"] + label {
+  cursor: not-allowed;
+}
+.evui-radio-group-inner {
+  display: inline-block;
+}
+
+/************************************************************************************
+ Selectbox
 ************************************************************************************/
 
 /** evui-selectbox **/
@@ -348,6 +675,34 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
   color:#fff!important
 }
 
+.evui-select-search:focus{
+  border-color: #66afe8;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+
+
+/************************************************************************************
+ Code Mirror
+************************************************************************************/
+
+.CodeMirror {
+  font-size: 13px;
+  height: 100% !important;
+}
+.vue-codemirror-wrap {
+  height: 100% !important;
+}
+
+/************************************************************************************
+ Guide Page
+************************************************************************************/
+
+.article-title {
+  color: #0055aa;
+  padding: 4px 0px 8px 0px;
+}
 
 .evui-select-tag-blue,
 .evui-select-tag.green,
@@ -355,6 +710,7 @@ div.evui-checkbox.evui-diabled input[type=checkbox]+label:before{
 .evui-select-tag-yellow{
   border:0
 }
+
 .evui-select-tag-blue,
 .evui-select-tag-blue .close,
 .evui-select-tag-blue .close:hover,
