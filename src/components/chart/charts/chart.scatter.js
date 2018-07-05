@@ -6,10 +6,7 @@ export default class ScatterChart extends BaseChart {
     this.seriesList = this.dataSet.getSeriesList();
   }
 
-  createChart() {
-    if (this.options.title.show) {
-      this.createTitle();
-    }
+  drawChart() {
     this.setLabelOffset();
     this.createAxis();
     this.createScatter();
@@ -19,7 +16,9 @@ export default class ScatterChart extends BaseChart {
 
   createScatter() {
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      this.drawSeries(ix);
+      if (this.seriesList[ix].show) {
+        this.drawSeries(ix);
+      }
     }
   }
 

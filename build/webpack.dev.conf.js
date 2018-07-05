@@ -60,7 +60,7 @@ module.exports = merge(webpackBaseConfig, {
     }),
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../static'),
+        from: path.resolve(__dirname, '../examples/routers'),
         to: 'static',
         ignore: ['.*']
       }

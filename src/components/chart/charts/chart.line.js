@@ -7,10 +7,7 @@ export default class LineChart extends BaseChart {
     this.seriesList = this.dataSet.getSeriesList();
   }
 
-  createChart() {
-    if (this.options.title.show) {
-      this.createTitle();
-    }
+  drawChart() {
     this.setLabelOffset();
     this.createAxis();
     this.createLine();
@@ -20,7 +17,9 @@ export default class LineChart extends BaseChart {
 
   createLine() {
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      this.drawSeries(ix);
+      if (this.seriesList[ix].show) {
+        this.drawSeries(ix);
+      }
     }
   }
 
@@ -105,7 +104,7 @@ export default class LineChart extends BaseChart {
     }
 
     ctx.stroke();
-    if (series.fill && series.data[series.data.length - 1].y !== null) {
+    if (series.fill && series.data.length && series.data[series.data.length - 1].y !== null) {
       ctx.stroke();
 
       ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;

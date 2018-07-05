@@ -11,7 +11,7 @@
           :class="computedInnerDiv"
         >
           <CheckBox
-            :label = "item.name"
+            :label = "item.label"
             :disabled="computedDisabled"
             type="checkbox"
           />
@@ -19,12 +19,7 @@
         {{ item.checked }}
       </template>
     </div>
-    <div
-      v-else
-      :class="computedInnerDiv"
-    >
-      <slot/>
-    </div>
+    <slot v-if="!list"/>
   </div>
 </template>
 <script>
