@@ -8,7 +8,6 @@
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
-          :height="item.height"
         >
           <component :is="item.component"/>
         </code-view>
@@ -35,13 +34,11 @@
             url: './guide/views/examples/chart/chart-bar-default.vue',
             component: chartBarDefault,
             title: 'Bar Chart Default',
-            height: 500,
           },
           {
             url: './guide/views/examples/chart/chart-bar-stack-default.vue',
             component: chartBarStackDefault,
             title: 'Stack Bar Chart',
-            height: 500,
           },
         ],
       };

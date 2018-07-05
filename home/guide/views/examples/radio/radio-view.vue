@@ -1,13 +1,35 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Radio </h2>
+    </div>
     <div
-      v-for="item in componentList"
+      v-for="item in checkList"
       :key="item.id"
     >
       <div class="inner-article">
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
+          :height="item.height"
+        >
+          <component :is="item.component"/>
+        </code-view>
+      </div>
+    </div>
+    <div class="split"/>
+    <div class="article-title">
+      <h2> Radio Group </h2>
+    </div>
+    <div
+      v-for="item in checkGroupList"
+      :key="item.id"
+    >
+      <div class="inner-article">
+        <h4># {{ item.title }}</h4>
+        <code-view
+          :code-url="item.url"
+          :height="item.height"
         >
           <component :is="item.component"/>
         </code-view>
@@ -17,7 +39,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import codeView from '@/components/codeview/code';
   import radioDefault from './radio-default';
 
@@ -31,21 +52,31 @@
         label: 'test',
         valueData: null,
         buttonLabel: 'visible',
-        componentList: [
+        checkList: [
           {
             url: './guide/views/examples/radio/radio-default.vue',
             component: radioDefault,
-            title: 'Radio Default',
+            title: 'Default',
           },
+        ],
+        checkGroupList: [
         ],
       };
     },
     methods: {
+      onChange(value) {
+        this.valueData = value;
+      },
     },
   };
 </script>
+
 <style scoped>
-  div {
-    font-family: 'NanumGothic', Helvetica;
+  .article-title {
+    color: #0055aa;
+    padding: 4px 0px 8px 0px;
+  }
+  .split {
+    margin: 40px;
   }
 </style>
