@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bind-model">
-      <h5># Bind  Model</h5>
+      <h5># Bind Model</h5>
       <radio-group
         v-model="value"
       >
@@ -32,13 +32,13 @@
         value: null,
         radioList: [
           {
-            name: 'value01',
+            name: 'apple',
           },
           {
-            name: 'value02',
+            name: 'orange',
           },
           {
-            name: 'value03',
+            name: 'banana',
           },
         ],
       };

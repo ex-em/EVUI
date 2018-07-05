@@ -16,7 +16,10 @@
           @on-change="changeAllChecked"
         />
         <h5># Disable All</h5>
-        <button @click="changeDisabled">change disabled</button>
+        <Button
+          text="change disabled"
+          @click="changeDisabled"
+        />
         <p>Selected List : {{ modelList }}</p>
       </div>
     </div>
@@ -25,11 +28,13 @@
 <script>
   import checkbox from '@/components/checkbox/checkbox';
   import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import Button from '@/components/button';
 
   export default {
     components: {
       checkbox,
       checkboxGroup,
+      Button,
     },
     data() {
       return {
@@ -37,13 +42,13 @@
         modelList: [],
         eventGroupList: [
           {
-            name: 'map',
+            label: 'map',
           },
           {
-            name: 'reduce',
+            label: 'reduce',
           },
           {
-            name: 'slice',
+            label: 'slice',
           },
         ],
         isDisabled: false,

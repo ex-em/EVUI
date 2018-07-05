@@ -28,13 +28,13 @@
       return {
         groupName: [
           {
-            name: 'Mac Book Pro',
+            label: 'Mac Book Pro',
           },
           {
-            name: 'Mac Pro',
+            label: 'Mac Pro',
           },
           {
-            name: 'Mac Book Air',
+            label: 'Mac Book Air',
           },
         ],
         itemNameList: ['Mac Book Pro', 'Mac Pro'],
