@@ -6,20 +6,29 @@
       <template
         v-for="item in computedList"
       >
-        <Radio
-          :label="item.label"
-          :checked="item.checked"
+        <div
           :key="item.id"
-          :value="item.value"
-          :disabled="item.disabled"
-        />
+          :class="computedInnerDiv"
+        >
+          <Radio
+            :label = "item.label"
+            :disabled="computedDisabled"
+            type="radio"
+          />
+        </div>
       </template>
     </div>
-    <slot v-if="!list"/>
+    <div
+      v-else
+      :class="computedInnerDiv"
+    >
+      <slot/>
+    </div>
   </div>
 </template>
 <script>
 import Radio from './radio';
+import { getMatchedComponentsDownward } from '../../common/utils';
 
 const prefixCls = 'evui-radio-group';
 
@@ -30,10 +39,8 @@ export default {
   },
   props: {
     value: {
-      type: Array,
-      default() {
-        return [];
-      },
+      type: [String, Number, Boolean],
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -42,6 +49,20 @@ export default {
     list: {
       type: [String, Number, Object, Array, Boolean],
       default: null,
+    },
+    groupAlign: {
+      type: String,
+      default: 'hbox',
+      validator(value) {
+        let result = '';
+        if (value === 'hbox' || value === 'vbox') {
+          result = value;
+        } else {
+          result = '';
+        }
+
+        return result;
+      },
     },
   },
   data() {
@@ -55,6 +76,13 @@ export default {
       return [
         `${prefixCls}`,
       ];
+    },
+    computedInnerDiv: function computedInnerDiv() {
+      const classArr = [];
+      if (this.groupAlign === 'hbox') {
+        classArr.push(`${prefixCls}-inner`);
+      }
+      return classArr;
     },
     computedList: function computedList() {
       if (this.list) {
@@ -72,10 +100,28 @@ export default {
     },
   },
   watch: {
-  },
-  mounted() {
+    value() {
+      this.currentValue = this.value;
+      this.updateModel();
+    },
   },
   methods: {
+    updateModel() {
+      this.children = getMatchedComponentsDownward(this, 'Radio');
+      if (this.children) {
+        this.children.forEach((v) => {
+            const item = v;
+            item.currentValue = this.value === item.label;
+            item.group = true;
+        });
+      }
+    },
+    change(data) {
+      this.currentValue = data.value;
+      this.updateModel();
+      this.$emit('input', data.value);
+      this.$emit('on-change', data.value);
+    },
   },
 };
 </script>

@@ -81,35 +81,6 @@
     const sf = 10 ** Math.max(sq1, sq2);
     return (Math.round(num1 * sf) + Math.round(num2 * sf)) / sf;
   }
-  // function toFixedWithZero(value, precision) {
-  //   let i;
-  //   let pointValue;
-  //   let remainedLength;
-  //   let val = value;
-  //
-  //   try {
-  //     pointValue = value.toString().split('.')[1].length;
-  //   } catch (e) {
-  //     pointValue = 0;
-  //   }
-  //
-  //   if (precision - pointValue > 0) {
-  //     remainedLength = precision - pointValue;
-  //   } else if (precision - pointValue <= 0) {
-  //     return Number(val.toFixed(precision));
-  //   }
-  //   val = val.toString();
-  //
-  //   if (pointValue === 0 && remainedLength > 0) {
-  //     val = val.concat('.');
-  //   }
-  //
-  //   for (i = 0; i < remainedLength; i++) {
-  //       val = val.concat(0);
-  //   }
-  //
-  //   return val;
-  // }
 
   export default {
       name: 'InputNumber',

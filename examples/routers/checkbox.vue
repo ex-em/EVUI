@@ -29,10 +29,6 @@
         <checkbox
           v-model="baseCheck[4]"
         />
-        <h5> Raw Values </h5>
-        <p>{{ base }}</p>
-        <h5> Check List </h5>
-        <p>{{ baseCheck }}</p>
         <h5> list handling </h5>
         <div
           v-for="item in baseList"
@@ -44,14 +40,13 @@
             :label="item.name"
           />
         </div>
-        <p>{{ baseList }}</p>
         <h5> bind custom event </h5>
         <checkbox
           v-model="customEvent.checked"
           :label="customEvent.name"
           @on-change="changeFn"
         />
-        <p> change value: {{ customEvent.value }}</p>
+        <p> {{ customEvent.value }} </p>
       </div>
     </div>
     <div>
@@ -85,12 +80,14 @@
         @on-change="checkAllGroupChange"
       />
       <p>{{ itemNameList }}</p>
-      <h5>vbox / hbox</h5>
+      <h4>vbox / hbox</h4>
+      <h5>hbox</h5>
       <checkbox-group
         :list="groupName"
         v-model="itemNameList"
         @on-change="checkAllGroupChange"
       />
+      <h5>vbox</h5>
       <checkbox-group
         :list="groupName"
         :group-align="'vbox'"

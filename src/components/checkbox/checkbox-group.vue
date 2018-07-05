@@ -19,7 +19,12 @@
         {{ item.checked }}
       </template>
     </div>
-    <slot v-if="!list"/>
+    <div
+      v-else
+      :class="computedInnerDiv"
+    >
+      <slot/>
+    </div>
   </div>
 </template>
 <script>

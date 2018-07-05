@@ -9,8 +9,6 @@ const Utils = {
   },
 };
 
-export default Utils;
-
 export function getMatchedComponentsDownward(context, componentName) {
     const children = context.$children;
     const result = [];
@@ -42,3 +40,5 @@ export function getMatchedComponentUpward(context, componentName) {
 
   return parent;
 }
+
+export default Utils;
