@@ -36,7 +36,7 @@
         inputList: [
           {
             url: './guide/views/examples/your-source-code',
-            component: '',
+            component: 'your-imported-component-object',
             title: 'Default',
           },
         ],
