@@ -8,7 +8,7 @@ export default class SunburstChart extends BaseChart {
     this.seriesGroupList = this.dataSet.getSeriesGroupList();
   }
 
-  createChart() {
+  drawChart() {
     if (this.options.title.show) {
       this.createTitle();
     }
