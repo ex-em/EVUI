@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bind-model">
-      <h5># Bind  Model</h5>
+      <h5># Bind Model</h5>
       <radio-group
         v-model="value"
       >
@@ -15,6 +15,7 @@
           :label="radioList[2].name"
         />
       </radio-group>
+      <p>v-model: {{ value }}</p>
     </div>
   </div>
 </template>

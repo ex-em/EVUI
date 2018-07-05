@@ -54,10 +54,6 @@
     },
     data() {
       return {
-        visible: true,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
         radioList: [
           {
             url: './guide/views/examples/radio/radio-default.vue',
@@ -98,11 +94,6 @@
           },
         ],
       };
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>
