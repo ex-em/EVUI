@@ -29,11 +29,11 @@
                 :alt="submenu.name"
                 :src="submenu.imgUrl || './guide/images/noImage.png'"
                 class="evui-summary-thumbnail-img"
-                @onerror="'../home/guide/images/noImage.png'"
+                @error="imgError"
               >
             </div>
             <div>
-              <h4> {{ submenu.name }} </h4>
+              <h5> {{ submenu.name }} </h5>
             </div>
           </router-link>
         </li>
@@ -81,6 +81,9 @@
           return item;
         });
       },
+      imgError(e) {
+        e.target.src = './guide/images/noImage.png';
+      },
     },
   };
 </script>
@@ -89,7 +92,7 @@
   a, span {
     text-decoration: none !important;
   }
-  a:visited {
+  a:visited, a:any-link {
     color: #000;
   }
   .evui-summary-content {

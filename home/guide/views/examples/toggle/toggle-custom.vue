@@ -7,6 +7,7 @@
     <br>
     <br>
     <toggle
+      :toggle-on="true"
     />
     <br>
     <br>
