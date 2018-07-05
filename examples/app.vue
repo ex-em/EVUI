@@ -33,6 +33,9 @@
         <li>
           <router-link to="/timepicker">Timepicker</router-link>
         </li>
+        <li>
+          <router-link to="/toggle">Toggle</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>

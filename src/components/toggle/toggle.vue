@@ -14,7 +14,7 @@
       :style="{
         width: dataToggleObj.height - 4 + 'px',
         height: dataToggleObj.height - 4 + 'px',
-        left: dataToggleFlag ? 'calc(100% - ' + dataToggleObj.height - 10 + 'px)' : '0px',
+        left: dataToggleFlag ? dataToggleObj.width - dataToggleObj.height + 1 + 'px' : '0px',
       }"
       :class="{ active : dataToggleFlag }"
       class="evui-toggle-button"

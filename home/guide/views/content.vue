@@ -88,6 +88,12 @@
                 content: '타임 피커',
                 imgUrl: `${this.imgUrl}/timepicker.png`,
               },
+              {
+                name: 'Toggle',
+                routerLink: '/toggle',
+                content: '토글',
+//                imgUrl: `${this.imgUrl}/timepicker.png`,
+              },
             ],
           },
           {
@@ -147,8 +153,9 @@
     width: 100%;
   }
   .evui-right-content {
-    margin: 20px;
+    padding: 20px;
     flex: 1;
+    border-left: 1px solid #dddee0;
   }
   .evui-page-anchor {
     width: 240px;

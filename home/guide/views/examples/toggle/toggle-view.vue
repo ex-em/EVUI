@@ -19,29 +19,20 @@
 
 <script>
   import codeView from '@/components/codeview/code';
-  import timepickerDefault from './timepicker-default';
-  import timepickerInit from './timepicker-init';
+  import toggleDefault from './toggle-default';
 
   export default {
     components: {
       codeView,
-      timepickerDefault,
-      timepickerInit,
+      toggleDefault,
     },
     data() {
       return {
         componentList: [
           {
-            url: './guide/views/examples/timepicker/timepicker-default.vue',
-            component: timepickerDefault,
-            title: 'Timepicker Default',
-            height: 400,
-          },
-          {
-            url: './guide/views/examples/timepicker/timepicker-init.vue',
-            component: timepickerInit,
-            title: 'Timepicker Setting Init Values',
-            height: 400,
+            url: './guide/views/examples/toggle/toggle-default.vue',
+            component: toggleDefault,
+            title: 'Toggle Default',
           },
         ],
       };
