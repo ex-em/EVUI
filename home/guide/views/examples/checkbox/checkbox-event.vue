@@ -1,35 +1,16 @@
 <template>
   <div>
-    <div class="disable-demo">
-      <checkbox
-        v-model="checkedList[0]"
-        :label="'Disable - On'"
-        :disabled="isDisabled"
-      />
-      <checkbox
-        v-model="checkedList[1]"
-        :label="'Disable - Off'"
-        :disabled="!isDisabled"
-      />
-      <checkbox
-        v-model="checkedList[2]"
-        :label="'Disable Statue Change'"
-        :disabled="changeDisabled"
-      />
-      <button @click="clickEvent"> {{ itemButtonName }} </button>
-    </div>
     <div class="custom-event-demo">
       <checkbox
         v-model="checked"
         :label="label"
         @on-change="changeFn"
       />
-      <p>alphabet value : {{ value }}</p>
+      <p>{{ name }} : {{ value }}</p>
     </div>
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
 
   export default {
@@ -40,15 +21,9 @@
       return {
         checked: false,
         code: 97,
-        label: ' fire custom event',
+        label: ' fire Custom Event',
         value: '',
-        name: 'add alphabet when you change',
-        itemButtonName: ' Change Status ',
-        isDisabled: true,
-        changeDisabled: true,
-        checkedList: [
-          false, false,
-        ],
+        name: 'Add Char',
       };
     },
     methods: {
@@ -66,9 +41,6 @@
 
         this.value = value;
         this.code = code;
-      },
-      clickEvent: function clickEvent() {
-        this.changeDisabled = !this.changeDisabled;
       },
     },
   };

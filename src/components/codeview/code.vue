@@ -30,6 +30,9 @@
           class="evui-codeview-example-bar-icon"
         >
           <icon class="fa-sort-down"/>
+          <span
+            class="evui-codeview-example-bar-span"
+          >{{ txtBottomBar }}</span>
         </div>
       </div>
     </div>
@@ -52,7 +55,7 @@
       },
       height: {
         type: Number,
-        default: 200,
+        default: 0,
       },
     },
     data() {
@@ -88,10 +91,15 @@
         ];
       },
     },
+    mounted() {
+      this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+    },
     created() {
       this.$http.get(this.codeUrl)
         .then((result) => {
-          this.rawCode = result.data;
+          setTimeout(() => {
+            this.rawCode = result.data;
+          }, 600);
         }, (error) => {
           throw new Error(error);
         });
@@ -106,7 +114,7 @@
           this.boxHeight = codeLayerHeight + exampleLayerHeight + 33;
         } else {
           this.txtBottomBar = 'Expand';
-          this.boxHeight = this.height;
+          this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
         }
 
         this.isExpand = !this.isExpand;
@@ -127,13 +135,15 @@
     padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
-    transition: height .8s ease-in-out;
+    z-index: 1;
+    transition: height .3s ease-in-out;
   }
   .evui-codeview-example.expand{
-    transition: height .8s ease-in-out;
+    transition: height .3s ease-in-out;
   }
   .evui-codeview-example-layer{
     position: relative;
+    padding: 0px 0px 8px 0px;
   }
   .evui-codeview-split-layer{
     position: relative;
@@ -150,12 +160,13 @@
     bottom: 0px;
     width: 100%;
     height: 37px;
-    padding: 6px;
     z-index: 10;
+    background-color: #ffffff;
+    transition: background-color .2s ease-in-out;
   }
   .evui-codeview-example-bar:hover{
     cursor: pointer;
-    background-color: rgba(231,231,231, 0.3);
+    background-color: rgba(255, 255, 255, 0.4);
   }
   .evui-codeview-example:hover{
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
@@ -167,37 +178,31 @@
     text-align: center;
   }
   .evui-codeview-example-bar-icon i{
-    display: inline-block;
     height: 100%;
-    line-height: 18px;
+    line-height: 30px;
     font-size: 16px;
-    color: #0055aa;
-    opacity: 0;
-    transition: all .2s ease-in-out;
+    color: rgba(30, 101, 188, 0.5);
+    transition: all .3s ease-in-out;
   }
-  .evui-codeview-example-bar-icon:hover i{
+  .evui-codeview-example-bar-icon span{
+    line-height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    opacity: 0;
+    transition: all .3s ease-in-out;
+  }
+
+  .evui-codeview-example-bar-icon:hover i, .evui-codeview-example-bar-icon:hover span{
+    color: rgb(30, 101, 188);
     opacity: 1;
+    transform: translateX(-6px);
+    transition: all .3s ease-out;
   }
   .evui-codeview-example-bar-icon.select-down i{
     transform: rotate(180deg);
+    transition: transform .4s ease-out;
   }
-  .evui-codeview-example-bar-icon span{
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-  }
-  .evui-codeview-example-jsfiddle, .evui-codeview-example-bar-icon span{
-    opacity: 1;
-  }
-  .evui-codeview-example-jsfiddle{
-    position: absolute;
-    top: 10px;
-    right: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    opacity: 0;
-    /*transition: opacity 0.5s ease-in-out;*/
-  }
-  .evui-codeview-example-jsfiddle:hover{
-    color: #0984e3;
+  .evui-codeview-example-bar-icon, .evui-codeview-example-bar-icon-span {
+    user-select: none;
   }
 </style>

@@ -13,7 +13,6 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
 
   export default {

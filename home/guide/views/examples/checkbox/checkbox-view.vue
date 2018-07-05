@@ -1,7 +1,28 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Check Box </h2>
+    </div>
     <div
-      v-for="item in componentList"
+      v-for="item in checkList"
+      :key="item.id"
+    >
+      <div class="inner-article">
+        <h4># {{ item.title }}</h4>
+        <code-view
+          :code-url="item.url"
+          :height="item.height"
+        >
+          <component :is="item.component"/>
+        </code-view>
+      </div>
+    </div>
+    <div class="split"/>
+    <div class="article-title">
+      <h2> Check Box Group </h2>
+    </div>
+    <div
+      v-for="item in checkGroupList"
       :key="item.id"
     >
       <div class="inner-article">
@@ -21,9 +42,13 @@
   import '@/styles/evui.css';
   import codeView from '@/components/codeview/code';
   import checkboxDefault from './checkbox-default';
-  import checkboxAdvanced from './checkbox-advanced';
+  import checkboxStatus from './checkbox-status';
+  import checkboxEvent from './checkbox-event';
   import checkboxGroupDefault from './checkbox-group-default';
-  import checkboxGroupAdvanced from './checkbox-group-advanced';
+  import checkboxGroupList from './checkbox-group-list-handling';
+  import checkboxGroupAlign from './checkbox-group-align';
+  import checkboxGroupEvent from './checkbox-group-event';
+  import checkboxGroupStatus from './checkbox-group-status';
 
   export default {
     components: {
@@ -35,27 +60,48 @@
         label: 'test',
         valueData: null,
         buttonLabel: 'visible',
-        componentList: [
+        checkList: [
           {
             url: './guide/views/examples/checkbox/checkbox-default.vue',
             component: checkboxDefault,
-            title: 'Check Box Default',
+            title: 'Default',
           },
           {
-            url: './guide/views/examples/checkbox/checkbox-advanced.vue',
-            component: checkboxAdvanced,
-            title: 'Check Box Status & Custom Bind Event',
+            url: './guide/views/examples/checkbox/checkbox-status.vue',
+            component: checkboxStatus,
+            title: 'Status',
           },
+          {
+            url: './guide/views/examples/checkbox/checkbox-event.vue',
+            component: checkboxEvent,
+            title: 'Bind Custom Event',
+          },
+        ],
+        checkGroupList: [
           {
             url: './guide/views/examples/checkbox/checkbox-group-default.vue',
             component: checkboxGroupDefault,
-            title: 'Check Box Group Default',
+            title: 'Default',
           },
           {
-            url: './guide/views/examples/checkbox/checkbox-group-advanced.vue',
-            component: checkboxGroupAdvanced,
-            title: 'Check Box Group List Handling & Custom Bind Event',
-            height: 500,
+            url: './guide/views/examples/checkbox/checkbox-group-status.vue',
+            component: checkboxGroupStatus,
+            title: 'Status',
+          },
+          {
+            url: './guide/views/examples/checkbox/checkbox-group-list-handing.vue',
+            component: checkboxGroupList,
+            title: 'List Handling',
+          },
+          {
+            url: './guide/views/examples/checkbox/checkbox-group-align.vue',
+            component: checkboxGroupAlign,
+            title: 'Align',
+          },
+          {
+            url: './guide/views/examples/checkbox/checkbox-group-event.vue',
+            component: checkboxGroupEvent,
+            title: 'Bind Custom Event',
           },
         ],
       };
@@ -71,5 +117,12 @@
 <style scoped>
   div {
     font-family: 'NanumGothic', Helvetica
+  }
+  .article-title {
+    color: #0055aa;
+    padding: 4px 0px 8px 0px;
+  }
+  .split {
+    margin: 40px;
   }
 </style>
