@@ -1,7 +1,7 @@
 <template>
   <div
-    class="evui-listbox"
     :style="listboxStyle"
+    class="evui-listbox"
   >
     <ul
       class="evui-listbox-ul"

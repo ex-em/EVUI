@@ -27,9 +27,9 @@
       </div>
       <input
         v-else
-        type="text"
         :disabled="disabled"
         :value="inputText"
+        type="text"
         class="input-text"
         @keyup="onKeyUpInputTxt"
       >

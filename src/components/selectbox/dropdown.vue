@@ -1,15 +1,15 @@
 <template>
   <div
-    class="dropdown-area"
     :style="dropdownStyle"
+    class="dropdown-area"
   >
     <div
       v-if="multiple"
       class="multiple-input-area"
     >
       <input
-        type="text"
         :disabled="disabled"
+        type="text"
         class="input-text"
         @keyup="onKeyUp"
       >
