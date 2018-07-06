@@ -31,7 +31,7 @@
       return {
         inputList: [
           {
-            url: './guide/views/examples/inputnumber/input-number-default',
+            url: './guide/views/examples/inputnumber/input-number-default.vue',
             component: inputNumberDefault,
             title: 'Default',
           },
