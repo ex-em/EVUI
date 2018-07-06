@@ -101,6 +101,11 @@
         event: null,
       };
     },
+    destroyed() {
+      if (this.liveInterval) {
+        clearTimeout(this.liveInterval);
+      }
+    },
     methods: {
       onClickLiveBtn(event, text) {
         this.event = event;
