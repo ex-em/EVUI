@@ -8,7 +8,7 @@
       <Button
         :text="liveBtnInfo.text"
         :name="liveBtnInfo.name"
-        @btnClick="onClickLiveBtn"
+        @click="onClickLiveBtn"
       />
     </div>
     <br>
