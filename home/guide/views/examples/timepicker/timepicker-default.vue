@@ -1,9 +1,12 @@
 <template>
   <div>
     <timepicker
+      v-model="timeValue"
       :spinner-arr="obj"
     />
-    <br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <br><br>
+    timepicker value => {{ timeValue }}
+    <br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 
@@ -17,6 +20,7 @@
     },
     data() {
       return {
+        timeValue: '',
         obj: [
           { from: 0, to: 23 },
           { from: 0, to: 59 },

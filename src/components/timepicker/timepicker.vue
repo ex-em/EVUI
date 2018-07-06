@@ -31,13 +31,13 @@
       <div class="evui-timepicker-content">
         <div class="evui-timepicker-spinner">
           <spinner
-            v-for="(item, index) in spinnerArr"
-            v-show="spinnerArr"
+            v-for="(item, index) in dataSpinnerArr"
+            v-show="dataSpinnerArr"
             ref="timePickerSpinner"
             :key="index"
             :from="item.from"
             :to="item.to"
-            :mid="(index === 0 || index === spinnerArr.length - 1) ? false : true"
+            :mid="(index === 0 || index === dataSpinnerArr.length - 1) ? false : true"
             :selected-number="lpad10(item.initNumber)"
             :selection-start-index="index"
             @setInput="setInputText"
@@ -98,6 +98,7 @@
     },
     data() {
       return {
+        dataSpinnerArr: this.spinnerArr,
         lastKeyPressSpell: null, // 최근 입력한 스펠
         formattedText: null, // input text 에 들어갈 실제 내용
         inputTextMaxLength: 8,
@@ -188,6 +189,7 @@
               }
             }
           }
+          this.$emit('input', this.formattedText);
         },
       },
     },
@@ -370,8 +372,8 @@
         );
       },
       keyDownSetNumber(index, number) {
-        if (this.spinnerArr && this.spinnerArr[index]) {
-          this.spinnerArr[index].selectedNumber = number;
+        if (this.dataSpinnerArr && this.dataSpinnerArr[index]) {
+          this.dataSpinnerArr[index].initNumber = number;
         }
       },
     },
