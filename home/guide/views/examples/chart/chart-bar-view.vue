@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Bar Chart </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -12,6 +16,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -35,17 +40,17 @@
           {
             url: './guide/views/examples/chart/chart.bar.default.vue',
             component: DefaultBarChart,
-            title: 'Default Bar Chart',
+            title: 'Default',
           },
           {
             url: './guide/views/examples/chart/chart.bar.stack.vue',
             component: StackBarChart,
-            title: 'Stack Bar Chart',
+            title: 'Stack',
           },
           {
             url: './guide/views/examples/chart/chart.bar.horizontal.vue',
             component: HorizontalBarChart,
-            title: 'Horizontal Bar Chart',
+            title: 'Horizontal',
           },
         ],
       };

@@ -3,6 +3,7 @@
     <div class="article-title">
       <h2> Radio </h2>
     </div>
+    <br>
     <div
       v-for="item in radioList"
       :key="item.id"
@@ -16,11 +17,13 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
     <div class="split"/>
     <div class="article-title">
       <h2> Radio Group </h2>
     </div>
+    <br>
     <div
       v-for="item in radioGroupList"
       :key="item.id"
@@ -34,6 +37,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>

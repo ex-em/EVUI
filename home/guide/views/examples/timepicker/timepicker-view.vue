@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Timepicker </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -13,6 +17,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -34,13 +39,13 @@
           {
             url: './guide/views/examples/timepicker/timepicker-default.vue',
             component: timepickerDefault,
-            title: 'Timepicker Default',
+            title: 'Default',
             height: 400,
           },
           {
             url: './guide/views/examples/timepicker/timepicker-init.vue',
             component: timepickerInit,
-            title: 'Timepicker Setting Init Values',
+            title: 'Setting Init Values',
             height: 400,
           },
         ],

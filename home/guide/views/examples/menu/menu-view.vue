@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Menu </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -13,6 +17,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -32,7 +37,7 @@
           {
             url: './guide/views/examples/menu/menu-default.vue',
             component: menuDefault,
-            title: 'Menu Default',
+            title: 'Default',
             height: 500,
           },
         ],
