@@ -88,7 +88,7 @@
             title: 'Status',
           },
           {
-            url: './guide/views/examples/checkbox/checkbox-group-list-handing.vue',
+            url: './guide/views/examples/checkbox/checkbox-group-list-handling.vue',
             component: checkboxGroupList,
             title: 'List Handling',
           },
