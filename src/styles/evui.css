@@ -501,6 +501,7 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  z-index: 11;
 }
 .dropdown-area .multiple-input-area{
   width: 100%;
@@ -517,22 +518,26 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 }
 
 /**  dropdown-area > listbox-area **/
-/**  dropdown-area > listbox-area > group-area **/
-/**  dropdown-area > listbox-area > group-area > title **/
 
 .dropdown-area .listbox-area{
   width: 100%;
-  height: 100%;
+  height: 200px;
 }
+
+/**  dropdown-area > listbox-area > group-area **/
+/**  dropdown-area > listbox-area > group-area > evui-listbox  **/
+/**  dropdown-area > listbox-area > group-area > evui-listbox > evui-listbox-ul **/
+/**  dropdown-area > listbox-area > group-area > evui-listbox > evui-listbox-li **/
+
 .dropdown-area .listbox-area .group-area{
   list-style-type: none;
-  height: 200px;
-  margin:0;
-  padding: 2px 0px;
+  width: 100%;
+  height: 100%;
   border: 1px solid #ccc;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  background: #FFFFFF;
   -webkit-box-shadow: 0 6px 12px #ccc;
   box-shadow: 0 6px 12px #ccc;
   overflow: auto;
@@ -541,18 +546,14 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   padding: 7px 10px;
   color:#999;
 }
-
-/**  group-area > evui-listbox  **/
-/**  group-area > evui-listbox > evui-listbox-ul **/
-/**  group-area > evui-listbox > evui-listbox-li **/
-
-.group-area .evui-listbox{
+.dropdown-area .listbox-area .group-area .evui-listbox{
   width: 100%;
+  height: 100%
 }
-.group-area .evui-listbox .evui-listbox-ul{
+.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-ul{
   height: 100%;
 }
-.group-area .evui-listbox .evui-listbox-li{
+.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li{
   display: block;
   list-style: none;
   padding: 7px 16px;
@@ -561,35 +562,40 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   cursor: pointer;
   transition: background .1s ease-in-out;
 }
-.group-area .evui-listbox .evui-listbox-li:hover{
+.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li:hover{
   background-color: #eeeeee;
 }
-.group-area .evui-listbox .evui-listbox-li.selected{
+.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li.selected{
   color: #fff;
   background-color: #337ab6;
 }
 
-/**  single-area > evui-listbox  **/
-/**  single-area > evui-listbox > evui-listbox-ul **/
-/**  single-area > evui-listbox > evui-listbox-li **/
+/**  dropdown-area > listbox-area > single-area > evui-listbox  **/
+/**  dropdown-area > listbox-area > single-area > evui-listbox > evui-listbox-ul **/
+/**  dropdown-area > listbox-area > single-area > evui-listbox > evui-listbox-li **/
 
-.single-area .evui-listbox{
+.dropdown-area .listbox-area .single-area{
   position: absolute;
   width: 100%;
   border: 1px solid #ccc;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  background: #FFFFFF;
   -webkit-box-shadow: 0 6px 12px #ccc;
   box-shadow: 0 6px 12px #ccc;
-}
-.single-area .evui-listbox .evui-listbox-ul{
-  list-style-type: none;
-  height: 200px;
-  padding: 2px 0px;
   overflow: auto;
 }
-.single-area .evui-listbox .evui-listbox-li{
+.dropdown-area .listbox-area .single-area .evui-listbox{
+  width: 100%;
+  height: 100%
+}
+.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-ul{
+  list-style-type: none;
+  height: 200px;
+  padding: 2px 0;
+}
+.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li{
   display: block;
   list-style: none;
   padding: 7px 16px;
@@ -598,10 +604,10 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   cursor: pointer;
   transition: background .1s ease-in-out;
 }
-.single-area .evui-listbox .evui-listbox-li:hover{
+.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li:hover{
   background-color: #eeeeee;
 }
-.single-area .evui-listbox .evui-listbox-li.selected{
+.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li.selected{
   color: #fff;
   background-color: #337ab6;
 }
