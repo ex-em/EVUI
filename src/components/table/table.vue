@@ -412,7 +412,7 @@
       } else if (leftSize > 0) {
         this.endColWidth = this.gridBoxWidth - this.sizeColSum;
       }
-      // this.$forceUpdate();
+      this.$forceUpdate();
     },
     beforeDestroy() {
       // this.records = [];
@@ -641,16 +641,16 @@
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const startOffsetY = this.$refs.evuiGrid.offsetTop - 20; // 기본 Y 고스트 위치용
-        const startOffsetX = this.$refs.evuiGrid.offsetLeft - 15; // 기본 X 고스트 위치용
+        const startOffsetY = this.$refs.evuiGrid.getBoundingClientRect().top - 20; // 기본 Y 고스트 위치용
+        const startOffsetX = this.$refs.evuiGrid.getBoundingClientRect().left - 15; // 기본 X 고스트 위치용
 
         let colIndex; // 드랍 할 컬럼 인덱스
 
         // 컬럼 고스트 무브
-        function moveAt(pageX, pageY) {
+        function moveAt(clientX, clientY) {
           // debugger;
-          vm.$refs.headGhost.style.left = `${pageX - startOffsetX}px`;
-          vm.$refs.headGhost.style.top = `${pageY - startOffsetY}px`;
+          vm.$refs.headGhost.style.left = `${clientX - startOffsetX}px`;
+          vm.$refs.headGhost.style.top = `${clientY - startOffsetY}px`;
         }
 
         // 컬럼 배열 변경
@@ -669,7 +669,7 @@
 
         // 마우스 이동할때 이벤트
         function onMouseMove(e) {
-          moveAt(e.pageX, e.pageY);
+          moveAt(e.clientX, e.clientY);
 
           const targetEl = e.target;
           if (!targetEl) {
@@ -889,7 +889,7 @@
         } else if (leftSize > 0) {
           this.endColWidth = this.gridBoxWidth - this.sizeColSum;
         }
-        // this.$forceUpdate();
+        this.$forceUpdate();
       },
     },
   };
