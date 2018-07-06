@@ -86,7 +86,7 @@
                 name: 'Selectbox',
                 routerLink: '/selectbox',
                 content: '셀렉트 박스',
-//                imgUrl: `${this.imgUrl}/selectbox.png`,
+                imgUrl: `${this.imgUrl}/selectbox.png`,
               },
               {
                 name: 'Table',
