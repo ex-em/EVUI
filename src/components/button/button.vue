@@ -5,7 +5,7 @@
       :name="name"
       :disabled="disabled"
       :class="classes"
-      @click="btnClick"
+      @click="onClick"
     >
       <i
         v-if="isLoading"
@@ -27,7 +27,7 @@
         v-for="menuInfo in menuList"
         :key="menuInfo.text"
       >
-        <li @click="menuItemClick">
+        <li @click="itemClick">
           {{ menuInfo.text }}
         </li>
       </ul>
@@ -138,14 +138,14 @@
       },
     },
     methods: {
-      btnClick(event) {
+      onClick(event) {
         const text = this.text;
         this._changeMenuListClasses();
-        this.$emit('btnClick', event, text);
+        this.$emit('click', event, text);
       },
-      menuItemClick(event) {
+      itemClick(event) {
         const text = event.currentTarget.innerText;
-        this.$emit('menuItemClick', event, text);
+        this.$emit('item-click', event, text);
       },
       _changeMenuListClasses() {
         if (!this.menuListCnt) {
