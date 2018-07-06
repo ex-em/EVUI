@@ -44,7 +44,7 @@
           {
             url: './guide/views/examples/timepicker/timepicker-init.vue',
             component: timepickerInit,
-            title: 'Setting Init Values',
+            title: 'Init Value',
           },
         ],
       };

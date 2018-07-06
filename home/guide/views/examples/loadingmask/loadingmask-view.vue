@@ -39,12 +39,12 @@
           {
             url: './guide/views/examples/loadingmask/loadingmask-default.vue',
             component: loadingmaskDefault,
-            title: 'Loadingmask Default',
+            title: 'Default',
           },
           {
             url: './guide/views/examples/loadingmask/loadingmask-custom.vue',
             component: loadingmaskCustom,
-            title: 'Loadingmask Custom Setting',
+            title: 'Custom',
           },
         ],
       };
