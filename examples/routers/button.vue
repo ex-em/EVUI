@@ -11,8 +11,8 @@
       :menu-list="btnInfo.menuList"
       :disabled="btnInfo.disabled"
       :isLoading="btnInfo.isLoading"
-      @btnClick="btnClick"
-      @menuItemClick="menuItemClick"
+      @click="onClick"
+      @item-click="itemClick"
     />
   </div>
 </template>
@@ -47,11 +47,11 @@
       };
     },
     methods: {
-      btnClick(event, text) {
+      onClick(event, text) {
         this.event = event;
         this.text = text;
       },
-      menuItemClick(event, itemId) {
+      itemClick(event, itemId) {
         this.event = event;
         this.itemId = itemId;
       },
