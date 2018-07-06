@@ -1,6 +1,5 @@
 <template>
   <div class="selectbox-default">
-    <h4># Default SelectBox</h4><br>
     <selectbox
       :name="boxInfo.name"
       :selectbox-style="boxInfo.selectboxStyle"
@@ -8,6 +7,7 @@
       @keyup="onKeyUp"
       @select="onSelect"
     />
+    <br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 <script>

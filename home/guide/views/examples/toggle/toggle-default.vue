@@ -1,12 +1,16 @@
 <template>
   <div>
     <toggle
+      v-model="toggleFlag"
+      :toggle-on="toggleFlag"
     />
+    {{ toggleFlag }}
     <br>
     <br>
     <toggle
-      :toggle-on="true"
+      v-model="toggleFlag2"
     />
+    {{ toggleFlag2 }}
   </div>
 </template>
 
@@ -20,6 +24,8 @@
     },
     data() {
       return {
+        toggleFlag: true,
+        toggleFlag2: false,
       };
     },
     methods: {
