@@ -2,26 +2,27 @@
   <div>
     <div class="input-demo">
       <h5> # Normal </h5>
-      <div>
-        <input-number
-          :value="2"
-        />
+      <div class="input-inner-width">
+        <div>
+          <input-number
+            :value="2"
+          />
+        </div>
+        <h5> # Disable </h5>
+        <div>
+          <input-number
+            :value="3"
+            :disabled="true"
+          />
+        </div>
+        <h5> # Read Only </h5>
+        <div>
+          <input-number
+            :value="2"
+            :readonly="true"
+          />
+        </div>
       </div>
-      <h5> # Disable </h5>
-      <div>
-        <input-number
-          :value="3"
-          :disabled="true"
-        />
-      </div>
-      <h5> # Read Only </h5>
-      <div>
-        <input-number
-          :value="2"
-          :readonly="true"
-        />
-      </div>
-
       <h5> # Variation </h5>
 
       <div class="input-demo-multi">
@@ -50,7 +51,7 @@
       </div>
       <h5> # Step </h5>
 
-      <div class="input-demo-multi">
+      <div class="input-inner-width">
         <div>
           <input-number
             :step="12"
@@ -101,9 +102,12 @@
     margin: 2px;
   }
   .input-demo {
-    width: 30%
+    width: 30%;
   }
   .input-demo-multi {
     display: inline-block;
+  }
+  .input-inner-width {
+    width: 60%;
   }
 </style>
