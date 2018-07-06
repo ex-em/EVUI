@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Pie Chart </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -12,6 +16,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -31,12 +36,12 @@
           {
             url: './guide/views/examples/chart/chart.pie.default.vue',
             component: DefaultPieChart,
-            title: 'Default Pie Chart',
+            title: 'Default',
           },
           {
             url: './guide/views/examples/chart/chart.pie.doughnut.vue',
             component: DoughnutChart,
-            title: 'Doughnut Chart',
+            title: 'Doughnut',
           },
         ],
       };
