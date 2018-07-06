@@ -3,6 +3,7 @@ import Axios from 'axios';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
+import rowdata from '@/components/table/data.json';
 
 require('codemirror/mode/vue/vue');
 
@@ -10,6 +11,7 @@ Vue.use(VueRouter);
 Vue.use(EVUI);
 Vue.prototype.$http = Axios;
 Vue.config.debug = true;
+Vue.prototype.$tableData = rowdata;
 
 const router = new VueRouter({
   mode: 'history',

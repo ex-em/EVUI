@@ -3,6 +3,7 @@
     <div class="article-title">
       <h2> Check Box </h2>
     </div>
+    <br>
     <div
       v-for="item in checkList"
       :key="item.id"
@@ -16,11 +17,13 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
     <div class="split"/>
     <div class="article-title">
       <h2> Check Box Group </h2>
     </div>
+    <br>
     <div
       v-for="item in checkGroupList"
       :key="item.id"
@@ -34,6 +37,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -55,10 +59,6 @@
     },
     data() {
       return {
-        visible: true,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
         checkList: [
           {
             url: './guide/views/examples/checkbox/checkbox-default.vue',
@@ -88,7 +88,7 @@
             title: 'Status',
           },
           {
-            url: './guide/views/examples/checkbox/checkbox-group-list-handing.vue',
+            url: './guide/views/examples/checkbox/checkbox-group-list-handling.vue',
             component: checkboxGroupList,
             title: 'List Handling',
           },
@@ -104,11 +104,6 @@
           },
         ],
       };
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>

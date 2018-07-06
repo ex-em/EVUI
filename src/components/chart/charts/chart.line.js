@@ -139,8 +139,6 @@ export default class LineChart extends BaseChart {
           this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
         }
       }
-      ctx.stroke();
-      ctx.fill();
     }
   }
 }

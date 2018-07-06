@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Loadingmask </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -13,6 +17,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -34,14 +39,12 @@
           {
             url: './guide/views/examples/loadingmask/loadingmask-default.vue',
             component: loadingmaskDefault,
-            title: 'Loadingmask Default',
-            height: 350,
+            title: 'Default',
           },
           {
             url: './guide/views/examples/loadingmask/loadingmask-custom.vue',
             component: loadingmaskCustom,
-            title: 'Loadingmask Custom Setting',
-            height: 350,
+            title: 'Custom',
           },
         ],
       };

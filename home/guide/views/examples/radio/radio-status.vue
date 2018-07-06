@@ -8,7 +8,7 @@
       />
       <radio
         v-model="checkedList[1]"
-        :label="'Checked'"
+        :label="'Selected'"
       />
       <radio
         v-model="checkedList[2]"
@@ -28,30 +28,34 @@
         :label="'Disable'"
         :disabled="changeDisabled"
       />
-      <button @click="changeDisabledItem">
-        {{ itemButtonName1 }}
-      </button>
+      <Button
+        :text="itemButtonName1"
+        @click="changeDisabledItem"
+      />
       <radio
         v-model="checkedList[5]"
         :label="'Value'"
       />
-      <button @click="changeStatus">
-        {{ itemButtonName2 }}
-      </button>
+      <Button
+        :text="itemButtonName2"
+        @click="changeStatus"
+      />
     </div>
   </div>
 </template>
 <script>
   import radio from '@/components/radio/radio';
+  import Button from '@/components/button/button';
 
   export default {
     components: {
       radio,
+      Button,
     },
     data() {
       return {
         itemButtonName1: 'Change Disabled',
-        itemButtonName2: 'Change Checked',
+        itemButtonName2: 'Change Selected',
         changeDisabled: true,
         isDisabled: true,
         checkedList: [
@@ -72,10 +76,6 @@
 <style scoped>
   .box-demo {
     padding-top: 2px;
-    padding-left: 1px;
-  }
-  .value-view {
-    padding-top: 5px;
     padding-left: 1px;
   }
   h5 {

@@ -59,6 +59,12 @@
 </script>
 
 <style>
+  a, span {
+    text-decoration: none !important;
+  }
+  a:visited, a:any-link {
+    color: #000;
+  }
   .evui-summary-content {
     margin-top: 50px;
   }

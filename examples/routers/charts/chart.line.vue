@@ -103,7 +103,6 @@
           type: 'line',
           width: '800px',
           height: '230px',
-          isRTM: true,
           legend: {
             show: true,
             position: 'right',

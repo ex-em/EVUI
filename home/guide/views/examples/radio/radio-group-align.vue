@@ -2,15 +2,15 @@
   <div class="outer">
     <div class="box-demo">
       <h5># V-Box</h5>
-      <checkbox-group
+      <radio-group
         :list="groupName"
         :group-align="'vbox'"
-        v-model="itemNameList"
+        v-model="selectedItem"
       />
       <h5># H-Box</h5>
-      <checkbox-group
+      <radio-group
         :list="groupName"
-        v-model="itemNameList"
+        v-model="selectedItem"
       />
     </div>
   </div>
@@ -37,7 +37,7 @@
             label: 'Mac Book Air',
           },
         ],
-        itemNameList: ['Mac Book Pro', 'Mac Pro'],
+        selectedItem: 'Mac Book Pro',
       };
     },
   };
