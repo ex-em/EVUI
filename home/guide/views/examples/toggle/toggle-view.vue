@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Toggle </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -13,6 +17,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -32,12 +37,12 @@
           {
             url: './guide/views/examples/toggle/toggle-default.vue',
             component: toggleDefault,
-            title: 'Toggle Default',
+            title: 'Default',
           },
           {
             url: './guide/views/examples/toggle/toggle-custom.vue',
             component: toggleCustom,
-            title: 'Toggle Custom',
+            title: 'Custom',
           },
         ],
       };

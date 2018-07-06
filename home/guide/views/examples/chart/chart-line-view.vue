@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="article-title">
+      <h2> Line Chart </h2>
+    </div>
+    <br>
     <div
       v-for="item in componentList"
       :key="item.id"
@@ -12,6 +16,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
@@ -33,22 +38,22 @@
           {
             url: './guide/views/examples/chart/chart.line.default.vue',
             component: DefaultLineChart,
-            title: 'Default Line Chart',
+            title: 'Default',
           },
           {
             url: './guide/views/examples/chart/chart.line.fill.vue',
             component: FillLineChart,
-            title: 'Fill Line Chart',
+            title: 'Fill',
           },
           {
             url: './guide/views/examples/chart/chart.line.fill.vue',
             component: StackLinechart,
-            title: 'Stack Line Chart',
+            title: 'Stack',
           },
           {
             url: './guide/views/examples/chart/chart.line.scatter.vue',
             component: ScatterChart,
-            title: 'Scatter Chart',
+            title: 'Scatter',
           },
         ],
       };
