@@ -13,7 +13,6 @@
 
 <script>
   import EvuiTable from '@/components/table';
-  import rowdata from '@/components/table/data.json';
 
   export default {
     components: {
@@ -32,8 +31,11 @@
           { field: 'sdate', caption: 'Start Date' },
           { field: 'edate', caption: 'End Date' },
         ],
-        rowData: rowdata,
+        rowData: null,
       };
+    },
+    created() {
+      this.rowData = this.$tableData;
     },
   };
 </script>
