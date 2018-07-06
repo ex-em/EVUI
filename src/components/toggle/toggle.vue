@@ -9,7 +9,7 @@
     }"
     :class="{ active : dataToggleOn }"
     class="evui-toggle"
-    @click="dataToggleOn = !dataToggleOn"
+    @click="changeToggle"
   >
     <p
       v-show="dataToggleText.offText"
@@ -91,6 +91,17 @@
     mounted() {
     },
     methods: {
+      changeToggle() {
+        this.dataToggleOn = !this.dataToggleOn;
+        this.$emit('input', this.dataToggleOn);
+      },
+      initToggle(flag) {
+        /*eslint-disable*/
+        console.log('flag : ' + flag);
+      },
+      value1(a) {
+        console.log('a : ' + a);
+      },
     },
   };
 </script>

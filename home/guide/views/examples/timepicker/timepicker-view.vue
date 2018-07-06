@@ -40,13 +40,11 @@
             url: './guide/views/examples/timepicker/timepicker-default.vue',
             component: timepickerDefault,
             title: 'Default',
-            height: 400,
           },
           {
             url: './guide/views/examples/timepicker/timepicker-init.vue',
             component: timepickerInit,
             title: 'Setting Init Values',
-            height: 400,
           },
         ],
       };
