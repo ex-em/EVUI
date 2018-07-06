@@ -235,7 +235,7 @@
     data() {
       return {
         // originData
-        originData: _.cloneDeep(this.records),
+        originData: this.records,
         originColumns: this.columns,
 
         // sort 관련 데이터들
@@ -326,26 +326,33 @@
       // 얕은 복사 객체 내용은 안바뀔거 같아서 얕은 복사함.
       // 객체 안의 내용 바뀔거 같은면 깊은 복사로 변경 필요.
       // 일단 가즈아!!
-      this.sortedData = this.originData.slice();
-      if (this.pagination) {
-        this.currentPage = 1;
-        this.lastPage = Math.ceil(this.originData.length / this.pageSize);
-        const start = (this.currentPage - 1) * this.pageSize;
-        const end = this.currentPage * this.pageSize;
-        this.resultData = this.originData.slice(start, end);
-      } else {
-        this.resultData = this.originData.slice();
-      }
+      // this.sortedData = this.originData.slice();
+      // if (this.pagination) {
+      //   this.currentPage = 1;
+      //   this.lastPage = Math.ceil(this.originData.length / this.pageSize);
+      //   const start = (this.currentPage - 1) * this.pageSize;
+      //   const end = this.currentPage * this.pageSize;
+      //   this.resultData = this.originData.slice(start, end);
+      // } else {
+      //   this.resultData = this.originData.slice();
+      // }
     },
     mounted() {
       // 그리드박스 높이 너비 가져오기
       this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
       this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
       this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
+      this.sortedData = this.originData.slice();
 
       if (this.pagination) {
         const gridBody = this.$refs.evuiGridBody;
         gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
+
+        this.currentPage = 1;
+        this.lastPage = Math.ceil(this.originData.length / this.pageSize);
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = this.currentPage * this.pageSize;
+        this.resultData = this.originData.slice(start, end);
       } else if (this.virtualScroll) {
         this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
         // this.s
@@ -353,7 +360,8 @@
         this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
 
         this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
-        // debugger;
+      } else {
+        this.resultData = this.originData.slice();
       }
 
       // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
