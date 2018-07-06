@@ -1,19 +1,24 @@
 <template>
   <div>
     <toggle
+      v-model="toggleValue1"
       :toggle-obj="largeObj"
       :toggle-text="largeText"
     />
+    {{ toggleValue1 }}
     <br>
     <br>
     <toggle
-      :toggle-on="true"
+      v-model="toggleValue2"
     />
+    {{ toggleValue2 }}
     <br>
     <br>
     <toggle
+      v-model="toggleValue3"
       :toggle-obj="smallObj"
     />
+    {{ toggleValue3 }}
   </div>
 </template>
 
@@ -27,6 +32,9 @@
     },
     data() {
       return {
+        toggleValue1: true,
+        toggleValue2: false,
+        toggleValue3: true,
         largeObj: {
           width: 80,
           height: 34,

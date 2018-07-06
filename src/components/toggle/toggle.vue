@@ -50,7 +50,7 @@
     model: {
     },
     props: {
-      toggleOn: {
+      value: {
         type: Boolean,
         default: false,
       },
@@ -80,7 +80,7 @@
     },
     data() {
       return {
-        dataToggleOn: this.toggleOn,
+        dataToggleOn: this.value,
         dataToggleSize: this.toggleSize,
         dataToggleObj: this.toggleObj,
         dataToggleText: this.toggleText,

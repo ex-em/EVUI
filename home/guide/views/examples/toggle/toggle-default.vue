@@ -2,7 +2,6 @@
   <div>
     <toggle
       v-model="toggleFlag"
-      :toggle-on="toggleFlag"
     />
     {{ toggleFlag }}
     <br>
