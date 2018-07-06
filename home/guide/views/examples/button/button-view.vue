@@ -3,6 +3,7 @@
     <div class="article-title">
       <h2> {{ title }} </h2>
     </div>
+    <br>
     <div
       v-for="item in buttonComponentList"
       :key="item.id"
@@ -15,6 +16,7 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>

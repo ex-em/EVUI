@@ -98,6 +98,9 @@ export default {
       }
       return this.list;
     },
+    computedDisabled: function computedDisabled() {
+      return this.disabled;
+    },
   },
   watch: {
     value() {

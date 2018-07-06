@@ -3,6 +3,7 @@
     <div class="article-title">
       <h2> Input Number </h2>
     </div>
+    <br>
     <div
       v-for="item in inputList"
       :key="item.id"
@@ -15,12 +16,14 @@
           <component :is="item.component"/>
         </code-view>
       </div>
+      <br>
     </div>
   </div>
 </template>
 
 <script>
   import codeView from '@/components/codeview/code';
+  import inputNumberDefault from './input-number-default';
 
   export default {
     components: {
@@ -28,23 +31,14 @@
     },
     data() {
       return {
-        visible: true,
-        label: 'test',
-        valueData: null,
-        buttonLabel: 'visible',
         inputList: [
           {
-            url: './guide/views/examples/your-source-code',
-            component: 'your-imported-component-object',
+            url: './guide/views/examples/inputnumber/input-number-default.vue',
+            component: inputNumberDefault,
             title: 'Default',
           },
         ],
       };
-    },
-    methods: {
-      onChange(value) {
-        this.valueData = value;
-      },
     },
   };
 </script>

@@ -1,8 +1,8 @@
 <template>
   <div>
     <chart
-      :data="stackData"
-      :options="chartOptions"
+      :data="stackBarChartData"
+      :options="stackBarChartOptions"
     />
     <br>
   </div>
@@ -18,41 +18,37 @@
     },
     data() {
       return {
-        stackData: {
+        stackBarChartData: {
           category: ['category1', 'category2', 'category3', 'category4', 'category5'],
           series: [
             {
-              id: 'simple1',
-              name: 'simple1',
+              id: 'series1',
+              name: 'series#1',
               stack: true,
               data: [5, 3, 6, 8, 9],
             },
             {
-              id: 'simple2',
-              name: 'simple2',
+              id: 'series2',
+              name: 'series#2',
               stack: true,
               data: [3, 8, 10, 5, 3],
             },
           ],
         },
-        chartOptions: {
+        stackBarChartOptions: {
           type: 'bar',
-          width: '400px',
+          width: '600px',
           height: '350px',
-          tickness: 0.8,
+          tickness: 0.5,
           xAxes: [{
             scaleType: 'step', // auto, fix, step
             labelType: 'category', // time, linear, category
-            tickFormat: 'hh:mm:ss',
             showGrid: false,
-            position: 'bottom',
-            interval: 'minute',
           }],
           yAxes: [{
             scaleType: 'auto', // auto, fix, step
             labelType: 'linear', // time, linear, category
             showGrid: true,
-            position: 'left',
           }],
         },
       };

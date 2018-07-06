@@ -43,7 +43,7 @@
       this.wrapperSize = {
         width: this.getChartSize(Util.quantity(this.options.width)),
         height: this.getChartSize(Util.quantity(this.options.height)),
-        border: '1px solid rgb(169, 169, 169)',
+        display: 'inline-block',
       };
     },
     mounted() {
@@ -107,7 +107,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    /*border: 1px solid red;*/
   }
 
   .evui-chart-container {
@@ -117,7 +116,6 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    /*border: 1px solid blue;*/
   }
 
   .evui-chart-title {
@@ -129,7 +127,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    /*border: 1px solid black;*/
   }
 
   .evui-chart-legend{

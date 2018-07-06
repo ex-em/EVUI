@@ -34,7 +34,6 @@ class BaseChart {
       border: 2,
       doughnutHoleSize: 0,
       reverse: false,
-      isRTM: false,
       bufferSize: 10,
       legend: {
         show: true,
@@ -78,7 +77,6 @@ class BaseChart {
       seriesGroupList: this.seriesGroupList,
       structType,
       axisType,
-      isRTM: this.options.isRTM,
       bufferSize: this.options.bufferSize,
     });
 

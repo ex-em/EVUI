@@ -1,77 +1,56 @@
 <template>
   <div class="outer">
-    <div class="custom-event-demo">
-      <div class="inner-event-demo">
-        <h5># All Check Box</h5>
-        <checkbox
-          v-model="allChecked"
-          :label="'all check'"
-          :disabled="isDisabled"
-          @on-change="handleModelList"
-        />
-        <checkbox-group
-          :list="eventGroupList"
-          v-model="modelList"
-          :disabled="isDisabled"
-          @on-change="changeAllChecked"
-        />
-        <h5># Disable All</h5>
-        <button @click="changeDisabled">change disabled</button>
-        <p>Selected List : {{ modelList }}</p>
-      </div>
+    <div class="box-demo">
+      <h5># Handle Custom Event</h5>
+      <radio-group
+        :list="groupName"
+        :group-align="'vbox'"
+        v-model="selectedItem"
+        @on-change="selectEvent"
+      />
+      <p>my new work station : {{ value }}</p>
     </div>
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
-  import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import radio from '@/components/radio/radio';
+  import radioGroup from '@/components/radio/radio-group';
 
   export default {
     components: {
-      checkbox,
-      checkboxGroup,
+      radio,
+      radioGroup,
     },
     data() {
       return {
-        allChecked: false,
-        modelList: [],
-        eventGroupList: [
+        groupName: [
           {
-            name: 'map',
+            label: 'Mac Book Pro',
           },
           {
-            name: 'reduce',
+            label: 'Mac Pro',
           },
           {
-            name: 'slice',
+            label: 'Mac Book Air',
           },
         ],
-        isDisabled: false,
+        selectedItem: 'Mac Book Pro',
+        value: '',
+        maxLength: 255,
       };
     },
     methods: {
-      handleModelList() {
-        if (this.allChecked) {
-          this.modelList = ['map', 'reduce', 'slice'];
-        } else {
-          this.modelList = [];
+      selectEvent: function selectEvent(newValue) {
+        if (this.value.length >= 80) {
+          this.value = '';
         }
-      },
-      changeAllChecked(data) {
-        if (data.length === this.eventGroupList.length) {
-          this.allChecked = true;
-        } else {
-          this.allChecked = false;
-        }
-      },
-      changeDisabled() {
-        this.isDisabled = !this.isDisabled;
+        this.value += ` ${newValue}`;
       },
     },
   };
 </script>
 <style scoped>
-  .inner-event-demo {
+  .box-demo {
     padding-top: 2px;
     padding-left: 1px;
   }

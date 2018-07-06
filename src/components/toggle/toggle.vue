@@ -4,19 +4,42 @@
     :style="{
       width: dataToggleObj.width + 'px',
       height: dataToggleObj.height + 'px',
+      lineHeight: dataToggleObj.height + 'px',
+      borderRadius: dataToggleObj.height + 'px',
     }"
-    :class="{ active : dataToggleFlag }"
+    :class="{ active : dataToggleOn }"
     class="evui-toggle"
-    @click="dataToggleFlag = !dataToggleFlag"
+    @click="dataToggleOn = !dataToggleOn"
   >
-    1 {{ dataToggleFlag }}
+    <p
+      v-show="dataToggleText.offText"
+      :style="{
+        marginRight: dataToggleObj.height/5 + 'px',
+        fontSize: dataToggleText.fontSize + 'px',
+      }"
+      :class="{ active : dataToggleOn }"
+      class="offText"
+    >
+      {{ dataToggleText.offText }}
+    </p>
+    <p
+      v-show="dataToggleText.onText"
+      :style="{
+        marginLeft: dataToggleObj.height/5 + 'px',
+        fontSize: dataToggleText.fontSize + 'px',
+      }"
+      :class="{ active : dataToggleOn }"
+      class="onText"
+    >
+      {{ dataToggleText.onText }}
+    </p>
     <span
       :style="{
         width: dataToggleObj.height - 4 + 'px',
         height: dataToggleObj.height - 4 + 'px',
-        left: dataToggleFlag ? dataToggleObj.width - dataToggleObj.height + 1 + 'px' : '0px',
+        left: dataToggleOn ? dataToggleObj.width - dataToggleObj.height + 1 + 'px' : '1px',
       }"
-      :class="{ active : dataToggleFlag }"
+      :class="{ active : dataToggleOn }"
       class="evui-toggle-button"
     />
   </span>
@@ -27,7 +50,7 @@
     model: {
     },
     props: {
-      defaultFlag: {
+      toggleOn: {
         type: Boolean,
         default: false,
       },
@@ -40,26 +63,32 @@
           };
         },
       },
-    },
-    data() {
-      return {
-        dataToggleFlag: this.defaultFlag,
-        dataToggleObj: this.toggleObj,
-      };
-    },
-    computed: {
-      computedToggleFlag: {
-        get() {
-          return this.defaultFlag;
-        },
-        set(flag) {
-          this.defaultFlag = flag;
+      toggleSize: {
+        type: String,
+        default: 'normal',
+      },
+      toggleText: {
+        type: Object,
+        default() {
+          return {
+            onText: '',
+            offText: '',
+            fontSize: 13,
+          };
         },
       },
     },
+    data() {
+      return {
+        dataToggleOn: this.toggleOn,
+        dataToggleSize: this.toggleSize,
+        dataToggleObj: this.toggleObj,
+        dataToggleText: this.toggleText,
+      };
+    },
+    computed: {
+    },
     mounted() {
-      /*eslint-disable*/
-      console.log('this.$refs.toggleRef : ' + this.$refs.toggleRef);
     },
     methods: {
     },
@@ -70,13 +99,8 @@
   .evui-toggle {
     display: inline-block;
     position: relative;
-    left: 1px;
-    width: 60px;
-    height: 24px;
-    line-height: 24px;
     vertical-align: middle;
     border: 1px solid #cccccc;
-    border-radius: 24px;
     background-color: #cccccc;
     color: #000000;
     transition: all .2s ease-in-out;
@@ -91,9 +115,6 @@
   .evui-toggle-button {
     position: absolute;
     top: 1px;
-    left: 1px;
-    width: 20px;
-    height: 20px;
     border-radius: 50%;
     background-color: #ffffff;
     transition: all .2s ease-in-out;
@@ -103,12 +124,24 @@
   .evui-toggle-button.active {
     position: absolute;
     top: 1px;
-    width: 20px;
-    height: 20px;
     border-radius: 50%;
     background-color: #ffffff;
     transition: all .2s ease-in-out;
     cursor: pointer;
     content: '';
+  }
+  .offText {
+    display: block;
+    float: right;
+  }
+  .offText.active {
+    display: none;
+  }
+  .onText {
+    display: none;
+  }
+  .onText.active {
+    display: block;
+    float: left;
   }
 </style>
