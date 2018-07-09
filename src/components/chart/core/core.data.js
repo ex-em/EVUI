@@ -68,7 +68,7 @@ export default class ChartDataStore {
       const seriesNode = this.seriesList[this.seriesList.length - 1];
       seriesNode.lvl = lvl;
       seriesNode.parentIndex = -1;
-      seriesNode.data = series[ix].data;
+      seriesNode.data = seriesNode.inputData;
 
       const pIndex = seriesNode.parentIndex;
 
@@ -171,7 +171,7 @@ export default class ChartDataStore {
       stackArr: [],
       stackOffsetIndex: 0,
       seriesIndex: this.seriesList.length,
-      data: [],
+      data: this.structType === 'array' ? [] : null,
       lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
       fill: param.fill === undefined ? false : param.fill,
       fillColor: param.fillColor,
@@ -183,7 +183,7 @@ export default class ChartDataStore {
       horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
       children: param.children === undefined ? [] : param.children,
       parentIndex: null,
-      inputData: param.data || [],
+      inputData: param.data || (this.structType === 'array' ? [] : null),
       hasAccumulate: false,
     };
 
@@ -598,6 +598,15 @@ export default class ChartDataStore {
     };
     this.seriesGroupList.length = 0;
 
+    if (this.structType === 'array') {
+      this.initArraySeries();
+    } else {
+      this.seriesList.length = 0;
+      this.createTreeSeries();
+    }
+  }
+
+  initArraySeries() {
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
       this.initializeSeries(ix);
       const series = this.seriesList[ix];
@@ -611,7 +620,12 @@ export default class ChartDataStore {
   initializeSeries(seriesIndex) {
     const series = this.seriesList[seriesIndex];
 
-    series.data.length = 0;
+    if (this.structType === 'array') {
+      series.data.length = 0;
+    } else {
+      series.data = null;
+    }
+
     series.hasAccumulate = false;
     series.min = null;
     series.minIndex = null;
