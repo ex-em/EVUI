@@ -25,7 +25,9 @@
 <script>
   import codeView from '@/components/codeview/code';
   import toggleDefault from './toggle-default';
-  import toggleCustom from './toggle-custom';
+  import toggleSize from './toggle-size';
+  import toggleShape from './toggle-shape';
+  import toggleType from './toggle-type';
 
   export default {
     components: {
@@ -40,9 +42,19 @@
             title: 'Default',
           },
           {
-            url: './guide/views/examples/toggle/toggle-custom.vue',
-            component: toggleCustom,
-            title: 'Custom',
+            url: './guide/views/examples/toggle/toggle-size.vue',
+            component: toggleSize,
+            title: 'Size',
+          },
+          {
+            url: './guide/views/examples/toggle/toggle-shape.vue',
+            component: toggleShape,
+            title: 'Shape',
+          },
+          {
+            url: './guide/views/examples/toggle/toggle-type.vue',
+            component: toggleType,
+            title: 'Type',
           },
         ],
       };
