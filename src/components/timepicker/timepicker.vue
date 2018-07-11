@@ -17,13 +17,18 @@
       class="evui-timepicker-suffix"
       @click.stop="hideTimePicker"
     />
-    <input
-      ref="timePickerText"
-      v-model="timeText"
-      type="text"
-      placeholder=" hh:mi:ss "
-      @keydown.stop="validKeyDown"
+    <div
+      :class="wrapClasses"
     >
+      <input
+        ref="timePickerText"
+        v-model="timeText"
+        :class="inputClasses"
+        type="text"
+        placeholder=" hh:mi:ss "
+        @keydown.stop="validKeyDown"
+      >
+    </div>
     <div
       ref="timePickerPanel"
       class="evui-timepicker-panel"
@@ -56,6 +61,8 @@
 
 <script>
   import spinner from '@/components/timepicker/spinner';
+
+  const prefixCls = 'evui-input-text';
 
   export default {
     components: {
@@ -108,9 +115,21 @@
         suffixFadeFlag: false,
         timePickerFadeFlag: false,
         suffixShowFlag: false,
+        disabled: true,
       };
     },
     computed: {
+      wrapClasses: function wrapClasses() {
+        return [
+          `${prefixCls}`,
+          {
+            [`${prefixCls}-disabled`]: this.disabled,
+          },
+        ];
+      },
+      inputClasses: function inputClasses() {
+        return `${prefixCls}-input`;
+      },
       timeText: {
         get() {
           return this.formattedText;
@@ -401,7 +420,6 @@
   .evui-timepicker input[type=text]:focus,
   .evui-timepicker input[type=text]:hover{
     outline: none;
-    border-color: #409eff;
   }
 
   .evui-timepicker div.evui-timepicker-prefix {
