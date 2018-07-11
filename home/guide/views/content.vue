@@ -106,6 +106,12 @@
                 content: '토글',
                 imgUrl: `${this.imgUrl}/toggle.png`,
               },
+              {
+                name: 'Label',
+                routerLink: '/label',
+                content: '라벨',
+                imgUrl: `${this.imgUrl}/label.png`,
+              },
             ],
           },
           {
