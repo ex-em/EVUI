@@ -1,5 +1,6 @@
 <template>
   <div
+    v-click-outside="hideDropdown"
     :style="selectboxStyle"
     class="evui-selectbox"
   >
@@ -76,10 +77,31 @@
     components: {
       dropdown,
     },
+    directives: {
+      'click-outside': {
+        bind(el, binding) {
+          const selectboxEl = el;
+          const bubble = binding.modifiers.bubble;
+          const handler = (evnet) => {
+            if (bubble || (selectboxEl !== evnet.target && !selectboxEl.contains(evnet.target))) {
+              binding.value(evnet);
+            }
+          };
+          selectboxEl.vueClickOutside = handler;
+
+          document.addEventListener('click', handler);
+        },
+        unbind(el) {
+          const selectboxEl = el;
+          document.removeEventListener('click', selectboxEl.__vueClickOutside__);
+          selectboxEl.vueClickOutside = null;
+        },
+      },
+    },
     props: {
       name: {
         type: String,
-        default: null,
+        default: '',
       },
       selectboxStyle: {
         type: Object,
@@ -144,9 +166,6 @@
     mounted() {
       this.listboxItems = this.items.slice();
 
-      if (this.selectboxStyle.height) {
-        this.dropdownStyle.height = this.selectboxStyle.height;
-      }
       if (!this.multiple) {
         this.dropdownStyle.border = 0;
       }
@@ -178,9 +197,9 @@
           this.filterItems(itemName);
         }
 
-        // if (!this.multiple) {
-        this.dropDownState = false;
-        // }
+        if (!this.multiple) {
+          this.dropDownState = false;
+        }
 
         this.$emit('select', item, target, index);
       },
@@ -212,37 +231,32 @@
         this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
       },
       filterItems(value) {
-        let ix;
-        let ixLen;
-        let jx;
-        let jxLen;
-        let groupObj;
-        let itemList;
-        let item;
-
-        if (value && value.length > 0) {
-          if (this.isGroup) {
-            this.listboxItems = [];
-
-            for (ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-              groupObj = this.items[ix];
-              itemList = groupObj.items;
-
-              for (jx = 0, jxLen = itemList.length; jx < jxLen; jx++) {
-                item = itemList[jx];
-
-                if (item.name.indexOf(value) === 0) {
-                  this.listboxItems.push(groupObj);
-                  break;
-                }
-              }
-            }
-          } else {
-            this.listboxItems = this.items.filter(obj => obj && obj.name.indexOf(value) === 0);
-          }
-        } else {
+        if (!value || value.length === 0) {
           this.listboxItems = this.items.slice();
+          return;
         }
+
+        if (this.isGroup) {
+          this.listboxItems = this.items.reduce((preArr, groupObj) => {
+            let groupItems = groupObj.items;
+
+            groupItems = groupItems.filter(item => item && item.name.includes(value));
+
+            if (groupItems.length > 0) {
+              preArr.push({
+                groupName: groupObj.groupName,
+                items: groupItems,
+              });
+            }
+
+            return preArr;
+          }, []);
+        } else {
+          this.listboxItems = this.items.filter(obj => obj && obj.name.includes(value));
+        }
+      },
+      hideDropdown() {
+        this.dropDownState = false;
       },
     },
   };
