@@ -30,6 +30,7 @@ export default class ChartLegend {
   init() {
     this.createLegend();
     if (!this.isShow) {
+      this.resizeDOM.style.display = 'none';
       this.legendDOM.style.display = 'none';
     }
 
@@ -42,6 +43,7 @@ export default class ChartLegend {
   createLegend() {
     const options = this.chartOptions.legend;
     const defColors = this.chartOptions.colors;
+    const chartType = this.chartOptions.type;
     const position = options.position;
 
     const calcSeriesWidthDOM = document.createElement('span');
@@ -69,7 +71,22 @@ export default class ChartLegend {
       legend.colorDOM.style.backgroundColor = series.color || defColors[series.seriesIndex];
 
       legend.nameDOM.textContent = series.name;
-      legend.nameDOM.dataset.id = series.name;
+      legend.nameDOM.chartType = chartType;
+      legend.containerDOM.style.cursor = chartType !== 'sunburst' ? 'pointer' : '';
+
+      legend.nameDOM.addEventListener('mouseover', (e) => {
+        if (e.target.chartType !== 'sunburst') {
+          e.target.style.fontWeight = 'bold';
+        }
+      });
+
+      legend.nameDOM.addEventListener('mouseout', (e) => {
+        if (e.target.chartType !== 'sunburst') {
+          e.target.style.fontWeight = '';
+        }
+      });
+
+
       legend.nameDOM.setAttribute('title', series.name);
 
       legend.containerDOM.appendChild(legend.colorDOM);
@@ -359,6 +376,10 @@ export default class ChartLegend {
   }
 
   onClickLegend(e) {
+    if (this.chartOptions.type === 'sunburst') {
+      return;
+    }
+
     const eventTargetDOM = e.currentTarget;
     const series = eventTargetDOM.series;
     const colorDOM = eventTargetDOM.getElementsByClassName('evui-chart-legend-color')[0];

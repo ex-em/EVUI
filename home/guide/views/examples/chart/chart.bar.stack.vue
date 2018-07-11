@@ -24,13 +24,11 @@
             {
               id: 'series1',
               name: 'series#1',
-              stack: true,
               data: [5, 3, 6, 8, 9],
             },
             {
               id: 'series2',
               name: 'series#2',
-              stack: true,
               data: [3, 8, 10, 5, 3],
             },
           ],
@@ -40,6 +38,7 @@
           width: '600px',
           height: '350px',
           tickness: 0.5,
+          stack: true,
           xAxes: [{
             scaleType: 'step', // auto, fix, step
             labelType: 'category', // time, linear, category

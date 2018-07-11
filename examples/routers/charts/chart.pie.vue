@@ -8,12 +8,10 @@
       :data="pieData"
       :options="doughnutOptions"
     />
-    <!--
     <chart
       :data="sunburstData"
       :options="sunburstOptions"
     />
-    -->
   </div>
 </template>
 <script>
@@ -76,74 +74,6 @@
               ],
             },
             {
-              id: 'series_1',
-              name: 'series_1',
-              show: true,
-              data: 10,
-              children: [
-                {
-                  id: 'series_1_0',
-                  name: 'series_1_0',
-                  show: true,
-                  data: 17,
-                },
-                {
-                  id: 'series_1_1',
-                  name: 'series_1_1',
-                  show: true,
-                  data: 13,
-                  children: [
-                    {
-                      id: 'series_1_1_0',
-                      name: 'series_1_1_0',
-                      show: true,
-                      data: 17,
-                    },
-                    {
-                      id: 'series_1_1_1',
-                      name: 'series_1_1_1',
-                      show: true,
-                      data: 10,
-                    },
-                  ],
-                },
-                {
-                  id: 'series_1_2',
-                  name: 'series_1_3',
-                  show: true,
-                  data: 30,
-                  children: [
-                    {
-                      id: 'series_1_2_0',
-                      name: 'series_1_2_0',
-                      show: true,
-                      data: 17,
-                      children: [
-                        {
-                          id: 'series_1_2_0',
-                          name: 'series_1_2_0',
-                          show: true,
-                          data: 10,
-                        },
-                        {
-                          id: 'series_1_2_0',
-                          name: 'series_1_2_0',
-                          show: true,
-                          data: 10,
-                        },
-                        {
-                          id: 'series_1_2_0',
-                          name: 'series_1_2_0',
-                          show: true,
-                          data: 15,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
               id: 'series_2',
               name: 'series_2',
               show: true,
@@ -155,6 +85,9 @@
           type: 'pie',
           width: '400px',
           height: '350px',
+          legend: {
+            show: false,
+          },
         },
         doughnutOptions: {
           type: 'pie',
@@ -198,6 +131,8 @@
         this.$children[0].addValue(3, randomData2, 1);
         this.$children[0].addValue(3, randomData3, 0);
 
+        this.$children[0].chart.redraw();
+
         this.$children[1].addValue(0, randomData1, 0);
         this.$children[1].addValue(0, randomData2, 1);
         this.$children[1].addValue(0, randomData3, 2);
@@ -214,7 +149,6 @@
         this.$children[1].addValue(3, randomData2, 1);
         this.$children[1].addValue(3, randomData3, 0);
 
-        this.$children[0].chart.redraw();
         this.$children[1].chart.redraw();
       },
     },
