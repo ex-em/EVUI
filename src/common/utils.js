@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 const vm = new Vue();
+const originConsole = window.console;
 export const prefix = 'evui-';
 
 const Utils = {
@@ -9,6 +10,17 @@ const Utils = {
   },
 };
 
+export const Console = {
+  log(message) {
+    originConsole.log(message);
+  },
+  warn(message) {
+    originConsole.warn(message);
+  },
+  info(message) {
+    originConsole.info(message);
+  },
+};
 
 export function getMatchedComponentsDownward(context, componentName) {
   const children = context.$children;
