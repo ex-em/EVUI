@@ -3,24 +3,21 @@
     <toggle
       v-model="toggleValue1"
       :toggle-obj="largeObj"
-      :toggle-text="largeText"
+      :toggle-text="largeText1"
+      :toggle-font-size="18"
     />
     {{ toggleValue1 }}
-    <br>
-    <br>
     <toggle
       v-model="toggleValue2"
+      :toggle-text="largeText2"
+      :toggle-font-size="13"
     />
     {{ toggleValue2 }}
-    <br>
-    <br>
     <toggle
       v-model="toggleValue3"
       :toggle-obj="smallObj"
     />
     {{ toggleValue3 }}
-    <br>
-    <br>
   </div>
 </template>
 
@@ -41,10 +38,13 @@
           width: 80,
           height: 34,
         },
-        largeText: {
+        largeText1: {
+          onText: 'ON',
+          offText: '',
+        },
+        largeText2: {
           onText: 'ON',
           offText: 'OFF',
-          fontSize: 17,
         },
         smallObj: {
           width: 30,

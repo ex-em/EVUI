@@ -4,6 +4,7 @@
       v-model="toggleValue1"
       :toggle-type="'tab'"
       :toggle-text="largeText1"
+      :toggle-font-size="13"
     />
     {{ toggleValue1 }}
     <br>
@@ -59,7 +60,6 @@
         largeText1: {
           onText: 'ON_TEXT',
           offText: 'OFF',
-          fontSize: 11,
         },
         largeText3: {
           onText: 'ON_TEXT',

@@ -4,14 +4,10 @@
       v-model="toggleFlag"
     />
     {{ toggleFlag }}
-    <br>
-    <br>
     <toggle
       v-model="toggleFlag2"
     />
     {{ toggleFlag2 }}
-    <br>
-    <br>
   </div>
 </template>
 
@@ -38,3 +34,6 @@
     },
   };
 </script>
+
+<style>
+</style>

@@ -1,74 +1,77 @@
 <template>
   <div
-    :style="computedToggleWrapStyle"
-    :class="[toggleTypeClass, {active : dataToggleOn}]"
+    ref="toggleRef"
+    :class="[setToggleTypeClass(), {active : dataToggleOn}]"
     @click="changeToggle"
   >
     <div
       v-if="toggleType === 'slide'"
-      v-show="dataToggleText.offText"
+      v-show="toggleText.offText"
       ref="offTextRef"
       :style="{
-        fontSize: dataToggleText.fontSize + 'px',
-        marginRight: dataToggleObj.height/5 + 'px',
+        fontSize: toggleFontSize + 'px',
+        marginRight: toggleObj.height/5 + 'px',
       }"
-      :class="{ active : dataToggleOn }"
       class="evui-toggle-offText-slide"
     >
-      {{ dataToggleText.offText }}
+      {{ toggleText.offText }}
     </div>
     <div
       v-if="toggleType === 'slide'"
-      v-show="dataToggleText.onText"
+      v-show="toggleText.onText"
       ref="onTextRef"
       :style="{
-        fontSize: dataToggleText.fontSize + 'px',
-        marginLeft: dataToggleObj.height/5 + 'px',
+        fontSize: toggleFontSize + 'px',
+        marginLeft: toggleObj.height/5 + 'px',
       }"
-      :class="{ active : dataToggleOn }"
       class="evui-toggle-onText-slide"
     >
-      {{ dataToggleText.onText }}
+      {{ toggleText.onText }}
     </div>
     <div
       v-if="toggleType === 'slide'"
-      :style="computedToggleButtonStyle"
-      :class="{ active : dataToggleOn }"
+      :style="setToggleButtonStyle()"
       class="evui-toggle-switch"
     />
     <div
       v-if="toggleType === 'tab'"
       ref="offTextRef"
       :style="{
-        fontSize: dataToggleText.fontSize + 'px',
+        fontSize: toggleFontSize + 'px',
       }"
       class="evui-toggle-offText-tab"
     >
-      {{ dataToggleText.onText }}
+      {{ toggleText.onText }}
     </div>
     <div
       v-if="toggleType === 'tab'"
       ref="onTextRef"
       :style="{
-        fontSize: dataToggleText.fontSize + 'px',
+        fontSize: toggleFontSize + 'px',
       }"
       class="evui-toggle-onText-tab"
     >
-      {{ dataToggleText.offText }}
+      {{ toggleText.offText }}
     </div>
     <div
       v-if="toggleType === 'button'"
       ref="onTextRef"
+      :style="{
+        fontSize: toggleFontSize + 'px',
+      }"
       class="evui-toggle-onText-button"
     >
-      {{ dataToggleText.onText }}
+      {{ toggleText.onText }}
     </div>
     <div
       v-if="toggleType === 'button'"
       ref="offTextRef"
+      :style="{
+        fontSize: toggleFontSize + 'px',
+      }"
       class="evui-toggle-offText-button"
     >
-      {{ dataToggleText.offText }}
+      {{ toggleText.offText }}
     </div>
   </div>
 </template>
@@ -99,130 +102,90 @@
           };
         },
       },
-      toggleSize: {
-        type: String,
-        default: 'normal',
-      },
       toggleText: {
         type: Object,
         default() {
           return {
             onText: '',
             offText: '',
-            fontSize: 11,
           };
         },
+      },
+      toggleFontSize: {
+        type: Number,
+        default: 11,
       },
     },
     data() {
       return {
-        toggleTypeClass: this.setToggleTypeClass(),
         dataToggleOn: this.value,
-        dataToggleType: this.toggleType,
-        dataToggleShape: this.toggleShape,
-        dataToggleSize: this.toggleSize,
-        dataToggleObj: this.toggleObj,
-        toggleWrapStyle: {},
-        dataToggleText: this.toggleText,
-        maxTextWidth: '',
+        maxWidth: 0,
       };
     },
     computed: {
-      computedToggleWrapStyle() {
-        let toggleWrapStyle = {};
-        if (this.maxTextWidth !== '') {
-          let maxWidth = 0;
-          if (this.maxTextWidth + (this.toggleObj.height * 1.5) < this.toggleObj.width) {
-            maxWidth = this.toggleObj.width;
-          } else {
-            maxWidth = this.maxTextWidth + (this.toggleObj.height * 1.5);
-          }
-          if (this.dataToggleType === 'tab') {
-            toggleWrapStyle = {
-              width: `${maxWidth}px`,
-              height: `${this.toggleObj.height}px`,
-              lineHeight: `${this.toggleObj.height}px`,
-              borderRadius: '4px',
-            };
-          } else if (this.dataToggleType === 'slide') {
-            if (this.dataToggleShape === 'square') {
-              toggleWrapStyle = {
-                width: `${maxWidth}px`,
-                height: `${this.toggleObj.height}px`,
-                lineHeight: `${this.toggleObj.height}px`,
-                borderRadius: '3px',
-              };
-            } else {
-              toggleWrapStyle = {
-                width: `${maxWidth}px`,
-                height: `${this.toggleObj.height}px`,
-                lineHeight: `${this.toggleObj.height}px`,
-                borderRadius: `${this.toggleObj.height}px`,
-              };
-            }
-          } else if (this.dataToggleType === 'button') {
-            toggleWrapStyle = {
-              width: `${maxWidth}px`,
-              height: `${this.toggleObj.height}px`,
-              lineHeight: `${this.toggleObj.height}px`,
-              borderRadius: '4px',
-            };
-          }
-        }
-        return toggleWrapStyle;
-      },
-      computedToggleButtonStyle() {
-        let toggleButtonStyle = {};
-        let maxWidth = 0;
-        if (this.maxTextWidth + (this.toggleObj.height * 1.5) < this.toggleObj.width) {
-          maxWidth = this.toggleObj.width;
-        } else {
-          maxWidth = this.maxTextWidth + (this.toggleObj.height * 1.5);
-        }
-        if (this.dataToggleType === 'slide') {
-          if (this.dataToggleShape === 'square') {
-            toggleButtonStyle = {
-              width: `${this.dataToggleObj.height - 4}px`,
-              height: `${this.dataToggleObj.height - 4}px`,
-              left: this.dataToggleOn ? `${(maxWidth - this.dataToggleObj.height) + 1}px` : '1px',
-            };
-          } else {
-            toggleButtonStyle = {
-              width: `${this.dataToggleObj.height - 4}px`,
-              height: `${this.dataToggleObj.height - 4}px`,
-              left: this.dataToggleOn ? `${(maxWidth - this.dataToggleObj.height) + 1}px` : '1px',
-              borderRadius: '50%',
-            };
-          }
-        }
-        return toggleButtonStyle;
-      },
     },
     mounted() {
-      if (this.$refs.offTextRef && this.$refs.onTextRef
-        && this.$refs.offTextRef.scrollWidth && this.$refs.onTextRef.scrollWidth) {
-        if (this.dataToggleType === 'slide') {
+      if (this.toggleText.onText || this.toggleText.offText) {
+        let maxTextWidth = 0;
+        if (this.toggleType === 'slide' || this.toggleType === 'button') {
           if (this.$refs.offTextRef.scrollWidth < this.$refs.onTextRef.scrollWidth) {
-            this.maxTextWidth = this.$refs.onTextRef.scrollWidth;
+            maxTextWidth = this.$refs.onTextRef.scrollWidth;
           } else {
-            this.maxTextWidth = this.$refs.offTextRef.scrollWidth;
+            maxTextWidth = this.$refs.offTextRef.scrollWidth;
           }
-        } else if (this.dataToggleType === 'tab') {
+        } else if (this.toggleType === 'tab') {
           if (this.$refs.offTextRef.scrollWidth < this.$refs.onTextRef.scrollWidth) {
-            this.maxTextWidth = this.$refs.onTextRef.scrollWidth * 2;
+            maxTextWidth = this.$refs.onTextRef.scrollWidth * 2;
           } else {
-            this.maxTextWidth = this.$refs.offTextRef.scrollWidth * 2;
-          }
-        } else if (this.dataToggleType === 'button') {
-          if (this.$refs.offTextRef.scrollWidth < this.$refs.onTextRef.scrollWidth) {
-            this.maxTextWidth = this.$refs.onTextRef.scrollWidth;
-          } else {
-            this.maxTextWidth = this.$refs.offTextRef.scrollWidth;
+            maxTextWidth = this.$refs.offTextRef.scrollWidth * 2;
           }
         }
+        if (maxTextWidth + (this.toggleObj.height * 1.5) < this.toggleObj.width) {
+          this.maxWidth = this.toggleObj.width;
+        } else {
+          this.maxWidth = maxTextWidth + (this.toggleObj.height * 1.5);
+        }
       } else {
-        this.maxTextWidth = 0;
-      }
+        this.maxWidth = this.toggleObj.width;
+      } // 최대 너비 구하기
+
+      let toggleWrapStyle = {};
+      if (this.toggleType === 'tab') {
+        toggleWrapStyle = {
+          width: `${this.maxWidth}px`,
+          height: `${this.toggleObj.height}px`,
+          lineHeight: `${this.toggleObj.height}px`,
+          borderRadius: '4px',
+        };
+      } else if (this.toggleType === 'slide') {
+        if (this.toggleShape === 'square') {
+          toggleWrapStyle = {
+            width: `${this.maxWidth}px`,
+            height: `${this.toggleObj.height}px`,
+            lineHeight: `${this.toggleObj.height}px`,
+            borderRadius: '3px',
+          };
+        } else if (this.toggleShape === 'circle') {
+          toggleWrapStyle = {
+            width: `${this.maxWidth}px`,
+            height: `${this.toggleObj.height}px`,
+            lineHeight: `${this.toggleObj.height}px`,
+            borderRadius: `${this.toggleObj.height}px`,
+          };
+        }
+      } else if (this.toggleType === 'button') {
+        toggleWrapStyle = {
+          width: `${this.maxWidth}px`,
+          height: `${this.toggleObj.height}px`,
+          lineHeight: `${this.toggleObj.height}px`,
+          borderRadius: '4px',
+        };
+      } // type별로 style setting
+
+      for (let ix = 0, ixLen = Object.keys(toggleWrapStyle).length; ix < ixLen; ix++) {
+        this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
+          = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
+      } // style 속성 부여
     },
     methods: {
       changeToggle() {
@@ -239,6 +202,26 @@
           cls = 'evui-toggle-button';
         }
         return cls;
+      },
+      setToggleButtonStyle() {
+        let toggleButtonStyle = {};
+        if (this.toggleType === 'slide') {
+          if (this.toggleShape === 'square') {
+            toggleButtonStyle = {
+              width: `${this.toggleObj.height - 4}px`,
+              height: `${this.toggleObj.height - 4}px`,
+              left: this.dataToggleOn ? `${(this.maxWidth - this.toggleObj.height) + 1}px` : '1px',
+            };
+          } else {
+            toggleButtonStyle = {
+              width: `${this.toggleObj.height - 4}px`,
+              height: `${this.toggleObj.height - 4}px`,
+              left: this.dataToggleOn ? `${(this.maxWidth - this.toggleObj.height) + 1}px` : '1px',
+              borderRadius: '50%',
+            };
+          }
+        }
+        return toggleButtonStyle;
       },
     },
   };
@@ -265,6 +248,8 @@
     display: inline-block;
     position: relative;
     border: 1px solid #2d8cf0;
+    user-select: none;
+    cursor: pointer;
   }
   .evui-toggle-button {
     display: inline-block;
@@ -272,6 +257,8 @@
     border: 1px solid #2d8cf0;
     background-color: #2d8cf0;
     color: #ffffff;
+    user-select: none;
+    cursor: pointer;
   }
   .evui-toggle-switch {
     position: absolute;
@@ -281,7 +268,7 @@
     cursor: pointer;
     content: '';
   }
-  .evui-toggle-switch.active {
+  .active > .evui-toggle-switch {
     position: absolute;
     top: 1px;
     background-color: #ffffff;
@@ -291,18 +278,18 @@
   }
   .evui-toggle-offText-slide {
     display: inline-block;
-    height: 0px;
+    height: 0;
     visibility: visible;
     float: right;
   }
-  .evui-toggle-offText-slide.active {
+  .active > .evui-toggle-offText-slide {
     visibility: hidden;
   }
   .evui-toggle-onText-slide {
-    height: 0px;
+    height: 0;
     visibility: hidden;
   }
-  .evui-toggle-onText-slide.active {
+  .active > .evui-toggle-onText-slide {
     display: inline-block;
     visibility: visible;
     float: left;
@@ -322,8 +309,8 @@
     transition: all .2s ease-in-out;
   }
   .active > .evui-toggle-offText-tab {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     background-color: #2d8cf0;
     color: #ffffff;
   }
@@ -353,11 +340,13 @@
     visibility: hidden;
   }
   .active > .evui-toggle-onText-button {
+    text-align: center;
     visibility: visible;
   }
   .evui-toggle-offText-button {
     display: block;
     height: 0px;
+    text-align: center;
     visibility: visible;
   }
   .active > .evui-toggle-offText-button {
