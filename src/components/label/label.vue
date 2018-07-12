@@ -52,7 +52,7 @@
       },
       fit: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       mandatory: {
         type: Boolean,
@@ -90,7 +90,6 @@
       styleObject: function styleObject() {
         return {
           width: parsedStyle(this.offsetWidth),
-          height: parsedStyle(this.offsetHeight),
         };
       },
       wrappedOuterClass() {
@@ -142,7 +141,6 @@
         medium: 18,
         small: 13,
       };
-
       if (this.fit === true && this.$refs.label) {
         this.offsetWidth = parsedStyle(this.$refs.label.offsetWidth + asterSize[this.size]);
       }
@@ -165,27 +163,32 @@
     padding: 0 2px 0 2px;
   }
   .evui-label-inner {
-    width: 100%;
-    height: 100%;
+    height: 30px;
     text-align: center;
+    line-height: 1.8;
+    border-radius: 4px;
   }
   .evui-label-outer {
+    display: inline-block;
     margin: 0;
-    padding: 2px;
+    padding: 0 2px 0 2px;
     vertical-align: middle;
     line-height: 1.5;
     font-weight: bold;
+    font-size: 15px;
     user-select: none;
   }
   .evui-label-error {
     color: red;
   }
   .evui-label-success {
-    background-color: green;
+    background-color: #34C032;
     color: #fff;
+    transition:all .2s ease-in-out;
   }
   .evui-label-fail {
-    background-color: red;
+    background-color: #F53243;
     color: #fff;
+    transition:all .2s ease-in-out;
   }
 </style>

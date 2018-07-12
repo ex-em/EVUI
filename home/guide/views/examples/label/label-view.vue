@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="article-title">
-      <h2> Input Number </h2>
+      <h2> Label </h2>
     </div>
     <br>
     <div

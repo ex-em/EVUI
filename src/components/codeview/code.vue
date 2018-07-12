@@ -92,7 +92,9 @@
       },
     },
     mounted() {
-      this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+      this.$nextTick(() => {
+        this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+      });
     },
     created() {
       this.$http.get(this.codeUrl)
