@@ -25,12 +25,14 @@
 <script>
   import codeView from '@/components/codeview/code';
   import timepickerDefault from './timepicker-default';
+  import timepickerDisable from './timepicker-disable';
   import timepickerInit from './timepicker-init';
 
   export default {
     components: {
       codeView,
       timepickerDefault,
+      timepickerDisable,
       timepickerInit,
     },
     data() {
@@ -40,6 +42,11 @@
             url: './guide/views/examples/timepicker/timepicker-default.vue',
             component: timepickerDefault,
             title: 'Default',
+          },
+          {
+            url: './guide/views/examples/timepicker/timepicker-disable.vue',
+            component: timepickerDisable,
+            title: 'Disable',
           },
           {
             url: './guide/views/examples/timepicker/timepicker-init.vue',

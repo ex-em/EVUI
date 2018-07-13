@@ -839,7 +839,6 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 /*base class*/
 .evui-input-text {
   display: inline-block;
-  position: relative;
   overflow: hidden;
   vertical-align: middle;
   margin: 0;
@@ -859,7 +858,6 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 /*border color when mouse hover*/
 .evui-input-text:hover {
   border-color : #2d8cf0;
-  opacity: 1;
 }
 
 .evui-input-text-input {
@@ -876,7 +874,6 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 /*disable base class*/
 .evui-input-text-disabled .evui-input-text-input {
   background-color: #f3f3f3;
-  opacity: 1;
   cursor: not-allowed;
   color: #ccc;
 }
@@ -900,7 +897,6 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 }
 .evui-input-text-input[disabled] {
   background-color: #f3f3f3;
-  opacity: 1;
   cursor: not-allowed;
   color: #ccc;
 }

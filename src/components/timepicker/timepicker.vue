@@ -102,6 +102,10 @@
         type: Array,
         default: null,
       },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
@@ -115,11 +119,10 @@
         suffixFadeFlag: false,
         timePickerFadeFlag: false,
         suffixShowFlag: false,
-        disabled: true,
       };
     },
     computed: {
-      wrapClasses: function wrapClasses() {
+      wrapClasses() {
         return [
           `${prefixCls}`,
           {
@@ -127,7 +130,7 @@
           },
         ];
       },
-      inputClasses: function inputClasses() {
+      inputClasses() {
         return `${prefixCls}-input`;
       },
       timeText: {
@@ -220,11 +223,13 @@
     },
     methods: {
       showTimePicker() {
-        this.$refs.timePickerPanel.style.display = 'block';
-        for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
-          this.$refs.timePickerSpinner[ix].liClick(true);
+        if (!this.disabled) {
+          this.$refs.timePickerPanel.style.display = 'block';
+          for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
+            this.$refs.timePickerSpinner[ix].liClick(true);
+          }
+          this.timePickerFadeFlag = true;
         }
-        this.timePickerFadeFlag = true;
       },
       hideTimePicker() {
         this.$refs.timePickerPanel.style.display = 'none';
