@@ -1,15 +1,15 @@
 <template>
-  <div
-    ref="datepickerRef"
+  <calendar
+    :data-obj="obj"
   />
 </template>
 
 <script>
-  import Calendar from '@/components/datepicker/calendar';
+  import calendar from '@/components/datepicker/calendar';
 
   export default {
     components: {
-      Calendar,
+      calendar,
     },
     directives: {
       // 해당 element 외의 클릭 시
@@ -40,7 +40,11 @@
     },
     data() {
       return {
-        calendar: null,
+        obj: {
+          colors: {
+            background: '#f00',
+          },
+        },
       };
     },
     computed: {
@@ -48,7 +52,6 @@
     created() {
     },
     mounted() {
-      this.calendar = new Calendar(this.$refs.datepickerRef, null);
     },
     beforeDestroy() {
     },
