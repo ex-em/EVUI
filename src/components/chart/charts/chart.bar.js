@@ -4,7 +4,7 @@ export default class BarChart extends BaseChart {
   constructor(target, data, options) {
     // this.setConvertedData(data);
     super(target, data, options);
-    this.seriesList = this.dataSet.getSeriesList();
+    this.seriesList = this.dataStore.getSeriesList();
   }
 
   drawChart() {
@@ -28,6 +28,7 @@ export default class BarChart extends BaseChart {
     const series = this.seriesList[seriesIndex];
     const category = this.data.category || [];
     const ctx = this.bufferCtx;
+    const isStack = this.options.stack;
     // series에 특정한 color 값이 없다면, options의 colors 참조
 
     const color = series.color || this.options.colors[seriesIndex];
@@ -44,7 +45,7 @@ export default class BarChart extends BaseChart {
     // column chart일 때를 의미.
     // series가 많을수록 막대 하나의 넓이가 줄어든다.
     // stack의 경우 막대 넓이가 줄어들 필요가 없음.
-    if (series.stack) {
+    if (isStack) {
       barArea = (categoryArea - (categoryPadding * 2));
     } else {
       barArea = (categoryArea - (categoryPadding * 2)) / this.seriesList.length;
@@ -56,7 +57,7 @@ export default class BarChart extends BaseChart {
     // barArea내에서 barWidth로 빠진 부분을 계산.
     const barPadding = isHorizontal ? (barArea - barHeight) / 2 : (barArea - barWidth) / 2;
     // series index에 따라 시작 X값 보정을 위한 변수.
-    const barSeriesX = series.stack ? 1 : seriesIndex + 1;
+    const barSeriesX = isStack ? 1 : seriesIndex + 1;
 
     // axis start point
     let startX;

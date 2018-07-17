@@ -6,7 +6,7 @@
     />
     <chart
       :data="stackData"
-      :options="chartOptions"
+      :options="stackOptions"
     />
     <chart
       :data="stackData"
@@ -29,10 +29,12 @@
             {
               id: 'simple1',
               name: 'simple1',
+              data: [3, 8, 10, 5, 3],
             },
             {
               id: 'simple2',
               name: 'simple2',
+              data: [5, 3, 6, 8, 9],
             },
           ],
         },
@@ -42,18 +44,18 @@
             {
               id: 'simple1',
               name: 'simple1',
-              stack: true,
+              data: [3, 8, 10, 5, 3],
             },
             {
               id: 'simple2',
               name: 'simple2',
-              stack: true,
+              data: [5, 3, 6, 8, 9],
             },
           ],
         },
         chartOptions: {
           type: 'bar',
-          width: '800px',
+          width: '550px',
           height: '230px',
           tickness: 0.8,
           xAxes: [{
@@ -71,10 +73,28 @@
             position: 'left',
           }],
         },
+        stackOptions: {
+          type: 'bar',
+          width: '550px',
+          height: '230px',
+          tickness: 0.8,
+          fill: true,
+          stack: true,
+          xAxes: [{
+            scaleType: 'step', // auto, fix, step
+            labelType: 'category', // time, linear, category
+          }],
+          yAxes: [{
+            scaleType: 'auto', // auto, fix, step
+            labelType: 'linear', // time, linear, category
+            position: 'left',
+          }],
+        },
         horizontalOptions: {
           type: 'bar',
-          width: '800px',
+          width: '550px',
           height: '230px',
+          stack: true,
           tickness: 0.8,
           horizontal: true,
           xAxes: [{

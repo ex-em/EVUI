@@ -3,7 +3,7 @@ import BaseChart from './chart.base';
 export default class ScatterChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
-    this.seriesList = this.dataSet.getSeriesList();
+    this.seriesList = this.dataStore.getSeriesList();
   }
 
   drawChart() {
