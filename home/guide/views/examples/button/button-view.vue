@@ -23,21 +23,21 @@
 
 <script>
   import codeView from '@/components/codeview/code';
-  import buttonCustom from './button-custom';
-  import buttonPrimary from './button-primary';
-  import buttonCircle from './button-circle';
+  import buttonType from './button-type';
+  import buttonSize from './button-size';
+  import buttonShape from './button-shape';
+  import buttonHighPriority from './button-high-priority';
   import buttonDisabled from './button-disabled';
-  import buttonText from './button-text';
   import buttonLoading from './button-loading';
 
   export default {
     components: {
       codeView,
-      buttonCustom,
-      buttonPrimary,
-      buttonCircle,
+      buttonType,
+      buttonSize,
+      buttonShape,
+      buttonHighPriority,
       buttonDisabled,
-      buttonText,
       buttonLoading,
     },
     data() {
@@ -45,32 +45,32 @@
         title: 'Button',
         buttonComponentList: [
           {
-            title: 'Custom Button',
-            component: buttonCustom,
-            url: './guide/views/examples/button/button-custom.vue',
+            title: 'Type',
+            component: buttonType,
+            url: './guide/views/examples/button/button-type.vue',
           },
           {
-            title: 'Primary Button',
-            component: buttonPrimary,
-            url: './guide/views/examples/button/button-primary.vue',
+            title: 'Size',
+            component: buttonSize,
+            url: './guide/views/examples/button/button-size.vue',
           },
           {
-            title: 'Circle Button',
-            component: buttonCircle,
-            url: './guide/views/examples/button/button-circle.vue',
+            title: 'Shape',
+            component: buttonShape,
+            url: './guide/views/examples/button/button-shape.vue',
           },
           {
-            title: 'Disabled Button',
+            title: 'High Priority',
+            component: buttonHighPriority,
+            url: './guide/views/examples/button/button-high-priority.vue',
+          },
+          {
+            title: 'Disabled',
             component: buttonDisabled,
             url: './guide/views/examples/button/button-disabled.vue',
           },
           {
-            title: 'Text Button',
-            component: buttonText,
-            url: './guide/views/examples/button/button-text.vue',
-          },
-          {
-            title: 'Loading Button',
+            title: 'Loading',
             component: buttonLoading,
             url: './guide/views/examples/button/button-loading.vue',
           },
