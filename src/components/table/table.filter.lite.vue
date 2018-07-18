@@ -99,16 +99,11 @@
     },
     watch: {
       field() {
-        if (this.filterCondition.length === 0) {
-          for (let ix = 0, ixLen = this.resultFilteredData.length; ix < ixLen; ix++) {
-            this.resultFilteredData[ix].text = '';
-            this.resultFilteredData[ix].condition = 'equal';
-          }
-        } else {
-          for (let ix = 0, ixLen = this.resultFilteredData.length; ix < ixLen; ix++) {
-            this.resultFilteredData[ix].text = '';
-            this.resultFilteredData[ix].condition = 'equal';
-          }
+        for (let ix = 0, ixLen = this.resultFilteredData.length; ix < ixLen; ix++) {
+          this.resultFilteredData[ix].text = '';
+          this.resultFilteredData[ix].condition = 'equal';
+        }
+        if (this.filterCondition.length > 0) {
           for (let jx = 0, jxLen = this.filterCondition.length; jx < jxLen; jx++) {
             const index = this.filterCondition[jx].index;
             this.resultFilteredData[index].text = this.filterCondition[jx].text;
