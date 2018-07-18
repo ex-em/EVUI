@@ -70,7 +70,7 @@
       }
 
       this.chart.drawChart();
-      this.dataSet = this.chart.dataSet;
+      this.dataStore = this.chart.dataStore;
     },
     methods: {
       getChartSize(size) {
@@ -84,17 +84,18 @@
         return sizeValue;
       },
       addValue(seriesIndex, value, dataIndex) {
-        const seriesList = this.dataSet.seriesList;
-        const baseIndex = this.dataSet.findBaseSeries(seriesList[seriesIndex].id);
+        const seriesList = this.dataStore.seriesList;
+        const baseIndex = this.dataStore.findBaseSeries(seriesList[seriesIndex].id);
+        const isStack = this.$props.options.stack;
 
-        if (seriesList[seriesIndex].stack && baseIndex !== null) {
+        if (isStack && baseIndex !== null) {
           if (this.$props.data.category) {
-            this.dataSet.addCategoryStackValue(seriesIndex, value, baseIndex, dataIndex);
+            this.dataStore.addCategoryStackValue(seriesIndex, value, baseIndex, dataIndex);
           } else {
-            this.dataSet.addStackValue(seriesIndex, value, baseIndex);
+            this.dataStore.addStackValue(seriesIndex, value, baseIndex);
           }
         } else {
-          this.dataSet.addValue(seriesIndex, value, dataIndex);
+          this.dataStore.addValue(seriesIndex, value, dataIndex);
         }
       },
     },
@@ -140,7 +141,7 @@
   .evui-chart-legend-container {
     position: relative;
     overflow: hidden;
-    cursor: pointer;
+    /*cursor: pointer;*/
     margin: 2px 10px 2px 0;
   }
 
@@ -175,9 +176,9 @@
     color: #bbb !important;
   }
 
-  .evui-chart-legend-name:hover {
-    font-weight: bold;
-  }
+  /*.evui-chart-legend-name:hover {*/
+    /*font-weight: bold;*/
+  /*}*/
 
   .evui-chart-legend-value {
     float: right;

@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { CHART_AXIS_TYPE, CHART_DATA_STRUCT } from '../core/core.constant';
-import DataStore from '../core/core.data';
+import { CHART_AXIS_TYPE } from '../core/core.constant';
+import DataStore from '../core/data/data';
+import StackDataStore from '../core/data/data.stack';
 import Util from '../core/core.util';
 import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
@@ -10,13 +11,20 @@ import Legend from '../core/core.legend';
 
 class BaseChart {
   constructor(target, data, options) {
-    // default chart info
     const defaultOptions = {
-      colors: ['#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
-        '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d', '#ff7d40',
-        '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd', '#009bc7', '#cacaff',
-        '#ffc125', '#df6264',
+      colors: [
+        '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
+        '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
+        '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
+        '#009bc7', '#cacaff', '#ffc125', '#df6264',
       ],
+      padding: {
+        top: 5,
+        right: 5,
+        bottom: 5,
+        left: 5,
+      },
+      border: 2,
       title: {
         text: '',
         font: '15px Droid Sans',
@@ -24,21 +32,16 @@ class BaseChart {
         height: 40,
         show: false,
       },
-      padding: {
-        top: 5,
-        right: 5,
-        bottom: 5,
-        left: 5,
-      },
-      horizontal: false,
-      border: 2,
-      doughnutHoleSize: 0,
-      reverse: false,
-      bufferSize: 10,
       legend: {
         show: true,
         position: 'right',
       },
+      fill: false,
+      stack: false,
+      horizontal: false,
+      doughnutHoleSize: 0,
+      reverse: false,
+      bufferSize: 10,
     };
 
     this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
@@ -52,7 +55,6 @@ class BaseChart {
 
     const type = this.options.type.toLowerCase();
     const axisType = CHART_AXIS_TYPE[type];
-    const structType = CHART_DATA_STRUCT[type];
 
     // set chart element layout
     this.wrapperDOM = document.createElement('div');
@@ -70,22 +72,13 @@ class BaseChart {
     this.createCanvas();
 
     // create chart DataStore & Series Data.
-    this.dataSet = new DataStore({
-      chartData: this.data,
-      horizontal: this.options.horizontal,
-      seriesList: this.seriesList,
-      seriesGroupList: this.seriesGroupList,
-      structType,
-      axisType,
-      bufferSize: this.options.bufferSize,
-    });
-
-    this.dataSet.init();
+    this.createDataStore();
+    this.dataStore.init();
 
     // create chart component
     // 1. axis
     if (axisType === 'axis') {
-      this.createAxesOptions();
+      this.setAxesOptions();
     }
 
     // 2. title
@@ -94,15 +87,7 @@ class BaseChart {
     }
 
     // 3. legend
-    this.legend = new Legend({
-      wrapperDOM: this.wrapperDOM,
-      chartDOM: this.chartDOM,
-      chartOptions: this.options,
-      seriesList: this.seriesList,
-      resize: this.resize.bind(this),
-      redraw: this.redraw.bind(this),
-    });
-
+    this.createLegend();
     this.legend.init();
 
     // calculate Chart Size
@@ -111,7 +96,56 @@ class BaseChart {
     window.addEventListener('resize', this.resize.bind(this));
   }
 
-  createAxesOptions() {
+  createCanvas() {
+    this.displayCanvas = document.createElement('canvas');
+    this.displayCanvas.setAttribute('style', 'display: block;');
+    this.displayCtx = this.displayCanvas.getContext('2d');
+    this.bufferCanvas = document.createElement('canvas');
+    this.bufferCanvas.setAttribute('style', 'display: block;');
+    this.bufferCtx = this.bufferCanvas.getContext('2d');
+
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const backingStoreRatio =
+      this.displayCtx.webkitBackingStorePixelRatio ||
+      this.displayCtx.mozBackingStorePixelRatio ||
+      this.displayCtx.msBackingStorePixelRatio ||
+      this.displayCtx.oBackingStorePixelRatio ||
+      this.displayCtx.backingStorePixelRatio || 1;
+
+    this.pixelRatio = devicePixelRatio / backingStoreRatio;
+    this.oldPixelRatio = this.pixelRatio;
+
+    this.chartDOM.appendChild(this.displayCanvas);
+  }
+
+  createDataStore() {
+    if (this.options.stack) {
+      this.dataStore = new StackDataStore({
+        chartData: this.data,
+        chartOptions: this.options,
+        seriesList: this.seriesList,
+      });
+    } else {
+      this.dataStore = new DataStore({
+        chartData: this.data,
+        chartOptions: this.options,
+        seriesList: this.seriesList,
+      });
+    }
+  }
+
+  createLegend() {
+    this.legend = new Legend({
+      wrapperDOM: this.wrapperDOM,
+      chartDOM: this.chartDOM,
+      chartOptions: this.options,
+      seriesList: this.seriesList,
+      resize: this.resize.bind(this),
+      redraw: this.redraw.bind(this),
+    });
+  }
+
+  setAxesOptions() {
     const paramXAxes = this.options.xAxes;
     const paramYAxes = this.options.yAxes;
 
@@ -125,7 +159,7 @@ class BaseChart {
       minIndex: null,
       maxIndex: null,
       autoScaleRatio: null,
-      showGrid: true,
+      showGrid: false,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
       gridLineWidth: 1,
@@ -180,28 +214,6 @@ class BaseChart {
     } else {
       this.options.yAxes = [defaultYAxis];
     }
-  }
-
-  createCanvas() {
-    this.displayCanvas = document.createElement('canvas');
-    this.displayCanvas.setAttribute('style', 'display: block;');
-    this.displayCtx = this.displayCanvas.getContext('2d');
-    this.bufferCanvas = document.createElement('canvas');
-    this.bufferCanvas.setAttribute('style', 'display: block;');
-    this.bufferCtx = this.bufferCanvas.getContext('2d');
-
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const backingStoreRatio =
-      this.displayCtx.webkitBackingStorePixelRatio ||
-      this.displayCtx.mozBackingStorePixelRatio ||
-      this.displayCtx.msBackingStorePixelRatio ||
-      this.displayCtx.oBackingStorePixelRatio ||
-      this.displayCtx.backingStorePixelRatio || 1;
-
-    this.pixelRatio = devicePixelRatio / backingStoreRatio;
-    this.oldPixelRatio = this.pixelRatio;
-    // 완성 뒤 displayCanvas를 append하도록 변경 필요. (중요**)
-    this.chartDOM.appendChild(this.displayCanvas);
   }
 
   getChartRect() {
@@ -265,7 +277,7 @@ class BaseChart {
     // label offset의 buffer size 20px
     for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
       this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
-      labelText = this.dataSet.getLabelTextMaxInfo(ix).yText || '';
+      labelText = this.dataStore.getLabelTextMaxInfo(ix).yText || '';
       labelSize = this.bufferCtx.measureText(`${labelText}`).width || 0;
 
       if (yAxes[ix].labelType === 'time') {
@@ -289,7 +301,7 @@ class BaseChart {
 
     for (let ix = 0, ixLen = xAxes.length; ix < ixLen; ix++) {
       this.bufferCtx.font = Util.getLabelStyle(xAxes[ix]);
-      labelText = this.dataSet.getLabelTextMaxInfo(ix).xText || '';
+      labelText = this.dataStore.getLabelTextMaxInfo(ix).xText || '';
       if (xAxes[ix].labelType === 'time') {
         labelText = moment(labelText);
         if (xAxes[ix].tickFormat) {
@@ -371,7 +383,7 @@ class BaseChart {
         case 'fix':
           xAxisObj = new AxisFixedScale({
             type: 'x',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
@@ -383,7 +395,7 @@ class BaseChart {
         case 'step':
           xAxisObj = new AxisStepsScale({
             type: 'x',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
@@ -397,7 +409,7 @@ class BaseChart {
         default:
           xAxisObj = new AxisAutoScale({
             type: 'x',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
@@ -416,7 +428,7 @@ class BaseChart {
         case 'fix':
           yAxisObj = new AxisFixedScale({
             type: 'y',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
@@ -428,7 +440,7 @@ class BaseChart {
         case 'step':
           yAxisObj = new AxisStepsScale({
             type: 'y',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
@@ -442,7 +454,7 @@ class BaseChart {
         default:
           yAxisObj = new AxisAutoScale({
             type: 'y',
-            dataSet: this.dataSet,
+            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
@@ -683,7 +695,7 @@ class BaseChart {
       return;
     }
 
-    this.dataSet.updateData();
+    this.dataStore.updateData();
     this.chartRect = this.getChartRect();
     this.initScale();
 
