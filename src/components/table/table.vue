@@ -24,13 +24,13 @@
                 <tr>
                   <td
                     class="evui-table-columns-head"
-                    col="start"
+                    data-col="start"
                     style="border-right: 0px; width: 0px;"
                   />
                   <template v-for="(column, index) in originColumns">
                     <td
                       :key="index"
-                      :col="index"
+                      :data-col="index"
                       :style="{width: column.width}"
                       :ref="`${column.field}_col`"
                       class="evui-table-columns-head"
@@ -63,7 +63,7 @@
                   <td
                     :style="{width: `${endColWidth}px`}"
                     class="evui-table-columns-head evui-table-columns-head-last"
-                    col="end"
+                    data-col="end"
                   >
                     <div>&nbsp;</div>
                   </td>
@@ -82,17 +82,17 @@
             >
               <table>
                 <tbody>
-                  <tr line="0">
+                  <tr>
                     <td
                       class="evui-table-data evui-table-data-spacer"
-                      col="start"
+                      data-col="start"
                       style="height: 0px; width: 0px;"
                     />
 
                     <template v-for="(column, index) in originColumns">
                       <td
                         :key="index"
-                        :col="index"
+                        :data-col="index"
                         :style="{height: '0px', width: column.width}"
                         class="evui-table-data"
                       />
@@ -102,21 +102,19 @@
                   <template v-for="(row, rowIndex) in resultData">
                     <tr
                       :key="rowIndex"
-                      :line="(rowIndex+1)"
-                      :index="rowIndex"
                       :class="(rowIndex+1)%2 !== 0 ? 'evui-odd' : 'evui-even'"
                       :style="{height: `${rowHeight}px`}"
                     >
                       <td
                         class="evui-table-data-spacer"
-                        col="start"
+                        data-col="start"
                         style="border-right: 0"
                       />
 
                       <template v-for="(col, colIndex) in originColumns">
                         <td
                           :key="colIndex"
-                          :col="colIndex"
+                          :data-col="colIndex"
                           class="evui-table-data"
                           style=""
                         >
@@ -128,7 +126,7 @@
 
                       <td
                         class="evui-table-data-last"
-                        col="end"
+                        data-col="end"
                       />
                     </tr>
                   </template>
@@ -742,9 +740,8 @@
 
         // 컬럼 고스트 무브
         function moveAt(clientX, clientY) {
-          // debugger;
-          vm.$refs.headGhost.style.left = `${clientX - startOffsetX}px`;
-          vm.$refs.headGhost.style.top = `${clientY - startOffsetY}px`;
+          vm.$refs.headGhost.style.cssText =
+            `top: ${clientY - startOffsetY}px; left: ${clientX - startOffsetX}px`;
         }
 
         // 컬럼 배열 변경
@@ -777,11 +774,11 @@
           }
 
 
-          if (targetCol.getAttribute('col') === 'start' || targetCol.getAttribute('col') === 'end') {
+          if (targetCol.getAttribute('data-col') === 'start' || targetCol.getAttribute('data-col') === 'end') {
             return;
           }
 
-          colIndex = +targetCol.getAttribute('col');
+          colIndex = +targetCol.getAttribute('data-col');
 
           const targetColHalfWidth = targetCol.offsetWidth / 2;
           const targetColPoint = e.pageX - targetCol.getBoundingClientRect().x;
@@ -1097,7 +1094,7 @@
         const vm = this;
         const targetPos = event.target.getBoundingClientRect();
         const targetCol = event.target.closest('.evui-table-columns-head');
-        const colIndex = +targetCol.getAttribute('col');
+        const colIndex = +targetCol.getAttribute('data-col');
 
         function onClick(e) {
           e.stopPropagation();
@@ -1109,10 +1106,8 @@
           vm.menuClickFlag = false;
           document.removeEventListener('mousedown', onClick, true);
         }
-        this.$refs.evuiTableMenu.style.left = `${targetPos.x}px`;
-        this.$refs.evuiTableMenu.style.top = `${targetPos.y + 5}px`;
-        this.$refs.evuiTableMenu.style.display = 'block';
-
+        this.$refs.evuiTableMenu.style.cssText =
+          `left: ${targetPos.x}px; top: ${targetPos.y + 5}px; display: block;`;
         if (!this.menuClickFlag) {
           document.addEventListener('mousedown', onClick, true);
           this.menuClickFlag = true;
