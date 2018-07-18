@@ -3,7 +3,7 @@
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
-      class="evui-reset evui-grid"
+      class="evui-table-reset evui-table"
     >
       <div
         class="evui-grid-box"
@@ -11,19 +11,19 @@
       >
         <div
           ref="evuiGridBody"
-          class="evui-grid-body"
+          class="evui-table-body"
           style="top: 0px; bottom: 0px; left: 0px; right: 0px;"
         >
           <div
             ref="gridColumns"
-            class="evui-grid-columns"
+            class="evui-table-columns"
             style=""
           >
             <table>
               <tbody>
                 <tr>
                   <td
-                    class="evui-head"
+                    class="evui-table-columns-head"
                     col="start"
                     style="border-right: 0px; width: 0px;"
                   />
@@ -33,7 +33,7 @@
                       :col="index"
                       :style="{width: column.width}"
                       :ref="`${column.field}_col`"
-                      class="evui-head"
+                      class="evui-table-columns-head"
                       @mouseup="columnSort(column, $event)"
                       @mousedown.stop.prevent="columnMove(column, index, $event)"
                     >
@@ -42,10 +42,10 @@
                           height: '25px',
                           marginLeft: `${(parseFloat(column.width)-6)}px`
                         }"
-                        class="evui-resizer"
+                        class="evui-table-columns-resizer"
                         @mousedown.stop.prevent="columnResize(column, index, $event)"
                       />
-                      <div class="evui-col-header">
+                      <div class="evui-table-col-header">
                         <div
                           v-if="column.sortable"
                           :ref="`${column.field}_sort`"
@@ -62,7 +62,7 @@
                   </template>
                   <td
                     :style="{width: `${endColWidth}px`}"
-                    class="evui-head evui-head-last"
+                    class="evui-table-columns-head evui-table-columns-head-last"
                     col="end"
                   >
                     <div>&nbsp;</div>
@@ -73,7 +73,7 @@
           </div>
           <div
             ref="evuiGridRecords"
-            class="evui-grid-records"
+            class="evui-table-records"
             style="top: 25px; overflow-x: auto; overflow-y: auto;"
             @scroll="scrollColumns"
           >
@@ -84,7 +84,7 @@
                 <tbody>
                   <tr line="0">
                     <td
-                      class="evui-grid-data evui-grid-data-spacer"
+                      class="evui-table-data evui-table-data-spacer"
                       col="start"
                       style="height: 0px; width: 0px;"
                     />
@@ -94,7 +94,7 @@
                         :key="index"
                         :col="index"
                         :style="{height: '0px', width: column.width}"
-                        class="evui-grid-data"
+                        class="evui-table-data"
                       />
                     </template>
                   </tr>
@@ -108,7 +108,7 @@
                       :style="{height: `${rowHeight}px`}"
                     >
                       <td
-                        class="evui-grid-data-spacer"
+                        class="evui-table-data-spacer"
                         col="start"
                         style="border-right: 0"
                       />
@@ -117,7 +117,7 @@
                         <td
                           :key="colIndex"
                           :col="colIndex"
-                          class="evui-grid-data "
+                          class="evui-table-data"
                           style=""
                         >
                           <div style="max-height: 24px;">
@@ -127,7 +127,7 @@
                       </template>
 
                       <td
-                        class="evui-grid-data-last"
+                        class="evui-table-data-last"
                         col="end"
                       />
                     </tr>
@@ -138,7 +138,7 @@
                   >
                     <td
                       colspan="2000"
-                      class="evui-load-more"
+                      class="evui-table-load-more"
                     />
                   </tr>
                 </tbody>
@@ -148,12 +148,12 @@
         </div>
         <div
           v-if="pagination"
-          class="evui-grid-footer"
+          class="evui-table-footer"
           style="bottom: 0px; left: 0px; right: 0px;"
         >
           <div>
-            <div class="evui-footer-left"/>
-            <div class="evui-footer-right">
+            <div class="evui-table-footer-left"/>
+            <div class="evui-table-footer-right">
               <button @click="movePage('start')">
                 <i class="fas fa-angle-double-left"/>
               </button>
@@ -168,20 +168,20 @@
                 <i class="fas fa-angle-double-right"/>
               </button>
             </div>
-            <div class="evui-footer-center"/>
+            <div class="evui-table-footer-center"/>
           </div>
         </div>
       </div>
       <div
         ref="headGhost"
-        class="evui-head-ghost"
+        class="evui-table-head-ghost"
       />
       <div
         ref="marker"
-        class="col-intersection-marker"
+        class="evui-table-col-intersection-marker"
       >
-        <div class="top-marker"/>
-        <div class="bottom-marker"/>
+        <div class="evui-table-top-marker"/>
+        <div class="evui-table-bottom-marker"/>
       </div>
     </div>
     <div
@@ -208,7 +208,7 @@
 </template>
 
 <script>
-  import '@/components/table/table2.css';
+  // import '@/components/table/table2.css';
   // import TableFilter from '@/components/table/table.filter';
   import TableFilterLite from '@/components/table/table.filter.lite';
   import util from '@/common/utils.table';
@@ -770,7 +770,7 @@
             return;
           }
 
-          const targetCol = targetEl.closest('.evui-head');
+          const targetCol = targetEl.closest('.evui-table-columns-head');
 
           if (!targetCol) {
             return;
@@ -1005,7 +1005,6 @@
             this.endColWidth = this.gridBoxWidth - this.sizeColSum;
           }
         });
-        // this.$forceUpdate();
       },
       changeFilterValue(param) {
         const result = _.cloneDeep(param);
@@ -1097,7 +1096,7 @@
         event.preventDefault();
         const vm = this;
         const targetPos = event.target.getBoundingClientRect();
-        const targetCol = event.target.closest('.evui-head');
+        const targetCol = event.target.closest('.evui-table-columns-head');
         const colIndex = +targetCol.getAttribute('col');
 
         function onClick(e) {
@@ -1127,25 +1126,4 @@
     },
   };
 </script>
-<style scoped>
-   button {
-     user-select: none;
-   }
-  .evui-table-menu {
-    width: 220px;
-    border: 1px solid black;
-    position: absolute;
-    display: none;
-    /*top: 71px;*/
-    z-index: 20000;
-    /*left: 69px;*/
-    background: #f5f7f7;
-  }
-  .evui-table-menu-tab-header {
-    height: 25px;
-    border: solid 1px black;
-  }
-  .evui-table-menu-tab-body {
-    max-height: 300px;
-  }
-</style>
+<style scoped src="@/components/table/table2.css"/>
