@@ -40,10 +40,11 @@ module.exports = merge(webpackBaseConfig, {
     historyApiFallback: true,
     noInfo: true,
     contentBase: './dist',
-    open: true,
+    // open: true,
     hot: true,
     inline: true,
-    //host: HOST || 'localhost',
+    host: '0.0.0.0',
+    disableHostCheck: true,
     port: '8888'
   },
   plugins: [
