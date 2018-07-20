@@ -85,7 +85,6 @@ class Calendar {
           linewidth: 1,
           color: '#000000',
         },
-        text: '',
         align: 'left',
         padding: {
           top: 0,
@@ -286,6 +285,17 @@ class Calendar {
   setMouseEvent() {
     this.overCanvas.addEventListener('mousemove', function(e) {
       e.preventDefault();
+      const leftAllDayCoordinate = this.coordinate.calendarArea.leftAllDay;
+      for (let ix = 0, ixLen = leftAllDayCoordinate.length; ix < ixLen; ix++) {
+        if (e.offsetX > leftAllDayCoordinate[ix].startX
+          && e.offsetX < (+leftAllDayCoordinate[ix].startX + +leftAllDayCoordinate[ix].width)
+          && e.offsetY > leftAllDayCoordinate[ix].startY
+          && e.offsetY < (+leftAllDayCoordinate[ix].startY + +leftAllDayCoordinate[ix].height)
+        ) {
+          /*eslint-disable*/
+          console.log(leftAllDayCoordinate[ix].style.fillText.text);
+        }
+      }
 
     }.bind(this));
   }
