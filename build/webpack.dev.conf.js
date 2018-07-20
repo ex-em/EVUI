@@ -6,10 +6,12 @@ const merge = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.conf.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const { VueLoaderPlugin } =  require ('vue-loader' );
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 module.exports = merge(webpackBaseConfig, {
+  mode: 'development',
   entry: {
     app: './examples/main.js',
     vendors: ['vue', 'vue-router']
@@ -19,7 +21,7 @@ module.exports = merge(webpackBaseConfig, {
     publicPath: '/',
     filename: '[name].js',
   },
-  devtool: '#eval-source-map',
+  devtool: 'source-map',
   module: {
     rules:[
       {
@@ -43,16 +45,17 @@ module.exports = merge(webpackBaseConfig, {
     // open: true,
     hot: true,
     inline: true,
+    //host: HOST || 'localhost',
     host: '0.0.0.0',
     disableHostCheck: true,
     port: '8888'
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env')
-    }),
+    // new webpack.DefinePlugin({
+    //   'process.env': require('../config/dev.env')
+    // }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
+    // new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
@@ -66,6 +69,7 @@ module.exports = merge(webpackBaseConfig, {
         ignore: ['.*']
       }
     ]),
-    new FriendlyErrorsPlugin()
+    new FriendlyErrorsPlugin(),
+    new VueLoaderPlugin()
   ]
 });
