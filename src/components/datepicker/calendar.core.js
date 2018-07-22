@@ -12,8 +12,10 @@ class Calendar {
         background: '#fff',
         border: 'f0f0f0',
         thisMonthFont: '#202020',
-        thisMonthBG: '#f5f5f5',
+        thisMonthFill: '#f5f5f5',
         prevNextMonthFont: '#ccc',
+        prevNextMonthFill: '#fff',
+        selectDayFill: 'rgba(255, 0, 0, 0.1)',
         mouseover: '#f00',
         mouseclick: '#0f0',
       },
@@ -27,7 +29,7 @@ class Calendar {
 
       // 최초 달력상 연,월
       // currentYearMonth: new Date(2015, 1, 1), // 4주
-      currentYearMonth: new Date(2017, 11, 1), // 6주
+      currentYearMonth: new Date(2017, 11, 1), // 6주 // 2017-12-01
       // currentYearMonth: new Date(2018, 3, 1), // 5주
       // currentYearMonth: new Date(2018, 5, 1), // 5주
       // currentYearMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -135,6 +137,10 @@ class Calendar {
         leftInner: {}, // 왼쪽 contents padding 제외 (요일, 날짜 부분)
         leftDayOfTheWeek: [], // 왼쪽 모든요일 좌표(일 ~ 토)
         leftAllDay: [], // 왼쪽 모든날짜 좌표
+        leftMouseover: {
+          prevSelectIdx: 0,
+          currSelectIdx: 0,
+        },
         right: {},
       },
       buttonArea: {
@@ -146,7 +152,9 @@ class Calendar {
     // init property
     this.initCalendarProperty();
     this.initCanvasProperty();
-    this.setMouseEvent();
+    this.setMouseoverEvent();
+    this.setMouseclickEvent();
+    this.setMouseleaveEvent();
 
     // draw
     this.drawCanvas();
@@ -282,10 +290,17 @@ class Calendar {
     // this.thisMonthWeekCnt = +Math.ceil((this.thisMonthFirstDay + this.thisMonthLastDate) / 7);
   }
 
-  setMouseEvent() {
+  setMouseoverEvent() {
     this.overCanvas.addEventListener('mousemove', function(e) {
       e.preventDefault();
+      const mouseover = this.coordinate.calendarArea.leftMouseover;
+      // console.log('prevSelectIdx : ' + mouseover.prevSelectIdx);
+      // console.log('currSelectIdx : ' + mouseover.currSelectIdx);
       const leftAllDayCoordinate = this.coordinate.calendarArea.leftAllDay;
+      const overCtx = this.overCtx;
+      const gap = 0;
+      let obj = {};
+      let mouseoverFlag = false;
       for (let ix = 0, ixLen = leftAllDayCoordinate.length; ix < ixLen; ix++) {
         if (e.offsetX > leftAllDayCoordinate[ix].startX
           && e.offsetX < (+leftAllDayCoordinate[ix].startX + +leftAllDayCoordinate[ix].width)
@@ -293,10 +308,49 @@ class Calendar {
           && e.offsetY < (+leftAllDayCoordinate[ix].startY + +leftAllDayCoordinate[ix].height)
         ) {
           /*eslint-disable*/
-          console.log(leftAllDayCoordinate[ix].style.fillText.text);
+          // console.log(leftAllDayCoordinate[ix].style.fillText.text);
+          console.log(leftAllDayCoordinate[ix].date.year);
+          console.log(leftAllDayCoordinate[ix].date.month);
+          console.log(leftAllDayCoordinate[ix].date.day);
+          mouseoverFlag = true;
+          mouseover.currSelectIdx = ix;
+
+          this.clearCanvas(overCtx, 0, 0, this.overCanvas.width, this.overCanvas.height);
+          obj = {
+            startX: +leftAllDayCoordinate[ix].startX + +gap,
+            width: leftAllDayCoordinate[ix].width - (gap * 2),
+            startY: +leftAllDayCoordinate[ix].startY + +gap,
+            height: leftAllDayCoordinate[ix].height - (gap * 2),
+          };
+          this.dynamicDraw(
+            overCtx, obj.startX, obj.startY,
+            obj.width, obj.height,
+            {
+              fill: {
+                show: true,
+                color: this.options.colors.selectDayFill,
+              }
+            }
+          );
         }
       }
+      if (mouseoverFlag) {
+        this.overCanvas.style.cursor = 'pointer';
+      }
+    }.bind(this));
+  }
 
+  setMouseclickEvent() {
+    this.overCanvas.addEventListener('click', function(e) {
+      e.preventDefault();
+    }.bind(this));
+  }
+
+  setMouseleaveEvent() {
+    this.overCanvas.addEventListener('mouseleave', function(e) {
+      e.preventDefault();
+      const overCtx = this.overCtx;
+      // this.clearCanvas(overCtx, 0, 0, this.overCanvas.width, this.overCanvas.height);
     }.bind(this));
   }
 
@@ -321,12 +375,13 @@ class Calendar {
     };
     // total Area = picker area + calendar area + button area
     // linewidth이 1이므로 total area에 선을 그을 때, p+c+b area의 보더 +1로 지정
+    const gap = 1;
     this.dynamicDraw(
       ctx,
-      padding.left - 1,
-      padding.top - 1,
-      ((this.baseCanvas.width - padding.left) - padding.right) + +2,
-      ((this.baseCanvas.height - padding.top) - padding.bottom) + +2,
+      padding.left - gap,
+      padding.top - gap,
+      ((this.baseCanvas.width - padding.left) - padding.right) + +(gap * 2),
+      ((this.baseCanvas.height - padding.top) - padding.bottom) + +(gap * 2),
       style,
     );
   }
@@ -336,15 +391,15 @@ class Calendar {
     const pickerArea = this.options.pickerArea;
     if (pickerArea.left.show) {
       const pickerAreaLeft = this.coordinate.pickerArea.left;
-
+      const gap = 1;
       // draw bottom line in picker area
       ctx.beginPath();
       ctx.moveTo(
-        pickerAreaLeft.startX - 1,
+        pickerAreaLeft.startX - gap,
         +pickerAreaLeft.startY + +pickerAreaLeft.height,
       );
       ctx.lineTo(
-        +pickerAreaLeft.startX + +pickerAreaLeft.width + +2,
+        +pickerAreaLeft.startX + +pickerAreaLeft.width + +(gap * 2),
         +pickerAreaLeft.startY + +pickerAreaLeft.height,
       );
       ctx.stroke();
@@ -478,7 +533,7 @@ class Calendar {
     // 현재 달력 연도
     const currentYear = this.options.currentYearMonth.getFullYear();
     // 현재 달력 월
-    const currentMonth = this.options.currentYearMonth.getMonth() + +1;
+    const currentMonth = +this.options.currentYearMonth.getMonth() + +1;
 
     // draw DAY NUMBER
     for (let ix = 0, ixLen = this.thisMonthWeekCnt; ix < ixLen; ix++) {
@@ -486,7 +541,9 @@ class Calendar {
         let obj = {};
         //// 첫번째 주
         if (ix === 0) {
-          const firstWeekDayCnt = this.thisMonthFirstDay != 0 ? this.thisMonthFirstDay : 7;
+          // true : 첫 주에 이번달 시작, false : 첫 주는 모두 저번달
+          const thisMonthStartFlag = this.thisMonthFirstDay != 0 ? true : false;
+          const firstWeekDayCnt = thisMonthStartFlag ? this.thisMonthFirstDay : 7;
           if (jx < firstWeekDayCnt) {
             // 1일 이전
             obj = {
@@ -510,6 +567,11 @@ class Calendar {
                 font: '10px Roboto Condensed',
                 selectable: false,
               },
+              date: {
+                year: currentMonth !== 1 ? currentYear : currentYear - 1,
+                month: thisMonthStartFlag ? (currentMonth !== 1 ? currentMonth - 1 : 12) : currentMonth - 1,
+                day: ((+this.prevMonthLastDate - +firstWeekDayCnt) + +jx) + +1
+              }
             };
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -522,7 +584,7 @@ class Calendar {
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthBG,
+              color: this.options.colors.thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -553,6 +615,11 @@ class Calendar {
                 font: '10px Roboto Condensed',
               },
               selectable: selectableFlag,
+              date: {
+                year: currentYear,
+                month: currentMonth,
+                day: 1
+              }
             };
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -565,7 +632,7 @@ class Calendar {
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthBG,
+              color: this.options.colors.thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -596,6 +663,11 @@ class Calendar {
                 font: '10px Roboto Condensed',
               },
               selectable: selectableFlag,
+              date: {
+                year: currentYear,
+                month: currentMonth,
+                day: this.monthDay
+              }
             };
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -620,6 +692,11 @@ class Calendar {
               font: '10px Roboto Condensed',
             },
             selectable: false,
+            date: {
+              year: +currentYear + +1,
+              month: currentMonth !== 12 ? +currentMonth + +1 : 1,
+              day: this.monthDay - this.thisMonthLastDate
+            }
           };
           this.coordinate.calendarArea.leftAllDay.push(obj);
           this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -633,7 +710,7 @@ class Calendar {
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthBG,
+              color: this.options.colors.thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -664,6 +741,11 @@ class Calendar {
                 font: '10px Roboto Condensed',
               },
               selectable: selectableFlag,
+              date: {
+                year: currentYear,
+                month: currentMonth,
+                day: this.monthDay
+              }
             };
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -675,7 +757,7 @@ class Calendar {
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthBG,
+              color: this.options.colors.thisMonthFill,
             };
             let selectableFlag = true; // 선택 여부
             if (this.options.limitToday) {
@@ -707,6 +789,11 @@ class Calendar {
                 font: '10px Roboto Condensed',
               },
               selectable: selectableFlag,
+              date: {
+                year: currentYear,
+                month: currentMonth,
+                day: this.monthDay
+              }
             };
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -718,7 +805,7 @@ class Calendar {
           // };
           // let fill = {
           //   show: true,
-          //   color: this.options.colors.thisMonthBG,
+          //   color: this.options.colors.thisMonthFill,
           // };
           // let selectableFlag = true; // 선택 여부
           // if (this.options.limitToday) {
@@ -807,7 +894,7 @@ class Calendar {
         ctx.stroke();
         ctx.closePath();
       }
-      if (mergedStyle.fill.show) {
+      if (mergedStyle.fill && mergedStyle.fill.show) {
         ctx.beginPath();
         ctx.rect(x, y, width, height);
         ctx.fillStyle = mergedStyle.fill.color;
