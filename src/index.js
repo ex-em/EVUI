@@ -1,17 +1,33 @@
-import ExButton from '@/components/button';
-import ExChart from '@/components/chart';
-import ExContainer from '@/components/container';
-import ExTable from '@/components/table';
-import ExLoadingmask from '@/components/loadingmask';
-import ExTimePicker from '@/components/timepicker';
+import EvButton from '@/components/button';
+import EvChart from '@/components/chart';
+import EvCheckbox from '@/components/checkbox';
+import EvCheckboxGroup from '@/components/checkbox-group';
+import EvIcon from '@/components/icon';
+import EvInput from '@/components/input';
+import EvLoadingmask from '@/components/loadingmask';
+import EvMenu from '@/components/menu';
+import EvRadio from '@/components/radio';
+import EvRadioGroup from '@/components/radio-group';
+import EvSelectbox from '@/components/selectbox';
+import EvTable from '@/components/table';
+import EvTimePicker from '@/components/timepicker';
+import EvToggle from '@/components/toggle';
 
 const components = {
-  ExButton,
-  ExContainer,
-  ExChart,
-  ExTable,
-  ExLoadingmask,
-  ExTimePicker,
+  EvButton,
+  EvChart,
+  EvCheckbox,
+  EvCheckboxGroup,
+  EvIcon,
+  EvInput,
+  EvLoadingmask,
+  EvMenu,
+  EvRadio,
+  EvRadioGroup,
+  EvSelectbox,
+  EvTable,
+  EvTimePicker,
+  EvToggle,
 };
 
 const evui = {
