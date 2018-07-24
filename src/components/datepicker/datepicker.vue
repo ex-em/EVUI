@@ -1,11 +1,30 @@
 <template>
-  <calendar
-    :data-obj="obj"
-  />
+  <div
+    v-click-outside="hideDatepicker"
+  >
+    <div
+      :class="wrapClasses"
+      :style="{width: `235px`}"
+    >
+      <input
+        ref="datepickerText"
+        :style="{width: `235px`}"
+        :class="inputClasses"
+        type="text"
+        placeholder=" yyyy-mm-dd "
+      >
+    </div>
+    <calendar
+      ref="calendarRef"
+      :data-obj="calObj"
+    />
+  </div>
 </template>
 
 <script>
   import calendar from '@/components/datepicker/calendar';
+
+  const prefixCls = 'evui-input-text';
 
   export default {
     components: {
@@ -37,17 +56,34 @@
       },
     },
     props: {
+      calObj: {
+        type: Object,
+        default() {
+          return {
+            width: this.width,
+            height: this.height,
+          };
+        },
+      },
     },
     data() {
       return {
-        obj: {
-          colors: {
-            background: '#f00',
-          },
-        },
+        width: 235,
+        height: 200,
       };
     },
     computed: {
+      wrapClasses() {
+        return [
+          `${prefixCls}`,
+          {
+            [`${prefixCls}-disabled`]: this.disabled,
+          },
+        ];
+      },
+      inputClasses() {
+        return `${prefixCls}-input`;
+      },
     },
     created() {
     },
@@ -56,6 +92,9 @@
     beforeDestroy() {
     },
     methods: {
+      hideDatepicker() {
+//        console.log('hideDatepicker');
+      },
     },
   };
 </script>

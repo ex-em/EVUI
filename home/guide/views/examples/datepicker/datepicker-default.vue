@@ -1,9 +1,15 @@
 <template>
   <div>
-    <datepicker
-      v-model="toggleFlag"
-    />
-    {{ toggleFlag }}
+    <div>
+      <datepicker
+      />
+      <datepicker
+        :cal-obj="obj2"
+      />
+      <datepicker
+        :cal-obj="obj3"
+      />
+    </div>
   </div>
 </template>
 
@@ -18,6 +24,12 @@
     data() {
       return {
         toggleFlag: true,
+        obj2: {
+          selectDayType: 'weekday',
+        },
+        obj3: {
+          selectDayType: 'week',
+        },
       };
     },
     methods: {

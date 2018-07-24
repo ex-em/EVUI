@@ -1,6 +1,7 @@
 <template>
   <div
     ref="datepickerRef"
+    :style="{width: `${dataObj.width}px`, height: `${dataObj.height}px`}"
     class="evui-calendar"
   />
 </template>
