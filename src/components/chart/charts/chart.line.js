@@ -4,7 +4,8 @@ import Util from '../core/core.util';
 export default class LineChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
-    this.seriesList = this.dataSet.getSeriesList();
+
+    this.seriesList = this.dataStore.getSeriesList();
   }
 
   drawChart() {
@@ -30,6 +31,9 @@ export default class LineChart extends BaseChart {
     // series에 특정한 color 값이 없다면, options의 colors 참조
     const color = series.color || this.options.colors[seriesIndex];
 
+    const isFill = this.options.fill;
+    const isStack = this.options.stack;
+
     ctx.beginPath();
     ctx.lineJoin = 'round';
     ctx.lineWidth = series.lineWidth;
@@ -39,7 +43,7 @@ export default class LineChart extends BaseChart {
         `rgba(${Util.hexToRgb(color)},${series.fill})`;
     }
 
-    if (series.fill !== null) {
+    if (isFill !== null) {
       ctx.fillStyle = series.fillStyle;
     }
     ctx.strokeStyle = color;
@@ -65,11 +69,11 @@ export default class LineChart extends BaseChart {
 
       if (y === null) {
         if (ix - 1 >= 0) {
-          if (series.fill && series.data[ix - 1].y !== null) {
+          if (isFill && series.data[ix - 1].y !== null) {
             ctx.stroke();
             ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
 
-            if (series.stack && series.hasAccumulate) {
+            if (isStack && series.hasAccumulate) {
               for (let jx = ix; jx >= startFillIndex; jx--) {
                 for (let kx = series.data[jx].b.length - 1; kx >= 0; kx--) {
                   convX = this.calculateX(series.data[jx].b[kx].x, series.axisIndex.x);
@@ -104,12 +108,12 @@ export default class LineChart extends BaseChart {
     }
 
     ctx.stroke();
-    if (series.fill && series.data.length && series.data[series.data.length - 1].y !== null) {
+    if (isFill && series.data.length && series.data[series.data.length - 1].y !== null) {
       ctx.stroke();
 
       ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
 
-      if (series.stack && series.hasAccumulate) {
+      if (isStack && series.hasAccumulate) {
         for (let ix = series.data.length - 1; ix >= startFillIndex; ix--) {
           for (let jx = series.data[ix].b.length - 1; jx >= 0; jx--) {
             this.tmp = series.data[ix];

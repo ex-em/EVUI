@@ -1,10 +1,24 @@
 import BaseChart from './chart.base';
+import PieDataStore from '../core/data/data.pie';
 
 export default class PieChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
-    this.seriesList = this.dataSet.getSeriesList();
-    this.seriesGroupList = this.dataSet.getSeriesGroupList();
+    this.seriesList = this.dataStore.getSeriesList();
+    this.seriesGroupList = this.dataStore.getSeriesGroupList();
+  }
+
+  createDataStore() {
+    this.dataStore = new PieDataStore({
+      chartData: this.data,
+      chartOptions: this.options,
+      horizontal: this.options.horizontal,
+      seriesList: this.seriesList,
+      seriesGroupList: this.seriesGroupList,
+      structType: 'array',
+      axisType: 'axisless',
+      bufferSize: this.options.bufferSize,
+    });
   }
 
   drawChart() {
@@ -14,7 +28,7 @@ export default class PieChart extends BaseChart {
 
   createPie() {
     for (let ix = 0, ixLen = this.seriesGroupList.length; ix < ixLen; ix++) {
-      this.dataSet.sortingDescGroupData(ix);
+      this.dataStore.sortingDescGroupData(ix);
       this.drawPieGroup(ix);
     }
 
@@ -41,7 +55,7 @@ export default class PieChart extends BaseChart {
     const outerRadius = Math.min(width / 2, height / 2);
     const radius = outerRadius - (((outerRadius - innerRadius) / groupLength) * groupIndex);
 
-    const totalValue = this.dataSet.getGroupTotalValue(groupIndex);
+    const totalValue = this.dataStore.getGroupTotalValue(groupIndex);
     for (let ix = 0, ixLen = this.seriesGroupList[groupIndex].length; ix < ixLen; ix++) {
       group = this.seriesGroupList[groupIndex][ix];
       if (group.show) {

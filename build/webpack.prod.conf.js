@@ -1,13 +1,15 @@
-'use strict'
-const path = require('path')
-const webpack = require('webpack')
-const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
+'use strict';
+const path = require('path');
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const baseWebpackConfig = require('./webpack.base.conf');
 const CompressionPlugin = require('compression-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const { VueLoaderPlugin } =  require ('vue-loader' );
 
 
 const webpackConfig = merge(baseWebpackConfig, {
+  mode: 'production',
   entry: {
     app: './src/index.js'
   },
@@ -26,28 +28,32 @@ const webpackConfig = merge(baseWebpackConfig, {
       amd: 'vue'
     }
   },
-  devtool: '#eval-source-map',
+  devtool: 'source-map',
+  optimization: {
+    minimize: true,
+  },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    }),
-    new UglifyJsPlugin({
-      uglifyOptions: {
-        compress: {
-          warnings: false
-        }
-      },
-      sourceMap: true,
-      parallel: true
-    }),
+    // new webpack.DefinePlugin({
+    //   'process.env.NODE_ENV': '"production"'
+    // }),
+    // new UglifyJsPlugin({
+    //   uglifyOptions: {
+    //     compress: {
+    //       warnings: false
+    //     }
+    //   },
+    //   sourceMap: true,
+    //   parallel: true
+    // }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
       test: /\.(js|css)$/,
       threshold: 10240,
       minRatio: 0.8
-    })
+    }),
+    new VueLoaderPlugin(),
   ]
 });
 

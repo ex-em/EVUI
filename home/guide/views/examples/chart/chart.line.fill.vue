@@ -34,7 +34,6 @@
               id: 'series1',
               name: 'series#1',
               point: true,
-              fill: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 20 },
                 { x: '2018-05-25 05:12:00', y: 10 },
@@ -53,7 +52,6 @@
               id: 'series2',
               name: 'series#2',
               point: true,
-              fill: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 15 },
                 { x: '2018-05-25 05:12:00', y: 17 },
@@ -74,6 +72,7 @@
           type: 'line',
           width: '600px',
           height: '350px',
+          fill: true,
           legend: {
             show: true,
             position: 'right',

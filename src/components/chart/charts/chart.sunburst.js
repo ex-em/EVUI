@@ -1,17 +1,28 @@
 import _ from 'lodash';
 import BaseChart from './chart.base';
+import SunburstDataStore from '../core/data/data.sunburst';
 
 export default class SunburstChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
-    this.seriesList = this.dataSet.getSeriesList();
-    this.seriesGroupList = this.dataSet.getSeriesGroupList();
+    this.seriesList = this.dataStore.getSeriesList();
+    this.seriesGroupList = this.dataStore.getSeriesGroupList();
+  }
+
+  createDataStore() {
+    this.dataStore = new SunburstDataStore({
+      chartData: this.data,
+      chartOptions: this.options,
+      horizontal: this.options.horizontal,
+      seriesList: this.seriesList,
+      seriesGroupList: this.seriesGroupList,
+      structType: 'tree',
+      axisType: 'axisless',
+      bufferSize: this.options.bufferSize,
+    });
   }
 
   drawChart() {
-    if (this.options.title.show) {
-      this.createTitle();
-    }
     this.createPie();
 
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
