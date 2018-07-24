@@ -4,8 +4,8 @@
       :type="type"
       :placeholder="placeholder"
       :value="value"
-      :error-msg="'you can write lower letters upper letter and numbers.'"
-      :reg-exp="/[a-zA-Z0-9]*/g"
+      :error-msg="'you can write lower letters, upper letter and numbers.'"
+      :reg-exp="/([^A-Za-z0-9])+/g"
       :max-length="20"
     />
   </div>

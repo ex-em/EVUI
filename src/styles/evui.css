@@ -936,10 +936,12 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   padding-left: 3px;
   padding-right: 5px;
   color: #ED1313;
+  float:left
 }
 .evui-input-text-valid-max-length {
   padding-left: 5px;
   padding-right: 3px;
+  float:right
 }
 
 .evui-input-text-valid-max-length.error {

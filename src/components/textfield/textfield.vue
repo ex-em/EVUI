@@ -29,16 +29,15 @@
       :class="wrapTextClass"
     >
       <div
-        v-if="useRegExp && isError"
-        :class="errorClass"
-        style="float:left"
+        v-show="useRegExp && textError"
+        :class="errorTextClass"
       >
-        <p>{{ customErrorMsg }}</p>
+        <p>{{ errorMsgWrapper }}</p>
       </div>
       <div
-        v-if="useMaxLength"
+        v-show="useMaxLength"
         :class="maxLengthClass"
-        style="float:right">
+      >
         <p>{{ currentTextLength }} / {{ totalTextLength }}</p>
       </div>
     </div>
@@ -46,6 +45,8 @@
 </template>
 
 <script>
+  import { Console } from '../../common/utils';
+
   const prefixCls = 'evui-input-text';
 
   function parsedStyle(value) {
@@ -92,17 +93,21 @@
         type: String,
         default: '',
       },
+      useAsterisk: {
+        type: Boolean,
+        default: false,
+      },
       maxLength: {
         type: Number,
         default: Infinity,
       },
       useRegExp: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       useMaxLength: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       regExp: {
         type: RegExp,
@@ -119,11 +124,11 @@
         cssError: false,
         maxError: false,
         useValid: true,
-        isError: false,
-        customErrorMsg: this.errorMsg,
-        currentTextLength: this.value.length,
-        totalTextLength: this.maxLength,
+        textError: false,
         currentValue: this.value,
+        errorMsgWrapper: this.errorMsg,
+        totalTextLength: this.maxLength,
+        currentTextLength: this.value.length,
       };
     },
     computed: {
@@ -138,7 +143,7 @@
           `${prefixCls}-valid-check`,
         ];
       },
-      errorClass: function errorClass() {
+      errorTextClass: function errorClass() {
         return [
           `${prefixCls}-valid-error`,
         ];
@@ -195,12 +200,13 @@
         this.focus = false;
       },
       change(e) {
+        this.preventDefault(e);
         const value = e.target.value;
         let isMaxLength = false;
+        this.cssError = false;
+        Console.log(value);
 
         if (this.useRegExp) {
-          this.isError = false;
-          this.cssError = false;
           this.validateRegExp(value);
         }
 
@@ -211,6 +217,8 @@
 
         if (isMaxLength) {
           this.maxError = true;
+          this.cssError = true;
+          this.currentValue = value.slice(0, this.maxLength);
           e.target.value = this.currentValue;
         } else {
           this.currentValue = value;
@@ -227,7 +235,7 @@
       validateTextLength(value) {
         const validValue = value;
         let result = false;
-        if (validValue.length > this.maxLength) {
+        if (validValue.length >= this.maxLength) {
           result = true;
         }
         return result;
@@ -240,17 +248,19 @@
         }
         const checked = this.regExp.exec(validValue);
         if (checked === null) {
+          this.textError = false;
+          this.cssError = false;
           return result;
         }
         const filteredValue = checked[0];
-        if (filteredValue.length === 0) {
-          this.isError = true;
+        if (filteredValue.length !== 0) {
+          this.textError = true;
           this.cssError = true;
           result = true;
         } else {
-          this.isError = false;
+          this.textError = false;
           this.cssError = false;
-          result = true;
+          result = false;
         }
         return result;
       },
