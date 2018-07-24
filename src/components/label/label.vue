@@ -100,28 +100,25 @@
         ];
       },
       wrappedValidClass() {
-        let status;
+        let status = '';
 
         if (this.checkValid) {
           if (
-            this.isError === true
-            || (this.isSuccess === true && this.isFailed === true)
+            this.isError || (this.isSuccess && this.isFailed)
           ) {
             status = 'error';
             } else {
-              if (this.isSuccess === true) {
+              if (this.isSuccess) {
                 status = 'success';
               }
-              if (this.isFailed === true) {
+              if (this.isFailed) {
                 status = 'fail';
               }
             }
-        } else {
-          status = 'normal';
         }
         return [
           `${prefixCls}-inner`,
-          `${prefixCls}-${status}`,
+          `${prefixCls} ${status}`,
         ];
       },
       wrappedLabelClass() {
@@ -141,18 +138,16 @@
         medium: 18,
         small: 13,
       };
-      if (this.fit === true && this.$refs.label) {
+      if (this.fit && this.$refs.label) {
         this.offsetWidth = parsedStyle(this.$refs.label.offsetWidth + asterSize[this.size]);
       }
     },
     methods: {
       setValue: function setValue(value) {
         let result = value;
-
-        if (this.mandatory === true) {
+        if (this.mandatory) {
           result = `* ${result}`;
         }
-
         return result;
       },
     },
@@ -181,14 +176,15 @@
   .evui-label-error {
     color: red;
   }
-  .evui-label-success {
-    background-color: #34C032;
-    color: #fff;
+  .evui-label {
     transition:all .2s ease-in-out;
   }
-  .evui-label-fail {
+  .evui-label.success {
+    background-color: #34C032;
+    color: #fff;
+  }
+  .evui-label.fail {
     background-color: #F53243;
     color: #fff;
-    transition:all .2s ease-in-out;
   }
 </style>
