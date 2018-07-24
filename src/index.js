@@ -1,17 +1,17 @@
-import Button from '@/components/button';
-import Chart from '@/components/chart';
-import Container from '@/components/container';
-import Table from '@/components/table';
-import Loadingmask from '@/components/loadingmask';
-import TimePicker from '@/components/timepicker';
+import ExButton from '@/components/button';
+import ExChart from '@/components/chart';
+import ExContainer from '@/components/container';
+import ExTable from '@/components/table';
+import ExLoadingmask from '@/components/loadingmask';
+import ExTimePicker from '@/components/timepicker';
 
 const components = {
-  Button,
-  Container,
-  Chart,
-  Table,
-  Loadingmask,
-  TimePicker,
+  ExButton,
+  ExContainer,
+  ExChart,
+  ExTable,
+  ExLoadingmask,
+  ExTimePicker,
 };
 
 const evui = {
