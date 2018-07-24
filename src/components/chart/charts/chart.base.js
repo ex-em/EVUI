@@ -93,6 +93,7 @@ class BaseChart {
     // calculate Chart Size
     this.chartRect = this.getChartRect();
 
+    this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
     window.addEventListener('resize', this.resize.bind(this));
   }
 
@@ -103,6 +104,10 @@ class BaseChart {
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.setAttribute('style', 'display: block;');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
+    this.overlayCanvas = document.createElement('canvas');
+    this.overlayCanvas.setAttribute('style', 'display: block;');
+    this.overlayCtx = this.overlayCanvas.getContext('2d');
+
 
     const devicePixelRatio = window.devicePixelRatio || 1;
     const backingStoreRatio =
@@ -115,7 +120,12 @@ class BaseChart {
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
     this.oldPixelRatio = this.pixelRatio;
 
-    this.chartDOM.appendChild(this.displayCanvas);
+    this.chartDOM.appendChild(this.bufferCanvas);
+    this.chartDOM.appendChild(this.overlayCanvas);
+
+    this.overlayCanvas.style.position = 'absolute';
+    this.overlayCanvas.style.top = '0px';
+    this.overlayCanvas.style.left = '0px';
   }
 
   createDataStore() {
@@ -142,6 +152,8 @@ class BaseChart {
       seriesList: this.seriesList,
       resize: this.resize.bind(this),
       redraw: this.redraw.bind(this),
+      overlayClear: this.overlayClear.bind(this),
+      seriesHighlight: this.seriesHighlight.bind(this),
     });
   }
 
@@ -278,7 +290,7 @@ class BaseChart {
     for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
       this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
       labelText = this.dataStore.getLabelTextMaxInfo(ix).yText || '';
-      labelSize = this.bufferCtx.measureText(`${labelText}`).width || 0;
+      labelSize = Math.ceil(this.bufferCtx.measureText(`${labelText}`).width) || 0;
 
       if (yAxes[ix].labelType === 'time') {
         labelSize = moment(labelText);
@@ -309,7 +321,7 @@ class BaseChart {
         }
       }
 
-      labelSize = this.bufferCtx.measureText(`${labelText}`).width || 0;
+      labelSize = Math.ceil(this.bufferCtx.measureText(`${labelText}`).width) || 0;
       if (Math.round(labelSize / 2) > this.labelOffset.right) {
         this.labelOffset.right = Math.round(labelSize / 2) + labelBuffer;
       }
@@ -359,6 +371,8 @@ class BaseChart {
     this.displayCanvas.style.width = `${width}px`;
     this.bufferCanvas.width = width * this.pixelRatio;
     this.bufferCanvas.style.width = `${width}px`;
+    this.overlayCanvas.width = width * this.pixelRatio;
+    this.overlayCanvas.style.width = `${width}px`;
   }
 
   setHeight(height) {
@@ -369,6 +383,8 @@ class BaseChart {
     this.displayCanvas.style.height = `${height}px`;
     this.bufferCanvas.height = height * this.pixelRatio;
     this.bufferCanvas.style.height = `${height}px`;
+    this.overlayCanvas.height = height * this.pixelRatio;
+    this.overlayCanvas.style.height = `${height}px`;
   }
 
   createAxis() {
@@ -497,8 +513,8 @@ class BaseChart {
     }
 
     const scalingFactor = this.drawingXArea() / (maxValue - minValue);
-    return (this.chartRect.x1 + this.labelOffset.left) +
-      (scalingFactor * (convertValue - (minValue || 0)));
+    return Math.floor((this.chartRect.x1 + this.labelOffset.left) +
+      (scalingFactor * (convertValue - (minValue || 0))));
   }
 
   calculateY(value, yAxisIndex, invert) {
@@ -529,7 +545,7 @@ class BaseChart {
         (scalingFactor * (convertValue - (minValue || 0)));
     }
 
-    return calcY;
+    return Math.floor(calcY);
   }
 
   drawingXArea() {
@@ -649,6 +665,44 @@ class BaseChart {
     ctx.stroke();
   }
 
+  findHitItem(offset) {
+    const dataIndex = this.findHitAxisX(offset[0]);
+    const mouseY = offset[1];
+    let seriesIndex = null;
+
+    // return value...index, seriesIndex
+    if (dataIndex !== null && dataIndex > -1) {
+      for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+        if (mouseY >= (this.seriesList[ix].drawInfo.yPoint[dataIndex] - 10) &&
+          mouseY <= (this.seriesList[ix].drawInfo.yPoint[dataIndex] + 10)) {
+          seriesIndex = ix;
+          break;
+        }
+      }
+    }
+
+    return { dataIndex, seriesIndex };
+  }
+
+  findHitAxisX(mouseX) {
+    const x2 = this.chartRect.x2 - this.labelOffset.right;
+    const x1 = this.chartRect.x1 + this.labelOffset.left;
+    const width = x2 - x1;
+
+    const series = this.seriesList[0];
+    const xPoint = series ? series.drawInfo.xPoint : [];
+
+    if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
+      const index = Math.round(((xPoint.length - 1) / width) * (mouseX - x1));
+
+      if (mouseX <= (xPoint[index] + 10) && mouseX >= (xPoint[index] - 10)) {
+        return index;
+      }
+    }
+
+    return null;
+  }
+
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const backingStoreRatio =
@@ -703,6 +757,10 @@ class BaseChart {
     this.drawChart();
   }
 
+  overlayClear() {
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+  }
+
   clearDraw() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -710,6 +768,38 @@ class BaseChart {
       this.displayCanvas.height / this.clearRectRatio);
     this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
       this.bufferCanvas.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(0, 0, this.overlayCtx.width / this.clearRectRatio,
+      this.overlayCtx.height / this.clearRectRatio);
+  }
+
+
+  mouseMoveEvent(e) {
+    const offset = this.getMousePosition(e);
+    const item = this.findHitItem(offset);
+
+    this.overlayClear();
+
+    if (item && this.itemHighlight) {
+      this.itemHighlight(item);
+    }
+  }
+
+  getMousePosition(evt) {
+    let mouseX;
+    let mouseY;
+
+    const e = evt.originalEvent || evt;
+    const boundingRect = this.overlayCanvas.getBoundingClientRect();
+
+    if (e.touches) {
+      mouseX = e.touches[0].clientX - boundingRect.left;
+      mouseY = e.touches[0].clientY - boundingRect.top;
+    } else {
+      mouseX = e.clientX - boundingRect.left;
+      mouseY = e.clientY - boundingRect.top;
+    }
+
+    return [mouseX, mouseY];
   }
 
   static getPadding(padding) {

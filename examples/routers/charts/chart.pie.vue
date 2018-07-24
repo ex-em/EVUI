@@ -29,25 +29,25 @@
               id: 'series0',
               name: 'series-0',
               show: true,
-              data: [5, 10, 6],
+              data: [5, 10],
             },
             {
               id: 'series1',
               name: 'series-1',
               show: true,
-              data: [10, 12, 8],
+              data: [10, 12],
             },
             {
               id: 'series2',
               name: 'series-2',
               show: true,
-              data: [15, 10, 20],
+              data: [15, 10],
             },
             {
               id: 'series3',
               name: 'series-3',
               show: true,
-              data: [5, 15, 10],
+              data: [5, 10],
             },
           ],
         },
@@ -85,9 +85,6 @@
           type: 'pie',
           width: '400px',
           height: '350px',
-          legend: {
-            show: false,
-          },
         },
         doughnutOptions: {
           type: 'pie',
@@ -106,6 +103,11 @@
     mounted() {
       this.addData();
     },
+    destroyed() {
+      if (this.interval) {
+        clearTimeout(this.interval);
+      }
+    },
     methods: {
       addData() {
         this.interval = setInterval(this.pieAddData.bind(this), 1000);
@@ -117,37 +119,29 @@
 
         this.$children[0].addValue(0, randomData1, 0);
         this.$children[0].addValue(0, randomData2, 1);
-        this.$children[0].addValue(0, randomData3, 2);
 
-        this.$children[0].addValue(1, randomData1, 1);
         this.$children[0].addValue(1, randomData2, 0);
-        this.$children[0].addValue(1, randomData3, 2);
+        this.$children[0].addValue(1, randomData1, 1);
 
-        this.$children[0].addValue(2, randomData1, 2);
         this.$children[0].addValue(2, randomData2, 0);
         this.$children[0].addValue(2, randomData3, 1);
 
-        this.$children[0].addValue(3, randomData1, 2);
-        this.$children[0].addValue(3, randomData2, 1);
         this.$children[0].addValue(3, randomData3, 0);
+        this.$children[0].addValue(3, randomData2, 1);
 
         this.$children[0].chart.redraw();
 
         this.$children[1].addValue(0, randomData1, 0);
         this.$children[1].addValue(0, randomData2, 1);
-        this.$children[1].addValue(0, randomData3, 2);
 
-        this.$children[1].addValue(1, randomData1, 1);
         this.$children[1].addValue(1, randomData2, 0);
-        this.$children[1].addValue(1, randomData3, 2);
+        this.$children[1].addValue(1, randomData1, 1);
 
-        this.$children[1].addValue(2, randomData1, 2);
         this.$children[1].addValue(2, randomData2, 0);
         this.$children[1].addValue(2, randomData3, 1);
 
-        this.$children[1].addValue(3, randomData1, 2);
-        this.$children[1].addValue(3, randomData2, 1);
         this.$children[1].addValue(3, randomData3, 0);
+        this.$children[1].addValue(3, randomData2, 1);
 
         this.$children[1].chart.redraw();
       },

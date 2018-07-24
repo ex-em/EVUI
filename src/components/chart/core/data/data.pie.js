@@ -1,61 +1,7 @@
 import _ from 'lodash';
-import Util from '@/common/utils';
 import DataStore from './data';
 
 export default class PieDataStore extends DataStore {
-  init() {
-    const series = this.chartData.series;
-
-    for (let ix = 0, ixLen = series.length; ix < ixLen; ix++) {
-      this.addSeries(series[ix]);
-
-      // 초기 데이터가 존재할 경우 addValues로 데이터 처리.
-      if (series[ix].data && series[ix].data.length) {
-        this.addValues(ix);
-      }
-    }
-  }
-
-  addSeries(param) {
-    const series = {
-      id: param.id === undefined ? `series-${Util.getId()}` : param.id,
-      name: param.name === undefined ? 'unknown' : param.name,
-      color: param.color,
-      show: param.show === undefined ? true : param.show,
-      point: param.point === undefined ? false : param.point,
-      pointSize: param.pointSize === undefined ? 4 : param.pointSize,
-      pointStyle: param.pointStyle === undefined ? '' : param.pointStyle,
-      axisIndex: {
-        x: param.xAxisIndex === undefined ? 0 : param.xAxisIndex,
-        y: param.yAxisIndex === undefined ? 0 : param.yAxisIndex,
-      },
-      min: null,
-      max: null,
-      minIndex: null,
-      maxIndex: null,
-      stack: param.stack === undefined ? false : param.stack,
-      stackArr: [],
-      stackOffsetIndex: 0,
-      seriesIndex: this.seriesList.length,
-      data: [],
-      lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
-      fill: param.fill === undefined ? false : param.fill,
-      fillColor: param.fillColor,
-      fillOpacity: param.fillOpacity === undefined ? 0.4 : param.fillOpacity,
-      toolTip: {},
-      insertIndex: -1,
-      dataIndex: 0,
-      startPoint: 0,
-      horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
-      children: param.children === undefined ? [] : param.children,
-      parentIndex: null,
-      inputData: param.data || (this.structType === 'array' ? [] : null),
-      hasAccumulate: false,
-    };
-
-    this.seriesList.push(series);
-  }
-
   addValue(seriesIndex, value, dataIndex) {
     if (this.seriesList === undefined) {
       return;
@@ -63,6 +9,8 @@ export default class PieDataStore extends DataStore {
     // category 형태의 데이터냐 아니냐에 따라 x,y 처리
     const series = this.seriesList[seriesIndex];
     const tempValue = {};
+    const isShow = (value === null) ? false : series.show;
+
     let dataIdx = dataIndex;
 
     if (!series) {
@@ -70,27 +18,32 @@ export default class PieDataStore extends DataStore {
     }
 
     if (dataIndex === null || dataIndex === undefined) {
-      dataIdx = series.data.length;
+      dataIdx = series.cData.length;
     }
 
     if (!this.seriesGroupList[dataIdx]) {
-      this.seriesGroupList[dataIdx] = [];
+      this.seriesGroupList[dataIdx] = {
+        data: [],
+        drawInfo: [],
+        r2: 0,
+        r1: 0,
+        show: false,
+      };
     }
-    this.seriesGroupList[dataIdx].push({ seriesIndex, data: value, show: series.show });
 
-    if (this.chartOptions.bufferSize) {
-      if (series.data.length > this.bufferSize) {
-        series.data.shift();
-        series.inputData.shift();
+    this.seriesGroupList[dataIdx].data.push({
+      seriesIndex,
+      data: value,
+      show: isShow,
+    });
 
-        --dataIdx;
-        --series.maxIndex;
-        --series.minIndex;
-      }
+    if (!this.seriesGroupList[dataIdx].show && isShow) {
+      this.seriesGroupList[dataIdx].show = true;
     }
-    series.data[dataIdx] = value;
 
-    series.inputData[dataIdx] = value;
+
+    series.cData[dataIdx] = value;
+    series.oData[dataIdx] = value;
 
     if (series.show) {
       this.setMinMaxValue(series, tempValue, dataIdx);
@@ -126,11 +79,11 @@ export default class PieDataStore extends DataStore {
   }
 
   sortingDescGroupData(groupIndex) {
-    this.seriesGroupList[groupIndex] = _.orderBy(this.seriesGroupList[groupIndex], 'data', 'desc');
+    this.seriesGroupList[groupIndex].data = _.orderBy(this.seriesGroupList[groupIndex].data, 'data', 'desc');
   }
 
   getGroupTotalValue(groupIndex) {
-    const group = this.seriesGroupList[groupIndex];
+    const group = this.seriesGroupList[groupIndex].data;
     let totalValue = 0;
 
     for (let ix = 0, ixLen = group.length; ix < ixLen; ix++) {
