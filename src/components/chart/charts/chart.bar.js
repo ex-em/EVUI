@@ -221,11 +221,12 @@ export default class BarChart extends BaseChart {
 
   findHitItem(offset) {
     const mouse = !this.options.horizontal ? offset[0] : offset[1];
+    const isHorizontal = this.options.horizontal;
 
     let dataIndex;
     let seriesIndex = null;
 
-    if (!this.options.horizontal) {
+    if (!isHorizontal) {
       dataIndex = this.findHitAxisX(mouse);
     } else {
       dataIndex = this.findHitAxisY(mouse);
@@ -239,7 +240,7 @@ export default class BarChart extends BaseChart {
         let min;
         let max;
 
-        if (!this.options.horizontal) {
+        if (!isHorizontal) {
           point = series.drawInfo.xPoint[dataIndex];
           size = series.drawInfo.width[dataIndex];
           min = point;

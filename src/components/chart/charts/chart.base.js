@@ -668,13 +668,15 @@ class BaseChart {
   findHitItem(offset) {
     const dataIndex = this.findHitAxisX(offset[0]);
     const mouseY = offset[1];
+    const seriesList = this.seriesList;
     let seriesIndex = null;
 
     // return value...index, seriesIndex
     if (dataIndex !== null && dataIndex > -1) {
-      for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-        if (mouseY >= (this.seriesList[ix].drawInfo.yPoint[dataIndex] - 10) &&
-          mouseY <= (this.seriesList[ix].drawInfo.yPoint[dataIndex] + 10)) {
+      for (let ix = 0, ixLen = seriesList.length; ix < ixLen; ix++) {
+        const yPoint = seriesList[ix].drawInfo.yPoint[dataIndex];
+
+        if (mouseY >= (yPoint - 10) && mouseY <= (yPoint + 10)) {
           seriesIndex = ix;
           break;
         }
