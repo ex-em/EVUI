@@ -110,10 +110,10 @@
             status = 'error';
             } else {
               if (this.isSuccess === true) {
-                status = this.isSuccess ? 'success' : 'fail';
+                status = 'success';
               }
               if (this.isFailed === true) {
-                status = this.isFailed ? 'fail' : 'success';
+                status = 'fail';
               }
             }
         } else {
