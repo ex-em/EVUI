@@ -106,6 +106,12 @@
                 content: '토글',
                 imgUrl: `${this.imgUrl}/toggle.png`,
               },
+              {
+                name: 'Textfield',
+                routerLink: '/textfield',
+                content: '텍스트 필드',
+                imgUrl: `${this.imgUrl}/textfield.png`,
+              },
             ],
           },
           {
