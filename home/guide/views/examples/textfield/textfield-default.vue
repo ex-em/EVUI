@@ -4,9 +4,11 @@
       :type="type"
       :placeholder="placeholder"
       :value="value"
-      :error-msg="'you can write lower letters, upper letter and numbers.'"
       :reg-exp="/([^A-Za-z0-9])+/g"
+      :use-reg-exp="true"
       :max-length="20"
+      :hide-string="true"
+      :use-max-length="true"
     />
   </div>
 </template>
@@ -19,9 +21,10 @@
     },
     data() {
       return {
-        value: 'abcd',
-        type: 'textarea',
-        placeholder: 'test',
+        value: '',
+        // type: 'textarea',
+        type: 'input',
+        placeholder: 'type something...',
       };
     },
   };

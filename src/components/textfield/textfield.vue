@@ -7,9 +7,12 @@
       <template v-if="type !== 'textarea'">
         <input
           :class="inputClasses"
-          @keydown.stop="keyDown"
-          @change="change"
+          :value="currentValue"
+          :placeholder="placeholder"
+          spellcheck="false"
+          @focus="onFocus"
           @input="change"
+          @blur="onBlur"
         >
       </template>
       <textarea
@@ -20,9 +23,8 @@
         :placeholder="placeholder"
         spellcheck="false"
         @focus="onFocus"
-        @blur="onBlur"
-        @change="change"
         @input="change"
+        @blur="onBlur"
       />
     </div>
     <div
@@ -38,15 +40,13 @@
         v-show="useMaxLength"
         :class="maxLengthClass"
       >
-        <p>{{ currentTextLength }} / {{ totalTextLength }}</p>
+        <p>{{ currentLength }} / {{ totalLength }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { Console } from '../../common/utils';
-
   const prefixCls = 'evui-input-text';
 
   function parsedStyle(value) {
@@ -93,7 +93,7 @@
         type: String,
         default: '',
       },
-      useAsterisk: {
+      hideString: {
         type: Boolean,
         default: false,
       },
@@ -123,12 +123,12 @@
         focus: false,
         cssError: false,
         maxError: false,
-        useValid: true,
         textError: false,
-        currentValue: this.value,
+        originValue: this.value,
+        currentValue: null,
         errorMsgWrapper: this.errorMsg,
-        totalTextLength: this.maxLength,
-        currentTextLength: this.value.length,
+        totalLength: this.maxLength,
+        currentLength: this.value.length,
       };
     },
     computed: {
@@ -180,12 +180,8 @@
     watch: {
       currentValue(value) {
         this.currentValue = value;
-        this.currentTextLength = value.length;
+        this.currentLength = value.length;
       },
-    },
-    created() {
-    },
-    mounted() {
     },
     methods: {
       preventDefault(e) {
@@ -193,49 +189,71 @@
       },
       onFocus(e) {
         this.preventDefault(e);
+
         this.focus = true;
       },
       onBlur(e) {
         this.preventDefault(e);
+
         this.focus = false;
       },
       change(e) {
         this.preventDefault(e);
-        const value = e.target.value;
-        let isMaxLength = false;
-        this.cssError = false;
-        Console.log(value);
+        this.setChangingFlags();
 
-        if (this.useRegExp) {
-          this.validateRegExp(value);
+        const targetValue = e.target.value;
+        this.originValue = this.setOriginText(e, this.originValue, targetValue);
+
+        if (!this.hideString && this.useRegExp) {
+          this.validateRegExp(this.originValue);
         }
 
-        if (this.useMaxLength) {
-          this.maxError = false;
-          isMaxLength = this.validateTextLength(value);
-        }
-
-        if (isMaxLength) {
-          this.maxError = true;
-          this.cssError = true;
-          this.currentValue = value.slice(0, this.maxLength);
-          e.target.value = this.currentValue;
+        if (this.useMaxLength && this.validateTextLength(targetValue)) {
+          this.currentValue = targetValue.slice(0, this.maxLength);
         } else {
-          this.currentValue = value;
-          this.setValue(value);
+          this.currentValue = targetValue;
         }
+
+        if (this.hideString) {
+          this.currentValue = this.changeStrToBullet(this.currentValue);
+        }
+
+        e.target.value = this.currentValue;
       },
-      setValue(value) {
-        const updateValue = value;
-        this.$nextTick(() => {
-          this.currentValue = updateValue;
-        });
-        return updateValue;
+      setChangingFlags() {
+        this.textError = false;
+        this.cssError = false;
+        this.maxError = false;
+      },
+      setOriginText(e, origin, target) {
+        let result = origin;
+        if (e.type === 'input') {
+          if (e.data !== null) {
+            result += e.data;
+          } else if (target.length !== 0) {
+            result += e.target.value.replace(/(\*)*/g, '');
+          } else {
+            result = '';
+          }
+        }
+        return result;
+      },
+      changeStrToBullet(origin) {
+        const result = [];
+        const bullet = String.fromCharCode(0x2022);
+        let length = origin.length;
+        while (length--) {
+          result.push(bullet);
+        }
+        return result.join('');
       },
       validateTextLength(value) {
         const validValue = value;
         let result = false;
+
         if (validValue.length >= this.maxLength) {
+          this.maxError = true;
+          this.cssError = true;
           result = true;
         }
         return result;
@@ -266,6 +284,11 @@
       },
     },
     init() {
+      if (this.hideString) {
+        this.currentValue = this.changeStrToBullet(this.value);
+      } else {
+        this.currentValue = this.value;
+      }
     },
   };
 </script>
