@@ -45,7 +45,7 @@
         @keydown.stop="keyDown"
         @focus="focus"
         @blur="blur"
-        @mouseup="preventDefault"
+        @mousewheel="wheelEvent"
         @change="change"
         @input="change"
       >
@@ -284,11 +284,6 @@
         setValue(value) {
           let val = value;
           if (!isNaN(this.precision)) {
-            // if (this.useZeroDigit) {
-            //   val = toFixedWithZero(val, this.precision);
-            // } else {
-            //   val = Number(val).toFixed(this.precision);
-            // }
             val = Number(Number(val).toFixed(this.precision));
           }
           this.$nextTick(() => {
@@ -346,6 +341,14 @@
               e.preventDefault();
               this.down(e);
             }
+        },
+        wheelEvent(e) {
+          e.preventDefault();
+          if (e.wheelDeltaY === -120) {
+            this.down(e);
+          } else if (e.wheelDeltaY === 120) {
+            this.up(e);
+          }
         },
       },
       init() {
