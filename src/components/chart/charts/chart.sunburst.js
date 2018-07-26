@@ -187,4 +187,8 @@ export default class SunburstChart extends BaseChart {
 
     return retObject;
   }
+
+  seriesHighlight() {
+    this.temp = 1;
+  }
 }
