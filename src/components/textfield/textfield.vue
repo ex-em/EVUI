@@ -9,10 +9,13 @@
           :class="inputClasses"
           :value="currentValue"
           :placeholder="placeholder"
+          :disabled="disabled"
+          :readonly="readonly"
           spellcheck="false"
           @focus="onFocus"
-          @input="change"
           @blur="onBlur"
+          @change="change"
+          @input="change"
         >
       </template>
       <textarea
@@ -21,10 +24,13 @@
         :value="currentValue"
         :class="inputClasses"
         :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
         spellcheck="false"
         @focus="onFocus"
-        @input="change"
         @blur="onBlur"
+        @change="change"
+        @input="change"
       />
     </div>
     <div
@@ -47,21 +53,18 @@
 </template>
 
 <script>
+  import { Console } from '@/common/utils';
+
   const prefixCls = 'evui-input-text';
+  const bulletChar = String.fromCharCode(0x2022);
 
   function parsedStyle(value) {
-    let val = value;
-
-    val = val.toString();
-
-    if (val.match(/[1-9]*?[0-9]+/gi)) {
-      if (val.match(/[px|%]/gi) === null) {
-        val = val.concat('px');
-      }
-    } else {
-      val = null;
+    const mark = value.toString();
+    let result = mark;
+    if (!mark.match(/([1-9]+)([0-9]*)(px|%+)/g)) {
+       result = mark.concat('px');
     }
-    return val;
+    return result;
   }
 
   export default {
@@ -82,6 +85,10 @@
         default: '',
       },
       disabled: {
+        type: Boolean,
+        default: false,
+      },
+      readonly: {
         type: Boolean,
         default: false,
       },
@@ -124,11 +131,11 @@
         cssError: false,
         maxError: false,
         textError: false,
-        originValue: this.value,
         currentValue: null,
-        errorMsgWrapper: this.errorMsg,
+        originValue: this.value,
         totalLength: this.maxLength,
         currentLength: this.value.length,
+        errorMsgWrapper: this.errorMsg,
       };
     },
     computed: {
@@ -189,12 +196,10 @@
       },
       onFocus(e) {
         this.preventDefault(e);
-
         this.focus = true;
       },
       onBlur(e) {
         this.preventDefault(e);
-
         this.focus = false;
       },
       change(e) {
@@ -202,18 +207,20 @@
         this.setChangingFlags();
 
         const targetValue = e.target.value;
-        this.originValue = this.setOriginText(e, this.originValue, targetValue);
 
         if (!this.hideString && this.useRegExp) {
           this.validateRegExp(this.originValue);
         }
-
+        this.originValue = this.setOriginText(e, this.originValue, targetValue);
         if (this.useMaxLength && this.validateTextLength(targetValue)) {
+          this.originValue = this.originValue.slice(0, this.maxLength);
           this.currentValue = targetValue.slice(0, this.maxLength);
+          Console.log('limit update', this.originValue, this.currentValue);
         } else {
+          this.originValue = this.originValue;
           this.currentValue = targetValue;
+          Console.log('update', this.originValue, this.currentValue);
         }
-
         if (this.hideString) {
           this.currentValue = this.changeStrToBullet(this.currentValue);
         }
@@ -231,7 +238,7 @@
           if (e.data !== null) {
             result += e.data;
           } else if (target.length !== 0) {
-            result += e.target.value.replace(/(\*)*/g, '');
+            result += e.target.value.replace(/(\u2022)*/g, '');
           } else {
             result = '';
           }
@@ -240,7 +247,7 @@
       },
       changeStrToBullet(origin) {
         const result = [];
-        const bullet = String.fromCharCode(0x2022);
+        const bullet = bulletChar;
         let length = origin.length;
         while (length--) {
           result.push(bullet);
