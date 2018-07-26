@@ -1,10 +1,21 @@
-import Util from '@/common/utils';
+import _ from 'lodash';
 import DataStore from './data';
 
 export default class SunburstDataStore extends DataStore {
   init() {
     this.initTreeData();
     this.createTreeDummy();
+  }
+
+  getSeriesExtends(defaultSeries, param) { // eslint-disable-line class-methods-use-this
+    const extSeries = {
+      oData: param.data || null,
+      cData: null,
+      children: param.children === undefined ? [] : param.children,
+      parentIndex: null,
+    };
+
+    return _.merge(defaultSeries, extSeries);
   }
 
   initTreeData() {
@@ -17,7 +28,7 @@ export default class SunburstDataStore extends DataStore {
       const seriesNode = this.seriesList[this.seriesList.length - 1];
       seriesNode.lvl = lvl;
       seriesNode.parentIndex = -1;
-      seriesNode.data = seriesNode.inputData;
+      seriesNode.data = seriesNode.oData;
 
       const pIndex = seriesNode.parentIndex;
 
@@ -99,46 +110,6 @@ export default class SunburstDataStore extends DataStore {
     }
   }
 
-  addSeries(param) {
-    const series = {
-      id: param.id === undefined ? `series-${Util.getId()}` : param.id,
-      name: param.name === undefined ? 'unknown' : param.name,
-      color: param.color,
-      show: param.show === undefined ? true : param.show,
-      point: param.point === undefined ? false : param.point,
-      pointSize: param.pointSize === undefined ? 4 : param.pointSize,
-      pointStyle: param.pointStyle === undefined ? '' : param.pointStyle,
-      axisIndex: {
-        x: param.xAxisIndex === undefined ? 0 : param.xAxisIndex,
-        y: param.yAxisIndex === undefined ? 0 : param.yAxisIndex,
-      },
-      min: null,
-      max: null,
-      minIndex: null,
-      maxIndex: null,
-      stack: param.stack === undefined ? false : param.stack,
-      stackArr: [],
-      stackOffsetIndex: 0,
-      seriesIndex: this.seriesList.length,
-      data: this.structType === 'array' ? [] : null,
-      lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
-      fill: param.fill === undefined ? false : param.fill,
-      fillColor: param.fillColor,
-      fillOpacity: param.fillOpacity === undefined ? 0.4 : param.fillOpacity,
-      toolTip: {},
-      insertIndex: -1,
-      dataIndex: 0,
-      startPoint: 0,
-      horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
-      children: param.children === undefined ? [] : param.children,
-      parentIndex: null,
-      inputData: param.data || null,
-      hasAccumulate: false,
-    };
-
-    this.seriesList.push(series);
-  }
-
   addValue(seriesIndex, value, dataIndex) {
     if (this.seriesList === undefined) {
       return;
@@ -161,19 +132,8 @@ export default class SunburstDataStore extends DataStore {
     }
     this.seriesGroupList[dataIdx].push({ seriesIndex, data: value, show: series.show });
 
-    if (this.chartOptions.bufferSize) {
-      if (series.data.length > this.bufferSize) {
-        series.data.shift();
-        series.inputData.shift();
-
-        --dataIdx;
-        --series.maxIndex;
-        --series.minIndex;
-      }
-    }
-    series.data[dataIdx] = value;
-
-    series.inputData[dataIdx] = value;
+    series.cData[dataIdx] = value;
+    series.oData[dataIdx] = value;
 
     if (series.show) {
       this.setMinMaxValue(series, tempValue, dataIdx);
