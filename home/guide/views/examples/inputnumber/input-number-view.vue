@@ -12,6 +12,7 @@
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
+          :is-bottom="item.isBottom"
           :description="item.description"
         >
           <component :is="item.component"/>
@@ -36,7 +37,7 @@
           {
             url: './guide/views/examples/inputnumber/input-number-default.vue',
             component: inputNumberDefault,
-            description: 'Test Code',
+            description: '마우스나 키보드를 이용해서 숫자를 입력할 수 있습니다.',
             title: 'Default',
           },
         ],
