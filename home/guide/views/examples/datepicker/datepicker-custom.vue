@@ -1,9 +1,6 @@
 <template>
   <div>
     <datepicker
-      class="evui-datepicker-temp"
-    />
-    <datepicker
       v-model="bindDay"
       :options="option"
       class="evui-datepicker-temp"

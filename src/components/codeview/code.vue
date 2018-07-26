@@ -7,6 +7,7 @@
     >
       <div
         v-if="description && !isBottom"
+        ref="descriptionLayer"
         class="evui-codeview-description"
       >
         <span>{{ description }}</span>
@@ -18,6 +19,7 @@
         <slot/>
         <div
           v-if="description && isBottom"
+          ref="descriptionLayer"
           class="evui-codeview-description"
         >
           <span>{{ description }}</span>
@@ -112,7 +114,11 @@
       },
     },
     mounted() {
-      this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+      const descriptionLayerHeight = this.$refs.descriptionLayer ?
+        this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
+      const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
+
+      this.boxHeight = exampleLayerHeight + descriptionLayerHeight + 50;
     },
     created() {
       this.$http.get(this.codeUrl)
@@ -128,15 +134,15 @@
       onBottomClick: function onBottomClick() {
         const codeLayerHeight = this.$refs.codeLayer.getBoundingClientRect().height;
         const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
-
+        const descriptionLayerHeight = this.$refs.descriptionLayer ?
+          this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
-          this.boxHeight = codeLayerHeight + exampleLayerHeight + 33;
+          this.boxHeight = codeLayerHeight + exampleLayerHeight + descriptionLayerHeight + 33;
         } else {
           this.txtBottomBar = 'Expand';
-          this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+          this.boxHeight = exampleLayerHeight + descriptionLayerHeight + 50;
         }
-
         this.isExpand = !this.isExpand;
       },
     },

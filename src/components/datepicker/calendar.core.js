@@ -36,21 +36,22 @@ class Calendar {
       initSelectDayFlag: true,
       // 최초 선택된 날(default : 오늘)
       initSelectDay: new Date(),
+      // 제한 시작 날짜(default:오늘) 이후 날짜 비활성화(default:false)
+      limitToday: false,
       // 제한 시작 날짜(default : 오늘)
       // initLimitDay: new Date(new Date().getFullYear(), new Date().getMonth(), 28),
       initLimitDay: new Date(),
       // 달력에 선택되는 날짜 타입
       // ('day'[default] : 하루, 'weekday' : 1주(평일, 월~금), 'week' : 1주일)
       selectDayType: 'day',
-      // 날짜 최대 (limit * 단위(일, 주, 평일))까지 선택 가능
+      // selectDayType가 'day'일 때, 날짜 최대 limit일까지 선택 가능
       selectDayLimit: 1,
-      // 제한 시작 날짜(default:오늘) 이후 날짜 비활성화(default:false)
-      limitToday: false,
 
       // init parameter
       pickerArea: {
         left: {
           show: true,
+          triangleLength: 15,
           height: 25,
         },
         right: {
@@ -111,12 +112,21 @@ class Calendar {
           'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
       },
       dayOfTheWeekArr: {
+        index: [0, 1, 2, 3, 4, 5, 6], // getDay()
         abbrUpperName: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
         abbrLowerName: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
         height: 25,
       },
+      titleType: {
+        // 'fullName', 'numberName', 'abbrName' 중 선택
+        month: 'fullName',
+        // 'abbrUpperName', 'abbrLowerName' 중 선택
+        dayOfTheWeek: 'abbrUpperName',
+      },
       // timepicker (left : calendar[default], right: time) all show?
-      twoPageShow: false,
+      twoPageShow: false, // 아직은 false로 놔둠
+      // twoPageShow가 true일 때 'H', 'HM', 'HMS'가 right영역에 추가되는 타입
+      twoPageType: null,
     };
 
     // parameter mapping
@@ -124,12 +134,12 @@ class Calendar {
 
     // create & init canvas
     this.baseCanvas = document.createElement('canvas');
-    this.baseCanvas.setAttribute('class', 'evui-calendar');
+    this.baseCanvas.setAttribute('class', 'evui-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
 
     this.overCanvas = document.createElement('canvas');
-    this.overCanvas.setAttribute('class', 'evui-calendar-overlay');
-    this.overCanvas.setAttribute('style', 'position: absolute; left: 0px;');
+    this.overCanvas.setAttribute('class', 'evui-calendar-overlay-canvas');
+    this.overCanvas.setAttribute('style', 'position: absolute; left: 0px; top: 0px;');
     this.overCtx = this.overCanvas.getContext('2d');
 
     // init coordinate obj
@@ -256,7 +266,7 @@ class Calendar {
         width: (leftInner.width / 7),
         startY: leftInner.startY,
         height: this.options.dayOfTheWeekArr.height,
-        text: this.options.dayOfTheWeekArr.abbrUpperName[ix],
+        text: this.options.dayOfTheWeekArr[this.options.titleType.dayOfTheWeek][ix],
       };
       this.coordinate.calendarArea.leftDayOfTheWeek.push(obj);
     }
@@ -362,11 +372,12 @@ class Calendar {
       });
       // mousemove on triangle in picker area
       const leftPickerArrow = this.coordinate.pickerArea.leftArrow;
+      const leftPickerAreaOption = this.options.pickerArea.left;
       let exist = false;
       leftPickerArrow.forEach((v, idx) => {
         exist = this.existTriangle(
           leftPickerArrow[idx].centerX, leftPickerArrow[idx].centerY,
-          v.direction, 10, e.offsetX, e.offsetY
+          v.direction, leftPickerAreaOption.triangleLength, e.offsetX, e.offsetY
         );
         if (exist) {
           mouseoverFlag = true;
@@ -522,12 +533,13 @@ class Calendar {
       // CLICK triangle in picker area
       if (e.offsetY > pickerAreaLeft.startY && e.offsetY < (+pickerAreaLeft.startY + +pickerAreaLeft.height)) {
         const leftPickerArrows = this.coordinate.pickerArea.leftArrow;
+        const leftPickerAreaOption = this.options.pickerArea.left;
         const currDate = this.options.currentYearMonth;
         let exist = false;
         leftPickerArrows.forEach((v, idx) => {
           exist = this.existTriangle(
             leftPickerArrows[idx].centerX, leftPickerArrows[idx].centerY,
-            v.direction, 10, e.offsetX, e.offsetY
+            v.direction, leftPickerAreaOption.triangleLength, e.offsetX, e.offsetY
           );
           if (exist) {
             if (v.direction === 'left') {
@@ -594,10 +606,10 @@ class Calendar {
     const gap = 1;
     this.clearCanvas(
       ctx,
-      padding.left - gap,
-      padding.top - gap,
-      ((this.baseCanvas.width - padding.left) - padding.right) + +(gap * 2),
-      ((this.baseCanvas.height - padding.top) - padding.bottom) + +(gap * 2),
+      padding.left - gap - 1,
+      padding.top - gap - 1,
+      ((this.baseCanvas.width - padding.left) - padding.right) + +(gap * 2) + +2,
+      ((this.baseCanvas.height - padding.top) - padding.bottom) + +(gap * 2) + +2,
     );
     this.dynamicDraw(
       ctx,
@@ -612,6 +624,7 @@ class Calendar {
   drawPickerArea() {
     const ctx = this.context;
     const pickerArea = this.options.pickerArea;
+    const leftPickerAreaOption = this.options.pickerArea.left;
     if (pickerArea.left.show) {
       this.coordinate.pickerArea.leftArrow = [];
       const pickerAreaLeft = this.coordinate.pickerArea.left;
@@ -634,7 +647,7 @@ class Calendar {
         centerX: +pickerAreaLeft.startX + +(pickerAreaLeft.width * (7 / 8)),
         centerY: +pickerAreaLeft.startY + +(pickerAreaLeft.height / 2),
         direction: 'right',
-        length: 10,
+        length: leftPickerAreaOption.triangleLength,
       };
       this.coordinate.pickerArea.leftArrow.push(rightArrow);
       this.drawTriangle(
@@ -646,7 +659,7 @@ class Calendar {
         centerX: +pickerAreaLeft.startX + +(pickerAreaLeft.width * (1 / 8)),
         centerY: +pickerAreaLeft.startY + +(pickerAreaLeft.height / 2),
         direction: 'left',
-        length: 10,
+        length: leftPickerAreaOption.triangleLength,
       };
       this.coordinate.pickerArea.leftArrow.push(leftArrow);
       this.drawTriangle(
@@ -681,7 +694,7 @@ class Calendar {
 
       // draw month TEXT
       const thisMonth = this.options.currentYearMonth.getMonth();
-      const thisMonthText = this.options.monthArr.fullName[thisMonth];
+      const thisMonthText = this.options.monthArr[this.options.titleType.month][thisMonth];
       this.coordinate.pickerArea.leftMonth = {
         x: +pickerAreaLeft.startX + +(pickerAreaLeft.width * (2 / 4)),
         y: +pickerAreaLeft.startY,
@@ -731,7 +744,7 @@ class Calendar {
         {
           fillText: {
             show: true,
-            text: this.options.dayOfTheWeekArr.abbrUpperName[idx],
+            text: this.options.dayOfTheWeekArr[this.options.titleType.dayOfTheWeek][idx],
           },
           stroke: {
             show: false,
@@ -1033,149 +1046,18 @@ class Calendar {
             this.coordinate.calendarArea.leftAllDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
           }
-          // //// 나머지 주 & 마지막 주의 이번달 날짜
-          // if (ix === 1 && jx === this.thisMonthFirstDay && this.thisMonthFirstDay === 0) {
-          //   this.monthDay = 1;
-          //   let fillText = {
-          //     show: true,
-          //     text: 1,
-          //   };
-          //   let fill = {
-          //     show: true,
-          //     color: this.options.colors.thisMonthFill,
-          //   };
-          //   let selectableFlag = true;
-          //   if (this.options.limitToday) {
-          //     const currentDate = new Date(currentYear, currentMonth - 1, 1);
-          //     const initLimitDay = this.options.initLimitDay;
-          //     if (initLimitDay < currentDate) {
-          //       fillText = {
-          //         show: true,
-          //         color: this.options.colors.prevNextMonthFont,
-          //         text: 1,
-          //       };
-          //       fill = {
-          //         show: false,
-          //       };
-          //       selectableFlag = false;
-          //     }
-          //   }
-          //   obj = {
-          //     startX: calendarAreaLeftInner.startX + ((calendarAreaLeftInner.width / 7) * jx),
-          //     width: calendarAreaLeftInner.width / 7,
-          //     startY: +(calendarAreaLeftInner.startY + dayOfTheWeekHeight)
-          //       + +((calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt),
-          //     height: (calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt,
-          //     style: {
-          //       fillText,
-          //       fill,
-          //       align: 'center',
-          //       padding: { bottom: 8 },
-          //       font: '10px Roboto Condensed',
-          //     },
-          //     selectable: selectableFlag,
-          //     date: {
-          //       year: currentYear,
-          //       month: currentMonth,
-          //       day: this.monthDay
-          //     }
-          //   };
-          //   this.coordinate.calendarArea.leftAllDay.push(obj);
-          //   this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
-          // } else {
-          //   this.monthDay++;
-          //   let fillText = {
-          //     show: true,
-          //     text: this.monthDay,
-          //   };
-          //   let fill = {
-          //     show: true,
-          //     color: this.options.colors.thisMonthFill,
-          //   };
-          //   let selectableFlag = true; // 선택 여부
-          //   if (this.options.limitToday) {
-          //     const currentDate = new Date(currentYear, currentMonth - 1, this.monthDay);
-          //     const initLimitDay = this.options.initLimitDay;
-          //     if (initLimitDay < currentDate) {
-          //       fillText = {
-          //         show: true,
-          //         color: this.options.colors.prevNextMonthFont,
-          //         text: this.monthDay,
-          //       };
-          //       fill = {
-          //         show: false,
-          //       };
-          //       selectableFlag = false;
-          //     }
-          //   }
-          //   obj = {
-          //     startX: calendarAreaLeftInner.startX + ((calendarAreaLeftInner.width / 7) * jx),
-          //     width: calendarAreaLeftInner.width / 7,
-          //     startY: calendarAreaLeftInner.startY + dayOfTheWeekHeight
-          //     + (((calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt) * ix),
-          //     height: (calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt,
-          //     style: {
-          //       fillText,
-          //       fill,
-          //       align: 'center',
-          //       padding: { bottom: 8 },
-          //       font: '10px Roboto Condensed',
-          //     },
-          //     selectable: selectableFlag,
-          //     date: {
-          //       year: currentYear,
-          //       month: currentMonth,
-          //       day: this.monthDay
-          //     }
-          //   };
-          //   this.coordinate.calendarArea.leftAllDay.push(obj);
-          //   this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
-          // }
-          // this.monthDay++;
-          // let fillText = {
-          //   show: true,
-          //   text: this.monthDay,
-          // };
-          // let fill = {
-          //   show: true,
-          //   color: this.options.colors.thisMonthFill,
-          // };
-          // let selectableFlag = true; // 선택 여부
-          // if (this.options.limitToday) {
-          //   const currentDate = new Date(currentYear, currentMonth - 1, this.monthDay);
-          //   const initLimitDay = this.options.initLimitDay;
-          //   if (initLimitDay < currentDate) {
-          //     fillText = {
-          //       show: true,
-          //       color: this.options.colors.prevNextMonthFont,
-          //       text: this.monthDay,
-          //     };
-          //     fill = {
-          //       show: false,
-          //     };
-          //     selectableFlag = false;
-          //   }
-          // }
-          // const obj = {
-          //   startX: calendarAreaLeftInner.startX + ((calendarAreaLeftInner.width / 7) * jx),
-          //   width: calendarAreaLeftInner.width / 7,
-          //   startY: calendarAreaLeftInner.startY + dayOfTheWeekHeight
-          //   + (((calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt) * ix),
-          //   height: (calendarAreaLeftInner.height - dayOfTheWeekHeight) / this.thisMonthWeekCnt,
-          //   style: {
-          //     fillText,
-          //     fill,
-          //     align: 'center',
-          //     padding: { bottom: 8 },
-          //     font: '10px Roboto Condensed',
-          //   },
-          //   selectable: selectableFlag,
-          // };
-          // this.coordinate.calendarArea.leftAllDay.push(obj);
-          // this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
         }
       }
     }
+  }
+
+  setSelectDays() {
+    const selectDayType = this.options.selectDayType;
+    const selectDayArr = this.coordinate.calendarArea.leftSelectDayArr;
+    if (selectDayType === 'day') {
+
+    }
+    return selectDayArr;
   }
 
   drawTimeArea() {
