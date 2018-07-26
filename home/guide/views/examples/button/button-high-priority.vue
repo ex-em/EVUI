@@ -1,10 +1,9 @@
 <template>
-  <div class="btn-loading">
+  <div class="btn-small">
     <Button
       :name="name"
       :text="text"
-      :type="type"
-      :is-loading="isLoading"
+      :is-high-priority="isHighPriority"
     />
   </div>
 </template>
@@ -18,17 +17,15 @@
     },
     data() {
       return {
-        name: 'loadingBtn',
-        text: 'loading',
-        type: 'primary',
-        isLoading: true,
+        name: 'highPriorityBtn',
+        text: 'high Priority',
+        isHighPriority: true,
       };
     },
   };
 </script>
-
 <style scoped>
-  .btn-loading{
+  .btn-small{
     display: inline-block;
     margin-left: 5px;
     height: 40px;

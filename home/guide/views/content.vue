@@ -101,6 +101,11 @@
                 imgUrl: `${this.imgUrl}/timepicker.png`,
               },
               {
+                name: 'Datepicker',
+                routerLink: '/datepicker',
+                content: '데이트 피커',
+              },
+              {
                 name: 'Toggle',
                 routerLink: '/toggle',
                 content: '토글',
