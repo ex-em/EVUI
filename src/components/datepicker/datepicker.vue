@@ -99,8 +99,13 @@
         return `${prefixCls}-input`;
       },
       mergedOption() {
+        let flag = false;
+        if (this.$props.value) {
+          flag = true;
+        }
         return Object.assign(this.$props.options, {
-          initSelectDay: this.$props.value ? new Date(this.$props.value) : null,
+          initSelectDayFlag: flag,
+          initSelectDay: this.$props.value ? new Date(this.$props.value) : new Date(),
         });
       },
     },
@@ -138,6 +143,6 @@
     position: absolute;
     height: 0px;
     overflow: hidden;
-    transition: height .5s ease-in-out;
+    transition: height .3s ease-in-out;
   }
 </style>
