@@ -1,15 +1,11 @@
 <template>
   <div>
-    <div>
-      <datepicker
-      />
-      <datepicker
-        :cal-obj="obj2"
-      />
-      <datepicker
-        :cal-obj="obj3"
-      />
-    </div>
+    <datepicker
+      v-model="bindDay"
+      :options="option"
+      class="evui-datepicker-temp"
+    />
+    <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 
@@ -23,12 +19,10 @@
     },
     data() {
       return {
-        toggleFlag: true,
-        obj2: {
-          selectDayType: 'weekday',
-        },
-        obj3: {
-          selectDayType: 'week',
+        bindDay: '2018-07-09',
+        option: {
+          selectDayType: 'day',
+          initSelectDayFlag: true,
         },
       };
     },
@@ -37,5 +31,8 @@
   };
 </script>
 
-<style>
+<style scoped>
+  .evui-datepicker-temp {
+    display: inline-block;
+  }
 </style>

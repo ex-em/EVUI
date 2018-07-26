@@ -24,6 +24,7 @@
 
 <script>
   import codeView from '@/components/codeview/code';
+  import calendarDefault from './datepicker-calendar';
   import datepickerDefault from './datepicker-default';
 
   export default {
@@ -34,9 +35,14 @@
       return {
         componentList: [
           {
+            url: './guide/views/examples/datepicker/datepicker-calendar.vue',
+            component: calendarDefault,
+            title: 'Default - Calendar',
+          },
+          {
             url: './guide/views/examples/datepicker/datepicker-default.vue',
             component: datepickerDefault,
-            title: 'Default',
+            title: 'Default - Datepicker',
           },
         ],
       };
