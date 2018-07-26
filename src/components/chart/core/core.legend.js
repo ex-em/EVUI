@@ -30,6 +30,7 @@ export default class ChartLegend {
   init() {
     this.createLegend();
     if (!this.isShow) {
+      this.resizeDOM.style.display = 'none';
       this.legendDOM.style.display = 'none';
     }
 
@@ -69,7 +70,7 @@ export default class ChartLegend {
       legend.colorDOM.style.backgroundColor = series.color || defColors[series.seriesIndex];
 
       legend.nameDOM.textContent = series.name;
-      legend.nameDOM.dataset.id = series.name;
+
       legend.nameDOM.setAttribute('title', series.name);
 
       legend.containerDOM.appendChild(legend.colorDOM);
@@ -86,7 +87,10 @@ export default class ChartLegend {
 
       this.legendWidth = Math.min(Math.max(width, this.legendWidth), 140);
       legend.containerDOM.style.lineHeight = `${this.legendHeight}px`;
+      legend.containerDOM.style.cursor = this.chartOptions.type !== 'sunburst' ? 'pointer' : '';
       legend.containerDOM.addEventListener('click', this.onClickLegend.bind(this));
+      legend.containerDOM.addEventListener('mouseover', this.onMouseOverLegend.bind(this));
+      legend.containerDOM.addEventListener('mouseout', this.onMouseOutLegend.bind(this));
       legend.containerDOM.series = series;
 
       if (position === 'top' || position === 'bottom') {
@@ -359,6 +363,10 @@ export default class ChartLegend {
   }
 
   onClickLegend(e) {
+    if (this.chartOptions.type === 'sunburst') {
+      return;
+    }
+
     const eventTargetDOM = e.currentTarget;
     const series = eventTargetDOM.series;
     const colorDOM = eventTargetDOM.getElementsByClassName('evui-chart-legend-color')[0];
@@ -379,7 +387,34 @@ export default class ChartLegend {
     colorDOM.classList.toggle('inactive');
     nameDOM.classList.toggle('inactive');
     series.show = !series.show;
-
+    series.highlight.show = !series.highlight.show;
+    this.overlayClear();
     this.redraw();
+  }
+
+  onMouseOverLegend(e) {
+    if (this.chartOptions.type !== 'sunburst') {
+      e.target.style.fontWeight = 'bold';
+    }
+
+    const eventTargetDOM = e.currentTarget;
+    const series = eventTargetDOM.series;
+
+    if (series.show) {
+      series.highlight.show = true;
+      this.overlayClear();
+      this.seriesHighlight(series.seriesIndex);
+    }
+  }
+
+  onMouseOutLegend(e) {
+    if (this.chartOptions.type !== 'sunburst') {
+      e.target.style.fontWeight = '';
+    }
+    const eventTargetDOM = e.currentTarget;
+    const series = eventTargetDOM.series;
+
+    series.highlight.show = false;
+    this.overlayClear();
   }
 }

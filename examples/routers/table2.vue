@@ -1,10 +1,10 @@
 <template>
   <div style="width:100%">
-    <Table
+    <evui-table
       ref="test"
       :width="'50%'"
       :height="'350px'"
-      :virtualScroll="true"
+      :virtual-scroll="true"
       :columns="columns"
       :records="rowData"
     />
@@ -13,14 +13,14 @@
 </template>
 
 <script>
-  import Table from '@/components/table';
+  import EvuiTable from '@/components/table';
   import rowdata from '@/components/table/data.json';
   // import rowdata2 from '@/components/table/data2.json';
   // import '@/components/table/table.css';
 
   export default {
     components: {
-      Table,
+      EvuiTable,
     },
     data() {
       return {

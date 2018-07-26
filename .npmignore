@@ -13,6 +13,7 @@ yarn-error.log*
 *.sln
 .git
 build/
+maxgauge/
 examples/
 src/TDDTest/
 test/
