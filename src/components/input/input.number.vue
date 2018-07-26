@@ -36,13 +36,12 @@
         :min="min"
         :max="max"
         :step="step"
-        :parser="parser"
         :disabled="disabled"
         :readonly="readonly"
         :precision="precision"
         :value="formatterValue"
         :class="inputClasses"
-        @keydown.stop="keyDown"
+        @keydown.stop="keyDownEvent"
         @focus="focus"
         @blur="blur"
         @mousewheel="wheelEvent"
@@ -59,18 +58,12 @@
   const prefixCls = 'evui-input-number';
 
   function parsedStyle(value) {
-    let val = value;
-
-    val = val.toString();
-
-    if (val.match(/[1-9]*?[0-9]+/gi)) {
-      if (val.match(/[px|%]/gi) === null) {
-        val = val.concat('px');
-      }
-    } else {
-      val = null;
+    const mark = value.toString();
+    let result = mark;
+    if (!mark.match(/([1-9]+)([0-9]*)(px|%+)/g)) {
+      result = mark.concat('px');
     }
-    return val;
+    return result;
   }
   function addNum(num1, num2) {
     let sq1;
@@ -79,7 +72,8 @@
       sq1 = num1.toString().split('.')[1].length;
     } catch (e) {
       sq1 = 0;
-    } try {
+    }
+    try {
       sq2 = num2.toString().split('.')[1].length;
     } catch (e) {
       sq2 = 0;
@@ -87,7 +81,6 @@
     const sf = 10 ** Math.max(sq1, sq2);
     return (Math.round(num1 * sf) + Math.round(num2 * sf)) / sf;
   }
-
   export default {
       name: 'InputNumber',
       components: {
@@ -106,14 +99,6 @@
           type: Number,
           default: 0.1,
         },
-        inputWidth: {
-          type: [String, Number],
-          default: '100%',
-        },
-        inputHeight: {
-          type: [String, Number],
-          default: '100%',
-        },
         width: {
           type: [String, Number],
           default: '100%',
@@ -130,31 +115,14 @@
           type: Boolean,
           default: false,
         },
-        useZeroDigit: {
-          type: Boolean,
-          default: false,
-        },
-        editable: {
-          type: Boolean,
-          default: true,
-        },
-        precisionMax: {
-          type: Number,
-          default: Infinity,
-        },
-        precisionMin: {
-          type: Number,
-          default: -Infinity,
-        },
         precision: {
           type: Number,
           default: 1,
+          validator(value) {
+            return !isNaN(Number(value)) && value >= 0 && value <= 100;
+          },
         },
         formatter: {
-          type: Function,
-          default: null,
-        },
-        parser: {
           type: Function,
           default: null,
         },
@@ -179,6 +147,9 @@
           };
         },
         formatterValue: function formatterValue() {
+          if (this.formatter) {
+            return this.formatter(this.currentValue);
+          }
           return this.currentValue;
         },
         wrapClasses: function wrapClasses() {
@@ -218,13 +189,9 @@
         },
       },
       watch: {
-        value(val) {
-          this.currentValue = val;
+        value(updatedValue) {
+          this.currentValue = updatedValue;
         },
-      },
-      created() {
-      },
-      mounted() {
       },
       methods: {
         preventDefault(e) {
@@ -252,80 +219,78 @@
           }
           const step = Number(this.step);
           const targetValue = Number(e.target.value);
-          let val = Number(this.currentValue);
-          if (isNaN(val)) {
+          let updatedValue = Number(this.currentValue);
+
+          if (isNaN(updatedValue)) {
             return false;
           }
-
-          if (!isNaN(targetValue)) {
-            if (type === 'up') {
-              if (addNum(targetValue, val) <= this.max) {
-                val = targetValue;
+          if (!isNaN(targetValue) && type !== null) {
+              if (addNum(targetValue, updatedValue) <= this.max ||
+                addNum(targetValue, -updatedValue) >= this.min) {
+                updatedValue = targetValue;
               } else {
                 return false;
               }
-            } else if (type === 'down') {
-              if (addNum(targetValue, -val) >= this.min) {
-                val = targetValue;
-              } else {
-                return false;
-              }
-            }
           }
-
           if (type === 'up') {
-            val = addNum(val, step);
+            updatedValue = addNum(updatedValue, step);
           } else if (type === 'down') {
-            val = addNum(val, -step);
+            updatedValue = addNum(updatedValue, -step);
           }
-          this.setValue(val);
+          this.setValue(updatedValue);
           return true;
         },
         setValue(value) {
-          let val = value;
-          if (!isNaN(this.precision)) {
-            val = Number(Number(val).toFixed(this.precision));
-          }
+          const updatedValue = Number(Number(value).toFixed(this.precision));
           this.$nextTick(() => {
-              this.currentValue = val;
+              this.currentValue = updatedValue;
             });
-          return val;
+          return updatedValue;
         },
         change(e) {
-          let value = e.target.value.trim();
-
-          if (this.parser) {
-            this.parser(value);
-          }
-          if (e.type === 'input' && value.match(/^-?\.?$|\.$/)) return;
-
-          const { min, max } = this;
+          let updatedValue;
+          const max = this.max;
+          const min = this.min;
+          const value = e.target.value.trim();
           const isEmptyString = value.length === 0;
-          value = Number(value);
-
           if (isEmptyString) {
             this.setValue(null);
-            return;
+            return false;
           }
-
-          if (e.type === 'change' && value === this.currentValue && value > min && value < max) return;
-
-          if (!isNaN(value) && !isEmptyString) {
-            this.currentValue = value;
-            if (e.type === 'input' && value < min) return;
-            if (value > max) {
-              this.setValue(max);
-            } else if (value < min) {
-              this.setValue(min);
-            } else {
-              this.setValue(value);
-            }
-          } else {
+          if (this.validateValue(e.type, value)) {
+            return false;
+          }
+          if (isNaN(value)) {
             e.target.value = this.setValue(this.currentValue);
-            return;
+            return false;
           }
-
+          if (!isNaN(value)) {
+            updatedValue = Number(value);
+            if (e.type === 'input' && value < min) {
+              return false;
+            }
+            if (value > max || value < min) {
+              updatedValue = value > max ? max : min;
+            } else {
+              updatedValue = value;
+            }
+            this.setValue(updatedValue);
+          }
+          this.setValue(updatedValue);
           this.currentValue = value;
+          return true;
+        },
+        validateValue(type, value) {
+          let result = false;
+          if (type === 'input'
+            && value.match(/^-?\.?$|\.$/)) {
+            result = true;
+          }
+          if (type === 'change'
+            && value === this.currentValue) {
+            result = true;
+          }
+          return result;
         },
         focus() {
           this.focused = true;
@@ -333,21 +298,21 @@
         blur() {
           this.focused = false;
         },
-        keyDown(e) {
-            if (e.keyCode === 38) {
-              e.preventDefault();
-              this.up(e);
-            } else if (e.keyCode === 40) {
-              e.preventDefault();
-              this.down(e);
-            }
+        keyDownEvent(e) {
+          if (e.keyCode === 38) {
+            e.preventDefault();
+            this.up(e);
+          } else if (e.keyCode === 40) {
+            e.preventDefault();
+            this.down(e);
+          }
         },
         wheelEvent(e) {
           e.preventDefault();
-          if (e.wheelDeltaY === -120) {
-            this.down(e);
-          } else if (e.wheelDeltaY === 120) {
+          if (e.wheelDeltaY === 120) {
             this.up(e);
+          } else if (e.wheelDeltaY === -120) {
+            this.down(e);
           }
         },
       },
