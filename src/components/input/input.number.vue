@@ -367,9 +367,7 @@
     cursor: text;
     margin: 0;
     padding: 0;
-    width: 80px;
     height: 32px;
-    line-height: 32px;
     vertical-align: middle;
     border: 1px solid #dddee1;
     border-radius: 4px;
