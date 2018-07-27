@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="article-title">
-      <h2> Input Number </h2>
+      <h2> Label </h2>
     </div>
     <br>
     <div
@@ -12,8 +12,6 @@
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
-          :is-bottom="item.isBottom"
-          :description="item.description"
         >
           <component :is="item.component"/>
         </code-view>
@@ -25,7 +23,7 @@
 
 <script>
   import codeView from '@/components/codeview/code';
-  import inputNumberDefault from './input-number-default';
+  import labelDefault from './label-default';
 
   export default {
     components: {
@@ -35,9 +33,8 @@
       return {
         inputList: [
           {
-            url: './guide/views/examples/inputnumber/input-number-default.vue',
-            component: inputNumberDefault,
-            description: '마우스나 키보드를 이용해서 숫자를 입력할 수 있습니다.',
+            url: './guide/views/examples/label/label-default.vue',
+            component: labelDefault,
             title: 'Default',
           },
         ],

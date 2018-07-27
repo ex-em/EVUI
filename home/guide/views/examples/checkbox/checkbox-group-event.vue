@@ -17,6 +17,8 @@
         />
         <h5># Disable All</h5>
         <Button
+          size="small"
+          type="primary"
           text="change disabled"
           @click="changeDisabled"
         />

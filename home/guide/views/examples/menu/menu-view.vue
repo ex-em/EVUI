@@ -12,7 +12,7 @@
         <h4># {{ item.title }}</h4>
         <code-view
           :code-url="item.url"
-          :height="item.height"
+          :description="item.description"
         >
           <component :is="item.component"/>
         </code-view>
@@ -37,6 +37,8 @@
           {
             url: './guide/views/examples/menu/menu-default.vue',
             component: menuDefault,
+            description: '사이트의 안내를 위한 메뉴입니다. 서브메뉴도 존재합니다.',
+            descriptionEng: 'Menu that provides navigation for your website. Vertical NavMenu with sub-menus',
             title: 'Default',
           },
         ],
