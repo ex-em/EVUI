@@ -4,8 +4,6 @@
       v-model="toggleFlag"
     />
     {{ toggleFlag }}
-    <br>
-    <br>
     <toggle
       v-model="toggleFlag2"
     />
@@ -25,9 +23,17 @@
       return {
         toggleFlag: true,
         toggleFlag2: false,
+        largeText: {
+          onText: 'ON',
+          offText: 'OFF',
+          fontSize: 11,
+        },
       };
     },
     methods: {
     },
   };
 </script>
+
+<style>
+</style>

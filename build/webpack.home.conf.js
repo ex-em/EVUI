@@ -7,6 +7,7 @@ const merge = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.conf.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const { VueLoaderPlugin } =  require ('vue-loader' );
 
 
 function resolve (dir) {
@@ -14,6 +15,7 @@ function resolve (dir) {
 }
 
 module.exports = merge(webpackBaseConfig, {
+  mode: 'development',
   entry: {
     app: './home/main.js',
     vendors: ['vue']
@@ -23,7 +25,7 @@ module.exports = merge(webpackBaseConfig, {
     publicPath: '/',
     filename: '[name].js',
   },
-  devtool: '#eval-source-map',
+  devtool: 'source-map',
   module: {
     rules:[
       {
@@ -44,18 +46,18 @@ module.exports = merge(webpackBaseConfig, {
     historyApiFallback: true,
     noInfo: true,
     contentBase: '/',
-    open: true,
+    // open: true,
     hot: true,
     inline: true,
-    host: 'localhost',
+    host: '0.0.0.0',
     port: '8888',
     compress: false,
   },
   plugins: [
     new CleanWebpackPlugin(['demo']),
-    new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env')
-    }),
+    // new webpack.DefinePlugin({
+    //   'process.env': require('../config/dev.env')
+    // }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
@@ -70,8 +72,9 @@ module.exports = merge(webpackBaseConfig, {
         to: './guide/'
       }
     ]),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'common'
-    }),
+    new VueLoaderPlugin(),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'common'
+    // }),
   ]
 });
