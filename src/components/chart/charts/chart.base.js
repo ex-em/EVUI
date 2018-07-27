@@ -8,6 +8,7 @@ import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
 import AxisStepsScale from '../core/axis/axis.scale.steps';
 import Legend from '../core/core.legend';
+import Tooltip from '../core/core.tooltip';
 
 class BaseChart {
   constructor(target, data, options) {
@@ -90,10 +91,15 @@ class BaseChart {
     this.createLegend();
     this.legend.init();
 
+    // 4. tooltip
+    this.createTooltip();
+    this.tooltip.init();
+
     // calculate Chart Size
     this.chartRect = this.getChartRect();
 
     this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
+    this.overlayCanvas.onmouseout = this.mouseOutEvent.bind(this);
     window.addEventListener('resize', this.resize.bind(this));
   }
 
@@ -154,6 +160,13 @@ class BaseChart {
       redraw: this.redraw.bind(this),
       overlayClear: this.overlayClear.bind(this),
       seriesHighlight: this.seriesHighlight.bind(this),
+    });
+  }
+
+  createTooltip() {
+    this.tooltip = new Tooltip({
+      seriesList: this.seriesList,
+      getChartGraphPos: this.getChartGraphPos.bind(this),
     });
   }
 
@@ -691,7 +704,13 @@ class BaseChart {
     const x1 = this.chartRect.x1 + this.labelOffset.left;
     const width = x2 - x1;
 
-    const series = this.seriesList[0];
+    let series;
+    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+      if (this.seriesList[ix].show) {
+        series = this.seriesList[ix];
+        break;
+      }
+    }
     const xPoint = series ? series.drawInfo.xPoint : [];
 
     if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
@@ -781,8 +800,16 @@ class BaseChart {
 
     this.overlayClear();
 
+    if (this.tooltip) {
+      this.tooltip.showTooltip(offset, e, item.dataIndex);
+    }
+
     if (item && this.itemHighlight) {
       this.itemHighlight(item);
+    }
+
+    if (this.showCrosshair) {
+      this.showCrosshair(offset);
     }
   }
 
@@ -802,6 +829,22 @@ class BaseChart {
     }
 
     return [mouseX, mouseY];
+  }
+
+  mouseOutEvent() {
+    this.overlayClear();
+    if (this.tooltip) {
+      this.tooltip.tooltipDOM.style.display = 'none';
+    }
+  }
+
+  getChartGraphPos() {
+    return {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
   }
 
   static getPadding(padding) {

@@ -1,8 +1,8 @@
 <template>
   <div style="display: flex; overflow: auto;">
     <line-chart/>
-    <bar-chart/>
-    <pie-chart/>
+    <!--<bar-chart/>-->
+    <!--<pie-chart/>-->
   </div>
 </template>
 <script>
