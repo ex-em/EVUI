@@ -19,6 +19,7 @@
     </div>
     <div
       ref="calendarWrapperRef"
+      :class="options.twoPageShow ? 'expand' : ''"
       class="evui-calendar-wrapper"
     >
       <calendar
@@ -117,7 +118,7 @@
     },
     methods: {
       showDatepicker() {
-        this.$refs.calendarWrapperRef.style.height = '200px';
+        this.$refs.calendarWrapperRef.style.height = '220px';
       },
       hideDatepicker() {
         this.$refs.calendarWrapperRef.style.height = '0px';
@@ -141,8 +142,12 @@
   }
   .evui-calendar-wrapper {
     position: absolute;
+    width: 235px;
     height: 0px;
     overflow: hidden;
     transition: height .3s ease-in-out;
+  }
+  .evui-calendar-wrapper.expand {
+    width: 470px;
   }
 </style>

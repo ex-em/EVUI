@@ -19,10 +19,11 @@
     },
     data() {
       return {
-        bindDay: '2018-07-09',
+        bindDay: '2018-06-09',
         option: {
           selectDayType: 'day',
           initSelectDayFlag: true,
+          twoPageShow: true,
         },
       };
     },

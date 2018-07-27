@@ -59,8 +59,10 @@
     },
     methods: {
       updateSelectOneDay() {
-        const selectDayObj = this.calendar.setSelectDays();
-        this.$emit('input', `${selectDayObj[0].year}-${this.lpad10(selectDayObj[0].month)}-${this.lpad10(selectDayObj[0].day)}`);
+        if (this.calendar.setSelectDays()) {
+          const selectDayObj = this.calendar.setSelectDays();
+          this.$emit('input', `${selectDayObj[0].year}-${this.lpad10(selectDayObj[0].month)}-${this.lpad10(selectDayObj[0].day)}`);
+        }
       },
       lpad10(v) {
         let value = v;
@@ -82,7 +84,7 @@
 <style scoped>
   .evui-calendar {
     position: relative;
-    width: 235px;
-    height: 200px;
+    width: inherit;
+    height: 220px;
   }
 </style>
