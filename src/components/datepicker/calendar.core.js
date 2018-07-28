@@ -66,6 +66,7 @@ class Calendar {
         // timeArea안에 hour, min, sec가 한 페이지에 몇 row * column으로 구성되는지
         columnCount: 6,
         rowCount: 2,
+        triangleLength: 13,
       },
 
       // canvas context style
@@ -152,16 +153,28 @@ class Calendar {
         selectDayArr: [], // 선택한 날짜 저장(월이 바뀐 경우에도)
       },
       timeArea: {
-        total: {},
-        hour: {}, // except title width
-        hourArr: [],
-        hourPage: 1,
-        minute: {}, // except title width
-        minuteArr: [],
-        minutePage: 1,
-        second: {}, // except title width
-        secondArr: [],
-        secondPage: 1,
+        total: {}, // 전체 좌표
+        hour: {
+          total: {}, // hour영역 전체 좌표
+          data: [], // 0 ~ 23 box 좌표
+          arrow: [], // 상,하 화살표
+          page: 1, // 페이지(1 ~ 2)
+          select: 0, // 선택한 시
+        },
+        minute: {
+          total: {},
+          data: [], // 0 ~ 59 box 좌표
+          arrow: [],
+          page: 1, // 페이지(1 ~ 5)
+          select: 0, // 선택한 분
+        },
+        second: {
+          total: {},
+          data: [],
+          arrow: [],
+          page: 1, // 페이지(1 ~ 5)
+          select: 0, // 선택한 초
+        },
       },
     };
 
@@ -251,6 +264,7 @@ class Calendar {
       this.coordinate.calendarArea.dayOfTheWeek.push(obj);
     }
 
+    // 2page일 때 hour, minute, second 영역 init
     if (this.options.twoPageShow) {
       this.coordinate.timeArea.total = {
         startX: this.baseCanvas.width / 2,
@@ -259,12 +273,12 @@ class Calendar {
         height: this.baseCanvas.height - padding.top - padding.bottom,
       };
       this.options.timeTypeName.forEach((v, idx) => {
-        this.coordinate.timeArea[v] = {
-          startX: (this.baseCanvas.width / 2) + +this.options.timeArea.titleWidth,
-          width: this.options.width - padding.right
-          - this.options.timeArea.titleWidth - this.options.timeArea.pageWidth,
-          startY: +padding.top + +((this.coordinate.timeArea.total.height / 3) * idx),
-          height: this.coordinate.timeArea.total.height / 3,
+        this.coordinate.timeArea[v].total = {
+          startX: (this.baseCanvas.width / 2) + +this.options.timeArea.titleWidth + +1,
+          width: this.options.width - padding.right - this.options.timeArea.titleWidth
+          - this.options.timeArea.pageWidth - 2.5,
+          startY: +padding.top + +((this.coordinate.timeArea.total.height / 3) * idx) + +idx,
+          height: (this.coordinate.timeArea.total.height / 3) - 2,
         }
       });
     }
@@ -336,16 +350,19 @@ class Calendar {
       // mousemove on triangle in picker area
       const pickerAreaArrow = this.coordinate.pickerArea.arrow;
       const pickerAreaOption = this.options.pickerArea;
-      let exist = false;
+      let pickerAreaArrowOver = false;
       pickerAreaArrow.forEach((v, idx) => {
-        exist = this.existTriangle(
+        pickerAreaArrowOver = this.existTriangle(
           pickerAreaArrow[idx].centerX, pickerAreaArrow[idx].centerY,
           v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY
         );
-        if (exist) {
+        if (pickerAreaArrowOver) {
           mouseoverFlag = true;
         }
       });
+      // mousemove on hour box
+      const timeAreaHour = this.coordinate.timeArea.hour.data;
+
 
       if (mouseoverFlag) {
         this.overCanvas.style.cursor = 'pointer';
@@ -515,6 +532,28 @@ class Calendar {
           }
         });
       }
+
+      // click on hour box
+      const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
+      const overCtx = this.overCtx;
+      if (e.offsetX > timeAreaHourTotal.startX && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
+        const timeAreaHourData = this.coordinate.timeArea.hour.data;
+        timeAreaHourData.forEach((v) => {
+          if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
+            && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height,
+              {
+                fill: {
+                  show: true,
+                  color: this.options.colors.mousemoveDayFill,
+                }
+              }
+            );
+          }
+        });
+      }
     }.bind(this));
   }
 
@@ -603,28 +642,29 @@ class Calendar {
     ctx.closePath();
 
     // draw triange in picker area
-    const rightArrow = {
+    let arrowObj = {};
+    arrowObj = {
       centerX: +pickerAreaTotal.startX + +(pickerAreaTotal.width * (7 / 8)),
       centerY: +pickerAreaTotal.startY + +(pickerAreaTotal.height / 2),
       direction: 'right',
       length: pickerAreaOption.triangleLength,
     };
-    this.coordinate.pickerArea.arrow.push(rightArrow);
+    this.coordinate.pickerArea.arrow.push(arrowObj);
     this.drawTriangle(
-      ctx, rightArrow.centerX, rightArrow.centerY,
-      rightArrow.direction, rightArrow.length,
+      ctx, arrowObj.centerX, arrowObj.centerY,
+      arrowObj.direction, arrowObj.length,
     );
 
-    const arrow = {
+    arrowObj = {
       centerX: +pickerAreaTotal.startX + +(pickerAreaTotal.width * (1 / 8)),
       centerY: +pickerAreaTotal.startY + +(pickerAreaTotal.height / 2),
       direction: 'left',
       length: pickerAreaOption.triangleLength,
     };
-    this.coordinate.pickerArea.arrow.push(arrow);
+    this.coordinate.pickerArea.arrow.push(arrowObj);
     this.drawTriangle(
-      ctx, arrow.centerX, arrow.centerY,
-      arrow.direction, arrow.length,
+      ctx, arrowObj.centerX, arrowObj.centerY,
+      arrowObj.direction, arrowObj.length,
     );
 
     // draw year TEXT
@@ -1072,84 +1112,88 @@ class Calendar {
   }
   drawTimeAreaContent() {
     const ctx = this.context;
-    const hour = this.coordinate.timeArea.hour;
-    const minute = this.coordinate.timeArea.minute;
-    const second = this.coordinate.timeArea.second;
-    const padding = this.options.padding;
-    const oneBoxWidth = (this.options.width - padding.right - this.options.timeArea.titleWidth
-      - this.options.timeArea.pageWidth) / this.options.timeArea.columnCount;
-    const oneBoxHeight = (this.coordinate.timeArea.total.height / 3)
-      / this.options.timeArea.rowCount;
-    const timeType = ['hour', 'minute', 'second'];
-    let timeAreaObj = {};
+    const timeType = this.options.timeTypeName;
     // init coordinate by time type
-    timeType.forEach((timeTypeValue) => {
-        const timeAreaType = this.coordinate.timeArea[timeTypeValue];
-        let maxNumber = timeTypeValue === 'hour' ? 24 : 60;
-        for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
-          const jx = ix % this.options.timeArea.columnCount;
-          const page = +parseInt(
-            ix / (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
-          ) + +1;
-          let kx = 1;
-          if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
-            < this.options.timeArea.columnCount) {
-            kx = 0;
-          }
-          timeAreaObj = {
-            startX: timeAreaType.startX + (jx * oneBoxWidth),
-            width: oneBoxWidth,
-            startY: timeAreaType.startY + (kx * oneBoxHeight),
-            height: oneBoxHeight,
-            page: page,
-            styleObj: {
-              fillText: {
-                show: true,
-                text: ''+ix,
-              },
-              fill: {
-                show: true,
-                color: this.options.colors.thisMonthFill,
-              },
-              align: 'center',
-              padding: {
-                bottom: 13,
-              },
-            },
-          };
-          this.coordinate.timeArea[timeTypeValue + 'Arr'].push(timeAreaObj);
+    timeType.forEach((type) => {
+      const timeAreaType = this.coordinate.timeArea[type].total;
+      const oneBoxWidth = timeAreaType.width / this.options.timeArea.columnCount;
+      const oneBoxHeight = timeAreaType.height / this.options.timeArea.rowCount;
+      let maxNumber = type === 'hour' ? 24 : 60; // minute, second = 60
+      let timeAreaObj = {};
+      for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
+        const columnIdx = ix % this.options.timeArea.columnCount;
+        const page = +parseInt(
+          ix / (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
+        ) + +1;
+        let rowIdx = 1;
+        if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
+          < this.options.timeArea.columnCount) {
+          rowIdx = 0;
         }
-    });
-    console.log('h : ' + this.coordinate.timeArea.hourArr);
-    console.log('m : ' + this.coordinate.timeArea.minuteArr);
-    console.log('s : ' + this.coordinate.timeArea.secondArr);
-
-    this.coordinate.timeArea.hourArr.forEach((v) => {
-      if (v.page === this.coordinate.timeArea.hourPage) {
-        this.dynamicDraw(ctx, v.startX, v.startY, v.width, v.height, v.styleObj);
+        timeAreaObj = {
+          startX: timeAreaType.startX + (columnIdx * oneBoxWidth),
+          width: oneBoxWidth,
+          startY: timeAreaType.startY + (rowIdx * oneBoxHeight),
+          height: oneBoxHeight,
+          page: page,
+          styleObj: {
+            fillText: {
+              show: true,
+              text: ''+ix,
+            },
+            fill: {
+              show: true,
+              color: this.options.colors.thisMonthFill,
+            },
+            align: 'center',
+            padding: {
+              bottom: 13,
+            },
+          },
+        };
+        this.coordinate.timeArea[type].data.push(timeAreaObj);
       }
     });
-    // this.dynamicDraw(ctx, hour.startX, hour.startY, hour.width, hour.height, {
-    //   stroke: {
-    //     show: true,
-    //     color: '#f00',
-    //   },
-    // });
-    // this.dynamicDraw(ctx, minute.startX, minute.startY, minute.width, minute.height, {
-    //   stroke: {
-    //     show: true,
-    //     color: '#0f0',
-    //   },
-    // });
-    // this.dynamicDraw(ctx, second.startX, second.startY, second.width, second.height, {
-    //   stroke: {
-    //     show: true,
-    //     color: '#00f',
-    //   },
-    // });
+
+    // DRAW box
+    timeType.forEach((type) => {
+      this.coordinate.timeArea[type].data.forEach((v) => {
+        if (v.page === this.coordinate.timeArea[type].page) {
+          this.dynamicDraw(ctx, v.startX, v.startY, v.width, v.height, v.styleObj);
+        }
+      });
+    });
   }
   drawTimeAreaPage() {
-
+    const ctx = this.context;
+    const timeType = this.options.timeTypeName;
+    const arrowArr = ['top', 'bottom'];
+    const timeArea = this.coordinate.timeArea;
+    let timeTypeAreaPage = {};
+    let arrowObj = {};
+    // init and draw arrows
+    timeType.forEach((type) => {
+      const timeTypeTotal = timeArea[type].total;
+      timeTypeAreaPage = {
+        startX: +timeTypeTotal.startX + +timeTypeTotal.width + +1,
+        width: this.options.timeArea.pageWidth,
+        startY: timeTypeTotal.startY,
+        height: timeTypeTotal.height,
+      };
+      arrowArr.forEach((v, idx) => {
+        arrowObj = {
+          centerX: timeTypeAreaPage.startX + (timeTypeAreaPage.width / 2),
+          centerY: timeTypeAreaPage.startY + (timeTypeAreaPage.height * ((+idx + +1) / 3)),
+          direction: v,
+          length: this.options.timeArea.triangleLength,
+        };
+        this.coordinate.timeArea.hour.arrow.push(arrowObj);
+        this.drawTriangle(
+          ctx, arrowObj.centerX, arrowObj.centerY,
+          arrowObj.direction, arrowObj.length,
+        );
+      });
+    });
   }
 
   // DRAW multiple function
@@ -1206,13 +1250,20 @@ class Calendar {
       ctx.lineTo(x, y - (Math.sin(this.toRadians(30)) * length));
       ctx.lineTo(+x + +(Math.cos(this.toRadians(30)) * length), y);
       ctx.lineTo(x, +y + +(Math.sin(this.toRadians(30)) * length));
-      ctx.lineTo(x, y);
     } else if (direction === 'left') {
       ctx.lineTo(x, y - (Math.sin(this.toRadians(30)) * length));
       ctx.lineTo(x - (Math.cos(this.toRadians(30)) * length), y);
       ctx.lineTo(x, +y + +(Math.sin(this.toRadians(30)) * length));
-      ctx.lineTo(x, y);
+    } else if (direction === 'top') {
+      ctx.lineTo(+x + +(Math.sin(this.toRadians(30)) * length), y);
+      ctx.lineTo(x, y - (Math.cos(this.toRadians(30)) * length));
+      ctx.lineTo(x - (Math.sin(this.toRadians(30)) * length), y);
+    } else if (direction === 'bottom') {
+      ctx.lineTo(+x + +(Math.sin(this.toRadians(30)) * length), y);
+      ctx.lineTo(x, +y + +(Math.cos(this.toRadians(30)) * length));
+      ctx.lineTo(x - (Math.sin(this.toRadians(30)) * length), y);
     }
+    ctx.lineTo(x, y);
     ctx.fillStyle = '#000000';
     ctx.fill();
     ctx.strokeStyle = '#000000';
