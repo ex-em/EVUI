@@ -53,8 +53,6 @@
 </template>
 
 <script>
-  import { Console } from '@/common/utils';
-
   const prefixCls = 'evui-input-text';
   const bulletChar = String.fromCharCode(0x2022);
 
@@ -215,11 +213,9 @@
         if (this.useMaxLength && this.validateTextLength(targetValue)) {
           this.originValue = this.originValue.slice(0, this.maxLength);
           this.currentValue = targetValue.slice(0, this.maxLength);
-          Console.log('limit update', this.originValue, this.currentValue);
         } else {
           this.originValue = this.originValue;
           this.currentValue = targetValue;
-          Console.log('update', this.originValue, this.currentValue);
         }
         if (this.hideString) {
           this.currentValue = this.changeStrToBullet(this.currentValue);
