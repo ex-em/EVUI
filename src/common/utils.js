@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 const vm = new Vue();
-const originConsole = window.console;
+const windowConsole = window.console;
 export const prefix = 'evui-';
 
 const Utils = {
@@ -11,14 +11,23 @@ const Utils = {
 };
 
 export const Console = {
-  log(message) {
-    originConsole.log(message);
+  log(...data) {
+    windowConsole.log(...data);
   },
-  warn(message) {
-    originConsole.warn(message);
+  warn(...data) {
+    windowConsole.warn(...data);
   },
-  info(message) {
-    originConsole.info(message);
+  info(...data) {
+    windowConsole.info(...data);
+  },
+  error(...data) {
+    windowConsole.error(...data);
+  },
+  debug(...data) {
+    windowConsole.debug(...data);
+  },
+  dir(item, options) {
+    windowConsole.dir(item, options);
   },
 };
 

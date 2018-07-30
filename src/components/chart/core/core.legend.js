@@ -43,7 +43,6 @@ export default class ChartLegend {
   createLegend() {
     const options = this.chartOptions.legend;
     const defColors = this.chartOptions.colors;
-    const chartType = this.chartOptions.type;
     const position = options.position;
 
     const calcSeriesWidthDOM = document.createElement('span');
@@ -71,21 +70,6 @@ export default class ChartLegend {
       legend.colorDOM.style.backgroundColor = series.color || defColors[series.seriesIndex];
 
       legend.nameDOM.textContent = series.name;
-      legend.nameDOM.chartType = chartType;
-      legend.containerDOM.style.cursor = chartType !== 'sunburst' ? 'pointer' : '';
-
-      legend.nameDOM.addEventListener('mouseover', (e) => {
-        if (e.target.chartType !== 'sunburst') {
-          e.target.style.fontWeight = 'bold';
-        }
-      });
-
-      legend.nameDOM.addEventListener('mouseout', (e) => {
-        if (e.target.chartType !== 'sunburst') {
-          e.target.style.fontWeight = '';
-        }
-      });
-
 
       legend.nameDOM.setAttribute('title', series.name);
 
@@ -103,7 +87,10 @@ export default class ChartLegend {
 
       this.legendWidth = Math.min(Math.max(width, this.legendWidth), 140);
       legend.containerDOM.style.lineHeight = `${this.legendHeight}px`;
+      legend.containerDOM.style.cursor = this.chartOptions.type !== 'sunburst' ? 'pointer' : '';
       legend.containerDOM.addEventListener('click', this.onClickLegend.bind(this));
+      legend.containerDOM.addEventListener('mouseover', this.onMouseOverLegend.bind(this));
+      legend.containerDOM.addEventListener('mouseout', this.onMouseOutLegend.bind(this));
       legend.containerDOM.series = series;
 
       if (position === 'top' || position === 'bottom') {
@@ -400,7 +387,34 @@ export default class ChartLegend {
     colorDOM.classList.toggle('inactive');
     nameDOM.classList.toggle('inactive');
     series.show = !series.show;
-
+    series.highlight.show = !series.highlight.show;
+    this.overlayClear();
     this.redraw();
+  }
+
+  onMouseOverLegend(e) {
+    if (this.chartOptions.type !== 'sunburst') {
+      e.target.style.fontWeight = 'bold';
+    }
+
+    const eventTargetDOM = e.currentTarget;
+    const series = eventTargetDOM.series;
+
+    if (series.show) {
+      series.highlight.show = true;
+      this.overlayClear();
+      this.seriesHighlight(series.seriesIndex);
+    }
+  }
+
+  onMouseOutLegend(e) {
+    if (this.chartOptions.type !== 'sunburst') {
+      e.target.style.fontWeight = '';
+    }
+    const eventTargetDOM = e.currentTarget;
+    const series = eventTargetDOM.series;
+
+    series.highlight.show = false;
+    this.overlayClear();
   }
 }

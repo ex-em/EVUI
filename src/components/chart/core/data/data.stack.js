@@ -1,12 +1,48 @@
+import _ from 'lodash';
 import DataStore from './data';
 
 export default class StackDataStore extends DataStore {
+  getSeriesExtends(defaultSeries, param) {
+    const chartType = this.chartOptions.type;
+    let extSeries;
+
+    if (chartType === 'line') {
+      extSeries = {
+        axisIndex: {
+          x: param.xAxisIndex ? param.xAxisIndex : 0,
+          y: param.yAxisIndex ? param.yAxisIndex : 0,
+        },
+        point: param.point || false,
+        pointSize: param.pointSize || 4,
+        pointStyle: param.pointStyle || '',
+        pointFill: param.pointFill || this.chartOptions.colors[this.seriesList.length],
+        lineWidth: param.lineWidth || 2,
+        fill: param.fill || false,
+        fillColor: param.fillColor || this.chartOptions.colors[this.seriesList.length],
+        fillOpacity: param.fillOpacity || 0.4,
+        stackArr: [],
+        stackOffsetIndex: 0,
+      };
+    } else if (chartType === 'bar') { // 'bar'
+      extSeries = {
+        axisIndex: {
+          x: param.xAxisIndex ? param.xAxisIndex : 0,
+          y: param.yAxisIndex ? param.yAxisIndex : 0,
+        },
+        stackArr: [],
+        stackOffsetIndex: 0,
+      };
+    }
+
+    return _.merge(defaultSeries, extSeries);
+  }
+
   addValues(seriesIndex) {
     const isStack = this.chartOptions.stack;
     const isCategory = this.chartData.category;
 
     const baseIndex = this.findBaseSeries(this.seriesList[seriesIndex].id);
-    const values = this.seriesList[seriesIndex].inputData;
+    const values = this.seriesList[seriesIndex].oData;
 
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
       if (isStack && baseIndex !== null) {
@@ -36,10 +72,10 @@ export default class StackDataStore extends DataStore {
     }
 
     if (dataIdx === null || dataIdx === undefined) {
-      dataIdx = cSeries.data.length;
+      dataIdx = cSeries.cData.length;
     }
 
-    const base = bSeries.data[dataIdx];
+    const base = bSeries.cData[dataIdx];
     const stackValue = {
       x: this.chartOptions.horizontal ? value + base.x : category[dataIdx],
       y: this.chartOptions.horizontal ? category[dataIdx] : value + base.y,
@@ -47,8 +83,8 @@ export default class StackDataStore extends DataStore {
       point: true,
     };
 
-    cSeries.data[dataIdx] = stackValue;
-    cSeries.inputData[dataIdx] = value;
+    cSeries.cData[dataIdx] = stackValue;
+    cSeries.oData[dataIdx] = value;
     cSeries.hasAccumulate = true;
     if (cSeries.show) {
       this.setMinMaxValue(cSeries, stackValue, dataIdx);
@@ -74,9 +110,9 @@ export default class StackDataStore extends DataStore {
     }
 
     if (this.chartOptions.bufferSize) {
-      if (cSeries.data.length > this.chartOptions.bufferSize) {
-        cSeries.data.shift();
-        cSeries.inputData.shift();
+      if (cSeries.cData.length > this.chartOptions.bufferSize) {
+        cSeries.cData.shift();
+        cSeries.oData.shift();
 
         --dataIdx;
         --cSeries.maxIndex;
@@ -85,13 +121,13 @@ export default class StackDataStore extends DataStore {
     }
 
     if (dataIndex === null || dataIndex === undefined) {
-      dataIdx = cSeries.data.length;
+      dataIdx = cSeries.cData.length;
     }
     dataIdx += cSeries.stackOffsetIndex;
 
-    const base = bSeries.data[dataIdx];
-    const basePrev = bSeries.data[dataIdx - 1];
-    const lastCurrValue = dataIdx === 0 ? cSeries.data[0] : cSeries.data[dataIdx];
+    const base = bSeries.cData[dataIdx];
+    const basePrev = bSeries.cData[dataIdx - 1];
+    const lastCurrValue = dataIdx === 0 ? cSeries.cData[0] : cSeries.cData[dataIdx];
     const stackValue = {
       x: value.x,
       y: value.y + base.y,
@@ -137,7 +173,7 @@ export default class StackDataStore extends DataStore {
         lastCurrValue.b.push({ x: value.x, y: 0 });
       }
     } else if (value.x > base.x) {
-      cSeries.data.push({
+      cSeries.cData.push({
         x: base.x,
         y: base.y,
         b: [{ x: base.x, y: base.y }],
@@ -146,7 +182,7 @@ export default class StackDataStore extends DataStore {
 
       if (basePrev.y !== null) {
         if (value.y !== null) {
-          stackValue.y = bSeries.data[dataIdx + 1].y + value.y;
+          stackValue.y = bSeries.cData[dataIdx + 1].y + value.y;
           if (dataIdx > 0 && base.y === null) {
             lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
             stackBase.push({ x: value.x, y: 0 });
@@ -155,11 +191,11 @@ export default class StackDataStore extends DataStore {
             stackBase.push({ x: value.x, y: base.y });
           } else {
             stackBase.push({ x: base.x, y: base.y });
-            if (bSeries.data[dataIdx + 1].y === null) {
+            if (bSeries.cData[dataIdx + 1].y === null) {
               stackBase.push({ x: base.x, y: 0 });
               stackBase.push({ x: value.x, y: 0 });
             } else {
-              stackBase.push({ x: value.x, y: bSeries.data[dataIdx + 1].y });
+              stackBase.push({ x: value.x, y: bSeries.cData[dataIdx + 1].y });
             }
           }
         } else {
@@ -170,8 +206,8 @@ export default class StackDataStore extends DataStore {
       }
     }
 
-    cSeries.data[dataIdx] = stackValue;
-    cSeries.inputData[dataIdx] = value;
+    cSeries.cData[dataIdx] = stackValue;
+    cSeries.oData[dataIdx] = value;
     cSeries.hasAccumulate = true;
     if (cSeries.show) {
       this.setMinMaxValue(cSeries, stackValue, dataIdx);

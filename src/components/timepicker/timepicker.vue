@@ -17,13 +17,18 @@
       class="evui-timepicker-suffix"
       @click.stop="hideTimePicker"
     />
-    <input
-      ref="timePickerText"
-      v-model="timeText"
-      type="text"
-      placeholder=" hh:mi:ss "
-      @keydown.stop="validKeyDown"
+    <div
+      :class="wrapClasses"
     >
+      <input
+        ref="timePickerText"
+        v-model="timeText"
+        :class="inputClasses"
+        type="text"
+        placeholder=" hh:mi:ss "
+        @keydown.stop="validKeyDown"
+      >
+    </div>
     <div
       ref="timePickerPanel"
       class="evui-timepicker-panel"
@@ -56,6 +61,8 @@
 
 <script>
   import spinner from '@/components/timepicker/spinner';
+
+  const prefixCls = 'evui-input-text';
 
   export default {
     components: {
@@ -95,6 +102,10 @@
         type: Array,
         default: null,
       },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
@@ -111,6 +122,17 @@
       };
     },
     computed: {
+      wrapClasses() {
+        return [
+          `${prefixCls}`,
+          {
+            [`${prefixCls}-disabled`]: this.disabled,
+          },
+        ];
+      },
+      inputClasses() {
+        return `${prefixCls}-input`;
+      },
       timeText: {
         get() {
           return this.formattedText;
@@ -201,11 +223,13 @@
     },
     methods: {
       showTimePicker() {
-        this.$refs.timePickerPanel.style.display = 'block';
-        for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
-          this.$refs.timePickerSpinner[ix].liClick(true);
+        if (!this.disabled) {
+          this.$refs.timePickerPanel.style.display = 'block';
+          for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
+            this.$refs.timePickerSpinner[ix].liClick(true);
+          }
+          this.timePickerFadeFlag = true;
         }
-        this.timePickerFadeFlag = true;
       },
       hideTimePicker() {
         this.$refs.timePickerPanel.style.display = 'none';
@@ -401,7 +425,6 @@
   .evui-timepicker input[type=text]:focus,
   .evui-timepicker input[type=text]:hover{
     outline: none;
-    border-color: #409eff;
   }
 
   .evui-timepicker div.evui-timepicker-prefix {
