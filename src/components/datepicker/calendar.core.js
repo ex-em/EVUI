@@ -277,8 +277,8 @@ class Calendar {
           startX: (this.baseCanvas.width / 2) + +this.options.timeArea.titleWidth + +1,
           width: this.options.width - padding.right - this.options.timeArea.titleWidth
           - this.options.timeArea.pageWidth - 2.5,
-          startY: +padding.top + +((this.coordinate.timeArea.total.height / 3) * idx) + +idx,
-          height: (this.coordinate.timeArea.total.height / 3) - 2,
+          startY: +padding.top + +(((this.coordinate.timeArea.total.height - 2) / 3) * idx) + +idx + (idx > 0 ? 0.5 : 0),
+          height: ((this.coordinate.timeArea.total.height - 2) / 3) - 0.5,
         }
       });
     }
@@ -360,8 +360,96 @@ class Calendar {
           mouseoverFlag = true;
         }
       });
-      // mousemove on hour box
-      const timeAreaHour = this.coordinate.timeArea.hour.data;
+
+      // mousemove on hour, minute, second box
+      const timeTypeName = this.options.timeTypeName;
+      const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
+      if (e.offsetX > timeAreaHourTotal.startX && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
+        timeTypeName.forEach((type) => {
+          const timeAreaTypeData = this.coordinate.timeArea[type].data;
+          timeAreaTypeData.forEach((v) => {
+            if (this.coordinate.timeArea.hour.page === v.page) {
+              if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
+                && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
+                this.dynamicDraw(
+                  overCtx, v.startX, v.startY,
+                  v.width, v.height,
+                  {
+                    fill: {
+                      show: true,
+                      color: this.options.colors.mousemoveDayFill,
+                    }
+                  }
+                );
+                mouseoverFlag = true;
+              }
+            }
+          });
+        });
+
+      }
+
+      // // mousemove on hour box
+      // const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
+      // if (e.offsetX > timeAreaHourTotal.startX && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
+      //   const timeAreaHourData = this.coordinate.timeArea.hour.data;
+      //   timeAreaHourData.forEach((v) => {
+      //     if (this.coordinate.timeArea.hour.page === v.page) {
+      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
+      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
+      //         this.dynamicDraw(
+      //           overCtx, v.startX, v.startY,
+      //           v.width, v.height,
+      //           {
+      //             fill: {
+      //               show: true,
+      //               color: this.options.colors.mousemoveDayFill,
+      //             }
+      //           }
+      //         );
+      //         mouseoverFlag = true;
+      //       }
+      //     }
+      //   });
+      //   const timeAreaMinuteData = this.coordinate.timeArea.minute.data;
+      //   timeAreaMinuteData.forEach((v) => {
+      //     if (this.coordinate.timeArea.minute.page === v.page) {
+      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
+      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
+      //         this.dynamicDraw(
+      //           overCtx, v.startX, v.startY,
+      //           v.width, v.height,
+      //           {
+      //             fill: {
+      //               show: true,
+      //               color: this.options.colors.mousemoveDayFill,
+      //             }
+      //           }
+      //         );
+      //         mouseoverFlag = true;
+      //       }
+      //     }
+      //   });
+      //   const timeAreaSecondData = this.coordinate.timeArea.second.data;
+      //   timeAreaSecondData.forEach((v) => {
+      //     if (this.coordinate.timeArea.second.page === v.page) {
+      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
+      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
+      //         this.dynamicDraw(
+      //           overCtx, v.startX, v.startY,
+      //           v.width, v.height,
+      //           {
+      //             fill: {
+      //               show: true,
+      //               color: this.options.colors.mousemoveDayFill,
+      //             }
+      //           }
+      //         );
+      //         mouseoverFlag = true;
+      //       }
+      //     }
+      //   });
+      // }
 
 
       if (mouseoverFlag) {
@@ -376,7 +464,7 @@ class Calendar {
     const allDay = this.coordinate.calendarArea.allDay;
     const selectDayArr = this.coordinate.calendarArea.selectDayArr;
     const overCtx = this.overCtx;
-    this.clearCanvas(overCtx, 0, 0, this.overCanvas.width, this.overCanvas.height);
+    this.clearCanvas(overCtx, 0, 0, this.options.width, this.overCanvas.height); // date쪽만으로 변경 필요
     let mouseclickCondition = false;
     allDay.forEach((v, idx) => {
       // type이 'day'일 때 initSelectDay(최초 선택날짜)여부에 따라 선택
@@ -413,7 +501,7 @@ class Calendar {
             return false;
           } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
             if (this.options.selectDayType === 'weekday') {
-
+              // 개발 필요
             }
           }
           // if (this.options.selectDayType === 'weekday') {
@@ -501,6 +589,13 @@ class Calendar {
     });
   }
 
+  mouseclickHour(e) {
+    const timeAreaHour = this.coordinate.timeArea.hour.data;
+    const selectHour = this.coordinate.timeArea.hour.select;
+    const overCtx = this.overCtx;
+
+  }
+
   initMouseclick() {
     this.overCanvas.addEventListener('click', function(e) {
       e.preventDefault();
@@ -547,7 +642,7 @@ class Calendar {
               {
                 fill: {
                   show: true,
-                  color: this.options.colors.mousemoveDayFill,
+                  color: this.options.colors.selectDayFill,
                 }
               }
             );
@@ -716,16 +811,8 @@ class Calendar {
       this.coordinate.pickerArea.month.width, this.coordinate.pickerArea.month.height,
       this.coordinate.pickerArea.month.style,
     );
-    // if (this.options.twoPageShow) {
-    //   if (pickerArea.right.show) {
-    //     const pickerAreaRight = this.coordinate.pickerArea.right;
-    //     this.dynamicDraw(
-    //      ctx, pickerAreaRight.startX, pickerAreaRight.startY,
-    //      pickerAreaRight.width, pickerAreaRight.height
-    //    );
-    //   }
-    // }
   }
+
   drawCalendarArea() {
     this.drawCalendarDayOfTheWeek();
     this.drawCalendarDay();
@@ -1060,24 +1147,25 @@ class Calendar {
     return selectDayArr;
   }
 
+  // 2페이지 일 때 우측 영역의 선 그리기
   drawSplitLine() {
     const ctx = this.context;
     const padding = this.options.padding;
     ctx.beginPath();
-    // 중앙 가로
+    // 중앙 세로
     ctx.moveTo(this.baseCanvas.width / 2, padding.top);
     ctx.lineTo(this.baseCanvas.width / 2, this.baseCanvas.height - padding.top);
-    // title|content 가로
+    // title|content 세로
     ctx.moveTo(+(this.baseCanvas.width / 2) + +this.options.timeArea.titleWidth, padding.top);
     ctx.lineTo(+(this.baseCanvas.width / 2) + +this.options.timeArea.titleWidth, this.baseCanvas.height - padding.top);
-    // content|page 가로
+    // content|page 세로
     ctx.moveTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth, padding.top);
     ctx.lineTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth, this.baseCanvas.height - padding.top);
-    // hour|minute|second 세로
-    ctx.moveTo(this.baseCanvas.width / 2, this.baseCanvas.height / 3);
-    ctx.lineTo(this.baseCanvas.width - padding.right, this.baseCanvas.height / 3);
-    ctx.moveTo(this.baseCanvas.width / 2, (this.baseCanvas.height / 3) * 2);
-    ctx.lineTo(this.baseCanvas.width - padding.right, (this.baseCanvas.height / 3) * 2);
+    // hour|minute|second 가로
+    ctx.moveTo(this.baseCanvas.width / 2, (this.baseCanvas.height / 3) + 1);
+    ctx.lineTo(this.baseCanvas.width - padding.right, (this.baseCanvas.height / 3) + 1);
+    ctx.moveTo(this.baseCanvas.width / 2, ((this.baseCanvas.height / 3) * 2) - 1);
+    ctx.lineTo(this.baseCanvas.width - padding.right, ((this.baseCanvas.height / 3) * 2) - 1);
     ctx.stroke();
     ctx.closePath();
   }
@@ -1110,6 +1198,7 @@ class Calendar {
       );
     });
   }
+  // DRAW 0 ~ 23 || 59 BOX
   drawTimeAreaContent() {
     const ctx = this.context;
     const timeType = this.options.timeTypeName;
