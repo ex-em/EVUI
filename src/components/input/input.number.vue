@@ -326,7 +326,7 @@
     display: inline-block;
     width: 100%;
     line-height: 1.5;
-    padding: 4px 7px;
+    padding: 4px 0px 7px 0px;
     font-size: 12px;
     color: #495060;
     background-color: #fff;
@@ -334,10 +334,7 @@
     position: relative;
     cursor: text;
     margin: 0;
-    padding: 0;
-    width: 80px;
     height: 32px;
-    line-height: 32px;
     vertical-align: middle;
     border: 1px solid #dddee1;
     border-radius: 4px;
@@ -437,15 +434,8 @@
     cursor: not-allowed;
     color: #ccc;
   }
-  /*handler class*/
-  .evui-input-number-handler-up-inner {
-  }
-  .evui-input-number-handler-down-inner {
-  }
   /*TODO SET ICON CLASS*/
   .fa-sort-up {
     margin-top: 4px;
-  }
-  .evui-icon-arrow-up {
   }
 </style>
