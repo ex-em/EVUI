@@ -60,7 +60,7 @@
   function parsedStyle(value) {
     const mark = value.toString();
     let result = mark;
-    if (!mark.match(/([1-9]+)([0-9]*)(px|%+)/g)) {
+    if (!mark.match(/^(([1-9]+(?:\.\d+)?)(px|%+))$/g)) {
       result = mark.concat('px');
     }
     return result;
