@@ -808,9 +808,9 @@ class BaseChart {
       this.itemHighlight(item);
     }
 
-    if (this.showCrosshair) {
-      this.showCrosshair(offset);
-    }
+//     if (this.showCrosshair) {
+//       this.showCrosshair(offset);
+//     }
   }
 
   getMousePosition(evt) {
