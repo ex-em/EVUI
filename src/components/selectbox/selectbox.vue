@@ -109,15 +109,21 @@
           return {};
         },
       },
-      size: {
-        type: String,
-        default: 'normal',
-      },
       dropdownStyle: {
         type: Object,
         default() {
           return {};
         },
+      },
+      listboxStyle: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      size: {
+        type: String,
+        default: 'normal',
       },
       isGroup: {
         type: Boolean,
@@ -127,15 +133,17 @@
         type: Boolean,
         default: false,
       },
-      listboxStyle: {
-        type: Object,
-        default() {
-          return {};
-        },
-      },
       multiple: {
         type: Boolean,
         default: false,
+      },
+      initSelect: {
+        type: [String, Number],
+        default: null,
+      },
+      initSelectIdx: {
+        type: Number,
+        default: null,
       },
       items: {
         type: Array,
@@ -169,6 +177,12 @@
       if (!this.multiple) {
         this.dropdownStyle.border = 0;
       }
+
+      if (this.initSelect != null) {
+        this.select(this.initSelect);
+      } else if (this.initSelectIdx != null) {
+        this.selectIdx(this.initSelectIdx);
+      }
     },
     methods: {
       onClick() {
@@ -179,13 +193,13 @@
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
-        let findedItem;
+        let foundItem;
         const itemName = item.name;
 
         if (this.multiple) {
-          findedItem = this.selectedItems.find(obj => obj.name === itemName);
+          foundItem = this.selectedItems.find(obj => obj.name === itemName);
 
-          if (findedItem) {
+          if (foundItem) {
             this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
           } else {
             this.selectedItems.push(item);
@@ -204,7 +218,7 @@
         this.$emit('select', item, target, index);
       },
       onKeyUpInputTxt(e) {
-        let findedItem;
+        let foundItem;
         const value = e.target.value;
 
         this.filterItems(value);
@@ -213,14 +227,87 @@
           this.inputText = value;
           this.selectedItems.length = 0;
 
-          findedItem = this.items.find(obj => obj.name === value);
+          foundItem = this.items.find(obj => obj.name === value);
 
-          if (findedItem) {
-            this.selectedItems.push(findedItem);
+          if (foundItem) {
+            this.selectedItems.push(foundItem);
           }
         }
 
         this.$emit('keyup', e);
+      },
+      select(value) {
+        let item;
+        let groupObj;
+        let isSelected = false;
+
+        if (this.isGroup) {
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+
+            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
+              item = groupObj.items[jx];
+
+              if (item.value === value) {
+                this.inputText = item.name;
+                this.selectedItems.push(item);
+                isSelected = true;
+                break;
+              }
+            }
+
+            if (isSelected) {
+              break;
+            }
+          }
+        } else {
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            item = this.items[ix];
+
+            if (item.value === value) {
+              this.inputText = item.name;
+              this.selectedItems.push(item);
+              break;
+            }
+          }
+        }
+      },
+      selectIdx(idx) {
+        let item;
+        let groupObj;
+        let isSelected;
+
+        if (this.isGroup) {
+          let rowIdx = 0;
+
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+
+            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
+              item = groupObj.items[jx];
+
+              if (item && rowIdx === idx) {
+                this.inputText = item.name;
+                this.selectedItems.push(item);
+                isSelected = true;
+                break;
+              }
+
+              rowIdx++;
+            }
+
+            if (isSelected || rowIdx > idx) {
+              break;
+            }
+          }
+        } else {
+          item = this.items[idx];
+
+          if (item) {
+            this.inputText = item.name;
+            this.selectedItems.push(item);
+          }
+        }
       },
       removeTag(item, event) {
         if (event) {

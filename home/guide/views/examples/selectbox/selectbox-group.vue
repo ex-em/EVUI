@@ -5,9 +5,8 @@
       :selectbox-style="boxInfo.selectboxStyle"
       :is-group="boxInfo.isGroup"
       :multiple="boxInfo.multiple"
+      :init-select-idx="3"
       :items="boxInfo.items"
-      @keyup="onKeyUp"
-      @select="onSelect"
     />
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
@@ -26,30 +25,18 @@
       };
     },
     methods: {
-      onSelect(item, target, index) {
-        this.selectedData = item;
-        this.target = target;
-        this.index = index;
-      },
-      onKeyUp(e) {
-        this.e = e;
-      },
       _getBoxInfo() {
-        let ix;
-        let ixLen;
-        let jx;
-        let jxLen;
         let groupObj;
         let boxInfo = {};
         const itemList = [];
 
-        for (ix = 0, ixLen = 20; ix < ixLen; ix++) {
+        for (let ix = 0, ixLen = 20; ix < ixLen; ix++) {
           groupObj = {
             groupName: `group${ix}`,
             items: [],
           };
 
-          for (jx = 0, jxLen = 3; jx < jxLen; jx++) {
+          for (let jx = 0, jxLen = 3; jx < jxLen; jx++) {
             groupObj.items.push({
               name: `group_${ix} > item${jx}`,
               value: ix,
