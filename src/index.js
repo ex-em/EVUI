@@ -12,6 +12,7 @@ import EvSelectbox from '@/components/selectbox';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
+import EvDocking from '@/components/dock';
 
 const components = {
   EvButton,
@@ -28,6 +29,7 @@ const components = {
   EvTable,
   EvTimePicker,
   EvToggle,
+  EvDocking,
 };
 
 const evui = {

@@ -2,10 +2,15 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
+import DockingSamples from './routers/dock/index';
+import store from '../src/components/dock/store';
 
 Vue.use(VueRouter);
 Vue.use(EVUI);
+Vue.use(DockingSamples);
 Vue.config.debug = true;
+
+Vue.prototype.$dockBus = new Vue();
 
 const router = new VueRouter({
   mode: 'history',
@@ -21,6 +26,10 @@ const router = new VueRouter({
     {
       path: '/dock/dockframeSample',
       component: resolve => require(['./routers/dock/dockframeSample'], resolve),
+    },
+    {
+      path: '/dock/DockingLayout',
+      component: resolve => require(['./routers/dock/DockingLayout'], resolve),
     },
     {
       path: '/chart',
@@ -72,5 +81,6 @@ const router = new VueRouter({
 const app = new Vue({
   el : '#app',
   router,
+  store,
   render: h => h(App),
 });
