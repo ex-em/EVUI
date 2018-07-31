@@ -226,4 +226,26 @@ export default class LineChart extends BaseChart {
 
     this.drawPoint(ctx, series.pointStyle, 5, x, y);
   }
+
+  showCrosshair(offset) {
+    const ctx = this.overlayCtx;
+    const x = offset[0];
+    const y = offset[1];
+    const graphPos = this.getChartGraphPos();
+
+    if ((x >= (graphPos.x1 - 1) && x <= (graphPos.x2 + 1))
+      && (y >= (graphPos.y1 - 1) && y <= (graphPos.y2 + 1))) {
+      ctx.strokeStyle = '#ff5500';
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.save();
+      ctx.shadowBlur = 0;
+      ctx.moveTo(x, graphPos.y1);
+      ctx.lineTo(x, graphPos.y2);
+
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
 }
