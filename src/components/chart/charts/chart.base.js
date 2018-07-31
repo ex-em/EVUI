@@ -92,8 +92,8 @@ class BaseChart {
     this.legend.init();
 
     // 4. tooltip
-    this.createTooltip();
-    this.tooltip.init();
+    // this.createTooltip();
+    // this.tooltip.init();
 
     // calculate Chart Size
     this.chartRect = this.getChartRect();
