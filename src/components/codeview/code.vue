@@ -25,28 +25,30 @@
           <span>{{ description }}</span>
         </div>
       </div>
-      <div class="evui-codeview-split-layer"/>
-      <div
-        ref="codeLayer"
-        class="evui-codeview-code-layer"
-      >
-        <codemirror
-          :value="rawCode"
-          :options="codeOption"
-        />
-      </div>
-      <div
-        class="evui-codeview-example-bar"
-        @click.stop="onBottomClick"
-      >
+      <div>
+        <div class="evui-codeview-split-layer"/>
         <div
-          :class="selectIconClasses"
-          class="evui-codeview-example-bar-icon"
+          ref="codeLayer"
+          class="evui-codeview-code-layer"
         >
-          <icon class="fa-sort-down"/>
-          <span
-            class="evui-codeview-example-bar-span"
-          >{{ txtBottomBar }}</span>
+          <codemirror
+            :value="rawCode"
+            :options="codeOption"
+          />
+        </div>
+        <div
+          class="evui-codeview-example-bar"
+          @click.stop="onBottomClick"
+        >
+          <div
+            :class="selectIconClasses"
+            class="evui-codeview-example-bar-icon"
+          >
+            <icon class="fa-sort-down"/>
+            <span
+              class="evui-codeview-example-bar-span"
+            >{{ txtBottomBar }}</span>
+          </div>
         </div>
       </div>
     </div>
