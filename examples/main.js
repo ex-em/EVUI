@@ -10,8 +10,6 @@ Vue.use(EVUI);
 Vue.use(DockingSamples);
 Vue.config.debug = true;
 
-Vue.prototype.$dockBus = new Vue();
-
 const router = new VueRouter({
   mode: 'history',
   routes: [
@@ -29,7 +27,7 @@ const router = new VueRouter({
     },
     {
       path: '/dock/DockingLayout',
-      component: resolve => require(['./routers/dock/DockingLayout'], resolve),
+      component: resolve => require(['./routers/dock/docking.layout'], resolve),
     },
     {
       path: '/chart',

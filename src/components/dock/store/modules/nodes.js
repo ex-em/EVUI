@@ -1,4 +1,4 @@
-/* eslint-disable no-shadow, arrow-parens, no-console */
+/* eslint-disable no-shadow, arrow-parens */
 
 const state = {
   maps: [],

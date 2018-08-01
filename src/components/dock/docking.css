@@ -76,7 +76,7 @@
   position: absolute;
   width: 35px;
   height: 35px;
-  background-image: url(DockingImage.png);
+  background-image: url(docking.image.png);
 }
 
 .docking-icon-wrap .background {
@@ -142,7 +142,7 @@
   position: absolute;
   width: 35px;
   height: 35px;
-  background-image: url(DockingImage.png);
+  background-image: url(docking.image.png);
   z-index: 30000;
 }
 
@@ -259,7 +259,7 @@
 .window-icon {
   width: 17px;
   height: 17px;
-  background-image: url(DockingImage.png);
+  background-image: url(docking.image.png);
 }
 
 .dock-window .header .title {
@@ -293,7 +293,7 @@
 
 /******************** dock frame option icon **********************/
 .option-icon {
-  background-image: url(DockingImage.png);
+  background-image: url(docking.image.png);
   width: 58px;
   height: 25px;
   cursor: pointer;

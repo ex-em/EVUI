@@ -1,3 +1,3 @@
-import DockingContainer from './DockingContainer';
+import DockingContainer from './docking.container';
 
 export default DockingContainer;

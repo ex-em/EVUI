@@ -74,10 +74,13 @@
   </div>
 </template>
 <script>
-  import { mapState, mapGetters, mapActions } from 'vuex';
-  import DockWindow from './DockingWindow';
-  import DockFrame from './DockingFrame';
-  import Splitter from './DockingSplitter';
+  import Vuex from 'vuex';
+  import nodes from './store/modules/nodes';
+  import windows from './store/modules/windows';
+  import splitters from './store/modules/splitters';
+  import DockWindow from './docking.window';
+  import DockFrame from './docking.frame';
+  import Splitter from './docking.splitter';
 
   export default {
     name: 'DockContainer',
@@ -102,12 +105,12 @@
       };
     },
     computed: {
-      ...mapState({
+      ...Vuex.mapState({
         nodes: state => state.nodes.items,
         splitters: state => state.splitters.items,
         windows: state => state.windows.items,
       }),
-      ...mapGetters({
+      ...Vuex.mapGetters({
         getAllMapItem: 'nodes/getAllMapItems',
         getDockWindow: 'windows/getActiveItem',
         getMaxIdSeqForNode: 'nodes/getMaxIdSeq',
@@ -126,6 +129,25 @@
         };
       },
     },
+    beforeCreate() {
+      if (!this.$store) {
+        this.$store = new Vuex.Store({});
+      }
+
+      const store = this.$store;
+
+      if (!store.state.nodes) {
+        store.registerModule('nodes', nodes);
+      }
+
+      if (!store.state.splitters) {
+        store.registerModule('splitters', splitters);
+      }
+
+      if (!store.state.windows) {
+        store.registerModule('windows', windows);
+      }
+    },
     created() {
       if (this.dockingList.nodes) {
         this.$store.commit('nodes/setItems', { items: this.dockingList.nodes });
@@ -136,7 +158,7 @@
     mounted() {
     },
     methods: {
-      ...mapActions({
+      ...Vuex.mapActions({
         addNode: 'nodes/addNode',
         addMapItem: 'nodes/addMapItem',
         addSplit: 'splitters/addSplitter',

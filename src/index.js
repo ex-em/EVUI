@@ -13,6 +13,7 @@ import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
 import EvDocking from '@/components/dock';
+import Vuex from 'vuex';
 
 const components = {
   EvButton,
@@ -42,6 +43,9 @@ const install = function (Vue) {
   Object.keys(evui).forEach((key) => {
     Vue.component(key, evui[key]);
   });
+
+  Vue.use(Vuex);
+  Vue.prototype.$dockBus = new Vue();
 };
 
 // auto install
