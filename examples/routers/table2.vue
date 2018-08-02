@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <evui-table
+    <ev-table
       ref="test"
       :width="'50%'"
       :height="'350px'"
@@ -13,15 +13,11 @@
 </template>
 
 <script>
-  import EvuiTable from '@/components/table';
   import rowdata from '@/components/table/data.json';
   // import rowdata2 from '@/components/table/data2.json';
   // import '@/components/table/table.css';
 
   export default {
-    components: {
-      EvuiTable,
-    },
     data() {
       return {
         columns: [
@@ -36,7 +32,6 @@
           { field: 'edate', caption: 'End Date' },
         ],
         rowData: rowdata,
-        // rowData2: rowdata2,
       };
     },
     methods: {
