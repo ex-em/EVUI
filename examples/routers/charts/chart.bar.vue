@@ -117,6 +117,11 @@
     mounted() {
       this.addData();
     },
+    destroyed() {
+      if (this.interval) {
+        clearTimeout(this.interval);
+      }
+    },
     methods: {
       addData() {
         this.interval = setInterval(this.barAddData.bind(this), 1000);

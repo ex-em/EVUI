@@ -6,10 +6,24 @@
       class="evui-codeview-example"
     >
       <div
+        v-if="description && !isBottom"
+        ref="descriptionLayer"
+        class="evui-codeview-description"
+      >
+        <span>{{ description }}</span>
+      </div>
+      <div
         ref="exampleLayer"
         class="evui-codeview-example-layer"
       >
         <slot/>
+        <div
+          v-if="description && isBottom"
+          ref="descriptionLayer"
+          class="evui-codeview-description"
+        >
+          <span>{{ description }}</span>
+        </div>
       </div>
       <div class="evui-codeview-split-layer"/>
       <div
@@ -57,6 +71,14 @@
         type: Number,
         default: 0,
       },
+      description: {
+        type: String,
+        default: '',
+      },
+      isBottom: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
@@ -92,7 +114,11 @@
       },
     },
     mounted() {
-      this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+      const descriptionLayerHeight = this.$refs.descriptionLayer ?
+        this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
+      const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
+
+      this.boxHeight = exampleLayerHeight + descriptionLayerHeight + 50;
     },
     created() {
       this.$http.get(this.codeUrl)
@@ -108,15 +134,15 @@
       onBottomClick: function onBottomClick() {
         const codeLayerHeight = this.$refs.codeLayer.getBoundingClientRect().height;
         const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
-
+        const descriptionLayerHeight = this.$refs.descriptionLayer ?
+          this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
-          this.boxHeight = codeLayerHeight + exampleLayerHeight + 33;
+          this.boxHeight = codeLayerHeight + exampleLayerHeight + descriptionLayerHeight + 33;
         } else {
           this.txtBottomBar = 'Expand';
-          this.boxHeight = this.$refs.exampleLayer.getBoundingClientRect().height + 50;
+          this.boxHeight = exampleLayerHeight + descriptionLayerHeight + 50;
         }
-
         this.isExpand = !this.isExpand;
       },
     },
@@ -204,5 +230,17 @@
   }
   .evui-codeview-example-bar-icon, .evui-codeview-example-bar-icon-span {
     user-select: none;
+  }
+  .evui-codeview-description {
+    border: 1px solid #dfe6e9;
+    border-radius: 2px;
+    padding: 5px 10px 8px 10px;
+    margin: 5px 3px 5px 3px;
+    background-color: #FAFAFA;
+    text-align: left;
+    line-height: 1.5;
+  }
+  .evui-codeview-description span{
+    font-size: 13px;
   }
 </style>

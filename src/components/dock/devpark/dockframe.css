@@ -199,7 +199,7 @@ div.evui-direct .wrap .evui-direct-background {
   left: 14px;
   width: 76px;
   height: 74px;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -185px;
   z-index: -1;
 }
@@ -214,7 +214,7 @@ div.evui-direct .top span {
   display: inline-block;
   width: 35px;
   height: 35px;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -5px;
 }
 
@@ -232,7 +232,7 @@ div.evui-direct .bottom span {
   display: inline-block;
   width: 35px;
   height: 35px;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -41px;
 }
 
@@ -255,7 +255,7 @@ div.evui-direct .left {
   width: 35px;
   height: 35px;
   float: left;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -113px;
 }
 
@@ -267,7 +267,7 @@ div.evui-direct .right {
   width: 35px;
   height: 35px;
   float: right;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -149px;
 }
 
@@ -279,7 +279,7 @@ div.evui-direct .tab-center {
   float: left;
   width: 35px;
   height: 35px;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -77px;
   position: relative;
   top: 32%;
@@ -290,7 +290,7 @@ div.evui-direct .center {
   float: left;
   width: 35px;
   height: 35px;
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   background-position: -286px -77px;
 }
 
@@ -336,7 +336,7 @@ div.evui-root-direct {
   width: 35px;
   height: 35px;
   transform: translateY(-50%) translateX(-50%);
-  background-image: url(./dock_image.png);
+  background-image: url(dock_image.png);
   z-index: 300000;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

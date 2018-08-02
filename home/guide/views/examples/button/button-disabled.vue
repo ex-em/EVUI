@@ -1,11 +1,9 @@
 <template>
   <div class="btn-disabled">
     <Button
-      :name="btnInfo.name"
-      :text="btnInfo.text"
-      :disabled="btnInfo.disabled"
-      @click="onClick"
-      @item-click="onItemClick"
+      :name="name"
+      :text="text"
+      :disabled="disabled"
     />
   </div>
 </template>
@@ -19,22 +17,10 @@
     },
     data() {
       return {
-        btnInfo: {
-          name: 'disabledBtn',
-          text: 'disabled',
-          disabled: true,
-        },
+        name: 'disabledBtn',
+        text: 'disabled',
+        disabled: true,
       };
-    },
-    methods: {
-      onClick(event, text) {
-        this.event = event;
-        this.text = text;
-      },
-      onItemClick(event, itemId) {
-        this.event = event;
-        this.itemId = itemId;
-      },
     },
   };
 </script>
@@ -42,5 +28,6 @@
   .btn-disabled{
     display: inline-block;
     margin-left: 5px;
+    height: 40px;
   }
 </style>
