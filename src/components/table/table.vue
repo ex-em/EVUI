@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%; height: 100%;">
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
