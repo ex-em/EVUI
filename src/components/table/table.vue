@@ -1166,6 +1166,9 @@
         }
         this.columnFilter(this.menuField);
       },
+      setData(data) {
+        this.originData = data;
+      },
     },
   };
 </script>
