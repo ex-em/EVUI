@@ -1,11 +1,11 @@
 <template>
   <div
     :style="dropdownStyle"
-    class="dropdown-area"
+    :class="prefixCls"
   >
     <div
       v-if="multiple"
-      class="multiple-input-area"
+      :class="`${prefixCls}-multiple-input-area`"
     >
       <input
         :disabled="disabled"
@@ -14,10 +14,10 @@
         @keyup="onKeyUp"
       >
     </div>
-    <div class="listbox-area">
+    <div :class="`${prefixCls}-listbox-wrap`">
       <div
         v-if="isGroup"
-        class="group-area"
+        :class="`${prefixCls}-group-area`"
       >
         <div
           v-for="item in items"
@@ -27,8 +27,9 @@
           <li class="title">
             {{ item.groupName }}
           </li>
-          <listbox
+          <Listbox
             :listbox-style="listboxStyle"
+            :is-group="true"
             :items="item.items"
             :selected-items="selectedItems"
             @select="onSelect"
@@ -37,9 +38,9 @@
       </div>
       <div
         v-else
-        class="single-area"
+        :class="`${prefixCls}-single-area`"
       >
-        <listbox
+        <Listbox
           :listbox-style="listboxStyle"
           :items="items"
           :selected-items="selectedItems"
@@ -51,11 +52,13 @@
 </template>
 
 <script>
-  import listbox from '@/components/selectbox/listbox';
+  import Listbox from '@/components/selectbox/listbox';
+
+  const prefixCls = 'evui-dropdown';
 
   export default {
     components: {
-      listbox,
+      Listbox,
     },
     props: {
       dropdownStyle: {
@@ -91,13 +94,9 @@
     },
     data() {
       return {
+        prefixCls,
         listboxStyle: {},
       };
-    },
-    mounted() {
-      // if (this.isGroup) {
-      //   this.listboxStyle.paddingLeft = '15px';
-      // }
     },
     methods: {
       onSelect(item, target, index) {
@@ -109,3 +108,71 @@
     },
   };
 </script>
+
+<style scoped>
+  /**  evui-dropdown  **/
+  /**  evui-dropdown > multiple-input-area **/
+  /**  evui-dropdown > multiple-input-area > input-text **/
+
+  .evui-dropdown{
+    position: absolute;
+    width: 100%;
+    height: calc(100% + 8px);
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    z-index: 11;
+  }
+  .evui-dropdown-multiple-input-area{
+    width: 100%;
+    height: 100%;
+    padding: 3px;
+  }
+  .evui-dropdown-multiple-input-area .input-text{
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+  }
+
+  /**  evui-dropdown > evui-dropdown-listbox-wrap **/
+  /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-group-area **/
+  /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-single-area **/
+
+  .evui-dropdown-listbox-wrap{
+    width: 100%;
+    height: 200px;
+  }
+  .evui-dropdown-group-area{
+    list-style-type: none;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background: #FFFFFF;
+    -webkit-box-shadow: 0 6px 12px #ccc;
+    box-shadow: 0 6px 12px #ccc;
+    overflow: auto;
+  }
+  .evui-dropdown-group-area .title{
+    padding: 7px 10px;
+    color:#999;
+  }
+  .evui-dropdown-single-area{
+    position: absolute;
+    width: 100%;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background: #FFFFFF;
+    -webkit-box-shadow: 0 6px 12px #ccc;
+    box-shadow: 0 6px 12px #ccc;
+    overflow: auto;
+  }
+</style>

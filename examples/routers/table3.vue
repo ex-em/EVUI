@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <evui-table
+    <ev-table
       ref="test"
       :width="'100%'"
       :height="'350px'"
@@ -12,14 +12,9 @@
 </template>
 
 <script>
-  import EvuiTable from '@/components/table';
   import rowdata2 from '@/components/table/data.json';
-  // import '@/components/table/table.css';
 
   export default {
-    components: {
-      EvuiTable,
-    },
     data() {
       return {
         columns: [

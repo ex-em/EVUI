@@ -3,6 +3,7 @@
     <selectbox
       :name="boxInfo.name"
       :selectbox-style="boxInfo.selectboxStyle"
+      :init-select="0"
       :items="boxInfo.items"
       @keyup="onKeyUp"
       @select="onSelect"
@@ -25,8 +26,7 @@
     },
     methods: {
       onSelect(item, target, index) {
-        this.selectedData = item;
-        this.target = target;
+        this.selectedItem = item;
         this.index = index;
       },
       onKeyUp(e) {
