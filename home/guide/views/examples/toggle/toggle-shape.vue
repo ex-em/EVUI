@@ -2,7 +2,8 @@
   <div>
     <toggle
       v-model="toggleValue1"
-      :toggle-obj="largeObj"
+      :toggle-type="'slide'"
+      :toggle-shape="'circle'"
       :toggle-text="largeText"
     />
     {{ toggleValue1 }}
@@ -10,15 +11,31 @@
     <br>
     <toggle
       v-model="toggleValue2"
+      :toggle-type="'slide'"
+      :toggle-shape="'circle'"
+      :toggle-text="largeText"
     />
     {{ toggleValue2 }}
     <br>
     <br>
     <toggle
       v-model="toggleValue3"
-      :toggle-obj="smallObj"
+      :toggle-type="'slide'"
+      :toggle-shape="'square'"
+      :toggle-text="largeText"
     />
     {{ toggleValue3 }}
+    <br>
+    <br>
+    <toggle
+      v-model="toggleValue4"
+      :toggle-type="'slide'"
+      :toggle-shape="'square'"
+      :toggle-text="largeText"
+    />
+    {{ toggleValue4 }}
+    <br>
+    <br>
   </div>
 </template>
 
@@ -35,18 +52,11 @@
         toggleValue1: true,
         toggleValue2: false,
         toggleValue3: true,
-        largeObj: {
-          width: 80,
-          height: 34,
-        },
+        toggleValue4: false,
         largeText: {
           onText: 'ON',
           offText: 'OFF',
-          fontSize: 17,
-        },
-        smallObj: {
-          width: 30,
-          height: 14,
+          fontSize: 11,
         },
       };
     },

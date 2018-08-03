@@ -34,8 +34,6 @@
               id: 'series1',
               name: 'series#1',
               point: true,
-              fill: true,
-              stack: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 10 },
                 { x: '2018-05-25 05:12:00', y: 10 },
@@ -54,8 +52,6 @@
               id: 'series2',
               name: 'series#2',
               point: true,
-              fill: true,
-              stack: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 15 },
                 { x: '2018-05-25 05:12:00', y: 17 },
@@ -74,8 +70,6 @@
               id: 'series3',
               name: 'series#3',
               point: true,
-              fill: true,
-              stack: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 12 },
                 { x: '2018-05-25 05:12:00', y: 13 },
@@ -96,6 +90,8 @@
           type: 'line',
           width: '600px',
           height: '350px',
+          fill: true,
+          stack: true,
           legend: {
             show: true,
             position: 'right',

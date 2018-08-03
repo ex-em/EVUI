@@ -13,6 +13,7 @@
         <code-view
           :code-url="item.url"
           :height="item.height"
+          :description="item.description"
         >
           <component :is="item.component"/>
         </code-view>
@@ -39,16 +40,19 @@
             url: './guide/views/examples/table/table-default.vue',
             component: tableDefault,
             title: 'Default',
+            description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
           },
           {
             url: './guide/views/examples/table/table-page.vue',
             component: tablePage,
             title: 'Page',
+            description: '기본 테이블에 페이지 기능을 이용하여 대용량 데이터를 보여줄 수 있습니다.',
           },
           {
             url: './guide/views/examples/table/table-buffer.vue',
             component: tableBuffer,
             title: 'Buffer(Virtual Scroll)',
+            description: '기본 테이블에 가상 스크롤 기능을 이용하여 대용량 데이터를 끊김 없이 보여줄 수 있습니다.',
           },
         ],
       };

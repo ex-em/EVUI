@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <Table
+    <ev-table
       ref="test"
       :width="'50%'"
       :height="'350px'"
@@ -13,14 +13,10 @@
 </template>
 
 <script>
-  import Table from '@/components/table';
   import rowdata from '@/components/table/data.json';
   // import '@/components/table/table.css';
 
   export default {
-    components: {
-      Table,
-    },
     data() {
       return {
         columns: [

@@ -4,7 +4,7 @@
     class="evui-listbox"
   >
     <ul
-      class="evui-listbox-ul"
+      class="ulClasses"
       @click.stop="onClick"
     >
       <li
@@ -40,6 +40,18 @@
           return [];
         },
       },
+      isGroup: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        ulClasses: '',
+      };
+    },
+    created() {
+      this.ulClasses = this.isGroup ? 'evui-listbox-ul-group' : 'evui-listbox-ul';
     },
     methods: {
       onClick(event) {
@@ -57,10 +69,12 @@
         }
       },
       getLiClass(item) {
-        const classList = ['evui-listbox-li'];
-        const findedItem = this.selectedItems.find(obj => obj.name === item.name);
+        const classList = [];
+        const foundItem = this.selectedItems.find(obj => obj.name === item.name);
 
-        if (findedItem) {
+        classList.push('evui-listbox-li');
+
+        if (foundItem) {
           classList.push('selected');
         }
 
@@ -69,3 +83,34 @@
     },
   };
 </script>
+
+<style scoped>
+  .evui-listbox{
+    width: 100%;
+    height: 100%
+  }
+  .evui-listbox-ul{
+    list-style-type: none;
+    height: 200px;
+    padding: 2px 0;
+  }
+  .evui-listbox-ul-group{
+    height: 100%;
+  }
+  .evui-listbox-li{
+    display: block;
+    list-style: none;
+    padding: 7px 16px;
+    color: #495060;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .1s ease-in-out;
+  }
+  .evui-listbox-li:hover{
+    background-color: #eeeeee;
+  }
+  .evui-listbox-li.selected{
+    color: #fff;
+    background-color: #337ab6;
+  }
+</style>

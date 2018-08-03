@@ -4,9 +4,8 @@
       :name="boxInfo.name"
       :selectbox-style="boxInfo.selectboxStyle"
       :multiple="boxInfo.multiple"
+      :init-select-idx="0"
       :items="boxInfo.items"
-      @keyup="onKeyUp"
-      @select="onSelect"
     />
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
@@ -25,14 +24,6 @@
       };
     },
     methods: {
-      onSelect(item, target, index) {
-        this.selectedData = item;
-        this.target = target;
-        this.index = index;
-      },
-      onKeyUp(e) {
-        this.e = e;
-      },
       _getBoxInfo() {
         let boxInfo = {};
         const itemList = [];

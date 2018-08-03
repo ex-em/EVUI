@@ -44,234 +44,6 @@
 }
 
 /************************************************************************************
- Button Component
-************************************************************************************/
-
-/** evui-btn **/
-
-.evui-btn {
-  display: inline-block;
-}
-
-/** evui-btn > button**/
-
-.evui-btn>button {
-  margin: 0px 2px 0px 2px;
-  padding: 5px 10px;
-  line-height: 1.5;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: Roboto Condensed;
-  cursor: pointer;
-  user-select: none;
-  transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
-}
-.evui-btn>button:hover {
-  color:#57a3f3;
-  background-color:#fff;
-  border-color:#57a3f3;
-}
-.evui-btn>button.active,
-.evui-btn>button:active {
-  color:#2b85e4;
-  background-color:#fff;
-  border-color:#2b85e4;
-}
-.evui-btn>button>.evui-icon{
-  line-height:1;
-}
-.evui-btn>button>.evui-icon+span,
-.evui-btn>button>span+.evui-icon {
-  margin-left:4px;
-}
-.evui-btn>button.disabled>*,
-.evui-btn>button[disabled]>* {
-  pointer-events: none;
-}
-.evui-btn>button.disabled,
-.evui-btn>button.disabled.active,
-.evui-btn>button.disabled:active,
-.evui-btn>button.disabled:hover,
-.evui-btn>button[disabled],
-.evui-btn>button[disabled].active,
-.evui-btn>button[disabled]:active,
-.evui-btn>button[disabled]:hover {
-  color:#bbbec4;
-  background-color:#f7f7f7;
-  border-color:#dddee1;
-}
-
-/** evui-btn > button > clsType(primary) **/
-
-.evui-btn>button.primary {
-  color:#fff;
-  background-color:#2d8cf0;
-  border-color:#2d8cf0;
-}
-.evui-btn>button.primary:hover {
-  background-color:#50A5F0;
-  border-color:#50A5F0;
-}
-.evui-btn>button.primary.active,
-.evui-btn>button.primary:active {
-  background-color:#2b85e4;
-  border-color:#2b85e4;
-}
-.evui-btn>button.primary.disabled,
-.evui-btn>button.primary.disabled.active,
-.evui-btn>button.primary.disabled:active,
-.evui-btn>button.primary.disabled:hover,
-.evui-btn>button.primary[disabled],
-.evui-btn>button.primary[disabled].active,
-.evui-btn>button.primary[disabled]:active,
-.evui-btn>button.primary[disabled]:hover {
-  color:#bbbec4;
-  background-color:#f7f7f7;
-  border-color:#dddee1;
-}
-
-/** Button > clsType > text **/
-
-.evui-btn>button.text {
-  columns: #000000;
-  background-color: transparent;
-  border-color: transparent;
-}
-.evui-btn>button.text:hover {
-  color: #6d7380;
-  background-color: rgba(255,255,255,.2);
-  border-color: rgba(255,255,255,.2)
-}
-.evui-btn>button.text.active,
-.evui-btn>button.text:active {
-  color: #454c5b;
-  background-color: rgba(0,0,0,.05);
-  border-color: rgba(0,0,0,.05)
-}
-.evui-btn>button.text:hover {
-  color: #57a3f3;
-  background-color: transparent;
-  border-color: transparent;
-}
-.evui-btn>button.text.active,
-.evui-btn>button.text:active {
-  color:#2b85e4;
-  background-color:transparent;
-  border-color:transparent
-}
-.evui-btn>button.text.disabled,
-.evui-btn>button.text.disabled.active,
-.evui-btn>button.text.disabled:active,
-.evui-btn>button.text.disabled:hover,
-.evui-btn>button.text[disabled],
-.evui-btn>button.text[disabled].active,
-.evui-btn>button.text[disabled]:active,
-.evui-btn>button.text[disabled]:hover {
-  color: #bbbec4;
-  background-color: #f7f7f7;
-  border-color: #dddee1
-}
-
-/** Button > shape > circle **/
-
-.evui-btn>button.circle {
-  border-radius: 32px;
-}
-.evui-btn>button.circle.icon-only{
-  width:32px;
-  height:32px;
-  padding:0;
-  border-radius:50%;
-  font-size:16px;
-}
-
-/** Button > Menu Button **/
-
-.evui-btn>button .menu-btn {
-  display: inline-block;
-}
-.evui-btn>button .menu-btn.arrow-up {
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 7px solid #FFFFFF;
-}
-.evui-btn>button .menu-btn.arrow-down {
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 7px solid #FFFFFF;
-}
-
-/** Button > Menu List Area **/
-
-.evui-btn .menu-area {
-  visibility: hidden;
-  position: absolute;
-  padding: 1px;
-  border-radius: 4px;
-  text-align: center;
-  background: #FFFFFF;
-  box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
-}
-.evui-btn .menu-area.on {
-  /* on activation */
-  visibility: visible;
-}
-.evui-btn .menu-area ul {
-  display: block;
-  list-style: none;
-}
-.evui-btn .menu-area li {
-  padding: 3px 13px 3px 13px;
-  font-size: 12px;
-  font-family: Roboto Condensed;
-  color: #000000;
-  transition: all .1s;
-  cursor: pointer;
-}
-.evui-btn .menu-area li:hover {
-  background: #2d8cf0;
-  color: #FFFFFF;
-}
-
-/** Button > loading **/
-
-.evui-btn>button .loading {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin-right: 2px;
-  border-width: 2px;
-  border-radius: 50%;
-  border-style: solid;
-  border-color: #FFFFFF;
-  border-top-color: #dddddd;
-  vertical-align: middle;
-  animation: spin 1s ease-in-out infinite;
-  -webkit-animation: spin 1s ease-in-out infinite;
-}
-
-.evui-btn>button.primary .loading {
-  border-color: #FFFFFF;
-  border-top-color: #2d8cf0;
-}
-
-@keyframes spin {
-  to { -webkit-transform: rotate(360deg); }
-}
-@-webkit-keyframes spin {
-  to { -webkit-transform: rotate(360deg); }
-}
-@-webkit-keyframes grdAiguille{
-  0%{-webkit-transform:rotate(0deg);}
-  100%{-webkit-transform:rotate(360deg);}
-}
-@keyframes grdAiguille{
-  0%{transform:rotate(0deg);}
-  100%{transform:rotate(360deg);}
-}
-
-/************************************************************************************
  Checkbox
 ************************************************************************************/
 .evui-checkbox{
@@ -412,282 +184,6 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .evui-radio-group-inner {
   display: inline-block;
 }
-
-/************************************************************************************
- Selectbox
-************************************************************************************/
-
-/** evui-selectbox **/
-
-.evui-selectbox{
-  display: inline-block;
-  position: relative;
-  border: 1px solid #dddeee;
-  border-radius: 4px;
-  vertical-align: middle;
-  font-size: 14px;
-  line-height: normal;
-}
-.evui-selectbox:hover{
-  background-color: #eeeeee;
-  border-color: #bbb;
-  cursor: pointer;
-}
-
-/**  evui-selectbox > selectbox-field  **/
-/**  evui-selectbox > selectbox-field > multiple-tag-view  **/
-/**  evui-selectbox > selectbox-field > input-text  **/
-/**  evui-selectbox > selectbox-field > arrow-icon  **/
-
-.evui-selectbox .selectbox-field{
-  width: 100%;
-  height: 100%;
-}
-.evui-selectbox .selectbox-field .multiple-tag-view{
-  width: calc(100% - 25px);
-  height: 100%;
-  padding: 0px 4px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.evui-selectbox .selectbox-field .input-text{
-  width: 100%;
-  height: 100%;
-  padding: 6px 10px;
-  border: 0px;
-  border-radius: 3px;
-  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-  -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-  -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-}
-.evui-selectbox .selectbox-field .input-text:focus{
-  border-color: #66afe8;
-  outline: 0;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-}
-.evui-selectbox .selectbox-field .arrow-icon{
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  width: 10px;
-  height: 10px;
-  margin-top: -4px;
-  line-height: 3px;
-  font-size: 16px;
-  font-weight: 900;
-  font-family: Font Awesome\ 5 Free;
-  font-style: normal;
-  font-variant: normal;
-  color: #888888;
-  transition: all .2s ease-in-out;
-}
-.evui-selectbox .selectbox-field .arrow-icon:before {
-  content: "\F0DD"
-}
-.evui-selectbox .selectbox-field .arrow-icon.rotate-180{
-  transform: rotate(180deg);
-}
-
-/**  dropdown-area  **/
-/**  dropdown-area > multiple-input-area **/
-/**  dropdown-area > multiple-input-area > input-text **/
-
-.dropdown-area{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  z-index: 11;
-}
-.dropdown-area .multiple-input-area{
-  width: 100%;
-  height: 100%;
-  padding: 3px;
-}
-.dropdown-area .multiple-input-area .input-text{
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-
-/**  dropdown-area > listbox-area **/
-
-.dropdown-area .listbox-area{
-  width: 100%;
-  height: 200px;
-}
-
-/**  dropdown-area > listbox-area > group-area **/
-/**  dropdown-area > listbox-area > group-area > evui-listbox  **/
-/**  dropdown-area > listbox-area > group-area > evui-listbox > evui-listbox-ul **/
-/**  dropdown-area > listbox-area > group-area > evui-listbox > evui-listbox-li **/
-
-.dropdown-area .listbox-area .group-area{
-  list-style-type: none;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  background: #FFFFFF;
-  -webkit-box-shadow: 0 6px 12px #ccc;
-  box-shadow: 0 6px 12px #ccc;
-  overflow: auto;
-}
-.dropdown-area .listbox-area .group-area .title{
-  padding: 7px 10px;
-  color:#999;
-}
-.dropdown-area .listbox-area .group-area .evui-listbox{
-  width: 100%;
-  height: 100%
-}
-.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-ul{
-  height: 100%;
-}
-.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li{
-  display: block;
-  list-style: none;
-  padding: 7px 16px;
-  color: #495060;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background .1s ease-in-out;
-}
-.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li:hover{
-  background-color: #eeeeee;
-}
-.dropdown-area .listbox-area .group-area .evui-listbox .evui-listbox-li.selected{
-  color: #fff;
-  background-color: #337ab6;
-}
-
-/**  dropdown-area > listbox-area > single-area > evui-listbox  **/
-/**  dropdown-area > listbox-area > single-area > evui-listbox > evui-listbox-ul **/
-/**  dropdown-area > listbox-area > single-area > evui-listbox > evui-listbox-li **/
-
-.dropdown-area .listbox-area .single-area{
-  position: absolute;
-  width: 100%;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  background: #FFFFFF;
-  -webkit-box-shadow: 0 6px 12px #ccc;
-  box-shadow: 0 6px 12px #ccc;
-  overflow: auto;
-}
-.dropdown-area .listbox-area .single-area .evui-listbox{
-  width: 100%;
-  height: 100%
-}
-.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-ul{
-  list-style-type: none;
-  height: 200px;
-  padding: 2px 0;
-}
-.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li{
-  display: block;
-  list-style: none;
-  padding: 7px 16px;
-  color: #495060;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background .1s ease-in-out;
-}
-.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li:hover{
-  background-color: #eeeeee;
-}
-.dropdown-area .listbox-area .single-area .evui-listbox .evui-listbox-li.selected{
-  color: #fff;
-  background-color: #337ab6;
-}
-
-/**  evui-selectbox > evui-select-tag **/
-
-.evui-select-tag{
-  display: inline-block;
-  margin: 4px 4px 0 0;
-  padding: 1px 10px;
-  border: 1px solid #e9eaec;
-  border-radius: 3px;
-  background: #f7f7f7;
-  font-size: 12px;
-  cursor: pointer
-}
-.evui-select-tag:hover{
-  opacity:.85
-}
-.evui-select-tag .text{
-  position: relative;
-  top: -1px;
-  color:#495060;
-}
-.evui-select-tag .close{
-  display: inline-block;
-  margin-left: 3px;
-  color: #666;
-  opacity: .66;
-  cursor: pointer;
-  -webkit-transform: scale(1.42857143) rotate(0);
-  -ms-transform: scale(1.42857143) rotate(0);
-  transform: scale(1.42857143) rotate(0);
-}
-.evui-select-tag .close:before{
-  position: relative;
-  top: -2px;
-  font-style: normal;
-  font-size: 10px;
-  font-family: Arial, sans-serif;
-  content: 'x';
-}
-.evui-select-tag .close:hover{
-  opacity: 1
-}
-.evui-select-tag:not(.evui-select-tag .evui-select-tag.border):not(.evui-select-tag-dot):not(.evui-select-tag.checked){
-  background:0 0;
-  border:0;
-  color:#495060
-}
-.evui-select-tag:not(.evui-select-tag .evui-select-tag.border):not(.evui-select-tag-dot):not(.evui-select-tag.checked) .close{
-  color:#495060!important
-}
-.evui-select-tag.color-red{
-  color:#ed3f14!important;
-  border-color:#ed3f14
-}
-.evui-select-tag.color-green{
-  color:#19be6b!important;
-  border-color:#19be6b
-}
-.evui-select-tag.color-blue{
-  color:#2d8cf0!important;
-  border-color:#2d8cf0
-}
-.evui-select-tag.color-yellow{
-  color:#f90!important;
-  border-color:#f90
-}
-.evui-select-tag.color-white{
-  color:#fff!important
-}
-
-.evui-select-search:focus{
-  border-color: #66afe8;
-  outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-}
-
 
 /************************************************************************************
  Code Mirror
@@ -832,12 +328,74 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   margin-left:12px!important
 }
 
+/************************************************************************************
+ Input
+************************************************************************************/
 
+/*base class*/
+.evui-input-text {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  border: 1px solid #dddee1;
+  color: #495060;
+  font-size: 12px;
+  line-height: 2;
+  cursor: text;
+  background-image: none;
+  transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
 
+/*border color when mouse hover*/
+.evui-input-text:hover {
+  border-color : #2d8cf0;
+}
 
+.evui-input-text-input {
+  width: 100%;
+  padding: 0 7px;
+  text-align: left;
+  outline: 0;
+  -moz-appearance: textfield;
+  color: #666;
+  border: 0;
+  border-radius: 4px;
+}
 
-
-
+/*disable base class*/
+.evui-input-text-disabled .evui-input-text-input {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+  color: #ccc;
+}
+/*use border color when mouse hover*/
+.evui-input-text-disabled:hover {
+  border-color : #D77F7F;
+}
+/*inner input div class*/
+.evui-input-text-disabled .evui-input-text {
+  opacity: .72;
+  cursor: not-allowed;
+  background-color: #f3f3f3;
+}
+.evui-input-text.evui-input-text-disabled {
+  background-color: #f3f3f3;
+}
+.evui-input-text-disabled {
+  opacity: .72;
+  color: #ccc!important;
+  cursor: not-allowed;
+}
+.evui-input-text-input[disabled] {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+  color: #ccc;
+}
 
 
 
