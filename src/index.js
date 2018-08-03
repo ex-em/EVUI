@@ -4,6 +4,7 @@ import Container from '@/components/container';
 import Table from '@/components/table';
 import Loadingmask from '@/components/loadingmask';
 import TimePicker from '@/components/timepicker';
+import Label from '@/components/label';
 
 const components = {
   Button,
@@ -12,6 +13,7 @@ const components = {
   Table,
   Loadingmask,
   TimePicker,
+  Label,
 };
 
 const evui = {
