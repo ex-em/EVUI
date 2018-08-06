@@ -3,6 +3,7 @@
     <selectbox
       :name="boxInfo.name"
       :selectbox-style="boxInfo.selectboxStyle"
+      :init-select-idx="0"
       :items="boxInfo.items"
       :disabled="boxInfo.disabled"
     />

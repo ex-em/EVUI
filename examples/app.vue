@@ -11,6 +11,7 @@
         <li>
           <router-link to="/container">Container</router-link>
           <router-link to="/dock/dockframeSample">dockframeSample</router-link>
+          <router-link to="/dock/DockingLayout">DockingLayout</router-link>
         </li>
         <li>
           <router-link to="/chart">Chart</router-link>
