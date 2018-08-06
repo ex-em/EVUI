@@ -89,6 +89,12 @@
                 imgUrl: `${this.imgUrl}/selectbox.png`,
               },
               {
+                name: 'Slider',
+                routerLink: '/slider',
+                content: '슬라이더',
+                imgUrl: `${this.imgUrl}/slider.png`,
+              },
+              {
                 name: 'Table',
                 routerLink: '/table',
                 content: '테이블 - 그리드',
