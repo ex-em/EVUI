@@ -35,6 +35,10 @@ const router = new VueRouter({
       component: resolve => require(['./routers/selectbox'], resolve),
     },
     {
+      path: '/slider',
+      component: resolve => require(['./routers/slider'], resolve),
+    },
+    {
       path: '/table',
       component: resolve => require(['./routers/table'], resolve),
     },
