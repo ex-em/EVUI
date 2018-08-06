@@ -290,6 +290,8 @@
         } else {
           this.rightBtnValue = resultVal > this.leftBtnValue ? resultVal : this.leftBtnValue;
         }
+
+        this.$emit('move-button', btnType, btnType === 'left' ? this.leftBtnValue : this.rightBtnValue);
       },
       addEvent(eventName, fn) {
         if (!eventName || !fn) {
@@ -312,9 +314,6 @@
         } else {
           window.detachEvent(eventName, fn, false);
         }
-      },
-      isNumeric(value) {
-        return !isNaN(parseFloat(value)) && isFinite(value);
       },
       getSliderInfo() {
         const sliderEl = this.$refs.slider;
