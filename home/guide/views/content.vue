@@ -101,10 +101,21 @@
                 imgUrl: `${this.imgUrl}/timepicker.png`,
               },
               {
+                name: 'Datepicker',
+                routerLink: '/datepicker',
+                content: '데이트 피커',
+              },
+              {
                 name: 'Toggle',
                 routerLink: '/toggle',
                 content: '토글',
                 imgUrl: `${this.imgUrl}/toggle.png`,
+              },
+              {
+                name: 'Label',
+                routerLink: '/label',
+                content: '라벨',
+                imgUrl: `${this.imgUrl}/label.png`,
               },
               {
                 name: 'Textfield',

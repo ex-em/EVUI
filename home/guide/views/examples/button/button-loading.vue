@@ -1,11 +1,10 @@
 <template>
   <div class="btn-loading">
     <Button
-      :name="btnInfo.name"
-      :text="btnInfo.text"
-      :is-loading="btnInfo.isLoading"
-      @click="onClick"
-      @item-click="onItemClick"
+      :name="name"
+      :text="text"
+      :type="type"
+      :is-loading="isLoading"
     />
   </div>
 </template>
@@ -19,28 +18,19 @@
     },
     data() {
       return {
-        btnInfo: {
-          name: 'loadingBtn',
-          text: 'loading',
-          isLoading: true,
-        },
+        name: 'loadingBtn',
+        text: 'loading',
+        type: 'primary',
+        isLoading: true,
       };
-    },
-    methods: {
-      onClick(event, text) {
-        this.event = event;
-        this.text = text;
-      },
-      onItemClick(event, itemId) {
-        this.event = event;
-        this.itemId = itemId;
-      },
     },
   };
 </script>
+
 <style scoped>
   .btn-loading{
     display: inline-block;
     margin-left: 5px;
+    height: 40px;
   }
 </style>

@@ -913,7 +913,7 @@
 <style>
   .delete-btn {
     /*background-color: #333333;*/
-    background-image: url(./dock_image.png);
+    background-image: url(dock_image.png);
     background-position: 0px -225px;
     width: 58px;
     height: 25px;

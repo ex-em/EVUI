@@ -70,7 +70,7 @@
       }
 
       this.chart.drawChart();
-      this.dataSet = this.chart.dataSet;
+      this.dataStore = this.chart.dataStore;
     },
     methods: {
       getChartSize(size) {
@@ -84,17 +84,18 @@
         return sizeValue;
       },
       addValue(seriesIndex, value, dataIndex) {
-        const seriesList = this.dataSet.seriesList;
-        const baseIndex = this.dataSet.findBaseSeries(seriesList[seriesIndex].id);
+        const seriesList = this.dataStore.seriesList;
+        const baseIndex = this.dataStore.findBaseSeries(seriesList[seriesIndex].id);
+        const isStack = this.$props.options.stack;
 
-        if (seriesList[seriesIndex].stack && baseIndex !== null) {
+        if (isStack && baseIndex !== null) {
           if (this.$props.data.category) {
-            this.dataSet.addCategoryStackValue(seriesIndex, value, baseIndex, dataIndex);
+            this.dataStore.addCategoryStackValue(seriesIndex, value, baseIndex, dataIndex);
           } else {
-            this.dataSet.addStackValue(seriesIndex, value, baseIndex);
+            this.dataStore.addStackValue(seriesIndex, value, baseIndex);
           }
         } else {
-          this.dataSet.addValue(seriesIndex, value, dataIndex);
+          this.dataStore.addValue(seriesIndex, value, dataIndex);
         }
       },
     },
@@ -127,6 +128,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    user-select: none;
   }
 
   .evui-chart-legend{
@@ -140,7 +142,6 @@
   .evui-chart-legend-container {
     position: relative;
     overflow: hidden;
-    cursor: pointer;
     margin: 2px 10px 2px 0;
   }
 
@@ -148,9 +149,10 @@
     left: 0;
     width: 10px;
     height: 10px;
-    margin-top: 5px;
+    margin-top: 6px;
     margin-right: 6px;
     position: absolute;
+    border-radius: 5px;
   }
 
   .evui-chart-legend-color.inactive {
@@ -173,10 +175,6 @@
 
   .evui-chart-legend-name.inactive {
     color: #bbb !important;
-  }
-
-  .evui-chart-legend-name:hover {
-    font-weight: bold;
   }
 
   .evui-chart-legend-value {
@@ -214,6 +212,60 @@
     width: 100%;
     height: 4px;
     cursor: row-resize;
+  }
+
+  .evui-chart-tooltip {
+    position: absolute;
+    z-index: 100000;
+    color: #000;
+    border-radius: 4px;
+    border: 1px solid #D8D8D8;
+    background: #fff;
+    overflow-y: auto;
+    max-height: 500px;
+    padding: 10px;
+  }
+
+  .evui-chart-tooltip-title {
+    font-size: 14px;
+    text-align: center;
+    margin: 0 5px 3px 5px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #D2D2D2;
+  }
+
+  .evui-chart-tooltip-ul {
+    list-style: none;
+  }
+
+  .evui-chart-tooltip-color {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    margin: 8px 0 0 5px;
+    border-radius: 5px;
+  }
+
+  .evui-chart-tooltip-name {
+    /*float: left;*/
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 12px;
+    margin-left: 20px;
+    width: 100%;
+    user-select: none;
+    color: #000;
+  }
+
+  .evui-chart-tooltip-colon {
+    width: 100%;
+  }
+
+  .evui-chart-tooltip-value {
+    font-size: 12px;
+    margin-right: 5px;
   }
 
 </style>

@@ -31,9 +31,9 @@ class Axis {
     // init variable
     const options = this.options;
     const chartRect = this.chartRect;
-    const dataSet = this.dataSet;
+    const dataStore = this.dataStore;
 
-    const maxLabelInfo = dataSet.getLabelTextMaxInfo();
+    const maxLabelInfo = dataStore.getLabelTextMaxInfo();
     // 실제 Axis가 그려질 영역
     const chartSize = this.units.pos === 'x' ? chartRect.chartWidth : chartRect.chartHeight;
     this.axisPosInfo = {
@@ -70,9 +70,9 @@ class Axis {
     let minMaxValue;
 
     if (this.units.pos === 'x') {
-      minMaxValue = this.dataSet.getXValueAxisPerSeries(this.axisIndex);
+      minMaxValue = this.dataStore.getXValueAxisPerSeries(this.axisIndex);
     } else {
-      minMaxValue = this.dataSet.getYValueAxisPerSeries(this.axisIndex);
+      minMaxValue = this.dataStore.getYValueAxisPerSeries(this.axisIndex);
     }
 
     if (options.labelType === 'time') {

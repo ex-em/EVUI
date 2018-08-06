@@ -77,8 +77,16 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/timepicker/timepicker-view'], resolve),
     },
     {
+      path: '/datepicker',
+      component: resolve => require(['./guide/views/examples/datepicker/datepicker-view'], resolve),
+    },
+    {
       path: '/toggle',
       component: resolve => require(['./guide/views/examples/toggle/toggle-view'], resolve),
+    },
+    {
+      path: '/label',
+      component: resolve => require(['./guide/views/examples/label/label-view'], resolve),
     },
     {
       path: '/textfield',

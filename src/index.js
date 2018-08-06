@@ -1,17 +1,38 @@
-import Button from '@/components/button';
-import Chart from '@/components/chart';
-import Container from '@/components/container';
-import Table from '@/components/table';
-import Loadingmask from '@/components/loadingmask';
-import TimePicker from '@/components/timepicker';
+import EvButton from '@/components/button';
+import EvChart from '@/components/chart';
+import EvCheckbox from '@/components/checkbox';
+import EvCheckboxGroup from '@/components/checkbox-group';
+import EvIcon from '@/components/icon';
+import EvInput from '@/components/input';
+import EvLoadingmask from '@/components/loadingmask';
+import EvMenu from '@/components/menu';
+import EvRadio from '@/components/radio';
+import EvRadioGroup from '@/components/radio-group';
+import EvSelectbox from '@/components/selectbox';
+import EvTable from '@/components/table';
+import EvTimePicker from '@/components/timepicker';
+import EvToggle from '@/components/toggle';
+import EvDocking from '@/components/dock';
+import EvLabel from '@/components/label';
+import Vuex from 'vuex';
 
 const components = {
-  Button,
-  Container,
-  Chart,
-  Table,
-  Loadingmask,
-  TimePicker,
+  EvButton,
+  EvChart,
+  EvCheckbox,
+  EvCheckboxGroup,
+  EvIcon,
+  EvInput,
+  EvLoadingmask,
+  EvMenu,
+  EvRadio,
+  EvRadioGroup,
+  EvSelectbox,
+  EvTable,
+  EvTimePicker,
+  EvToggle,
+  EvDocking,
+  EvLabel,
 };
 
 const evui = {
@@ -24,6 +45,9 @@ const install = function (Vue) {
   Object.keys(evui).forEach((key) => {
     Vue.component(key, evui[key]);
   });
+
+  Vue.use(Vuex);
+  Vue.prototype.$dockBus = new Vue();
 };
 
 // auto install
