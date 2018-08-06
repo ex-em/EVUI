@@ -31,6 +31,11 @@
               name: 'series#2',
               data: [3, 8, 10, 5, 3],
             },
+            {
+              id: 'series3',
+              name: 'series#3',
+              data: [5, 3, 2, 2, 6],
+            },
           ],
         },
         stackBarChartOptions: {

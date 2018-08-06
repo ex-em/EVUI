@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Util from '@/common/utils';
 
 export default class DataStore {
@@ -46,43 +47,99 @@ export default class DataStore {
   }
 
   addSeries(param) {
-    const series = {
-      id: param.id === undefined ? `series-${Util.getId()}` : param.id,
-      name: param.name === undefined ? 'unknown' : param.name,
-      color: param.color,
-      show: param.show === undefined ? true : param.show,
-      point: param.point === undefined ? false : param.point,
-      pointSize: param.pointSize === undefined ? 4 : param.pointSize,
-      pointStyle: param.pointStyle === undefined ? '' : param.pointStyle,
-      axisIndex: {
-        x: param.xAxisIndex === undefined ? 0 : param.xAxisIndex,
-        y: param.yAxisIndex === undefined ? 0 : param.yAxisIndex,
-      },
+    let series;
+    const defaultSeries = {
+      id: param.id || `series-${Util.getId()}`,
+      name: param.name || `series-${Util.getId()}`,
+      color: param.color || this.chartOptions.colors[this.seriesList.length],
+      show: param.show || true,
       min: null,
       max: null,
       minIndex: null,
       maxIndex: null,
-      stack: param.stack === undefined ? false : param.stack,
-      stackArr: [],
-      stackOffsetIndex: 0,
       seriesIndex: this.seriesList.length,
-      data: [],
-      lineWidth: param.lineWidth === undefined ? 2 : param.lineWidth,
-      fill: param.fill === undefined ? false : param.fill,
-      fillColor: param.fillColor,
-      fillOpacity: param.fillOpacity === undefined ? 0.4 : param.fillOpacity,
-      toolTip: {},
+      oData: param.data || [], // original Data
+      cData: [], // computed Data
       insertIndex: -1,
       dataIndex: 0,
       startPoint: 0,
-      horizontal: param.horizontal === undefined ? false : param.horizontal, // 현재 미사용
-      children: param.children === undefined ? [] : param.children,
-      parentIndex: null,
-      inputData: param.data || (this.structType === 'array' ? [] : null),
-      hasAccumulate: false,
+      highlight: {
+        show: false,
+        item: param.highlight ? (param.highlight.item || 5) : 5,
+        series: param.highlight ? (param.highlight.series || 4) : 4,
+      },
+      drawInfo: {
+        xPoint: [],
+        yPoint: [],
+        width: [],
+        height: [],
+      },
     };
 
+    if (this.getSeriesExtends) {
+      series = this.getSeriesExtends(defaultSeries, param);
+    }
+
+    // const series = {
+    //   id: param.id ? param.id : `series-${Util.getId()}`,
+    //   name: param.name ? param.name : `series-${Util.getId()}`,
+    //   color: param.color ? param.color : this.chartOptions.colors[this.seriesList.length],
+    //   show: param.show ? param.show : true,
+    //          point: param.point ? param.point : false,
+    //          pointSize: param.pointSize ? param.pointSize : 4,
+    //          pointStyle: param.pointStyle ? param.pointStyle : '',
+    //          pointFill: param.pointFill ? param.pointFill : '#fff',
+    //   axisIndex: {
+    //     x: param.xAxisIndex ? param.xAxisIndex : 0,
+    //     y: param.yAxisIndex ? param.yAxisIndex : 0,
+    //   },
+    //   min: null,
+    //   max: null,
+    //   minIndex: null,
+    //   maxIndex: null,
+    //   stack: param.stack ? param.stack : false,
+    //   stackArr: [],
+    //   stackOffsetIndex: 0,
+    //   seriesIndex: this.seriesList.length,
+    //   data: [],
+    //          lineWidth: param.lineWidth ? param.lineWidth : 2,
+    //          fill: param.fill ? param.fill : false,
+    //          fillColor: param.fillColor ? param.fillColor : '#fff',
+    //          fillOpacity: param.fillOpacity ? param.fillOpacity : 0.4,
+    //   toolTip: {},
+    //   insertIndex: -1,
+    //   dataIndex: 0,
+    //   startPoint: 0,
+    //   horizontal: param.horizontal ? param.horizontal : false,
+    //   children: param.children ? param.children : [],
+    //   parentIndex: null,
+    //   inputData: param.data || (this.structType === 'array' ? [] : null),
+    //   hasAccumulate: false,
+    //   pointHighlight: param.pointHighlight ? param.pointHighlight : 5,
+    //   seriesHighlight: param.seriesHighlight ? param.seriesHighlight : 4,
+    //   isHighlight: false,
+    // };
+
     this.seriesList.push(series);
+  }
+
+  getSeriesExtends(defaultSeries, param) {
+    const extSeries = {
+      axisIndex: {
+        x: param.xAxisIndex ? param.xAxisIndex : 0,
+        y: param.yAxisIndex ? param.yAxisIndex : 0,
+      },
+      point: param.point || false,
+      pointSize: param.pointSize || 4,
+      pointStyle: param.pointStyle || '',
+      pointFill: param.pointFill || this.chartOptions.colors[this.seriesList.length],
+      lineWidth: param.lineWidth || 2,
+      fill: param.fill || false,
+      fillColor: param.fillColor || this.chartOptions.colors[this.seriesList.length],
+      fillOpacity: param.fillOpacity || 0.4,
+    };
+
+    return _.merge(defaultSeries, extSeries);
   }
 
   addValue(seriesIndex, value, dataIndex) {
@@ -100,7 +157,7 @@ export default class DataStore {
     }
 
     if (dataIndex === null || dataIndex === undefined) {
-      dataIdx = series.data.length;
+      dataIdx = series.cData.length;
     }
 
     if (Object.hasOwnProperty.call(value, 'x') || Object.hasOwnProperty.call(value, 'y')) {
@@ -115,19 +172,19 @@ export default class DataStore {
     }
 
     if (this.chartOptions.bufferSize) {
-      if (series.data.length > this.chartOptions.bufferSize) {
-        series.data.shift();
-        series.inputData.shift();
+      if (series.cData.length > this.chartOptions.bufferSize) {
+        series.cData.shift();
+        series.oData.shift();
 
         --dataIdx;
         --series.maxIndex;
         --series.minIndex;
       }
     }
-    series.data[dataIdx] = tempValue;
-    series.data[dataIdx].point = series.point;
+    series.cData[dataIdx] = tempValue;
+    series.cData[dataIdx].point = series.point;
 
-    series.inputData[dataIdx] = value;
+    series.oData[dataIdx] = value;
 
     if (series.show) {
       this.setMinMaxValue(series, tempValue, dataIdx);
@@ -136,14 +193,14 @@ export default class DataStore {
   }
 
   static calculateBaseValue(series, index, value, comp) {
-    if (series.data[index + comp].y === null) {
+    if (series.cData[index + comp].y === null) {
       return null;
     }
 
-    const x1 = +new Date(series.data[index + comp].x);
-    const y1 = series.data[index + comp].y;
-    const x2 = +new Date(series.data[index].x);
-    const y2 = series.data[index].y;
+    const x1 = +new Date(series.cData[index + comp].x);
+    const y1 = series.cData[index + comp].y;
+    const x2 = +new Date(series.cData[index].x);
+    const y2 = series.cData[index].y;
 
     const slope = (y2 - y1) / (x2 - x1);
 
@@ -151,7 +208,7 @@ export default class DataStore {
   }
 
   addValues(seriesIndex) {
-    const values = this.seriesList[seriesIndex].inputData;
+    const values = this.seriesList[seriesIndex].oData;
 
     for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
       this.addValue(seriesIndex, values[ix]);
@@ -235,7 +292,7 @@ export default class DataStore {
 
     for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
       if (this.seriesList[ix].axisIndex.x === index && this.seriesList[ix].show) {
-        data = this.seriesList[ix].data;
+        data = this.seriesList[ix].cData;
 
         for (let jx = 0, jxLen = data.length; jx < jxLen; jx++) {
           if (min === null || data[jx].x < min) {
@@ -298,7 +355,7 @@ export default class DataStore {
       this.initializeSeries(ix);
       const series = this.seriesList[ix];
 
-      if (series.inputData && series.inputData.length) {
+      if (series.oData && series.oData.length) {
         this.addValues(ix);
       }
     }
@@ -307,7 +364,11 @@ export default class DataStore {
   initializeSeries(seriesIndex) {
     const series = this.seriesList[seriesIndex];
 
-    series.data.length = 0;
+    series.cData.length = 0;
+    series.drawInfo.xPoint = [];
+    series.drawInfo.yPoint = [];
+    series.drawInfo.width = [];
+    series.drawInfo.height = [];
     series.hasAccumulate = false;
     series.min = null;
     series.minIndex = null;

@@ -30,6 +30,8 @@
       />
       <Button
         :text="itemButtonName1"
+        size="small"
+        type="primary"
         @click="changeDisabledItem"
       />
       <radio
@@ -38,6 +40,8 @@
       />
       <Button
         :text="itemButtonName2"
+        size="small"
+        type="primary"
         @click="changeStatus"
       />
     </div>
