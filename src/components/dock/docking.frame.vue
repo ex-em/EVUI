@@ -141,13 +141,13 @@
       },
     },
     created() {
-      this.$dockBus.$on('restore', (id, type) => {
+      this.$dockBus.$on('restore', (id) => {
         if (this.id === id) {
-          if (this.options.type !== type) {
-            this.onParentAttach();
-          } else {
+          // if (this.options.type !== type) {
+          //   this.onParentAttach();
+          // } else {
             this.onAttach({ isRestore: true });
-          }
+          // }
         }
       });
 
