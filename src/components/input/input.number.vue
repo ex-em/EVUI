@@ -326,7 +326,7 @@
     display: inline-block;
     width: 100%;
     line-height: 1.5;
-    padding: 4px 0px 7px 0px;
+    padding: 0px;
     font-size: 12px;
     color: #495060;
     background-color: #fff;
