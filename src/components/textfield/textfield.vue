@@ -4,7 +4,9 @@
       :style="styleObject"
       :class="wrapClasses"
     >
-      <template v-if="type !== 'textarea'">
+      <template
+        v-if="type !== 'textarea'"
+      >
         <input
           :class="inputClasses"
           :value="currentValue"
@@ -12,10 +14,10 @@
           :disabled="disabled"
           :readonly="readonly"
           spellcheck="false"
-          @focus="onFocus"
-          @blur="onBlur"
-          @change="change"
-          @input="change"
+          @focus.prevent="onFocus"
+          @blur.prevent="onBlur"
+          @change.prevent="change"
+          @input.prevent="change"
         >
       </template>
       <textarea
@@ -189,19 +191,13 @@
       },
     },
     methods: {
-      preventDefault(e) {
-        e.preventDefault();
-      },
-      onFocus(e) {
-        this.preventDefault(e);
+      onFocus() {
         this.focus = true;
       },
-      onBlur(e) {
-        this.preventDefault(e);
+      onBlur() {
         this.focus = false;
       },
       change(e) {
-        this.preventDefault(e);
         this.setChangingFlags();
 
         const targetValue = e.target.value;
