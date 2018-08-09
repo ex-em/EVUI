@@ -659,9 +659,14 @@
             }
           }
         }
-
+      },
+      forceSort() {
+        const filedList = _.map(this.sortColumns, 'field');
+        const directionList = _.map(this.sortColumns, 'direction');
         if (this.isFilter) {
-          // this.filteredData = this.sortedData;
+          this.sortedData = _.orderBy(this.exFilteredData, filedList, directionList);
+        } else {
+          this.sortedData = _.orderBy(this.originData, filedList, directionList);
         }
       },
       columnResize(column, index, event) {
@@ -707,8 +712,9 @@
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const startClientX = this.$refs.evuiGrid.getBoundingClientRect().left;
-        const startClientY = this.$refs.evuiGrid.getBoundingClientRect().top;
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
 
 
         let colIndex; // 드랍 할 컬럼 인덱스
@@ -914,7 +920,7 @@
             this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
             this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
           }
-        } else if (this.filter) {
+        } else if (this.isFilter) {
           this.resultData = this.filteredData;
         } else if (this.isSort) {
           this.resultData = this.sortedData;
@@ -1134,13 +1140,23 @@
             });
           }
         }
+        if (menuField === undefined) {
+          this.filteredData = this.exFilteredData;
+          this.originFilterdData = this.exFilteredData;
+          if (this.isSort) {
+            const filedList = _.map(this.sortColumns, 'field');
+            const directionList = _.map(this.sortColumns, 'direction');
+            this.filteredData = _.orderBy(this.exFilteredData, filedList, directionList);
+          }
+        }
       },
       clickFilter(event) {
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const startClientX = this.$refs.evuiGrid.getBoundingClientRect().left;
-        const startClientY = this.$refs.evuiGrid.getBoundingClientRect().top;
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
         const startOffsetX = this.$refs.evuiGrid.offsetLeft;
         const startOffsetY = this.$refs.evuiGrid.offsetTop;
         const posX = (event.clientX - startClientX - event.offsetX) + startOffsetX + 6;
@@ -1175,6 +1191,14 @@
       },
       setData(data) {
         this.originData = data;
+        if (this.isFilter) {
+          this.columnFilter();
+        }
+        if (this.isSort) {
+          this.forceSort();
+        } else {
+          this.sortedData = data.slice();
+        }
       },
     },
   };
