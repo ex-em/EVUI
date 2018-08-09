@@ -137,23 +137,23 @@
       };
     },
     computed: {
-      styleObject: function styleObject() {
+      styleObject() {
         return {
           width: parsedStyle(this.width),
           height: parsedStyle(this.height),
         };
       },
-      wrapTextClass: function wrapTextClass() {
+      wrapTextClass() {
         return [
           `${prefixCls}-valid-check`,
         ];
       },
-      errorTextClass: function errorClass() {
+      errorTextClass() {
         return [
           `${prefixCls}-valid-error`,
         ];
       },
-      maxLengthClass: function maxLengthClass() {
+      maxLengthClass() {
         return [
           `${prefixCls}-valid-max-length`,
           {
@@ -161,10 +161,10 @@
           },
         ];
       },
-      formatterValue: function formatterValue() {
+      formatterValue() {
         return this.currentValue;
       },
-      wrapClasses: function wrapClasses() {
+      wrapClasses() {
         return [
           `${prefixCls}`,
           {
@@ -178,7 +178,7 @@
           },
         ];
       },
-      inputClasses: function inputClasses() {
+      inputClasses() {
         return `${prefixCls}-${this.type}`;
       },
     },
