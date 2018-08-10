@@ -1,6 +1,7 @@
 <template>
   <div class="slider-dots">
-    <Slider
+    <ev-slider
+      :width="1200"
       :value="200"
       :show-dots="true"
       :step="10"
@@ -11,14 +12,8 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import Slider from '@/components/slider';
-
   export default {
     name: 'SliderDots',
-    components: {
-      Slider,
-    },
   };
 </script>
 

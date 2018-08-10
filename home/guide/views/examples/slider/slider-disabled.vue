@@ -1,6 +1,7 @@
 <template>
   <div class="slider-disabled">
-    <Slider
+    <ev-slider
+      :width="300"
       :value="58"
       :disabled="true"
     />
@@ -8,14 +9,8 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import Slider from '@/components/slider';
-
   export default {
     name: 'SliderDisabled',
-    components: {
-      Slider,
-    },
   };
 </script>
 

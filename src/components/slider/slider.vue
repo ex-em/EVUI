@@ -1,7 +1,7 @@
 <template>
   <div
     ref="slider"
-    :style="sliderStyle"
+    :style="styles"
     :class="classes"
     @click="onClick"
   >
@@ -23,8 +23,8 @@
     >
       <div
         v-if="isRange"
-        :style="leftBtnStyle"
-        :class="`${prefixCls}-btn`"
+        :style="`left: ${leftBtnValuePer}%`"
+        :class="[`${prefixCls}-btn`, leftBtnDragging ? `${prefixCls}-btn-dragging` : '']"
         @mousedown="onMouseDown($event, 'left')"
         @touchstart="onMouseDown($event, 'left')"
       />
@@ -35,8 +35,8 @@
       :content="rightBtnValue"
     >
       <div
-        :style="rightBtnWrapStyle"
-        :class="`${prefixCls}-btn`"
+        :style="`left: ${rightBtnValuePer}%`"
+        :class="[`${prefixCls}-btn`, rightBtnDragging ? `${prefixCls}-btn-dragging` : '']"
         @mousedown="onMouseDown($event, 'right')"
         @touchstart="onMouseDown($event, 'right')"
       />
@@ -63,9 +63,16 @@
       sliderStyle: {
         type: Object,
         default() {
-          return {
-          };
+          return {};
         },
+      },
+      width: {
+        type: [String, Number],
+        default: 0,
+      },
+      height: {
+        type: [String, Number],
+        default: 0,
       },
       max: {
         type: Number,
@@ -99,6 +106,7 @@
     data() {
       return {
         prefixCls,
+        styles: {},
         dotList: [],
         maxValue: 0,
         minValue: 0,
@@ -112,25 +120,11 @@
     },
     computed: {
       classes() {
-        const classes = [];
-
-        classes.push(`${prefixCls}`);
-
-        if (this.disabled) {
-          classes.push(`${prefixCls}-disabled`);
-        }
-
-        if (this.leftBtnDragging || this.rightBtnDragging) {
-          classes.push(`${prefixCls}-dragging`);
-        }
-
-        return classes;
-      },
-      leftBtnStyle() {
-        return `left: ${this.leftBtnValuePer}%`;
-      },
-      rightBtnWrapStyle() {
-        return `left: ${this.rightBtnValuePer}%`;
+        return [
+          `${prefixCls}`,
+          this.disabled ? `${prefixCls}-disabled` : '',
+          (this.leftBtnDragging || this.rightBtnDragging) ? `${prefixCls}-dragging` : '',
+        ];
       },
       barStyle() {
         return `left: ${this.leftBtnValuePer}%; width: ${this.rightBtnValuePer - this.leftBtnValuePer}%`;
@@ -156,20 +150,41 @@
         }
       },
     },
+    created() {
+      this.initStyles();
+    },
     mounted() {
-      if (this.max % this.step) {
-        // max 가 step 으로 나눴을 때 나머지가 생기면, max 범위 내에서 step 의 마지막 지점으로 max 값을 변경해준다.
-        this.maxValue = this.step * Math.floor(this.max / this.step);
-      } else {
-        this.maxValue = this.max;
-      }
+      // if (this.max % this.step) {
+      //   // max 가 step 으로 나눴을 때 나머지가 생기면, max 범위 내에서 step 의 마지막 지점으로 max 값을 변경해준다.
+      //   this.maxValue = this.step * Math.floor(this.max / this.step);
+      // } else {
+      //   this.maxValue = this.max;
+      // }
 
+      this.maxValue = this.max;
       this.minValue = this.min;
 
       this.initDotList();
       this.initBtnValue();
     },
     methods: {
+      initStyles() {
+        if (Object.keys(this.sliderStyle).length) {
+          Object.assign(this.styles, this.sliderStyle);
+        }
+
+        if (this.width && !this.styles.width) {
+          let width;
+
+          if (typeof this.width === 'number') {
+            width = `${this.width}px`;
+          } else {
+            width = this.width;
+          }
+
+          this.styles.width = width;
+        }
+      },
       initBtnValue() {
         let leftVal = 0;
         let rightVal = 0;
@@ -198,18 +213,22 @@
         this.rightBtnValue = this.getValueCloseToDot(rightVal);
       },
       initDotList() {
-        const bgBarTotalSize = this.maxValue - this.minValue;
-        const dotCnt = Math.floor(bgBarTotalSize / this.step);
-        const dotStepWidth = (this.step / bgBarTotalSize) * 100;
+        let ix = 0;
+        let value = 0;
+        const valueRange = this.maxValue - this.minValue;
 
         this.dotList = [];
 
-        for (let ix = 0; ix <= dotCnt; ix++) {
-          this.dotList.push({
-            width: dotStepWidth,
-            value: ix * this.step,
-            valuePer: ix * dotStepWidth,
-          });
+        while (value <= this.maxValue) {
+          if (this.minValue <= value) {
+            this.dotList.push({
+              value,
+              valuePer: (((value - this.minValue) / valueRange) * 100).toFixed(4),
+            });
+          }
+
+          ix++;
+          value = ix * this.step;
         }
       },
       onClick(e) {
@@ -342,6 +361,10 @@
         const clickedValueWidth = ((currentOffsetX - offsetLeft) * valueRange) / offsetWidth;
         let clickedValue = this.minValue + clickedValueWidth;
 
+        if (clickedValue < this.minValue) {
+          clickedValue = this.minValue;
+        }
+
         if (clickedValue > this.maxValue) {
           clickedValue = this.maxValue;
         }
@@ -362,8 +385,8 @@
           resultVal = this.step * quotient;
         }
 
-        resultVal = resultVal < this.minValue ? this.minValue : resultVal;
-        resultVal = resultVal > this.maxValue ? this.maxValue : resultVal;
+        resultVal = resultVal < this.minValue ? (resultVal + this.step) : resultVal;
+        resultVal = resultVal > this.maxValue ? (resultVal - this.step) : resultVal;
 
         return resultVal;
       },
@@ -414,6 +437,11 @@
     outline: 0;
     transform: translateX(-4px);
   }
+  .evui-slider-btn-dragging:not(:hover) {
+    border-color: #2d8cf0;
+    transform: translateX(-4px) scale(1.5);
+    transition: transform .2s linear;
+  }
   .evui-slider-btn:focus,
   .evui-slider-btn:hover {
     border-color: #2d8cf0;
@@ -422,6 +450,7 @@
   }
   .evui-slider-dot {
     position: absolute;
+    margin-left: -1px;
     width: 4px;
     height: 4px;
     border-radius: 50%;
@@ -440,16 +469,9 @@
   .evui-slider-disabled .evui-slider-btn {
     border-color: #ccc
   }
-  .evui-slider-disabled .evui-slider-dragging,
   .evui-slider-disabled .evui-slider-btn:hover {
-    border-color: #ccc
-  }
-  .evui-slider-disabled .evui-slider-btn:hover {
-    cursor: not-allowed
-  }
-  .evui-slider-disabled .evui-slider-dragging,
-  .evui-slider-disabled .evui-slider-dragging:hover {
-    cursor: not-allowed
+    border-color: #ccc;
+    cursor: not-allowed;
   }
   .evui-slider-input .evui-slider {
     width: auto;

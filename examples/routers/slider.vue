@@ -9,7 +9,7 @@
       :min="slider.min"
       :is-range="slider.isRange"
       :show-dots="slider.showDots"
-      :dot-step="slider.dotStep"
+      :dot-step="slider.step"
       :disabled="slider.disabled"
     />
   </div>

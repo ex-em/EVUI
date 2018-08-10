@@ -59,15 +59,12 @@
         return `left: -${contentHalfWidth}px`;
       },
       popperClasses() {
-        const classes = [];
-
-        classes.push(`${prefixCls}-popper`);
-
-        if (this.visible || this.isDragging) {
-          classes.push('on');
-        }
-
-        return classes;
+        return [
+          `${prefixCls}-popper`,
+          {
+            on: (this.visible || this.isDragging),
+          },
+        ];
       },
     },
     methods: {

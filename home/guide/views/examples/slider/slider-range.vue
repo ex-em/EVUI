@@ -1,16 +1,18 @@
 <template>
   <div class="slider-default">
-    <Slider
+    <ev-slider
+      :width="900"
       :value="[380, 670]"
       :is-range="true"
       :step="50"
       :min="100"
       :max="800"
     />
-    <Slider
+    <ev-slider
       :slider-style="{
         marginTop: '20px',
       }"
+      :width="1200"
       :value="[27000, 48000]"
       :is-range="true"
       :show-dots="true"
@@ -22,14 +24,8 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import Slider from '@/components/slider';
-
   export default {
     name: 'SliderDefault',
-    components: {
-      Slider,
-    },
   };
 </script>
 
