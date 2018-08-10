@@ -88,6 +88,10 @@ const router = new VueRouter({
       path: '/label',
       component: resolve => require(['./guide/views/examples/label/label-view'], resolve),
     },
+    {
+      path: '/textfield',
+      component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
+    },
   ],
 });
 
