@@ -4,11 +4,13 @@
       <h5> # Normal </h5>
       <Label
         :value="textList[0]"
+        :bold="true"
         :fit="true"
       />
       <Label
         :mandatory="true"
         :value="textList[1]"
+        :bold="true"
         :fit="true"
       />
       <Label

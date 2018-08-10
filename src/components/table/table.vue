@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%;">
+  <div style="width: 100%; height: 100%; position: relative;">
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
@@ -14,64 +14,6 @@
           class="evui-table-body"
           style="top: 0px; bottom: 0px; left: 0px; right: 0px;"
         >
-          <div
-            ref="gridColumns"
-            class="evui-table-columns"
-            style=""
-          >
-            <table>
-              <tbody>
-                <tr>
-                  <td
-                    class="evui-table-columns-head"
-                    data-col="start"
-                    style="border-right: 0px; width: 0px;"
-                  />
-                  <template v-for="(column, index) in originColumns">
-                    <td
-                      :key="index"
-                      :data-col="index"
-                      :style="{width: column.width}"
-                      :ref="`${column.field}_col`"
-                      class="evui-table-columns-head"
-                      @mouseup="columnSort(column, $event)"
-                      @mousedown.stop.prevent="columnMove(column, index, $event)"
-                    >
-                      <div
-                        :style="{
-                          height: '25px',
-                          marginLeft: `${(parseFloat(column.width)-6)}px`
-                        }"
-                        class="evui-table-columns-resizer"
-                        @mousedown.stop.prevent="columnResize(column, index, $event)"
-                      />
-                      <div class="evui-table-col-header">
-                        <div
-                          v-if="column.sortable"
-                          :ref="`${column.field}_sort`"
-                        />
-                        {{ column.caption }}
-                        <span
-                          v-if="filter"
-                          class="fa fa-filter"
-                          style="float: right; cursor: pointer;"
-                          @mousedown="clickFilter"
-                          @mouseup.stop.prevent
-                        />
-                      </div>
-                    </td>
-                  </template>
-                  <td
-                    :style="{width: `${endColWidth}px`}"
-                    class="evui-table-columns-head evui-table-columns-head-last"
-                    data-col="end"
-                  >
-                    <div>&nbsp;</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
           <div
             ref="evuiGridRecords"
             class="evui-table-records"
@@ -143,6 +85,64 @@
                 </tbody>
               </table>
             </div>
+          </div>
+          <div
+            ref="gridColumns"
+            class="evui-table-columns"
+            style=""
+          >
+            <table>
+              <tbody>
+                <tr>
+                  <td
+                    class="evui-table-columns-head"
+                    data-col="start"
+                    style="border-right: 0px; width: 0px;"
+                  />
+                  <template v-for="(column, index) in originColumns">
+                    <td
+                      :key="index"
+                      :data-col="index"
+                      :style="{width: column.width}"
+                      :ref="`${column.field}_col`"
+                      class="evui-table-columns-head"
+                      @mouseup="columnSort(column, $event)"
+                      @mousedown.stop.prevent="columnMove(column, index, $event)"
+                    >
+                      <div
+                        :style="{
+                          height: '25px',
+                          marginLeft: `${(parseFloat(column.width)-6)}px`
+                        }"
+                        class="evui-table-columns-resizer"
+                        @mousedown.stop.prevent="columnResize(column, index, $event)"
+                      />
+                      <div class="evui-table-col-header">
+                        <div
+                          v-if="column.sortable"
+                          :ref="`${column.field}_sort`"
+                        />
+                        {{ column.caption }}
+                        <span
+                          v-if="filter"
+                          class="fa fa-filter"
+                          style="float: right; cursor: pointer;"
+                          @mousedown="clickFilter"
+                          @mouseup.stop.prevent
+                        />
+                      </div>
+                    </td>
+                  </template>
+                  <td
+                    :style="{width: `${endColWidth}px`}"
+                    class="evui-table-columns-head evui-table-columns-head-last"
+                    data-col="end"
+                  >
+                    <div>&nbsp;</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div
@@ -659,9 +659,14 @@
             }
           }
         }
-
+      },
+      forceSort() {
+        const filedList = _.map(this.sortColumns, 'field');
+        const directionList = _.map(this.sortColumns, 'direction');
         if (this.isFilter) {
-          // this.filteredData = this.sortedData;
+          this.sortedData = _.orderBy(this.exFilteredData, filedList, directionList);
+        } else {
+          this.sortedData = _.orderBy(this.originData, filedList, directionList);
         }
       },
       columnResize(column, index, event) {
@@ -707,15 +712,19 @@
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const startOffsetY = this.$refs.evuiGrid.getBoundingClientRect().top - 20; // 기본 Y 고스트 위치용
-        const startOffsetX = this.$refs.evuiGrid.getBoundingClientRect().left - 15; // 기본 X 고스트 위치용
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
+
 
         let colIndex; // 드랍 할 컬럼 인덱스
 
         // 컬럼 고스트 무브
         function moveAt(clientX, clientY) {
+          const posX = (clientX - startClientX) + 15;
+          const posY = (clientY - startClientY) + 20;
           vm.$refs.headGhost.style.cssText =
-            `top: ${clientY - startOffsetY}px; left: ${clientX - startOffsetX}px`;
+            `top: ${posY}px; left: ${posX}px; display: block`;
         }
 
         // 컬럼 배열 변경
@@ -778,15 +787,14 @@
             changeColumn(index, colIndex, vm.originColumns[index]);
           }
         }
-
         // sort랑 이벤트 충돌을 피하기 위해
         this.columnTimeout = setTimeout(() => {
-          this.$refs.headGhost.style.display = 'block';
+          // this.$refs.headGhost.style.display = 'block';
           this.$refs.marker.style.display = 'block';
           this.$refs.headGhost.textContent = column.caption;
           document.addEventListener('mousemove', onMouseMove);
           document.addEventListener('mouseup', onMouseUp, true);
-          moveAt(event.pageX, event.pageY);
+          moveAt(event.clientX, event.clientY);
         }, 200);
       },
       scrollColumns(e) {
@@ -912,7 +920,7 @@
             this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
             this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
           }
-        } else if (this.filter) {
+        } else if (this.isFilter) {
           this.resultData = this.filteredData;
         } else if (this.isSort) {
           this.resultData = this.sortedData;
@@ -1132,12 +1140,27 @@
             });
           }
         }
+        if (menuField === undefined) {
+          this.filteredData = this.exFilteredData;
+          this.originFilterdData = this.exFilteredData;
+          if (this.isSort) {
+            const filedList = _.map(this.sortColumns, 'field');
+            const directionList = _.map(this.sortColumns, 'direction');
+            this.filteredData = _.orderBy(this.exFilteredData, filedList, directionList);
+          }
+        }
       },
       clickFilter(event) {
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const targetPos = event.target.getBoundingClientRect();
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
+        const startOffsetX = this.$refs.evuiGrid.offsetLeft;
+        const startOffsetY = this.$refs.evuiGrid.offsetTop;
+        const posX = (event.clientX - startClientX - event.offsetX) + startOffsetX + 6;
+        const posY = (event.clientY - startClientY - event.offsetY) + startOffsetY + 7;
         const targetCol = event.target.closest('.evui-table-columns-head');
         const colIndex = +targetCol.getAttribute('data-col');
 
@@ -1152,7 +1175,7 @@
           document.removeEventListener('mousedown', onClick, true);
         }
         this.$refs.evuiTableMenu.style.cssText =
-          `left: ${targetPos.x}px; top: ${targetPos.y + 5}px; display: block;`;
+          `left: ${posX}px; top: ${posY}px; display: block;`;
         if (!this.menuClickFlag) {
           document.addEventListener('mousedown', onClick, true);
           this.menuClickFlag = true;
@@ -1168,6 +1191,14 @@
       },
       setData(data) {
         this.originData = data;
+        if (this.isFilter) {
+          this.columnFilter();
+        }
+        if (this.isSort) {
+          this.forceSort();
+        } else {
+          this.sortedData = data.slice();
+        }
       },
     },
   };

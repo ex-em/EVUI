@@ -1,9 +1,10 @@
 <template>
   <div style="width:100%">
-    <evui-table
+    <ev-table
       ref="test"
       :width="'1000px'"
       :height="'350px'"
+      :filter="true"
       :columns="columns"
       :records="rowData"
     />
@@ -11,12 +12,7 @@
 </template>
 
 <script>
-  import EvuiTable from '@/components/table';
-
   export default {
-    components: {
-      EvuiTable,
-    },
     data() {
       return {
         columns: [

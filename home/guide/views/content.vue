@@ -123,6 +123,12 @@
                 content: '라벨',
                 imgUrl: `${this.imgUrl}/label.png`,
               },
+              {
+                name: 'Textfield',
+                routerLink: '/textfield',
+                content: '텍스트 필드',
+                imgUrl: `${this.imgUrl}/textfield.png`,
+              },
             ],
           },
           {

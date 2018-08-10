@@ -48,7 +48,6 @@
           type="text"
           style="width:120px;"
           @focus="focusTextbox(index, $event.target.value)"
-          @change="test"
           @input="changeFilterValue(index, $event.target.value)"
         >
       </div>
