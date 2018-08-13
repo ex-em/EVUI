@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%; height: 100%; position: relative;">
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
@@ -14,63 +14,6 @@
           class="evui-table-body"
           style="top: 0px; bottom: 0px; left: 0px; right: 0px;"
         >
-          <div
-            ref="gridColumns"
-            class="evui-table-columns"
-            style=""
-          >
-            <table>
-              <tbody>
-                <tr>
-                  <td
-                    class="evui-table-columns-head"
-                    data-col="start"
-                    style="border-right: 0px; width: 0px;"
-                  />
-                  <template v-for="(column, index) in originColumns">
-                    <td
-                      :key="index"
-                      :data-col="index"
-                      :style="{width: column.width}"
-                      :ref="`${column.field}_col`"
-                      class="evui-table-columns-head"
-                      @mouseup="columnSort(column, $event)"
-                      @mousedown.stop.prevent="columnMove(column, index, $event)"
-                    >
-                      <div
-                        :style="{
-                          height: '25px',
-                          marginLeft: `${(parseFloat(column.width)-6)}px`
-                        }"
-                        class="evui-table-columns-resizer"
-                        @mousedown.stop.prevent="columnResize(column, index, $event)"
-                      />
-                      <div class="evui-table-col-header">
-                        <div
-                          v-if="column.sortable"
-                          :ref="`${column.field}_sort`"
-                        />
-                        {{ column.caption }}
-                        <span
-                          class="fa fa-filter"
-                          style="float: right; cursor: pointer;"
-                          @mousedown="clickFilter"
-                          @mouseup.stop.prevent
-                        />
-                      </div>
-                    </td>
-                  </template>
-                  <td
-                    :style="{width: `${endColWidth}px`}"
-                    class="evui-table-columns-head evui-table-columns-head-last"
-                    data-col="end"
-                  >
-                    <div>&nbsp;</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
           <div
             ref="evuiGridRecords"
             class="evui-table-records"
@@ -115,8 +58,8 @@
                         <td
                           :key="colIndex"
                           :data-col="colIndex"
+                          :style="{ textAlign: col.recordsAlign }"
                           class="evui-table-data"
-                          style=""
                         >
                           <div style="max-height: 24px;">
                             {{ row[col.field] }}
@@ -142,6 +85,64 @@
                 </tbody>
               </table>
             </div>
+          </div>
+          <div
+            ref="gridColumns"
+            class="evui-table-columns"
+            style=""
+          >
+            <table>
+              <tbody>
+                <tr>
+                  <td
+                    class="evui-table-columns-head"
+                    data-col="start"
+                    style="border-right: 0px; width: 0px;"
+                  />
+                  <template v-for="(column, index) in originColumns">
+                    <td
+                      :key="index"
+                      :data-col="index"
+                      :style="{width: column.width}"
+                      :ref="`${column.field}_col`"
+                      class="evui-table-columns-head"
+                      @mouseup="columnSort(column, $event)"
+                      @mousedown.stop.prevent="columnMove(column, index, $event)"
+                    >
+                      <div
+                        :style="{
+                          height: '25px',
+                          marginLeft: `${(parseFloat(column.width)-6)}px`
+                        }"
+                        class="evui-table-columns-resizer"
+                        @mousedown.stop.prevent="columnResize(column, index, $event)"
+                      />
+                      <div class="evui-table-col-header">
+                        <div
+                          v-if="column.sortable"
+                          :ref="`${column.field}_sort`"
+                        />
+                        {{ column.caption }}
+                        <span
+                          v-if="filter"
+                          class="fa fa-filter"
+                          style="float: right; cursor: pointer;"
+                          @mousedown="clickFilter"
+                          @mouseup.stop.prevent
+                        />
+                      </div>
+                    </td>
+                  </template>
+                  <td
+                    :style="{width: `${endColWidth}px`}"
+                    class="evui-table-columns-head evui-table-columns-head-last"
+                    data-col="end"
+                  >
+                    <div>&nbsp;</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div
@@ -195,6 +196,7 @@
         class="evui-table-menu-tab-body"
       >
         <table-filter-lite
+          v-if="filter"
           :filter-condition="filterCondition"
           :field="menuField"
           @change="changeFilterValue"
@@ -225,26 +227,6 @@
 
         return styleObj;
       },
-      // gridBoxFilter(obj, style) {
-      //   const styleObj = _.defaults(obj, style);
-      //
-      //   // %면 그냥  넣어주고 px이면 -2 해서 넣어준다. 양쪽 border 크기
-      //   if (util.isPercentValue(style.width)) {
-      //     styleObj.width = util.numberToPixel(style.width);
-      //   } else {
-      //     const boxWidth = `${util.quantity(style.width).value - 2}px`;
-      //     styleObj.width = util.numberToPixel(boxWidth);
-      //   }
-      //
-      //   if (util.isPercentValue(style.height)) {
-      //     styleObj.height = util.numberToPixel(style.height);
-      //   } else {
-      //     const boxHeight = `${util.quantity(style.height).value - 2}px`;
-      //     styleObj.height = util.numberToPixel(boxHeight);
-      //   }
-      //
-      //   return styleObj;
-      // },
     },
 
     props: {
@@ -265,6 +247,10 @@
         default: 50,
       },
       virtualScroll: {
+        type: Boolean,
+        default: false,
+      },
+      filter: {
         type: Boolean,
         default: false,
       },
@@ -313,6 +299,7 @@
           size: null,
           width: 0,
           sortable: false,
+          recordsAlign: 'left',
         },
         rowHeight: 24,
 
@@ -337,9 +324,11 @@
         filterConditionObj: {}, // 필터링 한 조건들 넣을곳 컬럼 선택시
         filterConditionList: [], // 필터링 한 조건들 넣을곳 배열
         filteredData: [], // filter된 데이터값 넣을곳
+        originFilterdData: [], // sort 안된 필터링 데이터
         exFilteredData: [], // filter 버튼 눌렸을시 그 컬럼 제외한 필터 실행 데이터
         isFilter: false,
-        filterCondition: [],
+        filterCondition: [], // 넘길때 사용,
+        // recentCondition: [],
 
         // menu관련
         menuClickFlag: false,
@@ -380,26 +369,8 @@
         },
       },
     },
-    // 초기데이터는 다 생성시 정의해보자
     created() {
-      // this.records = rowdata; // 임시 데이터
-      // window.addEventListener('resize',this.test);
-      // this.width = util.numberToPixel(this.width);
-
-      // 소트 데이터 초기값을 기본 데이터롤 복사해서 넣어두자.
-      // 얕은 복사 객체 내용은 안바뀔거 같아서 얕은 복사함.
-      // 객체 안의 내용 바뀔거 같은면 깊은 복사로 변경 필요.
-      // 일단 가즈아!!
-      // this.sortedData = this.originData.slice();
-      // if (this.pagination) {
-      //   this.currentPage = 1;
-      //   this.lastPage = Math.ceil(this.originData.length / this.pageSize);
-      //   const start = (this.currentPage - 1) * this.pageSize;
-      //   const end = this.currentPage * this.pageSize;
-      //   this.resultData = this.originData.slice(start, end);
-      // } else {
-      //   this.resultData = this.originData.slice();
-      // }
+      window.addEventListener('resize', this.draw);
     },
     mounted() {
       // 그리드박스 높이 너비 가져오기
@@ -487,6 +458,9 @@
         }
       });
       // this.$forceUpdate();
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.draw);
     },
     methods: {
       columnSort(column, event) {
@@ -634,7 +608,7 @@
               }
             } else {
               if (this.isFilter) {
-                this.sortedData = this.filteredData;
+                this.sortedData = this.originFilterdData;
               } else {
                 this.sortedData = this.originData;
               }
@@ -685,9 +659,14 @@
             }
           }
         }
-
+      },
+      forceSort() {
+        const filedList = _.map(this.sortColumns, 'field');
+        const directionList = _.map(this.sortColumns, 'direction');
         if (this.isFilter) {
-          this.filteredData = this.sortedData;
+          this.sortedData = _.orderBy(this.exFilteredData, filedList, directionList);
+        } else {
+          this.sortedData = _.orderBy(this.originData, filedList, directionList);
         }
       },
       columnResize(column, index, event) {
@@ -733,15 +712,19 @@
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const startOffsetY = this.$refs.evuiGrid.getBoundingClientRect().top - 20; // 기본 Y 고스트 위치용
-        const startOffsetX = this.$refs.evuiGrid.getBoundingClientRect().left - 15; // 기본 X 고스트 위치용
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
+
 
         let colIndex; // 드랍 할 컬럼 인덱스
 
         // 컬럼 고스트 무브
         function moveAt(clientX, clientY) {
+          const posX = (clientX - startClientX) + 15;
+          const posY = (clientY - startClientY) + 20;
           vm.$refs.headGhost.style.cssText =
-            `top: ${clientY - startOffsetY}px; left: ${clientX - startOffsetX}px`;
+            `top: ${posY}px; left: ${posX}px; display: block`;
         }
 
         // 컬럼 배열 변경
@@ -804,15 +787,14 @@
             changeColumn(index, colIndex, vm.originColumns[index]);
           }
         }
-
         // sort랑 이벤트 충돌을 피하기 위해
         this.columnTimeout = setTimeout(() => {
-          this.$refs.headGhost.style.display = 'block';
+          // this.$refs.headGhost.style.display = 'block';
           this.$refs.marker.style.display = 'block';
           this.$refs.headGhost.textContent = column.caption;
           document.addEventListener('mousemove', onMouseMove);
           document.addEventListener('mouseup', onMouseUp, true);
-          moveAt(event.pageX, event.pageY);
+          moveAt(event.clientX, event.clientY);
         }, 200);
       },
       scrollColumns(e) {
@@ -898,193 +880,273 @@
       },
       draw() {
         // 그리드박스 높이 너비 가져오기
-        // this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
-        // this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
-        // this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
+        this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
+        this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
+        this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
         // 초기화
         this.sizeColSum = 0;
         this.noSizeColList = [];
         this.endColWidth = 0;
+        if (this.pagination) {
+          const gridBody = this.$refs.evuiGridBody;
 
-        this.$nextTick(() => {
-          if (this.pagination) {
-            const gridBody = this.$refs.evuiGridBody;
-            // resize 대비해서 추가 resize 개발 후 검토 필요
-            if ((this.gridBoxHeight - this.footerHeight) !== gridBody.offsetHeight) {
-              gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
-            }
-            const start = (this.currentPage - 1) * this.pageSize;
-            const end = this.currentPage * this.pageSize;
-            if (this.isFilter) {
-              this.lastPage = Math.ceil(this.filteredData.length / this.pageSize);
-              this.resultData = this.filteredData.slice(start, end);
-            } else {
-              this.lastPage = Math.ceil(this.originData.length / this.pageSize);
-              this.resultData = this.originData.slice(start, end);
-            }
-          } else if (this.virtualScroll) {
-            this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
-            this.virtualBottom = this.virtualRowCount;
-            if (this.isFilter) {
-              this.$refs.evuiRecordsTable.style.height = `${this.filteredData.length * this.rowHeight}px`;
-              this.resultData = this.filteredData.slice(this.virtualTop, this.virtualBottom);
-            } else {
-              this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
-              this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
-            }
-          } else if (this.filter) {
-            this.resultData = this.filteredData;
-          } else {
-            this.resultData = this.originData;
+          // resize 대비해서 추가 resize 개발 후 검토 필요
+          if ((this.gridBoxHeight - this.footerHeight) !== gridBody.offsetHeight) {
+            gridBody.style.height = `${gridBody.offsetHeight - this.footerHeight}px`;
           }
-
-          // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
-          for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
-            // 초기화 한번 시켜주고요
-            _.defaults(this.originColumns[ix], this.columnDefaultProperty);
-            // 컬럼 너비랑, % 값인지를 가지고 있자
-            const colWidth = util.quantity(this.originColumns[ix].size);
-            const isPercentValue = colWidth ? colWidth.unit === '%' : false;
-            const min = util.quantity(this.originColumns[ix].min).value;
-            const max = this.originColumns[ix].max ?
-              util.quantity(this.originColumns[ix].max).value : undefined;
-
-            // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
-            if (isPercentValue) {
-              const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
-              this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
-              this.sizeColSum += util.checkColSize(percentToPixel, min, max);
-            } else if (colWidth === undefined) {
-              this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
-            } else {
-              this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
-              this.sizeColSum += util.checkColSize(colWidth.value, min, max);
-            }
-          }
+          const start = (this.currentPage - 1) * this.pageSize;
+          const end = this.currentPage * this.pageSize;
 
           if (this.isFilter) {
-            this.verticalScroll = this.gridRecordsHeight <
-              (this.filteredData.length * this.rowHeight);
+            this.lastPage = Math.ceil(this.filteredData.length / this.pageSize);
+            this.resultData = this.filteredData.slice(start, end);
+          } else if (this.isSort) {
+            this.lastPage = Math.ceil(this.sortedData.length / this.pageSize);
+            this.resultData = this.sortedData.slice(start, end);
           } else {
-            this.verticalScroll = this.gridRecordsHeight <
-              (this.originData.length * this.rowHeight);
+            this.lastPage = Math.ceil(this.originData.length / this.pageSize);
+            this.resultData = this.originData.slice(start, end);
           }
-
-          let leftSize;
-          if (this.verticalScroll) {
-            leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
-            this.endColWidth = this.scrollBarSize;
+        } else if (this.virtualScroll) {
+          this.virtualRowCount = Math.ceil(this.gridRecordsHeight / this.rowHeight) + 1;
+          this.virtualBottom = this.virtualRowCount;
+          if (this.isFilter) {
+            this.$refs.evuiRecordsTable.style.height = `${this.filteredData.length * this.rowHeight}px`;
+            this.resultData = this.filteredData.slice(this.virtualTop, this.virtualBottom);
+          } else if (this.isSort) {
+            this.$refs.evuiRecordsTable.style.height = `${this.sortedData.length * this.rowHeight}px`;
+            this.resultData = this.sortedData.slice(this.virtualTop, this.virtualBottom);
           } else {
-            leftSize = this.gridBoxWidth - this.sizeColSum;
-            this.endColWidth = 0;
+            this.$refs.evuiRecordsTable.style.height = `${this.originData.length * this.rowHeight}px`;
+            this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
           }
-
-
-          // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
-          const colSize = Math.floor(leftSize / this.noSizeColList.length);
-          if (this.noSizeColList.length > 0) {
-            for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
-              // debugger;
-              const min = util.quantity(this.noSizeColList[ix].min).value;
-              const max = this.noSizeColList[ix].max ?
-                util.quantity(this.noSizeColList[ix].max).value : undefined;
-              const isLastIndex = (ix + 1) === ixLen;
-              if (!isLastIndex) {
-                leftSize -= util.checkColSize(colSize, min, max);
-                this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
-              } else {
-                this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
-              }
-
-              this.sizeColSum += util.checkColSize(colSize, min, max);
-            }
-          } else if (leftSize > 0) {
-            this.endColWidth = this.gridBoxWidth - this.sizeColSum;
-          }
-        });
-      },
-      changeFilterValue(param) {
-        const result = _.cloneDeep(param);
-        const field = result.field;
-        const dataList = result.data;
-        const index = _.findIndex(this.filterConditionList, data => data.field === field);
-
-        if (dataList.length > 0) {
-          // 추가
-          this.filterConditionObj[field] = dataList;
-          if (index > 0) {
-            this.filterConditionList[index] = result;
-          } else {
-            this.filterConditionList.push(result);
-          }
-
-          for (let ix = 0, ixLen = dataList.length; ix < ixLen; ix++) {
-            const filter = dataList[ix];
-            this.filteredData = _.filter(this.exFilteredData, (data) => {
-              let resultCondition;
-              switch (filter.condition) {
-                case 'equal':
-                  resultCondition = data[field].toString() === filter.text;
-                  break;
-                case 'like':
-                  resultCondition = data[field].toString().indexOf(filter.text) > -1;
-                  break;
-                default :
-                  break;
-              }
-              return resultCondition;
-            });
-            this.resultData = this.filteredData;
-          }
+        } else if (this.isFilter) {
+          this.resultData = this.filteredData;
+        } else if (this.isSort) {
+          this.resultData = this.sortedData;
         } else {
-          // 삭제
-          this.filterConditionObj[field] = undefined;
-          this.filterConditionList.splice(index, 1);
-          this.resultData = this.exFilteredData;
+          this.resultData = this.originData;
         }
 
-        this.draw();
+        // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
+        for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
+        // 초기화 한번 시켜주고요
+        _.defaults(this.originColumns[ix], this.columnDefaultProperty);
+          // 컬럼 너비랑, % 값인지를 가지고 있자
+          const colWidth = util.quantity(this.originColumns[ix].size);
+          const isPercentValue = colWidth ? colWidth.unit === '%' : false;
+          const min = util.quantity(this.originColumns[ix].min).value;
+          const max = this.originColumns[ix].max ?
+            util.quantity(this.originColumns[ix].max).value : undefined;
+
+          // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
+          if (isPercentValue) {
+            const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
+            this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
+            this.sizeColSum += util.checkColSize(percentToPixel, min, max);
+          } else if (colWidth === undefined) {
+            this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
+          } else {
+            this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
+            this.sizeColSum += util.checkColSize(colWidth.value, min, max);
+          }
+        }
+
+        if (this.isFilter) {
+          this.verticalScroll = this.gridRecordsHeight <
+            (this.filteredData.length * this.rowHeight);
+        } else {
+          this.verticalScroll = this.gridRecordsHeight <
+            (this.originData.length * this.rowHeight);
+        }
+
+        let leftSize;
+        if (this.verticalScroll) {
+          leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
+          this.endColWidth = this.scrollBarSize;
+        } else {
+          leftSize = this.gridBoxWidth - this.sizeColSum;
+          this.endColWidth = 0;
+        }
+
+        // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
+        const colSize = Math.floor(leftSize / this.noSizeColList.length);
+        if (this.noSizeColList.length > 0) {
+          for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
+            // debugger;
+            const min = util.quantity(this.noSizeColList[ix].min).value;
+            const max = this.noSizeColList[ix].max ?
+              util.quantity(this.noSizeColList[ix].max).value : undefined;
+            const isLastIndex = (ix + 1) === ixLen;
+            if (!isLastIndex) {
+              leftSize -= util.checkColSize(colSize, min, max);
+              this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+            } else {
+              this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
+            }
+
+            this.sizeColSum += util.checkColSize(colSize, min, max);
+          }
+        } else if (leftSize > 0) {
+          this.endColWidth = this.gridBoxWidth - this.sizeColSum;
+        }
+        this.$forceUpdate();
+      },
+      checkCondition(data1, data2, condition, andOr, exResult) {
+        let result;
+        switch (condition) {
+          case 'equal':
+            if (andOr === 'and') {
+              result = exResult && (data1 === data2);
+            } else if (andOr === 'or') {
+              result = exResult || (data1 === data2);
+            } else {
+              result = data1 === data2;
+            }
+            break;
+          case 'notEqual':
+            if (andOr === 'and') {
+              result = exResult && (data1 !== data2);
+            } else if (andOr === 'or') {
+              result = exResult || (data1 !== data2);
+            } else {
+              result = data1 !== data2;
+            }
+            break;
+          case 'like':
+            if (andOr === 'and') {
+              result = exResult && (data1.indexOf(data2) > -1);
+            } else if (andOr === 'or') {
+              result = exResult || (data1.indexOf(data2) > -1);
+            } else {
+              result = (data1.indexOf(data2) > -1);
+            }
+            break;
+          case 'notLike':
+            if (andOr === 'and') {
+              result = exResult && (data1.indexOf(data2) === -1);
+            } else if (andOr === 'or') {
+              result = exResult || (data1.indexOf(data2) === -1);
+            } else {
+              result = (data1.indexOf(data2) === -1);
+            }
+            break;
+          default :
+            break;
+        }
+        return result;
+      },
+
+      changeFilterValue(param) {
+        // const result = _.cloneDeep(param);
+        const field = param.field;
+        const andOrCondition = param.andOrCondition;
+        const dataList = param.data;
+        const valueList = [];
+        const isFilter = param.nullValueCnt !== dataList.length;
+
+        for (let ix = 0, ixLen = dataList.length; ix < ixLen; ix++) {
+          if (dataList[ix].text !== '') {
+            valueList.push({
+              condition: dataList[ix].condition,
+              text: dataList[ix].text,
+            });
+          }
+        }
+
+        this.filterConditionObj[field] = {
+          field,
+          isFilter,
+          dataList,
+          valueList,
+        };
+        if (isFilter) {
+          this.filteredData = _.filter(this.exFilteredData, (data) => {
+            let resultCondition = true;
+            for (let ix = 0, ixLen = valueList.length; ix < ixLen; ix++) {
+              const data1 = data[field].toString();
+              const data2 = valueList[ix].text;
+              const condition = valueList[ix].condition;
+
+              if (ix > 0) {
+                resultCondition
+                  = this.checkCondition(data1, data2, condition, andOrCondition, resultCondition);
+              } else {
+                resultCondition = this.checkCondition(data1, data2, condition);
+              }
+            }
+            return resultCondition;
+          });
+        } else {
+          this.filteredData = this.exFilteredData;
+        }
+
+        this.filterConditionList = _.filter(this.filterConditionObj,
+          data => data.isFilter === true);
         // 필터 상태 프래그값 설정
         if (this.filterConditionList.length > 0) {
           this.isFilter = true;
         } else {
           this.isFilter = false;
         }
-      },
-      filterForSort() {
 
+        if (this.isSort) {
+          const filedList = _.map(this.sortColumns, 'field');
+          const directionList = _.map(this.sortColumns, 'direction');
+
+          this.originFilterdData = this.filteredData;
+          this.filteredData = _.orderBy(this.filteredData, filedList, directionList);
+          this.sortedData = this.filteredData;
+        } else {
+          this.originFilterdData = this.filteredData;
+        }
+
+        this.draw();
       },
       columnFilter(menuField) {
-        if (this.filterConditionList.length === 0) {
+        if (!this.isFilter) {
           this.exFilteredData = this.originData;
           return;
         }
 
-        this.filteredData = this.originData;
+        this.exFilteredData = this.originData;
+        //
+        // if (this.isSort) {
+        //   const filedList = _.map(this.sortColumns, 'field');
+        //   const directionList = _.map(this.sortColumns, 'direction');
+        //   this.exFilteredData = _.orderBy(this.originData, filedList, directionList);
+        // }
 
         for (let ix = 0, ixLen = this.filterConditionList.length; ix < ixLen; ix++) {
           const field = this.filterConditionList[ix].field;
-          const dataList = this.filterConditionList[ix].data;
+          const valueList = this.filterConditionList[ix].valueList;
+          const andOrCondition = this.filterConditionList[ix].andOrCondition;
           if (field !== menuField) {
-            for (let jx = 0, jxLen = dataList.length; jx < jxLen; jx++) {
-              const filter = dataList[jx];
-              this.filteredData = _.filter(this.filteredData, (data) => {
-                let result;
-                switch (filter.condition) {
-                  case 'equal':
-                    result = data[field].toString() === filter.text;
-                    break;
-                  case 'like':
-                    result = data[field].toString().indexOf(filter.text) > -1;
-                    break;
-                  default :
-                    break;
-                }
-                return result;
-              });
+            this.exFilteredData = _.filter(this.exFilteredData, (data) => {
+              let resultCondition = true;
+              for (let jx = 0, jxLen = valueList.length; jx < jxLen; jx++) {
+                const data1 = data[field].toString();
+                const data2 = valueList[jx].text;
+                const condition = valueList[jx].condition;
 
-              this.exFilteredData = this.filteredData;
-            }
+                if (ix > 0) {
+                  resultCondition
+                    = this.checkCondition(data1, data2, condition, andOrCondition, resultCondition);
+                } else {
+                  resultCondition = this.checkCondition(data1, data2, condition);
+                }
+              }
+              return resultCondition;
+            });
+          }
+        }
+        if (menuField === undefined) {
+          this.filteredData = this.exFilteredData;
+          this.originFilterdData = this.exFilteredData;
+          if (this.isSort) {
+            const filedList = _.map(this.sortColumns, 'field');
+            const directionList = _.map(this.sortColumns, 'direction');
+            this.filteredData = _.orderBy(this.exFilteredData, filedList, directionList);
           }
         }
       },
@@ -1092,7 +1154,13 @@
         event.stopPropagation();
         event.preventDefault();
         const vm = this;
-        const targetPos = event.target.getBoundingClientRect();
+        const clientRect = this.$refs.evuiGrid.getBoundingClientRect();
+        const startClientX = clientRect.left;
+        const startClientY = clientRect.top;
+        const startOffsetX = this.$refs.evuiGrid.offsetLeft;
+        const startOffsetY = this.$refs.evuiGrid.offsetTop;
+        const posX = (event.clientX - startClientX - event.offsetX) + startOffsetX + 6;
+        const posY = (event.clientY - startClientY - event.offsetY) + startOffsetY + 7;
         const targetCol = event.target.closest('.evui-table-columns-head');
         const colIndex = +targetCol.getAttribute('data-col');
 
@@ -1107,16 +1175,30 @@
           document.removeEventListener('mousedown', onClick, true);
         }
         this.$refs.evuiTableMenu.style.cssText =
-          `left: ${targetPos.x}px; top: ${targetPos.y + 5}px; display: block;`;
+          `left: ${posX}px; top: ${posY}px; display: block;`;
         if (!this.menuClickFlag) {
           document.addEventListener('mousedown', onClick, true);
           this.menuClickFlag = true;
         }
 
-
         this.menuField = this.originColumns[colIndex].field;
-        this.filterCondition = this.filterConditionObj[this.menuField];
+        if (this.filterConditionObj[this.menuField]) {
+          this.filterCondition = this.filterConditionObj[this.menuField].dataList;
+        } else {
+          this.filterCondition = [];
+        }
         this.columnFilter(this.menuField);
+      },
+      setData(data) {
+        this.originData = data;
+        if (this.isFilter) {
+          this.columnFilter();
+        }
+        if (this.isSort) {
+          this.forceSort();
+        } else {
+          this.sortedData = data.slice();
+        }
       },
     },
   };

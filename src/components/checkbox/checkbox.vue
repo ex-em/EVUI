@@ -124,6 +124,8 @@
           return;
         }
         const checked = e.target.checked;
+        const oldValue = this.currentValue;
+
         this.currentValue = checked;
         const value = checked ? this.trueValue : this.falseValue;
 
@@ -131,7 +133,7 @@
         if (this.group) {
           this.parent.change(this.model);
         } else {
-          this.$emit('on-change', value);
+          this.$emit('on-change', value, oldValue);
         }
       },
       updateModel() {

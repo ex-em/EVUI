@@ -1,0 +1,310 @@
+/******************** docking **********************/
+.dock-container {
+  overflow: auto;
+  background-color: #212227;
+}
+
+.dock-frame {
+  position: absolute;
+  overflow: auto;
+  background-color: #30333A;
+}
+
+.splitter {
+  position: absolute;
+  background-color: #212227;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.guideline-for-split {
+  display: none;
+  position: absolute;
+  z-index: 10000;
+  background-color: #ABAEB5;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.hbox.splitter,
+.hbox.guideline-for-split {
+  cursor: col-resize;
+}
+
+.vbox.splitter,
+.vbox.guideline-for-split {
+  cursor: row-resize;
+}
+
+/*.hbox > .splitter,*/
+/*.hbox > .guidelines-for-split {*/
+/*cursor: col-resize;*/
+/*}*/
+
+/*.vbox > .splitter,*/
+/*.vbox > .guidelines-for-split {*/
+/*cursor: row-resize;*/
+/*}*/
+
+/*.hbox > .splitter:hover,*/
+/*.vbox > .splitter:hover,*/
+/*.hbox > .splitter:active,*/
+/*.vbox > .splitter:active {*/
+/*background-color: #e4e4e4;*/
+/*}*/
+
+/******************** docking icon for dock frame **********************/
+.docking-icon-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin: -50px 0 0 -50px;
+  z-index: 20000;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.docking-icon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  background-image: url(docking.image.png);
+}
+
+.docking-icon-wrap .background {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 76px;
+  height: 74px;
+  background-position: -286px -185px;
+  z-index: -1;
+}
+
+.docking-icon-wrap .top {
+  left: 35px;
+  background-position: -286px -5px;
+}
+
+.docking-icon-wrap .left {
+  top: 35px;
+  background-position: -286px -113px;
+}
+
+.docking-icon-wrap .center {
+  top: 35px;
+  left: 35px;
+  background-position: -286px -77px;
+}
+
+.docking-icon-wrap .right {
+  top: 35px;
+  left: 70px;
+  background-position: -286px -149px;
+}
+
+.docking-icon-wrap .bottom {
+  top: 70px;
+  left: 35px;
+  background-position: -286px -41px;
+}
+
+.docking-icon-wrap .top:hover {
+  background-position: -322px -5px;
+}
+
+.docking-icon-wrap .left:hover {
+  background-position: -322px -113px;
+}
+
+.docking-icon-wrap .center:hover {
+  background-position: -322px -77px;
+}
+
+.docking-icon-wrap .right:hover {
+  background-position: -322px -149px;
+}
+
+.docking-icon-wrap .bottom:hover {
+  background-position: -322px -41px;
+}
+
+/******************** docking icon for dock container **********************/
+.root-docking-icon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  background-image: url(docking.image.png);
+  z-index: 30000;
+}
+
+.root-docking-icon.top {
+  margin-left: -18px;
+  background-position: -286px -5px;
+}
+
+.root-docking-icon.left {
+  margin-top: -18px;
+  background-position: -286px -113px;
+}
+
+.root-docking-icon.bottom {
+  margin-left: -18px;
+  background-position: -286px -41px;
+}
+
+.root-docking-icon.right {
+  margin-top: -18px;
+  background-position: -286px -149px;
+}
+
+.root-docking-icon.top:hover {
+  background-position: -322px -5px;
+}
+
+.root-docking-icon.left:hover {
+  background-position: -322px -113px;
+}
+
+.root-docking-icon.bottom:hover {
+  background-position: -322px -41px;
+}
+
+.root-docking-icon.right:hover {
+  background-position: -322px -149px;
+}
+
+/******************** docking preview **********************/
+.preview {
+  position: absolute;
+  opacity: 0.45;
+  background-color: #448CCB;
+  z-index: 10000;
+}
+
+.preview.top {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 50%;
+}
+
+.preview.left {
+  top: 0px;
+  left: 0px;
+  width: 50%;
+  height: 100%;
+}
+
+.preview.center {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.preview.right {
+  top: 0px;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+}
+
+.preview.bottom {
+  top: 50%;
+  left: 0px;
+  width: 100%;
+  height: 50%;
+}
+
+.preview-guide {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  position: absolute;
+  border: 5px dashed #3b5a82;
+}
+
+/******************** docking window **********************/
+.dock-window {
+  position: absolute;
+  overflow: auto;
+  background-color: #30333A;
+  border: 6px solid #474a53;
+  border-radius: 6px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.dock-window .header {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  background-color: #212227;
+  align-items: center;
+}
+
+.window-icon {
+  width: 17px;
+  height: 17px;
+  background-image: url(docking.image.png);
+}
+
+.dock-window .header .title {
+  flex: auto;
+  color: #ABAEB5;
+  margin-left: 10px;
+}
+
+.dock-window .header .window-icon.maximize {
+  background-position: -70px -131px;
+  margin: 0 7px 0 0;
+}
+
+.dock-window .header .window-icon.close {
+  background-position: -70px -51px;
+  margin: 0 7px 0 0;
+}
+
+.dock-window .header .window-icon.maximize:hover {
+  background-position: -70px -151px;
+}
+
+.dock-window .header .window-icon.close:hover {
+  background-position: -70px -71px;
+}
+
+.dock-window .body {
+  width: 100%;
+  background-color: transparent;
+}
+
+/******************** dock frame option icon **********************/
+.option-icon {
+  background-image: url(docking.image.png);
+  width: 58px;
+  height: 25px;
+  cursor: pointer;
+  position: fixed;
+  z-index: 10000;
+}
+
+.option-icon.close {
+  background-position: -1px -225px;
+}
+
+.option-icon.detach {
+  background-position: -62px -225px;
+}

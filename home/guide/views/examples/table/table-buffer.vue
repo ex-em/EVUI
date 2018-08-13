@@ -1,10 +1,11 @@
 <template>
   <div style="width:100%">
-    <evui-table
+    <ev-table
       ref="test"
       :width="'1000px'"
       :height="'350px'"
       :virtual-scroll="true"
+      :filter="true"
       :columns="columns"
       :records="rowData"
     />
@@ -12,13 +13,8 @@
 </template>
 
 <script>
-  import EvuiTable from '@/components/table';
-
   export default {
-    components: {
-      EvuiTable,
-    },
-    data() {
+     data() {
       return {
         columns: [
           { field: 'recid', caption: 'ID', size: '50px', sortable: true },

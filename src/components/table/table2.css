@@ -175,7 +175,7 @@ button {
 .evui-table .evui-table-body .evui-table-columns {
   overflow: hidden;
   position: absolute;
-  z-index: 1000;
+  /*z-index: 1000;*/
   left: 0px;
   top: 0px;
   right: 0px;
@@ -187,7 +187,7 @@ button {
 }
 .evui-table .evui-table-body .evui-table-columns .evui-table-columns-resizer {
   position: absolute;
-  z-index: 1000;
+  z-index: 10;
   display: block;
   background-image: none;
   background-color: rgba(0, 0, 0, 0);
@@ -485,7 +485,7 @@ button {
   height: 25px;
   border-right: 1px solid #c5c5c5;
   border-bottom: 1px solid #c5c5c5;
-  z-index: 9999;
+  /*z-index: 9999;*/
   background-image: linear-gradient(#f9f9f9, #e4e4e4);
   opacity: 0.8;
   padding: 6px 3px;
@@ -498,7 +498,7 @@ button {
   top: 0;
   left: 0;
   margin-left: -5px;
-  z-index: 9999;
+  /*z-index: 9999;*/
   display: none;
 }
 .evui-table-col-intersection-marker .evui-table-top-marker {
@@ -525,7 +525,7 @@ button {
   position: absolute;
   display: none;
   /*top: 71px;*/
-  z-index: 20000;
+  /*z-index: 20000;*/
   /*left: 69px;*/
   background: #f5f7f7;
 }
@@ -536,3 +536,4 @@ button {
 .evui-table-menu-tab-body {
   max-height: 300px;
 }
+

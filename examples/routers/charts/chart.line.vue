@@ -33,6 +33,7 @@
             {
               id: 'simple1',
               name: 'simple1',
+              point: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 20 },
                 { x: '2018-05-25 05:12:00', y: 10 },
@@ -50,6 +51,7 @@
             {
               id: 'simple2',
               name: 'simple2',
+              point: true,
               data: [
                 { x: '2018-05-25 05:11:00', y: 15 },
                 { x: '2018-05-25 05:12:00', y: 17 },
@@ -304,7 +306,7 @@
     },
     methods: {
       addData() {
-        this.interval = setInterval(this.lineAddData.bind(this), 1000);
+        // this.interval = setInterval(this.lineAddData.bind(this), 1000);
       },
 
       lineAddData() {

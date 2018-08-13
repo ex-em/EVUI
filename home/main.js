@@ -84,6 +84,14 @@ const router = new VueRouter({
       path: '/toggle',
       component: resolve => require(['./guide/views/examples/toggle/toggle-view'], resolve),
     },
+    {
+      path: '/label',
+      component: resolve => require(['./guide/views/examples/label/label-view'], resolve),
+    },
+    {
+      path: '/textfield',
+      component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
+    },
   ],
 });
 
