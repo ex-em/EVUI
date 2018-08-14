@@ -208,7 +208,7 @@
 </template>
 
 <script>
-  // import '@/components/table/table2.css';
+  // import '@/components/table/table.grey.css';
   // import TableFilter from '@/components/table/table.filter';
   import TableFilterLite from '@/components/table/table.filter.lite';
   import util from '@/common/utils.table';
@@ -1203,4 +1203,4 @@
     },
   };
 </script>
-<style scoped src="@/components/table/table2.css"/>
+<style scoped src="@/components/table/table.navy.css"/>
