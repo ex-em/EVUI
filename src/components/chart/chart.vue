@@ -169,12 +169,12 @@
     margin-left: 16px;
     padding-right: 21px;
     width: 100%;
-    color: #000;
+    color: #ABAEB5;
     user-select:none;
   }
 
   .evui-chart-legend-name.inactive {
-    color: #bbb !important;
+    color: #555 !important;
   }
 
   .evui-chart-legend-value {

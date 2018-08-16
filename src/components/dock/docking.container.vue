@@ -1,6 +1,5 @@
 <template>
   <div
-    :style="`width: ${getWidth}px; height: ${getHeight}px;`"
     class="dock-container"
   >
     <dock-frame
@@ -156,6 +155,8 @@
     mounted() {
       const bounds = this.$el.getBoundingClientRect();
 
+      this.width = bounds.width;
+      this.height = bounds.height;
       this.padding.top = bounds.top;
       this.padding.left = bounds.left;
     },
@@ -239,8 +240,8 @@
             id: `node-${this.getMaxIdSeqForNode() + 1}`,
             top: 0,
             left: 0,
-            width: this.getWidth,
-            height: this.getHeight,
+            width: this.width,
+            height: this.height,
             level: 0,
             contents: window.contents,
           };
