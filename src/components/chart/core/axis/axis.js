@@ -205,6 +205,28 @@ class Axis {
     let formattingValue;
     if (this.options.labelType === 'time') {
       formattingValue = moment(value).format(this.options.tickFormat);
+    } else if (this.options.labelType === 'linear') {
+      if (value >= 1000000000) {
+        if (value % 1000000000 === 0) {
+          formattingValue = `${(value / 1000000000).toFixed(1)}G`;
+        } else {
+          formattingValue = `${(value / 1000000000).toFixed(1)}G`;
+        }
+      } else if (value >= 1000000) {
+        if (value % 1000000 === 0) {
+          formattingValue = `${(value / 1000000).toFixed(1)}M`;
+        } else {
+          formattingValue = `${(value / 1000000).toFixed(1)}M`;
+        }
+      } else if (value >= 1000) {
+        if (value % 1000 === 0) {
+          formattingValue = `${(value / 1000).toFixed(1)}k`;
+        } else {
+          formattingValue = `${(value / 1000).toFixed(1)}k`;
+        }
+      } else {
+        formattingValue = value.toFixed(1);
+      }
     } else {
       formattingValue = value;
     }
