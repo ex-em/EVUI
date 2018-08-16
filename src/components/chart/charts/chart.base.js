@@ -290,11 +290,40 @@ class BaseChart {
     };
   }
 
+  static suffixFormatter(val) {
+    let result = 0;
+    if (val >= 1000000000) {
+      if (val % 1000000000 === 0) {
+        result = `${(val / 1000000000).toFixed(1)}G`;
+      } else {
+        result = `${(val / 1000000000).toFixed(1)}G`;
+      }
+      return result;
+    } else if (val >= 1000000) {
+      if (val % 1000000 === 0) {
+        result = `${(val / 1000000).toFixed(1)}M`;
+      } else {
+        result = `${(val / 1000000).toFixed(1)}M`;
+      }
+      return result;
+    } else if (val >= 1000) {
+      if (val % 1000 === 0) {
+        result = `${(val / 1000).toFixed(1)}k`;
+      } else {
+        result = `${(val / 1000).toFixed(1)}k`;
+      }
+      return result;
+    }
+
+    return val.toFixed(1);
+  }
+
   setLabelOffset() {
     let labelText;
+    let convLabel;
     let labelSize;
 
-    const labelBuffer = 20;
+    const labelBuffer = 24;
     const xAxes = this.options.xAxes;
     const yAxes = this.options.yAxes;
 
@@ -303,7 +332,8 @@ class BaseChart {
     for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
       this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
       labelText = this.dataStore.getLabelTextMaxInfo(ix).yText || '';
-      labelSize = Math.ceil(this.bufferCtx.measureText(`${labelText}`).width) || 0;
+      convLabel = this.constructor.suffixFormatter(+labelText);
+      labelSize = Math.ceil(this.bufferCtx.measureText(`${convLabel}`).width) || 0;
 
       if (yAxes[ix].labelType === 'time') {
         labelSize = moment(labelText);
