@@ -91,7 +91,6 @@
   }
   .evui-listbox-ul{
     list-style-type: none;
-    height: 200px;
     padding: 2px 0;
   }
   .evui-listbox-ul-group{
