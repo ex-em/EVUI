@@ -1,7 +1,7 @@
 <template>
   <!-- eslint-disable max-len -->
   <div
-    :style="`left: ${getLeft + getLeftPadding}px; top: ${getTop + getTopPadding}px; width: ${getWidth}px; height: ${getHeight}px;`"
+    :style="`left: ${getLeft}px; top: ${getTop}px; width: ${getWidth}px; height: ${getHeight}px;`"
     :class="`${type} splitter`"
     @mousedown="onMouseDown"
   />
@@ -113,6 +113,7 @@
       },
     },
     mounted() {
+      window.console.log('test');
     },
     methods: {
       ...mapActions({
@@ -122,8 +123,8 @@
       onMouseDown() {
         const rootEl = this.$el.parentElement;
         const guideLineEl = this.$parent.$refs.guideline;
-        const top = this.getTop + this.getTopPadding;
-        const left = this.getLeft + this.getLeftPadding;
+        const top = this.getTop;
+        const left = this.getLeft;
 
         this.isMouseDown = true;
 
@@ -161,8 +162,8 @@
           }
         }
 
-        guideLineEl.style.cssText = `display: block; top: ${top + this.getTopPadding}px;
-        left: ${left + this.getLeftPadding}px; width: ${this.getWidth}px; height: ${this.getHeight}px;`;
+        guideLineEl.style.cssText = `display: block; top: ${top}px;
+        left: ${left}px; width: ${this.getWidth}px; height: ${this.getHeight}px;`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;

@@ -1,12 +1,13 @@
 /******************** docking **********************/
 .dock-container {
   overflow: auto;
+  position: relative;
   background-color: #212227;
 }
 
 .dock-frame {
   position: absolute;
-  overflow: auto;
+  /*overflow: auto;*/
   background-color: #30333A;
 }
 
@@ -292,13 +293,21 @@
 }
 
 /******************** dock frame option icon **********************/
+.option-icon-wrap {
+  position: absolute;
+  display: flex;
+  top: -25px;
+  right: 0px;
+  width: 116px;
+  height: 25px;
+  z-index: 50000;
+}
+
 .option-icon {
   background-image: url(docking.image.png);
   width: 58px;
   height: 25px;
   cursor: pointer;
-  position: fixed;
-  z-index: 10000;
 }
 
 .option-icon.close {
