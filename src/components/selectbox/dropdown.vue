@@ -144,7 +144,6 @@
 
   .evui-dropdown-listbox-wrap{
     width: 100%;
-    height: 200px;
   }
   .evui-dropdown-group-area{
     list-style-type: none;
