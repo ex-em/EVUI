@@ -1203,4 +1203,4 @@
     },
   };
 </script>
-<style scoped src="@/components/table/table.navy.css"/>
+<style scoped src="@/components/table/table.black.css"/>
