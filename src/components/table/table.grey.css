@@ -1,5 +1,3 @@
-/* evui 1.4.x (nightly) (c) http://evui.com, vitmalina@gmail.com */
-
 /*************************************************
 * --- Reset (used for all evui wdigetes)
 * --- The reset is needed to coexist with other CSS
@@ -67,7 +65,6 @@ button {
   background-color: #f1f1f1 !important;
   color: #777 !important;
 }*/
-
 /*************************************************
 * ---- Grid ----
 */
@@ -81,7 +78,7 @@ button {
   position: absolute;
   overflow: hidden;
 }
-.evui-table .evui-grid-header {
+.evui-table .evui-table-header {
   position: absolute;
   border-bottom: 1px solid #99bbe8 !important;
   height: 28px;
@@ -175,7 +172,6 @@ button {
 .evui-table .evui-table-body .evui-table-columns {
   overflow: hidden;
   position: absolute;
-  z-index: 1000;
   left: 0px;
   top: 0px;
   right: 0px;
@@ -187,7 +183,7 @@ button {
 }
 .evui-table .evui-table-body .evui-table-columns .evui-table-columns-resizer {
   position: absolute;
-  z-index: 1000;
+  z-index: 10;
   display: block;
   background-image: none;
   background-color: rgba(0, 0, 0, 0);
@@ -296,7 +292,6 @@ button {
   overflow: hidden;
   position: relative;
 }
-
 /*.evui-table .evui-table-body table .evui-table-columns-head.evui-reorder-cols-head:hover {
   cursor: move;
 }*/
@@ -316,7 +311,7 @@ button {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.evui-grid .evui-table-body table td.evui-table-data > div.flexible-record {
+.evui-table .evui-table-body table td.evui-table-data > div.flexible-record {
   height: auto;
   overflow: visible;
   white-space: normal;
@@ -397,17 +392,17 @@ button {
   outline: none !important;
   background: #fff;
 }
-.evui-table .evui-grid-summary {
+.evui-table .evui-table-summary {
   position: absolute;
   box-shadow: 0px -1px 4px #aaaaaa;
 }
-.evui-table .evui-grid-summary table {
+.evui-table .evui-table-summary table {
   color: inherit;
 }
-.evui-table .evui-grid-summary table .evui-odd {
+.evui-table .evui-table-summary table .evui-odd {
   background-color: #eef5eb;
 }
-.evui-table .evui-grid-summary table .evui-even {
+.evui-table .evui-table-summary table .evui-even {
   background-color: #f8fff5;
 }
 .evui-table .evui-table-footer {
@@ -485,7 +480,7 @@ button {
   height: 25px;
   border-right: 1px solid #c5c5c5;
   border-bottom: 1px solid #c5c5c5;
-  z-index: 9999;
+  /*z-index: 9999;*/
   background-image: linear-gradient(#f9f9f9, #e4e4e4);
   opacity: 0.8;
   padding: 6px 3px;
@@ -498,7 +493,7 @@ button {
   top: 0;
   left: 0;
   margin-left: -5px;
-  z-index: 9999;
+  /*z-index: 9999;*/
   display: none;
 }
 .evui-table-col-intersection-marker .evui-table-top-marker {
@@ -525,7 +520,7 @@ button {
   position: absolute;
   display: none;
   /*top: 71px;*/
-  z-index: 20000;
+  /*z-index: 20000;*/
   /*left: 69px;*/
   background: #f5f7f7;
 }

@@ -54,6 +54,10 @@
         type: Boolean,
         default: false,
       },
+      bold: {
+        type: Boolean,
+        default: false,
+      },
       mandatory: {
         type: Boolean,
         default: false,
@@ -97,6 +101,9 @@
         return [
           `${prefixCls}-outer`,
           `${prefixCls}-size-${sizeCls}`,
+          {
+            [`${prefixCls}-font-bold`]: this.bold,
+          },
         ];
       },
       wrappedValidClass() {
@@ -169,9 +176,11 @@
     padding: 0 2px 0 2px;
     vertical-align: middle;
     line-height: 1.5;
-    font-weight: bold;
     font-size: 15px;
     user-select: none;
+  }
+  .evui-label-font-bold {
+    font-weight: bold;
   }
   .evui-label-error {
     color: red;
