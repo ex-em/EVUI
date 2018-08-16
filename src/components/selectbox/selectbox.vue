@@ -195,6 +195,12 @@
           return;
         }
 
+        if (this.multiple) {
+          this.inputText = '';
+        }
+
+        this.listboxItems = this.items.slice();
+
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
@@ -213,7 +219,6 @@
           this.inputText = itemName;
           this.selectedItems.length = 0;
           this.selectedItems.push(item);
-          this.filterItems(itemName);
         }
 
         if (!this.multiple) {

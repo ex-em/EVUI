@@ -4,14 +4,14 @@
     class="evui-listbox"
   >
     <ul
-      class="ulClasses"
+      :class="ulClasses"
       @click.stop="onClick"
     >
       <li
         v-for="(item, index) in items"
         :key="index"
         :data-index="index"
-        :class="getLiClass(item)"
+        :class="getLiClasses(item)"
       >
         {{ item.name }}
       </li>
@@ -61,14 +61,14 @@
 
         switch (target.tagName) {
           case 'LI':
-            this.$emit('beforedselect', item, target, index);
+            this.$emit('before-select', item, target, index);
             this.$emit('select', item, target, index);
             break;
           default:
             break;
         }
       },
-      getLiClass(item) {
+      getLiClasses(item) {
         const classList = [];
         const foundItem = this.selectedItems.find(obj => obj.name === item.name);
 
@@ -91,7 +91,6 @@
   }
   .evui-listbox-ul{
     list-style-type: none;
-    height: 200px;
     padding: 2px 0;
   }
   .evui-listbox-ul-group{
