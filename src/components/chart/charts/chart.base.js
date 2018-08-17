@@ -12,6 +12,7 @@ import Tooltip from '../core/core.tooltip';
 
 class BaseChart {
   constructor(target, data, options) {
+    // step1. Create Chart Property Object.
     const defaultOptions = {
       colors: [
         '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
@@ -27,11 +28,14 @@ class BaseChart {
       },
       border: 2,
       title: {
-        text: '',
-        font: '15px Droid Sans',
-        color: '#000000',
-        height: 40,
         show: false,
+        height: 40,
+        text: '',
+        style: {
+          fontSize: 15,
+          color: '#000',
+          fontFamily: 'Droid Sans',
+        },
       },
       legend: {
         show: true,
@@ -39,27 +43,33 @@ class BaseChart {
       },
       fill: false,
       stack: false,
-      horizontal: false,
       doughnutHoleSize: 0,
       reverse: false,
-      bufferSize: 10,
+      bufferSize: null,
     };
 
-    this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
+    const defaultData = {
+      series: {},
+      groups: [],
+      data: [],
+    };
+
+    this.labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
 
     // set chart properties
     this.options = _.merge({}, defaultOptions, options);
-    this.data = data;
+    this.data = _.merge({}, defaultData, data);
 
-    this.seriesList = [];
-    this.seriesGroupList = [];
+    this.options.type = this.options.type.toLowerCase();
 
-    const type = this.options.type.toLowerCase();
-    const axisType = CHART_AXIS_TYPE[type];
+    if (CHART_AXIS_TYPE[this.options.type] === 'axis') {
+      this.setAxesOptions();
+    }
 
-    // set chart element layout
+    // step2. Create Target DOM Wrapper
     this.wrapperDOM = document.createElement('div');
     this.wrapperDOM.className = 'evui-chart-wrapper';
+    this.wrapperDOM.style.display = 'block';
     this.chartDOM = document.createElement('div');
     this.chartDOM.className = 'evui-chart-container';
 
@@ -70,34 +80,34 @@ class BaseChart {
       target.appendChild(this.wrapperDOM);
     }
 
+    // step3. Create Chart Canvas
     this.createCanvas();
 
-    // create chart DataStore & Series Data.
+    // step4. Create Component of Chart.
+    // 4-1. store
     this.createDataStore();
-    this.dataStore.init();
+    this.store.init();
 
-    // create chart component
-    // 1. axis
-    if (axisType === 'axis') {
-      this.setAxesOptions();
-    }
-
-    // 2. title
+    // 4-2. title
     if (this.options.title.show) {
       this.createTitle();
     }
 
-    // 3. legend
-    this.createLegend();
-    this.legend.init();
+    // 4-3. legend
+    // this.createLegend();
+    // this.legend.init();
 
-    // 4. tooltip
+    // 4-4. tooltip
     // this.createTooltip();
     // this.tooltip.init();
 
-    // calculate Chart Size
+    // step5. Calculate Size.
     this.chartRect = this.getChartRect();
 
+    this.xMinMax = this.store.getXMinMax();
+    this.yMinMax = this.store.getYMinMax();
+
+    // step6. Add EventListener
     this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
     this.overlayCanvas.onmouseout = this.mouseOutEvent.bind(this);
     window.addEventListener('resize', this.resize.bind(this));
@@ -136,16 +146,15 @@ class BaseChart {
 
   createDataStore() {
     if (this.options.stack) {
-      this.dataStore = new StackDataStore({
+      this.store = new StackDataStore({
         chartData: this.data,
         chartOptions: this.options,
         seriesList: this.seriesList,
       });
     } else {
-      this.dataStore = new DataStore({
+      this.store = new DataStore({
         chartData: this.data,
         chartOptions: this.options,
-        seriesList: this.seriesList,
       });
     }
   }
@@ -176,21 +185,18 @@ class BaseChart {
 
     const defaultXAxis = {
       position: 'bottom',
-      type: 'linear',
-      show: true,
-      color: '#eeeeee',
       min: null,
       max: null,
-      minIndex: null,
-      maxIndex: null,
       autoScaleRatio: null,
       showGrid: false,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
+      labelIndicatorColor: '#e7e9ed',
       gridLineWidth: 1,
       ticks: null,
       tickFormat: null,
       tickSize: null,
+      range: null,
       labelHeight: 20,
       labelStyle: {
         fontSize: 12,
@@ -201,21 +207,18 @@ class BaseChart {
 
     const defaultYAxis = {
       position: 'left',
-      type: 'linear',
-      show: true,
-      color: '#eeeeee',
-      min: 0,
+      min: null,
       max: null,
-      minIndex: null,
-      maxIndex: null,
-      autoScaleRatio: 0.1,
+      autoScaleRatio: null,
       showGrid: true,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
+      labelIndicatorColor: '#e7e9ed',
       gridLineWidth: 1,
       ticks: null,
       tickFormat: null,
       tickSize: null,
+      range: null,
       labelWidth: null,
       labelStyle: {
         fontSize: 12,
@@ -224,7 +227,7 @@ class BaseChart {
       },
     };
 
-    if (paramXAxes && paramXAxes.length) {
+    if (paramXAxes) {
       for (let ix = 0, ixLen = paramXAxes.length; ix < ixLen; ix++) {
         paramXAxes[ix] = _.merge({}, defaultXAxis, paramXAxes[ix]);
       }
@@ -232,7 +235,7 @@ class BaseChart {
       this.options.xAxes = [defaultXAxis];
     }
 
-    if (paramYAxes && paramYAxes.length) {
+    if (paramYAxes) {
       for (let ix = 0, ixLen = paramYAxes.length; ix < ixLen; ix++) {
         paramYAxes[ix] = _.merge({}, defaultYAxis, paramYAxes[ix]);
       }
@@ -272,7 +275,7 @@ class BaseChart {
     const chartWidth = width - (padding.left + padding.right);
     const chartHeight = height - (padding.top + padding.bottom);
 
-    const x1 = 0;
+    const x1 = padding.left;
     const x2 = Math.max(width - padding.right, x1 + 1);
     const y1 = padding.top;
     const y2 = Math.max(height - padding.bottom, y1 + 1);
@@ -320,28 +323,28 @@ class BaseChart {
 
   setLabelOffset() {
     let labelText;
-    let convLabel;
     let labelSize;
 
     const labelBuffer = 24;
     const xAxes = this.options.xAxes;
     const yAxes = this.options.yAxes;
 
+    const ctx = this.bufferCtx;
+    const xMinMax = this.xMinMax;
+    const yMinMax = this.yMinMax;
+
     // 축의 Label 길이 중 가장 큰 value를 기준으로 label offset을 계산.
     // label offset의 buffer size 20px
     for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
-      this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
-      labelText = this.dataStore.getLabelTextMaxInfo(ix).yText || '';
-      convLabel = this.constructor.suffixFormatter(+labelText);
-      labelSize = Math.ceil(this.bufferCtx.measureText(`${convLabel}`).width) || 0;
+      ctx.font = Util.getLabelStyle(yAxes[ix]);
 
       if (yAxes[ix].labelType === 'time') {
-        labelSize = moment(labelText);
-
-        if (yAxes[ix].tickFormat) {
-          labelSize = labelSize.format(yAxes[ix].tickFormat);
-        }
+        labelText = `${moment(yMinMax.max).format(yAxes[ix].tickFormat)}`;
+      } else {
+        labelText = `${yMinMax.max}`;
       }
+
+      labelSize = Math.ceil(this.bufferCtx.measureText(labelText).width) || 0;
 
       if (yAxes[ix].position === 'left') {
         if (labelSize > this.labelOffset.left) {
@@ -355,16 +358,16 @@ class BaseChart {
     }
 
     for (let ix = 0, ixLen = xAxes.length; ix < ixLen; ix++) {
-      this.bufferCtx.font = Util.getLabelStyle(xAxes[ix]);
-      labelText = this.dataStore.getLabelTextMaxInfo(ix).xText || '';
+      ctx.font = Util.getLabelStyle(xAxes[ix]);
+
       if (xAxes[ix].labelType === 'time') {
-        labelText = moment(labelText);
-        if (xAxes[ix].tickFormat) {
-          labelText = labelText.format(xAxes[ix].tickFormat);
-        }
+        labelText = `${moment(xMinMax.max).format(xAxes[ix].tickFormat)}`;
+      } else {
+        labelText = `${xMinMax.max}`;
       }
 
-      labelSize = Math.ceil(this.bufferCtx.measureText(`${labelText}`).width) || 0;
+      labelSize = Math.ceil(this.bufferCtx.measureText(labelText).width) || 0;
+
       if (Math.round(labelSize / 2) > this.labelOffset.right) {
         this.labelOffset.right = Math.round(labelSize / 2) + labelBuffer;
       }
@@ -389,7 +392,9 @@ class BaseChart {
   createTitle() {
     const titleObj = this.options.title;
     this.titleDOM = document.createElement('div');
-    this.titleDOM.style.font = titleObj.style;
+    this.titleDOM.style.fontSize = titleObj.style.fontSize;
+    this.titleDOM.style.color = titleObj.style.color;
+    this.titleDOM.style.fontFamily = titleObj.style.fontFamily;
     this.titleDOM.textContent = titleObj.text;
 
     if (titleObj.show) {
@@ -442,19 +447,15 @@ class BaseChart {
         case 'fix':
           xAxisObj = new AxisFixedScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
         case 'step':
           xAxisObj = new AxisStepsScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
@@ -468,13 +469,10 @@ class BaseChart {
         default:
           xAxisObj = new AxisAutoScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
       }
@@ -513,13 +511,11 @@ class BaseChart {
         default:
           yAxisObj = new AxisAutoScale({
             type: 'y',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
             axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
       }
@@ -528,11 +524,11 @@ class BaseChart {
     }
 
     for (let ix = 0, ixLen = this.xAxes.length; ix < ixLen; ix++) {
-      this.xAxes[ix].createAxis();
+      this.xAxes[ix].createAxis(this.xMinMax[ix]);
     }
 
     for (let ix = 0, ixLen = this.yAxes.length; ix < ixLen; ix++) {
-      this.yAxes[ix].createAxis();
+      this.yAxes[ix].createAxis(this.yMinMax[ix]);
     }
   }
 
@@ -546,7 +542,7 @@ class BaseChart {
     }
 
     if (this.options.xAxes[xAxisIndex].labelType === 'time') {
-      convertValue = +moment(value)._d;
+      convertValue = +moment(value);
     } else {
       convertValue = value;
     }
@@ -556,7 +552,7 @@ class BaseChart {
     }
 
     const scalingFactor = this.drawingXArea() / (maxValue - minValue);
-    return Math.floor((this.chartRect.x1 + this.labelOffset.left) +
+    return Math.round((this.chartRect.x1 + this.labelOffset.left) +
       (scalingFactor * (convertValue - (minValue || 0))));
   }
 
@@ -571,7 +567,7 @@ class BaseChart {
     }
 
     if (this.options.yAxes[yAxisIndex].labelType === 'time') {
-      convertValue = +moment(value)._d;
+      convertValue = +moment(value);
     } else {
       convertValue = value;
     }

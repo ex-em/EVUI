@@ -48,7 +48,9 @@
         </li>
       </ul>
     </nav>
-    <router-view/>
+    <div class="contents">
+      <router-view/>
+    </div>
   </div>
 </template>
 <script>
@@ -56,12 +58,15 @@
     name: 'App',
   };
 </script>
-
+<style>
+  html, body { width: 100%; height: 100%; }
+</style>
 <style scoped>
-  nav { margin-bottom: 40px; }
+  nav { height: 40px; }
   ul { display: flex; flex-wrap: wrap; }
   li { display: inline-block; }
   li + li { border-left: solid 1px #bbb; padding-left: 10px; margin-left: 10px; }
-  .container{ padding: 10px 40px 0; }
+  .container{ padding: 10px 40px 0; width: 100%; height: 100%;}
+  .contents { width: 100%; height: calc(100% - 40px); }
   .v-link-active { color: #bbb; }
 </style>

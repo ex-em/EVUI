@@ -24,7 +24,7 @@ class AxisAutoScale extends Axis {
         if (numberOfSteps % 1 !== 0) {
           this.skipFitting = true;
         }
-      } else if (this.integersOnly && rangeMagnitude >= 0) {
+      } else if (rangeMagnitude >= 0) {
         if ((stepValue / 2) % 1 === 0) {
           stepValue /= 2;
           numberOfSteps = Math.round(graphRange / stepValue);

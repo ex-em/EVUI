@@ -43,7 +43,6 @@
       this.wrapperSize = {
         width: this.getChartSize(Util.quantity(this.options.width)),
         height: this.getChartSize(Util.quantity(this.options.height)),
-        display: 'inline-block',
       };
     },
     mounted() {

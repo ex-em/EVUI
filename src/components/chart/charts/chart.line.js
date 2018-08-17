@@ -5,7 +5,7 @@ export default class LineChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
 
-    this.seriesList = this.dataStore.getSeriesList();
+    this.seriesList = this.store.getSeriesList();
   }
 
   drawChart() {
@@ -13,32 +13,36 @@ export default class LineChart extends BaseChart {
     this.createAxis();
     this.createLine();
 
-    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    // this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   createLine() {
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        this.drawSeries(ix);
+    const graphData = this.store.getGraphData();
+    const keys = Object.keys(graphData);
+    let series;
+
+    for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
+      series = this.seriesList[keys[ix]];
+
+      if (series.show) {
+        this.drawSeries(keys[ix], graphData[keys[ix]]);
       }
     }
 
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].highlight.show) {
-        this.seriesHighlight(ix);
-        break;
-      }
-    }
+    // for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
+    //   if (this.seriesList[ix].highlight.show) {
+    //     this.seriesHighlight(ix);
+    //     break;
+    //   }
+    // }
   }
 
-  drawSeries(seriesIndex) {
-    // 해당 series 정보 및 ctx 등 확인
-    const series = this.seriesList[seriesIndex];
+  drawSeries(seriesId, cData) {
+    const series = this.seriesList[seriesId];
     const ctx = this.bufferCtx;
-    // series에 특정한 color 값이 없다면, options의 colors 참조
     const color = series.color;
 
-    const isFill = this.options.fill;
+    const isFill = series.fill;
     const isStack = this.options.stack;
 
     ctx.beginPath();
@@ -68,11 +72,11 @@ export default class LineChart extends BaseChart {
     let convX;
     let convY;
 
-    for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-      data = series.cData[ix];
+    for (let ix = 0, ixLen = cData.length; ix < ixLen; ix++) {
+      data = cData[ix];
 
-      x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y, false);
+      x = this.calculateX(data.x, series.xAxisIndex);
+      y = this.calculateY(data.y, series.yAxisIndex, false);
 
       if (y === null) {
         if (ix - 1 >= 0) {
@@ -82,9 +86,9 @@ export default class LineChart extends BaseChart {
 
             if (isStack && series.hasAccumulate) {
               for (let jx = ix; jx >= startFillIndex; jx--) {
-                for (let kx = series.cData[jx].b.length - 1; kx >= 0; kx--) {
-                  convX = this.calculateX(series.cData[jx].b[kx].x, series.axisIndex.x);
-                  convY = this.calculateY(series.cData[jx].b[kx].y, series.axisIndex.y);
+                for (let kx = cData[jx].b.length - 1; kx >= 0; kx--) {
+                  convX = this.calculateX(cData[jx].b[kx].x, series.axisIndex.x);
+                  convY = this.calculateY(cData[jx].b[kx].y, series.axisIndex.y);
                   ctx.lineTo(convX, convY);
                 }
               }
@@ -101,10 +105,10 @@ export default class LineChart extends BaseChart {
         }
 
         startFillIndex = ix + 1;
-      } else if (ix === 0 || series.cData[ix - 1].y === null || series.cData[ix].y === null ||
+      } else if (ix === 0 || cData[ix - 1].y === null || cData[ix].y === null ||
         // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
         // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-        series.cData[ix - 1].x === null || series.cData[ix].x === null) {
+        cData[ix - 1].x === null || cData[ix].x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);

@@ -19,21 +19,37 @@ class Axis {
     this.units = AXIS_UNITS[this.type];
     this.startFromZero = false;
     this.skipFitting = false;
-    this.integersOnly = true;
   }
 
-  createAxis() {
-    this.calculateRange();
+  createAxis(axisMinMax) {
+    this.calculateRange(axisMinMax);
     this.drawAxis();
   }
 
-  calculateRange() {
+  calculateRange(axisMinMax) {
     // init variable
     const options = this.options;
     const chartRect = this.chartRect;
-    const dataStore = this.dataStore;
 
-    const maxLabelInfo = dataStore.getLabelTextMaxInfo();
+    let maxValue;
+    let minValue;
+
+    if (options.range && options.range.length === 2) {
+      if (options.labelType === 'time') {
+        maxValue = +moment(options.range[1]);
+        minValue = +moment(options.range[0]);
+      } else {
+        maxValue = options.labelType === 'time' ? +moment(options.range[1]) : options.range[1];
+        minValue = options.labelType === 'time' ? +moment(options.range[0]) : options.range[0];
+      }
+    } else {
+      maxValue = axisMinMax ? (axisMinMax.max || 1) : 1;
+      minValue = axisMinMax ? (axisMinMax.min || 0) : 0;
+    }
+
+    let currentLabelOffset;
+    let tickSize;
+
     // 실제 Axis가 그려질 영역
     const chartSize = this.units.pos === 'x' ? chartRect.chartWidth : chartRect.chartHeight;
     this.axisPosInfo = {
@@ -43,7 +59,6 @@ class Axis {
       y2: chartRect.y2 - this.labelOffset.bottom,
     };
 
-    let currentLabelOffset;
     if (this.units.pos === 'x') {
       currentLabelOffset = [this.labelOffset.left, this.labelOffset.right];
     } else {
@@ -51,10 +66,9 @@ class Axis {
     }
     const drawRange = chartSize - (currentLabelOffset[0] + currentLabelOffset[1]);
 
-    let tickSize;
     if (this.units.pos === 'x') {
       // tickSize는 실제 step을 구하기 위해 각 축의 Label중 가장 큰 값을 기준으로 Size를 구한다.
-      tickSize = this.ctx.measureText(this.labelFormat(maxLabelInfo.xText)).width + 20;
+      tickSize = this.ctx.measureText(this.labelFormat(maxValue)).width + 20;
     } else {
      // Y축의 경우 글자의 높이로 전체 영역을 나누기 위함.
       tickSize = options.labelStyle.fontSize * 2;
@@ -64,25 +78,6 @@ class Axis {
     const maxSteps = Math.floor(drawRange / tickSize);
 
     this.skipFitting = minSteps >= maxSteps;
-
-    let maxValue;
-    let minValue;
-    let minMaxValue;
-
-    if (this.units.pos === 'x') {
-      minMaxValue = this.dataStore.getXValueAxisPerSeries(this.axisIndex);
-    } else {
-      minMaxValue = this.dataStore.getYValueAxisPerSeries(this.axisIndex);
-    }
-
-    if (options.labelType === 'time') {
-      // axis option의 label type이 time일 경우 moment로 date객체 생성 후 long type으로 변환
-      maxValue = +moment(options.max || minMaxValue.max)._d;
-      minValue = +moment(options.min || minMaxValue.min)._d;
-    } else {
-      maxValue = options.max || minMaxValue.max;
-      minValue = options.min || minMaxValue.min;
-    }
 
     if (options.autoScaleRatio !== null) {
       maxValue *= (options.autoScaleRatio + 1);
@@ -136,8 +131,6 @@ class Axis {
 
     let labelCenter = null;
     let linePosition = null;
-
-    this.ticks = [];
 
     if (options.ticks === null) {
       options.ticks = [];
@@ -196,9 +189,11 @@ class Axis {
           this.ctx.lineTo(offsetCounterPoint, linePosition);
         }
       }
+
+      this.ctx.stroke();
     }
 
-    this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   labelFormat(value) {
