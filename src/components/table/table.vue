@@ -61,9 +61,20 @@
                           :style="{ textAlign: col.recordsAlign }"
                           class="evui-table-data"
                         >
-                          <div style="max-height: 24px;">
+                          <div
+                            v-if="col.type === 'string' && col.cellRender === null"
+                            class="evui-table-records-col"
+                            style="max-height: 24px;"
+                          >
                             {{ row[col.field] }}
                           </div>
+                          <div
+                            v-else
+                            :class="col.type === 'number' ? 'evui-col-number' : ''"
+                            class="evui-table-records-col"
+                            style="max-height: 24px;"
+                            v-html="cellRender(row[col.field], col.type, col.cellRender)"
+                          />
                         </td>
                       </template>
 
@@ -300,6 +311,8 @@
           width: 0,
           sortable: false,
           recordsAlign: 'left',
+          type: 'string',
+          cellRender: null,
         },
         rowHeight: 24,
 
@@ -1200,7 +1213,27 @@
           this.sortedData = data.slice();
         }
       },
+      cellRender(value, type, cellRender) {
+        if (cellRender) {
+          return cellRender(value);
+        } else if (type === 'number') {
+          return value ? Number(value).toLocaleString() : value;
+        }
+        return value;
+      },
+      clearData() {
+        this.originData = [];
+        this.sortedData = [];
+        this.filteredData = [];
+        this.originFilterdData = [];
+        this.virtualRowCount = 0;
+        this.virtualTop = 0;
+        this.virtualBottom = 0;
+        this.prevScrollTop = 0;
+        this.currentPage = 0;
+        this.lastPage = 0;
+      },
     },
   };
 </script>
-<style scoped src="@/components/table/table.navy.css"/>
+<style scoped src="@/components/table/table.black.css"/>
