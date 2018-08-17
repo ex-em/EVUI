@@ -36,7 +36,7 @@
         let boxInfo = {};
         const itemList = [];
 
-        for (let ix = 0, ixLen = 100; ix < ixLen; ix++) {
+        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
           itemList.push({
             name: `item${ix}`,
             value: ix,
@@ -57,7 +57,7 @@
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-default{
     display: inline-block;
     margin-left: 5px;

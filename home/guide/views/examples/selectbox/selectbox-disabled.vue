@@ -50,7 +50,7 @@
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-disabled{
     display: inline-block;
     margin-left: 5px;
