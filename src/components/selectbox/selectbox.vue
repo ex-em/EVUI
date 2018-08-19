@@ -17,21 +17,23 @@
           :key="item.name"
           :class="`${prefixCls}-select-tag checked`"
         >
-          <span class="text">
-            {{ item.name }}
-          </span>
-          <i
-            class="close"
-            @click="removeTag(item, $event)"
-          />
+          <div :class="`${prefixCls}-text-bg-area`">
+            <span :class="`${prefixCls}-text`">
+              {{ item.name }}
+            </span>
+            <i
+              :class="`${prefixCls}-tag-close`"
+              @click="removeTag(item, $event)"
+            />
+          </div>
         </div>
       </div>
       <input
         v-else
         :disabled="disabled"
         :value="inputText"
+        :class="`${prefixCls}-input-text`"
         type="text"
-        class="input-text"
         @keyup="onKeyUpInputTxt"
       >
       <i :class="selectBoxIconCls"/>
@@ -167,7 +169,7 @@
       selectBoxIconCls() {
         const classList = [];
 
-        classList.push('arrow-icon');
+        classList.push('evui-selectbox-arrow-icon');
 
         if (this.dropDownState) {
           classList.push('rotate-180');
@@ -195,6 +197,12 @@
           return;
         }
 
+        if (this.multiple) {
+          this.inputText = '';
+        }
+
+        this.listboxItems = this.items.slice();
+
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
@@ -213,7 +221,6 @@
           this.inputText = itemName;
           this.selectedItems.length = 0;
           this.selectedItems.push(item);
-          this.filterItems(itemName);
         }
 
         if (!this.multiple) {
@@ -354,12 +361,12 @@
   };
 </script>
 
-<style scoped>
+<style>
 /************************************************************************************
  Selectbox
 ************************************************************************************/
 
-  /** evui-selectbox **/
+/** evui-selectbox **/
 
   .evui-selectbox {
     display: inline-block;
@@ -375,12 +382,6 @@
     border-color: #bbb;
     cursor: pointer;
   }
-
-  /**  evui-selectbox > evui-selectbox-select-field  **/
-  /**  evui-selectbox > evui-selectbox-select-field > evui-selectbox-multiple-tag-view  **/
-  /**  evui-selectbox > evui-selectbox-select-field > input-text  **/
-  /**  evui-selectbox > evui-selectbox-select-field > arrow-icon  **/
-
   .evui-selectbox-select-field {
     display: inline-block;
     width: 100%;
@@ -389,11 +390,12 @@
   .evui-selectbox-multiple-tag-view{
     width: calc(100% - 25px);
     height: 100%;
-    padding: 0 4px;
+    padding-right: 2px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
-  .evui-selectbox-select-field .input-text{
+  .evui-selectbox-input-text{
     width: 100%;
     height: 100%;
     padding: 6px 10px;
@@ -401,12 +403,12 @@
     border-radius: 3px;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
   }
-  .evui-selectbox-select-field .input-text:focus{
+  .evui-selectbox-input-text:focus{
     border-color: #66afe8;
     outline: 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
   }
-  .evui-selectbox-select-field .arrow-icon{
+  .evui-selectbox-arrow-icon{
     position: absolute;
     top: 50%;
     right: 8px;
@@ -422,82 +424,61 @@
     color: #888888;
     transition: all .2s ease-in-out;
   }
-  .evui-selectbox-select-field .arrow-icon:before {
+  .evui-selectbox-arrow-icon:before {
     content: "\F0DD"
   }
-  .evui-selectbox-select-field .arrow-icon.rotate-180{
+  .evui-selectbox-arrow-icon.rotate-180{
     transform: rotate(180deg);
   }
-
-  /**  evui-selectbox > evui-selectbox-select-tag **/
-
-  .evui-selectbox-select-tag{
-    display: inline-block;
-    margin: 5px 4px 0 0;
-    padding: 1px 10px;
-    border: 1px solid #e9eaec;
-    border-radius: 3px;
-    background: #f7f7f7;
-    font-size: 12px;
-    cursor: pointer
+  .evui-selectbox-select-tag {
+    display: block;
+    margin: 2px 2px 0 0;
+    padding: 1px 10px 1px 5px;
+    cursor: pointer;
   }
   .evui-selectbox-select-tag:hover{
     opacity:.85;
   }
-  .evui-selectbox-select-tag .text{
+  .evui-selectbox-text-bg-area {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #f7f7f7;
+    border: 1px solid #e9eaec;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .evui-selectbox-text {
     position: relative;
     top: -1px;
     color:#495060;
   }
-  .evui-selectbox-select-tag .close{
+  .evui-selectbox-tag-close {
     display: inline-block;
     margin-left: 3px;
     color: #666;
     opacity: .66;
     cursor: pointer;
-    -webkit-transform: scale(1.42857143) rotate(0);
-    -ms-transform: scale(1.42857143) rotate(0);
     transform: scale(1.42857143) rotate(0);
   }
-  .evui-selectbox-select-tag .close:before{
+  .evui-selectbox-tag-close:before{
     position: relative;
-    top: -2px;
+    top: -1px;
     font-style: normal;
     font-size: 10px;
     font-family: Arial, sans-serif;
     content: 'x';
   }
-  .evui-selectbox-select-tag .close:hover{
+  .evui-selectbox-tag-close:hover{
     opacity: 1
   }
   .evui-selectbox-select-tag:not(.evui-selectbox-select-tag.checked) {
     background:0 0;
     border:0;
-    color:#495060
+    color:#495060 !important;
   }
-  .evui-selectbox-select-tag:not(.evui-selectbox-select-tag.checked) .close{
-    color:#495060!important
+  .evui-selectbox-select-tag:not(.evui-selectbox-select-tag.checked) .evui-selectbox-tag-close{
+    color:#495060 !important;
   }
-  .evui-selectbox-select-tag.color-red{
-    color:#ed3f14!important;
-    border-color:#ed3f14
-  }
-  .evui-selectbox-select-tag.color-green{
-    color:#19be6b!important;
-    border-color:#19be6b
-  }
-  .evui-selectbox-select-tag.color-blue{
-    color:#2d8cf0!important;
-    border-color:#2d8cf0
-  }
-  .evui-selectbox-select-tag.color-yellow{
-    color:#f90!important;
-    border-color:#f90
-  }
-  .evui-selectbox-select-tag.color-white{
-    color:#fff!important
-  }
-
   .evui-select-search:focus{
     border-color: #66afe8;
     outline: 0;

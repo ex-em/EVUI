@@ -1,25 +1,24 @@
 <template>
   <div
-    :style="`width: ${getWidth}px; height: ${getHeight}px;`"
     class="dock-container"
   >
     <dock-frame
       v-for="node in nodes"
       :key="node.id"
       :options="node"
-      :padding="getPadding"
+      :padding="padding"
     />
     <splitter
       v-for="split in splitters"
       :key="split.id"
       :options="split"
-      :padding="getPadding"
+      :padding="padding"
     />
     <dock-window
       v-for="window in windows"
       :key="window.id"
       :options="window"
-      :padding="getPadding"
+      :padding="padding"
       @drag="onDrag"
       @drop="onDrop"
     />
@@ -99,6 +98,7 @@
     },
     data() {
       return {
+        padding: {},
         showDockIcon: false,
         showPreview: false,
         previewDirection: '',
@@ -123,10 +123,7 @@
         return this.bounds.height;
       },
       getPadding() {
-        return {
-          top: this.bounds.top,
-          left: this.bounds.left,
-        };
+        return this.padding;
       },
     },
     beforeCreate() {
@@ -156,6 +153,12 @@
       }
     },
     mounted() {
+      const bounds = this.$el.getBoundingClientRect();
+
+      this.width = bounds.width;
+      this.height = bounds.height;
+      this.padding.top = bounds.top;
+      this.padding.left = bounds.left;
     },
     methods: {
       ...Vuex.mapActions({
@@ -237,8 +240,8 @@
             id: `node-${this.getMaxIdSeqForNode() + 1}`,
             top: 0,
             left: 0,
-            width: this.getWidth,
-            height: this.getHeight,
+            width: this.width,
+            height: this.height,
             level: 0,
             contents: window.contents,
           };

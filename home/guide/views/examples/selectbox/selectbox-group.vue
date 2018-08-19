@@ -1,33 +1,34 @@
 <template>
   <div class="selectbox-group">
-    <selectbox
-      :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
-      :is-group="boxInfo.isGroup"
-      :multiple="boxInfo.multiple"
+    <Selectbox
+      :name="'groupCbBox'"
+      :selectbox-style="{ width: '180px',height: '30px' }"
+      :is-group="true"
       :init-select-idx="3"
-      :items="boxInfo.items"
+      :items="getGroupItemList()"
+    />
+    <Selectbox
+      :name="'groupMultipleCbBox'"
+      :selectbox-style="{ width: '180px',height: '30px' }"
+      :is-group="true"
+      :multiple="true"
+      :init-select-idx="3"
+      :items="getGroupItemList()"
     />
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 <script>
   import '@/styles/evui.css';
-  import selectbox from '@/components/selectbox/selectbox';
+  import Selectbox from '@/components/selectbox/selectbox';
 
   export default {
     components: {
-      selectbox,
-    },
-    data() {
-      return {
-        boxInfo: this._getBoxInfo(),
-      };
+      Selectbox,
     },
     methods: {
-      _getBoxInfo() {
+      getGroupItemList() {
         let groupObj;
-        let boxInfo = {};
         const itemList = [];
 
         for (let ix = 0, ixLen = 20; ix < ixLen; ix++) {
@@ -46,23 +47,12 @@
           itemList.push(groupObj);
         }
 
-        boxInfo = {
-          name: 'groupCbBox',
-          selectboxStyle: {
-            width: '180px',
-            height: '30px',
-          },
-          isGroup: true,
-          multiple: true,
-          items: itemList,
-        };
-
-        return boxInfo;
+        return itemList;
       },
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-group{
     display: inline-block;
     margin-left: 5px;

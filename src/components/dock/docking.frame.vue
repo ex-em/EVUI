@@ -1,15 +1,19 @@
 <template>
   <!-- eslint-disable max-len -->
   <div
-    :style="`left: ${getLeft + getLeftPadding}px; top: ${getTop + getTopPadding}px; width: ${getWidth}px; height: ${getHeight}px;`"
+    :style="`left: ${getLeft}px; top: ${getTop}px; width: ${getWidth}px; height: ${getHeight}px;`"
     class="dock-frame"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
     <!-- eslint-enable -->
-    <component
-      :is="getContents"
-    />
+    <div
+      style="overflow: auto; position: absolute; width: 100%; height: 100%;"
+    >
+      <component
+        :is="getContents"
+      />
+    </div>
     <div
       v-show="showDockIcon"
       class="docking-icon-wrap"
@@ -62,6 +66,7 @@
     />
     <div
       v-show="showOptionIcon"
+      class="option-icon-wrap"
     >
       <div
         ref="detachIcon"
@@ -381,14 +386,6 @@
         this.showPreview = false;
       },
       onMouseEnter() {
-        const top = (this.getTop + this.getTopPadding) - 25;
-        const left = (this.getLeft + this.getLeftPadding + this.getWidth) - 58;
-        const closeIconEl = this.$refs.closeIcon;
-        const detachIconiconEl = this.$refs.detachIcon;
-
-        closeIconEl.style.cssText = `top: ${top}px; left: ${left}px;`;
-        detachIconiconEl.style.cssText = `top: ${top}px; left: ${left - 60}px;`;
-
         this.showOptionIcon = true;
       },
       onMouseLeave() {
