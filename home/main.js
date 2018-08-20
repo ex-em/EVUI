@@ -92,6 +92,10 @@ const router = new VueRouter({
       path: '/textfield',
       component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
     },
+    {
+      path: '/tab',
+      component: resolve => require(['./guide/views/examples/tab/tab-view'], resolve),
+    },
   ],
 });
 
