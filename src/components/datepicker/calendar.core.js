@@ -1,5 +1,10 @@
-/*eslint-disable*/
-// import moment from 'moment';
+/*
+  eslint
+  class-methods-use-this:
+    ["error", { "exceptMethods": ["pointInPolygon", "toRadians", "getLastDayOfMonth"] }]
+  consistent-return:
+    ["error", { "treatUndefinedAsUnspecified": true }]
+*/
 import _ from 'lodash';
 
 class Calendar {
@@ -278,9 +283,10 @@ class Calendar {
           startX: (this.baseCanvas.width / 2) + this.options.timeArea.titleWidth + 1,
           width: this.options.width - padding.right - this.options.timeArea.titleWidth
           - this.options.timeArea.pageWidth - 2.5,
-          startY: padding.top + (((this.coordinate.timeArea.total.height - 2) / 3) * idx) + idx + (idx > 0 ? 0.5 : 0),
+          startY: padding.top + ((((this.coordinate.timeArea.total.height - 2) / 3) * idx)
+            + (idx + (idx > 0 ? 0.5 : 0))),
           height: ((this.coordinate.timeArea.total.height - 2) / 3) - 0.5,
-        }
+        };
       });
     }
   }
@@ -300,59 +306,74 @@ class Calendar {
   }
 
   initMouseover() {
-    this.overCanvas.addEventListener('mousemove', function(e) {
+    this.overCanvas.addEventListener('mousemove', (e) => {
       e.preventDefault();
       // init value
       const overCtx = this.overCtx;
       let mouseoverFlag = false;
       // init clear all canvas
-      this.clearCanvas(
-        overCtx, 0, 0,
-        this.overCanvas.width, this.overCanvas.height
-      );
+      // this.clearCanvas(
+      //   overCtx, 0, 0,
+      //   this.overCanvas.width, this.overCanvas.height
+      // );
+
       // mousemove on day box in calendar area
-      const allDay = this.coordinate.calendarArea.allDay;
-      const selectDayArr = this.coordinate.calendarArea.selectDayArr;
-      allDay.forEach((v) => {
-        if (e.offsetX > v.startX && e.offsetX < v.startX + v.width
-          && e.offsetY > v.startY && e.offsetY < v.startY + v.height
-        ) {
-          if (this.options.limitToday) {
-            const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
-            const initLimitDay = this.options.initLimitDay;
-            if (initLimitDay < mouseoverDay) {
-              return false;
-            }
-          }
-          mouseoverFlag = true;
-          this.dynamicDraw(
-            overCtx, v.startX, v.startY,
-            v.width, v.height,
-            {
-              fill: {
-                show: true,
-                color: this.options.colors.mousemoveDayFill,
+      // e.offsetX의 너비에 + this.options.timeArea.titleWidth를 하는 이유는 calendarArea에서 마우스가
+      // 우측 title범위로 벗어나는 경우에 clear해주기 위함
+      const calendarAreaTotal = this.coordinate.calendarArea.total;
+      if (e.offsetX > calendarAreaTotal.startX
+        && e.offsetX < calendarAreaTotal.startX + calendarAreaTotal.width
+          + this.options.timeArea.titleWidth
+        && e.offsetY > calendarAreaTotal.startY
+        && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
+        this.clearCanvas(overCtx,
+          calendarAreaTotal.startX, calendarAreaTotal.startY,
+          calendarAreaTotal.width, calendarAreaTotal.height,
+        );
+        const allDay = this.coordinate.calendarArea.allDay;
+        const selectDayArr = this.coordinate.calendarArea.selectDayArr;
+        allDay.forEach((v) => {
+          if (e.offsetX > v.startX && e.offsetX < v.startX + v.width
+            && e.offsetY > v.startY && e.offsetY < v.startY + v.height
+          ) {
+            if (this.options.limitToday) {
+              const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
+              const initLimitDay = this.options.initLimitDay;
+              if (initLimitDay < mouseoverDay) {
+                return undefined;
               }
             }
-          );
-        }
-        selectDayArr.forEach((s) => {
-          if (v.date.year === s.year
-            && v.date.month === s.month
-            && v.date.day === s.day) {
+            mouseoverFlag = true;
             this.dynamicDraw(
               overCtx, v.startX, v.startY,
               v.width, v.height,
               {
                 fill: {
                   show: true,
-                  color: this.options.colors.selectDayFill,
-                }
-              }
+                  color: this.options.colors.mousemoveDayFill,
+                },
+              },
             );
           }
+          selectDayArr.forEach((s) => {
+            if (v.date.year === s.year
+              && v.date.month === s.month
+              && v.date.day === s.day) {
+              this.dynamicDraw(
+                overCtx, v.startX, v.startY,
+                v.width, v.height,
+                {
+                  fill: {
+                    show: true,
+                    color: this.options.colors.selectDayFill,
+                  },
+                },
+              );
+            }
+          });
         });
-      });
+      }
+
       // mousemove on triangle in picker area
       const pickerAreaArrow = this.coordinate.pickerArea.arrow;
       const pickerAreaOption = this.options.pickerArea;
@@ -360,7 +381,7 @@ class Calendar {
       pickerAreaArrow.forEach((v, idx) => {
         pickerAreaArrowOver = this.existTriangle(
           pickerAreaArrow[idx].centerX, pickerAreaArrow[idx].centerY,
-          v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY
+          v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY,
         );
         if (pickerAreaArrowOver) {
           mouseoverFlag = true;
@@ -369,11 +390,19 @@ class Calendar {
 
       // mousemove on hour, minute, second box
       const timeTypeName = this.options.timeTypeName;
-      const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
-      if (e.offsetX > timeAreaHourTotal.startX && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
+      const timeAreaTotal = this.coordinate.timeArea.total;
+      if (e.offsetX > timeAreaTotal.startX
+        && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
+        && e.offsetY > timeAreaTotal.startY
+        && e.offsetY < timeAreaTotal.startY + timeAreaTotal.height
+      ) {
+        this.clearCanvas(overCtx,
+          timeAreaTotal.startX, timeAreaTotal.startY,
+          timeAreaTotal.width, timeAreaTotal.height,
+        );
         timeTypeName.forEach((type) => {
-          const timeAreaTypeData = this.coordinate.timeArea[type].data;
-          timeAreaTypeData.forEach((v) => {
+          const timeAreaType = this.coordinate.timeArea[type];
+          timeAreaType.data.forEach((v, idx) => {
             if (this.coordinate.timeArea.hour.page === v.page) {
               if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
                 && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
@@ -384,95 +413,44 @@ class Calendar {
                     fill: {
                       show: true,
                       color: this.options.colors.mousemoveDayFill,
-                    }
-                  }
+                    },
+                  },
                 );
                 mouseoverFlag = true;
+              }
+              if (timeAreaType.select === idx) {
+                this.dynamicDraw(
+                  overCtx, v.startX, v.startY,
+                  v.width, v.height, {
+                    fill: {
+                      show: true,
+                      color: this.options.colors.selectDayFill,
+                    },
+                  },
+                );
               }
             }
           });
         });
-
       }
-
-      // // mousemove on hour box
-      // const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
-      // if (e.offsetX > timeAreaHourTotal.startX && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
-      //   const timeAreaHourData = this.coordinate.timeArea.hour.data;
-      //   timeAreaHourData.forEach((v) => {
-      //     if (this.coordinate.timeArea.hour.page === v.page) {
-      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
-      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
-      //         this.dynamicDraw(
-      //           overCtx, v.startX, v.startY,
-      //           v.width, v.height,
-      //           {
-      //             fill: {
-      //               show: true,
-      //               color: this.options.colors.mousemoveDayFill,
-      //             }
-      //           }
-      //         );
-      //         mouseoverFlag = true;
-      //       }
-      //     }
-      //   });
-      //   const timeAreaMinuteData = this.coordinate.timeArea.minute.data;
-      //   timeAreaMinuteData.forEach((v) => {
-      //     if (this.coordinate.timeArea.minute.page === v.page) {
-      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
-      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
-      //         this.dynamicDraw(
-      //           overCtx, v.startX, v.startY,
-      //           v.width, v.height,
-      //           {
-      //             fill: {
-      //               show: true,
-      //               color: this.options.colors.mousemoveDayFill,
-      //             }
-      //           }
-      //         );
-      //         mouseoverFlag = true;
-      //       }
-      //     }
-      //   });
-      //   const timeAreaSecondData = this.coordinate.timeArea.second.data;
-      //   timeAreaSecondData.forEach((v) => {
-      //     if (this.coordinate.timeArea.second.page === v.page) {
-      //       if (e.offsetY > v.startY && e.offsetY < +v.startY + +v.height
-      //         && e.offsetX > v.startX && e.offsetX < +v.startX + +v.width) {
-      //         this.dynamicDraw(
-      //           overCtx, v.startX, v.startY,
-      //           v.width, v.height,
-      //           {
-      //             fill: {
-      //               show: true,
-      //               color: this.options.colors.mousemoveDayFill,
-      //             }
-      //           }
-      //         );
-      //         mouseoverFlag = true;
-      //       }
-      //     }
-      //   });
-      // }
-
 
       if (mouseoverFlag) {
         this.overCanvas.style.cursor = 'pointer';
       } else {
         this.overCanvas.style.cursor = 'default';
       }
-    }.bind(this));
+    });
   }
 
   mouseclickDate(e) {
+    const calendarAreaTotal = this.coordinate.calendarArea.total;
     const allDay = this.coordinate.calendarArea.allDay;
     const selectDayArr = this.coordinate.calendarArea.selectDayArr;
     const overCtx = this.overCtx;
     this.clearCanvas(
-      overCtx, 0, 0,
-      this.options.width, this.overCanvas.height
+      overCtx,
+      calendarAreaTotal.startX, calendarAreaTotal.startY,
+      calendarAreaTotal.width, calendarAreaTotal.height,
     ); // calendar영역만 clear
     let mouseclickCondition = false;
     allDay.forEach((v, idx) => {
@@ -507,28 +485,17 @@ class Calendar {
           initSelectSunday.setHours(0, 0, 0, 0);
           // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
           if (initLimitDay < mouseoverDay) {
-            return false;
+            return undefined;
           } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
             if (this.options.selectDayType === 'weekday') {
               // 개발 필요
             }
           }
-          // if (this.options.selectDayType === 'weekday') {
-          //   // 1주 평일의 경우 선택된 날(default:오늘)이 금, 토요일인 경우는 허용
-          //   if (initSelectGetDay < 5 && initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
-          //     return false;
-          //   }
-          // } else if (this.options.selectDayType === 'week') {
-          //   // 1주의 경우 선택된 날(default:오늘)이 토요일인 경우는 허용
-          //   if (initSelectGetDay < 6 && initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
-          //     return false;
-          //   }
-          // }
         }
         // selectDayType에 따라 선택
         if (this.options.selectDayType === 'weekday') {
           // 1주평일(5일)
-          let selectGetDay = idx % 7; // 요일
+          const selectGetDay = idx % 7; // 요일
           if (selectGetDay >= 1 && selectGetDay <= 5) {
             for (let ix = 1, ixLen = 6; ix < ixLen; ix++) {
               if (ix < selectGetDay) {
@@ -550,7 +517,7 @@ class Calendar {
           }
         } else if (this.options.selectDayType === 'week') {
           // 1주일(7일)
-          let selectGetDay = idx % 7; // 요일
+          const selectGetDay = idx % 7; // 요일
           for (let ix = 0, ixLen = 7; ix < ixLen; ix++) {
             selectDayArr.push(allDay[(idx + ix) - selectGetDay].date);
             if (selectDayArr.length > this.options.selectDayLimit * 7) {
@@ -572,8 +539,8 @@ class Calendar {
             fill: {
               show: true,
               color: this.options.colors.mousemoveDayFill,
-            }
-          }
+            },
+          },
         );
       }
     });
@@ -592,23 +559,82 @@ class Calendar {
               fill: {
                 show: true,
                 color: this.options.colors.selectDayFill,
-              }
-            }
+              },
+            },
           );
         }
       });
     });
   }
 
-  mouseclickHour(e) {
-    const timeAreaHour = this.coordinate.timeArea.hour.data;
-    const selectHour = this.coordinate.timeArea.hour.select;
+  mouseclickTime(e) {
     const overCtx = this.overCtx;
-
+    this.options.timeTypeName.forEach((type) => {
+      const timeAreaType = this.coordinate.timeArea[type];
+      timeAreaType.data.forEach((v, idx) => {
+        if (timeAreaType.page === v.page) {
+          if (e
+            && e.offsetY > v.startY && e.offsetY < v.startY + v.height
+            && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
+            timeAreaType.select = idx;
+            if (timeAreaType.page === v.page) {
+              this.clearCanvas(
+                overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+                timeAreaType.total.width, timeAreaType.total.height,
+              );
+              this.dynamicDraw(
+                overCtx, v.startX, v.startY,
+                v.width, v.height,
+                {
+                  fill: {
+                    show: true,
+                    color: this.options.colors.mousemoveDayFill,
+                  },
+                },
+              );
+            }
+          } else if (timeAreaType.page === v.page
+            && timeAreaType.select === idx) {
+            this.clearCanvas(
+              overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+              timeAreaType.total.width, timeAreaType.total.height,
+            );
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height,
+              {
+                fill: {
+                  show: true,
+                  color: this.options.colors.selectDayFill,
+                },
+              },
+            );
+          }
+        }
+      });
+    });
+    // this.options.timeTypeName.forEach((v) => {
+    //   const timeAreaType = this.coordinate.timeArea[v];
+    //   timeAreaType.data.forEach((v, idx) => {
+    //     if (timeAreaType.page === v.page
+    //       && timeAreaType.select === idx) {
+    //       this.dynamicDraw(
+    //         overCtx, v.startX, v.startY,
+    //         v.width, v.height,
+    //         {
+    //           fill: {
+    //             show: true,
+    //             color: this.options.colors.selectDayFill,
+    //           }
+    //         },
+    //       );
+    //     }
+    //   });
+    // });
   }
 
   initMouseclick() {
-    this.overCanvas.addEventListener('click', function(e) {
+    this.overCanvas.addEventListener('click', (e) => {
       e.preventDefault();
       const pickerAreaTotal = this.coordinate.pickerArea.total;
       const calendarAreaTotal = this.coordinate.calendarArea.total;
@@ -617,6 +643,7 @@ class Calendar {
         && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
         this.mouseclickDate(e);
       }
+
       // CLICK triangle in picker area
       if (e.offsetY > pickerAreaTotal.startY
         && e.offsetY < pickerAreaTotal.startY + pickerAreaTotal.height) {
@@ -627,7 +654,7 @@ class Calendar {
         pickerAreaArrow.forEach((v, idx) => {
           exist = this.existTriangle(
             pickerAreaArrow[idx].centerX, pickerAreaArrow[idx].centerY,
-            v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY
+            v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY,
           );
           if (exist) {
             if (v.direction === 'left') {
@@ -644,38 +671,20 @@ class Calendar {
       }
 
       // click on hour box
-      const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
-      const overCtx = this.overCtx;
+      const timeAreaTotal = this.coordinate.timeArea.total;
       // in Hour, Min, Sec Area (in X position)
-      if (e.offsetX > timeAreaHourTotal.startX
-        && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width) {
-        const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
-        const timeAreaHourData = this.coordinate.timeArea.hour.data;
-        timeAreaHourData.forEach((v) => {
-          if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
-            && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
-            this.clearCanvas(
-              overCtx, timeAreaHourTotal.startX, timeAreaHourTotal.startY,
-              timeAreaHourTotal.width, timeAreaHourTotal.height,
-            );
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                }
-              },
-            );
-          }
-        });
+      if (e.offsetX > timeAreaTotal.startX
+        && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
+        && e.offsetY > timeAreaTotal.startY
+        && e.offsetY < timeAreaTotal.startY + timeAreaTotal.height
+      ) {
+        this.mouseclickTime(e);
       }
-    }.bind(this));
+    });
   }
 
   initMouseleave() {
-    this.overCanvas.addEventListener('mouseleave', function(e) {
+    this.overCanvas.addEventListener('mouseleave', (e) => {
       e.preventDefault();
       const allDay = this.coordinate.calendarArea.allDay;
       const selectDayArr = this.coordinate.calendarArea.selectDayArr;
@@ -693,13 +702,31 @@ class Calendar {
                 fill: {
                   show: true,
                   color: this.options.colors.selectDayFill,
-                }
-              }
+                },
+              },
             );
           }
         });
       });
-    }.bind(this));
+      const timeTypeName = this.options.timeTypeName;
+      timeTypeName.forEach((type) => {
+        const timeAreaType = this.coordinate.timeArea[type];
+        timeAreaType.data.forEach((v, idx) => {
+          if (this.coordinate.timeArea.hour.page === v.page
+            && timeAreaType.select === idx) {
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height, {
+                fill: {
+                  show: true,
+                  color: this.options.colors.selectDayFill,
+                },
+              },
+            );
+          }
+        });
+      });
+    });
   }
 
 
@@ -712,6 +739,7 @@ class Calendar {
       this.drawTimeArea();
     }
     this.mouseclickDate();
+    this.mouseclickTime();
   }
 
   drawTotalArea() {
@@ -880,7 +908,7 @@ class Calendar {
     this.clearCanvas(
       ctx,
       calendarAreaTotal.startX, calendarAreaTotal.startY + this.options.dayOfTheWeekArr.height,
-      calendarAreaTotal.width, calendarAreaTotal.height - this.options.dayOfTheWeekArr.height
+      calendarAreaTotal.width, calendarAreaTotal.height - this.options.dayOfTheWeekArr.height,
     );
 
     // 현재 달력 연도
@@ -892,10 +920,10 @@ class Calendar {
     for (let ix = 0, ixLen = this.thisMonthWeekCnt; ix < ixLen; ix++) {
       for (let jx = 0; jx < 7; jx++) {
         let obj = {};
-        //// 첫번째 주
+        // 첫번째 주
         if (ix === 0) {
           // true : 첫 주에 이번달 시작, false : 첫 주는 모두 저번달
-          const thisMonthStartFlag = this.thisMonthFirstDay !== 0 ? true : false;
+          const thisMonthStartFlag = this.thisMonthFirstDay !== 0;
           const firstWeekDayCnt = thisMonthStartFlag ? this.thisMonthFirstDay : 7;
           if (jx < firstWeekDayCnt) {
             if (!thisMonthStartFlag && jx === 6) {
@@ -918,7 +946,7 @@ class Calendar {
                 },
                 align: 'center',
                 padding: {
-                  bottom: 8
+                  bottom: 8,
                 },
                 font: '10px Roboto Condensed',
               },
@@ -926,8 +954,8 @@ class Calendar {
               date: {
                 year: currentMonth !== 1 ? currentYear : currentYear - 1,
                 month: currentMonth !== 1 ? currentMonth - 1 : 12,
-                day: ((+this.prevMonthLastDate - +firstWeekDayCnt) + +jx) + +1
-              }
+                day: ((+this.prevMonthLastDate - +firstWeekDayCnt) + +jx) + +1,
+              },
             };
             this.coordinate.calendarArea.allDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -974,8 +1002,8 @@ class Calendar {
               date: {
                 year: currentYear,
                 month: currentMonth,
-                day: 1
-              }
+                day: 1,
+              },
             };
             this.coordinate.calendarArea.allDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -1022,14 +1050,14 @@ class Calendar {
               date: {
                 year: currentYear,
                 month: currentMonth,
-                day: this.monthDay
-              }
+                day: this.monthDay,
+              },
             };
             this.coordinate.calendarArea.allDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
           }
         } else if (this.thisMonthLastDate <= this.monthDay) {
-          //// 마지막 주의 다음달 날짜
+          // 마지막 주의 다음달 날짜
           this.monthDay++;
           obj = {
             startX: calendarAreaTotal.startX + ((calendarAreaTotal.width / 7) * jx),
@@ -1051,14 +1079,14 @@ class Calendar {
             date: {
               year: currentMonth !== 12 ? currentYear : currentYear + 1,
               month: currentMonth !== 12 ? currentMonth + 1 : 1,
-              day: this.monthDay - this.thisMonthLastDate
-            }
+              day: this.monthDay - this.thisMonthLastDate,
+            },
           };
           this.coordinate.calendarArea.allDay.push(obj);
           this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
         } else {
           // true : 첫 주에 이번달 시작, false : 첫 주는 모두 저번달(2주차 첫번째 무조건 일요일부터 시작)
-          const thisMonthStartFlag = this.thisMonthFirstDay !== 0 ? true : false;
+          const thisMonthStartFlag = this.thisMonthFirstDay !== 0;
           if (!thisMonthStartFlag && ix === 1 && jx === 0) {
             this.monthDay = 1;
             let fillText = {
@@ -1102,8 +1130,8 @@ class Calendar {
               date: {
                 year: currentYear,
                 month: currentMonth,
-                day: this.monthDay
-              }
+                day: this.monthDay,
+              },
             };
             this.coordinate.calendarArea.allDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -1150,8 +1178,8 @@ class Calendar {
               date: {
                 year: currentYear,
                 month: currentMonth,
-                day: this.monthDay
-              }
+                day: this.monthDay,
+              },
             };
             this.coordinate.calendarArea.allDay.push(obj);
             this.dynamicDraw(ctx, obj.startX, obj.startY, obj.width, obj.height, obj.style);
@@ -1163,11 +1191,7 @@ class Calendar {
 
   // 아직 미완
   setSelectDays() {
-    const selectDayType = this.options.selectDayType;
     const selectDayArr = this.coordinate.calendarArea.selectDayArr;
-    if (selectDayType === 'day') {
-
-    }
     return selectDayArr;
   }
 
@@ -1180,11 +1204,15 @@ class Calendar {
     ctx.moveTo(this.baseCanvas.width / 2, padding.top);
     ctx.lineTo(this.baseCanvas.width / 2, this.baseCanvas.height - padding.top);
     // title|content 세로
-    ctx.moveTo((this.baseCanvas.width / 2) + this.options.timeArea.titleWidth, padding.top);
-    ctx.lineTo((this.baseCanvas.width / 2) + this.options.timeArea.titleWidth, this.baseCanvas.height - padding.top);
+    ctx.moveTo((this.baseCanvas.width / 2) + this.options.timeArea.titleWidth,
+      padding.top);
+    ctx.lineTo((this.baseCanvas.width / 2) + this.options.timeArea.titleWidth,
+      this.baseCanvas.height - padding.top);
     // content|page 세로
-    ctx.moveTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth, padding.top);
-    ctx.lineTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth, this.baseCanvas.height - padding.top);
+    ctx.moveTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
+      padding.top);
+    ctx.lineTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
+      this.baseCanvas.height - padding.top);
     // hour|minute|second 가로
     ctx.moveTo(this.baseCanvas.width / 2, (this.baseCanvas.height / 3) + 1);
     ctx.lineTo(this.baseCanvas.width - padding.right, (this.baseCanvas.height / 3) + 1);
@@ -1221,7 +1249,7 @@ class Calendar {
             bottom: 27,
           },
           font: '12px Roboto Condensed',
-        }
+        },
       );
     });
   }
@@ -1234,13 +1262,12 @@ class Calendar {
       const timeAreaType = this.coordinate.timeArea[type].total;
       const oneBoxWidth = timeAreaType.width / this.options.timeArea.columnCount;
       const oneBoxHeight = timeAreaType.height / this.options.timeArea.rowCount;
-      let maxNumber = type === 'hour' ? 24 : 60; // minute, second = 60
+      const maxNumber = type === 'hour' ? 24 : 60; // minute, second = 60
       let timeAreaObj = {};
       for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
         const columnIdx = ix % this.options.timeArea.columnCount;
-        const page = parseInt(
-          ix / (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
-        ) + 1;
+        const page = parseInt(ix /
+          (this.options.timeArea.columnCount * this.options.timeArea.rowCount), 0) + 1;
         let rowIdx = 1;
         if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
           < this.options.timeArea.columnCount) {
@@ -1251,11 +1278,11 @@ class Calendar {
           width: oneBoxWidth,
           startY: timeAreaType.startY + (rowIdx * oneBoxHeight),
           height: oneBoxHeight,
-          page: page,
+          page,
           styleObj: {
             fillText: {
               show: true,
-              text: ''+ix,
+              text: `${ix}`,
             },
             fill: {
               show: true,
@@ -1394,16 +1421,16 @@ class Calendar {
       x: direction === 'right'
         ? x + (Math.cos(this.toRadians(30)) * length)
         : x - (Math.cos(this.toRadians(30)) * length),
-      y: y,
+      y,
     };
     vs.push(v1);
     const v2 = {
-      x: x,
+      x,
       y: y - (Math.sin(this.toRadians(30)) * length),
     };
     vs.push(v2);
     const v3 = {
-      x: x,
+      x,
       y: y + (Math.sin(this.toRadians(30)) * length),
     };
     vs.push(v3);
@@ -1428,7 +1455,7 @@ class Calendar {
       const y1 = vs[ix].y;
       const x2 = vs[ixLen].x;
       const y2 = vs[ixLen].y;
-      const intersect = ((y1 > y) != (y2 > y)) && (x < (((x2 - x1) * (y - y1)) / (y2 - y1)) + x1);
+      const intersect = ((y1 > y) !== (y2 > y)) && (x < (((x2 - x1) * (y - y1)) / (y2 - y1)) + x1);
       if (intersect) {
         inside = !inside;
       }
@@ -1472,11 +1499,11 @@ class Calendar {
         ctx.clearRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
       }
     } else {
-      const ctx = this.context;
+      const context = this.context;
       if (x && y && width && height) {
-        ctx.clearRect(x, y, width, height);
+        context.clearRect(x, y, width, height);
       } else {
-        ctx.clearRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
+        context.clearRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
       }
     }
   }
