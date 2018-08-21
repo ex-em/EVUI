@@ -1,29 +1,26 @@
 <template>
   <div>
-    <datepicker
+    <ev-datepicker
       v-model="bindDay"
       :options="option"
       class="evui-datepicker-temp"
     />
-    <br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br>
   </div>
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import datepicker from '@/components/datepicker';
-
   export default {
     components: {
-      datepicker,
     },
     data() {
       return {
-        bindDay: '2018-06-09',
+        bindDay: '2018-06-09 00:00:00',
         option: {
           selectDayType: 'day',
           initSelectDayFlag: true,
-          twoPageShow: true,
+          timeExpand: true,
+          localeType: 'Y-m-d H:i:s',
         },
       };
     },

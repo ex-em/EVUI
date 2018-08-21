@@ -17,40 +17,44 @@
         placeholder=" yyyy-mm-dd "
       >
     </div>
-    <div
-      ref="calendarWrapperRef"
-      :class="options.twoPageShow ? 'expand' : ''"
-      class="evui-calendar-wrapper"
-    >
-      <calendar
-        v-model="dataValue"
-        :datepicker-options="mergedOption"
-      />
-    </div>
   </div>
 </template>
 
 <script>
-  import calendar from '@/components/datepicker/calendar';
+  import Calendar from '@/components/datepicker/calendar.core';
   import moment from 'moment';
 
   const prefixCls = 'evui-input-text';
 
   export default {
     components: {
-      calendar,
       moment,
     },
     directives: {
       // 해당 element 외의 클릭 시
       'click-outside': {
-        bind(el, binding) {
+        bind(el, binding, vnode) {
           const element = el;
           const bind = binding;
+          const calendarDropdown = document.getElementsByClassName('ev-calendar-dropdown');
           // Define Handler and cache it on the element
           const bubble = bind.modifiers.bubble;
           const handler = (e) => {
-            if (bubble || (!element.contains(e.target) && element !== e.target)) {
+            let outsideClickFlag = false;
+            if ((bubble || (!element.contains(e.target) && element !== e.target))) {
+              if (e.target.getAttribute('class') === 'ev-calendar-overlay-canvas') {
+                for (let ix = 0, ixLen = calendarDropdown.length; ix < ixLen; ix++) {
+                  if (!calendarDropdown[ix].contains(e.target)
+                    && calendarDropdown[ix] !== e.target) {
+                    outsideClickFlag = false;
+                    vnode.context.setBindValue();
+                  }
+                }
+              } else {
+                outsideClickFlag = true;
+              }
+            }
+            if (outsideClickFlag) {
               bind.value(e);
             }
           };
@@ -110,18 +114,26 @@
         });
       },
     },
+    watch: {
+      dataValue() {
+      },
+    },
     created() {
     },
     mounted() {
+      this.calendar = new Calendar(this.$refs.datepickerRef, this.mergedOption);
     },
     beforeDestroy() {
     },
     methods: {
-      showDatepicker() {
-        this.$refs.calendarWrapperRef.style.height = '220px';
+      showDatepicker(e) {
+        this.calendar.showDropdown(e);
       },
       hideDatepicker() {
-        this.$refs.calendarWrapperRef.style.height = '0px';
+        this.calendar.hideDropdown();
+      },
+      setBindValue() {
+        this.dataValue = this.calendar.getSelectDateTime();
       },
     },
   };

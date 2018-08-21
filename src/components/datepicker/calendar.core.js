@@ -1,7 +1,7 @@
 /*
   eslint
   class-methods-use-this:
-    ["error", { "exceptMethods": ["pointInPolygon", "toRadians", "getLastDayOfMonth"] }]
+    ["error", { "exceptMethods": ["pointInPolygon", "toRadians", "getLastDayOfMonth", "lpad10"] }]
   consistent-return:
     ["error", { "treatUndefinedAsUnspecified": true }]
 */
@@ -31,6 +31,8 @@ class Calendar {
         bottom: 5,
         left: 5,
       },
+
+      dropdownFlag: true,
 
       // 최초 달력상 연,월
       // currentYearMonth: new Date(2015, 1, 1), // 4주
@@ -125,21 +127,28 @@ class Calendar {
         dayOfTheWeek: 'abbrUpperName',
       },
 
-      // timepicker (left : calendar[default], right: time) all show?
-      twoPageShow: false, // 아직은 false로 놔둠
-      // twoPageShow가 true일 때 'H', 'HM', 'HMS'가 right영역에 추가되는 타입
-      twoPageType: null,
+      // left : datepicker[default], right: timepicker - expand show?
+      timeExpand: false, // 아직은 false로 놔둠
+      // timeExpand가 true일 때 'H', 'HM', 'HMS'가 right영역에 추가되는 타입
+      // timeExpand가 false면 localeType은 'Y-m-d'
+      localeType: 'Y-m-d H:i:s',
     };
 
     // parameter mapping
     this.options = _.merge({}, obj, options);
 
     // create & init canvas
+    this.dropdown = document.createElement('div');
+    this.dropdown.setAttribute('class', 'ev-calendar-dropdown');
+    this.dropdown.style.position = 'absolute';
+    this.dropdown.style.display = 'none';
+    this.dropdown.style.zIndex = 1;
+    this.dropdown.style.background = '#ffffff';
     this.baseCanvas = document.createElement('canvas');
-    this.baseCanvas.setAttribute('class', 'evui-calendar-canvas');
+    this.baseCanvas.setAttribute('class', 'ev-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
     this.overCanvas = document.createElement('canvas');
-    this.overCanvas.setAttribute('class', 'evui-calendar-overlay-canvas');
+    this.overCanvas.setAttribute('class', 'ev-calendar-overlay-canvas');
     this.overCanvas.setAttribute('style', 'position: absolute; left: 0px; top: 0px;');
     this.overCtx = this.overCanvas.getContext('2d');
 
@@ -193,13 +202,33 @@ class Calendar {
     this.drawCanvas();
 
     // append dom
-    if (target === null) {
-      throw new Error('[EVUI][ERROR][Calendar]-Not found Target for rendering Calendar');
+    if (!this.options.dropdownFlag) {
+      if (target === null) {
+        throw new Error('[EVUI][ERROR][Calendar]-Not found Target for rendering Calendar');
+      } else {
+        target.appendChild(this.baseCanvas);
+        target.appendChild(this.overCanvas);
+      }
     } else {
-      target.appendChild(this.baseCanvas);
-      target.appendChild(this.overCanvas);
+      this.dropdown.appendChild(this.baseCanvas);
+      this.dropdown.appendChild(this.overCanvas);
+      document.body.appendChild(this.dropdown);
     }
   }
+
+  showDropdown(e) {
+    this.dropdown.style.display = 'block';
+    let targetDivHeight = 0;
+    if (e.currentTarget && e.currentTarget.clientHeight) {
+      targetDivHeight = e.currentTarget.clientHeight;
+    }
+    this.dropdown.style.top = `${(e.pageY - e.offsetY) + targetDivHeight}px`;
+    this.dropdown.style.left = `${e.pageX - e.offsetX}px`;
+  }
+  hideDropdown() {
+    this.dropdown.style.display = 'none';
+  }
+
   init() {
     this.initOptionsProperty();
     this.initCalendarProperty();
@@ -226,7 +255,7 @@ class Calendar {
   initCanvasProperty() {
     // set total width, height
     if (this.options.width && this.options.height) {
-      if (this.options.twoPageShow) {
+      if (this.options.timeExpand) {
         this.baseCanvas.width = this.options.width * 2;
         this.overCanvas.width = this.options.width * 2;
       } else {
@@ -241,7 +270,7 @@ class Calendar {
     const padding = this.options.padding;
     const pickerAreaHeight = this.options.pickerArea.height;
     let commonAreaTotalWidth = this.options.width - padding.left - padding.right;
-    if (this.options.twoPageShow) {
+    if (this.options.timeExpand) {
       commonAreaTotalWidth = this.options.width - padding.left;
     }
     this.coordinate.pickerArea.total = {
@@ -271,7 +300,7 @@ class Calendar {
     }
 
     // 2page일 때 hour, minute, second 영역 init
-    if (this.options.twoPageShow) {
+    if (this.options.timeExpand) {
       this.coordinate.timeArea.total = {
         startX: this.baseCanvas.width / 2,
         width: this.options.width - padding.right,
@@ -734,7 +763,7 @@ class Calendar {
     this.drawTotalArea();
     this.drawPickerArea();
     this.drawCalendarArea();
-    if (this.options.twoPageShow) {
+    if (this.options.timeExpand) {
       this.drawSplitLine();
       this.drawTimeArea();
     }
@@ -1195,6 +1224,37 @@ class Calendar {
     return selectDayArr;
   }
 
+  getSelectDateTime() {
+    const selectDayArr = this.coordinate.calendarArea.selectDayArr;
+    const selectHour = this.coordinate.timeArea.hour.select;
+    const selectMinute = this.coordinate.timeArea.minute.select;
+    const selectSecond = this.coordinate.timeArea.second.select;
+    const timeExpand = this.options.timeExpand;
+    let returnStr = null;
+    if (selectDayArr && selectDayArr.length > 0) {
+      if (!timeExpand) {
+        // 연,월,일
+        returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)}`;
+      } else {
+        // 연,월,일 + alpha
+        switch (this.options.localeType) {
+          case 'Y-m-d H:i:s':
+            returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}:${this.lpad10(selectMinute)}:${this.lpad10(selectSecond)}`;
+            break;
+          case 'Y-m-d H:i':
+            returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}:${this.lpad10(selectMinute)}`;
+            break;
+          case 'Y-m-d H':
+            returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}`;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    return returnStr;
+  }
+
   // 2페이지 일 때 우측 영역의 선 그리기
   drawSplitLine() {
     const ctx = this.context;
@@ -1489,6 +1549,20 @@ class Calendar {
         break;
     }
     return day;
+  }
+
+  lpad10(v) {
+    let value = v;
+    if (value < 10) {
+      if (value.length) {
+        value = `0${Number(value)}`;
+      } else {
+        value = `0${value}`;
+      }
+    } else {
+      value = `${value}`;
+    }
+    return value;
   }
 
   clearCanvas(ctx, x, y, width, height) {

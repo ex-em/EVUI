@@ -52,16 +52,14 @@
         });
       }
       this.calendar = new Calendar(this.$refs.datepickerRef, mergeOption);
-//      this.selectDay = this.calendar.setSelectDays();
-//      this.updateSelectDay();
     },
     beforeDestroy() {
     },
     methods: {
       updateSelectOneDay() {
         if (this.calendar.setSelectDays()) {
-          const selectDayObj = this.calendar.setSelectDays();
-          this.$emit('input', `${selectDayObj[0].year}-${this.lpad10(selectDayObj[0].month)}-${this.lpad10(selectDayObj[0].day)}`);
+          const selectDateTime = this.calendar.getSelectDateTime();
+          this.$emit('input', selectDateTime);
         }
       },
       lpad10(v) {

@@ -14,6 +14,7 @@ import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
 import EvDocking from '@/components/dock';
 import EvLabel from '@/components/label';
+import EvDatepicker from '@/components/datepicker';
 import Vuex from 'vuex';
 
 const components = {
@@ -33,6 +34,7 @@ const components = {
   EvToggle,
   EvDocking,
   EvLabel,
+  EvDatepicker,
 };
 
 const evui = {
