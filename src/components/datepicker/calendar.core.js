@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 class Calendar {
   constructor(target, options) {
+    const today = new Date();
     const obj = {
       // default width, height(onePage)
       width: 235,
@@ -35,20 +36,16 @@ class Calendar {
       dropdownFlag: true,
 
       // 최초 달력상 연,월
-      // currentYearMonth: new Date(2015, 1, 1), // 4주
-      // currentYearMonth: new Date(2017, 11, 1), // 6주 // 2017-12-01
-      // currentYearMonth: new Date(2018, 3, 1), // 5주
-      // currentYearMonth: new Date(2018, 5, 1), // 5주
-      currentYearMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      currentYearMonth: new Date(today.getFullYear(), today.getMonth(), 1),
       // 최초 선택날짜 여부
       initSelectDayFlag: true,
       // 최초 선택된 날(default : 오늘)
-      initSelectDay: new Date(),
+      initSelectDay: today,
       // 제한 시작 날짜(default:오늘) 이후 날짜 비활성화(default:false)
       limitToday: false,
       // 제한 시작 날짜(default : 오늘)
       // initLimitDay: new Date(new Date().getFullYear(), new Date().getMonth(), 28),
-      initLimitDay: new Date(),
+      initLimitDay: today,
       // 달력에 선택되는 날짜 타입
       // ('day'[default] : 하루, 'weekday' : 1주(평일, 월~금), 'week' : 1주일)
       selectDayType: 'day',
@@ -140,10 +137,7 @@ class Calendar {
     // create & init canvas
     this.dropdown = document.createElement('div');
     this.dropdown.setAttribute('class', 'ev-calendar-dropdown');
-    this.dropdown.style.position = 'absolute';
-    this.dropdown.style.display = 'none';
-    this.dropdown.style.zIndex = 1;
-    this.dropdown.style.background = '#ffffff';
+    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 1; background: #ffffff');
     this.baseCanvas = document.createElement('canvas');
     this.baseCanvas.setAttribute('class', 'ev-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
@@ -173,6 +167,7 @@ class Calendar {
           data: [], // 0 ~ 23 box 좌표
           arrow: [], // 상,하 화살표
           page: 1, // 페이지(1 ~ 2)
+          maxPage: 2,
           select: 0, // 선택한 시
         },
         minute: {
@@ -180,6 +175,7 @@ class Calendar {
           data: [], // 0 ~ 59 box 좌표
           arrow: [],
           page: 1, // 페이지(1 ~ 5)
+          maxPage: 5,
           select: 0, // 선택한 분
         },
         second: {
@@ -187,6 +183,7 @@ class Calendar {
           data: [],
           arrow: [],
           page: 1, // 페이지(1 ~ 5)
+          maxPage: 5,
           select: 0, // 선택한 초
         },
       },
@@ -403,20 +400,6 @@ class Calendar {
         });
       }
 
-      // mousemove on triangle in picker area
-      const pickerAreaArrow = this.coordinate.pickerArea.arrow;
-      const pickerAreaOption = this.options.pickerArea;
-      let pickerAreaArrowOver = false;
-      pickerAreaArrow.forEach((v, idx) => {
-        pickerAreaArrowOver = this.existTriangle(
-          pickerAreaArrow[idx].centerX, pickerAreaArrow[idx].centerY,
-          v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY,
-        );
-        if (pickerAreaArrowOver) {
-          mouseoverFlag = true;
-        }
-      });
-
       // mousemove on hour, minute, second box
       const timeTypeName = this.options.timeTypeName;
       const timeAreaTotal = this.coordinate.timeArea.total;
@@ -432,7 +415,7 @@ class Calendar {
         timeTypeName.forEach((type) => {
           const timeAreaType = this.coordinate.timeArea[type];
           timeAreaType.data.forEach((v, idx) => {
-            if (this.coordinate.timeArea.hour.page === v.page) {
+            if (timeAreaType.page === v.page) {
               if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
                 && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
                 this.dynamicDraw(
@@ -462,6 +445,36 @@ class Calendar {
           });
         });
       }
+
+      // mousemove on triangle in picker area (month)
+      const pickerAreaArrow = this.coordinate.pickerArea.arrow;
+      const pickerAreaOption = this.options.pickerArea;
+      let pickerAreaArrowOver = false;
+      pickerAreaArrow.forEach((v, idx) => {
+        pickerAreaArrowOver = this.existTriangle(
+          pickerAreaArrow[idx].centerX, pickerAreaArrow[idx].centerY,
+          v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY,
+        );
+        if (pickerAreaArrowOver) {
+          mouseoverFlag = true;
+        }
+      });
+
+      // mousemove on triangle in time area (HMS)
+      const timeAreaOption = this.options.timeArea;
+      let timeAreaArrowOver = false;
+      this.options.timeTypeName.forEach((type) => {
+        const timeAreaTypeArrow = this.coordinate.timeArea[type].arrow;
+        timeAreaTypeArrow.forEach((v, idx) => {
+          timeAreaArrowOver = this.existTriangle(
+            timeAreaTypeArrow[idx].centerX, timeAreaTypeArrow[idx].centerY,
+            v.direction, timeAreaOption.triangleLength, e.offsetX, e.offsetY,
+          );
+          if (timeAreaArrowOver) {
+            mouseoverFlag = true;
+          }
+        });
+      });
 
       if (mouseoverFlag) {
         this.overCanvas.style.cursor = 'pointer';
@@ -596,38 +609,22 @@ class Calendar {
     });
   }
 
-  mouseclickTime(e) {
+  updateTimeArea(changedType) {
     const overCtx = this.overCtx;
+    let condition = true;
     this.options.timeTypeName.forEach((type) => {
-      const timeAreaType = this.coordinate.timeArea[type];
-      timeAreaType.data.forEach((v, idx) => {
-        if (timeAreaType.page === v.page) {
-          if (e
-            && e.offsetY > v.startY && e.offsetY < v.startY + v.height
-            && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
-            timeAreaType.select = idx;
-            if (timeAreaType.page === v.page) {
-              this.clearCanvas(
-                overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
-                timeAreaType.total.width, timeAreaType.total.height,
-              );
-              this.dynamicDraw(
-                overCtx, v.startX, v.startY,
-                v.width, v.height,
-                {
-                  fill: {
-                    show: true,
-                    color: this.options.colors.mousemoveDayFill,
-                  },
-                },
-              );
-            }
-          } else if (timeAreaType.page === v.page
+      if (changedType) {
+        condition = changedType === type;
+      }
+      if (condition) {
+        const timeAreaType = this.coordinate.timeArea[type];
+        this.clearCanvas(
+          overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+          timeAreaType.total.width, timeAreaType.total.height,
+        );
+        timeAreaType.data.forEach((v, idx) => {
+          if (timeAreaType.page === v.page
             && timeAreaType.select === idx) {
-            this.clearCanvas(
-              overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
-              timeAreaType.total.width, timeAreaType.total.height,
-            );
             this.dynamicDraw(
               overCtx, v.startX, v.startY,
               v.width, v.height,
@@ -639,6 +636,57 @@ class Calendar {
               },
             );
           }
+        });
+      }
+    });
+  }
+
+  mouseclickTime(e) {
+    const overCtx = this.overCtx;
+    this.options.timeTypeName.forEach((type) => {
+      const timeAreaType = this.coordinate.timeArea[type];
+      timeAreaType.data.forEach((v, idx) => {
+        if (e
+          && e.offsetY > v.startY && e.offsetY < v.startY + v.height
+          && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
+          this.clearCanvas(
+            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+            timeAreaType.total.width, timeAreaType.total.height,
+          );
+          if (timeAreaType.page === v.page) {
+            timeAreaType.select = idx;
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height,
+              {
+                fill: {
+                  show: true,
+                  color: this.options.colors.mousemoveDayFill,
+                },
+              },
+            );
+          }
+        } else if (timeAreaType.page === v.page
+          && timeAreaType.select === idx) {
+          this.clearCanvas(
+            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+            timeAreaType.total.width, timeAreaType.total.height,
+          );
+          this.dynamicDraw(
+            overCtx, v.startX, v.startY,
+            v.width, v.height,
+            {
+              fill: {
+                show: true,
+                color: this.options.colors.selectDayFill,
+              },
+            },
+          );
+        } else {
+          this.clearCanvas(
+            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
+            timeAreaType.total.width, timeAreaType.total.height,
+          );
         }
       });
     });
@@ -667,13 +715,8 @@ class Calendar {
       e.preventDefault();
       const pickerAreaTotal = this.coordinate.pickerArea.total;
       const calendarAreaTotal = this.coordinate.calendarArea.total;
-      // CLICK Date logic
-      if (e.offsetY > calendarAreaTotal.startY
-        && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
-        this.mouseclickDate(e);
-      }
 
-      // CLICK triangle in picker area
+      // CLICK triangle in picker area (LEFT, RIGHT)
       if (e.offsetY > pickerAreaTotal.startY
         && e.offsetY < pickerAreaTotal.startY + pickerAreaTotal.height) {
         const pickerAreaArrow = this.coordinate.pickerArea.arrow;
@@ -699,16 +742,86 @@ class Calendar {
         });
       }
 
-      // click on hour box
-      const timeAreaTotal = this.coordinate.timeArea.total;
-      // in Hour, Min, Sec Area (in X position)
-      if (e.offsetX > timeAreaTotal.startX
-        && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
-        && e.offsetY > timeAreaTotal.startY
-        && e.offsetY < timeAreaTotal.startY + timeAreaTotal.height
-      ) {
-        this.mouseclickTime(e);
+      // CLICK Date logic
+      if (e.offsetY > calendarAreaTotal.startY
+        && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
+        this.mouseclickDate(e);
       }
+
+      const timePageWidth = this.options.timeArea.pageWidth;
+      const timeAreaOption = this.options.timeArea;
+
+      // CLICK triangle in time area (TOP, BOTTOM)
+      this.options.timeTypeName.forEach((type) => {
+        const timeAreaType = this.coordinate.timeArea[type];
+        const timeAreaTypeTotal = timeAreaType.total;
+        if (e.offsetX > timeAreaTypeTotal.startX + timeAreaTypeTotal.width
+          && e.offsetX < (timeAreaTypeTotal.startX + timeAreaTypeTotal.width) + timePageWidth
+          && e.offsetY > timeAreaTypeTotal.startY
+          && e.offsetY < timeAreaTypeTotal.startY + timeAreaTypeTotal.height
+        ) {
+          let exist = false;
+          timeAreaType.arrow.forEach((v) => {
+            exist = this.existTriangle(
+              v.centerX, v.centerY,
+              v.direction, timeAreaOption.triangleLength, e.offsetX, e.offsetY,
+            );
+            if (exist) {
+              if (v.direction === 'top') {
+                if (timeAreaType.page > 1) {
+                  this.coordinate.timeArea[type].page -= 1;
+                  this.drawTimeAreaContent(type);
+                  this.updateTimeArea(type);
+                }
+              } else if (v.direction === 'bottom') {
+                if (timeAreaType.page < timeAreaType.maxPage) {
+                  this.coordinate.timeArea[type].page += 1;
+                  this.drawTimeAreaContent(type);
+                  this.updateTimeArea(type);
+                }
+              }
+            }
+          });
+        }
+
+        // const timeAreaTypeData = timeAreaType.data;
+        // timeAreaTypeData.forEach((v, idx) => {
+        //   if (e.offsetX > v.startX
+        //     && e.offsetX < v.startX + v.width
+        //     && e.offsetY > v.startY
+        //     && e.offsetY < v.startY + v.height) {
+        //     timeAreaType.select = idx;
+        //     this.updateTimeArea(type);
+        //   }
+        // });
+      });
+
+      // CLICK triangle in time area (TOP, BOTTOM)
+      this.options.timeTypeName.forEach((type) => {
+        const timeAreaType = this.coordinate.timeArea[type];
+        const timeAreaTypeData = timeAreaType.data;
+        timeAreaTypeData.forEach((v, idx) => {
+          if (timeAreaType.page === v.page) {
+            if (e.offsetX > v.startX
+              && e.offsetX < v.startX + v.width
+              && e.offsetY > v.startY
+              && e.offsetY < v.startY + v.height) {
+              timeAreaType.select = idx;
+              this.updateTimeArea(type);
+            }
+          }
+        });
+      });
+
+
+      // // CLICK Hour, Min, Sec logic
+      // if (e.offsetX > timeAreaTotal.startX
+      //   && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
+      //   && e.offsetY > timeAreaTotal.startY
+      //   && e.offsetY < timeAreaTotal.startY + timeAreaTotal.height
+      // ) {
+      //   this.mouseclickTime(e);
+      // }
     });
   }
 
@@ -741,7 +854,7 @@ class Calendar {
       timeTypeName.forEach((type) => {
         const timeAreaType = this.coordinate.timeArea[type];
         timeAreaType.data.forEach((v, idx) => {
-          if (this.coordinate.timeArea.hour.page === v.page
+          if (timeAreaType.page === v.page
             && timeAreaType.select === idx) {
             this.dynamicDraw(
               overCtx, v.startX, v.startY,
@@ -768,7 +881,7 @@ class Calendar {
       this.drawTimeArea();
     }
     this.mouseclickDate();
-    this.mouseclickTime();
+    this.updateTimeArea();
   }
 
   drawTotalArea() {
@@ -1314,58 +1427,72 @@ class Calendar {
     });
   }
   // DRAW 0 ~ 23 || 59 BOX
-  drawTimeAreaContent() {
+  drawTimeAreaContent(changedType) {
     const ctx = this.context;
     const timeType = this.options.timeTypeName;
     // init coordinate by time type
-    timeType.forEach((type) => {
-      const timeAreaType = this.coordinate.timeArea[type].total;
-      const oneBoxWidth = timeAreaType.width / this.options.timeArea.columnCount;
-      const oneBoxHeight = timeAreaType.height / this.options.timeArea.rowCount;
-      const maxNumber = type === 'hour' ? 24 : 60; // minute, second = 60
-      let timeAreaObj = {};
-      for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
-        const columnIdx = ix % this.options.timeArea.columnCount;
-        const page = parseInt(ix /
-          (this.options.timeArea.columnCount * this.options.timeArea.rowCount), 0) + 1;
-        let rowIdx = 1;
-        if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
-          < this.options.timeArea.columnCount) {
-          rowIdx = 0;
-        }
-        timeAreaObj = {
-          startX: timeAreaType.startX + (columnIdx * oneBoxWidth),
-          width: oneBoxWidth,
-          startY: timeAreaType.startY + (rowIdx * oneBoxHeight),
-          height: oneBoxHeight,
-          page,
-          styleObj: {
-            fillText: {
-              show: true,
-              text: `${ix}`,
+    if (!changedType) {
+      timeType.forEach((type) => {
+        this.coordinate.timeArea[type].data = [];
+        const timeAreaType = this.coordinate.timeArea[type].total;
+        const oneBoxWidth = timeAreaType.width / this.options.timeArea.columnCount;
+        const oneBoxHeight = timeAreaType.height / this.options.timeArea.rowCount;
+        const maxNumber = type === 'hour' ? 24 : 60; // minute, second = 60
+        let timeAreaObj = {};
+        for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
+          const columnIdx = ix % this.options.timeArea.columnCount;
+          const page = parseInt(ix /
+            (this.options.timeArea.columnCount * this.options.timeArea.rowCount), 0) + 1;
+          let rowIdx = 1;
+          if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
+            < this.options.timeArea.columnCount) {
+            rowIdx = 0;
+          }
+          timeAreaObj = {
+            startX: timeAreaType.startX + (columnIdx * oneBoxWidth),
+            width: oneBoxWidth,
+            startY: timeAreaType.startY + (rowIdx * oneBoxHeight),
+            height: oneBoxHeight,
+            page,
+            styleObj: {
+              fillText: {
+                show: true,
+                text: `${ix}`,
+              },
+              fill: {
+                show: true,
+                color: this.options.colors.thisMonthFill,
+              },
+              align: 'center',
+              padding: {
+                bottom: 13,
+              },
             },
-            fill: {
-              show: true,
-              color: this.options.colors.thisMonthFill,
-            },
-            align: 'center',
-            padding: {
-              bottom: 13,
-            },
-          },
-        };
-        this.coordinate.timeArea[type].data.push(timeAreaObj);
-      }
-    });
-
-    // DRAW box
-    timeType.forEach((type) => {
-      this.coordinate.timeArea[type].data.forEach((v) => {
-        if (v.page === this.coordinate.timeArea[type].page) {
-          this.dynamicDraw(ctx, v.startX, v.startY, v.width, v.height, v.styleObj);
+          };
+          this.coordinate.timeArea[type].data.push(timeAreaObj);
         }
       });
-    });
+
+      // DRAW box
+      timeType.forEach((type) => {
+        this.coordinate.timeArea[type].data.forEach((v) => {
+          if (v.page === this.coordinate.timeArea[type].page) {
+            this.dynamicDraw(ctx, v.startX, v.startY, v.width, v.height, v.styleObj);
+          }
+        });
+      });
+    } else {
+      // DRAW box
+      timeType.forEach((type) => {
+        if (changedType === type) {
+          this.coordinate.timeArea[type].data.forEach((v) => {
+            if (v.page === this.coordinate.timeArea[type].page) {
+              this.dynamicDraw(ctx, v.startX, v.startY, v.width, v.height, v.styleObj);
+            }
+          });
+        }
+      });
+    }
   }
   drawTimeAreaPage() {
     const ctx = this.context;
@@ -1376,6 +1503,7 @@ class Calendar {
     let arrowObj = {};
     // init and draw arrows
     timeType.forEach((type) => {
+      this.coordinate.timeArea[type].arrow = [];
       const timeTypeTotal = timeArea[type].total;
       timeTypeAreaPage = {
         startX: +timeTypeTotal.startX + +timeTypeTotal.width + +1,
@@ -1390,7 +1518,7 @@ class Calendar {
           direction: v,
           length: this.options.timeArea.triangleLength,
         };
-        this.coordinate.timeArea.hour.arrow.push(arrowObj);
+        this.coordinate.timeArea[type].arrow.push(arrowObj);
         this.drawTriangle(
           ctx, arrowObj.centerX, arrowObj.centerY,
           arrowObj.direction, arrowObj.length,
@@ -1475,25 +1603,46 @@ class Calendar {
   }
 
   // 삼각형 안에 (px,py)이 존재하는지 확인
-  existTriangle(x, y, direction, length, px, py) {
+  existTriangle(x, y, direction, l, px, py) {
+    const length = l + 1;
     const vs = [];
-    const v1 = {
-      x: direction === 'right'
-        ? x + (Math.cos(this.toRadians(30)) * length)
-        : x - (Math.cos(this.toRadians(30)) * length),
-      y,
-    };
-    vs.push(v1);
-    const v2 = {
-      x,
-      y: y - (Math.sin(this.toRadians(30)) * length),
-    };
-    vs.push(v2);
-    const v3 = {
-      x,
-      y: y + (Math.sin(this.toRadians(30)) * length),
-    };
-    vs.push(v3);
+    if (direction === 'right' || direction === 'left') {
+      const v1 = {
+        x: direction === 'right'
+          ? x + (Math.cos(this.toRadians(30)) * length)
+          : x - (Math.cos(this.toRadians(30)) * length),
+        y,
+      };
+      vs.push(v1);
+      const v2 = {
+        x,
+        y: y - (Math.sin(this.toRadians(30)) * length),
+      };
+      vs.push(v2);
+      const v3 = {
+        x,
+        y: y + (Math.sin(this.toRadians(30)) * length),
+      };
+      vs.push(v3);
+    } else if (direction === 'top' || direction === 'bottom') {
+      const v1 = {
+        x,
+        y: direction === 'top'
+          ? y - (Math.cos(this.toRadians(30)) * length)
+          : y + (Math.cos(this.toRadians(30)) * length),
+      };
+      vs.push(v1);
+      const v2 = {
+        x: x - (Math.sin(this.toRadians(30)) * length),
+        y,
+      };
+      vs.push(v2);
+      const v3 = {
+        x: x + (Math.sin(this.toRadians(30)) * length),
+        y,
+      };
+      vs.push(v3);
+    }
     const p = {
       x: px,
       y: py,

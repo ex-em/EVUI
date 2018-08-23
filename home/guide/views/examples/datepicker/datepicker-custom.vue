@@ -5,7 +5,7 @@
       :options="option"
       class="evui-datepicker-temp"
     />
-    <br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 
@@ -15,7 +15,7 @@
     },
     data() {
       return {
-        bindDay: '2018-06-09 00:00:00',
+        bindDay: '2018-06-09 22:00:00',
         option: {
           selectDayType: 'day',
           initSelectDayFlag: true,
