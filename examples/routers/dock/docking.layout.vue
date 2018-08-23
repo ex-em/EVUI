@@ -1,85 +1,95 @@
 <template>
-  <div>
-    <div>
+  <div
+    style="width:100%; height: 100%; padding-top: 70px; padding-bottom: 10px;"
+  >
+    <div
+      style="top: 50px; height: 55px; position: absolute;"
+    >
       <h3> 닷킹 컴포넌트</h3>
-      <br>
-      <button @click="addDockWindow">New Window</button>
-      <button @click="saveLayout">Save</button>
-      <button @click="clearLayout">Clear</button>
+      <div
+        class="menu-list-wrap"
+      >
+        <ev-selectbox
+          :name="'Menu'"
+          :items="menuList"
+          class="menu-list"
+          @select="onSelect"
+        />
+        <ev-button
+          :name="'Save'"
+          :text="'Save'"
+          style="width: 50px; height: 30px"
+          @click="onSave"
+        />
+        <ev-button
+          :name="'Clear'"
+          :text="'Clear'"
+          style="width: 50px; height: 30px"
+          @click="onClear"
+        />
+      </div>
     </div>
     <ev-docking
       ref="dockContainer"
-      :docking-list="getLayout"
-      :bounds="containerBounds"
+      :docking-tree="getLayout"
     />
   </div>
 </template>
-<style>
-</style>
 <script>
-  import { mapGetters, mapActions } from 'vuex';
-
   export default {
     data() {
       return {
+        menuList: [{
+          name: 'SimpleLineChart',
+        }, {
+          name: 'FillLineChart',
+        }, {
+          name: 'StackedLineChart',
+        }, {
+          name: 'SimpleBarChart',
+        }, {
+          name: 'StackedBarChart',
+        }],
         contents: [
-          'SimpleLine',
-          'FillLine',
-          'StackedLine',
-          'SimpleBar',
-          'StackedBar',
-          'HorizontalBar',
+          'SimpleLineChart',
+          'FillLineChart',
+          'StackedLineChart',
+          'SimpleBarChart',
+          'StackedBarChart',
+          'HorizontalBarChart',
         ],
-        containerBounds: {
-          top: 140,
-          left: 40,
-          width: 1840,
-          height: 900,
-        },
       };
     },
     computed: {
-      ...mapGetters({
-        getNodes: 'nodes/getAllItems',
-        getMaps: 'nodes/getAllMapItems',
-        getSplits: 'splitters/getAllItems',
-        getMaxIdSeq: 'windows/getMaxIdSeq',
-      }),
       getLayout() {
         return JSON.parse(localStorage.getItem('layout-1') || '{}');
       },
     },
     methods: {
-      ...mapActions({
-        addWindow: 'windows/addWindow',
-      }),
-      addDockWindow() {
-        const bounds = this.$refs.dockContainer.$el.getBoundingClientRect();
-        const dockWindow = {
-          id: `window-${this.getMaxIdSeq() + 1}`,
-          top: bounds.top + ((bounds.height / 2) - 200),
-          left: bounds.left + ((bounds.width / 2) - 250),
-          width: 500,
-          height: 400,
-          contents: this.contents[Math.floor(Math.random() * 10)],
-          rs: null,
-        };
-
-        this.addWindow(dockWindow);
+      onSelect(item) {
+        this.$refs.dockContainer.addWindow(item.name);
       },
-      saveLayout() {
-        const layout = {
-          nodes: this.getNodes(),
-          nodeMap: this.getMaps(),
-          splitters: this.getSplits(),
-        };
+      onSave() {
+        const layout = this.$refs.dockContainer.getLayout();
 
         localStorage.setItem('layout-1', JSON.stringify(layout));
       },
-      clearLayout() {
+      onClear() {
         localStorage.removeItem('layout-1');
         location.reload();
       },
     },
   };
 </script>
+<style>
+  .menu-list-wrap {
+    display: flex;
+    height: 30px;
+    margin-right: 5px;
+  }
+  .menu-list {
+    width: 150px;
+    height: 100%;
+    margin-right: 5px;
+  }
+</style>

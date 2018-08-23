@@ -17,20 +17,19 @@
             {
               id: 'simple1',
               name: 'simple1',
-              data: [5, 3, 6, 8, 9],
+              data: [3, 8, 10, 5, 3],
             },
             {
               id: 'simple2',
               name: 'simple2',
-              point: true,
-              data: [3, 8, 10, 5, 3],
+              data: [5, 3, 6, 8, 9],
             },
           ],
         },
         chartOptions: {
           type: 'bar',
-          width: '400px',
-          height: '350px',
+          width: '100%',
+          height: '100%',
           tickness: 0.8,
           xAxes: [{
             scaleType: 'step', // auto, fix, step

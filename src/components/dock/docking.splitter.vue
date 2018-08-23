@@ -1,14 +1,15 @@
 <template>
   <!-- eslint-disable max-len -->
   <div
-    :style="`left: ${getLeft}px; top: ${getTop}px; width: ${getWidth}px; height: ${getHeight}px;`"
-    :class="`${type} splitter`"
+    :style="`left: ${getLeft}%; top: ${getTop}%; width: ${getWidth}%; height: ${getHeight}%;`"
+    :class="`${direction} splitter`"
     @mousedown="onMouseDown"
   />
   <!-- eslint-enable -->
 </template>
 <script>
-  import { mapActions, mapGetters } from 'vuex';
+  import { mapGetters, mapActions } from 'vuex';
+  import { convertToValue, convertToPercent } from '@/common/utils';
 
   export default {
     props: {
@@ -24,13 +25,13 @@
     data() {
       return {
         id: this.options.id,
-        type: this.options.type,
+        direction: this.options.direction,
         isMouseDown: false,
       };
     },
     computed: {
       ...mapGetters({
-        getNode: 'nodes/getItem',
+        getBounds: 'getBoundsForSplitter',
       }),
       getTop() {
         return this.options.top;
@@ -50,89 +51,24 @@
       getLeftPadding() {
         return this.padding.left;
       },
-      getRelationShip() {
-        return this.options.rs;
-      },
-      getBounds() {
-        const rs = this.getRelationShip;
-        const keys = Object.keys(rs || {});
-        const type = this.type;
-        let rsData;
-        let node;
-        let minLeft = 0;
-        let minRight = 0;
-        let tempLeft;
-        let tempRight;
-
-        for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
-          rsData = rs[keys[ix]];
-          for (let jx = 0, jxLen = rsData.length; jx < jxLen; jx++) {
-            if (rsData[jx].includes('node')) {
-              node = this.getNode(rsData[jx]);
-              if (type === 'hbox') {
-                if (keys[ix] === 'left') {
-                  tempLeft = node.left + node.minWidth;
-                  if (!minLeft) {
-                    minLeft = tempLeft;
-                  } else if (minLeft < tempLeft) {
-                    minLeft = tempLeft;
-                  }
-                } else {
-                  tempRight = (node.left + node.width) - node.minWidth;
-                  if (!minRight) {
-                    minRight = tempRight;
-                  } else if (minRight > tempRight) {
-                    minRight = tempRight;
-                  }
-                }
-              } else if (type === 'vbox') {
-                if (keys[ix] === 'left') {
-                  tempLeft = node.top + node.minHeight;
-                  if (!minLeft) {
-                    minLeft = tempLeft;
-                  } else if (minLeft < tempLeft) {
-                    minLeft = tempLeft;
-                  }
-                } else {
-                  tempRight = (node.top + node.height) - node.minHeight;
-                  if (!minRight) {
-                    minRight = tempRight;
-                  } else if (minRight > tempRight) {
-                    minRight = tempRight;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        return {
-          min: minLeft,
-          max: minRight,
-        };
-      },
     },
     mounted() {
-      window.console.log('test');
     },
     methods: {
       ...mapActions({
-        resizeSplit: 'splitters/resize',
-        resizeNode: 'nodes/resize',
+        resize: 'resize',
       }),
       onMouseDown() {
         const rootEl = this.$el.parentElement;
         const guideLineEl = this.$parent.$refs.guideline;
-        const top = this.getTop;
-        const left = this.getLeft;
 
         this.isMouseDown = true;
 
         rootEl.addEventListener('mousemove', this.onMouseMove);
         window.addEventListener('mouseup', this.onMouseUp);
 
-        guideLineEl.style.cssText = `display: block; top: ${top}px; left: ${left}px;
-        width: ${this.getWidth}px; height: ${this.getHeight}px;`;
+        guideLineEl.style.cssText = `display: block; top: ${this.getTop}%; left: ${this.getLeft}%;
+        width: ${this.getWidth}%; height: ${this.getHeight}%;`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         if (!this.isMouseDown) {
@@ -140,21 +76,25 @@
         }
 
         const guideLineEl = this.$parent.$refs.guideline;
-        const bounds = this.getBounds;
+        const parentWidth = this.$parent.width;
+        const parentHeight = this.$parent.height;
+        const bounds = this.getBounds(this.id, parentWidth, parentHeight);
         const min = bounds.min;
         const max = bounds.max;
-        let top = this.getTop;
-        let left = this.getLeft;
+        const width = convertToValue(this.getWidth, parentWidth);
+        const height = convertToValue(this.getHeight, parentHeight);
+        let top = convertToValue(this.getTop, parentHeight);
+        let left = convertToValue(this.getLeft, parentWidth);
 
-        if (this.type === 'hbox') {
-          left = xPos - this.getWidth - this.getLeftPadding;
+        if (this.direction === 'hbox') {
+          left = xPos - width - this.getLeftPadding;
           if (min > left) {
             left = min;
           } else if (max < left) {
             left = max;
           }
         } else {
-          top = yPos - this.getHeight - this.getTopPadding;
+          top = yPos - height - this.getTopPadding;
           if (min > top) {
             top = min;
           } else if (max < top) {
@@ -163,66 +103,64 @@
         }
 
         guideLineEl.style.cssText = `display: block; top: ${top}px;
-        left: ${left}px; width: ${this.getWidth}px; height: ${this.getHeight}px;`;
+        left: ${left}px; width: ${width}px; height: ${height}px;`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
         const guideLineEl = this.$parent.$refs.guideline;
-        const rs = this.getRelationShip;
-        const keys = Object.keys(rs);
-        const bounds = this.getBounds;
+        const parentWidth = this.$parent.width;
+        const parentHeight = this.$parent.height;
+        const bounds = this.getBounds(this.id, parentWidth, parentHeight);
         const min = bounds.min;
         const max = bounds.max;
-        const top = this.getTop;
-        const left = this.getLeft;
-        let moveTop;
-        let moveLeft;
+        const width = convertToValue(this.getWidth, parentWidth);
+        const height = convertToValue(this.getHeight, parentHeight);
+        const prevTop = convertToValue(this.getTop, parentHeight);
+        const prevLeft = convertToValue(this.getLeft, parentWidth);
+        let isMoveToLeft = false;
+        let top;
+        let left;
         let changeValue;
-        let rsData;
 
         this.isMouseDown = false;
-        if (this.type === 'hbox') {
-          moveLeft = xPos - this.getWidth - this.getLeftPadding;
-          if (min > moveLeft) {
-            moveLeft = min;
-          } else if (max < moveLeft) {
-            moveLeft = max;
+        if (this.direction === 'hbox') {
+          left = xPos - width - this.getLeftPadding;
+          if (min > left) {
+            left = min;
+          } else if (max < left) {
+            left = max;
           }
 
-          changeValue = left - moveLeft;
-          moveTop = top;
+          changeValue = prevLeft - left;
+          top = prevTop;
+
+          isMoveToLeft = changeValue > 0;
+          changeValue = convertToPercent(Math.abs(changeValue), parentWidth);
         } else {
-          moveTop = yPos - this.getHeight - this.getTopPadding;
-          if (min > moveTop) {
-            moveTop = min;
-          } else if (max < moveTop) {
-            moveTop = max;
+          top = yPos - height - this.getTopPadding;
+          if (min > top) {
+            top = min;
+          } else if (max < top) {
+            top = max;
           }
 
-          changeValue = top - moveTop;
-          moveLeft = left;
+          changeValue = prevTop - top;
+          left = prevLeft;
+
+          isMoveToLeft = changeValue > 0;
+          changeValue = convertToPercent(Math.abs(changeValue), parentHeight);
         }
+
+        top = convertToPercent(top, parentHeight);
+        left = convertToPercent(left, parentWidth);
 
         guideLineEl.style.cssText = 'display: none;';
 
-        for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
-          rsData = rs[keys[ix]];
-          for (let jx = 0, jxLen = rsData.length; jx < jxLen; jx++) {
-            if (rsData[jx].includes('node')) {
-              this.resizeNode({
-                id: rsData[jx],
-                type: this.type,
-                direction: keys[ix],
-                changeValue,
-              });
-            }
-          }
-        }
-
-        this.resizeSplit({
+        this.resize({
           id: this.id,
-          item: { left: moveLeft, top: moveTop },
-          type: this.type,
+          item: { id: this.id, left, top },
+          direction: this.direction,
+          isMoveToLeft,
           changeValue,
         });
 
@@ -232,5 +170,5 @@
     },
   };
 </script>
-<style scoped src="./docking.css">
+<style>
 </style>
