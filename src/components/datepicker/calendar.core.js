@@ -238,15 +238,25 @@ class Calendar {
   }
   initOptionsProperty() {
     if (this.options.initSelectDay) {
-      this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
-    }
-    if (this.options.initLimitDay) {
-      this.options.initLimitDay = this.options.initLimitDay.setHours(0, 0, 0, 0);
-    }
-    if (this.options.initSelectDay) {
+      if (!this.options.timeExpand) {
+        this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
+      } else {
+        this.coordinate.timeArea.hour.select = this.options.initSelectDay.getHours();
+        this.coordinate.timeArea.hour.page
+          = Math.floor(this.coordinate.timeArea.hour.select / 12) + 1;
+        this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
+        this.coordinate.timeArea.minute.page
+          = Math.floor(this.coordinate.timeArea.minute.select / 12) + 1;
+        this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
+        this.coordinate.timeArea.second.page
+          = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
+      }
       const initSelectDay = new Date(this.options.initSelectDay);
       this.options.currentYearMonth =
         new Date(initSelectDay.getFullYear(), initSelectDay.getMonth(), 1);
+    }
+    if (this.options.initLimitDay) {
+      this.options.initLimitDay = this.options.initLimitDay.setHours(0, 0, 0, 0);
     }
   }
   initCanvasProperty() {
@@ -641,75 +651,6 @@ class Calendar {
     });
   }
 
-  mouseclickTime(e) {
-    const overCtx = this.overCtx;
-    this.options.timeTypeName.forEach((type) => {
-      const timeAreaType = this.coordinate.timeArea[type];
-      timeAreaType.data.forEach((v, idx) => {
-        if (e
-          && e.offsetY > v.startY && e.offsetY < v.startY + v.height
-          && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
-          this.clearCanvas(
-            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
-            timeAreaType.total.width, timeAreaType.total.height,
-          );
-          if (timeAreaType.page === v.page) {
-            timeAreaType.select = idx;
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.mousemoveDayFill,
-                },
-              },
-            );
-          }
-        } else if (timeAreaType.page === v.page
-          && timeAreaType.select === idx) {
-          this.clearCanvas(
-            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
-            timeAreaType.total.width, timeAreaType.total.height,
-          );
-          this.dynamicDraw(
-            overCtx, v.startX, v.startY,
-            v.width, v.height,
-            {
-              fill: {
-                show: true,
-                color: this.options.colors.selectDayFill,
-              },
-            },
-          );
-        } else {
-          this.clearCanvas(
-            overCtx, timeAreaType.total.startX, timeAreaType.total.startY,
-            timeAreaType.total.width, timeAreaType.total.height,
-          );
-        }
-      });
-    });
-    // this.options.timeTypeName.forEach((v) => {
-    //   const timeAreaType = this.coordinate.timeArea[v];
-    //   timeAreaType.data.forEach((v, idx) => {
-    //     if (timeAreaType.page === v.page
-    //       && timeAreaType.select === idx) {
-    //       this.dynamicDraw(
-    //         overCtx, v.startX, v.startY,
-    //         v.width, v.height,
-    //         {
-    //           fill: {
-    //             show: true,
-    //             color: this.options.colors.selectDayFill,
-    //           }
-    //         },
-    //       );
-    //     }
-    //   });
-    // });
-  }
-
   initMouseclick() {
     this.overCanvas.addEventListener('click', (e) => {
       e.preventDefault();
@@ -783,17 +724,6 @@ class Calendar {
             }
           });
         }
-
-        // const timeAreaTypeData = timeAreaType.data;
-        // timeAreaTypeData.forEach((v, idx) => {
-        //   if (e.offsetX > v.startX
-        //     && e.offsetX < v.startX + v.width
-        //     && e.offsetY > v.startY
-        //     && e.offsetY < v.startY + v.height) {
-        //     timeAreaType.select = idx;
-        //     this.updateTimeArea(type);
-        //   }
-        // });
       });
 
       // CLICK triangle in time area (TOP, BOTTOM)
@@ -812,16 +742,6 @@ class Calendar {
           }
         });
       });
-
-
-      // // CLICK Hour, Min, Sec logic
-      // if (e.offsetX > timeAreaTotal.startX
-      //   && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
-      //   && e.offsetY > timeAreaTotal.startY
-      //   && e.offsetY < timeAreaTotal.startY + timeAreaTotal.height
-      // ) {
-      //   this.mouseclickTime(e);
-      // }
     });
   }
 
