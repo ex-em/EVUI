@@ -2,7 +2,7 @@
   <!-- eslint-disable max-len -->
   <div
     :style="`left: ${getLeft}%; top: ${getTop}%; width: ${getWidth}%; height: ${getHeight}%;`"
-    :class="`${direction} splitter`"
+    :class="`${direction} ev-docking-splitter`"
     @mousedown="onMouseDown"
   />
   <!-- eslint-enable -->

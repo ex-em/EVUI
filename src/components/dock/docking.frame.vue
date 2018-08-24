@@ -1,7 +1,7 @@
 <template>
   <div
     :style="`left: ${getLeft}%; top: ${getTop}%; width: ${getWidth}%; height: ${getHeight}%;`"
-    class="dock-frame"
+    class="ev-docking-frame"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
@@ -14,39 +14,39 @@
     </div>
     <div
       v-show="showDockIcon"
-      class="docking-icon-wrap"
+      class="ev-docking-frame-icon-wrap"
     >
-      <div class="docking-icon background"/>
+      <div class="ev-docking-frame-icon background"/>
       <div
-        class="docking-icon top"
+        class="ev-docking-frame-icon top"
         data-position="top"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onAttach"
       />
       <div
-        class="docking-icon right"
+        class="ev-docking-frame-icon right"
         data-position="right"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onAttach"
       />
       <div
-        class="docking-icon left"
+        class="ev-docking-frame-icon left"
         data-position="left"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onAttach"
       />
       <div
-        class="docking-icon center"
+        class="ev-docking-frame-icon center"
         data-position="center"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onAttach"
       />
       <div
-        class="docking-icon bottom"
+        class="ev-docking-frame-icon bottom"
         data-position="bottom"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
@@ -64,17 +64,17 @@
     />
     <div
       v-show="showOptionIcon"
-      class="option-icon-wrap"
+      class="ev-docking-frame-option-icon-wrap"
     >
       <div
         ref="detachIcon"
-        class="option-icon detach"
+        class="ev-docking-frame-option-icon detach"
         data-icon="detach"
         @click="onDetach"
       />
       <div
         ref="closeIcon"
-        class="option-icon close"
+        class="ev-docking-frame-option-icon close"
         data-icon="close"
         @click="onClose"
       />

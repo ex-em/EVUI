@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dock-container"
+    class="ev-docking-container"
   >
     <dock-frame
       v-for="node in nodes"
@@ -24,32 +24,32 @@
     />
     <div
       ref="guideline"
-      class="guideline-for-split"
+      class="ev-docking-guideline-for-split"
     />
     <div v-show="showDockIcon">
       <div
-        class="root-docking-icon top"
+        class="ev-docking-container-icon top"
         data-position="top"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onMouseUp"
       />
       <div
-        class="root-docking-icon right"
+        class="ev-docking-container-icon right"
         data-position="right"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onMouseUp"
       />
       <div
-        class="root-docking-icon left"
+        class="ev-docking-container-icon left"
         data-position="left"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
         @mouseup="onMouseUp"
       />
       <div
-        class="root-docking-icon bottom"
+        class="ev-docking-container-icon bottom"
         data-position="bottom"
         @mouseover="onMouseOver"
         @mouseout="onMouseOut"
@@ -394,45 +394,45 @@
 </script>
 <style>
   /******************** docking **********************/
-  .dock-container {
+  .ev-docking-container {
     position: relative;
-    background-color: #212227;
     width: 100%;
     height: 100%;
+    background: #212227;
   }
 
-  .dock-frame {
+  .ev-docking-frame {
     position: absolute;
-    background-color: #30333A;
+    background: #30333A;
   }
 
-  .splitter {
+  .ev-docking-splitter {
     position: absolute;
-    background-color: #212227;
+    background: #212227;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
   }
 
-  .guideline-for-split {
+  .ev-docking-guideline-for-split {
     display: none;
     position: absolute;
     z-index: 10000;
-    background-color: #ABAEB5;
+    background: #ABAEB5;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
   }
 
-  .hbox.splitter,
-  .hbox.guideline-for-split {
+  .hbox.ev-docking-splitter,
+  .hbox.ev-docking-guideline-for-split {
     cursor: col-resize;
   }
 
-  .vbox.splitter,
-  .vbox.guideline-for-split {
+  .vbox.ev-docking-splitter,
+  .vbox.ev-docking-guideline-for-split {
     cursor: row-resize;
   }
 
@@ -454,196 +454,203 @@
   /*}*/
 
   /******************** docking icon for dock frame **********************/
-  .docking-icon-wrap {
+  .ev-docking-frame-icon-wrap {
     position: absolute;
+    z-index: 20000;
     top: 50%;
     left: 50%;
     width: 100px;
     height: 100px;
     margin: -50px 0 0 -50px;
-    z-index: 20000;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
   }
 
-  .docking-icon {
+  .ev-docking-frame-icon {
     position: absolute;
     width: 35px;
     height: 35px;
     background-image: url(./docking.image.png);
   }
 
-  .docking-icon-wrap .background {
+  .ev-docking-frame-icon.background {
     position: absolute;
+    z-index: -1;
     top: 15px;
     left: 15px;
     width: 76px;
     height: 74px;
     background-position: -286px -185px;
-    z-index: -1;
   }
 
-  .docking-icon-wrap .top {
+  .ev-docking-frame-icon.top {
     left: 35px;
     background-position: -286px -5px;
   }
 
-  .docking-icon-wrap .left {
+  .ev-docking-frame-icon.left {
     top: 35px;
     background-position: -286px -113px;
   }
 
-  .docking-icon-wrap .center {
+  .ev-docking-frame-icon.center {
     top: 35px;
     left: 35px;
     background-position: -286px -77px;
   }
 
-  .docking-icon-wrap .right {
+  .ev-docking-frame-icon.right {
     top: 35px;
     left: 70px;
     background-position: -286px -149px;
   }
 
-  .docking-icon-wrap .bottom {
+  .ev-docking-frame-icon.bottom {
     top: 70px;
     left: 35px;
     background-position: -286px -41px;
   }
 
-  .docking-icon-wrap .top:hover {
+  .ev-docking-frame-icon.top:hover {
     background-position: -322px -5px;
   }
 
-  .docking-icon-wrap .left:hover {
+  .ev-docking-frame-icon.left:hover {
     background-position: -322px -113px;
   }
 
-  .docking-icon-wrap .center:hover {
+  .ev-docking-frame-icon.center:hover {
     background-position: -322px -77px;
   }
 
-  .docking-icon-wrap .right:hover {
+  .ev-docking-frame-icon.right:hover {
     background-position: -322px -149px;
   }
 
-  .docking-icon-wrap .bottom:hover {
+  .ev-docking-frame-icon.bottom:hover {
     background-position: -322px -41px;
   }
 
   /******************** docking icon for dock container **********************/
-  .root-docking-icon {
+  .ev-docking-container-icon {
     position: absolute;
+    z-index: 30000;
     width: 35px;
     height: 35px;
     background-image: url(./docking.image.png);
-    z-index: 30000;
   }
 
-  .root-docking-icon.top {
+  .ev-docking-container-icon.top {
     top: 5px;
     left: 50%;
-    margin-left: -18px;
+    margin: 0 0 0 -18px;
     background-position: -286px -5px;
   }
 
-  .root-docking-icon.left {
+  .ev-docking-container-icon.left {
     top: 50%;
     left: 5px;
-    margin-top: -18px;
+    margin: -18px 0 0 0;
     background-position: -286px -113px;
   }
 
-  .root-docking-icon.bottom {
-    bottom: 5px;
+  .ev-docking-container-icon.bottom {
     left: 50%;
-    margin-left: -18px;
+    bottom: 5px;
+    margin: 0 0 0 -18px;
     background-position: -286px -41px;
   }
 
-  .root-docking-icon.right {
+  .ev-docking-container-icon.right {
     top: 50%;
     right: 5px;
-    margin-top: -18px;
+    margin: -18px 0 0 0;
     background-position: -286px -149px;
   }
 
-  .root-docking-icon.top:hover {
+  .ev-docking-container-icon.top:hover {
     background-position: -322px -5px;
   }
 
-  .root-docking-icon.left:hover {
+  .ev-docking-container-icon.left:hover {
     background-position: -322px -113px;
   }
 
-  .root-docking-icon.bottom:hover {
+  .ev-docking-container-icon.bottom:hover {
     background-position: -322px -41px;
   }
 
-  .root-docking-icon.right:hover {
+  .ev-docking-container-icon.right:hover {
     background-position: -322px -149px;
   }
 
   /******************** docking preview **********************/
-  .preview {
+  .ev-docking-container > .preview,
+  .ev-docking-frame > .preview {
     position: absolute;
-    opacity: 0.45;
-    background-color: #448CCB;
     z-index: 10000;
+    background: #448CCB;
+    opacity: 0.45;
   }
 
-  .preview.top {
-    top: 0px;
-    left: 0px;
+  .ev-docking-container > .preview.top,
+  .ev-docking-frame > .preview.top {
+    top: 0;
+    left: 0;
     width: 100%;
     height: 50%;
   }
 
-  .preview.left {
-    top: 0px;
-    left: 0px;
+  .ev-docking-container > .preview.left,
+  .ev-docking-frame > .preview.left {
+    top: 0;
+    left: 0;
     width: 50%;
     height: 100%;
   }
 
-  .preview.center {
-    top: 0px;
-    left: 0px;
+  .ev-docking-container > .preview.center,
+  .ev-docking-frame > .preview.center {
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
   }
 
-  .preview.right {
-    top: 0px;
+  .ev-docking-container > .preview.right,
+  .ev-docking-frame > .preview.right {
+    top: 0;
     left: 50%;
     width: 50%;
     height: 100%;
   }
 
-  .preview.bottom {
+  .ev-docking-container > .preview.bottom,
+  .ev-docking-frame > .preview.bottom {
     top: 50%;
-    left: 0px;
+    left: 0;
     width: 100%;
     height: 50%;
   }
 
-  .preview-guide {
-    top: 0px;
-    left: 0px;
+  .ev-docking-container > .preview-guide,
+  .ev-docking-frame > .preview-guide {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background-color: transparent;
-    position: absolute;
+    background: transparent;
     border: 5px dashed #3b5a82;
   }
 
   /******************** docking window **********************/
-  .dock-window {
+  .ev-docking-window {
     position: absolute;
     overflow: auto;
-    background-color: #30333A;
+    background: #30333A;
     border: 6px solid #474a53;
     border-radius: 6px;
     -webkit-user-select: none;
@@ -652,73 +659,72 @@
     user-select: none;
   }
 
-  .dock-window .header {
+  .ev-docking-window > .header {
+    display: flex;
+    align-items: center;
     width: 100%;
     height: 30px;
-    display: flex;
-    background-color: #212227;
-    align-items: center;
+    background: #212227;
   }
 
-  .window-icon {
+  .ev-docking-window > .header > .title {
+    flex: auto;
+    margin: 0 0 0 10px;
+    color: #ABAEB5;
+  }
+
+  .ev-docking-window-icon {
     width: 17px;
     height: 17px;
     background-image: url(./docking.image.png);
   }
 
-  .dock-window .header .title {
-    flex: auto;
-    color: #ABAEB5;
-    margin-left: 10px;
-  }
-
-  .dock-window .header .window-icon.maximize {
+  .ev-docking-window-icon.maximize {
+    margin: 0 7px 0 0;
     background-position: -70px -131px;
-    margin: 0 7px 0 0;
   }
 
-  .dock-window .header .window-icon.close {
+  .ev-docking-window-icon.close {
+    margin: 0 7px 0 0;
     background-position: -70px -51px;
-    margin: 0 7px 0 0;
   }
 
-  .dock-window .header .window-icon.maximize:hover {
+  .ev-docking-window-icon.maximize:hover {
     background-position: -70px -151px;
   }
 
-  .dock-window .header .window-icon.close:hover {
+  .ev-docking-window-icon.close:hover {
     background-position: -70px -71px;
   }
 
-  .dock-window .body {
+  .ev-docking-window > .body {
     width: 100%;
-    background-color: transparent;
+    background: transparent;
   }
 
   /******************** dock frame option icon **********************/
-  .option-icon-wrap {
+  .ev-docking-frame-option-icon-wrap {
     position: absolute;
     display: flex;
+    z-index: 50000;
     top: -25px;
-    right: 0px;
+    right: 0;
     width: 116px;
     height: 25px;
-    z-index: 50000;
   }
 
-  .option-icon {
-    background-image: url(./docking.image.png);
+  .ev-docking-frame-option-icon {
     width: 58px;
     height: 25px;
+    background-image: url(./docking.image.png);
     cursor: pointer;
   }
 
-  .option-icon.close {
+  .ev-docking-frame-option-icon.close {
     background-position: -1px -225px;
   }
 
-  .option-icon.detach {
+  .ev-docking-frame-option-icon.detach {
     background-position: -62px -225px;
   }
-
 </style>

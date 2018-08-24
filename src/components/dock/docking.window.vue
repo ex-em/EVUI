@@ -1,7 +1,7 @@
 <template>
   <div
     :style="`left: ${getLeft}px; top: ${getTop}px; width: ${getWidth}px; height: ${getHeight}px;`"
-    class="dock-window"
+    class="ev-docking-window"
   >
     <div
       class="header"
@@ -12,10 +12,10 @@
         @dblclick="onRestore"
       >{{ id }}</div>
       <div
-        class="window-icon maximize"
+        class="ev-docking-window-icon maximize"
       />
       <div
-        class="window-icon close"
+        class="ev-docking-window-icon close"
         @click.stop="onClose"
       />
     </div>
