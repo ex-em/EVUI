@@ -233,11 +233,14 @@ class Calendar {
   }
   mouseInit() {
     this.initMouseclick();
-    this.initMouseover();
+    this.initMousemove();
     this.initMouseleave();
   }
   initOptionsProperty() {
-    if (this.options.initSelectDay) {
+    if (this.options.initSelectDayFlag
+      && this.options.selectDayType === 'day'
+      && this.options.initSelectDay
+    ) {
       if (!this.options.timeExpand) {
         this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
       } else {
@@ -252,6 +255,32 @@ class Calendar {
           = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
       }
       const initSelectDay = new Date(this.options.initSelectDay);
+      const obj = {
+        year: initSelectDay.getFullYear(),
+        month: initSelectDay.getMonth() + 1,
+        day: initSelectDay.getDate(),
+      };
+      this.coordinate.calendarArea.selectDayArr.push(obj);
+      // if (!this.options.timeExpand) {
+      //   this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
+      //   const initSelectDay = new Date(this.options.initSelectDay);
+      //   const obj = {
+      //     year: initSelectDay.getFullYear(),
+      //     month: initSelectDay.getMonth() + 1,
+      //     day: initSelectDay.getDate(),
+      //   };
+      //   this.coordinate.calendarArea.selectDayArr.push(obj);
+      // } else {
+      //   this.coordinate.timeArea.hour.select = this.options.initSelectDay.getHours();
+      //   this.coordinate.timeArea.hour.page
+      //     = Math.floor(this.coordinate.timeArea.hour.select / 12) + 1;
+      //   this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
+      //   this.coordinate.timeArea.minute.page
+      //     = Math.floor(this.coordinate.timeArea.minute.select / 12) + 1;
+      //   this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
+      //   this.coordinate.timeArea.second.page
+      //     = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
+      // }
       this.options.currentYearMonth =
         new Date(initSelectDay.getFullYear(), initSelectDay.getMonth(), 1);
     }
@@ -341,17 +370,12 @@ class Calendar {
     // this.thisMonthWeekCnt = +Math.ceil((this.thisMonthFirstDay + this.thisMonthLastDate) / 7);
   }
 
-  initMouseover() {
+  initMousemove() {
     this.overCanvas.addEventListener('mousemove', (e) => {
       e.preventDefault();
       // init value
       const overCtx = this.overCtx;
       let mouseoverFlag = false;
-      // init clear all canvas
-      // this.clearCanvas(
-      //   overCtx, 0, 0,
-      //   this.overCanvas.width, this.overCanvas.height
-      // );
 
       // mousemove on day box in calendar area
       // e.offsetX의 너비에 + this.options.timeArea.titleWidth를 하는 이유는 calendarArea에서 마우스가
@@ -366,48 +390,8 @@ class Calendar {
           calendarAreaTotal.startX, calendarAreaTotal.startY,
           calendarAreaTotal.width, calendarAreaTotal.height,
         );
-        const allDay = this.coordinate.calendarArea.allDay;
-        const selectDayArr = this.coordinate.calendarArea.selectDayArr;
-        allDay.forEach((v) => {
-          if (e.offsetX > v.startX && e.offsetX < v.startX + v.width
-            && e.offsetY > v.startY && e.offsetY < v.startY + v.height
-          ) {
-            if (this.options.limitToday) {
-              const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
-              const initLimitDay = this.options.initLimitDay;
-              if (initLimitDay < mouseoverDay) {
-                return undefined;
-              }
-            }
-            mouseoverFlag = true;
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.mousemoveDayFill,
-                },
-              },
-            );
-          }
-          selectDayArr.forEach((s) => {
-            if (v.date.year === s.year
-              && v.date.month === s.month
-              && v.date.day === s.day) {
-              this.dynamicDraw(
-                overCtx, v.startX, v.startY,
-                v.width, v.height,
-                {
-                  fill: {
-                    show: true,
-                    color: this.options.colors.selectDayFill,
-                  },
-                },
-              );
-            }
-          });
-        });
+        this.mousemoveDate(e);
+        mouseoverFlag = true;
       }
 
       // mousemove on hour, minute, second box
@@ -503,28 +487,13 @@ class Calendar {
       overCtx,
       calendarAreaTotal.startX, calendarAreaTotal.startY,
       calendarAreaTotal.width, calendarAreaTotal.height,
-    ); // calendar영역만 clear
-    let mouseclickCondition = false;
+    );
     allDay.forEach((v, idx) => {
-      // type이 'day'일 때 initSelectDay(최초 선택날짜)여부에 따라 선택
-      if (this.options.initSelectDayFlag && this.options.selectDayType === 'day') {
-        const initSelectDay = new Date(this.options.initSelectDay);
-        if (v.date.year === initSelectDay.getFullYear()
-          && v.date.month === initSelectDay.getMonth() + 1
-          && v.date.day === initSelectDay.getDate()) {
-          selectDayArr.push(v.date);
-        }
-      }
-      // mouseevent가 없을 시 redraw selected day
-      if (e) {
-        mouseclickCondition = (e.offsetX > v.startX
-          && e.offsetX < v.startX + v.width
-          && e.offsetY > v.startY
-          && e.offsetY < v.startY + v.height
-        );
-      }
       // click in area
-      if (mouseclickCondition) {
+      if (e.offsetX > v.startX
+        && e.offsetX < v.startX + v.width
+        && e.offsetY > v.startY
+        && e.offsetY < v.startY + v.height) {
         // 오늘 이후 비활성화 시 return false
         if (this.options.limitToday) {
           const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
@@ -583,40 +552,11 @@ class Calendar {
             selectDayArr.shift();
           }
         }
-        // 현재 마우스 클릭하려고 올려놓은 부분을 마우스무브 색상으로 fill
-        this.dynamicDraw(
-          overCtx, v.startX, v.startY,
-          v.width, v.height,
-          {
-            fill: {
-              show: true,
-              color: this.options.colors.mousemoveDayFill,
-            },
-          },
-        );
       }
     });
-    // initSelectDayFlag change false
+
     this.options.initSelectDayFlag = false;
-    // redraw select days
-    allDay.forEach((v) => {
-      selectDayArr.forEach((s) => {
-        if (v.date.year === s.year
-          && v.date.month === s.month
-          && v.date.day === s.day) {
-          this.dynamicDraw(
-            overCtx, v.startX, v.startY,
-            v.width, v.height,
-            {
-              fill: {
-                show: true,
-                color: this.options.colors.selectDayFill,
-              },
-            },
-          );
-        }
-      });
-    });
+    this.mousemoveDate(e);
   }
 
   updateTimeArea(changedType) {
@@ -658,7 +598,9 @@ class Calendar {
       const calendarAreaTotal = this.coordinate.calendarArea.total;
 
       // CLICK triangle in picker area (LEFT, RIGHT)
-      if (e.offsetY > pickerAreaTotal.startY
+      if (e.offsetX > pickerAreaTotal.startX
+        && e.offsetX < pickerAreaTotal.startX + pickerAreaTotal.width
+        && e.offsetY > pickerAreaTotal.startY
         && e.offsetY < pickerAreaTotal.startY + pickerAreaTotal.height) {
         const pickerAreaArrow = this.coordinate.pickerArea.arrow;
         const pickerAreaOption = this.options.pickerArea;
@@ -678,21 +620,24 @@ class Calendar {
                 new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
             }
             this.initCalendarProperty();
-            this.drawCanvas();
+            this.drawCalendarDay();
+            this.clearCalendarArea();
+            this.mousemoveDate();
           }
         });
       }
 
       // CLICK Date logic
-      if (e.offsetY > calendarAreaTotal.startY
+      if (e.offsetX > calendarAreaTotal.startX
+        && e.offsetX < calendarAreaTotal.startX + calendarAreaTotal.width
+        && e.offsetY > calendarAreaTotal.startY
         && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
         this.mouseclickDate(e);
       }
 
+      // CLICK triangle in time area (TOP, BOTTOM)
       const timePageWidth = this.options.timeArea.pageWidth;
       const timeAreaOption = this.options.timeArea;
-
-      // CLICK triangle in time area (TOP, BOTTOM)
       this.options.timeTypeName.forEach((type) => {
         const timeAreaType = this.coordinate.timeArea[type];
         const timeAreaTypeTotal = timeAreaType.total;
@@ -743,6 +688,78 @@ class Calendar {
         });
       });
     });
+  }
+
+  clearCalendarArea() {
+    const overCtx = this.overCtx;
+    const calendarAreaTotal = this.coordinate.calendarArea.total;
+    this.clearCanvas(
+      overCtx,
+      calendarAreaTotal.startX, calendarAreaTotal.startY,
+      calendarAreaTotal.width, calendarAreaTotal.height,
+    );
+  }
+
+  mousemoveDate(e) {
+    // cursorInfo - in - event: select + mousemove
+    // cursorInfo - out: select
+    const overCtx = this.overCtx;
+    const allDay = this.coordinate.calendarArea.allDay;
+    if (e) {
+      const selectDayArr = this.coordinate.calendarArea.selectDayArr;
+      allDay.forEach((v) => {
+        if (e.offsetX > v.startX && e.offsetX < v.startX + v.width
+          && e.offsetY > v.startY && e.offsetY < v.startY + v.height
+        ) {
+          this.dynamicDraw(
+            overCtx, v.startX, v.startY,
+            v.width, v.height,
+            {
+              fill: {
+                show: true,
+                color: this.options.colors.mousemoveDayFill,
+              },
+            },
+          );
+        }
+        selectDayArr.forEach((s) => {
+          if (v.date.year === s.year
+            && v.date.month === s.month
+            && v.date.day === s.day) {
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height,
+              {
+                fill: {
+                  show: true,
+                  color: this.options.colors.selectDayFill,
+                },
+              },
+            );
+          }
+        });
+      });
+    } else {
+      const selectDayArr = this.coordinate.calendarArea.selectDayArr;
+      allDay.forEach((v) => {
+        selectDayArr.forEach((s) => {
+          if (v.date.year === s.year
+            && v.date.month === s.month
+            && v.date.day === s.day) {
+            this.dynamicDraw(
+              overCtx, v.startX, v.startY,
+              v.width, v.height,
+              {
+                fill: {
+                  show: true,
+                  color: this.options.colors.selectDayFill,
+                },
+              },
+            );
+          }
+        });
+      });
+    }
   }
 
   initMouseleave() {
@@ -800,8 +817,8 @@ class Calendar {
       this.drawSplitLine();
       this.drawTimeArea();
     }
-    this.mouseclickDate();
     this.updateTimeArea();
+    this.mousemoveDate();
   }
 
   drawTotalArea() {
@@ -1249,12 +1266,6 @@ class Calendar {
         }
       }
     }
-  }
-
-  // 아직 미완
-  setSelectDays() {
-    const selectDayArr = this.coordinate.calendarArea.selectDayArr;
-    return selectDayArr;
   }
 
   getSelectDateTime() {

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div>
+    <div
+      class="ev-calendar-temp-wrapper"
+    >
       <calendar
         ref="calendarRef"
         :datepicker-options="obj1"
@@ -67,6 +69,9 @@
 </script>
 
 <style>
+  .ev-calendar-temp-wrapper {
+    user-select: none;
+  }
   .evui-calendar-temp {
     display: inline-block;
   }

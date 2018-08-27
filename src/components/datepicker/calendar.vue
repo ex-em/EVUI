@@ -57,10 +57,8 @@
     },
     methods: {
       updateSelectOneDay() {
-        if (this.calendar.setSelectDays()) {
-          const selectDateTime = this.calendar.getSelectDateTime();
-          this.$emit('input', selectDateTime);
-        }
+        const selectDateTime = this.calendar.getSelectDateTime();
+        this.$emit('input', selectDateTime);
       },
       lpad10(v) {
         let value = v;
