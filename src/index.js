@@ -49,7 +49,6 @@ const install = function (Vue) {
   });
 
   Vue.use(Vuex);
-  Vue.prototype.$dockBus = new Vue();
 };
 
 // auto install
