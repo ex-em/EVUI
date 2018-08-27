@@ -17,21 +17,20 @@
             {
               id: 'simple1',
               name: 'simple1',
-              stack: true,
-              data: [5, 3, 6, 8, 9],
+              data: [3, 8, 10, 5, 3],
             },
             {
               id: 'simple2',
               name: 'simple2',
-              stack: true,
-              data: [3, 8, 10, 5, 3],
+              data: [5, 3, 6, 8, 9],
             },
           ],
         },
         horizontalOptions: {
           type: 'bar',
-          width: '400px',
-          height: '350px',
+          width: '550px',
+          height: '230px',
+          stack: true,
           tickness: 0.8,
           horizontal: true,
           xAxes: [{
