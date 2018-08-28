@@ -494,60 +494,110 @@ class Calendar {
         && e.offsetX < v.startX + v.width
         && e.offsetY > v.startY
         && e.offsetY < v.startY + v.height) {
-        // 오늘 이후 비활성화 시 return false
-        if (this.options.limitToday) {
-          const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
-          const initLimitDay = new Date(this.options.initLimitDay);
-          // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
-          const initSelectGetDay = initLimitDay.getDay();
-          // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
-          const initSelectSunday = new Date();
-          initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
-          initSelectSunday.setHours(0, 0, 0, 0);
-          // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
-          if (initLimitDay < mouseoverDay) {
-            return undefined;
-          } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
-            if (this.options.selectDayType === 'weekday') {
-              // 개발 필요
-            }
-          }
-        }
+        // // 오늘 이후 비활성화 시 return false
+        // if (this.options.limitToday) {
+        //   const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
+        //   const initLimitDay = new Date(this.options.initLimitDay);
+        //   // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
+        //   const initSelectGetDay = initLimitDay.getDay();
+        //   // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
+        //   const initSelectSunday = new Date();
+        //   initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
+        //   initSelectSunday.setHours(0, 0, 0, 0);
+        //   // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
+        //   if (initLimitDay < mouseoverDay) {
+        //     return undefined;
+        //   } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
+        //     if (this.options.selectDayType === 'weekday') {
+        //       // 개발 필요
+        //     }
+        //   }
+        // }
         // selectDayType에 따라 선택
         if (this.options.selectDayType === 'weekday') {
           // 1주평일(5일)
           const selectGetDay = idx % 7; // 요일
-          if (selectGetDay >= 1 && selectGetDay <= 5) {
-            for (let ix = 1, ixLen = 6; ix < ixLen; ix++) {
+          let date;
+          // 기존에 존재할 경우, selectDayArr.length === 0인 경우
+          let exist = false;
+          for (let ix = 1, ixLen = 6; ix < ixLen; ix++) {
+            if (selectGetDay >= 1 && selectGetDay <= 5) {
+              // 월 ~ 금 클릭 시
               if (ix < selectGetDay) {
-                selectDayArr.push(allDay[idx - ix].date);
+                date = allDay[idx - ix].date;
               } else if (ix >= selectGetDay) {
-                selectDayArr.push(allDay[(idx + ix) - selectGetDay].date);
+                date = allDay[(idx + ix) - selectGetDay].date;
               }
-              if (selectDayArr.length > this.options.selectDayLimit * 5) {
-                selectDayArr.shift();
+            } else if (selectGetDay === 0 || selectGetDay === 6) {
+              // 일, 토 클릭 시
+              date = allDay[(idx + ix) - selectGetDay].date;
+            }
+            // exist: remove, noExist: push
+            for (let jx = 0, jxLen = selectDayArr.length; jx < jxLen; jx++) {
+              if (selectDayArr[jx].year === date.year
+                && selectDayArr[jx].month === date.month
+                && selectDayArr[jx].day === date.day) {
+                exist = true;
               }
             }
-          } else if (selectGetDay === 0 || selectGetDay === 6) {
-            for (let ix = 1, ixLen = 6; ix < ixLen; ix++) {
-              selectDayArr.push(allDay[(idx + ix) - selectGetDay].date);
-              if (selectDayArr.length > this.options.selectDayLimit * 5) {
-                selectDayArr.shift();
-              }
+            if (exist) {
+              _.remove(selectDayArr, date);
+            } else {
+              selectDayArr.push(date);
+            }
+            // overflow: shift
+            if (selectDayArr.length > this.options.selectDayLimit * 5) {
+              selectDayArr.shift();
             }
           }
         } else if (this.options.selectDayType === 'week') {
           // 1주일(7일)
           const selectGetDay = idx % 7; // 요일
+          let date;
+          // 기존에 존재할 경우, selectDayArr.length === 0인 경우
+          let exist = false;
           for (let ix = 0, ixLen = 7; ix < ixLen; ix++) {
-            selectDayArr.push(allDay[(idx + ix) - selectGetDay].date);
+            date = allDay[(idx + ix) - selectGetDay].date;
+            // exist: remove, noExist: push
+            for (let jx = 0, jxLen = selectDayArr.length; jx < jxLen; jx++) {
+              if (selectDayArr[jx].year === date.year
+                && selectDayArr[jx].month === date.month
+                && selectDayArr[jx].day === date.day) {
+                exist = true;
+              }
+            }
+            if (exist) {
+              _.remove(selectDayArr, date);
+            } else {
+              selectDayArr.push(date);
+            }
+            // overflow: shift
             if (selectDayArr.length > this.options.selectDayLimit * 7) {
               selectDayArr.shift();
             }
           }
         } else if (this.options.selectDayType === 'day') {
-          // 하루
-          selectDayArr.push(v.date);
+          // 하루씩 선택 (this.options.selectDayLimit 일수만큼 선택 가능)
+          const date = v.date;
+          if (this.options.selectDayLimit > 1) {
+            // 기존에 존재할 경우, selectDayArr.length === 0인 경우
+            let exist = false;
+            for (let jx = 0, jxLen = selectDayArr.length; jx < jxLen; jx++) {
+              if (selectDayArr[jx].year === date.year
+                && selectDayArr[jx].month === date.month
+                && selectDayArr[jx].day === date.day) {
+                exist = true;
+              }
+            }
+            if (exist) {
+              _.remove(selectDayArr, date);
+            } else {
+              selectDayArr.push(date);
+            }
+          } else if (this.options.selectDayLimit === 1) {
+            selectDayArr.push(date);
+          }
+          // overflow: shift
           if (selectDayArr.length > this.options.selectDayLimit) {
             selectDayArr.shift();
           }
@@ -557,6 +607,17 @@ class Calendar {
 
     this.options.initSelectDayFlag = false;
     this.mousemoveDate(e);
+  }
+
+  pushRemoveArray(date, selectDay) {
+    const selectDayArr = this.coordinate.calendarArea.selectDayArr;
+    if (selectDay.year === date.year
+      && selectDay.month === date.month
+      && selectDay.day === date.day) {
+      _.remove(selectDayArr, selectDay);
+    } else {
+      selectDayArr.push(date);
+    }
   }
 
   updateTimeArea(changedType) {
