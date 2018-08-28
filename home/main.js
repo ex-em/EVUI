@@ -12,6 +12,7 @@ Vue.use(EVUI);
 Vue.prototype.$http = Axios;
 Vue.config.debug = true;
 Vue.prototype.$tableData = rowdata;
+Vue.prototype.$Vue = Vue;
 
 const router = new VueRouter({
   mode: 'history',

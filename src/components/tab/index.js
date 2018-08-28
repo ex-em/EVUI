@@ -8,5 +8,8 @@
  *
  */
 import tab from './tab';
+import tabContent from './tab.content';
+import tabs from './tabs';
 
 export default tab;
+export { tabs, tabContent };
