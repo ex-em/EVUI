@@ -81,7 +81,8 @@
         type: Object,
         default() {
           return {
-            initSelectDay: this.$props.value ? new Date(this.$props.value) : null,
+            initSelectDay: this.$props.value ? moment(this.$props.value) : null,
+//            initSelectDay: this.$props.value ? new Date(this.$props.value) : null,
           };
         },
       },
@@ -110,7 +111,8 @@
         }
         return Object.assign(this.$props.options, {
           initSelectDayFlag: flag,
-          initSelectDay: this.$props.value ? new Date(this.$props.value) : new Date(),
+          initSelectDay: this.$props.value
+            ? new Date(moment(this.$props.value, this.options.localeType)) : new Date(),
         });
       },
     },

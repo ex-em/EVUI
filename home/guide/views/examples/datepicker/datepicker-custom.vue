@@ -1,9 +1,19 @@
 <template>
   <div>
     <ev-datepicker
-      v-model="bindDay"
-      :options="option"
-      class="evui-datepicker-temp"
+      v-model="bindDay1"
+      :options="option1"
+      class="ev-datepicker-temp"
+    />
+    <ev-datepicker
+      v-model="bindDay2"
+      :options="option2"
+      class="ev-datepicker-temp"
+    />
+    <ev-datepicker
+      v-model="bindDay3"
+      :options="option3"
+      class="ev-datepicker-temp"
     />
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
@@ -15,12 +25,26 @@
     },
     data() {
       return {
-        bindDay: '2018-06-09 22:00:00',
-        option: {
+        bindDay1: '2018-06-09 22:11:33',
+        option1: {
           selectDayType: 'day',
           initSelectDayFlag: true,
           timeExpand: true,
-          localeType: 'Y-m-d H:i:s',
+          localeType: 'YYYY-MM-DD HH:mm:ss',
+        },
+        bindDay2: '2018-06-09 11:01',
+        option2: {
+          selectDayType: 'day',
+          initSelectDayFlag: true,
+          timeExpand: true,
+          localeType: 'YYYY-MM-DD HH:mm',
+        },
+        bindDay3: '2018-06-09 09',
+        option3: {
+          selectDayType: 'day',
+          initSelectDayFlag: true,
+          timeExpand: true,
+          localeType: 'YYYY-MM-DD HH',
         },
       };
     },
@@ -30,7 +54,7 @@
 </script>
 
 <style scoped>
-  .evui-datepicker-temp {
+  .ev-datepicker-temp {
     display: inline-block;
   }
 </style>

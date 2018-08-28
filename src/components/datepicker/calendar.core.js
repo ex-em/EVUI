@@ -128,7 +128,7 @@ class Calendar {
       timeExpand: false, // 아직은 false로 놔둠
       // timeExpand가 true일 때 'H', 'HM', 'HMS'가 right영역에 추가되는 타입
       // timeExpand가 false면 localeType은 'Y-m-d'
-      localeType: 'Y-m-d H:i:s',
+      localeType: 'YYYY-MM-DD HH:mm:ss', // Y-m-d H:i:s
     };
 
     // parameter mapping
@@ -245,12 +245,12 @@ class Calendar {
         this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
       } else {
         this.coordinate.timeArea.hour.select = this.options.initSelectDay.getHours();
+        this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
+        this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
         this.coordinate.timeArea.hour.page
           = Math.floor(this.coordinate.timeArea.hour.select / 12) + 1;
-        this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
         this.coordinate.timeArea.minute.page
           = Math.floor(this.coordinate.timeArea.minute.select / 12) + 1;
-        this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
         this.coordinate.timeArea.second.page
           = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
       }
@@ -377,6 +377,8 @@ class Calendar {
       // mousemove on hour, minute, second box
       const timeTypeName = this.options.timeTypeName;
       const timeAreaTotal = this.coordinate.timeArea.total;
+      const localeType = this.options.localeType;
+      let condition = true;
       if (e.offsetX > timeAreaTotal.startX
         && e.offsetX < timeAreaTotal.startX + timeAreaTotal.width
         && e.offsetY > timeAreaTotal.startY
@@ -387,36 +389,47 @@ class Calendar {
           timeAreaTotal.width, timeAreaTotal.height,
         );
         timeTypeName.forEach((type) => {
-          const timeAreaType = this.coordinate.timeArea[type];
-          timeAreaType.data.forEach((v, idx) => {
-            if (timeAreaType.page === v.page) {
-              if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
-                && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
-                this.dynamicDraw(
-                  overCtx, v.startX, v.startY,
-                  v.width, v.height,
-                  {
-                    fill: {
-                      show: true,
-                      color: this.options.colors.mousemoveDayFill,
+          if (localeType === 'YYYY-MM-DD HH:mm:ss') {
+            condition = type === 'hour' || type === 'minute' || type === 'second';
+          } else if (localeType === 'YYYY-MM-DD HH:mm') {
+            condition = type === 'hour' || type === 'minute';
+          } else if (localeType === 'YYYY-MM-DD HH') {
+            condition = type === 'hour';
+          }
+          if (condition) {
+            const timeAreaType = this.coordinate.timeArea[type];
+            timeAreaType.data.forEach((v, idx) => {
+              if (timeAreaType.page === v.page) {
+                if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
+                  && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
+                  this.dynamicDraw(
+                    overCtx, v.startX, v.startY,
+                    v.width, v.height,
+                    {
+                      fill: {
+                        show: true,
+                        color: this.options.colors.mousemoveDayFill,
+                      },
                     },
-                  },
-                );
-                mouseoverFlag = true;
-              }
-              if (timeAreaType.select === idx) {
-                this.dynamicDraw(
-                  overCtx, v.startX, v.startY,
-                  v.width, v.height, {
-                    fill: {
-                      show: true,
-                      color: this.options.colors.selectDayFill,
+                  );
+                  mouseoverFlag = true;
+                }
+                if (timeAreaType.select === idx) {
+                  this.dynamicDraw(
+                    overCtx, v.startX, v.startY,
+                    v.width, v.height, {
+                      fill: {
+                        show: true,
+                        color: this.options.colors.selectDayFill,
+                      },
                     },
-                  },
-                );
+                  );
+                }
               }
-            }
-          });
+            });
+          } else {
+            this.updateTimeArea(type);
+          }
         });
       }
 
@@ -589,17 +602,6 @@ class Calendar {
     this.mousemoveDate(e);
   }
 
-  pushRemoveArray(date, selectDay) {
-    const selectDayArr = this.coordinate.calendarArea.selectDayArr;
-    if (selectDay.year === date.year
-      && selectDay.month === date.month
-      && selectDay.day === date.day) {
-      _.remove(selectDayArr, selectDay);
-    } else {
-      selectDayArr.push(date);
-    }
-  }
-
   updateTimeArea(changedType) {
     const overCtx = this.overCtx;
     let condition = true;
@@ -631,6 +633,7 @@ class Calendar {
       }
     });
   }
+
 
   initMouseclick() {
     this.overCanvas.addEventListener('click', (e) => {
@@ -679,7 +682,8 @@ class Calendar {
       // CLICK triangle in time area (TOP, BOTTOM)
       const timePageWidth = this.options.timeArea.pageWidth;
       const timeAreaOption = this.options.timeArea;
-      this.options.timeTypeName.forEach((type) => {
+      const timeTypeName = this.options.timeTypeName;
+      timeTypeName.forEach((type) => {
         const timeAreaType = this.coordinate.timeArea[type];
         const timeAreaTypeTotal = timeAreaType.total;
         if (e.offsetX > timeAreaTypeTotal.startX + timeAreaTypeTotal.width
@@ -712,21 +716,32 @@ class Calendar {
         }
       });
 
-      // CLICK triangle in time area (TOP, BOTTOM)
-      this.options.timeTypeName.forEach((type) => {
-        const timeAreaType = this.coordinate.timeArea[type];
-        const timeAreaTypeData = timeAreaType.data;
-        timeAreaTypeData.forEach((v, idx) => {
-          if (timeAreaType.page === v.page) {
-            if (e.offsetX > v.startX
-              && e.offsetX < v.startX + v.width
-              && e.offsetY > v.startY
-              && e.offsetY < v.startY + v.height) {
-              timeAreaType.select = idx;
-              this.updateTimeArea(type);
+      // CLICK Time logic
+      const localeType = this.options.localeType;
+      let condition = true;
+      timeTypeName.forEach((type) => {
+        if (localeType === 'YYYY-MM-DD HH:mm:ss') {
+          condition = type === 'hour' || type === 'minute' || type === 'second';
+        } else if (localeType === 'YYYY-MM-DD HH:mm') {
+          condition = type === 'hour' || type === 'minute';
+        } else if (localeType === 'YYYY-MM-DD HH') {
+          condition = type === 'hour';
+        }
+        if (condition) {
+          const timeAreaType = this.coordinate.timeArea[type];
+          const timeAreaTypeData = timeAreaType.data;
+          timeAreaTypeData.forEach((v, idx) => {
+            if (timeAreaType.page === v.page) {
+              if (e.offsetX > v.startX
+                && e.offsetX < v.startX + v.width
+                && e.offsetY > v.startY
+                && e.offsetY < v.startY + v.height) {
+                timeAreaType.select = idx;
+                this.updateTimeArea(type);
+              }
             }
-          }
-        });
+          });
+        }
       });
     });
   }
@@ -854,12 +869,12 @@ class Calendar {
     this.drawTotalArea();
     this.drawPickerArea();
     this.drawCalendarArea();
+    this.mousemoveDate();
     if (this.options.timeExpand) {
       this.drawSplitLine();
       this.drawTimeArea();
+      this.updateTimeArea();
     }
-    this.updateTimeArea();
-    this.mousemoveDate();
   }
 
   drawTotalArea() {
@@ -1323,13 +1338,13 @@ class Calendar {
       } else {
         // 연,월,일 + alpha
         switch (this.options.localeType) {
-          case 'Y-m-d H:i:s':
+          case 'YYYY-MM-DD HH:mm:ss':
             returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}:${this.lpad10(selectMinute)}:${this.lpad10(selectSecond)}`;
             break;
-          case 'Y-m-d H:i':
+          case 'YYYY-MM-DD HH:mm':
             returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}:${this.lpad10(selectMinute)}`;
             break;
-          case 'Y-m-d H':
+          case 'YYYY-MM-DD HH':
             returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}`;
             break;
           default:
