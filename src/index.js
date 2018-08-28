@@ -13,7 +13,6 @@ import EvSlider from '@/components/slider';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
-import EvDocking from '@/components/dock';
 import EvLabel from '@/components/label';
 import Vuex from 'vuex';
 
@@ -33,7 +32,6 @@ const components = {
   EvTable,
   EvTimePicker,
   EvToggle,
-  EvDocking,
   EvLabel,
 };
 
