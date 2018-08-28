@@ -261,26 +261,6 @@ class Calendar {
         day: initSelectDay.getDate(),
       };
       this.coordinate.calendarArea.selectDayArr.push(obj);
-      // if (!this.options.timeExpand) {
-      //   this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
-      //   const initSelectDay = new Date(this.options.initSelectDay);
-      //   const obj = {
-      //     year: initSelectDay.getFullYear(),
-      //     month: initSelectDay.getMonth() + 1,
-      //     day: initSelectDay.getDate(),
-      //   };
-      //   this.coordinate.calendarArea.selectDayArr.push(obj);
-      // } else {
-      //   this.coordinate.timeArea.hour.select = this.options.initSelectDay.getHours();
-      //   this.coordinate.timeArea.hour.page
-      //     = Math.floor(this.coordinate.timeArea.hour.select / 12) + 1;
-      //   this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
-      //   this.coordinate.timeArea.minute.page
-      //     = Math.floor(this.coordinate.timeArea.minute.select / 12) + 1;
-      //   this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
-      //   this.coordinate.timeArea.second.page
-      //     = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
-      // }
       this.options.currentYearMonth =
         new Date(initSelectDay.getFullYear(), initSelectDay.getMonth(), 1);
     }
@@ -289,7 +269,7 @@ class Calendar {
     }
   }
   initCanvasProperty() {
-    // set total width, height
+    // set total width, height 1
     if (this.options.width && this.options.height) {
       if (this.options.timeExpand) {
         this.baseCanvas.width = this.options.width * 2;
