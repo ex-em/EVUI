@@ -10,8 +10,6 @@
         </li>
         <li>
           <router-link to="/container">Container</router-link>
-          <router-link to="/dock/dockframeSample">dockframeSample</router-link>
-          <router-link to="/dock/DockingLayout">DockingLayout</router-link>
         </li>
         <li>
           <router-link to="/chart">Chart</router-link>
@@ -21,6 +19,9 @@
         </li>
         <li>
           <router-link to="/selectbox">Selectbox</router-link>
+        </li>
+        <li>
+          <router-link to="/slider">Slider</router-link>
         </li>
         <li>
           <router-link to="/table">Table(page)</router-link>

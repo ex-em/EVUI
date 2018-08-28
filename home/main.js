@@ -61,6 +61,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/selectbox/selectbox-view'], resolve),
     },
     {
+      path: '/slider',
+      component: resolve => require(['./guide/views/examples/slider/slider-view'], resolve),
+    },
+    {
       path: '/table',
       component: resolve => require(['./guide/views/examples/table/table-view'], resolve),
     },
