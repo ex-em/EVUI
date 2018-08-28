@@ -13,10 +13,8 @@ import EvSlider from '@/components/slider';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
-import EvDocking from '@/components/dock';
 import EvLabel from '@/components/label';
 import EvDatepicker from '@/components/datepicker';
-import Vuex from 'vuex';
 
 const components = {
   EvButton,
@@ -34,7 +32,6 @@ const components = {
   EvTable,
   EvTimePicker,
   EvToggle,
-  EvDocking,
   EvLabel,
   EvDatepicker,
 };
@@ -49,8 +46,6 @@ const install = function (Vue) {
   Object.keys(evui).forEach((key) => {
     Vue.component(key, evui[key]);
   });
-
-  Vue.use(Vuex);
 };
 
 // auto install

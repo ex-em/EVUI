@@ -2,11 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
-import DockingSamples from './routers/dock/index';
 
 Vue.use(VueRouter);
 Vue.use(EVUI);
-Vue.use(DockingSamples);
 Vue.config.debug = true;
 
 const router = new VueRouter({
@@ -19,14 +17,6 @@ const router = new VueRouter({
     {
       path: '/container',
       component: resolve => require(['./routers/container'], resolve),
-    },
-    {
-      path: '/dock/dockframeSample',
-      component: resolve => require(['./routers/dock/dockframeSample'], resolve),
-    },
-    {
-      path: '/dock/DockingLayout',
-      component: resolve => require(['./routers/dock/docking.layout'], resolve),
     },
     {
       path: '/chart',
