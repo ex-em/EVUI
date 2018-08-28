@@ -2,51 +2,13 @@ import Axis from './axis';
 import Util from '../core.util';
 
 class AxisStepsScale extends Axis {
-  calculateRange() {
-    // init variable
-    const options = this.options;
-    const chartRect = this.chartRect;
-    const dataStore = this.dataStore;
+  calculateSteps(rangeInfo) {
+    const maxSteps = rangeInfo.maxSteps;
+    const minSteps = rangeInfo.minSteps;
 
-    const maxLabelInfo = dataStore.getLabelTextMaxInfo();
-    // 실제 Axis가 그려질 영역
-    const chartSize = this.units.pos === 'x' ? chartRect.chartWidth : chartRect.chartHeight;
-    this.axisPosInfo = {
-      x1: chartRect.x1 + this.labelOffset.left,
-      x2: chartRect.x2 - this.labelOffset.right,
-      y1: chartRect.y1 + this.labelOffset.top,
-      y2: chartRect.y2 - this.labelOffset.bottom,
-    };
-
-    let currentLabelOffset;
-    if (this.units.pos === 'x') {
-      currentLabelOffset = [this.labelOffset.left, this.labelOffset.right];
-    } else {
-      currentLabelOffset = [this.labelOffset.top, this.labelOffset.bottom];
-    }
-    const drawRange = chartSize - (currentLabelOffset[0] + currentLabelOffset[1]);
-
-    let tickSize;
-    if (this.units.pos === 'x') {
-      // tickSize는 실제 step을 구하기 위해 각 축의 Label중 가장 큰 값을 기준으로 Size를 구한다.
-      tickSize = this.ctx.measureText(this.labelFormat(maxLabelInfo.xText)).width + 20;
-    } else {
-      // Y축의 경우 글자의 높이로 전체 영역을 나누기 위함.
-      tickSize = options.labelStyle.fontSize * 2;
-    }
-
-    const minSteps = 2;
-    const maxSteps = Math.floor(drawRange / tickSize);
-
-    this.skipFitting = minSteps >= maxSteps;
-
-    this.calculateSteps(maxSteps, minSteps);
-  }
-
-  calculateSteps(maxSteps, minSteps) {
-    const graphMax = this.category[this.category.length - 1];
-    const graphMin = this.category[0];
-    const graphRange = this.category.length;
+    const graphMax = this.axisData[this.axisData.length - 1];
+    const graphMin = this.axisData[0];
+    const graphRange = this.axisData.length;
 
     let stepValue = 1;
     let numberOfSteps = Math.round(graphRange / stepValue);
@@ -78,14 +40,17 @@ class AxisStepsScale extends Axis {
   }
 
   drawAxis() {
+    if (this.steps === 0) {
+      return;
+    }
+
     const options = this.options;
     const startPoint = this.axisPosInfo[this.units.rectStart];
     const endPoint = this.axisPosInfo[this.units.rectEnd];
     const offsetPoint = this.axisPosInfo[this.units.rectOffset(options.position)];
     const offsetCounterPoint = this.axisPosInfo[this.units.rectOffsetCounter(options.position)];
 
-    // label font 설정
-    this.ctx.font = Util.getLabelStyle(options);
+    const labelType = options.labelType;
 
     if (this.units.pos === 'x') {
       this.ctx.textAlign = this.stepValue > 1 ? 'start' : 'center';
@@ -95,13 +60,19 @@ class AxisStepsScale extends Axis {
       this.ctx.textBaseline = 'middle';
     }
     this.ctx.fillStyle = options.labelStyle.color;
+    this.ctx.font = Util.getLabelStyle(options);
 
-    if (this.steps === 0) {
-      return;
+
+    let labelPos;
+
+    const labelCount = labelType === 'category' ? this.axisData.length : this.axisData.length - 1;
+    const labelGap = (endPoint - startPoint) / labelCount;
+
+    if (labelType === 'category') {
+      labelPos = this.stepValue > 1 ? 0 : labelGap / 2;
+    } else {
+      labelPos = 0;
     }
-
-    // 각 라벨간 간격
-    const labelGap = (endPoint - startPoint) / this.category.length;
 
     let labelCenter = null;
     let linePosition = null;
@@ -135,16 +106,13 @@ class AxisStepsScale extends Axis {
     this.ctx.strokeStyle = options.gridLineColor;
 
     let labelText;
-    let labelPos;
 
-    for (let ix = 0, ixLen = this.category.length; ix <= ixLen; ix++) {
-      if (this.category[ix]) {
-        options.ticks[ix] = this.category[ix];
+    for (let ix = 0, ixLen = labelCount; ix <= ixLen; ix++) {
+      if (this.axisData[ix]) {
+        options.ticks[ix] = this.axisData[ix];
       } else {
         options.ticks[ix] = '';
       }
-      // step Skip이 존재할 때 label 위치 보정
-      labelPos = this.stepValue > 1 ? 0 : labelGap / 2;
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel;

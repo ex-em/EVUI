@@ -17,7 +17,6 @@ class Axis {
     }
 
     this.units = AXIS_UNITS[this.type];
-    this.startFromZero = false;
     this.skipFitting = false;
   }
 
@@ -45,6 +44,14 @@ class Axis {
     } else {
       maxValue = axisMinMax ? (axisMinMax.max || 1) : 1;
       minValue = axisMinMax ? (axisMinMax.min || 0) : 0;
+    }
+
+    if (options.autoScaleRatio) {
+      maxValue = Math.round(maxValue * (options.autoScaleRatio + 1));
+    }
+
+    if (options.isSetMinZero && options.labelType === 'linear') {
+      minValue = 0;
     }
 
     let currentLabelOffset;
@@ -79,28 +86,20 @@ class Axis {
 
     this.skipFitting = minSteps >= maxSteps;
 
-    if (options.autoScaleRatio !== null) {
-      maxValue *= (options.autoScaleRatio + 1);
-    }
-
-    if (options.labelType === 'linear' && maxValue <= 100) {
-      this.startFromZero = true;
-    }
-
     if (maxValue < 1) {
       maxValue = 1;
     }
 
     if (maxValue === minValue) {
       maxValue += 0.5;
-      if (minValue >= 0.5 && !this.startFromZero) {
+      if (minValue >= 0.5 && !options.isSetMinZero) {
         minValue -= 0.5;
       } else {
         maxValue += 0.5;
       }
     }
 
-    this.calculateSteps(maxValue, minValue, maxSteps, minSteps);
+    this.calculateSteps({ maxValue, minValue, maxSteps, minSteps });
   }
 
   drawAxis() {
@@ -197,36 +196,16 @@ class Axis {
   }
 
   labelFormat(value) {
-    let formattingValue;
-    if (this.options.labelType === 'time') {
-      formattingValue = moment(value).format(this.options.tickFormat);
-    } else if (this.options.labelType === 'linear') {
-      if (value >= 1000000000) {
-        if (value % 1000000000 === 0) {
-          formattingValue = `${(value / 1000000000).toFixed(1)}G`;
-        } else {
-          formattingValue = `${(value / 1000000000).toFixed(1)}G`;
-        }
-      } else if (value >= 1000000) {
-        if (value % 1000000 === 0) {
-          formattingValue = `${(value / 1000000).toFixed(1)}M`;
-        } else {
-          formattingValue = `${(value / 1000000).toFixed(1)}M`;
-        }
-      } else if (value >= 1000) {
-        if (value % 1000 === 0) {
-          formattingValue = `${(value / 1000).toFixed(1)}k`;
-        } else {
-          formattingValue = `${(value / 1000).toFixed(1)}k`;
-        }
-      } else {
-        formattingValue = value.toFixed(1);
-      }
+    const options = this.options;
+    let label;
+
+    if (options.labelType === 'time') {
+      label = moment(value).format(options.tickFormat);
     } else {
-      formattingValue = value;
+      label = value;
     }
 
-    return formattingValue;
+    return label;
   }
 }
 

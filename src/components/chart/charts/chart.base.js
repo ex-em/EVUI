@@ -106,6 +106,7 @@ class BaseChart {
 
     this.xMinMax = this.store.getXMinMax();
     this.yMinMax = this.store.getYMinMax();
+    this.axisList = this.store.getAxisList();
 
     // step6. Add EventListener
     this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
@@ -188,6 +189,7 @@ class BaseChart {
       min: null,
       max: null,
       autoScaleRatio: null,
+      isSetMinZero: false,
       showGrid: false,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
@@ -210,6 +212,7 @@ class BaseChart {
       min: null,
       max: null,
       autoScaleRatio: null,
+      isSetMinZero: false,
       showGrid: true,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
@@ -293,39 +296,11 @@ class BaseChart {
     };
   }
 
-  static suffixFormatter(val) {
-    let result = 0;
-    if (val >= 1000000000) {
-      if (val % 1000000000 === 0) {
-        result = `${(val / 1000000000).toFixed(1)}G`;
-      } else {
-        result = `${(val / 1000000000).toFixed(1)}G`;
-      }
-      return result;
-    } else if (val >= 1000000) {
-      if (val % 1000000 === 0) {
-        result = `${(val / 1000000).toFixed(1)}M`;
-      } else {
-        result = `${(val / 1000000).toFixed(1)}M`;
-      }
-      return result;
-    } else if (val >= 1000) {
-      if (val % 1000 === 0) {
-        result = `${(val / 1000).toFixed(1)}k`;
-      } else {
-        result = `${(val / 1000).toFixed(1)}k`;
-      }
-      return result;
-    }
-
-    return val.toFixed(1);
-  }
-
   setLabelOffset() {
     let labelText;
     let labelSize;
 
-    const labelBuffer = 24;
+    const labelBuffer = 20;
     const xAxes = this.options.xAxes;
     const yAxes = this.options.yAxes;
 
@@ -460,9 +435,7 @@ class BaseChart {
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            category: this.data.category,
-            horizontal: this.options.horizontal,
+            axisData: this.axisList.x[ix] || [],
           });
           break;
         case 'auto':
