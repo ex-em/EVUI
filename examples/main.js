@@ -2,12 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
-import DockingSamples from './routers/dock/index';
-import store from '../src/components/dock/store';
 
 Vue.use(VueRouter);
 Vue.use(EVUI);
-Vue.use(DockingSamples);
 Vue.config.debug = true;
 
 const router = new VueRouter({
