@@ -1,17 +1,17 @@
-import SimpleLine from './samples/chart.line.simple';
-import FillLine from './samples/chart.line.fill';
-import StackedLine from './samples/chart.line.stack';
-import SimpleBar from './samples/chart.bar.simple';
-import StackedBar from './samples/chart.bar.stack';
-import HorizontalBar from './samples/chart.bar.horizontal';
+import SimpleLineChart from './samples/chart.line.simple';
+import FillLineChart from './samples/chart.line.fill';
+import StackedLineChart from './samples/chart.line.stack';
+import SimpleBarChart from './samples/chart.bar.simple';
+import StackedBarChart from './samples/chart.bar.stack';
+import HorizontalBarChart from './samples/chart.bar.horizontal';
 
 const components = {
-  SimpleLine,
-  FillLine,
-  StackedLine,
-  SimpleBar,
-  StackedBar,
-  HorizontalBar,
+  SimpleLineChart,
+  FillLineChart,
+  StackedLineChart,
+  SimpleBarChart,
+  StackedBarChart,
+  HorizontalBarChart,
 };
 
 const testSamples = {

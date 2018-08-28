@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 import App from './app';
 import EVUI from '../src/index';
 import DockingSamples from './routers/dock/index';
-import store from '../src/components/dock/store';
 
 Vue.use(VueRouter);
 Vue.use(EVUI);
@@ -40,6 +39,10 @@ const router = new VueRouter({
     {
       path: '/selectbox',
       component: resolve => require(['./routers/selectbox'], resolve),
+    },
+    {
+      path: '/slider',
+      component: resolve => require(['./routers/slider'], resolve),
     },
     {
       path: '/table',
@@ -79,6 +82,5 @@ const router = new VueRouter({
 const app = new Vue({
   el : '#app',
   router,
-  store,
   render: h => h(App),
 });

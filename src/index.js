@@ -9,6 +9,7 @@ import EvMenu from '@/components/menu';
 import EvRadio from '@/components/radio';
 import EvRadioGroup from '@/components/radio-group';
 import EvSelectbox from '@/components/selectbox';
+import EvSlider from '@/components/slider';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
@@ -28,6 +29,7 @@ const components = {
   EvRadio,
   EvRadioGroup,
   EvSelectbox,
+  EvSlider,
   EvTable,
   EvTimePicker,
   EvToggle,
@@ -47,7 +49,6 @@ const install = function (Vue) {
   });
 
   Vue.use(Vuex);
-  Vue.prototype.$dockBus = new Vue();
 };
 
 // auto install

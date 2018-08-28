@@ -52,7 +52,7 @@
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-group{
     display: inline-block;
     margin-left: 5px;
