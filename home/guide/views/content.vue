@@ -52,6 +52,12 @@
                 content: '닥 컨테이너 샘플',
                 imgUrl: `${this.imgUrl}/dock.png`,
               },
+              {
+                name: 'Window',
+                routerLink: '/window',
+                content: '윈도우',
+                imgUrl: `${this.imgUrl}/window.png`,
+              },
             ],
           },
           {

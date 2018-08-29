@@ -4,16 +4,16 @@ import EvCheckbox from '@/components/checkbox';
 import EvCheckboxGroup from '@/components/checkbox-group';
 import EvIcon from '@/components/icon';
 import EvInput from '@/components/input';
-import EvLoadingmask from '@/components/loadingmask';
-import EvMenu from '@/components/menu';
+import EvLoadingMask from '@/components/loadingmask';
 import EvRadio from '@/components/radio';
 import EvRadioGroup from '@/components/radio-group';
-import EvSelectbox from '@/components/selectbox';
+import EvSelectBox from '@/components/selectbox';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
 import EvDocking from '@/components/dock';
 import EvLabel from '@/components/label';
+import EvWindow from '@/components/window';
 import Vuex from 'vuex';
 
 const components = {
@@ -23,16 +23,16 @@ const components = {
   EvCheckboxGroup,
   EvIcon,
   EvInput,
-  EvLoadingmask,
-  EvMenu,
+  EvLoadingMask,
   EvRadio,
   EvRadioGroup,
-  EvSelectbox,
+  EvSelectBox,
   EvTable,
   EvTimePicker,
   EvToggle,
   EvDocking,
   EvLabel,
+  EvWindow,
 };
 
 const evui = {
