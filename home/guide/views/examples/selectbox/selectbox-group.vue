@@ -1,13 +1,13 @@
 <template>
   <div class="selectbox-group">
-    <Selectbox
+    <ev-selectbox
       :name="'groupCbBox'"
       :selectbox-style="{ width: '180px',height: '30px' }"
       :is-group="true"
       :init-select-idx="3"
       :items="getGroupItemList()"
     />
-    <Selectbox
+    <ev-selectbox
       :name="'groupMultipleCbBox'"
       :selectbox-style="{ width: '180px',height: '30px' }"
       :is-group="true"
@@ -19,13 +19,7 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
-  import Selectbox from '@/components/selectbox/selectbox';
-
   export default {
-    components: {
-      Selectbox,
-    },
     methods: {
       getGroupItemList() {
         let groupObj;

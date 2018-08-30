@@ -1,8 +1,5 @@
 <template>
-  <div
-    :style="listboxStyle"
-    class="evui-listbox"
-  >
+  <div class="evui-listbox">
     <ul
       :class="ulClasses"
       @click.stop="onClick"
@@ -22,12 +19,6 @@
 <script>
   export default {
     props: {
-      listboxStyle: {
-        type: Object,
-        default() {
-          return {};
-        },
-      },
       items: {
         type: Array,
         default() {
