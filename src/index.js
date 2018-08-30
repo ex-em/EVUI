@@ -5,16 +5,16 @@ import EvCheckboxGroup from '@/components/checkbox-group';
 import EvIcon from '@/components/icon';
 import EvInput from '@/components/input';
 import EvLoadingMask from '@/components/loadingmask';
+import EvMenu from '@/components/menu';
 import EvRadio from '@/components/radio';
 import EvRadioGroup from '@/components/radio-group';
 import EvSelectBox from '@/components/selectbox';
+import EvSlider from '@/components/slider';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
-import EvDocking from '@/components/dock';
 import EvLabel from '@/components/label';
 import EvWindow from '@/components/window';
-import Vuex from 'vuex';
 
 const components = {
   EvButton,
@@ -24,13 +24,14 @@ const components = {
   EvIcon,
   EvInput,
   EvLoadingMask,
+  EvMenu,
   EvRadio,
   EvRadioGroup,
   EvSelectBox,
+  EvSlider,
   EvTable,
   EvTimePicker,
   EvToggle,
-  EvDocking,
   EvLabel,
   EvWindow,
 };
@@ -45,9 +46,6 @@ const install = function (Vue) {
   Object.keys(evui).forEach((key) => {
     Vue.component(key, evui[key]);
   });
-
-  Vue.use(Vuex);
-  Vue.prototype.$dockBus = new Vue();
 };
 
 // auto install
