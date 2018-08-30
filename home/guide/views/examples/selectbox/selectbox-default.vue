@@ -2,7 +2,7 @@
   <div class="selectbox-default">
     <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :init-select="0"
       :items="boxInfo.items"
       @keyup="onKeyUp"

@@ -2,7 +2,7 @@
   <div class="selectbox-disabled">
     <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :init-select-idx="0"
       :items="boxInfo.items"
       :disabled="boxInfo.disabled"

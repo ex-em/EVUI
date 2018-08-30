@@ -2,7 +2,7 @@
   <div class="selectbox-multiple">
     <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :multiple="boxInfo.multiple"
       :init-select-idx="0"
       :items="boxInfo.items"

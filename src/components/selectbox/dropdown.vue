@@ -1,7 +1,5 @@
 <template>
-  <div
-    :class="prefixCls"
-  >
+  <div :class="prefixCls">
     <div
       v-if="multiple"
       :class="`${prefixCls}-multiple-input-area`"

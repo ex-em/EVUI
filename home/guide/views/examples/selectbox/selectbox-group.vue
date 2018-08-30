@@ -2,14 +2,14 @@
   <div class="selectbox-group">
     <ev-selectbox
       :name="'groupCbBox'"
-      :selectbox-style="{ width: '180px',height: '30px' }"
+      :style="{ width: '180px',height: '30px' }"
       :is-group="true"
       :init-select-idx="3"
       :items="getGroupItemList()"
     />
     <ev-selectbox
       :name="'groupMultipleCbBox'"
-      :selectbox-style="{ width: '180px',height: '30px' }"
+      :style="{ width: '180px',height: '30px' }"
       :is-group="true"
       :multiple="true"
       :init-select-idx="3"
