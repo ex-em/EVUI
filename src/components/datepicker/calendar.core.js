@@ -33,6 +33,8 @@ class Calendar {
         left: 5,
       },
 
+      // 캔버스만 화면에 보여줄 경우 false (ref. datepicker-default.vue)
+      // input text에 연계하여 드랍다운으로 보여줄 경우 true (ref. datepicker.vue)
       dropdownFlag: true,
 
       // 최초 달력상 연,월
@@ -128,7 +130,7 @@ class Calendar {
       timeExpand: false, // 아직은 false로 놔둠
       // timeExpand가 true일 때 'H', 'HM', 'HMS'가 right영역에 추가되는 타입
       // timeExpand가 false면 localeType은 'Y-m-d'
-      localeType: 'YYYY-MM-DD HH:mm:ss', // Y-m-d H:i:s
+      localeType: 'YYYY-MM-DD', // Y-m-d H:i:s
     };
 
     // parameter mapping
@@ -219,8 +221,8 @@ class Calendar {
     if (e.currentTarget && e.currentTarget.clientHeight) {
       targetDivHeight = e.currentTarget.clientHeight;
     }
-    this.dropdown.style.top = `${(e.pageY - e.offsetY) + targetDivHeight}px`;
-    this.dropdown.style.left = `${e.pageX - e.offsetX}px`;
+    this.dropdown.style.top = `${(e.pageY - e.layerY) + targetDivHeight}px`;
+    this.dropdown.style.left = `${e.pageX - e.layerX}px`;
   }
   hideDropdown() {
     this.dropdown.style.display = 'none';
@@ -395,6 +397,8 @@ class Calendar {
             condition = type === 'hour' || type === 'minute';
           } else if (localeType === 'YYYY-MM-DD HH') {
             condition = type === 'hour';
+          } else if (localeType === 'YYYY-MM-DD') {
+            condition = false;
           }
           if (condition) {
             const timeAreaType = this.coordinate.timeArea[type];
@@ -636,7 +640,7 @@ class Calendar {
 
 
   initMouseclick() {
-    this.overCanvas.addEventListener('click', (e) => {
+    this.overCanvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const pickerAreaTotal = this.coordinate.pickerArea.total;
       const calendarAreaTotal = this.coordinate.calendarArea.total;
@@ -726,6 +730,8 @@ class Calendar {
           condition = type === 'hour' || type === 'minute';
         } else if (localeType === 'YYYY-MM-DD HH') {
           condition = type === 'hour';
+        } else if (localeType === 'YYYY-MM-DD') {
+          condition = false;
         }
         if (condition) {
           const timeAreaType = this.coordinate.timeArea[type];
@@ -1347,6 +1353,9 @@ class Calendar {
           case 'YYYY-MM-DD HH':
             returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)} ${this.lpad10(selectHour)}`;
             break;
+          case 'YYYY-MM-DD':
+            returnStr = `${selectDayArr[0].year}-${this.lpad10(selectDayArr[0].month)}-${this.lpad10(selectDayArr[0].day)}`;
+            break;
           default:
             break;
         }
@@ -1512,6 +1521,14 @@ class Calendar {
         );
       });
     });
+  }
+
+  /*eslint-disable*/
+  setMinute(time) {
+    this.coordinate.timeArea.minute.select = time;
+    this.coordinate.timeArea.minute.page = Math.floor(time / 12) + 1;
+    this.drawTimeAreaContent('minute');
+    this.updateTimeArea('minute');
   }
 
   // DRAW multiple function

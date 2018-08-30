@@ -83,12 +83,12 @@
           };
           element.__vueClickOutside__ = handler;
           // add Event Listeners
-          document.addEventListener('click', handler);
+          document.addEventListener('mousedown', handler);
         },
         unbind(el) {
           const element = el;
           // Remove Event Listeners
-          document.removeEventListener('click', element.__vueClickOutside__);
+          document.removeEventListener('mousedown', element.__vueClickOutside__);
           element.__vueClickOutside__ = null;
         },
       },
@@ -236,10 +236,7 @@
         this.timePickerFadeFlag = false;
       },
       removeColon(val) {
-        if (val && val.indexOf(':') > -1) {
-          return val.replace(/:/gi, '');
-        }
-        return val;
+        return val.replace(/:/gi, '');
       },
       addColon(val) {
         const number = this.removeColon(val);

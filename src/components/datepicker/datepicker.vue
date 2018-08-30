@@ -10,11 +10,12 @@
     >
       <input
         ref="datepickerText"
-        v-model="dataValue"
+        :value="computedValue"
         :class="inputClasses"
+        :placeholder="options.localeType"
         class="evui-datepicker-input"
         type="text"
-        placeholder=" yyyy-mm-dd "
+        v-on="allListeners"
       >
     </div>
   </div>
@@ -47,7 +48,6 @@
                   if (!calendarDropdown[ix].contains(e.target)
                     && calendarDropdown[ix] !== e.target) {
                     outsideClickFlag = false;
-                    vnode.context.setBindValue();
                   }
                 }
               } else {
@@ -56,16 +56,21 @@
             }
             if (outsideClickFlag) {
               bind.value(e);
+            } else if (vnode.context.calendar
+              && vnode.context.calendar.overCanvas
+              && e.target === vnode.context.calendar.overCanvas) {
+              // 클릭한 overCanvas(e.target)가 어떤 vnode의 overCanvas인지 확인하여 데이터 가져옴
+              vnode.context.setBindValue();
             }
           };
           element.__vueClickOutside__ = handler;
           // add Event Listeners
-          document.addEventListener('click', handler);
+          document.addEventListener('mousedown', handler);
         },
         unbind(el) {
           const element = el;
           // Remove Event Listeners
-          document.removeEventListener('click', element.__vueClickOutside__);
+          document.removeEventListener('mousedown', element.__vueClickOutside__);
           element.__vueClickOutside__ = null;
         },
       },
@@ -73,23 +78,26 @@
     props: {
       value: {
         type: String,
-        default() {
-          return null;
-        },
+        default: null,
       },
       options: {
         type: Object,
         default() {
           return {
-            initSelectDay: this.$props.value ? moment(this.$props.value) : null,
-//            initSelectDay: this.$props.value ? new Date(this.$props.value) : null,
+            localeType: 'YYYY-MM-DD',
+            initSelectDay: this.value ? new Date(moment(this.value)) : new Date(),
           };
         },
       },
     },
     data() {
       return {
-        dataValue: this.value,
+        dataValue: this.value, // 최초 value에 computedValue get()의 validDateFormat적용을 위함
+        lastKeyPressSpell: null, // 최근 입력한 스펠
+        formattedText: null, // input text 에 들어갈 실제 내용
+        inputTextMaxLength: 10, // default: YYYY-MM-DD
+        inputNumberMaxLength: 8, // default: YYYYMMDD
+        cursorPosition: 0,
       };
     },
     computed: {
@@ -105,25 +113,67 @@
         return `${prefixCls}-input`;
       },
       mergedOption() {
-        let flag = false;
-        if (this.$props.value) {
-          flag = true;
-        }
         return Object.assign(this.$props.options, {
-          initSelectDayFlag: flag,
+          // moment타입에 맞을 경우 초기input setting
+          initSelectDayFlag: !isNaN(moment(this.$props.value, this.options.localeType)),
+          // bindDay가 있는 경우 표시, 없는 경우 today
           initSelectDay: this.$props.value
             ? new Date(moment(this.$props.value, this.options.localeType)) : new Date(),
+          // localeType이 없는 경우 YYYY-MM-DD가 default
+          localeType: this.$props.options.localeType
+            ? this.$props.options.localeType : 'YYYY-MM-DD',
+        });
+      },
+      computedValue() {
+        return this.validDateFormat(this.dataValue);
+      },
+      allListeners() {
+        const vm = this;
+        return Object.assign({}, this.$listeners, {
+          keydown(e) {
+            const keyValue = e.which || e.keyCode || 0;
+            if (keyValue >= 48 && keyValue <= 57) {
+              // console.log('0 ~ 9');
+            } else if (keyValue >= 96 && keyValue <= 105) {
+              // console.log('keynum 0 ~ 9');
+            } else if (keyValue === 8 || (keyValue >= 16 && keyValue <= 18)
+              || (keyValue >= 35 && keyValue <= 40) || keyValue === 46) {
+              // console.log('backspace, shift, ctrl, alt,
+              // end, home, left, up, right, down, delete');
+            } else {
+              e.preventDefault();
+            }
+          },
+          input(e) {
+            const typingFullValue = e.target.value;
+            const exceptKoreanValue = typingFullValue.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
+            let setValue = '';
+            if (exceptKoreanValue !== typingFullValue) {
+              // 한글 방지
+              setValue = exceptKoreanValue;
+            } else if (vm.removeSpecialSymbols(exceptKoreanValue).length
+              > vm.inputNumberMaxLength) {
+              // length limit
+              setValue = exceptKoreanValue.slice(0, exceptKoreanValue.length - 1);
+            } else {
+              setValue = vm.addSpecialSymbols(exceptKoreanValue);
+            }
+            vm.$refs.datepickerText.value = setValue;
+          },
         });
       },
     },
     watch: {
-      dataValue() {
-      },
     },
     created() {
     },
     mounted() {
       this.calendar = new Calendar(this.$refs.datepickerRef, this.mergedOption);
+      if (this.options.initSelectDayFlag) {
+        this.setBindValue();
+      }
+      this.inputTextMaxLength = this.options.localeType.length;
+      this.inputNumberMaxLength = this.removeSpecialSymbols(this.options.localeType).length;
     },
     beforeDestroy() {
     },
@@ -136,6 +186,47 @@
       },
       setBindValue() {
         this.dataValue = this.calendar.getSelectDateTime();
+      },
+      validDateFormat(v) {
+        if (v && v.length) {
+          if (v.length === 19 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]')) {
+            return v;
+          } else if (v.length === 16 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]')) {
+            return v;
+          } else if (v.length === 13 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9])')) {
+            return v;
+          } else if (v.length === 10 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])')) {
+            return v;
+          }
+          return '';
+        }
+        return '';
+      },
+      removeSpecialSymbols(val) {
+        return val.replace(/( *)(:*)(-*)/g, '');
+      },
+      addSpecialSymbols(val) {
+        const number = this.removeSpecialSymbols(val);
+        const localeType = this.options.localeType || 'YYYY-MM-DD';
+        let returnVal = '';
+        if (localeType === 'YYYY-MM-DD HH:mm:ss') {
+          if (number.length <= 4) {
+            returnVal = number.slice(0);
+          } else if (number.length <= 6) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4)}`;
+          } else if (number.length <= 8) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6)}`;
+          } else if (number.length <= 10) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8)}`;
+          } else if (number.length <= 12) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10)}`;
+          } else if (number.length <= 14) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12)}`;
+          } else {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12, 14)}`;
+          }
+        }
+        return returnVal;
       },
     },
   };
