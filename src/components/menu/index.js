@@ -1,3 +1,4 @@
-import Menu from './menu';
+import NavMenu from './menu.nav';
+import ContextMenu from './menu.context';
 
-export default Menu;
+export { NavMenu, ContextMenu };

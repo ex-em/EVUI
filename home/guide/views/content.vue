@@ -52,6 +52,12 @@
                 content: '닥 컨테이너 샘플',
                 imgUrl: `${this.imgUrl}/dock.png`,
               },
+              {
+                name: 'ContextMenu',
+                routerLink: '/contextmenu',
+                content: '컨텍스트 메뉴',
+                imgUrl: `${this.imgUrl}/contextmenu.png`,
+              },
             ],
           },
           {

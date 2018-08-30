@@ -4,11 +4,11 @@ import EvCheckbox from '@/components/checkbox';
 import EvCheckboxGroup from '@/components/checkbox-group';
 import EvIcon from '@/components/icon';
 import EvInput from '@/components/input';
-import EvLoadingmask from '@/components/loadingmask';
-import EvMenu from '@/components/menu';
+import EvLoadingMask from '@/components/loadingmask';
+import { NavMenu as EvNavMenu, ContextMenu as EvContextMenu } from '@/components/menu';
 import EvRadio from '@/components/radio';
 import EvRadioGroup from '@/components/radio-group';
-import EvSelectbox from '@/components/selectbox';
+import EvSelectBox from '@/components/selectbox';
 import EvSlider from '@/components/slider';
 import EvTable from '@/components/table';
 import EvTimePicker from '@/components/timepicker';
@@ -22,11 +22,12 @@ const components = {
   EvCheckboxGroup,
   EvIcon,
   EvInput,
-  EvLoadingmask,
-  EvMenu,
+  EvLoadingMask,
+  EvNavMenu,
+  EvContextMenu,
   EvRadio,
   EvRadioGroup,
-  EvSelectbox,
+  EvSelectBox,
   EvSlider,
   EvTable,
   EvTimePicker,
