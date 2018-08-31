@@ -148,6 +148,9 @@
             const typingFullValue = e.target.value;
             const exceptKoreanValue = typingFullValue.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
             let setValue = '';
+            vm.cursorPosition = this.$refs.timePickerText.selectionStart;
+            /*eslint-disable*/
+            console.log('vm.cursorPosition : ' + vm.cursorPosition);
             if (exceptKoreanValue !== typingFullValue) {
               // 한글 방지
               setValue = exceptKoreanValue;
@@ -156,7 +159,7 @@
               // length limit
               setValue = exceptKoreanValue.slice(0, exceptKoreanValue.length - 1);
             } else {
-              setValue = vm.addSpecialSymbols(exceptKoreanValue);
+              setValue = vm.addSpecialSymbols(vm.validNumber(exceptKoreanValue));
             }
             vm.$refs.datepickerText.value = setValue;
           },
@@ -227,6 +230,124 @@
           }
         }
         return returnVal;
+      },
+      validNumber(val) {
+        let numberVal = this.removeSpecialSymbols(val);
+        const numberValLength = numberVal.length;
+        if (numberValLength <= 6) {
+          if (numberValLength === 6) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12`;
+            }
+          } else {
+            numberVal = `${numberVal}`;
+          }
+        } else if (numberValLength <= 8) {
+          if (numberValLength === 8) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31`;
+            }
+          } else if (numberValLength === 7) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
+            }
+          }
+        } else if (numberValLength <= 10) {
+          if (numberValLength === 10) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 10)}`;
+            }
+            if (numberVal.slice(8, 10) > 23) {
+              numberVal = `${numberVal.slice(0, 8)}23`;
+            }
+          } else if (numberValLength === 9) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 10)}`;
+            }
+          }
+        } else if (numberValLength <= 12) {
+          if (numberValLength === 12) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 12)}`;
+            }
+            if (numberVal.slice(8, 10) > 23) {
+              numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
+            }
+            if (numberVal.slice(10, 12) > 59) {
+              numberVal = `${numberVal.slice(0, 10)}59`;
+            }
+          } else if (numberValLength === 11) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 12)}`;
+            }
+            if (numberVal.slice(8, 10) > 23) {
+              numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
+            }
+          }
+        } else if (numberValLength <= 14) {
+          if (numberValLength === 14) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+            }
+            if (numberVal.slice(8, 10) > 23) {
+              numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
+            }
+            if (numberVal.slice(10, 12) > 59) {
+              numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
+            }
+            if (numberVal.slice(12, 14) > 59) {
+              numberVal = `${numberVal.slice(0, 12)}59`;
+            }
+          } else if (numberValLength === 13) {
+            if (numberVal.slice(4, 6) > 12) {
+              numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+            }
+            if (numberVal.slice(6, 8) > 31) {
+              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+            }
+            if (numberVal.slice(8, 10) > 23) {
+              numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
+            }
+            if (numberVal.slice(10, 12) > 59) {
+              numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
+            }
+          }
+        } else {
+          if (numberVal.slice(4, 6) > 12) {
+            numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+          }
+          if (numberVal.slice(6, 8) > 31) {
+            numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+          }
+          if (numberVal.slice(8, 10) > 23) {
+            numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
+          }
+          if (numberVal.slice(10, 12) > 59) {
+            numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
+          }
+          if (numberVal.slice(12, 14) > 59) {
+            numberVal = `${numberVal.slice(0, 12)}59`;
+          }
+        }
+        return numberVal;
       },
     },
   };
