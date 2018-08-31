@@ -6,17 +6,20 @@
         :text="'Tab Add'"
         @click="addTab"
       />
-      <Button
-        :type="'primary'"
-        :text="'change Scroll'"
-        @click="scroll = !scroll"
-      />
     </div>
     <div class="tab-default-outer">
       <tabs
-        :scrollable="scroll"
         :tab-data="list"
-      />
+      >
+        <tab
+          :tab-prop="tabItem"
+        />
+        <tab
+          v-for="item in tabItems"
+          :key="item.id"
+          :tab-prop="item"
+        />
+      </tabs>
     </div>
   </div>
 </template>
@@ -25,8 +28,10 @@
   import tabs from '@/components/tab/tabs';
   import Button from '@/components/button/button';
   import targetComponent1 from '../checkbox/checkbox-group-list-handling';
-  import targetComponent2 from '../checkbox/checkbox-group-align';
-  import targetComponent3 from '../checkbox/checkbox-group-default';
+  import targetComponent2 from '../table/table-buffer';
+  import targetComponent3 from '../button/button-loading';
+  import targetComponent4 from '../chart/chart.bar.stack';
+  import targetComponent5 from '../table/table-page';
 
   const componentList = [targetComponent1, targetComponent2, targetComponent3];
 
@@ -40,7 +45,7 @@
       return {
         scroll: false,
         tabItem: {
-          title: 'tab-item0',
+          title: 'use Tag 0',
           isActive: false,
           targetComponent: {
             keyName: 'targetComponent1',
@@ -48,16 +53,28 @@
           },
         },
         tabItems: [{
-            title: 'tab-item1',
+            title: 'use Tag 1',
             isActive: false,
+            targetComponent: {
+              keyName: 'targetComponent3',
+              component: targetComponent3,
+            },
           },
           {
-            title: 'tab-item2',
+            title: 'use Tag 2',
             isActive: false,
+            targetComponent: {
+              keyName: 'targetComponent4',
+              component: targetComponent4,
+            },
           },
           {
-            title: 'tab-item3',
+            title: 'use Tag 3',
             isActive: false,
+            targetComponent: {
+              keyName: 'targetComponent5',
+              component: targetComponent5,
+            },
           },
         ],
         list: this.createList(),

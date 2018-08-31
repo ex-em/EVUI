@@ -16,12 +16,14 @@
           <span
             v-if="tabScroll"
             class="ev-tabs-nav-prev"
+            @click.stop="onLeftMove"
           >
             <icon class="fa-angle-left"/>
           </span>
           <span
             v-if="tabScroll"
             class="ev-tabs-nav-next"
+            @click.stop="onRightMove"
           >
             <icon class="fa-angle-right"/>
           </span>
@@ -31,6 +33,7 @@
           >
             <div
               ref="tabListRef"
+              :style="styleObj"
               class="ev-tabs-nav"
             >
               <tab
@@ -117,6 +120,7 @@
         },
         tabListRect: null,
         tabWrapperRect: null,
+        styleObj: 'transform: \'\'',
         currentX: 0,
       };
     },
@@ -127,12 +131,13 @@
         }];
       },
       getTranslateX() {
-        return [{
-          transform: `translateX(${this.currentX}px)`,
-        }];
+        return [];
       },
     },
     watch: {
+      styleObj() {
+        console.log(this.styleObj);
+      },
       currentTab() {
         this.currentTab.isActive = true;
       },
@@ -148,7 +153,7 @@
           this.setActive(tabItem);
           this.idTag += 1;
           this.tabLength += 1;
-          this.setTabListWidth();
+          this.setTabListWidth('added');
         }
       },
     },
@@ -250,7 +255,7 @@
       },
       close(data) {
         this.removeTabTarget(data);
-        this.setTabListWidth();
+        this.setTabListWidth('removal');
       },
       removeTabTarget(data) {
         if (this.tabs.length === 1) {
@@ -276,14 +281,47 @@
       },
       onDragEnd() {
       },
-      setTabListWidth() {
+      onLeftMove(e) {
+        if (this.currentX === 0) {
+          console.log('don\'t move');
+          return;
+        }
+        this.onChangeTransForm(e, 'left');
+      },
+      onRightMove(e) {
+        if (this.currentX > this.tabWrapperRect.width) {
+          console.log('don\'t move');
+          return;
+        }
+        this.onChangeTransForm(e, 'right');
+      },
+      onChangeTransForm(e, type) {
+        const moveInterval = this.tabWrapperRect.width * 0.1;
+        if (type === 'left') {
+          this.currentX += moveInterval;
+        } else if (type === 'right') {
+          this.currentX -= moveInterval;
+        }
+        this.styleObj = `transform: translateX(${this.currentX}px);`;
+      },
+      setTranslatePosition(type) {
+        if (type === 'added') {
+          this.currentX -= this.tabWrapperRect.width * 0.1;
+        }
+        this.styleObj = `transform: translateX(${this.currentX}px);`;
+      },
+      setTabListWidth(type) {
         this.$nextTick(() => {
           this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
           this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-          if (this.tabWrapperRect.width < this.tabListRect.width) {
+          if (this.tabWrapperRect.width < this.tabListRect.width + 20) {
             this.tabScroll = true;
           } else {
             this.tabScroll = false;
+          }
+
+          if (this.tabScroll) {
+            this.setTranslatePosition(type);
           }
         });
       },
@@ -351,10 +389,9 @@
   .ev-tab-content-container {
     border: 1px solid #dddee1;
     border-top: 0;
+    padding: 3px;
     display: flex;
     flex-direction: row;
-    will-change: transform;
-    transition: transform 0.3s ease-in-out;
   }
   .ev-tabs-nav-scrollable.active {
     padding: 0 12px;
@@ -372,5 +409,8 @@
     visibility: hidden;
     font-size: 0;
     height: 0;
+  }
+  .ev-tabs-nav-next:hover, .ev-tabs-nav-prev:hover {
+    color: #2d8cf0;
   }
 </style>

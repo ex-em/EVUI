@@ -106,8 +106,12 @@
   .ev-btn-close {
     position: relative;
     float: right;
-    top: -9px;
-    left: 5px;
+    top: -8px;
+    left: 10px;
+    visibility: hidden;
+  }
+  .ev-tab-title:hover .ev-btn-close {
+    visibility: visible;
   }
 
   .ev-tab-title:hover .ev-btn-close:hover {
