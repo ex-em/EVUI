@@ -1,91 +1,116 @@
 <template>
   <div
     :class="activeClass"
-    @click.stop="setActive"
+    @click="setActive"
+    @dragend="onDragEnd"
   >
-    <li class="tab-title"> {{ tabData.title }}
-      <span
-        class="btn-close"
-        @click.stop="close"
-      > &times;
-      </span>
-    </li>
+    {{ tabProp.title }}
+    <span
+      class="ev-btn-close"
+      @click.stop="close"
+    > &times;
+    </span>
   </div>
 </template>
 
 <script>
-  const prefixCls = 'tab-title';
+  const prefixCls = 'ev-tab-title';
 
   export default {
     props: {
-      tabData: {
+      tabProp: {
         type: Object,
         default() {
           return {};
         },
       },
+      minWidth: {
+        type: Number,
+        default: 100,
+      },
     },
     data() {
       return {
-        isActive: this.tabData.isActive,
+        isActive: this.tabProp.isActive,
       };
     },
     computed: {
       activeClass() {
        return [
-          `${prefixCls}-outer`,
+          `${prefixCls}`,
           {
-            active: this.tabData.isActive,
+            active: this.tabProp.isActive,
           },
         ];
       },
+      currentWidth() {
+        return {
+            width: `${this.width}px`,
+        };
+      },
     },
     methods: {
+      computedTitle() {
+        const result = this.tabProp.title.split('');
+        let isShrink = false;
+        const minWidth = this.tabProp.width || this.minWidth;
+
+        while (result.length * 7 > (minWidth - 50)) {
+          result.pop();
+          isShrink = true;
+        }
+        if (isShrink) {
+          result.push('...');
+        }
+        return result.join('');
+      },
       close() {
-        this.$emit('close', this.tabData);
+        this.$emit('close', this.tabProp);
       },
       setActive() {
-        this.$emit('set-active', this.tabData);
+        this.$emit('set-active', this.tabProp);
+      },
+      onDragEnd(e) {
+        this.$emit('drag-end', this.tabProp, e);
       },
     },
   };
 </script>
 
 <style scoped>
-  .tab-title-outer {
-    float: left;
-    transition: .1s all ease-in-out;
-    border: 1px solid;
-    border-bottom: 2px solid;
-    border-color: #CBD3EA;
-    border-bottom-color: transparent;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    border-bottom-left-radius: 1px;
-    padding-left: 1px;
-    padding-right: 1px;
-    margin-right: 1px;
+  .ev-tab-title {
+    margin: 0;
+    margin-right: 4px;
+    height: 31px;
+    padding: 5px 16px 4px;
+    border: 1px solid #dddee1;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s ease-in-out;
+    background: #f8f8f9;
+    display: inline-block;
   }
-  .tab-title-outer.active {
-    border-bottom-color: #ffffff;
-    box-shadow:inset -1px 1px 2px -1px #2589E9;
+  .ev-tab-title.active {
+    height: 32px;
+    padding-bottom: 5px;
+    background: #fff;
+    transform: translateZ(0);
+    border-color: #dddee1;
+    color: #2d8cf0;
   }
-  .tab-title-outer:hover {
+  .ev-tab-title:hover {
     color: #2589E9;
     font-weight: bold;
     cursor: pointer;
   }
-  .tab-title {
-    margin: 5px;
-    padding: 5px;
-  }
-  .btn-close {
+  .ev-btn-close {
     position: relative;
+    float: right;
     top: -9px;
     left: 5px;
   }
 
-  .tab-title-outer:hover .btn-close:hover {
+  .ev-tab-title:hover .ev-btn-close:hover {
     color: red;
     font-weight: bold;
     cursor: pointer;

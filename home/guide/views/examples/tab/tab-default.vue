@@ -6,29 +6,17 @@
         :text="'Tab Add'"
         @click="addTab"
       />
+      <Button
+        :type="'primary'"
+        :text="'change Scroll'"
+        @click="scroll = !scroll"
+      />
     </div>
-    <div class="tab-outer">
+    <div class="tab-default-outer">
       <tabs
-        :tab-list="list"
-      >
-        <tab
-          :tab-data="tabItem"
-        />
-        <tab
-          :tab-data="tabItem"
-        />
-        <tab
-          :tab-data="tabItem"
-        />
-        <tab
-          :tab-data="tabItem"
-        />
-        <tab
-          v-for="item in tabItems"
-          :key="item.id"
-          :tab-data="item"
-        />
-      </tabs>
+        :scrollable="scroll"
+        :tab-data="list"
+      />
     </div>
   </div>
 </template>
@@ -50,6 +38,7 @@
     },
     data() {
       return {
+        scroll: false,
         tabItem: {
           title: 'tab-item0',
           isActive: false,
@@ -76,10 +65,13 @@
     },
     methods: {
       addTab() {
-        const random = Math.ceil((Math.random() * 234) % 141532);
         this.list.push({
-          title: `draggable tab${random}`,
+          title: 'draggable tabawerbawebawebawrbrbaw',
           isActive: false,
+          targetComponent: {
+            keyName: 'target-component1',
+            component: componentList[0],
+          },
         });
       },
       createList() {
@@ -88,6 +80,7 @@
           result.push({
             title: `draggable tab${i + 1}`,
             isActive: false,
+            width: 300,
             targetComponent: {
               keyName: `target-component${i + 1}`,
               component: componentList[i],
@@ -109,10 +102,9 @@
   }
   .outer {
     width: 100%;
-    height: 1070px;
   }
-  .tab-outer {
-    width: 100%;
+  .tab-default-outer {
+    width: 1500px;
     height: 1000px;
   }
 </style>
