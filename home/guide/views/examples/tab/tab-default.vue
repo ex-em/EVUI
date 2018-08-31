@@ -66,7 +66,7 @@
     methods: {
       addTab() {
         this.list.push({
-          title: 'draggable tabawerbawebawebawrbrbaw',
+          title: 'appended tab',
           isActive: false,
           targetComponent: {
             keyName: 'target-component1',
@@ -78,7 +78,7 @@
         const result = [];
         for (let i = 0, length = 3; i < length; i++) {
           result.push({
-            title: `draggable tab${i + 1}`,
+            title: `tab${i + 1}`,
             isActive: false,
             width: 300,
             targetComponent: {

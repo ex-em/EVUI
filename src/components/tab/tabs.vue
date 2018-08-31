@@ -32,7 +32,6 @@
             <div
               ref="tabListRef"
               class="ev-tabs-nav"
-              :style="getTranslateX"
             >
               <tab
                 v-for="(tab, index) in tabs"
