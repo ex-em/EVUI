@@ -132,36 +132,79 @@
         return Object.assign({}, this.$listeners, {
           keydown(e) {
             const keyValue = e.which || e.keyCode || 0;
+            vm.lastKeyPressSpell = keyValue;
             if (keyValue >= 48 && keyValue <= 57) {
               // console.log('0 ~ 9');
             } else if (keyValue >= 96 && keyValue <= 105) {
               // console.log('keynum 0 ~ 9');
-            } else if (keyValue === 8 || (keyValue >= 16 && keyValue <= 18)
+            } else if (keyValue === 8
               || (keyValue >= 35 && keyValue <= 40) || keyValue === 46) {
-              // console.log('backspace, shift, ctrl, alt,
+              // console.log('backspace
               // end, home, left, up, right, down, delete');
             } else {
               e.preventDefault();
             }
           },
           input(e) {
-            const typingFullValue = e.target.value;
-            const exceptKoreanValue = typingFullValue.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
-            let setValue = '';
-            vm.cursorPosition = this.$refs.timePickerText.selectionStart;
-            /*eslint-disable*/
-            console.log('vm.cursorPosition : ' + vm.cursorPosition);
-            if (exceptKoreanValue !== typingFullValue) {
-              // 한글 방지
-              setValue = exceptKoreanValue;
-            } else if (vm.removeSpecialSymbols(exceptKoreanValue).length
-              > vm.inputNumberMaxLength) {
-              // length limit
-              setValue = exceptKoreanValue.slice(0, exceptKoreanValue.length - 1);
-            } else {
-              setValue = vm.addSpecialSymbols(vm.validNumber(exceptKoreanValue));
+            // init values
+            let setValue = null;
+            let targetValue = e.target.value;
+            const exceptKoreanValue = targetValue.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g, '');
+            const currCursor = vm.$refs.datepickerText.selectionStart;
+            // prevent kor language
+            if (targetValue !== exceptKoreanValue) {
+              targetValue = exceptKoreanValue;
             }
+            const numberValue = vm.removeSpecialSymbols(targetValue);
+            const numberValueLength = numberValue.length;
+            // set mouse cursor
+            let numberValueCursor = 0;
+            if (currCursor >= 17) {
+              numberValueCursor = currCursor - 5;
+            } else if (currCursor >= 14) {
+              numberValueCursor = currCursor - 4;
+            } else if (currCursor >= 11) {
+              numberValueCursor = currCursor - 3;
+            } else if (currCursor >= 8) {
+              numberValueCursor = currCursor - 2;
+            } else if (currCursor >= 5) {
+              numberValueCursor = currCursor - 1;
+            } else {
+              numberValueCursor = currCursor;
+            }
+            /*eslint-disable*/
+            let preText = '';
+            let postText = '';
+            if (numberValueLength > vm.inputNumberMaxLength) {
+              // 인풋박스 맥스까지 글씨가 있는 경우
+              if (+numberValueLength - +vm.inputNumberMaxLength === 1) {
+                preText = numberValue.slice(0, numberValueCursor);
+                postText = numberValue.slice(numberValueCursor + 1, numberValueLength);
+                setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText)
+                );
+              } else {
+                setValue = vm.addSpecialSymbols(numberValue.slice(0, vm.inputNumberMaxLength));
+              }
+            } else {
+              // 글씨 max가 아닌경우
+              setValue = targetValue;
+            }
+            // const numberValue = vm.validNumber(setValue || targetValue);
+            // const preNumberText = numberValue.slice(0, numberValueCursor);
+            // const postNumberText = numberValue.slice(numberValueCursor);
+            // const computedValue
+            // = vm.addSpecialSymbols(vm.validNumber(preNumberText + postNumberText));
+            // set INPUTBOX
             vm.$refs.datepickerText.value = setValue;
+            if ((vm.lastKeyPressSpell >= 48 && vm.lastKeyPressSpell <= 57)
+              || (vm.lastKeyPressSpell >= 96 && vm.lastKeyPressSpell <= 105)) {
+              let specialSymbolTerm = 0;
+              if (currCursor === 4) {
+                specialSymbolTerm = 1;
+              }
+              vm.$refs.datepickerText.selectionStart = currCursor + specialSymbolTerm;
+              vm.$refs.datepickerText.selectionEnd = currCursor + specialSymbolTerm;
+            }
           },
         });
       },
@@ -179,6 +222,7 @@
       this.inputNumberMaxLength = this.removeSpecialSymbols(this.options.localeType).length;
     },
     beforeDestroy() {
+      this.calendar.removeDropdown();
     },
     methods: {
       showDatepicker(e) {
@@ -192,13 +236,14 @@
       },
       validDateFormat(v) {
         if (v && v.length) {
-          if (v.length === 19 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]')) {
+          const valueLength = v.length;
+          if (valueLength === 19 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]')) {
             return v;
-          } else if (v.length === 16 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]')) {
+          } else if (valueLength === 16 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]')) {
             return v;
-          } else if (v.length === 13 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9])')) {
+          } else if (valueLength === 13 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9])')) {
             return v;
-          } else if (v.length === 10 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])')) {
+          } else if (valueLength === 10 && v.match('[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])')) {
             return v;
           }
           return '';
@@ -210,21 +255,58 @@
       },
       addSpecialSymbols(val) {
         const number = this.removeSpecialSymbols(val);
+        const numberLength = number.length;
         const localeType = this.options.localeType || 'YYYY-MM-DD';
         let returnVal = '';
         if (localeType === 'YYYY-MM-DD HH:mm:ss') {
-          if (number.length <= 4) {
+          if (numberLength <= 4) {
             returnVal = number.slice(0);
-          } else if (number.length <= 6) {
+          } else if (numberLength <= 6) {
             returnVal = `${number.slice(0, 4)}-${number.slice(4)}`;
-          } else if (number.length <= 8) {
+          } else if (numberLength <= 8) {
             returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6)}`;
-          } else if (number.length <= 10) {
+          } else if (numberLength <= 10) {
             returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8)}`;
-          } else if (number.length <= 12) {
+          } else if (numberLength <= 12) {
             returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10)}`;
-          } else if (number.length <= 14) {
+          } else if (numberLength <= 14) {
             returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12)}`;
+          } else {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12, 14)}`;
+          }
+        } else if (localeType === 'YYYY-MM-DD HH:mm') {
+          if (numberLength <= 4) {
+            returnVal = number.slice(0);
+          } else if (numberLength <= 6) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4)}`;
+          } else if (numberLength <= 8) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6)}`;
+          } else if (numberLength <= 10) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8)}`;
+          } else if (numberLength <= 12) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10)}`;
+          } else {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12, 14)}`;
+          }
+        } else if (localeType === 'YYYY-MM-DD HH') {
+          if (numberLength <= 4) {
+            returnVal = number.slice(0);
+          } else if (numberLength <= 6) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4)}`;
+          } else if (numberLength <= 8) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6)}`;
+          } else if (numberLength <= 10) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8)}`;
+          } else {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12, 14)}`;
+          }
+        } else if (localeType === 'YYYY-MM-DD') {
+          if (numberLength <= 4) {
+            returnVal = number.slice(0);
+          } else if (numberLength <= 6) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4)}`;
+          } else if (numberLength <= 8) {
+            returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6)}`;
           } else {
             returnVal = `${number.slice(0, 4)}-${number.slice(4, 6)}-${number.slice(6, 8)} ${number.slice(8, 10)}:${number.slice(10, 12)}:${number.slice(12, 14)}`;
           }

@@ -215,6 +215,10 @@ class Calendar {
     }
   }
 
+  removeDropdown() {
+    document.body.removeChild(this.dropdown);
+  }
+
   showDropdown(e) {
     this.dropdown.style.display = 'block';
     let targetDivHeight = 0;
