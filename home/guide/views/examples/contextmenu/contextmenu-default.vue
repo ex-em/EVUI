@@ -43,7 +43,9 @@
     methods: {
       onContextMenu(e) {
         const contextMenu = this.$refs.contextMenu;
-        contextMenu.setPosition(e.pageX, e.pageY);
+        // body 에 붙이기 전 임시 위치 조정
+        contextMenu.setPosition(e.pageX - 277, e.pageY - 233);
+        // contextMenu.setPosition(e.pageX, e.pageY);
         contextMenu.show();
         e.preventDefault();
       },

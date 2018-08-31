@@ -36,11 +36,11 @@
           };
           contextMenuEl.vueClickOutside = handler;
 
-          document.addEventListener('click', handler);
+          document.addEventListener('mousedown', handler);
         },
         unbind(el) {
           const contextMenuEl = el;
-          document.removeEventListener('click', contextMenuEl.vueClickOutside);
+          document.removeEventListener('mousedown', contextMenuEl.vueClickOutside);
           contextMenuEl.vueClickOutside = null;
         },
       },
@@ -85,7 +85,6 @@
       this.setPosition(this.x, this.y);
     },
     mounted() {
-      this.show();
     },
     methods: {
       onClick(e, item, idx) {
@@ -125,7 +124,7 @@
 
 <style scoped>
   .ev-contextmenu{
-    position: fixed;
+    position: absolute;
     padding: 2px;
     background: #f0f0f0;
     border: 1px solid #d0d0d0;
