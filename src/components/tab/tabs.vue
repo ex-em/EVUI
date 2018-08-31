@@ -12,6 +12,7 @@
         <div
           :class="showScrollable"
           class="ev-tabs-nav-wrap ev-tabs-nav-scrollable"
+          @mousewheel="wheelEvent"
         >
           <span
             v-if="tabScroll"
@@ -66,7 +67,6 @@
 
 <script>
   import icon from '@/components/icon/icon';
-  import draggable from 'vuedraggable';
   import tab from './tab';
 
   const unpackNode = function unpackNode(node) {
@@ -80,7 +80,6 @@
     components: {
       icon,
       tab,
-      draggable,
     },
     props: {
       orderingSlotFirst: {
@@ -129,9 +128,6 @@
         return [{
           active: this.tabScroll,
         }];
-      },
-      getTranslateX() {
-        return [];
       },
     },
     watch: {
@@ -281,22 +277,30 @@
       },
       onDragEnd() {
       },
+      wheelEvent(e) {
+        e.preventDefault();
+        if (!this.tabScroll) {
+          return;
+        }
+        if (e.wheelDeltaY === 120) {
+          this.onLeftMove(e);
+        } else if (e.wheelDeltaY === -120) {
+          this.onRightMove(e);
+        }
+      },
       onLeftMove(e) {
-        if (this.currentX === 0) {
-          console.log('don\'t move');
+        if (this.currentX > -100) {
+          this.currentX = 0;
+          this.styleObj = `transform: translateX(${this.currentX}px);`;
           return;
         }
         this.onChangeTransForm(e, 'left');
       },
       onRightMove(e) {
-        if (this.currentX > this.tabWrapperRect.width) {
-          console.log('don\'t move');
-          return;
-        }
         this.onChangeTransForm(e, 'right');
       },
       onChangeTransForm(e, type) {
-        const moveInterval = this.tabWrapperRect.width * 0.1;
+        const moveInterval = Math.ceil(this.tabWrapperRect.width * 0.1);
         if (type === 'left') {
           this.currentX += moveInterval;
         } else if (type === 'right') {
@@ -306,7 +310,8 @@
       },
       setTranslatePosition(type) {
         if (type === 'added') {
-          this.currentX -= this.tabWrapperRect.width * 0.1;
+          const moveInterval = this.defaultTabWidth;
+          this.currentX -= moveInterval;
         }
         this.styleObj = `transform: translateX(${this.currentX}px);`;
       },
@@ -319,7 +324,6 @@
           } else {
             this.tabScroll = false;
           }
-
           if (this.tabScroll) {
             this.setTranslatePosition(type);
           }

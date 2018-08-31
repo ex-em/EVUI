@@ -89,6 +89,7 @@
     transition: all 0.3s ease-in-out;
     background: #f8f8f9;
     display: inline-block;
+    user-select: none;
   }
   .ev-tab-title.active {
     height: 32px;
@@ -106,8 +107,8 @@
   .ev-btn-close {
     position: relative;
     float: right;
-    top: -8px;
-    left: 10px;
+    left: 8px;
+    line-height: 4px;
     visibility: hidden;
   }
   .ev-tab-title:hover .ev-btn-close {
