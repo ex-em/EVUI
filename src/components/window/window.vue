@@ -420,6 +420,10 @@
         top = (offsetHeight / 2) - (this.height / 2);
         left = (offsetWidth / 2) - (this.width / 2);
 
+        // body 에 붙이기 전에 임시로 사이즈 조정
+        top -= 150;
+        left -= 300;
+
         return {
           top: this.numberToPixel(top),
           left: this.numberToPixel(left),
@@ -500,7 +504,7 @@
 
 <style>
   .ev-window{
-    position: fixed;
+    position: absolute;
     border: 9px solid;
     border-radius: 8px;
     overflow: visible;
