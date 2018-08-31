@@ -1,7 +1,6 @@
 <template>
   <div
     v-click-outside="hideDropdown"
-    :style="selectboxStyle"
     :class="prefixCls"
   >
     <div
@@ -41,12 +40,12 @@
     <transition name="fade">
       <Dropdown
         v-show="dropDownState"
-        :dropdown-style="dropdownStyle"
+        :style="dropdownStyle"
         :is-group="isGroup"
         :disabled="disabled"
-        :listbox-style="listboxStyle"
+        :listbox-style="listBoxStyle"
         :multiple="multiple"
-        :items="listboxItems"
+        :items="listBoxItems"
         :selected-items="selectedItems"
         @select="onSelect"
         @keyup="onKeyUpInputTxt"
@@ -62,21 +61,6 @@
 
   const prefixCls = 'evui-selectbox';
 
-  // const boxSize = {
-  //   small: {
-  //     height: 22,
-  //     fontSize: 12,
-  //   },
-  //   normal: {
-  //     height: 30,
-  //     fontSize: 14,
-  //   },
-  //   large: {
-  //     height: 34,
-  //     fontSize: 16,
-  //   },
-  // };
-
   export default {
     components: {
       Dropdown,
@@ -84,21 +68,21 @@
     directives: {
       'click-outside': {
         bind(el, binding) {
-          const selectboxEl = el;
+          const selectBoxEl = el;
           const bubble = binding.modifiers.bubble;
-          const handler = (evnet) => {
-            if (bubble || (selectboxEl !== evnet.target && !selectboxEl.contains(evnet.target))) {
-              binding.value(evnet);
+          const handler = (e) => {
+            if (bubble || (selectBoxEl !== e.target && !selectBoxEl.contains(e.target))) {
+              binding.value(e);
             }
           };
-          selectboxEl.vueClickOutside = handler;
+          selectBoxEl.vueClickOutside = handler;
 
-          document.addEventListener('click', handler);
+          document.addEventListener('mousedown', handler);
         },
         unbind(el) {
-          const selectboxEl = el;
-          document.removeEventListener('click', selectboxEl.__vueClickOutside__);
-          selectboxEl.vueClickOutside = null;
+          const selectBoxEl = el;
+          document.removeEventListener('mousedown', selectBoxEl.vueClickOutside);
+          selectBoxEl.vueClickOutside = null;
         },
       },
     },
@@ -107,19 +91,13 @@
         type: String,
         default: '',
       },
-      selectboxStyle: {
-        type: Object,
-        default() {
-          return {};
-        },
-      },
       dropdownStyle: {
         type: Object,
         default() {
           return {};
         },
       },
-      listboxStyle: {
+      listBoxStyle: {
         type: Object,
         default() {
           return {};
@@ -161,7 +139,7 @@
         prefixCls,
         dropDownState: false,
         inputText: '',
-        listboxItems: [],
+        listBoxItems: [],
         selectedItems: [],
       };
     },
@@ -179,7 +157,7 @@
       },
     },
     created() {
-      this.listboxItems = this.items.slice();
+      this.listBoxItems = this.items.slice();
 
       if (!this.multiple) {
         this.dropdownStyle.border = 0;
@@ -201,7 +179,7 @@
           this.inputText = '';
         }
 
-        this.listboxItems = this.items.slice();
+        this.listBoxItems = this.items.slice();
 
         this.dropDownState = !this.dropDownState;
       },
@@ -331,12 +309,12 @@
       },
       filterItems(value) {
         if (!value || value.length === 0) {
-          this.listboxItems = this.items.slice();
+          this.listBoxItems = this.items.slice();
           return;
         }
 
         if (this.isGroup) {
-          this.listboxItems = this.items.reduce((preArr, groupObj) => {
+          this.listBoxItems = this.items.reduce((preArr, groupObj) => {
             let groupItems = groupObj.items;
 
             groupItems = groupItems.filter(item => item && item.name.includes(value));
@@ -351,7 +329,7 @@
             return preArr;
           }, []);
         } else {
-          this.listboxItems = this.items.filter(obj => obj && obj.name.includes(value));
+          this.listBoxItems = this.items.filter(obj => obj && obj.name.includes(value));
         }
       },
       hideDropdown() {
