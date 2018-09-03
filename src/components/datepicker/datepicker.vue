@@ -192,7 +192,7 @@
                     // '-', ' ', ':' 특수문자 전에 값을 입력하면 +1칸 커서 왼쪽 자동이동 후 값이 변환됨
                     beforeSpecialSymbolTerm = 1;
                   }
-                  preText = numberValue.slice(0, numberValueCursor + beforeSpecialSymbolTerm);
+                  preText = numberValue.slice(0, numberValueCursor);
                   postText = numberValue.slice(numberValueCursor + beforeSpecialSymbolTerm + 1,
                     numberValueLength);
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
@@ -229,9 +229,7 @@
                 vm.$refs.datepickerText.selectionStart = currCursor + specialSymbolTerm;
                 vm.$refs.datepickerText.selectionEnd = currCursor + specialSymbolTerm;
               }
-              // input값을 모두 지우는 경우와
-              // YYYY-MM-DD에서 첫번째 M과 D를 입력할 때는 갱신하지 않도록 함
-              if (numberValueLength !== 0 && numberValueLength !== 5 && numberValueLength !== 7) {
+              if (numberValueLength > 3 && numberValueLength !== 5 && numberValueLength !== 7) {
                 vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
               }
             }
