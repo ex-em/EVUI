@@ -2,7 +2,7 @@
   <div>
     <div
       ref="datepickerRef"
-      class="evui-calendar"
+      class="ev-calendar"
       @click.stop.prevent="updateSelectOneDay"
     />
   </div>
@@ -78,7 +78,7 @@
 </script>
 
 <style scoped>
-  .evui-calendar {
+  .ev-calendar {
     position: relative;
     width: inherit;
     height: 220px;

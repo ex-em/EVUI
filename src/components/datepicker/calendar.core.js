@@ -771,6 +771,12 @@ class Calendar {
     // cursorInfo - out: select
     const overCtx = this.overCtx;
     const allDay = this.coordinate.calendarArea.allDay;
+    const calendarAreaTotal = this.coordinate.calendarArea.total;
+    this.clearCanvas(
+      overCtx,
+      calendarAreaTotal.startX, calendarAreaTotal.startY,
+      calendarAreaTotal.width, calendarAreaTotal.height,
+    );
     if (e) {
       const selectDayArr = this.coordinate.calendarArea.selectDayArr;
       allDay.forEach((v) => {
@@ -1527,12 +1533,14 @@ class Calendar {
     });
   }
 
-  /*eslint-disable*/
-  setMinute(time) {
-    this.coordinate.timeArea.minute.select = time;
-    this.coordinate.timeArea.minute.page = Math.floor(time / 12) + 1;
-    this.drawTimeAreaContent('minute');
-    this.updateTimeArea('minute');
+  // 외부 Input box에 입력받는 값으로 클래스 내 데이터 갱신하는 함수
+  setDateTime(dateTimeValue) {
+    this.options.initSelectDayFlag = true;
+    this.options.initSelectDay = new Date(dateTimeValue);
+    this.options.initLimitDay = new Date();
+    this.coordinate.calendarArea.selectDayArr = [];
+    this.init();
+    this.drawCanvas();
   }
 
   // DRAW multiple function

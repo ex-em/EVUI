@@ -1,19 +1,19 @@
 <template>
   <div
     v-click-outside="hideDatepicker"
-    class="evui-datepicker"
+    class="ev-datepicker"
     @click="showDatepicker"
   >
     <div
       :class="wrapClasses"
-      class="evui-datepicker-input-wrapper"
+      class="ev-datepicker-input-wrapper"
     >
       <input
         ref="datepickerText"
         :value="computedValue"
         :class="inputClasses"
         :placeholder="options.localeType"
-        class="evui-datepicker-input"
+        class="ev-datepicker-input"
         type="text"
         v-on="allListeners"
       >
@@ -42,7 +42,7 @@
           const bubble = bind.modifiers.bubble;
           const handler = (e) => {
             let outsideClickFlag = false;
-            if ((bubble || (!element.contains(e.target) && element !== e.target))) {
+            if (bubble || element !== e.target) {
               if (e.target.getAttribute('class') === 'ev-calendar-overlay-canvas') {
                 for (let ix = 0, ixLen = calendarDropdown.length; ix < ixLen; ix++) {
                   if (!calendarDropdown[ix].contains(e.target)
@@ -113,15 +113,15 @@
         return `${prefixCls}-input`;
       },
       mergedOption() {
-        return Object.assign(this.$props.options, {
+        return Object.assign(this.options, {
           // moment타입에 맞을 경우 초기input setting
-          initSelectDayFlag: !isNaN(moment(this.$props.value, this.options.localeType)),
+          initSelectDayFlag: !isNaN(moment(this.value, this.options.localeType)),
           // bindDay가 있는 경우 표시, 없는 경우 today
-          initSelectDay: this.$props.value
-            ? new Date(moment(this.$props.value, this.options.localeType)) : new Date(),
+          initSelectDay: this.value
+            ? new Date(moment(this.value, this.options.localeType)) : new Date(),
           // localeType이 없는 경우 YYYY-MM-DD가 default
-          localeType: this.$props.options.localeType
-            ? this.$props.options.localeType : 'YYYY-MM-DD',
+          localeType: this.options.localeType
+            ? this.options.localeType : 'YYYY-MM-DD',
         });
       },
       computedValue() {
@@ -172,38 +172,68 @@
             } else {
               numberValueCursor = currCursor;
             }
-            /*eslint-disable*/
             let preText = '';
             let postText = '';
             if (numberValueLength > vm.inputNumberMaxLength) {
-              // 인풋박스 맥스까지 글씨가 있는 경우
-              if (+numberValueLength - +vm.inputNumberMaxLength === 1) {
-                preText = numberValue.slice(0, numberValueCursor);
-                postText = numberValue.slice(numberValueCursor + 1, numberValueLength);
-                setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText)
-                );
-              } else {
-                setValue = vm.addSpecialSymbols(numberValue.slice(0, vm.inputNumberMaxLength));
+              // 인풋박스 마지막에 글씨 쓰는 경우
+              if (numberValueLength - vm.inputNumberMaxLength === 1) {
+                // 인풋박스 맥스까지 글씨가 있고 그 뒤에 한글자 더 입력한 경우
+                if ((vm.lastKeyPressSpell >= 48 && vm.lastKeyPressSpell <= 57)
+                  || (vm.lastKeyPressSpell >= 96 && vm.lastKeyPressSpell <= 105)) {
+                  // 숫자 입력 시
+                  let afterSpecialSymbolTerm = 0;
+                  let beforeSpecialSymbolTerm = 0;
+                  if (currCursor === 4 || currCursor === 7 || currCursor === 10
+                    || currCursor === 13 || currCursor === 16) {
+                    // '-', ' ', ':' 특수문자 부분을 +1칸 커서 왼쪽 자동이동 시킴
+                    afterSpecialSymbolTerm = 1;
+                  } else if (currCursor === 5 || currCursor === 8 || currCursor === 11
+                    || currCursor === 14 || currCursor === 17) {
+                    // '-', ' ', ':' 특수문자 전에 값을 입력하면 +1칸 커서 왼쪽 자동이동 후 값이 변환됨
+                    beforeSpecialSymbolTerm = 1;
+                  }
+                  preText = numberValue.slice(0, numberValueCursor + beforeSpecialSymbolTerm);
+                  postText = numberValue.slice(numberValueCursor + beforeSpecialSymbolTerm + 1,
+                    numberValueLength);
+                  setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
+                  vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
+                  vm.$refs.datepickerText.value = setValue;
+                  vm.$refs.datepickerText.selectionStart = (currCursor + afterSpecialSymbolTerm)
+                    + beforeSpecialSymbolTerm;
+                  vm.$refs.datepickerText.selectionEnd = (currCursor + afterSpecialSymbolTerm)
+                    + beforeSpecialSymbolTerm;
+                } else {
+                  // 숫자 입력이 아닌경우
+                  preText = numberValue.slice(0, numberValueCursor);
+                  postText = numberValue.slice(numberValueCursor + 1, numberValueLength);
+                  setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
+                  vm.$refs.datepickerText.value = setValue;
+                  vm.$refs.datepickerText.selectionStart = currCursor;
+                  vm.$refs.datepickerText.selectionEnd = currCursor;
+                }
               }
             } else {
               // 글씨 max가 아닌경우
-              setValue = targetValue;
-            }
-            // const numberValue = vm.validNumber(setValue || targetValue);
-            // const preNumberText = numberValue.slice(0, numberValueCursor);
-            // const postNumberText = numberValue.slice(numberValueCursor);
-            // const computedValue
-            // = vm.addSpecialSymbols(vm.validNumber(preNumberText + postNumberText));
-            // set INPUTBOX
-            vm.$refs.datepickerText.value = setValue;
-            if ((vm.lastKeyPressSpell >= 48 && vm.lastKeyPressSpell <= 57)
-              || (vm.lastKeyPressSpell >= 96 && vm.lastKeyPressSpell <= 105)) {
+              setValue = vm.addSpecialSymbols(vm.validNumber(targetValue));
+              vm.$refs.datepickerText.value = setValue;
+              vm.$refs.datepickerText.selectionStart = currCursor;
+              vm.$refs.datepickerText.selectionEnd = currCursor;
               let specialSymbolTerm = 0;
-              if (currCursor === 4) {
-                specialSymbolTerm = 1;
+              if ((vm.lastKeyPressSpell >= 48 && vm.lastKeyPressSpell <= 57)
+                || (vm.lastKeyPressSpell >= 96 && vm.lastKeyPressSpell <= 105)) {
+                if (currCursor === 5 || currCursor === 8 || currCursor === 11
+                  || currCursor === 14 || currCursor === 17) {
+                  // '-', ' ', ':' 특수문자 부분을 +1칸 커서 왼쪽 자동이동 시킴
+                  specialSymbolTerm = 1;
+                }
+                vm.$refs.datepickerText.selectionStart = currCursor + specialSymbolTerm;
+                vm.$refs.datepickerText.selectionEnd = currCursor + specialSymbolTerm;
               }
-              vm.$refs.datepickerText.selectionStart = currCursor + specialSymbolTerm;
-              vm.$refs.datepickerText.selectionEnd = currCursor + specialSymbolTerm;
+              // input값을 모두 지우는 경우와
+              // YYYY-MM-DD에서 첫번째 M과 D를 입력할 때는 갱신하지 않도록 함
+              if (numberValueLength !== 0 && numberValueLength !== 5 && numberValueLength !== 7) {
+                vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
+              }
             }
           },
         });
@@ -251,6 +281,16 @@
         return '';
       },
       removeSpecialSymbols(val) {
+//        const localeType = this.options.localeType || 'YYYY-MM-DD';
+//        if (localeType === 'YYYY-MM-DD HH:mm:ss') {
+//          return moment(val, 'YYYY-MM-DD HH:mm:ss').format('YYYYMMDDHHmmss');
+//        } else if (localeType === 'YYYY-MM-DD HH:mm') {
+//          return moment(val, 'YYYY-MM-DD HH:mm').format('YYYYMMDDHHmm');
+//        } else if (localeType === 'YYYY-MM-DD HH') {
+//          return moment(val, 'YYYY-MM-DD HH').format('YYYYMMDDHH');
+//        } else if (localeType === 'YYYY-MM-DD') {
+//          return moment(val, 'YYYY-MM-DD').format('YYYYMMDD');
+//        }
         return val.replace(/( *)(:*)(-*)/g, '');
       },
       addSpecialSymbols(val) {
@@ -316,10 +356,13 @@
       validNumber(val) {
         let numberVal = this.removeSpecialSymbols(val);
         const numberValLength = numberVal.length;
+        let lastDay = 31;
         if (numberValLength <= 6) {
           if (numberValLength === 6) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01`;
             }
           } else {
             numberVal = `${numberVal}`;
@@ -328,22 +371,34 @@
           if (numberValLength === 8) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 8)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01`;
             }
           } else if (numberValLength === 7) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 8)}`;
             }
           }
         } else if (numberValLength <= 10) {
           if (numberValLength === 10) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 10)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 10)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 10)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 10)}`;
             }
             if (numberVal.slice(8, 10) > 23) {
               numberVal = `${numberVal.slice(0, 8)}23`;
@@ -351,18 +406,28 @@
           } else if (numberValLength === 9) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 10)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 10)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 10)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 10)}`;
             }
           }
         } else if (numberValLength <= 12) {
           if (numberValLength === 12) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 12)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 12)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 12)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 12)}`;
             }
             if (numberVal.slice(8, 10) > 23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
@@ -373,9 +438,14 @@
           } else if (numberValLength === 11) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 12)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 12)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 12)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 12)}`;
             }
             if (numberVal.slice(8, 10) > 23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
@@ -385,9 +455,14 @@
           if (numberValLength === 14) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
             }
             if (numberVal.slice(8, 10) > 23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
@@ -401,9 +476,14 @@
           } else if (numberValLength === 13) {
             if (numberVal.slice(4, 6) > 12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+            } else if (numberVal.slice(4, 6) < 1) {
+              numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
             }
-            if (numberVal.slice(6, 8) > 31) {
-              numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+            lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+            if (numberVal.slice(6, 8) > lastDay) {
+              numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
+            } else if (numberVal.slice(6, 8) < 1) {
+              numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
             }
             if (numberVal.slice(8, 10) > 23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
@@ -415,9 +495,14 @@
         } else {
           if (numberVal.slice(4, 6) > 12) {
             numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
+          } else if (numberVal.slice(4, 6) < 1) {
+            numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
           }
-          if (numberVal.slice(6, 8) > 31) {
-            numberVal = `${numberVal.slice(0, 6)}31${numberVal.slice(8, 14)}`;
+          lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
+          if (numberVal.slice(6, 8) > lastDay) {
+            numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
+          } else if (numberVal.slice(6, 8) < 1) {
+            numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
           }
           if (numberVal.slice(8, 10) > 23) {
             numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
@@ -431,31 +516,25 @@
         }
         return numberVal;
       },
+      getLastDay(year, month) {
+        const lastDate = new Date(year, month, '');
+        return lastDate.getDate();
+      },
     },
   };
 </script>
 
 <style scoped>
-  .evui-datepicker {
+  .ev-datepicker {
     width: 235px;
   }
-  .evui-datepicker-input {
+  .ev-datepicker-input {
     width: 235px;
     height: 32px;
     line-height: 32px;
   }
-  .evui-datepicker-input-wrapper {
+  .ev-datepicker-input-wrapper {
     width: 235px;
     height: 32px;
-  }
-  .evui-calendar-wrapper {
-    position: absolute;
-    width: 235px;
-    height: 0px;
-    overflow: hidden;
-    transition: height .3s ease-in-out;
-  }
-  .evui-calendar-wrapper.expand {
-    width: 470px;
   }
 </style>
