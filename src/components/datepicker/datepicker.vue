@@ -229,6 +229,7 @@
                 vm.$refs.datepickerText.selectionStart = currCursor + specialSymbolTerm;
                 vm.$refs.datepickerText.selectionEnd = currCursor + specialSymbolTerm;
               }
+              // YYYY, MM, DD가 모두 끝까지 입력되어야지만 set하도록 조건 변경
               if (numberValueLength > 3 && numberValueLength !== 5 && numberValueLength !== 7) {
                 vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
               }
@@ -355,160 +356,220 @@
         let numberVal = this.removeSpecialSymbols(val);
         const numberValLength = numberVal.length;
         let lastDay = 31;
+        const currentYear = new Date().getFullYear();
+        const prevLimitYear = currentYear - 100;
+        const postLimitYear = currentYear + 100;
         if (numberValLength <= 6) {
           if (numberValLength === 6) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 6)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 6)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01`;
+            }
+          } else if (numberValLength >= 4) {
+            numberVal = `${numberVal}`;
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 6)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 6)}`;
             }
           } else {
             numberVal = `${numberVal}`;
           }
         } else if (numberValLength <= 8) {
           if (numberValLength === 8) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 8)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 8)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 8)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01`;
             }
           } else if (numberValLength === 7) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 8)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 8)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 8)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 8)}`;
             }
           }
         } else if (numberValLength <= 10) {
           if (numberValLength === 10) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 10)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 10)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 10)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 10)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 10)}`;
             }
-            if (numberVal.slice(8, 10) > 23) {
+            if (+numberVal.slice(8, 10) > +23) {
               numberVal = `${numberVal.slice(0, 8)}23`;
             }
           } else if (numberValLength === 9) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 10)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 10)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 10)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 10)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 10)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 10)}`;
             }
           }
         } else if (numberValLength <= 12) {
           if (numberValLength === 12) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 12)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 12)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 12)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 12)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 12)}`;
             }
-            if (numberVal.slice(8, 10) > 23) {
+            if (+numberVal.slice(8, 10) > +23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
             }
-            if (numberVal.slice(10, 12) > 59) {
+            if (+numberVal.slice(10, 12) > +59) {
               numberVal = `${numberVal.slice(0, 10)}59`;
             }
           } else if (numberValLength === 11) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 12)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 12)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 12)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 12)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 12)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 12)}`;
             }
-            if (numberVal.slice(8, 10) > 23) {
+            if (+numberVal.slice(8, 10) > +23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 12)}`;
             }
           }
         } else if (numberValLength <= 14) {
           if (numberValLength === 14) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 14)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 14)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
             }
-            if (numberVal.slice(8, 10) > 23) {
+            if (+numberVal.slice(8, 10) > +23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
             }
-            if (numberVal.slice(10, 12) > 59) {
+            if (+numberVal.slice(10, 12) > +59) {
               numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
             }
-            if (numberVal.slice(12, 14) > 59) {
+            if (+numberVal.slice(12, 14) > +59) {
               numberVal = `${numberVal.slice(0, 12)}59`;
             }
           } else if (numberValLength === 13) {
-            if (numberVal.slice(4, 6) > 12) {
+            if (+numberVal.slice(0, 4) < +prevLimitYear) {
+              numberVal = `${prevLimitYear + numberVal.slice(4, 14)}`;
+            } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+              numberVal = `${postLimitYear + numberVal.slice(4, 14)}`;
+            }
+            if (+numberVal.slice(4, 6) > +12) {
               numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
-            } else if (numberVal.slice(4, 6) < 1) {
+            } else if (+numberVal.slice(4, 6) < +1) {
               numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
             }
             lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-            if (numberVal.slice(6, 8) > lastDay) {
+            if (+numberVal.slice(6, 8) > +lastDay) {
               numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
-            } else if (numberVal.slice(6, 8) < 1) {
+            } else if (+numberVal.slice(6, 8) < +1) {
               numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
             }
-            if (numberVal.slice(8, 10) > 23) {
+            if (+numberVal.slice(8, 10) > +23) {
               numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
             }
-            if (numberVal.slice(10, 12) > 59) {
+            if (+numberVal.slice(10, 12) > +59) {
               numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
             }
           }
         } else {
-          if (numberVal.slice(4, 6) > 12) {
+          if (+numberVal.slice(0, 4) < +prevLimitYear) {
+            numberVal = `${prevLimitYear + numberVal.slice(4, 14)}`;
+          } else if (+numberVal.slice(0, 4) > +postLimitYear) {
+            numberVal = `${postLimitYear + numberVal.slice(4, 14)}`;
+          }
+          if (+numberVal.slice(4, 6) > +12) {
             numberVal = `${numberVal.slice(0, 4)}12${numberVal.slice(6, 14)}`;
-          } else if (numberVal.slice(4, 6) < 1) {
+          } else if (+numberVal.slice(4, 6) < +1) {
             numberVal = `${numberVal.slice(0, 4)}01${numberVal.slice(6, 14)}`;
           }
           lastDay = this.getLastDay(numberVal.slice(0, 4), numberVal.slice(4, 6));
-          if (numberVal.slice(6, 8) > lastDay) {
+          if (+numberVal.slice(6, 8) > +lastDay) {
             numberVal = `${numberVal.slice(0, 6) + lastDay + numberVal.slice(8, 14)}`;
-          } else if (numberVal.slice(6, 8) < 1) {
+          } else if (+numberVal.slice(6, 8) < +1) {
             numberVal = `${numberVal.slice(0, 6)}01${numberVal.slice(8, 14)}`;
           }
-          if (numberVal.slice(8, 10) > 23) {
+          if (+numberVal.slice(8, 10) > +23) {
             numberVal = `${numberVal.slice(0, 8)}23${numberVal.slice(10, 14)}`;
           }
-          if (numberVal.slice(10, 12) > 59) {
+          if (+numberVal.slice(10, 12) > +59) {
             numberVal = `${numberVal.slice(0, 10)}59${numberVal.slice(12, 14)}`;
           }
-          if (numberVal.slice(12, 14) > 59) {
+          if (+numberVal.slice(12, 14) > +59) {
             numberVal = `${numberVal.slice(0, 12)}59`;
           }
         }

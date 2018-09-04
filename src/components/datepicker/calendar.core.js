@@ -241,6 +241,7 @@ class Calendar {
     this.initMouseclick();
     this.initMousemove();
     this.initMouseleave();
+    this.initMousewheel();
   }
   initOptionsProperty() {
     if (this.options.initSelectDayFlag
@@ -297,13 +298,13 @@ class Calendar {
     }
     this.coordinate.pickerArea.total = {
       startX: padding.left,
-      width: commonAreaTotalWidth,
+      width: commonAreaTotalWidth - 1,
       startY: padding.top,
       height: pickerAreaHeight,
     };
     this.coordinate.calendarArea.total = {
       startX: padding.left,
-      width: commonAreaTotalWidth,
+      width: commonAreaTotalWidth - 1,
       startY: +padding.top + +pickerAreaHeight,
       height: this.baseCanvas.height - pickerAreaHeight - padding.top - padding.bottom,
     };
@@ -672,6 +673,7 @@ class Calendar {
                 new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
             }
             this.initCalendarProperty();
+            this.drawPickerArea();
             this.drawCalendarDay();
             this.clearCalendarArea();
             this.mousemoveDate();
@@ -880,6 +882,62 @@ class Calendar {
     });
   }
 
+  initMousewheel() {
+    this.overCanvas.addEventListener('mousewheel', (e) => {
+      /*eslint-disable*/
+      e.preventDefault();
+      const pickerAreaTotal = this.coordinate.pickerArea.total;
+      const calendarAreaTotal = this.coordinate.calendarArea.total;
+      const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
+      const timeAreaMinuteTotal = this.coordinate.timeArea.minute.total;
+      const timeAreaSecondTotal = this.coordinate.timeArea.second.total;
+      let areaType = '';
+      if (e.offsetX > pickerAreaTotal.startX
+        && e.offsetX < pickerAreaTotal.startX + pickerAreaTotal.width
+        && e.offsetY > pickerAreaTotal.startY
+        && e.offsetY < pickerAreaTotal.startY + pickerAreaTotal.height) {
+        areaType = 'month';
+      } else if (e.offsetX > calendarAreaTotal.startX
+        && e.offsetX < calendarAreaTotal.startX + calendarAreaTotal.width
+        && e.offsetY > calendarAreaTotal.startY
+        && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
+        areaType = 'month';
+      } else if (e.offsetX > timeAreaHourTotal.startX
+        && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width
+        && e.offsetY > timeAreaHourTotal.startY
+        && e.offsetY < timeAreaHourTotal.startY + timeAreaHourTotal.height) {
+        areaType = 'hour';
+      } else if (e.offsetX > timeAreaMinuteTotal.startX
+        && e.offsetX < timeAreaMinuteTotal.startX + timeAreaMinuteTotal.width
+        && e.offsetY > timeAreaMinuteTotal.startY
+        && e.offsetY < timeAreaMinuteTotal.startY + timeAreaMinuteTotal.height) {
+        areaType = 'minute';
+      } else if (e.offsetX > timeAreaSecondTotal.startX
+        && e.offsetX < timeAreaSecondTotal.startX + timeAreaSecondTotal.width
+        && e.offsetY > timeAreaSecondTotal.startY
+        && e.offsetY < timeAreaSecondTotal.startY + timeAreaSecondTotal.height) {
+        areaType = 'second';
+      }
+      if (areaType === 'month') {
+        const currDate = this.options.currentYearMonth;
+        if(e.deltaY < 0) {
+          // wheel up
+          this.options.currentYearMonth =
+            new Date(currDate.getFullYear(), currDate.getMonth() - 1, 1);
+        } else if(e.deltaY > 0) {
+          // wheel down
+          this.options.currentYearMonth =
+            new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
+        }
+        this.drawPickerArea();
+        this.initCalendarProperty();
+        this.drawCalendarDay();
+        this.clearCalendarArea();
+        this.mousemoveDate();
+      }
+    });
+  }
+
 
   drawCanvas() {
     this.drawTotalArea();
@@ -926,6 +984,10 @@ class Calendar {
     const pickerAreaOption = this.options.pickerArea;
     this.coordinate.pickerArea.arrow = [];
     const pickerAreaTotal = this.coordinate.pickerArea.total;
+    this.clearCanvas(ctx,
+      pickerAreaTotal.startX, pickerAreaTotal.startY,
+      pickerAreaTotal.width, pickerAreaTotal.height
+    );
     // draw bottom line in picker area
     ctx.beginPath();
     ctx.moveTo(
