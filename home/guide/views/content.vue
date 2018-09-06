@@ -64,6 +64,12 @@
                 content: '컨텍스트 메뉴',
                 imgUrl: `${this.imgUrl}/contextmenu.png`,
               },
+              {
+                name: 'Tab',
+                routerLink: '/tab',
+                content: '탭 패널 샘플',
+                imgUrl: `${this.imgUrl}/tab.png`,
+              },
             ],
           },
           {
