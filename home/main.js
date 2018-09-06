@@ -29,6 +29,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/dock/dock-view'], resolve),
     },
     {
+      path: '/window',
+      component: resolve => require(['./guide/views/examples/window/window-view'], resolve),
+    },
+    {
       path: '/barchart',
       component: resolve => require(['./guide/views/examples/chart/chart-bar-view'], resolve),
     },
