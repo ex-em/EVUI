@@ -58,6 +58,12 @@
                 content: '윈도우',
                 imgUrl: `${this.imgUrl}/window.png`,
               },
+              {
+                name: 'ContextMenu',
+                routerLink: '/contextmenu',
+                content: '컨텍스트 메뉴',
+                imgUrl: `${this.imgUrl}/contextmenu.png`,
+              },
             ],
           },
           {

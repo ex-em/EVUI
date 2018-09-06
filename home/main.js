@@ -33,6 +33,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/window/window-view'], resolve),
     },
     {
+      path: '/contextmenu',
+      component: resolve => require(['./guide/views/examples/contextmenu/contextmenu-view'], resolve),
+    },
+    {
       path: '/barchart',
       component: resolve => require(['./guide/views/examples/chart/chart-bar-view'], resolve),
     },

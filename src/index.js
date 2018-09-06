@@ -6,6 +6,8 @@ import EvIcon from '@/components/icon';
 import EvInput from '@/components/input';
 import EvLoadingMask from '@/components/loadingmask';
 import EvMenu from '@/components/menu';
+import EvLoadingMask from '@/components/loadingmask';
+import { NavMenu as EvNavMenu, ContextMenu as EvContextMenu } from '@/components/menu';
 import EvRadio from '@/components/radio';
 import EvRadioGroup from '@/components/radio-group';
 import EvSelectBox from '@/components/selectbox';
@@ -24,6 +26,9 @@ const components = {
   EvCheckboxGroup,
   EvIcon,
   EvInput,
+  EvLoadingMask,
+  EvNavMenu,
+  EvContextMenu,
   EvLoadingMask,
   EvMenu,
   EvRadio,

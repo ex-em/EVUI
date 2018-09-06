@@ -1,17 +1,12 @@
 <template>
   <div>
-    <menu-nav
+    <ev-nav-menu
       :store="menuStore"
     />
   </div>
 </template>
 <script>
-  import menuNav from '@/components/menu';
-
   export default {
-    components: {
-      menuNav,
-    },
     data() {
       return {
         menuStore: [
