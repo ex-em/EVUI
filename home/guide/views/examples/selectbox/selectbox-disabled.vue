@@ -1,8 +1,8 @@
 <template>
   <div class="selectbox-disabled">
-    <selectbox
+    <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :init-select-idx="0"
       :items="boxInfo.items"
       :disabled="boxInfo.disabled"
@@ -11,13 +11,7 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
-  import selectbox from '@/components/selectbox/selectbox';
-
   export default {
-    components: {
-      selectbox,
-    },
     data() {
       return {
         boxInfo: this._getBoxInfo(),
