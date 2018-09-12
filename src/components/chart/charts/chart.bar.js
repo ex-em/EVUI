@@ -247,11 +247,6 @@ export default class BarChart extends BaseChart {
     }
 
     if (index !== null && index > -1) {
-      // let p;
-      // let sz;
-      // let min;
-      // let max;
-
       let xp;
       let yp;
       let w;
@@ -275,24 +270,6 @@ export default class BarChart extends BaseChart {
           sId = skey[ix];
           break;
         }
-        // if (!isHorizontal) {
-        //
-        //
-        //   p = gdata[index].xp;
-        //   sz = gdata[index].w;
-        //   min = p;
-        //   max = p + sz;
-        // } else {
-        //   p = gdata[index].yp;
-        //   sz = gdata[index].h;
-        //   min = p + sz;
-        //   max = p;
-        // }
-        //
-        // if ((mouseInv >= min) && (mouseInv <= max + 10)) {
-        //   sId = skey[ix];
-        //   break;
-        // }
       }
     }
 

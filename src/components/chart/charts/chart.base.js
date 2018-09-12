@@ -157,7 +157,7 @@ class BaseChart {
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
     this.oldPixelRatio = this.pixelRatio;
 
-    this.chartDOM.appendChild(this.bufferCanvas);
+    this.chartDOM.appendChild(this.displayCanvas);
     this.chartDOM.appendChild(this.overlayCanvas);
 
     this.overlayCanvas.style.position = 'absolute';
