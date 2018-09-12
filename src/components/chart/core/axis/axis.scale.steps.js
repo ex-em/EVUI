@@ -107,7 +107,7 @@ class AxisStepsScale extends Axis {
 
     let labelText;
 
-    for (let ix = 0, ixLen = labelCount; ix <= ixLen; ix++) {
+    for (let ix = 0, ixLen = labelType === 'category' ? labelCount - 1 : labelCount; ix <= ixLen; ix++) {
       if (this.axisData[ix]) {
         options.ticks[ix] = this.axisData[ix];
       } else {

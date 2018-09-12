@@ -1,11 +1,6 @@
 import BaseChart from './chart.base';
 
 export default class ScatterChart extends BaseChart {
-  constructor(target, data, options) {
-    super(target, data, options);
-    this.seriesList = this.dataStore.getSeriesList();
-  }
-
   drawChart() {
     this.setLabelOffset();
     this.createAxis();
@@ -15,25 +10,23 @@ export default class ScatterChart extends BaseChart {
   }
 
   createScatter() {
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        this.drawSeries(ix);
-      }
-    }
+    const graphData = this.graphData;
+    const skey = Object.keys(graphData);
+    let series;
 
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].isHighlight) {
-        this.seriesHighlight(ix);
-        break;
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      series = this.seriesList[skey[ix]];
+
+      if (series.show) {
+        this.drawSeries(skey[ix], graphData[skey[ix]]);
       }
     }
   }
 
-  drawSeries(seriesIndex) {
+  drawSeries(seriesId, data) {
     // 해당 series 정보 및 ctx 등 확인
-    const series = this.seriesList[seriesIndex];
+    const series = this.seriesList[seriesId];
     const ctx = this.bufferCtx;
-    // series에 특정한 color 값이 없다면, options의 colors 참조
     const color = series.color;
 
     ctx.beginPath();
@@ -42,58 +35,63 @@ export default class ScatterChart extends BaseChart {
 
     ctx.strokeStyle = color;
 
-    // series의 data를 순회하며 계산된 X,Y좌표를 담는 배열
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
-
     let x = null;
     let y = null;
-    let data;
+    let gdata;
 
-    for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-      data = series.cData[ix];
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      gdata = data[ix];
 
-      x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y, false);
+      x = this.calculateX(gdata.x, series.xAxisIndex, true);
+      y = this.calculateY(gdata.y, series.yAxisIndex, false);
 
-      xPoint.push(x);
-      yPoint.push(y);
+      gdata.xp = x;
+      gdata.yp = y;
     }
 
-    this.xPoint = series.xPoint;
     if (series.point) {
       ctx.beginPath();
       ctx.strokeStyle = color;
-      ctx.fillStyle = color;
+      ctx.fillStyle = series.pointFill;
       ctx.lineWidth = series.lineWidth;
-      for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-        if (xPoint[ix] !== null && yPoint[ix] !== null && series.cData[ix].point) {
-          this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
+      for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+        if (data[ix].xp !== null && data[ix].yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, data[ix].xp, data[ix].yp);
         }
       }
     }
   }
 
 
-  seriesHighlight(seriesIndex) {
+  seriesHighlight(seriesId) {
     const ctx = this.overlayCtx;
-    const series = this.seriesList[seriesIndex];
+    const series = this.seriesList[seriesId];
+    const graphData = this.graphData;
+    const gdata = graphData[seriesId];
     const color = series.color;
 
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
-
-    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.lineJoin = 'round';
     ctx.lineWidth = 2;
-    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = color;
 
+    if (series.point) {
+      const pSize = series.highlight.pointSize;
 
-    for (let ix = 0, ixLen = xPoint.length; ix < ixLen; ix++) {
-      this.drawPoint(ctx, series.pointStyle, series.highlight.item, xPoint[ix], yPoint[ix]);
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.fillStyle = color;
+
+      for (let ix = 0, ixLen = gdata.length; ix < ixLen; ix++) {
+        if (gdata[ix].xp !== null && gdata[ix].yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, pSize, gdata[ix].xp, gdata[ix].yp);
+        }
+      }
     }
   }
 
@@ -101,12 +99,19 @@ export default class ScatterChart extends BaseChart {
     if (item.dataIndex === null || item.seriesIndex === null) {
       return;
     }
+    const graphData = this.graphData;
+    const gdata = graphData[item.sId];
     const ctx = this.overlayCtx;
-    const series = this.seriesList[item.seriesIndex];
+    const series = this.seriesList[item.sId];
+
+    if (!series.point) {
+      return;
+    }
 
     const color = series.color;
-    const x = series.drawInfo.xPoint[item.dataIndex];
-    const y = series.drawInfo.yPoint[item.dataIndex];
+    const x = gdata[item.index].xp;
+    const y = gdata[item.index].yp;
+    const pSize = series.highlight.pointSize;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = series.lineWidth;
@@ -116,7 +121,7 @@ export default class ScatterChart extends BaseChart {
     ctx.shadowBlur = 4;
     ctx.shadowColor = color;
 
-    this.drawPoint(ctx, series.pointStyle, series.highlight.item, x, y);
+    this.drawPoint(ctx, series.pointStyle, pSize, x, y);
   }
 
 

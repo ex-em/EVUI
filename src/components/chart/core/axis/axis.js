@@ -199,8 +199,30 @@ class Axis {
     const options = this.options;
     let label;
 
-    if (options.labelType === 'time') {
-      label = moment(value).format(options.tickFormat);
+    if (options.timeFormat !== null) {
+      label = moment(value).format(options.timeFormat);
+    } else if (options.labelType === 'linear') {
+      if (value >= 1000000000) {
+        if (value % 1000000000 === 0) {
+          label = `${(value / 1000000000).toFixed(1)}G`;
+        } else {
+          label = `${(value / 1000000000).toFixed(1)}G`;
+        }
+      } else if (value >= 1000000) {
+        if (value % 1000000 === 0) {
+          label = `${(value / 1000000).toFixed(1)}M`;
+        } else {
+          label = `${(value / 1000000).toFixed(1)}M`;
+        }
+      } else if (value >= 1000) {
+        if (value % 1000 === 0) {
+          label = `${(value / 1000).toFixed(1)}k`;
+        } else {
+          label = `${(value / 1000).toFixed(1)}k`;
+        }
+      } else {
+        label = value.toFixed(1);
+      }
     } else {
       label = value;
     }

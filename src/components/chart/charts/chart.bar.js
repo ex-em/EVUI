@@ -1,13 +1,12 @@
 import BaseChart from './chart.base';
 
 export default class BarChart extends BaseChart {
-  constructor(target, data, options) {
-    // this.setConvertedData(data);
-    super(target, data, options);
-    this.seriesList = this.dataStore.getSeriesList();
-  }
-
   drawChart() {
+    if (!this.chartRect.width || !this.chartRect.height ||
+      this.chartRect.width < 1 || this.chartRect.height < 1) {
+      return;
+    }
+
     this.setLabelOffset();
     this.createAxis();
     this.createBar();
@@ -16,135 +15,142 @@ export default class BarChart extends BaseChart {
   }
 
   createBar() {
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        this.drawSeries(ix);
-      }
-    }
+    const groups = this.data.groups;
+    const graphData = this.graphData;
+    const skey = Object.keys(graphData);
 
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].highlight.show) {
-        this.seriesHighlight(ix);
-        break;
+    this.seriesCount = this.getShowSeriesCount();
+
+    let series;
+    if (groups.length) {
+      for (let ix = 0, ixLen = groups.length; ix < ixLen; ix++) {
+        const group = groups[ix];
+        for (let jx = 0, jxLen = group.length; jx < jxLen; jx++) {
+          series = this.seriesList[group[jx]];
+
+          if (series.show) {
+            this.drawSeries(group[jx], graphData[group[jx]]);
+          }
+        }
+      }
+    } else {
+      for (let ix = 0, showIdx = 0, ixLen = skey.length; ix < ixLen; ix++) {
+        series = this.seriesList[skey[ix]];
+
+        if (!series.isExistGrp && series.show) {
+          this.drawSeries(skey[ix], graphData[skey[ix]], showIdx);
+          showIdx++;
+        }
       }
     }
   }
 
-  drawSeries(seriesIndex) {
-    // 해당 series 정보 및 ctx 등 확인
-    const series = this.seriesList[seriesIndex];
-    const category = this.data.category || [];
+  drawSeries(seriesId, data, sIndex) {
+    const series = this.seriesList[seriesId];
+    const axisType = series.axisType;
+    const aIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
+
+    const axisList = this.axisList;
+    const category = axisList[axisType][aIndex];
+
+    const thickness = this.options.thickness || 1;
+
     const ctx = this.bufferCtx;
-    const isStack = this.options.stack;
-    // series에 특정한 color 값이 없다면, options의 colors 참조
-
-    // series의 data를 순회하며 계산된 X,Y좌표를 담는 배열
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
-    const width = series.drawInfo.width;
-    const height = series.drawInfo.height;
-
     const color = series.color;
-    const tickness = this.options.tickness || 1;
-    const isHorizontal = this.options.horizontal;
 
-    // bar 차트는 category가 중심이 되며 축의 넓이를 category의 수로 나눠 각 cateogory의 넓이를 구함.
-    const drawingArea = this.options.horizontal ? this.drawingYArea() : this.drawingXArea();
-    const categoryArea = drawingArea / (category.length || 1);
-    // category간 padding값 (left, right)
-    const categoryPadding = 2;
-    let barArea;
+    const isHorizontal = !!(this.options.horizontal);
 
-    // column chart일 때를 의미.
-    // series가 많을수록 막대 하나의 넓이가 줄어든다.
-    // stack의 경우 막대 넓이가 줄어들 필요가 없음.
+    const isStack = !!(series.groupIndex !== null);
+    const dArea = isHorizontal ? this.drawingYArea() : this.drawingXArea();
+    const cArea = dArea / (category.length || 1);
+    const cPad = 2;
+
+    let bArea;
     if (isStack) {
-      barArea = (categoryArea - (categoryPadding * 2));
+      bArea = (cArea - (cPad * 2));
     } else {
-      barArea = (categoryArea - (categoryPadding * 2)) / this.seriesList.length;
+      bArea = (cArea - (cPad * 2)) / this.seriesCount;
     }
-
-    let barWidth = isHorizontal ? null : Math.round(barArea * tickness);
-    let barHeight = isHorizontal ? Math.round(barArea * tickness) : null;
+    let w = isHorizontal ? null : Math.round(bArea * thickness);
+    let h = isHorizontal ? Math.round(bArea * thickness) : null;
 
     // barArea내에서 barWidth로 빠진 부분을 계산.
-    const barPadding = isHorizontal ? (barArea - barHeight) / 2 : (barArea - barWidth) / 2;
+    const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     // series index에 따라 시작 X값 보정을 위한 변수.
-    const barSeriesX = isStack ? 1 : seriesIndex + 1;
+    const barSeriesX = isStack ? 1 : sIndex + 1;
+
 
     // axis start point
-    let startX;
-    let startY;
+    let sx;
+    let sy;
     if (isHorizontal) {
-      startX = this.yAxes[series.axisIndex.y].axisPosInfo.x1;
-      startY = this.yAxes[series.axisIndex.y].axisPosInfo.y2;
+      sx = this.yAxes[series.yAxisIndex].axisPosInfo.x1;
+      sy = this.yAxes[series.yAxisIndex].axisPosInfo.y2;
     } else {
-      startX = this.xAxes[series.axisIndex.x].axisPosInfo.x1;
-      startY = this.xAxes[series.axisIndex.x].axisPosInfo.y2;
+      sx = this.xAxes[series.xAxisIndex].axisPosInfo.x1;
+      sy = this.xAxes[series.xAxisIndex].axisPosInfo.y2;
     }
 
     let categoryPoint = null;
-    let barX = null;
-    let barY = null;
-    let data;
+    let x = null;
+    let y = null;
+    let gdata;
 
     ctx.beginPath();
     ctx.fillStyle = color;
 
-    for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-      data = series.cData[ix];
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      gdata = data[ix];
       if (category[ix]) {
         // category의 시작 위치
         if (isHorizontal) {
-          categoryPoint = startY - (categoryArea * ix) - categoryPadding;
+          categoryPoint = sy - (cArea * ix) - cPad;
         } else {
-          categoryPoint = startX + (categoryArea * ix) + categoryPadding;
+          categoryPoint = sx + (cArea * ix) + cPad;
         }
 
         // category의 시작 위치로부터 bar의 위치를 지정.
         if (isHorizontal) {
-          barX = startX;
-          barY = Math.round(categoryPoint - ((barArea * barSeriesX) - (barHeight + barPadding)));
+          x = sx;
+          y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
         } else {
-          barX = Math.round(categoryPoint + ((barArea * barSeriesX) - (barWidth + barPadding)));
-          barY = startY;
+          x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
+          y = sy;
         }
         // stack일 경우
         // data.y가 accumulate value이므로 data.b를 제한다.
         // dataStore단계에서는 line chart와 물려있어서 chart.bar에서 처리.
         if (isHorizontal) {
-          if (data.b) {
-            barWidth = this.calculateX(data.x - data.b, series.axisIndex.x) - startX;
-            barX = this.calculateX(data.b, series.axisIndex.x);
+          if (gdata.b) {
+            w = this.calculateX(gdata.x - gdata.b, series.xAxisIndex, false);
+            x = this.calculateX(gdata.b, series.xAxisIndex, false) + sx;
           } else {
-            barWidth = this.calculateX(data.x, series.axisIndex.x) - startX;
+            w = this.calculateX(gdata.x, series.xAxisIndex, false);
           }
-        } else if (data.b) { // vertical stack bar chart
-            barHeight = this.calculateY(data.y - data.b, series.axisIndex.y, true);
-            barY = this.calculateY(data.b, series.axisIndex.y);
+        } else if (gdata.b) { // vertical stack bar chart
+            h = this.calculateY(gdata.y - gdata.b, series.yAxisIndex, true);
+            y = this.calculateY(gdata.b, series.yAxisIndex);
         } else { // vertical bar chart
-          barHeight = this.calculateY(data.y, series.axisIndex.y, true);
+          h = this.calculateY(gdata.y, series.yAxisIndex, true);
         }
 
-        ctx.fillRect(barX, barY, barWidth, isHorizontal ? -barHeight : barHeight);
+        ctx.fillRect(x, y, w, isHorizontal ? -h : h);
 
-        xPoint.push(barX);
-        yPoint.push(barY);
-        width.push(barWidth);
-        height.push(isHorizontal ? -barHeight : barHeight);
+        gdata.xp = x;
+        gdata.yp = y;
+        gdata.w = w;
+        gdata.h = isHorizontal ? -h : h;
       }
     }
   }
 
-  seriesHighlight(seriesIndex) {
+  seriesHighlight(seriesId) {
     const ctx = this.overlayCtx;
-    const series = this.seriesList[seriesIndex];
-    const color = series.color;
+    const series = this.seriesList[seriesId];
+    const graphData = this.store.getGraphData();
+    const gdata = graphData[seriesId];
 
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
-    const width = series.drawInfo.width;
-    const height = series.drawInfo.height;
+    const color = series.color;
 
     let x = null;
     let y = null;
@@ -154,115 +160,143 @@ export default class BarChart extends BaseChart {
     ctx.beginPath();
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = color;
     ctx.fillStyle = color;
 
-    for (let ix = 0, ixLen = xPoint.length; ix < ixLen; ix++) {
-      x = xPoint[ix];
-      y = yPoint[ix];
-      bw = width[ix];
-      bh = height[ix];
+    for (let ix = 0, ixLen = gdata.length; ix < ixLen; ix++) {
+      x = gdata[ix].xp;
+      y = gdata[ix].yp;
+      bw = gdata[ix].w;
+      bh = gdata[ix].h;
 
       ctx.fillRect(x, y, bw, bh);
     }
   }
 
   itemHighlight(item) {
-    if (item.dataIndex === null || item.seriesIndex === null) {
+    if (item.index === null || item.sId === null) {
       return;
     }
-    const ctx = this.overlayCtx;
-    const isStack = this.options.stack;
 
-    let series;
+    const graphData = this.graphData;
+    const skey = Object.keys(graphData);
+    const ctx = this.overlayCtx;
+    const series = this.seriesList[item.sId];
+
+    let gdata;
     let color;
     let x;
     let y;
-    let width;
-    let height;
+    let w;
+    let h;
 
-    if (!isStack) {
-      series = this.seriesList[item.seriesIndex];
+    if (series.groupIndex === null) {
       color = series.color;
+      gdata = graphData[item.sId];
 
-      x = series.drawInfo.xPoint[item.dataIndex];
-      y = series.drawInfo.yPoint[item.dataIndex];
-      width = series.drawInfo.width[item.dataIndex];
-      height = series.drawInfo.height[item.dataIndex];
+      x = gdata[item.index].xp;
+      y = gdata[item.index].yp;
+      w = gdata[item.index].w;
+      h = gdata[item.index].h;
 
       ctx.fillStyle = color;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
-      ctx.shadowBlur = 4;
+      ctx.shadowBlur = 8;
       ctx.shadowColor = color;
 
-      ctx.fillRect(x, y, width, height);
+      ctx.fillRect(x, y, w, h);
     } else {
-      for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-        series = this.seriesList[ix];
-        color = series.color;
+      for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+        color = this.seriesList[skey[ix]].color;
+        gdata = graphData[skey[ix]];
 
-        x = series.drawInfo.xPoint[item.dataIndex];
-        y = series.drawInfo.yPoint[item.dataIndex];
-        width = series.drawInfo.width[item.dataIndex];
-        height = series.drawInfo.height[item.dataIndex];
 
-        ctx.fillStyle = series.color;
+        x = gdata[item.index].xp;
+        y = gdata[item.index].yp;
+        w = gdata[item.index].w;
+        h = gdata[item.index].h;
+
+        ctx.fillStyle = color;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 8;
         ctx.shadowColor = color;
 
-        ctx.fillRect(x, y, width, height);
+        ctx.fillRect(x, y, w, h);
       }
     }
   }
 
-  findHitItem(offset) {
-    const mouse = !this.options.horizontal ? offset[0] : offset[1];
-    const isHorizontal = this.options.horizontal;
+  findHitItem(offset, graphData) {
+    const skey = Object.keys(graphData);
+    const isHorizontal = !!this.options.horizontal;
 
-    let dataIndex;
-    let seriesIndex = null;
+    const mouse = isHorizontal ? offset[1] : offset[0];
+    // const mouseInv = isHorizontal ? offset[0] : offset[1];
+
+    let index;
+    let sId = null;
+    let gdata;
 
     if (!isHorizontal) {
-      dataIndex = this.findHitAxisX(mouse);
+      index = this.findHitAxisX(mouse, graphData);
     } else {
-      dataIndex = this.findHitAxisY(mouse);
+      index = this.findHitAxisY(mouse, graphData);
     }
 
-    if (dataIndex !== null && dataIndex > -1) {
-      for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-        const series = this.seriesList[ix];
-        let point;
-        let size;
-        let min;
-        let max;
+    if (index !== null && index > -1) {
+      // let p;
+      // let sz;
+      // let min;
+      // let max;
 
-        if (!isHorizontal) {
-          point = series.drawInfo.xPoint[dataIndex];
-          size = series.drawInfo.width[dataIndex];
-          min = point;
-          max = point + size;
-        } else {
-          point = series.drawInfo.yPoint[dataIndex];
-          size = series.drawInfo.height[dataIndex];
-          min = point + size;
-          max = point;
-        }
+      let xp;
+      let yp;
+      let w;
+      let h;
+      let xMax;
+      let yMax;
 
-        if ((mouse >= min) && (mouse <= max)) {
-          seriesIndex = ix;
+      for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+        gdata = graphData[skey[ix]];
+
+        xp = gdata[index].xp;
+        yp = gdata[index].yp;
+        w = gdata[index].w;
+        h = gdata[index].h;
+
+        xMax = xp + w;
+        yMax = yp + h;
+
+        if ((offset[0] >= xp) && (offset[0] <= xMax) &&
+          (offset[1] <= yp) && (offset[1] >= yMax)) {
+          sId = skey[ix];
           break;
         }
+        // if (!isHorizontal) {
+        //
+        //
+        //   p = gdata[index].xp;
+        //   sz = gdata[index].w;
+        //   min = p;
+        //   max = p + sz;
+        // } else {
+        //   p = gdata[index].yp;
+        //   sz = gdata[index].h;
+        //   min = p + sz;
+        //   max = p;
+        // }
+        //
+        // if ((mouseInv >= min) && (mouseInv <= max + 10)) {
+        //   sId = skey[ix];
+        //   break;
+        // }
       }
     }
 
-    return {
-      dataIndex,
-      seriesIndex,
-    };
+    return { index, sId };
   }
 
   findHitAxisX(mouseX) {
@@ -270,19 +304,19 @@ export default class BarChart extends BaseChart {
     const x2 = this.chartRect.x2 - this.labelOffset.right;
 
     const width = x2 - x1;
-    const category = this.data.category || [];
+    const category = this.axisList.x[0] || [];
 
-    let dataIndex = null;
+    let index = null;
 
     if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
-      dataIndex = Math.floor((category.length / width) * (mouseX - x1));
+      index = Math.floor((category.length / width) * (mouseX - x1));
 
-      if (dataIndex >= category.length) {
-        dataIndex = null;
+      if (index >= category.length) {
+        index = null;
       }
     }
 
-    return dataIndex;
+    return index;
   }
 
   findHitAxisY(mouseY) {
@@ -290,18 +324,34 @@ export default class BarChart extends BaseChart {
     const y2 = this.chartRect.y2 - this.labelOffset.bottom;
 
     const height = y2 - y1;
-    const category = this.data.category || [];
+    const category = this.axisList.y[0] || [];
 
-    let dataIndex = null;
+    let index = null;
 
     if (mouseY >= (y1 - 10) && mouseY <= (y2 + 10)) {
-      dataIndex = Math.floor((category.length / height) * (y2 - mouseY));
+      index = Math.floor((category.length / height) * (y2 - mouseY));
 
-      if (dataIndex >= category.length) {
-        dataIndex = null;
+      if (index >= category.length) {
+        index = null;
       }
     }
 
-    return dataIndex;
+    return index;
+  }
+
+  getShowSeriesCount() {
+    const skey = Object.keys(this.seriesList);
+
+    let count = 0;
+    let series;
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      series = this.seriesList[skey[ix]];
+
+      if (series.show) {
+        count += 1;
+      }
+    }
+
+    return count;
   }
 }

@@ -36,10 +36,10 @@ const router = new VueRouter({
       path: '/linechart',
       component: resolve => require(['./guide/views/examples/chart/chart-line-view'], resolve),
     },
-    {
-      path: '/piechart',
-      component: resolve => require(['./guide/views/examples/chart/chart-pie-view'], resolve),
-    },
+    // {
+    //   path: '/piechart',
+    //   component: resolve => require(['./guide/views/examples/chart/chart-pie-view'], resolve),
+    // },
     {
       path: '/checkbox',
       component: resolve => require(['./guide/views/examples/checkbox/checkbox-view'], resolve),

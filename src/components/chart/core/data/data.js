@@ -39,7 +39,7 @@ export default class DataStore {
     }
 
     if (this.chartData.data.length) {
-      this.createChartDataset();
+      this.createChartDataSet();
     }
   }
 
@@ -60,28 +60,28 @@ export default class DataStore {
       throw new Error('[EVUI][ERROR][ChartDataStore]-Not found input series object.');
     }
 
+    const skey = Object.keys(this.seriesList);
+
     let series;
     const defaultSeries = {
       name: param.name || `series-${Util.getId()}`,
-      color: param.color || this.chartOptions.colors[Object.keys(this.seriesList).length],
-      show: param.show || true,
+      color: param.color || this.chartOptions.colors[skey.length],
+      show: param.show === undefined ? true : param.show,
       min: null,
       max: null,
       minIndex: null,
       maxIndex: null,
       seriesIndex: this.seriesList.length,
       data: [],
-      computed: [],
       insertIndex: -1,
       dataIndex: 0,
       startPoint: 0,
-      highlight: false,
-      drawInfo: {
-        xPoint: [],
-        yPoint: [],
-        width: [],
-        height: [],
+      highlight: {
+        pointSize: param.highlight ? (param.highlight.size || 5) : 5,
       },
+      groupIndex: null,
+      stackIndex: null,
+      isExistGrp: false,
     };
 
     if (this.getSeriesExtends) {
@@ -104,19 +104,21 @@ export default class DataStore {
    * @return extended series object
    */
   getSeriesExtends(defaultSeries, param) {
-    const horizontal = !!param.horizontal; // lint escape.
+    const chartType = this.chartOptions.type;
+    const skey = Object.keys(this.seriesList);
+    const horizontal = !!(this.chartOptions.horizontal);
+
     const extSeries = {
-      horizontal,
       axisType: horizontal ? 'y' : 'x',
       xAxisIndex: param.xAxisIndex ? param.xAxisIndex : 0,
       yAxisIndex: param.yAxisIndex ? param.yAxisIndex : 0,
-      point: param.point || false,
+      point: param.point || chartType === 'scatter',
       pointSize: param.pointSize || 4,
       pointStyle: param.pointStyle || '',
-      pointFill: param.pointFill || this.chartOptions.colors[this.seriesList.length],
+      pointFill: param.pointFill || this.chartOptions.colors[skey.length],
       lineWidth: param.lineWidth || 2,
       fill: param.fill || false,
-      fillColor: param.fillColor || this.chartOptions.colors[this.seriesList.length],
+      fillColor: param.fillColor || this.chartOptions.colors[skey.length],
       fillOpacity: param.fillOpacity || 0.4,
     };
 
@@ -133,7 +135,7 @@ export default class DataStore {
    * @exec this.addAxisDataSet();
    * @exec this.graphDataSet
    */
-  createChartDataset() {
+  createChartDataSet() {
     const chartData = this.chartData.data;
     let meta;
     let data;
@@ -171,7 +173,7 @@ export default class DataStore {
     }
 
     for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-      this.addAxisData('x', data[ix], index);
+      this.addAxisData(axisType, data[ix], index);
     }
   }
 
@@ -232,11 +234,11 @@ export default class DataStore {
         axisArray.push(value);
       }
 
-      if (axisType === 'x') {
-        this.setAxisXMinMax('', value, index);
-      } else {
-        this.setAxisYMinMax('', value, index);
-      }
+      // if (axisType === 'x') {
+      //   this.setAxisXMinMax('', value, index);
+      // } else {
+      //   this.setAxisYMinMax('', value, index);
+      // }
     }
   }
 
@@ -318,6 +320,7 @@ export default class DataStore {
    * @param dataIndex dataIndex
    */
   addGraphData(seriesId, axisData, graphData, dataIndex) {
+    const isHorizontal = !!this.chartOptions.horizontal;
     const data = this.graphData[seriesId];
     const series = this.seriesList[seriesId];
     const axisType = series.axisType;
@@ -357,15 +360,22 @@ export default class DataStore {
       adata = axisData;
     }
 
-    if (graphData === undefined || isNaN(graphData) || +graphData < 0) {
+    if (graphData === undefined || graphData === null || isNaN(graphData) || +graphData < 0) {
       gdata = null;
     } else {
       gdata = +graphData;
     }
 
     if (adata) {
-      data[index] = { x: adata, y: gdata };
-      this.setMinMaxValue(seriesId, adata, gdata, index);
+      if (isHorizontal) {
+        data[index] = { x: gdata, y: adata, xp: null, yp: null, w: null, h: null };
+      } else {
+        data[index] = { x: adata, y: gdata, xp: null, yp: null, w: null, h: null };
+      }
+
+      if (series.show) {
+        this.setMinMaxValue(seriesId, adata, gdata, index);
+      }
     }
   }
 
@@ -412,6 +422,10 @@ export default class DataStore {
       throw new Error('[EVUI][ERROR][ChartDataStore]-Invalid Series setAxisMinMax.');
     }
 
+    if (value === null) {
+      return;
+    }
+
     if (!this.xMinMax[index]) {
       this.xMinMax[index] = { min: null, max: null, seriesId: null };
     }
@@ -420,12 +434,12 @@ export default class DataStore {
 
     if (xInfo.min === null || xInfo.min > value) {
       xInfo.min = value;
-      xInfo.seriesId = seriesId;
+      xInfo.minSId = seriesId;
     }
 
     if (xInfo.max === null || xInfo.max < value) {
       xInfo.max = value;
-      xInfo.seriesId = seriesId;
+      xInfo.maxSId = seriesId;
     }
   }
 
@@ -443,6 +457,10 @@ export default class DataStore {
       throw new Error('[EVUI][ERROR][ChartDataStore]-Invalid Series setAxisMinMax.');
     }
 
+    if (value === null) {
+      return;
+    }
+
     if (!this.yMinMax[index]) {
       this.yMinMax[index] = { min: null, max: null, seriesId: null };
     }
@@ -451,12 +469,12 @@ export default class DataStore {
 
     if (yInfo.min === null || yInfo.min > value) {
       yInfo.min = value;
-      yInfo.seriesId = seriesId;
+      yInfo.minSId = seriesId;
     }
 
     if (yInfo.max === null || yInfo.max < value) {
       yInfo.max = value;
-      yInfo.seriesId = seriesId;
+      yInfo.maxSId = seriesId;
     }
   }
 
@@ -478,5 +496,32 @@ export default class DataStore {
 
   getAxisList() {
     return this.axisList;
+  }
+
+  updateData() {
+    this.axisList = { x: [], y: [] };
+    this.xMinMax = [];
+    this.yMinMax = [];
+    this.graphData = {};
+
+    const sKeys = Object.keys(this.seriesList);
+    let series;
+
+    for (let ix = 0, ixLen = sKeys.length; ix < ixLen; ix++) {
+      series = this.seriesList[sKeys[ix]];
+      series.min = null;
+      series.minIndex = null;
+      series.max = null;
+      series.maxIndex = null;
+      series.isExistGrp = false;
+      series.groupIndex = null;
+      series.stackIndex = null;
+
+      if (!this.graphData[sKeys[ix]]) {
+        this.graphData[sKeys[ix]] = [];
+      }
+    }
+
+    this.createChartDataSet();
   }
 }
