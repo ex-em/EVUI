@@ -1,6 +1,25 @@
 import BaseChart from './chart.base';
 
 export default class ScatterChart extends BaseChart {
+  constructor(target, data, options) {
+    super(target, data, options);
+
+    this.selectBox = {
+      start: { x: -1, y: -1 },
+      end: { x: -1, y: -1 },
+      show: false,
+      active: false,
+      isDrawing: false,
+    };
+
+    this.selectPos = {
+      start: { x: -1, y: -1 },
+      end: { x: -1, y: -1 },
+    };
+
+    this.options.useSelect = true;
+    this.overlayCanvas.onmousedown = this.mouseDownEvent.bind(this);
+  }
   drawChart() {
     this.setLabelOffset();
     this.createAxis();
@@ -55,8 +74,10 @@ export default class ScatterChart extends BaseChart {
       ctx.fillStyle = series.pointFill;
       ctx.lineWidth = series.lineWidth;
       for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-        if (data[ix].xp !== null && data[ix].yp !== null) {
-          this.drawPoint(ctx, series.pointStyle, series.pointSize, data[ix].xp, data[ix].yp);
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, gdata.xp, gdata.yp);
         }
       }
     }
@@ -67,9 +88,13 @@ export default class ScatterChart extends BaseChart {
     const ctx = this.overlayCtx;
     const series = this.seriesList[seriesId];
     const graphData = this.graphData;
-    const gdata = graphData[seriesId];
+    const data = graphData[seriesId];
     const color = series.color;
 
+    if (this.selectBox && this.selectBox.active) {
+      return;
+    }
+    ctx.save();
     ctx.beginPath();
     ctx.lineJoin = 'round';
     ctx.lineWidth = 2;
@@ -81,24 +106,34 @@ export default class ScatterChart extends BaseChart {
 
     if (series.point) {
       const pSize = series.highlight.pointSize;
+      let gdata;
 
       ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
       ctx.fillStyle = color;
 
-      for (let ix = 0, ixLen = gdata.length; ix < ixLen; ix++) {
-        if (gdata[ix].xp !== null && gdata[ix].yp !== null) {
-          this.drawPoint(ctx, series.pointStyle, pSize, gdata[ix].xp, gdata[ix].yp);
+      for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, pSize, gdata.xp, gdata.yp);
         }
       }
     }
+
+    ctx.restore();
   }
 
   itemHighlight(item) {
-    if (item.dataIndex === null || item.seriesIndex === null) {
+    if (item.index === null || item.sId === null) {
       return;
     }
+
+    if (this.selectBox && this.selectBox.active) {
+      return;
+    }
+
     const graphData = this.graphData;
     const gdata = graphData[item.sId];
     const ctx = this.overlayCtx;
@@ -113,6 +148,8 @@ export default class ScatterChart extends BaseChart {
     const y = gdata[item.index].yp;
     const pSize = series.highlight.pointSize;
 
+    ctx.save();
+
     ctx.strokeStyle = color;
     ctx.lineWidth = series.lineWidth;
     ctx.fillStyle = series.pointFill;
@@ -122,6 +159,7 @@ export default class ScatterChart extends BaseChart {
     ctx.shadowColor = color;
 
     this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    ctx.restore();
   }
 
 
@@ -145,5 +183,116 @@ export default class ScatterChart extends BaseChart {
       ctx.stroke();
       ctx.restore();
     }
+  }
+
+  mouseDownEvent(e) {
+    if (e.which !== 1) {
+      return;
+    }
+
+    if (!this.selectBox) {
+      return;
+    }
+
+    document.body.focus();
+    this.overlayClear();
+    this.setSelectionPos(this.selectBox.start, e);
+    this.selectBox.active = true;
+
+    window.addEventListener('mouseup', this.mouseupEvent.bind(this), false);
+    window.addEventListener('mousemove', this.mouseMoveSelectEvent.bind(this), false);
+  }
+
+  mouseMoveSelectEvent(e) {
+    if (this.selectBox && this.selectBox.active) {
+      this.overlayCanvas.style.cursor = 'crosshair';
+      this.overlayClear();
+      this.setSelectionPos(this.selectBox.end, e);
+
+      if (this.drawSelection) {
+        this.drawSelection();
+      }
+    }
+  }
+
+  mouseupEvent(e) {
+    if (!this.selectBox) {
+      return;
+    }
+
+    this.setSelectionPos(this.selectBox.end, e);
+    this.selectBox.active = false;
+
+    this.overlayCanvas.style.cursor = 'default';
+    if (this.selectBox.start.x === this.selectBox.end.x &&
+      this.selectBox.start.y === this.selectBox.end.y) {
+      this.clearSelection();
+    } else {
+      this.selectPos.start.x = this.selectBox.start.x;
+      this.selectPos.start.y = this.selectBox.start.y;
+      this.selectPos.end.x = this.selectBox.end.x;
+      this.selectPos.end.y = this.selectBox.end.y;
+    }
+  }
+
+  setSelectionPos(pos, e) {
+    const mousePos = pos;
+    const chartRect = this.chartRect;
+    const x1 = chartRect.x1;
+    const x2 = chartRect.x2;
+    const y1 = chartRect.y1;
+    const y2 = chartRect.y2;
+
+    const mouse = this.getMousePosition(e);
+    const mouseX = mouse[0];
+    const mouseY = mouse[1];
+
+    if (mouseX < x1) {
+      mousePos.x = x1;
+    } else if (mouseX > x2) {
+      mousePos.x = x2;
+    } else {
+      mousePos.x = mouseX;
+    }
+
+    if (mouseY < y1) {
+      mousePos.y = y1;
+    } else if (mouseY > y2) {
+      mousePos.y = y2;
+    } else {
+      mousePos.y = mouseY;
+    }
+  }
+
+  drawSelection() {
+    if (this.selectBox.active) {
+      const ctx = this.overlayCtx;
+      const strokeColor = 'rgba(52,155,231, 0.8)';
+      const fillColor = 'rgba(52,155,231, 0.4)';
+
+      ctx.save();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.fillStyle = fillColor;
+
+      const x = Math.min(this.selectBox.start.x, this.selectBox.end.x) + 0.5;
+      const y = Math.min(this.selectBox.start.y, this.selectBox.end.y) + 0.5;
+      const w = Math.abs(this.selectBox.end.x - this.selectBox.start.x) - 1;
+      const h = Math.abs(this.selectBox.end.y - this.selectBox.start.y) - 1;
+
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x, y, w, h);
+      ctx.restore();
+    }
+  }
+
+  clearSelection() {
+    this.overlayClear();
+    this.selectBox.active = false;
+    this.selectBox.start.x = -1;
+    this.selectBox.start.y = -1;
+    this.selectBox.end.x = -1;
+    this.selectBox.end.y = -1;
   }
 }

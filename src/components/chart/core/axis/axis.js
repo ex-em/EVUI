@@ -157,17 +157,20 @@ class Axis {
     this.ctx.beginPath();
     this.ctx.strokeStyle = options.gridLineColor;
 
+    const ticks = options.ticks;
+    const showGrid = options.showGrid;
     let labelText;
-    for (let ix = 0, ixLen = this.steps; ix <= ixLen; ix++) {
+
+    for (let ix = 0; ix <= this.steps; ix++) {
       if (this.isStepValueFloat) {
-        options.ticks[ix] = Math.round(this.axisMin + ((ix * this.stepValue) * 10)) / 10;
+        ticks[ix] = Math.round(this.axisMin + ((ix * this.stepValue) * 10)) / 10;
       } else {
-        options.ticks[ix] = this.axisMin + (ix * this.stepValue);
+        ticks[ix] = this.axisMin + (ix * this.stepValue);
       }
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.labelFormat(options.ticks[ix]);
+      labelText = this.labelFormat(ticks[ix]);
 
       let labelPoint;
 
@@ -175,7 +178,7 @@ class Axis {
         labelPoint = options.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         this.ctx.fillText(labelText, labelCenter, labelPoint);
 
-        if (ix !== 0 && this.options.showGrid) {
+        if (ix !== 0 && showGrid) {
           this.ctx.moveTo(linePosition, offsetPoint);
           this.ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -183,7 +186,7 @@ class Axis {
         labelPoint = options.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         this.ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (ix !== 0 && this.options.showGrid) {
+        if (ix !== 0 && showGrid) {
           this.ctx.moveTo(offsetPoint, linePosition);
           this.ctx.lineTo(offsetCounterPoint, linePosition);
         }

@@ -51,29 +51,30 @@ export default class LineChart extends BaseChart {
     const isFill = series.fill;
     const stackIndex = series.stackIndex;
 
-    let fillStyle = '';
-
     ctx.beginPath();
     ctx.lineJoin = 'round';
     ctx.lineWidth = series.lineWidth;
     ctx.strokeStyle = color;
 
     if (isFill) {
-      fillStyle = isFill ? `rgba(${Util.hexToRgb(color)},${series.fillOpacity})` : '';
-      ctx.fillStyle = fillStyle;
+      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})` || '';
     }
 
     let startFillIndex = 0;
     const endPoint = this.chartRect.y2 - this.labelOffset.bottom;
-    let x = null;
-    let y = null;
+    const dataLen = data.length;
+
+    let x;
+    let y;
     let gdata;
+    let prev;
     let convX;
     let convY;
     let aliasPixel;
 
-    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+    for (let ix = 0; ix < dataLen; ix++) {
       gdata = data[ix];
+      prev = data[ix - 1];
 
       x = this.calculateX(gdata.x, series.xAxisIndex, true);
       y = this.calculateY(gdata.y, series.yAxisIndex, false);
@@ -82,10 +83,10 @@ export default class LineChart extends BaseChart {
       x += aliasPixel;
 
       if (y === null) {
-        if (ix - 1 >= 0) {
-          if (isFill && data[ix - 1].y !== null) {
+        if (ix - 1 > -1) {
+          if (isFill && prev.y !== null) {
             ctx.stroke();
-            ctx.lineTo(data[ix - 1].xp, endPoint);
+            ctx.lineTo(prev.xp, endPoint);
             ctx.lineTo(data[startFillIndex].xp, endPoint);
 
             // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
@@ -97,10 +98,10 @@ export default class LineChart extends BaseChart {
         }
 
         startFillIndex = ix + 1;
-      } else if (ix === 0 || data[ix - 1].y === null || data[ix].y === null ||
+      } else if (ix === 0 || prev.y === null || gdata.y === null ||
         // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
         // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-        data[ix - 1].x === null || data[ix].x === null) {
+        prev.x === null || gdata.x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -111,18 +112,20 @@ export default class LineChart extends BaseChart {
     }
 
     ctx.stroke();
-    if (isFill && data.length && data[data.length - 1].y !== null) {
-      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
+    if (isFill && dataLen && data[dataLen - 1].y !== null) {
+      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})` || '';
 
       if (stackIndex) {
-        for (let ix = data.length - 1; ix >= startFillIndex; ix--) {
-          convX = this.calculateX(data[ix].x, series.xAxisIndex, true);
-          convY = this.calculateY(data[ix].b, series.yAxisIndex, false);
+        for (let ix = dataLen - 1; ix >= startFillIndex; ix--) {
+          gdata = data[ix];
+
+          convX = this.calculateX(gdata.x, series.xAxisIndex, true);
+          convY = this.calculateY(gdata.b, series.yAxisIndex, false);
 
           ctx.lineTo(convX, convY);
         }
       } else {
-        ctx.lineTo(data[data.length - 1].xp, endPoint);
+        ctx.lineTo(data[dataLen - 1].xp, endPoint);
         ctx.lineTo(data[startFillIndex].xp, endPoint);
       }
       // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
@@ -136,9 +139,11 @@ export default class LineChart extends BaseChart {
       ctx.strokeStyle = color;
       ctx.fillStyle = series.pointFill;
       ctx.lineWidth = series.lineWidth;
-      for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-        if (data[ix].xp !== null && data[ix].yp !== null) {
-          this.drawPoint(ctx, series.pointStyle, series.pointSize, data[ix].xp, data[ix].yp);
+      for (let ix = 0, ixLen = dataLen; ix < ixLen; ix++) {
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, gdata.xp, gdata.yp);
         }
       }
     }
@@ -147,12 +152,13 @@ export default class LineChart extends BaseChart {
   seriesHighlight(seriesId) {
     const ctx = this.overlayCtx;
     const series = this.seriesList[seriesId];
-    const graphData = this.graphData;
-    const gdata = graphData[seriesId];
+    const data = this.graphData[seriesId];
     const color = series.color;
 
     let x = null;
     let y = null;
+    let gdata;
+    let prev;
 
     ctx.beginPath();
     ctx.lineJoin = 'round';
@@ -163,14 +169,16 @@ export default class LineChart extends BaseChart {
     ctx.shadowBlur = 8;
     ctx.shadowColor = color;
 
-    for (let ix = 0, ixLen = gdata.length; ix < ixLen; ix++) {
-      x = gdata[ix].xp;
-      y = gdata[ix].yp;
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      gdata = data[ix];
+      prev = data[ix - 1];
+
+      x = gdata.xp;
+      y = gdata.yp;
 
       // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
       // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-      if (ix === 0 || gdata[ix - 1].y === null || gdata[ix].y === null ||
-        gdata[ix - 1].x === null || gdata[ix].x === null) {
+      if (ix === 0 || prev.y === null || gdata.y === null || prev.x === null || gdata.x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -188,9 +196,11 @@ export default class LineChart extends BaseChart {
       ctx.lineWidth = 2;
       ctx.fillStyle = color;
 
-      for (let ix = 0, ixLen = gdata.length; ix < ixLen; ix++) {
-        if (gdata[ix].xp !== null && gdata[ix].yp !== null) {
-          this.drawPoint(ctx, series.pointStyle, pSize, gdata[ix].xp, gdata[ix].yp);
+      for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, pSize, gdata.xp, gdata.yp);
         }
       }
     }

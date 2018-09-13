@@ -44,6 +44,7 @@ class BaseChart {
       },
       itemHighlight: true,
       seriesHighlight: true,
+      useSelect: false,
       doughnutHoleSize: 0,
       reverse: false,
       bufferSize: null,
@@ -900,6 +901,10 @@ class BaseChart {
     const offset = this.getMousePosition(e);
     const item = this.findHitItem(offset, graphData);
 
+    if (this.selectBox && this.selectBox.active) {
+      return;
+    }
+
     this.overlayClear();
 
     if (this.options.useTooltip && item.sId !== null) {
@@ -1022,7 +1027,10 @@ class BaseChart {
   }
 
   mouseOutEvent() {
-    this.overlayClear();
+    if (!this.selectBox || (this.selectBox && !this.selectBox.active)) {
+      this.overlayClear();
+    }
+
     if (this.options.useTooltip) {
       this.hideTooltip();
     }
