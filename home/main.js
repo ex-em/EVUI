@@ -96,6 +96,10 @@ const router = new VueRouter({
       path: '/textfield',
       component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
     },
+    {
+      path: '/icon',
+      component: resolve => require(['./guide/views/examples/icon/icon-view'], resolve),
+    },
   ],
 });
 
