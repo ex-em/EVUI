@@ -9,9 +9,9 @@
     @mouseout="onMouseOut"
   >
     <div
-      ref="topArea"
-      :style="topStyle"
-      :class="topCls"
+      ref="headerArea"
+      :style="headerStyle"
+      :class="headerCls"
     >
       <div :class="`${prefixEvui}-title-area`">{{ title }}</div>
       <div :class="`${prefixEvui}-expand-btn-line`"/>
@@ -25,10 +25,7 @@
         @click="clickCloseBtn"
       />
     </div>
-    <div
-      :style="bodyStyle"
-      :class="`${prefixEvui}-body-area`"
-    >
+    <div :class="`${prefixEvui}-body-area`">
       <component :is="content"/>
     </div>
   </div>
@@ -97,9 +94,8 @@
         windowId: '',
         windowStyle: {},
         windowCls: '',
-        topCls: '',
-        topStyle: '',
-        bodyStyle: '',
+        headerCls: '',
+        headerStyle: '',
         titleHeight: 32,
         isShow: false,
         isMoving: false,
@@ -127,9 +123,8 @@
 
       this.windowStyle = this.getWindowStyle();
       this.windowCls = this.getWindowCls();
-      this.topStyle = `height: ${this.titleHeight}px;`;
-      this.bodyStyle = `height: calc(100% -${this.titleHeight}px);`;
-      this.topCls = this.getTopCls();
+      this.headerStyle = `height: ${this.titleHeight}px`;
+      this.headerCls = this.getHeaderCls();
     },
     mounted() {
     },
@@ -332,7 +327,7 @@
       },
       checkTitleAreaPanel(e) {
         const windowElStyleInfo = this.$el.style;
-        const topAreaStyleInfo = this.$refs.topArea.style;
+        const headerAreaStyleInfo = this.$refs.headerArea.style;
         const rect = this.$el.getBoundingClientRect();
         const x = e.pageX - rect.left;
         const y = e.pageY - rect.top;
@@ -341,14 +336,14 @@
           left: this.removePixel(windowElStyleInfo.paddingLeft),
           right: this.removePixel(windowElStyleInfo.paddingRight),
         };
-        const topAreaPaddingObj = {
-          top: this.removePixel(topAreaStyleInfo.paddingTop),
-          left: this.removePixel(topAreaStyleInfo.paddingLeft),
-          right: this.removePixel(topAreaStyleInfo.paddingRight),
+        const headerAreaPaddingObj = {
+          top: this.removePixel(headerAreaStyleInfo.paddingTop),
+          left: this.removePixel(headerAreaStyleInfo.paddingLeft),
+          right: this.removePixel(headerAreaStyleInfo.paddingRight),
         };
-        const startPosX = winPaddingObj.left + topAreaPaddingObj.left;
-        const endPosX = rect.width - winPaddingObj.right - topAreaPaddingObj.right;
-        const startPosY = winPaddingObj.top + topAreaPaddingObj.top;
+        const startPosX = winPaddingObj.left + headerAreaPaddingObj.left;
+        const endPosX = rect.width - winPaddingObj.right - headerAreaPaddingObj.right;
+        const startPosY = winPaddingObj.top + headerAreaPaddingObj.top;
         const endPosY = startPosY + this.titleHeight;
 
         return x > startPosX && x < endPosX && y > startPosY && y < endPosY;
@@ -431,31 +426,24 @@
           height: this.numberToPixel(this.height),
           minWidth: this.numberToPixel(this.minWidth),
           minHeight: this.numberToPixel(this.minHeight),
+          paddingTop: `${this.titleHeight}px`,
         };
       },
       getWindowCls() {
-        const classList = [];
-
-        classList.push(prefixEvui);
-
-        if (this.clsType === 'rtm') {
-          classList.push(`${prefixEvui}-rtm`);
-        }
-
-        return classList;
+        return [
+          prefixEvui,
+          {
+            [`${prefixEvui}-rtm`]: this.clsType === 'rtm',
+          },
+        ];
       },
-      getTopCls() {
-        const classList = [];
-
-        if (this.clsType) {
-          classList.push(`${prefixEvui}-top-area`);
-        }
-
-        if (this.clsType === 'rtm') {
-          classList.push(`${prefixEvui}-top-rtm`);
-        }
-
-        return classList;
+      getHeaderCls() {
+        return [
+          {
+            [`${prefixEvui}-header-area`]: this.clsType,
+            [`${prefixEvui}-header-rtm`]: this.clsType === 'rtm',
+          },
+        ];
       },
       numberToPixel(input) {
         let output;
@@ -514,7 +502,9 @@
     border-color: #595C64;
     background: #212227;
   }
-  .ev-window-top-area{
+  .ev-window-header-area{
+    position: absolute;
+    top: 0;
     width: 100%;
     border-bottom: 1px solid;
     background: transparent;
@@ -525,12 +515,12 @@
     padding: 6px 0 0 12px;
     font-size: 16px;
   }
-  .ev-window-top-rtm{
+  .ev-window-header-rtm{
     border-color: #464850;
     background-color: #27282E;
     color: #ABAEB5;
   }
-  .ev-window-top-pa{
+  .ev-window-header-pa{
     border-color: #474a53;
     background-color: #212227;
     color: #ABAEB5;
@@ -600,7 +590,9 @@
     cursor: pointer;
   }
   .ev-window-body-area{
+    position: relative;
     width: 100%;
+    height: 100%;
     padding: 9px 8px 8px 8px;
     background: transparent;
   }
