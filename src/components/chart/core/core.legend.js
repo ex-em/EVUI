@@ -272,8 +272,8 @@ export default class ChartLegend {
       }
     }
 
-    window.addEventListener('mousemove', this.mouseMove, false);
-    window.addEventListener('mouseup', this.mouseUp, false);
+    this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
+    this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
   }
 
   onMouseMove(e) {
@@ -341,8 +341,8 @@ export default class ChartLegend {
     e.stopPropagation();
     e.preventDefault();
 
-    window.removeEventListener('mousemove', this.mouseMove, false);
-    window.removeEventListener('mouseup', this.mouseUp, false);
+    this.wrapperDOM.removeEventListener('mousemove', this.mouseMove, false);
+    this.wrapperDOM.removeEventListener('mouseup', this.mouseUp, false);
 
     const position = this.chartOptions.legend.position;
     const resizeDOM = this.resizeDOM;

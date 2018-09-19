@@ -233,7 +233,9 @@ export default class LineChart extends BaseChart {
     ctx.shadowBlur = 4;
     ctx.shadowColor = color;
 
-    this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    if (x !== null && y !== null) {
+      this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    }
   }
 
   showCrosshair(offset) {

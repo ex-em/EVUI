@@ -17,6 +17,10 @@ export default class ScatterChart extends BaseChart {
       end: { x: -1, y: -1 },
     };
 
+    if (this.options.useSelectionData) {
+      this.selectionData = null;
+    }
+
     this.options.useSelect = true;
     this.overlayCanvas.onmousedown = this.mouseDownEvent.bind(this);
   }
@@ -158,7 +162,9 @@ export default class ScatterChart extends BaseChart {
     ctx.shadowBlur = 4;
     ctx.shadowColor = color;
 
-    this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    if (x !== null && y !== null) {
+      this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    }
     ctx.restore();
   }
 
@@ -186,6 +192,8 @@ export default class ScatterChart extends BaseChart {
   }
 
   mouseDownEvent(e) {
+    e.preventDefault();
+
     if (e.which !== 1) {
       return;
     }
@@ -194,13 +202,15 @@ export default class ScatterChart extends BaseChart {
       return;
     }
 
-    document.body.focus();
     this.overlayClear();
     this.setSelectionPos(this.selectBox.start, e);
     this.selectBox.active = true;
 
-    window.addEventListener('mouseup', this.mouseupEvent.bind(this), false);
-    window.addEventListener('mousemove', this.mouseMoveSelectEvent.bind(this), false);
+    this.mouseUp = this.mouseUpEvent.bind(this);
+    this.mouseMoveSelect = this.mouseMoveSelectEvent.bind(this);
+
+    window.addEventListener('mouseup', this.mouseUp, false);
+    window.addEventListener('mousemove', this.mouseMoveSelect, false);
   }
 
   mouseMoveSelectEvent(e) {
@@ -215,7 +225,13 @@ export default class ScatterChart extends BaseChart {
     }
   }
 
-  mouseupEvent(e) {
+  mouseUpEvent(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    window.removeEventListener('mouseup', this.mouseUp, false);
+    window.removeEventListener('mousemove', this.mouseMoveSelect, false);
+
     if (!this.selectBox) {
       return;
     }
@@ -228,10 +244,14 @@ export default class ScatterChart extends BaseChart {
       this.selectBox.start.y === this.selectBox.end.y) {
       this.clearSelection();
     } else {
-      this.selectPos.start.x = this.selectBox.start.x;
-      this.selectPos.start.y = this.selectBox.start.y;
-      this.selectPos.end.x = this.selectBox.end.x;
-      this.selectPos.end.y = this.selectBox.end.y;
+      this.selectPos.start.x = this.calculateXP(this.selectBox.start.x, 0, true);
+      this.selectPos.start.y = this.calculateYP(this.selectBox.start.y, 0, false);
+      this.selectPos.end.x = this.calculateXP(this.selectBox.end.x, 0, true);
+      this.selectPos.end.y = this.calculateYP(this.selectBox.end.y, 0, false);
+
+      if (this.options.useSelectionData) {
+        this.getSelectPosData();
+      }
     }
   }
 
@@ -294,5 +314,36 @@ export default class ScatterChart extends BaseChart {
     this.selectBox.start.y = -1;
     this.selectBox.end.x = -1;
     this.selectBox.end.y = -1;
+  }
+
+  getSelectPosData() {
+    const x1 = this.selectBox.start.x;
+    const y1 = this.selectBox.start.y;
+    const x2 = this.selectBox.end.x;
+    const y2 = this.selectBox.end.y;
+
+    const graphData = this.store.getGraphData();
+    const skey = Object.keys(graphData);
+
+    let sdata;
+    let gdata;
+    const selectData = {};
+
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      sdata = graphData[skey[ix]];
+
+      for (let jx = 0, jxLen = sdata.length; jx < jxLen; jx++) {
+        gdata = sdata[jx];
+        if (gdata.xp > x1 && gdata.xp < x2 && gdata.yp > y1 && gdata.yp < y2) {
+          if (!selectData[skey[ix]]) {
+            selectData[skey[ix]] = [];
+          }
+
+          selectData[skey[ix]].push({ x: gdata.x, y: gdata.y });
+        }
+      }
+    }
+
+    return selectData;
   }
 }

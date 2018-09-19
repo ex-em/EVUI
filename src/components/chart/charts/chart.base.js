@@ -53,6 +53,7 @@ class BaseChart {
       height: '100%',
       thickness: 1,
       useTooltip: true,
+      useSelectionData: false,
     };
 
     const defaultData = {
@@ -132,7 +133,9 @@ class BaseChart {
     // step6. Add EventListener
     this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
     this.overlayCanvas.onmouseout = this.mouseOutEvent.bind(this);
-    window.addEventListener('resize', this.resize.bind(this));
+    this.resizeEvent = this.resize.bind(this);
+
+    window.addEventListener('resize', this.resizeEvent);
   }
 
   createCanvas() {
@@ -649,6 +652,54 @@ class BaseChart {
     return Math.floor(calcY);
   }
 
+  calculateXP(point, xAxisIndex, isReqSp) {
+    const maxValue = this.xAxes[xAxisIndex].axisMax;
+    const minValue = this.xAxes[xAxisIndex].axisMin;
+    let convertValue;
+
+    if (point === null) {
+      return null;
+    }
+
+    const sp = isReqSp ? this.chartRect.x1 + this.labelOffset.left : 0;
+    const value = Math.ceil((((point - sp) * (maxValue - minValue)) /
+      this.drawingXArea()) + minValue);
+
+
+    if (this.options.xAxes[xAxisIndex].labelType === 'time') {
+      convertValue = +moment(value);
+    } else {
+      convertValue = value;
+    }
+
+    return convertValue;
+  }
+
+  calculateYP(point, yAxisIndex, invert) {
+    const maxValue = this.yAxes[yAxisIndex].axisMax;
+    const minValue = this.yAxes[yAxisIndex].axisMin;
+    let convertValue;
+
+    if (point === null) {
+      return null;
+    }
+    const sp = this.chartRect.y1 + this.labelOffset.top;
+    const value = Math.ceil((((point - sp) * (maxValue - minValue)) / this.drawingYArea()));
+
+
+    if (this.options.yAxes[yAxisIndex].labelType === 'time') {
+      convertValue = +moment(value);
+    } else {
+      convertValue = value;
+    }
+
+    if (!invert) {
+      convertValue = maxValue - convertValue;
+    }
+
+    return convertValue;
+  }
+
   drawingXArea() {
     return this.chartRect.chartWidth - (this.labelOffset.left + this.labelOffset.right);
   }
@@ -778,7 +829,8 @@ class BaseChart {
       for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
         gdata = graphData[skey[ix]];
 
-        if (mouseY >= (gdata[index].yp - 10) && mouseY <= (gdata[index].yp + 10)) {
+        if (gdata[index].yp !== null &&
+          mouseY >= (gdata[index].yp - 10) && mouseY <= (gdata[index].yp + 10)) {
           sId = skey[ix];
           break;
         }
@@ -856,6 +908,8 @@ class BaseChart {
       this.resizeTimer = setTimeout(this.updateChart.bind(this), 50);
       this.legend.updateLegendPosition();
     }
+
+    window.removeEventListener('mousemove', this.resizeEvent, false);
   }
 
   updateChart() {
