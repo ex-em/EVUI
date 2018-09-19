@@ -8,7 +8,6 @@
       :options="option"
       class="evui-datepicker-temp"
     />
-    <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
 
