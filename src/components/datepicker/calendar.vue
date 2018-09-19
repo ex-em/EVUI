@@ -2,7 +2,7 @@
   <div>
     <div
       ref="datepickerRef"
-      class="evui-calendar"
+      class="ev-calendar"
       @click.stop.prevent="updateSelectOneDay"
     />
   </div>
@@ -52,15 +52,13 @@
         });
       }
       this.calendar = new Calendar(this.$refs.datepickerRef, mergeOption);
-//      this.selectDay = this.calendar.setSelectDays();
-//      this.updateSelectDay();
     },
     beforeDestroy() {
     },
     methods: {
       updateSelectOneDay() {
-        const selectDayObj = this.calendar.setSelectDays();
-        this.$emit('input', `${selectDayObj[0].year}-${this.lpad10(selectDayObj[0].month)}-${this.lpad10(selectDayObj[0].day)}`);
+        const selectDateTime = this.calendar.getSelectDateTime();
+        this.$emit('input', selectDateTime);
       },
       lpad10(v) {
         let value = v;
@@ -80,9 +78,9 @@
 </script>
 
 <style scoped>
-  .evui-calendar {
+  .ev-calendar {
     position: relative;
-    width: 235px;
-    height: 200px;
+    width: inherit;
+    height: 220px;
   }
 </style>

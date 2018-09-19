@@ -83,12 +83,12 @@
           };
           element.__vueClickOutside__ = handler;
           // add Event Listeners
-          document.addEventListener('click', handler);
+          document.addEventListener('mousedown', handler);
         },
         unbind(el) {
           const element = el;
           // Remove Event Listeners
-          document.removeEventListener('click', element.__vueClickOutside__);
+          document.removeEventListener('mousedown', element.__vueClickOutside__);
           element.__vueClickOutside__ = null;
         },
       },
@@ -236,10 +236,7 @@
         this.timePickerFadeFlag = false;
       },
       removeColon(val) {
-        if (val && val.indexOf(':') > -1) {
-          return val.replace(/:/gi, '');
-        }
-        return val;
+        return val.replace(/:/gi, '');
       },
       addColon(val) {
         const number = this.removeColon(val);
@@ -263,9 +260,6 @@
               numberVal = '23';
             }
           } else if (numberVal.length === 1) {
-//            if (numberVal > 2) {
-//              numberVal = `0${numberVal}`;
-//            }
             numberVal = `${numberVal}`;
           }
         } else if (numberVal.length <= 4) {
@@ -280,9 +274,6 @@
             if (numberVal.slice(0, 2) > 23) {
               numberVal = `23${numberVal.slice(2)}`;
             }
-//            if (numberVal.slice(2, 3) > 5) {
-//              numberVal = `${numberVal.slice(0, 2)}0${numberVal.slice(2, 3)}`;
-//            }
           }
         } else if (numberVal.length <= 6) {
           if (numberVal.length === 6) {
@@ -302,9 +293,6 @@
             if (numberVal.slice(2, 4) > 59) {
               numberVal = `${numberVal.slice(0, 2)}59${numberVal.slice(4, 5)}`;
             }
-//            if (numberVal.slice(4, 5) > 5) {
-//              numberVal = `${numberVal.slice(0, 4)}0${numberVal.slice(4, 5)}`;
-//            }
           }
         } else {
           if (numberVal.slice(0, 2) > 23) {
