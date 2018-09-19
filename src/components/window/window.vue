@@ -173,7 +173,7 @@
           this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.isTopArea(e);
+        this.isMoving = !this.isGrabbingBorder && this.checkTitleAreaPanel(e);
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -311,7 +311,7 @@
             this.$el.style.cursor = 'ew-resize';
           } else if (bottom || top) {
             this.$el.style.cursor = 'ns-resize';
-          } else if (this.isTopArea(e)) {
+          } else if (this.checkTitleAreaPanel(e)) {
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
@@ -320,7 +320,7 @@
               document.body.style.cursor = '';
             }
           }
-        } else if (this.isTopArea(e)) {
+        } else if (this.checkTitleAreaPanel(e)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
@@ -330,7 +330,7 @@
           }
         }
       },
-      isTopArea(e) {
+      checkTitleAreaPanel(e) {
         const windowElStyleInfo = this.$el.style;
         const topAreaStyleInfo = this.$refs.topArea.style;
         const rect = this.$el.getBoundingClientRect();
@@ -403,7 +403,7 @@
           minHeight = this.minHeight;
         }
 
-        this.$el.style.cssText = `
+        windowEl.style.cssText = `
           top: ${this.numberToPixel(top)};
           left: ${this.numberToPixel(left)};
           width: ${this.numberToPixel(width)};
