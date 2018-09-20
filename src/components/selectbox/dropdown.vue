@@ -1,8 +1,5 @@
 <template>
-  <div
-    :style="dropdownStyle"
-    :class="prefixCls"
-  >
+  <div :class="prefixCls">
     <div
       v-if="multiple"
       :class="`${prefixCls}-multiple-input-area`"
@@ -28,7 +25,7 @@
             {{ item.groupName }}
           </li>
           <Listbox
-            :listbox-style="listboxStyle"
+            :style="listBoxStyle"
             :is-group="true"
             :items="item.items"
             :selected-items="selectedItems"
@@ -41,7 +38,7 @@
         :class="`${prefixCls}-single-area`"
       >
         <Listbox
-          :listbox-style="listboxStyle"
+          :style="listBoxStyle"
           :items="items"
           :selected-items="selectedItems"
           @select="onSelect"
@@ -61,7 +58,7 @@
       Listbox,
     },
     props: {
-      dropdownStyle: {
+      listBoxStyle: {
         type: Object,
         default() {
           return {};
@@ -95,7 +92,6 @@
     data() {
       return {
         prefixCls,
-        listboxStyle: {},
       };
     },
     methods: {
