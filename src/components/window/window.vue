@@ -96,7 +96,7 @@
         windowCls: '',
         headerCls: '',
         headerStyle: '',
-        titleHeight: 32,
+        headerHeight: 32,
         isShow: false,
         isMoving: false,
         isGrabbingBorder: false,
@@ -116,17 +116,12 @@
         },
       };
     },
-    computed: {
-    },
     created() {
       this.windowId = `window_${this._uid}_${this.name}`;
-
       this.windowStyle = this.getWindowStyle();
       this.windowCls = this.getWindowCls();
-      this.headerStyle = `height: ${this.titleHeight}px`;
+      this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = this.getHeaderCls();
-    },
-    mounted() {
     },
     beforeDestroy() {
       this.isShow = false;
@@ -168,7 +163,7 @@
           this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.checkTitleAreaPanel(e);
+        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.pageX, e.pageY);
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -306,7 +301,7 @@
             this.$el.style.cursor = 'ew-resize';
           } else if (bottom || top) {
             this.$el.style.cursor = 'ns-resize';
-          } else if (this.checkTitleAreaPanel(e)) {
+          } else if (this.isInHeader(e.pageX, e.pageY)) {
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
@@ -315,7 +310,7 @@
               document.body.style.cursor = '';
             }
           }
-        } else if (this.checkTitleAreaPanel(e)) {
+        } else if (this.isInHeader(e.pageX, e.pageY)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
@@ -325,28 +320,26 @@
           }
         }
       },
-      checkTitleAreaPanel(e) {
-        const windowElStyleInfo = this.$el.style;
-        const headerAreaStyleInfo = this.$refs.headerArea.style;
+      isInHeader(x, y) {
+        if (x == null || y == null) {
+          return false;
+        }
+
         const rect = this.$el.getBoundingClientRect();
-        const x = e.pageX - rect.left;
-        const y = e.pageY - rect.top;
-        const winPaddingObj = {
-          top: this.removePixel(windowElStyleInfo.paddingTop),
-          left: this.removePixel(windowElStyleInfo.paddingLeft),
-          right: this.removePixel(windowElStyleInfo.paddingRight),
-        };
-        const headerAreaPaddingObj = {
+        const posX = +x - rect.left;
+        const posY = +y - rect.top;
+        const headerAreaStyleInfo = this.$refs.headerArea.style;
+        const headerPaddingInfo = {
           top: this.removePixel(headerAreaStyleInfo.paddingTop),
           left: this.removePixel(headerAreaStyleInfo.paddingLeft),
           right: this.removePixel(headerAreaStyleInfo.paddingRight),
         };
-        const startPosX = winPaddingObj.left + headerAreaPaddingObj.left;
-        const endPosX = rect.width - winPaddingObj.right - headerAreaPaddingObj.right;
-        const startPosY = winPaddingObj.top + headerAreaPaddingObj.top;
-        const endPosY = startPosY + this.titleHeight;
+        const startPosX = headerPaddingInfo.left;
+        const endPosX = rect.width - headerPaddingInfo.right;
+        const startPosY = headerPaddingInfo.top;
+        const endPosY = startPosY + this.headerHeight;
 
-        return x > startPosX && x < endPosX && y > startPosY && y < endPosY;
+        return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
       },
       setCssText(paramObj) {
         if (paramObj === null || typeof paramObj !== 'object') {
@@ -359,43 +352,50 @@
         let height;
         let minWidth;
         let minHeight;
+        let headerHeight;
         const windowEl = this.$el;
-        const objPrototype = Object.prototype;
+        const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'top')) {
+        if (hasOwnProperty.call(paramObj, 'top')) {
           top = paramObj.top;
         } else {
           top = this.clickedInfo.top;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'left')) {
+        if (hasOwnProperty.call(paramObj, 'left')) {
           left = paramObj.left;
         } else {
           left = this.clickedInfo.left;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'width')) {
+        if (hasOwnProperty.call(paramObj, 'width')) {
           width = paramObj.width;
         } else {
           width = windowEl.offsetWidth;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'height')) {
+        if (hasOwnProperty.call(paramObj, 'height')) {
           height = paramObj.height;
         } else {
           height = windowEl.offsetHeight;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'minWidth')) {
+        if (hasOwnProperty.call(paramObj, 'minWidth')) {
           minWidth = paramObj.minWidth;
         } else {
           minWidth = this.minWidth;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'minHeight')) {
+        if (hasOwnProperty.call(paramObj, 'minHeight')) {
           minHeight = paramObj.minHeight;
         } else {
           minHeight = this.minHeight;
+        }
+
+        if (hasOwnProperty.call(paramObj, 'headerHeight')) {
+          headerHeight = paramObj.headerHeight;
+        } else {
+          headerHeight = this.headerHeight;
         }
 
         windowEl.style.cssText = `
@@ -404,7 +404,8 @@
           width: ${this.numberToPixel(width)};
           height: ${this.numberToPixel(height)};
           min-width: ${this.numberToPixel(minWidth)};
-          min-height: ${this.numberToPixel(minHeight)};`;
+          min-height: ${this.numberToPixel(minHeight)};
+          padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
         let top = 0;
@@ -426,7 +427,7 @@
           height: this.numberToPixel(this.height),
           minWidth: this.numberToPixel(this.minWidth),
           minHeight: this.numberToPixel(this.minHeight),
-          paddingTop: `${this.titleHeight}px`,
+          paddingTop: this.numberToPixel(this.headerHeight),
         };
       },
       getWindowCls() {
@@ -595,5 +596,6 @@
     height: 100%;
     padding: 9px 8px 8px 8px;
     background: transparent;
+    overflow: auto;
   }
 </style>
