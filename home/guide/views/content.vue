@@ -101,6 +101,12 @@
                 imgUrl: `${this.imgUrl}/table.png`,
               },
               {
+                name: 'Tree',
+                routerLink: '/tree',
+                content: '트리, 트리 테이블',
+                imgUrl: `${this.imgUrl}/table.png`,
+              },
+              {
                 name: 'Timepicker',
                 routerLink: '/timepicker',
                 content: '타임 피커',

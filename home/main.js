@@ -69,6 +69,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/table/table-view'], resolve),
     },
     {
+      path: '/tree',
+      component: resolve => require(['./guide/views/examples/tree/tree-table-view'], resolve),
+    },
+    {
       path: '/menu',
       component: resolve => require(['./guide/views/examples/menu/menu-view'], resolve),
     },

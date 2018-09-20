@@ -542,3 +542,24 @@ button {
 .evui-table-records-col.evui-col-number {
   float: right;
 }
+.evui-tree-plus {
+  display: inline-block;
+  background: url('../../images/evui_icon.png') no-repeat -114px -559px;
+  width: 16px;
+  height: 9px;
+  cursor: pointer;
+}
+.evui-tree-minus {
+  display: inline-block;
+  background: url('../../images/evui_icon.png') no-repeat -114px -575px;
+  width: 16px;
+  height: 9px;
+  cursor: pointer;
+}
+.evui-tree-empty {
+  display: inline-block;
+  /*background: url('../../images/evui_icon.png') no-repeat -114px -575px;*/
+  width: 16px;
+  height: 9px;
+  /*cursor: pointer;*/
+}
