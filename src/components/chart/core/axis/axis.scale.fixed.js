@@ -12,17 +12,28 @@ class AxisFixedScale extends Axis {
     }
   }
 
-  calculateSteps(maxValue, minValue, maxSteps, minSteps) {
+  calculateSteps(rangeInfo) {
+    const maxValue = rangeInfo.maxValue;
+    const minValue = rangeInfo.minValue;
+    const maxSteps = rangeInfo.maxSteps;
+    const minSteps = rangeInfo.minSteps;
+
+    const options = this.options;
+
     let incValue = minValue;
+    let stepValue;
+    let numberOfSteps;
+
     while (incValue < maxValue) {
       incValue += this.interval;
     }
 
-    const graphMax = incValue;
-    const graphMin = (this.startFromZero) ? 0 : minValue;
+    const graphMax = (options.autoScaleRatio && incValue <= maxValue) ? maxValue : incValue;
+    const graphMin = minValue;
     const graphRange = graphMax - graphMin;
-    let stepValue = this.interval;
-    let numberOfSteps = Math.round(graphRange / stepValue);
+
+    stepValue = this.interval;
+    numberOfSteps = Math.round(graphRange / stepValue);
 
     if (maxValue === 1) {
       stepValue = 0.2;
@@ -47,7 +58,7 @@ class AxisFixedScale extends Axis {
     this.stepValue = stepValue;
     this.isStepValueFloat = (`${stepValue}`).indexOf('.') > -1;
     this.axisMin = graphMin;
-    this.axisMax = Math.round((graphMin + (numberOfSteps * stepValue)) * 1000) / 1000;
+    this.axisMax = Math.ceil((graphMin + (numberOfSteps * stepValue)) * 1000) / 1000;
   }
 }
 

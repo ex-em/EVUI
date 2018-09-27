@@ -2,93 +2,66 @@ import _ from 'lodash';
 import DataStore from './data';
 
 export default class PieDataStore extends DataStore {
-  addValue(seriesIndex, value, dataIndex) {
-    if (this.seriesList === undefined) {
-      return;
+  constructor(props) {
+    super(props);
+
+    this.graphData = [];
+  }
+
+  createChartDataSet() {
+    const chartData = this.chartData.data;
+    let meta;
+    let data;
+
+    for (let ix = 0, ixLen = chartData.length; ix < ixLen; ix++) {
+      meta = chartData[ix][0];
+      data = _.slice(chartData[ix], 1);
+
+      this.addGraphDataSet(meta, data);
     }
-    // category 형태의 데이터냐 아니냐에 따라 x,y 처리
-    const series = this.seriesList[seriesIndex];
-    const tempValue = {};
-    const isShow = (value === null) ? false : series.show;
+  }
 
-    let dataIdx = dataIndex;
+  addGraphDataSet(seriesId, data) {
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      if (!this.graphData[ix]) {
+        this.graphData[ix] = { data: [], ir: 0, or: 0, total: 0, index: 0 };
+      }
 
-    if (!series) {
-      return;
+      this.addGraphData(seriesId, data[ix], ix); // 'series1', 100, 0
     }
+  }
 
-    if (dataIndex === null || dataIndex === undefined) {
-      dataIdx = series.cData.length;
-    }
-
-    if (!this.seriesGroupList[dataIdx]) {
-      this.seriesGroupList[dataIdx] = {
-        data: [],
-        drawInfo: [],
-        r2: 0,
-        r1: 0,
-        show: false,
-      };
-    }
-
-    this.seriesGroupList[dataIdx].data.push({
-      seriesIndex,
-      data: value,
-      show: isShow,
-    });
-
-    if (!this.seriesGroupList[dataIdx].show && isShow) {
-      this.seriesGroupList[dataIdx].show = true;
-    }
-
-
-    series.cData[dataIdx] = value;
-    series.oData[dataIdx] = value;
+  addGraphData(sId, graphData, dsIndex = 0) {
+    const ds = this.graphData[dsIndex];
+    const gdata = ds.data;
+    const series = this.seriesList[sId];
 
     if (series.show) {
-      this.setMinMaxValue(series, tempValue, dataIdx);
-      this.setMaxLabelWidth(tempValue);
+      ds.total += (graphData || 0);
+      gdata.push({ id: sId, value: graphData, sa: 0, ea: 0 });
     }
   }
 
   updateData() {
-    this.maxValueInfo = {
-      x: null,
-      y: null,
-      index: null,
-      seriesIndex: null,
-    };
-    this.minValueInfo = {
-      x: null,
-      y: null,
-      index: null,
-      seriesIndex: null,
-    };
-    this.labelTextMaxInfo = {
-      xLen: 0,
-      xText: '',
-      yLen: 0,
-      yText: '',
-    };
-    this.seriesGroupList.length = 0;
-    this.initArraySeries();
+    this.graphData = [];
+
+    this.createChartDataSet();
   }
 
-  getSeriesGroupList() {
-    return this.seriesGroupList;
+  sortingDescDataSet(dsIndex) {
+    this.graphData[dsIndex].data = _.orderBy(this.graphData[dsIndex].data, 'value', 'desc');
   }
 
-  sortingDescGroupData(groupIndex) {
-    this.seriesGroupList[groupIndex].data = _.orderBy(this.seriesGroupList[groupIndex].data, 'data', 'desc');
-  }
-
-  getGroupTotalValue(groupIndex) {
-    const group = this.seriesGroupList[groupIndex].data;
+  getDataSetTotalValue(dsIndex) {
+    const ds = this.graphData[dsIndex].data;
     let totalValue = 0;
+    let series;
 
-    for (let ix = 0, ixLen = group.length; ix < ixLen; ix++) {
-      if (group[ix].data && group[ix].show) {
-        totalValue += group[ix].data;
+    for (let ix = 0, ixLen = ds.length; ix < ixLen; ix++) {
+      series = this.seriesList[ds[ix].id];
+
+      if (ds[ix].value && series.show) {
+        totalValue += ds[ix].value;
       }
     }
 

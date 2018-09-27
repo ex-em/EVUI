@@ -1,8 +1,8 @@
 <template>
   <div>
     <chart
-      :data="simpleData"
-      :options="chartOptions"
+      :data="horizontalBarChartData"
+      :options="horizontalBarChartOptions"
     />
     <br>
   </div>
@@ -18,35 +18,42 @@
     },
     data() {
       return {
-        simpleData: {
-          category: ['category1', 'category2', 'category3', 'category4', 'category5'],
-          series: [
-            {
-              id: 'series1',
-              name: 'series#1',
-              data: [5, 3, 6, 8, 9],
-            },
-            {
-              id: 'series2',
-              name: 'series#2',
-              data: [3, 8, 10, 5, 3],
-            },
+        horizontalBarChartData: {
+          series: {
+            series1: { name: 'series#1', show: true },
+            series2: { name: 'series#2', show: true },
+            series3: { name: 'series#3', show: true },
+            series4: { name: 'series#4', show: true },
+          },
+          groups: [
+            ['series1', 'series2', 'series3', 'series4'],
+          ],
+          data: [
+            ['y',
+              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
+              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
+            ['series1', 100, 150, 50, 200, 350],
+            ['series2', 200, 100, null, 300, 400],
+            ['series3', 150, 100, 50, 350, 450],
+            ['series4', 200, 50, 500, 0, 300],
           ],
         },
-        chartOptions: {
+        horizontalBarChartOptions: {
           type: 'bar',
-          width: '600px',
+          width: '100%',
           height: '350px',
-          tickness: 0.8,
+          thickness: 0.8,
           horizontal: true,
-          xAxes: [{
-            scaleType: 'auto', // auto, fix, step
-            labelType: 'linear', // time, linear, category
-            showGrid: false,
-          }],
           yAxes: [{
-            scaleType: 'step', // auto, fix, step
-            labelType: 'category', // time, linear, category
+            scaleType: 'step',
+            labelType: 'category',
+            timeFormat: 'HH:mm:ss',
+            showGrid: true,
+          }],
+          xAxes: [{
+            scaleType: 'auto',
+            labelType: 'linear',
+            autoScaleRatio: 0.1,
             showGrid: true,
           }],
         },
