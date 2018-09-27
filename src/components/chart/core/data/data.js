@@ -92,7 +92,7 @@ export default class DataStore {
       this.seriesList[id] = series;
     }
 
-    if (!this.graphData[id]) {
+    if (!this.graphData[id] && this.chartOptions.type !== 'pie') {
       this.graphData[id] = [];
     }
   }

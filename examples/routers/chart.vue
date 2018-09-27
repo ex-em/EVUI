@@ -3,9 +3,6 @@
     <div class="ev-chart-ttt">
       <line-chart/>
     </div>
-    <div class="ev-chart-ttt">
-      <bar-chart/>
-    </div>
   </div>
 </template>
 <script>

@@ -161,7 +161,7 @@ class BaseChart {
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
     this.oldPixelRatio = this.pixelRatio;
 
-    this.chartDOM.appendChild(this.displayCanvas);
+    this.chartDOM.appendChild(this.bufferCanvas);
     this.chartDOM.appendChild(this.overlayCanvas);
 
     this.overlayCanvas.style.position = 'absolute';
@@ -913,6 +913,8 @@ class BaseChart {
   }
 
   updateChart() {
+    this.chartRect = this.getChartRect();
+
     if (!this.chartRect.width || !this.chartRect.height ||
       this.chartRect.width < 1 || this.chartRect.height < 1) {
       return;
@@ -924,7 +926,6 @@ class BaseChart {
     this.yMinMax = this.store.getYMinMax();
     this.axisList = this.store.getAxisList();
 
-    this.chartRect = this.getChartRect();
     this.initScale();
 
     this.clearDraw();
@@ -962,18 +963,22 @@ class BaseChart {
     this.overlayClear();
 
     if (this.options.useTooltip && item.sId !== null) {
-      const series = this.seriesList[item.sId];
-      const axisType = series.axisType;
-      const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
-      const axis = axisType === 'x' ? this.xAxes[axisIndex] : this.yAxes[axisIndex];
+      if (this.options.type === 'pie') {
+        this.showTooltip(offset, e, item);
+      } else {
+        const series = this.seriesList[item.sId];
+        const axisType = series.axisType;
+        const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
+        const axis = axisType === 'x' ? this.xAxes[axisIndex] : this.yAxes[axisIndex];
 
-      let adata = this.axisList[axisType][axisIndex][item.index];
+        let adata = this.axisList[axisType][axisIndex][item.index];
 
-      if (axis.options.timeFormat) {
-        adata = moment(adata).format(axis.options.timeFormat);
+        if (axis.options.timeFormat) {
+          adata = moment(adata).format(axis.options.timeFormat);
+        }
+
+        this.showTooltip(offset, e, item, graphData, adata);
       }
-
-      this.showTooltip(offset, e, item, graphData, adata);
     } else {
       this.hideTooltip();
     }
