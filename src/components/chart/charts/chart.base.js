@@ -75,6 +75,7 @@ class BaseChart {
     }
 
     // step2. Create Target DOM Wrapper
+    this.target = target;
     const targetRect = target.getBoundingClientRect();
 
     const targetWidth = targetRect.width - 10 || 10;
@@ -892,6 +893,21 @@ class BaseChart {
   resize() {
     if (!this.chartDOM) {
       return;
+    }
+    // target
+    const targetRect = this.target.getBoundingClientRect();
+
+    const targetWidth = targetRect.width - 10 || 10;
+    const targetHeight = targetRect.height - 10 || 10;
+
+    this.wrapperDOM.style.width = `${targetWidth}px`;
+    this.wrapperDOM.style.height = `${targetHeight}px`;
+    this.chartDOM.style.width = `${targetWidth}px`;
+    this.chartDOM.style.height = `${targetHeight}px`;
+
+    if (this.options.title.show) {
+      const titleObj = this.options.title;
+      this.chartDOM.style.height = `${targetHeight - titleObj.height}px`;
     }
 
     const offset = this.chartDOM.getBoundingClientRect();
