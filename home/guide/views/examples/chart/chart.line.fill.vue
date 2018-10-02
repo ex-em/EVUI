@@ -4,6 +4,7 @@
       :data="fillLineChartData"
       :options="fillLineChartOptions"
     />
+    <!--
     <div style="position: absolute; top: 0; left: 600px;">
       <Button
         :text="liveBtnInfo.text"
@@ -11,6 +12,7 @@
         @click="onClickLiveBtn"
       />
     </div>
+    -->
     <br>
   </div>
 </template>
@@ -29,67 +31,40 @@
     data() {
       return {
         fillLineChartData: {
-          series: [
-            {
-              id: 'series1',
-              name: 'series#1',
-              point: true,
-              data: [
-                { x: '2018-05-25 05:11:00', y: 20 },
-                { x: '2018-05-25 05:12:00', y: 10 },
-                { x: '2018-05-25 05:13:00', y: 10 },
-                { x: '2018-05-25 05:14:00', y: 13 },
-                { x: '2018-05-25 05:15:00', y: 20 },
-                { x: '2018-05-25 05:16:00', y: 20 },
-                { x: '2018-05-25 05:17:00', y: 10 },
-                { x: '2018-05-25 05:18:00', y: 10 },
-                { x: '2018-05-25 05:19:00', y: 13 },
-                { x: '2018-05-25 05:20:00', y: 20 },
-                { x: '2018-05-25 05:21:00', y: 20 },
-              ],
-            },
-            {
-              id: 'series2',
-              name: 'series#2',
-              point: true,
-              data: [
-                { x: '2018-05-25 05:11:00', y: 15 },
-                { x: '2018-05-25 05:12:00', y: 17 },
-                { x: '2018-05-25 05:13:00', y: 20 },
-                { x: '2018-05-25 05:14:00', y: 30 },
-                { x: '2018-05-25 05:15:00', y: 20 },
-                { x: '2018-05-25 05:16:00', y: 10 },
-                { x: '2018-05-25 05:17:00', y: 25 },
-                { x: '2018-05-25 05:18:00', y: 31 },
-                { x: '2018-05-25 05:19:00', y: 11 },
-                { x: '2018-05-25 05:20:00', y: 17 },
-                { x: '2018-05-25 05:21:00', y: 20 },
-              ],
-            },
+          series: {
+            series1: { name: 'series#1', show: true, fill: true, point: true },
+            series2: { name: 'series#2', show: true, fill: true, point: true },
+            series3: { name: 'series#3', show: true, fill: true, point: true },
+          },
+          data: [
+            ['x',
+              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
+              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
+            ['series1', 100, 150, 50, 200, 350],
+            ['series2', 200, 100, null, 300, 400],
+            ['series3', 150, 0, 0, 350, 450],
           ],
         },
         fillLineChartOptions: {
           type: 'line',
-          width: '600px',
+          width: '100%',
           height: '350px',
-          fill: true,
           legend: {
             show: true,
             position: 'right',
           },
           xAxes: [{
-            scaleType: 'fix', // auto, fix, step
-            labelType: 'time', // time, linear, category
-            tickFormat: 'mm:ss', // moment.js
-            showGrid: false,
-            position: 'bottom',
+            scaleType: 'fix',
+            labelType: 'time',
             interval: 'minute',
+            timeFormat: 'HH:mm:ss',
+            showGrid: true,
           }],
           yAxes: [{
-            scaleType: 'auto', // auto, fix, step
-            labelType: 'linear', // time, linear, category
+            scaleType: 'auto',
+            labelType: 'linear',
+            autoScaleRatio: 0.1,
             showGrid: true,
-            position: 'left',
           }],
         },
         liveBtnInfo: {

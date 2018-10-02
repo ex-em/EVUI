@@ -1,8 +1,8 @@
 <template>
   <div class="selectbox-default">
-    <selectbox
+    <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :init-select="0"
       :items="boxInfo.items"
       @keyup="onKeyUp"
@@ -12,13 +12,7 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
-  import selectbox from '@/components/selectbox/selectbox';
-
   export default {
-    components: {
-      selectbox,
-    },
     data() {
       return {
         boxInfo: this._getBoxInfo(),
@@ -36,7 +30,7 @@
         let boxInfo = {};
         const itemList = [];
 
-        for (let ix = 0, ixLen = 100; ix < ixLen; ix++) {
+        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
           itemList.push({
             name: `item${ix}`,
             value: ix,
@@ -57,7 +51,7 @@
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-default{
     display: inline-block;
     margin-left: 5px;

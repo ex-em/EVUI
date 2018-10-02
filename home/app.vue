@@ -24,3 +24,10 @@
     font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;
   }
 </style>
+<style>
+  body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+</style>

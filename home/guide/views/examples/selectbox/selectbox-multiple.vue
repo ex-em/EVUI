@@ -1,8 +1,8 @@
 <template>
   <div class="selectbox-multiple">
-    <selectbox
+    <ev-selectbox
       :name="boxInfo.name"
-      :selectbox-style="boxInfo.selectboxStyle"
+      :style="boxInfo.selectboxStyle"
       :multiple="boxInfo.multiple"
       :init-select-idx="0"
       :items="boxInfo.items"
@@ -11,13 +11,7 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
-  import selectbox from '@/components/selectbox/selectbox';
-
   export default {
-    components: {
-      selectbox,
-    },
     data() {
       return {
         boxInfo: this._getBoxInfo(),
@@ -50,7 +44,7 @@
     },
   };
 </script>
-<style scoped>
+<style>
   .selectbox-multiple{
     display: inline-block;
     margin-left: 5px;
