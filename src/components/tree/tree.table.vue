@@ -12,12 +12,12 @@
         <div
           ref="evuiGridBody"
           class="evui-table-body"
-          style="top: 0px; bottom: 0px; left: 0px; right: 0px;"
+          style="top: 0; bottom: 0; left: 0; right: 0;"
         >
           <div
             ref="evuiGridRecords"
+            :style="{ top: `${headerHeight + 1}px` }"
             class="evui-table-records"
-            style="top: 25px; overflow-x: auto; overflow-y: auto;"
             @scroll="scrollColumns"
           >
             <div
@@ -54,8 +54,11 @@
                         style="border-right: 0"
                       />
 
-                      <template v-for="(col, colIndex) in originColumns">
+                      <template
+                        v-if="!elbow"
+                      >
                         <td
+                          v-for="(col, colIndex) in originColumns"
                           :key="colIndex"
                           :data-col="colIndex"
                           :style="{ textAlign: col.recordsAlign }"
@@ -64,7 +67,7 @@
                           <div
                             v-if="col.type === 'string' && col.cellRender === null"
                             class="evui-table-records-col"
-                            style="max-height: 24px;"
+                            style="max-height: 20px;"
                           >
                             <template v-if="treeGroupColumn === col.field">
                               <i
@@ -72,28 +75,89 @@
                                 :key="level"
                                 class="evui-tree-empty"
                               />
+                              <i
+                                v-if="!row.leaf"
+                                :class="row.expend ? 'evui-tree-minus':'evui-tree-plus'"
+                                @click="toggle(row, $event)"
+                              />
+                              <i
+                                v-else
+                                class="evui-tree-empty"
+                              />
                             </template>
-                            <i
-                              v-if="treeGroupColumn === col.field && !row.leaf"
-                              :class="row.expend ? 'evui-tree-minus':'evui-tree-plus'"
-                              @click="toggle(row, $event)"
-                            />
-                            <i
-                              v-if="treeGroupColumn === col.field && row.leaf"
-                              class="evui-tree-empty"
-                            />
-                            {{ row.data[col.field] }}
+                            <div
+                              :style="{ lineHeight: `${rowHeight}px` }"
+                              class="evui-table-records-text"
+                            >
+                              {{ row.data[col.field] }}
+                            </div>
                           </div>
                           <div
                             v-else
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
-                            style="max-height: 24px;"
+                            style="max-height: 20px;"
                             v-html="cellRender(row[col.field], col.type, col.cellRender)"
                           />
                         </td>
                       </template>
 
+                      <template
+                        v-else
+                      >
+                        <td
+                          v-for="(col, colIndex) in originColumns"
+                          :key="colIndex"
+                          :data-col="colIndex"
+                          :style="{ textAlign: col.recordsAlign }"
+                          class="evui-table-data"
+                        >
+                          <div
+                            v-if="col.type === 'string' && col.cellRender === null"
+                            class="evui-table-records-col"
+                            style="max-height: 20px;"
+                          >
+                            <template
+                              v-if="treeGroupColumn === col.field"
+                            >
+                              <i
+                                v-for="(elbow, index) in row.elbow"
+                                :key="index"
+                                :class="elbow ? 'evui-tree-elbow-line':'evui-tree-empty'"
+                              />
+                              <i
+                                v-if="!row.leaf && !row.expend"
+                                :class="row.last ?
+                                'evui-tree-elbow-plus-end':'evui-tree-elbow-plus'"
+                                @click="toggle(row, $event)"
+                              />
+                              <i
+                                v-if="!row.leaf && row.expend"
+                                :class="row.last ?
+                                'evui-tree-elbow-minus-end':'evui-tree-elbow-minus'"
+                                @click="toggle(row, $event)"
+                              />
+                              <i
+                                v-if="row.leaf"
+                                :class="row.last ? 'evui-tree-elbow-end':'evui-tree-elbow'"
+                              />
+                            </template>
+                            <div
+                              :style="{ lineHeight: `${rowHeight}px` }"
+                              class="evui-table-records-text"
+                            >
+                              {{ row.data[col.field] }}
+                            </div>
+                          </div>
+                          <div
+                            v-else
+                            :class="col.type === 'number' ? 'evui-col-number' : ''"
+                            class="evui-table-records-col"
+                            style="max-height: 20px;"
+                            v-html="cellRender(row[col.field], col.type, col.cellRender)"
+                          />
+                        </td>
+                      </template>
                       <td
                         class="evui-table-data-last"
                         data-col="end"
@@ -120,7 +184,9 @@
           >
             <table>
               <tbody>
-                <tr>
+                <tr
+                  :style="{ height: `${headerHeight}px` }"
+                >
                   <td
                     class="evui-table-columns-head"
                     data-col="start"
@@ -219,6 +285,10 @@
           return [];
         },
       },
+      elbow: {
+        type: Boolean,
+        default: false,
+      },
     },
 
     data() {
@@ -256,7 +326,7 @@
           type: 'string',
           cellRender: null,
         },
-        rowHeight: 24,
+        rowHeight: 20,
 
         // 가상 스크롤 관련
         virtualRowCount: 0,
@@ -278,6 +348,8 @@
         resizeFlag: false,
 
         treeGroupColumn: '',
+
+        headerHeight: 30,
       };
     },
     computed: {
@@ -331,7 +403,7 @@
           }
         }
 
-        this.verticalScroll = this.gridRecordsHeight < (this.originData.length * this.rowHeight);
+        this.verticalScroll = this.gridRecordsHeight < (this.resultData.length * this.rowHeight);
         let leftSize;
         if (this.verticalScroll) {
           leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
@@ -346,7 +418,6 @@
         const colSize = Math.floor(leftSize / this.noSizeColList.length);
         if (this.noSizeColList.length > 0) {
           for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
-            // debugger;
             const min = util.quantity(this.noSizeColList[ix].min).value;
             const max = this.noSizeColList[ix].max ?
               util.quantity(this.noSizeColList[ix].max).value : undefined;

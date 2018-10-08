@@ -6,6 +6,7 @@
       :height="'350px'"
       :columns="columns"
       :records="rowData"
+      :elbow="true"
     />
   </div>
 </template>

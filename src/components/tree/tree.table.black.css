@@ -198,8 +198,9 @@ button {
   position: absolute;
   left: 0px;
   right: 0px;
-  top: 0px;
+  /*top: 0px;*/
   bottom: 0px;
+  overflow: auto;
 }
 .evui-table .evui-table-body .evui-table-records table tr.evui-odd {
   color: #ABAEB5 ;
@@ -289,7 +290,7 @@ button {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff495474', endColorstr='#ff404860', GradientType=0);*/
 }
 .evui-table .evui-table-body table .evui-table-columns-head > div {
-  padding: 7px 3px;
+  padding: 0 3px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -309,10 +310,13 @@ button {
   padding: 0px;
 }
 .evui-table .evui-table-body table td.evui-table-data > div {
-  padding: 3px 3px 3px 3px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: inline-block;*/
+  padding: 0 3px;
+  font-size: 0;
+  clear: both;
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
 }
 .evui-table .evui-table-body table td.evui-table-data > div.flexible-record {
   height: auto;
@@ -543,23 +547,134 @@ button {
   float: right;
 }
 .evui-tree-plus {
-  display: inline-block;
-  background: url('../../images/evui_icon.png') no-repeat -114px -559px;
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -114px -554px;
   width: 16px;
-  height: 9px;
+  height: 19px;
   cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
 }
 .evui-tree-minus {
-  display: inline-block;
-  background: url('../../images/evui_icon.png') no-repeat -114px -575px;
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -114px -570px;
   width: 16px;
-  height: 9px;
+  height: 19px;
   cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
 }
 .evui-tree-empty {
-  display: inline-block;
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
   /*background: url('../../images/evui_icon.png') no-repeat -114px -575px;*/
   width: 16px;
-  height: 9px;
+  height: 19px;
+  margin: 0;
+  /*vertical-align: middle;*/
   /*cursor: pointer;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-plus {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -190px -261px;
+  width: 16px;
+  height: 19px;
+  cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-minus {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -349px -261px;
+  width: 16px;
+  height: 19px;
+  cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -240px -261px;
+  width: 16px;
+  height: 19px;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-line {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -268px -261px;
+  width: 16px;
+  height: 19px;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-plus-end {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -294px -261px;
+  width: 16px;
+  height: 19px;
+  cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-minus-end {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -217px -261px;
+  width: 16px;
+  height: 19px;
+  cursor: pointer;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+.evui-tree-elbow-end {
+  /*display: inline-block;*/
+  float: left;
+  overflow: hidden;
+  background: url('../../images/evui_icon.png') no-repeat -322px -261px;
+  width: 16px;
+  height: 19px;
+  margin: 0;
+  /*vertical-align: middle;*/
+  /*border: solid 1px white;*/
+}
+/*.evui-tree-elbow-col {*/
+  /*display: inline-block;*/
+  /*top: 50%;*/
+  /*transform: translateY(-50%);*/
+  /*border: solid 1px red;*/
+/*}*/
+.evui-table-records-text {
+  /*display: inline-block;*/
+  font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /*line-height: 24px;*/
+  /*border: solid 1px white;*/
 }
