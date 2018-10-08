@@ -36,14 +36,6 @@ export default {
     return Math.floor(Math.log(val) / Math.LN10);
   },
 
-  xLabelFormat(value) {
-    return value;
-  },
-
-  yLabelFormat(value) {
-    return value;
-  },
-
   aliasPixel(pixelWidth) {
     return (pixelWidth % 2 === 0) ? 0 : 0.5;
   },

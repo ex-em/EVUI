@@ -2,6 +2,7 @@
   <div
     ref="wrapper"
     :style="wrapperSize"
+    class="ev-chart"
   />
 </template>
 <script>
@@ -43,7 +44,6 @@
       this.wrapperSize = {
         width: this.getChartSize(Util.quantity(this.options.width)),
         height: this.getChartSize(Util.quantity(this.options.height)),
-        display: 'inline-block',
       };
     },
     mounted() {
@@ -70,7 +70,12 @@
       }
 
       this.chart.drawChart();
-      this.dataStore = this.chart.dataStore;
+      this.dataStore = this.chart.store;
+    },
+    destroyed() {
+      if (this.chart.tooltipDOM) {
+        this.chart.tooltipDOM.remove();
+      }
     },
     methods: {
       getChartSize(size) {
@@ -102,24 +107,20 @@
   };
 </script>
 <style>
-  .evui-chart-wrapper {
+  .ev-chart-wrapper {
     position: relative;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
   }
 
-  .evui-chart-container {
+  .ev-chart-container {
     position: relative;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
   }
 
-  .evui-chart-title {
+  .ev-chart-title {
     position: absolute;
     top: 0;
     width: 100%;
@@ -131,7 +132,7 @@
     user-select: none;
   }
 
-  .evui-chart-legend{
+  .ev-chart-legend{
     position: absolute;
     width: 100%;
     height: 100%;
@@ -139,13 +140,13 @@
     overflow: auto;
   }
 
-  .evui-chart-legend-container {
+  .ev-chart-legend-container {
     position: relative;
     overflow: hidden;
     margin: 2px 10px 2px 0;
   }
 
-  .evui-chart-legend-color {
+  .ev-chart-legend-color {
     left: 0;
     width: 10px;
     height: 10px;
@@ -155,11 +156,11 @@
     border-radius: 5px;
   }
 
-  .evui-chart-legend-color.inactive {
-    background-color: #bbb !important;
+  .ev-chart-legend-color.inactive {
+    /*background-color: #555 !important;*/
   }
 
-  .evui-chart-legend-name {
+  .ev-chart-legend-name {
     float: left;
     text-align: left;
     text-overflow: ellipsis;
@@ -169,15 +170,15 @@
     margin-left: 16px;
     padding-right: 21px;
     width: 100%;
-    color: #ABAEB5;
+    /*color: #ABAEB5;*/
     user-select:none;
   }
 
-  .evui-chart-legend-name.inactive {
-    color: #555 !important;
+  .ev-chart-legend-name.inactive {
+    /*color: #555 !important;*/
   }
 
-  .evui-chart-legend-value {
+  .ev-chart-legend-value {
     float: right;
     text-align: left;
     text-overflow: ellipsis;
@@ -185,7 +186,7 @@
     overflow: hidden;
   }
 
-  .evui-chart-resize-bar {
+  .ev-chart-resize-bar {
     position: absolute;
     width: 4px;
     height: 100%;
@@ -195,11 +196,11 @@
     z-index: 1;
   }
 
-  .evui-chart-resize-bar:hover {
+  .ev-chart-resize-bar:hover {
     background-color: #e2e2e2;
   }
 
-  .evui-chart-resize-ghost {
+  .ev-chart-resize-ghost {
     position: absolute;
     width: 4px;
     height: 100%;
@@ -208,13 +209,13 @@
     background-color: #e2e2e2;
   }
 
-  .evui-chart-resize-ghost.horizontal {
+  .ev-chart-resize-ghost.horizontal {
     width: 100%;
     height: 4px;
     cursor: row-resize;
   }
 
-  .evui-chart-tooltip {
+  .ev-chart-tooltip {
     position: absolute;
     z-index: 100000;
     color: #000;
@@ -226,19 +227,28 @@
     padding: 10px;
   }
 
-  .evui-chart-tooltip-title {
+  .ev-chart-tooltip-title {
     font-size: 14px;
     text-align: center;
     margin: 0 5px 3px 5px;
     padding-bottom: 2px;
     border-bottom: 1px solid #D2D2D2;
+    user-select: none;
   }
 
-  .evui-chart-tooltip-ul {
+  .ev-chart-tooltip-ul {
     list-style: none;
+    display: block;
+    user-select: none;
   }
 
-  .evui-chart-tooltip-color {
+  .ev-chart-tooltip-li {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ev-chart-tooltip-color {
     width: 10px;
     height: 10px;
     position: absolute;
@@ -246,7 +256,7 @@
     border-radius: 5px;
   }
 
-  .evui-chart-tooltip-name {
+  .ev-chart-tooltip-name {
     /*float: left;*/
     text-align: left;
     text-overflow: ellipsis;
@@ -259,11 +269,11 @@
     color: #000;
   }
 
-  .evui-chart-tooltip-colon {
+  .ev-chart-tooltip-colon {
     width: 100%;
   }
 
-  .evui-chart-tooltip-value {
+  .ev-chart-tooltip-value {
     font-size: 12px;
     margin-right: 5px;
   }

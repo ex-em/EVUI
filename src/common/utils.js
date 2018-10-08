@@ -63,4 +63,24 @@ export function getMatchedComponentUpward(context, componentName) {
   return parent;
 }
 
+export function convertToPercent(value, totalValue) {
+  if (!value || !totalValue) {
+    return 0;
+  }
+
+  return +((value / totalValue) * 100).toFixed(2);
+}
+
+export function convertToValue(value, totalValue) {
+  let result = 0;
+
+  if (!value || !totalValue) {
+    return result;
+  }
+
+  result = (value / 100) * totalValue;
+
+  return +result.toFixed(2);
+}
+
 export default Utils;
