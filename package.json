@@ -14,7 +14,8 @@
     "build": "webpack --config build/webpack.prod.conf.js",
     "home": "webpack-dev-server --progress --config build/webpack.home.conf.js",
     "home_build": "webpack --config build/webpack.home.conf.js",
-    "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js"
+    "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
+    "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js"
   },
   "main": "dist/evui.min.js",
   "files": [
