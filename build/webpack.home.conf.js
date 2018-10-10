@@ -54,7 +54,7 @@ module.exports = merge(webpackBaseConfig, {
     compress: false,
   },
   plugins: [
-    new CleanWebpackPlugin(['demo']),
+    // new CleanWebpackPlugin(['demo']),
     // new webpack.DefinePlugin({
     //   'process.env': require('../config/dev.env')
     // }),
