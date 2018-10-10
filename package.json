@@ -1,8 +1,8 @@
 {
   "name": "evui",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A EXEM Library project",
-  "author": "jwlee <jwlee@ex-em.com>",
+  "author": "exem <dev_client@ex-em.com>",
   "private": true,
   "license": "MIT",
   "scripts": {
