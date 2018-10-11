@@ -130,6 +130,7 @@
         useTabScroll: this.scrollable,
         currentTabList: this.createTabData(),
         indicator: 0,
+        currentTabIndex: 0,
       };
     },
     computed: {
@@ -160,11 +161,9 @@
     mounted() {
       this.idTag = Number(this.currentTabList.length);
       this.tabCount = Number(this.originTabList.length);
-
-      this.currentTabList = this.currentTabList.map((v) => {
+      this.currentTabList.forEach((v) => {
         const target = v.targetComponent;
         this.installComponent(target);
-        return v;
       });
       this.setActive(this.currentTabList[this.currentTabList.length - 1]);
       this.setScrollIcon();
@@ -257,7 +256,6 @@
       close(data) {
         this.removeTabTarget(data);
         this.setScrollIcon(data, 'removal');
-        this.setTransForm(data, 'removal');
       },
       removeTabTarget(data) {
         if (this.currentTabList.length === 1) {
@@ -301,26 +299,40 @@
         this.onChangeTransForm(e, 'left');
       },
       onRightMove(e) {
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
+        const tabItemX = tabItemRef[tabItemRef.length - 1].$el.getBoundingClientRect().x;
+        const wrapperWidth = this.$refs.tabListWrapperRef.getBoundingClientRect().width;
+        if (Math.abs(wrapperWidth - tabItemX) < tabItemEl.width) {
+          return;
+        }
         this.onChangeTransForm(e, 'right');
       },
       onChangeTransForm(e, type) {
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
         if (type === 'left') {
-          this.currentX += 132;
+          this.currentX += ((tabItemEl.width) + 4);
         } else if (type === 'right') {
-          // TODO 가드 필요 특정 값까지 도달했으면 더이상 진행 x 하고 max value 로 변경
-          this.currentX -= 132;
+          this.currentX -= ((tabItemEl.width) + 4);
         }
         this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
       },
-      setTransForm(data, type) {
-        console.log(this.getTabItem(data), type);
-        // TODO goto last tab and last x position
-        // if (type === 'add') {
-        //   this.currentX -= 132;
-        // } else if (type === 'removal') {
-        //   this.currentX += 132;
-        // }
-        // this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
+      setTransForm(data, type, init) {
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
+        if (type === 'add') {
+          if (init) {
+            this.currentX -= 25;
+          } else {
+            this.currentX -= ((tabItemEl.width) + 4);
+          }
+        } else if (type === 'removal') {
+          this.currentX += ((tabItemEl.width) + 4);
+        } else if (type === 'deleteScroll') {
+          this.currentX = 0;
+        }
+        this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
       },
       setScrollIcon(data, type) {
         const sideIconWidth = 20;
@@ -329,9 +341,18 @@
           this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
           if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
             this.useTabScroll = true;
-            this.setTransForm(data, type);
+            if (!this.initScroll) {
+              this.initScroll = true;
+              this.setTransForm(data, type, this.initScroll);
+            } else {
+              this.setTransForm(data, type);
+            }
           } else {
             this.useTabScroll = false;
+            if (this.initScroll) {
+              this.initScroll = false;
+              this.setTransForm(data, 'deleteScroll');
+            }
           }
         });
       },
@@ -341,14 +362,13 @@
         const tabItemRef = this.$refs.tabItemRef;
         const totalWidth = tabItemRef.map(v => v.$el.getBoundingClientRect().width)
           .reduce((acc, curr) => acc + curr);
-        if (totalWidth >= this.max) {
-          this.indicator = this.max;
-        }
-        this.indicator = totalWidth;
+        console.log(totalWidth);
+        this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
+        this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
+        console.log(this.tabListRect.width, this.tabWrapperRect.width);
       },
-      getTabItem(data) {
-        console.log(data);
-        console.log(this.$refs.tabItemRef);
+      getTabItems() {
+        return this.$refs.tabItemRef;
       },
       setIndicator() {
         // this.max = this.tabWrapperRect;

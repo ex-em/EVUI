@@ -45,7 +45,7 @@
       return {
         scroll: false,
         tabItem: {
-          title: 'use Tag 0',
+          title: 'appended tab',
           isActive: false,
           targetComponent: {
             keyName: 'targetComponent1',
@@ -53,7 +53,7 @@
           },
         },
         tabItems: [{
-            title: 'use Tag 1',
+            title: 'appended tab',
             isActive: false,
             targetComponent: {
               keyName: 'targetComponent3',
@@ -61,7 +61,7 @@
             },
           },
           {
-            title: 'use Tag 2',
+            title: 'appended tab',
             isActive: false,
             targetComponent: {
               keyName: 'targetComponent4',
@@ -69,7 +69,7 @@
             },
           },
           {
-            title: 'use Tag 3',
+            title: 'appended tab',
             isActive: false,
             targetComponent: {
               keyName: 'targetComponent5',
@@ -95,9 +95,9 @@
         const result = [];
         for (let i = 0, length = 3; i < length; i++) {
           result.push({
-            title: `tab${i + 1}`,
+            title: 'appended tab',
             isActive: false,
-            width: 300,
+            width: 100,
             targetComponent: {
               keyName: `target-component${i + 1}`,
               component: componentList[i],
