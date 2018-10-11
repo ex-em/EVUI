@@ -539,3 +539,6 @@ button {
 .evui-table-menu-tab-body {
   max-height: 300px;
 }
+.evui-table-records-col.evui-col-number {
+  float: right;
+}

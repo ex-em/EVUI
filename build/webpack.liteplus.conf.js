@@ -1,14 +1,13 @@
 'use strict'
 const path = require('path');
 const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const webpackBaseConfig = require('./webpack.base.conf.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-const { VueLoaderPlugin } =  require ('vue-loader' );
-
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { VueLoaderPlugin } =  require ('vue-loader');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -17,11 +16,11 @@ function resolve (dir) {
 module.exports = merge(webpackBaseConfig, {
   mode: 'development',
   entry: {
-    app: './home/main.js',
-    vendors: ['vue']
+    app: './liteplus/main.js',
+    vendors: ['vue'],
   },
   output: {
-    path:path.resolve(__dirname, '../demo'),
+    path: path.resolve(__dirname, '../dist_liteplus'),
     publicPath: '/',
     filename: '[name].js',
   },
@@ -32,7 +31,7 @@ module.exports = merge(webpackBaseConfig, {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
-        include: [resolve('src'), resolve('home')],
+        include: [resolve('src'), resolve('liteplus')],
         options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
@@ -46,35 +45,29 @@ module.exports = merge(webpackBaseConfig, {
     historyApiFallback: true,
     noInfo: true,
     contentBase: '/',
-    // open: true,
     hot: true,
     inline: true,
     host: '0.0.0.0',
-    port: '8888',
+    disableHostCheck: true,
+    port: '7777',
     compress: false,
   },
   plugins: [
-    // new CleanWebpackPlugin(['demo']),
-    // new webpack.DefinePlugin({
-    //   'process.env': require('../config/dev.env')
-    // }),
+    new CleanWebpackPlugin(['dist_liteplus']),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       filename: './index.html',
-      template: './home/index.html',
+      template: './liteplus/index.html',
     }),
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../home/guide/'),
-        to: './guide/'
-      }
+        from: path.resolve(__dirname, '../liteplus/'),
+        to: './liteplus/'
+      },
     ]),
-    new VueLoaderPlugin(),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'common'
-    // }),
+    new FriendlyErrorsPlugin(),
+    new VueLoaderPlugin()
   ]
 });

@@ -1,8 +1,5 @@
 <template>
-  <div
-    :style="dropdownStyle"
-    :class="prefixCls"
-  >
+  <div :class="prefixCls">
     <div
       v-if="multiple"
       :class="`${prefixCls}-multiple-input-area`"
@@ -28,7 +25,7 @@
             {{ item.groupName }}
           </li>
           <Listbox
-            :listbox-style="listboxStyle"
+            :style="listBoxStyle"
             :is-group="true"
             :items="item.items"
             :selected-items="selectedItems"
@@ -41,7 +38,7 @@
         :class="`${prefixCls}-single-area`"
       >
         <Listbox
-          :listbox-style="listboxStyle"
+          :style="listBoxStyle"
           :items="items"
           :selected-items="selectedItems"
           @select="onSelect"
@@ -61,7 +58,7 @@
       Listbox,
     },
     props: {
-      dropdownStyle: {
+      listBoxStyle: {
         type: Object,
         default() {
           return {};
@@ -95,7 +92,6 @@
     data() {
       return {
         prefixCls,
-        listboxStyle: {},
       };
     },
     methods: {
@@ -142,13 +138,13 @@
   /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-group-area **/
   /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-single-area **/
 
-  .evui-dropdown-listbox-wrap{
+  .evui-dropdown-listbox-wrap {
     width: 100%;
   }
-  .evui-dropdown-group-area{
+  .evui-dropdown-group-area {
     list-style-type: none;
     width: 100%;
-    height: 100%;
+    max-height: 150px;
     border: 1px solid #ccc;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -158,13 +154,14 @@
     box-shadow: 0 6px 12px #ccc;
     overflow: auto;
   }
-  .evui-dropdown-group-area .title{
+  .evui-dropdown-group-area .title {
     padding: 7px 10px;
     color:#999;
   }
-  .evui-dropdown-single-area{
+  .evui-dropdown-single-area {
     position: absolute;
     width: 100%;
+    max-height: 150px;
     border: 1px solid #ccc;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;

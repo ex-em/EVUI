@@ -19,32 +19,20 @@
     data() {
       return {
         defaultPieChartData: {
-          series: [
-            {
-              id: 'series1',
-              name: 'series#1',
-              data: [5, 10, 6],
-            },
-            {
-              id: 'series2',
-              name: 'series#2',
-              data: [10, 12, 8],
-            },
-            {
-              id: 'series3',
-              name: 'series#3',
-              data: [15, 10, 20],
-            },
-            {
-              id: 'series4',
-              name: 'series#4',
-              data: [5, 15, 10],
-            },
+          series: {
+            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
+            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
+            series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
+          },
+          data: [
+            ['series1', 30, 100, 40],
+            ['series2', 80, 200, 20],
+            ['series3', 50, 150, 20],
           ],
         },
         defaultPieChartOptions: {
           type: 'pie',
-          width: '600px',
+          width: '100%',
           height: '350px',
         },
       };
