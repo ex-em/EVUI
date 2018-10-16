@@ -1,20 +1,24 @@
-'use strict';
 const path = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
-const baseWebpackConfig = require('./webpack.base.conf');
-const CompressionPlugin = require('compression-webpack-plugin');
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const { VueLoaderPlugin } =  require ('vue-loader' );
 
+const merge = require('webpack-merge');
+const CompressionPlugin = require('compression-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+const baseWebpackConfig = require('./webpack.base.conf');
+
+function resolve (dir) {
+  return path.join(__dirname, '..', dir)
+}
 
 const webpackConfig = merge(baseWebpackConfig, {
-  mode: 'production',
-  entry: {
-    app: './src/index.js'
-  },
+  mode: 'development',
+  devtool: 'source-map',
+  entry: resolve('./src/index.js'),
   output: {
-    path:path.resolve(__dirname, '../dist'),
+    path: resolve('./dist'),
+    publicPath: './dist',
     filename: 'evui.min.js',
     library: 'evui',
     libraryTarget: 'umd',
@@ -26,26 +30,12 @@ const webpackConfig = merge(baseWebpackConfig, {
       commonjs: 'vue',
       commonjs2: 'vue',
       amd: 'vue'
-    }
-  },
-  devtool: 'source-map',
-  optimization: {
-    minimize: true,
+    },
   },
   plugins: [
-    // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    // new webpack.DefinePlugin({
-    //   'process.env.NODE_ENV': '"production"'
-    // }),
-    // new UglifyJsPlugin({
-    //   uglifyOptions: {
-    //     compress: {
-    //       warnings: false
-    //     }
-    //   },
-    //   sourceMap: true,
-    //   parallel: true
-    // }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"'
+    }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
@@ -53,8 +43,9 @@ const webpackConfig = merge(baseWebpackConfig, {
       threshold: 10240,
       minRatio: 0.8
     }),
+    new CleanWebpackPlugin([resolve('./dist')], { allowExternal : true }),
     new VueLoaderPlugin(),
   ]
 });
 
-module.exports = webpackConfig
+module.exports = webpackConfig;
