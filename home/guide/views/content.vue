@@ -25,7 +25,7 @@
     props: {
       imgUrl: {
         type: String,
-        default: './guide/images/',
+        default: './guide/images',
       },
     },
     data() {

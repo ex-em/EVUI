@@ -1,14 +1,5 @@
-import Vue from 'vue';
-
-const vm = new Vue();
 const windowConsole = window.console;
 export const prefix = 'evui-';
-
-const Utils = {
-  getId() {
-    return prefix + vm._uid;
-  },
-};
 
 export const Console = {
   log(...data) {
@@ -82,5 +73,3 @@ export function convertToValue(value, totalValue) {
 
   return +result.toFixed(2);
 }
-
-export default Utils;
