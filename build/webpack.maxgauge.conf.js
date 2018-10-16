@@ -41,6 +41,31 @@ module.exports = merge(webpackBaseConfig, {
       }
     ]
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all', // all, async, initial
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          chunks: 'initial',
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  },
   devServer: {
     historyApiFallback: true,
     noInfo: true,
