@@ -70,6 +70,10 @@ const router = new VueRouter({
       component: () => import(/* webpackChunkName: 'table' */ './guide/views/examples/table/table-view'),
     },
     {
+      path: '/tree',
+      component: resolve => require(['./guide/views/examples/tree/tree-table-view'], resolve),
+    },
+    {
       path: '/menu',
       component: () => import(/* webpackChunkName: 'menu' */ './guide/views/examples/menu/menu-view'),
     },
