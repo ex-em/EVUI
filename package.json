@@ -1,9 +1,8 @@
 {
   "name": "evui",
-  "version": "2.0.1",
+  "version": "2.0.7",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
-  "private": true,
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
@@ -12,12 +11,13 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "webpack --config build/webpack.prod.conf.js",
-    "home": "webpack-dev-server --progress --config build/webpack.home.conf.js",
-    "home_build": "webpack --config build/webpack.home.conf.js",
+    "home": "webpack-dev-server --progress --config build/webpack.home.conf.js --mode development",
+    "home_build": "webpack --config build/webpack.home.conf.js --mode production",
     "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
     "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js"
   },
   "main": "dist/evui.min.js",
+  "module": "dist/evui.min.js",
   "files": [
     "dist",
     "src"
@@ -80,6 +80,7 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.6.1",
+    "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "inject-loader": "^4.0.1",
     "karma": "^3.0.0",

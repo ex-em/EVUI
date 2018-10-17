@@ -8,10 +8,13 @@
       :columns="columns"
       :records="rowData"
     />
+    <button @click="tt">test</button>
   </div>
 </template>
 
 <script>
+  import tr from '@/components/tree/tree.util';
+
   export default {
     data() {
       return {
@@ -40,7 +43,69 @@
           { recid: 14, fname: 'Manny', lname: 'Silver', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
           { recid: 15, fname: 'Ben', lname: 'Gatos', email: 'jdoe@gmail.com', sdate: '4/3/2012' },
         ],
+        testData: [
+          {
+            children: [
+              {
+                children: [{
+                  children: [],
+                  leaf: false,
+                  level: 1,
+                  name: 'Sub-Value',
+                  niif_account: '36565',
+                  parent_id: 2,
+                  id: 4,
+                  description: 'sub-description',
+                }],
+                leaf: true,
+                level: 1,
+                niff_account: '123567',
+                id: 2,
+                data: {
+                  description: 'sub-description value 1',
+                  parent_id: 1,
+                  name: 'Sub-Value 1',
+                },
+              },
+            ],
+            leaf: false,
+            level: 0,
+            parent_id: null,
+            expend: null,
+            id: 1,
+            data: {
+              description: 'description value 1',
+              niff_account: '',
+              name: 'Value 1',
+            },
+          },
+          {
+            children: [],
+            leaf: true,
+            level: 0,
+            parent_id: null,
+            expend: null,
+            id: 2,
+            data: {
+              description: 'description value 2',
+              niff_account: '',
+              name: 'Value 2',
+            },
+          },
+        ],
       };
+    },
+    created() {
+      const test = tr.testData;
+      const test1 = tr.transformTreeToArray(test);
+      window.console.log(test1);
+    },
+    methods: {
+      tt() {
+        // debugger;
+        this.$refs.test.setData(this.$tableData);
+        this.$refs.test.draw();
+      },
     },
   };
 </script>

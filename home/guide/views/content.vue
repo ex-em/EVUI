@@ -25,7 +25,7 @@
     props: {
       imgUrl: {
         type: String,
-        default: './guide/images/',
+        default: './guide/images',
       },
     },
     data() {
@@ -104,6 +104,12 @@
                 name: 'Table',
                 routerLink: '/table',
                 content: '테이블 - 그리드',
+                imgUrl: `${this.imgUrl}/table.png`,
+              },
+              {
+                name: 'Tree',
+                routerLink: '/tree',
+                content: '트리, 트리 테이블',
                 imgUrl: `${this.imgUrl}/table.png`,
               },
               {

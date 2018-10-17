@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { Util, Console } from '@/common/utils';
+import { Console } from '@/common/utils';
 
 export default class DataStore {
   constructor(props) {
@@ -23,6 +23,7 @@ export default class DataStore {
     this.axisList = { x: [], y: [] };
     this.xMinMax = [];
     this.yMinMax = [];
+    this.sIdx = 0;
   }
 
   /**
@@ -64,7 +65,7 @@ export default class DataStore {
 
     let series;
     const defaultSeries = {
-      name: param.name || `series-${Util.getId()}`,
+      name: param.name || `series-${this.sIdx++}`,
       color: param.color || this.chartOptions.colors[skey.length],
       show: param.show === undefined ? true : param.show,
       min: null,

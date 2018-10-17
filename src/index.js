@@ -1,21 +1,22 @@
-import EvButton from '@/components/button';
-import EvChart from '@/components/chart';
-import EvCheckbox from '@/components/checkbox';
-import EvCheckboxGroup from '@/components/checkbox-group';
-import EvIcon from '@/components/icon';
-import EvInput from '@/components/input';
-import EvLoadingmask from '@/components/loadingmask';
-import EvMenu from '@/components/menu';
-import EvRadio from '@/components/radio';
-import EvRadioGroup from '@/components/radio-group';
-import EvSelectbox from '@/components/selectbox';
-import EvSlider from '@/components/slider';
-import EvTable from '@/components/table';
-import EvTimePicker from '@/components/timepicker';
-import EvToggle from '@/components/toggle';
-import EvLabel from '@/components/label';
-import EvDatepicker from '@/components/datepicker';
-import { tabs as EvTabs, tab as EvTab } from '@/components/tabs';
+import EvButton from './components/button';
+import EvChart from './components/chart';
+import EvCheckbox from './components/checkbox';
+import EvCheckboxGroup from './components/checkbox-group';
+import EvIcon from './components/icon';
+import EvInput from './components/input';
+import EvLoadingmask from './components/loadingmask';
+import EvMenu from './components/menu';
+import EvRadio from './components/radio';
+import EvRadioGroup from './components/radio-group';
+import EvSelectbox from './components/selectbox';
+import EvSlider from './components/slider';
+import EvTable from './components/table';
+import EvTimePicker from './components/timepicker';
+import EvToggle from './components/toggle';
+import EvLabel from './components/label';
+import EvDatepicker from './components/datepicker';
+import { TreeTable as EvTreeTable } from './components/tree';
+import { tabs as EvTabs, tab as EvTab } from './components/tabs';
 
 const components = {
   EvButton,
@@ -37,6 +38,7 @@ const components = {
   EvDatepicker,
   EvTabs,
   EvTab,
+  EvTreeTable,
 };
 
 const evui = {
