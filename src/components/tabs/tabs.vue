@@ -197,19 +197,21 @@
         return installed;
       },
       createTabData() {
-        let result = [];
         const slotList = this.getSlotList(this.$slots.default);
+        let reduceList = [].concat(slotList, this.tabData);
 
-        result = result.concat(slotList, this.tabData).reduce((acc, curr) => {
-          const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
-          return val;
-        });
-
-        for (let i = 0, length = result.length; i < length; i++) {
-          this.appendTabId(result[i], i);
+        if (reduceList.length > 1) {
+          reduceList = reduceList.reduce((acc, curr) => {
+            const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
+            return val;
+          });
         }
 
-        return result;
+        for (let i = 0, length = reduceList.length; i < length; i++) {
+          this.appendTabId(reduceList[i], i);
+        }
+
+        return reduceList;
       },
       appendTabId(data, index) {
         const obj = {};
