@@ -74,7 +74,7 @@
 
   const unpackNode = function unpackNode(node) {
     let data = null;
-    const tagNameRxg = new RegExp(/(tab)+/g);
+    const tagNameRxg = new RegExp(/(EvTab)+/g);
     if (node.tag && node.tag.match(tagNameRxg).length > 0) {
       data = node.componentOptions.propsData.tabProp;
     }

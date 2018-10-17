@@ -15,6 +15,7 @@ import EvTimePicker from '@/components/timepicker';
 import EvToggle from '@/components/toggle';
 import EvLabel from '@/components/label';
 import EvDatepicker from '@/components/datepicker';
+import { tabs as EvTabs, tab as EvTab } from '@/components/tabs';
 
 const components = {
   EvButton,
@@ -34,6 +35,8 @@ const components = {
   EvToggle,
   EvLabel,
   EvDatepicker,
+  EvTabs,
+  EvTab,
 };
 
 const evui = {

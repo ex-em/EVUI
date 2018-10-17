@@ -1,32 +1,29 @@
 <template>
   <div class="outer">
     <div class="button-outer">
-      <Button
+      <ev-button
         :type="'primary'"
         :text="'Tab Add'"
         @click="addTab"
       />
     </div>
     <div class="tab-default-outer">
-      <tabs
+      <ev-tabs
         :tab-data="list"
       >
-        <tab
+        <ev-tab
           :tab-prop="tabItem"
         />
-        <tab
+        <ev-tab
           v-for="item in tabItems"
           :key="item.id"
           :tab-prop="item"
         />
-      </tabs>
+      </ev-tabs>
     </div>
   </div>
 </template>
 <script>
-  import tab from '@/components/tab/tab';
-  import tabs from '@/components/tab/tabs';
-  import Button from '@/components/button/button';
   import targetComponent1 from '../checkbox/checkbox-group-list-handling';
   import targetComponent2 from '../table/table-buffer';
   import targetComponent3 from '../button/button-loading';
@@ -36,11 +33,6 @@
   const componentList = [targetComponent1, targetComponent2, targetComponent3];
 
   export default {
-    components: {
-      tab,
-      tabs,
-      Button,
-    },
     data() {
       return {
         scroll: false,
@@ -104,7 +96,6 @@
             },
           });
         }
-
         return result;
       },
     },
