@@ -16,11 +16,11 @@ function resolve (dir) {
 module.exports = merge(webpackBaseConfig, {
   mode: 'development',
   entry: {
-    app: './maxgauge/main.js',
+    app: './liteplus/main.js',
     vendors: ['vue'],
   },
   output: {
-    path: path.resolve(__dirname, '../dist_maxgauge'),
+    path: path.resolve(__dirname, '../dist_liteplus'),
     publicPath: '/',
     filename: '[name].js',
   },
@@ -31,7 +31,7 @@ module.exports = merge(webpackBaseConfig, {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
-        include: [resolve('src'), resolve('maxgauge')],
+        include: [resolve('src'), resolve('liteplus')],
         options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
@@ -41,31 +41,6 @@ module.exports = merge(webpackBaseConfig, {
       }
     ]
   },
-  optimization: {
-    splitChunks: {
-      chunks: 'all', // all, async, initial
-      minSize: 30000,
-      maxSize: 0,
-      minChunks: 1,
-      maxAsyncRequests: 5,
-      maxInitialRequests: 3,
-      automaticNameDelimiter: '~',
-      name: true,
-      cacheGroups: {
-        vendors: {
-          chunks: 'initial',
-          name: 'vendor',
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10
-        },
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
-        }
-      }
-    }
-  },
   devServer: {
     historyApiFallback: true,
     noInfo: true,
@@ -74,22 +49,22 @@ module.exports = merge(webpackBaseConfig, {
     inline: true,
     host: '0.0.0.0',
     disableHostCheck: true,
-    port: '9999',
+    port: '7777',
     compress: false,
   },
   plugins: [
-    new CleanWebpackPlugin(['dist_maxgauge']),
+    new CleanWebpackPlugin(['dist_liteplus']),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       filename: './index.html',
-      template: './maxgauge/index.html',
+      template: './liteplus/index.html',
     }),
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../maxgauge/'),
-        to: './maxgauge/'
+        from: path.resolve(__dirname, '../liteplus/'),
+        to: './liteplus/'
       },
     ]),
     new FriendlyErrorsPlugin(),

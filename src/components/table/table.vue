@@ -1236,4 +1236,4 @@
     },
   };
 </script>
-<style scoped src="@/components/table/table.black.css"/>
+<style scoped src="@/components/table/table.grey.css"/>
