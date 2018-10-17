@@ -167,7 +167,6 @@
       });
       this.setActive(this.currentTabList[this.currentTabList.length - 1]);
       this.setScrollIcon();
-      this.initIndicator();
     },
     methods: {
       renderTab(data) {
@@ -273,11 +272,11 @@
           }
         }
       },
-      onDragStart(event, data, index) {
-        console.log(event, data, index);
+      onDragStart() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
-      onDragEnd(event, data, index) {
-        console.log(event, data, index);
+      onDragEnd() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
       wheelEvent(e) {
         e.preventDefault();
@@ -356,28 +355,8 @@
           }
         });
       },
-      initIndicator() {
-        this.indicator = 0;
-        this.max = this.tabWrapperRect;
-        const tabItemRef = this.$refs.tabItemRef;
-        const totalWidth = tabItemRef.map(v => v.$el.getBoundingClientRect().width)
-          .reduce((acc, curr) => acc + curr);
-        console.log(totalWidth);
-        this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
-        this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-        console.log(this.tabListRect.width, this.tabWrapperRect.width);
-      },
       getTabItems() {
         return this.$refs.tabItemRef;
-      },
-      setIndicator() {
-        // this.max = this.tabWrapperRect;
-        // this.indicator += width;
-        // if (this.indicator >= this.max) {
-        //   this.indicator = this.max;
-        // } else if (this.indicator <= 0) {
-        //   this.indicator = 0;
-        // }
       },
     },
   };
