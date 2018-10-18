@@ -1,61 +1,90 @@
-'use strict'
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const merge = require('webpack-merge');
-const webpackBaseConfig = require('./webpack.base.conf.js');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const { VueLoaderPlugin } =  require ('vue-loader');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-const { VueLoaderPlugin } =  require ('vue-loader' );
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const webpackBaseConfig = require('./webpack.base.conf.js');
+
 function resolve (dir) {
-  return path.join(__dirname, '..', dir)
+  return path.join(__dirname, '..', dir);
 }
+
 module.exports = merge(webpackBaseConfig, {
   mode: 'development',
+  devtool: 'eval-source-map',
   entry: {
-    app: './examples/main.js',
+    main: './examples/main.js',
     vendors: ['vue', 'vue-router']
   },
   output: {
-    path:path.resolve(__dirname, '../dist'),
+    path: resolve('../examples/dist'),
     publicPath: '/',
     filename: '[name].js',
+    chunkFilename: '[name].[chunkhash].js'
   },
-  devtool: 'source-map',
+  resolve: {
+    alias: {
+      'evui': '../../src/index',
+      'vue': 'vue/dist/vue.esm.js'
+    }
+  },
   module: {
     rules:[
       {
-        test: /\.(js|vue)$/,
+        test: /\.(vue|js)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
         include: [resolve('src'), resolve('examples'), resolve('test')],
-        options: {
+          options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
           failOnError: true,
           failOnWarning : true,
         }
-      }
+      },
     ]
   },
   devServer: {
     historyApiFallback: true,
     noInfo: true,
-    contentBase: './dist',
-    // open: true,
+    contentBase: '/',
     hot: true,
     inline: true,
-    //host: HOST || 'localhost',
     host: '0.0.0.0',
     disableHostCheck: true,
     port: '8888'
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all', // all, async, initial
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          chunks: 'initial',
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  },
   plugins: [
-    // new webpack.DefinePlugin({
-    //   'process.env': require('../config/dev.env')
-    // }),
     new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,

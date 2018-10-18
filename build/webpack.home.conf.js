@@ -1,31 +1,31 @@
-'use strict'
 const path = require('path');
 const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
-const webpackBaseConfig = require('./webpack.base.conf.js');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-const { VueLoaderPlugin } =  require ('vue-loader' );
 
+const merge = require('webpack-merge');
+const { VueLoaderPlugin } =  require ('vue-loader' );
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+const webpackBaseConfig = require('./webpack.base.conf.js');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
 module.exports = merge(webpackBaseConfig, {
-  mode: 'development',
+  devtool: 'eval-source-map',
   entry: {
     app: './home/main.js',
-    vendors: ['vue']
+    vendors: ['vue', 'vue-router']
   },
   output: {
-    path:path.resolve(__dirname, '../demo'),
+    path: resolve('./demo'),
     publicPath: '/',
     filename: '[name].js',
+    chunkFilename: '[name].js'
   },
-  devtool: 'source-map',
   module: {
     rules:[
       {
@@ -46,18 +46,38 @@ module.exports = merge(webpackBaseConfig, {
     historyApiFallback: true,
     noInfo: true,
     contentBase: '/',
-    // open: true,
     hot: true,
     inline: true,
     host: '0.0.0.0',
     port: '8888',
     compress: false,
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all', // all, async, initial
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          chunks: 'initial',
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  },
   plugins: [
-    new CleanWebpackPlugin(['demo']),
-    // new webpack.DefinePlugin({
-    //   'process.env': require('../config/dev.env')
-    // }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
@@ -72,9 +92,8 @@ module.exports = merge(webpackBaseConfig, {
         to: './guide/'
       }
     ]),
+    new FriendlyErrorsPlugin(),
     new VueLoaderPlugin(),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'common'
-    // }),
+    new CleanWebpackPlugin([resolve('./demo')], {allowExternal : true }),
   ]
 });

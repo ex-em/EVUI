@@ -3,17 +3,17 @@ export default class ChartLegend {
     Object.keys(props).forEach((key) => {
       this[key] = props[key];
     });
-
-    this.isShow = this.chartOptions.legend.show;
+    // false일 경우 생성 안됨.
+    this.isShow = true;
 
     this.legendDOM = document.createElement('div');
-    this.legendDOM.className = 'evui-chart-legend';
+    this.legendDOM.className = 'ev-chart-legend';
     this.resizeDOM = document.createElement('div');
-    this.resizeDOM.className = 'evui-chart-resize-bar';
+    this.resizeDOM.className = 'ev-chart-resize-bar';
     this.resizeDOM.onmousedown = this.onMouseDown.bind(this);
 
     this.ghostDOM = document.createElement('div');
-    this.ghostDOM.className = 'evui-chart-resize-ghost';
+    this.ghostDOM.className = 'ev-chart-resize-ghost';
 
     this.mouseUp = this.onMouseUp.bind(this); // resizing function
     this.mouseMove = this.onMouseMove.bind(this); // resizing function
@@ -41,66 +41,95 @@ export default class ChartLegend {
   }
 
   createLegend() {
-    const options = this.chartOptions.legend;
-    const defColors = this.chartOptions.colors;
-    const position = options.position;
+    const groups = this.groups;
+    const seriesList = this.seriesList;
+    const skey = Object.keys(seriesList);
 
     const calcSeriesWidthDOM = document.createElement('span');
+
     calcSeriesWidthDOM.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000;');
     this.wrapperDOM.appendChild(calcSeriesWidthDOM);
 
-    let width;
+    let series;
 
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      const series = this.seriesList[ix];
-      calcSeriesWidthDOM.textContent = series.name;
-      width = calcSeriesWidthDOM.clientWidth + 26; // 26 = color margin value.
+    if (groups.length) {
+      for (let ix = 0, ixLen = groups.length; ix < ixLen; ix++) {
+        const group = groups[ix];
+        for (let jx = group.length - 1; jx >= 0; jx--) {
+          series = seriesList[group[jx]];
 
-      const legend = {
-        containerDOM: document.createElement('div'),
-        colorDOM: document.createElement('span'),
-        nameDOM: document.createElement('div'),
-        valueDOM: document.createElement('span'),
-      };
-
-      legend.containerDOM.className = 'evui-chart-legend-container';
-      legend.colorDOM.className = 'evui-chart-legend-color';
-      legend.nameDOM.className = 'evui-chart-legend-name';
-      legend.valueDOM.className = 'evui-chart-legend-value';
-      legend.colorDOM.style.backgroundColor = series.color || defColors[series.seriesIndex];
-
-      legend.nameDOM.textContent = series.name;
-
-      legend.nameDOM.setAttribute('title', series.name);
-
-      legend.containerDOM.appendChild(legend.colorDOM);
-      legend.containerDOM.appendChild(legend.nameDOM);
-      legend.containerDOM.appendChild(legend.valueDOM);
-
-      series.labelObj = legend;
-
-      if (!series.show) {
-        legend.container.style.display = 'none';
-      } else {
-        this.legendCount += 1;
+          if (series.show) {
+            this.createLegendDOM(series, group[jx], calcSeriesWidthDOM);
+          }
+        }
       }
+    }
 
-      this.legendWidth = Math.min(Math.max(width, this.legendWidth), 140);
-      legend.containerDOM.style.lineHeight = `${this.legendHeight}px`;
-      legend.containerDOM.style.cursor = this.chartOptions.type !== 'sunburst' ? 'pointer' : '';
-      legend.containerDOM.addEventListener('click', this.onClickLegend.bind(this));
-      legend.containerDOM.addEventListener('mouseover', this.onMouseOverLegend.bind(this));
-      legend.containerDOM.addEventListener('mouseout', this.onMouseOutLegend.bind(this));
-      legend.containerDOM.series = series;
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      series = seriesList[skey[ix]];
 
-      if (position === 'top' || position === 'bottom') {
-        legend.containerDOM.style.display = 'inline-block';
+      if (!series.isExistGrp && series.show) {
+        this.createLegendDOM(series, skey[ix], calcSeriesWidthDOM);
       }
-
-      this.legendDOM.appendChild(legend.containerDOM);
     }
 
     calcSeriesWidthDOM.remove();
+  }
+
+  createLegendDOM(seriesObj, sId, widthDOM) {
+    const chartOpt = this.chartOptions;
+
+    const legendOpt = chartOpt.legend;
+    const position = legendOpt.position;
+    const series = seriesObj;
+    const calcSeriesWidthDOM = widthDOM;
+
+    calcSeriesWidthDOM.textContent = series.name;
+    const width = calcSeriesWidthDOM.clientWidth + 26; // 26 = color margin value.
+
+    const legend = {
+      containerDOM: document.createElement('div'),
+      colorDOM: document.createElement('span'),
+      nameDOM: document.createElement('div'),
+      valueDOM: document.createElement('span'),
+    };
+
+    legend.containerDOM.className = 'ev-chart-legend-container';
+    legend.colorDOM.className = 'ev-chart-legend-color';
+    legend.nameDOM.className = 'ev-chart-legend-name';
+    legend.nameDOM.style.color = legendOpt.color;
+    legend.valueDOM.className = 'ev-chart-legend-value';
+    legend.colorDOM.style.backgroundColor = series.color;
+
+    legend.nameDOM.textContent = series.name;
+
+    legend.nameDOM.setAttribute('title', series.name);
+
+    legend.containerDOM.appendChild(legend.colorDOM);
+    legend.containerDOM.appendChild(legend.nameDOM);
+    legend.containerDOM.appendChild(legend.valueDOM);
+
+    series.labelObj = legend;
+
+    if (!series.show) {
+      legend.containerDOM.style.display = 'none';
+    } else {
+      this.legendCount += 1;
+    }
+
+    this.legendWidth = Math.min(Math.max(width, this.legendWidth), 140);
+    legend.containerDOM.style.lineHeight = `${this.legendHeight}px`;
+    legend.containerDOM.style.cursor = this.chartOptions.type !== 'sunburst' ? 'pointer' : '';
+    legend.containerDOM.addEventListener('click', this.onClickLegend.bind(this));
+    legend.containerDOM.addEventListener('mouseover', this.onMouseOverLegend.bind(this));
+    legend.containerDOM.addEventListener('mouseout', this.onMouseOutLegend.bind(this));
+    legend.containerDOM.seriesId = sId;
+
+    if (position === 'top' || position === 'bottom') {
+      legend.containerDOM.style.display = 'inline-block';
+    }
+
+    this.legendDOM.appendChild(legend.containerDOM);
   }
 
   setLegendPosition(position) {
@@ -116,15 +145,16 @@ export default class ChartLegend {
     switch (position) {
       case 'top':
         topPadding = this.chartOptions.title.show ? `${titleHeight}px` : `${this.legendHeight}px`;
-        wrapperStyle.padding = `${topPadding + resizeTick}px 0 0 0`;
+        wrapperStyle.padding = `${topPadding + resizeTick + 8}px 0 0 0`;
 
-        chartDOMStyle.padding = `${this.legendHeight + resizeTick}px 0 0 0`;
+        chartDOMStyle.padding = `${this.legendHeight + resizeTick + 8}px 0 0 0`;
+        this.overlayCanvas.style.top = `${this.legendHeight + resizeTick + 8}px`;
 
         legendDOMStyle.top = `${titleHeight}px`;
         legendDOMStyle.left = '0';
         legendDOMStyle.bottom = '';
         legendDOMStyle.right = '';
-        legendDOMStyle.height = `${this.legendHeight}px`;
+        legendDOMStyle.height = `${this.legendHeight + 8}px`;
         legendDOMStyle.lineHeight = `${this.legendHeight}px`;
         legendDOMStyle.width = '100%';
         legendDOMStyle.padding = '0 0 0 10px';
@@ -161,6 +191,7 @@ export default class ChartLegend {
         break;
       case 'left':
         chartDOMStyle.padding = `0 0 0 ${this.legendWidth}px`;
+        this.overlayCanvas.style.left = `${this.legendWidth}px`;
 
         legendDOMStyle.top = `${titleHeight}px`;
         legendDOMStyle.bottom = '0';
@@ -241,8 +272,8 @@ export default class ChartLegend {
       }
     }
 
-    window.addEventListener('mousemove', this.mouseMove, false);
-    window.addEventListener('mouseup', this.mouseUp, false);
+    this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
+    this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
   }
 
   onMouseMove(e) {
@@ -310,8 +341,8 @@ export default class ChartLegend {
     e.stopPropagation();
     e.preventDefault();
 
-    window.removeEventListener('mousemove', this.mouseMove, false);
-    window.removeEventListener('mouseup', this.mouseUp, false);
+    this.wrapperDOM.removeEventListener('mousemove', this.mouseMove, false);
+    this.wrapperDOM.removeEventListener('mouseup', this.mouseUp, false);
 
     const position = this.chartOptions.legend.position;
     const resizeDOM = this.resizeDOM;
@@ -366,11 +397,12 @@ export default class ChartLegend {
     if (this.chartOptions.type === 'sunburst') {
       return;
     }
-
+    const options = this.chartOptions.legend;
     const eventTargetDOM = e.currentTarget;
-    const series = eventTargetDOM.series;
-    const colorDOM = eventTargetDOM.getElementsByClassName('evui-chart-legend-color')[0];
-    const nameDOM = eventTargetDOM.getElementsByClassName('evui-chart-legend-name')[0];
+    const sId = eventTargetDOM.seriesId;
+    const series = this.seriesList[sId];
+    const colorDOM = eventTargetDOM.getElementsByClassName('ev-chart-legend-color')[0];
+    const nameDOM = eventTargetDOM.getElementsByClassName('ev-chart-legend-name')[0];
 
     const isActive = !colorDOM.className.includes('inactive');
 
@@ -380,16 +412,20 @@ export default class ChartLegend {
 
     if (isActive) {
       this.legendCount -= 1;
+      colorDOM.style.backgroundColor = options.inactive;
+      nameDOM.style.color = options.inactive;
     } else {
       this.legendCount += 1;
+      colorDOM.style.backgroundColor = series.color;
+      nameDOM.style.color = options.color;
     }
 
     colorDOM.classList.toggle('inactive');
     nameDOM.classList.toggle('inactive');
     series.show = !series.show;
-    series.highlight.show = !series.highlight.show;
-    this.overlayClear();
-    this.redraw();
+    // series.highlight.show = !series.highlight.show;
+    // this.overlayClear();
+    this.updateChart();
   }
 
   onMouseOverLegend(e) {
@@ -398,12 +434,12 @@ export default class ChartLegend {
     }
 
     const eventTargetDOM = e.currentTarget;
-    const series = eventTargetDOM.series;
+    const sId = eventTargetDOM.seriesId;
+    const series = this.seriesList[sId];
 
-    if (series.show) {
-      series.highlight.show = true;
+    if (series.show && this.chartOptions.seriesHighlight) {
       this.overlayClear();
-      this.seriesHighlight(series.seriesIndex);
+      this.seriesHighlight(sId);
     }
   }
 
@@ -411,10 +447,11 @@ export default class ChartLegend {
     if (this.chartOptions.type !== 'sunburst') {
       e.target.style.fontWeight = '';
     }
-    const eventTargetDOM = e.currentTarget;
-    const series = eventTargetDOM.series;
 
-    series.highlight.show = false;
     this.overlayClear();
+  }
+
+  updateLegendPosition() {
+    this.setLegendPosition(this.chartOptions.legend.position);
   }
 }

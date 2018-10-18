@@ -8,10 +8,10 @@ import AxisAutoScale from '../core/axis/axis.scale.auto';
 import AxisFixedScale from '../core/axis/axis.scale.fixed';
 import AxisStepsScale from '../core/axis/axis.scale.steps';
 import Legend from '../core/core.legend';
-import Tooltip from '../core/core.tooltip';
 
 class BaseChart {
   constructor(target, data, options) {
+    // step1. Create Chart Property Object.
     const defaultOptions = {
       colors: [
         '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
@@ -27,41 +27,69 @@ class BaseChart {
       },
       border: 2,
       title: {
-        text: '',
-        font: '15px Droid Sans',
-        color: '#000000',
-        height: 40,
         show: false,
+        height: 40,
+        text: '',
+        style: {
+          fontSize: 15,
+          color: '#000',
+          fontFamily: 'Droid Sans',
+        },
       },
       legend: {
         show: true,
         position: 'right',
+        color: '#000',
+        inactive: '#aaa',
       },
-      fill: false,
-      stack: false,
-      horizontal: false,
+      itemHighlight: true,
+      seriesHighlight: true,
+      useSelect: false,
       doughnutHoleSize: 0,
       reverse: false,
-      bufferSize: 10,
+      bufferSize: null,
+      horizontal: false,
+      width: '100%',
+      height: '100%',
+      thickness: 1,
+      useTooltip: true,
+      useSelectionData: false,
     };
 
-    this.labelOffset = { top: 1, left: 1, right: 1, bottom: 1 };
+    const defaultData = {
+      series: {},
+      groups: [],
+      data: [],
+    };
+
+    this.labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
 
     // set chart properties
     this.options = _.merge({}, defaultOptions, options);
-    this.data = data;
+    this.data = _.merge({}, defaultData, data);
 
-    this.seriesList = [];
-    this.seriesGroupList = [];
+    this.options.type = this.options.type.toLowerCase();
 
-    const type = this.options.type.toLowerCase();
-    const axisType = CHART_AXIS_TYPE[type];
+    if (CHART_AXIS_TYPE[this.options.type] === 'axis') {
+      this.setAxesOptions();
+    }
 
-    // set chart element layout
+    // step2. Create Target DOM Wrapper
+    this.target = target;
+    const targetRect = target.getBoundingClientRect();
+
+    const targetWidth = targetRect.width - 10 || 10;
+    const targetHeight = targetRect.height - 10 || 10;
+
     this.wrapperDOM = document.createElement('div');
-    this.wrapperDOM.className = 'evui-chart-wrapper';
+    this.wrapperDOM.className = 'ev-chart-wrapper';
+    this.wrapperDOM.style.width = `${targetWidth}px`;
+    this.wrapperDOM.style.height = `${targetHeight}px`;
+    this.wrapperDOM.style.display = 'block';
     this.chartDOM = document.createElement('div');
-    this.chartDOM.className = 'evui-chart-container';
+    this.chartDOM.className = 'ev-chart-container';
+    this.chartDOM.style.width = `${targetWidth}px`;
+    this.chartDOM.style.height = `${targetHeight}px`;
 
     if (target === null) {
       throw new Error('[EVUI][ERROR][Chart]-Not found Target for rendering Chart');
@@ -70,37 +98,45 @@ class BaseChart {
       target.appendChild(this.wrapperDOM);
     }
 
+    // step3. Create Chart Canvas
     this.createCanvas();
 
-    // create chart DataStore & Series Data.
+    // step4. Create Component of Chart.
+    // 4-1. store
     this.createDataStore();
-    this.dataStore.init();
+    this.store.init();
 
-    // create chart component
-    // 1. axis
-    if (axisType === 'axis') {
-      this.setAxesOptions();
-    }
-
-    // 2. title
+    // 4-2. title
     if (this.options.title.show) {
       this.createTitle();
     }
 
-    // 3. legend
-    this.createLegend();
-    this.legend.init();
+    // 4-3. legend
+    if (this.options.legend.show) {
+      this.createLegend();
+      this.legend.init();
+    }
 
-    // 4. tooltip
-    // this.createTooltip();
-    // this.tooltip.init();
-
-    // calculate Chart Size
+    // step5. Calculate Size.
     this.chartRect = this.getChartRect();
 
+    this.xMinMax = this.store.getXMinMax();
+    this.yMinMax = this.store.getYMinMax();
+    this.axisList = this.store.getAxisList();
+    this.seriesList = this.store.getSeriesList();
+    this.graphData = this.store.getGraphData();
+
+
+    // step6. tooltip
+    if (this.options.useTooltip) {
+      this.createTooltip();
+    }
+    // step6. Add EventListener
     this.overlayCanvas.onmousemove = this.mouseMoveEvent.bind(this);
     this.overlayCanvas.onmouseout = this.mouseOutEvent.bind(this);
-    window.addEventListener('resize', this.resize.bind(this));
+    this.resizeEvent = this.resize.bind(this);
+
+    window.addEventListener('resize', this.resizeEvent);
   }
 
   createCanvas() {
@@ -135,62 +171,130 @@ class BaseChart {
   }
 
   createDataStore() {
-    if (this.options.stack) {
-      this.dataStore = new StackDataStore({
+    if (this.data.groups.length) {
+      this.store = new StackDataStore({
         chartData: this.data,
         chartOptions: this.options,
-        seriesList: this.seriesList,
       });
     } else {
-      this.dataStore = new DataStore({
+      this.store = new DataStore({
         chartData: this.data,
         chartOptions: this.options,
-        seriesList: this.seriesList,
       });
     }
   }
 
   createLegend() {
+    const seriesList = this.store.getSeriesList();
+    const groups = this.data.groups;
+
     this.legend = new Legend({
       wrapperDOM: this.wrapperDOM,
       chartDOM: this.chartDOM,
       chartOptions: this.options,
-      seriesList: this.seriesList,
+      seriesList,
+      groups,
+      overlayCanvas: this.overlayCanvas,
       resize: this.resize.bind(this),
-      redraw: this.redraw.bind(this),
+      updateChart: this.updateChart.bind(this),
       overlayClear: this.overlayClear.bind(this),
       seriesHighlight: this.seriesHighlight.bind(this),
     });
   }
 
   createTooltip() {
-    this.tooltip = new Tooltip({
-      seriesList: this.seriesList,
-      getChartGraphPos: this.getChartGraphPos.bind(this),
-    });
+    const skey = Object.keys(this.seriesList);
+    const groups = this.data.groups;
+
+    let series;
+
+
+    this.tooltipDOM = document.createElement('div');
+    this.tooltipDOM.className = 'ev-chart-tooltip';
+    this.tooltipDOM.style.display = 'none';
+
+    this.tooltipTitleDOM = document.createElement('div');
+    this.tooltipTitleDOM.className = 'ev-chart-tooltip-title';
+
+    this.ulDOM = document.createElement('ul');
+    this.ulDOM.className = 'ev-chart-tooltip-ul';
+
+    this.tooltipDOM.appendChild(this.tooltipTitleDOM);
+    this.tooltipDOM.appendChild(this.ulDOM);
+
+    if (groups.length) {
+      for (let ix = 0, ixLen = groups.length; ix < ixLen; ix++) {
+        const group = groups[ix];
+        for (let jx = group.length - 1; jx >= 0; jx--) {
+          series = this.seriesList[group[jx]];
+
+          if (series.show) {
+            this.createTooltipDOM(group[jx]);
+          }
+        }
+      }
+    }
+
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      series = this.seriesList[skey[ix]];
+
+      if (!series.isExistGrp && series.show) {
+        this.createTooltipDOM(skey[ix]);
+      }
+    }
+    document.body.appendChild(this.tooltipDOM);
+  }
+
+  createTooltipDOM(seriesId) {
+    const series = this.seriesList[seriesId];
+
+    const liDOM = document.createElement('li');
+    liDOM.className = 'ev-chart-tooltip-li';
+    liDOM.setAttribute('data-series-id', seriesId);
+
+    const colorDOM = document.createElement('span');
+    colorDOM.className = 'ev-chart-tooltip-color';
+    colorDOM.style.backgroundColor = series.color;
+
+    const nameDOM = document.createElement('span');
+    nameDOM.className = 'ev-chart-tooltip-name';
+    nameDOM.textContent = series.name;
+
+    const colonDOM = document.createElement('span');
+    colonDOM.className = 'ev-chart-tooltip-colon';
+    colonDOM.textContent = ' : ';
+
+    const valueDOM = document.createElement('span');
+    valueDOM.className = 'ev-chart-tooltip-value';
+
+    liDOM.appendChild(colorDOM);
+    liDOM.appendChild(nameDOM);
+    liDOM.appendChild(colonDOM);
+    liDOM.appendChild(valueDOM);
+    this.ulDOM.appendChild(liDOM);
   }
 
   setAxesOptions() {
     const paramXAxes = this.options.xAxes;
     const paramYAxes = this.options.yAxes;
+    const type = this.options.type;
+    const hasGroup = !!this.data.groups.length;
 
     const defaultXAxis = {
       position: 'bottom',
-      type: 'linear',
-      show: true,
-      color: '#eeeeee',
       min: null,
       max: null,
-      minIndex: null,
-      maxIndex: null,
       autoScaleRatio: null,
+      isSetMinZero: type === 'bar' || hasGroup,
       showGrid: false,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
+      labelIndicatorColor: '#e7e9ed',
       gridLineWidth: 1,
       ticks: null,
-      tickFormat: null,
+      timeFormat: null,
       tickSize: null,
+      range: null,
       labelHeight: 20,
       labelStyle: {
         fontSize: 12,
@@ -201,21 +305,19 @@ class BaseChart {
 
     const defaultYAxis = {
       position: 'left',
-      type: 'linear',
-      show: true,
-      color: '#eeeeee',
-      min: 0,
+      min: null,
       max: null,
-      minIndex: null,
-      maxIndex: null,
-      autoScaleRatio: 0.1,
+      autoScaleRatio: null,
+      isSetMinZero: type === 'bar' || hasGroup,
       showGrid: true,
       axisLineColor: '#b4b6ba',
       gridLineColor: '#e7e9ed',
+      labelIndicatorColor: '#e7e9ed',
       gridLineWidth: 1,
       ticks: null,
-      tickFormat: null,
+      timeFormat: null,
       tickSize: null,
+      range: null,
       labelWidth: null,
       labelStyle: {
         fontSize: 12,
@@ -224,7 +326,7 @@ class BaseChart {
       },
     };
 
-    if (paramXAxes && paramXAxes.length) {
+    if (paramXAxes) {
       for (let ix = 0, ixLen = paramXAxes.length; ix < ixLen; ix++) {
         paramXAxes[ix] = _.merge({}, defaultXAxis, paramXAxes[ix]);
       }
@@ -232,7 +334,7 @@ class BaseChart {
       this.options.xAxes = [defaultXAxis];
     }
 
-    if (paramYAxes && paramYAxes.length) {
+    if (paramYAxes) {
       for (let ix = 0, ixLen = paramYAxes.length; ix < ixLen; ix++) {
         paramYAxes[ix] = _.merge({}, defaultYAxis, paramYAxes[ix]);
       }
@@ -244,8 +346,8 @@ class BaseChart {
   getChartRect() {
     const padding = this.constructor.getPadding(this.options.padding);
 
-    let width = this.chartDOM.getClientRects()[0].width || 10;
-    let height = this.chartDOM.getClientRects()[0].height || 10;
+    let width = this.chartDOM.getBoundingClientRect().width || 10;
+    let height = this.chartDOM.getBoundingClientRect().height || 10;
 
     const legendOption = this.options.legend;
 
@@ -253,7 +355,7 @@ class BaseChart {
       switch (legendOption.position) {
         case 'top':
         case 'bottom':
-          height -= this.legend.legendHeight;
+          height -= (this.legend.legendHeight + 12);
           break;
         case 'left':
         case 'right':
@@ -272,7 +374,7 @@ class BaseChart {
     const chartWidth = width - (padding.left + padding.right);
     const chartHeight = height - (padding.top + padding.bottom);
 
-    const x1 = 0;
+    const x1 = padding.left;
     const x2 = Math.max(width - padding.right, x1 + 1);
     const y1 = padding.top;
     const y2 = Math.max(height - padding.bottom, y1 + 1);
@@ -290,58 +392,30 @@ class BaseChart {
     };
   }
 
-  static suffixFormatter(val) {
-    let result = 0;
-    if (val >= 1000000000) {
-      if (val % 1000000000 === 0) {
-        result = `${(val / 1000000000).toFixed(1)}G`;
-      } else {
-        result = `${(val / 1000000000).toFixed(1)}G`;
-      }
-      return result;
-    } else if (val >= 1000000) {
-      if (val % 1000000 === 0) {
-        result = `${(val / 1000000).toFixed(1)}M`;
-      } else {
-        result = `${(val / 1000000).toFixed(1)}M`;
-      }
-      return result;
-    } else if (val >= 1000) {
-      if (val % 1000 === 0) {
-        result = `${(val / 1000).toFixed(1)}k`;
-      } else {
-        result = `${(val / 1000).toFixed(1)}k`;
-      }
-      return result;
-    }
-
-    return val.toFixed(1);
-  }
-
   setLabelOffset() {
     let labelText;
-    let convLabel;
     let labelSize;
 
-    const labelBuffer = 24;
+    const labelBuffer = 20;
     const xAxes = this.options.xAxes;
     const yAxes = this.options.yAxes;
+
+    const ctx = this.bufferCtx;
+    const xMinMax = this.xMinMax;
+    const yMinMax = this.yMinMax;
 
     // 축의 Label 길이 중 가장 큰 value를 기준으로 label offset을 계산.
     // label offset의 buffer size 20px
     for (let ix = 0, ixLen = yAxes.length; ix < ixLen; ix++) {
-      this.bufferCtx.font = Util.getLabelStyle(yAxes[ix]);
-      labelText = this.dataStore.getLabelTextMaxInfo(ix).yText || '';
-      convLabel = this.constructor.suffixFormatter(+labelText);
-      labelSize = Math.ceil(this.bufferCtx.measureText(`${convLabel}`).width) || 0;
+      ctx.font = Util.getLabelStyle(yAxes[ix]);
 
-      if (yAxes[ix].labelType === 'time') {
-        labelSize = moment(labelText);
-
-        if (yAxes[ix].tickFormat) {
-          labelSize = labelSize.format(yAxes[ix].tickFormat);
-        }
+      if (yAxes[ix].timeFormat !== null) {
+        labelText = `${moment(yMinMax[ix].max).format(yAxes[ix].timeFormat)}`;
+      } else {
+        labelText = `${yMinMax[ix].max}`;
       }
+
+      labelSize = Math.ceil(this.bufferCtx.measureText(labelText).width) || 0;
 
       if (yAxes[ix].position === 'left') {
         if (labelSize > this.labelOffset.left) {
@@ -355,16 +429,16 @@ class BaseChart {
     }
 
     for (let ix = 0, ixLen = xAxes.length; ix < ixLen; ix++) {
-      this.bufferCtx.font = Util.getLabelStyle(xAxes[ix]);
-      labelText = this.dataStore.getLabelTextMaxInfo(ix).xText || '';
-      if (xAxes[ix].labelType === 'time') {
-        labelText = moment(labelText);
-        if (xAxes[ix].tickFormat) {
-          labelText = labelText.format(xAxes[ix].tickFormat);
-        }
+      ctx.font = Util.getLabelStyle(xAxes[ix]);
+
+      if (xAxes[ix].timeFormat !== null) {
+        labelText = `${moment(xMinMax[ix].max).format(xAxes[ix].timeFormat)}`;
+      } else {
+        labelText = `${xMinMax[ix].max}`;
       }
 
-      labelSize = Math.ceil(this.bufferCtx.measureText(`${labelText}`).width) || 0;
+      labelSize = Math.ceil(this.bufferCtx.measureText(labelText).width) || 0;
+
       if (Math.round(labelSize / 2) > this.labelOffset.right) {
         this.labelOffset.right = Math.round(labelSize / 2) + labelBuffer;
       }
@@ -389,18 +463,24 @@ class BaseChart {
   createTitle() {
     const titleObj = this.options.title;
     this.titleDOM = document.createElement('div');
-    this.titleDOM.style.font = titleObj.style;
+    this.titleDOM.style.fontSize = titleObj.style.fontSize;
+    this.titleDOM.style.color = titleObj.style.color;
+    this.titleDOM.style.fontFamily = titleObj.style.fontFamily;
     this.titleDOM.textContent = titleObj.text;
+
+    const height = this.chartDOM.getBoundingClientRect().height;
 
     if (titleObj.show) {
       this.titleDOM.style.display = 'block';
       this.wrapperDOM.style.paddingTop = `${titleObj.height}px`;
+      this.chartDOM.style.height = `${height - titleObj.height}px`;
     } else {
       this.titleDOM.style.display = 'none';
       this.wrapperDOM.style.paddingTop = '0';
+      this.chartDOM.style.height = `${height + titleObj.height}px`;
     }
 
-    this.titleDOM.className = 'evui-chart-title';
+    this.titleDOM.className = 'ev-chart-title';
     this.titleDOM.style.height = `${titleObj.height}px`;
     this.titleDOM.style.lineHeight = `${titleObj.height}px`;
     this.wrapperDOM.appendChild(this.titleDOM);
@@ -442,39 +522,30 @@ class BaseChart {
         case 'fix':
           xAxisObj = new AxisFixedScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
         case 'step':
           xAxisObj = new AxisStepsScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            category: this.data.category,
-            horizontal: this.options.horizontal,
+            axisData: this.axisList.x[ix] || [],
           });
           break;
         case 'auto':
         default:
           xAxisObj = new AxisAutoScale({
             type: 'x',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
       }
@@ -487,39 +558,30 @@ class BaseChart {
         case 'fix':
           yAxisObj = new AxisFixedScale({
             type: 'y',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
         case 'step':
           yAxisObj = new AxisStepsScale({
             type: 'y',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            category: this.data.category,
-            horizontal: this.options.horizontal,
+            axisData: this.axisList.y[ix] || [],
           });
           break;
         case 'auto':
         default:
           yAxisObj = new AxisAutoScale({
             type: 'y',
-            dataStore: this.dataStore,
             chartRect: this.chartRect,
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisIndex: ix,
-            horizontal: this.options.horizontal,
           });
           break;
       }
@@ -528,15 +590,15 @@ class BaseChart {
     }
 
     for (let ix = 0, ixLen = this.xAxes.length; ix < ixLen; ix++) {
-      this.xAxes[ix].createAxis();
+      this.xAxes[ix].createAxis(this.xMinMax[ix]);
     }
 
     for (let ix = 0, ixLen = this.yAxes.length; ix < ixLen; ix++) {
-      this.yAxes[ix].createAxis();
+      this.yAxes[ix].createAxis(this.yMinMax[ix]);
     }
   }
 
-  calculateX(value, xAxisIndex) {
+  calculateX(value, xAxisIndex, isReqSp) {
     const maxValue = this.xAxes[xAxisIndex].axisMax;
     const minValue = this.xAxes[xAxisIndex].axisMin;
     let convertValue;
@@ -546,18 +608,18 @@ class BaseChart {
     }
 
     if (this.options.xAxes[xAxisIndex].labelType === 'time') {
-      convertValue = +moment(value)._d;
+      convertValue = +moment(value);
     } else {
       convertValue = value;
     }
 
     if (convertValue > maxValue || convertValue < minValue) {
-      return undefined;
+      return null;
     }
 
+    const sp = isReqSp ? this.chartRect.x1 + this.labelOffset.left : 0;
     const scalingFactor = this.drawingXArea() / (maxValue - minValue);
-    return Math.floor((this.chartRect.x1 + this.labelOffset.left) +
-      (scalingFactor * (convertValue - (minValue || 0))));
+    return Math.ceil(sp + (scalingFactor * (convertValue - (minValue || 0))));
   }
 
   calculateY(value, yAxisIndex, invert) {
@@ -571,7 +633,7 @@ class BaseChart {
     }
 
     if (this.options.yAxes[yAxisIndex].labelType === 'time') {
-      convertValue = +moment(value)._d;
+      convertValue = +moment(value);
     } else {
       convertValue = value;
     }
@@ -589,6 +651,54 @@ class BaseChart {
     }
 
     return Math.floor(calcY);
+  }
+
+  calculateXP(point, xAxisIndex, isReqSp) {
+    const maxValue = this.xAxes[xAxisIndex].axisMax;
+    const minValue = this.xAxes[xAxisIndex].axisMin;
+    let convertValue;
+
+    if (point === null) {
+      return null;
+    }
+
+    const sp = isReqSp ? this.chartRect.x1 + this.labelOffset.left : 0;
+    const value = Math.ceil((((point - sp) * (maxValue - minValue)) /
+      this.drawingXArea()) + minValue);
+
+
+    if (this.options.xAxes[xAxisIndex].labelType === 'time') {
+      convertValue = +moment(value);
+    } else {
+      convertValue = value;
+    }
+
+    return convertValue;
+  }
+
+  calculateYP(point, yAxisIndex, invert) {
+    const maxValue = this.yAxes[yAxisIndex].axisMax;
+    const minValue = this.yAxes[yAxisIndex].axisMin;
+    let convertValue;
+
+    if (point === null) {
+      return null;
+    }
+    const sp = this.chartRect.y1 + this.labelOffset.top;
+    const value = Math.ceil((((point - sp) * (maxValue - minValue)) / this.drawingYArea()));
+
+
+    if (this.options.yAxes[yAxisIndex].labelType === 'time') {
+      convertValue = +moment(value);
+    } else {
+      convertValue = value;
+    }
+
+    if (!invert) {
+      convertValue = maxValue - convertValue;
+    }
+
+    return convertValue;
   }
 
   drawingXArea() {
@@ -708,45 +818,50 @@ class BaseChart {
     ctx.stroke();
   }
 
-  findHitItem(offset) {
-    const dataIndex = this.findHitAxisX(offset[0]);
+  findHitItem(offset, graphData) {
     const mouseY = offset[1];
-    const seriesList = this.seriesList;
-    let seriesIndex = null;
+    const index = this.findHitAxisX(offset[0], graphData);
+    const skey = Object.keys(graphData);
 
-    // return value...index, seriesIndex
-    if (dataIndex !== null && dataIndex > -1) {
-      for (let ix = 0, ixLen = seriesList.length; ix < ixLen; ix++) {
-        const yPoint = seriesList[ix].drawInfo.yPoint[dataIndex];
+    let gdata;
+    let sId = null;
 
-        if (mouseY >= (yPoint - 10) && mouseY <= (yPoint + 10)) {
-          seriesIndex = ix;
+    if (index !== null && index > -1) {
+      for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+        gdata = graphData[skey[ix]];
+
+        if (gdata[index].yp !== null &&
+          mouseY >= (gdata[index].yp - 10) && mouseY <= (gdata[index].yp + 10)) {
+          sId = skey[ix];
           break;
         }
       }
     }
 
-    return { dataIndex, seriesIndex };
+    return { index, sId };
   }
 
-  findHitAxisX(mouseX) {
+  findHitAxisX(mouseX, graphData) {
     const x2 = this.chartRect.x2 - this.labelOffset.right;
     const x1 = this.chartRect.x1 + this.labelOffset.left;
     const width = x2 - x1;
 
-    let series;
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        series = this.seriesList[ix];
+    const skey = Object.keys(graphData);
+    let sId;
+
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      if (this.seriesList[skey[ix]].show) {
+        sId = skey[ix];
         break;
       }
     }
-    const xPoint = series ? series.drawInfo.xPoint : [];
+
+    const gdata = graphData[sId];
 
     if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
-      const index = Math.round(((xPoint.length - 1) / width) * (mouseX - x1));
+      const index = Math.round(((gdata.length - 1) / width) * (mouseX - x1));
 
-      if (mouseX <= (xPoint[index] + 10) && mouseX >= (xPoint[index] - 10)) {
+      if (mouseX <= (gdata[index].xp + 10) && mouseX >= (gdata[index].xp - 10)) {
         return index;
       }
     }
@@ -771,7 +886,7 @@ class BaseChart {
     }
     if (devicePixelRatio !== backingStoreRatio) {
       this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
-      // this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
     }
   }
 
@@ -779,29 +894,54 @@ class BaseChart {
     if (!this.chartDOM) {
       return;
     }
+    // target
+    const targetRect = this.target.getBoundingClientRect();
+
+    const targetWidth = targetRect.width - 10 || 10;
+    const targetHeight = targetRect.height - 10 || 10;
+
+    this.wrapperDOM.style.width = `${targetWidth}px`;
+    this.wrapperDOM.style.height = `${targetHeight}px`;
+    this.chartDOM.style.width = `${targetWidth}px`;
+    this.chartDOM.style.height = `${targetHeight}px`;
+
+    if (this.options.title.show) {
+      const titleObj = this.options.title;
+      this.chartDOM.style.height = `${targetHeight - titleObj.height}px`;
+    }
 
     const offset = this.chartDOM.getBoundingClientRect();
-    const ctx = this.bufferCtx;
+    const bufferCtx = this.bufferCtx;
 
     if (offset) {
-      ctx.restore();
-      ctx.save();
-      ctx.scale(this.pixelRatio, this.pixelRatio);
+      bufferCtx.restore();
+      bufferCtx.save();
+      bufferCtx.scale(this.pixelRatio, this.pixelRatio);
 
       if (this.resizeTimer) {
         clearTimeout(this.resizeTimer);
       }
-      this.resizeTimer = setTimeout(this.redraw.bind(this), 50);
+      this.resizeTimer = setTimeout(this.updateChart.bind(this), 50);
+      this.legend.updateLegendPosition();
     }
+
+    window.removeEventListener('mousemove', this.resizeEvent, false);
   }
 
-  redraw() {
-    if (!this.chartRect.width && !this.chartRect.height) {
+  updateChart() {
+    this.chartRect = this.getChartRect();
+
+    if (!this.chartRect.width || !this.chartRect.height ||
+      this.chartRect.width < 1 || this.chartRect.height < 1) {
       return;
     }
 
-    this.dataStore.updateData();
-    this.chartRect = this.getChartRect();
+    this.store.updateData();
+    this.graphData = this.store.getGraphData();
+    this.xMinMax = this.store.getXMinMax();
+    this.yMinMax = this.store.getYMinMax();
+    this.axisList = this.store.getAxisList();
+
     this.initScale();
 
     this.clearDraw();
@@ -809,7 +949,10 @@ class BaseChart {
   }
 
   overlayClear() {
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
+      this.overlayCanvas.height / this.clearRectRatio);
   }
 
   clearDraw() {
@@ -819,28 +962,125 @@ class BaseChart {
       this.displayCanvas.height / this.clearRectRatio);
     this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
       this.bufferCanvas.height / this.clearRectRatio);
-    this.overlayCtx.clearRect(0, 0, this.overlayCtx.width / this.clearRectRatio,
-      this.overlayCtx.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
+      this.overlayCanvas.height / this.clearRectRatio);
   }
 
 
   mouseMoveEvent(e) {
+    const graphData = this.graphData;
     const offset = this.getMousePosition(e);
-    const item = this.findHitItem(offset);
+    const item = this.findHitItem(offset, graphData);
+
+    if (this.selectBox && this.selectBox.active) {
+      return;
+    }
 
     this.overlayClear();
 
-    if (this.tooltip) {
-      this.tooltip.showTooltip(offset, e, item.dataIndex);
+    if (this.options.useTooltip && item.sId !== null) {
+      if (this.options.type === 'pie') {
+        this.showTooltip(offset, e, item);
+      } else {
+        const series = this.seriesList[item.sId];
+        const axisType = series.axisType;
+        const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
+        const axis = axisType === 'x' ? this.xAxes[axisIndex] : this.yAxes[axisIndex];
+
+        let adata = this.axisList[axisType][axisIndex][item.index];
+
+        if (axis.options.timeFormat) {
+          adata = moment(adata).format(axis.options.timeFormat);
+        }
+
+        this.showTooltip(offset, e, item, graphData, adata);
+      }
+    } else {
+      this.hideTooltip();
     }
 
-    if (item && this.itemHighlight) {
-      this.itemHighlight(item);
+    if (this.options.itemHighlight) {
+      if (item && this.itemHighlight) {
+        this.itemHighlight(item);
+      }
+    }
+  }
+
+  showTooltip(offset, e, item, graphData, adata) {
+    const index = item.index;
+
+    if (index === null) {
+      this.tooltipDOM.style.display = 'none';
+      return;
     }
 
-//     if (this.showCrosshair) {
-//       this.showCrosshair(offset);
-//     }
+    const offsetX = offset[0];
+    const offsetY = offset[1];
+
+    const mouseX = e.pageX;
+    const mouseY = e.pageY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const bodyWidth = document.body.clientWidth;
+    const bodyHeight = document.body.clientHeight;
+
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    if ((offsetX >= (graphPos.x1 - 1) && offsetX <= (graphPos.x2))
+      && (offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1))) {
+      this.tooltipTitleDOM.textContent = adata || '';
+
+      const listDOM = this.ulDOM.children;
+      let sId;
+      let series;
+      let valueDOM;
+      let gdata;
+
+      for (let ix = 0, ixLen = listDOM.length; ix < ixLen; ix++) {
+        sId = listDOM[ix].dataset.seriesId;
+        series = this.seriesList[sId];
+
+        if (series.groupIndex === null) {
+          gdata = graphData[sId][index].y;
+        } else {
+          gdata = graphData[sId][index].i;
+        }
+
+
+        if (series && series.show) {
+          listDOM[ix].style.display = 'block';
+          valueDOM = listDOM[ix].children[3];
+          valueDOM.textContent = gdata;
+        } else {
+          listDOM[ix].style.display = 'none';
+        }
+      }
+
+      this.tooltipDOM.style.display = 'block';
+
+      if (offsetX > ((graphPos.x2 * 4) / 5) || clientX > ((bodyWidth * 4) / 5)) {
+        this.tooltipDOM.style.left = `${mouseX - (this.tooltipDOM.clientWidth + 10)}px`;
+      } else {
+        this.tooltipDOM.style.left = `${mouseX + 15}px`;
+      }
+
+      if (offsetY > ((graphPos.y2 * 3) / 4) || clientY > ((bodyHeight * 3) / 4)) {
+        this.tooltipDOM.style.top = `${mouseY - (this.tooltipDOM.clientHeight + 5)}px`;
+      } else {
+        this.tooltipDOM.style.top = `${mouseY + 10}px`;
+      }
+    } else {
+      this.tooltipDOM.style.display = 'none';
+    }
+  }
+
+  hideTooltip() {
+    this.tooltipDOM.style.display = 'none';
   }
 
   getMousePosition(evt) {
@@ -862,19 +1102,13 @@ class BaseChart {
   }
 
   mouseOutEvent() {
-    this.overlayClear();
-    if (this.tooltip) {
-      this.tooltip.tooltipDOM.style.display = 'none';
+    if (!this.selectBox || (this.selectBox && !this.selectBox.active)) {
+      this.overlayClear();
     }
-  }
 
-  getChartGraphPos() {
-    return {
-      x1: this.chartRect.x1 + this.labelOffset.left,
-      x2: this.chartRect.x2 - this.labelOffset.right,
-      y1: this.chartRect.y1 + this.labelOffset.top,
-      y2: this.chartRect.y2 - this.labelOffset.bottom,
-    };
+    if (this.options.useTooltip) {
+      this.hideTooltip();
+    }
   }
 
   static getPadding(padding) {

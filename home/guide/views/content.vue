@@ -25,7 +25,7 @@
     props: {
       imgUrl: {
         type: String,
-        default: './guide/images/',
+        default: './guide/images',
       },
     },
     data() {
@@ -51,6 +51,12 @@
                 routerLink: '/dock',
                 content: '닥 컨테이너 샘플',
                 imgUrl: `${this.imgUrl}/dock.png`,
+              },
+              {
+                name: 'Tab',
+                routerLink: '/tab',
+                content: '탭 패널 샘플',
+                imgUrl: `${this.imgUrl}/tab.png`,
               },
               {
                 name: 'Window',
@@ -104,6 +110,12 @@
                 name: 'Table',
                 routerLink: '/table',
                 content: '테이블 - 그리드',
+                imgUrl: `${this.imgUrl}/table.png`,
+              },
+              {
+                name: 'Tree',
+                routerLink: '/tree',
+                content: '트리, 트리 테이블',
                 imgUrl: `${this.imgUrl}/table.png`,
               },
               {

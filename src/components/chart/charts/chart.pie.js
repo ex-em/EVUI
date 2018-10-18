@@ -1,63 +1,60 @@
+import _ from 'lodash';
 import BaseChart from './chart.base';
 import PieDataStore from '../core/data/data.pie';
 
 export default class PieChart extends BaseChart {
   constructor(target, data, options) {
     super(target, data, options);
-    this.seriesList = this.dataStore.getSeriesList();
-    this.seriesGroupList = this.dataStore.getSeriesGroupList();
 
     this.radiusArr = [];
   }
 
   createDataStore() {
-    this.dataStore = new PieDataStore({
+    this.store = new PieDataStore({
       chartData: this.data,
       chartOptions: this.options,
-      seriesList: this.seriesList,
-      seriesGroupList: this.seriesGroupList,
     });
   }
 
   drawChart() {
     this.createPie();
-    // this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   createPie() {
+    const graphData = this.graphData;
+    let dsLength = 0;
     let showIndex = 0;
-    let lastGrpIndex = 0;
-    this.groupLength = 0;
-    for (let ix = 0, ixLen = this.seriesGroupList.length; ix < ixLen; ix++) {
-      if (this.seriesGroupList[ix].show) {
-        this.groupLength++;
+
+    for (let ix = 0, ixLen = graphData.length; ix < ixLen; ix++) {
+      if (graphData[ix].total) {
+        dsLength += 1;
       }
     }
 
-    for (let ix = 0, ixLen = this.seriesGroupList.length; ix < ixLen; ix++) {
-      if (this.seriesGroupList[ix].show) {
-        this.dataStore.sortingDescGroupData(ix);
-        this.drawPieGroup(ix, showIndex);
-        showIndex++;
-        lastGrpIndex = ix;
+    for (let ix = 0, ixLen = graphData.length; ix < ixLen; ix++) {
+      this.store.sortingDescDataSet(ix);
+      if (graphData[ix].total) {
+        this.drawPieDataSet(graphData[ix], showIndex, dsLength);
+        showIndex += 1;
       }
     }
 
     if (this.options.doughnutHoleSize > 0) {
-      this.drawDoughnutHole(lastGrpIndex);
+      this.drawDoughnutHole(graphData.length - 1);
     }
   }
 
-  drawPieGroup(groupIndex, showIndex) {
+  drawPieDataSet(dataSetInfo, dsIndex, dsLength) {
     let item;
     let val;
     let sliceAngle;
     let color;
     let startAngle = 1.5 * Math.PI;
     let endAngle;
+    let series;
 
-    const groupLength = this.groupLength;
-    const groupInfo = this.seriesGroupList[groupIndex];
+    const dsInfo = dataSetInfo;
     const width = this.chartRect.chartWidth - this.chartRect.padding.left;
     const height = this.chartRect.chartHeight - this.chartRect.padding.top;
 
@@ -67,46 +64,41 @@ export default class PieChart extends BaseChart {
     const innerRadius = Math.min(width / 2, height / 2) * this.options.doughnutHoleSize;
     const outerRadius = Math.min(width / 2, height / 2);
 
-    const radius = outerRadius - (((outerRadius - innerRadius) / groupLength) * showIndex);
+    const radius = outerRadius - (((outerRadius - innerRadius) / dsLength) * dsIndex);
 
-    groupInfo.r2 = radius;
-    if (groupIndex < groupLength - 1) {
-      groupInfo.r1 = outerRadius - (((outerRadius - innerRadius) / groupLength) * (showIndex + 1));
+    dsInfo.or = radius;
+    if (dsIndex < dsLength - 1) {
+      dsInfo.ir = outerRadius - (((outerRadius - innerRadius) / dsLength) * (dsIndex + 1));
     } else {
-      groupInfo.r1 = 1;
+      dsInfo.ir = 1;
     }
 
-    const totalValue = this.dataStore.getGroupTotalValue(groupIndex);
-    for (let ix = 0, ixLen = groupInfo.data.length; ix < ixLen; ix++) {
-      item = groupInfo.data[ix];
-      if (item.show) {
-        val = item.data;
-        sliceAngle = 2 * Math.PI * (val / totalValue);
+    if (dsInfo.total) {
+      for (let ix = 0, ixLen = dsInfo.data.length; ix < ixLen; ix++) {
+        item = dsInfo.data[ix];
+        series = this.seriesList[item.id];
+        val = item.value;
+        sliceAngle = 2 * Math.PI * (val / dsInfo.total);
         endAngle = startAngle + sliceAngle;
-        color = this.seriesList[item.seriesIndex].color || this.options.colors[item.seriesIndex];
-        groupInfo.drawInfo.push({
-          sa: startAngle,
-          ea: endAngle,
-        });
-        if (val) {
+        color = this.seriesList[item.id].color;
+
+        item.sa = startAngle;
+        item.ea = endAngle;
+
+        if (val && series.show) {
           this.drawPieSlice(centerX, centerY, radius, startAngle, endAngle, color, ixLen === 1);
           startAngle += sliceAngle;
         }
-      } else {
-        groupInfo.drawInfo.push({
-          sa: 0,
-          ea: 0,
-        });
       }
-    }
 
-    this.bufferCtx.beginPath();
-    this.bufferCtx.lineWidth = this.options.border;
-    this.bufferCtx.strokeStyle = '#fff';
-    this.bufferCtx.strokeOpacity = 0;
-    this.bufferCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    this.bufferCtx.stroke();
-    this.bufferCtx.closePath();
+      this.bufferCtx.beginPath();
+      this.bufferCtx.lineWidth = this.options.border;
+      this.bufferCtx.strokeStyle = '#fff';
+      this.bufferCtx.strokeOpacity = 0;
+      this.bufferCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      this.bufferCtx.stroke();
+      this.bufferCtx.closePath();
+    }
   }
 
   drawPieSlice(centerX, centerY, radius, startAngle, endAngle, color, isSingle) {
@@ -121,7 +113,7 @@ export default class PieChart extends BaseChart {
     ctx.closePath();
   }
 
-  drawDoughnutHole(lastGrpIndex) {
+  drawDoughnutHole(dsIndex) {
     const ctx = this.bufferCtx;
 
     const width = this.chartRect.chartWidth - this.chartRect.padding.left;
@@ -150,70 +142,58 @@ export default class PieChart extends BaseChart {
     ctx.stroke();
     ctx.closePath();
 
-    if (this.seriesGroupList[lastGrpIndex]) {
-      this.seriesGroupList[lastGrpIndex].r1 = radius;
-    }
+    this.graphData[dsIndex].ir = radius;
   }
 
-  seriesHighlight(seriesIndex) {
+  seriesHighlight(seriesId) {
     const ctx = this.overlayCtx;
-
-    const series = this.seriesList[seriesIndex];
+    const series = this.seriesList[seriesId];
     const color = series.color;
+    const graphData = this.graphData;
 
     const width = this.chartRect.chartWidth - this.chartRect.padding.left;
     const height = this.chartRect.chartHeight - this.chartRect.padding.top;
     const centerX = (width / 2) + this.chartRect.padding.left;
     const centerY = (height / 2) + this.chartRect.padding.top;
 
+    let findIndex = false;
+    for (let ix = 0, ixLen = graphData.length; ix < ixLen; ix++) {
+      const gdata = graphData[ix];
 
-    let findIndex;
-    let group;
-
-    for (let ix = 0, ixLen = this.seriesGroupList.length; ix < ixLen; ix++) {
-      group = this.seriesGroupList[ix];
-
-      if (group.show) {
-        for (let jx = 0, jxLen = group.data.length; jx < jxLen; jx++) {
-          if (group.data[jx].seriesIndex === seriesIndex) {
-            findIndex = jx;
-            break;
-          }
+      for (let jx = 0, jxLen = gdata.data.length; jx < jxLen; jx++) {
+        if (gdata.data[jx].id === seriesId) {
+          findIndex = jx;
         }
-
-        const info = group.drawInfo[findIndex];
-
-        const r2 = group.r2;
-        const r1 = group.r1;
-
-        const sa = info.sa;
-        const ea = info.ea;
-
-        ctx.fillStyle = color;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = color;
-        ctx.lineWidth = this.options.border;
-        ctx.strokeStyle = '#fff';
-
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, r2, sa, ea);
-        ctx.fill();
-        ctx.closePath();
-
-        ctx.save();
-        ctx.beginPath();
-
-        ctx.moveTo(centerX, centerY);
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillOpacity = 1;
-        ctx.arc(centerX, centerY, r1, sa - 1, ea + 1);
-        ctx.fill();
-        ctx.closePath();
-        ctx.restore();
       }
+
+      const info = gdata.data[findIndex];
+      const or = gdata.or;
+      const ir = gdata.ir;
+
+      const sa = info.sa;
+      const ea = info.ea;
+
+      ctx.fillStyle = color;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = color;
+      ctx.lineWidth = this.options.border;
+      ctx.strokeStyle = '#fff';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, or, sa, ea);
+      ctx.fill();
+      ctx.closePath();
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillOpacity = 1;
+      ctx.arc(centerX, centerY, ir, sa - 1, ea + 1);
+      ctx.fill();
+      ctx.closePath();
+      ctx.restore();
     }
 
     const hole = Math.min(width / 2, height / 2) * this.options.doughnutHoleSize;
@@ -231,28 +211,26 @@ export default class PieChart extends BaseChart {
   }
 
   itemHighlight(item) {
-    if (item.groupIndex === null || item.itemIndex === null) {
+    if (item.dsIndex === null || item.sId === null) {
       return;
     }
     const ctx = this.overlayCtx;
 
-    const group = this.seriesGroupList[item.groupIndex];
-    const info = group.drawInfo[item.itemIndex];
-    const data = group.data[item.itemIndex];
-    const series = this.seriesList[data.seriesIndex];
-
+    const series = this.seriesList[item.sId];
     const color = series.color;
+    const ds = this.graphData[item.dsIndex];
+    const gdata = _.find(ds.data, { id: item.sId });
 
     const width = this.chartRect.chartWidth - this.chartRect.padding.left;
     const height = this.chartRect.chartHeight - this.chartRect.padding.top;
     const centerX = (width / 2) + this.chartRect.padding.left;
     const centerY = (height / 2) + this.chartRect.padding.top;
 
-    const r2 = group.r2;
-    const r1 = group.r1;
+    const or = ds.or;
+    const ir = ds.ir;
 
-    const sa = info.sa;
-    const ea = info.ea;
+    const sa = gdata.sa;
+    const ea = gdata.ea;
 
     ctx.fillStyle = color;
     ctx.shadowOffsetX = 0;
@@ -262,19 +240,19 @@ export default class PieChart extends BaseChart {
     ctx.lineWidth = this.options.border;
     ctx.strokeStyle = '#fff';
 
+    ctx.save();
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, r2, sa, ea);
+    ctx.arc(centerX, centerY, or, sa, ea);
     ctx.fill();
     ctx.closePath();
 
-    ctx.save();
-    ctx.beginPath();
 
+    ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillOpacity = 1;
-    ctx.arc(centerX, centerY, r1, sa - 1, ea + 1);
+    ctx.arc(centerX, centerY, ir, sa - 1, ea + 1);
     ctx.fill();
     ctx.closePath();
     ctx.restore();
@@ -306,38 +284,100 @@ export default class PieChart extends BaseChart {
     const dy = mouseY - centerY;
 
     let angle;
-    let grpIdx = null;
-    let itemIdx = null;
-
     angle = ((Math.atan2(-dy, -dx) * 180) / Math.PI) - 90;
     angle = angle < 0 ? 360 + angle : angle;
-
     const rad = ((angle * Math.PI) / 180) + (1.5 * Math.PI);
     const distance = Math.round(Math.sqrt((dx ** 2) + (dy ** 2)));
 
-    for (let ix = this.seriesGroupList.length - 1; ix >= 0; ix--) {
-      const r2 = this.seriesGroupList[ix].r2;
-      const r1 = this.seriesGroupList[ix].r1;
-      if (distance > r1 && distance < r2) {
-        grpIdx = ix;
-        break;
+    const graphData = this.graphData;
+    let gdata;
+    let dsIndex = null;
+    let sId = null;
+
+    for (let ix = 0, ixLen = graphData.length; ix < ixLen; ix++) {
+      gdata = graphData[ix];
+      if (distance > gdata.ir && distance < gdata.or) {
+        dsIndex = ix;
       }
     }
 
-    if (this.seriesGroupList[grpIdx] && this.seriesGroupList[grpIdx].drawInfo) {
-      for (let ix = 0, ixLen = this.seriesGroupList[grpIdx].drawInfo.length; ix < ixLen; ix++) {
-        const info = this.seriesGroupList[grpIdx].drawInfo[ix];
+    if (graphData[dsIndex]) {
+      for (let ix = 0, ixLen = graphData[dsIndex].data.length; ix < ixLen; ix++) {
+        gdata = graphData[dsIndex].data[ix];
 
-        if (rad > info.sa && rad < info.ea) {
-          itemIdx = ix;
-          break;
+        if (rad > gdata.sa && rad < gdata.ea) {
+          sId = gdata.id;
         }
       }
     }
 
-    return {
-      groupIndex: grpIdx,
-      itemIndex: itemIdx,
+    return { dsIndex, sId };
+  }
+
+  showTooltip(offset, e, item) {
+    const index = item.dsIndex;
+    if (index === null) {
+      this.tooltipDOM.style.display = 'none';
+      return;
+    }
+
+    const graphData = this.graphData[item.dsIndex].data;
+    const offsetX = offset[0];
+    const offsetY = offset[1];
+
+    const mouseX = e.pageX;
+    const mouseY = e.pageY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const bodyWidth = document.body.clientWidth;
+    const bodyHeight = document.body.clientHeight;
+
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
+
+    if ((offsetX >= (graphPos.x1 - 1) && offsetX <= (graphPos.x2))
+      && (offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1))) {
+      this.tooltipTitleDOM.style.display = 'none';
+
+      const listDOM = this.ulDOM.children;
+      let sId;
+      let series;
+      let valueDOM;
+      let gdata;
+
+      for (let ix = 0, ixLen = listDOM.length; ix < ixLen; ix++) {
+        sId = listDOM[ix].dataset.seriesId;
+        series = this.seriesList[sId];
+
+        if (series && series.show) {
+          gdata = _.find(graphData, { id: sId }).value;
+          listDOM[ix].style.display = 'block';
+          valueDOM = listDOM[ix].children[3];
+          valueDOM.textContent = gdata;
+        } else {
+          listDOM[ix].style.display = 'none';
+        }
+      }
+
+      this.tooltipDOM.style.display = 'block';
+
+      if (offsetX > ((graphPos.x2 * 4) / 5) || clientX > ((bodyWidth * 4) / 5)) {
+        this.tooltipDOM.style.left = `${mouseX - (this.tooltipDOM.clientWidth + 10)}px`;
+      } else {
+        this.tooltipDOM.style.left = `${mouseX + 15}px`;
+      }
+
+      if (offsetY > ((graphPos.y2 * 3) / 4) || clientY > ((bodyHeight * 3) / 4)) {
+        this.tooltipDOM.style.top = `${mouseY - (this.tooltipDOM.clientHeight + 5)}px`;
+      } else {
+        this.tooltipDOM.style.top = `${mouseY + 10}px`;
+      }
+    } else {
+      this.tooltipDOM.style.display = 'none';
+    }
   }
 }
