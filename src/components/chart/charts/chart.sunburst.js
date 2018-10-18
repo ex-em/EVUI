@@ -13,7 +13,6 @@ export default class SunburstChart extends BaseChart {
     this.dataStore = new SunburstDataStore({
       chartData: this.data,
       chartOptions: this.options,
-      horizontal: this.options.horizontal,
       seriesList: this.seriesList,
       seriesGroupList: this.seriesGroupList,
       structType: 'tree',

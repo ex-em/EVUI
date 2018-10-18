@@ -2,13 +2,12 @@ import BaseChart from './chart.base';
 import Util from '../core/core.util';
 
 export default class LineChart extends BaseChart {
-  constructor(target, data, options) {
-    super(target, data, options);
-
-    this.seriesList = this.dataStore.getSeriesList();
-  }
-
   drawChart() {
+    if (!this.chartRect.width || !this.chartRect.height ||
+      this.chartRect.width < 1 || this.chartRect.height < 1) {
+      return;
+    }
+
     this.setLabelOffset();
     this.createAxis();
     this.createLine();
@@ -17,83 +16,81 @@ export default class LineChart extends BaseChart {
   }
 
   createLine() {
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].show) {
-        this.drawSeries(ix);
+    const groups = this.data.groups;
+    const graphData = this.graphData;
+    const skey = Object.keys(graphData);
+    let series;
+
+    if (groups.length) {
+      for (let ix = 0, ixLen = groups.length; ix < ixLen; ix++) {
+        const group = groups[ix];
+        for (let jx = 0, jxLen = group.length; jx < jxLen; jx++) {
+          series = this.seriesList[group[jx]];
+
+          if (series.show) {
+            this.drawSeries(group[jx], graphData[group[jx]]);
+          }
+        }
       }
     }
 
-    for (let ix = 0, ixLen = this.seriesList.length; ix < ixLen; ix++) {
-      if (this.seriesList[ix].highlight.show) {
-        this.seriesHighlight(ix);
-        break;
+    for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
+      series = this.seriesList[skey[ix]];
+
+      if (!series.isExistGrp && series.show) {
+        this.drawSeries(skey[ix], graphData[skey[ix]]);
       }
     }
   }
 
-  drawSeries(seriesIndex) {
-    // 해당 series 정보 및 ctx 등 확인
-    const series = this.seriesList[seriesIndex];
+  drawSeries(seriesId, data) {
+    const series = this.seriesList[seriesId];
     const ctx = this.bufferCtx;
-    // series에 특정한 color 값이 없다면, options의 colors 참조
     const color = series.color;
 
-    const isFill = this.options.fill;
-    const isStack = this.options.stack;
+    const isFill = series.fill;
+    const stackIndex = series.stackIndex;
 
     ctx.beginPath();
     ctx.lineJoin = 'round';
     ctx.lineWidth = series.lineWidth;
-
-    if (series.fillStyle === undefined) {
-      series.fillStyle = series.fill === undefined ? '' :
-        `rgba(${Util.hexToRgb(color)},${series.fill})`;
-    }
-
-    if (isFill !== null) {
-      ctx.fillStyle = series.fillStyle;
-    }
     ctx.strokeStyle = color;
 
-    // series의 data를 순회하며 계산된 X,Y좌표를 담는 배열
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
+    if (isFill) {
+      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})` || '';
+    }
 
-    // const xAreaPoint = [];
     let startFillIndex = 0;
     const endPoint = this.chartRect.y2 - this.labelOffset.bottom;
-    let x = null;
-    let y = null;
-    let data;
+    const dataLen = data.length;
+
+    let x;
+    let y;
+    let gdata;
+    let prev;
     let convX;
     let convY;
+    let aliasPixel;
 
-    for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-      data = series.cData[ix];
+    for (let ix = 0; ix < dataLen; ix++) {
+      gdata = data[ix];
+      prev = data[ix - 1];
 
-      x = this.calculateX(data.x, series.axisIndex.x);
-      y = this.calculateY(data.y, series.axisIndex.y, false);
+      x = this.calculateX(gdata.x, series.xAxisIndex, true);
+      y = this.calculateY(gdata.y, series.yAxisIndex, false);
+
+      aliasPixel = Util.aliasPixel(x);
+      x += aliasPixel;
 
       if (y === null) {
-        if (ix - 1 >= 0) {
-          if (isFill && series.cData[ix - 1].y !== null) {
+        if (ix - 1 > -1) {
+          if (isFill && prev.y !== null) {
             ctx.stroke();
-            ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
+            ctx.lineTo(prev.xp, endPoint);
+            ctx.lineTo(data[startFillIndex].xp, endPoint);
 
-            if (isStack && series.hasAccumulate) {
-              for (let jx = ix; jx >= startFillIndex; jx--) {
-                for (let kx = series.cData[jx].b.length - 1; kx >= 0; kx--) {
-                  convX = this.calculateX(series.cData[jx].b[kx].x, series.axisIndex.x);
-                  convY = this.calculateY(series.cData[jx].b[kx].y, series.axisIndex.y);
-                  ctx.lineTo(convX, convY);
-                }
-              }
-            } else {
-              ctx.lineTo(xPoint[ix - 1], endPoint);
-              ctx.lineTo(xPoint[startFillIndex], endPoint);
-            }
             // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
-            // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
+            ctx.lineTo(data[startFillIndex].xp, data[startFillIndex].yp);
 
             ctx.fill();
             ctx.beginPath();
@@ -101,40 +98,38 @@ export default class LineChart extends BaseChart {
         }
 
         startFillIndex = ix + 1;
-      } else if (ix === 0 || series.cData[ix - 1].y === null || series.cData[ix].y === null ||
+      } else if (ix === 0 || prev.y === null || gdata.y === null ||
         // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
         // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-        series.cData[ix - 1].x === null || series.cData[ix].x === null) {
+        prev.x === null || gdata.x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
       }
 
-      xPoint.push(x);
-      yPoint.push(y);
+      gdata.xp = x;
+      gdata.yp = y;
     }
 
     ctx.stroke();
-    if (isFill && series.cData.length && series.cData[series.cData.length - 1].y !== null) {
-      ctx.stroke();
+    if (isFill && dataLen && data[dataLen - 1].y !== null) {
+      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})` || '';
 
-      ctx.fillStyle = `rgba(${Util.hexToRgb(color)},${series.fillOpacity})`;
+      if (stackIndex) {
+        for (let ix = dataLen - 1; ix >= startFillIndex; ix--) {
+          gdata = data[ix];
 
-      if (isStack && series.hasAccumulate) {
-        for (let ix = series.cData.length - 1; ix >= startFillIndex; ix--) {
-          for (let jx = series.cData[ix].b.length - 1; jx >= 0; jx--) {
-            this.tmp = series.cData[ix];
-            convX = this.calculateX(series.cData[ix].b[jx].x, series.axisIndex.x);
-            convY = this.calculateY(series.cData[ix].b[jx].y, series.axisIndex.y);
-            ctx.lineTo(convX, convY);
-          }
+          convX = this.calculateX(gdata.x, series.xAxisIndex, true);
+          convY = this.calculateY(gdata.b, series.yAxisIndex, false);
+
+          ctx.lineTo(convX, convY);
         }
       } else {
-        ctx.lineTo(xPoint[series.cData.length - 1], endPoint);
-        ctx.lineTo(xPoint[startFillIndex], endPoint);
+        ctx.lineTo(data[dataLen - 1].xp, endPoint);
+        ctx.lineTo(data[startFillIndex].xp, endPoint);
       }
       // 단순히 fill을 위해서 하단 lineTo는 의미가 없으나 명확성을 위해 남겨둠
-      // ctx.lineTo(xPoint[startFillIndex], yPoint[startFillIndex]);
+      ctx.lineTo(data[startFillIndex].xp, data[startFillIndex].yp);
 
       ctx.fill();
     }
@@ -144,24 +139,26 @@ export default class LineChart extends BaseChart {
       ctx.strokeStyle = color;
       ctx.fillStyle = series.pointFill;
       ctx.lineWidth = series.lineWidth;
-      for (let ix = 0, ixLen = series.cData.length; ix < ixLen; ix++) {
-        if (xPoint[ix] !== null && yPoint[ix] !== null && series.cData[ix].point) {
-          this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
+      for (let ix = 0, ixLen = dataLen; ix < ixLen; ix++) {
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, series.pointSize, gdata.xp, gdata.yp);
         }
       }
     }
   }
 
-  seriesHighlight(seriesIndex) {
+  seriesHighlight(seriesId) {
     const ctx = this.overlayCtx;
-    const series = this.seriesList[seriesIndex];
+    const series = this.seriesList[seriesId];
+    const data = this.graphData[seriesId];
     const color = series.color;
-
-    const xPoint = series.drawInfo.xPoint;
-    const yPoint = series.drawInfo.yPoint;
 
     let x = null;
     let y = null;
+    let gdata;
+    let prev;
 
     ctx.beginPath();
     ctx.lineJoin = 'round';
@@ -169,17 +166,19 @@ export default class LineChart extends BaseChart {
     ctx.strokeStyle = color;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = color;
 
-    for (let ix = 0, ixLen = xPoint.length; ix < ixLen; ix++) {
-      x = xPoint[ix];
-      y = yPoint[ix];
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      gdata = data[ix];
+      prev = data[ix - 1];
 
-      if (ix === 0 || series.cData[ix - 1].y === null || series.cData[ix].y === null ||
-        // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
-        // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
-        xPoint[ix - 1] === null || xPoint[ix] === null) {
+      x = gdata.xp;
+      y = gdata.yp;
+
+      // 시작 지점 혹은 이전/현 X또는 Y값이 없다면 moveTo로 좌표를 이동
+      // null 데이터가 들어왔을 시 차트를 끊어내기 위함.
+      if (ix === 0 || prev.y === null || gdata.y === null || prev.x === null || gdata.x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -190,31 +189,41 @@ export default class LineChart extends BaseChart {
     ctx.closePath();
 
     if (series.point) {
+      const pSize = series.highlight.pointSize;
+
       ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
       ctx.fillStyle = color;
 
-      for (let ix = 0, ixLen = xPoint.length; ix < ixLen; ix++) {
-        this.drawPoint(ctx, series.pointStyle, series.pointSize, xPoint[ix], yPoint[ix]);
+      for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+        gdata = data[ix];
+
+        if (gdata.xp !== null && gdata.yp !== null) {
+          this.drawPoint(ctx, series.pointStyle, pSize, gdata.xp, gdata.yp);
+        }
       }
     }
   }
 
   itemHighlight(item) {
-    if (item.dataIndex === null || item.seriesIndex === null) {
+    if (item.index === null || item.sId === null) {
       return;
     }
+
+    const graphData = this.graphData;
+    const gdata = graphData[item.sId];
     const ctx = this.overlayCtx;
-    const series = this.seriesList[item.seriesIndex];
+    const series = this.seriesList[item.sId];
 
     if (!series.point) {
       return;
     }
 
     const color = series.color;
-    const x = series.drawInfo.xPoint[item.dataIndex];
-    const y = series.drawInfo.yPoint[item.dataIndex];
+    const x = gdata[item.index].xp;
+    const y = gdata[item.index].yp;
+    const pSize = series.highlight.pointSize;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = series.lineWidth;
@@ -224,7 +233,9 @@ export default class LineChart extends BaseChart {
     ctx.shadowBlur = 4;
     ctx.shadowColor = color;
 
-    this.drawPoint(ctx, series.pointStyle, 5, x, y);
+    if (x !== null && y !== null) {
+      this.drawPoint(ctx, series.pointStyle, pSize, x, y);
+    }
   }
 
   showCrosshair(offset) {

@@ -12,21 +12,26 @@ Vue.use(EVUI);
 Vue.prototype.$http = Axios;
 Vue.config.debug = true;
 Vue.prototype.$tableData = rowdata;
+Vue.prototype.$Vue = Vue;
 
 const router = new VueRouter({
   mode: 'history',
   routes: [
     {
       path: '/',
-      component: resolve => require(['./guide/views/intro'], resolve),
+      component: () => import(/* webpackChunkName: 'intro' */ './guide/views/intro'),
     },
     {
       path: '/container',
-      component: resolve => require(['./guide/views/examples/container/container-view'], resolve),
+      component: () => import(/* webpackChunkName: 'container' */ './guide/views/examples/container/container-view'),
     },
     {
       path: '/dock',
-      component: resolve => require(['./guide/views/examples/dock/dock-view'], resolve),
+      component: () => import(/* webpackChunkName: 'dock' */ './guide/views/examples/dock/dock-view'),
+    },
+    {
+      path: '/window',
+      component: resolve => require(['./guide/views/examples/window/window-view'], resolve),
     },
     {
       path: '/contextmenu',
@@ -34,71 +39,79 @@ const router = new VueRouter({
     },
     {
       path: '/barchart',
-      component: resolve => require(['./guide/views/examples/chart/chart-bar-view'], resolve),
+      component: () => import(/* webpackChunkName: 'barchart' */ './guide/views/examples/chart/chart-bar-view'),
     },
     {
       path: '/linechart',
-      component: resolve => require(['./guide/views/examples/chart/chart-line-view'], resolve),
+      component: () => import(/* webpackChunkName: 'linechart' */ './guide/views/examples/chart/chart-line-view'),
     },
     {
       path: '/piechart',
-      component: resolve => require(['./guide/views/examples/chart/chart-pie-view'], resolve),
+      component: () => import(/* webpackChunkName: 'piechart' */ './guide/views/examples/chart/chart-pie-view'),
     },
     {
       path: '/checkbox',
-      component: resolve => require(['./guide/views/examples/checkbox/checkbox-view'], resolve),
+      component: () => import(/* webpackChunkName: 'checkbox' */ './guide/views/examples/checkbox/checkbox-view'),
     },
     {
       path: '/radio',
-      component: resolve => require(['./guide/views/examples/radio/radio-view'], resolve),
+      component: () => import(/* webpackChunkName: 'radio' */ './guide/views/examples/radio/radio-view'),
     },
     {
       path: '/inputnumber',
-      component: resolve => require(['./guide/views/examples/inputnumber/input-number-view'], resolve),
+      component: () => import(/* webpackChunkName: 'inputnumber' */ './guide/views/examples/inputnumber/input-number-view'),
     },
     {
       path: '/button',
-      component: resolve => require(['./guide/views/examples/button/button-view'], resolve),
+      component: () => import(/* webpackChunkName: 'button' */ './guide/views/examples/button/button-view'),
     },
     {
       path: '/selectbox',
-      component: resolve => require(['./guide/views/examples/selectbox/selectbox-view'], resolve),
+      component: () => import(/* webpackChunkName: 'selectbox' */ './guide/views/examples/selectbox/selectbox-view'),
     },
     {
       path: '/slider',
-      component: resolve => require(['./guide/views/examples/slider/slider-view'], resolve),
+      component: () => import(/* webpackChunkName: 'slider' */ './guide/views/examples/slider/slider-view'),
     },
     {
       path: '/table',
-      component: resolve => require(['./guide/views/examples/table/table-view'], resolve),
+      component: () => import(/* webpackChunkName: 'table' */ './guide/views/examples/table/table-view'),
+    },
+    {
+      path: '/tree',
+      component: resolve => require(['./guide/views/examples/tree/tree-table-view'], resolve),
     },
     {
       path: '/menu',
-      component: resolve => require(['./guide/views/examples/menu/menu-view'], resolve),
+      component: () => import(/* webpackChunkName: 'menu' */ './guide/views/examples/menu/menu-view'),
     },
     {
       path: '/loadingmask',
-      component: resolve => require(['./guide/views/examples/loadingmask/loadingmask-view'], resolve),
+      component: () => import(/* webpackChunkName: 'loadingmask' */ './guide/views/examples/loadingmask/loadingmask-view'),
     },
     {
       path: '/timepicker',
-      component: resolve => require(['./guide/views/examples/timepicker/timepicker-view'], resolve),
+      component: () => import(/* webpackChunkName: 'timepicker' */ './guide/views/examples/timepicker/timepicker-view'),
     },
     {
       path: '/datepicker',
-      component: resolve => require(['./guide/views/examples/datepicker/datepicker-view'], resolve),
+      component: () => import(/* webpackChunkName: 'datepicker' */ './guide/views/examples/datepicker/datepicker-view'),
     },
     {
       path: '/toggle',
-      component: resolve => require(['./guide/views/examples/toggle/toggle-view'], resolve),
+      component: () => import(/* webpackChunkName: 'toggle' */ './guide/views/examples/toggle/toggle-view'),
     },
     {
       path: '/label',
-      component: resolve => require(['./guide/views/examples/label/label-view'], resolve),
+      component: () => import(/* webpackChunkName: 'label' */ './guide/views/examples/label/label-view'),
     },
     {
       path: '/textfield',
-      component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
+      component: () => import(/* webpackChunkName: 'textfield' */ './guide/views/examples/textfield/textfield-view'),
+    },
+    {
+      path: '/tab',
+      component: () => import(/* webpackChunkName: 'tab' */ './guide/views/examples/tab/tab-view'),
     },
   ],
 });
