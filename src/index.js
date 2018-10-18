@@ -4,7 +4,7 @@ import EvCheckbox from './components/checkbox';
 import EvCheckboxGroup from './components/checkbox-group';
 import EvIcon from './components/icon';
 import EvInput from './components/input';
-import EvLoadingmask from './components/loadingmask';
+import EvLoadingMask from './components/loadingmask';
 import EvMenu from './components/menu';
 import EvRadio from './components/radio';
 import EvRadioGroup from './components/radio-group';
@@ -15,6 +15,7 @@ import EvTimePicker from './components/timepicker';
 import EvToggle from './components/toggle';
 import EvLabel from './components/label';
 import EvDatepicker from './components/datepicker';
+import EvWindow from './components/window';
 import { tabs as EvTabs, tab as EvTab } from './components/tabs';
 
 const components = {
@@ -24,7 +25,7 @@ const components = {
   EvCheckboxGroup,
   EvIcon,
   EvInput,
-  EvLoadingmask,
+  EvLoadingMask,
   EvMenu,
   EvRadio,
   EvRadioGroup,
@@ -34,6 +35,7 @@ const components = {
   EvTimePicker,
   EvToggle,
   EvLabel,
+  EvWindow,
   EvDatepicker,
   EvTabs,
   EvTab,

@@ -58,6 +58,12 @@
                 content: '탭 패널 샘플',
                 imgUrl: `${this.imgUrl}/tab.png`,
               },
+              {
+                name: 'Window',
+                routerLink: '/window',
+                content: '윈도우',
+                imgUrl: `${this.imgUrl}/window.png`,
+              },
             ],
           },
           {
