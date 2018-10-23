@@ -48,7 +48,6 @@
   const prefixEvui = 'evui-btn';
 
   export default {
-    name: 'Button',
     props: {
       name: {
         type: String,

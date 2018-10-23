@@ -43,7 +43,6 @@
   const prefixEvui = 'ev-contextmenu-children';
 
   export default {
-    name: 'ContextChildren',
     components: {
       ContextChildren,
     },

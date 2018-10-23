@@ -37,7 +37,6 @@
   const prefixEvui = 'ev-window';
 
   export default {
-    name: 'Window',
     props: {
       name: {
         type: String,
