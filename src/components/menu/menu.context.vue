@@ -21,7 +21,6 @@
   const prefixEvui = 'ev-contextmenu';
 
   export default {
-    name: 'ContextMenu',
     components: {
       ContextChildren,
     },
