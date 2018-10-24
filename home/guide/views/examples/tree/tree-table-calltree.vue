@@ -13,7 +13,6 @@
 
 <script>
   import _ from 'lodash';
-  import util from 'main/commons/util';
   import packet from './packet.json';
 
   export default {
@@ -62,7 +61,84 @@
       for (let ix = 0, ixLen = this.packetData.length; ix < ixLen; ix++) {
         rowList.push(_.zipObject(this.field, this.packetData[ix]));
       }
-      this.rowData = util.arrayToTree(rowList);
+      this.rowData = this.arrayToTree(rowList);
+    },
+    methods: {
+      arrayToTree(data) {
+        const result = [];
+        this.createTree(data, result, 0, 0, 0);
+        return result;
+      },
+      createTree(data, result, index, preLvl, parentList, endResult) {
+        if (index === data.length) {
+          return;
+        }
+        let resultList = result;
+        let parentArray = parentList;
+        const lvl = data[index].level - 1;
+        if (index === 0) {
+          resultList.push({
+            children: [],
+            expend: null,
+            data: data[index],
+          });
+          this.createTree(data, resultList, index + 1, lvl, [0], resultList);
+        } else if (preLvl === lvl) {
+          let parentIndex;
+          resultList = endResult;
+          for (let ix = 0, ixLen = lvl; ix < ixLen; ix++) {
+            parentIndex = parentArray[ix];
+            resultList = resultList[parentIndex].children;
+          }
+          resultList.push({
+            children: [],
+            expend: null,
+            data: data[index],
+          });
+          const temp = parentArray[lvl] + 1;
+          parentArray[lvl] = temp;
+          parentArray = parentArray.slice(0, lvl + 1);
+
+          this.createTree(data, resultList,
+            index + 1, lvl, parentArray, endResult);
+        }
+        if (preLvl < lvl) {
+          const parentIndex = parentArray[preLvl];
+          if (!parentArray[lvl]) {
+            parentArray.push(0);
+          } else {
+            // parentArray = parentArray.slice(0, lvl);
+            parentArray.push(0);
+          }
+
+          resultList[parentIndex].expend = true;
+          resultList[parentIndex].children.push({
+            children: [],
+            expend: null,
+            data: data[index],
+          });
+          this.createTree(data, resultList[parentIndex].children,
+            index + 1, lvl, parentArray, endResult);
+        }
+        if (preLvl > lvl) {
+          let parentIndex;
+          resultList = endResult;
+          for (let ix = 0, ixLen = lvl; ix < ixLen; ix++) {
+            parentIndex = parentArray[ix];
+            resultList = resultList[parentIndex].children;
+          }
+          resultList.push({
+            children: [],
+            expend: null,
+            data: data[index],
+          });
+          const temp = parentArray[lvl] + 1;
+          parentArray[lvl] = temp;
+          parentArray = parentArray.slice(0, lvl + 1);
+          this.createTree(data, resultList,
+            index + 1, lvl, parentArray, endResult);
+        }
+      },
     },
   };
 </script>
