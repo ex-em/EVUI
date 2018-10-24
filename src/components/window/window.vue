@@ -84,6 +84,14 @@
         type: Boolean,
         default: false,
       },
+      closeType: {
+        type: String,
+        default: 'destroy',
+        validator(value) {
+          const list = ['destroy', 'hide'];
+          return list.indexOf(value) > -1;
+        },
+      },
       resizable: {
         type: Boolean,
         default: true,
@@ -228,7 +236,13 @@
         this.isFullExpandWindow = !this.isFullExpandWindow;
       },
       clickCloseBtn() {
-        this.hide();
+        this.$emit('beforeClose', this);
+
+        if (this.closeType === 'hide') {
+          this.hide();
+        } else {
+          this.$destroy();
+        }
       },
       resize(e) {
         const isTop = this.grabbingBorderPosInfo.top;
@@ -417,10 +431,6 @@
 
         top = (offsetHeight / 2) - (this.height / 2);
         left = (offsetWidth / 2) - (this.width / 2);
-
-        // body 에 붙이기 전에 임시로 사이즈 조정
-        top -= 150;
-        left -= 300;
 
         return {
           top: this.numberToPixel(top),
