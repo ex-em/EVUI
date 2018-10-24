@@ -32,6 +32,7 @@ module.exports = merge(webpackBaseConfig, {
         loader: 'eslint-loader',
         enforce: 'pre',
         include: [resolve('src'), resolve('liteplus')],
+        exclude: [resolve('liteplus/lib/ace'), resolve('liteplus/lib/ace/snippets')],
         options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,

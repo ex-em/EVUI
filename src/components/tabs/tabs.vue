@@ -74,7 +74,7 @@
 
   const unpackNode = function unpackNode(node) {
     let data = null;
-    const tagNameRxg = new RegExp(/(tab)+/g);
+    const tagNameRxg = new RegExp(/(EvTab)+/g);
     if (node.tag && node.tag.match(tagNameRxg).length > 0) {
       data = node.componentOptions.propsData.tabProp;
     }
@@ -167,7 +167,6 @@
       });
       this.setActive(this.currentTabList[this.currentTabList.length - 1]);
       this.setScrollIcon();
-      this.initIndicator();
     },
     methods: {
       renderTab(data) {
@@ -198,19 +197,21 @@
         return installed;
       },
       createTabData() {
-        let result = [];
         const slotList = this.getSlotList(this.$slots.default);
+        let reduceList = [].concat(slotList, this.tabData);
 
-        result = result.concat(slotList, this.tabData).reduce((acc, curr) => {
-          const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
-          return val;
-        });
-
-        for (let i = 0, length = result.length; i < length; i++) {
-          this.appendTabId(result[i], i);
+        if (reduceList.length > 1) {
+          reduceList = reduceList.reduce((acc, curr) => {
+            const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
+            return val;
+          });
         }
 
-        return result;
+        for (let i = 0, length = reduceList.length; i < length; i++) {
+          this.appendTabId(reduceList[i], i);
+        }
+
+        return reduceList;
       },
       appendTabId(data, index) {
         const obj = {};
@@ -273,11 +274,11 @@
           }
         }
       },
-      onDragStart(event, data, index) {
-        console.log(event, data, index);
+      onDragStart() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
-      onDragEnd(event, data, index) {
-        console.log(event, data, index);
+      onDragEnd() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
       wheelEvent(e) {
         e.preventDefault();
@@ -356,28 +357,8 @@
           }
         });
       },
-      initIndicator() {
-        this.indicator = 0;
-        this.max = this.tabWrapperRect;
-        const tabItemRef = this.$refs.tabItemRef;
-        const totalWidth = tabItemRef.map(v => v.$el.getBoundingClientRect().width)
-          .reduce((acc, curr) => acc + curr);
-        console.log(totalWidth);
-        this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
-        this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-        console.log(this.tabListRect.width, this.tabWrapperRect.width);
-      },
       getTabItems() {
         return this.$refs.tabItemRef;
-      },
-      setIndicator() {
-        // this.max = this.tabWrapperRect;
-        // this.indicator += width;
-        // if (this.indicator >= this.max) {
-        //   this.indicator = this.max;
-        // } else if (this.indicator <= 0) {
-        //   this.indicator = 0;
-        // }
       },
     },
   };

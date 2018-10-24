@@ -30,6 +30,14 @@ const router = new VueRouter({
       component: () => import(/* webpackChunkName: 'dock' */ './guide/views/examples/dock/dock-view'),
     },
     {
+      path: '/window',
+      component: resolve => require(['./guide/views/examples/window/window-view'], resolve),
+    },
+    {
+      path: '/contextmenu',
+      component: resolve => require(['./guide/views/examples/contextmenu/contextmenu-view'], resolve),
+    },
+    {
       path: '/barchart',
       component: () => import(/* webpackChunkName: 'barchart' */ './guide/views/examples/chart/chart-bar-view'),
     },

@@ -8,6 +8,7 @@
  *
  */
 
-import tabs from '../tab/tabs';
+import tabs from './tabs';
+import tab from './tab';
 
-export default tabs;
+export { tabs, tab };

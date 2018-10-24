@@ -1,6 +1,6 @@
 <template>
   <div>
-    <menu-nav
+    <ev-nav-menu
       :store="menuStore"
     />
     <br>
@@ -9,12 +9,8 @@
 
 <script>
   import '@/styles/evui.css';
-  import menuNav from '@/components/menu';
 
   export default {
-    components: {
-      menuNav,
-    },
     data() {
       return {
         menuStore: [
