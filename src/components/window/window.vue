@@ -13,19 +13,19 @@
       :style="headerStyle"
       :class="headerCls"
     >
-      <div :class="`${prefixEvui}-title-area`">{{ title }}</div>
-      <div :class="`${prefixEvui}-expand-btn-line`"/>
+      <div :class="`${prefixCls}-title-area`">{{ title }}</div>
+      <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
-        :class="`${prefixEvui}-expand-btn`"
+        :class="`${prefixCls}-expand-btn`"
         @click="clickExpandBtn"
       />
-      <div :class="`${prefixEvui}-close-btn-line`"/>
+      <div :class="`${prefixCls}-close-btn-line`"/>
       <div
-        :class="`${prefixEvui}-close-btn`"
+        :class="`${prefixCls}-close-btn`"
         @click="clickCloseBtn"
       />
     </div>
-    <div :class="`${prefixEvui}-body-area`">
+    <div :class="`${prefixCls}-body-area`">
       <component :is="content"/>
     </div>
   </div>
@@ -33,8 +33,6 @@
 
 <script>
   import '@/styles/evui.css';
-
-  const prefixEvui = 'ev-window';
 
   export default {
     props: {
@@ -79,8 +77,12 @@
         default: '',
       },
       content: {
-        type: Object,
+        type: [Object, String],
         default: null,
+      },
+      hidden: {
+        type: Boolean,
+        default: false,
       },
       resizable: {
         type: Boolean,
@@ -89,14 +91,14 @@
     },
     data() {
       return {
-        prefixEvui,
+        prefixCls: 'ev-window',
         windowId: '',
         windowStyle: {},
         windowCls: '',
         headerCls: '',
         headerStyle: '',
         headerHeight: 32,
-        isShow: false,
+        isShow: true,
         isMoving: false,
         isGrabbingBorder: false,
         grabbingBorderPosInfo: {
@@ -121,6 +123,7 @@
       this.windowCls = this.getWindowCls();
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = this.getHeaderCls();
+      this.isShow = !this.hidden;
     },
     beforeDestroy() {
       this.isShow = false;
@@ -431,17 +434,17 @@
       },
       getWindowCls() {
         return [
-          prefixEvui,
+          this.prefixCls,
           {
-            [`${prefixEvui}-rtm`]: this.clsType === 'rtm',
+            [`${this.prefixCls}-rtm`]: this.clsType === 'rtm',
           },
         ];
       },
       getHeaderCls() {
         return [
           {
-            [`${prefixEvui}-header-area`]: this.clsType,
-            [`${prefixEvui}-header-rtm`]: this.clsType === 'rtm',
+            [`${this.prefixCls}-header-area`]: this.clsType,
+            [`${this.prefixCls}-header-rtm`]: this.clsType === 'rtm',
           },
         ];
       },
@@ -492,7 +495,7 @@
 
 <style>
   .ev-window{
-    position: absolute;
+    position: fixed;
     border: 9px solid;
     border-radius: 8px;
     overflow: visible;
@@ -508,6 +511,7 @@
     width: 100%;
     border-bottom: 1px solid;
     background: transparent;
+    font-family: 'NanumGothic', sans-serif;
     align-items: center;
   }
   .ev-window-title-area{
