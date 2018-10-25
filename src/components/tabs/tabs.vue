@@ -69,6 +69,7 @@
 </template>
 
 <script>
+  import Vue from 'vue';
   import icon from '@/components/icon/icon';
   import tab from './tab';
 
@@ -142,7 +143,7 @@
     },
     watch: {
       currentTab() {
-        this.currentTab.isActive = true;
+        // this.currentTab.isActive = true;
       },
       originTabList() {
         if (this.tabCount < this.originTabList.length) {
@@ -159,14 +160,16 @@
       },
     },
     mounted() {
-      this.idTag = Number(this.currentTabList.length);
-      this.tabCount = Number(this.originTabList.length);
-      this.currentTabList.forEach((v) => {
-        const target = v.targetComponent;
-        this.installComponent(target);
+      this.$nextTick(() => {
+        this.idTag = Number(this.currentTabList.length);
+        this.tabCount = Number(this.originTabList.length);
+        this.currentTabList.forEach((v) => {
+          const target = v.targetComponent;
+          this.installComponent(target);
+        });
+        this.setActive(this.currentTabList[this.currentTabList.length - 1]);
+        this.setScrollIcon();
       });
-      this.setActive(this.currentTabList[this.currentTabList.length - 1]);
-      this.setScrollIcon();
     },
     methods: {
       renderTab(data) {
@@ -189,7 +192,7 @@
         let installed = false;
         if (target) {
           if (!this.renderedComponentList[target]) {
-            this.$Vue.component(target.keyName, target.component);
+            Vue.component(target.keyName, target.component);
             this.renderedComponentList[target.keyName] = true;
           }
           installed = true;
@@ -366,15 +369,21 @@
 
 <style scoped>
   .ev-tabs {
-    box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 30px 0 0 0;
     color: #495060;
     zoom: 1;
   }
   .ev-tabs-outer {
   }
   .ev-tabs-title-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 32px;
     outline: none;
     border-bottom: 1px solid #dddee1;
   }
@@ -408,6 +417,7 @@
     cursor: pointer;
   }
   .ev-tab-list-scroll {
+    width: 100%;
     overflow: hidden;
   }
   .ev-tabs-nav {
@@ -422,6 +432,8 @@
   }
 
   .ev-tab-content-container {
+    width: 100%;
+    height: 100%;
     border: 1px solid #dddee1;
     border-top: 0;
     padding: 3px;
