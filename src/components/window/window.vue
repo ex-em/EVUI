@@ -86,7 +86,7 @@
       },
       closeType: {
         type: String,
-        default: 'destroy',
+        default: 'hide',
         validator(value) {
           const list = ['destroy', 'hide'];
           return list.indexOf(value) > -1;
@@ -106,9 +106,10 @@
         headerCls: '',
         headerStyle: '',
         headerHeight: 32,
+        grabbingBorderSize: 5,
+        isGrabbingBorder: false,
         isShow: true,
         isMoving: false,
-        isGrabbingBorder: false,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -157,11 +158,10 @@
           const clientRect = windowEl.getBoundingClientRect();
           const x = e.pageX - clientRect.left;
           const y = e.pageY - clientRect.top;
-          const borderSize = 4;
-          const isGrabTop = y < borderSize;
-          const isGrabLeft = x < borderSize;
-          const isGrabRight = x >= (clientRect.width - borderSize);
-          const isGrabBottom = y >= (clientRect.height - borderSize);
+          const isGrabTop = y < this.grabbingBorderSize;
+          const isGrabLeft = x < this.grabbingBorderSize;
+          const isGrabRight = x >= (clientRect.width - this.grabbingBorderSize);
+          const isGrabBottom = y >= (clientRect.height - this.grabbingBorderSize);
 
           this.grabbingBorderPosInfo = {
             top: isGrabTop,
@@ -241,6 +241,7 @@
         if (this.closeType === 'hide') {
           this.hide();
         } else {
+          this.$el.parentNode.removeChild(this.$el);
           this.$destroy();
         }
       },
@@ -300,14 +301,13 @@
         }
 
         if (this.resizable) {
-          const borderSize = 4;
           const rect = this.$el.getBoundingClientRect();
           const x = e.pageX - rect.left;
           const y = e.pageY - rect.top;
-          const top = y < borderSize;
-          const left = x < borderSize;
-          const right = x >= (rect.width - borderSize);
-          const bottom = y >= (rect.height - borderSize);
+          const top = y < this.grabbingBorderSize;
+          const left = x < this.grabbingBorderSize;
+          const right = x >= (rect.width - this.grabbingBorderSize);
+          const bottom = y >= (rect.height - this.grabbingBorderSize);
 
           if ((top && left) || (bottom && right)) {
             this.$el.style.cursor = 'nwse-resize';
