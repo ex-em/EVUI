@@ -1,6 +1,7 @@
 <template>
   <div
-    v-if="isShow"
+    v-if="isExist"
+    v-show="isShow"
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
@@ -108,6 +109,7 @@
         headerHeight: 32,
         grabbingBorderSize: 5,
         isGrabbingBorder: false,
+        isExist: true,
         isShow: true,
         isMoving: false,
         grabbingBorderPosInfo: {
@@ -241,8 +243,7 @@
         if (this.closeType === 'hide') {
           this.hide();
         } else {
-          this.$el.parentNode.removeChild(this.$el);
-          this.$destroy();
+          this.isExist = false;
         }
       },
       resize(e) {
