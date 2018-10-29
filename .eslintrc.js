@@ -55,5 +55,6 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-console' : ['error', { allow : ['log']}],
+    'class-methods-use-this': 'off',
   }
-}
+};
