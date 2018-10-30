@@ -130,11 +130,13 @@
     },
     created() {
       this.windowId = `window_${this._uid}_${this.name}`;
-      this.windowStyle = this.getWindowStyle();
       this.windowCls = this.getWindowCls();
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = this.getHeaderCls();
       this.isShow = !this.hidden;
+    },
+    mounted() {
+      this.windowStyle = this.getWindowStyle();
     },
     beforeDestroy() {
       this.isShow = false;
@@ -425,13 +427,14 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        let top = 0;
-        let left = 0;
+        const clientRect = this.$el.getBoundingClientRect();
         const offsetWidth = document.body.clientWidth;
         const offsetHeight = document.body.clientHeight;
+        let top = 0;
+        let left = 0;
 
-        top = (offsetHeight / 2) - (this.height / 2);
-        left = (offsetWidth / 2) - (this.width / 2);
+        top = (offsetHeight / 2) - (this.height / 2) - clientRect.top;
+        left = (offsetWidth / 2) - (this.width / 2) - clientRect.left;
 
         return {
           top: this.numberToPixel(top),
@@ -506,7 +509,7 @@
 
 <style>
   .ev-window{
-    position: fixed;
+    position: absolute;
     border: 9px solid;
     border-radius: 8px;
     overflow: visible;

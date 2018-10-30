@@ -98,8 +98,9 @@
     color: #000;
   }
   .evui-left-navigation {
+    position: absolute;
+    left: 0;
     width: 240px;
-    height: 500px; /*fix px*/
   }
   .evui-menu {
     display: block;
