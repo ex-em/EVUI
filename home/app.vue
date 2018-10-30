@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app">
     <main-header/>
     <main-content/>
   </div>
@@ -29,5 +29,11 @@
     position: absolute;
     width: 100%;
     height: 100%;
+  }
+  .app {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 55px;
   }
 </style>

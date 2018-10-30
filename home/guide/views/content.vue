@@ -4,13 +4,12 @@
       ref="menuNav"
       :store="menuStore"
     />
-    <div class="evui-right-content">
+    <div class="evui-main-content-body">
       <router-view
         :store="$route.path === '/' ? menuStore : ''"
         @selectedSummary="getSelectedSummary"
       />
     </div>
-    <div class="evui-page-anchor"/>
   </div>
 </template>
 
@@ -219,16 +218,13 @@
 
 <style scoped>
   .evui-main-content {
-    display: inline-flex;
-    margin-top: 55px;
+    position: relative;
     width: 100%;
+    height: 100%;
+    padding: 0 240px;
   }
-  .evui-right-content {
+  .evui-main-content-body {
     padding: 20px;
-    flex: 1;
     border-left: 1px solid #dddee0;
-  }
-  .evui-page-anchor {
-    width: 240px;
   }
 </style>
