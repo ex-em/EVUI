@@ -167,11 +167,22 @@
           const target = v.targetComponent;
           this.installComponent(target);
         });
-        this.setActive(this.currentTabList[this.currentTabList.length - 1]);
+        this.setActive(this.findActiveTab());
         this.setScrollIcon();
       });
     },
     methods: {
+      findActiveTab() {
+        let firstIdx = 0;
+        let tabData = null;
+        for (let ix = 0; ix < this.currentTabList.length; ix++) {
+          tabData = this.currentTabList[ix];
+          if (tabData.isActive) {
+            firstIdx = ix;
+          }
+        }
+        return this.currentTabList[firstIdx];
+      },
       renderTab(data) {
         const target = data.targetComponent;
 
@@ -339,26 +350,26 @@
         this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
       },
       setScrollIcon(data, type) {
-        const sideIconWidth = 20;
-        this.$nextTick(() => {
-          this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
-          this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-          if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
-            this.useTabScroll = true;
-            if (!this.initScroll) {
-              this.initScroll = true;
-              this.setTransForm(data, type, this.initScroll);
+        setTimeout(() => {
+          const sideIconWidth = 20;
+            this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
+            this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
+            if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
+              this.useTabScroll = true;
+              if (!this.initScroll) {
+                this.initScroll = true;
+                this.setTransForm(data, type, this.initScroll);
+              } else {
+                this.setTransForm(data, type);
+              }
             } else {
-              this.setTransForm(data, type);
+              this.useTabScroll = false;
+              if (this.initScroll) {
+                this.initScroll = false;
+                this.setTransForm(data, 'deleteScroll');
+              }
             }
-          } else {
-            this.useTabScroll = false;
-            if (this.initScroll) {
-              this.initScroll = false;
-              this.setTransForm(data, 'deleteScroll');
-            }
-          }
-        });
+        }, 1);
       },
       getTabItems() {
         return this.$refs.tabItemRef;
