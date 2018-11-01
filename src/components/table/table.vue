@@ -1213,6 +1213,9 @@
           this.sortedData = data.slice();
         }
       },
+      setColumns(columns) {
+        this.originColumns = columns;
+      },
       cellRender(value, type, cellRender) {
         if (cellRender) {
           return cellRender(value);
