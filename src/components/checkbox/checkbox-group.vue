@@ -29,7 +29,6 @@ import { getMatchedComponentsDownward } from '../../common/utils';
 const prefixCls = 'evui-checkbox-group';
 
 export default {
-  name: 'CheckboxGroup',
   components: {
     CheckBox,
   },
