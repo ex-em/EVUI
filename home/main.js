@@ -12,6 +12,7 @@ Vue.use(EVUI);
 Vue.prototype.$http = Axios;
 Vue.config.debug = true;
 Vue.prototype.$tableData = rowdata;
+Vue.prototype.$Vue = Vue;
 
 const router = new VueRouter({
   mode: 'history',
@@ -27,6 +28,14 @@ const router = new VueRouter({
     {
       path: '/dock',
       component: resolve => require(['./guide/views/examples/dock/dock-view'], resolve),
+    },
+    {
+      path: '/window',
+      component: resolve => require(['./guide/views/examples/window/window-view'], resolve),
+    },
+    {
+      path: '/contextmenu',
+      component: resolve => require(['./guide/views/examples/contextmenu/contextmenu-view'], resolve),
     },
     {
       path: '/barchart',
@@ -95,6 +104,10 @@ const router = new VueRouter({
     {
       path: '/textfield',
       component: resolve => require(['./guide/views/examples/textfield/textfield-view'], resolve),
+    },
+    {
+      path: '/tab',
+      component: resolve => require(['./guide/views/examples/tab/tab-view'], resolve),
     },
   ],
 });

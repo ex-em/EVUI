@@ -52,6 +52,24 @@
                 content: '닥 컨테이너 샘플',
                 imgUrl: `${this.imgUrl}/dock.png`,
               },
+              {
+                name: 'Window',
+                routerLink: '/window',
+                content: '윈도우',
+                imgUrl: `${this.imgUrl}/window.png`,
+              },
+              {
+                name: 'ContextMenu',
+                routerLink: '/contextmenu',
+                content: '컨텍스트 메뉴',
+                imgUrl: `${this.imgUrl}/contextmenu.png`,
+              },
+              {
+                name: 'Tab',
+                routerLink: '/tab',
+                content: '탭 패널 샘플',
+                imgUrl: `${this.imgUrl}/tab.png`,
+              },
             ],
           },
           {

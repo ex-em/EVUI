@@ -4,7 +4,7 @@
       <div>Nomal ComboBox</div>
       <Selectbox
         :name="nomalCbBoxInfo.name"
-        :selectbox-style="nomalCbBoxInfo.selectboxStyle"
+        :style="nomalCbBoxInfo.selectboxStyle"
         :items="nomalCbBoxInfo.items"
         @keyup="onKeyUp"
         @select="onSelect"
@@ -14,7 +14,7 @@
       <div>Multiple ComboBox</div>
       <Selectbox
         :name="multipleCbBoxInfo.name"
-        :selectbox-style="multipleCbBoxInfo.selectboxStyle"
+        :style="multipleCbBoxInfo.selectboxStyle"
         :multiple="multipleCbBoxInfo.multiple"
         :items="multipleCbBoxInfo.items"
         @keyup="onKeyUp"
@@ -25,7 +25,7 @@
       <div>Group ComboBox</div>
       <Selectbox
         :name="groupCbBoxInfo.name"
-        :selectbox-style="groupCbBoxInfo.selectboxStyle"
+        :style="groupCbBoxInfo.selectboxStyle"
         :is-group="groupCbBoxInfo.isGroup"
         :multiple="groupCbBoxInfo.multiple"
         :items="groupCbBoxInfo.items"
