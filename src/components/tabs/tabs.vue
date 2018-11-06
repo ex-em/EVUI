@@ -62,6 +62,7 @@
         <component
           :is="renderedComponent.keyName"
           :key="renderedComponent.id"
+          v-bind="renderedComponent.parameters"
         />
       </keep-alive>
     </div>
@@ -185,24 +186,30 @@
       },
       renderTab(data) {
         const target = data.targetComponent;
+        let id = data.id;
+        let keyName = target.keyName;
+        let parameters = target.parameters;
+
+        if (target.keyName && target.component) {
+          this.installComponent(target);
+        } else {
+          id = null;
+          keyName = null;
+          parameters = null;
+        }
 
         this.renderedComponent = {
-          keyName: null,
-          id: null,
+          id,
+          keyName,
+          parameters,
         };
 
-        if (this.installComponent(target)) {
-          this.renderedComponent = {
-            keyName: target.keyName,
-            id: data.id,
-          };
-        }
         return data;
       },
       installComponent(target) {
         let installed = false;
         if (target) {
-          if (!this.renderedComponentList[target]) {
+          if (!this.renderedComponentList[target.keyName]) {
             Vue.component(target.keyName, target.component);
             this.renderedComponentList[target.keyName] = true;
           }
@@ -210,7 +217,7 @@
         }
         return installed;
       },
-      createTabData() {
+       createTabData() {
         const slotList = this.getSlotList(this.$slots.default);
         let reduceList = [].concat(slotList, this.tabData);
 
