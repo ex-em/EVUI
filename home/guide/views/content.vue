@@ -200,6 +200,12 @@
                 content: '로딩마스크',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
               },
+              {
+                name: 'Icon',
+                routerLink: '/icon',
+                content: '아이콘',
+                // imgUrl: `${this.imgUrl}/icon.png`,
+              },
             ],
           },
         ],
