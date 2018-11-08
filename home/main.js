@@ -113,6 +113,10 @@ const router = new VueRouter({
       path: '/tab',
       component: () => import(/* webpackChunkName: 'tab' */ './guide/views/examples/tab/tab-view'),
     },
+    {
+      path: '/icon',
+      component: resolve => require(['./guide/views/examples/icon/icon-view'], resolve),
+    },
   ],
 });
 
