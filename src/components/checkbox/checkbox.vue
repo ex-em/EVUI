@@ -37,7 +37,6 @@
   const prefixCls = 'evui-checkbox';
 
   export default {
-    name: 'CheckBox',
     props: {
       cls: {
         type: String,

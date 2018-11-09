@@ -62,6 +62,7 @@
         <component
           :is="renderedComponent.keyName"
           :key="renderedComponent.id"
+          v-bind="renderedComponent.parameters"
         />
       </keep-alive>
     </div>
@@ -167,31 +168,48 @@
           const target = v.targetComponent;
           this.installComponent(target);
         });
-        this.setActive(this.currentTabList[this.currentTabList.length - 1]);
+        this.setActive(this.findActiveTab());
         this.setScrollIcon();
       });
     },
     methods: {
+      findActiveTab() {
+        let firstIdx = 0;
+        let tabData = null;
+        for (let ix = 0; ix < this.currentTabList.length; ix++) {
+          tabData = this.currentTabList[ix];
+          if (tabData.isActive) {
+            firstIdx = ix;
+          }
+        }
+        return this.currentTabList[firstIdx];
+      },
       renderTab(data) {
         const target = data.targetComponent;
+        let id = data.id;
+        let keyName = target.keyName;
+        let parameters = target.parameters;
+
+        if (target.keyName && target.component) {
+          this.installComponent(target);
+        } else {
+          id = null;
+          keyName = null;
+          parameters = null;
+        }
 
         this.renderedComponent = {
-          keyName: null,
-          id: null,
+          id,
+          keyName,
+          parameters,
         };
 
-        if (this.installComponent(target)) {
-          this.renderedComponent = {
-            keyName: target.keyName,
-            id: data.id,
-          };
-        }
         return data;
       },
       installComponent(target) {
         let installed = false;
         if (target) {
-          if (!this.renderedComponentList[target]) {
+          if (!this.renderedComponentList[target.keyName]) {
             Vue.component(target.keyName, target.component);
             this.renderedComponentList[target.keyName] = true;
           }
@@ -199,7 +217,7 @@
         }
         return installed;
       },
-      createTabData() {
+       createTabData() {
         const slotList = this.getSlotList(this.$slots.default);
         let reduceList = [].concat(slotList, this.tabData);
 
@@ -339,26 +357,26 @@
         this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
       },
       setScrollIcon(data, type) {
-        const sideIconWidth = 20;
-        this.$nextTick(() => {
-          this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
-          this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-          if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
-            this.useTabScroll = true;
-            if (!this.initScroll) {
-              this.initScroll = true;
-              this.setTransForm(data, type, this.initScroll);
+        setTimeout(() => {
+          const sideIconWidth = 20;
+            this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
+            this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
+            if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
+              this.useTabScroll = true;
+              if (!this.initScroll) {
+                this.initScroll = true;
+                this.setTransForm(data, type, this.initScroll);
+              } else {
+                this.setTransForm(data, type);
+              }
             } else {
-              this.setTransForm(data, type);
+              this.useTabScroll = false;
+              if (this.initScroll) {
+                this.initScroll = false;
+                this.setTransForm(data, 'deleteScroll');
+              }
             }
-          } else {
-            this.useTabScroll = false;
-            if (this.initScroll) {
-              this.initScroll = false;
-              this.setTransForm(data, 'deleteScroll');
-            }
-          }
-        });
+        }, 1);
       },
       getTabItems() {
         return this.$refs.tabItemRef;

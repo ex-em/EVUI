@@ -123,18 +123,20 @@
           left: 0,
           width: 0,
           height: 0,
-          pageX: 0,
-          pageY: 0,
+          clientX: 0,
+          clientY: 0,
         },
       };
     },
     created() {
       this.windowId = `window_${this._uid}_${this.name}`;
-      this.windowStyle = this.getWindowStyle();
       this.windowCls = this.getWindowCls();
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = this.getHeaderCls();
       this.isShow = !this.hidden;
+    },
+    mounted() {
+      this.windowStyle = this.getWindowStyle();
     },
     beforeDestroy() {
       this.isShow = false;
@@ -152,14 +154,14 @@
           left: windowEl.offsetLeft,
           width: windowEl.offsetWidth,
           height: windowEl.offsetHeight,
-          pageX: e.pageX,
-          pageY: e.pageY,
+          clientX: e.clientX,
+          clientY: e.clientY,
         };
 
         if (this.resizable) {
           const clientRect = windowEl.getBoundingClientRect();
-          const x = e.pageX - clientRect.left;
-          const y = e.pageY - clientRect.top;
+          const x = e.clientX - clientRect.left;
+          const y = e.clientY - clientRect.top;
           const isGrabTop = y < this.grabbingBorderSize;
           const isGrabLeft = x < this.grabbingBorderSize;
           const isGrabRight = x >= (clientRect.width - this.grabbingBorderSize);
@@ -175,7 +177,7 @@
           this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.pageX, e.pageY);
+        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -190,8 +192,8 @@
         }
 
         if (this.isMoving) {
-          const diffTop = e.pageY - this.clickedInfo.pageY;
-          const diffLeft = e.pageX - this.clickedInfo.pageX;
+          const diffTop = e.clientY - this.clickedInfo.clientY;
+          const diffLeft = e.clientX - this.clickedInfo.clientX;
 
           this.setCssText({
             top: this.clickedInfo.top + diffTop,
@@ -251,8 +253,8 @@
         const isLeft = this.grabbingBorderPosInfo.left;
         const isRight = this.grabbingBorderPosInfo.right;
         const isBottom = this.grabbingBorderPosInfo.bottom;
-        const diffX = e.pageX - this.clickedInfo.pageX;
-        const diffY = e.pageY - this.clickedInfo.pageY;
+        const diffX = e.clientX - this.clickedInfo.clientX;
+        const diffY = e.clientY - this.clickedInfo.clientY;
         const minWidth = this.removePixel(this.minWidth);
         const minHeight = this.removePixel(this.minHeight);
         let top = this.clickedInfo.top;
@@ -303,8 +305,8 @@
 
         if (this.resizable) {
           const rect = this.$el.getBoundingClientRect();
-          const x = e.pageX - rect.left;
-          const y = e.pageY - rect.top;
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
           const top = y < this.grabbingBorderSize;
           const left = x < this.grabbingBorderSize;
           const right = x >= (rect.width - this.grabbingBorderSize);
@@ -318,7 +320,7 @@
             this.$el.style.cursor = 'ew-resize';
           } else if (bottom || top) {
             this.$el.style.cursor = 'ns-resize';
-          } else if (this.isInHeader(e.pageX, e.pageY)) {
+          } else if (this.isInHeader(e.clientX, e.clientY)) {
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
@@ -327,7 +329,7 @@
               document.body.style.cursor = '';
             }
           }
-        } else if (this.isInHeader(e.pageX, e.pageY)) {
+        } else if (this.isInHeader(e.clientX, e.clientY)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
@@ -425,13 +427,14 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        let top = 0;
-        let left = 0;
+        const clientRect = this.$el.getBoundingClientRect();
         const offsetWidth = document.body.clientWidth;
         const offsetHeight = document.body.clientHeight;
+        let top = 0;
+        let left = 0;
 
-        top = (offsetHeight / 2) - (this.height / 2);
-        left = (offsetWidth / 2) - (this.width / 2);
+        top = (offsetHeight / 2) - (this.height / 2) - clientRect.top;
+        left = (offsetWidth / 2) - (this.width / 2) - clientRect.left;
 
         return {
           top: this.numberToPixel(top),
@@ -506,7 +509,7 @@
 
 <style>
   .ev-window{
-    position: fixed;
+    position: absolute;
     border: 9px solid;
     border-radius: 8px;
     overflow: visible;

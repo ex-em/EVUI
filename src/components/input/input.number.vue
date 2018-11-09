@@ -82,7 +82,6 @@
     return (Math.round(num1 * sf) + Math.round(num2 * sf)) / sf;
   }
   export default {
-      name: 'InputNumber',
       components: {
         icon,
       },
