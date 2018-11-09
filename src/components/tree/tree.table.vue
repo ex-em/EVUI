@@ -356,7 +356,7 @@
     },
     created() {
       window.addEventListener('resize', this.draw);
-      if (!this.treeGroupColumn) {
+      if (!this.treeGroupColumn && this.originColumns[0]) {
         this.treeGroupColumn = this.originColumns[0].field;
       }
     },
@@ -629,6 +629,8 @@
         this.noSizeColList = [];
         this.endColWidth = 0;
 
+        this.resultData = treeUtil.transformTreeToArray(this.originData);
+
         // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
         for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
           // 초기화 한번 시켜주고요
@@ -658,7 +660,7 @@
             (this.filteredData.length * this.rowHeight);
         } else {
           this.verticalScroll = this.gridRecordsHeight <
-            (this.originData.length * this.rowHeight);
+            (this.resultData.length * this.rowHeight);
         }
 
         let leftSize;
@@ -693,16 +695,14 @@
         }
         this.$forceUpdate();
       },
+      setColumns(columns) {
+        this.originColumns = columns;
+        if (!this.treeGroupColumn && this.originColumns[0]) {
+          this.treeGroupColumn = this.originColumns[0].field;
+        }
+      },
       setData(data) {
         this.originData = data;
-        if (this.isFilter) {
-          this.columnFilter();
-        }
-        if (this.isSort) {
-          this.forceSort();
-        } else {
-          this.sortedData = data.slice();
-        }
       },
       cellRender(value, type, cellRender) {
         if (cellRender) {
