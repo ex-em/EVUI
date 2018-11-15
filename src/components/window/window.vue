@@ -13,6 +13,7 @@
       ref="headerArea"
       :style="headerStyle"
       :class="headerCls"
+      @dblclick="onHeaderDblClick"
     >
       <div :class="`${prefixCls}-title-area`">{{ title }}</div>
       <div :class="`${prefixCls}-expand-btn-line`"/>
@@ -84,6 +85,14 @@
       hidden: {
         type: Boolean,
         default: false,
+      },
+      initCenterBase: {
+        type: String,
+        default: 'body',
+        validator(value) {
+          const list = ['body', 'parent'];
+          return list.indexOf(value) > -1;
+        },
       },
       closeType: {
         type: String,
@@ -178,6 +187,9 @@
         }
 
         this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
+        if (!this.isMoving) {
+          this.$emit('onmousedown', e);
+        }
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -200,18 +212,26 @@
             left: this.clickedInfo.left + diffLeft,
           });
         }
+
+        this.$emit('onmousemove', e);
       },
-      onMouseUp() {
+      onMouseUp(e) {
         this.isMoving = false;
         this.isGrabbingBorder = false;
 
+        this.$emit('onmouseup', e);
         window.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onMouseUp);
       },
-      onMouseOut() {
+      onMouseOut(e) {
         if (!this.isMoving) {
           document.body.style.cursor = '';
         }
+
+        this.$emit('onmouseout', e);
+      },
+      onHeaderDblClick(e) {
+        this.$emit('onheaderdblclick', e);
       },
       clickExpandBtn() {
         if (this.isFullExpandWindow) {
@@ -240,7 +260,7 @@
         this.isFullExpandWindow = !this.isFullExpandWindow;
       },
       clickCloseBtn() {
-        this.$emit('beforeClose', this);
+        this.$emit('onbeforeclose', this);
 
         if (this.closeType === 'hide') {
           this.hide();
@@ -428,13 +448,24 @@
       },
       getWindowStyle() {
         const clientRect = this.$el.getBoundingClientRect();
-        const offsetWidth = document.body.clientWidth;
-        const offsetHeight = document.body.clientHeight;
-        let top = 0;
-        let left = 0;
+        let top;
+        let left;
+        let parentWidth;
+        let parentHeight;
 
-        top = (offsetHeight / 2) - (this.height / 2) - clientRect.top;
-        left = (offsetWidth / 2) - (this.width / 2) - clientRect.left;
+        if (this.initCenterBase === 'parent' && this.$el && this.$el.parentElement) {
+          parentWidth = this.$el.parentElement.clientWidth;
+          parentHeight = this.$el.parentElement.clientHeight;
+
+          top = (parentHeight / 2) - (this.height / 2);
+          left = (parentWidth / 2) - (this.width / 2);
+        } else {
+          parentWidth = document.body.clientWidth;
+          parentHeight = document.body.clientHeight;
+
+          top = (parentHeight / 2) - (this.height / 2) - clientRect.top;
+          left = (parentWidth / 2) - (this.width / 2) - clientRect.left;
+        }
 
         return {
           top: this.numberToPixel(top),
@@ -497,7 +528,6 @@
         return result || 0;
       },
       show() {
-        this.windowStyle = this.getWindowStyle();
         this.isShow = true;
       },
       hide() {
