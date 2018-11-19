@@ -118,6 +118,7 @@
 .evui-btn-span{
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 /** evui-btn > type(primary) **/
