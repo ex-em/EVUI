@@ -66,9 +66,7 @@
     },
     methods: {
       onClick(event) {
-        const childEl = event.currentTarget.children[0];
-        const text = childEl.tagName === 'SPAN' ? childEl.innerText : '';
-        this.$emit('click', event, text);
+        this.$emit('click', event);
       },
       _getBtnClass() {
         return {
