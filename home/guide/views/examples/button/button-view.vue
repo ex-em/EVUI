@@ -27,9 +27,7 @@
   import buttonType from './button-type';
   import buttonSize from './button-size';
   import buttonShape from './button-shape';
-  import buttonHighPriority from './button-high-priority';
   import buttonDisabled from './button-disabled';
-  import buttonLoading from './button-loading';
 
   export default {
     components: {
@@ -37,9 +35,7 @@
       buttonType,
       buttonSize,
       buttonShape,
-      buttonHighPriority,
       buttonDisabled,
-      buttonLoading,
     },
     data() {
       return {
@@ -70,24 +66,11 @@
                           기본 값은 모서리가 둥근 사각형입니다.`,
           },
           {
-            title: 'High Priority',
-            component: buttonHighPriority,
-            url: './guide/views/examples/button/button-high-priority.vue',
-            description: '버튼의 중요도를 설정할 수 있습니다.',
-          },
-          {
             title: 'Disabled',
             component: buttonDisabled,
             url: './guide/views/examples/button/button-disabled.vue',
             description: `버튼을 비활성화 시킬 수 있습니다.
                           disabled 속성을 true 로 설정하십시오.`,
-          },
-          {
-            title: 'Loading',
-            component: buttonLoading,
-            url: './guide/views/examples/button/button-loading.vue',
-            description: `버튼에 로딩마스크를 활용할 수 있습니다.
-                          로드 상태를 표시하려면로드 속성을 true 로 설정하십시오.`,
           },
         ],
       };

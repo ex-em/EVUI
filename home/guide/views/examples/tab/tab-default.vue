@@ -26,9 +26,8 @@
 <script>
   import targetComponent1 from '../checkbox/checkbox-group-list-handling';
   import targetComponent2 from '../table/table-buffer';
-  import targetComponent3 from '../button/button-loading';
-  import targetComponent4 from '../chart/chart.bar.stack';
-  import targetComponent5 from '../table/table-page';
+  import targetComponent3 from '../chart/chart.bar.stack';
+  import targetComponent4 from '../table/table-page';
 
   const componentList = [targetComponent1, targetComponent2, targetComponent3];
 
@@ -58,14 +57,6 @@
             targetComponent: {
               keyName: 'targetComponent4',
               component: targetComponent4,
-            },
-          },
-          {
-            title: 'appended tab',
-            isActive: false,
-            targetComponent: {
-              keyName: 'targetComponent5',
-              component: targetComponent5,
             },
           },
         ],
