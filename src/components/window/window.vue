@@ -13,6 +13,7 @@
       ref="headerArea"
       :style="headerStyle"
       :class="headerCls"
+      @dblclick="onHeaderDblClick"
     >
       <div :class="`${prefixCls}-title-area`">{{ title }}</div>
       <div :class="`${prefixCls}-expand-btn-line`"/>
@@ -186,6 +187,9 @@
         }
 
         this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
+        if (!this.isMoving) {
+          this.$emit('onmousedown', e);
+        }
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -208,18 +212,26 @@
             left: this.clickedInfo.left + diffLeft,
           });
         }
+
+        this.$emit('onmousemove', e);
       },
-      onMouseUp() {
+      onMouseUp(e) {
         this.isMoving = false;
         this.isGrabbingBorder = false;
 
+        this.$emit('onmouseup', e);
         window.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onMouseUp);
       },
-      onMouseOut() {
+      onMouseOut(e) {
         if (!this.isMoving) {
           document.body.style.cursor = '';
         }
+
+        this.$emit('onmouseout', e);
+      },
+      onHeaderDblClick(e) {
+        this.$emit('onheaderdblclick', e);
       },
       clickExpandBtn() {
         if (this.isFullExpandWindow) {
@@ -248,7 +260,7 @@
         this.isFullExpandWindow = !this.isFullExpandWindow;
       },
       clickCloseBtn() {
-        this.$emit('beforeClose', this);
+        this.$emit('onbeforeclose', this);
 
         if (this.closeType === 'hide') {
           this.hide();
