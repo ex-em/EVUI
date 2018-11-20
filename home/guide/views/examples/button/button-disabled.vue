@@ -1,33 +1,22 @@
 <template>
   <div class="btn-disabled">
-    <Button
-      :name="name"
-      :text="text"
-      :disabled="disabled"
-    />
+    <ev-button
+      :type="'primary'"
+      :disabled="true"
+    >
+      disabled
+    </ev-button>
   </div>
 </template>
-<script>
-  import '@/styles/evui.css';
-  import Button from '@/components/button';
 
-  export default {
-    components: {
-      Button,
-    },
-    data() {
-      return {
-        name: 'disabledBtn',
-        text: 'disabled',
-        disabled: true,
-      };
-    },
-  };
+<script>
+  export default {};
 </script>
-<style scoped>
+
+<style>
   .btn-disabled{
     display: inline-block;
-    margin-left: 5px;
+    margin: 5px;
     height: 40px;
   }
 </style>
