@@ -108,7 +108,6 @@ export default {
   },
   methods: {
     change(e) {
-      console.log('radio change');
       if (this.disabled) {
         return;
       }
