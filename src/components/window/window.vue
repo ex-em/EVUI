@@ -28,7 +28,11 @@
       />
     </div>
     <div :class="`${prefixCls}-body-area`">
-      <component :is="content"/>
+      <component
+        :is="content"
+        v-bind="bodyProps"
+        @onbodyevent="onBodyEvent"
+      />
     </div>
   </div>
 </template>
@@ -106,6 +110,10 @@
         type: Boolean,
         default: true,
       },
+      bodyProps: {
+        type: Object,
+        default: null,
+      },
     },
     data() {
       return {
@@ -151,6 +159,9 @@
       this.isShow = false;
     },
     methods: {
+      onBodyEvent(eventInfo) {
+        this.$emit(eventInfo.name, eventInfo.payload);
+      },
       onMouseDown(e) {
         const windowEl = this.$el;
 
