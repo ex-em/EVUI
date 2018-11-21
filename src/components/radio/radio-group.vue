@@ -33,7 +33,6 @@ import { getMatchedComponentsDownward } from '../../common/utils';
 const prefixCls = 'evui-radio-group';
 
 export default {
-  name: 'RadioGroup',
   components: {
     Radio,
   },

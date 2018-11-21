@@ -26,7 +26,6 @@
   const prefixCls = 'evui-slider-tooltip';
 
   export default {
-    name: 'SliderTootip',
     props: {
       posX: {
         type: Number,

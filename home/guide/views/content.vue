@@ -4,13 +4,12 @@
       ref="menuNav"
       :store="menuStore"
     />
-    <div class="evui-right-content">
+    <div class="evui-main-content-body">
       <router-view
         :store="$route.path === '/' ? menuStore : ''"
         @selectedSummary="getSelectedSummary"
       />
     </div>
-    <div class="evui-page-anchor"/>
   </div>
 </template>
 
@@ -25,7 +24,7 @@
     props: {
       imgUrl: {
         type: String,
-        default: './guide/images/',
+        default: './guide/images',
       },
     },
     data() {
@@ -53,6 +52,12 @@
                 imgUrl: `${this.imgUrl}/dock.png`,
               },
               {
+                name: 'Tab',
+                routerLink: '/tab',
+                content: '탭 패널 샘플',
+                imgUrl: `${this.imgUrl}/tab.png`,
+              },
+              {
                 name: 'Window',
                 routerLink: '/window',
                 content: '윈도우',
@@ -63,12 +68,6 @@
                 routerLink: '/contextmenu',
                 content: '컨텍스트 메뉴',
                 imgUrl: `${this.imgUrl}/contextmenu.png`,
-              },
-              {
-                name: 'Tab',
-                routerLink: '/tab',
-                content: '탭 패널 샘플',
-                imgUrl: `${this.imgUrl}/tab.png`,
               },
             ],
           },
@@ -116,6 +115,12 @@
                 name: 'Table',
                 routerLink: '/table',
                 content: '테이블 - 그리드',
+                imgUrl: `${this.imgUrl}/table.png`,
+              },
+              {
+                name: 'Tree',
+                routerLink: '/tree',
+                content: '트리, 트리 테이블',
                 imgUrl: `${this.imgUrl}/table.png`,
               },
               {
@@ -195,6 +200,12 @@
                 content: '로딩마스크',
                 imgUrl: `${this.imgUrl}/loadingmask.png`,
               },
+              {
+                name: 'Icon',
+                routerLink: '/icon',
+                content: '아이콘',
+                // imgUrl: `${this.imgUrl}/icon.png`,
+              },
             ],
           },
         ],
@@ -213,16 +224,13 @@
 
 <style scoped>
   .evui-main-content {
-    display: inline-flex;
-    margin-top: 55px;
+    position: relative;
     width: 100%;
+    height: 100%;
+    padding: 0 240px;
   }
-  .evui-right-content {
+  .evui-main-content-body {
     padding: 20px;
-    flex: 1;
     border-left: 1px solid #dddee0;
-  }
-  .evui-page-anchor {
-    width: 240px;
   }
 </style>

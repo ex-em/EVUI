@@ -17,15 +17,15 @@
 </template>
 
 <script>
-  import buttonType from './../button/button-type';
+  import ButtonType from './../button/button-type';
 
   export default {
     components: {
-      buttonType,
+      ButtonType,
     },
     data() {
       return {
-        buttonType,
+        buttonType: ButtonType,
       };
     },
     methods: {

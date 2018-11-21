@@ -1,54 +1,52 @@
 <template>
-  <div class="evui-codeview">
+  <div
+    :style="{ height: boxHeight+'px' }"
+    :class="isActive"
+    class="evui-codeview"
+  >
     <div
-      :style="{ height: boxHeight+'px' }"
-      :class="isActive"
-      class="evui-codeview-example"
+      v-if="description && !isBottom"
+      ref="descriptionLayer"
+      class="evui-codeview-description"
     >
+      <span>{{ description }}</span>
+    </div>
+    <div
+      ref="exampleLayer"
+      class="evui-codeview-example-layer"
+    >
+      <slot/>
       <div
-        v-if="description && !isBottom"
+        v-if="description && isBottom"
         ref="descriptionLayer"
         class="evui-codeview-description"
       >
         <span>{{ description }}</span>
       </div>
+    </div>
+    <div>
+      <div class="evui-codeview-split-layer"/>
       <div
-        ref="exampleLayer"
-        class="evui-codeview-example-layer"
+        ref="codeLayer"
+        class="evui-codeview-code-layer"
       >
-        <slot/>
-        <div
-          v-if="description && isBottom"
-          ref="descriptionLayer"
-          class="evui-codeview-description"
-        >
-          <span>{{ description }}</span>
-        </div>
+        <codemirror
+          :value="rawCode"
+          :options="codeOption"
+        />
       </div>
-      <div>
-        <div class="evui-codeview-split-layer"/>
+      <div
+        class="evui-codeview-example-bar"
+        @click.stop="onBottomClick"
+      >
         <div
-          ref="codeLayer"
-          class="evui-codeview-code-layer"
+          :class="selectIconClasses"
+          class="evui-codeview-example-bar-icon"
         >
-          <codemirror
-            :value="rawCode"
-            :options="codeOption"
-          />
-        </div>
-        <div
-          class="evui-codeview-example-bar"
-          @click.stop="onBottomClick"
-        >
-          <div
-            :class="selectIconClasses"
-            class="evui-codeview-example-bar-icon"
-          >
-            <icon class="fa-sort-down"/>
-            <span
-              class="evui-codeview-example-bar-span"
-            >{{ txtBottomBar }}</span>
-          </div>
+          <icon class="fa-sort-down"/>
+          <span
+            class="evui-codeview-example-bar-span"
+          >{{ txtBottomBar }}</span>
         </div>
       </div>
     </div>
@@ -152,21 +150,17 @@
 </script>
 <style scoped>
   .evui-codeview{
-    padding: 5px;
-  }
-  .evui-codeview-example{
     position: relative;
-    display: block;
-    flex-direction: column;
     width: 100%;
     border: 1px solid #dfe6e9;
+    margin: 5px;
     padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
     z-index: 1;
     transition: height .3s ease-in-out;
   }
-  .evui-codeview-example.expand{
+  .evui-codeview.expand{
     transition: height .3s ease-in-out;
   }
   .evui-codeview-example-layer{

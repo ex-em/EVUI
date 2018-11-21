@@ -15,14 +15,14 @@
           @mousewheel="wheelEvent"
         >
           <span
-            v-if="tabScroll"
+            v-if="useTabScroll"
             class="ev-tabs-nav-prev"
             @click.stop="onLeftMove"
           >
             <icon class="fa-angle-left"/>
           </span>
           <span
-            v-if="tabScroll"
+            v-if="useTabScroll"
             class="ev-tabs-nav-next"
             @click.stop="onRightMove"
           >
@@ -34,18 +34,21 @@
           >
             <div
               ref="tabListRef"
-              :style="styleObj"
+              :style="moveTranslateX"
               class="ev-tabs-nav"
             >
               <tab
-                v-for="(tab, index) in tabs"
+                v-for="(tab, index) in currentTabList"
+                ref="tabItemRef"
                 :key="index"
                 :tab-prop="tab"
+                :tab-index="tab.id"
                 :min-width="defaultTabWidth"
+                draggable="true"
                 @close="close"
                 @set-active="setActive"
-                @drag-start="onDragStart"
-                @drag-end="onDragEnd"
+                @drag-start="onDragStart($event, tab, index)"
+                @drag-end="onDragEnd($event, tab, index)"
               />
             </div>
           </div>
@@ -59,6 +62,7 @@
         <component
           :is="renderedComponent.keyName"
           :key="renderedComponent.id"
+          v-bind="renderedComponent.parameters"
         />
       </keep-alive>
     </div>
@@ -66,12 +70,14 @@
 </template>
 
 <script>
+  import Vue from 'vue';
   import icon from '@/components/icon/icon';
   import tab from './tab';
 
   const unpackNode = function unpackNode(node) {
     let data = null;
-    if (node.tag !== undefined) {
+    const tagNameRxg = new RegExp(/(EvTab)+/g);
+    if (node.tag && node.tag.match(tagNameRxg).length > 0) {
       data = node.componentOptions.propsData.tabProp;
     }
     return data;
@@ -100,113 +106,133 @@
         type: Boolean,
         default: false,
       },
+      useFlexibleScroll: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
-        tabScroll: this.scrollable,
-        originTabList: this.tabData,
-        tabs: this.createTabData(),
+        idTag: 0,
+        tabCount: 0,
+        defaultTabWidth: 100,
+        currentX: 0,
+        renderedComponentList: {},
+        tabListRect: null,
+        tabWrapperRect: null,
         currentTab: {
           isActive: false,
         },
-        idTag: 0,
-        tabLength: 0,
-        defaultTabWidth: 100,
-        renderedComponentList: {},
         renderedComponent: {
           id: null,
           keyName: null,
         },
-        tabListRect: null,
-        tabWrapperRect: null,
-        styleObj: 'transform: \'\'',
-        currentX: 0,
+        moveTranslateX: 'transform: \'\'',
+        originTabList: this.tabData,
+        useTabScroll: this.scrollable,
+        currentTabList: this.createTabData(),
+        indicator: 0,
+        currentTabIndex: 0,
       };
     },
     computed: {
       showScrollable() {
         return [{
-          active: this.tabScroll,
+          active: this.useTabScroll,
         }];
       },
     },
     watch: {
-      styleObj() {
-        console.log(this.styleObj);
-      },
       currentTab() {
-        this.currentTab.isActive = true;
+        // this.currentTab.isActive = true;
       },
       originTabList() {
-        if (this.checkAppendedTag()) {
+        if (this.tabCount < this.originTabList.length) {
           const obj = {
             id: `${this._uid}_tab_${this.idTag}`,
           };
-
           const tabItem = Object.assign({}, this.originTabList[this.originTabList.length - 1], obj);
-
-          this.tabs.push(tabItem);
+          this.currentTabList.push(tabItem);
           this.setActive(tabItem);
           this.idTag += 1;
-          this.tabLength += 1;
-          this.setTabListWidth('added');
+          this.tabCount += 1;
+          this.setScrollIcon(tabItem, 'add');
         }
       },
     },
     mounted() {
-      this.idTag = Number(this.tabs.length);
-      this.tabLength = Number(this.originTabList.length);
-
-      this.tabs = this.tabs.map((v) => {
-        const target = v.targetComponent;
-        this.installComponent(target);
-        return v;
+      this.$nextTick(() => {
+        this.idTag = Number(this.currentTabList.length);
+        this.tabCount = Number(this.originTabList.length);
+        this.currentTabList.forEach((v) => {
+          const target = v.targetComponent;
+          this.installComponent(target);
+        });
+        this.setActive(this.findActiveTab());
+        this.setScrollIcon();
       });
-      this.setActive(this.tabs[this.tabs.length - 1]);
-      this.setTabListWidth();
     },
     methods: {
+      findActiveTab() {
+        let firstIdx = 0;
+        let tabData = null;
+        for (let ix = 0; ix < this.currentTabList.length; ix++) {
+          tabData = this.currentTabList[ix];
+          if (tabData.isActive) {
+            firstIdx = ix;
+          }
+        }
+        return this.currentTabList[firstIdx];
+      },
       renderTab(data) {
         const target = data.targetComponent;
+        let id = data.id;
+        let keyName = target.keyName;
+        let parameters = target.parameters;
+
+        if (target.keyName && target.component) {
+          this.installComponent(target);
+        } else {
+          id = null;
+          keyName = null;
+          parameters = null;
+        }
 
         this.renderedComponent = {
-          keyName: null,
-          id: null,
+          id,
+          keyName,
+          parameters,
         };
 
-        if (this.installComponent(target)) {
-          this.renderedComponent = {
-            keyName: target.keyName,
-            id: data.id,
-          };
-        }
         return data;
       },
       installComponent(target) {
         let installed = false;
         if (target) {
-          if (!this.renderedComponentList[target]) {
-            this.$Vue.component(target.keyName, target.component);
+          if (!this.renderedComponentList[target.keyName]) {
+            Vue.component(target.keyName, target.component);
             this.renderedComponentList[target.keyName] = true;
           }
           installed = true;
         }
         return installed;
       },
-      createTabData() {
-        let result = [];
+       createTabData() {
         const slotList = this.getSlotList(this.$slots.default);
+        let reduceList = [].concat(slotList, this.tabData);
 
-        result = result.concat(slotList, this.tabData).reduce((acc, curr) => {
-          const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
-          return val;
-        });
-
-        for (let i = 0, length = result.length; i < length; i++) {
-          this.appendTabId(result[i], i);
+        if (reduceList.length > 1) {
+          reduceList = reduceList.reduce((acc, curr) => {
+            const val = this.orderingSlotFirst ? [].concat(acc, curr) : [].concat(curr, acc);
+            return val;
+          });
         }
 
-        return result;
+        for (let i = 0, length = reduceList.length; i < length; i++) {
+          this.appendTabId(reduceList[i], i);
+        }
+
+        return reduceList;
       },
       appendTabId(data, index) {
         const obj = {};
@@ -239,30 +265,29 @@
         return slotList;
       },
       setActive(data) {
-        for (let i = 0, length = this.tabs.length; i < length; i++) {
+        for (let i = 0, length = this.currentTabList.length; i < length; i++) {
           const obj = { isActive: false };
-          if (this.tabs[i].id === data.id) {
+          if (this.currentTabList[i].id === data.id) {
             obj.isActive = true;
-            this.currentTab = this.tabs[i];
+            this.currentTab = this.currentTabList[i];
             this.renderTab(data);
           }
-          this.tabs[i].isActive = obj.isActive;
+          this.currentTabList[i].isActive = obj.isActive;
         }
       },
       close(data) {
         this.removeTabTarget(data);
-        this.setTabListWidth('removal');
+        this.setScrollIcon(data, 'removal');
       },
       removeTabTarget(data) {
-        if (this.tabs.length === 1) {
-          console.log('last one!');
+        if (this.currentTabList.length === 1) {
           return;
         }
-        const result = this.tabs;
+        const result = this.currentTabList;
         for (let i = 0, length = result.length; i < length; i++) {
-          if (this.tabs[i].id === data.id) {
+          if (this.currentTabList[i].id === data.id) {
             result.splice(i, 1);
-            this.tabLength -= 1;
+            this.tabCount -= 1;
             if (data.isActive) {
               this.setActive(result[result.length - 1]);
             }
@@ -270,16 +295,15 @@
           }
         }
       },
-      checkAppendedTag() {
-        return this.tabLength < this.originTabList.length;
-      },
       onDragStart() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
       onDragEnd() {
+        // TODO 이벤트 추가작업 필요(MoveLeft or MoveRight)
       },
       wheelEvent(e) {
         e.preventDefault();
-        if (!this.tabScroll) {
+        if (!this.useTabScroll) {
           return;
         }
         if (e.wheelDeltaY === 120) {
@@ -291,43 +315,71 @@
       onLeftMove(e) {
         if (this.currentX > -100) {
           this.currentX = 0;
-          this.styleObj = `transform: translateX(${this.currentX}px);`;
+          this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
           return;
         }
         this.onChangeTransForm(e, 'left');
       },
       onRightMove(e) {
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
+        const tabItemX = tabItemRef[tabItemRef.length - 1].$el.getBoundingClientRect().x;
+        const wrapperWidth = this.$refs.tabListWrapperRef.getBoundingClientRect().width;
+        if (Math.abs(wrapperWidth - tabItemX) < tabItemEl.width) {
+          return;
+        }
         this.onChangeTransForm(e, 'right');
       },
       onChangeTransForm(e, type) {
-        const moveInterval = Math.ceil(this.tabWrapperRect.width * 0.1);
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
         if (type === 'left') {
-          this.currentX += moveInterval;
+          this.currentX += ((tabItemEl.width) + 4);
         } else if (type === 'right') {
-          this.currentX -= moveInterval;
+          this.currentX -= ((tabItemEl.width) + 4);
         }
-        this.styleObj = `transform: translateX(${this.currentX}px);`;
+        this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
       },
-      setTranslatePosition(type) {
-        if (type === 'added') {
-          const moveInterval = this.defaultTabWidth;
-          this.currentX -= moveInterval;
-        }
-        this.styleObj = `transform: translateX(${this.currentX}px);`;
-      },
-      setTabListWidth(type) {
-        this.$nextTick(() => {
-          this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
-          this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
-          if (this.tabWrapperRect.width < this.tabListRect.width + 20) {
-            this.tabScroll = true;
+      setTransForm(data, type, init) {
+        const tabItemRef = this.$refs.tabItemRef;
+        const tabItemEl = tabItemRef[0].$el.getBoundingClientRect();
+        if (type === 'add') {
+          if (init) {
+            this.currentX -= 25;
           } else {
-            this.tabScroll = false;
+            this.currentX -= ((tabItemEl.width) + 4);
           }
-          if (this.tabScroll) {
-            this.setTranslatePosition(type);
-          }
-        });
+        } else if (type === 'removal') {
+          this.currentX += ((tabItemEl.width) + 4);
+        } else if (type === 'deleteScroll') {
+          this.currentX = 0;
+        }
+        this.moveTranslateX = `transform: translateX(${this.currentX}px);`;
+      },
+      setScrollIcon(data, type) {
+        setTimeout(() => {
+          const sideIconWidth = 20;
+            this.tabWrapperRect = this.$refs.tabListWrapperRef.getBoundingClientRect();
+            this.tabListRect = this.$refs.tabListRef.getBoundingClientRect();
+            if (this.tabWrapperRect.width < this.tabListRect.width + sideIconWidth) {
+              this.useTabScroll = true;
+              if (!this.initScroll) {
+                this.initScroll = true;
+                this.setTransForm(data, type, this.initScroll);
+              } else {
+                this.setTransForm(data, type);
+              }
+            } else {
+              this.useTabScroll = false;
+              if (this.initScroll) {
+                this.initScroll = false;
+                this.setTransForm(data, 'deleteScroll');
+              }
+            }
+        }, 1);
+      },
+      getTabItems() {
+        return this.$refs.tabItemRef;
       },
     },
   };
@@ -335,15 +387,21 @@
 
 <style scoped>
   .ev-tabs {
-    box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 30px 0 0 0;
     color: #495060;
     zoom: 1;
   }
   .ev-tabs-outer {
   }
   .ev-tabs-title-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 32px;
     outline: none;
     border-bottom: 1px solid #dddee1;
   }
@@ -377,6 +435,7 @@
     cursor: pointer;
   }
   .ev-tab-list-scroll {
+    width: 100%;
     overflow: hidden;
   }
   .ev-tabs-nav {
@@ -391,6 +450,8 @@
   }
 
   .ev-tab-content-container {
+    width: 100%;
+    height: 100%;
     border: 1px solid #dddee1;
     border-top: 0;
     padding: 3px;
@@ -416,5 +477,8 @@
   }
   .ev-tabs-nav-next:hover, .ev-tabs-nav-prev:hover {
     color: #2d8cf0;
+  }
+  .ev-indicator {
+    display: inline-block;
   }
 </style>

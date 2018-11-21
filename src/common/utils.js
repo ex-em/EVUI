@@ -1,14 +1,5 @@
-import Vue from 'vue';
-
-const vm = new Vue();
 const windowConsole = window.console;
 export const prefix = 'evui-';
-
-const Utils = {
-  getId() {
-    return prefix + vm._uid;
-  },
-};
 
 export const Console = {
   log(...data) {
@@ -63,4 +54,22 @@ export function getMatchedComponentUpward(context, componentName) {
   return parent;
 }
 
-export default Utils;
+export function convertToPercent(value, totalValue) {
+  if (!value || !totalValue) {
+    return 0;
+  }
+
+  return +((value / totalValue) * 100).toFixed(2);
+}
+
+export function convertToValue(value, totalValue) {
+  let result = 0;
+
+  if (!value || !totalValue) {
+    return result;
+  }
+
+  result = (value / 100) * totalValue;
+
+  return +result.toFixed(2);
+}

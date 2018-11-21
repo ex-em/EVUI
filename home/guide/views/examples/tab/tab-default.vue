@@ -1,51 +1,42 @@
 <template>
   <div class="outer">
     <div class="button-outer">
-      <Button
+      <ev-button
         :type="'primary'"
         :text="'Tab Add'"
         @click="addTab"
       />
     </div>
     <div class="tab-default-outer">
-      <tabs
+      <ev-tabs
         :tab-data="list"
       >
-        <tab
+        <ev-tab
           :tab-prop="tabItem"
         />
-        <tab
+        <ev-tab
           v-for="item in tabItems"
           :key="item.id"
           :tab-prop="item"
         />
-      </tabs>
+      </ev-tabs>
     </div>
   </div>
 </template>
 <script>
-  import tab from '@/components/tab/tab';
-  import tabs from '@/components/tab/tabs';
-  import Button from '@/components/button/button';
   import targetComponent1 from '../checkbox/checkbox-group-list-handling';
   import targetComponent2 from '../table/table-buffer';
-  import targetComponent3 from '../button/button-loading';
-  import targetComponent4 from '../chart/chart.bar.stack';
-  import targetComponent5 from '../table/table-page';
+  import targetComponent3 from '../chart/chart.bar.stack';
+  import targetComponent4 from '../table/table-page';
 
   const componentList = [targetComponent1, targetComponent2, targetComponent3];
 
   export default {
-    components: {
-      tab,
-      tabs,
-      Button,
-    },
     data() {
       return {
         scroll: false,
         tabItem: {
-          title: 'use Tag 0',
+          title: 'appended tab',
           isActive: false,
           targetComponent: {
             keyName: 'targetComponent1',
@@ -53,7 +44,7 @@
           },
         },
         tabItems: [{
-            title: 'use Tag 1',
+            title: 'appended tab',
             isActive: false,
             targetComponent: {
               keyName: 'targetComponent3',
@@ -61,19 +52,11 @@
             },
           },
           {
-            title: 'use Tag 2',
+            title: 'appended tab',
             isActive: false,
             targetComponent: {
               keyName: 'targetComponent4',
               component: targetComponent4,
-            },
-          },
-          {
-            title: 'use Tag 3',
-            isActive: false,
-            targetComponent: {
-              keyName: 'targetComponent5',
-              component: targetComponent5,
             },
           },
         ],
@@ -95,16 +78,15 @@
         const result = [];
         for (let i = 0, length = 3; i < length; i++) {
           result.push({
-            title: `tab${i + 1}`,
+            title: 'appended tab',
             isActive: false,
-            width: 300,
+            width: 100,
             targetComponent: {
               keyName: `target-component${i + 1}`,
               component: componentList[i],
             },
           });
         }
-
         return result;
       },
     },

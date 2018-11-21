@@ -1,217 +1,222 @@
 import _ from 'lodash';
+import moment from 'moment';
 import DataStore from './data';
 
 export default class StackDataStore extends DataStore {
   getSeriesExtends(defaultSeries, param) {
     const chartType = this.chartOptions.type;
+    const horizontal = !!(this.chartOptions.horizontal);
+    const skey = Object.keys(this.seriesList);
     let extSeries;
 
     if (chartType === 'line') {
       extSeries = {
-        axisIndex: {
-          x: param.xAxisIndex ? param.xAxisIndex : 0,
-          y: param.yAxisIndex ? param.yAxisIndex : 0,
-        },
+        horizontal,
+        axisType: horizontal ? 'y' : 'x',
+        xAxisIndex: param.xAxisIndex ? param.xAxisIndex : 0,
+        yAxisIndex: param.yAxisIndex ? param.yAxisIndex : 0,
         point: param.point || false,
         pointSize: param.pointSize || 4,
         pointStyle: param.pointStyle || '',
-        pointFill: param.pointFill || this.chartOptions.colors[this.seriesList.length],
+        pointFill: param.pointFill || this.chartOptions.colors[skey.length],
         lineWidth: param.lineWidth || 2,
         fill: param.fill || false,
-        fillColor: param.fillColor || this.chartOptions.colors[this.seriesList.length],
+        fillColor: param.fillColor || this.chartOptions.colors[skey.length],
         fillOpacity: param.fillOpacity || 0.4,
-        stackArr: [],
-        stackOffsetIndex: 0,
       };
     } else if (chartType === 'bar') { // 'bar'
       extSeries = {
-        axisIndex: {
-          x: param.xAxisIndex ? param.xAxisIndex : 0,
-          y: param.yAxisIndex ? param.yAxisIndex : 0,
-        },
-        stackArr: [],
-        stackOffsetIndex: 0,
+        horizontal,
+        axisType: horizontal ? 'y' : 'x',
+        xAxisIndex: param.xAxisIndex ? param.xAxisIndex : 0,
+        yAxisIndex: param.yAxisIndex ? param.yAxisIndex : 0,
       };
     }
 
     return _.merge(defaultSeries, extSeries);
   }
 
-  addValues(seriesIndex) {
-    const isStack = this.chartOptions.stack;
-    const isCategory = this.chartData.category;
+  /**
+   * loop for addGraphData
+   * @param seriesId (require)
+   * @param data ex. [100,200,300,400,500]
+   */
+  addGraphDataSet(seriesId, data) {
+    const series = this.seriesList[seriesId];
+    const axisType = series.axisType;
+    const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
 
-    const baseIndex = this.findBaseSeries(this.seriesList[seriesIndex].id);
-    const values = this.seriesList[seriesIndex].oData;
+    if (!this.axisList[axisType][axisIndex]) {
+      this.axisList[axisType][axisIndex] = [];
+      this.createDummyAxis(axisType, axisIndex);
+    }
 
-    for (let ix = 0, ixLen = values.length; ix < ixLen; ix++) {
-      if (isStack && baseIndex !== null) {
-        if (isCategory) {
-          this.addCategoryStackValue(seriesIndex, values[ix], baseIndex);
-        } else {
-          this.addStackValue(seriesIndex, values[ix], baseIndex);
-        }
-      } else {
-        this.addValue(seriesIndex, values[ix]);
-      }
+    const axis = this.axisList[axisType][axisIndex];
+
+    this.setSeriesGroupInfo(seriesId);
+
+    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
+      this.addGraphStackData(seriesId, axis[ix], data[ix]);
     }
   }
 
-  addCategoryStackValue(currSeriesIndex, value, baseSeriesIndex, dataIndex) {
-    if (this.seriesList === undefined) {
-      return;
+  addGraphStackData(seriesId, axisData, graphData, dataIndex) {
+    const isHorizontal = !!this.chartOptions.horizontal;
+    const data = this.graphData[seriesId];
+    const series = this.seriesList[seriesId];
+    const axisType = series.axisType;
+
+    let axisOption;
+    let axisIndex;
+    let dateObj;
+
+    let adata; // axis
+    let gdata; // graph
+    let sdata; // sum
+
+    let bSId;
+    let bdata;
+    let b;
+
+    if (!series.isExistGrp) {
+      this.setSeriesGroupInfo(seriesId);
     }
 
-    let dataIdx = dataIndex;
-    const cSeries = this.seriesList[currSeriesIndex];
-    const bSeries = this.seriesList[baseSeriesIndex];
-    const category = this.chartData.category;
+    const groupIndex = series.groupIndex;
+    const stackIndex = series.stackIndex;
 
-    if (!cSeries || !bSeries) {
-      return;
+
+    if (axisType === 'x') {
+      axisIndex = series.xAxisIndex;
+      axisOption = this.chartOptions.xAxes[axisIndex];
+    } else {
+      axisIndex = series.yAxisIndex;
+      axisOption = this.chartOptions.yAxes[axisIndex];
     }
 
-    if (dataIdx === null || dataIdx === undefined) {
-      dataIdx = cSeries.cData.length;
-    }
-
-    const base = bSeries.cData[dataIdx];
-    const stackValue = {
-      x: this.chartOptions.horizontal ? value + base.x : category[dataIdx],
-      y: this.chartOptions.horizontal ? category[dataIdx] : value + base.y,
-      b: this.chartOptions.horizontal ? (base.x || 0) : (base.y || 0),
-      point: true,
-    };
-
-    cSeries.cData[dataIdx] = stackValue;
-    cSeries.oData[dataIdx] = value;
-    cSeries.hasAccumulate = true;
-    if (cSeries.show) {
-      this.setMinMaxValue(cSeries, stackValue, dataIdx);
-      this.setMaxLabelWidth(stackValue);
-    }
-  }
-
-  addStackValue(currSeriesIndex, value, baseSeriesIndex, dataIndex) {
-    // Base값을 Series에 배열로 하나로 안달고, 각 Value에다가 집어넣은 이유는
-    // 나중에 RTM용 차트에서 각 Value값을 넣고 빼고 하기 때문에...그를 대비함.
-    // Base 데이터가 null이 들어갈 때 혹은 X값의 좌표가 일치 하지 않을 때
-    // 하나의 값에 여러개의 Base Stack이 붙기 때문.
-    // 1차원 배열에 X Y를 달아 처리하면 어디까지 지워야하는지 찾아야함
-    if (this.seriesList === undefined) {
-      return;
-    }
-    let dataIdx = dataIndex;
-    const cSeries = this.seriesList[currSeriesIndex];
-    const bSeries = this.seriesList[baseSeriesIndex];
-
-    if (!cSeries || !bSeries) {
-      return;
-    }
+    let index = typeof dataIndex === 'number' && dataIndex > -1 ? dataIndex : data.length;
 
     if (this.chartOptions.bufferSize) {
-      if (cSeries.cData.length > this.chartOptions.bufferSize) {
-        cSeries.cData.shift();
-        cSeries.oData.shift();
-
-        --dataIdx;
-        --cSeries.maxIndex;
-        --cSeries.minIndex;
+      if (data.length >= this.chartOptions.bufferSize) {
+        data.shift();
+        --index;
       }
     }
 
-    if (dataIndex === null || dataIndex === undefined) {
-      dataIdx = cSeries.cData.length;
-    }
-    dataIdx += cSeries.stackOffsetIndex;
+    if (groupIndex !== null && stackIndex) {
+      bSId = this.findBaseSeries(seriesId);
 
-    const base = bSeries.cData[dataIdx];
-    const basePrev = bSeries.cData[dataIdx - 1];
-    const lastCurrValue = dataIdx === 0 ? cSeries.cData[0] : cSeries.cData[dataIdx];
-    const stackValue = {
-      x: value.x,
-      y: value.y + base.y,
-      b: [],
-      point: true,
-    };
-
-    const stackBase = stackValue.b;
-    if (value.x === base.x) {
-      if (value.y !== null) {
-        if (dataIdx > 0 && base.y === null) {
-          stackValue.y = value.y;
-          lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
-          stackBase.push({ x: value.x, y: 0 });
-        } else if (dataIdx > 0 && basePrev.y === null) {
-          stackBase.push({ x: value.x, y: 0 });
-          stackBase.push({ x: value.x, y: base.y });
-        } else {
-          stackBase.push({ x: value.x, y: base.y });
-        }
-      } else {
-        stackValue.y = null;
-      }
-    } else if (value.x < base.x) {
-      if (basePrev.y !== null) {
-        const convertBase = this.constructor.calculateBaseValue(bSeries, dataIdx, value.x, -1);
-        cSeries.stackOffsetIndex -= 1;
-
-        if (value.y !== null) {
-          if (dataIdx > 0 && base.y === null) {
-            stackValue.y = value.y;
-            lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
-            stackBase.push({ x: value.x, y: 0 });
-          } else if (dataIdx > 0 && basePrev.y === null) {
-            stackBase.push({ x: value.x, y: 0 });
-          } else {
-            stackBase.push({ x: value.x, y: convertBase });
-          }
-        } else {
-          stackValue.y = null;
-        }
-      } else {
-        lastCurrValue.b.push({ x: value.x, y: 0 });
-      }
-    } else if (value.x > base.x) {
-      cSeries.cData.push({
-        x: base.x,
-        y: base.y,
-        b: [{ x: base.x, y: base.y }],
-        point: false,
-      });
-
-      if (basePrev.y !== null) {
-        if (value.y !== null) {
-          stackValue.y = bSeries.cData[dataIdx + 1].y + value.y;
-          if (dataIdx > 0 && base.y === null) {
-            lastCurrValue.b.push({ x: lastCurrValue.b[lastCurrValue.b.length - 1].x, y: 0 });
-            stackBase.push({ x: value.x, y: 0 });
-          } else if (dataIdx > 0 && basePrev.y === null) {
-            stackBase.push({ x: value.x, y: 0 });
-            stackBase.push({ x: value.x, y: base.y });
-          } else {
-            stackBase.push({ x: base.x, y: base.y });
-            if (bSeries.cData[dataIdx + 1].y === null) {
-              stackBase.push({ x: base.x, y: 0 });
-              stackBase.push({ x: value.x, y: 0 });
-            } else {
-              stackBase.push({ x: value.x, y: bSeries.cData[dataIdx + 1].y });
-            }
-          }
-        } else {
-          stackValue.y = null;
-        }
-      } else {
-        lastCurrValue.b.push({ x: value.x, y: 0 });
+      if (bSId !== false) {
+        bdata = this.graphData[bSId][index];
       }
     }
 
-    cSeries.cData[dataIdx] = stackValue;
-    cSeries.oData[dataIdx] = value;
-    cSeries.hasAccumulate = true;
-    if (cSeries.show) {
-      this.setMinMaxValue(cSeries, stackValue, dataIdx);
-      this.setMaxLabelWidth(stackValue);
+    if (axisOption.labelType === 'time') {
+      dateObj = moment(axisData === undefined ? null : axisData);
+
+      if (dateObj.isValid()) {
+        adata = +dateObj;
+      } else {
+        adata = null;
+      }
+    } else {
+      adata = axisData;
+    }
+
+    if (graphData === undefined || graphData === null || isNaN(graphData) || +graphData < 0) {
+      gdata = groupIndex !== null ? 0 : null;
+    } else {
+      gdata = +graphData;
+    }
+
+    if (isHorizontal) {
+      if (bdata && bdata.y === adata) {
+        b = bdata.x || 0;
+      } else {
+        b = 0;
+      }
+    } else if (bdata && bdata.x === adata) {
+      b = bdata.y || 0;
+    } else {
+      b = 0;
+    }
+
+    if (groupIndex !== null) {
+      sdata = gdata + b;
+    } else {
+      sdata = gdata;
+    }
+
+    if (adata) {
+      if (isHorizontal) {
+        data[index] = { x: sdata, y: adata, b, i: gdata, xp: null, yp: null, w: null, h: null };
+      } else {
+        data[index] = { x: adata, y: sdata, b, i: gdata, xp: null, yp: null, w: null, h: null };
+      }
+      if (series.show) {
+        this.setMinMaxValue(seriesId, adata, sdata, index);
+      }
     }
   }
+
+  findBaseSeries(seriesId) {
+    const series = this.seriesList[seriesId];
+    const groupIndex = series.groupIndex;
+    const stackIndex = series.stackIndex;
+
+    const groups = this.chartData.groups;
+    const group = groups[groupIndex];
+
+    let baseOffset = 1;
+    let baseId = group[stackIndex - baseOffset];
+    let baseSeries = this.seriesList[baseId];
+
+    while (baseSeries && !baseSeries.show) {
+      baseOffset += 1;
+
+      if (stackIndex - baseOffset > -1) {
+        baseId = group[stackIndex - baseOffset];
+        baseSeries = this.seriesList[baseId];
+      } else {
+        baseId = false;
+        break;
+      }
+    }
+
+    return baseId;
+  }
+
+  setSeriesGroupInfo(seriesId) {
+    const groups = this.chartData.groups;
+    const series = this.seriesList[seriesId];
+
+    let group;
+
+    for (let ix = 0, ixLen = groups.length; ix < ixLen; ix++) {
+      group = groups[ix];
+
+      for (let jx = 0, jxLen = group.length; jx < jxLen; jx++) {
+        if (group[jx] === seriesId) {
+          series.stackIndex = jx;
+          series.groupIndex = ix;
+          series.isExistGrp = true;
+          break;
+        }
+      }
+    }
+  }
+  // static calculateBaseValue(series, index, value, comp) {
+  //   if (series.cData[index + comp].y === null) {
+  //     return null;
+  //   }
+  //
+  //   const x1 = +new Date(series.cData[index + comp].x);
+  //   const y1 = series.cData[index + comp].y;
+  //   const x2 = +new Date(series.cData[index].x);
+  //   const y2 = series.cData[index].y;
+  //
+  //   const slope = (y2 - y1) / (x2 - x1);
+  //
+  //   return ((slope * +new Date(value)) - (slope * x1)) + y1;
+  // }
 }

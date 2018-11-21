@@ -1,6 +1,7 @@
 <template>
   <div
-    v-if="isShow"
+    v-if="isExist"
+    v-show="isShow"
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
@@ -9,26 +10,24 @@
     @mouseout="onMouseOut"
   >
     <div
-      ref="topArea"
-      :style="topStyle"
-      :class="topCls"
+      ref="headerArea"
+      :style="headerStyle"
+      :class="headerCls"
+      @dblclick="onHeaderDblClick"
     >
-      <div :class="`${prefixEvui}-title-area`">{{ title }}</div>
-      <div :class="`${prefixEvui}-expand-btn-line`"/>
+      <div :class="`${prefixCls}-title-area`">{{ title }}</div>
+      <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
-        :class="`${prefixEvui}-expand-btn`"
+        :class="`${prefixCls}-expand-btn`"
         @click="clickExpandBtn"
       />
-      <div :class="`${prefixEvui}-close-btn-line`"/>
+      <div :class="`${prefixCls}-close-btn-line`"/>
       <div
-        :class="`${prefixEvui}-close-btn`"
+        :class="`${prefixCls}-close-btn`"
         @click="clickCloseBtn"
       />
     </div>
-    <div
-      :style="bodyStyle"
-      :class="`${prefixEvui}-body-area`"
-    >
+    <div :class="`${prefixCls}-body-area`">
       <component :is="content"/>
     </div>
   </div>
@@ -37,10 +36,7 @@
 <script>
   import '@/styles/evui.css';
 
-  const prefixEvui = 'ev-window';
-
   export default {
-    name: 'Window',
     props: {
       name: {
         type: String,
@@ -83,8 +79,28 @@
         default: '',
       },
       content: {
-        type: Object,
+        type: [Object, String],
         default: null,
+      },
+      hidden: {
+        type: Boolean,
+        default: false,
+      },
+      initCenterBase: {
+        type: String,
+        default: 'body',
+        validator(value) {
+          const list = ['body', 'parent'];
+          return list.indexOf(value) > -1;
+        },
+      },
+      closeType: {
+        type: String,
+        default: 'hide',
+        validator(value) {
+          const list = ['destroy', 'hide'];
+          return list.indexOf(value) > -1;
+        },
       },
       resizable: {
         type: Boolean,
@@ -93,17 +109,18 @@
     },
     data() {
       return {
-        prefixEvui,
+        prefixCls: 'ev-window',
         windowId: '',
         windowStyle: {},
         windowCls: '',
-        topCls: '',
-        topStyle: '',
-        bodyStyle: '',
-        titleHeight: 32,
-        isShow: false,
-        isMoving: false,
+        headerCls: '',
+        headerStyle: '',
+        headerHeight: 32,
+        grabbingBorderSize: 5,
         isGrabbingBorder: false,
+        isExist: true,
+        isShow: true,
+        isMoving: false,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -115,23 +132,20 @@
           left: 0,
           width: 0,
           height: 0,
-          pageX: 0,
-          pageY: 0,
+          clientX: 0,
+          clientY: 0,
         },
       };
     },
-    computed: {
-    },
     created() {
       this.windowId = `window_${this._uid}_${this.name}`;
-
-      this.windowStyle = this.getWindowStyle();
       this.windowCls = this.getWindowCls();
-      this.topStyle = `height: ${this.titleHeight}px;`;
-      this.bodyStyle = `height: calc(100% -${this.titleHeight}px);`;
-      this.topCls = this.getTopCls();
+      this.headerStyle = `height: ${this.headerHeight}px`;
+      this.headerCls = this.getHeaderCls();
+      this.isShow = !this.hidden;
     },
     mounted() {
+      this.windowStyle = this.getWindowStyle();
     },
     beforeDestroy() {
       this.isShow = false;
@@ -149,19 +163,18 @@
           left: windowEl.offsetLeft,
           width: windowEl.offsetWidth,
           height: windowEl.offsetHeight,
-          pageX: e.pageX,
-          pageY: e.pageY,
+          clientX: e.clientX,
+          clientY: e.clientY,
         };
 
         if (this.resizable) {
           const clientRect = windowEl.getBoundingClientRect();
-          const x = e.pageX - clientRect.left;
-          const y = e.pageY - clientRect.top;
-          const borderSize = 4;
-          const isGrabTop = y < borderSize;
-          const isGrabLeft = x < borderSize;
-          const isGrabRight = x >= (clientRect.width - borderSize);
-          const isGrabBottom = y >= (clientRect.height - borderSize);
+          const x = e.clientX - clientRect.left;
+          const y = e.clientY - clientRect.top;
+          const isGrabTop = y < this.grabbingBorderSize;
+          const isGrabLeft = x < this.grabbingBorderSize;
+          const isGrabRight = x >= (clientRect.width - this.grabbingBorderSize);
+          const isGrabBottom = y >= (clientRect.height - this.grabbingBorderSize);
 
           this.grabbingBorderPosInfo = {
             top: isGrabTop,
@@ -173,7 +186,10 @@
           this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.isTopArea(e);
+        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
+        if (!this.isMoving) {
+          this.$emit('onmousedown', e);
+        }
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -188,26 +204,34 @@
         }
 
         if (this.isMoving) {
-          const diffTop = e.pageY - this.clickedInfo.pageY;
-          const diffLeft = e.pageX - this.clickedInfo.pageX;
+          const diffTop = e.clientY - this.clickedInfo.clientY;
+          const diffLeft = e.clientX - this.clickedInfo.clientX;
 
           this.setCssText({
             top: this.clickedInfo.top + diffTop,
             left: this.clickedInfo.left + diffLeft,
           });
         }
+
+        this.$emit('onmousemove', e);
       },
-      onMouseUp() {
+      onMouseUp(e) {
         this.isMoving = false;
         this.isGrabbingBorder = false;
 
+        this.$emit('onmouseup', e);
         window.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onMouseUp);
       },
-      onMouseOut() {
+      onMouseOut(e) {
         if (!this.isMoving) {
           document.body.style.cursor = '';
         }
+
+        this.$emit('onmouseout', e);
+      },
+      onHeaderDblClick(e) {
+        this.$emit('onheaderdblclick', e);
       },
       clickExpandBtn() {
         if (this.isFullExpandWindow) {
@@ -236,15 +260,21 @@
         this.isFullExpandWindow = !this.isFullExpandWindow;
       },
       clickCloseBtn() {
-        this.hide();
+        this.$emit('onbeforeclose', this);
+
+        if (this.closeType === 'hide') {
+          this.hide();
+        } else {
+          this.isExist = false;
+        }
       },
       resize(e) {
         const isTop = this.grabbingBorderPosInfo.top;
         const isLeft = this.grabbingBorderPosInfo.left;
         const isRight = this.grabbingBorderPosInfo.right;
         const isBottom = this.grabbingBorderPosInfo.bottom;
-        const diffX = e.pageX - this.clickedInfo.pageX;
-        const diffY = e.pageY - this.clickedInfo.pageY;
+        const diffX = e.clientX - this.clickedInfo.clientX;
+        const diffY = e.clientY - this.clickedInfo.clientY;
         const minWidth = this.removePixel(this.minWidth);
         const minHeight = this.removePixel(this.minHeight);
         let top = this.clickedInfo.top;
@@ -294,14 +324,13 @@
         }
 
         if (this.resizable) {
-          const borderSize = 4;
           const rect = this.$el.getBoundingClientRect();
-          const x = e.pageX - rect.left;
-          const y = e.pageY - rect.top;
-          const top = y < borderSize;
-          const left = x < borderSize;
-          const right = x >= (rect.width - borderSize);
-          const bottom = y >= (rect.height - borderSize);
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const top = y < this.grabbingBorderSize;
+          const left = x < this.grabbingBorderSize;
+          const right = x >= (rect.width - this.grabbingBorderSize);
+          const bottom = y >= (rect.height - this.grabbingBorderSize);
 
           if ((top && left) || (bottom && right)) {
             this.$el.style.cursor = 'nwse-resize';
@@ -311,7 +340,7 @@
             this.$el.style.cursor = 'ew-resize';
           } else if (bottom || top) {
             this.$el.style.cursor = 'ns-resize';
-          } else if (this.isTopArea(e)) {
+          } else if (this.isInHeader(e.clientX, e.clientY)) {
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
@@ -320,7 +349,7 @@
               document.body.style.cursor = '';
             }
           }
-        } else if (this.isTopArea(e)) {
+        } else if (this.isInHeader(e.clientX, e.clientY)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
@@ -330,28 +359,26 @@
           }
         }
       },
-      isTopArea(e) {
-        const windowElStyleInfo = this.$el.style;
-        const topAreaStyleInfo = this.$refs.topArea.style;
-        const rect = this.$el.getBoundingClientRect();
-        const x = e.pageX - rect.left;
-        const y = e.pageY - rect.top;
-        const winPaddingObj = {
-          top: this.removePixel(windowElStyleInfo.paddingTop),
-          left: this.removePixel(windowElStyleInfo.paddingLeft),
-          right: this.removePixel(windowElStyleInfo.paddingRight),
-        };
-        const topAreaPaddingObj = {
-          top: this.removePixel(topAreaStyleInfo.paddingTop),
-          left: this.removePixel(topAreaStyleInfo.paddingLeft),
-          right: this.removePixel(topAreaStyleInfo.paddingRight),
-        };
-        const startPosX = winPaddingObj.left + topAreaPaddingObj.left;
-        const endPosX = rect.width - winPaddingObj.right - topAreaPaddingObj.right;
-        const startPosY = winPaddingObj.top + topAreaPaddingObj.top;
-        const endPosY = startPosY + this.titleHeight;
+      isInHeader(x, y) {
+        if (x == null || y == null) {
+          return false;
+        }
 
-        return x > startPosX && x < endPosX && y > startPosY && y < endPosY;
+        const rect = this.$el.getBoundingClientRect();
+        const posX = +x - rect.left;
+        const posY = +y - rect.top;
+        const headerAreaStyleInfo = this.$refs.headerArea.style;
+        const headerPaddingInfo = {
+          top: this.removePixel(headerAreaStyleInfo.paddingTop),
+          left: this.removePixel(headerAreaStyleInfo.paddingLeft),
+          right: this.removePixel(headerAreaStyleInfo.paddingRight),
+        };
+        const startPosX = headerPaddingInfo.left;
+        const endPosX = rect.width - headerPaddingInfo.right;
+        const startPosY = headerPaddingInfo.top;
+        const endPosY = startPosY + this.headerHeight;
+
+        return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
       },
       setCssText(paramObj) {
         if (paramObj === null || typeof paramObj !== 'object') {
@@ -364,65 +391,81 @@
         let height;
         let minWidth;
         let minHeight;
+        let headerHeight;
         const windowEl = this.$el;
-        const objPrototype = Object.prototype;
+        const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'top')) {
+        if (hasOwnProperty.call(paramObj, 'top')) {
           top = paramObj.top;
         } else {
           top = this.clickedInfo.top;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'left')) {
+        if (hasOwnProperty.call(paramObj, 'left')) {
           left = paramObj.left;
         } else {
           left = this.clickedInfo.left;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'width')) {
+        if (hasOwnProperty.call(paramObj, 'width')) {
           width = paramObj.width;
         } else {
           width = windowEl.offsetWidth;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'height')) {
+        if (hasOwnProperty.call(paramObj, 'height')) {
           height = paramObj.height;
         } else {
           height = windowEl.offsetHeight;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'minWidth')) {
+        if (hasOwnProperty.call(paramObj, 'minWidth')) {
           minWidth = paramObj.minWidth;
         } else {
           minWidth = this.minWidth;
         }
 
-        if (objPrototype.hasOwnProperty.call(paramObj, 'minHeight')) {
+        if (hasOwnProperty.call(paramObj, 'minHeight')) {
           minHeight = paramObj.minHeight;
         } else {
           minHeight = this.minHeight;
         }
 
-        this.$el.style.cssText = `
+        if (hasOwnProperty.call(paramObj, 'headerHeight')) {
+          headerHeight = paramObj.headerHeight;
+        } else {
+          headerHeight = this.headerHeight;
+        }
+
+        windowEl.style.cssText = `
           top: ${this.numberToPixel(top)};
           left: ${this.numberToPixel(left)};
           width: ${this.numberToPixel(width)};
           height: ${this.numberToPixel(height)};
           min-width: ${this.numberToPixel(minWidth)};
-          min-height: ${this.numberToPixel(minHeight)};`;
+          min-height: ${this.numberToPixel(minHeight)};
+          padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        let top = 0;
-        let left = 0;
-        const offsetWidth = document.body.clientWidth;
-        const offsetHeight = document.body.clientHeight;
+        const clientRect = this.$el.getBoundingClientRect();
+        let top;
+        let left;
+        let parentWidth;
+        let parentHeight;
 
-        top = (offsetHeight / 2) - (this.height / 2);
-        left = (offsetWidth / 2) - (this.width / 2);
+        if (this.initCenterBase === 'parent' && this.$el && this.$el.parentElement) {
+          parentWidth = this.$el.parentElement.clientWidth;
+          parentHeight = this.$el.parentElement.clientHeight;
 
-        // body 에 붙이기 전에 임시로 사이즈 조정
-        top -= 150;
-        left -= 300;
+          top = (parentHeight / 2) - (this.height / 2);
+          left = (parentWidth / 2) - (this.width / 2);
+        } else {
+          parentWidth = document.body.clientWidth;
+          parentHeight = document.body.clientHeight;
+
+          top = (parentHeight / 2) - (this.height / 2) - clientRect.top;
+          left = (parentWidth / 2) - (this.width / 2) - clientRect.left;
+        }
 
         return {
           top: this.numberToPixel(top),
@@ -431,31 +474,24 @@
           height: this.numberToPixel(this.height),
           minWidth: this.numberToPixel(this.minWidth),
           minHeight: this.numberToPixel(this.minHeight),
+          paddingTop: this.numberToPixel(this.headerHeight),
         };
       },
       getWindowCls() {
-        const classList = [];
-
-        classList.push(prefixEvui);
-
-        if (this.clsType === 'rtm') {
-          classList.push(`${prefixEvui}-rtm`);
-        }
-
-        return classList;
+        return [
+          this.prefixCls,
+          {
+            [`${this.prefixCls}-rtm`]: this.clsType === 'rtm',
+          },
+        ];
       },
-      getTopCls() {
-        const classList = [];
-
-        if (this.clsType) {
-          classList.push(`${prefixEvui}-top-area`);
-        }
-
-        if (this.clsType === 'rtm') {
-          classList.push(`${prefixEvui}-top-rtm`);
-        }
-
-        return classList;
+      getHeaderCls() {
+        return [
+          {
+            [`${this.prefixCls}-header-area`]: this.clsType,
+            [`${this.prefixCls}-header-rtm`]: this.clsType === 'rtm',
+          },
+        ];
       },
       numberToPixel(input) {
         let output;
@@ -492,7 +528,6 @@
         return result || 0;
       },
       show() {
-        this.windowStyle = this.getWindowStyle();
         this.isShow = true;
       },
       hide() {
@@ -514,10 +549,13 @@
     border-color: #595C64;
     background: #212227;
   }
-  .ev-window-top-area{
+  .ev-window-header-area{
+    position: absolute;
+    top: 0;
     width: 100%;
     border-bottom: 1px solid;
     background: transparent;
+    font-family: 'NanumGothic', sans-serif;
     align-items: center;
   }
   .ev-window-title-area{
@@ -525,12 +563,12 @@
     padding: 6px 0 0 12px;
     font-size: 16px;
   }
-  .ev-window-top-rtm{
+  .ev-window-header-rtm{
     border-color: #464850;
     background-color: #27282E;
     color: #ABAEB5;
   }
-  .ev-window-top-pa{
+  .ev-window-header-pa{
     border-color: #474a53;
     background-color: #212227;
     color: #ABAEB5;
@@ -600,8 +638,11 @@
     cursor: pointer;
   }
   .ev-window-body-area{
+    position: relative;
     width: 100%;
+    height: 100%;
     padding: 9px 8px 8px 8px;
     background: transparent;
+    overflow: auto;
   }
 </style>

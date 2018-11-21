@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app">
     <main-header/>
     <main-content/>
   </div>
@@ -22,5 +22,18 @@
 <style scoped>
   * {
     font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;
+  }
+</style>
+<style>
+  body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .app {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 55px;
   }
 </style>

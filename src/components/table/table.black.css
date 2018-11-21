@@ -422,8 +422,8 @@ button {
   -o-user-select: text;
   box-shadow: 0px -1px 4px #333333;
   color: #c0c8d5;
-  background-color: #404960;
-  border-top: 1px solid #495474;
+  background-color: #282B32;
+  border-top: 1px solid #50555C;
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }

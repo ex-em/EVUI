@@ -51,7 +51,6 @@
   const prefixCls = 'evui-slider';
 
   export default {
-    name: 'Slider',
     components: {
       SliderTooltip,
     },
