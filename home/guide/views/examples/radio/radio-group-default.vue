@@ -29,7 +29,7 @@
     },
     data() {
       return {
-        value: null,
+        value: 'apple',
         radioList: [
           {
             name: 'apple',
