@@ -218,7 +218,6 @@ class Calendar {
   removeDropdown() {
     document.body.removeChild(this.dropdown);
   }
-
   showDropdown(e) {
     this.dropdown.style.display = 'block';
     let targetDivHeight = 0;
@@ -236,12 +235,6 @@ class Calendar {
     this.initOptionsProperty();
     this.initCalendarProperty();
     this.initCanvasProperty();
-  }
-  mouseInit() {
-    this.initMouseclick();
-    this.initMousemove();
-    this.initMouseleave();
-    this.initMousewheel();
   }
   initOptionsProperty() {
     if (this.options.initSelectDayFlag
@@ -342,7 +335,6 @@ class Calendar {
       });
     }
   }
-
   initCalendarProperty() {
     // 이번달 thisMonth월
     const thisMonth = this.options.currentYearMonth.getMonth() + 1;
@@ -357,6 +349,12 @@ class Calendar {
     // this.thisMonthWeekCnt = +Math.ceil((this.thisMonthFirstDay + this.thisMonthLastDate) / 7);
   }
 
+  mouseInit() {
+    this.initMouseclick();
+    this.initMousemove();
+    this.initMouseleave();
+    this.initMousewheel();
+  }
   initMousemove() {
     this.overCanvas.addEventListener('mousemove', (e) => {
       e.preventDefault();
@@ -643,7 +641,6 @@ class Calendar {
     });
   }
 
-
   initMouseclick() {
     this.overCanvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -884,13 +881,14 @@ class Calendar {
 
   initMousewheel() {
     this.overCanvas.addEventListener('mousewheel', (e) => {
-      /*eslint-disable*/
       e.preventDefault();
       const pickerAreaTotal = this.coordinate.pickerArea.total;
       const calendarAreaTotal = this.coordinate.calendarArea.total;
       const timeAreaHourTotal = this.coordinate.timeArea.hour.total;
       const timeAreaMinuteTotal = this.coordinate.timeArea.minute.total;
       const timeAreaSecondTotal = this.coordinate.timeArea.second.total;
+      const timeAreaPageWidth = this.options.timeArea.pageWidth;
+
       let areaType = '';
       if (e.offsetX > pickerAreaTotal.startX
         && e.offsetX < pickerAreaTotal.startX + pickerAreaTotal.width
@@ -903,28 +901,29 @@ class Calendar {
         && e.offsetY < calendarAreaTotal.startY + calendarAreaTotal.height) {
         areaType = 'month';
       } else if (e.offsetX > timeAreaHourTotal.startX
-        && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width
+        && e.offsetX < timeAreaHourTotal.startX + timeAreaHourTotal.width + timeAreaPageWidth
         && e.offsetY > timeAreaHourTotal.startY
         && e.offsetY < timeAreaHourTotal.startY + timeAreaHourTotal.height) {
         areaType = 'hour';
       } else if (e.offsetX > timeAreaMinuteTotal.startX
-        && e.offsetX < timeAreaMinuteTotal.startX + timeAreaMinuteTotal.width
+        && e.offsetX < timeAreaMinuteTotal.startX + timeAreaMinuteTotal.width + timeAreaPageWidth
         && e.offsetY > timeAreaMinuteTotal.startY
         && e.offsetY < timeAreaMinuteTotal.startY + timeAreaMinuteTotal.height) {
         areaType = 'minute';
       } else if (e.offsetX > timeAreaSecondTotal.startX
-        && e.offsetX < timeAreaSecondTotal.startX + timeAreaSecondTotal.width
+        && e.offsetX < timeAreaSecondTotal.startX + timeAreaSecondTotal.width + timeAreaPageWidth
         && e.offsetY > timeAreaSecondTotal.startY
         && e.offsetY < timeAreaSecondTotal.startY + timeAreaSecondTotal.height) {
         areaType = 'second';
       }
+
       if (areaType === 'month') {
         const currDate = this.options.currentYearMonth;
-        if(e.deltaY < 0) {
+        if (e.deltaY < 0) {
           // wheel up
           this.options.currentYearMonth =
             new Date(currDate.getFullYear(), currDate.getMonth() - 1, 1);
-        } else if(e.deltaY > 0) {
+        } else if (e.deltaY > 0) {
           // wheel down
           this.options.currentYearMonth =
             new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
@@ -934,6 +933,23 @@ class Calendar {
         this.drawCalendarDay();
         this.clearCalendarArea();
         this.mousemoveDate();
+      } else if (areaType === 'hour' || areaType === 'minute' || areaType === 'second') {
+        const timeAreaType = this.coordinate.timeArea[areaType];
+        if (e.deltaY < 0) {
+          // wheel up
+          if (timeAreaType.page > 1) {
+            timeAreaType.page -= 1;
+            this.drawTimeAreaContent(areaType);
+            this.updateTimeArea(areaType);
+          }
+        } else if (e.deltaY > 0) {
+          // wheel down
+          if (timeAreaType.page < timeAreaType.maxPage) {
+            timeAreaType.page += 1;
+            this.drawTimeAreaContent(areaType);
+            this.updateTimeArea(areaType);
+          }
+        }
       }
     });
   }
@@ -986,7 +1002,7 @@ class Calendar {
     const pickerAreaTotal = this.coordinate.pickerArea.total;
     this.clearCanvas(ctx,
       pickerAreaTotal.startX, pickerAreaTotal.startY,
-      pickerAreaTotal.width, pickerAreaTotal.height
+      pickerAreaTotal.width, pickerAreaTotal.height,
     );
     // draw bottom line in picker area
     ctx.beginPath();
