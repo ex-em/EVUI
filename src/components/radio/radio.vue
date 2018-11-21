@@ -25,6 +25,7 @@ import { getMatchedComponentUpward } from '../../common/utils';
 const prefixCls = 'evui-radio';
 
 export default {
+  name: 'Radio',
   props: {
     cls: {
       type: String,
@@ -32,8 +33,7 @@ export default {
     },
     disabled: {
       type: Boolean,
-      default: false
-      ,
+      default: false,
     },
     indeterminate: {
       type: Boolean,
