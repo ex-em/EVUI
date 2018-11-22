@@ -9,6 +9,7 @@
       :max-length="20"
       :hide-string="true"
       :use-max-length="true"
+      :border-color="borderColor"
     />
   </div>
 </template>
@@ -25,6 +26,7 @@
         // type: 'textarea',
         type: 'input',
         placeholder: 'type something...',
+        borderColor: '#dddee1',
       };
     },
   };
