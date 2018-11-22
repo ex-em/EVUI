@@ -82,6 +82,10 @@
         type: Boolean,
         default: false,
       },
+      align: {
+        type: String,
+        default: 'center',
+      },
     },
     data() {
       return {
@@ -108,24 +112,34 @@
       },
       wrappedValidClass() {
         let status = '';
+        let align = '';
 
         if (this.checkValid) {
-          if (
-            this.isError || (this.isSuccess && this.isFailed)
-          ) {
+          if (this.isError || (this.isSuccess && this.isFailed)) {
             status = 'error';
-            } else {
-              if (this.isSuccess) {
-                status = 'success';
-              }
-              if (this.isFailed) {
-                status = 'fail';
-              }
+          } else {
+            if (this.isSuccess) {
+              status = 'success';
             }
+            if (this.isFailed) {
+              status = 'fail';
+            }
+          }
         }
+
+        switch (this.align) {
+          case 'left':
+          case 'right':
+          case 'center':
+            align = this.align;
+            break;
+          default:
+            align = 'center';
+        }
+
         return [
           `${prefixCls}-inner`,
-          `${prefixCls} ${status}`,
+          `${prefixCls} ${status} ${align}`,
         ];
       },
       wrappedLabelClass() {
@@ -182,7 +196,7 @@
   .evui-label-font-bold {
     font-weight: bold;
   }
-  .evui-label-error {
+  .evui-label.error {
     color: red;
   }
   .evui-label {
@@ -195,5 +209,14 @@
   .evui-label.fail {
     background-color: #F53243;
     color: #fff;
+  }
+  .evui-label.center {
+    text-align: center;
+  }
+  .evui-label.left {
+    text-align: left;
+  }
+  .evui-label.right {
+    text-align: right;
   }
 </style>
