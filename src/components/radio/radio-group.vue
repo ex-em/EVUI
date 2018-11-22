@@ -33,6 +33,7 @@ import { getMatchedComponentsDownward } from '../../common/utils';
 const prefixCls = 'evui-radio-group';
 
 export default {
+  name: 'RadioGroup',
   components: {
     Radio,
   },
@@ -71,19 +72,19 @@ export default {
     };
   },
   computed: {
-    wrapClasses: function wrapClasses() {
+    wrapClasses() {
       return [
         `${prefixCls}`,
       ];
     },
-    computedInnerDiv: function computedInnerDiv() {
+    computedInnerDiv() {
       const classArr = [];
       if (this.groupAlign === 'hbox') {
         classArr.push(`${prefixCls}-inner`);
       }
       return classArr;
     },
-    computedList: function computedList() {
+    computedList() {
       if (this.list) {
         this.list.forEach((v) => {
           const value = v;
@@ -97,7 +98,7 @@ export default {
       }
       return this.list;
     },
-    computedDisabled: function computedDisabled() {
+    computedDisabled() {
       return this.disabled;
     },
   },

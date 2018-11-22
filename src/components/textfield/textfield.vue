@@ -124,6 +124,10 @@
         type: String,
         default: 'Wrong Message',
       },
+      borderColor: {
+        type: String,
+        default: '#dddee1',
+      },
     },
     data() {
       return {
@@ -143,6 +147,7 @@
         return {
           width: parsedStyle(this.width),
           height: parsedStyle(this.height),
+          border: `1px solid ${this.borderColor}`,
         };
       },
       wrapTextClass() {
@@ -210,9 +215,8 @@
           this.originValue = this.originValue.slice(0, this.maxLength);
           this.currentValue = targetValue.slice(0, this.maxLength);
         } else {
-          this.originValue = this.originValue;
           this.currentValue = targetValue;
-        }
+      }
         if (this.hideString) {
           this.currentValue = this.changeStrToBullet(this.currentValue);
         }
@@ -291,6 +295,181 @@
     },
   };
 </script>
-<style scoped>
+<style>
+  /* base class */
+  .evui-input-text {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    color: #495060;
+    font-size: 12px;
+    line-height: 2;
+    cursor: text;
+    background-image: none;
+    transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  /*border color when mouse hover*/
+  .evui-input-text.focus, .evui-input-text.focus:hover {
+    border-color : #2d8cf0;
+    opacity: 1;
+  }
+
+  .evui-input-text:hover {
+    border-color : #A6A6A6;
+    opacity: 1;
+  }
+
+  .evui-input-text-input {
+    width: 100%;
+    padding: 0 7px;
+    text-align: left;
+    outline: 0;
+    -moz-appearance: textfield;
+    color: #666;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  /*disable base class*/
+  .evui-input-text-disabled .evui-input-text-input.evui-input-text-textarea {
+    background-color: #f3f3f3;
+    opacity: 1;
+    cursor: not-allowed;
+    color: #ccc;
+  }
+  /*use border color when mouse hover*/
+  .evui-input-text-disabled:hover,.evui-input-text:hover.error,  .evui-input-text.focus.error {
+    border-color : #D77F7F;
+  }
+  /*inner input div class*/
+  .evui-input-text-disabled .evui-input-text {
+    opacity: .72;
+    cursor: not-allowed;
+    background-color: #f3f3f3;
+  }
+  .evui-input-text.evui-input-text-disabled {
+    background-color: #f3f3f3;
+  }
+  .evui-input-text-disabled {
+    opacity: .72;
+    color: #ccc!important;
+    cursor: not-allowed;
+  }
+  .evui-input-text-input[disabled] {
+    background-color: #f3f3f3;
+    opacity: 1;
+    cursor: not-allowed;
+    color: #ccc;
+  }
+
+  .evui-input-text-textarea {
+    display: block;
+    text-align: left;
+    line-height: 1.5;
+    padding: 4px 7px;
+    outline: 0;
+    color: #666;
+    border: 0;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
+  .evui-input-text-textarea[disabled] {
+    background-color: #f3f3f3;
+    opacity: 1;
+    cursor: not-allowed;
+    color: #ccc;
+  }
+
+  .evui-input-text-valid-check {
+    font-size: 12px;
+  }
+  .evui-input-text-valid-error {
+    padding-left: 3px;
+    padding-right: 5px;
+    color: #ED1313;
+    float:left
+  }
+  .evui-input-text-valid-max-length {
+    padding-left: 5px;
+    padding-right: 3px;
+    float:right
+  }
+
+  .evui-input-text-valid-max-length.error {
+    color: #ED1313;
+  }
+
+  /*base class*/
+  .evui-input-text {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    border: 1px solid #dddee1;
+    color: #495060;
+    font-size: 12px;
+    line-height: 2;
+    cursor: text;
+    background-image: none;
+    transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  /*border color when mouse hover*/
+  .evui-input-text:hover {
+    border-color : #2d8cf0;
+  }
+
+  .evui-input-text-input {
+    width: 100%;
+    padding: 0 7px;
+    text-align: left;
+    outline: 0;
+    -moz-appearance: textfield;
+    color: #666;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  /*disable base class*/
+  .evui-input-text-disabled .evui-input-text-input {
+    background-color: #f3f3f3;
+    cursor: not-allowed;
+    color: #ccc;
+  }
+  /*use border color when mouse hover*/
+  .evui-input-text-disabled:hover {
+    border-color : #D77F7F;
+  }
+  /*inner input div class*/
+  .evui-input-text-disabled .evui-input-text {
+    opacity: .72;
+    cursor: not-allowed;
+    background-color: #f3f3f3;
+  }
+  .evui-input-text.evui-input-text-disabled {
+    background-color: #f3f3f3;
+  }
+  .evui-input-text-disabled {
+    opacity: .72;
+    color: #ccc!important;
+    cursor: not-allowed;
+  }
+  .evui-input-text-input[disabled] {
+    background-color: #f3f3f3;
+    cursor: not-allowed;
+    color: #ccc;
+  }
 </style>
 
