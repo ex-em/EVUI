@@ -18,6 +18,7 @@
         :isError="true"
         :value="textList[2]"
         :fit="true"
+        :align="leftAlign"
       />
       <Label
         :mandatory="true"
@@ -91,6 +92,7 @@
           'Input',
         ],
         checkItem: false,
+        leftAlign: 'left',
       };
     },
     methods: {
