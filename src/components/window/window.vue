@@ -206,7 +206,6 @@
 
         window.addEventListener('mousemove', this.onMouseMove);
         window.addEventListener('mouseup', this.onMouseUp);
-        e.preventDefault();
       },
       onMouseMove(e) {
         if (this.resizable && this.isGrabbingBorder) {
