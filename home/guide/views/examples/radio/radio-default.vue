@@ -1,10 +1,35 @@
 <template>
   <div>
+    <br>
+    <h5># Default Radio Button</h5>
+    <h6> &nbsp;&nbsp;&nbsp;&nbsp; :radio-id, :radio-value Binding Attrs are required.</h6>
+    <br>
     <radio
-      v-model="baseRadio.bool"
-      :label="baseRadio.label"
+      :radio-id="`test`"
+      :radio-value="`test`"
     />
-    <p>{{ baseRadio.bool }}</p>
+    <br>
+    <br>
+    <h5># Default true Radio Button</h5>
+    <br>
+    <radio
+      :radio-id="bindCaseId"
+      :radio-value="bindCaseValue"
+      :radio-name="bindCaseName"
+      v-model="vModelValue"
+    />
+    <br>
+    bind value : {{ vModelValue }}
+    <br>
+    <br>
+    <h5># Default Disabled Radio Button</h5>
+    <br>
+    <radio
+      :radio-id="DisabledCaseId"
+      :radio-value="DisabledCaseValue"
+      :radio-name="DisabledCaseName"
+      :disabled="true"
+    />
   </div>
 </template>
 <script>
@@ -16,10 +41,16 @@
     },
     data() {
       return {
-        baseRadio: {
-            bool: false,
-            label: 'Normal',
-          },
+        normalCaseId: 'id01',
+        normalCaseValue: 'normalValue',
+        normalCaseName: 'name01',
+        bindCaseId: 'id02',
+        bindCaseValue: 'bindingValue',
+        bindCaseName: 'name02',
+        vModelValue: 'bindingValue',
+        DisabledCaseId: 'id03',
+        DisabledCaseValue: 'DisabledValue',
+        DisabledCaseName: 'name03',
       };
     },
   };

@@ -1,140 +1,73 @@
 <template>
-  <div
-    :class="wrappedClasses"
-  >
+  <div>
     <input
-      :id="createId"
-      :class="wrappedInnerClasses"
+      :id="radioId"
+      :value="radioValue"
+      :name="radioName"
+      :checked="bindValue === radioValue"
       :disabled="disabled"
-      :checked="currentValue"
       type="radio"
-      @change="change"
+      @change="onChange"
     >
     <label
-      :for="createId"
-      :class="labelClasses"
+      :for="radioId"
     >
-      {{ label }}
+      {{ radioValue }}
     </label>
   </div>
 </template>
 
 <script>
-import { getMatchedComponentUpward } from '../../common/utils';
-
-const prefixCls = 'evui-radio';
-
 export default {
-  name: 'Radio',
   props: {
-    cls: {
+    radioId: {
       type: String,
-      default: null,
+      required: true,
+    },
+    radioValue: {
+      type: String,
+      required: true,
+    },
+    radioName: {
+      type: String,
+      default: '',
     },
     disabled: {
       type: Boolean,
       default: false,
     },
-    indeterminate: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: [String, Number, Boolean],
-      default: null,
-    },
     value: {
-      type: [String, Number, Boolean],
-      default: true,
-    },
-    trueValue: {
-      type: [String, Number, Boolean],
-      default: true,
-    },
-    falseValue: {
-      type: [String, Number, Boolean],
-      default: false,
+      type: String,
+      default: '',
     },
   },
   data() {
     return {
-      model: [],
-      group: false,
-      currentValue: this.value,
-      wrapperedInnerClass: this.cls,
-      parent: getMatchedComponentUpward(this, 'RadioGroup'),
+      bindValue: this.value,
     };
   },
   computed: {
-    wrappedClasses() {
-      return [
-        `${prefixCls}`,
-        {
-          'evui-disabled': this.disabled,
-        },
-      ];
-    },
-    labelClasses() {
-      return [
-        `${prefixCls}-label`,
-      ];
-    },
-    createId() {
-      return this._uid;
-    },
-    wrappedInnerClasses() {
-      return this.wrapperedInnerClass;
-    },
   },
   watch: {
-    value(value) {
-      if (value === this.trueValue || value === this.falseValue) {
-        this.updateModel();
-      }
-    },
   },
   mounted() {
-    this.parent = getMatchedComponentUpward(this, 'RadioGroup');
-
-    if (this.parent) {
-      this.group = true;
-    }
-
-    if (this.group) {
-      this.parent.updateModel(true);
-    } else {
-      this.updateModel();
-    }
   },
   methods: {
-    change(e) {
-      if (this.disabled) {
-        return;
-      }
-      const checked = e.target.checked;
-      this.currentValue = checked;
-      const value = checked ? this.trueValue : this.falseValue;
-
-      this.$emit('input', value);
-      if (this.group) {
-        if (this.label !== undefined) {
-          this.parent.change({
-            value: this.label,
-            checked: this.value,
-          });
-        }
+    onChange(e) {
+      if (this.$parent.$options.componentName === 'RadioGroup') {
+        // 부모 컴포넌트가 Radio Group인 경우
+        this.$parent.$emit('changeEvent', e);
+        this.$parent.$emit('changeTarget', e.target);
+        this.$parent.$emit('changeValue', e.target.value);
+        this.$parent.$emit('input', e.target.value);
       } else {
-        this.$emit('on-change', value);
+        // 부모 컴포넌트가 Radio Group로 안감싼경우
+        this.$emit('input', e.target.value);
       }
-    },
-    updateModel() {
-      this.currentValue = this.value === this.trueValue;
-    },
-    setDisabled(newValue) {
-      this.wrapperedDisabled = newValue;
     },
   },
 };
 </script>
+
 <style scoped>
 </style>

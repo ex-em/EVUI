@@ -1,129 +1,60 @@
 <template>
   <div
-    :class="wrapClasses"
+    @changeEvent="onChangeEvent"
+    @changeTarget="onChangeTarget"
+    @changeValue="onChangeValue"
   >
-    <div v-if="list">
-      <template
-        v-for="item in computedList"
-      >
-        <div
-          :key="item.id"
-          :class="computedInnerDiv"
-        >
-          <Radio
-            :label = "item.label"
-            :disabled="computedDisabled"
-            type="radio"
-          />
-        </div>
-      </template>
-    </div>
-    <div
-      v-else
-      :class="computedInnerDiv"
-    >
-      <slot/>
-    </div>
+    <slot/>
   </div>
 </template>
 <script>
-import Radio from './radio';
-import { getMatchedComponentsDownward } from '../../common/utils';
-
-const prefixCls = 'evui-radio-group';
 
 export default {
-  name: 'RadioGroup',
   components: {
-    Radio,
   },
   props: {
     value: {
-      type: [String, Number, Boolean],
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    list: {
-      type: [String, Number, Object, Array, Boolean],
-      default: null,
-    },
-    groupAlign: {
       type: String,
-      default: 'hbox',
-      validator(value) {
-        let result = '';
-        if (value === 'hbox' || value === 'vbox') {
-          result = value;
-        } else {
-          result = '';
-        }
-
-        return result;
-      },
+      default: '',
     },
   },
   data() {
     return {
-      currentValue: this.value,
-      children: [],
+      childrens: [],
     };
   },
+  componentName: 'RadioGroup',
   computed: {
-    wrapClasses() {
-      return [
-        `${prefixCls}`,
-      ];
-    },
-    computedInnerDiv() {
-      const classArr = [];
-      if (this.groupAlign === 'hbox') {
-        classArr.push(`${prefixCls}-inner`);
-      }
-      return classArr;
-    },
-    computedList() {
-      if (this.list) {
-        this.list.forEach((v) => {
-          const value = v;
-          if (v && !v.clickEvent) {
-            value.clickEvent = this.change;
-          }
-          if (v && !v.disabled) {
-            value.disabled = this.disabled;
-          }
-        });
-      }
-      return this.list;
-    },
-    computedDisabled() {
-      return this.disabled;
-    },
   },
   watch: {
-    value() {
-      this.currentValue = this.value;
-      this.updateModel();
-    },
+  },
+  created() {
+  },
+  mounted() {
+    this.initValue();
   },
   methods: {
-    updateModel() {
-      this.children = getMatchedComponentsDownward(this, 'Radio');
-      if (this.children) {
-        this.children.forEach((v) => {
-            const item = v;
-            item.currentValue = this.value === item.label;
-            item.group = true;
+    onChangeEvent(e) {
+      // return Event
+      this.$emit('changeEvent', e);
+    },
+    onChangeTarget(t) {
+      // return DOM
+      this.$emit('changeTarget', t);
+    },
+    onChangeValue(v) {
+      // return value
+      this.$emit('changeValue', v);
+      this.$emit('input', v);
+    },
+    initValue() {
+      this.childrens = this.$children;
+      if (this.childrens) {
+        this.childrens.forEach((c) => {
+          const child = c;
+          child.bindValue = this.value;
         });
       }
-    },
-    change(data) {
-      this.currentValue = data.value;
-      this.updateModel();
-      this.$emit('input', data.value);
-      this.$emit('on-change', data.value);
     },
   },
 };
