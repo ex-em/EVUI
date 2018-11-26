@@ -55,7 +55,7 @@
 }
 
 .evui-checkbox input[type="checkbox"] + label{
-  display: inline-block;
+  /*display: inline-block;*/
   position: relative;
   padding-left: 19px;
   padding-right: 5px;
@@ -78,7 +78,7 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 
 .evui-checkbox input[type="checkbox"] + label:before{
   content:"";
-  display: inline-block;
+  /*display: inline-block;*/
   position: absolute;
   left: 0px;
   bottom: 0px;
