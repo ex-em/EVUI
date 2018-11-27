@@ -1,46 +1,58 @@
 <template>
   <div>
     <div class="group-slot-demo">
-      <checkbox-group
-        v-model="itemNameList"
+      <Checkbox-group
+        v-model="bindList"
       >
-        <checkbox
-          :label="groupName[0].name"
+        <Checkbox
+          :id="obj0[0].id"
+          :label="obj0[0].label"
+          :group-name="obj0[0].name"
         />
-        <checkbox
-          :label="groupName[1].name"
+        <Checkbox
+          :id="obj0[1].id"
+          :label="obj0[1].label"
+          :group-name="obj0[1].name"
         />
-        <checkbox
-          :label="groupName[2].name"
+        <Checkbox
+          :id="obj0[2].id"
+          :label="obj0[2].label"
+          :group-name="obj0[2].name"
         />
-      </checkbox-group>
-      <p>Selected List : {{ itemNameList }}</p>
+      </Checkbox-group>
+      <p>Selected List : {{ bindList }}</p>
     </div>
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
-  import checkboxGroup from '@/components/checkbox/checkbox-group';
+  import Checkbox from '@/components/checkbox/checkbox';
+  import CheckboxGroup from '@/components/checkbox/checkbox-group';
 
   export default {
     components: {
-      checkbox,
-      checkboxGroup,
+      Checkbox,
+      CheckboxGroup,
     },
     data() {
       return {
-        groupName: [
+        obj0: [
           {
-            name: 'apple',
+            id: 'RADIOID01',
+            label: 'Base01',
+            name: 'RADIOID0',
           },
           {
-            name: 'orange',
+            id: 'RADIOID02',
+            label: 'Base02',
+            name: 'RADIOID0',
           },
           {
-            name: 'banana',
+            id: 'RADIOID03',
+            label: 'Base03',
+            name: 'RADIOID0',
           },
         ],
-        itemNameList: [],
+        bindList: ['RADIOID01', 'RADIOID02'],
       };
     },
   };

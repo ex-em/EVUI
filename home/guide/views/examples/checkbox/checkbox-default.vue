@@ -1,17 +1,16 @@
 <template>
   <div>
     <Checkbox
-      :checkbox-id="bindCaseId"
-      :checkbox-value="bindCaseValue"
-      :checkbox-name="bindCaseName"
-      v-model="vModelValue"
+      :id="bindCaseId"
+      :label="bindCaseLabel"
+      :checked="false"
     />
     <br>
+    <br>
     <Checkbox
-      :checkbox-id="bindCaseId2"
-      :checkbox-value="bindCaseValue2"
-      :checkbox-name="bindCaseName2"
-      v-model="vModelValue"
+      :id="bindCaseId2"
+      :label="bindCaseLabel2"
+      :checked="true"
     />
   </div>
 </template>
@@ -25,12 +24,9 @@
     data() {
       return {
         bindCaseId: 'id021',
-        bindCaseValue: 'bindingValue1',
-        bindCaseName: 'name021',
-        vModelValue: 'bindingValue1',
+        bindCaseLabel: 'name021',
         bindCaseId2: 'id022',
-        bindCaseValue2: 'bindingValue2',
-        bindCaseName2: 'name022',
+        bindCaseLabel2: 'name022',
       };
     },
   };

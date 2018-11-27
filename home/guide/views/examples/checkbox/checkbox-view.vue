@@ -49,7 +49,7 @@
 <script>
   import codeView from '@/components/codeview/code';
   import checkboxDefault from './checkbox-default';
-//  import checkboxGroupDefault from './checkbox-group-default';
+  import checkboxGroupDefault from './checkbox-group-default';
 
   export default {
     components: {
@@ -66,12 +66,12 @@
           },
         ],
         checkGroupList: [
-//          {
-//            url: './guide/views/examples/checkbox/checkbox-group-default.vue',
-//            component: checkboxGroupDefault,
-//            title: 'Default',
-//            description: '체크 박스 그룹에 묶인 여러 개의 선택 사항 중 원하는 항목을 선택합니다.',
-//          },
+          {
+            url: './guide/views/examples/checkbox/checkbox-group-default.vue',
+            component: checkboxGroupDefault,
+            title: 'Default',
+            description: '체크 박스 그룹에 묶인 여러 개의 선택 사항 중 원하는 항목을 선택합니다.',
+          },
         ],
       };
     },

@@ -1,16 +1,17 @@
 <template>
   <div>
     <input
-      :id="checkboxId"
-      :value="checkboxValue"
-      :name="checkboxName"
-      :checked="isCheck"
+      :id="id"
+      :label="label"
+      :name="groupName"
+      :checked="bindChecked"
       type="checkbox"
+      @change="onChange"
     >
     <label
-      :for="checkboxId"
+      :for="id"
     >
-      {{ checkboxValue }}
+      {{ label }}
     </label>
   </div>
 </template>
@@ -18,46 +19,48 @@
 <script>
   export default {
     props: {
-      checkboxId: {
+      id: {
         type: String,
         required: true,
       },
-      checkboxValue: {
+      label: {
         type: String,
-        required: true,
+        default: '',
       },
-      checkboxName: {
+      groupName: {
         type: String,
         default: '',
       },
       value: {
-        type: [String, Array],
-        default: null,
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+      checked: {
+        type: Boolean,
+        default: false,
       },
     },
     data() {
       return {
         bindValue: this.value,
+        bindChecked: this.checked,
       };
     },
     computed: {
-      isCheck() {
-        if (this.value) {
-          if (typeof this.value === 'string') {
-            return this.value === this.checkboxValue;
-          } else if (Array.isArray(this.value)) {
-            return this.value.includes(this.checkboxValue);
-          }
-          return false;
-        }
-        return false;
-      },
     },
     watch: {
     },
     mounted() {
     },
     methods: {
+      onChange(e) {
+        if (this.$parent.$options.componentName === 'CheckboxGroup') {
+          console.log('checkbox onChange if');
+          this.$parent.$emit('ttttt', e);
+        }
+      },
     },
   };
 </script>
