@@ -1,5 +1,8 @@
 <template>
-  <div style="width: 100%; height: 100%; position: relative;">
+  <div
+    :style="{} | gridStyleFilter({width: width, height: height})"
+    style="position: relative;"
+  >
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
@@ -45,8 +48,13 @@
                   <template v-for="(row, rowIndex) in resultData">
                     <tr
                       :key="rowIndex"
-                      :class="(rowIndex+1)%2 !== 0 ? 'evui-odd' : 'evui-even'"
+                      :class="{
+                        'evui-odd': (rowIndex+1)%2 !== 0,
+                        'evui-even': (rowIndex+1)%2 === 0,
+                        'evui-selected': row.$evuiSelected,
+                      }"
                       :style="{height: `${rowHeight}px`}"
+                      @mouseup="rowClick($event, row)"
                     >
                       <td
                         class="evui-table-data-spacer"
@@ -64,15 +72,24 @@
                           <div
                             v-if="col.type === 'string' && col.cellRender === null"
                             class="evui-table-records-col"
-                            style="max-height: 24px;"
                           >
                             {{ row[col.field] }}
+                          </div>
+                          <div
+                            v-else-if="col.type === 'checkbox'"
+                            :class="{ 'evui-selected': row[col.field]}"
+                            class="evui-table-records-col"
+                            style="text-overflow:unset;"
+                          >
+                            <ev-checkbox
+                              :value="row[col.field]"
+                              @on-change="changeCheckbox($event, row, col.field, col.checkType)"
+                            />
                           </div>
                           <div
                             v-else
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
-                            style="max-height: 24px;"
                             v-html="cellRender(row[col.field], col.type, col.cellRender)"
                           />
                         </td>
@@ -277,6 +294,10 @@
          return [];
         },
       },
+      select: {
+        type: String,
+        default: 'none',
+      },
     },
 
     data() {
@@ -353,6 +374,12 @@
         // 현재페이지, 마지막페이지
         currentPage: 0,
         lastPage: 0,
+
+        // select 관련
+        selectedData: null,
+
+        // check 관련
+        changeCheckData: null,
       };
     },
     computed: {
@@ -888,7 +915,6 @@
           // this.records.slice();
         } else {
           this.originData.push(row);
-          // this.records.slice();
         }
       },
       draw() {
@@ -1235,6 +1261,36 @@
         this.prevScrollTop = 0;
         this.currentPage = 0;
         this.lastPage = 0;
+      },
+      changeCheckbox(value, row, field, type) {
+        console.log('checkboc::#1', value, '#2', row);
+        const data = row;
+        if (type === 'single' && this.changeCheckData) {
+          this.$set(this.changeCheckData, field, false);
+        }
+        if (type === 'single') {
+          this.changeCheckData = data;
+        }
+        this.$set(data, field, value);
+        console.log('checkboc::#1', value, '#2', this.changeCheckData);
+      },
+      rowSelect(row) {
+        console.log('#1', row);
+        if (!row.$evuiSelected) {
+          if (this.select !== 'multi' && this.selectedData) {
+            this.$set(this.selectedData, '$evuiSelected', false);
+          }
+          this.selectedData = row;
+          this.$set(row, '$evuiSelected', true);
+        } else {
+          this.$set(row, '$evuiSelected', false);
+        }
+      },
+      rowClick() {
+        console.log('clickEvent');
+      },
+      getChangeCheckData() {
+        return this.changeCheckData;
       },
     },
   };
