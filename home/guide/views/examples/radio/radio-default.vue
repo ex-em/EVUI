@@ -5,29 +5,29 @@
     <h6> &nbsp;&nbsp;&nbsp;&nbsp; :radio-id, :radio-value Binding Attrs are required.</h6>
     <br>
     <radio
-      :radio-id="`test`"
-      :radio-value="`test`"
+      :id="`test-label`"
+      :label="`test-label`"
     />
     <br>
     <br>
     <h5># Default true Radio Button</h5>
     <br>
     <radio
-      :radio-id="bindCaseId"
-      :radio-value="bindCaseValue"
-      :radio-name="bindCaseName"
-      v-model="vModelValue"
+      :id="bindCaseId"
+      :label="bindCaseValue"
+      :group-name="bindCaseName"
+      v-model="bindCaseId"
     />
     <br>
-    bind value : {{ vModelValue }}
+    bind value : {{ bindCaseId }}
     <br>
     <br>
     <h5># Default Disabled Radio Button</h5>
     <br>
     <radio
-      :radio-id="DisabledCaseId"
-      :radio-value="DisabledCaseValue"
-      :radio-name="DisabledCaseName"
+      :id="DisabledCaseId"
+      :label="DisabledCaseValue"
+      :group-name="DisabledCaseName"
       :disabled="true"
     />
   </div>
@@ -47,7 +47,6 @@
         bindCaseId: 'id02',
         bindCaseValue: 'bindingValue',
         bindCaseName: 'name02',
-        vModelValue: 'bindingValue',
         DisabledCaseId: 'id03',
         DisabledCaseValue: 'DisabledValue',
         DisabledCaseName: 'name03',

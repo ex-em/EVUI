@@ -1,18 +1,18 @@
 <template>
   <div>
     <input
-      :id="radioId"
-      :value="radioValue"
-      :name="radioName"
-      :checked="bindValue === radioValue"
+      :id="id"
+      :name="groupName"
+      :label="label"
+      :checked="bindValue === id"
       :disabled="disabled"
       type="radio"
       @change="onChange"
     >
     <label
-      :for="radioId"
+      :for="id"
     >
-      {{ radioValue }}
+      {{ label }}
     </label>
   </div>
 </template>
@@ -20,15 +20,15 @@
 <script>
 export default {
   props: {
-    radioId: {
+    id: {
       type: String,
       required: true,
     },
-    radioValue: {
+    label: {
       type: String,
       required: true,
     },
-    radioName: {
+    groupName: {
       type: String,
       default: '',
     },
@@ -50,6 +50,8 @@ export default {
   },
   watch: {
   },
+  created() {
+  },
   mounted() {
   },
   methods: {
@@ -57,12 +59,10 @@ export default {
       if (this.$parent.$options.componentName === 'RadioGroup') {
         // 부모 컴포넌트가 Radio Group인 경우
         this.$parent.$emit('changeEvent', e);
-        this.$parent.$emit('changeTarget', e.target);
-        this.$parent.$emit('changeValue', e.target.value);
-        this.$parent.$emit('input', e.target.value);
+        this.$parent.$emit('input', e.target.id);
       } else {
         // 부모 컴포넌트가 Radio Group로 안감싼경우
-        this.$emit('input', e.target.value);
+        this.$emit('input', e.target.id);
       }
     },
   },
