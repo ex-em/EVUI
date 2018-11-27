@@ -44,7 +44,6 @@
     },
     data() {
       return {
-        bindValue: this.value,
         bindChecked: this.checked,
       };
     },

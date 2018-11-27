@@ -23,6 +23,32 @@
       </Checkbox-group>
       <p>Selected List : {{ bindList }}</p>
     </div>
+    <br>
+    <br>
+    <br>
+    <div class="group-slot-demo">
+      <Checkbox-group
+        v-model="bindList1"
+        @changeEvent="onChangeEvent"
+      >
+        <Checkbox
+          :id="obj1[0].id"
+          :label="obj1[0].label"
+          :group-name="obj1[0].name"
+        />
+        <Checkbox
+          :id="obj1[1].id"
+          :label="obj1[1].label"
+          :group-name="obj1[1].name"
+        />
+        <Checkbox
+          :id="obj1[2].id"
+          :label="obj1[2].label"
+          :group-name="obj1[2].name"
+        />
+      </Checkbox-group>
+      <p>Selected List : {{ bindList1 }}</p>
+    </div>
   </div>
 </template>
 
@@ -55,6 +81,24 @@
           },
         ],
         bindList: ['RADIOID01', 'RADIOID02'],
+        obj1: [
+          {
+            id: 'RADIOID11',
+            label: 'Base11',
+            name: 'RADIOID1',
+          },
+          {
+            id: 'RADIOID12',
+            label: 'Base12',
+            name: 'RADIOID1',
+          },
+          {
+            id: 'RADIOID13',
+            label: 'Base13',
+            name: 'RADIOID1',
+          },
+        ],
+        bindList1: ['RADIOID13'],
       };
     },
     methods: {
