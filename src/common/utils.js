@@ -1,6 +1,4 @@
 const windowConsole = window.console;
-export const prefix = 'evui-';
-
 export const Console = {
   log(...data) {
     windowConsole.log(...data);
@@ -21,6 +19,17 @@ export const Console = {
     windowConsole.dir(item, options);
   },
 };
+
+export function getQuantity(input) {
+  let output;
+  if (typeof input === 'string' || typeof input === 'number') {
+    const match = (/^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
+    output = match ? { value: +match[2], unit: match[3] || undefined } : null;
+  } else {
+    output = null;
+  }
+  return output;
+}
 
 export function getMatchedComponentsDownward(context, componentName) {
   const children = context.$children;
