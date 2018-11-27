@@ -1,38 +1,36 @@
 <template>
   <div>
-    <div
-      v-for="item in baseCheckList"
-      :key="item.id"
-    >
-      <checkbox
-        v-model="item.bool"
-        :label="item.name"
-      />
-      <div style="width:20px; height:20px;">
-        <i
-          :class="'ei ei-l ei-check-on'"
-        />
-        TEST
-      </div>
-      <p>{{ item.bool }}</p>
-    </div>
+    <Checkbox
+      :checkbox-id="bindCaseId"
+      :checkbox-value="bindCaseValue"
+      :checkbox-name="bindCaseName"
+      v-model="vModelValue"
+    />
+    <br>
+    <Checkbox
+      :checkbox-id="bindCaseId2"
+      :checkbox-value="bindCaseValue2"
+      :checkbox-name="bindCaseName2"
+      v-model="vModelValue"
+    />
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
+  import Checkbox from '@/components/checkbox/checkbox';
 
   export default {
     components: {
-      checkbox,
+      Checkbox,
     },
     data() {
       return {
-        baseCheckList: [
-          {
-            bool: true,
-            name: 'Normal',
-          },
-        ],
+        bindCaseId: 'id021',
+        bindCaseValue: 'bindingValue1',
+        bindCaseName: 'name021',
+        vModelValue: 'bindingValue1',
+        bindCaseId2: 'id022',
+        bindCaseValue2: 'bindingValue2',
+        bindCaseName2: 'name022',
       };
     },
   };
