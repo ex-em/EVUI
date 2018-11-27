@@ -223,11 +223,11 @@ button {
 .evui-table .evui-table-body .evui-table-records table tr.evui-even.evui-empty-record:hover {
   background-color: #f3f6fa;
 }
-/*.evui-table .evui-table-body .evui-table-records table tr.evui-selected,
+.evui-table .evui-table-body .evui-table-records table tr.evui-selected,
 .evui-table .evui-table-body .evui-table-records table tr td.evui-selected {
   color: #000000 !important;
   background-color: #b6d5ff !important;
-}*/
+}
 /*.evui-table .evui-table-body .evui-table-records .evui-expanded {
   background-color: #CCDCF0 !important;
 }
@@ -530,6 +530,9 @@ button {
 }
 .evui-table-menu-tab-body {
   max-height: 300px;
+}
+.evui-table-records-col {
+  max-height: 24px;
 }
 .evui-table-records-col.evui-col-number {
   float: right;
