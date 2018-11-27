@@ -57,8 +57,9 @@
     methods: {
       onChange(e) {
         if (this.$parent.$options.componentName === 'CheckboxGroup') {
-          console.log('checkbox onChange if');
-          this.$parent.$emit('ttttt', e);
+          this.$parent.$emit('changeEvent', e);
+        } else {
+          this.$emit('changeEvent', e);
         }
       },
     },

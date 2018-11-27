@@ -3,6 +3,7 @@
     <div class="group-slot-demo">
       <Checkbox-group
         v-model="bindList"
+        @changeEvent="onChangeEvent"
       >
         <Checkbox
           :id="obj0[0].id"
@@ -24,6 +25,7 @@
     </div>
   </div>
 </template>
+
 <script>
   import Checkbox from '@/components/checkbox/checkbox';
   import CheckboxGroup from '@/components/checkbox/checkbox-group';
@@ -55,8 +57,14 @@
         bindList: ['RADIOID01', 'RADIOID02'],
       };
     },
+    methods: {
+      onChangeEvent(e) {
+        console.log(`e : ${e}`);
+      },
+    },
   };
 </script>
+
 <style scoped>
   div{
     display: inline-block;

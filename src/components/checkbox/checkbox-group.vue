@@ -1,7 +1,5 @@
 <template>
-  <div
-    @ttttt="onChangeEvent"
-  >
+  <div>
     <slot/>
   </div>
 </template>
@@ -34,10 +32,6 @@ export default {
     this.initValue();
   },
   methods: {
-    onChangeEvent(e) {
-      console.log('checkboxgroup onChangeEvent');
-      this.$emit('changeEvent', e);
-    },
     initValue() {
       this.childrens = this.$children;
       const value = this.bindValue;
