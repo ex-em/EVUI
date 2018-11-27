@@ -1,7 +1,5 @@
 <template>
-  <div
-    @changeEvent="onChangeEvent"
-  >
+  <div>
     <slot/>
   </div>
 </template>
@@ -32,11 +30,6 @@ export default {
     this.initValue();
   },
   methods: {
-    onChangeEvent(e) {
-      // return Event
-      this.$emit('changeEvent', e);
-      this.$emit('input', e.target.value);
-    },
     initValue() {
       this.childrens = this.$children;
       if (this.childrens) {
