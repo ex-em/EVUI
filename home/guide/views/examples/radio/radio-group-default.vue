@@ -28,37 +28,6 @@
       <br>
       bind value : {{ radioObj0 }}
     </div>
-    <br>
-    <br>
-    <br>
-    <div class="bind-model">
-      <h5># Default Model2</h5>
-      <RadioGroup
-        v-model="radioObj1"
-        @change-event="onChangeEvent2"
-      >
-        <Radio
-          :id="obj1[0].id"
-          :value="obj1[0].value"
-        >
-          {{ obj1[0].text }}
-        </Radio>
-        <Radio
-          :id="obj1[1].id"
-          :value="obj1[1].value"
-        >
-          {{ obj1[1].text }}
-        </Radio>
-        <Radio
-          :id="obj1[2].id"
-          :value="obj1[2].value"
-        >
-          {{ obj1[2].text }}
-        </Radio>
-      </RadioGroup>
-      <br>
-      bind value : {{ radioObj1 }}
-    </div>
   </div>
 </template>
 
