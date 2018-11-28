@@ -1,17 +1,19 @@
 <template>
   <div>
-    <input
-      :id="id"
-      :name="groupName"
-      :label="label"
-      :checked="bindValue === id"
-      :disabled="disabled"
-      type="radio"
-      @change="onChange"
-    >
     <label
       :for="id"
+      class="ev-radio-label"
     >
+      <input
+        :id="id"
+        :name="groupName"
+        :label="label"
+        :checked="bindValue === id"
+        :disabled="disabled"
+        type="radio"
+        class="ev-radio-input"
+        @change="onChange"
+      >
       {{ label }}
     </label>
   </div>
@@ -70,4 +72,10 @@ export default {
 </script>
 
 <style scoped>
+  .ev-radio-label {
+    display: block;
+  }
+  .ev-radio-input {
+    vertical-align: middle;
+  }
 </style>
