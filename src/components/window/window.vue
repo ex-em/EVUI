@@ -19,12 +19,12 @@
       <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
         :class="`${prefixCls}-expand-btn`"
-        @click="clickExpandBtn"
+        @click="onExpand"
       />
       <div :class="`${prefixCls}-close-btn-line`"/>
       <div
         :class="`${prefixCls}-close-btn`"
-        @click="clickCloseBtn"
+        @click="close"
       />
     </div>
     <div :class="`${prefixCls}-body-area`">
@@ -32,6 +32,7 @@
         :is="content"
         v-bind="bodyProps"
         @onbodyevent="onBodyEvent"
+        @onwindowclose="close"
       />
     </div>
   </div>
@@ -243,7 +244,7 @@
       onHeaderDblClick(e) {
         this.$emit('onheaderdblclick', e);
       },
-      clickExpandBtn() {
+      onExpand() {
         if (this.isFullExpandWindow) {
           this.setCssText({
             top: this.posInfoBeforeExpand.top,
@@ -268,15 +269,6 @@
         }
 
         this.isFullExpandWindow = !this.isFullExpandWindow;
-      },
-      clickCloseBtn() {
-        this.$emit('onbeforeclose', this);
-
-        if (this.closeType === 'hide') {
-          this.hide();
-        } else {
-          this.isExist = false;
-        }
       },
       resize(e) {
         const isTop = this.grabbingBorderPosInfo.top;
@@ -542,6 +534,15 @@
       },
       hide() {
         this.isShow = false;
+      },
+      close() {
+        this.$emit('onbeforeclose', this);
+
+        if (this.closeType === 'hide') {
+          this.hide();
+        } else {
+          this.isExist = false;
+        }
       },
     },
   };
