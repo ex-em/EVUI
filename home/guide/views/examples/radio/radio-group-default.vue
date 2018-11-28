@@ -4,7 +4,6 @@
       <h5># Default Model</h5>
       <RadioGroup
         v-model="radioObj0"
-        :group-name="`RADIOID0`"
         @change-event="onChangeEvent"
       >
         <Radio
@@ -36,7 +35,6 @@
       <h5># Default Model2</h5>
       <RadioGroup
         v-model="radioObj1"
-        :group-name="`RADIOID1`"
         @change-event="onChangeEvent2"
       >
         <Radio
