@@ -53,9 +53,6 @@ export default {
   computed: {
   },
   watch: {
-    bindGroupName(v) {
-      this.groupName = v;
-    },
   },
   created() {
   },
@@ -67,10 +64,11 @@ export default {
         // 부모 컴포넌트가 Radio Group인 경우
         this.$parent.$emit('changeEvent', e);
         this.$parent.$emit('input', e.target.value);
-      } else {
-        // 부모 컴포넌트가 Radio Group로 안감싼경우
-        this.$emit('input', e.target.value);
       }
+//      else {
+//        // 부모 컴포넌트가 Radio Group로 안감싼경우
+//        this.$emit('input', e.target.value);
+//      }
     },
   },
 };
