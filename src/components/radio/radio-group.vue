@@ -23,6 +23,9 @@ export default {
   computed: {
   },
   watch: {
+    value(v) {
+      this.initValue(v);
+    },
   },
   created() {
   },
@@ -30,12 +33,12 @@ export default {
     this.initValue();
   },
   methods: {
-    initValue() {
+    initValue(v) {
       this.childrens = this.$children;
       if (this.childrens) {
         this.childrens.forEach((c) => {
           const child = c;
-          child.bindValue = this.value;
+          child.bindValue = v || this.value;
         });
       }
     },

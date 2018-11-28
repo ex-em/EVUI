@@ -4,40 +4,63 @@
       <h5># Default Model</h5>
       <RadioGroup
         v-model="radioObj0"
-        @changeEvent="onChangeEvent"
+        :group-name="`RADIOID0`"
+        @change-event="onChangeEvent"
       >
         <Radio
           :id="obj0[0].id"
-          :label="obj0[0].label"
-          :group-name="obj0[0].name"
-        />
+          :value="obj0[0].value"
+        >
+          {{ obj0[0].text }}
+        </Radio>
         <Radio
           :id="obj0[1].id"
-          :label="obj0[1].label"
-          :group-name="obj0[1].name"
-        />
+          :value="obj0[1].value"
+        >
+          {{ obj0[1].text }}
+        </Radio>
         <Radio
           :id="obj0[2].id"
-          :label="obj0[2].label"
-          :group-name="obj0[2].name"
-        />
+          :value="obj0[2].value"
+        >
+          {{ obj0[2].text }}
+        </Radio>
       </RadioGroup>
+      <br>
       bind value : {{ radioObj0 }}
     </div>
     <br>
+    <br>
+    <br>
     <div class="bind-model">
-      <h5># Group Model</h5>
-      <Radio
-        v-for="list in obj1"
-        :key="list.id"
-        :id="list.id"
-        :label="list.label"
-        :group-name="list.name"
+      <h5># Default Model2</h5>
+      <RadioGroup
         v-model="radioObj1"
-      />
+        :group-name="`RADIOID1`"
+        @change-event="onChangeEvent2"
+      >
+        <Radio
+          :id="obj1[0].id"
+          :value="obj1[0].value"
+        >
+          {{ obj1[0].text }}
+        </Radio>
+        <Radio
+          :id="obj1[1].id"
+          :value="obj1[1].value"
+        >
+          {{ obj1[1].text }}
+        </Radio>
+        <Radio
+          :id="obj1[2].id"
+          :value="obj1[2].value"
+        >
+          {{ obj1[2].text }}
+        </Radio>
+      </RadioGroup>
+      <br>
       bind value : {{ radioObj1 }}
     </div>
-    <br>
   </div>
 </template>
 
@@ -52,40 +75,40 @@
     },
     data() {
       return {
-        radioObj0: 'RADIOID01',
+        radioObj0: 'cellPhone',
         obj0: [
           {
             id: 'RADIOID01',
-            label: 'Base01',
-            name: 'RADIOID0',
+            text: 'Iphone',
+            value: 'cellPhone',
           },
           {
             id: 'RADIOID02',
-            label: 'Base02',
-            name: 'RADIOID0',
+            text: 'Hermes',
+            value: 'imitation',
           },
           {
             id: 'RADIOID03',
-            label: 'Base03',
-            name: 'RADIOID0',
+            text: 'Apple Watch',
+            value: 'luxury',
           },
         ],
-        radioObj1: 'RADIOID12',
+        radioObj1: 'cellPhone',
         obj1: [
           {
-            id: 'RADIOID11',
-            label: 'RADIOID1-v',
-            name: 'RADIOID1',
+            id: 'RADIOID04',
+            text: 'Iphone',
+            value: 'cellPhone',
           },
           {
-            id: 'RADIOID12',
-            label: 'RADIOID2-v',
-            name: 'RADIOID1',
+            id: 'RADIOID05',
+            text: 'Hermes',
+            value: 'imitation',
           },
           {
-            id: 'RADIOID13',
-            label: 'RADIOID3-v',
-            name: 'RADIOID1',
+            id: 'RADIOID06',
+            text: 'Apple Watch',
+            value: 'luxury',
           },
         ],
       };
@@ -93,7 +116,11 @@
     methods: {
       onChangeEvent(e) {
         // return Event
-        console.log(`e : ${e}`);
+        console.log(`onChangeEvent e : ${e}`);
+      },
+      onChangeEvent2(e) {
+        // return Event
+        console.log(`onChangeEvent2 e : ${e}`);
       },
     },
   };

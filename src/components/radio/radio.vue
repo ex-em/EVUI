@@ -2,33 +2,39 @@
   <div>
     <label
       :for="id"
-      class="ev-radio-label"
     >
       <input
         :id="id"
+        :value="value"
         :name="groupName"
-        :label="label"
-        :checked="bindValue === id"
+        :checked="value === bindValue"
         :disabled="disabled"
         type="radio"
         class="ev-radio-input"
         @change="onChange"
       >
-      {{ label }}
+      <slot/>
     </label>
   </div>
 </template>
 
 <script>
 export default {
+  model: {
+    prop: 'customVModel',
+  },
   props: {
     id: {
       type: String,
       required: true,
     },
-    label: {
+    value: {
       type: String,
       required: true,
+    },
+    customVModel: {
+      type: String,
+      default: '',
     },
     groupName: {
       type: String,
@@ -38,19 +44,18 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: {
-      type: String,
-      default: '',
-    },
   },
   data() {
     return {
-      bindValue: this.value,
+      bindValue: this.customVModel,
     };
   },
   computed: {
   },
   watch: {
+    bindGroupName(v) {
+      this.groupName = v;
+    },
   },
   created() {
   },
@@ -61,10 +66,10 @@ export default {
       if (this.$parent.$options.componentName === 'RadioGroup') {
         // 부모 컴포넌트가 Radio Group인 경우
         this.$parent.$emit('changeEvent', e);
-        this.$parent.$emit('input', e.target.id);
+        this.$parent.$emit('input', e.target.value);
       } else {
         // 부모 컴포넌트가 Radio Group로 안감싼경우
-        this.$emit('input', e.target.id);
+        this.$emit('input', e.target.value);
       }
     },
   },
