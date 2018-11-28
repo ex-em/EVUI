@@ -32,7 +32,7 @@
       const bindValue = this.value;
       this.$on('changeEvent', (e) => {
         if (e.currentTarget.checked) {
-          if (bindValue.indexOf(e.target.id) <= -1) {
+          if (bindValue.indexOf(e.target.id) === -1) {
             bindValue.push(e.target.id);
           }
           this.$parent.$emit('input', bindValue);

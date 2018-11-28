@@ -64,8 +64,6 @@
     },
   };
 </script>
+
 <style scoped>
-  div{
-    padding: 2px;
-  }
 </style>
