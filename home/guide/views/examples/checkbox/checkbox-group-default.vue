@@ -69,10 +69,4 @@
 </script>
 
 <style scoped>
-  div{
-    display: inline-block;
-  }
-  p{
-    padding: 5px;
-  }
 </style>

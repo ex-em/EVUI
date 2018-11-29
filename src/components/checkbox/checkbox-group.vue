@@ -27,40 +27,25 @@
     },
     mounted() {
       this.initValue();
-      const bindValue = this.value;
+      const bindValue = this.bindValue;
       this.$on('changeEvent', (e) => {
         const targetValue = e.target.value;
-        if (e.currentTarget.checked) {
-          if (bindValue.indexOf(targetValue) === -1) {
-            bindValue.push(targetValue);
-          }
-          this.$parent.$emit('input', bindValue);
-        } else {
-          if (bindValue.indexOf(targetValue) > -1) {
-            bindValue.splice(bindValue.indexOf(targetValue), 1);
-          }
-          this.$parent.$emit('input', bindValue);
+        if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
+          bindValue.push(targetValue);
+        } else if (!e.currentTarget.checked && bindValue.indexOf(targetValue) > -1) {
+          bindValue.splice(bindValue.indexOf(targetValue), 1);
         }
+        this.$parent.$emit('input', bindValue);
       });
     },
     methods: {
       initValue() {
         this.childrens = this.$children;
-        const value = this.bindValue;
+        const value = this.value;
         if (this.childrens) {
           this.childrens.forEach((c) => {
-            let checkFlag = false;
             const child = c;
-            value.forEach((v) => {
-              if (child.value === v) {
-                checkFlag = true;
-              }
-            });
-            if (checkFlag) {
-              child.bindChecked = true;
-            } else {
-              child.bindChecked = false;
-            }
+            child.bindValue = value;
           });
         }
       },

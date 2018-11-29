@@ -5,8 +5,9 @@
       :value="value1"
       v-model="vModel1"
     >
-      CHECK TEST 01
+      TEST TEXT
     </Checkbox>
+    <br>
     <br>
     bindValue : {{ vModel1 }}
   </div>
@@ -27,11 +28,6 @@
     },
   };
 </script>
+
 <style scoped>
-  div{
-    display: inline-block;
-  }
-  p{
-    margin-left: 30px;
-  }
 </style>

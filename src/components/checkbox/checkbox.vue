@@ -1,29 +1,17 @@
 <template>
   <div>
-    <label
-      v-if="isGroupWrap"
-      :for="`${id}_groupWrap`"
+    <input
+      :id="id"
+      :value="value"
+      v-model="bindValue"
+      type="checkbox"
+      class="ev-checkbox-input"
+      @change="onChange"
     >
-      <input
-        :id="`${id}_groupWrap`"
-        :value="value"
-        :checked="bindChecked"
-        type="checkbox"
-        @change="onChange"
-      >
-      <slot/>
-    </label>
     <label
-      v-else
-      :for="`${id}_noWrap`"
+      :for="id"
+      class="ev-checkbox-label"
     >
-      <input
-        :id="`${id}_noWrap`"
-        :value="value"
-        :checked="customVModel"
-        type="checkbox"
-        @change="onChange"
-      >
       <slot/>
     </label>
   </div>
@@ -44,14 +32,14 @@
         default: '',
       },
       customVModel: {
-        type: Boolean,
-        default: false,
+        type: [Boolean, Array],
+        default: null,
       },
     },
     data() {
       return {
         isGroupWrap: false, // group태그가 존재하는 경우 true
-        bindChecked: false,
+        bindValue: this.customVModel,
       };
     },
     computed: {
@@ -64,7 +52,6 @@
     methods: {
       onChange(e) {
         if (this.isGroupWrap) {
-          this.bindChecked = e.target.checked;
           this.$parent.$emit('changeEvent', e);
         } else {
           this.$emit('changeEvent', e);
@@ -76,7 +63,11 @@
 </script>
 
 <style scoped>
-  label {
+  .ev-checkbox-label {
     user-select: none;
+    vertical-align: middle;
+  }
+  .ev-checkbox-input {
+    vertical-align: middle;
   }
 </style>
