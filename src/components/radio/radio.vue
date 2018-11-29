@@ -22,14 +22,14 @@
 <script>
 export default {
   model: {
-    prop: 'customVModel',
+    prop: 'customValue',
   },
   props: {
     value: {
       type: String,
       required: true,
     },
-    customVModel: {
+    customValue: {
       type: String,
       default: '',
     },
@@ -44,7 +44,7 @@ export default {
   },
   data() {
     return {
-      bindValue: this.customVModel,
+      bindValue: this.customValue,
       radioId: this._uid,
     };
   },
