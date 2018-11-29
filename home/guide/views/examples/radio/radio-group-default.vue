@@ -60,34 +60,12 @@
             value: 'luxury',
           },
         ],
-        radioObj1: 'cellPhone',
-        obj1: [
-          {
-            id: 'RADIOID04',
-            text: 'Iphone',
-            value: 'cellPhone',
-          },
-          {
-            id: 'RADIOID05',
-            text: 'Hermes',
-            value: 'imitation',
-          },
-          {
-            id: 'RADIOID06',
-            text: 'Apple Watch',
-            value: 'luxury',
-          },
-        ],
       };
     },
     methods: {
       onChangeEvent(e) {
         // return Event
         console.log(`onChangeEvent e : ${e}`);
-      },
-      onChangeEvent2(e) {
-        // return Event
-        console.log(`onChangeEvent2 e : ${e}`);
       },
     },
   };

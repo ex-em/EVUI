@@ -1,18 +1,19 @@
 <template>
   <div>
+    <input
+      :id="id"
+      :value="value"
+      :name="groupName"
+      :disabled="disabled"
+      v-model="bindValue"
+      type="radio"
+      class="ev-radio-input"
+      @change="onChange"
+    >
     <label
       :for="id"
+      class="ev-radio-label"
     >
-      <input
-        :id="id"
-        :value="value"
-        :name="groupName"
-        :checked="value === bindValue"
-        :disabled="disabled"
-        type="radio"
-        class="ev-radio-input"
-        @change="onChange"
-      >
       <slot/>
     </label>
   </div>
@@ -76,7 +77,8 @@ export default {
 
 <style scoped>
   .ev-radio-label {
-    display: block;
+    user-select: none;
+    vertical-align: middle;
   }
   .ev-radio-input {
     vertical-align: middle;

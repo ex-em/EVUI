@@ -18,12 +18,13 @@
       :id="`disabledRadioButton01`"
       :value="`value02`"
       :disabled="true"
-      v-model="bindVModel02"
+      v-model="bindVModel03"
     >
       disabled selected radio
     </radio>
   </div>
 </template>
+
 <script>
   import radio from '@/components/radio/radio';
 
@@ -40,11 +41,6 @@
     },
   };
 </script>
+
 <style scoped>
-  div{
-    display: inline-block;
-  }
-  p{
-    margin-left: 30px;
-  }
 </style>
