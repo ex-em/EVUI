@@ -1,7 +1,6 @@
 <template>
   <div>
     <Checkbox
-      :id="id1"
       :value="value1"
       v-model="vModel1"
     >
@@ -21,7 +20,6 @@
     },
     data() {
       return {
-        id1: 'id01',
         value1: 'value01',
         vModel1: true,
       };

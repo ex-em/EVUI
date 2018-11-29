@@ -1,7 +1,7 @@
 <template>
   <div>
     <input
-      :id="id"
+      :id="`${checkboxId}_${value}`"
       :value="value"
       v-model="bindValue"
       type="checkbox"
@@ -9,7 +9,7 @@
       @change="onChange"
     >
     <label
-      :for="id"
+      :for="`${checkboxId}_${value}`"
       class="ev-checkbox-label"
     >
       <slot/>
@@ -23,10 +23,6 @@
       prop: 'customVModel',
     },
     props: {
-      id: {
-        type: String,
-        required: true,
-      },
       value: {
         type: String,
         default: '',
@@ -38,6 +34,7 @@
     },
     data() {
       return {
+        checkboxId: this._uid,
         isGroupWrap: false, // group태그가 존재하는 경우 true
         bindValue: this.customVModel,
       };
