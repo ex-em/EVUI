@@ -3,51 +3,28 @@
     <div class="group-slot-demo">
       <Checkbox-group
         v-model="bindList"
-        @changeEvent="onChangeEvent"
+        @change-event="onChangeEvent"
       >
         <Checkbox
           :id="obj0[0].id"
-          :label="obj0[0].label"
-          :group-name="obj0[0].name"
-        />
+          :value="obj0[0].value"
+        >
+          {{ obj0[0].text }}
+        </Checkbox>
         <Checkbox
           :id="obj0[1].id"
-          :label="obj0[1].label"
-          :group-name="obj0[1].name"
-        />
+          :value="obj0[1].value"
+        >
+          {{ obj0[1].text }}
+        </Checkbox>
         <Checkbox
           :id="obj0[2].id"
-          :label="obj0[2].label"
-          :group-name="obj0[2].name"
-        />
+          :value="obj0[2].value"
+        >
+          {{ obj0[2].text }}
+        </Checkbox>
       </Checkbox-group>
       <p>Selected List : {{ bindList }}</p>
-    </div>
-    <br>
-    <br>
-    <br>
-    <div class="group-slot-demo">
-      <Checkbox-group
-        v-model="bindList1"
-        @changeEvent="onChangeEvent"
-      >
-        <Checkbox
-          :id="obj1[0].id"
-          :label="obj1[0].label"
-          :group-name="obj1[0].name"
-        />
-        <Checkbox
-          :id="obj1[1].id"
-          :label="obj1[1].label"
-          :group-name="obj1[1].name"
-        />
-        <Checkbox
-          :id="obj1[2].id"
-          :label="obj1[2].label"
-          :group-name="obj1[2].name"
-        />
-      </Checkbox-group>
-      <p>Selected List : {{ bindList1 }}</p>
     </div>
   </div>
 </template>
@@ -66,39 +43,21 @@
         obj0: [
           {
             id: 'RADIOID01',
-            label: 'Base01',
-            name: 'RADIOID0',
+            value: 'Base01',
+            text: 'A',
           },
           {
             id: 'RADIOID02',
-            label: 'Base02',
-            name: 'RADIOID0',
+            value: 'Base02',
+            text: 'B',
           },
           {
             id: 'RADIOID03',
-            label: 'Base03',
-            name: 'RADIOID0',
+            value: 'Base03',
+            text: 'C',
           },
         ],
-        bindList: ['RADIOID01', 'RADIOID02'],
-        obj1: [
-          {
-            id: 'RADIOID11',
-            label: 'Base11',
-            name: 'RADIOID1',
-          },
-          {
-            id: 'RADIOID12',
-            label: 'Base12',
-            name: 'RADIOID1',
-          },
-          {
-            id: 'RADIOID13',
-            label: 'Base13',
-            name: 'RADIOID1',
-          },
-        ],
-        bindList1: ['RADIOID13'],
+        bindList: ['Base01', 'Base02'],
       };
     },
     methods: {

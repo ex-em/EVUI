@@ -6,8 +6,6 @@
 
 <script>
   export default {
-    components: {
-    },
     props: {
       value: {
         type: Array,
@@ -31,14 +29,15 @@
       this.initValue();
       const bindValue = this.value;
       this.$on('changeEvent', (e) => {
+        const targetValue = e.target.value;
         if (e.currentTarget.checked) {
-          if (bindValue.indexOf(e.target.id) === -1) {
-            bindValue.push(e.target.id);
+          if (bindValue.indexOf(targetValue) === -1) {
+            bindValue.push(targetValue);
           }
           this.$parent.$emit('input', bindValue);
         } else {
-          if (bindValue.indexOf(e.target.id) > -1) {
-            bindValue.splice(bindValue.indexOf(e.target.id), 1);
+          if (bindValue.indexOf(targetValue) > -1) {
+            bindValue.splice(bindValue.indexOf(targetValue), 1);
           }
           this.$parent.$emit('input', bindValue);
         }
@@ -53,7 +52,7 @@
             let checkFlag = false;
             const child = c;
             value.forEach((v) => {
-              if (child.id === v) {
+              if (child.value === v) {
                 checkFlag = true;
               }
             });
