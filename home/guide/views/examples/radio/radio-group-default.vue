@@ -7,19 +7,16 @@
         @change-event="onChangeEvent"
       >
         <Radio
-          :id="obj0[0].id"
           :value="obj0[0].value"
         >
           {{ obj0[0].text }}
         </Radio>
         <Radio
-          :id="obj0[1].id"
           :value="obj0[1].value"
         >
           {{ obj0[1].text }}
         </Radio>
         <Radio
-          :id="obj0[2].id"
           :value="obj0[2].value"
         >
           {{ obj0[2].text }}
@@ -45,17 +42,14 @@
         radioObj0: 'cellPhone',
         obj0: [
           {
-            id: 'RADIOID01',
             text: 'Iphone',
             value: 'cellPhone',
           },
           {
-            id: 'RADIOID02',
             text: 'Hermes',
             value: 'imitation',
           },
           {
-            id: 'RADIOID03',
             text: 'Apple Watch',
             value: 'luxury',
           },

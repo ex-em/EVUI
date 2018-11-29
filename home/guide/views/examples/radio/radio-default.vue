@@ -4,7 +4,6 @@
     <h5># Default Radio Button</h5>
     <br>
     <radio
-      :id="`defaultRadioButtonId01`"
       :value="`value01`"
       v-model="bindVModel01"
     >
@@ -15,7 +14,6 @@
     <h5># Default Disabled Radio Button</h5>
     <br>
     <radio
-      :id="`disabledRadioButton01`"
       :value="`value02`"
       :disabled="true"
       v-model="bindVModel03"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <input
-      :id="id"
+      :id="`${radioId}_${value}`"
       :value="value"
       :name="groupName"
       :disabled="disabled"
@@ -11,7 +11,7 @@
       @change="onChange"
     >
     <label
-      :for="id"
+      :for="`${radioId}_${value}`"
       class="ev-radio-label"
     >
       <slot/>
@@ -25,10 +25,6 @@ export default {
     prop: 'customVModel',
   },
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
     value: {
       type: String,
       required: true,
@@ -49,6 +45,7 @@ export default {
   data() {
     return {
       bindValue: this.customVModel,
+      radioId: this._uid,
     };
   },
   computed: {
