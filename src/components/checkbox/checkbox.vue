@@ -20,14 +20,14 @@
 <script>
   export default {
     model: {
-      prop: 'customVModel',
+      prop: 'customValue',
     },
     props: {
       value: {
         type: String,
         default: '',
       },
-      customVModel: {
+      customValue: {
         type: [Boolean, Array],
         default: null,
       },
@@ -36,7 +36,7 @@
       return {
         checkboxId: this._uid,
         isGroupWrap: false, // group태그가 존재하는 경우 true
-        bindValue: this.customVModel,
+        bindValue: this.customValue,
       };
     },
     computed: {
