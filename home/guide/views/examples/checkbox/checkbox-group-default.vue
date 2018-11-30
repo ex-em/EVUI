@@ -1,28 +1,40 @@
 <template>
   <div>
-    <div class="group-slot-demo">
-      <Checkbox-group
-        v-model="bindList"
-        @change-event="onChangeEvent"
+    <Checkbox-group
+      v-model="bindList"
+      @change-event="onChangeEvent"
+    >
+      <Checkbox
+        :value="obj0[0].value"
+        class="checkboxStyle"
       >
-        <Checkbox
-          :value="obj0[0].value"
-        >
-          {{ obj0[0].text }}
-        </Checkbox>
-        <Checkbox
-          :value="obj0[1].value"
-        >
-          {{ obj0[1].text }}
-        </Checkbox>
-        <Checkbox
-          :value="obj0[2].value"
-        >
-          {{ obj0[2].text }}
-        </Checkbox>
-      </Checkbox-group>
-      <p>Selected List : {{ bindList }}</p>
-    </div>
+        {{ obj0[0].text }}
+      </Checkbox>
+      <Checkbox
+        :value="obj0[1].value"
+        class="checkboxStyle"
+      >
+        {{ obj0[1].text }}
+      </Checkbox>
+      <Checkbox
+        :value="obj0[2].value"
+        :disabled="false"
+        class="checkboxStyle"
+      >
+        {{ obj0[2].text }}
+      </Checkbox>
+      <Checkbox
+        :value="obj0[3].value"
+        :disabled="true"
+        class="checkboxStyle"
+      >
+        {{ obj0[3].text }}
+      </Checkbox>
+    </Checkbox-group>
+    <br>
+    <br>
+    <p>Selected List : {{ bindList }}</p>
+    <br>
   </div>
 </template>
 
@@ -50,6 +62,10 @@
             value: 'Base03',
             text: 'C',
           },
+          {
+            value: 'Base04',
+            text: 'D',
+          },
         ],
         bindList: ['Base01', 'Base02'],
       };
@@ -63,4 +79,7 @@
 </script>
 
 <style scoped>
+  .checkboxStyle {
+    margin: 0 10px 0 10px;
+  }
 </style>

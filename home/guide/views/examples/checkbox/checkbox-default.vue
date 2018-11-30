@@ -1,16 +1,20 @@
 <template>
   <div>
     <Checkbox
-      :value="value1"
-      v-model="vModel1"
+      :value="bindValue"
+      v-model="vModel"
+      class="checkboxStyle"
     >
-      TEST TEXT
+      Single Checkbox
     </Checkbox>
     <br>
     <br>
-    bindValue : {{ vModel1 }}
+    bindValue : {{ vModel }}
+    <br>
+    <br>
   </div>
 </template>
+
 <script>
   import Checkbox from '@/components/checkbox/checkbox';
 
@@ -20,12 +24,15 @@
     },
     data() {
       return {
-        value1: 'value01',
-        vModel1: true,
+        bindValue: 'value01',
+        vModel: true,
       };
     },
   };
 </script>
 
 <style scoped>
+  .checkboxStyle {
+    margin: 0 10px 0 10px;
+  }
 </style>

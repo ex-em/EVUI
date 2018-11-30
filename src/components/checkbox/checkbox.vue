@@ -1,17 +1,21 @@
 <template>
-  <div>
-    <input
-      :id="`${checkboxId}_${value}`"
-      :value="value"
-      v-model="bindValue"
-      type="checkbox"
-      class="ev-checkbox-input"
-      @change="onChange"
-    >
+  <div
+    :class="{ disabled: disabled }"
+    class="ev-checkbox-wrap"
+  >
     <label
       :for="`${checkboxId}_${value}`"
       class="ev-checkbox-label"
     >
+      <input
+        :id="`${checkboxId}_${value}`"
+        :value="value"
+        :disabled="disabled"
+        v-model="bindValue"
+        type="checkbox"
+        class="ev-checkbox-input"
+        @change="onChange"
+      >
       <slot/>
     </label>
   </div>
@@ -26,6 +30,10 @@
       value: {
         type: String,
         default: '',
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
       },
       customValue: {
         type: [Boolean, Array],
@@ -60,11 +68,21 @@
 </script>
 
 <style scoped>
-  .ev-checkbox-label {
+  .ev-checkbox-wrap {
+    float: left;
     user-select: none;
+    cursor: pointer;
+  }
+  .ev-checkbox-wrap.disabled {
+    color: #C0C4CC;
+    cursor: not-allowed;
+  }
+  .ev-checkbox-label {
     vertical-align: middle;
+    cursor: inherit;
   }
   .ev-checkbox-input {
     vertical-align: middle;
+    cursor: inherit;
   }
 </style>
