@@ -3,20 +3,20 @@
     :class="{ disabled: disabled }"
     class="ev-radio-wrap"
   >
-    <input
-      :id="`${radioId}_${value}`"
-      :value="value"
-      :name="groupName"
-      :disabled="disabled"
-      v-model="bindValue"
-      type="radio"
-      class="ev-radio-input"
-      @change="onChange"
-    >
     <label
       :for="`${radioId}_${value}`"
       class="ev-radio-label"
     >
+      <input
+        :id="`${radioId}_${value}`"
+        :value="value"
+        :name="groupName"
+        :disabled="disabled"
+        v-model="bindValue"
+        type="radio"
+        class="ev-radio-input"
+        @change="onChange"
+      >
       <slot/>
     </label>
   </div>
@@ -82,20 +82,14 @@ export default {
     cursor: pointer;
   }
   .ev-radio-wrap.disabled {
-    cursor: not-allowed;
-  }
-  .ev-radio-label {
-    cursor: pointer;
-  }
-  .disabled > .ev-radio-label {
     color: #C0C4CC;
     cursor: not-allowed;
   }
+  .ev-radio-label {
+    cursor: inherit;
+  }
   .ev-radio-input {
     vertical-align: middle;
-    cursor: pointer;
-  }
-  .disabled > .ev-radio-input {
-    cursor: not-allowed;
+    cursor: inherit;
   }
 </style>

@@ -7,7 +7,7 @@
       :value="`value01`"
       v-model="bindVModel01"
     >
-      single radio
+      Single Radio
     </radio>
     <br>
     <br>
@@ -18,7 +18,7 @@
       :disabled="true"
       v-model="bindVModel03"
     >
-      disabled single radio
+      Disabled Single Radio
     </radio>
     <br>
     <br>

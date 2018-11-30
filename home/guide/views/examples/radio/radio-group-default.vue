@@ -3,7 +3,7 @@
     <h5># Default Model</h5>
     <br>
     <RadioGroup
-      v-model="bindingRadioValue"
+      v-model="bindingValue"
       @change-event="onChangeEvent"
     >
       <Radio
@@ -27,7 +27,8 @@
     </RadioGroup>
     <br>
     <br>
-    bind value : {{ bindingRadioValue }}
+    bind value : {{ bindingValue }}
+    <br>
     <br>
   </div>
 </template>
@@ -43,7 +44,7 @@
     },
     data() {
       return {
-        bindingRadioValue: 'cellPhone',
+        bindingValue: 'cellPhone',
         radioObj: [
           {
             text: 'Iphone',
