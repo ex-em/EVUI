@@ -7,7 +7,7 @@
       :value="`value01`"
       v-model="bindVModel01"
     >
-      TTTEST1
+      single radio
     </radio>
     <br>
     <br>
@@ -18,8 +18,11 @@
       :disabled="true"
       v-model="bindVModel03"
     >
-      disabled selected radio
+      disabled single radio
     </radio>
+    <br>
+    <br>
+    <br>
   </div>
 </template>
 

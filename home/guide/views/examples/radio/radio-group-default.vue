@@ -1,30 +1,34 @@
 <template>
   <div>
-    <div class="bind-model">
-      <h5># Default Model</h5>
-      <RadioGroup
-        v-model="radioObj0"
-        @change-event="onChangeEvent"
+    <h5># Default Model</h5>
+    <br>
+    <RadioGroup
+      v-model="bindingRadioValue"
+      @change-event="onChangeEvent"
+    >
+      <Radio
+        :value="radioObj[0].value"
       >
-        <Radio
-          :value="obj0[0].value"
-        >
-          {{ obj0[0].text }}
-        </Radio>
-        <Radio
-          :value="obj0[1].value"
-        >
-          {{ obj0[1].text }}
-        </Radio>
-        <Radio
-          :value="obj0[2].value"
-        >
-          {{ obj0[2].text }}
-        </Radio>
-      </RadioGroup>
-      <br>
-      bind value : {{ radioObj0 }}
-    </div>
+        {{ radioObj[0].text }}
+      </Radio>
+      <Radio
+        :value="radioObj[1].value"
+        class="radioStyle"
+      >
+        {{ radioObj[1].text }}
+      </Radio>
+      <Radio
+        :value="radioObj[2].value"
+        :disabled="true"
+        class="radioStyle"
+      >
+        {{ radioObj[2].text }}
+      </Radio>
+    </RadioGroup>
+    <br>
+    <br>
+    bind value : {{ bindingRadioValue }}
+    <br>
   </div>
 </template>
 
@@ -39,8 +43,8 @@
     },
     data() {
       return {
-        radioObj0: 'cellPhone',
-        obj0: [
+        bindingRadioValue: 'cellPhone',
+        radioObj: [
           {
             text: 'Iphone',
             value: 'cellPhone',
@@ -66,4 +70,7 @@
 </script>
 
 <style scoped>
+  .radioStyle {
+    margin: 0 0 0 10px;
+  }
 </style>

@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    :class="{ disabled: disabled }"
+    class="ev-radio-wrap"
+  >
     <input
       :id="`${radioId}_${value}`"
       :value="value"
@@ -73,11 +76,26 @@ export default {
 </script>
 
 <style scoped>
-  .ev-radio-label {
+  .ev-radio-wrap {
+    float: left;
     user-select: none;
-    vertical-align: middle;
+    cursor: pointer;
+  }
+  .ev-radio-wrap.disabled {
+    cursor: not-allowed;
+  }
+  .ev-radio-label {
+    cursor: pointer;
+  }
+  .disabled > .ev-radio-label {
+    color: #C0C4CC;
+    cursor: not-allowed;
   }
   .ev-radio-input {
     vertical-align: middle;
+    cursor: pointer;
+  }
+  .disabled > .ev-radio-input {
+    cursor: not-allowed;
   }
 </style>
