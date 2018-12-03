@@ -23,10 +23,15 @@ module.exports = merge(webpackBaseConfig, {
     path: path.resolve(__dirname, '../dist_maxgauge'),
     publicPath: '/',
     filename: '[name].js',
+    globalObject: 'this',
   },
   devtool: 'source-map',
   module: {
     rules:[
+      {
+        test: /web-socket-worker\.js$/,
+        use: { loader: 'worker-loader' }
+      },
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
@@ -89,7 +94,8 @@ module.exports = merge(webpackBaseConfig, {
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../maxgauge/'),
-        to: './maxgauge/'
+        to: './maxgauge/',
+        copyUnmodified: true,
       },
     ]),
     new FriendlyErrorsPlugin(),

@@ -19,20 +19,16 @@
       <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
         :class="`${prefixCls}-expand-btn`"
-        @click="clickExpandBtn"
+        @click="onExpand"
       />
       <div :class="`${prefixCls}-close-btn-line`"/>
       <div
         :class="`${prefixCls}-close-btn`"
-        @click="clickCloseBtn"
+        @click="close"
       />
     </div>
     <div :class="`${prefixCls}-body-area`">
-      <component
-        :is="content"
-        v-bind="bodyProps"
-        @onbodyevent="onBodyEvent"
-      />
+      <slot/>
     </div>
   </div>
 </template>
@@ -42,18 +38,6 @@
 
   export default {
     props: {
-      name: {
-        type: String,
-        default: '',
-      },
-      top: {
-        type: Number,
-        default: null,
-      },
-      left: {
-        type: Number,
-        default: null,
-      },
       width: {
         type: [String, Number],
         default: 250,
@@ -70,33 +54,9 @@
         type: [String, Number],
         default: 150,
       },
-      clsType: {
-        type: String,
-        default: 'rtm',
-        validator(value) {
-          const list = ['', 'rtm', 'pa', 'config'];
-          return list.indexOf(value) > -1;
-        },
-      },
       title: {
         type: String,
         default: '',
-      },
-      content: {
-        type: [Object, String],
-        default: null,
-      },
-      hidden: {
-        type: Boolean,
-        default: false,
-      },
-      initCenterBase: {
-        type: String,
-        default: 'body',
-        validator(value) {
-          const list = ['body', 'parent'];
-          return list.indexOf(value) > -1;
-        },
       },
       closeType: {
         type: String,
@@ -109,10 +69,6 @@
       resizable: {
         type: Boolean,
         default: true,
-      },
-      bodyProps: {
-        type: Object,
-        default: null,
       },
     },
     data() {
@@ -146,11 +102,10 @@
       };
     },
     created() {
-      this.windowId = `window_${this._uid}_${this.name}`;
-      this.windowCls = this.getWindowCls();
+      this.windowId = `window_${this._uid}`;
       this.headerStyle = `height: ${this.headerHeight}px`;
-      this.headerCls = this.getHeaderCls();
-      this.isShow = !this.hidden;
+      this.headerCls = { [`${this.prefixCls}-header-area`]: true };
+      this.windowCls = { [this.prefixCls]: true };
     },
     mounted() {
       this.windowStyle = this.getWindowStyle();
@@ -159,9 +114,6 @@
       this.isShow = false;
     },
     methods: {
-      onBodyEvent(eventInfo) {
-        this.$emit(eventInfo.name, eventInfo.payload);
-      },
       onMouseDown(e) {
         const windowEl = this.$el;
 
@@ -198,9 +150,6 @@
         }
 
         this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
-        if (!this.isMoving) {
-          this.$emit('onmousedown', e);
-        }
 
         document.body.style.cursor = windowEl.style.cursor;
 
@@ -210,10 +159,7 @@
       onMouseMove(e) {
         if (this.resizable && this.isGrabbingBorder) {
           this.resize(e);
-          return;
-        }
-
-        if (this.isMoving) {
+        } else if (this.isMoving) {
           const diffTop = e.clientY - this.clickedInfo.clientY;
           const diffLeft = e.clientX - this.clickedInfo.clientX;
 
@@ -243,7 +189,7 @@
       onHeaderDblClick(e) {
         this.$emit('onheaderdblclick', e);
       },
-      clickExpandBtn() {
+      onExpand() {
         if (this.isFullExpandWindow) {
           this.setCssText({
             top: this.posInfoBeforeExpand.top,
@@ -268,15 +214,6 @@
         }
 
         this.isFullExpandWindow = !this.isFullExpandWindow;
-      },
-      clickCloseBtn() {
-        this.$emit('onbeforeclose', this);
-
-        if (this.closeType === 'hide') {
-          this.hide();
-        } else {
-          this.isExist = false;
-        }
       },
       resize(e) {
         const isTop = this.grabbingBorderPosInfo.top;
@@ -458,24 +395,10 @@
       },
       getWindowStyle() {
         const clientRect = this.$el.getBoundingClientRect();
-        let top;
-        let left;
-        let parentWidth;
-        let parentHeight;
-
-        if (this.initCenterBase === 'parent' && this.$el && this.$el.parentElement) {
-          parentWidth = this.$el.parentElement.clientWidth;
-          parentHeight = this.$el.parentElement.clientHeight;
-
-          top = (parentHeight / 2) - (this.height / 2);
-          left = (parentWidth / 2) - (this.width / 2);
-        } else {
-          parentWidth = document.body.clientWidth;
-          parentHeight = document.body.clientHeight;
-
-          top = (parentHeight / 2) - (this.height / 2) - clientRect.top;
-          left = (parentWidth / 2) - (this.width / 2) - clientRect.left;
-        }
+        const bodyWidth = document.body.clientWidth;
+        const bodyHeight = document.body.clientHeight;
+        const top = (bodyHeight / 2) - (this.height / 2) - clientRect.top;
+        const left = (bodyWidth / 2) - (this.width / 2) - clientRect.left;
 
         return {
           top: this.numberToPixel(top),
@@ -486,22 +409,6 @@
           minHeight: this.numberToPixel(this.minHeight),
           paddingTop: this.numberToPixel(this.headerHeight),
         };
-      },
-      getWindowCls() {
-        return [
-          this.prefixCls,
-          {
-            [`${this.prefixCls}-rtm`]: this.clsType === 'rtm',
-          },
-        ];
-      },
-      getHeaderCls() {
-        return [
-          {
-            [`${this.prefixCls}-header-area`]: this.clsType,
-            [`${this.prefixCls}-header-rtm`]: this.clsType === 'rtm',
-          },
-        ];
       },
       numberToPixel(input) {
         let output;
@@ -543,6 +450,15 @@
       hide() {
         this.isShow = false;
       },
+      close() {
+        this.$emit('onbeforeclose', this);
+
+        if (this.closeType === 'hide') {
+          this.hide();
+        } else {
+          this.isExist = false;
+        }
+      },
     },
   };
 </script>
@@ -550,21 +466,20 @@
 <style>
   .ev-window{
     position: absolute;
-    border: 9px solid;
+    border: 9px solid #595C64;
     border-radius: 8px;
+    background: #212227;
     overflow: visible;
     z-index: 8888;
-  }
-  .ev-window-rtm{
-    border-color: #595C64;
-    background: #212227;
   }
   .ev-window-header-area{
     position: absolute;
     top: 0;
     width: 100%;
     border-bottom: 1px solid;
-    background: transparent;
+    background: #27282E;
+    border-color: #464850;
+    color: #ABAEB5;
     font-family: 'NanumGothic', sans-serif;
     align-items: center;
   }
@@ -572,11 +487,6 @@
     display: inline-block;
     padding: 6px 0 0 12px;
     font-size: 16px;
-  }
-  .ev-window-header-rtm{
-    border-color: #464850;
-    background-color: #27282E;
-    color: #ABAEB5;
   }
   .ev-window-header-pa{
     border-color: #474a53;

@@ -1,17 +1,18 @@
 <template>
   <div>
     <ev-button
-      text="Open Window"
       type="primary"
       @click="onClick"
-    />
+    >
+      Open Window
+    </ev-button>
     <ev-window
       ref="win"
       :body-style="{ padding: '10px' }"
-      :content="buttonType"
       title="Title"
-      @resize="resize"
-    />
+    >
+      <button-type/>
+    </ev-window>
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -40,12 +41,8 @@
           }
         }
       },
-      resize() {
-      },
     },
   };
 </script>
 
-<style scoped>
-
-</style>
+<style/>
