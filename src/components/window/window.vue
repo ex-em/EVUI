@@ -482,6 +482,7 @@
     color: #ABAEB5;
     font-family: 'NanumGothic', sans-serif;
     align-items: center;
+    user-select: none;
   }
   .ev-window-title-area{
     display: inline-block;
