@@ -4,7 +4,7 @@
     <br>
     <RadioGroup
       v-model="bindingValue"
-      @change-event="onChangeEvent"
+      @change-event="changeEvent"
     >
       <Radio
         :value="radioObj[0].value"
@@ -62,9 +62,9 @@
       };
     },
     methods: {
-      onChangeEvent(e) {
+      changeEvent(e) {
         // return Event
-        console.log(`onChangeEvent e : ${e}`);
+        console.log(`changeEvent e : ${e}`);
       },
     },
   };

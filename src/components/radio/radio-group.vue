@@ -16,7 +16,6 @@ export default {
   },
   data() {
     return {
-      childrens: [],
     };
   },
   componentName: 'RadioGroup',
@@ -34,9 +33,8 @@ export default {
   },
   methods: {
     initValue(v) {
-      this.childrens = this.$children;
-      if (this.childrens) {
-        this.childrens.forEach((c) => {
+      if (this.$children && this.$children instanceof Array) {
+        this.$children.forEach((c) => {
           const child = c;
           child.bindValue = v || this.value;
         });
