@@ -1,24 +1,31 @@
 <template>
-  <div
+  <label
+    :for="`${checkboxId}_${value}`"
     :class="{ disabled: disabled }"
-    class="ev-checkbox-wrap"
+    class="ev-checkbox-label"
   >
-    <label
-      :for="`${checkboxId}_${value}`"
-      class="ev-checkbox-label"
+    <input
+      v-if="!isGroupWrap"
+      :id="`${checkboxId}_${value}`"
+      :value="value"
+      :disabled="disabled"
+      v-model="bindValue"
+      type="checkbox"
+      class="ev-checkbox-input noGroupWrap"
+      @change="change"
     >
-      <input
-        :id="`${checkboxId}_${value}`"
-        :value="value"
-        :disabled="disabled"
-        v-model="bindValue"
-        type="checkbox"
-        class="ev-checkbox-input"
-        @change="onChange"
-      >
-      <slot/>
-    </label>
-  </div>
+    <input
+      v-else
+      :id="`${checkboxId}_${value}`"
+      :value="value"
+      :disabled="disabled"
+      v-model="groupBindValue"
+      type="checkbox"
+      class="ev-checkbox-input groupWrap"
+      @change="change"
+    >
+    <slot/>
+  </label>
 </template>
 
 <script>
@@ -44,22 +51,28 @@
       return {
         checkboxId: this._uid,
         isGroupWrap: false, // group태그가 존재하는 경우 true
-        bindValue: this.customValue,
+        groupBindValue: [],
       };
     },
     computed: {
-    },
-    watch: {
+      bindValue: {
+        get() {
+          return this.customValue;
+        },
+        set(list) {
+          this.groupBindValue = list;
+        },
+      },
     },
     created() {
       this.isGroupWrap = this.$parent.$options.componentName === 'CheckboxGroup';
     },
     methods: {
-      onChange(e) {
+      change(e) {
         if (this.isGroupWrap) {
-          this.$parent.$emit('changeEvent', e);
+          this.$parent.$emit('change-event', e);
         } else {
-          this.$emit('changeEvent', e);
+          this.$emit('change-event', e);
           this.$emit('input', e.target.checked);
         }
       },
@@ -68,18 +81,15 @@
 </script>
 
 <style scoped>
-  .ev-checkbox-wrap {
+  .ev-checkbox-label {
+    vertical-align: middle;
     float: left;
     user-select: none;
     cursor: pointer;
   }
-  .ev-checkbox-wrap.disabled {
+  .ev-checkbox-label.disabled {
     color: #C0C4CC;
     cursor: not-allowed;
-  }
-  .ev-checkbox-label {
-    vertical-align: middle;
-    cursor: inherit;
   }
   .ev-checkbox-input {
     vertical-align: middle;

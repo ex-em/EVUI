@@ -24,11 +24,14 @@
     computed: {
     },
     watch: {
+      value(array) {
+        this.initValue(array);
+      },
     },
     mounted() {
       this.initValue();
       const bindValue = this.bindValue;
-      this.$on('changeEvent', (e) => {
+      this.$on('change-event', (e) => {
         const targetValue = e.target.value;
         if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
           bindValue.push(targetValue);
@@ -39,13 +42,13 @@
       });
     },
     methods: {
-      initValue() {
+      initValue(array) {
         this.childrens = this.$children;
         const value = this.value;
         if (this.childrens) {
           this.childrens.forEach((c) => {
             const child = c;
-            child.bindValue = value;
+            child.bindValue = array || value;
           });
         }
       },

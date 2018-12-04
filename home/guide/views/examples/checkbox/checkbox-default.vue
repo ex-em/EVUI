@@ -8,6 +8,11 @@
       Single Checkbox
     </Checkbox>
     <br>
+    <button
+      @click="click"
+    >
+      test
+    </button>
     <br>
     bindValue : {{ vModel }}
     <br>
@@ -27,6 +32,11 @@
         bindValue: 'value01',
         vModel: true,
       };
+    },
+    methods: {
+      click() {
+        this.vModel = !this.vModel;
+      },
     },
   };
 </script>
