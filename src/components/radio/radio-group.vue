@@ -16,13 +16,15 @@ export default {
   },
   data() {
     return {
-      childrens: [],
     };
   },
   componentName: 'RadioGroup',
   computed: {
   },
   watch: {
+    value(v) {
+      this.initValue(v);
+    },
   },
   created() {
   },
@@ -30,12 +32,11 @@ export default {
     this.initValue();
   },
   methods: {
-    initValue() {
-      this.childrens = this.$children;
-      if (this.childrens) {
-        this.childrens.forEach((c) => {
+    initValue(v) {
+      if (this.$children && this.$children instanceof Array) {
+        this.$children.forEach((c) => {
           const child = c;
-          child.bindValue = this.value;
+          child.bindValue = v || this.value;
         });
       }
     },
