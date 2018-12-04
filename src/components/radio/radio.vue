@@ -1,32 +1,40 @@
 <template>
-  <div>
-    <input
-      :id="id"
-      :name="groupName"
-      :label="label"
-      :checked="bindValue === id"
-      :disabled="disabled"
-      type="radio"
-      @change="onChange"
-    >
+  <div
+    :class="{ disabled: disabled }"
+    class="ev-radio-wrap"
+  >
     <label
-      :for="id"
+      :for="`${radioId}_${value}`"
+      class="ev-radio-label"
     >
-      {{ label }}
+      <input
+        :id="`${radioId}_${value}`"
+        :value="value"
+        :name="groupName"
+        :disabled="disabled"
+        v-model="bindValue"
+        type="radio"
+        class="ev-radio-input"
+        @change="onChange"
+      >
+      <slot/>
     </label>
   </div>
 </template>
 
 <script>
 export default {
+  model: {
+    prop: 'customValue',
+  },
   props: {
-    id: {
+    value: {
       type: String,
       required: true,
     },
-    label: {
+    customValue: {
       type: String,
-      required: true,
+      default: '',
     },
     groupName: {
       type: String,
@@ -36,14 +44,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: {
-      type: String,
-      default: '',
-    },
   },
   data() {
     return {
-      bindValue: this.value,
+      bindValue: this.customValue,
+      radioId: this._uid,
     };
   },
   computed: {
@@ -59,15 +64,32 @@ export default {
       if (this.$parent.$options.componentName === 'RadioGroup') {
         // 부모 컴포넌트가 Radio Group인 경우
         this.$parent.$emit('changeEvent', e);
-        this.$parent.$emit('input', e.target.id);
-      } else {
-        // 부모 컴포넌트가 Radio Group로 안감싼경우
-        this.$emit('input', e.target.id);
+        this.$parent.$emit('input', e.target.value);
       }
+//      else {
+//        // 부모 컴포넌트가 Radio Group로 안감싼경우
+//        this.$emit('input', e.target.value);
+//      }
     },
   },
 };
 </script>
 
 <style scoped>
+  .ev-radio-wrap {
+    float: left;
+    user-select: none;
+    cursor: pointer;
+  }
+  .ev-radio-wrap.disabled {
+    color: #C0C4CC;
+    cursor: not-allowed;
+  }
+  .ev-radio-label {
+    cursor: inherit;
+  }
+  .ev-radio-input {
+    vertical-align: middle;
+    cursor: inherit;
+  }
 </style>
