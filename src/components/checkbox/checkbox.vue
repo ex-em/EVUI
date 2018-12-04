@@ -5,13 +5,13 @@
     class="ev-checkbox-label"
   >
     <input
-      v-if="!isGroupWrap"
+      v-if="!isGroup"
       :id="`${checkboxId}_${value}`"
       :value="value"
       :disabled="disabled"
       v-model="bindValue"
       type="checkbox"
-      class="ev-checkbox-input noGroupWrap"
+      class="ev-checkbox-input"
       @change="change"
     >
     <input
@@ -21,7 +21,7 @@
       :disabled="disabled"
       v-model="groupBindValue"
       type="checkbox"
-      class="ev-checkbox-input groupWrap"
+      class="ev-checkbox-input group"
       @change="change"
     >
     <slot/>
@@ -50,7 +50,7 @@
     data() {
       return {
         checkboxId: this._uid,
-        isGroupWrap: false, // group태그가 존재하는 경우 true
+        isGroup: false, // group태그가 존재하는 경우 true
         groupBindValue: [],
       };
     },
@@ -65,11 +65,11 @@
       },
     },
     created() {
-      this.isGroupWrap = this.$parent.$options.componentName === 'CheckboxGroup';
+      this.isGroup = this.$parent.$options.componentName === 'CheckboxGroup';
     },
     methods: {
       change(e) {
-        if (this.isGroupWrap) {
+        if (this.isGroup) {
           this.$parent.$emit('change-event', e);
         } else {
           this.$emit('change-event', e);

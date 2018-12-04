@@ -16,7 +16,6 @@
     },
     data() {
       return {
-        childrens: [],
         bindValue: this.value,
       };
     },
@@ -43,12 +42,10 @@
     },
     methods: {
       initValue(array) {
-        this.childrens = this.$children;
-        const value = this.value;
-        if (this.childrens) {
-          this.childrens.forEach((c) => {
+        if (this.$children && this.$children instanceof Array) {
+          this.$children.forEach((c) => {
             const child = c;
-            child.bindValue = array || value;
+            child.bindValue = array || this.value;
           });
         }
       },
