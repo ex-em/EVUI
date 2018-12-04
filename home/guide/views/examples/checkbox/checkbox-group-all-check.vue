@@ -94,10 +94,16 @@
     },
     watch: {
       bindList(list) {
-        if (_.isEqual(allList, list)) {
-          this.allCheckClick = true;
+        if (!(allList instanceof Array) || !(list instanceof Array)) {
+          console.log('All List or Bind List are not correct format (:Array)!');
         } else {
-          this.allCheckClick = false;
+          const a = allList.map(x => x).sort();
+          const l = list.map(x => x).sort();
+          if (_.isEqual(a, l)) {
+            this.allCheckClick = true;
+          } else {
+            this.allCheckClick = false;
+          }
         }
       },
     },
@@ -106,7 +112,6 @@
         console.log(`e : ${e}`);
       },
       allCheckEvent(e) {
-        console.log(`allCheckEvent e : ${e}`);
         if (e.target.checked) {
           this.bindList.splice(0, allList.length, ...allList);
         } else {
