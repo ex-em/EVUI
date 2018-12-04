@@ -1,5 +1,18 @@
 <template>
-  <div>
+  <div
+    class="checkbox-group-all-check"
+  >
+    <Checkbox
+      :value="`allCheckBoxValue`"
+      v-model="allCheckClick"
+      class="checkboxStyle"
+      @change-event="allCheckEvent"
+    >
+      ALL CHECK
+    </Checkbox>
+    <br>
+    <br>
+    <br>
     <Checkbox-group
       v-model="bindList"
       @change-event="changeEvent"
@@ -25,7 +38,6 @@
       </Checkbox>
       <Checkbox
         :value="obj0[3].value"
-        :disabled="true"
         class="checkboxStyle"
       >
         {{ obj0[3].text }}
@@ -33,7 +45,12 @@
     </Checkbox-group>
     <br>
     <br>
-    <p>Selected List : {{ bindList }}</p>
+    <br>
+    <p>bindList : {{ bindList }}</p>
+    <br>
+    <p>allCheckClick : {{ allCheckClick }}</p>
+    <br>
+    <br>
     <br>
   </div>
 </template>
@@ -41,7 +58,9 @@
 <script>
   import Checkbox from '@/components/checkbox/checkbox';
   import CheckboxGroup from '@/components/checkbox/checkbox-group';
+  import _ from 'lodash';
 
+  const allList = ['Base01', 'Base02', 'Base03', 'Base04'];
   export default {
     components: {
       Checkbox,
@@ -49,6 +68,7 @@
     },
     data() {
       return {
+        allCheckClick: false,
         obj0: [
           {
             value: 'Base01',
@@ -70,15 +90,42 @@
         bindList: ['Base01', 'Base02'],
       };
     },
+    computed: {
+    },
+    watch: {
+      bindList(list) {
+        if (!(allList instanceof Array) || !(list instanceof Array)) {
+          console.log('All List or Bind List are not correct format (:Array)!');
+        } else {
+          const a = allList.map(x => x).sort();
+          const l = list.map(x => x).sort();
+          if (_.isEqual(a, l)) {
+            this.allCheckClick = true;
+          } else {
+            this.allCheckClick = false;
+          }
+        }
+      },
+    },
     methods: {
       changeEvent(e) {
         console.log(`e : ${e}`);
+      },
+      allCheckEvent(e) {
+        if (e.target.checked) {
+          this.bindList.splice(0, allList.length, ...allList);
+        } else {
+          this.bindList.splice(0);
+        }
       },
     },
   };
 </script>
 
 <style scoped>
+  .checkbox-group-all-check {
+    display: block;
+  }
   .checkboxStyle {
     margin: 0 10px 0 10px;
   }
