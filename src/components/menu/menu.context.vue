@@ -5,7 +5,7 @@
     :style="ctxMenuStyle"
     :class="prefixEvui"
   >
-    <Context-children
+    <ev-context-menu-children
       ref="ctxChildren"
       :depth="0"
       :items="items"
@@ -16,14 +16,10 @@
 
 <script>
   import '@/styles/evui.css';
-  import ContextChildren from '@/components/menu/context.children';
 
   const prefixEvui = 'ev-contextmenu';
 
   export default {
-    components: {
-      ContextChildren,
-    },
     directives: {
       'click-outside': {
         bind(el, binding) {
