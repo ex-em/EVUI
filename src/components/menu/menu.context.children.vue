@@ -22,7 +22,7 @@
         />
       </div>
     </div>
-    <Context-children
+    <ev-context-menu-children
       v-for="(item, rowIdx) in items"
       v-if="item.items"
       v-show="getSubMenuKey(item.text, depth, rowIdx) === subMenuKey"
@@ -38,14 +38,10 @@
 <script>
   import '@/styles/all.css';
   import '@/styles/evui.css';
-  import ContextChildren from './context.children';
 
   const prefixEvui = 'ev-contextmenu-children';
 
   export default {
-    components: {
-      ContextChildren,
-    },
     props: {
       depth: {
         type: Number,
