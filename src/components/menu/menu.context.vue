@@ -16,6 +16,7 @@
 
 <script>
   import '@/styles/evui.css';
+  import { getQuantity } from '../../common/utils';
 
   const prefixEvui = 'ev-contextmenu';
 
@@ -80,13 +81,39 @@
     created() {
       this.setPosition(this.x, this.y);
     },
+    mounted() {
+      this.parentAddListener();
+      this.moveElToBody();
+    },
+    beforeDestroy() {
+      if (this.$el) {
+        this.$el.remove();
+      }
+    },
     methods: {
+      parentAddListener() {
+        const parentEl = this.$el.parentElement;
+
+        if (parentEl) {
+          parentEl.addEventListener('contextmenu', this.onContextMenu);
+        }
+      },
+      moveElToBody() {
+        document.body.appendChild(this.$el);
+      },
+      onContextMenu(e) {
+        this.setPosition(e.clientX, e.clientY);
+        this.show();
+        e.preventDefault();
+      },
       onClick(item) {
         this.$emit('click', item);
       },
       setPosition(x, y) {
-        this.top = `${this.extractNumber(y)}`;
-        this.left = `${this.extractNumber(x)}`;
+        const posX = getQuantity(x) || { value: 0 };
+        const posY = getQuantity(y) || { value: 0 };
+        this.top = posY.value;
+        this.left = posX.value;
       },
       show() {
         if (this.isUse) {
@@ -100,20 +127,6 @@
         if (ctxChildren && ctxChildren.clearSubMenuKey) {
           ctxChildren.clearSubMenuKey(this.$children);
         }
-      },
-      extractNumber(input) {
-        let result;
-
-        if (typeof input === 'string' && input) {
-          const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
-          if (match[2]) {
-            result = +match[2];
-          }
-        } else {
-          result = input;
-        }
-
-        return result || 0;
       },
     },
   };
