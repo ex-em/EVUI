@@ -1,15 +1,12 @@
 <template>
   <div>
     <div class="contextmenu-default">컨텍스트 메뉴를 보려면 마우스 우클릭 하세요. (사용 여부 옵션: is-use)<br></div>
-    <div
-      class="contextmenu-default-body"
-      @contextmenu="onContextMenu"
-    />
-    <ev-context-menu
-      ref="contextMenu"
-      :items="items"
-      @click="onClick"
-    />
+    <div class="contextmenu-default-body">
+      <ev-context-menu
+        :items="items"
+        @click="onClick"
+      />
+    </div>
   </div>
 </template>
 
@@ -24,12 +21,6 @@
       this.items = this.getItems();
     },
     methods: {
-      onContextMenu(e) {
-        const contextMenu = this.$refs.contextMenu;
-        contextMenu.setPosition(e.pageX - 277, e.pageY - 233);
-        contextMenu.show();
-        e.preventDefault();
-      },
       onClick(item) {
         console.log(`text: ${item.text} / itemId: ${item.itemId} / depth: ${item.depth} / rowIdx: ${item.rowIdx} / parentRowIdx: ${item.parentRowIdx}`);
       },
