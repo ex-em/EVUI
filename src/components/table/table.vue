@@ -380,6 +380,9 @@
 
         // check 관련
         changeCheckData: null,
+
+        // find 관련
+        findDataList: [],
       };
     },
     computed: {
@@ -1263,7 +1266,6 @@
         this.lastPage = 0;
       },
       changeCheckbox(value, row, field, type) {
-        console.log('checkboc::#1', value, '#2', row);
         const data = row;
         if (type === 'single' && this.changeCheckData) {
           this.$set(this.changeCheckData, field, false);
@@ -1272,7 +1274,6 @@
           this.changeCheckData = data;
         }
         this.$set(data, field, value);
-        console.log('checkboc::#1', value, '#2', this.changeCheckData);
       },
       rowSelect(row) {
         console.log('#1', row);
@@ -1291,6 +1292,31 @@
       },
       getChangeCheckData() {
         return this.changeCheckData;
+      },
+      findData(field, value) {
+        const hasLastPercent = value.lastIndexOf('%') === (value.length - 1);
+        const hasFirstPercent = value.indexOf('%') === 0;
+        const data = this.isSort ? this.sortedData : this.originData;
+        let text = value.replace(/^%/, '');
+        text = text.replace(/%$/, '');
+
+        this.resultData = _.filter(data, (row) => {
+          let result;
+          if (row[field]) {
+            if (hasLastPercent && hasFirstPercent) {
+              result = row[field].indexOf(text) > -1;
+            } else if (hasFirstPercent) {
+              result = row[field].lastIndexOf(text) + text.length === row[field].length;
+            } else if (hasLastPercent) {
+              result = row[field].indexOf(text) === 0;
+            } else {
+              result = row[field] === text;
+            }
+          } else {
+            result = false;
+          }
+          return result;
+        });
       },
     },
   };
