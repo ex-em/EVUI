@@ -9,6 +9,6 @@
  */
 
 import tabs from './tabs';
-import tab from './tab';
+import tab from './tab-panel';
 
 export { tabs, tab };
