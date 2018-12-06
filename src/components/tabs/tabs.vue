@@ -43,13 +43,15 @@
               v-for="tab in tabList"
               :key="tab.value"
               :value="tab.value"
-              :class="{'ev-tabs-item': true, 'active': tab.value === value, 'dragover': tab.value === dragOverValue}"
-              :style="`min-width: ${minWidth}px;`"
+              :class="{'ev-tabs-item': true, 'active': tab.value === activeTab, 'dragover': tab.value === dragOverValue}"
+              :style="`min-width: ${minTabWidth}px;`"
               :draggable="true"
               @click="changeTab(tab.value)"
+              @mouseenter="toggleCloseIcon($event, true)"
+              @mouseleave="toggleCloseIcon($event, false)"
               @dragstart="onDragStart($event, tab.value)"
               @dragover.prevent="onDragOver($event, tab.value)"
-              @dragend.prevent="onDragEnd()"
+              @dragend.prevent="onDragEnd"
             >
               <span
                 class="ev-tabs-item-content"
@@ -79,23 +81,29 @@
   export default {
     props: {
       value: {
-        type: String,
-        default: '',
+        type: Array,
+        default() {
+          return [];
+        },
       },
       useTabMoving: {
         type: Boolean,
         default: false,
       },
-      minWidth: {
+      minTabWidth: {
         type: Number,
         default: 100,
+      },
+      activeTabValue: {
+        type: String,
+        default: '',
       },
     },
     data() {
       return {
-        tabList: [],
+        tabList: this.value,
+        activeTab: this.activeTabValue,
         currentOffset: 0,
-        activeTab: this.value,
         isActiveScroll: false,
         disablePrev: true,
         disableNext: false,
@@ -109,18 +117,38 @@
       },
     },
     watch: {
+      activeTabValue(value) {
+        if (this.checkValid(value)) {
+          this.activeTab = value;
+          this.toggleScrollIcon();
+        }
+      },
       value(value) {
-        this.activeTab = value;
+        this.tabList = value;
+        setTimeout(() => this.toggleScrollIcon());
       },
     },
     created() {
     },
     mounted() {
-      this.toggleScrollIcon();
-    },
-    updated() {
+      if (!this.checkValid(this.activeTab) && this.tabList.length) {
+        this.activeTab = this.tabList[0].value;
+        this.toggleScrollIcon();
+      }
     },
     methods: {
+      checkValid(value) {
+        let isExist = false;
+
+        for (let ix = 0; ix < this.tabList.length; ix++) {
+          if (this.tabList[ix].value === value) {
+            isExist = true;
+            break;
+          }
+        }
+
+        return isExist;
+      },
       onDragStart(e, value) {
         if (!this.useTabMoving) {
           return;
@@ -162,6 +190,7 @@
         if (dragInfo && moveInfo) {
           this.$set(this.tabList, moveIndex, dragInfo);
           this.$set(this.tabList, dragIndex, moveInfo);
+          this.$emit('input', this.tabList);
         }
 
         this.dragStartValue = '';
@@ -178,25 +207,26 @@
       },
       onMoveScroll(type) {
         const currentOffset = this.currentOffset;
+        const minTabWidth = this.minTabWidth;
         const navWidth = this.$refs.nav.offsetWidth;
         const navWrapWidth = this.$refs.navWrap.offsetWidth;
         const maxOffset = navWidth - navWrapWidth;
 
         if (type === 'left' && currentOffset !== 0) {
-          if (currentOffset + this.minWidth > 0) {
+          if (currentOffset + minTabWidth > 0) {
             this.currentOffset = 0;
             this.disablePrev = true;
           } else {
-            this.currentOffset += this.minWidth;
+            this.currentOffset += minTabWidth;
             this.disablePrev = false;
             this.disableNext = false;
           }
         } else if (type === 'right' && currentOffset !== -maxOffset) {
-          if (currentOffset - this.minWidth < -maxOffset) {
+          if (currentOffset - minTabWidth < -maxOffset) {
             this.currentOffset -= maxOffset - Math.abs(currentOffset);
             this.disableNext = true;
           } else {
-            this.currentOffset -= this.minWidth;
+            this.currentOffset -= minTabWidth;
             this.disablePrev = false;
             this.disableNext = false;
           }
@@ -221,21 +251,31 @@
       },
       moveToScroll() {
         setTimeout(() => {
-          const navWidth = this.$refs.nav.offsetWidth;
+          const nav = this.$refs.nav;
+          const navRect = nav.getBoundingClientRect();
           const navWrapWidth = this.$refs.navWrap.offsetWidth;
+          const activeTabRect = nav.querySelector(`div[value='${this.activeTab}']`).getBoundingClientRect();
+          const activeTabWidth = (activeTabRect.left + activeTabRect.width) - navRect.left;
+          const moveOffset = navWrapWidth - (activeTabWidth + 4);
+          const maxMoveOffset = navRect.width - navWrapWidth;
 
-          this.currentOffset = navWrapWidth - navWidth;
-          this.currentOffset = this.currentOffset > 0 ? 0 : this.currentOffset;
+          this.currentOffset = moveOffset > 0 ? 0 : moveOffset;
           if (this.currentOffset) {
             this.disablePrev = false;
-            this.disableNext = true;
+            this.disableNext = Math.abs(this.currentOffset) === maxMoveOffset;
+          } else {
+            this.disablePrev = true;
+            this.disableNext = false;
           }
         });
       },
-      addTab(newTabInfo) {
-        this.tabList.push(newTabInfo);
-        this.changeTab(newTabInfo.value);
-        setTimeout(() => this.toggleScrollIcon());
+      toggleCloseIcon(e, value) {
+        const itemContent = e.target.getElementsByClassName('ev-tabs-item-content')[0];
+        if (value) {
+          itemContent.classList.add('icon');
+        } else {
+          itemContent.classList.remove('icon');
+        }
       },
       changeTab(value) {
         if (this.activeTab === value) {
@@ -244,7 +284,6 @@
 
         this.$emit('change-tab', this.activeTab, value);
         this.activeTab = value;
-        this.$emit('input', value);
       },
       removeTab(value) {
         let removeIndex;
@@ -264,11 +303,11 @@
         if (this.activeTab === value) {
           removeIndex = this.tabList.length === removeIndex ? removeIndex - 1 : removeIndex;
           this.activeTab = this.tabList[removeIndex].value;
-          this.$emit('input', this.activeTab);
+          this.$emit('change-tab', value, this.activeTab);
         }
 
+        this.$emit('input', this.tabList);
         setTimeout(() => this.toggleScrollIcon());
-        this.$emit('remove-tab', value);
       },
     },
   };
@@ -342,7 +381,12 @@
     border-left: 3px solid blue;
   }
   .ev-tab-close-btn {
+    width: 0;
+    overflow: hidden;
     font-weight: normal;
+  }
+  .ev-tabs-item > .icon > .ev-tab-close-btn {
+    width: 10px;
   }
   .ev-tab-close-btn:hover {
     font-weight: bold;

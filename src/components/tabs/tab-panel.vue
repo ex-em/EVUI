@@ -35,9 +35,6 @@
         return active;
       },
     },
-    created() {
-      this.$parent.addTab(this.$props);
-    },
   };
 </script>
 

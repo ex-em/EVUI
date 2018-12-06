@@ -5,20 +5,26 @@
         :type="'primary'"
         @click="addTab"
       >
-        Tab Add
+        Add Tab
+      </ev-button>
+      <ev-button
+        :type="'primary'"
+        @click="randomChangeTab"
+      >
+        Change Tab
       </ev-button>
     </div>
     <div class="tab-default-outer">
       <ev-tabs
-        v-model="activeTabName"
+        v-model="tabItems"
+        :active-tab-value="activeTabValue"
         :use-tab-moving="true"
-        @remove-tab="removeTab"
+        :min-tab-width="100"
         @change-tab="changeTab"
       >
         <ev-tab-panel
           v-for="item in tabItems"
           :key="item.value"
-          :title="item.title"
           :value="item.value"
         >
           <component
@@ -31,7 +37,7 @@
 </template>
 
 <script>
-  import targetComponent1 from '../checkbox/checkbox-group-list-handling';
+  import targetComponent1 from '../checkbox/checkbox-group-default';
   import targetComponent2 from '../table/table-buffer';
   import targetComponent3 from '../chart/chart.bar.stack';
   import targetComponent4 from '../table/table-page';
@@ -45,9 +51,9 @@
     },
     data() {
       return {
-        seq: 1,
+        seq: 0,
         tabItems: [],
-        activeTabName: '1',
+        activeTabValue: '1',
       };
     },
     created() {
@@ -55,7 +61,7 @@
     },
     methods: {
       createTabs() {
-        for (let ix = 0; ix < 10; ix++) {
+        for (let ix = 0; ix < 4; ix++) {
           this.tabItems.push({
             title: `appended tab${this.seq}`,
             value: `${this.seq}`,
@@ -71,20 +77,14 @@
           value: `${this.seq}`,
           content: `targetComponent${(this.seq % 4) + 1}`,
         });
-        this.activeTabName = `${this.seq}`;
+        this.activeTabValue = `${this.seq}`;
         this.seq++;
       },
-      removeTab(value) {
-        for (let ix = 0; ix < this.tabItems.length; ix++) {
-          if (this.tabItems[ix].value === value) {
-            this.tabItems.splice(ix, 1);
-            break;
-          }
-        }
-      },
       changeTab(oldValue, newValue) {
-        window.console.log(`oldValue: ${oldValue}`);
-        window.console.log(`newValue: ${newValue}`);
+        this.activeTabValue = newValue;
+      },
+      randomChangeTab() {
+        this.activeTabValue = `${Math.floor(Math.random() * Math.floor(this.seq))}`;
       },
     },
   };
