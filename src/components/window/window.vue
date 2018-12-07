@@ -5,26 +5,26 @@
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
-    @mousedown="onMouseDown"
-    @mousemove="changeMouseCursor"
-    @mouseout="onMouseOut"
+    @mousedown="mousedown"
+    @mousemove="mousemove"
+    @mouseout="mouseout"
   >
     <div
       ref="headerArea"
       :style="headerStyle"
       :class="headerCls"
-      @dblclick="onHeaderDblClick"
+      @dblclick="headerDblClick"
     >
       <div :class="`${prefixCls}-title-area`">{{ title }}</div>
       <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
         :class="`${prefixCls}-expand-btn`"
-        @click="onExpand"
+        @click="clickExpandBtn"
       />
       <div :class="`${prefixCls}-close-btn-line`"/>
       <div
         :class="`${prefixCls}-close-btn`"
-        @click="close"
+        @click="clickCloseBtn"
       />
     </div>
     <div :class="`${prefixCls}-body-area`">
@@ -114,7 +114,7 @@
       this.isShow = false;
     },
     methods: {
-      onMouseDown(e) {
+      mousedown(e) {
         const windowEl = this.$el;
 
         if (!windowEl) {
@@ -153,10 +153,18 @@
 
         document.body.style.cursor = windowEl.style.cursor;
 
-        window.addEventListener('mousemove', this.onMouseMove);
-        window.addEventListener('mouseup', this.onMouseUp);
+        window.addEventListener('mousemove', this.mousedownMousemove);
+        window.addEventListener('mouseup', this.mousedownMouseup);
+
+        this.$emit('mousedown', e);
       },
-      onMouseMove(e) {
+      mousemove(e) {
+        this.changeMouseCursor(e);
+      },
+      mouseout(e) {
+        this.$emit('mouseout', e);
+      },
+      mousedownMousemove(e) {
         if (this.resizable && this.isGrabbingBorder) {
           this.resize(e);
         } else if (this.isMoving) {
@@ -169,27 +177,24 @@
           });
         }
 
-        this.$emit('onmousemove', e);
+        this.$emit('mousedown-mousemove', e);
       },
-      onMouseUp(e) {
+      mousedownMouseup(e) {
         this.isMoving = false;
         this.isGrabbingBorder = false;
 
-        this.$emit('onmouseup', e);
-        window.removeEventListener('mousemove', this.onMouseMove);
-        window.removeEventListener('mouseup', this.onMouseUp);
-      },
-      onMouseOut(e) {
-        if (!this.isMoving) {
-          document.body.style.cursor = '';
-        }
+        document.body.style.cursor = '';
+        this.changeMouseCursor(e);
 
-        this.$emit('onmouseout', e);
+        window.removeEventListener('mousemove', this.mousedownMousemove);
+        window.removeEventListener('mouseup', this.mousedownMouseup);
+
+        this.$emit('mousedown-mouseup', e);
       },
-      onHeaderDblClick(e) {
-        this.$emit('onheaderdblclick', e);
+      headerDblClick(e) {
+        this.$emit('header-dbl-click', e);
       },
-      onExpand() {
+      clickExpandBtn() {
         if (this.isFullExpandWindow) {
           this.setCssText({
             top: this.posInfoBeforeExpand.top,
@@ -291,19 +296,11 @@
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
-
-            if (!this.isMoving) {
-              document.body.style.cursor = '';
-            }
           }
         } else if (this.isInHeader(e.clientX, e.clientY)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
-
-          if (!this.isMoving) {
-            document.body.style.cursor = '';
-          }
         }
       },
       isInHeader(x, y) {
@@ -450,8 +447,8 @@
       hide() {
         this.isShow = false;
       },
-      close() {
-        this.$emit('onbeforeclose', this);
+      clickCloseBtn() {
+        this.$emit('before-close', this);
 
         if (this.closeType === 'hide') {
           this.hide();
