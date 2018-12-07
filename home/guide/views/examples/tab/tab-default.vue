@@ -3,95 +3,93 @@
     <div class="button-outer">
       <ev-button
         :type="'primary'"
-        :text="'Tab Add'"
         @click="addTab"
-      />
+      >
+        Add Tab
+      </ev-button>
+      <ev-button
+        :type="'primary'"
+        @click="randomChangeTab"
+      >
+        Change Tab
+      </ev-button>
     </div>
     <div class="tab-default-outer">
       <ev-tabs
-        :tab-data="list"
+        v-model="tabItems"
+        :active-tab-value="activeTabValue"
+        :use-tab-moving="true"
+        :min-tab-width="100"
+        @change-tab="changeTab"
       >
-        <ev-tab
-          :tab-prop="tabItem"
-        />
-        <ev-tab
+        <ev-tab-panel
           v-for="item in tabItems"
-          :key="item.id"
-          :tab-prop="item"
-        />
+          :key="item.value"
+          :value="item.value"
+        >
+          <component
+            :is="item.content"
+          />
+        </ev-tab-panel>
       </ev-tabs>
     </div>
   </div>
 </template>
+
 <script>
-  import targetComponent1 from '../checkbox/checkbox-group-list-handling';
+  import targetComponent1 from '../checkbox/checkbox-group-default';
   import targetComponent2 from '../table/table-buffer';
   import targetComponent3 from '../chart/chart.bar.stack';
   import targetComponent4 from '../table/table-page';
 
-  const componentList = [targetComponent1, targetComponent2, targetComponent3];
-
   export default {
+    components: {
+      targetComponent1,
+      targetComponent2,
+      targetComponent3,
+      targetComponent4,
+    },
     data() {
       return {
-        scroll: false,
-        tabItem: {
-          title: 'appended tab',
-          isActive: false,
-          targetComponent: {
-            keyName: 'targetComponent1',
-            component: targetComponent1,
-          },
-        },
-        tabItems: [{
-            title: 'appended tab',
-            isActive: false,
-            targetComponent: {
-              keyName: 'targetComponent3',
-              component: targetComponent3,
-            },
-          },
-          {
-            title: 'appended tab',
-            isActive: false,
-            targetComponent: {
-              keyName: 'targetComponent4',
-              component: targetComponent4,
-            },
-          },
-        ],
-        list: this.createList(),
+        seq: 0,
+        tabItems: [],
+        activeTabValue: '1',
       };
     },
+    created() {
+      this.createTabs();
+    },
     methods: {
-      addTab() {
-        this.list.push({
-          title: 'appended tab',
-          isActive: false,
-          targetComponent: {
-            keyName: 'target-component1',
-            component: componentList[0],
-          },
-        });
-      },
-      createList() {
-        const result = [];
-        for (let i = 0, length = 3; i < length; i++) {
-          result.push({
-            title: 'appended tab',
-            isActive: false,
-            width: 100,
-            targetComponent: {
-              keyName: `target-component${i + 1}`,
-              component: componentList[i],
-            },
+      createTabs() {
+        for (let ix = 0; ix < 4; ix++) {
+          this.tabItems.push({
+            title: `appended tab${this.seq}`,
+            value: `${this.seq}`,
+            content: `targetComponent${(this.seq % 4) + 1}`,
           });
+
+          this.seq++;
         }
-        return result;
+      },
+      addTab() {
+        this.tabItems.push({
+          title: `appended tab${this.seq}`,
+          value: `${this.seq}`,
+          content: `targetComponent${(this.seq % 4) + 1}`,
+        });
+        this.activeTabValue = `${this.seq}`;
+        this.seq++;
+      },
+      changeTab(oldValue, newValue) {
+        this.activeTabValue = newValue;
+      },
+      randomChangeTab() {
+        this.activeTabValue = `${Math.floor(Math.random() * Math.floor(this.seq))}`;
       },
     },
   };
 </script>
+
 <style scoped>
   p{
     margin-left: 30px;
@@ -103,7 +101,7 @@
     width: 100%;
   }
   .tab-default-outer {
-    width: 1500px;
-    height: 1000px;
+    width: 100%;
+    height: 100%;
   }
 </style>
