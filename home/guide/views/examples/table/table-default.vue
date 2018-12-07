@@ -1,23 +1,32 @@
 <template>
   <div style="width:100%">
+    <input
+      v-model="t"
+      type="text"
+    >
+    <input
+      type="button"
+      value="ttt"
+      @click="tt"
+    >
     <ev-table
       ref="test"
       :width="'1000px'"
       :height="'350px'"
       :filter="true"
+      :select="'single'"
       :columns="columns"
       :records="rowData"
     />
-    <button @click="tt">test</button>
+    <button @click="getSelectedData">test</button>
   </div>
 </template>
 
 <script>
-  import tr from '@/components/tree/tree.util';
-
   export default {
     data() {
       return {
+        t: '',
         columns: [
           { field: 'recid', caption: 'ID', size: '50px', sortable: true },
           { field: 'fname', caption: 'First Name', size: '169px', sortable: true },
@@ -96,15 +105,19 @@
       };
     },
     created() {
-      const test = tr.testData;
-      const test1 = tr.transformTreeToArray(test);
-      window.console.log(test1);
+      // const test = tr.testData;
+      // const test1 = tr.transformTreeToArray(test);
+      // window.console.log(test1);
     },
     methods: {
       tt() {
         // debugger;
-        this.$refs.test.setData(this.$tableData);
-        this.$refs.test.draw();
+        this.$refs.test.findData('fname', this.t);
+        // this.$refs.test.setData(this.$tableData);
+        // this.$refs.test.draw();
+      },
+      getSelectedData() {
+        console.log('selected Data', this.$refs.test.getSelectedData());
       },
     },
   };
