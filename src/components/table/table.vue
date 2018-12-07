@@ -83,7 +83,7 @@
                           >
                             <ev-checkbox
                               :value="row[col.field]"
-                              @on-change="changeCheckbox($event, row, col.field, col.checkType)"
+                              @change-event="changeCheckbox($event, row, col.field, col.checkType)"
                             />
                           </div>
                           <div
@@ -1278,20 +1278,34 @@
       rowSelect(row) {
         console.log('#1', row);
         if (!row.$evuiSelected) {
-          if (this.select !== 'multi' && this.selectedData) {
-            this.$set(this.selectedData, '$evuiSelected', false);
+          if (this.select === 'single') {
+            if (this.selectedData) {
+              this.$set(this.selectedData, '$evuiSelected', false);
+            }
+            this.selectedData = row;
           }
-          this.selectedData = row;
+          // this.selectedData = row;
           this.$set(row, '$evuiSelected', true);
         } else {
           this.$set(row, '$evuiSelected', false);
         }
       },
-      rowClick() {
+      rowClick(event, row) {
         console.log('clickEvent');
+        if (this.select === 'single') {
+          this.rowSelect(row);
+        }
+        this.$emit('rowClick', event, row);
       },
       getChangeCheckData() {
         return this.changeCheckData;
+      },
+      getSelectedData() {
+        let result;
+        if (this.select === 'single') {
+          result = this.selectedData;
+        }
+        return result;
       },
       findData(field, value) {
         const hasLastPercent = value.lastIndexOf('%') === (value.length - 1);
