@@ -2,6 +2,7 @@
   <div
     v-if="loaded || isActive"
     v-show="isActive"
+    style="width: 100%; height: 100%"
   >
     <slot/>
   </div>
@@ -10,10 +11,6 @@
 <script>
   export default {
     props: {
-      title: {
-        type: String,
-        default: '',
-      },
       value: {
         type: String,
         default: '',
