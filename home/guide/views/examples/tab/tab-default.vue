@@ -18,7 +18,6 @@
       <ev-tabs
         v-model="tabItems"
         :active-tab-value="activeTabValue"
-        :use-tab-moving="true"
         :min-tab-width="100"
         @change-tab="changeTab"
       >
@@ -101,6 +100,7 @@
     width: 100%;
   }
   .tab-default-outer {
+    position: relative;
     width: 100%;
     height: 100%;
   }
