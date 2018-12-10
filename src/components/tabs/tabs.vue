@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ev-tabs">
     <div
       class="ev-tabs-header"
     >
@@ -58,6 +58,7 @@
               >
                 {{ tab.title }}
                 <ev-icon
+                  v-if="!disableRemoveTab"
                   class="ei-close ev-tab-close-btn"
                   style="margin-left: 3px; font-size: 10px;"
                   @click.native.stop="removeTab(tab.value)"
@@ -86,7 +87,11 @@
           return [];
         },
       },
-      useTabMoving: {
+      disableMoveTab: {
+        type: Boolean,
+        default: false,
+      },
+      disableRemoveTab: {
         type: Boolean,
         default: false,
       },
@@ -150,7 +155,7 @@
         return isExist;
       },
       onDragStart(e, value) {
-        if (!this.useTabMoving) {
+        if (this.disableMoveTab) {
           return;
         }
 
@@ -158,7 +163,7 @@
         this.dragStartValue = value;
       },
       onDragOver(e, value) {
-        if (!this.useTabMoving) {
+        if (this.disableMoveTab) {
           return;
         }
 
@@ -172,7 +177,7 @@
         let moveInfo;
         let tabInfo;
 
-        if (!this.useTabMoving) {
+        if (this.disableMoveTab) {
           return;
         }
 
@@ -270,6 +275,10 @@
         });
       },
       toggleCloseIcon(e, value) {
+        if (this.disableRemoveTab) {
+          return;
+        }
+
         const itemContent = e.target.getElementsByClassName('ev-tabs-item-content')[0];
         if (value) {
           itemContent.classList.add('icon');
@@ -314,13 +323,23 @@
 </script>
 
 <style>
+  .ev-tabs {
+    width: 100%;
+    height: 100%;
+    padding-top: 30px;
+  }
   .ev-tabs-header {
-    position: relative;
+    position: absolute;
     padding: 0;
+    top: 0;
+    width: 100%;
+    height: 30px;
     border-bottom: 1px solid #dddee1;
   }
   .ev-tabs-body {
-    padding: 10px 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
     border: 1px solid #dddee1;
     border-top: 0;
   }
