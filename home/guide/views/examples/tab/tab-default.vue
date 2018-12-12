@@ -84,6 +84,11 @@
       },
       randomChangeTab() {
         this.activeTabValue = `${Math.floor(Math.random() * Math.floor(this.seq))}`;
+        if (this.tabItems[0].icon) {
+          this.$set(this.tabItems[0], 'icon', '');
+        } else {
+          this.$set(this.tabItems[0], 'icon', 'ei-close');
+        }
       },
     },
   };

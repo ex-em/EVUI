@@ -56,6 +56,11 @@
               <span
                 class="ev-tabs-item-content"
               >
+                <ev-icon
+                  v-if="tab.icon"
+                  :class="tab.icon"
+                  style="margin-right: 3px; font-size: 10px;"
+                />
                 {{ tab.title }}
                 <ev-icon
                   v-if="!disableRemoveTab"
