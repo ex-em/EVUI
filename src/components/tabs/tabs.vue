@@ -56,6 +56,11 @@
               <span
                 class="ev-tabs-item-content"
               >
+                <ev-icon
+                  v-if="tab.icon"
+                  :class="tab.icon"
+                  style="margin-right: 3px; font-size: 10px;"
+                />
                 {{ tab.title }}
                 <ev-icon
                   v-if="!disableRemoveTab"
@@ -122,18 +127,16 @@
       },
     },
     watch: {
+      value(value) {
+        this.tabList = value;
+        setTimeout(() => this.toggleScrollIcon());
+      },
       activeTabValue(value) {
         if (this.checkValid(value)) {
           this.activeTab = value;
           this.toggleScrollIcon();
         }
       },
-      value(value) {
-        this.tabList = value;
-        setTimeout(() => this.toggleScrollIcon());
-      },
-    },
-    created() {
     },
     mounted() {
       if (!this.checkValid(this.activeTab) && this.tabList.length) {
@@ -296,6 +299,7 @@
       },
       removeTab(value) {
         let removeIndex;
+        let removeTab;
 
         if (this.tabList.length === 1) {
           return;
@@ -303,8 +307,9 @@
 
         for (let ix = 0; ix < this.tabList.length; ix++) {
           if (this.tabList[ix].value === value) {
-            this.tabList.splice(ix, 1);
+            removeTab = this.tabList[ix];
             removeIndex = ix;
+            this.tabList.splice(ix, 1);
             break;
           }
         }
@@ -315,6 +320,7 @@
           this.$emit('change-tab', value, this.activeTab);
         }
 
+        this.$emit('remove-tab', removeTab);
         this.$emit('input', this.tabList);
         setTimeout(() => this.toggleScrollIcon());
       },
@@ -327,6 +333,7 @@
     width: 100%;
     height: 100%;
     padding-top: 30px;
+    position: relative;
   }
   .ev-tabs-header {
     position: absolute;
