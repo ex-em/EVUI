@@ -479,32 +479,39 @@
 </script>
 
 <style>
-  .ev-window{
+  .ev-window {
     position: absolute;
-    border: 9px solid #595C64;
+    border: 9px solid #424242;
     border-radius: 8px;
-    background: #212227;
+    background: #424242;
     overflow: visible;
     z-index: 8888;
   }
-  .ev-window-header-area{
+  .gray .ev-window {
+    border: 9px solid #595C64;
+    background: #212227;
+  }
+  .ev-window-header-area {
     position: absolute;
     top: 0;
     width: 100%;
-    border-bottom: 1px solid;
-    background: #27282E;
-    border-color: #464850;
-    color: #ABAEB5;
+    border-bottom: 1px solid #B6B6B6;
+    background: #ffffff;
     font-family: 'NanumGothic', sans-serif;
     align-items: center;
     user-select: none;
   }
-  .ev-window-title-area{
+  .gray .ev-window-header-area {
+    border-bottom: 1px solid #464850;
+    background: #27282E;
+    color: #ABAEB5;
+  }
+  .ev-window-title-area {
     display: inline-block;
     padding: 6px 0 0 12px;
     font-size: 16px;
   }
-  .ev-window-header-pa{
+  .ev-window-header-pa {
     border-color: #474a53;
     background-color: #212227;
     color: #ABAEB5;
@@ -514,9 +521,12 @@
     top: 0;
     right: 66px;
     height: 32px;
+    border-left: 1px solid #B6B6B6;
+  }
+  .gray .ev-window-expand-btn-line {
     border-left: 1px solid #464850;
   }
-  .ev-window-expand-btn{
+  .ev-window-expand-btn {
     position: absolute;
     top: 6px;
     right: 40px;
@@ -524,30 +534,37 @@
     height: 19px;
     line-height: 19px;
     border-radius: 50%;
-    color: #c7c8cc;
+    color: white;
     text-align: center;
-    background: #595c64;
+    background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
   }
-  .ev-window-expand-btn:before{
+  .gray .ev-window-expand-btn {
+    color: #c7c8cc;
+    background: #595c64;
+  }
+  .ev-window-expand-btn:before {
     top: -1px;
     right: 1px;
     font-size: 18px;
     content: 'ㅁ';
   }
-  .ev-window-expand-btn:hover{
+  .ev-window-expand-btn:hover {
     background: #319de9;
     cursor: pointer;
   }
-  .ev-window-close-btn-line{
+  .ev-window-close-btn-line {
     position: absolute;
     top: 0;
     right: 32px;
     height: 32px;
+    border-left: 1px solid #B6B6B6;
+  }
+  .gray .ev-window-close-btn-line {
     border-left: 1px solid #464850;
   }
-  .ev-window-close-btn{
+  .ev-window-close-btn {
     position: absolute;
     top: 6px;
     right: 7px;
@@ -555,11 +572,15 @@
     height: 19px;
     line-height: 19px;
     border-radius: 50%;
-    color: #c7c8cc;
+    color: white;
     text-align: center;
-    background: #595c64;
+    background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
+  }
+  .gray .ev-window-close-btn {
+    color: #c7c8cc;
+    background: #595c64;
   }
   .ev-window-close-btn:before{
     top: 0;
@@ -576,7 +597,10 @@
     width: 100%;
     height: 100%;
     padding: 9px 8px 8px 8px;
-    background: transparent;
+    background: white;
     overflow: auto;
+  }
+  .gray .ev-window-body-area{
+    background: transparent;
   }
 </style>
