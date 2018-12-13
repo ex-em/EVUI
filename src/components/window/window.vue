@@ -81,10 +81,8 @@
         headerStyle: '',
         headerHeight: 32,
         grabbingBorderSize: 5,
-        isGrabbingBorder: false,
         isExist: true,
         isShow: true,
-        isMoving: false,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -92,6 +90,8 @@
           bottom: false,
         },
         clickedInfo: {
+          state: '',
+          pressedSpot: '',
           top: 0,
           left: 0,
           width: 0,
@@ -121,14 +121,7 @@
           return;
         }
 
-        this.clickedInfo = {
-          top: windowEl.offsetTop,
-          left: windowEl.offsetLeft,
-          width: windowEl.offsetWidth,
-          height: windowEl.offsetHeight,
-          clientX: e.clientX,
-          clientY: e.clientY,
-        };
+        let pressedSpot = '';
 
         if (this.resizable) {
           const clientRect = windowEl.getBoundingClientRect();
@@ -146,17 +139,32 @@
             bottom: isGrabBottom,
           };
 
-          this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
+          if (isGrabTop || isGrabLeft || isGrabRight || isGrabBottom) {
+            pressedSpot = 'border';
+          }
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
+        if (pressedSpot !== 'border' && this.isInHeader(e.clientX, e.clientY)) {
+          pressedSpot = 'header';
+        }
 
         document.body.style.cursor = windowEl.style.cursor;
 
+        this.clickedInfo = {
+          pressedSpot,
+          state: 'mousedown',
+          top: windowEl.offsetTop,
+          left: windowEl.offsetLeft,
+          width: windowEl.offsetWidth,
+          height: windowEl.offsetHeight,
+          clientX: e.clientX,
+          clientY: e.clientY,
+        };
+
+        this.$emit('mousedown', e, this.clickedInfo);
+
         window.addEventListener('mousemove', this.mousedownMousemove);
         window.addEventListener('mouseup', this.mousedownMouseup);
-
-        this.$emit('mousedown', e);
       },
       mousemove(e) {
         this.changeMouseCursor(e);
@@ -165,25 +173,35 @@
         this.$emit('mouseout', e);
       },
       mousedownMousemove(e) {
-        if (this.resizable && this.isGrabbingBorder) {
-          this.resize(e);
-        } else if (this.isMoving) {
-          const diffTop = e.clientY - this.clickedInfo.clientY;
-          const diffLeft = e.clientX - this.clickedInfo.clientX;
+        this.clickedInfo.state = 'mousedown-mousemove';
 
-          this.setCssText({
-            top: this.clickedInfo.top + diffTop,
-            left: this.clickedInfo.left + diffLeft,
-          });
+        switch (this.clickedInfo.pressedSpot) {
+          case 'header': {
+            const diffTop = e.clientY - this.clickedInfo.clientY;
+            const diffLeft = e.clientX - this.clickedInfo.clientX;
+
+            this.setCssText({
+              top: this.clickedInfo.top + diffTop,
+              left: this.clickedInfo.left + diffLeft,
+            });
+
+            this.$emit('mousedown-mousemove', e);
+            break;
+          }
+          case 'border':
+            this.resize(e);
+            this.$emit('mousedown-mousemove', e);
+            break;
+          default:
+            break;
         }
-
-        this.$emit('mousedown-mousemove', e);
       },
       mousedownMouseup(e) {
-        this.isMoving = false;
-        this.isGrabbingBorder = false;
+        this.clickedInfo.state = '';
+        this.clickedInfo.pressedSpot = '';
 
         document.body.style.cursor = '';
+
         this.changeMouseCursor(e);
 
         window.removeEventListener('mousemove', this.mousedownMousemove);
@@ -271,7 +289,7 @@
         this.$emit('resize', e, positionInfo);
       },
       changeMouseCursor(e) {
-        if (!this.$el || this.isMoving || this.isGrabbingBorder) {
+        if (!this.$el || this.clickedInfo.pressedSpot) {
           return;
         }
 
@@ -527,7 +545,6 @@
     background: #595c64;
   }
   .ev-window-expand-btn:before {
-    position: absolute;
     top: -1px;
     right: 1px;
     font-size: 18px;
@@ -566,7 +583,6 @@
     background: #595c64;
   }
   .ev-window-close-btn:before{
-    position: absolute;
     top: 0;
     right: 6px;
     font-size: 11px;
