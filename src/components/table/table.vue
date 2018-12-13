@@ -82,7 +82,7 @@
                             style="text-overflow:unset;"
                           >
                             <ev-checkbox
-                              :value="row[col.field]"
+                              v-model="row[col.field]"
                               @change-event="changeCheckbox($event, row, col.field, col.checkType)"
                             />
                           </div>
@@ -379,7 +379,7 @@
         selectedData: null,
 
         // check 관련
-        changeCheckData: null,
+        changeCheckData: [],
 
         // find 관련
         findDataList: [],
@@ -1267,11 +1267,12 @@
       },
       changeCheckbox(value, row, field, type) {
         const data = row;
-        if (type === 'single' && this.changeCheckData) {
-          this.$set(this.changeCheckData, field, false);
+        const checkedData = _.filter(this.originData, d => d[field] === true);
+        if (type === 'single' && checkedData.length) {
+          this.$set(checkedData[0], field, false);
         }
         if (type === 'single') {
-          this.changeCheckData = data;
+          checkedData[0] = data;
         }
         this.$set(data, field, value);
       },
@@ -1291,14 +1292,19 @@
         }
       },
       rowClick(event, row) {
+        if (this.select === 'none') {
+          return;
+        }
         console.log('clickEvent');
         if (this.select === 'single') {
           this.rowSelect(row);
         }
         this.$emit('rowClick', event, row);
       },
-      getChangeCheckData() {
-        return this.changeCheckData;
+      getCheckedData(field) {
+        console.log(field);
+        const result = _.filter(this.originData, data => data[field] === true);
+        return result;
       },
       getSelectedData() {
         let result;
