@@ -107,6 +107,10 @@
         e.preventDefault();
       },
       onClick(item) {
+        if (!item.items) {
+          this.hide();
+        }
+
         this.$emit('click', item);
       },
       setPosition(x, y) {
