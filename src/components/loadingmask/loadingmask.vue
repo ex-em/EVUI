@@ -94,13 +94,19 @@
     },
     methods: {
       updatePosition() {
-        const parentRect = this.$parent.$el.getBoundingClientRect();
-        const bodyRect = this.$refs.contents.getBoundingClientRect();
+        if (!this.isShow) {
+          return;
+        }
 
-        this.$el.style.top = `${(parentRect.height / 2) - (bodyRect.height / 2)}px`;
-        this.$el.style.left = `${(parentRect.width / 2) - (bodyRect.width / 2)}px`;
-        this.$el.style.width = `${bodyRect}px`;
-        this.$el.style.height = `${bodyRect}px`;
+        const element = this.$el;
+        const parentRect = element.parentElement.getBoundingClientRect();
+        const contentsRect = this.$refs.contents.getBoundingClientRect();
+
+        element.style.cssText = `
+          top: ${(parentRect.height / 2) - (contentsRect.height / 2)}px;
+          left: ${(parentRect.width / 2) - (contentsRect.width / 2)}px;
+          width: ${contentsRect}px;
+          height: ${contentsRect}px;`;
       },
     },
   };
