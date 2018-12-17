@@ -929,6 +929,9 @@
         this.sizeColSum = 0;
         this.noSizeColList = [];
         this.endColWidth = 0;
+        this.virtualTop = 0;
+        this.virtualBottom = 0;
+        this.$refs.evuiGridRecords.scrollTop = 0;
         if (this.pagination) {
           const gridBody = this.$refs.evuiGridBody;
 
