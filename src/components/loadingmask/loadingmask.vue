@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isShow"
+    v-show="isShow"
     class="ev-loadingmask"
     style="display: none;"
   >
