@@ -731,4 +731,4 @@
     },
   };
 </script>
-<style scoped src="@/components/tree/tree.table.black.css"/>
+<style scoped src="@/components/tree/tree.table.grey.css"/>
