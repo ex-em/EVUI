@@ -1,7 +1,8 @@
 <template>
   <div
-    v-if="isShow"
+    v-show="isShow"
     class="ev-loadingmask"
+    style="display: none;"
   >
     <div
       v-show="barCount"
@@ -68,10 +69,8 @@
       };
     },
     watch: {
-      isShow(value) {
-        if (value) {
-          setTimeout(this.updatePosition.bind(this), 1);
-        }
+      isShow() {
+        setTimeout(this.updatePosition.bind(this), 1);
       },
     },
     created() {
@@ -95,6 +94,7 @@
     methods: {
       updatePosition() {
         if (!this.isShow) {
+          this.$el.style.display = 'none';
           return;
         }
 
@@ -103,6 +103,7 @@
         const contentsRect = this.$refs.contents.getBoundingClientRect();
 
         element.style.cssText = `
+          display: block;
           top: ${(parentRect.height / 2) - (contentsRect.height / 2)}px;
           left: ${(parentRect.width / 2) - (contentsRect.width / 2)}px;
           width: ${contentsRect}px;
