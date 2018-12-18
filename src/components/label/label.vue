@@ -19,10 +19,6 @@
   const prefixCls = 'ev-label';
   export default{
     props: {
-      size: {
-        type: String,
-        default: 'medium',
-      },
       value: {
         type: String,
         default: '',
