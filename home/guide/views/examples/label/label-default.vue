@@ -1,69 +1,17 @@
 <template>
   <div>
-    <div class="label-demo">
-      <h5> # Normal </h5>
+    <div
+      class="label-demo"
+      style="width: 500px; height: 500px;"
+    >
       <Label
-        :value="textList[0]"
+        :refs="'label1'"
+        :value="labelValue"
         :bold="true"
-        :fit="true"
-      />
-      <Label
-        :mandatory="true"
-        :value="textList[1]"
-        :bold="true"
-        :fit="true"
-      />
-      <Label
-        :checkValid="true"
-        :isError="true"
-        :value="textList[2]"
-        :fit="true"
-        :align="leftAlign"
-      />
-      <Label
-        :mandatory="true"
-        :checkValid="true"
-        :isError="true"
-        :value="textList[3]"
-        :fit="true"
-      />
-      <Label
-        :checkValid="true"
-        :isSuccess="true"
-        :value="textList[4]"
-        :fit="true"
-      />
-      <Label
-        :checkValid="true"
-        :isFailed="true"
-        :value="textList[5]"
-        :fit="true"
-      />
-    </div>
-    <div class="event-demo">
-      <h5> # Event </h5>
-      <Label
-        :checkValid="true"
-        :isSuccess="checkItem"
-        :isFailed="!checkItem"
-        :value="textList[6]"
-        :fit="true"
-      />
-      <Button
-        :text="'Click Me!'"
-        @click="checkList"
-      />
-    </div>
-    <div class="compose-demo">
-      <h5> # compose </h5>
-      <Label
-        :value="textList[7]"
-        :fit="true"
-      />
-      <input-number
-        :readonly="true"
-        :value="0.5"
-        width="100"
+        :width="width"
+        :height="height"
+        :textAlign="textAlign"
+        :verticalAlign="verticalAlign"
       />
     </div>
   </div>
@@ -81,32 +29,19 @@
     },
     data() {
       return {
-        textList: [
-          'Normal',
-          'Important',
-          'Error',
-          'Important Error',
-          'Success',
-          'Failed',
-          'Check Event',
-          'Input',
-        ],
+        width: '100%',
+        height: '100%',
+        labelValue: 'Normalasdfasdf',
         checkItem: false,
-        leftAlign: 'left',
+        textAlign: 'left',
+        verticalAlign: 'middle',
       };
     },
+    mounted() {
+    },
     methods: {
-      checkList: function checkList() {
-        this.checkItem = !this.checkItem;
-      },
     },
   };
 </script>
 <style scoped>
-  div{
-    padding: 3px;
-  }
-  p{
-    margin: 2px;
-  }
 </style>
