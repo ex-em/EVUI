@@ -7,7 +7,6 @@
       <Label
         :refs="'label1'"
         :value="labelValue"
-        :bold="true"
         :width="width"
         :height="height"
         :textAlign="textAlign"
