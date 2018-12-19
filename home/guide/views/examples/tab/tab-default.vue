@@ -76,7 +76,7 @@
           value: `${this.seq}`,
           content: `targetComponent${(this.seq % 4) + 1}`,
         });
-        this.activeTabValue = `${this.seq}`;
+        // this.activeTabValue = `${this.seq}`;
         this.seq++;
       },
       changeTab(oldValue, newValue) {
