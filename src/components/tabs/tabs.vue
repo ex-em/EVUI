@@ -111,7 +111,7 @@
     },
     data() {
       return {
-        tabList: this.value,
+        tabList: this.value.slice(),
         activeTab: this.activeTabValue,
         currentOffset: 0,
         isActiveScroll: false,
@@ -131,11 +131,11 @@
         if (this.tabList.length < value.length) {
           const addValue = value[value.length - 1].value;
 
-          this.tabList = value;
-          this.$emit('change-tab', addValue, this.activeTab);
+          this.tabList = value.slice();
+          this.$emit('change-tab', this.activeTab, addValue);
           this.activeTab = addValue;
         } else {
-          this.tabList = value;
+          this.tabList = value.slice();
         }
 
         setTimeout(() => this.toggleScrollIcon());
