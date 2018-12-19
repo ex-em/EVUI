@@ -1,43 +1,22 @@
 <template>
   <div
-    :style="styleObject"
-    :class="wrappedOuterClass"
-  >
-    <div
-      :class="wrappedValidClass"
+    ref="wrapper"
+    :style="wrapperStyle"
+    class="ev-label-wrapper">
+    <label
+      ref="label"
+      :class="labelClass"
     >
-      <label
-        ref="label"
-        :class="wrappedLabelClass"
-      >
-        {{ currentValue }}
-      </label>
-    </div>
+      {{ labelText }}
+    </label>
   </div>
 </template>
 <script>
-  const prefixCls = 'evui-label';
+  import { getQuantity } from '@/common/utils';
 
-  function parsedStyle(value) {
-    let val = value;
-
-    val = val.toString();
-
-    if (val.match(/[1-9]*?[0-9]+/gi)) {
-      if (val.match(/[px|%]/gi) === null) {
-        val = val.concat('px');
-      }
-    } else {
-      val = null;
-    }
-    return val;
-  }
+  const prefixCls = 'ev-label';
   export default{
     props: {
-      size: {
-        type: String,
-        default: 'medium',
-      },
       value: {
         type: String,
         default: '',
@@ -50,173 +29,154 @@
         type: [String, Number],
         default: '100%',
       },
-      fit: {
-        type: Boolean,
-        default: false,
-      },
-      bold: {
-        type: Boolean,
-        default: false,
-      },
-      mandatory: {
-        type: Boolean,
-        default: false,
-      },
-      checkValid: {
-        type: Boolean,
-        default: false,
-      },
-      isSuccess: {
-        type: Boolean,
-        default: false,
-      },
-      isFailed: {
-        type: Boolean,
-        default: false,
-      },
-      isError: {
-        type: Boolean,
-        default: false,
-      },
-      isAlarm: {
-        type: Boolean,
-        default: false,
-      },
-      align: {
+      textAlign: {
         type: String,
         default: 'center',
+      },
+      verticalAlign: {
+        type: String,
+        default: 'middle',
       },
     },
     data() {
       return {
-        currentValue: this.setValue(this.value),
-        offsetWidth: this.width,
-        offsetHeight: this.height,
       };
     },
     computed: {
-      styleObject: function styleObject() {
-        return {
-          width: parsedStyle(this.offsetWidth),
-        };
+      labelText() {
+        return this.value;
       },
-      wrappedOuterClass() {
-        const sizeCls = this.size;
-        return [
-          `${prefixCls}-outer`,
-          `${prefixCls}-size-${sizeCls}`,
-          {
-            [`${prefixCls}-font-bold`]: this.bold,
-          },
-        ];
-      },
-      wrappedValidClass() {
-        let status = '';
-        let align = '';
+      hAlign() {
+        let align;
 
-        if (this.checkValid) {
-          if (this.isError || (this.isSuccess && this.isFailed)) {
-            status = 'error';
-          } else {
-            if (this.isSuccess) {
-              status = 'success';
-            }
-            if (this.isFailed) {
-              status = 'fail';
-            }
-          }
-        }
-
-        switch (this.align) {
+        switch (this.textAlign) {
           case 'left':
           case 'right':
           case 'center':
-            align = this.align;
+            align = this.textAlign;
             break;
           default:
             align = 'center';
         }
 
+        return align;
+      },
+      vAlign() {
+        let align;
+
+        switch (this.verticalAlign) {
+          case 'top':
+          case 'middle':
+          case 'bottom':
+            align = this.verticalAlign;
+            break;
+          default:
+            align = 'top';
+            break;
+        }
+
+        return align;
+      },
+      offsetWidth() {
+        return this.getSize(getQuantity(this.width));
+      },
+      offsetHeight() {
+        return this.getSize(getQuantity(this.height));
+      },
+      wrapperStyle() {
+        return {
+          width: this.offsetWidth,
+          height: this.offsetHeight,
+        };
+      },
+      labelClass() {
         return [
-          `${prefixCls}-inner`,
-          `${prefixCls} ${status} ${align}`,
+          `${prefixCls}`,
+          `${this.hAlign}-${this.vAlign}`,
         ];
       },
-      wrappedLabelClass() {
-        return [
-          `${prefixCls}-native`,
-        ];
-      },
-    },
-    watch: {
-      mandatory: function mandatory() {
-        this.currentValue = this.setValue(this.value);
-      },
-    },
-    mounted() {
-      const asterSize = {
-        large: 25,
-        medium: 18,
-        small: 13,
-      };
-      if (this.fit && this.$refs.label) {
-        this.offsetWidth = parsedStyle(this.$refs.label.offsetWidth + asterSize[this.size]);
-      }
     },
     methods: {
-      setValue: function setValue(value) {
-        let result = value;
-        if (this.mandatory) {
-          result = `* ${result}`;
+      getSize(size) {
+        let sizeValue;
+
+        if (size) {
+          sizeValue = size.unit ? size.value + size.unit : `${size.value}px`;
+        } else {
+          sizeValue = '100%';
         }
-        return result;
+        return sizeValue;
       },
     },
   };
 </script>
-<style scoped>
-  .evui-label-native {
-    padding: 0 2px 0 2px;
-  }
-  .evui-label-inner {
-    height: 30px;
-    text-align: center;
-    line-height: 1.8;
-    border-radius: 4px;
-  }
-  .evui-label-outer {
+<style>
+  .ev-label-wrapper {
+    position: relative;
     display: inline-block;
-    margin: 0;
-    padding: 0 2px 0 2px;
-    vertical-align: middle;
-    line-height: 1.5;
-    font-size: 15px;
-    user-select: none;
   }
-  .evui-label-font-bold {
-    font-weight: bold;
+
+  .ev-label {
+    position: absolute;
   }
-  .evui-label.error {
-    color: red;
+
+  .ev-label-wrapper .left-top {
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
   }
-  .evui-label {
-    transition:all .2s ease-in-out;
+
+  .ev-label-wrapper .left-middle {
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
   }
-  .evui-label.success {
-    background-color: #34C032;
-    color: #fff;
+
+  .ev-label-wrapper .left-bottom {
+    top: 100%;
+    left: 0;
+    transform: translate(0, -100%);
   }
-  .evui-label.fail {
-    background-color: #F53243;
-    color: #fff;
+
+  .ev-label-wrapper .center-top {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
   }
-  .evui-label.center {
-    text-align: center;
+
+  .ev-label-wrapper .center-middle {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
-  .evui-label.left {
-    text-align: left;
+
+  .ev-label-wrapper .center-bottom {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
   }
-  .evui-label.right {
-    text-align: right;
+
+  .ev-label-wrapper .right-top {
+    top: 0;
+    right: 0;
+    transform: translate(-100%, 0);
+  }
+
+  .ev-label-wrapper .right-top {
+    top: 0;
+    left: 100%;
+    transform: translate(-100%, 0);
+  }
+
+  .ev-label-wrapper .right-middle {
+    top: 50%;
+    left: 100%;
+    transform: translate(-100%, -50%);
+  }
+
+  .ev-label-wrapper .right-bottom {
+    top: 100%;
+    left: 100%;
+    transform: translate(-100%, -100%);
   }
 </style>
