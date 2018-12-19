@@ -88,20 +88,11 @@
         }
         return sizeValue;
       },
-      addValue(seriesIndex, value, dataIndex) {
-        const seriesList = this.dataStore.seriesList;
-        const baseIndex = this.dataStore.findBaseSeries(seriesList[seriesIndex].id);
-        const isStack = this.$props.options.stack;
-
-        if (isStack && baseIndex !== null) {
-          if (this.$props.data.category) {
-            this.dataStore.addCategoryStackValue(seriesIndex, value, baseIndex, dataIndex);
-          } else {
-            this.dataStore.addStackValue(seriesIndex, value, baseIndex);
-          }
-        } else {
-          this.dataStore.addValue(seriesIndex, value, dataIndex);
-        }
+      addAxisData(axisType, value, dataIndex) {
+        this.dataStore.addAxisData(axisType, value, dataIndex);
+      },
+      addGraphData(seriesIndex, axisData, value, dataIndex) {
+        this.dataStore.addGraphData(seriesIndex, axisData, value, dataIndex);
       },
     },
   };

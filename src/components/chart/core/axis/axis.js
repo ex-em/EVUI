@@ -4,28 +4,34 @@ import Util from '../core.util';
 
 class Axis {
   constructor(props) {
-    Object.keys(props).forEach((key) => {
-      this[key] = props[key];
-    });
+    this.type = props.type;
+    this.options = props.options;
+    this.ctx = props.ctx;
 
-    if (!this.options.scaleType) {
-      this.options.scaleType = 'auto';
-    }
-
-    if (!this.options.labelType) {
-      this.options.labelType = 'linear';
-    }
-
-    this.units = AXIS_UNITS[this.type];
-    this.skipFitting = false;
+    this.chartRect = props.chartRect;
+    this.labelOffset = props.labelOffset;
   }
 
   createAxis(axisMinMax) {
+    this.units = AXIS_UNITS[this.type];
+    this.skipFitting = false;
+
+    this.axisPosInfo = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
     this.calculateRange(axisMinMax);
     this.drawAxis();
   }
 
   calculateRange(axisMinMax) {
+    if (!axisMinMax) {
+      return;
+    }
+
     // init variable
     const options = this.options;
     const chartRect = this.chartRect;
@@ -59,12 +65,6 @@ class Axis {
 
     // 실제 Axis가 그려질 영역
     const chartSize = this.units.pos === 'x' ? chartRect.chartWidth : chartRect.chartHeight;
-    this.axisPosInfo = {
-      x1: chartRect.x1 + this.labelOffset.left,
-      x2: chartRect.x2 - this.labelOffset.right,
-      y1: chartRect.y1 + this.labelOffset.top,
-      y2: chartRect.y2 - this.labelOffset.bottom,
-    };
 
     if (this.units.pos === 'x') {
       currentLabelOffset = [this.labelOffset.left, this.labelOffset.right];

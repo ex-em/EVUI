@@ -216,7 +216,7 @@ export default class DataStore {
     let value;
 
     if (axisOption.labelType === 'time') {
-      dateObj = moment(data);
+      dateObj = moment(new Date(data));
 
       if (dateObj.isValid()) {
         value = +dateObj;
@@ -334,13 +334,6 @@ export default class DataStore {
 
     let index = typeof dataIndex === 'number' && dataIndex > -1 ? dataIndex : data.length;
 
-    if (this.chartOptions.bufferSize) {
-      if (data.length >= this.chartOptions.bufferSize) {
-        data.shift();
-        --index;
-      }
-    }
-
     if (axisType === 'x') {
       axisIndex = series.xAxisIndex;
       axisOption = this.chartOptions.xAxes[axisIndex];
@@ -348,6 +341,14 @@ export default class DataStore {
       axisIndex = series.yAxisIndex;
       axisOption = this.chartOptions.yAxes[axisIndex];
     }
+
+    if (this.chartOptions.bufferSize) {
+      if (data.length >= this.chartOptions.bufferSize) {
+        data.shift();
+        --index;
+      }
+    }
+
 
     if (axisOption.labelType === 'time') {
       dateObj = moment(axisData === undefined ? null : axisData);
@@ -435,6 +436,11 @@ export default class DataStore {
 
     if (xInfo.min === null || xInfo.min > value) {
       xInfo.min = value;
+      xInfo.minSId = seriesId;
+    }
+
+    if (xInfo.min < this.graphData[seriesId][0].x) {
+      xInfo.min = this.graphData[seriesId][0].x;
       xInfo.minSId = seriesId;
     }
 

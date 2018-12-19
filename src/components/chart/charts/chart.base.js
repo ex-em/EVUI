@@ -401,8 +401,8 @@ class BaseChart {
     const yAxes = this.options.yAxes;
 
     const ctx = this.bufferCtx;
-    const xMinMax = this.xMinMax;
-    const yMinMax = this.yMinMax;
+    const xMinMax = this.xMinMax.length ? this.xMinMax : [{ max: 1, min: 0 }];
+    const yMinMax = this.yMinMax.length ? this.yMinMax : [{ max: 1, min: 0 }];
 
     // 축의 Label 길이 중 가장 큰 value를 기준으로 label offset을 계산.
     // label offset의 buffer size 20px
@@ -942,6 +942,18 @@ class BaseChart {
     this.yMinMax = this.store.getYMinMax();
     this.axisList = this.store.getAxisList();
 
+    this.initScale();
+
+    this.clearDraw();
+    this.drawChart();
+  }
+
+  redraw() {
+    if (!this.chartRect.width && !this.chartRect.height) {
+      return;
+    }
+
+    this.chartRect = this.getChartRect();
     this.initScale();
 
     this.clearDraw();
