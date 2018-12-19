@@ -63,7 +63,7 @@
                 />
                 {{ tab.title }}
                 <ev-icon
-                  v-if="!disableRemoveTab"
+                  v-if="!disableRemoveTab && tabList.length > 1"
                   class="ei-close ev-tab-close-btn"
                   style="margin-left: 3px; font-size: 10px;"
                   @click.native.stop="removeTab(tab.value)"
@@ -128,7 +128,16 @@
     },
     watch: {
       value(value) {
-        this.tabList = value;
+        if (this.tabList.length < value.length) {
+          const addValue = value[value.length - 1].value;
+
+          this.tabList = value;
+          this.$emit('change-tab', addValue, this.activeTab);
+          this.activeTab = addValue;
+        } else {
+          this.tabList = value;
+        }
+
         setTimeout(() => this.toggleScrollIcon());
       },
       activeTabValue(value) {
