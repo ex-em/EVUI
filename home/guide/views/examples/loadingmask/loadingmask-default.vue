@@ -2,6 +2,7 @@
   <div>
     <div style="width: 400px; height: 200px;">
       <loadingmask
+        :is-show="true"
       />
     </div>
     <br>
