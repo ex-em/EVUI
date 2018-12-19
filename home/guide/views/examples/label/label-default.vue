@@ -5,7 +5,15 @@
       style="width: 500px; height: 500px;"
     >
       <Label
-        :refs="'label1'"
+        :ref="'label1'"
+        :value="labelValue"
+        :width="width"
+        :height="height"
+        :textAlign="textAlign"
+        :verticalAlign="verticalAlign"
+      />
+      <Label
+        :ref="'label1'"
         :value="labelValue"
         :width="width"
         :height="height"
@@ -28,7 +36,7 @@
     },
     data() {
       return {
-        width: '100%',
+        width: '40%',
         height: '100%',
         labelValue: 'Normalasdfasdf',
         checkItem: false,
@@ -37,8 +45,19 @@
       };
     },
     mounted() {
+      // this.timer = setTimeout(() => { this.updateData(); }, 3000);
     },
     methods: {
+      updateData() {
+        this.labelValue = 'asdjfkasdjfkasdjfk';
+        this.textAlign = 'right';
+        this.verticalAlign = 'bottom';
+        // this.height = 200;
+
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+      },
     },
   };
 </script>

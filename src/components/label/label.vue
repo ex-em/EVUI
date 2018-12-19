@@ -3,14 +3,12 @@
     ref="wrapper"
     :style="wrapperStyle"
     class="ev-label-wrapper">
-    <div class="ev-label-inner">
-      <label
-        ref="label"
-        :class="labelClass"
-      >
-        {{ labelText }}
-      </label>
-    </div>
+    <label
+      ref="label"
+      :class="labelClass"
+    >
+      {{ labelText }}
+    </label>
   </div>
 </template>
 <script>
@@ -115,74 +113,68 @@
 <style>
   .ev-label-wrapper {
     position: relative;
-  }
-</style>
-<style scoped>
-  .ev-label-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    display: inline-block;
   }
 
   .ev-label {
     position: absolute;
   }
 
-  .ev-label-inner .left-top {
+  .ev-label-wrapper .left-top {
     top: 0;
     left: 0;
     transform: translate(0, 0);
   }
 
-  .ev-label-inner .left-middle {
+  .ev-label-wrapper .left-middle {
     top: 50%;
     left: 0;
     transform: translate(0, -50%);
   }
 
-  .ev-label-inner .left-bottom {
+  .ev-label-wrapper .left-bottom {
     top: 100%;
     left: 0;
     transform: translate(0, -100%);
   }
 
-  .ev-label-inner .center-top {
+  .ev-label-wrapper .center-top {
     top: 0;
     left: 50%;
     transform: translate(-50%, 0);
   }
 
-  .ev-label-inner .center-middle {
+  .ev-label-wrapper .center-middle {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
 
-  .ev-label-inner .center-bottom {
+  .ev-label-wrapper .center-bottom {
     top: 100%;
     left: 50%;
     transform: translate(-50%, -100%);
   }
 
-  .ev-label-inner .right-top {
+  .ev-label-wrapper .right-top {
     top: 0;
     right: 0;
     transform: translate(-100%, 0);
   }
 
-  .ev-label-inner .right-top {
+  .ev-label-wrapper .right-top {
     top: 0;
     left: 100%;
     transform: translate(-100%, 0);
   }
 
-  .ev-label-inner .right-middle {
+  .ev-label-wrapper .right-middle {
     top: 50%;
     left: 100%;
     transform: translate(-100%, -50%);
   }
 
-  .ev-label-inner .right-bottom {
+  .ev-label-wrapper .right-bottom {
     top: 100%;
     left: 100%;
     transform: translate(-100%, -100%);
