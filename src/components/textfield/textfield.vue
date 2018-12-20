@@ -171,32 +171,32 @@
       this.validateError(this.currentValue);
     },
     methods: {
-      handleEnter(event) {
-        this.$emit('on-enter', event);
+      handleEnter(e) {
+        this.$emit('on-enter', e);
       },
-      handleKeyDown(event) {
-        this.$emit('on-keydown', event);
+      handleKeyDown(e) {
+        this.$emit('on-keydown', e);
       },
-      handleKeyUp(event) {
-        this.$emit('on-keyup', event);
+      handleKeyUp(e) {
+        this.$emit('on-keyup', e);
       },
-      handleFocus(event) {
+      handleFocus(e) {
         this.focus = true;
-        this.$emit('on-focus', event);
+        this.$emit('on-focus', e);
       },
-      handleBlur(event) {
+      handleBlur(e) {
         this.focus = false;
-        this.$emit('on-blur', event);
+        this.$emit('on-blur', e);
       },
-      handleInput(event) {
-        const value = event.target.value;
+      handleInput(e) {
+        const value = e.target.value;
 
         this.$emit('input', value);
         this.setCurrentValue(value);
-        this.$emit('on-input-change', event);
+        this.$emit('on-input-change', e);
       },
-      handleChange(event) {
-        this.$emit('on-change', event);
+      handleChange(e) {
+        this.$emit('on-change', e);
       },
       setCurrentValue(value) {
         if (value === this.currentValue) {
