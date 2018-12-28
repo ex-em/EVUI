@@ -1,57 +1,108 @@
 <template>
   <div
     ref="wrapper"
-    :style="wrapperSize"
+    :style="wrapperStyle"
     class="ev-chart"
   />
 </template>
 <script>
-  import Util from './core/core.util';
+  import _ from 'lodash';
+  import { getQuantity } from '@/common/utils';
   import LineChart from './charts/chart.line';
   import ScatterChart from './charts/chart.scatter';
   import BarChart from './charts/chart.bar';
   import PieChart from './charts/chart.pie';
-  import SunburstChart from './charts/chart.sunburst';
 
   export default {
     props: {
       options: {
         type: Object,
-        default() {
-          return {
-            type: 'line',
-            xAxes: [],
-            yAxes: [],
-          };
-        },
+        default: () => {},
       },
       data: {
         type: Object,
-        default() {
-          return {
-            series: [],
-          };
-        },
+        default: () => {},
       },
     },
     data() {
       return {
         chart: null,
+        normalizedOption: null,
+        normalizedData: null,
       };
+    },
+    computed: {
+      wrapperStyle() {
+        return {
+          width: this.getChartSize(getQuantity(this.options.width)),
+          height: this.getChartSize(getQuantity(this.options.height)),
+        };
+      },
     },
     created() {
-      // using wrapper div
-      this.wrapperSize = {
-        width: this.getChartSize(Util.quantity(this.options.width)),
-        height: this.getChartSize(Util.quantity(this.options.height)),
+      const defaultOptions = {
+        colors: [
+          '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
+          '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
+          '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
+          '#009bc7', '#cacaff', '#ffc125', '#df6264',
+        ],
+        padding: {
+          top: 5,
+          right: 5,
+          bottom: 5,
+          left: 5,
+        },
+        border: 2,
+        title: {
+          show: false,
+          height: 40,
+          text: '',
+          style: {
+            fontSize: 15,
+            color: '#000',
+            fontFamily: 'Droid Sans',
+          },
+        },
+        legend: {
+          show: true,
+          position: 'right',
+          color: '#000',
+          inactive: '#aaa',
+        },
+        itemHighlight: true,
+        seriesHighlight: true,
+        useSelect: false,
+        doughnutHoleSize: 0,
+        reverse: false,
+        bufferSize: null,
+        horizontal: false,
+        width: '100%',
+        height: '100%',
+        thickness: 1,
+        useTooltip: true,
+        useSelectionData: false,
+        type: 'line',
       };
+
+      const defaultData = {
+        series: {},
+        groups: [],
+        labels: [],
+        data: {},
+      };
+
+      this.normalizedOption = _.merge(defaultOptions, this.options);
+      this.normalizedData = _.merge(defaultData, this.data);
     },
     mounted() {
-      const chartType = this.$props.options.type || '';
+      const wrapper = this.$refs.wrapper;
+      const options = this.normalizedOption;
+      const data = this.normalizedData;
 
-      switch (chartType.toLowerCase()) {
+      switch (options.type.toLowerCase()) {
         case 'line':
-          this.chart = new LineChart(this.$refs.wrapper, this.$props.data, this.$props.options);
+          this.chart = new LineChart(wrapper, data, options);
           break;
         case 'scatter':
           this.chart = new ScatterChart(this.$refs.wrapper, this.$props.data, this.$props.options);
@@ -62,15 +113,15 @@
         case 'pie':
           this.chart = new PieChart(this.$refs.wrapper, this.$props.data, this.$props.options);
           break;
-        case 'sunburst':
-          this.chart = new SunburstChart(this.$refs.wrapper, this.$props.data, this.$props.options);
-          break;
         default:
+          console.log('%c Unexpected Chart Type', 'color:yellow');
           break;
       }
 
-      this.chart.drawChart();
-      this.dataStore = this.chart.store;
+      this.store = this.chart.store;
+      setTimeout(() => {
+        this.chart.drawChart();
+      }, 1);
     },
     destroyed() {
       if (this.chart.tooltipDOM) {
@@ -88,11 +139,42 @@
         }
         return sizeValue;
       },
-      addAxisData(axisType, value, dataIndex) {
-        this.dataStore.addAxisData(axisType, value, dataIndex);
+      addAxisLabel(value, index = -1) {
+        const labels = this.store.chartData.labels;
+        if (index > -1) {
+          labels[index] = value;
+        } else {
+          labels.push(value);
+        }
       },
-      addGraphData(seriesIndex, axisData, value, dataIndex) {
-        this.dataStore.addGraphData(seriesIndex, axisData, value, dataIndex);
+      updateAxisLabelSet(labelSet) {
+        this.store.chartData.labels = labelSet;
+      },
+      updateGraphDataSet(graphSet) {
+        this.store.chartData.data = graphSet;
+      },
+      updateSeriesSet(seriesSet) {
+        this.store.chartData.series = seriesSet;
+      },
+      addGraphData(seriesId, value, index = -1) {
+        const data = this.store.chartData.data;
+
+        if (!data[seriesId]) {
+          data[seriesId] = [];
+        }
+
+        if (index > -1) {
+          data[seriesId][index] = value;
+        } else {
+          data[seriesId].push(value);
+        }
+      },
+      addSeries(sId, sInfo) {
+        const series = this.store.chartData.series;
+        series[sId] = sInfo;
+      },
+      updateChart() {
+        this.chart.updateChart();
       },
     },
   };
