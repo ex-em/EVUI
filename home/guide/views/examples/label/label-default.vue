@@ -2,23 +2,16 @@
   <div>
     <div
       class="label-demo"
-      style="width: 500px; height: 500px;"
     >
       <Label
-        :ref="'label1'"
         :value="labelValue"
-        :width="width"
-        :height="height"
-        :textAlign="textAlign"
-        :verticalAlign="verticalAlign"
+        :size="'medium'"
+        :user-cls="'test'"
       />
       <Label
         :ref="'label1'"
         :value="labelValue"
-        :width="width"
-        :height="height"
-        :textAlign="textAlign"
-        :verticalAlign="verticalAlign"
+        :size="'large'"
       />
     </div>
   </div>
@@ -38,10 +31,7 @@
       return {
         width: '40%',
         height: '100%',
-        labelValue: 'Normalasdfasdf',
-        checkItem: false,
-        textAlign: 'left',
-        verticalAlign: 'middle',
+        labelValue: 'Test Label Value',
       };
     },
     mounted() {
@@ -49,10 +39,7 @@
     },
     methods: {
       updateData() {
-        this.labelValue = 'asdjfkasdjfkasdjfk';
-        this.textAlign = 'right';
-        this.verticalAlign = 'bottom';
-        // this.height = 200;
+        this.labelValue = 'Updated Label Value';
 
         if (this.timer) {
           clearTimeout(this.timer);
@@ -62,4 +49,7 @@
   };
 </script>
 <style scoped>
+  .ev-label.test {
+    font-size: 50px;
+  }
 </style>

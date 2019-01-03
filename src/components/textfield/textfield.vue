@@ -1,35 +1,43 @@
 <template>
   <div>
     <div
-      :style="styleObject"
+      :style="wrapStyle"
       :class="wrapClasses"
     >
       <input
         v-if="type === 'input'"
-        :class="inputClasses"
         :value="currentValue"
+        :class="inputClasses"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
+        :maxlength="maxLength"
         spellcheck="false"
-        @focus.prevent="onFocus"
-        @blur.prevent="onBlur"
-        @change.prevent="change"
-        @input.prevent="change"
+        @keyup.enter="handleEnter"
+        @keyup="handleKeyUp"
+        @keydown="handleKeyDown"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @input="handleInput"
+        @change="handleChange"
       >
       <textarea
         v-else
-        :style="styleObject"
+        :style="wrapStyle"
         :value="currentValue"
         :class="inputClasses"
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
+        :maxlength="maxLength"
         spellcheck="false"
-        @focus="onFocus"
-        @blur="onBlur"
-        @change="change"
-        @input="change"
+        @keyup.enter="handleEnter"
+        @keyup="handleKeyUp"
+        @keydown="handleKeyDown"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @input="handleInput"
+        @change="handleChange"
       />
     </div>
     <div :class="wrapTextClass">
@@ -50,21 +58,12 @@
 </template>
 
 <script>
-  const prefixCls = 'evui-input-text';
+  import { getQuantity, getSize } from '@/common/utils';
 
-  function parsedStyle(value) {
-    const mark = value.toString();
-    let result = mark;
-    if (!mark.match(/([1-9]+)([0-9]*)(px|%+)/g)) {
-      result = mark.concat('px');
-    }
-    return result;
-  }
+  const prefixCls = 'ev-input-text';
 
   export default {
     name: 'TextField',
-    components: {
-    },
     props: {
       width: {
         type: [String, Number],
@@ -121,21 +120,29 @@
     },
     data() {
       return {
+        currentValue: this.value,
+        currentLength: this.value.length,
+        totalLength: this.maxLength,
         focus: false,
         cssError: false,
         maxError: false,
         textError: false,
-        currentValue: '',
-        totalLength: this.maxLength,
-        currentLength: this.value.length,
         errorMsgWrapper: this.errorMsg,
       };
     },
     computed: {
-      styleObject() {
+      wrapClasses() {
+        return [
+          `${prefixCls}`,
+          { [`${prefixCls}-disabled`]: this.disabled },
+          { focus: this.focus },
+          { error: this.cssError },
+        ];
+      },
+      wrapStyle() {
         return {
-          width: parsedStyle(this.width),
-          height: parsedStyle(this.height),
+          width: getSize(getQuantity(this.width)),
+          height: getSize(getQuantity(this.height)),
           background: '#fff',
         };
       },
@@ -151,64 +158,68 @@
           { error: this.maxError },
         ];
       },
-      wrapClasses() {
-        return [
-          `${prefixCls}`,
-          { [`${prefixCls}-disabled`]: this.disabled },
-          { focus: this.focus },
-          { error: this.cssError },
-        ];
-      },
       inputClasses() {
         return `${prefixCls}-${this.type}`;
       },
     },
     watch: {
-      currentValue(value) {
-        this.currentValue = value;
-        this.currentLength = value.length;
+      value(val) {
+        this.setCurrentValue(val);
       },
     },
     created() {
-      this.textError = false;
-      this.cssError = false;
-      this.maxError = false;
-
-      if (this.useRegExp) {
-        this.validateRegExp(this.value);
-      }
-
-      if (this.useMaxLength && this.validateTextLength(this.value)) {
-        this.currentValue = this.value.slice(0, this.maxLength);
-      } else {
-        this.currentValue = this.value;
-      }
+      this.validateError(this.currentValue);
     },
     methods: {
-      onFocus() {
+      handleEnter(e) {
+        this.$emit('on-enter', e);
+      },
+      handleKeyDown(e) {
+        this.$emit('on-keydown', e);
+      },
+      handleKeyUp(e) {
+        this.$emit('on-keyup', e);
+      },
+      handleFocus(e) {
         this.focus = true;
+        this.$emit('on-focus', e);
       },
-      onBlur() {
+      handleBlur(e) {
         this.focus = false;
+        this.$emit('on-blur', e);
       },
-      change(e) {
+      handleInput(e) {
+        const value = e.target.value;
+
+        this.$emit('input', value);
+        this.setCurrentValue(value);
+        this.$emit('on-input-change', e);
+      },
+      handleChange(e) {
+        this.$emit('on-change', e);
+      },
+      setCurrentValue(value) {
+        if (value === this.currentValue) {
+          return;
+        }
+
+        this.validateError(value);
+      },
+      validateError(value) {
         this.textError = false;
         this.cssError = false;
         this.maxError = false;
 
-        const targetValue = e.target.value;
-
         if (this.useRegExp) {
-          this.validateRegExp(targetValue);
+          this.validateRegExp(value);
         }
 
-        if (this.useMaxLength && this.validateTextLength(targetValue)) {
-          this.currentValue = targetValue.slice(0, this.maxLength);
-        } else {
-          this.currentValue = targetValue;
+        if (this.useMaxLength) {
+          this.validateTextLength(value);
         }
 
-        e.target.value = this.currentValue;
+        this.currentValue = value;
+        this.currentLength = value.length;
       },
       validateTextLength(value) {
         if (value.length >= this.maxLength) {
@@ -247,7 +258,7 @@
   };
 </script>
 <style>
-  .evui-input-text {
+  .ev-input-text {
     display: inline-block;
     position: relative;
     overflow: hidden;
@@ -266,16 +277,16 @@
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   }
 
-  .evui-input-text:hover {
+  .ev-input-text:hover {
     border-color : #adaeb1;
   }
 
-  .evui-input-text.focus, .evui-input-text.focus:hover {
+  .ev-input-text.focus, .ev-input-text.focus:hover {
     border-color : #2d8cf0;
     opacity: 1;
   }
 
-  .evui-input-text-input {
+  .ev-input-text-input {
     width: 100%;
     padding: 0 7px;
     text-align: left;
@@ -286,48 +297,48 @@
     border-radius: 4px;
   }
 
-  .evui-input-text-input[disabled] {
+  .ev-input-text-input[disabled] {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #495060;
   }
 
-  .evui-input-text-disabled .evui-input-text-input {
+  .ev-input-text-disabled .ev-input-text-input {
     background-color: #f3f3f3;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .evui-input-text-disabled .evui-input-text-input.evui-input-text-textarea {
+  .ev-input-text-disabled .ev-input-text-input.evui-input-text-textarea {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .evui-input-text-disabled:hover, .evui-input-text:hover.error,
-  .evui-input-text.focus.error, .evui-input-text.error {
+  .ev-input-text-disabled:hover, .ev-input-text:hover.error,
+  .ev-input-text.focus.error, .ev-input-text.error {
     border-color : #d77f7f;
   }
 
-  .evui-input-text-disabled .evui-input-text {
+  .ev-input-text-disabled .ev-input-text {
     opacity: .72;
     cursor: not-allowed;
     background-color: #f3f3f3;
   }
 
-  .evui-input-text.evui-input-text-disabled {
+  .ev-input-text.ev-input-text-disabled {
     background-color: #f3f3f3;
   }
 
-  .evui-input-text-disabled {
+  .ev-input-text-disabled {
     opacity: .72;
     color: #5f5d5d !important;
     cursor: not-allowed;
   }
 
-  .evui-input-text-textarea {
+  .ev-input-text-textarea {
     display: block;
     text-align: left;
     line-height: 1.5;
@@ -339,31 +350,31 @@
     border-radius: 4px;
   }
 
-  .evui-input-text-textarea[disabled] {
+  .ev-input-text-textarea[disabled] {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .evui-input-text-valid-check {
+  .ev-input-text-valid-check {
     font-size: 12px;
   }
 
-  .evui-input-text-valid-error {
+  .ev-input-text-valid-error {
     padding-left: 3px;
     padding-right: 5px;
     color: #ed1313;
     float:left
   }
 
-  .evui-input-text-valid-max-length {
+  .ev-input-text-valid-max-length {
     padding-left: 5px;
     padding-right: 3px;
     float:right
   }
 
-  .evui-input-text-valid-max-length.error {
+  .ev-input-text-valid-max-length.error {
     color: #ed1313;
   }
 </style>
