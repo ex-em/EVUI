@@ -27,6 +27,22 @@ export default class ChartLegend {
     this.legendCount = 0;
   }
 
+  updateLegend() {
+    const legend = this.legendDOM;
+
+    while (legend.firstChild) {
+      legend.firstChild.remove();
+    }
+
+    this.createLegend();
+    if (!this.isShow) {
+      this.resizeDOM.style.display = 'none';
+      this.legendDOM.style.display = 'none';
+    }
+
+    this.setLegendPosition(this.chartOptions.legend.position);
+  }
+
   init() {
     this.createLegend();
     if (!this.isShow) {

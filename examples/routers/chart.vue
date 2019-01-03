@@ -1,6 +1,8 @@
 <template>
   <div style="width: 100%; height: 100%; display: table;">
-    <div class="ev-chart-ttt">
+    <div
+      class="ev-chart-ttt"
+      style="width:100%; height:100%;">
       <line-chart/>
     </div>
   </div>
@@ -22,10 +24,3 @@
     },
   };
 </script>
-<style>
-  .ev-chart-ttt {
-    width: 50%;
-    height: 100%;
-    display: table-cell;
-  }
-</style>

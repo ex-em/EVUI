@@ -11,62 +11,10 @@ import Legend from '../core/core.legend';
 
 class BaseChart {
   constructor(target, data, options) {
-    // step1. Create Chart Property Object.
-    const defaultOptions = {
-      colors: [
-        '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
-        '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
-        '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
-        '#009bc7', '#cacaff', '#ffc125', '#df6264',
-      ],
-      padding: {
-        top: 5,
-        right: 5,
-        bottom: 5,
-        left: 5,
-      },
-      border: 2,
-      title: {
-        show: false,
-        height: 40,
-        text: '',
-        style: {
-          fontSize: 15,
-          color: '#000',
-          fontFamily: 'Droid Sans',
-        },
-      },
-      legend: {
-        show: true,
-        position: 'right',
-        color: '#000',
-        inactive: '#aaa',
-      },
-      itemHighlight: true,
-      seriesHighlight: true,
-      useSelect: false,
-      doughnutHoleSize: 0,
-      reverse: false,
-      bufferSize: null,
-      horizontal: false,
-      width: '100%',
-      height: '100%',
-      thickness: 1,
-      useTooltip: true,
-      useSelectionData: false,
-    };
-
-    const defaultData = {
-      series: {},
-      groups: [],
-      data: [],
-    };
+    this.options = options;
+    this.data = data;
 
     this.labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
-
-    // set chart properties
-    this.options = _.merge({}, defaultOptions, options);
-    this.data = _.merge({}, defaultData, data);
 
     this.options.type = this.options.type.toLowerCase();
 
@@ -122,7 +70,7 @@ class BaseChart {
 
     this.xMinMax = this.store.getXMinMax();
     this.yMinMax = this.store.getYMinMax();
-    this.axisList = this.store.getAxisList();
+    this.labelList = this.store.getLabelList();
     this.seriesList = this.store.getSeriesList();
     this.graphData = this.store.getGraphData();
 
@@ -401,8 +349,8 @@ class BaseChart {
     const yAxes = this.options.yAxes;
 
     const ctx = this.bufferCtx;
-    const xMinMax = this.xMinMax;
-    const yMinMax = this.yMinMax;
+    const xMinMax = this.xMinMax.length ? this.xMinMax : [{ max: 1, min: 0 }];
+    const yMinMax = this.yMinMax.length ? this.yMinMax : [{ max: 1, min: 0 }];
 
     // 축의 Label 길이 중 가장 큰 value를 기준으로 label offset을 계산.
     // label offset의 buffer size 20px
@@ -412,7 +360,7 @@ class BaseChart {
       if (yAxes[ix].timeFormat !== null) {
         labelText = `${moment(yMinMax[ix].max).format(yAxes[ix].timeFormat)}`;
       } else {
-        labelText = `${yMinMax[ix].max}`;
+        labelText = `${Util.labelFormat(yMinMax[ix].max)}`;
       }
 
       labelSize = Math.ceil(this.bufferCtx.measureText(labelText).width) || 0;
@@ -535,7 +483,7 @@ class BaseChart {
             options: this.options.xAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisData: this.axisList.x[ix] || [],
+            axisData: this.labelList || [],
           });
           break;
         case 'auto':
@@ -571,7 +519,7 @@ class BaseChart {
             options: this.options.yAxes[ix],
             ctx: this.bufferCtx,
             labelOffset: this.labelOffset,
-            axisData: this.axisList.y[ix] || [],
+            axisData: this.labelList || [],
           });
           break;
         case 'auto':
@@ -830,7 +778,7 @@ class BaseChart {
       for (let ix = 0, ixLen = skey.length; ix < ixLen; ix++) {
         gdata = graphData[skey[ix]];
 
-        if (gdata[index].yp !== null &&
+        if (gdata[index] && gdata[index].yp !== null &&
           mouseY >= (gdata[index].yp - 10) && mouseY <= (gdata[index].yp + 10)) {
           sId = skey[ix];
           break;
@@ -857,12 +805,16 @@ class BaseChart {
     }
 
     const gdata = graphData[sId];
+    if (gdata && gdata.length) {
+      if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
+        const index = Math.round(((gdata.length - 1) / width) * (mouseX - x1));
+        if (!gdata[index]) {
+          return null;
+        }
 
-    if (mouseX >= (x1 - 10) && mouseX <= (x2 + 10)) {
-      const index = Math.round(((gdata.length - 1) / width) * (mouseX - x1));
-
-      if (mouseX <= (gdata[index].xp + 10) && mouseX >= (gdata[index].xp - 10)) {
-        return index;
+        if (mouseX <= (gdata[index].xp + 10) && mouseX >= (gdata[index].xp - 10)) {
+          return index;
+        }
       }
     }
 
@@ -921,14 +873,26 @@ class BaseChart {
       if (this.resizeTimer) {
         clearTimeout(this.resizeTimer);
       }
-      this.resizeTimer = setTimeout(this.updateChart.bind(this), 50);
       this.legend.updateLegendPosition();
+      this.resizeTimer = setTimeout(this.updateChart.bind(this)(true), 50);
     }
 
     window.removeEventListener('mousemove', this.resizeEvent, false);
   }
 
-  updateChart() {
+  updateChart(isResize) {
+    this.store.updateData();
+    this.seriesList = this.store.getSeriesList();
+    this.graphData = this.store.getGraphData();
+    this.xMinMax = this.store.getXMinMax();
+    this.yMinMax = this.store.getYMinMax();
+    this.labelList = this.store.getLabelList();
+
+    if (!isResize) {
+      this.legend.seriesList = this.seriesList;
+      this.legend.updateLegend();
+    }
+
     this.chartRect = this.getChartRect();
 
     if (!this.chartRect.width || !this.chartRect.height ||
@@ -936,14 +900,7 @@ class BaseChart {
       return;
     }
 
-    this.store.updateData();
-    this.graphData = this.store.getGraphData();
-    this.xMinMax = this.store.getXMinMax();
-    this.yMinMax = this.store.getYMinMax();
-    this.axisList = this.store.getAxisList();
-
     this.initScale();
-
     this.clearDraw();
     this.drawChart();
   }
@@ -966,7 +923,6 @@ class BaseChart {
       this.overlayCanvas.height / this.clearRectRatio);
   }
 
-
   mouseMoveEvent(e) {
     const graphData = this.graphData;
     const offset = this.getMousePosition(e);
@@ -982,18 +938,8 @@ class BaseChart {
       if (this.options.type === 'pie') {
         this.showTooltip(offset, e, item);
       } else {
-        const series = this.seriesList[item.sId];
-        const axisType = series.axisType;
-        const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
-        const axis = axisType === 'x' ? this.xAxes[axisIndex] : this.yAxes[axisIndex];
-
-        let adata = this.axisList[axisType][axisIndex][item.index];
-
-        if (axis.options.timeFormat) {
-          adata = moment(adata).format(axis.options.timeFormat);
-        }
-
-        this.showTooltip(offset, e, item, graphData, adata);
+        const ldata = this.labelList[item.index];
+        this.showTooltip(offset, e, item, graphData, ldata);
       }
     } else {
       this.hideTooltip();
