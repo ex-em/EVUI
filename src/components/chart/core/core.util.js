@@ -6,18 +6,6 @@ export default {
 
   extraColor: [],
 
-  quantity(input) {
-    let output;
-
-    if (typeof input === 'string' || typeof input === 'number') {
-      const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
-      output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
-    } else {
-      output = undefined;
-    }
-    return output;
-  },
-
   hexToRgb(hex) {
     if (!hex) {
       return false;
@@ -43,5 +31,36 @@ export default {
   getLabelStyle(axis) {
     const style = axis.labelStyle;
     return `normal ${style.fontSize}px ${style.fontFamily}`;
+  },
+
+  labelFormat(value) {
+    let label;
+    if (typeof value === 'number') {
+      if (value >= 1000000000) {
+        if (value % 1000000000 === 0) {
+          label = `${(value / 1000000000).toFixed(1)}G`;
+        } else {
+          label = `${(value / 1000000000).toFixed(1)}G`;
+        }
+      } else if (value >= 1000000) {
+        if (value % 1000000 === 0) {
+          label = `${(value / 1000000).toFixed(1)}M`;
+        } else {
+          label = `${(value / 1000000).toFixed(1)}M`;
+        }
+      } else if (value >= 1000) {
+        if (value % 1000 === 0) {
+          label = `${(value / 1000).toFixed(1)}k`;
+        } else {
+          label = `${(value / 1000).toFixed(1)}k`;
+        }
+      } else {
+        label = value.toFixed(1);
+      }
+    } else {
+      label = value;
+    }
+
+    return label;
   },
 };

@@ -1,25 +1,15 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { Console } from '@/common/utils';
 
 export default class DataStore {
   constructor(props) {
-    Object.keys(props).forEach((key) => {
-      this[key] = props[key];
-    });
+    this.chartOptions = props.chartOptions;
+    this.chartData = props.chartData;
 
     this.seriesList = {};
     this.graphData = {};
 
-    /**
-     * Axis List는 Vertical일 경우 X축을 뜻하고 Horizontal의 경우 Y축을 뜻함
-     * 예로 아래와 같은 input이 존재할 경우,
-     * data: [
-     *   ['x', '2018/01', '2018/02', '2018/03', '2018/04', '2018/05'],
-     *   ['series1', 100, 200, 300, 400, 500],
-     * ],
-     * data[0]을 처리하기 위함.
-     */
+    this.labelList = [];
     this.axisList = { x: [], y: [] };
     this.xMinMax = [];
     this.yMinMax = [];
@@ -39,9 +29,7 @@ export default class DataStore {
       this.addSeries(seriesKeys[ix], series[seriesKeys[ix]]);
     }
 
-    if (this.chartData.data.length) {
-      this.createChartDataSet();
-    }
+    this.createChartDataSet();
   }
 
   /**
@@ -107,10 +95,8 @@ export default class DataStore {
   getSeriesExtends(defaultSeries, param) {
     const chartType = this.chartOptions.type;
     const skey = Object.keys(this.seriesList);
-    const horizontal = !!(this.chartOptions.horizontal);
 
     const extSeries = {
-      axisType: horizontal ? 'y' : 'x',
       xAxisIndex: param.xAxisIndex ? param.xAxisIndex : 0,
       yAxisIndex: param.yAxisIndex ? param.yAxisIndex : 0,
       point: param.point || chartType === 'scatter',
@@ -138,85 +124,54 @@ export default class DataStore {
    */
   createChartDataSet() {
     const chartData = this.chartData.data;
-    let meta;
+    const keys = Object.keys(chartData);
+    const labels = this.chartData.labels;
+
     let data;
 
-    for (let ix = 0, ixLen = chartData.length; ix < ixLen; ix++) {
-      meta = chartData[ix][0];
-      data = _.slice(chartData[ix], 1);
+    if (this.chartData.labels) {
+      this.addAxisLabels(labels);
+    }
 
-      if (meta === 'x' || meta === 'y') {
-        this.addAxisDataSet(meta, data);
-      } else if (this.seriesList[meta]) {
-        this.addGraphDataSet(meta, data);
-      }
+    for (let ix = 0; ix < keys.length; ix++) {
+      data = chartData[keys[ix]];
+      this.addGraphDataSet(keys[ix], data);
     }
   }
 
   /**
-   * addAxisDataSet (addAxis + addAxisData)
+   * addAxisLabels (addAxis + addAxisData)
    * 데이터 처리를 위한 X축 배열 파싱
-   * @param axisType axisType
-   * @param data (require) ex. ['x', '2018/01', '2018/02', '2018/03', '2018/04', '2018/05']
-   * @param axisIndex
+   * @param labels ex. ['2018/01', '2018/02', '2018/03', '2018/04', '2018/05']
    */
-  addAxisDataSet(axisType, data, axisIndex) {
-    // ['2018/01', '2018/02', '2018/03', '2018/04', '2018/05'] 전체 추가
-    const axis = this.axisList[axisType];
-    const index = typeof axisIndex === 'number' ? axisIndex : axis.length;
-
-    if (!data) {
-      throw new Error('[EVUI][ERROR][ChartDataStore]-Not found Axis DataSet.');
-    }
-
-    if (!axis[index]) {
-      axis[index] = [];
-    }
-
-    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-      this.addAxisData(axisType, data[ix], index);
+  addAxisLabels(labels) {
+    for (let ix = 0, ixLen = labels.length; ix < ixLen; ix++) {
+      this.addAxisLabel(labels[ix], ix);
     }
   }
 
   /**
-   * addAxisData
-   * @param axisType 'x' or 'y' (require)
-   * @param data string or number (require)
-   * @param axisIndex number (require)
-   * @param dataIndex number
+   * addAxisLabel
+   * @param label string or number (require)
+   * @param labelIndex number
    */
-  addAxisData(axisType, data, axisIndex, dataIndex) {
-    if (axisType !== 'x' && axisType !== 'y') {
-      throw new Error('[EVUI][ERROR][ChartDataStore]-Invalid Axis Type.');
-    }
-
-    const axis = this.axisList[axisType];
-    const index = typeof axisIndex === 'number' ? axisIndex : axis.length;
+  addAxisLabel(label, labelIndex = -1) {
+    const labelList = this.labelList;
+    const options = this.chartOptions;
+    const horizontal = options.horizontal;
 
     let axisOption;
-    if (axisType === 'x') {
-      axisOption = this.chartOptions.xAxes[index];
+    if (horizontal) {
+      axisOption = this.chartOptions.yAxes[0];
     } else {
-      axisOption = this.chartOptions.yAxes[index];
+      axisOption = this.chartOptions.xAxes[0];
     }
-
-    if (!axis[index]) {
-      axis[index] = [];
-    }
-
-    if (!axisOption) {
-      Console.info('[EVUI][INFO][ChartDataStore]-Not found Axis Index');
-      // data로 넘어온 axis 데이터가 option보다 많으면 무시
-      return;
-    }
-
-    const axisArray = axis[index];
 
     let dateObj;
     let value;
 
     if (axisOption.labelType === 'time') {
-      dateObj = moment(data);
+      dateObj = moment(new Date(label));
 
       if (dateObj.isValid()) {
         value = +dateObj;
@@ -224,170 +179,98 @@ export default class DataStore {
         value = null;
       }
     } else {
-      value = data;
+      value = label;
     }
 
 
-    if (value !== null && value !== undefined) {
-      if (typeof dataIndex === 'number') {
-        axisArray[dataIndex] = value;
+    if (value !== null && value !== undefined && labelList.indexOf(value) < 0) {
+      if (typeof labelIndex === 'number' && labelIndex > -1) {
+        labelList[labelIndex] = value;
       } else {
-        axisArray.push(value);
+        labelList.push(value);
       }
-
-      // if (axisType === 'x') {
-      //   this.setAxisXMinMax('', value, index);
-      // } else {
-      //   this.setAxisYMinMax('', value, index);
-      // }
     }
+
+    this.calcAxisLMinMax(value);
   }
 
   /**
    * loop for addGraphData
    * @param seriesId (require)
-   * @param data ex. [100,200,300,400,500]
+   * @param data ex. [100,200,300,400,500] or [{ x: '', y: '' }]
    */
   addGraphDataSet(seriesId, data) {
-    // this.addSeriesDataSet(meta, _.slice(data[ix], 1));
-    // series1, [100, 200, 300, 400, 500],
-    const series = this.seriesList[seriesId];
-    const axisType = series.axisType;
-    const axisIndex = axisType === 'x' ? series.xAxisIndex : series.yAxisIndex;
-
-    if (!this.axisList[axisType][axisIndex]) {
-      this.axisList[axisType][axisIndex] = [];
-      this.createDummyAxis(axisType, axisIndex);
-    }
-
-    const axis = this.axisList[axisType][axisIndex];
     for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-      this.addGraphData(seriesId, axis[ix], data[ix]);
-    }
-  }
-
-  createDummyAxis(axisType, axisIndex) {
-    const data = this.chartData.data;
-    const axis = this.axisList[axisType][axisIndex];
-
-    let option;
-    let maxLength = 0;
-    let min;
-    let max;
-    let minValue;
-    let maxValue;
-
-    if (axisType === 'x') {
-      option = this.chartOptions.xAxes[axisIndex];
-    } else {
-      option = this.chartOptions.yAxes[axisIndex];
-    }
-
-    for (let ix = 0, ixLen = data.length; ix < ixLen; ix++) {
-      if (maxLength <= data[ix].length - 1) {
-        maxLength = data[ix].length - 1;
-      }
-    }
-
-    if (option.range && option.range.length === 2) {
-      min = option.range[0];
-      max = option.range[1];
-
-      if (option.labelType === 'time') {
-        minValue = +moment(min);
-        maxValue = +moment(max);
-      } else {
-        minValue = min;
-        maxValue = max;
-      }
-
-      const tickSize = Math.floor((maxValue - minValue) / (maxLength - 1));
-      for (let ix = 0; ix < maxLength; ix++) {
-        axis.push(minValue + (tickSize * ix));
-      }
-    } else {
-      for (let ix = 0; ix < maxLength; ix++) {
-        axis.push(`${ix + 1}`);
-      }
+      this.addGraphData(seriesId, data[ix]);
     }
   }
 
   /**
    * addGraphData
-   * if axis === null, can be push invalid data
    * @param seriesId (require)
-   * @param axisData axis value
-   * @param graphData graph value
+   * @param value graph value
    * @param dataIndex dataIndex
    */
-  addGraphData(seriesId, axisData, graphData, dataIndex) {
-    const isHorizontal = !!this.chartOptions.horizontal;
-    const data = this.graphData[seriesId];
-    const series = this.seriesList[seriesId];
-    const axisType = series.axisType;
+  addGraphData(seriesId, value, dataIndex = -1) {
+    const options = this.chartOptions;
+    const horizontal = options.horizontal;
 
-    let axisOption;
-    let axisIndex;
-    let dateObj;
-    let adata;
+    const series = this.seriesList[seriesId];
+    const labelIndex = horizontal ? series.yAxisIndex : series.xAxisIndex;
+    const labelAxisOption = horizontal ? options.yAxes[labelIndex] : options.xAxes[labelIndex];
+
+    const labelAxisType = horizontal ? 'y' : 'x';
+    const graphAxisType = horizontal ? 'x' : 'y';
+
+    const sgData = this.graphData[seriesId];
+    const index = (typeof dataIndex === 'number' && dataIndex > -1) ? dataIndex : sgData.length;
+
+    let date;
+    let ldata;
     let gdata;
 
-    let index = typeof dataIndex === 'number' && dataIndex > -1 ? dataIndex : data.length;
-
-    if (this.chartOptions.bufferSize) {
-      if (data.length >= this.chartOptions.bufferSize) {
-        data.shift();
-        --index;
-      }
-    }
-
-    if (axisType === 'x') {
-      axisIndex = series.xAxisIndex;
-      axisOption = this.chartOptions.xAxes[axisIndex];
+    if (typeof value === 'object' && value) {
+      gdata = value[graphAxisType];
+      ldata = value[labelAxisType];
     } else {
-      axisIndex = series.yAxisIndex;
-      axisOption = this.chartOptions.yAxes[axisIndex];
-    }
-
-    if (axisOption.labelType === 'time') {
-      dateObj = moment(axisData === undefined ? null : axisData);
-
-      if (dateObj.isValid()) {
-        adata = +dateObj;
+      if (value === null || isNaN(value)) {
+        gdata = null;
       } else {
-        adata = null;
+        gdata = +value;
       }
-    } else {
-      adata = axisData;
+
+      ldata = this.labelList[index];
     }
 
-    if (graphData === undefined || graphData === null || isNaN(graphData) || +graphData < 0) {
-      gdata = null;
-    } else {
-      gdata = +graphData;
-    }
+    if (labelAxisOption.labelType === 'time') {
+      date = moment(ldata === undefined ? null : new Date(ldata));
 
-    if (adata) {
-      if (isHorizontal) {
-        data[index] = { x: gdata, y: adata, xp: null, yp: null, w: null, h: null };
+      if (date.isValid()) {
+        ldata = +date;
       } else {
-        data[index] = { x: adata, y: gdata, xp: null, yp: null, w: null, h: null };
+        ldata = null;
       }
+    }
 
-      if (series.show) {
-        this.setMinMaxValue(seriesId, adata, gdata, index);
-      }
+    if (horizontal) {
+      sgData[index] = { x: gdata, y: ldata, xp: null, yp: null, w: null, h: null };
+    } else {
+      sgData[index] = { x: ldata, y: gdata, xp: null, yp: null, w: null, h: null };
+    }
+
+    if (series.show) {
+      this.setMinMaxValue(seriesId, ldata, gdata, index);
     }
   }
 
   /**
    * set min max value by series
    * @param seriesId (require)
-   * @param axisData axis value
+   * @param labelData domain value
    * @param graphData graph value
    * @param index dataIndex
    */
-  setMinMaxValue(seriesId, axisData, graphData, index) {
+  setMinMaxValue(seriesId, labelData, graphData, index) {
     const series = this.seriesList[seriesId];
 
     if (series.min === null || series.min > graphData) {
@@ -400,82 +283,75 @@ export default class DataStore {
       series.maxIndex = index;
     }
 
-    if (series.axisType === 'x') {
-      this.setAxisXMinMax(seriesId, axisData);
-      this.setAxisYMinMax(seriesId, graphData);
+    this.calcAxisLMinMax(labelData);
+    this.calcAxisGMinMax(seriesId, graphData);
+  }
+
+  calcAxisLMinMax(value) {
+    if (value === null) {
+      return;
+    }
+
+    const options = this.chartOptions;
+    const horizontal = options.horizontal;
+    let lMinMax;
+
+    if (horizontal) {
+      if (!this.yMinMax[0]) {
+        this.yMinMax[0] = { min: null, max: null };
+      }
+
+      lMinMax = this.yMinMax[0];
     } else {
-      this.setAxisXMinMax(seriesId, graphData);
-      this.setAxisYMinMax(seriesId, axisData);
+      if (!this.xMinMax[0]) {
+        this.xMinMax[0] = { min: null, max: null };
+      }
+
+      lMinMax = this.xMinMax[0];
+    }
+
+    if (lMinMax.min === null || lMinMax.min > value) {
+      lMinMax.min = value;
+    }
+
+    if (lMinMax.max === null || lMinMax.max < value) {
+      lMinMax.max = value;
     }
   }
 
-  /**
-   * set min max by axis
-   * @param seriesId (require)
-   * @param value
-   * @param axisIndex
-   */
-  setAxisXMinMax(seriesId, value, axisIndex) {
-    const series = this.seriesList[seriesId];
-    const index = (seriesId && series) ? series.xAxisIndex : axisIndex;
-
-    if (index === undefined) {
-      throw new Error('[EVUI][ERROR][ChartDataStore]-Invalid Series setAxisMinMax.');
-    }
-
+  calcAxisGMinMax(seriesId, value) {
     if (value === null) {
       return;
     }
 
-    if (!this.xMinMax[index]) {
-      this.xMinMax[index] = { min: null, max: null, seriesId: null };
-    }
-
-    const xInfo = this.xMinMax[index];
-
-    if (xInfo.min === null || xInfo.min > value) {
-      xInfo.min = value;
-      xInfo.minSId = seriesId;
-    }
-
-    if (xInfo.max === null || xInfo.max < value) {
-      xInfo.max = value;
-      xInfo.maxSId = seriesId;
-    }
-  }
-
-  /**
-   * set min max by axis
-   * @param seriesId (require)
-   * @param value
-   * @param axisIndex
-   */
-  setAxisYMinMax(seriesId, value, axisIndex) {
     const series = this.seriesList[seriesId];
-    const index = (seriesId && series) ? series.yAxisIndex : axisIndex;
+    const options = this.chartOptions;
+    const horizontal = options.horizontal;
+    const index = horizontal ? series.xAxisIndex : series.yAxisIndex;
+    let gMinMax;
 
-    if (index === undefined) {
-      throw new Error('[EVUI][ERROR][ChartDataStore]-Invalid Series setAxisMinMax.');
+    if (horizontal) {
+      if (!this.xMinMax[index]) {
+        this.xMinMax[index] = { min: null, max: null, seriesId: null };
+      }
+
+      gMinMax = this.xMinMax[index];
+    } else {
+      if (!this.yMinMax[index]) {
+        this.yMinMax[index] = { min: null, max: null, seriesId: null };
+      }
+
+      gMinMax = this.yMinMax[index];
     }
 
-    if (value === null) {
-      return;
+    if (gMinMax.min === null || gMinMax.min > value) {
+      gMinMax.min = value;
+      gMinMax.minSId = seriesId;
     }
 
-    if (!this.yMinMax[index]) {
-      this.yMinMax[index] = { min: null, max: null, seriesId: null };
-    }
-
-    const yInfo = this.yMinMax[index];
-
-    if (yInfo.min === null || yInfo.min > value) {
-      yInfo.min = value;
-      yInfo.minSId = seriesId;
-    }
-
-    if (yInfo.max === null || yInfo.max < value) {
-      yInfo.max = value;
-      yInfo.maxSId = seriesId;
+    if (gMinMax.max === null || gMinMax.max < value) {
+      gMinMax.max = value;
+      gMinMax.maxSId = seriesId;
     }
   }
 
@@ -495,8 +371,8 @@ export default class DataStore {
     return this.graphData;
   }
 
-  getAxisList() {
-    return this.axisList;
+  getLabelList() {
+    return this.labelList;
   }
 
   updateData() {
@@ -504,6 +380,14 @@ export default class DataStore {
     this.xMinMax = [];
     this.yMinMax = [];
     this.graphData = {};
+    this.seriesList = {};
+
+    const seriesData = this.chartData.series;
+    const seriesKeys = Object.keys(seriesData);
+
+    for (let ix = 0, ixLen = seriesKeys.length; ix < ixLen; ix++) {
+      this.addSeries(seriesKeys[ix], seriesData[seriesKeys[ix]]);
+    }
 
     const sKeys = Object.keys(this.seriesList);
     let series;
