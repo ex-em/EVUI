@@ -87,6 +87,16 @@
                             />
                           </div>
                           <div
+                            v-else-if="col.type === 'textField'"
+                            class="evui-table-records-col"
+                          >
+                            <ev-text-field
+                              v-model="row[col.field]"
+                              :width="'100%'"
+                              :height="'20px'"
+                            />
+                          </div>
+                          <div
                             v-else
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
