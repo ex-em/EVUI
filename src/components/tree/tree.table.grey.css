@@ -200,6 +200,7 @@ button {
   right: 0px;
   /*top: 0px;*/
   bottom: 0px;
+  overflow: auto;
 }
 .evui-table .evui-table-body .evui-table-records table tr.evui-odd {
   color: inherit;
