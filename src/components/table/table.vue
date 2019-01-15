@@ -68,6 +68,7 @@
                           :data-col="colIndex"
                           :style="{ textAlign: col.recordsAlign }"
                           class="evui-table-data"
+                          @dblclick="showTextField(row, col.field, col.type, $event)"
                         >
                           <div
                             v-if="col.type === 'string' && col.cellRender === null"
@@ -90,10 +91,17 @@
                             v-else-if="col.type === 'textField'"
                             class="evui-table-records-col"
                           >
+                            <template
+                              v-if="!row[`$${col.field}Edit`]"
+                            >
+                              {{ row[col.field] }}
+                            </template>
                             <ev-text-field
+                              v-else
                               v-model="row[col.field]"
                               :width="'100%'"
                               :height="'20px'"
+                              @on-blur="hideTextField(row, col.field)"
                             />
                           </div>
                           <div
@@ -423,7 +431,7 @@
       },
     },
     created() {
-      window.addEventListener('resize', this.draw);
+      // window.addEventListener('resize', this.draw);
     },
     mounted() {
       // 그리드박스 높이 너비 가져오기
@@ -513,7 +521,7 @@
       // this.$forceUpdate();
     },
     beforeDestroy() {
-      window.removeEventListener('resize', this.draw);
+      // window.removeEventListener('resize', this.draw);
     },
     methods: {
       columnSort(column, event) {
@@ -1350,6 +1358,23 @@
           }
           return result;
         });
+      },
+      showTextField(row, field, type, e) {
+        if (type !== 'textField') {
+          return;
+        }
+        const rowData = row;
+        rowData[`$${field}Edit`] = true;
+        this.draw();
+        this.$nextTick(() => {
+          e.srcElement.getElementsByTagName('input')[0].focus();
+        });
+      },
+      hideTextField(row, field) {
+        console.log('##focus##', row, field);
+        const rowData = row;
+        rowData[`$${field}Edit`] = false;
+        this.draw();
       },
     },
   };
