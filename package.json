@@ -14,7 +14,8 @@
     "home": "webpack-dev-server --progress --config build/webpack.home.conf.js --mode development",
     "home_build": "webpack --config build/webpack.home.conf.js --mode production",
     "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
-    "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js"
+    "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js",
+    "liteplus_build": "webpack --config build/webpack.liteplus.conf.js --mode production"
   },
   "main": "dist/evui.min.js",
   "module": "dist/evui.min.js",

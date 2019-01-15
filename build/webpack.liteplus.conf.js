@@ -21,7 +21,7 @@ module.exports = merge(webpackBaseConfig, {
   },
   output: {
     path: path.resolve(__dirname, '../dist_liteplus'),
-    publicPath: '/',
+    publicPath: './',
     filename: '[name].js',
   },
   devtool: 'source-map',
