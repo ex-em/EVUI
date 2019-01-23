@@ -320,9 +320,9 @@ button {
   border-right: 0px;
 }
 .evui-table .evui-table-body table .evui-col-number {
-  width: 34px;
+  /*width: 34px;*/
   color: #777777;
-  background-color: rgba(233, 237, 243, 0.5);
+  /*background-color: rgba(233, 237, 243, 0.5);*/
 }
 .evui-table .evui-table-body table .evui-col-number div {
   padding: 0px 7px 0px 3px;
