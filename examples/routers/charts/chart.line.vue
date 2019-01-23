@@ -16,28 +16,33 @@
       return {
         defaultData: {
           series: {
-            // series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-            // series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
-            // series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
+            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
+            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
+            series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
           },
           groups: [
-            // ['series1', 'series3'],
+            ['series1', 'series2'],
           ],
-          labels: [],
-          // labels: ['2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-          //   '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
+          // labels: [],
+          labels: [
+            +new Date('2017/01/01 00:00:00'),
+            +new Date('2017/01/01 00:01:00'),
+            +new Date('2017/01/01 00:02:00'),
+            +new Date('2017/01/01 00:03:00'),
+            +new Date('2017/01/01 00:04:00'),
+          ],
           data: {
-            // series1: [100, 150, 50, 200, 350],
-            // series2: [200, 100, null, 300, 400],
-            // series3: [
-            //   { x: '2017/01/01 00:02:00', y: 100 },
-            //   { x: '2017/01/01 00:03:00', y: 200 },
-            //   { x: '2017/01/01 00:04:00', y: 300 },
-            //   { x: '2017/01/01 00:05:00', y: 100 },
-            //   { x: '2017/01/01 00:06:00', y: 500 },
-            // ],
+            series1: [100, 150, 51, 150, 350],
+            series2: [200, 100, 71, 300, 400],
+            series3: [
+              { x: +new Date('2017/01/01 00:02:00'), y: 100 },
+              { x: +new Date('2017/01/01 00:03:00'), y: 200 },
+              { x: +new Date('2017/01/01 00:04:00'), y: 300 },
+              { x: +new Date('2017/01/01 00:05:00'), y: 100 },
+              { x: +new Date('2017/01/01 00:06:00'), y: 401 },
+            ],
           },
-      },
+        },
         lineOptions: {
           type: 'line',
           width: '100%',
@@ -52,16 +57,13 @@
             position: 'right',
           },
           horizontal: false,
-          xAxes: [{
-            scaleType: 'fix',
-            labelType: 'time',
-            interval: 'minute',
+          axesX: [{
+            type: 'time',
             timeFormat: 'HH:mm:ss',
-            showGrid: true,
+            interval: 'minute',
           }],
-          yAxes: [{
-            scaleType: 'auto',
-            labelType: 'linear',
+          axesY: [{
+            type: 'log',
             autoScaleRatio: 0.1,
             showGrid: true,
           }],
@@ -74,8 +76,8 @@
       }
     },
     mounted() {
-      this.interval2 = setTimeout(() => this.updateChartData2(), 3000);
-      this.interval3 = setTimeout(() => this.updateChartData3(), 10000);
+      // this.interval2 = setTimeout(() => this.updateChartData2(), 3000);
+      // this.interval3 = setTimeout(() => this.updateChartData3(), 10000);
     },
     methods: {
       updateChartData() {

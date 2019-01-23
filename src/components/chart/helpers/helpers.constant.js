@@ -1,29 +1,15 @@
 export const AXIS_UNITS = {
   x: {
-    pos: 'x',
-    len: 'width',
-    dir: 'horizontal',
     rectStart: 'x1',
     rectEnd: 'x2',
-    rectOffsetCounter(position) {
-      return position === 'top' ? 'y2' : 'y1';
-    },
-    rectOffset(position) {
-      return position === 'top' ? 'y1' : 'y2';
-    },
+    rectOffsetCounter: position => (position === 'top' ? 'y2' : 'y1'),
+    rectOffset: position => (position === 'top' ? 'y1' : 'y2'),
   },
   y: {
-    pos: 'y',
-    len: 'height',
-    dir: 'vertical',
     rectStart: 'y2',
     rectEnd: 'y1',
-    rectOffsetCounter(position) {
-      return position === 'left' ? 'x2' : 'x1';
-    },
-    rectOffset(position) {
-      return position === 'left' ? 'x1' : 'x2';
-    },
+    rectOffsetCounter: position => (position === 'left' ? 'x2' : 'x1'),
+    rectOffset: position => (position === 'left' ? 'x1' : 'x2'),
   },
 };
 
@@ -35,7 +21,6 @@ export const COLOR = [
 ];
 
 export const LINE_OPTION = {
-  color: '#000', // this.chartOptions.colors[skey.length]
   show: true,
   highlight: {
     pointSize: 5,
@@ -45,11 +30,31 @@ export const LINE_OPTION = {
   point: true,
   pointSize: 4,
   pointStyle: '',
-  pointFill: '#000',
   lineWidth: 2,
   fill: false,
-  fillColor: '#000',
-  fiillOpacity: 0.4,
+  fillOpacity: 0.4,
+};
+
+export const AXIS_OPTION = {
+  min: null,
+  max: null,
+  autoScaleRatio: null,
+  startToZero: false,
+  showGrid: true,
+  axisLineColor: '#b4b6ba',
+  gridLineColor: '#e7e9ed',
+  labelIndicatorColor: '#e7e9ed',
+  gridLineWidth: 1,
+  ticks: null,
+  timeFormat: 'mm:ss',
+  tickSize: null,
+  range: null,
+  labelWidth: null,
+  labelStyle: {
+    fontSize: 12,
+    color: '#333',
+    fontFamily: 'Droid Sans',
+  },
 };
 
 export const CHART_DATA_STRUCT = {
