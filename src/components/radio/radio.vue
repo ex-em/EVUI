@@ -3,20 +3,20 @@
     :class="{ disabled: disabled }"
     class="ev-radio-wrap"
   >
+    <input
+      :id="`${radioId}_${value}`"
+      :value="value"
+      :name="groupName"
+      :disabled="disabled"
+      v-model="bindValue"
+      type="radio"
+      class="ev-radio-input"
+      @change="onChange"
+    >
     <label
       :for="`${radioId}_${value}`"
       class="ev-radio-label"
     >
-      <input
-        :id="`${radioId}_${value}`"
-        :value="value"
-        :name="groupName"
-        :disabled="disabled"
-        v-model="bindValue"
-        type="radio"
-        class="ev-radio-input"
-        @change="onChange"
-      >
       <slot/>
     </label>
   </div>
@@ -85,11 +85,49 @@ export default {
     color: #C0C4CC;
     cursor: not-allowed;
   }
+  .ev-radio-wrap.disabled .ev-radio-label:before {
+    border: 1px solid #B01012;
+  }
   .ev-radio-label {
+    position: relative;
+    display: inline-block;
+    padding-left: 25px;
     cursor: inherit;
   }
+  .ev-radio-label:before {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    background: #FAFAFA;
+    border: 1px solid #B0B3B7;
+    border-radius: 100%;
+    text-align: center;
+    content: '';
+  }
   .ev-radio-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
     vertical-align: middle;
+    overflow: hidden;
     cursor: inherit;
+    clip: rect(0, 0, 0, 0);
+  }
+  .ev-radio-input:checked + .ev-radio-label:before {
+    border: 1px solid #41B7FD;
+  }
+  .ev-radio-input:checked + .ev-radio-label:after {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    width: 9px;
+    height: 9px;
+    background: #41B7FD;
+    border-radius: 100%;
+    content: '';
   }
 </style>
