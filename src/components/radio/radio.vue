@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="{ disabled: disabled }"
+    :class="[{ disabled: disabled }, type]"
     class="ev-radio-wrap"
   >
     <input
@@ -15,6 +15,7 @@
     >
     <label
       :for="`${radioId}_${value}`"
+      :class="type"
       class="ev-radio-label"
     >
       <slot/>
@@ -43,6 +44,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    type: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -82,6 +87,9 @@ export default {
     user-select: none;
     cursor: pointer;
   }
+  .ev-radio-wrap.small{
+    height: 15px;
+  }
   .ev-radio-wrap.disabled {
     color: #C0C4CC;
     cursor: not-allowed;
@@ -96,6 +104,10 @@ export default {
     line-height: 19px;
     cursor: inherit;
   }
+  .ev-radio-label.small {
+    padding-left: 20px;
+    line-height: 15px;
+  }
   .ev-radio-label:before {
     position: absolute;
     top: 1px;
@@ -107,6 +119,10 @@ export default {
     border-radius: 100%;
     text-align: center;
     content: '';
+  }
+  .ev-radio-label.small:before {
+    width: 12px;
+    height: 12px;
   }
   .ev-radio-input {
     position: absolute;
@@ -122,6 +138,9 @@ export default {
   .ev-radio-input:checked + .ev-radio-label:before {
     border: 1px solid #41B7FD;
   }
+  .ev-radio-wrap.disabled .ev-radio-input:checked + .ev-radio-label:before {
+    border: 1px solid #B01012;
+  }
   .ev-radio-input:checked + .ev-radio-label:after {
     position: absolute;
     top: 5px;
@@ -131,5 +150,14 @@ export default {
     background: #41B7FD;
     border-radius: 100%;
     content: '';
+  }
+  .ev-radio-wrap.disabled .ev-radio-input:checked + .ev-radio-label:after {
+    background: #B01012;
+  }
+  .ev-radio-input:checked + .ev-radio-label.small:after {
+    top: 5px;
+    left: 6px;
+    width: 6px;
+    height: 6px;
   }
 </style>
