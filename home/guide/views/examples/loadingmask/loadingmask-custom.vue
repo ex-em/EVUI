@@ -3,6 +3,7 @@
     <div style="width: 400px; height: 200px;">
       <loadingmask
         v-show="true"
+        :is-show="true"
         :bar-count="10"
         :width="'40px'"
         :height="'7px'"

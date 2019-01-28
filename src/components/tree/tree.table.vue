@@ -1,5 +1,7 @@
 <template>
-  <div style="width: 100%; height: 100%; position: relative;">
+  <div
+    :style="{} | gridStyleFilter({width: width, height: height})"
+  >
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
@@ -97,7 +99,7 @@
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
                             style="max-height: 20px;"
-                            v-html="cellRender(row[col.field], col.type, col.cellRender)"
+                            v-html="cellRender(row.data[col.field], col.type, col.cellRender, row)"
                           />
                         </td>
                       </template>
@@ -154,7 +156,7 @@
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
                             style="max-height: 20px;"
-                            v-html="cellRender(row[col.field], col.type, col.cellRender)"
+                            v-html="cellRender(row.data[col.field], col.type, col.cellRender)"
                           />
                         </td>
                       </template>
@@ -704,9 +706,9 @@
       setData(data) {
         this.originData = data;
       },
-      cellRender(value, type, cellRender) {
+      cellRender(value, type, cellRender, row) {
         if (cellRender) {
-          return cellRender(value);
+          return cellRender(value, row);
         } else if (type === 'number') {
           return value ? Number(value).toLocaleString() : value;
         }
@@ -729,4 +731,4 @@
     },
   };
 </script>
-<style scoped src="@/components/tree/tree.table.black.css"/>
+<style scoped src="@/components/tree/tree.table.grey.css"/>

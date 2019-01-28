@@ -1,47 +1,48 @@
 <template>
   <div>
-    <div
-      v-for="item in baseCheckList"
-      :key="item.id"
+    <Checkbox
+      :value="bindValue"
+      v-model="vModel"
+      class="checkboxStyle"
     >
-      <checkbox
-        v-model="item.bool"
-        :label="item.name"
-      />
-      <div style="width:20px; height:20px;">
-        <i
-          :class="'ei ei-l ei-check-on'"
-        />
-        TEST
-      </div>
-      <p>{{ item.bool }}</p>
-    </div>
+      Single Checkbox
+    </Checkbox>
+    <br>
+    <button
+      @click="click"
+    >
+      test
+    </button>
+    <br>
+    bindValue : {{ vModel }}
+    <br>
+    <br>
   </div>
 </template>
+
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
+  import Checkbox from '@/components/checkbox/checkbox';
 
   export default {
     components: {
-      checkbox,
+      Checkbox,
     },
     data() {
       return {
-        baseCheckList: [
-          {
-            bool: true,
-            name: 'Normal',
-          },
-        ],
+        bindValue: 'value01',
+        vModel: true,
       };
+    },
+    methods: {
+      click() {
+        this.vModel = !this.vModel;
+      },
     },
   };
 </script>
+
 <style scoped>
-  div{
-    display: inline-block;
-  }
-  p{
-    margin-left: 30px;
+  .checkboxStyle {
+    margin: 0 10px 0 10px;
   }
 </style>

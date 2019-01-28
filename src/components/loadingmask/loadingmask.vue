@@ -1,10 +1,13 @@
 <template>
   <div
-    class="evui-loadingmask"
+    v-show="isShow"
+    class="ev-loadingmask"
+    style="display: none;"
   >
     <div
       v-show="barCount"
-      class="evui-loadingmask-center"
+      ref="contents"
+      class="ev-loadingmask-center"
     >
       <div
         v-for="(item, index) in barData"
@@ -55,11 +58,20 @@
         type: Number,
         default: 1,
       },
+      isShow: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
         barData: [],
       };
+    },
+    watch: {
+      isShow() {
+        setTimeout(this.updatePosition.bind(this), 1);
+      },
     },
     created() {
       for (let ix = 0, ixLen = this.barCount; ix < ixLen; ix++) {
@@ -71,34 +83,50 @@
         obj.borderRadius = this.borderRadius;
         obj.barColor = this.barColor;
         obj.transform = `rotate(${deg}deg) translate(${this.fadebarRadius}, 0px)`;
-        obj.animation = `evui-loadingmask-fadedelay ${this.animInterval}s infinite ease-in-out`;
+        obj.animation = `ev-loadingmask-fadedelay ${this.animInterval}s infinite ease-in-out`;
         obj.animDelay = `${(this.animInterval * (ix / ixLen)).toFixed(3)}s`;
         this.barData.push(obj);
       }
     },
     mounted() {
+      setTimeout(this.updatePosition.bind(this), 1);
     },
     methods: {
+      updatePosition() {
+        if (!this.isShow) {
+          this.$el.style.display = 'none';
+          return;
+        }
+
+        const element = this.$el;
+        const parentRect = element.parentElement.getBoundingClientRect();
+        const contentsRect = this.$refs.contents.getBoundingClientRect();
+
+        element.style.cssText = `
+          display: block;
+          top: ${(parentRect.height / 2) - (contentsRect.height / 2)}px;
+          left: ${(parentRect.width / 2) - (contentsRect.width / 2)}px;
+          width: ${contentsRect}px;
+          height: ${contentsRect}px;`;
+      },
     },
   };
 </script>
 
 <style>
-  .evui-loadingmask
+  .ev-loadingmask
   {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: absolute;
     z-index: 18000;
   }
-  .evui-loadingmask-center
+  .ev-loadingmask-center
   {
     position: relative;
     top: 45%;
     left: calc(50% - 15px);
     transform: translate3d(0px, 0px, 0px);
   }
-  @keyframes evui-loadingmask-fadedelay
+  @keyframes ev-loadingmask-fadedelay
   {
     80%
     {
