@@ -77,6 +77,7 @@ export default {
 
 <style scoped>
   .ev-radio-wrap {
+    height: 19px;
     float: left;
     user-select: none;
     cursor: pointer;
@@ -92,6 +93,7 @@ export default {
     position: relative;
     display: inline-block;
     padding-left: 25px;
+    line-height: 19px;
     cursor: inherit;
   }
   .ev-radio-label:before {
