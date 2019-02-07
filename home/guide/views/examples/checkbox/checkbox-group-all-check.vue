@@ -2,6 +2,8 @@
   <div
     class="checkbox-group-all-check"
   >
+    <h5># normal</h5>
+    <br>
     <Checkbox
       :value="`allCheckBoxValue`"
       v-model="allCheckClick"
@@ -51,6 +53,8 @@
     <p>allCheckClick : {{ allCheckClick }}</p>
     <br>
     <br>
+    <br>
+    <h5># include disabled</h5>
     <br>
     <Checkbox
       :value="`allCheckBoxValue1`"

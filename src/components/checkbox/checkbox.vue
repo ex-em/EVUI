@@ -25,7 +25,7 @@
     >
     <label
       :for="`${checkboxId}_${value}`"
-      :class="dataSize"
+      :class="[dataSize, dataType]"
       class="ev-checkbox-label"
     >
       <slot/>
@@ -55,6 +55,10 @@
         type: String,
         default: '',
       },
+      type: {
+        type: String,
+        default: '',
+      },
     },
     data() {
       return {
@@ -62,6 +66,7 @@
         isGroup: false, // group태그가 존재하는 경우 true
         groupBindValue: [],
         dataSize: this.size,
+        dataType: this.type,
       };
     },
     computed: {
@@ -79,6 +84,14 @@
         },
         set(size) {
           this.dataSize = size;
+        },
+      },
+      bindType: {
+        get() {
+          return this.type;
+        },
+        set(size) {
+          this.dataType = size;
         },
       },
     },
@@ -120,7 +133,7 @@
     cursor: inherit;
   }
   .ev-checkbox-label.small {
-    padding-left: 20px;
+    padding-left: 23px;
     line-height: 15px;
   }
   .ev-checkbox-label:before {
@@ -134,6 +147,9 @@
     border-radius: 100%;
     text-align: center;
     content: '';
+  }
+  .ev-checkbox-label.square:before {
+    border-radius: 0;
   }
   .ev-checkbox-label.small:before {
     width: 12px;
@@ -167,6 +183,9 @@
     height: 9px;
     border-radius: 100%;
     content: '';
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label.square:after {
+    border-radius: 0;
   }
   .ev-checkbox-input:checked + .ev-checkbox-label.small:after {
     top: 5px;

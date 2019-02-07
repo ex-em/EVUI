@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h5># normal</h5>
+    <br>
     <Checkbox-group
       v-model="bindList0"
       @change-event="changeEvent"
@@ -35,8 +37,12 @@
     <br>
     <p>Selected List : {{ bindList0 }}</p>
     <br>
+    <br>
+    <h5># small & square</h5>
+    <br>
     <Checkbox-group
       v-model="bindList1"
+      :type="`square`"
       :size="`small`"
       @change-event="changeEvent1"
     >

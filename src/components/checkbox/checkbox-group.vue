@@ -19,11 +19,16 @@
           return '';
         },
       },
+      type: {
+        type: String,
+        default() {
+          return '';
+        },
+      },
     },
     data() {
       return {
         bindValue: this.value,
-        test: this.size,
       };
     },
     componentName: 'CheckboxGroup',
@@ -55,6 +60,7 @@
             const child = c;
             child.bindValue = array || self.value;
             child.bindSize = self.size;
+            child.bindType = self.type;
           });
         }
       },
