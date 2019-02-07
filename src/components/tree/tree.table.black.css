@@ -183,7 +183,7 @@ button {
 }
 .evui-table .evui-table-body .evui-table-columns .evui-table-columns-resizer {
   position: absolute;
-  z-index: 1000;
+  z-index: 10;
   display: block;
   background-image: none;
   background-color: rgba(0, 0, 0, 0);
@@ -656,7 +656,7 @@ button {
   /*display: inline-block;*/
   float: left;
   overflow: hidden;
-  background: url('../../images/evui_icon.png') no-repeat -322px -261px;
+  background: url('../../images/evui_icon.png') no-repeat -319px -261px;
   width: 16px;
   height: 19px;
   margin: 0;

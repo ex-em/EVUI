@@ -6,7 +6,11 @@ import EvIcon from './components/icon';
 import EvInput from './components/input';
 import EvTextField from './components/textfield';
 import EvLoadingMask from './components/loadingmask';
-import { NavMenu as EvNavMenu, ContextMenu as EvContextMenu } from './components/menu';
+import {
+  NavMenu as EvNavMenu,
+  ContextMenu as EvContextMenu,
+  ContextMenuChildren as EvContextMenuChildren,
+} from './components/menu';
 import EvRadio from './components/radio';
 import EvRadioGroup from './components/radio-group';
 import EvSelectbox from './components/selectbox';
@@ -17,7 +21,7 @@ import EvToggle from './components/toggle';
 import EvLabel from './components/label';
 import EvDatepicker from './components/datepicker';
 import EvWindow from './components/window';
-import { tabs as EvTabs, tab as EvTab } from './components/tabs';
+import { tabs as EvTabs, tab as EvTabPanel } from './components/tabs';
 import { TreeTable as EvTreeTable } from './components/tree';
 
 const components = {
@@ -31,6 +35,7 @@ const components = {
   EvLoadingMask,
   EvNavMenu,
   EvContextMenu,
+  EvContextMenuChildren,
   EvRadio,
   EvRadioGroup,
   EvSelectbox,
@@ -42,7 +47,7 @@ const components = {
   EvWindow,
   EvDatepicker,
   EvTabs,
-  EvTab,
+  EvTabPanel,
   EvTreeTable,
 };
 

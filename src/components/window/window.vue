@@ -5,35 +5,30 @@
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
-    @mousedown="onMouseDown"
-    @mousemove="changeMouseCursor"
-    @mouseout="onMouseOut"
+    @mousedown="mousedown"
+    @mousemove="mousemove"
+    @mouseout="mouseout"
   >
     <div
       ref="headerArea"
       :style="headerStyle"
       :class="headerCls"
-      @dblclick="onHeaderDblClick"
+      @dblclick="headerDblClick"
     >
       <div :class="`${prefixCls}-title-area`">{{ title }}</div>
       <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
         :class="`${prefixCls}-expand-btn`"
-        @click="onExpand"
+        @click="clickExpandBtn"
       />
       <div :class="`${prefixCls}-close-btn-line`"/>
       <div
         :class="`${prefixCls}-close-btn`"
-        @click="close"
+        @click="clickCloseBtn"
       />
     </div>
     <div :class="`${prefixCls}-body-area`">
-      <component
-        :is="content"
-        v-bind="bodyProps"
-        @onbodyevent="onBodyEvent"
-        @onwindowclose="close"
-      />
+      <slot/>
     </div>
   </div>
 </template>
@@ -43,18 +38,6 @@
 
   export default {
     props: {
-      name: {
-        type: String,
-        default: '',
-      },
-      top: {
-        type: Number,
-        default: null,
-      },
-      left: {
-        type: Number,
-        default: null,
-      },
       width: {
         type: [String, Number],
         default: 250,
@@ -71,33 +54,9 @@
         type: [String, Number],
         default: 150,
       },
-      clsType: {
-        type: String,
-        default: 'rtm',
-        validator(value) {
-          const list = ['', 'rtm', 'pa', 'config'];
-          return list.indexOf(value) > -1;
-        },
-      },
       title: {
         type: String,
         default: '',
-      },
-      content: {
-        type: [Object, String],
-        default: null,
-      },
-      hidden: {
-        type: Boolean,
-        default: false,
-      },
-      initCenterBase: {
-        type: String,
-        default: 'body',
-        validator(value) {
-          const list = ['body', 'parent'];
-          return list.indexOf(value) > -1;
-        },
       },
       closeType: {
         type: String,
@@ -111,10 +70,6 @@
         type: Boolean,
         default: true,
       },
-      bodyProps: {
-        type: Object,
-        default: null,
-      },
     },
     data() {
       return {
@@ -126,10 +81,8 @@
         headerStyle: '',
         headerHeight: 32,
         grabbingBorderSize: 5,
-        isGrabbingBorder: false,
         isExist: true,
         isShow: true,
-        isMoving: false,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -137,6 +90,8 @@
           bottom: false,
         },
         clickedInfo: {
+          state: '',
+          pressedSpot: '',
           top: 0,
           left: 0,
           width: 0,
@@ -147,11 +102,10 @@
       };
     },
     created() {
-      this.windowId = `window_${this._uid}_${this.name}`;
-      this.windowCls = this.getWindowCls();
+      this.windowId = `window_${this._uid}`;
       this.headerStyle = `height: ${this.headerHeight}px`;
-      this.headerCls = this.getHeaderCls();
-      this.isShow = !this.hidden;
+      this.headerCls = { [`${this.prefixCls}-header-area`]: true };
+      this.windowCls = { [this.prefixCls]: true };
     },
     mounted() {
       this.windowStyle = this.getWindowStyle();
@@ -160,24 +114,14 @@
       this.isShow = false;
     },
     methods: {
-      onBodyEvent(eventInfo) {
-        this.$emit(eventInfo.name, eventInfo.payload);
-      },
-      onMouseDown(e) {
+      mousedown(e) {
         const windowEl = this.$el;
 
         if (!windowEl) {
           return;
         }
 
-        this.clickedInfo = {
-          top: windowEl.offsetTop,
-          left: windowEl.offsetLeft,
-          width: windowEl.offsetWidth,
-          height: windowEl.offsetHeight,
-          clientX: e.clientX,
-          clientY: e.clientY,
-        };
+        let pressedSpot = '';
 
         if (this.resizable) {
           const clientRect = windowEl.getBoundingClientRect();
@@ -195,56 +139,80 @@
             bottom: isGrabBottom,
           };
 
-          this.isGrabbingBorder = isGrabTop || isGrabLeft || isGrabRight || isGrabBottom;
+          if (isGrabTop || isGrabLeft || isGrabRight || isGrabBottom) {
+            pressedSpot = 'border';
+          }
         }
 
-        this.isMoving = !this.isGrabbingBorder && this.isInHeader(e.clientX, e.clientY);
-        if (!this.isMoving) {
-          this.$emit('onmousedown', e);
+        if (pressedSpot !== 'border' && this.isInHeader(e.clientX, e.clientY)) {
+          pressedSpot = 'header';
         }
 
         document.body.style.cursor = windowEl.style.cursor;
 
-        window.addEventListener('mousemove', this.onMouseMove);
-        window.addEventListener('mouseup', this.onMouseUp);
+        this.clickedInfo = {
+          pressedSpot,
+          state: 'mousedown',
+          top: windowEl.offsetTop,
+          left: windowEl.offsetLeft,
+          width: windowEl.offsetWidth,
+          height: windowEl.offsetHeight,
+          clientX: e.clientX,
+          clientY: e.clientY,
+        };
+
+        this.$emit('mousedown', e, this.clickedInfo);
+
+        window.addEventListener('mousemove', this.mousedownMousemove);
+        window.addEventListener('mouseup', this.mousedownMouseup);
       },
-      onMouseMove(e) {
-        if (this.resizable && this.isGrabbingBorder) {
-          this.resize(e);
-          return;
+      mousemove(e) {
+        this.changeMouseCursor(e);
+      },
+      mouseout(e) {
+        this.$emit('mouseout', e);
+      },
+      mousedownMousemove(e) {
+        this.clickedInfo.state = 'mousedown-mousemove';
+
+        switch (this.clickedInfo.pressedSpot) {
+          case 'header': {
+            const diffTop = e.clientY - this.clickedInfo.clientY;
+            const diffLeft = e.clientX - this.clickedInfo.clientX;
+
+            this.setCssText({
+              top: this.clickedInfo.top + diffTop,
+              left: this.clickedInfo.left + diffLeft,
+            });
+
+            this.$emit('mousedown-mousemove', e);
+            break;
+          }
+          case 'border':
+            this.resize(e);
+            this.$emit('mousedown-mousemove', e);
+            break;
+          default:
+            break;
         }
-
-        if (this.isMoving) {
-          const diffTop = e.clientY - this.clickedInfo.clientY;
-          const diffLeft = e.clientX - this.clickedInfo.clientX;
-
-          this.setCssText({
-            top: this.clickedInfo.top + diffTop,
-            left: this.clickedInfo.left + diffLeft,
-          });
-        }
-
-        this.$emit('onmousemove', e);
       },
-      onMouseUp(e) {
-        this.isMoving = false;
-        this.isGrabbingBorder = false;
+      mousedownMouseup(e) {
+        this.clickedInfo.state = '';
+        this.clickedInfo.pressedSpot = '';
 
-        this.$emit('onmouseup', e);
-        window.removeEventListener('mousemove', this.onMouseMove);
-        window.removeEventListener('mouseup', this.onMouseUp);
-      },
-      onMouseOut(e) {
-        if (!this.isMoving) {
-          document.body.style.cursor = '';
-        }
+        document.body.style.cursor = '';
 
-        this.$emit('onmouseout', e);
+        this.changeMouseCursor(e);
+
+        window.removeEventListener('mousemove', this.mousedownMousemove);
+        window.removeEventListener('mouseup', this.mousedownMouseup);
+
+        this.$emit('mousedown-mouseup', e);
       },
-      onHeaderDblClick(e) {
-        this.$emit('onheaderdblclick', e);
+      headerDblClick(e) {
+        this.$emit('header-dbl-click', e);
       },
-      onExpand() {
+      clickExpandBtn() {
         if (this.isFullExpandWindow) {
           this.setCssText({
             top: this.posInfoBeforeExpand.top,
@@ -321,7 +289,7 @@
         this.$emit('resize', e, positionInfo);
       },
       changeMouseCursor(e) {
-        if (!this.$el || this.isMoving || this.isGrabbingBorder) {
+        if (!this.$el || this.clickedInfo.pressedSpot) {
           return;
         }
 
@@ -346,19 +314,11 @@
             this.$el.style.cursor = 'move';
           } else {
             this.$el.style.cursor = 'default';
-
-            if (!this.isMoving) {
-              document.body.style.cursor = '';
-            }
           }
         } else if (this.isInHeader(e.clientX, e.clientY)) {
           this.$el.style.cursor = 'move';
         } else {
           this.$el.style.cursor = 'default';
-
-          if (!this.isMoving) {
-            document.body.style.cursor = '';
-          }
         }
       },
       isInHeader(x, y) {
@@ -450,24 +410,10 @@
       },
       getWindowStyle() {
         const clientRect = this.$el.getBoundingClientRect();
-        let top;
-        let left;
-        let parentWidth;
-        let parentHeight;
-
-        if (this.initCenterBase === 'parent' && this.$el && this.$el.parentElement) {
-          parentWidth = this.$el.parentElement.clientWidth;
-          parentHeight = this.$el.parentElement.clientHeight;
-
-          top = (parentHeight / 2) - (this.height / 2);
-          left = (parentWidth / 2) - (this.width / 2);
-        } else {
-          parentWidth = document.body.clientWidth;
-          parentHeight = document.body.clientHeight;
-
-          top = (parentHeight / 2) - (this.height / 2) - clientRect.top;
-          left = (parentWidth / 2) - (this.width / 2) - clientRect.left;
-        }
+        const bodyWidth = document.body.clientWidth;
+        const bodyHeight = document.body.clientHeight;
+        const top = (bodyHeight / 2) - (this.height / 2) - clientRect.top;
+        const left = (bodyWidth / 2) - (this.width / 2) - clientRect.left;
 
         return {
           top: this.numberToPixel(top),
@@ -478,22 +424,6 @@
           minHeight: this.numberToPixel(this.minHeight),
           paddingTop: this.numberToPixel(this.headerHeight),
         };
-      },
-      getWindowCls() {
-        return [
-          this.prefixCls,
-          {
-            [`${this.prefixCls}-rtm`]: this.clsType === 'rtm',
-          },
-        ];
-      },
-      getHeaderCls() {
-        return [
-          {
-            [`${this.prefixCls}-header-area`]: this.clsType,
-            [`${this.prefixCls}-header-rtm`]: this.clsType === 'rtm',
-          },
-        ];
       },
       numberToPixel(input) {
         let output;
@@ -535,8 +465,8 @@
       hide() {
         this.isShow = false;
       },
-      close() {
-        this.$emit('onbeforeclose', this);
+      clickCloseBtn() {
+        this.$emit('before-close', this);
 
         if (this.closeType === 'hide') {
           this.hide();
@@ -549,37 +479,39 @@
 </script>
 
 <style>
-  .ev-window{
+  .ev-window {
     position: absolute;
-    border: 9px solid;
+    border: 9px solid #424242;
     border-radius: 8px;
+    background: #424242;
     overflow: visible;
     z-index: 8888;
   }
-  .ev-window-rtm{
-    border-color: #595C64;
+  .gray .ev-window {
+    border: 9px solid #595C64;
     background: #212227;
   }
-  .ev-window-header-area{
+  .ev-window-header-area {
     position: absolute;
     top: 0;
     width: 100%;
-    border-bottom: 1px solid;
-    background: transparent;
+    border-bottom: 1px solid #B6B6B6;
+    background: #ffffff;
     font-family: 'NanumGothic', sans-serif;
     align-items: center;
+    user-select: none;
   }
-  .ev-window-title-area{
+  .gray .ev-window-header-area {
+    border-bottom: 1px solid #464850;
+    background: #27282E;
+    color: #ABAEB5;
+  }
+  .ev-window-title-area {
     display: inline-block;
     padding: 6px 0 0 12px;
     font-size: 16px;
   }
-  .ev-window-header-rtm{
-    border-color: #464850;
-    background-color: #27282E;
-    color: #ABAEB5;
-  }
-  .ev-window-header-pa{
+  .ev-window-header-pa {
     border-color: #474a53;
     background-color: #212227;
     color: #ABAEB5;
@@ -589,9 +521,12 @@
     top: 0;
     right: 66px;
     height: 32px;
+    border-left: 1px solid #B6B6B6;
+  }
+  .gray .ev-window-expand-btn-line {
     border-left: 1px solid #464850;
   }
-  .ev-window-expand-btn{
+  .ev-window-expand-btn {
     position: absolute;
     top: 6px;
     right: 40px;
@@ -599,31 +534,37 @@
     height: 19px;
     line-height: 19px;
     border-radius: 50%;
-    color: #c7c8cc;
+    color: white;
     text-align: center;
-    background: #595c64;
+    background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
   }
-  .ev-window-expand-btn:before{
-    position: absolute;
+  .gray .ev-window-expand-btn {
+    color: #c7c8cc;
+    background: #595c64;
+  }
+  .ev-window-expand-btn:before {
     top: -1px;
     right: 1px;
     font-size: 18px;
     content: 'ㅁ';
   }
-  .ev-window-expand-btn:hover{
+  .ev-window-expand-btn:hover {
     background: #319de9;
     cursor: pointer;
   }
-  .ev-window-close-btn-line{
+  .ev-window-close-btn-line {
     position: absolute;
     top: 0;
     right: 32px;
     height: 32px;
+    border-left: 1px solid #B6B6B6;
+  }
+  .gray .ev-window-close-btn-line {
     border-left: 1px solid #464850;
   }
-  .ev-window-close-btn{
+  .ev-window-close-btn {
     position: absolute;
     top: 6px;
     right: 7px;
@@ -631,14 +572,17 @@
     height: 19px;
     line-height: 19px;
     border-radius: 50%;
-    color: #c7c8cc;
+    color: white;
     text-align: center;
-    background: #595c64;
+    background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
   }
+  .gray .ev-window-close-btn {
+    color: #c7c8cc;
+    background: #595c64;
+  }
   .ev-window-close-btn:before{
-    position: absolute;
     top: 0;
     right: 6px;
     font-size: 11px;
@@ -653,7 +597,10 @@
     width: 100%;
     height: 100%;
     padding: 9px 8px 8px 8px;
-    background: transparent;
+    background: white;
     overflow: auto;
+  }
+  .gray .ev-window-body-area{
+    background: transparent;
   }
 </style>

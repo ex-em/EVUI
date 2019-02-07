@@ -12,7 +12,7 @@
         v-for="(item, rowIdx) in items"
         :key="`${item.text}_${depth}_${rowIdx}`"
         :class="`${prefixEvui}-row`"
-        @click="onRowClick(item.text, item.itemId, depth, rowIdx)"
+        @click="onRowClick(item, depth, rowIdx)"
         @mouseover="onMouseOver(item.text, depth, rowIdx)"
       >
         {{ item.text }}
@@ -22,7 +22,7 @@
         />
       </div>
     </div>
-    <Context-children
+    <ev-context-menu-children
       v-for="(item, rowIdx) in items"
       v-if="item.items"
       v-show="getSubMenuKey(item.text, depth, rowIdx) === subMenuKey"
@@ -38,14 +38,10 @@
 <script>
   import '@/styles/all.css';
   import '@/styles/evui.css';
-  import ContextChildren from './context.children';
 
   const prefixEvui = 'ev-contextmenu-children';
 
   export default {
-    components: {
-      ContextChildren,
-    },
     props: {
       depth: {
         type: Number,
@@ -84,8 +80,8 @@
       this.nextDepth = this.depth + 1;
     },
     methods: {
-      onRowClick(text, itemId, depth, rowIdx) {
-        this.$emit('click', { text, itemId, depth, rowIdx, parentRowIdx: this.parentRowIdx });
+      onRowClick(item, depth, rowIdx) {
+        this.$emit('click', { ...item, depth, rowIdx, parentRowIdx: this.parentRowIdx });
       },
       onClick(item) {
         this.$emit('click', item);

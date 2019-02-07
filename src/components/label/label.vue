@@ -1,222 +1,86 @@
 <template>
-  <div
-    :style="styleObject"
-    :class="wrappedOuterClass"
+  <label
+    ref="label"
+    :class="labelClass"
+    :style="labelStyle"
   >
-    <div
-      :class="wrappedValidClass"
-    >
-      <label
-        ref="label"
-        :class="wrappedLabelClass"
-      >
-        {{ currentValue }}
-      </label>
-    </div>
-  </div>
+    {{ labelText }}
+  </label>
 </template>
 <script>
-  const prefixCls = 'evui-label';
-
-  function parsedStyle(value) {
-    let val = value;
-
-    val = val.toString();
-
-    if (val.match(/[1-9]*?[0-9]+/gi)) {
-      if (val.match(/[px|%]/gi) === null) {
-        val = val.concat('px');
-      }
-    } else {
-      val = null;
-    }
-    return val;
-  }
+  const prefixCls = 'ev-label';
   export default{
     props: {
-      size: {
-        type: String,
-        default: 'medium',
-      },
       value: {
         type: String,
         default: '',
       },
-      width: {
-        type: [String, Number],
-        default: '100%',
+      size: {
+        type: String,
+        default: 'medium',
       },
-      height: {
-        type: [String, Number],
-        default: '100%',
+      userCls: {
+        type: String,
+        default: '',
       },
-      fit: {
-        type: Boolean,
-        default: false,
-      },
-      bold: {
-        type: Boolean,
-        default: false,
-      },
-      mandatory: {
-        type: Boolean,
-        default: false,
-      },
-      checkValid: {
-        type: Boolean,
-        default: false,
-      },
-      isSuccess: {
-        type: Boolean,
-        default: false,
-      },
-      isFailed: {
-        type: Boolean,
-        default: false,
-      },
-      isError: {
-        type: Boolean,
-        default: false,
-      },
-      isAlarm: {
-        type: Boolean,
-        default: false,
-      },
-      align: {
+      textAlign: {
         type: String,
         default: 'center',
       },
     },
     data() {
       return {
-        currentValue: this.setValue(this.value),
-        offsetWidth: this.width,
-        offsetHeight: this.height,
+        labelSize: this.size,
       };
     },
     computed: {
-      styleObject: function styleObject() {
-        return {
-          width: parsedStyle(this.offsetWidth),
-        };
+      labelText() {
+        return this.value;
       },
-      wrappedOuterClass() {
-        const sizeCls = this.size;
-        return [
-          `${prefixCls}-outer`,
-          `${prefixCls}-size-${sizeCls}`,
-          {
-            [`${prefixCls}-font-bold`]: this.bold,
-          },
-        ];
-      },
-      wrappedValidClass() {
-        let status = '';
-        let align = '';
+      hAlign() {
+        let align;
 
-        if (this.checkValid) {
-          if (this.isError || (this.isSuccess && this.isFailed)) {
-            status = 'error';
-          } else {
-            if (this.isSuccess) {
-              status = 'success';
-            }
-            if (this.isFailed) {
-              status = 'fail';
-            }
-          }
-        }
-
-        switch (this.align) {
+        switch (this.textAlign) {
           case 'left':
-          case 'right':
           case 'center':
-            align = this.align;
+          case 'right':
+            align = this.textAlign;
             break;
           default:
             align = 'center';
+            break;
         }
 
+        return align;
+      },
+      labelStyle() {
+        return {
+          textAlign: this.hAlign,
+        };
+      },
+      labelClass() {
         return [
-          `${prefixCls}-inner`,
-          `${prefixCls} ${status} ${align}`,
+          `${prefixCls}`,
+          `${prefixCls}-${this.labelSize}`,
+          `${this.userCls}`,
         ];
       },
-      wrappedLabelClass() {
-        return [
-          `${prefixCls}-native`,
-        ];
-      },
-    },
-    watch: {
-      mandatory: function mandatory() {
-        this.currentValue = this.setValue(this.value);
-      },
-    },
-    mounted() {
-      const asterSize = {
-        large: 25,
-        medium: 18,
-        small: 13,
-      };
-      if (this.fit && this.$refs.label) {
-        this.offsetWidth = parsedStyle(this.$refs.label.offsetWidth + asterSize[this.size]);
-      }
     },
     methods: {
-      setValue: function setValue(value) {
-        let result = value;
-        if (this.mandatory) {
-          result = `* ${result}`;
-        }
-        return result;
-      },
     },
   };
 </script>
-<style scoped>
-  .evui-label-native {
-    padding: 0 2px 0 2px;
-  }
-  .evui-label-inner {
-    height: 30px;
-    text-align: center;
-    line-height: 1.8;
-    border-radius: 4px;
-  }
-  .evui-label-outer {
+<style>
+  .ev-label {
     display: inline-block;
-    margin: 0;
-    padding: 0 2px 0 2px;
-    vertical-align: middle;
-    line-height: 1.5;
-    font-size: 15px;
-    user-select: none;
   }
-  .evui-label-font-bold {
-    font-weight: bold;
+  .ev-label-small {
+    font-size: 12px;
   }
-  .evui-label.error {
-    color: red;
+  .ev-label-medium {
+    font-size: 14px;
   }
-  .evui-label {
-    transition:all .2s ease-in-out;
-  }
-  .evui-label.success {
-    background-color: #34C032;
-    color: #fff;
-  }
-  .evui-label.fail {
-    background-color: #F53243;
-    color: #fff;
-  }
-  .evui-label.center {
-    text-align: center;
-  }
-  .evui-label.left {
-    text-align: left;
-  }
-  .evui-label.right {
-    text-align: right;
+  .ev-label-large {
+    font-size: 16px;
   }
 </style>

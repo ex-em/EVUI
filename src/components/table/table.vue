@@ -68,6 +68,7 @@
                           :data-col="colIndex"
                           :style="{ textAlign: col.recordsAlign }"
                           class="evui-table-data"
+                          @dblclick="showTextField(row, col.field, col.type, $event)"
                         >
                           <div
                             v-if="col.type === 'string' && col.cellRender === null"
@@ -82,8 +83,25 @@
                             style="text-overflow:unset;"
                           >
                             <ev-checkbox
-                              :value="row[col.field]"
-                              @on-change="changeCheckbox($event, row, col.field, col.checkType)"
+                              v-model="row[col.field]"
+                              @change-event="changeCheckbox($event, row, col.field, col.checkType)"
+                            />
+                          </div>
+                          <div
+                            v-else-if="col.type === 'textField'"
+                            class="evui-table-records-col"
+                          >
+                            <template
+                              v-if="!row[`$${col.field}Edit`]"
+                            >
+                              {{ row[col.field] }}
+                            </template>
+                            <ev-text-field
+                              v-else
+                              v-model="row[col.field]"
+                              :width="'100%'"
+                              :height="'20px'"
+                              @on-blur="hideTextField(row, col.field)"
                             />
                           </div>
                           <div
@@ -379,7 +397,10 @@
         selectedData: null,
 
         // check 관련
-        changeCheckData: null,
+        changeCheckData: [],
+
+        // find 관련
+        findDataList: [],
       };
     },
     computed: {
@@ -410,7 +431,7 @@
       },
     },
     created() {
-      window.addEventListener('resize', this.draw);
+      // window.addEventListener('resize', this.draw);
     },
     mounted() {
       // 그리드박스 높이 너비 가져오기
@@ -500,7 +521,7 @@
       // this.$forceUpdate();
     },
     beforeDestroy() {
-      window.removeEventListener('resize', this.draw);
+      // window.removeEventListener('resize', this.draw);
     },
     methods: {
       columnSort(column, event) {
@@ -926,6 +947,9 @@
         this.sizeColSum = 0;
         this.noSizeColList = [];
         this.endColWidth = 0;
+        this.virtualTop = 0;
+        this.virtualBottom = 0;
+        this.$refs.evuiGridRecords.scrollTop = 0;
         if (this.pagination) {
           const gridBody = this.$refs.evuiGridBody;
 
@@ -1263,34 +1287,94 @@
         this.lastPage = 0;
       },
       changeCheckbox(value, row, field, type) {
-        console.log('checkboc::#1', value, '#2', row);
         const data = row;
-        if (type === 'single' && this.changeCheckData) {
-          this.$set(this.changeCheckData, field, false);
+        const checkedData = _.filter(this.originData, d => d[field] === true);
+        if (type === 'single' && checkedData.length) {
+          this.$set(checkedData[0], field, false);
         }
         if (type === 'single') {
-          this.changeCheckData = data;
+          checkedData[0] = data;
         }
         this.$set(data, field, value);
-        console.log('checkboc::#1', value, '#2', this.changeCheckData);
       },
       rowSelect(row) {
         console.log('#1', row);
         if (!row.$evuiSelected) {
-          if (this.select !== 'multi' && this.selectedData) {
-            this.$set(this.selectedData, '$evuiSelected', false);
+          if (this.select === 'single') {
+            if (this.selectedData) {
+              this.$set(this.selectedData, '$evuiSelected', false);
+            }
+            this.selectedData = row;
           }
-          this.selectedData = row;
+          // this.selectedData = row;
           this.$set(row, '$evuiSelected', true);
         } else {
           this.$set(row, '$evuiSelected', false);
         }
       },
-      rowClick() {
+      rowClick(event, row) {
+        if (this.select === 'none') {
+          return;
+        }
         console.log('clickEvent');
+        if (this.select === 'single') {
+          this.rowSelect(row);
+        }
+        this.$emit('rowClick', event, row);
       },
-      getChangeCheckData() {
-        return this.changeCheckData;
+      getCheckedData(field) {
+        console.log(field);
+        const result = _.filter(this.originData, data => data[field] === true);
+        return result;
+      },
+      getSelectedData() {
+        let result;
+        if (this.select === 'single') {
+          result = this.selectedData;
+        }
+        return result;
+      },
+      findData(field, value) {
+        const hasLastPercent = value.lastIndexOf('%') === (value.length - 1);
+        const hasFirstPercent = value.indexOf('%') === 0;
+        const data = this.isSort ? this.sortedData : this.originData;
+        let text = value.replace(/^%/, '');
+        text = text.replace(/%$/, '');
+
+        this.resultData = _.filter(data, (row) => {
+          let result;
+          if (row[field]) {
+            if (hasLastPercent && hasFirstPercent) {
+              result = row[field].indexOf(text) > -1;
+            } else if (hasFirstPercent) {
+              result = row[field].lastIndexOf(text) + text.length === row[field].length;
+            } else if (hasLastPercent) {
+              result = row[field].indexOf(text) === 0;
+            } else {
+              result = row[field] === text;
+            }
+          } else {
+            result = false;
+          }
+          return result;
+        });
+      },
+      showTextField(row, field, type, e) {
+        if (type !== 'textField') {
+          return;
+        }
+        const rowData = row;
+        rowData[`$${field}Edit`] = true;
+        this.draw();
+        this.$nextTick(() => {
+          e.srcElement.getElementsByTagName('input')[0].focus();
+        });
+      },
+      hideTextField(row, field) {
+        console.log('##focus##', row, field);
+        const rowData = row;
+        rowData[`$${field}Edit`] = false;
+        this.draw();
       },
     },
   };

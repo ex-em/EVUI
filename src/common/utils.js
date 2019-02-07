@@ -31,6 +31,17 @@ export function getQuantity(input) {
   return output;
 }
 
+export function getSize(size) {
+  let sizeValue;
+
+  if (size) {
+    sizeValue = size.unit ? size.value + size.unit : `${size.value}px`;
+  } else {
+    sizeValue = '100%';
+  }
+  return sizeValue;
+}
+
 export function getMatchedComponentsDownward(context, componentName) {
   const children = context.$children;
   const result = [];

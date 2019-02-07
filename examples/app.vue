@@ -9,9 +9,6 @@
           <router-link to="/button">Button</router-link>
         </li>
         <li>
-          <router-link to="/container">Container</router-link>
-        </li>
-        <li>
           <router-link to="/chart">Chart</router-link>
         </li>
         <li>
