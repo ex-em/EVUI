@@ -17,6 +17,24 @@
     bindValue : {{ vModel }}
     <br>
     <br>
+    <Checkbox
+      :value="bindValue2"
+      v-model="vModel2"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Small Checkbox
+    </Checkbox>
+    <br>
+    <button
+      @click="click2"
+    >
+      test
+    </button>
+    <br>
+    bindValue2 : {{ vModel2 }}
+    <br>
+    <br>
   </div>
 </template>
 
@@ -31,11 +49,16 @@
       return {
         bindValue: 'value01',
         vModel: true,
+        bindValue2: 'value02',
+        vModel2: false,
       };
     },
     methods: {
       click() {
         this.vModel = !this.vModel;
+      },
+      click2() {
+        this.vModel2 = !this.vModel2;
       },
     },
   };

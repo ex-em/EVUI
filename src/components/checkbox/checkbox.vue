@@ -61,7 +61,7 @@
         checkboxId: this._uid,
         isGroup: false, // group태그가 존재하는 경우 true
         groupBindValue: [],
-        dataSize: '',
+        dataSize: this.size,
       };
     },
     computed: {
