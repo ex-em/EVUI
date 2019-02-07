@@ -30,7 +30,7 @@
       <input
         v-else
         :disabled="disabled"
-        :value="inputText"
+        :value="inputValue"
         :class="`${prefixCls}-input-text`"
         type="text"
         @keyup="onKeyUpInputTxt"
@@ -138,7 +138,7 @@
       return {
         prefixCls,
         dropDownState: false,
-        inputText: '',
+        inputValue: '',
         listBoxItems: [],
         selectedItems: [],
       };
@@ -156,30 +156,40 @@
         return classList;
       },
     },
+    watch: {
+      items(list) {
+        this.listBoxItems = list.slice();
+        this.initInputValue();
+      },
+    },
     created() {
-      this.listBoxItems = this.items.slice();
-
       if (!this.multiple) {
         this.dropdownStyle.border = 0;
       }
 
-      if (this.initSelect != null) {
-        this.select(this.initSelect);
-      } else if (this.initSelectIdx != null) {
-        this.selectIdx(this.initSelectIdx);
-      }
+      this.listBoxItems = this.items.slice();
+
+      this.initInputValue();
     },
     methods: {
+      initInputValue() {
+        if (this.initSelect != null) {
+          this.select(this.initSelect);
+        } else if (this.initSelectIdx != null) {
+          this.selectIdx(this.initSelectIdx);
+        } else {
+          this.inputValue = '';
+          this.selectedItems.length = 0;
+        }
+      },
       onClick() {
         if (this.disabled) {
           return;
         }
 
         if (this.multiple) {
-          this.inputText = '';
+          this.inputValue = '';
         }
-
-        this.listBoxItems = this.items.slice();
 
         this.dropDownState = !this.dropDownState;
       },
@@ -196,7 +206,7 @@
             this.selectedItems.push(item);
           }
         } else {
-          this.inputText = itemName;
+          this.inputValue = itemName;
           this.selectedItems.length = 0;
           this.selectedItems.push(item);
         }
@@ -214,7 +224,7 @@
         this.filterItems(value);
 
         if (!this.isGroup && !this.multiple) {
-          this.inputText = value;
+          this.inputValue = value;
           this.selectedItems.length = 0;
 
           foundItem = this.items.find(obj => obj.name === value);
@@ -239,7 +249,7 @@
               item = groupObj.items[jx];
 
               if (item.value === value) {
-                this.inputText = item.name;
+                this.inputValue = item.name;
                 this.selectedItems.push(item);
                 isSelected = true;
                 break;
@@ -255,7 +265,7 @@
             item = this.items[ix];
 
             if (item.value === value) {
-              this.inputText = item.name;
+              this.inputValue = item.name;
               this.selectedItems.push(item);
               break;
             }
@@ -277,7 +287,7 @@
               item = groupObj.items[jx];
 
               if (item && rowIdx === idx) {
-                this.inputText = item.name;
+                this.inputValue = item.name;
                 this.selectedItems.push(item);
                 isSelected = true;
                 break;
@@ -294,7 +304,7 @@
           item = this.items[idx];
 
           if (item) {
-            this.inputText = item.name;
+            this.inputValue = item.name;
             this.selectedItems.push(item);
           }
         }
