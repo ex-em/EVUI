@@ -13,10 +13,17 @@
           return [];
         },
       },
+      size: {
+        type: String,
+        default() {
+          return '';
+        },
+      },
     },
     data() {
       return {
         bindValue: this.value,
+        test: this.size,
       };
     },
     componentName: 'CheckboxGroup',
@@ -43,9 +50,11 @@
     methods: {
       initValue(array) {
         if (this.$children && this.$children instanceof Array) {
+          const self = this;
           this.$children.forEach((c) => {
             const child = c;
-            child.bindValue = array || this.value;
+            child.bindValue = array || self.value;
+            child.bindSize = self.size;
           });
         }
       },
