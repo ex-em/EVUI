@@ -173,13 +173,13 @@
     },
     methods: {
       initInputValue() {
+        this.inputValue = '';
+        this.selectedItems.length = 0;
+
         if (this.initSelect != null) {
           this.select(this.initSelect);
         } else if (this.initSelectIdx != null) {
           this.selectIdx(this.initSelectIdx);
-        } else {
-          this.inputValue = '';
-          this.selectedItems.length = 0;
         }
       },
       onClick() {
