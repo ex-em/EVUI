@@ -114,7 +114,7 @@ export default {
     left: 2px;
     width: 15px;
     height: 15px;
-    background: #FAFAFA;
+    background: transparent;
     border: 1px solid #B0B3B7;
     border-radius: 100%;
     text-align: center;
