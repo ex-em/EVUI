@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="[{ disabled: disabled }, size]"
+    :class="[{ disabled: disabled }, dataSize]"
     class="ev-radio-wrap"
   >
     <input
@@ -15,7 +15,7 @@
     >
     <label
       :for="`${radioId}_${value}`"
-      :class="size"
+      :class="dataSize"
       class="ev-radio-label"
     >
       <slot/>
@@ -54,9 +54,18 @@ export default {
     return {
       bindValue: this.customValue,
       radioId: this._uid,
+      dataSize: this.size,
     };
   },
   computed: {
+    bindSize: {
+      get() {
+        return this.size;
+      },
+      set(size) {
+        this.dataSize = size;
+      },
+    },
   },
   watch: {
   },

@@ -38,10 +38,11 @@ export default {
   methods: {
     initValue(v) {
       if (this.$children && this.$children instanceof Array) {
+        const self = this;
         this.$children.forEach((c) => {
           const child = c;
-          child.bindValue = v || this.value;
-          child.size = this.size;
+          child.bindValue = v || self.value;
+          child.bindSize = self.size;
         });
       }
     },
