@@ -13,6 +13,10 @@ export default {
       type: String,
       default: '',
     },
+    size: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -37,6 +41,7 @@ export default {
         this.$children.forEach((c) => {
           const child = c;
           child.bindValue = v || this.value;
+          child.size = this.size;
         });
       }
     },

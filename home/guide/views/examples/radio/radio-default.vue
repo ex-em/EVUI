@@ -26,7 +26,7 @@
     <br>
     <radio
       :value="`value02`"
-      :type="`small`"
+      :size="`small`"
       v-model="bindVModel03"
     >
       <p
@@ -42,7 +42,7 @@
     <radio
       :value="`value04`"
       :disabled="true"
-      :type="`small`"
+      :size="`small`"
       v-model="bindVModel04"
     >
       <p
