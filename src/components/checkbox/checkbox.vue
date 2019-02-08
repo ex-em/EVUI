@@ -116,25 +116,24 @@
     height: 19px;
     float: left;
     user-select: none;
-    cursor: pointer;
   }
   .ev-checkbox-wrap.small{
-    height: 15px;
+    height: 16px;
   }
   .ev-checkbox-wrap.disabled {
     color: #C0C4CC;
-    cursor: not-allowed;
   }
   .ev-checkbox-label {
     position: relative;
+    height: 100%;
     display: inline-block;
     padding-left: 25px;
     line-height: 19px;
-    cursor: inherit;
+    cursor: pointer;
   }
   .ev-checkbox-label.small {
     padding-left: 23px;
-    line-height: 15px;
+    line-height: 16px;
   }
   .ev-checkbox-label:before {
     position: absolute;
@@ -154,6 +153,9 @@
   .ev-checkbox-label.small:before {
     width: 12px;
     height: 12px;
+  }
+  .ev-checkbox-wrap.disabled .ev-checkbox-label {
+    cursor: not-allowed;
   }
   .ev-checkbox-wrap.disabled .ev-checkbox-label:before {
     border: 1px solid #B01012;

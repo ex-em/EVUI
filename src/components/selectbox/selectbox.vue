@@ -30,7 +30,7 @@
       <input
         v-else
         :disabled="disabled"
-        :value="inputValue"
+        :value="inputText"
         :class="`${prefixCls}-input-text`"
         type="text"
         @keyup="onKeyUpInputTxt"
@@ -60,6 +60,7 @@
   import Dropdown from '@/components/selectbox/dropdown';
 
   const prefixCls = 'evui-selectbox';
+
   export default {
     components: {
       Dropdown,
@@ -75,6 +76,7 @@
             }
           };
           selectBoxEl.vueClickOutside = handler;
+
           document.addEventListener('mousedown', handler);
         },
         unbind(el) {
@@ -136,7 +138,7 @@
       return {
         prefixCls,
         dropDownState: false,
-        inputValue: '',
+        inputText: '',
         listBoxItems: [],
         selectedItems: [],
       };
@@ -144,138 +146,110 @@
     computed: {
       selectBoxIconCls() {
         const classList = [];
+
         classList.push('evui-selectbox-arrow-icon');
+
         if (this.dropDownState) {
           classList.push('rotate-180');
         }
+
         return classList;
       },
     },
-    watch: {
-      items(list) {
-        this.listBoxItems = list.slice();
-        this.initInputValue();
-      },
-    },
     created() {
+      let item;
+      this.listBoxItems = this.items.slice();
+
       if (!this.multiple) {
         this.dropdownStyle.border = 0;
       }
-      this.listBoxItems = this.items.slice();
-      this.initInputValue();
+
+      if (this.initSelect != null) {
+        item = this.getItemBySelect(this.initSelect);
+      } else if (this.initSelectIdx != null) {
+        item = this.getItemByIndex(this.initSelectIdx);
+      }
+
+      if (item) {
+        this.inputText = item.name;
+        this.selectedItems.push(item);
+      }
     },
     methods: {
-      initInputValue() {
-        this.inputValue = '';
-        this.selectedItems.length = 0;
-        if (this.initSelect != null) {
-          this.select(this.initSelect);
-        } else if (this.initSelectIdx != null) {
-          this.selectIdx(this.initSelectIdx);
-        }
-      },
       onClick() {
         if (this.disabled) {
           return;
         }
+
         if (this.multiple) {
-          this.inputValue = '';
+          this.inputText = '';
         }
+
+        this.listBoxItems = this.items.slice();
+
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
+        this.selectByItem(item);
+        this.$emit('select', item, target, index);
+      },
+      onKeyUpInputTxt(e) {
+        let foundItem;
+        const value = e.target.value;
+
+        this.filterItems(value);
+
+        if (!this.isGroup && !this.multiple) {
+          this.inputText = value;
+          this.selectedItems.length = 0;
+
+          foundItem = this.items.find(obj => obj.name === value);
+
+          if (foundItem) {
+            this.selectedItems.push(foundItem);
+          }
+        }
+
+        this.$emit('keyup', e);
+      },
+      select(value) {
+        const item = this.getItemBySelect(value);
+
+        if (item) {
+          this.selectByItem(item);
+        }
+      },
+      selectByIndex(idx) {
+        const item = this.getItemByIndex(idx);
+
+        if (item) {
+          this.selectByItem(item);
+        }
+      },
+      selectByItem(item) {
+        if (!item) {
+          return;
+        }
+
         let foundItem;
         const itemName = item.name;
+
         if (this.multiple) {
           foundItem = this.selectedItems.find(obj => obj.name === itemName);
+
           if (foundItem) {
             this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
           } else {
             this.selectedItems.push(item);
           }
         } else {
-          this.inputValue = itemName;
+          this.inputText = itemName;
           this.selectedItems.length = 0;
           this.selectedItems.push(item);
         }
+
         if (!this.multiple) {
           this.dropDownState = false;
-        }
-        this.$emit('select', item, target, index);
-      },
-      onKeyUpInputTxt(e) {
-        let foundItem;
-        const value = e.target.value;
-        this.filterItems(value);
-        if (!this.isGroup && !this.multiple) {
-          this.inputValue = value;
-          this.selectedItems.length = 0;
-          foundItem = this.items.find(obj => obj.name === value);
-          if (foundItem) {
-            this.selectedItems.push(foundItem);
-          }
-        }
-        this.$emit('keyup', e);
-      },
-      select(value) {
-        let item;
-        let groupObj;
-        let isSelected = false;
-        if (this.isGroup) {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
-            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
-              item = groupObj.items[jx];
-              if (item.value === value) {
-                this.inputValue = item.name;
-                this.selectedItems.push(item);
-                isSelected = true;
-                break;
-              }
-            }
-            if (isSelected) {
-              break;
-            }
-          }
-        } else {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            item = this.items[ix];
-            if (item.value === value) {
-              this.inputValue = item.name;
-              this.selectedItems.push(item);
-              break;
-            }
-          }
-        }
-      },
-      selectIdx(idx) {
-        let item;
-        let groupObj;
-        let isSelected;
-        if (this.isGroup) {
-          let rowIdx = 0;
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
-            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
-              item = groupObj.items[jx];
-              if (item && rowIdx === idx) {
-                this.inputValue = item.name;
-                this.selectedItems.push(item);
-                isSelected = true;
-                break;
-              }
-              rowIdx++;
-            }
-            if (isSelected || rowIdx > idx) {
-              break;
-            }
-          }
-        } else {
-          item = this.items[idx];
-          if (item) {
-            this.inputValue = item.name;
-            this.selectedItems.push(item);
-          }
         }
       },
       removeTag(item, event) {
@@ -283,6 +257,7 @@
           event.preventDefault();
           event.stopPropagation();
         }
+
         this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
       },
       filterItems(value) {
@@ -290,16 +265,20 @@
           this.listBoxItems = this.items.slice();
           return;
         }
+
         if (this.isGroup) {
           this.listBoxItems = this.items.reduce((preArr, groupObj) => {
             let groupItems = groupObj.items;
+
             groupItems = groupItems.filter(item => item && item.name.includes(value));
+
             if (groupItems.length > 0) {
               preArr.push({
                 groupName: groupObj.groupName,
                 items: groupItems,
               });
             }
+
             return preArr;
           }, []);
         } else {
@@ -309,6 +288,61 @@
       hideDropdown() {
         this.dropDownState = false;
       },
+      getItemBySelect(value) {
+        let groupObj;
+        let groupItems;
+        let foundItem;
+
+        if (this.isGroup) {
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+            groupItems = groupObj.items || [];
+            foundItem = groupItems.find(item => item.value === value);
+
+            if (foundItem) {
+              break;
+            }
+          }
+        } else {
+          foundItem = this.items.find(item => item.value === value);
+        }
+
+        return foundItem;
+      },
+      getItemByIndex(idx) {
+        let groupObj;
+        let groupItems;
+        let foundItem;
+        let item;
+
+        if (this.isGroup) {
+          let itemRowIdx = 0;
+
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+            groupItems = groupObj.items || [];
+
+            for (let jx = 0, jxLen; jx < jxLen; jx++) {
+              item = groupItems[jx];
+
+              if (item && itemRowIdx === idx) {
+                foundItem = item;
+                break;
+              }
+
+              itemRowIdx++;
+            }
+
+            if (foundItem || itemRowIdx > idx) {
+              break;
+            }
+          }
+        } else {
+          foundItem = this.items[idx];
+        }
+
+        return foundItem;
+      },
     },
   };
 </script>
@@ -317,7 +351,9 @@
   /************************************************************************************
    Selectbox
   ************************************************************************************/
+
   /** evui-selectbox **/
+
   .evui-selectbox {
     display: inline-block;
     position: relative;
