@@ -7,9 +7,45 @@
       :reg-exp="/([^A-Za-z0-9])+/g"
       :use-reg-exp="true"
       :max-length="20"
-      :hide-string="true"
       :use-max-length="true"
       :border-color="borderColor"
+      @input="onInput"
+    />
+    <text-field
+      v-model="value"
+      :type="type"
+      :placeholder="placeholder"
+      :reg-exp="/([^A-Za-z0-9])+/g"
+      :use-reg-exp="true"
+      :max-length="20"
+      :use-max-length="true"
+      :border-color="borderColor"
+      :disabled="true"
+      @input="onInput"
+    />
+    <text-field
+      v-model="value"
+      :type="'password'"
+      :placeholder="placeholder"
+      :reg-exp="/([^A-Za-z0-9])+/g"
+      :use-reg-exp="true"
+      :max-length="20"
+      :use-max-length="true"
+      :border-color="borderColor"
+      :height="200"
+      @input="onInput"
+    />
+    <text-field
+      v-model="value"
+      :type="type"
+      :placeholder="placeholder"
+      :reg-exp="/([^A-Za-z0-9])+/g"
+      :use-reg-exp="true"
+      :max-length="20"
+      :use-max-length="true"
+      :border-color="borderColor"
+      :disabled="true"
+      :height="200"
       @input="onInput"
     />
   </div>
@@ -23,8 +59,8 @@
     },
     data() {
       return {
-        value: '1asdffasdfasdf22',
-        type: 'input',
+        value: '131231',
+        type: 'text',
         placeholder: 'type something...',
         borderColor: '#dddee1',
       };
