@@ -110,7 +110,7 @@ export default {
   }
   .ev-radio-label.small {
     padding-left: 20px;
-    line-height: 15px;
+    line-height: 16px;
   }
   .ev-radio-label:before {
     position: absolute;
