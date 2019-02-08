@@ -13,12 +13,12 @@ export default {
     return `${r},${g},${b}`;
   },
 
-  calculateMagnitude(val) {
-    return Math.floor(Math.log(val) / Math.LN10);
+  calculateMagnitude(value) {
+    return Math.floor(Math.log(value) / Math.LN10);
   },
 
-  aliasPixel(pixelWidth) {
-    return (pixelWidth % 2 === 0) ? 0 : 0.5;
+  aliasPixel(width) {
+    return (width % 2 === 0) ? 0 : 0.5;
   },
 
   getLabelStyle(style) {
@@ -57,15 +57,18 @@ export default {
   },
 
   calcTextSize(text, fontStyle) {
-    const calcSpan = document.createElement('span');
-    calcSpan.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000;');
-    calcSpan.style.font = fontStyle;
-    calcSpan.textContent = text;
-    document.body.appendChild(calcSpan);
+    const calc = document.createElement('span');
+    calc.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000;');
+    calc.style.font = fontStyle;
+    calc.textContent = text;
+    document.body.appendChild(calc);
 
-    return {
-      width: Math.ceil(calcSpan.getBoundingClientRect().width) || 2,
-      height: Math.ceil(calcSpan.getBoundingClientRect().height) || 2,
-    };
+    const rect = calc.getBoundingClientRect();
+    const width = rect.width || 2;
+    const height = rect.height || 2;
+
+    calc.remove();
+
+    return { width, height };
   },
 };

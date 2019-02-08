@@ -18,36 +18,37 @@ const module = {
   },
 
   addStack(data, label, base, sIdx = 0) {
-    return data.map((value, index) => {
-      const bdata = base[index];
-
-      let odata = value;
+    return data.map((curr, index) => {
+      let bdata = base[index];
+      let odata = curr;
       let ldata = label[index];
       let gdata;
 
       if (gdata && typeof gdata === 'object') {
-        odata = this.horizontal ? value.x : value.y;
-        ldata = this.horizontal ? value.y : value.x;
+        odata = this.horizontal ? curr.x : curr.y;
+        ldata = this.horizontal ? curr.y : curr.x;
       }
 
       if (sIdx > 0) {
         gdata = (this.horizontal ? bdata.x : bdata.y) + odata;
+        bdata = bdata.y;
       } else {
         gdata = odata;
+        bdata = 0;
       }
 
-      return this.addData(gdata, ldata, odata);
+      return this.addData(gdata, ldata, odata, bdata);
     });
   },
 
   addSeriesDataSet(data, label) {
-    return data.map((value, index) => {
-      let gdata = value;
+    return data.map((curr, index) => {
+      let gdata = curr;
       let ldata = label[index];
 
       if (gdata && typeof gdata === 'object') {
-        gdata = this.horizontal ? value.x : value.y;
-        ldata = this.horizontal ? value.y : value.x;
+        gdata = this.horizontal ? curr.x : curr.y;
+        ldata = this.horizontal ? curr.y : curr.x;
       }
 
       return this.addData(gdata, ldata);
@@ -133,7 +134,10 @@ const module = {
         }
 
         return minmax;
-      }, init);
+      }, {
+        x: [{ min: init.minX, max: init.maxX }],
+        y: [{ min: init.minY, max: init.maxY }],
+      });
     }
 
     return def;

@@ -94,6 +94,8 @@ class Line {
         this.data.reverse().forEach((curr) => {
           x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
           y = Canvas.calculateY(curr.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+
+          ctx.lineTo(x, y);
         });
       } else {
         ctx.lineTo(this.data[dataLen - 1].xp, endPoint);
@@ -101,6 +103,17 @@ class Line {
       }
 
       ctx.fill();
+    }
+
+    if (this.point) {
+      ctx.strokeStyle = this.color;
+      ctx.fillStyle = this.pointFill;
+
+      this.data.forEach((curr) => {
+        if (curr.xp !== null && curr.yp !== null) {
+          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+        }
+      });
     }
   }
 }

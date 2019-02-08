@@ -54,6 +54,8 @@
           position: 'right',
           color: '#000',
           inactive: '#aaa',
+          width: 140,
+          height: 24,
         },
         itemHighlight: true,
         seriesHighlight: true,
@@ -88,8 +90,9 @@
       this.chart = new EvChart(wrapper, data, options);
 
       this.store = this.chart.store;
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         this.chart.init();
+        clearTimeout(timer);
       }, 1);
     },
     destroyed() {
@@ -166,6 +169,7 @@
   .ev-chart-title {
     position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
     padding-left: 10px;
     word-wrap: normal;
@@ -175,28 +179,29 @@
     user-select: none;
   }
 
-  .ev-chart-legend{
+  .ev-chart-legend {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    padding: 0 0 0 10px;
-    overflow: auto;
+    overflow: hidden;
+  }
+
+  .ev-chart-legend-box {
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .ev-chart-legend-container {
     position: relative;
     overflow: hidden;
-    margin: 2px 10px 2px 0;
   }
 
   .ev-chart-legend-color {
+    top: 50%;
     left: 0;
-    width: 10px;
-    height: 10px;
-    margin-top: 6px;
-    margin-right: 6px;
+    transform: translate(0, -50%);
+    width: 8px;
+    height: 8px;
     position: absolute;
-    border-radius: 5px;
+    border-radius: 50%;
   }
 
   .ev-chart-legend-color.inactive {
@@ -204,21 +209,19 @@
   }
 
   .ev-chart-legend-name {
-    float: left;
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     font-size: 12px;
     margin-left: 16px;
-    padding-right: 21px;
-    width: 100%;
-    /*color: #ABAEB5;*/
+    padding-right: 16px;
     user-select:none;
-  }
-
-  .ev-chart-legend-name.inactive {
-    /*color: #555 !important;*/
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translate(0, -65%);
+    position: absolute;
   }
 
   .ev-chart-legend-value {
@@ -231,10 +234,7 @@
 
   .ev-chart-resize-bar {
     position: absolute;
-    width: 4px;
-    height: 100%;
-    cursor: col-resize;
-    background-color: transparent;
+    background: transparent;
     opacity: 0.5;
     z-index: 1;
   }
@@ -300,7 +300,6 @@
   }
 
   .ev-chart-tooltip-name {
-    /*float: left;*/
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;

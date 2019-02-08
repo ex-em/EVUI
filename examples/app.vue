@@ -79,7 +79,7 @@
   .container{
     padding: 50px 40px 0 40px;
     width: 100%;
-    height: calc(100% - 16px);
+    height: 100%;
   }
   .v-link-active {
     color: #bbb;

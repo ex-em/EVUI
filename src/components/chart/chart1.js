@@ -2,12 +2,14 @@ import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
 import LogarithmicScale from './scale/scale.logarithmic';
+import Title from './plugins/plugins.title';
+import Legend from './plugins/plugins.legend';
 
 class EvChart {
   constructor(target, data, options) {
-    Object.keys(Model).forEach((key) => {
-      Object.assign(this, Model[key]);
-    });
+    Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
+    Object.assign(this, Title);
+    Object.assign(this, Legend);
 
     this.target = target;
     this.data = data;
@@ -39,46 +41,68 @@ class EvChart {
     this.overlayCanvas.style.position = 'absolute';
     this.overlayCanvas.style.top = '0px';
     this.overlayCanvas.style.left = '0px';
+
+    this.seriesList = {};
+    this.chartRect = {};
   }
 
   init() {
-    this.seriesList = {};
-    this.chartRect = {};
-
-    this.initSeries();
-    this.initStore();
-    this.initAxes();
-    this.drawChart();
-  }
-
-  initSeries() {
-    const type = this.options.type;
     const series = this.data.series;
+    const data = this.data.data;
+    const labels = this.data.labels;
     const groups = this.data.groups;
 
-    this.createSeriesSet(this.seriesList, series, type);
+    const options = this.options;
 
+    this.createSeriesSet(this.seriesList, series, options.type);
     if (groups.length) {
       this.addGroupInfo(this.seriesList, groups);
     }
-  }
 
-  initStore() {
-    Model.Store.horizontal = !!this.options.horizontal;
-    const data = this.data.data;
-    const labels = this.data.labels;
-
+    Model.Store.horizontal = !!options.horizontal;
     this.createDataSet(this.seriesList, data, labels);
     this.minMax = this.getStoreMinMax(this.seriesList);
-  }
 
-  initAxes() {
-    this.axesX = this.createAxes('x', this.options.axesX, this.bufferCtx);
-    this.axesY = this.createAxes('y', this.options.axesY, this.bufferCtx);
+    this.axesX = this.createAxes('x', options.axesX, this.bufferCtx);
+    this.axesY = this.createAxes('y', options.axesY, this.bufferCtx);
     this.axesRange = this.getAxesRange(this.axesX, this.axesY, this.minMax);
     this.labelOffset = this.getLabelOffset(this.axesX, this.axesY, this.axesRange);
-    this.chartRect = this.getChartRect();
 
+    this.initRect();
+    this.drawChart();
+  }
+
+  initRect() {
+    const opt = this.options;
+
+    if (opt.title.show) {
+      this.titleDOM = document.createElement('div');
+      this.titleDOM.className = 'ev-chart-title';
+      this.wrapperDOM.appendChild(this.titleDOM);
+
+      this.initTitle();
+      this.showTitle();
+    }
+
+    if (opt.legend.show) {
+      this.legendDOM = document.createElement('div');
+      this.legendDOM.className = 'ev-chart-legend';
+      this.legendBoxDOM = document.createElement('div');
+      this.legendBoxDOM.className = 'ev-chart-legend-box';
+      this.resizeDOM = document.createElement('div');
+      this.resizeDOM.className = 'ev-chart-resize-bar';
+      this.ghostDOM = document.createElement('div');
+      this.ghostDOM.className = 'ev-chart-resize-ghost';
+      this.wrapperDOM.appendChild(this.resizeDOM);
+      this.legendDOM.appendChild(this.legendBoxDOM);
+      this.wrapperDOM.appendChild(this.legendDOM);
+      this.initLegend();
+      this.setLegendPosition(opt.legend.position);
+    }
+    this.chartRect = this.getChartRect();
+  }
+
+  drawChart() {
     this.labelRange = this.getAxesLabelRange({
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
@@ -93,9 +117,7 @@ class EvChart {
       axesRange: this.axesRange,
       labelRange: this.labelRange,
     });
-  }
 
-  drawChart() {
     this.drawAxis({
       axesX: this.axesX,
       axesY: this.axesY,
@@ -306,6 +328,37 @@ class EvChart {
     });
 
     return labelOffset;
+  }
+  update() {}
+  destroy() {}
+  reset() {
+    this.seriesList = {};
+    this.minMax = null;
+    this.axesX = null;
+    this.axesY = null;
+    this.axesRange = null;
+    this.labelOffset = null;
+    this.chartRect = null;
+
+    this.titleDOM.remove();
+    this.legendDOM.remove();
+    this.resizeDOM.remove();
+    this.ghostDOM.remove();
+  }
+  render() {
+    this.clear();
+    this.chartRect = this.getChartRect();
+    this.drawChart();
+  }
+  clear() {
+    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+
+    this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
+      this.displayCanvas.height / this.clearRectRatio);
+    this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
+      this.bufferCanvas.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
+      this.overlayCanvas.height / this.clearRectRatio);
   }
 }
 
