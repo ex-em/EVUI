@@ -21,11 +21,14 @@
       _getBoxInfo() {
         let boxInfo = {};
         const itemList = [];
+        let value;
 
         for (let ix = 0, ixLen = 100; ix < ixLen; ix++) {
+          value = `item_${ix}`;
+
           itemList.push({
-            name: `item${ix}`,
-            value: ix,
+            name: value,
+            value,
           });
         }
 

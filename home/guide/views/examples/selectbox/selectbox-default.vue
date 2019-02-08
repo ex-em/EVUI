@@ -3,7 +3,7 @@
     <ev-selectbox
       :name="boxInfo.name"
       :style="boxInfo.selectboxStyle"
-      :init-select="0"
+      :init-select="'item_2'"
       :items="boxInfo.items"
       @keyup="onKeyUp"
       @select="onSelect"
@@ -29,11 +29,14 @@
       _getBoxInfo() {
         let boxInfo = {};
         const itemList = [];
+        let value;
 
         for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
+          value = `item_${ix}`;
+
           itemList.push({
-            name: `item${ix}`,
-            value: ix,
+            name: value,
+            value,
           });
         }
 

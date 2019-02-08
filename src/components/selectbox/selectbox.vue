@@ -322,7 +322,7 @@
             groupObj = this.items[ix];
             groupItems = groupObj.items || [];
 
-            for (let jx = 0, jxLen; jx < jxLen; jx++) {
+            for (let jx = 0, jxLen = groupItems.length; jx < jxLen; jx++) {
               item = groupItems[jx];
 
               if (item && itemRowIdx === idx) {

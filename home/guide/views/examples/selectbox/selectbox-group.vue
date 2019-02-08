@@ -2,14 +2,14 @@
   <div class="selectbox-group">
     <ev-selectbox
       :name="'groupCbBox'"
-      :style="{ width: '180px',height: '30px' }"
+      :style="{ width: '180px', height: '30px' }"
       :is-group="true"
       :init-select-idx="3"
       :items="getGroupItemList()"
     />
     <ev-selectbox
       :name="'groupMultipleCbBox'"
-      :style="{ width: '180px',height: '30px' }"
+      :style="{ width: '180px', height: '30px' }"
       :is-group="true"
       :multiple="true"
       :init-select-idx="3"
@@ -22,19 +22,24 @@
   export default {
     methods: {
       getGroupItemList() {
-        let groupObj;
         const itemList = [];
+        let groupObj;
+        let groupName;
+        let value;
 
         for (let ix = 0, ixLen = 20; ix < ixLen; ix++) {
+          groupName = `group_${ix}`;
           groupObj = {
-            groupName: `group${ix}`,
+            groupName,
             items: [],
           };
 
           for (let jx = 0, jxLen = 3; jx < jxLen; jx++) {
+            value = `${groupName} > item_${jx}`;
+
             groupObj.items.push({
-              name: `group_${ix} > item${jx}`,
-              value: ix,
+              name: value,
+              value,
             });
           }
 
