@@ -96,7 +96,7 @@ export default {
     user-select: none;
   }
   .ev-radio-wrap.small{
-    height: 15px;
+    height: 16px;
   }
   .ev-radio-wrap.disabled {
     color: #C0C4CC;
