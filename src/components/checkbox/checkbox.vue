@@ -118,7 +118,7 @@
     user-select: none;
   }
   .ev-checkbox-wrap.small{
-    height: 15px;
+    height: 16px;
   }
   .ev-checkbox-wrap.disabled {
     color: #C0C4CC;
@@ -132,7 +132,7 @@
   }
   .ev-checkbox-label.small {
     padding-left: 23px;
-    line-height: 15px;
+    line-height: 16px;
   }
   .ev-checkbox-label:before {
     position: absolute;
