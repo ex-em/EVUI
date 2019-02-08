@@ -1,6 +1,7 @@
 <template>
   <div class="selectbox-default">
     <ev-selectbox
+      ref="selectbox"
       :name="boxInfo.name"
       :style="boxInfo.selectboxStyle"
       :init-select="'item_2'"
@@ -8,6 +9,7 @@
       @keyup="onKeyUp"
       @select="onSelect"
     />
+    <ev-button @click="onClickBtn">select value (item_3)</ev-button>
     <br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -25,6 +27,9 @@
       },
       onKeyUp(e) {
         this.e = e;
+      },
+      onClickBtn() {
+        this.$refs.selectbox.select('item_3');
       },
       _getBoxInfo() {
         let boxInfo = {};
