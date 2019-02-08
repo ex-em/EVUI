@@ -114,14 +114,15 @@ export default {
   }
   .ev-radio-label:before {
     position: absolute;
-    top: 1px;
+    top: 50%;
     left: 2px;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     background: transparent;
     border: 1px solid #B0B3B7;
     border-radius: 100%;
     text-align: center;
+    transform: translateY(-50%);
     content: '';
   }
   .ev-radio-label.small:before {
@@ -153,15 +154,15 @@ export default {
   }
   .ev-radio-input:checked + .ev-radio-label:after {
     position: absolute;
-    top: 5px;
-    left: 6px;
-    width: 9px;
-    height: 9px;
+    top: 50%;
+    left: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 100%;
+    transform: translateY(-50%);
     content: '';
   }
   .ev-radio-input:checked + .ev-radio-label.small:after {
-    top: 5px;
     left: 6px;
     width: 6px;
     height: 6px;
