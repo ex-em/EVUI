@@ -94,41 +94,43 @@ export default {
     height: 19px;
     float: left;
     user-select: none;
-    cursor: pointer;
   }
   .ev-radio-wrap.small{
-    height: 15px;
+    height: 16px;
   }
   .ev-radio-wrap.disabled {
     color: #C0C4CC;
-    cursor: not-allowed;
   }
   .ev-radio-label {
     position: relative;
     display: inline-block;
     padding-left: 25px;
     line-height: 19px;
-    cursor: inherit;
+    cursor: pointer;
   }
   .ev-radio-label.small {
     padding-left: 20px;
-    line-height: 15px;
+    line-height: 16px;
   }
   .ev-radio-label:before {
     position: absolute;
-    top: 1px;
+    top: 50%;
     left: 2px;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     background: transparent;
     border: 1px solid #B0B3B7;
     border-radius: 100%;
     text-align: center;
+    transform: translateY(-50%);
     content: '';
   }
   .ev-radio-label.small:before {
     width: 12px;
     height: 12px;
+  }
+  .ev-radio-wrap.disabled .ev-radio-label {
+    cursor: not-allowed;
   }
   .ev-radio-wrap.disabled .ev-radio-label:before {
     border: 1px solid #B01012;
@@ -152,15 +154,15 @@ export default {
   }
   .ev-radio-input:checked + .ev-radio-label:after {
     position: absolute;
-    top: 5px;
-    left: 6px;
-    width: 9px;
-    height: 9px;
+    top: 50%;
+    left: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 100%;
+    transform: translateY(-50%);
     content: '';
   }
   .ev-radio-input:checked + .ev-radio-label.small:after {
-    top: 5px;
     left: 6px;
     width: 6px;
     height: 6px;
