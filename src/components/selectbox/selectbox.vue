@@ -30,8 +30,9 @@
       <input
         v-else
         :disabled="disabled"
-        :value="inputText"
+        :readonly="readOnly"
         :class="`${prefixCls}-input-text`"
+        :value="inputText"
         type="text"
         @keyup="onKeyUpInputTxt"
       >
@@ -86,6 +87,10 @@
         },
       },
     },
+    model: {
+      prop: 'selectedValue',
+      event: 'change-selected-value',
+    },
     props: {
       name: {
         type: String,
@@ -119,6 +124,14 @@
         type: Boolean,
         default: false,
       },
+      readOnly: {
+        type: Boolean,
+        default: false,
+      },
+      selectedValue: {
+        type: [String, Number, Array],
+        default: null,
+      },
       initSelect: {
         type: [String, Number],
         default: null,
@@ -145,15 +158,24 @@
     },
     computed: {
       selectBoxIconCls() {
-        const classList = [];
+        return {
+          'evui-selectbox-arrow-icon': true,
+          'rotate-180': this.dropDownState,
+        };
+      },
+    },
+    watch: {
+      selectedItems(items) {
+        let value;
 
-        classList.push('evui-selectbox-arrow-icon');
-
-        if (this.dropDownState) {
-          classList.push('rotate-180');
+        if (this.multiple) {
+          value = [];
+          items.map(obj => value.push(obj.value));
+        } else {
+          value = items[0].value;
         }
 
-        return classList;
+        this.$emit('change-selected-value', value);
       },
     },
     created() {

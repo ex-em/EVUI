@@ -1,18 +1,15 @@
 <template>
-  <div class="selectbox-default">
+  <div class="selectbox-read-only">
     <ev-selectbox
       ref="selectbox"
       v-model="selectedValue"
-      :name="boxInfo.name"
       :style="boxInfo.selectboxStyle"
-      :init-select="'item_1'"
+      :read-only="true"
+      :init-select="'item_2'"
       :items="boxInfo.items"
-      @keyup="onKeyUp"
-      @select="onSelect"
     />
-    <ev-button @click="onClickBtn">select value (item_3)</ev-button>
     <br><br>
-    selected value : <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
+    selected value: <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
     <br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -24,21 +21,7 @@
         selectedValue: '',
       };
     },
-    watch: {
-      selectedValue(value) {
-        console.log(`value: ${value}`);
-      },
-    },
     methods: {
-      onSelect(item, target, index) {
-        this.index = index;
-      },
-      onKeyUp(e) {
-        this.e = e;
-      },
-      onClickBtn() {
-        this.$refs.selectbox.select('item_3');
-      },
       _getBoxInfo() {
         let boxInfo = {};
         const itemList = [];
@@ -68,7 +51,7 @@
   };
 </script>
 <style>
-  .selectbox-default{
+  .selectbox-read-only{
     display: inline-block;
     margin-left: 5px;
   }

@@ -1,12 +1,15 @@
 <template>
   <div class="selectbox-multiple">
     <ev-selectbox
+      v-model="selectedValue"
       :name="boxInfo.name"
       :style="boxInfo.selectboxStyle"
       :multiple="boxInfo.multiple"
       :init-select-idx="0"
       :items="boxInfo.items"
     />
+    <br><br>
+    selected value : <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -15,6 +18,7 @@
     data() {
       return {
         boxInfo: this._getBoxInfo(),
+        selectedValue: '',
       };
     },
     methods: {
