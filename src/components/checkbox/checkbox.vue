@@ -1,8 +1,7 @@
 <template>
-  <label
-    :for="`${checkboxId}_${value}`"
-    :class="{ disabled: disabled }"
-    class="ev-checkbox-label"
+  <div
+    :class="[{ disabled: disabled }, dataSize]"
+    class="ev-checkbox-wrap"
   >
     <input
       v-if="!isGroup"
@@ -24,8 +23,14 @@
       class="ev-checkbox-input group"
       @change="change"
     >
-    <slot/>
-  </label>
+    <label
+      :for="`${checkboxId}_${value}`"
+      :class="[dataSize, dataType]"
+      class="ev-checkbox-label"
+    >
+      <slot/>
+    </label>
+  </div>
 </template>
 
 <script>
@@ -46,12 +51,22 @@
         type: [Boolean, Array],
         default: null,
       },
+      size: {
+        type: String,
+        default: '',
+      },
+      type: {
+        type: String,
+        default: '',
+      },
     },
     data() {
       return {
         checkboxId: this._uid,
         isGroup: false, // group태그가 존재하는 경우 true
         groupBindValue: [],
+        dataSize: this.size,
+        dataType: this.type,
       };
     },
     computed: {
@@ -61,6 +76,22 @@
         },
         set(list) {
           this.groupBindValue = list;
+        },
+      },
+      bindSize: {
+        get() {
+          return this.size;
+        },
+        set(size) {
+          this.dataSize = size;
+        },
+      },
+      bindType: {
+        get() {
+          return this.type;
+        },
+        set(size) {
+          this.dataType = size;
         },
       },
     },
@@ -81,18 +112,91 @@
 </script>
 
 <style scoped>
-  .ev-checkbox-label {
-    vertical-align: middle;
+  .ev-checkbox-wrap {
+    height: 19px;
     float: left;
     user-select: none;
     cursor: pointer;
   }
-  .ev-checkbox-label.disabled {
+  .ev-checkbox-wrap.small{
+    height: 15px;
+  }
+  .ev-checkbox-wrap.disabled {
     color: #C0C4CC;
     cursor: not-allowed;
   }
-  .ev-checkbox-input {
-    vertical-align: middle;
+  .ev-checkbox-label {
+    position: relative;
+    display: inline-block;
+    padding-left: 25px;
+    line-height: 19px;
     cursor: inherit;
+  }
+  .ev-checkbox-label.small {
+    padding-left: 23px;
+    line-height: 15px;
+  }
+  .ev-checkbox-label:before {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    background: transparent;
+    border: 1px solid #B0B3B7;
+    border-radius: 100%;
+    text-align: center;
+    content: '';
+  }
+  .ev-checkbox-label.square:before {
+    border-radius: 0;
+  }
+  .ev-checkbox-label.small:before {
+    width: 12px;
+    height: 12px;
+  }
+  .ev-checkbox-wrap.disabled .ev-checkbox-label:before {
+    border: 1px solid #B01012;
+  }
+  .ev-checkbox-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    vertical-align: middle;
+    overflow: hidden;
+    cursor: inherit;
+    clip: rect(0, 0, 0, 0);
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label:before {
+    border: 1px solid #41B7FD;
+  }
+  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:before {
+    border: 1px solid #B01012;
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label:after {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 100%;
+    content: '';
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label.square:after {
+    border-radius: 0;
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label.small:after {
+    top: 5px;
+    left: 6px;
+    width: 6px;
+    height: 6px;
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label:after {
+    background: #41B7FD;
+  }
+  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:after {
+    background: #B01012;
   }
 </style>
