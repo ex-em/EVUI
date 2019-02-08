@@ -94,21 +94,19 @@ export default {
     height: 19px;
     float: left;
     user-select: none;
-    cursor: pointer;
   }
   .ev-radio-wrap.small{
     height: 15px;
   }
   .ev-radio-wrap.disabled {
     color: #C0C4CC;
-    cursor: not-allowed;
   }
   .ev-radio-label {
     position: relative;
     display: inline-block;
     padding-left: 25px;
     line-height: 19px;
-    cursor: inherit;
+    cursor: pointer;
   }
   .ev-radio-label.small {
     padding-left: 20px;
@@ -129,6 +127,9 @@ export default {
   .ev-radio-label.small:before {
     width: 12px;
     height: 12px;
+  }
+  .ev-radio-wrap.disabled .ev-radio-label {
+    cursor: not-allowed;
   }
   .ev-radio-wrap.disabled .ev-radio-label:before {
     border: 1px solid #B01012;
