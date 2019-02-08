@@ -5,7 +5,9 @@
       :class="wrapClasses"
     >
       <input
-        v-if="type === 'input'"
+        v-if="type !== 'textarea'"
+        :type="type"
+        :style="wrapStyle"
         :value="currentValue"
         :class="inputClasses"
         :placeholder="placeholder"
@@ -60,7 +62,7 @@
 <script>
   import { getQuantity, getSize } from '@/common/utils';
 
-  const prefixCls = 'ev-input-text';
+  const prefixCls = 'ev-input';
 
   export default {
     name: 'TextField',
@@ -87,7 +89,11 @@
       },
       type: {
         type: String,
-        default: 'input',
+        validator(value) {
+          const supportType = ['text', 'password', 'textarea'];
+          return !!supportType.filter(item => value === item).length;
+        },
+        default: 'text',
       },
       placeholder: {
         type: String,
@@ -143,7 +149,7 @@
         return {
           width: getSize(getQuantity(this.width)),
           height: getSize(getQuantity(this.height)),
-          background: '#fff',
+          background: this.disabled ? '#f3f3f3' : '#fff',
         };
       },
       wrapTextClass() {
@@ -258,7 +264,7 @@
   };
 </script>
 <style>
-  .ev-input-text {
+  .ev-input {
     display: inline-block;
     position: relative;
     overflow: hidden;
@@ -277,17 +283,18 @@
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   }
 
-  .ev-input-text:hover {
+  .ev-input:hover {
     border-color : #adaeb1;
   }
 
-  .ev-input-text.focus, .ev-input-text.focus:hover {
+  .ev-input.focus, .ev-input.focus:hover {
     border-color : #2d8cf0;
     opacity: 1;
   }
 
-  .ev-input-text-input {
+  .ev-input-text {
     width: 100%;
+    height: 100%;
     padding: 0 7px;
     text-align: left;
     outline: 0;
@@ -297,48 +304,73 @@
     border-radius: 4px;
   }
 
-  .ev-input-text-input[disabled] {
+  .ev-input-text[disabled] {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #495060;
   }
 
-  .ev-input-text-disabled .ev-input-text-input {
+  .ev-input-disabled .ev-input-text {
     background-color: #f3f3f3;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .ev-input-text-disabled .ev-input-text-input.evui-input-text-textarea {
+  .ev-input-disabled .ev-input-text.evui-input-textarea.ev-input-password {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .ev-input-text-disabled:hover, .ev-input-text:hover.error,
-  .ev-input-text.focus.error, .ev-input-text.error {
+  .ev-input-password {
+    width: 100%;
+    height: 100%;
+    padding: 0 7px;
+    text-align: left;
+    outline: 0;
+    -moz-appearance: textfield;
+    color: #666;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  .ev-input-password[disabled] {
+    background-color: #f3f3f3;
+    opacity: 1;
+    cursor: not-allowed;
+    color: #495060;
+  }
+
+  .ev-input-disabled .ev-input-password {
+    background-color: #f3f3f3;
+    cursor: not-allowed;
+    color: #5f5d5d;
+  }
+
+  .ev-input-disabled:hover, .ev-input:hover.error,
+  .ev-input.focus.error, .ev-input.error {
     border-color : #d77f7f;
   }
 
-  .ev-input-text-disabled .ev-input-text {
+  .ev-input-disabled .ev-input {
     opacity: .72;
     cursor: not-allowed;
     background-color: #f3f3f3;
   }
 
-  .ev-input-text.ev-input-text-disabled {
+  .ev-input.ev-input-disabled {
     background-color: #f3f3f3;
   }
 
-  .ev-input-text-disabled {
+  .ev-input-disabled {
     opacity: .72;
     color: #5f5d5d !important;
     cursor: not-allowed;
   }
 
-  .ev-input-text-textarea {
+  .ev-input-textarea {
     display: block;
     text-align: left;
     line-height: 1.5;
@@ -350,31 +382,31 @@
     border-radius: 4px;
   }
 
-  .ev-input-text-textarea[disabled] {
+  .ev-input-textarea[disabled] {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #5f5d5d;
   }
 
-  .ev-input-text-valid-check {
+  .ev-input-valid-check {
     font-size: 12px;
   }
 
-  .ev-input-text-valid-error {
+  .ev-input-valid-error {
     padding-left: 3px;
     padding-right: 5px;
     color: #ed1313;
     float:left
   }
 
-  .ev-input-text-valid-max-length {
+  .ev-input-valid-max-length {
     padding-left: 5px;
     padding-right: 3px;
     float:right
   }
 
-  .ev-input-text-valid-max-length.error {
+  .ev-input-valid-max-length.error {
     color: #ed1313;
   }
 </style>
