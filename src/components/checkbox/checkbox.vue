@@ -125,6 +125,7 @@
   }
   .ev-checkbox-label {
     position: relative;
+    height: 100%;
     display: inline-block;
     padding-left: 25px;
     line-height: 19px;
