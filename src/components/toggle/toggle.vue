@@ -1,7 +1,8 @@
 <template>
   <div
     ref="toggleRef"
-    :class="[setToggleTypeClass(), {active : dataToggleOn}]"
+    :class="[toggleType, {active : dataToggleOn}]"
+    class="ev-toggle"
     @click="changeToggle"
   >
     <div
@@ -12,7 +13,7 @@
         fontSize: toggleFontSize + 'px',
         marginRight: toggleObj.height/5 + 'px',
       }"
-      class="evui-toggle-offText-slide"
+      class="ev-toggle-offText-slide"
     >
       {{ toggleText.offText }}
     </div>
@@ -24,14 +25,15 @@
         fontSize: toggleFontSize + 'px',
         marginLeft: toggleObj.height/5 + 'px',
       }"
-      class="evui-toggle-onText-slide"
+      class="ev-toggle-onText-slide"
     >
       {{ toggleText.onText }}
     </div>
     <div
+      v-show="isShow"
       v-if="toggleType === 'slide'"
       :style="setToggleButtonStyle()"
-      class="evui-toggle-switch"
+      class="ev-toggle-switch"
     />
     <div
       v-if="toggleType === 'tab'"
@@ -39,7 +41,7 @@
       :style="{
         fontSize: toggleFontSize + 'px',
       }"
-      class="evui-toggle-offText-tab"
+      class="ev-toggle-offText-tab"
     >
       {{ toggleText.onText }}
     </div>
@@ -49,7 +51,7 @@
       :style="{
         fontSize: toggleFontSize + 'px',
       }"
-      class="evui-toggle-onText-tab"
+      class="ev-toggle-onText-tab"
     >
       {{ toggleText.offText }}
     </div>
@@ -59,7 +61,7 @@
       :style="{
         fontSize: toggleFontSize + 'px',
       }"
-      class="evui-toggle-onText-button"
+      class="ev-toggle-onText-button"
     >
       {{ toggleText.onText }}
     </div>
@@ -69,7 +71,7 @@
       :style="{
         fontSize: toggleFontSize + 'px',
       }"
-      class="evui-toggle-offText-button"
+      class="ev-toggle-offText-button"
     >
       {{ toggleText.offText }}
     </div>
@@ -120,6 +122,7 @@
       return {
         dataToggleOn: this.value,
         maxWidth: 0,
+        isShow: false,
       };
     },
     computed: {
@@ -127,17 +130,19 @@
     mounted() {
       if (this.toggleText.onText || this.toggleText.offText) {
         let maxTextWidth = 0;
+        const onTextScrollWidth = this.$refs.onTextRef.scrollWidth;
+        const offTextScrollWidth = this.$refs.offTextRef.scrollWidth;
         if (this.toggleType === 'slide' || this.toggleType === 'button') {
-          if (this.$refs.offTextRef.scrollWidth < this.$refs.onTextRef.scrollWidth) {
-            maxTextWidth = this.$refs.onTextRef.scrollWidth;
+          if (offTextScrollWidth < onTextScrollWidth) {
+            maxTextWidth = onTextScrollWidth;
           } else {
-            maxTextWidth = this.$refs.offTextRef.scrollWidth;
+            maxTextWidth = offTextScrollWidth;
           }
         } else if (this.toggleType === 'tab') {
-          if (this.$refs.offTextRef.scrollWidth < this.$refs.onTextRef.scrollWidth) {
-            maxTextWidth = this.$refs.onTextRef.scrollWidth * 2;
+          if (offTextScrollWidth < onTextScrollWidth) {
+            maxTextWidth = onTextScrollWidth * 2;
           } else {
-            maxTextWidth = this.$refs.offTextRef.scrollWidth * 2;
+            maxTextWidth = offTextScrollWidth * 2;
           }
         }
         if (maxTextWidth + (this.toggleObj.height * 1.5) < this.toggleObj.width) {
@@ -186,22 +191,18 @@
         this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
           = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
       } // style 속성 부여
+
+      const self = this;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          self.isShow = true;
+        });
+      });
     },
     methods: {
       changeToggle() {
         this.dataToggleOn = !this.dataToggleOn;
         this.$emit('input', this.dataToggleOn);
-      },
-      setToggleTypeClass() {
-        let cls = 'evui-toggle-slide';
-        if (this.toggleType === 'slide') {
-          cls = 'evui-toggle-slide';
-        } else if (this.toggleType === 'tab') {
-          cls = 'evui-toggle-tab';
-        } else if (this.toggleType === 'button') {
-          cls = 'evui-toggle-button';
-        }
-        return cls;
       },
       setToggleButtonStyle() {
         let toggleButtonStyle = {};
@@ -228,7 +229,7 @@
 </script>
 
 <style scoped>
-  .evui-toggle-slide {
+  .ev-toggle.slide {
     display: inline-block;
     position: relative;
     vertical-align: middle;
@@ -239,19 +240,19 @@
     user-select: none;
     cursor: pointer;
   }
-  .evui-toggle-slide.active {
+  .ev-toggle.slide.active {
     border: 1px solid #2d8cf0;
     background-color: #2d8cf0;
     color: #ffffff;
   }
-  .evui-toggle-tab {
+  .ev-toggle.tab {
     display: inline-block;
     position: relative;
     border: 1px solid #2d8cf0;
     user-select: none;
     cursor: pointer;
   }
-  .evui-toggle-button {
+  .ev-toggle.button {
     display: inline-block;
     position: relative;
     border: 1px solid #2d8cf0;
@@ -260,7 +261,7 @@
     user-select: none;
     cursor: pointer;
   }
-  .evui-toggle-switch {
+  .ev-toggle-switch {
     position: absolute;
     top: 1px;
     background-color: #ffffff;
@@ -268,7 +269,7 @@
     cursor: pointer;
     content: '';
   }
-  .active > .evui-toggle-switch {
+  .active > .ev-toggle-switch {
     position: absolute;
     top: 1px;
     background-color: #ffffff;
@@ -276,25 +277,25 @@
     cursor: pointer;
     content: '';
   }
-  .evui-toggle-offText-slide {
+  .ev-toggle-offText-slide {
     display: inline-block;
     height: 0;
     visibility: visible;
     float: right;
   }
-  .active > .evui-toggle-offText-slide {
+  .active > .ev-toggle-offText-slide {
     visibility: hidden;
   }
-  .evui-toggle-onText-slide {
+  .ev-toggle-onText-slide {
     height: 0;
     visibility: hidden;
   }
-  .active > .evui-toggle-onText-slide {
+  .active > .ev-toggle-onText-slide {
     display: inline-block;
     visibility: visible;
     float: left;
   }
-  .evui-toggle-offText-tab {
+  .ev-toggle-offText-tab {
     display: inline-block;
     float: left;
     width: 50%;
@@ -308,13 +309,13 @@
     user-select: none;
     transition: all .2s ease-in-out;
   }
-  .active > .evui-toggle-offText-tab {
+  .active > .ev-toggle-offText-tab {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     background-color: #2d8cf0;
     color: #ffffff;
   }
-  .evui-toggle-onText-tab {
+  .ev-toggle-onText-tab {
     display: inline-block;
     float: left;
     width: 50%;
@@ -328,28 +329,28 @@
     user-select: none;
     transition: all .2s ease-in-out;
   }
-  .active > .evui-toggle-onText-tab {
+  .active > .ev-toggle-onText-tab {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     background-color: #f7f7f7;
     color: #000000;
   }
-  .evui-toggle-onText-button {
+  .ev-toggle-onText-button {
     display: block;
     height: 0px;
     visibility: hidden;
   }
-  .active > .evui-toggle-onText-button {
+  .active > .ev-toggle-onText-button {
     text-align: center;
     visibility: visible;
   }
-  .evui-toggle-offText-button {
+  .ev-toggle-offText-button {
     display: block;
     height: 0px;
     text-align: center;
     visibility: visible;
   }
-  .active > .evui-toggle-offText-button {
+  .active > .ev-toggle-offText-button {
     visibility: hidden;
   }
 </style>
