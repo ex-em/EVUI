@@ -5,7 +5,7 @@ const module = {
       const series = target[key];
 
       if (data[key]) {
-        if (series.isExistGrp) {
+        if (series.isExistGrp && series.stackIndex) {
           const bs = target[series.bsId];
           series.data = this.addStack(data[key], label, bs.data, series.stackIndex);
         } else {
@@ -22,7 +22,7 @@ const module = {
       let bdata = base[index];
       let odata = curr;
       let ldata = label[index];
-      let gdata;
+      let gdata = curr;
 
       if (gdata && typeof gdata === 'object') {
         odata = this.horizontal ? curr.x : curr.y;
@@ -117,7 +117,7 @@ const module = {
           minmax.y[axisY] = { min: null, max: null };
         }
 
-        if (smm) {
+        if (smm && series.show) {
           if (smm.minX < minmax.x[axisX].min) {
             minmax.x[axisX].min = smm.minX;
           }

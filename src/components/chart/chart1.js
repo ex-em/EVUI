@@ -145,7 +145,9 @@ class EvChart {
     const steps = param.axesSteps;
 
     Object.keys(slist).forEach((series) => {
-      slist[series].draw(ctx, rect, offset, steps);
+      if (slist[series].show) {
+        slist[series].draw(ctx, rect, offset, steps);
+      }
     });
   }
 
@@ -329,7 +331,25 @@ class EvChart {
 
     return labelOffset;
   }
-  update() {}
+  update() {
+    const options = this.options;
+    const data = this.data.data;
+    const labels = this.data.labels;
+    const groups = this.data.groups;
+
+    if (groups.length) {
+      this.addGroupInfo(this.seriesList, groups);
+    }
+    this.createDataSet(this.seriesList, data, labels);
+
+    this.minMax = this.getStoreMinMax(this.seriesList);
+    this.axesX = this.createAxes('x', options.axesX, this.bufferCtx);
+    this.axesY = this.createAxes('y', options.axesY, this.bufferCtx);
+    this.axesRange = this.getAxesRange(this.axesX, this.axesY, this.minMax);
+    this.labelOffset = this.getLabelOffset(this.axesX, this.axesY, this.axesRange);
+
+    this.render();
+  }
   destroy() {}
   reset() {
     this.seriesList = {};

@@ -29,16 +29,21 @@ const module = {
   },
 
   addGroupInfo(target, groups) {
-    groups.forEach((group, gidx) => {
-      group.reduce((prev, curr, sidx) => {
+    groups.forEach((group, gIdx) => {
+      let interpolation = 0;
+      group.reduce((prev, curr, sIdx) => {
         const series = target[curr];
 
-        series.stackIndex = sidx;
-        series.groupIndex = gidx;
+        series.stackIndex = sIdx + interpolation;
+        series.groupIndex = gIdx;
         series.isExistGrp = true;
         series.bsId = prev;
 
-        return curr;
+        if (!series.show) {
+          interpolation--;
+        }
+
+        return !series.show ? prev : curr;
       }, group[0]);
     });
   },
