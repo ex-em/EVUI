@@ -67,27 +67,36 @@
     },
     methods: {
       test1() {
-        this.$data.defaultData = {
-          series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-          },
-          labels: [
-            +new Date('2017/01/01 00:00:00'),
-            +new Date('2017/01/01 00:01:00'),
-            +new Date('2017/01/01 00:02:00'),
-            +new Date('2017/01/01 00:03:00'),
-            +new Date('2017/01/01 00:04:00'),
-          ],
-            data: {
-            series1: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-          },
-        };
+        this.$data.defaultData.data.series1 =
+          [
+            this.getRandomInt(),
+            this.getRandomInt(),
+            this.getRandomInt(),
+            this.getRandomInt(),
+            this.getRandomInt(),
+          ];
+
+        // this.$data.defaultData = {
+        //   series: {
+        //     series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
+        //   },
+        //   labels: [
+        //     +new Date('2017/01/01 00:00:00'),
+        //     +new Date('2017/01/01 00:01:00'),
+        //     +new Date('2017/01/01 00:02:00'),
+        //     +new Date('2017/01/01 00:03:00'),
+        //     +new Date('2017/01/01 00:04:00'),
+        //   ],
+        //     data: {
+        //     series1: [
+        //       this.getRandomInt(),
+        //       this.getRandomInt(),
+        //       this.getRandomInt(),
+        //       this.getRandomInt(),
+        //       this.getRandomInt(),
+        //     ],
+        //   },
+        // };
       },
       getRandomInt() {
         return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
