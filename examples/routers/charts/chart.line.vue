@@ -17,28 +17,7 @@
         defaultData: {
           series: {
             series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
-            series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series4: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series5: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series6: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series7: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series8: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series9: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series11: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series12: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series13: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series14: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series15: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series16: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series18: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series19: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-            series20: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
           },
-          groups: [
-            ['series1', 'series2'],
-          ],
-          // labels: [],
           labels: [
             +new Date('2017/01/01 00:00:00'),
             +new Date('2017/01/01 00:01:00'),
@@ -48,14 +27,6 @@
           ],
           data: {
             series1: [100, 150, 51, 150, 350],
-            series2: [200, 100, 71, 300, 400],
-            series3: [
-              { x: +new Date('2017/01/01 00:02:00'), y: 100 },
-              { x: +new Date('2017/01/01 00:03:00'), y: 200 },
-              { x: +new Date('2017/01/01 00:04:00'), y: 300 },
-              { x: +new Date('2017/01/01 00:05:00'), y: 100 },
-              { x: +new Date('2017/01/01 00:06:00'), y: 401 },
-            ],
           },
         },
         lineOptions: {
@@ -78,7 +49,8 @@
             interval: 'minute',
           }],
           axesY: [{
-            type: 'log',
+            type: 'linear',
+            startToZero: true,
             autoScaleRatio: 0.1,
             showGrid: true,
           }],
@@ -91,48 +63,34 @@
       }
     },
     mounted() {
-      // this.interval2 = setTimeout(() => this.updateChartData2(), 3000);
-      // this.interval3 = setTimeout(() => this.updateChartData3(), 10000);
+      setInterval(() => this.test1(), 2000);
     },
     methods: {
-      updateChartData() {
-        this.lineOptions.width = '40%';
-
-        if (this.interval) {
-          clearTimeout(this.interval);
-        }
-      },
-      updateChartData2() {
-        const dchart = this.$refs.defaultChart;
-        dchart.addSeries('series1', { name: 'series#1', show: true, type: 'line', fill: true, point: true });
-        dchart.addAxisLabel('2017/01/01 00:00:00');
-        dchart.addAxisLabel('2017/01/01 00:01:00');
-        dchart.addGraphData('series1', 200);
-        dchart.updateChart();
-        if (this.interval2) {
-          clearTimeout(this.interval2);
-        }
-      },
-      updateChartData3() {
-        const dchart = this.$refs.defaultChart;
-        const tempLabel = ['2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-           '2017/01/01 00:03:00', '2017/01/01 00:04:00'];
-        const tempData = {
-          series1: [100, 150, 50, 200, 350],
-          series2: [200, 100, null, 300, 400],
+      test1() {
+        this.$data.defaultData = {
+          series: {
+            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
+          },
+          labels: [
+            +new Date('2017/01/01 00:00:00'),
+            +new Date('2017/01/01 00:01:00'),
+            +new Date('2017/01/01 00:02:00'),
+            +new Date('2017/01/01 00:03:00'),
+            +new Date('2017/01/01 00:04:00'),
+          ],
+            data: {
+            series1: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+          },
         };
-        const tempSeries = {
-          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-          series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
-          series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
-        };
-        dchart.updateAxisLabelSet(tempLabel);
-        dchart.updateGraphDataSet(tempData);
-        dchart.updateSeriesSet(tempSeries);
-        dchart.updateChart();
-        if (this.interval3) {
-          clearTimeout(this.interval3);
-        }
+      },
+      getRandomInt() {
+        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
       },
     },
   };

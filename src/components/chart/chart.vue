@@ -8,7 +8,7 @@
 <script>
   import _ from 'lodash';
   import { getQuantity } from '@/common/utils';
-  import EvChart from './chart1';
+  import EvChart from './chart.core';
 
   export default {
     props: {
@@ -34,6 +34,21 @@
           width: this.getChartSize(getQuantity(this.options.width)),
           height: this.getChartSize(getQuantity(this.options.height)),
         };
+      },
+    },
+    watch: {
+      data: {
+        handler(newVal) {
+          this.chart.data = _.merge(this.normalizedData, newVal);
+          this.chart.update();
+        },
+        deep: true,
+      },
+      options: {
+        handler(newVal) {
+          this.chart.options = _.merge(this.normalizedOption, newVal);
+          this.chart.update();
+        },
       },
     },
     created() {
@@ -110,43 +125,6 @@
           sizeValue = undefined;
         }
         return sizeValue;
-      },
-      addAxisLabel(value, index = -1) {
-        const labels = this.store.chartData.labels;
-        if (index > -1) {
-          labels[index] = value;
-        } else {
-          labels.push(value);
-        }
-      },
-      updateAxisLabelSet(labelSet) {
-        this.store.chartData.labels = labelSet;
-      },
-      updateGraphDataSet(graphSet) {
-        this.store.chartData.data = graphSet;
-      },
-      updateSeriesSet(seriesSet) {
-        this.store.chartData.series = seriesSet;
-      },
-      addGraphData(seriesId, value, index = -1) {
-        const data = this.store.chartData.data;
-
-        if (!data[seriesId]) {
-          data[seriesId] = [];
-        }
-
-        if (index > -1) {
-          data[seriesId][index] = value;
-        } else {
-          data[seriesId].push(value);
-        }
-      },
-      addSeries(sId, sInfo) {
-        const series = this.store.chartData.series;
-        series[sId] = sInfo;
-      },
-      updateChart() {
-        this.chart.updateChart();
       },
     },
   };
