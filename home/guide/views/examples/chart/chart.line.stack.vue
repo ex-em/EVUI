@@ -4,15 +4,11 @@
       :data="stackLineChartData"
       :options="stackLineChartOptions"
     />
-    <!--
-    <div style="position: absolute; top: 0; left: 600px;">
+    <div style="position: absolute; top: 0; right: 0;">
       <Button
-        :text="liveBtnInfo.text"
-        :name="liveBtnInfo.name"
         @click="onClickLiveBtn"
-      />
+      >{{ liveBtnInfo.text }}</Button>
     </div>
-    -->
     <br>
   </div>
 </template>
@@ -32,40 +28,44 @@
       return {
         stackLineChartData: {
           series: {
-            series1: { name: 'series#1', show: true, point: true, fill: true },
-            series2: { name: 'series#2', show: true, point: true, fill: true },
-            series3: { name: 'series#3', show: true, point: true, fill: true },
+            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
+            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: false },
           },
           groups: [
-            ['series1', 'series2', 'series3'],
+            ['series1', 'series2'],
           ],
-          data: [
-            ['x',
-              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
-            ['series1', 100, 150, 50, 200, 350],
-            ['series2', 200, 100, null, 300, 400],
-            ['series3', 150, 0, 0, 350, 450],
+          labels: [
+            +new Date('2017/01/01 00:00:00'),
+            +new Date('2017/01/01 00:01:00'),
+            +new Date('2017/01/01 00:02:00'),
+            +new Date('2017/01/01 00:03:00'),
+            +new Date('2017/01/01 00:04:00'),
           ],
+          data: {
+            series1: [100, 150, 51, 150, 350],
+            series2: [50, 200, 100, 150, 80],
+          },
         },
         stackLineChartOptions: {
-          type: 'line',
           width: '100%',
-          height: '350px',
+          height: '100%',
+          title: {
+            text: 'Title Test',
+            show: true,
+          },
           legend: {
             show: true,
             position: 'right',
           },
-          xAxes: [{
-            scaleType: 'fix',
-            labelType: 'time',
-            interval: 'minute',
+          horizontal: false,
+          axesX: [{
+            type: 'time',
             timeFormat: 'HH:mm:ss',
-            showGrid: true,
+            interval: 'minute',
           }],
-          yAxes: [{
-            scaleType: 'auto',
-            labelType: 'linear',
+          axesY: [{
+            type: 'linear',
+            startToZero: true,
             autoScaleRatio: 0.1,
             showGrid: true,
           }],
@@ -75,7 +75,7 @@
           text: 'Live',
           customCls: '',
         },
-        timeData: '2018-05-25 05:21:00',
+        timeValue: '2017-01-01 00:04:00',
         liveMode: false,
         event: null,
       };
@@ -86,9 +86,9 @@
       }
     },
     methods: {
-      onClickLiveBtn(event, text) {
+      onClickLiveBtn(event) {
         this.event = event;
-        this.liveBtnInfo.text = text === 'Live' ? 'Stop' : 'Live';
+        this.liveBtnInfo.text = this.liveBtnInfo.text === 'Live' ? 'Stop' : 'Live';
         this.liveMode = !this.liveMode;
 
         if (this.liveMode) {
@@ -97,18 +97,17 @@
           clearTimeout(this.liveInterval);
         }
       },
+      getRandomInt() {
+        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+      },
       addLiveData() {
-        const randomData1 = Math.floor((Math.random() * 30) + 1);
-        const randomData2 = Math.floor((Math.random() * 30) + 1);
-        const randomData3 = Math.floor((Math.random() * 30) + 1);
-
-        this.timeData = moment(this.timeData).add(1, 'm').format('YYYY-MM-DD HH:mm:ss');
-
-        this.$children[0].addValue(0, { x: this.timeData, y: randomData1 });
-        this.$children[0].addValue(1, { x: this.timeData, y: randomData2 });
-        this.$children[0].addValue(2, { x: this.timeData, y: randomData3 });
-
-        this.$children[0].chart.redraw();
+        this.timeValue = +moment(this.timeValue).add(1, 'm');
+        this.stackLineChartData.labels.shift();
+        this.stackLineChartData.data.series1.shift();
+        this.stackLineChartData.data.series2.shift();
+        this.stackLineChartData.labels.push(this.timeValue);
+        this.stackLineChartData.data.series1.push(this.getRandomInt());
+        this.stackLineChartData.data.series2.push(this.getRandomInt());
       },
     },
   };

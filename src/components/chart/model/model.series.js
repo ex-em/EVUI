@@ -1,4 +1,5 @@
 import Line from '../element/element.line';
+import Scatter from '../element/element.scatter';
 
 const module = {
   createSeriesSet(target, series, defaultType) {
@@ -23,6 +24,8 @@ const module = {
 
     if (type === 'line') {
       return new Line(id, opt, idx);
+    } else if (type === 'scatter') {
+      return new Scatter(id, opt, idx);
     }
 
     return false;
