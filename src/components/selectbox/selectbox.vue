@@ -157,6 +157,7 @@
       },
     },
     created() {
+      let item;
       this.listBoxItems = this.items.slice();
 
       if (!this.multiple) {
@@ -164,9 +165,14 @@
       }
 
       if (this.initSelect != null) {
-        this.select(this.initSelect);
+        item = this.getItemBySelect(this.initSelect);
       } else if (this.initSelectIdx != null) {
-        this.selectIdx(this.initSelectIdx);
+        item = this.getItemByIndex(this.initSelectIdx);
+      }
+
+      if (item) {
+        this.inputText = item.name;
+        this.selectedItems.push(item);
       }
     },
     methods: {
@@ -184,27 +190,7 @@
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
-        let foundItem;
-        const itemName = item.name;
-
-        if (this.multiple) {
-          foundItem = this.selectedItems.find(obj => obj.name === itemName);
-
-          if (foundItem) {
-            this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
-          } else {
-            this.selectedItems.push(item);
-          }
-        } else {
-          this.inputText = itemName;
-          this.selectedItems.length = 0;
-          this.selectedItems.push(item);
-        }
-
-        if (!this.multiple) {
-          this.dropDownState = false;
-        }
-
+        this.selectByItem(item);
         this.$emit('select', item, target, index);
       },
       onKeyUpInputTxt(e) {
@@ -227,76 +213,43 @@
         this.$emit('keyup', e);
       },
       select(value) {
-        let item;
-        let groupObj;
-        let isSelected = false;
+        const item = this.getItemBySelect(value);
 
-        if (this.isGroup) {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
-
-            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
-              item = groupObj.items[jx];
-
-              if (item.value === value) {
-                this.inputText = item.name;
-                this.selectedItems.push(item);
-                isSelected = true;
-                break;
-              }
-            }
-
-            if (isSelected) {
-              break;
-            }
-          }
-        } else {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            item = this.items[ix];
-
-            if (item.value === value) {
-              this.inputText = item.name;
-              this.selectedItems.push(item);
-              break;
-            }
-          }
+        if (item) {
+          this.selectByItem(item);
         }
       },
-      selectIdx(idx) {
-        let item;
-        let groupObj;
-        let isSelected;
+      selectByIndex(idx) {
+        const item = this.getItemByIndex(idx);
 
-        if (this.isGroup) {
-          let rowIdx = 0;
+        if (item) {
+          this.selectByItem(item);
+        }
+      },
+      selectByItem(item) {
+        if (!item) {
+          return;
+        }
 
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
+        let foundItem;
+        const itemName = item.name;
 
-            for (let jx = 0, jxLen = groupObj.items.length; jx < jxLen; jx++) {
-              item = groupObj.items[jx];
+        if (this.multiple) {
+          foundItem = this.selectedItems.find(obj => obj.name === itemName);
 
-              if (item && rowIdx === idx) {
-                this.inputText = item.name;
-                this.selectedItems.push(item);
-                isSelected = true;
-                break;
-              }
-
-              rowIdx++;
-            }
-
-            if (isSelected || rowIdx > idx) {
-              break;
-            }
-          }
-        } else {
-          item = this.items[idx];
-
-          if (item) {
-            this.inputText = item.name;
+          if (foundItem) {
+            this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
+          } else {
             this.selectedItems.push(item);
           }
+        } else {
+          this.inputText = itemName;
+          this.selectedItems.length = 0;
+          this.selectedItems.push(item);
+        }
+
+        if (!this.multiple) {
+          this.dropDownState = false;
         }
       },
       removeTag(item, event) {
@@ -335,16 +288,71 @@
       hideDropdown() {
         this.dropDownState = false;
       },
+      getItemBySelect(value) {
+        let groupObj;
+        let groupItems;
+        let foundItem;
+
+        if (this.isGroup) {
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+            groupItems = groupObj.items || [];
+            foundItem = groupItems.find(item => item.value === value);
+
+            if (foundItem) {
+              break;
+            }
+          }
+        } else {
+          foundItem = this.items.find(item => item.value === value);
+        }
+
+        return foundItem;
+      },
+      getItemByIndex(idx) {
+        let groupObj;
+        let groupItems;
+        let foundItem;
+        let item;
+
+        if (this.isGroup) {
+          let itemRowIdx = 0;
+
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
+            groupItems = groupObj.items || [];
+
+            for (let jx = 0, jxLen; jx < jxLen; jx++) {
+              item = groupItems[jx];
+
+              if (item && itemRowIdx === idx) {
+                foundItem = item;
+                break;
+              }
+
+              itemRowIdx++;
+            }
+
+            if (foundItem || itemRowIdx > idx) {
+              break;
+            }
+          }
+        } else {
+          foundItem = this.items[idx];
+        }
+
+        return foundItem;
+      },
     },
   };
 </script>
 
 <style>
-/************************************************************************************
- Selectbox
-************************************************************************************/
+  /************************************************************************************
+   Selectbox
+  ************************************************************************************/
 
-/** evui-selectbox **/
+  /** evui-selectbox **/
 
   .evui-selectbox {
     display: inline-block;

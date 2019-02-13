@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h5># normal</h5>
+    <br>
     <Checkbox
       :value="bindValue"
       v-model="vModel"
@@ -8,13 +10,149 @@
       Single Checkbox
     </Checkbox>
     <br>
+    <br>
     <button
       @click="click"
     >
       test
     </button>
     <br>
+    <br>
     bindValue : {{ vModel }}
+    <br>
+    <br>
+    <br>
+    <h5># small</h5>
+    <br>
+    <Checkbox
+      :value="bindValue2"
+      v-model="vModel2"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Small Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <button
+      @click="click2"
+    >
+      test
+    </button>
+    <br>
+    <br>
+    bindValue2 : {{ vModel2 }}
+    <br>
+    <br>
+    <br>
+    <h5># square</h5>
+    <br>
+    <Checkbox
+      :value="bindValue3"
+      v-model="vModel3"
+      :type="`square`"
+      class="checkboxStyle"
+    >
+      Single Square Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue4"
+      v-model="vModel4"
+      :size="`small`"
+      :type="`square`"
+      class="checkboxStyle"
+    >
+      Single Small Square Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue5"
+      v-model="vModel5"
+      :disabled="true"
+      :size="`small`"
+      :type="`square`"
+      class="checkboxStyle"
+    >
+      Single Small Square Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <br>
+    <h5># minus</h5>
+    <br>
+    <Checkbox
+      :value="bindValue6"
+      v-model="vModel6"
+      :after-type="`minus`"
+      class="checkboxStyle"
+    >
+      Single Circle Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue7"
+      v-model="vModel7"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Small Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue8"
+      v-model="vModel8"
+      :disabled="true"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Small Minus Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue9"
+      v-model="vModel9"
+      :type="`square`"
+      :after-type="`minus`"
+      class="checkboxStyle"
+    >
+      Single Square Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue100"
+      v-model="vModel100"
+      :type="`square`"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Small Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue101"
+      v-model="vModel101"
+      :disabled="true"
+      :type="`square`"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Small Minus Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <br>
     <br>
     <br>
   </div>
@@ -31,11 +169,34 @@
       return {
         bindValue: 'value01',
         vModel: true,
+        bindValue2: 'value02',
+        vModel2: false,
+        bindValue3: 'value03',
+        vModel3: true,
+        bindValue4: 'value04',
+        vModel4: false,
+        bindValue5: 'value05',
+        vModel5: true,
+        bindValue6: 'value06',
+        vModel6: true,
+        bindValue7: 'value07',
+        vModel7: true,
+        bindValue8: 'value08',
+        vModel8: true,
+        bindValue9: 'value09',
+        vModel9: true,
+        bindValue100: 'value100',
+        vModel100: true,
+        bindValue11: 'value101',
+        vModel101: true,
       };
     },
     methods: {
       click() {
         this.vModel = !this.vModel;
+      },
+      click2() {
+        this.vModel2 = !this.vModel2;
       },
     },
   };
