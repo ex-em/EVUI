@@ -1,14 +1,14 @@
 <template>
-  <div class="selectbox-disabled">
+  <div class="selectbox-read-only">
     <ev-selectbox
+      ref="selectbox"
       v-model="selectedValue"
-      :name="boxInfo.name"
-      :init-select-idx="0"
+      :read-only="true"
+      :init-select="'item_2'"
       :items="boxInfo.items"
-      :disabled="boxInfo.disabled"
     />
     <br><br>
-    value: <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
+    selected value: <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
     <br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -22,11 +22,11 @@
     },
     methods: {
       _getBoxInfo() {
-        const itemList = [];
         let boxInfo = {};
+        const itemList = [];
         let value;
 
-        for (let ix = 0, ixLen = 10; ix < ixLen; ix++) {
+        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
           value = `item_${ix}`;
 
           itemList.push({
@@ -38,7 +38,6 @@
         boxInfo = {
           name: 'nomalCbBox',
           items: itemList,
-          disabled: true,
         };
 
         return boxInfo;
@@ -47,7 +46,7 @@
   };
 </script>
 <style>
-  .selectbox-disabled{
+  .selectbox-read-only{
     display: inline-block;
     margin-left: 5px;
     font-size: 14px;

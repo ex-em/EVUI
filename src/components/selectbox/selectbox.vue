@@ -1,7 +1,7 @@
 <template>
   <div
     v-click-outside="hideDropdown"
-    :class="prefixCls"
+    :class="selectboxClass"
   >
     <div
       class="evui-selectbox-select-field"
@@ -12,37 +12,49 @@
         class="evui-selectbox-multiple-tag-view"
       >
         <div
-          v-for="item in selectedItems"
-          :key="item.name"
-          :class="`${prefixCls}-select-tag checked`"
+          v-if="selectedItems.length"
+          :class="`${prefixCls}-select-tag ${selectedItems.length > 1 ? 'max-width' : ''}`"
         >
-          <div :class="`${prefixCls}-text-bg-area`">
-            <span :class="`${prefixCls}-text`">
-              {{ item.name }}
-            </span>
-            <i
-              :class="`${prefixCls}-tag-close`"
-              @click="removeTag(item, $event)"
-            />
+          <div :class="`${prefixCls}-text-wrap`">
+            <span :class="`${prefixCls}-text`">{{ selectedItems[0].name }}</span>
+          </div>
+          <div
+            :class="`${prefixCls}-tag-close`"
+            @click="removeTag(selectedItems[0], $event)"
+          >
+            <div :class="`${prefixCls}-tag-close-scale`">
+              <span :class="`ei ei-close`"/>
+            </div>
+          </div>
+        </div>
+        <div
+          v-show="selectedItems.length > 1"
+          :class="`${prefixCls}-select-count-tag`"
+        >
+          <div :class="`${prefixCls}-text-wrap`">
+            <span :class="`${prefixCls}-text`">+ {{ selectedItems.length -1 }}</span>
           </div>
         </div>
       </div>
       <input
         v-else
         :disabled="disabled"
+        :readonly="readOnly"
+        :class="inputTextClass"
         :value="inputText"
-        :class="`${prefixCls}-input-text`"
         type="text"
         @keyup="onKeyUpInputTxt"
       >
-      <i :class="selectBoxIconCls"/>
+      <i :class="arrowIconClass"/>
     </div>
     <transition name="fade">
       <Dropdown
         v-show="dropDownState"
+        ref="dropdown"
         :style="dropdownStyle"
         :is-group="isGroup"
         :disabled="disabled"
+        :size="size"
         :listbox-style="listBoxStyle"
         :multiple="multiple"
         :items="listBoxItems"
@@ -86,6 +98,10 @@
         },
       },
     },
+    model: {
+      prop: 'selectedValue',
+      event: 'change-selected-value',
+    },
     props: {
       name: {
         type: String,
@@ -105,7 +121,11 @@
       },
       size: {
         type: String,
-        default: 'normal',
+        default: 'medium',
+        validator(value) {
+          const list = ['small', 'medium', 'large'];
+          return list.indexOf(value) > -1;
+        },
       },
       isGroup: {
         type: Boolean,
@@ -118,6 +138,14 @@
       multiple: {
         type: Boolean,
         default: false,
+      },
+      readOnly: {
+        type: Boolean,
+        default: false,
+      },
+      selectedValue: {
+        type: [String, Number, Array],
+        default: null,
       },
       initSelect: {
         type: [String, Number],
@@ -137,6 +165,8 @@
     data() {
       return {
         prefixCls,
+        selectboxClass: this.getSelectboxClass(),
+        inputTextClass: this.getInputTextClass(),
         dropDownState: false,
         inputText: '',
         listBoxItems: [],
@@ -144,25 +174,33 @@
       };
     },
     computed: {
-      selectBoxIconCls() {
-        const classList = [];
+      arrowIconClass() {
+        return {
+          'evui-selectbox-arrow-icon': true,
+          'evui-selectbox-arrow-icon-rotate-180': this.dropDownState,
+          'evui-selectbox-arrow-icon-disabled': this.disabled,
+        };
+      },
+    },
+    watch: {
+      selectedItems(items) {
+        let value;
 
-        classList.push('evui-selectbox-arrow-icon');
-
-        if (this.dropDownState) {
-          classList.push('rotate-180');
+        if (this.multiple) {
+          value = [];
+          items.map(obj => value.push(obj.value));
+        } else {
+          value = items[0].value;
         }
 
-        return classList;
+        this.$emit('change-selected-value', value);
       },
     },
     created() {
       let item;
       this.listBoxItems = this.items.slice();
 
-      if (!this.multiple) {
-        this.dropdownStyle.border = 0;
-      }
+      this.dropdownStyle.border = this.multiple ? 1 : 0;
 
       if (this.initSelect != null) {
         item = this.getItemBySelect(this.initSelect);
@@ -183,6 +221,12 @@
 
         if (this.multiple) {
           this.inputText = '';
+        }
+
+        if (!this.dropDownState &&
+          this.$refs.dropdown &&
+          this.$refs.dropdown.$refs.filterInputText) {
+          this.$refs.dropdown.$refs.filterInputText.value = '';
         }
 
         this.listBoxItems = this.items.slice();
@@ -288,6 +332,20 @@
       hideDropdown() {
         this.dropDownState = false;
       },
+      getSelectboxClass() {
+        return {
+          [`${prefixCls}`]: true,
+          [`${prefixCls}-size-${this.size}`]: true,
+          [`${prefixCls}-disabled`]: this.disabled,
+        };
+      },
+      getInputTextClass() {
+        return {
+          [`${prefixCls}-input-text`]: true,
+          [`${prefixCls}-input-text-readonly`]: this.readOnly,
+          [`${prefixCls}-input-text-disabled`]: this.disabled,
+        };
+      },
       getItemBySelect(value) {
         let groupObj;
         let groupItems;
@@ -318,11 +376,11 @@
         if (this.isGroup) {
           let itemRowIdx = 0;
 
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+          for (let ix = 0; ix < this.items.length; ix++) {
             groupObj = this.items[ix];
             groupItems = groupObj.items || [];
 
-            for (let jx = 0, jxLen; jx < jxLen; jx++) {
+            for (let jx = 0; jx < groupItems.length; jx++) {
               item = groupItems[jx];
 
               if (item && itemRowIdx === idx) {
@@ -360,49 +418,47 @@
     border: 1px solid #dddeee;
     border-radius: 4px;
     vertical-align: middle;
-    font-size: 14px;
     line-height: normal;
-  }
-  .evui-selectbox:hover{
-    background-color: #eeeeee;
-    border-color: #bbb;
     cursor: pointer;
+    transition: border-color ease-in-out .15s;
+  }
+  .evui-selectbox-disabled{
+    cursor: not-allowed;
+  }
+  .evui-selectbox:focus{
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
   }
   .evui-selectbox-select-field {
     display: inline-block;
     width: 100%;
     height: 100%;
   }
-  .evui-selectbox-multiple-tag-view{
-    width: calc(100% - 25px);
-    height: 100%;
-    padding-right: 2px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    overflow-y: auto;
+  .evui-selectbox-select-field:hover{
+    background-color: #eeeeee;
+    border-color: #bbb;
   }
   .evui-selectbox-input-text{
     width: 100%;
     height: 100%;
     padding: 6px 10px;
     border: 0;
-    border-radius: 3px;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    background: transparent;
   }
   .evui-selectbox-input-text:focus{
-    border-color: #66afe8;
     outline: 0;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  }
+  .evui-selectbox-input-text-readonly{
+    cursor: default;
+  }
+  .evui-selectbox-input-text-disabled{
+    cursor: not-allowed;
   }
   .evui-selectbox-arrow-icon{
     position: absolute;
     top: 50%;
-    right: 8px;
     width: 10px;
     height: 10px;
-    margin-top: -4px;
     line-height: 3px;
-    font-size: 16px;
     font-weight: 900;
     font-family: Font Awesome\ 5 Free;
     font-style: normal;
@@ -413,61 +469,146 @@
   .evui-selectbox-arrow-icon:before {
     content: "\F0DD"
   }
-  .evui-selectbox-arrow-icon.rotate-180{
+  .evui-selectbox-arrow-icon-disabled{
+    cursor: not-allowed;
+  }
+  .evui-selectbox-arrow-icon-rotate-180{
     transform: rotate(180deg);
   }
+  .evui-selectbox-multiple-tag-view{
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .evui-selectbox-select-tag {
-    display: block;
-    margin: 2px 2px 0 0;
-    padding: 1px 10px 1px 5px;
-    cursor: pointer;
-  }
-  .evui-selectbox-select-tag:hover{
-    opacity:.85;
-  }
-  .evui-selectbox-text-bg-area {
-    display: inline-block;
-    padding: 3px 10px;
-    background: #f7f7f7;
+    display: inline-flex;
+    height: 100%;
+    max-width: 100%;
+    padding: 0 5px;
     border: 1px solid #e9eaec;
     border-radius: 3px;
-    font-size: 12px;
+    background: #f0f2f5;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .evui-selectbox-select-tag:hover {
+    opacity:.85;
+  }
+  .evui-selectbox-select-tag.max-width {
+    max-width: calc(100% - 40px);
+  }
+  .evui-selectbox-text-wrap{
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .evui-selectbox-text {
-    position: relative;
-    top: -1px;
-    color:#495060;
+    color: #495060;
   }
   .evui-selectbox-tag-close {
-    display: inline-block;
-    margin-left: 3px;
-    color: #666;
+    margin-left: 5px;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.4);
     opacity: .66;
     cursor: pointer;
-    transform: scale(1.42857143) rotate(0);
-  }
-  .evui-selectbox-tag-close:before{
-    position: relative;
-    top: -1px;
-    font-style: normal;
-    font-size: 10px;
-    font-family: Arial, sans-serif;
-    content: 'x';
   }
   .evui-selectbox-tag-close:hover{
     opacity: 1
   }
-  .evui-selectbox-select-tag:not(.evui-selectbox-select-tag.checked) {
-    background:0 0;
-    border:0;
-    color:#495060 !important;
-  }
-  .evui-selectbox-select-tag:not(.evui-selectbox-select-tag.checked) .evui-selectbox-tag-close{
-    color:#495060 !important;
+  .evui-selectbox-tag-close-scale {
+    color: #fff;
   }
   .evui-select-search:focus{
     border-color: #66afe8;
     outline: 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  }
+  .evui-selectbox-select-count-tag {
+    display: inline-flex;
+    width: 35px;
+    height: 100%;
+    padding: 0 2px;
+    border: 1px solid #e9eaec;
+    border-radius: 3px;
+    background: #f0f2f5;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /** size **/
+  .evui-selectbox-size-small {
+    width: 90px;
+    height: 18px;
+    font-size: 11px;
+  }
+  .evui-selectbox-size-medium {
+    width: 140px;
+    height: 25px;
+    font-size: 12px;
+  }
+  .evui-selectbox-size-large {
+    width: 180px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .evui-selectbox-size-small .evui-selectbox-select-field { padding: 1px 12px 1px 2px; }
+  .evui-selectbox-size-medium .evui-selectbox-select-field { padding: 2px 19px 2px 3px; }
+  .evui-selectbox-size-large .evui-selectbox-select-field { padding: 2px 23px 2px 4px; }
+
+  .evui-selectbox-size-small .evui-selectbox-arrow-icon{
+    right: 1px;
+    margin-top: -3px;
+  }
+  .evui-selectbox-size-medium .evui-selectbox-arrow-icon{
+    right: 4px;
+    margin-top: -4px;
+  }
+  .evui-selectbox-size-large .evui-selectbox-arrow-icon{
+    right: 7px;
+    margin-top: -4px;
+  }
+
+  .evui-selectbox-size-small .evui-selectbox-arrow-icon-rotate-180{
+    right: 4px;
+    margin-top: -7px;
+  }
+  .evui-selectbox-size-medium .evui-selectbox-arrow-icon-rotate-180{
+    right: 7px;
+    margin-top: -6px;
+  }
+  .evui-selectbox-size-large .evui-selectbox-arrow-icon-rotate-180{
+    right: 8px;
+  }
+
+  .evui-selectbox-size-small .evui-selectbox-tag-close{
+    font-size: 10px;
+    transform: scale(0.9);
+  }
+  .evui-selectbox-size-medium .evui-selectbox-tag-close{
+    transform: scale(0.8);
+  }
+  .evui-selectbox-size-large .evui-selectbox-tag-close{
+    transform: scale(0.8);
+  }
+
+  .evui-selectbox-size-small .evui-selectbox-tag-close-scale{
+     transform: scale(0.6);
+   }
+  .evui-selectbox-size-medium .evui-selectbox-tag-close-scale{
+    transform: scale(0.5);
+  }
+  .evui-selectbox-size-large .evui-selectbox-tag-close-scale{
+    transform: scale(0.45);
   }
 </style>

@@ -5,6 +5,7 @@
       :class="`${prefixCls}-multiple-input-area`"
     >
       <input
+        ref="filterInputText"
         :disabled="disabled"
         type="text"
         class="input-text"
@@ -27,6 +28,7 @@
           <Listbox
             :style="listBoxStyle"
             :is-group="true"
+            :size="size"
             :items="item.items"
             :selected-items="selectedItems"
             @select="onSelect"
@@ -72,6 +74,14 @@
         type: Boolean,
         default: false,
       },
+      size: {
+        type: String,
+        default: 'medium',
+        validator(value) {
+          const list = ['small', 'medium', 'large'];
+          return list.indexOf(value) > -1;
+        },
+      },
       multiple: {
         type: Boolean,
         default: false,
@@ -113,8 +123,9 @@
   .evui-dropdown{
     position: absolute;
     width: 100%;
-    height: calc(100% + 8px);
+    height: 35px;
     border: 1px solid #ccc;
+    background-color: #fff;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -160,7 +171,7 @@
   }
   .evui-dropdown-single-area {
     position: absolute;
-    width: 100%;
+    min-width: 100%;
     max-height: 150px;
     border: 1px solid #ccc;
     -webkit-border-radius: 4px;
