@@ -3,7 +3,6 @@
     <ev-selectbox
       ref="selectbox"
       v-model="selectedValue"
-      :style="boxInfo.selectboxStyle"
       :read-only="true"
       :init-select="'item_2'"
       :items="boxInfo.items"
@@ -38,10 +37,6 @@
 
         boxInfo = {
           name: 'nomalCbBox',
-          selectboxStyle: {
-            width: '180px',
-            height: '30px',
-          },
           items: itemList,
         };
 
@@ -54,5 +49,6 @@
   .selectbox-read-only{
     display: inline-block;
     margin-left: 5px;
+    font-size: 14px;
   }
 </style>

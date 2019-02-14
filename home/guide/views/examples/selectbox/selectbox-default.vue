@@ -4,15 +4,19 @@
       ref="selectbox"
       v-model="selectedValue"
       :name="boxInfo.name"
-      :style="boxInfo.selectboxStyle"
       :init-select="'item_1'"
       :items="boxInfo.items"
       @keyup="onKeyUp"
       @select="onSelect"
     />
-    <ev-button @click="onClickBtn">select value (item_3)</ev-button>
+    <ev-button
+      :size="'small'"
+      @click="onClickBtn"
+    >
+      select value (item_3)
+    </ev-button>
     <br><br>
-    selected value : <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
+    value: <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
     <br><br><br><br><br><br><br><br><br><br><br><br>
   </div>
 </template>
@@ -23,11 +27,6 @@
         boxInfo: this._getBoxInfo(),
         selectedValue: '',
       };
-    },
-    watch: {
-      selectedValue(value) {
-        console.log(`value: ${value}`);
-      },
     },
     methods: {
       onSelect(item, target, index) {
@@ -55,10 +54,6 @@
 
         boxInfo = {
           name: 'nomalCbBox',
-          selectboxStyle: {
-            width: '180px',
-            height: '30px',
-          },
           items: itemList,
         };
 
@@ -71,5 +66,6 @@
   .selectbox-default{
     display: inline-block;
     margin-left: 5px;
+    font-size: 14px;
   }
 </style>
