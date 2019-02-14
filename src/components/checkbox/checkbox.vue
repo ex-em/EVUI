@@ -25,7 +25,7 @@
     >
     <label
       :for="`${checkboxId}_${value}`"
-      :class="[dataSize, dataType]"
+      :class="[dataSize, dataType, dataAfterType]"
       class="ev-checkbox-label"
     >
       <slot/>
@@ -59,6 +59,10 @@
         type: String,
         default: '',
       },
+      afterType: {
+        type: String,
+        default: '',
+      },
     },
     data() {
       return {
@@ -67,6 +71,7 @@
         groupBindValue: [],
         dataSize: this.size,
         dataType: this.type,
+        dataAfterType: this.afterType,
       };
     },
     computed: {
@@ -195,6 +200,16 @@
     left: 6px;
     width: 6px;
     height: 6px;
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label.minus:after {
+    left: 5px;
+    width: 12px;
+    height: 4px;
+    border-radius: 0;
+  }
+  .ev-checkbox-input:checked + .ev-checkbox-label.minus.small:after {
+    width: 8px;
+    height: 2px;
   }
   .ev-checkbox-input:checked + .ev-checkbox-label:after {
     background: #41B7FD;

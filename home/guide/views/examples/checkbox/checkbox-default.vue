@@ -81,6 +81,79 @@
     <br>
     <br>
     <br>
+    <h5># minus</h5>
+    <br>
+    <Checkbox
+      :value="bindValue6"
+      v-model="vModel6"
+      :after-type="`minus`"
+      class="checkboxStyle"
+    >
+      Single Circle Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue7"
+      v-model="vModel7"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Small Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue8"
+      v-model="vModel8"
+      :disabled="true"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Small Minus Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue9"
+      v-model="vModel9"
+      :type="`square`"
+      :after-type="`minus`"
+      class="checkboxStyle"
+    >
+      Single Square Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue100"
+      v-model="vModel100"
+      :type="`square`"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Small Minus Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue101"
+      v-model="vModel101"
+      :disabled="true"
+      :type="`square`"
+      :after-type="`minus`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Small Minus Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <br>
+    <br>
     <br>
   </div>
 </template>
@@ -104,6 +177,18 @@
         vModel4: false,
         bindValue5: 'value05',
         vModel5: true,
+        bindValue6: 'value06',
+        vModel6: true,
+        bindValue7: 'value07',
+        vModel7: true,
+        bindValue8: 'value08',
+        vModel8: true,
+        bindValue9: 'value09',
+        vModel9: true,
+        bindValue100: 'value100',
+        vModel100: true,
+        bindValue11: 'value101',
+        vModel101: true,
       };
     },
     methods: {
