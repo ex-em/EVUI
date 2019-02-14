@@ -376,11 +376,11 @@
         if (this.isGroup) {
           let itemRowIdx = 0;
 
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+          for (let ix = 0; ix < this.items.length; ix++) {
             groupObj = this.items[ix];
             groupItems = groupObj.items || [];
 
-            for (let jx = 0, jxLen = groupItems.length; jx < jxLen; jx++) {
+            for (let jx = 0; jx < groupItems.length; jx++) {
               item = groupItems[jx];
 
               if (item && itemRowIdx === idx) {
