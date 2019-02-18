@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import DataStore from './data';
 
 export default class SunburstDataStore extends DataStore {

@@ -5,7 +5,7 @@
   consistent-return:
     ["error", { "treatUndefinedAsUnspecified": true }]
 */
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 class Calendar {
   constructor(target, options) {

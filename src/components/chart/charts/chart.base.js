@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import moment from 'moment';
 import { CHART_AXIS_TYPE } from '../core/core.constant';
 import DataStore from '../core/data/data';

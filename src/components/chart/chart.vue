@@ -6,7 +6,7 @@
   />
 </template>
 <script>
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 

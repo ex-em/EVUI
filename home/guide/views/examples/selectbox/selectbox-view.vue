@@ -26,6 +26,8 @@
 <script>
   import codeView from '@/components/codeview/code';
   import selectboxDefault from './selectbox-default';
+  import selectboxSize from './selectbox-size';
+  import selectboxReadOnly from './selectbox-read-only';
   import selectboxDisabled from './selectbox-disabled';
   import selectboxMultiple from './selectbox-multiple';
   import selectboxGroup from './selectbox-group';
@@ -34,6 +36,8 @@
     components: {
       codeView,
       selectboxDefault,
+      selectboxSize,
+      selectboxReadOnly,
       selectboxDisabled,
       selectboxMultiple,
       selectboxGroup,
@@ -48,6 +52,20 @@
             description: `기본적인 selectbox 입니다.
                           입력박스에는 텍스트를 입력받아 필터기능을 사용할 수 있습니다.
                           화살표 버튼을 클릭하여 선택을 확장할 수 있습니다.`,
+          },
+          {
+            title: 'Size',
+            component: selectboxSize,
+            url: './guide/views/examples/selectbox/selectbox-size.vue',
+            description: `selectbox 크기를 설정할 수 있습니다.
+                          크기: small, medium, large (기본 값은 medium 입니다)`,
+          },
+          {
+            title: 'Read Only',
+            component: selectboxReadOnly,
+            url: './guide/views/examples/selectbox/selectbox-read-only.vue',
+            description: `selectbox 의 input field 에 입력을 막을 수 있습니다.
+                          read-only 속성을 true 로 설정하십시오.`,
           },
           {
             title: 'Disabled',
