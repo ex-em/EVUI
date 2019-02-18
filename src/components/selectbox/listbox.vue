@@ -1,5 +1,5 @@
 <template>
-  <div class="evui-listbox">
+  <div class="prefixCls">
     <ul
       :class="ulClasses"
       @click.stop="onClick"
@@ -17,8 +17,22 @@
 </template>
 
 <script>
+  const prefixCls = 'evui-listbox';
+
   export default {
     props: {
+      isGroup: {
+        type: Boolean,
+        default: false,
+      },
+      size: {
+        type: String,
+        default: 'medium',
+        validator(value) {
+          const list = ['small', 'medium', 'large'];
+          return list.indexOf(value) > -1;
+        },
+      },
       items: {
         type: Array,
         default() {
@@ -31,18 +45,15 @@
           return [];
         },
       },
-      isGroup: {
-        type: Boolean,
-        default: false,
-      },
     },
     data() {
       return {
+        prefixCls,
         ulClasses: '',
       };
     },
     created() {
-      this.ulClasses = this.isGroup ? 'evui-listbox-ul-group' : 'evui-listbox-ul';
+      this.ulClasses = this.isGroup ? `${prefixCls}-ul-group` : `${prefixCls}-ul`;
     },
     methods: {
       onClick(event) {
@@ -60,16 +71,12 @@
         }
       },
       getLiClasses(item) {
-        const classList = [];
         const foundItem = this.selectedItems.find(obj => obj.name === item.name);
 
-        classList.push('evui-listbox-li');
-
-        if (foundItem) {
-          classList.push('selected');
-        }
-
-        return classList;
+        return {
+          [`${prefixCls}-li`]: true,
+          [`${prefixCls}-li-selected`]: !!foundItem,
+        };
       },
     },
   };
@@ -78,7 +85,7 @@
 <style scoped>
   .evui-listbox{
     width: 100%;
-    height: 100%
+    height: 100%;
   }
   .evui-listbox-ul{
     list-style-type: none;
@@ -90,17 +97,20 @@
   .evui-listbox-li{
     display: block;
     list-style: none;
-    padding: 7px 16px;
     color: #495060;
     white-space: nowrap;
     cursor: pointer;
     transition: background .1s ease-in-out;
   }
-  .evui-listbox-li:hover{
+  .evui-listbox-li:hover:not(.evui-listbox-li-selected){
     background-color: #eeeeee;
   }
-  .evui-listbox-li.selected{
+  .evui-listbox-li-selected {
     color: #fff;
     background-color: #337ab6;
   }
+
+  .evui-selectbox-size-small .evui-listbox-li { padding: 7px; }
+  .evui-selectbox-size-medium .evui-listbox-li { padding: 7px; }
+  .evui-selectbox-size-large .evui-listbox-li { padding: 7px 10px; }
 </style>
