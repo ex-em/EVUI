@@ -6,7 +6,7 @@
   />
 </template>
 <script>
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import { getQuantity } from '@/common/utils';
   import LineChart from './charts/chart.line';
   import ScatterChart from './charts/chart.scatter';
