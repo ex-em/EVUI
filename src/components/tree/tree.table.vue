@@ -244,7 +244,7 @@
 <script>
   import util from '@/common/utils.table';
   import treeUtil from '@/components/tree/tree.util';
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import '@/styles/all.css';
 
   export default {

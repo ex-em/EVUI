@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import BaseChart from './chart.base';
 import PieDataStore from '../core/data/data.pie';
 
