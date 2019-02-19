@@ -183,35 +183,31 @@
       },
     },
     watch: {
+      items: {
+        deep: true,
+        handler(newItems) {
+          this.listBoxItems = newItems.slice();
+          this.initSelectedItems();
+        },
+      },
       selectedItems(items) {
-        let value;
+        let value = null;
 
         if (this.multiple) {
           value = [];
           items.map(obj => value.push(obj.value));
         } else {
-          value = items[0].value;
+          value = items[0] ? items[0].value : null;
         }
 
         this.$emit('change-selected-value', value);
       },
     },
     created() {
-      let item;
       this.listBoxItems = this.items.slice();
 
       this.dropdownStyle.border = this.multiple ? 1 : 0;
-
-      if (this.initSelect != null) {
-        item = this.getItemBySelect(this.initSelect);
-      } else if (this.initSelectIdx != null) {
-        item = this.getItemByIndex(this.initSelectIdx);
-      }
-
-      if (item) {
-        this.inputText = item.name;
-        this.selectedItems.push(item);
-      }
+      this.initSelectedItems();
     },
     methods: {
       onClick() {
@@ -229,8 +225,6 @@
           this.$refs.dropdown.$refs.filterInputText.value = '';
         }
 
-        this.listBoxItems = this.items.slice();
-
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
@@ -240,6 +234,7 @@
       onKeyUpInputTxt(e) {
         let foundItem;
         const value = e.target.value;
+        const items = this.items.slice();
 
         this.filterItems(value);
 
@@ -247,7 +242,7 @@
           this.inputText = value;
           this.selectedItems.length = 0;
 
-          foundItem = this.items.find(obj => obj.name === value);
+          foundItem = items.find(obj => obj.name === value);
 
           if (foundItem) {
             this.selectedItems.push(foundItem);
@@ -255,6 +250,18 @@
         }
 
         this.$emit('keyup', e);
+      },
+      initSelectedItems() {
+        let item;
+
+        if (this.initSelect != null) {
+          item = this.getItemBySelect(this.initSelect);
+        } else if (this.initSelectIdx != null) {
+          item = this.getItemByIndex(this.initSelectIdx);
+        }
+
+        this.inputText = item ? item.name : '';
+        this.selectedItems = item ? [item] : [];
       },
       select(value) {
         const item = this.getItemBySelect(value);
@@ -305,13 +312,15 @@
         this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
       },
       filterItems(value) {
+        const items = this.items.slice();
+
         if (!value || value.length === 0) {
-          this.listBoxItems = this.items.slice();
+          this.listBoxItems = items;
           return;
         }
 
         if (this.isGroup) {
-          this.listBoxItems = this.items.reduce((preArr, groupObj) => {
+          this.listBoxItems = items.reduce((preArr, groupObj) => {
             let groupItems = groupObj.items;
 
             groupItems = groupItems.filter(item => item && item.name.includes(value));
@@ -326,7 +335,7 @@
             return preArr;
           }, []);
         } else {
-          this.listBoxItems = this.items.filter(obj => obj && obj.name.includes(value));
+          this.listBoxItems = items.filter(obj => obj && obj.name.includes(value));
         }
       },
       hideDropdown() {
@@ -350,10 +359,11 @@
         let groupObj;
         let groupItems;
         let foundItem;
+        const items = this.listBoxItems.slice();
 
         if (this.isGroup) {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
+          for (let ix = 0, ixLen = items.length; ix < ixLen; ix++) {
+            groupObj = items[ix];
             groupItems = groupObj.items || [];
             foundItem = groupItems.find(item => item.value === value);
 
@@ -362,7 +372,7 @@
             }
           }
         } else {
-          foundItem = this.items.find(item => item.value === value);
+          foundItem = items.find(item => item.value === value);
         }
 
         return foundItem;
@@ -372,12 +382,13 @@
         let groupItems;
         let foundItem;
         let item;
+        const items = this.listBoxItems.slice();
 
         if (this.isGroup) {
           let itemRowIdx = 0;
 
-          for (let ix = 0; ix < this.items.length; ix++) {
-            groupObj = this.items[ix];
+          for (let ix = 0; ix < items.length; ix++) {
+            groupObj = items[ix];
             groupItems = groupObj.items || [];
 
             for (let jx = 0; jx < groupItems.length; jx++) {
@@ -396,7 +407,7 @@
             }
           }
         } else {
-          foundItem = this.items[idx];
+          foundItem = items[idx];
         }
 
         return foundItem;

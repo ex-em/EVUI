@@ -3,9 +3,8 @@
     <ev-selectbox
       ref="selectbox"
       v-model="selectedValue"
-      :name="boxInfo.name"
       :init-select="'item_1'"
-      :items="boxInfo.items"
+      :items="items"
       @keyup="onKeyUp"
       @select="onSelect"
     />
@@ -24,8 +23,8 @@
   export default {
     data() {
       return {
-        boxInfo: this._getBoxInfo(),
         selectedValue: '',
+        items: this.getItems(),
       };
     },
     methods: {
@@ -38,12 +37,11 @@
       onClickBtn() {
         this.$refs.selectbox.select('item_3');
       },
-      _getBoxInfo() {
-        let boxInfo = {};
-        const itemList = [];
+      getItems() {
         let value;
+        const itemList = [];
 
-        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
+        for (let ix = 0; ix < 5; ix++) {
           value = `item_${ix}`;
 
           itemList.push({
@@ -52,12 +50,7 @@
           });
         }
 
-        boxInfo = {
-          name: 'nomalCbBox',
-          items: itemList,
-        };
-
-        return boxInfo;
+        return itemList;
       },
     },
   };

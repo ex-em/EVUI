@@ -3,10 +3,9 @@
     <div class="selectbox-group-left">
       <ev-selectbox
         v-model="selectedValue1"
-        :name="'groupCbBox'"
         :is-group="true"
         :init-select-idx="3"
-        :items="getGroupItemList()"
+        :items="items1"
       />
       <br><br>
       value: <span style="font-weight: bold; color: blue;">{{ selectedValue1 }}</span>
@@ -14,11 +13,10 @@
     <div class="selectbox-group-right">
       <ev-selectbox
         v-model="selectedValue2"
-        :name="'groupMultipleCbBox'"
         :is-group="true"
         :multiple="true"
         :init-select-idx="3"
-        :items="getGroupItemList()"
+        :items="items2"
       />
       <br><br>
       value: <span style="font-weight: bold; color: blue;">{{ selectedValue2 }}</span>
@@ -32,23 +30,25 @@
       return {
         selectedValue1: '',
         selectedValue2: '',
+        items1: this.getItems(),
+        items2: this.getItems(),
       };
     },
     methods: {
-      getGroupItemList() {
+      getItems() {
         const itemList = [];
         let groupObj;
         let groupName;
         let value;
 
-        for (let ix = 0, ixLen = 20; ix < ixLen; ix++) {
+        for (let ix = 0; ix < 20; ix++) {
           groupName = `group_${ix}`;
           groupObj = {
             groupName,
             items: [],
           };
 
-          for (let jx = 0, jxLen = 3; jx < jxLen; jx++) {
+          for (let jx = 0; jx < 3; jx++) {
             value = `${groupName} > item_${jx}`;
 
             groupObj.items.push({

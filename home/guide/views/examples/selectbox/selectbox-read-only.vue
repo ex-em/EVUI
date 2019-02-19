@@ -5,7 +5,7 @@
       v-model="selectedValue"
       :read-only="true"
       :init-select="'item_2'"
-      :items="boxInfo.items"
+      :items="items"
     />
     <br><br>
     selected value: <span style="font-weight: bold; color: blue;">{{ selectedValue }}</span>
@@ -16,17 +16,16 @@
   export default {
     data() {
       return {
-        boxInfo: this._getBoxInfo(),
         selectedValue: '',
+        items: this.getItems(),
       };
     },
     methods: {
-      _getBoxInfo() {
-        let boxInfo = {};
+      getItems() {
         const itemList = [];
         let value;
 
-        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
+        for (let ix = 0; ix < 5; ix++) {
           value = `item_${ix}`;
 
           itemList.push({
@@ -35,12 +34,7 @@
           });
         }
 
-        boxInfo = {
-          name: 'nomalCbBox',
-          items: itemList,
-        };
-
-        return boxInfo;
+        return itemList;
       },
     },
   };

@@ -16,7 +16,7 @@
           :size="'small'"
           :multiple="true"
           :init-select-idx="0"
-          :items="getItemList()"
+          :items="items0"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -32,7 +32,7 @@
           :size="'medium'"
           :multiple="true"
           :init-select-idx="1"
-          :items="getItemList()"
+          :items="items1"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -48,7 +48,7 @@
           :size="'large'"
           :multiple="true"
           :init-select-idx="2"
-          :items="getItemList()"
+          :items="items2"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -73,7 +73,7 @@
           :size="'small'"
           :multiple="true"
           :init-select-idx="0"
-          :items="getItemList()"
+          :items="items3"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -91,7 +91,7 @@
           :name="'box_4'"
           :multiple="true"
           :init-select-idx="1"
-          :items="getItemList()"
+          :items="items4"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -109,7 +109,7 @@
           :name="'box_5'"
           :multiple="true"
           :init-select-idx="2"
-          :items="getItemList()"
+          :items="items5"
         />
         <br><br>
         <span style="font-size: 12px;">value: </span>
@@ -130,6 +130,12 @@
         vModel3: '',
         vModel4: '',
         vModel5: '',
+        items0: this.getItemList(),
+        items1: this.getItemList(),
+        items2: this.getItemList(),
+        items3: this.getItemList(),
+        items4: this.getItemList(),
+        items5: this.getItemList(),
         customStyle1: { width: '100px', height: '18px' },
         customStyle2: { width: '200px', height: '80px' },
         customStyle3: { width: '300px', height: '200px' },
@@ -140,7 +146,7 @@
         let value;
         const itemList = [];
 
-        for (let ix = 0, ixLen = 5; ix < ixLen; ix++) {
+        for (let ix = 0; ix < 5; ix++) {
           value = `item_${ix}`;
 
           itemList.push({
