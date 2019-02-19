@@ -115,7 +115,7 @@
 <script>
   import Checkbox from '@/components/checkbox/checkbox';
   import CheckboxGroup from '@/components/checkbox/checkbox-group';
-  import _ from 'lodash';
+  import _ from 'lodash-es';
 
   const allList = ['Base01', 'Base02', 'Base03', 'Base04'];
   export default {
