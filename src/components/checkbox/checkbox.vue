@@ -12,6 +12,7 @@
       type="checkbox"
       class="ev-checkbox-input"
       @change="change"
+      @click="click"
     >
     <input
       v-else
@@ -71,7 +72,7 @@
         groupBindValue: [],
         dataSize: this.size,
         dataType: this.type,
-        dataAfterType: this.afterType,
+        // dataAfterType: this.afterType,
       };
     },
     computed: {
@@ -99,6 +100,9 @@
           this.dataType = size;
         },
       },
+      dataAfterType() {
+        return this.afterType;
+      },
     },
     created() {
       this.isGroup = this.$parent.$options.componentName === 'CheckboxGroup';
@@ -109,6 +113,14 @@
           this.$parent.$emit('change-event', e);
         } else {
           this.$emit('change-event', e);
+          this.$emit('input', e.target.checked);
+        }
+      },
+      click(e) {
+        if (this.isGroup) {
+          this.$parent.$emit('click-event', e);
+        } else {
+          this.$emit('click-event', e);
           this.$emit('input', e.target.checked);
         }
       },
