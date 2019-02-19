@@ -24,8 +24,11 @@ class Line {
     this.data = [];
   }
 
-  draw(context, chartRect, labelOffset, axesSteps) {
-    const ctx = context;
+  draw(param) {
+    const ctx = param.ctx;
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
 
     ctx.beginPath();
     ctx.lineJoin = 'round';

@@ -71,4 +71,23 @@ export default {
 
     return { width, height };
   },
+
+  getStringMinMax(array) {
+    const minMax = {
+      min: array[0],
+      max: array[0],
+    };
+
+    array.forEach((item) => {
+      if (minMax.max.length < item.length) {
+        minMax.max = item;
+      }
+
+      if (minMax.min.length > item.length) {
+        minMax.min = item;
+      }
+    });
+
+    return minMax;
+  },
 };

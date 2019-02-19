@@ -1,15 +1,14 @@
 const module = {
-  horizontal: false,
-  createDataSet(target, data, label) {
-    Object.keys(target).forEach((key) => {
-      const series = target[key];
+  createDataSet(data, label) {
+    Object.keys(this.seriesList).forEach((key) => {
+      const series = this.seriesList[key];
 
       if (data[key]) {
         if (series.isExistGrp && series.stackIndex) {
-          const bs = target[series.bsId];
-          series.data = this.addStack(data[key], label, bs.data, series.stackIndex);
+          const bs = this.seriesList[series.bsId];
+          series.data = this.addSeriesStackDS(data[key], label, bs.data, series.stackIndex);
         } else {
-          series.data = this.addSeriesDataSet(data[key], label);
+          series.data = this.addSeriesDS(data[key], label);
         }
 
         series.minMax = this.getSeriesMinMax(series.data);
@@ -17,7 +16,9 @@ const module = {
     });
   },
 
-  addStack(data, label, base, sIdx = 0) {
+  addSeriesStackDS(data, label, base, sIdx = 0) {
+    const isHorizontal = this.options.horizontal;
+
     return data.map((curr, index) => {
       let bdata = base[index];
       let odata = curr;
@@ -25,12 +26,13 @@ const module = {
       let gdata = curr;
 
       if (gdata && typeof gdata === 'object') {
-        odata = this.horizontal ? curr.x : curr.y;
-        ldata = this.horizontal ? curr.y : curr.x;
+        odata = isHorizontal ? curr.x : curr.y;
+        ldata = isHorizontal ? curr.y : curr.x;
+        this.addIntegratedLabels(ldata);
       }
 
       if (sIdx > 0) {
-        gdata = (this.horizontal ? bdata.x : bdata.y) + odata;
+        gdata = (isHorizontal ? bdata.x : bdata.y) + odata;
         bdata = bdata.y;
       } else {
         gdata = odata;
@@ -41,14 +43,17 @@ const module = {
     });
   },
 
-  addSeriesDataSet(data, label) {
+  addSeriesDS(data, label) {
+    const isHorizontal = this.options.horizontal;
+
     return data.map((curr, index) => {
       let gdata = curr;
       let ldata = label[index];
 
       if (gdata && typeof gdata === 'object') {
-        gdata = this.horizontal ? curr.x : curr.y;
-        ldata = this.horizontal ? curr.y : curr.x;
+        gdata = isHorizontal ? curr.x : curr.y;
+        ldata = isHorizontal ? curr.y : curr.x;
+        this.addIntegratedLabels(ldata);
       }
 
       return this.addData(gdata, ldata);
@@ -58,13 +63,19 @@ const module = {
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
 
-    if (this.horizontal) {
+    if (this.options.horizontal) {
       data = { x: gdata, y: ldata, o: odata, b: bdata, xp: null, yp: null, w: null, h: null };
     } else {
       data = { x: ldata, y: gdata, o: odata, b: bdata, xp: null, yp: null, w: null, h: null };
     }
 
     return data;
+  },
+
+  addIntegratedLabels(value) {
+    if (this.integratedLabels.indexOf(`${value}`) < 0) {
+      this.integratedLabels.push(`${value}`);
+    }
   },
 
   getSeriesMinMax(data) {
@@ -93,19 +104,19 @@ const module = {
     return def;
   },
 
-  getStoreMinMax(seriesList) {
-    const keys = Object.keys(seriesList);
+  getStoreMinMax() {
+    const keys = Object.keys(this.seriesList);
     const def = {
       x: [{ min: null, max: null }],
       y: [{ min: null, max: null }],
     };
 
     if (keys.length) {
-      const init = seriesList[keys[0]].minMax || def;
+      const init = this.seriesList[keys[0]].minMax || def;
 
       return keys.reduce((acc, key) => {
         const minmax = acc;
-        const series = seriesList[key];
+        const series = this.seriesList[key];
         const smm = series.minMax;
         const axisX = series.xAxisIndex;
         const axisY = series.yAxisIndex;

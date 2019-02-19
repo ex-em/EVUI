@@ -24,8 +24,11 @@ class Scatter {
     this.data = [];
   }
 
-  draw(context, chartRect, labelOffset, axesSteps) {
-    const ctx = context;
+  draw(param) {
+    const ctx = param.ctx;
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
 
     let x;
     let y;

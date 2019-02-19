@@ -30,14 +30,12 @@
           },
         },
         lineOptions: {
-          type: 'line',
           width: '100%',
           height: '100%',
           title: {
             text: 'Title Test',
             show: true,
           },
-          thickness: 0.8,
           legend: {
             show: true,
             position: 'right',
