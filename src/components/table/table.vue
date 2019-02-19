@@ -84,6 +84,7 @@
                           >
                             <ev-checkbox
                               v-model="row[col.field]"
+                              :size="'small'"
                               @change-event="changeCheckbox($event, row, col.field, col.checkType)"
                             />
                           </div>
@@ -1288,17 +1289,17 @@
       },
       changeCheckbox(value, row, field, type) {
         const data = row;
-        const checkedData = _.filter(this.originData, d => d[field] === true);
+        const checked = value.target.checked;
+        const checkedData = _.filter(this.originData, d => d !== row && d[field] === true);
         if (type === 'single' && checkedData.length) {
           this.$set(checkedData[0], field, false);
         }
         if (type === 'single') {
           checkedData[0] = data;
         }
-        this.$set(data, field, value);
+        this.$set(data, field, checked);
       },
       rowSelect(row) {
-        console.log('#1', row);
         if (!row.$evuiSelected) {
           if (this.select === 'single') {
             if (this.selectedData) {
@@ -1316,14 +1317,12 @@
         if (this.select === 'none') {
           return;
         }
-        console.log('clickEvent');
         if (this.select === 'single') {
           this.rowSelect(row);
         }
         this.$emit('rowClick', event, row);
       },
       getCheckedData(field) {
-        console.log(field);
         const result = _.filter(this.originData, data => data[field] === true);
         return result;
       },
@@ -1371,7 +1370,6 @@
         });
       },
       hideTextField(row, field) {
-        console.log('##focus##', row, field);
         const rowData = row;
         rowData[`$${field}Edit`] = false;
         this.draw();
