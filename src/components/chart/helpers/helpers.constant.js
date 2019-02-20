@@ -35,6 +35,18 @@ export const LINE_OPTION = {
   fillOpacity: 0.4,
 };
 
+export const BAR_OPTION = {
+  color: '#000',
+  show: true,
+  highlight: {
+    pointSize: 5,
+  },
+  xAxisIndex: 0,
+  yAxisIndex: 0,
+  fillColor: '#000',
+};
+
+
 export const AXIS_OPTION = {
   min: null,
   max: null,

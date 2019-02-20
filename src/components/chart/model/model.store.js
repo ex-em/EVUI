@@ -33,7 +33,7 @@ const module = {
 
       if (sIdx > 0) {
         gdata = (isHorizontal ? bdata.x : bdata.y) + odata;
-        bdata = bdata.y;
+        bdata = isHorizontal ? bdata.x : bdata.y;
       } else {
         gdata = odata;
         bdata = 0;

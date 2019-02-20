@@ -1,5 +1,5 @@
 export default {
-  calculateX(value, min, max, area, startPoint) {
+  calculateX(value, min, max, area, startPoint = 0) {
     if (value === null) {
       return null;
     }
@@ -12,7 +12,7 @@ export default {
     return Math.ceil(startPoint + (scalingFactor * (value - min)));
   },
 
-  calculateY(value, min, max, area, startPoint) {
+  calculateY(value, min, max, area, startPoint = 0) {
     let calcY;
 
     if (value === null) {

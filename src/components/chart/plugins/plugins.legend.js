@@ -2,12 +2,10 @@ const module = {
   initLegend() {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
-    this.legendBoxDOM.count = 0;
     // event delegation
     this.legendBoxDOM.addEventListener('click', (e) => {
       const opt = this.options.legend;
       const type = e.target.evcType;
-      const box = e.currentTarget;
 
       let targetDOM;
       if (type === 'container') {
@@ -23,16 +21,16 @@ const module = {
       const isActive = !colorDOM.className.includes('inactive');
       const series = nameDOM.series;
 
-      if (isActive && box.count === 1) {
+      if (isActive && this.showSeriesCount === 1) {
         return;
       }
 
       if (isActive) {
-        box.count--;
+        this.showSeriesCount--;
         colorDOM.style.backgroundColor = opt.inactive;
         nameDOM.style.color = opt.inactive;
       } else {
-        box.count++;
+        this.showSeriesCount++;
         colorDOM.style.backgroundColor = series.color;
         nameDOM.style.color = opt.color;
       }
@@ -129,7 +127,7 @@ const module = {
     containerDOM.evcType = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
-    this.legendBoxDOM.count++;
+    this.showSeriesCount++;
   },
   setLegendPosition(position) {
     const opt = this.options;

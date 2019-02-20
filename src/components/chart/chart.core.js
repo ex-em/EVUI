@@ -45,6 +45,7 @@ class EvChart {
 
     this.seriesList = {};
     this.chartRect = {};
+    this.showSeriesCount = 0;
     this.integratedLabels = this.data.labels.slice();
   }
 
@@ -113,16 +114,22 @@ class EvChart {
   }
 
   drawSeries() {
-    Object.keys(this.seriesList).forEach((series, index) => {
-      if (this.seriesList[series].show) {
-        this.seriesList[series].draw({
-          ctx: this.bufferCtx,
-          chartRect: this.chartRect,
-          labelOffset: this.labelOffset,
-          axesSteps: this.axesSteps,
-          isHorizontal: this.options.horizontal,
-          index,
-        });
+    let showIndex = 0;
+    Object.values(this.seriesList).forEach((series) => {
+      series.draw({
+        ctx: this.bufferCtx,
+        chartRect: this.chartRect,
+        labelOffset: this.labelOffset,
+        axesSteps: this.axesSteps,
+        isHorizontal: this.options.horizontal,
+        showSeriesCount: this.showSeriesCount,
+        integLabels: this.integratedLabels,
+        thickness: this.options.thickness,
+        showIndex,
+      });
+
+      if (series.show) {
+        showIndex++;
       }
     });
   }
