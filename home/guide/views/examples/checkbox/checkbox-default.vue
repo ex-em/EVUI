@@ -140,7 +140,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue101"
       v-model="vModel101"
       :disabled="true"
       :type="`square`"
@@ -178,7 +177,7 @@
         bindValue5: 'value05',
         vModel5: true,
         bindValue6: 'value06',
-        vModel6: true,
+        vModel6: false,
         bindValue7: 'value07',
         vModel7: true,
         bindValue8: 'value08',
@@ -187,7 +186,7 @@
         vModel9: true,
         bindValue100: 'value100',
         vModel100: true,
-        bindValue11: 'value101',
+        bindValue101: 'value101',
         vModel101: true,
       };
     },
