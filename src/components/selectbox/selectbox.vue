@@ -40,10 +40,11 @@
         v-else
         :disabled="disabled"
         :readonly="readOnly"
-        :class="inputTextClass"
-        :value="inputText"
+        :class="inputFieldClass"
+        :value="inputFieldValue"
         type="text"
-        @keyup="onKeyUpInputTxt"
+        @keyup="onKeyUpInputField"
+        @blur="onBlurInputField"
       >
       <i :class="arrowIconClass"/>
     </div>
@@ -60,7 +61,7 @@
         :items="listBoxItems"
         :selected-items="selectedItems"
         @select="onSelect"
-        @keyup="onKeyUpInputTxt"
+        @keyup="onKeyUpDropDownInputField"
       />
     </transition>
   </div>
@@ -147,12 +148,12 @@
         type: [String, Number, Array],
         default: null,
       },
-      initSelect: {
-        type: [String, Number],
+      initSelectValue: {
+        type: [String, Number, Array],
         default: null,
       },
       initSelectIdx: {
-        type: Number,
+        type: [Number, Array],
         default: null,
       },
       items: {
@@ -166,9 +167,10 @@
       return {
         prefixCls,
         selectboxClass: this.getSelectboxClass(),
-        inputTextClass: this.getInputTextClass(),
+        inputFieldClass: this.getInputFieldClass(),
         dropDownState: false,
-        inputText: '',
+        clickedValue: '',
+        inputFieldValue: '',
         listBoxItems: [],
         selectedItems: [],
       };
@@ -187,7 +189,7 @@
         deep: true,
         handler(newItems) {
           this.listBoxItems = newItems.slice();
-          this.initSelectedItems();
+          this.initSelect();
         },
       },
       selectedItems(items) {
@@ -207,7 +209,7 @@
       this.listBoxItems = this.items.slice();
 
       this.dropdownStyle.border = this.multiple ? 1 : 0;
-      this.initSelectedItems();
+      this.initSelect();
     },
     methods: {
       onClick() {
@@ -216,68 +218,93 @@
         }
 
         if (this.multiple) {
-          this.inputText = '';
+          this.inputFieldValue = '';
         }
+
+        this.listBoxItems = this.items.slice();
 
         if (!this.dropDownState &&
           this.$refs.dropdown &&
-          this.$refs.dropdown.$refs.filterInputText) {
-          this.$refs.dropdown.$refs.filterInputText.value = '';
+          this.$refs.dropdown.$refs.filterInputField) {
+          this.$refs.dropdown.$refs.filterInputField.value = '';
         }
 
         this.dropDownState = !this.dropDownState;
       },
       onSelect(item, target, index) {
-        this.selectByItem(item);
+        this.selectItem(item);
         this.$emit('select', item, target, index);
       },
-      onKeyUpInputTxt(e) {
-        let foundItem;
-        const value = e.target.value;
-        const items = this.items.slice();
-
-        this.filterItems(value);
-
-        if (!this.isGroup && !this.multiple) {
-          this.inputText = value;
-          this.selectedItems.length = 0;
-
-          foundItem = items.find(obj => obj.name === value);
-
-          if (foundItem) {
-            this.selectedItems.push(foundItem);
+      onKeyUpInputField(e) {
+        if (!this.readOnly) {
+          if (!this.dropDownState) {
+            this.dropDownState = true;
           }
+
+          this.inputFieldValue = e.target.value;
+          this.listBoxItems = this.getFilteredListBoxItems(this.inputFieldValue);
         }
 
         this.$emit('keyup', e);
       },
-      initSelectedItems() {
+      onBlurInputField(e) {
+        this.inputFieldValue = this.clickedValue;
+        this.$emit('blur', e);
+      },
+      onKeyUpDropDownInputField(e) {
+        this.listBoxItems = this.getFilteredListBoxItems(e.target.value);
+        this.$emit('keyup', e);
+      },
+      initSelect() {
         let item;
+        let value;
 
-        if (this.initSelect != null) {
-          item = this.getItemBySelect(this.initSelect);
+        this.selectedItems.length = 0;
+
+        if (this.initSelectValue != null) {
+          if (this.initSelectValue.constructor === Array) {
+            for (let ix = 0; ix < this.initSelectValue.length; ix++) {
+              value = this.initSelectValue[ix];
+              item = this.getItemByValue(value);
+              this.selectedItems.push(item);
+            }
+          } else {
+            item = this.getItemByValue(this.initSelectValue);
+            this.selectedItems.push(item);
+          }
         } else if (this.initSelectIdx != null) {
-          item = this.getItemByIndex(this.initSelectIdx);
+          if (this.initSelectIdx.constructor === Array) {
+            for (let ix = 0; ix < this.initSelectIdx.length; ix++) {
+              value = this.initSelectIdx[ix];
+              item = this.getItemByIndex(value);
+              this.selectedItems.push(item);
+            }
+          } else {
+            item = this.getItemByIndex(this.initSelectIdx);
+            this.selectedItems.push(item);
+          }
         }
 
-        this.inputText = item ? item.name : '';
-        this.selectedItems = item ? [item] : [];
+        if (!this.multiple) {
+          this.inputFieldValue = this.selectedItems.length ? this.selectedItems[0].name : '';
+          this.clickedValue = this.inputFieldValue;
+        }
       },
       select(value) {
-        const item = this.getItemBySelect(value);
+        const item = this.getItemByValue(value);
 
         if (item) {
-          this.selectByItem(item);
+          this.selectItem(item);
         }
       },
-      selectByIndex(idx) {
+      selectIndex(idx) {
         const item = this.getItemByIndex(idx);
 
         if (item) {
-          this.selectByItem(item);
+          this.selectItem(item);
         }
       },
-      selectByItem(item) {
+      selectItem(item) {
         if (!item) {
           return;
         }
@@ -294,7 +321,8 @@
             this.selectedItems.push(item);
           }
         } else {
-          this.inputText = itemName;
+          this.clickedValue = itemName;
+          this.inputFieldValue = itemName;
           this.selectedItems.length = 0;
           this.selectedItems.push(item);
         }
@@ -311,32 +339,36 @@
 
         this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
       },
-      filterItems(value) {
-        const items = this.items.slice();
+      getFilteredListBoxItems(value) {
+        let filteredItems;
+        let listBoxItems = [];
 
-        if (!value || value.length === 0) {
-          this.listBoxItems = items;
-          return;
-        }
+        if (value && value.length) {
+          if (this.isGroup) {
+            this.items.reduce((preArr, groupItem) => {
+              filteredItems = groupItem.items.filter(item => item && item.name.includes(value));
 
-        if (this.isGroup) {
-          this.listBoxItems = items.reduce((preArr, groupObj) => {
-            let groupItems = groupObj.items;
+              if (filteredItems.length > 0) {
+                preArr.push({
+                  groupName: groupItem.groupName,
+                  items: filteredItems,
+                });
+              }
 
-            groupItems = groupItems.filter(item => item && item.name.includes(value));
-
-            if (groupItems.length > 0) {
-              preArr.push({
-                groupName: groupObj.groupName,
-                items: groupItems,
-              });
-            }
-
-            return preArr;
-          }, []);
+              return preArr;
+            }, listBoxItems);
+          } else {
+            listBoxItems = this.items.filter(obj => obj && obj.name.includes(value));
+          }
         } else {
-          this.listBoxItems = items.filter(obj => obj && obj.name.includes(value));
+          listBoxItems = this.items;
         }
+
+        if (listBoxItems.length) {
+          listBoxItems = listBoxItems.slice();
+        }
+
+        return listBoxItems;
       },
       hideDropdown() {
         this.dropDownState = false;
@@ -348,22 +380,21 @@
           [`${prefixCls}-disabled`]: this.disabled,
         };
       },
-      getInputTextClass() {
+      getInputFieldClass() {
         return {
           [`${prefixCls}-input-text`]: true,
           [`${prefixCls}-input-text-readonly`]: this.readOnly,
           [`${prefixCls}-input-text-disabled`]: this.disabled,
         };
       },
-      getItemBySelect(value) {
+      getItemByValue(value) {
         let groupObj;
         let groupItems;
         let foundItem;
-        const items = this.listBoxItems.slice();
 
         if (this.isGroup) {
-          for (let ix = 0, ixLen = items.length; ix < ixLen; ix++) {
-            groupObj = items[ix];
+          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
+            groupObj = this.items[ix];
             groupItems = groupObj.items || [];
             foundItem = groupItems.find(item => item.value === value);
 
@@ -372,7 +403,11 @@
             }
           }
         } else {
-          foundItem = items.find(item => item.value === value);
+          foundItem = this.items.find(item => item.value === value);
+        }
+
+        if (foundItem) {
+          foundItem = JSON.parse(JSON.stringify(foundItem));
         }
 
         return foundItem;
@@ -382,13 +417,12 @@
         let groupItems;
         let foundItem;
         let item;
-        const items = this.listBoxItems.slice();
 
         if (this.isGroup) {
           let itemRowIdx = 0;
 
-          for (let ix = 0; ix < items.length; ix++) {
-            groupObj = items[ix];
+          for (let ix = 0; ix < this.items.length; ix++) {
+            groupObj = this.items[ix];
             groupItems = groupObj.items || [];
 
             for (let jx = 0; jx < groupItems.length; jx++) {
@@ -407,7 +441,11 @@
             }
           }
         } else {
-          foundItem = items[idx];
+          foundItem = this.items[idx];
+        }
+
+        if (foundItem) {
+          foundItem = JSON.parse(JSON.stringify(foundItem));
         }
 
         return foundItem;

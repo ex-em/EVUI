@@ -4,7 +4,7 @@
       ref="selectbox"
       v-model="selectedValue"
       :read-only="true"
-      :init-select="'item_2'"
+      :init-select-value="'item_2'"
       :items="items"
     />
     <br><br>

@@ -3,7 +3,7 @@
     <ev-selectbox
       ref="selectbox"
       v-model="selectedValue"
-      :init-select="'item_1'"
+      :init-select-value="'item_1'"
       :items="items"
       @keyup="onKeyUp"
       @select="onSelect"
