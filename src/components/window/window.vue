@@ -16,8 +16,11 @@
       @dblclick="headerDblClick"
     >
       <div :class="`${prefixCls}-title-area`">{{ title }}</div>
-      <div :class="`${prefixCls}-expand-btn-line`"/>
       <div
+        v-if="maximizable"
+        :class="`${prefixCls}-expand-btn-line`"/>
+      <div
+        v-if="maximizable"
         :class="`${prefixCls}-expand-btn`"
         @click="clickExpandBtn"
       />
@@ -65,6 +68,10 @@
           const list = ['destroy', 'hide'];
           return list.indexOf(value) > -1;
         },
+      },
+      maximizable: {
+        type: Boolean,
+        default: true,
       },
       resizable: {
         type: Boolean,

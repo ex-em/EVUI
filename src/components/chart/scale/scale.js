@@ -1,0 +1,207 @@
+import _merge from 'lodash/merge';
+import { AXIS_OPTION, AXIS_UNITS } from '../helpers/helpers.constant';
+import Util from '../helpers/helpers.util';
+
+class Scale {
+  constructor(type, opt, ctx) {
+    const merged = _merge({}, AXIS_OPTION, opt);
+    Object.keys(merged).forEach((key) => {
+      this[key] = merged[key];
+    });
+
+    this.type = type;
+    this.ctx = ctx;
+    this.units = AXIS_UNITS[this.type];
+
+    if (!this.position) {
+      this.position = type === 'x' ? 'bottom' : 'left';
+    }
+  }
+
+  calculateLabelRange(type, chartRect, labelOffset, tickSize) {
+    let chartSize;
+    let axisOffset;
+
+    if (type === 'x') {
+      chartSize = chartRect.chartWidth;
+      axisOffset = [labelOffset.left, labelOffset.right];
+    } else {
+      chartSize = chartRect.chartHeight;
+      axisOffset = [labelOffset.top, labelOffset.bottom];
+    }
+
+    const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
+    const minSteps = 2;
+    const maxSteps = Math.floor(drawRange / tickSize);
+
+    return {
+      min: minSteps,
+      max: maxSteps,
+    };
+  }
+
+  calculateScaleRange(minMax) {
+    let maxValue;
+    let minValue;
+
+    if (this.range && this.range.length === 2) {
+      maxValue = this.range[1];
+      minValue = this.range[0];
+    } else {
+      maxValue = minMax.max;
+      minValue = minMax.min;
+    }
+
+    if (this.autoScaleRatio) {
+      maxValue = Math.round(maxValue * (this.autoScaleRatio + 1));
+    }
+
+    if (this.startToZero) {
+      minValue = 0;
+    }
+
+    if (maxValue === minValue) {
+      maxValue += 1;
+    }
+
+    const minLabel = this.getLabelFormat(minValue);
+    const maxLabel = this.getLabelFormat(maxValue);
+
+    return {
+      min: minValue,
+      max: maxValue,
+      minLabel,
+      maxLabel,
+      size: Util.calcTextSize(maxLabel, Util.getLabelStyle(this.labelStyle)),
+    };
+  }
+
+  calculateSteps(range, skipFitting) {
+    const maxValue = range.maxValue;
+    const minValue = range.minValue;
+    const maxSteps = range.maxSteps;
+
+    let interval = this.getInterval(range);
+    let increase = minValue;
+    let numberOfSteps;
+
+    while (increase < maxValue) {
+      increase += interval;
+    }
+
+    const graphMax = increase;
+    const graphMin = minValue;
+    const graphRange = graphMax - graphMin;
+
+    numberOfSteps = Math.round(graphRange / interval);
+
+    if (maxValue === 1) {
+      interval = 0.2;
+      numberOfSteps = 5;
+    }
+
+    while (numberOfSteps > maxSteps && !skipFitting) {
+      interval *= 2;
+      numberOfSteps = Math.round(graphRange / interval);
+    }
+
+    return {
+      steps: numberOfSteps,
+      interval,
+      graphMin,
+      graphMax: Math.ceil(graphMin + (numberOfSteps * interval)),
+    };
+  }
+
+  draw(chartRect, labelOffset, stepInfo) {
+    const ctx = this.ctx;
+    const aPos = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
+    const steps = stepInfo.steps;
+    const axisMin = stepInfo.graphMin;
+    const stepValue = stepInfo.interval;
+
+    const startPoint = aPos[this.units.rectStart];
+    const endPoint = aPos[this.units.rectEnd];
+    const offsetPoint = aPos[this.units.rectOffset(this.position)];
+    const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+
+    // label font 설정
+    ctx.font = Util.getLabelStyle(this.labelStyle);
+
+    if (this.type === 'x') {
+      ctx.textAlign = 'center';
+      ctx.textBaseline = this.position === 'top' ? 'bottom' : 'top';
+    } else {
+      ctx.textAlign = this.position === 'left' ? 'right' : 'left';
+      ctx.textBaseline = 'middle';
+    }
+
+    ctx.fillStyle = this.labelStyle.color;
+    ctx.lineWidth = 1;
+    const aliasPixel = Util.aliasPixel(ctx.lineWidth);
+
+    ctx.beginPath();
+    ctx.strokeStyle = this.axisLineColor;
+    if (this.type === 'x') {
+      ctx.moveTo(startPoint, offsetPoint + aliasPixel);
+      ctx.lineTo(endPoint, offsetPoint + aliasPixel);
+    } else {
+      ctx.moveTo(offsetPoint + aliasPixel, startPoint);
+      ctx.lineTo(offsetPoint + aliasPixel, endPoint);
+    }
+    ctx.stroke();
+
+    if (steps === 0) {
+      return;
+    }
+
+    const labelGap = (endPoint - startPoint) / steps;
+    const ticks = [];
+    let labelCenter = null;
+    let linePosition = null;
+
+    ctx.beginPath();
+    ctx.strokeStyle = this.gridLineColor;
+
+    let labelText;
+    for (let ix = 0; ix <= steps; ix++) {
+      ticks[ix] = axisMin + (ix * stepValue);
+
+      labelCenter = Math.round(startPoint + (labelGap * ix));
+      linePosition = labelCenter + aliasPixel;
+      labelText = this.getLabelFormat(ticks[ix]);
+
+      let labelPoint;
+
+      if (this.type === 'x') {
+        labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+        ctx.fillText(labelText, labelCenter, labelPoint);
+
+        if (ix !== 0 && this.showGrid) {
+          ctx.moveTo(linePosition, offsetPoint);
+          ctx.lineTo(linePosition, offsetCounterPoint);
+        }
+      } else {
+        labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+        ctx.fillText(labelText, labelPoint, labelCenter);
+
+        if (ix !== 0 && this.showGrid) {
+          ctx.moveTo(offsetPoint, linePosition);
+          ctx.lineTo(offsetCounterPoint, linePosition);
+        }
+      }
+
+      ctx.stroke();
+    }
+
+    ctx.closePath();
+  }
+}
+
+export default Scale;
