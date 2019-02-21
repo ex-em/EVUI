@@ -30,16 +30,8 @@
           series: {
             series1: { name: 'series#1', show: true, type: 'line', fill: false, point: false },
           },
-          labels: [
-            +new Date('2017/01/01 00:00:00'),
-            +new Date('2017/01/01 00:01:00'),
-            +new Date('2017/01/01 00:02:00'),
-            +new Date('2017/01/01 00:03:00'),
-            +new Date('2017/01/01 00:04:00'),
-          ],
-          data: {
-            series1: [100, 150, 51, 150, 350],
-          },
+          labels: [],
+          data: {},
         },
         defaultLineChartOptions: {
           width: '100%',
@@ -70,10 +62,13 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:04:00',
+        timeValue: '2017-01-01 00:00:00',
         liveMode: false,
         event: null,
       };
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.liveInterval) {
@@ -87,20 +82,35 @@
         this.liveMode = !this.liveMode;
 
         if (this.liveMode) {
-          this.liveInterval = setInterval(this.addLiveData.bind(this), 1000);
+          this.liveInterval = setInterval(this.addLiveData.bind(this), 100);
         } else {
           clearTimeout(this.liveInterval);
         }
       },
       getRandomInt() {
-        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'm');
+        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
         this.defaultLineChartData.labels.shift();
         this.defaultLineChartData.data.series1.shift();
         this.defaultLineChartData.labels.push(this.timeValue);
         this.defaultLineChartData.data.series1.push(this.getRandomInt());
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [] };
+
+        for (let ix = 0; ix < 60; ix++) {
+          label.push(+moment(this.timeValue));
+          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
+          data.series1.push(null);
+        }
+        label.push(+moment(this.timeValue));
+        data.series1.push(null);
+
+        this.defaultLineChartData.labels = label;
+        this.defaultLineChartData.data = data;
       },
     },
   };
