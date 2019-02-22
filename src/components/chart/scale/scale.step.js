@@ -89,8 +89,7 @@ class StepScale extends Scale {
       return;
     }
 
-    const labelGap = (endPoint - startPoint) / steps;
-    const ticks = [];
+    const labelGap = (endPoint - startPoint) / labels.length;
     let labelCenter = null;
     let linePosition = null;
 
@@ -98,12 +97,10 @@ class StepScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    for (let ix = 0; ix <= steps; ix++) {
-      ticks[ix] = labels[ix];
-
+    for (let ix = 0; ix < labels.length; ix += stepInfo.interval) {
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel;
-      labelText = ticks[ix];
+      labelText = labels[ix];
 
       let labelPoint;
 

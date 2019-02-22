@@ -76,7 +76,7 @@ class Scale {
     };
   }
 
-  calculateSteps(range, skipFitting) {
+  calculateSteps(range) {
     const maxValue = range.maxValue;
     const minValue = range.minValue;
     const maxSteps = range.maxSteps;
@@ -100,7 +100,7 @@ class Scale {
       numberOfSteps = 5;
     }
 
-    while (numberOfSteps > maxSteps && !skipFitting) {
+    while (numberOfSteps > maxSteps) {
       interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
     }

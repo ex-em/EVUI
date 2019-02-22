@@ -6,6 +6,7 @@
   />
 </template>
 <script>
+  import moment from 'moment';
   import chart from '@/components/chart';
 
   export default {
@@ -16,23 +17,19 @@
       return {
         defaultData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'bar', fill: true, point: true },
+            series1: { name: 'series#1', show: true, type: 'bar' },
           },
           groups: [
+            ['series1'],
           ],
           labels: [
-            'aeeeeeeeeeee',
-            'b',
-            'c',
-            'd',
-            'e',
           ],
           data: {
-            series1: [100, 150, 51, 150, 350],
+            series1: [],
           },
         },
         lineOptions: {
-          thickness: 0.8,
+          thickness: 1,
           width: '100%',
           height: '100%',
           title: {
@@ -47,6 +44,7 @@
           axesX: [{
             type: 'step',
             showGrid: false,
+            mode: 'category',
           }],
           axesY: [{
             type: 'linear',
@@ -55,7 +53,11 @@
             showGrid: false,
           }],
         },
+        timeValue: '2017-01-01 00:00:00',
       };
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.interval) {
@@ -63,43 +65,34 @@
       }
     },
     mounted() {
-      setInterval(() => this.test1(), 1000);
+      setInterval(() => this.addLiveData(), 500);
     },
     methods: {
-      test1() {
-        this.$data.defaultData.data.series1 =
-          [
-            this.getRandomInt(),
-            this.getRandomInt(),
-            this.getRandomInt(),
-            this.getRandomInt(),
-            this.getRandomInt(),
-          ];
+      addLiveData() {
+        this.timeValue = moment(this.timeValue).add(1, 'seconds');
+        this.defaultData.labels.shift();
+        this.defaultData.data.series1.shift();
+        this.defaultData.labels.push(moment(this.timeValue).format('HH:mm:ss'));
+        this.defaultData.data.series1.push(this.getRandomInt());
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [] };
 
-        // this.$data.defaultData = {
-        //   series: {
-        //     series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-        //   },
-        //   labels: [
-        //     +new Date('2017/01/01 00:00:00'),
-        //     +new Date('2017/01/01 00:01:00'),
-        //     +new Date('2017/01/01 00:02:00'),
-        //     +new Date('2017/01/01 00:03:00'),
-        //     +new Date('2017/01/01 00:04:00'),
-        //   ],
-        //     data: {
-        //     series1: [
-        //       this.getRandomInt(),
-        //       this.getRandomInt(),
-        //       this.getRandomInt(),
-        //       this.getRandomInt(),
-        //       this.getRandomInt(),
-        //     ],
-        //   },
-        // };
+        for (let ix = 0; ix < 60; ix++) {
+          label.push(moment(this.timeValue).format('HH:mm:ss'));
+          this.timeValue = moment(this.timeValue).add(1, 'seconds');
+          data.series1.push(this.getRandomInt());
+        }
+        label.push(moment(this.timeValue).format('HH:mm:ss'));
+        data.series1.push(this.getRandomInt());
+
+        this.defaultData.labels = label;
+        this.defaultData.data = data;
       },
       getRandomInt() {
-        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        const rand = Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return rand < 10 ? null : rand;
       },
     },
   };
