@@ -19,9 +19,6 @@
           series: {
             series1: { name: 'series#1', show: true, type: 'bar' },
           },
-          groups: [
-            ['series1'],
-          ],
           labels: [
           ],
           data: {
@@ -44,7 +41,6 @@
           axesX: [{
             type: 'step',
             showGrid: false,
-            mode: 'category',
           }],
           axesY: [{
             type: 'linear',

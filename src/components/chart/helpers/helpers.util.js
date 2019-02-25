@@ -58,7 +58,7 @@ export default {
 
   calcTextSize(text, fontStyle) {
     const calc = document.createElement('span');
-    calc.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000;');
+    calc.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000px;');
     calc.style.font = fontStyle;
     calc.textContent = text;
     document.body.appendChild(calc);

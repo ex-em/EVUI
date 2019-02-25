@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -12,9 +13,9 @@ class StepScale extends Scale {
     return {
       min: minMax.min,
       max: minMax.max,
-      minLabel: minMax.min,
-      maxLabel: minMax.max,
-      size: Util.calcTextSize(minMax.max, Util.getLabelStyle(this.labelStyle)),
+      minLabel: this.getLabelFormat(minMax.min),
+      maxLabel: this.getLabelFormat(minMax.max),
+      size: Util.calcTextSize(this.getLabelFormat(minMax.max), Util.getLabelStyle(this.labelStyle)),
     };
   }
 
@@ -53,6 +54,7 @@ class StepScale extends Scale {
     };
 
     const steps = stepInfo.steps;
+    // const interval = stepInfo.interval;
 
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -97,38 +99,51 @@ class StepScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    for (let ix = 0; ix < labels.length; ix += stepInfo.interval) {
-      labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel;
-      labelText = labels[ix];
+    let labelPoint;
+    let prevIndex = 0;
 
-      let labelPoint;
+    labels.reduce((prev, curr, index) => {
+      labelCenter = Math.round(startPoint + (labelGap * index));
+      linePosition = labelCenter + aliasPixel;
+      labelText = this.getLabelFormat(curr);
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
 
-        if (ix !== 0 && this.showGrid) {
+        if (prev.label !== labelText && (index === 0 || index - prev.index >= stepInfo.interval)) {
+          prevIndex = index;
+          ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+        }
+
+        if (index > 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
 
-        if (ix !== 0 && this.showGrid) {
+        if (prev.label !== labelText && (index === 0 || index - prev.index >= stepInfo.interval)) {
+          prevIndex = index;
+          ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+        }
+
+        if (index > 0 && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
       }
-
       ctx.stroke();
-    }
+
+      return { label: labelText, index: prevIndex };
+    }, { label: '', index: prevIndex });
 
     ctx.closePath();
   }
 
   getLabelFormat(value) {
+    if (this.mode === 'time') {
+      return moment(new Date(value)).format(this.timeFormat);
+    }
     return value;
   }
 }
