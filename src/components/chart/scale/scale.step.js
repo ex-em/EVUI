@@ -54,7 +54,7 @@ class StepScale extends Scale {
     };
 
     const steps = stepInfo.steps;
-    // const interval = stepInfo.interval;
+    const interval = stepInfo.interval;
 
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -110,7 +110,7 @@ class StepScale extends Scale {
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
 
-        if (prev.label !== labelText && (index === 0 || index - prev.index >= stepInfo.interval)) {
+        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
           prevIndex = index;
           ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
         }
@@ -122,7 +122,7 @@ class StepScale extends Scale {
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
 
-        if (prev.label !== labelText && (index === 0 || index - prev.index >= stepInfo.interval)) {
+        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
           prevIndex = index;
           ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
         }
@@ -141,7 +141,7 @@ class StepScale extends Scale {
   }
 
   getLabelFormat(value) {
-    if (this.mode === 'time') {
+    if (this.timeMode) {
       return moment(new Date(value)).format(this.timeFormat);
     }
     return value;

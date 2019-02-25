@@ -55,7 +55,7 @@
           axesX: [{
             type: 'step',
             showGrid: false,
-            mode: 'time',
+            timeMode: true,
             timeFormat: 'HH:mm',
           }],
           axesY: [{

@@ -42,9 +42,9 @@ export default {
         }
       } else if (value >= 1000) {
         if (value % 1000 === 0) {
-          label = `${(value / 1000).toFixed(1)}k`;
+          label = `${(value / 1000).toFixed(1)}K`;
         } else {
-          label = `${(value / 1000).toFixed(1)}k`;
+          label = `${(value / 1000).toFixed(1)}K`;
         }
       } else {
         label = value.toFixed(1);
