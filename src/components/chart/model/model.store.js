@@ -32,11 +32,11 @@ const module = {
       }
 
       if (sIdx > 0) {
-        gdata = (isHorizontal ? bdata.x : bdata.y) + odata;
         bdata = isHorizontal ? bdata.x : bdata.y;
+        gdata = bdata + odata;
       } else {
-        gdata = odata;
         bdata = 0;
+        gdata = odata;
       }
 
       return this.addData(gdata, ldata, odata, bdata);
