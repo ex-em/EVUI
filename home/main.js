@@ -50,6 +50,10 @@ const router = new VueRouter({
       component: () => import(/* webpackChunkName: 'piechart' */ './guide/views/examples/chart/chart-pie-view'),
     },
     {
+      path: '/combochart',
+      component: () => import(/* webpackChunkName: 'combochart' */ './guide/views/examples/chart/chart-combo-view'),
+    },
+    {
       path: '/checkbox',
       component: () => import(/* webpackChunkName: 'checkbox' */ './guide/views/examples/checkbox/checkbox-view'),
     },

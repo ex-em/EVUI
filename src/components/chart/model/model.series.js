@@ -26,6 +26,7 @@ const module = {
     } else if (type === 'scatter') {
       return new Scatter(id, opt, idx);
     } else if (type === 'bar') {
+      this.showSeriesInfo.barSeriesIds.push(id);
       return new Bar(id, opt, idx);
     }
 
