@@ -50,7 +50,7 @@
       },
       spinnerRadius: { // 중앙점에서부터 로딩 바까지의 반지름
         type: Number,
-        default: 45,
+        default: 30,
       },
       animInterval: { // css animation seconds during 1-time
         type: Number,
@@ -75,7 +75,7 @@
         obj.barHeight = this.barHeight;
         obj.barBorderRadius = this.barBorderRadius;
         obj.barColor = this.barColor;
-        obj.transform = `rotate(${deg}deg) translate(${this.spinnerRadius}px, 0px)`;
+        obj.transform = `rotate(${deg}deg) translate(${this.spinnerRadius + (this.barWidth / 2)}px, 0px)`;
         obj.animation = `ev-loadingmask-fadedelay ${this.animInterval}s infinite ease-in-out`;
         obj.animDelay = `${(this.animInterval * (ix / ixLen)).toFixed(3)}s`;
         this.barData.push(obj);
