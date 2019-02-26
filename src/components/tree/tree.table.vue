@@ -143,6 +143,21 @@
                                 v-if="row.leaf"
                                 :class="row.last ? 'evui-tree-elbow-end':'evui-tree-elbow'"
                               />
+                              <ev-checkbox
+                                v-if="checkbox && row.leaf"
+                                v-model="row.checked"
+                                :size="'small'"
+                                :type="'square'"
+                                @click-event="changeCheckbox($event, row)"
+                              />
+                              <ev-checkbox
+                                v-if="checkbox && !row.leaf"
+                                v-model="row.checked"
+                                :size="'small'"
+                                :type="'square'"
+                                :after-type="row.afterType"
+                                @click-event="changeCheckbox($event, row)"
+                              />
                             </template>
                             <div
                               :style="{ lineHeight: `${rowHeight}px` }"
@@ -291,6 +306,10 @@
         type: Boolean,
         default: false,
       },
+      checkbox: {
+        type: Boolean,
+        default: false,
+      },
     },
 
     data() {
@@ -352,6 +371,10 @@
         treeGroupColumn: '',
 
         headerHeight: 30,
+
+        // 체크 데이터
+        checkedObjData: [],
+        checkedData: [],
       };
     },
     computed: {
@@ -367,6 +390,9 @@
       this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
       this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
       this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
+      const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
+      this.checkedData = result.checkedData;
+      this.checkedObjData = result.checkedObjData;
       // this.sortedData = this.originData.slice();
 
       this.$nextTick(() => {
@@ -378,7 +404,7 @@
 
           this.resultData = this.originData.slice(this.virtualTop, this.virtualBottom);
         } else {
-          this.resultData = treeUtil.transformTreeToArray(this.originData);
+          this.resultData = result.resultData;
         }
 
         // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
@@ -623,79 +649,84 @@
 
       draw() {
         // 그리드박스 높이 너비 가져오기
-        this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
-        this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
-        this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
-        // 초기화
-        this.sizeColSum = 0;
-        this.noSizeColList = [];
-        this.endColWidth = 0;
-
-        this.resultData = treeUtil.transformTreeToArray(this.originData);
-
-        // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
-        for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
-          // 초기화 한번 시켜주고요
-          _.defaults(this.originColumns[ix], this.columnDefaultProperty);
-          // 컬럼 너비랑, % 값인지를 가지고 있자
-          const colWidth = util.quantity(this.originColumns[ix].size);
-          const isPercentValue = colWidth ? colWidth.unit === '%' : false;
-          const min = util.quantity(this.originColumns[ix].min).value;
-          const max = this.originColumns[ix].max ?
-            util.quantity(this.originColumns[ix].max).value : undefined;
-
-          // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
-          if (isPercentValue) {
-            const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
-            this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
-            this.sizeColSum += util.checkColSize(percentToPixel, min, max);
-          } else if (colWidth === undefined) {
-            this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
-          } else {
-            this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
-            this.sizeColSum += util.checkColSize(colWidth.value, min, max);
-          }
-        }
-
-        if (this.isFilter) {
-          this.verticalScroll = this.gridRecordsHeight <
-            (this.filteredData.length * this.rowHeight);
-        } else {
-          this.verticalScroll = this.gridRecordsHeight <
-            (this.resultData.length * this.rowHeight);
-        }
-
-        let leftSize;
-        if (this.verticalScroll) {
-          leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
-          this.endColWidth = this.scrollBarSize;
-        } else {
-          leftSize = this.gridBoxWidth - this.sizeColSum;
+        this.$nextTick(() => {
+          this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
+          this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
+          this.gridRecordsHeight = this.$refs.evuiGridRecords.offsetHeight;
+          // 초기화
+          this.sizeColSum = 0;
+          this.noSizeColList = [];
           this.endColWidth = 0;
-        }
 
-        // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
-        const colSize = Math.floor(leftSize / this.noSizeColList.length);
-        if (this.noSizeColList.length > 0) {
-          for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
-            // debugger;
-            const min = util.quantity(this.noSizeColList[ix].min).value;
-            const max = this.noSizeColList[ix].max ?
-              util.quantity(this.noSizeColList[ix].max).value : undefined;
-            const isLastIndex = (ix + 1) === ixLen;
-            if (!isLastIndex) {
-              leftSize -= util.checkColSize(colSize, min, max);
-              this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+          const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
+          this.resultData = result.resultData;
+          this.checkedData = result.checkedData;
+          this.checkedObjData = result.checkedObjData;
+
+          // 그리드 sizeColSum 계산 및 size 값이 없는경우 빼고 값 설정
+          for (let ix = 0, ixLen = this.originColumns.length; ix < ixLen; ix++) {
+            // 초기화 한번 시켜주고요
+            _.defaults(this.originColumns[ix], this.columnDefaultProperty);
+            // 컬럼 너비랑, % 값인지를 가지고 있자
+            const colWidth = util.quantity(this.originColumns[ix].size);
+            const isPercentValue = colWidth ? colWidth.unit === '%' : false;
+            const min = util.quantity(this.originColumns[ix].min).value;
+            const max = this.originColumns[ix].max ?
+              util.quantity(this.originColumns[ix].max).value : undefined;
+
+            // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
+            if (isPercentValue) {
+              const percentToPixel = Math.floor(this.gridBoxWidth * (colWidth.value / 100));
+              this.originColumns[ix].width = `${util.checkColSize(percentToPixel, min, max)}px`;
+              this.sizeColSum += util.checkColSize(percentToPixel, min, max);
+            } else if (colWidth === undefined) {
+              this.noSizeColList.push(this.originColumns[ix]); // 얕은복사 % 숫자 px도 아닐때
             } else {
-              this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
+              this.originColumns[ix].width = `${util.checkColSize(colWidth.value, min, max)}px`; // px 숫자일때
+              this.sizeColSum += util.checkColSize(colWidth.value, min, max);
             }
-
-            this.sizeColSum += util.checkColSize(colSize, min, max);
           }
-        } else if (leftSize > 0) {
-          this.endColWidth = this.gridBoxWidth - this.sizeColSum;
-        }
+
+          if (this.isFilter) {
+            this.verticalScroll = this.gridRecordsHeight <
+              (this.filteredData.length * this.rowHeight);
+          } else {
+            this.verticalScroll = this.gridRecordsHeight <
+              (this.resultData.length * this.rowHeight);
+          }
+
+          let leftSize;
+          if (this.verticalScroll) {
+            leftSize = this.gridBoxWidth - this.sizeColSum - this.scrollBarSize;
+            this.endColWidth = this.scrollBarSize;
+          } else {
+            leftSize = this.gridBoxWidth - this.sizeColSum;
+            this.endColWidth = 0;
+          }
+
+          // 그리드 크기 남은공간에 size 집어 넣기 size값 없는놈들
+          const colSize = Math.floor(leftSize / this.noSizeColList.length);
+          if (this.noSizeColList.length > 0) {
+            for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
+              // debugger;
+              const min = util.quantity(this.noSizeColList[ix].min).value;
+              const max = this.noSizeColList[ix].max ?
+                util.quantity(this.noSizeColList[ix].max).value : undefined;
+              const isLastIndex = (ix + 1) === ixLen;
+              if (!isLastIndex) {
+                leftSize -= util.checkColSize(colSize, min, max);
+                this.noSizeColList[ix].width = `${util.checkColSize(colSize, min, max)}px`;
+              } else {
+                this.noSizeColList[ix].width = `${util.checkColSize(leftSize, min, max)}px`;
+              }
+
+              this.sizeColSum += util.checkColSize(colSize, min, max);
+            }
+          } else if (leftSize > 0) {
+            this.endColWidth = this.gridBoxWidth - this.sizeColSum;
+          }
         this.$forceUpdate();
+        });
       },
       setColumns(columns) {
         this.originColumns = columns;
@@ -725,10 +756,31 @@
       },
       toggle(row) {
         const rowData = row;
+        const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
         rowData.expend = !rowData.expend;
-        this.resultData = treeUtil.transformTreeToArray(this.originData);
+        this.resultData = result.resultData;
+        this.checkedData = result.checkedData;
+        this.checkedObjData = result.checkedObjData;
+      },
+      changeCheckbox(checked, row) {
+        const rowData = row;
+        const checkTarget = checked.target;
+        rowData.checked = checkTarget.checked;
+        if (!row.leaf) {
+          rowData.afterType = '';
+          treeUtil.childrenCheck(row.children, checkTarget.checked);
+        }
+         this.draw();
+      },
+      getCheckedData() {
+        return this.checkedData;
       },
     },
   };
 </script>
 <style scoped src="@/components/tree/tree.table.grey.css"/>
+<style>
+  .evui-table-records-col .ev-checkbox-wrap .small {
+    height: 19px;
+  }
+</style>
