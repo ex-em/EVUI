@@ -3,7 +3,7 @@
     <div
       class="ev-chart-ttt"
       style="width:100%; height:100%;">
-      <line-chart/>
+      <bar-chart/>
     </div>
   </div>
 </template>

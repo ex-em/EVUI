@@ -42,9 +42,9 @@ export default {
         }
       } else if (value >= 1000) {
         if (value % 1000 === 0) {
-          label = `${(value / 1000).toFixed(1)}k`;
+          label = `${(value / 1000).toFixed(1)}K`;
         } else {
-          label = `${(value / 1000).toFixed(1)}k`;
+          label = `${(value / 1000).toFixed(1)}K`;
         }
       } else {
         label = value.toFixed(1);
@@ -58,7 +58,9 @@ export default {
 
   calcTextSize(text, fontStyle) {
     const calc = document.createElement('span');
-    calc.setAttribute('style', 'visibility:hidden; position:absolute; top:-10000;');
+    const style = `visibility:hidden; position:absolute; top:-10000px; font: ${fontStyle};`;
+
+    calc.setAttribute('style', style);
     calc.style.font = fontStyle;
     calc.textContent = text;
     document.body.appendChild(calc);
@@ -70,5 +72,24 @@ export default {
     calc.remove();
 
     return { width, height };
+  },
+
+  getStringMinMax(array) {
+    const minMax = {
+      min: array[0],
+      max: array[0],
+    };
+
+    array.forEach((item) => {
+      if (minMax.max.length < item.length) {
+        minMax.max = item;
+      }
+
+      if (minMax.min.length > item.length) {
+        minMax.min = item;
+      }
+    });
+
+    return minMax;
   },
 };

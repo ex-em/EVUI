@@ -6,6 +6,7 @@
   />
 </template>
 <script>
+  import moment from 'moment';
   import chart from '@/components/chart';
 
   export default {
@@ -16,58 +17,79 @@
       return {
         defaultData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
-            series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
+            series1: { name: 'series#1', show: true, type: 'bar' },
           },
-          groups: [
-            ['series1', 'series2', 'series3'],
+          labels: [
           ],
-          data: [
-            ['x',
-              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
-            ['series1', 100, 150, 50, 200, 350],
-            ['series2', 200, 100, null, 300, 400],
-            ['series3', 150, 0, 0, 350, 450],
-          ],
+          data: {
+            series1: [],
+          },
         },
         lineOptions: {
-          type: 'bar',
+          thickness: 1,
           width: '100%',
           height: '100%',
           title: {
             text: 'Title Test',
             show: true,
           },
-          thickness: 0.8,
           legend: {
             show: true,
             position: 'right',
           },
           horizontal: false,
-          xAxes: [{
-            scaleType: 'step',
-            labelType: 'category',
-            interval: 'minute',
-            timeFormat: 'HH:mm:ss',
-            showGrid: true,
+          axesX: [{
+            type: 'step',
+            showGrid: false,
           }],
-          yAxes: [{
-            scaleType: 'auto',
-            labelType: 'linear',
+          axesY: [{
+            type: 'linear',
+            startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
           }],
         },
+        timeValue: '2017-01-01 00:00:00',
       };
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.interval) {
         clearTimeout(this.interval);
       }
     },
+    mounted() {
+      setInterval(() => this.addLiveData(), 500);
+    },
     methods: {
+      addLiveData() {
+        this.timeValue = moment(this.timeValue).add(1, 'seconds');
+        this.defaultData.labels.shift();
+        this.defaultData.data.series1.shift();
+        this.defaultData.labels.push(moment(this.timeValue).format('HH:mm:ss'));
+        this.defaultData.data.series1.push(this.getRandomInt());
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [] };
+
+        for (let ix = 0; ix < 60; ix++) {
+          label.push(moment(this.timeValue).format('HH:mm:ss'));
+          this.timeValue = moment(this.timeValue).add(1, 'seconds');
+          data.series1.push(this.getRandomInt());
+        }
+        label.push(moment(this.timeValue).format('HH:mm:ss'));
+        data.series1.push(this.getRandomInt());
+
+        this.defaultData.labels = label;
+        this.defaultData.data = data;
+      },
+      getRandomInt() {
+        const rand = Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return rand < 10 ? null : rand;
+      },
     },
   };
 </script>

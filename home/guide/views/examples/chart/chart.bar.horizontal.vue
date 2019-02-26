@@ -20,41 +20,46 @@
       return {
         horizontalBarChartData: {
           series: {
-            series1: { name: 'series#1', show: true },
-            series2: { name: 'series#2', show: true },
-            series3: { name: 'series#3', show: true },
-            series4: { name: 'series#4', show: true },
+            series1: { name: 'series#1', show: true, type: 'bar' },
+            series2: { name: 'series#2', show: true, type: 'bar' },
+            series3: { name: 'series#3', show: true, type: 'bar' },
+            series4: { name: 'series#4', show: true, type: 'bar' },
           },
-          groups: [
-            ['series1', 'series2', 'series3', 'series4'],
+          labels: [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
           ],
-          data: [
-            ['y',
-              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
-            ['series1', 100, 150, 50, 200, 350],
-            ['series2', 200, 100, null, 300, 400],
-            ['series3', 150, 100, 50, 350, 450],
-            ['series4', 200, 50, 500, 0, 300],
-          ],
+          data: {
+            series1: [100, 150, 50, 150, 350],
+            series2: [50, 100, 70, 80, 100],
+            series3: [100, 100, 200, 150, 60],
+            series4: [100, 80, 100, 150, 50],
+          },
         },
         horizontalBarChartOptions: {
-          type: 'bar',
-          width: '100%',
-          height: '350px',
           thickness: 0.8,
+          width: '100%',
+          title: {
+            text: 'Title Test',
+            show: true,
+          },
+          legend: {
+            show: true,
+            position: 'right',
+          },
           horizontal: true,
-          yAxes: [{
-            scaleType: 'step',
-            labelType: 'category',
-            timeFormat: 'HH:mm:ss',
-            showGrid: true,
-          }],
-          xAxes: [{
-            scaleType: 'auto',
-            labelType: 'linear',
+          axesX: [{
+            type: 'linear',
+            startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
+          }],
+          axesY: [{
+            type: 'step',
+            showGrid: false,
           }],
         },
       };
