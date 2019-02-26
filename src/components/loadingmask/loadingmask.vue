@@ -113,22 +113,20 @@
 <style>
   .ev-loadingmask {
     position: absolute;
-    background: #EEEEEE;
-    opacity: 0.4;
+    /*background: #EEEEEE;*/
+    /*opacity: 0.2;*/
+    overflow: hidden;
     z-index: 20000;
   }
   .ev-loadingmask-center {
     position: relative;
   }
-  @keyframes ev-loadingmask-fadedelay
-  {
-    80%
-    {
+  @keyframes ev-loadingmask-fadedelay {
+    80% {
       -webkit-opacity: 0.2;
       opacity: 0.2;
     }
-    100%
-    {
+    100% {
       -webkit-opacity: 0.9;
       opacity: 0.9;
     }
