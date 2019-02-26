@@ -259,7 +259,7 @@
   // import TableFilter from '@/components/table/table.filter';
   import TableFilterLite from '@/components/table/table.filter.lite';
   import util from '@/common/utils.table';
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import '@/styles/all.css';
 
   export default {

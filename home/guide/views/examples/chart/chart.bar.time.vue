@@ -1,8 +1,8 @@
 <template>
   <div>
     <chart
-      :data="defaultLineChartData"
-      :options="defaultLineChartOptions"
+      :data="liveBarChartData"
+      :options="liveBarChartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <Button
@@ -26,35 +26,43 @@
     },
     data() {
       return {
-        defaultLineChartData: {
+        liveBarChartData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: false, point: false },
+            series1: { name: 'series#1', show: true, type: 'bar' },
+            series2: { name: 'series#2', show: true, type: 'bar' },
+            series3: { name: 'series#3', show: true, type: 'bar' },
+            series4: { name: 'series#4', show: true, type: 'bar' },
           },
+          groups: [
+            ['series1', 'series2', 'series3', 'series4'],
+          ],
           labels: [],
           data: {},
         },
-        defaultLineChartOptions: {
+        liveBarChartOptions: {
           width: '100%',
           height: '100%',
+          thickness: 1,
           title: {
             text: 'Title Test',
             show: true,
           },
           legend: {
             show: true,
-            position: 'right',
+            position: 'top',
           },
           horizontal: false,
           axesX: [{
-            type: 'time',
-            timeFormat: 'HH:mm:ss',
-            interval: 'minute',
+            type: 'step',
+            showGrid: false,
+            timeMode: true,
+            timeFormat: 'HH:mm',
           }],
           axesY: [{
             type: 'linear',
             startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
           }],
         },
         liveBtnInfo: {
@@ -82,7 +90,7 @@
         this.liveMode = !this.liveMode;
 
         if (this.liveMode) {
-          this.liveInterval = setInterval(this.addLiveData.bind(this), 1000);
+          this.liveInterval = setInterval(this.addLiveData.bind(this), 500);
         } else {
           clearTimeout(this.liveInterval);
         }
@@ -91,26 +99,38 @@
         return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
-        this.defaultLineChartData.labels.shift();
-        this.defaultLineChartData.data.series1.shift();
-        this.defaultLineChartData.labels.push(this.timeValue);
-        this.defaultLineChartData.data.series1.push(this.getRandomInt());
+        this.timeValue = +moment(this.timeValue).add(1, 'seconds');
+        this.liveBarChartData.labels.shift();
+        this.liveBarChartData.data.series1.shift();
+        this.liveBarChartData.data.series2.shift();
+        this.liveBarChartData.data.series3.shift();
+        this.liveBarChartData.data.series4.shift();
+        this.liveBarChartData.labels.push(+moment(this.timeValue));
+        this.liveBarChartData.data.series1.push(this.getRandomInt());
+        this.liveBarChartData.data.series2.push(this.getRandomInt());
+        this.liveBarChartData.data.series3.push(this.getRandomInt());
+        this.liveBarChartData.data.series4.push(this.getRandomInt());
       },
       makeInitData() {
         const label = [];
-        const data = { series1: [] };
+        const data = { series1: [], series2: [], series3: [], series4: [] };
 
         for (let ix = 0; ix < 60; ix++) {
           label.push(+moment(this.timeValue));
-          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
+          this.timeValue = +moment(this.timeValue).add(1, 'seconds');
           data.series1.push(null);
+          data.series2.push(null);
+          data.series3.push(null);
+          data.series4.push(null);
         }
         label.push(+moment(this.timeValue));
         data.series1.push(null);
+        data.series2.push(null);
+        data.series3.push(null);
+        data.series4.push(null);
 
-        this.defaultLineChartData.labels = label;
-        this.defaultLineChartData.data = data;
+        this.liveBarChartData.labels = label;
+        this.liveBarChartData.data = data;
       },
     },
   };

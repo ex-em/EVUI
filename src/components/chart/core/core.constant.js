@@ -27,6 +27,31 @@ export const AXIS_UNITS = {
   },
 };
 
+export const COLOR = [
+  '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
+  '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
+  '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
+  '#009bc7', '#cacaff', '#ffc125', '#df6264',
+];
+
+export const LINE_OPTION = {
+  color: '#000', // this.chartOptions.colors[skey.length]
+  show: true,
+  highlight: {
+    pointSize: 5,
+  },
+  xAxisIndex: 0,
+  yAxisIndex: 0,
+  point: true,
+  pointSize: 4,
+  pointStyle: '',
+  pointFill: '#000',
+  lineWidth: 2,
+  fill: false,
+  fillColor: '#000',
+  fiillOpacity: 0.4,
+};
+
 export const CHART_DATA_STRUCT = {
   bar: 'array',
   line: 'array',

@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const pkg = require('../package.json');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir);
@@ -66,20 +67,14 @@ module.exports = {
         test: /\.css$/,
         loaders: [
           {
-            loader: 'style-loader',
+            loader: MiniCssExtractPlugin.loader,
             options: {
-              sourceMap: true,
-            },
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              publicPath: './'
+            }
           },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'postcss-loader',
-          },
+          'css-loader'
         ]
       },
       {
@@ -142,6 +137,9 @@ module.exports = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.DefinePlugin({
       'process.env.VERSION': `'${pkg.version}'`
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
     }),
   ]
 };

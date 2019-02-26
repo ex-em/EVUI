@@ -6,12 +6,9 @@
   />
 </template>
 <script>
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import { getQuantity } from '@/common/utils';
-  import LineChart from './charts/chart.line';
-  import ScatterChart from './charts/chart.scatter';
-  import BarChart from './charts/chart.bar';
-  import PieChart from './charts/chart.pie';
+  import EvChart from './chart.core';
 
   export default {
     props: {
@@ -39,20 +36,23 @@
         };
       },
     },
+    watch: {
+      data: {
+        handler(newVal) {
+          this.chart.data = _.merge(this.normalizedData, newVal);
+          this.chart.update();
+        },
+        deep: true,
+      },
+      options: {
+        handler(newVal) {
+          this.chart.options = _.merge(this.normalizedOption, newVal);
+          this.chart.update();
+        },
+      },
+    },
     created() {
       const defaultOptions = {
-        colors: [
-          '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
-          '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
-          '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
-          '#009bc7', '#cacaff', '#ffc125', '#df6264',
-        ],
-        padding: {
-          top: 5,
-          right: 5,
-          bottom: 5,
-          left: 5,
-        },
         border: 2,
         title: {
           show: false,
@@ -69,6 +69,8 @@
           position: 'right',
           color: '#000',
           inactive: '#aaa',
+          width: 140,
+          height: 24,
         },
         itemHighlight: true,
         seriesHighlight: true,
@@ -100,27 +102,12 @@
       const options = this.normalizedOption;
       const data = this.normalizedData;
 
-      switch (options.type.toLowerCase()) {
-        case 'line':
-          this.chart = new LineChart(wrapper, data, options);
-          break;
-        case 'scatter':
-          this.chart = new ScatterChart(this.$refs.wrapper, this.$props.data, this.$props.options);
-          break;
-        case 'bar':
-          this.chart = new BarChart(this.$refs.wrapper, this.$props.data, this.$props.options);
-          break;
-        case 'pie':
-          this.chart = new PieChart(this.$refs.wrapper, this.$props.data, this.$props.options);
-          break;
-        default:
-          console.log('%c Unexpected Chart Type', 'color:yellow');
-          break;
-      }
+      this.chart = new EvChart(wrapper, data, options);
 
       this.store = this.chart.store;
-      setTimeout(() => {
-        this.chart.drawChart();
+      const timer = setTimeout(() => {
+        this.chart.init();
+        clearTimeout(timer);
       }, 1);
     },
     destroyed() {
@@ -139,63 +126,28 @@
         }
         return sizeValue;
       },
-      addAxisLabel(value, index = -1) {
-        const labels = this.store.chartData.labels;
-        if (index > -1) {
-          labels[index] = value;
-        } else {
-          labels.push(value);
-        }
-      },
-      updateAxisLabelSet(labelSet) {
-        this.store.chartData.labels = labelSet;
-      },
-      updateGraphDataSet(graphSet) {
-        this.store.chartData.data = graphSet;
-      },
-      updateSeriesSet(seriesSet) {
-        this.store.chartData.series = seriesSet;
-      },
-      addGraphData(seriesId, value, index = -1) {
-        const data = this.store.chartData.data;
-
-        if (!data[seriesId]) {
-          data[seriesId] = [];
-        }
-
-        if (index > -1) {
-          data[seriesId][index] = value;
-        } else {
-          data[seriesId].push(value);
-        }
-      },
-      addSeries(sId, sInfo) {
-        const series = this.store.chartData.series;
-        series[sId] = sInfo;
-      },
-      updateChart() {
-        this.chart.updateChart();
-      },
     },
   };
 </script>
 <style>
   .ev-chart-wrapper {
     position: relative;
-    top: 0;
-    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   .ev-chart-container {
     position: relative;
-    top: 0;
-    left: 0;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
   }
 
   .ev-chart-title {
     position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
     padding-left: 10px;
     word-wrap: normal;
@@ -205,28 +157,29 @@
     user-select: none;
   }
 
-  .ev-chart-legend{
+  .ev-chart-legend {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    padding: 0 0 0 10px;
-    overflow: auto;
+    overflow: hidden;
+  }
+
+  .ev-chart-legend-box {
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .ev-chart-legend-container {
     position: relative;
     overflow: hidden;
-    margin: 2px 10px 2px 0;
   }
 
   .ev-chart-legend-color {
+    top: 50%;
     left: 0;
-    width: 10px;
-    height: 10px;
-    margin-top: 6px;
-    margin-right: 6px;
+    transform: translate(0, -50%);
+    width: 8px;
+    height: 8px;
     position: absolute;
-    border-radius: 5px;
+    border-radius: 50%;
   }
 
   .ev-chart-legend-color.inactive {
@@ -234,21 +187,19 @@
   }
 
   .ev-chart-legend-name {
-    float: left;
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     font-size: 12px;
     margin-left: 16px;
-    padding-right: 21px;
-    width: 100%;
-    /*color: #ABAEB5;*/
+    padding-right: 16px;
     user-select:none;
-  }
-
-  .ev-chart-legend-name.inactive {
-    /*color: #555 !important;*/
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translate(0, -65%);
+    position: absolute;
   }
 
   .ev-chart-legend-value {
@@ -261,10 +212,7 @@
 
   .ev-chart-resize-bar {
     position: absolute;
-    width: 4px;
-    height: 100%;
-    cursor: col-resize;
-    background-color: transparent;
+    background: transparent;
     opacity: 0.5;
     z-index: 1;
   }
@@ -330,7 +278,6 @@
   }
 
   .ev-chart-tooltip-name {
-    /*float: left;*/
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;

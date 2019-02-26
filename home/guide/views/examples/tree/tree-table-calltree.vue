@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import _ from 'lodash';
+  import _ from 'lodash-es';
   import packet from './packet.json';
 
   export default {
