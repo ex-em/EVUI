@@ -112,9 +112,12 @@ class StepScale extends Scale {
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-
-        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-          prevIndex = index;
+        if (this.timeMode) {
+          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
+            prevIndex = index;
+            ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+          }
+        } else {
           ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
         }
 
@@ -124,9 +127,12 @@ class StepScale extends Scale {
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-
-        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-          prevIndex = index;
+        if (this.timeMode) {
+          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
+            prevIndex = index;
+            ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+          }
+        } else {
           ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
         }
 
