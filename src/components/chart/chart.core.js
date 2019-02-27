@@ -328,7 +328,9 @@ class EvChart {
     const data = this.data.data;
     const labels = this.data.labels;
     const groups = this.data.groups;
+    const series = this.data.series;
 
+    this.createSeriesSet(series, options.type);
     this.integratedLabels = labels.slice();
     if (groups.length) {
       this.addGroupInfo(groups);
