@@ -18,11 +18,13 @@
         defaultData: {
           series: {
             series1: { name: 'series#1', show: true, type: 'bar' },
+            series2: { name: 'series#2', show: true, type: 'line', combo: true, color: '#ee7f44', pointFill: '#ee7f44' },
           },
           labels: [
           ],
           data: {
             series1: [],
+            series2: [],
           },
         },
         lineOptions: {
@@ -37,10 +39,11 @@
             show: true,
             position: 'right',
           },
-          horizontal: false,
           axesX: [{
             type: 'step',
             showGrid: false,
+            timeMode: true,
+            timeFormat: 'HH:mm:ss',
           }],
           axesY: [{
             type: 'linear',
@@ -68,27 +71,30 @@
         this.timeValue = moment(this.timeValue).add(1, 'seconds');
         this.defaultData.labels.shift();
         this.defaultData.data.series1.shift();
-        this.defaultData.labels.push(moment(this.timeValue).format('HH:mm:ss'));
+        this.defaultData.data.series2.shift();
+        this.defaultData.labels.push(+moment(this.timeValue));
         this.defaultData.data.series1.push(this.getRandomInt());
+        this.defaultData.data.series2.push(this.getRandomInt());
       },
       makeInitData() {
         const label = [];
-        const data = { series1: [] };
+        const data = { series1: [], series2: [] };
 
         for (let ix = 0; ix < 60; ix++) {
-          label.push(moment(this.timeValue).format('HH:mm:ss'));
+          label.push(+moment(this.timeValue));
           this.timeValue = moment(this.timeValue).add(1, 'seconds');
-          data.series1.push(this.getRandomInt());
+          data.series1.push(null);
+          data.series2.push(null);
         }
-        label.push(moment(this.timeValue).format('HH:mm:ss'));
-        data.series1.push(this.getRandomInt());
+        label.push(+moment(this.timeValue));
+        data.series1.push(null);
+        data.series2.push(null);
 
         this.defaultData.labels = label;
         this.defaultData.data = data;
       },
       getRandomInt() {
-        const rand = Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
-        return rand < 10 ? null : rand;
+        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
       },
     },
   };

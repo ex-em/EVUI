@@ -8,14 +8,17 @@ class StepScale extends Scale {
     this.integratedLabels = labels;
   }
 
-  calculateScaleRange() {
-    const minMax = Util.getStringMinMax(this.integratedLabels);
+  calculateScaleRange(minMax) {
+    const stepMinMax = this.timeMode ? minMax : Util.getStringMinMax(this.integratedLabels);
+    const maxValue = stepMinMax.max;
+    const minValue = stepMinMax.min;
+
     return {
-      min: minMax.min,
-      max: minMax.max,
-      minLabel: this.getLabelFormat(minMax.min),
-      maxLabel: this.getLabelFormat(minMax.max),
-      size: Util.calcTextSize(this.getLabelFormat(minMax.max), Util.getLabelStyle(this.labelStyle)),
+      min: minValue,
+      max: maxValue,
+      minLabel: this.getLabelFormat(minValue),
+      maxLabel: this.getLabelFormat(maxValue),
+      size: Util.calcTextSize(this.getLabelFormat(maxValue), Util.getLabelStyle(this.labelStyle)),
     };
   }
 
@@ -109,9 +112,12 @@ class StepScale extends Scale {
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-
-        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-          prevIndex = index;
+        if (this.timeMode) {
+          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
+            prevIndex = index;
+            ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+          }
+        } else {
           ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
         }
 
@@ -121,9 +127,12 @@ class StepScale extends Scale {
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-
-        if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-          prevIndex = index;
+        if (this.timeMode) {
+          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
+            prevIndex = index;
+            ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+          }
+        } else {
           ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
         }
 
