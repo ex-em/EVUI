@@ -8,14 +8,17 @@ class StepScale extends Scale {
     this.integratedLabels = labels;
   }
 
-  calculateScaleRange() {
-    const minMax = Util.getStringMinMax(this.integratedLabels);
+  calculateScaleRange(minMax) {
+    const stepMinMax = this.timeMode ? minMax : Util.getStringMinMax(this.integratedLabels);
+    const maxValue = stepMinMax.max;
+    const minValue = stepMinMax.min;
+
     return {
-      min: minMax.min,
-      max: minMax.max,
-      minLabel: this.getLabelFormat(minMax.min),
-      maxLabel: this.getLabelFormat(minMax.max),
-      size: Util.calcTextSize(this.getLabelFormat(minMax.max), Util.getLabelStyle(this.labelStyle)),
+      min: minValue,
+      max: maxValue,
+      minLabel: this.getLabelFormat(minValue),
+      maxLabel: this.getLabelFormat(maxValue),
+      size: Util.calcTextSize(this.getLabelFormat(maxValue), Util.getLabelStyle(this.labelStyle)),
     };
   }
 

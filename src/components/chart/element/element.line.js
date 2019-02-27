@@ -25,6 +25,10 @@ class Line {
   }
 
   draw(param) {
+    if (!this.show) {
+      return;
+    }
+
     const ctx = param.ctx;
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
@@ -45,13 +49,20 @@ class Line {
     let x;
     let y;
     let aliasPixel;
+    let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
+
+    if (this.combo) {
+      barAreaByCombo = xArea / (this.data.length || 1);
+      xArea -= barAreaByCombo;
+    }
+
+    const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     this.data.reduce((prev, curr, ix, item) => {
