@@ -51,11 +51,8 @@ const router = new VueRouter({
     },
     {
       path: '/combochart',
-      component: () => import(/* webpackChunkName: 'combochart' */ './guide/views/examples/chart/chart-combo-view'),
-    },
-    {
-      path: '/combochart',
-      component: () => import(/* webpackChunkName: 'combochart' */ './guide/views/examples/chart/chart-combo-view'),
+      // component: () => import(/* webpackChunkName: 'combochart' */ './guide/views/examples/chart/chart-combo-view'),
+      component: resolve => require(['./guide/views/examples/chart/chart-combo-view'], resolve),
     },
     {
       path: '/checkbox',
