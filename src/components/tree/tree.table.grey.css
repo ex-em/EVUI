@@ -545,8 +545,8 @@ button {
   /*display: inline-block;*/
   float: left;
   overflow: hidden;
-  background: url('../../images/evui_icon.png') no-repeat -114px -554px;
-  width: 16px;
+  background: url('../../images/evui_icon.png') no-repeat -119px -554px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -557,8 +557,8 @@ button {
   /*display: inline-block;*/
   float: left;
   overflow: hidden;
-  background: url('../../images/evui_icon.png') no-repeat -114px -570px;
-  width: 16px;
+  background: url('../../images/evui_icon.png') no-repeat -119px -570px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -570,7 +570,7 @@ button {
   float: left;
   overflow: hidden;
   /*background: url('../../images/evui_icon.png') no-repeat -114px -575px;*/
-  width: 16px;
+  width: 11px;
   height: 19px;
   margin: 0;
   /*vertical-align: middle;*/
@@ -582,7 +582,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -190px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -594,7 +594,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -349px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -606,7 +606,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -240px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   margin: 0;
   /*vertical-align: middle;*/
@@ -617,7 +617,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -268px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   margin: 0;
   /*vertical-align: middle;*/
@@ -628,7 +628,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -294px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -640,7 +640,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -217px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   cursor: pointer;
   margin: 0;
@@ -652,7 +652,7 @@ button {
   float: left;
   overflow: hidden;
   background: url('../../images/evui_icon.png') no-repeat -319px -261px;
-  width: 16px;
+  width: 11px;
   height: 19px;
   margin: 0;
   /*vertical-align: middle;*/

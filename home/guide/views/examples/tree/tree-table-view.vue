@@ -27,6 +27,7 @@
   import codeView from '@/components/codeview/code';
   import treeTable from './tree-table-default';
   import callTree from './tree-table-calltree';
+  import checkbox from './tree-table-checkbox';
 
   export default {
     components: {
@@ -45,6 +46,12 @@
             url: './guide/views/examples/tree/tree-table-calltree.vue',
             component: callTree,
             title: 'Call Tree',
+            description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
+          },
+          {
+            url: './guide/views/examples/tree/tree-table-checkbox.vue',
+            component: checkbox,
+            title: 'Checkbox',
             description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
           },
         ],
