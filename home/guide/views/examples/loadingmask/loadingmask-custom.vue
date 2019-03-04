@@ -1,8 +1,8 @@
 <template>
   <div>
     <div style="width: 400px; height: 200px; border: 1px solid #FF0000;">
-      <loadingmask
-        v-show="true"
+      <ev-loading-mask
+        v-if="true"
         :bar-count="10"
         :bar-width="40"
         :bar-height="7"
@@ -17,12 +17,8 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-  import loadingmask from '@/components/loadingmask/loadingmask';
-
   export default {
     components: {
-      loadingmask,
     },
     data() {
       return {

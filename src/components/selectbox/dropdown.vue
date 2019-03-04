@@ -5,7 +5,7 @@
       :class="`${prefixCls}-multiple-input-area`"
     >
       <input
-        ref="filterInputText"
+        ref="filterInputField"
         :disabled="disabled"
         type="text"
         class="input-text"
