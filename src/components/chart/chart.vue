@@ -110,10 +110,11 @@
         clearTimeout(timer);
       }, 1);
     },
-    destroyed() {
+    beforeDestroy() {
       if (this.chart.tooltipDOM) {
         this.chart.tooltipDOM.remove();
       }
+      delete this.chart;
     },
     methods: {
       getChartSize(size) {
