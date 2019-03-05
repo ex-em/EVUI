@@ -89,7 +89,7 @@ class Scale {
       increase += interval;
     }
 
-    const graphMax = increase;
+    const graphMax = increase > maxValue ? maxValue : increase;
     const graphMin = minValue;
     const graphRange = graphMax - graphMin;
 
@@ -109,7 +109,7 @@ class Scale {
       steps: numberOfSteps,
       interval,
       graphMin,
-      graphMax: Math.ceil(graphMin + (numberOfSteps * interval)),
+      graphMax,
     };
   }
 
@@ -157,7 +157,7 @@ class Scale {
     }
     ctx.stroke();
 
-    if (steps === 0) {
+    if (steps === 0 || axisMin === null) {
       return;
     }
 
@@ -183,7 +183,7 @@ class Scale {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
 
-        if (ix !== 0 && this.showGrid) {
+        if (ix !== 0 && ix < steps && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -191,7 +191,7 @@ class Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (ix !== 0 && this.showGrid) {
+        if (ix !== 0 && ix < steps && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }

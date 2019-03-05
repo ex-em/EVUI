@@ -13,7 +13,10 @@ class Bar {
       this.name = `series-${sIdx}`;
     }
 
-    this.color = COLOR[sIdx];
+    if (this.color === undefined) {
+      this.color = COLOR[sIdx];
+    }
+
     this.sId = sId;
     this.data = [];
   }
