@@ -3,7 +3,7 @@ import Util from '../helpers/helpers.util';
 
 class LinearScale extends Scale {
   getLabelFormat(value) {
-    return Util.labelSignFormat(value);
+    return Util.labelSignFormat(value, this.decimalPoint);
   }
 
   getInterval(range) {

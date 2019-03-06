@@ -122,7 +122,7 @@ const module = {
     } else {
       containerDOM.style.width = '100%';
     }
-    containerDOM.style.height = `${opt.height}px`;
+    containerDOM.style.height = `${opt.height - 4}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.evcType = 'container';
 
