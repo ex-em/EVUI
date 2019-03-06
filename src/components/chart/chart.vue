@@ -199,7 +199,7 @@
     top: 50%;
     left: 0;
     width: 100%;
-    transform: translate(0, -65%);
+    transform: translate(0, -50%);
     position: absolute;
   }
 
