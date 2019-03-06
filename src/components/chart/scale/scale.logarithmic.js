@@ -82,7 +82,7 @@ class LogarithmicScale extends Scale {
   }
 
   getLabelFormat(value) {
-    return Util.labelSignFormat(value);
+    return Util.labelSignFormat(value, this.decimalPoint);
   }
 
   getInterval(range) {

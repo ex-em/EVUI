@@ -25,29 +25,43 @@ export default {
     return `normal ${style.fontSize}px ${style.fontFamily}`;
   },
 
-  labelSignFormat(value) {
+  labelSignFormat(value, decimalPoint) {
     let label;
     if (typeof value === 'number') {
-      if (value >= 1000000000) {
+      if (value >= 1000000000000000) {
+        if (value % 1000000000000000 === 0) {
+          label = `${(value / 1000000000000000).toFixed(decimalPoint)}P`;
+        } else {
+          label = `${(value / 1000000000000000).toFixed(1)}P`;
+        }
+      } else if (value >= 1000000000000) {
+        if (value % 1000000000000 === 0) {
+          label = `${(value / 1000000000000).toFixed(decimalPoint)}T`;
+        } else {
+          label = `${(value / 1000000000000).toFixed(1)}T`;
+        }
+      } else if (value >= 1000000000) {
         if (value % 1000000000 === 0) {
-          label = `${(value / 1000000000).toFixed(1)}G`;
+          label = `${(value / 1000000000).toFixed(decimalPoint)}G`;
         } else {
           label = `${(value / 1000000000).toFixed(1)}G`;
         }
       } else if (value >= 1000000) {
         if (value % 1000000 === 0) {
-          label = `${(value / 1000000).toFixed(1)}M`;
+          label = `${(value / 1000000).toFixed(decimalPoint)}M`;
         } else {
           label = `${(value / 1000000).toFixed(1)}M`;
         }
       } else if (value >= 1000) {
         if (value % 1000 === 0) {
-          label = `${(value / 1000).toFixed(1)}K`;
+          label = `${(value / 1000).toFixed(decimalPoint)}K`;
         } else {
           label = `${(value / 1000).toFixed(1)}K`;
         }
-      } else {
+      } else if (value < 1 && value > 0) {
         label = value.toFixed(1);
+      } else {
+        label = value.toFixed(decimalPoint);
       }
     } else {
       label = value;

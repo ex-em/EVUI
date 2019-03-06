@@ -112,8 +112,6 @@ const module = {
     };
 
     if (keys.length) {
-      const init = this.seriesList[keys[0]].minMax || def;
-
       return keys.reduce((acc, key) => {
         const minmax = acc;
         const series = this.seriesList[key];
@@ -129,14 +127,14 @@ const module = {
         }
 
         if (smm && series.show) {
-          if (smm.minX < minmax.x[axisX].min) {
+          if (!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)) {
             minmax.x[axisX].min = smm.minX;
           }
           if (smm.maxX > minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
           }
 
-          if (smm.minY < minmax.y[axisY].min) {
+          if (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min)) {
             minmax.y[axisY].min = smm.minY;
           }
           if (smm.maxY > minmax.y[axisY].max) {
@@ -146,8 +144,8 @@ const module = {
 
         return minmax;
       }, {
-        x: [{ min: init.minX, max: init.maxX }],
-        y: [{ min: init.minY, max: init.maxY }],
+        x: [{ min: null, max: null }],
+        y: [{ min: null, max: null }],
       });
     }
 
