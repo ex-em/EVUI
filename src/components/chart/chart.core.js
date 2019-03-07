@@ -85,6 +85,7 @@ class EvChart {
     if (opt.title.show) {
       this.createTitle();
       this.initTitle();
+      this.showTitle();
     }
 
     if (opt.legend.show) {
