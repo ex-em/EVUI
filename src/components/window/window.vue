@@ -502,7 +502,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    padding-left: 8px;
+    padding-left: 6px;
     border-bottom: 1px solid #B6B6B6;
     background: #ffffff;
     font-family: Verdana, Arial, sans-serif;
@@ -604,6 +604,7 @@
     position: relative;
     width: 100%;
     height: 100%;
+    padding: 6px;
     background: white;
     overflow: auto;
   }
