@@ -106,6 +106,7 @@ const module = {
 
   getStoreMinMax() {
     const keys = Object.keys(this.seriesList);
+    const isHorizontal = this.options.horizontal;
     const def = {
       x: [{ min: null, max: null }],
       y: [{ min: null, max: null }],
@@ -127,15 +128,23 @@ const module = {
         }
 
         if (smm && series.show) {
-          if (!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)) {
-            minmax.x[axisX].min = smm.minX;
+          if (!isHorizontal) {
+            if (smm.minX && ((!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)))) {
+              minmax.x[axisX].min = smm.minX;
+            }
+            if (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min)) {
+              minmax.y[axisY].min = smm.minY;
+            }
+          } else {
+            if (!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)) {
+              minmax.x[axisX].min = smm.minX;
+            }
+            if (smm.minY && (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min))) {
+              minmax.y[axisY].min = smm.minY;
+            }
           }
           if (smm.maxX > minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
-          }
-
-          if (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min)) {
-            minmax.y[axisY].min = smm.minY;
           }
           if (smm.maxY > minmax.y[axisY].max) {
             minmax.y[axisY].max = smm.maxY;
