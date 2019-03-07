@@ -502,9 +502,10 @@
     position: absolute;
     top: 0;
     width: 100%;
+    padding-left: 8px;
     border-bottom: 1px solid #B6B6B6;
     background: #ffffff;
-    font-family: 'NanumGothic', sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     align-items: center;
     user-select: none;
   }
