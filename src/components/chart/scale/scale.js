@@ -21,18 +21,21 @@ class Scale {
   calculateLabelRange(type, chartRect, labelOffset, tickSize) {
     let chartSize;
     let axisOffset;
+    let bufferedTickSize;
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
+      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
       axisOffset = [labelOffset.top, labelOffset.bottom];
+      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
     }
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
     const minSteps = 2;
-    const maxSteps = Math.floor(drawRange / tickSize);
+    const maxSteps = Math.floor(drawRange / bufferedTickSize);
 
     return {
       min: minSteps,

@@ -1,8 +1,8 @@
 <template>
   <div>
     <chart
-      :data="scatterLineChartData"
-      :options="scatterLineChartOptions"
+      :data="scatterData"
+      :options="scatterOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <Button
@@ -26,22 +26,17 @@
     },
     data() {
       return {
-        scatterLineChartData: {
-          series: {
-            series1: { name: 'series#1', show: true, type: 'scatter', fill: false, point: true },
-          },
-          labels: [
-            +new Date('2017/01/01 00:00:00'),
-            +new Date('2017/01/01 00:01:00'),
-            +new Date('2017/01/01 00:02:00'),
-            +new Date('2017/01/01 00:03:00'),
-            +new Date('2017/01/01 00:04:00'),
-          ],
-          data: {
-            series1: [100, 150, 51, 150, 350],
-          },
+        series: {
+          series1: { name: 'series#1', show: true, type: 'scatter', fill: false, point: true },
+          series2: { name: 'series#2', show: true, type: 'scatter', fill: false, point: true },
+          series3: { name: 'series#3', show: true, type: 'scatter', fill: false, point: true },
         },
-        scatterLineChartOptions: {
+        graphData: {
+          series1: [],
+          series2: [],
+          series3: [],
+        },
+        scatterOptions: {
           width: '100%',
           height: '100%',
           title: {
@@ -56,7 +51,7 @@
           axesX: [{
             type: 'time',
             timeFormat: 'HH:mm:ss',
-            interval: 'minute',
+            interval: 'second',
           }],
           axesY: [{
             type: 'linear',
@@ -70,10 +65,19 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:04:00',
+        timeValue: null,
         liveMode: false,
         event: null,
       };
+    },
+    computed: {
+      scatterData() {
+        return {
+          series: this.series,
+          labels: [],
+          data: this.graphData,
+        };
+      },
     },
     destroyed() {
       if (this.liveInterval) {
@@ -96,11 +100,17 @@
         return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'm');
-        this.scatterLineChartData.labels.shift();
-        this.scatterLineChartData.data.series1.shift();
-        this.scatterLineChartData.labels.push(this.timeValue);
-        this.scatterLineChartData.data.series1.push(this.getRandomInt());
+        this.timeValue = +new Date();
+        const range = [+new Date(this.timeValue - 180000), this.timeValue];
+        this.$set(this.scatterOptions.axesX[0], 'range', range);
+
+        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.graphData.series2.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.graphData.series3.push({ x: this.timeValue, y: this.getRandomInt() });
+
+        this.timeValue = +moment(this.timeValue).add(3, 's');
       },
     },
   };

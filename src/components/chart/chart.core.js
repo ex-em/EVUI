@@ -43,6 +43,9 @@ class EvChart {
     this.overlayCanvas.style.top = '0px';
     this.overlayCanvas.style.left = '0px';
 
+    this.isInitLegend = false;
+    this.isInitTitle = false;
+
     this.seriesList = {};
     this.chartRect = {};
     this.showSeriesInfo = {
@@ -79,30 +82,15 @@ class EvChart {
 
   initRect() {
     const opt = this.options;
-
     if (opt.title.show) {
-      this.titleDOM = document.createElement('div');
-      this.titleDOM.className = 'ev-chart-title';
-      this.wrapperDOM.appendChild(this.titleDOM);
-
+      this.createTitle();
       this.initTitle();
-      this.showTitle();
     }
 
     if (opt.legend.show) {
-      this.legendDOM = document.createElement('div');
-      this.legendDOM.className = 'ev-chart-legend';
-      this.legendBoxDOM = document.createElement('div');
-      this.legendBoxDOM.className = 'ev-chart-legend-box';
-      this.resizeDOM = document.createElement('div');
-      this.resizeDOM.className = 'ev-chart-resize-bar';
-      this.ghostDOM = document.createElement('div');
-      this.ghostDOM.className = 'ev-chart-resize-ghost';
-      this.wrapperDOM.appendChild(this.resizeDOM);
-      this.legendDOM.appendChild(this.legendBoxDOM);
-      this.wrapperDOM.appendChild(this.legendDOM);
+      this.createLegend();
       this.initLegend();
-      this.setLegendPosition(opt.legend.position);
+      this.setLegendPosition();
     }
     this.chartRect = this.getChartRect();
   }
@@ -329,6 +317,7 @@ class EvChart {
     const labels = this.data.labels;
     const groups = this.data.groups;
 
+    this.clearObject();
     this.integratedLabels = labels.slice();
     if (groups.length) {
       this.addGroupInfo(groups);
@@ -341,7 +330,37 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
+    // title update
+    if (options.title.show) {
+      if (!this.isInitTitle) {
+        this.initTitle();
+      }
+
+      this.showTitle();
+    } else {
+      this.hideTitle();
+    }
+
+    if (options.legend.show) {
+      if (!this.isInitLegend) {
+        this.initLegend();
+      }
+
+      this.setLegendPosition();
+      this.updateLegendContainerSize();
+      this.showLegend();
+    } else {
+      this.hideLegend();
+    }
+
     this.render();
+  }
+  clearObject() {
+    delete this.minMax;
+    delete this.axesX;
+    delete this.axesY;
+    delete this.axesRange;
+    delete this.labelOffset;
   }
   destroy() {}
   reset() {
