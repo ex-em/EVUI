@@ -337,7 +337,7 @@ class EvChart {
       }
 
       this.showTitle();
-    } else {
+    } else if (this.isInitTitle) {
       this.hideTitle();
     }
 
@@ -349,7 +349,7 @@ class EvChart {
       this.setLegendPosition();
       this.updateLegendContainerSize();
       this.showLegend();
-    } else {
+    } else if (this.isInitLegend) {
       this.hideLegend();
     }
 
