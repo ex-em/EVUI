@@ -603,7 +603,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 9px 8px 8px 8px;
     background: white;
     overflow: auto;
   }
