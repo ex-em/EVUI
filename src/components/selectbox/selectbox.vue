@@ -188,8 +188,10 @@
       items: {
         deep: true,
         handler(newItems) {
-          this.listBoxItems = newItems.slice();
-          this.initSelect();
+          if (newItems.length > 0) {
+            this.listBoxItems = newItems.slice();
+            this.initSelect();
+          }
         },
       },
       selectedItems(items) {
