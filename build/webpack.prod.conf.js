@@ -43,7 +43,8 @@ const webpackConfig = merge(baseWebpackConfig, {
       threshold: 10240,
       minRatio: 0.8
     }),
-    new CleanWebpackPlugin([resolve('./dist')], { allowExternal : true }),
+    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin([resolve('./dist')], { allowExternal : true }),
     new VueLoaderPlugin(),
   ]
 });

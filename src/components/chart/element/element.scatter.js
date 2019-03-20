@@ -25,6 +25,10 @@ class Scatter {
   }
 
   draw(param) {
+    if (!this.show) {
+      return;
+    }
+
     const ctx = param.ctx;
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
@@ -46,8 +50,11 @@ class Scatter {
       x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+      if (x !== null) {
+        aliasPixel = Util.aliasPixel(x);
+        x += aliasPixel;
+      }
+
 
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line

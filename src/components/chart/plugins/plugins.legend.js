@@ -1,5 +1,23 @@
 const module = {
+  createLegend() {
+    this.legendDOM = document.createElement('div');
+    this.legendDOM.className = 'ev-chart-legend';
+    this.legendBoxDOM = document.createElement('div');
+    this.legendBoxDOM.className = 'ev-chart-legend-box';
+    this.resizeDOM = document.createElement('div');
+    this.resizeDOM.className = 'ev-chart-resize-bar';
+    this.ghostDOM = document.createElement('div');
+    this.ghostDOM.className = 'ev-chart-resize-ghost';
+
+    this.wrapperDOM.appendChild(this.resizeDOM);
+    this.legendDOM.appendChild(this.legendBoxDOM);
+    this.wrapperDOM.appendChild(this.legendDOM);
+  },
   initLegend() {
+    if (!this.isInitLegend) {
+      this.createLegend();
+    }
+
     const groups = this.data.groups;
     const seriesList = this.seriesList;
     // event delegation
@@ -88,6 +106,8 @@ const module = {
         this.addLegend(series);
       }
     });
+
+    this.isInitLegend = true;
   },
   addLegend(series) {
     const opt = this.options.legend;
@@ -110,7 +130,7 @@ const module = {
     nameDOM.setAttribute('title', series.name);
     nameDOM.evcType = 'name';
 
-    this.legendDOM.style.padding = '0 0 0 0';
+    this.legendDOM.style.padding = '0';
 
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
@@ -129,8 +149,9 @@ const module = {
     this.legendBoxDOM.appendChild(containerDOM);
     this.showSeriesInfo.count++;
   },
-  setLegendPosition(position) {
+  setLegendPosition() {
     const opt = this.options;
+    const position = opt.legend.position;
     const wrapperStyle = this.wrapperDOM.style;
     const legendStyle = this.legendDOM.style;
     const boxStyle = this.legendBoxDOM.style;
@@ -243,6 +264,19 @@ const module = {
         break;
       default:
         break;
+    }
+  },
+  updateLegendContainerSize() {
+    const opt = this.options.legend;
+    const container = this.legendBoxDOM.getElementsByClassName('ev-chart-legend-container');
+
+    for (let ix = 0; ix < container.length; ix++) {
+      if (opt.position === 'top' || opt.position === 'bottom') {
+        container[ix].style.width = `${opt.width - 8}px`;
+        container[ix].style.margin = '0 4px';
+      } else {
+        container[ix].style.width = '100%';
+      }
     }
   },
   onMouseMove(e) {
@@ -363,6 +397,24 @@ const module = {
     resizeDOMStyle.display = 'block';
     this.ghostDOM.remove();
     this.render();
+  },
+  showLegend() {
+    this.resizeDOM.style.display = 'block';
+    this.legendDOM.style.display = 'block';
+  },
+  hideLegend() {
+    const opt = this.options;
+    const wrapperStyle = this.wrapperDOM.style;
+    const resizeStyle = this.resizeDOM.style;
+    const legendStyle = this.legendDOM.style;
+    const title = opt.title.show ? opt.title.height : 0;
+
+    resizeStyle.display = 'none';
+    legendStyle.display = 'none';
+
+    legendStyle.width = '0';
+    legendStyle.height = '0';
+    wrapperStyle.padding = `${title}px 0 0 0`;
   },
 };
 

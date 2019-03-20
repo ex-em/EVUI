@@ -502,9 +502,10 @@
     position: absolute;
     top: 0;
     width: 100%;
+    padding-left: 6px;
     border-bottom: 1px solid #B6B6B6;
     background: #ffffff;
-    font-family: 'NanumGothic', sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     align-items: center;
     user-select: none;
   }
@@ -603,7 +604,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 9px 8px 8px 8px;
+    padding: 6px;
     background: white;
     overflow: auto;
   }
