@@ -268,22 +268,34 @@
             for (let ix = 0; ix < this.initSelectValue.length; ix++) {
               value = this.initSelectValue[ix];
               item = this.getItemByValue(value);
-              this.selectedItems.push(item);
+
+              if (item) {
+                this.selectedItems.push(item);
+              }
             }
           } else {
             item = this.getItemByValue(this.initSelectValue);
-            this.selectedItems.push(item);
+
+            if (item) {
+              this.selectedItems.push(item);
+            }
           }
         } else if (this.initSelectIdx != null) {
           if (this.initSelectIdx.constructor === Array) {
             for (let ix = 0; ix < this.initSelectIdx.length; ix++) {
               value = this.initSelectIdx[ix];
               item = this.getItemByIndex(value);
-              this.selectedItems.push(item);
+
+              if (item) {
+                this.selectedItems.push(item);
+              }
             }
           } else {
             item = this.getItemByIndex(this.initSelectIdx);
-            this.selectedItems.push(item);
+
+            if (item) {
+              this.selectedItems.push(item);
+            }
           }
         }
 
