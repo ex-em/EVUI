@@ -24,6 +24,7 @@ import EvDatepicker from './components/datepicker';
 import EvWindow from './components/window';
 import { tabs as EvTabs, tab as EvTabPanel } from './components/tabs';
 import { TreeTable as EvTreeTable } from './components/tree';
+import EvSplitter from './components/splitter';
 
 const components = {
   EvButton,
@@ -51,6 +52,7 @@ const components = {
   EvTabs,
   EvTabPanel,
   EvTreeTable,
+  EvSplitter,
 };
 
 const evui = {

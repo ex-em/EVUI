@@ -176,6 +176,12 @@
                 content: '파이 차트',
                 imgUrl: `${this.imgUrl}/chart-pie.png`,
               },
+              {
+                name: 'Combo Chart',
+                routerLink: '/combochart',
+                content: '복합 차트',
+                imgUrl: `${this.imgUrl}/chart-combo.png`,
+              },
             ],
           },
           {

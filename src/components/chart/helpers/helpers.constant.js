@@ -20,6 +20,12 @@ export const COLOR = [
   '#009bc7', '#cacaff', '#ffc125', '#df6264',
 ];
 
+// export const COLOR = [
+//   '#00C8FC', '#00F1CD', '#C19F87', '#008FD2', '#93F7FE', '#00FC78', '#0058DE',
+//   '#3BDEFF', '#254763', '#BAEDF9', '#A24E3D', '#1FD017', '#F1D3B6', '#AFC9C9',
+//   '#498700', '#3650FE', '#8786EF', '#68FBFB', '#BCF061', '#CBD3EA',
+// ];
+
 export const LINE_OPTION = {
   show: true,
   highlight: {
@@ -35,6 +41,17 @@ export const LINE_OPTION = {
   fillOpacity: 0.4,
 };
 
+export const BAR_OPTION = {
+  show: true,
+  highlight: {
+    pointSize: 5,
+  },
+  xAxisIndex: 0,
+  yAxisIndex: 0,
+  category: true,
+};
+
+
 export const AXIS_OPTION = {
   min: null,
   max: null,
@@ -43,34 +60,15 @@ export const AXIS_OPTION = {
   showGrid: true,
   axisLineColor: '#b4b6ba',
   gridLineColor: '#e7e9ed',
-  labelIndicatorColor: '#e7e9ed',
-  gridLineWidth: 1,
-  ticks: null,
   timeFormat: 'mm:ss',
-  tickSize: null,
   range: null,
-  labelWidth: null,
+  interval: null,
+  decimalPoint: null,
   labelStyle: {
     fontSize: 12,
     color: '#333',
     fontFamily: 'Droid Sans',
   },
-};
-
-export const CHART_DATA_STRUCT = {
-  bar: 'array',
-  line: 'array',
-  scatter: 'array',
-  pie: 'array',
-  sunburst: 'tree',
-};
-
-export const CHART_AXIS_TYPE = {
-  bar: 'axis',
-  line: 'axis',
-  scatter: 'axis',
-  pie: 'axisless',
-  sunburst: 'axisless',
 };
 
 export const TIME_INTERVALS = {

@@ -1,8 +1,8 @@
 <template>
   <div>
     <chart
-      :data="defaultLineChartData"
-      :options="defaultLineChartOptions"
+      :data="chartData"
+      :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <Button
@@ -26,16 +26,22 @@
     },
     data() {
       return {
-        defaultLineChartData: {
+        chartData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: false, point: false },
+            series1: { name: 'series#1', show: true, type: 'bar' },
+            series2: { name: 'series#2', show: true, type: 'line', combo: true, fill: true },
+            series3: { name: 'series#3', show: true, type: 'line', combo: true, fill: true },
           },
+          groups: [
+            ['series2', 'series3'],
+          ],
           labels: [],
           data: {},
         },
-        defaultLineChartOptions: {
+        chartOptions: {
           width: '100%',
           height: '100%',
+          thickness: 1,
           title: {
             text: 'Title Test',
             show: true,
@@ -44,17 +50,17 @@
             show: true,
             position: 'right',
           },
-          horizontal: false,
           axesX: [{
-            type: 'time',
-            timeFormat: 'HH:mm:ss',
-            interval: 'minute',
+            type: 'step',
+            showGrid: false,
+            timeMode: true,
+            timeFormat: 'HH:mm',
           }],
           axesY: [{
             type: 'linear',
             startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
           }],
         },
         liveBtnInfo: {
@@ -82,7 +88,7 @@
         this.liveMode = !this.liveMode;
 
         if (this.liveMode) {
-          this.liveInterval = setInterval(this.addLiveData.bind(this), 1000);
+          this.liveInterval = setInterval(this.addLiveData.bind(this), 500);
         } else {
           clearTimeout(this.liveInterval);
         }
@@ -91,26 +97,34 @@
         return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
-        this.defaultLineChartData.labels.shift();
-        this.defaultLineChartData.data.series1.shift();
-        this.defaultLineChartData.labels.push(this.timeValue);
-        this.defaultLineChartData.data.series1.push(this.getRandomInt());
+        this.timeValue = +moment(this.timeValue).add(1, 'seconds');
+        this.chartData.labels.shift();
+        this.chartData.data.series1.shift();
+        this.chartData.data.series2.shift();
+        this.chartData.data.series3.shift();
+        this.chartData.labels.push(+moment(this.timeValue));
+        this.chartData.data.series1.push(this.getRandomInt());
+        this.chartData.data.series2.push(this.getRandomInt());
+        this.chartData.data.series3.push(this.getRandomInt());
       },
       makeInitData() {
         const label = [];
-        const data = { series1: [] };
+        const data = { series1: [], series2: [], series3: [], series4: [] };
 
         for (let ix = 0; ix < 60; ix++) {
           label.push(+moment(this.timeValue));
-          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
-          data.series1.push(null);
+          this.timeValue = +moment(this.timeValue).add(1, 'seconds');
+          data.series1.push(0);
+          data.series2.push(0);
+          data.series3.push(null);
         }
         label.push(+moment(this.timeValue));
-        data.series1.push(null);
+        data.series1.push(0);
+        data.series2.push(0);
+        data.series3.push(null);
 
-        this.defaultLineChartData.labels = label;
-        this.defaultLineChartData.data = data;
+        this.chartData.labels = label;
+        this.chartData.data = data;
       },
     },
   };

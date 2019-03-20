@@ -2,6 +2,7 @@ import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
 import LogarithmicScale from './scale/scale.logarithmic';
+import StepScale from './scale/scale.step';
 import Title from './plugins/plugins.title';
 import Legend from './plugins/plugins.legend';
 
@@ -42,8 +43,16 @@ class EvChart {
     this.overlayCanvas.style.top = '0px';
     this.overlayCanvas.style.left = '0px';
 
+    this.isInitLegend = false;
+    this.isInitTitle = false;
+
     this.seriesList = {};
     this.chartRect = {};
+    this.showSeriesInfo = {
+      count: 0,
+      barSeriesIds: [],
+    };
+    this.integratedLabels = this.data.labels.slice();
   }
 
   init() {
@@ -54,19 +63,18 @@ class EvChart {
 
     const options = this.options;
 
-    this.createSeriesSet(this.seriesList, series, options.type);
+    this.createSeriesSet(series, options.type);
     if (groups.length) {
-      this.addGroupInfo(this.seriesList, groups);
+      this.addGroupInfo(groups);
     }
 
-    Model.Store.horizontal = !!options.horizontal;
-    this.createDataSet(this.seriesList, data, labels);
-    this.minMax = this.getStoreMinMax(this.seriesList);
+    this.createDataSet(data, labels);
+    this.minMax = this.getStoreMinMax();
 
-    this.axesX = this.createAxes('x', options.axesX, this.bufferCtx);
-    this.axesY = this.createAxes('y', options.axesY, this.bufferCtx);
-    this.axesRange = this.getAxesRange(this.axesX, this.axesY, this.minMax);
-    this.labelOffset = this.getLabelOffset(this.axesX, this.axesY, this.axesRange);
+    this.axesX = this.createAxes('x', options.axesX);
+    this.axesY = this.createAxes('y', options.axesY);
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
 
     this.initRect();
     this.drawChart();
@@ -74,84 +82,62 @@ class EvChart {
 
   initRect() {
     const opt = this.options;
-
     if (opt.title.show) {
-      this.titleDOM = document.createElement('div');
-      this.titleDOM.className = 'ev-chart-title';
-      this.wrapperDOM.appendChild(this.titleDOM);
-
+      this.createTitle();
       this.initTitle();
       this.showTitle();
     }
 
     if (opt.legend.show) {
-      this.legendDOM = document.createElement('div');
-      this.legendDOM.className = 'ev-chart-legend';
-      this.legendBoxDOM = document.createElement('div');
-      this.legendBoxDOM.className = 'ev-chart-legend-box';
-      this.resizeDOM = document.createElement('div');
-      this.resizeDOM.className = 'ev-chart-resize-bar';
-      this.ghostDOM = document.createElement('div');
-      this.ghostDOM.className = 'ev-chart-resize-ghost';
-      this.wrapperDOM.appendChild(this.resizeDOM);
-      this.legendDOM.appendChild(this.legendBoxDOM);
-      this.wrapperDOM.appendChild(this.legendDOM);
+      this.createLegend();
       this.initLegend();
-      this.setLegendPosition(opt.legend.position);
+      this.setLegendPosition();
     }
     this.chartRect = this.getChartRect();
   }
 
   drawChart() {
-    this.labelRange = this.getAxesLabelRange({
-      chartRect: this.chartRect,
-      labelOffset: this.labelOffset,
-      axesX: this.axesX,
-      axesY: this.axesY,
-      axesRange: this.axesRange,
-    });
-
-    this.axesSteps = this.calculateSteps({
-      axesX: this.axesX,
-      axesY: this.axesY,
-      axesRange: this.axesRange,
-      labelRange: this.labelRange,
-    });
-
-    this.drawAxis({
-      axesX: this.axesX,
-      axesY: this.axesY,
-      chartRect: this.chartRect,
-      labelOffset: this.labelOffset,
-      axesSteps: this.axesSteps,
-    });
-
-    this.drawSeries({
-      seriesList: this.seriesList,
-      ctx: this.bufferCtx,
-      chartRect: this.chartRect,
-      labelOffset: this.labelOffset,
-      axesSteps: this.axesSteps,
-    });
+    this.labelRange = this.getAxesLabelRange();
+    this.axesSteps = this.calculateSteps();
+    this.drawAxis();
+    this.drawSeries();
 
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
-  drawSeries(param) {
-    const slist = param.seriesList;
-    const ctx = param.ctx;
-    const rect = param.chartRect;
-    const offset = param.labelOffset;
-    const steps = param.axesSteps;
+  drawSeries() {
+    let showIndex = 0;
+    let showSeriesCount = 0;
+    this.showSeriesInfo.barSeriesIds.forEach((series) => {
+      if (this.seriesList[series].show) {
+        showSeriesCount++;
+      }
+    });
 
-    Object.keys(slist).forEach((series) => {
-      if (slist[series].show) {
-        slist[series].draw(ctx, rect, offset, steps);
+
+    Object.values(this.seriesList).forEach((series) => {
+      series.draw({
+        ctx: this.bufferCtx,
+        chartRect: this.chartRect,
+        labelOffset: this.labelOffset,
+        axesSteps: this.axesSteps,
+        isHorizontal: this.options.horizontal,
+        integLabels: this.integratedLabels,
+        thickness: this.options.thickness,
+        showSeriesCount,
+        showIndex,
+      });
+
+      if (series.show) {
+        showIndex++;
       }
     });
   }
 
-  createAxes(dir, axes, ctx) {
+  createAxes(dir, axes) {
+    const ctx = this.bufferCtx;
+    const integLabels = this.integratedLabels;
+
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
@@ -160,52 +146,50 @@ class EvChart {
           return new TimeScale(dir, axis, ctx);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
+        case 'step':
+          return new StepScale(dir, axis, ctx, integLabels);
         default:
           return false;
       }
     });
   }
 
-  getAxesRange(axesX, axesY, minMax) {
-    const axesXMinMax = axesX.map((axis, index) => axis.calculateScaleRange(minMax.x[index]));
-    const axesYMinMax = axesY.map((axis, index) => axis.calculateScaleRange(minMax.y[index]));
+  getAxesRange() {
+    /* eslint-disable max-len */
+    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index]));
+    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index]));
+    /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
   }
 
-  drawAxis(param) {
-    const axesX = param.axesX;
-    const axesY = param.axesY;
-    const rect = param.chartRect;
-    const offset = param.labelOffset;
-    const steps = param.axesSteps;
+  drawAxis() {
+    this.axesX.forEach((axis, index) => {
+      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.x[index]);
+    });
 
-    axesX.forEach((axis, index) => axis.draw(rect, offset, steps.x[index]));
-    axesY.forEach((axis, index) => axis.draw(rect, offset, steps.y[index]));
+    this.axesY.forEach((axis, index) => {
+      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.y[index]);
+    });
   }
 
-  calculateSteps(param) {
-    const axesX = param.axesX;
-    const axesY = param.axesY;
-    const aMinMax = param.axesRange;
-    const lMinMax = param.labelRange;
-
-    const axesXMinMax = axesX.map((axis, index) => {
+  calculateSteps() {
+    const axesXMinMax = this.axesX.map((axis, index) => {
       const range = {
-        minValue: aMinMax.x[index].min,
-        maxValue: aMinMax.x[index].max,
-        minSteps: lMinMax.x[index].min,
-        maxSteps: lMinMax.x[index].max,
+        minValue: this.axesRange.x[index].min,
+        maxValue: this.axesRange.x[index].max,
+        minSteps: this.labelRange.x[index].min,
+        maxSteps: this.labelRange.x[index].max,
       };
       return axis.calculateSteps(range);
     });
 
-    const axesYMinMax = axesY.map((axis, index) => {
+    const axesYMinMax = this.axesY.map((axis, index) => {
       const range = {
-        minValue: aMinMax.y[index].min,
-        maxValue: aMinMax.y[index].max,
-        minSteps: lMinMax.y[index].min,
-        maxSteps: lMinMax.y[index].max,
+        minValue: this.axesRange.y[index].min,
+        maxValue: this.axesRange.y[index].max,
+        minSteps: this.labelRange.y[index].min,
+        maxSteps: this.labelRange.y[index].max,
       };
 
       return axis.calculateSteps(range);
@@ -214,21 +198,15 @@ class EvChart {
     return { x: axesXMinMax, y: axesYMinMax };
   }
 
-  getAxesLabelRange(param) {
-    const rect = param.chartRect;
-    const offset = param.labelOffset;
-    const axesX = param.axesX;
-    const axesY = param.axesY;
-    const range = param.axesRange;
-
-    const axesXSteps = axesX.map((axis, index) => {
-      const size = range.x[index].size;
-      return axis.calculateLabelRange('x', rect, offset, size.width);
+  getAxesLabelRange() {
+    const axesXSteps = this.axesX.map((axis, index) => {
+      const size = this.axesRange.x[index].size;
+      return axis.calculateLabelRange('x', this.chartRect, this.labelOffset, size.width);
     });
 
-    const axesYSteps = axesY.map((axis, index) => {
-      const size = range.y[index].size;
-      return axis.calculateLabelRange('y', rect, offset, size.height);
+    const axesYSteps = this.axesY.map((axis, index) => {
+      const size = this.axesRange.y[index].size;
+      return axis.calculateLabelRange('y', this.chartRect, this.labelOffset, size.height);
     });
 
     return { x: axesXSteps, y: axesYSteps };
@@ -287,7 +265,10 @@ class EvChart {
     this.overlayCanvas.style.height = `${height}px`;
   }
 
-  getLabelOffset(axesX, axesY, range) {
+  getLabelOffset() {
+    const axesX = this.axesX;
+    const axesY = this.axesY;
+    const range = this.axesRange;
     const labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
     const labelBuffer = { width: 20, height: 4 };
 
@@ -337,18 +318,50 @@ class EvChart {
     const labels = this.data.labels;
     const groups = this.data.groups;
 
+    this.clearObject();
+    this.integratedLabels = labels.slice();
     if (groups.length) {
-      this.addGroupInfo(this.seriesList, groups);
+      this.addGroupInfo(groups);
     }
-    this.createDataSet(this.seriesList, data, labels);
+    this.createDataSet(data, labels);
 
-    this.minMax = this.getStoreMinMax(this.seriesList);
-    this.axesX = this.createAxes('x', options.axesX, this.bufferCtx);
-    this.axesY = this.createAxes('y', options.axesY, this.bufferCtx);
-    this.axesRange = this.getAxesRange(this.axesX, this.axesY, this.minMax);
-    this.labelOffset = this.getLabelOffset(this.axesX, this.axesY, this.axesRange);
+    this.minMax = this.getStoreMinMax();
+    this.axesX = this.createAxes('x', options.axesX);
+    this.axesY = this.createAxes('y', options.axesY);
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
+
+    // title update
+    if (options.title.show) {
+      if (!this.isInitTitle) {
+        this.initTitle();
+      }
+
+      this.showTitle();
+    } else if (this.isInitTitle) {
+      this.hideTitle();
+    }
+
+    if (options.legend.show) {
+      if (!this.isInitLegend) {
+        this.initLegend();
+      }
+
+      this.setLegendPosition();
+      this.updateLegendContainerSize();
+      this.showLegend();
+    } else if (this.isInitLegend) {
+      this.hideLegend();
+    }
 
     this.render();
+  }
+  clearObject() {
+    delete this.minMax;
+    delete this.axesX;
+    delete this.axesY;
+    delete this.axesRange;
+    delete this.labelOffset;
   }
   destroy() {}
   reset() {

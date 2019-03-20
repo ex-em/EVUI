@@ -49,6 +49,7 @@
           this.chart.options = _.merge(this.normalizedOption, newVal);
           this.chart.update();
         },
+        deep: true,
       },
     },
     created() {
@@ -110,10 +111,11 @@
         clearTimeout(timer);
       }, 1);
     },
-    destroyed() {
+    beforeDestroy() {
       if (this.chart.tooltipDOM) {
         this.chart.tooltipDOM.remove();
       }
+      delete this.chart;
     },
     methods: {
       getChartSize(size) {
@@ -198,7 +200,7 @@
     top: 50%;
     left: 0;
     width: 100%;
-    transform: translate(0, -65%);
+    transform: translate(0, -50%);
     position: absolute;
   }
 

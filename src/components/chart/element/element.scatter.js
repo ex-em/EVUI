@@ -24,8 +24,15 @@ class Scatter {
     this.data = [];
   }
 
-  draw(context, chartRect, labelOffset, axesSteps) {
-    const ctx = context;
+  draw(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const ctx = param.ctx;
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
 
     let x;
     let y;
@@ -39,17 +46,20 @@ class Scatter {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.data.reduce((prev, curr) => {
-      x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-      y = Canvas.calculateY(curr.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    this.data.forEach((item) => {
+      x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+      y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+      if (x !== null) {
+        aliasPixel = Util.aliasPixel(x);
+        x += aliasPixel;
+      }
 
-      curr.xp = x; // eslint-disable-line
-      curr.yp = y; // eslint-disable-line
 
-      return curr;
+      item.xp = x; // eslint-disable-line
+      item.yp = y; // eslint-disable-line
+
+      return item;
     }, this.data[0]);
 
     ctx.strokeStyle = this.color;

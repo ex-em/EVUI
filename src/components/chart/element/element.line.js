@@ -24,8 +24,15 @@ class Line {
     this.data = [];
   }
 
-  draw(context, chartRect, labelOffset, axesSteps) {
-    const ctx = context;
+  draw(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const ctx = param.ctx;
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
 
     ctx.beginPath();
     ctx.lineJoin = 'round';
@@ -42,21 +49,30 @@ class Line {
     let x;
     let y;
     let aliasPixel;
+    let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
+
+    if (this.combo) {
+      barAreaByCombo = xArea / (this.data.length || 1);
+      xArea -= barAreaByCombo;
+    }
+
+    const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     this.data.reduce((prev, curr, ix, item) => {
       x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       y = Canvas.calculateY(curr.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+      if (x !== null) {
+        aliasPixel = Util.aliasPixel(x);
+        x += aliasPixel;
+      }
 
       if (y === null) {
         if (ix - 1 > -1) {

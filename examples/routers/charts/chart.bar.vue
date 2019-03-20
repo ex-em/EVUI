@@ -6,6 +6,7 @@
   />
 </template>
 <script>
+  import moment from 'moment';
   import chart from '@/components/chart';
 
   export default {
@@ -16,58 +17,110 @@
       return {
         defaultData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-            series2: { name: 'series#2', show: true, type: 'line', fill: true, point: true },
-            series3: { name: 'series#3', show: true, type: 'line', fill: true, point: true },
+            series1: { name: 'series#1', show: true, type: 'line' },
+            series2: { name: 'series#2', show: true, type: 'line', color: '#ee7f44', pointFill: '#ee7f44' },
           },
-          groups: [
-            ['series1', 'series2', 'series3'],
+          labels: [
           ],
-          data: [
-            ['x',
-              '2017/01/01 00:00:00', '2017/01/01 00:01:00', '2017/01/01 00:02:00',
-              '2017/01/01 00:03:00', '2017/01/01 00:04:00'],
-            ['series1', 100, 150, 50, 200, 350],
-            ['series2', 200, 100, null, 300, 400],
-            ['series3', 150, 0, 0, 350, 450],
-          ],
+          data: {
+            series1: [],
+            series2: [],
+          },
         },
         lineOptions: {
-          type: 'bar',
+          thickness: 1,
           width: '100%',
           height: '100%',
           title: {
             text: 'Title Test',
             show: true,
           },
-          thickness: 0.8,
           legend: {
             show: true,
             position: 'right',
           },
-          horizontal: false,
-          xAxes: [{
-            scaleType: 'step',
-            labelType: 'category',
-            interval: 'minute',
+          axesX: [{
+            type: 'time',
+            showGrid: false,
+            timeMode: true,
             timeFormat: 'HH:mm:ss',
-            showGrid: true,
+            interval: 'second',
           }],
-          yAxes: [{
-            scaleType: 'auto',
-            labelType: 'linear',
+          axesY: [{
+            type: 'linear',
+            startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
           }],
         },
+        timeValue: '2017-01-01 00:00:00',
       };
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.interval) {
         clearTimeout(this.interval);
       }
     },
+    mounted() {
+      setInterval(() => this.addLiveData(), 500);
+      setTimeout(() => {
+        this.lineOptions.title.show = false;
+      }, 2000);
+      setTimeout(() => {
+        this.lineOptions.legend.position = 'top';
+      }, 4000);
+      setTimeout(() => {
+        this.lineOptions.title.show = true;
+      }, 6000);
+      setTimeout(() => {
+        this.lineOptions.legend.position = 'right';
+      }, 8000);
+      setTimeout(() => {
+        this.lineOptions.legend.show = false;
+      }, 10000);
+      setTimeout(() => this.aaa(), 10000);
+    },
     methods: {
+      aaa() {
+        const range = [
+          +new Date('2017-01-01 00:00:00'),
+          +new Date('2017-01-01 00:05:00'),
+        ];
+
+        this.$set(this.lineOptions.axesX[0], 'range', range);
+      },
+      addLiveData() {
+        this.timeValue = moment(this.timeValue).add(1, 'seconds');
+        this.defaultData.labels.shift();
+        this.defaultData.data.series1.shift();
+        this.defaultData.data.series2.shift();
+        this.defaultData.labels.push(+moment(this.timeValue));
+        this.defaultData.data.series1.push(this.getRandomInt());
+        this.defaultData.data.series2.push(this.getRandomInt());
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [], series2: [] };
+
+        for (let ix = 0; ix < 60; ix++) {
+          label.push(+moment(this.timeValue));
+          this.timeValue = moment(this.timeValue).add(1, 'seconds');
+          data.series1.push(null);
+          data.series2.push(null);
+        }
+        label.push(+moment(this.timeValue));
+        data.series1.push(null);
+        data.series2.push(null);
+
+        this.defaultData.labels = label;
+        this.defaultData.data = data;
+      },
+      getRandomInt() {
+        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+      },
     },
   };
 </script>

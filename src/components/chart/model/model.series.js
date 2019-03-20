@@ -1,13 +1,12 @@
 import Line from '../element/element.line';
 import Scatter from '../element/element.scatter';
+import Bar from '../element/element.bar';
 
 const module = {
-  createSeriesSet(target, series, defaultType) {
-    const slist = target;
+  createSeriesSet(series, defaultType) {
     Object.keys(series).forEach((key, index) => {
       const type = series[key].type || defaultType;
-
-      slist[key] = this.addSeries({
+      this.seriesList[key] = this.addSeries({
         type,
         sId: key,
         sOpt: series[key],
@@ -26,16 +25,19 @@ const module = {
       return new Line(id, opt, idx);
     } else if (type === 'scatter') {
       return new Scatter(id, opt, idx);
+    } else if (type === 'bar') {
+      this.showSeriesInfo.barSeriesIds.push(id);
+      return new Bar(id, opt, idx);
     }
 
     return false;
   },
 
-  addGroupInfo(target, groups) {
+  addGroupInfo(groups) {
     groups.forEach((group, gIdx) => {
       let interpolation = 0;
       group.reduce((prev, curr, sIdx) => {
-        const series = target[curr];
+        const series = this.seriesList[curr];
 
         series.stackIndex = sIdx + interpolation;
         series.groupIndex = gIdx;

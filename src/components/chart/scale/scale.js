@@ -21,18 +21,21 @@ class Scale {
   calculateLabelRange(type, chartRect, labelOffset, tickSize) {
     let chartSize;
     let axisOffset;
+    let bufferedTickSize;
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
+      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
       axisOffset = [labelOffset.top, labelOffset.bottom];
+      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
     }
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
     const minSteps = 2;
-    const maxSteps = Math.floor(drawRange / tickSize);
+    const maxSteps = Math.floor(drawRange / bufferedTickSize);
 
     return {
       min: minSteps,
@@ -76,7 +79,7 @@ class Scale {
     };
   }
 
-  calculateSteps(range, skipFitting) {
+  calculateSteps(range) {
     const maxValue = range.maxValue;
     const minValue = range.minValue;
     const maxSteps = range.maxSteps;
@@ -89,7 +92,7 @@ class Scale {
       increase += interval;
     }
 
-    const graphMax = increase;
+    const graphMax = increase > maxValue ? maxValue : increase;
     const graphMin = minValue;
     const graphRange = graphMax - graphMin;
 
@@ -100,7 +103,7 @@ class Scale {
       numberOfSteps = 5;
     }
 
-    while (numberOfSteps > maxSteps && !skipFitting) {
+    while (numberOfSteps > maxSteps) {
       interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
     }
@@ -109,7 +112,7 @@ class Scale {
       steps: numberOfSteps,
       interval,
       graphMin,
-      graphMax: Math.ceil(graphMin + (numberOfSteps * interval)),
+      graphMax,
     };
   }
 
@@ -157,7 +160,7 @@ class Scale {
     }
     ctx.stroke();
 
-    if (steps === 0) {
+    if (steps === 0 || axisMin === null) {
       return;
     }
 
@@ -183,7 +186,7 @@ class Scale {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
 
-        if (ix !== 0 && this.showGrid) {
+        if (ix !== 0 && ix < steps && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -191,7 +194,7 @@ class Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (ix !== 0 && this.showGrid) {
+        if (ix !== 0 && ix < steps && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }

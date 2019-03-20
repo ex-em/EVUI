@@ -28,6 +28,7 @@
   import DefaultBarChart from './chart.bar.default';
   import StackBarChart from './chart.bar.stack';
   import HorizontalBarChart from './chart.bar.horizontal';
+  import TimeBarChart from './chart.bar.time';
 
   export default {
     components: {
@@ -35,6 +36,7 @@
       DefaultBarChart,
       StackBarChart,
       HorizontalBarChart,
+      TimeBarChart,
     },
     data() {
       return {
@@ -61,6 +63,13 @@
                           계열이 여러개가 존재할 경우 동일한 높이의 Bar를 생성하여 Category 기준으로 각 계열을 표현합니다.`,
             isBottom: true,
             title: 'Horizontal',
+          },
+          {
+            url: './guide/views/examples/chart/chart.bar.time.vue',
+            component: TimeBarChart,
+            description: 'RealTime 처리를 위한 차트입니다.',
+            isBottom: true,
+            title: 'Time',
           },
         ],
       };
