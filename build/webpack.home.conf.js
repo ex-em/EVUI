@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const merge = require('webpack-merge');
-const { VueLoaderPlugin } =  require ('vue-loader' );
+const { VueLoaderPlugin } =  require ('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -94,6 +94,7 @@ module.exports = merge(webpackBaseConfig, {
     ]),
     new FriendlyErrorsPlugin(),
     new VueLoaderPlugin(),
-    new CleanWebpackPlugin([resolve('./demo')], {allowExternal : true }),
+    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin([resolve('./demo')], {allowExternal : true }),
   ]
 });
