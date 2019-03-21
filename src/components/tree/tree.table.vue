@@ -171,7 +171,7 @@
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
                             style="max-height: 20px;"
-                            v-html="cellRender(row.data[col.field], col.type, col.cellRender)"
+                            v-html="cellRender(row.data[col.field], col.type, col.cellRender, row)"
                           />
                         </td>
                       </template>
