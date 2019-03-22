@@ -149,6 +149,7 @@
                                 :size="'small'"
                                 :type="'square'"
                                 @click-event="changeCheckbox($event, row)"
+                                @change-event="checkChageEvent($event, row)"
                               />
                               <ev-checkbox
                                 v-if="checkbox && !row.leaf"
@@ -157,6 +158,7 @@
                                 :type="'square'"
                                 :after-type="row.afterType"
                                 @click-event="changeCheckbox($event, row)"
+                                @change-event="checkChageEvent($event, row)"
                               />
                             </template>
                             <div
@@ -774,6 +776,12 @@
       },
       getCheckedData() {
         return this.checkedData;
+      },
+      checkChageEvent(e, row) {
+        this.$emit('check-change-event', e, row);
+      },
+      test() {
+        console.log('check');
       },
     },
   };
