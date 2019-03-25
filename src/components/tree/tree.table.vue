@@ -758,11 +758,12 @@
       },
       toggle(row) {
         const rowData = row;
-        const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
+        // const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
         rowData.expend = !rowData.expend;
-        this.resultData = result.resultData;
-        this.checkedData = result.checkedData;
-        this.checkedObjData = result.checkedObjData;
+        // this.resultData = result.resultData;
+        // this.checkedData = result.checkedData;
+        // this.checkedObjData = result.checkedObjData;
+        this.draw();
       },
       changeCheckbox(checked, row) {
         const rowData = row;
