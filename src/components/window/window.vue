@@ -501,7 +501,6 @@
         this.vIf = this.closeType === 'hide' || this.isShow;
         this.vShow = this.isShow;
 
-        console.log(`isShow: ${this.isShow} / vShow: ${this.vShow}`);
         if (!this.windowStyle && this.isShow) {
           this.$nextTick(() => {
             this.windowStyle = this.getWindowStyle();
