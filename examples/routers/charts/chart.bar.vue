@@ -17,8 +17,8 @@
       return {
         defaultData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'bar' },
-            series2: { name: 'series#2', show: true, type: 'line', combo: true, color: '#ee7f44', pointFill: '#ee7f44' },
+            series1: { name: 'series#1', show: true, type: 'line' },
+            series2: { name: 'series#2', show: true, type: 'line', color: '#ee7f44', pointFill: '#ee7f44' },
           },
           labels: [
           ],
@@ -40,10 +40,11 @@
             position: 'right',
           },
           axesX: [{
-            type: 'step',
+            type: 'time',
             showGrid: false,
             timeMode: true,
             timeFormat: 'HH:mm:ss',
+            interval: 'second',
           }],
           axesY: [{
             type: 'linear',
@@ -65,8 +66,32 @@
     },
     mounted() {
       setInterval(() => this.addLiveData(), 500);
+      setTimeout(() => {
+        this.lineOptions.title.show = false;
+      }, 2000);
+      setTimeout(() => {
+        this.lineOptions.legend.position = 'top';
+      }, 4000);
+      setTimeout(() => {
+        this.lineOptions.title.show = true;
+      }, 6000);
+      setTimeout(() => {
+        this.lineOptions.legend.position = 'right';
+      }, 8000);
+      setTimeout(() => {
+        this.lineOptions.legend.show = false;
+      }, 10000);
+      setTimeout(() => this.aaa(), 10000);
     },
     methods: {
+      aaa() {
+        const range = [
+          +new Date('2017-01-01 00:00:00'),
+          +new Date('2017-01-01 00:05:00'),
+        ];
+
+        this.$set(this.lineOptions.axesX[0], 'range', range);
+      },
       addLiveData() {
         this.timeValue = moment(this.timeValue).add(1, 'seconds');
         this.defaultData.labels.shift();

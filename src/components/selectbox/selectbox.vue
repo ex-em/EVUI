@@ -188,8 +188,10 @@
       items: {
         deep: true,
         handler(newItems) {
-          this.listBoxItems = newItems.slice();
-          this.initSelect();
+          if (newItems.length > 0) {
+            this.listBoxItems = newItems.slice();
+            this.initSelect();
+          }
         },
       },
       selectedItems(items) {
@@ -266,22 +268,34 @@
             for (let ix = 0; ix < this.initSelectValue.length; ix++) {
               value = this.initSelectValue[ix];
               item = this.getItemByValue(value);
-              this.selectedItems.push(item);
+
+              if (item) {
+                this.selectedItems.push(item);
+              }
             }
           } else {
             item = this.getItemByValue(this.initSelectValue);
-            this.selectedItems.push(item);
+
+            if (item) {
+              this.selectedItems.push(item);
+            }
           }
         } else if (this.initSelectIdx != null) {
           if (this.initSelectIdx.constructor === Array) {
             for (let ix = 0; ix < this.initSelectIdx.length; ix++) {
               value = this.initSelectIdx[ix];
               item = this.getItemByIndex(value);
-              this.selectedItems.push(item);
+
+              if (item) {
+                this.selectedItems.push(item);
+              }
             }
           } else {
             item = this.getItemByIndex(this.initSelectIdx);
-            this.selectedItems.push(item);
+
+            if (item) {
+              this.selectedItems.push(item);
+            }
           }
         }
 

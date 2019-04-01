@@ -49,6 +49,7 @@
           this.chart.options = _.merge(this.normalizedOption, newVal);
           this.chart.update();
         },
+        deep: true,
       },
     },
     created() {

@@ -54,7 +54,7 @@ module.exports = merge(webpackBaseConfig, {
     compress: false,
   },
   plugins: [
-    new CleanWebpackPlugin(['dist_liteplus']),
+    new CleanWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({

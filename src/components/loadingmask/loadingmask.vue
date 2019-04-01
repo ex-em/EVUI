@@ -88,23 +88,27 @@
       updatePosition() {
         const element = this.$el;
         const parentEl = element.parentElement;
-        const getComputedParent = getComputedStyle(parentEl);
-        const parentPaddingTop = getComputedParent.getPropertyValue('padding-top');
-        const parentPaddingLeft = getComputedParent.getPropertyValue('padding-left');
-        const parentBorder = getComputedParent.getPropertyValue('border-width');
-        const parentElRect = parentEl.getBoundingClientRect();
-        const parentWidth =
-          parentElRect.width - (parseInt(parentBorder, 10) * 2);
-        const parentHeight =
-          parentElRect.height - (parseInt(parentBorder, 10) * 2);
-        const wrapperTransform =
-          `translate(-${parentPaddingLeft}, -${parentPaddingTop})`;
-        this.$el.setAttribute('style',
-          `width: ${parentWidth}px; height: ${parentHeight}px; transform: ${wrapperTransform}`);
-        const centerTransform =
-          `translate(-${(this.barWidth / 2)}px, -${(this.barHeight / 2)}px)`;
-        this.$refs.loadingCenter.setAttribute('style',
-          `top: ${parentHeight / 2}px; left: ${parentWidth / 2}px; transform: ${centerTransform}`);
+        if (parentEl) {
+          const getComputedParent = getComputedStyle(parentEl);
+          if (getComputedParent) {
+            const parentPaddingTop = getComputedParent.getPropertyValue('padding-top');
+            const parentPaddingLeft = getComputedParent.getPropertyValue('padding-left');
+            const parentBorder = getComputedParent.getPropertyValue('border-width');
+            const parentElRect = parentEl.getBoundingClientRect();
+            const parentWidth =
+              parentElRect.width - (parseInt(parentBorder, 10) * 2);
+            const parentHeight =
+              parentElRect.height - (parseInt(parentBorder, 10) * 2);
+            const wrapperTransform =
+              `translate(-${parentPaddingLeft}, -${parentPaddingTop})`;
+            this.$el.setAttribute('style',
+              `width: ${parentWidth}px; height: ${parentHeight}px; transform: ${wrapperTransform}`);
+            const centerTransform =
+              `translate(-${(this.barWidth / 2)}px, -${(this.barHeight / 2)}px)`;
+            this.$refs.loadingCenter.setAttribute('style',
+              `top: ${parentHeight / 2}px; left: ${parentWidth / 2}px; transform: ${centerTransform}`);
+          }
+        }
       },
     },
   };

@@ -83,7 +83,8 @@ module.exports = merge(webpackBaseConfig, {
     compress: false,
   },
   plugins: [
-    new CleanWebpackPlugin(['dist_maxgauge']),
+    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(['dist_maxgauge']),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({

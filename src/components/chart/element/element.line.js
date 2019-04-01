@@ -69,8 +69,10 @@ class Line {
       x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       y = Canvas.calculateY(curr.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+      if (x !== null) {
+        aliasPixel = Util.aliasPixel(x);
+        x += aliasPixel;
+      }
 
       if (y === null) {
         if (ix - 1 > -1) {

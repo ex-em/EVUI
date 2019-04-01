@@ -149,6 +149,7 @@
                                 :size="'small'"
                                 :type="'square'"
                                 @click-event="changeCheckbox($event, row)"
+                                @change-event="checkChageEvent($event, row)"
                               />
                               <ev-checkbox
                                 v-if="checkbox && !row.leaf"
@@ -157,6 +158,7 @@
                                 :type="'square'"
                                 :after-type="row.afterType"
                                 @click-event="changeCheckbox($event, row)"
+                                @change-event="checkChageEvent($event, row)"
                               />
                             </template>
                             <div
@@ -171,7 +173,7 @@
                             :class="col.type === 'number' ? 'evui-col-number' : ''"
                             class="evui-table-records-col"
                             style="max-height: 20px;"
-                            v-html="cellRender(row.data[col.field], col.type, col.cellRender)"
+                            v-html="cellRender(row.data[col.field], col.type, col.cellRender, row)"
                           />
                         </td>
                       </template>
@@ -756,11 +758,12 @@
       },
       toggle(row) {
         const rowData = row;
-        const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
+        // const result = treeUtil.transformTreeToArray(this.originData, this.checkbox);
         rowData.expend = !rowData.expend;
-        this.resultData = result.resultData;
-        this.checkedData = result.checkedData;
-        this.checkedObjData = result.checkedObjData;
+        // this.resultData = result.resultData;
+        // this.checkedData = result.checkedData;
+        // this.checkedObjData = result.checkedObjData;
+        this.draw();
       },
       changeCheckbox(checked, row) {
         const rowData = row;
@@ -774,6 +777,12 @@
       },
       getCheckedData() {
         return this.checkedData;
+      },
+      checkChageEvent(e, row) {
+        this.$emit('check-change-event', e, row);
+      },
+      test() {
+        console.log('check');
       },
     },
   };

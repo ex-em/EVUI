@@ -152,6 +152,79 @@
     <br>
     <br>
     <br>
+    <h5># check</h5>
+    <br>
+    <Checkbox
+      :value="bindValue20"
+      v-model="vModel20"
+      :after-type="`check`"
+      class="checkboxStyle"
+    >
+      Single Circle Border Check Shape Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue21"
+      v-model="vModel21"
+      :after-type="`check`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Border Check Shape Small Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue22"
+      v-model="vModel22"
+      :disabled="true"
+      :after-type="`check`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Circle Border Check Shape Small Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue23"
+      v-model="vModel23"
+      :type="`square`"
+      :after-type="`check`"
+      class="checkboxStyle"
+    >
+      Single Square Border Check Shape Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue24"
+      v-model="vModel24"
+      :type="`square`"
+      :after-type="`check`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Border Check Shape Small Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <Checkbox
+      :value="bindValue25"
+      v-model="vModel25"
+      :disabled="true"
+      :type="`square`"
+      :after-type="`check`"
+      :size="`small`"
+      class="checkboxStyle"
+    >
+      Single Square Border Check Shape Small Disabled Checkbox
+    </Checkbox>
+    <br>
+    <br>
+    <br>
+    <br>
     <br>
     <br>
   </div>
@@ -188,6 +261,18 @@
         vModel100: true,
         bindValue101: 'value101',
         vModel101: true,
+        bindValue20: 'value20',
+        vModel20: true,
+        bindValue21: 'value21',
+        vModel21: true,
+        bindValue22: 'value22',
+        vModel22: true,
+        bindValue23: 'value23',
+        vModel23: true,
+        bindValue24: 'value24',
+        vModel24: true,
+        bindValue25: 'value25',
+        vModel25: true,
       };
     },
     methods: {
