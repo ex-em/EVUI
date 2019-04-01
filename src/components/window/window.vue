@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isExist"
+    v-if="isIf"
     v-show="isShow"
     :id="windowId"
     :style="windowStyle"
@@ -61,14 +61,6 @@
         type: String,
         default: '',
       },
-      closeType: {
-        type: String,
-        default: 'hide',
-        validator(value) {
-          const list = ['destroy', 'hide'];
-          return list.indexOf(value) > -1;
-        },
-      },
       maximizable: {
         type: Boolean,
         default: true,
@@ -76,6 +68,22 @@
       resizable: {
         type: Boolean,
         default: true,
+      },
+      isIf: {
+        type: Boolean,
+        default: true,
+      },
+      isShow: {
+        type: Boolean,
+        default: true,
+      },
+      closeType: {
+        type: String,
+        default: 'hide',
+        validator(value) {
+          const list = ['destroy', 'hide'];
+          return list.indexOf(value) > -1;
+        },
       },
     },
     data() {
@@ -88,8 +96,6 @@
         headerStyle: '',
         headerHeight: 32,
         grabbingBorderSize: 5,
-        isExist: true,
-        isShow: true,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -118,7 +124,11 @@
       this.windowStyle = this.getWindowStyle();
     },
     beforeDestroy() {
-      this.isShow = false;
+      if (this.closeType === 'hide') {
+        this.hide();
+      } else {
+        this.$emit('update:is-if', false);
+      }
     },
     methods: {
       mousedown(e) {
@@ -466,11 +476,8 @@
 
         return result || 0;
       },
-      show() {
-        this.isShow = true;
-      },
       hide() {
-        this.isShow = false;
+        this.$emit('update:is-show', false);
       },
       clickCloseBtn() {
         this.$emit('before-close', this);
@@ -478,7 +485,7 @@
         if (this.closeType === 'hide') {
           this.hide();
         } else {
-          this.isExist = false;
+          this.$emit('update:is-if', false);
         }
       },
     },
