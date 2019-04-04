@@ -109,6 +109,32 @@ const module = {
 
     this.isInitLegend = true;
   },
+  updateLegend() {
+    this.resetLegend();
+    const groups = this.data.groups;
+    const seriesList = this.seriesList;
+
+    if (groups.length) {
+      groups.forEach((group) => {
+        group.slice().reverse().forEach((series) => {
+          this.addLegend(seriesList[series]);
+        });
+      });
+    }
+
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp) {
+        this.addLegend(series);
+      }
+    });
+  },
+  resetLegend() {
+    const legendDOM = this.legendBoxDOM;
+
+    while (legendDOM.hasChildNodes()) {
+      legendDOM.removeChild(legendDOM.firstChild);
+    }
+  },
   addLegend(series) {
     const opt = this.options.legend;
     const containerDOM = document.createElement('div');

@@ -312,14 +312,20 @@ class EvChart {
 
     return labelOffset;
   }
-  update() {
+  update(updateSeries) {
     const options = this.options;
     const data = this.data.data;
     const labels = this.data.labels;
     const groups = this.data.groups;
+    const series = this.data.series;
 
     this.clearObject();
     this.integratedLabels = labels.slice();
+    if (updateSeries) {
+      this.seriesList = {};
+      this.createSeriesSet(series, options.type);
+    }
+
     if (groups.length) {
       this.addGroupInfo(groups);
     }
@@ -345,6 +351,8 @@ class EvChart {
     if (options.legend.show) {
       if (!this.isInitLegend) {
         this.initLegend();
+      } else if (updateSeries) {
+        this.updateLegend();
       }
 
       this.setLegendPosition();

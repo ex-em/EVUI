@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="article-title">
-      <h2> Pie Chart </h2>
+      <h2> Combo Chart </h2>
     </div>
     <br>
     <div
