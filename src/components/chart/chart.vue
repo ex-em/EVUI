@@ -50,65 +50,20 @@
           if (!this.isEqualObject(newVal.series, oldVal.series)) {
             isSeriesUpdate = true;
           }
-          this.evChart.data = _.merge(this.normalizedData, newVal);
+          this.evChart.data = _.merge(this.getDefaultData(), newVal);
           this.evChart.update(isSeriesUpdate);
         },
       },
       options: {
-        handler(newVal, oldVal) {
-          this.evChart.options = _.merge(this.normalizedOption, newVal);
-
-          if (!_.isEqual(newVal, oldVal)) {
-            this.evChart.update();
-          }
+        handler(newVal) {
+          this.evChart.options = _.merge(this.getDefaultOptions(), newVal);
+          this.evChart.update();
         },
       },
     },
     created() {
-      const defaultOptions = {
-        border: 2,
-        title: {
-          show: false,
-          height: 40,
-          text: '',
-          style: {
-            fontSize: 15,
-            color: '#000',
-            fontFamily: 'Droid Sans',
-          },
-        },
-        legend: {
-          show: true,
-          position: 'right',
-          color: '#000',
-          inactive: '#aaa',
-          width: 140,
-          height: 24,
-        },
-        itemHighlight: true,
-        seriesHighlight: true,
-        useSelect: false,
-        doughnutHoleSize: 0,
-        reverse: false,
-        bufferSize: null,
-        horizontal: false,
-        width: '100%',
-        height: '100%',
-        thickness: 1,
-        useTooltip: true,
-        useSelectionData: false,
-        type: 'line',
-      };
-
-      const defaultData = {
-        series: {},
-        groups: [],
-        labels: [],
-        data: {},
-      };
-
-      this.normalizedOption = _.merge(defaultOptions, this.options);
-      this.normalizedData = _.merge(defaultData, this.data);
+      this.normalizedOption = _.merge(this.getDefaultOptions(), this.options);
+      this.normalizedData = _.merge(this.getDefaultData(), this.data);
     },
     mounted() {
       const wrapper = this.$refs.wrapper;
@@ -130,6 +85,50 @@
       delete this.evChart;
     },
     methods: {
+      getDefaultOptions() {
+        return {
+          border: 2,
+          title: {
+            show: false,
+            height: 40,
+            text: '',
+            style: {
+              fontSize: 15,
+              color: '#000',
+              fontFamily: 'Droid Sans',
+            },
+          },
+          legend: {
+            show: true,
+            position: 'right',
+            color: '#000',
+            inactive: '#aaa',
+            width: 140,
+            height: 24,
+          },
+          itemHighlight: true,
+          seriesHighlight: true,
+          useSelect: false,
+          doughnutHoleSize: 0,
+          reverse: false,
+          bufferSize: null,
+          horizontal: false,
+          width: '100%',
+          height: '100%',
+          thickness: 1,
+          useTooltip: true,
+          useSelectionData: false,
+          type: 'line',
+        };
+      },
+      getDefaultData() {
+        return {
+          series: {},
+          groups: [],
+          labels: [],
+          data: {},
+        };
+      },
       getChartSize(size) {
         let sizeValue;
 
