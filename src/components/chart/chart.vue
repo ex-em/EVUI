@@ -38,86 +38,97 @@
     },
     watch: {
       data: {
-        handler(newVal) {
-          this.chart.data = _.merge(this.normalizedData, newVal);
-          this.chart.update();
+        handler(newVal, oldVal) {
+          let isSeriesUpdate = false;
+          this.normalizedData = {
+            series: {},
+            data: {},
+            groups: [],
+            labels: [],
+          };
+
+          if (!this.isEqualObject(newVal.series, oldVal.series)) {
+            isSeriesUpdate = true;
+          }
+          this.evChart.data = _.merge(this.getDefaultData(), newVal);
+          this.evChart.update(isSeriesUpdate);
         },
-        deep: true,
       },
       options: {
         handler(newVal) {
-          this.chart.options = _.merge(this.normalizedOption, newVal);
-          this.chart.update();
+          this.evChart.options = _.merge(this.getDefaultOptions(), newVal);
+          this.evChart.update();
         },
-        deep: true,
       },
     },
     created() {
-      const defaultOptions = {
-        border: 2,
-        title: {
-          show: false,
-          height: 40,
-          text: '',
-          style: {
-            fontSize: 15,
-            color: '#000',
-            fontFamily: 'Droid Sans',
-          },
-        },
-        legend: {
-          show: true,
-          position: 'right',
-          color: '#000',
-          inactive: '#aaa',
-          width: 140,
-          height: 24,
-        },
-        itemHighlight: true,
-        seriesHighlight: true,
-        useSelect: false,
-        doughnutHoleSize: 0,
-        reverse: false,
-        bufferSize: null,
-        horizontal: false,
-        width: '100%',
-        height: '100%',
-        thickness: 1,
-        useTooltip: true,
-        useSelectionData: false,
-        type: 'line',
-      };
-
-      const defaultData = {
-        series: {},
-        groups: [],
-        labels: [],
-        data: {},
-      };
-
-      this.normalizedOption = _.merge(defaultOptions, this.options);
-      this.normalizedData = _.merge(defaultData, this.data);
+      this.normalizedOption = _.merge(this.getDefaultOptions(), this.options);
+      this.normalizedData = _.merge(this.getDefaultData(), this.data);
     },
     mounted() {
       const wrapper = this.$refs.wrapper;
       const options = this.normalizedOption;
       const data = this.normalizedData;
 
-      this.chart = new EvChart(wrapper, data, options);
+      this.evChart = new EvChart(wrapper, data, options);
 
-      this.store = this.chart.store;
+      this.store = this.evChart.store;
       const timer = setTimeout(() => {
-        this.chart.init();
+        this.evChart.init();
         clearTimeout(timer);
       }, 1);
     },
     beforeDestroy() {
-      if (this.chart.tooltipDOM) {
-        this.chart.tooltipDOM.remove();
+      if (this.evChart.tooltipDOM) {
+        this.evChart.tooltipDOM.remove();
       }
-      delete this.chart;
+      delete this.evChart;
     },
     methods: {
+      getDefaultOptions() {
+        return {
+          border: 2,
+          title: {
+            show: false,
+            height: 40,
+            text: '',
+            style: {
+              fontSize: 15,
+              color: '#000',
+              fontFamily: 'Droid Sans',
+            },
+          },
+          legend: {
+            show: true,
+            position: 'right',
+            color: '#000',
+            inactive: '#aaa',
+            width: 140,
+            height: 24,
+          },
+          itemHighlight: true,
+          seriesHighlight: true,
+          useSelect: false,
+          doughnutHoleSize: 0,
+          reverse: false,
+          bufferSize: null,
+          horizontal: false,
+          width: '100%',
+          height: '100%',
+          thickness: 1,
+          useTooltip: true,
+          useSelectionData: false,
+          type: 'line',
+        };
+      },
+      getDefaultData() {
+        return {
+          series: {},
+          groups: [],
+          labels: [],
+          data: {},
+        };
+      },
       getChartSize(size) {
         let sizeValue;
 
@@ -127,6 +138,24 @@
           sizeValue = undefined;
         }
         return sizeValue;
+      },
+      isEqualObject(newVal, oldVal) {
+        const nKey = Object.keys(newVal).sort();
+        const oKey = Object.keys(oldVal).sort();
+
+        if (nKey.length !== oKey.length) {
+          return false;
+        }
+
+        for (let ix = 0; ix < nKey.length; ix++) {
+          if (nKey[ix] !== oKey[ix]) {
+            return false;
+          } else if (!_.isEqual(newVal[nKey[ix]], oldVal[oKey[ix]])) {
+            return false;
+          }
+        }
+
+        return true;
       },
     },
   };

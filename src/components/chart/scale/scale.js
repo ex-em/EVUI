@@ -35,7 +35,7 @@ class Scale {
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
     const minSteps = 2;
-    const maxSteps = Math.floor(drawRange / bufferedTickSize);
+    const maxSteps = Math.max(Math.floor(drawRange / bufferedTickSize), 4);
 
     return {
       min: minSteps,

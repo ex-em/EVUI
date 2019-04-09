@@ -55,6 +55,10 @@ const router = new VueRouter({
       component: resolve => require(['./guide/views/examples/chart/chart-combo-view'], resolve),
     },
     {
+      path: '/reactivitychart',
+      component: resolve => require(['./guide/views/examples/chart/chart-reactivity-view'], resolve),
+    },
+    {
       path: '/checkbox',
       component: resolve => require(['./guide/views/examples/checkbox/checkbox-view'], resolve),
     },
