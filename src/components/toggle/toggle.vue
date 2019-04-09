@@ -99,7 +99,7 @@
         type: Object,
         default() {
           return {
-            width: 60,
+            width: 80,
             height: 24,
           };
         },
@@ -127,79 +127,87 @@
     },
     computed: {
     },
+    watch: {
+      toggleText: {
+        handler() {
+          this.setToggleStyle();
+        },
+        deep: true,
+      },
+    },
     mounted() {
-      if (this.toggleText.onText || this.toggleText.offText) {
-        let maxTextWidth = 0;
-        const onTextScrollWidth = this.$refs.onTextRef.scrollWidth;
-        const offTextScrollWidth = this.$refs.offTextRef.scrollWidth;
-        if (this.toggleType === 'slide' || this.toggleType === 'button') {
-          if (offTextScrollWidth < onTextScrollWidth) {
-            maxTextWidth = onTextScrollWidth;
-          } else {
-            maxTextWidth = offTextScrollWidth;
-          }
-        } else if (this.toggleType === 'tab') {
-          if (offTextScrollWidth < onTextScrollWidth) {
-            maxTextWidth = onTextScrollWidth * 2;
-          } else {
-            maxTextWidth = offTextScrollWidth * 2;
-          }
-        }
-        if (maxTextWidth + (this.toggleObj.height * 1.5) < this.toggleObj.width) {
-          this.maxWidth = this.toggleObj.width;
-        } else {
-          this.maxWidth = maxTextWidth + (this.toggleObj.height * 1.5);
-        }
-      } else {
-        this.maxWidth = this.toggleObj.width;
-      } // 최대 너비 구하기
+      this.setToggleStyle();
 
-      let toggleWrapStyle = {};
-      if (this.toggleType === 'tab') {
-        toggleWrapStyle = {
-          width: `${this.maxWidth}px`,
-          height: `${this.toggleObj.height}px`,
-          lineHeight: `${this.toggleObj.height}px`,
-          borderRadius: '4px',
-        };
-      } else if (this.toggleType === 'slide') {
-        if (this.toggleShape === 'square') {
-          toggleWrapStyle = {
-            width: `${this.maxWidth}px`,
-            height: `${this.toggleObj.height}px`,
-            lineHeight: `${this.toggleObj.height}px`,
-            borderRadius: '3px',
-          };
-        } else if (this.toggleShape === 'circle') {
-          toggleWrapStyle = {
-            width: `${this.maxWidth}px`,
-            height: `${this.toggleObj.height}px`,
-            lineHeight: `${this.toggleObj.height}px`,
-            borderRadius: `${this.toggleObj.height}px`,
-          };
-        }
-      } else if (this.toggleType === 'button') {
-        toggleWrapStyle = {
-          width: `${this.maxWidth}px`,
-          height: `${this.toggleObj.height}px`,
-          lineHeight: `${this.toggleObj.height}px`,
-          borderRadius: '4px',
-        };
-      } // type별로 style setting
-
-      for (let ix = 0, ixLen = Object.keys(toggleWrapStyle).length; ix < ixLen; ix++) {
-        this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
-          = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
-      } // style 속성 부여
-
-      const self = this;
-      this.$nextTick(() => {
-        setTimeout(() => {
-          self.isShow = true;
-        });
+      setTimeout(() => {
+        this.isShow = true;
       });
     },
     methods: {
+      setToggleStyle() {
+        if (this.toggleText.onText || this.toggleText.offText) {
+          let maxTextWidth = 0;
+          const onTextScrollWidth = this.$refs.onTextRef.clientWidth;
+          const offTextScrollWidth = this.$refs.offTextRef.clientWidth;
+          if (this.toggleType === 'slide' || this.toggleType === 'button') {
+            if (offTextScrollWidth < onTextScrollWidth) {
+              maxTextWidth = onTextScrollWidth;
+            } else {
+              maxTextWidth = offTextScrollWidth;
+            }
+          } else if (this.toggleType === 'tab') {
+            if (offTextScrollWidth < onTextScrollWidth) {
+              maxTextWidth = onTextScrollWidth * 2;
+            } else {
+              maxTextWidth = offTextScrollWidth * 2;
+            }
+          }
+          if (maxTextWidth < this.toggleObj.width) {
+            this.maxWidth = this.toggleObj.width;
+          } else {
+            this.maxWidth = maxTextWidth;
+          }
+        } else {
+          this.maxWidth = this.toggleObj.width;
+        } // 최대 너비 구하기
+
+        let toggleWrapStyle = {};
+        if (this.toggleType === 'tab') {
+          toggleWrapStyle = {
+            width: `${this.maxWidth}px`,
+            height: `${this.toggleObj.height}px`,
+            lineHeight: `${this.toggleObj.height}px`,
+            borderRadius: '4px',
+          };
+        } else if (this.toggleType === 'slide') {
+          if (this.toggleShape === 'square') {
+            toggleWrapStyle = {
+              width: `${this.maxWidth}px`,
+              height: `${this.toggleObj.height}px`,
+              lineHeight: `${this.toggleObj.height}px`,
+              borderRadius: '3px',
+            };
+          } else if (this.toggleShape === 'circle') {
+            toggleWrapStyle = {
+              width: `${this.maxWidth}px`,
+              height: `${this.toggleObj.height}px`,
+              lineHeight: `${this.toggleObj.height}px`,
+              borderRadius: `${this.toggleObj.height}px`,
+            };
+          }
+        } else if (this.toggleType === 'button') {
+          toggleWrapStyle = {
+            width: `${this.maxWidth}px`,
+            height: `${this.toggleObj.height}px`,
+            lineHeight: `${this.toggleObj.height}px`,
+            borderRadius: '4px',
+          };
+        } // type별로 style setting
+
+        for (let ix = 0, ixLen = Object.keys(toggleWrapStyle).length; ix < ixLen; ix++) {
+          this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
+            = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
+        } // style 속성 부여
+      },
       changeToggle() {
         this.dataToggleOn = !this.dataToggleOn;
         this.$emit('input', this.dataToggleOn);
