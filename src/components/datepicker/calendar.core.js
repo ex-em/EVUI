@@ -224,8 +224,8 @@ class Calendar {
     if (e.currentTarget && e.currentTarget.clientHeight) {
       targetDivHeight = e.currentTarget.clientHeight;
     }
-    this.dropdown.style.top = `${(e.pageY - e.layerY) + targetDivHeight}px`;
-    this.dropdown.style.left = `${e.pageX - e.layerX}px`;
+    this.dropdown.style.top = `${(e.pageY - e.offsetY) + targetDivHeight}px`;
+    this.dropdown.style.left = `${(e.pageX - e.offsetX) - 5}px`;
   }
   hideDropdown() {
     this.dropdown.style.display = 'none';

@@ -3,21 +3,25 @@
     <ev-datepicker
       v-model="bindDay1"
       :options="option1"
+      :size="'fit'"
       class="ev-datepicker-temp"
     />
     <ev-datepicker
       v-model="bindDay2"
       :options="option2"
+      :size="'fit'"
       class="ev-datepicker-temp"
     />
     <ev-datepicker
       v-model="bindDay3"
       :options="option3"
+      :size="'fit'"
       class="ev-datepicker-temp"
     />
     <ev-datepicker
       v-model="bindDay4"
       :options="option4"
+      :size="'fit'"
       class="ev-datepicker-temp"
     />
     <br><br><br><br><br>
