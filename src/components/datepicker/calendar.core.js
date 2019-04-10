@@ -495,24 +495,22 @@ class Calendar {
         && e.offsetY > v.startY
         && e.offsetY < v.startY + v.height) {
         // // 오늘 이후 비활성화 시 return false
-        // if (this.options.limitToday) {
-        //   const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
-        //   const initLimitDay = new Date(this.options.initLimitDay);
-        //   // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
-        //   const initSelectGetDay = initLimitDay.getDay();
-        //   // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
-        //   const initSelectSunday = new Date();
-        //   initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
-        //   initSelectSunday.setHours(0, 0, 0, 0);
-        //   // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
-        //   if (initLimitDay < mouseoverDay) {
-        //     return undefined;
-        //   } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
-        //     if (this.options.selectDayType === 'weekday') {
-        //       // 개발 필요
-        //     }
-        //   }
-        // }
+        if (this.options.limitToday) {
+          if (this.options.selectDayType === 'day') {
+            const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
+            const initLimitDay = new Date(this.options.initLimitDay);
+            // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
+            const initSelectGetDay = initLimitDay.getDay();
+            // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
+            const initSelectSunday = new Date();
+            initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
+            initSelectSunday.setHours(0, 0, 0, 0);
+            // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
+            if (initLimitDay < mouseoverDay) {
+              return undefined;
+            }
+          }
+        }
         // selectDayType에 따라 선택
         if (this.options.selectDayType === 'weekday') {
           // 1주평일(5일)

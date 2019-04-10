@@ -18,6 +18,13 @@
       class="evui-datepicker-temp"
     />
     value: {{ bindDay2 }}
+    <datepicker
+      v-model="bindDay3"
+      :options="option3"
+      :size="'fit'"
+      class="evui-datepicker-temp"
+    />
+    value: {{ bindDay2 }}
   </div>
 </template>
 
@@ -41,6 +48,13 @@
         option2: {
           selectDayType: 'day',
           initSelectDayFlag: true,
+        },
+        bindDay3: '2019-04-09',
+        option3: {
+          selectDayType: 'day',
+          initSelectDayFlag: true,
+          limitToday: true,
+          initLimitDay: new Date(new Date().setDate(new Date().getDate() - 1)),
         },
       };
     },
