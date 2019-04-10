@@ -244,6 +244,9 @@
       },
     },
     watch: {
+      computedValue(v) {
+        this.$emit('input', v);
+      },
     },
     created() {
     },
