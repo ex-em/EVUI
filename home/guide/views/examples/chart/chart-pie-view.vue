@@ -27,7 +27,7 @@
   import CodeView from '@/components/codeview/code';
   import DefaultPieChart from './chart.pie.default';
   import DoughnutChart from './chart.pie.doughnut';
-  // import SunburstChart from './chart.pie.sunburst';
+  import SunburstChart from './chart.pie.sunburst';
 
   export default {
     components: {
@@ -51,11 +51,13 @@
             isBottom: true,
             title: 'Doughnut',
           },
-          // {
-          //   url: './guide/views/examples/chart/chart.pie.sunburst.vue',
-          //   component: SunburstChart,
-          //   title: 'Sunburst',
-          // },
+          {
+            url: './guide/views/examples/chart/chart.pie.sunburst.vue',
+            component: SunburstChart,
+            description: 'SunburstChart',
+            isBottom: true,
+            title: 'Sunburst',
+          },
         ],
       };
     },

@@ -39,16 +39,16 @@ const module = {
       const isActive = !colorDOM.className.includes('inactive');
       const series = nameDOM.series;
 
-      if (isActive && this.showSeriesInfo.count === 1) {
+      if (isActive && this.seriesInfo.count === 1) {
         return;
       }
 
       if (isActive) {
-        this.showSeriesInfo.count--;
+        this.seriesInfo.count--;
         colorDOM.style.backgroundColor = opt.inactive;
         nameDOM.style.color = opt.inactive;
       } else {
-        this.showSeriesInfo.count++;
+        this.seriesInfo.count++;
         colorDOM.style.backgroundColor = series.color;
         nameDOM.style.color = opt.color;
       }
@@ -173,7 +173,7 @@ const module = {
     containerDOM.evcType = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
-    this.showSeriesInfo.count++;
+    this.seriesInfo.count++;
   },
   setLegendPosition() {
     const opt = this.options;

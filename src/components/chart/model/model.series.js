@@ -1,6 +1,7 @@
 import Line from '../element/element.line';
 import Scatter from '../element/element.scatter';
 import Bar from '../element/element.bar';
+import Pie from '../element/element.pie';
 
 const module = {
   createSeriesSet(series, defaultType) {
@@ -22,12 +23,17 @@ const module = {
     const idx = param.sIdx;
 
     if (type === 'line') {
+      this.seriesInfo.charts.line.push(id);
       return new Line(id, opt, idx);
     } else if (type === 'scatter') {
+      this.seriesInfo.charts.scatter.push(id);
       return new Scatter(id, opt, idx);
     } else if (type === 'bar') {
-      this.showSeriesInfo.barSeriesIds.push(id);
+      this.seriesInfo.charts.bar.push(id);
       return new Bar(id, opt, idx);
+    } else if (type === 'pie') {
+      this.seriesInfo.charts.pie.push(id);
+      return new Pie(id, opt, idx);
     }
 
     return false;

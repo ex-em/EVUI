@@ -3,7 +3,7 @@
     <div
       class="ev-chart-ttt"
       style="width:100%; height:100%;">
-      <bar-chart/>
+      <pie-chart/>
     </div>
   </div>
 </template>
