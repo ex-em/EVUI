@@ -182,6 +182,12 @@
                 content: '복합 차트',
                 imgUrl: `${this.imgUrl}/chart-combo.png`,
               },
+              {
+                name: 'Reactivity Chart',
+                routerLink: '/reactivitychart',
+                content: '실시간 차트',
+                imgUrl: `${this.imgUrl}/chart-line.png`,
+              },
             ],
           },
           {

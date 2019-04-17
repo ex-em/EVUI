@@ -22,6 +22,7 @@
         @blur="handleBlur"
         @input="handleInput"
         @change="handleChange"
+        @click="handleClick"
       >
       <textarea
         v-else
@@ -40,6 +41,7 @@
         @blur="handleBlur"
         @input="handleInput"
         @change="handleChange"
+        @click="handleClick"
       />
     </div>
     <div :class="wrapTextClass">
@@ -203,6 +205,9 @@
       },
       handleChange(e) {
         this.$emit('on-change', e);
+      },
+      handleClick(e) {
+        this.$emit('on-click', e);
       },
       setCurrentValue(value) {
         if (value === this.currentValue) {

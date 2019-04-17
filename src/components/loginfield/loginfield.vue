@@ -13,6 +13,7 @@
       :readonly="readonly"
       :maxlength="maxLength"
       spellcheck="false"
+      autocomplete="autoComplete"
       required
       @keyup.enter="handleEnter"
       @keyup="handleKeyUp"
@@ -134,6 +135,7 @@
         maxError: false,
         textError: false,
         errorMsgWrapper: this.errorMsg,
+        autoComplete: this.type === 'password' ? 'new-password' : null,
       };
     },
     computed: {

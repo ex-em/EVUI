@@ -1,6 +1,6 @@
 {
   "name": "evui",
-  "version": "2.0.8",
+  "version": "2.1.0",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
@@ -48,6 +48,7 @@
     "vuex": "^3.1.0"
   },
   "devDependencies": {
+    "acorn": "^6.1.1",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
@@ -60,6 +61,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-2": "^6.22.0",
+    "chai": "^3.5.0",
     "clean-webpack-plugin": "^2.0.1",
     "compression-webpack-plugin": "^2.0.0",
     "copy-webpack-plugin": "^5.0.1",
@@ -95,7 +97,7 @@
     "postcss-url": "^7.3.2",
     "shelljs": "^0.7.6",
     "sinon": "^4.5.0",
-    "sinon-chai": "^2.8.0",
+    "sinon-chai": "^2.9.0",
     "style-loader": "^0.21.0",
     "url-loader": "^1.1.2",
     "vue-codemirror-lite": "^1.0.4",

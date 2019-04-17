@@ -32,7 +32,7 @@ class Bar {
     const axesSteps = param.axesSteps;
     const index = param.showIndex;
     const isHorizontal = param.isHorizontal;
-    const labels = param.integLabels;
+    const labels = param.integratedLabels;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
 

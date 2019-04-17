@@ -1,17 +1,18 @@
 <template>
   <div
     v-click-outside="hideDatepicker"
+    :class="size + inputTextMaxLength"
     class="ev-datepicker"
     @click="showDatepicker"
   >
     <div
-      :class="wrapClasses"
+      :class="[{wrapClasses}, size + inputTextMaxLength]"
       class="ev-datepicker-input-wrapper"
     >
       <input
         ref="datepickerText"
         :value="computedValue"
-        :class="inputClasses"
+        :class="[{inputClasses}, size + inputTextMaxLength]"
         :placeholder="options.localeType"
         class="ev-datepicker-input"
         type="text"
@@ -88,6 +89,10 @@
             initSelectDay: this.value ? new Date(moment(this.value)) : new Date(),
           };
         },
+      },
+      size: {
+        type: String,
+        default: '',
       },
     },
     data() {
@@ -239,6 +244,9 @@
       },
     },
     watch: {
+      computedValue(v) {
+        this.$emit('input', v);
+      },
     },
     created() {
     },
@@ -587,13 +595,36 @@
   .ev-datepicker {
     width: 235px;
   }
+  .ev-datepicker-input-wrapper {
+    width: 235px;
+    height: 32px;
+  }
   .ev-datepicker-input {
     width: 235px;
     height: 32px;
     line-height: 32px;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    color: #606266;
+    padding: 0 5px 0 5px;
   }
-  .ev-datepicker-input-wrapper {
-    width: 235px;
-    height: 32px;
+  .fit10,
+  .fit13,
+  .fit16,
+  .fit19 {
+    height: 23px;
+    line-height: 23px;
+  }
+  .fit10 {
+    width: 85px;
+  }
+  .fit13 {
+    width: 105px;
+  }
+  .fit16 {
+    width: 125px;
+  }
+  .fit19 {
+    width: 145px;
   }
 </style>
