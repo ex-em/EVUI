@@ -51,6 +51,9 @@ export const BAR_OPTION = {
   category: true,
 };
 
+export const PIE_OPTION = {
+  show: true,
+};
 
 export const AXIS_OPTION = {
   min: null,

@@ -1,18 +1,8 @@
 <template>
-  <div style="width: 33%; overflow: auto;">
-    <chart
-      :data="pieData"
-      :options="pieOptions"
-    />
-    <chart
-      :data="pieData"
-      :options="doughnutOptions"
-    />
-    <chart
-      :data="sunburstData"
-      :options="sunburstOptions"
-    />
-  </div>
+  <chart
+    :data="pieData"
+    :options="pieOptions"
+  />
 </template>
 <script>
   import chart from '@/components/chart';
@@ -24,127 +14,73 @@
     data() {
       return {
         pieData: {
-          series: [
-            {
-              id: 'series0',
-              name: 'series-0',
-              show: true,
-              data: [5, 10],
-            },
-            {
-              id: 'series1',
-              name: 'series-1',
-              show: true,
-              data: [10, 12],
-            },
-            {
+          series: {
+            series1: { name: 'series#1', show: true, type: 'pie' },
+            series2: { name: 'series#2', show: true, type: 'pie' },
+            series3: { name: 'series#3', show: true, type: 'pie' },
+            series4: { name: 'series#4', show: true, type: 'pie' },
+            series5: { name: 'series#5', show: true, type: 'pie' },
+            series6: { name: 'series#6', show: true, type: 'pie' },
+            series7: { name: 'series#7', show: true, type: 'pie' },
+            series8: { name: 'series#8', show: true, type: 'pie' },
+            series9: { name: 'series#9', show: true, type: 'pie' },
+          },
+          data: [{
+            id: 'series1',
+            value: 15,
+            children: [{
               id: 'series2',
-              name: 'series-2',
-              show: true,
-              data: [15, 10],
-            },
-            {
-              id: 'series3',
-              name: 'series-3',
-              show: true,
-              data: [5, 10],
-            },
-          ],
-        },
-        sunburstData: {
-          series: [
-            {
-              id: 'series_0',
-              name: 'series_0',
-              show: true,
-              data: 15,
-              children: [
-                {
-                  id: 'series_0_0',
-                  name: 'series_0_0',
-                  show: true,
-                  data: 10,
-                },
-                {
-                  id: 'series_0_1',
-                  name: 'series_0_1',
-                  show: true,
-                  data: 12,
-                },
-              ],
-            },
-            {
-              id: 'series_2',
-              name: 'series_2',
-              show: true,
-              data: 12,
-            },
-          ],
+              value: 30,
+            }, {
+              id: 'series5',
+              value: 10,
+              children: [{
+                id: 'series7',
+                value: 10,
+              }],
+            }],
+          }, {
+            id: 'series3',
+            value: 20,
+            children: [{
+              id: 'series6',
+              value: 5,
+              children: [{
+                id: 'series8',
+                value: 10,
+              }],
+            }],
+          }, {
+            id: 'series4',
+            value: 10,
+            // children: [{
+            //   id: 'series9',
+            //   value: 10,
+            // }],
+          }],
         },
         pieOptions: {
-          type: 'pie',
-          width: '400px',
-          height: '350px',
-        },
-        doughnutOptions: {
-          type: 'pie',
-          doughnutHoleSize: 0.4,
-          width: '400px',
-          height: '350px',
-        },
-        sunburstOptions: {
-          type: 'sunburst',
-          width: '400px',
-          height: '350px',
+          width: '100%',
+          height: '100%',
+          title: {
+            text: 'Title Test',
+            show: true,
+          },
+          legend: {
+            show: true,
+            position: 'right',
+          },
+          sunburst: true,
+          reverse: false,
           doughnutHoleSize: 0.4,
         },
       };
     },
     mounted() {
-      this.addData();
     },
     destroyed() {
-      if (this.interval) {
-        clearTimeout(this.interval);
-      }
     },
     methods: {
-      addData() {
-        this.interval = setInterval(this.pieAddData.bind(this), 1000);
-      },
-      pieAddData() {
-        const randomData1 = Math.floor((Math.random() * 30) + 1);
-        const randomData2 = Math.floor((Math.random() * 30) + 1);
-        const randomData3 = Math.floor((Math.random() * 30) + 1);
-
-        this.$children[0].addValue(0, randomData1, 0);
-        this.$children[0].addValue(0, randomData2, 1);
-
-        this.$children[0].addValue(1, randomData2, 0);
-        this.$children[0].addValue(1, randomData1, 1);
-
-        this.$children[0].addValue(2, randomData2, 0);
-        this.$children[0].addValue(2, randomData3, 1);
-
-        this.$children[0].addValue(3, randomData3, 0);
-        this.$children[0].addValue(3, randomData2, 1);
-
-        this.$children[0].chart.redraw();
-
-        this.$children[1].addValue(0, randomData1, 0);
-        this.$children[1].addValue(0, randomData2, 1);
-
-        this.$children[1].addValue(1, randomData2, 0);
-        this.$children[1].addValue(1, randomData1, 1);
-
-        this.$children[1].addValue(2, randomData2, 0);
-        this.$children[1].addValue(2, randomData3, 1);
-
-        this.$children[1].addValue(3, randomData3, 0);
-        this.$children[1].addValue(3, randomData2, 1);
-
-        this.$children[1].chart.redraw();
-      },
     },
   };
 </script>

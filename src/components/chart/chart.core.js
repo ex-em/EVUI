@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -46,11 +47,18 @@ class EvChart {
     this.isInitLegend = false;
     this.isInitTitle = false;
 
+    this.pieDataSet = [];
     this.seriesList = {};
     this.chartRect = {};
-    this.showSeriesInfo = {
+
+    this.seriesInfo = {
+      charts: {
+        pie: [],
+        bar: [],
+        line: [],
+        scatter: [],
+      },
       count: 0,
-      barSeriesIds: [],
     };
     this.integratedLabels = this.data.labels.slice();
   }
@@ -106,37 +114,67 @@ class EvChart {
   }
 
   drawSeries() {
+    const ctx = this.bufferCtx;
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const axesSteps = this.axesSteps;
+    const isHorizontal = this.options.horizontal;
+    const thickness = this.options.thickness;
+    const integratedLabels = this.integratedLabels;
+
     let showIndex = 0;
     let showSeriesCount = 0;
-    this.showSeriesInfo.barSeriesIds.forEach((series) => {
+    this.seriesInfo.charts.bar.forEach((series) => {
       if (this.seriesList[series].show) {
         showSeriesCount++;
       }
     });
 
+    const chartKeys = Object.keys(this.seriesInfo.charts);
+    for (let ix = 0; ix < chartKeys.length; ix++) {
+      const chartType = chartKeys[ix];
+      const chartTypeSet = this.seriesInfo.charts[chartType];
 
-    Object.values(this.seriesList).forEach((series) => {
-      series.draw({
-        ctx: this.bufferCtx,
-        chartRect: this.chartRect,
-        labelOffset: this.labelOffset,
-        axesSteps: this.axesSteps,
-        isHorizontal: this.options.horizontal,
-        integLabels: this.integratedLabels,
-        thickness: this.options.thickness,
-        showSeriesCount,
-        showIndex,
-      });
+      for (let jx = 0; jx < chartTypeSet.length; jx++) {
+        const series = this.seriesList[chartTypeSet[jx]];
 
-      if (series.show) {
-        showIndex++;
+        if (chartType === 'line' || chartType === 'scatter') {
+          series.draw({ ctx, chartRect, labelOffset, axesSteps, isHorizontal });
+        } else if (chartType === 'bar') {
+          series.draw({
+            ctx,
+            chartRect,
+            labelOffset,
+            axesSteps,
+            isHorizontal,
+            integratedLabels,
+            thickness,
+            showSeriesCount,
+            showIndex,
+          });
+
+          if (series.show) {
+            showIndex++;
+          }
+        } else {
+          if (this.options.sunburst) {
+            this.drawSunburst();
+          } else {
+            this.drawPie();
+          }
+
+          if (this.options.doughnutHoleSize > 0) {
+            this.drawDoughnutHole();
+          }
+          break;
+        }
       }
-    });
+    }
   }
 
-  createAxes(dir, axes) {
+  createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
-    const integLabels = this.integratedLabels;
+    const integratedLabels = this.integratedLabels;
 
     return axes.map((axis) => {
       switch (axis.type) {
@@ -147,7 +185,7 @@ class EvChart {
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':
-          return new StepScale(dir, axis, ctx, integLabels);
+          return new StepScale(dir, axis, ctx, integratedLabels);
         default:
           return false;
       }
@@ -212,6 +250,255 @@ class EvChart {
     return { x: axesXSteps, y: axesYSteps };
   }
 
+  drawPie() {
+    const ctx = this.bufferCtx;
+    const chartRect = this.chartRect;
+    const pieDataSet = this.pieDataSet;
+
+    let slice;
+    let value;
+    let sliceAngle;
+    let startAngle = 1.5 * Math.PI;
+    let endAngle;
+    let series;
+
+    const centerX = chartRect.chartWidth / 2;
+    const centerY = chartRect.chartHeight / 2;
+
+    const innerRadius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    const outerRadius = Math.min(centerX, centerY);
+
+    for (let ix = 0; ix < pieDataSet.length; ix++) {
+      const pie = pieDataSet[ix];
+      const radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+
+      pie.or = radius;
+      if (ix < pieDataSet.length - 1) {
+        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+      } else {
+        pie.ir = 1;
+      }
+
+      if (pie.total) {
+        for (let jx = 0; jx < pie.data.length; jx++) {
+          slice = pie.data[jx];
+          value = slice.value;
+          sliceAngle = 2 * Math.PI * (value / pie.total);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+          series = this.seriesList[slice.id];
+
+          if (value) {
+            series.draw({
+              ctx,
+              centerX,
+              centerY,
+              radius,
+              startAngle,
+              endAngle,
+            });
+            startAngle += sliceAngle;
+          }
+        }
+      }
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#fff';
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  drawSunburst() {
+    const ctx = this.bufferCtx;
+    const chartRect = this.chartRect;
+    const pieDataSet = this.pieDataSet;
+
+    this.calculateAngle();
+
+    let slice;
+    let series;
+
+    const centerX = chartRect.chartWidth / 2;
+    const centerY = chartRect.chartHeight / 2;
+
+    const innerRadius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    const outerRadius = Math.min(centerX, centerY);
+
+    for (let ix = 0; ix < pieDataSet.length; ix++) {
+      const pie = pieDataSet[ix];
+      const radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+
+      pie.or = radius;
+      if (ix < pieDataSet.length - 1) {
+        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+      } else {
+        pie.ir = 1;
+      }
+
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        slice = pie.data[jx];
+
+        if (slice.id === 'dummy') {
+          ctx.save();
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.fillStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#fff';
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, slice.sa, slice.ea);
+          ctx.stroke();
+          ctx.fill();
+          ctx.closePath();
+          ctx.restore();
+        } else {
+          series = this.seriesList[slice.id];
+
+          if (slice.value) {
+            series.draw({
+              ctx,
+              centerX,
+              centerY,
+              radius,
+              startAngle: slice.sa,
+              endAngle: slice.ea,
+            });
+          }
+        }
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#fff';
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  calculateAngle() {
+    const pieDataSet = this.pieDataSet;
+
+    let slice;
+    let value;
+    let parent;
+    let totalValue;
+
+    let sliceAngle;
+    let startAngle;
+    let endAngle;
+    let totalAngle;
+    let isDummy;
+
+    const dummyIndex = [];
+    const saStore = {
+      '$ev-root': 1.5 * Math.PI,
+    };
+
+    for (let ix = 0; ix < pieDataSet.length; ix++) {
+      const pie = pieDataSet[ix];
+      isDummy = true;
+
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        slice = pie.data[jx];
+        value = slice.value;
+
+        if (isDummy) {
+          isDummy = slice.id === 'dummy';
+        }
+
+        if (!ix) {
+          startAngle = saStore['$ev-root'];
+          sliceAngle = 2 * Math.PI * (value / pie.total);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+          saStore['$ev-root'] += sliceAngle;
+        } else {
+          parent = this.getParentInfo(ix - 1, slice.parent);
+          if (!parent) {
+            break;
+          }
+
+          if (!saStore[slice.parent]) {
+            saStore[slice.parent] = parent.sa;
+          }
+
+          startAngle = saStore[slice.parent];
+          totalAngle = parent.ea - parent.sa;
+          totalValue = pie.total[slice.parent] || 0;
+          sliceAngle = totalAngle * (value / totalValue);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+
+          saStore[slice.parent] += sliceAngle;
+        }
+      }
+
+      if (isDummy) {
+        dummyIndex.push(ix);
+      }
+    }
+
+    for (let ix = 0; ix < dummyIndex.length; ix++) {
+      this.pieDataSet.splice(dummyIndex, 1);
+    }
+
+    if (this.options.reverse) {
+      this.pieDataSet = _.reverse(this.pieDataSet);
+    }
+  }
+
+  getParentInfo(depth, parentId) {
+    for (let ix = depth; ix >= 0; ix--) {
+      const pie = this.pieDataSet[ix];
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        if (pie.data[jx].id === parentId) {
+          return pie.data[jx];
+        }
+      }
+    }
+
+    return null;
+  }
+
+  drawDoughnutHole() {
+    const ctx = this.bufferCtx;
+
+    const centerX = (this.chartRect.chartWidth / 2);
+    const centerY = (this.chartRect.chartHeight / 2);
+
+    const radius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.fillOpacity = 0;
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+
+    // inner stroke
+    ctx.beginPath();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = this.options.border;
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.closePath();
+
+    this.pieDataSet[this.pieDataSet.length - 1].ir = radius;
+  }
+
   getChartRect() {
     const width = this.chartDOM.getBoundingClientRect().width || 10;
     const height = this.chartDOM.getBoundingClientRect().height || 10;
@@ -272,8 +559,8 @@ class EvChart {
     const labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
     const labelBuffer = { width: 20, height: 4 };
 
-    let lw;
-    let lh;
+    let lw = 0;
+    let lh = 0;
 
     axesX.forEach((axis, index) => {
       lw = range.x[index].size.width + labelBuffer.width;
