@@ -1,10 +1,8 @@
 <template>
   <div class="selectbox-read-only">
     <ev-selectbox
-      ref="selectbox"
       v-model="selectedValue"
       :read-only="true"
-      :init-select-value="'item_2'"
       :items="items"
     />
     <br><br>
@@ -16,7 +14,7 @@
   export default {
     data() {
       return {
-        selectedValue: '',
+        selectedValue: 'item_2',
         items: this.getItems(),
       };
     },

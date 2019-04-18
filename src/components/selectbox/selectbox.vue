@@ -148,14 +148,6 @@
         type: [String, Number, Array],
         default: null,
       },
-      initSelectValue: {
-        type: [String, Number, Array],
-        default: null,
-      },
-      initSelectIdx: {
-        type: [Number, Array],
-        default: null,
-      },
       items: {
         type: Array,
         default() {
@@ -172,7 +164,8 @@
         clickedValue: '',
         inputFieldValue: '',
         listBoxItems: [],
-        selectedItems: [],
+        isUseVModel: this.$vnode.data && this.$vnode.data.model,
+        selectedValueData: this.multiple ? [] : null,
       };
     },
     computed: {
@@ -183,37 +176,52 @@
           'evui-selectbox-arrow-icon-disabled': this.disabled,
         };
       },
+      selectedItems() {
+        let items = [];
+
+        if (this.multiple) {
+          items = this.items.filter(item =>
+            this.selectedValueData.findIndex(v => v === item.value) > -1,
+          );
+        } else {
+          const selectedItem = this.items.find(item => item.value === this.selectedValueData);
+
+          if (selectedItem) {
+            items.push(selectedItem);
+          }
+        }
+
+        return items;
+      },
     },
     watch: {
       items: {
         deep: true,
-        handler(newItems) {
-          if (newItems.length > 0) {
-            this.listBoxItems = newItems.slice();
-            this.initSelect();
-          }
+        handler() {
+          this.initSettings();
         },
       },
-      selectedItems(items) {
-        let value = null;
-
-        if (this.multiple) {
-          value = [];
-          items.map(obj => value.push(obj.value));
-        } else {
-          value = items[0] ? items[0].value : null;
-        }
-
-        this.$emit('change-selected-value', value);
+      selectedValue(value) {
+        this.setSelectedValueData(value);
       },
     },
     created() {
-      this.listBoxItems = this.items.slice();
-
       this.dropdownStyle.border = this.multiple ? 1 : 0;
-      this.initSelect();
+
+      this.initSettings();
     },
     methods: {
+      initSettings() {
+        this.listBoxItems = this.items.slice() || [];
+        this.setSelectedValueData(this.selectedValue);
+
+        if (this.multiple) {
+          this.inputFieldValue = '';
+        } else {
+          this.inputFieldValue = this.selectedValue;
+          this.clickedValue = this.selectedValue;
+        }
+      },
       onClick() {
         if (this.disabled) {
           return;
@@ -257,93 +265,27 @@
         this.listBoxItems = this.getFilteredListBoxItems(e.target.value);
         this.$emit('keyup', e);
       },
-      initSelect() {
-        let item;
-        let value;
-
-        this.selectedItems.length = 0;
-
-        if (this.initSelectValue != null) {
-          if (this.initSelectValue.constructor === Array) {
-            for (let ix = 0; ix < this.initSelectValue.length; ix++) {
-              value = this.initSelectValue[ix];
-              item = this.getItemByValue(value);
-
-              if (item) {
-                this.selectedItems.push(item);
-              }
-            }
-          } else {
-            item = this.getItemByValue(this.initSelectValue);
-
-            if (item) {
-              this.selectedItems.push(item);
-            }
-          }
-        } else if (this.initSelectIdx != null) {
-          if (this.initSelectIdx.constructor === Array) {
-            for (let ix = 0; ix < this.initSelectIdx.length; ix++) {
-              value = this.initSelectIdx[ix];
-              item = this.getItemByIndex(value);
-
-              if (item) {
-                this.selectedItems.push(item);
-              }
-            }
-          } else {
-            item = this.getItemByIndex(this.initSelectIdx);
-
-            if (item) {
-              this.selectedItems.push(item);
-            }
-          }
-        }
-
-        if (!this.multiple) {
-          this.inputFieldValue = this.selectedItems.length ? this.selectedItems[0].name : '';
-          this.clickedValue = this.inputFieldValue;
-        }
-      },
-      select(value) {
-        const item = this.getItemByValue(value);
-
-        if (item) {
-          this.selectItem(item);
-        }
-      },
-      selectIndex(idx) {
-        const item = this.getItemByIndex(idx);
-
-        if (item) {
-          this.selectItem(item);
-        }
-      },
       selectItem(item) {
         if (!item) {
           return;
         }
 
-        let foundItem;
-        const itemName = item.name;
+        let selectedValue;
+        const itemValue = item.value;
 
         if (this.multiple) {
-          foundItem = this.selectedItems.find(obj => obj.name === itemName);
+          selectedValue = this.selectedValueData.slice();
 
-          if (foundItem) {
-            this.selectedItems = this.selectedItems.filter(obj => obj.name !== itemName);
+          if (selectedValue.findIndex(value => value === itemValue) > -1) {
+            selectedValue = selectedValue.filter(value => value !== itemValue);
           } else {
-            this.selectedItems.push(item);
+            selectedValue.push(itemValue);
           }
         } else {
-          this.clickedValue = itemName;
-          this.inputFieldValue = itemName;
-          this.selectedItems.length = 0;
-          this.selectedItems.push(item);
+          selectedValue = itemValue;
         }
 
-        if (!this.multiple) {
-          this.dropDownState = false;
-        }
+        this.setSelectedValue(selectedValue);
       },
       removeTag(item, event) {
         if (event) {
@@ -351,7 +293,48 @@
           event.stopPropagation();
         }
 
-        this.selectedItems = this.selectedItems.filter(obj => obj.name !== item.name);
+        this.setSelectedValue(this.selectedValueData.filter(v => v !== item.value));
+      },
+      hideDropdown() {
+        this.dropDownState = false;
+      },
+      setSelectedValue(value) {
+        if (this.isUseVModel) {
+          this.$emit('change-selected-value', value);
+        } else {
+          this.setSelectedValueData(value);
+        }
+      },
+      setSelectedValueData(selectedValue) {
+        if (this.multiple) {
+          if (selectedValue && selectedValue.constructor === Array) {
+            if (selectedValue.length === this.selectedValueData.length) {
+              let matchCnt = 0;
+
+              this.selectedValueData.map((value) => {
+                if (selectedValue.findIndex(v => v === value) > -1) {
+                  matchCnt++;
+                }
+
+                return value;
+              });
+
+              if (this.selectedValueData.length !== matchCnt) {
+                this.selectedValueData = selectedValue;
+              }
+            } else {
+              this.selectedValueData = selectedValue;
+            }
+          } else {
+            this.selectedValueData.length = 0;
+          }
+        } else {
+          this.dropDownState = false;
+
+          this.selectedValueData = selectedValue;
+          this.clickedValue = selectedValue;
+          this.inputFieldValue = selectedValue;
+        }
       },
       getFilteredListBoxItems(value) {
         let filteredItems;
@@ -384,9 +367,6 @@
 
         return listBoxItems;
       },
-      hideDropdown() {
-        this.dropDownState = false;
-      },
       getSelectboxClass() {
         return {
           [`${prefixCls}`]: true,
@@ -400,69 +380,6 @@
           [`${prefixCls}-input-text-readonly`]: this.readOnly,
           [`${prefixCls}-input-text-disabled`]: this.disabled,
         };
-      },
-      getItemByValue(value) {
-        let groupObj;
-        let groupItems;
-        let foundItem;
-
-        if (this.isGroup) {
-          for (let ix = 0, ixLen = this.items.length; ix < ixLen; ix++) {
-            groupObj = this.items[ix];
-            groupItems = groupObj.items || [];
-            foundItem = groupItems.find(item => item.value === value);
-
-            if (foundItem) {
-              break;
-            }
-          }
-        } else {
-          foundItem = this.items.find(item => item.value === value);
-        }
-
-        if (foundItem) {
-          foundItem = JSON.parse(JSON.stringify(foundItem));
-        }
-
-        return foundItem;
-      },
-      getItemByIndex(idx) {
-        let groupObj;
-        let groupItems;
-        let foundItem;
-        let item;
-
-        if (this.isGroup) {
-          let itemRowIdx = 0;
-
-          for (let ix = 0; ix < this.items.length; ix++) {
-            groupObj = this.items[ix];
-            groupItems = groupObj.items || [];
-
-            for (let jx = 0; jx < groupItems.length; jx++) {
-              item = groupItems[jx];
-
-              if (item && itemRowIdx === idx) {
-                foundItem = item;
-                break;
-              }
-
-              itemRowIdx++;
-            }
-
-            if (foundItem || itemRowIdx > idx) {
-              break;
-            }
-          }
-        } else {
-          foundItem = this.items[idx];
-        }
-
-        if (foundItem) {
-          foundItem = JSON.parse(JSON.stringify(foundItem));
-        }
-
-        return foundItem;
       },
     },
   };
@@ -666,8 +583,8 @@
   }
 
   .evui-selectbox-size-small .evui-selectbox-tag-close-scale{
-     transform: scale(0.6);
-   }
+    transform: scale(0.6);
+  }
   .evui-selectbox-size-medium .evui-selectbox-tag-close-scale{
     transform: scale(0.5);
   }
