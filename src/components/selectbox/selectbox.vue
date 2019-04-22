@@ -100,7 +100,7 @@
       },
     },
     model: {
-      prop: 'selectedValue',
+      prop: 'vModelSelectedValue',
       event: 'change-selected-value',
     },
     props: {
@@ -144,7 +144,7 @@
         type: Boolean,
         default: false,
       },
-      selectedValue: {
+      vModelSelectedValue: {
         type: [String, Number, Array],
         default: null,
       },
@@ -165,7 +165,7 @@
         inputFieldValue: '',
         listBoxItems: [],
         isUseVModel: this.$vnode.data && this.$vnode.data.model,
-        selectedValueData: this.multiple ? [] : null,
+        selectedValue: this.multiple ? [] : null,
       };
     },
     computed: {
@@ -181,10 +181,10 @@
 
         if (this.multiple) {
           items = this.items.filter(item =>
-            this.selectedValueData.findIndex(v => v === item.value) > -1,
+            this.selectedValue.findIndex(v => v === item.value) > -1,
           );
         } else {
-          const selectedItem = this.items.find(item => item.value === this.selectedValueData);
+          const selectedItem = this.items.find(item => item.value === this.selectedValue);
 
           if (selectedItem) {
             items.push(selectedItem);
@@ -201,8 +201,8 @@
           this.initSettings();
         },
       },
-      selectedValue(value) {
-        this.setSelectedValueData(value);
+      vModelSelectedValue(value) {
+        this.setSelectedValue(value);
       },
     },
     created() {
@@ -213,13 +213,13 @@
     methods: {
       initSettings() {
         this.listBoxItems = this.items.slice() || [];
-        this.setSelectedValueData(this.selectedValue);
+        this.setSelectedValue(this.vModelSelectedValue);
 
         if (this.multiple) {
           this.inputFieldValue = '';
         } else {
-          this.inputFieldValue = this.selectedValue;
-          this.clickedValue = this.selectedValue;
+          this.inputFieldValue = this.vModelSelectedValue;
+          this.clickedValue = this.vModelSelectedValue;
         }
       },
       onClick() {
@@ -274,7 +274,7 @@
         const itemValue = item.value;
 
         if (this.multiple) {
-          selectedValue = this.selectedValueData.slice();
+          selectedValue = this.selectedValue.slice();
 
           if (selectedValue.findIndex(value => value === itemValue) > -1) {
             selectedValue = selectedValue.filter(value => value !== itemValue);
@@ -285,7 +285,7 @@
           selectedValue = itemValue;
         }
 
-        this.setSelectedValue(selectedValue);
+        this.changeVModelValue(selectedValue);
       },
       removeTag(item, event) {
         if (event) {
@@ -293,47 +293,47 @@
           event.stopPropagation();
         }
 
-        this.setSelectedValue(this.selectedValueData.filter(v => v !== item.value));
+        this.changeVModelValue(this.selectedValue.filter(v => v !== item.value));
       },
       hideDropdown() {
         this.dropDownState = false;
       },
-      setSelectedValue(value) {
+      changeVModelValue(value) {
         if (this.isUseVModel) {
           this.$emit('change-selected-value', value);
         } else {
-          this.setSelectedValueData(value);
+          this.setSelectedValue(value);
         }
       },
-      setSelectedValueData(selectedValue) {
+      setSelectedValue(value) {
         if (this.multiple) {
-          if (selectedValue && selectedValue.constructor === Array) {
-            if (selectedValue.length === this.selectedValueData.length) {
+          if (value && value.constructor === Array) {
+            if (value.length === this.selectedValue.length) {
               let matchCnt = 0;
 
-              this.selectedValueData.map((value) => {
-                if (selectedValue.findIndex(v => v === value) > -1) {
+              this.selectedValue.map((v1) => {
+                if (value.findIndex(v2 => v2 === v1) > -1) {
                   matchCnt++;
                 }
 
-                return value;
+                return v1;
               });
 
-              if (this.selectedValueData.length !== matchCnt) {
-                this.selectedValueData = selectedValue;
+              if (this.selectedValue.length !== matchCnt) {
+                this.selectedValue = value;
               }
             } else {
-              this.selectedValueData = selectedValue;
+              this.selectedValue = value;
             }
           } else {
-            this.selectedValueData.length = 0;
+            this.selectedValue.length = 0;
           }
         } else {
           this.dropDownState = false;
 
-          this.selectedValueData = selectedValue;
-          this.clickedValue = selectedValue;
-          this.inputFieldValue = selectedValue;
+          this.selectedValue = value;
+          this.clickedValue = value;
+          this.inputFieldValue = value;
         }
       },
       getFilteredListBoxItems(value) {
