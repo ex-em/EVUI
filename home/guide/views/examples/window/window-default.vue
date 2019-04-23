@@ -7,7 +7,7 @@
       Open Window
     </ev-button>
     <ev-window
-      ref="win"
+      :is-show.sync="isShow"
       :body-style="{ padding: '10px' }"
       title="Title"
     >
@@ -27,19 +27,12 @@
     data() {
       return {
         buttonType: ButtonType,
+        isShow: false,
       };
     },
     methods: {
       onClick() {
-        const win = this.$refs.win;
-
-        if (win) {
-          if (win.isShow) {
-            win.hide();
-          } else {
-            win.show();
-          }
-        }
+        this.isShow = !this.isShow;
       },
     },
   };
