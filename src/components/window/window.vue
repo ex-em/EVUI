@@ -1,7 +1,7 @@
 <template>
   <div
-    v-if="isExist"
-    v-show="isShow"
+    v-if="vIf"
+    v-show="vShow"
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
@@ -61,14 +61,6 @@
         type: String,
         default: '',
       },
-      closeType: {
-        type: String,
-        default: 'hide',
-        validator(value) {
-          const list = ['destroy', 'hide'];
-          return list.indexOf(value) > -1;
-        },
-      },
       maximizable: {
         type: Boolean,
         default: true,
@@ -77,19 +69,31 @@
         type: Boolean,
         default: true,
       },
+      isShow: {
+        type: Boolean,
+        default: true,
+      },
+      closeType: {
+        type: String,
+        default: 'hide',
+        validator(value) {
+          const list = ['destroy', 'hide'];
+          return list.indexOf(value) > -1;
+        },
+      },
     },
     data() {
       return {
         prefixCls: 'ev-window',
+        vIf: true,
+        vShow: true,
         windowId: '',
-        windowStyle: {},
+        windowStyle: null,
         windowCls: '',
         headerCls: '',
         headerStyle: '',
         headerHeight: 32,
         grabbingBorderSize: 5,
-        isExist: true,
-        isShow: true,
         grabbingBorderPosInfo: {
           top: false,
           right: false,
@@ -108,17 +112,22 @@
         },
       };
     },
+    watch: {
+      isShow: {
+        immediate: true,
+        handler() {
+          this.syncIsShow();
+        },
+      },
+    },
     created() {
       this.windowId = `window_${this._uid}`;
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = { [`${this.prefixCls}-header-area`]: true };
       this.windowCls = { [this.prefixCls]: true };
     },
-    mounted() {
-      this.windowStyle = this.getWindowStyle();
-    },
     beforeDestroy() {
-      this.isShow = false;
+      this.close();
     },
     methods: {
       mousedown(e) {
@@ -245,6 +254,28 @@
 
         this.isFullExpandWindow = !this.isFullExpandWindow;
       },
+      clickCloseBtn() {
+        this.$emit('before-close', this);
+        this.close();
+      },
+      close() {
+        if (this.closeType === 'destroy') {
+          this.vIf = false;
+        } else {
+          this.vShow = false;
+        }
+
+        this.$emit('update:is-show', false);
+      },
+      show() {
+        if (this.closeType === 'destroy') {
+          this.vIf = true;
+        } else {
+          this.vShow = true;
+        }
+
+        this.$emit('update:is-show', true);
+      },
       resize(e) {
         const isTop = this.grabbingBorderPosInfo.top;
         const isLeft = this.grabbingBorderPosInfo.left;
@@ -327,27 +358,6 @@
         } else {
           this.$el.style.cursor = 'default';
         }
-      },
-      isInHeader(x, y) {
-        if (x == null || y == null) {
-          return false;
-        }
-
-        const rect = this.$el.getBoundingClientRect();
-        const posX = +x - rect.left;
-        const posY = +y - rect.top;
-        const headerAreaStyleInfo = this.$refs.headerArea.style;
-        const headerPaddingInfo = {
-          top: this.removePixel(headerAreaStyleInfo.paddingTop),
-          left: this.removePixel(headerAreaStyleInfo.paddingLeft),
-          right: this.removePixel(headerAreaStyleInfo.paddingRight),
-        };
-        const startPosX = headerPaddingInfo.left;
-        const endPosX = rect.width - headerPaddingInfo.right;
-        const startPosY = headerPaddingInfo.top;
-        const endPosY = startPosY + this.headerHeight;
-
-        return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
       },
       setCssText(paramObj) {
         if (paramObj === null || typeof paramObj !== 'object') {
@@ -466,19 +476,35 @@
 
         return result || 0;
       },
-      show() {
-        this.isShow = true;
-      },
-      hide() {
-        this.isShow = false;
-      },
-      clickCloseBtn() {
-        this.$emit('before-close', this);
+      isInHeader(x, y) {
+        if (x == null || y == null) {
+          return false;
+        }
 
-        if (this.closeType === 'hide') {
-          this.hide();
-        } else {
-          this.isExist = false;
+        const rect = this.$el.getBoundingClientRect();
+        const posX = +x - rect.left;
+        const posY = +y - rect.top;
+        const headerAreaStyleInfo = this.$refs.headerArea.style;
+        const headerPaddingInfo = {
+          top: this.removePixel(headerAreaStyleInfo.paddingTop),
+          left: this.removePixel(headerAreaStyleInfo.paddingLeft),
+          right: this.removePixel(headerAreaStyleInfo.paddingRight),
+        };
+        const startPosX = headerPaddingInfo.left;
+        const endPosX = rect.width - headerPaddingInfo.right;
+        const startPosY = headerPaddingInfo.top;
+        const endPosY = startPosY + this.headerHeight;
+
+        return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
+      },
+      syncIsShow() {
+        this.vIf = this.closeType === 'hide' || this.isShow;
+        this.vShow = this.isShow;
+
+        if (!this.windowStyle && this.isShow) {
+          this.$nextTick(() => {
+            this.windowStyle = this.getWindowStyle();
+          });
         }
       },
     },

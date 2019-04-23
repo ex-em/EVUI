@@ -4,7 +4,6 @@
       <ev-selectbox
         v-model="selectedValue1"
         :is-group="true"
-        :init-select-idx="3"
         :items="items1"
       />
       <br><br>
@@ -15,7 +14,6 @@
         v-model="selectedValue2"
         :is-group="true"
         :multiple="true"
-        :init-select-idx="3"
         :items="items2"
       />
       <br><br>
@@ -28,8 +26,8 @@
   export default {
     data() {
       return {
-        selectedValue1: '',
-        selectedValue2: '',
+        selectedValue1: 'group_0 > item_1',
+        selectedValue2: ['group_1 > item_2'],
         items1: this.getItems(),
         items2: this.getItems(),
       };

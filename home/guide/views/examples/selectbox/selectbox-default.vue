@@ -1,9 +1,7 @@
 <template>
   <div class="selectbox-default">
     <ev-selectbox
-      ref="selectbox"
       v-model="selectedValue"
-      :init-select-value="'item_1'"
       :items="items"
       @keyup="onKeyUp"
       @select="onSelect"
@@ -23,7 +21,7 @@
   export default {
     data() {
       return {
-        selectedValue: '',
+        selectedValue: 'item_1',
         items: this.getItems(),
       };
     },
@@ -35,7 +33,7 @@
         this.e = e;
       },
       onClickBtn() {
-        this.$refs.selectbox.select('item_3');
+        this.selectedValue = 'item_3';
       },
       getItems() {
         let value;

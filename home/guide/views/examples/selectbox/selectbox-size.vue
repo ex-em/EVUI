@@ -15,7 +15,6 @@
           :name="'box_0'"
           :size="'small'"
           :multiple="true"
-          :init-select-idx="0"
           :items="items0"
         />
         <br><br>
@@ -31,7 +30,6 @@
           :name="'box_1'"
           :size="'medium'"
           :multiple="true"
-          :init-select-idx="1"
           :items="items1"
         />
         <br><br>
@@ -47,7 +45,6 @@
           :name="'box_2'"
           :size="'large'"
           :multiple="true"
-          :init-select-idx="2"
           :items="items2"
         />
         <br><br>
@@ -72,7 +69,6 @@
           :name="'box_3'"
           :size="'small'"
           :multiple="true"
-          :init-select-idx="0"
           :items="items3"
         />
         <br><br>
@@ -90,7 +86,6 @@
           v-model="vModel4"
           :name="'box_4'"
           :multiple="true"
-          :init-select-idx="1"
           :items="items4"
         />
         <br><br>
@@ -108,7 +103,6 @@
           v-model="vModel5"
           :name="'box_5'"
           :multiple="true"
-          :init-select-idx="2"
           :items="items5"
         />
         <br><br>
@@ -124,12 +118,12 @@
   export default {
     data() {
       return {
-        vModel0: '',
-        vModel1: '',
-        vModel2: '',
-        vModel3: '',
-        vModel4: '',
-        vModel5: '',
+        vModel0: ['item_0', 'item_2'],
+        vModel1: ['item_1'],
+        vModel2: ['item_2', 'item_3'],
+        vModel3: ['item_3'],
+        vModel4: ['item_1'],
+        vModel5: ['item_2'],
         items0: this.getItemList(),
         items1: this.getItemList(),
         items2: this.getItemList(),
