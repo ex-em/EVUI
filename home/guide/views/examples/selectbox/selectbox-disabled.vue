@@ -3,7 +3,6 @@
     <ev-selectbox
       v-model="selectedValue"
       :disabled="true"
-      :init-select-idx="0"
       :items="items"
     />
     <br><br>
@@ -15,7 +14,7 @@
   export default {
     data() {
       return {
-        selectedValue: '',
+        selectedValue: 'item_0',
         items: this.getItems(),
       };
     },
