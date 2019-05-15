@@ -1,53 +1,76 @@
+import moment from 'moment';
+import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
-class StepScale extends Scale {
-  constructor(type, opt, ctx, labels) {
-    super(type, opt, ctx);
-    this.labels = labels;
+class TimeCategoryScale extends Scale {
+  getLabelFormat(value) {
+    return moment(value).format(this.timeFormat);
   }
 
-  calculateScaleRange() {
-    const stepMinMax = Util.getStringMinMax(this.labels);
-    const maxValue = stepMinMax.max;
-    const minValue = stepMinMax.min;
+  getInterval(range) {
+    const max = range.maxValue;
+    const min = range.minValue;
+    const step = range.maxSteps;
 
-    return {
-      min: minValue,
-      max: maxValue,
-      minLabel: this.getLabelFormat(minValue),
-      maxLabel: this.getLabelFormat(maxValue),
-      size: Util.calcTextSize(this.getLabelFormat(maxValue), Util.getLabelStyle(this.labelStyle)),
-    };
+    if (this.interval) {
+      if (typeof this.interval === 'string') {
+        return TIME_INTERVALS[this.interval].size;
+      } else if (typeof this.interval === 'object') {
+        return this.interval.time * TIME_INTERVALS[this.interval.unit].size;
+      } else if (typeof this.interval === 'number') {
+        return this.interval;
+      }
+    }
+    return Math.ceil((max - min) / step);
   }
 
   calculateSteps(range) {
-    const labels = this.labels;
+    const maxValue = range.maxValue;
+    const minValue = range.minValue;
     const maxSteps = range.maxSteps;
+    const rawInterval = this.getInterval(range);
 
-    let interval = 1;
+    let count = 1;
+    let interval = rawInterval;
+    let increase = minValue;
     let numberOfSteps;
 
-    const graphRange = labels.length;
+    while (increase < maxValue) {
+      increase += interval;
+    }
+
+    const graphMax = increase > maxValue ? maxValue : increase;
+    const graphMin = minValue;
+    const graphRange = graphMax - graphMin;
 
     numberOfSteps = Math.round(graphRange / interval);
+    const oriSteps = numberOfSteps;
+
+    if (maxValue === 1) {
+      interval = 0.2;
+      numberOfSteps = 5;
+    }
 
     while (numberOfSteps > maxSteps) {
       interval *= 2;
+      count *= 2;
       numberOfSteps = Math.round(graphRange / interval);
     }
 
     return {
       steps: numberOfSteps,
+      oriSteps,
       interval,
-      graphMin: range.minValue,
-      graphMax: range.maxValue,
+      rawInterval,
+      graphMin,
+      graphMax,
+      count,
     };
   }
 
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
-    const labels = this.labels;
     const aPos = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,
@@ -56,8 +79,13 @@ class StepScale extends Scale {
     };
 
     const steps = stepInfo.steps;
+    const axisMin = stepInfo.graphMin;
+    const axisMax = stepInfo.graphMax;
+    const stepValue = stepInfo.rawInterval;
+    const oriSteps = stepInfo.oriSteps + 1;
+    const count = stepInfo.count;
 
-    const startPoint = aPos[this.units.rectStart];
+    let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
@@ -87,12 +115,18 @@ class StepScale extends Scale {
       ctx.lineTo(offsetPoint + aliasPixel, endPoint);
     }
     ctx.stroke();
+    ctx.closePath();
 
-    if (steps === 0) {
+    if (steps === 0 || axisMin === null) {
       return;
     }
 
-    const labelGap = (endPoint - startPoint) / labels.length;
+    const graphGap = (endPoint - startPoint) / oriSteps;
+    if (this.categoryMode) {
+      startPoint += Math.ceil(graphGap / 2) - 2;
+    }
+
+    const ticks = [];
     let labelCenter = null;
     let linePosition = null;
 
@@ -100,39 +134,38 @@ class StepScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    let labelPoint;
+    for (let ix = 0; ix < oriSteps; ix += count) {
+      ticks[ix] = axisMin + (ix * stepValue);
 
-    labels.forEach((item, index) => {
-      labelCenter = Math.round(startPoint + (labelGap * index));
+      labelCenter = Math.round(startPoint + (graphGap * ix));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(item);
+      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+
+      let labelPoint;
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+        ctx.fillText(labelText, labelCenter, labelPoint);
 
-        if (index > 0 && this.showGrid) {
+        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+        ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (index > 0 && this.showGrid) {
+        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
       }
+
       ctx.stroke();
-    });
+    }
 
     ctx.closePath();
   }
-
-  getLabelFormat(value) {
-    return value;
-  }
 }
 
-export default StepScale;
+export default TimeCategoryScale;

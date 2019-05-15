@@ -21,45 +21,47 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
-          series2: { name: 'series#2', show: true, type: 'line', fill: true, point: false },
+          series1: { name: 'series#1', show: true, type: 'bar', timeMode: true },
+          series2: { name: 'series#2', show: true, type: 'bar', timeMode: true },
+          // series3: { name: 'series#3', show: true, type: 'bar' },
+          // series4: { name: 'series#4', show: true, type: 'bar' },
         },
         groups: [
+          // ['series1', 'series2', 'series3', 'series4'],
           ['series1', 'series2'],
         ],
-        labels: [
-          +new Date('2017/01/01 00:00:00'),
-          +new Date('2017/01/01 00:01:00'),
-          +new Date('2017/01/01 00:02:00'),
-          +new Date('2017/01/01 00:03:00'),
-          +new Date('2017/01/01 00:04:00'),
-        ],
+        labels: [],
         chartData: {
-          series1: [100, 150, 51, 150, 350],
-          series2: [50, 200, 100, 150, 80],
+          series1: [],
+          series2: [],
+          series3: [],
+          series4: [],
         },
         chartOptions: {
           width: '100%',
           height: '100%',
+          thickness: 1,
           title: {
             text: 'Title Test',
             show: true,
           },
           legend: {
             show: true,
-            position: 'right',
+            position: 'top',
           },
           horizontal: false,
           axesX: [{
             type: 'time',
-            timeFormat: 'HH:mm:ss',
-            interval: 'minute',
+            showGrid: true,
+            categoryMode: true,
+            timeFormat: 'mm:ss',
+            interval: 3000,
           }],
           axesY: [{
             type: 'linear',
             startToZero: true,
             autoScaleRatio: 0.1,
-            showGrid: true,
+            showGrid: false,
           }],
         },
         liveBtnInfo: {
@@ -67,18 +69,26 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:04:00',
+        timeValue: +new Date('2017-01-01 00:10:00'),
         liveMode: false,
         event: null,
       };
     },
     computed: {
+      graphData() {
+        return {
+          series1: this.chartData.series1,
+          series2: this.chartData.series2,
+          // series3: this.chartData.series3,
+          // series4: this.chartData.series4,
+        };
+      },
       getChartData() {
         return {
           series: this.series,
           labels: this.labels,
-          data: this.chartData,
           groups: this.groups,
+          data: this.graphData,
         };
       },
     },
@@ -94,22 +104,23 @@
         this.liveMode = !this.liveMode;
 
         if (this.liveMode) {
-          this.liveInterval = setInterval(this.addLiveData.bind(this), 1000);
+          this.liveInterval = setInterval(this.addLiveData.bind(this), 100);
         } else {
           clearTimeout(this.liveInterval);
         }
       },
       getRandomInt() {
-        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'm');
-        this.labels.shift();
-        this.chartData.series1.shift();
-        this.chartData.series2.shift();
-        this.labels.push(this.timeValue);
-        this.chartData.series1.push(this.getRandomInt());
-        this.chartData.series2.push(this.getRandomInt());
+        this.$set(this.chartOptions.axesX[0], 'range', [+new Date(this.timeValue - 60000), this.timeValue]);
+
+        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series2.push({ x: this.timeValue, y: this.getRandomInt() });
+        // this.chartData.series3.push({ x: this.timeValue, y: this.getRandomInt() });
+        // this.chartData.series4.push({ x: this.timeValue, y: this.getRandomInt() });
+
+        this.timeValue = +moment(this.timeValue).add(3, 's');
       },
     },
   };

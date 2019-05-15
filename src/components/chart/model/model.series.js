@@ -1,6 +1,7 @@
 import Line from '../element/element.line';
 import Scatter from '../element/element.scatter';
 import Bar from '../element/element.bar';
+import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
 
 const module = {
@@ -30,6 +31,10 @@ const module = {
       return new Scatter(id, opt, idx);
     } else if (type === 'bar') {
       this.seriesInfo.charts.bar.push(id);
+
+      if (opt.timeMode) {
+        return new TimeBar(id, opt, idx);
+      }
       return new Bar(id, opt, idx);
     } else if (type === 'pie') {
       this.seriesInfo.charts.pie.push(id);

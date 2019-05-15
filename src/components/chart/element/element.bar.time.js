@@ -1,26 +1,7 @@
-import _merge from 'lodash/merge';
-import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
+import Bar from './element.bar';
 
-class Bar {
-  constructor(sId, opt, sIdx) {
-    const merged = _merge({}, BAR_OPTION, opt);
-    Object.keys(merged).forEach((key) => {
-      this[key] = merged[key];
-    });
-
-    if (this.name === undefined) {
-      this.name = `series-${sIdx}`;
-    }
-
-    if (this.color === undefined) {
-      this.color = COLOR[sIdx];
-    }
-
-    this.sId = sId;
-    this.data = [];
-  }
-
+class TimeBar extends Bar {
   draw(param) {
     if (!this.show) {
       return;
@@ -37,6 +18,9 @@ class Bar {
 
     let x;
     let y;
+    let interval;
+    let rawInterval;
+    let interpolateGraphMax;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
@@ -46,8 +30,18 @@ class Bar {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
+    if (isHorizontal) {
+      rawInterval = axesSteps.y[this.yAxisIndex].rawInterval || 1;
+      interpolateGraphMax = minmaxY.graphMax + rawInterval;
+      interval = Math.floor((interpolateGraphMax - minmaxY.graphMin) / rawInterval);
+    } else {
+      rawInterval = axesSteps.x[this.xAxisIndex].rawInterval || 1;
+      interpolateGraphMax = minmaxX.graphMax + rawInterval;
+      interval = Math.floor((interpolateGraphMax - minmaxX.graphMin) / rawInterval);
+    }
+
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
+    const cArea = dArea / (interval || 1);
     const cPad = 2;
 
     let bArea;
@@ -59,28 +53,21 @@ class Bar {
     let w = isHorizontal ? null : Math.round(bArea * thickness);
     let h = isHorizontal ? Math.round(bArea * thickness) : null;
 
-    // barArea내에서 barWidth로 빠진 부분을 계산.
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
-    // series index에 따라 시작 X값 보정을 위한 변수.
     const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
-
-    let categoryPoint = null;
 
     ctx.beginPath();
     ctx.fillStyle = this.color;
 
-    this.data.forEach((item, index) => {
-      if (isHorizontal) {
-        categoryPoint = ysp - (cArea * index) - cPad;
-      } else {
-        categoryPoint = xsp + (cArea * index) + cPad;
-      }
-
+    this.data.forEach((item) => {
       if (isHorizontal) {
         x = xsp;
-        y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
+        y = Canvas.calculateY(item.y, minmaxY.graphMin, interpolateGraphMax, yArea, ysp);
       } else {
-        x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
+        x = Canvas.calculateX(item.x, minmaxX.graphMin, interpolateGraphMax, xArea, xsp);
+        if (x !== null) {
+          x += Math.ceil(bArea * barSeriesX) - Math.round(w + bPad);
+        }
         y = ysp;
       }
 
@@ -98,7 +85,9 @@ class Bar {
         h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
       }
 
-      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+      if (x !== null && y !== null) {
+        ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+      }
 
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line
@@ -108,4 +97,4 @@ class Bar {
   }
 }
 
-export default Bar;
+export default TimeBar;
