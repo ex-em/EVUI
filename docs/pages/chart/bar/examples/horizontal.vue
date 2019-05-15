@@ -1,6 +1,6 @@
 <template>
   <div>
-    <chart
+    <ev-chart
       :data="horizontalBarChartData"
       :options="horizontalBarChartOptions"
     />
@@ -10,12 +10,8 @@
 
 <script>
   import '@/styles/evui.css';
-  import chart from '@/components/chart';
 
   export default {
-    components: {
-      chart,
-    },
     data() {
       return {
         horizontalBarChartData: {

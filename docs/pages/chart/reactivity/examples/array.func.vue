@@ -1,15 +1,15 @@
 <template>
   <div>
-    <chart
+    <ev-chart
       :data="getChartData"
       :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <Button
+      <ev-button
         @click="onClickLiveBtn"
       >
         {{ liveBtnInfo.text }}
-      </Button>
+      </ev-button>
     </div>
     <br>
   </div>
@@ -18,14 +18,8 @@
 <script>
   import moment from 'moment';
   import '@/styles/evui.css';
-  import Chart from '@/components/chart';
-  import Button from '@/components/button';
 
   export default {
-    components: {
-      Chart,
-      Button,
-    },
     data() {
       return {
         series: {

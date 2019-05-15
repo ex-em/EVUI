@@ -1,6 +1,6 @@
 <template>
   <div>
-    <chart
+    <ev-chart
       :data="pieData"
       :options="pieOptions"
     />
@@ -10,12 +10,8 @@
 
 <script>
   import '@/styles/evui.css';
-  import chart from '@/components/chart';
 
   export default {
-    components: {
-      chart,
-    },
     data() {
       return {
         pieData: {

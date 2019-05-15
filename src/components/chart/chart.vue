@@ -37,6 +37,20 @@
       },
     },
     watch: {
+      'options.axesX': {
+        handler(newVal) {
+          this.evChart.options.axesX = newVal;
+          this.evChart.update();
+        },
+        deep: true,
+      },
+      'options.axesY': {
+        handler(newVal) {
+          this.evChart.options.axesY = newVal;
+          this.evChart.update();
+        },
+        deep: true,
+      },
       data: {
         handler(newVal, oldVal) {
           let isSeriesUpdate = false;

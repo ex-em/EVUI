@@ -1,3 +1,5 @@
+import _ from 'lodash-es/reverse';
+
 const module = {
   createDataSet(data, label) {
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
@@ -160,7 +162,6 @@ const module = {
       if (gdata && typeof gdata === 'object') {
         odata = isHorizontal ? curr.x : curr.y;
         ldata = isHorizontal ? curr.y : curr.x;
-        this.addIntegratedLabels(ldata);
       }
 
       if (sIdx > 0) {
@@ -185,7 +186,6 @@ const module = {
       if (gdata && typeof gdata === 'object') {
         gdata = isHorizontal ? curr.x : curr.y;
         ldata = isHorizontal ? curr.y : curr.x;
-        this.addIntegratedLabels(ldata);
       }
 
       return this.addData(gdata, ldata);
@@ -202,12 +202,6 @@ const module = {
     }
 
     return data;
-  },
-
-  addIntegratedLabels(value) {
-    if (this.integratedLabels.indexOf(`${value}`) < 0) {
-      this.integratedLabels.push(`${value}`);
-    }
   },
 
   getSeriesMinMax(data) {
@@ -291,6 +285,95 @@ const module = {
     }
 
     return def;
+  },
+
+  calculateAngle() {
+    const pieDataSet = this.pieDataSet;
+
+    let slice;
+    let value;
+    let parent;
+    let totalValue;
+
+    let sliceAngle;
+    let startAngle;
+    let endAngle;
+    let totalAngle;
+    let isDummy;
+
+    const dummyIndex = [];
+    const saStore = {
+      '$ev-root': 1.5 * Math.PI,
+    };
+
+    for (let ix = 0; ix < pieDataSet.length; ix++) {
+      const pie = pieDataSet[ix];
+      isDummy = true;
+
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        slice = pie.data[jx];
+        value = slice.value;
+
+        if (isDummy) {
+          isDummy = slice.id === 'dummy';
+        }
+
+        if (!ix) {
+          startAngle = saStore['$ev-root'];
+          sliceAngle = 2 * Math.PI * (value / pie.total);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+          saStore['$ev-root'] += sliceAngle;
+        } else {
+          parent = this.getParentInfo(ix - 1, slice.parent);
+          if (!parent) {
+            break;
+          }
+
+          if (!saStore[slice.parent]) {
+            saStore[slice.parent] = parent.sa;
+          }
+
+          startAngle = saStore[slice.parent];
+          totalAngle = parent.ea - parent.sa;
+          totalValue = pie.total[slice.parent] || 0;
+          sliceAngle = totalAngle * (value / totalValue);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+
+          saStore[slice.parent] += sliceAngle;
+        }
+      }
+
+      if (isDummy) {
+        dummyIndex.push(ix);
+      }
+    }
+
+    for (let ix = 0; ix < dummyIndex.length; ix++) {
+      this.pieDataSet.splice(dummyIndex, 1);
+    }
+
+    if (this.options.reverse) {
+      this.pieDataSet = _.reverse(this.pieDataSet);
+    }
+  },
+
+  getParentInfo(depth, parentId) {
+    for (let ix = depth; ix >= 0; ix--) {
+      const pie = this.pieDataSet[ix];
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        if (pie.data[jx].id === parentId) {
+          return pie.data[jx];
+        }
+      }
+    }
+
+    return null;
   },
 };
 

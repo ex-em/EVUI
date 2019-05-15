@@ -24,6 +24,7 @@
   import Stack from './examples/stack';
   import Horizontal from './examples/horizontal';
   import Time from './examples/time';
+  import Range from './examples/range';
 
   export default {
     data() {
@@ -50,6 +51,11 @@
           title: 'Time',
           component: Time,
           url: './docs/pages/chart/bar/examples/time.vue',
+          description: 'RealTime 처리를 위한 차트입니다.',
+        }, {
+          title: 'Range',
+          component: Range,
+          url: './docs/pages/chart/bar/examples/range.vue',
           description: 'RealTime 처리를 위한 차트입니다.',
         }],
       };

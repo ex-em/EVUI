@@ -1,13 +1,13 @@
 <template>
   <div>
-    <chart
-      :data="scatterData"
-      :options="scatterOptions"
+    <ev-chart
+      :data="getChartData"
+      :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <Button
+      <ev-button
         @click="onClickLiveBtn"
-      >{{ liveBtnInfo.text }}</Button>
+      >{{ liveBtnInfo.text }}</ev-button>
     </div>
     <br>
   </div>
@@ -16,14 +16,8 @@
 <script>
   import moment from 'moment';
   import '@/styles/evui.css';
-  import Chart from '@/components/chart';
-  import Button from '@/components/button';
 
   export default {
-    components: {
-      Chart,
-      Button,
-    },
     data() {
       return {
         series: {
@@ -31,12 +25,13 @@
           series2: { name: 'series#2', show: true, type: 'scatter', fill: false, point: true },
           series3: { name: 'series#3', show: true, type: 'scatter', fill: false, point: true },
         },
-        graphData: {
+        chartData: {
           series1: [],
           series2: [],
           series3: [],
         },
-        scatterOptions: {
+        labels: [],
+        chartOptions: {
           width: '100%',
           height: '100%',
           title: {
@@ -71,10 +66,17 @@
       };
     },
     computed: {
-      scatterData() {
+      graphData() {
+        return {
+          series1: this.chartData.series1,
+          series2: this.chartData.series2,
+          series3: this.chartData.series3,
+        };
+      },
+      getChartData() {
         return {
           series: this.series,
-          labels: [],
+          labels: this.labels,
           data: this.graphData,
         };
       },
@@ -101,14 +103,13 @@
       },
       addLiveData() {
         this.timeValue = +new Date();
-        const range = [+new Date(this.timeValue - 180000), this.timeValue];
-        this.$set(this.scatterOptions.axesX[0], 'range', range);
-
-        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.graphData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.graphData.series2.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.graphData.series3.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.$set(this.chartOptions.axesX[0], 'range', [+new Date(this.timeValue - 180000), this.timeValue]);
+        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series2.push({ x: this.timeValue, y: this.getRandomInt() });
+        this.chartData.series3.push({ x: this.timeValue, y: this.getRandomInt() });
 
         this.timeValue = +moment(this.timeValue).add(3, 's');
       },

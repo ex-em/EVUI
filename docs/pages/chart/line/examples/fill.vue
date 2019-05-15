@@ -1,13 +1,13 @@
 <template>
   <div>
-    <chart
-      :data="fillLineChartData"
-      :options="fillLineChartOptions"
+    <ev-chart
+      :data="getChartData"
+      :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <Button
+      <ev-button
         @click="onClickLiveBtn"
-      >{{ liveBtnInfo.text }}</Button>
+      >{{ liveBtnInfo.text }}</ev-button>
     </div>
     <br>
   </div>
@@ -16,32 +16,24 @@
 <script>
   import moment from 'moment';
   import '@/styles/evui.css';
-  import Chart from '@/components/chart';
-  import Button from '@/components/button';
 
   export default {
-    components: {
-      Chart,
-      Button,
-    },
     data() {
       return {
-        fillLineChartData: {
-          series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
-          },
-          labels: [
-            +new Date('2017/01/01 00:00:00'),
-            +new Date('2017/01/01 00:01:00'),
-            +new Date('2017/01/01 00:02:00'),
-            +new Date('2017/01/01 00:03:00'),
-            +new Date('2017/01/01 00:04:00'),
-          ],
-          data: {
-            series1: [100, 150, 51, 150, 350],
-          },
+        series: {
+          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
         },
-        fillLineChartOptions: {
+        labels: [
+          +new Date('2017/01/01 00:00:00'),
+          +new Date('2017/01/01 00:01:00'),
+          +new Date('2017/01/01 00:02:00'),
+          +new Date('2017/01/01 00:03:00'),
+          +new Date('2017/01/01 00:04:00'),
+        ],
+        chartData: {
+          series1: [100, 150, 51, 150, 350],
+        },
+        chartOptions: {
           width: '100%',
           height: '100%',
           title: {
@@ -75,6 +67,15 @@
         event: null,
       };
     },
+    computed: {
+      getChartData() {
+        return {
+          series: this.series,
+          labels: this.labels,
+          data: this.chartData,
+        };
+      },
+    },
     destroyed() {
       if (this.liveInterval) {
         clearTimeout(this.liveInterval);
@@ -97,10 +98,10 @@
       },
       addLiveData() {
         this.timeValue = +moment(this.timeValue).add(1, 'm');
-        this.fillLineChartData.labels.shift();
-        this.fillLineChartData.data.series1.shift();
-        this.fillLineChartData.labels.push(this.timeValue);
-        this.fillLineChartData.data.series1.push(this.getRandomInt());
+        this.labels.shift();
+        this.chartData.series1.shift();
+        this.labels.push(this.timeValue);
+        this.chartData.series1.push(this.getRandomInt());
       },
     },
   };

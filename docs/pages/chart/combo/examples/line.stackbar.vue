@@ -1,13 +1,13 @@
 <template>
   <div>
-    <chart
-      :data="chartData"
+    <ev-chart
+      :data="getChartData"
       :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <Button
+      <ev-button
         @click="onClickLiveBtn"
-      >{{ liveBtnInfo.text }}</Button>
+      >{{ liveBtnInfo.text }}</ev-button>
     </div>
     <br>
   </div>
@@ -16,28 +16,20 @@
 <script>
   import moment from 'moment';
   import '@/styles/evui.css';
-  import Chart from '@/components/chart';
-  import Button from '@/components/button';
 
   export default {
-    components: {
-      Chart,
-      Button,
-    },
     data() {
       return {
-        chartData: {
-          series: {
-            series1: { name: 'series#1', show: true, type: 'bar' },
-            series2: { name: 'series#2', show: true, type: 'bar' },
-            series3: { name: 'series#3', show: true, type: 'line', combo: true },
-          },
-          groups: [
-            ['series1', 'series2'],
-          ],
-          labels: [],
-          data: {},
+        series: {
+          series1: { name: 'series#1', show: true, type: 'bar' },
+          series2: { name: 'series#2', show: true, type: 'bar' },
+          series3: { name: 'series#3', show: true, type: 'line', combo: true },
         },
+        groups: [
+          ['series1', 'series2'],
+        ],
+        labels: [],
+        chartData: {},
         chartOptions: {
           width: '100%',
           height: '100%',
@@ -51,10 +43,11 @@
             position: 'right',
           },
           axesX: [{
-            type: 'step',
-            showGrid: false,
-            timeMode: true,
-            timeFormat: 'HH:mm',
+            type: 'time',
+            showGrid: true,
+            categoryMode: true,
+            timeFormat: 'HH:mm:ss',
+            interval: 3000,
           }],
           axesY: [{
             type: 'linear',
@@ -72,6 +65,16 @@
         liveMode: false,
         event: null,
       };
+    },
+    computed: {
+      getChartData() {
+        return {
+          series: this.series,
+          labels: this.labels,
+          groups: this.groups,
+          data: this.chartData,
+        };
+      },
     },
     created() {
       this.makeInitData();
@@ -98,14 +101,14 @@
       },
       addLiveData() {
         this.timeValue = +moment(this.timeValue).add(1, 'seconds');
-        this.chartData.labels.shift();
-        this.chartData.data.series1.shift();
-        this.chartData.data.series2.shift();
-        this.chartData.data.series3.shift();
-        this.chartData.labels.push(+moment(this.timeValue));
-        this.chartData.data.series1.push(this.getRandomInt());
-        this.chartData.data.series2.push(this.getRandomInt());
-        this.chartData.data.series3.push(this.getRandomInt());
+        this.labels.shift();
+        this.chartData.series1.shift();
+        this.chartData.series2.shift();
+        this.chartData.series3.shift();
+        this.labels.push(+moment(this.timeValue));
+        this.chartData.series1.push(this.getRandomInt());
+        this.chartData.series2.push(this.getRandomInt());
+        this.chartData.series3.push(this.getRandomInt());
       },
       makeInitData() {
         const label = [];
@@ -123,8 +126,8 @@
         data.series2.push(null);
         data.series3.push(null);
 
-        this.chartData.labels = label;
-        this.chartData.data = data;
+        this.labels = label;
+        this.chartData = data;
       },
     },
   };
