@@ -24,20 +24,20 @@
     data() {
       return {
         title: 'Tree',
-        componentList: [{
+        components: [{
           title: 'Default',
           component: Default,
-          url: './pages/tree/examples/default.vue',
+          url: './docs/pages/tree/examples/default.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }, {
           title: 'Call Tree',
           component: CallTree,
-          url: './pages/tree/examples/calltree.vue',
+          url: './docs/pages/tree/examples/calltree.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }, {
           title: 'Checkbox',
           component: CheckBox,
-          url: './pages/tree/examples/checkbox.vue',
+          url: './docs/pages/tree/examples/checkbox.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }],
       };

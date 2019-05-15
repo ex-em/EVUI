@@ -17,11 +17,11 @@ function resolve (dir) {
 module.exports = merge(webpackBaseConfig, {
   devtool: 'eval-source-map',
   entry: {
-    app: './home/main.js',
+    app: './docs/main.js',
     vendors: ['vue', 'vue-router']
   },
   output: {
-    path: resolve('./demo'),
+    path: resolve('./dist_docs'),
     publicPath: '/',
     filename: '[name].js',
     chunkFilename: '[name].js'
@@ -32,7 +32,7 @@ module.exports = merge(webpackBaseConfig, {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
-        include: [resolve('src'), resolve('home')],
+        include: [resolve('src'), resolve('docs')],
         options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
@@ -84,17 +84,18 @@ module.exports = merge(webpackBaseConfig, {
     new HtmlWebpackPlugin({
       inject: true,
       filename: './index.html',
-      template: './home/index.html',
+      template: './docs/index.html',
     }),
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../home/guide/'),
-        to: './guide/'
+        from: path.resolve(__dirname, '../docs/'),
+        to: './docs/',
+        copyUnmodified: true,
       }
     ]),
     new FriendlyErrorsPlugin(),
     new VueLoaderPlugin(),
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
     // new CleanWebpackPlugin([resolve('./demo')], {allowExternal : true }),
   ]
 });

@@ -13,7 +13,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/radio/api/radio.md'"
+      :url="'./docs/pages/radio/api/radio.md'"
     />
   </div>
 </template>
@@ -30,12 +30,12 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/radio/examples/default.vue',
+          url: './docs/pages/radio/examples/default.vue',
           description: '라디오 그룹의 단일 라디오 버튼의 기능입니다. (하나 선택은 라디오의 기능이 아니므로 사용 안함) ',
         }, {
           title: 'Group Default',
           component: GroupDefault,
-          url: './pages/radio/examples/group-default.vue',
+          url: './docs/pages/radio/examples/group-default.vue',
           description: '라디오 그룹에 묶인 여러 개의 선택 사항 중 한 항목을 선택합니다.',
         }],
       };

@@ -14,7 +14,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/chart/api/chart.md'"
+      :url="'./docs/pages/chart/api/chart.md'"
     />
   </div>
 </template>
@@ -32,24 +32,24 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/chart/bar/examples/default.vue',
+          url: './docs/pages/chart/bar/examples/default.vue',
           description: `Bar Chart는 Category 기반의 데이터를 표현하는 차트로, 각 Category에 대한 Bar의 높이가 나타내는 값에 비례합니다.
                         계열이 여러개가 존재할 경우 동일한 넓이의 Bar를 생성하여 Category 기준으로 각 계열을 표현합니다.`,
         }, {
           title: 'Stack',
           component: Stack,
-          url: './pages/chart/bar/examples/stack.vue',
+          url: './docs/pages/chart/bar/examples/stack.vue',
           description: 'Category 기반의 막대 데이터를 누적하여 표현합니다.',
         }, {
           title: 'Horizontal',
           component: Horizontal,
-          url: './pages/chart/bar/examples/horizontal.vue',
+          url: './docs/pages/chart/bar/examples/horizontal.vue',
           description: `Horizontal Bar Chart는 각 Category에 대한 Bar의 널이가 나타내는 값에 비례합니다.
                         계열이 여러개가 존재할 경우 동일한 높이의 Bar를 생성하여 Category 기준으로 각 계열을 표현합니다.`,
         }, {
           title: 'Time',
           component: Time,
-          url: './pages/chart/bar/examples/time.vue',
+          url: './docs/pages/chart/bar/examples/time.vue',
           description: 'RealTime 처리를 위한 차트입니다.',
         }],
       };

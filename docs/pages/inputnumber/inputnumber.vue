@@ -1,44 +1,33 @@
 <template>
   <div>
     <div class="article-title">
-      <h2> Input Number </h2>
+      <h1> {{ title }} </h1>
     </div>
     <br>
-    <div
-      v-for="item in inputList"
-      :key="item.id"
-    >
-      <div class="inner-article">
-        <h4># {{ item.title }}</h4>
-        <code-view
-          :code-url="item.url"
-          :is-bottom="item.isBottom"
-          :description="item.description"
-        >
-          <component :is="item.component"/>
-        </code-view>
-      </div>
-      <br>
-    </div>
+    <Example
+      v-for="(item, index) in components"
+      :key="index"
+      :title="item.title"
+      :description="item.description"
+      :contents="item.component"
+      :url="item.url"
+    />
   </div>
 </template>
 
 <script>
-  import codeView from '@/components/codeview/code';
-  import inputNumberDefault from './examples/default';
+  import Default from './examples/default';
 
   export default {
-    components: {
-      codeView,
-    },
     data() {
       return {
-        inputList: [
+        title: 'Input Number',
+        components: [
           {
-            url: './guide/views/examples/inputnumber/default.vue',
-            component: inputNumberDefault,
-            description: '마우스나 키보드를 이용해서 숫자를 입력할 수 있습니다.',
             title: 'Default',
+            component: Default,
+            url: './docs/pages/inputnumber/examples/default.vue',
+            description: '마우스나 키보드를 이용해서 숫자를 입력할 수 있습니다.',
           },
         ],
       };

@@ -25,7 +25,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/textfield/examples/default.vue',
+          url: './docs/pages/textfield/examples/default.vue',
           description: '',
         }],
       };

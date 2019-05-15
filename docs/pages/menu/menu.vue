@@ -25,7 +25,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/menu/examples/default.vue',
+          url: './docs/pages/menu/examples/default.vue',
           description: '사이트의 안내를 위한 메뉴입니다. 서브메뉴도 존재합니다.',
           descriptionEng: 'Menu that provides navigation for your website. Vertical NavMenu with sub-menus',
         }],

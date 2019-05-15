@@ -13,7 +13,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/label/api/label.md'"
+      :url="'./docs/pages/label/api/label.md'"
     />
   </div>
 </template>
@@ -28,7 +28,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/label/examples/default.vue',
+          url: './docs/pages/label/examples/default.vue',
           description: '기본적인 라벨입니다.',
         }],
       };

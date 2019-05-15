@@ -82,7 +82,7 @@
         });
       },
       imgError(e) {
-        e.target.src = './images/noImage.png';
+        e.target.src = './docs/images/noImage.png';
       },
     },
   };

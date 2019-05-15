@@ -103,6 +103,7 @@
   }
   .outer {
     width: 100%;
+    overflow: auto;
   }
   .tab-default-outer {
     position: relative;

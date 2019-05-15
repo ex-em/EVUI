@@ -26,7 +26,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/loadingmask/examples/default.vue',
+          url: './docs/pages/loadingmask/examples/default.vue',
           description: `페이지의 일부분에서 동기화된 데이터를 기다리거나 프로세스를 렌더링하는 동안
           적절한 로딩 애니메이션은 사용자의 불안을 효과적으로 해소할 수 있습니다.`,
           descriptionEng: `When part of the page is waiting for asynchronous data or during a rendering process,
@@ -34,7 +34,7 @@
         }, {
           title: 'Custom',
           component: Custom,
-          url: './pages/loadingmask/examples/custom.vue',
+          url: './docs/pages/loadingmask/examples/custom.vue',
           description: '스타일 커스텀 로딩마스크 입니다.',
         }],
       };

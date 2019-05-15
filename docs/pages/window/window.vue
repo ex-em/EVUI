@@ -13,7 +13,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/window/api/window.md'"
+      :url="'./docs/pages/window/api/window.md'"
     />
   </div>
 </template>
@@ -28,7 +28,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/window/examples/default.vue',
+          url: './docs/pages/window/examples/default.vue',
           description: '윈도우',
         }],
       };

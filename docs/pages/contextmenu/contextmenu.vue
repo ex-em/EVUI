@@ -26,7 +26,7 @@
           {
             title: 'Default',
             component: Default,
-            url: './pages/contextmenu/examples/default.vue',
+            url: './docs/pages/contextmenu/examples/default.vue',
             description: '컨텍스트 메뉴',
           },
         ],

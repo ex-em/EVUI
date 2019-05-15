@@ -26,7 +26,7 @@
           {
             title: 'Default',
             component: Default,
-            url: './pages/icon/examples/default.vue',
+            url: './docs/pages/icon/examples/default.vue',
             description: 'ei [ei-s, ei-m, ei-l] ei-check-on 이런 식으로 사용하면 됩니다.',
           },
         ],

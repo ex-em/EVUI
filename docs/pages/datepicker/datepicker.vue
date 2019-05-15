@@ -27,7 +27,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/datepicker/examples/default.vue',
+          url: './docs/pages/datepicker/examples/default.vue',
           description: `기본적인 데이터피커입니다.
             해당 컴포넌트에 연, 월, 일 데이터를 선택할 수 있습니다.`,
           descriptionEng: `Use Basic Datepicker for date input.
@@ -35,7 +35,7 @@
         }, {
             title: 'Calendar',
             component: Calendar,
-            url: './pages/datepicker/examples/calendar.vue',
+            url: './docs/pages/datepicker/examples/calendar.vue',
             description: `기본적인 달력입니다.
             해당 컴포넌트를 클릭하여 연, 월, 일 또는 여러 날짜를 선택할 수 있습니다.`,
             descriptionEng: `Use Basic Calendar for select date.
@@ -44,7 +44,7 @@
         }, {
             title: 'Custom',
             component: Custom,
-            url: './pages/datepicker/examples/custom.vue',
+            url: './docs/pages/datepicker/examples/custom.vue',
             description: `커스텀 데이트피커를 사용하여
             연, 월, 일 또는 다른 형식의 데이터를 선택할 수 있습니다.`,
             descriptionEng: `Use Custom Datepicker for date input.

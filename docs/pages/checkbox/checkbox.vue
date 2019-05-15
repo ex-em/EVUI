@@ -13,7 +13,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/checkbox/api/checkbox.md'"
+      :url="'./docs/pages/checkbox/api/checkbox.md'"
     />
   </div>
 </template>
@@ -30,17 +30,17 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/checkbox/examples/default.vue',
+          url: './docs/pages/checkbox/examples/default.vue',
           description: '여러 개의 선택 사항을 고르기 위한 단일 체크 박스의 기능입니다.',
         }, {
           title: 'Group Default',
           component: GroupDefault,
-          url: './pages/checkbox/examples/group-default.vue',
+          url: './docs/pages/checkbox/examples/group-default.vue',
           description: '체크 박스 그룹에 묶인 여러 개의 선택 사항 중 원하는 항목을 선택합니다.',
         }, {
           title: 'Group All Check',
           component: GroupAllCheck,
-          url: './pages/checkbox/examples/group-all-check.vue',
+          url: './docs/pages/checkbox/examples/group-all-check.vue',
           description: '체크 박스 그룹을 한꺼번에 선택합니다.',
         }],
       };

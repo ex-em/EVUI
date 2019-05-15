@@ -27,17 +27,17 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/table/examples/default.vue',
+          url: './docs/pages/table/examples/default.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }, {
           title: 'Page',
           component: Page,
-          url: './pages/table/examples/page.vue',
+          url: './docs/pages/table/examples/page.vue',
           description: '기본 테이블에 페이지 기능을 이용하여 대용량 데이터를 보여줄 수 있습니다.',
         }, {
           title: 'Buffer(Virtual Scroll)',
           component: Buffer,
-          url: './pages/table/examples/buffer.vue',
+          url: './docs/pages/table/examples/buffer.vue',
           description: '기본 테이블에 가상 스크롤 기능을 이용하여 대용량 데이터를 끊김 없이 보여줄 수 있습니다.',
         }],
       };

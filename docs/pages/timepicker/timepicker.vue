@@ -26,7 +26,7 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './pages/timepicker/examples/default.vue',
+          url: './docs/pages/timepicker/examples/default.vue',
           description: `시간을 선택하는 기본적인 타임피커입니다.
           드랍다운 컴포넌트에서 시, 분, 초를 선택할 수 있습니다.`,
           descriptionEng: `Use Basic Timepicker for select time.
@@ -34,7 +34,7 @@
         }, {
           title: 'Init Value',
           component: Init,
-          url: './pages/timepicker/examples/init.vue',
+          url: './docs/pages/timepicker/examples/init.vue',
           description: '입력 텍스트 컨포넌트에 시, 분, 초 데이터를 초기화할 수 있습니다.',
           descriptionEng: 'You can initialize hour, minute, second by input text component.',
         }],

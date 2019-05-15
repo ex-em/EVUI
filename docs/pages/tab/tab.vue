@@ -13,7 +13,7 @@
       :url="item.url"
     />
     <ApiView
-      :url="'./pages/tab/api/tab.md'"
+      :url="'./docs/pages/tab/api/tab.md'"
     />
   </div>
 </template>
@@ -29,7 +29,7 @@
         components: [{
           title: 'Tab Panel',
           component: Default,
-          url: './pages/tab/examples/default.vue',
+          url: './docs/pages/tab/examples/default.vue',
           description: '',
         }],
       };
