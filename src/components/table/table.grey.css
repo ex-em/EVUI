@@ -154,11 +154,6 @@ button {
   overflow: hidden;
   padding: 0px;
   background-color: #ffffff;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
 }
 .evui-table .evui-table-body input,
 .evui-table .evui-table-body select,
