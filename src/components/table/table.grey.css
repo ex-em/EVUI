@@ -16,7 +16,6 @@ button {
   font-size: 11px;
 }
 .evui-table-reset * {
-  color: default;
   line-height: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -154,6 +153,11 @@ button {
   overflow: hidden;
   padding: 0px;
   background-color: #ffffff;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  -o-user-select: text;
 }
 .evui-table .evui-table-body input,
 .evui-table .evui-table-body select,
