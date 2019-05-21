@@ -96,13 +96,15 @@ const module = {
     if (groups.length) {
       groups.forEach((group) => {
         group.slice().reverse().forEach((series) => {
-          this.addLegend(seriesList[series]);
+          if (series.showLegend) {
+            this.addLegend(seriesList[series]);
+          }
         });
       });
     }
 
     Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp) {
+      if (!series.isExistGrp && series.showLegend) {
         this.addLegend(series);
       }
     });
@@ -123,7 +125,7 @@ const module = {
     }
 
     Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp) {
+      if (!series.isExistGrp && series.showLegend) {
         this.addLegend(series);
       }
     });

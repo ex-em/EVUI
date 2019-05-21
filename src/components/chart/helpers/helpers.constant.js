@@ -39,6 +39,7 @@ export const LINE_OPTION = {
   lineWidth: 2,
   fill: false,
   fillOpacity: 0.4,
+  showLegend: true,
 };
 
 export const BAR_OPTION = {
@@ -49,10 +50,12 @@ export const BAR_OPTION = {
   xAxisIndex: 0,
   yAxisIndex: 0,
   category: true,
+  showLegend: true,
 };
 
 export const PIE_OPTION = {
   show: true,
+  showLegend: true,
 };
 
 export const AXIS_OPTION = {
