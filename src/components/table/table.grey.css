@@ -173,7 +173,6 @@ button {
   position: absolute;
   left: 0px;
   top: 0px;
-  cursor: default;
   right: 0px;
   box-shadow: 0px 1px 4px #dddddd;
   height: auto;
@@ -298,6 +297,7 @@ button {
 .evui-table .evui-table-body table td {
   border-right: 1px solid #d6d5d7;
   border-bottom: 0px solid #d6d5d7;
+  cursor: default;
   overflow: hidden;
 }
 .evui-table .evui-table-body table td.evui-table-data {
