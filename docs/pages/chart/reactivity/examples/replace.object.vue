@@ -17,7 +17,6 @@
 
 <script>
   import moment from 'moment';
-  import '@/styles/evui.css';
 
   export default {
     data() {

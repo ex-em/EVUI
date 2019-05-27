@@ -29,7 +29,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import datepicker from '@/components/datepicker';
 
   export default {

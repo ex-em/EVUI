@@ -9,7 +9,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
 
   export default {
     data() {
