@@ -3,7 +3,10 @@
     <h2>{{ title }}</h2>
     <p class="example-desc">{{ description }}</p>
     <div :class="{ 'example': true, 'vertical': vertical }">
-      <div class="edit-code">
+      <div
+        class="edit-code"
+        @click="openCodeSandBox"
+      >
         <span>JSFIDDLE</span>
         <ev-icon
           :cls="'ei-s ei-edit-code'"
@@ -22,6 +25,8 @@
   </section>
 </template>
 <script>
+  import axios from 'axios';
+  import { getParameters } from 'codesandbox/lib/api/define';
   import CodeView from './code-view';
 
   export default {
@@ -49,6 +54,67 @@
       vertical: {
         type: Boolean,
         default: true,
+      },
+    },
+    methods: {
+      async getCode(url) {
+        let codeData;
+        await axios.get(url)
+          .then((result) => {
+            codeData = `${result.data}`;
+          }, (error) => {
+            throw new Error(error);
+          });
+
+        return codeData;
+      },
+      async openCodeSandBox() {
+        const parameters = getParameters({
+          files: {
+            'package.json': {
+              content: {
+                name: 'evui examples',
+                private: true,
+                main: 'main.js',
+                scripts: {
+                  serve: 'vue-cli-service serve',
+                  build: 'vue-cli-service build',
+                  lint: 'vue-cli-service lint',
+                },
+                dependencies: {
+                  evui: '2.1.0',
+                  moment: '2.24.0',
+                  vue: '^2.5.2',
+                },
+                devDependencies: {
+                  '@vue/cli-plugin-babel': '3.6.0',
+                  '@vue/cli-plugin-eslint': '3.6.0',
+                  '@vue/cli-service': '3.6.0',
+                  'babel-eslint': '^10.0.1',
+                  eslint: '^5.8.0',
+                  'eslint-plugin-vue': '^5.0.0',
+                  'vue-template-compiler': '^2.5.21',
+                },
+              },
+            },
+            'main.js': {
+              content: await this.getCode('./docs/components/template/main.js'),
+            },
+            'App.vue': {
+              content: await this.getCode('./docs/components/template/App.vue'),
+            },
+            'public/index.html': {
+              content: await this.getCode('./docs/components/template/index.html'),
+            },
+            'Examples.vue': {
+              content: await this.getCode(this.url),
+            },
+          },
+        });
+
+        const url = `https://codesandbox.io/api/v1/sandboxes/define?parameters=${parameters}`;
+
+        window.open(url);
       },
     },
   };
@@ -93,6 +159,9 @@
     bottom: 100%;
     right: -1px;
     padding: 4px 8px;
+  }
+  .edit-code:hover {
+    cursor: pointer;
   }
   .contents {
     padding: 15px;

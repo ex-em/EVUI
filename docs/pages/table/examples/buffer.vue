@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%">
+  <div style="width:100%; overflow: auto;">
     <ev-table
       ref="test"
       :width="'1000px'"

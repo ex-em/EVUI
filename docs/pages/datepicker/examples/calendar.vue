@@ -50,7 +50,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import datepicker from '@/components/datepicker';
   import calendar from '@/components/datepicker/calendar';
 

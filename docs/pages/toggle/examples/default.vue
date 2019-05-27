@@ -12,7 +12,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import toggle from '@/components/toggle';
 
   export default {
