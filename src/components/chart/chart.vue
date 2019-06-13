@@ -64,6 +64,8 @@
           if (!this.isEqualObject(newVal.series, oldVal.series)) {
             isSeriesUpdate = true;
           }
+
+          console.log('&&&&');
           this.evChart.data = _.merge(this.getDefaultData(), newVal);
           this.evChart.update(isSeriesUpdate);
         },

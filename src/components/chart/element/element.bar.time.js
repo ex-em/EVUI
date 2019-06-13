@@ -20,7 +20,6 @@ class TimeBar extends Bar {
     let y;
     let interval;
     let rawInterval;
-    let interpolateGraphMax;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
@@ -29,15 +28,14 @@ class TimeBar extends Bar {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
+    const xep = chartRect.x2 - labelOffset.right;
 
     if (isHorizontal) {
       rawInterval = axesSteps.y[this.yAxisIndex].rawInterval || 1;
-      interpolateGraphMax = minmaxY.graphMax + rawInterval;
-      interval = Math.floor((interpolateGraphMax - minmaxY.graphMin) / rawInterval);
+      interval = Math.floor((minmaxY.graphMax - minmaxY.graphMin) / rawInterval);
     } else {
       rawInterval = axesSteps.x[this.xAxisIndex].rawInterval || 1;
-      interpolateGraphMax = minmaxX.graphMax + rawInterval;
-      interval = Math.floor((interpolateGraphMax - minmaxX.graphMin) / rawInterval);
+      interval = Math.floor((minmaxX.graphMax - minmaxX.graphMin) / rawInterval);
     }
 
     const dArea = isHorizontal ? yArea : xArea;
@@ -51,6 +49,7 @@ class TimeBar extends Bar {
       bArea = (cArea - (cPad * 2)) / showSeriesCount;
     }
     let w = isHorizontal ? null : Math.round(bArea * thickness);
+    let subW = isHorizontal ? null : Math.round(bArea * thickness);
     let h = isHorizontal ? Math.round(bArea * thickness) : null;
 
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
@@ -62,9 +61,20 @@ class TimeBar extends Bar {
     this.data.forEach((item) => {
       if (isHorizontal) {
         x = xsp;
-        y = Canvas.calculateY(item.y, minmaxY.graphMin, interpolateGraphMax, yArea, ysp);
+        y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
       } else {
-        x = Canvas.calculateX(item.x, minmaxX.graphMin, interpolateGraphMax, xArea, xsp);
+        x = Canvas.calculateSubX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+        if (x < xsp) {
+          subW -= xsp - x;
+          x = (x + w < xsp) ? null : xsp;
+        } else if (x + w > xep) {
+          subW -= subW - (xep - x);
+        }
+
+        if (x >= xep) {
+          x = null;
+        }
+
         if (x !== null) {
           x += Math.ceil(bArea * barSeriesX) - Math.round(w + bPad);
         }
@@ -86,12 +96,13 @@ class TimeBar extends Bar {
       }
 
       if (x !== null && y !== null) {
-        ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+        ctx.fillRect(x, y, w !== subW ? subW : w, isHorizontal ? -h : h);
       }
+      subW = w;
 
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line
-      item.w = w; // eslint-disable-line
+      item.w = w !== subW ? subW : w; // eslint-disable-line
       item.h = isHorizontal ? -h : h; // eslint-disable-line
     });
   }

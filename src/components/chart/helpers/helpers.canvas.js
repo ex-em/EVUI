@@ -12,6 +12,15 @@ export default {
     return Math.ceil(startPoint + (scalingFactor * (value - min)));
   },
 
+  calculateSubX(value, min, max, area, startPoint = 0) {
+    if (value === null) {
+      return null;
+    }
+
+    const scalingFactor = area / (max - min);
+    return Math.ceil(startPoint + (scalingFactor * (value - min)));
+  },
+
   calculateY(value, min, max, area, startPoint = 0) {
     let calcY;
 
