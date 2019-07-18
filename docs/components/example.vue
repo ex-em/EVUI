@@ -135,6 +135,7 @@
     flex-direction: row;
   }
   .example.vertical .contents {
+    overflow: auto;
     width: 50%;
   }
   .example:before {

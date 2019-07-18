@@ -19,7 +19,6 @@
   import Default from './examples/default';
   import Page from './examples/page';
   import Buffer from './examples/buffer';
-  import New from './examples/new';
 
   export default {
     data() {
@@ -40,11 +39,6 @@
           component: Buffer,
           url: './docs/pages/table/examples/buffer.vue',
           description: '기본 테이블에 가상 스크롤 기능을 이용하여 대용량 데이터를 끊김 없이 보여줄 수 있습니다.',
-        }, {
-          title: 'New Table',
-          component: New,
-          url: './docs/pages/table/examples/new.vue',
-          description: '',
         }],
       };
     },

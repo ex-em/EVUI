@@ -2,20 +2,19 @@
   <div
     v-click-outside="hideTimePicker"
     ref="timePickerDiv"
-    class="evui-timepicker"
+    class="ev-timepicker"
     @click="showTimePicker"
     @mouseover="suffixFadeFlag = true"
     @mouseleave="suffixFadeFlag = false"
   >
     <div
-      class="evui-timepicker-prefix"
+      class="ev-timepicker-prefix"
     />
     <div
       v-show="suffixShowFlag"
-      ref="suffix"
       :class="suffixFadeFlag ? 'suffix-fadein' : 'suffix-fadeout'"
-      class="evui-timepicker-suffix"
-      @click.stop="hideTimePicker"
+      class="ev-timepicker-suffix"
+      @click.stop="initSuffix"
     />
     <div
       :class="wrapClasses"
@@ -31,11 +30,12 @@
     </div>
     <div
       ref="timePickerPanel"
-      class="evui-timepicker-panel"
+      :class="{ excludeFooter: !showFooter }"
+      class="ev-timepicker-panel"
     >
-      <div class="evui-timepicker-content">
-        <div class="evui-timepicker-spinner">
-          <spinner
+      <div class="ev-timepicker-content">
+        <div class="ev-timepicker-spinner">
+          <ev-spinner
             v-for="(item, index) in dataSpinnerArr"
             v-show="dataSpinnerArr"
             ref="timePickerSpinner"
@@ -51,22 +51,34 @@
           />
         </div>
       </div>
-      <div class="evui-timepicker-footer">
-        <button class="evui-timepicker-btn-cancel">Cancel</button>
-        <button class="evui-timepicker-btn-ok">OK</button>
+      <div
+        v-if="showFooter"
+        class="ev-timepicker-footer"
+      >
+        <button
+          class="ev-timepicker-btn-cancel"
+          @click.prevent="clickCancel"
+        >
+          Cancel
+        </button>
+        <button
+          class="ev-timepicker-btn-ok"
+        >
+          OK
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import spinner from '@/components/timepicker/spinner';
+  import EvSpinner from './spinner';
 
-  const prefixCls = 'evui-input-text';
+  const prefixCls = 'ev-input-text';
 
   export default {
     components: {
-      spinner,
+      EvSpinner,
     },
     directives: {
       // 해당 element 외의 클릭 시
@@ -100,11 +112,21 @@
       },
       spinnerArr: {
         type: Array,
-        default: null,
+        default() {
+          return [
+            { from: 0, to: 23 },
+            { from: 0, to: 59 },
+            { from: 0, to: 59 },
+          ];
+        },
       },
       disabled: {
         type: Boolean,
         default: false,
+      },
+      showFooter: {
+        type: Boolean,
+        default: true,
       },
     },
     data() {
@@ -117,7 +139,6 @@
         selectedLiIndex: null, // 선택된 spinner의 index(ul의 index cf> 0, 1, 2)
         cursorPosition: 0,
         suffixFadeFlag: false,
-        timePickerFadeFlag: false,
         suffixShowFlag: false,
       };
     },
@@ -228,15 +249,16 @@
           for (let ix = 0, ixLen = this.$refs.timePickerSpinner.length; ix < ixLen; ix++) {
             this.$refs.timePickerSpinner[ix].liClick(true);
           }
-          this.timePickerFadeFlag = true;
         }
       },
       hideTimePicker() {
         this.$refs.timePickerPanel.style.display = 'none';
-        this.timePickerFadeFlag = false;
+      },
+      initSuffix() {
+        this.timeText = '000000';
       },
       removeColon(val) {
-        return val.replace(/:/gi, '');
+        return val ? val.replace(/:/gi, '') : '';
       },
       addColon(val) {
         const number = this.removeColon(val);
@@ -388,18 +410,26 @@
           this.dataSpinnerArr[index].initNumber = number;
         }
       },
+      clickCancel() {
+        this.hideTimePicker();
+        this.initSuffix();
+      },
     },
   };
 </script>
 
 <style scoped>
-
-  .evui-timepicker {
+  .ev-timepicker {
+    position: relative;
     width: 220px;
     height: 40px;
   }
+  .ev-timepicker .ev-input-text {
+    height: 100%;
+    padding: 0;
+  }
 
-  .evui-timepicker input[type=text]{
+  .ev-timepicker input[type=text]{
     display: inline-block;
     width: 100%;
     height: 100%;
@@ -410,12 +440,12 @@
     background-image: none;
   }
 
-  .evui-timepicker input[type=text]:focus,
-  .evui-timepicker input[type=text]:hover{
+  .ev-timepicker input[type=text]:focus,
+  .ev-timepicker input[type=text]:hover{
     outline: none;
   }
 
-  .evui-timepicker div.evui-timepicker-prefix {
+  .ev-timepicker div.ev-timepicker-prefix {
     position: absolute;
     width: 26px;
     height: 26px;
@@ -424,7 +454,7 @@
     background-position: -196px -102px;
   }
 
-  .evui-timepicker div.evui-timepicker-suffix {
+  .ev-timepicker div.ev-timepicker-suffix {
     position: absolute;
     left: 190px;
     width: 26px;
@@ -433,16 +463,16 @@
     background-image: url(../../images/evui_icon.png);
     background-position: 7px -362px;
   }
-  .evui-timepicker div.evui-timepicker-suffix.suffix-fadein {
-    display: block;
+  .ev-timepicker div.ev-timepicker-suffix.suffix-fadein {
+    display: block !important;
     cursor: pointer;
   }
-  .evui-timepicker div.evui-timepicker-suffix.suffix-fadeout {
-    display: none;
+  .ev-timepicker div.ev-timepicker-suffix.suffix-fadeout {
+    display: none !important;
     cursor: default;
   }
 
-  .evui-timepicker-panel {
+  .ev-timepicker-panel {
     display: none;
     position: absolute;
     z-index: 300;
@@ -454,35 +484,39 @@
     background-color: #ffffff;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   }
+  .ev-timepicker-panel.excludeFooter {
+    height: 190px;
+  }
 
-  .evui-timepicker-content {
+  .ev-timepicker-content {
     display: block;
     overflow: hidden;
     position: relative;
     height: 188px;
   }
-  .evui-timepicker-content .evui-timepicker-spinner {
+  .ev-timepicker-content .ev-timepicker-spinner {
     width: 100%;
     height: 100%;
     padding-left: 5px;
     font-size: 0; /*필수 width:33.3%*/
     white-space: nowrap;
   }
-  .evui-timepicker-footer {
-    display: block;
+  .ev-timepicker-footer {
+    display: flex;
     height: 34px;
     background-color: #f5f7fa;
     text-align: right;
+    justify-content: flex-end;
   }
-  .evui-timepicker-footer .evui-timepicker-btn-cancel {
-    padding: 8px 8px 0 0;
+  .ev-timepicker-footer .ev-timepicker-btn-cancel {
+    padding: 0 8px;
     border: none;
     background-color: transparent;
     font-size: 12px;
     cursor: pointer;
   }
-  .evui-timepicker-footer .evui-timepicker-btn-ok {
-    padding: 8px 8px 0 0;
+  .ev-timepicker-footer .ev-timepicker-btn-ok {
+    padding: 0 8px;
     border: none;
     background-color: transparent;
     color: #409eff;

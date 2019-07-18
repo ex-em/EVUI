@@ -117,10 +117,8 @@
 <style>
   .ev-loadingmask {
     position: absolute;
-    /*background: #EEEEEE;*/
-    /*opacity: 0.2;*/
     overflow: hidden;
-    z-index: 20000;
+    z-index: 8887;
   }
   .ev-loadingmask-center {
     position: relative;
