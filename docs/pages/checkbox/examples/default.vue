@@ -3,7 +3,6 @@
     <h5># normal</h5>
     <br>
     <Checkbox
-      :value="bindValue"
       v-model="vModel"
       class="checkboxStyle"
     >
@@ -14,18 +13,16 @@
     <button
       @click="click"
     >
-      test
+      CLICK
     </button>
-    <br>
-    <br>
-    bindValue : {{ vModel }}
+    {{ vModel }}
     <br>
     <br>
     <br>
     <h5># small</h5>
     <br>
     <Checkbox
-      :value="bindValue2"
+      :value="stringCustomValue"
       v-model="vModel2"
       :size="`small`"
       class="checkboxStyle"
@@ -37,18 +34,15 @@
     <button
       @click="click2"
     >
-      test
+      CLICK
     </button>
-    <br>
-    <br>
-    bindValue2 : {{ vModel2 }}
+    {{ vModel2 }}
     <br>
     <br>
     <br>
     <h5># square</h5>
     <br>
     <Checkbox
-      :value="bindValue3"
       v-model="vModel3"
       :type="`square`"
       class="checkboxStyle"
@@ -58,7 +52,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue4"
       v-model="vModel4"
       :size="`small`"
       :type="`square`"
@@ -69,7 +62,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue5"
       v-model="vModel5"
       :disabled="true"
       :size="`small`"
@@ -84,7 +76,6 @@
     <h5># minus</h5>
     <br>
     <Checkbox
-      :value="bindValue6"
       v-model="vModel6"
       :after-type="`minus`"
       class="checkboxStyle"
@@ -94,7 +85,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue7"
       v-model="vModel7"
       :after-type="`minus`"
       :size="`small`"
@@ -105,7 +95,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue8"
       v-model="vModel8"
       :disabled="true"
       :after-type="`minus`"
@@ -117,7 +106,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue9"
       v-model="vModel9"
       :type="`square`"
       :after-type="`minus`"
@@ -128,7 +116,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue100"
       v-model="vModel100"
       :type="`square`"
       :after-type="`minus`"
@@ -155,7 +142,6 @@
     <h5># check</h5>
     <br>
     <Checkbox
-      :value="bindValue20"
       v-model="vModel20"
       :after-type="`check`"
       class="checkboxStyle"
@@ -165,7 +151,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue21"
       v-model="vModel21"
       :after-type="`check`"
       :size="`small`"
@@ -176,7 +161,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue22"
       v-model="vModel22"
       :disabled="true"
       :after-type="`check`"
@@ -188,7 +172,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue23"
       v-model="vModel23"
       :type="`square`"
       :after-type="`check`"
@@ -199,7 +182,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue24"
       v-model="vModel24"
       :type="`square`"
       :after-type="`check`"
@@ -211,7 +193,6 @@
     <br>
     <br>
     <Checkbox
-      :value="bindValue25"
       v-model="vModel25"
       :disabled="true"
       :type="`square`"
@@ -239,39 +220,23 @@
     },
     data() {
       return {
-        bindValue: 'value01',
+        stringCustomValue: 'value',
         vModel: true,
-        bindValue2: 'value02',
         vModel2: false,
-        bindValue3: 'value03',
         vModel3: true,
-        bindValue4: 'value04',
         vModel4: false,
-        bindValue5: 'value05',
         vModel5: true,
-        bindValue6: 'value06',
         vModel6: false,
-        bindValue7: 'value07',
         vModel7: true,
-        bindValue8: 'value08',
         vModel8: true,
-        bindValue9: 'value09',
         vModel9: true,
-        bindValue100: 'value100',
         vModel100: true,
-        bindValue101: 'value101',
         vModel101: true,
-        bindValue20: 'value20',
         vModel20: true,
-        bindValue21: 'value21',
         vModel21: true,
-        bindValue22: 'value22',
         vModel22: true,
-        bindValue23: 'value23',
         vModel23: true,
-        bindValue24: 'value24',
         vModel24: true,
-        bindValue25: 'value25',
         vModel25: true,
       };
     },

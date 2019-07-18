@@ -109,17 +109,17 @@
     methods: {
       change(e) {
         if (this.isGroup) {
-          this.$parent.$emit('change-event', e);
+          this.$parent.$emit('on-change', e);
         } else {
-          this.$emit('change-event', e);
+          this.$emit('on-change', e);
           this.$emit('input', e.target.checked);
         }
       },
       click(e) {
         if (this.isGroup) {
-          this.$parent.$emit('click-event', e);
+          this.$parent.$emit('on-click', e);
         } else {
-          this.$emit('click-event', e);
+          this.$emit('on-click', e);
           this.$emit('input', e.target.checked);
         }
       },
