@@ -14,7 +14,7 @@
     <h5># Default Disabled Radio Button</h5>
     <br>
     <radio
-      :value="`value03`"
+      :value="`value02`"
       :disabled="true"
       v-model="bindVModel02"
     >
