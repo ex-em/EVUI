@@ -72,7 +72,6 @@
         groupBindValue: [],
         dataSize: this.size,
         dataType: this.type,
-        // dataAfterType: this.afterType,
       };
     },
     computed: {
