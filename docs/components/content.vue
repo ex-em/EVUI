@@ -133,6 +133,7 @@
                 name: 'Datepicker',
                 routerLink: '/datepicker',
                 content: '데이트 피커',
+                imgUrl: `${this.imgUrl}/datepicker.png`,
               },
               {
                 name: 'Toggle',
