@@ -8,7 +8,7 @@
       :value="`allCheckBoxValue`"
       v-model="allCheckClick"
       class="checkboxStyle"
-      @change-event="allCheckEvent"
+      @on-change="allCheckEvent"
     >
       ALL CHECK
     </Checkbox>
@@ -17,7 +17,7 @@
     <br>
     <Checkbox-group
       v-model="bindList"
-      @change-event="changeEvent"
+      @on-change="changeEvent"
     >
       <Checkbox
         :value="obj0[0].value"
@@ -60,7 +60,7 @@
       :value="`allCheckBoxValue1`"
       v-model="allCheckClick1"
       class="checkboxStyle"
-      @change-event="allCheckEvent1"
+      @on-change="allCheckEvent1"
     >
       ALL CHECK
     </Checkbox>
@@ -69,7 +69,7 @@
     <br>
     <Checkbox-group
       v-model="bindList1"
-      @change-event="changeEvent"
+      @on-change="changeEvent"
     >
       <Checkbox
         :value="obj1[0].value"

@@ -17,7 +17,7 @@ import EvRadioGroup from './components/radio-group';
 import EvSelectbox from './components/selectbox';
 import EvSlider from './components/slider';
 import EvTable from './components/table';
-import EvTimePicker from './components/timepicker';
+import EvTimepicker from './components/timepicker';
 import EvToggle from './components/toggle';
 import EvLabel from './components/label';
 import EvDatepicker from './components/datepicker';
@@ -45,7 +45,7 @@ const components = {
   EvSelectbox,
   EvSlider,
   EvTable,
-  EvTimePicker,
+  EvTimepicker,
   EvToggle,
   EvLabel,
   EvWindow,

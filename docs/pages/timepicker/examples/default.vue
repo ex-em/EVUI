@@ -1,8 +1,7 @@
 <template>
   <div>
-    <timepicker
+    <ev-timepicker
       v-model="timeValue"
-      :spinner-arr="obj"
     />
     <br><br>
     timepicker value => {{ timeValue }}
@@ -11,20 +10,12 @@
 </template>
 
 <script>
-  import timepicker from '@/components/timepicker/timepicker';
-
   export default {
     components: {
-      timepicker,
     },
     data() {
       return {
         timeValue: '',
-        obj: [
-          { from: 0, to: 23 },
-          { from: 0, to: 59 },
-          { from: 0, to: 59 },
-        ],
       };
     },
     methods: {

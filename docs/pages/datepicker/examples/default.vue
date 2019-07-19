@@ -1,16 +1,18 @@
 <template>
   <div>
     <datepicker
-      v-model="test"
+      v-model="bindDateNull"
       class="evui-datepicker-temp"
     />
-    value: {{ test }}
+    value: {{ bindDateNull }}
+    <br>
     <datepicker
       v-model="bindDay"
       :options="option"
       class="evui-datepicker-temp"
     />
     value: {{ bindDay }}
+    <br>
     <datepicker
       v-model="bindDay2"
       :options="option2"
@@ -18,13 +20,15 @@
       class="evui-datepicker-temp"
     />
     value: {{ bindDay2 }}
+    <br>
     <datepicker
       v-model="bindDay3"
       :options="option3"
       :size="'fit'"
       class="evui-datepicker-temp"
     />
-    value: {{ bindDay2 }}
+    value: {{ bindDay3 }}
+    <br>
   </div>
 </template>
 
@@ -37,7 +41,7 @@
     },
     data() {
       return {
-        test: null,
+        bindDateNull: null,
         bindDay: '2018-07-09',
         option: {
           selectDayType: 'day',
@@ -48,7 +52,7 @@
           selectDayType: 'day',
           initSelectDayFlag: true,
         },
-        bindDay3: '2019-04-09',
+        bindDay3: '2019-07-09',
         option3: {
           selectDayType: 'day',
           initSelectDayFlag: true,
