@@ -137,7 +137,6 @@
     },
     mounted() {
       this.setToggleStyle();
-
       setTimeout(() => {
         this.isShow = true;
       });
@@ -146,25 +145,41 @@
       setToggleStyle() {
         if (this.toggleText.onText || this.toggleText.offText) {
           let maxTextWidth = 0;
-          const onTextScrollWidth = this.$refs.onTextRef.clientWidth;
-          const offTextScrollWidth = this.$refs.offTextRef.clientWidth;
-          if (this.toggleType === 'slide' || this.toggleType === 'button') {
-            if (offTextScrollWidth < onTextScrollWidth) {
-              maxTextWidth = onTextScrollWidth;
+          const onTextWidth = this.$refs.onTextRef.getBoundingClientRect().width;
+          const offTextWidth = this.$refs.offTextRef.getBoundingClientRect().width;
+          if (this.toggleType === 'slide') {
+            if (offTextWidth < onTextWidth) {
+              maxTextWidth = onTextWidth;
             } else {
-              maxTextWidth = offTextScrollWidth;
+              maxTextWidth = offTextWidth;
+            }
+            if (maxTextWidth < this.toggleObj.width - 40) {
+              this.maxWidth = this.toggleObj.width;
+            } else {
+              this.maxWidth = maxTextWidth + 40;
+            }
+          } else if (this.toggleType === 'button') {
+            if (offTextWidth < onTextWidth) {
+              maxTextWidth = onTextWidth;
+            } else {
+              maxTextWidth = offTextWidth;
+            }
+            if (maxTextWidth < this.toggleObj.width) {
+              this.maxWidth = this.toggleObj.width;
+            } else {
+              this.maxWidth = maxTextWidth + 20;
             }
           } else if (this.toggleType === 'tab') {
-            if (offTextScrollWidth < onTextScrollWidth) {
-              maxTextWidth = onTextScrollWidth * 2;
+            if (offTextWidth < onTextWidth) {
+              maxTextWidth = onTextWidth * 2;
             } else {
-              maxTextWidth = offTextScrollWidth * 2;
+              maxTextWidth = offTextWidth * 2;
             }
-          }
-          if (maxTextWidth < this.toggleObj.width) {
-            this.maxWidth = this.toggleObj.width;
-          } else {
-            this.maxWidth = maxTextWidth;
+            if (maxTextWidth < this.toggleObj.width) {
+              this.maxWidth = this.toggleObj.width;
+            } else {
+              this.maxWidth = maxTextWidth + 40;
+            }
           }
         } else {
           this.maxWidth = this.toggleObj.width;
@@ -254,7 +269,7 @@
     color: #ffffff;
   }
   .ev-toggle.tab {
-    display: inline-block;
+    display: inline-flex;
     position: relative;
     border: 1px solid #2d8cf0;
     user-select: none;
@@ -306,7 +321,7 @@
   .ev-toggle-offText-tab {
     display: inline-block;
     float: left;
-    width: 50%;
+    width: 100%;
     height: 100%;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
@@ -326,10 +341,10 @@
   .ev-toggle-onText-tab {
     display: inline-block;
     float: left;
-    width: 50%;
+    width: 100%;
     height: 100%;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     background-color: #2d8cf0;
     color: #ffffff;
     text-align: center;
