@@ -12,6 +12,9 @@
       :contents="item.component"
       :url="item.url"
     />
+    <ApiView
+      :url="'./docs/pages/toggle/api/toggle.md'"
+    />
   </div>
 </template>
 <script>

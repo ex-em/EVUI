@@ -57,15 +57,15 @@
         toggleValue4: false,
         toggleValue5: true,
         largeText1: {
-          onText: 'ON_TEXT',
+          onText: 'ON_LONG_TEXT',
           offText: 'OFF',
         },
         largeText3: {
-          onText: 'ON_TEXT',
+          onText: 'ON_LONG_TEXT',
           offText: 'OFF_TEXT',
         },
         largeText5: {
-          onText: 'ON_TEXT',
+          onText: 'ON',
           offText: 'OFF_TEXT',
         },
       };
