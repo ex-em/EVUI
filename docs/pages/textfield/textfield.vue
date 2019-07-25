@@ -12,6 +12,9 @@
       :contents="item.component"
       :url="item.url"
     />
+    <ApiView
+      :url="'./docs/pages/textfield/api/textfield.md'"
+    />
   </div>
 </template>
 
