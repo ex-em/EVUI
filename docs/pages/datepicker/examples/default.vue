@@ -1,19 +1,19 @@
 <template>
   <div>
-    <datepicker
+    <ev-datepicker
       v-model="bindDateNull"
       class="evui-datepicker-temp"
     />
     value: {{ bindDateNull }}
     <br>
-    <datepicker
+    <ev-datepicker
       v-model="bindDay"
       :options="option"
       class="evui-datepicker-temp"
     />
     value: {{ bindDay }}
     <br>
-    <datepicker
+    <ev-datepicker
       v-model="bindDay2"
       :options="option2"
       :size="'fit'"
@@ -21,7 +21,7 @@
     />
     value: {{ bindDay2 }}
     <br>
-    <datepicker
+    <ev-datepicker
       v-model="bindDay3"
       :options="option3"
       :size="'fit'"
@@ -33,11 +33,9 @@
 </template>
 
 <script>
-  import datepicker from '@/components/datepicker';
 
   export default {
     components: {
-      datepicker,
     },
     data() {
       return {
