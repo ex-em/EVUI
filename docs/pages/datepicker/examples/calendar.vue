@@ -3,22 +3,22 @@
     <div
       class="ev-calendar-temp-wrapper"
     >
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj1"
         class="evui-calendar-temp"
       />
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj2"
         class="evui-calendar-temp"
       />
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj3"
         class="evui-calendar-temp"
       />
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj4"
         class="evui-calendar-temp"
@@ -30,12 +30,12 @@
       selectDayType: 'week', selectDayLimit: 1,<br>
       selectDayType: 'day', selectDayLimit: 7,<br>
       <br><br>
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj5"
         class="evui-calendar-temp"
       />
-      <calendar
+      <ev-calendar
         ref="calendarRef"
         :datepicker-options="obj6"
         class="evui-calendar-temp"
@@ -50,13 +50,8 @@
 </template>
 
 <script>
-  import datepicker from '@/components/datepicker';
-  import calendar from '@/components/datepicker/calendar';
-
   export default {
     components: {
-      datepicker,
-      calendar,
     },
     data() {
       return {
