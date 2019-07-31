@@ -4,7 +4,7 @@
     <br>
     <Checkbox-group
       v-model="bindList0"
-      @change-event="changeEvent"
+      @on-change="changeEvent"
     >
       <Checkbox
         :value="obj0[0].value"
@@ -44,7 +44,7 @@
       v-model="bindList1"
       :type="`square`"
       :size="`small`"
-      @change-event="changeEvent1"
+      @on-change="changeEvent1"
     >
       <Checkbox
         :value="obj1[0].value"

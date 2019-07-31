@@ -40,6 +40,7 @@
   ],
   "dependencies": {
     "axios": "^0.18.0",
+    "codesandbox": "^2.1.6",
     "highlight.js": "^9.15.6",
     "lodash": "^4.17.11",
     "lodash-es": "^4.17.11",

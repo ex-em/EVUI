@@ -42,7 +42,7 @@
     mounted() {
       this.initValue();
       const bindValue = this.bindValue;
-      this.$on('change-event', (e) => {
+      this.$on('on-change', (e) => {
         const targetValue = e.target.value;
         if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
           bindValue.push(targetValue);

@@ -4,7 +4,7 @@
     <br>
     <RadioGroup
       v-model="bindingValue"
-      @change-event="changeEvent"
+      @on-change="changeEvent"
     >
       <Radio
         :value="radioObj[0].value"
@@ -35,7 +35,7 @@
     <RadioGroup
       v-model="bindingValue2"
       :size="`small`"
-      @change-event="changeEvent"
+      @on-change="changeEvent"
     >
       <Radio
         :value="radioObj2[0].value"
