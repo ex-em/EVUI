@@ -6,7 +6,7 @@
   />
 </template>
 <script>
-  import _ from 'lodash-es';
+  import _ from 'lodash-es/merge';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -37,44 +37,19 @@
       },
     },
     watch: {
-      'options.axesX': {
-        handler(newVal) {
-          this.evChart.options.axesX = newVal;
-          this.evChart.update();
-        },
-        deep: true,
-      },
-      'options.axesY': {
-        handler(newVal) {
-          this.evChart.options.axesY = newVal;
-          this.evChart.update();
-        },
-        deep: true,
-      },
       data: {
-        handler(newVal, oldVal) {
-          let isSeriesUpdate = false;
-          this.normalizedData = {
-            series: {},
-            data: {},
-            groups: [],
-            labels: [],
-          };
-
-          if (!this.isEqualObject(newVal.series, oldVal.series)) {
-            isSeriesUpdate = true;
-          }
-
-          console.log('&&&&');
-          this.evChart.data = _.merge(this.getDefaultData(), newVal);
-          this.evChart.update(isSeriesUpdate);
+        handler(newVal) {
+          this.evChart.data = _.merge(this.normalizedData, newVal);
+          this.evChart.update();
         },
+        deep: true,
       },
       options: {
         handler(newVal) {
-          this.evChart.options = _.merge(this.getDefaultOptions(), newVal);
+          this.evChart.options = _.merge(this.normalizedOption, newVal);
           this.evChart.update();
         },
+        deep: true,
       },
     },
     created() {
@@ -154,24 +129,6 @@
           sizeValue = undefined;
         }
         return sizeValue;
-      },
-      isEqualObject(newVal, oldVal) {
-        const nKey = Object.keys(newVal).sort();
-        const oKey = Object.keys(oldVal).sort();
-
-        if (nKey.length !== oKey.length) {
-          return false;
-        }
-
-        for (let ix = 0; ix < nKey.length; ix++) {
-          if (nKey[ix] !== oKey[ix]) {
-            return false;
-          } else if (!_.isEqual(newVal[nKey[ix]], oldVal[oKey[ix]])) {
-            return false;
-          }
-        }
-
-        return true;
       },
     },
   };
