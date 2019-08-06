@@ -2,16 +2,16 @@ import EvButton from './components/button';
 import EvChart from './components/chart';
 import EvCheckbox from './components/checkbox';
 import EvCheckboxGroup from './components/checkbox-group';
+import {
+  ContextMenu as EvContextMenu,
+  ContextMenuChildren as EvContextMenuChildren,
+} from './components/contextmenu';
 import EvIcon from './components/icon';
 import EvInput from './components/input';
 import EvTextField from './components/textfield';
 import EvLoginField from './components/loginfield';
 import EvLoadingMask from './components/loadingmask';
-import {
-  NavMenu as EvNavMenu,
-  ContextMenu as EvContextMenu,
-  ContextMenuChildren as EvContextMenuChildren,
-} from './components/menu';
+import EvNavMenu from './components/menu';
 import EvRadio from './components/radio';
 import EvRadioGroup from './components/radio-group';
 import EvSelectbox from './components/selectbox';
@@ -32,14 +32,14 @@ const components = {
   EvChart,
   EvCheckbox,
   EvCheckboxGroup,
+  EvContextMenu,
+  EvContextMenuChildren,
   EvIcon,
   EvInput,
   EvTextField,
   EvLoginField,
   EvLoadingMask,
   EvNavMenu,
-  EvContextMenu,
-  EvContextMenuChildren,
   EvRadio,
   EvRadioGroup,
   EvSelectbox,

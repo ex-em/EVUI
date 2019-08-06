@@ -1,7 +1,6 @@
 <template>
   <div
     v-click-outside="hide"
-    v-show="isShow"
     :style="ctxMenuStyle"
     :class="prefixEvui"
   >
@@ -70,16 +69,17 @@
         prefixEvui,
         top: 0,
         left: 0,
-        isShow: false,
+        isVisible: 'hidden',
       };
     },
     computed: {
       ctxMenuStyle() {
-        return `top: ${this.top}px; left: ${this.left}px;`;
+        return `
+          visibility: ${this.isVisible};
+          top: ${this.top}px;
+          left: ${this.left}px;
+          `;
       },
-    },
-    created() {
-      this.setPosition(this.x, this.y);
     },
     mounted() {
       this.parentAddListener();
@@ -102,35 +102,45 @@
         document.body.appendChild(this.$el);
       },
       onContextMenu(e) {
-        this.setPosition(e.clientX, e.clientY);
+        this.setPosition(e, e.clientX, e.clientY);
         this.show();
         e.preventDefault();
       },
       onClick(item) {
-        if (!item.items) {
-          this.hide();
-        }
-
         this.$emit('click', item);
       },
-      setPosition(x, y) {
-        const posX = getQuantity(x) || { value: 0 };
-        const posY = getQuantity(y) || { value: 0 };
-        this.top = posY.value;
-        this.left = posX.value;
+      setPosition(e, x, y) {
+        const width = this.$el.clientWidth;
+        const height = this.$el.clientHeight;
+        let posX = (getQuantity(x) || { value: 0 }).value;
+        let posY = (getQuantity(y) || { value: 0 }).value;
+        const extraWidth = window.innerWidth - posX;
+        const extraHeight = window.innerHeight - posY;
+
+        if (width > extraWidth && (posX - width) >= 0) {
+          posX -= (width - extraWidth);
+        }
+
+        if (extraHeight < height && (posY - height) >= 0) {
+          posY -= (height - extraHeight);
+        }
+
+        this.top = posY + document.scrollingElement.scrollTop;
+        this.left = posX + document.scrollingElement.scrollLeft;
       },
       show() {
         if (this.isUse) {
-          this.isShow = true;
+          this.isVisible = 'visible';
         }
       },
       hide() {
-        this.isShow = false;
         const ctxChildren = this.$refs.ctxChildren;
 
         if (ctxChildren && ctxChildren.clearSubMenuKey) {
           ctxChildren.clearSubMenuKey(this.$children);
         }
+
+        this.isVisible = 'hidden';
       },
     },
   };

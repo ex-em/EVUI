@@ -2,10 +2,10 @@
   <div
     :style="contextChildrenStyle"
     :class="prefixEvui"
+    @mouseout="onMouseOut"
   >
     <div
       :class="bodyCls"
-      @mouseout="onMouseOut"
     >
       <div :class="`${prefixEvui}-separator`"/>
       <div
