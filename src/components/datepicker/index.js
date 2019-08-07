@@ -1,3 +1,7 @@
 import Datepicker from './datepicker';
+import Calendar from './calendar';
 
-export default Datepicker;
+export {
+  Datepicker,
+  Calendar,
+};
