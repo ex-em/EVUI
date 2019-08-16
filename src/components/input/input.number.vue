@@ -55,7 +55,7 @@
 <script>
   import icon from '@/components/icon/icon';
 
-  const prefixCls = 'evui-input-number';
+  const prefixCls = 'ev-input-number';
 
   function parsedStyle(value) {
     const mark = value.toString();
@@ -321,7 +321,7 @@
 </script>
 <style scoped>
   /*base class*/
-  .evui-input-number {
+  .ev-input-number {
     display: inline-block;
     width: 100%;
     line-height: 1.5;
@@ -340,7 +340,7 @@
     overflow: hidden;
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   }
-  .evui-input-number-handler-wrap {
+  .ev-input-number-handler-wrap {
     width: 22px;
     height: 100%;
     border-left: 1px solid #dddee1;
@@ -353,24 +353,24 @@
     transition: opacity 0.2s ease-in-out;
   }
   /*border color when mouse hover*/
-  .evui-input-number:hover {
+  .ev-input-number:hover {
     border-color : #2d8cf0;
   }
-  .evui-input-number:hover .evui-input-number-handler-wrap {
+  .ev-input-number:hover .ev-input-number-handler-wrap {
     border-color : #2d8cf0;
     opacity: 1;
   }
 
-  .evui-input-number:hover i{
+  .ev-input-number:hover i{
     color : #2d8cf0;
   }
 
   /*inner input div class*/
-  .evui-input-number-input-wrap {
+  .ev-input-number-input-wrap {
     overflow: hidden;
     height: 32px;
   }
-  .evui-input-number-input {
+  .ev-input-number-input {
     width: 100%;
     height: 32px;
     line-height: 32px;
@@ -383,7 +383,7 @@
     border-radius: 4px;
   }
   /*handler line class*/
-  .evui-input-number-handler  {
+  .ev-input-number-handler  {
     display: block;
     width: 100%;
     height: 16px;
@@ -393,41 +393,41 @@
     color: #999;
     position: relative;
   }
-  .evui-input-number-handler-up {
+  .ev-input-number-handler-up {
     cursor: pointer;
   }
-  .evui-input-number-handler-down {
+  .ev-input-number-handler-down {
     border-top: 1px solid #dddee1;
     top: -1px;
     cursor: pointer;
   }
   /*disable base class*/
-  .evui-input-number-disabled {
+  .ev-input-number-disabled {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
     color: #ccc;
   }
   /*use border color when mouse hover*/
-  .evui-input-number-disabled:hover {
+  .ev-input-number-disabled:hover {
     border-color : #D77F7F;
   }
   /*inner input div class*/
-  .evui-input-number-disabled .evui-input-number {
+  .ev-input-number-disabled .ev-input-number {
     opacity: .72;
     cursor: not-allowed;
     background-color: #f3f3f3;
   }
   /*handler line class*/
-  .evui-input-number-disabled .evui-input-number-handler-wrap {
+  .ev-input-number-disabled .ev-input-number-handler-wrap {
     display: none;
   }
-  .evui-input-number-disabled .evui-input-number-handler {
+  .ev-input-number-disabled .ev-input-number-handler {
     opacity: .72;
     color: #ccc!important;
     cursor: not-allowed;
   }
-  .evui-input-number-input[disabled] {
+  .ev-input-number-input[disabled] {
     background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;

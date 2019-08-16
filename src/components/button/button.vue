@@ -61,8 +61,12 @@
     data() {
       return {
         prefixCls,
-        btnClass: this._getBtnClass(),
       };
+    },
+    computed: {
+      btnClass() {
+        return this._getBtnClass();
+      },
     },
     methods: {
       onClick(event) {
