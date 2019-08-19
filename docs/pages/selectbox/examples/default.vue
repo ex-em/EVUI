@@ -21,7 +21,7 @@
   export default {
     data() {
       return {
-        selectedValue: 'item_1',
+        selectedValue: 1,
         items: this.getItems(),
       };
     },
@@ -33,18 +33,15 @@
         this.e = e;
       },
       onClickBtn() {
-        this.selectedValue = 'item_3';
+        this.selectedValue = 3;
       },
       getItems() {
-        let value;
         const itemList = [];
 
         for (let ix = 0; ix < 5; ix++) {
-          value = `item_${ix}`;
-
           itemList.push({
-            name: value,
-            value,
+            name: `item_${ix}`,
+            value: ix,
           });
         }
 
