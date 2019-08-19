@@ -16,11 +16,11 @@
           :class="`${prefixCls}-select-tag ${selectedItems.length > 1 ? 'max-width' : ''}`"
         >
           <div :class="`${prefixCls}-text-wrap`">
-            <span :class="`${prefixCls}-text`">{{ selectedItems[0].name }}</span>
+            <span :class="`${prefixCls}-text`">{{ multipleFieldFirstItem.name }}</span>
           </div>
           <div
             :class="`${prefixCls}-tag-close`"
-            @click="removeTag(selectedItems[0], $event)"
+            @click="removeTag(multipleFieldFirstItem, $event)"
           >
             <div :class="`${prefixCls}-tag-close-scale`">
               <span :class="`ei ei-close`"/>
@@ -160,12 +160,11 @@
         prefixCls,
         selectboxClass: this.getSelectboxClass(),
         inputFieldClass: this.getInputFieldClass(),
-        dropDownState: false,
-        clickedValue: '',
-        inputFieldValue: '',
-        listBoxItems: [],
         isUseVModel: this.$vnode.data && this.$vnode.data.model,
+        dropDownState: false,
+        listBoxItems: [],
         selectedValueList: [],
+        inputFieldValue: '',
       };
     },
     computed: {
@@ -180,18 +179,20 @@
         let items = [];
 
         if (this.multiple) {
-          items = this.items.filter(item =>
-            this.selectedValueList.findIndex(v => v === item.value) > -1,
-          );
+          items = this.selectedValueList.map(v => this.findItemByValue(v));
         } else {
-          const selectedItem = this.items.find(item => item.value === this.selectedValueList[0]);
+          const foundItem = this.findItemByValue(this.selectedValueList[0]);
 
-          if (selectedItem) {
-            items.push(selectedItem);
+          if (foundItem) {
+            items.push(foundItem);
           }
         }
 
         return items;
+      },
+      multipleFieldFirstItem() {
+        const firstItem = (this.selectedItems.length && this.selectedItems[0]) || {};
+        return this.findItemByValue(firstItem.value);
       },
     },
     watch: {
@@ -207,19 +208,19 @@
     },
     created() {
       this.dropdownStyle.border = this.multiple ? 1 : 0;
-
-      this.initSettings();
+    },
+    mounted() {
+      this.syncSelectedValue();
     },
     methods: {
       initSettings() {
         this.listBoxItems = this.items.slice() || [];
-        this.syncSelectedValue();
 
         if (this.multiple) {
           this.inputFieldValue = '';
         } else {
-          this.inputFieldValue = this.vModelSelectedValue;
-          this.clickedValue = this.vModelSelectedValue;
+          const selectedItem = this.items.find(obj => obj.value === this.vModelSelectedValue) || {};
+          this.inputFieldValue = selectedItem.name;
         }
       },
       onClick() {
@@ -258,7 +259,7 @@
         this.$emit('keyup', e);
       },
       onBlurInputField(e) {
-        this.inputFieldValue = this.clickedValue;
+        this.syncSelectedValue();
         this.$emit('blur', e);
       },
       onKeyUpDropDownInputField(e) {
@@ -270,9 +271,9 @@
           return;
         }
 
-        let selectedValue;
-        let existItemValue = false;
         const itemValue = item.value;
+        let existValue = false;
+        let selectedValue;
 
         if (this.multiple) {
           selectedValue = [];
@@ -281,13 +282,13 @@
             const value = this.selectedValueList[ix];
 
             if (value === itemValue) {
-              existItemValue = true;
+              existValue = true;
             } else {
               selectedValue.push(value);
             }
           }
 
-          if (!existItemValue) {
+          if (!existValue) {
             selectedValue.push(itemValue);
           }
         } else {
@@ -320,10 +321,26 @@
         this.selectedValueList = this.multiple ? selectedValue : [selectedValue];
 
         if (!this.multiple) {
+          const foundItem = this.findItemByValue(selectedValue);
           this.dropDownState = false;
-          this.clickedValue = selectedValue;
-          this.inputFieldValue = selectedValue;
+          this.inputFieldValue = foundItem.name;
         }
+      },
+      findItemByValue(value) {
+        let foundItem = {};
+
+        if (value != null) {
+          if (this.isGroup) {
+            this.items.some((groupItem) => {
+              foundItem = groupItem.items.find(item => item && item.value === value);
+              return foundItem != null;
+            });
+          } else {
+            foundItem = this.items.find(obj => obj && obj.value === value);
+          }
+        }
+
+        return foundItem;
       },
       getFilteredListBoxItems(value) {
         let filteredItems;

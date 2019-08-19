@@ -31,6 +31,7 @@
             :size="size"
             :items="item.items"
             :selected-items="selectedItems"
+            @before-select="onBeforeSelect"
             @select="onSelect"
           />
         </div>
@@ -43,6 +44,7 @@
           :style="listBoxStyle"
           :items="items"
           :selected-items="selectedItems"
+          @before-select="onBeforeSelect"
           @select="onSelect"
         />
       </div>
@@ -105,6 +107,9 @@
       };
     },
     methods: {
+      onBeforeSelect(item, target, index) {
+        this.$emit('before-select', item, target, index);
+      },
       onSelect(item, target, index) {
         this.$emit('select', item, target, index);
       },
