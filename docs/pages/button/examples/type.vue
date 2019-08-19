@@ -2,6 +2,9 @@
   <div class="btn-type">
     <ev-button>default</ev-button>
     <ev-button :type="'primary'">primary</ev-button>
+    <ev-button :type="'info'">info</ev-button>
+    <ev-button :type="'warning'">warning</ev-button>
+    <ev-button :type="'error'">error</ev-button>
     <ev-button :type="'ghost'">ghost</ev-button>
     <ev-button :type="'dashed'">dashed</ev-button>
     <ev-button :type="'text'">text</ev-button>
