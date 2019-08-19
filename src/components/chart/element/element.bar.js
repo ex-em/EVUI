@@ -30,9 +30,8 @@ class Bar {
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
     const axesSteps = param.axesSteps;
-    const index = param.showIndex;
+    const showIndex = param.showIndex;
     const isHorizontal = param.isHorizontal;
-    const labels = param.integratedLabels;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
 
@@ -48,7 +47,7 @@ class Bar {
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (labels.length || 1);
+    const cArea = dArea / (this.data.length || 1);
     const cPad = 2;
 
     let bArea;
@@ -63,23 +62,18 @@ class Bar {
     // barArea내에서 barWidth로 빠진 부분을 계산.
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     // series index에 따라 시작 X값 보정을 위한 변수.
-    const barSeriesX = this.isExistGrp ? 1 : index + 1;
+    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
     let categoryPoint = null;
 
     ctx.beginPath();
     ctx.fillStyle = this.color;
 
-    this.data.forEach((item) => {
-      const posIdx = labels.indexOf(isHorizontal ? item.y : item.x);
-      if (posIdx < 0) {
-        return;
-      }
-
+    this.data.forEach((item, index) => {
       if (isHorizontal) {
-        categoryPoint = ysp - (cArea * posIdx) - cPad;
+        categoryPoint = ysp - (cArea * index) - cPad;
       } else {
-        categoryPoint = xsp + (cArea * posIdx) + cPad;
+        categoryPoint = xsp + (cArea * index) + cPad;
       }
 
       if (isHorizontal) {

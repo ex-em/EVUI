@@ -13,7 +13,13 @@ class TimeScale extends Scale {
     const step = range.maxSteps;
 
     if (this.interval) {
-      return TIME_INTERVALS[this.interval].size;
+      if (typeof this.interval === 'string') {
+        return TIME_INTERVALS[this.interval].size;
+      } else if (typeof this.interval === 'object') {
+        return this.interval.time * TIME_INTERVALS[this.interval.unit].size;
+      } else if (typeof this.interval === 'number') {
+        return this.interval;
+      }
     }
     return Math.ceil((max - min) / step);
   }

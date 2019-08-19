@@ -1,9 +1,9 @@
-import _ from 'lodash-es';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
 import LogarithmicScale from './scale/scale.logarithmic';
 import StepScale from './scale/scale.step';
+import TimeCategoryScale from './scale/scale.time.category';
 import Title from './plugins/plugins.title';
 import Legend from './plugins/plugins.legend';
 
@@ -37,7 +37,7 @@ class EvChart {
     this.pixelRatio = window.devicePixelRatio || 1;
     this.oldPixelRatio = this.pixelRatio;
 
-    this.chartDOM.appendChild(this.displayCanvas);
+    this.chartDOM.appendChild(this.bufferCanvas);
     this.chartDOM.appendChild(this.overlayCanvas);
 
     this.overlayCanvas.style.position = 'absolute';
@@ -49,7 +49,6 @@ class EvChart {
 
     this.pieDataSet = [];
     this.seriesList = {};
-    this.chartRect = {};
 
     this.seriesInfo = {
       charts: {
@@ -60,7 +59,6 @@ class EvChart {
       },
       count: 0,
     };
-    this.integratedLabels = this.data.labels.slice();
   }
 
   init() {
@@ -120,7 +118,6 @@ class EvChart {
     const axesSteps = this.axesSteps;
     const isHorizontal = this.options.horizontal;
     const thickness = this.options.thickness;
-    const integratedLabels = this.integratedLabels;
 
     let showIndex = 0;
     let showSeriesCount = 0;
@@ -147,7 +144,6 @@ class EvChart {
             labelOffset,
             axesSteps,
             isHorizontal,
-            integratedLabels,
             thickness,
             showSeriesCount,
             showIndex,
@@ -174,18 +170,21 @@ class EvChart {
 
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
-    const integratedLabels = this.integratedLabels;
+    const labels = this.data.labels;
 
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
           return new LinearScale(dir, axis, ctx);
         case 'time':
+          if (axis.categoryMode) {
+            return new TimeCategoryScale(dir, axis, ctx);
+          }
           return new TimeScale(dir, axis, ctx);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':
-          return new StepScale(dir, axis, ctx, integratedLabels);
+          return new StepScale(dir, axis, ctx, labels);
         default:
           return false;
       }
@@ -380,95 +379,6 @@ class EvChart {
     }
   }
 
-  calculateAngle() {
-    const pieDataSet = this.pieDataSet;
-
-    let slice;
-    let value;
-    let parent;
-    let totalValue;
-
-    let sliceAngle;
-    let startAngle;
-    let endAngle;
-    let totalAngle;
-    let isDummy;
-
-    const dummyIndex = [];
-    const saStore = {
-      '$ev-root': 1.5 * Math.PI,
-    };
-
-    for (let ix = 0; ix < pieDataSet.length; ix++) {
-      const pie = pieDataSet[ix];
-      isDummy = true;
-
-      for (let jx = 0; jx < pie.data.length; jx++) {
-        slice = pie.data[jx];
-        value = slice.value;
-
-        if (isDummy) {
-          isDummy = slice.id === 'dummy';
-        }
-
-        if (!ix) {
-          startAngle = saStore['$ev-root'];
-          sliceAngle = 2 * Math.PI * (value / pie.total);
-          endAngle = startAngle + sliceAngle;
-
-          slice.sa = startAngle;
-          slice.ea = endAngle;
-          saStore['$ev-root'] += sliceAngle;
-        } else {
-          parent = this.getParentInfo(ix - 1, slice.parent);
-          if (!parent) {
-            break;
-          }
-
-          if (!saStore[slice.parent]) {
-            saStore[slice.parent] = parent.sa;
-          }
-
-          startAngle = saStore[slice.parent];
-          totalAngle = parent.ea - parent.sa;
-          totalValue = pie.total[slice.parent] || 0;
-          sliceAngle = totalAngle * (value / totalValue);
-          endAngle = startAngle + sliceAngle;
-
-          slice.sa = startAngle;
-          slice.ea = endAngle;
-
-          saStore[slice.parent] += sliceAngle;
-        }
-      }
-
-      if (isDummy) {
-        dummyIndex.push(ix);
-      }
-    }
-
-    for (let ix = 0; ix < dummyIndex.length; ix++) {
-      this.pieDataSet.splice(dummyIndex, 1);
-    }
-
-    if (this.options.reverse) {
-      this.pieDataSet = _.reverse(this.pieDataSet);
-    }
-  }
-
-  getParentInfo(depth, parentId) {
-    for (let ix = depth; ix >= 0; ix--) {
-      const pie = this.pieDataSet[ix];
-      for (let jx = 0; jx < pie.data.length; jx++) {
-        if (pie.data[jx].id === parentId) {
-          return pie.data[jx];
-        }
-      }
-    }
-
-    return null;
-  }
-
   drawDoughnutHole() {
     const ctx = this.bufferCtx;
 
@@ -581,7 +491,7 @@ class EvChart {
     });
 
     axesY.forEach((axis, index) => {
-      lw = range.y[index].size.width + labelBuffer.width;
+      lw = Math.max(range.y[index].size.width + labelBuffer.width, 42 + labelBuffer.width);
 
       if (axis.position === 'left') {
         if (lw > labelOffset.left) {
@@ -599,6 +509,7 @@ class EvChart {
 
     return labelOffset;
   }
+
   update(updateSeries) {
     const options = this.options;
     const data = this.data.data;
@@ -606,11 +517,30 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    this.clearObject();
-    this.integratedLabels = labels.slice();
+    this.resetProps();
+
     if (updateSeries) {
+      delete this.seriesInfo;
+      delete this.seriesList;
+
+      this.seriesInfo = {
+        charts: {
+          pie: [],
+          bar: [],
+          line: [],
+          scatter: [],
+        },
+        count: 0,
+      };
       this.seriesList = {};
+
       this.createSeriesSet(series, options.type);
+
+      if (this.legendDOM) {
+        this.legendDOM.remove();
+        this.resizeDOM.remove();
+        this.ghostDOM.remove();
+      }
     }
 
     if (groups.length) {
@@ -651,33 +581,21 @@ class EvChart {
 
     this.render();
   }
-  clearObject() {
+
+  resetProps() {
     delete this.minMax;
     delete this.axesX;
     delete this.axesY;
     delete this.axesRange;
     delete this.labelOffset;
-  }
-  destroy() {}
-  reset() {
-    this.seriesList = {};
-    this.minMax = null;
-    this.axesX = null;
-    this.axesY = null;
-    this.axesRange = null;
-    this.labelOffset = null;
-    this.chartRect = null;
+    delete this.chartRect;
+    delete this.pieDataSet;
 
-    this.titleDOM.remove();
-    this.legendDOM.remove();
-    this.resizeDOM.remove();
-    this.ghostDOM.remove();
+    this.pieDataSet = [];
   }
-  render() {
-    this.clear();
-    this.chartRect = this.getChartRect();
-    this.drawChart();
-  }
+
+  destroy() {}
+
   clear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -687,6 +605,12 @@ class EvChart {
       this.bufferCanvas.height / this.clearRectRatio);
     this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
       this.overlayCanvas.height / this.clearRectRatio);
+  }
+
+  render() {
+    this.clear();
+    this.chartRect = this.getChartRect();
+    this.drawChart();
   }
 }
 

@@ -1,15 +1,14 @@
-import moment from 'moment';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class StepScale extends Scale {
   constructor(type, opt, ctx, labels) {
     super(type, opt, ctx);
-    this.integratedLabels = labels;
+    this.labels = labels;
   }
 
-  calculateScaleRange(minMax) {
-    const stepMinMax = this.timeMode ? minMax : Util.getStringMinMax(this.integratedLabels);
+  calculateScaleRange() {
+    const stepMinMax = Util.getStringMinMax(this.labels);
     const maxValue = stepMinMax.max;
     const minValue = stepMinMax.min;
 
@@ -23,7 +22,7 @@ class StepScale extends Scale {
   }
 
   calculateSteps(range) {
-    const labels = this.integratedLabels;
+    const labels = this.labels;
     const maxSteps = range.maxSteps;
 
     let interval = 1;
@@ -48,7 +47,7 @@ class StepScale extends Scale {
 
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
-    const labels = this.integratedLabels;
+    const labels = this.labels;
     const aPos = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,
@@ -57,7 +56,6 @@ class StepScale extends Scale {
     };
 
     const steps = stepInfo.steps;
-    const interval = stepInfo.interval;
 
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -103,23 +101,15 @@ class StepScale extends Scale {
 
     let labelText;
     let labelPoint;
-    let prevIndex = 0;
 
-    labels.reduce((prev, curr, index) => {
+    labels.forEach((item, index) => {
       labelCenter = Math.round(startPoint + (labelGap * index));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(curr);
+      labelText = this.getLabelFormat(item);
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        if (this.timeMode) {
-          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-            prevIndex = index;
-            ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
-          }
-        } else {
-          ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
-        }
+        ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
 
         if (index > 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
@@ -127,14 +117,7 @@ class StepScale extends Scale {
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        if (this.timeMode) {
-          if (prev.label !== labelText && (index === 0 || index - prev.index > interval)) {
-            prevIndex = index;
-            ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
-          }
-        } else {
-          ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
-        }
+        ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
 
         if (index > 0 && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
@@ -142,17 +125,12 @@ class StepScale extends Scale {
         }
       }
       ctx.stroke();
-
-      return { label: labelText, index: prevIndex };
-    }, { label: '', index: prevIndex });
+    });
 
     ctx.closePath();
   }
 
   getLabelFormat(value) {
-    if (this.timeMode) {
-      return moment(new Date(value)).format(this.timeFormat);
-    }
     return value;
   }
 }

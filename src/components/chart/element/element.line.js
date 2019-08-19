@@ -74,7 +74,7 @@ class Line {
         x += aliasPixel;
       }
 
-      if (y === null) {
+      if (y === null || x === null) {
         if (ix - 1 > -1) {
           if (this.fill && prev.y !== null) {
             ctx.stroke();

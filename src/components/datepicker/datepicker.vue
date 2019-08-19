@@ -179,6 +179,7 @@
             }
             let preText = '';
             let postText = '';
+            // 8칸보다 오버해서 숫자를 입력하는 경우
             if (numberValueLength > vm.inputNumberMaxLength) {
               // 인풋박스 마지막에 글씨 쓰는 경우
               if (numberValueLength - vm.inputNumberMaxLength === 1) {
@@ -203,6 +204,7 @@
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
                   vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
                   vm.$refs.datepickerText.value = setValue;
+                  vm.dataValue = setValue;
                   vm.$refs.datepickerText.selectionStart = (currCursor + afterSpecialSymbolTerm)
                     + beforeSpecialSymbolTerm;
                   vm.$refs.datepickerText.selectionEnd = (currCursor + afterSpecialSymbolTerm)
@@ -213,14 +215,18 @@
                   postText = numberValue.slice(numberValueCursor + 1, numberValueLength);
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
                   vm.$refs.datepickerText.value = setValue;
+                  vm.dataValue = setValue;
                   vm.$refs.datepickerText.selectionStart = currCursor;
                   vm.$refs.datepickerText.selectionEnd = currCursor;
                 }
               }
             } else {
-              // 글씨 max가 아닌경우
+              // 숫자 입력 값이 max이거나 그보다 작은 경우
               setValue = vm.addSpecialSymbols(vm.validNumber(targetValue));
               vm.$refs.datepickerText.value = setValue;
+              if (numberValueLength === vm.inputNumberMaxLength) {
+                vm.dataValue = setValue;
+              }
               vm.$refs.datepickerText.selectionStart = currCursor;
               vm.$refs.datepickerText.selectionEnd = currCursor;
               let specialSymbolTerm = 0;
@@ -244,6 +250,10 @@
       },
     },
     watch: {
+      value(v) {
+        this.calendar.setDateTime(v);
+        this.dataValue = v;
+      },
       computedValue(v) {
         this.$emit('input', v);
       },

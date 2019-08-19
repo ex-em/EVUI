@@ -85,7 +85,7 @@
                             <ev-checkbox
                               v-model="row[col.field]"
                               :size="'small'"
-                              @change-event="changeCheckbox($event, row, col.field, col.checkType)"
+                              @on-change="changeCheckbox($event, row, col.field, col.checkType)"
                             />
                           </div>
                           <div

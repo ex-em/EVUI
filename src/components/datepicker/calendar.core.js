@@ -139,7 +139,7 @@ class Calendar {
     // create & init canvas
     this.dropdown = document.createElement('div');
     this.dropdown.setAttribute('class', 'ev-calendar-dropdown');
-    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 9999; background: #ffffff');
+    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 9999; background: rgba(255, 255, 255, 1); border-radius: 4px;');
     this.baseCanvas = document.createElement('canvas');
     this.baseCanvas.setAttribute('class', 'ev-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
