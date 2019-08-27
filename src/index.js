@@ -26,6 +26,7 @@ import { tabs as EvTabs, tab as EvTabPanel } from './components/tabs';
 import { TreeTable as EvTreeTable } from './components/tree';
 import EvSplitter from './components/splitter';
 import EvMarkdown from './components/markdown';
+import EvGrid from './components/grid/grid';
 
 const components = {
   EvButton,
@@ -56,6 +57,7 @@ const components = {
   EvTreeTable,
   EvSplitter,
   EvMarkdown,
+  EvGrid,
 };
 
 const evui = {
