@@ -1,0 +1,100 @@
+'use strict'
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const merge = require('webpack-merge');
+const webpackBaseConfig = require('./webpack.base.conf.js');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { VueLoaderPlugin } =  require ('vue-loader');
+
+function resolve (dir) {
+  return path.join(__dirname, '..', dir)
+}
+
+module.exports = merge(webpackBaseConfig, {
+  mode: 'development',
+  entry: {
+    app: './dashboard/main.js',
+    vendors: ['vue'],
+  },
+  output: {
+    path: path.resolve(__dirname, '../dist_dashboard'),
+    publicPath: '/',
+    filename: '[name].js',
+    globalObject: 'this',
+  },
+  devtool: 'source-map',
+  module: {
+    rules:[
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src'), resolve('dashboard')],
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          emitWarning: true,
+          failOnError: true,
+          failOnWarning : true,
+        }
+      }
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all', // all, async, initial
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          chunks: 'initial',
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  },
+  devServer: {
+    historyApiFallback: true,
+    noInfo: true,
+    contentBase: '/',
+    hot: true,
+    inline: true,
+    host: '0.0.0.0',
+    disableHostCheck: true,
+    port: '9999',
+    compress: false,
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new HtmlWebpackPlugin({
+      inject: true,
+      filename: './index.html',
+      template: './dashboard/index.html',
+    }),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../dashboard/'),
+        to: './dashboard/',
+        copyUnmodified: true,
+      },
+    ]),
+    new FriendlyErrorsPlugin(),
+    new VueLoaderPlugin()
+  ]
+});

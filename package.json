@@ -14,6 +14,7 @@
     "docs": "webpack-dev-server --progress --config build/webpack.docs.conf.js --mode=development",
     "docs_build": "webpack --config build/webpack.docs.conf.js --mode=production",
     "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
+    "dashboard": "webpack-dev-server --progress --config build/webpack.dashboard.conf.js",
     "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js",
     "liteplus_build": "webpack --config build/webpack.liteplus.conf.js --mode=production"
   },
