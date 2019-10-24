@@ -1,6 +1,7 @@
 <template>
   <div
-    :class="[{ disabled: disabled }, dataSize]"
+    :class="[{ disabled: disabled }, dataSize, type]"
+    :style="{ width: buttonSize }"
     class="ev-radio-wrap"
   >
     <input
@@ -15,7 +16,7 @@
     >
     <label
       :for="`${radioId}_${value}`"
-      :class="dataSize"
+      :class="[dataSize, type]"
       class="ev-radio-label"
     >
       <slot/>
@@ -49,12 +50,17 @@ export default {
       type: String,
       default: '',
     },
+    buttonSize: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       bindValue: this.customValue,
       radioId: this._uid,
       dataSize: this.size,
+      type: this.$parent.type,
     };
   },
   computed: {
@@ -101,18 +107,41 @@ export default {
   .ev-radio-wrap.disabled {
     color: #C0C4CC;
   }
-  .ev-radio-label {
+  .ev-radio-wrap.button {
+    font-size: 12px;
+    height: 100%;
+  }
+  .ev-radio-label:not(.button) {
     position: relative;
     display: inline-block;
     padding-left: 25px;
     line-height: 19px;
     cursor: pointer;
+    margin-right: 10px;
+  }
+  .ev-radio-label.button {
+    display: flex;
+    flex-direction: row;
+    color: #495060;
+    background-color: transparent;
+    border: solid 1px #dddee1;
+    border-radius: 4px;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 19px;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  .ev-radio-label.button:hover {
+    color: #57a3f3;
+    background-color: transparent;
+    border-color: #57a3f3
   }
   .ev-radio-label.small {
     padding-left: 20px;
     line-height: 16px;
   }
-  .ev-radio-label:before {
+  .ev-radio-label:not(.button):before {
     position: absolute;
     top: 50%;
     left: 2px;
@@ -125,7 +154,7 @@ export default {
     transform: translateY(-50%);
     content: '';
   }
-  .ev-radio-label.small:before {
+  .ev-radio-label:not(.button).small:before {
     width: 12px;
     height: 12px;
   }
@@ -146,21 +175,26 @@ export default {
     cursor: inherit;
     clip: rect(0, 0, 0, 0);
   }
-  .ev-radio-input:checked + .ev-radio-label:before {
+  .ev-radio-input:checked + .ev-radio-label:not(.button):before {
     border: 1px solid #41B7FD;
   }
   .ev-radio-wrap.disabled .ev-radio-input:checked + .ev-radio-label:before {
     border: 1px solid #B01012;
   }
-  .ev-radio-input:checked + .ev-radio-label:after {
-    position: absolute;
-    top: 50%;
-    left: 7px;
-    width: 8px;
-    height: 8px;
-    border-radius: 100%;
-    transform: translateY(-50%);
-    content: '';
+  .ev-radio-input:checked + .ev-radio-label:not(.button):after {
+     position: absolute;
+     top: 50%;
+     left: 7px;
+     width: 8px;
+     height: 8px;
+     border-radius: 100%;
+     transform: translateY(-50%);
+     content: '';
+   }
+  .ev-radio-input:checked + .ev-radio-label.button {
+    color:#fff;
+    background-color:#2d8cf0;
+    border-color:#2d8cf0;
   }
   .ev-radio-input:checked + .ev-radio-label.small:after {
     left: 6px;

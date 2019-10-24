@@ -132,6 +132,7 @@
     height: 19px;
     float: left;
     user-select: none;
+    font-size: 12px;
   }
   .ev-checkbox-wrap.small{
     height: 16px;
