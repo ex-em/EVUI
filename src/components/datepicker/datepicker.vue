@@ -198,7 +198,7 @@
                     // '-', ' ', ':' 특수문자 전에 값을 입력하면 +1칸 커서 왼쪽 자동이동 후 값이 변환됨
                     beforeSpecialSymbolTerm = 1;
                   }
-                  preText = numberValue.slice(0, numberValueCursor);
+                  preText = numberValue.slice(0, numberValueCursor + beforeSpecialSymbolTerm);
                   postText = numberValue.slice(numberValueCursor + beforeSpecialSymbolTerm + 1,
                     numberValueLength);
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
@@ -251,7 +251,7 @@
     },
     watch: {
       value(v) {
-        this.calendar.setDateTime(v);
+        this.calendar.setDateTime(moment(v));
         this.dataValue = v;
       },
       computedValue(v) {
