@@ -106,6 +106,94 @@ class Bar {
       item.h = isHorizontal ? -h : h; // eslint-disable-line
     });
   }
+
+  itemHighlight(item, context) {
+    const gdata = item.data;
+    const ctx = context;
+
+    const x = gdata.xp;
+    const y = gdata.yp;
+    const w = gdata.w;
+    const h = gdata.h;
+
+    ctx.fillStyle = this.color;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = this.color;
+
+    ctx.fillRect(x, y, w, h);
+  }
+
+  findGraphData(offset, isHorizontal) {
+    return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
+  }
+
+  findGraphRange(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
+        item.data = gdata[m];
+
+        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (sx + 4 < xp) {
+        s = m + 1;
+      } else {
+        e = m - 1;
+      }
+    }
+
+    return item;
+  }
+
+  findGraphRangeCount(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((ey <= yp) && (yp <= sy)) {
+        item.data = gdata[m];
+
+        if ((sx <= xp) && (xp <= ex)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (ey < yp) {
+        e = m - 1;
+      } else {
+        s = m + 1;
+      }
+    }
+
+    return item;
+  }
 }
 
 export default Bar;
