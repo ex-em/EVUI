@@ -107,7 +107,7 @@ class Line {
     if (this.fill && dataLen) {
       ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${this.fillOpacity})` || '';
       if (this.stackIndex) {
-        this.data.reverse().forEach((curr) => {
+        this.data.slice().reverse().forEach((curr) => {
           x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
           y = Canvas.calculateY(curr.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
@@ -131,6 +131,64 @@ class Line {
         }
       });
     }
+  }
+
+  itemHighlight(item, context) {
+    const gdata = item.data;
+    const ctx = context;
+
+    if (!this.point) {
+      return;
+    }
+
+    const x = gdata.xp;
+    const y = gdata.yp;
+
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.lineWidth;
+    ctx.fillStyle = this.color;
+
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = this.color;
+
+    if (x !== null && y !== null) {
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.pointSize, x, y);
+    }
+  }
+
+  findGraphData(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
+        item.data = gdata[m];
+
+        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (sx + 4 < xp) {
+        s = m + 1;
+      } else {
+        e = m - 1;
+      }
+    }
+
+    return item;
   }
 }
 

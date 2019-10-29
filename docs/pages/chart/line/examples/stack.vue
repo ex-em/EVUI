@@ -20,8 +20,8 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
-          series2: { name: 'series#2', show: true, type: 'line', fill: true, point: false },
+          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
+          series2: { name: 'series#1231231232', show: true, type: 'line', fill: true, point: true },
         },
         groups: [
           ['series1', 'series2'],
@@ -34,8 +34,8 @@
           +new Date('2017/01/01 00:04:00'),
         ],
         chartData: {
-          series1: [100, 150, 51, 150, 350],
-          series2: [50, 200, 100, 150, 80],
+          series1: [100, 150, 50, 150, 350],
+          series2: [100, 150, 50, 150, 350],
         },
         chartOptions: {
           width: '100%',
