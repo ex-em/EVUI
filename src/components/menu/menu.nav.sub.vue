@@ -1,16 +1,14 @@
 <template>
-  <ul
-    :style="`width: ${width}`"
-  >
+  <ul>
     <li
       v-for="menuItem in menu"
       :key="menuItem.name"
+      :style="`margin-left: ${depth * 5}px`"
       class="ev-menu-item"
     >
       <menu-item
         v-bind="menuItem"
-        :depth="1"
-        :selected-name="value"
+        :selected-name="selectedName"
         @menu-click="onClick"
       />
     </li>
@@ -26,31 +24,19 @@
         type: Array,
         default: () => [],
       },
-      value: {
+      depth: {
+        type: Number,
+        default: 1,
+      },
+      selectedName: {
         type: String,
         default: '',
       },
-      width: {
-        type: String,
-        default: '240px',
-      },
-    },
-    data() {
-      return {};
     },
     methods: {
       onClick(selectedName) {
-        this.$emit('input', selectedName);
+        this.$emit('menu-click', selectedName);
       },
     },
   };
 </script>
-<style>
-  .ev-menu-item {
-    list-style-type: none;
-  }
-  div.ev-menu-item {
-    padding: 8px 18px;
-
-  }
-</style>
