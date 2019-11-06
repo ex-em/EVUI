@@ -7,6 +7,8 @@
 </template>
 <script>
   import _merge from 'lodash-es/merge';
+  import _defaults from 'lodash-es/defaults';
+  import _isEqual from 'lodash-es/isEqual';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -38,15 +40,15 @@
     },
     watch: {
       data: {
-        handler(newVal) {
-          this.evChart.data = _merge(this.normalizedData, newVal);
-          this.evChart.update();
+        handler(newVal, oldVal) {
+          this.evChart.data = _defaults(newVal, this.normalizedData);
+          this.evChart.update(!_isEqual(newVal.series, oldVal.series));
         },
         deep: true,
       },
       options: {
         handler(newVal) {
-          this.evChart.options = _merge(this.normalizedOption, newVal);
+          this.evChart.options = _merge(newVal, this.normalizedOption);
           this.evChart.update();
         },
         deep: true,

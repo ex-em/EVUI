@@ -545,9 +545,7 @@ class EvChart {
       this.createSeriesSet(series, options.type);
 
       if (this.legendDOM) {
-        this.legendDOM.remove();
-        this.resizeDOM.remove();
-        this.ghostDOM.remove();
+        this.resetLegend();
       }
     }
 
