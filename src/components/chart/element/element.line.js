@@ -104,7 +104,7 @@ class Line {
 
     const dataLen = this.data.length;
 
-    if (this.fill && dataLen) {
+    if (this.fill && dataLen > 1) {
       ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${this.fillOpacity})` || '';
       if (this.stackIndex) {
         this.data.slice().reverse().forEach((curr) => {
