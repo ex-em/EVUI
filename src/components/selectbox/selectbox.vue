@@ -340,7 +340,7 @@
           }
         }
 
-        return foundItem;
+        return foundItem || {};
       },
       getFilteredListBoxItems(value) {
         let filteredItems;
