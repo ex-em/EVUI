@@ -221,7 +221,7 @@
     transform: rotate(45deg);
   }
   .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:after {
-    background: #B01012;
+    /*background: #B01012;*/
   }
   .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
     border: solid #B01012;
