@@ -6,7 +6,9 @@
   />
 </template>
 <script>
-  import _ from 'lodash-es/merge';
+  import _merge from 'lodash-es/merge';
+  import _defaults from 'lodash-es/defaults';
+  import _isEqual from 'lodash-es/isEqual';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -38,23 +40,23 @@
     },
     watch: {
       data: {
-        handler(newVal) {
-          this.evChart.data = _.merge(this.normalizedData, newVal);
-          this.evChart.update();
+        handler(newVal, oldVal) {
+          this.evChart.data = _defaults(newVal, this.normalizedData);
+          this.evChart.update(!_isEqual(newVal.series, oldVal.series));
         },
         deep: true,
       },
       options: {
         handler(newVal) {
-          this.evChart.options = _.merge(this.normalizedOption, newVal);
+          this.evChart.options = _merge(newVal, this.normalizedOption);
           this.evChart.update();
         },
         deep: true,
       },
     },
     created() {
-      this.normalizedOption = _.merge(this.getDefaultOptions(), this.options);
-      this.normalizedData = _.merge(this.getDefaultData(), this.data);
+      this.normalizedOption = _merge(this.getDefaultOptions(), this.options);
+      this.normalizedData = _merge(this.getDefaultData(), this.data);
     },
     mounted() {
       const wrapper = this.$refs.wrapper;
@@ -63,16 +65,12 @@
 
       this.evChart = new EvChart(wrapper, data, options);
 
-      this.store = this.evChart.store;
       const timer = setTimeout(() => {
         this.evChart.init();
         clearTimeout(timer);
       }, 1);
     },
     beforeDestroy() {
-      if (this.evChart.tooltipDOM) {
-        this.evChart.tooltipDOM.remove();
-      }
       delete this.evChart;
     },
     methods: {
@@ -243,63 +241,15 @@
   .ev-chart-tooltip {
     position: absolute;
     z-index: 100000;
-    color: #000;
-    border-radius: 4px;
-    border: 1px solid #D8D8D8;
-    background: #fff;
     overflow-y: auto;
-    max-height: 500px;
-    padding: 10px;
+    overflow-x: hidden;
+    padding-right: 17px;
   }
 
-  .ev-chart-tooltip-title {
-    font-size: 14px;
-    text-align: center;
-    margin: 0 5px 3px 5px;
-    padding-bottom: 2px;
-    border-bottom: 1px solid #D2D2D2;
-    user-select: none;
-  }
-
-  .ev-chart-tooltip-ul {
-    list-style: none;
-    display: block;
-    user-select: none;
-  }
-
-  .ev-chart-tooltip-li {
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .ev-chart-tooltip-color {
-    width: 10px;
-    height: 10px;
+  .ev-chart-tooltip-canvas {
     position: absolute;
-    margin: 8px 0 0 5px;
-    border-radius: 5px;
+    top: 0;
+    left: 0;
+    display: block;
   }
-
-  .ev-chart-tooltip-name {
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    margin-left: 20px;
-    width: 100%;
-    user-select: none;
-    color: #000;
-  }
-
-  .ev-chart-tooltip-colon {
-    width: 100%;
-  }
-
-  .ev-chart-tooltip-value {
-    font-size: 12px;
-    margin-right: 5px;
-  }
-
 </style>

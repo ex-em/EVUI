@@ -14,7 +14,7 @@
           @click="preventDefault"
         />
         <icon
-          class="fa-sort-up"
+          class="ei-arrow-up"
         />
       </a>
       <a
@@ -26,7 +26,7 @@
           :class="innerDownClasses"
           @click="preventDefault"
         />
-        <icon class="fa-sort-down"/>
+        <icon class="ei-arrow-down"/>
       </a>
     </div>
     <div
@@ -82,242 +82,244 @@
     return (Math.round(num1 * sf) + Math.round(num2 * sf)) / sf;
   }
   export default {
-      components: {
-        icon,
+    components: {
+      icon,
+    },
+    props: {
+      max: {
+        type: Number,
+        default: Infinity,
       },
-      props: {
-        max: {
-          type: Number,
-          default: Infinity,
-        },
-        min: {
-          type: Number,
-          default: -Infinity,
-        },
-        step: {
-          type: Number,
-          default: 0.1,
-        },
-        width: {
-          type: [String, Number],
-          default: '100%',
-        },
-        height: {
-          type: [String, Number],
-          default: '100%',
-        },
-        value: {
-          type: Number,
-          default: null,
-        },
-        disabled: {
-          type: Boolean,
-          default: false,
-        },
-        precision: {
-          type: Number,
-          default: 1,
-          validator(value) {
-            return !isNaN(Number(value)) && value >= 0 && value <= 100;
-          },
-        },
-        formatter: {
-          type: Function,
-          default: null,
-        },
-        readonly: {
-          type: Boolean,
-          default: false,
+      min: {
+        type: Number,
+        default: -Infinity,
+      },
+      step: {
+        type: Number,
+        default: 0.1,
+      },
+      width: {
+        type: [String, Number],
+        default: '100%',
+      },
+      height: {
+        type: [String, Number],
+        default: '100%',
+      },
+      value: {
+        type: Number,
+        default: null,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+      precision: {
+        type: Number,
+        default: 1,
+        validator(value) {
+          return !isNaN(Number(value)) && value >= 0 && value <= 100;
         },
       },
-      data() {
+      formatter: {
+        type: Function,
+        default: null,
+      },
+      readonly: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        focused: false,
+        upDisabled: false,
+        downDisabled: false,
+        currentValue: this.setValue(this.value),
+      };
+    },
+    computed: {
+      styleObject() {
         return {
-          focused: false,
-          upDisabled: false,
-          downDisabled: false,
-          currentValue: this.setValue(this.value),
+          width: parsedStyle(this.width),
+          height: parsedStyle(this.height),
         };
       },
-      computed: {
-        styleObject: function styleObject() {
-          return {
-            width: parsedStyle(this.width),
-            height: parsedStyle(this.height),
-          };
-        },
-        formatterValue: function formatterValue() {
-          if (this.formatter) {
-            return this.formatter(this.currentValue);
-          }
-          return this.currentValue;
-        },
-        wrapClasses: function wrapClasses() {
-          return [
-            `${prefixCls}`,
-            {
-              [`${prefixCls}-disabled`]: this.disabled,
-            },
-          ];
-        },
-        handlerClasses: function handlerClasses() {
-          return `${prefixCls}-handler-wrap`;
-        },
-        upClasses: function upClasses() {
-          return [
-            `${prefixCls}-handler`,
-            `${prefixCls}-handler-up`,
-          ];
-        },
-        innerUpClasses: function innerUpClasses() {
-          return `${prefixCls}-handler-up-inner icon`;
-        },
-        downClasses: function downClasses() {
-          return [
-            `${prefixCls}-handler`,
-            `${prefixCls}-handler-down`,
-          ];
-        },
-        innerDownClasses: function innerDownClasses() {
-          return `${prefixCls}-handler-down-inner icon`;
-        },
-        inputWrapClasses: function inputWrapClasses() {
-          return `${prefixCls}-input-wrap`;
-        },
-        inputClasses: function inputClasses() {
-          return `${prefixCls}-input`;
-        },
+      formatterValue() {
+        if (this.formatter) {
+          this.$emit('input', this.formatter(this.currentValue));
+          return this.formatter(this.currentValue);
+        }
+        this.$emit('input', this.currentValue);
+        return this.currentValue;
       },
-      watch: {
-        value(updatedValue) {
-          this.currentValue = updatedValue;
-        },
+      wrapClasses() {
+        return [
+          `${prefixCls}`,
+          {
+            [`${prefixCls}-disabled`]: this.disabled,
+          },
+        ];
       },
-      methods: {
-        preventDefault(e) {
-          e.preventDefault();
-        },
-        up(e) {
-          const targetValue = Number(e.target.value);
-          if (this.upDisabled && isNaN(targetValue)) {
-            return false;
-          }
-          this.changeStep('up', e);
-          return true;
-        },
-        down(e) {
-          const targetValue = Number(e.target.value);
-          if (this.downDisabled && isNaN(targetValue)) {
-            return false;
-          }
-          this.changeStep('down', e);
-          return true;
-        },
-        changeStep(type, e) {
-          if (this.disabled || this.readonly) {
-            return false;
-          }
-          const step = Number(this.step);
-          const targetValue = Number(e.target.value);
-          let updatedValue = Number(this.currentValue);
+      handlerClasses() {
+        return `${prefixCls}-handler-wrap`;
+      },
+      upClasses() {
+        return [
+          `${prefixCls}-handler`,
+          `${prefixCls}-handler-up`,
+        ];
+      },
+      innerUpClasses() {
+        return `${prefixCls}-handler-up-inner icon`;
+      },
+      downClasses() {
+        return [
+          `${prefixCls}-handler`,
+          `${prefixCls}-handler-down`,
+        ];
+      },
+      innerDownClasses() {
+        return `${prefixCls}-handler-down-inner icon`;
+      },
+      inputWrapClasses() {
+        return `${prefixCls}-input-wrap`;
+      },
+      inputClasses() {
+        return `${prefixCls}-input`;
+      },
+    },
+    watch: {
+      value(updatedValue) {
+        this.currentValue = updatedValue;
+      },
+    },
+    methods: {
+      preventDefault(e) {
+        e.preventDefault();
+      },
+      up(e) {
+        const targetValue = Number(e.target.value);
+        if (this.upDisabled && isNaN(targetValue)) {
+          return false;
+        }
+        this.changeStep('up', e);
+        return true;
+      },
+      down(e) {
+        const targetValue = Number(e.target.value);
+        if (this.downDisabled && isNaN(targetValue)) {
+          return false;
+        }
+        this.changeStep('down', e);
+        return true;
+      },
+      changeStep(type, e) {
+        if (this.disabled || this.readonly) {
+          return false;
+        }
+        const step = Number(this.step);
+        const targetValue = Number(e.target.value);
+        let updatedValue = Number(this.currentValue);
 
-          if (isNaN(updatedValue)) {
-            return false;
-          }
-          if (!isNaN(targetValue) && type !== null) {
-              if (addNum(targetValue, updatedValue) <= this.max ||
-                addNum(targetValue, -updatedValue) >= this.min) {
-                updatedValue = targetValue;
-              } else {
-                return false;
-              }
-          }
-          if (type === 'up') {
-            updatedValue = addNum(updatedValue, step);
-          } else if (type === 'down') {
-            updatedValue = addNum(updatedValue, -step);
-          }
-          this.setValue(updatedValue);
-          return true;
-        },
-        setValue(value) {
-          const updatedValue = Number(Number(value).toFixed(this.precision));
-          this.$nextTick(() => {
-              this.currentValue = updatedValue;
-            });
-          return updatedValue;
-        },
-        change(e) {
-          let updatedValue;
-          const max = this.max;
-          const min = this.min;
-          const value = e.target.value.trim();
-          const isEmptyString = value.length === 0;
-          if (isEmptyString) {
-            this.setValue(null);
-            return false;
-          }
-          if (this.validateValue(e.type, value)) {
-            return false;
-          }
-          if (isNaN(value)) {
-            e.target.value = this.setValue(this.currentValue);
-            return false;
-          }
-          if (!isNaN(value)) {
-            updatedValue = Number(value);
-            if (e.type === 'input' && value < min) {
+        if (isNaN(updatedValue)) {
+          return false;
+        }
+        if (!isNaN(targetValue) && type !== null) {
+            if (addNum(targetValue, updatedValue) <= this.max ||
+              addNum(targetValue, -updatedValue) >= this.min) {
+              updatedValue = targetValue;
+            } else {
               return false;
             }
-            if (value > max || value < min) {
-              updatedValue = value > max ? max : min;
-            } else {
-              updatedValue = value;
-            }
-            this.setValue(updatedValue);
+        }
+        if (type === 'up') {
+          updatedValue = addNum(updatedValue, step);
+        } else if (type === 'down') {
+          updatedValue = addNum(updatedValue, -step);
+        }
+        this.setValue(updatedValue);
+        return true;
+      },
+      setValue(value) {
+        const updatedValue = Number(Number(value).toFixed(this.precision));
+        this.$nextTick(() => {
+            this.currentValue = updatedValue;
+          });
+        return updatedValue;
+      },
+      change(e) {
+        let updatedValue;
+        const max = this.max;
+        const min = this.min;
+        const value = e.target.value.trim();
+        const isEmptyString = value.length === 0;
+        if (isEmptyString) {
+          this.setValue(null);
+          return false;
+        }
+        if (this.validateValue(e.type, value)) {
+          return false;
+        }
+        if (isNaN(value)) {
+          e.target.value = this.setValue(this.currentValue);
+          return false;
+        }
+        if (!isNaN(value)) {
+          updatedValue = Number(value);
+          if (e.type === 'input' && value < min) {
+            return false;
+          }
+          if (value > max || value < min) {
+            updatedValue = value > max ? max : min;
+          } else {
+            updatedValue = value;
           }
           this.setValue(updatedValue);
-          this.currentValue = value;
-          return true;
-        },
-        validateValue(type, value) {
-          let result = false;
-          if (type === 'input'
-            && value.match(/^-?\.?$|\.$/)) {
-            result = true;
-          }
-          if (type === 'change'
-            && value === this.currentValue) {
-            result = true;
-          }
-          return result;
-        },
-        focus() {
-          this.focused = true;
-        },
-        blur() {
-          this.focused = false;
-        },
-        keyDownEvent(e) {
-          if (e.keyCode === 38) {
-            e.preventDefault();
-            this.up(e);
-          } else if (e.keyCode === 40) {
-            e.preventDefault();
-            this.down(e);
-          }
-        },
-        wheelEvent(e) {
+        }
+        this.setValue(updatedValue);
+        this.currentValue = value;
+        return true;
+      },
+      validateValue(type, value) {
+        let result = false;
+        if (type === 'input'
+          && value.match(/^-?\.?$|\.$/)) {
+          result = true;
+        }
+        if (type === 'change'
+          && value === this.currentValue) {
+          result = true;
+        }
+        return result;
+      },
+      focus() {
+        this.focused = true;
+      },
+      blur() {
+        this.focused = false;
+      },
+      keyDownEvent(e) {
+        if (e.keyCode === 38) {
           e.preventDefault();
-          if (e.wheelDeltaY === 120) {
-            this.up(e);
-          } else if (e.wheelDeltaY === -120) {
-            this.down(e);
-          }
-        },
+          this.up(e);
+        } else if (e.keyCode === 40) {
+          e.preventDefault();
+          this.down(e);
+        }
       },
-      init() {
+      wheelEvent(e) {
+        e.preventDefault();
+        if (e.wheelDeltaY === 120) {
+          this.up(e);
+        } else if (e.wheelDeltaY === -120) {
+          this.down(e);
+        }
       },
-    };
+    },
+    init() {
+    },
+  };
 </script>
 <style scoped>
   /*base class*/
@@ -392,6 +394,8 @@
     overflow: hidden;
     color: #999;
     position: relative;
+    padding-top: 1px;
+    padding-left: 1px;
   }
   .ev-input-number-handler-up {
     cursor: pointer;
@@ -432,9 +436,5 @@
     opacity: 1;
     cursor: not-allowed;
     color: #ccc;
-  }
-  /*TODO SET ICON CLASS*/
-  .fa-sort-up {
-    margin-top: 4px;
   }
 </style>

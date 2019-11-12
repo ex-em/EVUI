@@ -152,6 +152,90 @@
   border-color:#dddee1;
 }
 
+/** evui-btn > type(info) **/
+
+.evui-btn-info {
+  color: #fff;
+  background-color: #2db7f5 !important;
+  border-color: #2db7f5 !important;
+}
+.evui-btn-info:hover {
+  background-color: #57c5f7 !important;
+  border-color: #57c5f7 !important;
+}
+.evui-btn-info.active,
+.evui-btn-info:active {
+  color: #f2f2f2 !important;
+  background-color: #2baee9 !important;
+  border-color: #2baee9 !important;
+}
+.evui-btn-info.disabled,
+.evui-btn-info.disabled:active,
+.evui-btn-info.disabled:hover,
+.evui-btn-info[disabled],
+.evui-btn-info[disabled]:active,
+.evui-btn-info[disabled]:hover {
+  color: #c5c8ce !important;
+  background-color: #f7f7f7 !important;
+  border-color: #dcdee2 !important;
+}
+
+/** evui-btn > type(warning) **/
+
+.evui-btn-warning {
+  color: #fff;
+  background-color: #f90;
+  border-color: #f90;
+}
+.evui-btn-warning:hover {
+  background-color: #ffad33;
+  border-color: #ffad33;
+}
+.evui-btn-warning.active,
+.evui-btn-warning:active {
+  color: #f2f2f2;
+  background-color: #f29100;
+  border-color: #f29100;
+}
+.evui-btn-warning.disabled,
+.evui-btn-warning.disabled:active,
+.evui-btn-warning.disabled:hover,
+.evui-btn-warning[disabled],
+.evui-btn-warning[disabled]:active,
+.evui-btn-warning[disabled]:hover {
+  color: #c5c8ce;
+  background-color: #f7f7f7;
+  border-color: #dcdee2;
+}
+
+/** evui-btn > type(error) **/
+
+.evui-btn-error {
+  color: #fff !important;
+  background-color: #ed4014 !important;
+  border-color: #ed4014 !important;
+}
+.evui-btn-error:hover {
+  background-color: #f16643 !important;
+  border-color: #f16643 !important;
+}
+.evui-btn-error.active,
+.evui-btn-error:active {
+  color: #f2f2f2 !important;
+  background-color: #e13d13 !important;
+  border-color: #e13d13 !important;
+}
+.evui-btn-error.disabled,
+.evui-btn-error.disabled:active,
+.evui-btn-error.disabled:hover,
+.evui-btn-error[disabled],
+.evui-btn-error[disabled]:active,
+.evui-btn-error[disabled]:hover {
+  color: #c5c8ce !important;
+  background-color: #f7f7f7 !important;
+  border-color: #dcdee2 !important;
+}
+
 /** evui-btn > type(gost) **/
 
 .evui-btn-ghost {

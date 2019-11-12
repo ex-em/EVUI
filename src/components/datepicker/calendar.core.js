@@ -99,7 +99,7 @@ class Calendar {
           bottom: 0,
           left: 0,
         },
-        font: '10px Roboto Condensed',
+        font: '10px sans-serif',
       },
       // selectable: true, // 선택 가능 여부 (이번달 & 오늘 전까지)
 
@@ -1056,7 +1056,7 @@ class Calendar {
         text: thisYear,
         align: 'center',
         padding: { bottom: 8 },
-        font: '14px Roboto Condensed',
+        font: '14px sans-serif',
       },
     };
     this.dynamicDraw(
@@ -1081,7 +1081,7 @@ class Calendar {
         },
         align: 'center',
         padding: { bottom: 8 },
-        font: '14px Roboto Condensed',
+        font: '14px sans-serif',
       },
     };
     this.dynamicDraw(
@@ -1116,7 +1116,7 @@ class Calendar {
           },
           align: 'center',
           padding: { bottom: 8 },
-          font: '10px Roboto Condensed',
+          font: '10px sans-serif',
         },
       );
     });
@@ -1175,7 +1175,7 @@ class Calendar {
                 padding: {
                   bottom: 8,
                 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: false,
               date: {
@@ -1223,7 +1223,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1271,7 +1271,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1300,7 +1300,7 @@ class Calendar {
               },
               align: 'center',
               padding: { bottom: 8 },
-              font: '10px Roboto Condensed',
+              font: '10px sans-serif',
             },
             selectable: false,
             date: {
@@ -1351,7 +1351,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1399,7 +1399,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1503,7 +1503,7 @@ class Calendar {
           padding: {
             bottom: 27,
           },
-          font: '12px Roboto Condensed',
+          font: '12px sans-serif',
         },
       );
     });
