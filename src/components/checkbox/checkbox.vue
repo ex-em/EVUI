@@ -111,16 +111,16 @@
         if (this.isGroup) {
           this.$parent.$emit('on-change', e);
         } else {
-          this.$emit('on-change', e);
           this.$emit('input', e.target.checked);
+          this.$emit('on-change', e);
         }
       },
       click(e) {
         if (this.isGroup) {
           this.$parent.$emit('on-click', e);
         } else {
-          this.$emit('on-click', e);
           this.$emit('input', e.target.checked);
+          this.$emit('on-click', e);
         }
       },
     },
@@ -132,6 +132,7 @@
     height: 19px;
     float: left;
     user-select: none;
+    font-size: 12px;
   }
   .ev-checkbox-wrap.small{
     height: 16px;
@@ -220,7 +221,7 @@
     transform: rotate(45deg);
   }
   .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:after {
-    background: #B01012;
+    /*background: #B01012;*/
   }
   .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
     border: solid #B01012;

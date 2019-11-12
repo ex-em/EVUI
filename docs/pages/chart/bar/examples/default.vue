@@ -14,17 +14,19 @@
       return {
         defaultBarChartData: {
           series: {
-            series1: { name: 'series#1', show: true, type: 'bar' },
+              series1: { name: 'series#1', show: true, type: 'bar' },
+              series2: { name: 'series#2', show: true, type: 'bar' },
           },
           labels: [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
+              'January',
+              'February',
+              'March',
+              'April',
+              'May',
           ],
           data: {
-            series1: [100, 150, 51, 150, 350],
+              series1: [100, 150, 51, 150, 350],
+              series2: [100, 150, 51, 150, 350],
           },
         },
         defaultBarChartOptions: {

@@ -5,34 +5,32 @@
     class="ev-toggle"
     @click="changeToggle"
   >
-    <div
+    <span
       v-if="toggleType === 'slide'"
       v-show="toggleText.offText"
       ref="offTextRef"
       :style="{
         fontSize: toggleFontSize + 'px',
-        marginRight: toggleObj.height/5 + 'px',
       }"
       class="ev-toggle-offText-slide"
     >
       {{ toggleText.offText }}
-    </div>
-    <div
+    </span>
+    <span
       v-if="toggleType === 'slide'"
       v-show="toggleText.onText"
       ref="onTextRef"
       :style="{
         fontSize: toggleFontSize + 'px',
-        marginLeft: toggleObj.height/5 + 'px',
       }"
       class="ev-toggle-onText-slide"
     >
       {{ toggleText.onText }}
-    </div>
+    </span>
     <div
       v-show="isShow"
       v-if="toggleType === 'slide'"
-      :style="setToggleButtonStyle()"
+      ref="toggleSwitch"
       class="ev-toggle-switch"
     />
     <div
@@ -55,7 +53,7 @@
     >
       {{ toggleText.offText }}
     </div>
-    <div
+    <span
       v-if="toggleType === 'button'"
       ref="onTextRef"
       :style="{
@@ -64,8 +62,8 @@
       class="ev-toggle-onText-button"
     >
       {{ toggleText.onText }}
-    </div>
-    <div
+    </span>
+    <span
       v-if="toggleType === 'button'"
       ref="offTextRef"
       :style="{
@@ -74,14 +72,12 @@
       class="ev-toggle-offText-button"
     >
       {{ toggleText.offText }}
-    </div>
+    </span>
   </div>
 </template>
 
 <script>
   export default {
-    model: {
-    },
     props: {
       value: {
         type: Boolean,
@@ -129,15 +125,20 @@
     },
     watch: {
       toggleText: {
-        handler() {
-          this.setToggleStyle();
+        async handler() {
+          await this.setToggleStyle();
+          await this.setToggleButtonStyle();
         },
         deep: true,
       },
+      dataToggleOn() {
+        this.setToggleButtonStyle();
+      },
     },
     mounted() {
-      this.setToggleStyle();
-      setTimeout(() => {
+      setTimeout(async () => {
+        await this.setToggleStyle();
+        await this.setToggleButtonStyle();
         this.isShow = true;
       });
     },
@@ -145,50 +146,29 @@
       setToggleStyle() {
         if (this.toggleText.onText || this.toggleText.offText) {
           let maxTextWidth = 0;
-          const onTextWidth = this.$refs.onTextRef.getBoundingClientRect().width;
-          const offTextWidth = this.$refs.offTextRef.getBoundingClientRect().width;
+          const onTextWidth = Math.ceil(this.$refs.onTextRef.getBoundingClientRect().width);
+          const offTextWidth = Math.ceil(this.$refs.offTextRef.getBoundingClientRect().width);
+          const wrapperWidth = Math.ceil(this.$refs.toggleRef.getBoundingClientRect().width);
           if (this.toggleType === 'slide') {
-            if (offTextWidth < onTextWidth) {
-              maxTextWidth = onTextWidth;
+            maxTextWidth = offTextWidth < onTextWidth ? onTextWidth : offTextWidth;
+            if (wrapperWidth - maxTextWidth !== 60) {
+              if (maxTextWidth < this.toggleObj.width - 60) {
+                this.maxWidth = this.toggleObj.width;
+              } else {
+                this.maxWidth = maxTextWidth + 60;
+              }
             } else {
-              maxTextWidth = offTextWidth;
-            }
-            if (maxTextWidth < this.toggleObj.width - 40) {
-              this.maxWidth = this.toggleObj.width;
-            } else {
-              this.maxWidth = maxTextWidth + 40;
-            }
-          } else if (this.toggleType === 'button') {
-            if (offTextWidth < onTextWidth) {
-              maxTextWidth = onTextWidth;
-            } else {
-              maxTextWidth = offTextWidth;
-            }
-            if (maxTextWidth < this.toggleObj.width) {
-              this.maxWidth = this.toggleObj.width;
-            } else {
-              this.maxWidth = maxTextWidth + 20;
-            }
-          } else if (this.toggleType === 'tab') {
-            if (offTextWidth < onTextWidth) {
-              maxTextWidth = onTextWidth * 2;
-            } else {
-              maxTextWidth = offTextWidth * 2;
-            }
-            if (maxTextWidth < this.toggleObj.width) {
-              this.maxWidth = this.toggleObj.width;
-            } else {
-              this.maxWidth = maxTextWidth + 40;
+              this.maxWidth = wrapperWidth;
             }
           }
         } else {
           this.maxWidth = this.toggleObj.width;
-        } // 최대 너비 구하기
+        }
 
         let toggleWrapStyle = {};
         if (this.toggleType === 'tab') {
           toggleWrapStyle = {
-            width: `${this.maxWidth}px`,
+            width: 'auto',
             height: `${this.toggleObj.height}px`,
             lineHeight: `${this.toggleObj.height}px`,
             borderRadius: '4px',
@@ -211,17 +191,17 @@
           }
         } else if (this.toggleType === 'button') {
           toggleWrapStyle = {
-            width: `${this.maxWidth}px`,
+            width: 'auto',
             height: `${this.toggleObj.height}px`,
             lineHeight: `${this.toggleObj.height}px`,
             borderRadius: '4px',
           };
-        } // type별로 style setting
+        }
 
         for (let ix = 0, ixLen = Object.keys(toggleWrapStyle).length; ix < ixLen; ix++) {
           this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
             = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
-        } // style 속성 부여
+        }
       },
       changeToggle() {
         this.dataToggleOn = !this.dataToggleOn;
@@ -234,18 +214,23 @@
             toggleButtonStyle = {
               width: `${this.toggleObj.height - 4}px`,
               height: `${this.toggleObj.height - 4}px`,
-              left: this.dataToggleOn ? `${(this.maxWidth - this.toggleObj.height) + 1}px` : '1px',
+              left: this.dataToggleOn ? 'auto' : '1px',
+              right: this.dataToggleOn ? '1px' : '0',
             };
           } else {
             toggleButtonStyle = {
               width: `${this.toggleObj.height - 4}px`,
               height: `${this.toggleObj.height - 4}px`,
-              left: this.dataToggleOn ? `${(this.maxWidth - this.toggleObj.height) + 1}px` : '1px',
+              left: this.dataToggleOn ? 'auto' : '1px',
+              right: this.dataToggleOn ? '1px' : '0',
               borderRadius: '50%',
             };
           }
         }
-        return toggleButtonStyle;
+        for (let ix = 0, ixLen = Object.keys(toggleButtonStyle).length; ix < ixLen; ix++) {
+          this.$refs.toggleSwitch.style[Object.keys(toggleButtonStyle)[ix]]
+            = toggleButtonStyle[Object.keys(toggleButtonStyle)[ix]];
+        }
       },
     },
   };
@@ -256,53 +241,47 @@
     display: inline-block;
     position: relative;
     vertical-align: middle;
-    border: 1px solid #cccccc;
-    background-color: #cccccc;
+    border: 1px solid #CCCCCC;
+    background-color: #CCCCCC;
     color: #000000;
     transition: all .2s ease-in-out;
     user-select: none;
     cursor: pointer;
   }
   .ev-toggle.slide.active {
-    border: 1px solid #2d8cf0;
-    background-color: #2d8cf0;
-    color: #ffffff;
+    border: 1px solid #2D8CF0;
+    background-color: #2D8CF0;
+    color: #FFFFFF;
   }
   .ev-toggle.tab {
     display: inline-flex;
     position: relative;
-    border: 1px solid #2d8cf0;
+    border: 1px solid #2D8CF0;
     user-select: none;
     cursor: pointer;
   }
   .ev-toggle.button {
     display: inline-block;
     position: relative;
-    border: 1px solid #2d8cf0;
-    background-color: #2d8cf0;
-    color: #ffffff;
+    border: 0;
+    padding: 0 10px 0 10px;
+    background-color: #2D8CF0;
+    color: #FFFFFF;
     user-select: none;
     cursor: pointer;
   }
   .ev-toggle-switch {
     position: absolute;
     top: 1px;
-    background-color: #ffffff;
-    transition: all .2s ease-in-out;
-    cursor: pointer;
-    content: '';
-  }
-  .active > .ev-toggle-switch {
-    position: absolute;
-    top: 1px;
-    background-color: #ffffff;
-    transition: all .2s ease-in-out;
+    background-color: #FFFFFF;
+    transition-duration: 0.5s;
     cursor: pointer;
     content: '';
   }
   .ev-toggle-offText-slide {
     display: inline-block;
     height: 0;
+    margin-right: 10px;
     visibility: visible;
     float: right;
   }
@@ -311,6 +290,7 @@
   }
   .ev-toggle-onText-slide {
     height: 0;
+    margin-left: 10px;
     visibility: hidden;
   }
   .active > .ev-toggle-onText-slide {
@@ -321,11 +301,12 @@
   .ev-toggle-offText-tab {
     display: inline-block;
     float: left;
-    width: 100%;
+    width: auto;
     height: 100%;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
-    background-color: #f7f7f7;
+    background-color: #F7F7F7;
+    padding: 0 10px 0 10px;
     color: #000000;
     text-align: center;
     vertical-align: middle;
@@ -335,18 +316,19 @@
   .active > .ev-toggle-offText-tab {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    background-color: #2d8cf0;
-    color: #ffffff;
+    background-color: #2D8CF0;
+    color: #FFFFFF;
   }
   .ev-toggle-onText-tab {
     display: inline-block;
     float: left;
-    width: 100%;
+    width: auto;
     height: 100%;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background-color: #2d8cf0;
-    color: #ffffff;
+    background-color: #2D8CF0;
+    padding: 0 10px 0 10px;
+    color: #FFFFFF;
     text-align: center;
     vertical-align: middle;
     user-select: none;
@@ -355,12 +337,14 @@
   .active > .ev-toggle-onText-tab {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
-    background-color: #f7f7f7;
+    background-color: #F7F7F7;
     color: #000000;
   }
   .ev-toggle-onText-button {
     display: block;
-    height: 0px;
+    left: 0;
+    right: 0;
+    height: 0;
     visibility: hidden;
   }
   .active > .ev-toggle-onText-button {
@@ -369,7 +353,9 @@
   }
   .ev-toggle-offText-button {
     display: block;
-    height: 0px;
+    left: 0;
+    right: 0;
+    height: 0;
     text-align: center;
     visibility: visible;
   }

@@ -17,6 +17,10 @@ export default {
       type: String,
       default: '',
     },
+    type: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
