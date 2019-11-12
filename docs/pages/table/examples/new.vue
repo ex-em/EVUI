@@ -1,13 +1,28 @@
 <template>
   <div style="width:100%; height: 300px;">
     <ev-grid
+      v-resize="onResize"
+      ref="grid"
       :columns="columns"
       :rows="tableData"
-      :adjust="true"
+      :selected.sync="selected"
+      :checked.sync="checked"
+      :option="{
+        adjust: true,
+        rowHeight: 30,
+        columnWidth: 150,
+        useCheckbox: {
+          use: true,
+          headerCheck: true,
+          mode: 'multi'
+        }
+      }"
     />
   </div>
 </template>
 <script>
+  import resize from 'vue-resize-directive';
+
   const contries = [
     'Russia', 'Canada', 'United States', 'China', 'Brazil',
     'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
@@ -16,12 +31,17 @@
   ];
   export default {
     name: 'New',
+    directives: {
+      resize,
+    },
     data() {
       return {
+        selected: [],
+        checked: [],
         columns: [
           { caption: 'ID', field: 'id', type: 'number' },
           { caption: 'Country', field: 'country', type: 'string' },
-          { caption: 'Area', field: 'area', type: 'number' },
+          { caption: 'Area', field: 'area', type: 'number', hide: true },
           { caption: 'Population', field: 'population', type: 'number' },
           { caption: 'GDP', field: 'gdp', type: 'number' },
           { caption: 'test1', field: 'test1', type: 'number' },
@@ -45,18 +65,22 @@
       };
     },
     created() {
+      this.getData(100, 0);
     },
     mounted() {
-      this.getData(1000);
+      // this.getData(100, 100);
       // setTimeout(this.refreshData.bind(this), 3000);
     },
     methods: {
-      refreshData() {
-        this.getData(1000);
-        setTimeout(this.refreshData.bind(this), 3000);
+      onResize() {
+        this.$refs.grid.$forceUpdate();
       },
-      getData(count) {
-        for (let ix = 0; ix < count; ix++) {
+      refreshData() {
+        this.getData(100, this.tableData.length);
+        setTimeout(this.refreshData.bind(this), 1000);
+      },
+      getData(count, startIndex) {
+        for (let ix = startIndex; ix < startIndex + count; ix++) {
           this.tableData.push([
             ix + 1,
             contries[ix % 20],
