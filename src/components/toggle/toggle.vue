@@ -131,6 +131,9 @@
         },
         deep: true,
       },
+      dataToggleOn() {
+        this.setToggleButtonStyle();
+      },
     },
     mounted() {
       setTimeout(async () => {
