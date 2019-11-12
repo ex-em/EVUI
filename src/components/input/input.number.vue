@@ -14,7 +14,7 @@
           @click="preventDefault"
         />
         <icon
-          class="fa-sort-up"
+          class="ei-arrow-up"
         />
       </a>
       <a
@@ -26,7 +26,7 @@
           :class="innerDownClasses"
           @click="preventDefault"
         />
-        <icon class="fa-sort-down"/>
+        <icon class="ei-arrow-down"/>
       </a>
     </div>
     <div
@@ -394,6 +394,8 @@
     overflow: hidden;
     color: #999;
     position: relative;
+    padding-top: 1px;
+    padding-left: 1px;
   }
   .ev-input-number-handler-up {
     cursor: pointer;
@@ -434,9 +436,5 @@
     opacity: 1;
     cursor: not-allowed;
     color: #ccc;
-  }
-  /*TODO SET ICON CLASS*/
-  .fa-sort-up {
-    margin-top: 4px;
   }
 </style>
