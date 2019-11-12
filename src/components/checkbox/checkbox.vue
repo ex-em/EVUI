@@ -111,16 +111,16 @@
         if (this.isGroup) {
           this.$parent.$emit('on-change', e);
         } else {
-          this.$emit('on-change', e);
           this.$emit('input', e.target.checked);
+          this.$emit('on-change', e);
         }
       },
       click(e) {
         if (this.isGroup) {
           this.$parent.$emit('on-click', e);
         } else {
-          this.$emit('on-click', e);
           this.$emit('input', e.target.checked);
+          this.$emit('on-click', e);
         }
       },
     },
