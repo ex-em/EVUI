@@ -216,11 +216,9 @@
       this.orderedColumns = this.columns.map((column, index) => ({ index, ...column }));
     },
     mounted() {
-      setTimeout(() => {
-        this.calculatedColumn();
-        this.setStore(this.rows);
-        this.$forceUpdate();
-      }, 0);
+      this.calculatedColumn();
+      this.setStore(this.rows);
+      this.$forceUpdate();
     },
     methods: {
       getColumnName(field) {
@@ -256,7 +254,8 @@
 
           columnWidth = elWidth - result.totalWidth;
           if (columnWidth > 0) {
-            remainWidth = columnWidth - Math.floor(columnWidth / result.emptyCount);
+            remainWidth = columnWidth -
+              (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
             columnWidth = Math.floor(columnWidth / result.emptyCount);
           } else {
             columnWidth = this.columnWidth;
