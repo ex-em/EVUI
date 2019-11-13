@@ -355,7 +355,7 @@
   .ev-tabs-body {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: auto;
     border: 1px solid #dddee1;
     border-top: 0;
   }
