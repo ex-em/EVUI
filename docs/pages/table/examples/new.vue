@@ -1,8 +1,6 @@
 <template>
   <div style="width:100%; height: 300px;">
     <ev-grid
-      v-resize="onResize"
-      ref="grid"
       :columns="columns"
       :rows="tableData"
       :selected.sync="selected"
@@ -11,6 +9,7 @@
         adjust: true,
         rowHeight: 30,
         columnWidth: 150,
+        useSelected: false,
         useCheckbox: {
           use: true,
           headerCheck: true,
@@ -21,8 +20,6 @@
   </div>
 </template>
 <script>
-  import resize from 'vue-resize-directive';
-
   const contries = [
     'Russia', 'Canada', 'United States', 'China', 'Brazil',
     'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
@@ -31,9 +28,6 @@
   ];
   export default {
     name: 'New',
-    directives: {
-      resize,
-    },
     data() {
       return {
         selected: [],
@@ -72,9 +66,6 @@
       // setTimeout(this.refreshData.bind(this), 3000);
     },
     methods: {
-      onResize() {
-        this.$refs.grid.$forceUpdate();
-      },
       refreshData() {
         this.getData(100, this.tableData.length);
         setTimeout(this.refreshData.bind(this), 1000);
