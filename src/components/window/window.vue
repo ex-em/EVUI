@@ -85,6 +85,7 @@
     data() {
       return {
         prefixCls: 'ev-window',
+        isMovedEl: false,
         vIf: true,
         vShow: true,
         windowId: '',
@@ -125,6 +126,12 @@
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = { [`${this.prefixCls}-header-area`]: true };
       this.windowCls = { [this.prefixCls]: true };
+    },
+    mounted() {
+      if (!this.isMovedEl) {
+        this.isMovedEl = true;
+        this.$root.$el.appendChild(this.$el);
+      }
     },
     beforeDestroy() {
       this.close();
@@ -426,11 +433,10 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        const clientRect = this.$el.getBoundingClientRect();
         const bodyWidth = document.body.clientWidth;
         const bodyHeight = document.body.clientHeight;
-        const top = (bodyHeight / 2) - (this.height / 2) - clientRect.top;
-        const left = (bodyWidth / 2) - (this.width / 2) - clientRect.left;
+        const top = (bodyHeight / 2) - (this.height / 2);
+        const left = (bodyWidth / 2) - (this.width / 2);
 
         return {
           top: this.numberToPixel(top),
