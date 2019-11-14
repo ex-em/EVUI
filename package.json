@@ -1,6 +1,6 @@
 {
   "name": "evui",
-  "version": "2.0.8",
+  "version": "2.1.0",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
@@ -11,8 +11,8 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "webpack --config build/webpack.prod.conf.js",
-    "home": "webpack-dev-server --progress --config build/webpack.home.conf.js --mode=development",
-    "home_build": "webpack --config build/webpack.home.conf.js --mode=production",
+    "docs": "webpack-dev-server --progress --config build/webpack.docs.conf.js --mode=development",
+    "docs_build": "webpack --config build/webpack.docs.conf.js --mode=production",
     "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
     "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js",
     "liteplus_build": "webpack --config build/webpack.liteplus.conf.js --mode=production"
@@ -40,9 +40,13 @@
   ],
   "dependencies": {
     "axios": "^0.18.0",
+    "codesandbox": "^2.1.6",
+    "highlight.js": "^9.15.6",
     "lodash": "^4.17.11",
     "lodash-es": "^4.17.11",
+    "marked": "^0.6.2",
     "vue": "^2.6.9",
+    "vue-i18n": "^8.12.0",
     "vue-resize-directive": "^1.2.0",
     "vue-router": "^3.0.2",
     "vuex": "^3.1.0"

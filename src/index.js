@@ -17,14 +17,16 @@ import EvRadioGroup from './components/radio-group';
 import EvSelectbox from './components/selectbox';
 import EvSlider from './components/slider';
 import EvTable from './components/table';
-import EvTimePicker from './components/timepicker';
+import EvTimepicker from './components/timepicker';
 import EvToggle from './components/toggle';
 import EvLabel from './components/label';
-import EvDatepicker from './components/datepicker';
+import { Calendar as EvCalendar, Datepicker as EvDatepicker } from './components/datepicker';
 import EvWindow from './components/window';
 import { tabs as EvTabs, tab as EvTabPanel } from './components/tabs';
 import { TreeTable as EvTreeTable } from './components/tree';
 import EvSplitter from './components/splitter';
+import EvMarkdown from './components/markdown';
+import EvGrid from './components/grid/grid';
 
 const components = {
   EvButton,
@@ -44,15 +46,18 @@ const components = {
   EvSelectbox,
   EvSlider,
   EvTable,
-  EvTimePicker,
+  EvTimepicker,
   EvToggle,
   EvLabel,
   EvWindow,
+  EvCalendar,
   EvDatepicker,
   EvTabs,
   EvTabPanel,
   EvTreeTable,
   EvSplitter,
+  EvMarkdown,
+  EvGrid,
 };
 
 const evui = {
@@ -78,5 +83,5 @@ const API = {
   ...components,
 };
 
-module.exports.default = module.exports = API; // eslint-disable-line no-undef
+export default API;
 

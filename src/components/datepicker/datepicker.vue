@@ -1,17 +1,18 @@
 <template>
   <div
     v-click-outside="hideDatepicker"
+    :class="size + inputTextMaxLength"
     class="ev-datepicker"
     @click="showDatepicker"
   >
     <div
-      :class="wrapClasses"
+      :class="[{wrapClasses}, size + inputTextMaxLength]"
       class="ev-datepicker-input-wrapper"
     >
       <input
         ref="datepickerText"
         :value="computedValue"
-        :class="inputClasses"
+        :class="[{inputClasses}, size + inputTextMaxLength]"
         :placeholder="options.localeType"
         class="ev-datepicker-input"
         type="text"
@@ -88,6 +89,10 @@
             initSelectDay: this.value ? new Date(moment(this.value)) : new Date(),
           };
         },
+      },
+      size: {
+        type: String,
+        default: '',
       },
     },
     data() {
@@ -174,6 +179,7 @@
             }
             let preText = '';
             let postText = '';
+            // 8칸보다 오버해서 숫자를 입력하는 경우
             if (numberValueLength > vm.inputNumberMaxLength) {
               // 인풋박스 마지막에 글씨 쓰는 경우
               if (numberValueLength - vm.inputNumberMaxLength === 1) {
@@ -192,12 +198,13 @@
                     // '-', ' ', ':' 특수문자 전에 값을 입력하면 +1칸 커서 왼쪽 자동이동 후 값이 변환됨
                     beforeSpecialSymbolTerm = 1;
                   }
-                  preText = numberValue.slice(0, numberValueCursor);
+                  preText = numberValue.slice(0, numberValueCursor + beforeSpecialSymbolTerm);
                   postText = numberValue.slice(numberValueCursor + beforeSpecialSymbolTerm + 1,
                     numberValueLength);
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
                   vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
                   vm.$refs.datepickerText.value = setValue;
+                  vm.dataValue = setValue;
                   vm.$refs.datepickerText.selectionStart = (currCursor + afterSpecialSymbolTerm)
                     + beforeSpecialSymbolTerm;
                   vm.$refs.datepickerText.selectionEnd = (currCursor + afterSpecialSymbolTerm)
@@ -208,14 +215,18 @@
                   postText = numberValue.slice(numberValueCursor + 1, numberValueLength);
                   setValue = vm.addSpecialSymbols(vm.validNumber(preText + postText));
                   vm.$refs.datepickerText.value = setValue;
+                  vm.dataValue = setValue;
                   vm.$refs.datepickerText.selectionStart = currCursor;
                   vm.$refs.datepickerText.selectionEnd = currCursor;
                 }
               }
             } else {
-              // 글씨 max가 아닌경우
+              // 숫자 입력 값이 max이거나 그보다 작은 경우
               setValue = vm.addSpecialSymbols(vm.validNumber(targetValue));
               vm.$refs.datepickerText.value = setValue;
+              if (numberValueLength === vm.inputNumberMaxLength) {
+                vm.dataValue = setValue;
+              }
               vm.$refs.datepickerText.selectionStart = currCursor;
               vm.$refs.datepickerText.selectionEnd = currCursor;
               let specialSymbolTerm = 0;
@@ -239,6 +250,13 @@
       },
     },
     watch: {
+      value(v) {
+        this.calendar.setDateTime(moment(v));
+        this.dataValue = v;
+      },
+      computedValue(v) {
+        this.$emit('input', v);
+      },
     },
     created() {
     },
@@ -587,13 +605,36 @@
   .ev-datepicker {
     width: 235px;
   }
+  .ev-datepicker-input-wrapper {
+    width: 235px;
+    height: 32px;
+  }
   .ev-datepicker-input {
     width: 235px;
     height: 32px;
     line-height: 32px;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    color: #606266;
+    padding: 0 5px 0 5px;
   }
-  .ev-datepicker-input-wrapper {
-    width: 235px;
-    height: 32px;
+  .fit10,
+  .fit13,
+  .fit16,
+  .fit19 {
+    height: 23px;
+    line-height: 23px;
+  }
+  .fit10 {
+    width: 85px;
+  }
+  .fit13 {
+    width: 105px;
+  }
+  .fit16 {
+    width: 125px;
+  }
+  .fit19 {
+    width: 145px;
   }
 </style>

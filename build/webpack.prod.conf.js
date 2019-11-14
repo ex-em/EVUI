@@ -1,18 +1,19 @@
 const path = require('path');
 const webpack = require('webpack');
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
+const webpackBaseConfig = require('./webpack.base.conf');
 const CompressionPlugin = require('compression-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-const baseWebpackConfig = require('./webpack.base.conf');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
-const webpackConfig = merge(baseWebpackConfig, {
+const webpackConfig = merge(webpackBaseConfig, {
   mode: 'development',
   devtool: 'source-map',
   entry: resolve('./src/index.js'),
@@ -33,17 +34,19 @@ const webpackConfig = merge(baseWebpackConfig, {
     },
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    }),
+    new CleanWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.EnvironmentPlugin(['NODE_ENV']),
     new CompressionPlugin({
-      asset: '[path].gz[query]',
+      filename: '[path].gz[query]',
       algorithm: 'gzip',
       test: /\.(js|css)$/,
       threshold: 10240,
       minRatio: 0.8
     }),
     new CleanWebpackPlugin(),
+    new FriendlyErrorsPlugin(),
     // new CleanWebpackPlugin([resolve('./dist')], { allowExternal : true }),
     new VueLoaderPlugin(),
   ]

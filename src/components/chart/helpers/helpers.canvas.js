@@ -12,6 +12,15 @@ export default {
     return Math.ceil(startPoint + (scalingFactor * (value - min)));
   },
 
+  calculateSubX(value, min, max, area, startPoint = 0) {
+    if (value === null) {
+      return null;
+    }
+
+    const scalingFactor = area / (max - min);
+    return Math.ceil(startPoint + (scalingFactor * (value - min)));
+  },
+
   calculateY(value, min, max, area, startPoint = 0) {
     let calcY;
 
@@ -139,5 +148,38 @@ export default {
     }
 
     ctx.stroke();
+  },
+  roundedRect(ctx, x, y, width, height, radius) {
+    const pi = Math.PI;
+    const halfPi = pi / 2;
+
+    if (radius) {
+      const r = Math.min(radius, height / 2, width / 2);
+      const left = x + r;
+      const top = y + r;
+      const right = (x + width) - r;
+      const bottom = (y + height) - r;
+
+      ctx.moveTo(x, top);
+      if (left < right && top < bottom) {
+        ctx.arc(left, top, r, -pi, -halfPi);
+        ctx.arc(right, top, r, -halfPi, 0);
+        ctx.arc(right, bottom, r, 0, halfPi);
+        ctx.arc(left, bottom, r, halfPi, pi);
+      } else if (left < right) {
+        ctx.moveTo(left, y);
+        ctx.arc(right, top, r, -halfPi, halfPi);
+        ctx.arc(left, top, r, halfPi, pi + halfPi);
+      } else if (top < bottom) {
+        ctx.arc(left, top, r, -pi, 0);
+        ctx.arc(left, bottom, r, 0, pi);
+      } else {
+        ctx.arc(left, top, r, -pi, pi);
+      }
+      ctx.closePath();
+      ctx.moveTo(x, y);
+    } else {
+      ctx.rect(x, y, width, height);
+    }
   },
 };

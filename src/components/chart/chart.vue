@@ -6,7 +6,9 @@
   />
 </template>
 <script>
-  import _ from 'lodash-es';
+  import _merge from 'lodash-es/merge';
+  import _defaults from 'lodash-es/defaults';
+  import _isEqual from 'lodash-es/isEqual';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -38,86 +40,84 @@
     },
     watch: {
       data: {
-        handler(newVal) {
-          this.chart.data = _.merge(this.normalizedData, newVal);
-          this.chart.update();
+        handler(newVal, oldVal) {
+          this.evChart.data = _defaults(newVal, this.normalizedData);
+          this.evChart.update(!_isEqual(newVal.series, oldVal.series));
         },
         deep: true,
       },
       options: {
         handler(newVal) {
-          this.chart.options = _.merge(this.normalizedOption, newVal);
-          this.chart.update();
+          this.evChart.options = _merge(newVal, this.normalizedOption);
+          this.evChart.update();
         },
         deep: true,
       },
     },
     created() {
-      const defaultOptions = {
-        border: 2,
-        title: {
-          show: false,
-          height: 40,
-          text: '',
-          style: {
-            fontSize: 15,
-            color: '#000',
-            fontFamily: 'Droid Sans',
-          },
-        },
-        legend: {
-          show: true,
-          position: 'right',
-          color: '#000',
-          inactive: '#aaa',
-          width: 140,
-          height: 24,
-        },
-        itemHighlight: true,
-        seriesHighlight: true,
-        useSelect: false,
-        doughnutHoleSize: 0,
-        reverse: false,
-        bufferSize: null,
-        horizontal: false,
-        width: '100%',
-        height: '100%',
-        thickness: 1,
-        useTooltip: true,
-        useSelectionData: false,
-        type: 'line',
-      };
-
-      const defaultData = {
-        series: {},
-        groups: [],
-        labels: [],
-        data: {},
-      };
-
-      this.normalizedOption = _.merge(defaultOptions, this.options);
-      this.normalizedData = _.merge(defaultData, this.data);
+      this.normalizedOption = _merge(this.getDefaultOptions(), this.options);
+      this.normalizedData = _merge(this.getDefaultData(), this.data);
     },
     mounted() {
       const wrapper = this.$refs.wrapper;
       const options = this.normalizedOption;
       const data = this.normalizedData;
 
-      this.chart = new EvChart(wrapper, data, options);
+      this.evChart = new EvChart(wrapper, data, options);
 
-      this.store = this.chart.store;
       const timer = setTimeout(() => {
-        this.chart.init();
+        this.evChart.init();
         clearTimeout(timer);
       }, 1);
     },
     beforeDestroy() {
-      if (this.chart.tooltipDOM) {
-        this.chart.tooltipDOM.remove();
-      }
-      delete this.chart;
+      delete this.evChart;
     },
     methods: {
+      getDefaultOptions() {
+        return {
+          border: 2,
+          title: {
+            show: false,
+            height: 40,
+            text: '',
+            style: {
+              fontSize: 15,
+              color: '#000',
+              fontFamily: 'Droid Sans',
+            },
+          },
+          legend: {
+            show: true,
+            position: 'right',
+            color: '#000',
+            inactive: '#aaa',
+            width: 140,
+            height: 24,
+          },
+          itemHighlight: true,
+          seriesHighlight: true,
+          useSelect: false,
+          doughnutHoleSize: 0,
+          reverse: false,
+          bufferSize: null,
+          horizontal: false,
+          width: '100%',
+          height: '100%',
+          thickness: 1,
+          useTooltip: true,
+          useSelectionData: false,
+          type: 'line',
+        };
+      },
+      getDefaultData() {
+        return {
+          series: {},
+          groups: [],
+          labels: [],
+          data: {},
+        };
+      },
       getChartSize(size) {
         let sizeValue;
 
@@ -241,63 +241,15 @@
   .ev-chart-tooltip {
     position: absolute;
     z-index: 100000;
-    color: #000;
-    border-radius: 4px;
-    border: 1px solid #D8D8D8;
-    background: #fff;
     overflow-y: auto;
-    max-height: 500px;
-    padding: 10px;
+    overflow-x: hidden;
+    padding-right: 17px;
   }
 
-  .ev-chart-tooltip-title {
-    font-size: 14px;
-    text-align: center;
-    margin: 0 5px 3px 5px;
-    padding-bottom: 2px;
-    border-bottom: 1px solid #D2D2D2;
-    user-select: none;
-  }
-
-  .ev-chart-tooltip-ul {
-    list-style: none;
-    display: block;
-    user-select: none;
-  }
-
-  .ev-chart-tooltip-li {
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .ev-chart-tooltip-color {
-    width: 10px;
-    height: 10px;
+  .ev-chart-tooltip-canvas {
     position: absolute;
-    margin: 8px 0 0 5px;
-    border-radius: 5px;
+    top: 0;
+    left: 0;
+    display: block;
   }
-
-  .ev-chart-tooltip-name {
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    margin-left: 20px;
-    width: 100%;
-    user-select: none;
-    color: #000;
-  }
-
-  .ev-chart-tooltip-colon {
-    width: 100%;
-  }
-
-  .ev-chart-tooltip-value {
-    font-size: 12px;
-    margin-right: 5px;
-  }
-
 </style>

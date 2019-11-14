@@ -39,16 +39,16 @@ const module = {
       const isActive = !colorDOM.className.includes('inactive');
       const series = nameDOM.series;
 
-      if (isActive && this.showSeriesInfo.count === 1) {
+      if (isActive && this.seriesInfo.count === 1) {
         return;
       }
 
       if (isActive) {
-        this.showSeriesInfo.count--;
+        this.seriesInfo.count--;
         colorDOM.style.backgroundColor = opt.inactive;
         nameDOM.style.color = opt.inactive;
       } else {
-        this.showSeriesInfo.count++;
+        this.seriesInfo.count++;
         colorDOM.style.backgroundColor = series.color;
         nameDOM.style.color = opt.color;
       }
@@ -96,18 +96,46 @@ const module = {
     if (groups.length) {
       groups.forEach((group) => {
         group.slice().reverse().forEach((series) => {
+          if (series.showLegend) {
+            this.addLegend(seriesList[series]);
+          }
+        });
+      });
+    }
+
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp && series.showLegend) {
+        this.addLegend(series);
+      }
+    });
+
+    this.isInitLegend = true;
+  },
+  updateLegend() {
+    this.resetLegend();
+    const groups = this.data.groups;
+    const seriesList = this.seriesList;
+
+    if (groups.length) {
+      groups.forEach((group) => {
+        group.slice().reverse().forEach((series) => {
           this.addLegend(seriesList[series]);
         });
       });
     }
 
     Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp) {
+      if (!series.isExistGrp && series.showLegend) {
         this.addLegend(series);
       }
     });
+  },
+  resetLegend() {
+    const legendDOM = this.legendBoxDOM;
 
-    this.isInitLegend = true;
+    while (legendDOM.hasChildNodes()) {
+      legendDOM.removeChild(legendDOM.firstChild);
+    }
   },
   addLegend(series) {
     const opt = this.options.legend;
@@ -147,7 +175,7 @@ const module = {
     containerDOM.evcType = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
-    this.showSeriesInfo.count++;
+    this.seriesInfo.count++;
   },
   setLegendPosition() {
     const opt = this.options;

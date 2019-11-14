@@ -1,18 +1,152 @@
+import _ from 'lodash-es/reverse';
+
 const module = {
   createDataSet(data, label) {
-    Object.keys(this.seriesList).forEach((key) => {
-      const series = this.seriesList[key];
+    Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
+      const type = this.seriesInfo.charts[typeKey];
 
-      if (data[key]) {
-        if (series.isExistGrp && series.stackIndex) {
-          const bs = this.seriesList[series.bsId];
-          series.data = this.addSeriesStackDS(data[key], label, bs.data, series.stackIndex);
+      if (type.length) {
+        if (typeKey === 'pie') {
+          if (this.options.sunburst) {
+            this.createSunburstDataSet(data);
+          } else {
+            this.createPieDataSet(data, type);
+          }
         } else {
-          series.data = this.addSeriesDS(data[key], label);
+          type.forEach((sId) => {
+            const series = this.seriesList[sId];
+
+            if (series && data[sId]) {
+              if (series.isExistGrp && series.stackIndex) {
+                const bs = this.seriesList[series.bsId];
+                series.data = this.addSeriesStackDS(data[sId], label, bs.data, series.stackIndex);
+              } else {
+                series.data = this.addSeriesDS(data[sId], label);
+              }
+              series.minMax = this.getSeriesMinMax(series.data);
+            }
+          });
+        }
+      }
+    });
+  },
+
+  createSunburstDataSet(data) {
+    this.pieDataSet = [];
+    const ds = this.pieDataSet;
+    const sunburstQueue = [];
+
+    for (let ix = 0; ix < data.length; ix++) {
+      const slice = data[ix];
+      const series = this.seriesList[slice.id];
+      let showChildren = false;
+
+      if (!ds[0]) {
+        ds[0] = { ir: 0, or: 0, total: 0, data: [] };
+      }
+
+      if (series.show) {
+        ds[0].total += slice.value || 0;
+        ds[0].data.push({ parent: '$ev-root', id: slice.id, value: slice.value, sa: 0, ea: 0 });
+
+        if (slice.children) {
+          for (let jx = 0; jx < slice.children.length; jx++) {
+            const childSeries = this.seriesList[slice.children[jx].id];
+            if (childSeries.show) {
+              showChildren = true;
+            }
+            sunburstQueue.push({ parent: slice.id, data: slice.children[jx], depth: 1 });
+          }
+        } else {
+          const dummy = {
+            id: 'dummy',
+            value: slice.value,
+          };
+          sunburstQueue.push({ parent: slice.id, data: dummy, depth: 1 });
         }
 
-        series.minMax = this.getSeriesMinMax(series.data);
+        if (!showChildren) {
+          const dummy = {
+            id: 'dummy',
+            value: slice.value,
+          };
+          sunburstQueue.push({ parent: slice.id, data: dummy, depth: 1 });
+        }
       }
+    }
+
+    ds[0].data.sort((a, b) => b.value - a.value);
+
+    while (sunburstQueue.length) {
+      const item = sunburstQueue.shift();
+      const parent = item.parent;
+      const slice = item.data;
+      const depth = item.depth;
+      let showChildren = false;
+
+      if (!ds[depth]) {
+        ds[depth] = { ir: 0, or: 0, total: {}, data: [] };
+      }
+
+      if (!ds[depth].total[parent]) {
+        ds[depth].total[parent] = 0;
+      }
+
+      const series = this.seriesList[slice.id];
+      if (slice.id === 'dummy') {
+        ds[depth].data.push({ parent, id: 'dummy', value: slice.value, sa: 0, ea: 0 });
+        ds[depth].total[parent] += slice.value;
+      } else if (series && series.show) {
+        ds[depth].data.push({ parent, id: slice.id, value: slice.value, sa: 0, ea: 0 });
+        ds[depth].total[parent] += slice.value;
+
+        if (slice.children) {
+          for (let ix = 0; ix < slice.children.length; ix++) {
+            if (this.seriesList[slice.children[ix].id].show) {
+              showChildren = true;
+            }
+            sunburstQueue.push({ parent: slice.id, data: slice.children[ix], depth: depth + 1 });
+          }
+        } else {
+          const dummy = {
+            id: 'dummy',
+            value: slice.value,
+          };
+          sunburstQueue.push({ parent: slice.id, data: dummy, depth: depth + 1 });
+        }
+
+        if (!showChildren) {
+          const dummy = {
+            id: 'dummy',
+            value: slice.value,
+          };
+          sunburstQueue.push({ parent: slice.id, data: dummy, depth: depth + 1 });
+        }
+      }
+
+      ds[depth].data.sort((a, b) => b.value - a.value);
+    }
+  },
+
+  createPieDataSet(data, pie) {
+    this.pieDataSet = [];
+    const ds = this.pieDataSet;
+
+    pie.forEach((sId) => {
+      data[sId].forEach((value, index) => {
+        if (!ds[index]) {
+          ds[index] = { data: [], ir: 0, or: 0, total: 0 };
+        }
+
+        if (this.seriesList[sId].show) {
+          ds[index].total += value || 0;
+          ds[index].data.push({ id: sId, value, sa: 0, ea: 0 });
+        }
+      });
+    });
+
+    ds.forEach((item) => {
+      item.data.sort((a, b) => b.value - a.value);
     });
   },
 
@@ -28,7 +162,6 @@ const module = {
       if (gdata && typeof gdata === 'object') {
         odata = isHorizontal ? curr.x : curr.y;
         ldata = isHorizontal ? curr.y : curr.x;
-        this.addIntegratedLabels(ldata);
       }
 
       if (sIdx > 0) {
@@ -53,7 +186,6 @@ const module = {
       if (gdata && typeof gdata === 'object') {
         gdata = isHorizontal ? curr.x : curr.y;
         ldata = isHorizontal ? curr.y : curr.x;
-        this.addIntegratedLabels(ldata);
       }
 
       return this.addData(gdata, ldata);
@@ -70,12 +202,6 @@ const module = {
     }
 
     return data;
-  },
-
-  addIntegratedLabels(value) {
-    if (this.integratedLabels.indexOf(`${value}`) < 0) {
-      this.integratedLabels.push(`${value}`);
-    }
   },
 
   getSeriesMinMax(data) {
@@ -159,6 +285,95 @@ const module = {
     }
 
     return def;
+  },
+
+  calculateAngle() {
+    const pieDataSet = this.pieDataSet;
+
+    let slice;
+    let value;
+    let parent;
+    let totalValue;
+
+    let sliceAngle;
+    let startAngle;
+    let endAngle;
+    let totalAngle;
+    let isDummy;
+
+    const dummyIndex = [];
+    const saStore = {
+      '$ev-root': 1.5 * Math.PI,
+    };
+
+    for (let ix = 0; ix < pieDataSet.length; ix++) {
+      const pie = pieDataSet[ix];
+      isDummy = true;
+
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        slice = pie.data[jx];
+        value = slice.value;
+
+        if (isDummy) {
+          isDummy = slice.id === 'dummy';
+        }
+
+        if (!ix) {
+          startAngle = saStore['$ev-root'];
+          sliceAngle = 2 * Math.PI * (value / pie.total);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+          saStore['$ev-root'] += sliceAngle;
+        } else {
+          parent = this.getParentInfo(ix - 1, slice.parent);
+          if (!parent) {
+            break;
+          }
+
+          if (!saStore[slice.parent]) {
+            saStore[slice.parent] = parent.sa;
+          }
+
+          startAngle = saStore[slice.parent];
+          totalAngle = parent.ea - parent.sa;
+          totalValue = pie.total[slice.parent] || 0;
+          sliceAngle = totalAngle * (value / totalValue);
+          endAngle = startAngle + sliceAngle;
+
+          slice.sa = startAngle;
+          slice.ea = endAngle;
+
+          saStore[slice.parent] += sliceAngle;
+        }
+      }
+
+      if (isDummy) {
+        dummyIndex.push(ix);
+      }
+    }
+
+    for (let ix = 0; ix < dummyIndex.length; ix++) {
+      this.pieDataSet.splice(dummyIndex, 1);
+    }
+
+    if (this.options.reverse) {
+      this.pieDataSet = _.reverse(this.pieDataSet);
+    }
+  },
+
+  getParentInfo(depth, parentId) {
+    for (let ix = depth; ix >= 0; ix--) {
+      const pie = this.pieDataSet[ix];
+      for (let jx = 0; jx < pie.data.length; jx++) {
+        if (pie.data[jx].id === parentId) {
+          return pie.data[jx];
+        }
+      }
+    }
+
+    return null;
   },
 };
 

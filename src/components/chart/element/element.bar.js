@@ -30,9 +30,8 @@ class Bar {
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
     const axesSteps = param.axesSteps;
-    const index = param.showIndex;
+    const showIndex = param.showIndex;
     const isHorizontal = param.isHorizontal;
-    const labels = param.integLabels;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
 
@@ -48,7 +47,7 @@ class Bar {
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (labels.length || 1);
+    const cArea = dArea / (this.data.length || 1);
     const cPad = 2;
 
     let bArea;
@@ -63,23 +62,18 @@ class Bar {
     // barArea내에서 barWidth로 빠진 부분을 계산.
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     // series index에 따라 시작 X값 보정을 위한 변수.
-    const barSeriesX = this.isExistGrp ? 1 : index + 1;
+    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
     let categoryPoint = null;
 
     ctx.beginPath();
     ctx.fillStyle = this.color;
 
-    this.data.forEach((item) => {
-      const posIdx = labels.indexOf(isHorizontal ? item.y : item.x);
-      if (posIdx < 0) {
-        return;
-      }
-
+    this.data.forEach((item, index) => {
       if (isHorizontal) {
-        categoryPoint = ysp - (cArea * posIdx) - cPad;
+        categoryPoint = ysp - (cArea * index) - cPad;
       } else {
-        categoryPoint = xsp + (cArea * posIdx) + cPad;
+        categoryPoint = xsp + (cArea * index) + cPad;
       }
 
       if (isHorizontal) {
@@ -111,6 +105,94 @@ class Bar {
       item.w = w; // eslint-disable-line
       item.h = isHorizontal ? -h : h; // eslint-disable-line
     });
+  }
+
+  itemHighlight(item, context) {
+    const gdata = item.data;
+    const ctx = context;
+
+    const x = gdata.xp;
+    const y = gdata.yp;
+    const w = gdata.w;
+    const h = gdata.h;
+
+    ctx.fillStyle = this.color;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = this.color;
+
+    ctx.fillRect(x, y, w, h);
+  }
+
+  findGraphData(offset, isHorizontal) {
+    return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
+  }
+
+  findGraphRange(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
+        item.data = gdata[m];
+
+        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (sx + 4 < xp) {
+        s = m + 1;
+      } else {
+        e = m - 1;
+      }
+    }
+
+    return item;
+  }
+
+  findGraphRangeCount(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((ey <= yp) && (yp <= sy)) {
+        item.data = gdata[m];
+
+        if ((sx <= xp) && (xp <= ex)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (ey < yp) {
+        e = m - 1;
+      } else {
+        s = m + 1;
+      }
+    }
+
+    return item;
   }
 }
 

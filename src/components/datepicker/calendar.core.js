@@ -99,7 +99,7 @@ class Calendar {
           bottom: 0,
           left: 0,
         },
-        font: '10px Roboto Condensed',
+        font: '10px sans-serif',
       },
       // selectable: true, // 선택 가능 여부 (이번달 & 오늘 전까지)
 
@@ -139,7 +139,7 @@ class Calendar {
     // create & init canvas
     this.dropdown = document.createElement('div');
     this.dropdown.setAttribute('class', 'ev-calendar-dropdown');
-    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 1; background: #ffffff');
+    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 9999; background: rgba(255, 255, 255, 1); border-radius: 4px;');
     this.baseCanvas = document.createElement('canvas');
     this.baseCanvas.setAttribute('class', 'ev-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
@@ -224,8 +224,8 @@ class Calendar {
     if (e.currentTarget && e.currentTarget.clientHeight) {
       targetDivHeight = e.currentTarget.clientHeight;
     }
-    this.dropdown.style.top = `${(e.pageY - e.layerY) + targetDivHeight}px`;
-    this.dropdown.style.left = `${e.pageX - e.layerX}px`;
+    this.dropdown.style.top = `${(e.pageY - e.offsetY) + targetDivHeight}px`;
+    this.dropdown.style.left = `${(e.pageX - e.offsetX) - 5}px`;
   }
   hideDropdown() {
     this.dropdown.style.display = 'none';
@@ -495,24 +495,22 @@ class Calendar {
         && e.offsetY > v.startY
         && e.offsetY < v.startY + v.height) {
         // // 오늘 이후 비활성화 시 return false
-        // if (this.options.limitToday) {
-        //   const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
-        //   const initLimitDay = new Date(this.options.initLimitDay);
-        //   // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
-        //   const initSelectGetDay = initLimitDay.getDay();
-        //   // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
-        //   const initSelectSunday = new Date();
-        //   initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
-        //   initSelectSunday.setHours(0, 0, 0, 0);
-        //   // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
-        //   if (initLimitDay < mouseoverDay) {
-        //     return undefined;
-        //   } else if (initSelectSunday <= mouseoverDay && mouseoverDay <= initLimitDay) {
-        //     if (this.options.selectDayType === 'weekday') {
-        //       // 개발 필요
-        //     }
-        //   }
-        // }
+        if (this.options.limitToday) {
+          if (this.options.selectDayType === 'day') {
+            const mouseoverDay = new Date(v.date.year, v.date.month - 1, v.date.day);
+            const initLimitDay = new Date(this.options.initLimitDay);
+            // 선택된 날(default:오늘)의 요일 (일 : 0, 토 : 6)
+            const initSelectGetDay = initLimitDay.getDay();
+            // 선택된 날의 첫번째 일요일(선택된 날 기준 첫 날)
+            const initSelectSunday = new Date();
+            initSelectSunday.setDate(initLimitDay.getDate() - initSelectGetDay);
+            initSelectSunday.setHours(0, 0, 0, 0);
+            // 선택된 날(default:오늘)보다 크거나 선택된 날의 일요일 ~ 선택된 날 사이의 날짜인 경우 false
+            if (initLimitDay < mouseoverDay) {
+              return undefined;
+            }
+          }
+        }
         // selectDayType에 따라 선택
         if (this.options.selectDayType === 'weekday') {
           // 1주평일(5일)
@@ -1058,7 +1056,7 @@ class Calendar {
         text: thisYear,
         align: 'center',
         padding: { bottom: 8 },
-        font: '14px Roboto Condensed',
+        font: '14px sans-serif',
       },
     };
     this.dynamicDraw(
@@ -1083,7 +1081,7 @@ class Calendar {
         },
         align: 'center',
         padding: { bottom: 8 },
-        font: '14px Roboto Condensed',
+        font: '14px sans-serif',
       },
     };
     this.dynamicDraw(
@@ -1118,7 +1116,7 @@ class Calendar {
           },
           align: 'center',
           padding: { bottom: 8 },
-          font: '10px Roboto Condensed',
+          font: '10px sans-serif',
         },
       );
     });
@@ -1177,7 +1175,7 @@ class Calendar {
                 padding: {
                   bottom: 8,
                 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: false,
               date: {
@@ -1225,7 +1223,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1273,7 +1271,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1302,7 +1300,7 @@ class Calendar {
               },
               align: 'center',
               padding: { bottom: 8 },
-              font: '10px Roboto Condensed',
+              font: '10px sans-serif',
             },
             selectable: false,
             date: {
@@ -1353,7 +1351,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1401,7 +1399,7 @@ class Calendar {
                 fill,
                 align: 'center',
                 padding: { bottom: 8 },
-                font: '10px Roboto Condensed',
+                font: '10px sans-serif',
               },
               selectable: selectableFlag,
               date: {
@@ -1505,7 +1503,7 @@ class Calendar {
           padding: {
             bottom: 27,
           },
-          font: '12px Roboto Condensed',
+          font: '12px sans-serif',
         },
       );
     });

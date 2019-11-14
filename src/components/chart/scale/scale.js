@@ -35,7 +35,7 @@ class Scale {
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
     const minSteps = 2;
-    const maxSteps = Math.floor(drawRange / bufferedTickSize);
+    const maxSteps = Math.max(Math.floor(drawRange / bufferedTickSize), 4);
 
     return {
       min: minSteps,
@@ -127,6 +127,7 @@ class Scale {
 
     const steps = stepInfo.steps;
     const axisMin = stepInfo.graphMin;
+    const axisMax = stepInfo.graphMax;
     const stepValue = stepInfo.interval;
 
     const startPoint = aPos[this.units.rectStart];
@@ -178,7 +179,7 @@ class Scale {
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(ticks[ix]);
+      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
       let labelPoint;
 
