@@ -45,23 +45,23 @@ export default {
       return value;
     }
 
-    const assignLabelWith = (condition, label) => {
-      if (!condition) {
-        return `${condition.toFixed(decimalPoint)}${label}`;
+    const assignLabelWith = (value, target, label) => {
+      if (value % target === 0) {
+        return `${(value / target).toFixed(decimalPoint)}${label}`;
       }
-      return `${condition.toFixed(1)}${label}`;
+      return `${(value / target).toFixed(1)}${label}`;
     };
 
     if (value >= quad) {
-      label = assignLabelWith(value % quad, "P");
+      label = assignLabelWith(value, quad, "P");
     } else if (value >= trill) {
-      label = assignLabelWith(value % trill, "T");
+      label = assignLabelWith(value, trill, "T");
     } else if (value >= billi) {
-      label = assignLabelWith(value % billi, "G");
+      label = assignLabelWith(value, billi, "G");
     } else if (value >= milli) {
-      label = assignLabelWith(value % milli, "M");
+      label = assignLabelWith(value, milli, "M");
     } else if (value >= killo) {
-      label = assignLabelWith(value % 1000, "K");
+      label = assignLabelWith(value, 1000, "K");
     } else if (value < 1 && value > 0) {
       label = value.toFixed(1);
     } else {
