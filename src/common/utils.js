@@ -17,28 +17,25 @@ export const Console = {
   },
   dir(item, options) {
     windowConsole.dir(item, options);
-  },
+  }
 };
 
 export function getQuantity(input) {
-  let output;
-  if (typeof input === 'string' || typeof input === 'number') {
-    const match = (/^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
+  let output = null;
+  if (typeof input === "string" || typeof input === "number") {
+    const match = /^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
     output = match ? { value: +match[2], unit: match[3] || undefined } : null;
-  } else {
-    output = null;
   }
+
   return output;
 }
 
 export function getSize(size) {
-  let sizeValue;
-
+  let sizeValue = "100%";
   if (size) {
     sizeValue = size.unit ? size.value + size.unit : `${size.value}px`;
-  } else {
-    sizeValue = '100%';
   }
+
   return sizeValue;
 }
 
@@ -46,7 +43,7 @@ export function getMatchedComponentsDownward(context, componentName) {
   const children = context.$children;
   const result = [];
   if (!children) {
-    return [];
+    return result;
   }
   for (let i = 0; i < children.length; i++) {
     const v = children[i];
@@ -74,22 +71,44 @@ export function getMatchedComponentUpward(context, componentName) {
   return parent;
 }
 
+export function truthyNumber(v) {
+  return !!v && typeof v === "number" && !Number.isNaN(v);
+}
+
+export function truthy(...args) {
+  return args.every(truthyNumber);
+}
+
 export function convertToPercent(value, totalValue) {
-  if (!value || !totalValue) {
+  const _res = (value / totalValue) * 100;
+  if (!truthy(value, totalValue, _res)) {
     return 0;
   }
 
-  return +((value / totalValue) * 100).toFixed(2);
+  return _res.toFixed(2);
 }
 
 export function convertToValue(value, totalValue) {
-  let result = 0;
-
-  if (!value || !totalValue) {
-    return result;
+  const _res = (value / 100) * totalValue;
+  if (!truthy(value, totalValue, _res)) {
+    return 0;
   }
 
-  result = (value / 100) * totalValue;
+  return _res.toFixed(2);
+}
 
-  return +result.toFixed(2);
+export function millions(v) {
+  return truthy(v) ? 1e6 * v : 0;
+}
+
+export function billions(v) {
+  return truthy(v) ? 1e9 * v : 0;
+}
+
+export function trillion(v) {
+  return truthy(v) ? 1e12 * v : 0;
+}
+
+export function quadrillion(v) {
+  return truthy(v) ? 1e15 * v : 0;
 }
