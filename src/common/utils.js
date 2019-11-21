@@ -17,12 +17,12 @@ export const Console = {
   },
   dir(item, options) {
     windowConsole.dir(item, options);
-  }
+  },
 };
 
 export function getQuantity(input) {
   let output = null;
-  if (typeof input === "string" || typeof input === "number") {
+  if (typeof input === 'string' || typeof input === 'number') {
     const match = /^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
     output = match ? { value: +match[2], unit: match[3] || undefined } : null;
   }
@@ -31,7 +31,7 @@ export function getQuantity(input) {
 }
 
 export function getSize(size) {
-  let sizeValue = "100%";
+  let sizeValue = '100%';
   if (size) {
     sizeValue = size.unit ? size.value + size.unit : `${size.value}px`;
   }
@@ -72,7 +72,7 @@ export function getMatchedComponentUpward(context, componentName) {
 }
 
 export function truthyNumber(v) {
-  return !!v && typeof v === "number" && !Number.isNaN(v);
+  return typeof v === 'number' && !Number.isNaN(v);
 }
 
 export function truthy(...args) {
@@ -80,21 +80,21 @@ export function truthy(...args) {
 }
 
 export function convertToPercent(value, totalValue) {
-  const _res = (value / totalValue) * 100;
-  if (!truthy(value, totalValue, _res)) {
+  const res = (value / totalValue) * 100;
+  if (!truthy(value, totalValue, res) || value === 0 || totalValue === 0) {
     return 0;
   }
 
-  return _res.toFixed(2);
+  return res.toFixed(2);
 }
 
 export function convertToValue(value, totalValue) {
-  const _res = (value / 100) * totalValue;
-  if (!truthy(value, totalValue, _res)) {
+  const res = (value / 100) * totalValue;
+  if (!truthy(value, totalValue, res) || value === 0 || totalValue === 0) {
     return 0;
   }
 
-  return _res.toFixed(2);
+  return res.toFixed(2);
 }
 
 export function millions(v) {
