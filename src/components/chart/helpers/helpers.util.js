@@ -1,3 +1,11 @@
+import {
+  billions,
+  millions,
+  quadrillion,
+  trillion,
+  truthy,
+} from '../../../common/utils';
+
 export default {
   hexToRgb(hex) {
     if (!hex) {
@@ -18,7 +26,7 @@ export default {
   },
 
   aliasPixel(width) {
-    return (width % 2 === 0) ? 0 : 0.5;
+    return width % 2 === 0 ? 0 : 0.5;
   },
 
   getLabelStyle(style) {
@@ -26,45 +34,38 @@ export default {
   },
 
   labelSignFormat(value, decimalPoint) {
+    const quad = quadrillion(1);
+    const trill = trillion(1);
+    const billi = billions(1);
+    const milli = millions(1);
+    const killo = 1000;
+
     let label;
-    if (typeof value === 'number') {
-      if (value >= 1000000000000000) {
-        if (value % 1000000000000000 === 0) {
-          label = `${(value / 1000000000000000).toFixed(decimalPoint)}P`;
-        } else {
-          label = `${(value / 1000000000000000).toFixed(1)}P`;
-        }
-      } else if (value >= 1000000000000) {
-        if (value % 1000000000000 === 0) {
-          label = `${(value / 1000000000000).toFixed(decimalPoint)}T`;
-        } else {
-          label = `${(value / 1000000000000).toFixed(1)}T`;
-        }
-      } else if (value >= 1000000000) {
-        if (value % 1000000000 === 0) {
-          label = `${(value / 1000000000).toFixed(decimalPoint)}G`;
-        } else {
-          label = `${(value / 1000000000).toFixed(1)}G`;
-        }
-      } else if (value >= 1000000) {
-        if (value % 1000000 === 0) {
-          label = `${(value / 1000000).toFixed(decimalPoint)}M`;
-        } else {
-          label = `${(value / 1000000).toFixed(1)}M`;
-        }
-      } else if (value >= 1000) {
-        if (value % 1000 === 0) {
-          label = `${(value / 1000).toFixed(decimalPoint)}K`;
-        } else {
-          label = `${(value / 1000).toFixed(1)}K`;
-        }
-      } else if (value < 1 && value > 0) {
-        label = value.toFixed(1);
-      } else {
-        label = value.toFixed(decimalPoint);
+    if (!truthy(value)) {
+      return value;
+    }
+
+    const assignLabelWith = (v, target, lb) => {
+      if (v % target === 0) {
+        return `${(v / target).toFixed(decimalPoint)}${lb}`;
       }
+      return `${(v / target).toFixed(1)}${lb}`;
+    };
+
+    if (value >= quad) {
+      label = assignLabelWith(value, quad, 'P');
+    } else if (value >= trill) {
+      label = assignLabelWith(value, trill, 'T');
+    } else if (value >= billi) {
+      label = assignLabelWith(value, billi, 'G');
+    } else if (value >= milli) {
+      label = assignLabelWith(value, milli, 'M');
+    } else if (value >= killo) {
+      label = assignLabelWith(value, 1000, 'K');
+    } else if (value < 1 && value > 0) {
+      label = value.toFixed(1);
     } else {
-      label = value;
+      label = value.toFixed(decimalPoint);
     }
 
     return label;
