@@ -84,13 +84,13 @@
             style: {
               fontSize: 15,
               color: '#000',
-              fontFamily: 'Droid Sans',
+              fontFamily: 'Roboto',
             },
           },
           legend: {
             show: true,
             position: 'right',
-            color: '#000',
+            color: '#353740',
             inactive: '#aaa',
             width: 140,
             height: 24,
@@ -172,20 +172,16 @@
   .ev-chart-legend-container {
     position: relative;
     overflow: hidden;
+    font-family: 'Roboto', 'sans-serif';
   }
 
   .ev-chart-legend-color {
     top: 50%;
     left: 0;
     transform: translate(0, -50%);
-    width: 8px;
-    height: 8px;
+    width: 18px;
+    height: 4px;
     position: absolute;
-    border-radius: 50%;
-  }
-
-  .ev-chart-legend-color.inactive {
-    /*background-color: #555 !important;*/
   }
 
   .ev-chart-legend-name {
@@ -194,9 +190,9 @@
     white-space: nowrap;
     overflow: hidden;
     font-size: 12px;
-    margin-left: 16px;
+    margin-left: 24px;
     padding-right: 16px;
-    user-select:none;
+    user-select: none;
     top: 50%;
     left: 0;
     width: 100%;
@@ -220,7 +216,7 @@
   }
 
   .ev-chart-resize-bar:hover {
-    background-color: #e2e2e2;
+    background-color: #E2E2E2;
   }
 
   .ev-chart-resize-ghost {
@@ -229,7 +225,7 @@
     height: 100%;
     cursor: col-resize;
     opacity: 0.5;
-    background-color: #e2e2e2;
+    background-color: #E2E2E2;
   }
 
   .ev-chart-resize-ghost.horizontal {

@@ -1,4 +1,4 @@
-const module = {
+const modules = {
   createTooltipDOM() {
     this.tooltipDOM = document.createElement('div');
     this.tooltipDOM.className = 'ev-chart-tooltip';
@@ -150,4 +150,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;
