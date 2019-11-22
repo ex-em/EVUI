@@ -641,7 +641,7 @@
     height: 30px;
     background-color: #ffffff;
     border-top: 2px solid #545965;
-    border-bottom: 1px solid #797e8a;
+    border-bottom: 1px solid #c9cfdc;
   }
   .column-list {
     width: 100%;
@@ -668,6 +668,7 @@
   .column-name {
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: bold;
     color: #353740;
   }
   .column-option {
@@ -687,6 +688,7 @@
     overflow: auto;
     overflow-anchor: none;
     background-color: #ffffff;
+    border-bottom: 1px solid #c9cfdc;
   }
   .table-body table {
     clear: both;
