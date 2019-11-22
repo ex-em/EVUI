@@ -20,8 +20,7 @@
             :type="`square`"
             @on-click="onCheckAll"
           />
-        </li>
-        <li
+        </li><li
           v-for="(column, index) in orderedColumns"
           v-show="!column.hide"
           :key="index"
@@ -35,6 +34,7 @@
             style="margin: 3px 0 0 0; font-size: 12px;"
           />
           <span
+            v-if="false"
             class="column-option"
             @click.stop.prevent="onClickOption($event, column.field, index)"
           >
@@ -44,7 +44,7 @@
             />
           </span>
         </li>
-        <div class="column dummy"/>
+        <li class="column dummy"/>
       </ul>
     </div>
     <div
@@ -58,6 +58,23 @@
       />
       <table>
         <tbody>
+          <tr
+            v-if="!viewStore.length"
+            class="dummy"
+          >
+            <td
+              v-if="useCheckbox.use"
+              :style="
+              `width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+            />
+            <td
+              v-for="(column, cellIndex) in orderedColumns"
+              v-show="!column.hide"
+              :key="cellIndex"
+              :style="
+              `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+            />
+          </tr>
           <tr
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
@@ -76,15 +93,26 @@
               />
             </td>
             <td
-              v-for="(column, viewIndex) in orderedColumns"
+              v-for="(column, cellIndex) in orderedColumns"
               v-show="!column.hide"
-              :key="viewIndex"
+              :key="cellIndex"
               :data-name="column.field"
               :data-index="column.index"
               :style="
               `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             >
-              {{ row[2][column.index] }}
+              <Renderer
+                v-if="isRenderer(column)"
+                :name="column.field"
+                :item="{
+                  row: row[2],
+                  rowIndex: rowIndex,
+                  cellIndex: column.index,
+                  value: row[2][column.index],
+                  props: column.render.props,
+                }"
+              />
+              <span v-else>{{ row[2][column.index] }}</span>
             </td>
           </tr>
         </tbody>
@@ -106,6 +134,7 @@
   import resize from 'vue-resize-directive';
   import _ from 'lodash-es';
   import TableFilter from './grid.filter';
+  import Renderer from './grid.render';
 
   const ROW_INDEX = 0;
   const ROW_CHECK_INDEX = 1;
@@ -118,6 +147,7 @@
     },
     components: {
       TableFilter,
+      Renderer,
     },
     props: {
       columns: {
@@ -221,8 +251,8 @@
       this.$forceUpdate();
     },
     methods: {
-      getColumnName(field) {
-        return this.columns.find(column => column.field === field).caption;
+      isRenderer(column = {}) {
+        return column.render && column.render.use;
       },
       getColumnIndex(field) {
         return this.columns.findIndex(column => column.field === field);
@@ -232,8 +262,8 @@
         let remainWidth = 0;
         if (this.adjust) {
           const el = this.$refs.body;
-          let elWidth = el.clientWidth;
-          const elHeight = el.clientHeight;
+          let elWidth = el.offsetWidth;
+          const elHeight = el.offsetHeight;
           const result = this.orderedColumns.reduce((acc, column) => {
             if (column.hide) {
               return acc;
@@ -249,7 +279,11 @@
           }, { totalWidth: 0, emptyCount: 0 });
 
           if (this.rowHeight * this.rows.length > elHeight) {
-            elWidth += 17;
+            elWidth -= 17;
+          }
+
+          if (this.useCheckbox.use) {
+            elWidth -= 30;
           }
 
           columnWidth = elWidth - result.totalWidth;
@@ -393,13 +427,19 @@
         let checked;
 
         if (makeIndex) {
+          let hasUnChecked = false;
+
           for (let ix = 0; ix < value.length; ix++) {
-            checked = this.checked.findIndex(item => item === value[ix]) !== -1;
+            checked = this.checked.includes(value[ix]);
+            if (!checked) {
+              hasUnChecked = true;
+            }
             store.push([ix, checked, value[ix]]);
           }
-        }
 
-        this.originStore = store;
+          this.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
+          this.originStore = store;
+        }
 
         if (this.sortField) {
           this.setSort();
@@ -421,8 +461,11 @@
         const el = this.$refs.body;
         const offset = 5;
         const rowHeight = this.rowHeight;
-        const rowCount = Math.ceil(el.clientHeight / rowHeight);
         const store = this.useFilter ? this.filteredStore : this.originStore;
+        const rowCount = el.clientHeight > rowHeight ?
+          Math.ceil(el.clientHeight / rowHeight) : store.length;
+        // const rowCount = Math.ceil(el.clientHeight / rowHeight) > 10 ?
+        //   Math.ceil(el.clientHeight / rowHeight) : store.length;
         const totalScrollHeight = store.length * rowHeight;
         const firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
         const lastVisibleIndex = firstVisibleIndex + rowCount;
@@ -564,13 +607,18 @@
         this.$forceUpdate();
       },
       onResize() {
-        this.orderedColumns.map((column) => {
-          const item = column;
+        if (this.adjust) {
+          // return 값을 고려하면 forEach가 맞으나 성능를 고려하여 map을 사용하도록 함
+          this.orderedColumns.map((column) => {
+            const item = column;
 
-          item.width = 0;
+            if (!this.columns[column.index].width) {
+              item.width = 0;
+            }
 
-          return item;
-        });
+            return item;
+          }, this);
+        }
 
         this.calculatedColumn();
         this.$forceUpdate();
@@ -583,7 +631,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    border: 1px solid black;
     padding-top: 30px;
   }
   .table-header {
@@ -592,12 +639,14 @@
     top: 0;
     width: 100%;
     height: 30px;
-    background-color: darkgray;
-    border-bottom: 1px solid black;
+    background-color: #ffffff;
+    border-top: 2px solid #545965;
+    border-bottom: 1px solid #c9cfdc;
   }
   .column-list {
-    white-space: nowrap;
     width: 100%;
+    white-space: nowrap;
+    list-style-type: none;
   }
   .column {
     position: relative;
@@ -606,7 +655,6 @@
     height: 30px;
     line-height: 30px;
     vertical-align: top;
-    border-right: 1px solid black;
     padding: 0 3px;
     user-select: none;
   }
@@ -614,11 +662,14 @@
     border-right: 0;
   }
   .column.dummy {
-    width: 0px;
+    width: 0;
+    padding: 0;
   }
   .column-name {
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: bold;
+    color: #353740;
   }
   .column-option {
     position: absolute;
@@ -636,7 +687,8 @@
     height: 100%;
     overflow: auto;
     overflow-anchor: none;
-    background-color: lightgray;
+    background-color: #ffffff;
+    border-bottom: 1px solid #c9cfdc;
   }
   .table-body table {
     clear: both;
@@ -646,10 +698,13 @@
   }
   .table-body tr {
     white-space: nowrap;
-    border-bottom: 1px solid black;
   }
   .table-body tr.selected {
-    background: #2D89EF;
+    background: #e3e7f0;
+  }
+  .table-body tr.dummy {
+    border-bottom: none;
+    background: transparent;
   }
   .table-body td {
     display: inline-block;
@@ -657,6 +712,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: #797e8a;
   }
   .table-body td:last-child {
     border-right: 0;

@@ -63,17 +63,19 @@ export const AXIS_OPTION = {
   max: null,
   autoScaleRatio: null,
   startToZero: false,
+  showAxis: true,
+  axisLineColor: '#C9CFDC',
   showGrid: true,
-  axisLineColor: '#b4b6ba',
-  gridLineColor: '#e7e9ed',
+  gridLineColor: '#C9CFDC',
+  showIndicator: false,
   timeFormat: 'mm:ss',
   range: null,
   interval: null,
   decimalPoint: null,
   labelStyle: {
     fontSize: 12,
-    color: '#333',
-    fontFamily: 'Droid Sans',
+    color: '#25262E',
+    fontFamily: 'Roboto',
   },
 };
 

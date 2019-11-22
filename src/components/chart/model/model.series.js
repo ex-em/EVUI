@@ -4,7 +4,7 @@ import Bar from '../element/element.bar';
 import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
 
-const module = {
+const modules = {
   createSeriesSet(series, defaultType) {
     Object.keys(series).forEach((key, index) => {
       const type = series[key].type || defaultType;
@@ -65,4 +65,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;
