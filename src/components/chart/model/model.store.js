@@ -1,6 +1,6 @@
-import _ from 'lodash-es/reverse';
+import _reverse from 'lodash-es/reverse';
 
-const module = {
+const modules = {
   createDataSet(data, label) {
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
       const type = this.seriesInfo.charts[typeKey];
@@ -152,34 +152,40 @@ const module = {
 
   addSeriesStackDS(data, label, base, sIdx = 0) {
     const isHorizontal = this.options.horizontal;
+    const sdata = [];
 
-    return data.map((curr, index) => {
+    data.forEach((curr, index) => {
       let bdata = base[index];
       let odata = curr;
       let ldata = label[index];
       let gdata = curr;
 
-      if (gdata && typeof gdata === 'object') {
-        odata = isHorizontal ? curr.x : curr.y;
-        ldata = isHorizontal ? curr.y : curr.x;
-      }
+      if (bdata != null && ldata != null) {
+        if (gdata && typeof gdata === 'object') {
+          odata = isHorizontal ? curr.x : curr.y;
+          ldata = isHorizontal ? curr.y : curr.x;
+        }
 
-      if (sIdx > 0) {
-        bdata = isHorizontal ? bdata.x : bdata.y;
-        gdata = bdata + odata;
-      } else {
-        bdata = 0;
-        gdata = odata;
-      }
+        if (sIdx > 0) {
+          bdata = isHorizontal ? bdata.x : bdata.y;
+          gdata = bdata + odata;
+        } else {
+          bdata = 0;
+          gdata = odata;
+        }
 
-      return this.addData(gdata, ldata, odata, bdata);
+        sdata.push(this.addData(gdata, ldata, odata, bdata));
+      }
     });
+
+    return sdata;
   },
 
   addSeriesDS(data, label) {
     const isHorizontal = this.options.horizontal;
+    const sdata = [];
 
-    return data.map((curr, index) => {
+    data.forEach((curr, index) => {
       let gdata = curr;
       let ldata = label[index];
 
@@ -188,8 +194,12 @@ const module = {
         ldata = isHorizontal ? curr.y : curr.x;
       }
 
-      return this.addData(gdata, ldata);
+      if (ldata !== null) {
+        sdata.push(this.addData(gdata, ldata));
+      }
     });
+
+    return sdata;
   },
 
   addData(gdata, ldata, odata = null, bdata = null) {
@@ -359,7 +369,7 @@ const module = {
     }
 
     if (this.options.reverse) {
-      this.pieDataSet = _.reverse(this.pieDataSet);
+      this.pieDataSet = _reverse(this.pieDataSet);
     }
   },
 
@@ -377,4 +387,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;
