@@ -6,7 +6,7 @@
       :selected.sync="selected"
       :checked.sync="checked"
       :option="{
-        adjust: false,
+        adjust: true,
         rowHeight: 30,
         columnWidth: 100,
         useSelected: true,
@@ -20,7 +20,7 @@
       <template v-slot:test1="item">
         <ev-checkbox
           v-model="item.row[item.cellIndex]"
-          :type="`square`"
+          :type="'square'"
           @on-click="onCheckBox"
           @click.native.stop=""
         />
@@ -58,7 +58,7 @@
       <template v-slot:test5="item">
         <ev-text-field
           v-model="item.row[item.cellIndex]"
-          :placeholder="'Do Something..'"
+          :placeholder="'Do Something ...'"
           @click.native.stop=""
         />
       </template>
@@ -87,12 +87,12 @@
   </div>
 </template>
 <script>
-  // const countries = [
-  //   'Russia', 'Canada', 'United States', 'China', 'Brazil',
-  //   'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
-  //   'Denmark', 'Mexico', 'Indonesia', 'Sudan', 'Libya',
-  //   'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
-  // ];
+  const countries = [
+    'Russia', 'Canada', 'United States', 'China', 'Brazil',
+    'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
+    'Denmark', 'Mexico', 'Indonesia', 'Sudan', 'Libya',
+    'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
+  ];
   export default {
     name: 'New',
     data() {
@@ -101,66 +101,67 @@
         checked: [],
         columns: [
           { caption: 'ID', field: 'id', type: 'number', width: 50 },
-          // { caption: 'Country', field: 'country', type: 'string' },
-          // { caption: 'Area', field: 'area', type: 'number', hide: true },
-          // { caption: 'Population', field: 'population', type: 'number' },
-          // { caption: 'GDP', field: 'gdp', type: 'number' },
-          { caption: 'test1', field: 'test1', type: 'boolean', width: 50, render: { use: true } },
-          { caption: 'test2', field: 'test2', type: 'boolean', render: { use: true } },
-          {
-            caption: 'test3',
-            field: 'test3',
-            type: 'string',
-            width: 300,
-            render: {
-              use: true,
-              props: {
-                children: {
-                  typeA: 'radio-01',
-                  typeB: 'radio-02',
-                  typeC: 'radio-03',
-                },
-              },
-            },
-          },
-          { caption: 'test4', field: 'test4', type: 'string', render: { use: true } },
-          { caption: 'test5', field: 'test5', type: 'string', render: { use: true } },
-          { caption: 'test6', field: 'test6', type: 'number', render: { use: true } },
-          {
-            caption: 'test7',
-            field: 'test7',
-            type: 'string',
-            width: 100,
-            render: {
-              use: true,
-              props: {
-                list: [
-                  { name: 'normal', value: 'normal' },
-                  { name: 'warning', value: 'warning' },
-                  { name: 'critical', value: 'critical' },
-                ],
-              },
-            },
-          },
-          {
-            caption: 'test8',
-            field: 'test8',
-            type: 'array',
-            width: 200,
-            render: {
-              use: true,
-              props: {
-                list: [
-                  { name: 'normal', value: 'normal' },
-                  { name: 'warning', value: 'warning' },
-                  { name: 'critical', value: 'critical' },
-                  { name: 'block', value: 'block' },
-                  { name: 'major', value: 'major' },
-                  { name: 'minor', value: 'minor' },
-                ],
-              },
-            },
-          },
+          { caption: 'Country', field: 'country', type: 'string' },
+          { caption: 'Area', field: 'area', type: 'number', hide: true },
+          { caption: 'Population', field: 'population', type: 'number' },
+          { caption: 'GDP', field: 'gdp', type: 'number' },
+          // { caption: 'test1', field: 'test1', type: 'boolean',
+          // width: 50, render: { use: true } },
+          // { caption: 'test2', field: 'test2', type: 'boolean', render: { use: true } },
+          // {
+          //   caption: 'test3',
+          //   field: 'test3',
+          //   type: 'string',
+          //   width: 300,
+          //   render: {
+          //     use: true,
+          //     props: {
+          //       children: {
+          //         typeA: 'radio-01',
+          //         typeB: 'radio-02',
+          //         typeC: 'radio-03',
+          //       },
+          //     },
+          //   },
+          // },
+          // { caption: 'test4', field: 'test4', type: 'string', render: { use: true } },
+          // { caption: 'test5', field: 'test5', type: 'string', render: { use: true } },
+          // { caption: 'test6', field: 'test6', type: 'number', render: { use: true } },
+          // {
+          //   caption: 'test7',
+          //   field: 'test7',
+          //   type: 'string',
+          //   width: 100,
+          //   render: {
+          //     use: true,
+          //     props: {
+          //       list: [
+          //         { name: 'normal', value: 'normal' },
+          //         { name: 'warning', value: 'warning' },
+          //         { name: 'critical', value: 'critical' },
+          //       ],
+          //     },
+          //   },
+          // },
+          // {
+          //   caption: 'test8',
+          //   field: 'test8',
+          //   type: 'array',
+          //   width: 200,
+          //   render: {
+          //     use: true,
+          //     props: {
+          //       list: [
+          //         { name: 'normal', value: 'normal' },
+          //         { name: 'warning', value: 'warning' },
+          //         { name: 'critical', value: 'critical' },
+          //         { name: 'block', value: 'block' },
+          //         { name: 'major', value: 'major' },
+          //         { name: 'minor', value: 'minor' },
+          //       ],
+          //     },
+          //   },
+          // },
           // { caption: 'test9', field: 'test9', type: 'number' },
           // { caption: 'test10', field: 'test10', type: 'number' },
           // { caption: 'test11', field: 'test11', type: 'number' },
@@ -183,10 +184,8 @@
     },
     methods: {
       onButton() {
-        window.console.log('click button');
       },
       onCheckBox() {
-        window.console.log('click checkbox');
       },
       refreshData() {
         this.getData(100, this.tableData.length);
@@ -196,18 +195,18 @@
         for (let ix = startIndex; ix < startIndex + count; ix++) {
           this.tableData.push([
             ix + 1,
-            // countries[ix % 20],
-            // Math.random() * 10000,
-            // Math.random() * 100,
-            // Math.random() * 1000,
-            false,
-            false,
-            'radio-01',
-            null,
-            '',
-            1,
-            'normal',
-            ['warning', 'block'],
+            countries[ix % 20],
+            Math.random() * 10000,
+            Math.random() * 100,
+            Math.random() * 1000,
+            // false,
+            // false,
+            // 'radio-01',
+            // null,
+            // '',
+            // 1,
+            // 'normal',
+            // ['warning', 'block'],
             // Math.random() * 2000,
             // Math.random() * 3000,
             // Math.random() * 4000,

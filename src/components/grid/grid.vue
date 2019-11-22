@@ -34,6 +34,7 @@
             style="margin: 3px 0 0 0; font-size: 12px;"
           />
           <span
+            v-if="false"
             class="column-option"
             @click.stop.prevent="onClickOption($event, column.field, index)"
           >
@@ -250,11 +251,8 @@
       this.$forceUpdate();
     },
     methods: {
-      isRenderer(column) {
+      isRenderer(column = {}) {
         return column.render && column.render.use;
-      },
-      getColumnName(field) {
-        return this.columns.find(column => column.field === field).caption;
       },
       getColumnIndex(field) {
         return this.columns.findIndex(column => column.field === field);
@@ -432,7 +430,7 @@
           let hasUnChecked = false;
 
           for (let ix = 0; ix < value.length; ix++) {
-            checked = this.checked.findIndex(item => item === value[ix]) !== -1;
+            checked = this.checked.includes(value[ix]);
             if (!checked) {
               hasUnChecked = true;
             }
@@ -610,6 +608,7 @@
       },
       onResize() {
         if (this.adjust) {
+          // return 값을 고려하면 forEach가 맞으나 성능를 고려하여 map을 사용하도록 함
           this.orderedColumns.map((column) => {
             const item = column;
 
@@ -624,9 +623,6 @@
         this.calculatedColumn();
         this.$forceUpdate();
       },
-      onChangeRender(row, cellIndex, value) {
-        this.$set(row, cellIndex, value);
-      },
     },
   };
 </script>
@@ -635,7 +631,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    border: 1px solid black;
     padding-top: 30px;
   }
   .table-header {
@@ -644,8 +639,9 @@
     top: 0;
     width: 100%;
     height: 30px;
-    background-color: darkgray;
-    border-bottom: 1px solid black;
+    background-color: #ffffff;
+    border-top: 2px solid #545965;
+    border-bottom: 1px solid #797e8a;
   }
   .column-list {
     width: 100%;
@@ -659,7 +655,6 @@
     height: 30px;
     line-height: 30px;
     vertical-align: top;
-    border-right: 1px solid black;
     padding: 0 3px;
     user-select: none;
   }
@@ -673,6 +668,7 @@
   .column-name {
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #353740;
   }
   .column-option {
     position: absolute;
@@ -690,7 +686,7 @@
     height: 100%;
     overflow: auto;
     overflow-anchor: none;
-    background-color: lightgray;
+    background-color: #ffffff;
   }
   .table-body table {
     clear: both;
@@ -700,10 +696,9 @@
   }
   .table-body tr {
     white-space: nowrap;
-    border-bottom: 1px solid black;
   }
   .table-body tr.selected {
-    background: #2D89EF;
+    background: #e3e7f0;
   }
   .table-body tr.dummy {
     border-bottom: none;
@@ -715,6 +710,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: #797e8a;
   }
   .table-body td:last-child {
     border-right: 0;
