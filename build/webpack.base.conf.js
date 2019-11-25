@@ -33,21 +33,6 @@ module.exports = {
                 },
               },
             ],
-            less: [
-              'vue-style-loader',
-              {
-                loader: 'css-loader',
-                options: {
-                  sourceMap: true,
-                },
-              },
-              {
-                loader: 'less-loader',
-                options: {
-                  sourceMap: true,
-                },
-              },
-            ],
           },
           postLoaders: {
             html: 'babel-loader?sourceMap'
@@ -64,64 +49,13 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/,
-        loaders: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // you can specify a publicPath here
-              // by default it use publicPath in webpackOptions.output
-              publicPath: './'
-            }
-          },
-          'css-loader'
-        ]
-      },
-      {
-        test: /\.less$/,
-        loaders: [
-          {
-            loader: 'style-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'less-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-        ]
-      },
-      {
-        test: /\.scss$/,
-        loaders: [
-          {
-            loader: 'style-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-        ]
+        test: /\.(css|sass|scss)$/,
+        use: [
+          'vue-style-loader',
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ],
       },
       {
         test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,

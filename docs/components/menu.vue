@@ -101,6 +101,7 @@
     position: absolute;
     left: 0;
     width: 240px;
+    border-right: 1px solid #dddee0;
   }
   .evui-menu {
     display: block;

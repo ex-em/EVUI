@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
 
   const prefixCls = 'evui-btn';
 
@@ -85,6 +85,8 @@
 </script>
 
 <style lang="scss">
+@import '~evui/styles/default';
+
 .evui-btn {
   display: inline-block;
   border: $border-solid transparent;
@@ -217,6 +219,18 @@
     border-color: $color-primary;
   }
 }
+
+fieldset[disabled] .evui-btn-dashed,
+fieldset[disabled] .evui-btn-dashed:active,
+fieldset[disabled] .evui-btn-dashed:focus,
+fieldset[disabled] .evui-btn-dashed:hover {
+  @include themify() {
+    color: themed('button-disabled') !important;
+    background-color: themed('button-disabled-bg') !important;
+    border-color: themed('button-disabled-border') !important;
+  }
+}
+
 /*
  ** 스타일 적용 안 되어 주석 처리 **
 .evui-btn-dashed:focus {

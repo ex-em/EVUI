@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
 
   export default {
     props: {
@@ -517,18 +517,22 @@
   };
 </script>
 
-<style>
+<style lang="scss">
+  @import '~evui/styles/default';
+
   .ev-window {
     position: absolute;
     border: 9px solid #424242;
     border-radius: 8px;
-    background: #424242;
     overflow: visible;
     z-index: 8888;
+
+    @include themify() {
+      background-color: themed('window-bg');
+    }
   }
-  .gray .ev-window {
+  .dark .ev-window {
     border: 9px solid #595C64;
-    background: #212227;
   }
   .ev-window-header-area {
     position: absolute;
@@ -536,14 +540,12 @@
     width: 100%;
     padding-left: 6px;
     border-bottom: 1px solid #B6B6B6;
-    background: #ffffff;
     font-family: Verdana, Arial, sans-serif;
     align-items: center;
     user-select: none;
   }
-  .gray .ev-window-header-area {
+  .dark .ev-window-header-area {
     border-bottom: 1px solid #464850;
-    background: #27282E;
     color: #ABAEB5;
   }
   .ev-window-title-area {
@@ -563,7 +565,7 @@
     height: 32px;
     border-left: 1px solid #B6B6B6;
   }
-  .gray .ev-window-expand-btn-line {
+  .dark .ev-window-expand-btn-line {
     border-left: 1px solid #464850;
   }
   .ev-window-expand-btn {
@@ -579,21 +581,24 @@
     background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
+
+    &:before {
+      top: -1px;
+      right: 1px;
+      font-size: 18px;
+      content: 'ㅁ';
+    }
+
+    &:hover {
+      background: #319de9;
+      cursor: pointer;
+    }
   }
-  .gray .ev-window-expand-btn {
+  .dark .ev-window-expand-btn {
     color: #c7c8cc;
     background: #595c64;
   }
-  .ev-window-expand-btn:before {
-    top: -1px;
-    right: 1px;
-    font-size: 18px;
-    content: 'ㅁ';
-  }
-  .ev-window-expand-btn:hover {
-    background: #319de9;
-    cursor: pointer;
-  }
+
   .ev-window-close-btn-line {
     position: absolute;
     top: 0;
@@ -601,7 +606,7 @@
     height: 32px;
     border-left: 1px solid #B6B6B6;
   }
-  .gray .ev-window-close-btn-line {
+  .dark .ev-window-close-btn-line {
     border-left: 1px solid #464850;
   }
   .ev-window-close-btn {
@@ -617,30 +622,30 @@
     background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
+
+    &:before {
+      top: 0;
+      right: 6px;
+      font-size: 11px;
+      content: 'X';
+    }
+
+    &:hover {
+      background: #319de9;
+      cursor: pointer;
+    }
   }
-  .gray .ev-window-close-btn {
+
+  .dark .ev-window-close-btn {
     color: #c7c8cc;
     background: #595c64;
   }
-  .ev-window-close-btn:before{
-    top: 0;
-    right: 6px;
-    font-size: 11px;
-    content: 'X';
-  }
-  .ev-window-close-btn:hover{
-    background: #319de9;
-    cursor: pointer;
-  }
-  .ev-window-body-area{
+
+  .ev-window-body-area {
     position: relative;
     width: 100%;
     height: 100%;
     padding: 6px;
-    background: white;
     overflow: auto;
-  }
-  .gray .ev-window-body-area{
-    background: transparent;
   }
 </style>

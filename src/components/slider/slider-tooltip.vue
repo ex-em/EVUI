@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
 
   const prefixCls = 'evui-slider-tooltip';
 
@@ -77,7 +77,8 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  @import '~evui/styles/default';
   .evui-slider-tooltip {
     position: absolute;
     user-select: none;

@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
   import Selectbox from '@/components/selectbox/selectbox';
 
   export default {
@@ -155,5 +155,6 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss">
+  @import '~evui/styles/default';
 </style>

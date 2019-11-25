@@ -3,12 +3,13 @@
 /************************************************************************************
  common
 ************************************************************************************/
+
 @font-face {
-  font-family:'NanumGothic';
-  src:url('../webfonts/NanumGothic.ttf') format('truetype');
+  font-family: 'NanumGothic';
+  src: url('../../webfonts/NanumGothic.ttf') format('truetype');
 }
-*{
-  -moz-box-sizing: border-box;
+
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -16,8 +17,8 @@
 
 /************************************************************************************
  Icon
-************************************************************************************/
-.evui-select-arrow{
+***********************************************************************************
+.evui-select-arrow {
   position: absolute;
   top: 50%;
   right: 8px;
@@ -42,10 +43,10 @@
 .fade-leave-active{
   transition: opacity .5s;
 }
-
+*/
 /************************************************************************************
  Checkbox
-************************************************************************************/
+************************************************************************************
 .evui-checkbox{
   display: inline-block;
 }
@@ -55,7 +56,7 @@
 }
 
 .evui-checkbox input[type="checkbox"] + label{
-  /*display: inline-block;*/
+  /* display: inline-block; **
   position: relative;
   padding-left: 19px;
   padding-right: 5px;
@@ -78,7 +79,7 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 
 .evui-checkbox input[type="checkbox"] + label:before{
   content:"";
-  /*display: inline-block;*/
+  /*display: inline-block;**
   position: absolute;
   left: 0px;
   bottom: 0px;
@@ -108,10 +109,11 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .evui-checkbox-group-inner {
   display: inline-block;
 }
+*/
 
 /************************************************************************************
  Radio
-************************************************************************************/
+************************************************************************************
 .evui-radio {
   display: inline-block;
 }
@@ -184,10 +186,10 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .evui-radio-group-inner {
   display: inline-block;
 }
-
+*/
 /************************************************************************************
  Code Mirror
-************************************************************************************/
+************************************************************************************
 
 .CodeMirror {
   font-size: 13px;
@@ -196,10 +198,10 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
 .vue-codemirror-wrap {
   height: 100% !important;
 }
-
+*/
 /************************************************************************************
  Guide Page
-************************************************************************************/
+************************************************************************************
 
 .article-title {
   color: #0055aa;
@@ -327,6 +329,7 @@ div.evui-checkbox.evui-disabled input[type="checkbox"] + label:before{
   color:#666!important;
   margin-left:12px!important
 }
+*/
 
 fieldset {
   display: block;

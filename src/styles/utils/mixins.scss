@@ -1,0 +1,61 @@
+@import '../themes/index';
+
+@mixin prefix($property, $value, $vendors: webkit moz ms o, $default: true) {
+  @if $vendors {
+    @each $vendor in $vendors {
+      #{'-' + $vendor + '-' + $property}: #{$value};
+    }
+  }
+  @if $default {
+    #{$property}: #{$value};
+  }
+}
+@mixin truncate($truncation-boundary) {
+  max-width: $truncation-boundary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@mixin clearfix() {
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+@mixin place-at-center() {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+@mixin font-hide() {
+  font-size: 0;
+  text-indent: -999px;
+}
+@mixin set-scrollbar() {
+  &::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    border-radius: 10px;
+
+    @include themify() {
+      background-color: themed('rtm-nav-item-background');
+    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+
+    @include themify() {
+      background-color: themed('rtm-nav-item-title-active-background');
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+
+    @include themify() {
+      background-color: themed('rtm-nav-item-background');
+    }
+  }
+}

@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
 
   import mainHeader from './components/header';
   import mainContent from './components/content';
@@ -19,21 +19,14 @@
   };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  @import '~evui/styles/default';
+
   * {
     font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;
   }
-</style>
-<style>
-  body {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
+
   .app {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     padding-top: 55px;
   }
 </style>

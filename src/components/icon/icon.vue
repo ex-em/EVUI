@@ -2,8 +2,7 @@
   <i :class="preCls"/>
 </template>
 <script>
-  import '@/styles/all.css';
-  import '@/styles/icon.css';
+  import '@/styles/lib/icon.css';
 
   const prefixCls = 'ei';
 

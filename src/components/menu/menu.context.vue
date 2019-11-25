@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import { getQuantity } from '../../common/utils';
 
   const prefixEvui = 'ev-contextmenu';
@@ -136,8 +135,10 @@
   };
 </script>
 
-<style>
-  .ev-contextmenu{
+<style lang="scss">
+  @import '~evui/styles/default';
+
+  .ev-contextmenu {
     position: absolute;
     z-index: 9999;
   }

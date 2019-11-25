@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
+  // import '@/styles/evui.css';
   import loadingmask from '@/components/loadingmask/loadingmask';
 
   export default {
@@ -24,3 +24,7 @@
     },
   };
 </script>
+
+<style lang="scss">
+  @import '~evui/styles/default';
+</style>
