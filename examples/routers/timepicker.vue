@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import timepicker from '@/components/timepicker/timepicker';
 
   export default {
@@ -48,3 +47,7 @@
     },
   };
 </script>
+
+<style lang="scss">
+  @import '~@/styles/default';
+</style>

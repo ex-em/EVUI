@@ -68,8 +68,7 @@
 </template>
 
 <script>
-  import '@/styles/all.css';
-  import '@/styles/evui.css';
+  import '@/styles/lib/fontawesome.css';
   import Dropdown from '@/components/selectbox/dropdown';
 
   const prefixCls = 'evui-selectbox';
@@ -391,7 +390,8 @@
   };
 </script>
 
-<style>
+<style lang="scss">
+  @import '~@/styles/default';
   /************************************************************************************
    Selectbox
   ************************************************************************************/

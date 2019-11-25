@@ -128,7 +128,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import checkbox from '@/components/checkbox/checkbox';
   import checkboxGroup from '@/components/checkbox/checkbox-group';
 
@@ -229,7 +228,10 @@
     },
   };
 </script>
-<style scoped>
+
+<style lang="scss" scoped>
+  @import '~@/styles/default';
+
   h4 {
     color: mediumseagreen;
   }

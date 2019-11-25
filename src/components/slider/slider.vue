@@ -45,7 +45,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
   import SliderTooltip from './slider-tooltip';
 
   const prefixCls = 'evui-slider';
@@ -393,7 +392,9 @@
   };
 </script>
 
-<style>
+
+<style lang="scss">
+  @import '~@/styles/default';
 /************************************************************************************
  Slider Component
 ************************************************************************************/

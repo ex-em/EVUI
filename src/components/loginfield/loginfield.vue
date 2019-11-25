@@ -61,7 +61,6 @@
 
 <script>
   import { getQuantity, getSize } from '@/common/utils';
-  import '@/styles/evui.css';
 
   const prefixCls = 'ev-login';
 
@@ -265,9 +264,12 @@
     },
   };
 </script>
-<style>
+
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-login {
-    font-family:'NanumGothic';
+    font-family: 'NanumGothic';
     display: inline-block;
     position: relative;
     vertical-align: middle;
