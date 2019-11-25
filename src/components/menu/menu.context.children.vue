@@ -36,9 +36,6 @@
 </template>
 
 <script>
-  // import '@/styles/lib/all.css';
-  // import '@/styles/evui.css';
-
   const prefixEvui = 'ev-contextmenu-children';
 
   export default {

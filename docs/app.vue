@@ -5,8 +5,6 @@
   </div>
 </template>
 <script>
-  // import '@/styles/evui.css';
-
   import mainHeader from './components/header';
   import mainContent from './components/content';
 

@@ -15,7 +15,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
   import timepicker from '@/components/timepicker/timepicker';
 
   export default {

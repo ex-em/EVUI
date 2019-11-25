@@ -21,8 +21,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
-
   const prefixCls = 'evui-slider-tooltip';
 
   export default {

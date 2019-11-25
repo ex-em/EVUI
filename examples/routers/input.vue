@@ -50,7 +50,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
   import inputNumber from '@/components/input/input.number';
 
   export default {
@@ -71,5 +70,5 @@
 </script>
 
 <style lang="scss">
-  @import '~@/styles/default';
+  @import '~evui/styles/default';
 </style>

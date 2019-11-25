@@ -37,7 +37,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
   import Selectbox from '@/components/selectbox/selectbox';
 
   export default {

@@ -12,8 +12,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
-
   const prefixCls = 'evui-btn';
 
   export default {

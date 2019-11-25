@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import '@/styles/lib/all.css';
+  import '@/styles/lib/fontawesome.css';
   import menuNav from './menu';
 
   export default {

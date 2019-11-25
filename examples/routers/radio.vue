@@ -43,7 +43,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
   import radio from '@/components/radio/radio';
   import radioGroup from '@/components/radio/radio-group';
   import checkbox from '@/components/checkbox/checkbox';

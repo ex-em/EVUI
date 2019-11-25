@@ -260,7 +260,7 @@
   import TableFilterLite from '@/components/table/table.filter.lite';
   import util from '@/common/utils.table';
   import _ from 'lodash-es';
-  import '@/styles/lib/all.css';
+  import '@/styles/lib/fontawesome.css';
 
   export default {
     components: {

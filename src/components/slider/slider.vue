@@ -45,7 +45,6 @@
 </template>
 
 <script>
-  // import '@/styles/evui.css';
   import SliderTooltip from './slider-tooltip';
 
   const prefixCls = 'evui-slider';

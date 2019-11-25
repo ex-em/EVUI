@@ -61,7 +61,6 @@
 
 <script>
   import { getQuantity, getSize } from '@/common/utils';
-  // import '@/styles/evui.css';
 
   const prefixCls = 'ev-login';
 
