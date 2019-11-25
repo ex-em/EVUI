@@ -76,7 +76,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '~evui/styles/default';
+  @import '~@/styles/default';
   .evui-slider-tooltip {
     position: absolute;
     user-select: none;

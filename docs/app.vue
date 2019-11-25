@@ -18,7 +18,7 @@
 </script>
 
 <style scoped lang="scss">
-  @import '~evui/styles/default';
+  @import '~@/styles/default';
 
   * {
     font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;

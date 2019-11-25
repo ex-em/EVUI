@@ -25,5 +25,5 @@
 </script>
 
 <style lang="scss">
-  @import '~evui/styles/default';
+  @import '~@/styles/default';
 </style>

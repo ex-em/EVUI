@@ -126,7 +126,7 @@
 </script>
 
 <style>
-  @import '~evui/styles/default';
+  @import '~@/styles/default';
 
   .ev-contextmenu-children{
     position: relative;

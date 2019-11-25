@@ -230,7 +230,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '~evui/styles/default';
+  @import '~@/styles/default';
 
   h4 {
     color: mediumseagreen;
