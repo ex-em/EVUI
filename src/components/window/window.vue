@@ -525,8 +525,8 @@
     overflow: visible;
     z-index: 8888;
 
-    @include themify() {
-      background-color: themed('window-bg');
+    @include evThemify() {
+      background-color: evThemed('window-bg');
     }
   }
   .dark .ev-window {
@@ -556,7 +556,7 @@
     background-color: #212227;
     color: #ABAEB5;
   }
-  .ev-window-expand-btn-line{
+  .ev-window-expand-btn-line {
     position: absolute;
     top: 0;
     right: 66px;
