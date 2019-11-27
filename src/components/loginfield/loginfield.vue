@@ -285,47 +285,38 @@
     background-image: none;
   }
   .ev-login.focus, .ev-login.focus:hover {
-    border-color : #2d8cf0;
+    border-color: #1A6AFE;
     opacity: 1;
   }
   .ev-login-text, .ev-login-password {
     width: 100%;
     height: 100%;
-    font-size:18px;
-    padding:10px 10px 10px 12px;
-    display:block;
-    border: 1px solid #dadce0;
-    border-radius: 3px;
+    font-size: 18px;
+    padding: 10px 10px 10px 12px;
+    display: block;
+    border: 1px solid #DCE1E5;
+    border-radius: 1px;
   }
   .ev-login-text:focus, .ev-login-password:focus {
-    outline:none;
-    border: 2px solid #2d8cf0;
-    border-radius: 3px;
+    outline: none;
+    border-bottom: 3px solid #1A6AFE;
   }
 
   /* LABEL ======================================= */
   .loginLabel {
-    color:#999;
-    font-size:18px;
-    font-weight:normal;
-    position:absolute;
-    pointer-events:none;
-    left:12px;
-    top:10px;
-    transition:0.1s ease all;
-    -moz-transition:0.1s ease all;
-    -webkit-transition:0.1s ease all;
+    color: #353739;
+    font-size: 12px;
+    position: absolute;
+    pointer-events: none;
+    height: 22px;
+    top: -22px;
+    font-family: Roboto;
+    font-weight: 600;
   }
   /* active state */
   .ev-login-text:focus ~ .loginLabel, .ev-login-text:valid ~ .loginLabel,
   .ev-login-password:focus ~ .loginLabel, .ev-login-password:valid ~ .loginLabel {
-    top:-13px;
-    left:7px;
-    font-size:14px;
-    padding: 0 5px 0 5px;
-    color:#2d8cf0;
-    background-color: #ffffff;
-    font-weight:600;
+    color: #1A6AFE;
   }
 
 </style>
