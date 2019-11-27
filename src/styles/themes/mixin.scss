@@ -1,33 +1,33 @@
-@mixin themify($themes: $themes) {
-  @each $theme, $map in $themes {
+@mixin evThemify($ev-themes: $ev-themes) {
+  @each $theme, $map in $ev-themes {
     @if $theme == 'dark' {
       .#{$theme} & {
-        $theme-map: () !global;
+        $ev-theme-map: () !global;
 
         @each $key, $submap in $map {
-          $value: map-get(map-get($themes, $theme), '#{$key}');
-          $theme-map: map-merge($theme-map, ($key: $value)) !global;
+          $value: map-get(map-get($ev-themes, $theme), '#{$key}');
+          $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
         }
 
         @content;
-        $theme-map: null !global;
+        $ev-theme-map: null !global;
       }
     }
 
     @else {
-      $theme-map: () !global;
+      $ev-theme-map: () !global;
 
       @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), '#{$key}');
-        $theme-map: map-merge($theme-map, ($key: $value)) !global;
+        $value: map-get(map-get($ev-themes, $theme), '#{$key}');
+        $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
       }
 
       @content;
-      $theme-map: null !global;
+      $ev-theme-map: null !global;
     }
   }
 }
 
-@function themed($key) {
-  @return map-get($theme-map, $key);
+@function evThemed($key) {
+  @return map-get($ev-theme-map, $key);
 }
