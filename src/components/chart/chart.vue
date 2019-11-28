@@ -1,11 +1,13 @@
 <template>
   <div
+    v-resize="onResize"
     ref="wrapper"
     :style="wrapperStyle"
     class="ev-chart"
   />
 </template>
 <script>
+  import resize from 'vue-resize-directive';
   import _merge from 'lodash-es/merge';
   import _defaults from 'lodash-es/defaults';
   import _isEqual from 'lodash-es/isEqual';
@@ -13,6 +15,9 @@
   import EvChart from './chart.core';
 
   export default {
+    directives: {
+      resize,
+    },
     props: {
       options: {
         type: Object,
@@ -127,6 +132,9 @@
           sizeValue = undefined;
         }
         return sizeValue;
+      },
+      onResize() {
+        this.evChart.update();
       },
     },
   };
