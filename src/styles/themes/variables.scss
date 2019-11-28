@@ -2,7 +2,7 @@
 
 $ev-themes: (
   light: (
-    font-color-base: $color-white,
+    font-color-base: $color-black,
 
     /* button
     -------------------------- */
@@ -20,6 +20,14 @@ $ev-themes: (
     /* window
     -------------------------- */
     window-bg: $color-white,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #545965,
+    grid-bottom-border: #C9CFDC,
+    grid-row-selected: #E3E7F0,
+    grid-cell-text: #797E8A,
+
   ),
   dark: (
     font-color-base: $color-white,
@@ -40,6 +48,13 @@ $ev-themes: (
     /* window
     -------------------------- */
     window-bg: $color-dark-level2,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #797E8A,
+    grid-bottom-border: #545965,
+    grid-row-selected: #797E8A,
+    grid-cell-text: #C9CFDC,
 
   ),
 ) !default;
