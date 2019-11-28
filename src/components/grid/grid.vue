@@ -737,10 +737,8 @@
   td {
     display: inline-block;
     padding: 0 3px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
 
+    @include truncate(100%);
     @include evThemify() {
       color: evThemed('grid-cell-text');
     }
