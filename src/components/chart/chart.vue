@@ -1,18 +1,23 @@
 <template>
   <div
+    v-resize="onResize"
     ref="wrapper"
     :style="wrapperStyle"
     class="ev-chart"
   />
 </template>
 <script>
+  import resize from 'vue-resize-directive';
   import _merge from 'lodash-es/merge';
-  import _defaults from 'lodash-es/defaults';
+  import _defaultsDeep from 'lodash-es/defaultsDeep';
   import _isEqual from 'lodash-es/isEqual';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
   export default {
+    directives: {
+      resize,
+    },
     props: {
       options: {
         type: Object,
@@ -41,15 +46,15 @@
     watch: {
       data: {
         handler(newVal, oldVal) {
-          this.evChart.data = _defaults(newVal, this.normalizedData);
+          this.evChart.data = _defaultsDeep({}, newVal, this.normalizedData);
           this.evChart.update(!_isEqual(newVal.series, oldVal.series));
         },
         deep: true,
       },
       options: {
-        handler(newVal) {
-          this.evChart.options = _merge(newVal, this.normalizedOption);
-          this.evChart.update();
+        handler(newVal, oldVal) {
+          this.evChart.options = _defaultsDeep({}, newVal, this.normalizedOption);
+          this.evChart.update(!_isEqual(newVal.legend, oldVal.legend));
         },
         deep: true,
       },
@@ -127,6 +132,9 @@
           sizeValue = undefined;
         }
         return sizeValue;
+      },
+      onResize() {
+        this.evChart.update();
       },
     },
   };
