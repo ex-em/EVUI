@@ -464,8 +464,6 @@
         const store = this.useFilter ? this.filteredStore : this.originStore;
         const rowCount = el.clientHeight > rowHeight ?
           Math.ceil(el.clientHeight / rowHeight) : store.length;
-        // const rowCount = Math.ceil(el.clientHeight / rowHeight) > 10 ?
-        //   Math.ceil(el.clientHeight / rowHeight) : store.length;
         const totalScrollHeight = store.length * rowHeight;
         const firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
         const lastVisibleIndex = firstVisibleIndex + rowCount;
@@ -626,102 +624,139 @@
     },
   };
 </script>
-<style scoped>
-  .table {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    padding-top: 30px;
+<style lang="scss" scoped>
+@import '~@/styles/default';
+
+.table {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-top: 30px;
+}
+
+.table-header {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 30px;
+
+  @include evThemify() {
+    background-color: evThemed('bg-color-base');
+    border-top: 2px solid evThemed('grid-header-border');
+    border-bottom: $border-solid evThemed('grid-bottom-border');
   }
-  .table-header {
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 30px;
-    background-color: #ffffff;
-    border-top: 2px solid #545965;
-    border-bottom: 1px solid #c9cfdc;
-  }
-  .column-list {
-    width: 100%;
-    white-space: nowrap;
-    list-style-type: none;
-  }
-  .column {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    height: 30px;
-    line-height: 30px;
-    vertical-align: top;
-    padding: 0 3px;
-    user-select: none;
-  }
-  .adjust .column:last-child {
-    border-right: 0;
-  }
-  .column.dummy {
+}
+
+.column-list {
+  width: 100%;
+  white-space: nowrap;
+  list-style-type: none;
+}
+
+.column {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  line-height: 30px;
+  vertical-align: top;
+  padding: 0 3px;
+  user-select: none;
+
+  &.dummy {
     width: 0;
     padding: 0;
   }
-  .column-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: bold;
-    color: #353740;
+}
+
+.adjust .column:last-child {
+  border-right: 0;
+}
+
+.column-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+
+  @include evThemify() {
+    color: evThemed('font-color-base');
   }
-  .column-option {
-    position: absolute;
-    right: 0;
-    height: 100%;
-    background-color: transparent;
-    box-shadow: inset 0 0 3px #000000;
+}
+
+.column-option {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  background-color: transparent;
+
+  @include evThemify() {
+    /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
+    box-shadow: inset 0 0 3px evThemed('font-color-base');
   }
-  .v-scroll .dummy {
-    width: 17px;
+}
+
+.v-scroll .dummy {
+  width: 17px;
+}
+
+.table-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overflow-anchor: none;
+
+  @include evThemify() {
+    background-color: evThemed('bg-color-base');
+    border-bottom: $border-solid evThemed('grid-bottom-border');
   }
-  .table-body {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-anchor: none;
-    background-color: #ffffff;
-    border-bottom: 1px solid #c9cfdc;
-  }
-  .table-body table {
+
+  table {
     clear: both;
-    /*margin: 0 auto;*/
     border-spacing: 0;
     border-collapse: collapse;
   }
-  .table-body tr {
+
+  tr {
     white-space: nowrap;
+    /* stylelint-disable */
+    &.selected {
+      @include evThemify() {
+        background-color: evThemed('grid-row-selected');
+      }
+    }
+
+    &.dummy {
+      border-bottom: none;
+      background: transparent;
+    }
+    /* stylelint-enable */
   }
-  .table-body tr.selected {
-    background: #e3e7f0;
-  }
-  .table-body tr.dummy {
-    border-bottom: none;
-    background: transparent;
-  }
-  .table-body td {
+
+  td {
     display: inline-block;
     padding: 0 3px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    color: #797e8a;
+
+    @include evThemify() {
+      color: evThemed('grid-cell-text');
+    }
+
+    &:last-child {
+      border-right: 0;
+    }
   }
-  .table-body td:last-child {
-    border-right: 0;
-  }
-  .vscroll-spacer {
-    opacity: 0;
-    clear: both;
-  }
-  [v-cloak] {
-    display: none;
-  }
+}
+
+.vscroll-spacer {
+  opacity: 0;
+  clear: both;
+}
+
+[v-cloak] {
+  display: none;
+}
 </style>
