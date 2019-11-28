@@ -131,7 +131,6 @@
   .ev-contextmenu-children{
     position: relative;
     float: left;
-    z-index: 9999;
   }
   .ev-contextmenu-children-body{
     float: left;

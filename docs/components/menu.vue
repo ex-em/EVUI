@@ -107,7 +107,6 @@
     display: block;
     width: 100%;
     background: #fff;
-    z-index: 900;
   }
   .evui-menu-group {
     list-style-type: none;
@@ -144,6 +143,5 @@
     color: #F1F1F1;
     background-color: #2D89EF;
     transition: background-color 600ms ease;
-    z-index: 2;
   }
 </style>

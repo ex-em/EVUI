@@ -88,7 +88,7 @@
     left: -17px;
     font-size: 12px;
     line-height: 1.5;
-    z-index: 1060;
+    z-index: 100;
   }
   .evui-slider-tooltip-popper.on {
     visibility: visible;

@@ -220,7 +220,7 @@
     position: absolute;
     background: transparent;
     opacity: 0.5;
-    z-index: 1;
+    z-index: 10;
   }
 
   .ev-chart-resize-bar:hover {
@@ -244,7 +244,7 @@
 
   .ev-chart-tooltip {
     position: absolute;
-    z-index: 100000;
+    z-index: 100;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 17px;

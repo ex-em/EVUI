@@ -157,7 +157,6 @@
     padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
-    z-index: 1;
     transition: height .3s ease-in-out;
   }
   .evui-codeview.expand{

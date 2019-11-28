@@ -259,7 +259,7 @@
   }
   .ev-splitter-guideline {
     position: absolute;
-    z-index: 10000;
+    z-index: 100;
     background: #dadada;
     -webkit-user-select: none;
     -moz-user-select: none;

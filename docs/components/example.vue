@@ -28,10 +28,12 @@
   import axios from 'axios';
   import { getParameters } from 'codesandbox/lib/api/define';
   import CodeView from './code-view';
+  import EvSplitter from '../../src';
 
   export default {
     name: 'Example',
     components: {
+      EvSplitter,
       CodeView,
     },
     props: {

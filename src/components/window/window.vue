@@ -523,7 +523,7 @@
     border: 9px solid #424242;
     border-radius: 8px;
     overflow: visible;
-    z-index: 8888;
+    z-index: 700;
 
     @include evThemify() {
       background-color: evThemed('window-bg');
