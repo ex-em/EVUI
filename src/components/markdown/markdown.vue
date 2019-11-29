@@ -868,7 +868,6 @@
   .markdown :checked+.radio-label {
     border-color: #0366d6;
     position: relative;
-    z-index: 1;
   }
 
   .markdown .tab-size[data-tab-size="1"] {

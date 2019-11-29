@@ -140,6 +140,6 @@
 
   .ev-contextmenu {
     position: absolute;
-    z-index: 9999;
+    z-index: 100;
   }
 </style>
