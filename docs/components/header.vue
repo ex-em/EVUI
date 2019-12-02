@@ -41,7 +41,7 @@
     width: 100%;
     height: 55px;
     background: #67A1F4;
-    z-index: 30000;
+    z-index: 1000;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   }
   .evui-header-title {

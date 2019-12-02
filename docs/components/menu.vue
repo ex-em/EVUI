@@ -101,12 +101,12 @@
     position: absolute;
     left: 0;
     width: 240px;
+    border-right: 1px solid #DDDEE0;
   }
   .evui-menu {
     display: block;
     width: 100%;
     background: #fff;
-    z-index: 900;
   }
   .evui-menu-group {
     list-style-type: none;
@@ -130,19 +130,18 @@
     padding-left: 30px;
     border-right: 2px solid transparent;
     color: #888888;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     z-index: 1;
     cursor: pointer;
   }
   .evui-menu-item:hover {
     border-right: 4px solid #2D89EF;
-    color: #2d8cf0;
+    color: #2D8CF0;
   }
   .evui-menu-item.active {
     border-right: 4px solid #2D89EF;
-    color: #f1f1f1;
+    color: #F1F1F1;
     background-color: #2D89EF;
     transition: background-color 600ms ease;
-    z-index: 2;
   }
 </style>

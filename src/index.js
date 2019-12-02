@@ -27,6 +27,7 @@ import { TreeTable as EvTreeTable } from './components/tree';
 import EvSplitter from './components/splitter';
 import EvMarkdown from './components/markdown';
 import EvGrid from './components/grid/grid';
+import EvMessage from './components/message/index';
 
 const components = {
   EvButton,
@@ -58,6 +59,7 @@ const components = {
   EvSplitter,
   EvMarkdown,
   EvGrid,
+  EvMessage,
 };
 
 const evui = {
@@ -70,6 +72,8 @@ const install = function (Vue) {
   Object.keys(evui).forEach((key) => {
     Vue.component(key, evui[key]);
   });
+
+  Vue.prototype.$message = EvMessage;
 };
 
 // auto install

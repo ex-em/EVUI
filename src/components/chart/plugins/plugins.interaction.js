@@ -1,4 +1,4 @@
-const module = {
+const modules = {
   onMouseMoveEvent(e) {
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
@@ -101,4 +101,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;

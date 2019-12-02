@@ -134,7 +134,7 @@
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    z-index: 11;
+    z-index: 100;
   }
   .evui-dropdown-multiple-input-area{
     width: 100%;

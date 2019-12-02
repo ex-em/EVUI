@@ -1,0 +1,60 @@
+@import '../utils/variables';
+
+$ev-themes: (
+  light: (
+    font-color-base: $color-black,
+
+    /* button
+    -------------------------- */
+    button-active-bg: $color-white,
+    button-disabled: $color-light-level4,
+    button-disabled-bg: $color-light-level1,
+    button-disabled-border: $color-light-level2,
+    button-ghost: $color-light-level5,
+    button-ghost-border: $color-light-level2,
+    button-dashed: $color-light-level5,
+    button-dashed-border: $color-light-level2,
+    button-dashed-active-bg: $color-light-level1,
+    button-text: $color-black,
+
+    /* window
+    -------------------------- */
+    window-bg: $color-white,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #545965,
+    grid-bottom-border: #C9CFDC,
+    grid-row-selected: #E3E7F0,
+    grid-cell-text: #797E8A,
+
+  ),
+  dark: (
+    font-color-base: $color-white,
+
+    /* button
+    -------------------------- */
+    button-active-bg: $color-white,
+    button-disabled: $color-light-level4,
+    button-disabled-bg: $color-light-level1,
+    button-disabled-border: $color-light-level2,
+    button-ghost: $color-light-level5,
+    button-ghost-border: $color-light-level2,
+    button-dashed: $color-light-level5,
+    button-dashed-border: $color-light-level2,
+    button-dashed-active-bg: $color-light-level1,
+    button-text: $color-black,
+
+    /* window
+    -------------------------- */
+    window-bg: $color-dark-level2,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #797E8A,
+    grid-bottom-border: #545965,
+    grid-row-selected: #797E8A,
+    grid-cell-text: #C9CFDC,
+
+  ),
+) !default;

@@ -36,9 +36,6 @@
 </template>
 
 <script>
-  import '@/styles/all.css';
-  import '@/styles/evui.css';
-
   const prefixEvui = 'ev-contextmenu-children';
 
   export default {
@@ -129,10 +126,11 @@
 </script>
 
 <style>
+  @import '~@/styles/default';
+
   .ev-contextmenu-children{
     position: relative;
     float: left;
-    z-index: 9999;
   }
   .ev-contextmenu-children-body{
     float: left;

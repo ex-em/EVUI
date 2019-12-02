@@ -21,8 +21,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-
   const prefixCls = 'evui-slider-tooltip';
 
   export default {
@@ -77,7 +75,8 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  @import '~@/styles/default';
   .evui-slider-tooltip {
     position: absolute;
     user-select: none;
@@ -89,7 +88,7 @@
     left: -17px;
     font-size: 12px;
     line-height: 1.5;
-    z-index: 1060;
+    z-index: 100;
   }
   .evui-slider-tooltip-popper.on {
     visibility: visible;

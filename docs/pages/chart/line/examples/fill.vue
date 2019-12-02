@@ -20,7 +20,8 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
+          series1: { name: 'AAAAAA#1', show: true, type: 'line', fill: true, point: false },
+          series2: { name: 'bbbbbb#1', show: true, type: 'line', fill: true, point: false },
         },
         labels: [
           +new Date('2017/01/01 00:00:00'),
@@ -31,6 +32,7 @@
         ],
         chartData: {
           series1: [100, 150, 51, 150, 350],
+          series2: [200, 300, 100, 200, 100],
         },
         chartOptions: {
           width: '100%',
@@ -48,12 +50,14 @@
             type: 'time',
             timeFormat: 'HH:mm:ss',
             interval: 'minute',
+            showGrid: false,
           }],
           axesY: [{
             type: 'linear',
             startToZero: true,
             autoScaleRatio: 0.1,
             showGrid: true,
+            showAxis: false,
           }],
         },
         liveBtnInfo: {

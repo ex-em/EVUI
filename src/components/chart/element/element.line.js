@@ -104,7 +104,7 @@ class Line {
 
     const dataLen = this.data.length;
 
-    if (this.fill && dataLen > 1) {
+    if (this.fill && dataLen) {
       ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${this.fillOpacity})` || '';
       if (this.stackIndex) {
         this.data.slice().reverse().forEach((curr) => {
@@ -113,7 +113,7 @@ class Line {
 
           ctx.lineTo(x, y);
         });
-      } else {
+      } else if (startFillIndex < dataLen) {
         ctx.lineTo(this.data[dataLen - 1].xp, endPoint);
         ctx.lineTo(this.data[startFillIndex].xp, endPoint);
       }

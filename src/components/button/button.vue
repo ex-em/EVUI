@@ -12,8 +12,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-
   const prefixCls = 'evui-btn';
 
   export default {
@@ -22,8 +20,8 @@
         type: String,
         default: 'button',
         validator(value) {
-            const list = ['button', 'submit', 'reset'];
-            return list.indexOf(value) > -1;
+          const list = ['button', 'submit', 'reset'];
+          return list.indexOf(value) > -1;
         },
       },
       type: {
@@ -84,323 +82,274 @@
   };
 </script>
 
-<style>
-.evui-btn {
-  display: inline-block;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  vertical-align: middle;
-  line-height: 100%;
-  font-size: 12px;
-  cursor: pointer;
-  user-select: none;
-  transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
-}
-.evui-btn:hover {
-  opacity: 0.8;
-}
-.evui-btn.active,
-.evui-btn:active {
-  background-color:#fff;
-  border-color:#2b85e4;
-}
-.evui-btn.disabled>*,
-.evui-btn[disabled]>* {
-  pointer-events: none;
-}
-.evui-btn.disabled,
-.evui-btn.disabled:active,
-.evui-btn.disabled:hover,
-.evui-btn[disabled],
-.evui-btn[disabled]:active,
-.evui-btn[disabled]:hover {
-  color:#bbbec4;
-  background-color:#f7f7f7;
-  border-color:#dddee1;
-}
+<style lang="scss">
+  @import '~@/styles/default';
 
-.evui-btn-span{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .evui-btn {
+    display: inline-block;
+    border: $border-solid transparent;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    user-select: none;
+    transition: color .2s linear,
+    background-color .2s linear,
+    border .2s linear,
+    opacity .2s linear,
+    box-shadow .2s linear;
 
-/** evui-btn > type(primary) **/
+    &:hover {
+      opacity: 0.8;
+    }
 
-.evui-btn-primary {
-  color:#fff;
-  background-color:#2d8cf0;
-  border-color:#2d8cf0;
-}
-.evui-btn-primary:hover {
-  background-color:#50A5F0;
-  border-color:#50A5F0;
-}
-.evui-btn-primary.active,
-.evui-btn-primary:active {
-  background-color:#2b85e4;
-  border-color:#2b85e4;
-}
-.evui-btn-primary.disabled,
-.evui-btn-primary.disabled:active,
-.evui-btn-primary.disabled:hover,
-.evui-btn-primary[disabled],
-.evui-btn-primary[disabled]:active,
-.evui-btn-primary[disabled]:hover {
-  color:#bbbec4;
-  background-color:#f7f7f7;
-  border-color:#dddee1;
-}
+    &.active,
+    &:active {
+      background-color: $color-white;
+      border-color: $color-primary;
+    }
 
-/** evui-btn > type(info) **/
+    &.disabled>*,
+    &[disabled]>* {
+      pointer-events: none;
+    }
 
-.evui-btn-info {
-  color: #fff;
-  background-color: #2db7f5 !important;
-  border-color: #2db7f5 !important;
-}
-.evui-btn-info:hover {
-  background-color: #57c5f7 !important;
-  border-color: #57c5f7 !important;
-}
-.evui-btn-info.active,
-.evui-btn-info:active {
-  color: #f2f2f2 !important;
-  background-color: #2baee9 !important;
-  border-color: #2baee9 !important;
-}
-.evui-btn-info.disabled,
-.evui-btn-info.disabled:active,
-.evui-btn-info.disabled:hover,
-.evui-btn-info[disabled],
-.evui-btn-info[disabled]:active,
-.evui-btn-info[disabled]:hover {
-  color: #c5c8ce !important;
-  background-color: #f7f7f7 !important;
-  border-color: #dcdee2 !important;
-}
+    &.disabled,
+    &.disabled:active,
+    &.disabled:hover,
+    &[disabled],
+    &[disabled]:active,
+    &[disabled]:hover {
+      @include evThemify() {
+        color: evThemed('button-disabled') !important;
+        background-color: evThemed('button-disabled-bg') !important;
+        border-color: evThemed('button-disabled-border') !important;
+      }
+    }
 
-/** evui-btn > type(warning) **/
+    &-span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 
-.evui-btn-warning {
-  color: #fff;
-  background-color: #f90;
-  border-color: #f90;
-}
-.evui-btn-warning:hover {
-  background-color: #ffad33;
-  border-color: #ffad33;
-}
-.evui-btn-warning.active,
-.evui-btn-warning:active {
-  color: #f2f2f2;
-  background-color: #f29100;
-  border-color: #f29100;
-}
-.evui-btn-warning.disabled,
-.evui-btn-warning.disabled:active,
-.evui-btn-warning.disabled:hover,
-.evui-btn-warning[disabled],
-.evui-btn-warning[disabled]:active,
-.evui-btn-warning[disabled]:hover {
-  color: #c5c8ce;
-  background-color: #f7f7f7;
-  border-color: #dcdee2;
-}
+  /** evui-btn > type(primary) **/
+  .evui-btn-primary {
+    color: $color-white;
+    background-color: $color-primary;
+    border-color: $color-primary;
 
-/** evui-btn > type(error) **/
+    &.active,
+    &:active {
+      background-color: darken($color-primary, 10%);
+      border-color: darken($color-primary, 10%);
+    }
+  }
 
-.evui-btn-error {
-  color: #fff !important;
-  background-color: #ed4014 !important;
-  border-color: #ed4014 !important;
-}
-.evui-btn-error:hover {
-  background-color: #f16643 !important;
-  border-color: #f16643 !important;
-}
-.evui-btn-error.active,
-.evui-btn-error:active {
-  color: #f2f2f2 !important;
-  background-color: #e13d13 !important;
-  border-color: #e13d13 !important;
-}
-.evui-btn-error.disabled,
-.evui-btn-error.disabled:active,
-.evui-btn-error.disabled:hover,
-.evui-btn-error[disabled],
-.evui-btn-error[disabled]:active,
-.evui-btn-error[disabled]:hover {
-  color: #c5c8ce !important;
-  background-color: #f7f7f7 !important;
-  border-color: #dcdee2 !important;
-}
+  /** evui-btn > type(info) **/
+  .evui-btn-info {
+    color: $color-white;
+    background-color: $color-info !important;
+    border-color: $color-info !important;
 
-/** evui-btn > type(gost) **/
+    &.active,
+    &:active {
+      background-color: darken($color-info, 10%);
+      border-color: darken($color-info, 10%);
+    }
+  }
 
-.evui-btn-ghost {
-  color: #495060;
-  background-color: transparent;
-  border-color: #dddee1
-}
-.evui-btn-ghost:hover {
-  color: #57a3f3;
-  background-color: transparent;
-  border-color: #57a3f3
-}
-.evui-btn-ghost.active,
-.evui-btn-ghost:active {
-  color: #2b85e4;
-  background-color: transparent;
-  border-color: #2b85e4
-}
-.evui-btn-ghost:focus {
-  -webkit-box-shadow: 0 0 0 2px rgba(45, 140, 240, .2);
-  box-shadow: 0 0 0 2px rgba(45, 140, 240, .2)
-}
-.evui-btn-ghost.disabled,
-.evui-btn-ghost.disabled:active,
-.evui-btn-ghost.disabled:focus,
-.evui-btn-ghost.disabled:hover,
-.evui-btn-ghost[disabled],
-.evui-btn-ghost[disabled]:active,
-.evui-btn-ghost[disabled]:focus,
-.evui-btn-ghost[disabled]:hover{
-  color: #bbbec4;
-  background-color: #f7f7f7;
-  border-color: #dddee1
-}
+  /** evui-btn > type(warning) **/
+  .evui-btn-warning {
+    color: $color-white;
+    background-color: $color-warning;
+    border-color: $color-warning;
 
-/** evui-btn > type(dashed) **/
+    &.active,
+    &:active {
+      background-color: darken($color-warning, 10%);
+      border-color: darken($color-warning, 10%);
+    }
+  }
 
-.evui-btn-dashed {
-  color: #495060;
-  background-color: transparent;
-  border-color: #dddee1;
-  border-style: dashed
-}
-.evui-btn-dashed:hover {
-  color: #6d7380;
-  background-color: rgba(255, 255, 255, .2);
-  border-color: #e4e5e7
-}
-.evui-btn-dashed.active,
-.evui-btn-dashed:active {
-  color: #454c5b;
-  background-color: rgba(0, 0, 0, .05);
-  border-color: rgba(0, 0, 0, .05)
-}
-.evui-btn-dashed.disabled,
-.evui-btn-dashed.disabled:active,
-.evui-btn-dashed.disabled:focus,
-.evui-btn-dashed.disabled:hover,
-.evui-btn-dashed[disabled],
-.evui-btn-dashed[disabled]:active,
-.evui-btn-dashed[disabled]:focus,
-.evui-btn-dashed[disabled]:hover,
-fieldset[disabled] .evui-btn-dashed,
-fieldset[disabled] .evui-btn-dashed:active,
-fieldset[disabled] .evui-btn-dashed:focus,
-fieldset[disabled] .evui-btn-dashed:hover {
-  color: #bbbec4;
-  background-color: #f7f7f7;
-  border-color: #dddee1
-}
-.evui-btn-dashed:hover {
-  color: #57a3f3;
-  background-color: transparent;
-  border-color: #57a3f3
-}
-.evui-btn-dashed:active {
-  color: #2b85e4;
-  background-color: transparent;
-  border-color: #2b85e4
-}
-.evui-btn-dashed:focus {
-  -webkit-box-shadow: 0 0 0 2px rgba(45, 140, 240, .2);
-  box-shadow: 0 0 0 2px rgba(45, 140, 240, .2)
-}
+  /** evui-btn > type(error) **/
+  .evui-btn-error {
+    color: $color-white !important;
+    background-color: $color-error;
+    border-color: $color-error;
 
-/** evui-btn > type(text) **/
+    &.active,
+    &:active {
+      background-color: darken($color-error, 10%);
+      border-color: darken($color-error, 10%);
+    }
+  }
 
-.evui-btn-text {
-  color: #000000;
-  background-color: transparent;
-  border-color: transparent;
-}
-.evui-btn-text:hover {
-  color: #6d7380;
-  background-color: rgba(255,255,255,.2);
-  border-color: rgba(255,255,255,.2)
-}
-.evui-btn-text:active {
-  color: #454c5b;
-  background-color: rgba(0,0,0,.05);
-  border-color: rgba(0,0,0,.05)
-}
-.evui-btn-text:hover {
-  color: #57a3f3;
-  background-color: transparent;
-  border-color: transparent;
-}
-.evui-btn-text:active {
-  color:#2b85e4;
-  background-color:transparent;
-  border-color:transparent
-}
-.evui-btn-text.disabled,
-.evui-btn-text.disabled:active,
-.evui-btn-text.disabled:hover,
-.evui-btn-text[disabled],
-.evui-btn-text[disabled]:active,
-.evui-btn-text[disabled]:hover {
-  color: #bbbec4;
-  background-color: #f7f7f7;
-  border-color: #dddee1
-}
 
-/** evui-btn > shape > circle **/
+  /** evui-btn > type(ghost) **/
+  .evui-btn-ghost {
+    background-color: transparent;
 
-.evui-btn-radius {
-  border-radius: 32px;
-}
-.evui-btn-circle {
-  padding: 9px;
-  border-radius: 50%;
-}
+    @include evThemify() {
+      color: evThemed('button-ghost');
+      border-color: evThemed('button-ghost-border');
+    }
 
-/** size **/
+    &.active,
+    &:active {
+      color: $color-primary;
+      border-color: $color-primary;
+    }
+  }
 
-.evui-btn-size-small {
-  padding: 7px 10px;
-  font-size: 12px;
-}
-.evui-btn-size-medium {
-  padding: 8px 12px;
-  font-size: 14px;
-}
-.evui-btn-size-large {
-  padding: 10px 14px;
-  font-size: 16px;
-}
+  /** evui-btn > type(dashed) **/
+  .evui-btn-dashed {
+    background-color: transparent;
+    border-style: dashed;
 
-.evui-btn-size-small i { font-size: 12px !important; }
-.evui-btn-size-medium i { font-size: 14px !important; }
-.evui-btn-size-large i { font-size: 16px !important; }
+    @include evThemify() {
+      color: evThemed('button-dashed');
+      border-color: evThemed('button-dashed-border');
+    }
 
-@keyframes spin {
-  to { -webkit-transform: rotate(360deg); }
-}
-@-webkit-keyframes spin {
-  to { -webkit-transform: rotate(360deg); }
-}
-@-webkit-keyframes grdAiguille{
-  0%{-webkit-transform:rotate(0deg);}
-  100%{-webkit-transform:rotate(360deg);}
-}
-@keyframes grdAiguille{
-  0%{transform:rotate(0deg);}
-  100%{transform:rotate(360deg);}
-}
+    &.active,
+    &:active {
+      color: $color-primary;
+      border-color: $color-primary;
+    }
+  }
 
+  fieldset[disabled] .evui-btn-dashed,
+  fieldset[disabled] .evui-btn-dashed:active,
+  fieldset[disabled] .evui-btn-dashed:focus,
+  fieldset[disabled] .evui-btn-dashed:hover {
+    @include evThemify() {
+      color: evThemed('button-disabled') !important;
+      background-color: evThemed('button-disabled-bg') !important;
+      border-color: evThemed('button-disabled-border') !important;
+    }
+  }
+
+  /*
+   ** 스타일 적용 안 되어 주석 처리 **
+  .evui-btn-dashed:focus {
+    -webkit-box-shadow: 0 0 0 2px rgba(45, 140, 240, .2);
+    box-shadow: 0 0 0 2px rgba(45, 140, 240, .2)
+  }
+  */
+
+  /** evui-btn > type(text) **/
+  .evui-btn-text {
+    background-color: transparent;
+    border-color: transparent;
+
+    @include evThemify() {
+      color: evThemed('button-text');
+    }
+
+    &:hover {
+      color: $color-info;
+    }
+
+    &.active,
+    &:active {
+      color: $color-primary;
+    }
+  }
+  /*
+   ** 중복으로 주석 처리 **
+  .evui-btn-text:hover {
+    color: #6d7380;
+    background-color: rgba(255,255,255,.2);
+    border-color: rgba(255,255,255,.2)
+  }
+  .evui-btn-text:active {
+    color: #454c5b;
+    background-color: rgba(0,0,0,.05);
+    border-color: rgba(0,0,0,.05)
+  }
+  */
+
+  /** evui-btn > shape > circle **/
+  .evui-btn-radius {
+    border-radius: 32px;
+  }
+  .evui-btn-circle {
+    border-radius: 50%;
+  }
+
+  /** size **/
+  .evui-btn-size-small {
+    padding: 7px 10px;
+    font-size: $font-size-base;
+
+    &.evui-btn-circle {
+      padding: 7px;
+    }
+
+    i {
+      font-size: $font-size-base !important;
+    }
+  }
+
+  .evui-btn-size-medium {
+    padding: 8px 12px;
+    font-size: $font-size-medium;
+
+    &.evui-btn-circle {
+      padding: 8px;
+    }
+
+    i {
+      font-size: $font-size-medium !important;
+    }
+  }
+
+  .evui-btn-size-large {
+    padding: 10px 14px;
+    font-size: $font-size-large;
+
+    &.evui-btn-circle {
+      padding: 10px;
+    }
+
+    i {
+      font-size: $font-size-large !important;
+    }
+  }
+
+  @-webkit-keyframes spin {
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @-webkit-keyframes grdAiguille {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes grdAiguille {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
 </style>

@@ -262,7 +262,7 @@
   import util from '@/common/utils.table';
   import treeUtil from '@/components/tree/tree.util';
   import _ from 'lodash-es';
-  import '@/styles/all.css';
+  import '@/styles/lib/fontawesome.css';
 
   export default {
     filters: {
