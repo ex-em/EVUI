@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import '@/styles/all.css';
+  import '@/styles/lib/fontawesome.css';
   import menuNav from './menu';
 
   export default {
@@ -244,6 +244,5 @@
   }
   .evui-main-content-body {
     padding: 20px;
-    border-left: 1px solid #dddee0;
   }
 </style>

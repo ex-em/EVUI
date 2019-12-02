@@ -118,18 +118,17 @@
   .ev-loadingmask {
     position: absolute;
     overflow: hidden;
-    z-index: 8887;
+    z-index: 300;
   }
   .ev-loadingmask-center {
     position: relative;
   }
+
   @keyframes ev-loadingmask-fadedelay {
     80% {
-      -webkit-opacity: 0.2;
       opacity: 0.2;
     }
     100% {
-      -webkit-opacity: 0.9;
       opacity: 0.9;
     }
   }

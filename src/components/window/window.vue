@@ -37,8 +37,6 @@
 </template>
 
 <script>
-  import '@/styles/evui.css';
-
   export default {
     props: {
       width: {
@@ -85,6 +83,7 @@
     data() {
       return {
         prefixCls: 'ev-window',
+        isMovedEl: false,
         vIf: true,
         vShow: true,
         windowId: '',
@@ -125,6 +124,12 @@
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = { [`${this.prefixCls}-header-area`]: true };
       this.windowCls = { [this.prefixCls]: true };
+    },
+    mounted() {
+      if (!this.isMovedEl) {
+        this.isMovedEl = true;
+        this.$root.$el.appendChild(this.$el);
+      }
     },
     beforeDestroy() {
       this.close();
@@ -426,11 +431,10 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        const clientRect = this.$el.getBoundingClientRect();
         const bodyWidth = document.body.clientWidth;
         const bodyHeight = document.body.clientHeight;
-        const top = (bodyHeight / 2) - (this.height / 2) - clientRect.top;
-        const left = (bodyWidth / 2) - (this.width / 2) - clientRect.left;
+        const top = (bodyHeight / 2) - (this.height / 2);
+        const left = (bodyWidth / 2) - (this.width / 2);
 
         return {
           top: this.numberToPixel(top),
@@ -511,18 +515,22 @@
   };
 </script>
 
-<style>
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-window {
     position: absolute;
     border: 9px solid #424242;
     border-radius: 8px;
-    background: #424242;
     overflow: visible;
-    z-index: 8888;
+    z-index: 700;
+
+    @include evThemify() {
+      background-color: evThemed('window-bg');
+    }
   }
-  .gray .ev-window {
+  .dark .ev-window {
     border: 9px solid #595C64;
-    background: #212227;
   }
   .ev-window-header-area {
     position: absolute;
@@ -530,14 +538,12 @@
     width: 100%;
     padding-left: 6px;
     border-bottom: 1px solid #B6B6B6;
-    background: #ffffff;
     font-family: Verdana, Arial, sans-serif;
     align-items: center;
     user-select: none;
   }
-  .gray .ev-window-header-area {
+  .dark .ev-window-header-area {
     border-bottom: 1px solid #464850;
-    background: #27282E;
     color: #ABAEB5;
   }
   .ev-window-title-area {
@@ -550,14 +556,14 @@
     background-color: #212227;
     color: #ABAEB5;
   }
-  .ev-window-expand-btn-line{
+  .ev-window-expand-btn-line {
     position: absolute;
     top: 0;
     right: 66px;
     height: 32px;
     border-left: 1px solid #B6B6B6;
   }
-  .gray .ev-window-expand-btn-line {
+  .dark .ev-window-expand-btn-line {
     border-left: 1px solid #464850;
   }
   .ev-window-expand-btn {
@@ -573,21 +579,24 @@
     background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
+
+    &:before {
+      top: -1px;
+      right: 1px;
+      font-size: 18px;
+      content: 'ㅁ';
+    }
+
+    &:hover {
+      background: #319de9;
+      cursor: pointer;
+    }
   }
-  .gray .ev-window-expand-btn {
+  .dark .ev-window-expand-btn {
     color: #c7c8cc;
     background: #595c64;
   }
-  .ev-window-expand-btn:before {
-    top: -1px;
-    right: 1px;
-    font-size: 18px;
-    content: 'ㅁ';
-  }
-  .ev-window-expand-btn:hover {
-    background: #319de9;
-    cursor: pointer;
-  }
+
   .ev-window-close-btn-line {
     position: absolute;
     top: 0;
@@ -595,7 +604,7 @@
     height: 32px;
     border-left: 1px solid #B6B6B6;
   }
-  .gray .ev-window-close-btn-line {
+  .dark .ev-window-close-btn-line {
     border-left: 1px solid #464850;
   }
   .ev-window-close-btn {
@@ -611,30 +620,30 @@
     background: #B6B6B6;
     font-size: 13px;
     font-weight: bold;
+
+    &:before {
+      top: 0;
+      right: 6px;
+      font-size: 11px;
+      content: 'X';
+    }
+
+    &:hover {
+      background: #319de9;
+      cursor: pointer;
+    }
   }
-  .gray .ev-window-close-btn {
+
+  .dark .ev-window-close-btn {
     color: #c7c8cc;
     background: #595c64;
   }
-  .ev-window-close-btn:before{
-    top: 0;
-    right: 6px;
-    font-size: 11px;
-    content: 'X';
-  }
-  .ev-window-close-btn:hover{
-    background: #319de9;
-    cursor: pointer;
-  }
-  .ev-window-body-area{
+
+  .ev-window-body-area {
     position: relative;
     width: 100%;
     height: 100%;
     padding: 6px;
-    background: white;
     overflow: auto;
-  }
-  .gray .ev-window-body-area{
-    background: transparent;
   }
 </style>

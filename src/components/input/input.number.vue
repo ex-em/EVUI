@@ -118,7 +118,7 @@
         type: Number,
         default: 1,
         validator(value) {
-          return !isNaN(Number(value)) && value >= 0 && value <= 100;
+          return typeof value === 'number' && !Number.isNaN(value) && value >= 0 && value <= 100;
         },
       },
       formatter: {

@@ -1,4 +1,4 @@
-const module = {
+const modules = {
   pieDataSet: [],
   drawPie() {
     const ctx = this.bufferCtx;
@@ -161,4 +161,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;

@@ -475,7 +475,7 @@
   .ev-timepicker-panel {
     display: none;
     position: absolute;
-    z-index: 300;
+    z-index: 100;
     width: 180px;
     height: 224px;
     margin: 12px 0 0 0;

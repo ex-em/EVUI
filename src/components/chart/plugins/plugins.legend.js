@@ -1,5 +1,5 @@
-const module = {
-  createLegend() {
+const modules = {
+  createLegendLayout() {
     this.legendDOM = document.createElement('div');
     this.legendDOM.className = 'ev-chart-legend';
     this.legendBoxDOM = document.createElement('div');
@@ -15,15 +15,37 @@ const module = {
   },
   initLegend() {
     if (!this.isInitLegend) {
-      this.createLegend();
+      this.createLegendLayout();
+      this.initEvent();
     }
 
+    this.addLegendList();
+    this.isInitLegend = true;
+  },
+
+  addLegendList() {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
-    // event delegation
+
+    groups.forEach((group) => {
+      group.slice().reverse().forEach((series) => {
+        if (series.showLegend) {
+          this.addLegend(seriesList[series]);
+        }
+      });
+    });
+
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp && series.showLegend) {
+        this.addLegend(series);
+      }
+    });
+  },
+
+  initEvent() {
     this.legendBoxDOM.addEventListener('click', (e) => {
       const opt = this.options.legend;
-      const type = e.target.evcType;
+      const type = e.target.domType;
 
       let targetDOM;
       if (type === 'container') {
@@ -92,44 +114,13 @@ const module = {
 
     this.mouseMove = this.onMouseMove.bind(this); // resizing function
     this.mouseUp = this.onMouseUp.bind(this); // resizing function
-
-    if (groups.length) {
-      groups.forEach((group) => {
-        group.slice().reverse().forEach((series) => {
-          if (series.showLegend) {
-            this.addLegend(seriesList[series]);
-          }
-        });
-      });
-    }
-
-    Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp && series.showLegend) {
-        this.addLegend(series);
-      }
-    });
-
-    this.isInitLegend = true;
   },
+
   updateLegend() {
     this.resetLegend();
-    const groups = this.data.groups;
-    const seriesList = this.seriesList;
-
-    if (groups.length) {
-      groups.forEach((group) => {
-        group.slice().reverse().forEach((series) => {
-          this.addLegend(seriesList[series]);
-        });
-      });
-    }
-
-    Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp && series.showLegend) {
-        this.addLegend(series);
-      }
-    });
+    this.addLegendList();
   },
+
   resetLegend() {
     const legendDOM = this.legendBoxDOM;
 
@@ -137,6 +128,7 @@ const module = {
       legendDOM.removeChild(legendDOM.firstChild);
     }
   },
+
   addLegend(series) {
     const opt = this.options.legend;
     const containerDOM = document.createElement('div');
@@ -150,19 +142,16 @@ const module = {
     nameDOM.series = series;
 
     colorDOM.style.backgroundColor = series.color;
-    colorDOM.evcType = 'color';
+    colorDOM.domType = 'color';
     nameDOM.style.color = opt.color;
-    // nameDOM.style.width = `${opt.width - 48}px`; // y-scroll width + left margin
-    // nameDOM.style.padding = '0 48px 0 0';
     nameDOM.textContent = series.name;
     nameDOM.setAttribute('title', series.name);
-    nameDOM.evcType = 'name';
+    nameDOM.domType = 'name';
 
     this.legendDOM.style.padding = '0';
 
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
-    // containerDOM.style.width = `${opt.width - 32}px`; // 24 y-scroll width
 
     if (opt.position === 'top' || opt.position === 'bottom') {
       containerDOM.style.width = `${opt.width - 8}px`;
@@ -172,11 +161,12 @@ const module = {
     }
     containerDOM.style.height = `${opt.height - 4}px`;
     containerDOM.style.display = 'inline-block';
-    containerDOM.evcType = 'container';
+    containerDOM.domType = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
     this.seriesInfo.count++;
   },
+
   setLegendPosition() {
     const opt = this.options;
     const position = opt.legend.position;
@@ -184,7 +174,6 @@ const module = {
     const legendStyle = this.legendDOM.style;
     const boxStyle = this.legendBoxDOM.style;
     const resizeStyle = this.resizeDOM.style;
-
 
     let chartRect;
     const title = opt.title.show ? opt.title.height : 0;
@@ -294,6 +283,7 @@ const module = {
         break;
     }
   },
+
   updateLegendContainerSize() {
     const opt = this.options.legend;
     const container = this.legendBoxDOM.getElementsByClassName('ev-chart-legend-container');
@@ -307,6 +297,7 @@ const module = {
       }
     }
   },
+
   onMouseMove(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -367,6 +358,7 @@ const module = {
         break;
     }
   },
+
   onMouseUp(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -383,6 +375,7 @@ const module = {
     const wrapperDOMStyle = this.wrapperDOM.style;
 
     const title = opt.title.show ? opt.title.height : 0;
+    const padding = +this.legendDOM.style.paddingLeft.replace('px', '');
     let move;
 
     switch (pos) {
@@ -398,7 +391,7 @@ const module = {
         resizeDOMStyle.left = ghostDOMStyle.left;
         move = +ghostDOMStyle.left.replace('px', '');
         legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-        boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
+        boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
         opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
         wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
         break;
@@ -426,10 +419,12 @@ const module = {
     this.ghostDOM.remove();
     this.render();
   },
+
   showLegend() {
     this.resizeDOM.style.display = 'block';
     this.legendDOM.style.display = 'block';
   },
+
   hideLegend() {
     const opt = this.options;
     const wrapperStyle = this.wrapperDOM.style;
@@ -446,4 +441,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;

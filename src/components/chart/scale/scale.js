@@ -135,8 +135,11 @@ class Scale {
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
 
+    let aliasPixel;
+
     // label font 설정
     ctx.font = Util.getLabelStyle(this.labelStyle);
+    ctx.fillStyle = this.labelStyle.color;
 
     if (this.type === 'x') {
       ctx.textAlign = 'center';
@@ -146,20 +149,23 @@ class Scale {
       ctx.textBaseline = 'middle';
     }
 
-    ctx.fillStyle = this.labelStyle.color;
-    ctx.lineWidth = 1;
-    const aliasPixel = Util.aliasPixel(ctx.lineWidth);
+    if (this.showAxis) {
+      ctx.lineWidth = 2;
+      aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
-    ctx.beginPath();
-    ctx.strokeStyle = this.axisLineColor;
-    if (this.type === 'x') {
-      ctx.moveTo(startPoint, offsetPoint + aliasPixel);
-      ctx.lineTo(endPoint, offsetPoint + aliasPixel);
-    } else {
-      ctx.moveTo(offsetPoint + aliasPixel, startPoint);
-      ctx.lineTo(offsetPoint + aliasPixel, endPoint);
+      ctx.beginPath();
+      ctx.strokeStyle = this.axisLineColor;
+
+      if (this.type === 'x') {
+        ctx.moveTo(startPoint, offsetPoint + aliasPixel);
+        ctx.lineTo(endPoint, offsetPoint + aliasPixel);
+      } else {
+        ctx.moveTo(offsetPoint + aliasPixel + 1, startPoint);
+        ctx.lineTo(offsetPoint + aliasPixel + 1, endPoint);
+      }
+      ctx.stroke();
+      ctx.closePath();
     }
-    ctx.stroke();
 
     if (steps === 0 || axisMin === null) {
       return;
@@ -172,13 +178,15 @@ class Scale {
 
     ctx.beginPath();
     ctx.strokeStyle = this.gridLineColor;
+    ctx.lineWidth = 1;
+    aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
     let labelText;
     for (let ix = 0; ix <= steps; ix++) {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel;
+      linePosition = labelCenter + aliasPixel + (!ix ? 0 : -1);
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
       let labelPoint;
@@ -187,7 +195,12 @@ class Scale {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
 
-        if (ix !== 0 && ix < steps && this.showGrid) {
+        if (this.showIndicator) {
+          ctx.moveTo(linePosition, offsetPoint + 6);
+          ctx.lineTo(linePosition, offsetPoint);
+        }
+
+        if (ix !== 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -195,7 +208,16 @@ class Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (ix !== 0 && ix < steps && this.showGrid) {
+        if (ix === steps) {
+          linePosition += 1;
+        }
+
+        if (this.showIndicator) {
+          ctx.moveTo(offsetPoint - 6, linePosition);
+          ctx.lineTo(offsetPoint, linePosition);
+        }
+
+        if (ix !== 0 && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }

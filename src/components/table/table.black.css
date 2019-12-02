@@ -183,7 +183,7 @@ button {
 }
 .evui-table .evui-table-body .evui-table-columns .evui-table-columns-resizer {
   position: absolute;
-  z-index: 1000;
+  z-index: 10;
   display: block;
   background-image: none;
   background-color: rgba(0, 0, 0, 0);

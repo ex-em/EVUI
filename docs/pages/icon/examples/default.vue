@@ -4675,7 +4675,7 @@
 </template>
 
 <script>
-  import '@/styles/icon.css';
+  import '@/styles/lib/icon.css';
   import '../icon-demo.css';
 
   export default {

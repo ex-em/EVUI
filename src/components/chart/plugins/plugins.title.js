@@ -1,4 +1,4 @@
-const module = {
+const modules = {
   createTitle() {
     this.titleDOM = document.createElement('div');
     this.titleDOM.className = 'ev-chart-title';
@@ -30,4 +30,4 @@ const module = {
   },
 };
 
-export default module;
+export default modules;
