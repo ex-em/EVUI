@@ -7,6 +7,7 @@
       Open Window
     </ev-button>
     <ev-window
+      :modal="true"
       :is-show.sync="isShow"
       :body-style="{ padding: '10px' }"
       title="Title"

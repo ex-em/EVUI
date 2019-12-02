@@ -67,6 +67,10 @@
         type: Boolean,
         default: true,
       },
+      modal: {
+        type: Boolean,
+        default: false,
+      },
       isShow: {
         type: Boolean,
         default: true,
@@ -83,6 +87,7 @@
     data() {
       return {
         prefixCls: 'ev-window',
+        modelEl: null,
         isMovedEl: false,
         vIf: true,
         vShow: true,
@@ -115,7 +120,16 @@
       isShow: {
         immediate: true,
         handler() {
-          this.syncIsShow();
+          this.vIf = this.closeType === 'hide' || this.isShow;
+          this.vShow = this.isShow;
+
+          if (!this.windowStyle && this.isShow) {
+            this.$nextTick(() => {
+              this.syncIsShow();
+            });
+          } else {
+            this.syncIsShow();
+          }
         },
       },
     },
@@ -128,7 +142,15 @@
     mounted() {
       if (!this.isMovedEl) {
         this.isMovedEl = true;
-        this.$root.$el.appendChild(this.$el);
+
+        if (this.modal) {
+          this.modelEl = document.createElement('div');
+          this.modelEl.classList.add(`${this.prefixCls}-modal`);
+          this.modelEl.appendChild(this.$el);
+          this.$root.$el.appendChild(this.modelEl);
+        } else {
+          this.$root.$el.appendChild(this.$el);
+        }
       }
     },
     beforeDestroy() {
@@ -431,8 +453,8 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        const bodyWidth = document.body.clientWidth;
-        const bodyHeight = document.body.clientHeight;
+        const bodyWidth = window.innerWidth;
+        const bodyHeight = window.innerHeight;
         const top = (bodyHeight / 2) - (this.height / 2);
         const left = (bodyWidth / 2) - (this.width / 2);
 
@@ -502,14 +524,11 @@
         return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
       },
       syncIsShow() {
-        this.vIf = this.closeType === 'hide' || this.isShow;
-        this.vShow = this.isShow;
-
-        if (!this.windowStyle && this.isShow) {
-          this.$nextTick(() => {
-            this.windowStyle = this.getWindowStyle();
-          });
+        if (this.modal && this.modelEl) {
+          this.modelEl.style.display = this.vShow ? 'block' : 'none';
         }
+
+        this.windowStyle = this.getWindowStyle();
       },
     },
   };
@@ -523,7 +542,7 @@
     border: 9px solid #424242;
     border-radius: 8px;
     overflow: visible;
-    z-index: 700;
+    z-index: 99997;
 
     @include evThemify() {
       background-color: evThemed('window-bg');
@@ -645,5 +664,18 @@
     height: 100%;
     padding: 6px;
     overflow: auto;
+  }
+  .ev-window-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 100px;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    text-align: center;
+    z-index: 99998;
   }
 </style>
