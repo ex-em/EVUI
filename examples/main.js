@@ -62,6 +62,14 @@ const router = new VueRouter({
       path: '/toggle',
       component: resolve => require(['./routers/toggle'], resolve),
     },
+    {
+      path: '/message',
+      component: resolve => require(['./routers/message'], resolve),
+    },
+    {
+      path: '/notification',
+      component: resolve => require(['./routers/notification'], resolve),
+    },
   ],
 });
 
