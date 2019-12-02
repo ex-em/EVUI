@@ -258,7 +258,16 @@
         this.$emit('keyup', e);
       },
       onBlurInputField(e) {
-        this.syncSelectedValue();
+        const text = e.target.value;
+        const foundItem = this.items.find(o => o.name === text);
+
+        if (foundItem) {
+          this.setVModel(foundItem.value);
+        } else {
+          this.inputFieldValue = '';
+          this.setVModel('');
+        }
+
         this.$emit('blur', e);
       },
       onKeyUpDropDownInputField(e) {
@@ -317,9 +326,11 @@
       syncSelectedValue(value) {
         const selectedValue = this.isUseVModel ? this.vModelSelectedValue : value;
 
-        this.selectedValueList = this.multiple ? selectedValue : [selectedValue];
+        if (this.multiple) {
+          this.selectedValueList = selectedValue;
+        } else {
+          this.selectedValueList = [selectedValue];
 
-        if (!this.multiple) {
           const foundItem = this.findItemByValue(selectedValue);
           this.dropDownState = false;
           this.inputFieldValue = foundItem.name;
