@@ -135,20 +135,20 @@
     left: 0;
   }
   .ev-message {
-    min-width: 380px;
-    box-sizing: border-box;
-    border-radius: 4px;
-    border: 1px solid #EBEEF5;
+    display: flex;
     position: fixed;
     left: 50%;
     top: 20px;
-    transform: translateX(-50%);
-    background-color: #EDF2FC;
-    transition: opacity .3s, transform .4s, top .4s;
-    overflow: hidden;
+    min-width: 380px;
     padding: 15px 15px 15px 20px;
-    display: flex;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #EBEEF5;
+    background-color: #EDF2FC;
     align-items: center;
+    overflow: hidden;
+    transform: translateX(-50%);
+    transition: opacity .3s, transform .3s, top .3s;
   }
   .ev-message-fade-enter,
   .ev-message-fade-leave-active {
@@ -183,7 +183,7 @@
   .ev-message-error .el-message-content {
     color: #F56C6C;
   }
-  .el-message-content{
+  .el-message-content {
     width: 100%;
   }
 </style>
