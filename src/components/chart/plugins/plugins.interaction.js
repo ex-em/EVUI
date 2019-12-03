@@ -3,13 +3,14 @@ const modules = {
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
     const ctx = this.overlayCtx;
-    const sId = hitInfo.hitId;
     this.overlayClear();
+    this.tooltipClear();
 
-    if (sId) {
-      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx);
-      const sizeInfo = this.setTooltipLayout(hitInfo, e, offset);
-      this.drawTooltip(hitInfo, this.tooltipCtx, sizeInfo);
+    this.drawIndicator(offset);
+
+    if (Object.keys(hitInfo.items).length) {
+      this.drawItemsHighlight(hitInfo, ctx);
+      this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
       this.tooltipDOM.style.display = 'block';
     } else {
       this.tooltipDOM.scrollTop = 0;
@@ -33,27 +34,32 @@ const modules = {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      item = series.findGraphData(offset, !!this.options.horizontal);
-      if (item.data) {
-        item.name = series.name;
-        item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
-        items[sId] = item;
+      if (series.findGraphData) {
+        item = series.findGraphData(offset, !!this.options.horizontal);
 
-        const g = item.data.b || item.data.y || 0;
+        if (item.data) {
+          item.name = series.name;
+          item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+          items[sId] = item;
 
-        if (maxs.length < series.name.length) {
-          maxs = series.name;
-        }
+          const g = item.data.b || item.data.y || 0;
 
-        if (maxv.length < `${g}`.length) {
-          maxv = `${g}`;
-        }
+          if (maxs.length < series.name.length) {
+            maxs = series.name;
+          }
 
-        if (item.hit) {
-          hitId = sId;
+          if (maxv.length < `${g}`.length) {
+            maxv = `${g}`;
+          }
+
+          if (item.hit) {
+            hitId = sId;
+          }
         }
       }
     }
+
+    hitId = hitId === null ? sIds[0] : hitId;
 
     return { items, hitId, maxTip: [maxs, maxv] };
   },

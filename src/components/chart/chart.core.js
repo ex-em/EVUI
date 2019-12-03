@@ -56,7 +56,7 @@ class EvChart {
 
     this.seriesList = {};
 
-    this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 100);
+    this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 30);
     this.seriesInfo = {
       charts: {
         pie: [],
@@ -91,7 +91,10 @@ class EvChart {
 
     this.initRect();
     this.drawChart();
-    this.createTooltipDOM();
+
+    if (options.useTooltip) {
+      this.createTooltipDOM();
+    }
   }
 
   initRect() {
@@ -407,11 +410,12 @@ class EvChart {
       if (this.legendDOM) {
         this.resetLegend();
       }
+
+      if (groups.length) {
+        this.addGroupInfo(groups);
+      }
     }
 
-    if (groups.length) {
-      this.addGroupInfo(groups);
-    }
     this.createDataSet(data, labels);
 
     this.minMax = this.getStoreMinMax();
@@ -485,6 +489,36 @@ class EvChart {
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
+  }
+
+  destroyChart() {
+    const target = this.target;
+
+    this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
+    this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
+
+    if (this.options.useTooltip) {
+      this.tooltipDOM.removeChild(this.tooltipCanvas);
+      document.body.removeChild(this.tooltipDOM);
+
+      this.tooltipDOM = null;
+      this.tooltipCanvas = null;
+    }
+
+    this.wrapperDOM = null;
+    this.chartDOM = null;
+    this.legendDOM = null;
+    this.legendBoxDOM = null;
+    this.resizeDOM = null;
+    this.ghostDOM = null;
+    this.titleDOM = null;
+    this.displayCanvas = null;
+    this.bufferCanvas = null;
+    this.overlayCanvas = null;
+
+    while (target.hasChildNodes()) {
+      target.removeChild(target.firstChild);
+    }
   }
 }
 
