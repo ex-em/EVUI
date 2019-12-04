@@ -244,6 +244,10 @@
               if (numberValueLength > 3 && numberValueLength !== 5 && numberValueLength !== 7) {
                 vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
               }
+              if (!numberValueLength) {
+                vm.calendar.setDateTime(null);
+                vm.dataValue = null;
+              }
             }
           },
         });
