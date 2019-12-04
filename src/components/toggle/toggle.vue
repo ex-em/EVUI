@@ -124,6 +124,9 @@
     computed: {
     },
     watch: {
+      value(val) {
+        this.dataToggleOn = val;
+      },
       toggleText: {
         async handler() {
           await this.setToggleStyle();
