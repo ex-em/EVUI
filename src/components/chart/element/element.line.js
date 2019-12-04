@@ -48,7 +48,6 @@ class Line {
 
     let x;
     let y;
-    let aliasPixel;
     let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
@@ -70,8 +69,7 @@ class Line {
       y = Canvas.calculateY(curr.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
       if (x !== null) {
-        aliasPixel = Util.aliasPixel(x);
-        x += aliasPixel;
+        x += Util.aliasPixel(x);
       }
 
       if (y === null || x === null) {
@@ -137,25 +135,19 @@ class Line {
     const gdata = item.data;
     const ctx = context;
 
-    if (!this.point) {
-      return;
-    }
-
     const x = gdata.xp;
     const y = gdata.yp;
 
+    ctx.save();
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.lineWidth;
     ctx.fillStyle = this.color;
 
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
-    ctx.shadowColor = this.color;
-
     if (x !== null && y !== null) {
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.pointSize, x, y);
     }
+
+    ctx.restore();
   }
 
   findGraphData(offset) {
@@ -174,14 +166,14 @@ class Line {
       const ex = sx + gdata[m].w;
       const ey = sy + gdata[m].h;
 
-      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
+      if ((sx - 2 <= xp) && (xp <= ex + 2)) {
         item.data = gdata[m];
 
-        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
+        if ((ey - 2 <= yp) && (yp <= sy + 2)) {
           item.hit = true;
         }
         return item;
-      } else if (sx + 4 < xp) {
+      } else if (sx + 2 < xp) {
         s = m + 1;
       } else {
         e = m - 1;

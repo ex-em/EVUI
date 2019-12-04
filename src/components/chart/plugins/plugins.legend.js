@@ -28,9 +28,9 @@ const modules = {
     const seriesList = this.seriesList;
 
     groups.forEach((group) => {
-      group.slice().reverse().forEach((series) => {
-        if (series.showLegend) {
-          this.addLegend(seriesList[series]);
+      group.slice().reverse().forEach((sId) => {
+        if (seriesList[sId] && seriesList[sId].showLegend) {
+          this.addLegend(seriesList[sId]);
         }
       });
     });
@@ -43,7 +43,7 @@ const modules = {
   },
 
   initEvent() {
-    this.legendBoxDOM.addEventListener('click', (e) => {
+    this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
       const type = e.target.domType;
 
@@ -79,9 +79,9 @@ const modules = {
       colorDOM.classList.toggle('inactive');
       nameDOM.classList.toggle('inactive');
       this.update();
-    });
+    };
 
-    this.resizeDOM.addEventListener('mousedown', (e) => {
+    this.onResizeMouseDown = (e) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -110,7 +110,10 @@ const modules = {
 
       this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
       this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
-    });
+    };
+
+    this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
+    this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
 
     this.mouseMove = this.onMouseMove.bind(this); // resizing function
     this.mouseUp = this.onMouseUp.bind(this); // resizing function
