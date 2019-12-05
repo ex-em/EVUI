@@ -46,6 +46,12 @@ $ev-themes: (
     window-btn: $color-dark-level6,
     window-btn-bg: transparent,
 
+    /* tab
+    -------------------------- */
+    tab-bg: $color-light-level1,
+    tab-active-bg: $color-light-level1,
+    tab-border: $color-light-level6,
+
     /* grid
     -------------------------- */
     grid-header-border: $color-light-level7,
@@ -99,6 +105,11 @@ $ev-themes: (
     window-border: $color-dark-level6,
     window-btn: $color-dark-level8,
     window-btn-bg: $color-dark-level5,
+
+    /* tab
+    -------------------------- */
+    tab-bg: $color-dark-level6,
+    tab-border: $color-dark-level1,
 
     /* grid
     -------------------------- */
