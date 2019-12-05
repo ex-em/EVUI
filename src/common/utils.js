@@ -113,3 +113,6 @@ export function quadrillion(v) {
   return truthy(v) ? 1e15 * v : 0;
 }
 
+export function numberWithComma(v) {
+  return truthy(v) ? v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : false;
+}
