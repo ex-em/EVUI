@@ -1,12 +1,18 @@
+import { numberWithComma } from '@/common/utils';
+
 const modules = {
   onMouseMoveEvent(e) {
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
     const ctx = this.overlayCtx;
+    const indOpt = this.options.indicator;
+
     this.overlayClear();
     this.tooltipClear();
 
-    this.drawIndicator(offset);
+    if (indOpt.use) {
+      this.drawIndicator(offset, indOpt.color);
+    }
 
     if (Object.keys(hitInfo.items).length) {
       this.drawItemsHighlight(hitInfo, ctx);
@@ -43,13 +49,14 @@ const modules = {
           items[sId] = item;
 
           const g = item.data.b || item.data.y || 0;
+          const cg = numberWithComma(g);
 
           if (maxs.length < series.name.length) {
             maxs = series.name;
           }
 
-          if (maxv.length < `${g}`.length) {
-            maxv = `${g}`;
+          if (maxv.length < `${cg}`.length) {
+            maxv = `${cg}`;
           }
 
           if (item.hit) {

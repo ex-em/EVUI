@@ -122,15 +122,23 @@ class EvChart {
   }
 
   drawSeries() {
-    const ctx = this.bufferCtx;
-    const chartRect = this.chartRect;
-    const labelOffset = this.labelOffset;
-    const axesSteps = this.axesSteps;
-    const isHorizontal = this.options.horizontal;
     const thickness = this.options.thickness;
+    const isHorizontal = this.options.horizontal;
+    const maxTip = this.options.maxTip;
+    const maxInfo = this.minMax[isHorizontal ? 'x' : 'y'];
+
+    const opt = {
+      ctx: this.bufferCtx,
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+      maxTipOpt: { background: maxTip.background, color: maxTip.color },
+      isHorizontal,
+    };
 
     let showIndex = 0;
     let showSeriesCount = 0;
+
     this.seriesInfo.charts.bar.forEach((series) => {
       if (this.seriesList[series].show) {
         showSeriesCount++;
@@ -144,20 +152,13 @@ class EvChart {
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
+        const maxSID = maxInfo[series[isHorizontal ? 'xAxisIndex' : 'yAxisIndex']].maxSID;
+        const showMaxTip = maxTip.use && chartTypeSet[jx] === maxSID;
 
         if (chartType === 'line' || chartType === 'scatter') {
-          series.draw({ ctx, chartRect, labelOffset, axesSteps, isHorizontal });
+          series.draw({ showMaxTip, ...opt });
         } else if (chartType === 'bar') {
-          series.draw({
-            ctx,
-            chartRect,
-            labelOffset,
-            axesSteps,
-            isHorizontal,
-            thickness,
-            showSeriesCount,
-            showIndex,
-          });
+          series.draw({ thickness, showSeriesCount, showIndex, showMaxTip, ...opt });
 
           if (series.show) {
             showIndex++;
@@ -283,17 +284,18 @@ class EvChart {
   getChartRect() {
     const width = this.chartDOM.getBoundingClientRect().width || 10;
     const height = this.chartDOM.getBoundingClientRect().height || 10;
+    const padding = { top: 10, right: 4, left: 4, bottom: 4 };
 
     this.setWidth(width);
     this.setHeight(height);
 
-    const chartWidth = width - 8;
-    const chartHeight = height - 8;
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
 
-    const x1 = 4;
-    const x2 = Math.max(width - 4, x1 + 2);
-    const y1 = 4;
-    const y2 = Math.max(height - 4, y1 + 2);
+    const x1 = padding.left;
+    const x2 = Math.max(width - padding.right, x1 + 2);
+    const y1 = padding.top;
+    const y2 = Math.max(height - padding.bottom, y1 + 2);
 
     return {
       x1,
@@ -464,8 +466,6 @@ class EvChart {
     this.pieDataSet = [];
   }
 
-  destroy() {}
-
   overlayClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -491,18 +491,17 @@ class EvChart {
     this.drawChart();
   }
 
-  destroyChart() {
+  destroy() {
     const target = this.target;
 
     this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
     this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
 
     if (this.options.useTooltip) {
-      this.tooltipDOM.removeChild(this.tooltipCanvas);
-      document.body.removeChild(this.tooltipDOM);
-
-      this.tooltipDOM = null;
+      this.tooltipCanvas.remove();
       this.tooltipCanvas = null;
+      this.tooltipDOM.remove();
+      this.tooltipDOM = null;
     }
 
     this.wrapperDOM = null;
