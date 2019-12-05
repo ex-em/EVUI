@@ -25,11 +25,16 @@
           v-show="!column.hide"
           :key="index"
           :style="`width: ${column.width}px;`"
+          :class="{
+            column: true,
+            render: isRenderer(column),
+          }"
           class="column"
           @click="onSort(column.field)"
         >
           <span class="column-name">{{ column.caption }}</span>
           <ev-icon
+            v-if="false"
             :cls="'ei-s ei-s-arrow-down'"
             style="margin: 3px 0 0 0; font-size: 12px;"
           />
@@ -64,8 +69,7 @@
           >
             <td
               v-if="useCheckbox.use"
-              :style="
-              `width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+              :style="`width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             />
             <td
               v-for="(column, cellIndex) in orderedColumns"
@@ -78,7 +82,7 @@
           <tr
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
-            :class="row[2] === selected ? 'selected' : ''"
+            :class="row[2] === selectedRow ? 'selected' : ''"
             @click="onRowClick($event, row)"
           >
             <td
@@ -192,7 +196,8 @@
         sortList: {},
         filterList: {},
         filterCondition: {},
-        checkedRows: this.checked.map(item => item),
+        selectedRow: this.selected,
+        checkedRows: this.checked,
         prevCheckedRow: [],
         isHeaderChecked: false,
       };
@@ -227,6 +232,19 @@
     watch: {
       rows(value) {
         this.setStore(value);
+      },
+      selected(value) {
+        this.selectedRow = value;
+      },
+      checked(value) {
+        const store = this.originStore;
+
+        this.checkedRows = value;
+        for (let ix = 0; ix < store.length; ix++) {
+          if (value.includes(store[ix][ROW_DATA_INDEX])) {
+            store[ix][ROW_CHECK_INDEX] = true;
+          }
+        }
       },
       filterCondition: {
         deep: true,
@@ -376,7 +394,7 @@
 
         for (let ix = 0; ix < data.length; ix++) {
           if (filterFn(data[ix], condition)) {
-              filteredData.push(data[ix]);
+            filteredData.push(data[ix]);
           }
         }
 
@@ -401,18 +419,18 @@
               if (filter.conditions[jx].use) {
                 if (!filteredStore.length) {
                   filteredStore = this.getFilteredData(store, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   });
                 } else if (filter.method === 'or') {
                   filteredStore.push(...this.getFilteredData(store, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   }));
                 } else {
                   filteredStore = this.getFilteredData(filteredStore, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   });
                 }
               }
@@ -516,8 +534,8 @@
       },
       onClickOption(e, field, index) {
         if (this.showColumnOption) {
-            this.showColumnOption = false;
-            return;
+          this.showColumnOption = false;
+          return;
         }
 
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
@@ -550,6 +568,7 @@
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
 
+        this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
         this.$emit('click-row', event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
       },
@@ -593,7 +612,7 @@
         for (let ix = 0; ix < this.originStore.length; ix++) {
           item = this.originStore[ix];
           if (status) {
-            checked.push(item);
+            checked.push(item[ROW_DATA_INDEX]);
           }
 
           item[ROW_CHECK_INDEX] = status;
@@ -666,6 +685,10 @@
     &.dummy {
       width: 0;
       padding: 0;
+    }
+
+    &.render {
+      justify-content: center;
     }
   }
 
