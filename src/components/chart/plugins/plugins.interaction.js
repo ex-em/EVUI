@@ -19,9 +19,13 @@ const modules = {
       this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
       this.tooltipDOM.style.display = 'block';
     } else {
-      this.tooltipDOM.scrollTop = 0;
       this.tooltipDOM.style.display = 'none';
     }
+  },
+  onMouseOutEvent() {
+    this.overlayClear();
+    this.tooltipClear();
+    this.tooltipDOM.style.display = 'none';
   },
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
@@ -44,15 +48,17 @@ const modules = {
         item = series.findGraphData(offset, !!this.options.horizontal);
 
         if (item.data) {
-          item.name = series.name;
+          const sName = `${series.name}`;
+
+          item.name = sName;
           item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
           items[sId] = item;
 
           const g = item.data.b || item.data.y || 0;
           const cg = numberWithComma(g);
 
-          if (maxs.length < series.name.length) {
-            maxs = series.name;
+          if (maxs.length < sName.length) {
+            maxs = sName;
           }
 
           if (maxv.length < `${cg}`.length) {

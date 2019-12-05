@@ -57,6 +57,7 @@ class EvChart {
     this.seriesList = {};
 
     this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 30);
+    this.overlayCanvas.onmouseout = this.onMouseOutEvent.bind(this);
     this.seriesInfo = {
       charts: {
         pie: [],
@@ -496,6 +497,8 @@ class EvChart {
 
     this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
     this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
+    this.overlayCanvas.onmousemove = null;
+    this.overlayCanvas.onmouseout = null;
 
     if (this.options.useTooltip) {
       this.tooltipCanvas.remove();

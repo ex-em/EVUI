@@ -71,6 +71,8 @@ const modules = {
       this.tooltipCanvas.height = height;
       this.tooltipCanvas.style.width = `${width}px`;
       this.tooltipCanvas.style.height = `${height}px`;
+    } else {
+      pos = -1;
     }
 
     return { nw, width, height, pos };
@@ -92,6 +94,10 @@ const modules = {
     const arrowBY = -10;
     const arrowLX = -5;
     const arrowRX = 5;
+
+    if (pos < 0) {
+      return;
+    }
 
     const title = this.options.horizontal ?
       this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
