@@ -119,11 +119,11 @@
     watch: {
       isShow: {
         immediate: true,
-        handler() {
-          this.vIf = this.closeType === 'hide' || this.isShow;
-          this.vShow = this.isShow;
+        handler(value) {
+          this.vIf = this.closeType === 'hide' || value;
+          this.vShow = value;
 
-          if (!this.windowStyle && this.isShow) {
+          if (!this.windowStyle && value) {
             this.$nextTick(() => {
               this.syncIsShow();
             });
@@ -542,7 +542,7 @@
     border: 9px solid #424242;
     border-radius: 8px;
     overflow: visible;
-    z-index: 99997;
+    z-index: 700;
 
     @include evThemify() {
       background-color: evThemed('window-bg');
@@ -676,6 +676,6 @@
     overflow: auto;
     background-color: rgba(0,0,0,0.6);
     text-align: center;
-    z-index: 99998;
+    z-index: 700;
   }
 </style>
