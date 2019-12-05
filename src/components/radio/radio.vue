@@ -2,7 +2,7 @@
   <div
     :class="[{ disabled: disabled }, dataSize, type]"
     :style="{ width: buttonSize }"
-    class="ev-radio-wrap"
+    class="ev-radio"
   >
     <input
       :id="`${radioId}_${value}`"
@@ -95,75 +95,83 @@ export default {
 };
 </script>
 
-<style scoped>
-  .ev-radio-wrap {
-    /*height: 19px;*/
+<style lang="scss">
+  @import '~@/styles/default';
+
+  .ev-radio {
+    /* height: 19px; */
     float: left;
     user-select: none;
+
+    @include evThemify() {
+      color: evThemed('radio');
+    }
+
+    &.small {
+      height: 16px;
+    }
+
+    &.button {
+      font-size: $font-size-base;
+      height: 100%;
+    }
   }
-  .ev-radio-wrap.small{
-    height: 16px;
+
+  .ev-radio-label {
+    &:not(.button) {
+      position: relative;
+      display: inline-block;
+      padding-left: 25px;
+      line-height: 19px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    &.button {
+      display: flex;
+      flex-direction: row;
+      color: #495060;
+      background-color: transparent;
+      border: solid 1px #dddee1;
+      border-radius: 4px;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 19px;
+      padding: 5px;
+      margin-right: 10px;
+
+      &:hover {
+        color: $color-primary;
+        background-color: transparent;
+        border-color: $color-primary;
+      }
+    }
+
+    &.small {
+      padding-left: 20px;
+      line-height: 16px;
+    }
+
+    &:not(.button):before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: transparent;
+      border: 1px solid #B0B3B7;
+      border-radius: 100%;
+      text-align: center;
+      transform: translateY(-50%);
+    }
+
+    &:not(.button).small:before {
+      width: 12px;
+      height: 12px;
+    }
   }
-  .ev-radio-wrap.disabled {
-    color: #C0C4CC;
-  }
-  .ev-radio-wrap.button {
-    font-size: 12px;
-    height: 100%;
-  }
-  .ev-radio-label:not(.button) {
-    position: relative;
-    display: inline-block;
-    padding-left: 25px;
-    line-height: 19px;
-    cursor: pointer;
-    margin-right: 10px;
-  }
-  .ev-radio-label.button {
-    display: flex;
-    flex-direction: row;
-    color: #495060;
-    background-color: transparent;
-    border: solid 1px #dddee1;
-    border-radius: 4px;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 19px;
-    padding: 5px;
-    margin-right: 10px;
-  }
-  .ev-radio-label.button:hover {
-    color: #57a3f3;
-    background-color: transparent;
-    border-color: #57a3f3
-  }
-  .ev-radio-label.small {
-    padding-left: 20px;
-    line-height: 16px;
-  }
-  .ev-radio-label:not(.button):before {
-    position: absolute;
-    top: 50%;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background: transparent;
-    border: 1px solid #B0B3B7;
-    border-radius: 100%;
-    text-align: center;
-    transform: translateY(-50%);
-    content: '';
-  }
-  .ev-radio-label:not(.button).small:before {
-    width: 12px;
-    height: 12px;
-  }
-  .ev-radio-wrap.disabled .ev-radio-label {
-    cursor: not-allowed;
-  }
-  .ev-radio-wrap.disabled .ev-radio-label:before {
-    border: 1px solid #B01012;
-  }
+
   .ev-radio-input {
     position: absolute;
     width: 1px;
@@ -174,37 +182,60 @@ export default {
     overflow: hidden;
     cursor: inherit;
     clip: rect(0, 0, 0, 0);
+
+    &:checked + .ev-radio-label:not(.button):before {
+      border: 1px solid $color-primary;
+    }
+
+    &:checked + .ev-radio-label:not(.button):after {
+      position: absolute;
+      top: 50%;
+      left: 7px;
+      width: 8px;
+      height: 8px;
+      border-radius: 100%;
+      transform: translateY(-50%);
+      content: '';
+    }
+
+    &:checked + .ev-radio-label.button {
+      color: $color-white;
+      background-color: $color-primary;
+      border-color: $color-primary;
+    }
+
+    &:checked + .ev-radio-label.small:after {
+      left: 6px;
+      width: 6px;
+      height: 6px;
+    }
+
+    &:checked + .ev-radio-label:after {
+      background-color: $color-primary;
+    }
   }
-  .ev-radio-input:checked + .ev-radio-label:not(.button):before {
-    border: 1px solid #41B7FD;
-  }
-  .ev-radio-wrap.disabled .ev-radio-input:checked + .ev-radio-label:before {
-    border: 1px solid #B01012;
-  }
-  .ev-radio-input:checked + .ev-radio-label:not(.button):after {
-     position: absolute;
-     top: 50%;
-     left: 7px;
-     width: 8px;
-     height: 8px;
-     border-radius: 100%;
-     transform: translateY(-50%);
-     content: '';
-   }
-  .ev-radio-input:checked + .ev-radio-label.button {
-    color:#fff;
-    background-color:#2d8cf0;
-    border-color:#2d8cf0;
-  }
-  .ev-radio-input:checked + .ev-radio-label.small:after {
-    left: 6px;
-    width: 6px;
-    height: 6px;
-  }
-  .ev-radio-input:checked + .ev-radio-label:after {
-    background: #41B7FD;
-  }
-  .ev-radio-wrap.disabled .ev-radio-input:checked + .ev-radio-label:after {
-    background: #B01012;
+
+  .disabled {
+    .ev-radio-label {
+      cursor: not-allowed;
+
+      @include evThemify() {
+        color: evThemed('radio-disabled');
+      }
+
+      &:before {
+        border: 1px solid $color-not-allow;
+      }
+    }
+
+    .ev-radio-input {
+      &:checked + .ev-radio-label:before {
+        border: 1px solid $color-not-allow;
+      }
+
+      &:checked + .ev-radio-label:after {
+        background-color: $color-not-allow;
+      }
+    }
   }
 </style>

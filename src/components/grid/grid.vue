@@ -625,136 +625,134 @@
   };
 </script>
 <style lang="scss" scoped>
-@import '~@/styles/default';
+  @import '~@/styles/default';
 
-.table {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding-top: 30px;
-}
-
-.table-header {
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 30px;
-
-  @include evThemify() {
-    background-color: evThemed('bg-color-base');
-    border-top: 2px solid evThemed('grid-header-border');
-    border-bottom: $border-solid evThemed('grid-bottom-border');
-  }
-}
-
-.column-list {
-  width: 100%;
-  white-space: nowrap;
-  list-style-type: none;
-}
-
-.column {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: 30px;
-  line-height: 30px;
-  vertical-align: top;
-  padding: 0 3px;
-  user-select: none;
-
-  &.dummy {
-    width: 0;
-    padding: 0;
-  }
-}
-
-.adjust .column:last-child {
-  border-right: 0;
-}
-
-.column-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: bold;
-
-  @include evThemify() {
-    color: evThemed('font-color-base');
-  }
-}
-
-.column-option {
-  position: absolute;
-  right: 0;
-  height: 100%;
-  background-color: transparent;
-
-  @include evThemify() {
-    /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
-    box-shadow: inset 0 0 3px evThemed('font-color-base');
-  }
-}
-
-.v-scroll .dummy {
-  width: 17px;
-}
-
-.table-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  overflow-anchor: none;
-
-  @include evThemify() {
-    background-color: evThemed('bg-color-base');
-    border-bottom: $border-solid evThemed('grid-bottom-border');
+  .table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 30px;
   }
 
-  table {
-    clear: both;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
+  .table-header {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 30px;
 
-  tr {
-    white-space: nowrap;
-    /* stylelint-disable */
-    &.selected {
-      @include evThemify() {
-        background-color: evThemed('grid-row-selected');
-      }
+    @include evThemify() {
+      border-top: 2px solid evThemed('grid-header-border');
+      border-bottom: $border-solid evThemed('grid-bottom-border');
     }
+  }
+
+  .column-list {
+    width: 100%;
+    white-space: nowrap;
+    list-style-type: none;
+  }
+
+  .column {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: top;
+    padding: 0 3px;
+    user-select: none;
 
     &.dummy {
-      border-bottom: none;
-      background: transparent;
+      width: 0;
+      padding: 0;
     }
-    /* stylelint-enable */
   }
 
-  td {
-    display: inline-block;
-    padding: 0 3px;
+  .adjust .column:last-child {
+    border-right: 0;
+  }
 
-    @include truncate(100%);
+  .column-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+
     @include evThemify() {
-      color: evThemed('grid-cell-text');
-    }
-
-    &:last-child {
-      border-right: 0;
+      color: evThemed('font-color-base');
     }
   }
-}
 
-.vscroll-spacer {
-  opacity: 0;
-  clear: both;
-}
+  .column-option {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    background-color: transparent;
 
-[v-cloak] {
-  display: none;
-}
+    @include evThemify() {
+      /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
+      box-shadow: inset 0 0 3px evThemed('font-color-base');
+    }
+  }
+
+  .v-scroll .dummy {
+    width: 17px;
+  }
+
+  .table-body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-anchor: none;
+
+    @include evThemify() {
+      border-bottom: $border-solid evThemed('grid-bottom-border');
+    }
+
+    table {
+      clear: both;
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    tr {
+      white-space: nowrap;
+      /* stylelint-disable */
+      &.selected {
+        @include evThemify() {
+          background-color: evThemed('grid-row-selected');
+        }
+      }
+
+      &.dummy {
+        border-bottom: none;
+        background: transparent;
+      }
+      /* stylelint-enable */
+    }
+
+    td {
+      display: inline-block;
+      padding: 0 3px;
+
+      @include truncate(100%);
+      @include evThemify() {
+        color: evThemed('grid-cell-text');
+      }
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+  }
+
+  .vscroll-spacer {
+    opacity: 0;
+    clear: both;
+  }
+
+  [v-cloak] {
+    display: none;
+  }
 </style>

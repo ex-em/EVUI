@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[{ disabled: disabled }, dataSize]"
-    class="ev-checkbox-wrap"
+    class="ev-checkbox"
   >
     <input
       v-if="!isGroup"
@@ -127,57 +127,71 @@
   };
 </script>
 
-<style scoped>
-  .ev-checkbox-wrap {
+<style lang="scss">
+  @import '~@/styles/default';
+
+  .ev-checkbox {
     height: 19px;
+    line-height: 19px;
     float: left;
     user-select: none;
-    font-size: 12px;
+    font-size: $font-size-base;
+
+    &.small {
+      height: 16px;
+      line-height: 16px;
+    }
   }
-  .ev-checkbox-wrap.small{
-    height: 16px;
-  }
-  .ev-checkbox-wrap.disabled {
-    color: #C0C4CC;
-  }
+
   .ev-checkbox-label {
     position: relative;
+    display: inline-flex;
     height: 100%;
-    display: inline-block;
     padding-left: 25px;
-    line-height: 19px;
     cursor: pointer;
+
+    @include evThemify() {
+      color: evThemed('checkbox');
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background-color: transparent;
+      border-radius: 50%;
+      text-align: center;
+      transform: translateY(-50%);
+
+      @include evThemify() {
+        border: $border-solid evThemed('checkbox-border');
+      }
+    }
+
+    &:after {
+      content: '';
+      display: block;
+    }
+
+    /* unchecked -- type: small */
+    &.small {
+      padding-left: 23px;
+
+      &:before {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    /* unchecked -- type: square */
+    &.square:before {
+      border-radius: 0;
+    }
   }
-  .ev-checkbox-label.small {
-    padding-left: 23px;
-    line-height: 16px;
-  }
-  .ev-checkbox-label:before {
-    position: absolute;
-    top: 50%;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background: transparent;
-    border: 1px solid #B0B3B7;
-    border-radius: 100%;
-    text-align: center;
-    transform: translateY(-50%);
-    content: '';
-  }
-  .ev-checkbox-label.square:before {
-    border-radius: 0;
-  }
-  .ev-checkbox-label.small:before {
-    width: 12px;
-    height: 12px;
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-label {
-    cursor: not-allowed;
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-label:before {
-    border: 1px solid #B01012;
-  }
+
   .ev-checkbox-input {
     position: absolute;
     width: 1px;
@@ -188,89 +202,112 @@
     overflow: hidden;
     cursor: inherit;
     clip: rect(0, 0, 0, 0);
+
+    /* checked */
+    &:checked + .ev-checkbox-label:before {
+      border-color: $color-primary;
+    }
+
+    &:checked + .ev-checkbox-label:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 7px;
+      width: 8px;
+      height: 8px;
+      border-radius: 100%;
+      transform: translateY(-50%);
+      background-color: $color-primary;
+    }
+
+    /* checked -- type: check */
+    &:checked + .ev-checkbox-label.check:before {
+      background-color: $color-primary;
+    }
+
+    &:checked + .ev-checkbox-label.check:after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 8px;
+      width: 5px;
+      height: 8px;
+      border: solid $color-white;
+      border-radius: 0;
+      border-width: 0 1px 1px 0;
+      transform: rotate(45deg);
+    }
+
+    &:checked + .ev-checkbox-label.check.small:after {
+      top: 3px;
+      left: 6px;
+      width: 4px;
+      height: 6px;
+    }
+
+    /* checked -- type: square */
+    &:checked + .ev-checkbox-label.square:after {
+      border-radius: 0;
+    }
+
+    /* checked -- type: small */
+    &:checked + .ev-checkbox-label.small:after {
+      left: 6px;
+      width: 6px;
+      height: 6px;
+    }
+
+    /* checked -- type: minus */
+    &:checked + .ev-checkbox-label.minus:after {
+      left: 5px;
+      width: 12px;
+      height: 4px;
+      border-radius: 0;
+    }
+
+    /* checked -- type: minus + small */
+    &:checked + .ev-checkbox-label.minus.small:after {
+      width: 8px;
+      height: 2px;
+    }
+
+    /* checked -- type: check + small */
+    &:checked + .ev-checkbox-label.check.small:after {
+      top: 3px;
+      left: 6px;
+      width: 4px;
+      height: 6px;
+      background: none;
+    }
   }
-  .ev-checkbox-input:checked + .ev-checkbox-label:before {
-    border: 1px solid #41B7FD;
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:before {
-    border: 1px solid #B01012;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label:after {
-    position: absolute;
-    top: 50%;
-    left: 7px;
-    width: 8px;
-    height: 8px;
-    border-radius: 100%;
-    transform: translateY(-50%);
-    content: '';
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label:after {
-    background: #41B7FD;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
-    border: solid #41B7FD;
-    border-radius: 0;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.check.small:after {
-    border: solid #41B7FD;
-    border-radius: 0;
-    border-width: 0 1.5px 1.5px 0;
-    transform: rotate(45deg);
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label:after {
-    /*background: #B01012;*/
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
-    border: solid #B01012;
-    border-radius: 0;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  .ev-checkbox-wrap.disabled .ev-checkbox-input:checked + .ev-checkbox-label.check.small:after {
-    border: solid #B01012;
-    border-radius: 0;
-    border-width: 0 1.5px 1.5px 0;
-    transform: rotate(45deg);
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.square:after {
-    border-radius: 0;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
-    background: none;
-    border-radius: 0;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.small:after {
-    left: 6px;
-    width: 6px;
-    height: 6px;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.minus:after {
-    left: 5px;
-    width: 12px;
-    height: 4px;
-    border-radius: 0;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.minus.small:after {
-    width: 8px;
-    height: 2px;
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.check:after {
-    display: block;
-    top: 4px;
-    left: 7px;
-    width: 5px;
-    height: 8px;
-    background: none;
-    content: '';
-  }
-  .ev-checkbox-input:checked + .ev-checkbox-label.check.small:after {
-    top: 3px;
-    left: 6px;
-    width: 4px;
-    height: 6px;
-    background: none;
+
+
+  /* disabled */
+  .disabled {
+    .ev-checkbox-label {
+      cursor: not-allowed;
+
+      @include evThemify() {
+        color: evThemed('checkbox-disabled');
+      }
+
+      &:before {
+        border: $border-solid $color-not-allow;
+      }
+    }
+
+    .ev-checkbox-input:checked + .ev-checkbox-label:before {
+      border-color: $color-not-allow;
+    }
+
+    .ev-checkbox-input:checked + .ev-checkbox-label:after {
+      background-color: $color-not-allow;
+    }
+
+    /* checked -- type: check */
+    .ev-checkbox-input:checked + .ev-checkbox-label.check:before {
+      background-color: $color-not-allow;
+    }
   }
 </style>

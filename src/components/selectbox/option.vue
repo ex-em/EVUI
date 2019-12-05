@@ -1,6 +1,6 @@
 <template>
   <li
-    class="evui-selectbox-item"
+    class="ev-selectbox-item"
   ><slot/>
   </li>
 </template>
