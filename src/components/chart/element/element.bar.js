@@ -116,6 +116,7 @@ class Bar {
     const w = gdata.w;
     const h = gdata.h;
 
+    ctx.save();
     ctx.fillStyle = this.color;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
@@ -123,6 +124,7 @@ class Bar {
     ctx.shadowColor = this.color;
 
     ctx.fillRect(x, y, w, h);
+    ctx.restore();
   }
 
   findGraphData(offset, isHorizontal) {

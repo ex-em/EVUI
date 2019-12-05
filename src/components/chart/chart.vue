@@ -76,6 +76,8 @@
       }, 1);
     },
     beforeDestroy() {
+      this.evChart.destroyChart();
+
       delete this.evChart;
     },
     methods: {
@@ -111,8 +113,10 @@
           height: '100%',
           thickness: 1,
           useTooltip: true,
-          useSelectionData: false,
-          type: 'line',
+          indicator: {
+            use: true,
+            color: '#EE7F44',
+          },
         };
       },
       getDefaultData() {
