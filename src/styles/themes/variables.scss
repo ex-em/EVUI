@@ -6,27 +6,58 @@ $ev-themes: (
 
     /* button
     -------------------------- */
-    button-active-bg: $color-white,
-    button-disabled: $color-light-level4,
-    button-disabled-bg: $color-light-level1,
-    button-disabled-border: $color-light-level2,
-    button-ghost: $color-light-level5,
-    button-ghost-border: $color-light-level2,
-    button-dashed: $color-light-level5,
-    button-dashed-border: $color-light-level2,
-    button-dashed-active-bg: $color-light-level1,
+    button-disabled: $color-light-level6,
+    button-disabled-bg: $color-light-level2,
+    button-disabled-border: $color-light-level4,
+    button-ghost: $color-dark-level5,
+    button-ghost-border: $color-light-level4,
+    button-dashed: $color-dark-level5,
+    button-dashed-border: $color-light-level5,
+    button-dashed-active-bg: $color-light-level2,
     button-text: $color-black,
+
+    /* checkbox
+    -------------------------- */
+    checkbox: $color-dark-level4,
+    checkbox-border: $color-light-level6,
+    checkbox-disabled: $color-light-level6,
+
+    /* radio
+    -------------------------- */
+    radio: $color-dark-level4,
+    radio-border: $color-light-level6,
+    radio-disabled: $color-light-level6,
+
+    /* select box
+    -------------------------- */
+    selectbox-border: $color-light-level6,
+    selectbox-bg: $color-light-level1,
+    selectbox-bg-hover: $color-light-level3,
+    selectbox-select-bg: $color-light-level2,
+
+    /* datepicker
+    -------------------------- */
+    datepicker-input-border: $color-light-level6,
 
     /* window
     -------------------------- */
-    window-bg: $color-white,
+    window-bg: $color-light-level1,
+    window-border: $color-light-level6,
+    window-btn: $color-dark-level6,
+    window-btn-bg: transparent,
+
+    /* tab
+    -------------------------- */
+    tab-bg: $color-light-level1,
+    tab-active-bg: $color-light-level1,
+    tab-border: $color-light-level6,
 
     /* grid
     -------------------------- */
-    grid-header-border: #545965,
-    grid-bottom-border: #C9CFDC,
-    grid-row-selected: #E3E7F0,
-    grid-cell-text: #797E8A,
+    grid-header-border: $color-light-level7,
+    grid-bottom-border: lighten($color-light-level7, 20%),
+    grid-row-selected: $color-light-level3,
+    grid-cell-text: lighten($color-light-level8, 10%),
 
   ),
   dark: (
@@ -34,27 +65,58 @@ $ev-themes: (
 
     /* button
     -------------------------- */
-    button-active-bg: $color-white,
-    button-disabled: $color-light-level4,
-    button-disabled-bg: $color-light-level1,
-    button-disabled-border: $color-light-level2,
-    button-ghost: $color-light-level5,
-    button-ghost-border: $color-light-level2,
-    button-dashed: $color-light-level5,
-    button-dashed-border: $color-light-level2,
-    button-dashed-active-bg: $color-light-level1,
+    button-disabled: $color-light-level6,
+    button-disabled-bg: $color-light-level2,
+    button-disabled-border: $color-light-level4,
+    button-ghost: $color-dark-level5,
+    button-ghost-border: $color-light-level5,
+    button-dashed: $color-dark-level5,
+    button-dashed-border: $color-light-level4,
+    button-dashed-active-bg: $color-light-level2,
     button-text: $color-black,
+
+    /* checkbox
+    -------------------------- */
+    checkbox: $color-dark-level8,
+    checkbox-border: $color-dark-level8,
+    checkbox-disabled: $color-dark-level6,
+
+    /* radio
+    -------------------------- */
+    radio: $color-dark-level8,
+    radio-border: $color-dark-level8,
+    radio-disabled: $color-dark-level6,
+
+    /* select box
+    -------------------------- */
+    selectbox-border: $color-dark-level6,
+    selectbox-bg: $color-dark-level3,
+    selectbox-bg-hover: $color-dark-level4,
+    selectbox-select-bg: $color-dark-level5,
+
+    /* datepicker
+    -------------------------- */
+    datepicker-input-border: $color-dark-level6,
+
 
     /* window
     -------------------------- */
-    window-bg: $color-dark-level2,
+    window-bg: $color-dark-level4,
+    window-border: $color-dark-level6,
+    window-btn: $color-dark-level8,
+    window-btn-bg: $color-dark-level5,
+
+    /* tab
+    -------------------------- */
+    tab-bg: $color-dark-level6,
+    tab-border: $color-dark-level1,
 
     /* grid
     -------------------------- */
-    grid-header-border: #797E8A,
-    grid-bottom-border: #545965,
-    grid-row-selected: #797E8A,
-    grid-cell-text: #C9CFDC,
+    grid-header-border: $color-dark-level7,
+    grid-bottom-border: lighten($color-dark-level7, 10%),
+    grid-row-selected: lighten($color-light-level8, 10%),
+    grid-cell-text: darken($color-white, 25%),
 
   ),
 ) !default;

@@ -278,17 +278,21 @@
     width: 100%;
     height: 100%;
     border-radius: 4px;
-    color: #495060;
+    color: $color-dark-level5;
     font-size: 12px;
     line-height: 2;
     cursor: text;
     background-image: none;
   }
-  .ev-login.focus, .ev-login.focus:hover {
-    border-color: #1A6AFE;
+
+  .ev-login.focus,
+  .ev-login.focus:hover {
+    border-color: $color-primary;
     opacity: 1;
   }
-  .ev-login-text, .ev-login-password {
+
+  .ev-login-text,
+  .ev-login-password {
     width: 100%;
     height: 100%;
     font-size: 18px;
@@ -296,15 +300,18 @@
     display: block;
     border: 1px solid #DCE1E5;
     border-radius: 1px;
+    transition: border $animate-fast;
   }
-  .ev-login-text:focus, .ev-login-password:focus {
+
+  .ev-login-text:focus,
+  .ev-login-password:focus {
     outline: none;
-    border-bottom: 3px solid #1A6AFE;
+    border-bottom: 3px solid $color-primary;
   }
 
   /* LABEL ======================================= */
   .loginLabel {
-    color: #353739;
+    color: $color-dark-level4;
     font-size: 12px;
     position: absolute;
     pointer-events: none;
@@ -312,11 +319,14 @@
     top: -22px;
     font-family: Roboto;
     font-weight: 600;
+    transition: color $animate-fast;
   }
   /* active state */
-  .ev-login-text:focus ~ .loginLabel, .ev-login-text:valid ~ .loginLabel,
-  .ev-login-password:focus ~ .loginLabel, .ev-login-password:valid ~ .loginLabel {
-    color: #1A6AFE;
+  .ev-login-text:focus ~ .loginLabel,
+  .ev-login-text:valid ~ .loginLabel,
+  .ev-login-password:focus ~ .loginLabel,
+  .ev-login-password:valid ~ .loginLabel {
+    color: $color-primary;
   }
 
 </style>

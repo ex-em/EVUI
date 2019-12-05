@@ -1,5 +1,5 @@
 <template>
-  <div class="prefixCls">
+  <div :class="prefixCls">
     <ul
       :class="ulClasses"
       @click.stop="onClick"
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-  const prefixCls = 'evui-listbox';
+  const prefixCls = 'ev-listbox';
 
   export default {
     props: {
@@ -82,35 +82,52 @@
   };
 </script>
 
-<style scoped>
-  .evui-listbox{
+<style lang="scss">
+  @import '~@/styles/default';
+
+  .ev-listbox {
     width: 100%;
     height: 100%;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
   }
-  .evui-listbox-ul{
+
+  .ev-listbox-ul {
     list-style-type: none;
     padding: 2px 0;
   }
-  .evui-listbox-ul-group{
+
+  .ev-listbox-ul-group {
     height: 100%;
   }
-  .evui-listbox-li{
+
+  .ev-listbox-li {
     display: block;
     list-style: none;
-    color: #495060;
     white-space: nowrap;
     cursor: pointer;
     transition: background .1s ease-in-out;
   }
-  .evui-listbox-li:hover:not(.evui-listbox-li-selected){
-    background-color: #eeeeee;
-  }
-  .evui-listbox-li-selected {
-    color: #fff;
-    background-color: #337ab6;
+
+  .ev-listbox-li:hover:not(.ev-listbox-li-selected) {
+    @include evThemify() {
+      background-color: evThemed('selectbox-select-bg');
+    }
   }
 
-  .evui-selectbox-size-small .evui-listbox-li { padding: 7px; }
-  .evui-selectbox-size-medium .evui-listbox-li { padding: 7px; }
-  .evui-selectbox-size-large .evui-listbox-li { padding: 7px 10px; }
+  .ev-listbox-li-selected {
+    color: $color-dark-level8;
+    background-color: $color-selected;
+  }
+
+  .ev-selectbox-size-small .ev-listbox-li,
+  .ev-selectbox-size-medium .ev-listbox-li {
+    padding: 7px;
+  }
+
+  .ev-selectbox-size-large .ev-listbox-li {
+    padding: 7px 10px;
+  }
 </style>

@@ -4,12 +4,12 @@
     :class="selectboxClass"
   >
     <div
-      class="evui-selectbox-select-field"
+      class="ev-selectbox-select-field"
       @click="onClick"
     >
       <div
         v-if="multiple"
-        class="evui-selectbox-multiple-tag-view"
+        class="ev-selectbox-multiple-tag-view"
       >
         <div
           v-if="selectedItems.length"
@@ -71,7 +71,7 @@
   import '@/styles/lib/fontawesome.css';
   import Dropdown from '@/components/selectbox/dropdown';
 
-  const prefixCls = 'evui-selectbox';
+  const prefixCls = 'ev-selectbox';
 
   export default {
     components: {
@@ -169,9 +169,9 @@
     computed: {
       arrowIconClass() {
         return {
-          'evui-selectbox-arrow-icon': true,
-          'evui-selectbox-arrow-icon-rotate-180': this.dropDownState,
-          'evui-selectbox-arrow-icon-disabled': this.disabled,
+          'ev-selectbox-arrow-icon': true,
+          'ev-selectbox-arrow-icon-rotate-180': this.dropDownState,
+          'ev-selectbox-arrow-icon-disabled': this.disabled,
         };
       },
       selectedItems() {
@@ -392,54 +392,68 @@
 
 <style lang="scss">
   @import '~@/styles/default';
-  /************************************************************************************
-   Selectbox
-  ************************************************************************************/
 
-  /** evui-selectbox **/
-
-  .evui-selectbox {
+  .ev-selectbox {
     display: inline-block;
     position: relative;
-    border: 1px solid #dddeee;
-    border-radius: 4px;
+    border-radius: $border-radius-base;
     vertical-align: middle;
     line-height: normal;
     cursor: pointer;
-    transition: border-color ease-in-out .15s;
+    transition: border-color $animate-fast;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('selectbox-border');
+      background-color: evThemed('selectbox-bg');
+    }
+
+    &:focus {
+      box-shadow: inset 0 1px 1px rgba($color-black, 0.075), 0 0 8px rgba($color-primary, 0.6);
+    }
+
+    &:hover {
+      @include evThemify() {
+        background-color: evThemed('selectbox-bg-hover');
+      }
+    }
   }
-  .evui-selectbox-disabled{
+
+  .ev-selectbox-disabled {
     cursor: not-allowed;
   }
-  .evui-selectbox:focus{
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-  }
-  .evui-selectbox-select-field {
+
+  .ev-selectbox-select-field {
     display: inline-block;
     width: 100%;
     height: 100%;
   }
-  .evui-selectbox-select-field:hover{
-    background-color: #eeeeee;
-    border-color: #bbb;
-  }
-  .evui-selectbox-input-text{
+
+  .ev-selectbox-input-text {
     width: 100%;
     height: 100%;
     padding: 6px 10px;
     border: 0;
     background: transparent;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
+
+    &:focus {
+      outline: 0;
+    }
   }
-  .evui-selectbox-input-text:focus{
-    outline: 0;
-  }
-  .evui-selectbox-input-text-readonly{
+
+  .ev-selectbox-input-text-readonly {
     cursor: default;
   }
-  .evui-selectbox-input-text-disabled{
+
+  .ev-selectbox-input-text-disabled {
     cursor: not-allowed;
   }
-  .evui-selectbox-arrow-icon{
+
+  .ev-selectbox-arrow-icon {
     position: absolute;
     top: 50%;
     width: 10px;
@@ -449,152 +463,182 @@
     font-family: Font Awesome\ 5 Free;
     font-style: normal;
     font-variant: normal;
-    color: #888888;
-    transition: all .2s ease-in-out;
+    color: $color-dark-level7;
+    transition: all $animate-fast;
+
+    &:before {
+      content: '\F0DD';
+    }
   }
-  .evui-selectbox-arrow-icon:before {
-    content: "\F0DD"
-  }
-  .evui-selectbox-arrow-icon-disabled{
+
+  .ev-selectbox-arrow-icon-disabled {
     cursor: not-allowed;
   }
-  .evui-selectbox-arrow-icon-rotate-180{
+
+  .ev-selectbox-arrow-icon-rotate-180 {
     transform: rotate(180deg);
   }
-  .evui-selectbox-multiple-tag-view{
+
+  .ev-selectbox-multiple-tag-view {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
   }
-  .evui-selectbox-select-tag {
+
+  .ev-selectbox-select-tag {
     display: inline-flex;
     height: 100%;
     max-width: 100%;
     padding: 0 5px;
-    border: 1px solid #e9eaec;
     border-radius: 3px;
-    background: #f0f2f5;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
+
+    @include evThemify() {
+      background-color: evThemed('selectbox-select-bg');
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &.max-width {
+      max-width: calc(100% - 40px);
+    }
   }
-  .evui-selectbox-select-tag:hover {
-    opacity:.85;
-  }
-  .evui-selectbox-select-tag.max-width {
-    max-width: calc(100% - 40px);
-  }
-  .evui-selectbox-text-wrap{
+
+  .ev-selectbox-text-wrap {
     display: inline-block;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    @include truncate(100%);
   }
-  .evui-selectbox-text {
-    color: #495060;
-  }
-  .evui-selectbox-tag-close {
+
+  .ev-selectbox-tag-close {
     margin-left: 5px;
     border-radius: 50%;
-    background-color: rgba(0,0,0,0.4);
-    opacity: .66;
+    background-color: rgba($color-black, 0.4);
+    opacity: 0.66;
     cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
   }
-  .evui-selectbox-tag-close:hover{
-    opacity: 1
+
+  .ev-selectbox-tag-close-scale {
+    color: $color-white;
   }
-  .evui-selectbox-tag-close-scale {
-    color: #fff;
-  }
-  .evui-select-search:focus{
-    border-color: #66afe8;
+
+  .ev-select-search:focus {
+    border-color: $color-primary;
     outline: 0;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba($color-black, 0.075), 0 0 8px rgba($color-primary, 0.6);
   }
-  .evui-selectbox-select-count-tag {
+
+  .ev-selectbox-select-count-tag {
     display: inline-flex;
     width: 35px;
     height: 100%;
     padding: 0 2px;
-    border: 1px solid #e9eaec;
     border-radius: 3px;
-    background: #f0f2f5;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    @include evThemify() {
+      background-color: darken(evThemed('selectbox-select-bg'), 3%);
+    }
   }
 
   /** size **/
-  .evui-selectbox-size-small {
+  .ev-selectbox-size-small {
     width: 90px;
     height: 18px;
     font-size: 11px;
+
+    .ev-selectbox-select-field {
+      padding: 1px 12px 1px 2px;
+    }
+
+    .ev-selectbox-arrow-icon {
+      right: 1px;
+      margin-top: -3px;
+    }
+
+    .ev-selectbox-arrow-icon-rotate-180 {
+      right: 4px;
+      margin-top: -7px;
+    }
+
+    .ev-selectbox-tag-close {
+      font-size: 10px;
+      transform: scale(0.9);
+    }
+
+    .ev-selectbox-tag-close-scale {
+      transform: scale(0.6);
+    }
   }
-  .evui-selectbox-size-medium {
+
+  .ev-selectbox-size-medium {
     width: 140px;
     height: 25px;
     font-size: 12px;
+
+    .ev-selectbox-select-field {
+      padding: 2px 19px 2px 3px;
+    }
+
+    .ev-selectbox-arrow-icon {
+      right: 4px;
+      margin-top: -4px;
+    }
+
+    .ev-selectbox-arrow-icon-rotate-180 {
+      right: 7px;
+      margin-top: -6px;
+    }
+
+    .ev-selectbox-tag-close {
+      transform: scale(0.8);
+    }
+
+    .ev-selectbox-tag-close-scale {
+      transform: scale(0.5);
+    }
   }
-  .evui-selectbox-size-large {
+
+  .ev-selectbox-size-large {
     width: 180px;
     height: 30px;
-    font-size: 14px;
-  }
+    font-size: $font-size-medium;
 
-  .evui-selectbox-size-small .evui-selectbox-select-field { padding: 1px 12px 1px 2px; }
-  .evui-selectbox-size-medium .evui-selectbox-select-field { padding: 2px 19px 2px 3px; }
-  .evui-selectbox-size-large .evui-selectbox-select-field { padding: 2px 23px 2px 4px; }
+    .ev-selectbox-select-field {
+      padding: 2px 23px 2px 4px;
+    }
 
-  .evui-selectbox-size-small .evui-selectbox-arrow-icon{
-    right: 1px;
-    margin-top: -3px;
-  }
-  .evui-selectbox-size-medium .evui-selectbox-arrow-icon{
-    right: 4px;
-    margin-top: -4px;
-  }
-  .evui-selectbox-size-large .evui-selectbox-arrow-icon{
-    right: 7px;
-    margin-top: -4px;
-  }
+    .ev-selectbox-arrow-icon {
+      right: 7px;
+      margin-top: -4px;
+    }
 
-  .evui-selectbox-size-small .evui-selectbox-arrow-icon-rotate-180{
-    right: 4px;
-    margin-top: -7px;
-  }
-  .evui-selectbox-size-medium .evui-selectbox-arrow-icon-rotate-180{
-    right: 7px;
-    margin-top: -6px;
-  }
-  .evui-selectbox-size-large .evui-selectbox-arrow-icon-rotate-180{
-    right: 8px;
-  }
+    .ev-selectbox-arrow-icon-rotate-180 {
+      right: 8px;
+    }
 
-  .evui-selectbox-size-small .evui-selectbox-tag-close{
-    font-size: 10px;
-    transform: scale(0.9);
-  }
-  .evui-selectbox-size-medium .evui-selectbox-tag-close{
-    transform: scale(0.8);
-  }
-  .evui-selectbox-size-large .evui-selectbox-tag-close{
-    transform: scale(0.8);
-  }
+    .ev-selectbox-tag-close {
+      transform: scale(0.8);
+    }
 
-  .evui-selectbox-size-small .evui-selectbox-tag-close-scale{
-    transform: scale(0.6);
-  }
-  .evui-selectbox-size-medium .evui-selectbox-tag-close-scale{
-    transform: scale(0.5);
-  }
-  .evui-selectbox-size-large .evui-selectbox-tag-close-scale{
-    transform: scale(0.45);
+    .ev-selectbox-tag-close-scale {
+      transform: scale(0.45);
+    }
   }
 </style>
