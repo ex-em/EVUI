@@ -1,3 +1,5 @@
+import { numberWithComma } from '@/common/utils';
+
 const modules = {
   createTooltipDOM() {
     this.tooltipDOM = document.createElement('div');
@@ -69,6 +71,8 @@ const modules = {
       this.tooltipCanvas.height = height;
       this.tooltipCanvas.style.width = `${width}px`;
       this.tooltipCanvas.style.height = `${height}px`;
+    } else {
+      pos = -1;
     }
 
     return { nw, width, height, pos };
@@ -90,6 +94,10 @@ const modules = {
     const arrowBY = -10;
     const arrowLX = -5;
     const arrowRX = 5;
+
+    if (pos < 0) {
+      return;
+    }
 
     const title = this.options.horizontal ?
       this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
@@ -173,7 +181,7 @@ const modules = {
       ctx.fillStyle = '#F4FAFF';
       ctx.textBaseline = 'Bottom';
       ctx.fillText(this.seriesList[s].name, itemX + 10, itemY);
-      ctx.fillText(value, (itemX + 10 + nw) + 5, itemY);
+      ctx.fillText(numberWithComma(value), (itemX + 10 + nw) + 5, itemY);
       ctx.closePath();
       y += lineSpacing;
     });
@@ -184,7 +192,7 @@ const modules = {
       this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx, isHit);
     });
   },
-  drawIndicator(offset) {
+  drawIndicator(offset, color) {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
     const graphPos = {
@@ -198,7 +206,7 @@ const modules = {
       && offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1)) {
       ctx.beginPath();
       ctx.save();
-      ctx.strokeStyle = '#EE7F44';
+      ctx.strokeStyle = color;
       ctx.lineWidth = 1;
       ctx.moveTo(offsetX + 0.5, graphPos.y1);
       ctx.lineTo(offsetX + 0.5, graphPos.y2);

@@ -4,7 +4,7 @@ import {
   quadrillion,
   trillion,
   truthy,
-} from '../../../common/utils';
+} from '@/common/utils';
 
 export default {
   hexToRgb(hex) {

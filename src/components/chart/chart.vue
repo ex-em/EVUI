@@ -76,7 +76,7 @@
       }, 1);
     },
     beforeDestroy() {
-      this.evChart.destroyChart();
+      this.evChart.destroy();
 
       delete this.evChart;
     },
@@ -116,6 +116,11 @@
           indicator: {
             use: true,
             color: '#EE7F44',
+          },
+          maxTip: {
+            use: true,
+            background: '#FFFFFF',
+            color: '#000000',
           },
         };
       },

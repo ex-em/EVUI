@@ -1,4 +1,5 @@
 import _merge from 'lodash/merge';
+import { numberWithComma } from '@/common/utils';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
@@ -29,12 +30,10 @@ class Line {
       return;
     }
 
-    const ctx = param.ctx;
-    const chartRect = param.chartRect;
-    const labelOffset = param.labelOffset;
-    const axesSteps = param.axesSteps;
+    const { ctx, chartRect, labelOffset, axesSteps, showMaxTip, maxTipOpt } = param;
 
     ctx.beginPath();
+    ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineWidth = this.lineWidth;
     ctx.strokeStyle = this.color;
@@ -129,6 +128,107 @@ class Line {
         }
       });
     }
+
+    ctx.restore();
+
+    if (showMaxTip && this.data.length > 1) {
+      const { maxDomain, maxY } = this.minMax;
+      const maxValue = numberWithComma(maxY);
+
+      if (maxValue === false) {
+        return;
+      }
+
+      const arrowSize = 4;
+      const maxTipHeight = 20;
+      const borderRadius = 4;
+
+      let maxTipType = 'center';
+
+      x = Canvas.calculateX(maxDomain, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+      y = Canvas.calculateY(maxY, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp)
+        - this.pointSize;
+
+      ctx.save();
+      ctx.font = 'bold 14px Roboto';
+      const maxTipWidth = Math.round(Math.max(ctx.measureText(maxValue).width + 12, 40));
+
+      if (x + (maxTipWidth / 2) > chartRect.x2 - labelOffset.right - 10) {
+        maxTipType = 'right';
+        x -= (maxTipWidth / 2) - (arrowSize * 2);
+      } else if (x - (maxTipWidth / 2) < chartRect.x1 + labelOffset.left + 10) {
+        maxTipType = 'left';
+        x += (maxTipWidth / 2) - (arrowSize * 2);
+      }
+      ctx.restore();
+      this.showMaxTip({
+        context: ctx,
+        type: maxTipType,
+        width: maxTipWidth,
+        height: maxTipHeight,
+        opt: maxTipOpt,
+        x,
+        y,
+        arrowSize,
+        borderRadius,
+        maxValue,
+      });
+    }
+  }
+
+  showMaxTip(param) {
+    const { type, width, height, x, y, arrowSize, borderRadius, maxValue, opt } = param;
+    const ctx = param.context;
+
+    const sx = x - (width / 2);
+    const ex = x + (width / 2);
+    const sy = y - height;
+    const ey = y;
+
+    ctx.save();
+    ctx.font = 'bold 14px Roboto';
+
+    ctx.fillStyle = opt.background;
+    ctx.shadowColor = opt.color;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(sx + borderRadius, sy);
+    ctx.quadraticCurveTo(sx, sy, sx, sy + borderRadius);
+    ctx.lineTo(sx, ey - borderRadius);
+    ctx.quadraticCurveTo(sx, ey, sx + borderRadius, ey);
+
+    if (type === 'left') {
+      ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
+      ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+      ctx.lineTo(ex - borderRadius, ey);
+    } else if (type === 'right') {
+      ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+      ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
+      ctx.lineTo(ex - borderRadius, ey);
+    } else {
+      ctx.lineTo(x - arrowSize, ey);
+      ctx.lineTo(x, ey + arrowSize);
+      ctx.lineTo(x + arrowSize, ey);
+      ctx.lineTo(ex - borderRadius, ey);
+    }
+
+    ctx.quadraticCurveTo(ex, ey, ex, ey - borderRadius);
+    ctx.lineTo(ex, sy + borderRadius);
+    ctx.quadraticCurveTo(ex, sy, ex - borderRadius, sy);
+    ctx.lineTo(sx + borderRadius, sy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.font = 'bold 14px Roboto';
+    ctx.fillStyle = opt.color;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${maxValue}`, x, sy + (height / 2));
+    ctx.restore();
   }
 
   itemHighlight(item, context) {

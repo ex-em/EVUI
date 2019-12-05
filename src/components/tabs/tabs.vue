@@ -337,7 +337,9 @@
   };
 </script>
 
-<style>
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-tabs {
     width: 100%;
     height: 100%;
@@ -350,15 +352,22 @@
     top: 0;
     width: 100%;
     height: 30px;
-    border-bottom: 1px solid #dddee1;
+
+    @include evThemify() {
+      border-bottom: $border-solid evThemed('tab-border');
+    }
   }
   .ev-tabs-body {
     position: relative;
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    border: 1px solid #dddee1;
-    border-top: 0;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('tab-border');
+      border-top: 0;
+    }
   }
   .ev-tabs-scroll {
     box-sizing: border-box;
@@ -396,22 +405,20 @@
     display: inline-block;
     font-size: 12px;
     font-weight: 500;
-    color: #303133;
     position: relative;
-    background: #f8f8f9;
-    border: 1px solid #dddee1;
     user-select: none;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('tab-border');
+      background-color: evThemed('tab-bg');
+    }
   }
   .ev-tabs-item.active {
-    background: #fff;
     transform: translateZ(0);
-    color: #2d8cf0;
+    color: $color-primary;
     border-bottom: none;
-  }
-  .ev-tabs-item:hover {
-    color: #2589E9;
-    font-weight: bold;
-    cursor: pointer;
+    background-color: $color-white;
   }
   .ev-tabs-item.dragover {
     border-left: 3px solid blue;

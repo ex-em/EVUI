@@ -215,26 +215,41 @@ const modules = {
   },
 
   getSeriesMinMax(data) {
-    const def = { minX: null, minY: null, maxX: null, maxY: null };
+    const def = { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
+    const isHorizontal = this.options.horizontal;
 
     if (data.length) {
       return data.reduce((acc, p) => {
         const minmax = acc;
-        if (p.x < minmax.minX) {
+        if (p.x <= minmax.minX) {
           minmax.minX = (p.x === null) ? 0 : p.x;
         }
-        if (p.y < minmax.minY) {
+        if (p.y <= minmax.minY) {
           minmax.minY = (p.y === null) ? 0 : p.y;
         }
-        if (p.x > minmax.maxX) {
+        if (p.x >= minmax.maxX) {
           minmax.maxX = (p.x === null) ? 0 : p.x;
+
+          if (isHorizontal) {
+            minmax.maxDomain = p.y;
+          }
         }
-        if (p.y > minmax.maxY) {
+        if (p.y >= minmax.maxY) {
           minmax.maxY = (p.y === null) ? 0 : p.y;
+
+          if (!isHorizontal) {
+            minmax.maxDomain = p.x;
+          }
         }
 
         return minmax;
-      }, { minX: data[0].x, minY: data[0].y, maxX: data[0].x, maxY: data[0].y });
+      }, {
+        minX: data[0].x,
+        minY: data[0].y,
+        maxX: data[0].x,
+        maxY: data[0].y,
+        maxDomain: isHorizontal ? data[0].y : data[0].x,
+      });
     }
 
     return def;
@@ -257,10 +272,10 @@ const modules = {
         const axisY = series.yAxisIndex;
 
         if (!minmax.x[axisX]) {
-          minmax.x[axisX] = { min: null, max: null };
+          minmax.x[axisX] = { min: null, max: null, maxSID: null };
         }
         if (!minmax.y[axisY]) {
-          minmax.y[axisY] = { min: null, max: null };
+          minmax.y[axisY] = { min: null, max: null, maxSID: null };
         }
 
         if (smm && series.show) {
@@ -281,16 +296,18 @@ const modules = {
           }
           if (smm.maxX > minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
+            minmax.x[axisX].maxSID = key;
           }
           if (smm.maxY > minmax.y[axisY].max) {
             minmax.y[axisY].max = smm.maxY;
+            minmax.y[axisX].maxSID = key;
           }
         }
 
         return minmax;
       }, {
-        x: [{ min: null, max: null }],
-        y: [{ min: null, max: null }],
+        x: [{ min: null, max: null, maxSID: null }],
+        y: [{ min: null, max: null, maxSID: null }],
       });
     }
 

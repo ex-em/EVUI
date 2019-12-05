@@ -418,15 +418,22 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-timepicker {
     position: relative;
     width: 220px;
     height: 40px;
-  }
-  .ev-timepicker .ev-input-text {
-    height: 100%;
-    padding: 0;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
+
+    .ev-input-text {
+      height: 100%;
+      padding: 0;
+    }
   }
 
   .ev-timepicker input[type=text]{
@@ -434,10 +441,14 @@
     width: 100%;
     height: 100%;
     padding: 0 30px 0 30px;
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    background-color: #ffffff;
+    border-radius: $border-radius-base;
+    background-color: transparent;
     background-image: none;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('datepicker-input-border');
+    }
   }
 
   .ev-timepicker input[type=text]:focus,

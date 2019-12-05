@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  const prefixCls = 'evui-btn';
+  const prefixCls = 'ev-btn';
 
   export default {
     props: {
@@ -85,17 +85,22 @@
 <style lang="scss">
   @import '~@/styles/default';
 
-  .evui-btn {
+  $border-radius-circle: 50%;
+  $border-radius-half: 32px;
+
+  .ev-btn {
     display: inline-block;
     border: $border-solid transparent;
     border-radius: $border-radius-base;
+    background-color: $color-dark-level6;
+    color: $color-white;
     cursor: pointer;
     user-select: none;
     transition: color .2s linear,
-    background-color .2s linear,
-    border .2s linear,
-    opacity .2s linear,
-    box-shadow .2s linear;
+      background-color .2s linear,
+      border .2s linear,
+      opacity .2s linear,
+      box-shadow .2s linear;
 
     &:hover {
       opacity: 0.8;
@@ -118,6 +123,8 @@
     &[disabled],
     &[disabled]:active,
     &[disabled]:hover {
+      cursor: default;
+
       @include evThemify() {
         color: evThemed('button-disabled') !important;
         background-color: evThemed('button-disabled-bg') !important;
@@ -132,8 +139,8 @@
     }
   }
 
-  /** evui-btn > type(primary) **/
-  .evui-btn-primary {
+  /** ev-btn > type(primary) **/
+  .ev-btn-primary {
     color: $color-white;
     background-color: $color-primary;
     border-color: $color-primary;
@@ -145,8 +152,8 @@
     }
   }
 
-  /** evui-btn > type(info) **/
-  .evui-btn-info {
+  /** ev-btn > type(info) **/
+  .ev-btn-info {
     color: $color-white;
     background-color: $color-info !important;
     border-color: $color-info !important;
@@ -158,8 +165,8 @@
     }
   }
 
-  /** evui-btn > type(warning) **/
-  .evui-btn-warning {
+  /** ev-btn > type(warning) **/
+  .ev-btn-warning {
     color: $color-white;
     background-color: $color-warning;
     border-color: $color-warning;
@@ -171,8 +178,8 @@
     }
   }
 
-  /** evui-btn > type(error) **/
-  .evui-btn-error {
+  /** ev-btn > type(error) **/
+  .ev-btn-error {
     color: $color-white !important;
     background-color: $color-error;
     border-color: $color-error;
@@ -185,8 +192,8 @@
   }
 
 
-  /** evui-btn > type(ghost) **/
-  .evui-btn-ghost {
+  /** ev-btn > type(ghost) **/
+  .ev-btn-ghost {
     background-color: transparent;
 
     @include evThemify() {
@@ -201,8 +208,8 @@
     }
   }
 
-  /** evui-btn > type(dashed) **/
-  .evui-btn-dashed {
+  /** ev-btn > type(dashed) **/
+  .ev-btn-dashed {
     background-color: transparent;
     border-style: dashed;
 
@@ -218,10 +225,10 @@
     }
   }
 
-  fieldset[disabled] .evui-btn-dashed,
-  fieldset[disabled] .evui-btn-dashed:active,
-  fieldset[disabled] .evui-btn-dashed:focus,
-  fieldset[disabled] .evui-btn-dashed:hover {
+  fieldset[disabled] .ev-btn-dashed,
+  fieldset[disabled] .ev-btn-dashed:active,
+  fieldset[disabled] .ev-btn-dashed:focus,
+  fieldset[disabled] .ev-btn-dashed:hover {
     @include evThemify() {
       color: evThemed('button-disabled') !important;
       background-color: evThemed('button-disabled-bg') !important;
@@ -231,14 +238,14 @@
 
   /*
    ** 스타일 적용 안 되어 주석 처리 **
-  .evui-btn-dashed:focus {
+  .ev-btn-dashed:focus {
     -webkit-box-shadow: 0 0 0 2px rgba(45, 140, 240, .2);
     box-shadow: 0 0 0 2px rgba(45, 140, 240, .2)
   }
   */
 
-  /** evui-btn > type(text) **/
-  .evui-btn-text {
+  /** ev-btn > type(text) **/
+  .ev-btn-text {
     background-color: transparent;
     border-color: transparent;
 
@@ -257,32 +264,32 @@
   }
   /*
    ** 중복으로 주석 처리 **
-  .evui-btn-text:hover {
+  .ev-btn-text:hover {
     color: #6d7380;
     background-color: rgba(255,255,255,.2);
     border-color: rgba(255,255,255,.2)
   }
-  .evui-btn-text:active {
+  .ev-btn-text:active {
     color: #454c5b;
     background-color: rgba(0,0,0,.05);
     border-color: rgba(0,0,0,.05)
   }
   */
 
-  /** evui-btn > shape > circle **/
-  .evui-btn-radius {
+  /** ev-btn > shape > circle **/
+  .ev-btn-radius {
     border-radius: 32px;
   }
-  .evui-btn-circle {
+  .ev-btn-circle {
     border-radius: 50%;
   }
 
   /** size **/
-  .evui-btn-size-small {
+  .ev-btn-size-small {
     padding: 7px 10px;
     font-size: $font-size-base;
 
-    &.evui-btn-circle {
+    &.ev-btn-circle {
       padding: 7px;
     }
 
@@ -291,11 +298,11 @@
     }
   }
 
-  .evui-btn-size-medium {
+  .ev-btn-size-medium {
     padding: 8px 12px;
     font-size: $font-size-medium;
 
-    &.evui-btn-circle {
+    &.ev-btn-circle {
       padding: 8px;
     }
 
@@ -304,11 +311,11 @@
     }
   }
 
-  .evui-btn-size-large {
+  .ev-btn-size-large {
     padding: 10px 14px;
     font-size: $font-size-large;
 
-    &.evui-btn-circle {
+    &.ev-btn-circle {
       padding: 10px;
     }
 
