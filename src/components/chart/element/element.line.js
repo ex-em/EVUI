@@ -142,12 +142,13 @@ class Line {
       const arrowSize = 4;
       const maxTipHeight = 20;
       const borderRadius = 4;
+      const yOffset = this.point ? (this.pointSize * 2) : ((this.lineWidth * 2) + 2);
 
       let maxTipType = 'center';
 
       x = Canvas.calculateX(maxDomain, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       y = Canvas.calculateY(maxY, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp)
-        - this.pointSize;
+        - yOffset;
 
       ctx.save();
       ctx.font = 'bold 14px Roboto';

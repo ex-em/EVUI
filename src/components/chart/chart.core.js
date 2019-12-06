@@ -285,7 +285,7 @@ class EvChart {
   getChartRect() {
     const width = this.chartDOM.getBoundingClientRect().width || 10;
     const height = this.chartDOM.getBoundingClientRect().height || 10;
-    const padding = { top: 10, right: 4, left: 4, bottom: 4 };
+    const padding = { top: 20, right: 4, left: 4, bottom: 4 };
 
     this.setWidth(width);
     this.setHeight(height);
@@ -495,10 +495,20 @@ class EvChart {
   destroy() {
     const target = this.target;
 
-    this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
-    this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
-    this.overlayCanvas.onmousemove = null;
-    this.overlayCanvas.onmouseout = null;
+    if (this.options.legend.show) {
+      if (this.legendBoxDOM) {
+        this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
+      }
+
+      if (this.resizeDOM) {
+        this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
+      }
+    }
+
+    if (this.overlayCanvas) {
+      this.overlayCanvas.onmousemove = null;
+      this.overlayCanvas.onmouseout = null;
+    }
 
     if (this.options.useTooltip) {
       this.tooltipCanvas.remove();
