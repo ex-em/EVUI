@@ -4,7 +4,7 @@
       v-for="menuItem in menu"
       :key="menuItem.name"
       :style="`margin-left: ${depth * 5}px`"
-      class="ev-menu-item"
+      class="ev-menu-sub"
     >
       <menu-item
         v-bind="menuItem"

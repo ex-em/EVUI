@@ -65,6 +65,11 @@ $ev-themes: (
     textfield-input-background: $color-light-level1,
     textfield-input-disabled: lighten($color-black, 40%),
     textfield-input-disabled-background: $color-light-level2,
+
+    /* menu
+    -------------------------- */
+    menu-selected-bg: $color-selected,
+
   ),
   dark: (
     font-color-base: $color-white,
@@ -129,5 +134,10 @@ $ev-themes: (
     textfield-input-background: $color-dark-level1,
     textfield-input-disabled: darken($color-white, 40%),
     textfield-input-disabled-background: $color-dark-level4,
+
+    /* menu
+    -------------------------- */
+    menu-selected-bg: $color-selected-blue,
+
   ),
 ) !default;
