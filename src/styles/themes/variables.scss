@@ -59,6 +59,13 @@ $ev-themes: (
     grid-row-selected: $color-light-level3,
     grid-cell-text: lighten($color-light-level8, 10%),
 
+    /* input
+    -------------------------- */
+    textfield-input-border: $color-light-level6,
+    textfield-input-background: $color-light-level1,
+    textfield-input-disabled: lighten($color-black, 40%),
+    textfield-input-disabled-background: $color-light-level2,
+
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected,
@@ -102,7 +109,6 @@ $ev-themes: (
     -------------------------- */
     datepicker-input-border: $color-dark-level6,
 
-
     /* window
     -------------------------- */
     window-bg: $color-dark-level4,
@@ -122,10 +128,16 @@ $ev-themes: (
     grid-row-selected: lighten($color-light-level8, 10%),
     grid-cell-text: darken($color-white, 25%),
 
+    /* input
+    -------------------------- */
+    textfield-input-border: $color-dark-level6,
+    textfield-input-background: $color-dark-level1,
+    textfield-input-disabled: darken($color-white, 40%),
+    textfield-input-disabled-background: $color-dark-level4,
+
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected-blue,
-
 
   ),
 ) !default;
