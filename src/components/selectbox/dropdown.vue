@@ -131,7 +131,7 @@
     width: 100%;
     height: 35px;
     border-radius: $border-radius-base;
-    z-index: 100;
+    z-index: 850;
 
     @include evThemify() {
       color: evThemed('font-color-base');
