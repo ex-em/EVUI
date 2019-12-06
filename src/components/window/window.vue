@@ -1,7 +1,7 @@
 <template>
   <div
-    v-if="vIf"
-    v-show="vShow"
+    v-if="isAttachToDom"
+    v-show="isShowFlag"
     :id="windowId"
     :style="windowStyle"
     :class="windowCls"
@@ -89,8 +89,8 @@
         prefixCls: 'ev-window',
         modelEl: null,
         isMovedEl: false,
-        vIf: true,
-        vShow: true,
+        isAttachToDom: true,
+        isShowFlag: true,
         windowId: '',
         windowStyle: null,
         windowCls: '',
@@ -120,8 +120,8 @@
       isShow: {
         immediate: true,
         handler(value) {
-          this.vIf = this.closeType === 'hide' || value;
-          this.vShow = value;
+          this.isAttachToDom = this.closeType === 'hide' || value;
+          this.isShowFlag = value;
 
           if (!this.windowStyle && value) {
             this.$nextTick(() => {
@@ -287,18 +287,18 @@
       },
       close() {
         if (this.closeType === 'destroy') {
-          this.vIf = false;
+          this.isAttachToDom = false;
         } else {
-          this.vShow = false;
+          this.isShowFlag = false;
         }
 
         this.$emit('update:is-show', false);
       },
       show() {
         if (this.closeType === 'destroy') {
-          this.vIf = true;
+          this.isAttachToDom = true;
         } else {
-          this.vShow = true;
+          this.isShowFlag = true;
         }
 
         this.$emit('update:is-show', true);
@@ -525,7 +525,13 @@
       },
       syncIsShow() {
         if (this.modal && this.modelEl) {
-          this.modelEl.style.display = this.vShow ? 'block' : 'none';
+          const displayBlockCls = `${this.prefixCls}-display-block`;
+
+          if (this.isShowFlag) {
+            this.modelEl.classList.add(displayBlockCls);
+          } else {
+            this.modelEl.classList.remove(displayBlockCls);
+          }
         }
 
         this.windowStyle = this.getWindowStyle();
@@ -567,7 +573,10 @@
   }
   .ev-window-title-area {
     display: inline-block;
-    padding: 6px 0 0 12px;
+    position: absolute;
+    top: 0;
+    left: 15px;
+    padding-top: 6px;
     font-size: 16px;
   }
   .ev-window-header-pa {
@@ -677,5 +686,8 @@
     background-color: rgba(0,0,0,0.6);
     text-align: center;
     z-index: 700;
+  }
+  .ev-window-display-block {
+    display: block !important;
   }
 </style>
