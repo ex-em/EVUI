@@ -59,6 +59,10 @@ $ev-themes: (
     grid-row-selected: $color-light-level3,
     grid-cell-text: lighten($color-light-level8, 10%),
 
+    /* menu
+    -------------------------- */
+    menu-selected-bg: $color-selected,
+
   ),
   dark: (
     font-color-base: $color-white,
@@ -117,6 +121,11 @@ $ev-themes: (
     grid-bottom-border: lighten($color-dark-level7, 10%),
     grid-row-selected: lighten($color-light-level8, 10%),
     grid-cell-text: darken($color-white, 25%),
+
+    /* menu
+    -------------------------- */
+    menu-selected-bg: $color-selected-blue,
+
 
   ),
 ) !default;

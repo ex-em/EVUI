@@ -7,7 +7,7 @@
       <ev-icon
         v-if="firstIcon"
         :cls="firstIcon"
-        style="margin-right: 5px"
+        style="margin-right: 5px;"
       />
       {{ name }}
       <ev-icon
@@ -83,15 +83,12 @@
     },
     computed: {
       classes() {
-        return [
-          'ev-menu-item',
-          'wrap',
-          {
-            bold: this.children.length,
-            active: this.active,
-            selected: !this.children.length && this.name === this.selectedName,
-          },
-        ];
+        return {
+          'ev-menu-item': true,
+          bold: this.children.length,
+          active: this.active,
+          selected: !this.children.length && this.name === this.selectedName,
+        };
       },
     },
     methods: {
@@ -108,18 +105,23 @@
     },
   };
 </script>
-<style scoped>
-  .wrap {
+<style lang="scss">
+  @import '~@/styles/default';
+
+  .ev-menu-item {
     display: flex;
     align-items: center;
     user-select: none;
     cursor: pointer;
-  }
-  .wrap.selected {
-    background: #438DF3;
-    color: white;
-  }
-  .wrap.bold {
-    font-weight: bold;
+
+    &.selected {
+      @include evThemify() {
+        color: evThemed('menu-selected-bg');
+      }
+    }
+
+    &.bold {
+      font-weight: bold;
+    }
   }
 </style>

@@ -5,7 +5,7 @@
     <li
       v-for="menuItem in menu"
       :key="menuItem.name"
-      class="ev-menu-item"
+      class="ev-menu-sub"
     >
       <menu-item
         v-bind="menuItem"
@@ -45,12 +45,13 @@
     },
   };
 </script>
-<style>
+<style lang="scss">
+  .ev-menu-sub,
   .ev-menu-item {
     list-style-type: none;
   }
-  div.ev-menu-item {
-    padding: 8px 18px;
 
+  .ev-menu-item {
+    padding: 8px 18px;
   }
 </style>
