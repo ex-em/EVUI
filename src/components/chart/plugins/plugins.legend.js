@@ -21,6 +21,7 @@ const modules = {
 
     this.addLegendList();
     this.isInitLegend = true;
+    this.isLegendMove = false;
   },
 
   addLegendList() {
@@ -360,6 +361,8 @@ const modules = {
       default:
         break;
     }
+
+    this.isLegendMove = true;
   },
 
   onMouseUp(e) {
@@ -380,47 +383,52 @@ const modules = {
     const title = opt.title.show ? opt.title.height : 0;
     const padding = +this.legendDOM.style.paddingLeft.replace('px', '');
     let move;
-
-    switch (pos) {
-      case 'top':
-        resizeDOMStyle.top = ghostDOMStyle.top;
-        move = +ghostDOMStyle.top.replace('px', '');
-        legendDOMStyle.height = `${move - title}px`;
-        boxDOMStyle.height = `${move - title - 4}px`;
-        opt.legend.height = move - title - 4;
-        wrapperDOMStyle.padding = `${move}px 0 0 0`;
-        break;
-      case 'right':
-        resizeDOMStyle.left = ghostDOMStyle.left;
-        move = +ghostDOMStyle.left.replace('px', '');
-        legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-        boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
-        opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
-        wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
-        break;
-      case 'bottom':
-        resizeDOMStyle.bottom = ghostDOMStyle.bottom;
-        move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
-        legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
-        boxDOMStyle.height = `${move - title - 4}px`;
-        opt.legend.height = this.wrapperDOM.offsetHeight - move;
-        wrapperDOMStyle.padding = `${title}px 0 ${this.wrapperDOM.offsetHeight - move}px 0`;
-        break;
-      case 'left':
-        resizeDOMStyle.left = ghostDOMStyle.left;
-        move = +ghostDOMStyle.left.replace('px', '');
-        legendDOMStyle.width = `${move}px`;
-        boxDOMStyle.width = `${move}px`;
-        opt.legend.width = move;
-        wrapperDOMStyle.padding = `${title}px 0 0 ${move - 4}px`;
-        break;
-      default:
-        break;
+    if (this.isLegendMove) {
+      switch (pos) {
+        case 'top':
+          resizeDOMStyle.top = ghostDOMStyle.top;
+          move = +ghostDOMStyle.top.replace('px', '');
+          legendDOMStyle.height = `${move - title}px`;
+          boxDOMStyle.height = `${move - title - 4}px`;
+          opt.legend.height = move - title - 4;
+          wrapperDOMStyle.padding = `${move}px 0 0 0`;
+          break;
+        case 'right':
+          resizeDOMStyle.left = ghostDOMStyle.left;
+          move = +ghostDOMStyle.left.replace('px', '');
+          legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
+          boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
+          opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
+          wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
+          break;
+        case 'bottom':
+          resizeDOMStyle.bottom = ghostDOMStyle.bottom;
+          move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
+          legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
+          boxDOMStyle.height = `${move - title - 4}px`;
+          opt.legend.height = this.wrapperDOM.offsetHeight - move;
+          wrapperDOMStyle.padding = `${title}px 0 ${this.wrapperDOM.offsetHeight - move}px 0`;
+          break;
+        case 'left':
+          resizeDOMStyle.left = ghostDOMStyle.left;
+          move = +ghostDOMStyle.left.replace('px', '');
+          legendDOMStyle.width = `${move}px`;
+          boxDOMStyle.width = `${move}px`;
+          opt.legend.width = move;
+          wrapperDOMStyle.padding = `${title}px 0 0 ${move - 4}px`;
+          break;
+        default:
+          break;
+      }
     }
 
     resizeDOMStyle.display = 'block';
     this.ghostDOM.remove();
-    this.render();
+
+    if (this.isLegendMove) {
+      this.render();
+      this.isLegendMove = false;
+    }
   },
 
   showLegend() {
