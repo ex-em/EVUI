@@ -130,20 +130,24 @@ export default {
     &.button {
       display: flex;
       flex-direction: row;
-      color: #495060;
-      background-color: transparent;
-      border: solid 1px #dddee1;
       border-radius: 4px;
       justify-content: center;
       cursor: pointer;
       line-height: 19px;
       padding: 5px;
       margin-right: 10px;
+      background-color: $color-dark-level6;
+      color: $color-white;
+      border: solid 1px $color-dark-level6;
+      transition: opacity .2s linear;
 
       &:hover {
+        opacity: 0.7;
+        /*
         color: $color-primary;
         background-color: transparent;
         border-color: $color-primary;
+         */
       }
     }
 
@@ -202,6 +206,10 @@ export default {
       color: $color-white;
       background-color: $color-primary;
       border-color: $color-primary;
+
+      &:hover {
+        opacity: 1;
+      }
     }
 
     &:checked + .ev-radio-label.small:after {
