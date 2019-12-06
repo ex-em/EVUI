@@ -147,7 +147,7 @@ class Line {
 
       x = Canvas.calculateX(maxDomain, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       y = Canvas.calculateY(maxY, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp)
-        - this.pointSize;
+        - (this.pointSize * 2);
 
       ctx.save();
       ctx.font = 'bold 14px Roboto';
