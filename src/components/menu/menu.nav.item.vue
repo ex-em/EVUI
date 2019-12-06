@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{ first: depth === 1 }">
     <div
       :class="classes"
       @click="onClick"
@@ -20,13 +20,13 @@
           v-if="isExpanded"
           :key="'down'"
           :cls="'ei-s ei-arrow-down'"
-          style="margin-left: auto;"
+          style="margin-left: auto; opacity: .5;"
         />
         <ev-icon
           v-else
           :key="'up'"
           :cls="'ei-s ei-arrow-up'"
-          style="margin-left: auto;"
+          style="margin-left: auto; opacity: .5;"
         />
       </template>
     </div>
@@ -85,7 +85,8 @@
       classes() {
         return {
           'ev-menu-item': true,
-          bold: this.children.length,
+          // bold: this.children.length,
+          first: this.depth === 1,
           active: this.active,
           selected: !this.children.length && this.name === this.selectedName,
         };
@@ -105,23 +106,3 @@
     },
   };
 </script>
-<style lang="scss">
-  @import '~@/styles/default';
-
-  .ev-menu-item {
-    display: flex;
-    align-items: center;
-    user-select: none;
-    cursor: pointer;
-
-    &.selected {
-      @include evThemify() {
-        color: evThemed('menu-selected-bg');
-      }
-    }
-
-    &.bold {
-      font-weight: bold;
-    }
-  }
-</style>
