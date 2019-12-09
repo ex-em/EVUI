@@ -1,8 +1,7 @@
 <template>
   <section
-    v-if="vIf"
-    v-show="vShow"
-    :id="windowId"
+    v-if="isAttachToDom"
+    v-show="isShowFlag"
     :style="windowStyle"
     :class="windowCls"
     @mousedown="mousedown"
@@ -78,6 +77,10 @@
         type: Boolean,
         default: true,
       },
+      modal: {
+        type: Boolean,
+        default: false,
+      },
       isShow: {
         type: Boolean,
         default: true,
@@ -94,11 +97,13 @@
     data() {
       return {
         prefixCls: 'ev-window',
+        modelEl: null,
         isMovedEl: false,
+        isAttachToDom: true,
+        isShowFlag: true,
         isFullExpandWindow: false,
         vIf: true,
         vShow: true,
-        windowId: '',
         windowStyle: null,
         windowCls: '',
         headerCls: '',
@@ -126,13 +131,21 @@
     watch: {
       isShow: {
         immediate: true,
-        handler() {
-          this.syncIsShow();
+        handler(value) {
+          this.isAttachToDom = this.closeType === 'hide' || value;
+          this.isShowFlag = value;
+
+          if (!this.windowStyle && value) {
+            this.$nextTick(() => {
+              this.syncIsShow();
+            });
+          } else {
+            this.syncIsShow();
+          }
         },
       },
     },
     created() {
-      this.windowId = `window_${this._uid}`;
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = { [`${this.prefixCls}-header-area`]: true };
       this.windowCls = { [this.prefixCls]: true };
@@ -140,7 +153,15 @@
     mounted() {
       if (!this.isMovedEl) {
         this.isMovedEl = true;
-        this.$root.$el.appendChild(this.$el);
+
+        if (this.modal) {
+          this.modelEl = document.createElement('div');
+          this.modelEl.classList.add(`${this.prefixCls}-modal`);
+          this.modelEl.appendChild(this.$el);
+          this.$root.$el.appendChild(this.modelEl);
+        } else {
+          this.$root.$el.appendChild(this.$el);
+        }
       }
     },
     beforeDestroy() {
@@ -277,18 +298,18 @@
       },
       close() {
         if (this.closeType === 'destroy') {
-          this.vIf = false;
+          this.isAttachToDom = false;
         } else {
-          this.vShow = false;
+          this.isShowFlag = false;
         }
 
         this.$emit('update:is-show', false);
       },
       show() {
         if (this.closeType === 'destroy') {
-          this.vIf = true;
+          this.isAttachToDom = true;
         } else {
-          this.vShow = true;
+          this.isShowFlag = true;
         }
 
         this.$emit('update:is-show', true);
@@ -433,6 +454,9 @@
           headerHeight = this.headerHeight;
         }
 
+        width = Math.max(width, minWidth);
+        height = Math.max(height, minHeight);
+
         windowEl.style.cssText = `
           top: ${this.numberToPixel(top)};
           left: ${this.numberToPixel(left)};
@@ -443,8 +467,8 @@
           padding-top: ${this.numberToPixel(headerHeight)}`;
       },
       getWindowStyle() {
-        const bodyWidth = document.body.clientWidth;
-        const bodyHeight = document.body.clientHeight;
+        const bodyWidth = window.innerWidth;
+        const bodyHeight = window.innerHeight;
         const top = (bodyHeight / 2) - (this.height / 2);
         const left = (bodyWidth / 2) - (this.width / 2);
 
@@ -514,14 +538,17 @@
         return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
       },
       syncIsShow() {
-        this.vIf = this.closeType === 'hide' || this.isShow;
-        this.vShow = this.isShow;
+        if (this.modal && this.modelEl) {
+          const displayBlockCls = `${this.prefixCls}-display-block`;
 
-        if (!this.windowStyle && this.isShow) {
-          this.$nextTick(() => {
-            this.windowStyle = this.getWindowStyle();
-          });
+          if (this.isShowFlag) {
+            this.modelEl.classList.add(displayBlockCls);
+          } else {
+            this.modelEl.classList.remove(displayBlockCls);
+          }
         }
+
+        this.windowStyle = this.getWindowStyle();
       },
     },
   };
@@ -533,7 +560,7 @@
   .ev-window {
     position: absolute;
     border-radius: $border-radius-base;
-    overflow: visible;
+    overflow: hidden;
     z-index: 700;
     user-select: none;
 
@@ -553,6 +580,7 @@
     }
 
     &-title-area {
+      left: 15px;
       line-height: 26px;
       font-size: $font-size-large;
 
@@ -589,5 +617,22 @@
       padding: 13px 10px 10px;
       overflow: auto;
     }
+  }
+  .ev-window-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 100px;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.6);
+    text-align: center;
+    z-index: 700;
+    user-select: none;
+  }
+  .ev-window-display-block {
+    display: block !important;
   }
 </style>
