@@ -124,6 +124,9 @@
     computed: {
     },
     watch: {
+      value(val) {
+        this.dataToggleOn = val;
+      },
       toggleText: {
         async handler() {
           await this.setToggleStyle();
@@ -214,15 +217,17 @@
             toggleButtonStyle = {
               width: `${this.toggleObj.height - 4}px`,
               height: `${this.toggleObj.height - 4}px`,
-              left: this.dataToggleOn ? 'auto' : '1px',
-              right: this.dataToggleOn ? '1px' : '0',
+              top: '2px',
+              left: this.dataToggleOn ? 'auto' : '2px',
+              right: this.dataToggleOn ? '2px' : '0',
             };
           } else {
             toggleButtonStyle = {
-              width: `${this.toggleObj.height - 4}px`,
-              height: `${this.toggleObj.height - 4}px`,
-              left: this.dataToggleOn ? 'auto' : '1px',
-              right: this.dataToggleOn ? '1px' : '0',
+              width: `${this.toggleObj.height + 2}px`,
+              height: `${this.toggleObj.height + 2}px`,
+              top: '-1px',
+              left: this.dataToggleOn ? 'auto' : '-1px',
+              right: this.dataToggleOn ? '-1px' : '0',
               borderRadius: '50%',
             };
           }
@@ -236,48 +241,53 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-toggle.slide {
     display: inline-block;
     position: relative;
     vertical-align: middle;
-    border: 1px solid #CCCCCC;
     background-color: #CCCCCC;
     color: #000000;
     transition: all .2s ease-in-out;
     user-select: none;
     cursor: pointer;
+
+    &.active {
+      background-color: $color-primary;
+      color: $color-white;
+    }
   }
-  .ev-toggle.slide.active {
-    border: 1px solid #2D8CF0;
-    background-color: #2D8CF0;
-    color: #FFFFFF;
-  }
+
   .ev-toggle.tab {
     display: inline-flex;
     position: relative;
-    border: 1px solid #2D8CF0;
+    border: 1px solid $color-primary;
     user-select: none;
     cursor: pointer;
   }
+
   .ev-toggle.button {
     display: inline-block;
     position: relative;
     border: 0;
     padding: 0 10px 0 10px;
-    background-color: #2D8CF0;
-    color: #FFFFFF;
+    background-color: $color-primary;
+    color: $color-white;
     user-select: none;
     cursor: pointer;
   }
+
   .ev-toggle-switch {
     position: absolute;
-    top: 1px;
-    background-color: #FFFFFF;
+    background-color: $color-white;
     transition-duration: 0.5s;
     cursor: pointer;
-    content: '';
+    box-shadow: 0 0 12px 0 rgba($color-black, 0.2);
+    transition: left $animate-base;
   }
+
   .ev-toggle-offText-slide {
     display: inline-block;
     height: 0;
@@ -285,19 +295,13 @@
     visibility: visible;
     float: right;
   }
-  .active > .ev-toggle-offText-slide {
-    visibility: hidden;
-  }
+
   .ev-toggle-onText-slide {
     height: 0;
     margin-left: 10px;
     visibility: hidden;
   }
-  .active > .ev-toggle-onText-slide {
-    display: inline-block;
-    visibility: visible;
-    float: left;
-  }
+
   .ev-toggle-offText-tab {
     display: inline-block;
     float: left;
@@ -305,20 +309,15 @@
     height: 100%;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
-    background-color: #F7F7F7;
+    background-color: $color-light-level2;
     padding: 0 10px 0 10px;
-    color: #000000;
+    color: $color-black;
     text-align: center;
     vertical-align: middle;
     user-select: none;
     transition: all .2s ease-in-out;
   }
-  .active > .ev-toggle-offText-tab {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    background-color: #2D8CF0;
-    color: #FFFFFF;
-  }
+
   .ev-toggle-onText-tab {
     display: inline-block;
     float: left;
@@ -326,20 +325,15 @@
     height: 100%;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background-color: #2D8CF0;
+    background-color: $color-primary;
     padding: 0 10px 0 10px;
-    color: #FFFFFF;
+    color: $color-white;
     text-align: center;
     vertical-align: middle;
     user-select: none;
     transition: all .2s ease-in-out;
   }
-  .active > .ev-toggle-onText-tab {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    background-color: #F7F7F7;
-    color: #000000;
-  }
+
   .ev-toggle-onText-button {
     display: block;
     left: 0;
@@ -347,10 +341,7 @@
     height: 0;
     visibility: hidden;
   }
-  .active > .ev-toggle-onText-button {
-    text-align: center;
-    visibility: visible;
-  }
+
   .ev-toggle-offText-button {
     display: block;
     left: 0;
@@ -359,7 +350,40 @@
     text-align: center;
     visibility: visible;
   }
-  .active > .ev-toggle-offText-button {
-    visibility: hidden;
+
+  .active {
+    .ev-toggle-offText-slide {
+      visibility: hidden;
+    }
+
+    .ev-toggle-onText-slide {
+      display: inline-block;
+      visibility: visible;
+      float: left;
+    }
+
+    .ev-toggle-offText-tab {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      background-color: $color-primary;
+      color: $color-white;
+    }
+
+    .ev-toggle-onText-tab {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      background-color: $color-light-level2;
+      color: $color-black;
+    }
+
+    .ev-toggle-onText-button {
+      text-align: center;
+      visibility: visible;
+    }
+
+    .ev-toggle-offText-button {
+      visibility: hidden;
+    }
   }
+
 </style>

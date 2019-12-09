@@ -8,37 +8,42 @@ $font-weight-base: 400 !default;
 $font-family-base: 'NanumGothic', tahoma, arial, verdana, sans-serif !default;
 
 // Color
-$color-primary: #198FFF !default;
+$color-primary: #0F77EE !default;
 $color-info: #2DB7F5 !default;
 $color-warning: #FF9900 !default;
 $color-error: #ED4014 !default;
 $color-not-allow: #B01012 !default;
+$color-selected: #7F0AFF !default;
+$color-selected-blue: #347BFF !default;
 
 $color-white: #FFFFFF !default;
 $color-black: #202020 !default;
 
 // etc
-$border-radius-base: 4px;
-$border-radius-circle: 50%;
-$border-radius-half: 32px;
+$border-radius-base: 2px;
 $border-solid: 1px solid;
 $border-dotted: 1px dotted;
 
 // color - themes
-$color-dark-level1: #141518 !default;
-$color-dark-level2: #1D1E24 !default;
-$color-dark-level3: #25262E !default;
-$color-dark-level4: #353740 !default;
-$color-dark-level5: #3E414B !default;
-$color-dark-level6: #545965 !default;
-$color-dark-level7: #A0A5AE !default;
+$color-dark-level1: #111111 !default;
+$color-dark-level2: #191919 !default;
+$color-dark-level3: #262626 !default;
+$color-dark-level4: #333333 !default;
+$color-dark-level5: #414141 !default;
+$color-dark-level6: #666666 !default;
+$color-dark-level7: #999999 !default;
 $color-dark-level8: #EFF1F7 !default;
 
-$color-light-level1: #F7F7F7 !default;
-$color-light-level2: #DDDEE1 !default;
-$color-light-level3: #CCCCCC !default;
-$color-light-level4: #BBBEC4 !default;
-$color-light-level5: #495060 !default;
+$color-light-level1: #FCFCFC !default;
+$color-light-level2: #F4F4F4 !default;
+$color-light-level3: #EBEBEB !default;
+$color-light-level4: #DDDDDD !default;
+$color-light-level5: #CFCFCF !default;
+$color-light-level6: #B2B2B2 !default;
+$color-light-level7: #A6A6A6 !default;
+$color-light-level8: #323232 !default;
 
-
-
+// animate level
+$animate-base: 0.3s ease-in-out !default;
+$animate-fast: 0.2s ease-in-out !default;
+$animate-slow: 0.5s ease-in-out !default;

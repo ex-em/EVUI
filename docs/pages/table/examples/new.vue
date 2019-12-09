@@ -49,8 +49,7 @@
         <ev-button
           :type="'primary'"
           :size="'small'"
-          @on-click="onButton"
-          @click.native.stop=""
+          @click.native.stop="onButton"
         >
           Test Button
         </ev-button>
@@ -105,63 +104,62 @@
           { caption: 'Area', field: 'area', type: 'number', hide: true },
           { caption: 'Population', field: 'population', type: 'number' },
           { caption: 'GDP', field: 'gdp', type: 'number' },
-          // { caption: 'test1', field: 'test1', type: 'boolean',
-          // width: 50, render: { use: true } },
-          // { caption: 'test2', field: 'test2', type: 'boolean', render: { use: true } },
-          // {
-          //   caption: 'test3',
-          //   field: 'test3',
-          //   type: 'string',
-          //   width: 300,
-          //   render: {
-          //     use: true,
-          //     props: {
-          //       children: {
-          //         typeA: 'radio-01',
-          //         typeB: 'radio-02',
-          //         typeC: 'radio-03',
-          //       },
-          //     },
-          //   },
-          // },
-          // { caption: 'test4', field: 'test4', type: 'string', render: { use: true } },
-          // { caption: 'test5', field: 'test5', type: 'string', render: { use: true } },
-          // { caption: 'test6', field: 'test6', type: 'number', render: { use: true } },
-          // {
-          //   caption: 'test7',
-          //   field: 'test7',
-          //   type: 'string',
-          //   width: 100,
-          //   render: {
-          //     use: true,
-          //     props: {
-          //       list: [
-          //         { name: 'normal', value: 'normal' },
-          //         { name: 'warning', value: 'warning' },
-          //         { name: 'critical', value: 'critical' },
-          //       ],
-          //     },
-          //   },
-          // },
-          // {
-          //   caption: 'test8',
-          //   field: 'test8',
-          //   type: 'array',
-          //   width: 200,
-          //   render: {
-          //     use: true,
-          //     props: {
-          //       list: [
-          //         { name: 'normal', value: 'normal' },
-          //         { name: 'warning', value: 'warning' },
-          //         { name: 'critical', value: 'critical' },
-          //         { name: 'block', value: 'block' },
-          //         { name: 'major', value: 'major' },
-          //         { name: 'minor', value: 'minor' },
-          //       ],
-          //     },
-          //   },
-          // },
+          { caption: 'test1', field: 'test1', type: 'boolean', width: 50, render: { use: true } },
+          { caption: 'test2', field: 'test2', type: 'boolean', render: { use: true } },
+          {
+            caption: 'test3',
+            field: 'test3',
+            type: 'string',
+            width: 300,
+            render: {
+              use: true,
+              props: {
+                children: {
+                  typeA: 'radio-01',
+                  typeB: 'radio-02',
+                  typeC: 'radio-03',
+                },
+              },
+            },
+          },
+          { caption: 'test4', field: 'test4', type: 'string', render: { use: true } },
+          { caption: 'test5', field: 'test5', type: 'string', render: { use: true } },
+          { caption: 'test6', field: 'test6', type: 'number', render: { use: true } },
+          {
+            caption: 'test7',
+            field: 'test7',
+            type: 'string',
+            width: 100,
+            render: {
+              use: true,
+              props: {
+                list: [
+                  { name: 'normal', value: 'normal' },
+                  { name: 'warning', value: 'warning' },
+                  { name: 'critical', value: 'critical' },
+                ],
+              },
+            },
+          },
+          {
+            caption: 'test8',
+            field: 'test8',
+            type: 'array',
+            width: 200,
+            render: {
+              use: true,
+              props: {
+                list: [
+                  { name: 'normal', value: 'normal' },
+                  { name: 'warning', value: 'warning' },
+                  { name: 'critical', value: 'critical' },
+                  { name: 'block', value: 'block' },
+                  { name: 'major', value: 'major' },
+                  { name: 'minor', value: 'minor' },
+                ],
+              },
+            },
+          },
           // { caption: 'test9', field: 'test9', type: 'number' },
           // { caption: 'test10', field: 'test10', type: 'number' },
           // { caption: 'test11', field: 'test11', type: 'number' },
@@ -184,6 +182,10 @@
     },
     methods: {
       onButton() {
+        this.selected = this.tableData[3];
+        for (let ix = 0; ix < this.tableData.length - 5; ix++) {
+          this.checked.push(this.tableData[ix]);
+        }
       },
       onCheckBox() {
       },
@@ -199,14 +201,14 @@
             Math.random() * 10000,
             Math.random() * 100,
             Math.random() * 1000,
-            // false,
-            // false,
-            // 'radio-01',
-            // null,
-            // '',
-            // 1,
-            // 'normal',
-            // ['warning', 'block'],
+            false,
+            false,
+            'radio-01',
+            null,
+            '',
+            1,
+            'normal',
+            ['warning', 'block'],
             // Math.random() * 2000,
             // Math.random() * 3000,
             // Math.random() * 4000,

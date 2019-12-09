@@ -1,5 +1,5 @@
 <template>
-  <div
+  <section
     v-if="isAttachToDom"
     v-show="isShowFlag"
     :id="windowId"
@@ -15,25 +15,36 @@
       :class="headerCls"
       @dblclick="headerDblClick"
     >
-      <div :class="`${prefixCls}-title-area`">{{ title }}</div>
+      <p :class="`${prefixCls}-title-area`">{{ title }}</p>
       <div
-        v-if="maximizable"
-        :class="`${prefixCls}-expand-btn-line`"/>
-      <div
-        v-if="maximizable"
-        :class="`${prefixCls}-expand-btn`"
-        @click="clickExpandBtn"
-      />
-      <div :class="`${prefixCls}-close-btn-line`"/>
-      <div
-        :class="`${prefixCls}-close-btn`"
-        @click="clickCloseBtn"
-      />
+        :class="`${prefixCls}-btn-area`"
+      >
+        <span
+          v-if="maximizable"
+          :class="`${prefixCls}-btn`"
+          class="expand"
+          @click="clickExpandBtn"
+        >
+          <i
+            v-if="!isFullExpandWindow"
+            class="ei ei-expand" />
+          <i
+            v-else
+            class="ei ei-compress" />
+        </span>
+        <span
+          :class="`${prefixCls}-btn`"
+          class="close"
+          @click="clickCloseBtn"
+        >
+          <i class="ei ei-close" />
+        </span>
+      </div>
     </div>
     <div :class="`${prefixCls}-body-area`">
       <slot/>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -91,6 +102,9 @@
         isMovedEl: false,
         isAttachToDom: true,
         isShowFlag: true,
+        isFullExpandWindow: false,
+        vIf: true,
+        vShow: true,
         windowId: '',
         windowStyle: null,
         windowCls: '',
@@ -443,6 +457,9 @@
           headerHeight = this.headerHeight;
         }
 
+        width = Math.max(width, minWidth);
+        height = Math.max(height, minHeight);
+
         windowEl.style.cssText = `
           top: ${this.numberToPixel(top)};
           left: ${this.numberToPixel(left)};
@@ -545,134 +562,64 @@
 
   .ev-window {
     position: absolute;
-    border: 9px solid #424242;
-    border-radius: 8px;
-    overflow: visible;
+    border-radius: $border-radius-base;
+    overflow: hidden;
     z-index: 700;
+    user-select: none;
 
     @include evThemify() {
       background-color: evThemed('window-bg');
-    }
-  }
-  .dark .ev-window {
-    border: 9px solid #595C64;
-  }
-  .ev-window-header-area {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    padding-left: 6px;
-    border-bottom: 1px solid #B6B6B6;
-    font-family: Verdana, Arial, sans-serif;
-    align-items: center;
-    user-select: none;
-  }
-  .dark .ev-window-header-area {
-    border-bottom: 1px solid #464850;
-    color: #ABAEB5;
-  }
-  .ev-window-title-area {
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    left: 15px;
-    padding-top: 6px;
-    font-size: 16px;
-  }
-  .ev-window-header-pa {
-    border-color: #474a53;
-    background-color: #212227;
-    color: #ABAEB5;
-  }
-  .ev-window-expand-btn-line {
-    position: absolute;
-    top: 0;
-    right: 66px;
-    height: 32px;
-    border-left: 1px solid #B6B6B6;
-  }
-  .dark .ev-window-expand-btn-line {
-    border-left: 1px solid #464850;
-  }
-  .ev-window-expand-btn {
-    position: absolute;
-    top: 6px;
-    right: 40px;
-    width: 19px;
-    height: 19px;
-    line-height: 19px;
-    border-radius: 50%;
-    color: white;
-    text-align: center;
-    background: #B6B6B6;
-    font-size: 13px;
-    font-weight: bold;
-
-    &:before {
-      top: -1px;
-      right: 1px;
-      font-size: 18px;
-      content: 'ㅁ';
+      border: $border-solid evThemed('window-border');
     }
 
-    &:hover {
-      background: #319de9;
-      cursor: pointer;
-    }
-  }
-  .dark .ev-window-expand-btn {
-    color: #c7c8cc;
-    background: #595c64;
-  }
-
-  .ev-window-close-btn-line {
-    position: absolute;
-    top: 0;
-    right: 32px;
-    height: 32px;
-    border-left: 1px solid #B6B6B6;
-  }
-  .dark .ev-window-close-btn-line {
-    border-left: 1px solid #464850;
-  }
-  .ev-window-close-btn {
-    position: absolute;
-    top: 6px;
-    right: 7px;
-    width: 19px;
-    height: 19px;
-    line-height: 19px;
-    border-radius: 50%;
-    color: white;
-    text-align: center;
-    background: #B6B6B6;
-    font-size: 13px;
-    font-weight: bold;
-
-    &:before {
+    &-header-area {
+      position: absolute;
       top: 0;
-      right: 6px;
-      font-size: 11px;
-      content: 'X';
+      left: 0;
+      display: flex;
+      width: 100%;
+      padding: 7px 10px;
+      justify-content: space-between;
     }
 
-    &:hover {
-      background: #319de9;
-      cursor: pointer;
+    &-title-area {
+      left: 15px;
+      line-height: 26px;
+      font-size: $font-size-large;
+
+      @include evThemify() {
+        color: evThemed('window-btn');
+      }
     }
-  }
 
-  .dark .ev-window-close-btn {
-    color: #c7c8cc;
-    background: #595c64;
-  }
+    &-btn-area {
+      display: inline-flex;
 
-  .ev-window-body-area {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    padding: 6px;
-    overflow: auto;
+      .ev-window-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px;
+        height: 20px;
+        margin-left: 4px;
+        cursor: pointer;
+        font-size: $font-size-small;
+        border-radius: $border-radius-base;
+
+        @include evThemify() {
+          color: evThemed('window-btn');
+          background-color: evThemed('window-btn-bg');
+        }
+      }
+    }
+
+    &-body-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 13px 10px 10px;
+      overflow: auto;
+    }
   }
   .ev-window-modal {
     display: none;
@@ -682,10 +629,11 @@
     width: 100%;
     height: 100%;
     padding-top: 100px;
-    overflow: auto;
+    overflow: hidden;
     background-color: rgba(0,0,0,0.6);
     text-align: center;
     z-index: 700;
+    user-select: none;
   }
   .ev-window-display-block {
     display: block !important;

@@ -1611,8 +1611,15 @@ class Calendar {
 
   // 외부 Input box에 입력받는 값으로 클래스 내 데이터 갱신하는 함수
   setDateTime(dateTimeValue) {
+    const isValid = dateTimeValue && dateTimeValue.isValid();
     this.options.initSelectDayFlag = true;
-    this.options.initSelectDay = new Date(dateTimeValue);
+    if (isValid) {
+      this.options.initSelectDay = new Date(dateTimeValue);
+    } else {
+      const today = new Date();
+      this.options.initSelectDay = null;
+      this.options.currentYearMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    }
     this.options.initLimitDay = new Date();
     this.coordinate.calendarArea.selectDayArr = [];
     this.init();

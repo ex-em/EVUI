@@ -55,7 +55,7 @@
 <script>
   import Listbox from '@/components/selectbox/listbox';
 
-  const prefixCls = 'evui-dropdown';
+  const prefixCls = 'ev-dropdown';
 
   export default {
     components: {
@@ -120,28 +120,33 @@
   };
 </script>
 
-<style scoped>
-  /**  evui-dropdown  **/
-  /**  evui-dropdown > multiple-input-area **/
-  /**  evui-dropdown > multiple-input-area > input-text **/
+<style lang="scss">
+  @import '~@/styles/default';
+  /**  ev-dropdown  **/
+  /**  ev-dropdown > multiple-input-area **/
+  /**  ev-dropdown > multiple-input-area > input-text **/
 
-  .evui-dropdown{
+  .ev-dropdown {
     position: absolute;
     width: 100%;
     height: 35px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    z-index: 100;
+    border-radius: $border-radius-base;
+    z-index: 850;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('selectbox-border');
+      background-color: evThemed('selectbox-bg');
+    }
   }
-  .evui-dropdown-multiple-input-area{
+
+  .ev-dropdown-multiple-input-area {
     width: 100%;
     height: 100%;
     padding: 3px;
   }
-  .evui-dropdown-multiple-input-area .input-text{
+
+  .ev-dropdown-multiple-input-area .input-text {
     width: 100%;
     height: 100%;
     border: 1px solid #ccc;
@@ -150,41 +155,43 @@
     border-radius: 4px;
   }
 
-  /**  evui-dropdown > evui-dropdown-listbox-wrap **/
-  /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-group-area **/
-  /**  evui-dropdown > evui-dropdown-listbox-wrap > evui-dropdown-single-area **/
+  /**  ev-dropdown > ev-dropdown-listbox-wrap **/
+  /**  ev-dropdown > ev-dropdown-listbox-wrap > ev-dropdown-group-area **/
+  /**  ev-dropdown > ev-dropdown-listbox-wrap > ev-dropdown-single-area **/
 
-  .evui-dropdown-listbox-wrap {
+  .ev-dropdown-listbox-wrap {
     width: 100%;
   }
-  .evui-dropdown-group-area {
+
+  .ev-dropdown-group-area {
     list-style-type: none;
     width: 100%;
     max-height: 150px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    background: #FFFFFF;
-    -webkit-box-shadow: 0 6px 12px #ccc;
-    box-shadow: 0 6px 12px #ccc;
+    border-radius: $border-radius-base;
     overflow: auto;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('selectbox-border');
+      background-color: evThemed('selectbox-bg');
+    }
+
+    .title {
+      padding: 7px 10px;
+    }
   }
-  .evui-dropdown-group-area .title {
-    padding: 7px 10px;
-    color:#999;
-  }
-  .evui-dropdown-single-area {
+
+  .ev-dropdown-single-area {
     position: absolute;
     min-width: 100%;
     max-height: 150px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    background: #FFFFFF;
-    -webkit-box-shadow: 0 6px 12px #ccc;
-    box-shadow: 0 6px 12px #ccc;
+    border-radius: $border-radius-base;
     overflow: auto;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('selectbox-border');
+      background-color: evThemed('selectbox-bg');
+    }
   }
 </style>

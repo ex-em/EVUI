@@ -29,12 +29,12 @@ export const COLOR = [
 export const LINE_OPTION = {
   show: true,
   highlight: {
-    pointSize: 5,
+    pointSize: 4,
   },
   xAxisIndex: 0,
   yAxisIndex: 0,
   point: true,
-  pointSize: 4,
+  pointSize: 3,
   pointStyle: '',
   lineWidth: 2,
   fill: false,

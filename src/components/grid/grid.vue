@@ -25,11 +25,16 @@
           v-show="!column.hide"
           :key="index"
           :style="`width: ${column.width}px;`"
+          :class="{
+            column: true,
+            render: isRenderer(column),
+          }"
           class="column"
           @click="onSort(column.field)"
         >
           <span class="column-name">{{ column.caption }}</span>
           <ev-icon
+            v-if="false"
             :cls="'ei-s ei-s-arrow-down'"
             style="margin: 3px 0 0 0; font-size: 12px;"
           />
@@ -64,8 +69,7 @@
           >
             <td
               v-if="useCheckbox.use"
-              :style="
-              `width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+              :style="`width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             />
             <td
               v-for="(column, cellIndex) in orderedColumns"
@@ -78,7 +82,7 @@
           <tr
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
-            :class="row[2] === selected ? 'selected' : ''"
+            :class="row[2] === selectedRow ? 'selected' : ''"
             @click="onRowClick($event, row)"
           >
             <td
@@ -192,7 +196,8 @@
         sortList: {},
         filterList: {},
         filterCondition: {},
-        checkedRows: this.checked.map(item => item),
+        selectedRow: this.selected,
+        checkedRows: this.checked,
         prevCheckedRow: [],
         isHeaderChecked: false,
       };
@@ -227,6 +232,19 @@
     watch: {
       rows(value) {
         this.setStore(value);
+      },
+      selected(value) {
+        this.selectedRow = value;
+      },
+      checked(value) {
+        const store = this.originStore;
+
+        this.checkedRows = value;
+        for (let ix = 0; ix < store.length; ix++) {
+          if (value.includes(store[ix][ROW_DATA_INDEX])) {
+            store[ix][ROW_CHECK_INDEX] = true;
+          }
+        }
       },
       filterCondition: {
         deep: true,
@@ -376,7 +394,7 @@
 
         for (let ix = 0; ix < data.length; ix++) {
           if (filterFn(data[ix], condition)) {
-              filteredData.push(data[ix]);
+            filteredData.push(data[ix]);
           }
         }
 
@@ -401,18 +419,18 @@
               if (filter.conditions[jx].use) {
                 if (!filteredStore.length) {
                   filteredStore = this.getFilteredData(store, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   });
                 } else if (filter.method === 'or') {
                   filteredStore.push(...this.getFilteredData(store, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   }));
                 } else {
                   filteredStore = this.getFilteredData(filteredStore, columnType, {
-                      ...filter.conditions[jx],
-                      index,
+                    ...filter.conditions[jx],
+                    index,
                   });
                 }
               }
@@ -516,8 +534,8 @@
       },
       onClickOption(e, field, index) {
         if (this.showColumnOption) {
-            this.showColumnOption = false;
-            return;
+          this.showColumnOption = false;
+          return;
         }
 
         const rect = e.currentTarget.parentElement.getBoundingClientRect();
@@ -550,6 +568,7 @@
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
 
+        this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
         this.$emit('click-row', event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
       },
@@ -593,7 +612,7 @@
         for (let ix = 0; ix < this.originStore.length; ix++) {
           item = this.originStore[ix];
           if (status) {
-            checked.push(item);
+            checked.push(item[ROW_DATA_INDEX]);
           }
 
           item[ROW_CHECK_INDEX] = status;
@@ -625,136 +644,138 @@
   };
 </script>
 <style lang="scss" scoped>
-@import '~@/styles/default';
+  @import '~@/styles/default';
 
-.table {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding-top: 30px;
-}
-
-.table-header {
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 30px;
-
-  @include evThemify() {
-    background-color: evThemed('bg-color-base');
-    border-top: 2px solid evThemed('grid-header-border');
-    border-bottom: $border-solid evThemed('grid-bottom-border');
-  }
-}
-
-.column-list {
-  width: 100%;
-  white-space: nowrap;
-  list-style-type: none;
-}
-
-.column {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: 30px;
-  line-height: 30px;
-  vertical-align: top;
-  padding: 0 3px;
-  user-select: none;
-
-  &.dummy {
-    width: 0;
-    padding: 0;
-  }
-}
-
-.adjust .column:last-child {
-  border-right: 0;
-}
-
-.column-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: bold;
-
-  @include evThemify() {
-    color: evThemed('font-color-base');
-  }
-}
-
-.column-option {
-  position: absolute;
-  right: 0;
-  height: 100%;
-  background-color: transparent;
-
-  @include evThemify() {
-    /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
-    box-shadow: inset 0 0 3px evThemed('font-color-base');
-  }
-}
-
-.v-scroll .dummy {
-  width: 17px;
-}
-
-.table-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  overflow-anchor: none;
-
-  @include evThemify() {
-    background-color: evThemed('bg-color-base');
-    border-bottom: $border-solid evThemed('grid-bottom-border');
+  .table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 30px;
   }
 
-  table {
-    clear: both;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
+  .table-header {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 30px;
 
-  tr {
-    white-space: nowrap;
-    /* stylelint-disable */
-    &.selected {
-      @include evThemify() {
-        background-color: evThemed('grid-row-selected');
-      }
+    @include evThemify() {
+      border-top: 2px solid evThemed('grid-header-border');
+      border-bottom: $border-solid evThemed('grid-bottom-border');
     }
+  }
+
+  .column-list {
+    width: 100%;
+    white-space: nowrap;
+    list-style-type: none;
+  }
+
+  .column {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: top;
+    padding: 0 3px;
+    user-select: none;
 
     &.dummy {
-      border-bottom: none;
-      background: transparent;
+      width: 0;
+      padding: 0;
     }
-    /* stylelint-enable */
+
+    &.render {
+      justify-content: center;
+    }
   }
 
-  td {
-    display: inline-block;
-    padding: 0 3px;
+  .adjust .column:last-child {
+    border-right: 0;
+  }
 
-    @include truncate(100%);
+  .column-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+
     @include evThemify() {
-      color: evThemed('grid-cell-text');
-    }
-
-    &:last-child {
-      border-right: 0;
+      color: evThemed('font-color-base');
     }
   }
-}
 
-.vscroll-spacer {
-  opacity: 0;
-  clear: both;
-}
+  .column-option {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    background-color: transparent;
 
-[v-cloak] {
-  display: none;
-}
+    @include evThemify() {
+      /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
+      box-shadow: inset 0 0 3px evThemed('font-color-base');
+    }
+  }
+
+  .v-scroll .dummy {
+    width: 17px;
+  }
+
+  .table-body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    overflow-anchor: none;
+
+    @include evThemify() {
+      border-bottom: $border-solid evThemed('grid-bottom-border');
+    }
+
+    table {
+      clear: both;
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    tr {
+      white-space: nowrap;
+      /* stylelint-disable */
+      &.selected {
+        @include evThemify() {
+          background-color: evThemed('grid-row-selected');
+        }
+      }
+
+      &.dummy {
+        border-bottom: none;
+        background: transparent;
+      }
+      /* stylelint-enable */
+    }
+
+    td {
+      display: inline-block;
+      padding: 0 3px;
+
+      @include truncate(100%);
+      @include evThemify() {
+        color: evThemed('grid-cell-text');
+      }
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+  }
+
+  .vscroll-spacer {
+    opacity: 0;
+    clear: both;
+  }
+
+  [v-cloak] {
+    display: none;
+  }
 </style>

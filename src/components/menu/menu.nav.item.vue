@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{ first: depth === 1 }">
     <div
       :class="classes"
       @click="onClick"
@@ -7,7 +7,7 @@
       <ev-icon
         v-if="firstIcon"
         :cls="firstIcon"
-        style="margin-right: 5px"
+        style="margin-right: 5px;"
       />
       {{ name }}
       <ev-icon
@@ -20,13 +20,13 @@
           v-if="isExpanded"
           :key="'down'"
           :cls="'ei-s ei-arrow-down'"
-          style="margin-left: auto;"
+          style="margin-left: auto; opacity: .5;"
         />
         <ev-icon
           v-else
           :key="'up'"
           :cls="'ei-s ei-arrow-up'"
-          style="margin-left: auto;"
+          style="margin-left: auto; opacity: .5;"
         />
       </template>
     </div>
@@ -83,15 +83,13 @@
     },
     computed: {
       classes() {
-        return [
-          'ev-menu-item',
-          'wrap',
-          {
-            bold: this.children.length,
-            active: this.active,
-            selected: !this.children.length && this.name === this.selectedName,
-          },
-        ];
+        return {
+          'ev-menu-item': true,
+          // bold: this.children.length,
+          first: this.depth === 1,
+          active: this.active,
+          selected: !this.children.length && this.name === this.selectedName,
+        };
       },
     },
     methods: {
@@ -108,18 +106,3 @@
     },
   };
 </script>
-<style scoped>
-  .wrap {
-    display: flex;
-    align-items: center;
-    user-select: none;
-    cursor: pointer;
-  }
-  .wrap.selected {
-    background: #438DF3;
-    color: white;
-  }
-  .wrap.bold {
-    font-weight: bold;
-  }
-</style>

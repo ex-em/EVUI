@@ -1,11 +1,12 @@
 <template>
   <ul
     :style="`width: ${width}`"
+    class="ev-menu"
   >
     <li
       v-for="menuItem in menu"
       :key="menuItem.name"
-      class="ev-menu-item"
+      class="ev-menu-sub split"
     >
       <menu-item
         v-bind="menuItem"
@@ -45,12 +46,56 @@
     },
   };
 </script>
-<style>
-  .ev-menu-item {
-    list-style-type: none;
-  }
-  div.ev-menu-item {
-    padding: 8px 18px;
+<style lang="scss">
+  @import '~@/styles/default';
 
+  .ev-menu {
+    @include evThemify() {
+      color: evThemed('menu-color');
+    }
+  }
+
+  .ev-menu-sub {
+    list-style-type: none;
+
+    @include evThemify() {
+      color: evThemed('menu-color');
+    }
+
+    &.split:not(:last-child) {
+      @include evThemify() {
+        border-bottom: 1px solid evThemed('menu-sub-split');
+      }
+    }
+
+    &.split:not(:first-child) {
+      @include evThemify() {
+        padding-top: 18px;
+      }
+    }
+
+    & > .first {
+      padding: 0 18px;
+    }
+  }
+
+  .ev-menu-item {
+    display: flex;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+    list-style-type: none;
+    padding-bottom: 18px;
+    font-size: 13px;
+
+    &.first {
+      font-size: 16px;
+    }
+
+    &.selected {
+      @include evThemify() {
+        color: evThemed('menu-selected-bg');
+      }
+    }
   }
 </style>

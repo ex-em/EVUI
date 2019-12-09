@@ -76,6 +76,8 @@
       }, 1);
     },
     beforeDestroy() {
+      this.evChart.destroy();
+
       delete this.evChart;
     },
     methods: {
@@ -111,8 +113,15 @@
           height: '100%',
           thickness: 1,
           useTooltip: true,
-          useSelectionData: false,
-          type: 'line',
+          indicator: {
+            use: true,
+            color: '#EE7F44',
+          },
+          maxTip: {
+            use: true,
+            background: '#FFFFFF',
+            color: '#000000',
+          },
         };
       },
       getDefaultData() {
@@ -244,7 +253,7 @@
 
   .ev-chart-tooltip {
     position: absolute;
-    z-index: 100;
+    z-index: 850;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 17px;

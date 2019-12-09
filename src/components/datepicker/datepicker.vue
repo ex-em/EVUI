@@ -26,7 +26,7 @@
   import Calendar from '@/components/datepicker/calendar.core';
   import moment from 'moment';
 
-  const prefixCls = 'evui-input-text';
+  const prefixCls = 'ev-input-text';
 
   export default {
     components: {
@@ -243,6 +243,10 @@
               // YYYY, MM, DD가 모두 끝까지 입력되어야지만 set하도록 조건 변경
               if (numberValueLength > 3 && numberValueLength !== 5 && numberValueLength !== 7) {
                 vm.calendar.setDateTime(moment(setValue, vm.options.localeType));
+              }
+              if (!numberValueLength) {
+                vm.calendar.setDateTime(null);
+                vm.dataValue = null;
               }
             }
           },
@@ -601,23 +605,36 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-datepicker {
     width: 235px;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
   }
+
   .ev-datepicker-input-wrapper {
-    width: 235px;
+    width: 100%;
     height: 32px;
   }
+
   .ev-datepicker-input {
     width: 235px;
     height: 32px;
     line-height: 32px;
-    border: 1px solid #DCDFE6;
-    border-radius: 4px;
-    color: #606266;
+    border-radius: $border-radius-base;
     padding: 0 5px 0 5px;
+    background-color: transparent;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('datepicker-input-border');
+    }
   }
+
   .fit10,
   .fit13,
   .fit16,

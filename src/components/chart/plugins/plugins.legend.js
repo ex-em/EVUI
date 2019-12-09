@@ -21,6 +21,7 @@ const modules = {
 
     this.addLegendList();
     this.isInitLegend = true;
+    this.isLegendMove = false;
   },
 
   addLegendList() {
@@ -28,9 +29,9 @@ const modules = {
     const seriesList = this.seriesList;
 
     groups.forEach((group) => {
-      group.slice().reverse().forEach((series) => {
-        if (series.showLegend) {
-          this.addLegend(seriesList[series]);
+      group.slice().reverse().forEach((sId) => {
+        if (seriesList[sId] && seriesList[sId].showLegend) {
+          this.addLegend(seriesList[sId]);
         }
       });
     });
@@ -43,7 +44,7 @@ const modules = {
   },
 
   initEvent() {
-    this.legendBoxDOM.addEventListener('click', (e) => {
+    this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
       const type = e.target.domType;
 
@@ -79,9 +80,9 @@ const modules = {
       colorDOM.classList.toggle('inactive');
       nameDOM.classList.toggle('inactive');
       this.update();
-    });
+    };
 
-    this.resizeDOM.addEventListener('mousedown', (e) => {
+    this.onResizeMouseDown = (e) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -110,7 +111,10 @@ const modules = {
 
       this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
       this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
-    });
+    };
+
+    this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
+    this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
 
     this.mouseMove = this.onMouseMove.bind(this); // resizing function
     this.mouseUp = this.onMouseUp.bind(this); // resizing function
@@ -357,6 +361,8 @@ const modules = {
       default:
         break;
     }
+
+    this.isLegendMove = true;
   },
 
   onMouseUp(e) {
@@ -377,47 +383,52 @@ const modules = {
     const title = opt.title.show ? opt.title.height : 0;
     const padding = +this.legendDOM.style.paddingLeft.replace('px', '');
     let move;
-
-    switch (pos) {
-      case 'top':
-        resizeDOMStyle.top = ghostDOMStyle.top;
-        move = +ghostDOMStyle.top.replace('px', '');
-        legendDOMStyle.height = `${move - title}px`;
-        boxDOMStyle.height = `${move - title - 4}px`;
-        opt.legend.height = move - title - 4;
-        wrapperDOMStyle.padding = `${move}px 0 0 0`;
-        break;
-      case 'right':
-        resizeDOMStyle.left = ghostDOMStyle.left;
-        move = +ghostDOMStyle.left.replace('px', '');
-        legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-        boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
-        opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
-        wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
-        break;
-      case 'bottom':
-        resizeDOMStyle.bottom = ghostDOMStyle.bottom;
-        move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
-        legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
-        boxDOMStyle.height = `${move - title - 4}px`;
-        opt.legend.height = this.wrapperDOM.offsetHeight - move;
-        wrapperDOMStyle.padding = `${title}px 0 ${this.wrapperDOM.offsetHeight - move}px 0`;
-        break;
-      case 'left':
-        resizeDOMStyle.left = ghostDOMStyle.left;
-        move = +ghostDOMStyle.left.replace('px', '');
-        legendDOMStyle.width = `${move}px`;
-        boxDOMStyle.width = `${move}px`;
-        opt.legend.width = move;
-        wrapperDOMStyle.padding = `${title}px 0 0 ${move - 4}px`;
-        break;
-      default:
-        break;
+    if (this.isLegendMove) {
+      switch (pos) {
+        case 'top':
+          resizeDOMStyle.top = ghostDOMStyle.top;
+          move = +ghostDOMStyle.top.replace('px', '');
+          legendDOMStyle.height = `${move - title}px`;
+          boxDOMStyle.height = `${move - title - 4}px`;
+          opt.legend.height = move - title - 4;
+          wrapperDOMStyle.padding = `${move}px 0 0 0`;
+          break;
+        case 'right':
+          resizeDOMStyle.left = ghostDOMStyle.left;
+          move = +ghostDOMStyle.left.replace('px', '');
+          legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
+          boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
+          opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
+          wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
+          break;
+        case 'bottom':
+          resizeDOMStyle.bottom = ghostDOMStyle.bottom;
+          move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
+          legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
+          boxDOMStyle.height = `${move - title - 4}px`;
+          opt.legend.height = this.wrapperDOM.offsetHeight - move;
+          wrapperDOMStyle.padding = `${title}px 0 ${this.wrapperDOM.offsetHeight - move}px 0`;
+          break;
+        case 'left':
+          resizeDOMStyle.left = ghostDOMStyle.left;
+          move = +ghostDOMStyle.left.replace('px', '');
+          legendDOMStyle.width = `${move}px`;
+          boxDOMStyle.width = `${move}px`;
+          opt.legend.width = move;
+          wrapperDOMStyle.padding = `${title}px 0 0 ${move - 4}px`;
+          break;
+        default:
+          break;
+      }
     }
 
     resizeDOMStyle.display = 'block';
     this.ghostDOM.remove();
-    this.render();
+
+    if (this.isLegendMove) {
+      this.render();
+      this.isLegendMove = false;
+    }
   },
 
   showLegend() {

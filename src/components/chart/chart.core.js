@@ -56,7 +56,8 @@ class EvChart {
 
     this.seriesList = {};
 
-    this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 100);
+    this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 30);
+    this.overlayCanvas.onmouseout = this.onMouseOutEvent.bind(this);
     this.seriesInfo = {
       charts: {
         pie: [],
@@ -91,7 +92,10 @@ class EvChart {
 
     this.initRect();
     this.drawChart();
-    this.createTooltipDOM();
+
+    if (options.useTooltip) {
+      this.createTooltipDOM();
+    }
   }
 
   initRect() {
@@ -119,15 +123,23 @@ class EvChart {
   }
 
   drawSeries() {
-    const ctx = this.bufferCtx;
-    const chartRect = this.chartRect;
-    const labelOffset = this.labelOffset;
-    const axesSteps = this.axesSteps;
-    const isHorizontal = this.options.horizontal;
     const thickness = this.options.thickness;
+    const isHorizontal = this.options.horizontal;
+    const maxTip = this.options.maxTip;
+    const maxInfo = this.minMax[isHorizontal ? 'x' : 'y'];
+
+    const opt = {
+      ctx: this.bufferCtx,
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+      maxTipOpt: { background: maxTip.background, color: maxTip.color },
+      isHorizontal,
+    };
 
     let showIndex = 0;
     let showSeriesCount = 0;
+
     this.seriesInfo.charts.bar.forEach((series) => {
       if (this.seriesList[series].show) {
         showSeriesCount++;
@@ -141,20 +153,13 @@ class EvChart {
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
+        const maxSID = maxInfo[series[isHorizontal ? 'xAxisIndex' : 'yAxisIndex']].maxSID;
+        const showMaxTip = maxTip.use && chartTypeSet[jx] === maxSID;
 
         if (chartType === 'line' || chartType === 'scatter') {
-          series.draw({ ctx, chartRect, labelOffset, axesSteps, isHorizontal });
+          series.draw({ showMaxTip, ...opt });
         } else if (chartType === 'bar') {
-          series.draw({
-            ctx,
-            chartRect,
-            labelOffset,
-            axesSteps,
-            isHorizontal,
-            thickness,
-            showSeriesCount,
-            showIndex,
-          });
+          series.draw({ thickness, showSeriesCount, showIndex, showMaxTip, ...opt });
 
           if (series.show) {
             showIndex++;
@@ -280,17 +285,18 @@ class EvChart {
   getChartRect() {
     const width = this.chartDOM.getBoundingClientRect().width || 10;
     const height = this.chartDOM.getBoundingClientRect().height || 10;
+    const padding = { top: 20, right: 4, left: 4, bottom: 4 };
 
     this.setWidth(width);
     this.setHeight(height);
 
-    const chartWidth = width - 8;
-    const chartHeight = height - 8;
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
 
-    const x1 = 4;
-    const x2 = Math.max(width - 4, x1 + 2);
-    const y1 = 4;
-    const y2 = Math.max(height - 4, y1 + 2);
+    const x1 = padding.left;
+    const x2 = Math.max(width - padding.right, x1 + 2);
+    const y1 = padding.top;
+    const y2 = Math.max(height - padding.bottom, y1 + 2);
 
     return {
       x1,
@@ -407,11 +413,12 @@ class EvChart {
       if (this.legendDOM) {
         this.resetLegend();
       }
+
+      if (groups.length) {
+        this.addGroupInfo(groups);
+      }
     }
 
-    if (groups.length) {
-      this.addGroupInfo(groups);
-    }
     this.createDataSet(data, labels);
 
     this.minMax = this.getStoreMinMax();
@@ -460,8 +467,6 @@ class EvChart {
     this.pieDataSet = [];
   }
 
-  destroy() {}
-
   overlayClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -485,6 +490,47 @@ class EvChart {
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
+  }
+
+  destroy() {
+    const target = this.target;
+
+    if (this.options.legend.show) {
+      if (this.legendBoxDOM) {
+        this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
+      }
+
+      if (this.resizeDOM) {
+        this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
+      }
+    }
+
+    if (this.overlayCanvas) {
+      this.overlayCanvas.onmousemove = null;
+      this.overlayCanvas.onmouseout = null;
+    }
+
+    if (this.options.useTooltip) {
+      this.tooltipCanvas.remove();
+      this.tooltipCanvas = null;
+      this.tooltipDOM.remove();
+      this.tooltipDOM = null;
+    }
+
+    this.wrapperDOM = null;
+    this.chartDOM = null;
+    this.legendDOM = null;
+    this.legendBoxDOM = null;
+    this.resizeDOM = null;
+    this.ghostDOM = null;
+    this.titleDOM = null;
+    this.displayCanvas = null;
+    this.bufferCanvas = null;
+    this.overlayCanvas = null;
+
+    while (target.hasChildNodes()) {
+      target.removeChild(target.firstChild);
+    }
   }
 }
 

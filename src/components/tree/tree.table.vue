@@ -787,9 +787,10 @@
     },
   };
 </script>
+
 <style scoped src="@/components/tree/tree.table.grey.css"/>
 <style>
-  .evui-table-records-col .ev-checkbox-wrap .small {
+  .evui-table-records-col .ev-checkbox .small {
     height: 19px;
   }
 </style>
