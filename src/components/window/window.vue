@@ -2,7 +2,6 @@
   <section
     v-if="isAttachToDom"
     v-show="isShowFlag"
-    :id="windowId"
     :style="windowStyle"
     :class="windowCls"
     @mousedown="mousedown"
@@ -105,7 +104,6 @@
         isFullExpandWindow: false,
         vIf: true,
         vShow: true,
-        windowId: '',
         windowStyle: null,
         windowCls: '',
         headerCls: '',
@@ -148,7 +146,6 @@
       },
     },
     created() {
-      this.windowId = `window_${this._uid}`;
       this.headerStyle = `height: ${this.headerHeight}px`;
       this.headerCls = { [`${this.prefixCls}-header-area`]: true };
       this.windowCls = { [this.prefixCls]: true };
