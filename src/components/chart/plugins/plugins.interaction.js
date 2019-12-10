@@ -2,7 +2,6 @@ import { numberWithComma } from '@/common/utils';
 
 const modules = {
   onMouseMoveEvent(e) {
-    console.log('[event] [move]');
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
     const ctx = this.overlayCtx;
@@ -24,7 +23,6 @@ const modules = {
     }
   },
   onMouseLeaveEvent() {
-    console.log('[event] [out]');
     this.throttledMouseMove.cancel();
     this.overlayClear();
     this.tooltipClear();
