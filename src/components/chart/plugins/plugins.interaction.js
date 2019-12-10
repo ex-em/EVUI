@@ -2,6 +2,7 @@ import { numberWithComma } from '@/common/utils';
 
 const modules = {
   onMouseMoveEvent(e) {
+    console.log('[event] [move]');
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
     const ctx = this.overlayCtx;
@@ -22,7 +23,9 @@ const modules = {
       this.tooltipDOM.style.display = 'none';
     }
   },
-  onMouseOutEvent() {
+  onMouseLeaveEvent() {
+    console.log('[event] [out]');
+    this.throttledMouseMove.cancel();
     this.overlayClear();
     this.tooltipClear();
     this.tooltipDOM.style.display = 'none';
@@ -35,44 +38,49 @@ const modules = {
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
+    const isHorizontal = !!this.options.horizontal;
+
     let hitId = null;
     let maxs = '';
     let maxv = '';
-    let item = null;
 
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
       if (series.findGraphData) {
-        item = series.findGraphData(offset, !!this.options.horizontal);
+        const item = series.findGraphData(offset, isHorizontal);
 
         if (item.data) {
-          const sName = `${series.name}`;
+          const gdata = isHorizontal ? (item.data.b || item.data.x) : (item.data.b || item.data.y);
 
-          item.name = sName;
-          item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
-          items[sId] = item;
+          if (gdata !== null && gdata !== undefined) {
+            const sName = `${series.name}`;
 
-          const g = item.data.b || item.data.y || 0;
-          const cg = numberWithComma(g);
+            item.name = sName;
+            item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+            items[sId] = item;
 
-          if (maxs.length < sName.length) {
-            maxs = sName;
-          }
+            const g = item.data.b || item.data.y || 0;
+            const cg = numberWithComma(g);
 
-          if (maxv.length < `${cg}`.length) {
-            maxv = `${cg}`;
-          }
+            if (maxs.length < sName.length) {
+              maxs = sName;
+            }
 
-          if (item.hit) {
-            hitId = sId;
+            if (maxv.length < `${cg}`.length) {
+              maxv = `${cg}`;
+            }
+
+            if (item.hit) {
+              hitId = sId;
+            }
           }
         }
       }
     }
 
-    hitId = hitId === null ? sIds[0] : hitId;
+    hitId = hitId === null ? Object.keys(items)[0] : hitId;
 
     return { items, hitId, maxTip: [maxs, maxv] };
   },

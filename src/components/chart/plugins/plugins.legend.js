@@ -98,6 +98,7 @@ const modules = {
       if (pos === 'left' || pos === 'right') {
         ghostDOM.style.top = `${title}px`;
         ghostDOM.style.left = this.resizeDOM.style.left;
+        ghostDOM.style.right = this.resizeDOM.style.right;
         ghostDOM.style.height = this.resizeDOM.style.height;
       } else {
         ghostDOM.classList.add('horizontal');

@@ -114,5 +114,16 @@ export function quadrillion(v) {
 }
 
 export function numberWithComma(v) {
-  return truthy(v) ? v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : false;
+  const reg = /\B(?=(\d{3})+(?!\d))/g;
+
+  if (truthy(v)) {
+    if (Number.isInteger(v)) {
+      return v.toString().replace(reg, ',');
+    }
+
+    const part = v.toString().split('.');
+    return part[0].replace(reg, ',') + (part[1] ? `.${part[1]}` : '');
+  }
+
+  return false;
 }
