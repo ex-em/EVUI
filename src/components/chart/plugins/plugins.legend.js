@@ -114,7 +114,38 @@ const modules = {
       this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
     };
 
+    this.onLegendBoxOver = (e) => {
+      const type = e.target.domType;
+
+      let targetDOM;
+      if (type === 'container') {
+        targetDOM = e.target;
+      } else if (type === 'name' || type === 'color') {
+        targetDOM = e.target.parentElement;
+      } else {
+        return;
+      }
+      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
+      const targetId = nameDOM.series.sId;
+
+      Object.values(this.seriesList).forEach((series) => {
+        series.state = series.sId === targetId ? 'highlight' : 'downplay'; // eslint-disable-line
+      });
+
+      this.update();
+    };
+
+    this.onLegendBoxLeave = () => {
+      Object.values(this.seriesList).forEach((series) => {
+        series.state = 'normal'; // eslint-disable-line
+      });
+
+      this.update();
+    };
+
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
+    this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
+    this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
     this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
 
     this.mouseMove = this.onMouseMove.bind(this); // resizing function

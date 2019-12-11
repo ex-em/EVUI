@@ -148,7 +148,7 @@
     },
   };
 </script>
-<style>
+<style lang="scss">
   .ev-chart-wrapper {
     position: relative;
     width: 100%;
@@ -215,6 +215,10 @@
     width: 100%;
     transform: translate(0, -50%);
     position: absolute;
+
+    &:hover {
+      font-weight: bold;
+    }
   }
 
   .ev-chart-legend-value {

@@ -500,6 +500,8 @@ class EvChart {
     if (this.options.legend.show) {
       if (this.legendBoxDOM) {
         this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
+        this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver, false);
+        this.legendBoxDOM.removeEventListener('mouseleave', this.onLegendBoxLeave, false);
       }
 
       if (this.resizeDOM) {

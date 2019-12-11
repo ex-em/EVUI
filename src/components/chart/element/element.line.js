@@ -22,6 +22,12 @@ class Line {
     });
 
     this.sId = sId;
+    this.state = 'normal';
+    this.extent = {
+      downplay: { opacity: 0.1, lineWidth: 1 },
+      normal: { opacity: 1, lineWidth: 1 },
+      highlight: { opacity: 1, lineWidth: 2 },
+    };
     this.data = [];
   }
 
@@ -31,15 +37,20 @@ class Line {
     }
 
     const { ctx, chartRect, labelOffset, axesSteps, showMaxTip, maxTipOpt } = param;
+    const extent = this.extent[this.state];
+
+    const blurOpacity = extent.opacity;
+    const fillOpacity = this.fillOpacity * extent.opacity;
+    const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();
     ctx.save();
     ctx.lineJoin = 'round';
-    ctx.lineWidth = this.lineWidth;
-    ctx.strokeStyle = this.color;
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${blurOpacity})` || '';
 
     if (this.fill) {
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${this.fillOpacity})` || '';
+      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${fillOpacity})` || '';
     }
 
     let startFillIndex = 0;
@@ -102,7 +113,7 @@ class Line {
     const dataLen = this.data.length;
 
     if (this.fill && dataLen) {
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${this.fillOpacity})` || '';
+      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${fillOpacity})` || '';
       if (this.stackIndex) {
         this.data.slice().reverse().forEach((curr) => {
           x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -119,8 +130,8 @@ class Line {
     }
 
     if (this.point) {
-      ctx.strokeStyle = this.color;
-      ctx.fillStyle = this.pointFill;
+      ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${blurOpacity})` || '';
+      ctx.fillStyle = `rgba(${Util.hexToRgb(this.pointFill)},${blurOpacity})` || '';
 
       this.data.forEach((curr) => {
         if (curr.xp !== null && curr.yp !== null) {
@@ -142,7 +153,7 @@ class Line {
       const arrowSize = 4;
       const maxTipHeight = 20;
       const borderRadius = 4;
-      const yOffset = this.point ? (this.pointSize * 2) : ((this.lineWidth * 2) + 2);
+      const yOffset = this.point ? (this.pointSize * 2) : ((lineWidth * 2) + 2);
 
       let maxTipType = 'center';
 
