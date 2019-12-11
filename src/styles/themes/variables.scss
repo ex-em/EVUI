@@ -69,6 +69,8 @@ $ev-themes: (
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected,
+    menu-sub-split: $color-light-level5,
+    menu-color: #353740,
 
   ),
   dark: (
@@ -109,6 +111,7 @@ $ev-themes: (
     -------------------------- */
     datepicker-input-border: $color-dark-level6,
 
+
     /* window
     -------------------------- */
     window-bg: $color-dark-level4,
@@ -138,6 +141,8 @@ $ev-themes: (
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected-blue,
+    menu-sub-split: #353740,
+    menu-color: #E3E7F0,
 
   ),
 ) !default;

@@ -56,8 +56,10 @@ class EvChart {
 
     this.seriesList = {};
 
-    this.overlayCanvas.onmousemove = _throttle(this.onMouseMoveEvent.bind(this), 30);
-    this.overlayCanvas.onmouseout = this.onMouseOutEvent.bind(this);
+    this.throttledMouseMove = _throttle(this.onMouseMoveEvent, 30);
+
+    this.overlayCanvas.onmousemove = this.throttledMouseMove.bind(this);
+    this.overlayCanvas.onmouseleave = this.onMouseLeaveEvent.bind(this);
     this.seriesInfo = {
       charts: {
         pie: [],
@@ -507,7 +509,7 @@ class EvChart {
 
     if (this.overlayCanvas) {
       this.overlayCanvas.onmousemove = null;
-      this.overlayCanvas.onmouseout = null;
+      this.overlayCanvas.onmouseleave = null;
     }
 
     if (this.options.useTooltip) {

@@ -253,7 +253,7 @@
 
   .ev-chart-tooltip {
     position: absolute;
-    z-index: 100;
+    z-index: 850;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 17px;

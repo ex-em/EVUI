@@ -294,11 +294,11 @@ const modules = {
               minmax.y[axisY].min = smm.minY;
             }
           }
-          if (smm.maxX > minmax.x[axisX].max) {
+          if (smm.maxX >= minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
             minmax.x[axisX].maxSID = key;
           }
-          if (smm.maxY > minmax.y[axisY].max) {
+          if (smm.maxY >= minmax.y[axisY].max) {
             minmax.y[axisY].max = smm.maxY;
             minmax.y[axisX].maxSID = key;
           }
