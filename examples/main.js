@@ -70,6 +70,10 @@ const router = new VueRouter({
       path: '/notification',
       component: resolve => require(['./routers/notification'], resolve),
     },
+    {
+      path: '/message-box',
+      component: resolve => require(['./routers/message-box'], resolve),
+    },
   ],
 });
 

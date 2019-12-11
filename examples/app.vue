@@ -50,6 +50,9 @@
         <li>
           <router-link to="/notification">Notification</router-link>
         </li>
+        <li>
+          <router-link to="/message-box">MessageBox</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>
