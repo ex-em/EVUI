@@ -80,14 +80,12 @@
   export default {
     data() {
       return {
-        uid: 1,
         type: 'info',
         visible: false,
         title: '',
         message: '',
         iconClass: '',
         customClass: '',
-        showInput: false,
         showOKButton: true,
         showCancelButton: true,
         buttonAlign: 'right',
@@ -99,7 +97,6 @@
         cancelButtonClass: '',
         callback: null,
         useHTMLString: false,
-        focusAfterClosed: null,
       };
     },
     computed: {
@@ -120,11 +117,9 @@
     watch: {
       visible(val) {
         if (val) {
-          this.uid++;
           this.$nextTick(() => {
             this.$refs.confirm.$el.focus();
           });
-          this.focusAfterClosed = document.activeElement;
         }
       },
     },

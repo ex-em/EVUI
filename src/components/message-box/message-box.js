@@ -16,6 +16,6 @@ export default function messageBox(options = {}) {
     instance.$mount();
     root.appendChild(instance.$el);
   }
-  instance._data = Object.assign(instance._data, options);
+  Object.assign(instance._data, options);
   instance.visible = true;
 }
