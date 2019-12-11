@@ -83,8 +83,8 @@ export default {
     onChange(e) {
       if (this.$parent.$options.componentName === 'RadioGroup') {
         // 부모 컴포넌트가 Radio Group인 경우
-        this.$parent.$emit('on-change', e);
         this.$parent.$emit('input', e.target.value);
+        this.$parent.$emit('on-change', e);
       }
 //      else {
 //        // 부모 컴포넌트가 Radio Group로 안감싼경우
