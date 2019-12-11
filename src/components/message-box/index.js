@@ -1,3 +1,3 @@
-import Message from './message-box';
+import MessageBox from './message-box';
 
-export default Message;
+export default MessageBox;

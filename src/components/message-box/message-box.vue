@@ -6,17 +6,15 @@
     tabindex="-1"
     role="dialog"
     aria-modal="true"
-    @click.self="handleWrapperClick"
   >
     <div class="ev-message-box-modal"/>
     <div
       :class="['ev-message-box', customClass]"
     >
       <div
-        v-if="title !== null"
         class="ev-message-box-top"
       >
-        <div class="el-message-box-top-title">
+        <div class="ev-message-box-top-title">
           <div
             v-if="icon"
             :class="['ev-message-box-status', icon]"
@@ -55,10 +53,10 @@
         <ev-button
           v-if="showCancelButton"
           :loading="cancelButtonLoading"
-          :class="[ cancelButtonClasses ]"
           size="small"
           @click.native="handleAction('cancel')"
-          @keydown.enter="handleAction('cancel')">
+          @keydown.enter="handleAction('cancel')"
+        >
           {{ cancelButtonText }}
         </ev-button>
         <ev-button
@@ -67,7 +65,8 @@
           :loading="confirmButtonLoading"
           size="small"
           @click.native="handleAction('ok')"
-          @keydown.enter="handleAction('ok')">
+          @keydown.enter="handleAction('ok')"
+        >
           {{ okButtonText }}
         </ev-button>
       </div>
@@ -76,7 +75,6 @@
 </template>
 
 <script type="text/babel">
-  // let messageBox;
   const typeMap = {
     success: 'success',
     info: 'info',
@@ -85,22 +83,6 @@
   };
 
   export default {
-    components: {
-    },
-    props: {
-      // showClose: {
-      //   type: Boolean,
-      //   default: true,
-      // },
-      // closeOnClickModal: {
-      //   type: Boolean,
-      //   default: true,
-      // },
-      // closeOnPressEscape: {
-      //   type: Boolean,
-      //   default: true,
-      // },
-    },
     data() {
       return {
         uid: 1,
@@ -134,9 +116,6 @@
         const { type, iconClass } = this;
         return iconClass || (type && typeMap[type] ? `ev-icon-${typeMap[type]}` : '');
       },
-      cancelButtonClasses() {
-        return `${this.cancelButtonClass}`;
-      },
       bottomAlign() {
         let result;
         switch (this.buttonAlign) {
@@ -159,7 +138,6 @@
             this.$refs.confirm.$el.focus();
           });
           this.focusAfterClosed = document.activeElement;
-          // messageBox = new Dialog(this.$el, this.focusAfterClosed, this.getFirstFocus());
         }
       },
     },
@@ -168,30 +146,19 @@
     beforeDestroy() {
     },
     methods: {
-      getSafeClose() {
-        const currentId = this.uid;
-        return () => {
-          this.$nextTick(() => {
-            if (currentId === this.uid) this.doClose();
-          });
-        };
-      },
       doClose() {
-        if (!this.visible) return;
+        if (!this.visible) {
+          return;
+        }
         this.visible = false;
 
         if (this.onClosed) {
           this.onClosed(this.action, this);
         }
       },
-      handleWrapperClick() {
-      },
       handleAction(action) {
         this.action = action;
         this.doClose();
-      },
-      handleClose() {
-        this.handleAction('close');
       },
     },
   };

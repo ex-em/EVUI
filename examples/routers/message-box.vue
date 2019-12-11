@@ -25,6 +25,14 @@
           title: 'Title',
           message: 'message',
           type: 'success',
+          onClosed: (type, scope) => {
+            console.log(type);
+            console.log(scope);
+            this.$message({
+              message: type,
+              type: 'success',
+            });
+          },
         });
       },
     },
