@@ -34,7 +34,7 @@
       </slot>
       <i
         v-if="showClose"
-        class="el-message-closeBtn el-icon-close"
+        class="ei ei-close"
         @click="close"
       />
     </div>
