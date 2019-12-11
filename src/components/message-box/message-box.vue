@@ -15,9 +15,9 @@
         class="ev-message-box-top"
       >
         <div class="ev-message-box-top-title">
-          <div
-            v-if="icon"
-            :class="['ev-message-box-status', icon]"
+          <i
+            v-if="type!==''"
+            :class="['ei', `ei-${type}`]"
           />
           <span>{{ title }}</span>
         </div>
@@ -29,10 +29,6 @@
       </div>
       <div class="ev-message-box-center">
         <div class="ev-message-box-container">
-          <div
-            v-if="icon && message !== ''"
-            :class="['ev-message-box-status', icon]"
-          />
           <div
             v-if="message !== ''"
             class="ev-message-box-message"
@@ -52,7 +48,6 @@
       >
         <ev-button
           v-if="showCancelButton"
-          :loading="cancelButtonLoading"
           size="small"
           @click.native="handleAction('cancel')"
           @keydown.enter="handleAction('cancel')"
@@ -62,7 +57,7 @@
         <ev-button
           v-show="showOKButton"
           ref="confirm"
-          :loading="confirmButtonLoading"
+          :type="'primary'"
           size="small"
           @click.native="handleAction('ok')"
           @keydown.enter="handleAction('ok')"
@@ -75,12 +70,12 @@
 </template>
 
 <script type="text/babel">
-  const typeMap = {
-    success: 'success',
-    info: 'info',
-    warning: 'warning',
-    error: 'error',
-  };
+  // const typeMap = {
+  //   success: 'success',
+  //   info: 'info',
+  //   warning: 'warning',
+  //   error: 'error',
+  // };
 
   export default {
     data() {
@@ -99,23 +94,15 @@
         action: '',
         okButtonText: 'OK',
         cancelButtonText: 'Cancel',
-        confirmButtonLoading: false,
-        cancelButtonLoading: false,
         confirmButtonClass: '',
         confirmButtonDisabled: false,
         cancelButtonClass: '',
-        editorErrorMessage: null,
         callback: null,
         useHTMLString: false,
         focusAfterClosed: null,
-        isOnComposition: false,
       };
     },
     computed: {
-      icon() {
-        const { type, iconClass } = this;
-        return iconClass || (type && typeMap[type] ? `ev-icon-${typeMap[type]}` : '');
-      },
       bottomAlign() {
         let result;
         switch (this.buttonAlign) {
@@ -163,7 +150,8 @@
     },
   };
 </script>
-<style>
+<style lang="scss">
+  @import '~@/styles/default';
   @keyframes ev-message-box-fade-in {
     0% {
       transform: translate3d(0, -20px, 0);
@@ -233,15 +221,21 @@
   }
   .ev-message-box-top-title {
     font-size: 18px;
-    line-height: 1;
     color: #303133;
+  }
+  ev-message-box-top-title .ei {
+    font-size: 16px;
   }
   .ev-message-box .ei-close {
     position: absolute;
     top: 5px;
     right: 7px;
     font-size: 12px;
-    font-weight: 600;
+    cursor: pointer;
+  }
+  .ev-message-box .ei-close:hover {
+    transition: color $animate-fast;
+    color: $color-primary;
   }
   .ev-message-box-center {
     margin: 14px 0;
