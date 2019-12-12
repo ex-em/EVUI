@@ -46,7 +46,7 @@ const modules = {
   initEvent() {
     this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
-      const type = e.target.domType;
+      const type = e.target.dataset.type;
 
       let targetDOM;
       if (type === 'container') {
@@ -114,7 +114,38 @@ const modules = {
       this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
     };
 
+    this.onLegendBoxOver = (e) => {
+      const type = e.target.dataset.type;
+
+      let targetDOM;
+      if (type === 'container') {
+        targetDOM = e.target;
+      } else if (type === 'name' || type === 'color') {
+        targetDOM = e.target.parentElement;
+      } else {
+        return;
+      }
+      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
+      const targetId = nameDOM.series.sId;
+
+      Object.values(this.seriesList).forEach((series) => {
+        series.state = series.sId === targetId ? 'highlight' : 'downplay';
+      });
+
+      this.update();
+    };
+
+    this.onLegendBoxLeave = () => {
+      Object.values(this.seriesList).forEach((series) => {
+        series.state = 'normal';
+      });
+
+      this.update();
+    };
+
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
+    this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
+    this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
     this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
 
     this.mouseMove = this.onMouseMove.bind(this); // resizing function
@@ -147,11 +178,11 @@ const modules = {
     nameDOM.series = series;
 
     colorDOM.style.backgroundColor = series.color;
-    colorDOM.domType = 'color';
+    colorDOM.dataset.type = 'color';
     nameDOM.style.color = opt.color;
     nameDOM.textContent = series.name;
     nameDOM.setAttribute('title', series.name);
-    nameDOM.domType = 'name';
+    nameDOM.dataset.type = 'name';
 
     this.legendDOM.style.padding = '0';
 
@@ -166,7 +197,7 @@ const modules = {
     }
     containerDOM.style.height = `${opt.height - 4}px`;
     containerDOM.style.display = 'inline-block';
-    containerDOM.domType = 'container';
+    containerDOM.dataset.type = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
     this.seriesInfo.count++;
