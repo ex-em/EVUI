@@ -28,6 +28,8 @@ import EvSplitter from './components/splitter';
 import EvMarkdown from './components/markdown';
 import EvGrid from './components/grid/grid';
 import EvMessage from './components/message/index';
+import EvNotification from './components/notification/index';
+import EvMessageBox from './components/message-box/index';
 
 const components = {
   EvButton,
@@ -60,6 +62,8 @@ const components = {
   EvMarkdown,
   EvGrid,
   EvMessage,
+  EvNotification,
+  EvMessageBox,
 };
 
 const evui = {
@@ -74,6 +78,8 @@ const install = function (Vue) {
   });
 
   Vue.prototype.$message = EvMessage;
+  Vue.prototype.$messagebox = EvMessageBox;
+  Vue.prototype.$notify = EvNotification;
 };
 
 // auto install

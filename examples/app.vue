@@ -44,6 +44,15 @@
         <li>
           <router-link to="/radio">Radio</router-link>
         </li>
+        <li>
+          <router-link to="/message">Message</router-link>
+        </li>
+        <li>
+          <router-link to="/notification">Notification</router-link>
+        </li>
+        <li>
+          <router-link to="/message-box">MessageBox</router-link>
+        </li>
       </ul>
     </nav>
     <router-view/>
@@ -72,16 +81,16 @@
     display: inline-block;
   }
   li + li {
-    border-left: solid 1px #bbb;
+    border-left: solid 1px #BBBBBB;
     padding-left: 10px;
     margin-left: 10px;
   }
-  .container{
+  .container {
     padding: 50px 40px 0 40px;
     width: 100%;
     height: 100%;
   }
   .v-link-active {
-    color: #bbb;
+    color: #BBBBBB;
   }
 </style>
