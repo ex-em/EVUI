@@ -1,10 +1,10 @@
-import _merge from 'lodash/merge';
+import { merge } from 'lodash-es';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 
 class Bar {
   constructor(sId, opt, sIdx) {
-    const merged = _merge({}, BAR_OPTION, opt);
+    const merged = merge({}, BAR_OPTION, opt);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });

@@ -1,4 +1,4 @@
-import _throttle from 'lodash-es/throttle';
+import { throttle } from 'lodash-es';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -56,7 +56,7 @@ class EvChart {
 
     this.seriesList = {};
 
-    this.throttledMouseMove = _throttle(this.onMouseMoveEvent, 30);
+    this.throttledMouseMove = throttle(this.onMouseMoveEvent, 30);
 
     this.overlayCanvas.onmousemove = this.throttledMouseMove.bind(this);
     this.overlayCanvas.onmouseleave = this.onMouseLeaveEvent.bind(this);
@@ -93,6 +93,7 @@ class EvChart {
     this.labelOffset = this.getLabelOffset();
 
     this.initRect();
+    this.bufferCtx.save();
     this.drawChart();
 
     if (options.useTooltip) {
@@ -277,17 +278,15 @@ class EvChart {
     if (this.oldPixelRatio !== this.pixelRatio) {
       this.oldPixelRatio = this.pixelRatio;
     }
-    if (devicePixelRatio !== backingStoreRatio) {
-      this.displayCtx.scale(this.pixelRatio, this.pixelRatio);
-      this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
-      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
-    }
+
+    this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
+    this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
   }
 
   getChartRect() {
     const width = this.chartDOM.getBoundingClientRect().width || 10;
     const height = this.chartDOM.getBoundingClientRect().height || 10;
-    const padding = { top: 20, right: 4, left: 4, bottom: 4 };
+    const padding = { top: 20, right: 2, left: 2, bottom: 4 };
 
     this.setWidth(width);
     this.setHeight(height);
@@ -343,7 +342,7 @@ class EvChart {
     const axesY = this.axesY;
     const range = this.axesRange;
     const labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
-    const labelBuffer = { width: 20, height: 4 };
+    const labelBuffer = { width: 14, height: 4 };
 
     let lw = 0;
     let lh = 0;
@@ -415,10 +414,10 @@ class EvChart {
       if (this.legendDOM) {
         this.resetLegend();
       }
+    }
 
-      if (groups.length) {
-        this.addGroupInfo(groups);
-      }
+    if (groups.length) {
+      this.addGroupInfo(groups);
     }
 
     this.createDataSet(data, labels);
@@ -489,8 +488,29 @@ class EvChart {
 
   render() {
     this.clear();
-    this.initScale();
     this.chartRect = this.getChartRect();
+    this.initScale();
+    this.drawChart();
+  }
+
+  resize() {
+    this.bufferCtx.restore();
+    this.bufferCtx.save();
+
+    this.initScale();
+    this.redraw();
+    this.render();
+  }
+
+  redraw() {
+    const width = this.chartDOM.getBoundingClientRect().width || 10;
+    const height = this.chartDOM.getBoundingClientRect().height || 10;
+
+    this.setWidth(width);
+    this.setHeight(height);
+
+    this.initScale();
+    this.clear();
     this.drawChart();
   }
 

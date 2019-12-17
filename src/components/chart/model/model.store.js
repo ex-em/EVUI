@@ -1,4 +1,4 @@
-import _reverse from 'lodash-es/reverse';
+import { reverse } from 'lodash-es';
 
 const modules = {
   createDataSet(data, label) {
@@ -386,7 +386,7 @@ const modules = {
     }
 
     if (this.options.reverse) {
-      this.pieDataSet = _reverse(this.pieDataSet);
+      this.pieDataSet = reverse(this.pieDataSet);
     }
   },
 

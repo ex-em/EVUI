@@ -1,6 +1,6 @@
 <template>
   <div
-    v-resize="onResize"
+    v-resize.debounce="onResize"
     ref="wrapper"
     :style="wrapperStyle"
     class="ev-chart"
@@ -8,9 +8,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
-  import _merge from 'lodash-es/merge';
-  import _defaultsDeep from 'lodash-es/defaultsDeep';
-  import _isEqual from 'lodash-es/isEqual';
+  import { defaultsDeep, isEqual } from 'lodash-es';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -45,23 +43,29 @@
     },
     watch: {
       data: {
-        handler(newVal, oldVal) {
-          this.evChart.data = _defaultsDeep({}, newVal, this.normalizedData);
-          this.evChart.update(!_isEqual(newVal.series, oldVal.series));
+        handler(newVal) {
+          const newData = defaultsDeep({}, newVal, this.normalizedData);
+          const updatedSeries = !isEqual(newData.series, this.evChart.data.series);
+
+          this.evChart.data = newData;
+          this.evChart.update(updatedSeries);
         },
         deep: true,
       },
       options: {
-        handler(newVal, oldVal) {
-          this.evChart.options = _defaultsDeep({}, newVal, this.normalizedOption);
-          this.evChart.update(!_isEqual(newVal.legend, oldVal.legend));
+        handler(newVal) {
+          const newOpt = defaultsDeep({}, newVal, this.normalizedOption);
+          const updatedSeries = !isEqual(newOpt.legend, this.evChart.options.legend);
+
+          this.evChart.options = newOpt;
+          this.evChart.update(updatedSeries);
         },
         deep: true,
       },
     },
     created() {
-      this.normalizedOption = _merge(this.getDefaultOptions(), this.options);
-      this.normalizedData = _merge(this.getDefaultData(), this.data);
+      this.normalizedOption = defaultsDeep({}, this.options, this.getDefaultOptions());
+      this.normalizedData = defaultsDeep(this.data, this.getDefaultData());
     },
     mounted() {
       const wrapper = this.$refs.wrapper;
@@ -143,7 +147,7 @@
         return sizeValue;
       },
       onResize() {
-        this.evChart.update();
+        this.evChart.resize();
       },
     },
   };

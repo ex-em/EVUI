@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import Util from '../helpers/helpers.util';
 
 const modules = {
   createTooltipDOM() {
@@ -12,6 +13,7 @@ const modules = {
     this.tooltipDOM.appendChild(this.tooltipCanvas);
     document.body.appendChild(this.tooltipDOM);
   },
+
   setTooltipLayout(hitInfo, e, offset) {
     const ctx = this.tooltipCtx;
     const mouseX = e.pageX;
@@ -47,16 +49,16 @@ const modules = {
     };
 
     this.tooltipDOM.style.width = `${width + 17}px`;
-    this.tooltipDOM.style.height = `${height}px`;
+    this.tooltipDOM.style.height = `${height + 6}px`;
 
     let pos = 0; // tooltip position based on mouse cursor position. lb: 0, lt: 1, rb: 2, rt: 3
 
     if ((offsetX >= (graphPos.x1 - 4) && offsetX <= (graphPos.x2 + 4))
       && (offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1))) {
       if (offsetX > ((graphPos.x2 * 4) / 5) || clientX > ((bodyWidth * 4) / 5)) {
-        this.tooltipDOM.style.left = `${mouseX - (width + 4)}px`;
+        this.tooltipDOM.style.left = `${mouseX - (width + 6)}px`;
       } else {
-        this.tooltipDOM.style.left = `${mouseX + 10}px`;
+        this.tooltipDOM.style.left = `${mouseX + 6}px`;
         pos += 2;
       }
 
@@ -67,16 +69,17 @@ const modules = {
         this.tooltipDOM.style.top = `${mouseY + 10}px`;
       }
 
-      this.tooltipCanvas.width = width * this.pixelRatio;
-      this.tooltipCanvas.height = height;
-      this.tooltipCanvas.style.width = `${width}px`;
-      this.tooltipCanvas.style.height = `${height}px`;
+      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 5;
+      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 5;
+      this.tooltipCanvas.style.width = `${width + 6}px`;
+      this.tooltipCanvas.style.height = `${height + 6}px`;
     } else {
       pos = -1;
     }
 
     return { nw, width, height, pos };
   },
+
   drawTooltip(hitInfo, context, size) {
     const ctx = context;
     const sId = hitInfo.hitId;
@@ -103,8 +106,14 @@ const modules = {
       this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
       this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
-    let x = pos > 1 ? 5 : 0;
-    let y = 0;
+    let x = pos > 1 ? 5 : 2;
+    let y = 2;
+
+    x += Util.aliasPixel(x);
+    y += Util.aliasPixel(y);
+
+    ctx.save();
+    ctx.scale(this.pixelRatio, this.pixelRatio);
 
     ctx.lineWidth = 2;
     ctx.font = '14px Roboto';
@@ -171,8 +180,11 @@ const modules = {
       const color = items[s].color;
       const value = gdata.b || gdata.y || 0;
 
-      const itemX = x;
-      const itemY = y + ((index + 1) * textHeight);
+      let itemX = x;
+      let itemY = y + ((index + 1) * textHeight);
+
+      itemX += Util.aliasPixel(itemX);
+      itemY += Util.aliasPixel(itemY);
 
       ctx.beginPath();
       ctx.fillStyle = color;
@@ -180,18 +192,22 @@ const modules = {
       ctx.fillRect(itemX - 4, itemY - 10, 10, 10);
       ctx.fillStyle = '#F4FAFF';
       ctx.textBaseline = 'Bottom';
-      ctx.fillText(this.seriesList[s].name, itemX + 10, itemY);
+      ctx.fillText(this.seriesList[s].name, (itemX + 10), itemY);
       ctx.fillText(numberWithComma(value), (itemX + 10 + nw) + 5, itemY);
       ctx.closePath();
       y += lineSpacing;
     });
+
+    ctx.restore();
   },
+
   drawItemsHighlight(hitInfo, ctx) {
     Object.keys(hitInfo.items).forEach((sId) => {
       const isHit = hitInfo.hitId === sId;
       this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx, isHit);
     });
   },
+
   drawIndicator(offset, color) {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
@@ -215,6 +231,7 @@ const modules = {
       ctx.closePath();
     }
   },
+
   tooltipClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
