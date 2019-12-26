@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import rowdata from '@/components/table/data.json';
 import App from './app';
-import EVUI from '../src/';
+import EVUI from '../src';
 import router from './router';
 
 import ApiView from './components/api-view';

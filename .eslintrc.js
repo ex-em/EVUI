@@ -57,5 +57,33 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-console' : ['error', { allow : ['log']}],
     'class-methods-use-this': 'off',
+
+    // need to check the list
+    'vue/html-closing-bracket-spacing': 'off',
+    'vue/html-closing-bracket-newline': 'off',
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue-i18n/no-v-html': 'off',
+    'vue/no-use-v-if-with-v-for': 'off',
+    'vue/no-unused-vars': 'off',
+    'vue/no-unused-components': 'off',
+    'vue/no-v-html': 'off',
+    'vue/no-template-shadow': 'off',
+    'vue/multiline-html-element-content-newline': 'off',
+    'vue/attributes-order': 'off',
+    'vue/html-indent': 'off',
+
+    'object-curly-newline': 'off',
+    'import/order': 'off',
+    'operator-linebreak': 'off',
+    'prefer-destructuring': 'off',
+    'switch-colon-spacing': 'off',
+    'arrow-parens': 'off',
+    'no-else-return': 'off',
+    'no-restricted-globals': 'off',
+    'prefer-object-spread': 'off',
+    'no-multiple-empty-lines': 'off',
+    'keyword-spacing': 'off',
+    'lines-between-class-members': 'off',
+    'function-paren-newline': 'off',
   }
 };

@@ -16,6 +16,9 @@
 
   export default {
     props: {
+      /**
+       * HTML <button> type Attribute
+       */
       htmlType: {
         type: String,
         default: 'button',
@@ -24,6 +27,9 @@
           return list.indexOf(value) > -1;
         },
       },
+      /**
+       * 버튼의 유형를 설정한다.
+       */
       type: {
         type: String,
         default: 'default',
@@ -35,6 +41,9 @@
           return list.indexOf(value) > -1;
         },
       },
+      /**
+       * 버튼의 크기를 설정한다.
+       */
       size: {
         type: String,
         default: 'medium',
@@ -43,6 +52,9 @@
           return list.indexOf(value) > -1;
         },
       },
+      /**
+       * 버튼의 모양을 설정한다.
+       */
       shape: {
         type: String,
         default: 'square',
@@ -51,6 +63,9 @@
           return list.indexOf(value) > -1;
         },
       },
+      /**
+       * 버튼의 활성화 유무를 결정한다.
+       */
       disabled: {
         type: Boolean,
         default: false,
@@ -68,6 +83,12 @@
     },
     methods: {
       onClick(event) {
+        /**
+         * 버튼 클릭 시 발생
+         *
+         * @event click
+         * @type {object}
+         */
         this.$emit('click', event);
       },
       _getBtnClass() {
