@@ -136,7 +136,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
-  import _ from 'lodash-es';
+  import { uniqBy } from 'lodash-es';
   import TableFilter from './grid.filter';
   import Renderer from './grid.render';
 
@@ -438,7 +438,7 @@
           }
         }
 
-        this.filteredStore = _.uniqBy(filteredStore, JSON.stringify);
+        this.filteredStore = uniqBy(filteredStore, JSON.stringify);
       },
       setStore(value, makeIndex = true) {
         const store = [];

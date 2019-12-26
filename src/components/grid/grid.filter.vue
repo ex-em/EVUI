@@ -104,7 +104,8 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash-es';
+  import { cloneDeep } from 'lodash-es';
+  import debounce from '@/common/utils.debounce';
 
   export default {
     directives: {
@@ -157,7 +158,7 @@
             { name: '=', value: 'equal' },
           ],
         },
-        inputFn: _.debounce(this.onInput, 250),
+        inputFn: debounce(this.onInput, 250),
       };
     },
     watch: {
@@ -167,7 +168,7 @@
     },
     mounted() {
       if (this.value.conditions.length) {
-        this.conditions = _.cloneDeep(this.value.conditions);
+        this.conditions = cloneDeep(this.value.conditions);
         this.itemSeq = this.conditions.reduce((maxSeq, condition) => {
           const seq = parseInt(condition.id.split('-')[1], 10);
           if (maxSeq < seq) {
