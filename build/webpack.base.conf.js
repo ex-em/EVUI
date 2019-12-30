@@ -17,6 +17,7 @@ module.exports = {
       'main': resolve('maxgauge'),
     }
   },
+  stats: 'errors-warnings',
   module: {
     rules: [
       {
