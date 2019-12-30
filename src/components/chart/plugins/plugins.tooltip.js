@@ -32,6 +32,9 @@ const modules = {
     const lineSpacing = 6;
     const colorMargin = 10;
     const textHeight = 14;
+    const scrollWidth = 17;
+    const mouseXIp = 4; // mouseInterpolation
+    const mouseYIp = 1;
 
     ctx.font = '14px Roboto';
     const nw = Math.round(ctx.measureText(maxSeries).width);
@@ -48,13 +51,13 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    this.tooltipDOM.style.width = `${width + 17}px`;
+    this.tooltipDOM.style.width = `${width + scrollWidth}px`;
     this.tooltipDOM.style.height = `${height + 6}px`;
 
     let pos = 0; // tooltip position based on mouse cursor position. lb: 0, lt: 1, rb: 2, rt: 3
 
-    if ((offsetX >= (graphPos.x1 - 4) && offsetX <= (graphPos.x2 + 4))
-      && (offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1))) {
+    if ((offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp))
+      && (offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp))) {
       if (offsetX > ((graphPos.x2 * 4) / 5) || clientX > ((bodyWidth * 4) / 5)) {
         this.tooltipDOM.style.left = `${mouseX - (width + 6)}px`;
       } else {
@@ -69,10 +72,10 @@ const modules = {
         this.tooltipDOM.style.top = `${mouseY + 10}px`;
       }
 
-      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 5;
-      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 5;
-      this.tooltipCanvas.style.width = `${width + 6}px`;
-      this.tooltipCanvas.style.height = `${height + 6}px`;
+      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 2;
+      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 2;
+      this.tooltipCanvas.style.width = `${width}px`;
+      this.tooltipCanvas.style.height = `${height}px`;
     } else {
       pos = -1;
     }

@@ -284,8 +284,9 @@ class EvChart {
   }
 
   getChartRect() {
-    const width = this.chartDOM.getBoundingClientRect().width || 10;
-    const height = this.chartDOM.getBoundingClientRect().height || 10;
+    const rect = this.chartDOM.getBoundingClientRect();
+    const width = rect.width || 10;
+    const height = rect.height || 10;
     const padding = { top: 20, right: 2, left: 2, bottom: 4 };
 
     this.setWidth(width);
@@ -503,8 +504,9 @@ class EvChart {
   }
 
   redraw() {
-    const width = this.chartDOM.getBoundingClientRect().width || 10;
-    const height = this.chartDOM.getBoundingClientRect().height || 10;
+    const rect = this.chartDOM.getBoundingClientRect();
+    const width = rect.width || 10;
+    const height = rect.height || 10;
 
     this.setWidth(width);
     this.setHeight(height);
