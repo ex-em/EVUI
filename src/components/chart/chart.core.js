@@ -1,4 +1,4 @@
-import { throttle } from 'lodash-es';
+import throttle from '@/common/utils.throttle';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
