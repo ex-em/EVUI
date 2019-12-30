@@ -1,11 +1,11 @@
-import _merge from 'lodash/merge';
+import { merge } from 'lodash-es';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
 class Scatter {
   constructor(sId, opt, sIdx) {
-    const merged = _merge({}, LINE_OPTION, opt);
+    const merged = merge({}, LINE_OPTION, opt);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });

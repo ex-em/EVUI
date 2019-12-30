@@ -1,9 +1,9 @@
-import _merge from 'lodash/merge';
+import { merge } from 'lodash-es';
 import { PIE_OPTION, COLOR } from '../helpers/helpers.constant';
 
 class Pie {
   constructor(sId, opt, sIdx) {
-    const merged = _merge({}, PIE_OPTION, opt);
+    const merged = merge({}, PIE_OPTION, opt);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });
