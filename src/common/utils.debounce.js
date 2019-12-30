@@ -1,4 +1,15 @@
 /**
+ * Original Code
+ * https://github.com/lodash/lodash/blob/es/debounce.js
+ * lodash/debounce.js
+ */
+
+function isObject(value) {
+  const type = typeof value;
+  return value != null && (type === 'object' || type === 'function');
+}
+
+/**
  * Creates a debounced function that delays invoking `func` until after `wait`
  * milliseconds have elapsed since the last time the debounced function was
  * invoked, or until the next browser frame is drawn. The debounced function
@@ -206,11 +217,6 @@ function debounce(func, wait, options) {
   debounced.flush = flush
   debounced.pending = pending
   return debounced
-}
-
-function isObject(value) {
-  const type = typeof value
-  return value != null && (type === 'object' || type === 'function')
 }
 
 export default debounce
