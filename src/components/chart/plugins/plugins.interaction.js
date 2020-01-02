@@ -5,25 +5,30 @@ const modules = {
     const offset = this.getMousePosition(e);
     const hitInfo = this.findHitItem(offset);
     const ctx = this.overlayCtx;
-    const indOpt = this.options.indicator;
+    const { indicator, tooltip } = this.options;
 
     this.overlayClear();
-    this.tooltipClear();
 
-    if (indOpt.use) {
-      this.drawIndicator(offset, indOpt.color);
+    if (indicator.use) {
+      this.drawIndicator(offset, indicator.color);
     }
 
     if (Object.keys(hitInfo.items).length) {
       this.drawItemsHighlight(hitInfo, ctx);
-      this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-      this.tooltipDOM.style.display = 'block';
-    } else {
-      this.tooltipDOM.style.display = 'none';
+
+      if (tooltip.use) {
+        this.tooltipClear();
+        this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
+        this.tooltipDOM.style.display = 'block';
+      }
+    } else if (tooltip.use) {
+      this.hideTooltipDOM();
     }
   },
   onMouseLeaveEvent() {
-    this.throttledMouseMove.cancel();
+    if (this.options.tooltip.throttledMove) {
+      this.onMouseMoveEvent.cancel();
+    }
     this.overlayClear();
     this.tooltipClear();
     this.tooltipDOM.style.display = 'none';
@@ -41,6 +46,8 @@ const modules = {
     let hitId = null;
     let maxs = '';
     let maxv = '';
+    let maxg = null;
+    let maxSID = null;
 
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
@@ -66,8 +73,13 @@ const modules = {
               maxs = sName;
             }
 
-            if (maxv.length < `${cg}`.length) {
+            if (maxv.length <= `${cg}`.length) {
               maxv = `${cg}`;
+            }
+
+            if (maxg === null || maxg <= g) {
+              maxg = g;
+              maxSID = sId;
             }
 
             if (item.hit) {
@@ -79,8 +91,9 @@ const modules = {
     }
 
     hitId = hitId === null ? Object.keys(items)[0] : hitId;
+    const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
-    return { items, hitId, maxTip: [maxs, maxv] };
+    return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
   },
   findHitItem2(offset) {
     const mouseX = offset[0];

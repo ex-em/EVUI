@@ -243,7 +243,7 @@ class Line {
     ctx.restore();
   }
 
-  itemHighlight(item, context) {
+  itemHighlight(item, context, isMax) {
     const gdata = item.data;
     const ctx = context;
 
@@ -251,12 +251,24 @@ class Line {
     const y = gdata.yp;
 
     ctx.save();
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = this.lineWidth;
-    ctx.fillStyle = this.color;
-
     if (x !== null && y !== null) {
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.pointSize, x, y);
+      if (isMax) {
+        ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)}, 0)` || '';
+        ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)}, ${this.highlight.maxShadowOpacity})` || '';
+        Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
+
+        ctx.fillStyle = this.color;
+        Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
+
+        ctx.fillStyle = '#fff';
+        Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, x, y);
+      } else {
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
+        ctx.fillStyle = this.color;
+
+        Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, x, y);
+      }
     }
 
     ctx.restore();

@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import debounce from '@/common/utils.debounce';
 import Util from '../helpers/helpers.util';
 
 const modules = {
@@ -12,6 +13,16 @@ const modules = {
     this.tooltipDOM.style.display = 'none';
     this.tooltipDOM.appendChild(this.tooltipCanvas);
     document.body.appendChild(this.tooltipDOM);
+
+    if (this.options.tooltip.debouncedHide) {
+      this.hideTooltipDOM = debounce(() => {
+        this.tooltipDOM.style.display = 'none';
+      }, 200);
+    } else {
+      this.hideTooltipDOM = () => {
+        this.tooltipDOM.style.display = 'none';
+      };
+    }
   },
 
   setTooltipLayout(hitInfo, e, offset) {
@@ -33,8 +44,8 @@ const modules = {
     const colorMargin = 10;
     const textHeight = 14;
     const scrollWidth = 17;
-    const mouseXIp = 4; // mouseInterpolation
-    const mouseYIp = 1;
+    const mouseXIp = 2; // mouseInterpolation
+    const mouseYIp = 10;
 
     ctx.font = '14px Roboto';
     const nw = Math.round(ctx.measureText(maxSeries).width);
@@ -65,17 +76,17 @@ const modules = {
         pos += 2;
       }
 
-      if (offsetY > (graphPos.y2 / 2) || clientY > (bodyHeight / 2)) {
-        this.tooltipDOM.style.top = `${mouseY - (height <= 500 ? height : 500)}px`;
+      if (offsetY > (graphPos.y2 / 2) || clientY > ((bodyHeight * 9) / 10)) {
+        this.tooltipDOM.style.top = `${mouseY - height - 6}px`;
         pos += 1;
       } else {
         this.tooltipDOM.style.top = `${mouseY + 10}px`;
       }
 
-      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 2;
-      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 2;
-      this.tooltipCanvas.style.width = `${width}px`;
-      this.tooltipCanvas.style.height = `${height}px`;
+      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 5;
+      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 5;
+      this.tooltipCanvas.style.width = `${width + 6}px`;
+      this.tooltipCanvas.style.height = `${height + 6}px`;
     } else {
       pos = -1;
     }
@@ -205,9 +216,12 @@ const modules = {
   },
 
   drawItemsHighlight(hitInfo, ctx) {
+    const { maxHighlight } = hitInfo;
+    const maxSID = maxHighlight ? maxHighlight[0] : null;
+
     Object.keys(hitInfo.items).forEach((sId) => {
-      const isHit = hitInfo.hitId === sId;
-      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx, isHit);
+      const isMaxHighlight = maxSID === sId;
+      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx, isMaxHighlight);
     });
   },
 
@@ -221,8 +235,11 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    if (offsetX >= (graphPos.x1 - 1) && offsetX <= (graphPos.x2 + 1)
-      && offsetY >= (graphPos.y1 - 1) && offsetY <= (graphPos.y2 + 1)) {
+    const mouseXIp = 1; // mouseInterpolation
+    const mouseYIp = 10;
+
+    if (offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp)
+      && offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp)) {
       ctx.beginPath();
       ctx.save();
       ctx.strokeStyle = color;

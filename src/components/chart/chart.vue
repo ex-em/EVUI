@@ -116,7 +116,11 @@
           width: '100%',
           height: '100%',
           thickness: 1,
-          useTooltip: true,
+          tooltip: {
+            use: true,
+            throttledMove: false,
+            debouncedHide: false,
+          },
           indicator: {
             use: true,
             color: '#EE7F44',
