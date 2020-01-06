@@ -56,10 +56,6 @@ class EvChart {
 
     this.seriesList = {};
 
-    this.throttledMouseMove = throttle(this.onMouseMoveEvent, 30);
-
-    this.overlayCanvas.onmousemove = this.throttledMouseMove.bind(this);
-    this.overlayCanvas.onmouseleave = this.onMouseLeaveEvent.bind(this);
     this.seriesInfo = {
       charts: {
         pie: [],
@@ -77,9 +73,9 @@ class EvChart {
     const labels = this.data.labels;
     const groups = this.data.groups;
 
-    const options = this.options;
+    const { type, axesX, axesY, tooltip } = this.options;
 
-    this.createSeriesSet(series, options.type);
+    this.createSeriesSet(series, type);
     if (groups.length) {
       this.addGroupInfo(groups);
     }
@@ -87,8 +83,8 @@ class EvChart {
     this.createDataSet(data, labels);
     this.minMax = this.getStoreMinMax();
 
-    this.axesX = this.createAxes('x', options.axesX);
-    this.axesY = this.createAxes('y', options.axesY);
+    this.axesX = this.createAxes('x', axesX);
+    this.axesY = this.createAxes('y', axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
@@ -96,9 +92,16 @@ class EvChart {
     this.bufferCtx.save();
     this.drawChart();
 
-    if (options.useTooltip) {
+    if (tooltip.use) {
       this.createTooltipDOM();
+
+      if (tooltip.throttledMove) {
+        this.onMouseMoveEvent = throttle(this.onMouseMoveEvent, 30);
+      }
     }
+
+    this.overlayCanvas.onmousemove = this.onMouseMoveEvent.bind(this);
+    this.overlayCanvas.onmouseleave = this.onMouseLeaveEvent.bind(this);
   }
 
   initRect() {
@@ -536,7 +539,7 @@ class EvChart {
       this.overlayCanvas.onmouseleave = null;
     }
 
-    if (this.options.useTooltip) {
+    if (this.options.tooltip.use) {
       this.tooltipCanvas.remove();
       this.tooltipCanvas = null;
       this.tooltipDOM.remove();

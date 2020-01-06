@@ -29,7 +29,10 @@ export const COLOR = [
 export const LINE_OPTION = {
   show: true,
   highlight: {
-    pointSize: 4,
+    defaultSize: 4,
+    maxSize: 6,
+    maxShadowSize: 10,
+    maxShadowOpacity: 0.4,
   },
   xAxisIndex: 0,
   yAxisIndex: 0,
