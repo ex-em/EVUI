@@ -56,7 +56,7 @@ class Scale {
     }
 
     if (this.autoScaleRatio) {
-      maxValue = Math.round(maxValue * (this.autoScaleRatio + 1));
+      maxValue = Math.ceil(maxValue * (this.autoScaleRatio + 1));
     }
 
     if (this.startToZero) {
