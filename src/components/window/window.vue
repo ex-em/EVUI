@@ -567,6 +567,7 @@
     @include evThemify() {
       background-color: evThemed('window-bg');
       border: $border-solid evThemed('window-border');
+      color: evThemed('window-btn');
     }
 
     &-header-area {
@@ -616,6 +617,10 @@
       height: 100%;
       padding: 13px 10px 10px;
       overflow: auto;
+
+      @include evThemify() {
+        color: evThemed('window-btn');
+      }
     }
   }
   .ev-window-modal {
