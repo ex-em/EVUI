@@ -503,7 +503,6 @@ class EvChart {
 
     this.initScale();
     this.redraw();
-    this.render();
   }
 
   redraw() {

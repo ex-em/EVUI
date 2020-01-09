@@ -108,6 +108,10 @@ class Scale {
       numberOfSteps = Math.round(graphRange / interval);
     }
 
+    if (graphMax - graphMin > (numberOfSteps * interval)) {
+      interval = (graphMax - graphMin) / numberOfSteps;
+    }
+
     return {
       steps: numberOfSteps,
       interval,
