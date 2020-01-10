@@ -151,7 +151,10 @@
         return sizeValue;
       },
       onResize() {
-        this.evChart.resize();
+        const timer = setTimeout(() => {
+          this.evChart.resize();
+          clearTimeout(timer);
+        }, 1);
       },
     },
   };
