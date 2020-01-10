@@ -109,7 +109,7 @@ class Scale {
     }
 
     if (graphMax - graphMin > (numberOfSteps * interval)) {
-      interval = (graphMax - graphMin) / numberOfSteps;
+      interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
     }
 
     return {
