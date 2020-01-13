@@ -1,37 +1,75 @@
 import { numberWithComma } from '@/common/utils';
 
 const modules = {
-  onMouseMoveEvent(e) {
-    const offset = this.getMousePosition(e);
-    const hitInfo = this.findHitItem(offset);
-    const ctx = this.overlayCtx;
-    const { indicator, tooltip } = this.options;
+  createEventFunctions() {
+    this.onMouseMove = (e) => {
+      const offset = this.getMousePosition(e);
+      const hitInfo = this.findHitItem(offset);
+      const ctx = this.overlayCtx;
+      const { indicator, tooltip } = this.options;
 
-    this.overlayClear();
+      this.overlayClear();
 
-    if (indicator.use) {
-      this.drawIndicator(offset, indicator.color);
-    }
-
-    if (Object.keys(hitInfo.items).length) {
-      this.drawItemsHighlight(hitInfo, ctx);
-
-      if (tooltip.use) {
-        this.tooltipClear();
-        this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-        this.tooltipDOM.style.display = 'block';
+      if (indicator.use) {
+        this.drawIndicator(offset, indicator.color);
       }
-    } else if (tooltip.use) {
-      this.hideTooltipDOM();
-    }
-  },
-  onMouseLeaveEvent() {
-    if (this.options.tooltip.throttledMove) {
-      this.onMouseMoveEvent.cancel();
-    }
-    this.overlayClear();
-    this.tooltipClear();
-    this.tooltipDOM.style.display = 'none';
+
+      if (Object.keys(hitInfo.items).length) {
+        this.drawItemsHighlight(hitInfo, ctx);
+
+        if (tooltip.use) {
+          this.tooltipClear();
+          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
+          this.tooltipDOM.style.display = 'block';
+        }
+      } else if (tooltip.use) {
+        this.hideTooltipDOM();
+      }
+    };
+
+    this.onMouseLeave = () => {
+      if (this.options.tooltip.throttledMove) {
+        this.onMouseMove.cancel();
+      }
+      this.overlayClear();
+      this.tooltipClear();
+      this.tooltipDOM.style.display = 'none';
+    };
+
+    this.onDblClick = (e) => {
+      const fixedIndicator = this.options.fixedIndicator;
+      const offset = this.getMousePosition(e);
+      const hitInfo = this.findClickedData(offset, fixedIndicator.useApproximateValue);
+      const args = {};
+      if (hitInfo) {
+        this.redraw(hitInfo);
+      }
+
+      ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+      if (typeof this.listeners.dblclick === 'function') {
+        this.listeners.dblclick(args);
+      }
+    };
+
+    this.onClick = (e) => {
+      const offset = this.getMousePosition(e);
+      const hitInfo = this.findClickedData(offset);
+
+      const args = {};
+      if (hitInfo) {
+        this.redraw(hitInfo);
+      }
+
+      ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+      if (typeof this.listeners.click === 'function') {
+        this.listeners.click(args);
+      }
+    };
+
+    this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
+    this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
+    this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
+    this.overlayCanvas.addEventListener('click', this.onClick);
   },
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
@@ -94,6 +132,44 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+  findClickedData(offset, useApproxiate) {
+    const sIds = Object.keys(this.seriesList);
+    const isHorizontal = !!this.options.horizontal;
+
+    let maxl = null;
+    let maxp = null;
+    let maxg = null;
+    let maxSID = '';
+
+    for (let ix = 0; ix < sIds.length; ix++) {
+      const sId = sIds[ix];
+      const series = this.seriesList[sId];
+      const findFn = useApproxiate ?
+        series.findApproximateData : series.findGraphData;
+
+      if (findFn) {
+        const data = findFn.call(series, offset, isHorizontal).data;
+
+        if (data) {
+          const ldata = isHorizontal ? data.y : data.x;
+          const lp = isHorizontal ? data.yp : data.xp;
+
+          if (ldata !== null && ldata !== undefined) {
+            const g = isHorizontal ? data.b || data.x : data.b || data.y;
+
+            if (maxg === null || maxg <= g) {
+              maxg = g;
+              maxSID = sId;
+              maxl = ldata;
+              maxp = lp;
+            }
+          }
+        }
+      }
+    }
+
+    return { label: maxl, pos: maxp, value: maxg, sId: maxSID };
   },
   findHitItem2(offset) {
     const mouseX = offset[0];

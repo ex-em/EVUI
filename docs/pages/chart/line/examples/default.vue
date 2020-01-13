@@ -3,6 +3,7 @@
     <ev-chart
       :data="getChartData"
       :options="chartOptions"
+      @on-dblclick="onDblClick"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <ev-button
@@ -45,7 +46,7 @@
             series1: [100, 150, 51, 150, 200],
             series2: [150, 200, 58, 150, 40],
             series3: [200, 50, 90, 300, 500],
-            series4: [300, 70, 30, 200, 100],
+            series4: [300, 800, 30, 200, 100],
             series5: [300, 70, 30, 200, 100],
             series6: [300, 70, 30, 200, 100],
             series7: [300, 70, 30, 200, 100],
@@ -79,6 +80,10 @@
             autoScaleRatio: 0.1,
             showGrid: true,
           }],
+          fixedIndicator: {
+            use: true,
+            useApproximateValue: false,
+          },
         },
         liveBtnInfo: {
           name: 'liveBtn',
@@ -143,6 +148,9 @@
 
         this.labels = label;
         this.chartData = data;
+      },
+      onDblClick(e) {
+        console.log(e, 'on doubled click');
       },
     },
   };

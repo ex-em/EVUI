@@ -219,7 +219,7 @@ const modules = {
     const isHorizontal = this.options.horizontal;
 
     if (data.length) {
-      return data.reduce((acc, p) => {
+      return data.reduce((acc, p, index) => {
         const minmax = acc;
         if (p.x <= minmax.minX) {
           minmax.minX = (p.x === null) ? 0 : p.x;
@@ -232,6 +232,7 @@ const modules = {
 
           if (isHorizontal) {
             minmax.maxDomain = p.y;
+            minmax.maxDomainIndex = index;
           }
         }
         if (p.y >= minmax.maxY) {
@@ -239,6 +240,7 @@ const modules = {
 
           if (!isHorizontal) {
             minmax.maxDomain = p.x;
+            minmax.maxDomainIndex = index;
           }
         }
 
@@ -249,6 +251,7 @@ const modules = {
         maxX: data[0].x,
         maxY: data[0].y,
         maxDomain: isHorizontal ? data[0].y : data[0].x,
+        maxDomainIndex: 0,
       });
     }
 

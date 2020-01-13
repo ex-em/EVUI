@@ -59,6 +59,10 @@
             showGrid: true,
             showAxis: false,
           }],
+          fixedIndicator: {
+            use: true,
+            useApproximateValue: true,
+          },
         },
         liveBtnInfo: {
           name: 'liveBtn',

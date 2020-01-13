@@ -191,6 +191,7 @@ class Scale {
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
       linePosition = labelCenter + aliasPixel + (!ix ? 0 : -1);
+      linePosition += Util.aliasPixel(linePosition);
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
       let labelPoint;

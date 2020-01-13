@@ -33,6 +33,7 @@
           width: '100%',
           height: '100%',
           thickness: 1,
+          combo: true,
           title: {
             text: 'Title Test',
             show: true,
