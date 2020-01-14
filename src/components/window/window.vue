@@ -634,7 +634,7 @@
     overflow: hidden;
     background-color: rgba(0,0,0,0.6);
     text-align: center;
-    z-index: 700;
+    z-index: 710;
     user-select: none;
   }
   .ev-window-display-block {
