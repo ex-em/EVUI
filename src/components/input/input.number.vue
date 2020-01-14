@@ -226,12 +226,13 @@
           return false;
         }
         if (!isNaN(targetValue) && type !== null) {
-            if (addNum(targetValue, updatedValue) <= this.max ||
-              addNum(targetValue, -updatedValue) >= this.min) {
-              updatedValue = targetValue;
-            } else {
-              return false;
-            }
+          if (e.wheelDeltaY === 120 && addNum(targetValue, step) <= this.max) {
+            updatedValue = targetValue;
+          } else if (e.wheelDeltaY === -120 && addNum(targetValue, -step) >= this.min) {
+            updatedValue = targetValue;
+          } else {
+            return false;
+          }
         }
         if (type === 'up') {
           updatedValue = addNum(updatedValue, step);
