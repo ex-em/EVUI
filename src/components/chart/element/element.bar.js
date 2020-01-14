@@ -147,10 +147,10 @@ class Bar {
       const ex = sx + gdata[m].w;
       const ey = sy + gdata[m].h;
 
-      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
+      if ((sx <= xp) && (xp <= ex)) {
         item.data = gdata[m];
 
-        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
+        if ((ey <= yp) && (yp <= sy)) {
           item.hit = true;
         }
         return item;

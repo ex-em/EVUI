@@ -10,19 +10,22 @@ import Legend from './plugins/plugins.legend';
 import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
 import Pie from './plugins/plugins.pie';
+import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options) {
+  constructor(target, data, options, listeners) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
     Object.assign(this, Title);
     Object.assign(this, Legend);
     Object.assign(this, Interaction);
     Object.assign(this, Tooltip);
     Object.assign(this, Pie);
+    Object.assign(this, Tip);
 
     this.target = target;
     this.data = data;
     this.options = options;
+    this.listeners = listeners;
 
     this.wrapperDOM = document.createElement('div');
     this.wrapperDOM.className = 'ev-chart-wrapper';
@@ -50,29 +53,20 @@ class EvChart {
     this.overlayCanvas.style.position = 'absolute';
     this.overlayCanvas.style.top = '0px';
     this.overlayCanvas.style.left = '0px';
-
-    this.isInitLegend = false;
-    this.isInitTitle = false;
-
-    this.seriesList = {};
-
-    this.seriesInfo = {
-      charts: {
-        pie: [],
-        bar: [],
-        line: [],
-        scatter: [],
-      },
-      count: 0,
-    };
   }
 
   init() {
-    const series = this.data.series;
-    const data = this.data.data;
-    const labels = this.data.labels;
-    const groups = this.data.groups;
+    this.isInitLegend = false;
+    this.isInitTitle = false;
+    this.seriesList = {};
+    this.lastTip = { pos: null, value: null };
 
+    this.seriesInfo = {
+      charts: { pie: [], bar: [], line: [], scatter: [] },
+      count: 0,
+    };
+
+    const { series, data, labels, groups } = this.data;
     const { type, axesX, axesY, tooltip } = this.options;
 
     this.createSeriesSet(series, type);
@@ -96,12 +90,11 @@ class EvChart {
       this.createTooltipDOM();
 
       if (tooltip.throttledMove) {
-        this.onMouseMoveEvent = throttle(this.onMouseMoveEvent, 30);
+        this.onMouseMove = throttle(this.onMouseMove, 30);
       }
     }
 
-    this.overlayCanvas.onmousemove = this.onMouseMoveEvent.bind(this);
-    this.overlayCanvas.onmouseleave = this.onMouseLeaveEvent.bind(this);
+    this.createEventFunctions();
   }
 
   initRect() {
@@ -119,12 +112,12 @@ class EvChart {
     this.chartRect = this.getChartRect();
   }
 
-  drawChart() {
+  drawChart(hitInfo) {
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
     this.drawAxis();
     this.drawSeries();
-
+    this.createTipInfo(hitInfo);
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
@@ -132,7 +125,6 @@ class EvChart {
     const thickness = this.options.thickness;
     const isHorizontal = this.options.horizontal;
     const maxTip = this.options.maxTip;
-    const maxInfo = this.minMax[isHorizontal ? 'x' : 'y'];
 
     const opt = {
       ctx: this.bufferCtx,
@@ -159,13 +151,11 @@ class EvChart {
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
-        const maxSID = maxInfo[series[isHorizontal ? 'xAxisIndex' : 'yAxisIndex']].maxSID;
-        const showMaxTip = maxTip.use && chartTypeSet[jx] === maxSID;
 
         if (chartType === 'line' || chartType === 'scatter') {
-          series.draw({ showMaxTip, ...opt });
+          series.draw(opt);
         } else if (chartType === 'bar') {
-          series.draw({ thickness, showSeriesCount, showIndex, showMaxTip, ...opt });
+          series.draw({ thickness, showSeriesCount, showIndex, ...opt });
 
           if (series.show) {
             showIndex++;
@@ -401,6 +391,7 @@ class EvChart {
     if (updateSeries) {
       delete this.seriesInfo;
       delete this.seriesList;
+      delete this.lastTip;
 
       this.seriesInfo = {
         charts: {
@@ -412,6 +403,7 @@ class EvChart {
         count: 0,
       };
       this.seriesList = {};
+      this.lastTip = { pos: null, value: null };
 
       this.createSeriesSet(series, options.type);
 
@@ -502,20 +494,14 @@ class EvChart {
     this.bufferCtx.save();
 
     this.initScale();
-    this.redraw();
+    this.render();
   }
 
-  redraw() {
-    const rect = this.chartDOM.getBoundingClientRect();
-    const width = rect.width || 10;
-    const height = rect.height || 10;
-
-    this.setWidth(width);
-    this.setHeight(height);
-
-    this.initScale();
+  redraw(hitInfo) {
     this.clear();
-    this.drawChart();
+    this.chartRect = this.getChartRect();
+    this.initScale();
+    this.drawChart(hitInfo);
   }
 
   destroy() {
@@ -523,19 +509,21 @@ class EvChart {
 
     if (this.options.legend.show) {
       if (this.legendBoxDOM) {
-        this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick, false);
-        this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver, false);
-        this.legendBoxDOM.removeEventListener('mouseleave', this.onLegendBoxLeave, false);
+        this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick);
+        this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver);
+        this.legendBoxDOM.removeEventListener('mouseleave', this.onLegendBoxLeave);
       }
 
       if (this.resizeDOM) {
-        this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown, false);
+        this.resizeDOM.removeEventListener('mousedown', this.onResizeMouseDown);
       }
     }
 
     if (this.overlayCanvas) {
-      this.overlayCanvas.onmousemove = null;
-      this.overlayCanvas.onmouseleave = null;
+      this.overlayCanvas.removeEventListener('mousemove', this.onMouseMove);
+      this.overlayCanvas.removeEventListener('mouseleave', this.onMouseLeave);
+      this.overlayCanvas.removeEventListener('dblclick', this.onDblClick);
+      this.overlayCanvas.removeEventListener('click', this.onClick);
     }
 
     if (this.options.tooltip.use) {

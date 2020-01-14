@@ -3,6 +3,8 @@
     <ev-chart
       :data="defaultBarChartData"
       :options="defaultBarChartOptions"
+      @on-dblclick="onDblClick"
+      @on-click="onClick"
     />
     <br>
   </div>
@@ -52,6 +54,14 @@
           }],
         },
       };
+    },
+    methods: {
+      onDblClick(e) {
+        console.log(e, 'on doubled click');
+      },
+      onClick(e) {
+        console.log(e, 'on click');
+      },
     },
   };
 </script>

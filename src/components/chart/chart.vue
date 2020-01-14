@@ -31,6 +31,10 @@
         chart: null,
         normalizedOption: null,
         normalizedData: null,
+        listeners: {
+          dblclick: this.onDblClick,
+          click: this.onClick,
+        },
       };
     },
     computed: {
@@ -71,8 +75,9 @@
       const wrapper = this.$refs.wrapper;
       const options = this.normalizedOption;
       const data = this.normalizedData;
+      const listeners = this.listeners;
 
-      this.evChart = new EvChart(wrapper, data, options);
+      this.evChart = new EvChart(wrapper, data, options, listeners);
 
       const timer = setTimeout(() => {
         this.evChart.init();
@@ -111,11 +116,11 @@
           useSelect: false,
           doughnutHoleSize: 0,
           reverse: false,
-          bufferSize: null,
           horizontal: false,
           width: '100%',
           height: '100%',
           thickness: 1,
+          combo: false,
           tooltip: {
             use: true,
             throttledMove: false,
@@ -124,6 +129,11 @@
           indicator: {
             use: true,
             color: '#EE7F44',
+          },
+          fixedIndicator: {
+            use: false,
+            useApproximateValue: false,
+            color: '#FF8983',
           },
           maxTip: {
             use: true,
@@ -155,6 +165,12 @@
           this.evChart.resize();
           clearTimeout(timer);
         }, 1);
+      },
+      onDblClick(e) {
+        this.$emit('on-dblclick', e);
+      },
+      onClick(e) {
+        this.$emit('on-click', e);
       },
     },
   };
