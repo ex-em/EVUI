@@ -53,19 +53,19 @@ class EvChart {
     this.overlayCanvas.style.position = 'absolute';
     this.overlayCanvas.style.top = '0px';
     this.overlayCanvas.style.left = '0px';
-  }
 
-  init() {
     this.isInitLegend = false;
     this.isInitTitle = false;
+    this.isInit = false;
     this.seriesList = {};
     this.lastTip = { pos: null, value: null };
-
     this.seriesInfo = {
       charts: { pie: [], bar: [], line: [], scatter: [] },
       count: 0,
     };
+  }
 
+  init() {
     const { series, data, labels, groups } = this.data;
     const { type, axesX, axesY, tooltip } = this.options;
 
@@ -95,6 +95,7 @@ class EvChart {
     }
 
     this.createEventFunctions();
+    this.isInit = true;
   }
 
   initRect() {
@@ -505,6 +506,10 @@ class EvChart {
   }
 
   destroy() {
+    if (!this.isInit) {
+      return;
+    }
+
     const target = this.target;
 
     if (this.options.legend.show) {
