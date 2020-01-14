@@ -87,6 +87,7 @@
           return {
             localeType: 'YYYY-MM-DD',
             initSelectDay: this.value ? new Date(moment(this.value)) : new Date(),
+            theme: 'light',
           };
         },
       },
@@ -127,6 +128,7 @@
           // localeType이 없는 경우 YYYY-MM-DD가 default
           localeType: this.options.localeType
             ? this.options.localeType : 'YYYY-MM-DD',
+          theme: this.options.theme,
         });
       },
       computedValue() {
