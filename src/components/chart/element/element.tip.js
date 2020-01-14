@@ -21,14 +21,19 @@ const modules = {
 
       const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
       const series = this.seriesList[maxSID];
+
+      if (!series) {
+        return;
+      }
+
       const type = series.type;
       const size = type === 'bar' ? series.size : null;
       const maxDomain = series.minMax.maxDomain;
       const maxY = series.minMax.maxY;
       const minmaxX = this.axesSteps.x[0];
       const minmaxY = this.axesSteps.y[0];
-      const xsp = graphPos.x1 + (barAreaByCombo / 2);
-      const ysp = graphPos.y2;
+
+
       const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
       let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
 
@@ -36,6 +41,9 @@ const modules = {
         barAreaByCombo = xArea / (series.data.length || 1);
         xArea -= barAreaByCombo;
       }
+
+      const xsp = graphPos.x1 + (barAreaByCombo / 2);
+      const ysp = graphPos.y2;
 
       if (indicatorOpt.use) {
         const args = { hitInfo, maxDomain, graphPos, opt: indicatorOpt };
