@@ -5,33 +5,64 @@
   consistent-return:
     ["error", { "treatUndefinedAsUnspecified": true }]
 */
-import _ from 'lodash-es';
+import { merge, remove } from 'lodash-es';
 
 class Calendar {
   constructor(target, options) {
     const today = new Date();
     const obj = {
       // default width, height(onePage)
-      width: 235,
-      height: 220,
+      width: 224,
+      height: 222,
       // style
       colors: {
-        background: '#fff',
-        border: 'f0f0f0',
-        thisMonthFont: '#202020',
-        thisMonthFill: '#f5f5f5',
-        prevNextMonthFont: '#ccc',
-        prevNextMonthFill: '#fff',
-        selectDayFill: 'rgba(0, 255, 0, 0.1)',
-        mousemoveDayFill: 'rgba(255, 0, 0, 0.1)',
+        light: {
+          background: '#FFFFFF',
+          border: '#CFCFCF',
+          thisMonthFont: '#202020',
+          thisMonthFill: '#F5F5F5',
+          yearMonthColor: '#505050',
+          prevNextMonthFont: '#CCCCCC',
+          prevNextMonthFill: '#FFFFFF',
+          selectDayFill: 'rgba(0, 255, 0, 0.3)',
+          mousemoveDayFill: 'rgba(255, 0, 0, 0.3)',
+          triangle: '#B2B2B2',
+          weekColor: '#000000',
+          dayColor: '#000000',
+          timeLabelFont: '#989898',
+          timeLabelFill: '#E5E5E5',
+          timeLabelStroke: '#CFCFCF',
+          timeAreaFill: '#E5E5E5',
+          selectDay: '#FFFFFF',
+        },
+        dark: {
+          background: '#191919',
+          border: '#333333',
+          thisMonthFont: '#FFFFFF',
+          thisMonthFill: '#333333',
+          yearMonthColor: '#FFFFFF',
+          prevNextMonthFont: '#999999',
+          prevNextMonthFill: '#191919',
+          selectDayFill: 'rgba(0, 255, 0, 0.3)',
+          mousemoveDayFill: 'rgba(255, 0, 0, 0.3)',
+          triangle: '#666666',
+          weekColor: '#FFFFFF',
+          dayColor: '#FFFFFF',
+          timeLabelFont: '#666666',
+          timeLabelFill: '#262626',
+          timeLabelStroke: '#CFCFCF',
+          timeAreaFill: '#191919',
+          selectDay: '#000000',
+        },
       },
-      font: 'bold 12px sans-serif',
+      font: 'bold 12px Roboto',
       padding: {
-        top: 5,
-        right: 5,
-        bottom: 5,
-        left: 5,
+        top: 1,
+        right: 1,
+        bottom: 1,
+        left: 1,
       },
+      theme: 'light',
 
       // 캔버스만 화면에 보여줄 경우 false (ref. datepicker-default.vue)
       // input text에 연계하여 드랍다운으로 보여줄 경우 true (ref. datepicker.vue)
@@ -56,8 +87,8 @@ class Calendar {
 
       // init parameter
       pickerArea: {
-        triangleLength: 15,
-        height: 25,
+        triangleLength: 10,
+        height: 35,
       },
       calendarArea: {
       },
@@ -72,7 +103,7 @@ class Calendar {
         // timeArea안에 hour, min, sec가 한 페이지에 몇 row * column으로 구성되는지
         columnCount: 6,
         rowCount: 2,
-        triangleLength: 13,
+        triangleLength: 10,
       },
 
       // canvas context style
@@ -99,7 +130,7 @@ class Calendar {
           bottom: 0,
           left: 0,
         },
-        font: '10px sans-serif',
+        font: '10px Roboto',
       },
       // selectable: true, // 선택 가능 여부 (이번달 & 오늘 전까지)
 
@@ -121,9 +152,9 @@ class Calendar {
       timeTypeName: ['hour', 'minute', 'second'],
       titleType: {
         // 'fullName', 'numberName', 'abbrName' 중 선택
-        month: 'fullName',
+        month: 'abbrName',
         // 'abbrUpperName', 'abbrLowerName' 중 선택
-        dayOfTheWeek: 'abbrUpperName',
+        dayOfTheWeek: 'abbrLowerName',
       },
 
       // left : datepicker[default], right: timepicker - expand show?
@@ -134,12 +165,16 @@ class Calendar {
     };
 
     // parameter mapping
-    this.options = _.merge({}, obj, options);
+    this.options = merge({}, obj, options);
 
     // create & init canvas
     this.dropdown = document.createElement('div');
     this.dropdown.setAttribute('class', 'ev-calendar-dropdown');
-    this.dropdown.setAttribute('style', 'position: absolute; display: none; z-index: 9999; background: rgba(255, 255, 255, 1); border-radius: 4px;');
+    const bgColor = this.options.colors[this.options.theme].background;
+    this.dropdown.setAttribute('style', `position: absolute; display: none; 
+      z-index: 850; background: ${bgColor}; border-radius: 4px; 
+      box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.27); border: 0.5px solid #B2B2B2;
+      box-sizing: border-box;`);
     this.baseCanvas = document.createElement('canvas');
     this.baseCanvas.setAttribute('class', 'ev-calendar-canvas');
     this.context = this.baseCanvas.getContext('2d');
@@ -225,7 +260,9 @@ class Calendar {
       targetDivHeight = e.currentTarget.clientHeight;
     }
     this.dropdown.style.top = `${(e.pageY - e.offsetY) + targetDivHeight}px`;
-    this.dropdown.style.left = `${(e.pageX - e.offsetX) - 5}px`;
+    this.dropdown.style.left = `${(e.pageX - e.offsetX) - 1}px`;
+    this.dropdown.style.width = `${this.baseCanvas.width + 2}px`;
+    this.dropdown.style.height = `${this.baseCanvas.height + 2}px`;
   }
   hideDropdown() {
     this.dropdown.style.display = 'none';
@@ -295,9 +332,10 @@ class Calendar {
       startY: padding.top,
       height: pickerAreaHeight,
     };
+    const caPaddingLR = 10; // calendar area padding l/r
     this.coordinate.calendarArea.total = {
-      startX: padding.left,
-      width: commonAreaTotalWidth - 1,
+      startX: padding.left + caPaddingLR,
+      width: commonAreaTotalWidth - (caPaddingLR * 2) - 1,
       startY: +padding.top + +pickerAreaHeight,
       height: this.baseCanvas.height - pickerAreaHeight - padding.top - padding.bottom,
     };
@@ -409,28 +447,23 @@ class Calendar {
               if (timeAreaType.page === v.page) {
                 if (e.offsetY > v.startY && e.offsetY < v.startY + v.height
                   && e.offsetX > v.startX && e.offsetX < v.startX + v.width) {
-                  this.dynamicDraw(
-                    overCtx, v.startX, v.startY,
-                    v.width, v.height,
-                    {
-                      fill: {
-                        show: true,
-                        color: this.options.colors.mousemoveDayFill,
-                      },
-                    },
-                  );
+                  overCtx.beginPath();
+                  const cx = v.startX + (v.width / 2);
+                  const cy = v.startY + (v.height / 2);
+                  const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+                  overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+                  overCtx.fillStyle = this.options.colors[this.options.theme].mousemoveDayFill;
+                  overCtx.fill();
                   mouseoverFlag = true;
                 }
                 if (timeAreaType.select === idx) {
-                  this.dynamicDraw(
-                    overCtx, v.startX, v.startY,
-                    v.width, v.height, {
-                      fill: {
-                        show: true,
-                        color: this.options.colors.selectDayFill,
-                      },
-                    },
-                  );
+                  overCtx.beginPath();
+                  const cx = v.startX + (v.width / 2);
+                  const cy = v.startY + (v.height / 2);
+                  const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+                  overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+                  overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+                  overCtx.fill();
                 }
               }
             });
@@ -539,7 +572,7 @@ class Calendar {
               }
             }
             if (exist) {
-              _.remove(selectDayArr, date);
+              remove(selectDayArr, date);
             } else {
               selectDayArr.push(date);
             }
@@ -565,7 +598,7 @@ class Calendar {
               }
             }
             if (exist) {
-              _.remove(selectDayArr, date);
+              remove(selectDayArr, date);
             } else {
               selectDayArr.push(date);
             }
@@ -588,7 +621,7 @@ class Calendar {
               }
             }
             if (exist) {
-              _.remove(selectDayArr, date);
+              remove(selectDayArr, date);
             } else {
               selectDayArr.push(date);
             }
@@ -623,16 +656,13 @@ class Calendar {
         timeAreaType.data.forEach((v, idx) => {
           if (timeAreaType.page === v.page
             && timeAreaType.select === idx) {
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                },
-              },
-            );
+            overCtx.beginPath();
+            const cx = v.startX + (v.width / 2);
+            const cy = v.startY + (v.height / 2);
+            const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+            overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+            overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+            overCtx.fill();
           }
         });
       }
@@ -707,12 +737,14 @@ class Calendar {
                 if (timeAreaType.page > 1) {
                   this.coordinate.timeArea[type].page -= 1;
                   this.drawTimeAreaContent(type);
+                  this.drawSplitLine();
                   this.updateTimeArea(type);
                 }
               } else if (v.direction === 'bottom') {
                 if (timeAreaType.page < timeAreaType.maxPage) {
                   this.coordinate.timeArea[type].page += 1;
                   this.drawTimeAreaContent(type);
+                  this.drawSplitLine();
                   this.updateTimeArea(type);
                 }
               }
@@ -780,31 +812,25 @@ class Calendar {
         if (e.offsetX > v.startX && e.offsetX < v.startX + v.width
           && e.offsetY > v.startY && e.offsetY < v.startY + v.height
         ) {
-          this.dynamicDraw(
-            overCtx, v.startX, v.startY,
-            v.width, v.height,
-            {
-              fill: {
-                show: true,
-                color: this.options.colors.mousemoveDayFill,
-              },
-            },
-          );
+          overCtx.beginPath();
+          const cx = v.startX + (v.width / 2);
+          const cy = v.startY + (v.height / 2);
+          const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+          overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+          overCtx.fillStyle = this.options.colors[this.options.theme].mousemoveDayFill;
+          overCtx.fill();
         }
         selectDayArr.forEach((s) => {
           if (v.date.year === s.year
             && v.date.month === s.month
             && v.date.day === s.day) {
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                },
-              },
-            );
+            overCtx.beginPath();
+            const cx = v.startX + (v.width / 2);
+            const cy = v.startY + (v.height / 2);
+            const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+            overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+            overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+            overCtx.fill();
           }
         });
       });
@@ -815,16 +841,13 @@ class Calendar {
           if (v.date.year === s.year
             && v.date.month === s.month
             && v.date.day === s.day) {
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                },
-              },
-            );
+            overCtx.beginPath();
+            const cx = v.startX + (v.width / 2);
+            const cy = v.startY + (v.height / 2);
+            const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+            overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+            overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+            overCtx.fill();
           }
         });
       });
@@ -843,16 +866,13 @@ class Calendar {
           if (v.date.year === s.year
             && v.date.month === s.month
             && v.date.day === s.day) {
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height,
-              {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                },
-              },
-            );
+            overCtx.beginPath();
+            const cx = v.startX + (v.width / 2);
+            const cy = v.startY + (v.height / 2);
+            const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+            overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+            overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+            overCtx.fill();
           }
         });
       });
@@ -862,15 +882,13 @@ class Calendar {
         timeAreaType.data.forEach((v, idx) => {
           if (timeAreaType.page === v.page
             && timeAreaType.select === idx) {
-            this.dynamicDraw(
-              overCtx, v.startX, v.startY,
-              v.width, v.height, {
-                fill: {
-                  show: true,
-                  color: this.options.colors.selectDayFill,
-                },
-              },
-            );
+            overCtx.beginPath();
+            const cx = v.startX + (v.width / 2);
+            const cy = v.startY + (v.height / 2);
+            const r = (v.width < v.height) ? (v.width / 2) : (v.height / 2);
+            overCtx.arc(cx, cy, r, 0, Math.PI * 2, true);
+            overCtx.fillStyle = this.options.colors[this.options.theme].selectDayFill;
+            overCtx.fill();
           }
         });
       });
@@ -938,6 +956,7 @@ class Calendar {
           if (timeAreaType.page > 1) {
             timeAreaType.page -= 1;
             this.drawTimeAreaContent(areaType);
+            this.drawSplitLine();
             this.updateTimeArea(areaType);
           }
         } else if (e.deltaY > 0) {
@@ -945,6 +964,7 @@ class Calendar {
           if (timeAreaType.page < timeAreaType.maxPage) {
             timeAreaType.page += 1;
             this.drawTimeAreaContent(areaType);
+            this.drawSplitLine();
             this.updateTimeArea(areaType);
           }
         }
@@ -952,15 +972,14 @@ class Calendar {
     });
   }
 
-
   drawCanvas() {
     this.drawTotalArea();
     this.drawPickerArea();
     this.drawCalendarArea();
     this.mousemoveDate();
     if (this.options.timeExpand) {
-      this.drawSplitLine();
       this.drawTimeArea();
+      this.drawSplitLine();
       this.updateTimeArea();
     }
   }
@@ -968,11 +987,11 @@ class Calendar {
   drawTotalArea() {
     const ctx = this.context;
     const padding = this.options.padding;
-    const style = {
-      stroke: {
-        show: true,
-      },
-    };
+    // const style = {
+    //   stroke: {
+    //     show: true,
+    //   },
+    // };
     // total Area = picker area + calendar area + button area
     // linewidth이 1이므로 total area에 선을 그을 때, p+c+b area의 보더 +1로 지정
     const gap = 1;
@@ -983,14 +1002,14 @@ class Calendar {
       ((this.baseCanvas.width - padding.left) - padding.right) + (gap * 2) + 2,
       ((this.baseCanvas.height - padding.top) - padding.bottom) + (gap * 2) + 2,
     );
-    this.dynamicDraw(
-      ctx,
-      padding.left - gap,
-      padding.top - gap,
-      ((this.baseCanvas.width - padding.left) - padding.right) + (gap * 2),
-      ((this.baseCanvas.height - padding.top) - padding.bottom) + (gap * 2),
-      style,
-    );
+    // this.dynamicDraw(
+    //   ctx,
+    //   padding.left - gap,
+    //   padding.top - gap,
+    //   ((this.baseCanvas.width - padding.left) - padding.right) + (gap * 2),
+    //   ((this.baseCanvas.height - padding.top) - padding.bottom) + (gap * 2),
+    //   style,
+    // );
   }
 
   drawPickerArea() {
@@ -1003,17 +1022,22 @@ class Calendar {
       pickerAreaTotal.width, pickerAreaTotal.height,
     );
     // draw bottom line in picker area
+    const yearUnderlinePaddingSide = 11;
+    ctx.save();
     ctx.beginPath();
     ctx.moveTo(
-      pickerAreaTotal.startX,
+      pickerAreaTotal.startX + yearUnderlinePaddingSide,
       +pickerAreaTotal.startY + +pickerAreaTotal.height,
     );
     ctx.lineTo(
-      +pickerAreaTotal.startX + +pickerAreaTotal.width,
+      +pickerAreaTotal.startX + (+pickerAreaTotal.width - yearUnderlinePaddingSide),
       +pickerAreaTotal.startY + +pickerAreaTotal.height,
     );
+    ctx.strokeStyle = '#CFCFCF';
+    ctx.lineWidth = 1;
     ctx.stroke();
     ctx.closePath();
+    ctx.restore();
 
     // draw triange in picker area
     let arrowObj = {};
@@ -1052,11 +1076,12 @@ class Calendar {
         fillText: {
           show: true,
           text: thisYear,
+          color: this.options.colors[this.options.theme].yearMonthColor,
         },
         text: thisYear,
         align: 'center',
-        padding: { bottom: 8 },
-        font: '14px sans-serif',
+        padding: { bottom: 12 },
+        font: 'bold 16px Roboto',
       },
     };
     this.dynamicDraw(
@@ -1078,10 +1103,11 @@ class Calendar {
         fillText: {
           show: true,
           text: thisMonthText,
+          color: this.options.colors[this.options.theme].yearMonthColor,
         },
         align: 'center',
-        padding: { bottom: 8 },
-        font: '14px sans-serif',
+        padding: { bottom: 12 },
+        font: 'bold 16px Roboto',
       },
     };
     this.dynamicDraw(
@@ -1110,13 +1136,14 @@ class Calendar {
           fillText: {
             show: true,
             text: this.options.dayOfTheWeekArr[this.options.titleType.dayOfTheWeek][idx],
+            color: this.options.colors[this.options.theme].weekColor,
           },
           stroke: {
             show: false,
           },
           align: 'center',
           padding: { bottom: 8 },
-          font: '10px sans-serif',
+          font: '11px Roboto',
         },
       );
     });
@@ -1142,6 +1169,8 @@ class Calendar {
     const currentYear = this.options.currentYearMonth.getFullYear();
     // 현재 달력 월
     const currentMonth = +this.options.currentYearMonth.getMonth() + +1;
+    // 일 숫자 텍스트 아래 패딩
+    const daysPaddingBottom = 9;
 
     // draw DAY NUMBER
     for (let ix = 0, ixLen = this.thisMonthWeekCnt; ix < ixLen; ix++) {
@@ -1165,17 +1194,15 @@ class Calendar {
               style: {
                 fillText: {
                   show: true,
-                  color: this.options.colors.prevNextMonthFont,
+                  color: this.options.colors[this.options.theme].prevNextMonthFont,
                   text: ((this.prevMonthLastDate - firstWeekDayCnt) + jx) + 1,
                 },
                 fill: {
                   show: false,
                 },
                 align: 'center',
-                padding: {
-                  bottom: 8,
-                },
-                font: '10px sans-serif',
+                padding: { bottom: daysPaddingBottom },
+                font: '12px Roboto',
               },
               selectable: false,
               date: {
@@ -1192,10 +1219,11 @@ class Calendar {
             let fillText = {
               show: true,
               text: 1,
+              color: this.options.colors[this.options.theme].dayColor,
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthFill,
+              color: this.options.colors[this.options.theme].thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -1204,7 +1232,7 @@ class Calendar {
               if (initLimitDay < currentDate) {
                 fillText = {
                   show: true,
-                  color: this.options.colors.prevNextMonthFont,
+                  color: this.options.colors[this.options.theme].prevNextMonthFont,
                   text: 1,
                 };
                 fill = {
@@ -1222,8 +1250,8 @@ class Calendar {
                 fillText,
                 fill,
                 align: 'center',
-                padding: { bottom: 8 },
-                font: '10px sans-serif',
+                padding: { bottom: daysPaddingBottom },
+                font: '12px Roboto',
               },
               selectable: selectableFlag,
               date: {
@@ -1240,10 +1268,11 @@ class Calendar {
             let fillText = {
               show: true,
               text: this.monthDay,
+              color: this.options.colors[this.options.theme].dayColor,
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthFill,
+              color: this.options.colors[this.options.theme].thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -1252,7 +1281,7 @@ class Calendar {
               if (initLimitDay < currentDate) {
                 fillText = {
                   show: true,
-                  color: this.options.colors.prevNextMonthFont,
+                  color: this.options.colors[this.options.theme].prevNextMonthFont,
                   text: this.monthDay,
                 };
                 fill = {
@@ -1270,8 +1299,8 @@ class Calendar {
                 fillText,
                 fill,
                 align: 'center',
-                padding: { bottom: 8 },
-                font: '10px sans-serif',
+                padding: { bottom: daysPaddingBottom },
+                font: '12px Roboto',
               },
               selectable: selectableFlag,
               date: {
@@ -1295,12 +1324,12 @@ class Calendar {
             style: {
               fillText: {
                 show: true,
-                color: this.options.colors.prevNextMonthFont,
+                color: this.options.colors[this.options.theme].prevNextMonthFont,
                 text: this.monthDay - this.thisMonthLastDate,
               },
               align: 'center',
-              padding: { bottom: 8 },
-              font: '10px sans-serif',
+              padding: { bottom: daysPaddingBottom },
+              font: '12px Roboto',
             },
             selectable: false,
             date: {
@@ -1319,10 +1348,11 @@ class Calendar {
             let fillText = {
               show: true,
               text: 1,
+              color: this.options.colors[this.options.theme].dayColor,
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthFill,
+              color: this.options.colors[this.options.theme].thisMonthFill,
             };
             let selectableFlag = true;
             if (this.options.limitToday) {
@@ -1331,7 +1361,7 @@ class Calendar {
               if (initLimitDay < currentDate) {
                 fillText = {
                   show: true,
-                  color: this.options.colors.prevNextMonthFont,
+                  color: this.options.colors[this.options.theme].prevNextMonthFont,
                   text: 1,
                 };
                 fill = {
@@ -1350,8 +1380,8 @@ class Calendar {
                 fillText,
                 fill,
                 align: 'center',
-                padding: { bottom: 8 },
-                font: '10px sans-serif',
+                padding: { bottom: daysPaddingBottom },
+                font: '12px Roboto',
               },
               selectable: selectableFlag,
               date: {
@@ -1367,10 +1397,11 @@ class Calendar {
             let fillText = {
               show: true,
               text: this.monthDay,
+              color: this.options.colors[this.options.theme].dayColor,
             };
             let fill = {
               show: true,
-              color: this.options.colors.thisMonthFill,
+              color: this.options.colors[this.options.theme].thisMonthFill,
             };
             let selectableFlag = true; // 선택 여부
             if (this.options.limitToday) {
@@ -1379,7 +1410,7 @@ class Calendar {
               if (initLimitDay < currentDate) {
                 fillText = {
                   show: true,
-                  color: this.options.colors.prevNextMonthFont,
+                  color: this.options.colors[this.options.theme].prevNextMonthFont,
                   text: this.monthDay,
                 };
                 fill = {
@@ -1398,8 +1429,8 @@ class Calendar {
                 fillText,
                 fill,
                 align: 'center',
-                padding: { bottom: 8 },
-                font: '10px sans-serif',
+                padding: { bottom: daysPaddingBottom },
+                font: '12px Roboto',
               },
               selectable: selectableFlag,
               date: {
@@ -1454,6 +1485,7 @@ class Calendar {
   drawSplitLine() {
     const ctx = this.context;
     const padding = this.options.padding;
+    ctx.save();
     ctx.beginPath();
     // 중앙 세로
     ctx.moveTo(this.baseCanvas.width / 2, padding.top);
@@ -1464,17 +1496,19 @@ class Calendar {
     ctx.lineTo((this.baseCanvas.width / 2) + this.options.timeArea.titleWidth,
       this.baseCanvas.height - padding.top);
     // content|page 세로
-    ctx.moveTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
-      padding.top);
-    ctx.lineTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
-      this.baseCanvas.height - padding.top);
+    // ctx.moveTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
+    //   padding.top);
+    // ctx.lineTo(this.baseCanvas.width - padding.right - this.options.timeArea.pageWidth,
+    //   this.baseCanvas.height - padding.top);
     // hour|minute|second 가로
     ctx.moveTo(this.baseCanvas.width / 2, (this.baseCanvas.height / 3) + 1);
     ctx.lineTo(this.baseCanvas.width - padding.right, (this.baseCanvas.height / 3) + 1);
     ctx.moveTo(this.baseCanvas.width / 2, ((this.baseCanvas.height / 3) * 2) - 1);
     ctx.lineTo(this.baseCanvas.width - padding.right, ((this.baseCanvas.height / 3) * 2) - 1);
+    ctx.strokeStyle = this.options.colors[this.options.theme].border;
     ctx.stroke();
     ctx.closePath();
+    ctx.restore();
   }
 
   drawTimeArea() {
@@ -1497,13 +1531,23 @@ class Calendar {
         {
           fillText: {
             show: true,
+            color: this.options.colors[this.options.theme].timeLabelFont,
             text: v,
+          },
+          fill: {
+            show: true,
+            color: this.options.colors[this.options.theme].timeLabelFill,
+          },
+          stroke: {
+            show: true,
+            linewidth: 1,
+            color: this.options.colors[this.options.theme].timeLabelStroke,
           },
           align: 'center',
           padding: {
-            bottom: 27,
+            bottom: 30,
           },
-          font: '12px sans-serif',
+          font: 'bold 11px Roboto',
         },
       );
     });
@@ -1540,11 +1584,13 @@ class Calendar {
               fillText: {
                 show: true,
                 text: `${ix}`,
+                color: this.options.colors[this.options.theme].dayColor,
               },
               fill: {
                 show: true,
-                color: this.options.colors.thisMonthFill,
+                color: this.options.colors[this.options.theme].background,
               },
+              font: '12px Roboto',
               align: 'center',
               padding: {
                 bottom: 13,
@@ -1593,6 +1639,19 @@ class Calendar {
         startY: timeTypeTotal.startY,
         height: timeTypeTotal.height,
       };
+      this.dynamicDraw(
+        ctx,
+        timeTypeAreaPage.startX - 1,
+        timeTypeAreaPage.startY - 1,
+        timeTypeAreaPage.width + 2,
+        timeTypeAreaPage.height + 2,
+        {
+          fill: {
+            show: true,
+            color: this.options.colors[this.options.theme].timeAreaFill,
+          },
+        },
+      );
       arrowArr.forEach((v, idx) => {
         arrowObj = {
           centerX: timeTypeAreaPage.startX + (timeTypeAreaPage.width / 2),
@@ -1629,7 +1688,7 @@ class Calendar {
   // DRAW multiple function
   dynamicDraw(context, x, y, width, height, style) {
     if (style) {
-      const mergedStyle = _.merge({}, this.options.styleObj, style);
+      const mergedStyle = merge({}, this.options.styleObj, style);
       const ctx = context;
 
       if (mergedStyle.stroke && mergedStyle.stroke.show) {
@@ -1674,31 +1733,31 @@ class Calendar {
   // 중심점을 기준으로 left, right 방향으로 삼각형 그리기
   drawTriangle(context, x, y, direction, length) {
     const ctx = context;
+    const angle = 42;
+    ctx.save();
     ctx.beginPath();
-    ctx.moveTo(x, y);
     if (direction === 'right') {
-      ctx.lineTo(x, y - (Math.sin(this.toRadians(30)) * length));
-      ctx.lineTo(x + (Math.cos(this.toRadians(30)) * length), y);
-      ctx.lineTo(x, y + (Math.sin(this.toRadians(30)) * length));
+      ctx.moveTo(x, y - (Math.sin(this.toRadians(angle)) * length));
+      ctx.lineTo(x + (Math.cos(this.toRadians(angle)) * length), y);
+      ctx.lineTo(x, y + (Math.sin(this.toRadians(angle)) * length));
     } else if (direction === 'left') {
-      ctx.lineTo(x, y - (Math.sin(this.toRadians(30)) * length));
-      ctx.lineTo(x - (Math.cos(this.toRadians(30)) * length), y);
-      ctx.lineTo(x, y + (Math.sin(this.toRadians(30)) * length));
+      ctx.moveTo(x, y - (Math.sin(this.toRadians(angle)) * length));
+      ctx.lineTo(x - (Math.cos(this.toRadians(angle)) * length), y);
+      ctx.lineTo(x, y + (Math.sin(this.toRadians(angle)) * length));
     } else if (direction === 'top') {
-      ctx.lineTo(x + (Math.sin(this.toRadians(30)) * length), y);
-      ctx.lineTo(x, y - (Math.cos(this.toRadians(30)) * length));
-      ctx.lineTo(x - (Math.sin(this.toRadians(30)) * length), y);
+      ctx.moveTo(x + (Math.sin(this.toRadians(angle)) * length), y);
+      ctx.lineTo(x, y - (Math.cos(this.toRadians(angle)) * length));
+      ctx.lineTo(x - (Math.sin(this.toRadians(angle)) * length), y);
     } else if (direction === 'bottom') {
-      ctx.lineTo(x + (Math.sin(this.toRadians(30)) * length), y);
-      ctx.lineTo(x, y + (Math.cos(this.toRadians(30)) * length));
-      ctx.lineTo(x - (Math.sin(this.toRadians(30)) * length), y);
+      ctx.moveTo(x + (Math.sin(this.toRadians(angle)) * length), y);
+      ctx.lineTo(x, y + (Math.cos(this.toRadians(angle)) * length));
+      ctx.lineTo(x - (Math.sin(this.toRadians(angle)) * length), y);
     }
-    ctx.lineTo(x, y);
-    ctx.fillStyle = '#000000';
-    ctx.fill();
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = this.options.colors[this.options.theme].triangle;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
     ctx.closePath();
+    ctx.restore();
   }
 
   // 삼각형 안에 (px,py)이 존재하는지 확인
