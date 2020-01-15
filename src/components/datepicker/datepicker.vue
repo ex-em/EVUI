@@ -280,10 +280,6 @@
     },
     methods: {
       showDatepicker(e) {
-        if (this.onceSetDateTime) {
-          this.onceSetDateTime = false;
-          this.calendar.setDateTime(moment(this.value));
-        }
         this.calendar.showDropdown(e);
       },
       hideDatepicker() {
