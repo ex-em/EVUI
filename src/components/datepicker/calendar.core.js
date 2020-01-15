@@ -130,7 +130,7 @@ class Calendar {
           bottom: 0,
           left: 0,
         },
-        font: '10px Roboto',
+        font: '12px Roboto',
       },
       // selectable: true, // 선택 가능 여부 (이번달 & 오늘 전까지)
 
