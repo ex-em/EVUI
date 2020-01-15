@@ -1,5 +1,7 @@
 <template>
-  <div :class="{ first: depth === 1 }">
+  <div
+    v-if="!hidden"
+    :class="{ first: depth === 1 }">
     <div
       :class="classes"
       @click="onClick"
@@ -74,6 +76,10 @@
       depth: {
         type: Number,
         default: 1,
+      },
+      hidden: {
+        type: Boolean,
+        default: false,
       },
     },
     data() {
