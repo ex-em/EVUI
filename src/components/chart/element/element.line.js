@@ -28,6 +28,9 @@ class Line {
       highlight: { opacity: 1, lineWidth: 2 },
     };
     this.data = [];
+    this.size = {
+      comboOffset: 0,
+    };
   }
 
   draw(param) {
@@ -68,6 +71,7 @@ class Line {
     if (this.combo) {
       barAreaByCombo = xArea / (this.data.length || 1);
       xArea -= barAreaByCombo;
+      this.size.comboOffset = barAreaByCombo;
     }
 
     const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);

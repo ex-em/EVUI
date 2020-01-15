@@ -100,7 +100,7 @@ const modules = {
     const items = hitInfo.items;
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
-    const seriesKeys = Object.keys(items);
+    const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = { t: 4, b: 4, r: 16, l: 16 };
     const borderRadius = 10;
     const lineSpacing = 6;
@@ -192,7 +192,7 @@ const modules = {
     seriesKeys.forEach((s, index) => {
       const gdata = items[s].data;
       const color = items[s].color;
-      const value = gdata.b || gdata.y || 0;
+      const value = gdata.o || gdata.y || 0;
 
       let itemX = x;
       let itemY = y + ((index + 1) * textHeight);
@@ -257,6 +257,32 @@ const modules = {
 
     this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width / this.clearRectRatio,
       this.tooltipCanvas.height / this.clearRectRatio);
+  },
+
+  alignSeriesList(sKeys) {
+    const groups = this.data.groups;
+    const seriesList = this.seriesList;
+    const result = [];
+
+    groups.forEach((group) => {
+      group.slice().reverse().forEach((sId) => {
+        const series = seriesList[sId];
+
+        if (series && series.showLegend && sKeys.includes(sId)) {
+          result.push(sId);
+        }
+      });
+    });
+
+    Object.keys(seriesList).forEach((sId) => {
+      const series = seriesList[sId];
+
+      if (!series.isExistGrp && series.showLegend && sKeys.includes(sId)) {
+        result.push(sId);
+      }
+    });
+
+    return result;
   },
 };
 

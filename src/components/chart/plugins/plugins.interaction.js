@@ -141,6 +141,8 @@ const modules = {
     let maxp = null;
     let maxg = null;
     let maxSID = '';
+    let acc = 0;
+    let useStack = false;
 
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
@@ -156,7 +158,14 @@ const modules = {
           const lp = isHorizontal ? data.yp : data.xp;
 
           if (ldata !== null && ldata !== undefined) {
-            const g = isHorizontal ? data.b || data.x : data.b || data.y;
+            const g = isHorizontal ? data.o || data.x : data.o || data.y;
+
+            if (series.stackIndex) {
+              acc += !isNaN(data.o) ? data.o : 0;
+              useStack = true;
+            } else {
+              acc += data.y;
+            }
 
             if (maxg === null || maxg <= g) {
               maxg = g;
@@ -169,7 +178,7 @@ const modules = {
       }
     }
 
-    return { label: maxl, pos: maxp, value: maxg, sId: maxSID };
+    return { label: maxl, pos: maxp, value: maxg, sId: maxSID, acc, useStack };
   },
   findHitItem2(offset) {
     const mouseX = offset[0];

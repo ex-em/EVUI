@@ -79,7 +79,7 @@ const modules = {
       series.show = !series.show;
       colorDOM.classList.toggle('inactive');
       nameDOM.classList.toggle('inactive');
-      this.update();
+      this.update(false, true);
     };
 
     this.onResizeMouseDown = (e) => {
