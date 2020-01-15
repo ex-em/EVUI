@@ -6,8 +6,7 @@
     <li
       v-for="menuItem in menu"
       :key="menuItem.name"
-      :class="{split: menuItem.hidden === true ? false : true}"
-      class="ev-menu-sub"
+      :class="{split: menuItem.hidden === true ? false : true, 'ev-menu-sub': true}"
     >
       <menu-item
         v-bind="menuItem"
