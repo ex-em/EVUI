@@ -8,7 +8,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
-  import { defaultsDeep, isEqual } from 'lodash-es';
+  import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
   import { getQuantity } from '@/common/utils';
   import EvChart from './chart.core';
 
@@ -35,6 +35,7 @@
           dblclick: this.onDblClick,
           click: this.onClick,
         },
+        isInit: false,
       };
     },
     computed: {
@@ -68,6 +69,9 @@
       },
     },
     created() {
+      this.data.series = cloneDeep(this.data.series || {});
+      this.options.legend = cloneDeep(this.options.legend || {});
+
       this.normalizedOption = defaultsDeep({}, this.options, this.getDefaultOptions());
       this.normalizedData = defaultsDeep(this.data, this.getDefaultData());
     },
@@ -81,6 +85,7 @@
 
       const timer = setTimeout(() => {
         this.evChart.init();
+        this.isInit = true;
         clearTimeout(timer);
       }, 1);
     },
@@ -132,13 +137,15 @@
           },
           fixedIndicator: {
             use: false,
-            useApproximateValue: false,
-            color: '#FF8983',
+            fixedPosTop: true,
+            useApproximateValue: true,
+            color: '#000000',
           },
           maxTip: {
             use: true,
-            background: '#FFFFFF',
-            color: '#000000',
+            fixedPosTop: true,
+            background: '#000000',
+            color: '#FFFFFF',
           },
         };
       },
@@ -161,10 +168,9 @@
         return sizeValue;
       },
       onResize() {
-        const timer = setTimeout(() => {
+        if (this.isInit) {
           this.evChart.resize();
-          clearTimeout(timer);
-        }, 1);
+        }
       },
       onDblClick(e) {
         this.$emit('on-dblclick', e);

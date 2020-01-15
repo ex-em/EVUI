@@ -19,6 +19,15 @@ class Bar {
 
     this.sId = sId;
     this.data = [];
+    this.size = {
+      cat: 0,
+      bar: 0,
+      cPad: 0,
+      bPad: 0,
+      w: 0,
+      h: 0,
+      ix: 0,
+    };
   }
 
   draw(param) {
@@ -59,10 +68,14 @@ class Bar {
     let w = isHorizontal ? null : Math.round(bArea * thickness);
     let h = isHorizontal ? Math.round(bArea * thickness) : null;
 
-    // barArea내에서 barWidth로 빠진 부분을 계산.
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
-    // series index에 따라 시작 X값 보정을 위한 변수.
     const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
+    this.size.cat = cArea;
+    this.size.bar = bArea;
+    this.size.cPad = cPad;
+    this.size.bPad = bPad;
+    this.size.w = w;
+    this.size.ix = barSeriesX;
 
     let categoryPoint = null;
 

@@ -4,11 +4,13 @@ import Canvas from '../helpers/helpers.canvas';
 const modules = {
   createTipInfo(hitInfo) {
     const opt = this.options;
+    const lastTip = this.lastTip;
     const maxTipOpt = opt.maxTip;
     const indicatorOpt = opt.fixedIndicator;
     const isHorizontal = !!opt.horizontal;
 
     if (indicatorOpt.use || maxTipOpt.use) {
+      // size
       const chartRect = this.chartRect;
       const labelOffset = this.labelOffset;
       const graphPos = {
@@ -17,89 +19,115 @@ const modules = {
         y1: chartRect.y1 + labelOffset.top,
         y2: chartRect.y2 - labelOffset.bottom,
       };
-      let barAreaByCombo = 0;
+      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
 
-      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
+      // series
+      const maxSID = hitInfo && hitInfo.sId ? hitInfo.sId : this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
       const series = this.seriesList[maxSID];
 
       if (!series) {
         return;
       }
 
-      const type = series.type;
-      const size = type === 'bar' ? series.size : null;
-      const maxDomain = series.minMax.maxDomain;
-      const maxY = series.minMax.maxY;
-      const minmaxX = this.axesSteps.x[0];
-      const minmaxY = this.axesSteps.y[0];
+      const graphX = this.axesSteps.x[series.xAxisIndex];
+      const graphY = this.axesSteps.y[series.yAxisIndex];
+      const maxX = this.minMax.x[series.xAxisIndex].max;
+      const maxY = this.minMax.y[series.yAxisIndex].max;
 
-
-      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-      let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-
-      if (opt.combo) {
-        barAreaByCombo = xArea / (series.data.length || 1);
-        xArea -= barAreaByCombo;
-      }
-
-      const xsp = graphPos.x1 + (barAreaByCombo / 2);
+      const xsp = graphPos.x1;
+      const xep = graphPos.x2;
       const ysp = graphPos.y2;
 
-      if (indicatorOpt.use) {
-        const args = { hitInfo, maxDomain, graphPos, opt: indicatorOpt };
-        let calculateFn;
-        let minmaxAxis;
-        let area;
-        let sp;
+      const { type, size } = series;
+      const { maxDomain, maxDomainIndex } = series.minMax;
+      const seriesMaxY = series.minMax.maxY;
 
+      // pos calculate
+      let cp;
+      let halfBarSize;
+      let d;
+
+      // domain pos
+      if (type === 'bar') {
         if (isHorizontal) {
-          calculateFn = Canvas.calculateY;
-          minmaxAxis = minmaxY;
-          area = yArea;
-          sp = ysp;
+          halfBarSize = Math.round(size.h / 2);
+          cp = ysp - (size.cat * maxDomainIndex) - size.cPad;
+          d = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) + halfBarSize;
         } else {
-          calculateFn = Canvas.calculateX;
-          minmaxAxis = minmaxX;
-          area = xArea;
-          sp = xsp;
+          halfBarSize = Math.round(size.w / 2);
+          cp = xsp + (size.cat * maxDomainIndex) + size.cPad;
+          d = cp + ((size.bar * size.ix) - (size.w + size.bPad)) + halfBarSize;
+        }
+      } else if (type === 'line') {
+        d = Canvas.calculateX(
+          maxDomain,
+          graphX.graphMin,
+          graphX.graphMax,
+          xArea - size.comboOffset,
+          xsp + (size.comboOffset / 2),
+        );
+      }
+
+      if (hitInfo && hitInfo.pos !== null) {
+        d = type === 'bar' ? hitInfo.pos + halfBarSize : hitInfo.pos;
+        lastTip.pos = d;
+      } else if (lastTip.pos !== null) {
+        d = lastTip.pos;
+      }
+
+      // graph value
+      let maxTipText;
+      let maxValue;
+
+      if (hitInfo && hitInfo.value !== null) {
+        maxValue = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+        maxTipText = numberWithComma(maxValue);
+
+        if (maxTipText === false) {
+          return;
         }
 
-        this.drawFixedIndicator({ calculateFn, minmaxAxis, area, sp, ...args });
+        lastTip.value = maxTipText;
+      } else if (lastTip.value !== null) {
+        maxTipText = lastTip.value;
+        maxValue = +((maxTipText).replace(/,/gi, ''));
+      } else {
+        maxTipText = numberWithComma(seriesMaxY);
+        maxValue = seriesMaxY;
+      }
+
+      const args = { graphX, graphY, maxX, maxY, xArea, yArea, xsp, ysp, d, maxValue };
+
+      if (indicatorOpt.use) {
+        this.drawFixedIndicator({ opt: indicatorOpt, type, ...args });
       }
 
       if (maxTipOpt.use) {
-        this.drawMaxTip({
-          hitInfo,
-          opt: maxTipOpt,
-          maxDomain,
-          maxY,
-          minmaxX,
-          minmaxY,
-          graphPos,
-          xArea,
-          yArea,
-          xsp,
-          ysp,
-          size,
-        });
+        this.drawMaxTip({ opt: maxTipOpt, maxTipText, xep, type, ...args });
       }
     }
   },
   drawFixedIndicator(param) {
-    const { hitInfo, maxDomain, calculateFn, minmaxAxis, area, sp, graphPos, opt } = param;
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const lastTip = this.lastTip;
+    const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, ysp, d, type, maxValue, opt } = param;
+    const offset = type === 'bar' ? 0 : 3;
 
-    let pos;
+    let g;
 
-    if (hitInfo && hitInfo.pos !== null) {
-      pos = hitInfo.pos;
-      lastTip.pos = pos;
-    } else if (lastTip.pos !== null) {
-      pos = lastTip.pos;
+    if (opt.fixedPosTop) {
+      if (isHorizontal) {
+        g = Canvas.calculateX(maxX, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      } else {
+        g = Canvas.calculateY(maxY, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        g -= offset;
+      }
+    } else if (isHorizontal) {
+      g = Canvas.calculateX(maxValue, graphX.graphMin, graphX.graphMax, xArea, xsp);
     } else {
-      pos = calculateFn(maxDomain, minmaxAxis.graphMin, minmaxAxis.graphMax, area, sp);
+      g = Canvas.calculateY(maxValue, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      g -= offset;
     }
 
     ctx.beginPath();
@@ -108,11 +136,11 @@ const modules = {
     ctx.lineWidth = 2;
 
     if (isHorizontal) {
-      ctx.moveTo(graphPos.x1, pos);
-      ctx.lineTo(graphPos.x2, pos);
+      ctx.moveTo(xsp, d);
+      ctx.lineTo(g, d);
     } else {
-      ctx.moveTo(pos, graphPos.y1);
-      ctx.lineTo(pos, graphPos.y2);
+      ctx.moveTo(d, ysp);
+      ctx.lineTo(d, g);
     }
 
     ctx.stroke();
@@ -120,67 +148,47 @@ const modules = {
     ctx.closePath();
   },
   drawMaxTip(param) {
+    const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const lastTip = this.lastTip;
-    const {
-      hitInfo,
-      maxDomain,
-      maxY,
-      minmaxX,
-      minmaxY,
-      graphPos,
-      opt,
-      xArea,
-      yArea,
-      xsp,
-      ysp,
-    } = param;
-
-    let maxValue;
-
-    if (hitInfo && hitInfo.value !== null) {
-      maxValue = numberWithComma(hitInfo.value);
-      lastTip.value = maxValue;
-    } else if (lastTip.value !== null) {
-      maxValue = lastTip.value;
-    } else {
-      maxValue = numberWithComma(maxY);
-    }
-
-    if (maxValue === false) {
-      return;
-    }
+    const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, xep, ysp } = param;
+    const { maxValue, maxTipText, opt, type } = param;
 
     const arrowSize = 4;
     const maxTipHeight = 20;
     const borderRadius = 4;
-    const yOffset = 8;
+    const offset = type === 'bar' ? 4 : 6;
 
-    let maxTipType = 'center';
-    let x;
+    let d = param.d;
+    let g;
 
-    if (hitInfo && hitInfo.pos !== null) {
-      x = hitInfo.pos;
-      lastTip.pos = x;
-    } else if (lastTip.pos !== null) {
-      x = lastTip.pos;
+    if (opt.fixedPosTop) {
+      if (isHorizontal) {
+        g = Canvas.calculateX(maxX, graphX.graphMin, graphX.graphMax, xArea, xsp);
+        g += offset;
+      } else {
+        g = Canvas.calculateY(maxY, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        g -= offset;
+      }
+    } else if (isHorizontal) {
+      g = Canvas.calculateX(maxValue, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      g += offset;
     } else {
-      x = Canvas.calculateX(maxDomain, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+      g = Canvas.calculateY(maxValue, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      g -= offset;
     }
 
-    const y = Canvas.calculateY(maxY, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp)
-      - yOffset;
+    let maxTipType = 'center';
 
     ctx.save();
     ctx.font = 'bold 14px Roboto';
-    const maxTipWidth = Math.round(Math.max(ctx.measureText(maxValue).width + 12, 40));
+    const maxTipWidth = Math.round(Math.max(ctx.measureText(maxTipText).width + 12, 40));
 
-    if (x + (maxTipWidth / 2) > graphPos.x2 - 10) {
+    if (d + (maxTipWidth / 2) > xep - 10) {
       maxTipType = 'right';
-      x -= (maxTipWidth / 2) - (arrowSize * 2);
-    } else if (x - (maxTipWidth / 2) < graphPos.x1 + 10) {
+      d -= (maxTipWidth / 2) - (arrowSize * 2);
+    } else if (d - (maxTipWidth / 2) < xsp + 10) {
       maxTipType = 'left';
-      x += (maxTipWidth / 2) - (arrowSize * 2);
+      d += (maxTipWidth / 2) - (arrowSize * 2);
     }
 
     ctx.restore();
@@ -189,17 +197,17 @@ const modules = {
       type: maxTipType,
       width: maxTipWidth,
       height: maxTipHeight,
+      x: d,
+      y: g,
       opt,
-      x,
-      y,
       arrowSize,
       borderRadius,
-      maxValue,
+      maxTipText,
     });
   },
 
   showMaxTip(param) {
-    const { type, width, height, x, y, arrowSize, borderRadius, maxValue, opt } = param;
+    const { type, width, height, x, y, arrowSize, borderRadius, maxTipText, opt } = param;
     const ctx = param.context;
 
     const sx = x - (width / 2);
@@ -211,7 +219,7 @@ const modules = {
     ctx.font = 'bold 14px Roboto';
 
     ctx.fillStyle = opt.background;
-    ctx.shadowColor = opt.color;
+    ctx.shadowColor = opt.background;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
@@ -249,7 +257,7 @@ const modules = {
     ctx.fillStyle = opt.color;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${maxValue}`, x, sy + (height / 2));
+    ctx.fillText(`${maxTipText}`, x, sy + (height / 2));
     ctx.restore();
   },
 };

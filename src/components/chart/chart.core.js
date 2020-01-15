@@ -380,12 +380,16 @@ class EvChart {
     return labelOffset;
   }
 
-  update(updateSeries) {
+  update(updateSeries, updateTip) {
     const options = this.options;
     const data = this.data.data;
     const labels = this.data.labels;
     const groups = this.data.groups;
     const series = this.data.series;
+
+    if (!this.isInit) {
+      return;
+    }
 
     this.resetProps();
 
@@ -411,6 +415,10 @@ class EvChart {
       if (this.legendDOM) {
         this.resetLegend();
       }
+    }
+
+    if (updateTip) {
+      this.lastTip = { pos: null, value: null };
     }
 
     if (groups.length) {
