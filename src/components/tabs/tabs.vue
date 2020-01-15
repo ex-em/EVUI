@@ -399,7 +399,6 @@
     border-right: none;
   }
   .ev-tabs-item {
-    margin-right: 4px;
     height: 30px;
     box-sizing: border-box;
     display: inline-block;
@@ -409,16 +408,19 @@
     user-select: none;
 
     @include evThemify() {
-      color: evThemed('font-color-base');
+      color: evThemed('tab-color');
       border: $border-solid evThemed('tab-border');
       background-color: evThemed('tab-bg');
     }
   }
   .ev-tabs-item.active {
     transform: translateZ(0);
-    color: $color-primary;
     border-bottom: none;
-    background-color: $color-white;
+
+    @include evThemify() {
+      color: evThemed('tab-active-color');
+      background-color: evThemed('tab-active-bg');
+    }
   }
   .ev-tabs-item.dragover {
     border-left: 3px solid blue;
