@@ -147,6 +147,7 @@
 </script>
 <style lang="scss">
   @import '~@/styles/default';
+
   @keyframes ev-message-box-fade-in {
     0% {
       transform: translate3d(0, -20px, 0);
@@ -168,9 +169,6 @@
     }
   }
 
-  .ev-message-box-root {
-    z-index: 100000;
-  }
   .ev-message-box-wrap {
     display: flex;
     justify-content: center;
@@ -180,6 +178,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 1000;
   }
   .ev-message-box-modal {
     position: absolute;
@@ -192,7 +191,6 @@
     z-index: -1;
   }
   .ev-message-box {
-    position: absolute;
     width: 420px;
     padding: 10px;
     background-color: #FFFFFF;

@@ -139,6 +139,7 @@
     position: fixed;
     left: 50%;
     top: 20px;
+    z-index: 900;
     min-width: 380px;
     padding: 15px 15px 15px 20px;
     box-sizing: border-box;
