@@ -6,7 +6,7 @@
     <li
       v-for="menuItem in menu"
       :key="menuItem.name"
-      class="ev-menu-sub split"
+      :class="{split: menuItem.hidden === true ? false : true, 'ev-menu-sub': true}"
     >
       <menu-item
         v-bind="menuItem"
@@ -62,15 +62,10 @@
       color: evThemed('menu-color');
     }
 
-    &.split:not(:last-child) {
-      @include evThemify() {
-        border-bottom: 1px solid evThemed('menu-sub-split');
-      }
-    }
-
     &.split:not(:first-child) {
       @include evThemify() {
         padding-top: 18px;
+        border-top: 1px solid evThemed('menu-sub-split');
       }
     }
 
