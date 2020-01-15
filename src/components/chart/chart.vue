@@ -69,8 +69,8 @@
       },
     },
     created() {
-      this.data.series = cloneDeep(this.data.series);
-      this.options.legend = cloneDeep(this.options.legend);
+      this.data.series = cloneDeep(this.data.series || {});
+      this.options.legend = cloneDeep(this.options.legend || {});
 
       this.normalizedOption = defaultsDeep({}, this.options, this.getDefaultOptions());
       this.normalizedData = defaultsDeep(this.data, this.getDefaultData());

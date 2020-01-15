@@ -60,11 +60,13 @@ const modules = {
           d = cp + ((size.bar * size.ix) - (size.w + size.bPad)) + halfBarSize;
         }
       } else if (type === 'line') {
-        if (isHorizontal) {
-          d = Canvas.calculateY(maxDomain, graphY.graphMin, graphY.graphMax, xArea, ysp);
-        } else {
-          d = Canvas.calculateX(maxDomain, graphX.graphMin, graphX.graphMax, xArea, xsp);
-        }
+        d = Canvas.calculateX(
+          maxDomain,
+          graphX.graphMin,
+          graphX.graphMax,
+          xArea - size.comboOffset,
+          xsp + (size.comboOffset / 2),
+        );
       }
 
       if (hitInfo && hitInfo.pos !== null) {
