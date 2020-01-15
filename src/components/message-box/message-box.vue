@@ -118,7 +118,9 @@
       visible(val) {
         if (val) {
           this.$nextTick(() => {
-            this.$refs.confirm.$el.focus();
+            if (this.$refs.confirm && this.$refs.confirm.$el) {
+              this.$refs.confirm.$el.focus();
+            }
           });
         }
       },

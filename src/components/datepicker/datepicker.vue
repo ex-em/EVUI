@@ -104,6 +104,7 @@
         inputTextMaxLength: 10, // default: YYYY-MM-DD
         inputNumberMaxLength: 8, // default: YYYYMMDD
         cursorPosition: 0,
+        onceSetDateTime: true,
       };
     },
     computed: {
@@ -279,6 +280,10 @@
     },
     methods: {
       showDatepicker(e) {
+        if (this.onceSetDateTime) {
+          this.onceSetDateTime = false;
+          this.calendar.setDateTime(moment(this.value));
+        }
         this.calendar.showDropdown(e);
       },
       hideDatepicker() {
@@ -624,7 +629,7 @@
   }
 
   .ev-datepicker-input {
-    width: 235px;
+    width: 100%;
     height: 32px;
     line-height: 32px;
     border-radius: $border-radius-base;
