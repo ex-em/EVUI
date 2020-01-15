@@ -1,12 +1,13 @@
 @font-face {
   font-family: 'EVUI';
-  src: url('../../webfonts/EVUI.eot?2i83u2');
-  src: url('../../webfonts/EVUI.eot?2i83u2#iefix') format('embedded-opentype'),
-    url('../../webfonts/EVUI.ttf?2i83u2') format('truetype'),
-    url('../../webfonts/EVUI.woff?2i83u2') format('woff'),
-    url('../../webfonts/EVUI.svg?2i83u2#EVUI') format('svg');
+  src:  url('../../webfonts/EVUI.eot?3tmsvg');
+  src:  url('../../webfonts/EVUI.eot?3tmsvg#iefix') format('embedded-opentype'),
+  url('../../webfonts/EVUI.ttf?3tmsvg') format('truetype'),
+  url('../../webfonts/EVUI.woff?3tmsvg') format('woff'),
+  url('../../webfonts/EVUI.svg?3tmsvg#EVUI') format('svg');
   font-weight: normal;
   font-style: normal;
+  font-display: block;
 }
 
 .ei {
@@ -37,521 +38,686 @@
 }
 
 .ei-all-check:before {
-  content: "\e900";
+  content: '\e900';
 }
 .ei-allow2-down:before {
-  content: "\e901";
+  content: '\e901';
 }
 .ei-allow2-left:before {
-  content: "\e902";
+  content: '\e902';
 }
 .ei-allow2-right:before {
-  content: "\e903";
+  content: '\e903';
 }
 .ei-allow2-up:before {
-  content: "\e904";
+  content: '\e904';
 }
 .ei-arrow-down:before {
-  content: "\e905";
+  content: '\e905';
 }
 .ei-arrow-left:before {
-  content: "\e906";
+  content: '\e906';
 }
 .ei-arrow-right:before {
-  content: "\e907";
+  content: '\e907';
 }
 .ei-arrow-up:before {
-  content: "\e908";
+  content: '\e908';
 }
 .ei-ascending:before {
-  content: "\e909";
+  content: '\e909';
 }
 .ei-bell:before {
-  content: "\e90a";
+  content: '\e90a';
 }
 .ei-binder:before {
-  content: "\e90b";
+  content: '\e90b';
 }
 .ei-briefcase:before {
-  content: "\e90c";
+  content: '\e90c';
 }
 .ei-calendar:before {
-  content: "\e90d";
+  content: '\e90d';
 }
 .ei-calendar-minus:before {
-  content: "\e90e";
+  content: '\e90e';
 }
 .ei-calendar-one:before {
-  content: "\e90f";
+  content: '\e90f';
 }
 .ei-calendar-plus:before {
-  content: "\e910";
+  content: '\e910';
 }
 .ei-calendar-two:before {
-  content: "\e911";
+  content: '\e911';
 }
 .ei-chart-bar:before {
-  content: "\e912";
+  content: '\e912';
 }
 .ei-chart-line:before {
-  content: "\e913";
+  content: '\e913';
 }
 .ei-chart-line-minus:before {
-  content: "\e914";
+  content: '\e914';
 }
 .ei-chart-line-plus:before {
-  content: "\e915";
+  content: '\e915';
 }
 .ei-chart-pie:before {
-  content: "\e916";
+  content: '\e916';
 }
 .ei-check-off:before {
-  content: "\e917";
+  content: '\e917';
 }
 .ei-check-on:before {
-  content: "\e918";
+  content: '\e918';
 }
 .ei-circle-arrow-down:before {
-  content: "\e919";
+  content: '\e919';
 }
 .ei-circle-arrow-left:before {
-  content: "\e91a";
+  content: '\e91a';
 }
 .ei-circle-arrow-right:before {
-  content: "\e91b";
+  content: '\e91b';
 }
 .ei-circle-arrow-up:before {
-  content: "\e91c";
+  content: '\e91c';
 }
 .ei-circle-minus:before {
-  content: "\e91d";
+  content: '\e91d';
 }
 .ei-circle-plus:before {
-  content: "\e91e";
+  content: '\e91e';
 }
 .ei-close:before {
-  content: "\e91f";
+  content: '\e91f';
 }
 .ei-collapse:before {
-  content: "\e920";
+  content: '\e920';
 }
 .ei-collapse2:before {
-  content: "\e921";
+  content: '\e921';
 }
 .ei-column:before {
-  content: "\e922";
+  content: '\e922';
 }
 .ei-compress:before {
-  content: "\e923";
+  content: '\e923';
 }
 .ei-db:before {
-  content: "\e924";
+  content: '\e924';
 }
 .ei-db-delete:before {
-  content: "\e925";
+  content: '\e925';
 }
 .ei-db-minus:before {
-  content: "\e926";
+  content: '\e926';
 }
 .ei-db-plus:before {
-  content: "\e927";
+  content: '\e927';
 }
 .ei-descending:before {
-  content: "\e928";
+  content: '\e928';
 }
 .ei-document:before {
-  content: "\e929";
+  content: '\e929';
 }
 .ei-document-a:before {
-  content: "\e92a";
+  content: '\e92a';
 }
 .ei-document-copy:before {
-  content: "\e92b";
+  content: '\e92b';
 }
 .ei-document-division:before {
-  content: "\e92c";
+  content: '\e92c';
 }
 .ei-document-division2:before {
-  content: "\e92d";
+  content: '\e92d';
 }
 .ei-document-edit:before {
-  content: "\e92e";
+  content: '\e92e';
 }
 .ei-document-horizontally:before {
-  content: "\e92f";
+  content: '\e92f';
 }
 .ei-document-merge:before {
-  content: "\e930";
+  content: '\e930';
 }
 .ei-document-move:before {
-  content: "\e931";
+  content: '\e931';
 }
 .ei-document-script:before {
-  content: "\e932";
+  content: '\e932';
 }
 .ei-document-search:before {
-  content: "\e933";
+  content: '\e933';
 }
 .ei-document-share:before {
-  content: "\e934";
+  content: '\e934';
 }
 .ei-document-vertically:before {
-  content: "\e935";
+  content: '\e935';
 }
 .ei-dolphin:before {
-  content: "\e936";
+  content: '\e936';
 }
 .ei-double-square:before {
-  content: "\e937";
+  content: '\e937';
 }
 .ei-download:before {
-  content: "\e938";
+  content: '\e938';
 }
 .ei-edit-code:before {
-  content: "\e939";
+  content: '\e939';
 }
 .ei-elapse:before {
-  content: "\e93a";
+  content: '\e93a';
 }
 .ei-elapse2:before {
-  content: "\e93b";
+  content: '\e93b';
 }
 .ei-error:before {
-  content: "\e93c";
+  content: '\e93c';
 }
 .ei-expand:before {
-  content: "\e93d";
+  content: '\e93d';
 }
 .ei-external-link:before {
-  content: "\e93e";
+  content: '\e93e';
 }
 .ei-flow:before {
-  content: "\e93f";
+  content: '\e93f';
 }
 .ei-folder:before {
-  content: "\e940";
+  content: '\e940';
 }
 .ei-folder-merge:before {
-  content: "\e941";
+  content: '\e941';
 }
 .ei-folder-minus:before {
-  content: "\e942";
+  content: '\e942';
 }
 .ei-folder-open:before {
-  content: "\e943";
+  content: '\e943';
 }
 .ei-folder-plus:before {
-  content: "\e944";
+  content: '\e944';
 }
 .ei-folder-share:before {
-  content: "\e945";
+  content: '\e945';
 }
 .ei-funnel:before {
-  content: "\e946";
+  content: '\e946';
 }
 .ei-gauge:before {
-  content: "\e947";
+  content: '\e947';
 }
 .ei-gear:before {
-  content: "\e948";
+  content: '\e948';
 }
 .ei-grid:before {
-  content: "\e949";
+  content: '\e949';
 }
 .ei-grid-check:before {
-  content: "\e94a";
+  content: '\e94a';
 }
 .ei-grid-minus:before {
-  content: "\e94b";
+  content: '\e94b';
 }
 .ei-grid-plus:before {
-  content: "\e94c";
+  content: '\e94c';
 }
 .ei-grid-script:before {
-  content: "\e94d";
+  content: '\e94d';
 }
 .ei-hamburger:before {
-  content: "\e94e";
+  content: '\e94e';
 }
 .ei-help:before {
-  content: "\e94f";
+  content: '\e94f';
 }
 .ei-hive:before {
-  content: "\e950";
+  content: '\e950';
 }
 .ei-hive2:before {
-  content: "\e951";
+  content: '\e951';
 }
 .ei-info:before {
-  content: "\e952";
+  content: '\e952';
 }
 .ei-kafka:before {
-  content: "\e953";
+  content: '\e953';
 }
 .ei-layout:before {
-  content: "\e954";
+  content: '\e954';
 }
 .ei-link:before {
-  content: "\e955";
+  content: '\e955';
 }
 .ei-list:before {
-  content: "\e956";
+  content: '\e956';
 }
 .ei-lock:before {
-  content: "\e957";
+  content: '\e957';
 }
 .ei-login:before {
-  content: "\e958";
+  content: '\e958';
 }
 .ei-logout:before {
-  content: "\e959";
+  content: '\e959';
 }
 .ei-manual:before {
-  content: "\e95a";
+  content: '\e95a';
 }
 .ei-menu:before {
-  content: "\e95b";
+  content: '\e95b';
 }
 .ei-mobius:before {
-  content: "\e95c";
+  content: '\e95c';
 }
 .ei-monitor-chart:before {
-  content: "\e95d";
+  content: '\e95d';
 }
 .ei-monitor-grid:before {
-  content: "\e95e";
+  content: '\e95e';
 }
 .ei-network-division:before {
-  content: "\e95f";
+  content: '\e95f';
 }
 .ei-network-oneway:before {
-  content: "\e960";
+  content: '\e960';
 }
 .ei-network-twoway:before {
-  content: "\e961";
+  content: '\e961';
 }
 .ei-panel-out:before {
-  content: "\e962";
+  content: '\e962';
 }
 .ei-pencil:before {
-  content: "\e963";
+  content: '\e963';
 }
 .ei-piece:before {
-  content: "\e964";
+  content: '\e964';
 }
 .ei-pig:before {
-  content: "\e965";
+  content: '\e965';
 }
 .ei-pin:before {
-  content: "\e966";
+  content: '\e966';
 }
 .ei-plug:before {
-  content: "\e967";
+  content: '\e967';
 }
 .ei-printer:before {
-  content: "\e968";
+  content: '\e968';
 }
 .ei-r:before {
-  content: "\e969";
+  content: '\e969';
 }
 .ei-radio-off:before {
-  content: "\e96a";
+  content: '\e96a';
 }
 .ei-radio-on:before {
-  content: "\e96b";
+  content: '\e96b';
 }
 .ei-redo:before {
-  content: "\e96c";
+  content: '\e96c';
 }
 .ei-refresh:before {
-  content: "\e96d";
+  content: '\e96d';
 }
 .ei-s-arrow-down:before {
-  content: "\e96e";
+  content: '\e96e';
 }
 .ei-s-arrow-left:before {
-  content: "\e96f";
+  content: '\e96f';
 }
 .ei-s-arrow-right:before {
-  content: "\e970";
+  content: '\e970';
 }
 .ei-s-arrow-up:before {
-  content: "\e971";
+  content: '\e971';
 }
 .ei-save:before {
-  content: "\e972";
+  content: '\e972';
 }
 .ei-s-back:before {
-  content: "\e973";
+  content: '\e973';
 }
 .ei-s-backward:before {
-  content: "\e974";
+  content: '\e974';
 }
 .ei-s-close:before {
-  content: "\e975";
+  content: '\e975';
 }
 .ei-s-double-down:before {
-  content: "\e976";
+  content: '\e976';
 }
 .ei-s-double-left:before {
-  content: "\e977";
+  content: '\e977';
 }
 .ei-s-double-right:before {
-  content: "\e978";
+  content: '\e978';
 }
 .ei-s-double-up:before {
-  content: "\e979";
+  content: '\e979';
 }
 .ei-search:before {
-  content: "\e97a";
+  content: '\e97a';
 }
 .ei-search-chart:before {
-  content: "\e97b";
+  content: '\e97b';
 }
 .ei-server:before {
-  content: "\e97c";
+  content: '\e97c';
 }
 .ei-s-forward:before {
-  content: "\e97d";
+  content: '\e97d';
 }
 .ei-s-hamburger:before {
-  content: "\e97e";
+  content: '\e97e';
 }
 .ei-share:before {
-  content: "\e97f";
+  content: '\e97f';
 }
 .ei-shovel:before {
-  content: "\e980";
+  content: '\e980';
 }
 .ei-s-minus:before {
-  content: "\e981";
+  content: '\e981';
 }
 .ei-s-panel-out:before {
-  content: "\e982";
+  content: '\e982';
 }
 .ei-spark:before {
-  content: "\e983";
+  content: '\e983';
 }
 .ei-s-pause:before {
-  content: "\e984";
+  content: '\e984';
 }
 .ei-s-play:before {
-  content: "\e985";
+  content: '\e985';
 }
 .ei-s-plus:before {
-  content: "\e986";
+  content: '\e986';
 }
 .ei-square-arrow-down:before {
-  content: "\e987";
+  content: '\e987';
 }
 .ei-square-arrow-left:before {
-  content: "\e988";
+  content: '\e988';
 }
 .ei-square-arrow-right:before {
-  content: "\e989";
+  content: '\e989';
 }
 .ei-square-arrow-up:before {
-  content: "\e98a";
+  content: '\e98a';
 }
 .ei-square-double-down:before {
-  content: "\e98b";
+  content: '\e98b';
 }
 .ei-square-double-left:before {
-  content: "\e98c";
+  content: '\e98c';
 }
 .ei-square-double-right:before {
-  content: "\e98d";
+  content: '\e98d';
 }
 .ei-square-double-up:before {
-  content: "\e98e";
+  content: '\e98e';
 }
 .ei-square-minus:before {
-  content: "\e98f";
+  content: '\e98f';
 }
 .ei-square-plus:before {
-  content: "\e990";
+  content: '\e990';
 }
 .ei-s-resume:before {
-  content: "\e991";
+  content: '\e991';
 }
 .ei-s-square-minus:before {
-  content: "\e992";
+  content: '\e992';
 }
 .ei-s-square-plus:before {
-  content: "\e993";
+  content: '\e993';
 }
 .ei-s-step-backward:before {
-  content: "\e994";
+  content: '\e994';
 }
 .ei-s-step-forward:before {
-  content: "\e995";
+  content: '\e995';
 }
 .ei-s-stop:before {
-  content: "\e996";
+  content: '\e996';
 }
 .ei-s-time-backward:before {
-  content: "\e997";
+  content: '\e997';
 }
 .ei-terminal:before {
-  content: "\e998";
+  content: '\e998';
 }
 .ei-time:before {
-  content: "\e999";
+  content: '\e999';
 }
 .ei-timeline:before {
-  content: "\e99a";
+  content: '\e99a';
 }
 .ei-tool:before {
-  content: "\e99b";
+  content: '\e99b';
 }
 .ei-topology:before {
-  content: "\e99c";
+  content: '\e99c';
 }
 .ei-trash:before {
-  content: "\e99d";
+  content: '\e99d';
 }
 .ei-undo:before {
-  content: "\e99e";
+  content: '\e99e';
 }
 .ei-unlock:before {
-  content: "\e99f";
+  content: '\e99f';
 }
 .ei-upload:before {
-  content: "\e9a0";
+  content: '\e9a0';
 }
 .ei-user:before {
-  content: "\e9a1";
+  content: '\e9a1';
 }
 .ei-user-check:before {
-  content: "\e9a2";
+  content: '\e9a2';
 }
 .ei-user-delete:before {
-  content: "\e9a3";
+  content: '\e9a3';
 }
 .ei-user-minus:before {
-  content: "\e9a4";
+  content: '\e9a4';
 }
 .ei-user-plus:before {
-  content: "\e9a5";
+  content: '\e9a5';
 }
 .ei-warning:before {
-  content: "\e9a6";
+  content: '\e9a6';
 }
 .ei-window:before {
-  content: "\e9a7";
+  content: '\e9a7';
 }
 .ei-window-maximize:before {
-  content: "\e9a8";
+  content: '\e9a8';
 }
 .ei-window-minimize:before {
-  content: "\e9a9";
+  content: '\e9a9';
 }
 .ei-workflow:before {
-  content: "\e9aa";
+  content: '\e9aa';
 }
 .ei-zoomin:before {
-  content: "\e9ab";
+  content: '\e9ab';
 }
 .ei-zoomout:before {
-  content: "\e9ac";
+  content: '\e9ac';
+}
+.ei-user-plus2:before {
+  content: '\e9ad';
+}
+.ei-bell2:before {
+  content: '\e9ae';
+}
+.ei-bell-warning:before {
+  content: '\e9af';
+}
+.ei-bell-line:before {
+  content: '\e9b0';
+}
+.ei-allow2-left2:before {
+  content: '\e9b1';
+}
+.ei-exchange:before {
+  content: '\e9b2';
+}
+.ei-arrow-check:before {
+  content: '\e9b3';
+}
+.ei-check-on2:before {
+  content: '\e9b4';
+}
+.ei-check-off2:before {
+  content: '\e9b5';
+}
+.ei-arrow-left2:before {
+  content: '\e9b6';
+}
+.ei-arrow-right2:before {
+  content: '\e9b7';
+}
+.ei-close2:before {
+  content: '\e9b8';
+}
+.ei-flow2:before {
+  content: '\e9b9';
+}
+.ei-configration:before {
+  content: '\e9ba';
+}
+.ei-configuration-line:before {
+  content: '\e9bb';
+}
+.ei-connection-line:before {
+  content: '\e9bc';
+}
+.ei-user2:before {
+  content: '\e9bd';
+}
+.ei-db2:before {
+  content: '\e9be';
+}
+.ei-trash2:before {
+  content: '\e9bf';
+}
+.ei-arrow-down2:before {
+  content: '\e9c0';
+}
+.ei-warning2:before {
+  content: '\e9c1';
+}
+.ei-expand2:before {
+  content: '\e9c2';
+}
+.ei-document-copy2:before {
+  content: '\e9c3';
+}
+.ei-folder2:before {
+  content: '\e9c4';
+}
+.ei-group:before {
+  content: '\e9c5';
+}
+.ei-hamburger2:before {
+  content: '\e9c6';
+}
+.ei-server2:before {
+  content: '\e9c7';
+}
+.ei-link-off:before {
+  content: '\e9c8';
+}
+.ei-lock2:before {
+  content: '\e9c9';
+}
+.ei-unlock2:before {
+  content: '\e9ca';
+}
+.ei-logout2:before {
+  content: '\e9cb';
+}
+.ei-manual2:before {
+  content: '\e9cc';
+}
+.ei-memory:before {
+  content: '\e9cd';
+}
+.ei-minus:before {
+  content: '\e9ce';
+}
+.ei-moon:before {
+  content: '\e9cf';
+}
+.ei-network-check:before {
+  content: '\e9d0';
+}
+.ei-notice:before {
+  content: '\e9d1';
+}
+.ei-node:before {
+  content: '\e9d2';
+}
+.ei-external-link2:before {
+  content: '\e9d3';
+}
+.ei-plus:before {
+  content: '\e9d4';
+}
+.ei-radio-off2:before {
+  content: '\e9d5';
+}
+.ei-radio-on2:before {
+  content: '\e9d6';
+}
+.ei-registration:before {
+  content: '\e9d7';
+}
+.ei-refresh2:before {
+  content: '\e9d8';
+}
+.ei-replicaset:before {
+  content: '\e9d9';
+}
+.ei-calendar2:before {
+  content: '\e9da';
+}
+.ei-search2:before {
+  content: '\e9db';
+}
+.ei-spinner:before {
+  content: '\e9dc';
+}
+.ei-sun:before {
+  content: '\e9dd';
+}
+.ei-time2:before {
+  content: '\e9de';
+}
+.ei-time-line:before {
+  content: '\e9df';
+}
+.ei-triangle-down:before {
+  content: '\e9e0';
+}
+.ei-triangle-up:before {
+  content: '\e9e1';
+}
+.ei-monitor:before {
+  content: '\e9e2';
+}
+.ei-warning3:before {
+  content: '\e9e3';
 }
