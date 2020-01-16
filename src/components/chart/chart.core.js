@@ -118,7 +118,7 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis();
     this.drawSeries();
-    this.createTipInfo(hitInfo);
+    this.drawTip(hitInfo);
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 

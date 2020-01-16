@@ -37,9 +37,9 @@ const modules = {
     };
 
     this.onDblClick = (e) => {
-      const fixedIndicator = this.options.fixedIndicator;
+      const selectItem = this.options.selectItem;
       const offset = this.getMousePosition(e);
-      const hitInfo = this.findClickedData(offset, fixedIndicator.useApproximateValue);
+      const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
       const args = {};
       if (hitInfo) {
         this.redraw(hitInfo);
@@ -80,9 +80,11 @@ const modules = {
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
+    const ctx = this.tooltipCtx;
 
     let hitId = null;
     let maxs = '';
+    let maxsw = 0;
     let maxv = '';
     let maxg = null;
     let maxSID = null;
@@ -99,6 +101,7 @@ const modules = {
 
           if (gdata !== null && gdata !== undefined) {
             const sName = `${series.name}`;
+            const sw = ctx.measureText(sName).width;
 
             item.name = sName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
@@ -107,8 +110,9 @@ const modules = {
             const g = item.data.b || item.data.y || 0;
             const cg = numberWithComma(g);
 
-            if (maxs.length < sName.length) {
+            if (maxsw < sw) {
               maxs = sName;
+              maxsw = sw;
             }
 
             if (maxv.length <= `${cg}`.length) {
