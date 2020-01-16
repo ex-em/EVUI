@@ -37,9 +37,9 @@ const modules = {
     };
 
     this.onDblClick = (e) => {
-      const fixedIndicator = this.options.fixedIndicator;
+      const selectItem = this.options.selectItem;
       const offset = this.getMousePosition(e);
-      const hitInfo = this.findClickedData(offset, fixedIndicator.useApproximateValue);
+      const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
       const args = {};
       if (hitInfo) {
         this.redraw(hitInfo);
