@@ -18,6 +18,7 @@ class Pie {
 
     this.sId = sId;
     this.data = [];
+    this.type = 'pie';
   }
 
   draw(param) {

@@ -16,7 +16,7 @@ class Bar {
     if (this.color === undefined) {
       this.color = COLOR[sIdx];
     }
-
+    this.type = 'bar';
     this.sId = sId;
     this.data = [];
     this.size = {

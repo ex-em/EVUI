@@ -19,7 +19,7 @@ class Line {
         this[colorProp] = COLOR[sIdx];
       }
     });
-
+    this.type = 'line';
     this.sId = sId;
     this.state = 'normal';
     this.extent = {
