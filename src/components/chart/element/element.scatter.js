@@ -22,6 +22,7 @@ class Scatter {
 
     this.sId = sId;
     this.data = [];
+    this.type = 'scatter';
   }
 
   draw(param) {
