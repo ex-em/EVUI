@@ -366,6 +366,7 @@
     @include evThemify() {
       color: evThemed('font-color-base');
       border: $border-solid evThemed('tab-border');
+      background-color: evThemed('tab-active-bg');
       border-top: 0;
     }
   }
