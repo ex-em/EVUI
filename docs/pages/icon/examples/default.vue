@@ -3536,8 +3536,8 @@
     </div>
     <div class="glyph fs1">
       <div class="clearfix bshadow0 pbs">
-        <span class="ei ei-configration" />
-        <span class="mls"> ei-configration</span>
+        <span class="ei ei-configuration" />
+        <span class="mls"> ei-configuration</span>
       </div>
       <fieldset class="fs0 size1of1 clearfix hidden-false">
         <input
@@ -3574,8 +3574,8 @@
     </div>
     <div class="glyph fs1">
       <div class="clearfix bshadow0 pbs">
-        <span class="ei ei-connection-line" />
-        <span class="mls"> ei-connection-line</span>
+        <span class="ei ei-connection" />
+        <span class="mls"> ei-connection</span>
       </div>
       <fieldset class="fs0 size1of1 clearfix hidden-false">
         <input
