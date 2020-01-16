@@ -37,8 +37,8 @@
           +new Date('2020-01-14 05:00:00'),
         ],
         chartData: {
-          series1: [null, 20, null, 0, 30, 50], // eslint-disable-line
-          series2: [10, null, null, 0, 30, 50], // eslint-disable-line
+          series1: [0, 20, 0, 0, 30, 50], // eslint-disable-line
+          series2: [10, 0, 0, 0, 30, 50], // eslint-disable-line
         },
         chartOptions: {
           width: '100%',

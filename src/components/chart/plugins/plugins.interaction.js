@@ -97,7 +97,13 @@ const modules = {
         const item = series.findGraphData(offset, isHorizontal);
 
         if (item.data) {
-          const gdata = isHorizontal ? (item.data.b || item.data.x) : (item.data.b || item.data.y);
+          let gdata;
+
+          if (item.data.o === null) {
+            gdata = isHorizontal ? item.data.x : item.data.y;
+          } else if (!isNaN(item.data.o)) {
+            gdata = isHorizontal ? item.data.x : item.data.y;
+          }
 
           if (gdata !== null && gdata !== undefined) {
             const sName = `${series.name}`;
@@ -107,8 +113,7 @@ const modules = {
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
-            const g = item.data.b || item.data.y || 0;
-            const cg = numberWithComma(g);
+            const cg = numberWithComma(gdata);
 
             if (maxsw < sw) {
               maxs = sName;
@@ -119,8 +124,8 @@ const modules = {
               maxv = `${cg}`;
             }
 
-            if (maxg === null || maxg <= g) {
-              maxg = g;
+            if (maxg === null || maxg <= gdata) {
+              maxg = gdata;
               maxSID = sId;
             }
 
