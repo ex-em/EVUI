@@ -16,8 +16,8 @@ const modules = {
       const selArgs = this.calculateTipInfo(this.seriesList[selSID], 'sel', hitInfo);
 
       if (selectItemOpt.use && selArgs) {
-        if (selectItemOpt.showTip) {
-          this.drawTextTip({ opt: selectItemOpt, ...selArgs });
+        if (selectItemOpt.showTextTip || selectItemOpt.showTip) {
+          this.drawTextTip({ opt: selectItemOpt, tipType: 'sel', ...selArgs });
         }
 
         if (selectItemOpt.showIndicator) {
@@ -26,7 +26,7 @@ const modules = {
       }
 
       if (maxTipOpt.use && maxArgs) {
-        this.drawTextTip({ opt: maxTipOpt, ...maxArgs });
+        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
 
         if (maxTipOpt.showIndicator) {
           this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
@@ -167,8 +167,7 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
     const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, xep, ysp } = param;
-    const { value, text, opt, type } = param;
-    let { dp } = param;
+    const { dp, value, text, opt, type, tipType } = param;
 
     const arrowSize = 4;
     const maxTipHeight = 20;
@@ -176,6 +175,7 @@ const modules = {
     const offset = type === 'bar' ? 4 : 6;
 
     let gp;
+    let tdp = dp;
 
     if (opt.fixedPosTop) {
       if (isHorizontal) {
@@ -201,27 +201,39 @@ const modules = {
 
     if (dp + (maxTipWidth / 2) > xep - 10) {
       maxTipType = 'right';
-      dp -= (maxTipWidth / 2) - (arrowSize * 2);
+      tdp -= (maxTipWidth / 2) - (arrowSize * 2);
     } else if (dp - (maxTipWidth / 2) < xsp + 10) {
       maxTipType = 'left';
-      dp += (maxTipWidth / 2) - (arrowSize * 2);
+      tdp += (maxTipWidth / 2) - (arrowSize * 2);
     }
 
     ctx.restore();
-    this.showTextTip({
-      context: ctx,
-      type: maxTipType,
-      width: maxTipWidth,
-      height: maxTipHeight,
-      x: dp,
-      y: gp,
-      opt,
-      arrowSize,
-      borderRadius,
-      text,
-    });
-  },
 
+    if (opt.showTextTip || tipType === 'max') {
+      this.showTextTip({
+        context: ctx,
+        type: maxTipType,
+        width: maxTipWidth,
+        height: maxTipHeight,
+        x: tdp,
+        y: gp,
+        opt,
+        arrowSize,
+        borderRadius,
+        text,
+      });
+    }
+
+    if (opt.showTip && tipType === 'sel') {
+      this.showTip({
+        context: ctx,
+        x: dp,
+        y: gp,
+        opt,
+        arrowSize,
+      });
+    }
+  },
   showTextTip(param) {
     const { type, width, height, x, y, arrowSize, borderRadius, text, opt } = param;
     const ctx = param.context;
@@ -274,6 +286,22 @@ const modules = {
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.restore();
+  },
+  showTip(param) {
+    const { x, y, opt } = param;
+    const ctx = param.context;
+    ctx.save();
+
+    ctx.fillStyle = opt.tipBackground;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 6, y - 6);
+    ctx.lineTo(x - 6, y - 6);
+    ctx.lineTo(x, y);
+    ctx.closePath();
+    ctx.fill();
+
     ctx.restore();
   },
 };
