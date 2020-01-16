@@ -117,9 +117,9 @@
     watch: {
       visible(val) {
         if (val) {
-          this.$nextTick(() => {
+          setTimeout(() => {
             if (this.$refs.confirm) {
-              this.$refs.confirm.focus();
+              this.$refs.confirm.$el.focus();
             }
           });
         }
