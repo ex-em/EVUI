@@ -136,20 +136,20 @@
             color: '#EE7F44',
           },
           maxTip: {
-            use: true,
-            fixedPosTop: true,
-            showIndicator: true,
+            use: false,
+            fixedPosTop: false,
+            showIndicator: false,
             indicatorColor: '#000000',
             tipBackground: '#000000',
             tipTextColor: '#FFFFFF',
           },
           selectItem: {
-            use: true,
+            use: false,
             showTextTip: false,
-            showTip: true,
+            showTip: false,
             showIndicator: false,
             fixedPosTop: false,
-            useApproximateValue: true,
+            useApproximateValue: false,
             indicatorColor: '#000000',
             tipBackground: '#000000',
             tipTextColor: '#FFFFFF',
@@ -184,6 +184,9 @@
       },
       onClick(e) {
         this.$emit('on-click', e);
+      },
+      selectItemByLabel(label) {
+        return this.evChart.selectItemByLabel(label);
       },
     },
   };
