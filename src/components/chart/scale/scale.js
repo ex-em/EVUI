@@ -25,7 +25,7 @@ class Scale {
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
-      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
+      bufferedTickSize = Math.floor(tickSize * 1.2);
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
@@ -35,7 +35,7 @@ class Scale {
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
     const minSteps = 1;
-    const maxSteps = Math.max(Math.floor(drawRange / bufferedTickSize), 1);
+    const maxSteps = Math.max(Math.floor(drawRange / bufferedTickSize) - 1, 1);
 
     return {
       min: minSteps,
@@ -106,6 +106,7 @@ class Scale {
     while (numberOfSteps > maxSteps) {
       interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
+      interval = Math.ceil(graphRange / numberOfSteps);
     }
 
     if (graphMax - graphMin > (numberOfSteps * interval)) {

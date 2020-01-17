@@ -70,35 +70,38 @@ const modules = {
     let cp;
     let halfBarSize;
     let dp;
+    let ldata;
+
+    ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+
+    if (tipType === 'sel') {
+      if (hitInfo && hitInfo.label !== null) {
+        lastTip.pos = hitInfo.label;
+        ldata = lastTip.pos;
+      } else if (lastTip.label !== null) {
+        ldata = lastTip.pos;
+      }
+    }
 
     // domain pos
     if (type === 'bar') {
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
-        cp = ysp - (size.cat * maxDomainIndex) - size.cPad;
+        cp = ysp - (size.cat * ldata) - size.cPad;
         dp = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) + halfBarSize;
       } else {
         halfBarSize = Math.round(size.w / 2);
-        cp = xsp + (size.cat * maxDomainIndex) + size.cPad;
+        cp = xsp + (size.cat * ldata) + size.cPad;
         dp = cp + ((size.bar * size.ix) - (size.w + size.bPad)) + halfBarSize;
       }
     } else if (type === 'line') {
       dp = Canvas.calculateX(
-        maxDomain,
+        ldata,
         graphX.graphMin,
         graphX.graphMax,
         xArea - size.comboOffset,
         xsp + (size.comboOffset / 2),
       );
-    }
-
-    if (tipType === 'sel') {
-      if (hitInfo && hitInfo.pos !== null) {
-        dp = type === 'bar' ? hitInfo.pos + halfBarSize : hitInfo.pos;
-        lastTip.pos = dp;
-      } else if (lastTip.pos !== null) {
-        dp = lastTip.pos;
-      }
     }
 
     // graph value
