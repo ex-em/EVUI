@@ -322,8 +322,9 @@
     },
   };
 </script>
-<style scoped>
-  /*base class*/
+<style lang="scss">
+  @import '~@/styles/default';
+
   .ev-input-number {
     display: inline-block;
     width: 100%;
@@ -342,6 +343,12 @@
     border-radius: 4px;
     overflow: hidden;
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('number-input-border');
+      background-color: evThemed('number-input-background');
+    }
   }
   .ev-input-number-handler-wrap {
     width: 22px;
@@ -357,10 +364,10 @@
   }
   /*border color when mouse hover*/
   .ev-input-number:hover {
-    border-color : #2d8cf0;
+    border-color: #2d8cf0;
   }
   .ev-input-number:hover .ev-input-number-handler-wrap {
-    border-color : #2d8cf0;
+    border-color: #2d8cf0;
     opacity: 1;
   }
 
@@ -373,6 +380,7 @@
     overflow: hidden;
     height: 32px;
   }
+
   .ev-input-number-input {
     width: 100%;
     height: 32px;
@@ -381,12 +389,17 @@
     text-align: left;
     outline: 0;
     -moz-appearance: textfield;
-    color: #666;
     border: 0;
     border-radius: 4px;
+    background-color: transparent;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
   }
+
   /*handler line class*/
-  .ev-input-number-handler  {
+  .ev-input-number-handler {
     display: block;
     width: 100%;
     height: 16px;
@@ -397,6 +410,11 @@
     position: relative;
     padding-top: 1px;
     padding-left: 1px;
+    @include evThemify() {
+      color: evThemed('font-color-base');
+      border: $border-solid evThemed('number-input-border');
+      background-color: evThemed('number-input-background');
+    }
   }
   .ev-input-number-handler-up {
     cursor: pointer;
@@ -408,34 +426,34 @@
   }
   /*disable base class*/
   .ev-input-number-disabled {
-    background-color: #f3f3f3;
-    opacity: 1;
     cursor: not-allowed;
-    color: #ccc;
+    @include evThemify() {
+      color: evThemed('number-input-disabled');
+      background-color: evThemed('number-input-disabled-background');
+    }
+
+    .ev-input-number-handler-wrap {
+      display: none;
+    }
+    .ev-input-number-handler {
+      opacity: .72;
+      cursor: not-allowed;
+    }
+    .ev-input-number-input {
+      opacity: 1;
+      cursor: not-allowed;
+      @include evThemify() {
+        color: evThemed('textfield-input-disabled');
+      }
+    }
   }
   /*use border color when mouse hover*/
   .ev-input-number-disabled:hover {
-    border-color : #D77F7F;
+    border-color: $color-not-allow;
   }
-  /*inner input div class*/
-  .ev-input-number-disabled .ev-input-number {
-    opacity: .72;
-    cursor: not-allowed;
-    background-color: #f3f3f3;
-  }
-  /*handler line class*/
-  .ev-input-number-disabled .ev-input-number-handler-wrap {
-    display: none;
-  }
-  .ev-input-number-disabled .ev-input-number-handler {
-    opacity: .72;
-    color: #ccc!important;
-    cursor: not-allowed;
-  }
+
   .ev-input-number-input[disabled] {
-    background-color: #f3f3f3;
     opacity: 1;
     cursor: not-allowed;
-    color: #ccc;
   }
 </style>
