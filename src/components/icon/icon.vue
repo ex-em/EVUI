@@ -21,10 +21,10 @@
         default: null,
       },
     },
-    data() {
-      return {
-        preCls: `${prefixCls} ${this.cls}`,
-      };
+    computed: {
+      preCls() {
+        return `${prefixCls} ${this.cls}`;
+      },
     },
   };
 </script>
