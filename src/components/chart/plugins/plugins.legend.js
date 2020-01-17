@@ -184,7 +184,7 @@ const modules = {
     nameDOM.setAttribute('title', series.name);
     nameDOM.dataset.type = 'name';
 
-    this.legendDOM.style.padding = '0';
+    this.legendDOM.style.padding = '5px 0 0 0';
 
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
@@ -195,7 +195,7 @@ const modules = {
     } else {
       containerDOM.style.width = '100%';
     }
-    containerDOM.style.height = `${opt.height - 4}px`;
+    containerDOM.style.height = '18px';
     containerDOM.style.display = 'inline-block';
     containerDOM.dataset.type = 'container';
 

@@ -301,7 +301,9 @@
   .ev-chart-tooltip {
     position: absolute;
     z-index: 850;
-    overflow-y: auto;
+    top: 0;
+    left: 0;
+    overflow-y: hidden;
     overflow-x: hidden;
     padding-right: 17px;
   }

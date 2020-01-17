@@ -66,7 +66,8 @@
           },
           legend: {
             show: true,
-            position: 'right',
+            position: 'bottom',
+            height: 50,
           },
           horizontal: false,
           axesX: [{
