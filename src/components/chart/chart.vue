@@ -52,7 +52,7 @@
           const newData = defaultsDeep({}, newVal, this.normalizedData);
           const updatedSeries = !isEqual(newData.series, this.evChart.data.series);
 
-          this.evChart.data = newData;
+          this.evChart.data = cloneDeep(newData);
           this.evChart.update(updatedSeries);
         },
         deep: true,
@@ -62,7 +62,7 @@
           const newOpt = defaultsDeep({}, newVal, this.normalizedOption);
           const updatedSeries = !isEqual(newOpt.legend, this.evChart.options.legend);
 
-          this.evChart.options = newOpt;
+          this.evChart.options = cloneDeep(newOpt);
           this.evChart.update(updatedSeries);
         },
         deep: true,

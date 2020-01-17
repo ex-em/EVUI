@@ -47,11 +47,21 @@ const modules = {
     const mouseXIp = 2; // mouseInterpolation
     const mouseYIp = 10;
 
+    const sId = hitInfo.hitId;
+    const hitItem = items[sId].data;
+    const hitAxis = items[sId].axis;
+    const isHorizontal = this.options.horizontal;
+
+    const title = isHorizontal ?
+      this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
+      this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+
     ctx.font = '14px Roboto';
     const nw = Math.round(ctx.measureText(maxSeries).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
+    const tw = Math.round(ctx.measureText(title).width);
 
-    const width = nw + vw + boxPadding.l + boxPadding.r + (colorMargin * 2);
+    const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + (colorMargin * 2);
     const height = ((seriesKeys.length + 1) * textHeight) + ((seriesKeys.length + 1) * lineSpacing)
       + boxPadding.t + boxPadding.b;
 
@@ -76,11 +86,12 @@ const modules = {
         pos += 2;
       }
 
-      if (offsetY > (graphPos.y2 / 2) || clientY > ((bodyHeight * 9) / 10)) {
+      if ((offsetY > (graphPos.y2 / 2) || clientY > ((bodyHeight * 9) / 10))
+        && (clientY > (height + 6))) {
         this.tooltipDOM.style.top = `${mouseY - height - 6}px`;
         pos += 1;
       } else {
-        this.tooltipDOM.style.top = `${mouseY + 10}px`;
+        this.tooltipDOM.style.top = `${mouseY + 6}px`;
       }
 
       this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 5;
@@ -111,12 +122,13 @@ const modules = {
     const arrowBY = -10;
     const arrowLX = -5;
     const arrowRX = 5;
+    const isHorizontal = this.options.horizontal;
 
     if (pos < 0) {
       return;
     }
 
-    const title = this.options.horizontal ?
+    const title = isHorizontal ?
       this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
       this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
@@ -192,7 +204,14 @@ const modules = {
     seriesKeys.forEach((s, index) => {
       const gdata = items[s].data;
       const color = items[s].color;
-      const value = gdata.o || gdata.y || 0;
+
+      let value;
+
+      if (gdata.o === null) {
+        value = isHorizontal ? gdata.x : gdata.y;
+      } else if (!isNaN(gdata.o)) {
+        value = gdata.o;
+      }
 
       let itemX = x;
       let itemY = y + ((index + 1) * textHeight);

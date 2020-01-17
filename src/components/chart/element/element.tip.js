@@ -146,6 +146,10 @@ const modules = {
       gp -= offset;
     }
 
+    if (dp === null || dp < xsp) {
+      return;
+    }
+
     ctx.beginPath();
     ctx.save();
     ctx.strokeStyle = opt.indicatorColor;
@@ -247,10 +251,7 @@ const modules = {
     ctx.font = 'bold 14px Roboto';
 
     ctx.fillStyle = opt.tipBackground;
-    ctx.shadowColor = opt.tipBackground;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    ctx.shadowBlur = 0;
 
     ctx.beginPath();
     ctx.moveTo(sx + borderRadius, sy);
