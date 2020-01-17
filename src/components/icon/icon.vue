@@ -1,5 +1,10 @@
 <template>
-  <i :class="preCls"/>
+  <i
+    :class="preCls"
+    @click="click"
+    @dblclick="dblClick"
+    @contextmenu="contextMenu"
+  />
 </template>
 <script>
   import '@/styles/lib/icon.css';
@@ -24,6 +29,17 @@
     computed: {
       preCls() {
         return `${prefixCls} ${this.cls}`;
+      },
+    },
+    methods: {
+      click(e) {
+        this.$emit('click', e);
+      },
+      dblClick(e) {
+        this.$emit('dblclick', e);
+      },
+      contextMenu(e) {
+        this.$emit('contextmenu', e);
       },
     },
   };
