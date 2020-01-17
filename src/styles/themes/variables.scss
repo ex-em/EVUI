@@ -68,6 +68,13 @@ $ev-themes: (
     textfield-input-disabled: lighten($color-black, 40%),
     textfield-input-disabled-background: $color-light-level2,
 
+    /* input number
+    -------------------------- */
+    number-input-border: $color-light-level6,
+    number-input-background: $color-light-level1,
+    number-input-disabled: lighten($color-black, 40%),
+    number-input-disabled-background: $color-light-level2,
+
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected,
@@ -142,6 +149,13 @@ $ev-themes: (
     textfield-input-background: $color-dark-level1,
     textfield-input-disabled: darken($color-white, 40%),
     textfield-input-disabled-background: $color-dark-level4,
+
+    /* input number
+    -------------------------- */
+    number-input-border: $color-dark-level6,
+    number-input-background: $color-dark-level1,
+    number-input-disabled: darken($color-white, 40%),
+    number-input-disabled-background: $color-dark-level4,
 
     /* menu
     -------------------------- */
