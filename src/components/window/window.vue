@@ -24,19 +24,21 @@
           class="expand"
           @click="clickExpandBtn"
         >
-          <i
+          <ev-icon
             v-if="!isFullExpandWindow"
-            class="ei ei-expand" />
-          <i
+            :cls="'ei-expand2'" />
+          <ev-icon
             v-else
-            class="ei ei-compress" />
+            :cls="'ei-compress2'" />
         </span>
         <span
           :class="`${prefixCls}-btn`"
           class="close"
           @click="clickCloseBtn"
         >
-          <i class="ei ei-close" />
+          <ev-icon
+            :cls="'ei-close2'"
+          />
         </span>
       </div>
     </div>
@@ -601,7 +603,7 @@
         height: 20px;
         margin-left: 4px;
         cursor: pointer;
-        font-size: $font-size-small;
+        font-size: $font-size-medium;
         border-radius: $border-radius-base;
 
         @include evThemify() {

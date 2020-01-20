@@ -123,7 +123,7 @@ $ev-themes: (
 
     /* window
     -------------------------- */
-    window-bg: $color-dark-level4,
+    window-bg: darken($color-dark-level4, 4%),
     window-border: $color-dark-level6,
     window-btn: $color-dark-level8,
     window-btn-bg: $color-dark-level5,
