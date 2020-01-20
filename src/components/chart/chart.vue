@@ -25,16 +25,16 @@
         type: Object,
         default: () => {},
       },
+      listeners: {
+        type: Object,
+        default: () => {},
+      },
     },
     data() {
       return {
         chart: null,
         normalizedOption: null,
         normalizedData: null,
-        listeners: {
-          dblclick: this.onDblClick,
-          click: this.onClick,
-        },
         isInit: false,
       };
     },
@@ -79,9 +79,8 @@
       const wrapper = this.$refs.wrapper;
       const options = this.normalizedOption;
       const data = this.normalizedData;
-      const listeners = this.listeners;
 
-      this.evChart = new EvChart(wrapper, data, options, listeners);
+      this.evChart = new EvChart(wrapper, data, options, this.createEventListener());
 
       const timer = setTimeout(() => {
         this.evChart.init();
@@ -95,6 +94,25 @@
       delete this.evChart;
     },
     methods: {
+      createEventListener() {
+        const listeners = this.listeners || {};
+        const evtMap = {
+          click: this.onClick,
+          dblclick: this.onDblClick,
+        };
+
+        return Object.keys(listeners).reduce((acc, fn) => {
+          if (typeof listeners[fn] === 'function') {
+            acc[fn] = listeners[fn];
+          } else if (listeners[fn] === true) {
+            acc[fn] = evtMap[fn];
+          } else {
+            acc[fn] = null;
+          }
+
+          return acc;
+        }, {});
+      },
       getDefaultOptions() {
         return {
           border: 2,

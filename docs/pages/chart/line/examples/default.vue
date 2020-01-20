@@ -3,7 +3,8 @@
     <ev-chart
       :data="getChartData"
       :options="chartOptions"
-      @on-dblclick="onDblClick"
+      :listeners="listeners"
+      @on-click="onClick"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <ev-button
@@ -91,6 +92,10 @@
           text: 'Live',
           customCls: '',
         },
+        listeners: {
+          dblclick: this.onDblClick,
+          click: true,
+        },
         timeValue: '2017-01-01 00:00:00',
         liveMode: false,
         event: null,
@@ -151,7 +156,10 @@
         this.chartData = data;
       },
       onDblClick(e) {
-        console.log(e, 'on doubled click');
+        console.log(e, 'user defined callback.');
+      },
+      onClick(e) {
+        console.log(e, 'chart default callback.');
       },
     },
   };
