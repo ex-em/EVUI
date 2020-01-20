@@ -96,22 +96,16 @@
     methods: {
       createEventListener() {
         const listeners = this.listeners || {};
-        const evtMap = {
-          click: this.onClick,
-          dblclick: this.onDblClick,
-        };
+        const evtList = ['dblclick', 'click'];
+        const cbMap = {};
 
-        return Object.keys(listeners).reduce((acc, fn) => {
-          if (typeof listeners[fn] === 'function') {
-            acc[fn] = listeners[fn];
-          } else if (listeners[fn] === true) {
-            acc[fn] = evtMap[fn];
-          } else {
-            acc[fn] = null;
+        evtList.forEach((fnKey) => {
+          if (Object.prototype.hasOwnProperty.call(listeners, fnKey)) {
+            cbMap[fnKey] = listeners[fnKey];
           }
+        });
 
-          return acc;
-        }, {});
+        return cbMap;
       },
       getDefaultOptions() {
         return {

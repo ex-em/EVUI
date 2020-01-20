@@ -94,7 +94,7 @@
         },
         listeners: {
           dblclick: this.onDblClick,
-          click: true,
+          click: this.onClick,
         },
         timeValue: '2017-01-01 00:00:00',
         liveMode: false,
@@ -156,10 +156,10 @@
         this.chartData = data;
       },
       onDblClick(e) {
-        console.log(e, 'user defined callback.');
+        console.log(e, 'user defined dblclick callback.');
       },
       onClick(e) {
-        console.log(e, 'chart default callback.');
+        console.log(e, 'user defined click callback.');
       },
     },
   };
