@@ -296,11 +296,13 @@
         }
         return result;
       },
-      focus() {
+      focus(e) {
         this.focused = true;
+        this.$emit('focus', e);
       },
-      blur() {
+      blur(e) {
         this.focused = false;
+        this.$emit('blur', e);
       },
       keyDownEvent(e) {
         if (e.keyCode === 38) {
