@@ -234,10 +234,12 @@
             return false;
           }
         }
-        if (type === 'up') {
+        if (type === 'up' && addNum(targetValue, step) <= this.max) {
           updatedValue = addNum(updatedValue, step);
-        } else if (type === 'down') {
+        } else if (type === 'down' && addNum(targetValue, -step) >= this.min) {
           updatedValue = addNum(updatedValue, -step);
+        } else {
+          return false;
         }
         this.setValue(updatedValue);
         return true;
