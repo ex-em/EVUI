@@ -3,6 +3,9 @@ import { numberWithComma } from '@/common/utils';
 const modules = {
   createEventFunctions() {
     this.onMouseMove = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
       const ctx = this.overlayCtx;
@@ -27,7 +30,10 @@ const modules = {
       }
     };
 
-    this.onMouseLeave = () => {
+    this.onMouseLeave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       if (this.options.tooltip.throttledMove) {
         this.onMouseMove.cancel();
       }
