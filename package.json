@@ -15,7 +15,10 @@
     "docs_build": "webpack --config build/webpack.docs.conf.js --mode=production",
     "maxgauge": "webpack-dev-server --progress --config build/webpack.maxgauge.conf.js",
     "liteplus": "webpack-dev-server --progress --config build/webpack.liteplus.conf.js",
-    "liteplus_build": "webpack --config build/webpack.liteplus.conf.js --mode=production"
+    "liteplus_build": "webpack --config build/webpack.liteplus.conf.js --mode=production",
+    "pub:patch": "npm version patch --no-git-tag-version",
+    "pub:minor": "npm version minor --no-git-tag-version",
+    "pub:major": "npm version major --no-git-tag-version"
   },
   "main": "dist/evui.min.js",
   "module": "dist/evui.min.js",
