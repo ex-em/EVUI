@@ -335,8 +335,8 @@ const modules = {
   },
 
   onMouseMove(e) {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
 
     const offset = this.wrapperDOM.getBoundingClientRect();
     const offsetWidth = this.wrapperDOM.offsetWidth;
@@ -398,8 +398,8 @@ const modules = {
   },
 
   onMouseUp(e) {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
 
     this.wrapperDOM.removeEventListener('mousemove', this.mouseMove, false);
     this.wrapperDOM.removeEventListener('mouseup', this.mouseUp, false);
