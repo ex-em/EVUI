@@ -41,8 +41,8 @@
     },
     props: {
       value: {
-        type: String,
-        default: '',
+        type: [String, Number],
+        default: null,
       },
       disabled: {
         type: Boolean,

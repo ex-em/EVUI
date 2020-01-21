@@ -10,8 +10,8 @@ export default {
   },
   props: {
     value: {
-      type: String,
-      default: '',
+      type: [String, Number],
+      default: null,
     },
     size: {
       type: String,
