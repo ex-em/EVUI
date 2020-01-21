@@ -22,8 +22,8 @@
           />
           <span>{{ title }}</span>
         </div>
-        <i
-          class="ei ei-close"
+        <ev-icon
+          :cls="'ei-close'"
           @click="handleAction('cancel')"
           @keydown.enter="handleAction('cancel')"
         />
@@ -132,20 +132,20 @@
               break;
             case 'info':
               this.headerTypeIconInfo = {
-                cls: 'ei-info',
-                style: '',
+                cls: 'ei-info2',
+                style: 'color: #4169E1;',
               };
               break;
             case 'warning':
               this.headerTypeIconInfo = {
                 cls: 'ei-warning2',
-                style: 'color: #fe8a00;',
+                style: 'color: #FE8A00;',
               };
               break;
             case 'error':
               this.headerTypeIconInfo = {
                 cls: 'ei-warning3',
-                style: 'color: #ff0000;',
+                style: 'color: #FF0000;',
               };
               break;
             default:
