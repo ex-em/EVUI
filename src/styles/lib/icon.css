@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'EVUI';
-  src: url('../../webfonts/EVUI.eot?ism126');
-  src: url('../../webfonts/EVUI.eot?ism126#iefix') format('embedded-opentype'),
-    url('../../webfonts/EVUI.ttf?ism126') format('truetype'),
-    url('../../webfonts/EVUI.woff?ism126') format('woff'),
-    url('../../webfonts/EVUI.svg?ism126#EVUI') format('svg');
+  src: url('../../webfonts/EVUI.eot?xnf1pg');
+  src: url('../../webfonts/EVUI.eot?xnf1pg#iefix') format('embedded-opentype'),
+    url('../../webfonts/EVUI.ttf?xnf1pg') format('truetype'),
+    url('../../webfonts/EVUI.woff?xnf1pg') format('woff'),
+    url('../../webfonts/EVUI.svg?xnf1pg#EVUI') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -37,6 +37,12 @@
   font-size: 25px;
 }
 
+.ei-info2:before {
+  content: '\e9de';
+}
+.ei-question:before {
+  content: '\e9e7';
+}
 .ei-shard:before {
   content: '\e9e6';
 }
@@ -713,7 +719,7 @@
   content: '\e9dd';
 }
 .ei-window-maximize:before {
-  content: '\e9de';
+  content: '\e9e8';
 }
 .ei-window-minimize:before {
   content: '\e9df';

@@ -2,6 +2,44 @@
   <div class="clearfix mhl ptl">
     <div class="glyph fs1">
       <div class="clearfix bshadow0 pbs">
+        <span class="ei ei-info2" />
+        <span class="mls"> ei-info2</span>
+      </div>
+      <fieldset class="fs0 size1of1 clearfix hidden-false">
+        <input
+          type="text"
+          readonly
+          value="e9de"
+          class="unit size1of2" >
+        <input
+          type="text"
+          maxlength="1"
+          readonly
+          value="&#xe9de;"
+          class="unitRight size1of2 talign-right" >
+      </fieldset>
+    </div>
+    <div class="glyph fs1">
+      <div class="clearfix bshadow0 pbs">
+        <span class="ei ei-question" />
+        <span class="mls"> ei-question</span>
+      </div>
+      <fieldset class="fs0 size1of1 clearfix hidden-false">
+        <input
+          type="text"
+          readonly
+          value="e9e7"
+          class="unit size1of2" >
+        <input
+          type="text"
+          maxlength="1"
+          readonly
+          value="&#xe9e7;"
+          class="unitRight size1of2 talign-right" >
+      </fieldset>
+    </div>
+    <div class="glyph fs1">
+      <div class="clearfix bshadow0 pbs">
         <span class="ei ei-shard" />
         <span class="mls"> ei-shard</span>
       </div>
@@ -4284,13 +4322,13 @@
         <input
           type="text"
           readonly
-          value="e9de"
+          value="e9e8"
           class="unit size1of2" >
         <input
           type="text"
           maxlength="1"
           readonly
-          value="&#xe9de;"
+          value="&#xe9e8;"
           class="unitRight size1of2 talign-right" >
       </fieldset>
     </div>
