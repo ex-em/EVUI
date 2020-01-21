@@ -37,31 +37,33 @@ const modules = {
     };
 
     this.onDblClick = (e) => {
-      const selectItem = this.options.selectItem;
-      const offset = this.getMousePosition(e);
-      const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
-      const args = {};
-      if (hitInfo) {
-        this.redraw(hitInfo);
-      }
-
-      ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
       if (typeof this.listeners.dblclick === 'function') {
+        const selectItem = this.options.selectItem;
+        const offset = this.getMousePosition(e);
+        const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
+        const args = {};
+        if (hitInfo) {
+          this.redraw(hitInfo);
+        }
+
+        ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+
         this.listeners.dblclick(args);
       }
     };
 
     this.onClick = (e) => {
-      const offset = this.getMousePosition(e);
-      const hitInfo = this.findClickedData(offset);
-
-      const args = {};
-      if (hitInfo) {
-        this.redraw(hitInfo);
-      }
-
-      ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
       if (typeof this.listeners.click === 'function') {
+        const offset = this.getMousePosition(e);
+        const hitInfo = this.findClickedData(offset);
+
+        const args = {};
+        if (hitInfo) {
+          this.redraw(hitInfo);
+        }
+
+        ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+
         this.listeners.click(args);
       }
     };

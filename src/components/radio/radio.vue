@@ -31,12 +31,12 @@ export default {
   },
   props: {
     value: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
     customValue: {
-      type: String,
-      default: '',
+      type: [String, Number],
+      default: null,
     },
     groupName: {
       type: String,
