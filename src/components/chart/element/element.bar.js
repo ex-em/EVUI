@@ -162,6 +162,7 @@ class Bar {
 
       if ((sx <= xp) && (xp <= ex)) {
         item.data = gdata[m];
+        item.index = m;
 
         if ((ey <= yp) && (yp <= sy)) {
           item.hit = true;
@@ -195,6 +196,7 @@ class Bar {
 
       if ((ey <= yp) && (yp <= sy)) {
         item.data = gdata[m];
+        item.index = m;
 
         if ((sx <= xp) && (xp <= ex)) {
           item.hit = true;
