@@ -15,9 +15,10 @@
         class="ev-message-box-top"
       >
         <div class="ev-message-box-top-title">
-          <i
+          <ev-icon
             v-if="type!==''"
-            :class="['ei', `ei-${type}`]"
+            :cls="headerTypeIconInfo.cls"
+            :style="headerTypeIconInfo.style"
           />
           <span>{{ title }}</span>
         </div>
@@ -97,6 +98,10 @@
         cancelButtonClass: '',
         callback: null,
         useHTMLString: false,
+        headerTypeIconInfo: {
+          cls: '',
+          style: '',
+        },
       };
     },
     computed: {
@@ -115,6 +120,39 @@
       },
     },
     watch: {
+      type: {
+        immediate: true,
+        handler(value) {
+          switch (value) {
+            case 'success':
+              this.headerTypeIconInfo = {
+                cls: '',
+                style: '',
+              };
+              break;
+            case 'info':
+              this.headerTypeIconInfo = {
+                cls: 'ei-info',
+                style: '',
+              };
+              break;
+            case 'warning':
+              this.headerTypeIconInfo = {
+                cls: 'ei-warning2',
+                style: 'color: #fe8a00;',
+              };
+              break;
+            case 'error':
+              this.headerTypeIconInfo = {
+                cls: 'ei-warning3',
+                style: 'color: #ff0000;',
+              };
+              break;
+            default:
+              break;
+          }
+        },
+      },
       visible(val) {
         if (val) {
           setTimeout(() => {
