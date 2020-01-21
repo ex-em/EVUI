@@ -407,6 +407,7 @@
     font-weight: 500;
     position: relative;
     user-select: none;
+    cursor: pointer;
 
     @include evThemify() {
       color: evThemed('tab-color');
