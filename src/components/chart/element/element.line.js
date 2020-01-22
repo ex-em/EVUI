@@ -193,6 +193,7 @@ class Line {
 
       if ((x - 2 <= xp) && (xp <= x + 2)) {
         item.data = gdata[m];
+        item.index = m;
 
         if ((y - 2 <= yp) && (yp <= y + 2)) {
           item.hit = true;
@@ -224,6 +225,7 @@ class Line {
 
       if ((x - 2 <= xp) && (xp <= x + 2)) {
         item.data = gdata[m];
+        item.index = m;
 
         if ((y - 2 <= yp) && (yp <= y + 2)) {
           item.hit = true;
@@ -236,6 +238,7 @@ class Line {
           const next = Math.abs(gdata[m + 1].xp - xp);
 
           item.data = curr > next ? gdata[m + 1] : gdata[m];
+          item.index = curr > next ? m + 1 : m;
           return item;
         }
         s = m + 1;
@@ -245,6 +248,7 @@ class Line {
           const curr = Math.abs(gdata[m].xp - xp);
 
           item.data = prev > curr ? gdata[m] : gdata[m - 1];
+          item.index = prev > curr ? m : m - 1;
           return item;
         }
         e = m - 1;

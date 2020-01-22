@@ -154,6 +154,7 @@ const modules = {
     let maxSID = '';
     let acc = 0;
     let useStack = false;
+    let maxIndex = null;
 
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
@@ -162,7 +163,9 @@ const modules = {
         series.findApproximateData : series.findGraphData;
 
       if (findFn) {
-        const data = findFn.call(series, offset, isHorizontal).data;
+        const item = findFn.call(series, offset, isHorizontal);
+        const data = item.data;
+        const index = item.index;
 
         if (data) {
           const ldata = isHorizontal ? data.y : data.x;
@@ -183,13 +186,14 @@ const modules = {
               maxSID = sId;
               maxl = ldata;
               maxp = lp;
+              maxIndex = index;
             }
           }
         }
       }
     }
 
-    return { label: maxl, pos: maxp, value: maxg, sId: maxSID, acc, useStack };
+    return { label: maxl, pos: maxp, value: maxg, sId: maxSID, acc, useStack, maxIndex };
   },
   selectItemByLabel(label) {
     const sIds = Object.keys(this.seriesList);
@@ -236,7 +240,15 @@ const modules = {
         }
       }
 
-      findInfo = { label: maxl, pos: maxp, value: maxg, sId: maxSID, acc, useStack };
+      findInfo = {
+        label: maxl,
+        pos: maxp,
+        value: maxg,
+        sId: maxSID,
+        acc,
+        useStack,
+        maxIndex: labelIndex,
+      };
     }
 
     if (findInfo) {

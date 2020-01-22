@@ -15,23 +15,29 @@ const modules = {
       const maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
       const selArgs = this.calculateTipInfo(this.seriesList[selSID], 'sel', hitInfo);
 
-      if (selectItemOpt.use && selArgs) {
-        if (selectItemOpt.showTextTip || selectItemOpt.showTip) {
-          this.drawTextTip({ opt: selectItemOpt, tipType: 'sel', ...selArgs });
-        }
-
-        if (selectItemOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: selectItemOpt, ...selArgs });
-        }
-      }
-
       if (maxTipOpt.use && maxArgs) {
         this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
 
         if (maxTipOpt.showIndicator) {
           this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
         }
-     }
+      }
+
+      if (selectItemOpt.use && selArgs) {
+        let isSamePos = false;
+
+        if (maxTipOpt.use && maxArgs && maxArgs.dp === selArgs.dp) {
+          isSamePos = true;
+        }
+
+        if (selectItemOpt.showTextTip || selectItemOpt.showTip) {
+          this.drawTextTip({ opt: selectItemOpt, tipType: 'sel', isSamePos, ...selArgs });
+        }
+
+        if (selectItemOpt.showIndicator) {
+          this.drawFixedIndicator({ opt: selectItemOpt, ...selArgs });
+        }
+      }
     }
   },
   calculateTipInfo(series, tipType, hitInfo) {
@@ -76,9 +82,9 @@ const modules = {
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
-        lastTip.pos = hitInfo.label;
+        lastTip.pos = type === 'bar' ? hitInfo.maxIndex : hitInfo.label;
         ldata = lastTip.pos;
-      } else if (lastTip.label !== null) {
+      } else if (lastTip.pos !== null) {
         ldata = lastTip.pos;
       }
     }
@@ -174,7 +180,7 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
     const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, xep, ysp } = param;
-    const { dp, value, text, opt, type, tipType } = param;
+    const { dp, value, text, opt, type, tipType, isSamePos } = param;
 
     const arrowSize = 4;
     const maxTipHeight = 20;
@@ -238,6 +244,7 @@ const modules = {
         y: gp,
         opt,
         arrowSize,
+        isSamePos,
       });
     }
   },
@@ -293,16 +300,18 @@ const modules = {
     ctx.restore();
   },
   showTip(param) {
-    const { x, y, opt } = param;
+    const { x, y, opt, isSamePos } = param;
     const ctx = param.context;
+    const offset = isSamePos ? 24 : 0;
+    const cy = y - offset;
     ctx.save();
 
     ctx.fillStyle = opt.tipBackground;
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + 6, y - 6);
-    ctx.lineTo(x - 6, y - 6);
-    ctx.lineTo(x, y);
+    ctx.moveTo(x, cy);
+    ctx.lineTo(x + 6, cy - 6);
+    ctx.lineTo(x - 6, cy - 6);
+    ctx.lineTo(x, cy);
     ctx.closePath();
     ctx.fill();
 
