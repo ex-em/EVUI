@@ -153,6 +153,7 @@
       this.windowCls = { [this.prefixCls]: true };
     },
     mounted() {
+      const body = document.body;
       if (!this.isMovedEl) {
         this.isMovedEl = true;
 
@@ -160,14 +161,11 @@
           this.modelEl = document.createElement('div');
           this.modelEl.classList.add(`${this.prefixCls}-modal`);
           this.modelEl.appendChild(this.$el);
-          this.$root.$el.appendChild(this.modelEl);
+          body.appendChild(this.modelEl);
         } else {
-          this.$root.$el.appendChild(this.$el);
+          body.appendChild(this.$el);
         }
       }
-    },
-    beforeDestroy() {
-      this.close();
     },
     methods: {
       mousedown(e) {
@@ -304,7 +302,7 @@
         } else {
           this.isShowFlag = false;
         }
-
+        this.isFullExpandWindow = false;
         this.$emit('update:is-show', false);
       },
       show() {
