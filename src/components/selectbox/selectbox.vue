@@ -157,8 +157,6 @@
     data() {
       return {
         prefixCls,
-        selectboxClass: this.getSelectboxClass(),
-        inputFieldClass: this.getInputFieldClass(),
         isUseVModel: this.$vnode.data && this.$vnode.data.model,
         dropDownState: false,
         listBoxItems: [],
@@ -172,6 +170,20 @@
           'ev-selectbox-arrow-icon': true,
           'ev-selectbox-arrow-icon-rotate-180': this.dropDownState,
           'ev-selectbox-arrow-icon-disabled': this.disabled,
+        };
+      },
+      selectboxClass() {
+        return {
+          [`${prefixCls}`]: true,
+          [`${prefixCls}-size-${this.size}`]: true,
+          [`${prefixCls}-disabled`]: this.disabled,
+        };
+      },
+      inputFieldClass() {
+        return {
+          [`${prefixCls}-input-text`]: true,
+          [`${prefixCls}-input-text-readonly`]: this.readOnly,
+          [`${prefixCls}-input-text-disabled`]: this.disabled,
         };
       },
       selectedItems() {
@@ -382,20 +394,6 @@
         }
 
         return listBoxItems;
-      },
-      getSelectboxClass() {
-        return {
-          [`${prefixCls}`]: true,
-          [`${prefixCls}-size-${this.size}`]: true,
-          [`${prefixCls}-disabled`]: this.disabled,
-        };
-      },
-      getInputFieldClass() {
-        return {
-          [`${prefixCls}-input-text`]: true,
-          [`${prefixCls}-input-text-readonly`]: this.readOnly,
-          [`${prefixCls}-input-text-disabled`]: this.disabled,
-        };
       },
     },
   };
