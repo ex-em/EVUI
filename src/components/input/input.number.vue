@@ -234,9 +234,9 @@
             return false;
           }
         }
-        if (type === 'up' && addNum(targetValue, step) <= this.max) {
+        if (type === 'up' && addNum(updatedValue, step) <= this.max) {
           updatedValue = addNum(updatedValue, step);
-        } else if (type === 'down' && addNum(targetValue, -step) >= this.min) {
+        } else if (type === 'down' && addNum(updatedValue, -step) >= this.min) {
           updatedValue = addNum(updatedValue, -step);
         } else {
           return false;
