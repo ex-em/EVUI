@@ -8,6 +8,7 @@
         v-for="(item, index) in items"
         :key="index"
         :data-index="index"
+        :title="item.name"
         :class="getLiClasses(item)"
       >
         {{ item.name }}
@@ -86,8 +87,9 @@
   @import '~@/styles/default';
 
   .ev-listbox {
-    width: 100%;
+    display: table;
     height: 100%;
+    text-align: start;
 
     @include evThemify() {
       color: evThemed('font-color-base');
