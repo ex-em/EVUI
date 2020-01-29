@@ -183,7 +183,7 @@
 
   .ev-dropdown-single-area {
     position: absolute;
-    min-width: 100%;
+    width: 100%;
     max-height: 150px;
     border-radius: $border-radius-base;
     overflow: auto;
