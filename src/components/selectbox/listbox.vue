@@ -87,7 +87,7 @@
   @import '~@/styles/default';
 
   .ev-listbox {
-    width: max-content;
+    display: table;
     height: 100%;
     text-align: start;
 
