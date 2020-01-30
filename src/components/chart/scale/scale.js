@@ -80,9 +80,8 @@ class Scale {
   }
 
   calculateSteps(range) {
-    const maxValue = range.maxValue;
-    const minValue = range.minValue;
-    const maxSteps = range.maxSteps;
+    const { maxValue, minValue } = range;
+    let { maxSteps } = range;
 
     let interval = this.getInterval(range);
     let increase = minValue;
@@ -99,8 +98,15 @@ class Scale {
     numberOfSteps = Math.round(graphRange / interval);
 
     if (maxValue === 1) {
-      interval = 0.2;
-      numberOfSteps = 5;
+      if (maxSteps > 2) {
+        interval = 0.2;
+        numberOfSteps = 5;
+        maxSteps = 5;
+      } else {
+        interval = 0.5;
+        numberOfSteps = 2;
+        maxSteps = 2;
+      }
     }
 
     while (numberOfSteps > maxSteps) {
