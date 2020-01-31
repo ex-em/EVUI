@@ -79,6 +79,8 @@ export const AXIS_OPTION = {
     fontSize: 12,
     color: '#25262E',
     fontFamily: 'Roboto',
+    fitWidth: false,
+    fitDir: 'right',
   },
 };
 

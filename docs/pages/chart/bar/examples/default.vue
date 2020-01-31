@@ -17,18 +17,16 @@
         defaultBarChartData: {
           series: {
               series1: { name: 'series#1', show: true, type: 'bar' },
-              series2: { name: 'series#2', show: true, type: 'bar' },
           },
           labels: [
-              'January',
-              'February',
-              'March',
-              'April',
-              'May',
+              'JanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuary',
+              'FebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruary',
+              'MarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarch',
+              'AprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilApril',
+              'MayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMay',
           ],
           data: {
               series1: [100, 150, 51, 150, 350],
-              series2: [100, 150, 51, 150, 350],
           },
         },
         defaultBarChartOptions: {
@@ -45,6 +43,10 @@
           axesX: [{
             type: 'step',
             showGrid: false,
+            labelStyle: {
+              fitWidth: true,
+              fitDir: 'left',
+            },
           }],
           axesY: [{
             type: 'linear',

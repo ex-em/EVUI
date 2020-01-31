@@ -43,7 +43,7 @@ const modules = {
         const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
         const args = {};
         if (hitInfo && hitInfo.value !== null) {
-          this.redraw(hitInfo);
+          this.render(hitInfo);
         }
 
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
@@ -59,7 +59,7 @@ const modules = {
 
         const args = {};
         if (hitInfo && hitInfo.value !== null) {
-          this.redraw(hitInfo);
+          this.render(hitInfo);
         }
 
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
@@ -252,7 +252,7 @@ const modules = {
     }
 
     if (findInfo) {
-      this.redraw(findInfo);
+      this.render(findInfo);
     } else {
       return false;
     }
