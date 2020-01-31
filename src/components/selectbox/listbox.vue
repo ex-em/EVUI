@@ -87,8 +87,8 @@
   @import '~@/styles/default';
 
   .ev-listbox {
-    display: table;
     height: 100%;
+    word-break: break-all;
     text-align: start;
 
     @include evThemify() {
@@ -108,7 +108,6 @@
   .ev-listbox-li {
     display: block;
     list-style: none;
-    white-space: nowrap;
     cursor: pointer;
     transition: background .1s ease-in-out;
   }
