@@ -141,7 +141,7 @@
       },
       readOnly: {
         type: Boolean,
-        default: false,
+        default: true,
       },
       vModelSelectedValue: {
         type: [String, Number, Array],
