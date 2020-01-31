@@ -42,7 +42,7 @@ const modules = {
         const offset = this.getMousePosition(e);
         const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
         const args = {};
-        if (hitInfo) {
+        if (hitInfo && hitInfo.value !== null) {
           this.redraw(hitInfo);
         }
 
@@ -58,7 +58,7 @@ const modules = {
         const hitInfo = this.findClickedData(offset);
 
         const args = {};
-        if (hitInfo) {
+        if (hitInfo && hitInfo.value !== null) {
           this.redraw(hitInfo);
         }
 
