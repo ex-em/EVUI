@@ -77,13 +77,15 @@ class EvChart {
     this.createDataSet(data, labels);
     this.minMax = this.getStoreMinMax();
 
+    this.initRect();
+
     this.axesX = this.createAxes('x', axesX);
     this.axesY = this.createAxes('y', axesY);
+
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
-    this.initRect();
-    this.bufferCtx.save();
+    this.initScale();
     this.drawChart();
 
     if (tooltip.use) {
@@ -202,8 +204,8 @@ class EvChart {
 
   getAxesRange() {
     /* eslint-disable max-len */
-    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index]));
-    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index]));
+    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.chartRect));
+    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.chartRect));
     /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
@@ -277,15 +279,21 @@ class EvChart {
     this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
   }
 
-  getChartRect() {
+  getChartDOMRect() {
     const rect = this.chartDOM.getBoundingClientRect();
     const width = rect.width || 10;
     const height = rect.height || 10;
-    const padding = { top: 20, right: 2, left: 2, bottom: 4 };
 
     this.setWidth(width);
     this.setHeight(height);
 
+    return { width, height };
+  }
+
+  getChartRect() {
+    const { width, height } = this.getChartDOMRect();
+
+    const padding = { top: 20, right: 2, left: 2, bottom: 4 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
@@ -427,12 +435,6 @@ class EvChart {
 
     this.createDataSet(data, labels);
 
-    this.minMax = this.getStoreMinMax();
-    this.axesX = this.createAxes('x', options.axesX);
-    this.axesY = this.createAxes('y', options.axesY);
-    this.axesRange = this.getAxesRange();
-    this.labelOffset = this.getLabelOffset();
-
     // title update
     if (options.title.show) {
       if (!this.isInitTitle) {
@@ -457,6 +459,13 @@ class EvChart {
     } else if (this.isInitLegend) {
       this.hideLegend();
     }
+    this.chartRect = this.getChartRect();
+
+    this.minMax = this.getStoreMinMax();
+    this.axesX = this.createAxes('x', options.axesX);
+    this.axesY = this.createAxes('y', options.axesY);
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
 
     this.render();
   }
@@ -491,22 +500,17 @@ class EvChart {
       this.overlayCanvas.height / this.clearRectRatio);
   }
 
-  render() {
+  resize() {
     this.clear();
-    this.chartRect = this.getChartRect();
+    this.bufferCtx.restore();
+    this.bufferCtx.save();
+
+    this.getChartDOMRect();
     this.initScale();
     this.drawChart();
   }
 
-  resize() {
-    this.bufferCtx.restore();
-    this.bufferCtx.save();
-
-    this.initScale();
-    this.render();
-  }
-
-  redraw(hitInfo) {
+  render(hitInfo) {
     this.clear();
     this.chartRect = this.getChartRect();
     this.initScale();

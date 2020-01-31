@@ -1,10 +1,10 @@
-import { merge } from 'lodash-es';
+import { defaultsDeep } from 'lodash-es';
 import { AXIS_OPTION, AXIS_UNITS } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
 class Scale {
   constructor(type, opt, ctx) {
-    const merged = merge({}, AXIS_OPTION, opt);
+    const merged = defaultsDeep({}, opt, AXIS_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });

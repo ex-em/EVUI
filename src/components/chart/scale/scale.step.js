@@ -7,39 +7,28 @@ class StepScale extends Scale {
     this.labels = labels;
   }
 
-  calculateScaleRange() {
+  calculateScaleRange(minMax, chartRect) {
     const stepMinMax = Util.getStringMinMax(this.labels);
     const maxValue = stepMinMax.max;
     const minValue = stepMinMax.min;
+    const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
 
     return {
       min: minValue,
       max: maxValue,
-      minLabel: this.getLabelFormat(minValue),
-      maxLabel: this.getLabelFormat(maxValue),
-      size: Util.calcTextSize(this.getLabelFormat(maxValue), Util.getLabelStyle(this.labelStyle)),
+      minLabel: this.getLabelFormat(minValue, maxWidth),
+      maxLabel: this.getLabelFormat(maxValue, maxWidth),
+      size: Util.calcTextSize(
+        this.getLabelFormat(maxValue, maxWidth),
+        Util.getLabelStyle(this.labelStyle),
+      ),
     };
   }
 
   calculateSteps(range) {
-    const labels = this.labels;
-    const maxSteps = range.maxSteps;
-
-    let interval = 1;
-    let numberOfSteps;
-
-    const graphRange = labels.length;
-
-    numberOfSteps = Math.round(graphRange / interval);
-
-    while (numberOfSteps > maxSteps) {
-      interval *= 2;
-      numberOfSteps = Math.round(graphRange / interval);
-    }
-
     return {
-      steps: numberOfSteps,
-      interval,
+      steps: this.labels.length,
+      interval: 1,
       graphMin: range.minValue,
       graphMax: range.maxValue,
     };
@@ -61,6 +50,7 @@ class StepScale extends Scale {
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+    const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
 
     // label font 설정
     ctx.font = Util.getLabelStyle(this.labelStyle);
@@ -105,7 +95,7 @@ class StepScale extends Scale {
     labels.forEach((item, index) => {
       labelCenter = Math.round(startPoint + (labelGap * index));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(item);
+      labelText = this.getLabelFormat(item, maxWidth);
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
@@ -130,8 +120,34 @@ class StepScale extends Scale {
     ctx.closePath();
   }
 
-  getLabelFormat(value) {
-    return value;
+  getLabelFormat(value, maxWidth) {
+    return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
+  }
+
+  fittingString(value, maxWidth) {
+    const ctx = this.ctx;
+
+    ctx.save();
+    ctx.font = Util.getLabelStyle(this.labelStyle);
+    const dir = this.labelStyle.fitDir;
+
+    const ellipsis = '…';
+    const ellipsisWidth = ctx.measureText(ellipsis).width;
+
+    let str = value;
+    let width = ctx.measureText(str).width;
+
+    if (width <= maxWidth || width <= ellipsisWidth) {
+      return str;
+    }
+
+    let len = str.length;
+    while (width >= maxWidth - ellipsisWidth && len-- > 0) {
+      str = dir === 'right' ? str.substring(0, len) : str.substring(1, str.length);
+      width = ctx.measureText(str).width;
+    }
+
+    return dir === 'right' ? str + ellipsis : ellipsis + str;
   }
 }
 
