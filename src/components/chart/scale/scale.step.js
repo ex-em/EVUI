@@ -125,6 +125,10 @@ class StepScale extends Scale {
   }
 
   fittingString(value, maxWidth) {
+    if (!value) {
+      return '';
+    }
+
     const ctx = this.ctx;
 
     ctx.save();

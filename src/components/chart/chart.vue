@@ -53,7 +53,7 @@
           const updatedSeries = !isEqual(newData.series, this.evChart.data.series);
 
           this.evChart.data = cloneDeep(newData);
-          this.evChart.update(updatedSeries);
+          this.evChart.update(updatedSeries, true);
         },
         deep: true,
       },
@@ -83,8 +83,10 @@
       this.evChart = new EvChart(wrapper, data, options, this.createEventListener());
 
       const timer = setTimeout(() => {
-        this.evChart.init();
-        this.isInit = true;
+        if (this.evChart) {
+          this.evChart.init();
+          this.isInit = true;
+        }
         clearTimeout(timer);
       }, 1);
     },
