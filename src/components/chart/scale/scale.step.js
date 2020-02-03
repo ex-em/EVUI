@@ -125,29 +125,33 @@ class StepScale extends Scale {
   }
 
   fittingString(value, maxWidth) {
-    const ctx = this.ctx;
+    if (value) {
+      const ctx = this.ctx;
 
-    ctx.save();
-    ctx.font = Util.getLabelStyle(this.labelStyle);
-    const dir = this.labelStyle.fitDir;
+      ctx.save();
+      ctx.font = Util.getLabelStyle(this.labelStyle);
+      const dir = this.labelStyle.fitDir;
 
-    const ellipsis = '…';
-    const ellipsisWidth = ctx.measureText(ellipsis).width;
+      const ellipsis = '…';
+      const ellipsisWidth = ctx.measureText(ellipsis).width;
 
-    let str = value;
-    let width = ctx.measureText(str).width;
+      let str = value;
+      let width = ctx.measureText(str).width;
 
-    if (width <= maxWidth || width <= ellipsisWidth) {
-      return str;
+      if (width <= maxWidth || width <= ellipsisWidth) {
+        return str;
+      }
+
+      let len = str.length;
+      while (width >= maxWidth - ellipsisWidth && len-- > 0) {
+        str = dir === 'right' ? str.substring(0, len) : str.substring(1, str.length);
+        width = ctx.measureText(str).width;
+      }
+
+      return dir === 'right' ? str + ellipsis : ellipsis + str;
     }
 
-    let len = str.length;
-    while (width >= maxWidth - ellipsisWidth && len-- > 0) {
-      str = dir === 'right' ? str.substring(0, len) : str.substring(1, str.length);
-      width = ctx.measureText(str).width;
-    }
-
-    return dir === 'right' ? str + ellipsis : ellipsis + str;
+    return value;
   }
 }
 
