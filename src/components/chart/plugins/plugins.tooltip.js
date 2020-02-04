@@ -147,7 +147,7 @@ const modules = {
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.5;
     ctx.shadowBlur = 0;
     ctx.fillStyle = opt.backgroundColor;
     ctx.strokeStyle = opt.borderColor;
