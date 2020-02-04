@@ -39,10 +39,13 @@ const modules = {
     const [maxSeries, maxValue] = hitInfo.maxTip;
 
     const seriesKeys = Object.keys(items);
-    const boxPadding = { t: 8, b: 8, r: 16, l: 16 };
-    const lineSpacing = 6;
-    const colorMargin = 10;
+    const seriesLen = seriesKeys.length;
+    const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
+    const lineSpacing = 8;
+    const colorMargin = 16;
     const textHeight = 14;
+    const titleMargin = 12;
+    const titleHeight = 16;
     const scrollWidth = 17;
     const mouseXIp = 2; // mouseInterpolation
     const mouseYIp = 10;
@@ -62,8 +65,8 @@ const modules = {
     const tw = Math.round(ctx.measureText(title).width);
 
     const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + (colorMargin * 2);
-    const height = ((seriesKeys.length + 1) * textHeight) + ((seriesKeys.length + 1) * lineSpacing)
-      + boxPadding.t + boxPadding.b;
+    const height = boxPadding.t + titleHeight + titleMargin +
+      (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
 
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
@@ -94,10 +97,10 @@ const modules = {
         this.tooltipDOM.style.top = `${mouseY + 6}px`;
       }
 
-      this.tooltipCanvas.width = Math.round(width * this.pixelRatio) + 5;
-      this.tooltipCanvas.height = Math.round(height * this.pixelRatio) + 5;
+      this.tooltipCanvas.width = (width + 6) * this.pixelRatio;
+      this.tooltipCanvas.height = (height + 5) * this.pixelRatio;
       this.tooltipCanvas.style.width = `${width + 6}px`;
-      this.tooltipCanvas.style.height = `${height + 6}px`;
+      this.tooltipCanvas.style.height = `${height + 5}px`;
     } else {
       pos = -1;
     }
@@ -112,9 +115,11 @@ const modules = {
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
-    const boxPadding = { t: 4, b: 4, r: 16, l: 16 };
-    const borderRadius = 10;
-    const lineSpacing = 6;
+    const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
+    const borderRadius = 8;
+    const titleMargin = 12;
+    const lineSpacing = 8;
+    const colorMargin = 16;
     const textHeight = 14;
     const { nw, height, pos } = size;
     const width = size.width - 5;
@@ -123,6 +128,7 @@ const modules = {
     const arrowLX = -5;
     const arrowRX = 5;
     const isHorizontal = this.options.horizontal;
+    const opt = this.options.tooltip;
 
     if (pos < 0) {
       return;
@@ -141,11 +147,10 @@ const modules = {
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    ctx.lineWidth = 2;
-    ctx.font = '14px Roboto';
+    ctx.lineWidth = 1;
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(51, 67, 80, 0.9)';
-    ctx.strokeStyle = '#1F303A';
+    ctx.fillStyle = opt.backgroundColor;
+    ctx.strokeStyle = opt.borderColor;
 
     ctx.beginPath();
     ctx.moveTo(x + borderRadius, y);
@@ -181,26 +186,34 @@ const modules = {
     ctx.lineTo(x, y + borderRadius);
     ctx.quadraticCurveTo(x, y, x + borderRadius, y);
     ctx.closePath();
-    ctx.fill();
+
+    if (opt.useShadow) {
+      ctx.save();
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 2;
+      ctx.shadowColor = `rgba(${Util.hexToRgb('#000000')}, 0.3)` || '';
+      ctx.fill();
+      ctx.restore();
+    } else {
+      ctx.fill();
+    }
+
     ctx.stroke();
+
 
     x += boxPadding.l;
     y += boxPadding.t + textHeight;
 
-    ctx.fillStyle = '#F4FAFF';
-    ctx.strokeStyle = '#F4FAFF';
+    ctx.font = 'normal normal normal 16px Roboto';
+    ctx.fillStyle = '#FFFFFF';
     ctx.lineWidth = 1;
     ctx.textBaseline = 'Bottom';
-
     ctx.fillText(title, x, y);
-    y += lineSpacing;
-    ctx.beginPath();
-    ctx.moveTo(x - 4, y);
-    ctx.lineTo((x + width) - (boxPadding.r + boxPadding.l), y);
-    ctx.stroke();
-    ctx.closePath();
-    y += lineSpacing;
 
+    y += titleMargin;
+
+    ctx.font = 'normal normal lighter 14px Roboto';
     seriesKeys.forEach((s, index) => {
       const gdata = items[s].data;
       const color = items[s].color;
@@ -213,7 +226,7 @@ const modules = {
         value = gdata.o;
       }
 
-      let itemX = x;
+      let itemX = x + 4;
       let itemY = y + ((index + 1) * textHeight);
 
       itemX += Util.aliasPixel(itemX);
@@ -222,11 +235,11 @@ const modules = {
       ctx.beginPath();
       ctx.fillStyle = color;
 
-      ctx.fillRect(itemX - 4, itemY - 10, 10, 10);
-      ctx.fillStyle = '#F4FAFF';
+      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
+      ctx.fillStyle = '#FFFFFF';
       ctx.textBaseline = 'Bottom';
-      ctx.fillText(this.seriesList[s].name, (itemX + 10), itemY);
-      ctx.fillText(numberWithComma(value), (itemX + 10 + nw) + 5, itemY);
+      ctx.fillText(this.seriesList[s].name, (itemX + colorMargin), itemY);
+      ctx.fillText(numberWithComma(value), (itemX + colorMargin + nw) + 12, itemY);
       ctx.closePath();
       y += lineSpacing;
     });

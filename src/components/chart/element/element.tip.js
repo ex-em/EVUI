@@ -209,7 +209,7 @@ const modules = {
     let maxTipType = 'center';
 
     ctx.save();
-    ctx.font = 'bold 14px Roboto';
+    ctx.font = 'normal normal bold 14px Roboto';
     const maxTipWidth = Math.round(Math.max(ctx.measureText(text).width + 12, 40));
 
     if (dp + (maxTipWidth / 2) > xep - 10) {
@@ -258,7 +258,7 @@ const modules = {
     const ey = y;
 
     ctx.save();
-    ctx.font = 'bold 14px Roboto';
+    ctx.font = 'normal normal bold 14px Roboto';
 
     ctx.fillStyle = opt.tipBackground;
     ctx.shadowBlur = 0;
@@ -292,7 +292,7 @@ const modules = {
     ctx.fill();
     ctx.restore();
     ctx.save();
-    ctx.font = 'bold 14px Roboto';
+    ctx.font = 'normal normal bold 14px Roboto';
     ctx.fillStyle = opt.tipTextColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
