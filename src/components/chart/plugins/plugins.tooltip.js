@@ -43,6 +43,7 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const lineSpacing = 8;
     const colorMargin = 16;
+    const valueMargin = 20;
     const textHeight = 14;
     const titleMargin = 12;
     const titleHeight = 16;
@@ -64,7 +65,7 @@ const modules = {
     const vw = Math.round(ctx.measureText(maxValue).width);
     const tw = Math.round(ctx.measureText(title).width);
 
-    const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + (colorMargin * 2);
+    const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + colorMargin + valueMargin;
     const height = boxPadding.t + titleHeight + titleMargin +
       (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
 
@@ -121,7 +122,7 @@ const modules = {
     const lineSpacing = 8;
     const colorMargin = 16;
     const textHeight = 14;
-    const { nw, height, pos } = size;
+    const { height, pos } = size;
     const width = size.width - 5;
     const arrowTY = 30;
     const arrowBY = -10;
@@ -239,7 +240,10 @@ const modules = {
       ctx.fillStyle = '#FFFFFF';
       ctx.textBaseline = 'Bottom';
       ctx.fillText(this.seriesList[s].name, (itemX + colorMargin), itemY);
-      ctx.fillText(numberWithComma(value), (itemX + colorMargin + nw) + 12, itemY);
+      ctx.save();
+      ctx.textAlign = 'right';
+      ctx.fillText(numberWithComma(value), size.width - boxPadding.r, itemY);
+      ctx.restore();
       ctx.closePath();
       y += lineSpacing;
     });
