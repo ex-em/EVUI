@@ -192,7 +192,7 @@ const modules = {
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
       ctx.shadowBlur = 2;
-      ctx.shadowColor = `rgba(${Util.hexToRgb('#000000')}, 0.3)` || '';
+      ctx.shadowColor = `rgba(${Util.hexToRgb('#000000')}, ${opt.shadowOpacity})` || '';
       ctx.fill();
       ctx.restore();
     } else {
