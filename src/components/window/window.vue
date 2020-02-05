@@ -167,6 +167,15 @@
         }
       }
     },
+    destroyed() {
+      if (this.isMovedEl) {
+        if (this.modal) {
+          this.modelEl.remove();
+        } else {
+          this.$el.remove();
+        }
+      }
+    },
     methods: {
       mousedown(e) {
         const windowEl = this.$el;
