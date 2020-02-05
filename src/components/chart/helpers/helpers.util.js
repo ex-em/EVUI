@@ -30,7 +30,7 @@ export default {
   },
 
   getLabelStyle(style) {
-    return `normal ${style.fontSize}px ${style.fontFamily}`;
+    return `normal normal normal ${style.fontSize}px ${style.fontFamily}`;
   },
 
   labelSignFormat(value, decimalPoint) {

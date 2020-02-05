@@ -142,6 +142,10 @@
           combo: false,
           tooltip: {
             use: true,
+            backgroundColor: '#4C4C4C',
+            borderColor: '#666666',
+            shadowOpacity: 0.25,
+            useShadow: false,
             throttledMove: false,
             debouncedHide: false,
           },
@@ -206,6 +210,8 @@
   };
 </script>
 <style lang="scss">
+  @import '~@/styles/default';
+
   .ev-chart-wrapper {
     position: relative;
     width: 100%;
@@ -246,7 +252,6 @@
   .ev-chart-legend-container {
     position: relative;
     overflow: hidden;
-    font-family: 'Roboto', 'sans-serif';
   }
 
   .ev-chart-legend-color {
@@ -270,6 +275,8 @@
     top: 50%;
     left: 0;
     width: 100%;
+    font-family: 'Roboto';
+    font-weight: 400;
     transform: translate(0, -50%);
     position: absolute;
 
