@@ -37,6 +37,15 @@
   font-size: 25px;
 }
 
+.ei-getmore:before {
+  content: '\e9e9';
+}
+.ei-query:before {
+  content: '\e9ea';
+}
+.ei-trash3:before {
+  content: '\e9eb';
+}
 .ei-info2:before {
   content: '\e9de';
 }

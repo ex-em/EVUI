@@ -2,6 +2,63 @@
   <div class="clearfix mhl ptl">
     <div class="glyph fs1">
       <div class="clearfix bshadow0 pbs">
+        <span class="ei ei-getmore" />
+        <span class="mls"> ei-getmore</span>
+      </div>
+      <fieldset class="fs0 size1of1 clearfix hidden-false">
+        <input
+          type="text"
+          readonly
+          value="e9e9"
+          class="unit size1of2" >
+        <input
+          type="text"
+          maxlength="1"
+          readonly
+          value="&#xe9e9;"
+          class="unitRight size1of2 talign-right" >
+      </fieldset>
+    </div>
+    <div class="glyph fs1">
+      <div class="clearfix bshadow0 pbs">
+        <span class="ei ei-query" />
+        <span class="mls"> ei-query</span>
+      </div>
+      <fieldset class="fs0 size1of1 clearfix hidden-false">
+        <input
+          type="text"
+          readonly
+          value="e9ea"
+          class="unit size1of2" >
+        <input
+          type="text"
+          maxlength="1"
+          readonly
+          value="&#xe9ea;"
+          class="unitRight size1of2 talign-right" >
+      </fieldset>
+    </div>
+    <div class="glyph fs1">
+      <div class="clearfix bshadow0 pbs">
+        <span class="ei ei-trash3" />
+        <span class="mls"> ei-trash3</span>
+      </div>
+      <fieldset class="fs0 size1of1 clearfix hidden-false">
+        <input
+          type="text"
+          readonly
+          value="e9eb"
+          class="unit size1of2" >
+        <input
+          type="text"
+          maxlength="1"
+          readonly
+          value="&#xe9eb;"
+          class="unitRight size1of2 talign-right" >
+      </fieldset>
+    </div>
+    <div class="glyph fs1">
+      <div class="clearfix bshadow0 pbs">
         <span class="ei ei-info2" />
         <span class="mls"> ei-info2</span>
       </div>
