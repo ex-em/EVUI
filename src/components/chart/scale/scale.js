@@ -187,13 +187,13 @@ class Scale {
     let labelCenter = null;
     let linePosition = null;
 
-    ctx.beginPath();
     ctx.strokeStyle = this.gridLineColor;
     ctx.lineWidth = 1;
     aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
     let labelText;
     for (let ix = 0; ix <= steps; ix++) {
+      ctx.beginPath();
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
@@ -236,9 +236,8 @@ class Scale {
       }
 
       ctx.stroke();
+      ctx.closePath();
     }
-
-    ctx.closePath();
   }
 }
 
