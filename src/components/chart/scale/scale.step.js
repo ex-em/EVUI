@@ -129,6 +129,10 @@ class StepScale extends Scale {
       return '';
     }
 
+    if (!maxWidth) {
+      return value;
+    }
+
     const ctx = this.ctx;
 
     ctx.save();
