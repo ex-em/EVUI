@@ -59,12 +59,14 @@ const modules = {
     const title = isHorizontal ?
       this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
       this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    ctx.save();
+    ctx.font = '16px Roboto';
+    const tw = Math.round(ctx.measureText(title).width);
 
     ctx.font = '14px Roboto';
     const nw = Math.round(ctx.measureText(maxSeries).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
-    const tw = Math.round(ctx.measureText(title).width);
-
+    ctx.restore();
     const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + colorMargin + valueMargin;
     const height = boxPadding.t + titleHeight + titleMargin +
       (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
