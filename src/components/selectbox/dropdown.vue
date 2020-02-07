@@ -133,7 +133,7 @@
             listRowHeight += li.clientHeight;
           }
         }
-        return listRowHeight === 0 ? defaultRowHeight : listRowHeight;
+        return listRowHeight;
       },
       setScrollTop(selectedIdx) {
         if (!this.isGroup && this.$refs.singleAreaList) {
