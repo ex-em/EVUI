@@ -38,6 +38,7 @@
       </div>
       <div
         v-else
+        ref="singleAreaList"
         :class="`${prefixCls}-single-area`"
       >
         <Listbox
@@ -106,7 +107,38 @@
         prefixCls,
       };
     },
+    updated() {
+      const index = this.items.findIndex(item => item.value === this.selectedItems[0].value &&
+        item.name === this.selectedItems[0].name);
+      this.setScrollTop(index);
+    },
     methods: {
+      getClientHeight(selectedIdx) {
+        const defaultRowHeight = 30;
+        let listRowHeight = 0;
+        if (this.$refs.singleAreaList.children &&
+          this.$refs.singleAreaList.children[0] &&
+          this.$refs.singleAreaList.children[0].children[0] &&
+          this.$refs.singleAreaList.children[0].children[0].children
+        ) {
+          let li;
+          const liList = this.$refs.singleAreaList.children[0].children[0].children;
+          if (liList.length < selectedIdx) {
+            return defaultRowHeight;
+          }
+          for (let ix = 0; ix < selectedIdx; ix++) {
+            li = liList[ix];
+            listRowHeight += li.clientHeight;
+          }
+        }
+        return listRowHeight === 0 ? defaultRowHeight : listRowHeight;
+      },
+      setScrollTop(selectedIdx) {
+        if (!this.isGroup && this.$refs.singleAreaList) {
+          const listRowHeight = this.getClientHeight(selectedIdx);
+          this.$refs.singleAreaList.scrollTop = listRowHeight;
+        }
+      },
       onBeforeSelect(item, target, index) {
         this.$emit('before-select', item, target, index);
       },
