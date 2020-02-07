@@ -108,9 +108,11 @@
       };
     },
     updated() {
-      const index = this.items.findIndex(item => item.value === this.selectedItems[0].value &&
-        item.name === this.selectedItems[0].name);
-      this.setScrollTop(index);
+      setTimeout(() => {
+        const index = this.items.findIndex(item => item.value === this.selectedItems[0].value &&
+          item.name === this.selectedItems[0].name);
+        this.setScrollTop(index);
+      });
     },
     methods: {
       getClientHeight(selectedIdx) {
