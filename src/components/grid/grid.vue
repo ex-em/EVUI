@@ -32,7 +32,10 @@
           class="column"
           @click="onSort(column.field)"
         >
-          <span class="column-name">{{ column.caption }}</span>
+          <span
+            :title="column.caption"
+            class="column-name"
+          >{{ column.caption }}</span>
           <ev-icon
             v-if="false"
             :cls="'ei-s ei-s-arrow-down'"
@@ -49,7 +52,10 @@
             />
           </span>
         </li>
-        <li class="column dummy"/>
+        <li
+          :style="`width: ${hasVerticalScrollBar ? scrollWidth : 0}px;`"
+          class="column dummy"
+        />
       </ul>
     </div>
     <div
@@ -110,13 +116,16 @@
                 :name="column.field"
                 :item="{
                   row: row[2],
-                  rowIndex: rowIndex,
+                  rowIndex: row[0],
                   cellIndex: column.index,
                   value: row[2][column.index],
                   props: column.render.props,
                 }"
               />
-              <span v-else>{{ row[2][column.index] }}</span>
+              <span
+                v-else
+                :title="row[2][column.index]"
+              >{{ row[2][column.index] }}</span>
             </td>
           </tr>
         </tbody>
@@ -188,6 +197,7 @@
         useCheckbox: this.option.useCheckbox || {},
         rowHeight: this.option.rowHeight || 24,
         columnWidth: this.option.columnWidth || 80,
+        scrollWidth: this.option.scrollWidth || 17,
         lastScroll: {},
         vScrollTopHeight: 0,
         vScrollBottomHeight: 0,
@@ -297,14 +307,15 @@
           }, { totalWidth: 0, emptyCount: 0 });
 
           if (this.rowHeight * this.rows.length > elHeight) {
-            elWidth -= 17;
+            elWidth -= this.scrollWidth;
           }
 
           if (this.useCheckbox.use) {
             elWidth -= 30;
           }
 
-          columnWidth = elWidth - result.totalWidth;
+          // 1을 빼주는 이유는 돔에서는 소수점까지 너비를 취급하나 offsetWidth 같은 속성값은 반올림되어 저장되어 있음
+          columnWidth = elWidth - result.totalWidth - 1;
           if (columnWidth > 0) {
             remainWidth = columnWidth -
               (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
