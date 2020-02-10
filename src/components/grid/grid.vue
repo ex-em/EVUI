@@ -1,6 +1,5 @@
 <template>
   <div
-    v-resize="onResize"
     v-cloak
     :class="getTableClass"
   >
