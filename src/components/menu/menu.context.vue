@@ -88,6 +88,10 @@
       if (this.$el) {
         this.$el.remove();
       }
+      const parentEl = this.$el.parentElement;
+      if (parentEl && this.onContextMenu) {
+        parentEl.removeEventListener('contextmenu', this.onContextMenu);
+      }
     },
     methods: {
       parentAddListener() {
