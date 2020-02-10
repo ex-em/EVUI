@@ -276,6 +276,7 @@
       this.inputNumberMaxLength = this.removeSpecialSymbols(this.options.localeType).length;
     },
     beforeDestroy() {
+      this.calendar.removeListeners();
       this.calendar.removeDropdown();
     },
     methods: {
