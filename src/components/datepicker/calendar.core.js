@@ -369,13 +369,17 @@ class Calendar {
   }
 
   mouseInit() {
+    this.mousemove = this.onMousemove.bind(this);
+    this.mousedown = this.onMousedown.bind(this);
+    this.mouseleave = this.onMouseleave.bind(this);
+    this.mousewheel = this.onMousewheel.bind(this);
     this.initMouseclick();
     this.initMousemove();
     this.initMouseleave();
     this.initMousewheel();
   }
   initMousemove() {
-    this.overCanvas.addEventListener('mousemove', this.onMousemove.bind(this));
+    this.overCanvas.addEventListener('mousemove', this.mousemove);
   }
   onMousemove(e) {
     e.preventDefault();
@@ -651,7 +655,7 @@ class Calendar {
   }
 
   initMouseclick() {
-    this.overCanvas.addEventListener('mousedown', this.onMousedown.bind(this));
+    this.overCanvas.addEventListener('mousedown', this.mousedown);
   }
   onMousedown(e) {
     e.preventDefault();
@@ -837,7 +841,7 @@ class Calendar {
   }
 
   initMouseleave() {
-    this.overCanvas.addEventListener('mouseleave', this.onMouseleave.bind(this));
+    this.overCanvas.addEventListener('mouseleave', this.mouseleave);
   }
   onMouseleave(e) {
     e.preventDefault();
@@ -879,7 +883,7 @@ class Calendar {
   }
 
   initMousewheel() {
-    this.overCanvas.addEventListener('mousewheel', this.onMousewheel.bind(this));
+    this.overCanvas.addEventListener('mousewheel', this.mousewheel);
   }
   onMousewheel(e) {
     e.preventDefault();
@@ -1892,10 +1896,10 @@ class Calendar {
   }
 
   removeListeners() {
-    this.overCanvas.removeEventListener('mousemove', this.onMousemove.bind(this));
-    this.overCanvas.removeEventListener('mousedown', this.onMousedown.bind(this));
-    this.overCanvas.removeEventListener('mouseleave', this.onMouseleave.bind(this));
-    this.overCanvas.removeEventListener('mousewheel', this.onMousewheel.bind(this));
+    this.overCanvas.removeEventListener('mousemove', this.mousemove);
+    this.overCanvas.removeEventListener('mousedown', this.mousedown);
+    this.overCanvas.removeEventListener('mouseleave', this.mouseleave);
+    this.overCanvas.removeEventListener('mousewheel', this.mousewheel);
   }
 }
 
