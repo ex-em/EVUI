@@ -375,7 +375,7 @@ class Calendar {
     this.initMousewheel();
   }
   initMousemove() {
-    this.overCanvas.addEventListener('mousemove', this.onMousemove);
+    this.overCanvas.addEventListener('mousemove', this.onMousemove.bind(this));
   }
   onMousemove(e) {
     e.preventDefault();
@@ -651,7 +651,7 @@ class Calendar {
   }
 
   initMouseclick() {
-    this.overCanvas.addEventListener('mousedown', this.onMousedown);
+    this.overCanvas.addEventListener('mousedown', this.onMousedown.bind(this));
   }
   onMousedown(e) {
     e.preventDefault();
@@ -837,7 +837,7 @@ class Calendar {
   }
 
   initMouseleave() {
-    this.overCanvas.addEventListener('mouseleave', this.onMouseleave);
+    this.overCanvas.addEventListener('mouseleave', this.onMouseleave.bind(this));
   }
   onMouseleave(e) {
     e.preventDefault();
@@ -879,7 +879,7 @@ class Calendar {
   }
 
   initMousewheel() {
-    this.overCanvas.addEventListener('mousewheel', this.onMousewheel);
+    this.overCanvas.addEventListener('mousewheel', this.onMousewheel.bind(this));
   }
   onMousewheel(e) {
     e.preventDefault();
@@ -1892,10 +1892,10 @@ class Calendar {
   }
 
   removeListeners() {
-    this.overCanvas.removeEventListener('mousemove', this.onMousemove);
-    this.overCanvas.removeEventListener('mousedown', this.onMousedown);
-    this.overCanvas.removeEventListener('mouseleave', this.onMouseleave);
-    this.overCanvas.removeEventListener('mousewheel', this.onMousewheel);
+    this.overCanvas.removeEventListener('mousemove', this.onMousemove.bind(this));
+    this.overCanvas.removeEventListener('mousedown', this.onMousedown.bind(this));
+    this.overCanvas.removeEventListener('mouseleave', this.onMouseleave.bind(this));
+    this.overCanvas.removeEventListener('mousewheel', this.onMousewheel.bind(this));
   }
 }
 

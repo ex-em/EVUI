@@ -41,16 +41,10 @@
     },
     mounted() {
       this.initValue();
-      const bindValue = this.bindValue;
-      this.$on('on-change', (e) => {
-        const targetValue = e.target.value;
-        if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
-          bindValue.push(targetValue);
-        } else if (!e.currentTarget.checked && bindValue.indexOf(targetValue) > -1) {
-          bindValue.splice(bindValue.indexOf(targetValue), 1);
-        }
-        this.$parent.$emit('input', bindValue);
-      });
+      this.$on('on-change', this.onChange);
+    },
+    beforeDestroy() {
+      this.$off('on-change', this.onChange);
     },
     methods: {
       initValue(array) {
@@ -63,6 +57,16 @@
             child.bindType = self.type;
           });
         }
+      },
+      onChange(e) {
+        const bindValue = this.bindValue;
+        const targetValue = e.target.value;
+        if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
+          bindValue.push(targetValue);
+        } else if (!e.currentTarget.checked && bindValue.indexOf(targetValue) > -1) {
+          bindValue.splice(bindValue.indexOf(targetValue), 1);
+        }
+        this.$parent.$emit('input', bindValue);
       },
     },
   };
