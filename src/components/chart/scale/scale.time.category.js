@@ -26,9 +26,7 @@ class TimeCategoryScale extends Scale {
   }
 
   calculateSteps(range) {
-    const maxValue = range.maxValue;
-    const minValue = range.minValue;
-    const maxSteps = range.maxSteps;
+    const { maxValue, minValue, maxSteps } = range;
     const rawInterval = this.getInterval(range);
 
     let count = 1;
@@ -134,7 +132,7 @@ class TimeCategoryScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    for (let ix = 0; ix < oriSteps; ix += count) {
+    for (let ix = 0; ix <= oriSteps; ix += count) {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
