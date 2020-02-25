@@ -389,14 +389,6 @@
     position: relative;
     transition: transform .3s;
     float: left;
-
-    &:first-child {
-      border-left: none;
-    }
-
-    &:last-child {
-      border-right: none;
-    }
   }
   .ev-tabs-item {
     position: relative;
