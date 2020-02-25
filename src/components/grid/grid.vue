@@ -2,8 +2,10 @@
   <div
     v-cloak
     :class="getTableClass"
+    @contextmenu="onContextMenu($event)"
   >
     <div
+      v-show="showHeader"
       ref="header"
       class="table-header"
     >
@@ -87,6 +89,7 @@
           <tr
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
+            :data-index="rowIndex"
             :class="row[2] === selectedRow ? 'selected' : ''"
             @click="onRowClick($event, row)"
           >
@@ -140,6 +143,11 @@
       :show.sync="showColumnOption"
       @sort="onSort"
     />
+    <ev-context-menu
+      :is-use="showContextMenu"
+      :items="useContextMenu.use ? useContextMenu.items : []"
+      @click="onClickCtxMenu"
+    />
   </div>
 </template>
 <script>
@@ -153,7 +161,7 @@
   const ROW_DATA_INDEX = 2;
 
   export default {
-    name: 'EvTableNew',
+    name: 'EVGrid',
     directives: {
       resize,
     },
@@ -192,8 +200,10 @@
         sortOrder: 'desc',
         sortField: '',
         adjust: this.option.adjust || false,
+        showHeader: this.option.showHeader === undefined ? true : this.option.showHeader,
         useSelect: this.option.useSelect || true,
         useCheckbox: this.option.useCheckbox || {},
+        useContextMenu: this.option.useContextMenu || {},
         rowHeight: this.option.rowHeight || 24,
         columnWidth: this.option.columnWidth || 80,
         scrollWidth: this.option.scrollWidth || 17,
@@ -209,6 +219,7 @@
         checkedRows: this.checked,
         prevCheckedRow: [],
         isHeaderChecked: false,
+        isClickedCtxMenu: false,
       };
     },
     computed: {
@@ -217,6 +228,7 @@
           table: true,
           adjust: this.adjust,
           'v-scroll': this.hasVerticalScrollBar,
+          'non-header': !this.showHeader,
         };
       },
       useFilter() {
@@ -236,6 +248,9 @@
         const option = this.useCheckbox;
 
         return option.use && option.headerCheck && option.mode !== 'single';
+      },
+      showContextMenu() {
+        return this.useContextMenu.use && this.isClickedCtxMenu;
       },
     },
     watch: {
@@ -453,6 +468,7 @@
       setStore(value, makeIndex = true) {
         const store = [];
         let checked;
+        let selected = false;
 
         if (makeIndex) {
           let hasUnChecked = false;
@@ -462,7 +478,17 @@
             if (!checked) {
               hasUnChecked = true;
             }
+
+            if (!selected && JSON.stringify(this.selectedRow) === JSON.stringify(value[ix])) {
+              this.selectedRow = value[ix];
+              selected = true;
+            }
+
             store.push([ix, checked, value[ix]]);
+          }
+
+          if (!selected) {
+            this.selectedRow = [];
           }
 
           this.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
@@ -570,6 +596,28 @@
         this.filterCondition = condition;
         this.showColumnOption = true;
       },
+      onClickCtxMenu({ itemId }) {
+        if (this.useContextMenu.use && this.useContextMenu.clickFn) {
+          this.useContextMenu.clickFn(itemId);
+        }
+      },
+      onContextMenu(event) {
+        if (!this.useContextMenu.items || !this.useContextMenu.items.length) {
+          return;
+        }
+
+        const rowIndex = event.target.parentElement.parentElement.dataset.index;
+        if (rowIndex) {
+          const rowData = this.viewStore[rowIndex][ROW_DATA_INDEX];
+          this.selectedRow = rowData;
+          this.isClickedCtxMenu = true;
+          this.$emit('update:selected', rowData);
+        } else {
+          this.selectedRow = [];
+          this.isClickedCtxMenu = false;
+          this.$emit('update:selected', []);
+        }
+      },
       onRowClick(event, row) {
         if (!this.useSelect) {
           return;
@@ -661,6 +709,10 @@
     width: 100%;
     height: 100%;
     padding-top: 30px;
+
+    &.non-header {
+      padding-top: 0;
+    }
   }
 
   .table-header {
