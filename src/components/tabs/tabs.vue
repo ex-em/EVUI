@@ -59,13 +59,13 @@
                 <ev-icon
                   v-if="tab.icon"
                   :class="tab.icon"
-                  style="margin-right: 3px; font-size: 10px;"
+                  style="margin-right: 3px; font-size: 12px;"
                 />
                 {{ tab.title }}
                 <ev-icon
                   v-if="!disableRemoveTab && tabList.length > 1"
                   class="ei-close ev-tab-close-btn"
-                  style="margin-left: 3px; font-size: 10px;"
+                  style="margin-left: 3px; font-size: 12px;"
                   @click.native.stop="removeTab(tab.value)"
                 />
               </span>
@@ -143,14 +143,14 @@
       activeTabValue(value) {
         if (this.checkValid(value)) {
           this.activeTab = value;
-          this.toggleScrollIcon();
+          setTimeout(() => this.toggleScrollIcon());
         }
       },
     },
     mounted() {
       if (!this.checkValid(this.activeTab) && this.tabList.length) {
         this.activeTab = this.tabList[0].value;
-        this.toggleScrollIcon();
+        setTimeout(() => this.toggleScrollIcon());
       }
     },
     methods: {
@@ -343,7 +343,7 @@
   .ev-tabs {
     width: 100%;
     height: 100%;
-    padding-top: 30px;
+    padding-top: 36px;
     position: relative;
   }
   .ev-tabs-header {
@@ -351,7 +351,7 @@
     padding: 0;
     top: 0;
     width: 100%;
-    height: 30px;
+    height: 36px;
 
     @include evThemify() {
       border-bottom: $border-solid evThemed('tab-border');
@@ -361,7 +361,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    overflow-y: auto;
+    overflow: auto;
 
     @include evThemify() {
       color: evThemed('font-color-base');
@@ -375,84 +375,94 @@
     overflow: hidden;
     margin-bottom: -1px;
     position: relative;
-  }
-  .ev-tabs-scroll.scrollable {
-    padding: 0 15px;
+
+    &.scrollable {
+      padding: 0 15px;
+    }
   }
   .ev-tabs-nav-wrap {
     overflow: hidden;
   }
   .ev-tabs-nav {
-    border: 1px solid #dddee1;
-    border-bottom: none;
-    border-top: none;
-    border-radius: 4px 4px 0 0;
     box-sizing: border-box;
     white-space: nowrap;
     position: relative;
     transition: transform .3s;
     float: left;
   }
-  .ev-tabs-nav:first-child {
-    border-left: none;
-  }
-  .ev-tabs-nav:last-child {
-    border-right: none;
-  }
   .ev-tabs-item {
-    height: 30px;
-    box-sizing: border-box;
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 500;
     position: relative;
+    display: inline-block;
+    height: 36px;
+    box-sizing: border-box;
     user-select: none;
     cursor: pointer;
+    border-radius: 2px;
 
     @include evThemify() {
       color: evThemed('tab-color');
       border: $border-solid evThemed('tab-border');
       background-color: evThemed('tab-bg');
     }
-  }
-  .ev-tabs-item.active {
-    transform: translateZ(0);
-    border-bottom: none;
 
-    @include evThemify() {
-      color: evThemed('tab-active-color');
-      background-color: evThemed('tab-active-bg');
+    &.active {
+      transform: translateZ(0);
+      border-bottom: none;
+
+      @include evThemify() {
+        color: evThemed('tab-color');
+        background-color: evThemed('tab-active-bg');
+      }
+
+      & .ev-tabs-item-content {
+        @include evThemify() {
+          color: evThemed('tab-color');
+        }
+      }
     }
-  }
-  .ev-tabs-item.dragover {
-    border-left: 3px solid blue;
-  }
-  .ev-tab-close-btn {
-    width: 0;
-    overflow: hidden;
-    font-weight: normal;
-  }
-  .ev-tabs-item > .icon > .ev-tab-close-btn {
-    width: 10px;
-  }
-  .ev-tab-close-btn:hover {
-    font-weight: bold;
-    color: red;
+
+    &.dragover {
+      border-left: 3px solid blue;
+    }
+
+    &:not(:last-child) {
+      margin-right: 4px;
+    }
   }
   .ev-tabs-item-content {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
-    padding: 5px 16px 4px;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 36px;
+    text-align: center;
+
+    @include evThemify() {
+      color: rgba(evThemed('tab-color'), 0.7);
+    }
+
+    &.icon .ev-tab-close-btn {
+      width: 12px;
+    }
+
+    & .ev-tab-close-btn {
+      width: 0;
+      overflow: hidden;
+
+      &:hover {
+        font-weight: bold;
+        color: red;
+      }
+    }
   }
   .ev-tab-scroll-icon {
     position: absolute;
     line-height: 30px;
     cursor: pointer;
-  }
-  .ev-tab-scroll-icon.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+
+    &.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
   }
 </style>
