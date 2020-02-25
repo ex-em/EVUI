@@ -152,7 +152,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
-  import { uniqBy } from 'lodash-es';
+  import { uniqBy, isEqual } from 'lodash-es';
   import TableFilter from './grid.filter';
   import Renderer from './grid.render';
 
@@ -161,7 +161,7 @@
   const ROW_DATA_INDEX = 2;
 
   export default {
-    name: 'EVGrid',
+    name: 'EvGrid',
     directives: {
       resize,
     },
@@ -479,7 +479,7 @@
               hasUnChecked = true;
             }
 
-            if (!selected && JSON.stringify(this.selectedRow) === JSON.stringify(value[ix])) {
+            if (!selected && isEqual(this.selectedRow, value[ix])) {
               this.selectedRow = value[ix];
               selected = true;
             }
