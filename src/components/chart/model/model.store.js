@@ -230,7 +230,7 @@ const modules = {
         if (p.x >= minmax.maxX) {
           minmax.maxX = (p.x === null) ? 0 : p.x;
 
-          if (isHorizontal) {
+          if (isHorizontal && p.x !== null) {
             minmax.maxDomain = p.y;
             minmax.maxDomainIndex = index;
           }
@@ -238,7 +238,7 @@ const modules = {
         if (p.y >= minmax.maxY) {
           minmax.maxY = (p.y === null) ? 0 : p.y;
 
-          if (!isHorizontal) {
+          if (!isHorizontal && p.y !== null) {
             minmax.maxDomain = p.x;
             minmax.maxDomainIndex = index;
           }
