@@ -132,7 +132,7 @@ class TimeCategoryScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    for (let ix = 0; ix <= oriSteps; ix += count) {
+    for (let ix = 0; ix < oriSteps; ix += count) {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
