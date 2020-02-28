@@ -92,8 +92,7 @@
     },
     beforeDestroy() {
       this.evChart.destroy();
-
-      delete this.evChart;
+      this.evChart = null;
     },
     methods: {
       createEventListener() {
