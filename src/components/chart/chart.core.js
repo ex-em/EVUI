@@ -402,9 +402,9 @@ class EvChart {
     this.resetProps();
 
     if (updateSeries) {
-      delete this.seriesInfo;
-      delete this.seriesList;
-      delete this.lastTip;
+      this.seriesInfo = null;
+      this.seriesList = null;
+      this.lastTip = null;
 
       this.seriesInfo = {
         charts: {
@@ -471,14 +471,14 @@ class EvChart {
   }
 
   resetProps() {
-    delete this.minMax;
-    delete this.axesX;
-    delete this.axesY;
-    delete this.axesRange;
-    delete this.labelOffset;
-    delete this.chartRect;
-    delete this.pieDataSet;
-
+    this.axesX[0] = null;
+    this.axesY[0] = null;
+    this.axesX = null;
+    this.axesY = null;
+    this.minMax = null;
+    this.axesRange = null;
+    this.labelOffset = null;
+    this.chartRect = null;
     this.pieDataSet = [];
   }
 
