@@ -243,7 +243,7 @@ const modules = {
       findInfo = {
         label: maxl,
         pos: maxp,
-        value: maxg,
+        value: maxg === null ? 0 : maxg,
         sId: maxSID,
         acc,
         useStack,
