@@ -7,7 +7,6 @@
       :class="bodyCls"
       @mouseout="onMouseOut"
     >
-      <div :class="`${prefixEvui}-separator`"/>
       <div
         v-for="(item, rowIdx) in items"
         :key="`${item.text}_${depth}_${rowIdx}`"
@@ -15,10 +14,13 @@
         @click="onRowClick(item, depth, rowIdx)"
         @mouseover="onMouseOver(item.text, depth, rowIdx)"
       >
-        {{ item.text }}
-        <i
+        <div
+          :class="{ 'no-children': !item.items }"
+          class="menu-name"
+        >{{ item.text }}</div>
+        <ev-icon
           v-if="item.items"
-          :class="`${prefixEvui}-right-arrow`"
+          :cls="'ei-arrow-right2 menu-arrow'"
         />
       </div>
     </div>
@@ -94,7 +96,7 @@
         return `menu_sub_${text}_${depth}_${rowIdx}`;
       },
       getContextChildrenStyle() {
-        return this.depth === 0 ? '' : `margin-top: ${26 * this.parentRowIdx}px; left: -2px;`;
+        return this.depth === 0 ? '' : `margin-top: ${29 * this.parentRowIdx}px; left: 1px;`;
       },
       getBodyClasses() {
         return [
@@ -135,65 +137,52 @@
   .ev-contextmenu-children-body{
     float: left;
     position: relative;
-    border: 1px solid #d0d0d0;
     font-size: 12px;
-    background: #f0f0f0;
-    color: #222222;
-  }
-  .ev-contextmenu-children-box-style{
-    border-radius: 3px 0 0 3px;
-    box-shadow: 2px 2px #9c9c9c;
-  }
-  .ev-contextmenu-children-separator {
-    position: absolute;
-    top: 0;
-    left: 20px;
-    width: 2px;
-    height: 100%;
-    background-color: white;
-    border-left: solid 1px #e0e0e0;
-    overflow: hidden;
+
+    @include evThemify() {
+      background: evThemed('contextmenu-wrap-bg');
+      color: evThemed('contextmenu-color');
+      border: 1px solid evThemed('contextmenu-wrap-border');
+      box-shadow: 0 7px 15px 0 evThemed('contextmenu-wrap-boxshadow');
+    }
   }
   .ev-contextmenu-children-row{
     position: relative;
-    padding: 2px 22px 2px 30px;
-    line-height: 22px;
+    height: 29px;
+    padding: 2px 0;
+    line-height: 25px;
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
+
+    & .menu-name {
+      float: left;
+      padding: 0 5px 0 16px;
+
+      &.no-children {
+        padding-right: 16px;
+      }
+    }
+
+    & .menu-arrow {
+      float: right;
+      line-height: 25px;
+      padding-right: 4px;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    @include evThemify() {
+      border-bottom: 1px solid evThemed('contextmenu-row-border');
+    }
   }
   .ev-contextmenu-children-row:hover{
-    margin: 0 2px 0 2px;
-    padding: 1px 19px 1px 27px;
-    background-color: #e6e6e6;
-    border: 1px solid #9d9d9d;
-    border-radius: 3px;
-  }
-  .ev-contextmenu-children-right-arrow{
-    position: absolute;
-  }
-  .ev-contextmenu-children-right-arrow:after{
-    padding-left: 8px;
-    vertical-align: middle;
-    font: bold 16px "Font Awesome\ 5 Free";
-    color: #9c9c9c;
-    background: -webkit-linear-gradient(#eee, #333);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    content: "\f0da";
-  }
-  .ev-contextmenu-children-sub-row{
-    position: relative;
-    padding: 2px 24px 2px 34px;
-    line-height: 22px;
-    white-space: nowrap;
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .ev-contextmenu-children-sub-row:hover{
-    padding: 1px 11px 1px 33px;
-    background-color: #e6e6e6;
-    border: 1px solid #9d9d9d;
-    border-radius: 3px;
+    opacity: 0.6;
+
+    @include evThemify() {
+      background-color: evThemed('contextmenu-row-border');
+    }
   }
 </style>

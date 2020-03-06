@@ -81,6 +81,14 @@ $ev-themes: (
     menu-sub-split: $color-light-level5,
     menu-color: #353740,
 
+    /* context menu
+    -------------------------- */
+    contextmenu-color: #0D0D0D,
+    contextmenu-wrap-bg: #FFFFFF,
+    contextmenu-wrap-border: #B2B2B2,
+    contextmenu-wrap-boxshadow: rgba(0, 0, 0, 0.3),
+    contextmenu-row-border: #E5E5E5,
+
   ),
   dark: (
     font-color-base: $color-white,
@@ -162,6 +170,14 @@ $ev-themes: (
     menu-selected-bg: $color-selected-blue,
     menu-sub-split: #353740,
     menu-color: #E3E7F0,
+
+    /* context menu
+    -------------------------- */
+    contextmenu-color: #FFFFFF,
+    contextmenu-wrap-bg: #333333,
+    contextmenu-wrap-border: #7F7F7F,
+    contextmenu-wrap-boxshadow: rgba(0, 0, 0, 0.58),
+    contextmenu-row-border: #191919,
 
   ),
 ) !default;
