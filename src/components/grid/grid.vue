@@ -38,9 +38,8 @@
             class="column-name"
           >{{ column.caption }}</span>
           <ev-icon
-            v-if="false"
-            :cls="'ei-s ei-s-arrow-down'"
-            style="margin: 3px 0 0 0; font-size: 12px;"
+            v-if="sortField === column.field"
+            :cls="`ei-s ${sortOrder === 'desc' ? 'ei-s-arrow-down' : 'ei-s-arrow-up'} sort-icon`"
           />
           <span
             v-if="false"
@@ -751,6 +750,12 @@
 
     &.render {
       justify-content: center;
+    }
+
+    & .sort-icon {
+      position: absolute;
+      right: 0;
+      font-size: 12px;
     }
   }
 
