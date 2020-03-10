@@ -60,7 +60,10 @@
     </div>
     <div
       ref="body"
-      class="table-body"
+      :class="{
+        'table-body': true,
+        stripe: stripeRows
+      }"
       @scroll="onScroll"
     >
       <div
@@ -89,7 +92,9 @@
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
             :data-index="rowIndex"
-            :class="row[2] === selectedRow ? 'selected' : ''"
+            :class="{
+              selected: row[2] === selectedRow,
+            }"
             @click="onRowClick($event, row)"
           >
             <td
@@ -199,11 +204,12 @@
         sortOrder: 'desc',
         sortField: '',
         adjust: this.option.adjust || false,
+        stripeRows: this.option.stripeRows || false,
         showHeader: this.option.showHeader === undefined ? true : this.option.showHeader,
         useSelect: this.option.useSelect || true,
         useCheckbox: this.option.useCheckbox || {},
         useContextMenu: this.option.useContextMenu || {},
-        rowHeight: this.option.rowHeight || 24,
+        rowHeight: this.option.rowHeight || 32,
         columnWidth: this.option.columnWidth || 80,
         scrollWidth: this.option.scrollWidth || 17,
         lastScroll: {},
@@ -281,6 +287,9 @@
 
           this.updateVScroll();
         },
+      },
+      hasVerticalScrollBar() {
+        this.onResize();
       },
     },
     created() {
@@ -804,6 +813,12 @@
       clear: both;
       border-spacing: 0;
       border-collapse: collapse;
+    }
+
+    &.stripe tr:nth-child(even) {
+      @include evThemify() {
+        background-color: evThemed('grid-row-stripe');
+      }
     }
 
     tr {

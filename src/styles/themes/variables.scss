@@ -60,6 +60,7 @@ $ev-themes: (
     grid-bottom-border: lighten($color-light-level7, 20%),
     grid-row-selected: $color-light-level3,
     grid-cell-text: lighten($color-light-level8, 10%),
+    grid-row-stripe: #E5E5E5,
 
     /* input
     -------------------------- */
@@ -150,6 +151,7 @@ $ev-themes: (
     grid-bottom-border: lighten($color-dark-level7, 10%),
     grid-row-selected: lighten($color-light-level8, 10%),
     grid-cell-text: darken($color-white, 25%),
+    grid-row-stripe: $color-dark-level3,
 
     /* input
     -------------------------- */
