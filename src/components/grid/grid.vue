@@ -60,7 +60,10 @@
     </div>
     <div
       ref="body"
-      class="table-body"
+      :class="{
+        'table-body': true,
+        stripe: stripeRows
+      }"
       @scroll="onScroll"
     >
       <div
@@ -91,7 +94,6 @@
             :data-index="rowIndex"
             :class="{
               selected: row[2] === selectedRow,
-              stripe: stripeRows,
             }"
             @click="onRowClick($event, row)"
           >
@@ -813,15 +815,15 @@
       border-collapse: collapse;
     }
 
+    &.stripe tr:nth-child(even) {
+      @include evThemify() {
+        background-color: evThemed('grid-row-stripe');
+      }
+    }
+
     tr {
       white-space: nowrap;
       /* stylelint-disable */
-      &.stripe:nth-child(even) {
-        @include evThemify() {
-          background-color: evThemed('grid-row-stripe');
-        }
-      }
-
       &.selected {
         @include evThemify() {
           background-color: evThemed('grid-row-selected');
