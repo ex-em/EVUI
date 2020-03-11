@@ -357,10 +357,12 @@ class Calendar {
   initCalendarProperty() {
     // 이번달 thisMonth월
     const thisMonth = this.options.currentYearMonth.getMonth() + 1;
+    // 이번 년도
+    const thisYear = this.options.currentYearMonth.getFullYear();
     // 저번달 마지막 날짜
-    this.prevMonthLastDate = +this.getLastDayOfMonth(thisMonth - 1);
+    this.prevMonthLastDate = +this.getLastDayOfMonth(thisMonth - 1, thisYear);
     // 이번달 마지막 날짜
-    this.thisMonthLastDate = +this.getLastDayOfMonth(thisMonth);
+    this.thisMonthLastDate = +this.getLastDayOfMonth(thisMonth, thisYear);
     // 이번달 첫번째 요일(sun : 0, sat : 6) & 해당 달력에서 선택된 달의 1일까지의 공백 before 일수
     this.thisMonthFirstDay = +this.options.currentYearMonth.getDay();
     // 이번달의 주 개수 (4주 ~ 6주)
