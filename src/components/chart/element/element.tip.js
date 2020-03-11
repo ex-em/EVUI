@@ -61,8 +61,6 @@ const modules = {
 
     const graphX = this.axesSteps.x[series.xAxisIndex];
     const graphY = this.axesSteps.y[series.yAxisIndex];
-    const maxX = this.minMax.x[series.xAxisIndex].max;
-    const maxY = this.minMax.y[series.yAxisIndex].max;
 
     const xsp = graphPos.x1;
     const xep = graphPos.x2;
@@ -71,6 +69,10 @@ const modules = {
     const { type, size } = series;
     const { maxDomain, maxDomainIndex } = series.minMax;
     const seriesMaxY = series.minMax.maxY;
+
+    if (maxDomain === null || maxDomainIndex < 0) {
+      return false;
+    }
 
     // pos calculate
     let cp;
@@ -129,23 +131,23 @@ const modules = {
     }
 
     const sizeObj = { xArea, yArea, graphX, graphY, xsp, xep, ysp };
-    const dataObj = { dp, value, text, maxX, maxY, type };
+    const dataObj = { dp, value, text, type };
 
     return { ...sizeObj, ...dataObj };
   },
   drawFixedIndicator(param) {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, ysp, dp, type, value, opt } = param;
+    const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt } = param;
     const offset = type === 'bar' ? 0 : 3;
 
     let gp;
 
     if (opt.fixedPosTop) {
       if (isHorizontal) {
-        gp = Canvas.calculateX(maxX, graphX.graphMin, graphX.graphMax, xArea, xsp);
+        gp = Canvas.calculateX(graphX.graphMax, graphX.graphMin, graphX.graphMax, xArea, xsp);
       } else {
-        gp = Canvas.calculateY(maxY, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        gp = Canvas.calculateY(graphY.graphMax, graphY.graphMin, graphY.graphMax, yArea, ysp);
         gp -= offset;
       }
     } else if (isHorizontal) {
@@ -179,7 +181,7 @@ const modules = {
   drawTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const { graphX, graphY, maxX, maxY, xArea, yArea, xsp, xep, ysp } = param;
+    const { graphX, graphY, xArea, yArea, xsp, xep, ysp } = param;
     const { dp, value, text, opt, type, tipType, isSamePos } = param;
 
     const arrowSize = 4;
@@ -192,10 +194,10 @@ const modules = {
 
     if (opt.fixedPosTop) {
       if (isHorizontal) {
-        gp = Canvas.calculateX(maxX, graphX.graphMin, graphX.graphMax, xArea, xsp);
+        gp = Canvas.calculateX(graphX.graphMax, graphX.graphMin, graphX.graphMax, xArea, xsp);
         gp += offset;
       } else {
-        gp = Canvas.calculateY(maxY, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        gp = Canvas.calculateY(graphY.graphMax, graphY.graphMin, graphY.graphMax, yArea, ysp);
         gp -= offset;
       }
     } else if (isHorizontal) {

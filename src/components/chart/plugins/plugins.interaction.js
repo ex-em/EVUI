@@ -42,7 +42,8 @@ const modules = {
         const offset = this.getMousePosition(e);
         const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
         const args = {};
-        if (hitInfo && hitInfo.value !== null) {
+
+        if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
@@ -58,7 +59,8 @@ const modules = {
         const hitInfo = this.findClickedData(offset);
 
         const args = {};
-        if (hitInfo && hitInfo.value !== null) {
+
+        if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
@@ -193,7 +195,15 @@ const modules = {
       }
     }
 
-    return { label: maxl, pos: maxp, value: maxg, sId: maxSID, acc, useStack, maxIndex };
+    return {
+      label: maxl,
+      pos: maxp,
+      value: maxg === null ? 0 : maxg,
+      sId: maxSID,
+      acc,
+      useStack,
+      maxIndex,
+    };
   },
   selectItemByLabel(label) {
     const sIds = Object.keys(this.seriesList);
