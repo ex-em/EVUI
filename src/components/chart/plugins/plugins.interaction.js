@@ -206,60 +206,7 @@ const modules = {
     };
   },
   selectItemByLabel(label) {
-    const sIds = Object.keys(this.seriesList);
-    const isHorizontal = !!this.options.horizontal;
-
-    let maxl = null;
-    let maxp = null;
-    let maxg = null;
-    let maxSID = '';
-    let acc = 0;
-    let useStack = false;
-    let findInfo = false;
-
-    const labels = this.data.labels;
-    const labelIndex = labels && labels.indexOf ? labels.indexOf(label) : -1;
-
-    if (labelIndex > -1) {
-      for (let ix = 0; ix < sIds.length; ix++) {
-        const sId = sIds[ix];
-        const series = this.seriesList[sId];
-        const data = series.data[labelIndex];
-
-        if (data) {
-          const ldata = isHorizontal ? data.y : data.x;
-          const lp = isHorizontal ? data.yp : data.xp;
-
-          if (ldata !== null && ldata !== undefined) {
-            const g = isHorizontal ? data.o || data.x : data.o || data.y;
-
-            if (series.stackIndex) {
-              acc += !isNaN(data.o) ? data.o : 0;
-              useStack = true;
-            } else {
-              acc += data.y;
-            }
-
-            if (maxg === null || maxg <= g) {
-              maxg = g;
-              maxSID = sId;
-              maxl = ldata;
-              maxp = lp;
-            }
-          }
-        }
-      }
-
-      findInfo = {
-        label: maxl,
-        pos: maxp,
-        value: maxg === null ? 0 : maxg,
-        sId: maxSID,
-        acc,
-        useStack,
-        maxIndex: labelIndex,
-      };
-    }
+    const findInfo = this.getItemByLabel(label);
 
     if (findInfo) {
       this.render(findInfo);

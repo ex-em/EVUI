@@ -79,7 +79,11 @@ const modules = {
       series.show = !series.show;
       colorDOM.classList.toggle('inactive');
       nameDOM.classList.toggle('inactive');
-      this.update(false, true);
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: true, keepDomain: true },
+      });
     };
 
     this.onResizeMouseDown = (e) => {
@@ -132,7 +136,10 @@ const modules = {
         series.state = series.sId === targetId ? 'highlight' : 'downplay';
       });
 
-      this.update();
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
     };
 
     this.onLegendBoxLeave = () => {
@@ -140,7 +147,10 @@ const modules = {
         series.state = 'normal';
       });
 
-      this.update();
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
     };
 
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);

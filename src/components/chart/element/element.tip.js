@@ -74,13 +74,7 @@ const modules = {
       return false;
     }
 
-    // pos calculate
-    let cp;
-    let halfBarSize;
-    let dp;
-    let ldata;
-
-    ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    let ldata = type === 'bar' ? maxDomainIndex : maxDomain;
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
@@ -91,7 +85,27 @@ const modules = {
       }
     }
 
-    // domain pos
+    let value = seriesMaxY;
+
+    if (tipType === 'sel') {
+      if (hitInfo && hitInfo.value !== null) {
+        value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+        lastTip.value = value;
+      } else if (lastTip.value !== null) {
+        value = lastTip.value;
+      } else if (lastTip.pos !== null) {
+        const item = type === 'bar' ?
+          this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
+
+        value = item.useStack ? item.acc : item.value;
+        lastTip.value = value;
+      }
+    }
+
+    let cp;
+    let halfBarSize;
+    let dp;
+
     if (type === 'bar') {
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
@@ -112,26 +126,8 @@ const modules = {
       );
     }
 
-    // graph value
-    let text;
-    let value;
-
-    text = numberWithComma(seriesMaxY);
-    value = seriesMaxY;
-
-    if (tipType === 'sel') {
-      if (hitInfo && hitInfo.value !== null) {
-        value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
-        text = numberWithComma(value);
-        lastTip.value = text;
-      } else if (lastTip.value !== null) {
-        text = lastTip.value;
-        value = +((text).replace(/,/gi, ''));
-      }
-    }
-
     const sizeObj = { xArea, yArea, graphX, graphY, xsp, xep, ysp };
-    const dataObj = { dp, value, text, type };
+    const dataObj = { dp, value, text: numberWithComma(value), type };
 
     return { ...sizeObj, ...dataObj };
   },
