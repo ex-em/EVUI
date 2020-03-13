@@ -388,12 +388,14 @@ class EvChart {
     return labelOffset;
   }
 
-  update(updateSeries, updateTip) {
+  update(updateInfo) {
     const options = this.options;
     const data = this.data.data;
     const labels = this.data.labels;
     const groups = this.data.groups;
     const series = this.data.series;
+
+    const { updateSeries, updateSelTip } = updateInfo;
 
     if (!this.isInit) {
       return;
@@ -425,8 +427,12 @@ class EvChart {
       }
     }
 
-    if (updateTip) {
-      this.lastTip = { pos: null, value: null };
+    if (updateSelTip.update) {
+      this.lastTip.value = null;
+
+      if (!updateSelTip.keepDomain) {
+        this.lastTip.pos = null;
+      }
     }
 
     if (groups.length) {

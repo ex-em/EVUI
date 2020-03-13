@@ -50,20 +50,25 @@
       data: {
         handler(newVal) {
           const newData = defaultsDeep({}, newVal, this.normalizedData);
-          const updatedSeries = !isEqual(newData.series, this.evChart.data.series);
+          const isUpdateSeries = !isEqual(newData.series, this.evChart.data.series);
 
           this.evChart.data = cloneDeep(newData);
-          this.evChart.update(updatedSeries, true);
+          this.evChart.update({
+            updateSeries: isUpdateSeries,
+            updateSelTip: { update: true, keepDomain: false },
+          });
         },
         deep: true,
       },
       options: {
         handler(newVal) {
           const newOpt = defaultsDeep({}, newVal, this.normalizedOption);
-          const updatedSeries = !isEqual(newOpt.legend, this.evChart.options.legend);
 
           this.evChart.options = cloneDeep(newOpt);
-          this.evChart.update(updatedSeries);
+          this.evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
         },
         deep: true,
       },
