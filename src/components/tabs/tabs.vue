@@ -1,8 +1,6 @@
 <template>
   <div class="ev-tabs">
-    <div
-      class="ev-tabs-header"
-    >
+    <div class="ev-tabs-header">
       <div
         :class="{'ev-tabs-scroll': true, 'scrollable': isActiveScroll}"
       >
@@ -47,13 +45,12 @@
               :style="`min-width: ${minTabWidth}px;`"
               :draggable="true"
               @click="changeTab(tab.value)"
-              @mouseenter="toggleCloseIcon($event, true)"
-              @mouseleave="toggleCloseIcon($event, false)"
               @dragstart="onDragStart($event, tab.value)"
               @dragover.prevent="onDragOver($event, tab.value)"
               @dragend.prevent="onDragEnd"
             >
               <span
+                :style="`font-size: ${titleSize}px;`"
                 class="ev-tabs-item-content"
               >
                 <ev-icon
@@ -75,9 +72,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="ev-tabs-body"
-    >
+    <div class="ev-tabs-body">
       <slot/>
     </div>
   </div>
@@ -103,6 +98,10 @@
       minTabWidth: {
         type: Number,
         default: 100,
+      },
+      titleSize: {
+        type: Number,
+        default: 16,
       },
       activeTabValue: {
         type: String,
@@ -150,8 +149,9 @@
     mounted() {
       if (!this.checkValid(this.activeTab) && this.tabList.length) {
         this.activeTab = this.tabList[0].value;
-        setTimeout(() => this.toggleScrollIcon());
       }
+
+      setTimeout(() => this.toggleScrollIcon());
     },
     methods: {
       checkValid(value) {
@@ -273,8 +273,12 @@
           const navWrapWidth = this.$refs.navWrap.offsetWidth;
           const activeTabRect = nav.querySelector(`div[value='${this.activeTab}']`).getBoundingClientRect();
           const activeTabWidth = (activeTabRect.left + activeTabRect.width) - navRect.left;
-          const moveOffset = navWrapWidth - (activeTabWidth + 4);
+          let moveOffset = navWrapWidth - activeTabWidth;
           const maxMoveOffset = navRect.width - navWrapWidth;
+
+          if (this.tabList[this.tabList.length - 1].value !== this.activeTab) {
+            moveOffset += 4;
+          }
 
           this.currentOffset = moveOffset > 0 ? 0 : moveOffset;
           if (this.currentOffset) {
@@ -285,18 +289,6 @@
             this.disableNext = false;
           }
         });
-      },
-      toggleCloseIcon(e, value) {
-        if (this.disableRemoveTab) {
-          return;
-        }
-
-        const itemContent = e.target.getElementsByClassName('ev-tabs-item-content')[0];
-        if (value) {
-          itemContent.classList.add('icon');
-        } else {
-          itemContent.classList.remove('icon');
-        }
       },
       changeTab(value) {
         if (this.activeTab === value) {
@@ -433,21 +425,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
     line-height: 36px;
     text-align: center;
+    padding: 0 5px;
 
     @include evThemify() {
       color: rgba(evThemed('tab-color'), 0.7);
     }
 
-    &.icon .ev-tab-close-btn {
-      width: 12px;
-    }
-
     & .ev-tab-close-btn {
-      width: 0;
-      overflow: hidden;
+      width: 12px;
 
       &:hover {
         font-weight: bold;
@@ -457,8 +444,12 @@
   }
   .ev-tab-scroll-icon {
     position: absolute;
-    line-height: 30px;
+    line-height: 36px;
     cursor: pointer;
+
+    @include evThemify() {
+      border: $border-solid evThemed('tab-border');
+    }
 
     &.disabled {
       opacity: 0.3;

@@ -19,6 +19,7 @@
         v-model="tabItems"
         :active-tab-value="activeTabValue"
         :min-tab-width="100"
+        :title-size="20"
         @change-tab="changeTab"
       >
         <ev-tab-panel
@@ -94,7 +95,7 @@
   };
 </script>
 
-<style scoped>
+<style>
   p{
     margin-left: 30px;
   }
