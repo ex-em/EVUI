@@ -746,10 +746,11 @@
     position: relative;
     display: inline-flex;
     align-items: center;
+    min-width: 40px;
     height: 30px;
     line-height: 30px;
     vertical-align: top;
-    padding: 0 3px;
+    padding: 0 10px;
     user-select: none;
 
     &.dummy {
@@ -762,8 +763,8 @@
     }
 
     & .sort-icon {
-      position: absolute;
-      right: 0;
+      display: inline-block;
+      float: right;
       font-size: 12px;
     }
   }
@@ -773,6 +774,9 @@
   }
 
   .column-name {
+    display: inline-block;
+    float: left;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: bold;
@@ -839,7 +843,8 @@
 
     td {
       display: inline-block;
-      padding: 0 3px;
+      padding: 0 10px;
+
 
       @include truncate(100%);
       @include evThemify() {
