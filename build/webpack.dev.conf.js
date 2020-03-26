@@ -1,21 +1,16 @@
 const path = require('path');
 const webpack = require('webpack');
-
+const webpackBaseConfig = require('./webpack.base.conf.js');
 const merge = require('webpack-merge');
-const { VueLoaderPlugin } =  require ('vue-loader');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const webpackBaseConfig = require('./webpack.base.conf.js');
-
-function resolve (dir) {
-  return path.join(__dirname, '..', dir);
-}
+const resolve = (dir) => path.join(__dirname, '..', dir);
 
 module.exports = merge(webpackBaseConfig, {
   mode: 'development',
-  devtool: 'eval-source-map',
+  devtool: 'source-map',
   entry: {
     main: './examples/main.js',
     vendors: ['vue', 'vue-router']
@@ -38,7 +33,7 @@ module.exports = merge(webpackBaseConfig, {
         test: /\.(vue|js)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
-        include: [resolve('src'), resolve('examples'), resolve('test')],
+        include: [resolve('src'), resolve('examples')],
           options: {
           formatter: require('eslint-friendly-formatter'),
           emitWarning: true,
@@ -56,17 +51,13 @@ module.exports = merge(webpackBaseConfig, {
     inline: true,
     host: '0.0.0.0',
     disableHostCheck: true,
-    port: '8888'
+    port: '8888',
+    compress: false,
   },
   optimization: {
+    concatenateModules: true,
     splitChunks: {
       chunks: 'all', // all, async, initial
-      minSize: 30000,
-      maxSize: 0,
-      minChunks: 1,
-      maxAsyncRequests: 5,
-      maxInitialRequests: 3,
-      automaticNameDelimiter: '~',
       name: true,
       cacheGroups: {
         vendors: {
@@ -75,30 +66,16 @@ module.exports = merge(webpackBaseConfig, {
           test: /[\\/]node_modules[\\/]/,
           priority: -10
         },
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
-        }
-      }
-    }
+      },
+    },
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       filename: './index.html',
       template: './examples/index.html',
     }),
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, '../examples/routers'),
-        to: 'static',
-        ignore: ['.*']
-      }
-    ]),
     new FriendlyErrorsPlugin(),
-    new VueLoaderPlugin()
   ]
 });

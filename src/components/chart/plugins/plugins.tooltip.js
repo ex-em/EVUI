@@ -56,9 +56,9 @@ const modules = {
     const hitAxis = items[sId].axis;
     const isHorizontal = this.options.horizontal;
 
-    const title = isHorizontal ?
-      this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
-      this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    const title = isHorizontal
+      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
+      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
     ctx.save();
     ctx.font = '16px Roboto';
     const tw = Math.round(ctx.measureText(title).width);
@@ -68,8 +68,8 @@ const modules = {
     const vw = Math.round(ctx.measureText(maxValue).width);
     ctx.restore();
     const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + colorMargin + valueMargin;
-    const height = boxPadding.t + titleHeight + titleMargin +
-      (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
+    const height = boxPadding.t + titleHeight + titleMargin
+      + (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
 
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
@@ -137,9 +137,9 @@ const modules = {
       return;
     }
 
-    const title = isHorizontal ?
-      this.axesY[hitAxis.y].getLabelFormat(hitItem.y) :
-      this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    const title = isHorizontal
+      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
+      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
     let x = pos > 1 ? 5 : 2;
     let y = 2;

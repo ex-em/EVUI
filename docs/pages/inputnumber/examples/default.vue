@@ -80,12 +80,10 @@
   </div>
 </template>
 <script>
-  import checkbox from '@/components/checkbox/checkbox';
   import inputNumber from '@/components/input/input.number';
 
   export default {
     components: {
-      checkbox,
       inputNumber,
     },
     data() {

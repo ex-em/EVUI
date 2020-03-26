@@ -1,7 +1,7 @@
 <template>
   <div
-    v-click-outside="hide"
     v-show="isShow"
+    v-click-outside="hide"
     :style="ctxMenuStyle"
     :class="prefixEvui"
   >

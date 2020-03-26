@@ -262,12 +262,12 @@ class EvChart {
 
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const backingStoreRatio =
-      this.displayCtx.webkitBackingStorePixelRatio ||
-      this.displayCtx.mozBackingStorePixelRatio ||
-      this.displayCtx.msBackingStorePixelRatio ||
-      this.displayCtx.oBackingStorePixelRatio ||
-      this.displayCtx.backingStorePixelRatio || 1;
+    const backingStoreRatio = this.displayCtx.webkitBackingStorePixelRatio
+      || this.displayCtx.mozBackingStorePixelRatio
+      || this.displayCtx.msBackingStorePixelRatio
+      || this.displayCtx.oBackingStorePixelRatio
+      || this.displayCtx.backingStorePixelRatio
+      || 1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
 

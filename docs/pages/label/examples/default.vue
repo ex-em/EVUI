@@ -18,14 +18,10 @@
 </template>
 <script>
   import Label from '@/components/label/label';
-  import Button from '@/components/button';
-  import inputNumber from '@/components/input/input.number';
 
   export default {
     components: {
       Label,
-      Button,
-      inputNumber,
     },
     data() {
       return {

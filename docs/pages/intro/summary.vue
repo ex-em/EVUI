@@ -11,17 +11,17 @@
         class="evui-summary-thumbnail-title"
         @click.stop="openSummaryThumbnail(index)"
       >
-        <i class="fas fa-angle-down"/> &nbsp; {{ menu.name }}
+        <i class="fas fa-angle-down" /> &nbsp; {{ menu.name }}
       </div>
       <ul
         :class="{active: menu.openFlag}"
         class="evui-summary-thumbnail-ul"
       >
         <li
-          v-for="(submenu, index) in menu.children"
-          :key="submenu+index"
+          v-for="(submenu, idx) in menu.children"
+          :key="submenu+idx"
           class="evui-summary-thumbnail-li"
-          @click.stop="$emit('clickSummary', menu.name, submenu.name, index)"
+          @click.stop="$emit('clickSummary', menu.name, submenu.name, idx)"
         >
           <router-link :to="submenu.routerLink">
             <div class="evui-summary-thumbnail-box-image">
@@ -93,7 +93,7 @@
     text-decoration: none !important;
   }
   a:visited, a:any-link {
-    color: #000;
+    color: #000000;
   }
   .evui-summary-content {
     margin-top: 50px;
@@ -126,7 +126,7 @@
   }
   .evui-summary-thumbnail-ul.active {
     display: none;
-    height: 0px;
+    height: 0;
     transition: all 0.5s ease-in-out;
   }
   .evui-summary-thumbnail-li {
@@ -134,7 +134,7 @@
     float: left;
     width: calc(16.6% - 23px);
     margin: 10px;
-    /*box-shadow: 0 0 4px 4px rgba(0,0,0,0.1);*/
+    /* box-shadow: 0 0 4px 4px rgba(0,0,0,0.1); */
     word-wrap: break-word;
     transition: opacity 0.5s ease-in-out;
   }
@@ -152,28 +152,27 @@
   .evui-summary-thumbnail-box-image img {
     width: 100%;
     height: 150px;
-    border: 1px solid #eeeeee;
+    border: 1px solid #EEEEEE;
   }
 
   @media all and (max-width: 1400px) {
-    .evui-summary-thumbnail-li{
+    .evui-summary-thumbnail-li {
       list-style: none;
       width: calc(25% - 23px);
       margin: 10px;
     }
   }
   @media all and (max-width: 900px) {
-    .evui-summary-thumbnail-li{
+    .evui-summary-thumbnail-li {
       list-style: none;
       width: calc(50% - 23px);
       margin: 10px;
     }
   }
   @media all and (max-width: 600px) {
-    .evui-summary-thumbnail-li{
+    .evui-summary-thumbnail-li {
       list-style: none;
       width: calc(100% - 23px);
     }
   }
 </style>
-

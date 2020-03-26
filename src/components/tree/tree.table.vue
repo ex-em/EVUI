@@ -1,7 +1,5 @@
 <template>
-  <div
-    :style="{} | gridStyleFilter({width: width, height: height})"
-  >
+  <div :style="{} | gridStyleFilter({width: width, height: height})">
     <div
       ref="evuiGrid"
       :style="{} | gridStyleFilter({width: width, height: height})"
@@ -9,7 +7,7 @@
     >
       <div
         class="evui-grid-box"
-        style="width:100%;height:100%;"
+        style="width: 100%; height: 100%;"
       >
         <div
           ref="evuiGridBody"
@@ -31,7 +29,7 @@
                     <td
                       class="evui-table-data evui-table-data-spacer"
                       data-col="start"
-                      style="height: 0px; width: 0px;"
+                      style="height: 0; width: 0;"
                     />
 
                     <template v-for="(column, index) in originColumns">
@@ -53,12 +51,10 @@
                       <td
                         class="evui-table-data-spacer"
                         data-col="start"
-                        style="border-right: 0"
+                        style="border-right: 0;"
                       />
 
-                      <template
-                        v-if="!elbow"
-                      >
+                      <template v-if="!elbow">
                         <td
                           v-for="(col, colIndex) in originColumns"
                           :key="colIndex"
@@ -123,20 +119,20 @@
                               v-if="treeGroupColumn === col.field"
                             >
                               <i
-                                v-for="(elbow, index) in row.elbow"
+                                v-for="(el, index) in row.elbow"
                                 :key="index"
-                                :class="elbow ? 'evui-tree-elbow-line':'evui-tree-empty'"
+                                :class="el ? 'evui-tree-elbow-line':'evui-tree-empty'"
                               />
                               <i
                                 v-if="!row.leaf && !row.expend"
                                 :class="row.last ?
-                                'evui-tree-elbow-plus-end':'evui-tree-elbow-plus'"
+                                  'evui-tree-elbow-plus-end':'evui-tree-elbow-plus'"
                                 @click="toggle(row, $event)"
                               />
                               <i
                                 v-if="!row.leaf && row.expend"
                                 :class="row.last ?
-                                'evui-tree-elbow-minus-end':'evui-tree-elbow-minus'"
+                                  'evui-tree-elbow-minus-end':'evui-tree-elbow-minus'"
                                 @click="toggle(row, $event)"
                               />
                               <i
@@ -185,7 +181,7 @@
                   </template>
 
                   <tr
-                    style="display: none"
+                    style="display: none;"
                   >
                     <td
                       colspan="2000"
@@ -209,14 +205,14 @@
                   <td
                     class="evui-table-columns-head"
                     data-col="start"
-                    style="border-right: 0px; width: 0px;"
+                    style="border-right: 0; width: 0;"
                   />
                   <template v-for="(column, index) in originColumns">
                     <td
                       :key="index"
+                      :ref="`${column.field}_col`"
                       :data-col="index"
                       :style="{width: column.width}"
-                      :ref="`${column.field}_col`"
                       class="evui-table-columns-head"
                       @mousedown.stop.prevent="columnMove(column, index, $event)"
                     >
@@ -417,8 +413,8 @@
           const colWidth = util.quantity(this.originColumns[ix].size);
           const isPercentValue = colWidth ? colWidth.unit === '%' : false;
           const min = util.quantity(this.originColumns[ix].min).value;
-          const max = this.originColumns[ix].max ?
-            util.quantity(this.originColumns[ix].max).value : undefined;
+          const max = this.originColumns[ix].max
+            ? util.quantity(this.originColumns[ix].max).value : undefined;
 
           // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
           if (isPercentValue) {
@@ -449,8 +445,8 @@
         if (this.noSizeColList.length > 0) {
           for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
             const min = util.quantity(this.noSizeColList[ix].min).value;
-            const max = this.noSizeColList[ix].max ?
-              util.quantity(this.noSizeColList[ix].max).value : undefined;
+            const max = this.noSizeColList[ix].max
+              ? util.quantity(this.noSizeColList[ix].max).value : undefined;
             const isLastIndex = (ix + 1) === ixLen;
             if (!isLastIndex) {
               leftSize -= util.checkColSize(colSize, min, max);
@@ -477,8 +473,8 @@
         this.resizeFlag = true;
         const startOffset = util.quantity(vm.originColumns[index].width).value - event.screenX;
         const min = util.quantity(vm.originColumns[index].min).value;
-        const max = vm.originColumns[index].max ?
-          util.quantity(vm.originColumns[index].max).value : undefined;
+        const max = vm.originColumns[index].max
+          ? util.quantity(vm.originColumns[index].max).value : undefined;
 
         function onMouseMove(e) {
           e.stopPropagation();
@@ -524,8 +520,7 @@
         function moveAt(clientX, clientY) {
           const posX = (clientX - startClientX) + 15;
           const posY = (clientY - startClientY) + 20;
-          vm.$refs.headGhost.style.cssText =
-            `top: ${posY}px; left: ${posX}px; display: block`;
+          vm.$refs.headGhost.style.cssText = `top: ${posY}px; left: ${posX}px; display: block`;
         }
 
         // 컬럼 배열 변경
@@ -673,8 +668,8 @@
             const colWidth = util.quantity(this.originColumns[ix].size);
             const isPercentValue = colWidth ? colWidth.unit === '%' : false;
             const min = util.quantity(this.originColumns[ix].min).value;
-            const max = this.originColumns[ix].max ?
-              util.quantity(this.originColumns[ix].max).value : undefined;
+            const max = this.originColumns[ix].max
+              ? util.quantity(this.originColumns[ix].max).value : undefined;
 
             // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
             if (isPercentValue) {
@@ -690,11 +685,11 @@
           }
 
           if (this.isFilter) {
-            this.verticalScroll = this.gridRecordsHeight <
-              (this.filteredData.length * this.rowHeight);
+            this.verticalScroll = this.gridRecordsHeight
+              < (this.filteredData.length * this.rowHeight);
           } else {
-            this.verticalScroll = this.gridRecordsHeight <
-              (this.resultData.length * this.rowHeight);
+            this.verticalScroll = this.gridRecordsHeight
+              < (this.resultData.length * this.rowHeight);
           }
 
           let leftSize;
@@ -712,8 +707,8 @@
             for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
               // debugger;
               const min = util.quantity(this.noSizeColList[ix].min).value;
-              const max = this.noSizeColList[ix].max ?
-                util.quantity(this.noSizeColList[ix].max).value : undefined;
+              const max = this.noSizeColList[ix].max
+                ? util.quantity(this.noSizeColList[ix].max).value : undefined;
               const isLastIndex = (ix + 1) === ixLen;
               if (!isLastIndex) {
                 leftSize -= util.checkColSize(colSize, min, max);
@@ -787,7 +782,6 @@
     },
   };
 </script>
-
 <style scoped src="@/components/tree/tree.table.grey.css"/>
 <style>
   .evui-table-records-col .ev-checkbox .small {

@@ -249,11 +249,13 @@ class Calendar {
       document.body.appendChild(this.dropdown);
     }
   }
+
   init() {
     this.initOptionsProperty();
     this.initCalendarProperty();
     this.initCanvasProperty();
   }
+
   initOptionsProperty() {
     if (this.options.initSelectDayFlag
       && this.options.selectDayType === 'day'
@@ -262,30 +264,30 @@ class Calendar {
       if (!this.options.timeExpand) {
         this.options.initSelectDay = this.options.initSelectDay.setHours(0, 0, 0, 0);
       } else {
-        this.coordinate.timeArea.hour.select = this.options.initSelectDay.getHours();
-        this.coordinate.timeArea.minute.select = this.options.initSelectDay.getMinutes();
-        this.coordinate.timeArea.second.select = this.options.initSelectDay.getSeconds();
-        this.coordinate.timeArea.hour.page
-          = Math.floor(this.coordinate.timeArea.hour.select / 12) + 1;
-        this.coordinate.timeArea.minute.page
-          = Math.floor(this.coordinate.timeArea.minute.select / 12) + 1;
-        this.coordinate.timeArea.second.page
-          = Math.floor(this.coordinate.timeArea.second.select / 12) + 1;
+        const timeArea = this.coordinate.timeArea;
+        timeArea.hour.select = this.options.initSelectDay.getHours();
+        timeArea.minute.select = this.options.initSelectDay.getMinutes();
+        timeArea.second.select = this.options.initSelectDay.getSeconds();
+        timeArea.hour.page = Math.floor(timeArea.hour.select / 12) + 1;
+        timeArea.minute.page = Math.floor(timeArea.minute.select / 12) + 1;
+        timeArea.second.page = Math.floor(timeArea.second.select / 12) + 1;
       }
       const initSelectDay = new Date(this.options.initSelectDay);
+      const year = initSelectDay.getFullYear();
+      const month = initSelectDay.getMonth();
       const obj = {
-        year: initSelectDay.getFullYear(),
-        month: initSelectDay.getMonth() + 1,
+        year,
+        month: month + 1,
         day: initSelectDay.getDate(),
       };
       this.coordinate.calendarArea.selectDayArr.push(obj);
-      this.options.currentYearMonth =
-        new Date(initSelectDay.getFullYear(), initSelectDay.getMonth(), 1);
+      this.options.currentYearMonth = new Date(year, month, 1);
     }
     if (this.options.initLimitDay) {
       this.options.initLimitDay = this.options.initLimitDay.setHours(0, 0, 0, 0);
     }
   }
+
   initCanvasProperty() {
     // set total width, height 1
     if (this.options.width && this.options.height) {
@@ -354,6 +356,7 @@ class Calendar {
       });
     }
   }
+
   initCalendarProperty() {
     // 이번달 thisMonth월
     const thisMonth = this.options.currentYearMonth.getMonth() + 1;
@@ -380,9 +383,11 @@ class Calendar {
     this.initMouseleave();
     this.initMousewheel();
   }
+
   initMousemove() {
     this.overCanvas.addEventListener('mousemove', this.mousemove);
   }
+
   onMousemove(e) {
     e.preventDefault();
     // init value
@@ -498,6 +503,7 @@ class Calendar {
       this.overCanvas.style.cursor = 'default';
     }
   }
+
   mouseclickDate(e) {
     const calendarAreaTotal = this.coordinate.calendarArea.total;
     const allDay = this.coordinate.calendarArea.allDay;
@@ -659,6 +665,7 @@ class Calendar {
   initMouseclick() {
     this.overCanvas.addEventListener('mousedown', this.mousedown);
   }
+
   onMousedown(e) {
     e.preventDefault();
     const pickerAreaTotal = this.coordinate.pickerArea.total;
@@ -679,12 +686,13 @@ class Calendar {
           v.direction, pickerAreaOption.triangleLength, e.offsetX, e.offsetY,
         );
         if (exist) {
+          const year = currDate.getFullYear();
+          const month = currDate.getMonth();
+
           if (v.direction === 'left') {
-            this.options.currentYearMonth =
-              new Date(currDate.getFullYear(), currDate.getMonth() - 1, 1);
+            this.options.currentYearMonth = new Date(year, month - 1, 1);
           } else if (v.direction === 'right') {
-            this.options.currentYearMonth =
-              new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
+            this.options.currentYearMonth = new Date(year, +month + +1, 1);
           }
           this.initCalendarProperty();
           this.drawPickerArea();
@@ -845,6 +853,7 @@ class Calendar {
   initMouseleave() {
     this.overCanvas.addEventListener('mouseleave', this.mouseleave);
   }
+
   onMouseleave(e) {
     e.preventDefault();
     const allDay = this.coordinate.calendarArea.allDay;
@@ -887,6 +896,7 @@ class Calendar {
   initMousewheel() {
     this.overCanvas.addEventListener('mousewheel', this.mousewheel);
   }
+
   onMousewheel(e) {
     e.preventDefault();
     const pickerAreaTotal = this.coordinate.pickerArea.total;
@@ -926,14 +936,14 @@ class Calendar {
 
     if (areaType === 'month') {
       const currDate = this.options.currentYearMonth;
+      const year = currDate.getFullYear();
+      const month = currDate.getMonth();
       if (e.deltaY < 0) {
         // wheel up
-        this.options.currentYearMonth =
-          new Date(currDate.getFullYear(), currDate.getMonth() - 1, 1);
+        this.options.currentYearMonth = new Date(year, month - 1, 1);
       } else if (e.deltaY > 0) {
         // wheel down
-        this.options.currentYearMonth =
-          new Date(currDate.getFullYear(), +currDate.getMonth() + +1, 1);
+        this.options.currentYearMonth = new Date(year, +month + +1, 1);
       }
       this.drawPickerArea();
       this.initCalendarProperty();
@@ -1506,6 +1516,7 @@ class Calendar {
     this.drawTimeAreaContent();
     this.drawTimeAreaPage();
   }
+
   // DRAW 'Hour, Min, Sec'
   drawTimeAreaTitle() {
     const ctx = this.context;
@@ -1542,6 +1553,7 @@ class Calendar {
       );
     });
   }
+
   // DRAW 0 ~ 23 || 59 BOX
   drawTimeAreaContent(changedType) {
     const ctx = this.context;
@@ -1557,8 +1569,8 @@ class Calendar {
         let timeAreaObj = {};
         for (let ix = 0, ixLen = maxNumber; ix < ixLen; ix++) {
           const columnIdx = ix % this.options.timeArea.columnCount;
-          const page = parseInt(ix /
-            (this.options.timeArea.columnCount * this.options.timeArea.rowCount), 0) + 1;
+          const page = parseInt(ix
+            / (this.options.timeArea.columnCount * this.options.timeArea.rowCount), 0) + 1;
           let rowIdx = 1;
           if (ix % (this.options.timeArea.columnCount * this.options.timeArea.rowCount)
             < this.options.timeArea.columnCount) {
@@ -1612,6 +1624,7 @@ class Calendar {
       });
     }
   }
+
   drawTimeAreaPage() {
     const ctx = this.context;
     const timeType = this.options.timeTypeName;
@@ -1701,8 +1714,8 @@ class Calendar {
       }
       if (mergedStyle.fillText.show && mergedStyle.fillText.text) {
         ctx.font = mergedStyle.font;
-        const textWidth = mergedStyle.fillText.text ?
-          ctx.measureText(mergedStyle.fillText.text).width : 0;
+        const textWidth = mergedStyle.fillText.text
+          ? ctx.measureText(mergedStyle.fillText.text).width : 0;
         let textStartX;
         if (mergedStyle.align === 'center') {
           textStartX = (x + (width / 2)) - (textWidth / 2);
@@ -1882,6 +1895,7 @@ class Calendar {
   removeDropdown() {
     document.body.removeChild(this.dropdown);
   }
+
   showDropdown(e) {
     this.dropdown.style.display = 'block';
     let targetDivHeight = 0;
@@ -1893,6 +1907,7 @@ class Calendar {
     this.dropdown.style.width = `${this.baseCanvas.width + 2}px`;
     this.dropdown.style.height = `${this.baseCanvas.height + 2}px`;
   }
+
   hideDropdown() {
     this.dropdown.style.display = 'none';
   }

@@ -41,7 +41,8 @@ module.exports = {
         'state', // for vuex state
         'acc', // for reduce accumulators
         'e', // for e.returnvalue
-        'series' // for chart
+        'series', // for chart
+        'ctx'
       ]
     }],
     'indent': 'off',
@@ -57,5 +58,19 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-console' : ['error', { allow : ['log']}],
     'class-methods-use-this': 'off',
+    'no-bitwise': 'off',
+    'prefer-promise-reject-errors': 'off',
+    'prefer-destructuring': 'off',
+    'no-restricted-globals': 'off',
+    'prefer-object-spread': 'off',
+    'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true, }],
+    'implicit-arrow-linebreak': 'off',
+    'function-paren-newline': 'off',
+    'object-curly-newline': 'off',
+    'no-else-return': ['error', { 'allowElseIf': true }],
+    'import/no-useless-path-segments': 'off',
+    'import/no-cycle': 'off',
+    'vue/no-use-v-if-with-v-for': 'off',
+    'vue/no-v-html': 'off',
   }
 };

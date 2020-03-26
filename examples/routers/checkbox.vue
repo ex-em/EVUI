@@ -33,7 +33,7 @@
         <div
           v-for="item in baseList"
           :key="item.id"
-          style="display:inline-block;"
+          style="display: inline-block;"
         >
           <checkbox
             v-model="item.checked"
@@ -75,32 +75,32 @@
       <p>{{ itemNameList }}</p>
       <h5>use list</h5>
       <checkbox-group
-        :list="groupName"
         v-model="itemNameList"
+        :list="groupName"
         @on-change="checkAllGroupChange"
       />
       <p>{{ itemNameList }}</p>
       <h4>vbox / hbox</h4>
       <h5>hbox</h5>
       <checkbox-group
-        :list="groupName"
         v-model="itemNameList"
+        :list="groupName"
         @on-change="checkAllGroupChange"
       />
       <h5>vbox</h5>
       <checkbox-group
+        v-model="itemNameList"
         :list="groupName"
         :group-align="'vbox'"
-        v-model="itemNameList"
         @on-change="checkAllGroupChange"
       />
       <p>{{ itemNameList }}</p>
       <h5> disabled </h5>
       <p>list</p>
       <checkbox-group
+        v-model="itemNameList"
         :list="groupName"
         :disabled="checked"
-        v-model="itemNameList"
       />
       <p>slot</p>
       <checkbox-group
@@ -120,8 +120,8 @@
         />
       </checkbox-group>
       <checkbox
-        :label="'checked disabled'"
         v-model="checked"
+        :label="'checked disabled'"
       />
     </div>
   </div>

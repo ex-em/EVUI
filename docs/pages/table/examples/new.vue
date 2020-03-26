@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%; height: 300px;">
+  <div style="width: 100%; height: 300px;">
     <ev-grid
       :columns="columns"
       :rows="tableData"
@@ -45,7 +45,7 @@
           </ev-radio>
         </ev-radio-group>
       </template>
-      <template v-slot:test4="item">
+      <template v-slot:test4="">
         <ev-button
           :type="'primary'"
           :size="'small'"

@@ -109,8 +109,8 @@
     },
     updated() {
       setTimeout(() => {
-        const index = this.items.findIndex(item => item.value === this.selectedItems[0].value &&
-          item.name === this.selectedItems[0].name);
+        const index = this.items.findIndex(item => item.value === this.selectedItems[0].value
+          && item.name === this.selectedItems[0].name);
         this.setScrollTop(index);
       });
     },
@@ -118,10 +118,10 @@
       getClientHeight(selectedIdx) {
         const defaultRowHeight = 30;
         let listRowHeight = 0;
-        if (this.$refs.singleAreaList.children &&
-          this.$refs.singleAreaList.children[0] &&
-          this.$refs.singleAreaList.children[0].children[0] &&
-          this.$refs.singleAreaList.children[0].children[0].children
+        if (this.$refs.singleAreaList.children
+          && this.$refs.singleAreaList.children[0]
+          && this.$refs.singleAreaList.children[0].children[0]
+          && this.$refs.singleAreaList.children[0].children[0].children
         ) {
           let li;
           const liList = this.$refs.singleAreaList.children[0].children[0].children;
@@ -183,7 +183,7 @@
   .ev-dropdown-multiple-input-area .input-text {
     width: 100%;
     height: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid #CCCCCC;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;

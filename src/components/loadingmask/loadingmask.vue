@@ -95,16 +95,12 @@
             const parentPaddingLeft = getComputedParent.getPropertyValue('padding-left');
             const parentBorder = getComputedParent.getPropertyValue('border-width');
             const parentElRect = parentEl.getBoundingClientRect();
-            const parentWidth =
-              parentElRect.width - (parseInt(parentBorder, 10) * 2);
-            const parentHeight =
-              parentElRect.height - (parseInt(parentBorder, 10) * 2);
-            const wrapperTransform =
-              `translate(-${parentPaddingLeft}, -${parentPaddingTop})`;
+            const parentWidth = parentElRect.width - (parseInt(parentBorder, 10) * 2);
+            const parentHeight = parentElRect.height - (parseInt(parentBorder, 10) * 2);
+            const wrapperTransform = `translate(-${parentPaddingLeft}, -${parentPaddingTop})`;
             this.$el.setAttribute('style',
               `width: ${parentWidth}px; height: ${parentHeight}px; transform: ${wrapperTransform}`);
-            const centerTransform =
-              `translate(-${(this.barWidth / 2)}px, -${(this.barHeight / 2)}px)`;
+            const centerTransform = `translate(-${(this.barWidth / 2)}px, -${(this.barHeight / 2)}px)`;
             this.$refs.loadingCenter.setAttribute('style',
               `top: ${parentHeight / 2}px; left: ${parentWidth / 2}px; transform: ${centerTransform}`);
           }

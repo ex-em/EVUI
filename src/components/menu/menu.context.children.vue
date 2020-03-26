@@ -17,7 +17,9 @@
         <div
           :class="{ 'no-children': !item.items }"
           class="menu-name"
-        >{{ item.text }}</div>
+        >
+          {{ item.text }}
+        </div>
         <ev-icon
           v-if="item.items"
           :cls="'ei-arrow-right2 menu-arrow'"
@@ -127,14 +129,15 @@
   };
 </script>
 
-<style>
+<style lang="scss">
   @import '~@/styles/default';
 
-  .ev-contextmenu-children{
+  .ev-contextmenu-children {
     position: relative;
     float: left;
   }
-  .ev-contextmenu-children-body{
+
+  .ev-contextmenu-children-body {
     float: left;
     position: relative;
     font-size: 12px;
@@ -146,7 +149,8 @@
       box-shadow: 0 7px 15px 0 evThemed('contextmenu-wrap-boxshadow');
     }
   }
-  .ev-contextmenu-children-row{
+
+  .ev-contextmenu-children-row {
     position: relative;
     height: 29px;
     padding: 2px 0;
@@ -178,6 +182,7 @@
       border-bottom: 1px solid evThemed('contextmenu-row-border');
     }
   }
+
   .ev-contextmenu-children-row:hover{
     opacity: 0.6;
 

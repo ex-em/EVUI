@@ -27,7 +27,9 @@
           class="ev-notification-content"
         >
           <slot>
-            <p v-if="!useHTMLString">{{ message }}</p>
+            <p v-if="!useHTMLString">
+              {{ message }}
+            </p>
             <p
               v-else
               v-html="message"
@@ -238,4 +240,3 @@
     color: #F56C6C;
   }
 </style>
-

@@ -7,7 +7,7 @@
     role="dialog"
     aria-modal="true"
   >
-    <div class="ev-message-box-modal"/>
+    <div class="ev-message-box-modal" />
     <div
       :class="['ev-message-box', customClass]"
     >
@@ -35,7 +35,9 @@
             class="ev-message-box-message"
           >
             <slot>
-              <p v-if="!useHTMLString">{{ message }}</p>
+              <p v-if="!useHTMLString">
+                {{ message }}
+              </p>
               <p
                 v-else
                 v-html="message"

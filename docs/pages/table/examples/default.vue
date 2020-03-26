@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%">
+  <div style="width: 100%;">
     <input
       v-model="t"
       type="text"
@@ -18,7 +18,9 @@
       :columns="columns"
       :records="rowData"
     />
-    <button @click="getSelectedData">test</button>
+    <button @click="getSelectedData">
+      test
+    </button>
   </div>
 </template>
 

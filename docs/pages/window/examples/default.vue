@@ -12,7 +12,7 @@
       :body-style="{ padding: '10px' }"
       title="Title"
     >
-      <button-type/>
+      <button-type />
     </ev-window>
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   </div>

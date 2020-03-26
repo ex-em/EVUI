@@ -24,7 +24,9 @@
       <slot>
         <p
           v-if="!useHTMLString"
-          class="el-message-content">{{ message }}
+          class="el-message-content"
+        >
+          {{ message }}
         </p>
         <p
           v-else
@@ -40,7 +42,6 @@
     </div>
   </transition>
 </template>
-
 <script>
   // const typeMap = {
   //   info: 'info',

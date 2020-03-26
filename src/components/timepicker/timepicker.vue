@@ -1,7 +1,7 @@
 <template>
   <div
-    v-click-outside="hideTimePicker"
     ref="timePickerDiv"
+    v-click-outside="hideTimePicker"
     class="ev-timepicker"
     @click="showTimePicker"
     @mouseover="suffixFadeFlag = true"
@@ -42,7 +42,7 @@
             :key="index"
             :from="item.from"
             :to="item.to"
-            :mid="(index === 0 || index === dataSpinnerArr.length - 1) ? false : true"
+            :mid="(!(index === 0 || index === dataSpinnerArr.length - 1))"
             :selected-number="lpad10(item.initNumber)"
             :selection-start-index="index"
             @setInput="setInputText"
@@ -192,8 +192,8 @@
 
           // maxLength만큼 hhmiss가 모두 있는 경우 숫자를 입력 시 insert Mode처럼 덮어씌우기
           const postText = numberText.slice(
-            numberText.length > this.inputNumberMaxLength ?
-              changedCursorPosition + +1 : changedCursorPosition,
+            numberText.length > this.inputNumberMaxLength
+              ? changedCursorPosition + +1 : changedCursorPosition,
           );
 
           this.formattedText = null; // 필수
@@ -436,7 +436,7 @@
     }
   }
 
-  .ev-timepicker input[type=text]{
+  .ev-timepicker input[type=text] {
     display: inline-block;
     width: 100%;
     height: 100%;
@@ -452,7 +452,7 @@
   }
 
   .ev-timepicker input[type=text]:focus,
-  .ev-timepicker input[type=text]:hover{
+  .ev-timepicker input[type=text]:hover {
     outline: none;
   }
 
@@ -490,9 +490,9 @@
     width: 180px;
     height: 224px;
     margin: 12px 0 0 0;
-    border: 1px solid #dcdfe6;
+    border: 1px solid #DCDFE6;
     border-radius: 4px;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   }
   .ev-timepicker-panel.excludeFooter {
@@ -509,13 +509,13 @@
     width: 100%;
     height: 100%;
     padding-left: 5px;
-    font-size: 0; /*필수 width:33.3%*/
+    font-size: 0; /* 필수 width:33.3% */
     white-space: nowrap;
   }
   .ev-timepicker-footer {
     display: flex;
     height: 34px;
-    background-color: #f5f7fa;
+    background-color: #F5F7FA;
     text-align: right;
     justify-content: flex-end;
   }
@@ -530,7 +530,7 @@
     padding: 0 8px;
     border: none;
     background-color: transparent;
-    color: #409eff;
+    color: #409EFF;
     font-size: 12px;
     cursor: pointer;
   }

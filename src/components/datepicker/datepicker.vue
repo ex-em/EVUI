@@ -23,15 +23,12 @@
 </template>
 
 <script>
-  import Calendar from '@/components/datepicker/calendar.core';
   import moment from 'moment';
+  import Calendar from '@/components/datepicker/calendar.core';
 
   const prefixCls = 'ev-input-text';
 
   export default {
-    components: {
-      moment,
-    },
     directives: {
       // 해당 element 외의 클릭 시
       'click-outside': {

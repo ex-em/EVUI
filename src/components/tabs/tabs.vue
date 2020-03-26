@@ -73,7 +73,7 @@
       </div>
     </div>
     <div class="ev-tabs-body">
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>

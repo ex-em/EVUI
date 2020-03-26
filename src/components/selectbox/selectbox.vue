@@ -23,7 +23,7 @@
             @click="removeTag(multipleFieldFirstItem, $event)"
           >
             <div :class="`${prefixCls}-tag-close-scale`">
-              <span :class="`ei ei-close`"/>
+              <span :class="`ei ei-close`" />
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
         @keyup="onKeyUpInputField"
         @blur="onBlurInputField"
       >
-      <i :class="arrowIconClass"/>
+      <i :class="arrowIconClass" />
     </div>
     <transition name="fade">
       <Dropdown
@@ -245,9 +245,9 @@
 
         this.listBoxItems = this.items.slice();
 
-        if (!this.dropDownState &&
-          this.$refs.dropdown &&
-          this.$refs.dropdown.$refs.filterInputField) {
+        if (!this.dropDownState
+          && this.$refs.dropdown
+          && this.$refs.dropdown.$refs.filterInputField) {
           this.$refs.dropdown.$refs.filterInputField.value = '';
         }
 

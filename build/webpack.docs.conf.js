@@ -1,18 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-
 const merge = require('webpack-merge');
-const { VueLoaderPlugin } =  require ('vue-loader');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-
 const webpackBaseConfig = require('./webpack.base.conf.js');
 
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
-}
+const resolve = (dir) => path.join(__dirname, '..', dir);
 
 module.exports = merge(webpackBaseConfig, {
   devtool: 'eval-source-map',
@@ -79,8 +74,6 @@ module.exports = merge(webpackBaseConfig, {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
-    new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       filename: './index.html',
@@ -94,7 +87,6 @@ module.exports = merge(webpackBaseConfig, {
       }
     ]),
     new FriendlyErrorsPlugin(),
-    new VueLoaderPlugin(),
     // new CleanWebpackPlugin(),
     // new CleanWebpackPlugin([resolve('./demo')], {allowExternal : true }),
   ]

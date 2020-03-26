@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="contextmenu-default">컨텍스트 메뉴를 보려면 마우스 우클릭 하세요. (사용 여부 옵션: is-use)<br></div>
+    <div class="contextmenu-default">
+      컨텍스트 메뉴를 보려면 마우스 우클릭 하세요. (사용 여부 옵션: is-use)<br>
+    </div>
     <div class="contextmenu-default-body">
       <ev-context-menu
         :items="items"
@@ -83,11 +85,11 @@
 </script>
 
 <style scoped>
-  .contextmenu-default{
+  .contextmenu-default {
     height: 40px;
     margin-top: 20px;
   }
-  .contextmenu-default-body{
+  .contextmenu-default-body {
     width: 800px;
     height: 500px;
     background: #8D99A7;

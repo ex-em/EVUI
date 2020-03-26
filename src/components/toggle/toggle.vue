@@ -201,9 +201,9 @@
           };
         }
 
-        for (let ix = 0, ixLen = Object.keys(toggleWrapStyle).length; ix < ixLen; ix++) {
-          this.$refs.toggleRef.style[Object.keys(toggleWrapStyle)[ix]]
-            = toggleWrapStyle[Object.keys(toggleWrapStyle)[ix]];
+        const keys = Object.keys(toggleWrapStyle);
+        for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
+          this.$refs.toggleRef.style[keys[ix]] = toggleWrapStyle[keys[ix]];
         }
       },
       changeToggle() {
@@ -232,9 +232,9 @@
             };
           }
         }
-        for (let ix = 0, ixLen = Object.keys(toggleButtonStyle).length; ix < ixLen; ix++) {
-          this.$refs.toggleSwitch.style[Object.keys(toggleButtonStyle)[ix]]
-            = toggleButtonStyle[Object.keys(toggleButtonStyle)[ix]];
+        const keys = Object.keys(toggleButtonStyle);
+        for (let ix = 0, ixLen = keys.length; ix < ixLen; ix++) {
+          this.$refs.toggleSwitch.style[keys[ix]] = toggleButtonStyle[keys[ix]];
         }
       },
     },
@@ -385,5 +385,4 @@
       visibility: hidden;
     }
   }
-
 </style>
