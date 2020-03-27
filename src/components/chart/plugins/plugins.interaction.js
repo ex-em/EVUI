@@ -161,8 +161,7 @@ const modules = {
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
-      const findFn = useApproxiate ?
-        series.findApproximateData : series.findGraphData;
+      const findFn = useApproxiate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
         const item = findFn.call(series, offset, isHorizontal);

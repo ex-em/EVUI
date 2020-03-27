@@ -9,7 +9,7 @@
 </template>
 <script>
   const prefixCls = 'ev-label';
-  export default{
+  export default {
     props: {
       value: {
         type: [String, Number],

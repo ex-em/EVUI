@@ -1,7 +1,7 @@
 <template>
   <div class="app">
-    <main-header/>
-    <main-content/>
+    <main-header />
+    <main-content />
   </div>
 </template>
 <script>
@@ -21,7 +21,7 @@
   @import '~@/styles/default';
 
   * {
-    font-family: 'NanumGothic', Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-family: 'NanumGothic', Arial, 'Helvetica Neue', Helvetica, sans-serif;
   }
 
   .app {

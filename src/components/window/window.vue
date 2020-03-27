@@ -14,7 +14,9 @@
       :class="headerCls"
       @dblclick="headerDblClick"
     >
-      <p :class="`${prefixCls}-title-area`">{{ title }}</p>
+      <p :class="`${prefixCls}-title-area`">
+        {{ title }}
+      </p>
       <div
         :class="`${prefixCls}-btn-area`"
       >
@@ -26,10 +28,12 @@
         >
           <ev-icon
             v-if="!isFullExpandWindow"
-            :cls="'ei-expand2'" />
+            :cls="'ei-expand2'"
+          />
           <ev-icon
             v-else
-            :cls="'ei-compress2'" />
+            :cls="'ei-compress2'"
+          />
         </span>
         <span
           :class="`${prefixCls}-btn`"
@@ -43,7 +47,7 @@
       </div>
     </div>
     <div :class="`${prefixCls}-body-area`">
-      <slot/>
+      <slot />
     </div>
   </section>
 </template>

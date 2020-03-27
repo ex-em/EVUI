@@ -21,7 +21,8 @@
             :type="`square`"
             @on-click="onCheckAll"
           />
-        </li><li
+        </li>
+        <li
           v-for="(column, index) in orderedColumns"
           v-show="!column.hide"
           :key="index"
@@ -84,8 +85,8 @@
               v-for="(column, cellIndex) in orderedColumns"
               v-show="!column.hide"
               :key="cellIndex"
-              :style="
-              `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+              :style="`
+                width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             />
           </tr>
           <tr
@@ -115,7 +116,7 @@
               :data-name="column.field"
               :data-index="column.index"
               :style="
-              `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+                `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             >
               <Renderer
                 v-if="isRenderer(column)"
@@ -339,8 +340,8 @@
           // 1을 빼주는 이유는 돔에서는 소수점까지 너비를 취급하나 offsetWidth 같은 속성값은 반올림되어 저장되어 있음
           columnWidth = elWidth - result.totalWidth - 1;
           if (columnWidth > 0) {
-            remainWidth = columnWidth -
-              (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
+            remainWidth = columnWidth
+              - (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
             columnWidth = Math.floor(columnWidth / result.emptyCount);
           } else {
             columnWidth = this.columnWidth;
@@ -524,8 +525,8 @@
         const offset = 5;
         const rowHeight = this.rowHeight;
         const store = this.useFilter ? this.filteredStore : this.originStore;
-        const rowCount = el.clientHeight > rowHeight ?
-          Math.ceil(el.clientHeight / rowHeight) : store.length;
+        const rowCount = el.clientHeight > rowHeight
+          ? Math.ceil(el.clientHeight / rowHeight) : store.length;
         const totalScrollHeight = store.length * rowHeight;
         const firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
         const lastVisibleIndex = firstVisibleIndex + rowCount;

@@ -15,7 +15,7 @@
       ref="exampleLayer"
       class="evui-codeview-example-layer"
     >
-      <slot/>
+      <slot />
       <div
         v-if="description && isBottom"
         ref="descriptionLayer"
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div>
-      <div class="evui-codeview-split-layer"/>
+      <div class="evui-codeview-split-layer" />
       <div
         ref="codeLayer"
         class="evui-codeview-code-layer"
@@ -43,7 +43,7 @@
           :class="selectIconClasses"
           class="evui-codeview-example-bar-icon"
         >
-          <icon class="fa-sort-down"/>
+          <icon class="fa-sort-down" />
           <span
             class="evui-codeview-example-bar-span"
           >{{ txtBottomBar }}</span>
@@ -114,8 +114,8 @@
       },
     },
     mounted() {
-      const descriptionLayerHeight = this.$refs.descriptionLayer ?
-        this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
+      const descriptionLayerHeight = this.$refs.descriptionLayer
+        ? this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
       const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
 
       this.boxHeight = exampleLayerHeight + descriptionLayerHeight + 50;
@@ -134,8 +134,8 @@
       onBottomClick: function onBottomClick() {
         const codeLayerHeight = this.$refs.codeLayer.getBoundingClientRect().height;
         const exampleLayerHeight = this.$refs.exampleLayer.getBoundingClientRect().height;
-        const descriptionLayerHeight = this.$refs.descriptionLayer ?
-          this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
+        const descriptionLayerHeight = this.$refs.descriptionLayer
+          ? this.$refs.descriptionLayer.getBoundingClientRect().height + 14.5 : 0;
         if (this.txtBottomBar === 'Expand') {
           this.txtBottomBar = 'Hide';
           this.boxHeight = codeLayerHeight + exampleLayerHeight + descriptionLayerHeight + 33;
@@ -149,63 +149,73 @@
   };
 </script>
 <style scoped>
-  .evui-codeview{
+  .evui-codeview {
     position: relative;
     width: 100%;
-    border: 1px solid #dfe6e9;
+    border: 1px solid #DFE6E9;
     margin: 5px;
     padding: 10px 10px 20px 10px;
     border-radius: 6px;
     overflow: hidden;
     transition: height .3s ease-in-out;
   }
-  .evui-codeview.expand{
+
+  .evui-codeview.expand {
     transition: height .3s ease-in-out;
   }
-  .evui-codeview-example-layer{
+
+  .evui-codeview-example-layer {
     position: relative;
-    padding: 0px 0px 8px 0px;
+    padding: 0 0 8px 0;
   }
-  .evui-codeview-split-layer{
+
+  .evui-codeview-split-layer {
     position: relative;
-    border-bottom: 1px solid #dfe6e9;
+    border-bottom: 1px solid #DFE6E9;
   }
-  .evui-codeview-code-layer{
+
+  .evui-codeview-code-layer {
     position: relative;
     width: 100%;
     font-size: 8px;
   }
-  .evui-codeview-example-bar{
+
+  .evui-codeview-example-bar {
     position: absolute;
-    left: 0px;
-    bottom: 0px;
+    left: 0;
+    bottom: 0;
     width: 100%;
     height: 37px;
     z-index: 10;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     transition: background-color .2s ease-in-out;
   }
-  .evui-codeview-example-bar:hover{
+
+  .evui-codeview-example-bar:hover {
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.4);
   }
-  .evui-codeview-example:hover{
+
+  .evui-codeview-example:hover {
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
   }
-  .evui-codeview-example-bar-icon{
+
+  .evui-codeview-example-bar-icon {
     width: 100%;
     height: 100%;
     line-height: 25px;
     text-align: center;
   }
-  .evui-codeview-example-bar-icon i{
+
+  .evui-codeview-example-bar-icon i {
     height: 100%;
     line-height: 30px;
     font-size: 16px;
     color: rgba(30, 101, 188, 0.5);
     transition: all .3s ease-in-out;
   }
-  .evui-codeview-example-bar-icon span{
+
+  .evui-codeview-example-bar-icon span {
     line-height: 30px;
     font-size: 13px;
     font-weight: bold;
@@ -213,21 +223,24 @@
     transition: all .3s ease-in-out;
   }
 
-  .evui-codeview-example-bar-icon:hover i, .evui-codeview-example-bar-icon:hover span{
+  .evui-codeview-example-bar-icon:hover i, .evui-codeview-example-bar-icon:hover span {
     color: rgb(30, 101, 188);
     opacity: 1;
     transform: translateX(-6px);
     transition: all .3s ease-out;
   }
-  .evui-codeview-example-bar-icon.select-down i{
+
+  .evui-codeview-example-bar-icon.select-down i {
     transform: rotate(180deg);
     transition: transform .4s ease-out;
   }
+
   .evui-codeview-example-bar-icon, .evui-codeview-example-bar-icon-span {
     user-select: none;
   }
+
   .evui-codeview-description {
-    border: 1px solid #dfe6e9;
+    border: 1px solid #DFE6E9;
     border-radius: 2px;
     padding: 5px 10px 8px 10px;
     margin: 5px 3px 5px 3px;
@@ -235,7 +248,8 @@
     text-align: left;
     line-height: 1.5;
   }
-  .evui-codeview-description span{
+
+  .evui-codeview-description span {
     font-size: 13px;
   }
 </style>

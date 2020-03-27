@@ -3,59 +3,93 @@
     <nav>
       <ul>
         <li>
-          <router-link to="/">Index</router-link>
+          <router-link to="/">
+            Index
+          </router-link>
         </li>
         <li>
-          <router-link to="/button">Button</router-link>
+          <router-link to="/button">
+            Button
+          </router-link>
         </li>
         <li>
-          <router-link to="/chart">Chart</router-link>
+          <router-link to="/chart">
+            Chart
+          </router-link>
         </li>
         <li>
-          <router-link to="/checkbox">Checkbox</router-link>
+          <router-link to="/checkbox">
+            Checkbox
+          </router-link>
         </li>
         <li>
-          <router-link to="/selectbox">Selectbox</router-link>
+          <router-link to="/selectbox">
+            Selectbox
+          </router-link>
         </li>
         <li>
-          <router-link to="/slider">Slider</router-link>
+          <router-link to="/slider">
+            Slider
+          </router-link>
         </li>
         <li>
-          <router-link to="/table">Table(page)</router-link>
+          <router-link to="/table">
+            Table(page)
+          </router-link>
         </li>
         <li>
-          <router-link to="/table2">Table(virtualScroll)</router-link>
+          <router-link to="/table2">
+            Table(virtualScroll)
+          </router-link>
         </li>
         <li>
-          <router-link to="/table3">Table(normal)</router-link>
+          <router-link to="/table3">
+            Table(normal)
+          </router-link>
         </li>
         <li>
-          <router-link to="/loadingmask">Loadingmask</router-link>
+          <router-link to="/loadingmask">
+            Loadingmask
+          </router-link>
         </li>
         <li>
-          <router-link to="/timepicker">Timepicker</router-link>
+          <router-link to="/timepicker">
+            Timepicker
+          </router-link>
         </li>
         <li>
-          <router-link to="/toggle">Toggle</router-link>
+          <router-link to="/toggle">
+            Toggle
+          </router-link>
         </li>
         <li>
-          <router-link to="/input">Input</router-link>
+          <router-link to="/input">
+            Input
+          </router-link>
         </li>
         <li>
-          <router-link to="/radio">Radio</router-link>
+          <router-link to="/radio">
+            Radio
+          </router-link>
         </li>
         <li>
-          <router-link to="/message">Message</router-link>
+          <router-link to="/message">
+            Message
+          </router-link>
         </li>
         <li>
-          <router-link to="/notification">Notification</router-link>
+          <router-link to="/notification">
+            Notification
+          </router-link>
         </li>
         <li>
-          <router-link to="/message-box">MessageBox</router-link>
+          <router-link to="/message-box">
+            MessageBox
+          </router-link>
         </li>
       </ul>
     </nav>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 <script>

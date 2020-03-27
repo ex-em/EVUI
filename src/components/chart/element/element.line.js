@@ -98,8 +98,8 @@ class Line {
         }
 
         startFillIndex = ix + 1;
-      } else if (ix === 0 || prev.y === null || curr.y === null ||
-        prev.x === null || curr.x === null) {
+      } else if (ix === 0 || prev.y === null || curr.y === null
+        || prev.x === null || curr.x === null) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);

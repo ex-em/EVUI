@@ -6,7 +6,7 @@
     @click="onClick"
   >
     <span :class="`${prefixCls}-span`">
-      <slot/>
+      <slot />
     </span>
   </button>
 </template>

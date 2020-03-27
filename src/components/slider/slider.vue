@@ -11,11 +11,13 @@
         :key="name+'Dot'+idx"
         :style="{ left: `${item.valuePer}%` }"
         :class="`${prefixCls}-dot`"
-        @click="onClick"/>
+        @click="onClick"
+      />
     </template>
     <div
       :style="barStyle"
-      :class="`${prefixCls}-bar`"/>
+      :class="`${prefixCls}-bar`"
+    />
     <slider-tooltip
       :pos-x="leftBtnValuePer"
       :is-dragging="leftBtnDragging"
@@ -392,14 +394,8 @@
   };
 </script>
 
-
 <style lang="scss">
   @import '~@/styles/default';
-/************************************************************************************
- Slider Component
-************************************************************************************/
-
-/** evui-slider **/
 
   .evui-slider {
     position: relative;
@@ -407,22 +403,20 @@
     height: 4px;
     margin: 4px 0;
     vertical-align: middle;
-    background-color: #e9eaec;
+    background-color: #E9EAEC;
     border-radius: 3px;
   }
   .evui-slider-dragging {
-    border-color: #2d8cf0;
-    cursor: -webkit-grabbing;
+    border-color: #2D8CF0;
     cursor: grabbing;
   }
   .evui-slider:hover:not(.evui-slider-dragging) {
-    cursor: -webkit-grab;
     cursor: grab;
   }
   .evui-slider-bar {
     position: absolute;
     height: 4px;
-    background: #57a3f3;
+    background: #57A3F3;
     border-radius: 3px;
   }
   .evui-slider-btn {
@@ -430,21 +424,21 @@
     top: -4px;
     width: 12px;
     height: 12px;
-    border: 2px solid #57a3f3;
+    border: 2px solid #57A3F3;
     border-radius: 50%;
     text-align: center;
-    background-color: #fff;
+    background-color: #FFFFFF;
     outline: 0;
     transform: translateX(-4px);
   }
   .evui-slider-btn-dragging:not(:hover) {
-    border-color: #2d8cf0;
+    border-color: #2D8CF0;
     transform: translateX(-4px) scale(1.5);
     transition: transform .2s linear;
   }
   .evui-slider-btn:focus,
   .evui-slider-btn:hover {
-    border-color: #2d8cf0;
+    border-color: #2D8CF0;
     transform: translateX(-4px) scale(1.5);
     transition: transform .2s linear;
   }
@@ -454,23 +448,23 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background-color: #ccc;
+    background-color: #CCCCCC;
   }
   .evui-slider-disabled {
-    cursor: not-allowed
+    cursor: not-allowed;
   }
   .evui-slider-disabled .evui-slider {
-    background-color: #ccc;
-    cursor: not-allowed
+    background-color: #CCCCCC;
+    cursor: not-allowed;
   }
   .evui-slider-disabled .evui-slider-bar {
-    background-color: #ccc
+    background-color: #CCCCCC;
   }
   .evui-slider-disabled .evui-slider-btn {
-    border-color: #ccc
+    border-color: #CCCCCC;
   }
   .evui-slider-disabled .evui-slider-btn:hover {
-    border-color: #ccc;
+    border-color: #CCCCCC;
     cursor: not-allowed;
   }
   .evui-slider-input .evui-slider {

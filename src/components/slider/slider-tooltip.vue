@@ -5,7 +5,7 @@
     @mouseover="onMouseOver"
     @mouseout="onMouseOut"
   >
-    <slot/>
+    <slot />
     <transition name="fade">
       <div :class="popperClasses">
         <div
@@ -14,7 +14,7 @@
         >
           {{ content }}
         </div>
-        <div :class="`${prefixCls}-arrow`"/>
+        <div :class="`${prefixCls}-arrow`" />
       </div>
     </transition>
   </div>
@@ -102,7 +102,7 @@
     text-align: left;
     text-decoration: none;
     border-radius: 4px;
-    color: #fff;
+    color: #FFFFFF;
     background-color: rgba(70, 76, 91, .9);
     box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
     white-space: nowrap;

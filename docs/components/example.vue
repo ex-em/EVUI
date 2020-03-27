@@ -1,7 +1,9 @@
 <template>
   <section>
     <h2>{{ title }}</h2>
-    <p class="example-desc">{{ description }}</p>
+    <p class="example-desc">
+      {{ description }}
+    </p>
     <div :class="{ 'example': true, 'vertical': vertical }">
       <div
         class="edit-code"
@@ -14,7 +16,7 @@
         />
       </div>
       <div class="contents">
-        <component :is="contents"/>
+        <component :is="contents" />
       </div>
       <CodeView
         :code-url="url"
@@ -124,7 +126,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border: 1px solid #ffdd57;
+    border: 1px solid #FFDD57;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
@@ -140,10 +142,10 @@
   }
   .example:before {
     position: absolute;
-    background: #ffdd57;
+    background: #FFDD57;
     border-radius: 4px 4px 0 0;
     bottom: 100%;
-    content: "EXAMPLE";
+    content: 'EXAMPLE';
     font-size: 8px;
     font-weight: bold;
     left: -1px;
@@ -153,7 +155,7 @@
     position: absolute;
     display: flex;
     align-items: center;
-    background: #ffdd57;
+    background: #FFDD57;
     border-radius: 4px 4px 0 0;
     font-size: 8px;
     font-weight: bold;
@@ -168,7 +170,7 @@
     padding: 15px;
   }
   hr.example-splitter {
-    background-color: #f5f5f5;
+    background-color: #F5F5F5;
     border-top: rgba(0, 0, 0, 0.7);
     margin: 30px 0;
   }

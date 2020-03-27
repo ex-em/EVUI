@@ -12,9 +12,6 @@
   import Calendar from '@/components/datepicker/calendar.core';
 
   export default {
-    components: {
-      Calendar,
-    },
     props: {
       value: {
         type: String,

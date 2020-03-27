@@ -6,10 +6,10 @@
   >
     <input
       :id="`${radioId}_${value}`"
+      v-model="bindValue"
       :value="value"
       :name="groupName"
       :disabled="disabled"
-      v-model="bindValue"
       type="radio"
       class="ev-radio-input"
       @change="onChange"
@@ -19,7 +19,7 @@
       :class="[dataSize, type]"
       class="ev-radio-label"
     >
-      <slot/>
+      <slot />
     </label>
   </div>
 </template>

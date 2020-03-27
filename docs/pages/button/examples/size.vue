@@ -13,7 +13,7 @@
         :size="btn.size"
         :shape="btn.shape"
       >
-        <i :class="btn.iconCls"/>
+        <i :class="btn.iconCls" />
         {{ btn.text }}
       </ev-button>
       <br>

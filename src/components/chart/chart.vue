@@ -1,7 +1,7 @@
 <template>
   <div
-    v-resize.debounce="onResize"
     ref="wrapper"
+    v-resize.debounce="onResize"
     :style="wrapperStyle"
     class="ev-chart"
   />

@@ -22,8 +22,8 @@
     <h5># small</h5>
     <br>
     <Checkbox
-      :value="stringCustomValue"
       v-model="vModel2"
+      :value="stringCustomValue"
       :size="`small`"
       class="checkboxStyle"
     >

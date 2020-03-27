@@ -4,8 +4,8 @@
     <h5># Default Radio Button</h5>
     <br>
     <radio
-      :value="`value01`"
       v-model="bindVModel01"
+      :value="`value01`"
     >
       Single Radio
     </radio>
@@ -14,9 +14,9 @@
     <h5># Default Disabled Radio Button</h5>
     <br>
     <radio
+      v-model="bindVModel02"
       :value="`value02`"
       :disabled="true"
-      v-model="bindVModel02"
     >
       Disabled Single Radio
     </radio>
@@ -25,9 +25,9 @@
     <h5># Default Small Radio Button</h5>
     <br>
     <radio
+      v-model="bindVModel03"
       :value="`value02`"
       :size="`small`"
-      v-model="bindVModel03"
     >
       <p
         style="font-size: 12px;"
@@ -40,10 +40,10 @@
     <h5># Default Disabled Small Radio Button</h5>
     <br>
     <radio
+      v-model="bindVModel04"
       :value="`value04`"
       :disabled="true"
       :size="`small`"
-      v-model="bindVModel04"
     >
       <p
         style="font-size: 12px;"

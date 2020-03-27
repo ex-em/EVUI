@@ -31,16 +31,16 @@
           /> {{ menu.name }}
         </div>
         <ul
-          v-for="(submenu, index) in menu.children"
+          v-for="(submenu, idx) in menu.children"
           v-show="menu.children"
-          :key="submenu.name + index"
+          :key="submenu.name + idx"
           class="evui-menu-group-sub"
         >
           <router-link :to="submenu.routerLink">
             <li
               :class="selectedMenu.name === submenu.name ? 'active' : ''"
               class="evui-menu-item"
-              @click="setSelectedMenu(menu.name, submenu.name, index)"
+              @click="setSelectedMenu(menu.name, submenu.name, idx)"
             >
               {{ submenu.name }}
             </li>
@@ -95,7 +95,7 @@
     color: #2D89EF;
   }
   a:visited {
-    color: #000;
+    color: #000000;
   }
   .evui-left-navigation {
     position: absolute;
@@ -106,7 +106,7 @@
   .evui-menu {
     display: block;
     width: 100%;
-    background: #fff;
+    background: #FFFFFF;
   }
   .evui-menu-group {
     list-style-type: none;

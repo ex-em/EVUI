@@ -16,7 +16,7 @@
           value="or"
         >
         <label> OR </label>
-        <div style="float:right">
+        <div style="float: right;">
           <button
             ref="addButton"
             disabled="true"
@@ -29,16 +29,16 @@
       <div
         v-for="(item, index) in filterDataList"
         :key="index"
-        style="margin:3px;"
+        style="margin: 3px;"
       >
         <select
           v-model="item.condition"
           @change="changeCondition"
         >
           <option
-            v-for="item in condition"
-            :value="item.value"
-            :key="item.value"
+            v-for="opt in condition"
+            :key="opt.value"
+            :value="opt.value"
           >
             {{ item.name }}
           </option>
@@ -46,7 +46,7 @@
         <input
           v-model="item.text"
           type="text"
-          style="width:120px;"
+          style="width: 120px;"
           @focus="focusTextbox(index, $event.target.value)"
           @input="changeFilterValue(index, $event.target.value)"
         >
@@ -163,7 +163,7 @@
   };
 </script>
 <style scoped>
-  .evui-table-filter-body,  .evui-table-filter-body select, .evui-table-filter-body input{
+  .evui-table-filter-body, .evui-table-filter-body select, .evui-table-filter-body input {
     font-family: Verdana, Arial, sans-serif;
     font-size: 11px;
   }

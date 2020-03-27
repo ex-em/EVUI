@@ -26,7 +26,7 @@
           :class="innerDownClasses"
           @click="preventDefault"
         />
-        <icon class="ei-arrow-down"/>
+        <icon class="ei-arrow-down" />
       </a>
     </div>
     <div
@@ -333,17 +333,17 @@
     display: inline-block;
     width: 100%;
     line-height: 1.5;
-    padding: 0px;
+    padding: 0;
     font-size: 12px;
     color: #495060;
-    background-color: #fff;
+    background-color: #FFFFFF;
     background-image: none;
     position: relative;
     cursor: text;
     margin: 0;
     height: 32px;
     vertical-align: middle;
-    border: 1px solid #dddee1;
+    border: 1px solid #DDDEE1;
     border-radius: 4px;
     overflow: hidden;
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -354,32 +354,34 @@
       background-color: evThemed('number-input-background');
     }
   }
+
   .ev-input-number-handler-wrap {
     width: 22px;
     height: 100%;
-    border-left: 1px solid #dddee1;
+    border-left: 1px solid #DDDEE1;
     border-radius: 0 4px 4px 0;
-    background: #fff;
+    background: #FFFFFF;
     position: absolute;
     top: 0;
     right: 0;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
   }
-  /*border color when mouse hover*/
+  /* border color when mouse hover */
   .ev-input-number:hover {
-    border-color: #2d8cf0;
+    border-color: #2D8CF0;
   }
+
   .ev-input-number:hover .ev-input-number-handler-wrap {
-    border-color: #2d8cf0;
+    border-color: #2D8CF0;
     opacity: 1;
   }
 
-  .ev-input-number:hover i{
-    color : #2d8cf0;
+  .ev-input-number:hover i {
+    color: #2D8CF0;
   }
 
-  /*inner input div class*/
+  /* inner input div class */
   .ev-input-number-input-wrap {
     overflow: hidden;
     height: 32px;
@@ -402,7 +404,7 @@
     }
   }
 
-  /*handler line class*/
+  /* handler line class */
   .ev-input-number-handler {
     display: block;
     width: 100%;
@@ -410,27 +412,31 @@
     line-height: 0;
     text-align: center;
     overflow: hidden;
-    color: #999;
+    color: #999999;
     position: relative;
     padding-top: 1px;
     padding-left: 1px;
+
     @include evThemify() {
       color: evThemed('font-color-base');
       border: $border-solid evThemed('number-input-border');
       background-color: evThemed('number-input-background');
     }
   }
+
   .ev-input-number-handler-up {
     cursor: pointer;
   }
+
   .ev-input-number-handler-down {
-    border-top: 1px solid #dddee1;
+    border-top: 1px solid #DDDEE1;
     top: -1px;
     cursor: pointer;
   }
-  /*disable base class*/
+  /* disable base class */
   .ev-input-number-disabled {
     cursor: not-allowed;
+
     @include evThemify() {
       color: evThemed('number-input-disabled');
       background-color: evThemed('number-input-disabled-background');
@@ -439,19 +445,22 @@
     .ev-input-number-handler-wrap {
       display: none;
     }
+
     .ev-input-number-handler {
       opacity: .72;
       cursor: not-allowed;
     }
+
     .ev-input-number-input {
       opacity: 1;
       cursor: not-allowed;
+
       @include evThemify() {
         color: evThemed('textfield-input-disabled');
       }
     }
   }
-  /*use border color when mouse hover*/
+  /* use border color when mouse hover */
   .ev-input-number-disabled:hover {
     border-color: $color-not-allow;
   }

@@ -1,7 +1,6 @@
 <template>
   <div>
-    <toggle
-    />
+    <toggle />
   </div>
 </template>
 <script>

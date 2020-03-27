@@ -6,9 +6,9 @@
     <input
       v-if="!isGroup"
       :id="`${checkboxId}_${value}`"
+      v-model="bindValue"
       :value="value"
       :disabled="disabled"
-      v-model="bindValue"
       type="checkbox"
       class="ev-checkbox-input"
       @change="change"
@@ -17,9 +17,9 @@
     <input
       v-else
       :id="`${checkboxId}_${value}`"
+      v-model="groupBindValue"
       :value="value"
       :disabled="disabled"
-      v-model="groupBindValue"
       type="checkbox"
       class="ev-checkbox-input group"
       @change="change"
@@ -29,7 +29,7 @@
       :class="[dataSize, dataType, dataAfterType]"
       class="ev-checkbox-label"
     >
-      <slot/>
+      <slot />
     </label>
   </div>
 </template>
@@ -237,13 +237,6 @@
       border-width: 0 1px 1px 0;
       transform: rotate(45deg);
       content: '';
-    }
-
-    &:checked + .ev-checkbox-label.check.small:after {
-      top: 3px;
-      left: 6px;
-      width: 4px;
-      height: 6px;
     }
 
     /* checked -- type: square */

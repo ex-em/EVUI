@@ -64,8 +64,8 @@
           size: width: {{ customStyle1.width }} / height: {{ customStyle1.height }}
         </span><br><br>
         <ev-selectbox
-          :style="customStyle1"
           v-model="vModel3"
+          :style="customStyle1"
           :name="'box_3'"
           :size="'small'"
           :multiple="true"
@@ -82,8 +82,8 @@
           size: width: {{ customStyle2.width }} / height: {{ customStyle2.height }}
         </span><br><br>
         <ev-selectbox
-          :style="customStyle2"
           v-model="vModel4"
+          :style="customStyle2"
           :name="'box_4'"
           :multiple="true"
           :items="items4"
@@ -99,8 +99,8 @@
           size: width: {{ customStyle3.width }} / height: {{ customStyle3.height }}
         </span><br><br>
         <ev-selectbox
-          :style="customStyle3"
           v-model="vModel5"
+          :style="customStyle3"
           :name="'box_5'"
           :multiple="true"
           :items="items5"

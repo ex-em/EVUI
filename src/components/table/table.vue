@@ -10,12 +10,12 @@
     >
       <div
         class="evui-grid-box"
-        style="width:100%;height:100%;"
+        style="width: 100%; height: 100%;"
       >
         <div
           ref="evuiGridBody"
           class="evui-table-body"
-          style="top: 0px; bottom: 0px; left: 0px; right: 0px;"
+          style="top: 0; bottom: 0; left: 0; right: 0;"
         >
           <div
             ref="evuiGridRecords"
@@ -32,7 +32,7 @@
                     <td
                       class="evui-table-data evui-table-data-spacer"
                       data-col="start"
-                      style="height: 0px; width: 0px;"
+                      style="height: 0; width: 0;"
                     />
 
                     <template v-for="(column, index) in originColumns">
@@ -59,7 +59,7 @@
                       <td
                         class="evui-table-data-spacer"
                         data-col="start"
-                        style="border-right: 0"
+                        style="border-right: 0;"
                       />
 
                       <template v-for="(col, colIndex) in originColumns">
@@ -80,7 +80,7 @@
                             v-else-if="col.type === 'checkbox'"
                             :class="{ 'evui-selected': row[col.field]}"
                             class="evui-table-records-col"
-                            style="text-overflow:unset;"
+                            style="text-overflow: unset;"
                           >
                             <ev-checkbox
                               v-model="row[col.field]"
@@ -122,7 +122,7 @@
                   </template>
 
                   <tr
-                    style="display: none"
+                    style="display: none;"
                   >
                     <td
                       colspan="2000"
@@ -144,14 +144,14 @@
                   <td
                     class="evui-table-columns-head"
                     data-col="start"
-                    style="border-right: 0px; width: 0px;"
+                    style="border-right: 0; width: 0;"
                   />
                   <template v-for="(column, index) in originColumns">
                     <td
+                      :ref="`${column.field}_col`"
                       :key="index"
                       :data-col="index"
                       :style="{width: column.width}"
-                      :ref="`${column.field}_col`"
                       class="evui-table-columns-head"
                       @mouseup="columnSort(column, $event)"
                       @mousedown.stop.prevent="columnMove(column, index, $event)"
@@ -195,26 +195,26 @@
         <div
           v-if="pagination"
           class="evui-table-footer"
-          style="bottom: 0px; left: 0px; right: 0px;"
+          style="bottom: 0; left: 0; right: 0;"
         >
           <div>
-            <div class="evui-table-footer-left"/>
+            <div class="evui-table-footer-left" />
             <div class="evui-table-footer-right">
               <button @click="movePage('start')">
-                <i class="fas fa-angle-double-left"/>
+                <i class="fas fa-angle-double-left" />
               </button>
               <button @click="movePage('before')">
-                <i class="fas fa-angle-left"/>
+                <i class="fas fa-angle-left" />
               </button>
               {{ currentPageInput }} / {{ lastPage }}
               <button @click="movePage('next')">
-                <i class="fas fa-angle-right"/>
+                <i class="fas fa-angle-right" />
               </button>
               <button @click="movePage('end')">
-                <i class="fas fa-angle-double-right"/>
+                <i class="fas fa-angle-double-right" />
               </button>
             </div>
-            <div class="evui-table-footer-center"/>
+            <div class="evui-table-footer-center" />
           </div>
         </div>
       </div>
@@ -226,8 +226,8 @@
         ref="marker"
         class="evui-table-col-intersection-marker"
       >
-        <div class="evui-table-top-marker"/>
-        <div class="evui-table-bottom-marker"/>
+        <div class="evui-table-top-marker" />
+        <div class="evui-table-bottom-marker" />
       </div>
     </div>
     <div
@@ -237,7 +237,7 @@
       <div
         class="evui-table-menu-tab-header"
       >
-        <i class="fa fa-filter"/>
+        <i class="fa fa-filter" />
       </div>
       <div
         class="evui-table-menu-tab-body"
@@ -251,7 +251,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -470,8 +469,8 @@
           const colWidth = util.quantity(this.originColumns[ix].size);
           const isPercentValue = colWidth ? colWidth.unit === '%' : false;
           const min = util.quantity(this.originColumns[ix].min).value;
-          const max = this.originColumns[ix].max ?
-            util.quantity(this.originColumns[ix].max).value : undefined;
+          const max = this.originColumns[ix].max
+            ? util.quantity(this.originColumns[ix].max).value : undefined;
 
           // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
           if (isPercentValue) {
@@ -503,8 +502,8 @@
           for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
             // debugger;
             const min = util.quantity(this.noSizeColList[ix].min).value;
-            const max = this.noSizeColList[ix].max ?
-              util.quantity(this.noSizeColList[ix].max).value : undefined;
+            const max = this.noSizeColList[ix].max
+              ? util.quantity(this.noSizeColList[ix].max).value : undefined;
             const isLastIndex = (ix + 1) === ixLen;
             if (!isLastIndex) {
               leftSize -= util.checkColSize(colSize, min, max);
@@ -738,8 +737,8 @@
         this.resizeFlag = true;
         const startOffset = util.quantity(vm.originColumns[index].width).value - event.screenX;
         const min = util.quantity(vm.originColumns[index].min).value;
-        const max = vm.originColumns[index].max ?
-          util.quantity(vm.originColumns[index].max).value : undefined;
+        const max = vm.originColumns[index].max
+          ? util.quantity(vm.originColumns[index].max).value : undefined;
 
         function onMouseMove(e) {
           e.stopPropagation();
@@ -785,8 +784,7 @@
         function moveAt(clientX, clientY) {
           const posX = (clientX - startClientX) + 15;
           const posY = (clientY - startClientY) + 20;
-          vm.$refs.headGhost.style.cssText =
-            `top: ${posY}px; left: ${posX}px; display: block`;
+          vm.$refs.headGhost.style.cssText = `top: ${posY}px; left: ${posX}px; display: block`;
         }
 
         // 컬럼 배열 변경
@@ -911,16 +909,16 @@
       },
       movePage(value) {
         switch (value) {
-          case 'start' :
+          case 'start':
                 this.currentPageInput = 1;
                 break;
-          case 'before' :
+          case 'before':
                 this.currentPageInput -= 1;
                 break;
-          case 'next' :
+          case 'next':
                 this.currentPageInput += 1;
                 break;
-          case 'end' :
+          case 'end':
                 this.currentPageInput = this.lastPage;
                 break;
           default:
@@ -1000,8 +998,8 @@
           const colWidth = util.quantity(this.originColumns[ix].size);
           const isPercentValue = colWidth ? colWidth.unit === '%' : false;
           const min = util.quantity(this.originColumns[ix].min).value;
-          const max = this.originColumns[ix].max ?
-            util.quantity(this.originColumns[ix].max).value : undefined;
+          const max = this.originColumns[ix].max
+            ? util.quantity(this.originColumns[ix].max).value : undefined;
 
           // 숫자로 넘어올때 px 붙여주기용 이상한 값 처리등 % 값일때 처리
           if (isPercentValue) {
@@ -1017,11 +1015,11 @@
         }
 
         if (this.isFilter) {
-          this.verticalScroll = this.gridRecordsHeight <
-            (this.filteredData.length * this.rowHeight);
+          this.verticalScroll = this.gridRecordsHeight
+            < (this.filteredData.length * this.rowHeight);
         } else {
-          this.verticalScroll = this.gridRecordsHeight <
-            (this.originData.length * this.rowHeight);
+          this.verticalScroll = this.gridRecordsHeight
+            < (this.originData.length * this.rowHeight);
         }
 
         let leftSize;
@@ -1039,8 +1037,8 @@
           for (let ix = 0, ixLen = this.noSizeColList.length; ix < ixLen; ix++) {
             // debugger;
             const min = util.quantity(this.noSizeColList[ix].min).value;
-            const max = this.noSizeColList[ix].max ?
-              util.quantity(this.noSizeColList[ix].max).value : undefined;
+            const max = this.noSizeColList[ix].max
+              ? util.quantity(this.noSizeColList[ix].max).value : undefined;
             const isLastIndex = (ix + 1) === ixLen;
             if (!isLastIndex) {
               leftSize -= util.checkColSize(colSize, min, max);
@@ -1095,7 +1093,7 @@
               result = (data1.indexOf(data2) === -1);
             }
             break;
-          default :
+          default:
             break;
         }
         return result;
@@ -1133,8 +1131,13 @@
               const condition = valueList[ix].condition;
 
               if (ix > 0) {
-                resultCondition
-                  = this.checkCondition(data1, data2, condition, andOrCondition, resultCondition);
+                resultCondition = this.checkCondition(
+                  data1,
+                  data2,
+                  condition,
+                  andOrCondition,
+                  resultCondition,
+                );
               } else {
                 resultCondition = this.checkCondition(data1, data2, condition);
               }
@@ -1194,8 +1197,13 @@
                 const condition = valueList[jx].condition;
 
                 if (ix > 0) {
-                  resultCondition
-                    = this.checkCondition(data1, data2, condition, andOrCondition, resultCondition);
+                  resultCondition = this.checkCondition(
+                    data1,
+                    data2,
+                    condition,
+                    andOrCondition,
+                    resultCondition,
+                  );
                 } else {
                   resultCondition = this.checkCondition(data1, data2, condition);
                 }
@@ -1238,8 +1246,7 @@
           vm.menuClickFlag = false;
           document.removeEventListener('mousedown', onClick, true);
         }
-        this.$refs.evuiTableMenu.style.cssText =
-          `left: ${posX}px; top: ${posY}px; display: block;`;
+        this.$refs.evuiTableMenu.style.cssText = `left: ${posX}px; top: ${posY}px; display: block;`;
         if (!this.menuClickFlag) {
           document.addEventListener('mousedown', onClick, true);
           this.menuClickFlag = true;

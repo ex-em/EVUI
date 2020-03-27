@@ -49,8 +49,7 @@ const notificationManager = {
     const positionStyle = instance.position.split('-')[0];
     for (let ix = 0; ix < notiList.length; ix++) {
       el = notiList[ix].$el;
-      el.style[positionStyle] =
-        `${parseInt(el.style[positionStyle], 10) - notiList[ix].height - this.increaseOffsetVal}px`;
+      el.style[positionStyle] = `${parseInt(el.style[positionStyle], 10) - notiList[ix].height - this.increaseOffsetVal}px`;
     }
   },
   closeAll() {

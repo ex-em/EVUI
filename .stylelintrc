@@ -7,7 +7,15 @@
     "declaration-block-single-line-max-declarations": 1,
     "max-nesting-depth": 3,
     "selector-max-compound-selectors": 3,
-    "selector-no-qualifying-type": true,
+    "selector-no-qualifying-type": [
+      true,
+      {
+        "ignore": [
+          "attribute",
+          "class"
+        ]
+      }
+    ],
     "no-duplicate-selectors": true,
     "block-no-empty": true,
     "at-rule-empty-line-before": [

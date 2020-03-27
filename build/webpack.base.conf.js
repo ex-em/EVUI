@@ -1,11 +1,8 @@
 const path = require('path');
-const webpack = require('webpack');
-const pkg = require('../package.json');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const VueLoaderPlugin =  require ('vue-loader/lib/plugin');
 
-function resolve (dir) {
-  return path.join(__dirname, '..', dir);
-}
+const resolve = (dir) => path.join(__dirname, '..', dir);
 
 module.exports = {
   resolve: {
@@ -14,7 +11,6 @@ module.exports = {
       'vue': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       'evui': resolve('src'),
-      'main': resolve('maxgauge'),
     }
   },
   stats: 'errors-warnings',
@@ -69,12 +65,9 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.VERSION': `'${pkg.version}'`
-    }),
     new MiniCssExtractPlugin({
       filename: '[name].css'
     }),
+    new VueLoaderPlugin(),
   ]
 };

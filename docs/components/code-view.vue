@@ -5,8 +5,8 @@
     <div class="contents">
       <ev-button
         v-show="isExpanded"
-        :type="'text'"
         :key="'copy-btn'"
+        :type="'text'"
         class="copy-btn"
       >
         <ev-icon
@@ -19,8 +19,8 @@
       />
       <ev-button
         v-show="!isExpanded"
-        :type="'text'"
         :key="'show-code'"
+        :type="'text'"
         class="show-code"
         @click="isExpanded = true"
       >
@@ -31,8 +31,8 @@
       </ev-button>
       <ev-button
         v-show="isExpanded"
-        :type="'text'"
         :key="'hide-code'"
+        :type="'text'"
         class="hide-code"
         @click="isExpanded = false"
       >

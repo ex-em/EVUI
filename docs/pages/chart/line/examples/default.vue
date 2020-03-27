@@ -7,9 +7,9 @@
       @on-click="onClick"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <ev-button
-        @click="onClickLiveBtn"
-      >{{ liveBtnInfo.text }}</ev-button>
+      <ev-button @click="onClickLiveBtn">
+        {{ liveBtnInfo.text }}
+      </ev-button>
     </div>
     <br>
   </div>

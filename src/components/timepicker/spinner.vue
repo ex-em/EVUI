@@ -100,8 +100,7 @@
           const idx = this.findIndexToValue(clickedNumber);
           if (idx !== null) {
             // move scroll
-            this.$refs.spinnerContent.scrollTop
-              = this.$refs.spinnerLi[idx].offsetTop - 76;
+            this.$refs.spinnerContent.scrollTop = this.$refs.spinnerLi[idx].offsetTop - 76;
             this.initAllClass();
             this.activeClass(clickedNumber);
             if (clickFlag) {
@@ -149,31 +148,29 @@
     max-height: 185px;
   }
 
-  .evui-timepicker-spinner-content{
+  .evui-timepicker-spinner-content {
     overflow: scroll;
     height: 100%;
     max-height: inherit;
-    font-size: 0px; /*width 33.3% inline-block 시 필요*/
+    font-size: 0; /* width 33.3% inline-block 시 필요 */
   }
-  .evui-timepicker-spinner-content::-webkit-scrollbar
-  {
+  .evui-timepicker-spinner-content::-webkit-scrollbar {
     width: 5px;
-    height: 0px;
+    height: 0;
     background-color: rgba(0,0,0,0);
   }
 
-  .evui-timepicker-spinner-content:hover
-  {
+  .evui-timepicker-spinner-content:hover {
     overflow: scroll;
   }
-  .evui-timepicker-spinner-content:hover::-webkit-scrollbar
-  {
+
+  .evui-timepicker-spinner-content:hover::-webkit-scrollbar {
     width: 5px;
-    height: 0px;
-    background-color: #ffffff;
+    height: 0;
+    background-color: #FFFFFF;
   }
-  .evui-timepicker-spinner-content:hover::-webkit-scrollbar-thumb
-  {
+
+  .evui-timepicker-spinner-content:hover::-webkit-scrollbar-thumb {
     border-radius: 4px;
     background-color: rgba(0,0,0,.1);
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.1);
@@ -186,6 +183,7 @@
     text-align: center;
     cursor: pointer;
   }
+
   .evui-timepicker-spinner-list .evui-timepicker-spinner-item {
     display: list-item;
     height: 32px;
@@ -195,11 +193,11 @@
   }
 
   .evui-timepicker-spinner-list .evui-timepicker-spinner-item:hover {
-    background-color: #f5f7fa;
+    background-color: #F5F7FA;
   }
   .evui-timepicker-spinner-list .evui-timepicker-spinner-item.active,
   .evui-timepicker-spinner-list .evui-timepicker-spinner-item.active:hover {
     background-color: #41B883;
-    color: #ffffff;
+    color: #FFFFFF;
   }
 </style>

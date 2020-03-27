@@ -5,7 +5,7 @@
         :vue-instance="component"
         :code="code"
       >
-        <checkbox/>
+        <checkbox />
       </code-view>
     </div>
   </div>

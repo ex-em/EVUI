@@ -5,9 +5,7 @@
       :options="chartOptions"
     />
     <div style="position: absolute; top: 0; right: 0;">
-      <ev-button
-        @click="onchangeSeries"
-      >
+      <ev-button @click="onchangeSeries">
         {{ changeSeriesBtnInfo.text }}
       </ev-button>
     </div>

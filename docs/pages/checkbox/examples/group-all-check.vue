@@ -5,8 +5,8 @@
     <h5># normal</h5>
     <br>
     <Checkbox
-      :value="`allCheckBoxValue`"
       v-model="allCheckClick"
+      :value="`allCheckBoxValue`"
       class="checkboxStyle"
       @on-change="allCheckEvent"
     >
@@ -57,8 +57,8 @@
     <h5># include disabled</h5>
     <br>
     <Checkbox
-      :value="`allCheckBoxValue1`"
       v-model="allCheckClick1"
+      :value="`allCheckBoxValue1`"
       class="checkboxStyle"
       @on-change="allCheckEvent1"
     >

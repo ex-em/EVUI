@@ -328,6 +328,4 @@
   .ev-login-password:valid ~ .loginLabel {
     color: $color-primary;
   }
-
 </style>
-

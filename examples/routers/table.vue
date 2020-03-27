@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%">
+  <div style="width: 100%;">
     <ev-table
       ref="test"
       :width="'50%'"
@@ -8,7 +8,9 @@
       :columns="columns"
       :records="rowData"
     />
-    <button @click="add">add row</button>
+    <button @click="add">
+      add row
+    </button>
   </div>
 </template>
 

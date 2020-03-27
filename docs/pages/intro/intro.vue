@@ -2,7 +2,7 @@
   <div class="evui-summary">
     <div class="evui-summary-header">
       <h3>
-        <i class="far fa-list-alt"/> Guide Summary
+        <i class="far fa-list-alt" /> Guide Summary
       </h3>
       <br><br>
       <p>
@@ -53,4 +53,3 @@
     font-size: 14px;
   }
 </style>
-

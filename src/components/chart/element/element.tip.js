@@ -94,8 +94,8 @@ const modules = {
       } else if (lastTip.value !== null) {
         value = lastTip.value;
       } else if (lastTip.pos !== null) {
-        const item = type === 'bar' ?
-          this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
+        const item = type === 'bar'
+          ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
 
         value = item.useStack ? item.acc : item.value;
         lastTip.value = value;
