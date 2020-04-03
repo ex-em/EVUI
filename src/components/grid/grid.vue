@@ -12,7 +12,7 @@
       <ul class="column-list">
         <li
           v-if="useCheckbox.use"
-          style="width: 30px;"
+          style="width: 40px;"
           class="column"
         >
           <ev-checkbox
@@ -21,22 +21,22 @@
             :type="`square`"
             @on-click="onCheckAll"
           />
-        </li>
-        <li
+        </li><li
           v-for="(column, index) in orderedColumns"
-          v-show="!column.hide"
+          v-if="!column.hide"
           :key="index"
+          :data-index="index"
           :style="`width: ${column.width}px;`"
           :class="{
             column: true,
             render: isRenderer(column),
           }"
           class="column"
-          @click="onSort(column.field)"
         >
           <span
             :title="column.caption"
             class="column-name"
+            @click.stop="onSort(column.field)"
           >{{ column.caption }}</span>
           <ev-icon
             v-if="sortField === column.field"
@@ -52,10 +52,14 @@
               style="margin: 3px 0 0 0; font-size: 12px;"
             />
           </span>
+          <span
+            class="column-resize"
+            @mousedown.stop="onColumnResize(index, $event)"
+          />
         </li>
         <li
           :style="`width: ${hasVerticalScrollBar ? scrollWidth : 0}px;`"
-          class="column dummy"
+          class="column-dummy"
         />
       </ul>
     </div>
@@ -79,7 +83,7 @@
           >
             <td
               v-if="useCheckbox.use"
-              :style="`width: 30px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
+              :style="`width: 40px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             />
             <td
               v-for="(column, cellIndex) in orderedColumns"
@@ -100,7 +104,8 @@
           >
             <td
               v-if="useCheckbox.use"
-              style="width: 30px;"
+              :style="`width: 40px; height: ${rowHeight}px;`"
+              class="row-checkbox"
             >
               <ev-checkbox
                 v-model="row[1]"
@@ -111,7 +116,7 @@
             </td>
             <td
               v-for="(column, cellIndex) in orderedColumns"
-              v-show="!column.hide"
+              v-if="!column.hide"
               :key="cellIndex"
               :data-name="column.field"
               :data-index="column.index"
@@ -142,6 +147,11 @@
         class="vscroll-spacer"
       />
     </div>
+    <div
+      ref="resizeLine"
+      v-show="showResizeLine"
+      class="table-resize-line"
+    />
     <TableFilter
       v-if="showColumnOption"
       v-model="filterCondition"
@@ -218,6 +228,7 @@
         vScrollBottomHeight: 0,
         hasVerticalScrollBar: false,
         showColumnOption: false,
+        showResizeLine: false,
         sortList: {},
         filterList: {},
         filterCondition: {},
@@ -305,6 +316,19 @@
       isRenderer(column = {}) {
         return column.render && column.render.use;
       },
+      isLastColumn(index) {
+        const columns = this.orderedColumns;
+        let lastIndex = 0;
+
+        for (let ix = columns.length - 1; ix >= 0; ix--) {
+          if (!columns[ix].hide) {
+            lastIndex = ix;
+            break;
+          }
+        }
+
+        return lastIndex === index;
+      },
       getColumnIndex(field) {
         return this.columns.findIndex(column => column.field === field);
       },
@@ -334,7 +358,7 @@
           }
 
           if (this.useCheckbox.use) {
-            elWidth -= 30;
+            elWidth -= 40;
           }
 
           // 1을 빼주는 이유는 돔에서는 소수점까지 너비를 취급하나 offsetWidth 같은 속성값은 반올림되어 저장되어 있음
@@ -615,9 +639,18 @@
           return;
         }
 
-        const rowIndex = event.target.parentElement.parentElement.dataset.index;
+        const target = event.target;
+        const tagName = target.tagName.toLowerCase();
+        let rowIndex;
+
+        if (tagName === 'td') {
+          rowIndex = target.parentElement.dataset.index;
+        } else {
+          rowIndex = target.parentElement.parentElement.dataset.index;
+        }
+
         if (rowIndex) {
-          const rowData = this.viewStore[rowIndex][ROW_DATA_INDEX];
+          const rowData = this.viewStore[+rowIndex][ROW_DATA_INDEX];
           this.selectedRow = rowData;
           this.isClickedCtxMenu = true;
           this.$emit('update:selected', rowData);
@@ -696,7 +729,7 @@
           this.orderedColumns.map((column) => {
             const item = column;
 
-            if (!this.columns[column.index].width) {
+            if (!this.columns[column.index].width && !item.resized) {
               item.width = 0;
             }
 
@@ -706,6 +739,59 @@
 
         this.calculatedColumn();
         this.$forceUpdate();
+      },
+      onColumnResize(columnIndex, event) {
+        if (this.isLastColumn(columnIndex)) {
+          return;
+        }
+
+        const nextColumnIndex = columnIndex + 1;
+        const headerEl = this.$refs.header;
+        const headerLeft = headerEl.getBoundingClientRect().left;
+        const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
+        const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
+        const columnRect = columnEl.getBoundingClientRect();
+        const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - 40;
+        const resizeLineEl = this.$refs.resizeLine;
+        const minLeft = columnRect.left - headerLeft + 40;
+        const startLeft = columnRect.right - headerLeft;
+        const startMouseLeft = event.clientX;
+        const startColumnLeft = columnRect.left - headerLeft;
+
+        resizeLineEl.style.left = startLeft + 'px';
+
+        this.showResizeLine = true;
+
+        const handleMouseMove = (event) => {
+          const deltaLeft = event.clientX - startMouseLeft;
+          const proxyLeft = startLeft + deltaLeft;
+          let resizeWidth = Math.max(minLeft, proxyLeft);
+
+          resizeWidth = Math.min(maxRight, resizeWidth);
+
+          resizeLineEl.style.left = resizeWidth + 'px';
+        };
+
+        const handleMouseUp = (e) => {
+          const destLeft = parseInt(resizeLineEl.style.left, 10);
+          const changedWidth = destLeft - startColumnLeft;
+
+          if (this.orderedColumns[columnIndex]) {
+            const columnWidth = this.orderedColumns[columnIndex].width;
+            this.orderedColumns[columnIndex].width = changedWidth;
+            this.orderedColumns[columnIndex].resized = true;
+            this.orderedColumns[nextColumnIndex].width += (columnWidth - changedWidth);
+            this.orderedColumns[nextColumnIndex].resized = true;
+          }
+
+          this.showResizeLine = false;
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+          this.onResize();
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
       },
     },
   };
@@ -717,7 +803,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding-top: 30px;
+    padding-top: 33px;
 
     &.non-header {
       padding-top: 0;
@@ -729,7 +815,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    height: 30px;
+    height: 33px;
 
     @include evThemify() {
       border-top: 2px solid evThemed('grid-header-border');
@@ -738,9 +824,20 @@
   }
 
   .column-list {
+    position: relative;
     width: 100%;
+    height: 100%;
     white-space: nowrap;
     list-style-type: none;
+
+    & .column-dummy {
+      position: relative;
+      display: inline-block;
+      width: 0;
+      height: 30px;
+      padding: 0;
+      user-select: none;
+    }
   }
 
   .column {
@@ -748,19 +845,26 @@
     display: inline-flex;
     align-items: center;
     min-width: 40px;
-    height: 30px;
+    height: 100%;
     line-height: 30px;
     vertical-align: top;
     padding: 0 10px;
     user-select: none;
 
-    &.dummy {
-      width: 0;
-      padding: 0;
+    @include evThemify() {
+      border-right: $border-solid evThemed('grid-bottom-border');
     }
 
     &.render {
-      justify-content: center;
+      text-align: center;
+    }
+
+    &:nth-last-child(2) {
+      border-right: 0;
+
+      & .column-resize {
+        cursor: default !important;
+      }
     }
 
     & .sort-icon {
@@ -768,10 +872,6 @@
       float: right;
       font-size: 12px;
     }
-  }
-
-  .adjust .column:last-child {
-    border-right: 0;
   }
 
   .column-name {
@@ -796,6 +896,18 @@
     @include evThemify() {
       /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
       box-shadow: inset 0 0 3px evThemed('font-color-base');
+    }
+  }
+
+  .column-resize {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    right: -5px;
+    bottom: 0;
+
+    &:hover {
+      cursor: col-resize;
     }
   }
 
@@ -846,16 +958,29 @@
       display: inline-block;
       padding: 0 10px;
 
-
       @include truncate(100%);
       @include evThemify() {
         color: evThemed('grid-cell-text');
+        border-right: 0;//$border-solid evThemed('grid-bottom-border');
+      }
+
+      &.row-checkbox {
+        display: inline-flex;
+        align-items: center;
       }
 
       &:last-child {
         border-right: 0;
       }
     }
+  }
+
+  .table-resize-line {
+    position: absolute;
+    width: 1px;
+    top: 0;
+    bottom: 0;
+    border-right: 1px solid red;
   }
 
   .vscroll-spacer {
