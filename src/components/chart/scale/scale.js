@@ -81,9 +81,10 @@ class Scale {
 
   calculateSteps(range) {
     const { maxValue, minValue } = range;
+    const rawInterval = this.getInterval(range);
     let { maxSteps } = range;
 
-    let interval = this.getInterval(range);
+    let interval = rawInterval;
     let increase = minValue;
     let numberOfSteps;
 
@@ -110,13 +111,19 @@ class Scale {
     }
 
     while (numberOfSteps > maxSteps) {
-      interval *= 2;
-      numberOfSteps = Math.round(graphRange / interval);
-      interval = Math.ceil(graphRange / numberOfSteps);
+      interval += rawInterval;
+
+      while (graphRange % interval !== 0 && graphRange > interval) {
+        interval += rawInterval;
+      }
+
+      numberOfSteps = graphRange / interval;
     }
 
-    if (graphMax - graphMin > (numberOfSteps * interval)) {
-      interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
+
+    if (graphRange % interval !== 0) {
+      interval = graphRange;
+      numberOfSteps = 1;
     }
 
     return {
@@ -197,10 +204,9 @@ class Scale {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel + (!ix ? 0 : -1);
-      linePosition += Util.aliasPixel(linePosition);
+      linePosition = labelCenter + aliasPixel;
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
-
+      console.log('linePosition', linePosition);
       let labelPoint;
 
       if (this.type === 'x') {

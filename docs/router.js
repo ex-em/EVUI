@@ -37,6 +37,9 @@ const router = new VueRouter({
       path: '/reactivitychart',
       component: () => import(/* webpackChunkName: 'reactivitychart' */ './pages/chart/reactivity/reactivity'),
     }, {
+      path: '/scatterchart',
+      component: () => import(/* webpackChunkName: 'scatterchart' */ './pages/chart/scatter/scatter'),
+    }, {
       path: '/checkbox',
       component: () => import(/* webpackChunkName: 'checkbox' */ './pages/checkbox/checkbox'),
     }, {

@@ -189,7 +189,7 @@ class EvChart {
           return new LinearScale(dir, axis, ctx);
         case 'time':
           if (axis.categoryMode) {
-            return new TimeCategoryScale(dir, axis, ctx);
+            return new TimeCategoryScale(dir, axis, ctx, labels);
           }
           return new TimeScale(dir, axis, ctx);
         case 'log':

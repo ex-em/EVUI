@@ -4,6 +4,11 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
+  constructor(type, opt, ctx, labels) {
+    super(type, opt, ctx);
+    this.labels = labels;
+  }
+
   getLabelFormat(value) {
     return moment(value).format(this.timeFormat);
   }
@@ -29,7 +34,6 @@ class TimeCategoryScale extends Scale {
     const { maxValue, minValue, maxSteps } = range;
     const rawInterval = this.getInterval(range);
 
-    let count = 1;
     let interval = rawInterval;
     let increase = minValue;
     let numberOfSteps;
@@ -42,7 +46,7 @@ class TimeCategoryScale extends Scale {
     const graphMin = minValue;
     const graphRange = graphMax - graphMin;
 
-    numberOfSteps = Math.round(graphRange / interval);
+    numberOfSteps = Math.round(graphRange / interval) + 1;
     const oriSteps = numberOfSteps;
 
     if (maxValue === 1) {
@@ -51,8 +55,12 @@ class TimeCategoryScale extends Scale {
     }
 
     while (numberOfSteps > maxSteps) {
-      interval *= 2;
-      count *= 2;
+      interval += rawInterval;
+
+      while (graphRange % interval !== 0 && graphRange > interval) {
+        interval += rawInterval;
+      }
+
       numberOfSteps = Math.round(graphRange / interval);
     }
 
@@ -63,12 +71,12 @@ class TimeCategoryScale extends Scale {
       rawInterval,
       graphMin,
       graphMax,
-      count,
     };
   }
 
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
+    const labels = this.labels;
     const aPos = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,
@@ -80,8 +88,8 @@ class TimeCategoryScale extends Scale {
     const axisMin = stepInfo.graphMin;
     const axisMax = stepInfo.graphMax;
     const stepValue = stepInfo.rawInterval;
-    const oriSteps = stepInfo.oriSteps + 1;
-    const count = stepInfo.count;
+    const oriSteps = stepInfo.oriSteps;
+    const count = Math.round(oriSteps / steps);
 
     let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -119,7 +127,7 @@ class TimeCategoryScale extends Scale {
       return;
     }
 
-    const graphGap = (endPoint - startPoint) / oriSteps;
+    const graphGap = (endPoint - startPoint) / (labels.length || 1);
     if (this.categoryMode) {
       startPoint += Math.ceil(graphGap / 2) - 2;
     }

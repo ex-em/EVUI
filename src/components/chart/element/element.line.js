@@ -191,15 +191,15 @@ class Line {
       const x = gdata[m].xp;
       const y = gdata[m].yp;
 
-      if ((x - 2 <= xp) && (xp <= x + 2)) {
+      if ((x - 6 <= xp) && (xp <= x + 6)) {
         item.data = gdata[m];
         item.index = m;
 
-        if ((y - 2 <= yp) && (yp <= y + 2)) {
+        if ((y - 6 <= yp) && (yp <= y + 6)) {
           item.hit = true;
         }
         return item;
-      } else if (x + 2 < xp) {
+      } else if (x + 6 < xp) {
         s = m + 1;
       } else {
         e = m - 1;
