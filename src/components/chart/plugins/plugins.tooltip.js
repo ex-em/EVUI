@@ -48,7 +48,7 @@ const modules = {
     const titleMargin = 12;
     const titleHeight = 16;
     const scrollWidth = 17;
-    const mouseXIp = 2; // mouseInterpolation
+    const mouseXIp = 4; // mouseInterpolation
     const mouseYIp = 10;
 
     const sId = hitInfo.hitId;
