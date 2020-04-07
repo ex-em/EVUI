@@ -25,7 +25,7 @@ class Scale {
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
-      bufferedTickSize = Math.floor(tickSize * 1.2);
+      bufferedTickSize = Math.floor(tickSize * 1.1);
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
