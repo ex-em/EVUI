@@ -172,6 +172,12 @@
                 imgUrl: `${this.imgUrl}/chart-line.png`,
               },
               {
+                name: 'Scatter Chart',
+                routerLink: '/scatterchart',
+                content: '점 차트',
+                imgUrl: `${this.imgUrl}/chart-line.png`,
+              },
+              {
                 name: 'Pie Chart',
                 routerLink: '/piechart',
                 content: '파이 차트',

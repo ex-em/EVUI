@@ -1,6 +1,5 @@
 ## 1. Data  
 ```javascript
-// Data Form example
 const chartData = {
   series: {
     series1: { name: 'series#1', show: true, type: 'line', fill: true, point: false },
@@ -25,6 +24,12 @@ watch를 통해 데이터 변경을 감지하므로, labels와 data property의 
 
 ## 2. Options
 ### 2.1 Axis
+- showAxis
+
+  | Description                   | Value     | Default |
+  | ----------------------------- | --------- | ------- |
+  | Axis의 Show/Hide 속성         | Boolean   | true    |
+
 - autoScaleRatio
 
   | Description                   | Value            | Default |
@@ -35,7 +40,25 @@ watch를 통해 데이터 변경을 감지하므로, labels와 data property의 
 
   | Description                       | Value   | Default         |
   | --------------------------------- | ------- | --------------- |
-  | Chart의 Grid선을 그리기 위한 속성 | Boolean | truestartToZero |
+  | Chart의 Grid선을 그리기 위한 속성 | Boolean | false |
+
+- gridLineColor
+
+  | Description        | Value            | Default   |
+  | ------------------ | ---------------- | --------- |
+  | Chart의 Grid 선 색 | HexCode (String) | '#C9CFDC' |
+  
+- axisLineColor
+
+  | Description  | Value            | Default   |
+  | ------------ | ---------------- | --------- |
+  | Axis의 선 색 | HexCode (String) | '#b4b6ba' |  
+  
+- showIndicator
+
+  | Description                       | Value   | Default         |
+  | --------------------------------- | ------- | --------------- |
+  | Chart의 Grid선을 그리기 위한 속성 | Boolean | false |
 
 - startToZero
 
@@ -49,32 +72,24 @@ watch를 통해 데이터 변경을 감지하므로, labels와 data property의 
   | -------------------------------- | ------- | ------- |
   | Horizontal Bar Chart를 위한 속성 | Boolean | false   |
 
-- axisLineColor
-
-  | Description  | Value            | Default   |
-  | ------------ | ---------------- | --------- |
-  | Axis의 선 색 | HexCode (String) | '#b4b6ba' |
-
-- gridLineColor
-
-  | Description        | Value            | Default   |
-  | ------------------ | ---------------- | --------- |
-  | Chart의 Grid 선 색 | HexCode (String) | '#e7e9ed' |
-
 - labelStyle (Object)
 
   | Property   | Description | Value            | Default      |
   | ---------- | ----------- | ---------------- | ------------ |
   | fontSize   | 글자 크기   | Number           | 12           |
-  | color      | 글자 색상   | HexCode (String) | '#333'       |
-  | fontFamilt | 글자체      | String           | 'Droid Sans' |
+  | color      | 글자 색상   | HexCode (String) | '#25262E'    |
+  | fontFamily | 글자체      | String           | 'Roboto' |
+  | fitWidth   | Label Text Ellipsis 처리 | Boolean | false |
+  | fitDir   | Ellipsis 방향 | String | 'right' |
 
   ```javascript
   // Example
   const labelStyle = {
     fontSize: 12,
-    color: '#333',
+    color: '#25262E',
     fontFamily: 'Droid Sans',
+    fitWidth: false,
+    fitDir: 'right',
   };
   ```
 
@@ -215,4 +230,49 @@ watch를 통해 데이터 변경을 감지하므로, labels와 data property의 
   | Description             | Value          | Default |
   | ----------------------- | -------------- | ------- |
   | Bar Chart의 각 Bar 넓이 | 0.1~1 (Number) | 1       |
+
+
+- tooltip (object)
+
+  | Property         | Description                      | Value           | Default   |
+  | ---------------- | -------------------------------- | --------------- | --------- |
+  | use              | tooltip 표시 여부                | Boolean         | true      |
+  | backgroundColor  | tooltip 배경 색상                | HexCode(String) | '#4C4C4C' |
+  | borderColor      | tooltip 테두리 색상              | HexCode(String) | '#666666' |
+  | shadowOpacity    | 그림자 투명도                    | Number          | 0.25      |
+  | useShadow        | 그림자 사용 여부                 | Boolean         | false     |
+  | throttledMove    | 데이터 조회 Throttling 처리 유무 | Boolean         | false     |
+  | debouncedHide    | 좌표 이동 시 tooltip hide 여부   | Boolean         | false     |
+
+- indicator (object)
+
+  | Property  | Description         | Value           | Default   |
+  | --------- | ------------------- | --------------- | --------- |
+  | use       | indicator 표시 여부 | Boolean         | false     |
+  | color     | 색상                | HexCode(String) | '#EE7F44' |
+
+- maxTip (object)
+
+  | Property         | Description                   | Value           | Default   |
+  | ---------------- | ----------------------------- | --------------- | --------- |
+  | use              | maxTip 표시 여부              | Boolean         | false     |
+  | fixedPosTop      | maxTip 위치를 최대값으로 고정 | Boolean         | false     |
+  | showIndicator    | indicator 표시 여부           | Boolean         | false     |
+  | indicatorColor   | indicator 색상                | HexCode(String) | '#000000' |
+  | tipBackground    | maxTip 배경색상               | HexCode(String) | '#000000' |
+  | tipTextColor     | maxTip 글자 색상              | HexCode(String) | '#FFFFFF' |
+
+- selectItem (object)
+
+  | Property            | Description                               | Value           | Default   |
+  | ------------------- | ----------------------------------------- | --------------- | --------- |
+  | use                 | 차트 아이템 선택 기능                     | Boolean         | false     |
+  | showTextTip         | 선택한 label의 최대값 표시                | Boolean         | false     |
+  | showTip             | 선택한 label의 상단에 화살표 표시         | Boolean         | false     |
+  | showIndicator       | 선택한 label의 indicator 표시             | Boolean         | false     |
+  | fixedPosTop         | indicator 및 tip의 위치를 최대값으로 고정 | Boolean         | false     |
+  | useApproximateValue | 가까운 label을 선택                       | Boolean         | false     |
+  | indicatorColor   | indicator 색상                               | HexCode(String) | '#000000' |
+  | tipBackground    | tip 배경색상                                 | HexCode(String) | '#000000' |
+  | tipTextColor     | tip 글자 색상                                | HexCode(String) | '#FFFFFF' |
 

@@ -1,10 +1,8 @@
 <template>
   <div>
     <ev-chart
-      :data="defaultBarChartData"
-      :options="defaultBarChartOptions"
-      @on-dblclick="onDblClick"
-      @on-click="onClick"
+      :data="chartData"
+      :options="chartOptions"
     />
     <br>
   </div>
@@ -14,26 +12,27 @@
   export default {
     data() {
       return {
-        defaultBarChartData: {
+        chartData: {
           series: {
-              series1: { name: 'series#1', show: true, type: 'bar' },
+            series1: { name: 'series#1' },
           },
           labels: [
-              'JanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuaryJanuary',
-              'FebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruaryFebruary',
-              'MarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarchMarch',
-              'AprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilAprilApril',
-              'MayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMayMay',
+            'value1',
+            'value2',
+            'value3',
+            'value4',
+            'value5',
           ],
           data: {
-              series1: [100, 150, 51, 150, 350],
+            series1: [100, 150, 51, 150, 350],
           },
         },
-        defaultBarChartOptions: {
+        chartOptions: {
+          type: 'bar',
           thickness: 0.8,
           width: '100%',
           title: {
-            text: 'Title Test',
+            text: 'Default Bar Chart',
             show: true,
           },
           legend: {
@@ -56,14 +55,6 @@
           }],
         },
       };
-    },
-    methods: {
-      onDblClick(e) {
-        console.log(e, 'on doubled click');
-      },
-      onClick(e) {
-        console.log(e, 'on click');
-      },
     },
   };
 </script>

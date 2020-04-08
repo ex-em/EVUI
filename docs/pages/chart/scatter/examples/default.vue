@@ -20,9 +20,9 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'scatter', fill: false, point: true },
-          series2: { name: 'series#2', show: true, type: 'scatter', fill: false, point: true },
-          series3: { name: 'series#3', show: true, type: 'scatter', fill: false, point: true },
+          series1: { name: 'series#1', type: 'scatter', pointSize: 6, pointStyle: 'triangle' },
+          series2: { name: 'series#2', type: 'scatter', pointSize: 6, pointStyle: 'rectRot' },
+          series3: { name: 'series#3', type: 'scatter', pointSize: 6, pointStyle: 'crossRot' },
         },
         chartData: {
           series1: [],
@@ -103,12 +103,10 @@
       addLiveData() {
         this.timeValue = +new Date();
         this.$set(this.chartOptions.axesX[0], 'range', [+new Date(this.timeValue - 180000), this.timeValue]);
-        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.chartData.series1.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.chartData.series2.push({ x: this.timeValue, y: this.getRandomInt() });
-        this.chartData.series3.push({ x: this.timeValue, y: this.getRandomInt() });
+        Object.values(this.chartData).forEach((series) => {
+          series.push({ x: this.timeValue, y: this.getRandomInt() });
+          series.push({ x: this.timeValue, y: this.getRandomInt() });
+        });
 
         this.timeValue = +moment(this.timeValue).add(3, 's');
       },
