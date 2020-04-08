@@ -20,10 +20,10 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'bar' },
-          series2: { name: 'series#2', show: true, type: 'bar' },
-          series3: { name: 'series#3', show: true, type: 'bar' },
-          series4: { name: 'series#4', show: true, type: 'bar' },
+          series1: { name: 'series#1', timeMode: true },
+          series2: { name: 'series#2', timeMode: true },
+          series3: { name: 'series#3', timeMode: true },
+          series4: { name: 'series#4', timeMode: true },
         },
         groups: [
           ['series1', 'series2', 'series3', 'series4'],
@@ -31,6 +31,7 @@
         labels: [],
         chartData: {},
         chartOptions: {
+          type: 'bar',
           width: '100%',
           height: '100%',
           thickness: 1,
@@ -48,7 +49,7 @@
             showGrid: true,
             categoryMode: true,
             timeFormat: 'HH:mm:ss',
-            interval: 3000,
+            interval: 'hour',
           }],
           axesY: [{
             type: 'linear',
@@ -62,7 +63,7 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:00:00',
+        timeValue: moment().format('YYYY-MM-DD HH:mm:ss'),
         liveMode: false,
         event: null,
       };
@@ -101,35 +102,26 @@
         return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
         this.labels.shift();
-        this.chartData.series1.shift();
-        this.chartData.series2.shift();
-        this.chartData.series3.shift();
-        this.chartData.series4.shift();
         this.labels.push(+moment(this.timeValue));
-        this.chartData.series1.push(this.getRandomInt());
-        this.chartData.series2.push(this.getRandomInt());
-        this.chartData.series3.push(this.getRandomInt());
-        this.chartData.series4.push(this.getRandomInt());
+
+        Object.values(this.chartData).forEach((series) => {
+          series.shift();
+          series.push(this.getRandomInt());
+        });
+
+        this.timeValue = +moment(this.timeValue).add(1, 'hours');
       },
       makeInitData() {
         const label = [];
         const data = { series1: [], series2: [], series3: [], series4: [] };
 
-        for (let ix = 0; ix < 59; ix++) {
+        for (let ix = 0; ix <= 60; ix++) {
           label.push(+moment(this.timeValue));
-          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
-          data.series1.push(null);
-          data.series2.push(null);
-          data.series3.push(null);
-          data.series4.push(null);
+          Object.values(data).forEach(series => series.push(this.getRandomInt()));
+
+          this.timeValue = +moment(this.timeValue).add(1, 'hours');
         }
-        label.push(+moment(this.timeValue));
-        data.series1.push(null);
-        data.series2.push(null);
-        data.series3.push(null);
-        data.series4.push(null);
 
         this.labels = label;
         this.chartData = data;

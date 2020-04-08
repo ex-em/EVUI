@@ -20,28 +20,22 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', show: true, type: 'line', fill: true, point: true },
-          series2: { name: 'series#1231231232', show: true, type: 'line', fill: true, point: true },
+          series1: { name: 'series#1', fill: true, point: false },
+          series2: { name: 'series#2', fill: true, point: false },
+          series3: { name: 'series#3', fill: true, point: false },
+          series4: { name: 'series#4', fill: true, point: false },
         },
         groups: [
-          ['series1', 'series2'],
+          ['series1', 'series2', 'series3', 'series4'],
         ],
-        labels: [
-          +new Date('2017/01/01 00:00:00'),
-          +new Date('2017/01/01 00:01:00'),
-          +new Date('2017/01/01 00:02:00'),
-          +new Date('2017/01/01 00:03:00'),
-          +new Date('2017/01/01 00:04:00'),
-        ],
-        chartData: {
-          series1: [100, 150, 50, 150, 350],
-          series2: [100, 150, 50, 150, 350],
-        },
+        labels: [],
+        chartData: {},
         chartOptions: {
+          type: 'line',
           width: '100%',
           height: '100%',
           title: {
-            text: 'Title Test',
+            text: 'Stack Line Chart',
             show: true,
           },
           legend: {
@@ -60,13 +54,17 @@
             autoScaleRatio: 0.1,
             showGrid: true,
           }],
+          fixedIndicator: {
+            use: true,
+            useApproximateValue: false,
+          },
         },
         liveBtnInfo: {
           name: 'liveBtn',
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:04:00',
+        timeValue: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
         liveMode: false,
         event: null,
       };
@@ -76,10 +74,13 @@
         return {
           series: this.series,
           labels: this.labels,
-          data: this.chartData,
           groups: this.groups,
+          data: this.chartData,
         };
       },
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.liveInterval) {
@@ -99,16 +100,30 @@
         }
       },
       getRandomInt() {
-        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'm');
         this.labels.shift();
-        this.chartData.series1.shift();
-        this.chartData.series2.shift();
         this.labels.push(this.timeValue);
-        this.chartData.series1.push(this.getRandomInt());
-        this.chartData.series2.push(this.getRandomInt());
+
+        Object.values(this.chartData).forEach(series => series.shift());
+        Object.values(this.chartData).forEach(series => series.push(this.getRandomInt()));
+
+        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [], series2: [], series3: [], series4: [] };
+
+        for (let ix = 0; ix <= 60; ix++) {
+          label.push(+moment(this.timeValue));
+          Object.values(data).forEach(series => series.push(this.getRandomInt()));
+
+          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
+        }
+
+        this.labels = label;
+        this.chartData = data;
       },
     },
   };

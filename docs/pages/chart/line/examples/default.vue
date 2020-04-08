@@ -3,8 +3,6 @@
     <ev-chart
       :data="getChartData"
       :options="chartOptions"
-      :listeners="listeners"
-      @on-click="onClick"
     />
     <div style="position: absolute; top: 0; right: 0;">
       <ev-button @click="onClickLiveBtn">
@@ -22,59 +20,30 @@
     data() {
       return {
         series: {
-            series1: { name: 'series#1', show: true, type: 'line', fill: false, point: true },
-            series2: { name: 'series#2', show: true, type: 'line', fill: false, point: true },
-            series3: { name: 'series#3', show: true, type: 'line', fill: false, point: true },
-            series4: { name: 'series#4', show: true, type: 'line', fill: false, point: true },
-            series5: { name: 'series#5', show: true, type: 'line', fill: false, point: true },
-            series6: { name: 'series#6', show: true, type: 'line', fill: false, point: true },
-            series7: { name: 'series#7', show: true, type: 'line', fill: false, point: true },
-            series8: { name: 'series#8', show: true, type: 'line', fill: false, point: true },
-            series9: { name: 'series#9', show: true, type: 'line', fill: false, point: true },
-            series10: { name: 'series#10', show: true, type: 'line', fill: false, point: true },
-            series11: { name: 'series#11', show: true, type: 'line', fill: false, point: true },
-            series12: { name: 'series#12', show: true, type: 'line', fill: false, point: true },
-            series13: { name: 'series#13', show: true, type: 'line', fill: false, point: true },
+            series1: { name: 'series#1' },
+            series2: { name: 'series#2' },
+            series3: { name: 'series#3' },
+            series4: { name: 'series#4' },
         },
-        labels: [
-            +new Date('2017/01/01 00:00:00'),
-            +new Date('2017/01/01 00:01:00'),
-            +new Date('2017/01/01 00:02:00'),
-            +new Date('2017/01/01 00:03:00'),
-            +new Date('2017/01/01 00:04:00'),
-        ],
-        chartData: {
-            series1: [100, 150, 51, 150, 200],
-            series2: [150, 200, 58, 150, 40],
-            series3: [200, 50, 90, 300, 500],
-            series4: [300, 800, 30, 200, 100],
-            series5: [300, 70, 30, 200, 100],
-            series6: [300, 70, 30, 200, 100],
-            series7: [300, 70, 30, 200, 100],
-            series8: [300, 70, 30, 200, 100],
-            series9: [300, 70, 30, 200, 100],
-            series10: [300, 70, 30, 200, 100],
-            series11: [300, 70, 30, 200, 100],
-            series12: [300, 70, 30, 200, 100],
-            series13: [300, 70, 30, 200, 100],
-        },
+        labels: [],
+        chartData: {},
         chartOptions: {
+          type: 'line',
           width: '100%',
           height: '100%',
           title: {
-            text: 'Title Test',
+            text: 'Default Line Chart',
             show: true,
           },
           legend: {
             show: true,
-            position: 'bottom',
-            height: 50,
+            position: 'right',
           },
           horizontal: false,
           axesX: [{
             type: 'time',
-            timeFormat: 'HH:mm:ss',
-            interval: 'minute',
+            timeFormat: 'HH:00',
+            interval: 'hour',
           }],
           axesY: [{
             type: 'linear',
@@ -92,11 +61,7 @@
           text: 'Live',
           customCls: '',
         },
-        listeners: {
-          dblclick: this.onDblClick,
-          click: this.onClick,
-        },
-        timeValue: '2017-01-01 00:00:00',
+        timeValue: moment(new Date()).format('YYYY-MM-DD HH:mm:00'),
         liveMode: false,
         event: null,
       };
@@ -111,7 +76,7 @@
       },
     },
     created() {
-      // this.makeInitData();
+      this.makeInitData();
     },
     destroyed() {
       if (this.liveInterval) {
@@ -134,32 +99,27 @@
         return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
         this.labels.shift();
-        this.chartData.series1.shift();
         this.labels.push(this.timeValue);
-        this.chartData.series1.push(this.getRandomInt());
+
+        Object.values(this.chartData).forEach(series => series.shift());
+        Object.values(this.chartData).forEach(series => series.push(this.getRandomInt()));
+
+        this.timeValue = +moment(this.timeValue).add(1, 'hours');
       },
       makeInitData() {
         const label = [];
-        const data = { series1: [] };
+        const data = { series1: [], series2: [], series3: [], series4: [] };
 
-        for (let ix = 0; ix < 60; ix++) {
+        for (let ix = 0; ix < 26; ix++) {
           label.push(+moment(this.timeValue));
-          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
-          data.series1.push(null);
+          Object.values(data).forEach(series => series.push(this.getRandomInt()));
+
+          this.timeValue = +moment(this.timeValue).add(1, 'hours');
         }
-        label.push(+moment(this.timeValue));
-        data.series1.push(null);
 
         this.labels = label;
         this.chartData = data;
-      },
-      onDblClick(e) {
-        console.log(e, 'user defined dblclick callback.');
-      },
-      onClick(e) {
-        console.log(e, 'user defined click callback.');
       },
     },
   };

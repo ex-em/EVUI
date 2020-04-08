@@ -23,7 +23,6 @@
   import Default from './examples/default';
   import Fill from './examples/fill';
   import Stack from './examples/stack';
-  import Scatter from './examples/scatter';
 
   export default {
     data() {
@@ -44,11 +43,6 @@
           component: Stack,
           url: './docs/pages/chart/line/examples/stack.vue',
           description: 'Stack Line Chart는 계열의 순서에 맞춰 데이터를 누적하여 각 계열의 데이터 비교를 시각적으로 판단하는데 도움을 줍니다.',
-        }, {
-          title: 'Scatter',
-          component: Scatter,
-          url: './docs/pages/chart/line/examples/scatter.vue',
-          description: 'Scatter Chart는 데이터의 분포를 시각적으로 인지하도록 합니다.',
         }],
       };
     },

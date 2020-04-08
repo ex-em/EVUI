@@ -20,25 +20,19 @@
     data() {
       return {
         series: {
-          series1: { name: 'AAAAAA#1', show: true, type: 'line', fill: true, point: false },
-          series2: { name: 'bbbbbb#1', show: true, type: 'line', fill: true, point: false },
+          series1: { name: 'series#1', fill: true, point: false },
+          series2: { name: 'series#2', fill: true, point: false },
+          series3: { name: 'series#3', fill: true, point: false },
+          series4: { name: 'series#4', fill: true, point: false },
         },
-        labels: [
-          +new Date('2017/01/01 00:00:00'),
-          +new Date('2017/01/01 00:01:00'),
-          +new Date('2017/01/01 00:02:00'),
-          +new Date('2017/01/01 00:03:00'),
-          +new Date('2017/01/01 00:04:00'),
-        ],
-        chartData: {
-          series1: [100, 150, 51, 150, 350],
-          series2: [200, 300, 100, 200, 100],
-        },
+        labels: [],
+        chartData: {},
         chartOptions: {
+          type: 'line',
           width: '100%',
           height: '100%',
           title: {
-            text: 'Title Test',
+            text: 'Filled Line Chart',
             show: true,
           },
           legend: {
@@ -49,19 +43,17 @@
           axesX: [{
             type: 'time',
             timeFormat: 'HH:mm:ss',
-            interval: 'minute',
-            showGrid: false,
+            interval: 3000,
           }],
           axesY: [{
             type: 'linear',
             startToZero: true,
             autoScaleRatio: 0.1,
             showGrid: true,
-            showAxis: false,
           }],
           fixedIndicator: {
             use: true,
-            useApproximateValue: true,
+            useApproximateValue: false,
           },
         },
         liveBtnInfo: {
@@ -69,7 +61,7 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:04:00',
+        timeValue: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
         liveMode: false,
         event: null,
       };
@@ -82,6 +74,9 @@
           data: this.chartData,
         };
       },
+    },
+    created() {
+      this.makeInitData();
     },
     destroyed() {
       if (this.liveInterval) {
@@ -101,14 +96,30 @@
         }
       },
       getRandomInt() {
-        return Math.floor(Math.random() * ((50 - 5) + 1)) + 5;
+        return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'm');
         this.labels.shift();
-        this.chartData.series1.shift();
         this.labels.push(this.timeValue);
-        this.chartData.series1.push(this.getRandomInt());
+
+        Object.values(this.chartData).forEach(series => series.shift());
+        Object.values(this.chartData).forEach(series => series.push(this.getRandomInt()));
+
+        this.timeValue = +moment(this.timeValue).add(5, 'seconds');
+      },
+      makeInitData() {
+        const label = [];
+        const data = { series1: [], series2: [], series3: [], series4: [] };
+
+        for (let ix = 0; ix <= 60; ix++) {
+          label.push(+moment(this.timeValue));
+          Object.values(data).forEach(series => series.push(this.getRandomInt()));
+
+          this.timeValue = +moment(this.timeValue).add(5, 'seconds');
+        }
+
+        this.labels = label;
+        this.chartData = data;
       },
     },
   };
