@@ -320,7 +320,7 @@
       },
       isLastColumn(index) {
         const columns = this.orderedColumns;
-        let lastIndex = 0;
+        let lastIndex = -1;
 
         for (let ix = columns.length - 1; ix >= 0; ix--) {
           if (!columns[ix].hide) {
