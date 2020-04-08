@@ -19,6 +19,7 @@
             v-if="isHeaderCheckBox"
             v-model="isHeaderChecked"
             :type="`square`"
+            :after-type="`check`"
             @on-click="onCheckAll"
           />
         </li><li
@@ -110,6 +111,7 @@
               <ev-checkbox
                 v-model="row[1]"
                 :type="`square`"
+                :after-type="`check`"
                 @on-click="onCheck($event, row)"
                 @click.native.stop=""
               />
@@ -786,12 +788,11 @@
 
           this.showResizeLine = false;
           document.removeEventListener('mousemove', handleMouseMove);
-          document.removeEventListener('mouseup', handleMouseUp);
           this.onResize();
         };
 
         document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('mouseup', handleMouseUp, { once: true });
       },
     },
   };
@@ -799,11 +800,13 @@
 <style lang="scss" scoped>
   @import '~@/styles/default';
 
+  $header-height: 33px;
+
   .table {
     position: relative;
     width: 100%;
     height: 100%;
-    padding-top: 33px;
+    padding-top: $header-height;
 
     &.non-header {
       padding-top: 0;
@@ -815,7 +818,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    height: 33px;
+    height: $header-height;
 
     @include evThemify() {
       border-top: 2px solid evThemed('grid-header-border');
@@ -830,7 +833,7 @@
     white-space: nowrap;
     list-style-type: none;
 
-    & .column-dummy {
+    .column-dummy {
       position: relative;
       display: inline-block;
       width: 0;
@@ -862,12 +865,12 @@
     &:nth-last-child(2) {
       border-right: 0;
 
-      & .column-resize {
+      .column-resize {
         cursor: default !important;
       }
     }
 
-    & .sort-icon {
+    .sort-icon {
       display: inline-block;
       float: right;
       font-size: 12px;
@@ -940,10 +943,15 @@
 
     tr {
       white-space: nowrap;
+
+      @include evThemify() {
+        border-bottom: $border-solid evThemed('grid-bottom-border');
+      }
+
       /* stylelint-disable */
       &.selected {
         @include evThemify() {
-          background-color: evThemed('grid-row-selected');
+          background-color: evThemed('grid-row-selected') !important;
         }
       }
 
@@ -961,7 +969,7 @@
       @include truncate(100%);
       @include evThemify() {
         color: evThemed('grid-cell-text');
-        border-right: 0;//$border-solid evThemed('grid-bottom-border');
+        border-right: $border-solid evThemed('grid-bottom-border');
       }
 
       &.row-checkbox {
@@ -973,6 +981,10 @@
         border-right: 0;
       }
     }
+
+    tr.dummy td {
+      border-right: 0;
+    }
   }
 
   .table-resize-line {
@@ -980,7 +992,10 @@
     width: 1px;
     top: 0;
     bottom: 0;
-    border-right: 1px solid red;
+
+    @include evThemify() {
+      border-right: $border-solid evThemed('grid-bottom-border');
+    }
   }
 
   .vscroll-spacer {
