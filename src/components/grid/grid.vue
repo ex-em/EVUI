@@ -150,8 +150,8 @@
       />
     </div>
     <div
-      ref="resizeLine"
       v-show="showResizeLine"
+      ref="resizeLine"
       class="table-resize-line"
     />
     <TableFilter
@@ -760,21 +760,21 @@
         const startMouseLeft = event.clientX;
         const startColumnLeft = columnRect.left - headerLeft;
 
-        resizeLineEl.style.left = startLeft + 'px';
+        resizeLineEl.style.left = `${startLeft}px`;
 
         this.showResizeLine = true;
 
-        const handleMouseMove = (event) => {
-          const deltaLeft = event.clientX - startMouseLeft;
+        const handleMouseMove = (evt) => {
+          const deltaLeft = evt.clientX - startMouseLeft;
           const proxyLeft = startLeft + deltaLeft;
           let resizeWidth = Math.max(minLeft, proxyLeft);
 
           resizeWidth = Math.min(maxRight, resizeWidth);
 
-          resizeLineEl.style.left = resizeWidth + 'px';
+          resizeLineEl.style.left = `${resizeWidth}px`;
         };
 
-        const handleMouseUp = (e) => {
+        const handleMouseUp = () => {
           const destLeft = parseInt(resizeLineEl.style.left, 10);
           const changedWidth = destLeft - startColumnLeft;
 
