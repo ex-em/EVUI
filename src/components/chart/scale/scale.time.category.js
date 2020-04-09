@@ -46,7 +46,7 @@ class TimeCategoryScale extends Scale {
     const graphMin = minValue;
     const graphRange = graphMax - graphMin;
 
-    numberOfSteps = Math.round(graphRange / interval);
+    numberOfSteps = Math.round(graphRange / interval) + 1;
     const oriSteps = numberOfSteps;
 
     if (maxValue === 1) {
@@ -55,14 +55,15 @@ class TimeCategoryScale extends Scale {
     }
 
     while (numberOfSteps > maxSteps) {
-      interval += rawInterval;
-
-      while (graphRange % interval !== 0 && graphRange > interval) {
-        interval += rawInterval;
-      }
-
+      interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
+      interval = Math.ceil(graphRange / numberOfSteps);
     }
+
+    if (graphMax - graphMin > (numberOfSteps * interval)) {
+      interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
+    }
+
 
     return {
       steps: numberOfSteps,
@@ -140,7 +141,7 @@ class TimeCategoryScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
-    for (let ix = 0; ix <= oriSteps; ix += count) {
+    for (let ix = 0; ix < oriSteps; ix += count) {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
