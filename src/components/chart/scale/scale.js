@@ -1,6 +1,7 @@
 import { defaultsDeep } from 'lodash-es';
 import { AXIS_OPTION, AXIS_UNITS } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
+import Canvas from '../helpers/helpers.canvas';
 
 class Scale {
   constructor(type, opt, ctx) {
@@ -25,7 +26,7 @@ class Scale {
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
-      bufferedTickSize = Math.floor(tickSize * 1.2);
+      bufferedTickSize = Math.floor(tickSize * 1.1);
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
@@ -112,11 +113,11 @@ class Scale {
     while (numberOfSteps > maxSteps) {
       interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
-      interval = Math.ceil(graphRange / numberOfSteps);
+      interval = Math.floor(graphRange / numberOfSteps);
     }
 
     if (graphMax - graphMin > (numberOfSteps * interval)) {
-      interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
+      interval = Math.floor((graphMax - graphMin) / numberOfSteps);
     }
 
     return {
@@ -169,7 +170,7 @@ class Scale {
 
       if (this.type === 'x') {
         ctx.moveTo(startPoint, offsetPoint + aliasPixel);
-        ctx.lineTo(endPoint, offsetPoint + aliasPixel);
+        ctx.lineTo(endPoint + 1, offsetPoint + aliasPixel);
       } else {
         ctx.moveTo(offsetPoint + aliasPixel + 1, startPoint);
         ctx.lineTo(offsetPoint + aliasPixel + 1, endPoint);
@@ -182,30 +183,30 @@ class Scale {
       return;
     }
 
-    const labelGap = (endPoint - startPoint) / steps;
+    const area = Math.abs(endPoint - startPoint);
     const ticks = [];
-    let labelCenter = null;
-    let linePosition = null;
 
     ctx.strokeStyle = this.gridLineColor;
     ctx.lineWidth = 1;
-    aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
-    let labelText;
     for (let ix = 0; ix <= steps; ix++) {
       ctx.beginPath();
       ticks[ix] = axisMin + (ix * stepValue);
 
-      labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel + (!ix ? 0 : -1);
-      linePosition += Util.aliasPixel(linePosition);
-      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+      // interpolation
+      // stepValue * count로 처리를 하다보니 미세한 차이로 max값을 넘어가는 경우가 발생.
+      if (ticks[ix] > axisMax) {
+        ticks[ix] = axisMax;
+      }
 
+      const labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
       let labelPoint;
+      let linePosition;
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter, labelPoint);
+        linePosition = Canvas.calculateX(ticks[ix], axisMin, axisMax, area, startPoint);
+        ctx.fillText(labelText, linePosition, labelPoint);
 
         if (this.showIndicator) {
           ctx.moveTo(linePosition, offsetPoint + 6);
@@ -218,7 +219,9 @@ class Scale {
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter);
+        linePosition = Canvas.calculateY(ticks[ix], axisMin, axisMax, area, startPoint);
+
+        ctx.fillText(labelText, labelPoint, linePosition);
 
         if (ix === steps) {
           linePosition += 1;
