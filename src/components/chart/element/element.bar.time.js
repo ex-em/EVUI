@@ -18,8 +18,6 @@ class TimeBar extends Bar {
 
     let x;
     let y;
-    let interval;
-    let rawInterval;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
@@ -30,16 +28,8 @@ class TimeBar extends Bar {
     const ysp = chartRect.y2 - labelOffset.bottom;
     const xep = chartRect.x2 - labelOffset.right;
 
-    if (isHorizontal) {
-      rawInterval = axesSteps.y[this.yAxisIndex].rawInterval || 1;
-      interval = Math.floor((minmaxY.graphMax - minmaxY.graphMin) / rawInterval);
-    } else {
-      rawInterval = axesSteps.x[this.xAxisIndex].rawInterval || 1;
-      interval = Math.floor((minmaxX.graphMax - minmaxX.graphMin) / rawInterval);
-    }
-
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (interval || 1);
+    const cArea = dArea / (this.data.length || 1);
     const cPad = 2;
 
     let bArea;

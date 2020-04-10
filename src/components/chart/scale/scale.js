@@ -25,7 +25,7 @@ class Scale {
 
     if (type === 'x') {
       chartSize = chartRect.chartWidth;
-      bufferedTickSize = Math.floor(tickSize * 1.2);
+      bufferedTickSize = Math.floor(tickSize * 1.1);
       axisOffset = [labelOffset.left, labelOffset.right];
     } else {
       chartSize = chartRect.chartHeight;
@@ -197,8 +197,7 @@ class Scale {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel + (!ix ? 0 : -1);
-      linePosition += Util.aliasPixel(linePosition);
+      linePosition = labelCenter + aliasPixel;
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
       let labelPoint;

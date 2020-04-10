@@ -20,10 +20,10 @@
     data() {
       return {
         series: {
-          series1: { name: 'series#1', timeMode: true },
-          series2: { name: 'series#2', timeMode: true },
-          series3: { name: 'series#3', timeMode: true },
-          series4: { name: 'series#4', timeMode: true },
+          series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
+          series3: { name: 'series#3' },
+          series4: { name: 'series#4' },
         },
         groups: [
           ['series1', 'series2', 'series3', 'series4'],
@@ -116,7 +116,7 @@
         const label = [];
         const data = { series1: [], series2: [], series3: [], series4: [] };
 
-        for (let ix = 0; ix <= 60; ix++) {
+        for (let ix = 0; ix < 60; ix++) {
           label.push(+moment(this.timeValue));
           Object.values(data).forEach(series => series.push(this.getRandomInt()));
 

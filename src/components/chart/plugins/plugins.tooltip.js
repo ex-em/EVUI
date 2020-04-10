@@ -48,7 +48,7 @@ const modules = {
     const titleMargin = 12;
     const titleHeight = 16;
     const scrollWidth = 17;
-    const mouseXIp = 2; // mouseInterpolation
+    const mouseXIp = 4; // mouseInterpolation
     const mouseYIp = 10;
 
     const sId = hitInfo.hitId;
@@ -204,7 +204,6 @@ const modules = {
 
     ctx.stroke();
 
-
     x += boxPadding.l;
     y += boxPadding.t + textHeight;
 
@@ -272,21 +271,32 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-
     const mouseXIp = 1; // mouseInterpolation
     const mouseYIp = 10;
 
     if (offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp)
       && offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp)) {
-      ctx.beginPath();
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.moveTo(offsetX + 0.5, graphPos.y1);
-      ctx.lineTo(offsetX + 0.5, graphPos.y2);
-      ctx.stroke();
-      ctx.restore();
-      ctx.closePath();
+      if (this.options.horizontal) {
+        ctx.beginPath();
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.moveTo(graphPos.x1, offsetY + 0.5);
+        ctx.lineTo(graphPos.x2, offsetY + 0.5);
+        ctx.stroke();
+        ctx.restore();
+        ctx.closePath();
+      } else {
+        ctx.beginPath();
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.moveTo(offsetX + 0.5, graphPos.y1);
+        ctx.lineTo(offsetX + 0.5, graphPos.y2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.closePath();
+      }
     }
   },
 
