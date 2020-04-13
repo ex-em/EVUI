@@ -278,7 +278,7 @@
     width: 100%;
     height: 100%;
     border-radius: 4px;
-    color: $color-dark-level5;
+    color: $color-gray75;
     font-size: 12px;
     line-height: 2;
     cursor: text;
@@ -287,8 +287,11 @@
 
   .ev-login.focus,
   .ev-login.focus:hover {
-    border-color: $color-primary;
     opacity: 1;
+
+    @include evThemify() {
+      background-color: evThemed('color-primary');
+    }
   }
 
   .ev-login-text,
@@ -306,12 +309,15 @@
   .ev-login-text:focus,
   .ev-login-password:focus {
     outline: none;
-    border-bottom: 3px solid $color-primary;
+
+    @include evThemify() {
+      border-bottom: 3px solid evThemed('color-primary');
+    }
   }
 
   /* LABEL ======================================= */
   .loginLabel {
-    color: $color-dark-level4;
+    color: $color-gray80;
     font-size: 12px;
     position: absolute;
     pointer-events: none;
@@ -326,6 +332,8 @@
   .ev-login-text:valid ~ .loginLabel,
   .ev-login-password:focus ~ .loginLabel,
   .ev-login-password:valid ~ .loginLabel {
-    color: $color-primary;
+    @include evThemify() {
+      color: evThemed('color-primary');
+    }
   }
 </style>

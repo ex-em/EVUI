@@ -205,7 +205,9 @@
 
     /* checked */
     &:checked + .ev-checkbox-label:before {
-      border-color: $color-primary;
+      @include evThemify() {
+        border-color: evThemed('color-primary');
+      }
     }
 
     &:checked + .ev-checkbox-label:after {
@@ -218,12 +220,17 @@
       height: 8px;
       border-radius: 100%;
       transform: translateY(-50%);
-      background-color: $color-primary;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
 
     /* checked -- type: check */
     &:checked + .ev-checkbox-label.check:before {
-      background-color: $color-primary;
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
 
     &:checked + .ev-checkbox-label.check:after {

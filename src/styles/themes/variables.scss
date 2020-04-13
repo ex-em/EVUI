@@ -2,183 +2,198 @@
 
 $ev-themes: (
   light: (
+    /* common
+    -------------------------- */
     font-color-base: $color-black,
+    color-primary: $color-light-blue,
+    color-info: $color-light-skyblue,
+    color-warning: $color-light-orange,
+    color-error: $color-light-red,
+    color-selected: $color-light-deep-purple,
 
     /* button
     -------------------------- */
-    button-disabled: $color-light-level6,
-    button-disabled-bg: $color-light-level2,
-    button-disabled-border: $color-light-level4,
-    button-ghost: $color-dark-level5,
-    button-ghost-border: $color-light-level4,
-    button-dashed: $color-dark-level5,
-    button-dashed-border: $color-light-level5,
-    button-dashed-active-bg: $color-light-level2,
+    button-disabled: $color-gray30,
+    button-disabled-bg: $color-gray5,
+    button-disabled-border: $color-gray13,
+    button-ghost: $color-gray75,
+    button-ghost-border: $color-gray13,
+    button-dashed: $color-gray75,
+    button-dashed-border: $color-gray19,
+    button-dashed-active-bg: $color-gray5,
     button-text: $color-black,
 
     /* checkbox
     -------------------------- */
-    checkbox: $color-dark-level4,
-    checkbox-border: $color-light-level6,
-    checkbox-disabled: $color-light-level6,
+    checkbox: $color-gray80,
+    checkbox-border: $color-gray30,
+    checkbox-disabled: $color-gray30,
 
     /* radio
     -------------------------- */
-    radio: $color-dark-level4,
-    radio-border: $color-light-level6,
-    radio-disabled: $color-light-level6,
+    radio: $color-gray80,
+    radio-border: $color-gray30,
+    radio-disabled: $color-gray30,
 
     /* select box
     -------------------------- */
-    selectbox-border: $color-light-level6,
-    selectbox-bg: $color-light-level1,
-    selectbox-bg-hover: $color-light-level3,
-    selectbox-select-bg: $color-light-level2,
+    selectbox-border: $color-gray30,
+    selectbox-bg: $color-gray1,
+    selectbox-bg-hover: $color-gray8,
+    selectbox-select-bg: $color-gray5,
 
     /* datepicker
     -------------------------- */
-    datepicker-input-border: $color-light-level6,
+    datepicker-input-border: $color-gray30,
 
     /* window
     -------------------------- */
-    window-bg: $color-light-level1,
-    window-border: $color-light-level6,
-    window-btn: $color-dark-level6,
+    window-bg: $color-gray1,
+    window-border: $color-gray30,
+    window-btn: $color-gray60,
     window-btn-bg: transparent,
+
     /* tab
     -------------------------- */
-    tab-bg: $color-light-level5,
-    tab-border: $color-light-level5,
-    tab-color: $color-dark-level2,
-    tab-active-color: $color-dark-level2,
+    tab-bg: $color-gray19,
+    tab-border: $color-gray19,
+    tab-color: $color-gray90,
+    tab-active-color: $color-gray90,
     tab-active-bg: $color-white,
 
     /* grid
     -------------------------- */
-    grid-header-border: #7F7F7F,
-    grid-bottom-border: $color-light-level5,
-    grid-row-selected: $color-light-level3,
-    grid-cell-text: rgba($color-dark-level2, 0.8),
-    grid-row-stripe: rgba(#E5E5E5, 0.6),
+    grid-header-border: $color-gray50,
+    grid-bottom-border: $color-gray19,
+    grid-row-selected: $color-gray8,
+    grid-cell-text: rgba($color-gray90, 0.8),
+    grid-row-stripe: rgba($color-gray10, 0.6),
 
     /* input
     -------------------------- */
-    textfield-input-border: $color-light-level6,
-    textfield-input-background: $color-light-level1,
+    textfield-input-border: $color-gray30,
+    textfield-input-background: $color-gray1,
     textfield-input-disabled: lighten($color-black, 40%),
-    textfield-input-disabled-background: $color-light-level2,
+    textfield-input-disabled-background: $color-gray5,
 
     /* input number
     -------------------------- */
-    number-input-border: $color-light-level6,
-    number-input-background: $color-light-level1,
+    number-input-border: $color-gray30,
+    number-input-background: $color-gray1,
     number-input-disabled: lighten($color-black, 40%),
-    number-input-disabled-background: $color-light-level2,
+    number-input-disabled-background: $color-gray5,
 
     /* menu
     -------------------------- */
-    menu-selected-bg: $color-selected,
-    menu-sub-split: $color-light-level5,
-    menu-color: #353740,
+    menu-selected-bg: $color-light-deep-purple,
+    menu-sub-split: $color-gray19,
+    menu-color: $color-gray80,
 
     /* context menu
     -------------------------- */
-    contextmenu-color: #0D0D0D,
-    contextmenu-wrap-bg: #FFFFFF,
-    contextmenu-wrap-border: #B2B2B2,
-    contextmenu-wrap-boxshadow: rgba(0, 0, 0, 0.3),
-    contextmenu-row-border: #E5E5E5,
+    contextmenu-color: $color-gray95,
+    contextmenu-wrap-bg: $color-white,
+    contextmenu-wrap-border: $color-gray30,
+    contextmenu-wrap-boxshadow: rgba($color-gray100, 0.3),
+    contextmenu-row-border: $color-gray10,
 
   ),
   dark: (
+    /* common
+    -------------------------- */
     font-color-base: $color-white,
+    color-primary: $color-dark-blue,
+    color-info: $color-dark-skyblue,
+    color-warning: $color-dark-orange,
+    color-error: $color-dark-red,
+    color-selected: $color-dark-deep-purple,
 
     /* button
     -------------------------- */
-    button-disabled: $color-light-level6,
-    button-disabled-bg: $color-light-level2,
-    button-disabled-border: $color-light-level4,
-    button-ghost: $color-dark-level5,
-    button-ghost-border: $color-light-level5,
-    button-dashed: $color-dark-level5,
-    button-dashed-border: $color-light-level4,
-    button-dashed-active-bg: $color-light-level2,
+    button-disabled: $color-gray30,
+    button-disabled-bg: $color-gray5,
+    button-disabled-border: $color-gray13,
+    button-ghost: $color-gray75,
+    button-ghost-border: $color-gray19,
+    button-dashed: $color-gray75,
+    button-dashed-border: $color-gray13,
+    button-dashed-active-bg: $color-gray5,
     button-text: $color-black,
 
     /* checkbox
     -------------------------- */
-    checkbox: $color-dark-level8,
-    checkbox-border: $color-dark-level8,
-    checkbox-disabled: $color-dark-level6,
+    checkbox: $color-gray8,
+    checkbox-border: $color-gray8,
+    checkbox-disabled: $color-gray60,
 
     /* radio
     -------------------------- */
-    radio: $color-dark-level8,
-    radio-border: $color-dark-level8,
-    radio-disabled: $color-dark-level6,
+    radio: $color-gray8,
+    radio-border: $color-gray8,
+    radio-disabled: $color-gray60,
 
     /* select box
     -------------------------- */
-    selectbox-border: $color-dark-level6,
-    selectbox-bg: $color-dark-level3,
-    selectbox-bg-hover: $color-dark-level4,
-    selectbox-select-bg: $color-dark-level5,
+    selectbox-border: $color-gray60,
+    selectbox-bg: $color-gray85,
+    selectbox-bg-hover: $color-gray80,
+    selectbox-select-bg: $color-gray75,
 
     /* datepicker
     -------------------------- */
-    datepicker-input-border: $color-dark-level6,
+    datepicker-input-border: $color-gray60,
 
 
     /* window
     -------------------------- */
-    window-bg: darken($color-dark-level4, 4%),
-    window-border: $color-dark-level6,
-    window-btn: $color-dark-level8,
-    window-btn-bg: $color-dark-level5,
+    window-bg: darken($color-gray80, 4%),
+    window-border: $color-gray60,
+    window-btn: $color-gray8,
+    window-btn-bg: $color-gray75,
 
     /* tab
     -------------------------- */
-    tab-bg: $color-dark-level4,
-    tab-border: $color-dark-level3,
+    tab-bg: $color-gray80,
+    tab-border: $color-gray85,
     tab-color: $color-white,
     tab-active-color: $color-white,
-    tab-active-bg: $color-dark-level2,
+    tab-active-bg: $color-gray90,
 
     /* grid
     -------------------------- */
-    grid-header-border: #7F7F7F,
-    grid-bottom-border: #4C4C4C,
-    grid-row-selected: #404040,
+    grid-header-border: $color-gray50,
+    grid-bottom-border: $color-gray70,
+    grid-row-selected: $color-gray75,
     grid-cell-text: rgba($color-white, 0.7),
-    grid-row-stripe: $color-dark-level3,
+    grid-row-stripe: $color-gray85,
 
     /* input
     -------------------------- */
-    textfield-input-border: $color-dark-level6,
-    textfield-input-background: $color-dark-level1,
+    textfield-input-border: $color-gray60,
+    textfield-input-background: $color-gray95,
     textfield-input-disabled: darken($color-white, 40%),
-    textfield-input-disabled-background: $color-dark-level4,
+    textfield-input-disabled-background: $color-gray80,
 
     /* input number
     -------------------------- */
-    number-input-border: $color-dark-level6,
-    number-input-background: $color-dark-level1,
+    number-input-border: $color-gray60,
+    number-input-background: $color-gray95,
     number-input-disabled: darken($color-white, 40%),
-    number-input-disabled-background: $color-dark-level4,
+    number-input-disabled-background: $color-gray80,
 
     /* menu
     -------------------------- */
     menu-selected-bg: $color-selected-blue,
-    menu-sub-split: #353740,
-    menu-color: #E3E7F0,
+    menu-sub-split: $color-gray80,
+    menu-color: $color-gray10,
 
     /* context menu
     -------------------------- */
-    contextmenu-color: #FFFFFF,
-    contextmenu-wrap-bg: #333333,
-    contextmenu-wrap-border: #7F7F7F,
-    contextmenu-wrap-boxshadow: rgba(0, 0, 0, 0.58),
-    contextmenu-row-border: #191919,
+    contextmenu-color: $color-white,
+    contextmenu-wrap-bg: $color-gray80,
+    contextmenu-wrap-border: $color-gray50,
+    contextmenu-wrap-boxshadow: rgba($color-gray100, 0.58),
+    contextmenu-row-border: $color-gray90,
 
   ),
 ) !default;

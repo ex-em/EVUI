@@ -295,8 +295,11 @@
 
   .ev-input.focus,
   .ev-input.focus:hover {
-    border-color: $color-primary;
     opacity: 1;
+
+    @include evThemify() {
+      border-color: evThemed('color-primary');
+    }
   }
 
   .ev-input-text {

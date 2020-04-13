@@ -418,7 +418,10 @@
     }
 
     &:focus {
-      box-shadow: inset 0 1px 1px rgba($color-black, 0.075), 0 0 8px rgba($color-primary, 0.6);
+      @include evThemify() {
+        box-shadow: inset 0 1px 1px rgba($color-black, 0.075),
+          0 0 8px rgba(evThemed('color-primary'), 0.6);
+      }
     }
 
     &:hover {
@@ -472,7 +475,7 @@
     font-family: Font Awesome\ 5 Free;
     font-style: normal;
     font-variant: normal;
-    color: $color-dark-level7;
+    color: $color-gray40;
     transition: all $animate-fast;
 
     &:before {
@@ -544,9 +547,13 @@
   }
 
   .ev-select-search:focus {
-    border-color: $color-primary;
     outline: 0;
-    box-shadow: inset 0 1px 1px rgba($color-black, 0.075), 0 0 8px rgba($color-primary, 0.6);
+
+    @include evThemify() {
+      border-color: evThemed('color-primary');
+      box-shadow: inset 0 1px 1px rgba($color-black, 0.075),
+        0 0 8px rgba(evThemed('color-primary'), 0.6);
+    }
   }
 
   .ev-selectbox-select-count-tag {

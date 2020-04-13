@@ -270,7 +270,10 @@
   }
   .ev-message-box .ei-close:hover {
     transition: color $animate-fast;
-    color: $color-primary;
+
+    @include evThemify() {
+      color: evThemed('color-primary');
+    }
   }
   .ev-message-box-center {
     margin: 14px 0;

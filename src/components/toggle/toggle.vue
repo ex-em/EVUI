@@ -255,17 +255,23 @@
     cursor: pointer;
 
     &.active {
-      background-color: $color-primary;
       color: $color-white;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
   }
 
   .ev-toggle.tab {
     display: inline-flex;
     position: relative;
-    border: 1px solid $color-primary;
     user-select: none;
     cursor: pointer;
+
+    @include evThemify() {
+      border: 1px solid evThemed('color-primary');
+    }
   }
 
   .ev-toggle.button {
@@ -273,10 +279,13 @@
     position: relative;
     border: 0;
     padding: 0 10px 0 10px;
-    background-color: $color-primary;
     color: $color-white;
     user-select: none;
     cursor: pointer;
+
+    @include evThemify() {
+      background-color: evThemed('color-primary');
+    }
   }
 
   .ev-toggle-switch {
@@ -309,7 +318,7 @@
     height: 100%;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
-    background-color: $color-light-level2;
+    background-color: $color-gray5;
     padding: 0 10px 0 10px;
     color: $color-black;
     text-align: center;
@@ -325,13 +334,16 @@
     height: 100%;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background-color: $color-primary;
     padding: 0 10px 0 10px;
     color: $color-white;
     text-align: center;
     vertical-align: middle;
     user-select: none;
     transition: all .2s ease-in-out;
+
+    @include evThemify() {
+      background-color: evThemed('color-primary');
+    }
   }
 
   .ev-toggle-onText-button {
@@ -365,14 +377,17 @@
     .ev-toggle-offText-tab {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      background-color: $color-primary;
       color: $color-white;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
 
     .ev-toggle-onText-tab {
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
-      background-color: $color-light-level2;
+      background-color: $color-gray5;
       color: $color-black;
     }
 
