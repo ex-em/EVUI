@@ -136,9 +136,9 @@ export default {
       line-height: 19px;
       padding: 5px;
       margin-right: 10px;
-      background-color: $color-dark-level6;
+      background-color: $color-gray60;
       color: $color-white;
-      border: solid 1px $color-dark-level6;
+      border: solid 1px $color-gray60;
       transition: opacity .2s linear;
 
       &:hover {
@@ -188,7 +188,9 @@ export default {
     clip: rect(0, 0, 0, 0);
 
     &:checked + .ev-radio-label:not(.button):before {
-      border: 1px solid $color-primary;
+      @include evThemify() {
+        border: 1px solid evThemed('color-primary');
+      }
     }
 
     &:checked + .ev-radio-label:not(.button):after {
@@ -204,8 +206,11 @@ export default {
 
     &:checked + .ev-radio-label.button {
       color: $color-white;
-      background-color: $color-primary;
-      border-color: $color-primary;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+        border-color: evThemed('color-primary');
+      }
 
       &:hover {
         opacity: 1;
@@ -219,7 +224,9 @@ export default {
     }
 
     &:checked + .ev-radio-label:after {
-      background-color: $color-primary;
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
   }
 

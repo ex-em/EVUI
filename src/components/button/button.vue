@@ -92,7 +92,7 @@
     display: inline-block;
     border: $border-solid transparent;
     border-radius: $border-radius-base;
-    background-color: $color-dark-level6;
+    background-color: $color-gray60;
     color: $color-white;
     cursor: pointer;
     user-select: none;
@@ -109,7 +109,10 @@
     &.active,
     &:active {
       background-color: $color-white;
-      border-color: $color-primary;
+
+      @include evThemify() {
+        border-color: evThemed('color-primary');
+      }
     }
 
     &.disabled>*,
@@ -142,52 +145,72 @@
   /** ev-btn > type(primary) **/
   .ev-btn-primary {
     color: $color-white;
-    background-color: $color-primary;
-    border-color: $color-primary;
+
+    @include evThemify() {
+      background-color: evThemed('color-primary');
+      border-color: evThemed('color-primary');
+    }
 
     &.active,
     &:active {
-      background-color: darken($color-primary, 10%);
-      border-color: darken($color-primary, 10%);
+      @include evThemify() {
+        background-color: darken(evThemed('color-primary'), 10%);
+        border-color: darken(evThemed('color-primary'), 10%);
+      }
     }
   }
 
   /** ev-btn > type(info) **/
   .ev-btn-info {
     color: $color-white;
-    background-color: $color-info !important;
-    border-color: $color-info !important;
+
+    @include evThemify() {
+      background-color: evThemed('color-info') !important;
+      border-color: evThemed('color-info') !important;
+    }
 
     &.active,
     &:active {
-      background-color: darken($color-info, 10%);
-      border-color: darken($color-info, 10%);
+      @include evThemify() {
+        background-color: darken(evThemed('color-info'), 10%) !important;
+        border-color: darken(evThemed('color-info'), 10%) !important;
+      }
     }
   }
 
   /** ev-btn > type(warning) **/
   .ev-btn-warning {
     color: $color-white;
-    background-color: $color-warning;
-    border-color: $color-warning;
+
+    @include evThemify() {
+      background-color: evThemed('color-warning');
+      border-color: evThemed('color-warning');
+    }
 
     &.active,
     &:active {
-      background-color: darken($color-warning, 10%);
-      border-color: darken($color-warning, 10%);
+      @include evThemify() {
+        background-color: darken(evThemed('color-warning'), 10%);
+        border-color: darken(evThemed('color-warning'), 10%);
+      }
     }
   }
 
   /** ev-btn > type(error) **/
   .ev-btn-error {
     color: $color-white !important;
-    background-color: $color-error;
-    border-color: $color-error;
+
+    @include evThemify() {
+      background-color: evThemed('color-error');
+      border-color: evThemed('color-error');
+    }
 
     &.active,
     &:active {
-      background-color: darken($color-error, 10%);
-      border-color: darken($color-error, 10%);
+      @include evThemify() {
+        background-color: darken(evThemed('color-error'), 10%);
+        border-color: darken(evThemed('color-error'), 10%);
+      }
     }
   }
 
@@ -203,8 +226,10 @@
 
     &.active,
     &:active {
-      color: $color-primary;
-      border-color: $color-primary;
+      @include evThemify() {
+        color: evThemed('color-primary');
+        border-color: evThemed('color-primary');
+      }
     }
   }
 
@@ -220,8 +245,10 @@
 
     &.active,
     &:active {
-      color: $color-primary;
-      border-color: $color-primary;
+      @include evThemify() {
+        color: evThemed('color-primary');
+        border-color: evThemed('color-primary');
+      }
     }
   }
 
@@ -254,12 +281,16 @@
     }
 
     &:hover {
-      color: $color-info;
+      @include evThemify() {
+        color: evThemed('color-info');
+      }
     }
 
     &.active,
     &:active {
-      color: $color-primary;
+      @include evThemify() {
+        color: evThemed('color-primary');
+      }
     }
   }
   /*

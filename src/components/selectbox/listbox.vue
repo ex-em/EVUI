@@ -119,8 +119,11 @@
   }
 
   .ev-listbox-li-selected {
-    color: $color-dark-level8;
-    background-color: $color-selected;
+    color: $color-gray8;
+
+    @include evThemify() {
+      background-color: evThemed('color-selected');
+    }
   }
 
   .ev-selectbox-size-small .ev-listbox-li,
