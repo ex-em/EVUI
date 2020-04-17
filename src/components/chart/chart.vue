@@ -201,6 +201,14 @@
           this.evChart.resize();
         }
       },
+      forceUpdate() {
+        if (this.isInit) {
+          this.evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
+        }
+      },
       onDblClick(e) {
         this.$emit('on-dblclick', e);
       },
