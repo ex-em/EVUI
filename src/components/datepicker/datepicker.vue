@@ -640,8 +640,8 @@
   .fit13,
   .fit16,
   .fit19 {
-    height: 23px;
-    line-height: 23px;
+    height: 25px;
+    line-height: 25px;
   }
   .fit10 {
     width: 85px;
