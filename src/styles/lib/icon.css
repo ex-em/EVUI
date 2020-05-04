@@ -37,6 +37,39 @@
   font-size: 25px;
 }
 
+.ei-add-box:before {
+  content: '\e9ec';
+}
+.ei-add:before {
+  content: '\e9ed';
+}
+.ei-binary:before {
+  content: '\e9ee';
+}
+.ei-change:before {
+  content: '\e9ef';
+}
+.ei-cloud_upload:before {
+  content: '\e9f0';
+}
+.ei-cpu:before {
+  content: '\e9f1';
+}
+.ei-description:before {
+  content: '\e9f2';
+}
+.ei-done:before {
+  content: '\e9f3';
+}
+.ei-edit:before {
+  content: '\e9f4';
+}
+.ei-License:before {
+  content: '\e9f5';
+}
+.ei-play_circle:before {
+  content: '\e9f6';
+}
 .ei-getmore:before {
   content: '\e9e9';
 }
