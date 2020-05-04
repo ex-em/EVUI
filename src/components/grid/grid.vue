@@ -219,7 +219,7 @@
         adjust: this.option.adjust || false,
         stripeRows: this.option.stripeRows || false,
         showHeader: this.option.showHeader === undefined ? true : this.option.showHeader,
-        useSelect: this.option.useSelect || true,
+        useSelect: this.option.useSelect === undefined ? true : this.option.useSelect,
         useCheckbox: this.option.useCheckbox || {},
         useContextMenu: this.option.useContextMenu || {},
         rowHeight: this.option.rowHeight || 32,
@@ -702,7 +702,7 @@
           }
         }
 
-        this.prevCheckedRow = row;
+        this.prevCheckedRow = row.slice();
         this.$emit('update:checked', this.checkedRows);
         this.$emit('check-one', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
       },

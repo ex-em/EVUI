@@ -36,6 +36,7 @@
           />
         </span>
         <span
+          v-if="closable"
           :class="`${prefixCls}-btn`"
           class="close"
           @click="clickCloseBtn"
@@ -80,6 +81,10 @@
         default: true,
       },
       resizable: {
+        type: Boolean,
+        default: true,
+      },
+      closable: {
         type: Boolean,
         default: true,
       },
