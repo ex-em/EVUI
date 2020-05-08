@@ -14,8 +14,6 @@
 </template>
 
 <script>
-  import { getQuantity } from '../../common/utils';
-
   const prefixEvui = 'ev-contextmenu';
 
   export default {
@@ -132,8 +130,8 @@
       setPosition(e, x, y) {
         const isHScroll = window.innerWidth < document.scrollingElement.scrollWidth;
         const isVScroll = window.innerHeight < document.scrollingElement.scrollHeight;
-        const clientX = (getQuantity(x) || { value: 0 }).value;
-        const clientY = (getQuantity(y) || { value: 0 }).value;
+        const clientX = x || 0;
+        const clientY = y || 0;
         const remainingWidth = (window.innerWidth - clientX)
           - (isVScroll ? this.scrollbarSize : 0);
         const remainingHeight = (window.innerHeight - clientY)
