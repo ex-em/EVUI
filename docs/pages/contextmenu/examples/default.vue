@@ -47,10 +47,31 @@
                   {
                     text: 'menu(2-1-2)',
                     itemId: 'menu2_1_2',
+                    items: [
+                      {
+                        text: 'menu(2-1-2-1)',
+                        itemId: 'menu2_1_2_1',
+                      },
+                      {
+                        text: 'menu(2-1-2-2)',
+                        itemId: 'menu2_1_2_2',
+                      },
+                    ],
                   },
                   {
                     text: 'menu(2-1-3)',
                     itemId: 'menu2_1_3',
+                    disabled: true,
+                    items: [
+                      {
+                        text: 'menu(2-1-3-1)',
+                        itemId: 'menu2_1_3_1',
+                      },
+                      {
+                        text: 'menu(2-1-3-2)',
+                        itemId: 'menu2_1_3_2',
+                      },
+                    ],
                   },
                 ],
               },
@@ -91,7 +112,7 @@
   }
   .contextmenu-default-body {
     width: 800px;
-    height: 500px;
+    height: 1000px;
     background: #8D99A7;
   }
 </style>
