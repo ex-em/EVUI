@@ -1,4 +1,3 @@
-import ContextMenu from './contextmenu';
-import ContextMenuChildren from './contextmenu.children';
+import ContextMenu from './contextmenu.wrap';
 
-export { ContextMenu, ContextMenuChildren };
+export default ContextMenu;

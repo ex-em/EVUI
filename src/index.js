@@ -2,10 +2,7 @@ import EvButton from './components/button';
 import EvChart from './components/chart';
 import EvCheckbox from './components/checkbox';
 import EvCheckboxGroup from './components/checkbox-group';
-import {
-  ContextMenu as EvContextMenu,
-  ContextMenuChildren as EvContextMenuChildren,
-} from './components/contextmenu';
+import EvContextMenu from './components/contextmenu';
 import EvIcon from './components/icon';
 import EvInput from './components/input';
 import EvTextField from './components/textfield';
@@ -37,7 +34,6 @@ const components = {
   EvCheckbox,
   EvCheckboxGroup,
   EvContextMenu,
-  EvContextMenuChildren,
   EvIcon,
   EvInput,
   EvTextField,

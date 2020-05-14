@@ -1,53 +1,60 @@
 <template>
   <div
-    v-click-outside="hide"
     :style="ctxMenuStyle"
     :class="prefixEvui"
+    @mouseleave="onMouseLeave"
   >
-    <ev-context-menu-children
-      ref="ctxChildren"
-      :depth="0"
-      :items="items"
+    <div
+      class="contextmenu-body"
+    >
+      <div
+        v-for="(item, rowIdx) in items"
+        :key="getRowKey(depth, rowIdx, item.text)"
+        :class="getRowCls(item)"
+        :disabled="item.disabled"
+        @click="onRowClick(item, depth, rowIdx)"
+        @mouseover="onMouseOver(depth, rowIdx, item)"
+      >
+        {{ item.text }}
+        <ev-icon
+          v-if="item.items"
+          :cls="'ei-arrow-right2 menu-arrow'"
+        />
+      </div>
+    </div>
+    <context-menu-child
+      v-for="(item, rowIdx) in items"
+      v-if="item.items"
+      :key="`children_menu_${item.text}_${depth}_${rowIdx}`"
+      :depth="depth + 1"
+      :row-index="rowIdx"
+      :row-key="getRowKey(depth, rowIdx, item.text)"
+      :focused-row-key="focusedRowKey"
+      :items="item.items"
       @click="onClick"
     />
   </div>
 </template>
 
 <script>
-  const prefixEvui = 'ev-contextmenu';
-
   export default {
-    directives: {
-      'click-outside': {
-        bind(el, binding) {
-          const contextMenuEl = el;
-          const bubble = binding.modifiers.bubble;
-          const handler = (e) => {
-            if (bubble || (contextMenuEl !== e.target && !contextMenuEl.contains(e.target))) {
-              binding.value(e);
-            }
-          };
-          contextMenuEl.vueClickOutside = handler;
-
-          document.addEventListener('mousedown', handler);
-        },
-        unbind(el) {
-          const contextMenuEl = el;
-          document.removeEventListener('mousedown', contextMenuEl.vueClickOutside);
-          contextMenuEl.vueClickOutside = null;
-        },
-      },
+    components: {
+      ContextMenuChild: () => import('./contextmenu.child'),
     },
     props: {
-      isUse: {
-        type: Boolean,
-        default: true,
+      visibility: {
+        type: String,
+        default: 'visible',
+        validator(value) {
+          const list = ['visible', 'hidden', 'collapse', 'inherit', 'initial', 'unset'];
+          return list.indexOf(value) > -1;
+        },
       },
-      x: {
+      depth: {
         type: Number,
         default: 0,
       },
-      y: {
+      rowIndex: {
         type: Number,
         default: 0,
       },
@@ -63,106 +70,133 @@
     },
     data() {
       return {
-        prefixEvui,
+        prefixEvui: 'contextmenu',
         top: 0,
         left: 0,
         width: 0,
         height: 0,
-        visibility: 'hidden',
+        clientRect: null,
+        clientRectLeft: 0,
+        isHScroll: false,
+        isVScroll: false,
         scrollbarSize: 16,
+        directionToShow: 'right',
+        rowHeight: 29,
+        focusedRowKey: '',
       };
     },
     computed: {
       ctxMenuStyle() {
-        return `
-          visibility: ${this.visibility};
-          top: ${this.top}px;
-          left: ${this.left}px;
+        return this.depth === 0 ? '' : `
+            visibility: ${this.visibility};
+            top: ${this.top}px;
+            left: ${this.left}px;
           `;
       },
     },
-    mounted() {
-      this.parentAddListener();
-      this.moveElToBody();
-
-      if (this.$el && this.$el.firstElementChild) {
-        const clientRect = (this.$el.firstElementChild.getClientRects() || {})[0] || {};
-
-        this.top = clientRect.top || 0;
-        this.left = clientRect.left || 0;
-        this.width = clientRect.width || 0;
-        this.height = clientRect.height || 0;
-      } else {
-        this.top = 0;
-        this.left = 0;
-        this.width = 0;
-        this.height = 0;
-      }
-    },
-    beforeDestroy() {
-      if (this.$el) {
-        this.$el.remove();
-      }
-      const parentEl = this.$el.parentElement;
-      if (parentEl && this.onContextMenu) {
-        parentEl.removeEventListener('contextmenu', this.onContextMenu);
-      }
+    watch: {
+      focusedRowKey(value) {
+        console.log(value);
+      },
+      visibility(value) {
+        if (value === 'visible') {
+          this.setPosition();
+        }
+      },
     },
     methods: {
-      parentAddListener() {
-        const parentEl = this.$el.parentElement;
-
-        if (parentEl) {
-          parentEl.addEventListener('contextmenu', this.onContextMenu);
+      onRowClick(item, depth, rowIdx) {
+        if (!item.disabled) {
+          this.$emit('click', {
+            ...item,
+            depth,
+            rowIdx,
+            scope: this,
+          });
         }
-      },
-      moveElToBody() {
-        document.body.appendChild(this.$el);
-      },
-      onContextMenu(e) {
-        this.setPosition(e, e.clientX, e.clientY);
-        this.show();
-        e.preventDefault();
       },
       onClick(item) {
-        this.$emit('click', item);
-      },
-      setPosition(e, x, y) {
-        const isHScroll = window.innerWidth < document.scrollingElement.scrollWidth;
-        const isVScroll = window.innerHeight < document.scrollingElement.scrollHeight;
-        const clientX = x || 0;
-        const clientY = y || 0;
-        const remainingWidth = (window.innerWidth - clientX)
-          - (isVScroll ? this.scrollbarSize : 0);
-        const remainingHeight = (window.innerHeight - clientY)
-          - (isHScroll ? this.scrollbarSize : 0);
-        let left = clientX + document.scrollingElement.scrollLeft;
-        let top = clientY + document.scrollingElement.scrollTop;
-
-        if (this.width > remainingWidth) {
-          left -= (this.width - remainingWidth);
-        }
-
-        if (this.height > remainingHeight) {
-          top -= (this.height - remainingHeight);
-        }
-
-        this.left = left;
-        this.top = top;
-      },
-      show() {
-        if (this.isUse) {
-          this.visibility = 'visible';
+        if (!item.disabled) {
+          this.$emit('click', item);
         }
       },
-      hide() {
-        const ctxChildren = this.$refs.ctxChildren;
+      onMouseOver(depth, rowIdx, item) {
+        if (item.disabled) {
+          this.focusedRowKey = '';
+        } else {
+          this.focusedRowKey = this.getRowKey(depth, rowIdx, item.text);
+        }
+      },
+      onMouseLeave() {
+        this.focusedRowKey = '';
+      },
+      setPosition() {
+        const parent = this.$parent.$parent;
 
-        if (ctxChildren && ctxChildren.hide) {
-          ctxChildren.hide(this.$children);
+        if (!this.clientRect) {
+          this.clientRect = this.getClientRect() || {};
+
+          if (this.clientRect) {
+            this.isHScroll = window.innerWidth < document.scrollingElement.scrollWidth;
+            this.isVScroll = window.innerHeight < document.scrollingElement.scrollHeight;
+            this.width = this.clientRect.width || 0;
+            this.height = this.clientRect.height || 0;
+            this.top = this.rowIndex * this.rowHeight;
+          }
         }
 
-        this.visibility = 'hidden';
+        if (this.clientRect && parent) {
+          const parentClientRect = parent.getClientRect() || {};
+          const parentClientRectLeft = parent.clientRectLeft;
+          const parentWidth = parentClientRect.width || 0;
+          const parentDirectionToShow = parent.directionToShow;
+          let top = this.top;
+          let left = 0;
+          let clientRectLeft;
+
+          if (this.depth === 1) {
+            clientRectLeft = parentWidth;
+          } else {
+            clientRectLeft = parentWidth + parentClientRectLeft;
+          }
+
+          const remainingHeight = (window.innerHeight - top)
+            - (this.isHScroll ? this.scrollbarSize : 0);
+          const remainingWidth = (window.innerWidth - (clientRectLeft + parentWidth))
+            - (this.isVScroll ? this.scrollbarSize : 0);
+
+          if (this.height > remainingHeight) {
+            top -= (this.height - remainingHeight);
+          }
+
+          if (parentDirectionToShow === 'left'
+            || this.width > remainingWidth) {
+            left = -this.width;
+            this.directionToShow = 'left';
+          } else {
+            left = parentWidth;
+            this.directionToShow = 'right';
+          }
+
+          this.clientRectLeft = clientRectLeft;
+          // this.top = firstChild.scrollTop + top;
+          // this.left = firstChild.scrollLeft + left;
+          this.top = top;
+          this.left = left;
+        }
+      },
+      getClientRect() {
+        return this.$el && (this.$el.firstElementChild.getClientRects() || {})[0];
+      },
+      getRowCls(item) {
+        return {
+          'contextmenu-row': true,
+          'exist-arrow': !!item.items,
+          disabled: !!item.disabled,
+        };
+      },
+      getRowKey(depth, rowIndex, text) {
+        return `rowKey_${depth}_${rowIndex}_${text}`;
       },
     },
   };
@@ -171,8 +205,62 @@
 <style lang="scss">
   @import '~@/styles/default';
 
-  .ev-contextmenu {
+  .contextmenu {
     position: absolute;
     z-index: 850;
+
+    .contextmenu-body {
+      position: relative;
+      font-size: 12px;
+
+      @include evThemify() {
+        background: evThemed('contextmenu-wrap-bg');
+        color: evThemed('contextmenu-color');
+        border: 1px solid evThemed('contextmenu-wrap-border');
+        box-shadow: 0 7px 15px 0 evThemed('contextmenu-wrap-boxshadow');
+      }
+    }
+
+    .contextmenu-row {
+      position: relative;
+      height: 29px;
+      padding: 2px 16px;
+      line-height: 22px;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &:hover {
+        @include evThemify() {
+          background-color: evThemed('contextmenu-row-border');
+        }
+      }
+
+      &.disabled {
+        opacity: 0.5;
+      }
+
+      &:not(.disabled) {
+        cursor: pointer;
+      }
+
+      &.exist-arrow {
+        padding: 2px 21px 2px 16px;
+      }
+
+      .menu-arrow {
+        position: absolute;
+        top: 8px;
+        right: 4px;
+        pointer-events: none;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      @include evThemify() {
+        border-bottom: 1px solid evThemed('contextmenu-row-border');
+      }
+    }
   }
 </style>
