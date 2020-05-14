@@ -134,11 +134,13 @@
         const parent = this.$parent.$parent;
 
         if (!this.clientRect) {
-          this.clientRect = this.getClientRect() || {};
+          this.clientRect = this.getClientRect();
 
           if (this.clientRect) {
-            this.isHScroll = window.innerWidth < document.scrollingElement.scrollWidth;
-            this.isVScroll = window.innerHeight < document.scrollingElement.scrollHeight;
+            const scrollEl = document.scrollingElement
+              || document.documentElement || document.body;
+            this.isHScroll = window.innerWidth < scrollEl.scrollWidth;
+            this.isVScroll = window.innerHeight < scrollEl.scrollHeight;
             this.width = this.clientRect.width || 0;
             this.height = this.clientRect.height || 0;
             this.top = this.rowIndex * this.rowHeight;
@@ -146,7 +148,7 @@
         }
 
         if (this.clientRect && parent) {
-          const parentClientRect = parent.getClientRect() || {};
+          const parentClientRect = parent.getClientRect();
           const parentClientRectLeft = parent.clientRectLeft;
           const parentWidth = parentClientRect.width || 0;
           const parentDirectionToShow = parent.directionToShow;
@@ -179,14 +181,16 @@
           }
 
           this.clientRectLeft = clientRectLeft;
-          // this.top = firstChild.scrollTop + top;
-          // this.left = firstChild.scrollLeft + left;
           this.top = top;
           this.left = left;
         }
       },
       getClientRect() {
-        return this.$el && (this.$el.firstElementChild.getClientRects() || {})[0];
+        return (
+          this.$el
+          && this.$el.firstElementChild
+          && this.$el.firstElementChild.getClientRects()[0]
+        ) || {};
       },
       getRowCls(item) {
         return {
