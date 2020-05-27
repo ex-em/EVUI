@@ -2,7 +2,6 @@
   <div
     v-cloak
     :class="getTableClass"
-    @contextmenu="onContextMenu($event)"
   >
     <div
       v-show="showHeader"
@@ -32,8 +31,15 @@
             column: true,
             render: isRenderer(column),
           }"
-          class="column"
         >
+          <span
+            v-if="isFiltering &&
+            filterList[column.field] &&
+            filterList[column.field].find(item => item.use)"
+            class="column-filter-status"
+          >
+            <ev-icon :cls="'ei-filter'"/>
+          </span>
           <span
             :title="column.caption"
             class="column-name"
@@ -41,21 +47,18 @@
           >{{ column.caption }}</span>
           <ev-icon
             v-if="sortField === column.field"
-            :cls="`ei-s ${sortOrder === 'desc' ? 'ei-s-arrow-down' : 'ei-s-arrow-up'} sort-icon`"
+            :cls="`${sortOrder === 'desc' ? 'ei-text-vertical' : 'ei-text-up'} sort-icon`"
           />
           <span
-            v-if="false"
-            class="column-option"
-            @click.stop.prevent="onClickOption($event, column.field, index)"
+            v-if="isFiltering"
+            class="column-filter"
+            @click.stop.prevent="onClickFilter(column)"
           >
-            <ev-icon
-              :cls="'ei-s ei-s-arrow-down'"
-              style="margin: 3px 0 0 0; font-size: 12px;"
-            />
+            <ev-icon :cls="'ei-filter-list set-filter-icon'"/>
           </span>
           <span
             class="column-resize"
-            @mousedown.stop="onColumnResize(index, $event)"
+            @mousedown.stop.left="onColumnResize(index, $event)"
           />
         </li>
         <li
@@ -71,6 +74,7 @@
         stripe: stripeRows
       }"
       @scroll="onScroll"
+      @contextmenu="onContextMenu($event)"
     >
       <div
         :style="`height: ${vScrollTopHeight}px;`"
@@ -122,6 +126,7 @@
               :key="cellIndex"
               :data-name="column.field"
               :data-index="column.index"
+              :class="`${column.type} ${column.align ? column.align : ''}`"
               :style="
                 `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             >
@@ -138,8 +143,8 @@
               />
               <span
                 v-else
-                :title="row[2][column.index]"
-              >{{ row[2][column.index] }}</span>
+                :title="getConvertValue(column.type, row[2][column.index])"
+              >{{ getConvertValue(column.type, row[2][column.index]) }}</span>
             </td>
           </tr>
         </tbody>
@@ -148,29 +153,32 @@
         :style="`height: ${vScrollBottomHeight}px;`"
         class="vscroll-spacer"
       />
+      <ev-context-menu
+        :is-use="showContextMenu"
+        :items="contextMenuItems"
+        @click="onClickCtxMenu"
+      />
     </div>
     <div
       v-show="showResizeLine"
       ref="resizeLine"
       class="table-resize-line"
     />
-    <TableFilter
-      v-if="showColumnOption"
-      v-model="filterCondition"
-      :show.sync="showColumnOption"
-      @sort="onSort"
-    />
-    <ev-context-menu
-      :is-use="showContextMenu"
-      :items="useContextMenu.use ? useContextMenu.items : []"
-      @click="onClickCtxMenu"
+    <filter-window
+      v-show="showFilterWindow"
+      :is-show="showFilterWindow"
+      :target-column="currentFilter.column"
+      :filter-items="currentFilter.items"
+      @apply-filter="onApplyFilter"
+      @before-close="onCloseFilterWindow"
     />
   </div>
 </template>
 <script>
   import resize from 'vue-resize-directive';
   import { uniqBy, isEqual } from 'lodash-es';
-  import TableFilter from './grid.filter';
+  import { numberWithComma } from '@/common/utils';
+  import FilterWindow from './grid.filter.window';
   import Renderer from './grid.render';
 
   const ROW_INDEX = 0;
@@ -183,7 +191,7 @@
       resize,
     },
     components: {
-      TableFilter,
+      FilterWindow,
       Renderer,
     },
     props: {
@@ -221,24 +229,28 @@
         showHeader: this.option.showHeader === undefined ? true : this.option.showHeader,
         useSelect: this.option.useSelect === undefined ? true : this.option.useSelect,
         useCheckbox: this.option.useCheckbox || {},
-        useContextMenu: this.option.useContextMenu || {},
+        customContextMenu: this.option.customContextMenu || [],
+        useFilter: this.option.useFilter === undefined ? true : this.option.useFilter,
         rowHeight: this.option.rowHeight || 32,
         columnWidth: this.option.columnWidth || 80,
-        scrollWidth: this.option.scrollWidth || 17,
+        scrollWidth: this.option.scrollWidth || 16,
         lastScroll: {},
         vScrollTopHeight: 0,
         vScrollBottomHeight: 0,
         hasVerticalScrollBar: false,
         showColumnOption: false,
         showResizeLine: false,
+        showFilterWindow: false,
+        contextMenuItems: [],
+        currentFilter: { column: {}, items: [] },
         sortList: {},
         filterList: {},
-        filterCondition: {},
         selectedRow: this.selected,
         checkedRows: this.checked,
         prevCheckedRow: [],
         isHeaderChecked: false,
         isClickedCtxMenu: false,
+        isFiltering: false,
       };
     },
     computed: {
@@ -250,26 +262,13 @@
           'non-header': !this.showHeader,
         };
       },
-      useFilter() {
-        let result = false;
-        const columns = Object.keys(this.filterList || {});
-
-        for (let ix = 0; ix < columns.length; ix++) {
-          if (this.filterList[columns[ix]].use) {
-            result = true;
-            break;
-          }
-        }
-
-        return result;
-      },
       isHeaderCheckBox() {
         const option = this.useCheckbox;
 
         return option.use && option.headerCheck && option.mode !== 'single';
       },
       showContextMenu() {
-        return this.useContextMenu.use && this.isClickedCtxMenu;
+        return !!(this.contextMenuItems.length && this.isClickedCtxMenu);
       },
     },
     watch: {
@@ -288,19 +287,6 @@
             store[ix][ROW_CHECK_INDEX] = true;
           }
         }
-      },
-      filterCondition: {
-        deep: true,
-        handler(value) {
-          this.$set(this.filterList, value.field, value);
-          this.filteredStore.length = 0;
-
-          if (this.useFilter) {
-            this.setFilter();
-          }
-
-          this.updateVScroll();
-        },
       },
       hasVerticalScrollBar() {
         this.onResize();
@@ -333,6 +319,20 @@
       },
       getColumnIndex(field) {
         return this.columns.findIndex(column => column.field === field);
+      },
+      getConvertValue(type, value) {
+        let convertValue;
+
+        if (type === 'number') {
+          convertValue = numberWithComma(value);
+          convertValue = convertValue === false ? value : convertValue;
+        } else if (type === 'float') {
+          convertValue = value.toFixed(3);
+        } else {
+          convertValue = value;
+        }
+
+        return convertValue;
       },
       calculatedColumn() {
         let columnWidth = this.columnWidth;
@@ -389,18 +389,41 @@
           this.orderedColumns[this.orderedColumns.length - 1].width += remainWidth;
         }
       },
+      setContextMenu(useCustom = true) {
+        const menuItems = [];
+
+        if (useCustom && this.customContextMenu.length) {
+          menuItems.push(...this.customContextMenu);
+        }
+
+        if (this.useFilter) {
+          menuItems.push({
+            text: this.isFiltering ? 'Filter Off' : 'Filter On',
+            itemId: 'set_filter',
+            callback: () => {
+              this.isFiltering = !this.isFiltering;
+              this.filteredStore = [];
+
+              this.setStore([], false);
+            },
+          });
+        }
+
+        this.contextMenuItems = menuItems;
+      },
       setSort() {
         const index = this.getColumnIndex(this.sortField);
         const desc = (a, b) => (a > b ? -1 : 1);
         const asc = (a, b) => (a < b ? -1 : 1);
         const type = this.columns[index].type || 'string';
         const sortFn = this.sortOrder === 'desc' ? desc : asc;
+        const store = this.isFiltering ? this.filteredStore : this.originStore;
 
         if (type === 'string') {
-          this.originStore.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
+          store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
             b[ROW_DATA_INDEX][index].toLowerCase()));
         } else {
-          this.originStore.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index],
+          store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index],
             b[ROW_DATA_INDEX][index]));
         }
       },
@@ -415,34 +438,34 @@
         return RegExp(`^${regx}$`, 'gi').test(origin);
       },
       stringFilter(item, condition) {
-        const type = condition.type;
+        const comparison = condition.comparison;
         const value = condition.value;
         const index = condition.index;
         let result;
 
-        if (type === 'equal') {
+        if (comparison === 'Equal') {
           result = item[ROW_DATA_INDEX][index] === value;
-        } else if (type === 'notEqual') {
+        } else if (comparison === 'Not Equal') {
           result = item[ROW_DATA_INDEX][index] !== value;
-        } else if (type === 'like') {
+        } else if (comparison === 'Like') {
           result = this.likeSearch(`%${value}%`, item[ROW_DATA_INDEX][index]);
-        } else if (type === 'notLike') {
+        } else if (comparison === 'Not Like') {
           result = !this.likeSearch(`%${value}%`, item[ROW_DATA_INDEX][index]);
         }
 
         return result;
       },
       numberFilter(item, condition) {
-        const type = condition.type;
+        const comparison = condition.comparison;
         const value = condition.value;
         const index = condition.index;
         let result;
 
-        if (type === 'equal') {
+        if (comparison === '=') {
           result = item[ROW_DATA_INDEX][index] === value;
-        } else if (type === 'greaterThan') {
+        } else if (comparison === '>') {
           result = item[ROW_DATA_INDEX][index] > value;
-        } else if (type === 'lessThan') {
+        } else if (comparison === '<') {
           result = item[ROW_DATA_INDEX][index] < value;
         }
 
@@ -461,44 +484,50 @@
         return filteredData;
       },
       setFilter() {
-        let filteredStore = [];
         let field;
         let index;
-        let filter;
+        let filters;
         let columnType;
-        const fields = Object.keys(this.filterList || {});
+        let filteredStore = [];
+        let isAppliedFilter = false;
+        const filterByColumn = this.filterList;
+        const fields = Object.keys(filterByColumn || {});
         const store = this.originStore;
 
         for (let ix = 0; ix < fields.length; ix++) {
           field = fields[ix];
-          filter = this.filterList[field];
+          filters = filterByColumn[field];
           index = this.getColumnIndex(field);
           columnType = this.columns[index].type;
-          if (filter.use && filter.conditions.length) {
-            for (let jx = 0; jx < filter.conditions.length; jx++) {
-              if (filter.conditions[jx].use) {
-                if (!filteredStore.length) {
-                  filteredStore = this.getFilteredData(store, columnType, {
-                    ...filter.conditions[jx],
-                    index,
-                  });
-                } else if (filter.method === 'or') {
-                  filteredStore.push(...this.getFilteredData(store, columnType, {
-                    ...filter.conditions[jx],
-                    index,
-                  }));
-                } else {
-                  filteredStore = this.getFilteredData(filteredStore, columnType, {
-                    ...filter.conditions[jx],
-                    index,
-                  });
-                }
+          for (let jx = 0; jx < filters.length; jx++) {
+            const filterItem = filters[jx];
+            if (filterItem.use) {
+              isAppliedFilter = true;
+              if (!filteredStore.length) {
+                filteredStore = this.getFilteredData(store, columnType, {
+                  ...filterItem,
+                  index,
+                });
+              } else if (filterItem.type === 'OR') {
+                filteredStore.push(...this.getFilteredData(store, columnType, {
+                  ...filterItem,
+                  index,
+                }));
+              } else {
+                filteredStore = this.getFilteredData(filteredStore, columnType, {
+                  ...filterItem,
+                  index,
+                });
               }
             }
           }
         }
 
-        this.filteredStore = uniqBy(filteredStore, JSON.stringify);
+        if (!isAppliedFilter) {
+          this.filteredStore = store;
+        } else {
+          this.filteredStore = uniqBy(filteredStore, JSON.stringify);
+        }
       },
       setStore(value, makeIndex = true) {
         const store = [];
@@ -530,12 +559,12 @@
           this.originStore = store;
         }
 
-        if (this.sortField) {
-          this.setSort();
+        if (this.isFiltering) {
+          this.setFilter();
         }
 
-        if (this.useFilter) {
-          this.setFilter();
+        if (this.sortField) {
+          this.setSort();
         }
 
         this.updateVScroll();
@@ -550,16 +579,20 @@
         const el = this.$refs.body;
         const offset = 5;
         const rowHeight = this.rowHeight;
-        const store = this.useFilter ? this.filteredStore : this.originStore;
+        const store = this.isFiltering ? this.filteredStore : this.originStore;
         const rowCount = el.clientHeight > rowHeight
           ? Math.ceil(el.clientHeight / rowHeight) : store.length;
         const totalScrollHeight = store.length * rowHeight;
-        const firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
+        let firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
+        if (firstVisibleIndex > store.length - 1) {
+          firstVisibleIndex = 0;
+        }
+
         const lastVisibleIndex = firstVisibleIndex + rowCount;
         const firstIndex = Math.max(firstVisibleIndex - offset, 0);
         const lastIndex = lastVisibleIndex + offset;
 
-        this.hasVerticalScrollBar = rowCount < this.originStore.length;
+        this.hasVerticalScrollBar = rowCount < store.length;
         this.viewStore = store.slice(firstIndex, lastIndex);
 
         this.vScrollTopHeight = firstIndex * rowHeight;
@@ -567,10 +600,11 @@
           - this.vScrollTopHeight;
       },
       unCheckedRow(row) {
-        const index = this.originStore.findIndex(item => item === row);
+        const index = this.originStore.findIndex(
+          item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
 
         if (index !== -1) {
-          this.$set(this.originStore, index, row);
+          this.$set(this.originStore[index], ROW_CHECK_INDEX, row[ROW_CHECK_INDEX]);
         }
       },
       onSort(field) {
@@ -603,44 +637,39 @@
         this.lastScroll.top = scrollTop;
         this.lastScroll.left = scrollLeft;
       },
-      onClickOption(e, field, index) {
-        if (this.showColumnOption) {
-          this.showColumnOption = false;
-          return;
-        }
-
-        const rect = e.currentTarget.parentElement.getBoundingClientRect();
-        const top = rect.height;
-        const left = (rect.width * (index + 1)) - 12;
-        let condition = this.filterList[field];
-
-        if (!condition) {
-          condition = {
-            use: false,
-            method: 'or',
-            type: this.orderedColumns[index].type || 'string',
-            conditions: [],
-            field,
-          };
-        }
-
-        condition.field = field;
-        condition.top = top;
-        condition.left = left;
-
-        this.filterCondition = condition;
-        this.showColumnOption = true;
+      onCloseFilterWindow() {
+        this.currentFilter = {
+          column: {},
+          items: [],
+        };
+        this.showFilterWindow = false;
       },
-      onClickCtxMenu({ itemId }) {
-        if (this.useContextMenu.use && this.useContextMenu.clickFn) {
-          this.useContextMenu.clickFn(itemId);
+      onApplyFilter(columnField, filters) {
+        this.$set(this.filterList, columnField, filters);
+        this.filteredStore = [];
+
+        this.setStore([], false);
+      },
+      onClickFilter(column) {
+        const filter = {
+          column,
+          items: [],
+        };
+        const filterItems = this.filterList[column.field];
+
+        if (filterItems) {
+          filter.items = filterItems;
+        }
+
+        this.currentFilter = filter;
+        this.showFilterWindow = true;
+      },
+      onClickCtxMenu(item) {
+        if (item && item.callback) {
+          item.callback(this.selectedRow);
         }
       },
       onContextMenu(event) {
-        if (!this.useContextMenu.items || !this.useContextMenu.items.length) {
-          return;
-        }
-
         const target = event.target;
         const tagName = target.tagName.toLowerCase();
         let rowIndex;
@@ -651,14 +680,15 @@
           rowIndex = target.parentElement.parentElement.dataset.index;
         }
 
+        this.isClickedCtxMenu = true;
         if (rowIndex) {
           const rowData = this.viewStore[+rowIndex][ROW_DATA_INDEX];
           this.selectedRow = rowData;
-          this.isClickedCtxMenu = true;
+          this.setContextMenu();
           this.$emit('update:selected', rowData);
         } else {
           this.selectedRow = [];
-          this.isClickedCtxMenu = false;
+          this.setContextMenu(false);
           this.$emit('update:selected', []);
         }
       },
@@ -846,20 +876,18 @@
   .column {
     position: relative;
     display: inline-flex;
-    align-items: center;
     min-width: 40px;
     height: 100%;
-    line-height: 30px;
-    vertical-align: top;
     padding: 0 10px;
+    line-height: 30px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    vertical-align: top;
     user-select: none;
 
     @include evThemify() {
       border-right: $border-solid evThemed('grid-bottom-border');
-    }
-
-    &.render {
-      text-align: center;
     }
 
     &:nth-last-child(2) {
@@ -873,32 +901,62 @@
     .sort-icon {
       display: inline-block;
       float: right;
-      font-size: 12px;
+      font-size: 14px;
+      line-height: 30px;
+
+      @include evThemify() {
+        color: evThemed('font-color-base');
+      }
     }
   }
 
   .column-name {
     display: inline-block;
     float: left;
-    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: bold;
+    font-size: 14px;
 
     @include evThemify() {
       color: evThemed('font-color-base');
     }
   }
 
-  .column-option {
+  .column-filter {
     position: absolute;
     right: 0;
-    height: 100%;
+    background-color: transparent;
+    display: none;
+
+    .set-filter-icon {
+      margin-right: 2px;
+      font-size: 14px;
+      vertical-align: middle;
+
+      @include evThemify() {
+        color: evThemed('font-color-base');
+      }
+    }
+  }
+
+  .column:hover .column-filter {
+    display: block;
+  }
+
+  .column-filter-status {
+    position: absolute;
+    top: 3px;
+    left: 0;
     background-color: transparent;
 
-    @include evThemify() {
-      /* 옵션 버튼에 대한 스펙이 정해지면 수정 필요 */
-      box-shadow: inset 0 0 3px evThemed('font-color-base');
+    .ei {
+      font-size: 10px;
+      vertical-align: top;
+
+      @include evThemify() {
+        color: evThemed('color-primary');
+      }
     }
   }
 
@@ -915,7 +973,7 @@
   }
 
   .v-scroll .dummy {
-    width: 17px;
+    width: 16px;
   }
 
   .table-body {
@@ -965,6 +1023,7 @@
     td {
       display: inline-block;
       padding: 0 10px;
+      text-align: center;
 
       @include truncate(100%);
       @include evThemify() {
@@ -974,7 +1033,28 @@
 
       &.row-checkbox {
         display: inline-flex;
+        justify-content: center;
         align-items: center;
+      }
+
+      &.number,
+      &.float {
+        text-align: right;
+      }
+
+      &.string,
+      &.stringnumber {
+        text-align: left;
+      }
+
+      &.center {
+        text-align: center;
+      }
+      &.left {
+        text-align: left;
+      }
+      &.right {
+        text-align: right;
       }
 
       &:last-child {

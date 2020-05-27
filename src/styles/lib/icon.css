@@ -37,6 +37,18 @@
   font-size: 25px;
 }
 
+.ei-filter-list:before {
+  content: '\e9fa';
+}
+.ei-filter:before {
+  content: '\e9f7';
+}
+.ei-text-up:before {
+  content: '\e9f8';
+}
+.ei-text-vertical:before {
+  content: '\e9f9';
+}
 .ei-add-box:before {
   content: '\e9ec';
 }

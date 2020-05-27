@@ -13,9 +13,6 @@ const router = new VueRouter({
       path: '/container',
       component: () => import(/* webpackChunkName: 'container' */ './pages/container/container'),
     }, {
-      path: '/docking',
-      component: () => import(/* webpackChunkName: 'docking' */ './pages/docking/docking'),
-    }, {
       path: '/window',
       component: () => import(/* webpackChunkName: 'window' */ './pages/window/window'),
     }, {
@@ -58,8 +55,8 @@ const router = new VueRouter({
       path: '/slider',
       component: () => import(/* webpackChunkName: 'slider' */ './pages/slider/slider'),
     }, {
-      path: '/table',
-      component: () => import(/* webpackChunkName: 'table' */ './pages/table/table'),
+      path: '/grid',
+      component: () => import(/* webpackChunkName: 'grid' */ './pages/grid/grid'),
     }, {
       path: '/tree',
       component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree'),

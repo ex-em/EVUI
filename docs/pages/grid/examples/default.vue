@@ -14,7 +14,16 @@
           use: true,
           headerCheck: true,
           mode: 'multi'
-        }
+        },
+        customContextMenu: [{
+          text: 'Test Menu 1',
+          itemId: 'menu_1',
+          callback: onContextMenu,
+        }, {
+          text: 'Test Menu 2',
+          itemId: 'menu_2',
+          callback: onContextMenu,
+        }],
       }"
     >
       <template v-slot:test1="item">
@@ -45,7 +54,7 @@
           </ev-radio>
         </ev-radio-group>
       </template>
-      <template v-slot:test4="item">
+      <template v-slot:test4="">
         <ev-button
           :type="'primary'"
           :size="'small'"
@@ -93,7 +102,7 @@
     'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
   ];
   export default {
-    name: 'Default',
+    name: 'New',
     data() {
       return {
         selected: [],
@@ -174,7 +183,7 @@
     },
     watch: {},
     created() {
-      this.getData(11, 0);
+      this.getData(100, 0);
     },
     mounted() {
       // this.getData(100, 100);
@@ -186,6 +195,9 @@
         for (let ix = 0; ix < this.tableData.length - 5; ix++) {
           this.checked.push(this.tableData[ix]);
         }
+      },
+      onContextMenu() {
+        console.log('On Context Menu');
       },
       onCheckBox() {
       },

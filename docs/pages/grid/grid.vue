@@ -24,12 +24,12 @@
   export default {
     data() {
       return {
-        title: 'Table',
+        title: 'Grid',
         components: [{
           title: 'Default',
           component: Default,
           url: './docs/pages/grid/examples/default.vue',
-          description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
+          description: '그리드는 여러 데이터를 보여주는 컴포넌트입니다.',
         }],
       };
     },
