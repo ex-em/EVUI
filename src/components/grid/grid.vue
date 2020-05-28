@@ -666,7 +666,7 @@
       },
       onClickCtxMenu(item) {
         if (item && item.callback) {
-          item.callback(this.selectedRow);
+          item.callback(item.itemId, this.selectedRow);
         }
       },
       onContextMenu(event) {
