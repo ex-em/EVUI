@@ -95,9 +95,6 @@
       },
     },
     watch: {
-      focusedRowKey(value) {
-        console.log(value);
-      },
       visibility(value) {
         if (value === 'visible') {
           this.setPosition();
