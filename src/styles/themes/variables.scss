@@ -68,6 +68,10 @@ $ev-themes: (
     grid-row-selected: $color-gray8,
     grid-cell-text: rgba($color-gray90, 0.8),
     grid-row-stripe: rgba($color-gray10, 0.6),
+    grid-filter-add-background: $color-gray10,
+    grid-filter-add-label: $color-gray70,
+    grid-filter-add-split: $color-gray30,
+
 
     /* input
     -------------------------- */
@@ -166,6 +170,9 @@ $ev-themes: (
     grid-row-selected: $color-gray75,
     grid-cell-text: rgba($color-white, 0.7),
     grid-row-stripe: $color-gray85,
+    grid-filter-add-background: $color-gray95,
+    grid-filter-add-label: $color-gray19,
+    grid-filter-add-split: #383838,
 
     /* input
     -------------------------- */

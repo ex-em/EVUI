@@ -46,12 +46,6 @@
                 imgUrl: `${this.imgUrl}/container.png`,
               },
               {
-                name: 'Docking',
-                routerLink: '/docking',
-                content: '닥 컨테이너 샘플',
-                imgUrl: `${this.imgUrl}/dock.png`,
-              },
-              {
                 name: 'Tab',
                 routerLink: '/tab',
                 content: '탭 패널 샘플',
@@ -112,8 +106,8 @@
                 imgUrl: `${this.imgUrl}/slider.png`,
               },
               {
-                name: 'Table',
-                routerLink: '/table',
+                name: 'Grid',
+                routerLink: '/grid',
                 content: '테이블 - 그리드',
                 imgUrl: `${this.imgUrl}/table.png`,
               },

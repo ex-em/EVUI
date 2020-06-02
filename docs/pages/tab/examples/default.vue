@@ -38,16 +38,14 @@
 
 <script>
   import targetComponent1 from '../../checkbox/examples/group-default';
-  import targetComponent2 from '../../table/examples/buffer';
+  import targetComponent2 from '../../grid/examples/default';
   import targetComponent3 from '../../chart/bar/examples/stack';
-  import targetComponent4 from '../../table/examples/page';
 
   export default {
     components: {
       targetComponent1,
       targetComponent2,
       targetComponent3,
-      targetComponent4,
     },
     data() {
       return {
@@ -65,7 +63,7 @@
           this.tabItems.push({
             title: `appended tab${this.seq}`,
             value: `${this.seq}`,
-            content: `targetComponent${(this.seq % 4) + 1}`,
+            content: `targetComponent${(this.seq % 3) + 1}`,
           });
 
           this.seq++;
@@ -75,7 +73,7 @@
         this.tabItems.push({
           title: `appended tab${this.seq}`,
           value: `${this.seq}`,
-          content: `targetComponent${(this.seq % 4) + 1}`,
+          content: `targetComponent${(this.seq % 3) + 1}`,
         });
         // this.activeTabValue = `${this.seq}`;
         this.seq++;
@@ -96,7 +94,7 @@
 </script>
 
 <style>
-  p{
+  p {
     margin-left: 30px;
   }
   .button-outer {
