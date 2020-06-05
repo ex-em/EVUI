@@ -139,6 +139,8 @@
   .example.vertical .contents {
     overflow: auto;
     width: 50%;
+    min-width: 800px;
+    max-height: 600px;
   }
   .example:before {
     position: absolute;

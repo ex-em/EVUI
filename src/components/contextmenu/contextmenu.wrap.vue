@@ -1,12 +1,11 @@
 <template>
   <div
-    v-show="isShow"
     v-click-outside="hide"
     :style="ctxMenuStyle"
     :class="prefixEvui"
   >
-    <ev-context-menu-children
-      ref="ctxChildren"
+    <context-menu
+      ref="ctxMenu"
       :depth="0"
       :items="items"
       @click="onClick"
@@ -15,11 +14,10 @@
 </template>
 
 <script>
-  import { getQuantity } from '../../common/utils';
-
-  const prefixEvui = 'ev-contextmenu';
-
   export default {
+    components: {
+      ContextMenu: () => import('./contextmenu'),
+    },
     directives: {
       'click-outside': {
         bind(el, binding) {
@@ -66,23 +64,41 @@
     },
     data() {
       return {
-        prefixEvui,
+        prefixEvui: 'ev-contextmenu',
         top: 0,
         left: 0,
-        isShow: false,
+        width: 0,
+        height: 0,
+        visibility: 'hidden',
+        scrollbarSize: 16,
       };
     },
     computed: {
       ctxMenuStyle() {
-        return `top: ${this.top}px; left: ${this.left}px;`;
+        return `
+          visibility: ${this.visibility};
+          top: ${this.top}px;
+          left: ${this.left}px;
+          `;
       },
-    },
-    created() {
-      this.setPosition(this.x, this.y);
     },
     mounted() {
       this.parentAddListener();
       this.moveElToBody();
+
+      if (this.$el && this.$el.firstElementChild) {
+        const clientRect = this.$el.firstElementChild.getClientRects()[0] || {};
+
+        this.top = clientRect.top || 0;
+        this.left = clientRect.left || 0;
+        this.width = clientRect.width || 0;
+        this.height = clientRect.height || 0;
+      } else {
+        this.top = 0;
+        this.left = 0;
+        this.width = 0;
+        this.height = 0;
+      }
     },
     beforeDestroy() {
       if (this.$el) {
@@ -105,35 +121,50 @@
         document.body.appendChild(this.$el);
       },
       onContextMenu(e) {
-        this.setPosition(e.clientX, e.clientY);
+        this.setPosition(e, e.clientX, e.clientY);
         this.show();
         e.preventDefault();
       },
       onClick(item) {
-        if (!item.items) {
-          this.hide();
-        }
-
         this.$emit('click', item);
       },
-      setPosition(x, y) {
-        const posX = getQuantity(x) || { value: 0 };
-        const posY = getQuantity(y) || { value: 0 };
-        this.top = posY.value;
-        this.left = posX.value;
+      setPosition(e, x, y) {
+        const scrollEl = document.scrollingElement || document.documentElement || document.body;
+        const isHScroll = window.innerWidth < scrollEl.scrollWidth;
+        const isVScroll = window.innerHeight < scrollEl.scrollHeight;
+        const clientX = x || 0;
+        const clientY = y || 0;
+        const remainingWidth = (window.innerWidth - clientX)
+          - (isVScroll ? this.scrollbarSize : 0);
+        const remainingHeight = (window.innerHeight - clientY)
+          - (isHScroll ? this.scrollbarSize : 0);
+        let left = clientX + scrollEl.scrollLeft;
+        let top = clientY + scrollEl.scrollTop;
+
+        if (this.width > remainingWidth) {
+          left -= (this.width - remainingWidth);
+        }
+
+        if (this.height > remainingHeight) {
+          top -= (this.height - remainingHeight);
+        }
+
+        this.left = left;
+        this.top = top;
       },
       show() {
         if (this.isUse) {
-          this.isShow = true;
+          this.visibility = 'visible';
         }
       },
       hide() {
-        this.isShow = false;
-        const ctxChildren = this.$refs.ctxChildren;
+        const ctxMenu = this.$refs.ctxMenu;
 
-        if (ctxChildren && ctxChildren.clearSubMenuKey) {
-          ctxChildren.clearSubMenuKey(this.$children);
+        if (ctxMenu && ctxMenu.hide) {
+          ctxMenu.hide(this.$children);
         }
+
+        this.visibility = 'hidden';
       },
     },
   };
