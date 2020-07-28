@@ -14,8 +14,7 @@ module.exports = {
   extends: ['plugin:vue/recommended', 'airbnb-base'],
   // required to lint *.vue files
   plugins: [
-    'vue',
-    'html'
+    'vue'
   ],
   // check if imports actually resolve
   settings: {
@@ -23,11 +22,18 @@ module.exports = {
       webpack: {
         config: 'build/webpack.base.conf.js'
       }
-    },
-    'html/html-extensions': ['.html'],  // don't include .vue
+    }
   },
   // add your custom rules here
   rules: {
+    'import/no-extraneous-dependencies': [
+      'warn',
+      {
+        devDependencies: true,
+        optionalDependencies: true,
+        peerDependencies: true,
+      },
+    ],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       js: 'never',
@@ -201,7 +207,7 @@ module.exports = {
     'no-with': 'error',
     'prefer-named-capture-group': 'off',
     'prefer-regex-literals': 'off',
-    'radix': 'error',
+    'radix': 'off',
     'require-await': 'off',
     'require-unicode-regexp': 'off',
     'vars-on-top': 'error',

@@ -35,7 +35,7 @@ module.exports = merge(webpackBaseConfig, {
         enforce: 'pre',
         include: [resolve('src'), resolve('examples')],
           options: {
-          formatter: require('eslint-friendly-formatter'),
+          formatter: require('eslint-formatter-friendly'),
           emitWarning: true,
           failOnError: true,
           failOnWarning : true,
