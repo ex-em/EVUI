@@ -256,7 +256,7 @@
 </template>
 <script>
   import util from '@/common/utils.table';
-  import treeUtil from '@/components/tree/tree.util';
+  import treeUtil from '@/components/tree-table/tree.util';
   import _ from 'lodash-es';
   import '@/styles/lib/fontawesome.css';
 
@@ -782,7 +782,7 @@
     },
   };
 </script>
-<style scoped src="@/components/tree/tree.table.grey.css"/>
+<style scoped src="@/components/tree-table/tree.table.grey.css"/>
 <style>
   .evui-table-records-col .ev-checkbox .small {
     height: 19px;

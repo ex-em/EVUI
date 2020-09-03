@@ -20,7 +20,8 @@ import EvLabel from './components/label';
 import { Calendar as EvCalendar, Datepicker as EvDatepicker } from './components/datepicker';
 import EvWindow from './components/window';
 import { tabs as EvTabs, tab as EvTabPanel } from './components/tabs';
-import { TreeTable as EvTreeTable } from './components/tree';
+import { TreeTable as EvTreeTable } from './components/tree-table';
+import EvTree from './components/tree';
 import EvSplitter from './components/splitter';
 import EvMarkdown from './components/markdown';
 import EvGrid from './components/grid/grid';
@@ -54,6 +55,7 @@ const components = {
   EvTabs,
   EvTabPanel,
   EvTreeTable,
+  EvTree,
   EvSplitter,
   EvMarkdown,
   EvGrid,
