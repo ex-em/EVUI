@@ -1,0 +1,27 @@
+@import 'colors';
+
+// Font
+$font-size-base: 12px !default;
+$font-size-small: 11px !default;
+$font-size-medium: 14px !default;
+$font-size-large: 16px !default;
+
+$font-weight-base: 400 !default;
+$font-family-base: 'NanumGothic', tahoma, arial, verdana, sans-serif !default;
+
+// Color
+$color-not-allow: #B01012 !default;
+$color-selected-blue: #347BFF !default;
+
+$color-white: $color-gray0 !default;
+$color-black: $color-gray95 !default;
+
+// etc
+$border-radius-base: 2px;
+$border-solid: 1px solid;
+$border-dotted: 1px dotted;
+
+// animate level
+$animate-base: 0.3s ease-in-out !default;
+$animate-fast: 0.2s ease-in-out !default;
+$animate-slow: 0.5s ease-in-out !default;

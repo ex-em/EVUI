@@ -1,0 +1,50 @@
+$file-path : '~@/webfonts/';
+
+@font-face {
+  font-family: 'NanumGothic';
+  src: url($file-path + 'NanumGothic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Bold.ttf') format('trutype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Medium.ttf') format('trutype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+}
+@font-face {
+  font-family: 'RobotoBold';
+  src: url($file-path + 'Roboto-Bold.ttf') format('trutype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'RobotoMedium';
+  src: url($file-path + 'Roboto-Medium.ttf') format('trutype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'RobotoRegular';
+  src: url($file-path + 'Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}

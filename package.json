@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0",
@@ -24,10 +25,17 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/test-utils": "^2.0.0-0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-vue": "^7.0.0-0",
+    "lodash-es": "^4.17.15",
+    "moment": "^2.27.0",
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2",
+    "stylelint": "^13.7.0",
+    "stylelint-order": "^4.1.0",
+    "stylelint-webpack-plugin": "^2.1.0",
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0"
   }
