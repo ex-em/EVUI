@@ -32,8 +32,11 @@ const modules = {
         this.onMouseMove.cancel();
       }
       this.overlayClear();
-      this.tooltipClear();
-      this.tooltipDOM.style.display = 'none';
+
+      if (this.options.tooltip.use) {
+        this.tooltipClear();
+        this.tooltipDOM.style.display = 'none';
+      }
     };
 
     this.onDblClick = (e) => {
@@ -111,7 +114,7 @@ const modules = {
 
           if (gdata !== null && gdata !== undefined) {
             const sName = `${series.name}`;
-            const sw = ctx.measureText(sName).width;
+            const sw = ctx ? ctx.measureText(sName).width : 1;
 
             item.name = sName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
