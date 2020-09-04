@@ -5,11 +5,11 @@ $ev-themes: (
     /* common
     -------------------------- */
     font-color-base: $color-black,
-    color-primary: $color-light-blue,
-    color-info: $color-light-skyblue,
-    color-warning: $color-light-orange,
-    color-error: $color-light-red,
-    color-selected: $color-light-deep-purple,
+    color-primary: #1A6AFE,
+    color-info: #5AC8FA,
+    color-warning: #FF9500,
+    color-error: #FF3B30,
+    color-selected: #730EF4,
 
     /* button
     -------------------------- */
@@ -89,7 +89,7 @@ $ev-themes: (
 
     /* menu
     -------------------------- */
-    menu-selected-bg: $color-light-deep-purple,
+    menu-selected-bg: #730EF4,
     menu-sub-split: $color-gray19,
     menu-color: $color-gray80,
 
@@ -106,11 +106,11 @@ $ev-themes: (
     /* common
     -------------------------- */
     font-color-base: $color-white,
-    color-primary: $color-dark-blue,
-    color-info: $color-dark-skyblue,
-    color-warning: $color-dark-orange,
-    color-error: $color-dark-red,
-    color-selected: $color-dark-deep-purple,
+    color-primary: #007AFF,
+    color-info: #64D2FF,
+    color-warning: #FF9F0A,
+    color-error: #FF453A,
+    color-selected: #791BF2,
 
     /* button
     -------------------------- */

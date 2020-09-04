@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    sdf
+    <router-view />
   </div>
 </template>
 

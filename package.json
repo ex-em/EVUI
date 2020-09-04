@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "docs": "vue-cli-service serve --port 8888 docs/main.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
