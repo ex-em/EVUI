@@ -26,8 +26,7 @@
     >
     <label
       :for="`${checkboxId}_${value}`"
-      :class="[dataSize, dataType, dataAfterType, isIndeterminate]"
-      class="ev-checkbox-label"
+      :class="checkboxClasses"
     >
       <slot />
     </label>
@@ -104,11 +103,16 @@
           this.dataType = size;
         },
       },
-      dataAfterType() {
-        return this.afterType;
-      },
-      isIndeterminate() {
-        return this.indeterminate ? 'indeterminate' : '';
+      checkboxClasses() {
+        return [
+          'ev-checkbox-label',
+          this.dataSize,
+          this.dataType,
+          this.afterType,
+          {
+            indeterminate: this.indeterminate,
+          },
+        ];
       },
     },
     created() {

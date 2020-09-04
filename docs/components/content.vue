@@ -114,7 +114,13 @@
               {
                 name: 'Tree',
                 routerLink: '/tree',
-                content: '트리, 트리 테이블',
+                content: '트리',
+                imgUrl: `${this.imgUrl}/table.png`,
+              },
+              {
+                name: 'Tree Table',
+                routerLink: '/treetable',
+                content: '트리 테이블',
                 imgUrl: `${this.imgUrl}/table.png`,
               },
               {

@@ -109,14 +109,14 @@ export default {
       if (Tree && Tree.render) {
         return Tree.render;
       }
-        return null;
+      return null;
     },
     node() {
       const Tree = findComponentUpward(this, 'Tree');
       if (Tree) {
         return [Tree.flatState, Tree.flatState.find(item => item.nodeKey === this.data.nodeKey)];
       }
-        return [];
+      return [];
     },
     children() {
       return this.data[this.childrenKey];
@@ -127,7 +127,7 @@ export default {
       const item = this.data;
       if (item.disabled) return;
       // async loading
-      if (item[this.childrenKey].length === 0) {
+      if (!item[this.childrenKey].length) {
         const tree = findComponentUpward(this, 'Tree');
         if (tree && tree.loadData) {
           this.$set(this.data, 'loading', true);

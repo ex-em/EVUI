@@ -198,6 +198,7 @@ export default {
   float: left;
   cursor: pointer;
   width: 12px;
+  height: 12px;
   text-align: center;
   display: inline-block;
   margin-right: 5px;

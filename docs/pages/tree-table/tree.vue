@@ -16,9 +16,9 @@
 </template>
 
 <script>
-  import Default from './examples/default.vue';
-  import CallTree from './examples/calltree.vue';
-  import CheckBox from './examples/checkbox.vue';
+  import Default from './examples/default';
+  import CallTree from './examples/calltree';
+  import CheckBox from './examples/checkbox';
 
   export default {
     data() {
