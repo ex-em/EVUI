@@ -1,6 +1,7 @@
 <template>
   <div
     v-cloak
+    v-resize.debounce="onResize"
     :class="getTableClass"
   >
     <div
@@ -283,9 +284,7 @@
 
         this.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
-          if (value.includes(store[ix][ROW_DATA_INDEX])) {
-            store[ix][ROW_CHECK_INDEX] = true;
-          }
+          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
         }
       },
       hasVerticalScrollBar() {
