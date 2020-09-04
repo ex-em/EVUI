@@ -155,7 +155,7 @@
         class="vscroll-spacer"
       />
       <ev-context-menu
-        :is-use="showContextMenu"
+        v-show="showContextMenu"
         :items="contextMenuItems"
         @click="onClickCtxMenu"
       />
@@ -392,7 +392,15 @@
         const menuItems = [];
 
         if (useCustom && this.customContextMenu.length) {
-          menuItems.push(...this.customContextMenu);
+          const row = this.selectedRow;
+          const customItems = this.customContextMenu.map(
+            (item) => {
+              const menuItem = item;
+              menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+              return menuItem;
+            });
+
+          menuItems.push(...customItems);
         }
 
         if (this.useFilter) {
@@ -667,6 +675,8 @@
         if (item && item.callback) {
           item.callback(item.itemId, this.selectedRow);
         }
+
+        this.isClickedCtxMenu = false;
       },
       onContextMenu(event) {
         const target = event.target;
