@@ -39,7 +39,7 @@
         }, {
           title: 'Column',
           component: Column,
-          url: './docspages/chart/bar/examples/column.vue',
+          url: './docs/pages/chart/bar/examples/column.vue',
           description: 'Category 기반의 막대 데이터를 누적하여 표현합니다.',
         }, {
           title: 'Stack',
