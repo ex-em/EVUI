@@ -62,7 +62,7 @@ const router = new VueRouter({
     component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree.vue'),
     }, {
       path: '/treetable',
-      component: () => import(/* webpackChunkName: 'treetable' */ './pages/tree-table/tree.vue'),
+      component: () => import(/* webpackChunkName: 'tree' */ './pages/tree-table/tree.vue'),
     }, {
       path: '/menu',
       component: () => import(/* webpackChunkName: 'menu' */ './pages/menu/menu'),
