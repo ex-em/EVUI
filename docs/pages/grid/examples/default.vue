@@ -19,10 +19,12 @@
           text: 'Test Menu 1',
           itemId: 'menu_1',
           callback: onContextMenu,
+          validate: checkActive,
         }, {
           text: 'Test Menu 2',
           itemId: 'menu_2',
           callback: onContextMenu,
+          validate: checkActive,
         }],
       }"
     >
@@ -198,6 +200,14 @@
       },
       onContextMenu() {
         console.log('On Context Menu');
+        this.checked = [];
+      },
+      checkActive(itemId, row) {
+        if (itemId === 'menu_1') {
+          return row[0] === 1;
+        }
+
+        return row[1] === 'Russia';
       },
       onCheckBox() {
       },
