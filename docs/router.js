@@ -58,8 +58,11 @@ const router = new VueRouter({
       path: '/grid',
       component: () => import(/* webpackChunkName: 'grid' */ './pages/grid/grid'),
     }, {
-      path: '/tree',
-      component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree'),
+    path: '/tree',
+    component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree.vue'),
+    }, {
+      path: '/treetable',
+      component: () => import(/* webpackChunkName: 'tree' */ './pages/tree-table/tree.vue'),
     }, {
       path: '/menu',
       component: () => import(/* webpackChunkName: 'menu' */ './pages/menu/menu'),

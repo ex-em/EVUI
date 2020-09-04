@@ -26,8 +26,7 @@
     >
     <label
       :for="`${checkboxId}_${value}`"
-      :class="[dataSize, dataType, dataAfterType]"
-      class="ev-checkbox-label"
+      :class="checkboxClasses"
     >
       <slot />
     </label>
@@ -64,6 +63,11 @@
         type: String,
         default: '',
       },
+      // afterType: 'minus'랑 동일 속성으로 추후 afterType 삭제 필요
+      indeterminate: {
+        type: Boolean,
+        default: false,
+      },
     },
     data() {
       return {
@@ -99,8 +103,16 @@
           this.dataType = size;
         },
       },
-      dataAfterType() {
-        return this.afterType;
+      checkboxClasses() {
+        return [
+          'ev-checkbox-label',
+          this.dataSize,
+          this.dataType,
+          this.afterType,
+          {
+            indeterminate: this.indeterminate,
+          },
+        ];
       },
     },
     created() {
@@ -189,6 +201,29 @@
     /* unchecked -- type: square */
     &.square:before {
       border-radius: 0;
+    }
+    &.indeterminate:before {
+      @include evThemify() {
+        border-color: evThemed('color-primary');
+      }
+    }
+
+    &.indeterminate:after {
+      left: 5px;
+      width: 12px;
+      height: 4px;
+      border-radius: 0;
+    }
+    &.small.indeterminate:after {
+      width: 8px;
+      height: 2px;
+      display: block;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
     }
   }
 

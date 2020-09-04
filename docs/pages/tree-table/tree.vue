@@ -16,8 +16,9 @@
 </template>
 
 <script>
-  import Default from './examples/tree-default';
-  import CheckBox from './examples/tree-checkbox';
+  import Default from './examples/default';
+  import CallTree from './examples/calltree';
+  import CheckBox from './examples/checkbox';
 
   export default {
     data() {
@@ -26,12 +27,17 @@
         components: [{
           title: 'Default',
           component: Default,
-          url: './docs/pages/tree/examples/tree-default.vue',
+          url: './docs/pages/tree/examples/default.vue',
+          description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
+        }, {
+          title: 'Call Tree',
+          component: CallTree,
+          url: './docs/pages/tree/examples/calltree.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }, {
           title: 'Checkbox',
           component: CheckBox,
-          url: './docs/pages/tree/examples/tree-checkbox.vue',
+          url: './docs/pages/tree/examples/checkbox.vue',
           description: '테이블은 여러 데이터를 보여주는 기본 컴포넌트입니다.',
         }],
       };

@@ -1,7 +1,3 @@
-import TreeTable from './tree.table';
-import util from './tree.util';
+import Tree from './tree';
 
-export {
-  TreeTable,
-  util,
-};
+export default Tree;
