@@ -396,7 +396,10 @@
           const customItems = this.customContextMenu.map(
             (item) => {
               const menuItem = item;
-              menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+              if (menuItem.validate) {
+                menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+              }
+
               return menuItem;
             });
 
