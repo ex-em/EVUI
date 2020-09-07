@@ -253,7 +253,6 @@
         isHeaderChecked: false,
         isClickedCtxMenu: false,
         isFiltering: false,
-        clickTimer: null,
       };
     },
     computed: {
