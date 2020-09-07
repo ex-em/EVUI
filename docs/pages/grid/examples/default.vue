@@ -27,6 +27,8 @@
           validate: checkActive,
         }],
       }"
+      @click-row="onClick"
+      @dblclick-row="onDblClick"
     >
       <template v-slot:test1="item">
         <ev-checkbox
@@ -249,6 +251,14 @@
             // Math.random() * 800,
           ]);
         }
+      },
+      onClick(...parameters) {
+        console.log('Click!!!!');
+        console.log(parameters);
+      },
+      onDblClick(parameters) {
+        console.log('DblClick!!!');
+        console.log(parameters);
       },
     },
   };
