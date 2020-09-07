@@ -107,6 +107,7 @@
               selected: row[2] === selectedRow,
             }"
             @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
           >
             <td
               v-if="useCheckbox.use"
@@ -711,10 +712,24 @@
 
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
 
         this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
-        this.$emit('click-row', event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
+        this.$emit('click-row', event, rowIndex, cellInfo.name, cellInfo.index, rowData);
+      },
+      onRowDblClick(event, row) {
+        const cellInfo = event.target.dataset;
+        const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
+
+        this.$emit('dblclick-row', {
+          event,
+          rowData,
+          rowIndex,
+          cellName: cellInfo.name,
+          cellIndex: cellInfo.index,
+        });
       },
       onCheck(event, row) {
         if (this.useCheckbox.mode === 'single' && this.prevCheckedRow.length) {
