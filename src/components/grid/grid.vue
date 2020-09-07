@@ -107,6 +107,7 @@
               selected: row[2] === selectedRow,
             }"
             @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
           >
             <td
               v-if="useCheckbox.use"
@@ -705,31 +706,31 @@
           this.$emit('update:selected', []);
         }
       },
-      checkClickType() {
-        return new Promise((resolve) => {
-          if (this.clickTimer) {
-            clearTimeout(this.clickTimer);
-            resolve('dblclick');
-          }
-          this.clickTimer = setTimeout(() => {
-            this.clickTimer = null;
-            resolve('click');
-          }, 200);
-        });
-      },
-      async onRowClick(event, row) {
+      onRowClick(event, row) {
         if (!this.useSelect) {
           return;
         }
 
-        const clickType = await this.checkClickType();
-        const eventName = clickType === 'click' ? 'click-row' : 'dblclick-row';
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
 
         this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
-        this.$emit(eventName, event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
+        this.$emit('click-row', event, rowIndex, cellInfo.name, cellInfo.index, rowData);
+      },
+      onRowDblClick(event, row) {
+        const cellInfo = event.target.dataset;
+        const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
+
+        this.$emit('dblclick-row', {
+          event,
+          rowData,
+          rowIndex,
+          cellName: cellInfo.name,
+          cellIndex: cellInfo.index,
+        });
       },
       onCheck(event, row) {
         if (this.useCheckbox.mode === 'single' && this.prevCheckedRow.length) {
