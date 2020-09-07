@@ -252,6 +252,7 @@
         isHeaderChecked: false,
         isClickedCtxMenu: false,
         isFiltering: false,
+        clickTimer: null,
       };
     },
     computed: {
@@ -704,17 +705,31 @@
           this.$emit('update:selected', []);
         }
       },
-      onRowClick(event, row) {
+      checkClickType() {
+        return new Promise((resolve) => {
+          if (this.clickTimer) {
+            clearTimeout(this.clickTimer);
+            resolve('dblclick');
+          }
+          this.clickTimer = setTimeout(() => {
+            this.clickTimer = null;
+            resolve('click');
+          }, 200);
+        });
+      },
+      async onRowClick(event, row) {
         if (!this.useSelect) {
           return;
         }
 
+        const clickType = await this.checkClickType();
+        const eventName = clickType === 'click' ? 'click-row' : 'dblclick-row';
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
 
         this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
-        this.$emit('click-row', event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
+        this.$emit(eventName, event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
       },
       onCheck(event, row) {
         if (this.useCheckbox.mode === 'single' && this.prevCheckedRow.length) {
