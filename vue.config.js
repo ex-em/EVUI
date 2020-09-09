@@ -19,7 +19,7 @@ module.exports = {
       new StyleLintPlugin({
         files: [
           'src/**/*.{vue,scss}',
-          'docs/**/*.{vue,scss}'
+          'docs/**/*.{vue,scss}',
         ],
         emitError: true,
         emitWarning: true,

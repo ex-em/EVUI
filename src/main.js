@@ -1,14 +1,14 @@
-import HelloWorld from './components/HelloWorld';
+import EvCheckBox from '@/components/checkBox';
 
 const components = {
-  HelloWorld,
+  EvCheckBox,
 };
 
 const evui = {
   ...components,
 };
 
-const install = function (app) {
+const install = (app) => {
   if (!app) {
     return;
   }
