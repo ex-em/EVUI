@@ -16,8 +16,10 @@
 </template>
 
 <script>
+import { nextTick } from 'vue';
+
 export default {
-  name: 'CheckBox',
+  name: 'EvCheckbox',
   props: {
     modelValue: {
       type: Boolean,
@@ -33,7 +35,8 @@ export default {
     change: val => typeof val === 'boolean',
   },
   setup(props, { emit }) {
-    const onChange = (e) => {
+    const onChange = async (e) => {
+      await nextTick();
       const value = !props.modelValue;
       emit('update:modelValue', value);
       emit('change', value, e);
@@ -49,6 +52,7 @@ export default {
 <style lang="scss">
 .ev-checkbox {
   cursor: pointer;
+  user-select: none;
   input {
     cursor: pointer;
   }

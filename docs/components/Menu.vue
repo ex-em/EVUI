@@ -40,12 +40,12 @@ export default {
       },
       {
         name: 'CheckBox',
-        routerLink: '/checkBox',
+        routerLink: '/checkbox',
         content: '체크박스',
       },
       {
         name: 'RadioButton',
-        routerLink: '/radioButton',
+        routerLink: '/radio',
         content: '라디오버튼',
       },
       {
@@ -55,7 +55,7 @@ export default {
       },
       {
         name: 'SelectBox',
-        routerLink: '/selectBox',
+        routerLink: '/select',
         content: '셀렉트 박스',
       },
       {

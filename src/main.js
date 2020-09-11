@@ -1,31 +1,26 @@
-import EvCheckBox from '@/components/checkBox';
+import EvCheckbox from '@/components/checkbox/Checkbox.vue';
+import { version } from '../package.json';
 
-const components = {
-  EvCheckBox,
-};
-
-const evui = {
-  ...components,
-};
+const components = [
+  EvCheckbox,
+];
 
 const install = (app) => {
   if (!app) {
     return;
   }
-
-  Object.keys(evui).forEach((key) => {
-    app.component(key, evui[key]);
+  components.forEach((component) => {
+    app.component(component.name, component);
   });
-
-  // app.config.globalProperties.$message = () => EvMessage;
-  // app.config.globalProperties.$messagebox = () => EvMessageBox;
-  // app.config.globalProperties.$notify = () => EvNotification;
 };
 
-const API = {
-  version: '"2.0"',
+const EVUI = {
+  version,
   install,
-  ...components,
 };
 
-export default API;
+export {
+  EvCheckbox,
+};
+
+export default EVUI;

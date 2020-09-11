@@ -20,7 +20,7 @@ export default {
 @import '~@/stylesheets/default';
 
 * {
-  font-family: 'NanumGothic', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 #app {

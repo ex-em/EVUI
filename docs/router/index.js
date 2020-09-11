@@ -23,14 +23,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "button" */ '../views/button'),
   },
   {
-    path: '/checkBox',
-    name: 'CheckBox',
-    component: () => import(/* webpackChunkName: "checkBox" */ '../views/checkBox'),
+    path: '/checkbox',
+    name: 'Checkbox',
+    component: () => import(/* webpackChunkName: "checkbox" */ '../views/checkbox'),
   },
   {
-    path: '/radioButton',
-    name: 'RadioButton',
-    component: () => import(/* webpackChunkName: "radioButton" */ '../views/radioButton'),
+    path: '/radio',
+    name: 'Radio',
+    component: () => import(/* webpackChunkName: "radio" */ '../views/radio'),
   },
   {
     path: '/inputNumber',
@@ -38,9 +38,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "inputNumber" */ '../views/inputNumber'),
   },
   {
-    path: '/selectBox',
-    name: 'SelectBox',
-    component: () => import(/* webpackChunkName: "selectBox" */ '../views/selectBox'),
+    path: '/select',
+    name: 'Select',
+    component: () => import(/* webpackChunkName: "select" */ '../views/select'),
   },
   {
     path: '/slider',

@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import HelloWorld from '@/components/checkBox';
+import Checkbox from '@/components/checkbox/Checkbox';
 
-describe('index.vue', () => {
+describe('Checkbox.vue', () => {
   it('renders props.msg when passed', () => {
     const msg = 'new message';
-    const wrapper = shallowMount(HelloWorld, {
+    const wrapper = shallowMount(Checkbox, {
       props: { msg },
     });
     expect(wrapper.text()).toMatch(msg);
