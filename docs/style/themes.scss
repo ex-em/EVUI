@@ -1,0 +1,28 @@
+@import 'variables';
+
+$ev-themes: (
+  light: (
+    /* common
+    -------------------------- */
+    background-color-base: $color-white,
+    font-color-base: $color-black,
+    color-primary: #1A6AFE,
+    color-info: #5AC8FA,
+    color-warning: #FF9500,
+    color-error: #FF3B30,
+    color-selected: #730EF4,
+    color-not-allow: #B01012,
+  ),
+  dark: (
+    /* common
+    -------------------------- */
+    background-color-base: #2D2D2D,
+    font-color-base: $color-white,
+    color-primary: #007AFF,
+    color-info: #64D2FF,
+    color-warning: #FF9F0A,
+    color-error: #FF453A,
+    color-selected: #791BF2,
+    color-not-allow: #B01012,
+  ),
+) !default;

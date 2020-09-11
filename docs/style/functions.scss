@@ -1,0 +1,3 @@
+@function themed($key) {
+  @return map-get($ev-theme-map, $key);
+}

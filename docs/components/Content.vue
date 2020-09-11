@@ -1,32 +1,20 @@
 <template>
-  <div class="evui-main-content">
-    <MenuNav />
-    <div class="evui-main-content-body">
-      <router-view />
-    </div>
+  <div class="evui-content">
+    <router-view />
   </div>
 </template>
 
 <script>
-import MenuNav from '../components/Menu';
-
 export default {
-  components: {
-    MenuNav,
-  },
   setup() {},
 };
 </script>
 
-<style scoped>
-.evui-main-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding: 0 240px;
-}
+<style lang="scss" scoped>
+@import '../style/index.scss';
 
-.evui-main-content-body {
-  padding: 20px;
+.evui-content {
+  position: relative;
+  padding: 30px;
 }
 </style>

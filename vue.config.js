@@ -4,16 +4,6 @@ module.exports = {
   devServer: {
     overlay: false,
   },
-  css: {
-    extract: {
-      filename: 'app.css',
-    },
-    loaderOptions: {
-      scss: {
-        prependData: '@import "~@/stylesheets/default.scss";',
-      },
-    },
-  },
   configureWebpack: {
     plugins: [
       new StyleLintPlugin({
