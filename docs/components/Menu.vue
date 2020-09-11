@@ -1,15 +1,16 @@
 <template>
-  <div class="evui-left-navigation">
+  <nav class="evui-navigation">
     <ul>
       <li
         v-for="(menu, index) in store"
         :key="menu.name + index"
+        class="evui-navigation-item"
         @click="clickMenu(menu.routerLink)"
       >
        {{ menu.name }}
       </li>
     </ul>
-  </div>
+  </nav>
 </template>
 
 <script>
@@ -137,10 +138,31 @@ export default {
 };
 </script>
 
-<style>
-.evui-left-navigation {
-  position: absolute;
-  top: 0;
+<style lang="scss" scoped>
+@import '../style/index.scss';
+
+.evui-navigation {
+  position: fixed;
+  top: $header-height;
   left: 0;
+  width: $nav-width;
+  height: 100%;
+  padding: 25px 12px;
+  overflow: auto;
+  border-right: 1px solid #DDDDDD;
+
+  ul, li {
+    list-style: none;
+  }
+
+  &-item {
+    padding: 5px 3px;
+    font-size: $font-size-medium;
+    cursor: pointer;
+
+    &:hover {
+      color: $color-main;
+    }
+  }
 }
 </style>

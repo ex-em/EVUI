@@ -1,0 +1,79 @@
+@mixin evThemify($ev-themes: $ev-themes) {
+  @each $theme, $map in $ev-themes {
+    @if $theme == 'dark' {
+      .#{$theme} & {
+        $ev-theme-map: () !global;
+
+        @each $key, $submap in $map {
+          $value: map-get(map-get($ev-themes, $theme), '#{$key}');
+          $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+        }
+
+        /* stylelint-disable */
+        @content;
+        $ev-theme-map: null !global;
+        /* stylelint-enable */
+      }
+    }
+
+    @else {
+      $ev-theme-map: () !global;
+
+      @each $key, $submap in $map {
+        $value: map-get(map-get($ev-themes, $theme), '#{$key}');
+        $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+      }
+
+      /* stylelint-disable */
+      @content;
+      $ev-theme-map: null !global;
+      /* stylelint-enable */
+    }
+  }
+}
+@mixin prefix($property, $value, $vendors: webkit moz ms o, $default: true) {
+  @if $vendors {
+    @each $vendor in $vendors {
+      #{'-' + $vendor + '-' + $property}: #{$value};
+    }
+  }
+  @if $default {
+    #{$property}: #{$value};
+  }
+}
+@mixin shortening($display: inline-block, $width: 100%, $line: 1) {
+  width: $width;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @if $line == 1 {
+    display: $display;
+    white-space: nowrap;
+  }
+
+  @else {
+    display: -webkit-box;
+    height: auto;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    -webkit-line-clamp: $line;
+    -webkit-box-orient: vertical;
+  }
+}
+@mixin clearfix() {
+  &:after {
+    display: table;
+    clear: both;
+    content: '';
+  }
+}
+@mixin place-at-center() {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+@mixin font-hide() {
+  font-size: 0;
+  text-indent: -999px;
+}
