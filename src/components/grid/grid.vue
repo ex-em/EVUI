@@ -1079,9 +1079,15 @@
       }
       &.left {
         text-align: left;
+        .wrap {
+          justify-content: flex-start;
+        }
       }
       &.right {
         text-align: right;
+        .wrap {
+          justify-content: flex-end;
+        }
       }
 
       &:last-child {
