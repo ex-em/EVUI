@@ -2,8 +2,15 @@
   <div>
     <div
       :class="`${type} ev-splitter ${isDragging ? 'hide' : ''}`"
+      :style="{
+          background: color,
+          width: type === 'hbox' ? `${size}px` : '100%',
+          height: type === 'hbox' ? '100%' : `${size}px`,
+        }"
       @mousedown="onMouseDown"
-    />
+    >
+      <slot />
+    </div>
     <div
       v-show="isDragging"
       ref="guideline"
@@ -18,6 +25,14 @@
       type: {
         type: String,
         default: 'hbox',
+      },
+      color: {
+        type: String,
+        default: '#dadada',
+      },
+      size: {
+        type: Number,
+        default: 4,
       },
     },
     data() {
@@ -153,7 +168,7 @@
           rightItemInfo.height = rightWh;
           rightItemInfo.top = rightOffset;
         }
-
+        this.$emit('resize', changeValue, leftItemInfo, rightItemInfo);
         // if (leftId) {
         //   this.$resizeBus.$emit('resize', leftId, this.type, leftItemInfo);
         // }
@@ -174,7 +189,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px;`;
+        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
@@ -202,7 +217,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px;`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
@@ -250,7 +265,6 @@
 <style>
   .ev-splitter {
     top: 0;
-    background: #dadada;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -260,7 +274,6 @@
   .ev-splitter-guideline {
     position: absolute;
     z-index: 100;
-    background: #dadada;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -271,14 +284,10 @@
   }
   .ev-splitter.hbox,
   .ev-splitter-guideline.hbox {
-    width: 4px;
-    height: 100%;
     cursor: col-resize;
   }
   .ev-splitter.vbox,
   .ev-splitter-guideline.vbox {
-    width: 100%;
-    height: 4px;
     cursor: row-resize;
   }
 </style>
