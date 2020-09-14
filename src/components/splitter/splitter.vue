@@ -2,11 +2,7 @@
   <div>
     <div
       :class="`${type} ev-splitter ${isDragging ? 'hide' : ''}`"
-      :style="{
-          background: color,
-          width: type === 'hbox' ? `${size}px` : '100%',
-          height: type === 'hbox' ? '100%' : `${size}px`,
-        }"
+      :style="splitterStyle"
       @mousedown="onMouseDown"
     >
       <slot />
@@ -37,17 +33,38 @@
     },
     data() {
       return {
-        top: 0,
-        left: 0,
-        width: 0,
-        height: 0,
-        topPad: 0,
-        leftPad: 0,
         prevOffset: {},
         leftItemInfo: {},
         rightItemInfo: {},
         isDragging: false,
       };
+    },
+    computed: {
+      splitterStyle() {
+        return {
+          background: this.color,
+          width: this.type === 'hbox' ? `${this.size}px` : '100%',
+          height: this.type === 'hbox' ? '100%' : `${this.size}px`,
+        };
+      },
+      top() {
+        return this.$el.offsetTop;
+      },
+      left() {
+        return this.$el.offsetLeft;
+      },
+      width() {
+        return this.$el.getBoundingClientRect().width;
+      },
+      height() {
+        return this.$el.getBoundingClientRect().height;
+      },
+      topPad() {
+        return this.$el.getBoundingClientRect().top - this.top;
+      },
+      leftPad() {
+        return this.$el.getBoundingClientRect().left - this.left;
+      },
     },
     created() {
     },
@@ -57,16 +74,8 @@
     methods: {
       updateItemInfo() {
         const el = this.$el;
-        const rect = this.$el.getBoundingClientRect();
         const leftEl = el.previousElementSibling;
         const rightEl = el.nextElementSibling;
-
-        this.top = el.offsetTop;
-        this.left = el.offsetLeft;
-        this.width = rect.width;
-        this.height = rect.height;
-        this.topPad = rect.top - this.top;
-        this.leftPad = rect.left - this.left;
 
         this.leftItemInfo.el = leftEl;
         this.rightItemInfo.el = rightEl;
@@ -169,7 +178,7 @@
           rightItemInfo.top = rightOffset;
         }
 
-        this.$emit('resize', changeValue, leftItemInfo, rightItemInfo);
+        this.$emit('resize', { value: changeValue, left: leftItemInfo, right: rightItemInfo });
         // if (leftId) {
         //   this.$resizeBus.$emit('resize', leftId, this.type, leftItemInfo);
         // }
@@ -190,7 +199,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
+        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.splitterStyle.width}; height: ${this.splitterStyle.height};`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
@@ -218,7 +227,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.splitterStyle.width}; height: ${this.splitterStyle.height};`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
