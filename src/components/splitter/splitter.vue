@@ -2,7 +2,7 @@
   <div>
     <div
       :class="`${type} ev-splitter ${isDragging ? 'hide' : ''}`"
-      :style="splitterStyle"
+      :style="getStyle"
       @mousedown="onMouseDown"
     >
       <slot />
@@ -33,6 +33,12 @@
     },
     data() {
       return {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        topPad: 0,
+        leftPad: 0,
         prevOffset: {},
         leftItemInfo: {},
         rightItemInfo: {},
@@ -40,30 +46,12 @@
       };
     },
     computed: {
-      splitterStyle() {
+      getStyle() {
         return {
           background: this.color,
           width: this.type === 'hbox' ? `${this.size}px` : '100%',
           height: this.type === 'hbox' ? '100%' : `${this.size}px`,
         };
-      },
-      top() {
-        return this.$el.offsetTop;
-      },
-      left() {
-        return this.$el.offsetLeft;
-      },
-      width() {
-        return this.$el.getBoundingClientRect().width;
-      },
-      height() {
-        return this.$el.getBoundingClientRect().height;
-      },
-      topPad() {
-        return this.$el.getBoundingClientRect().top - this.top;
-      },
-      leftPad() {
-        return this.$el.getBoundingClientRect().left - this.left;
       },
     },
     created() {
@@ -74,8 +62,16 @@
     methods: {
       updateItemInfo() {
         const el = this.$el;
+        const rect = this.$el.getBoundingClientRect();
         const leftEl = el.previousElementSibling;
         const rightEl = el.nextElementSibling;
+
+        this.top = el.offsetTop;
+        this.left = el.offsetLeft;
+        this.width = rect.width;
+        this.height = rect.height;
+        this.topPad = rect.top - this.top;
+        this.leftPad = rect.left - this.left;
 
         this.leftItemInfo.el = leftEl;
         this.rightItemInfo.el = rightEl;
@@ -152,33 +148,33 @@
         // const rightId = rightItemInfo.el.dataset.id;
         let leftWh;
         let rightWh;
-        let rightOffset;
+        let actualChangeValue;
 
         if (this.type === 'hbox') {
           leftWh = leftItemInfo.width - changeValue;
           rightWh = rightItemInfo.width + changeValue;
-          rightOffset = rightItemInfo.left - changeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
           rightItemInfo.el.style.cssText += `width: ${rightWh}px; height: ${rightItemInfo.height}px`;
 
-          leftItemInfo.width = leftWh;
-          rightItemInfo.width = rightWh;
-          rightItemInfo.left = rightOffset;
+          actualChangeValue = leftItemInfo.width - leftItemInfo.el.getBoundingClientRect().width;
+          leftItemInfo.width = leftItemInfo.el.getBoundingClientRect().width;
+          rightItemInfo.width = rightItemInfo.el.getBoundingClientRect().width;
+          rightItemInfo.left -= actualChangeValue;
         } else {
           leftWh = leftItemInfo.height - changeValue;
           rightWh = rightItemInfo.height + changeValue;
-          rightOffset = rightItemInfo.top - changeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
           rightItemInfo.el.style.cssText += `width: ${rightItemInfo.width}px; height: ${rightWh}px`;
 
-          leftItemInfo.height = leftWh;
-          rightItemInfo.height = rightWh;
-          rightItemInfo.top = rightOffset;
+          actualChangeValue = leftItemInfo.height - leftItemInfo.el.getBoundingClientRect().height;
+          leftItemInfo.height = leftItemInfo.el.getBoundingClientRect().height;
+          rightItemInfo.height = rightItemInfo.el.getBoundingClientRect().height;
+          rightItemInfo.top -= actualChangeValue;
         }
 
-        this.$emit('resize', { value: changeValue, left: leftItemInfo, right: rightItemInfo });
+        this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
         // if (leftId) {
         //   this.$resizeBus.$emit('resize', leftId, this.type, leftItemInfo);
         // }
@@ -199,7 +195,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.splitterStyle.width}; height: ${this.splitterStyle.height};`;
+        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
@@ -227,7 +223,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.splitterStyle.width}; height: ${this.splitterStyle.height};`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
