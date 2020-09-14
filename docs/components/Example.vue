@@ -6,22 +6,40 @@
       {{ description }}
     </p>
     <br><br>
-    <component
-      :is="contents"
-    />
-    <br>
-    url : {{ url }}
-    <br>
-    <hr class="example-splitter">
+    <div
+      class="example-sample"
+    >
+      <component
+        :is="contents"
+      />
+      <hr class="example-splitter">
+      <div v-highlight>
+        <pre>
+          {{ content }}
+        </pre>
+      </div>
+    </div>
   </section>
 </template>
 
 <script>
-import { ref } from 'vue';
-import axios from 'axios';
+import { parseComponent } from 'vue-template-compiler';
+import hljs from 'highlight.js';
+import CheckboxRaw from '!!raw-loader!../views/checkbox/example/Default';
+import 'highlight.js/styles/github.css';
 
 export default {
   name: 'Example',
+  directives: {
+    highlight: {
+      mounted(el) {
+        const blocks = el.querySelectorAll('pre');
+        blocks.forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+      },
+    },
+  },
   components: {
   },
   props: {
@@ -42,20 +60,37 @@ export default {
       default: '',
     },
   },
-  setup(props) {
-    const codeData = ref('');
-
-    console.log(`props.url : ${props.url}`);
-    axios.get(props.url).then((result) => {
-      codeData.value = `\`\`\`html\n${result.data}\n\`\`\``;
-    });
+  setup() {
+    const { template } = parseComponent(CheckboxRaw);
+    const { content } = template;
 
     return {
-      codeData,
+      content,
+      template,
     };
   },
 };
 </script>
 
-<style scoped>
+<style lang="scss">
+.example-sample {
+  display: flex;
+  border: 1px solid #FFDD57;
+  border-radius: 4px;
+  div {
+    max-height: 600px;
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+  }
+  div:last-child {
+    padding: 0;
+  }
+}
+
+.example-splitter {
+  width: 1px;
+  background-color: #FFDD57;
+  border: none;
+}
 </style>
