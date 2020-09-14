@@ -4,6 +4,17 @@ module.exports = {
   devServer: {
     overlay: false,
   },
+  chainWebpack: (config) => {
+    config.module
+      .rule('raw')
+      .include
+      .add('/docs/views/*/example')
+      .end()
+      .test(/\.vue$/)
+      .use('raw-loader')
+      .loader('raw-loader')
+      .end();
+  },
   configureWebpack: {
     plugins: [
       new StyleLintPlugin({

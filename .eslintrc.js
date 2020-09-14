@@ -24,6 +24,7 @@ module.exports = {
     // don't require .vue extension when importing
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
+    'import/no-webpack-loader-syntax': 'off',
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': ['error', {

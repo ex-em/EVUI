@@ -107,6 +107,11 @@ const routes = [
     name: 'ReactivityChart',
     component: () => import(/* webpackChunkName: "reactivityChart" */ '../views/reactivityChart'),
   },
+  {
+    path: '/:catchAll(.*)',
+    name: 'PageNotFound',
+    component: () => import(/* webpackChunkName: "pageNotFound" */ '../views/PageNotFound'),
+  },
 ];
 
 const router = createRouter({
