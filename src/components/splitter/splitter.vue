@@ -162,6 +162,8 @@
       resizeForNeighbor(changeValue) {
         const leftItemInfo = this.leftItemInfo;
         const rightItemInfo = this.rightItemInfo;
+        const { min: leftMin, max: leftMax } = this.leftBound;
+        const { min: rightMin, max: rightMax } = this.rightBound;
         // const leftId = leftItemInfo.el.dataset.id;
         // const rightId = rightItemInfo.el.dataset.id;
         let leftWh;
@@ -172,19 +174,19 @@
         if (this.type === 'hbox') {
           leftWh = leftItemInfo.width - changeValue;
           // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
-          if (this.leftBound.min && leftWh < this.leftBound.min) {
-            leftWh = this.leftBound.min;
-          } else if (this.leftBound.max && leftWh > this.leftBound.max) {
-            leftWh = this.leftBound.max;
+          if (leftMin && leftWh < leftMin) {
+            leftWh = leftMin;
+          } else if (leftMax && leftWh > leftMax) {
+            leftWh = leftMax;
           }
           actualChangeValue = leftItemInfo.width - leftWh;
 
           // 찾은 actualChangeValue 로 right 의 크기를 변경
           rightWh = rightItemInfo.width + actualChangeValue;
-          if (this.rightBound.min && rightWh < this.rightBound.min) {
-            rightWh = this.rightBound.min;
-          } else if (this.rightBound.max && rightWh > this.rightBound.max) {
-            rightWh = this.rightBound.max;
+          if (rightMin && rightWh < rightMin) {
+            rightWh = rightMin;
+          } else if (rightMax && rightWh > rightMax) {
+            rightWh = rightMax;
           }
           // 실제 이동할 actualChangeValue 를 구한다
           actualChangeValue = rightWh - rightItemInfo.width;
@@ -200,18 +202,18 @@
           rightItemInfo.left = rightOffset;
         } else {
           leftWh = leftItemInfo.height - changeValue;
-          if (this.leftBound.min && leftWh < this.leftBound.min) {
-            leftWh = this.leftBound.min;
-          } else if (this.leftBound.max && leftWh > this.leftBound.max) {
-            leftWh = this.leftBound.max;
+          if (leftMin && leftWh < leftMin) {
+            leftWh = leftMin;
+          } else if (leftMax && leftWh > leftMax) {
+            leftWh = leftMax;
           }
           actualChangeValue = leftItemInfo.height - leftWh;
 
           rightWh = rightItemInfo.height + actualChangeValue;
-          if (this.rightBound.min && rightWh < this.rightBound.min) {
-            rightWh = this.rightBound.min;
-          } else if (this.rightBound.max && rightWh > this.rightBound.max) {
-            rightWh = this.rightBound.max;
+          if (rightMin && rightWh < rightMin) {
+            rightWh = rightMin;
+          } else if (rightMax && rightWh > rightMax) {
+            rightWh = rightMax;
           }
           actualChangeValue = rightWh - rightItemInfo.height;
 
