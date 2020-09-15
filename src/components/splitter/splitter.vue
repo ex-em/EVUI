@@ -159,14 +159,19 @@
           max,
         };
       },
-      getLimitSize(elementSize, { min, max }) {
-        let result = elementSize;
+      getActualValue(elementSize, changeValue, isLeftEl) {
+        let result;
+        const { min, max } = isLeftEl ? this.leftBound : this.rightBound;
+
+        result = isLeftEl ? elementSize - changeValue : elementSize + changeValue;
+
         if (min && result < min) {
           result = min;
         } else if (max && result > max) {
           result = max;
         }
-        return result;
+
+        return isLeftEl ? elementSize - result : result - elementSize;
       },
       resizeForNeighbor(changeValue) {
         const leftItemInfo = this.leftItemInfo;
@@ -180,18 +185,12 @@
 
         if (this.type === 'hbox') {
           // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
-          leftWh = leftItemInfo.width - changeValue;
-          leftWh = this.getLimitSize(leftWh, this.leftBound);
+          actualChangeValue = this.getActualValue(leftItemInfo.width, changeValue, true);
+          // 찾은 actualChangeValue 로 실제 이동할 actualChangeValue 를 구한다
+          actualChangeValue = this.getActualValue(rightItemInfo.width, actualChangeValue, false);
 
-          actualChangeValue = leftItemInfo.width - leftWh;
-
-          // 찾은 actualChangeValue 로 right 의 크기를 변경
-          rightWh = rightItemInfo.width + actualChangeValue;
-          rightWh = this.getLimitSize(rightWh, this.rightBound);
-
-          // 실제 이동할 actualChangeValue 를 구한다
-          actualChangeValue = rightWh - rightItemInfo.width;
           leftWh = leftItemInfo.width - actualChangeValue;
+          rightWh = rightItemInfo.width + actualChangeValue;
           rightOffset = rightItemInfo.left - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
@@ -201,16 +200,11 @@
           rightItemInfo.width = rightWh;
           rightItemInfo.left = rightOffset;
         } else {
-          leftWh = leftItemInfo.height - changeValue;
-          leftWh = this.getLimitSize(leftWh, this.leftBound);
+          actualChangeValue = this.getActualValue(leftItemInfo.height, changeValue, true);
+          actualChangeValue = this.getActualValue(rightItemInfo.height, actualChangeValue, false);
 
-          actualChangeValue = leftItemInfo.height - leftWh;
-
-          rightWh = rightItemInfo.height + actualChangeValue;
-          rightWh = this.getLimitSize(rightWh, this.rightBound);
-
-          actualChangeValue = rightWh - rightItemInfo.height;
           leftWh = leftItemInfo.height - actualChangeValue;
+          rightWh = rightItemInfo.height + actualChangeValue;
           rightOffset = rightItemInfo.top - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
