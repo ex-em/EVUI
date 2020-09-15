@@ -38,8 +38,7 @@ class Bar {
       return;
     }
 
-    const isHorizontal = this.isHorizontal;
-    const showValue = this.showValue;
+    const { isHorizontal, showValue } = this;
 
     const ctx = param.ctx;
     const chartRect = param.chartRect;
