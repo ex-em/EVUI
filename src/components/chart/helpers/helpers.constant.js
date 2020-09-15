@@ -54,6 +54,11 @@ export const BAR_OPTION = {
   yAxisIndex: 0,
   category: true,
   showLegend: true,
+  showValue: {
+    use: false,
+    fontSize: 12,
+    textColor: '#000000',
+  },
 };
 
 export const PIE_OPTION = {

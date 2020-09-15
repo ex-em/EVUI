@@ -1,11 +1,11 @@
-import { merge } from 'lodash-es';
+import { defaultsDeep } from 'lodash-es';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
 class Line {
   constructor(sId, opt, sIdx) {
-    const merged = merge({}, LINE_OPTION, opt);
+    const merged = defaultsDeep({}, opt, LINE_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });
