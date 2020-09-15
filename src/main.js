@@ -1,8 +1,10 @@
 import EvCheckbox from '@/components/checkbox/Checkbox.vue';
+import EvRadio from '@/components/radio/Radio.vue';
 import { version } from '../package.json';
 
 const components = [
   EvCheckbox,
+  EvRadio,
 ];
 
 const install = (app) => {

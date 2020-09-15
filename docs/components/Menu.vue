@@ -149,7 +149,10 @@ export default {
   height: 100%;
   padding: 25px 12px;
   overflow: auto;
-  border-right: 1px solid #DDDDDD;
+
+  @include themify() {
+    border-right: 1px solid themed('border-color-base');
+  }
 
   ul, li {
     list-style: none;
@@ -161,7 +164,7 @@ export default {
     cursor: pointer;
 
     &:hover {
-      color: $color-main;
+      color: $color-blue;
     }
   }
 }
