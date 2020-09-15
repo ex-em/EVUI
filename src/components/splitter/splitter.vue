@@ -30,6 +30,24 @@
         type: Number,
         default: 4,
       },
+      leftBound: {
+        type: Object,
+        default() {
+          return {
+            min: 0,
+            max: 0,
+          };
+        },
+      },
+      rightBound: {
+        type: Object,
+        default() {
+          return {
+            min: 0,
+            max: 0,
+          };
+        },
+      },
     },
     data() {
       return {
@@ -148,30 +166,64 @@
         // const rightId = rightItemInfo.el.dataset.id;
         let leftWh;
         let rightWh;
+        let rightOffset;
         let actualChangeValue;
 
         if (this.type === 'hbox') {
           leftWh = leftItemInfo.width - changeValue;
-          rightWh = rightItemInfo.width + changeValue;
+          // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
+          if (this.leftBound.min && leftWh < this.leftBound.min) {
+            leftWh = this.leftBound.min;
+          } else if (this.leftBound.max && leftWh > this.leftBound.max) {
+            leftWh = this.leftBound.max;
+          }
+          actualChangeValue = leftItemInfo.width - leftWh;
+
+          // 찾은 actualChangeValue 로 right 의 크기를 변경
+          rightWh = rightItemInfo.width + actualChangeValue;
+          if (this.rightBound.min && rightWh < this.rightBound.min) {
+            rightWh = this.rightBound.min;
+          } else if (this.rightBound.max && rightWh > this.rightBound.max) {
+            rightWh = this.rightBound.max;
+          }
+          // 실제 이동할 actualChangeValue 를 구한다
+          actualChangeValue = rightWh - rightItemInfo.width;
+
+          leftWh = leftItemInfo.width - actualChangeValue;
+          rightOffset = rightItemInfo.left - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
           rightItemInfo.el.style.cssText += `width: ${rightWh}px; height: ${rightItemInfo.height}px`;
 
-          actualChangeValue = leftItemInfo.width - leftItemInfo.el.getBoundingClientRect().width;
-          leftItemInfo.width = leftItemInfo.el.getBoundingClientRect().width;
-          rightItemInfo.width = rightItemInfo.el.getBoundingClientRect().width;
-          rightItemInfo.left -= actualChangeValue;
+          leftItemInfo.width = leftWh;
+          rightItemInfo.width = rightWh;
+          rightItemInfo.left = rightOffset;
         } else {
           leftWh = leftItemInfo.height - changeValue;
-          rightWh = rightItemInfo.height + changeValue;
+          if (this.leftBound.min && leftWh < this.leftBound.min) {
+            leftWh = this.leftBound.min;
+          } else if (this.leftBound.max && leftWh > this.leftBound.max) {
+            leftWh = this.leftBound.max;
+          }
+          actualChangeValue = leftItemInfo.height - leftWh;
+
+          rightWh = rightItemInfo.height + actualChangeValue;
+          if (this.rightBound.min && rightWh < this.rightBound.min) {
+            rightWh = this.rightBound.min;
+          } else if (this.rightBound.max && rightWh > this.rightBound.max) {
+            rightWh = this.rightBound.max;
+          }
+          actualChangeValue = rightWh - rightItemInfo.height;
+
+          leftWh = leftItemInfo.height - actualChangeValue;
+          rightOffset = rightItemInfo.top - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
           rightItemInfo.el.style.cssText += `width: ${rightItemInfo.width}px; height: ${rightWh}px`;
 
-          actualChangeValue = leftItemInfo.height - leftItemInfo.el.getBoundingClientRect().height;
-          leftItemInfo.height = leftItemInfo.el.getBoundingClientRect().height;
-          rightItemInfo.height = rightItemInfo.el.getBoundingClientRect().height;
-          rightItemInfo.top -= actualChangeValue;
+          leftItemInfo.height = leftWh;
+          rightItemInfo.height = rightWh;
+          rightItemInfo.top = rightOffset;
         }
 
         this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
