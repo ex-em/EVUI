@@ -5,40 +5,38 @@ import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
 
 const modules = {
-  createSeriesSet(series, defaultType) {
+  createSeriesSet(series, defaultType, isHorizontal) {
     Object.keys(series).forEach((key, index) => {
       const type = series[key].type || defaultType;
       this.seriesList[key] = this.addSeries({
         type,
-        sId: key,
-        sOpt: series[key],
-        sIdx: index,
+        id: key,
+        opt: series[key],
+        index,
+        isHorizontal,
       });
     });
   },
 
   addSeries(param) {
-    const type = param.type;
-    const id = param.sId;
-    const opt = param.sOpt;
-    const idx = param.sIdx;
+    const { type, id, opt, index, isHorizontal } = param;
 
     if (type === 'line') {
       this.seriesInfo.charts.line.push(id);
-      return new Line(id, opt, idx);
+      return new Line(id, opt, index);
     } else if (type === 'scatter') {
       this.seriesInfo.charts.scatter.push(id);
-      return new Scatter(id, opt, idx);
+      return new Scatter(id, opt, index);
     } else if (type === 'bar') {
       this.seriesInfo.charts.bar.push(id);
 
       if (opt.timeMode) {
-        return new TimeBar(id, opt, idx);
+        return new TimeBar(id, opt, index, isHorizontal);
       }
-      return new Bar(id, opt, idx);
+      return new Bar(id, opt, index, isHorizontal);
     } else if (type === 'pie') {
       this.seriesInfo.charts.pie.push(id);
-      return new Pie(id, opt, idx);
+      return new Pie(id, opt, index);
     }
 
     return false;

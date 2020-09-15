@@ -40,35 +40,41 @@ const modules = {
     };
 
     this.onDblClick = (e) => {
-      if (typeof this.listeners.dblclick === 'function') {
-        const selectItem = this.options.selectItem;
+      const selectItem = this.options.selectItem;
+      const args = {};
+
+      if (selectItem.use) {
         const offset = this.getMousePosition(e);
         const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
-        const args = {};
+
 
         if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+      }
 
+      if (typeof this.listeners.dblclick === 'function') {
         this.listeners.dblclick(args);
       }
     };
 
     this.onClick = (e) => {
-      if (typeof this.listeners.click === 'function') {
+      const args = {};
+
+      if (this.options.selectItem.use) {
         const offset = this.getMousePosition(e);
         const hitInfo = this.findClickedData(offset);
-
-        const args = {};
 
         if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+      }
 
+      if (typeof this.listeners.click === 'function') {
         this.listeners.click(args);
       }
     };

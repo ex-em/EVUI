@@ -1,10 +1,11 @@
-import { merge } from 'lodash-es';
+import { defaultsDeep } from 'lodash-es';
+import { numberWithComma } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 
 class Bar {
-  constructor(sId, opt, sIdx) {
-    const merged = merge({}, BAR_OPTION, opt);
+  constructor(sId, opt, sIdx, isHorizontal) {
+    const merged = defaultsDeep({}, opt, BAR_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });
@@ -16,9 +17,11 @@ class Bar {
     if (this.color === undefined) {
       this.color = COLOR[sIdx];
     }
+
     this.type = 'bar';
     this.sId = sId;
     this.data = [];
+    this.isHorizontal = isHorizontal;
     this.size = {
       cat: 0,
       bar: 0,
@@ -35,12 +38,13 @@ class Bar {
       return;
     }
 
+    const { isHorizontal, showValue } = this;
+
     const ctx = param.ctx;
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
     const axesSteps = param.axesSteps;
     const showIndex = param.showIndex;
-    const isHorizontal = param.isHorizontal;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
 
@@ -60,16 +64,20 @@ class Bar {
     const cPad = 2;
 
     let bArea;
-    if (this.isExistGrp) {
-      bArea = (cArea - (cPad * 2));
-    } else {
-      bArea = (cArea - (cPad * 2)) / showSeriesCount;
-    }
-    let w = isHorizontal ? null : Math.round(bArea * thickness);
-    let h = isHorizontal ? Math.round(bArea * thickness) : null;
+    let w;
+    let h;
+
+    bArea = (cArea - (cPad * 2));
+    bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
+
+    const size = Math.round(bArea * thickness);
+
+    w = isHorizontal ? null : size;
+    h = isHorizontal ? size : null;
 
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
+
     this.size.cat = cArea;
     this.size.bar = bArea;
     this.size.cPad = cPad;
@@ -113,6 +121,32 @@ class Bar {
 
       ctx.fillRect(x, y, w, isHorizontal ? -h : h);
 
+
+      if (showValue.use) {
+        ctx.save();
+
+        const value = numberWithComma(isHorizontal ? item.x : item.y);
+
+        ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
+        ctx.fillStyle = showValue.textColor;
+        ctx.lineWidth = 1;
+        ctx.textBaseline = isHorizontal ? 'middle' : 'bottom';
+        ctx.textAlign = 'center';
+
+        const vw = Math.round(ctx.measureText(value).width);
+        const vh = showValue.fontSize + 4;
+
+        if (vw < w && vh < Math.abs(h)) {
+          if (isHorizontal) {
+            ctx.fillText(value, x + w - vw, y - (h / 2));
+          } else {
+            ctx.fillText(value, x + (w / 2), y + h + vh);
+          }
+        }
+
+        ctx.restore();
+      }
+
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line
       item.w = w; // eslint-disable-line
@@ -121,6 +155,9 @@ class Bar {
   }
 
   itemHighlight(item, context) {
+    const isHorizontal = this.isHorizontal;
+    const showValue = this.showValue;
+
     const gdata = item.data;
     const ctx = context;
 
@@ -137,6 +174,32 @@ class Bar {
     ctx.shadowColor = this.color;
 
     ctx.fillRect(x, y, w, h);
+
+    if (showValue.use) {
+      ctx.save();
+
+      const value = numberWithComma(isHorizontal ? gdata.x : gdata.y);
+
+      ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
+      ctx.fillStyle = showValue.textColor;
+      ctx.lineWidth = 1;
+      ctx.textBaseline = isHorizontal ? 'middle' : 'bottom';
+      ctx.textAlign = 'center';
+
+      const vw = Math.round(ctx.measureText(value).width);
+      const vh = showValue.fontSize + 4;
+
+      if (vw < w && vh < Math.abs(h)) {
+        if (isHorizontal) {
+          ctx.fillText(value, x + w - vw, y + (h / 2));
+        } else {
+          ctx.fillText(value, x + (w / 2), y + h + vh);
+        }
+      }
+
+      ctx.restore();
+    }
+
     ctx.restore();
   }
 
