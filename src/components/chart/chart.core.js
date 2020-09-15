@@ -67,9 +67,9 @@ class EvChart {
 
   init() {
     const { series, data, labels, groups } = this.data;
-    const { type, axesX, axesY, tooltip } = this.options;
+    const { type, axesX, axesY, tooltip, horizontal } = this.options;
 
-    this.createSeriesSet(series, type);
+    this.createSeriesSet(series, type, horizontal);
     if (groups.length) {
       this.addGroupInfo(groups);
     }
@@ -126,7 +126,6 @@ class EvChart {
 
   drawSeries() {
     const thickness = this.options.thickness;
-    const isHorizontal = this.options.horizontal;
     const maxTip = this.options.maxTip;
 
     const opt = {
@@ -135,7 +134,6 @@ class EvChart {
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
-      isHorizontal,
     };
 
     let showIndex = 0;
