@@ -59,7 +59,7 @@ a {
   height: $header-height;
   padding: 0 10px;
   align-items: center;
-  background-color: #67A1F4;
+  background-color: $color-blue;
   z-index: 10;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 

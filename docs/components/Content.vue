@@ -1,7 +1,7 @@
 <template>
-  <div class="evui-content">
+  <main class="evui-content">
     <router-view />
-  </div>
+  </main>
 </template>
 
 <script>
@@ -15,6 +15,6 @@ export default {
 
 .evui-content {
   position: relative;
-  padding: 30px;
+  padding: 30px 40px;
 }
 </style>

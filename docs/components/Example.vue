@@ -1,32 +1,46 @@
 <template>
-  <section>
-    <h2>{{ title }}</h2>
-    <br>
-    <p class="example-desc">
+  <article class="article-wrapper">
+    <h3 class="article-title">
+      {{ title }}
+    </h3>
+    <p class="article-description">
       {{ description }}
     </p>
-    <br><br>
-    <div
-      class="example-sample"
-    >
-      <component
-        :is="contents"
-      />
-      <hr class="example-splitter">
-      <div v-highlight>
-        <pre>
-          {{ content }}
-        </pre>
+    <div class="article-example">
+      <div class="view">
+        <component
+          :is="contents"
+        />
+      </div>
+      <div
+        v-highlight
+        :class="['code', { 'expend': codeExpend }]"
+      >
+        <div
+          ref="codeWrapper"
+          class="code-wrapper"
+        >
+          <pre
+            v-for="(code, key) in codeText"
+            :key="key"
+          >
+            {{ code }}
+          </pre>
+        </div>
+        <div
+          class="btn-show-more"
+          @click="clickExpend"
+        >
+          {{ codeExpend ? '▲ Fold the code' : '▼ Unfold the code' }}
+        </div>
       </div>
     </div>
-  </section>
+  </article>
 </template>
 
 <script>
-import { parseComponent } from 'vue-template-compiler';
+import { ref } from 'vue';
 import hljs from 'highlight.js';
-import CheckboxRaw from '!!raw-loader!../views/checkbox/example/Default';
-import 'highlight.js/styles/github.css';
 
 export default {
   name: 'Example',
@@ -39,8 +53,6 @@ export default {
         });
       },
     },
-  },
-  components: {
   },
   props: {
     title: {
@@ -59,38 +71,110 @@ export default {
       type: String,
       default: '',
     },
+    codeText: {
+      type: Object,
+      default: () => {},
+    },
   },
   setup() {
-    const { template } = parseComponent(CheckboxRaw);
-    const { content } = template;
-
+    const codeExpend = ref(false);
+    const codeWrapper = ref(null);
+    const clickExpend = () => {
+      codeExpend.value = !codeExpend.value;
+      if (!codeExpend.value) {
+        codeWrapper.value.scrollTop = 0;
+      }
+    };
     return {
-      content,
-      template,
+      codeExpend,
+      codeWrapper,
+      clickExpend,
     };
   },
 };
 </script>
 
 <style lang="scss">
-.example-sample {
-  display: flex;
-  border: 1px solid #FFDD57;
-  border-radius: 4px;
-  div {
-    max-height: 600px;
-    flex-grow: 1;
-    padding: 15px;
-    overflow-y: auto;
+@import '../style/index.scss';
+
+.content-title {
+  padding-bottom: 15px;
+  margin-bottom: 35px;
+  font-size: 28px;
+  font-weight: bold;
+
+  @include themify() {
+    border-bottom: 1px solid themed('border-color-base');
   }
-  div:last-child {
-    padding: 0;
+}
+.article-wrapper {
+  margin-bottom: 55px;
+  font-size: 15px;
+}
+.article-title {
+  margin-bottom: 20px;
+  font-size: 23px;
+  font-weight: bold;
+}
+.article-description {
+  margin-bottom: 30px;
+  line-height: 1.5em;
+}
+.article-example {
+  display: flex;
+  border: 1px solid $color-yellow;
+  border-radius: 4px;
+  .view {
+    flex: 1;
+    padding: 15px 20px;
+    border-right: 1px solid $color-yellow;
+  }
+  .code {
+    position: relative;
+    width: 50%;
+    max-width: 700px;
+    .code-wrapper {
+      height: 400px;
+      overflow-y: hidden;
+    }
+    .btn-show-more {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 45px;
+      line-height: 45px;
+      background-color: rgba($color-yellow, 0.7);
+      color: $color-black;
+      text-align: center;
+      cursor: pointer;
+    }
+    &.expend {
+      .code-wrapper {
+        height: auto;
+        max-height: 600px;
+        padding-bottom: 45px;
+        overflow-y: auto;
+      }
+    }
+    * {
+      font-family: consolas, monospace;
+    }
   }
 }
 
-.example-splitter {
-  width: 1px;
-  background-color: #FFDD57;
-  border: none;
+@media all and (max-width: 1280px) {
+  .article-example {
+    display: block;
+    .view {
+      width: 100%;
+      border-right: 0;
+      border-bottom: 1px solid $color-yellow;
+    }
+    .code {
+      max-width: none;
+      width: 100%;
+    }
+  }
 }
 </style>
