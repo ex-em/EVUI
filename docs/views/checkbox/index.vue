@@ -11,7 +11,6 @@
     :url="component.url"
     :code-text="component.codeText"
   />
-  <br><br><br><hr><br><br><br>
   <MarkdownView
     :source="mdText"
   />

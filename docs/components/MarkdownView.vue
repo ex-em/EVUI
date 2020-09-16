@@ -1,7 +1,8 @@
 <template>
+  <hr><br><br>
   <div>
     <h2>API</h2>
-    <br>
+    <br><br>
     <div
       v-highlight
       class="markdown"

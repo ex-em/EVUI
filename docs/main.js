@@ -5,7 +5,6 @@ import Example from './components/Example.vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
-import 'highlight.js/styles/github.css';
 
 const app = createApp(App);
 
