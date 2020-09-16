@@ -3,7 +3,9 @@
     :class="['evui-docs', docsTheme]"
   >
     <div class="evui-wrapper">
-      <MainHeader />
+      <MainHeader
+        v-model="docsTheme"
+      />
       <MainNav />
       <MainContent />
     </div>
@@ -11,7 +13,7 @@
 </template>
 
 <script>
-import { ref, provide } from 'vue';
+import { ref } from 'vue';
 import MainHeader from './components/Header';
 import MainContent from './components/Content';
 import MainNav from './components/Menu';
@@ -25,16 +27,6 @@ export default {
   },
   setup() {
     const docsTheme = ref('light');
-    const changeDocsTheme = () => {
-      if (docsTheme.value === 'light') {
-        docsTheme.value = 'dark';
-      } else {
-        docsTheme.value = 'light';
-      }
-    };
-
-    provide('docsTheme', docsTheme);
-    provide('changeDocsTheme', changeDocsTheme);
 
     return {
       docsTheme,
@@ -52,15 +44,17 @@ export default {
   box-sizing: border-box;
   font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 }
-
 .dark {
   @import './style/lib/highlightjs.hybrid';
 }
-
 .light {
   @import './style/lib/highlightjs.github';
 }
-
+.hljs {
+  * {
+    font-family: consolas, monospace;
+  }
+}
 .evui-wrapper {
   position: relative;
   min-height: 100vh;

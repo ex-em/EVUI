@@ -108,7 +108,7 @@ export default {
   }
 }
 .article-wrapper {
-  margin-bottom: 55px;
+  padding: 20px 0 55px;
   font-size: 15px;
 }
 .article-title {
@@ -156,9 +156,6 @@ export default {
         padding-bottom: 45px;
         overflow-y: auto;
       }
-    }
-    * {
-      font-family: consolas, monospace;
     }
   }
 }

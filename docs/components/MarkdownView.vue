@@ -1,14 +1,12 @@
 <template>
-  <hr><br><br>
-  <div>
-    <h2>API</h2>
-    <br><br>
+  <article class="article-wrapper">
+    <h3 class="article-title">API</h3>
     <div
       v-highlight
       class="markdown"
       v-html="compiledMd"
     />
-  </div>
+  </article>
 </template>
 
 <script>
