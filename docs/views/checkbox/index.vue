@@ -11,30 +11,30 @@
     :url="component.url"
     :code-text="component.codeText"
   />
+  <br><br><br><hr><br><br><br>
+  <MarkdownView
+    :source="mdText"
+  />
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';
 import { parseComponent } from 'vue-template-compiler';
 import Example from '../../components/Example';
 import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
+import MarkdownView from '../../components/MarkdownView';
+import CheckboxMd from '!!raw-loader!./api/checkbox.md';
 
 export default {
   name: 'Checkbox',
   components: {
     Example,
+    MarkdownView,
   },
   inheritAttrs: false,
   setup() {
-    const checkVal1 = ref(true);
-    const checkVal2 = ref(false);
-    const checkVal3 = ref(false);
-
-    const onChange = (value, e) => {
-      console.log(`value: ${value}, e : ${e}`);
-    };
-
+    const mdText = CheckboxMd;
     const { template, script } = parseComponent(DefaultRaw);
     const codeTextObj = {
       template: template.content,
@@ -52,11 +52,8 @@ export default {
     ];
 
     return {
+      mdText,
       components,
-      checkVal1,
-      checkVal2,
-      checkVal3,
-      onChange,
     };
   },
 };
