@@ -11,30 +11,12 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { inject } from 'vue';
 
 export default {
-  props: {
-    modelValue: {
-      type: String,
-      default: 'light',
-    },
-  },
-  emits: {
-    'update:modelValue': null,
-  },
-  setup(props, { emit }) {
-    const theme = computed({
-      get: () => props.modelValue,
-      set: value => emit('update:modelValue', value),
-    });
-    const changeTheme = () => {
-      if (theme.value === 'light') {
-        theme.value = 'dark';
-      } else {
-        theme.value = 'light';
-      }
-    };
+  setup() {
+    const theme = inject('docsTheme');
+    const changeTheme = inject('changeDocsTheme');
 
     return {
       theme,
