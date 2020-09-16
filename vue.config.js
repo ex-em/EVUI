@@ -9,8 +9,9 @@ module.exports = {
       .rule('raw')
       .include
       .add('/docs/views/*/example')
+      .add('/docs/views/*/api')
       .end()
-      .test(/\.vue$/)
+      .test(/\.(vue|md)$/)
       .use('raw-loader')
       .loader('raw-loader')
       .end();
