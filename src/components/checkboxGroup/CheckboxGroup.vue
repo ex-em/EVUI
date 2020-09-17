@@ -19,7 +19,7 @@ export default {
     },
   },
   emits: {
-    'update:modelValue': null,
+    'update:modelValue': [Array],
   },
   setup(props, { emit }) {
     const mv = computed({
