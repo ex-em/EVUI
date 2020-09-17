@@ -3,15 +3,15 @@
     <EvRadio
       v-model="radio1"
       label="Option A"
-    />
+    >Radio Option A</EvRadio>
     <EvRadio
       v-model="radio1"
       label="Option B"
-    />
+    >Radio Option B</EvRadio>
     <EvRadio
       v-model="radio1"
       label="Option C"
-    />
+    >Radio Option C</EvRadio>
     <div class="description">
       <span class="badge">
         Selected Value
@@ -60,6 +60,17 @@
       </span>
       {{ eventText }}
     </div>
+    <div class="description">
+      <span class="badge">
+        Button Event
+      </span>
+      <button
+        class="btn"
+        @click="selectValue('Option C')"
+      >
+        Select Option C
+      </button>
+    </div>
   </div>
 </template>
 
@@ -75,12 +86,16 @@ export default {
     const changeRadio = () => {
       eventText.value = `Click radio and change value '${radio3.value}'`;
     };
+    const selectValue = (val) => {
+      radio3.value = val;
+    };
     return {
       radio1,
       radio2,
       radio3,
       eventText,
       changeRadio,
+      selectValue,
     };
   },
 };

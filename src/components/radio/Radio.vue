@@ -1,7 +1,7 @@
 <template>
   <div
-    :class="[{ disabled }, { checked }, size]"
     class="ev-radio"
+    :class="[{ disabled }, { checked }, size]"
   >
     <label
       class="ev-radio-wrapper"
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, computed, inject, nextTick } from 'vue';
+import { ref, computed, watch, inject, nextTick } from 'vue';
 
 export default {
   name: 'EvRadio',
@@ -60,26 +60,23 @@ export default {
   },
   setup(props, { emit }) {
     const radio = ref();
-    const checked = ref(false);
     const mv = inject(
       'EvRadioGroupMv',
       computed({
         get: () => props.modelValue,
-        set: () => {
-          radio.value.checked = props.modelValue === props.label;
-          if (props.modelValue === props.label) {
-            checked.value = true;
-          } else {
-            checked.value = false;
-          }
-          emit('update:modelValue', props.label);
-        },
+        set: () => emit('update:modelValue', props.label),
       }),
     );
+
     const onChange = async (e) => {
       await nextTick();
       emit('change', mv.value, e);
     };
+
+    const checked = ref(mv.value === props.label);
+    watch(() => mv.value, (cur) => {
+      checked.value = cur === props.label;
+    });
 
     return {
       radio,

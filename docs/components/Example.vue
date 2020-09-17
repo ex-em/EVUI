@@ -158,6 +158,20 @@ export default {
         background-color: themed('border-color-base');
       }
     }
+    .btn {
+      padding: 4px 7px;
+      outline: none;
+      cursor: pointer;
+      background-color: rgba($color-yellow, 0.5);
+      border: 1px solid $color-yellow;
+
+      @include themify() {
+        color: themed('font-color-base');
+      }
+      &:hover {
+        background-color: $color-yellow;
+      }
+    }
   }
   .code {
     position: relative;
@@ -174,10 +188,13 @@ export default {
       width: 100%;
       height: 45px;
       line-height: 45px;
-      background-color: rgba($color-yellow, 0.7);
+      background-color: rgba($color-yellow, 0.5);
       color: $color-black;
       text-align: center;
       cursor: pointer;
+      &:hover {
+        background-color: $color-yellow;
+      }
     }
     &.expend {
       .code-wrapper {
