@@ -129,6 +129,36 @@ export default {
     padding: 15px 20px;
     border-right: 1px solid $color-yellow;
   }
+  .case {
+    padding: 15px 0;
+    &-title {
+      margin-bottom: 25px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+  }
+  .description {
+    padding: 9px 12px;
+    margin: 15px 0 20px;
+    border-radius: 4px;
+    font-size: 13px;
+
+    @include themify() {
+      background-color: themed('background-color-description');
+      border: 1px solid themed('border-color-base');
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      margin-right: 10px;
+      border-radius: 4px;
+
+      @include themify() {
+        background-color: themed('border-color-base');
+      }
+    }
+  }
   .code {
     position: relative;
     width: 50%;

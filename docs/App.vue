@@ -52,6 +52,7 @@ export default {
 }
 .hljs {
   * {
+    font-size: 14px;
     font-family: consolas, monospace;
   }
 }
