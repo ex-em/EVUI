@@ -159,11 +159,8 @@
           max,
         };
       },
-      getActualValue(elementSize, changeValue, isLeftEl) {
-        let result;
-        const { min, max } = isLeftEl ? this.leftBound : this.rightBound;
-
-        result = elementSize + changeValue;
+      getActualValue(elementSize, changeValue, { min, max }) {
+        let result = elementSize + changeValue;
 
         if (min && result < min) {
           result = min;
@@ -171,7 +168,7 @@
           result = max;
         }
 
-        return isLeftEl ? elementSize - result : result - elementSize;
+        return elementSize - result;
       },
       resizeForNeighbor(changeValue) {
         const leftItemInfo = this.leftItemInfo;
@@ -185,9 +182,11 @@
 
         if (this.type === 'hbox') {
           // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
-          actualChangeValue = this.getActualValue(leftItemInfo.width, changeValue * -1, true);
+          actualChangeValue = this.getActualValue(
+                  leftItemInfo.width, changeValue * -1, this.leftBound);
           // 찾은 actualChangeValue 로 실제 이동할 actualChangeValue 를 구한다
-          actualChangeValue = this.getActualValue(rightItemInfo.width, actualChangeValue, false);
+          actualChangeValue = this.getActualValue(
+                  rightItemInfo.width, actualChangeValue, this.rightBound) * -1;
 
           leftWh = leftItemInfo.width - actualChangeValue;
           rightWh = rightItemInfo.width + actualChangeValue;
@@ -200,8 +199,10 @@
           rightItemInfo.width = rightWh;
           rightItemInfo.left = rightOffset;
         } else {
-          actualChangeValue = this.getActualValue(leftItemInfo.height, changeValue * -1, true);
-          actualChangeValue = this.getActualValue(rightItemInfo.height, actualChangeValue, false);
+          actualChangeValue = this.getActualValue(
+                  leftItemInfo.height, changeValue * -1, this.leftBound);
+          actualChangeValue = this.getActualValue(
+                  rightItemInfo.height, actualChangeValue, this.rightBound) * -1;
 
           leftWh = leftItemInfo.height - actualChangeValue;
           rightWh = rightItemInfo.height + actualChangeValue;
