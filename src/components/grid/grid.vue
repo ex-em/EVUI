@@ -1,6 +1,7 @@
 <template>
   <div
     v-cloak
+    v-resize.debounce="onResize"
     :class="getTableClass"
   >
     <div
@@ -106,6 +107,7 @@
               selected: row[2] === selectedRow,
             }"
             @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
           >
             <td
               v-if="useCheckbox.use"
@@ -154,7 +156,7 @@
         class="vscroll-spacer"
       />
       <ev-context-menu
-        :is-use="showContextMenu"
+        v-show="showContextMenu"
         :items="contextMenuItems"
         @click="onClickCtxMenu"
       />
@@ -283,9 +285,7 @@
 
         this.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
-          if (value.includes(store[ix][ROW_DATA_INDEX])) {
-            store[ix][ROW_CHECK_INDEX] = true;
-          }
+          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
         }
       },
       hasVerticalScrollBar() {
@@ -393,7 +393,18 @@
         const menuItems = [];
 
         if (useCustom && this.customContextMenu.length) {
-          menuItems.push(...this.customContextMenu);
+          const row = this.selectedRow;
+          const customItems = this.customContextMenu.map(
+            (item) => {
+              const menuItem = item;
+              if (menuItem.validate) {
+                menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+              }
+
+              return menuItem;
+            });
+
+          menuItems.push(...customItems);
         }
 
         if (this.useFilter) {
@@ -668,6 +679,8 @@
         if (item && item.callback) {
           item.callback(item.itemId, this.selectedRow);
         }
+
+        this.isClickedCtxMenu = false;
       },
       onContextMenu(event) {
         const target = event.target;
@@ -699,10 +712,24 @@
 
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
 
         this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
-        this.$emit('click-row', event, row[ROW_INDEX], cellInfo.name, cellInfo.index, rowData);
+        this.$emit('click-row', event, rowIndex, cellInfo.name, cellInfo.index, rowData);
+      },
+      onRowDblClick(event, row) {
+        const cellInfo = event.target.dataset;
+        const rowData = row[ROW_DATA_INDEX];
+        const rowIndex = row[ROW_INDEX];
+
+        this.$emit('dblclick-row', {
+          event,
+          rowData,
+          rowIndex,
+          cellName: cellInfo.name,
+          cellIndex: cellInfo.index,
+        });
       },
       onCheck(event, row) {
         if (this.useCheckbox.mode === 'single' && this.prevCheckedRow.length) {
@@ -1052,9 +1079,15 @@
       }
       &.left {
         text-align: left;
+        .wrap {
+          justify-content: flex-start;
+        }
       }
       &.right {
         text-align: right;
+        .wrap {
+          justify-content: flex-end;
+        }
       }
 
       &:last-child {

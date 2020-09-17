@@ -19,12 +19,16 @@
           text: 'Test Menu 1',
           itemId: 'menu_1',
           callback: onContextMenu,
+          validate: checkActive,
         }, {
           text: 'Test Menu 2',
           itemId: 'menu_2',
           callback: onContextMenu,
+          validate: checkActive,
         }],
       }"
+      @click-row="onClick"
+      @dblclick-row="onDblClick"
     >
       <template v-slot:test1="item">
         <ev-checkbox
@@ -198,6 +202,14 @@
       },
       onContextMenu() {
         console.log('On Context Menu');
+        this.checked = [];
+      },
+      checkActive(itemId, row) {
+        if (itemId === 'menu_1') {
+          return row[0] === 1;
+        }
+
+        return row[1] === 'Russia';
       },
       onCheckBox() {
       },
@@ -239,6 +251,14 @@
             // Math.random() * 800,
           ]);
         }
+      },
+      onClick(...parameters) {
+        console.log('Click!!!!');
+        console.log(parameters);
+      },
+      onDblClick(parameters) {
+        console.log('DblClick!!!');
+        console.log(parameters);
       },
     },
   };
