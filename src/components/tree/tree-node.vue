@@ -1,10 +1,12 @@
 <template>
   <ul :class="classes">
     <li>
-      <span :class="[`${prefixCls}-arrow`,
-       {[`${prefixCls}-arrow-disabled`]: data.disabled}]" @click="handleExpand">
-        <ev-icon v-if="showArrow" :cls="arrowClasses"></ev-icon>
-        <ev-loading-mask v-if="showLoading"></ev-loading-mask>
+      <span
+        :class="[`${prefixCls}-arrow`, {[`${prefixCls}-arrow-disabled`]: data.disabled}]"
+        @click="handleExpand"
+      >
+        <ev-icon v-if="showArrow" :cls="arrowClasses"/>
+        <ev-loading-mask v-if="showLoading"/>
       </span>
       <ev-checkbox
         v-if="showCheckbox"
@@ -15,10 +17,12 @@
         :indeterminate="data.indeterminate"
         :disabled="data.disabled || data.disableCheckbox"
         @on-click="handleCheck"
-      ></ev-checkbox>
-      <Render v-if="data.render" :render="data.render" :data="data" :node="node"></Render>
-      <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"></Render>
-      <span v-else :class="titleClasses" @click="handleSelect">{{ data.title }}</span>
+      />
+      <Render v-if="data.render" :render="data.render" :data="data" :node="node"/>
+      <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"/>
+      <span v-else :class="titleClasses" @click="handleSelect">
+        {{ data.title }}
+      </span>
       <Tree-node
         v-for="(item, i) in children"
         v-if="data.expand"
@@ -26,8 +30,8 @@
         :data="item"
         :multiple="multiple"
         :show-checkbox="showCheckbox"
-        :children-key="childrenKey">
-      </Tree-node>
+        :children-key="childrenKey"
+      />
     </li>
   </ul>
 </template>
@@ -125,7 +129,9 @@ export default {
   methods: {
     handleExpand() {
       const item = this.data;
-      if (item.disabled) return;
+      if (item.disabled) {
+        return;
+      }
       // async loading
       if (!item[this.childrenKey].length) {
         const tree = findComponentUpward(this, 'Tree');
