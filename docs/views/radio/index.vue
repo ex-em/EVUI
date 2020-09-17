@@ -53,7 +53,7 @@ export default {
         url: './docs/views/radio/example/RadioGroup.vue',
         codeText: {
           template: parseComponent(RadioGroupRaw)?.template?.content,
-          script: parseComponent(RadioGroupRaw)?.template?.content,
+          script: parseComponent(RadioGroupRaw)?.script?.content,
         },
       },
     ];
