@@ -1,29 +1,46 @@
 <template>
   <label
+    role="checkbox"
     class="ev-checkbox"
     :class="[
       { 'disabled': disabled },
     ]"
   >
     <input
+      v-model="mv"
       type="checkbox"
-      :checked="modelValue"
       :disabled="disabled"
+      :value="refLabel"
       @change="onChange"
     />
-    <slot />
+    <span
+      v-if="$slots.default"
+      class="ev-checkbox-label"
+    >
+      <slot />
+    </span>
+    <span
+      v-else
+      class="ev-checkbox-label"
+    >
+      {{ label }}
+    </span>
   </label>
 </template>
 
 <script>
-import { nextTick } from 'vue';
+import { ref, inject, nextTick, computed } from 'vue';
 
 export default {
   name: 'EvCheckbox',
   props: {
     modelValue: {
-      type: Boolean,
+      type: [String, Number, Boolean, Symbol, Array],
       default: false,
+    },
+    label: {
+      type: [String, Number, Boolean, Symbol],
+      default: null,
     },
     disabled: {
       type: Boolean,
@@ -32,17 +49,26 @@ export default {
   },
   emits: {
     'update:modelValue': [Boolean],
-    change: val => typeof val === 'boolean',
+    change: null,
   },
   setup(props, { emit }) {
+    const mv = inject(
+      'EvCheckboxGroupMv',
+      computed({
+        get: () => props.modelValue,
+        set: () => emit('update:modelValue', !props.modelValue),
+      }),
+    );
+    const refLabel = ref(props.label);
+
     const onChange = async (e) => {
       await nextTick();
-      const value = !props.modelValue;
-      emit('update:modelValue', value);
-      emit('change', value, e);
+      emit('change', mv.value, e);
     };
 
     return {
+      mv,
+      refLabel,
       onChange,
     };
   },
@@ -51,6 +77,7 @@ export default {
 
 <style lang="scss">
 .ev-checkbox {
+  margin-right: 30px;
   cursor: pointer;
   user-select: none;
   input {
@@ -64,5 +91,8 @@ export default {
       cursor: not-allowed;
     }
   }
+}
+.ev-checkbox-label {
+  padding-left: 10px;
 }
 </style>

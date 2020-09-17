@@ -1,30 +1,35 @@
 <template>
-  <div>EvCheckboxGroup</div>
+  <div
+    class="ev-checkbox-group"
+    role="group"
+  >
+    <slot />
+  </div>
 </template>
 
 <script>
+import { computed, provide } from 'vue';
+
 export default {
   name: 'EvCheckboxGroup',
   props: {
+    modelValue: {
+      type: Array,
+      default: () => [],
+    },
   },
-  setup() {
+  emits: {
+    'update:modelValue': null,
+  },
+  setup(props, { emit }) {
+    const mv = computed({
+      get: () => props.modelValue,
+      set: labels => emit('update:modelValue', labels),
+    });
+    provide('EvCheckboxGroupMv', mv);
   },
 };
 </script>
 
 <style lang="scss">
-.ev-checkbox {
-  cursor: pointer;
-  input {
-    cursor: pointer;
-  }
-
-  &.disabled {
-    color: #C0C4CC;
-    cursor: not-allowed;
-    input {
-      cursor: not-allowed;
-    }
-  }
-}
 </style>
