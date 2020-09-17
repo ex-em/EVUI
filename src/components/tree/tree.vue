@@ -4,7 +4,6 @@
       v-for="(item, i) in stateTree"
       :key="i"
       :data="item"
-      visible
       :multiple="multiple"
       :show-checkbox="showCheckbox"
       :children-key="childrenKey"
@@ -177,22 +176,26 @@ export default {
 };
 </script>
 <style lang="scss">
-.ev-tree li ul {
-  margin: 0;
-  padding: 0 0 0 18px;
-}
-.ev-tree ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 12px;
-}
-.ev-tree ul li {
-  list-style: none;
-  margin: 8px 0;
-  padding: 0;
-  white-space: nowrap;
-  outline: 0;
+.ev-tree {
+  li {
+    ul {
+      margin: 0;
+      padding: 0 0 0 18px;
+    }
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    li {
+      list-style: none;
+      margin: 8px 0;
+      padding: 0;
+      white-space: nowrap;
+      outline: 0;
+    }
+  }
 }
 .ev-tree-arrow {
   float: left;

@@ -2,6 +2,7 @@
   <div style="width:100%">
     <ev-tree
       :data="data"
+      @on-toggle-expand="onExpand"
     />
   </div>
 </template>
@@ -43,6 +44,11 @@
           },
         ],
       };
+    },
+    methods: {
+      onExpand(node) {
+        console.log('Expand', node);
+      },
     },
   };
 </script>
