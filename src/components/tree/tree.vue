@@ -10,6 +10,7 @@
     <div v-if="!stateTree.length" :class="[prefixCls + '-empty']">
       {{ emptyText }}
     </div>
+    <ev-context-menu/>
   </div>
 </template>
 <script>
@@ -228,5 +229,8 @@ export default {
 }
 .ev-tree-title-selected, .ev-tree-title-selected:hover {
   background-color: #d5e8fc;
+}
+.ev-tree-icon {
+  vertical-align: middle;
 }
 </style>

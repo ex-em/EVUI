@@ -20,12 +20,21 @@
       />
       <Render v-if="data.render" :render="data.render" :data="data" :node="node"/>
       <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"/>
-      <span v-else :class="titleClasses"
+      <template v-else>
+        <ev-icon
+          v-if="data.icon"
+          :class="`${prefixCls}-icon`"
+          :cls="data.icon"
+        />
+        <span
+          :class="titleClasses"
           @click="handleSelect"
           @dblclick="handleDblclick"
-      >
-        {{ data.title }}
-      </span>
+        >
+          {{ data.title }}
+        </span>
+      </template>
+
       <Tree-node
         v-for="(item, i) in children"
         v-if="data.expand"

@@ -19,12 +19,14 @@
               {
                 title: 'parent 1-1',
                 expand: true,
+                icon: 'ei-trash3',
                 children: [
                   {
                     title: 'leaf 1-1-1',
                   },
                   {
                     title: 'leaf 1-1-2',
+                    icon: 'ei-trash2',
                   },
                 ],
               },
