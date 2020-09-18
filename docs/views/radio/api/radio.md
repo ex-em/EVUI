@@ -17,14 +17,14 @@
 
 |    이름     |   디폴트   |  타입   |          설명            |                    종류                           |
 |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-| v-model     | null      | String, Number, Symbol | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+| v-model     | null      | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
 
 #### <라디오>
 
 |    이름     |   디폴트   |  타입   |          설명            |                    종류                           |
 |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-| v-model     | null      | String, Number, Symbol | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-| label       | null      | String, Number, Symbol | HTML element value (required) |  |
+| v-model     | null      | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+| label       | null      | String, Number, Symbol, Boolean | HTML element value (required) |  |
 | disabled    | false     | Boolean | HTML element disabled attribute    |  |
 | size        | medium    | String  | 라디오 버튼 크기 | small, medium(default) |
 
@@ -33,11 +33,11 @@
 
  | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | change | event | <라디오그룹> 내 <라디오> 변화 이벤트 감지 |
+ | change | (event, newValue) | <라디오그룹> 내 <라디오> 변화 이벤트 감지 |
 
 #### <라디오>
 
  | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | change | event | <라디오> 변화 이벤트 감지 |
+ | change | (event, newValue) | <라디오> 변화 이벤트 감지 |
 

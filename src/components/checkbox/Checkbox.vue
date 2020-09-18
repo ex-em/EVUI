@@ -3,8 +3,8 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { disabled: isDisabled },
-      { checked: isChecked },
+      { 'is-disabled': isDisabled },
+      { 'is-checked': isChecked },
     ]"
   >
     <input
@@ -96,10 +96,11 @@ export default {
   input {
     cursor: pointer;
   }
-  &.disabled {
+  &.is-disabled {
+    cursor: not-allowed;
+
     @include evThemify() {
       color: evThemed('color-disabled');
-      cursor: not-allowed;
     }
     input {
       cursor: not-allowed;

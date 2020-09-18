@@ -177,9 +177,9 @@ export default {
     position: relative;
     width: 50%;
     max-width: 700px;
+    overflow: hidden;
     .code-wrapper {
-      height: 400px;
-      overflow-y: hidden;
+      height: 50px;
     }
     .btn-show-more {
       position: absolute;

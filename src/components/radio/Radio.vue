@@ -1,37 +1,33 @@
 <template>
-  <div
+  <label
     class="ev-radio"
     :class="[
-      { disabled },
-      { checked: mv === label },
+      { 'is-disabled': isDisabled },
+      { 'is-checked': isChecked },
       size,
     ]"
   >
-    <label
-      class="ev-radio-wrapper"
+    <input
+      v-model="mv"
+      type="radio"
+      class="ev-radio-input"
+      :value="label"
+      :disabled="isDisabled"
+      @change="onChange"
     >
-      <input
-        v-model="mv"
-        type="radio"
-        class="ev-radio-input"
-        :value="label"
-        :disabled="disabled"
-        @change="onChange"
-      >
-      <span
-        v-if="$slots.default"
-        class="ev-radio-label"
-      >
-        <slot />
-      </span>
-      <span
-        v-else
-        class="ev-radio-label"
-      >
-        {{ label }}
-      </span>
-    </label>
-  </div>
+    <span
+      v-if="$slots.default"
+      class="ev-radio-label"
+    >
+      <slot />
+    </span>
+    <span
+      v-else
+      class="ev-radio-label"
+    >
+      {{ label }}
+    </span>
+  </label>
 </template>
 
 <script>
@@ -75,8 +71,13 @@ export default {
       emit('change', mv.value, e);
     };
 
+    const isDisabled = computed(() => props.disabled);
+    const isChecked = computed(() => mv.value === props.label);
+
     return {
       mv,
+      isDisabled,
+      isChecked,
       onChange,
     };
   },
@@ -87,20 +88,17 @@ export default {
 @import '../../style/index.scss';
 
 .ev-radio {
+  $button-size-default: 18px;
   display: inline-block;
   padding: 0 5px;
   margin-right: 30px;
-  cursor: pointer;
   user-select: none;
-  &-wrapper {
-    $button-size-default: 18px;
-    line-height: $button-size-default;
-    cursor: pointer;
-  }
+  line-height: $button-size-default;
+  cursor: pointer;
   &-label {
     padding-left: 5px;
   }
-  &.disabled {
+  &.is-disabled {
     @include evThemify() {
       color: evThemed('color-disabled');
     }
