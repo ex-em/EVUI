@@ -20,7 +20,10 @@
       />
       <Render v-if="data.render" :render="data.render" :data="data" :node="node"/>
       <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"/>
-      <span v-else :class="titleClasses" @click="handleSelect">
+      <span v-else :class="titleClasses"
+          @click="handleSelect"
+          @dblclick="handleDblclick"
+      >
         {{ data.title }}
       </span>
       <Tree-node
@@ -28,7 +31,6 @@
         v-if="data.expand"
         :key="i"
         :data="item"
-        :multiple="multiple"
         :show-checkbox="showCheckbox"
         :children-key="childrenKey"
       />
@@ -55,10 +57,6 @@ export default {
       default() {
         return {};
       },
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
     },
     childrenKey: {
       type: String,
@@ -156,8 +154,14 @@ export default {
       if (this.data.disabled) return;
       this.dispatch('Tree', 'on-selected', this.data.nodeKey);
     },
-    handleCheck() {
+    handleDblclick() {
       if (this.data.disabled) return;
+      this.dispatch('Tree', 'on-dblclick', this.data.nodeKey);
+    },
+    handleCheck() {
+      if (this.data.disabled) {
+        return;
+      }
       const changes = {
         checked: this.data.checked && !this.data.indeterminate,
         nodeKey: this.data.nodeKey,
