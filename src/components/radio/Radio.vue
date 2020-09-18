@@ -7,7 +7,6 @@
       class="ev-radio-wrapper"
     >
       <input
-        ref="radio"
         v-model="mv"
         type="radio"
         class="ev-radio-input"
@@ -59,12 +58,11 @@ export default {
     change: null,
   },
   setup(props, { emit }) {
-    const radio = ref();
     const mv = inject(
       'EvRadioGroupMv',
       computed({
         get: () => props.modelValue,
-        set: () => emit('update:modelValue', props.label),
+        set: val => emit('update:modelValue', val),
       }),
     );
 
@@ -79,7 +77,6 @@ export default {
     });
 
     return {
-      radio,
       mv,
       checked,
       onChange,
