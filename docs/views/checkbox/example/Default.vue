@@ -53,8 +53,6 @@
         toggle to disable
       </button>
     </div>
-    <br>
-    <br>
   </div>
 </template>
 

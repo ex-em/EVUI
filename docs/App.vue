@@ -51,7 +51,7 @@ export default {
   @import './style/lib/highlightjs.github';
 }
 .hljs {
-  * {
+  &, * {
     font-size: 14px;
     font-family: consolas, monospace;
   }

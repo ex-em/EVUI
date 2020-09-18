@@ -45,9 +45,9 @@ export default {
         content: '체크박스',
       },
       {
-        name: 'RadioButton',
+        name: 'Radio',
         routerLink: '/radio',
-        content: '라디오버튼',
+        content: '라디오',
       },
       {
         name: 'InputNumber',
@@ -123,6 +123,11 @@ export default {
         name: 'Reactivity Chart',
         routerLink: '/reactivityChart',
         content: '실시간 차트',
+      },
+      {
+        name: 'Icon',
+        routerLink: '/icon',
+        content: '아이콘',
       },
     ];
 

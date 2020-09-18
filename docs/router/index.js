@@ -108,6 +108,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "reactivityChart" */ '../views/reactivityChart'),
   },
   {
+    path: '/icon',
+    name: 'Icon',
+    component: () => import(/* webpackChunkName: "icon" */ '../views/icon/index'),
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
     component: () => import(/* webpackChunkName: "pageNotFound" */ '../views/PageNotFound'),

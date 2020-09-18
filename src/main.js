@@ -2,6 +2,7 @@ import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
 import EvRadio from '@/components/radio/Radio.vue';
 import EvRadioGroup from '@/components/radioGroup/RadioGroup.vue';
+import EvIcon from '@/components/icon/Icon.vue';
 import { version } from '../package.json';
 
 const components = [
@@ -9,6 +10,7 @@ const components = [
   EvCheckboxGroup,
   EvRadio,
   EvRadioGroup,
+  EvIcon,
 ];
 
 const install = (app) => {
