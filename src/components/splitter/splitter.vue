@@ -2,8 +2,11 @@
   <div>
     <div
       :class="`${type} ev-splitter ${isDragging ? 'hide' : ''}`"
+      :style="getStyle"
       @mousedown="onMouseDown"
-    />
+    >
+      <slot />
+    </div>
     <div
       v-show="isDragging"
       ref="guideline"
@@ -19,6 +22,32 @@
         type: String,
         default: 'hbox',
       },
+      color: {
+        type: String,
+        default: '#dadada',
+      },
+      size: {
+        type: Number,
+        default: 4,
+      },
+      leftBound: {
+        type: Object,
+        default() {
+          return {
+            min: 0,
+            max: 0,
+          };
+        },
+      },
+      rightBound: {
+        type: Object,
+        default() {
+          return {
+            min: 0,
+            max: 0,
+          };
+        },
+      },
     },
     data() {
       return {
@@ -33,6 +62,15 @@
         rightItemInfo: {},
         isDragging: false,
       };
+    },
+    computed: {
+      getStyle() {
+        return {
+          background: this.color,
+          width: this.type === 'hbox' ? `${this.size}px` : '100%',
+          height: this.type === 'hbox' ? '100%' : `${this.size}px`,
+        };
+      },
     },
     created() {
     },
@@ -121,6 +159,17 @@
           max,
         };
       },
+      getActualValue(elementSize, changeValue, { min, max }) {
+        let result = elementSize + changeValue;
+
+        if (min && result < min) {
+          result = min;
+        } else if (max && result > max) {
+          result = max;
+        }
+
+        return elementSize - result;
+      },
       resizeForNeighbor(changeValue) {
         const leftItemInfo = this.leftItemInfo;
         const rightItemInfo = this.rightItemInfo;
@@ -129,11 +178,19 @@
         let leftWh;
         let rightWh;
         let rightOffset;
+        let actualChangeValue;
 
         if (this.type === 'hbox') {
-          leftWh = leftItemInfo.width - changeValue;
-          rightWh = rightItemInfo.width + changeValue;
-          rightOffset = rightItemInfo.left - changeValue;
+          // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
+          actualChangeValue = this.getActualValue(
+                  leftItemInfo.width, changeValue * -1, this.leftBound);
+          // 찾은 actualChangeValue 로 실제 이동할 actualChangeValue 를 구한다
+          actualChangeValue = this.getActualValue(
+                  rightItemInfo.width, actualChangeValue, this.rightBound) * -1;
+
+          leftWh = leftItemInfo.width - actualChangeValue;
+          rightWh = rightItemInfo.width + actualChangeValue;
+          rightOffset = rightItemInfo.left - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
           rightItemInfo.el.style.cssText += `width: ${rightWh}px; height: ${rightItemInfo.height}px`;
@@ -142,9 +199,14 @@
           rightItemInfo.width = rightWh;
           rightItemInfo.left = rightOffset;
         } else {
-          leftWh = leftItemInfo.height - changeValue;
-          rightWh = rightItemInfo.height + changeValue;
-          rightOffset = rightItemInfo.top - changeValue;
+          actualChangeValue = this.getActualValue(
+                  leftItemInfo.height, changeValue * -1, this.leftBound);
+          actualChangeValue = this.getActualValue(
+                  rightItemInfo.height, actualChangeValue, this.rightBound) * -1;
+
+          leftWh = leftItemInfo.height - actualChangeValue;
+          rightWh = rightItemInfo.height + actualChangeValue;
+          rightOffset = rightItemInfo.top - actualChangeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
           rightItemInfo.el.style.cssText += `width: ${rightItemInfo.width}px; height: ${rightWh}px`;
@@ -154,6 +216,7 @@
           rightItemInfo.top = rightOffset;
         }
 
+        this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
         // if (leftId) {
         //   this.$resizeBus.$emit('resize', leftId, this.type, leftItemInfo);
         // }
@@ -174,7 +237,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px;`;
+        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
@@ -202,7 +265,7 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px;`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
@@ -250,7 +313,6 @@
 <style>
   .ev-splitter {
     top: 0;
-    background: #dadada;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -260,7 +322,6 @@
   .ev-splitter-guideline {
     position: absolute;
     z-index: 100;
-    background: #dadada;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -271,14 +332,10 @@
   }
   .ev-splitter.hbox,
   .ev-splitter-guideline.hbox {
-    width: 4px;
-    height: 100%;
     cursor: col-resize;
   }
   .ev-splitter.vbox,
   .ev-splitter-guideline.vbox {
-    width: 100%;
-    height: 4px;
     cursor: row-resize;
   }
 </style>
