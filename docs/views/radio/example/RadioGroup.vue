@@ -1,0 +1,60 @@
+<template>
+  <div class="case">
+    <EvRadioGroup
+      v-model="radioGroup1"
+    >
+      <EvRadio label="Option A" />
+      <EvRadio label="Option B" />
+      <EvRadio label="Option C" />
+    </EvRadioGroup>
+    <div class="description">
+      <span class="badge">
+        Selected Value
+      </span>
+      {{ radioGroup1 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Event</p>
+    <EvRadioGroup
+      v-model="radioGroup2"
+      @change="changeRadioGroup"
+    >
+      <EvRadio label="Option A" />
+      <EvRadio label="Option B" />
+      <EvRadio label="Option C" />
+    </EvRadioGroup>
+    <div class="description">
+      <span class="badge">
+        Change Event
+      </span>
+      {{ eventText }}
+    </div>
+  </div>
+</template>
+
+<script>
+  import { ref } from 'vue';
+
+  export default {
+    components: {},
+    setup() {
+      const radioGroup1 = ref('Option A');
+      const radioGroup2 = ref('Option A');
+      const eventText = ref('No event occurred');
+      const changeRadioGroup = () => {
+        eventText.value = `Click radio and change value '${radioGroup2.value}'`;
+      };
+
+      return {
+        radioGroup1,
+        radioGroup2,
+        eventText,
+        changeRadioGroup,
+      };
+    },
+  };
+</script>
+
+<style lang="scss">
+</style>

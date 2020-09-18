@@ -1,48 +1,56 @@
 <template>
   <div
-    :class="[{ disabled: disabled }, size]"
     class="ev-radio"
+    :class="[
+      { disabled },
+      { checked: mv === label },
+      size,
+    ]"
   >
     <label
-      class="ev-radio-label"
+      class="ev-radio-wrapper"
     >
       <input
+        v-model="mv"
         type="radio"
         class="ev-radio-input"
-        :value="value"
-        :name="name"
-        :checked="modelValue"
+        :value="label"
         :disabled="disabled"
         @change="onChange"
       >
-      <span class="ev-radio-label">
+      <span
+        v-if="$slots.default"
+        class="ev-radio-label"
+      >
         <slot />
+      </span>
+      <span
+        v-else
+        class="ev-radio-label"
+      >
+        {{ label }}
       </span>
     </label>
   </div>
 </template>
 
 <script>
-import { nextTick } from 'vue';
+import { computed, inject, nextTick } from 'vue';
 
 export default {
   name: 'EvRadio',
   props: {
     modelValue: {
-      type: Boolean,
-      default: false,
+      type: [String, Number, Symbol, Boolean],
+      default: null,
+    },
+    label: {
+      type: [String, Number, Symbol, Boolean],
+      default: null,
     },
     disabled: {
       type: Boolean,
       default: false,
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    value: {
-      type: [String, Number, Symbol, Boolean],
-      default: '',
     },
     size: {
       type: String,
@@ -50,18 +58,25 @@ export default {
     },
   },
   emits: {
-    'update:modelValue': [Boolean],
-    change: val => typeof val === 'boolean',
+    'update:modelValue': null,
+    change: null,
   },
   setup(props, { emit }) {
+    const mv = inject(
+      'EvRadioGroupMv',
+      computed({
+        get: () => props.modelValue,
+        set: val => emit('update:modelValue', val),
+      }),
+    );
+
     const onChange = async (e) => {
       await nextTick();
-      const value = !props.modelValue;
-      emit('update:modelValue', value);
-      emit('change', value, e);
+      emit('change', mv.value, e);
     };
 
     return {
+      mv,
       onChange,
     };
   },
@@ -69,19 +84,29 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../style/index.scss';
+
 .ev-radio {
   display: inline-block;
+  padding: 0 5px;
+  margin-right: 30px;
   cursor: pointer;
   user-select: none;
-  input {
+  &-wrapper {
+    $button-size-default: 18px;
+    line-height: $button-size-default;
     cursor: pointer;
   }
-
+  &-label {
+    padding-left: 5px;
+  }
   &.disabled {
-    color: #C0C4CC;
-    cursor: not-allowed;
-    input {
-      cursor: not-allowed;
+    @include evThemify() {
+      color: evThemed('color-disabled');
+    }
+    input,
+    .ev-radio-wrapper {
+      cursor: not-allowed !important;
     }
   }
 }
