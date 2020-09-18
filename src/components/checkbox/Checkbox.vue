@@ -3,13 +3,14 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { 'disabled': disabled },
+      { disabled: isDisabled },
+      { checked: isChecked },
     ]"
   >
     <input
       v-model="mv"
       type="checkbox"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :value="refLabel"
       @change="onChange"
     />
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import { ref, inject, nextTick, computed } from 'vue';
+import { inject, nextTick, computed } from 'vue';
 
 export default {
   name: 'EvCheckbox',
@@ -56,10 +57,18 @@ export default {
       'EvCheckboxGroupMv',
       computed({
         get: () => props.modelValue,
-        set: () => emit('update:modelValue', !props.modelValue),
+        set: val => emit('update:modelValue', val),
       }),
     );
-    const refLabel = ref(props.label);
+    const refLabel = computed(() => props.label);
+
+    const isChecked = computed(() => {
+      if (Array.isArray(mv.value)) {
+        return mv.value.includes(refLabel.value);
+      }
+      return mv.value;
+    });
+    const isDisabled = computed(() => props.disabled);
 
     const onChange = async (e) => {
       await nextTick();
@@ -69,6 +78,8 @@ export default {
     return {
       mv,
       refLabel,
+      isChecked,
+      isDisabled,
       onChange,
     };
   },
@@ -76,6 +87,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../style/index.scss';
+
 .ev-checkbox {
   margin-right: 30px;
   cursor: pointer;
@@ -83,10 +96,11 @@ export default {
   input {
     cursor: pointer;
   }
-
   &.disabled {
-    color: #C0C4CC;
-    cursor: not-allowed;
+    @include evThemify() {
+      color: evThemed('color-disabled');
+      cursor: not-allowed;
+    }
     input {
       cursor: not-allowed;
     }

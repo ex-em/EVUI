@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <h5># Checkbox Group</h5>
-    <br>
+  <div class="case">
+    <p class="case-title">Group</p>
     <EvCheckboxGroup
       v-model="checkboxGroup"
     >
@@ -10,14 +9,15 @@
       <EvCheckbox label="Option C" />
       <EvCheckbox label="Option D" />
     </EvCheckboxGroup>
-    <br>
-    <br>
-    checkboxGroup : {{ checkboxGroup }}
-    <br>
-    <br>
-    <hr>
-    <h5># Checkbox Group Event</h5>
-    <br>
+    <div class="description">
+      <span class="badge">
+        checkboxGroup
+      </span>
+      {{ checkboxGroup }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Event</p>
     <EvCheckboxGroup
       v-model="checkboxGroup2"
     >
@@ -26,24 +26,21 @@
       <EvCheckbox label="Option C" />
       <EvCheckbox label="Option D" />
     </EvCheckboxGroup>
-    <br>
-    <button @click="clickButton">
-      Add 'Option A'
-    </button>
-    <br>
-    checkboxGroup2 : {{ checkboxGroup2 }}
-    <br>
-    <br>
-    <hr>
-    <h5># All Check</h5>
-    <br>
-    <EvCheckbox
-      v-model="allCheck"
-      @change="changeAllCheck"
-    >
-      ALL CHECK
-    </EvCheckbox>
-    <br><br>
+    <div class="description">
+      <span class="badge">
+        checkboxGroup2
+      </span>
+      <button
+        class="btn"
+        @click="clickButton"
+      >
+        Add 'Option A'
+      </button>
+      {{ checkboxGroup2 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">All Check</p>
     <EvCheckboxGroup
       v-model="checkboxGroup3"
     >
@@ -55,11 +52,18 @@
         {{ info.text }}
       </EvCheckbox>
     </EvCheckboxGroup>
-    <br>
-    <br>
-    checkboxGroup3 : {{ checkboxGroup3 }}
-    <br>
-    <br>
+    <div class="description">
+      <span class="badge">
+        checkboxGroup3
+      </span>
+      <EvCheckbox
+        v-model="allCheck"
+        @change="changeAllCheck"
+      >
+        ALL CHECK
+      </EvCheckbox>
+      {{ checkboxGroup3 }}
+    </div>
   </div>
 </template>
 
