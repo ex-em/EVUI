@@ -1,7 +1,11 @@
 <template>
   <div
     class="ev-radio"
-    :class="[{ disabled }, { checked }, size]"
+    :class="[
+      { disabled },
+      { checked: mv === label },
+      size,
+    ]"
   >
     <label
       class="ev-radio-wrapper"
@@ -31,7 +35,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, inject, nextTick } from 'vue';
+import { computed, inject, nextTick } from 'vue';
 
 export default {
   name: 'EvRadio',
@@ -71,14 +75,8 @@ export default {
       emit('change', mv.value, e);
     };
 
-    const checked = ref(mv.value === props.label);
-    watch(() => mv.value, (cur) => {
-      checked.value = cur === props.label;
-    });
-
     return {
       mv,
-      checked,
       onChange,
     };
   },
