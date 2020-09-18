@@ -34,8 +34,8 @@
         type: Object,
         default() {
           return {
-            min: 0,
-            max: 0,
+            min: undefined,
+            max: undefined,
           };
         },
       },
@@ -43,8 +43,8 @@
         type: Object,
         default() {
           return {
-            min: 0,
-            max: 0,
+            min: undefined,
+            max: undefined,
           };
         },
       },
@@ -61,6 +61,7 @@
         leftItemInfo: {},
         rightItemInfo: {},
         isDragging: false,
+        bound: null,
       };
     },
     computed: {
@@ -76,6 +77,7 @@
     },
     mounted() {
       this.updateItemInfo();
+      this.setBounds();
     },
     methods: {
       updateItemInfo() {
@@ -124,7 +126,7 @@
 
         this.$el.style.cssText += `top: ${top}px; left: ${left}px;`;
       },
-      getBounds() {
+      setBounds() {
         const leftItemInfo = this.leftItemInfo;
         const rightItemInfo = this.rightItemInfo;
         let min = 0;
@@ -146,51 +148,29 @@
           rightOffset = rightItemInfo.top;
         }
 
-        min = Math.floor(leftWh * 0.1);
-        min = min < 60 ? 60 : min;
-        min += leftOffset;
+        const { min: leftMin = 40, max: leftMax = leftWh + rightWh - 40 } = this.leftBound;
+        const { min: rightMin = 40, max: rightMax = leftWh + rightWh - 40 } = this.rightBound;
 
-        max = Math.floor(rightWh * 0.1);
-        max = max < 60 ? 60 : max;
-        max = (rightOffset + rightWh) - max;
+        min = Math.min(leftWh - leftMin, rightMax - rightWh);
+        min = leftOffset + (leftWh - min);
 
-        return {
-          min,
-          max,
-        };
-      },
-      getActualValue(elementSize, changeValue, { min, max }) {
-        let result = elementSize + changeValue;
+        max = Math.min(leftMax - leftWh, rightWh - rightMin);
+        max += rightOffset;
 
-        if (min && result < min) {
-          result = min;
-        } else if (max && result > max) {
-          result = max;
-        }
-
-        return elementSize - result;
+        this.bound = { min, max };
       },
       resizeForNeighbor(changeValue) {
         const leftItemInfo = this.leftItemInfo;
         const rightItemInfo = this.rightItemInfo;
-        // const leftId = leftItemInfo.el.dataset.id;
-        // const rightId = rightItemInfo.el.dataset.id;
         let leftWh;
         let rightWh;
         let rightOffset;
         let actualChangeValue;
 
         if (this.type === 'hbox') {
-          // 먼저 leftBound 의 값으로 actualChangeValue 을 찾는다
-          actualChangeValue = this.getActualValue(
-                  leftItemInfo.width, changeValue * -1, this.leftBound);
-          // 찾은 actualChangeValue 로 실제 이동할 actualChangeValue 를 구한다
-          actualChangeValue = this.getActualValue(
-                  rightItemInfo.width, actualChangeValue, this.rightBound) * -1;
-
-          leftWh = leftItemInfo.width - actualChangeValue;
-          rightWh = rightItemInfo.width + actualChangeValue;
-          rightOffset = rightItemInfo.left - actualChangeValue;
+          leftWh = leftItemInfo.width - changeValue;
+          rightWh = rightItemInfo.width + changeValue;
+          rightOffset = rightItemInfo.left - changeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
           rightItemInfo.el.style.cssText += `width: ${rightWh}px; height: ${rightItemInfo.height}px`;
@@ -199,14 +179,9 @@
           rightItemInfo.width = rightWh;
           rightItemInfo.left = rightOffset;
         } else {
-          actualChangeValue = this.getActualValue(
-                  leftItemInfo.height, changeValue * -1, this.leftBound);
-          actualChangeValue = this.getActualValue(
-                  rightItemInfo.height, actualChangeValue, this.rightBound) * -1;
-
-          leftWh = leftItemInfo.height - actualChangeValue;
-          rightWh = rightItemInfo.height + actualChangeValue;
-          rightOffset = rightItemInfo.top - actualChangeValue;
+          leftWh = leftItemInfo.height - changeValue;
+          rightWh = rightItemInfo.height + changeValue;
+          rightOffset = rightItemInfo.top - changeValue;
 
           leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
           rightItemInfo.el.style.cssText += `width: ${rightItemInfo.width}px; height: ${rightWh}px`;
@@ -217,13 +192,6 @@
         }
 
         this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
-        // if (leftId) {
-        //   this.$resizeBus.$emit('resize', leftId, this.type, leftItemInfo);
-        // }
-        //
-        // if (rightId) {
-        //   this.$resizeBus.$emit('resize', rightId, this.type, rightItemInfo);
-        // }
       },
       onMouseDown({ pageX: prevLeft, pageY: prevTop }) {
         const rootEl = this.$el.parentElement;
@@ -237,11 +205,11 @@
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
+        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
       },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
-        const { min, max } = this.getBounds();
+        const { min, max } = this.bound;
         const width = this.width;
         const height = this.height;
         let left = this.left;
@@ -249,27 +217,23 @@
 
         if (this.type === 'hbox') {
           left = xPos - width - this.leftPad;
-          if (min > left) {
-            left = min;
-          } else if (max < left) {
-            left = max;
+          if (min > left || max < left) {
+            return;
           }
         } else {
           top = yPos - height - this.topPad;
-          if (min > top) {
-            top = min;
-          } else if (max < top) {
-            top = max;
+          if (min > top || max < top) {
+            return;
           }
         }
 
         this.isDragging = true;
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.getStyle.width}; height: ${this.getStyle.height};`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
       },
       onMouseUp({ pageX: xPos, pageY: yPos }) {
         const rootEl = this.$el.parentElement;
-        const { min, max } = this.getBounds();
+        const { min, max } = this.bound;
         const { prevLeft, prevTop } = this.prevOffset;
         let left;
         let top;
@@ -284,7 +248,7 @@
             left = max;
           }
 
-          changeValue = prevLeft - xPos;
+          changeValue = prevLeft - (left + this.width + this.leftPad);
           cssText = `left: ${left}px;`;
         } else {
           top = yPos - this.height - this.topPad;
@@ -294,7 +258,7 @@
             top = max;
           }
 
-          changeValue = prevTop - yPos;
+          changeValue = prevTop - (top - this.height - this.topPad);
           cssText = `top: ${top}px;`;
         }
 

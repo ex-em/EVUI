@@ -16,12 +16,18 @@
 </template>
 
 <script>
+  import Default from './examples/default';
+
   export default {
     data() {
       return {
         title: 'Splitter',
-        components: [
-        ],
+        components: [{
+          title: 'Default',
+          component: Default,
+          url: './docs/pages/splitter/examples/default.vue',
+          description: 'how to use a ev-splitter',
+        }],
       };
     },
   };
