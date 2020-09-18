@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { ref, inject, nextTick, computed } from 'vue';
+import { inject, nextTick, computed } from 'vue';
 
 export default {
   name: 'EvCheckbox',
@@ -60,7 +60,7 @@ export default {
         set: val => emit('update:modelValue', val),
       }),
     );
-    const refLabel = ref(props.label);
+    const refLabel = computed(() => props.label);
 
     const isChecked = computed(() => {
       if (Array.isArray(mv.value)) {
@@ -68,7 +68,7 @@ export default {
       }
       return mv.value;
     });
-    const isDisabled = ref(props.disabled);
+    const isDisabled = computed(() => props.disabled);
 
     const onChange = async (e) => {
       await nextTick();
@@ -87,6 +87,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../style/index.scss';
+
 .ev-checkbox {
   margin-right: 30px;
   cursor: pointer;
@@ -94,10 +96,11 @@ export default {
   input {
     cursor: pointer;
   }
-
   &.disabled {
-    color: #C0C4CC;
-    cursor: not-allowed;
+    @include evThemify() {
+      color: evThemed('color-disabled');
+      cursor: not-allowed;
+    }
     input {
       cursor: not-allowed;
     }

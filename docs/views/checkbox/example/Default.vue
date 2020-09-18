@@ -41,10 +41,18 @@
     <p class="case-title">Disabled</p>
     <EvCheckbox
       v-model="checkVal3"
-      disabled
+      :disabled="isDisable"
     >
       DISABLED
     </EvCheckbox>
+    <div class="description">
+      <button
+        class="btn"
+        @click="toggleDisable"
+      >
+        toggle to disable
+      </button>
+    </div>
     <br>
     <br>
   </div>
@@ -71,6 +79,10 @@ export default {
     };
 
     const checkVal3 = ref(false);
+    const isDisable = ref(true);
+    const toggleDisable = () => {
+      isDisable.value = !isDisable.value;
+    };
 
     return {
       checkVal1,
@@ -79,6 +91,8 @@ export default {
       checkResult2,
       changeVal2,
       checkVal3,
+      isDisable,
+      toggleDisable,
     };
   },
 };
