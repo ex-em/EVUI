@@ -29,6 +29,10 @@ const EVUI = {
 
 export {
   EvCheckbox,
+  EvCheckboxGroup,
+  EvRadio,
+  EvRadioGroup,
+  EvIcon,
 };
 
 export default EVUI;

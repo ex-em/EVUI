@@ -110,7 +110,7 @@ const routes = [
   {
     path: '/icon',
     name: 'Icon',
-    component: () => import(/* webpackChunkName: "icon" */ '../views/icon/index'),
+    component: () => import(/* webpackChunkName: "icon" */ '../views/icon'),
   },
   {
     path: '/:catchAll(.*)',

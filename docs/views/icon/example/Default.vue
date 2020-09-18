@@ -52,15 +52,9 @@ import { ref } from 'vue';
 export default {
   setup() {
     const eventText = ref('No event occurred');
-    const clickIcon = (e) => {
-      eventText.value = e.type;
-    };
-    const dblClickIcon = (e) => {
-      eventText.value = e.type;
-    };
-    const contextMenuIcon = (e) => {
-      eventText.value = e.type;
-    };
+    const clickIcon = (e) => { eventText.value = e.type; };
+    const dblClickIcon = (e) => { eventText.value = e.type; };
+    const contextMenuIcon = (e) => { eventText.value = e.type; };
     return {
       eventText,
       clickIcon,

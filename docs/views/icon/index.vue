@@ -25,10 +25,10 @@
   import DefaultRaw from '!!raw-loader!./example/Default';
   import IconList from './example/IconList';
   import MarkdownView from '../../components/MarkdownView';
-  import CheckboxMd from '!!raw-loader!./api/icon.md';
+  import IconMd from '!!raw-loader!./api/icon.md';
 
   export default {
-    name: 'Checkbox',
+    name: 'Icon',
     components: {
       Example,
       IconList,
@@ -36,7 +36,7 @@
     },
     inheritAttrs: false,
     setup() {
-      const mdText = CheckboxMd;
+      const mdText = IconMd;
 
       const components = [
         {
