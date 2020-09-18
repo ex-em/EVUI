@@ -1,36 +1,44 @@
 <template>
-  <div>
-    <h5># Common</h5>
-    <br>
+  <div class="case">
+    <p class="case-title">Common</p>
     <EvCheckbox
       v-model="checkVal1"
     >
       Checkbox
     </EvCheckbox>
-    <br>
-    <br>
-    <button @click="clickButton1">
-      click to change the check value
-    </button>
-    <br>
-    <br>
-    <h5># Use Change Event</h5>
-    <br>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton1"
+      >
+        click to change the check value
+      </button>
+      {{ checkResult2.value }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Use Change Event</p>
     <EvCheckbox
       v-model="checkVal2"
       @change="changeVal2"
     >
       Single Checkbox
     </EvCheckbox>
-    <br>
-    <br>
-    Value in changeEvent : {{ checkResult2.value }}
-    <br>
-    Event in changeEvent : {{ checkResult2.e }}
-    <br>
-    <br>
-    <h5># Disabled</h5>
-    <br>
+    <div class="description">
+      <span class="badge">
+        Value in changeEvent
+      </span>
+      {{ checkResult2.value }}
+    </div>
+    <div class="description">
+      <span class="badge">
+        Event in changeEvent
+      </span>
+      {{ checkResult2.e }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Disabled</p>
     <EvCheckbox
       v-model="checkVal3"
       disabled

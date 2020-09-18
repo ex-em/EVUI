@@ -3,13 +3,14 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { 'disabled': disabled },
+      { disabled: isDisabled },
+      { checked: isChecked },
     ]"
   >
     <input
       v-model="mv"
       type="checkbox"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :value="refLabel"
       @change="onChange"
     />
@@ -56,10 +57,18 @@ export default {
       'EvCheckboxGroupMv',
       computed({
         get: () => props.modelValue,
-        set: () => emit('update:modelValue', !props.modelValue),
+        set: val => emit('update:modelValue', val),
       }),
     );
     const refLabel = ref(props.label);
+
+    const isChecked = computed(() => {
+      if (Array.isArray(mv.value)) {
+        return mv.value.includes(refLabel.value);
+      }
+      return mv.value;
+    });
+    const isDisabled = ref(props.disabled);
 
     const onChange = async (e) => {
       await nextTick();
@@ -69,6 +78,8 @@ export default {
     return {
       mv,
       refLabel,
+      isChecked,
+      isDisabled,
       onChange,
     };
   },
