@@ -165,7 +165,7 @@ export default {
     },
     handleDblclick() {
       if (this.data.disabled) return;
-      this.dispatch('Tree', 'on-dblclick', this.data.nodeKey);
+      this.dispatch('Tree', 'on-dbl-click', this.data.nodeKey);
     },
     handleCheck() {
       if (this.data.disabled) {

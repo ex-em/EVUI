@@ -10,7 +10,6 @@
     <div v-if="!stateTree.length" :class="[prefixCls + '-empty']">
       {{ emptyText }}
     </div>
-    <ev-context-menu/>
   </div>
 </template>
 <script>
@@ -75,7 +74,7 @@ export default {
   mounted() {
     this.$on('on-click-checkbox', this.handleCheck);
     this.$on('on-selected', this.handleSelect);
-    this.$on('on-dblclick', this.handleDblclick);
+    this.$on('on-dbl-click', this.handleDblclick);
     this.$on('toggle-expand', node => this.$emit('on-toggle-expand', node));
   },
   methods: {
@@ -159,11 +158,13 @@ export default {
     handleSelect(nodeKey) {
       const node = this.flatState[nodeKey].node;
       const currentSelectedKey = this.flatState.findIndex(obj => obj.node.selected);
+      let beforeSelectedNode = null;
       if (currentSelectedKey >= 0 && currentSelectedKey !== nodeKey) {
-        this.$set(this.flatState[currentSelectedKey].node, 'selected', false);
+        beforeSelectedNode = this.flatState[currentSelectedKey].node;
+        this.$set(beforeSelectedNode, 'selected', false);
       }
       this.$set(node, 'selected', true);
-      this.$emit('on-select', this.getSelectedNodes(), this.flatState[currentSelectedKey].node);
+      this.$emit('on-select', this.getSelectedNodes(), beforeSelectedNode);
       this.$emit('on-click', node);
     },
     handleDblclick(nodeKey) {
