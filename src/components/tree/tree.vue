@@ -4,7 +4,6 @@
       v-for="(item, i) in stateTree"
       :key="i"
       :data="item"
-      :multiple="multiple"
       :show-checkbox="showCheckbox"
       :children-key="childrenKey"
     />
@@ -29,10 +28,6 @@ export default {
       default() {
         return [];
       },
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
     },
     showCheckbox: {
       type: Boolean,
@@ -79,6 +74,7 @@ export default {
   mounted() {
     this.$on('on-click-checkbox', this.handleCheck);
     this.$on('on-selected', this.handleSelect);
+    this.$on('on-dbl-click', this.handleDblclick);
     this.$on('toggle-expand', node => this.$emit('on-toggle-expand', node));
   },
   methods: {
@@ -110,7 +106,9 @@ export default {
         this.updateTreeDown(node, { checked: true });
         // propagate upwards
         const parentKey = this.flatState[node.nodeKey].parent;
-        if (!parentKey && parentKey !== 0) return;
+        if (!parentKey && parentKey !== 0) {
+          return;
+        }
         const parent = this.flatState[parentKey].node;
         const childHasCheckSetter = typeof node.checked !== 'undefined' && node.checked;
         if (childHasCheckSetter && parent.checked !== node.checked) {
@@ -120,7 +118,9 @@ export default {
     },
     updateTreeUp(nodeKey) {
       const parentKey = this.flatState[nodeKey].parent;
-      if (typeof parentKey === 'undefined') return;
+      if (typeof parentKey === 'undefined') {
+        return;
+      }
       const node = this.flatState[nodeKey].node;
       const parent = this.flatState[parentKey].node;
       if (node.checked === parent.checked && node.indeterminate === parent.indeterminate) {
@@ -157,12 +157,19 @@ export default {
     },
     handleSelect(nodeKey) {
       const node = this.flatState[nodeKey].node;
-      if (!this.multiple) { // reset previously selected node
-        const currentSelectedKey = this.flatState.findIndex(obj => obj.node.selected);
-        if (currentSelectedKey >= 0 && currentSelectedKey !== nodeKey) this.$set(this.flatState[currentSelectedKey].node, 'selected', false);
+      const currentSelectedKey = this.flatState.findIndex(obj => obj.node.selected);
+      let beforeSelectedNode = null;
+      if (currentSelectedKey >= 0 && currentSelectedKey !== nodeKey) {
+        beforeSelectedNode = this.flatState[currentSelectedKey].node;
+        this.$set(beforeSelectedNode, 'selected', false);
       }
-      this.$set(node, 'selected', !node.selected);
-      this.$emit('on-select-change', this.getSelectedNodes());
+      this.$set(node, 'selected', true);
+      this.$emit('on-select', this.getSelectedNodes(), beforeSelectedNode);
+      this.$emit('on-click', node);
+    },
+    handleDblclick(nodeKey) {
+      const node = this.flatState[nodeKey].node;
+      this.$emit('on-dblclick', node);
     },
     handleCheck({ checked, nodeKey }) {
       const node = this.flatState[nodeKey].node;
@@ -210,5 +217,21 @@ export default {
     font-size: 12px;
     vertical-align: middle;
   }
+}
+.ev-tree-title {
+  border-radius: 3px;
+  cursor: pointer;
+  vertical-align: middle;
+  padding: 0 4px;
+  user-select: none;
+  &:hover {
+    background-color: #eaf4fe;
+  }
+}
+.ev-tree-title-selected, .ev-tree-title-selected:hover {
+  background-color: #d5e8fc;
+}
+.ev-tree-icon {
+  vertical-align: middle;
 }
 </style>
