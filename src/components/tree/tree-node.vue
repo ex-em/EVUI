@@ -28,6 +28,7 @@
         />
         <span
           :class="titleClasses"
+          @contextmenu="handleContextmenu"
           @click="handleSelect"
           @dblclick="handleDblclick"
         >
@@ -160,11 +161,15 @@ export default {
       }
     },
     handleSelect() {
-      if (this.data.disabled) return;
+      if (this.data.disabled) {
+        return;
+      }
       this.dispatch('Tree', 'on-selected', this.data.nodeKey);
     },
     handleDblclick() {
-      if (this.data.disabled) return;
+      if (this.data.disabled) {
+        return;
+      }
       this.dispatch('Tree', 'on-dbl-click', this.data.nodeKey);
     },
     handleCheck() {
@@ -176,6 +181,9 @@ export default {
         nodeKey: this.data.nodeKey,
       };
       this.dispatch('Tree', 'on-click-checkbox', changes);
+    },
+    handleContextmenu() {
+      this.dispatch('Tree', 'on-context-menu', this.data.nodeKey);
     },
   },
 };

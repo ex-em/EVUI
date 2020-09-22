@@ -2,7 +2,10 @@
   <div style="width:100%">
     <ev-tree
       :data="data"
+      :menu-items="menuItems"
       @on-toggle-expand="onExpand"
+      @before-contextmenu="beforeContext"
+      @select-contextmenu="selectContext"
     />
   </div>
 </template>
@@ -45,11 +48,28 @@
             ],
           },
         ],
+        menuItems: [
+          {
+            text: '테스트1',
+            itemId: 'test1',
+          },
+        ],
       };
     },
     methods: {
       onExpand(node) {
         console.log('Expand', node);
+      },
+      beforeContext() {
+        this.menuItems = [
+          {
+            text: '테스트2',
+            itemId: 'test2',
+          },
+        ];
+      },
+      selectContext(item) {
+        console.log(item);
       },
     },
   };
