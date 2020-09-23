@@ -157,6 +157,9 @@ export default {
       @include themify() {
         background-color: themed('border-color-base');
       }
+      &.yellow {
+        background-color: $color-yellow;
+      }
     }
     .btn {
       padding: 4px 7px;

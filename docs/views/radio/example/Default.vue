@@ -1,5 +1,6 @@
 <template>
   <div class="case">
+    <p class="case-title">Common</p>
     <EvRadio
       v-model="radio1"
       label="Option A"

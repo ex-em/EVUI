@@ -33,11 +33,11 @@
 
  | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | change | (event, newValue) | <라디오그룹> 내 <라디오> 변화 이벤트 감지 |
+ | change | (event, newValue) | <라디오그룹> 내 <라디오> 컴포넌트 change 이벤트 발생 시 호출  |
 
 #### <라디오>
 
  | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | change | (event, newValue) | <라디오> 변화 이벤트 감지 |
+ | change | (event, newValue) | 컴포넌트 change 이벤트 발생 시 호출  |
 
