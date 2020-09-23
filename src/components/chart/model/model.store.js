@@ -1,6 +1,13 @@
 import { reverse } from 'lodash-es';
 
 const modules = {
+  /**
+   * Take chart data and labels to create normalized data and min/max info
+   * @param {object}  data    chart series info
+   * @param {object}  label   chart label
+   *
+   * @returns {undefined}
+   */
   createDataSet(data, label) {
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
       const type = this.seriesInfo.charts[typeKey];
@@ -31,6 +38,12 @@ const modules = {
     });
   },
 
+  /**
+   * Take chart data and to create normalized pie data
+   * @param {object}  data    chart series info
+   *
+   * @returns {undefined}
+   */
   createSunburstDataSet(data) {
     this.pieDataSet = [];
     const ds = this.pieDataSet;
@@ -128,6 +141,12 @@ const modules = {
     }
   },
 
+  /**
+   * Take chart data and to create normalized pie data
+   * @param {object}  data    chart series info
+   *
+   * @returns {undefined}
+   */
   createPieDataSet(data, pie) {
     this.pieDataSet = [];
     const ds = this.pieDataSet;
@@ -150,6 +169,15 @@ const modules = {
     });
   },
 
+  /**
+   * Take data and label to create stack data for each series
+   * @param {object}  data    chart series info
+   * @param {object}  label   chart label
+   * @param {array}   base    stacked base data
+   * @param {number}  sIdx    series ordered index
+   *
+   * @returns {array} data for each series
+   */
   addSeriesStackDS(data, label, base, sIdx = 0) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
@@ -181,6 +209,13 @@ const modules = {
     return sdata;
   },
 
+  /**
+   * Take data and label to create data for each series
+   * @param {object}  data    chart series info
+   * @param {object}  label   chart label
+   *
+   * @returns {array} data for each series
+   */
   addSeriesDS(data, label) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
@@ -202,6 +237,15 @@ const modules = {
     return sdata;
   },
 
+  /**
+   * Take data to create data object for graph
+   * @param {object}  gdata    graph data (y-axis value for vertical chart)
+   * @param {object}  ldata    label data (x-axis value for vertical chart)
+   * @param {object}  odata    original data (without stacked value)
+   * @param {object}  bdata    base data (stacked value)
+
+   * @returns {object} data for each graph point
+   */
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
 
@@ -214,6 +258,12 @@ const modules = {
     return data;
   },
 
+  /**
+   * Take series data to create min/max info for each series
+   * @param {object}  data    series data
+   *
+   * @returns {object} min/max info for series
+   */
   getSeriesMinMax(data) {
     const def = { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
     const isHorizontal = this.options.horizontal;
@@ -258,6 +308,12 @@ const modules = {
     return def;
   },
 
+  /**
+   * Get graph item by label index
+   * @param {number} pos  label index position
+   *
+   * @returns {object} graph item
+   */
   getItemByLabelIndex(pos) {
     if (pos < 0) {
       return false;
@@ -266,6 +322,12 @@ const modules = {
     return this.getItem(pos);
   },
 
+  /**
+   * Get graph item by label
+   * @param {any} label  label value for searching graph item
+   *
+   * @returns {object} graph item
+   */
   getItemByLabel(label) {
     if (label === null || label === undefined) {
       return false;
@@ -277,6 +339,12 @@ const modules = {
     return this.getItem(labelIndex);
   },
 
+  /**
+   * Get graph items for each series by label index
+   * @param {number} labelIndex  label index
+   *
+   * @returns {object} graph item
+   */
   getItem(labelIndex) {
     const sIds = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
@@ -333,6 +401,12 @@ const modules = {
     return findInfo;
   },
 
+  /**
+   * Create min/max information for all of data
+   * @property seriesList
+   *
+   * @returns {object} min/max info for all of data
+   */
   getStoreMinMax() {
     const keys = Object.keys(this.seriesList);
     const isHorizontal = this.options.horizontal;

@@ -33,6 +33,12 @@ class Line {
     };
   }
 
+  /**
+   * Draw series data
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
   draw(param) {
     if (!this.show) {
       return;
@@ -146,6 +152,14 @@ class Line {
     ctx.restore();
   }
 
+  /**
+   * Draw item highlight
+   * @param {object}  item       object for drawing series data
+   * @param {object}  context    canvas context
+   * @param {boolean} isMax      max series value
+   *
+   * @returns {undefined}
+   */
   itemHighlight(item, context, isMax) {
     const gdata = item.data;
     const ctx = context;
@@ -177,6 +191,12 @@ class Line {
     ctx.restore();
   }
 
+  /**
+   * Find graph item
+   * @param {array}  offset       mouse position
+   *
+   * @returns {object} graph item
+   */
   findGraphData(offset) {
     const xp = offset[0];
     const yp = offset[1];
@@ -209,6 +229,12 @@ class Line {
     return item;
   }
 
+  /**
+   * Find approximate graph item
+   * @param {array}  offset       mouse position
+   *
+   * @returns {object} graph item
+   */
   findApproximateData(offset) {
     const xp = offset[0];
     const yp = offset[1];

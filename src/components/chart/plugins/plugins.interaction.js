@@ -1,7 +1,17 @@
 import { numberWithComma } from '@/common/utils';
 
 const modules = {
+  /**
+   * Hide legend components by manipulating css
+   *
+   * @returns {undefined}
+   */
   createEventFunctions() {
+    /**
+     * To show tooltip and item highlighting, add event listener on mousemove
+     *
+     * @returns {undefined}
+     */
     this.onMouseMove = (e) => {
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -27,6 +37,11 @@ const modules = {
       }
     };
 
+    /**
+     * To clear tooltip and item highlighting, add event listener on mouseleave
+     *
+     * @returns {undefined}
+     */
     this.onMouseLeave = () => {
       if (this.options.tooltip.throttledMove) {
         this.onMouseMove.cancel();
@@ -39,6 +54,11 @@ const modules = {
       }
     };
 
+    /**
+     * Dealing with graph item select and invoking user custom dblclick event
+     *
+     * @returns {undefined}
+     */
     this.onDblClick = (e) => {
       const selectItem = this.options.selectItem;
       const args = {};
@@ -60,6 +80,11 @@ const modules = {
       }
     };
 
+    /**
+     * Dealing with graph item select and invoking user custom click event
+     *
+     * @returns {undefined}
+     */
     this.onClick = (e) => {
       const args = {};
 
@@ -84,11 +109,24 @@ const modules = {
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
     this.overlayCanvas.addEventListener('click', this.onClick);
   },
+
+  /**
+   * Computing mouse position on canvas
+   *
+   * @returns {array} mouse pointer position
+   */
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
     const rect = this.overlayCanvas.getBoundingClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height];
   },
+
+  /**
+   * Find graph item on mouse position
+   * @param {array} offset    return value from getMousePosition()
+   *
+   * @returns {object} hit item information
+   */
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
@@ -155,7 +193,15 @@ const modules = {
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
   },
-  findClickedData(offset, useApproxiate) {
+
+  /**
+   * Find clicked graph item on mouse position
+   * @param {array}   offset          return value from getMousePosition()
+   * @param {boolean} useApproximate  looking for approximated graph item on mouse position
+   *
+   * @returns {object} clicked item information
+   */
+  findClickedData(offset, useApproximate) {
     const sIds = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -170,7 +216,7 @@ const modules = {
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
-      const findFn = useApproxiate ? series.findApproximateData : series.findGraphData;
+      const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
         const item = findFn.call(series, offset, isHorizontal);
@@ -213,6 +259,13 @@ const modules = {
       maxIndex,
     };
   },
+
+  /**
+   * Find graph item by label entered from user
+   * @param {any} label   label value
+   *
+   * @returns {boolean} if it wasn't able to find it, return false. if not, return true and render.
+   */
   selectItemByLabel(label) {
     const findInfo = this.getItemByLabel(label);
 

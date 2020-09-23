@@ -2,6 +2,13 @@ import Canvas from '../helpers/helpers.canvas';
 import Bar from './element.bar';
 
 class TimeBar extends Bar {
+  /**
+   * Draw series data
+   * It shows partial bar item as time goes by.
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
   draw(param) {
     if (!this.show) {
       return;

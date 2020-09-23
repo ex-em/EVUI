@@ -33,6 +33,12 @@ class Bar {
     };
   }
 
+  /**
+   * Draw series data
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
   draw(param) {
     if (!this.show) {
       return;
@@ -154,6 +160,13 @@ class Bar {
     });
   }
 
+  /**
+   * Draw item highlight
+   * @param {object}  item       object for drawing series data
+   * @param {object}  context    canvas context
+   *
+   * @returns {undefined}
+   */
   itemHighlight(item, context) {
     const isHorizontal = this.isHorizontal;
     const showValue = this.showValue;
@@ -203,10 +216,23 @@ class Bar {
     ctx.restore();
   }
 
+  /**
+   * Find graph item
+   * @param {array}    offset          mouse position
+   * @param {boolean}  isHorizontal    horizontal type
+   *
+   * @returns {object} graph item
+   */
   findGraphData(offset, isHorizontal) {
     return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
   }
 
+  /**
+   * Find graph item
+   * @param {array}    offset          mouse position
+   *
+   * @returns {object} graph item
+   */
   findGraphRange(offset) {
     const xp = offset[0];
     const yp = offset[1];
@@ -241,6 +267,12 @@ class Bar {
     return item;
   }
 
+  /**
+   * Find graph item (horizontal)
+   * @param {array}    offset          mouse position
+   *
+   * @returns {object} graph item
+   */
   findGraphRangeCount(offset) {
     const xp = offset[0];
     const yp = offset[1];

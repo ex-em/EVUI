@@ -5,6 +5,14 @@ import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
 
 const modules = {
+  /**
+   * Takes series information to create series list.
+   * @param {object}  series          chart series info
+   * @param {string}  defaultType     default series type in options
+   * @param {boolean} isHorizontal    type of horizontal chart
+   *
+   * @returns {undefined}
+   */
   createSeriesSet(series, defaultType, isHorizontal) {
     Object.keys(series).forEach((key, index) => {
       const type = series[key].type || defaultType;
@@ -18,6 +26,12 @@ const modules = {
     });
   },
 
+  /**
+   * Takes series information to create series list.
+   * @param {object} param   series info
+   *
+   * @returns {undefined}
+   */
   addSeries(param) {
     const { type, id, opt, index, isHorizontal } = param;
 
@@ -42,6 +56,12 @@ const modules = {
     return false;
   },
 
+  /**
+   * Set series group to create stack chart
+   * @param {object} groups   group info
+   *
+   * @returns {undefined}
+   */
   addGroupInfo(groups) {
     groups.forEach((group, gIdx) => {
       let interpolation = 0;

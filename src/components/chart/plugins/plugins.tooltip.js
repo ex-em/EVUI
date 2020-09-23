@@ -3,6 +3,11 @@ import debounce from '@/common/utils.debounce';
 import Util from '../helpers/helpers.util';
 
 const modules = {
+  /**
+   * Create tooltip DOM
+   *
+   * @returns {undefined}
+   */
   createTooltipDOM() {
     this.tooltipDOM = document.createElement('div');
     this.tooltipDOM.className = 'ev-chart-tooltip';
@@ -25,6 +30,14 @@ const modules = {
     }
   },
 
+  /**
+   * Set tooltip canvas layout
+   * @param {object} hitInfo    mousemove callback
+   * @param {object} e          mousemove callback
+   * @param {object} offset     mousemove callback
+   *
+   * @returns {object} tooltip layout information
+   */
   setTooltipLayout(hitInfo, e, offset) {
     const ctx = this.tooltipCtx;
     const mouseX = e.pageX;
@@ -111,6 +124,14 @@ const modules = {
     return { nw, width, height, pos };
   },
 
+  /**
+   * Draw tooltip canvas
+   * @param {object} hitInfo    mousemove callback
+   * @param {object} context    tooltip canvas context
+   * @param {object} size       tooltip size information
+   *
+   * @returns {undefined}
+   */
   drawTooltip(hitInfo, context, size) {
     const ctx = context;
     const sId = hitInfo.hitId;
@@ -252,6 +273,13 @@ const modules = {
     ctx.restore();
   },
 
+  /**
+   * Draw graph item highlight
+   * @param {object} hitInfo    mousemove callback
+   * @param {object} ctx        overlayCanvas context
+   *
+   * @returns {undefined}
+   */
   drawItemsHighlight(hitInfo, ctx) {
     const { maxHighlight } = hitInfo;
     const maxSID = maxHighlight ? maxHighlight[0] : null;
@@ -262,6 +290,13 @@ const modules = {
     });
   },
 
+  /**
+   * Draw chart indicator with mousemove
+   * @param {object} offset    mousemove callback
+   * @param {string} color     indicator color
+   *
+   * @returns {undefined}
+   */
   drawIndicator(offset, color) {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
@@ -300,12 +335,23 @@ const modules = {
     }
   },
 
+  /**
+   * Clear tooltip canvas
+   *
+   * @returns {undefined}
+   */
   tooltipClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
     this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width / this.clearRectRatio,
       this.tooltipCanvas.height / this.clearRectRatio);
   },
+
+  /**
+   * Order series list by groups
+   *
+   * @returns {array} ordered series list by groups
+   */
 
   alignSeriesList(sKeys) {
     const groups = this.data.groups;

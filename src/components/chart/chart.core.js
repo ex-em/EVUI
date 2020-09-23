@@ -65,6 +65,11 @@ class EvChart {
     };
   }
 
+  /**
+   * initialize chart object
+   *
+   * @returns {undefined}
+   */
   init() {
     const { series, data, labels, groups } = this.data;
     const { type, axesX, axesY, tooltip, horizontal } = this.options;
@@ -100,10 +105,14 @@ class EvChart {
     this.isInit = true;
   }
 
+  /**
+   * initialize chart rect
+   *
+   * @returns {undefined}
+   */
   initRect() {
     const opt = this.options;
     if (opt.title.show) {
-      this.createTitle();
       this.initTitle();
       this.showTitle();
     }
@@ -115,6 +124,12 @@ class EvChart {
     this.chartRect = this.getChartRect();
   }
 
+  /**
+   * To draw canvas chart, it processes several sequential jobs
+   * @param {any} [hitInfo=undefined]    from mousemove callback (object or undefined)
+   *
+   * @returns {undefined}
+   */
   drawChart(hitInfo) {
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
@@ -124,6 +139,11 @@ class EvChart {
     this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
+  /**
+   * Draw each series
+   *
+   * @returns {undefined}
+   */
   drawSeries() {
     const thickness = this.options.thickness;
     const maxTip = this.options.maxTip;
@@ -177,6 +197,13 @@ class EvChart {
     }
   }
 
+  /**
+   * Create axes
+   * @param {string} dir    axis direction
+   * @param {array}  axes   axes array
+   *
+   * @returns {array} axes objects in array
+   */
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
     const labels = this.data.labels;
@@ -200,6 +227,11 @@ class EvChart {
     });
   }
 
+  /**
+   * Calculate min/max value, label and size information for each axis
+   *
+   * @returns {object} axes min/max information
+   */
   getAxesRange() {
     /* eslint-disable max-len */
     const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.chartRect));
@@ -209,6 +241,11 @@ class EvChart {
     return { x: axesXMinMax, y: axesYMinMax };
   }
 
+  /**
+   * Draw each axis
+   *
+   * @returns {undefined}
+   */
   drawAxis() {
     this.axesX.forEach((axis, index) => {
       axis.draw(this.chartRect, this.labelOffset, this.axesSteps.x[index]);
@@ -219,6 +256,11 @@ class EvChart {
     });
   }
 
+  /**
+   * With each axis's min/max value and label information, calculate how many labels in each axis
+   *
+   * @returns {object} axis's label steps
+   */
   calculateSteps() {
     const axesXMinMax = this.axesX.map((axis, index) => {
       const range = {
@@ -244,6 +286,11 @@ class EvChart {
     return { x: axesXMinMax, y: axesYMinMax };
   }
 
+  /**
+   * Calculate axis's min/max label steps
+   *
+   * @returns {object} axes's label range
+   */
   getAxesLabelRange() {
     const axesXSteps = this.axesX.map((axis, index) => {
       const size = this.axesRange.x[index].size;
@@ -258,6 +305,11 @@ class EvChart {
     return { x: axesXSteps, y: axesYSteps };
   }
 
+  /**
+   * Reset devicePixelRatio for high DPI
+   *
+   * @returns {undefined}
+   */
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const backingStoreRatio = this.displayCtx.webkitBackingStorePixelRatio
@@ -277,6 +329,11 @@ class EvChart {
     this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
   }
 
+  /**
+   * Get chart DOM size and set canvas size
+   *
+   * @returns {object} chart size information
+   */
   getChartDOMRect() {
     const rect = this.chartDOM.getBoundingClientRect();
     const width = rect.width || 10;
@@ -288,6 +345,11 @@ class EvChart {
     return { width, height };
   }
 
+  /**
+   * Calculate chart size
+   *
+   * @returns {object} chart size information
+   */
   getChartRect() {
     const { width, height } = this.getChartDOMRect();
 
@@ -312,6 +374,11 @@ class EvChart {
     };
   }
 
+  /**
+   * Set canvas width
+   *
+   * @returns {undefined}
+   */
   setWidth(width) {
     if (!this.displayCanvas) {
       return;
@@ -325,6 +392,11 @@ class EvChart {
     this.overlayCanvas.style.width = `${width}px`;
   }
 
+  /**
+   * Set canvas height
+   *
+   * @returns {undefined}
+   */
   setHeight(height) {
     if (!this.displayCanvas) {
       return;
@@ -338,6 +410,20 @@ class EvChart {
     this.overlayCanvas.style.height = `${height}px`;
   }
 
+  /**
+   * Calculate labels offset from chart rect (Axis 영역을 벗어나는 label 크기 계산)
+   *
+   * ex)
+   * Y축 label의 넓이와 (X축 최소값 label 넓이 / 2) 중 넓은 값이 left label offset으로 처리됨
+   *
+   * 0 |
+   *   |
+   *   |
+   * 0 ----------------------
+   * hh:mm                 hh:mm
+   *
+   * @returns {object} label offset for edge
+   */
   getLabelOffset() {
     const axesX = this.axesX;
     const axesY = this.axesY;
@@ -386,6 +472,12 @@ class EvChart {
     return labelOffset;
   }
 
+  /**
+   * To re-render chart, reset properties, canvas and then render chart.
+   * @param {object} updateInfo   information for each components are needed to update
+   *
+   * @returns {undefined}
+   */
   update(updateInfo) {
     const options = this.options;
     const data = this.data.data;
@@ -474,6 +566,11 @@ class EvChart {
     this.render();
   }
 
+  /**
+   * To re-render chart, reset properties
+   *
+   * @returns {undefined}
+   */
   resetProps() {
     this.axesX[0] = null;
     this.axesY[0] = null;
@@ -486,6 +583,11 @@ class EvChart {
     this.pieDataSet = [];
   }
 
+  /**
+   * Clear overlay canvas
+   *
+   * @returns {undefined}
+   */
   overlayClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -493,6 +595,11 @@ class EvChart {
       this.overlayCanvas.height / this.clearRectRatio);
   }
 
+  /**
+   * Clear display and buffer canvas
+   *
+   * @returns {undefined}
+   */
   clear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
@@ -504,6 +611,11 @@ class EvChart {
       this.overlayCanvas.height / this.clearRectRatio);
   }
 
+  /**
+   * Resize chart
+   *
+   * @returns {undefined}
+   */
   resize() {
     this.clear();
     this.bufferCtx.restore();
@@ -514,6 +626,12 @@ class EvChart {
     this.drawChart();
   }
 
+  /**
+   * Render chart
+   * @param {any} [hitInfo=undefined]   mousemove callback
+   *
+   * @returns {undefined}
+   */
   render(hitInfo) {
     this.clear();
     this.chartRect = this.getChartRect();
@@ -521,6 +639,11 @@ class EvChart {
     this.drawChart(hitInfo);
   }
 
+  /**
+   * destroy chart component
+   *
+   * @returns {undefined}
+   */
   destroy() {
     if (!this.isInit) {
       return;

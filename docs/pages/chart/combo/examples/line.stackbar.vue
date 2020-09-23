@@ -61,7 +61,7 @@
           text: 'Live',
           customCls: '',
         },
-        timeValue: '2017-01-01 00:00:00',
+        timeValue: new Date(),
         liveMode: false,
         event: null,
       };
@@ -100,7 +100,7 @@
         return Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       },
       addLiveData() {
-        this.timeValue = +moment(this.timeValue).add(1, 'seconds');
+        this.timeValue = +moment(this.timeValue).add(3, 'seconds');
         this.labels.shift();
         this.chartData.series1.shift();
         this.chartData.series2.shift();
@@ -116,7 +116,7 @@
 
         for (let ix = 0; ix < 60; ix++) {
           label.push(+moment(this.timeValue));
-          this.timeValue = +moment(this.timeValue).add(1, 'seconds');
+          this.timeValue = +moment(this.timeValue).add(3, 'seconds');
           data.series1.push(null);
           data.series2.push(null);
           data.series3.push(null);
