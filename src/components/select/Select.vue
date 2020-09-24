@@ -5,7 +5,6 @@
     :class="{
         'is-selected': isDropbox,
       }"
-    @click.stop.prevent="clickDropbox"
   >
     <input
       v-model="mvName"
@@ -13,8 +12,9 @@
       type="text"
       class="ev-input"
       :placeholder="placeholder"
-      readonly
+      :readonly="readonly"
       @click.stop.prevent="clickSelectInput"
+      @change="changeMv"
     />
     <i
       class="ev-input-suffix ev-icon-s-arrow-down"
@@ -49,7 +49,7 @@
 
 <script>
 import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
-import { useDropdown, useModel } from './uses';
+import { useModel, useDropdown } from './uses';
 
 export default {
   name: 'EvSelect',
@@ -69,12 +69,13 @@ export default {
       type: Array,
       default: () => [],
     },
-    inputSize: {
-      type: Object,
-      default: () => ({
-        width: 200,
-        height: 35,
-      }),
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    readonly: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: {
@@ -85,6 +86,7 @@ export default {
       mv,
       mvName,
       clickItem,
+      changeMv,
     } = useModel();
 
     const {
@@ -100,6 +102,7 @@ export default {
       mv,
       mvName,
       clickItem,
+      changeMv,
       select,
       isDropbox,
       dropdownStyle,

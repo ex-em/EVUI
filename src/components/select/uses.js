@@ -1,4 +1,4 @@
-import { ref, reactive, computed, watch, getCurrentInstance } from 'vue';
+import { ref, reactive, computed, getCurrentInstance, nextTick } from 'vue';
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -9,12 +9,18 @@ export const useModel = () => {
     set: value => emit('update:modelValue', value),
   });
   const mvName = computed(() => props.items.find(v => v.value === mv.value)?.name);
+
   const clickItem = (val) => { mv.value = val; };
+  const changeMv = async (e) => {
+    await nextTick();
+    emit('change', mv.value, e);
+  };
 
   return {
     mv,
     mvName,
     clickItem,
+    changeMv,
   };
 };
 
@@ -26,14 +32,9 @@ export const useDropdown = () => {
     top: 0,
     left: 0,
     width: 0,
+    height: 0,
   });
   const isDropbox = ref(false);
-  watch(
-    () => select.value?.getBoundingClientRect().width,
-    (width) => {
-      dropboxPosition.width = width;
-    },
-  );
 
   const dropdownStyle = computed(() => ({
     top: `${dropboxPosition.top}px`,
@@ -45,10 +46,13 @@ export const useDropdown = () => {
     if (!props.items.length) {
       return;
     }
-    isDropbox.value = true;
+    isDropbox.value = !isDropbox.value;
     const borderWidth = (select.value.offsetWidth - select.value.clientWidth) / 2;
-    dropboxPosition.left = e.clientX - e.offsetX - borderWidth;
-    dropboxPosition.top = e.clientY - e.offsetY + props.inputSize.height - borderWidth;
+    const selectRect = select.value?.getBoundingClientRect();
+
+    dropboxPosition.left = e.pageX - e.offsetX - borderWidth;
+    dropboxPosition.top = e.pageY - e.offsetY + selectRect?.height - borderWidth;
+    dropboxPosition.width = selectRect?.width;
   };
   const clickDropbox = () => { isDropbox.value = true; };
   const clickOutsideDropbox = () => { isDropbox.value = false; };

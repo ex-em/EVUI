@@ -12,7 +12,7 @@
       type="checkbox"
       :disabled="disabled"
       :value="label"
-      @change="onChange"
+      @change="changeMv"
     />
     <span
       v-if="$slots.default"
@@ -69,7 +69,7 @@ export default {
       return mv.value;
     });
 
-    const onChange = async (e) => {
+    const changeMv = async (e) => {
       await nextTick();
       emit('change', mv.value, e);
     };
@@ -77,7 +77,7 @@ export default {
     return {
       mv,
       isChecked,
-      onChange,
+      changeMv,
     };
   },
 };
