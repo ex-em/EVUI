@@ -20,36 +20,33 @@
 > 1) 체크박스 그룹 사용 시
 >> <체크박스그룹>
 >
-> |    이름     |   디폴트  |  타입   |          설명            |                    종류                           |
-  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model     | null      | Array   | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+> | 이름 | 디폴트 | 타입 | 설명 | 종류 |
+  |----- |--------|------|------|------|
+  | v-model | null | Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
 >> <체크박스>
 >
-> |    이름     |   디폴트  |  타입   |          설명            |                    종류                           |
+> | 이름 | 디폴트 | 타입 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model     |   null    | String, Number, Boolean, Symbol, Array   | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | label       |   null    | String  | HTML element value (required)    |  |
-  | disabled    |   false   | Boolean | HTML element disabled attribute    |  |
+  | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+  | label | null | String  | HTML element value (required) |  |
+  | disabled | false | Boolean | HTML element disabled attribute |  |
 >
 
 >
 > 2) 체크박스만 사용 시
 >> <체크박스>
 >
->  |    이름     |   디폴트   |  타입   |          설명            |                    종류                           |
+> | 이름 | 디폴트 | 타입 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model       |         | String or Boolean | <체크박스>의 value    |  |
-  | value       |           | String  | HTML element value    |  |
-  | size       |           | String  | 체크박스의 크기 | '', 'small' |
-  | type       |           | String  | 체크박스 박스의 모양 (default : 테두리 원) | '', 'square' |
-  | after-type |           | String  | 체크박스 내부 체크모양 (deault : 내부 원) | '', 'minus', 'check' |
-  | disabled    |   false   | Boolean | HTML element disabled attribute    |  |
+  | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+  | label | null | String  | HTML element value (required) |  |
+  | disabled | false | Boolean | HTML element disabled attribute |  |
 
 >### Event
 >> <체크박스그룹>
-
- | 이름 | 파라미터 | 설명 |
- | ---- | ------- | ---- |
+>
+>| 이름 | 파라미터 | 설명 |
+ |------|----------|------|
  | change | event | <체크박스그룹> 내 <체크박스> 변화 이벤트 감지 |
 
 >### 참고

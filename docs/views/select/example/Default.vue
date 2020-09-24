@@ -1,13 +1,13 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvSelect
+    <ev-select
       v-if="isShow"
       v-model="selectVal1"
       :items="items1"
     />
     <br>
-    <EvSelect
+    <ev-select
       v-model="selectVal2"
       :placeholder="'phdsfsdfjsdhfdfgdfgdfsdjkfhsjkdhjkk'"
       :items="items1"

@@ -47,12 +47,14 @@ export const useDropdown = () => {
       return;
     }
     isDropbox.value = !isDropbox.value;
-    const borderWidth = (select.value.offsetWidth - select.value.clientWidth) / 2;
-    const selectRect = select.value?.getBoundingClientRect();
+    if (isDropbox.value) {
+      const borderWidth = (select.value.offsetWidth - select.value.clientWidth) / 2;
+      const selectRect = select.value?.getBoundingClientRect();
 
-    dropboxPosition.left = e.pageX - e.offsetX - borderWidth;
-    dropboxPosition.top = e.pageY - e.offsetY + selectRect?.height - borderWidth;
-    dropboxPosition.width = selectRect?.width;
+      dropboxPosition.left = e.pageX - e.offsetX - borderWidth;
+      dropboxPosition.top = e.pageY - e.offsetY + selectRect?.height - borderWidth;
+      dropboxPosition.width = selectRect?.width;
+    }
   };
   const clickDropbox = () => { isDropbox.value = true; };
   const clickOutsideDropbox = () => { isDropbox.value = false; };
