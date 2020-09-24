@@ -10,6 +10,13 @@
     <div v-if="!stateTree.length" :class="[prefixCls + '-empty']">
       {{ emptyText }}
     </div>
+    <ev-context-menu
+      ref="contextmenu"
+      :is-use="showContextmenu"
+      :items="menuItems"
+      @click="selectContextmenu"
+      @on-context-menu="initShowContextmenu"
+    />
   </div>
 </template>
 <script>
@@ -49,12 +56,19 @@ export default {
       type: Function,
       default: null,
     },
+    menuItems: {
+      type: Array,
+      default() {
+         return [];
+      },
+    },
   },
   data() {
     return {
       prefixCls,
       stateTree: this.data,
       flatState: [],
+      showContextmenu: false,
     };
   },
   watch: {
@@ -75,6 +89,7 @@ export default {
     this.$on('on-click-checkbox', this.handleCheck);
     this.$on('on-selected', this.handleSelect);
     this.$on('on-dbl-click', this.handleDblclick);
+    this.$on('on-context-menu', this.handleContextmenu);
     this.$on('toggle-expand', node => this.$emit('on-toggle-expand', node));
   },
   methods: {
@@ -179,6 +194,18 @@ export default {
       this.updateTreeDown(node, { checked, indeterminate: false }); // reset `indeterminate`
       this.$emit('on-check-change', this.getCheckedNodes());
     },
+    handleContextmenu(nodeKey) {
+      const node = this.flatState[nodeKey].node;
+      this.$emit('before-contextmenu', node);
+      this.showContextmenu = true;
+    },
+    selectContextmenu(item) {
+      this.$emit('select-contextmenu', item);
+      this.$refs.contextmenu.hide();
+    },
+    initShowContextmenu() {
+      this.showContextmenu = false;
+    },
   },
 };
 </script>
@@ -201,6 +228,7 @@ export default {
       padding: 0;
       white-space: nowrap;
       outline: 0;
+      text-align: start;
     }
   }
 }

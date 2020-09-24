@@ -121,9 +121,10 @@
         document.body.appendChild(this.$el);
       },
       onContextMenu(e) {
+        e.preventDefault();
         this.setPosition(e, e.clientX, e.clientY);
         this.show();
-        e.preventDefault();
+        this.$emit('on-context-menu');
       },
       onClick(item) {
         this.$emit('click', item);
