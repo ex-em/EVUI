@@ -13,7 +13,7 @@
       >
         click to change the check value
       </button>
-      {{ checkVal1 }}
+      {{ checkResult2.value }}
     </div>
   </div>
   <div class="case">
