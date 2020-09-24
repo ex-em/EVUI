@@ -1,14 +1,14 @@
 <template>
   <div class="case">
     <p class="case-title">Group</p>
-    <EvCheckboxGroup
+    <ev-checkbox-group
       v-model="checkboxGroup"
     >
-      <EvCheckbox label="Option A">A</EvCheckbox>
-      <EvCheckbox label="Option B" />
-      <EvCheckbox label="Option C" />
-      <EvCheckbox label="Option D" />
-    </EvCheckboxGroup>
+      <ev-checkbox label="Option A">A</ev-checkbox>
+      <ev-checkbox label="Option B" />
+      <ev-checkbox label="Option C" />
+      <ev-checkbox label="Option D" />
+    </ev-checkbox-group>
     <div class="description">
       <span class="badge">
         checkboxGroup
@@ -18,14 +18,14 @@
   </div>
   <div class="case">
     <p class="case-title">Event</p>
-    <EvCheckboxGroup
+    <ev-checkbox-group
       v-model="checkboxGroup2"
     >
-      <EvCheckbox label="Option A">A</EvCheckbox>
-      <EvCheckbox label="Option B">B</EvCheckbox>
-      <EvCheckbox label="Option C" />
-      <EvCheckbox label="Option D" />
-    </EvCheckboxGroup>
+      <ev-checkbox label="Option A">A</ev-checkbox>
+      <ev-checkbox label="Option B">B</ev-checkbox>
+      <ev-checkbox label="Option C" />
+      <ev-checkbox label="Option D" />
+    </ev-checkbox-group>
     <div class="description">
       <span class="badge">
         checkboxGroup2
@@ -41,27 +41,27 @@
   </div>
   <div class="case">
     <p class="case-title">All Check</p>
-    <EvCheckboxGroup
+    <ev-checkbox-group
       v-model="checkboxGroup3"
     >
-      <EvCheckbox
+      <ev-checkbox
         v-for="(info, idx) in checkboxList3"
         :key="idx"
         :label="info.label"
       >
         {{ info.text }}
-      </EvCheckbox>
-    </EvCheckboxGroup>
+      </ev-checkbox>
+    </ev-checkbox-group>
     <div class="description">
       <span class="badge">
         checkboxGroup3
       </span>
-      <EvCheckbox
+      <ev-checkbox
         v-model="allCheck"
         @change="changeAllCheck"
       >
         ALL CHECK
-      </EvCheckbox>
+      </ev-checkbox>
       {{ checkboxGroup3 }}
     </div>
   </div>
@@ -70,8 +70,10 @@
 <script>
 import { ref, watch } from 'vue';
 import { isEqual, sortBy } from 'lodash-es';
+import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
 
 export default {
+  components: { EvCheckboxGroup },
   setup() {
     const checkboxGroup = ref(['Option A', 'Option B']);
 

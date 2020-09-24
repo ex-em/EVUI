@@ -3,8 +3,8 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { 'is-disabled': disabled },
-      { 'is-checked': isChecked },
+      { disabled: disabled },
+      { checked: checked },
     ]"
   >
     <input
@@ -41,7 +41,7 @@ export default {
     },
     label: {
       type: [String, Number, Boolean, Symbol],
-      default: null,
+      required: true,
     },
     disabled: {
       type: Boolean,
@@ -62,7 +62,7 @@ export default {
     );
     const refLabel = computed(() => props.label);
 
-    const isChecked = computed(() => {
+    const checked = computed(() => {
       if (Array.isArray(mv.value)) {
         return mv.value.includes(refLabel.value);
       }
@@ -76,7 +76,7 @@ export default {
 
     return {
       mv,
-      isChecked,
+      checked,
       changeMv,
     };
   },
@@ -93,7 +93,7 @@ export default {
   input {
     cursor: pointer;
   }
-  &.is-disabled {
+  &.disabled {
     cursor: not-allowed;
 
     @include evThemify() {

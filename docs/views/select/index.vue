@@ -2,7 +2,7 @@
   <h2 class="content-title">
     Select
   </h2>
-  <Example
+  <example
     v-for="(component, index) in components"
     :key="`${component.title}_${index}`"
     :title="component.title"
@@ -11,7 +11,7 @@
     :url="component.url"
     :code-text="component.codeText"
   />
-  <MarkdownView
+  <markdown-view
     :source="mdText"
   />
 </template>
@@ -19,10 +19,10 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { parseComponent } from 'vue-template-compiler';
-import Example from '../../components/Example';
+import Example from 'docs/components/Example';
+import MarkdownView from 'docs/components/MarkdownView';
 import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
-import MarkdownView from '../../components/MarkdownView';
 import apiMd from '!!raw-loader!./api/select.md';
 
 export default {

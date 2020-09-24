@@ -3,7 +3,7 @@
     ref="select"
     class="ev-select"
     :class="{
-        'is-selected': isDropbox,
+        'selected': isDropbox,
       }"
   >
     <input
@@ -19,7 +19,7 @@
     <i
       class="ev-input-suffix ev-icon-s-arrow-down"
       :class="{
-        'is-selected': isDropbox,
+        'selected': isDropbox,
       }"
     />
   </div>
@@ -35,7 +35,7 @@
           :key="`${item.value}_${idx}`"
           class="ev-select-dropdown-item"
           :class="{
-            'is-selected': item.value === mv,
+            'selected': item.value === mv,
           }"
           :title="item.name"
           @click.stop.prevent="clickItem(item.value)"
@@ -127,7 +127,7 @@ export default {
   border-radius: 2px;
   cursor: pointer;
 
-  &.is-selected {
+  &.selected {
     border: 1px solid #409EFF;
   }
 
@@ -149,7 +149,7 @@ export default {
     transform: rotate(0deg);
     transition-duration: 0.3s;
 
-    &.is-selected {
+    &.selected {
       transform: rotate(180deg);
     }
   }
@@ -190,7 +190,7 @@ export default {
   &:hover {
     opacity: 0.85;
   }
-  &.is-selected {
+  &.selected {
     color: #EBEBEB;
     background-color: #730EF4;
   }
