@@ -1,8 +1,8 @@
 ### Desc
-- 태그는 &lt;EvIcon&gt;(이하 <아이콘>)으로 정의
+- 태그는 &lt;ev-icon&gt;(이하 <아이콘>)으로 정의
 
 ```
-<EvIcon icon="아이콘명" />
+<ev-icon icon="아이콘명" />
 ```
 
 ### Props

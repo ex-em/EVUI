@@ -2,23 +2,23 @@
   <div class="case">
     <p class="case-title">Size</p>
     <div style="font-size: 40px;">
-      <EvIcon icon="ev-icon-user" />
-      <EvIcon icon="ev-icon-topology" />
+      <ev-icon icon="ev-icon-user" />
+      <ev-icon icon="ev-icon-topology" />
       <i class="ev-icon-server"/>
     </div>
     <div class="description">
       font-size 지정하여 크기 변경
     </div>
     <div>
-      <EvIcon
+      <ev-icon
         icon="ev-icon-user2"
         size="s"
       />
-      <EvIcon
+      <ev-icon
         icon="ev-icon-user2"
         size="m"
       />
-      <EvIcon
+      <ev-icon
         icon="ev-icon-user2"
         size="l"
       />
@@ -30,7 +30,7 @@
   <div class="case">
     <p class="case-title">Event</p>
     <div style="font-size: 40px;">
-      <EvIcon
+      <ev-icon
         icon="ev-icon-save"
         @click="clickIcon"
         @dblClick="dblClickIcon"
