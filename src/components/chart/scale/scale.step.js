@@ -143,8 +143,8 @@ class StepScale extends Scale {
 
   /**
    * Transforming label by designated format
-   * @param {any} value       label value
-   * @param {any} maxWidth    max width for each label
+   * @param {string} value       label value
+   * @param {number} maxWidth    max width for each label
    *
    * @returns {string} formatted label
    */
@@ -154,8 +154,8 @@ class StepScale extends Scale {
 
   /**
    * Transforming ellipsis label by designated format and specific width
-   * @param {any} value       label value
-   * @param {any} maxWidth    max width for each label
+   * @param {string} value       label value
+   * @param {number} maxWidth    max width for each label
    *
    * @returns {string} formatted label
    */

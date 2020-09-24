@@ -11,7 +11,7 @@ class TimeCategoryScale extends Scale {
 
   /**
    * Transforming label by designated format
-   * @param {any} value       label value
+   * @param {number} value       label value
    *
    * @returns {string} formatted label
    */

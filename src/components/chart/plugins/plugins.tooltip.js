@@ -349,6 +349,7 @@ const modules = {
 
   /**
    * Order series list by groups
+   * @param {array} sKeys    series list that is hit by mouse cursor. (not all of series)
    *
    * @returns {array} ordered series list by groups
    */

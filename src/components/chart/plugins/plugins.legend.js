@@ -21,6 +21,8 @@ const modules = {
 
   /**
    * Initialize legend
+   * If there was no initialization, create DOM and set default layout.
+   * It not, there will already be set layout, so add a legend for each series with group
    *
    * @returns {undefined}
    */
@@ -36,7 +38,9 @@ const modules = {
   },
 
   /**
-   * Initialize legend
+   * Add legend with group information to align each series properly.
+   * Especially if a chart is stacked,
+   * legends have to align with series ordering as we can see in chart.
    *
    * @returns {undefined}
    */

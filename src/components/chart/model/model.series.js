@@ -9,7 +9,7 @@ const modules = {
    * Takes series information to create series list.
    * @param {object}  series          chart series info
    * @param {string}  defaultType     default series type in options
-   * @param {boolean} isHorizontal    type of horizontal chart
+   * @param {boolean} isHorizontal    determines if a horizontal option's value
    *
    * @returns {undefined}
    */
@@ -30,7 +30,7 @@ const modules = {
    * Takes series information to create series list.
    * @param {object} param   series info
    *
-   * @returns {undefined}
+   * @returns {object} object for proper series type
    */
   addSeries(param) {
     const { type, id, opt, index, isHorizontal } = param;

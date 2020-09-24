@@ -4,7 +4,7 @@ import Util from '../helpers/helpers.util';
 class LinearScale extends Scale {
   /**
    * Transforming label by designated format
-   * @param {any} value    label value
+   * @param {number} value    label value
    *
    * @returns {string} formatted label
    */

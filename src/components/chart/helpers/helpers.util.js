@@ -105,7 +105,7 @@ export default {
   /**
    * Calculate text size with html
    * @param {string} text         text is needed to check size
-   * @param {object} fontStyle    text font style
+   * @param {string} fontStyle    text font style
    *
    * @returns {object} text size information
    */

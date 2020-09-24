@@ -197,7 +197,7 @@ const modules = {
   /**
    * Find clicked graph item on mouse position
    * @param {array}   offset          return value from getMousePosition()
-   * @param {boolean} useApproximate  looking for approximated graph item on mouse position
+   * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    *
    * @returns {object} clicked item information
    */

@@ -66,7 +66,7 @@ class EvChart {
   }
 
   /**
-   * initialize chart object
+   * Initialize chart object
    *
    * @returns {undefined}
    */
@@ -106,7 +106,7 @@ class EvChart {
   }
 
   /**
-   * initialize chart rect
+   * Initialize chart rectangle
    *
    * @returns {undefined}
    */
@@ -259,7 +259,7 @@ class EvChart {
   /**
    * With each axis's min/max value and label information, calculate how many labels in each axis
    *
-   * @returns {object} axis's label steps
+   * @returns {object} each axis's label steps in axes array
    */
   calculateSteps() {
     const axesXMinMax = this.axesX.map((axis, index) => {
@@ -376,6 +376,7 @@ class EvChart {
 
   /**
    * Set canvas width
+   * @param {number} width    canvas width from chartDOM.width
    *
    * @returns {undefined}
    */
@@ -394,6 +395,7 @@ class EvChart {
 
   /**
    * Set canvas height
+   * @param {number} height    canvas width from chartDOM.height
    *
    * @returns {undefined}
    */
@@ -628,7 +630,7 @@ class EvChart {
 
   /**
    * Render chart
-   * @param {any} [hitInfo=undefined]   mousemove callback
+   * @param {any} [hitInfo=undefined]   hit item from mouse click/dblclick
    *
    * @returns {undefined}
    */

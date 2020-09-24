@@ -45,7 +45,7 @@ class LogarithmicScale extends Scale {
   /**
    * With range information, calculate how many labels in axis
    * @param {object}  range          min/max information
-   * @param {boolean} skipFitting    boolean for label skipping
+   * @param {boolean} skipFitting    determines if label skipping job.
    *
    * @returns {object} steps, interval, min/max graph value
    */

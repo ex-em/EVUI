@@ -219,7 +219,7 @@ class Bar {
   /**
    * Find graph item
    * @param {array}    offset          mouse position
-   * @param {boolean}  isHorizontal    horizontal type
+   * @param {boolean}  isHorizontal    determines if a horizontal option's value
    *
    * @returns {object} graph item
    */

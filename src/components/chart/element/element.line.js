@@ -154,9 +154,9 @@ class Line {
 
   /**
    * Draw item highlight
-   * @param {object}  item       object for drawing series data
-   * @param {object}  context    canvas context
-   * @param {boolean} isMax      max series value
+   * @param {object}   item       object for drawing series data
+   * @param {object}   context    canvas context
+   * @param {boolean}  isMax      determines if this series has max value
    *
    * @returns {undefined}
    */
