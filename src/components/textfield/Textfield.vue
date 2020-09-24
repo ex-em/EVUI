@@ -150,10 +150,9 @@ export default {
       return props.type;
     });
     const changePasswordVisible = () => {
-      if (props.type !== 'password') {
-        return;
+      if (props.type === 'password') {
+        isPasswordVisible.value = !isPasswordVisible.value;
       }
-      isPasswordVisible.value = !isPasswordVisible.value;
     };
 
     const clearValue = () => { mv.value = ''; };
