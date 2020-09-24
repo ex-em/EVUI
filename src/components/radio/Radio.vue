@@ -2,8 +2,8 @@
   <label
     class="ev-radio"
     :class="[
-      { 'is-disabled': isDisabled },
-      { 'is-checked': isChecked },
+      { 'disabled': isDisabled },
+      { 'checked': isChecked },
       size,
     ]"
   >
@@ -98,7 +98,8 @@ export default {
   &-label {
     padding-left: 5px;
   }
-  &.is-disabled {
+
+  @include state('disabled') {
     @include evThemify() {
       color: evThemed('color-disabled');
     }

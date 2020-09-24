@@ -1,26 +1,34 @@
 ### Desc
-- 태그는 &lt;EvTextfield&gt;(이하 <텍스트필드>)으로 정의
+- 태그는 &lt;ev-textfield&gt;(이하 <텍스트필드>)으로 정의
 
 ```
-<EvTextfield
+<ev-textfield
   옵션
 />
 ```
- - <텍스트필드>에서 바인딩 옵션 설정으로 의도에 맞는 텍스트필드 구현
+- <텍스트필드>에서 바인딩 옵션 설정으로 의도에 맞는 텍스트필드 구현
+- 기본 설정 스타일
+```css
+width: 100%;
+/* type = text, password */
+height: 35px;
+/* type = textarea */
+height: 100px;
+```
+ 
 
 ### Props
 
-|     이름     |  타입            |   디폴트         |                 설명              |                  종류               |
-| ------------ | --------------- | --------------- | --------------------------------- | ----------------------------------- |
-| type         | String          | 'text'          | 타입 설정                          | 'text', 'password', 'textarea'     |
-| width        | String, Number  | '100%'          | textfield 너비. Number 입력 시, px 설정, String 입력으로 단위 변경 가능 | |
-| height       | String, Number  | '100%'          | textfield 높이. Number 입력 시, px 설정, String 입력으로 단위 변경 가능 | |
-| disabled     | Boolean         | false           | 비활성화 여부                       | true, false                      |
-| readonly     | Boolean         | false           | 읽기 전용 여부                      | true, false                      |
-| placeholder  | String          |                 | Input / Textarea의 placeholder 값  | |
-| maxLength    | Number          | Infinity        | value 의 최대길이 제한 길이          | true, false |
-| showMaxLength | Boolean        | false           | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false |
-| errorMsg     | String          |                 | Error 표현을 위한 메시지 |  |
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+| --- | ---- | ----- | ---- | --- |
+| v-model | null | String, Number | 컴포넌트 입력 값 | |
+| type | String | 'text' | 타입 설정 | 'text', 'password', 'textarea' |
+| disabled | Boolean | false | 비활성화 여부 | true, false |
+| readonly | Boolean | false | 읽기 전용 여부 | true, false |
+| placeholder | String | | Input / Textarea의 placeholder 값 | |
+| maxLength | Number | Infinity | value 의 최대길이 제한 길이 | true, false |
+| showMaxLength | Boolean | false | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false |
+| errorMsg | String | | Error 표현을 위한 메시지 |  |
 
 ### Event
 

@@ -1,12 +1,10 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield1"
       placeholder="Please enter the password"
       type="password"
-      width="230px"
-      height="35px"
     />
     <div class="description">
       <span class="badge yellow">
@@ -16,13 +14,11 @@
   </div>
   <div class="case">
     <p class="case-title">Show Password</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield2"
       placeholder="Please enter the content"
       type="password"
-      width="230px"
-      height="35px"
-      :showPassword="true"
+      show-password
     />
   </div>
 </template>

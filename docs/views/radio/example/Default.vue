@@ -1,18 +1,18 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvRadio
+    <ev-radio
       v-model="radio1"
       label="Option A"
-    >Radio Option A</EvRadio>
-    <EvRadio
+    >Radio Option A</ev-radio>
+    <ev-radio
       v-model="radio1"
       label="Option B"
-    >Radio Option B</EvRadio>
-    <EvRadio
+    >Radio Option B</ev-radio>
+    <ev-radio
       v-model="radio1"
       label="Option C"
-    >Radio Option C</EvRadio>
+    >Radio Option C</ev-radio>
     <div class="description">
       <span class="badge">
         Selected Value
@@ -22,17 +22,17 @@
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
-    <EvRadio
+    <ev-radio
       v-model="radio2"
       label="Option A"
       disabled
     />
-    <EvRadio
+    <ev-radio
       v-model="radio2"
       label="Option B"
       disabled
     />
-    <EvRadio
+    <ev-radio
       v-model="radio2"
       label="Option C"
       disabled
@@ -40,17 +40,17 @@
   </div>
   <div class="case">
     <p class="case-title">Event</p>
-    <EvRadio
+    <ev-radio
       v-model="radio3"
       label="Option A"
       @change="changeRadio"
     />
-    <EvRadio
+    <ev-radio
       v-model="radio3"
       label="Option B"
       @change="changeRadio"
     />
-    <EvRadio
+    <ev-radio
       v-model="radio3"
       label="Option C"
       @change="changeRadio"

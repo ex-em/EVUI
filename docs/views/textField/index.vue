@@ -18,12 +18,12 @@
 <script>
   import { defineAsyncComponent } from 'vue';
   import { parseComponent } from 'vue-template-compiler';
-  import Example from '../../components/Example';
-  import MarkdownView from '../../components/MarkdownView';
+  import Example from 'docs/components/Example';
+  import MarkdownView from 'docs/components/MarkdownView';
   import Default from './example/Default';
   import DefaultRaw from '!!raw-loader!./example/Default';
-  import Password from './example/TextfieldPassword';
-  import PasswordRaw from '!!raw-loader!./example/TextfieldPassword';
+  import Password from './example/Password';
+  import PasswordRaw from '!!raw-loader!./example/Password';
   import Textarea from './example/Textarea';
   import TextareaRaw from '!!raw-loader!./example/Textarea';
   import TextfieldMd from '!!raw-loader!./api/textfield.md';
@@ -52,7 +52,7 @@
           title: 'Password',
           description: 'Password를 입력할 수 있는 input 컴포넌트입니다.',
           component: defineAsyncComponent(() => Promise.resolve(Password)),
-          url: './docs/views/textfield/example/TextfieldPassword.vue',
+          url: './docs/views/textfield/example/Password.vue',
           codeText: {
             template: parseComponent(PasswordRaw)?.template?.content,
             script: parseComponent(PasswordRaw)?.script?.content,

@@ -3,37 +3,32 @@
     class="ev-textfield"
     :class="[
       `type-${type}`,
-      { 'is-disabled': disabled },
-      { 'is-clearable': clearable },
-      { 'is-readonly': readonly },
-      { 'is-error': errorMsg },
+      { 'disabled': disabled },
+      { 'clearable': clearable },
+      { 'readonly': readonly },
+      { 'error': errorMsg },
       { 'show-password': showPassword },
+      { 'show-maxlength': showMaxLength },
     ]"
-    :style="{ width: style.width }"
   >
     <div
       class="ev-textfield-wrapper"
-      :style="style"
     >
       <template
         v-if="type === 'text' || type === 'password'"
       >
         <input
           v-model="mv"
-          class="ev-textfield-input"
+          class="ev-input"
           :type="inputType"
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="readonly"
           :maxlength="maxLength"
-          @keyup.enter="onEnter"
-          @keyup="onKeyUp"
-          @keydown="onKeyDown"
-          @focus="onFocus"
-          @blur="onBlur"
-          @input="onInput"
-          @change="onChange"
-          @click="onClick"
+          @focus="focusInput"
+          @blur="blurInput"
+          @input="inputMv"
+          @change="changeMv"
         />
         <span
           v-if="type === 'text' && clearable"
@@ -52,54 +47,44 @@
         </span>
       </template>
       <template v-else>
-      <textarea
-        v-model="mv"
-        class="ev-textfield-textarea"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :readonly="readonly"
-        :maxlength="maxLength"
-        @keyup.enter="onEnter"
-        @keyup="onKeyUp"
-        @keydown="onKeyDown"
-        @focus="onFocus"
-        @blur="onBlur"
-        @input="onInput"
-        @change="onChange"
-        @click="onClick"
-      />
-    </template>
+        <textarea
+          v-model="mv"
+          class="ev-textarea"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          :readonly="readonly"
+          :maxlength="maxLength"
+          @focus="focusInput"
+          @blur="blurInput"
+          @input="inputMv"
+          @change="changeMv"
+        />
+      </template>
     </div>
     <div
-      class="ev-textfield-sub-text"
-      :style="{ width: style.width }"
+      v-if="errorMsg"
+      class="ev-textfield-error"
     >
-      <div
-        v-if="errorMsg"
-        class="ev-textfield-error"
-      >
-        {{ errorMsg }}
-      </div>
-      <div
-        v-if="maxLength && showMaxLength"
-        class="ev-textfield-maxlength"
-        :class="{ max: mv && mv.length >= maxLength }"
-      >
-        <span class="curr-length">{{ mv ? mv.length : 0 }}</span> / {{ maxLength }}
-      </div>
+      {{ errorMsg }}
+    </div>
+    <div
+      v-if="maxLength && showMaxLength"
+      class="ev-textfield-maxlength"
+      :class="{ max: mv?.length > maxLength }"
+    >
+      <span class="curr-length">{{ mv ? mv.length : 0 }}</span> / {{ maxLength }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, reactive, nextTick } from 'vue';
-import { getQuantity, getSize } from '@/common/utils';
+import { ref, computed } from 'vue';
 
 export default {
   name: 'EvTextfield',
   props: {
     modelValue: {
-      type: [String, Number, Symbol, Boolean],
+      type: [String, Number],
       default: null,
     },
     type: {
@@ -134,17 +119,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    width: {
-      type: [String, Number],
-      default: '100%',
-    },
-    height: {
-      type: [String, Number],
-      default: '100%',
-    },
     errorMsg: {
       type: String,
-      default: null,
+      default: '',
     },
   },
   emits: [
@@ -163,10 +140,6 @@ export default {
       get: () => props.modelValue,
       set: val => emit('update:modelValue', val),
     });
-    const style = reactive({
-      width: getSize(getQuantity(props.width)),
-      height: getSize(getQuantity(props.height)),
-    });
 
     const isPasswordVisible = ref(false);
     const inputType = computed(() => {
@@ -176,10 +149,6 @@ export default {
       isPasswordVisible.value = false;
       return props.type;
     });
-
-    const clearValue = () => {
-      mv.value = '';
-    };
     const changePasswordVisible = () => {
       if (props.type !== 'password') {
         return;
@@ -187,54 +156,38 @@ export default {
       isPasswordVisible.value = !isPasswordVisible.value;
     };
 
-    const onEnter = async (e) => {
-      await nextTick();
-      emit('enter', e);
+    const clearValue = () => { mv.value = ''; };
+
+    const checkMvValue = (inputValue) => {
+      if (mv.value !== inputValue) {
+        mv.value = inputValue;
+      }
     };
-    const onKeyUp = async (e) => {
-      await nextTick();
-      emit('key-up', e);
-    };
-    const onKeyDown = async (e) => {
-      await nextTick();
-      emit('key-down', e);
-    };
-    const onFocus = async (e) => {
-      await nextTick();
+
+    const focusInput = (e) => {
       emit('focus', e);
     };
-    const onBlur = async (e) => {
-      await nextTick();
+    const blurInput = (e) => {
       emit('blur', e);
     };
-    const onInput = async (e) => {
-      await nextTick();
+    const inputMv = (e) => {
+      checkMvValue(e.target.value);
       emit('input', mv.value, e);
     };
-    const onChange = async (e) => {
-      await nextTick();
+    const changeMv = (e) => {
       emit('change', mv.value, e);
-    };
-    const onClick = async (e) => {
-      await nextTick();
-      emit('click', e);
     };
 
     return {
       mv,
       inputType,
-      style,
       isPasswordVisible,
       clearValue,
       changePasswordVisible,
-      onEnter,
-      onKeyUp,
-      onKeyDown,
-      onFocus,
-      onBlur,
-      onInput,
-      onChange,
-      onClick,
+      focusInput,
+      blurInput,
+      inputMv,
+      changeMv,
     };
   },
 };
@@ -246,6 +199,8 @@ export default {
 .ev-textfield {
   position: relative;
   box-sizing: border-box;
+
+  @include clearfix();
   &-wrapper {
     position: relative;
     border-radius: 4px;
@@ -254,108 +209,109 @@ export default {
       border: 1px solid evThemed('color-line-base');
     }
   }
-  &-input {
+  .ev-input {
     width: 100%;
-    height: 100%;
+    height: $input-default-height;
     padding: 0 5px;
     border: 0;
     outline: 0;
     background-color: transparent;
   }
-  &-textarea {
+  .ev-textarea {
     width: 100%;
-    height: 100%;
+    height: $textarea-default-height;
     padding: 5px;
     border: 0;
     outline: 0;
     background-color: transparent;
     resize: none;
   }
-  &.is-readonly {
-    .ev-textfield-wrapper {
-      @include evThemify() {
-        background-color: lighten(evThemed('color-disabled'), 25%);
-      }
-    }
-    .ev-textfield-input,
-    .ev-textfield-textarea {
-      @include evThemify() {
-        color: evThemed('color-disabled');
-      }
-    }
-  }
-  &.is-disabled {
-    &, * {
-      cursor: not-allowed !important;
-    }
-    .ev-textfield-wrapper {
-      @include evThemify() {
-        border: 1px solid evThemed('color-disabled');
-        background-color: lighten(evThemed('color-disabled'), 25%);
-        color: evThemed('color-disabled');
-      }
-    }
-    .ev-textfield-input,
-    .ev-textfield-textarea {
-      @include evThemify() {
-        color: evThemed('color-disabled');
-      }
-    }
-  }
-  &.is-clearable,
-  &.show-password {
-    .ev-textfield-input {
-      padding: 0 23px 0 5px;
-    }
-    .ev-textfield-icon {
-      display: flex;
-      position: absolute;
-      top: 50%;
-      right: 3px;
-      width: 14px;
-      height: 14px;
-      cursor: pointer;
-      justify-content: center;
-      align-items: center;
-      z-index: 5;
-      transform: translateY(-50%);
-      box-sizing: border-box;
+}
 
-      @include evThemify() {
-        color: evThemed('color-line-base');
-      }
+@include state('readonly') {
+  .ev-textfield-wrapper {
+    @include evThemify() {
+      background-color: lighten(evThemed('color-disabled'), 25%);
     }
   }
-  &.is-clearable {
-    .icon-clear {
-      font-size: 10px;
-      border-radius: 8px;
-
-      @include evThemify() {
-        border: 1px solid evThemed('color-line-base');
-      }
+}
+@include state('disabled') {
+  &, * {
+    cursor: not-allowed !important;
+  }
+  .ev-textfield-wrapper {
+    @include evThemify() {
+      border: 1px solid evThemed('color-disabled');
+      background-color: lighten(evThemed('color-disabled'), 25%);
+      color: evThemed('color-disabled');
     }
   }
-  &.show-password {
-    .icon-password {
-      font-size: 15px;
-      &:hover,
-      &.on {
-        @include evThemify() {
-          color: evThemed('color-primary');
-        }
-      }
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      color: evThemed('color-disabled');
     }
   }
-  &-sub-text {
+}
+@include state('clearable') {
+  .ev-input {
+    padding: 0 23px 0 5px;
+  }
+  .ev-textfield-icon {
     display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+    font-size: 10px;
+    border-radius: 8px;
+
+    @include evThemify() {
+      border: 1px solid evThemed('color-line-base');
+      color: evThemed('color-line-base');
+    }
   }
-  &-maxlength {
-    flex: 1;
-    max-width: 100%;
+}
+@include state('show-password') {
+  .ev-input {
+    padding: 0 23px 0 5px;
+  }
+  .ev-textfield-icon {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+    font-size: 15px;
+
+    @include evThemify() {
+      color: evThemed('color-line-base');
+    }
+    &:hover,
+    &.on {
+      @include evThemify() {
+        color: evThemed('color-primary');
+      }
+    }
+  }
+}
+@include state('show-maxlength') {
+  .ev-textfield-maxlength {
+    float: right;
     padding: 5px 0 3px;
     text-align: right;
     font-size: 12px;
@@ -375,21 +331,21 @@ export default {
       }
     }
   }
-  &.is-error {
-    flex: 1;
+}
+@include state('error') {
+  .ev-textfield-wrapper {
+    @include evThemify() {
+      border: 1px solid evThemed('color-error');
+    }
+  }
+  .ev-textfield-error {
+    float: left;
+    padding: 5px 0 3px;
+    font-size: 12px;
+    word-break: break-all;
 
     @include evThemify() {
       color: evThemed('color-error');
-    }
-    .ev-textfield-wrapper {
-      @include evThemify() {
-        border: 1px solid evThemed('color-error');
-      }
-    }
-    .ev-textfield-error {
-      padding: 5px 0 3px;
-      font-size: 12px;
-      word-break: break-all;
     }
   }
 }

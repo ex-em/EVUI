@@ -1,12 +1,10 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield1"
       placeholder="Please enter the content"
       type="textarea"
-      width="350px"
-      height="80px"
     />
     <div class="description">
       <span class="badge yellow">
@@ -21,22 +19,18 @@
 
   <div class="case">
     <p class="case-title">Readonly</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield2"
       type="textarea"
-      width="350px"
-      height="80px"
       readonly
     />
   </div>
 
   <div class="case">
     <p class="case-title">Disabled</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield3"
       type="textarea"
-      width="350px"
-      height="80px"
       disabled
     />
   </div>
@@ -44,21 +38,17 @@
   <div class="case">
     <p class="case-title">Max Length</p>
     <div style="display: flex;">
-      <EvTextfield
+      <ev-textfield
         v-model="textfield4"
         placeholder="Please enter the content"
         type="textarea"
-        width="350px"
-        height="80px"
-        :maxLength="10"
+        :max-length="10"
       />
-      <EvTextfield
+      <ev-textfield
         v-model="textfield4"
         placeholder="Please enter the content"
         type="textarea"
-        width="350px"
-        height="80px"
-        :maxLength="10"
+        :max-length="10"
         show-max-length
       />
     </div>

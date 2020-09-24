@@ -1,12 +1,12 @@
 <template>
   <div class="case">
-    <EvRadioGroup
+    <ev-radio-group
       v-model="radioGroup1"
     >
-      <EvRadio label="Option A" />
-      <EvRadio label="Option B" />
-      <EvRadio label="Option C" />
-    </EvRadioGroup>
+      <ev-radio label="Option A" />
+      <ev-radio label="Option B" />
+      <ev-radio label="Option C" />
+    </ev-radio-group>
     <div class="description">
       <span class="badge">
         Selected Value
@@ -16,14 +16,14 @@
   </div>
   <div class="case">
     <p class="case-title">Event</p>
-    <EvRadioGroup
+    <ev-radio-group
       v-model="radioGroup2"
       @change="changeRadioGroup"
     >
-      <EvRadio label="Option A" />
-      <EvRadio label="Option B" />
-      <EvRadio label="Option C" />
-    </EvRadioGroup>
+      <ev-radio label="Option A" />
+      <ev-radio label="Option B" />
+      <ev-radio label="Option C" />
+    </ev-radio-group>
     <div class="description">
       <span class="badge">
         Change Event

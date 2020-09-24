@@ -1,12 +1,10 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield1"
       placeholder="Please enter the content"
       type="text"
-      width="230px"
-      height="35px"
     />
     <div class="description">
       <span class="badge yellow">
@@ -21,34 +19,28 @@
 
   <div class="case">
     <p class="case-title">Readonly</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield2"
       type="text"
-      width="230px"
-      height="35px"
       readonly
     />
   </div>
 
   <div class="case">
     <p class="case-title">Disabled</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield3"
       type="text"
-      width="230px"
-      height="35px"
       disabled
     />
   </div>
 
   <div class="case">
     <p class="case-title">Clearable</p>
-    <EvTextfield
+    <ev-textfield
       v-model="textfield4"
       placeholder="Please enter the content"
       type="text"
-      width="230px"
-      height="35px"
       clearable
     />
   </div>
@@ -56,21 +48,17 @@
   <div class="case">
     <p class="case-title">Max Length</p>
     <div style="display: flex;">
-      <EvTextfield
+      <ev-textfield
         v-model="textfield5"
         placeholder="Please enter the content"
         type="text"
-        width="230px"
-        height="35px"
-        :maxLength="3"
+        :max-length="3"
       />
-      <EvTextfield
+      <ev-textfield
         v-model="textfield5"
         placeholder="Please enter the content"
         type="text"
-        width="230px"
-        height="35px"
-        :maxLength="3"
+        :max-length="3"
         show-max-length
       />
     </div>
@@ -79,12 +67,12 @@
   <div class="case">
     <p class="case-title">Error Message</p>
     <div style="display: flex;">
-      <EvTextfield
+      <ev-textfield
+        v-model="textfield6"
         placeholder="Please enter the content"
         type="text"
-        width="230px"
-        height="35px"
-        error-msg="Error Message"
+        :error-msg="errMsg"
+        @input="checkValid"
       />
     </div>
   </div>
@@ -100,12 +88,26 @@ export default {
     const textfield3 = ref('Disabled Content');
     const textfield4 = ref();
     const textfield5 = ref();
+    const textfield6 = ref('1234가나다');
+    const errMsg = ref();
+    const checkValid = () => {
+      const regexp = /^[0-9]*$/;
+      if (!regexp.test(textfield6.value)) {
+        errMsg.value = '숫자만 입력 가능!';
+      } else {
+        errMsg.value = '';
+      }
+    };
+    checkValid();
     return {
       textfield1,
       textfield2,
       textfield3,
       textfield4,
       textfield5,
+      textfield6,
+      checkValid,
+      errMsg,
     };
   },
 };
@@ -113,6 +115,7 @@ export default {
 
 <style lant="scss">
 .case .ev-textfield {
+  width: 300px;
   margin-right: 15px;
 }
 </style>
