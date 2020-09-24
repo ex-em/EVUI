@@ -3,16 +3,16 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { 'is-disabled': isDisabled },
-      { 'is-checked': isChecked },
+      { disabled: disabled },
+      { checked: checked },
     ]"
   >
     <input
       v-model="mv"
       type="checkbox"
-      :disabled="isDisabled"
-      :value="refLabel"
-      @change="onChange"
+      :disabled="disabled"
+      :value="label"
+      @change="changeMv"
     />
     <span
       v-if="$slots.default"
@@ -41,7 +41,7 @@ export default {
     },
     label: {
       type: [String, Number, Boolean, Symbol],
-      default: null,
+      required: true,
     },
     disabled: {
       type: Boolean,
@@ -62,25 +62,22 @@ export default {
     );
     const refLabel = computed(() => props.label);
 
-    const isChecked = computed(() => {
+    const checked = computed(() => {
       if (Array.isArray(mv.value)) {
         return mv.value.includes(refLabel.value);
       }
       return mv.value;
     });
-    const isDisabled = computed(() => props.disabled);
 
-    const onChange = async (e) => {
+    const changeMv = async (e) => {
       await nextTick();
       emit('change', mv.value, e);
     };
 
     return {
       mv,
-      refLabel,
-      isChecked,
-      isDisabled,
-      onChange,
+      checked,
+      changeMv,
     };
   },
 };
@@ -96,7 +93,7 @@ export default {
   input {
     cursor: pointer;
   }
-  &.is-disabled {
+  &.disabled {
     cursor: not-allowed;
 
     @include evThemify() {

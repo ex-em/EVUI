@@ -1,11 +1,11 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <EvCheckbox
+    <ev-checkbox
       v-model="checkVal1"
     >
       Checkbox
-    </EvCheckbox>
+    </ev-checkbox>
     <div class="description">
       <button
         class="btn"
@@ -13,17 +13,17 @@
       >
         click to change the check value
       </button>
-      {{ checkResult2.value }}
+      {{ checkVal1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Use Change Event</p>
-    <EvCheckbox
+    <ev-checkbox
       v-model="checkVal2"
       @change="changeVal2"
     >
       Single Checkbox
-    </EvCheckbox>
+    </ev-checkbox>
     <div class="description">
       <span class="badge">
         Value in changeEvent
@@ -39,12 +39,12 @@
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
-    <EvCheckbox
+    <ev-checkbox
       v-model="checkVal3"
       :disabled="isDisable"
     >
       DISABLED
-    </EvCheckbox>
+    </ev-checkbox>
     <div class="description">
       <button
         class="btn"
