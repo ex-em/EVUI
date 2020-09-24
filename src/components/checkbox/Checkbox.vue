@@ -3,16 +3,16 @@
     role="checkbox"
     class="ev-checkbox"
     :class="[
-      { 'is-disabled': isDisabled },
+      { 'is-disabled': disabled },
       { 'is-checked': isChecked },
     ]"
   >
     <input
       v-model="mv"
       type="checkbox"
-      :disabled="isDisabled"
-      :value="refLabel"
-      @change="onChange"
+      :disabled="disabled"
+      :value="label"
+      @change="changeMv"
     />
     <span
       v-if="$slots.default"
@@ -68,19 +68,16 @@ export default {
       }
       return mv.value;
     });
-    const isDisabled = computed(() => props.disabled);
 
-    const onChange = async (e) => {
+    const changeMv = async (e) => {
       await nextTick();
       emit('change', mv.value, e);
     };
 
     return {
       mv,
-      refLabel,
       isChecked,
-      isDisabled,
-      onChange,
+      changeMv,
     };
   },
 };
