@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import marked from 'marked';
 import hljs from 'highlight.js';
 
@@ -34,7 +35,7 @@ export default {
     },
   },
   setup(props) {
-    const compiledMd = marked(props.source);
+    const compiledMd = computed(() => marked(props.source));
 
     return {
       compiledMd,

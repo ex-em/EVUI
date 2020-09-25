@@ -8,9 +8,7 @@
     </p>
     <div class="article-example">
       <div class="view">
-        <component
-          :is="contents"
-        />
+        <component :is="component" />
       </div>
       <div
         v-highlight
@@ -20,11 +18,11 @@
           ref="codeWrapper"
           class="code-wrapper"
         >
-          <pre
-            v-for="(code, key) in codeText"
-            :key="key"
-          >
-            {{ code }}
+          <pre>
+            {{ parsedData?.template?.content }}
+          </pre>
+          <pre>
+            {{ parsedData?.script?.content }}
           </pre>
         </div>
         <div
@@ -46,7 +44,7 @@ export default {
   name: 'Example',
   directives: {
     highlight: {
-      mounted(el) {
+      updated(el) {
         const blocks = el.querySelectorAll('pre');
         blocks.forEach((block) => {
           hljs.highlightBlock(block);
@@ -55,6 +53,10 @@ export default {
     },
   },
   props: {
+    componentName: {
+      type: String,
+      default: '',
+    },
     title: {
       type: String,
       default: '',
@@ -63,17 +65,13 @@ export default {
       type: String,
       default: '',
     },
-    contents: {
+    component: {
       type: Object,
       default: null,
     },
-    url: {
-      type: String,
-      default: '',
-    },
-    codeText: {
-      type: Object,
-      default: () => {},
+    parsedData: {
+      type: [String, Object],
+      default: null,
     },
   },
   setup() {
@@ -85,6 +83,7 @@ export default {
         codeWrapper.value.scrollTop = 0;
       }
     };
+
     return {
       codeExpend,
       codeWrapper,

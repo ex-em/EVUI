@@ -3,13 +3,11 @@
     Checkbox
   </h2>
   <example
-    v-for="(component, index) in components"
-    :key="`${component.title}_${index}`"
-    :title="component.title"
-    :description="component.description"
-    :contents="component.component"
-    :url="component.url"
-    :code-text="component.codeText"
+    v-for="(value, name, index) in components"
+    :key="`${name}_${index}`"
+    v-bind="value"
+    component-name="select"
+    :title="name"
   />
   <markdown-view
     :source="mdText"
@@ -17,15 +15,10 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { ref, reactive, defineAsyncComponent, markRaw } from 'vue';
 import { parseComponent } from 'vue-template-compiler';
 import Example from 'docs/components/Example';
 import MarkdownView from 'docs/components/MarkdownView';
-import Default from './example/Default';
-import CheckboxGroup from './example/CheckboxGroup';
-import DefaultRaw from '!!raw-loader!./example/Default';
-import CheckboxGroupRaw from '!!raw-loader!./example/CheckboxGroup';
-import CheckboxMd from '!!raw-loader!./api/checkbox.md';
 
 export default {
   name: 'Checkbox',
@@ -35,30 +28,27 @@ export default {
   },
   inheritAttrs: false,
   setup() {
-    const mdText = CheckboxMd;
-
-    const components = [
-      {
-        title: 'Default',
+    const mdText = ref('');
+    const components = reactive({
+      Default: {
         description: '여러 개의 선택 사항을 고르기 위한 단일 체크 박스의 기능입니다.',
-        component: defineAsyncComponent(() => Promise.resolve(Default)),
-        url: './docs/views/checkbox/example/Default.vue',
-        codeText: {
-          template: parseComponent(DefaultRaw)?.template?.content,
-          script: parseComponent(DefaultRaw)?.script?.content,
-        },
+        component: markRaw(defineAsyncComponent(() => import('./example/Default'))),
       },
-      {
-        title: 'CheckboxGroup',
-        description: '체크박스 그룹 기능입니다..',
-        component: defineAsyncComponent(() => Promise.resolve(CheckboxGroup)),
-        url: './docs/views/checkbox/example/CheckboxGroup.vue',
-        codeText: {
-          template: parseComponent(CheckboxGroupRaw)?.template?.content,
-          script: parseComponent(CheckboxGroupRaw)?.script?.content,
-        },
+      CheckboxGroup: {
+        description: '체크박스 그룹 기능입니다.',
+        component: markRaw(defineAsyncComponent(() => import('./example/CheckboxGroup'))),
       },
-    ];
+    });
+
+    import('raw-loader!./api/checkbox.md').then((data) => {
+      mdText.value = data.default;
+    });
+    import('!!raw-loader!./example/Default').then((data) => {
+      components.Default.parsedData = parseComponent(data.default);
+    });
+    import('!!raw-loader!./example/CheckboxGroup').then((data) => {
+      components.CheckboxGroup.parsedData = parseComponent(data.default);
+    });
 
     return {
       mdText,
