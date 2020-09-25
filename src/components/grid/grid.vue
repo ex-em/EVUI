@@ -128,7 +128,11 @@
               :key="cellIndex"
               :data-name="column.field"
               :data-index="column.index"
-              :class="`${column.type} ${column.align ? column.align : ''}`"
+              :class="{
+                [column.type]: column.type,
+                [column.align]: column.align,
+                render: isRenderer(column),
+              }"
               :style="
                 `width: ${column.width}px; height: ${rowHeight}px; line-height: ${rowHeight}px`"
             >
@@ -1062,6 +1066,9 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
+      }
+      &.render {
+        overflow: initial;
       }
 
       &.number,
