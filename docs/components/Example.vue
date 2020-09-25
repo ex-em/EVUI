@@ -53,10 +53,6 @@ export default {
     },
   },
   props: {
-    componentName: {
-      type: String,
-      default: '',
-    },
     title: {
       type: String,
       default: '',

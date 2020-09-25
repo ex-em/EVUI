@@ -6,7 +6,6 @@
     v-for="(value, name, index) in components"
     :key="`${name}_${index}`"
     v-bind="value"
-    component-name="select"
     :title="name"
   />
   <markdown-view
