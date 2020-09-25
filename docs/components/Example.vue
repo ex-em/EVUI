@@ -44,7 +44,7 @@ export default {
   name: 'Example',
   directives: {
     highlight: {
-      updated(el) {
+      mounted(el) {
         const blocks = el.querySelectorAll('pre');
         blocks.forEach((block) => {
           hljs.highlightBlock(block);

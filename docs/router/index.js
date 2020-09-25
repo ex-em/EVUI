@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Intro from '../views/Intro.vue';
+import Intro from 'docs/views/Intro.vue';
+import PageView from 'docs/components/PageView';
+import checkboxProps from 'docs/views/checkbox/props';
 
 const routes = [
   {
@@ -25,7 +27,8 @@ const routes = [
   {
     path: '/checkbox',
     name: 'Checkbox',
-    component: () => import(/* webpackChunkName: "checkbox" */ '../views/checkbox'),
+    component: PageView,
+    props: checkboxProps,
   },
   {
     path: '/radio',
