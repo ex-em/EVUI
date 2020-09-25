@@ -25,6 +25,12 @@ class Scatter {
     this.type = 'scatter';
   }
 
+  /**
+   * Draw series data
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
   draw(param) {
     if (!this.show) {
       return;

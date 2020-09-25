@@ -1,5 +1,10 @@
 const modules = {
   pieDataSet: [],
+  /**
+   * Draw series data
+   *
+   * @returns {undefined}
+   */
   drawPie() {
     const ctx = this.bufferCtx;
     const chartRect = this.chartRect;
@@ -62,6 +67,11 @@ const modules = {
     }
   },
 
+  /**
+   * Draw series data
+   *
+   * @returns {undefined}
+   */
   drawSunburst() {
     const ctx = this.bufferCtx;
     const chartRect = this.chartRect;
@@ -130,6 +140,11 @@ const modules = {
     }
   },
 
+  /**
+   * Draw doughnut hole
+   *
+   * @returns {undefined}
+   */
   drawDoughnutHole() {
     const ctx = this.bufferCtx;
 

@@ -2,6 +2,12 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class LogarithmicScale extends Scale {
+  /**
+   * Calculate min/max value, label and size information for logarithmic scale
+   * @param {object} minMax    min/max information
+   *
+   * @returns {object} min/max value and label
+   */
   calculateScaleRange(minMax) {
     let maxValue;
     let minValue;
@@ -36,6 +42,13 @@ class LogarithmicScale extends Scale {
     };
   }
 
+  /**
+   * With range information, calculate how many labels in axis
+   * @param {object}  range          min/max information
+   * @param {boolean} skipFitting    determines if label skipping job.
+   *
+   * @returns {object} steps, interval, min/max graph value
+   */
   calculateSteps(range, skipFitting) {
     const maxValue = range.maxValue;
     const minValue = range.minValue;
@@ -81,10 +94,22 @@ class LogarithmicScale extends Scale {
     };
   }
 
+  /**
+   * Transforming label by designated format
+   * @param {any} value    label value
+   *
+   * @returns {string} formatted label
+   */
   getLabelFormat(value) {
     return Util.labelSignFormat(value, this.decimalPoint);
   }
 
+  /**
+   * Calculate interval
+   * @param {object} range    range information
+   *
+   * @returns {number} interval
+   */
   getInterval(range) {
     const max = range.maxValue;
     const min = range.minValue;

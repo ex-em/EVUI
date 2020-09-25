@@ -1,4 +1,14 @@
 export default {
+  /**
+   * Calculate X position
+   * @param {any}    value         graph value
+   * @param {number} min           min value
+   * @param {number} max           max value
+   * @param {number} area          height for axis
+   * @param {number} startPoint    startPoint
+   *
+   * @returns {any} position
+   */
   calculateX(value, min, max, area, startPoint = 0) {
     if (value === null) {
       return null;
@@ -12,6 +22,16 @@ export default {
     return Math.ceil(startPoint + (scalingFactor * (value - min)));
   },
 
+  /**
+   * Calculate X position (for timebar)
+   * @param {any}    value         graph value
+   * @param {number} min           min value
+   * @param {number} max           max value
+   * @param {number} area          height for axis
+   * @param {number} startPoint    startPoint
+   *
+   * @returns {any} position
+   */
   calculateSubX(value, min, max, area, startPoint = 0) {
     if (value === null) {
       return null;
@@ -21,6 +41,16 @@ export default {
     return Math.ceil(startPoint + (scalingFactor * (value - min)));
   },
 
+  /**
+   * Calculate Y position
+   * @param {any}    value         graph value
+   * @param {number} min           min value
+   * @param {number} max           max value
+   * @param {number} area          height for axis
+   * @param {number} startPoint    startPoint
+   *
+   * @returns {any} position
+   */
   calculateY(value, min, max, area, startPoint = 0) {
     let calcY;
 
@@ -41,6 +71,16 @@ export default {
     return Math.floor(calcY);
   },
 
+  /**
+   * Draw point for chart
+   * @param {object} ctx       canvas context
+   * @param {string} style     point style
+   * @param {number} radius    radius
+   * @param {number} x         x position
+   * @param {number} y         y position
+   *
+   * @returns {undefined}
+   */
   drawPoint(ctx, style, radius, x, y) {
     let edgeLength;
     let xOffset;
@@ -149,6 +189,18 @@ export default {
 
     ctx.stroke();
   },
+
+  /**
+   * Draw roundedRect point for chart
+   * @param {object} ctx       canvas context
+   * @param {number} x         x position
+   * @param {number} y         y position
+   * @param {string} width     width
+   * @param {number} height    height
+   * @param {number} radius    radius
+   *
+   * @returns {undefined}
+   */
   roundedRect(ctx, x, y, width, height, radius) {
     const pi = Math.PI;
     const halfPi = pi / 2;

@@ -2,6 +2,12 @@ import { numberWithComma } from '@/common/utils';
 import Canvas from '../helpers/helpers.canvas';
 
 const modules = {
+  /**
+   * Draw TextTip with hitInfo
+   * @param {object} [hitInfo=undefined]    mouse hit information
+   *
+   * @returns {undefined}
+   */
   drawTip(hitInfo) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
@@ -40,6 +46,15 @@ const modules = {
       }
     }
   },
+
+  /**
+   * Calculate tip size and contents
+   * @param {object} series     series information (max series or selected series)
+   * @param {string} tipType    tip type [sel = user select, max = max value]
+   * @param {object} hitInfo    mouse hit information
+   *
+   * @returns {object} size and tip contents
+   */
   calculateTipInfo(series, tipType, hitInfo) {
     if (!series) {
       return false;
@@ -174,6 +189,13 @@ const modules = {
     ctx.restore();
     ctx.closePath();
   },
+
+  /**
+   * Calculate x, y position to draw text tip
+   * @param {object} param     object for drawing text tip
+   *
+   * @returns {undefined}
+   */
   drawTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
@@ -246,6 +268,13 @@ const modules = {
       });
     }
   },
+
+  /**
+   * Draw text tip
+   * @param {object} param     object for drawing text tip
+   *
+   * @returns {undefined}
+   */
   showTextTip(param) {
     const { type, width, height, x, y, arrowSize, borderRadius, text, opt } = param;
     const ctx = param.context;
@@ -297,6 +326,13 @@ const modules = {
     ctx.fillText(`${text}`, x, sy + (height / 2));
     ctx.restore();
   },
+
+  /**
+   * Draw arrow tip
+   * @param {object} param     object for drawing arrow tip
+   *
+   * @returns {undefined}
+   */
   showTip(param) {
     const { x, y, opt, isSamePos } = param;
     const ctx = param.context;

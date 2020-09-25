@@ -9,10 +9,22 @@ class TimeCategoryScale extends Scale {
     this.labels = labels;
   }
 
+  /**
+   * Transforming label by designated format
+   * @param {number} value       label value
+   *
+   * @returns {string} formatted label
+   */
   getLabelFormat(value) {
     return moment(value).format(this.timeFormat);
   }
 
+  /**
+   * Calculate interval
+   * @param {object} range    range information
+   *
+   * @returns {number} interval
+   */
   getInterval(range) {
     const max = range.maxValue;
     const min = range.minValue;
@@ -30,6 +42,12 @@ class TimeCategoryScale extends Scale {
     return Math.ceil((max - min) / step);
   }
 
+  /**
+   * With range information, calculate how many labels in axis
+   * @param {object} range    min/max information
+   *
+   * @returns {object} steps, interval, min/max graph value
+   */
   calculateSteps(range) {
     const { maxValue, minValue, maxSteps } = range;
     const rawInterval = this.getInterval(range);
@@ -75,6 +93,14 @@ class TimeCategoryScale extends Scale {
     };
   }
 
+  /**
+   * Draw axis
+   * @param {object} chartRect      min/max information
+   * @param {object} labelOffset    label offset information
+   * @param {object} stepInfo       label steps information
+   *
+   * @returns {undefined}
+   */
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
     const labels = this.labels;

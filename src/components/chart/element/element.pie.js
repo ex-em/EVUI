@@ -21,6 +21,12 @@ class Pie {
     this.type = 'pie';
   }
 
+  /**
+   * Draw series data
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
   draw(param) {
     const ctx = param.ctx;
     const centerX = param.centerX;
@@ -37,6 +43,12 @@ class Pie {
     ctx.closePath();
   }
 
+  /**
+   * Find graph item
+   * @param {array}    offset          mouse position
+   *
+   * @returns {object} graph item
+   */
   findGraphRange(offset) {
     const xp = offset[0];
     const yp = offset[1];

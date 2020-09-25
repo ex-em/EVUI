@@ -7,6 +7,13 @@ class StepScale extends Scale {
     this.labels = labels;
   }
 
+  /**
+   * Calculate min/max value, label and size information for step scale
+   * @param {object} minMax       min/max information (unused on step scale)
+   * @param {object} chartRect    chart size information
+   *
+   * @returns {object} min/max value and label
+   */
   calculateScaleRange(minMax, chartRect) {
     const stepMinMax = Util.getStringMinMax(this.labels);
     const maxValue = stepMinMax.max;
@@ -25,6 +32,12 @@ class StepScale extends Scale {
     };
   }
 
+  /**
+   * With range information, calculate how many labels in axis
+   * @param {object}  range          min/max information
+   *
+   * @returns {object} steps, interval, min/max graph value
+   */
   calculateSteps(range) {
     return {
       steps: this.labels.length,
@@ -34,6 +47,14 @@ class StepScale extends Scale {
     };
   }
 
+  /**
+   * Draw axis
+   * @param {object} chartRect      min/max information
+   * @param {object} labelOffset    label offset information
+   * @param {object} stepInfo       label steps information
+   *
+   * @returns {undefined}
+   */
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
     const labels = this.labels;
@@ -120,10 +141,24 @@ class StepScale extends Scale {
     ctx.closePath();
   }
 
+  /**
+   * Transforming label by designated format
+   * @param {string} value       label value
+   * @param {number} maxWidth    max width for each label
+   *
+   * @returns {string} formatted label
+   */
   getLabelFormat(value, maxWidth) {
     return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
   }
 
+  /**
+   * Transforming ellipsis label by designated format and specific width
+   * @param {string} value       label value
+   * @param {number} maxWidth    max width for each label
+   *
+   * @returns {string} formatted label
+   */
   fittingString(value, maxWidth) {
     if (!value) {
       return '';

@@ -7,6 +7,12 @@ import {
 } from '@/common/utils';
 
 export default {
+  /**
+   * Transforming hex to rgb code
+   * @param {string} hex    hex color code
+   *
+   * @returns {string} rgb code
+   */
   hexToRgb(hex) {
     if (!hex) {
       return false;
@@ -21,18 +27,43 @@ export default {
     return `${r},${g},${b}`;
   },
 
+  /**
+   * To logarithmic scale, compute log value
+   * @param {number} value    graph value
+   *
+   * @returns {number} computed value
+   */
   calculateMagnitude(value) {
     return Math.floor(Math.log(value) / Math.LN10);
   },
 
+  /**
+   * Set alias pixel to deal with anti-aliasing
+   * @param {number} width    line width
+   *
+   * @returns {number} computed value
+   */
   aliasPixel(width) {
     return width % 2 === 0 ? 0 : 0.5;
   },
 
+  /**
+   * Create string for canvas font style
+   * @param {object} style    style object by user
+   *
+   * @returns {string} computed value
+   */
   getLabelStyle(style) {
     return `normal normal ${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`;
   },
 
+  /**
+   * Create sign format with number
+   * @param {number} value           graph value
+   * @param {string} decimalPoint    decimal point
+   *
+   * @returns {string} signed value
+   */
   labelSignFormat(value, decimalPoint) {
     const quad = quadrillion(1);
     const trill = trillion(1);
@@ -71,6 +102,13 @@ export default {
     return label;
   },
 
+  /**
+   * Calculate text size with html
+   * @param {string} text         text is needed to check size
+   * @param {string} fontStyle    text font style
+   *
+   * @returns {object} text size information
+   */
   calcTextSize(text, fontStyle) {
     const calc = document.createElement('span');
     const style = `visibility:hidden; position:absolute; top:-10000px; font: ${fontStyle};`;
@@ -89,6 +127,12 @@ export default {
     return { width, height };
   },
 
+  /**
+   * Comparing strings
+   * @param {array} array    compared array
+   *
+   * @returns {object} min/max information
+   */
   getStringMinMax(array) {
     const minMax = {
       min: array[0],

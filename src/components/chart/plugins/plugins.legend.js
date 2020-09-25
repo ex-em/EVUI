@@ -1,4 +1,9 @@
 const modules = {
+  /**
+   * Create legend DOM
+   *
+   * @returns {undefined}
+   */
   createLegendLayout() {
     this.legendDOM = document.createElement('div');
     this.legendDOM.className = 'ev-chart-legend';
@@ -13,6 +18,14 @@ const modules = {
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
   },
+
+  /**
+   * Initialize legend
+   * If there was no initialization, create DOM and set default layout.
+   * It not, there will already be set layout, so add a legend for each series with group
+   *
+   * @returns {undefined}
+   */
   initLegend() {
     if (!this.isInitLegend) {
       this.createLegendLayout();
@@ -24,6 +37,13 @@ const modules = {
     this.isLegendMove = false;
   },
 
+  /**
+   * Add legend with group information to align each series properly.
+   * Especially if a chart is stacked,
+   * legends have to align with series ordering as we can see in chart.
+   *
+   * @returns {undefined}
+   */
   addLegendList() {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
@@ -43,7 +63,17 @@ const modules = {
     });
   },
 
+  /**
+   * Initialize legend event
+   *
+   * @returns {undefined}
+   */
   initEvent() {
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @returns {undefined}
+     */
     this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
       const type = e.target.dataset.type;
@@ -86,6 +116,13 @@ const modules = {
       });
     };
 
+    /**
+     * callback for resizeDOM click event
+     * 1. hide resizeDOM
+     * 2. show ghost DOM on same position with hidden resizeDOM
+     *
+     * @returns {undefined}
+     */
     this.onResizeMouseDown = (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -118,6 +155,11 @@ const modules = {
       this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
     };
 
+    /**
+     * callback for legendBoxDOM hovering
+     *
+     * @returns {undefined}
+     */
     this.onLegendBoxOver = (e) => {
       const type = e.target.dataset.type;
 
@@ -142,6 +184,11 @@ const modules = {
       });
     };
 
+    /**
+     * callback for mouseleave event on legendBoxDOM
+     *
+     * @returns {undefined}
+     */
     this.onLegendBoxLeave = () => {
       Object.values(this.seriesList).forEach((series) => {
         series.state = 'normal';
@@ -162,11 +209,21 @@ const modules = {
     this.mouseUp = this.onMouseUp.bind(this); // resizing function
   },
 
+  /**
+   * To update legend, reset all process.
+   *
+   * @returns {undefined}
+   */
   updateLegend() {
     this.resetLegend();
     this.addLegendList();
   },
 
+  /**
+   * To update legend, remove all of legendBoxDOM's children
+   *
+   * @returns {undefined}
+   */
   resetLegend() {
     const legendDOM = this.legendBoxDOM;
 
@@ -175,6 +232,11 @@ const modules = {
     }
   },
 
+  /**
+   * Create DOM for each series
+   *
+   * @returns {undefined}
+   */
   addLegend(series) {
     const opt = this.options.legend;
     const containerDOM = document.createElement('div');
@@ -213,6 +275,11 @@ const modules = {
     this.seriesInfo.count++;
   },
 
+  /**
+   * Set legend components position by option
+   *
+   * @returns {undefined}
+   */
   setLegendPosition() {
     const opt = this.options;
     const position = opt.legend.position;
@@ -330,6 +397,11 @@ const modules = {
     }
   },
 
+  /**
+   * Update legend components size
+   *
+   * @returns {undefined}
+   */
   updateLegendContainerSize() {
     const opt = this.options.legend;
     const container = this.legendBoxDOM.getElementsByClassName('ev-chart-legend-container');
@@ -344,6 +416,11 @@ const modules = {
     }
   },
 
+  /**
+   * When user moves resizeDOM, this function will change css
+   *
+   * @returns {undefined}
+   */
   onMouseMove(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -407,6 +484,11 @@ const modules = {
     this.isLegendMove = true;
   },
 
+  /**
+   * callback for mouseup on ghostDOM, this function will change legend and chart size.
+   *
+   * @returns {undefined}
+   */
   onMouseUp(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -473,11 +555,21 @@ const modules = {
     }
   },
 
+  /**
+   * Show legend components by manipulating css
+   *
+   * @returns {undefined}
+   */
   showLegend() {
     this.resizeDOM.style.display = 'block';
     this.legendDOM.style.display = 'block';
   },
 
+  /**
+   * Hide legend components by manipulating css
+   *
+   * @returns {undefined}
+   */
   hideLegend() {
     const opt = this.options;
     const wrapperStyle = this.wrapperDOM.style;

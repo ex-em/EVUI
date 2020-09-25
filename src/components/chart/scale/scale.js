@@ -18,6 +18,15 @@ class Scale {
     }
   }
 
+  /**
+   * Calculate axis's min/max label steps
+   * @param {string} type           axis direction ('x', 'y')
+   * @param {object} chartRect      chart size information
+   * @param {object} labelOffset    chart label offset information
+   * @param {number} tickSize       label's size
+   *
+   * @returns {object} label range
+   */
   calculateLabelRange(type, chartRect, labelOffset, tickSize) {
     let chartSize;
     let axisOffset;
@@ -43,6 +52,12 @@ class Scale {
     };
   }
 
+  /**
+   * Calculate min/max value, label and size information for axis
+   * @param {object} minMax    min/max information
+   *
+   * @returns {object} min/max value and label
+   */
   calculateScaleRange(minMax) {
     let maxValue;
     let minValue;
@@ -79,6 +94,12 @@ class Scale {
     };
   }
 
+  /**
+   * With range information, calculate how many labels in axis
+   * @param {object} range    min/max information
+   *
+   * @returns {object} steps, interval, min/max graph value
+   */
   calculateSteps(range) {
     const { maxValue, minValue } = range;
     let { maxSteps } = range;
@@ -127,6 +148,14 @@ class Scale {
     };
   }
 
+  /**
+   * Draw axis
+   * @param {object} chartRect      min/max information
+   * @param {object} labelOffset    label offset information
+   * @param {object} stepInfo       label steps information
+   *
+   * @returns {undefined}
+   */
   draw(chartRect, labelOffset, stepInfo) {
     const ctx = this.ctx;
     const aPos = {
