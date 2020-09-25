@@ -1,13 +1,22 @@
 
 >### Desc
- - 태그는 &lt;EvCheckbox&gt;(이하 <체크박스>), &lt;EvCheckboxGroup&gt;(이하 <체크박스그룹>)으로 정의
+ - 태그는 &lt;ev-checkbox&gt;(이하 <체크박스>), &lt;ev-checkbox-group&gt;(이하 <체크박스그룹>)으로 정의
 
 ```
-<EvCheckboxGroup>
-  <EvCheckbox>텍스트</EvCheckbox>
-  <EvCheckbox>텍스트</EvCheckbox>
-  <EvCheckbox>텍스트</EvCheckbox>
-</EvCheckboxGroup>
+<ev-checkbox
+    v-mode="바인딩값"
+    @change="이벤트메소드"
+>
+    텍스트
+</ev-checkbox>
+```
+
+```
+<ev-checkbox-group>
+    <ev-checkbox label="라벨값">텍스트</ev-checkbox>
+    <ev-checkbox label="라벨값">텍스트</ev-checkbox>
+    <ev-checkbox label="라벨값" /> // 이 경우는 라벨값 = 텍스트
+</ev-checkbox-group>
 ```
 
  - <체크박스그룹>과 <체크박스> 태그는 위와 같이 상위에 그룹, 하위에 체크박스로 사용
@@ -39,7 +48,6 @@
 > | 이름 | 디폴트 | 타입 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | label | null | String  | HTML element value (required) |  |
   | disabled | false | Boolean | HTML element disabled attribute |  |
 
 >### Event
@@ -50,6 +58,4 @@
  | change | event | <체크박스그룹> 내 <체크박스> 변화 이벤트 감지 |
 
 >### 참고
- - :id는 내부적으로 가지고 있으며, <체크박스>태그 내 <label for=":id">와 연동하기 위함.
-   - 현재는 ${&#95;uid}&#95;${value}로 되어있으나, 추후 바꿀 예정
  - <체크박스>체크박스텍스트값</체크박스>로 태그 내부에 텍스트는 &lt;slot/&gt;을 사용함.
