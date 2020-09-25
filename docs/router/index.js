@@ -1,7 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Intro from 'docs/views/Intro.vue';
-import PageView from 'docs/components/PageView';
+import PageView from 'docs/views/PageView';
 import checkboxProps from 'docs/views/checkbox/props';
+import selectProps from 'docs/views/select/props';
+import radioProps from 'docs/views/radio/props';
+import textFieldProps from 'docs/views/textField/props';
+import iconProps from 'docs/views/icon/props';
 
 const routes = [
   {
@@ -33,7 +37,8 @@ const routes = [
   {
     path: '/radio',
     name: 'Radio',
-    component: () => import(/* webpackChunkName: "radio" */ '../views/radio'),
+    component: PageView,
+    props: radioProps,
   },
   {
     path: '/inputNumber',
@@ -43,7 +48,8 @@ const routes = [
   {
     path: '/select',
     name: 'Select',
-    component: () => import(/* webpackChunkName: "select" */ '../views/select'),
+    component: PageView,
+    props: selectProps,
   },
   {
     path: '/slider',
@@ -78,7 +84,8 @@ const routes = [
   {
     path: '/textField',
     name: 'TextField',
-    component: () => import(/* webpackChunkName: "textField" */ '../views/textField'),
+    component: PageView,
+    props: textFieldProps,
   },
   {
     path: '/barChart',
@@ -113,7 +120,8 @@ const routes = [
   {
     path: '/icon',
     name: 'Icon',
-    component: () => import(/* webpackChunkName: "icon" */ '../views/icon'),
+    component: PageView,
+    props: iconProps,
   },
   {
     path: '/:catchAll(.*)',
