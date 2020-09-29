@@ -3,9 +3,11 @@
 | -------- | ----------- | ---- | ------- |
 | data | tree Data | Array | - |
 | columns | 컬럼 리스트 | Array | - |
-| showCheckbox | 체크박스 지원 | Boolean | false |
-| emptyText | 데이터 없을시 표시 메시지 | String | No Data |
+| show-checkbox | 체크박스 지원 | Boolean | false |
+| empty-text | 데이터 없을시 표시 메시지 | String | No Data |
 | render | 트리 표시해줄 render 함수 제공  | Function | - |
+| title-key | title 키 값  | Function | title |
+| children-key | children 배열 키 값 | Function | children |
 
 ## Events
 | Event Name | Description | Return Value |
