@@ -32,17 +32,18 @@
           @click="handleSelect"
           @dblclick="handleDblclick"
         >
-          {{ data.title }}
+          {{ data[titleKey] }}
         </span>
       </template>
 
-      <Tree-node
+      <tree-node
         v-for="(item, i) in children"
         v-if="data.expand"
         :key="i"
         :data="item"
         :show-checkbox="showCheckbox"
         :children-key="childrenKey"
+        :title-key="titleKey"
       />
     </li>
   </ul>
@@ -75,6 +76,10 @@ export default {
     showCheckbox: {
       type: Boolean,
       default: false,
+    },
+    titleKey: {
+      type: String,
+      default: 'title',
     },
   },
   data() {

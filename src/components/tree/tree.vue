@@ -6,6 +6,7 @@
       :data="item"
       :show-checkbox="showCheckbox"
       :children-key="childrenKey"
+      :title-key="titleKey"
     />
     <div v-if="!stateTree.length" :class="[prefixCls + '-empty']">
       {{ emptyText }}
@@ -61,6 +62,10 @@ export default {
       default() {
          return [];
       },
+    },
+    titleKey: {
+      type: String,
+      default: 'title',
     },
   },
   data() {
