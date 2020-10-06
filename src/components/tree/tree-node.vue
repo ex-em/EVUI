@@ -9,12 +9,12 @@
         <ev-loading-mask v-if="showLoading"/>
       </span>
       <ev-checkbox
-        v-if="showCheckbox"
+        v-if="useCheckbox"
         v-model="data.checked"
         type="square"
         size="small"
         after-type="check"
-        :indeterminate="data.indeterminate"
+        :indeterminate.sync="data.indeterminate"
         :disabled="data.disabled || data.disableCheckbox"
         @on-click="handleCheck"
       />
@@ -41,7 +41,7 @@
         v-if="data.expand"
         :key="i"
         :data="item"
-        :show-checkbox="showCheckbox"
+        :use-checkbox="useCheckbox"
         :children-key="childrenKey"
         :title-key="titleKey"
       />
@@ -73,7 +73,7 @@ export default {
       type: String,
       default: 'children',
     },
-    showCheckbox: {
+    useCheckbox: {
       type: Boolean,
       default: false,
     },
@@ -182,7 +182,7 @@ export default {
         return;
       }
       const changes = {
-        checked: this.data.checked && !this.data.indeterminate,
+        checked: this.data.checked,
         nodeKey: this.data.nodeKey,
       };
       this.dispatch('Tree', 'on-click-checkbox', changes);
