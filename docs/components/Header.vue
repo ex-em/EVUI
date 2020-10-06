@@ -1,12 +1,15 @@
 <template>
   <header class="evui-header">
-    <h1 class="evui-header-logo">EXEM Visualization UI</h1>
-    <button
+    <h1 class="evui-header-logo">EVUI</h1>
+    <p class="evui-header-name">EXEM Visualization UI</p>
+    <span
       class="evui-header-theme"
-      @click="changeTheme"
     >
-      {{ theme }}
-    </button>
+      <ev-icon
+        :icon="themeIcon"
+        @click="changeTheme"
+      />
+    </span>
   </header>
 </template>
 
@@ -29,15 +32,13 @@ export default {
       set: value => emit('update:modelValue', value),
     });
     const changeTheme = () => {
-      if (theme.value === 'light') {
-        theme.value = 'dark';
-      } else {
-        theme.value = 'light';
-      }
+      theme.value = theme.value === 'light' ? 'dark' : 'light';
     };
+    const themeIcon = computed(() => (theme.value === 'light' ? 'ev-icon-sun' : 'ev-icon-moon'));
 
     return {
       theme,
+      themeIcon,
       changeTheme,
     };
   },
@@ -51,7 +52,6 @@ a {
   text-decoration: none !important;
 }
 .evui-header {
-  display: flex;
   position: fixed;
   top: 0;
   right: 0;
@@ -62,32 +62,40 @@ a {
   background-color: $color-blue;
   z-index: 10;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-
   &-logo {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 110px;
     height: 30px;
-    line-height: 30px;
-    padding-left: 110px;
     background: url('http://evui.ex-em.com/wp-content/uploads/2017/11/evui_1.png') left center no-repeat;
     background-size: contain;
-    color: rgb(43,87,151);
+    transform: translateY(-50%);
+
+    @include font-hide();
+  }
+  &-name {
     font-size: $font-size-large;
-    font-weight: bold;
+    color: #E8E8E8;
+    text-align: center;
+    line-height: $header-height;
   }
 }
 .evui-header-theme {
   position: absolute;
   top: 50%;
   right: 20px;
-  width: 60px;
-  height: 25px;
+  width: 26px;
+  height: 26px;
   transform: translateY(-50%);
   outline: none;
   border: none;
   cursor: pointer;
-
-  @include themify() {
-    color: themed('font-color-base');
-    background-color: themed('background-color-base');
+  font-size: 26px;
+  color: #E8E8E8;
+  transition: all $animate-fast;
+  &:hover {
+    opacity: 0.5;
   }
 }
 </style>

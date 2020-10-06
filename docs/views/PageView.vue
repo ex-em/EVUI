@@ -2,15 +2,13 @@
   <h2 class="content-title">
     {{ $route.name }}
   </h2>
-  <template v-if="$route.name !== 'Icon'">
-    <example
-      v-for="(value, name, index) in components"
-      :key="`${name}_${index}`"
-      v-bind="value"
-      :title="name"
-    />
-  </template>
-  <icon-list v-else />
+  <example
+    v-for="(value, name, index) in components"
+    :key="`${name}_${index}`"
+    v-bind="value"
+    :title="name"
+  />
+  <icon-list v-if="$route.name === 'Icon'"/>
   <markdown-view
     :source="mdText"
   />

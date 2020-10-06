@@ -1,5 +1,5 @@
 // Font
-$font-size-base: 12px !default;
+$font-size-base: 15px !default;
 $font-size-small: 11px !default;
 $font-size-medium: 14px !default;
 $font-size-large: 16px !default;
@@ -17,6 +17,10 @@ $color-yellow: #FADE4C !default;
 // etc
 $border-radius-base: 2px;
 
+// animate
+$animate-base: 0.3s ease-in-out !default;
+$animate-fast: 0.2s ease-in-out !default;
+
 // layout
-$header-height: 55px;
-$nav-width: 240px;
+$header-height: 60px;
+$nav-width: 320px;
