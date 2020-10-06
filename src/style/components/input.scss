@@ -1,0 +1,75 @@
+.ev-input,
+.ev-textarea {
+  width: 100%;
+  outline: 0;
+  background-color: transparent;
+  border-radius: $default-radius;
+  transition: border $animate-base;
+
+  @include evThemify() {
+    border: 1px solid evThemed('color-line-base');
+  }
+  &:focus,
+  &:hover {
+    @include evThemify() {
+      border: 1px solid evThemed('color-primary');
+    }
+  }
+}
+.ev-input {
+  height: $input-default-height;
+  padding: 0 $input-default-padding;
+}
+.ev-textarea {
+  height: $textarea-default-height;
+  padding: 5px;
+  resize: none;
+}
+
+@include state('readonly') {
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      background-color: evThemed('color-background-lighten');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('color-line-base'), 0.5);
+      }
+    }
+  }
+}
+@include state('disabled') {
+  &, * {
+    cursor: not-allowed !important;
+  }
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      border: 1px solid evThemed('color-disabled');
+      background-color: evThemed('color-background-lighten');
+      color: evThemed('color-disabled');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid evThemed('color-error');
+      }
+    }
+  }
+}
+@include state('error') {
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      border: 1px solid evThemed('color-error');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('color-error'), 0.5);
+      }
+    }
+  }
+}

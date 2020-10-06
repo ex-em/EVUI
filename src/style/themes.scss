@@ -5,7 +5,8 @@ $ev-themes: (
     /* common
     -------------------------- */
     font-color-base: $color-black,
-    color-line-base: #666666,
+    color-line-base: #B2B2B2,
+    color-background-lighten: rgba(#B2B2B2, 0.1),
     color-primary: #1A6AFE,
     color-info: #5AC8FA,
     color-warning: #FF9500,
@@ -19,6 +20,7 @@ $ev-themes: (
     -------------------------- */
     font-color-base: $color-white,
     color-line-base: #666666,
+    color-background-lighten: rgba(#666666, 0.3),
     color-primary: #007AFF,
     color-info: #64D2FF,
     color-warning: #FF9F0A,

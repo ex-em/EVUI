@@ -126,14 +126,10 @@ export default {
   },
   emits: [
     'update:modelValue',
-    'enter',
-    'key-up',
-    'key-down',
     'focus',
     'blur',
     'input',
     'change',
-    'click',
   ],
   setup(props, { emit }) {
     const mv = computed({
@@ -192,66 +188,28 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../style/index.scss';
+@import '../../style/components/input.scss';
 
 .ev-textfield {
   position: relative;
   box-sizing: border-box;
 
   @include clearfix();
+  &:hover {
+    .ev-input,
+    .ev-textfield {
+      @include evThemify() {
+        border: 1px solid evThemed('color-primary');
+      }
+    }
+  }
   &-wrapper {
     position: relative;
-    border-radius: 4px;
-
-    @include evThemify() {
-      border: 1px solid evThemed('color-line-base');
-    }
-  }
-  .ev-input {
-    width: 100%;
-    height: $input-default-height;
-    padding: 0 5px;
-    border: 0;
-    outline: 0;
-    background-color: transparent;
-  }
-  .ev-textarea {
-    width: 100%;
-    height: $textarea-default-height;
-    padding: 5px;
-    border: 0;
-    outline: 0;
-    background-color: transparent;
-    resize: none;
   }
 }
 
-@include state('readonly') {
-  .ev-textfield-wrapper {
-    @include evThemify() {
-      background-color: lighten(evThemed('color-disabled'), 25%);
-    }
-  }
-}
-@include state('disabled') {
-  &, * {
-    cursor: not-allowed !important;
-  }
-  .ev-textfield-wrapper {
-    @include evThemify() {
-      border: 1px solid evThemed('color-disabled');
-      background-color: lighten(evThemed('color-disabled'), 25%);
-      color: evThemed('color-disabled');
-    }
-  }
-  .ev-input,
-  .ev-textarea {
-    @include evThemify() {
-      color: evThemed('color-disabled');
-    }
-  }
-}
 @include state('clearable') {
   .ev-input {
     padding: 0 23px 0 5px;
@@ -332,11 +290,6 @@ export default {
   }
 }
 @include state('error') {
-  .ev-textfield-wrapper {
-    @include evThemify() {
-      border: 1px solid evThemed('color-error');
-    }
-  }
   .ev-textfield-error {
     float: left;
     padding: 5px 0 3px;
