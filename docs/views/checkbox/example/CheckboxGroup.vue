@@ -47,7 +47,7 @@
     >
       <ev-checkbox
         v-for="(info, idx) in checkboxList3"
-        :key="`${idx}`"
+        :key="`${info.label}_${idx}`"
         :label="`${info.label}`"
       >
         {{ info.text }}
@@ -59,18 +59,18 @@
       </span>
       <ev-checkbox
         v-model="allCheck"
-        :indeterminate="indeterminate"
+        v-model:indeterminate="indeterminate"
         @change="changeAllCheck"
       >
         All Check & Indeterminate
       </ev-checkbox>
-      {{ checkboxGroup3 }}
+      {{ checkboxGroup3 }} / {{ indeterminate }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { isEqual, sortBy } from 'lodash-es';
 import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
 
@@ -117,12 +117,9 @@ export default {
     };
     const indeterminate = ref(false);
     const changeGroupValues = (val) => {
-      console.log(`changeGroupValues : ${val}`);
+      allCheck.value = isEqual(sortBy(val), sortBy(labels));
+      indeterminate.value = val.length && val.length !== labels.length;
     };
-
-    watch(checkboxGroup3, (cur) => {
-      allCheck.value = isEqual(sortBy(cur), sortBy(labels));
-    });
 
     return {
       checkboxGroup,

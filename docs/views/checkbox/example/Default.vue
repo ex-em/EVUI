@@ -30,12 +30,6 @@
       </span>
       {{ checkResult2.value }}
     </div>
-    <div class="description">
-      <span class="badge">
-        Event in changeEvent
-      </span>
-      {{ checkResult2.e }}
-    </div>
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
@@ -87,7 +81,6 @@ export default {
     const checkVal2 = ref(true);
     const checkResult2 = reactive({
       value: '',
-      e: null,
     });
     const changeCheck = (value, e) => {
       checkResult2.value = value;

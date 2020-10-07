@@ -39,7 +39,7 @@
   | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
   | label | null | String  | HTML element value (required) |  |
   | disabled | false | Boolean | HTML element disabled attribute |  |
-  | indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
+  | v-model:indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
 >
 
 >
@@ -50,7 +50,7 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
   | disabled | false | Boolean | HTML element disabled attribute |  |
-  | indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
+  | v-model:indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
 
 >### Event
 >> <체크박스그룹>
