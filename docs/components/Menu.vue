@@ -20,11 +20,8 @@ import router from '../router';
 
 export default {
   setup() {
-    const currentMenu = computed(() => router.currentRoute.value.name);
-    const store = (() => {
-      const routesList = router.getRoutes();
-      return routesList.filter(item => item.name !== 'PageNotFound');
-    })();
+    const currentMenu = computed(() => router.currentRoute?.value.name);
+    const store = router.getRoutes().filter(item => item.name !== 'PageNotFound');
     const clickMenu = (routerLink) => {
       router.push({ path: routerLink });
     };

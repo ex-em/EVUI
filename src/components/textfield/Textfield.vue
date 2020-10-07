@@ -3,12 +3,14 @@
     class="ev-textfield"
     :class="[
       `type-${type}`,
-      { 'disabled': disabled },
-      { 'clearable': clearable },
-      { 'readonly': readonly },
-      { 'error': errorMsg },
-      { 'show-password': showPassword },
-      { 'show-maxlength': showMaxLength },
+      {
+        disabled,
+        clearable,
+        readonly,
+        error: errorMsg,
+        'show-password': showPassword,
+        'show-maxlength': showMaxLength,
+      },
     ]"
   >
     <div
@@ -197,14 +199,6 @@ export default {
   box-sizing: border-box;
 
   @include clearfix();
-  &:hover {
-    .ev-input,
-    .ev-textfield {
-      @include evThemify() {
-        border: 1px solid evThemed('color-primary');
-      }
-    }
-  }
   &-wrapper {
     position: relative;
   }

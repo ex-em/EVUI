@@ -4,7 +4,7 @@
   </h2>
   <example
     v-for="(value, name, index) in components"
-    :key="`${name}_${index}`"
+    :key="`${currentMenu}_${name}_${index}`"
     v-bind="value"
     :title="name"
   />
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import router from 'docs/router';
 import Example from 'docs/components/Example';
 import MarkdownView from 'docs/components/MarkdownView';
 import IconList from 'docs/views/icon/example/IconList';
@@ -37,6 +39,10 @@ export default {
     },
   },
   setup() {
+    const currentMenu = computed(() => router.currentRoute?.value.name);
+    return {
+      currentMenu,
+    };
   },
 };
 </script>

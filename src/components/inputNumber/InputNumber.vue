@@ -1,22 +1,18 @@
 <template>
   <div
     class="ev-input-number"
-    :class="[
-      { 'disabled': disabled },
-      { 'readonly': readonly },
-    ]"
+    :class="{
+      disabled,
+      readonly,
+    }"
   >
     <span
-      class="ev-input-number-icon step-up"
-      @click="stepValue('up')"
+      v-for="type in ['up', 'down']"
+      :key="`step-arrow-${type}`"
+      :class="['ev-input-number-icon', `step-${type}`]"
+      @click="stepValue(type)"
     >
-      <i class="ev-icon-s-arrow-up" />
-    </span>
-    <span
-      class="ev-input-number-icon step-down"
-      @click="stepValue('down')"
-    >
-      <i class="ev-icon-s-arrow-down"/>
+      <i :class="`ev-icon-s-arrow-${type}`" />
     </span>
     <input
       v-model="mv"
@@ -34,7 +30,6 @@
       @keydown.enter.prevent="validateValue(mv)"
     />
   </div>
-  mv : {{ mv }} / {{ mv + '' }}
 </template>
 
 <script>
@@ -45,11 +40,7 @@
       return 0;
     }
     const decimal = num.toString().split('.')[1];
-    let precision = 0;
-    if (decimal) {
-      precision = decimal.length;
-    }
-    return precision;
+    return decimal ? decimal.length : 0;
   };
 
   export default {
@@ -106,17 +97,15 @@
       const prevValue = ref(mv.value);
 
       const validateValue = (nextValue) => {
-        let result;
-        if (!nextValue && nextValue !== 0) {
-          result = null;
-        } else {
-          result = nextValue;
-
+        let result = null;
+        if (nextValue || nextValue === 0) {
           if ((props.min && nextValue < props.min)
             || (props.max && nextValue > props.max)
             || isNaN(nextValue)
           ) {
             result = prevValue.value;
+          } else {
+            result = nextValue;
           }
         }
 
@@ -157,25 +146,30 @@
       };
 
       const initValue = () => {
-        let result = mv.value;
+        const hasMaxProps = props.max || props.max === 0;
+        const hasMinProps = props.min || props.min === 0;
 
-        if (mv.value || mv.value === 0) {
-          if ((props.max || props.max === 0) && mv.value > props.max) {
-            result = props.max;
-          }
-          if ((props.min || props.min === 0) && mv.value < props.min) {
-            result = props.min;
+        if (hasMaxProps && hasMinProps) {
+          if (props.max <= props.min) {
+            console.warn('[EVUI][InputNumber] Max value must be greater than min value.');
           }
         }
 
-        validateValue(result);
-
         if (props.step && (props.precision || props.precision === 0)) {
-          const stepPrecision = getPrecision(props.step);
-          if (stepPrecision > props.precision) {
+          if (getPrecision(props.step) > props.precision) {
             console.warn('[EVUI][InputNumber] It cannot be calculated because the step is smaller than the precision setting.');
           }
         }
+
+        let modelValue = mv.value;
+        if (modelValue || modelValue === 0) {
+          if (hasMaxProps && modelValue > props.max) {
+            modelValue = props.max;
+          } else if (hasMinProps && modelValue < props.min) {
+            modelValue = props.min;
+          }
+        }
+        validateValue(modelValue);
       };
 
       onBeforeMount(() => {
@@ -206,14 +200,6 @@
   box-sizing: border-box;
 
   @include clearfix();
-  &:hover {
-    .ev-input,
-    .ev-textfield {
-      @include evThemify() {
-        border: 1px solid evThemed('color-primary');
-      }
-    }
-  }
   .ev-input {
     padding: 0 #{$number-icon-width + $input-default-padding} 0 $input-default-padding;
     text-align: center;
