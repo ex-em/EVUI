@@ -4,7 +4,7 @@
       v-for="(item, i) in stateTree"
       :key="i"
       :data="item"
-      :show-checkbox="showCheckbox"
+      :use-checkbox="useCheckbox"
       :children-key="childrenKey"
       :title-key="titleKey"
     />
@@ -37,7 +37,7 @@ export default {
         return [];
       },
     },
-    showCheckbox: {
+    useCheckbox: {
       type: Boolean,
       default: false,
     },
@@ -183,7 +183,7 @@ export default {
         beforeSelectedNode = this.flatState[currentSelectedKey].node;
         this.$set(beforeSelectedNode, 'selected', false);
       }
-      this.$set(node, 'selected', true);
+      this.$set(node, 'selected', !node.selected);
       this.$emit('on-select', this.getSelectedNodes(), beforeSelectedNode);
       this.$emit('on-click', node);
     },

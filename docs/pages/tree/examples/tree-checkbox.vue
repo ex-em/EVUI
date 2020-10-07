@@ -1,8 +1,9 @@
 <template>
   <div style="width:100%">
     <ev-tree
-      :show-checkbox="true"
+      :use-checkbox="true"
       :data="data"
+      @on-check-change="onCheckChange"
     />
   </div>
 </template>
@@ -47,6 +48,11 @@
           },
         ],
       };
+    },
+    methods: {
+      onCheckChange(val) {
+        console.log(val);
+      },
     },
   };
 </script>
