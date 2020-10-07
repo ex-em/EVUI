@@ -2,15 +2,9 @@
   <div class="case">
     <p class="case-title">Common</p>
     <ev-select
-      v-if="isShow"
       v-model="selectVal1"
       :items="items1"
-    />
-    <br>
-    <ev-select
-      v-model="selectVal2"
-      :placeholder="'phdsfsdfjsdhfdfgdfgdfsdjkfhsjkdhjkk'"
-      :items="items1"
+      @change="changeSelect1"
     />
     <div class="description">
       <button
@@ -21,22 +15,70 @@
       first selectbox value : {{ selectVal1 }}
     </div>
     <div class="description">
-      <button
-        @click="toggleEvSelect"
-      >
-        ON / OFF
-      </button>
+      change val : {{ selectEventVal.val }} / change e : {{ selectEventVal.e }}
     </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Disabled Item</p>
+    <ev-select
+      v-model="selectVal3"
+      :items="items3"
+    />
+    <div class="description">
+      <button
+        @click="disableIdx1"
+      >
+        Disable Items[1]
+      </button>
+      selected value : {{ selectVal3 }}
+    </div>
+    <div class="description">
+      items : {{ items3 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Disabled Select</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      :disabled="isDisabled"
+    />
+    <br>
+    <div class="description">
+      <button
+        @click="disableSelect"
+      >
+        Disable Selectbox
+      </button>
+      selected value : {{ selectVal4 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Clearable Select</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      placeholder="Please Select Item."
+      clearable
+    />
+  </div>
+  <div class="case">
+    <p class="case-title">Filterable Select</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      placeholder="Please Select Item."
+      filterable
+    />
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 
 export default {
   setup() {
     const selectVal1 = ref('value4');
-    const selectVal2 = ref('');
     const items1 = ref([
       {
         name: 'name0name0name0name0name0',
@@ -75,9 +117,11 @@ export default {
         value: 'value8',
       },
     ]);
+    const selectEventVal = reactive({
+      e: null,
+      val: null,
+    });
 
-    const isShow = ref(true);
-    const toggleEvSelect = () => { isShow.value = !isShow.value; };
     const addItem = () => {
       const count = items1.value.length;
       items1.value.push({
@@ -85,14 +129,76 @@ export default {
         value: `value${count}`,
       });
     };
+    const changeSelect1 = (val, e) => {
+      selectEventVal.val = val;
+      selectEventVal.e = e;
+    };
+
+    const selectVal3 = ref('value1');
+    const items3 = ref([
+      {
+        name: 'name1',
+        value: 'value1',
+      },
+      {
+        name: 'name2',
+        value: 'value2',
+        disabled: true,
+      },
+      {
+        name: 'name3',
+        value: 'value3',
+      },
+    ]);
+    const disableIdx1 = () => {
+      items3.value[1].disabled = !items3.value[1].disabled;
+    };
+
+    const selectVal4 = ref('value2');
+    const items4 = ref([
+      {
+        name: 'name1',
+        value: 'value1',
+      },
+      {
+        name: 'name2',
+        value: 'value2',
+      },
+      {
+        name: 'name3',
+        value: 'value3',
+      },
+      {
+        name: 'name13',
+        value: 'value13',
+      },
+      {
+        name: 'name23',
+        value: 'value23',
+      },
+      {
+        name: 'name33',
+        value: 'value33',
+      },
+    ]);
+    const isDisabled = ref(true);
+    const disableSelect = () => { isDisabled.value = !isDisabled.value; };
 
     return {
-      isShow,
-      toggleEvSelect,
       selectVal1,
-      selectVal2,
       items1,
+      selectEventVal,
       addItem,
+      changeSelect1,
+
+      selectVal3,
+      items3,
+      disableIdx1,
+
+      selectVal4,
+      items4,
+      isDisabled,
+      disableSelect,
     };
   },
 };
