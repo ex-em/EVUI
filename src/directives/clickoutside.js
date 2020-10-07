@@ -26,7 +26,14 @@ const selectClickoutside = {
     let dropLi = null;
     const bubble = binding.modifiers.bubble;
     const selectDropbox = document.body.getElementsByClassName('ev-select-dropdown');
+    const TAG_NAME_CLS = 'ev-tag-name';
+    const TAG_SUFFIX_CLOSE_CLS = 'ev-tag-suffix-close';
     const handler = (e) => {
+      if (e.target.classList.contains(TAG_NAME_CLS)
+        || e.target.classList.contains(TAG_SUFFIX_CLOSE_CLS)
+      ) {
+        return;
+      }
       if (selectDropbox && selectDropbox.length) {
         if (bubble || (componentEl !== e.target && !componentEl.contains(e.target))) {
           for (let i = 0; i < selectDropbox.length; i++) {

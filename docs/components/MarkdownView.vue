@@ -12,19 +12,12 @@
 <script>
 import { computed } from 'vue';
 import marked from 'marked';
-import hljs from 'highlight.js';
+import highlight from 'docs/directives/highlight';
 
 export default {
   name: 'Example',
   directives: {
-    highlight: {
-      mounted(el) {
-        const blocks = el.querySelectorAll('pre');
-        blocks.forEach((block) => {
-          hljs.highlightBlock(block);
-        });
-      },
-    },
+    highlight,
   },
   components: {
   },
