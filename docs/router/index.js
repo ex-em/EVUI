@@ -5,6 +5,7 @@ import checkboxProps from 'docs/views/checkbox/props';
 import selectProps from 'docs/views/select/props';
 import radioProps from 'docs/views/radio/props';
 import textFieldProps from 'docs/views/textField/props';
+import inputNumberProps from 'docs/views/inputNumber/props';
 import iconProps from 'docs/views/icon/props';
 
 const routes = [
@@ -41,15 +42,22 @@ const routes = [
     props: radioProps,
   },
   {
-    path: '/inputNumber',
-    name: 'InputNumber',
-    component: () => import(/* webpackChunkName: "inputNumber" */ '../views/inputNumber'),
-  },
-  {
     path: '/select',
     name: 'Select',
     component: PageView,
     props: selectProps,
+  },
+  {
+    path: '/textField',
+    name: 'TextField',
+    component: PageView,
+    props: textFieldProps,
+  },
+  {
+    path: '/inputNumber',
+    name: 'InputNumber',
+    component: PageView,
+    props: inputNumberProps,
   },
   {
     path: '/slider',
@@ -80,12 +88,6 @@ const routes = [
     path: '/toggle',
     name: 'Toggle',
     component: () => import(/* webpackChunkName: "toggle" */ '../views/toggle'),
-  },
-  {
-    path: '/textField',
-    name: 'TextField',
-    component: PageView,
-    props: textFieldProps,
   },
   {
     path: '/barChart',

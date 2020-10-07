@@ -51,7 +51,7 @@ module.exports = {
     'no-bitwise': 'off',
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-console': ['error', { allow: ['log'] }],
+    'no-console': ['error', { allow: ['log', 'warn'] }],
     'class-methods-use-this': 'off',
     'prefer-promise-reject-errors': 'off',
     'prefer-destructuring': 'off',

@@ -1,19 +1,16 @@
 ### Desc
-- 태그는 &lt;ev-textfield&gt;(이하 <텍스트필드>)으로 정의
+- 태그는 &lt;ev-input-number&gt;(이하 <인풋넘버>)으로 정의
 
 ```
-<ev-textfield
+<ev-input-number
   옵션
 />
 ```
-- <텍스트필드>에서 바인딩 옵션 설정으로 의도에 맞는 텍스트필드 구현
+- <인풋넘버>에서 바인딩 옵션 설정으로 의도에 맞는 텍스트필드 구현
 - 기본 설정 스타일
 ```css
 width: 100%;
-/* type = text, password */
 height: 35px;
-/* type = textarea */
-height: 100px;
 ```
  
 
@@ -22,13 +19,13 @@ height: 100px;
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
 | v-model | null | String, Number | 컴포넌트 입력 값 | |
-| type | String | 'text' | 타입 설정 | 'text', 'password', 'textarea' |
 | disabled | Boolean | false | 비활성화 여부 | true, false |
 | readonly | Boolean | false | 읽기 전용 여부 | true, false |
 | placeholder | String | | Input / Textarea의 placeholder 값 | |
-| maxLength | Number | Infinity | value 의 최대길이 제한 길이 | |
-| showMaxLength | Boolean | false | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false |
-| errorMsg | String | | Error 표현을 위한 메시지 |  |
+| max | Number | Infinity | value 의 최대값 | |
+| min | Number | Infinity | value 의 최소값 | |
+| step | Number | 1 | 우측 화살표 클릭 및 키보드 ArrowUp / ArrowDown 이벤트를 통한 변화 값 | |
+| precision | Number |  | 고정 소수점 값. 0~100 사이의 정수 | |
 
 ### Event
 

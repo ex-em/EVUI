@@ -7,7 +7,10 @@
       {{ description }}
     </p>
     <div class="article-example">
-      <div class="view">
+      <div
+        ref="viewArea"
+        class="view"
+      >
         <component :is="component" />
       </div>
       <div
@@ -17,11 +20,12 @@
         <div
           ref="codeWrapper"
           class="code-wrapper"
+          :style="{ height: `${viewAreaHeight}px` }"
         >
-          <pre>
+          <pre class="html">
             {{ parsedData?.template?.content }}
           </pre>
-          <pre>
+          <pre class="javascript">
             {{ parsedData?.script?.content }}
           </pre>
         </div>
@@ -29,7 +33,8 @@
           class="btn-show-more"
           @click="clickExpend"
         >
-          {{ codeExpend ? '▲ Fold the code' : '▼ Unfold the code' }}
+          <i class="ev-icon-document-vertically" />
+          {{ codeExpend ? 'Hide the code' : 'Show more code' }}
         </div>
       </div>
     </div>
@@ -37,7 +42,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import hljs from 'highlight.js';
 
 export default {
@@ -80,10 +85,18 @@ export default {
       }
     };
 
+    const viewArea = ref();
+    const viewAreaHeight = ref();
+    onMounted(() => {
+      viewAreaHeight.value = viewArea.value.offsetHeight;
+    });
+
     return {
       codeExpend,
       codeWrapper,
       clickExpend,
+      viewArea,
+      viewAreaHeight,
     };
   },
 };
@@ -137,6 +150,7 @@ export default {
     margin: 15px 0 20px;
     border-radius: 4px;
     font-size: 13px;
+    word-break: break-all;
 
     @include themify() {
       background-color: themed('background-color-description');
@@ -177,29 +191,37 @@ export default {
     max-width: 700px;
     overflow: hidden;
     .code-wrapper {
-      height: 50px;
+      height: 100px;
+      min-height: 350px;
+      overflow: hidden;
     }
     .btn-show-more {
+      display: flex;
       position: absolute;
+      top: 0;
       left: 0;
-      bottom: 0;
       width: 100%;
-      height: 45px;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
       line-height: 45px;
       background-color: rgba($color-yellow, 0.5);
+      backdrop-filter: blur(2px);
       color: $color-black;
       text-align: center;
       cursor: pointer;
+      transition: all $animate-fast;
       &:hover {
-        background-color: $color-yellow;
+        background-color: rgba($color-yellow, 0.8);
       }
     }
     &.expend {
       .code-wrapper {
-        height: auto;
-        max-height: 600px;
-        padding-bottom: 45px;
+        padding-top: 40px;
         overflow-y: auto;
+      }
+      .btn-show-more {
+        height: 40px;
       }
     }
   }
@@ -216,6 +238,18 @@ export default {
     .code {
       max-width: none;
       width: 100%;
+      .code-wrapper {
+        height: 40px !important;
+        transition: all $animate-fast;
+      }
+      .btn-show-more {
+        height: 40px;
+      }
+      &.expend {
+        .code-wrapper {
+          height: 300px !important;
+        }
+      }
     }
   }
 }

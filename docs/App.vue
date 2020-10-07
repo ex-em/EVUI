@@ -36,13 +36,45 @@ export default {
 </script>
 
 <style lang="scss">
+$file-path: './assets/fonts/';
+
 @import './style/index.scss';
+
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Bold.ttf') format('trutype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Medium.ttf') format('trutype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url($file-path + 'Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: 'Roboto', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+}
+.evui-wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding: $header-height 0 0 $nav-width;
+  font-size: $font-size-base;
+
+  @include themify() {
+    color: themed('font-color-base');
+    background-color: themed('background-color-base');
+  }
 }
 .dark {
   @import './style/lib/highlightjs.hybrid';
@@ -54,16 +86,6 @@ export default {
   &, * {
     font-size: 14px;
     font-family: consolas, monospace;
-  }
-}
-.evui-wrapper {
-  position: relative;
-  min-height: 100vh;
-  padding: $header-height 0 0 $nav-width;
-
-  @include themify() {
-    color: themed('font-color-base');
-    background-color: themed('background-color-base');
   }
 }
 </style>
