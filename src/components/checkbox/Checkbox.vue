@@ -8,10 +8,12 @@
     ]"
   >
     <input
+      ref="checkbox"
       v-model="mv"
       type="checkbox"
       :disabled="disabled"
       :value="label"
+      :readonly="readonly"
       @change="changeMv"
     />
     <span
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { inject, nextTick, computed } from 'vue';
+import { ref, computed, watch, nextTick, inject } from 'vue';
 
 export default {
   name: 'EvCheckbox',
@@ -47,6 +49,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
+    indeterminate: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
     'update:modelValue': [Boolean],
@@ -60,8 +70,9 @@ export default {
         set: val => emit('update:modelValue', val),
       }),
     );
-    const refLabel = computed(() => props.label);
+    const checkbox = ref(null);
 
+    const refLabel = computed(() => props.label);
     const checked = computed(() => {
       if (Array.isArray(mv.value)) {
         return mv.value.includes(refLabel.value);
@@ -69,13 +80,19 @@ export default {
       return mv.value;
     });
 
-    const changeMv = async (e) => {
+    watch(
+      () => props.indeterminate,
+      (val) => { checkbox.value.indeterminate = val; },
+    );
+
+    const changeMv = async () => {
       await nextTick();
-      emit('change', mv.value, e);
+      emit('change', mv.value);
     };
 
     return {
       mv,
+      checkbox,
       checked,
       changeMv,
     };

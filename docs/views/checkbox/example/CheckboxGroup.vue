@@ -11,7 +11,7 @@
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup
+        Checkbox Group Values
       </span>
       {{ checkboxGroup }}
     </div>
@@ -28,7 +28,7 @@
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup2
+        Checkbox Group Values
       </span>
       <button
         class="btn"
@@ -36,31 +36,33 @@
       >
         Add 'Option A'
       </button>
-      {{ checkboxGroup2 }}
+      &nbsp; {{ checkboxGroup2 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">All Check</p>
     <ev-checkbox-group
       v-model="checkboxGroup3"
+      @change="changeGroupValues"
     >
       <ev-checkbox
         v-for="(info, idx) in checkboxList3"
-        :key="idx"
-        :label="info.label"
+        :key="`${idx}`"
+        :label="`${info.label}`"
       >
         {{ info.text }}
       </ev-checkbox>
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup3
+        Checkbox Group Values
       </span>
       <ev-checkbox
         v-model="allCheck"
+        :indeterminate="indeterminate"
         @change="changeAllCheck"
       >
-        ALL CHECK
+        All Check & Indeterminate
       </ev-checkbox>
       {{ checkboxGroup3 }}
     </div>
@@ -113,6 +115,10 @@ export default {
         checkboxGroup3.value = [];
       }
     };
+    const indeterminate = ref(false);
+    const changeGroupValues = (val) => {
+      console.log(`changeGroupValues : ${val}`);
+    };
 
     watch(checkboxGroup3, (cur) => {
       allCheck.value = isEqual(sortBy(cur), sortBy(labels));
@@ -125,7 +131,9 @@ export default {
       checkboxGroup3,
       allCheck,
       checkboxList3,
+      indeterminate,
       changeAllCheck,
+      changeGroupValues,
     };
   },
 };

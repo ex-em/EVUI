@@ -9,18 +9,18 @@
     <div class="description">
       <button
         class="btn"
-        @click="clickButton1"
+        @click="clickButton"
       >
         click to change the check value
       </button>
-      {{ checkVal1 }}
+      &nbsp; {{ checkVal1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Use Change Event</p>
     <ev-checkbox
       v-model="checkVal2"
-      @change="changeVal2"
+      @change="changeCheck"
     >
       Single Checkbox
     </ev-checkbox>
@@ -40,7 +40,7 @@
   <div class="case">
     <p class="case-title">Disabled</p>
     <ev-checkbox
-      v-model="checkVal3"
+      v-model="checkVal1"
       :disabled="isDisable"
     >
       DISABLED
@@ -54,6 +54,24 @@
       </button>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Indeterminate</p>
+    <ev-checkbox
+      v-model="checkVal3"
+      :indeterminate="isIndeterminate"
+    >
+      INDETERMINATE
+    </ev-checkbox>
+    <div class="description">
+      <button
+        class="btn"
+        @click="toggleIndeterminate"
+      >
+        toggle to indeterminate
+      </button>
+      &nbsp; {{ isIndeterminate }}
+    </div>
+  </div>
 </template>
 
 <script>
@@ -62,7 +80,7 @@ import { ref, reactive } from 'vue';
 export default {
   setup() {
     const checkVal1 = ref(false);
-    const clickButton1 = () => {
+    const clickButton = () => {
       checkVal1.value = !checkVal1.value;
     };
 
@@ -71,26 +89,36 @@ export default {
       value: '',
       e: null,
     });
-    const changeVal2 = (value, e) => {
+    const changeCheck = (value, e) => {
       checkResult2.value = value;
       checkResult2.e = e;
     };
 
-    const checkVal3 = ref(false);
     const isDisable = ref(true);
     const toggleDisable = () => {
       isDisable.value = !isDisable.value;
     };
 
+    const checkVal3 = ref(false);
+    const isIndeterminate = ref(false);
+    const toggleIndeterminate = () => {
+      isIndeterminate.value = !isIndeterminate.value;
+    };
+
     return {
       checkVal1,
+      clickButton,
+
       checkVal2,
-      clickButton1,
       checkResult2,
-      changeVal2,
-      checkVal3,
+      changeCheck,
+
       isDisable,
       toggleDisable,
+
+      checkVal3,
+      isIndeterminate,
+      toggleIndeterminate,
     };
   },
 };
