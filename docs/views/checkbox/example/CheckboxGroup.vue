@@ -20,6 +20,7 @@
     <p class="case-title">Event</p>
     <ev-checkbox-group
       v-model="checkboxGroup2"
+      @change="changeGroup2"
     >
       <ev-checkbox label="Option A">A</ev-checkbox>
       <ev-checkbox label="Option B">B</ev-checkbox>
@@ -37,6 +38,12 @@
         Add 'Option A'
       </button>
       &nbsp; {{ checkboxGroup2 }}
+    </div>
+    <div class="description">
+      <span class="badge">
+        Checkbox Group Change Event
+      </span>
+      &nbsp; {{ changeEventVal }}
     </div>
   </div>
   <div class="case">
@@ -85,6 +92,8 @@ export default {
         checkboxGroup2.value.push('Option A');
       }
     };
+    const changeEventVal = ref([]);
+    const changeGroup2 = (val) => { changeEventVal.value = val; };
 
     const checkboxGroup3 = ref([]);
     const allCheck = ref(false);
@@ -125,6 +134,8 @@ export default {
       checkboxGroup,
       checkboxGroup2,
       clickButton,
+      changeEventVal,
+      changeGroup2,
       checkboxGroup3,
       allCheck,
       checkboxList3,
