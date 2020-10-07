@@ -15,6 +15,7 @@ $ev-themes: (
     background-color-base: $color-white,
     border-color-base: #DDDDDD,
     font-color-base: $color-black,
+    font-color-nav: #737373,
     background-color-description: #F8F8F8,
   ),
   dark: (
@@ -31,6 +32,7 @@ $ev-themes: (
     background-color-base: #0D0D0D,
     border-color-base: #222222,
     font-color-base: $color-white,
+    font-color-nav: #DDDDDD,
     background-color-description: #333333,
   ),
 ) !default;
