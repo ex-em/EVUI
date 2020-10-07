@@ -53,7 +53,7 @@
             </span>
             <span
               class="ev-tag-suffix"
-              @click.stop.prevent="removeMv(item.value)"
+              @click.stop="removeMv(item.value)"
             >
               <i class="ev-tag-suffix-close ev-icon-error" />
             </span>
@@ -69,7 +69,7 @@
             </span>
             <span
               class="ev-tag-suffix"
-              @click.stop.prevent="removeMv(selectedModel[0].value)"
+              @click.stop="removeMv(selectedModel[0].value)"
             >
               <i class="ev-tag-suffix-close ev-icon-error" />
             </span>
@@ -89,7 +89,7 @@
       <span
         v-show="isClearableIcon"
         class="ev-input-suffix"
-        @click.stop.prevent="removeAllMv"
+        @click.stop="removeAllMv"
       >
         <i class="ev-icon-error" />
       </span>
@@ -107,7 +107,7 @@
         v-model="filterTextRef"
         type="text"
         class="ev-input-query"
-        placeholder="Please Enter a Search Words."
+        :placeholder="searchPlaceholder"
       />
       <div
         ref="itemWrapper"
@@ -133,7 +133,7 @@
         </ul>
         <ul v-else>
           <li class="ev-select-dropdown-item disabled">
-            NO MATCHING DATA
+            {{ noMatchingText }}
           </li>
         </ul>
       </div>
@@ -158,6 +158,14 @@ export default {
     placeholder: {
       type: String,
       default: '',
+    },
+    searchPlaceholder: {
+      type: String,
+      default: 'Please Enter a Search Words.',
+    },
+    noMatchingText: {
+      type: String,
+      default: 'NO MATCHING DATA',
     },
     items: {
       type: Array,

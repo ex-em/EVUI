@@ -32,6 +32,8 @@
   | disabled | false | Boolean | <셀렉트> 사용가능 여부 |  |
   | clearable | false | Boolean | <셀렉트>에 선택된 항목들 모두 clear기능 사용여부 |  |
   | filterable | false | Boolean | <셀렉트> 항목들 필터링 기능 사용여부 |  |
+  | searchPlaceholder | '' | String | <셀렉트> 필터링의 표기문구 |  |
+  | noMatchingText | '' | String | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
 > - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫혀야한다.
 >
 
@@ -48,6 +50,8 @@
   | clearable | false | Boolean | <셀렉트>에 선택된 항목들 모두 clear기능 사용여부 |  |
   | collapse-tags | false | Boolean | <셀렉트>에 선택된 항목의 생략 태그기능 사용여부 | { 항목1 (x) } { +1 } |
   | filterable | false | Boolean | <셀렉트> 항목들 필터링 기능 사용여부 |  |
+  | searchPlaceholder | '' | String | <셀렉트> 필터링의 표기문구 |  |
+  | noMatchingText | '' | String | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
 > - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫히지 말아야 한다.
 >
 

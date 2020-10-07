@@ -4,6 +4,7 @@
     <ev-select
       v-model="selectVal1"
       :items="items1"
+      placeholder="Please select values."
       multiple
     />
     <div class="description">

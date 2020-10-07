@@ -4,6 +4,7 @@
     <ev-select
       v-model="selectVal1"
       :items="items1"
+      placeholder="Please select value."
       @change="changeSelect1"
     />
     <div class="description">
@@ -78,7 +79,7 @@ import { ref, reactive } from 'vue';
 
 export default {
   setup() {
-    const selectVal1 = ref('value4');
+    const selectVal1 = ref('');
     const items1 = ref([
       {
         name: 'name0name0name0name0name0',
