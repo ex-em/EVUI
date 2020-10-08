@@ -84,3 +84,11 @@
   font-size: 0;
   text-indent: -999px;
 }
+@mixin visible-hide() {
+  position: absolute;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  z-index: -1;
+}

@@ -1,6 +1,7 @@
 <template>
   <div
     class="ev-radio-group"
+    :class="{ 'type-button': type === 'button' }"
     role="group"
   >
     <slot />
@@ -17,12 +18,16 @@ export default {
       type: [String, Number, Symbol, Boolean],
       default: null,
     },
+    type: {
+      type: String,
+      default: 'radio',
+    },
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
-      set: label => emit('update:modelValue', label),
+      set: val => emit('update:modelValue', val),
     });
     provide('EvRadioGroupMv', mv);
 

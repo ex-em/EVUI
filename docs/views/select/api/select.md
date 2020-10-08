@@ -54,7 +54,7 @@
 1) 셀렉트
  | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | change | event | <셀렉트> 내 v-model 변화 이벤트 감지 |
+ | change | newValue, event | <셀렉트> 내 v-model 변화 이벤트 감지 |
 
 >### 참고
  - 

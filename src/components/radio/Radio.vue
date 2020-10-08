@@ -2,8 +2,10 @@
   <label
     class="ev-radio"
     :class="[
-      { 'disabled': isDisabled },
-      { 'checked': isChecked },
+      {
+        disabled,
+        checked,
+      },
       size,
     ]"
   >
@@ -12,8 +14,8 @@
       type="radio"
       class="ev-radio-input"
       :value="label"
-      :disabled="isDisabled"
-      @change="onChange"
+      :disabled="disabled"
+      @change.stop="changeMv"
     >
     <span class="ev-radio-label">
       <template v-if="$slots.default">
@@ -62,7 +64,7 @@ export default {
       }),
     );
 
-    const onChange = inject(
+    const changeMv = inject(
       'EvRadioGroupChange',
       async (e) => {
         await nextTick();
@@ -70,14 +72,12 @@ export default {
       },
     );
 
-    const isDisabled = computed(() => props.disabled);
-    const isChecked = computed(() => mv.value === props.label);
+    const checked = computed(() => mv.value === props.label);
 
     return {
       mv,
-      isDisabled,
-      isChecked,
-      onChange,
+      checked,
+      changeMv,
     };
   },
 };
@@ -89,6 +89,7 @@ export default {
 .ev-radio {
   $button-size-default: 18px;
   display: inline-block;
+  position: relative;
   padding: 0 5px;
   margin-right: 30px;
   user-select: none;
@@ -97,15 +98,59 @@ export default {
   &-label {
     padding-left: 5px;
   }
+}
 
-  @include state('disabled') {
+@include state('disabled') {
+  .ev-radio-label {
     @include evThemify() {
-      color: evThemed('color-disabled');
+    color: evThemed('color-disabled');
     }
-    input,
-    .ev-radio-wrapper {
-      cursor: not-allowed !important;
+  }
+  .ev-radio-input,
+  .ev-radio-label {
+    cursor: not-allowed !important;
+  }
+}
+@include state('type-button') {
+  .ev-radio {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+
+    @include evThemify() {
+      border: 1px solid evThemed('color-line-base');
+      border-left: 0;
     }
+    &:first-child {
+      border-radius: $border-radius-button 0 0 $border-radius-button;
+
+      @include evThemify() {
+        border-left: 1px solid evThemed('color-line-base');
+      }
+    }
+    &:last-child {
+      border-radius: 0 $border-radius-button $border-radius-button 0;
+    }
+    &.checked {
+      color: $color-white;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
+    }
+    &.disabled.checked {
+      @include evThemify() {
+        background-color: rgba(evThemed('color-line-base'), 0.5);
+      }
+    }
+  }
+  .ev-radio-input {
+    @include visible-hide();
+  }
+  .ev-radio-label {
+    display: inline-block;
+    padding: 7px 12px;
   }
 }
 </style>
