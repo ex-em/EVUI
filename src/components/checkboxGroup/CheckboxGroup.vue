@@ -19,8 +19,8 @@ export default {
     },
   },
   emits: {
-    'update:modelValue': [Array],
-    change: [Array],
+    'update:modelValue': null,
+    change: null,
   },
   setup(props, { emit }) {
     const mv = computed({
@@ -29,9 +29,9 @@ export default {
     });
     provide('EvCheckboxGroupMv', mv);
 
-    const change = async () => {
+    const change = async (e) => {
       await nextTick();
-      emit('change', mv.value);
+      emit('change', mv.value, e);
     };
     provide('EvCheckboxGroupChange', change);
   },

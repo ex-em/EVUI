@@ -16,17 +16,13 @@
       :readonly="readonly"
       @change="changeMv"
     />
-    <span
-      v-if="$slots.default"
-      class="ev-checkbox-label"
-    >
-      <slot />
-    </span>
-    <span
-      v-else
-      class="ev-checkbox-label"
-    >
-      {{ label }}
+    <span class="ev-checkbox-label">
+      <template v-if="$slots.default">
+        <slot />
+      </template>
+      <template v-else>
+        {{ label }}
+      </template>
     </span>
   </label>
 </template>
@@ -59,7 +55,7 @@ export default {
     },
   },
   emits: {
-    'update:modelValue': [Boolean],
+    'update:modelValue': null,
     'update:indeterminate': [Boolean],
     change: null,
   },
@@ -108,9 +104,9 @@ export default {
      */
     const changeMv = inject(
       'EvCheckboxGroupChange',
-      async () => {
+      async (e) => {
         await nextTick();
-        emit('change', mv.value);
+        emit('change', mv.value, e);
       },
     );
 
