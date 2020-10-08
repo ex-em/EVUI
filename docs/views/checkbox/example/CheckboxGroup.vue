@@ -78,6 +78,32 @@
       {{ checkboxGroup3 }} / {{ indeterminate }}
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Button Type</p>
+    <ev-checkbox-group
+      v-model="buttonGroup"
+      type="button"
+    >
+      <ev-checkbox label="Option A" />
+      <ev-checkbox label="Option B" />
+      <ev-checkbox label="Option C" />
+    </ev-checkbox-group>
+    <br>
+    <ev-checkbox-group
+      v-model="buttonGroup"
+      type="button"
+    >
+      <ev-checkbox
+        label="Option A"
+        disabled
+      />
+      <ev-checkbox
+        label="Option B"
+        disabled
+      />
+      <ev-checkbox label="Option C" />
+    </ev-checkbox-group>
+  </div>
 </template>
 
 <script>
@@ -131,8 +157,10 @@ export default {
     const indeterminate = ref(false);
     const changeGroupValues = (val) => {
       allCheck.value = isEqual(sortBy(val), sortBy(labels));
-      indeterminate.value = val.length && val.length !== labels.length;
+      indeterminate.value = !!(val.length && val.length !== labels.length);
     };
+
+    const buttonGroup = ref([]);
 
     return {
       checkboxGroup,
@@ -146,6 +174,7 @@ export default {
       indeterminate,
       changeAllCheck,
       changeGroupValues,
+      buttonGroup,
     };
   },
 };
