@@ -6,8 +6,12 @@
     >
       <ev-checkbox label="Option A">A</ev-checkbox>
       <ev-checkbox label="Option B" />
-      <ev-checkbox label="Option C" />
-      <ev-checkbox label="Option D" />
+      <div>
+        <ev-checkbox label="Option C" />
+      </div>
+      <div>
+        <ev-checkbox label="Option D" />
+      </div>
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
