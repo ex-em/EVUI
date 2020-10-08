@@ -98,6 +98,9 @@ export default {
   &-label {
     padding-left: 5px;
   }
+  &-input {
+    cursor: pointer;
+  }
 }
 
 @include state('disabled') {

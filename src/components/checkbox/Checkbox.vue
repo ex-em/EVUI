@@ -1,6 +1,5 @@
 <template>
   <label
-    role="checkbox"
     class="ev-checkbox"
     :class="[
       { disabled, },
@@ -11,6 +10,7 @@
       ref="checkbox"
       v-model="mv"
       type="checkbox"
+      class="ev-checkbox-input"
       :disabled="disabled"
       :value="label"
       :readonly="readonly"
@@ -136,21 +136,65 @@ export default {
   margin-right: 30px;
   cursor: pointer;
   user-select: none;
-  input {
+  &-label {
+    padding-left: 5px;
+  }
+  &-input {
     cursor: pointer;
   }
-  &.disabled {
-    cursor: not-allowed;
+}
 
+@include state('disabled') {
+  .ev-checkbox-label {
     @include evThemify() {
       color: evThemed('color-disabled');
     }
-    input {
-      cursor: not-allowed;
-    }
+  }
+  .ev-checkbox-input,
+  .ev-checkbox-label {
+    cursor: not-allowed !important;
   }
 }
-.ev-checkbox-label {
-  padding-left: 10px;
+@include state('type-button') {
+  .ev-checkbox {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+
+    @include evThemify() {
+      border: 1px solid evThemed('color-line-base');
+      border-left: 0;
+    }
+    &:first-child {
+      border-radius: $border-radius-button 0 0 $border-radius-button;
+
+      @include evThemify() {
+        border-left: 1px solid evThemed('color-line-base');
+      }
+    }
+    &:last-child {
+      border-radius: 0 $border-radius-button $border-radius-button 0;
+    }
+    &.checked {
+      color: $color-white;
+
+      @include evThemify() {
+        background-color: evThemed('color-primary');
+      }
+    }
+    &.disabled.checked {
+      @include evThemify() {
+        background-color: rgba(evThemed('color-line-base'), 0.5);
+      }
+    }
+  }
+  .ev-checkbox-input {
+    @include visible-hide();
+  }
+  .ev-checkbox-label {
+    display: inline-block;
+    padding: 7px 12px;
+  }
 }
 </style>

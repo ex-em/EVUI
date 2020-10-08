@@ -1,6 +1,7 @@
 <template>
   <div
     class="ev-checkbox-group"
+    :class="{ 'type-button': type === 'button' }"
     role="group"
   >
     <slot />
@@ -16,6 +17,10 @@ export default {
     modelValue: {
       type: Array,
       default: () => [],
+    },
+    type: {
+      type: String,
+      default: 'checkbox',
     },
   },
   emits: {
