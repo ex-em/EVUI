@@ -15,14 +15,14 @@
 ### Props
 #### <라디오그룹>
 
-| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+| 이름 | 디폴트 | 타입 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
 | v-model | null | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
 | type | radio | String | 라디오 버튼 스타일 | radio, button |
 
 #### <라디오>
 
-| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+| 이름 | 디폴트 | 타입 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
 | v-model | null | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
 | label | null | String, Number, Symbol, Boolean | HTML element value (required) |  |
