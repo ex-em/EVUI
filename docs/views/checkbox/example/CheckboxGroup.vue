@@ -6,12 +6,16 @@
     >
       <ev-checkbox label="Option A">A</ev-checkbox>
       <ev-checkbox label="Option B" />
-      <ev-checkbox label="Option C" />
-      <ev-checkbox label="Option D" />
+      <div>
+        <ev-checkbox label="Option C" />
+      </div>
+      <div>
+        <ev-checkbox label="Option D" />
+      </div>
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup
+        Checkbox Group Values
       </span>
       {{ checkboxGroup }}
     </div>
@@ -20,6 +24,7 @@
     <p class="case-title">Event</p>
     <ev-checkbox-group
       v-model="checkboxGroup2"
+      @change="changeGroup2"
     >
       <ev-checkbox label="Option A">A</ev-checkbox>
       <ev-checkbox label="Option B">B</ev-checkbox>
@@ -28,7 +33,7 @@
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup2
+        Checkbox Group Values
       </span>
       <button
         class="btn"
@@ -36,39 +41,47 @@
       >
         Add 'Option A'
       </button>
-      {{ checkboxGroup2 }}
+      &nbsp; {{ checkboxGroup2 }}
+    </div>
+    <div class="description">
+      <span class="badge">
+        Checkbox Group Change Event
+      </span>
+      &nbsp; {{ changeEventVal }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">All Check</p>
     <ev-checkbox-group
       v-model="checkboxGroup3"
+      @change="changeGroupValues"
     >
       <ev-checkbox
         v-for="(info, idx) in checkboxList3"
-        :key="idx"
-        :label="info.label"
+        :key="`${info.label}_${idx}`"
+        :label="`${info.label}`"
       >
         {{ info.text }}
       </ev-checkbox>
     </ev-checkbox-group>
     <div class="description">
       <span class="badge">
-        checkboxGroup3
+        Checkbox Group Values
       </span>
       <ev-checkbox
         v-model="allCheck"
+        v-model:indeterminate="indeterminate"
         @change="changeAllCheck"
       >
-        ALL CHECK
+        All Check & Indeterminate
       </ev-checkbox>
-      {{ checkboxGroup3 }}
+      {{ checkboxGroup3 }} / {{ indeterminate }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { isEqual, sortBy } from 'lodash-es';
 import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
 
@@ -83,6 +96,8 @@ export default {
         checkboxGroup2.value.push('Option A');
       }
     };
+    const changeEventVal = ref([]);
+    const changeGroup2 = (val) => { changeEventVal.value = val; };
 
     const checkboxGroup3 = ref([]);
     const allCheck = ref(false);
@@ -113,19 +128,24 @@ export default {
         checkboxGroup3.value = [];
       }
     };
-
-    watch(checkboxGroup3, (cur) => {
-      allCheck.value = isEqual(sortBy(cur), sortBy(labels));
-    });
+    const indeterminate = ref(false);
+    const changeGroupValues = (val) => {
+      allCheck.value = isEqual(sortBy(val), sortBy(labels));
+      indeterminate.value = val.length && val.length !== labels.length;
+    };
 
     return {
       checkboxGroup,
       checkboxGroup2,
       clickButton,
+      changeEventVal,
+      changeGroup2,
       checkboxGroup3,
       allCheck,
       checkboxList3,
+      indeterminate,
       changeAllCheck,
+      changeGroupValues,
     };
   },
 };

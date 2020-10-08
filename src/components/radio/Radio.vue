@@ -15,17 +15,13 @@
       :disabled="isDisabled"
       @change="onChange"
     >
-    <span
-      v-if="$slots.default"
-      class="ev-radio-label"
-    >
-      <slot />
-    </span>
-    <span
-      v-else
-      class="ev-radio-label"
-    >
-      {{ label }}
+    <span class="ev-radio-label">
+      <template v-if="$slots.default">
+        <slot />
+      </template>
+      <template v-else>
+        {{ label }}
+      </template>
     </span>
   </label>
 </template>
@@ -66,10 +62,13 @@ export default {
       }),
     );
 
-    const onChange = async (e) => {
-      await nextTick();
-      emit('change', mv.value, e);
-    };
+    const onChange = inject(
+      'EvRadioGroupChange',
+      async (e) => {
+        await nextTick();
+        emit('change', mv.value, e);
+      },
+    );
 
     const isDisabled = computed(() => props.disabled);
     const isChecked = computed(() => mv.value === props.label);

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { computed, provide } from 'vue';
+import { computed, nextTick, provide } from 'vue';
 
 export default {
   name: 'EvCheckboxGroup',
@@ -19,7 +19,8 @@ export default {
     },
   },
   emits: {
-    'update:modelValue': [Array],
+    'update:modelValue': null,
+    change: null,
   },
   setup(props, { emit }) {
     const mv = computed({
@@ -27,6 +28,12 @@ export default {
       set: labels => emit('update:modelValue', labels),
     });
     provide('EvCheckboxGroupMv', mv);
+
+    const change = async (e) => {
+      await nextTick();
+      emit('change', mv.value, e);
+    };
+    provide('EvCheckboxGroupChange', change);
   },
 };
 </script>

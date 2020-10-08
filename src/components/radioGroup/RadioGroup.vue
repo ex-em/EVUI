@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { computed, provide } from 'vue';
+import { computed, provide, nextTick } from 'vue';
 
 export default {
   name: 'EvRadioGroup',
@@ -18,13 +18,19 @@ export default {
       default: null,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
       set: label => emit('update:modelValue', label),
     });
     provide('EvRadioGroupMv', mv);
+
+    const change = async (e) => {
+      await nextTick();
+      emit('change', mv.value, e);
+    };
+    provide('EvRadioGroupChange', change);
   },
 };
 </script>
