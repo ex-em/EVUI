@@ -3,6 +3,7 @@ import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
 import EvRadio from '@/components/radio/Radio.vue';
 import EvRadioGroup from '@/components/radioGroup/RadioGroup.vue';
 import EvSelect from '@/components/select/Select.vue';
+import EvToggle from '@/components/toggle/Toggle.vue';
 import EvTextfield from '@/components/textfield/Textfield.vue';
 import EvInputNumber from '@/components/inputNumber/InputNumber.vue';
 import EvIcon from '@/components/icon/Icon.vue';
@@ -14,6 +15,7 @@ const components = [
   EvRadio,
   EvRadioGroup,
   EvSelect,
+  EvToggle,
   EvTextfield,
   EvInputNumber,
   EvIcon,
@@ -39,6 +41,7 @@ export {
   EvRadio,
   EvRadioGroup,
   EvSelect,
+  EvToggle,
   EvTextfield,
   EvInputNumber,
   EvIcon,
