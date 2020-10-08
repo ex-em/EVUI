@@ -15,7 +15,7 @@
       class="ev-radio-input"
       :value="label"
       :disabled="disabled"
-      @change="onChange"
+      @change.stop="changeMv"
     >
     <span class="ev-radio-label">
       <template v-if="$slots.default">
@@ -64,7 +64,7 @@ export default {
       }),
     );
 
-    const onChange = inject(
+    const changeMv = inject(
       'EvRadioGroupChange',
       async (e) => {
         await nextTick();
@@ -77,7 +77,7 @@ export default {
     return {
       mv,
       isChecked,
-      onChange,
+      changeMv,
     };
   },
 };
@@ -98,22 +98,23 @@ export default {
   &-label {
     padding-left: 5px;
   }
-
-  @include state('disabled') {
-    @include evThemify() {
-      color: evThemed('color-disabled');
-    }
-    input,
-    .ev-radio-wrapper {
-      cursor: not-allowed !important;
-    }
-  }
 }
 
+@include state('disabled') {
+  .ev-radio-label {
+    @include evThemify() {
+    color: evThemed('color-disabled');
+    }
+  }
+  .ev-radio-input,
+  .ev-radio-label {
+    cursor: not-allowed !important;
+  }
+}
 @include state('type-button') {
   .ev-radio {
     display: inline-block;
-    padding: 7px 12px;
+    padding: 0;
     margin: 0;
     text-align: center;
 
@@ -138,12 +139,18 @@ export default {
         background-color: evThemed('color-primary');
       }
     }
+    &.disabled.checked {
+      @include evThemify() {
+        background-color: rgba(evThemed('color-line-base'), 0.5);
+      }
+    }
   }
   .ev-radio-input {
     @include visible-hide();
   }
   .ev-radio-label {
-    padding: 0;
+    display: inline-block;
+    padding: 7px 12px;
   }
 }
 </style>

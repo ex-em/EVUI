@@ -27,7 +27,7 @@ export default {
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
-      set: label => emit('update:modelValue', label),
+      set: val => emit('update:modelValue', val),
     });
     provide('EvRadioGroupMv', mv);
 

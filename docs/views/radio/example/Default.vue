@@ -35,7 +35,6 @@
     <ev-radio
       v-model="radio2"
       label="Option C"
-      disabled
     />
   </div>
   <div class="case">
@@ -84,8 +83,8 @@ export default {
     const radio2 = ref('Option A');
     const radio3 = ref('Option A');
     const eventText = ref('No event occurred');
-    const changeRadio = () => {
-      eventText.value = `Click radio and change value '${radio3.value}'`;
+    const changeRadio = (newValue) => {
+      eventText.value = `Click radio and change value '${newValue}'`;
     };
     const selectValue = (val) => {
       radio3.value = val;
