@@ -2,23 +2,16 @@
   <div
     class="ev-toggle"
     :class="{
+      checked: modelValue,
       disabled,
     }"
-    @click.prevent="clickToggle"
-  >
-    <span
-      class="ev-toggle-core"
-      :class="{
-        checked: modelValue,
-        disabled,
-      }"
-      :style="{
-        width: `${width}px`,
-        border: `1px solid ${ modelValue ? activeColor : inactiveColor }`,
-        'background-color': `${ modelValue ? activeColor : inactiveColor }`,
-      }"
-    />
-  </div>
+    :style="{
+      width: `${width}px`,
+      border: `1px solid ${ modelValue ? activeColor : inactiveColor }`,
+      'background-color': `${ modelValue ? activeColor : inactiveColor }`,
+    }"
+    @click="clickMv"
+  />
 </template>
 
 <script>
@@ -57,7 +50,7 @@ export default {
         emit('change', val);
       },
     });
-    const clickToggle = () => {
+    const clickMv = () => {
       if (!props.disabled) {
         mv.value = !mv.value;
       }
@@ -65,7 +58,7 @@ export default {
 
     return {
       mv,
-      clickToggle,
+      clickMv,
     };
   },
 };
@@ -75,20 +68,6 @@ export default {
 @import '../../style/index.scss';
 
 .ev-toggle {
-  display: inline-flex;
-  position: relative;
-  height: 20px;
-  align-items: center;
-  line-height: 20px;
-  vertical-align: middle;
-  font-size: $font-size-medium;
-
-  &.disabled {
-    opacity: .6;
-  }
-}
-
-.ev-toggle-core {
   display: inline-block;
   position: relative;
   width: 40px;
@@ -116,8 +95,12 @@ export default {
     left: calc(100% - 17px);
   }
 
-  &.disabled:hover {
-    cursor: not-allowed;
+  &.disabled {
+    opacity: .6;
+
+    &:hover {
+      cursor: not-allowed;
+    }
   }
 }
 
