@@ -3,6 +3,7 @@ import Intro from 'docs/views/Intro.vue';
 import PageView from 'docs/views/PageView';
 import checkboxProps from 'docs/views/checkbox/props';
 import selectProps from 'docs/views/select/props';
+import toggleProps from 'docs/views/toggle/props';
 import radioProps from 'docs/views/radio/props';
 import textFieldProps from 'docs/views/textField/props';
 import inputNumberProps from 'docs/views/inputNumber/props';
@@ -87,7 +88,8 @@ const routes = [
   {
     path: '/toggle',
     name: 'Toggle',
-    component: () => import(/* webpackChunkName: "toggle" */ '../views/toggle'),
+    component: PageView,
+    props: toggleProps,
   },
   {
     path: '/barChart',

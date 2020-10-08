@@ -103,7 +103,7 @@ export default {
 @include state('disabled') {
   .ev-radio-label {
     @include evThemify() {
-    color: evThemed('color-disabled');
+      color: evThemed('color-disabled');
     }
   }
   .ev-radio-input,
