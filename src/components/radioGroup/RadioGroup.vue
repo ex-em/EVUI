@@ -1,6 +1,7 @@
 <template>
   <div
     class="ev-radio-group"
+    :class="{ 'type-button': type === 'button' }"
     role="group"
   >
     <slot />
@@ -16,6 +17,10 @@ export default {
     modelValue: {
       type: [String, Number, Symbol, Boolean],
       default: null,
+    },
+    type: {
+      type: String,
+      default: 'radio',
     },
   },
   emits: ['update:modelValue', 'change'],

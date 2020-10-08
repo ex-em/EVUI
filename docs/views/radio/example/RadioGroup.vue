@@ -31,6 +31,17 @@
       {{ eventText }}
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Button Type</p>
+    <ev-radio-group
+      v-model="radioGroup2"
+      type="button"
+    >
+      <ev-radio label="Option A" />
+      <ev-radio label="Option B" />
+      <ev-radio label="Option C" />
+    </ev-radio-group>
+  </div>
 </template>
 
 <script>
