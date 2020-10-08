@@ -4,7 +4,7 @@
     :class="[
       {
         disabled,
-        'checked': isChecked,
+        checked,
       },
       size,
     ]"
@@ -72,11 +72,11 @@ export default {
       },
     );
 
-    const isChecked = computed(() => mv.value === props.label);
+    const checked = computed(() => mv.value === props.label);
 
     return {
       mv,
-      isChecked,
+      checked,
       changeMv,
     };
   },
