@@ -5,7 +5,7 @@
       :style="getStyle"
       @mousedown="onMouseDown"
     >
-      <slot />
+      <slot/>
     </div>
     <div
       v-show="isDragging"
@@ -57,7 +57,7 @@
         height: 0,
         topPad: 0,
         leftPad: 0,
-        prevOffset: {},
+        dragOffset: {},
         leftItemInfo: {},
         rightItemInfo: {},
         isDragging: false,
@@ -76,8 +76,7 @@
     created() {
     },
     mounted() {
-      this.updateItemInfo();
-      this.setBounds();
+      this.onResize();
     },
     methods: {
       updateItemInfo() {
@@ -106,15 +105,12 @@
         this.rightItemInfo.width = rightEl.offsetWidth;
         this.rightItemInfo.height = rightEl.offsetHeight;
       },
-      onResize(id, type) {
-        if (!type && this.uid !== id) {
-          return;
-        }
-
+      onResize() {
         let top;
         let left;
 
         this.updateItemInfo();
+        this.setBounds();
 
         if (this.type === 'hbox') {
           top = this.leftItemInfo.top;
@@ -193,83 +189,66 @@
 
         this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
       },
-      onMouseDown({ pageX: prevLeft, pageY: prevTop }) {
+      onMouseDown() {
         const rootEl = this.$el.parentElement;
         const guideEl = this.$refs.guideline;
 
-        this.prevOffset = { prevLeft, prevTop };
         this.updateItemInfo();
+
+        const { width, height, color, top, left } = this;
 
         rootEl.addEventListener('mousemove', this.onMouseMove);
         window.addEventListener('mouseup', this.onMouseUp);
 
-        this.isDragging = true;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${color}; width: ${width}px; height: ${height}px;`;
 
-        guideEl.style.cssText = `top: ${this.top}px; left: ${this.left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
+        this.isDragging = true;
       },
+      getBoundaryValue(value) {
+        const { bound: { min, max } } = this;
+        let computed = value;
+
+        if (max < computed) {
+          computed = max;
+        }
+        if (min > computed) {
+          computed = min;
+        }
+
+        return computed;
+      }
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
-        const { min, max } = this.bound;
-        const width = this.width;
-        const height = this.height;
-        let left = this.left;
-        let top = this.top;
+        const { width, height, type, color, bound: { min, max } } = this;
+        let { left, top } = this;
 
-        if (this.type === 'hbox') {
-          left = xPos - width - this.leftPad;
-          if (min > left || max < left) {
-            return;
-          }
+        if (type === 'hbox') {
+          left = this.getBoundaryValue(xPos - (width / 2) - this.leftPad);
         } else {
-          top = yPos - height - this.topPad;
-          if (min > top || max < top) {
-            return;
-          }
+          top = this.getBoundaryValue(yPos - (height / 2) - this.topPad);
         }
 
-        this.isDragging = true;
+        this.dragOffset = { top, left };
 
-        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${this.color}; width: ${this.width}px; height: ${this.height}px;`;
+        guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${color}; width: ${width}px; height: ${height}px;`;
       },
-      onMouseUp({ pageX: xPos, pageY: yPos }) {
+      onMouseUp() {
         const rootEl = this.$el.parentElement;
-        const { min, max } = this.bound;
-        const { prevLeft, prevTop } = this.prevOffset;
-        let left;
-        let top;
-        let changeValue;
-        let cssText;
-
-        if (this.type === 'hbox') {
-          left = xPos - this.width - this.leftPad;
-          if (min > left) {
-            left = min;
-          } else if (max < left) {
-            left = max;
-          }
-
-          changeValue = prevLeft - (left + this.width + this.leftPad);
-          cssText = `left: ${left}px;`;
-        } else {
-          top = yPos - this.height - this.topPad;
-          if (min > top) {
-            top = min;
-          } else if (max < top) {
-            top = max;
-          }
-
-          changeValue = prevTop - (top - this.height - this.topPad);
-          cssText = `top: ${top}px;`;
-        }
+        const { left: prevLeft, top: prevTop } = this;
+        const { top, left } = this.dragOffset;
 
         rootEl.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onMouseUp);
 
         this.isDragging = false;
 
-        this.resizeForNeighbor(changeValue);
-
-        this.$el.style.cssText += cssText;
+        if (this.type === 'hbox') {
+          this.resizeForNeighbor(prevLeft - left);
+          this.$el.style.left = `${left}px`;
+        } else {
+          this.resizeForNeighbor(prevTop - top);
+          this.$el.style.top = `${top}px`;
+        }
       },
     },
   };
@@ -283,6 +262,7 @@
     user-select: none;
     display: block;
   }
+
   .ev-splitter-guideline {
     position: absolute;
     z-index: 100;
@@ -291,13 +271,16 @@
     -ms-user-select: none;
     user-select: none;
   }
+
   .ev-splitter.hide {
     background: transparent;
   }
+
   .ev-splitter.hbox,
   .ev-splitter-guideline.hbox {
     cursor: col-resize;
   }
+
   .ev-splitter.vbox,
   .ev-splitter-guideline.vbox {
     cursor: row-resize;
