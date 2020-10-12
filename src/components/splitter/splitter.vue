@@ -216,10 +216,10 @@
         }
 
         return computed;
-      }
+      },
       onMouseMove({ pageX: xPos, pageY: yPos }) {
         const guideEl = this.$refs.guideline;
-        const { width, height, type, color, bound: { min, max } } = this;
+        const { width, height, type, color } = this;
         let { left, top } = this;
 
         if (type === 'hbox') {
