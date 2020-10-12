@@ -1,8 +1,8 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-textfield
-      v-model="textfield1"
+    <ev-text-field
+      v-model="modelValue1"
       placeholder="Please enter the password"
       type="password"
     />
@@ -14,8 +14,8 @@
   </div>
   <div class="case">
     <p class="case-title">Show Password</p>
-    <ev-textfield
-      v-model="textfield2"
+    <ev-text-field
+      v-model="modelValue2"
       placeholder="Please enter the content"
       type="password"
       show-password
@@ -28,12 +28,12 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const textfield1 = ref();
-    const textfield2 = ref();
+    const modelValue1 = ref();
+    const modelValue2 = ref();
 
     return {
-      textfield1,
-      textfield2,
+      modelValue1,
+      modelValue2,
     };
   },
 };

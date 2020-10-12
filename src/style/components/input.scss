@@ -16,10 +16,10 @@
     }
   }
 }
-.ev-textfield:hover,
+.ev-text-field:hover,
 .ev-input-number:hover {
   .ev-input,
-  .ev-textfield {
+  .ev-textarea {
     @include evThemify() {
       border: 1px solid evThemed('color-primary');
     }
@@ -48,10 +48,10 @@
       }
     }
   }
-  &.ev-textfield:hover,
+  &.ev-text-field:hover,
   &.ev-input-number:hover {
     .ev-input,
-    .ev-textfield {
+    .ev-textarea {
       @include evThemify() {
         border: 1px solid rgba(evThemed('color-line-base'), 0.5);
       }
@@ -76,10 +76,10 @@
       }
     }
   }
-  &.ev-textfield:hover,
+  &.ev-text-field:hover,
   &.ev-input-number:hover {
     .ev-input,
-    .ev-textfield {
+    .ev-textarea {
       @include evThemify() {
         border: 1px solid evThemed('color-error');
       }
@@ -99,10 +99,10 @@
       }
     }
   }
-  &.ev-textfield:hover,
+  &.ev-text-field:hover,
   &.ev-input-number:hover {
     .ev-input,
-    .ev-textfield {
+    .ev-textarea {
       @include evThemify() {
         border: 1px solid rgba(evThemed('color-error'), 0.5);
       }

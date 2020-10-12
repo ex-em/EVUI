@@ -1,5 +1,5 @@
 import { parseComponent } from 'vue-template-compiler';
-import mdText from '!!raw-loader!./api/textfield.md';
+import mdText from '!!raw-loader!./api/textField.md';
 import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
 import Password from './example/Password';

@@ -4,7 +4,7 @@ import EvRadio from '@/components/radio/Radio.vue';
 import EvRadioGroup from '@/components/radioGroup/RadioGroup.vue';
 import EvSelect from '@/components/select/Select.vue';
 import EvToggle from '@/components/toggle/Toggle.vue';
-import EvTextfield from '@/components/textfield/Textfield.vue';
+import EvTextField from '@/components/textField/TextField.vue';
 import EvInputNumber from '@/components/inputNumber/InputNumber.vue';
 import EvIcon from '@/components/icon/Icon.vue';
 import { version } from '../package.json';
@@ -16,7 +16,7 @@ const components = [
   EvRadioGroup,
   EvSelect,
   EvToggle,
-  EvTextfield,
+  EvTextField,
   EvInputNumber,
   EvIcon,
 ];
@@ -42,7 +42,7 @@ export {
   EvRadioGroup,
   EvSelect,
   EvToggle,
-  EvTextfield,
+  EvTextField,
   EvInputNumber,
   EvIcon,
 };

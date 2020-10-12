@@ -140,7 +140,7 @@ export default {
   }
   .description {
     padding: 9px 12px;
-    margin: 15px 0 20px;
+    margin-top: 15px;
     border-radius: 4px;
     font-size: 13px;
     word-break: break-all;

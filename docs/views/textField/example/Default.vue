@@ -1,8 +1,8 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-textfield
-      v-model="textfield1"
+    <ev-text-field
+      v-model="modelValue1"
       placeholder="Please enter the content"
       type="text"
     />
@@ -11,16 +11,16 @@
         type="text"
       </span>
       <span class="badge">
-        Textfield Value
+        Text Field Value
       </span>
-      {{ textfield1 }}
+      {{ modelValue1 }}
     </div>
   </div>
 
   <div class="case">
     <p class="case-title">Readonly</p>
-    <ev-textfield
-      v-model="textfield2"
+    <ev-text-field
+      v-model="modelValue2"
       type="text"
       readonly
     />
@@ -28,8 +28,8 @@
 
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-textfield
-      v-model="textfield3"
+    <ev-text-field
+      v-model="modelValue3"
       type="text"
       disabled
     />
@@ -37,8 +37,8 @@
 
   <div class="case">
     <p class="case-title">Clearable</p>
-    <ev-textfield
-      v-model="textfield4"
+    <ev-text-field
+      v-model="modelValue4"
       placeholder="Please enter the content"
       type="text"
       clearable
@@ -48,14 +48,14 @@
   <div class="case">
     <p class="case-title">Max Length</p>
     <div style="display: flex;">
-      <ev-textfield
-        v-model="textfield5"
+      <ev-text-field
+        v-model="modelValue5"
         placeholder="Please enter the content"
         type="text"
         :max-length="3"
       />
-      <ev-textfield
-        v-model="textfield5"
+      <ev-text-field
+        v-model="modelValue5"
         placeholder="Please enter the content"
         type="text"
         :max-length="3"
@@ -66,15 +66,13 @@
 
   <div class="case">
     <p class="case-title">Error Message</p>
-    <div style="display: flex;">
-      <ev-textfield
-        v-model="textfield6"
-        placeholder="Please enter the content"
-        type="text"
-        :error-msg="errMsg"
-        @input="checkValid"
-      />
-    </div>
+    <ev-text-field
+      v-model="modelValue6"
+      placeholder="Please enter the content"
+      type="text"
+      :error-msg="errMsg"
+      @input="checkValid"
+    />
   </div>
 </template>
 
@@ -83,16 +81,16 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const textfield1 = ref();
-    const textfield2 = ref('Read Only Content');
-    const textfield3 = ref('Disabled Content');
-    const textfield4 = ref();
-    const textfield5 = ref();
-    const textfield6 = ref('1234가나다');
+    const modelValue1 = ref();
+    const modelValue2 = ref('Read Only Content');
+    const modelValue3 = ref('Disabled Content');
+    const modelValue4 = ref();
+    const modelValue5 = ref();
+    const modelValue6 = ref('1234가나다');
     const errMsg = ref();
     const checkValid = () => {
       const regexp = /^[0-9]*$/;
-      if (!regexp.test(textfield6.value)) {
+      if (!regexp.test(modelValue6.value)) {
         errMsg.value = '숫자만 입력 가능!';
       } else {
         errMsg.value = '';
@@ -100,12 +98,12 @@ export default {
     };
     checkValid();
     return {
-      textfield1,
-      textfield2,
-      textfield3,
-      textfield4,
-      textfield5,
-      textfield6,
+      modelValue1,
+      modelValue2,
+      modelValue3,
+      modelValue4,
+      modelValue5,
+      modelValue6,
       checkValid,
       errMsg,
     };
@@ -113,8 +111,8 @@ export default {
 };
 </script>
 
-<style lant="scss">
-.case .ev-textfield {
+<style lang="scss">
+.case .ev-text-field {
   width: 300px;
   margin-right: 15px;
 }
