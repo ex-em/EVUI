@@ -15,6 +15,10 @@
         @click="onRowClick(item, depth, rowIdx)"
         @mouseover="onMouseOver(depth, rowIdx, item)"
       >
+        <ev-icon
+          v-if="item.icon"
+          :cls="`${item.icon} contextmenu-row-icon`"
+        />
         {{ item.text }}
         <ev-icon
           v-if="item.items"
@@ -261,6 +265,10 @@
 
       @include evThemify() {
         border-bottom: 1px solid evThemed('contextmenu-row-border');
+      }
+
+      &-icon {
+        padding: 0 5px 0 0;
       }
     }
   }
