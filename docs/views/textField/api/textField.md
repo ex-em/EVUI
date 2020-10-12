@@ -1,8 +1,8 @@
 ### Desc
-- 태그는 &lt;ev-textfield&gt;(이하 <텍스트필드>)으로 정의
+- 태그는 &lt;ev-text-field&gt;(이하 <텍스트필드>)으로 정의
 
 ```
-<ev-textfield
+<ev-text-field
   옵션
 />
 ```

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="ev-textfield"
+    class="ev-text-field"
     :class="[
       `type-${type}`,
       {
@@ -14,7 +14,7 @@
     ]"
   >
     <div
-      class="ev-textfield-wrapper"
+      class="ev-text-field-wrapper"
     >
       <template
         v-if="type === 'text' || type === 'password'"
@@ -34,14 +34,14 @@
         />
         <span
           v-if="type === 'text' && clearable"
-          class="ev-textfield-icon icon-clear"
+          class="ev-text-field-icon icon-clear"
           @click="clearValue"
         >
           <i class="ev-icon-close" />
         </span>
         <span
           v-if="type === 'password' && showPassword"
-          class="ev-textfield-icon icon-password"
+          class="ev-text-field-icon icon-password"
           :class="{ 'on': isPasswordVisible }"
           @click="changePasswordVisible"
         >
@@ -65,13 +65,13 @@
     </div>
     <div
       v-if="errorMsg"
-      class="ev-textfield-error"
+      class="ev-text-field-error"
     >
       {{ errorMsg }}
     </div>
     <div
       v-if="maxLength && showMaxLength"
-      class="ev-textfield-maxlength"
+      class="ev-text-field-maxlength"
       :class="{ max: mv?.length > maxLength }"
     >
       <span class="curr-length">{{ mv ? mv.length : 0 }}</span> / {{ maxLength }}
@@ -83,7 +83,7 @@
 import { ref, computed } from 'vue';
 
 export default {
-  name: 'EvTextfield',
+  name: 'EvTextField',
   props: {
     modelValue: {
       type: [String, Number],
@@ -190,31 +190,33 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../style/index.scss';
-@import '../../style/components/input.scss';
 
-.ev-textfield {
+.ev-text-field {
   position: relative;
   box-sizing: border-box;
 
   @include clearfix();
+
+  @import '../../style/components/input.scss';
   &-wrapper {
     position: relative;
   }
 }
 
 @include state('clearable') {
+  $icon-width: 14px;
   .ev-input {
-    padding: 0 23px 0 5px;
+    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
   }
-  .ev-textfield-icon {
+  .ev-text-field-icon {
     display: flex;
     position: absolute;
     top: 50%;
-    right: 3px;
-    width: 14px;
-    height: 14px;
+    right: #{$icon-width / 2};
+    width: $icon-width;
+    height: $icon-width;
     cursor: pointer;
     justify-content: center;
     align-items: center;
@@ -231,16 +233,17 @@ export default {
   }
 }
 @include state('show-password') {
+  $icon-width: 14px;
   .ev-input {
-    padding: 0 23px 0 5px;
+    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
   }
-  .ev-textfield-icon {
+  .ev-text-field-icon {
     display: flex;
     position: absolute;
     top: 50%;
-    right: 3px;
-    width: 14px;
-    height: 14px;
+    right: #{$icon-width / 2};
+    width: $icon-width;
+    height: $icon-width;
     cursor: pointer;
     justify-content: center;
     align-items: center;
@@ -261,7 +264,7 @@ export default {
   }
 }
 @include state('show-maxlength') {
-  .ev-textfield-maxlength {
+  .ev-text-field-maxlength {
     float: right;
     padding: 5px 0 3px;
     text-align: right;
@@ -284,7 +287,7 @@ export default {
   }
 }
 @include state('error') {
-  .ev-textfield-error {
+  .ev-text-field-error {
     float: left;
     padding: 5px 0 3px;
     font-size: 12px;

@@ -1,8 +1,8 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-textfield
-      v-model="textfield1"
+    <ev-text-field
+      v-model="modelValue1"
       placeholder="Please enter the content"
       type="textarea"
     />
@@ -11,16 +11,16 @@
         type="textarea"
       </span>
       <span class="badge">
-        Textfield Value
+        Text Field Value
       </span>
-      {{ textfield1 }}
+      {{ modelValue1 }}
     </div>
   </div>
 
   <div class="case">
     <p class="case-title">Readonly</p>
-    <ev-textfield
-      v-model="textfield2"
+    <ev-text-field
+      v-model="modelValue2"
       type="textarea"
       readonly
     />
@@ -28,8 +28,8 @@
 
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-textfield
-      v-model="textfield3"
+    <ev-text-field
+      v-model="modelValue3"
       type="textarea"
       disabled
     />
@@ -38,14 +38,14 @@
   <div class="case">
     <p class="case-title">Max Length</p>
     <div style="display: flex;">
-      <ev-textfield
-        v-model="textfield4"
+      <ev-text-field
+        v-model="modelValue4"
         placeholder="Please enter the content"
         type="textarea"
         :max-length="10"
       />
-      <ev-textfield
-        v-model="textfield4"
+      <ev-text-field
+        v-model="modelValue4"
         placeholder="Please enter the content"
         type="textarea"
         :max-length="10"
@@ -60,16 +60,16 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const textfield1 = ref();
-    const textfield2 = ref('Read Only Content');
-    const textfield3 = ref('Disabled Content');
-    const textfield4 = ref();
+    const modelValue1 = ref();
+    const modelValue2 = ref('Read Only Content');
+    const modelValue3 = ref('Disabled Content');
+    const modelValue4 = ref();
 
     return {
-      textfield1,
-      textfield2,
-      textfield3,
-      textfield4,
+      modelValue1,
+      modelValue2,
+      modelValue3,
+      modelValue4,
     };
   },
 };
