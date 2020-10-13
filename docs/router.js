@@ -58,8 +58,8 @@ const router = new VueRouter({
       path: '/grid',
       component: () => import(/* webpackChunkName: 'grid' */ './pages/grid/grid'),
     }, {
-    path: '/tree',
-    component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree.vue'),
+      path: '/tree',
+      component: () => import(/* webpackChunkName: 'tree' */ './pages/tree/tree.vue'),
     }, {
       path: '/treetable',
       component: () => import(/* webpackChunkName: 'treetable' */ './pages/tree-table/tree.vue'),
@@ -90,6 +90,9 @@ const router = new VueRouter({
     }, {
       path: '/icon',
       component: () => import(/* webpackChunkName: 'icon' */ './pages/icon/icon'),
+    }, {
+      path: '/splitter',
+      component: () => import(/* webpackChunkName: 'splitter' */ './pages/splitter/splitter'),
     },
   ],
 });

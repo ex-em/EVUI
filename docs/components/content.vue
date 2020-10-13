@@ -63,6 +63,12 @@
                 content: '컨텍스트 메뉴',
                 imgUrl: `${this.imgUrl}/contextmenu.png`,
               },
+              {
+                name: 'Splitter',
+                routerLink: '/splitter',
+                content: '스플리터',
+                imgUrl: `${this.imgUrl}/contextmenu.png`,
+              },
             ],
           },
           {
