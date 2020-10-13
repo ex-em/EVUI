@@ -7,6 +7,8 @@
       :use-checkbox="useCheckbox"
       :children-key="childrenKey"
       :title-key="titleKey"
+      :expand-icon="expandIcon"
+      :collapse-icon="collapseIcon"
     />
     <div v-if="!stateTree.length" :class="[prefixCls + '-empty']">
       {{ emptyText }}
@@ -66,6 +68,14 @@ export default {
     titleKey: {
       type: String,
       default: 'title',
+    },
+    expandIcon: {
+      type: String,
+      default: '',
+    },
+    collapseIcon: {
+      type: String,
+      default: '',
     },
   },
   data() {
