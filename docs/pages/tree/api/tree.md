@@ -6,8 +6,10 @@
 | use-checkbox | 체크박스 지원 | Boolean | false |
 | empty-text | 데이터 없을시 표시 메시지 | String | No Data |
 | render | 트리 표시해줄 render 함수 제공  | Function | - |
-| title-key | title 키 값  | Function | title |
-| children-key | children 배열 키 값 | Function | children |
+| title-key | title 키 값  | String | title |
+| children-key | children 배열 키 값 | String | children |
+| expand-icon | expand icon  i태그 클래스 변경 | String | - |
+| collapse-icon | collapse icon  i태그 클래스 변경 | String | - |
 
 ## Events
 | Event Name | Description | Return Value |
@@ -19,3 +21,8 @@
 | select-contextmenu | 컨텍스트메뉴에서 항목 클릭시 호출 된다. | 컨텍스트메뉴 선택한 항목 data |
 | on-check-change| 체크박스 변화할때마다 호출 | checked data |
 
+## Public Methods
+| Method Name | Description | Return Value |
+| ---------- | ----------- | ------------ |
+| getSelectedNodes | 선택한 노드들을 가져온다 | 선택된 node Data(Array)|
+| getCheckedNodes | 체크한 노드들을 가져온다 | 체크한 node Data(Array)|

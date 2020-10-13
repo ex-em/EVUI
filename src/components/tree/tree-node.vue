@@ -44,6 +44,8 @@
         :use-checkbox="useCheckbox"
         :children-key="childrenKey"
         :title-key="titleKey"
+        :expand-icon="expandIcon"
+        :collapse-icon="collapseIcon"
       />
     </li>
   </ul>
@@ -81,6 +83,14 @@ export default {
       type: String,
       default: 'title',
     },
+    expandIcon: {
+      type: String,
+      default: '',
+    },
+    collapseIcon: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -101,7 +111,10 @@ export default {
       ];
     },
     arrowClasses() {
-      return this.data.expand ? 'ei-arrow-down' : 'ei-arrow-right';
+      // return this.data.expand ? 'ei-arrow-down' : 'ei-arrow-right';
+      const expandIcon = this.expandIcon ? this.expandIcon : 'ei-arrow-right';
+      const collapseIcon = this.expandIcon ? this.collapseIcon : 'ei-arrow-down';
+      return this.data.expand ? collapseIcon : expandIcon;
     },
     titleClasses() {
       return [

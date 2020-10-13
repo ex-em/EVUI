@@ -3,6 +3,8 @@
     <ev-tree
       :data="data"
       :menu-items="menuItems"
+      expand-icon="ei-square-plus"
+      collapse-icon="ei-square-minus"
       @on-toggle-expand="onExpand"
       @before-contextmenu="beforeContext"
       @select-contextmenu="selectContext"
