@@ -8,8 +8,8 @@
 | render | 트리 표시해줄 render 함수 제공  | Function | - |
 | title-key | title 키 값  | String | title |
 | children-key | children 배열 키 값 | String | children |
-| expand-icon | expand icon  i태그 클래스 변경 | String | children |
-| collapse-icon | collapse icon  i태그 클래스 변경 | String | children |
+| expand-icon | expand icon  i태그 클래스 변경 | String | - |
+| collapse-icon | collapse icon  i태그 클래스 변경 | String | - |
 
 ## Events
 | Event Name | Description | Return Value |
