@@ -24,5 +24,5 @@
 ## Public Methods
 | Method Name | Description | Return Value |
 | ---------- | ----------- | ------------ |
-| getSelectedNodes | 선택한 노드들을 가져오단 | 선택된 node Data(Array)|
-| getCheckedNodes | 체크한 노드들을 가져오단 | 체크한 node Data(Array)|
+| getSelectedNodes | 선택한 노드들을 가져온다 | 선택된 node Data(Array)|
+| getCheckedNodes | 체크한 노드들을 가져온다 | 체크한 node Data(Array)|
