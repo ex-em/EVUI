@@ -42,6 +42,7 @@
         :readonly="readOnly"
         :class="inputFieldClass"
         :value="inputFieldValue"
+        :placeholder="placeholder"
         type="text"
         @keyup="onKeyUpInputField"
         @blur="onBlurInputField"
@@ -152,6 +153,10 @@
         default() {
           return [];
         },
+      },
+      placeholder: {
+        type: String,
+        default: '',
       },
     },
     data() {

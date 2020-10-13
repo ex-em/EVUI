@@ -11,6 +11,10 @@
         :title="item.name"
         :class="getLiClasses(item)"
       >
+        <ev-icon
+          v-if="item.icon"
+          :cls="`${item.icon} ${prefixCls}-li-custom-icon`"
+        />
         {{ item.name }}
       </li>
     </ul>
@@ -110,6 +114,10 @@
     list-style: none;
     cursor: pointer;
     transition: background .1s ease-in-out;
+
+    &-custom-icon {
+      padding: 0 5px 0 0;
+    }
   }
 
   .ev-listbox-li:hover:not(.ev-listbox-li-selected) {
