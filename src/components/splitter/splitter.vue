@@ -189,7 +189,7 @@
 
         this.$emit('resize', { value: actualChangeValue, left: leftItemInfo, right: rightItemInfo });
       },
-      onMouseDown() {
+      onMouseDown(event) {
         const rootEl = this.$el.parentElement;
         const guideEl = this.$refs.guideline;
 
@@ -203,6 +203,7 @@
         guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${color}; width: ${width}px; height: ${height}px;`;
 
         this.isDragging = true;
+        this.$emit('custom-mousedown', event);
       },
       getBoundaryValue(value) {
         const { bound: { min, max } } = this;
@@ -232,7 +233,7 @@
 
         guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${color}; width: ${width}px; height: ${height}px;`;
       },
-      onMouseUp() {
+      onMouseUp(event) {
         const rootEl = this.$el.parentElement;
         const { left: prevLeft, top: prevTop } = this;
         const { top, left } = this.dragOffset;
@@ -249,6 +250,7 @@
           this.resizeForNeighbor(prevTop - top);
           this.$el.style.top = `${top}px`;
         }
+        this.$emit('custom-mouseup', event);
       },
     },
   };
