@@ -233,7 +233,7 @@
 
         guideEl.style.cssText = `top: ${top}px; left: ${left}px; background: ${color}; width: ${width}px; height: ${height}px;`;
       },
-      onMouseUp() {
+      onMouseUp(event) {
         const rootEl = this.$el.parentElement;
         const { left: prevLeft, top: prevTop } = this;
         const { top, left } = this.dragOffset;
