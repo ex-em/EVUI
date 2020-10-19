@@ -151,6 +151,7 @@
         return {
           width: getSize(getQuantity(this.width)),
           height: getSize(getQuantity(this.height)),
+          lineHeight: getSize(getQuantity(this.height)),
         };
       },
       wrapTextClass() {
