@@ -257,17 +257,9 @@
           this.cssError = false;
           return false;
         }
-
-        // const filteredValue = checked[0];
-        if (checked.length !== 0) {
-          this.textError = true;
-          this.cssError = true;
-          return true;
-        }
-
-        this.textError = false;
-        this.cssError = false;
-        return false;
+        this.textError = true;
+        this.cssError = true;
+        return true;
       },
     },
   };
