@@ -174,6 +174,11 @@
       value(val) {
         this.setCurrentValue(val);
       },
+      useRegExp(val) {
+        if (val) {
+          this.validateError(this.currentValue);
+        }
+      },
     },
     created() {
       this.validateError(this.currentValue);
@@ -253,17 +258,9 @@
           this.cssError = false;
           return false;
         }
-
-        const filteredValue = checked[0];
-        if (filteredValue.length !== 0) {
-          this.textError = true;
-          this.cssError = true;
-          return true;
-        }
-
-        this.textError = false;
-        this.cssError = false;
-        return false;
+        this.textError = true;
+        this.cssError = true;
+        return true;
       },
     },
   };
