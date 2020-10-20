@@ -16,7 +16,7 @@
       >
         <div class="ev-message-box-top-title">
           <ev-icon
-            v-if="type!==''"
+            v-if="showHeaderIcon"
             :cls="headerTypeIconInfo.cls"
             :style="headerTypeIconInfo.style"
           />
@@ -99,6 +99,7 @@
         confirmButtonDisabled: false,
         cancelButtonClass: '',
         callback: null,
+        showHeaderIcon: true,
         useHTMLString: false,
         headerTypeIconInfo: {
           cls: '',
