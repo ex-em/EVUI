@@ -138,15 +138,16 @@
           - (isVScroll ? this.scrollbarSize : 0);
         const remainingHeight = (window.innerHeight - clientY)
           - (isHScroll ? this.scrollbarSize : 0);
+        const clientRect = this.$el.firstElementChild.getClientRects()[0];
         let left = clientX + scrollEl.scrollLeft;
         let top = clientY + scrollEl.scrollTop;
 
-        if (this.width > remainingWidth) {
-          left -= (this.width - remainingWidth);
+        if (clientRect.width > remainingWidth) {
+          left -= (clientRect.width - remainingWidth);
         }
 
-        if (this.height > remainingHeight) {
-          top -= (this.height - remainingHeight);
+        if (clientRect.height > remainingHeight) {
+          top -= (clientRect.height - remainingHeight);
         }
 
         this.left = left;
