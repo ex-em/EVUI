@@ -129,7 +129,7 @@
       },
       setPosition(e, x, y) {
         const scrollEl = document.scrollingElement || document.documentElement || document.body;
-        const scrollbarSize = window.innerWidth - document.documentElement.clientWidth;
+        const scrollbarSize = window.innerWidth - scrollEl.clientWidth;
         const isHScroll = window.innerWidth < scrollEl.scrollWidth;
         const isVScroll = window.innerHeight < scrollEl.scrollHeight;
         const clientX = x || 0;
