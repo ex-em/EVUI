@@ -286,8 +286,8 @@ export default {
       display: inline;
     }
   }
-}
-.ev-tree-node-selected, .ev-tree-node-selected:hover {
-  background-color: #d5e8fc;
+  .ev-tree-node-selected, .ev-tree-node-selected:hover {
+    background-color: #d5e8fc;
+  }
 }
 </style>
