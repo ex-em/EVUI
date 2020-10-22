@@ -8,34 +8,35 @@
         <ev-icon v-if="showArrow" :cls="arrowClasses"/>
         <ev-loading-mask v-if="showLoading"/>
       </span>
-      <ev-checkbox
-        v-if="useCheckbox"
-        v-model="data.checked"
-        type="square"
-        size="small"
-        after-type="check"
-        :indeterminate.sync="data.indeterminate"
-        :disabled="data.disabled || data.disableCheckbox"
-        @on-click="handleCheck"
-      />
-      <Render v-if="data.render" :render="data.render" :data="data" :node="node"/>
-      <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"/>
-      <template v-else>
-        <ev-icon
-          v-if="data.icon"
-          :class="`${prefixCls}-icon`"
-          :cls="data.icon"
+      <div :class="selectedCls">
+        <ev-checkbox
+          v-if="useCheckbox"
+          v-model="data.checked"
+          type="square"
+          size="small"
+          after-type="check"
+          :indeterminate.sync="data.indeterminate"
+          :disabled="data.disabled || data.disableCheckbox"
+          @on-click="handleCheck"
         />
-        <span
-          :class="titleClasses"
-          @contextmenu="handleContextmenu"
-          @click="handleSelect"
-          @dblclick="handleDblclick"
-        >
-          {{ data[titleKey] }}
-        </span>
-      </template>
-
+        <Render v-if="data.render" :render="data.render" :data="data" :node="node"/>
+        <Render v-else-if="isParentRender" :render="parentRender" :data="data" :node="node"/>
+        <template v-else>
+          <ev-icon
+            v-if="data.icon"
+            :class="`${prefixCls}-icon`"
+            :cls="data.icon"
+          />
+          <span
+            :class="titleClasses"
+            @contextmenu="handleContextmenu"
+            @click="handleSelect"
+            @dblclick="handleDblclick"
+          >
+            {{ data[titleKey] }}
+          </span>
+        </template>
+      </div>
       <tree-node
         v-for="(item, i) in children"
         v-if="data.expand"
@@ -105,6 +106,7 @@ export default {
     },
     selectedCls() {
       return [
+        `${prefixCls}-node`,
         {
           [`${prefixCls}-node-selected`]: this.data.selected,
         },
