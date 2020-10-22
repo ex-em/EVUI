@@ -248,14 +248,14 @@ export default {
   }
 }
 .ev-tree-arrow {
-  float: left;
+  display: inline-block;
   cursor: pointer;
   width: 12px;
   height: 12px;
   text-align: center;
-  display: inline-block;
   margin-right: 5px;
   i {
+    position: relative;
     transition: all .2s ease-in-out;
     font-size: 12px;
     vertical-align: middle;
@@ -265,7 +265,6 @@ export default {
   border-radius: 3px;
   cursor: pointer;
   vertical-align: middle;
-  padding: 0 4px;
   user-select: none;
   &:hover {
     background-color: #eaf4fe;
@@ -276,5 +275,19 @@ export default {
 }
 .ev-tree-icon {
   vertical-align: middle;
+}
+.ev-tree-node {
+  display: inline-block;
+  width: calc(100% - 20px);
+  .ev-checkbox {
+    display: inline-block;
+    float: none;
+    .ev-checkbox-label {
+      display: inline;
+    }
+  }
+  .ev-tree-node-selected, .ev-tree-node-selected:hover {
+    background-color: #d5e8fc;
+  }
 }
 </style>
