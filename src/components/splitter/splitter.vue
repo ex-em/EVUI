@@ -145,13 +145,12 @@
         }
 
         const { min: leftMin = 40, max: leftMax = leftWh + rightWh - 40 } = this.leftBound;
-        const { min: rightMinTemp = 40, max: rightMax = leftWh + rightWh - 40 } = this.rightBound;
-        const rightMin = rightMinTemp + this.size;
+        const { min: rightMin = 40, max: rightMax = leftWh + rightWh - 40 } = this.rightBound;
 
         min = Math.min(leftWh - leftMin, rightMax - rightWh);
         min = leftOffset + (leftWh - min);
 
-        max = Math.min(leftMax - leftWh, rightWh - rightMin);
+        max = Math.min(leftMax - leftWh, rightWh - (rightMin + this.size));
         max += rightOffset;
 
         this.bound = { min, max };
