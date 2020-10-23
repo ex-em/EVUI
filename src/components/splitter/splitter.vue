@@ -150,7 +150,7 @@
         min = Math.min(leftWh - leftMin, rightMax - rightWh);
         min = leftOffset + (leftWh - min);
 
-        max = Math.min(leftMax - leftWh, rightWh - rightMin);
+        max = Math.min(leftMax - leftWh, rightWh - (rightMin + this.size));
         max += rightOffset;
 
         this.bound = { min, max };
