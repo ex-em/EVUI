@@ -64,9 +64,7 @@ export default {
     step: {
       type: Number,
       default: 1,
-      validator(val) {
-        return val > 0;
-      },
+      validator: val => val > 0,
     },
     stepStrictly: {
       type: Boolean,
@@ -75,9 +73,7 @@ export default {
     precision: {
       type: Number,
       default: 0,
-      validator(val) {
-        return val >= 0 && val <= 100 && val === parseInt(val, 10);
-      },
+      validator: val => (val >= 0 && val <= 100 && val === parseInt(val, 10)),
     },
   },
   emits: [
@@ -110,11 +106,13 @@ export default {
 
     return {
       currentValue,
-      stepValue,
       validateValue,
+
       focusInput,
       blurInput,
       changeMv,
+
+      stepValue,
     };
   },
 };

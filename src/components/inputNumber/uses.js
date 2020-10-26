@@ -47,7 +47,7 @@ export function getValueCloseToStep(val, { min, max, step }) {
 export function useModel() {
   const { props, emit } = getCurrentInstance();
   const currentValue = ref(props.modelValue);
-  const prevValue = ref(props.modelValue);
+  const previousValue = ref(props.modelValue);
 
   const getPrecisionValue = val => (
     props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val
@@ -56,9 +56,9 @@ export function useModel() {
     let result = val;
 
     if (!val && val !== 0) {
-      result = props.stepStrictly ? prevValue.value : null;
+      result = props.stepStrictly ? previousValue.value : null;
     } else if (isNaN(val)) {
-      result = prevValue.value;
+      result = previousValue.value;
     } else if (props.stepStrictly) {
       if (props.min === -Infinity) {
         props.min = 0;
@@ -77,7 +77,7 @@ export function useModel() {
     }
 
     currentValue.value = getPrecisionValue(result);
-    prevValue.value = getPrecisionValue(result);
+    previousValue.value = getPrecisionValue(result);
     emit('update:modelValue', result);
     emit('change', result);
   };

@@ -21,7 +21,6 @@
       show-input
       show-step
     />
-    modelValue2 : {{ modelValue2 }}
     <div class="description" style="margin-bottom: 20px;">
       <span class="badge yellow">
         min=2
@@ -76,16 +75,12 @@
     <p class="case-title">Range</p>
     <ev-slider
       v-model="modelValue5"
-      :min="5"
       :step="15"
       range
       show-input
       show-step
     />
     <div class="description">
-      <span class="badge">
-        min=5
-      </span>
       <span class="badge">
         step=15
       </span>
@@ -106,7 +101,7 @@
       const modelValue2 = ref(8);
       const modelValue3 = ref(-12);
       const modelValue4 = ref(30);
-      const modelValue5 = ref([30, 74]);
+      const modelValue5 = ref([1, 20]);
       return {
         modelValue1,
         modelValue2,

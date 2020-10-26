@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { computed, watch } from 'vue';
+import { computed, onActivated } from 'vue';
 import router from '../router';
 
 export default {
@@ -26,7 +26,7 @@ export default {
       router.push({ path: routerLink });
     };
 
-    watch(currentMenu, () => {
+    onActivated(() => {
       document.documentElement.scrollTop = 0;
     });
     return {

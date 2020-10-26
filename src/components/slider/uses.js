@@ -8,6 +8,7 @@ export const useModel = () => {
   const currentValue = ref(props.modelValue);
 
   const state = reactive({
+    isInit: false,
     dragging: false,
     handleType: null, // 'left', 'right', null
     leftValue: null,
@@ -289,7 +290,7 @@ export const useEvent = (params) => {
   };
 
   const changeInput = (val, type) => {
-    if (props.showInput && !state.dragging) {
+    if (props.showInput && !state.dragging && state.isInit) {
       if (props.range && Array.isArray(currentValue.value)) {
         const result = type === 'left' ? [val, currentValue.value[1]] : [currentValue.value[0], val];
         setSliderValue(result);
@@ -306,8 +307,8 @@ export const useEvent = (params) => {
 };
 
 export const useInit = (params) => {
-  const { props } = getCurrentInstance();
-  const { currentValue, slider, updateSliderInfo, setSliderValue } = params;
+  const { props, emit } = getCurrentInstance();
+  const { currentValue, state, slider, updateSliderInfo, setSliderValue } = params;
 
   const validateProps = () => {
     const hasMaxProps = props.max || props.max === 0;
@@ -317,6 +318,16 @@ export const useInit = (params) => {
         console.warn('[EVUI][Slider] Max value must be greater than min value.');
       }
     }
+  };
+  const initValue = () => {
+    updateSliderInfo();
+
+    if (slider.valueRange <= 0) {
+      currentValue.value = props.range ? [props.min, props.min] : props.min;
+      emit('update:modelValue', currentValue.value);
+    }
+    setSliderValue(currentValue.value);
+    state.isInit = true;
   };
 
   const initStepList = () => {
@@ -371,8 +382,7 @@ export const useInit = (params) => {
 
   onMounted(() => {
     validateProps();
-    updateSliderInfo();
-    setSliderValue(currentValue.value);
+    initValue();
     initStepList();
     initMarkList();
   });
