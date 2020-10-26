@@ -59,12 +59,35 @@
       <span class="badge">
         min="2"
       </span>
+      {{ inputNumber3 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Step Strictly</p>
+    <ev-input-number
+      v-model="inputNumber4"
+      :step="3"
+      :min="2"
+      :max="10"
+      step-strictly
+    />
+    <div class="description">
+      <span class="badge yellow">
+        step="3"
+      </span>
+      <span class="badge yellow">
+        min="2"
+      </span>
+      <span class="badge">
+        max="10"
+      </span>
+      {{ inputNumber4 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Precision</p>
     <ev-input-number
-      v-model="inputNumber4"
+      v-model="inputNumber5"
       :precision="3"
       :step="0.02"
     />
@@ -88,17 +111,19 @@ export default {
     const inputNumber2 = ref();
     const inputNumber3 = ref();
     const inputNumber4 = ref();
+    const inputNumber5 = ref();
     return {
       inputNumber1,
       inputNumber2,
       inputNumber3,
       inputNumber4,
+      inputNumber5,
     };
   },
 };
 </script>
 
-<style lant="scss">
+<style lang="scss" scoped>
 .case .ev-input-number {
   width: 300px;
   margin-right: 15px;

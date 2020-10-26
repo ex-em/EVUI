@@ -2,31 +2,49 @@
 
 $ev-themes: (
   light: (
+    /* primary color
+    ------------------------- */
+    primary: #1A6AFE,
+    info: #5AC8FA,
+    warning: #FF9500,
+    error: #FF3B30,
+    selected: #730EF4,
+    not-allow: #B01012,
+    disabled: #B2B2B2,
+
     /* common
     -------------------------- */
-    font-color-base: $color-black,
-    color-line-base: #B2B2B2,
-    color-background-lighten: rgba(#B2B2B2, 0.1),
-    color-primary: #1A6AFE,
-    color-info: #5AC8FA,
-    color-warning: #FF9500,
-    color-error: #FF3B30,
-    color-selected: #730EF4,
-    color-not-allow: #B01012,
-    color-disabled: #B2B2B2,
+    font-base: $color-black,
+    border-base: #B2B2B2,
+    border-light: #E3E3E3,
+    background-lighten: rgba(#B2B2B2, 0.1),
+
+    /* components
+    -------------------------- */
+    slider-mark-background: #F8F8F8,
+    tooltip-background: $color-black,
   ),
   dark: (
+    /* primary color
+    ------------------------- */
+    primary: #007AFF,
+    info: #64D2FF,
+    warning: #FF9F0A,
+    error: #FF453A,
+    selected: #791BF2,
+    not-allow: #B01012,
+    disabled: #555555,
+
     /* common
     -------------------------- */
-    font-color-base: $color-white,
-    color-line-base: #666666,
-    color-background-lighten: rgba(#666666, 0.3),
-    color-primary: #007AFF,
-    color-info: #64D2FF,
-    color-warning: #FF9F0A,
-    color-error: #FF453A,
-    color-selected: #791BF2,
-    color-not-allow: #B01012,
-    color-disabled: #555555,
+    font-base: $color-white,
+    border-base: #666666,
+    border-light: #333333,
+    background-lighten: rgba(#666666, 0.3),
+
+    /* components
+    -------------------------- */
+    slider-mark-background: #B2B2B2,
+    tooltip-background: #555555,
   ),
 ) !default;

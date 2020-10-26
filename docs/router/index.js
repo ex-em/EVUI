@@ -7,6 +7,7 @@ import toggleProps from 'docs/views/toggle/props';
 import radioProps from 'docs/views/radio/props';
 import textFieldProps from 'docs/views/textField/props';
 import inputNumberProps from 'docs/views/inputNumber/props';
+import sliderProps from 'docs/views/slider/props';
 import iconProps from 'docs/views/icon/props';
 
 const routes = [
@@ -63,7 +64,8 @@ const routes = [
   {
     path: '/slider',
     name: 'Slider',
-    component: () => import(/* webpackChunkName: "slider" */ '../views/slider'),
+    component: PageView,
+    props: sliderProps,
   },
   {
     path: '/grid',

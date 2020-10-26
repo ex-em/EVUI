@@ -18,13 +18,14 @@ height: 35px;
 
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
-| v-model | null | String, Number | 컴포넌트 입력 값 | |
+| v-model | Number | null | 컴포넌트 입력 값 | |
 | disabled | Boolean | false | 비활성화 여부 | true, false |
 | readonly | Boolean | false | 읽기 전용 여부 | true, false |
-| placeholder | String | | Input / Textarea의 placeholder 값 | |
+| placeholder | String | | Input의 placeholder 값 | |
 | max | Number | Infinity | value 의 최대값 | |
-| min | Number | Infinity | value 의 최소값 | |
-| step | Number | 1 | 우측 화살표 클릭 및 키보드 ArrowUp / ArrowDown 이벤트를 통한 변화 값 | |
+| min | Number | -Infinity | value 의 최소값 | |
+| step | Number | 1 | 우측 화살표 클릭 및 키보드 ArrowUp / ArrowDown 입력 이벤트를 통한 변화 값 | |
+| step-strictly | Boolean | false | 설정한 step에 맞는 수만 허용. `modelValue`가 없을 경우 `props.min`을 기준으로 세팅됨(`props.min`을 따로 설정하지 않았을 경우, 0으로 세팅됨) | |
 | precision | Number |  | 고정 소수점 값. 0~100 사이의 정수 | |
 
 ### Event
@@ -33,5 +34,4 @@ height: 35px;
  | ---- | ------- | ---- |
  | focus | event | Event object. 컴포넌트 focus 이벤트 발생 시 호출 |
  | blur | event | Event object. 컴포넌트 blur 이벤트 발생 시 호출 |
- | input | (event, newValue) | 컴포넌트 input 이벤트 발생 시 호출 |
- | change | (event, newValue) | 컴포넌트 change 이벤트 발생 시 호출 |
+ | change | newValue | 컴포넌트 change 이벤트 발생 시 호출 |

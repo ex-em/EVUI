@@ -1,17 +1,15 @@
 <template>
   <div
     class="ev-text-field"
-    :class="[
-      `type-${type}`,
-      {
-        disabled,
-        clearable,
-        readonly,
-        error: errorMsg,
-        'show-password': showPassword,
-        'show-maxlength': showMaxLength,
-      },
-    ]"
+    :class="{
+      disabled,
+      clearable,
+      readonly,
+      error: !!errorMsg,
+      'show-password': showPassword,
+      'show-maxlength': showMaxLength,
+      [`type-${type}`]: !!type,
+    }"
   >
     <div
       class="ev-text-field-wrapper"
@@ -200,6 +198,14 @@ export default {
   @include clearfix();
 
   @import '../../style/components/input.scss';
+  &:hover {
+    .ev-input,
+    .ev-textarea {
+      @include evThemify() {
+        border: 1px solid evThemed('primary');
+      }
+    }
+  }
   &-wrapper {
     position: relative;
   }
@@ -227,8 +233,8 @@ export default {
     border-radius: 8px;
 
     @include evThemify() {
-      border: 1px solid evThemed('color-line-base');
-      color: evThemed('color-line-base');
+      border: 1px solid evThemed('border-base');
+      color: evThemed('border-base');
     }
   }
 }
@@ -253,12 +259,12 @@ export default {
     font-size: 15px;
 
     @include evThemify() {
-      color: evThemed('color-line-base');
+      color: evThemed('border-base');
     }
     &:hover,
     &.on {
       @include evThemify() {
-        color: evThemed('color-primary');
+        color: evThemed('primary');
       }
     }
   }
@@ -271,17 +277,17 @@ export default {
     font-size: 12px;
 
     @include evThemify() {
-      color: evThemed('color-line-base');
+      color: evThemed('border-base');
     }
     .curr-length {
       @include evThemify() {
-        color: darken(evThemed('color-line-base'), 10%);
+        color: darken(evThemed('border-base'), 10%);
       }
     }
     &.max,
     &.max * {
       @include evThemify() {
-        color: evThemed('color-error') !important;
+        color: evThemed('error') !important;
       }
     }
   }
@@ -294,7 +300,7 @@ export default {
     word-break: break-all;
 
     @include evThemify() {
-      color: evThemed('color-error');
+      color: evThemed('error');
     }
   }
 }

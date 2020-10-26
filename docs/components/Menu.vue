@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, onActivated } from 'vue';
 import router from '../router';
 
 export default {
@@ -26,6 +26,9 @@ export default {
       router.push({ path: routerLink });
     };
 
+    onActivated(() => {
+      document.documentElement.scrollTop = 0;
+    });
     return {
       store,
       currentMenu,
