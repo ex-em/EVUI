@@ -149,7 +149,6 @@ export default {
       background-color: themed('background-color-description');
       border: 1px solid themed('border-color-base');
     }
-
     .badge {
       display: inline-block;
       padding: 3px 7px;
@@ -160,7 +159,16 @@ export default {
         background-color: themed('border-color-base');
       }
       &.yellow {
-        background-color: $color-yellow;
+        background-color: rgba($color-yellow, 0.6);
+        color: $color-black;
+
+        @include themify() {
+          border: 1px solid themed('border-color-base');
+        }
+      }
+      &.dark {
+        background-color: #666666;
+        color: $color-white;
       }
     }
     .btn {

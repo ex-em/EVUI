@@ -30,10 +30,4 @@ export default {
 </script>
 
 <style>
-.evui-summary-header {
-  height: auto;
-}
-p {
-  font-size: 14px;
-}
 </style>

@@ -106,7 +106,7 @@ export default {
 @include state('disabled') {
   .ev-radio-label {
     @include evThemify() {
-      color: evThemed('color-disabled');
+      color: evThemed('disabled');
     }
   }
   .ev-radio-input,
@@ -122,14 +122,14 @@ export default {
     text-align: center;
 
     @include evThemify() {
-      border: 1px solid evThemed('color-line-base');
+      border: 1px solid evThemed('border-base');
       border-left: 0;
     }
     &:first-child {
       border-radius: $border-radius-button 0 0 $border-radius-button;
 
       @include evThemify() {
-        border-left: 1px solid evThemed('color-line-base');
+        border-left: 1px solid evThemed('border-base');
       }
     }
     &:last-child {
@@ -139,12 +139,12 @@ export default {
       color: $color-white;
 
       @include evThemify() {
-        background-color: evThemed('color-primary');
+        background-color: evThemed('primary');
       }
     }
     &.disabled.checked {
       @include evThemify() {
-        background-color: rgba(evThemed('color-line-base'), 0.5);
+        background-color: rgba(evThemed('border-base'), 0.5);
       }
     }
   }

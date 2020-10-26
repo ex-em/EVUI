@@ -6,6 +6,7 @@ import EvSelect from '@/components/select/Select.vue';
 import EvToggle from '@/components/toggle/Toggle.vue';
 import EvTextField from '@/components/textField/TextField.vue';
 import EvInputNumber from '@/components/inputNumber/InputNumber.vue';
+import EvSlider from '@/components/slider/Slider.vue';
 import EvIcon from '@/components/icon/Icon.vue';
 import { version } from '../package.json';
 
@@ -18,6 +19,7 @@ const components = [
   EvToggle,
   EvTextField,
   EvInputNumber,
+  EvSlider,
   EvIcon,
 ];
 
@@ -44,6 +46,7 @@ export {
   EvToggle,
   EvTextField,
   EvInputNumber,
+  EvSlider,
   EvIcon,
 };
 

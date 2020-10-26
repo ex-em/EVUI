@@ -7,21 +7,12 @@
   transition: border $animate-base;
 
   @include evThemify() {
-    border: 1px solid evThemed('color-line-base');
+    border: 1px solid evThemed('border-base');
   }
   &:focus,
   &:hover {
     @include evThemify() {
-      border: 1px solid evThemed('color-primary');
-    }
-  }
-}
-.ev-text-field:hover,
-.ev-input-number:hover {
-  .ev-input,
-  .ev-textarea {
-    @include evThemify() {
-      border: 1px solid evThemed('color-primary');
+      border: 1px solid evThemed('primary');
     }
   }
 }
@@ -39,12 +30,12 @@
   .ev-input,
   .ev-textarea {
     @include evThemify() {
-      background-color: evThemed('color-background-lighten');
+      background-color: evThemed('background-lighten');
     }
     &:focus,
     &:hover {
       @include evThemify() {
-        border: 1px solid rgba(evThemed('color-line-base'), 0.5);
+        border: 1px solid rgba(evThemed('border-base'), 0.5);
       }
     }
   }
@@ -53,7 +44,7 @@
     .ev-input,
     .ev-textarea {
       @include evThemify() {
-        border: 1px solid rgba(evThemed('color-line-base'), 0.5);
+        border: 1px solid rgba(evThemed('border-base'), 0.5);
       }
     }
   }
@@ -65,14 +56,14 @@
   .ev-input,
   .ev-textarea {
     @include evThemify() {
-      border: 1px solid evThemed('color-disabled');
-      background-color: evThemed('color-background-lighten');
-      color: evThemed('color-disabled');
+      border: 1px solid evThemed('disabled');
+      background-color: evThemed('background-lighten');
+      color: evThemed('disabled');
     }
     &:focus,
     &:hover {
       @include evThemify() {
-        border: 1px solid evThemed('color-error');
+        border: 1px solid evThemed('error');
       }
     }
   }
@@ -81,7 +72,7 @@
     .ev-input,
     .ev-textarea {
       @include evThemify() {
-        border: 1px solid evThemed('color-error');
+        border: 1px solid evThemed('error');
       }
     }
   }
@@ -90,12 +81,12 @@
   .ev-input,
   .ev-textarea {
     @include evThemify() {
-      border: 1px solid evThemed('color-error');
+      border: 1px solid evThemed('error');
     }
     &:focus,
     &:hover {
       @include evThemify() {
-        border: 1px solid rgba(evThemed('color-error'), 0.5);
+        border: 1px solid rgba(evThemed('error'), 0.5);
       }
     }
   }
@@ -104,7 +95,7 @@
     .ev-input,
     .ev-textarea {
       @include evThemify() {
-        border: 1px solid rgba(evThemed('color-error'), 0.5);
+        border: 1px solid rgba(evThemed('error'), 0.5);
       }
     }
   }
