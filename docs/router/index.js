@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Intro from 'docs/views/Intro.vue';
 import PageView from 'docs/views/PageView';
+import buttonProps from 'docs/views/button/props';
 import checkboxProps from 'docs/views/checkbox/props';
 import selectProps from 'docs/views/select/props';
 import toggleProps from 'docs/views/toggle/props';
@@ -29,7 +30,8 @@ const routes = [
   {
     path: '/button',
     name: 'Button',
-    component: () => import(/* webpackChunkName: "button" */ '../views/button'),
+    component: PageView,
+    props: buttonProps,
   },
   {
     path: '/checkbox',

@@ -1,6 +1,9 @@
 <template>
   <i
-    :class="[icon, sizeCls]"
+    :class="[
+      icon,
+      { [`ev-icon-${size}`]: !!size },
+    ]"
     @click.stop="onClick"
     @dblClick="onDblClick"
     @contextmenu="onContextMenu"
@@ -8,7 +11,6 @@
 </template>
 
 <script>
-import { computed, nextTick } from 'vue';
 import '@/style/lib/icon.css';
 
 export default {
@@ -21,6 +23,7 @@ export default {
     size: {
       type: String,
       default: '',
+      validator: val => ['', 'small', 'medium', 'large'].includes(val),
     },
   },
   emits: {
@@ -29,21 +32,16 @@ export default {
     'context-menu': null,
   },
   setup(props, { emit }) {
-    const sizeCls = computed(() => `ev-icon-${props.size}`);
     const onClick = async (e) => {
-      await nextTick();
       emit('click', e);
     };
     const onDblClick = async (e) => {
-      await nextTick();
       emit('dbl-click', e);
     };
     const onContextMenu = async (e) => {
-      await nextTick();
       emit('context-menu', e);
     };
     return {
-      sizeCls,
       onClick,
       onDblClick,
       onContextMenu,
