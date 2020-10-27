@@ -9,7 +9,8 @@
     }"
     :type="htmlType"
     :disabled="disabled"
-    @click="clickBtn"
+    :autofocus="autoFocus"
+    @click="(e) => $emit('click', e)"
   >
     <slot />
   </button>
@@ -23,33 +24,33 @@ export default {
       type: Boolean,
       default: false,
     },
+    autoFocus: {
+      type: Boolean,
+      default: false,
+    },
     type: {
       type: String,
       default: 'default',
+      validator: val => ['default', 'primary', 'info', 'warning', 'error', 'ghost', 'dashed', 'text'].includes(val),
     },
     htmlType: {
       type: String,
       default: 'button',
+      validator: val => ['button', 'submit', 'reset'].includes(val),
     },
     shape: {
       type: String,
       default: 'square',
+      validator: val => ['square', 'radius', 'circle'].includes(val),
     },
     size: {
       type: String,
       default: 'medium',
+      validator: val => ['small', 'medium', 'large'].includes(val),
     },
   },
   emits: {
     click: null,
-  },
-  setup(props, { emit }) {
-    const clickBtn = (e) => {
-      emit('click', e);
-    };
-    return {
-      clickBtn,
-    };
   },
 };
 </script>
@@ -147,7 +148,8 @@ export default {
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     opacity: 0.7;
   }
 
@@ -155,7 +157,8 @@ export default {
     opacity: 0.5;
     cursor: not-allowed;
 
-    &:hover {
+    &:hover,
+    &:focus {
       opacity: 0.5;
     }
   }
@@ -164,15 +167,15 @@ export default {
 @include state('ev-button-group') {
   .ev-button {
     margin: 0;
-    border-radius: 0;
-    border-left: 1px solid $color-white;
+    border-radius: 0 !important;
+    border-left: 1px solid $color-white !important;
 
     &:first-child {
-      border-radius: $border-radius-button 0 0 $border-radius-button;
-      border-left: 1px solid transparent;
+      border-radius: $border-radius-button 0 0 $border-radius-button !important;
+      border-left: 1px solid transparent !important;
     }
     &:last-child {
-      border-radius: 0 $border-radius-button $border-radius-button 0;
+      border-radius: 0 $border-radius-button $border-radius-button 0 !important;
     }
   }
 }

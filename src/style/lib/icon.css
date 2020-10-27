@@ -25,15 +25,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ev-icon-s {
+.ev-icon-small {
   font-size: 16px;
 }
 
-.ev-icon-m {
+.ev-icon-medium {
   font-size: 20px;
 }
 
-.ev-icon-l {
+.ev-icon-large {
   font-size: 25px;
 }
 

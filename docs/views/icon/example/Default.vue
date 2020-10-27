@@ -6,25 +6,25 @@
       <ev-icon icon="ev-icon-topology" />
       <i class="ev-icon-server"/>
     </div>
-    <div class="description">
+    <div class="description" style="margin-bottom: 20px;">
       font-size 지정하여 크기 변경
     </div>
     <div>
       <ev-icon
         icon="ev-icon-user2"
-        size="s"
+        size="small"
       />
       <ev-icon
         icon="ev-icon-user2"
-        size="m"
+        size="medium"
       />
       <ev-icon
         icon="ev-icon-user2"
-        size="l"
+        size="large"
       />
     </div>
     <div class="description">
-      size 변수(s, m, l) 바인딩
+      size 변수(small, medium, large) 바인딩
     </div>
   </div>
   <div class="case">
@@ -64,3 +64,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.case i {
+  margin-right: 10px;
+}
+</style>

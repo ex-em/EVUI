@@ -248,6 +248,34 @@
     </ev-button>
   </div>
   <div class="case">
+    <p class="case-title">HTML Type</p>
+    <form>
+      <ev-button
+        html-type="button"
+      >
+        Button
+      </ev-button>
+      <ev-button
+        html-type="submit"
+      >
+        Submit
+      </ev-button>
+      <ev-button
+        html-type="reset"
+      >
+        Reset
+      </ev-button>
+    </form>
+  </div>
+  <div class="case">
+    <p class="case-title">Auto Focus</p>
+    <ev-button
+      :auto-focus="true"
+    >
+      Auto Focus
+    </ev-button>
+  </div>
+  <div class="case">
     <p class="case-title">Event</p>
     <ev-button
       type="info"
@@ -268,7 +296,7 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const clickMsg = ref();
+    const clickMsg = ref('No event occurred');
     const clickBtn = (e) => {
       clickMsg.value = 'Button was clicked!';
       console.log('[EVUI][Button] Click event', e);
