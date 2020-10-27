@@ -244,20 +244,20 @@ export default {
       white-space: nowrap;
       outline: 0;
       text-align: start;
+      user-select: none;
     }
   }
 }
 .ev-tree-arrow {
   display: inline-block;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
   text-align: center;
-  margin-right: 5px;
+  margin-right: 2px;
+  vertical-align: middle;
   i {
     position: relative;
+    cursor: pointer;
     transition: all .2s ease-in-out;
-    font-size: 12px;
+    font-size: 14px;
     vertical-align: middle;
   }
 }
@@ -275,15 +275,18 @@ export default {
 }
 .ev-tree-icon {
   vertical-align: middle;
+  font-size: 16px;
 }
 .ev-tree-node {
   display: inline-block;
-  width: calc(100% - 20px);
+  width: calc(100% - 21px);
+  vertical-align: middle;
   .ev-checkbox {
     display: inline-block;
     float: none;
     .ev-checkbox-label {
       display: inline;
+      padding-left: 20px;
     }
   }
   .ev-tree-node-selected, .ev-tree-node-selected:hover {
