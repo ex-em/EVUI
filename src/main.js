@@ -1,3 +1,5 @@
+import EvButton from '@/components/button/Button.vue';
+import EvButtonGroup from '@/components/buttonGroup/ButtonGroup.vue';
 import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
 import EvRadio from '@/components/radio/Radio.vue';
@@ -11,6 +13,8 @@ import EvIcon from '@/components/icon/Icon.vue';
 import { version } from '../package.json';
 
 const components = [
+  EvButton,
+  EvButtonGroup,
   EvCheckbox,
   EvCheckboxGroup,
   EvRadio,
@@ -38,6 +42,8 @@ const EVUI = {
 };
 
 export {
+  EvButton,
+  EvButtonGroup,
   EvCheckbox,
   EvCheckboxGroup,
   EvRadio,

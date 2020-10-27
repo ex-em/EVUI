@@ -29,7 +29,7 @@ export default {
     'context-menu': null,
   },
   setup(props, { emit }) {
-    const sizeCls = computed(() => `ev-icon-${props.size}`);
+    const sizeCls = computed(() => (props.size ? `ev-icon-${props.size}` : ''));
     const onClick = async (e) => {
       await nextTick();
       emit('click', e);
