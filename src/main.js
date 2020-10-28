@@ -10,6 +10,8 @@ import EvTextField from '@/components/textField/TextField.vue';
 import EvInputNumber from '@/components/inputNumber/InputNumber.vue';
 import EvSlider from '@/components/slider/Slider.vue';
 import EvIcon from '@/components/icon/Icon.vue';
+import EvCalendar from '@/components/calendar/Calendar.vue';
+import EvTimePicker from '@/components/datePicker/DatePicker.vue';
 import { version } from '../package.json';
 
 const components = [
@@ -25,6 +27,8 @@ const components = [
   EvInputNumber,
   EvSlider,
   EvIcon,
+  EvCalendar,
+  EvTimePicker,
 ];
 
 const install = (app) => {
@@ -54,6 +58,8 @@ export {
   EvInputNumber,
   EvSlider,
   EvIcon,
+  EvCalendar,
+  EvTimePicker,
 };
 
 export default EVUI;

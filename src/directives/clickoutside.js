@@ -56,7 +56,35 @@ const selectClickoutside = {
   },
 };
 
+const datePickerClickoutside = {
+  mounted(el, binding) {
+    const componentEl = el;
+    const bubble = binding.modifiers.bubbles;
+    const selectDropbox = document.body.getElementsByClassName('ev-date-picker-dropdown');
+    const handler = (e) => {
+      if (!selectDropbox
+        && (bubble || (componentEl !== e.target && !componentEl.contains(e.target)))
+      ) {
+        binding.value(e);
+      } else if (selectDropbox && selectDropbox[0]
+        && (selectDropbox[0] !== e.target && !selectDropbox[0].contains(e.target))
+        && (componentEl !== e.target && !componentEl.contains(e.target))
+      ) {
+        binding.value(e);
+      }
+    };
+    componentEl.vueClickOutside = handler;
+    document.addEventListener('mousedown', handler);
+  },
+  unmounted(el) {
+    const componentEl = el;
+    document.removeEventListener('mousedown', componentEl.vueClickOutside);
+    componentEl.vueClickOutside = null;
+  },
+};
+
 export {
   clickoutside,
   selectClickoutside,
+  datePickerClickoutside,
 };
