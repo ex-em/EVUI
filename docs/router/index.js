@@ -10,6 +10,8 @@ import textFieldProps from 'docs/views/textField/props';
 import inputNumberProps from 'docs/views/inputNumber/props';
 import sliderProps from 'docs/views/slider/props';
 import iconProps from 'docs/views/icon/props';
+import datePickerProps from 'docs/views/datePicker/props';
+import calendarProps from 'docs/views/calendar/props';
 
 const routes = [
   {
@@ -85,9 +87,16 @@ const routes = [
     component: () => import(/* webpackChunkName: "treeTable" */ '../views/treeTable'),
   },
   {
+    path: '/calendar',
+    name: 'Calendar',
+    component: PageView,
+    props: calendarProps,
+  },
+  {
     path: '/datePicker',
     name: 'DatePicker',
-    component: () => import(/* webpackChunkName: "datePicker" */ '../views/datePicker'),
+    component: PageView,
+    props: datePickerProps,
   },
   {
     path: '/toggle',

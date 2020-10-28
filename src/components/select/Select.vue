@@ -26,7 +26,7 @@
         type="text"
         class="ev-input"
         readonly
-        :placeholder="placeholder"
+        :placeholder="computedPlaceholder"
         :disabled="disabled"
         @change="changeMv"
       />
@@ -37,14 +37,13 @@
         type="text"
         class="ev-input multiple"
         readonly
-        :placeholder="placeholder"
+        :placeholder="computedPlaceholder"
         :disabled="disabled"
       />
       <div class="ev-select-tag-wrapper">
         <template v-if="!collapseTags">
           <div
             v-for="item in selectedModel"
-            v-if="!collapseTags"
             :key="item"
             class="ev-select-tag"
           >
@@ -204,6 +203,7 @@ export default {
     const {
       mv,
       selectedModel,
+      computedPlaceholder,
       isClearableIcon,
       changeMv,
       removeAllMv,
@@ -234,6 +234,7 @@ export default {
     return {
       mv,
       selectedModel,
+      computedPlaceholder,
       isClearableIcon,
       changeMv,
       removeAllMv,
@@ -264,13 +265,8 @@ export default {
   position: relative;
   width: 100%;
   min-height: $select-height;
-  border: 1px solid #B2B2B2;
-  border-radius: 2px;
+  border-radius: $default-radius;
   cursor: pointer;
-
-  &.selected {
-    border: 1px solid #409EFF;
-  }
 
   &.disabled {
     background-color: #F5F7FA;
@@ -278,17 +274,14 @@ export default {
     color: #C0C4CC;
   }
 
+  @import '../../style/components/input.scss';
   .ev-input {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
     padding: 0 30px 0 15px;
-    border: 0;
-    outline: 0;
-    font-size: $font-size-medium;
-    background-color: transparent;
+    border: 1px solid #B2B2B2;
     cursor: pointer;
   }
 
@@ -313,17 +306,17 @@ export default {
       transform: rotate(180deg);
     }
   }
-}
 
-.ev-select-tag-wrapper {
-  $select-height: 35px;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: $select-height;
-  padding: 0 30px 0 0;
-  flex-wrap: wrap;
-  align-items: center;
+  .ev-select-tag-wrapper {
+    $select-height: 35px;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: $select-height;
+    padding: 0 30px 0 0;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 }
 
 .ev-select-tag {
@@ -367,8 +360,12 @@ export default {
   left: 0;
   width: 100%;
   max-height: $select-height * 5;
-  border: 1px solid #B2B2B2;
   background-color: white;
+  border: 1px solid #E4E7ED;
+  color: #606266;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  border-radius: 4px;
+  box-sizing: content-box;
   z-index: 100;
   cursor: pointer;
   overflow-x: hidden;

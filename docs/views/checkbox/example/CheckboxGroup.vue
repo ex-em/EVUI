@@ -109,10 +109,8 @@
 <script>
 import { ref } from 'vue';
 import { isEqual, sortBy } from 'lodash-es';
-import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
 
 export default {
-  components: { EvCheckboxGroup },
   setup() {
     const checkboxGroup = ref(['Option A', 'Option B']);
 

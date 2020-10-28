@@ -445,7 +445,7 @@ export default {
 }
 
 @include state('disabled') {
-  &, * {
+  & {
     cursor: not-allowed !important;
   }
   .ev-slider-thumb {

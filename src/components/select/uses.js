@@ -41,6 +41,13 @@ export const useModel = () => {
   const multipleSm = () => props.items.filter(v => props.modelValue.includes(v.value));
   const selectedModel = computed(!props.multiple ? singleSm : multipleSm);
 
+  const computedPlaceholder = computed(() => {
+    if (!props.multiple) {
+      return props.placeholder;
+    }
+    return mv.value.length ? null : props.placeholder;
+  });
+
   /**
    * clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부
    */
@@ -76,6 +83,7 @@ export const useModel = () => {
   return {
     mv,
     selectedModel,
+    computedPlaceholder,
     isClearableIcon,
     removeAllMv,
     removeMv,

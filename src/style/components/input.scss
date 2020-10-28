@@ -50,7 +50,7 @@
   }
 }
 @include state('disabled') {
-  &, * {
+  & {
     cursor: not-allowed !important;
   }
   .ev-input,
