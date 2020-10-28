@@ -28,6 +28,8 @@ const DAY_OF_THE_WEEK_NAME_LIST = {
   abbrKorName: ['일', '월', '화', '수', '목', '금', '토'],
 };
 const ONE_DAY_MS = 86400000;
+const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
+const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
 
 /**
  * 배열 내 여러 날짜(eg. 'YYYY-MM-DD' || 'YYYY-MM-DD HH:MI:SS') 중 가장 끝의 날짜 텍스트 구하기
@@ -189,9 +191,20 @@ export const useModel = () => {
    */
   let selectedValue;
   if (props.mode !== 'dateMulti' && props.mode !== 'dateRange') {
-    selectedValue = ref(props.modelValue);
-  } else {
+    if (!props.modelValue
+      || (props.modelValue.length === 10 && dateReg.exec(props.modelValue))
+      || (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue))
+    ) {
+      selectedValue = ref(props.modelValue);
+    } else {
+      selectedValue = ref('');
+    }
+  } else if (Array.isArray(props.modelValue)
+    && props.modelValue.every(v => (!v || (v.length === 10 && dateReg.exec(v))))
+  ) {
     selectedValue = ref([...props.modelValue]);
+  } else {
+    selectedValue = ref([]);
   }
 
   /**
@@ -225,7 +238,7 @@ export const useModel = () => {
       min: Math.floor(getDateTimeInfoByType(selectedValue.value, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
       sec: Math.floor(getDateTimeInfoByType(selectedValue.value, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
     });
-  } else if (selectedValue.value[0]) {
+  } else if (Array.isArray(selectedValue.value) && selectedValue.value[0]) {
     mainCalendarPageInfo = reactive({
       year: getDateTimeInfoByType(selectedValue.value[0], 'year'),
       month: getDateTimeInfoByType(selectedValue.value[0], 'month'),
@@ -239,13 +252,7 @@ export const useModel = () => {
 
   // 'mode: dateRange'인 경우 확장된 달력(연, 월) 페이징 정보
   let expandedCalendarPageInfo;
-  if (props.mode !== 'dateRange') {
-    expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
-      'next',
-      mainCalendarPageInfo.year,
-      mainCalendarPageInfo.month,
-    ));
-  } else if (selectedValue.value[1]) {
+  if (props.mode === 'dateRange' && Array.isArray(selectedValue.value) && selectedValue.value[1]) {
     expandedCalendarPageInfo = reactive({
       year: getDateTimeInfoByType(selectedValue.value[1], 'year'),
       month: getDateTimeInfoByType(selectedValue.value[1], 'month'),

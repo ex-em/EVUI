@@ -20,10 +20,10 @@
 |  | dateRange |  | 메인 캘린더와 확장 캘린더에서 fromDate ~ toDate를 선택 | \['YYYY-MM-DD'`(fromDate)`, 'YYYY-MM-DD'`(toDate)`\] |
 | monthNotation | String | 'fullName' | 캘린더 헤더의 월 표기방식 | 'fullName', 'abbrName', 'numberName', 'korName' |
 | dayOfTheWeekNotation | String | 'abbrUpperName' | 캘린더의 요일 표기방식 | 'abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName' |
-| options | Object | {} | `mode: dateMulti`의 세부 옵션 |  |
-|  | multiType | 'date' | 멀티모드 타입 | 'weekday', 'week', 'date' |
-|  |  | date | limit개수만큼 단일 날짜 선택 | \[YYYY-MM-DD, ...\] |
+| options | Object | {} | 캘린더의 세부 옵션 |  |
+|  | multiType | 'date' | `mode: dateMulti` 의 세부 타입 | 'weekday', 'week', 'date' |
+|  |  | date | limit 개수만큼 단일 날짜 선택 | \[YYYY-MM-DD, ...\] |
 |  |  | weekday | 주중(월~금) 선택 | \['YYYY-MM-DD'`월`, 'YYYY-MM-DD'`화`, 'YYYY-MM-DD'`수`, 'YYYY-MM-DD'`목`, 'YYYY-MM-DD'`금`\] |
 |  |  | week | 주일(일~토) 선택 | \['YYYY-MM-DD'`일`, 'YYYY-MM-DD'`월`, 'YYYY-MM-DD'`화`, 'YYYY-MM-DD'`수`, 'YYYY-MM-DD'`목`, 'YYYY-MM-DD'`금`, 'YYYY-MM-DD'`토`\] |
-|  | multiDayLimit | 1 | `type: day` 시 선택 일수 제한 |  |
+|  | multiDayLimit | 1 | `mode: dateMulti, type: date` 시 선택 일수 제한 |  |
 |  | disabledDate | () => {} | 달력 상 사용불가능 날짜를 함수로 정의 |  |

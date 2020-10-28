@@ -200,15 +200,15 @@ export default {
       type: [String, Array],
       default: '',
       validator: (value) => {
-        const dateReq = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-        const dateTimeReq = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
+        const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
+        const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
         if (Array.isArray(value)) {
           return value.every(v => !!(!v
-            || (v.length === 10 && dateReq.exec(v))));
+            || (v.length === 10 && dateReg.exec(v))));
         }
         return !!(!value
-          || (value.length === 10 && dateReq.exec(value))
-          || (value.length === 19 && dateTimeReq.exec(value)));
+          || (value.length === 10 && dateReg.exec(value))
+          || (value.length === 19 && dateTimeReg.exec(value)));
       },
     },
     mode: {
