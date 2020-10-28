@@ -70,7 +70,6 @@
         width: 0,
         height: 0,
         visibility: 'hidden',
-        scrollbarSize: 16,
       };
     },
     computed: {
@@ -131,23 +130,25 @@
       },
       setPosition(e, x, y) {
         const scrollEl = document.scrollingElement || document.documentElement || document.body;
-        const isHScroll = window.innerWidth < scrollEl.scrollWidth;
-        const isVScroll = window.innerHeight < scrollEl.scrollHeight;
+        const scrollbarSize = window.innerWidth - scrollEl.clientWidth;
         const clientX = x || 0;
         const clientY = y || 0;
         const remainingWidth = (window.innerWidth - clientX)
-          - (isVScroll ? this.scrollbarSize : 0);
+          - scrollbarSize;
         const remainingHeight = (window.innerHeight - clientY)
-          - (isHScroll ? this.scrollbarSize : 0);
+          - scrollbarSize;
+        const clientRect = this.$el.firstElementChild.getClientRects()[0];
+        const clientWidth = clientRect.width || this.width;
+        const clientHeight = clientRect.height || this.height;
         let left = clientX + scrollEl.scrollLeft;
         let top = clientY + scrollEl.scrollTop;
 
-        if (this.width > remainingWidth) {
-          left -= (this.width - remainingWidth);
+        if (clientWidth > remainingWidth) {
+          left -= (clientWidth - remainingWidth);
         }
 
-        if (this.height > remainingHeight) {
-          top -= (this.height - remainingHeight);
+        if (clientHeight > remainingHeight) {
+          top -= (clientHeight - remainingHeight);
         }
 
         this.left = left;

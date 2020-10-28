@@ -165,7 +165,7 @@
 
           const remainingHeight = (window.innerHeight - top)
             - (this.isHScroll ? this.scrollbarSize : 0);
-          const remainingWidth = (window.innerWidth - (clientRectLeft + parentWidth))
+          const remainingWidth = (window.innerWidth - (parentClientRect.x + parentWidth))
             - (this.isVScroll ? this.scrollbarSize : 0);
 
           if (this.height > remainingHeight) {
