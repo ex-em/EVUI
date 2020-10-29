@@ -297,9 +297,8 @@ import { ref } from 'vue';
 export default {
   setup() {
     const clickMsg = ref('No event occurred');
-    const clickBtn = (e) => {
+    const clickBtn = () => {
       clickMsg.value = 'Button was clicked!';
-      console.log('[EVUI][Button] Click event', e);
     };
     return {
       clickMsg,

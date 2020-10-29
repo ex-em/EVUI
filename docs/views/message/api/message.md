@@ -5,7 +5,7 @@
     <ev-button
       @click="showMsg"
     >
-      Show HTML
+      Show Message
     </ev-button>
 </template>
 <script>
