@@ -14,10 +14,7 @@ const useModel = (param) => {
   const mv = computed({
     get: () => {
       if (!props.modelValue) {
-        if (props.mode === 'date' || props.mode === 'dateTime') {
-          return '';
-        }
-        return [];
+        return (props.mode === 'date' || props.mode === 'dateTime') ? '' : [];
       }
       return props.modelValue;
     },
@@ -42,18 +39,20 @@ const useModel = (param) => {
       mv.value = null;
     } else {
       mv.value.splice(0);
+      mv.value = [...mv.value];
       isDropbox.value = false;
     }
   };
 
   /**
-   * mode: dateMulti, type: day인 경우 선택된 value를 mv에서 삭제하는 로직
+   * mode: dateMulti, type: date인 경우 선택된 value를 mv에서 삭제하는 로직
    * @param val - tagWrapper에서 [x]클릭된 목록의 value
    */
   const removeMv = (val) => {
     if (!props.disabled) {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
+      mv.value = [...mv.value];
     }
   };
 
@@ -99,6 +98,21 @@ const useDropdown = () => {
   const clickOutsideDropbox = () => {
     isDropbox.value = false;
   };
+
+  watch(
+    () => props.modelValue,
+    (cur) => {
+      if (props.mode === 'dateMulti'
+        && props?.options?.multiType === 'date'
+        && props?.options?.multiDayLimit > cur.length
+      ) {
+        return;
+      } else if (props.mode === 'dateTime') {
+        return;
+      }
+      clickOutsideDropbox();
+    },
+  );
 
   return {
     isDropbox,

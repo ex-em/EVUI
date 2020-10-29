@@ -4,7 +4,12 @@
     <ev-date-picker
       v-model="date1"
       placeholder="Select a date."
-      :clearable="true"
+      clearable
+    />
+    <ev-date-picker
+      v-model="date1"
+      placeholder="Select a date."
+      disabled
     />
     <div class="description">
       <span class="badge">
@@ -27,14 +32,14 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Calendar dateMulti mode(type: day, limit: 3)</p>
+    <p class="case-title">Calendar dateMulti mode(multiType: date, multiDayLimit: 3)</p>
     <ev-date-picker
       v-model="dateMulti1"
       mode="dateMulti"
       :clearable="true"
-      :date-multi-option="{
-        type: 'day',
-        limit: 3,
+      :options="{
+        multiType: 'date',
+        multiDayLimit: 3,
         disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6,
       }"
     />
@@ -46,13 +51,13 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Calendar dateMulti mode(type: weekday)</p>
+    <p class="case-title">Calendar dateMulti mode(multiType: weekday)</p>
     <ev-date-picker
       v-model="dateMulti2"
       mode="dateMulti"
       :clearable="true"
-      :date-multi-option="{
-        type: 'weekday',
+      :options="{
+        multiType: 'weekday',
       }"
     />
     <div class="description">
@@ -63,21 +68,21 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Calendar dateMulti mode(type: week)</p>
+    <p class="case-title">Calendar dateMulti mode(multiType: week)</p>
     <ev-date-picker
       v-model="dateMulti3"
       mode="dateMulti"
       :clearable="true"
-      :date-multi-option="{
-        type: 'week',
+      :options="{
+        multiType: 'week',
         tagShorten: true,
       }"
     />
     <ev-date-picker
       v-model="dateMulti3"
       mode="dateMulti"
-      :date-multi-option="{
-        type: 'week',
+      :options="{
+        multiType: 'week',
       }"
     />
     <div class="description">
@@ -85,6 +90,20 @@
         Value
       </span>
       {{ dateMulti3 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Calendar dateRange mode</p>
+    <ev-date-picker
+      v-model="dateRange1"
+      mode="dateRange"
+      :clearable="true"
+    />
+    <div class="description">
+      <span class="badge">
+        Value
+      </span>
+      {{ dateRange1 }}
     </div>
   </div>
 </template>
@@ -99,6 +118,7 @@ export default {
     const dateMulti1 = ref([]);
     const dateMulti2 = ref([]);
     const dateMulti3 = ref([]);
+    const dateRange1 = ref([]);
 
     return {
       date1,
@@ -106,6 +126,7 @@ export default {
       dateMulti1,
       dateMulti2,
       dateMulti3,
+      dateRange1,
     };
   },
 };

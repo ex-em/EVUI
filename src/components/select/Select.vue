@@ -4,7 +4,7 @@
     class="ev-select"
     :class="{
       selected: isDropbox,
-      disabled: disabled,
+      disabled,
     }"
     @click.stop="clickSelectInput"
   >
