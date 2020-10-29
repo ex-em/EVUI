@@ -5,7 +5,7 @@
       appear
     >
       <div
-        v-if="!closed"
+        v-if="isShow"
         class="ev-message"
         :class="{
           [`type-${type}`]: !!type,
@@ -85,16 +85,14 @@ export default {
   setup(props) {
     const state = reactive({
       timer: null,
-      closed: false,
-      visible: false,
+      isShow: true,
     });
     const clearTimer = () => {
       clearTimeout(state.timer);
       state.timer = null;
     };
     const closeMsg = () => {
-      state.closed = true;
-      state.visible = false;
+      state.isShow = false;
       if (props.onClose && typeof props.onClose === 'function') {
         props.onClose();
       }
@@ -102,7 +100,6 @@ export default {
     };
     const startTimer = () => {
       if (props.duration > 0) {
-        state.visible = true;
         state.timer = setTimeout(closeMsg, props.duration);
       }
     };
@@ -111,15 +108,14 @@ export default {
         closeMsg();
       }
     };
+
     onMounted(() => {
       startTimer();
       document.addEventListener('keydown', keydown);
     });
-
     onUnmounted(() => {
       document.removeEventListener('keydown', keydown);
     });
-
     return {
       startTimer,
       clearTimer,
