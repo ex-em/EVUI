@@ -52,6 +52,12 @@
         <p>{{ errorMsgWrapper }}</p>
       </div>
       <div
+        v-show="customErrorMsg"
+        :class="errorTextClass"
+      >
+        <p>{{ customErrorMsg }}</p>
+      </div>
+      <div
         v-show="useMaxLength"
         :class="maxLengthClass"
       >
@@ -120,6 +126,10 @@
       errorMsg: {
         type: String,
         default: 'Wrong Message',
+      },
+      customErrorMsg: {
+        type: String,
+        default: '',
       },
       borderColor: {
         type: String,
