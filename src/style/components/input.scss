@@ -50,8 +50,19 @@
   }
 }
 @include state('disabled') {
-  & {
-    cursor: not-allowed !important;
+  &.ev-input-number,
+  &.ev-text-field {
+    &, * {
+      cursor: not-allowed !important;
+    }
+    &:hover {
+      .ev-input,
+      .ev-textarea {
+        @include evThemify() {
+          border: 1px solid evThemed('error');
+        }
+      }
+    }
   }
   .ev-input,
   .ev-textarea {
@@ -62,15 +73,6 @@
     }
     &:focus,
     &:hover {
-      @include evThemify() {
-        border: 1px solid evThemed('error');
-      }
-    }
-  }
-  &.ev-text-field:hover,
-  &.ev-input-number:hover {
-    .ev-input,
-    .ev-textarea {
       @include evThemify() {
         border: 1px solid evThemed('error');
       }

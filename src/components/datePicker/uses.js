@@ -4,29 +4,44 @@ import {
   nextTick, getCurrentInstance,
 } from 'vue';
 
-const useModel = (param) => {
-  const { props, emit } = getCurrentInstance();
-  const isDropbox = param.isDropbox;
+const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
+const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
 
-  /**
-   * Select 컴포넌트의 v-model 값
-   */
+const useModel = () => {
+  const { props, emit } = getCurrentInstance();
+
+  // Select 컴포넌트의 v-model 값
   const mv = computed({
     get: () => {
       if (!props.modelValue) {
-        if (props.mode === 'date' || props.mode === 'dateTime') {
-          return '';
-        }
-        return [];
+        return (props.mode === 'date' || props.mode === 'dateTime') ? '' : [];
       }
       return props.modelValue;
     },
     set: value => emit('update:modelValue', value),
   });
 
-  /**
-   * clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부
-   */
+  // mode: 'date' or 'dateTime'시 input box의 입력된 텍스트값
+  const currentValue = ref(props.modelValue);
+
+  const validateValue = (curr) => {
+    if (props.mode === 'date'
+      && (curr.length !== 10 || !dateReg.exec(curr))
+    ) {
+      currentValue.value = mv.value;
+    } else if (props.mode === 'dateTime'
+      && (curr.length !== 19 || !dateTimeReg.exec(curr))
+    ) {
+      currentValue.value = mv.value;
+    } else {
+      mv.value = curr;
+    }
+  };
+
+  // 드랍박스 존재 여부
+  const isDropbox = ref(false);
+
+  // clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부
   const isClearableIcon = computed(() => {
     if (props.mode === 'date' || props.mode === 'dateTime') {
       return mv.value;
@@ -42,18 +57,20 @@ const useModel = (param) => {
       mv.value = null;
     } else {
       mv.value.splice(0);
+      mv.value = [...mv.value];
       isDropbox.value = false;
     }
   };
 
   /**
-   * mode: dateMulti, type: day인 경우 선택된 value를 mv에서 삭제하는 로직
+   * mode: dateMulti, type: date인 경우 선택된 value를 mv에서 삭제하는 로직
    * @param val - tagWrapper에서 [x]클릭된 목록의 value
    */
   const removeMv = (val) => {
     if (!props.disabled) {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
+      mv.value = [...mv.value];
     }
   };
 
@@ -68,18 +85,19 @@ const useModel = (param) => {
 
   return {
     mv,
+    currentValue,
+    isDropbox,
     isClearableIcon,
+    validateValue,
     removeAllMv,
     changeMv,
     removeMv,
   };
 };
 
-const useDropdown = () => {
+const useDropdown = (param) => {
   const { props } = getCurrentInstance();
-
-  // 드랍박스 존재 여부
-  const isDropbox = ref(false);
+  const { isDropbox, currentValue } = param;
 
   /**
    * 인풋박스 클릭 이벤트
@@ -100,6 +118,24 @@ const useDropdown = () => {
     isDropbox.value = false;
   };
 
+  watch(
+    () => props.modelValue,
+    (curr) => {
+      if (props.mode === 'dateMulti'
+        && props?.options?.multiType === 'date'
+        && props?.options?.multiDayLimit > curr.length
+      ) {
+        return;
+      } else if (props.mode === 'dateTime') {
+        currentValue.value = curr;
+        return;
+      } else if (props.mode === 'date') {
+        currentValue.value = curr;
+      }
+      clickOutsideDropbox();
+    },
+  );
+
   return {
     isDropbox,
     clickSelectInput,
@@ -108,7 +144,7 @@ const useDropdown = () => {
 };
 
 const usePosition = (param) => {
-  const isDropbox = param.isDropbox;
+  const { isDropbox } = param;
 
   const datePicker = ref(null);
   const itemWrapper = ref(null);

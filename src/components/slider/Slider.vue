@@ -337,7 +337,7 @@ export default {
     bottom: $handle-height + 10px;
     padding: 3px 5px;
     color: $color-white;
-    border-radius: $border-radius-button;
+    border-radius: $default-radius;
     font-size: $font-size-base;
     opacity: 0;
     z-index: 850;
@@ -442,43 +442,42 @@ export default {
   @include state('show-mark') {
     padding-bottom: $handle-height;
   }
-}
-
-@include state('disabled') {
-  & {
-    cursor: not-allowed !important;
-  }
-  .ev-slider-thumb {
-    @include evThemify() {
-      background-color: evThemed('disabled');
-    }
-    &.left,
-    &.right {
-      @include evThemify() {
-        background-color: lighten(evThemed('disabled'), 5%);
-      }
-    }
-  }
-  .ev-slider-handle {
-    &-btn {
+  @include state('disabled') {
+    &, * {
       cursor: not-allowed !important;
-
+    }
+    .ev-slider-thumb {
       @include evThemify() {
-        background-color: evThemed('border-light');
-        border-color: evThemed('disabled');
+        background-color: evThemed('disabled');
+      }
+      &.left,
+      &.right {
+        @include evThemify() {
+          background-color: lighten(evThemed('disabled'), 5%);
+        }
       }
     }
-    &.on,
-    &:hover {
-      .ev-slider-handle-btn {
-        transform: scale(1);
+    .ev-slider-handle {
+      &-btn {
+        cursor: not-allowed !important;
+
+        @include evThemify() {
+          background-color: evThemed('border-light');
+          border-color: evThemed('disabled');
+        }
+      }
+      &.on,
+      &:hover {
+        .ev-slider-handle-btn {
+          transform: scale(1);
+        }
       }
     }
-  }
-  .ev-slider-tooltip,
-  .ev-slider-tooltip:before {
-    @include evThemify() {
-      background-color: evThemed('disabled');
+    .ev-slider-tooltip,
+    .ev-slider-tooltip:before {
+      @include evThemify() {
+        background-color: evThemed('disabled');
+      }
     }
   }
 }
