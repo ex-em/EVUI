@@ -1,7 +1,18 @@
-import EvMessage from './message.js';
+import { defineComponent, h, render } from 'vue';
+import Component from './Message.vue';
 
-// EvMessage.install = (app) => {
-//   app.component(EvMessage.name, EvMessage);
-// };
+const componentObj = defineComponent(Component);
 
-export default EvMessage;
+const root = document.createElement('div');
+root.classList.add('ev-message-modal');
+document.body.appendChild(root);
+
+export default function message(options = {}) {
+  const msgOption = (typeof options === 'string') ? { message: options } : options;
+  const instance = h(
+    componentObj,
+    msgOption,
+  );
+  const container = document.createElement('div');
+  render(instance, container);
+}

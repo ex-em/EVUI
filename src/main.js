@@ -12,7 +12,7 @@ import EvSlider from '@/components/slider/Slider.vue';
 import EvIcon from '@/components/icon/Icon.vue';
 import EvCalendar from '@/components/calendar/Calendar.vue';
 import EvTimePicker from '@/components/datePicker/DatePicker.vue';
-import EvMessage from '@/components/message/message.js';
+import EvMessage from '@/components/message/';
 import { version } from '../package.json';
 
 const components = [

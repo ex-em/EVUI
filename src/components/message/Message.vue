@@ -93,7 +93,7 @@ export default {
     };
     const closeMsg = () => {
       state.isShow = false;
-      if (props.onClose && typeof props.onClose === 'function') {
+      if (props.onClose) {
         props.onClose();
       }
       clearTimer();
