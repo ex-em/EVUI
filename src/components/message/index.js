@@ -7,7 +7,7 @@ const root = document.createElement('div');
 root.classList.add('ev-message-modal');
 document.body.appendChild(root);
 
-export default function message(options = {}) {
+const message = (options = {}) => {
   const msgOption = (typeof options === 'string') ? { message: options } : options;
   const instance = h(
     componentObj,
@@ -15,4 +15,6 @@ export default function message(options = {}) {
   );
   const container = document.createElement('div');
   render(instance, container);
-}
+};
+
+export default message;
