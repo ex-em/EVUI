@@ -167,14 +167,14 @@ export default {
       border-left: 0;
     }
     &:first-child {
-      border-radius: $border-radius-button 0 0 $border-radius-button;
+      border-radius: $default-radius 0 0 $default-radius;
 
       @include evThemify() {
         border-left: 1px solid evThemed('border-base');
       }
     }
     &:last-child {
-      border-radius: 0 $border-radius-button $border-radius-button 0;
+      border-radius: 0 $default-radius $default-radius 0;
     }
     &.checked {
       color: $color-white;

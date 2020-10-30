@@ -66,7 +66,7 @@ export default {
   padding: 0 $default-padding;
   line-height: $default-height;
   font-size: $font-size-medium;
-  border-radius: $border-radius-button;
+  border-radius: $default-radius;
   cursor: pointer;
   outline: none;
   color: $color-white;
@@ -171,11 +171,11 @@ export default {
     border-left: 1px solid $color-white !important;
 
     &:first-child {
-      border-radius: $border-radius-button 0 0 $border-radius-button !important;
+      border-radius: $default-radius 0 0 $default-radius !important;
       border-left: 1px solid transparent !important;
     }
     &:last-child {
-      border-radius: 0 $border-radius-button $border-radius-button 0 !important;
+      border-radius: 0 $default-radius $default-radius 0 !important;
     }
   }
 }
