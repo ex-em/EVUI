@@ -22,7 +22,7 @@
     <template v-else>
       <input
         type="text"
-        class="ev-input"
+        class="ev-input readonly"
         readonly
         :placeholder="placeholder"
         :disabled="disabled"
@@ -252,12 +252,8 @@ export default {
     height: 100%;
     padding: 0 $input-default-padding 0 $calendar-icon-width;
 
-    &.no-tag-input {
-      position: relative;
-      width: 100px;
-      padding: 0 10px;
-      border: 0;
-      text-align: center;
+    &.readonly {
+      cursor: pointer;
     }
   }
 

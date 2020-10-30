@@ -97,7 +97,7 @@
     <ev-date-picker
       v-model="dateRange1"
       mode="dateRange"
-      :clearable="true"
+      clearable
     />
     <div class="description">
       <span class="badge">

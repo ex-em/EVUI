@@ -4,7 +4,7 @@
 ```
 <ev-date-picker
   v-model=""
-  ...
+  ...옵션
 />
 ```
 - <데이트피커>는 인풋박스와 드롭다운, 캘린더로 기능을 구현
@@ -19,8 +19,8 @@
 | disabled | Boolean | false | <데이트피커> 사용여부 |  |
 | clearable | Boolean | false | <데이트피커> 내 선택된 항목을 모두 clear할 수 있는 아이콘 사용 여부 |  |
 | mode | String | 'date' | 캘린더 모드 | 'date', 'dateTime', 'dateMulti', 'dateRange' |
-|  |  | date(default) | 메인 캘린더에서 날짜를 선택 | 'YYYY-MM-DD' |
-|  |  | dateTime | 메인 캘린더에 날짜와 시간(HMS)을 선택 | 'YYYY-MM-DD HH:MI:SS' |
+|  |  | date(default) | 메인 캘린더에서 날짜를 선택(사용자가 인풋에 직접 입력 가능) | 'YYYY-MM-DD' |
+|  |  | dateTime | 메인 캘린더에 날짜와 시간(HMS)을 선택(사용자가 인풋에 직접 입력 가능) | 'YYYY-MM-DD HH:MI:SS' |
 |  |  | dateMulti | 메인 캘린더에 여러 날짜는 선택 | \['YYYY-MM-DD', ...\] |
 |  |  | dateRange | 메인 캘린더와 확장 캘린더에서 fromDate ~ toDate를 선택 | \['YYYY-MM-DD'`(fromDate)`, 'YYYY-MM-DD'`(toDate)`\] |
 | monthNotation | String | 'fullName' | 캘린더 헤더의 월 표기방식 | 'fullName', 'abbrName', 'numberName', 'korName' |
