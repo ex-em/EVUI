@@ -4,15 +4,16 @@
       <div class="ev-calendar-header">
         <div>
           <i
-            class="ev-icon-s-arrow-left"
+            class="ev-icon-s-arrow-left move-month-arrow"
             @click="clickPrevNextBtn('main', 'prev')"
           />
         </div>
         <span class="ev-calendar-year">{{ mainCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ mainCalendarMonth }}</span>
-        <div :class="{ disabled: isContinuousMonths }">
+        <div>
           <i
-            class="ev-icon-s-arrow-right"
+            class="ev-icon-s-arrow-right move-month-arrow"
+            :class="{ disabled: isContinuousMonths }"
             @click="clickPrevNextBtn('main', 'next')"
           />
         </div>
@@ -68,9 +69,10 @@
       class="ev-calendar-date-area"
     >
       <div class="ev-calendar-header">
-        <div :class="{ disabled: isContinuousMonths }">
+        <div>
           <i
-            class="ev-icon-s-arrow-left"
+            class="ev-icon-s-arrow-left move-month-arrow"
+            :class="{ disabled: isContinuousMonths }"
             @click="clickPrevNextBtn('expanded', 'prev')"
           />
         </div>
@@ -78,7 +80,7 @@
         <span class="ev-calendar-month">{{ expandedCalendarMonth }}</span>
         <div>
           <i
-            class="ev-icon-s-arrow-right"
+            class="ev-icon-s-arrow-right move-month-arrow"
             @click="clickPrevNextBtn('expanded', 'next')"
           />
         </div>
@@ -343,12 +345,9 @@ export default {
     width: 20px;
     flex: 1;
     text-align: center;
-    &.disabled i {
-      color: #C0C4CC;
-    }
   }
 
-  i {
+  .move-month-arrow {
     width: 20px;
     height: 20px;
     line-height: 20px;
@@ -357,6 +356,9 @@ export default {
     cursor: pointer;
     &:hover {
       color: #3C81F6;
+    }
+    &.disabled {
+      color: #C0C4CC;
     }
   }
 
