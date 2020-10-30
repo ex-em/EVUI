@@ -1,4 +1,4 @@
-import EvMessage from './Message.js';
+import EvMessage from './message.js';
 
 // EvMessage.install = (app) => {
 //   app.component(EvMessage.name, EvMessage);

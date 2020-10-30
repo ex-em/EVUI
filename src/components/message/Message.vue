@@ -100,11 +100,15 @@ export default {
     };
     const startTimer = () => {
       if (props.duration > 0) {
-        state.timer = setTimeout(closeMsg, props.duration);
+        state.timer = setTimeout(() => {
+          if (state.isShow) {
+            closeMsg();
+          }
+        }, props.duration);
       }
     };
     const keydown = (e) => {
-      if (e.keyCode === 27) {
+      if (e.keyCode === 27 && state.isShow) {
         closeMsg();
       }
     };

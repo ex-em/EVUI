@@ -1,5 +1,5 @@
 ### Desc
-`app.config.globalProperties`에 등록되어 있어, 각 컴포넌트에서 아래처럼 사용 가능 
+$message 는 `app.config.globalProperties`에 등록되어 있어, 각 컴포넌트에서 아래처럼 사용 가능 
 ```vue
 <template>
     <ev-button
