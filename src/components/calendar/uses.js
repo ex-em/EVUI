@@ -1,5 +1,5 @@
 import {
-  ref, reactive, computed, getCurrentInstance, unref, onBeforeMount,
+  ref, reactive, computed, watch, getCurrentInstance, unref, onBeforeMount,
 } from 'vue';
 import { throttle } from 'lodash-es';
 
@@ -157,6 +157,7 @@ const getDateTimeInfoByType = (param, typeToImport) => {
 
 /**
  * 이전달, 다음달의 달력 상 연도, 월 정보 구하기
+ * @param prevNext - 이전, 다음 여부 ('prev'|'next')
  * @param year
  * @param month
  * @returns {{month: number, year: *}}
@@ -252,11 +253,28 @@ export const useModel = () => {
 
   // 'mode: dateRange'인 경우 확장된 달력(연, 월) 페이징 정보
   let expandedCalendarPageInfo;
-  if (props.mode === 'dateRange' && Array.isArray(selectedValue.value) && selectedValue.value[1]) {
-    expandedCalendarPageInfo = reactive({
+  if (props.mode === 'dateRange'
+    && Array.isArray(selectedValue.value)
+    && selectedValue.value[1]
+  ) {
+    const fromDate = {
+      year: getDateTimeInfoByType(selectedValue.value[0], 'year'),
+      month: getDateTimeInfoByType(selectedValue.value[0], 'month'),
+    };
+    const toDate = {
       year: getDateTimeInfoByType(selectedValue.value[1], 'year'),
       month: getDateTimeInfoByType(selectedValue.value[1], 'month'),
-    });
+    };
+    // fromDate, toDate의 연, 월이 같은 경우의 확장된 달력 페이징 정보는 다음달로 세팅
+    if (fromDate.year === toDate.year && fromDate.month === toDate.month) {
+      expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
+        'next',
+        mainCalendarPageInfo.year,
+        mainCalendarPageInfo.month,
+      ));
+    } else {
+      expandedCalendarPageInfo = reactive(toDate);
+    }
   } else {
     expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
       'next',
@@ -274,6 +292,11 @@ export const useModel = () => {
   // 현재 달력에 표현되는 타입별 요일
   const dayOfTheWeekList = computed(() =>
     DAY_OF_THE_WEEK_NAME_LIST[props.dayOfTheWeekNotation]);
+  // mode: dateRange에 두 달력이 연속적인 경우
+  const isContinuousMonths = computed(
+    () => props.mode === 'dateRange'
+      && (getSideMonthCalendarInfo('next', mainCalendarPageInfo.year, mainCalendarPageInfo.month).year === expandedCalendarPageInfo.year
+        && getSideMonthCalendarInfo('next', mainCalendarPageInfo.year, mainCalendarPageInfo.month).month === expandedCalendarPageInfo.month));
 
   onBeforeMount(() => {
     validateModelValue();
@@ -286,6 +309,7 @@ export const useModel = () => {
     mainCalendarMonth,
     expandedCalendarMonth,
     dayOfTheWeekList,
+    isContinuousMonths,
   };
 };
 
@@ -464,6 +488,22 @@ export const useCalendarDate = (param) => {
       + (currRowIdx * CELL_CNT_IN_ONE_ROW) + currColIdx;
     return timeTableInfo[timeType][currIdx];
   };
+
+  watch(
+    () => props.modelValue,
+    (curr) => {
+      selectedValue.value = curr;
+      if (props.mode !== 'dateRange') {
+        setCalendarDate('main');
+        if (props.mode === 'dateTime') {
+          setHmsTime();
+        }
+      } else {
+        setCalendarDate('main');
+        setCalendarDate('expanded');
+      }
+    },
+  );
 
   return {
     mainCalendarTableInfo,

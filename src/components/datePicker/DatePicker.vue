@@ -3,34 +3,44 @@
     ref="datePicker"
     v-clickoutside="clickOutsideDropbox"
     class="ev-date-picker"
+    :class="{
+      disabled,
+    }"
     @click="clickSelectInput"
   >
     <template v-if="mode === 'date' || mode === 'dateTime'">
       <input
-        v-model="mv"
+        v-model.trim="currentValue"
         type="text"
         class="ev-input"
         :placeholder="placeholder"
+        :disabled="disabled"
+        @keydown.enter.prevent="validateValue(currentValue)"
+        @change="validateValue(currentValue)"
       />
     </template>
     <template v-else>
       <input
         type="text"
-        class="ev-input"
+        class="ev-input readonly"
         readonly
         :placeholder="placeholder"
+        :disabled="disabled"
       />
-      <template v-if="!dateMultiOption.tagShorten">
+      <template
+        v-if="mode === 'dateMulti'
+          && (options.multiType === 'date' || !options.tagShorten)"
+      >
         <div class="ev-select-tag-wrapper">
           <div
             v-for="(item, idx) in mv"
             :key="`${item}_${idx}`"
             class="ev-select-tag"
-            :class="{ num: dateMultiOption.type !== 'day' }"
+            :class="{ num: options.multiType !== 'date' }"
           >
             <span class="ev-tag-name"> {{ item }} </span>
             <span
-              v-if="dateMultiOption.type === 'day'"
+              v-if="options.multiType === 'date'"
               class="ev-tag-suffix"
               @click.stop="removeMv(item)"
             >
@@ -74,6 +84,7 @@
     <div
       v-if="isDropbox"
       class="ev-date-picker-dropdown"
+      :class="mode"
       :style="dropdownStyle"
     >
       <ev-calendar
@@ -82,7 +93,7 @@
         :mode="mode"
         :month-notation="monthNotation"
         :day-of-the-week-notation="dayOfTheWeekNotation"
-        :date-multi-option="dateMultiOption"
+        :options="options"
       />
     </div>
   </teleport>
@@ -102,16 +113,15 @@ export default {
       type: [String, Array],
       default: '',
       validator: (value) => {
-        const dateReq = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-        const dateTimeReq = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
+        const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
+        const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
         if (Array.isArray(value)) {
           return value.every(v => !!(!v
-            || (v.length === 10 && dateReq.exec(v))
-            || (v.length === 19 && dateTimeReq.exec(v))));
+            || (v.length === 10 && dateReg.exec(v))));
         }
         return !!(!value
-          || (value.length === 10 && dateReq.exec(value))
-          || (value.length === 19 && dateTimeReq.exec(value)));
+          || (value.length === 10 && dateReg.exec(value))
+          || (value.length === 19 && dateTimeReg.exec(value)));
       },
     },
     placeholder: {
@@ -144,37 +154,42 @@ export default {
       validator: value => ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName']
         .indexOf(value) !== -1,
     },
-    dateMultiOption: {
+    options: {
       type: Object,
       default: () => ({
-        type: 'day',
+        type: 'date',
         limit: 1,
         tagShorten: false,
       }),
-      validator: ({ type, limit, disabledDate, tagShorten }) =>
-        ['weekday', 'week', 'day'].indexOf(type) !== -1
-        && (limit ? typeof limit === 'number' && limit > 0 : true)
+      validator: ({ multiType, multiDayLimit, disabledDate, tagShorten }) =>
+        (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
+        && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
         && (disabledDate ? typeof disabledDate === 'function' : true)
         && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true),
     },
   },
   emits: {
-    'update:modelValue': null,
+    'update:modelValue': [Array, String],
   },
   setup() {
     const {
-      isDropbox,
-      clickSelectInput,
-      clickOutsideDropbox,
-    } = useDropdown();
-
-    const {
       mv,
+      currentValue,
+      isDropbox,
       isClearableIcon,
+      validateValue,
       removeAllMv,
       changeMv,
       removeMv,
-    } = useModel({ isDropbox });
+    } = useModel();
+
+    const {
+      clickSelectInput,
+      clickOutsideDropbox,
+    } = useDropdown({
+      isDropbox,
+      currentValue,
+    });
 
     const {
       datePicker,
@@ -182,14 +197,18 @@ export default {
       dropdownStyle,
       createDropdownEl,
       observeDropbox,
-    } = usePosition({ isDropbox });
+    } = usePosition({
+      isDropbox,
+    });
 
     createDropdownEl();
     observeDropbox();
 
     return {
       mv,
+      currentValue,
       isClearableIcon,
+      validateValue,
       removeAllMv,
       changeMv,
       removeMv,
@@ -218,6 +237,12 @@ export default {
   width: 100%;
   min-height: $select-height;
 
+  &.disabled {
+    background-color: #F5F7FA;
+    border-color: #E4E7ED;
+    color: #C0C4CC;
+  }
+
   @import '../../style/components/input.scss';
   .ev-input {
     $calendar-icon-width: 30px;
@@ -227,12 +252,8 @@ export default {
     height: 100%;
     padding: 0 $input-default-padding 0 $calendar-icon-width;
 
-    &.no-tag-input {
-      position: relative;
-      width: 100px;
-      padding: 0 10px;
-      border: 0;
-      text-align: center;
+    &.readonly {
+      cursor: pointer;
     }
   }
 
