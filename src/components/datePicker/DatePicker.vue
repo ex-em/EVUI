@@ -10,11 +10,13 @@
   >
     <template v-if="mode === 'date' || mode === 'dateTime'">
       <input
-        v-model="mv"
+        v-model.trim="currentValue"
         type="text"
         class="ev-input"
         :placeholder="placeholder"
         :disabled="disabled"
+        @keydown.enter.prevent="validateValue(currentValue)"
+        @change="validateValue(currentValue)"
       />
     </template>
     <template v-else>
@@ -171,18 +173,23 @@ export default {
   },
   setup() {
     const {
-      isDropbox,
-      clickSelectInput,
-      clickOutsideDropbox,
-    } = useDropdown();
-
-    const {
       mv,
+      currentValue,
+      isDropbox,
       isClearableIcon,
+      validateValue,
       removeAllMv,
       changeMv,
       removeMv,
-    } = useModel({ isDropbox });
+    } = useModel();
+
+    const {
+      clickSelectInput,
+      clickOutsideDropbox,
+    } = useDropdown({
+      isDropbox,
+      currentValue,
+    });
 
     const {
       datePicker,
@@ -190,14 +197,18 @@ export default {
       dropdownStyle,
       createDropdownEl,
       observeDropbox,
-    } = usePosition({ isDropbox });
+    } = usePosition({
+      isDropbox,
+    });
 
     createDropdownEl();
     observeDropbox();
 
     return {
       mv,
+      currentValue,
       isClearableIcon,
+      validateValue,
       removeAllMv,
       changeMv,
       removeMv,

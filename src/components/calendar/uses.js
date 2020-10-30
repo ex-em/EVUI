@@ -495,6 +495,9 @@ export const useCalendarDate = (param) => {
       selectedValue.value = curr;
       if (props.mode !== 'dateRange') {
         setCalendarDate('main');
+        if (props.mode === 'dateTime') {
+          setHmsTime();
+        }
       } else {
         setCalendarDate('main');
         setCalendarDate('expanded');
