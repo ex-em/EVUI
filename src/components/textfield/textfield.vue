@@ -189,6 +189,12 @@
           this.validateError(this.currentValue);
         }
       },
+      regExp() {
+        this.validateError(this.currentValue);
+      },
+      errorMsg(val) {
+        this.errorMsgWrapper = val;
+      },
     },
     created() {
       this.validateError(this.currentValue);
