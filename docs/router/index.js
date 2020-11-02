@@ -13,6 +13,7 @@ import iconProps from 'docs/views/icon/props';
 import datePickerProps from 'docs/views/datePicker/props';
 import calendarProps from 'docs/views/calendar/props';
 import messageProps from 'docs/views/message/props';
+import notificationProps from 'docs/views/notification/props';
 
 const routes = [
   {
@@ -146,6 +147,12 @@ const routes = [
     name: 'Message',
     component: PageView,
     props: messageProps,
+  },
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: PageView,
+    props: notificationProps,
   },
   {
     path: '/:catchAll(.*)',
