@@ -13,6 +13,7 @@ import EvIcon from '@/components/icon/Icon.vue';
 import EvCalendar from '@/components/calendar/Calendar.vue';
 import EvTimePicker from '@/components/datePicker/DatePicker.vue';
 import EvMessage from '@/components/message/';
+import EvNotification from '@/components/notification/';
 import { version } from '../package.json';
 
 const components = [
@@ -43,7 +44,7 @@ const install = (app) => {
   const global = app.config.globalProperties;
   global.$message = EvMessage;
   global.$messagebox = () => {};
-  global.$notify = () => {};
+  global.$notify = EvNotification;
 };
 
 const EVUI = {

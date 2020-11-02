@@ -1,20 +1,20 @@
 <template>
-  <teleport to=".ev-message-modal">
-    <transition
-      name="ev-message-fade"
-      appear
+  <transition
+    name="ev-message-fade"
+    appear
+  >
+    <div
+      v-show="isShow"
+      ref="msgRef"
+      class="ev-message"
+      :class="{
+        [`type-${type}`]: !!type,
+        'show-close': showClose,
+        'has-icon': iconClass,
+      }"
+      @mouseenter="clearTimer"
+      @mouseleave="startTimer"
     >
-      <div
-        v-if="isShow"
-        class="ev-message"
-        :class="{
-          [`type-${type}`]: !!type,
-          'show-close': showClose,
-          'has-icon': iconClass,
-        }"
-        @mouseenter="clearTimer"
-        @mouseleave="startTimer"
-      >
         <span
           v-if="iconClass"
           class="ev-message-icon"
@@ -23,27 +23,26 @@
             :class="iconClass"
           />
         </span>
-        <div
-          v-if="useHTML"
-          class="ev-message-content"
-          v-html="message"
-        />
-        <div
-          v-else
-          class="ev-message-content"
-        >
-          {{ message }}
-        </div>
-        <span
-          v-if="showClose"
-          class="ev-message-close"
-          @click="closeMsg"
-        >
+      <div
+        v-if="useHTML"
+        class="ev-message-content"
+        v-html="message"
+      />
+      <div
+        v-else
+        class="ev-message-content"
+      >
+        {{ message }}
+      </div>
+      <span
+        v-if="showClose"
+        class="ev-message-close"
+        @click="closeMsg"
+      >
           <i class="ev-icon-close" />
         </span>
-      </div>
-    </transition>
-  </teleport>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -81,6 +80,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    unmount: {
+      type: Function,
+      default: null,
+    },
   },
   setup(props) {
     const state = reactive({
@@ -97,6 +100,9 @@ export default {
         props.onClose();
       }
       clearTimer();
+      if (props.unmount) {
+        setTimeout(props.unmount, 1000);
+      }
     };
     const startTimer = () => {
       if (props.duration > 0) {
@@ -144,36 +150,37 @@ export default {
   transform: translateX(-50%);
 }
 .ev-message {
-  $padding-default: 20px;
+  $padding-vertical: 20px;
+  $padding-horizontal: 17px;
 
   display: flex;
   position: relative;
   width: 400px;
-  padding: $padding-default 17px;
+  padding: $padding-vertical $padding-horizontal;
   margin-bottom: 10px;
   align-items: center;
   box-sizing: border-box;
   border-radius: $default-radius;
   border: 1px solid #EBEEF5;
   background-color: #EDF2FC;
-  transition: opacity .3s, transform .3s;
+  transition: opacity .4s ease-in-out, transform .3s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
 
-  &-fade-enter,
+  &-fade-enter-active,
   &-fade-leave-active {
     opacity: 0;
     transform: translateY(-100%);
   }
   &-icon {
     position: absolute;
-    top: $padding-default;
-    left: $padding-default;
+    top: $padding-vertical;
+    left: $padding-horizontal;
   }
   &-close {
     position: absolute;
-    top: $padding-default;
-    right: $padding-default;
+    top: $padding-vertical;
+    right: $padding-horizontal;
     font-size: $font-size-small;
     cursor: pointer;
     transition: opacity $animate-base;
