@@ -14,6 +14,7 @@ import datePickerProps from 'docs/views/datePicker/props';
 import calendarProps from 'docs/views/calendar/props';
 import messageProps from 'docs/views/message/props';
 import notificationProps from 'docs/views/notification/props';
+import schedulerProps from 'docs/views/scheduler/props';
 
 const routes = [
   {
@@ -153,6 +154,12 @@ const routes = [
     name: 'Notification',
     component: PageView,
     props: notificationProps,
+  },
+  {
+    path: '/scheduler',
+    name: 'Scheduler',
+    component: PageView,
+    props: schedulerProps,
   },
   {
     path: '/:catchAll(.*)',

@@ -14,6 +14,7 @@ import EvCalendar from '@/components/calendar/Calendar.vue';
 import EvTimePicker from '@/components/datePicker/DatePicker.vue';
 import EvMessage from '@/components/message/';
 import EvNotification from '@/components/notification/';
+import EvScheduler from '@/components/scheduler/Scheduler.vue';
 import { version } from '../package.json';
 
 const components = [
@@ -31,6 +32,7 @@ const components = [
   EvIcon,
   EvCalendar,
   EvTimePicker,
+  EvScheduler,
 ];
 
 const install = (app) => {
@@ -67,6 +69,7 @@ export {
   EvIcon,
   EvCalendar,
   EvTimePicker,
+  EvScheduler,
 };
 
 export default EVUI;
