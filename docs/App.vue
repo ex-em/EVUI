@@ -39,14 +39,6 @@ $file-path: './assets/fonts/';
 
 @import './style/index.scss';
 
-body,
-#app {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
 @font-face {
   font-family: 'Roboto';
   src: url($file-path + 'Roboto-Bold.ttf') format('trutype');
@@ -74,7 +66,7 @@ body,
 }
 .evui-wrapper {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
   padding: $header-height 0 0 $nav-width;
   font-size: $font-size-base;
 
