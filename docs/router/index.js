@@ -13,6 +13,7 @@ import iconProps from 'docs/views/icon/props';
 import datePickerProps from 'docs/views/datePicker/props';
 import calendarProps from 'docs/views/calendar/props';
 import messageProps from 'docs/views/message/props';
+import messageBoxProps from 'docs/views/messageBox/props';
 import notificationProps from 'docs/views/notification/props';
 import schedulerProps from 'docs/views/scheduler/props';
 
@@ -148,6 +149,12 @@ const routes = [
     name: 'Message',
     component: PageView,
     props: messageProps,
+  },
+  {
+    path: '/messageBox',
+    name: 'MessageBox',
+    component: PageView,
+    props: messageBoxProps,
   },
   {
     path: '/notification',
