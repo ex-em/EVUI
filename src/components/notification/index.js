@@ -3,18 +3,23 @@ import Component from './Notification.vue';
 
 const componentObj = defineComponent(Component);
 
+const rootId = 'ev-notification-modal';
 const root = document.createElement('div');
-root.classList.add('ev-notification-modal');
-document.body.appendChild(root);
+root.id = rootId;
 
 const positionList = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
 const notification = (options = {}) => {
   const position = options.position || 'top-right';
   if (!positionList.includes(position)) {
+    console.warn('[EVUI][Notification] The position value is incorrectly entered.');
     return;
   }
 
+  const hasRoot = document.getElementById(rootId);
+  if (!hasRoot) {
+    document.body.appendChild(root);
+  }
   let wrapper = root.getElementsByClassName(`modal-${position}`);
   const hasElem = wrapper.length;
   if (hasElem) {

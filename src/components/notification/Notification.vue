@@ -16,18 +16,15 @@
       @mouseleave="startTimer"
       @click="clickMsg"
     >
-        <span
-          v-if="iconClass"
-          class="ev-notification-icon"
-        >
-          <i
-            :class="iconClass"
-          />
-        </span>
-      <div
-        v-if="useHTML"
-        class="ev-notification-content"
+      <span
+        v-if="iconClass"
+        class="ev-notification-icon"
       >
+        <i
+          :class="iconClass"
+        />
+      </span>
+      <div class="ev-notification-content">
         <p
           v-if="title"
           class="title"
@@ -35,21 +32,14 @@
           {{ title }}
         </p>
         <p
+          v-if="useHTML"
           class="message"
           v-html="message"
         />
-      </div>
-      <div
-        v-else
-        class="ev-notification-content"
-      >
         <p
-          v-if="title"
-          class="title"
+          v-else
+          class="message"
         >
-          {{ title }}
-        </p>
-        <p class="message">
           {{ message }}
         </p>
       </div>
@@ -58,8 +48,8 @@
         class="ev-notification-close"
         @click="closeMsg"
       >
-          <i class="ev-icon-close" />
-        </span>
+        <i class="ev-icon-close" />
+      </span>
     </div>
   </transition>
 </template>
@@ -180,7 +170,7 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-notification-modal {
+#ev-notification-modal {
   max-height: 100vh;
   overflow: hidden;
 
