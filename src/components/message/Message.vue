@@ -1,20 +1,21 @@
 <template>
-  <transition
-    name="ev-message-fade"
-    appear
-  >
-    <div
-      v-show="isShow"
-      ref="msgRef"
-      class="ev-message"
-      :class="{
-        [`type-${type}`]: !!type,
-        'show-close': showClose,
-        'has-icon': iconClass,
-      }"
-      @mouseenter="clearTimer"
-      @mouseleave="startTimer"
+  <teleport to="#ev-message-modal">
+    <transition
+      name="ev-message-fade"
+      appear
     >
+      <div
+        v-show="isShow"
+        ref="msgRef"
+        class="ev-message"
+        :class="{
+          [`type-${type}`]: !!type,
+          'show-close': showClose,
+          'has-icon': !!iconClass,
+        }"
+        @mouseenter="clearTimer"
+        @mouseleave="startTimer"
+      >
         <span
           v-if="iconClass"
           class="ev-message-icon"
@@ -23,26 +24,27 @@
             :class="iconClass"
           />
         </span>
-      <div
-        v-if="useHTML"
-        class="ev-message-content"
-        v-html="message"
-      />
-      <div
-        v-else
-        class="ev-message-content"
-      >
-        {{ message }}
-      </div>
-      <span
-        v-if="showClose"
-        class="ev-message-close"
-        @click="closeMsg"
-      >
+        <div
+          v-if="useHTML"
+          class="ev-message-content"
+          v-html="message"
+        />
+        <div
+          v-else
+          class="ev-message-content"
+        >
+          {{ message }}
+        </div>
+        <span
+          v-if="showClose"
+          class="ev-message-close"
+          @click="closeMsg"
+        >
           <i class="ev-icon-close" />
         </span>
-    </div>
-  </transition>
+      </div>
+    </transition>
+  </teleport>
 </template>
 
 <script>
@@ -139,7 +141,7 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-message-modal {
+#ev-message-modal {
   position: fixed;
   top: 0;
   left: 50%;
