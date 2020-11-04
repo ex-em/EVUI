@@ -1,14 +1,13 @@
 <template>
   <div
+    class="evui-wrapper"
     :class="['evui-docs', docsTheme]"
   >
-    <div class="evui-wrapper">
-      <MainHeader
-        v-model="docsTheme"
-      />
-      <MainNav />
-      <MainContent />
-    </div>
+    <MainHeader
+      v-model="docsTheme"
+    />
+    <MainNav />
+    <MainContent />
   </div>
 </template>
 
@@ -39,6 +38,14 @@ export default {
 $file-path: './assets/fonts/';
 
 @import './style/index.scss';
+
+body,
+#app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 
 @font-face {
   font-family: 'Roboto';

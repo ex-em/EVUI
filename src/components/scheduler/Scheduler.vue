@@ -7,28 +7,28 @@
       <tr class="ev-scheduler-header">
         <td />
         <td
-          v-for="(wItem, wIdx) in widthOptions.count"
+          v-for="(wItem, wIdx) in colLabels.length"
           :key="`${wItem}_${wIdx}_header`"
           class="ev-scheduler-header-label"
           @click="selectColumn(wIdx)"
-          v-html="widthOptions.labels[wIdx]"
+          v-html="colLabels[wIdx]"
         />
       </tr>
     </thead>
     <tbody @mouseleave="mouseleaveBoxArea">
       <tr
-        v-for="(hItem, hIdx) in heightOptions.count"
+        v-for="(hItem, hIdx) in rowLabels.length"
         :key="`${hItem}_${hIdx}_body`"
         class="ev-scheduler-body"
       >
         <td
-          :key="`${hItem}_${hIdx}_${heightOptions.labels[hIdx]}`"
+          :key="`${hItem}_${hIdx}_${rowLabels[hIdx]}`"
           class="ev-scheduler-body-label"
           @click="selectRow(hIdx)"
-          v-html="heightOptions.labels[hIdx]"
+          v-html="rowLabels[hIdx]"
         />
         <td
-          v-for="(wItem, wIdx) in widthOptions.count"
+          v-for="(wItem, wIdx) in colLabels.length"
           :key="`${wItem}_${hIdx}_${wIdx}_body`"
           class="ev-scheduler-body-box"
           :class="{ selected: mv[hIdx][wIdx] }"
@@ -53,36 +53,23 @@ export default {
       type: Array,
       default: () => [],
     },
-    widthOptions: {
-      type: Object,
-      default: () => ({
-        count: 7,
-        labels: ['<span style="color: #FF0000">SUN</span>',
-          'MON', 'TUE', 'WED', 'THU', 'FRI',
-          '<span style="color: #0006F9">SAT</span>',
-        ],
-      }),
-      validator: ({ count, labels }) =>
-        (count ? typeof count === 'number' && count > 0 : true)
-        && (labels ? Array.isArray(labels) && labels.length === count : true),
+    colLabels: {
+      type: Array,
+      default: () => (['<span style="color: #FF0000">SUN</span>',
+        'MON', 'TUE', 'WED', 'THU', 'FRI',
+        '<span style="color: #0006F9">SAT</span>']),
     },
-    heightOptions: {
-      type: Object,
-      default: () => ({
-        count: 24,
-        labels: ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
-          '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
-          '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-          '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-      }),
-      validator: ({ count, labels }) =>
-        (count ? typeof count === 'number' && count > 0 : true)
-        && (labels ? Array.isArray(labels) && labels.length === count : true),
+    rowLabels: {
+      type: Array,
+      default: () => (['00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
+        '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+        '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
+        '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']),
     },
   },
   emits: {
     'update:modelValue': Array,
-    change: null,
+    change: Array,
   },
   setup() {
     const {
@@ -137,6 +124,13 @@ export default {
   td {
     height: 18px;
   }
+}
+
+.ev-scheduler-header-label,
+.ev-scheduler-body-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ev-scheduler-body-box {

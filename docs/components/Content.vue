@@ -14,7 +14,10 @@ export default {
 @import '../style/index.scss';
 
 .evui-content {
-  position: relative;
+  position: fixed;
+  width: calc(100% - 320px);
+  height: calc(100% - 60px);
+  overflow: auto;
   padding: 30px 40px;
 }
 </style>

@@ -18,8 +18,8 @@
     <p class="case-title">Custom</p>
     <ev-scheduler
       v-model="checkVal2"
-      :width-options="widthOptions"
-      :height-options="heightOptions"
+      :col-labels="widthLabels()"
+      :row-labels="heightLabels()"
     />
     <div class="description">
       {{ checkVal2 }}
@@ -30,39 +30,36 @@
 <script>
 import { ref } from 'vue';
 
+/**
+ * 월, 일을 두자리 숫자로 보정
+ * @param num
+ * @returns {string|*}
+ */
+const lpadToTwoDigits = (num) => {
+  if (num === null) {
+    return '00';
+  } else if (+num < 10) {
+    return `0${num}`;
+  }
+  return num;
+};
+
 export default {
   setup() {
     const checkVal1 = ref([]);
+    const clearVal1 = () => { checkVal1.value = []; };
 
     const checkVal2 = ref([]);
-    const widthLabels = (cnt) => {
+    const widthLabels = () => {
       const result = [];
-      for (let i = 0; i < cnt; i++) {
+      for (let i = 0; i < 15; i++) {
         result.push(`+${i + 1}일`);
       }
       return result;
     };
-    const widthOptions = ref({
-      count: 15,
-      labels: widthLabels(15),
-    });
-
-    /**
-     * 월, 일을 두자리 숫자로 보정
-     * @param num
-     * @returns {string|*}
-     */
-    const lpadToTwoDigits = (num) => {
-      if (num === null) {
-        return '00';
-      } else if (+num < 10) {
-        return `0${num}`;
-      }
-      return num;
-    };
-    const heightLabels = (cnt) => {
+    const heightLabels = () => {
       const result = [];
-      for (let i = 0; i < cnt; i++) {
+      for (let i = 0; i < 48; i++) {
         if (i % 2) {
           result.push(`${lpadToTwoDigits(Math.floor(i / 2))}:30`);
         } else {
@@ -71,19 +68,13 @@ export default {
       }
       return result;
     };
-    const heightOptions = ref({
-      count: 48,
-      labels: heightLabels(48),
-    });
-
-    const clearVal1 = () => { checkVal1.value = []; };
 
     return {
       checkVal1,
-      checkVal2,
-      widthOptions,
-      heightOptions,
       clearVal1,
+      checkVal2,
+      widthLabels,
+      heightLabels,
     };
   },
 };

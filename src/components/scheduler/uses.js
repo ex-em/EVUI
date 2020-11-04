@@ -9,11 +9,11 @@ export const useModel = () => {
 
   const mv = computed({
     get: () => {
-      if (props.modelValue.length !== props.heightOptions.count
+      if (props.modelValue.length !== props.rowLabels.length
         || !props.modelValue[0]
-        || props.modelValue[0].length !== props.widthOptions.count
+        || props.modelValue[0].length !== props.colLabels.length
       ) {
-        return getMatrixArr(props.heightOptions.count, props.widthOptions.count);
+        return getMatrixArr(props.rowLabels.length, props.colLabels.length);
       }
       return props.modelValue;
     },
@@ -27,11 +27,11 @@ export const useModel = () => {
    * 초기값 배열의 length와 options의 count가 안맞는 경우 valid체크하는 로직
    */
   const validateValue = () => {
-    if (props.modelValue.length !== props.heightOptions.count
+    if (props.modelValue.length !== props.rowLabels.length
       || !props.modelValue[0]
-      || props.modelValue[0].length !== props.widthOptions.count
+      || props.modelValue[0].length !== props.colLabels.length
     ) {
-      mv.value = [...getMatrixArr(props.heightOptions.count, props.widthOptions.count)];
+      mv.value = [...getMatrixArr(props.rowLabels.length, props.colLabels.length)];
     }
   };
 
