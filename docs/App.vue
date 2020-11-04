@@ -1,14 +1,13 @@
 <template>
   <div
+    class="evui-wrapper"
     :class="['evui-docs', docsTheme]"
   >
-    <div class="evui-wrapper">
-      <MainHeader
-        v-model="docsTheme"
-      />
-      <MainNav />
-      <MainContent />
-    </div>
+    <MainHeader
+      v-model="docsTheme"
+    />
+    <MainNav />
+    <MainContent />
   </div>
 </template>
 
@@ -67,7 +66,7 @@ $file-path: './assets/fonts/';
 }
 .evui-wrapper {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
   padding: $header-height 0 0 $nav-width;
   font-size: $font-size-base;
 
