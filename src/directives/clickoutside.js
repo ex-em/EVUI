@@ -25,7 +25,7 @@ const selectClickoutside = {
     const componentEl = el;
     let dropLi = null;
     const bubble = binding.modifiers.bubble;
-    const selectDropbox = document.body.getElementsByClassName('ev-select-dropdown');
+    const selectDropbox = document.body.getElementsByClassName('ev-select-dropbox');
     const TAG_NAME_CLS = 'ev-tag-name';
     const TAG_SUFFIX_CLOSE_CLS = 'ev-tag-suffix-close';
     const handler = (e) => {
