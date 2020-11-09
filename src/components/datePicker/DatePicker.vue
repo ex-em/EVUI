@@ -236,8 +236,8 @@ export default {
   .ev-input {
     $calendar-icon-width: 30px;
     position: absolute;
-    height: 100%;
     left: 0;
+    height: 100%;
     padding: 0 $input-default-padding 0 $calendar-icon-width;
 
     &.readonly {
