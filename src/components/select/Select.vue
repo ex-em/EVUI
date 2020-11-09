@@ -99,7 +99,7 @@
       <span
         v-show="isClearableIcon"
         class="ev-input-suffix"
-        @click.stop="[removeAllMv(), changeDropboxPosition()]"
+        @click.stop="[removeAllMv(), clickOutsideDropbox()]"
       >
         <i class="ev-icon-error" />
       </span>

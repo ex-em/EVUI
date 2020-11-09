@@ -59,7 +59,12 @@ export const useModel = () => {
    */
   const removeAllMv = () => {
     if (!props.disabled) {
-      mv.value = !props.multiple ? null : [];
+      if (!props.multiple) {
+        mv.value = null;
+      } else {
+        mv.value.splice(0);
+        mv.value = [...mv.value];
+      }
     }
   };
 
@@ -71,6 +76,7 @@ export const useModel = () => {
     if (!props.disabled) {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
+      mv.value = [...mv.value];
     }
   };
 
@@ -96,16 +102,16 @@ export const useModel = () => {
 
 export const useDropdown = (param) => {
   const { props } = getCurrentInstance();
-  const mv = param.mv;
+  const { mv } = param;
 
   const isDropbox = ref(false);
   const filterTextRef = ref(props.filterText);
   const select = ref(null);
   const dropbox = ref(null);
+  const itemWrapper = ref(null);
   const dropboxPosition = reactive({
     top: 0,
   });
-  const itemWrapper = ref(null);
 
   /**
    * filterable 모드 시 인풋박스에 입력된 텍스트가 포함된 목록 가져오기
