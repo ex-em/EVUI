@@ -74,9 +74,13 @@
       },
     },
     created() {
+      window.addEventListener('resize', this.onResize);
     },
     mounted() {
       this.onResize();
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.onResize);
     },
     methods: {
       updateItemInfo() {
