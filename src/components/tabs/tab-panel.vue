@@ -11,10 +11,16 @@
 <script>
   export default {
     props: {
+      /**
+       * 탭의 키값
+       */
       value: {
         type: String,
         default: '',
       },
+      /**
+       * 탭 활성화 전 사전 로드 처리 유무
+       */
       preload: {
         type: Boolean,
         default: false,

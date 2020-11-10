@@ -1,10 +1,16 @@
 <script>
   export default {
     props: {
+      /**
+       * 매핑될 slot name
+       */
       name: {
         type: String,
         default: '',
       },
+      /**
+       * 매핑될 slot props
+       */
       item: {
         type: Object,
         default: () => {},
