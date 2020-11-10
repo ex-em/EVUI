@@ -72,6 +72,18 @@
       filterable
     />
   </div>
+  <div class="case">
+    <p class="case-title">Icon</p>
+    <ev-select
+      v-model="selectVal5"
+      :items="items5"
+      placeholder="Please select value."
+      @change="changeSelect1"
+    />
+    <div class="description">
+      val : {{ selectVal5 }}
+    </div>
+  </div>
 </template>
 
 <script>
@@ -185,6 +197,34 @@ export default {
     const isDisabled = ref(true);
     const disableSelect = () => { isDisabled.value = !isDisabled.value; };
 
+    const selectVal5 = ref();
+    const items5 = ref([
+      {
+        name: 'name0',
+        value: 'value0',
+        cls: 'ev-icon-query',
+      },
+      {
+        name: 'name1',
+        value: 'value1',
+      },
+      {
+        name: 'name2',
+        value: 'value2',
+        cls: '',
+      },
+      {
+        name: 'name3',
+        value: 'value3',
+        cls: 'ev-icon-bell',
+      },
+      {
+        name: 'name4',
+        value: 'value4',
+        cls: 'ev-icon-close2',
+      },
+    ]);
+
     return {
       selectVal1,
       items1,
@@ -200,6 +240,9 @@ export default {
       items4,
       isDisabled,
       disableSelect,
+
+      selectVal5,
+      items5,
     };
   },
 };

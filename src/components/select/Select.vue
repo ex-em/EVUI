@@ -1,46 +1,57 @@
 <template>
   <div
     ref="select"
+    v-clickoutside="clickOutsideDropbox"
     class="ev-select"
     :class="{
       selected: isDropbox,
       disabled,
     }"
-    @click.stop="clickSelectInput"
   >
-    <span
-      v-if="!clearable || !isClearableIcon"
-      class="ev-input-suffix"
-    >
-      <i
-        class="ev-input-suffix-arrow ev-icon-s-arrow-down"
-        :class="{
-          selected: isDropbox,
-        }"
-      />
-    </span>
     <template v-if="!multiple">
+      <span
+        v-if="!clearable || !isClearableIcon"
+        class="ev-input-suffix"
+      >
+        <i
+          class="ev-input-suffix-arrow ev-icon-s-arrow-down"
+          :class="{
+            selected: isDropbox,
+          }"
+        />
+      </span>
       <input
         v-model="selectedModel"
-        v-clickoutside="clickOutsideDropbox"
         type="text"
         class="ev-input"
         readonly
         :placeholder="computedPlaceholder"
         :disabled="disabled"
         @change="changeMv"
+        @click="clickSelectInput"
       />
     </template>
     <template v-else>
-      <input
-        v-clickoutside="clickOutsideDropbox"
-        type="text"
-        class="ev-input multiple"
-        readonly
-        :placeholder="computedPlaceholder"
-        :disabled="disabled"
-      />
       <div class="ev-select-tag-wrapper">
+        <span
+          v-if="!clearable || !isClearableIcon"
+          class="ev-input-suffix"
+        >
+          <i
+            class="ev-input-suffix-arrow ev-icon-s-arrow-down"
+            :class="{
+              selected: isDropbox,
+            }"
+          />
+        </span>
+        <input
+          type="text"
+          class="ev-input multiple"
+          readonly
+          :placeholder="computedPlaceholder"
+          :disabled="disabled"
+          @click="clickSelectInput"
+        />
         <template v-if="!collapseTags">
           <div
             v-for="item in selectedModel"
@@ -52,7 +63,7 @@
             </span>
             <span
               class="ev-tag-suffix"
-              @click.stop="removeMv(item.value)"
+              @click.stop="[removeMv(item.value), changeDropboxPosition()]"
             >
               <i class="ev-tag-suffix-close ev-icon-error" />
             </span>
@@ -68,7 +79,7 @@
             </span>
             <span
               class="ev-tag-suffix"
-              @click.stop="removeMv(selectedModel[0].value)"
+              @click.stop="[removeMv(selectedModel[0].value), changeDropboxPosition()]"
             >
               <i class="ev-tag-suffix-close ev-icon-error" />
             </span>
@@ -88,61 +99,65 @@
       <span
         v-show="isClearableIcon"
         class="ev-input-suffix"
-        @click.stop="removeAllMv"
+        @click.stop="[removeAllMv(), clickOutsideDropbox()]"
       >
         <i class="ev-icon-error" />
       </span>
     </template>
-  </div>
-
-  <teleport to="#ev-select-dropdown-modal">
-    <div
-      v-if="isDropbox"
-      class="ev-select-dropdown"
-      :style="dropdownStyle"
-    >
-      <input
-        v-if="filterable"
-        v-model="filterTextRef"
-        type="text"
-        class="ev-input-query"
-        :placeholder="searchPlaceholder"
-      />
+    <div class="ev-select-dropbox-wrapper">
       <div
-        ref="itemWrapper"
-        class="ev-select-dropdown-wrapper"
+        v-if="isDropbox"
+        ref="dropbox"
+        class="ev-select-dropbox"
+        :style="dropboxPosition"
       >
-        <ul
-          v-if="filteredItems.length"
-          class="ev-select-dropdown-ul"
+        <input
+          v-if="filterable"
+          v-model="filterTextRef"
+          type="text"
+          class="ev-input-query"
+          :placeholder="searchPlaceholder"
+        />
+        <div
+          ref="itemWrapper"
+          class="ev-select-dropbox-list"
         >
-          <li
-            v-for="(item, idx) in filteredItems"
-            :key="`${item.value}_${idx}`"
-            class="ev-select-dropdown-item"
-            :class="{
+          <ul
+            v-if="filteredItems.length"
+            class="ev-select-dropbox-ul"
+          >
+            <li
+              v-for="(item, idx) in filteredItems"
+              :key="`${item.value}_${idx}`"
+              class="ev-select-dropbox-item"
+              :class="{
               selected: selectedItemClass(item.value),
               disabled: item.disabled
             }"
-            :title="item.name"
-            @click.stop.prevent="clickItem(item.value)"
-          >
-            {{ item.name }}
-          </li>
-        </ul>
-        <ul v-else>
-          <li class="ev-select-dropdown-item disabled">
-            {{ noMatchingText }}
-          </li>
-        </ul>
+              :title="item.name"
+              @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
+            >
+              <i
+                v-if="item.cls"
+                :class="item.cls"
+              />
+              {{ item.name }}
+            </li>
+          </ul>
+          <ul v-else>
+            <li class="ev-select-dropbox-item disabled">
+              {{ noMatchingText }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-  </teleport>
+  </div>
 </template>
 
 <script>
 import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
-import { useModel, useDropdown, usePosition } from './uses';
+import { useModel, useDropdown } from './uses';
 
 export default {
   name: 'EvSelect',
@@ -206,30 +221,24 @@ export default {
       computedPlaceholder,
       isClearableIcon,
       changeMv,
-      removeAllMv,
       removeMv,
+      removeAllMv,
     } = useModel();
 
     const {
+      select,
+      dropbox,
+      itemWrapper,
       isDropbox,
+      dropboxPosition,
       filterTextRef,
       filteredItems,
       clickSelectInput,
       clickOutsideDropbox,
+      changeDropboxPosition,
       clickItem,
       selectedItemClass,
     } = useDropdown({ mv });
-
-    const {
-      select,
-      itemWrapper,
-      dropdownStyle,
-      createDropdownEl,
-      observeDropbox,
-    } = usePosition({ isDropbox, selectedModel });
-
-    createDropdownEl();
-    observeDropbox();
 
     return {
       mv,
@@ -237,20 +246,21 @@ export default {
       computedPlaceholder,
       isClearableIcon,
       changeMv,
-      removeAllMv,
       removeMv,
+      removeAllMv,
 
+      select,
+      dropbox,
+      itemWrapper,
       isDropbox,
+      dropboxPosition,
       filterTextRef,
       filteredItems,
       clickSelectInput,
       clickOutsideDropbox,
+      changeDropboxPosition,
       clickItem,
       selectedItemClass,
-
-      select,
-      itemWrapper,
-      dropdownStyle,
     };
   },
 };
@@ -276,13 +286,14 @@ export default {
 
   @import '../../style/components/input.scss';
   .ev-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
     padding: 0 30px 0 15px;
     border: 1px solid #B2B2B2;
     cursor: pointer;
+
+    &.multiple {
+      position: absolute;
+      height: 100%;
+    }
   }
 
   .ev-input-suffix {
@@ -312,10 +323,11 @@ export default {
     display: flex;
     width: 100%;
     height: 100%;
+    padding: 3px 0;
     min-height: $select-height;
-    padding: 0 30px 0 0;
     flex-wrap: wrap;
     align-items: center;
+    z-index: 100;
   }
 }
 
@@ -353,11 +365,13 @@ export default {
   }
 }
 
-.ev-select-dropdown {
+.ev-select-dropbox-wrapper {
+  height: 0;
+}
+
+.ev-select-dropbox {
   $select-height: 35px;
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   max-height: $select-height * 5;
   background-color: white;
@@ -365,7 +379,6 @@ export default {
   color: #606266;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   border-radius: 4px;
-  box-sizing: content-box;
   z-index: 100;
   cursor: pointer;
   overflow-x: hidden;
@@ -391,14 +404,14 @@ export default {
     background-color: transparent;
   }
 
-  .ev-select-dropdown-wrapper {
+  .ev-select-dropbox-list {
     width: 100%;
     max-height: $select-height * 4;
     overflow-y: auto;
   }
 }
 
-.ev-select-dropdown-item {
+.ev-select-dropbox-item {
   padding: 0 15px;
   overflow: hidden;
   text-overflow: ellipsis;

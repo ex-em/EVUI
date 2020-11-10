@@ -6,32 +6,39 @@
     :class="{
       disabled,
     }"
-    @click="clickSelectInput"
   >
     <template v-if="mode === 'date' || mode === 'dateTime'">
+      <span class="ev-date-picker-prefix-icon">
+        <i class="ev-icon-calendar" />
+      </span>
       <input
         v-model.trim="currentValue"
         type="text"
         class="ev-input"
         :placeholder="placeholder"
         :disabled="disabled"
+        @click="clickSelectInput"
         @keydown.enter.prevent="validateValue(currentValue)"
         @change="validateValue(currentValue)"
       />
     </template>
     <template v-else>
-      <input
-        type="text"
-        class="ev-input readonly"
-        readonly
-        :placeholder="placeholder"
-        :disabled="disabled"
-      />
-      <template
-        v-if="mode === 'dateMulti'
+      <div class="ev-date-picker-tag-wrapper">
+        <span class="ev-date-picker-prefix-icon">
+          <i class="ev-icon-calendar" />
+        </span>
+        <input
+          type="text"
+          class="ev-input readonly"
+          readonly
+          :placeholder="placeholder"
+          :disabled="disabled"
+          @click="clickSelectInput"
+        />
+        <template
+          v-if="mode === 'dateMulti'
           && (options.multiType === 'date' || !options.tagShorten)"
-      >
-        <div class="ev-select-tag-wrapper">
+        >
           <div
             v-for="(item, idx) in mv"
             :key="`${item}_${idx}`"
@@ -42,18 +49,13 @@
             <span
               v-if="options.multiType === 'date'"
               class="ev-tag-suffix"
-              @click.stop="removeMv(item)"
+              @click.stop="[removeMv(item), changeDropboxPosition()]"
             >
-              <i class="ev-tag-suffix-close ev-icon-error" />
-            </span>
+            <i class="ev-tag-suffix-close ev-icon-error" />
+          </span>
           </div>
-        </div>
-      </template>
-      <template v-else>
-        <div
-          v-show="mv[0] && mv[mv.length - 1]"
-          class="ev-select-tag-wrapper"
-        >
+        </template>
+        <template v-else-if="mv[0] && mv[mv.length - 1]">
           <div class="ev-select-tag num">
             <span class="ev-tag-name"> {{ mv[0] }} </span>
           </div>
@@ -63,45 +65,42 @@
           <div class="ev-select-tag num">
             <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </template>
-    <span class="ev-date-picker-prefix-icon">
-      <i class="ev-icon-calendar" />
-    </span>
     <template v-if="clearable">
       <span
         v-show="isClearableIcon"
         class="ev-input-suffix"
-        @click.stop="removeAllMv"
+        @click.stop="[removeAllMv(), clickOutsideDropbox()]"
       >
         <i class="ev-icon-error" />
       </span>
     </template>
-  </div>
-
-  <teleport to="#ev-date-picker-dropdown-modal">
-    <div
-      v-if="isDropbox"
-      class="ev-date-picker-dropdown"
-      :class="mode"
-      :style="dropdownStyle"
-    >
-      <ev-calendar
-        key="fromCalendar"
-        v-model="mv"
-        :mode="mode"
-        :month-notation="monthNotation"
-        :day-of-the-week-notation="dayOfTheWeekNotation"
-        :options="options"
-      />
+    <div class="ev-date-picker-dropbox-wrapper">
+      <div
+        v-if="isDropbox"
+        ref="dropbox"
+        class="ev-date-picker-dropdown"
+        :class="mode"
+        :style="dropboxPosition"
+      >
+        <ev-calendar
+          key="fromCalendar"
+          v-model="mv"
+          :mode="mode"
+          :month-notation="monthNotation"
+          :day-of-the-week-notation="dayOfTheWeekNotation"
+          :options="options"
+        />
+      </div>
     </div>
-  </teleport>
+  </div>
 </template>
 
 <script>
 import { datePickerClickoutside as clickoutside } from '@/directives/clickoutside';
-import { useModel, useDropdown, usePosition } from './uses';
+import { useModel, useDropdown } from './uses';
 
 export default {
   name: 'EvDatePicker',
@@ -175,7 +174,6 @@ export default {
     const {
       mv,
       currentValue,
-      isDropbox,
       isClearableIcon,
       validateValue,
       removeAllMv,
@@ -184,25 +182,17 @@ export default {
     } = useModel();
 
     const {
+      isDropbox,
+      datePicker,
+      dropbox,
+      itemWrapper,
+      dropboxPosition,
       clickSelectInput,
       clickOutsideDropbox,
+      changeDropboxPosition,
     } = useDropdown({
-      isDropbox,
       currentValue,
     });
-
-    const {
-      datePicker,
-      itemWrapper,
-      dropdownStyle,
-      createDropdownEl,
-      observeDropbox,
-    } = usePosition({
-      isDropbox,
-    });
-
-    createDropdownEl();
-    observeDropbox();
 
     return {
       mv,
@@ -214,14 +204,13 @@ export default {
       removeMv,
 
       isDropbox,
+      datePicker,
+      dropbox,
+      itemWrapper,
+      dropboxPosition,
       clickSelectInput,
       clickOutsideDropbox,
-
-      datePicker,
-      itemWrapper,
-      dropdownStyle,
-      createDropdownEl,
-      observeDropbox,
+      changeDropboxPosition,
     };
   },
 };
@@ -247,7 +236,6 @@ export default {
   .ev-input {
     $calendar-icon-width: 30px;
     position: absolute;
-    top: 0;
     left: 0;
     height: 100%;
     padding: 0 $input-default-padding 0 $calendar-icon-width;
@@ -266,12 +254,13 @@ export default {
     align-items: center;
     cursor: pointer;
 
+
     &:hover {
       color: #409EFF;
     }
   }
 
-  .ev-select-tag-wrapper {
+  .ev-date-picker-tag-wrapper {
     $select-height: 35px;
     display: flex;
     width: 100%;
@@ -338,5 +327,10 @@ export default {
       color: #409EFF;
     }
   }
+}
+
+.ev-date-picker-dropbox-wrapper {
+  height: 0;
+  z-index: 100;
 }
 </style>

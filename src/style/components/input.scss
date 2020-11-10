@@ -28,7 +28,8 @@
 
 @include state('readonly') {
   .ev-input,
-  .ev-textarea {
+  .ev-textarea,
+  .ev-select {
     @include evThemify() {
       background-color: evThemed('background-lighten');
     }
@@ -40,7 +41,8 @@
     }
   }
   &.ev-text-field:hover,
-  &.ev-input-number:hover {
+  &.ev-input-number:hover,
+  &.ev-select:hover {
     .ev-input,
     .ev-textarea {
       @include evThemify() {
@@ -51,7 +53,8 @@
 }
 @include state('disabled') {
   &.ev-input-number,
-  &.ev-text-field {
+  &.ev-text-field,
+  &.ev-select {
     &, * {
       cursor: not-allowed !important;
     }
