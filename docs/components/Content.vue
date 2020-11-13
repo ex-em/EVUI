@@ -14,10 +14,11 @@ export default {
 @import '../style/index.scss';
 
 .evui-content {
-  position: fixed;
-  width: calc(100% - 320px);
-  height: calc(100% - 60px);
-  overflow: auto;
+  height: 100%;
   padding: 30px 40px;
+
+  //@include themify() {
+  //  background-color: themed('background-color-base');
+  //}
 }
 </style>

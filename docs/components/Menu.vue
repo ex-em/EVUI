@@ -53,6 +53,7 @@ export default {
 
   @include themify() {
     border-right: 1px solid themed('border-color-base');
+    background-color: themed('background-color-base');
   }
   ul, li {
     list-style: none;
