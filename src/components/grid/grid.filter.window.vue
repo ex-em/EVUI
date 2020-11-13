@@ -109,7 +109,7 @@
        */
       targetColumn: {
         type: Object,
-        default: () => {},
+        default: () => ({}),
       },
       /**
        * 설정된 필터 목록

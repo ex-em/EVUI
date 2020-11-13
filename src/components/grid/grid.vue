@@ -234,7 +234,7 @@
        */
       option: {
         type: Object,
-        default: () => {},
+        default: () => ({}),
       },
     },
     data() {
@@ -505,6 +505,8 @@
           return false;
         }
 
+        // test 시에 사용될 정규식 부분이 문자열로 넣어줘야하다 보니
+        // 특수문자에 대한 처리가 필요하여 아래 replace 처리를 함
         let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
         regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
 

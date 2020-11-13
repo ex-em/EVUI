@@ -13,7 +13,7 @@
        */
       item: {
         type: Object,
-        default: () => {},
+        default: () => ({}),
       },
     },
     data() {
