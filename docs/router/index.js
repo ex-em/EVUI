@@ -15,6 +15,7 @@ import calendarProps from 'docs/views/calendar/props';
 import messageProps from 'docs/views/message/props';
 import messageBoxProps from 'docs/views/messageBox/props';
 import notificationProps from 'docs/views/notification/props';
+import contextMenuProps from 'docs/views/contextMenu/props';
 import schedulerProps from 'docs/views/scheduler/props';
 
 const routes = [
@@ -31,7 +32,8 @@ const routes = [
   {
     path: '/contextMenu',
     name: 'ContextMenu',
-    component: () => import(/* webpackChunkName: "contextMenu" */ '../views/contextMenu'),
+    component: PageView,
+    props: contextMenuProps,
   },
   {
     path: '/button',
