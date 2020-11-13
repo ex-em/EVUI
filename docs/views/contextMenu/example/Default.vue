@@ -49,7 +49,7 @@ export default {
     const menu = ref(null);
     const menuItems = ref([
       {
-        text: 'TEXT1',
+        text: 11111,
         cls: 'ev-icon-s-panel-out',
         click: () => console.log('CLICK text1'),
       },

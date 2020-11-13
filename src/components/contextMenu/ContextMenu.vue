@@ -31,6 +31,16 @@ export default {
     items: {
       type: Array,
       default: () => [],
+      validator: (list) => {
+        if (list.filter(v => v.children).some(v => !Array.isArray(v.children))) {
+          console.warn('[EVUI][ContextMenu] children attribute must be \'Array\' type.');
+          return false;
+        } else if (list.filter(v => v.click).some(v => typeof v.click !== 'function')) {
+          console.warn('[EVUI][ContextMenu] click attribute must be \'Function\' type.');
+          return false;
+        }
+        return true;
+      },
     },
   },
   emits: {
