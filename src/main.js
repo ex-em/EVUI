@@ -1,22 +1,22 @@
-import EvButton from '@/components/button/Button.vue';
-import EvButtonGroup from '@/components/buttonGroup/ButtonGroup.vue';
-import EvCheckbox from '@/components/checkbox/Checkbox.vue';
-import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
-import EvRadio from '@/components/radio/Radio.vue';
-import EvRadioGroup from '@/components/radioGroup/RadioGroup.vue';
-import EvSelect from '@/components/select/Select.vue';
-import EvToggle from '@/components/toggle/Toggle.vue';
-import EvTextField from '@/components/textField/TextField.vue';
-import EvInputNumber from '@/components/inputNumber/InputNumber.vue';
-import EvSlider from '@/components/slider/Slider.vue';
-import EvIcon from '@/components/icon/Icon.vue';
-import EvCalendar from '@/components/calendar/Calendar.vue';
-import EvTimePicker from '@/components/datePicker/DatePicker.vue';
+import EvButton from '@/components/button/';
+import EvButtonGroup from '@/components/buttonGroup/';
+import EvCheckbox from '@/components/checkbox/';
+import EvCheckboxGroup from '@/components/checkboxGroup/';
+import EvRadio from '@/components/radio/';
+import EvRadioGroup from '@/components/radioGroup/';
+import EvSelect from '@/components/select/';
+import EvToggle from '@/components/toggle/';
+import EvTextField from '@/components/textField/';
+import EvInputNumber from '@/components/inputNumber/';
+import EvSlider from '@/components/slider/';
+import EvIcon from '@/components/icon/';
+import EvCalendar from '@/components/calendar/';
+import EvTimePicker from '@/components/datePicker/';
 import EvMessage from '@/components/message/';
 import EvNotification from '@/components/notification/';
 import EvMessageBox from '@/components/messageBox/';
-import EvScheduler from '@/components/scheduler/Scheduler.vue';
-import EvContextMenu from '@/components/contextMenu/ContextMenu.vue';
+import EvScheduler from '@/components/scheduler/';
+import EvContextMenu from '@/components/contextMenu/';
 import { version } from '../package.json';
 
 const components = [
@@ -43,7 +43,7 @@ const install = (app) => {
     return;
   }
   components.forEach((component) => {
-    app.component(component.name, component);
+    app.use(component);
   });
 
   const global = app.config.globalProperties;
