@@ -155,7 +155,6 @@ export default {
   display: flex;
   position: relative;
   max-height: 100%;
-  padding: $padding-vertical $padding-horizontal;
   flex-direction: column;
   box-sizing: border-box;
   border-radius: $default-radius;
@@ -175,18 +174,19 @@ export default {
 
   &-header {
     display: flex;
-    padding: 10px;
+    padding: $padding-vertical $padding-horizontal;
     font-weight: bold;
     font-size: $font-size-large;
   }
 
   &-content {
-    padding: 20px;
+    padding: $padding-vertical $padding-horizontal;
     overflow: auto;
+    flex: 1;
   }
 
   &-footer {
-    padding: 10px;
+    padding: $padding-vertical $padding-horizontal;
   }
 
   &-title {

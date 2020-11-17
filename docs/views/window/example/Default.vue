@@ -27,6 +27,9 @@
       <div>CUSTOM CONTENTS</div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      <template #footer>
+        <div>FOOTER</div>
+      </template>
       <button
         class="nested-btn"
         @click="clickButton3"
@@ -56,7 +59,7 @@
           NESTED CONTENTS
         </div>
         <template #footer>
-          <div>FOOTER</div>
+          <div>NESTED FOOTER</div>
         </template>
       </ev-window>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
