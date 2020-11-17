@@ -137,9 +137,16 @@
           - scrollbarSize;
         const remainingHeight = (window.innerHeight - clientY)
           - scrollbarSize;
-        const clientRect = this.$el.firstElementChild.getClientRects()[0];
-        const clientWidth = clientRect.width || this.width;
-        const clientHeight = clientRect.height || this.height;
+        let clientWidth = this.width;
+        let clientHeight = this.height;
+
+        const clientRects = this.$el.firstElementChild.getClientRects();
+        if (clientRects.length) {
+          const clientRect = clientRects[0];
+          clientWidth = clientRect.width;
+          clientHeight = clientRect.height;
+        }
+
         let left = clientX + scrollEl.scrollLeft;
         let top = clientY + scrollEl.scrollTop;
 
