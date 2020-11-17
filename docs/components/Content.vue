@@ -16,6 +16,7 @@ export default {
 .evui-content {
   height: 100%;
   padding: 30px 40px;
+  overflow: auto;
 
   //@include themify() {
   //  background-color: themed('background-color-base');

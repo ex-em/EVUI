@@ -13,9 +13,9 @@ export const useModel = () => {
    */
   const initWrapperDiv = () => {
     const root = document.createElement('div');
-    root.id = 'ev-context-menu';
+    root.id = 'ev-context-menu-modal';
     root.setAttribute('style', 'position: absolute; top: 0; left: 0;');
-    const hasRoot = document.getElementById('ev-context-menu');
+    const hasRoot = document.getElementById('ev-context-menu-modal');
     if (!hasRoot) {
       document.body.appendChild(root);
     }

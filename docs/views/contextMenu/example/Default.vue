@@ -50,35 +50,35 @@ export default {
     const menuItems = ref([
       {
         text: 11111,
-        cls: 'ev-icon-s-panel-out',
+        iconClass: 'ev-icon-s-panel-out',
         click: () => console.log('CLICK text1'),
       },
       {
         text: 'TEXT22222222222222',
-        cls: 'ev-icon-s-pause',
+        iconClass: 'ev-icon-s-pause',
         children: [
           {
             text: 'TEXT2-111111111111111',
-            cls: 'ev-icon-server2',
+            iconClass: 'ev-icon-server2',
             click: () => console.log('CLICK TEXT2-111111111111111'),
           },
           {
             text: 'TEXT2-2',
             value: 'value22',
-            cls: 'ev-icon-server',
+            iconClass: 'ev-icon-server',
           },
           {
             text: 'TEXT2-3',
-            cls: 'ev-icon-compress',
+            iconClass: 'ev-icon-compress',
             children: [
               {
                 text: 'TEXT2-3-1',
-                cls: 'ev-icon-bell-warning',
+                iconClass: 'ev-icon-bell-warning',
                 click: () => console.log('CLICK TEXT2-3-1'),
               },
               {
                 text: 'TEXT2-3-2',
-                cls: 'ev-icon-expand2',
+                iconClass: 'ev-icon-expand2',
               },
             ],
           },
@@ -101,7 +101,7 @@ export default {
           },
           {
             text: 'TEXT5-2',
-            cls: 'ev-icon-expand',
+            iconClass: 'ev-icon-expand',
           },
         ],
       },
@@ -114,24 +114,24 @@ export default {
     const menuItems2 = ref([
       {
         text: 'TEXT1',
-        cls: 'ev-icon-s-panel-out',
+        iconClass: 'ev-icon-s-panel-out',
         disabled: true,
         click: () => console.log('CLICK text1'),
       },
       {
         text: 'TEXT2',
         disabled: true,
-        cls: 'ev-icon-s-pause',
+        iconClass: 'ev-icon-s-pause',
         children: [
           {
             text: 'TEXT2-1',
-            cls: 'ev-icon-server2',
+            iconClass: 'ev-icon-server2',
             click: () => console.log('CLICK text2-1'),
           },
           {
             text: 'TEXT2-2',
             disabled: true,
-            cls: 'ev-icon-server',
+            iconClass: 'ev-icon-server',
           },
         ],
       },
@@ -143,7 +143,7 @@ export default {
     const addChild = () => {
       menuItems2.value.push({
         text: 'TEXT4',
-        cls: 'ev-icon-bell-warning',
+        iconClass: 'ev-icon-bell-warning',
         click: () => { console.log('CLICK TEXT4'); },
       });
     };

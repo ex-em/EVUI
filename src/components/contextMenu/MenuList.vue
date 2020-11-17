@@ -11,9 +11,9 @@
         @mouseenter="!item.disabled ? mouseenterLi($event, item.children) : (() => {})()"
       >
         <i
-          v-if="!!item.cls"
+          v-if="!!item.iconClass"
           class="ev-menu-li-prefix"
-          :class="item.cls"
+          :class="item.iconClass"
         />
         {{ item.text }}
         <i

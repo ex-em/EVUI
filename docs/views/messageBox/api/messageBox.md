@@ -45,7 +45,7 @@ ctx.$messagebox({
 | type | '' | String | 메시지 스타일. type입력 시 좌측 상단에 타입에 맞는 아이콘 노출됨 | 'info', 'success', 'warning', 'error' |
 | message | '' | String | 메시지 창에 띄울 문구 | |
 | title | '' | String | 메시지 상단 타이틀 문구 | |
-| iconClass | '' | String | 메시지 창 좌측에 띄울 EVUI 아이콘 명 | |
+| iconClass | '' | String | 메시지 창 좌측에 띄울 아이콘 클래스 명 | |
 | onClose | null | Function | 메시지 창이 닫힌 후 동작. 매개변수로 클릭한 버튼 타입을 받음(ok, cancel). 닫기 버튼 및 모달 레이어 클릭으로 닫을 시 cancel | |
 | showClose | true | Boolean | 닫기 버튼 노출 여부 | true, false |
 | showConfirmBtn | true | Boolean | 확인 버튼 노출 여부 | true, false |
