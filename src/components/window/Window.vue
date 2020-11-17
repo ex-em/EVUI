@@ -13,24 +13,35 @@
           :style="windowStyle"
         >
           <div
-            v-if="iconClass && title"
+            v-if="$slots.header || iconClass || title"
             class="ev-window-header"
           >
-            <span
-              v-if="iconClass"
-              class="ev-window-icon"
-            >
-              <i :class="iconClass"/>
-            </span>
-            <p
-              v-if="title"
-              class="ev-window-title"
-            >
-              {{ title }}
-            </p>
+            <template v-if="$slots.header">
+              <slot name="header" />
+            </template>
+            <template v-else>
+              <span
+                v-if="iconClass"
+                class="ev-window-icon"
+              >
+                <i :class="iconClass"/>
+              </span>
+              <p
+                v-if="title"
+                class="ev-window-title"
+              >
+                {{ title }}
+              </p>
+            </template>
           </div>
           <div class="ev-window-content">
-            <slot/>
+            <slot />
+          </div>
+          <div
+            v-if="$slots.footer"
+            class="ev-window-footer"
+          >
+            <slot name="footer" />
           </div>
           <span
             class="ev-window-close"
@@ -66,6 +77,14 @@ export default {
       type: String,
       default: '50%',
     },
+    height: {
+      type: String,
+      default: '50%',
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
     'update:visible': [Boolean],
@@ -85,9 +104,18 @@ export default {
     };
     initWrapperDiv();
 
-    const windowStyle = computed(() => ({
-      width: props.width,
-    }));
+    const windowStyle = computed(() => {
+      if (props.fullscreen) {
+        return {
+          width: '100%',
+          height: '100%',
+        };
+      }
+      return {
+        width: props.width,
+        height: props.height,
+      };
+    });
     /**
      * [x] 클릭 시 닫는 기능
      */
@@ -155,6 +183,10 @@ export default {
   &-content {
     padding: 20px;
     overflow: auto;
+  }
+
+  &-footer {
+    padding: 10px;
   }
 
   &-title {

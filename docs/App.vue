@@ -64,10 +64,6 @@ $file-path: './assets/fonts/';
   box-sizing: border-box;
   font-family: 'Roboto', Arial, 'Helvetica Neue', Helvetica, sans-serif;
 }
-body {
-  height: 100%;
-  overflow: hidden;
-}
 .evui-wrapper {
   position: relative;
   height: 100vh;

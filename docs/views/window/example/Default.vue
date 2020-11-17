@@ -3,6 +3,7 @@
     <p class="case-title">Common</p>
     <ev-window
       v-model:visible="isVisible1"
+      :title="'COMMON TITLE'"
     >
       <div>COMMON CONTENTS</div>
     </ev-window>
@@ -20,7 +21,7 @@
     <ev-window
       v-model:visible="isVisible2"
       :title="'CUSTOM TITLE'"
-      :width="'100%'"
+      :fullscreen="true"
       :icon-class="'ev-icon-binder'"
     >
       <div>CUSTOM CONTENTS</div>
@@ -36,8 +37,27 @@
         v-model:visible="isVisible3"
         :title="'NESTED TITLE'"
         :icon-class="'ev-icon-info2'"
+        :width="'40%'"
+        :height="'60%'"
       >
-        NESTED CONTENTS
+        <template #header>
+          <div>
+            NESTED TITLE >
+          </div>
+          <div class="header-right-title">
+            CUSTOM TITLE
+          </div>
+          <span class="header-right-icon">
+            <i class="ev-icon-calendar" />
+            <i class="ev-icon-shard" />
+          </span>
+        </template>
+        <div>
+          NESTED CONTENTS
+        </div>
+        <template #footer>
+          <div>FOOTER</div>
+        </template>
       </ev-window>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -102,5 +122,12 @@ export default {
   &:hover {
     background-color: $color-yellow;
   }
+}
+
+.header-right-title {
+  margin-left: 10px;
+}
+.header-right-icon {
+  margin-left: 20px;
 }
 </style>
