@@ -16,6 +16,7 @@ import messageProps from 'docs/views/message/props';
 import messageBoxProps from 'docs/views/messageBox/props';
 import notificationProps from 'docs/views/notification/props';
 import contextMenuProps from 'docs/views/contextMenu/props';
+import windowProps from 'docs/views/window/props';
 import schedulerProps from 'docs/views/scheduler/props';
 
 const routes = [
@@ -34,6 +35,12 @@ const routes = [
     name: 'ContextMenu',
     component: PageView,
     props: contextMenuProps,
+  },
+  {
+    path: '/window',
+    name: 'Window',
+    component: PageView,
+    props: windowProps,
   },
   {
     path: '/button',

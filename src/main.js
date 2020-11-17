@@ -17,6 +17,7 @@ import EvNotification from '@/components/notification/';
 import EvMessageBox from '@/components/messageBox/';
 import EvScheduler from '@/components/scheduler/';
 import EvContextMenu from '@/components/contextMenu/';
+import EvWindow from '@/components/window/';
 import { version } from '../package.json';
 
 const components = [
@@ -36,6 +37,7 @@ const components = [
   EvTimePicker,
   EvScheduler,
   EvContextMenu,
+  EvWindow,
 ];
 
 const install = (app) => {
@@ -74,6 +76,7 @@ export {
   EvTimePicker,
   EvScheduler,
   EvContextMenu,
+  EvWindow,
 };
 
 export default EVUI;
