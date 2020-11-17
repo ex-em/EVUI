@@ -15,16 +15,16 @@
           :class="{
           [`type-${type}`]: !!type,
           'show-close': showClose,
-          'has-icon': !!iconName,
+          'has-icon': !!iconClass,
           'has-title': !!title,
         }"
         >
           <span
-            v-if="iconName"
+            v-if="iconClass"
             class="ev-message-box-icon"
           >
             <i
-              :class="iconName"
+              :class="iconClass"
             />
           </span>
           <div class="ev-message-box-content">
@@ -149,7 +149,7 @@ export default {
   setup(props) {
     const state = reactive({
       isShow: true,
-      iconName: '',
+      iconClass: '',
     });
     const closeMsg = (btnType) => {
       if (!props.closeOnClickModal && btnType === 'modal') {
@@ -172,7 +172,7 @@ export default {
       }
     };
 
-    const getIconName = (type) => {
+    const getIconClassName = (type) => {
       switch (type) {
         case 'success':
           return 'ev-icon-arrow-check';
@@ -187,9 +187,9 @@ export default {
     };
     const setState = () => {
       if (props.iconClass) {
-        state.iconName = props.iconClass;
+        state.iconClass = props.iconClass;
       } else if (props.type) {
-        state.iconName = getIconName(props.type);
+        state.iconClass = getIconClassName(props.type);
       }
       if (props.lockScroll) {
         document.body.style.width = '100vw';
