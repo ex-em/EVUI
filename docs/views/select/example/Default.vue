@@ -202,7 +202,7 @@ export default {
       {
         name: 'name0',
         value: 'value0',
-        cls: 'ev-icon-query',
+        iconClass: 'ev-icon-query',
       },
       {
         name: 'name1',
@@ -211,17 +211,17 @@ export default {
       {
         name: 'name2',
         value: 'value2',
-        cls: '',
+        iconClass: '',
       },
       {
         name: 'name3',
         value: 'value3',
-        cls: 'ev-icon-bell',
+        iconClass: 'ev-icon-bell',
       },
       {
         name: 'name4',
         value: 'value4',
-        cls: 'ev-icon-close2',
+        iconClass: 'ev-icon-close2',
       },
     ]);
 

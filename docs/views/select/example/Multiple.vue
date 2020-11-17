@@ -72,6 +72,7 @@ export default {
       {
         name: 'name0name0name0name0name0name0',
         value: 'value0',
+        iconClass: 'ev-icon-query',
       },
       {
         name: 'name1name1name1name1name1name1',
@@ -84,6 +85,7 @@ export default {
       {
         name: 'name3name3name3name3name3name3',
         value: 'value3',
+        iconClass: 'ev-icon-bell',
       },
       {
         name: 'name4name4name4name4name4name4',

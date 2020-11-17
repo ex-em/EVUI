@@ -138,8 +138,8 @@
               @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
             >
               <i
-                v-if="item.cls"
-                :class="item.cls"
+                v-if="item.iconClass"
+                :class="item.iconClass"
               />
               {{ item.name }}
             </li>
