@@ -1,15 +1,51 @@
 <template>
-  <div
-    v-if="modelValue"
-    class="ev-loading"
-  >
-    <div class="ev-loading-spinner">
-      <i class="ev-icon-shard ev-loading-icon" />
+  <template v-if="fullscreen">
+    <teleport to="body">
+      <div
+        v-if="modelValue"
+        class="ev-loading"
+        @[`${clickEventName}`]="closeLoading"
+      >
+        <div class="ev-loading-spinner">
+          <template v-if="$slots.default">
+            <slot />
+          </template>
+          <template v-else>
+            <i
+              :class="iconClass || 'ev-icon-refresh2'"
+              class="ev-loading-icon"
+              :style="iconStyle"
+            />
+          </template>
+        </div>
+      </div>
+    </teleport>
+  </template>
+  <template v-else>
+    <div
+      v-if="modelValue"
+      class="ev-loading"
+      @[`${clickEventName}`]="closeLoading"
+    >
+      <div class="ev-loading-spinner">
+        <template v-if="$slots.default">
+          <slot />
+        </template>
+        <template v-else>
+          <i
+            :class="iconClass || 'ev-icon-refresh2'"
+            class="ev-loading-icon"
+            :style="iconStyle"
+          />
+        </template>
+      </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <script>
+import { computed } from 'vue';
+
 export default {
   name: 'EvLoading',
   props: {
@@ -17,8 +53,35 @@ export default {
       type: Boolean,
       default: false,
     },
+    fullscreen: {
+      type: Boolean,
+      default: false,
+    },
+    clickOutside: {
+      type: Boolean,
+      default: false,
+    },
+    iconClass: {
+      type: String,
+      default: null,
+    },
+    iconStyle: {
+      type: Object,
+      default: () => {},
+    },
   },
-  setup() {
+  emits: {
+    'update:modelValue': [Boolean],
+  },
+  setup(props, { emit }) {
+    const clickEventName = computed(() => (props.clickOutside ? 'click' : null));
+
+    const closeLoading = () => emit('update:modelValue', false);
+
+    return {
+      clickEventName,
+      closeLoading,
+    };
   },
 };
 </script>
@@ -28,8 +91,10 @@ export default {
 
 .ev-loading {
   position: absolute;
-  width: inherit;
-  height: inherit;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: #000000;
   opacity: 0.5;
 }
@@ -41,17 +106,17 @@ export default {
   text-align: center;
 }
 .ev-loading-icon {
-  width: 30px;
-  height: 30px;
+  display: inline-block;
+  font-size: 25px;
   animation: rotating 2s linear infinite;
 }
 
 @keyframes rotating {
   from {
-    transform: rotate(0);
+    transform: rotate(360deg);
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(0);
   }
 }
 </style>

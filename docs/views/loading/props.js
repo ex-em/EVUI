@@ -7,7 +7,7 @@ export default {
   mdText,
   components: {
     Default: {
-      description: '로딩마스크가 바인딩 값에 의해서 결정됩니다.',
+      description: '데이터가 로드되는 동안 애니메이션을 보여줍니다.',
       component: Default,
       parsedData: parseComponent(DefaultRaw),
     },
