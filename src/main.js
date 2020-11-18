@@ -18,6 +18,7 @@ import EvMessageBox from '@/components/messageBox/';
 import EvScheduler from '@/components/scheduler/';
 import EvContextMenu from '@/components/contextMenu/';
 import EvWindow from '@/components/window/';
+import EvLoading from '@/components/loading/';
 import { version } from '../package.json';
 
 const components = [
@@ -38,6 +39,7 @@ const components = [
   EvScheduler,
   EvContextMenu,
   EvWindow,
+  EvLoading,
 ];
 
 const install = (app) => {
@@ -77,6 +79,7 @@ export {
   EvScheduler,
   EvContextMenu,
   EvWindow,
+  EvLoading,
 };
 
 export default EVUI;
