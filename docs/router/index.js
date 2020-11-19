@@ -18,6 +18,7 @@ import notificationProps from 'docs/views/notification/props';
 import contextMenuProps from 'docs/views/contextMenu/props';
 import windowProps from 'docs/views/window/props';
 import schedulerProps from 'docs/views/scheduler/props';
+import loadingProps from 'docs/views/loading/props';
 
 const routes = [
   {
@@ -41,6 +42,12 @@ const routes = [
     name: 'Window',
     component: PageView,
     props: windowProps,
+  },
+  {
+    path: '/loading',
+    name: 'Loading',
+    component: PageView,
+    props: loadingProps,
   },
   {
     path: '/button',
