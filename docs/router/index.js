@@ -19,6 +19,7 @@ import contextMenuProps from 'docs/views/contextMenu/props';
 import windowProps from 'docs/views/window/props';
 import schedulerProps from 'docs/views/scheduler/props';
 import loadingProps from 'docs/views/loading/props';
+import progressProps from 'docs/views/progress/props';
 
 const routes = [
   {
@@ -90,6 +91,12 @@ const routes = [
     name: 'Slider',
     component: PageView,
     props: sliderProps,
+  },
+  {
+    path: '/progress',
+    name: 'Progress',
+    component: PageView,
+    props: progressProps,
   },
   {
     path: '/grid',
