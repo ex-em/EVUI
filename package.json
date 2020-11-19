@@ -43,6 +43,7 @@
     "lodash-es": "^4.17.15",
     "vue": "^2.6.11",
     "vue-i18n": "^8.15.6",
+    "vue-observe-visibility": "^0.4.6",
     "vue-resize-directive": "^1.2.0"
   },
   "devDependencies": {
