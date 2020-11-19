@@ -1,3 +1,5 @@
+import EvTabs from '@/components/tabs/';
+import EvTabPanel from '@/components/tabPanel/';
 import EvButton from '@/components/button/';
 import EvButtonGroup from '@/components/buttonGroup/';
 import EvCheckbox from '@/components/checkbox/';
@@ -23,6 +25,8 @@ import EvProgress from '@/components/progress';
 import { version } from '../package.json';
 
 const components = [
+  EvTabs,
+  EvTabPanel,
   EvButton,
   EvButtonGroup,
   EvCheckbox,
@@ -64,6 +68,8 @@ const EVUI = {
 };
 
 export {
+  EvTabs,
+  EvTabPanel,
   EvButton,
   EvButtonGroup,
   EvCheckbox,

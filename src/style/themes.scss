@@ -19,6 +19,7 @@ $ev-themes: (
     font-base: $color-black,
     border-base: #B2B2B2,
     border-light: #E3E3E3,
+    background-base: $color-white,
     background-lighten: rgba(#B2B2B2, 0.1),
 
     /* components
@@ -44,6 +45,7 @@ $ev-themes: (
     font-base: $color-white,
     border-base: #666666,
     border-light: #333333,
+    background-base: $color-black,
     background-lighten: rgba(#666666, 0.3),
 
     /* components

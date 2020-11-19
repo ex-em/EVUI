@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Intro from 'docs/views/Intro.vue';
 import PageView from 'docs/views/PageView';
+import tabProps from 'docs/views/tab/props';
 import buttonProps from 'docs/views/button/props';
 import checkboxProps from 'docs/views/checkbox/props';
 import selectProps from 'docs/views/select/props';
@@ -30,7 +31,8 @@ const routes = [
   {
     path: '/tab',
     name: 'Tab',
-    component: () => import(/* webpackChunkName: "tab" */ '../views/tab'),
+    component: PageView,
+    props: tabProps,
   },
   {
     path: '/contextMenu',
