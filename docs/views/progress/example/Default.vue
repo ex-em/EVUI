@@ -9,7 +9,18 @@
       v-model="progressVal1"
       color="#67C23A"
     >
-      <p>{{ progressVal1 }} %</p>
+      <div class="label-cls">
+        <p>{{ progressVal1 }} %</p>
+      </div>
+    </ev-progress>
+    <br>
+    <ev-progress
+      v-model="progressVal1"
+      color="#F56C6C"
+    >
+      <div class="label-cls">
+        <p>{{ progressVal1 }} / 100</p>
+      </div>
     </ev-progress>
     <br>
     <ev-progress
@@ -66,4 +77,7 @@ export default {
 </script>
 
 <style lang="scss">
+.label-cls {
+  width: 70px;
+}
 </style>

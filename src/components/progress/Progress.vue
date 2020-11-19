@@ -58,7 +58,6 @@ export default {
     const innerStyle = computed(() => {
       if (Array.isArray(props.color)) {
         const sortedColorList = [...props.color].sort((curr, next) => curr.value - next.value);
-        console.log(sortedColorList);
         let color = sortedColorList[0].color;
         if (!props.modelValue) {
           return {
@@ -132,8 +131,9 @@ export default {
   }
 
   &-label {
-    width: 55px;
-    text-align: center;
+    min-width: 55px;
+    text-align: right;
+    margin-left: 10px;
   }
 }
 </style>
