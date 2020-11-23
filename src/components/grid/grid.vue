@@ -2,10 +2,10 @@
   <div
     v-cloak
     v-resize.debounce="onResize"
-    v-observe-visibility="useVisibleObserve ? {
+    v-observe-visibility="{
       callback: onShow,
       once: true,
-    } : false"
+    }"
     :class="getTableClass"
   >
     <div
@@ -240,8 +240,6 @@
         stripeRows: this.option.stripeRows || false,
         showHeader: this.option.showHeader === undefined ? true : this.option.showHeader,
         useSelect: this.option.useSelect === undefined ? true : this.option.useSelect,
-        useVisibleObserve:
-          this.option.useVisibleObserve === undefined ? false : this.option.useVisibleObserve,
         useCheckbox: this.option.useCheckbox || {},
         customContextMenu: this.option.customContextMenu || [],
         useFilter: this.option.useFilter === undefined ? true : this.option.useFilter,
