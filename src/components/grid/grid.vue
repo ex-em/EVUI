@@ -2,6 +2,10 @@
   <div
     v-cloak
     v-resize.debounce="onResize"
+    v-observe-visibility="{
+      callback: onShow,
+      once: true,
+    }"
     :class="getTableClass"
   >
     <div
@@ -182,6 +186,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
+  import { ObserveVisibility } from 'vue-observe-visibility';
   import { uniqBy, isEqual } from 'lodash-es';
   import { numberWithComma } from '@/common/utils';
   import FilterWindow from './grid.filter.window';
@@ -195,6 +200,7 @@
     name: 'EvGrid',
     directives: {
       resize,
+      ObserveVisibility,
     },
     components: {
       FilterWindow,
@@ -802,6 +808,11 @@
 
         this.calculatedColumn();
         this.$forceUpdate();
+      },
+      onShow(isVisible) {
+        if (isVisible) {
+          this.onResize();
+        }
       },
       onColumnResize(columnIndex, event) {
         if (this.isLastColumn(columnIndex)) {
