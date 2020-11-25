@@ -1,36 +1,53 @@
 <template>
-  <article class="ev-tab-panel">
+  <article
+    v-show="isSelected"
+    class="ev-tab-panel"
+  >
     <slot />
   </article>
 </template>
 
 <script>
+import { reactive, computed, inject } from 'vue';
+
 export default {
   name: 'EvTabPanel',
   props: {
-    modelValue: {
-      type: [String, Number, Symbol, Boolean],
-      default: null,
+    text: {
+      type: String,
+      default: '',
     },
-    label: {
-      type: [String, Number, Symbol, Boolean],
+    value: {
+      type: String,
+      default: '',
+    },
+    content: {
+      type: String,
       default: null,
     },
     disabled: {
       type: Boolean,
       default: false,
     },
-    size: {
-      type: String,
-      default: '',
-    },
   },
   emits: {
-    'update:modelValue': null,
-    change: null,
   },
-  setup() {
+  setup(props) {
+    const tabInfo = reactive({
+      text: props.text,
+      value: props.value,
+      disabled: props.disabled,
+    });
+    const evTabs = inject('evTabs', null);
+    const mv = computed(() => evTabs.ctx.mv);
+    const addTab = evTabs.ctx.addTab;
+
+    addTab(tabInfo);
+    const isSelected = computed(() => props.value === mv.value);
+
     return {
+      mv,
+      isSelected,
     };
   },
 };
