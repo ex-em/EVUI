@@ -20,6 +20,7 @@ import windowProps from 'docs/views/window/props';
 import schedulerProps from 'docs/views/scheduler/props';
 import loadingProps from 'docs/views/loading/props';
 import progressProps from 'docs/views/progress/props';
+import gridProps from 'docs/views/grid/props';
 
 const routes = [
   {
@@ -101,7 +102,8 @@ const routes = [
   {
     path: '/grid',
     name: 'Grid',
-    component: () => import(/* webpackChunkName: "grid" */ '../views/grid'),
+    component: PageView,
+    props: gridProps,
   },
   {
     path: '/tree',
