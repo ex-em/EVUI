@@ -3,7 +3,8 @@
     <p class="case-title">Common</p>
     <div class="tab-wrapper">
       <ev-tabs
-        v-model="activeName1"
+        v-model="selectedValue1"
+        v-model:panels="tabPanels1"
       >
         <ev-tab-panel
           v-for="(item, idx) in tabPanels1"
@@ -22,15 +23,29 @@
       >
         addItem
       </button>
+      &nbsp;&nbsp;&nbsp;
+      <button
+        class="btn"
+        @click="popItem1"
+      >
+        popItem
+      </button>
+      &nbsp;&nbsp;&nbsp;
+      <button
+        class="btn"
+        @click="spliceItem1"
+      >
+        spliceItem1
+      </button>
     </div>
   </div>
   <div class="case">
     <p class="case-title">Common</p>
     <div class="tab-wrapper">
       <ev-tabs
-        v-model="activeName2"
+        v-model="selectedValue2"
+        v-model:panels="tabPanels2"
       >
-        tabPanels2 : {{ tabPanels2 }}
         <ev-tab-panel
           v-for="(item, idx) in tabPanels2"
           :key="`${item.name}_${idx}`"
@@ -57,11 +72,11 @@
 </template>
 
 <script>
-import { ref, shallowRef, triggerRef, watchEffect, defineAsyncComponent } from 'vue';
+import { ref, shallowRef, triggerRef, defineAsyncComponent } from 'vue';
 
 export default {
   setup() {
-    const activeName1 = ref('tabName1');
+    const selectedValue1 = ref('tabName2');
     const tabPanels1 = ref([
       {
         text: 'LABEL1LABEL1LABEL1LABEL1LABEL1',
@@ -110,16 +125,29 @@ export default {
       //   content: 'content9',
       // },
     ]);
+    const idx = ref(tabPanels1.value.length + 1);
 
     const addItem1 = () => {
       tabPanels1.value.push({
         text: 'NEW TEXT',
-        value: `value${tabPanels1.value.length + 1}`,
-        content: `content${tabPanels1.value.length + 1}`,
+        value: `value${idx.value}`,
+        content: `content${idx.value}`,
       });
+      idx.value++;
     };
 
-    const activeName2 = ref('comp1');
+    const popItem1 = () => {
+      if (tabPanels1.value.length > 1) {
+        tabPanels1.value.pop();
+      }
+    };
+    const spliceItem1 = () => {
+      if (tabPanels1.value.length > 1) {
+        tabPanels1.value.splice(0, 1);
+      }
+    };
+
+    const selectedValue2 = ref('comp1');
     const tabPanels2 = shallowRef([
       {
         text: 'LABEL1LABEL1LABEL1LABEL1LABEL1',
@@ -138,30 +166,28 @@ export default {
       },
     ]);
 
-    watchEffect(() => {
-      console.log(tabPanels2.value);
-    });
-
     const toggleComp4 = () => {
-      if (!tabPanels2.value.find(v => v.value === 'comp4')) {
+      const comp4Idx = tabPanels2.value.findIndex(v => v.value === 'comp4');
+      if (comp4Idx < 0) {
         tabPanels2.value.push({
           text: 'LABEL4',
           value: 'comp4',
           component: defineAsyncComponent(() => import('./Comp4.vue')),
         });
       } else {
-        const comp4Idx = tabPanels2.value.findIndex(v => v.value === 'comp4');
         tabPanels2.value.splice(comp4Idx, 1);
       }
       triggerRef(tabPanels2);
     };
 
     return {
-      activeName1,
+      selectedValue1,
       tabPanels1,
       addItem1,
+      popItem1,
+      spliceItem1,
 
-      activeName2,
+      selectedValue2,
       tabPanels2,
       toggleComp4,
     };

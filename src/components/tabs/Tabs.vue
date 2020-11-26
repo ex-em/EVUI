@@ -2,12 +2,10 @@
   <section
     class="ev-tabs"
     :class="{
-      closable,
+      closable: true,
     }"
   >
-    <div
-      class="ev-tabs-header"
-    >
+    <div class="ev-tabs-header">
       <div
         class="ev-tabs-nav-wrapper"
         :class="{
@@ -61,16 +59,20 @@
         </div>
       </div>
     </div>
-    <div class="ev-tabs-body">
+    <div
+      class="ev-tabs-body"
+    >
       <slot />
     </div>
   </section>
 </template>
 
 <script>
-
-import { ref, reactive, computed, watch,
-  provide, getCurrentInstance, nextTick } from 'vue';
+import {
+  ref, computed,
+  provide, getCurrentInstance,
+  onBeforeUpdate, onUpdated,
+} from 'vue';
 
 export default {
   name: 'EvTabs',
@@ -81,14 +83,28 @@ export default {
       type: [String, Number],
       default: null,
     },
-    closable: {
-      type: Boolean,
-      default: true,
+    panels: {
+      type: Array,
+      default: () => [],
+      validator: (list) => {
+        const valueList = list.map(v => v.value);
+        const setList = [...new Set(valueList)];
+        if (list.length !== setList.length) {
+          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is duplicate values.');
+          return false;
+        }
+        if (!list.every(v => Object.hasOwnProperty.call(v, 'value'))) {
+          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is essential.');
+          return false;
+        }
+        return true;
+      },
     },
   },
   emits: {
     'update:modelValue': [String, Number],
-    change: null,
+    'update:panels': [Array],
+    change: [String, Number],
   },
   setup(props, { emit }) {
     const instance = getCurrentInstance();
@@ -96,9 +112,16 @@ export default {
 
     const mv = computed({
       get: () => props.modelValue,
-      set: val => emit('update:modelValue', val),
+      set: (val) => {
+        emit('update:modelValue', val);
+        emit('change', val);
+      },
     });
-    const tabList = reactive([]);
+    const tabList = computed({
+      get: () => props.panels,
+      set: val => emit('update:panels', val),
+    });
+    let tabElValueList = tabList.value.map(v => v.value);
 
     const listWrapperRef = ref(null);
     const listRef = ref(null);
@@ -117,45 +140,84 @@ export default {
       hasScroll.value = listWrapperWidth < listWidth;
     };
 
-    watch(
-      () => tabList,
-      curr => console.log(curr),
-    );
+    onBeforeUpdate(() => {
+      // 삭제된 탭이 선택된 경우 탭선택인덱스를 변경하는 로직
+      if (tabElValueList.length === tabList.value.length + 1) {
+        let longList;
+        let shortList;
+        if (tabElValueList.length > tabList.value.length) {
+          longList = tabElValueList;
+          shortList = tabList.value.map(v => v.value);
+        } else {
+          longList = tabList.value.map(v => v.value);
+          shortList = tabElValueList;
+        }
+        const removeValue = longList.filter(v => !shortList.includes(v))[0];
+        if (mv.value === removeValue) {
+          const selectedIdx = tabElValueList.findIndex(v => v === removeValue);
+          if (selectedIdx === 0) {
+            mv.value = tabList.value[0].value;
+          } else {
+            mv.value = tabList.value[selectedIdx - 1].value;
+          }
+        }
+      }
+    });
 
-    const addTab = async (val) => {
-      if (!val.value) {
+    onUpdated(() => {
+      observeListEl();
+      tabElValueList = tabList.value.map(v => v.value);
+    });
+
+    /**
+     *  탭 추가 로직
+     */
+    const addTab = (info) => {
+      if (!info.value) {
         console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is essential.');
         return;
       }
-      if (tabList.some(v => v.value === val.value)) {
+      if (mv.value.some(v => v.value === info.value)) {
         console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is duplicate values.');
         return;
       }
-      tabList.push(val);
-
-      await nextTick();
-      observeListEl();
+      mv.value.push(info);
     };
-    const clickTab = (val) => { mv.value = val; };
-    const removeTab = async (val) => {
-      if (tabList.length < 2) {
+
+    /**
+     *  탭 클릭 로직
+     */
+    const clickTab = (val) => {
+      mv.value = val;
+    };
+
+    /**
+     *  탭 삭제 로직
+     */
+    const removeTab = (val) => {
+      if (tabList.value.length < 2) {
         return;
       }
-      const selectedIdx = tabList.findIndex(v => v.value === val);
+      const selectedIdx = tabList.value.findIndex(v => v.value === val);
+      if (selectedIdx < 0) {
+        mv.value = tabList.value[0].value;
+        return;
+      }
       if (val === mv.value) {
         if (selectedIdx === 0) {
-          mv.value = tabList[1].value;
+          mv.value = tabList.value[1].value;
         } else {
-          mv.value = tabList[selectedIdx - 1].value;
+          mv.value = tabList.value[selectedIdx - 1].value;
         }
       }
-      tabList.splice(selectedIdx, 1);
-
-      await nextTick();
-      observeListEl();
+      tabList.value.splice(selectedIdx, 1);
     };
+
+    /**
+     * tab nav위에서 마우스 휠 동작
+     * @param type - {'next'|'prev'}
+     */
     const scrollTab = (type) => {
-      console.log(type);
       if (type === 'next') {
         listRefTranslateX.value -= 100;
       } else {

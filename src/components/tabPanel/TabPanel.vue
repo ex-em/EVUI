@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { reactive, computed, inject } from 'vue';
+import { computed, inject } from 'vue';
 
 export default {
   name: 'EvTabPanel',
@@ -33,16 +33,8 @@ export default {
   emits: {
   },
   setup(props) {
-    const tabInfo = reactive({
-      text: props.text,
-      value: props.value,
-      disabled: props.disabled,
-    });
     const evTabs = inject('evTabs', null);
     const mv = computed(() => evTabs.ctx.mv);
-    const addTab = evTabs.ctx.addTab;
-
-    addTab(tabInfo);
     const isSelected = computed(() => props.value === mv.value);
 
     return {
