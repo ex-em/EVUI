@@ -152,6 +152,7 @@
           const parentClientRect = parent.getClientRect();
           const parentClientRectLeft = parent.clientRectLeft;
           const parentWidth = parentClientRect.width || 0;
+          const parentY = parentClientRect.y || 0;
           const parentDirectionToShow = parent.directionToShow;
           let top = this.top;
           let left = 0;
@@ -163,7 +164,7 @@
             clientRectLeft = parentWidth + parentClientRectLeft;
           }
 
-          const remainingHeight = (window.innerHeight - top)
+          const remainingHeight = (window.innerHeight - (top + parentY))
             - (this.isHScroll ? this.scrollbarSize : 0);
           const remainingWidth = (window.innerWidth - (parentClientRect.x + parentWidth))
             - (this.isVScroll ? this.scrollbarSize : 0);
