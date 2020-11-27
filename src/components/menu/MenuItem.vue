@@ -9,7 +9,7 @@
     <div
       :class="[
         'ev-menu-title',
-      { active: item.text === selectedItem },
+        { active: item.text === selectedItem },
         { 'expandable': hasChild && expandable },
       ]"
       @click="clickMenu(item.text, depth)"
@@ -25,15 +25,15 @@
         v-if="expandable && hasChild"
         :class="[
           'list-expend-icon',
-          { 'expend': expandable && isExpend }
+          { 'expend': expandable && isExpand }
         ]"
-        >
+      >
         <i class="ev-icon-s-arrow-up" />
       </span>
     </div>
     <template v-if="hasChild">
       <ol
-        v-show="isExpend"
+        v-show="isExpand"
         :class="['ev-menu-sub', `depth${depth}`]"
       >
         <template
@@ -82,13 +82,14 @@ export default {
   },
   emits: ['click-menu'],
   setup(props, { emit }) {
-    const isExpend = ref(true);
+    const defaultExpand = (props.expandable && props.item.expand !== undefined && typeof props.item.expand === 'boolean') ? props.item.expand : true;
+    const isExpand = ref(defaultExpand);
     const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
 
     const clickMenu = (menuName, depth) => {
       if (hasChild.value && depth === props.depth) {
         if (props.expandable) {
-          isExpend.value = !isExpend.value;
+          isExpand.value = !isExpand.value;
         }
       } else {
         emit('click-menu', menuName, props.depth);
@@ -96,7 +97,7 @@ export default {
     };
 
     return {
-      isExpend,
+      isExpand,
       hasChild,
       clickMenu,
     };

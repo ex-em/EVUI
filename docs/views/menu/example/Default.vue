@@ -31,6 +31,7 @@ export default {
           {
             text: 'Child Text 02-1',
             iconClass: 'ev-icon-server2',
+            expand: false,
             children: [
               { text: 'Child Text 02-1-1' },
               { text: 'Child Text 02-1-2' },
