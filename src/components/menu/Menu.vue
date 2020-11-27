@@ -50,10 +50,10 @@ export default {
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     const prevMenu = ref(props.modelValue);
-    const clickMenu = ({ menuName, item }) => {
-      emit('update:modelValue', menuName);
-      emit('change', menuName, prevMenu.value, item);
-      prevMenu.value = menuName;
+    const clickMenu = (newMenu) => {
+      emit('update:modelValue', newMenu);
+      emit('change', newMenu, prevMenu.value);
+      prevMenu.value = newMenu;
     };
     return {
       clickMenu,

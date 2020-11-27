@@ -9,12 +9,14 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import router from '../router';
 
 export default {
   setup() {
-    const currentMenu = ref();
+    const urlArr = window.location.href.split('/');
+    const menuName = urlArr[urlArr.length - 1];
+    const currentMenu = ref(menuName.charAt(0).toUpperCase() + menuName.slice(1));
 
     const getCategoryMenu = (category) => {
       const store = router.getRoutes().filter(item => item.name !== 'PageNotFound');
@@ -47,10 +49,7 @@ export default {
 
       return list ? store.reduce((pre, item) => {
         if (list.includes(item.name)) {
-          pre.push({
-            text: item.name,
-            path: item.path,
-          });
+          pre.push({ text: item.name });
         }
         return pre;
       }, []) : [];
@@ -79,15 +78,9 @@ export default {
       },
     ];
 
-    const changeMenu = (newVal, prevVal, item) => {
-      if (item && item.path) {
-        router.push({ path: item.path });
-      }
+    const changeMenu = (newVal) => {
+      router.push({ name: newVal });
     };
-
-    watch(() => router.currentRoute?.value.name, (newVal) => {
-      currentMenu.value = newVal;
-    });
 
     return {
       menu,

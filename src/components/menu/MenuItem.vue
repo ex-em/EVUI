@@ -12,11 +12,7 @@
       { active: item.text === selectedItem },
         { 'expandable': hasChild && expandable },
       ]"
-      @click="clickMenu({
-        menuName: item.text,
-        depth,
-        item,
-      })"
+      @click="clickMenu(item.text, depth)"
     >
       <i
         v-if="!!item.iconClass"
@@ -89,20 +85,13 @@ export default {
     const isExpend = ref(true);
     const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
 
-    const clickMenu = ({ menuName, depth, item }) => {
+    const clickMenu = (menuName, depth) => {
       if (hasChild.value && depth === props.depth) {
         if (props.expandable) {
           isExpend.value = !isExpend.value;
         }
       } else {
-        const param = {
-          menuName,
-          depth: props.depth,
-        };
-        if (item) {
-          param.item = item;
-        }
-        emit('click-menu', param);
+        emit('click-menu', menuName, props.depth);
       }
     };
 
