@@ -69,11 +69,6 @@ $file-path: './assets/fonts/';
   height: 100vh;
   padding: $header-height 0 0 $nav-width;
   font-size: $font-size-base;
-
-  @include themify() {
-    color: themed('font-color-base');
-    background-color: themed('background-color-base');
-  }
 }
 .dark {
   @import './style/lib/highlightjs.hybrid';

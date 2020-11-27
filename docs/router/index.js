@@ -20,6 +20,7 @@ import windowProps from 'docs/views/window/props';
 import schedulerProps from 'docs/views/scheduler/props';
 import loadingProps from 'docs/views/loading/props';
 import progressProps from 'docs/views/progress/props';
+import menuProps from 'docs/views/menu/props';
 
 const routes = [
   {
@@ -33,28 +34,34 @@ const routes = [
     component: () => import(/* webpackChunkName: "tab" */ '../views/tab'),
   },
   {
-    path: '/contextMenu',
-    name: 'ContextMenu',
-    component: PageView,
-    props: contextMenuProps,
-  },
-  {
     path: '/window',
     name: 'Window',
     component: PageView,
     props: windowProps,
   },
   {
-    path: '/loading',
-    name: 'Loading',
+    path: '/menu',
+    name: 'Menu',
     component: PageView,
-    props: loadingProps,
+    props: menuProps,
+  },
+  {
+    path: '/contextMenu',
+    name: 'ContextMenu',
+    component: PageView,
+    props: contextMenuProps,
   },
   {
     path: '/button',
     name: 'Button',
     component: PageView,
     props: buttonProps,
+  },
+  {
+    path: '/icon',
+    name: 'Icon',
+    component: PageView,
+    props: iconProps,
   },
   {
     path: '/checkbox',
@@ -75,6 +82,12 @@ const routes = [
     props: selectProps,
   },
   {
+    path: '/toggle',
+    name: 'Toggle',
+    component: PageView,
+    props: toggleProps,
+  },
+  {
     path: '/textField',
     name: 'TextField',
     component: PageView,
@@ -93,10 +106,22 @@ const routes = [
     props: sliderProps,
   },
   {
-    path: '/progress',
-    name: 'Progress',
+    path: '/calendar',
+    name: 'Calendar',
     component: PageView,
-    props: progressProps,
+    props: calendarProps,
+  },
+  {
+    path: '/datePicker',
+    name: 'DatePicker',
+    component: PageView,
+    props: datePickerProps,
+  },
+  {
+    path: '/scheduler',
+    name: 'Scheduler',
+    component: PageView,
+    props: schedulerProps,
   },
   {
     path: '/grid',
@@ -112,24 +137,6 @@ const routes = [
     path: '/treeTable',
     name: 'TreeTable',
     component: () => import(/* webpackChunkName: "treeTable" */ '../views/treeTable'),
-  },
-  {
-    path: '/calendar',
-    name: 'Calendar',
-    component: PageView,
-    props: calendarProps,
-  },
-  {
-    path: '/datePicker',
-    name: 'DatePicker',
-    component: PageView,
-    props: datePickerProps,
-  },
-  {
-    path: '/toggle',
-    name: 'Toggle',
-    component: PageView,
-    props: toggleProps,
   },
   {
     path: '/barChart',
@@ -162,12 +169,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "reactivityChart" */ '../views/reactivityChart'),
   },
   {
-    path: '/icon',
-    name: 'Icon',
-    component: PageView,
-    props: iconProps,
-  },
-  {
     path: '/message',
     name: 'Message',
     component: PageView,
@@ -186,10 +187,16 @@ const routes = [
     props: notificationProps,
   },
   {
-    path: '/scheduler',
-    name: 'Scheduler',
+    path: '/loading',
+    name: 'Loading',
     component: PageView,
-    props: schedulerProps,
+    props: loadingProps,
+  },
+  {
+    path: '/progress',
+    name: 'Progress',
+    component: PageView,
+    props: progressProps,
   },
   {
     path: '/:catchAll(.*)',
@@ -201,6 +208,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+  scrollBehavior() {
+    const scrollTarget = document.getElementsByClassName('evui-content')[0];
+    scrollTarget.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  },
 });
 
 export default router;
