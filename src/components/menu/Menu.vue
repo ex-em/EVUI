@@ -2,7 +2,7 @@
   <ul class="ev-menu">
     <menu-item
       v-for="(menuItem, index) in items"
-      :key="menuItem.text + index"
+      :key="`${menuItem.text}_${index}_0`"
       :item="menuItem"
       :selected-item="modelValue"
       :expandable="expandable"

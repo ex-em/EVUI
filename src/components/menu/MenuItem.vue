@@ -38,7 +38,7 @@
       >
         <menu-item
           v-for="(menuItem, index) in item.children"
-          :key="menuItem.text + index"
+          :key="`${menuItem.text}_${index}_${depth + 1}`"
           :depth="depth + 1"
           :item="menuItem"
           :selected-item="selectedItem"
