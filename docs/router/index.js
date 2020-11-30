@@ -32,171 +32,261 @@ const routes = [
     path: '/tab',
     name: 'Tab',
     component: () => import(/* webpackChunkName: "tab" */ '../views/tab'),
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/window',
     name: 'Window',
     component: PageView,
     props: windowProps,
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/menu',
     name: 'Menu',
     component: PageView,
     props: menuProps,
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/contextMenu',
     name: 'ContextMenu',
     component: PageView,
     props: contextMenuProps,
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/button',
     name: 'Button',
     component: PageView,
     props: buttonProps,
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/icon',
     name: 'Icon',
     component: PageView,
     props: iconProps,
+    meta: {
+      category: 'Layout',
+    },
   },
   {
     path: '/checkbox',
     name: 'Checkbox',
     component: PageView,
     props: checkboxProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/radio',
     name: 'Radio',
     component: PageView,
     props: radioProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/select',
     name: 'Select',
     component: PageView,
     props: selectProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/toggle',
     name: 'Toggle',
     component: PageView,
     props: toggleProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/textField',
     name: 'TextField',
     component: PageView,
     props: textFieldProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/inputNumber',
     name: 'InputNumber',
     component: PageView,
     props: inputNumberProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/slider',
     name: 'Slider',
     component: PageView,
     props: sliderProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/calendar',
     name: 'Calendar',
     component: PageView,
     props: calendarProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/datePicker',
     name: 'DatePicker',
     component: PageView,
     props: datePickerProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/scheduler',
     name: 'Scheduler',
     component: PageView,
     props: schedulerProps,
+    meta: {
+      category: 'Form',
+    },
   },
   {
     path: '/grid',
     name: 'Grid',
     component: () => import(/* webpackChunkName: "grid" */ '../views/grid'),
+    meta: {
+      category: 'Table',
+    },
   },
   {
     path: '/tree',
     name: 'Tree',
     component: () => import(/* webpackChunkName: "tree" */ '../views/tree'),
+    meta: {
+      category: 'Table',
+    },
   },
   {
     path: '/treeTable',
     name: 'TreeTable',
     component: () => import(/* webpackChunkName: "treeTable" */ '../views/treeTable'),
+    meta: {
+      category: 'Table',
+    },
   },
   {
     path: '/barChart',
     name: 'BarChart',
     component: () => import(/* webpackChunkName: "barChart" */ '../views/barChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/lineChart',
     name: 'LineChart',
     component: () => import(/* webpackChunkName: "lineChart" */ '../views/lineChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/scatterChart',
     name: 'ScatterChart',
     component: () => import(/* webpackChunkName: "scatterChart" */ '../views/scatterChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/pieChart',
     name: 'PieChart',
     component: () => import(/* webpackChunkName: "pieChart" */ '../views/pieChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/comboChart',
     name: 'ComboChart',
     component: () => import(/* webpackChunkName: "comboChart" */ '../views/comboChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/reactivityChart',
     name: 'ReactivityChart',
     component: () => import(/* webpackChunkName: "reactivityChart" */ '../views/reactivityChart'),
+    meta: {
+      category: 'Chart',
+    },
   },
   {
     path: '/message',
     name: 'Message',
     component: PageView,
     props: messageProps,
+    meta: {
+      category: 'Notice',
+    },
   },
   {
     path: '/messageBox',
     name: 'MessageBox',
     component: PageView,
     props: messageBoxProps,
+    meta: {
+      category: 'Notice',
+    },
   },
   {
     path: '/notification',
     name: 'Notification',
     component: PageView,
     props: notificationProps,
+    meta: {
+      category: 'Notice',
+    },
   },
   {
     path: '/loading',
     name: 'Loading',
     component: PageView,
     props: loadingProps,
+    meta: {
+      category: 'Notice',
+    },
   },
   {
     path: '/progress',
     name: 'Progress',
     component: PageView,
     props: progressProps,
+    meta: {
+      category: 'Notice',
+    },
   },
   {
     path: '/:catchAll(.*)',

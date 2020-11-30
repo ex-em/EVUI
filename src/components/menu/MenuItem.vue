@@ -70,6 +70,19 @@ export default {
     item: {
       type: Object,
       default: () => {},
+      validator: (obj) => {
+        if (obj.children !== undefined && !Array.isArray(obj.children)) {
+          console.warn('[EVUI][Menu] children attribute must be \'Array\' type.');
+          return false;
+        } else if (obj.expand !== undefined && typeof obj.expand !== 'boolean') {
+          console.warn('[EVUI][Menu] expand attribute must be \'Boolean\' type.');
+          return false;
+        } else if (obj.hidden !== undefined && typeof obj.hidden !== 'boolean') {
+          console.warn('[EVUI][Menu] hidden attribute must be \'Boolean\' type.');
+          return false;
+        }
+        return true;
+      },
     },
     depth: {
       type: Number,

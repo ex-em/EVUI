@@ -14,69 +14,40 @@ import router from '../router';
 
 export default {
   setup() {
-    const urlArr = window.location.href.split('/');
-    const menuName = urlArr[urlArr.length - 1];
-    const currentMenu = ref(menuName.charAt(0).toUpperCase() + menuName.slice(1));
+    const currentMenu = ref(null);
+    router.beforeEach((to, from, next) => {
+      if (!from.name) {
+        currentMenu.value = to.name;
+      }
+      next();
+    });
 
-    const getCategoryMenu = (category) => {
+    const menu = (() => {
       const store = router.getRoutes().filter(item => item.name !== 'PageNotFound');
-      const layoutList = ['Tab', 'Window', 'Menu', 'ContextMenu', 'Button', 'Icon'];
-      const formList = ['Checkbox', 'Radio', 'Select', 'Toggle', 'TextField', 'InputNumber', 'Slider', 'Calendar', 'DatePicker', 'Scheduler'];
-      const tableList = ['Grid', 'Tree', 'TreeTable'];
-      const chartList = ['BarChart', 'LineChart', 'ScatterChart', 'PieChart', 'ComboChart', 'ReactivityChart'];
-      const noticeList = ['Message', 'MessageBox', 'Notification', 'Loading', 'Progress'];
+      const list = [];
+      const tempListObj = {};
 
-      let list;
-      switch (category) {
-        case 'layout':
-          list = layoutList;
-          break;
-        case 'form':
-          list = formList;
-          break;
-        case 'table':
-          list = tableList;
-          break;
-        case 'chart':
-          list = chartList;
-          break;
-        case 'notice':
-          list = noticeList;
-          break;
-        default:
-          break;
+      store.forEach((item) => {
+        const category = item.meta.category;
+        if (category) {
+          if (!tempListObj[category]) {
+            tempListObj[category] = [];
+          }
+          tempListObj[category].push({ text: item.name });
+        }
+      });
+
+      const tempListKeys = Object.keys(tempListObj);
+      for (let ix = 0; ix < tempListKeys.length; ix++) {
+        const text = tempListKeys[ix];
+        list.push({
+          text,
+          children: tempListObj[text],
+        });
       }
 
-      return list ? store.reduce((pre, item) => {
-        if (list.includes(item.name)) {
-          pre.push({ text: item.name });
-        }
-        return pre;
-      }, []) : [];
-    };
-
-    const menu = [
-      {
-        text: 'Layout',
-        children: getCategoryMenu('layout'),
-      },
-      {
-        text: 'Form',
-        children: getCategoryMenu('form'),
-      },
-      {
-        text: 'Table',
-        children: getCategoryMenu('table'),
-      },
-      {
-        text: 'Chart',
-        children: getCategoryMenu('chart'),
-      },
-      {
-        text: 'Notice',
-        children: getCategoryMenu('notice'),
-      },
-    ];
+      return list;
+    })();
 
     const changeMenu = (newVal) => {
       router.push({ name: newVal });
