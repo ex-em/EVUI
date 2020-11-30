@@ -36,18 +36,15 @@
         v-show="isExpand"
         :class="['ev-menu-sub', `depth${depth}`]"
       >
-        <template
+        <menu-item
           v-for="(menuItem, index) in item.children"
           :key="menuItem.text + index"
-        >
-          <menu-item
-            :depth="depth + 1"
-            :item="menuItem"
-            :selected-item="selectedItem"
-            :expandable="expandable"
-            @click-menu="clickMenu"
-          />
-        </template>
+          :depth="depth + 1"
+          :item="menuItem"
+          :selected-item="selectedItem"
+          :expandable="expandable"
+          @click="clickMenu"
+        />
       </ol>
     </template>
   </li>
@@ -93,7 +90,7 @@ export default {
       default: true,
     },
   },
-  emits: ['click-menu'],
+  emits: ['click'],
   setup(props, { emit }) {
     const defaultExpand = (props.expandable && props.item.expand !== undefined && typeof props.item.expand === 'boolean') ? props.item.expand : true;
     const isExpand = ref(defaultExpand);
@@ -105,7 +102,7 @@ export default {
           isExpand.value = !isExpand.value;
         }
       } else {
-        emit('click-menu', menuName, props.depth);
+        emit('click', menuName, props.depth);
       }
     };
 

@@ -1,16 +1,13 @@
 <template>
   <ul class="ev-menu">
-    <template
+    <menu-item
       v-for="(menuItem, index) in items"
       :key="menuItem.text + index"
-    >
-      <menu-item
-        :item="menuItem"
-        :selected-item="modelValue"
-        :expandable="expandable"
-        @click-menu="clickMenu"
-      />
-    </template>
+      :item="menuItem"
+      :selected-item="modelValue"
+      :expandable="expandable"
+      @click="clickMenu"
+    />
   </ul>
 </template>
 

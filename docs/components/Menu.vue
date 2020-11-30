@@ -22,32 +22,19 @@ export default {
       next();
     });
 
-    const menu = (() => {
-      const store = router.getRoutes().filter(item => item.name !== 'PageNotFound');
-      const list = [];
-      const tempListObj = {};
-
-      store.forEach((item) => {
-        const category = item.meta.category;
-        if (category) {
-          if (!tempListObj[category]) {
-            tempListObj[category] = [];
-          }
-          tempListObj[category].push({ text: item.name });
+    const menu = router.getRoutes().filter(item => item.name !== 'PageNotFound').reduce((acc, cur) => {
+      if (!cur.meta.category) {
+        acc.push({ text: cur.name });
+      } else {
+        const idx = acc.findIndex(v => v.text === cur.meta.category);
+        if (idx < 0) {
+          acc.push({ text: cur.meta.category, children: [{ text: cur.name }] });
+        } else {
+          acc[idx].children.push({ text: cur.name });
         }
-      });
-
-      const tempListKeys = Object.keys(tempListObj);
-      for (let ix = 0; ix < tempListKeys.length; ix++) {
-        const text = tempListKeys[ix];
-        list.push({
-          text,
-          children: tempListObj[text],
-        });
       }
-
-      return list;
-    })();
+      return acc;
+    }, []);
 
     const changeMenu = (newVal) => {
       router.push({ name: newVal });
