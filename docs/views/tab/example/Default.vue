@@ -5,6 +5,7 @@
       <ev-tabs
         v-model="selectedValue1"
         v-model:panels="tabPanels1"
+        :closable="true"
       >
         <ev-tab-panel
           v-for="(item, idx) in tabPanels1"
@@ -40,11 +41,55 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Common</p>
+    <p class="case-title">Draggable</p>
+    <div class="tab-wrapper">
+      <ev-tabs
+        v-model="selectedValue1"
+        v-model:panels="tabPanels1"
+        :draggable="true"
+      >
+        <ev-tab-panel
+          v-for="(item, idx) in tabPanels1"
+          :key="`${item.name}_${idx}`"
+          :text="item.text"
+          :value="item.value"
+        >
+          <div v-html="item.content"/>
+        </ev-tab-panel>
+      </ev-tabs>
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">With Component</p>
     <div class="tab-wrapper">
       <ev-tabs
         v-model="selectedValue2"
         v-model:panels="tabPanels2"
+        class="example2"
+      >
+        <ev-tab-panel
+          v-for="(item, idx) in tabPanels2"
+          :key="`${item.name}_${idx}`"
+          :text="item.text"
+          :value="item.value"
+        >
+          <component
+            :is="item.component"
+            v-if="item.component"
+            class="componentCls"
+          />
+        </ev-tab-panel>
+      </ev-tabs>
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Stretch Tab Name</p>
+    <div class="tab-wrapper">
+      <ev-tabs
+        v-model="selectedValue2"
+        v-model:panels="tabPanels2"
+        :stretch="true"
+        :closable="true"
       >
         <ev-tab-panel
           v-for="(item, idx) in tabPanels2"
@@ -86,7 +131,7 @@ export default {
       {
         text: 'LABEL2LABEL2',
         value: 'tabName2',
-        content: '<div><h3>HEADER</h3><p>123123123423423423</p></div>',
+        content: '<div class="example1-label"><h3>HEADER</h3><p>123123123423423423</p></div>',
       },
       {
         text: 'LABEL3',
@@ -108,22 +153,6 @@ export default {
         value: 'tabName6',
         content: 'content6',
       },
-      // {
-      //   text: 'LABEL7',
-      //   value: 'tabName7',
-      //   content: 'content7',
-      // },
-      // {
-      //   text: 'LABEL8'
-      //   ,
-      //   value: 'tabName8',
-      //   content: 'content8',
-      // },
-      // {
-      //   text: 'LABEL9',
-      //   value: 'tabName9',
-      //   content: 'content9',
-      // },
     ]);
     const idx = ref(tabPanels1.value.length + 1);
 
@@ -153,26 +182,31 @@ export default {
         text: 'LABEL1LABEL1LABEL1LABEL1LABEL1',
         value: 'comp1',
         component: defineAsyncComponent(() => import('./Comp1.vue')),
+        iconClass: 'ev-icon-question',
       },
       {
         text: 'LABEL2LABEL2',
         value: 'comp2',
         component: defineAsyncComponent(() => import('./Comp2.vue')),
+        iconClass: 'ev-icon-shard',
       },
       {
-        text: 'LABEL3',
+        text: 'TEXT3TEXT3TEXT3EXT3TEXT3TEX3',
         value: 'comp3',
         component: defineAsyncComponent(() => import('./Comp3.vue')),
+        iconClass: 'ev-icon-bell',
       },
+
     ]);
 
     const toggleComp4 = () => {
       const comp4Idx = tabPanels2.value.findIndex(v => v.value === 'comp4');
       if (comp4Idx < 0) {
         tabPanels2.value.push({
-          text: 'LABEL4',
+          text: 'LABEL4LABEL4LABEL4LABEL4LABEL4',
           value: 'comp4',
           component: defineAsyncComponent(() => import('./Comp4.vue')),
+          iconClass: 'ev-icon-binder',
         });
       } else {
         tabPanels2.value.splice(comp4Idx, 1);
@@ -194,7 +228,8 @@ export default {
   },
 };
 </script>
-<style>
+
+<style lang="scss">
 .tab-wrapper {
   width: 100%;
   height: 100%;
@@ -205,5 +240,15 @@ export default {
   border: 1px solid #B2B2B2;
   border-top: none;
   border-radius: 0 0 4px 4px;
+}
+
+.example1-label {
+  padding: 20px;
+}
+
+.example2 {
+  .ev-tabs-title {
+    width: 150px;
+  }
 }
 </style>
