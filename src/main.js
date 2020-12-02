@@ -22,6 +22,7 @@ import EvContextMenu from '@/components/contextMenu/';
 import EvWindow from '@/components/window/';
 import EvLoading from '@/components/loading/';
 import EvProgress from '@/components/progress/';
+import EvMenu from '@/components/menu/';
 import { version } from '../package.json';
 
 const components = [
@@ -46,6 +47,7 @@ const components = [
   EvWindow,
   EvLoading,
   EvProgress,
+  EvMenu,
 ];
 
 const install = (app) => {
@@ -89,6 +91,7 @@ export {
   EvWindow,
   EvLoading,
   EvProgress,
+  EvMenu,
 };
 
 export default EVUI;

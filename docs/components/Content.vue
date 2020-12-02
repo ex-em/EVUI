@@ -18,8 +18,9 @@ export default {
   padding: 30px 40px;
   overflow: auto;
 
-  //@include themify() {
-  //  background-color: themed('background-color-base');
-  //}
+  @include themify() {
+    color: themed('font-color-base');
+    background-color: themed('background-color-base');
+  }
 }
 </style>
