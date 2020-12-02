@@ -14,16 +14,13 @@ export default {
   name: 'EvTabPanel',
   props: {
     text: {
-      type: String,
-      default: '',
+      type: [String, Number],
+      default: null,
     },
     value: {
-      type: String,
-      default: '',
-    },
-    content: {
-      type: String,
+      type: [String, Number],
       default: null,
+      required: true,
     },
     disabled: {
       type: Boolean,

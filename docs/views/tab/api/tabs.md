@@ -3,58 +3,44 @@
  - 태그는 &lt;ev-tabs&gt;(이하 <탭>)과 &lt;ev-tab-panel&gt;(이하 <탭 패널>)로 정의
 
 ```
-<ev-select
+<ev-tabs
     v-model="초기값(value)"
-    :items="[{...}, {...}, {...}]"
-/>
+    v-model:panels="[{...}, {...}, {...}]"
+    :closable="Boolean값"
+    :stretch="Boolean값"
+    :draggable="Boolean값"
+>
+    <ev-tab-panel
+        :text="패널의 텍스트(라벨)"
+        :value="패널 값"
+    >
+        // rendering contents
+    </ev-tab-panel>
+</ev-tabs>
 ```
 
-- <탭> 태그 내부에 <탭 패널>을 나열하면서 <탭>에 v-model로 걸린 리스트 
- - <셀렉트> 컴포넌트는 `<input type="text" />` 를 래핑하는 구조를 가지고 있다.
- - <셀렉트> 컴포넌트를 클릭하였을 때, :items 속성에 1개 이상의 객체를 가진 배열이 존재하는 경우,
-   하단에 선택할 리스트 데이터를 보여주는 <드랍다운 박스>가 나타난다.
- - <드랍박스>가 열린 상태에서 <셀렉트>를 한번더 클릭할 시 <드랍다운 박스>는 사라진다. 
- - <셀렉트> 컴포넌트의 기본 width는 100%이다.
-   다른 형태를 위해서는 ev-select 클래스에 스타일을 래핑해야한다.
- - 기본적으로 <드랍박스>의 너비는 <셀렉트> 컴포넌트의 너비와 동일하게 맞춰져 있다.
- - items 바인딩 값의 타입은 배열이며, 속성으로는 name, value, iconClass 이다.
- - iconClass속성의 값으로 <드랍박스>의 <li> 내 아이콘을 추가할 수 있다.
- - <드랍박스>는 기본적으로 인풋박스의 하단에 드랍다운되며, 브라우저 높이에 맞춰 <드랍박스>가 아래로 위치하는 경우 브라우저 화면을 넘어가는 경우 상단에 드랍업 된다.
+- <탭> 컴포넌트 하위에 <탭 패널> 컴포넌트가 존재합니다. 
+- <탭> 컴포넌트의 v-model로는 초기에 선택된 탭의 value가 바인딩되며, v-model:panels에는 탭 리스트 정보가 바인딩됩니다..
+- <탭> 컴포넌트에는 여러 옵션들이 존재합니다. (closable, stretch, draggable)
+- <탭 패널>에는 text, value 속성이 존재합니다. <탭 패널> 태그 내부에는 실제로 해당 탭이 선택되었을 때, 보여줄 컨텐츠를 넣으면 됩니다.
+
 
 >### Props
-1) 셀렉트 사용 시
- | 이름 | 디폴트 | 타입 | 설명 | 종류 |
-  |------|--------|------|------|------|
-  | v-model | null | Boolean, String, Number | <셀렉트>에서 선택된 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | items | [] | Array | <셀렉트> 선택가능한 리스트 |  |
-  | placeholder | '' | String | <셀렉트>의 표기문구 |  |
-  | disabled | false | Boolean | <셀렉트> 사용가능 여부 |  |
-  | clearable | false | Boolean | <셀렉트>에 선택된 항목들 모두 clear기능 사용여부 |  |
-  | filterable | false | Boolean | <셀렉트> 항목들 필터링 기능 사용여부 |  |
-  | searchPlaceholder | '' | String | <셀렉트> 필터링의 표기문구 |  |
-  | noMatchingText | '' | String | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
-- <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫혀야한다.
+1) tabs
 
-2) 멀티 셀렉트 사용 시
- | 이름 | 디폴트 | 타입 | 설명 | 종류 |
-  |------|--------|------|------|------|
-  | v-model | null | Boolean, String, Number | <셀렉트>에서 선택된 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | items | [] | Array | <셀렉트> 선택가능한 리스트 |  |
-  | placeholder | '' | String | <셀렉트>의 표기문구 |  |
-  | multiple | false | Boolean | <셀렉트> 복수 선택 가능여부 |  |
-  | disabled | false | Boolean | <셀렉트> 사용가능 여부 |  |
-  | clearable | false | Boolean | <셀렉트>에 선택된 항목들 모두 clear기능 사용여부 |  |
-  | collapse-tags | false | Boolean | <셀렉트>에 선택된 항목의 생략 태그기능 사용여부 | { 항목1 (x) } { +1 } |
-  | filterable | false | Boolean | <셀렉트> 항목들 필터링 기능 사용여부 |  |
-  | searchPlaceholder | '' | String | <셀렉트> 필터링의 표기문구 |  |
-  | noMatchingText | '' | String | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
-- <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫히지 말아야 한다.
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+|------|--------|------|------|------|
+| v-model(modelValue) | String, Number | null | <탭>에서 선택한 탭 value | |
+| panels | Array | [] | <탭>의 리스트 | |
+| closable | Boolean | false | <탭> 상단 nav의 닫기 아이콘 표기 여부 | |
+| stretch | Boolean | false | <탭> 상단 nav의 텍스트 모두 표기 여부 | |
+| stretch | draggable | false | <탭> 상단 nav의 드래그앤드랍 이동 여부 | |
 
->### Event
-1) 셀렉트
- | 이름 | 파라미터 | 설명 |
- | ---- | ------- | ---- |
- | change | newValue, event | <셀렉트> 내 v-model 변화 이벤트 감지 |
+2) tab-panel
 
->### 참고
- - 
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+|------|--------|------|------|------|
+| text | String, Number | null | <탭 패널>의 텍스트(라벨) | |
+| value | String, Number | null | <탭 패널>의 value | required |
+
+

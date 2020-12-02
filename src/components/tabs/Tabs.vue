@@ -35,13 +35,12 @@
             ref="listRef"
             class="ev-tabs-list"
             :style="listRefStyle"
-            draggable="false"
           >
             <li
               v-for="(item, idx) in computedTabList"
               :key="`${item.value}_${idx}`"
               class="ev-tabs-title"
-              :draggable="draggable"
+              v-bind="{ draggable }"
               :class="{
                 active: item.value === mv,
                 'has-icon': item.iconClass,
@@ -150,7 +149,15 @@ export default {
     });
     const tabCloneList = ref([]);
     const isDrag = ref(false);
-    const computedTabList = computed(() => (!isDrag.value ? tabList.value : tabCloneList.value));
+    const computedTabList = computed(() => {
+      if (!props.draggable) {
+        return tabList.value;
+      }
+      if (!isDrag.value) {
+        return tabList.value;
+      }
+      return tabCloneList.value;
+    });
     const tabElValueList = tabList.value.map(v => v.value);
 
     const listWrapperRef = ref(null);
@@ -297,6 +304,9 @@ export default {
      * @param item - 선택한 아이템
      */
     const dragstartTab = (item, idx) => {
+      if (!props.draggable) {
+        return;
+      }
       tabCloneList.value = [...tabList.value];
       dragObj.item = item;
       dragObj.idx = idx;
@@ -308,7 +318,9 @@ export default {
      * @param val - 오버 중인 아이템의 value
      */
     const dragoverTab = (val) => {
-      if (dragObj.item?.value === val) return;
+      if (!props.draggable || dragObj.item?.value === val) {
+        return;
+      }
       const dragValueIdx = tabCloneList.value.findIndex(v => v.value === dragObj.item?.value);
       const targetValueIdx = tabCloneList.value.findIndex(v => v.value === val);
       tabCloneList.value.splice(dragValueIdx, 1);
@@ -319,6 +331,9 @@ export default {
      * 탭 드래그 종료 메소드, 원래 tabList에 값을 넣고 isDrag모드를 종료
      */
     const dragendTab = () => {
+      if (!props.draggable) {
+        return;
+      }
       tabList.value = [...tabCloneList.value];
       dragObj.item = {};
       dragObj.idx = null;
@@ -387,6 +402,7 @@ export default {
   }
 
   .ev-tabs-list-wrapper {
+    user-select: none;
     overflow: hidden;
   }
   .ev-tabs-list {

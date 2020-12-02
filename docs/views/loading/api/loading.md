@@ -37,10 +37,11 @@
  - slot을 사용하는 경우, 태그 내부에 슬롯이 들어갈 컨텐츠를 커스텀으로 입력한다.
 
 >### Props
-  | 이름 | 디폴트 | 타입 | 설명 | 종류 |
+
+  | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model | false | Boolean | 보임 여부 | |
-  | fullscreen | false | Boolean | 전체화면 로딩 여부 | |
-  | click-outside | false | Boolean | 로딩 백그라운드 클릭 시 닫힘 여부 | |
-  | icon-class | null | String | i 태그 클래스명 | 슬롯을 사용하지 않는 경우 |
-  | icon-style | null | String | i 태그 스타일 | 슬롯을 사용하지 않는 경우 |
+  | v-model | Boolean | false | 보임 여부 | |
+  | fullscreen | Boolean | false | 전체화면 로딩 여부 | |
+  | click-outside | Boolean | false | 로딩 백그라운드 클릭 시 닫힘 여부 | |
+  | icon-class | String | null | i 태그 클래스명 | 슬롯을 사용하지 않는 경우 |
+  | icon-style | String | null | i 태그 스타일 | 슬롯을 사용하지 않는 경우 |
