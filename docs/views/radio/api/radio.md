@@ -15,19 +15,19 @@
 ### Props
 #### <라디오그룹>
 
-| 이름 | 디폴트 | 타입 | 설명 | 종류 |
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
-| v-model | null | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-| type | radio | String | 라디오 버튼 스타일 | radio, button |
+| v-model | String, Number, Symbol, Boolean | null | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+| type | String | radio | 라디오 버튼 스타일 | radio, button |
 
 #### <라디오>
 
-| 이름 | 디폴트 | 타입 | 설명 | 종류 |
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
-| v-model | null | String, Number, Symbol, Boolean | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-| label | null | String, Number, Symbol, Boolean | HTML element value (required) |  |
-| disabled | false | Boolean | HTML element disabled attribute |  |
-| size | m | String | 라디오 버튼 크기 | s, m |
+| v-model | String, Number, Symbol, Boolean | null | <라디오그룹> 내 선택된 <라디오>의 label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+| label | String, Number, Symbol, Boolean | null | HTML element value (required) |  |
+| disabled | Boolean | false | HTML element disabled attribute |  |
+| size | String | m | 라디오 버튼 크기 | s, m |
 
 ### Event
 #### <라디오그룹>

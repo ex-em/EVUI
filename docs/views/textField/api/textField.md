@@ -21,7 +21,7 @@ height: 100px;
 
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
-| v-model | null | String, Number | 컴포넌트 입력 값 | |
+| v-model | String, Number | null | 컴포넌트 입력 값 | |
 | type | String | 'text' | 타입 설정 | 'text', 'password', 'textarea' |
 | disabled | Boolean | false | 비활성화 여부 | true, false |
 | readonly | Boolean | false | 읽기 전용 여부 | true, false |
