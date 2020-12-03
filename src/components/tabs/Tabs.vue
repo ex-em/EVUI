@@ -90,8 +90,6 @@ import {
 
 export default {
   name: 'EvTabs',
-  components: {
-  },
   props: {
     modelValue: {
       type: [String, Number],
@@ -441,9 +439,9 @@ export default {
     }
     &.active {
       background-color: transparent;
-      border-bottom: 1px solid #FFFFFF;
 
       @include evThemify() {
+        border-bottom: 1px solid evThemed('background-base');
         color: evThemed('primary');
       }
     }
@@ -481,6 +479,7 @@ export default {
   $tab-header-height: $input-default-height;
   box-sizing: border-box;
   margin-bottom: -1px;
+  user-select: none;
 
   &.has-scroll {
     $arrow-width: 17px;
@@ -495,7 +494,11 @@ export default {
       font-size: $font-size-base;
       text-align: center;
       cursor: pointer;
-      background-color: #FFFFFF;
+
+      @include evThemify() {
+        background-color: evThemed('background-base');
+      }
+
       &:hover {
         @include evThemify() {
           color: evThemed('primary');
