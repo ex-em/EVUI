@@ -226,12 +226,6 @@ export default {
   width: 100%;
   min-height: $select-height;
 
-  &.disabled {
-    background-color: #F5F7FA;
-    border-color: #E4E7ED;
-    color: #C0C4CC;
-  }
-
   @import '../../style/components/input.scss';
   .ev-input {
     $calendar-icon-width: 30px;
@@ -242,6 +236,12 @@ export default {
 
     &.readonly {
       cursor: pointer;
+    }
+  }
+
+  @include state('disabled') {
+    .ev-input {
+      cursor: not-allowed;
     }
   }
 
