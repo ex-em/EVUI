@@ -1,0 +1,240 @@
+<template>
+  <ul class="ev-tree-children">
+    <li>
+      <span class="ev-tree-toggle">
+        <ev-icon
+          v-if="showExpandIcon"
+          :icon="expandIconClasses"
+          @click="handleExpand"
+        />
+      </span>
+      <div class="ev-tree-node">
+        <ev-checkbox
+          v-if="useCheckbox"
+          v-model="treeData.checked"
+          :indeterminate="treeData.indeterminate"
+          :disabled="treeData.disabled"
+          @change="handleCheck(treeData.checked, treeData.nodeKey)"
+        />
+        <ev-icon
+          v-if="treeData.icon"
+          :icon="treeData.icon"
+          class="ev-tree-icon"
+        />
+        <span
+          :class="[ 'ev-tree-title',
+          { 'ev-tree-title-selected': treeData.selected,
+            'ev-tree-title-disabled': treeData.disabled,
+          }]"
+          @contextmenu="handleContextmenu"
+          @click="clickTreeContent"
+          @dblclick="dblClickTreeContent"
+        >
+          {{ treeData.title }}
+        </span>
+      </div>
+      <tree-node
+        v-for="(child, i) in childrenInfo"
+        v-if="treeData.expand"
+        :key="i"
+        :data="child"
+        :use-checkbox="useCheckbox"
+        :expand-icon="expandIcon"
+        :collapse-icon="collapseIcon"
+        @update-checked-info="emitCheckedInfo"
+        @click-content="emitClickedContent"
+        @dblclick-content="emitDblClickedContent"
+        @show-context-menu="emitContextMenuFlag"
+      />
+    </li>
+  </ul>
+</template>
+
+<script>
+import { reactive, computed } from 'vue';
+
+export default {
+  name: 'TreeNode',
+  props: {
+    data: {
+      type: Object,
+      require: true,
+      default: () => ({}),
+    },
+    useCheckbox: {
+      type: Boolean,
+      default: false,
+    },
+    expandIcon: {
+      type: String,
+      default: '',
+    },
+    collapseIcon: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: {
+    'update-checked-info': null,
+    'click-content': null,
+    'dblclick-content': null,
+    'show-context-menu': null,
+  },
+  setup(props, { emit }) {
+    const treeData = reactive(props.data);
+    const showExpandIcon = computed(() =>
+      (props.data.children && props.data.children.length));
+
+    const expandIconClasses = computed(() => {
+      const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-arrow-right';
+      const collapseIcon = props.expandIcon ? props.collapseIcon : 'ev-icon-arrow-down';
+      return props.data.expand ? collapseIcon : expandIcon;
+    });
+
+    const childrenInfo = computed(() => props.data.children);
+
+    function handleCheck(isChecked, nodeKey) {
+      emit('update-checked-info', { nodeKey, isChecked });
+    }
+
+    function emitCheckedInfo({ nodeKey, isChecked }) {
+      emit('update-checked-info', { nodeKey, isChecked });
+    }
+
+    function handleExpand() {
+      treeData.expand = !treeData.expand;
+    }
+
+    function clickTreeContent() {
+      if (treeData.disabled) {
+        return;
+      }
+      treeData.selected = !treeData.selected; // for highlighting clicked title
+      emit('click-content', treeData.nodeKey);
+    }
+
+    function emitClickedContent(nodeKey) {
+      emit('click-content', nodeKey);
+    }
+
+    function dblClickTreeContent() {
+      if (treeData.disabled) {
+        return;
+      }
+      emit('dblclick-content', treeData.nodeKey);
+    }
+
+    function emitDblClickedContent(nodeKey) {
+      emit('dblclick-content', nodeKey);
+    }
+
+    function handleContextmenu(e) {
+      emit('show-context-menu', true, e);
+    }
+
+    const emitContextMenuFlag = (isShow, e) => {
+      emit('show-context-menu', isShow, e);
+    };
+
+    return {
+      expandIconClasses,
+      showExpandIcon,
+      treeData,
+      childrenInfo,
+      handleCheck,
+      emitCheckedInfo,
+      handleExpand,
+      clickTreeContent,
+      emitClickedContent,
+      dblClickTreeContent,
+      emitDblClickedContent,
+      handleContextmenu,
+      emitContextMenuFlag,
+    };
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+$expand-toggle-icon-size: 13px;
+
+@import '../../style/index.scss';
+
+.ev-tree-view {
+  li {
+    ul {
+      padding: 0 0 0 18px;
+      margin: 0;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+
+    li {
+      list-style: none;
+      padding: 3px 0;
+      margin: 0;
+      text-align: start;
+      white-space: nowrap;
+    }
+  }
+}
+
+.ev-tree-toggle {
+  display: inline-block;
+  width: $expand-toggle-icon-size; // icon font size와 동일
+  margin-right: 2px;
+  text-align: center;
+  vertical-align: middle;
+
+  i {
+    position: relative;
+    cursor: pointer;
+    font-size: $expand-toggle-icon-size;
+    vertical-align: middle;
+  }
+}
+
+.ev-tree-title {
+  cursor: pointer;
+  vertical-align: middle;
+
+  &:hover, &-selected {
+    @include evThemify() {
+      color: evThemed('primary') !important;
+    }
+  }
+
+  &-disabled, &-disabled:hover {
+    cursor: not-allowed;
+    user-select: none;
+
+    @include evThemify() {
+      color: evThemed('disabled') !important;
+    }
+  }
+}
+
+.ev-tree-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.ev-tree-node {
+  display: inline-block;
+  width: calc(100% - (#{$expand-toggle-icon-size} + 3px * 2));
+  padding: 7px 0;
+  vertical-align: middle;
+
+  .ev-checkbox {
+    display: inline-block;
+    padding: 5px 5px 0;
+    margin: 0;
+    vertical-align: middle;
+  }
+}
+</style>

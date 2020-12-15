@@ -22,6 +22,7 @@ import schedulerProps from 'docs/views/scheduler/props';
 import loadingProps from 'docs/views/loading/props';
 import progressProps from 'docs/views/progress/props';
 import menuProps from 'docs/views/menu/props';
+import treeProps from 'docs/views/tree/props';
 
 const routes = [
   {
@@ -184,7 +185,8 @@ const routes = [
   {
     path: '/tree',
     name: 'Tree',
-    component: () => import(/* webpackChunkName: "tree" */ '../views/tree'),
+    component: PageView,
+    props: treeProps,
     meta: {
       category: 'Table',
     },

@@ -23,6 +23,7 @@ import EvWindow from '@/components/window/';
 import EvLoading from '@/components/loading/';
 import EvProgress from '@/components/progress/';
 import EvMenu from '@/components/menu/';
+import EvTree from '@/components/tree';
 import { version } from '../package.json';
 
 const components = [
@@ -48,6 +49,7 @@ const components = [
   EvLoading,
   EvProgress,
   EvMenu,
+  EvTree,
 ];
 
 const install = (app) => {
