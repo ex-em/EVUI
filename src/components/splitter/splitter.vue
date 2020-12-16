@@ -74,9 +74,13 @@
       },
     },
     created() {
+      window.addEventListener('resize', this.onResize);
     },
     mounted() {
       this.onResize();
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.onResize);
     },
     methods: {
       updateItemInfo() {
@@ -168,8 +172,8 @@
           rightWh = rightItemInfo.width + changeValue;
           rightOffset = rightItemInfo.left - changeValue;
 
-          leftItemInfo.el.style.cssText += `width: ${leftWh}px; height: ${leftItemInfo.height}px`;
-          rightItemInfo.el.style.cssText += `width: ${rightWh}px; height: ${rightItemInfo.height}px`;
+          leftItemInfo.el.style.cssText += `width: ${leftWh}px;`;
+          rightItemInfo.el.style.cssText += `width: ${rightWh}px;`;
 
           leftItemInfo.width = leftWh;
           rightItemInfo.width = rightWh;
@@ -179,8 +183,8 @@
           rightWh = rightItemInfo.height + changeValue;
           rightOffset = rightItemInfo.top - changeValue;
 
-          leftItemInfo.el.style.cssText += `width: ${leftItemInfo.width}px; height: ${leftWh}px`;
-          rightItemInfo.el.style.cssText += `width: ${rightItemInfo.width}px; height: ${rightWh}px`;
+          leftItemInfo.el.style.cssText += `height: ${leftWh}px`;
+          rightItemInfo.el.style.cssText += `height: ${rightWh}px`;
 
           leftItemInfo.height = leftWh;
           rightItemInfo.height = rightWh;

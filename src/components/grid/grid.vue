@@ -2,6 +2,10 @@
   <div
     v-cloak
     v-resize.debounce="onResize"
+    v-observe-visibility="{
+      callback: onShow,
+      once: true,
+    }"
     :class="getTableClass"
   >
     <div
@@ -182,6 +186,7 @@
 </template>
 <script>
   import resize from 'vue-resize-directive';
+  import { ObserveVisibility } from 'vue-observe-visibility';
   import { uniqBy, isEqual } from 'lodash-es';
   import { numberWithComma } from '@/common/utils';
   import FilterWindow from './grid.filter.window';
@@ -195,46 +200,32 @@
     name: 'EvGrid',
     directives: {
       resize,
+      ObserveVisibility,
     },
     components: {
       FilterWindow,
       Renderer,
     },
     props: {
-      /**
-       * 컬럼 정보 목록
-       */
       columns: {
         type: Array,
         default: () => [],
       },
-      /**
-       * row 데이터
-       */
       rows: {
         type: Array,
         default: () => [],
       },
-      /**
-       * 선택된 row 데이터 (sync)
-       */
       selected: {
         type: Array,
         default: () => [],
       },
-      /**
-       * 체크된 row 데이터 (sync)
-       */
       checked: {
         type: Array,
         default: () => [],
       },
-      /**
-       * 그리드 옵션 정보
-       */
       option: {
         type: Object,
-        default: () => ({}),
+        default: () => {},
       },
     },
     data() {
@@ -320,21 +311,9 @@
       this.$forceUpdate();
     },
     methods: {
-      /**
-       * 해당 컬럼이 사용자 지정 컬럼인지 확인한다.
-       *
-       * @param {object} column - 컬럼 정보
-       * @returns {boolean} 사용자 지정 컬럼 유무
-       */
       isRenderer(column = {}) {
         return column.render && column.render.use;
       },
-      /**
-       * 해당 컬럼 인덱스가 마지막인지 확인한다.
-       *
-       * @param {number} index - 컬럼 인덱스
-       * @returns {boolean} 마지막 컬럼 유무
-       */
       isLastColumn(index) {
         const columns = this.orderedColumns;
         let lastIndex = -1;
@@ -348,22 +327,9 @@
 
         return lastIndex === index;
       },
-      /**
-       * 전달받은 필드명과 일치하는 컬럼 인덱스를 반환한다.
-       *
-       * @param {string} field - 컬럼 필드명
-       * @returns {number} 일치한다면 컬럼 인덱스, 일치하지 않는다면 -1
-       */
       getColumnIndex(field) {
         return this.columns.findIndex(column => column.field === field);
       },
-      /**
-       * 데이터 타입에 따라 변환된 데이터을 반환한다.
-       *
-       * @param {string} type - 데이터 유형
-       * @param {number|string} value - 데이터
-       * @returns {number|string} 변환된 데이터
-       */
       getConvertValue(type, value) {
         let convertValue;
 
@@ -378,9 +344,6 @@
 
         return convertValue;
       },
-      /**
-       * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
-       */
       calculatedColumn() {
         let columnWidth = this.columnWidth;
         let remainWidth = 0;
@@ -436,11 +399,6 @@
           this.orderedColumns[this.orderedColumns.length - 1].width += remainWidth;
         }
       },
-      /**
-       * 컨텍스트 메뉴를 설정한다.
-       *
-       * @param {boolean} useCustom - 사용자 지정 메뉴 사용 유무
-       */
       setContextMenu(useCustom = true) {
         const menuItems = [];
 
@@ -474,9 +432,6 @@
 
         this.contextMenuItems = menuItems;
       },
-      /**
-       * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
-       */
       setSort() {
         const index = this.getColumnIndex(this.sortField);
         const desc = (a, b) => (a > b ? -1 : 1);
@@ -493,32 +448,16 @@
             b[ROW_DATA_INDEX][index]));
         }
       },
-      /**
-       * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
-       *
-       * @param {string} search - 검색 키워드
-       * @param {string} origin - 기준 문자열
-       * @returns {boolean} 문자열 내 키워드 존재 유무
-       */
       likeSearch(search, origin) {
         if (typeof search !== 'string' || origin === null) {
           return false;
         }
 
-        // test 시에 사용될 정규식 부분이 문자열로 넣어줘야하다 보니
-        // 특수문자에 대한 처리가 필요하여 아래 replace 처리를 함
         let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
         regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
 
         return RegExp(`^${regx}$`, 'gi').test(origin);
       },
-      /**
-       * 필터 조건에 따라 문자열을 확인한다.
-       *
-       * @param {array} item - row 데이터
-       * @param {object} condition - 필터 정보
-       * @returns {boolean} 확인 결과
-       */
       stringFilter(item, condition) {
         const comparison = condition.comparison;
         const value = condition.value;
@@ -537,13 +476,6 @@
 
         return result;
       },
-      /**
-       * 필터 조건에 따라 숫자를 확인한다.
-       *
-       * @param {array} item - row 데이터
-       * @param {object} condition - 필터 정보
-       * @returns {boolean} 확인 결과
-       */
       numberFilter(item, condition) {
         const comparison = condition.comparison;
         const value = condition.value;
@@ -560,14 +492,6 @@
 
         return result;
       },
-      /**
-       * 필터 조건이 적용된 데이터를 반환한다.
-       *
-       * @param {array} data - row 데이터
-       * @param {string} filterType - 데이터 유형
-       * @param {object} condition - 필터 정보
-       * @returns {boolean} 확인 결과
-       */
       getFilteredData(data, filterType, condition) {
         const filterFn = filterType === 'string' ? this.stringFilter : this.numberFilter;
         const filteredData = [];
@@ -580,9 +504,6 @@
 
         return filteredData;
       },
-      /**
-       * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore에 저장한다.
-       */
       setFilter() {
         let field;
         let index;
@@ -629,12 +550,6 @@
           this.filteredStore = uniqBy(filteredStore, JSON.stringify);
         }
       },
-      /**
-       * 전달된 데이터를 내부 store 및 속성에 저장한다.
-       *
-       * @param {array} value - row 데이터
-       * @param {boolean} makeIndex - 인덱스 생성 유무
-       */
       setStore(value, makeIndex = true) {
         const store = [];
         let checked;
@@ -675,18 +590,12 @@
 
         this.updateVScroll();
       },
-      /**
-       * 수평 스크롤의 위치 계산 후 적용한다.
-       */
       updateHScroll() {
         const headerEl = this.$refs.header;
         const bodyEl = this.$refs.body;
 
         headerEl.scrollLeft = bodyEl.scrollLeft;
       },
-      /**
-       * 수직 스크롤의 위치 계산 후 적용한다.
-       */
       updateVScroll() {
         const el = this.$refs.body;
         const offset = 5;
@@ -711,11 +620,6 @@
         this.vScrollBottomHeight = totalScrollHeight - (this.viewStore.length * rowHeight)
           - this.vScrollTopHeight;
       },
-      /**
-       * row에 대한 체크 상태를 해제한다.
-       *
-       * @param {array} row - row 데이터
-       */
       unCheckedRow(row) {
         const index = this.originStore.findIndex(
           item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
@@ -724,11 +628,6 @@
           this.$set(this.originStore[index], ROW_CHECK_INDEX, row[ROW_CHECK_INDEX]);
         }
       },
-      /**
-       * sort 이벤트를 처리한다.
-       *
-       * @param {string} field - 컬럼 field
-       */
       onSort(field) {
         if (this.sortField === field) {
           this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc';
@@ -739,9 +638,6 @@
 
         this.setStore(this.originStore, false);
       },
-      /**
-       * scroll 이벤트를 처리한다.
-       */
       onScroll() {
         const el = this.$refs.body;
         const scrollTop = el.scrollTop;
@@ -762,9 +658,6 @@
         this.lastScroll.top = scrollTop;
         this.lastScroll.left = scrollLeft;
       },
-      /**
-       * 필터 팝업 관련 데이터 초기화 및 숨김 처리한다.
-       */
       onCloseFilterWindow() {
         this.currentFilter = {
           column: {},
@@ -772,23 +665,12 @@
         };
         this.showFilterWindow = false;
       },
-      /**
-       * 전달된 필터 정보를 저장하고 store에 반영한다.
-       *
-       * @param {string} columnField - row 데이터
-       * @param {array} filters - 필터 정보
-       */
       onApplyFilter(columnField, filters) {
         this.$set(this.filterList, columnField, filters);
         this.filteredStore = [];
 
         this.setStore([], false);
       },
-      /**
-       * 해당 컬럼에 대한 필터 팝업을 보여준다.
-       *
-       * @param {object} column - 컬럼 정보
-       */
       onClickFilter(column) {
         const filter = {
           column,
@@ -803,11 +685,6 @@
         this.currentFilter = filter;
         this.showFilterWindow = true;
       },
-      /**
-       * 컨텍스트 메뉴 선택 이벤트를 처리한다.
-       *
-       * @param {object} item - 선택된 메뉴 정보
-       */
       onClickCtxMenu(item) {
         if (item && item.callback) {
           item.callback(item.itemId, this.selectedRow);
@@ -815,11 +692,6 @@
 
         this.isClickedCtxMenu = false;
       },
-      /**
-       * 마우스 우클릭 이벤트를 처리한다.
-       *
-       * @param {object} event - 이벤트 객체
-       */
       onContextMenu(event) {
         const target = event.target;
         const tagName = target.tagName.toLowerCase();
@@ -843,12 +715,6 @@
           this.$emit('update:selected', []);
         }
       },
-      /**
-       * row click 이벤트를 처리한다.
-       *
-       * @param {object} event - 이벤트 객체
-       * @param {array} row - row 데이터
-       */
       onRowClick(event, row) {
         if (!this.useSelect) {
           return;
@@ -860,37 +726,13 @@
 
         this.selectedRow = rowData;
         this.$emit('update:selected', rowData);
-        /**
-         * row click 이벤트
-         *
-         * @property {object} event - 이벤트 객체
-         * @property {number} rowIndex - row 인덱스
-         * @property {string} cellName - 셀 이름
-         * @property {number} cellIndex - 셀 인덱스
-         * @property {array} rowData - row 데이터
-         */
         this.$emit('click-row', event, rowIndex, cellInfo.name, cellInfo.index, rowData);
       },
-      /**
-       * row dblclick 이벤트를 처리한다.
-       *
-       * @param {object} event - 이벤트 객체
-       * @param {array} row - row 데이터
-       */
       onRowDblClick(event, row) {
         const cellInfo = event.target.dataset;
         const rowData = row[ROW_DATA_INDEX];
         const rowIndex = row[ROW_INDEX];
 
-        /**
-         * row dblclick 이벤트
-         *
-         * @property {object} event - 이벤트 객체
-         * @property {number} rowIndex - row 인덱스
-         * @property {string} cellName - 셀 이름
-         * @property {number} cellIndex - 셀 인덱스
-         * @property {array} rowData - row 데이터
-         */
         this.$emit('dblclick-row', {
           event,
           rowData,
@@ -899,12 +741,6 @@
           cellIndex: cellInfo.index,
         });
       },
-      /**
-       * checkbox click 이벤트를 처리한다.
-       *
-       * @param {object} event - 이벤트 객체
-       * @param {array} row - row 데이터
-       */
       onCheck(event, row) {
         if (this.useCheckbox.mode === 'single' && this.prevCheckedRow.length) {
           this.prevCheckedRow[1] = false;
@@ -935,20 +771,8 @@
 
         this.prevCheckedRow = row.slice();
         this.$emit('update:checked', this.checkedRows);
-        /**
-         * check single row 이벤트
-         *
-         * @property {object} event - 이벤트 객체
-         * @property {number} rowIndex - row 인덱스
-         * @property {array} rowData - row 데이터
-         */
         this.$emit('check-one', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
       },
-      /**
-       * all checkbox click 이벤트를 처리한다.
-       *
-       * @param {object} event - 이벤트 객체
-       */
       onCheckAll(event) {
         const status = this.isHeaderChecked;
         const checked = [];
@@ -965,18 +789,9 @@
 
         this.checkedRows = checked;
         this.$emit('update:checked', checked);
-        /**
-         * check all row 이벤트
-         *
-         * @property {object} event - 이벤트 객체
-         * @property {array} checked - 선택된 row 데이터
-         */
         this.$emit('check-all', event, checked);
         this.$forceUpdate();
       },
-      /**
-       * dom resize 이벤트를 처리한다.
-       */
       onResize() {
         if (this.adjust) {
           // return 값을 고려하면 forEach가 맞으나 성능를 고려하여 map을 사용하도록 함
@@ -994,12 +809,11 @@
         this.calculatedColumn();
         this.$forceUpdate();
       },
-      /**
-       * column resize 이벤트를 처리한다.
-       *
-       * @param {number} columnIndex - 컬럼 인덱스
-       * @param {object} event - 이벤트 객체
-       */
+      onShow(isVisible) {
+        if (isVisible) {
+          this.onResize();
+        }
+      },
       onColumnResize(columnIndex, event) {
         if (this.isLastColumn(columnIndex)) {
           return;
