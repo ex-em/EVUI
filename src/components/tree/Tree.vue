@@ -52,9 +52,7 @@ export default {
     },
     contextMenuItems: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
   },
   emits: {
