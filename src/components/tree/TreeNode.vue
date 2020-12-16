@@ -17,8 +17,8 @@
           @change="handleCheck(treeData.checked, treeData.nodeKey)"
         />
         <ev-icon
-          v-if="treeData.icon"
-          :icon="treeData.icon"
+          v-if="treeData.iconClass"
+          :icon="treeData.iconClass"
           class="ev-tree-icon"
         />
         <span
@@ -86,7 +86,7 @@ export default {
       (props.data.children && props.data.children.length));
 
     const expandIconClasses = computed(() => {
-      const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-arrow-right';
+      const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-s-play';// 'ev-icon-arrow-right';
       const collapseIcon = props.expandIcon ? props.collapseIcon : 'ev-icon-arrow-down';
       return props.data.expand ? collapseIcon : expandIcon;
     });
@@ -220,6 +220,7 @@ $expand-toggle-icon-size: 13px;
 }
 
 .ev-tree-icon {
+  margin: 0 5px;
   font-size: 16px;
   vertical-align: middle;
 }

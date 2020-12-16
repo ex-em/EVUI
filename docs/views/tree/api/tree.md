@@ -12,12 +12,12 @@
 
  | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------|--------|------|------|------|
-  | data | Array | - | 트리 컴포넌트에 사용될 데이터|  |
+  | data | Array | [] | 트리 컴포넌트에 사용될 데이터|  |
   | use-checkbox | Boolean | false | 체크 박스를 사용 유무 |  |
-  | empty-text | String | No Data | 트리 데이터가 없을 경우 나타낼 문구 | |
+  | empty-text | String | 'No Data' | 트리 데이터가 없을 경우 나타낼 문구 | |
   | expand-icon | String | 'ev-icon-arrow-right' 아이콘 | 트리를 펼쳤을 때 보여질 아이콘 | |
   | collapse-icon | String | 'ev-icon-arrow-down' 아이콘 | 트리를 접었을 때 보여질 아이콘 | |
-  | context-menu-items | Array | - | 우클릭 시 보여지는 컨텍스트 메뉴, 사용하지 않을 경우 컨텍스트 메뉴는 보이지 않음 | | 
+  | context-menu-items | Array | [] | 우클릭 시 보여지는 컨텍스트 메뉴, 사용하지 않을 경우 컨텍스트 메뉴는 보이지 않음 | | 
 
 >### Event
 
