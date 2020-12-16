@@ -81,28 +81,46 @@
 <script>
   export default {
     props: {
+      /**
+       * 탭 목록
+       */
       value: {
         type: Array,
         default() {
           return [];
         },
       },
+      /**
+       * 탭 이동 가능 유무
+       */
       disableMoveTab: {
         type: Boolean,
         default: false,
       },
+      /**
+       * 탭 제거 가능 유무
+       */
       disableRemoveTab: {
         type: Boolean,
         default: false,
       },
+      /**
+       * 탭 헤더 너비
+       */
       minTabWidth: {
         type: Number,
         default: 100,
       },
+      /**
+       * 탭 제목 글자 크기
+       */
       titleSize: {
         type: Number,
         default: 16,
       },
+      /**
+       * 탭 활성화 키값
+       */
       activeTabValue: {
         type: String,
         default: '',
@@ -154,6 +172,12 @@
       setTimeout(() => this.toggleScrollIcon());
     },
     methods: {
+      /**
+       * 해당 키값을 가진 탭이 존재하는지 확인한다.
+       *
+       * @param {string} value - 탭의 키값
+       * @returns {boolean} 탭 존재 유무
+       */
       checkValid(value) {
         let isExist = false;
 
@@ -166,6 +190,12 @@
 
         return isExist;
       },
+      /**
+       * dragstart 이벤트를 처리한다.
+       *
+       * @param {object} e - 이벤트 객체
+       * @param {string} value - 탭의 키값
+       */
       onDragStart(e, value) {
         if (this.disableMoveTab) {
           return;
@@ -174,6 +204,12 @@
         e.dataTransfer.effectAllowed = 'move';
         this.dragStartValue = value;
       },
+      /**
+       * dragover 이벤트를 처리한다.
+       *
+       * @param {object} e - 이벤트 객체
+       * @param {string} value - 탭의 키값
+       */
       onDragOver(e, value) {
         if (this.disableMoveTab) {
           return;
@@ -182,6 +218,9 @@
         e.dataTransfer.dropEffect = 'move';
         this.dragOverValue = value;
       },
+      /**
+       * dragend 이벤트를 처리한다.
+       */
       onDragEnd() {
         let dragIndex;
         let moveIndex;
@@ -213,6 +252,11 @@
         this.dragStartValue = '';
         this.dragOverValue = '';
       },
+      /**
+       * mousewheel 이벤트를 처리한다.
+       *
+       * @param {object} e - 이벤트 객체
+       */
       onMouseWheel(e) {
         if (this.isActiveScroll) {
           if (e.deltaY < 0) {
@@ -222,6 +266,11 @@
           }
         }
       },
+      /**
+       * scroll 이벤트를 처리한다.
+       *
+       * @param {string} type - 이동 방향
+       */
       onMoveScroll(type) {
         const currentOffset = this.currentOffset;
         const minTabWidth = this.minTabWidth;
@@ -249,6 +298,9 @@
           }
         }
       },
+      /**
+       * tab scroll icon 표시 유무를 처리한다.
+       */
       toggleScrollIcon() {
         const navWidth = this.$refs.nav.offsetWidth;
         const navWrapWidth = this.$refs.navWrap.offsetWidth;
@@ -266,6 +318,9 @@
           this.moveToScroll();
         }
       },
+      /**
+       * tab scroll 관련 offset 계산하여 적용한다.
+       */
       moveToScroll() {
         setTimeout(() => {
           const nav = this.$refs.nav;
@@ -290,14 +345,30 @@
           }
         });
       },
+      /**
+       * 탭 변경에 대해서 치리한다.
+       *
+       * @param {string} value - 탭의 키값
+       */
       changeTab(value) {
         if (this.activeTab === value) {
           return;
         }
 
+        /**
+         * 탭 변경 이벤트
+         *
+         * @property {string} oldTab - 이전 탭 키값
+         * @property {string} newTab - 현재 탭 키값
+         */
         this.$emit('change-tab', this.activeTab, value);
         this.activeTab = value;
       },
+      /**
+       * 탭 제거에 대해서 처리한다.
+       *
+       * @param {string} value - 탭의 키값
+       */
       removeTab(value) {
         let removeIndex;
         let removeTab;
@@ -318,9 +389,20 @@
         if (this.activeTab === value) {
           removeIndex = this.tabList.length === removeIndex ? removeIndex - 1 : removeIndex;
           this.activeTab = this.tabList[removeIndex].value;
+          /**
+           * 탭 변경 이벤트
+           *
+           * @property {string} oldTab - 이전 탭 키값
+           * @property {string} newTab - 현재 탭 키값
+           */
           this.$emit('change-tab', value, this.activeTab);
         }
 
+        /**
+         * 탭 제거 이벤트
+         *
+         * @property {string} removeTab - 제거된 탭 키값
+         */
         this.$emit('remove-tab', removeTab);
         this.$emit('input', this.tabList);
         setTimeout(() => this.toggleScrollIcon());

@@ -97,14 +97,23 @@
       },
     },
     props: {
+      /**
+       * 필터 팝업 표시 유무
+       */
       isShow: {
         type: Boolean,
         default: false,
       },
+      /**
+       * 필터 대상 컬럼 정보
+       */
       targetColumn: {
         type: Object,
-        default: () => {},
+        default: () => ({}),
       },
+      /**
+       * 설정된 필터 목록
+       */
       filterItems: {
         type: Array,
         default: () => [],
@@ -178,6 +187,12 @@
       },
     },
     methods: {
+      /**
+       * 데이터 유형에 맞는 필터 목록을 반환한다.
+       *
+       * @param {string} type - 데이터 유형
+       * @returns {array} 필터 목록
+       */
       getList(type) {
         let result = this.defaultComparison[type];
 
@@ -187,6 +202,9 @@
 
         return result;
       },
+      /**
+       * 선택한 필터를 테이블에 적용하도록 요청한다.
+       */
       onApply() {
         const filterItems = [];
         const rows = this.rows;
@@ -205,9 +223,21 @@
           filterItems.push(item);
         }
 
+        /**
+         * 필터 적용 요청 이벤트
+         *
+         * @property {string} field - 컬럼 field
+         * @property {array} filterItems - 필터 목록
+         */
         this.$emit('apply-filter', this.targetColumn.field, filterItems);
+        /**
+         * 필터 팝업 종료 전 이벤트
+         */
         this.$emit('before-close');
       },
+      /**
+       * 작성한 필터 정보를 저장한다.
+       */
       onSave() {
         const item = this.addInfo;
         this.rows.push(this.columns.reduce((acc, column) => {
@@ -216,6 +246,9 @@
         }, []));
         this.showAddForm = false;
       },
+      /**
+       * 새로운 필터 추가 팝업을 표시한다.
+       */
       onAdd() {
         this.showAddForm = true;
         this.addInfo = {
@@ -224,6 +257,9 @@
           value: '',
         };
       },
+      /**
+       * 선택한 필터를 필터 목록에서 삭제한다.
+       */
       onDelete() {
         if (!this.checked.length) {
           return;
@@ -242,10 +278,16 @@
         this.checked.length = 0;
         this.rows = tempRows;
       },
+      /**
+       * 필터 팝업을 종료한다.
+       */
       onCloseWindow() {
         this.checked.length = 0;
         this.rows.length = 0;
         this.showAddForm = false;
+        /**
+         * 필터 팝업 종료 전 이벤트
+         */
         this.$emit('before-close');
       },
     },
