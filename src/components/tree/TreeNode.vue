@@ -1,7 +1,10 @@
 <template>
   <ul class="ev-tree-children">
     <li>
-      <span class="ev-tree-toggle">
+      <span
+        :class="{ expand: treeData.expand }"
+        class="ev-tree-toggle"
+      >
         <ev-icon
           v-if="showExpandIcon"
           :icon="expandIconClasses"
@@ -22,10 +25,11 @@
           class="ev-tree-icon"
         />
         <span
-          :class="[ 'ev-tree-title',
-          { 'ev-tree-title-selected': treeData.selected,
+          :class="{
+            'ev-tree-title-selected': treeData.selected,
             'ev-tree-title-disabled': treeData.disabled,
-          }]"
+          }"
+          class="ev-tree-title"
           @contextmenu="handleContextmenu"
           @click="clickTreeContent"
           @dblclick="dblClickTreeContent"
@@ -33,19 +37,21 @@
           {{ treeData.title }}
         </span>
       </div>
-      <tree-node
-        v-for="(child, i) in childrenInfo"
-        v-if="treeData.expand"
-        :key="i"
-        :data="child"
-        :use-checkbox="useCheckbox"
-        :expand-icon="expandIcon"
-        :collapse-icon="collapseIcon"
-        @update-checked-info="emitCheckedInfo"
-        @click-content="emitClickedContent"
-        @dblclick-content="emitDblClickedContent"
-        @show-context-menu="emitContextMenuFlag"
-      />
+      <transition-group name="fade">
+        <tree-node
+          v-for="(child, i) in childrenInfo"
+          v-if="treeData.expand"
+          :key="i"
+          :data="child"
+          :use-checkbox="useCheckbox"
+          :expand-icon="expandIcon"
+          :collapse-icon="collapseIcon"
+          @update-checked-info="emitCheckedInfo"
+          @click-node="emitClickedContent"
+          @dblclick-node="emitDblClickedContent"
+          @show-context-menu="emitContextMenuFlag"
+        />
+      </transition-group>
     </li>
   </ul>
 </template>
@@ -76,8 +82,8 @@ export default {
   },
   emits: {
     'update-checked-info': null,
-    'click-content': null,
-    'dblclick-content': null,
+    'click-node': null,
+    'dblclick-node': null,
     'show-context-menu': null,
   },
   setup(props, { emit }) {
@@ -86,8 +92,8 @@ export default {
       (props.data.children && props.data.children.length));
 
     const expandIconClasses = computed(() => {
-      const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-s-play';// 'ev-icon-arrow-right';
-      const collapseIcon = props.expandIcon ? props.collapseIcon : 'ev-icon-arrow-down';
+      const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-s-play';
+      const collapseIcon = props.expandIcon ? props.collapseIcon : 'ev-icon-s-play';
       return props.data.expand ? collapseIcon : expandIcon;
     });
 
@@ -110,22 +116,22 @@ export default {
         return;
       }
       treeData.selected = !treeData.selected; // for highlighting clicked title
-      emit('click-content', treeData.nodeKey);
+      emit('click-node', treeData.nodeKey);
     }
 
     function emitClickedContent(nodeKey) {
-      emit('click-content', nodeKey);
+      emit('click-node', nodeKey);
     }
 
     function dblClickTreeContent() {
       if (treeData.disabled) {
         return;
       }
-      emit('dblclick-content', treeData.nodeKey);
+      emit('dblclick-node', treeData.nodeKey);
     }
 
     function emitDblClickedContent(nodeKey) {
-      emit('dblclick-content', nodeKey);
+      emit('dblclick-node', nodeKey);
     }
 
     function handleContextmenu(e) {
@@ -191,7 +197,17 @@ $expand-toggle-icon-size: 13px;
   text-align: center;
   vertical-align: middle;
 
+  .ev-icon-s-play {
+    transition-property: transform;
+    transition-duration: 0.4s;
+  }
+
+  &.expand > .ev-icon-s-play {
+    transform: rotate(90deg);
+  }
+
   i {
+    display: inline-block;
     position: relative;
     cursor: pointer;
     font-size: $expand-toggle-icon-size;
@@ -238,4 +254,31 @@ $expand-toggle-icon-size: 13px;
     vertical-align: middle;
   }
 }
+
+.fade {
+  &-enter-active {
+    animation: fade 0.3s ease-in-out;
+  }
+
+  &-leave-active {
+    animation: fade 0.3s ease-in-out reverse;
+  }
+
+  @keyframes fade {
+    0% {
+      opacity: 0;
+      height: 0;
+    }
+
+    50% {
+      opacity: 0.3;
+      height: 20%;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+}
+
 </style>

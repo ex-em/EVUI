@@ -8,8 +8,8 @@
       :expand-icon="expandIcon"
       :collapse-icon="collapseIcon"
       @update-checked-info="updateCheckedInfo"
-      @click-content="clickContent"
-      @dblclick-content="dblClickContent"
+      @click-node="clickContent"
+      @dblclick-node="dblClickContent"
       @show-context-menu="getContextMenuFlag"
       @contextmenu.prevent="showContextMenu"
     />
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 import TreeNode from './TreeNode';
 
 export default {
@@ -56,9 +56,9 @@ export default {
     },
   },
   emits: {
-    'click-content': null,
-    'dblclick-content': null,
-    'change-checked-node': Array,
+    'click-node': null,
+    'dblclick-node': null,
+    check: Array,
   },
   setup(props, { emit }) {
     let treeNodeData = reactive(props.data);
@@ -89,10 +89,11 @@ export default {
     }
 
     function updateTreeDown(node, changes = {}) {
-      /* eslint-disable */
-      for (const key in changes) {
-        node[key] = changes[key];
+      const keys = Object.keys(changes);
+      for (let ix = 0; ix < keys.length; ix++) {
+        node[keys[ix]] = changes[keys[ix]]; // eslint-disable-line no-param-reassign
       }
+
       if (node.children) {
         node.children.forEach((child) => {
           updateTreeDown(child, changes);
@@ -109,9 +110,7 @@ export default {
         node.nodeKey = keyCounter++;
 
         // add 'selected' property for highlighting clicked node
-        if ('selected' in node) {
-          node.selected = node.selected;
-        } else {
+        if (!('selected' in node)) {
           node.selected = false;
         }
 
@@ -134,7 +133,7 @@ export default {
 
     function getCheckedNodes() {
       return allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
-    };
+    }
 
     function rebuildTree() { // rebuild the tree through checked nodes
       const checkedNodes = getCheckedNodes();
@@ -159,24 +158,24 @@ export default {
       node.indeterminate = false;
       updateTreeUp(nodeKey); // propagate up
       updateTreeDown(node, { checked: isChecked, indeterminate: false }); // reset `indeterminate`
-      emit('change-checked-node', getCheckedNodes());
+      emit('check', getCheckedNodes());
       rebuildTree();
     }
 
     function clickContent(nodeKey) {
       const clickedNode = allNodeInfo[nodeKey];
       // reset other selected node to false
-      allNodeInfo.forEach(item => {
-        if (item.node.nodeKey !== nodeKey) {
-          item.node.selected = false;
+      for (let ix = 0; ix < allNodeInfo.length; ix++) {
+        if (allNodeInfo[ix].node.nodeKey !== nodeKey) {
+          allNodeInfo[ix].node.selected = false;
         }
-      })
-      emit('click-content', clickedNode);
+      }
+      emit('click-node', clickedNode);
     }
 
     function dblClickContent(nodeKey) {
       const dbClickedContent = allNodeInfo[nodeKey];
-      emit('dblclick-content', dbClickedContent);
+      emit('dblclick-node', dbClickedContent);
     }
 
     const showContextMenu = (e) => {
@@ -194,6 +193,10 @@ export default {
     watch(props.data, (newData) => {
       treeNodeData = newData;
       allNodeInfo = getAllNodeInfo();
+    });
+
+    onMounted(() => {
+      rebuildTree();
     });
 
     return {
