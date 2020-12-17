@@ -30,3 +30,4 @@
 >### 참고
  - context-menu-items는 contextmenu 컴포넌트의 items를 참고하여 형식에 맞춰 작성하면 됩니다.
  - data안의 icon 프로퍼티와 expand-icon, collapse-icon은 icon 메뉴를 참고하여 사용하면 됩니다. 
+ - data 프로퍼티 내부의 value는 unique한 값이어야 합니다. value 프로퍼티가 없을 경우 title + nodeKey로 대체됩니다.

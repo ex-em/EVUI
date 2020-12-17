@@ -87,14 +87,17 @@ export default {
     const commonData = ref([
       {
         title: 'Root',
+        value: 'root',
         expand: true,
         children: [
           {
             title: 'Parent A',
+            value: 'p1',
             expand: true,
             children: [
               {
                 title: 'Leaf AA',
+                value: 'p1a',
                 expand: true,
                 children: [
                   {
@@ -104,6 +107,7 @@ export default {
               },
               {
                 title: 'Leaf AB',
+                value: 'p1b',
               },
             ],
           },

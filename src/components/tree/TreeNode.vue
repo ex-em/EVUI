@@ -41,7 +41,7 @@
         <tree-node
           v-for="(child, i) in childrenInfo"
           v-if="treeData.expand"
-          :key="i"
+          :key="`${child.value}-${i}`"
           :data="child"
           :use-checkbox="useCheckbox"
           :expand-icon="expandIcon"

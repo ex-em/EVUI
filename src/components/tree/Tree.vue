@@ -104,6 +104,7 @@ export default {
     function getAllNodeInfo() { // return the array to easily search parents and children
       let keyCounter = 0;
       const flatTree = [];
+      const valueArr = [];
 
       function flattenChildren(n, parent) {
         const node = n;
@@ -113,6 +114,15 @@ export default {
         if (!('selected' in node)) {
           node.selected = false;
         }
+
+        // check 'value' property and add nodeKey if same value already exists
+        if ('value' in node && valueArr.includes(node.value)) {
+          console.warn('The \'value\' of data should be unique.');
+          node.value += node.nodeKey;
+        } else if (!('value' in node)) {
+          node.value = node.title + node.nodeKey;
+        }
+        valueArr.push(node.value);
 
         flatTree[node.nodeKey] = { node, nodeKey: node.nodeKey };
         if (typeof parent !== 'undefined') {
@@ -158,24 +168,29 @@ export default {
       node.indeterminate = false;
       updateTreeUp(nodeKey); // propagate up
       updateTreeDown(node, { checked: isChecked, indeterminate: false }); // reset `indeterminate`
-      emit('check', getCheckedNodes());
+      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked)
+        .map(obj => ({
+            title: obj.node.title,
+            value: obj.node.value,
+          }));
+      emit('check', checkedNodes);
       rebuildTree();
     }
 
     function clickContent(nodeKey) {
-      const clickedNode = allNodeInfo[nodeKey];
+      const clickedNode = allNodeInfo[nodeKey].node;
       // reset other selected node to false
       for (let ix = 0; ix < allNodeInfo.length; ix++) {
         if (allNodeInfo[ix].node.nodeKey !== nodeKey) {
           allNodeInfo[ix].node.selected = false;
         }
       }
-      emit('click-node', clickedNode);
+      emit('click-node', { title: clickedNode.title, value: clickedNode.value });
     }
 
     function dblClickContent(nodeKey) {
-      const dbClickedContent = allNodeInfo[nodeKey];
-      emit('dblclick-node', dbClickedContent);
+      const dbClickedContent = allNodeInfo[nodeKey].node;
+      emit('dblclick-node', { title: dbClickedContent.title, value: dbClickedContent.value });
     }
 
     const showContextMenu = (e) => {
@@ -197,6 +212,13 @@ export default {
 
     onMounted(() => {
       rebuildTree();
+      const checkedNodes = getCheckedNodes();
+      if (checkedNodes.length) {
+        emit('check', checkedNodes.map(node => ({
+          title: node.title,
+          value: node.value,
+        })));
+      }
     });
 
     return {
