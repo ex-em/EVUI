@@ -6,7 +6,7 @@
     >
       <div
         v-if="visible"
-        id="ev-window-wrapper"
+        :class="['ev-window-wrapper', windowClass]"
       >
         <div
           class="ev-window"
@@ -68,6 +68,10 @@ export default {
     title: {
       type: [String, Number],
       default: null,
+    },
+    windowClass: {
+      type: String,
+      default: '',
     },
     iconClass: {
       type: String,
@@ -134,7 +138,7 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-#ev-window-wrapper {
+.ev-window-wrapper {
   display: flex;
   position: fixed;
   top: 0;
