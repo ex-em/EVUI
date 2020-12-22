@@ -30,9 +30,3 @@
 | | | children | 해당 메뉴 내 부가 메뉴 목록. 배열로 메뉴 구성과 같은 구성 |  |
 | expandable | Boolean | true | 중첩된 메뉴의 펼침 여부 | true, false |
 
-
-### Event
-
-| 이름 | 파라미터 | 설명 |
-| ---- | ------- | ---- |
-| change | newValue, prevValue, item | 메뉴 변경(클릭) 시 호출. (새로운 메뉴명, 이전 메뉴명, 새로운 메뉴 항목 정보 객체) |

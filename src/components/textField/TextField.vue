@@ -15,8 +15,22 @@
       class="ev-text-field-wrapper"
     >
       <template
-        v-if="type === 'text' || type === 'password'"
+        v-if="type === 'textarea'"
       >
+        <textarea
+          v-model="mv"
+          class="ev-textarea"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          :readonly="readonly"
+          :maxlength="maxLength"
+          @focus="focusInput"
+          @blur="blurInput"
+          @input="inputMv"
+          @change="changeMv"
+        />
+      </template>
+      <template v-else >
         <input
           v-model="mv"
           class="ev-input"
@@ -29,6 +43,7 @@
           @blur="blurInput"
           @input="inputMv"
           @change="changeMv"
+          @keyup="keyupInput"
         />
         <span
           v-if="type === 'text' && clearable"
@@ -45,20 +60,13 @@
         >
           <i class="ev-icon-radio-on"/>
         </span>
-      </template>
-      <template v-else>
-        <textarea
-          v-model="mv"
-          class="ev-textarea"
-          :placeholder="placeholder"
-          :disabled="disabled"
-          :readonly="readonly"
-          :maxlength="maxLength"
-          @focus="focusInput"
-          @blur="blurInput"
-          @input="inputMv"
-          @change="changeMv"
-        />
+        <span
+          v-if="type === 'search'"
+          class="ev-text-field-icon icon-search"
+          @click="searchValue"
+        >
+          <i class="ev-icon-search"/>
+        </span>
       </template>
     </div>
     <div
@@ -130,6 +138,7 @@ export default {
     'blur',
     'input',
     'change',
+    'search',
   ],
   setup(props, { emit }) {
     const mv = computed({
@@ -137,28 +146,41 @@ export default {
       set: val => emit('update:modelValue', val),
     });
 
+    // password visible on/off
     const isPasswordVisible = ref(false);
-    const inputType = computed(() => {
-      if (props.type === 'password') {
-        return isPasswordVisible.value ? 'text' : 'password';
-      }
-      isPasswordVisible.value = false;
-      return props.type;
-    });
     const changePasswordVisible = () => {
       if (props.type === 'password') {
         isPasswordVisible.value = !isPasswordVisible.value;
       }
     };
 
+    // input type setting
+    const inputType = computed(() => {
+      if (props.type === 'password') {
+        return isPasswordVisible.value ? 'text' : 'password';
+      }
+      isPasswordVisible.value = false;
+      return props.type === 'search' ? 'text' : props.type;
+    });
+
+    // clear input value
     const clearValue = () => { mv.value = ''; };
 
-    const checkMvValue = (inputValue) => {
-      if (mv.value !== inputValue) {
-        mv.value = inputValue;
+    // search input
+    const searchValue = () => {
+      if (mv.value && mv.value.trim()) {
+        emit('search', mv.value);
+      }
+    };
+    const keyupInput = (e) => {
+      if (props.type === 'search'
+        && (e.key === 'Enter' || e.keyCode === 13)
+      ) {
+        searchValue();
       }
     };
 
+    // input event
     const focusInput = (e) => {
       emit('focus', e);
     };
@@ -166,8 +188,11 @@ export default {
       emit('blur', e);
     };
     const inputMv = (e) => {
-      checkMvValue(e.target.value);
-      emit('input', mv.value, e);
+      const inputValue = e.target.value;
+      if (mv.value !== inputValue) {
+        mv.value = inputValue;
+        emit('input', mv.value, e);
+      }
     };
     const changeMv = (e) => {
       emit('change', mv.value, e);
@@ -179,6 +204,8 @@ export default {
       isPasswordVisible,
       clearValue,
       changePasswordVisible,
+      searchValue,
+      keyupInput,
       focusInput,
       blurInput,
       inputMv,
@@ -189,6 +216,8 @@ export default {
 </script>
 
 <style lang="scss">
+$icon-width: 14px !default;
+
 @import '../../style/index.scss';
 
 .ev-text-field {
@@ -209,13 +238,6 @@ export default {
   &-wrapper {
     position: relative;
   }
-}
-
-@include state('clearable') {
-  $icon-width: 14px;
-  .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
-  }
   .ev-text-field-icon {
     display: flex;
     position: absolute;
@@ -229,40 +251,47 @@ export default {
     z-index: 5;
     transform: translateY(-50%);
     box-sizing: border-box;
+
+    @include evThemify() {
+      color: evThemed('border-base');
+    }
+  }
+}
+
+@include state('clearable') {
+  .ev-input {
+    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+  }
+  .ev-text-field-icon {
     font-size: 10px;
     border-radius: 8px;
 
     @include evThemify() {
       border: 1px solid evThemed('border-base');
-      color: evThemed('border-base');
     }
   }
 }
 @include state('show-password') {
-  $icon-width: 14px;
   .ev-input {
     padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
   }
   .ev-text-field-icon {
-    display: flex;
-    position: absolute;
-    top: 50%;
-    right: #{$icon-width / 2};
-    width: $icon-width;
-    height: $icon-width;
-    cursor: pointer;
-    justify-content: center;
-    align-items: center;
-    z-index: 5;
-    transform: translateY(-50%);
-    box-sizing: border-box;
     font-size: 15px;
-
-    @include evThemify() {
-      color: evThemed('border-base');
-    }
     &:hover,
     &.on {
+      @include evThemify() {
+        color: evThemed('primary');
+      }
+    }
+  }
+}
+@include state('type-search') {
+  .ev-input {
+    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+  }
+  .ev-text-field-icon {
+    font-size: 15px;
+    &:hover {
       @include evThemify() {
         color: evThemed('primary');
       }
