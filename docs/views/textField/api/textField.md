@@ -22,7 +22,7 @@ height: 100px;
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
 | v-model | String, Number | null | 컴포넌트 입력 값 | |
-| type | String | 'text' | 타입 설정 | 'text', 'password', 'textarea' |
+| type | String | 'text' | 타입 설정 | 'text', 'password', 'search', 'textarea' |
 | disabled | Boolean | false | 비활성화 여부 | true, false |
 | readonly | Boolean | false | 읽기 전용 여부 | true, false |
 | placeholder | String | | Input / Textarea의 placeholder 값 | |
@@ -38,3 +38,4 @@ height: 100px;
  | blur | event | Event object. 컴포넌트 blur 이벤트 발생 시 호출 |
  | input | (event, newValue) | 컴포넌트 input 이벤트 발생 시 호출 |
  | change | (event, newValue) | 컴포넌트 change 이벤트 발생 시 호출 |
+ | search | newValue | type === 'search'일 경우, 컴포넌트 search 이벤트 발생 시 호출 |
