@@ -12,6 +12,13 @@
     </div>
   </div>
   <div class="case">
+    <p class="case-title">Readonly</p>
+    <ev-slider
+      v-model="modelValue1"
+      readonly
+    />
+  </div>
+  <div class="case">
     <p class="case-title">Disabled</p>
     <ev-slider
       v-model="modelValue1"

@@ -2,6 +2,7 @@
   <div
     class="ev-slider"
     :class="{
+      readonly,
       disabled,
       'hide-tooltip': !showTooltip,
       'show-input': showInput,
@@ -128,6 +129,10 @@ export default {
     modelValue: {
       type: [Number, Array],
       default: null,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
     },
     disabled: {
       type: Boolean,
@@ -441,6 +446,19 @@ export default {
   }
   @include state('show-mark') {
     padding-bottom: $handle-height;
+  }
+  @include state('readonly') {
+    &, * {
+      cursor: default !important;
+    }
+    .ev-slider-handle {
+      &.on,
+      &:hover {
+        .ev-slider-handle-btn {
+          transform: scale(1);
+        }
+      }
+    }
   }
   @include state('disabled') {
     &, * {
