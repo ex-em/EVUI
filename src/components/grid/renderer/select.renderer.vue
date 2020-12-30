@@ -24,15 +24,11 @@
       const mv = ref(props.item.value);
       const clickedHandler = (e) => {
         emit('change-renderer', props.item.rowIndex, props.item.cellIndex, e, props.item.value);
-        // if (props.option.onClick) {
-        //   props.option.onClick(e);
-        // }
       };
       watch(
           () => mv.value,
-          (curr, prev) => {
-            console.log(curr, prev);
-            emit('change-renderer', props.item.rowIndex, props.item.cellIndex, curr);
+          (value) => {
+            emit('change-renderer', props.item.rowIndex, props.item.cellIndex, value);
           },
       );
       return {

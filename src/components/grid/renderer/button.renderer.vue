@@ -28,11 +28,6 @@
           props.option.onClick(e);
         }
       };
-      // const button = ref(null);
-      // onMounted(() => {
-      //   const width = button.value.$el.offsetWidth;
-      //   emit('change-column-width', props.item.cellIndex, width);
-      // });
       return {
         clickedHandler,
       };

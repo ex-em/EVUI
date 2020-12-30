@@ -66,9 +66,9 @@
             v-model:checked="checked"
             :rows="tableData"
             :columns="columns"
+            :width="`100%`"
+            :height="gridHeight"
             :option="{
-              width: '100%',
-              height: gridHeight,
               adjust: true,
               useFilter: false,
               useCheckbox: {
@@ -216,20 +216,20 @@ export default {
         return acc;
       }, []));
       gridInfo.tableData = tempData;
-      showAddForm.value = false;
       gridHeight.value = 320;
+      showAddForm.value = false;
     };
     /**
      * 새로운 필터 추가 양식을 표시한다.
      */
     const onAdd = () => {
-      showAddForm.value = true;
-      gridHeight.value = 153;
       gridInfo.addInfo = {
         type: 'AND',
         comparison: props.targetColumn.type === 'string' ? 'Equal' : '>',
         value: '',
       };
+      gridHeight.value = 153;
+      showAddForm.value = true;
     };
     /**
      * 선택한 필터를 필터 목록에서 삭제한다.
@@ -256,8 +256,8 @@ export default {
      * 필터 추가 작성을 취소한다.
      */
     const onCancel = () => {
-      showAddForm.value = false;
       gridHeight.value = 320;
+      showAddForm.value = false;
     };
     /**
      * 필터 팝업을 종료한다.
@@ -266,8 +266,8 @@ export default {
       if (!state) {
         gridInfo.checked.length = 0;
         gridInfo.tableData.length = 0;
-        showAddForm.value = false;
         gridHeight.value = 320;
+        showAddForm.value = false;
         /**
          * 필터 팝업 종료 전 이벤트
          */

@@ -773,7 +773,10 @@ export const storeEvent = (params) => {
      * @param {number|string} newValue - 데이터
      */
     const updateData = (rowIndex, cellIndex, newValue) => {
-        stores.store[rowIndex][ROW_DATA_INDEX][cellIndex] = newValue;
+        const row = stores.store.filter(data => data[0] === rowIndex);
+        if (row) {
+            row[0][ROW_DATA_INDEX][cellIndex] = newValue;
+        }
     };
     return { setStore, updateData };
 };

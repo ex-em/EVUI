@@ -214,14 +214,14 @@ export default {
     const menuItems = ref([
       {
         text: 'TEXT1',
-        click: () => alert('CLICK text1'),
+        click: () => console.log('CLICK text1'),
       },
     ]);
-    const onClickCheckbox = () => {
-      alert('checkbox component click!');
+    const onClickCheckbox = (e) => {
+      console.log(`checkbox component click: ${e}`);
     };
-    const onClickButton = () => {
-      alert('button component click!');
+    const onClickButton = (e) => {
+      console.log(`button component click: ${e}`);
     };
     const clearData = () => {
       tableData.value = [];
@@ -240,7 +240,7 @@ export default {
       clickedRowMV.value = rowData;
     };
     const onAllCheckedRow = (check) => {
-      alert(`All Check : ${check}`);
+      console.log(`All Check : ${check}`);
     };
     const getData = (count, startIndex) => {
       const countries = [

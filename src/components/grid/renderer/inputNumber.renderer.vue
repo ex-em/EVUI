@@ -22,9 +22,9 @@
     },
     setup(props, { emit }) {
       const mv = ref(props.item.value);
-      const clickedHandler = (e) => {
-        if (e !== props.item.value) {
-          emit('change-renderer', props.item.rowIndex, props.item.cellIndex, e, props.item.value);
+      const clickedHandler = (newValue) => {
+        if (newValue !== props.item.value) {
+          emit('change-renderer', props.item.rowIndex, props.item.cellIndex, newValue, props.item.value);
         }
       };
       return {
