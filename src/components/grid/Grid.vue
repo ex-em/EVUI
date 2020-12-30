@@ -209,6 +209,7 @@ import CheckboxRenderer from './renderer/checkbox.renderer';
 import ButtonRenderer from './renderer/button.renderer';
 import InputNumberRenderer from './renderer/inputNumber.renderer';
 import SelectRenderer from './renderer/select.renderer';
+import ToggleRenderer from './renderer/toggle.renderer';
 import {
   commonFunctions,
   scrollEvent,
@@ -229,6 +230,7 @@ export default {
     ButtonRenderer,
     InputNumberRenderer,
     SelectRenderer,
+    ToggleRenderer,
   },
   props: {
     columns: {

@@ -28,6 +28,12 @@ export const commonFunctions = () => {
             case 'select': {
                 return 'SelectRenderer';
             }
+            case 'toggle': {
+                return 'ToggleRenderer';
+            }
+            case 'progress': {
+                return 'ProgressRenderer';
+            }
             default:
                 return '';
         }
