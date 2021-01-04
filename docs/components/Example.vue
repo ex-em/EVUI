@@ -126,7 +126,8 @@ export default {
   border: 1px solid $color-yellow;
   border-radius: 4px;
   .view {
-    flex: 1;
+    //flex: 1;
+    width: 50%;
     padding: 15px 20px;
     border-right: 1px solid $color-yellow;
   }
@@ -189,7 +190,7 @@ export default {
   .code {
     position: relative;
     width: 50%;
-    max-width: 700px;
+    //max-width: 700px;
     overflow: hidden;
     .code-wrapper {
       height: 100px;

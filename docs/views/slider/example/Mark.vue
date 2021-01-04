@@ -58,6 +58,17 @@
         },
       }"
     />
+    <ev-slider
+      v-model="modelValue3"
+      range
+      readonly
+      :mark="{
+        33.33: 'Warning Value',
+        66.66: 'Critical Value',
+      }"
+      :color="['#3C81F6', '#FADE4C', '#FF470E']"
+      :show-tooltip="false"
+    />
     <div class="description">
       <span class="badge">
         min=0
@@ -110,9 +121,11 @@
     setup() {
       const modelValue1 = ref();
       const modelValue2 = ref();
+      const modelValue3 = ref([33.33, 66.66]);
       return {
         modelValue1,
         modelValue2,
+        modelValue3,
       };
     },
   };

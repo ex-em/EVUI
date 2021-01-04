@@ -1,44 +1,55 @@
 <template>
   <nav class="evui-navigation">
-    <ul>
-      <li
-        v-for="(menu, index) in store"
-        :key="menu.name + index"
-        class="evui-navigation-item"
-        :class="{ active: menu.name === currentMenu }"
-        @click="clickMenu(menu.path)"
-      >
-       {{ menu.name }}
-      </li>
-    </ul>
+    <ev-menu
+      v-model="currentMenu"
+      :items="menu"
+      @change="changeMenu"
+    />
   </nav>
 </template>
 
 <script>
-import { computed, onActivated } from 'vue';
+import { ref } from 'vue';
 import router from '../router';
 
 export default {
   setup() {
-    const currentMenu = computed(() => router.currentRoute?.value.name);
-    const store = router.getRoutes().filter(item => item.name !== 'PageNotFound');
-    const clickMenu = (routerLink) => {
-      router.push({ path: routerLink });
+    const currentMenu = ref(null);
+    router.beforeEach((to, from, next) => {
+      if (!from.name) {
+        currentMenu.value = to.name;
+      }
+      next();
+    });
+
+    const menu = router.getRoutes().filter(item => item.name !== 'PageNotFound').reduce((acc, cur) => {
+      if (!cur.meta.category) {
+        acc.push({ text: cur.name });
+      } else {
+        const idx = acc.findIndex(v => v.text === cur.meta.category);
+        if (idx < 0) {
+          acc.push({ text: cur.meta.category, children: [{ text: cur.name }] });
+        } else {
+          acc[idx].children.push({ text: cur.name });
+        }
+      }
+      return acc;
+    }, []);
+
+    const changeMenu = (newVal) => {
+      router.push({ name: newVal });
     };
 
-    onActivated(() => {
-      document.documentElement.scrollTop = 0;
-    });
     return {
-      store,
+      menu,
       currentMenu,
-      clickMenu,
+      changeMenu,
     };
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../style/index.scss';
 
 .evui-navigation {
@@ -47,7 +58,7 @@ export default {
   left: 0;
   width: $nav-width;
   height: calc(100% - #{$header-height});
-  padding: 17px 0;
+  padding-bottom: 17px;
   box-sizing: border-box;
   overflow-y: auto;
 
@@ -58,32 +69,28 @@ export default {
   ul, li {
     list-style: none;
   }
-  &-item {
-    padding: 3px 24px;
-    margin-bottom: 3px;
+
+  .ev-menu-item:not(.depth1) {
+    border-left: 5px solid transparent;
+    &.active {
+      border-left: 5px solid $color-blue;
+    }
+  }
+  .ev-menu-title {
+    padding: 3px 33px;
     font-size: $font-size-base;
     line-height: 1.7em;
-    cursor: pointer;
-    border-left: 5px solid transparent;
-    transition: all $animate-base;
 
     @include themify() {
       color: themed('font-color-nav');
     }
-    &:hover {
-      color: $color-blue;
-    }
-    &.active {
-      border-left: 5px solid $color-blue;
-      color: $color-blue;
-    }
   }
-  .evui-link {
-    display: flex;
-    padding: 20px;
+  .depth1 > .ev-menu-title {
+    padding: 0 30px;
+    margin: 27px 0 10px;
 
     @include themify() {
-      background-color: themed('background-color-lighten');
+      color: themed('color-disabled');
     }
   }
 }
