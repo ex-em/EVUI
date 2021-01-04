@@ -24,9 +24,15 @@
 | items | Array | [] | 메뉴의 목록. nested 가능 | |
 | | {} |  | 개별 항목 정보 객체 | |
 | | | text | 메뉴명 | |
+| | | value | 메뉴 id명(필수값) | |
 | | | iconClass | 메뉴 앞에 위치하는 아이콘 클래스명 | |
 | | | hidden | 항목 숨김 여부 | false, true |
 | | | expand | 항목 여닫음 여부 | false, true |
 | | | children | 해당 메뉴 내 부가 메뉴 목록. 배열로 메뉴 구성과 같은 구성 |  |
 | expandable | Boolean | true | 중첩된 메뉴의 펼침 여부 | true, false |
 
+### Event
+
+ | 이름 | 파라미터 | 설명 |
+ | ---- | ------- | ---- |
+ | change | newValueObj, prevValueObj | 컴포넌트 값 변경 시 호출, 선택한 메뉴 정보 object |

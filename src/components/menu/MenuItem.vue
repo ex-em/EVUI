@@ -12,14 +12,14 @@
         { active: item.text === selectedItem },
         { 'expandable': hasChild && expandable },
       ]"
-      @click="clickMenu(item.text, depth)"
+      @click="clickMenu(item, depth)"
     >
       <i
         v-if="!!item.iconClass"
         :class="['front-icon', item.iconClass]"
       />
       <span class="text">
-        {{ item.text }}
+        {{ item.text || item.value }}
       </span>
       <span
         v-if="expandable && hasChild"
@@ -68,7 +68,10 @@ export default {
       type: Object,
       default: () => {},
       validator: (obj) => {
-        if (obj.children !== undefined && !Array.isArray(obj.children)) {
+        if (!obj.value) {
+          console.warn('[EVUI][Menu] value attribute is required.');
+          return false;
+        } else if (obj.children !== undefined && !Array.isArray(obj.children)) {
           console.warn('[EVUI][Menu] children attribute must be \'Array\' type.');
           return false;
         } else if (obj.expand !== undefined && typeof obj.expand !== 'boolean') {
@@ -96,13 +99,13 @@ export default {
     const isExpand = ref(defaultExpand);
     const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
 
-    const clickMenu = (menuName, depth) => {
+    const clickMenu = (menuItem, depth) => {
       if (hasChild.value && depth === props.depth) {
         if (props.expandable) {
           isExpand.value = !isExpand.value;
         }
       } else {
-        emit('click', menuName, props.depth);
+        emit('click', menuItem, props.depth);
       }
     };
 

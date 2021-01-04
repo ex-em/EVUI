@@ -23,21 +23,29 @@ export default {
     });
 
     const menu = router.getRoutes().filter(item => item.name !== 'PageNotFound').reduce((acc, cur) => {
+      const menuInfoObj = {
+        text: cur.name,
+        value: cur.name,
+      };
       if (!cur.meta.category) {
-        acc.push({ text: cur.name });
+        acc.push(menuInfoObj);
       } else {
         const idx = acc.findIndex(v => v.text === cur.meta.category);
         if (idx < 0) {
-          acc.push({ text: cur.meta.category, children: [{ text: cur.name }] });
+          acc.push({
+            text: cur.meta.category,
+            value: cur.meta.category,
+            children: [menuInfoObj],
+          });
         } else {
-          acc[idx].children.push({ text: cur.name });
+          acc[idx].children.push(menuInfoObj);
         }
       }
       return acc;
     }, []);
 
     const changeMenu = (newVal) => {
-      router.push({ name: newVal });
+      router.push({ name: newVal.value });
     };
 
     return {
