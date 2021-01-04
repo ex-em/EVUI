@@ -4,12 +4,11 @@
     :class="[
       'ev-menu-item',
        `depth${depth}`,
-      { active: item.text === selectedItem },
+      { active: item.value === selectedItem },
     ]">
     <div
       :class="[
         'ev-menu-title',
-        { active: item.text === selectedItem },
         { 'expandable': hasChild && expandable },
       ]"
       @click="clickMenu(item, depth)"
@@ -38,7 +37,7 @@
       >
         <menu-item
           v-for="(menuItem, index) in item.children"
-          :key="`${menuItem.text}_${index}_${depth + 1}`"
+          :key="`${menuItem.value}_${index}_${depth + 1}`"
           :depth="depth + 1"
           :item="menuItem"
           :selected-item="selectedItem"
@@ -125,8 +124,14 @@ export default {
   &:not(.depth1) {
     padding-left: 10px;
   }
+  &.active > .ev-menu-title {
+    @include evThemify() {
+      color: evThemed('primary') !important;
+    }
+  }
 }
 .ev-menu-title {
+  position: relative;
   display: flex;
   padding: 3px 7px;
   margin-bottom: 6px;
@@ -134,18 +139,14 @@ export default {
   align-items: center;
   line-height: 1.5em;
   word-break: break-all;
-
-  &.active,
   &:hover:not(.expandable) {
     @include evThemify() {
       color: evThemed('primary') !important;
     }
   }
   &.expandable {
-    position: relative;
     padding-right: 27px;
   }
-
   .list-expend-icon {
     position: absolute;
     top: 50%;

@@ -18,7 +18,7 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const menu = ref(null);
+    const menu = ref('menu01');
     const menuItems = ref([
       {
         text: 'Menu Text 01',
