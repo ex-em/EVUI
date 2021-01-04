@@ -9,12 +9,12 @@
       :width="widthMV"
       :height="heightMV"
       :option="{
-          adjust     : adjustMV,
-          showHeader : showHeaderMV,
-          stripeRows : isStripeStyleMV,
-          rowHeight  : rowHeightMV,
+          adjust: adjustMV,
+          showHeader: showHeaderMV,
+          stripeRows: isStripeStyleMV,
+          rowHeight: rowHeightMV,
           columnWidth: columnWidthMV,
-          useFilter  : useFilterMV,
+          useFilter: useFilterMV,
           useCheckbox: {
             use: useCheckboxMV,
             mode: checkboxModeMV,
@@ -120,9 +120,7 @@
           <div class="form-row">
             <span class="form-row-title">Clear Data</span>
             <div class="form-row-contents">
-              <ev-button
-                @click="clearData"
-              >
+              <ev-button @click="clearData">
                 <ev-icon icon="ev-icon-trash3" />
                 Clear
               </ev-button>
