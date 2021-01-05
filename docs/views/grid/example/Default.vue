@@ -36,6 +36,7 @@
             <div class="form-row-contents">
               <ev-text-field
                   v-model="widthMV"
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -44,6 +45,7 @@
             <div class="form-row-contents">
               <ev-text-field
                   v-model="heightMV"
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -57,6 +59,7 @@
                   :step="10"
                   :max="150"
                   :min="35"
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -68,6 +71,7 @@
                   :step="20"
                   :max="300"
                   :min="40"
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -158,6 +162,7 @@
                   v-model="checkedRowsMV"
                   type="textarea"
                   readonly
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -170,6 +175,7 @@
                   v-model="clickedRowMV"
                   type="textarea"
                   readonly
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -180,6 +186,7 @@
                   v-model="DbClickedRowsMV"
                   type="textarea"
                   readonly
+                  style="width: 200px;"
               />
             </div>
           </div>
@@ -197,7 +204,7 @@ export default {
     const tableData = ref([]);
     const selected = ref([]);
     const checked = ref([]);
-    const widthMV = ref(850);
+    const widthMV = ref('100%');
     const heightMV = ref(300);
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
@@ -257,7 +264,7 @@ export default {
           countries[ix % 20],
           Math.random() * 10000,
           Math.random() * 100,
-          Math.random() * 1000,
+          // Math.random() * 1000,
           true,
           true,
           Math.floor(Math.random() * (100 - 0 + 1)) + 0,
@@ -271,7 +278,7 @@ export default {
       { caption: 'Country', field: 'country', type: 'string' },
       { caption: 'Area', field: 'area', type: 'number', hide: true },
       { caption: 'Population', field: 'population', type: 'number' },
-      { caption: 'GDP', field: 'gdp', type: 'number' },
+      // { caption: 'GDP', field: 'gdp', type: 'number' },
       {
         caption: 'Information',
         field: 'information',
@@ -379,13 +386,12 @@ export default {
 <style lang="scss" scoped>
 .description {
   width: 100%;
-  min-width: 900px;
   margin-bottom: 20px;
 }
 
 .form-row-contents {
   min-height: 35px;
-  //flex: 1;
+  flex: 1;
 }
 
 .form-rows {
