@@ -36,11 +36,11 @@ export default {
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
-    const prevMenu = ref(props.modelValue);
-    const clickMenu = (newMenu) => {
-      emit('update:modelValue', newMenu);
-      emit('change', newMenu, prevMenu.value);
-      prevMenu.value = newMenu;
+    const prevMenuItem = ref(props.items.filter(item => props.modelValue === item.value));
+    const clickMenu = (newMenuItem) => {
+      emit('update:modelValue', newMenuItem.value);
+      emit('change', newMenuItem, prevMenuItem.value);
+      prevMenuItem.value = newMenuItem;
     };
     return {
       clickMenu,
