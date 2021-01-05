@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+  import { computed, watch, onMounted } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -102,6 +102,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    lockScroll: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: {
     'update:visible': [Boolean],
@@ -141,7 +145,27 @@ export default {
       }
       emit('update:visible', false);
     };
-
+    const setBodyLock = (val) => {
+      if (val) {
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.width = 'auto';
+        document.body.style.height = 'auto';
+        document.body.style.overflow = 'visible';
+      }
+    };
+    onMounted(() => {
+      if (props.visible && props.lockScroll) {
+        setBodyLock(true);
+      }
+    });
+    watch(() => props.visible, (val) => {
+      if (props.lockScroll) {
+        setBodyLock(val);
+      }
+    });
     return {
       windowStyle,
       closeWin,

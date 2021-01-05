@@ -80,7 +80,7 @@
     <ev-window
       v-model:visible="isVisible4"
       :title="'COMMON TITLE'"
-      :showModalLayer="false"
+      :show-modal-layer="false"
     >
       <div>COMMON CONTENTS</div>
     </ev-window>
