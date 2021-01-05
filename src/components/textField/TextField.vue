@@ -50,7 +50,7 @@
           class="ev-text-field-icon icon-clear"
           @click="clearValue"
         >
-          <i class="ev-icon-close" />
+          <i class="ev-icon-error" />
         </span>
         <span
           v-if="type === 'password' && showPassword"
@@ -263,11 +263,11 @@ $icon-width: 14px !default;
     padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
   }
   .ev-text-field-icon {
-    font-size: 10px;
-    border-radius: 8px;
-
-    @include evThemify() {
-      border: 1px solid evThemed('border-base');
+    font-size: 15px;
+    &:hover {
+      @include evThemify() {
+        color: evThemed('primary');
+      }
     }
   }
 }

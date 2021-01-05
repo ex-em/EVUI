@@ -75,6 +75,24 @@
       </button>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Hide Modal Layer</p>
+    <ev-window
+      v-model:visible="isVisible4"
+      :title="'COMMON TITLE'"
+      :showModalLayer="false"
+    >
+      <div>COMMON CONTENTS</div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton4"
+      >
+        click to open window!
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -97,6 +115,11 @@ export default {
       isVisible3.value = true;
     };
 
+    const isVisible4 = ref(false);
+    const clickButton4 = () => {
+      isVisible4.value = true;
+    };
+
     return {
       isVisible1,
       clickButton1,
@@ -104,6 +127,8 @@ export default {
       clickButton2,
       isVisible3,
       clickButton3,
+      isVisible4,
+      clickButton4,
     };
   },
 };

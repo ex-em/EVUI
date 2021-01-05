@@ -30,4 +30,6 @@
 | v-mode:visible | Boolean | false | <윈도우>의 보임 여부, 양방향 바인딩 | |
 | title | String, Number | null | <윈도우> 내부 헤더의 타이틀 | |
 | icon-class | String | '' | <윈도우> 내부 헤더의 아이콘 | |
-| width | String | '50%' | <윈도우> 너비 | |
+| width | String | '50%' | <윈도우> 너비 | 
+| show-modal-layer | Boolean | true | 모달창 하단의 dim layer 출력 여부 | true, false |
+| close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |

@@ -6,10 +6,15 @@
     >
       <div
         v-if="visible"
-        :class="['ev-window-wrapper', windowClass]"
+        class="ev-window-wrapper"
       >
         <div
-          class="ev-window"
+          v-if="showModalLayer"
+          class="ev-window-dim-layer"
+          @click="closeWin('layer')"
+        />
+        <div
+          :class="['ev-window', windowClass]"
           :style="windowStyle"
         >
           <div
@@ -89,6 +94,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    showModalLayer: {
+      type: Boolean,
+      default: true,
+    },
+    closeOnClickModal: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
     'update:visible': [Boolean],
@@ -100,7 +113,6 @@ export default {
     const initWrapperDiv = () => {
       const root = document.createElement('div');
       root.id = 'ev-window-modal';
-      root.setAttribute('style', 'position: absolute; top: 0; left: 0;');
       const hasRoot = document.getElementById('ev-window-modal');
       if (!hasRoot) {
         document.body.appendChild(root);
@@ -123,7 +135,10 @@ export default {
     /**
      * [x] 클릭 시 닫는 기능
      */
-    const closeWin = () => {
+    const closeWin = (from) => {
+      if (from === 'layer' && !props.closeOnClickModal) {
+        return;
+      }
       emit('update:visible', false);
     };
 
@@ -138,26 +153,23 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-window-wrapper {
-  display: flex;
+.ev-window-dim-layer {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 700;
   width: 100vw;
   height: 100vh;
-  justify-content: center;
-  align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity .2s ease-in-out;
+  z-index: 700;
 }
-
 .ev-window {
   $padding-vertical: 20px;
   $padding-horizontal: 17px;
 
   display: flex;
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
   max-height: 100%;
   flex-direction: column;
   box-sizing: border-box;
@@ -165,14 +177,16 @@ export default {
   background-color: #FDFDFD;
   border: 1px solid #E3E3E3;
   transition: opacity .2s ease-in-out, transform .3s ease-in-out;
+  transform: translate(-50%, -50%);
   font-size: $font-size-medium;
   line-height: 1.5em;
+  z-index: 700;
 
   &-fade-enter-active,
   &-fade-leave-active {
     .ev-window {
       opacity: 0;
-      transform: translateY(-10%);
+      transform: translate(-50%, -60%);
     }
   }
 
