@@ -8,6 +8,7 @@
 
   @include evThemify() {
     border: 1px solid evThemed('border-base');
+    color: evThemed('font-base');
   }
   &:focus,
   &:hover {

@@ -28,28 +28,32 @@
 
 >### Props
 1) 체크박스 그룹
-  | 이름 | 디폴트 | 타입 | 설명 | 종류 |
+
+  | 이름 | 타입 |디폴트 |  설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | label | null | String  | HTML element value (required) |  |
-  | disabled | false | Boolean | HTML element disabled attribute |  |
-  | v-model:indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
+  | v-model | String, Number, Boolean, Symbol, Array | null | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+  | label | String  | null | HTML element value (required) |  |
+  | disabled | Boolean | false | HTML element disabled attribute |  |
+  | v-model:indeterminate | Boolean | false | HTML5 checkbox indeterminate attribute |  |
 
 2) 체크박스
- | 이름 | 디폴트 | 타입 | 설명 | 종류 |
+
+ | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | v-model | null | String, Number, Boolean, Symbol, Array | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
-  | disabled | false | Boolean | HTML element disabled attribute |  |
-  | v-model:indeterminate | false | Boolean | HTML5 checkbox indeterminate attribute |  |
+  | v-model | String, Number, Boolean, Symbol, Array | null | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
+  | disabled | Boolean | false | HTML element disabled attribute |  |
+  | v-model:indeterminate | Boolean | false | HTML5 checkbox indeterminate attribute |  |
 
 
 >### Event
 1) 체크박스 그룹
+
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
  | change | newValue, event | <체크박스그룹> 내 <체크박스> 변화 이벤트 감지 |
 
 2) 체크박스
+
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
  | change | newValue, event | <체크박스> 변화 이벤트 감지 |

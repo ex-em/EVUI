@@ -1,6 +1,13 @@
 import { ref, watch, onBeforeMount, getCurrentInstance } from 'vue';
 import { getPrecision } from '@/common/utils';
 
+/**
+ * step 사용 시, up-down 및 값 입력할 때 step에 해당하는 값 반환
+ * @param val - 현재값
+ * @param { min, max, step } - 현재 컴포넌트의 최소값, 최대값, step 값
+ *                           - inputNumber, slider 컴포넌트 공통 사용
+ * @return number - 입력된 val에 가까운 step 값 반환
+ * */
 export function getValueCloseToStep(val, { min, max, step }) {
   const quotient = Math.floor((val - min) / step); // 몫
   const remainder = (val - min) % step; // 나머지
@@ -14,6 +21,7 @@ export function getValueCloseToStep(val, { min, max, step }) {
    */
   let result;
   if (maxPrecision) {
+    // 소수점 값일 경우
     let multipleValue = +parseFloat(step * quotient).toFixed(maxPrecision);
     result = +(multipleValue + min).toFixed(maxPrecision);
     preventStep = quotient === maxQuotient
@@ -29,6 +37,7 @@ export function getValueCloseToStep(val, { min, max, step }) {
       result = min;
     }
   } else {
+    // 소수점 아닐 경우
     result = (step * quotient) + min;
     preventStep = quotient === maxQuotient && (max - result) !== step;
     if (remainder > (step / 2) && !preventStep) {
@@ -49,17 +58,28 @@ export function useModel() {
   const currentValue = ref(props.modelValue);
   const previousValue = ref(props.modelValue);
 
+  /**
+   * 고정 소수점 사용 시, 해당하는 소수점 값 반환
+   * */
   const getPrecisionValue = val => (
     props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val
   );
+
+  /**
+   * input 값 validate
+   * @param val - input 현재 값
+   * */
   const validateValue = (val) => {
     let result = val;
 
     if (!val && val !== 0) {
+      // 값이 없을 경우
       result = props.stepStrictly ? previousValue.value : null;
     } else if (isNaN(val)) {
+      // 숫자 아닐 경우 - 문자열 들어 왔을 경우
       result = previousValue.value;
     } else if (props.stepStrictly) {
+      // step 유지
       if (props.min === -Infinity) {
         props.min = 0;
       }
@@ -68,9 +88,15 @@ export function useModel() {
         max: props.max,
         step: props.step,
       });
-    } else if (props.min && result < props.min) {
+    } else if ((props.min || props.min === 0)
+      && result < props.min
+    ) {
+      // 최소값보다 작을 경우
       result = props.min;
-    } else if (props.max && result > props.max) {
+    } else if ((props.max || props.max === 0)
+      && result > props.max
+    ) {
+      // 최대값보다 클 경우
       result = props.max;
     } else {
       result = +result;
@@ -82,6 +108,7 @@ export function useModel() {
     emit('change', result);
   };
 
+  // input 이벤트 발생 시
   const focusInput = (e) => {
     emit('focus', e);
   };
@@ -110,6 +137,10 @@ export function useStep(params) {
   const { props } = getCurrentInstance();
   const { currentValue, validateValue } = params;
 
+  /**
+   * 화살표 및 키보드 방향키 통해 값 up-down할 경우
+   * @param type - 'up', 'down'
+   * */
   const stepValue = (type) => {
     if (props.readonly || props.disabled) {
       return;
@@ -142,6 +173,9 @@ export function useInit(params) {
   const hasMaxProps = props.max || props.max === 0;
   const hasMinProps = props.min || props.min === 0;
 
+  /**
+   * props validate
+   * */
   const validateProps = () => {
     if (hasMaxProps && hasMinProps) {
       if (props.max <= props.min) {
@@ -156,6 +190,9 @@ export function useInit(params) {
     }
   };
 
+  /**
+   * 초기 modelValue 값 사용자 입력 시 validate
+   * */
   const initValue = () => {
     let modelValue = currentValue.value;
 

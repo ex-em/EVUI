@@ -764,6 +764,10 @@ export default {
   line-height: 1.45;
   overflow: auto;
   padding: 16px;
+
+  @include themify() {
+    background-color: themed('border-color-base');
+  }
 }
 
 .markdown pre code {

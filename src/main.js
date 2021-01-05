@@ -1,3 +1,5 @@
+import EvTabs from '@/components/tabs/';
+import EvTabPanel from '@/components/tabPanel/';
 import EvButton from '@/components/button/';
 import EvButtonGroup from '@/components/buttonGroup/';
 import EvCheckbox from '@/components/checkbox/';
@@ -19,11 +21,15 @@ import EvScheduler from '@/components/scheduler/';
 import EvContextMenu from '@/components/contextMenu/';
 import EvWindow from '@/components/window/';
 import EvLoading from '@/components/loading/';
-import EvGrid from '@/components/grid/';
 import EvProgress from '@/components/progress/';
+import EvMenu from '@/components/menu/';
+import EvTree from '@/components/tree/';
+import EvGrid from '@/components/grid/';
 import { version } from '../package.json';
 
 const components = [
+  EvTabs,
+  EvTabPanel,
   EvButton,
   EvButtonGroup,
   EvCheckbox,
@@ -42,8 +48,10 @@ const components = [
   EvContextMenu,
   EvWindow,
   EvLoading,
-  EvGrid,
   EvProgress,
+  EvMenu,
+  EvTree,
+  EvGrid,
 ];
 
 const install = (app) => {
@@ -66,6 +74,8 @@ const EVUI = {
 };
 
 export {
+  EvTabs,
+  EvTabPanel,
   EvButton,
   EvButtonGroup,
   EvCheckbox,
@@ -84,8 +94,10 @@ export {
   EvContextMenu,
   EvWindow,
   EvLoading,
-  EvGrid,
   EvProgress,
+  EvMenu,
+  EvTree,
+  EvGrid,
 };
 
 export default EVUI;
