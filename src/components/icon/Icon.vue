@@ -32,13 +32,13 @@ export default {
     'context-menu': null,
   },
   setup(props, { emit }) {
-    const onClick = async (e) => {
+    const onClick = (e) => {
       emit('click', e);
     };
-    const onDblClick = async (e) => {
+    const onDblClick = (e) => {
       emit('dbl-click', e);
     };
-    const onContextMenu = async (e) => {
+    const onContextMenu = (e) => {
       emit('context-menu', e);
     };
     return {

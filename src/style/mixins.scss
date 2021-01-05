@@ -49,7 +49,7 @@
   }
 }
 @mixin shortening($display: inline-block, $width: 100%, $line: 1) {
-  width: $width;
+  max-width: $width;
   overflow: hidden;
   text-overflow: ellipsis;
 

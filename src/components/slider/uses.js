@@ -228,7 +228,7 @@ export const useEvent = (params) => {
   };
 
   const clickSlider = (e) => {
-    if (props.disabled || state.dragging) {
+    if (props.readonly || props.disabled || state.dragging) {
       return;
     }
 
@@ -277,7 +277,7 @@ export const useEvent = (params) => {
     window.removeEventListener('touchend', endDrag);
   };
   const startDrag = (handleType) => {
-    if (props.disabled) {
+    if (props.readonly || props.disabled) {
       return;
     }
     state.handleType = handleType;
