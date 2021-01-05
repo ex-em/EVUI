@@ -1,205 +1,205 @@
 <template>
   <div
-      class="grid-wrapper"
-      :style="`width: ${gridWidth}; height: ${gridHeight};`"
+    class="grid-wrapper"
+    :style="`width: ${gridWidth}; height: ${gridHeight};`"
   >
-      <!--Table-->
-      <div
-          v-cloak
-          :class="{
+    <!--Table-->
+    <div
+      v-cloak
+      :class="{
             table: true,
             adjust: adjust,
             'non-header': !showHeader,
           }"
+    >
+      <!--Header-->
+      <div
+        v-show="showHeader"
+        ref="header"
+        class="table-header"
       >
-        <!--Header-->
-        <div
-            v-show="showHeader"
-            ref="header"
-            class="table-header"
-        >
-          <ul class="column-list">
-            <!--Header Checkbox-->
-            <li
-                v-if="useCheckbox.use"
-                class="column"
-                :style="`width: ${minWidth}px;`"
-            >
-              <ev-checkbox
-                  v-if="useCheckbox.use
+        <ul class="column-list">
+          <!--Header Checkbox-->
+          <li
+            v-if="useCheckbox.use"
+            class="column"
+            :style="`width: ${minWidth}px;`"
+          >
+            <ev-checkbox
+              v-if="useCheckbox.use
                         && useCheckbox.headerCheck
                         && useCheckbox.mode !== 'single'"
-                  v-model="isHeaderChecked"
-                  @change="onCheckAll"
-              />
-            </li>
-            <!--Column List-->
-            <template
-                v-for="(column, index) in orderedColumns"
-                :key="index"
-            >
-              <li
-                  v-if="!column.hide"
-                  :data-index="index"
-                  :class="{
+              v-model="isHeaderChecked"
+              @change="onCheckAll"
+            />
+          </li>
+          <!--Column List-->
+          <template
+            v-for="(column, index) in orderedColumns"
+            :key="index"
+          >
+            <li
+              v-if="!column.hide"
+              :data-index="index"
+              :class="{
                     column: true,
                     render: isRenderer(column),
                   }"
-                  :style="`
+              :style="`
                     width: ${column.width}px;
                     min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;
                   `"
-              >
-                <!--Filter Status-->
-                <span
-                    v-if="isFiltering
+            >
+              <!--Filter Status-->
+              <span
+                v-if="isFiltering
                           &&filterList[column.field]
                           &&filterList[column.field].find(item => item.use)"
-                    class="column-filter-status"
-                >
+                class="column-filter-status"
+              >
                   <ev-icon icon="ev-icon-filter"/>
                 </span>
-                <!--Column Name-->
-                <span
-                    :title="column.caption"
-                    class="column-name"
-                    @click.stop="onSort(column.field)"
-                >
+              <!--Column Name-->
+              <span
+                :title="column.caption"
+                class="column-name"
+                @click.stop="onSort(column.field)"
+              >
                   {{ column.caption }}
                 </span>
-                <!--Sort Icon-->
-                <ev-icon
-                    v-if="sortField === column.field"
-                    :icon="`${sortOrder === 'desc' ?
+              <!--Sort Icon-->
+              <ev-icon
+                v-if="sortField === column.field"
+                :icon="`${sortOrder === 'desc' ?
                             'ev-icon-triangle-down' : 'ev-icon-triangle-up'}`"
-                />
-                <!--Filter Button-->
-                <span
-                    v-if="isFiltering"
-                    class="column-filter"
-                    @click.capture="onClickFilter(column)"
-                >
+              />
+              <!--Filter Button-->
+              <span
+                v-if="isFiltering"
+                class="column-filter"
+                @click.capture="onClickFilter(column)"
+              >
                   <ev-icon icon="ev-icon-hamburger2"/>
                 </span>
-                <!--Column Resize-->
-                <span
-                    class="column-resize"
-                    @mousedown.stop.left="onColumnResize(index, $event)"
-                />
-              </li>
-            </template>
-          </ul>
-        </div>
-        <!--Body-->
-        <div
-            ref="body"
-            :class="{
+              <!--Column Resize-->
+              <span
+                class="column-resize"
+                @mousedown.stop.left="onColumnResize(index, $event)"
+              />
+            </li>
+          </template>
+        </ul>
+      </div>
+      <!--Body-->
+      <div
+        ref="body"
+        :class="{
               'table-body': true,
               'bottom-border': !viewStore.length ? false : true,
               stripe: isStripeStyle
             }"
-            @scroll="onScroll"
-            @contextmenu="onContextMenu($event)"
-            @contextmenu.prevent="menu.show"
-        >
-          <!--vScroll Top-->
-          <div
-              :style="`height: ${vScrollTopHeight}px;`"
-              class="vscroll-spacer"
-          />
-          <table>
-            <tbody>
-              <!--Row List-->
-              <tr
-                v-for="(row, rowIndex) in viewStore"
-                :key="rowIndex"
-                :data-index="rowIndex"
-                :class="{
+        @scroll="onScroll"
+        @contextmenu="onContextMenu($event)"
+        @contextmenu.prevent="menu.show"
+      >
+        <!--vScroll Top-->
+        <div
+          :style="`height: ${vScrollTopHeight}px;`"
+          class="vscroll-spacer"
+        />
+        <table>
+          <tbody>
+          <!--Row List-->
+          <tr
+            v-for="(row, rowIndex) in viewStore"
+            :key="rowIndex"
+            :data-index="rowIndex"
+            :class="{
                   selected: row[2] === selectedRow
                 }"
-                @click="onRowClick($event, row)"
-                @dblclick="onRowDblClick($event, row)"
-              >
-                <!--Row Checkbox-->
-                <td
-                    v-if="useCheckbox.use"
-                    class="row-checkbox"
-                    :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
-                >
-                  <ev-checkbox
-                      v-model="row[1]"
-                      @change="onCheck($event, row)"
-                  />
-                </td>
-                <!--Cell-->
-                <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
-                  <td
-                      v-if="!column.hide"
-                      :data-name="column.field"
-                      :data-index="column.index"
-                      :class="{
+            @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
+          >
+            <!--Row Checkbox-->
+            <td
+              v-if="useCheckbox.use"
+              class="row-checkbox"
+              :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+            >
+              <ev-checkbox
+                v-model="row[1]"
+                @change="onCheck($event, row)"
+              />
+            </td>
+            <!--Cell-->
+            <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
+              <td
+                v-if="!column.hide"
+                :data-name="column.field"
+                :data-index="column.index"
+                :class="{
                         [column.type]: column.type,
                         [column.align]: column.align,
                         render: isRenderer(column)
                       }"
-                      :style="`
+                :style="`
                         width: ${column.width}px;
                         height: ${rowHeight}px;
                         line-height: ${rowHeight}px;
                         min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;
                       `"
-                  >
-                    <component
-                        :is="getComponentName(column.render.type)"
-                        v-if="isRenderer(column)"
-                        :item="{
+              >
+                <component
+                  :is="getComponentName(column.render.type)"
+                  v-if="isRenderer(column)"
+                  :item="{
                           row: row[2],
                           rowIndex: row[0],
                           cellIndex: column.index,
                           value: row[2][column.index],
                         }"
-                        :option="column.render.option"
-                        @change-renderer="updateData"
-                    />
-                    <span
-                        v-else
-                        :title="getConvertValue(column.type, row[2][column.index])"
-                    >
+                  :option="column.render.option"
+                  @change-renderer="updateData"
+                />
+                <span
+                  v-else
+                  :title="getConvertValue(column.type, row[2][column.index])"
+                >
                       {{ getConvertValue(column.type, row[2][column.index]) }}
                     </span>
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
-          <!--vScroll Bottom-->
-          <div
-              :style="`height: ${vScrollBottomHeight}px;`"
-              class="vscroll-spacer"
-          />
-          <!--Context Menu-->
-          <ev-context-menu
-              ref="menu"
-              :items="contextMenuItems"
-          />
-        </div>
-        <!--Resize Line-->
+              </td>
+            </template>
+          </tr>
+          </tbody>
+        </table>
+        <!--vScroll Bottom-->
         <div
-            v-show="showResizeLine"
-            ref="resizeLine"
-            class="table-resize-line"
+          :style="`height: ${vScrollBottomHeight}px;`"
+          class="vscroll-spacer"
         />
-        <!--Filter Window-->
-        <filter-window
-            v-show="showFilterWindow"
-            :is-show="showFilterWindow"
-            :target-column="currentFilter.column"
-            :filter-items="currentFilter.items"
-            @apply-filter="onApplyFilter"
-            @before-close="onCloseFilterWindow"
+        <!--Context Menu-->
+        <ev-context-menu
+          ref="menu"
+          :items="contextMenuItems"
         />
       </div>
+      <!--Resize Line-->
+      <div
+        v-show="showResizeLine"
+        ref="resizeLine"
+        class="table-resize-line"
+      />
+      <!--Filter Window-->
+      <filter-window
+        v-show="showFilterWindow"
+        :is-show="showFilterWindow"
+        :target-column="currentFilter.column"
+        :filter-items="currentFilter.items"
+        @apply-filter="onApplyFilter"
+        @before-close="onCloseFilterWindow"
+      />
     </div>
+  </div>
 </template>
 
 <script>
@@ -272,7 +272,7 @@ export default {
     } = commonFunctions();
 
     const showHeader = ref(computed(() =>
-        (props.option.showHeader === undefined ? true : props.option.showHeader)));
+      (props.option.showHeader === undefined ? true : props.option.showHeader)));
     const isStripeStyle = ref(computed(() => (props.option.stripeRows || false)));
     const dom = reactive({
       body: null,
@@ -289,7 +289,7 @@ export default {
         items: [],
       },
       useFilter: computed(() =>
-          (props.option.useFilter === undefined ? true : props.option.useFilter)),
+        (props.option.useFilter === undefined ? true : props.option.useFilter)),
     });
     const stores = reactive({
       tableData: props.rows,
@@ -297,9 +297,9 @@ export default {
       originStore: [],
       filteredStore: [],
       store: computed(() =>
-          (filterInfo.isFiltering ? stores.filteredStore : stores.originStore)),
+        (filterInfo.isFiltering ? stores.filteredStore : stores.originStore)),
       orderedColumns: computed(() =>
-          (props.columns.map((column, index) => ({ index, ...column })))),
+        (props.columns.map((column, index) => ({ index, ...column })))),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -338,7 +338,7 @@ export default {
       columnWidth: computed(() => (props.option.columnWidth || 80)),
       scrollWidth: props.option.scrollWidth || 20,
       rowHeight: computed(() =>
-          (props.option.rowHeight && props.option.rowHeight > 35 ? props.option.rowHeight : 35)),
+        (props.option.rowHeight && props.option.rowHeight > 35 ? props.option.rowHeight : 35)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
     });
@@ -402,60 +402,60 @@ export default {
     });
 
     watch(
-        () => sortInfo.setSorting,
-        (value) => {
-          if (value) {
-            setStore(stores.originStore, false);
-            sortInfo.setSorting = !value;
-          }
-        },
+      () => sortInfo.setSorting,
+      (value) => {
+        if (value) {
+          setStore(stores.originStore, false);
+          sortInfo.setSorting = !value;
+        }
+      },
     );
     watch(
-        () => filterInfo.setFiltering,
-        (value) => {
-          if (value) {
-            setStore([], false);
-            filterInfo.setFiltering = !value;
-          }
-        },
+      () => filterInfo.setFiltering,
+      (value) => {
+        if (value) {
+          setStore([], false);
+          filterInfo.setFiltering = !value;
+        }
+      },
     );
     watch(
-        () => props.rows,
-        (value) => {
-          setStore(value);
-        },
+      () => props.rows,
+      (value) => {
+        setStore(value);
+      },
     );
     watch(
-        () => props.checked,
-        (value) => {
-          const ROW_CHECK_INDEX = 1;
-          const ROW_DATA_INDEX = 2;
-          const store = stores.originStore;
-          if (value.length === 0) {
-            checkInfo.isHeaderChecked = false;
-          }
-          for (let ix = 0; ix < store.length; ix++) {
-            store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
-          }
-          checkInfo.checkedRows = value;
-        },
+      () => props.checked,
+      (value) => {
+        const ROW_CHECK_INDEX = 1;
+        const ROW_DATA_INDEX = 2;
+        const store = stores.originStore;
+        if (value.length === 0) {
+          checkInfo.isHeaderChecked = false;
+        }
+        for (let ix = 0; ix < store.length; ix++) {
+          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
+        }
+        checkInfo.checkedRows = value;
+      },
     );
     // TEST
     watch(
-        () => [resizeInfo.adjust, resizeInfo.columnWidth],
-        () => {
-          stores.orderedColumns.map((column) => {
-            const item = column;
+      () => [resizeInfo.adjust, resizeInfo.columnWidth],
+      () => {
+        stores.orderedColumns.map((column) => {
+          const item = column;
 
-            if (!props.columns[column.index].width && !item.resized) {
-              item.width = 0;
-            }
+          if (!props.columns[column.index].width && !item.resized) {
+            item.width = 0;
+          }
 
-            return item;
-          }, this);
-          onResize();
-          updateVScroll();
-        },
+          return item;
+        }, this);
+        onResize();
+        updateVScroll();
+      },
     );
     //
     return {

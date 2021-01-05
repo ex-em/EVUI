@@ -2,13 +2,13 @@
   <div class="case">
     <p class="case-title">Common</p>
     <ev-grid
-        v-model:selected="selected"
-        v-model:checked="checked"
-        :columns="columns"
-        :rows="tableData"
-        :width="widthMV"
-        :height="heightMV"
-        :option="{
+      v-model:selected="selected"
+      v-model:checked="checked"
+      :columns="columns"
+      :rows="tableData"
+      :width="widthMV"
+      :height="heightMV"
+      :option="{
           adjust     : adjustMV,
           showHeader : showHeaderMV,
           stripeRows : isStripeStyleMV,
@@ -22,10 +22,10 @@
           },
           customContextMenu: menuItems,
         }"
-        @check-one="onCheckedRow"
-        @check-all="onAllCheckedRow"
-        @click-row="onClickRow"
-        @dblclick-row="onDoubleClickRow"
+      @check-one="onCheckedRow"
+      @check-all="onAllCheckedRow"
+      @click-row="onClickRow"
+      @dblclick-row="onDoubleClickRow"
     >
     </ev-grid>
     <div class="description">
@@ -35,8 +35,8 @@
             <span class="form-row-title">Width</span>
             <div class="form-row-contents">
               <ev-text-field
-                  v-model="widthMV"
-                  style="width: 200px;"
+                v-model="widthMV"
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -44,8 +44,8 @@
             <span class="form-row-title">Height</span>
             <div class="form-row-contents">
               <ev-text-field
-                  v-model="heightMV"
-                  style="width: 200px;"
+                v-model="heightMV"
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -55,11 +55,11 @@
             <span class="form-row-title">Row Height</span>
             <div class="form-row-contents">
               <ev-input-number
-                  v-model="rowHeightMV"
-                  :step="10"
-                  :max="150"
-                  :min="35"
-                  style="width: 200px;"
+                v-model="rowHeightMV"
+                :step="10"
+                :max="150"
+                :min="35"
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -67,11 +67,11 @@
             <span class="form-row-title">Column Width</span>
             <div class="form-row-contents">
               <ev-input-number
-                  v-model="columnWidthMV"
-                  :step="20"
-                  :max="300"
-                  :min="40"
-                  style="width: 200px;"
+                v-model="columnWidthMV"
+                :step="20"
+                :max="300"
+                :min="40"
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -81,7 +81,7 @@
             <span class="form-row-title">Show Header</span>
             <div class="form-row-contents">
               <ev-toggle
-                  v-model="showHeaderMV"
+                v-model="showHeaderMV"
               />
             </div>
           </div>
@@ -89,7 +89,7 @@
             <span class="form-row-title">Adjust</span>
             <div class="form-row-contents">
               <ev-toggle
-                  v-model="adjustMV"
+                v-model="adjustMV"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@
             <span class="form-row-title">Use Filter</span>
             <div class="form-row-contents">
               <ev-toggle
-                  v-model="useFilterMV"
+                v-model="useFilterMV"
               />
             </div>
           </div>
@@ -107,7 +107,7 @@
             <span class="form-row-title">Use Checkbox</span>
             <div class="form-row-contents">
               <ev-toggle
-                  v-model="useCheckboxMV"
+                v-model="useCheckboxMV"
               />
             </div>
           </div>
@@ -117,7 +117,7 @@
             <span class="form-row-title">Stripe Style</span>
             <div class="form-row-contents">
               <ev-toggle
-                  v-model="isStripeStyleMV"
+                v-model="isStripeStyleMV"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@
             <span class="form-row-title">Clear Data</span>
             <div class="form-row-contents">
               <ev-button
-                  @click="clearData"
+                @click="clearData"
               >
                 <ev-icon icon="ev-icon-trash3" />
                 Clear
@@ -139,14 +139,14 @@
             <div class="form-row-contents">
               <ev-button-group>
                 <ev-button
-                    type="primary"
-                    @click="changeMode('single')"
+                  type="primary"
+                  @click="changeMode('single')"
                 >
                   Single
                 </ev-button>
                 <ev-button
-                    type="warning"
-                    @click="changeMode('multi')"
+                  type="warning"
+                  @click="changeMode('multi')"
                 >
                   Multi
                 </ev-button>
@@ -159,10 +159,10 @@
             <span class="form-row-title">Current Checked Row</span>
             <div class="form-row-contents">
               <ev-text-field
-                  v-model="checkedRowsMV"
-                  type="textarea"
-                  readonly
-                  style="width: 200px;"
+                v-model="checkedRowsMV"
+                type="textarea"
+                readonly
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -172,10 +172,10 @@
             <span class="form-row-title">Clicked Row</span>
             <div class="form-row-contents">
               <ev-text-field
-                  v-model="clickedRowMV"
-                  type="textarea"
-                  readonly
-                  style="width: 200px;"
+                v-model="clickedRowMV"
+                type="textarea"
+                readonly
+                style="width: 200px;"
               />
             </div>
           </div>
@@ -183,10 +183,10 @@
             <span class="form-row-title">Double Clicked Row</span>
             <div class="form-row-contents">
               <ev-text-field
-                  v-model="DbClickedRowsMV"
-                  type="textarea"
-                  readonly
-                  style="width: 200px;"
+                v-model="DbClickedRowsMV"
+                type="textarea"
+                readonly
+                style="width: 200px;"
               />
             </div>
           </div>

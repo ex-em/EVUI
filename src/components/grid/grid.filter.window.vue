@@ -1,23 +1,23 @@
 <template>
   <ev-window
-      v-model:visible="showWindow"
-      @update:visible="onCloseWindow"
-      :width="'500px'"
-      :height="'510px'"
-      :title="`Setting Filter(${targetColumn.caption})`"
+    v-model:visible="showWindow"
+    :width="'500px'"
+    :height="'510px'"
+    :title="`Setting Filter(${targetColumn.caption})`"
+    @update:visible="onCloseWindow"
   >
     <!--Contents-->
     <div class="grid-filter">
       <div class="grid-filter-header">
         <!--Add Button-->
         <ev-button size="small" @click="onAdd">Add</ev-button>
-        <ev-button size="small" @click="onDelete" :disabled="!checked.length">Delete</ev-button>
+        <ev-button size="small" :disabled="!checked.length" @click="onDelete">Delete</ev-button>
       </div>
       <div class="grid-filter-body">
         <!--Add Form-->
         <div
-            v-if="showAddForm"
-            class="grid-filter-add-wrap"
+          v-if="showAddForm"
+          class="grid-filter-add-wrap"
         >
           <div class="grid-filter-add-item">
             <div class="form-row-contents">
@@ -25,9 +25,9 @@
                 <span class="form-row-title wide">Type</span>
                 <div class="form-row-contents">
                   <ev-select
-                      v-model="addInfo.type"
-                      :items="types"
-                      class="item-input"
+                    v-model="addInfo.type"
+                    :items="types"
+                    class="item-input"
                   />
                 </div>
               </div>
@@ -35,9 +35,9 @@
                 <span class="form-row-title wide">Comparison</span>
                 <div class="form-row-contents">
                   <ev-select
-                      v-model="addInfo.comparison"
-                      :items="getList(targetColumn.type)"
-                      class="item-input"
+                    v-model="addInfo.comparison"
+                    :items="getList(targetColumn.type)"
+                    class="item-input"
                   />
                 </div>
               </div>
@@ -45,10 +45,10 @@
                 <span class="form-row-title wide">Value</span>
                 <div class="form-row-contents">
                   <ev-text-field
-                      v-model.trim="addInfo.value"
-                      type="text"
-                      placeholder="Please enter the content"
-                      class="item-input"
+                    v-model.trim="addInfo.value"
+                    type="text"
+                    placeholder="Please enter the content"
+                    class="item-input"
                   />
                 </div>
               </div>
@@ -63,12 +63,12 @@
         </div>
         <!--Grid-->
         <ev-grid
-            v-model:checked="checked"
-            :rows="tableData"
-            :columns="columns"
-            :width="`100%`"
-            :height="gridHeight"
-            :option="{
+          v-model:checked="checked"
+          :rows="tableData"
+          :columns="columns"
+          :width="`100%`"
+          :height="gridHeight"
+          :option="{
               adjust: true,
               useFilter: false,
               useCheckbox: {
@@ -79,7 +79,7 @@
             }"
         />
         <!--Apply Button-->
-        <ev-button class="applyBtn" @click="onApply" type="primary">Apply</ev-button>
+        <ev-button class="applyBtn" type="primary" @click="onApply">Apply</ev-button>
       </div>
     </div>
   </ev-window>
@@ -275,29 +275,29 @@ export default {
       }
     };
     watch(
-        () => props.filterItems,
-        (items) => {
-          const columns = gridInfo.columns;
-          const rowList = [];
-          const checkList = [];
+      () => props.filterItems,
+      (items) => {
+        const columns = gridInfo.columns;
+        const rowList = [];
+        const checkList = [];
 
-          for (let ix = 0; ix < items.length; ix++) {
-            const item = items[ix];
-            const value = columns.reduce((acc, column) => {
-              acc.push(item[column.field]);
-              return acc;
-            }, []);
+        for (let ix = 0; ix < items.length; ix++) {
+          const item = items[ix];
+          const value = columns.reduce((acc, column) => {
+            acc.push(item[column.field]);
+            return acc;
+          }, []);
 
-            if (item.use) {
-              checkList.push(value);
-            }
-
-            rowList.push(value);
+          if (item.use) {
+            checkList.push(value);
           }
 
-          gridInfo.checked = checkList;
-          gridInfo.tableData = rowList;
-        },
+          rowList.push(value);
+        }
+
+        gridInfo.checked = checkList;
+        gridInfo.tableData = rowList;
+      },
     );
     return {
       showWindow,
