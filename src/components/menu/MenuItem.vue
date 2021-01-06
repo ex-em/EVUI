@@ -131,8 +131,8 @@ export default {
   }
 }
 .ev-menu-title {
-  position: relative;
   display: flex;
+  position: relative;
   padding: 3px 7px;
   margin-bottom: 6px;
   cursor: pointer;

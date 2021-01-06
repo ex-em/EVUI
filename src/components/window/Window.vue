@@ -6,7 +6,10 @@
     >
       <div
         v-if="visible"
-        class="ev-window-wrapper"
+        :class="[
+          'ev-window-wrapper',
+          { 'lock-scroll': lockScroll }
+        ]"
       >
         <div
           v-if="showModalLayer"
@@ -84,11 +87,11 @@ export default {
     },
     width: {
       type: String,
-      default: '50%',
+      default: '',
     },
     height: {
       type: String,
-      default: '50%',
+      default: '',
     },
     fullscreen: {
       type: Boolean,
@@ -115,11 +118,11 @@ export default {
      * body에 ev-window-modal DIV를 append하는 로직
      */
     const initWrapperDiv = () => {
-      const root = document.createElement('div');
-      root.id = 'ev-window-modal';
-      const hasRoot = document.getElementById('ev-window-modal');
-      if (!hasRoot) {
-        document.body.appendChild(root);
+      const root = document.getElementById('ev-window-modal');
+      if (!root) {
+        const rootDiv = document.createElement('div');
+        rootDiv.id = 'ev-window-modal';
+        document.body.appendChild(rootDiv);
       }
     };
     initWrapperDiv();
@@ -131,9 +134,21 @@ export default {
           height: '100%',
         };
       }
+      let widthObj = {};
+      let heightObj = {};
+      if (props.width) {
+        widthObj = {
+          width: props.width,
+        };
+      }
+      if (props.height) {
+        heightObj = {
+          height: props.height,
+        };
+      }
       return {
-        width: props.width,
-        height: props.height,
+        ...widthObj,
+        ...heightObj,
       };
     });
     /**
@@ -151,9 +166,13 @@ export default {
         document.body.style.height = '100vh';
         document.body.style.overflow = 'hidden';
       } else {
-        document.body.style.width = 'auto';
-        document.body.style.height = 'auto';
-        document.body.style.overflow = 'visible';
+        const root = document.getElementById('ev-window-modal');
+        const lockChildren = root.getElementsByClassName('lock-scroll');
+        if (lockChildren.length === 1) {
+          document.body.style.width = 'auto';
+          document.body.style.height = 'auto';
+          document.body.style.overflow = 'visible';
+        }
       }
     };
     onMounted(() => {
@@ -194,6 +213,9 @@ export default {
   position: fixed;
   top: 50%;
   left: 50%;
+  width: 50%;
+  height: 50%;
+  max-width: 100%;
   max-height: 100%;
   flex-direction: column;
   box-sizing: border-box;
