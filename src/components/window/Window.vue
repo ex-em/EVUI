@@ -6,10 +6,18 @@
     >
       <div
         v-if="visible"
-        :class="['ev-window-wrapper', windowClass]"
+        :class="[
+          'ev-window-wrapper',
+          { 'lock-scroll': lockScroll }
+        ]"
       >
         <div
-          class="ev-window"
+          v-if="showModalLayer"
+          class="ev-window-dim-layer"
+          @click="closeWin('layer')"
+        />
+        <div
+          :class="['ev-window', windowClass]"
           :style="windowStyle"
         >
           <div
@@ -56,7 +64,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+  import { computed, watch, onMounted } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -79,15 +87,27 @@ export default {
     },
     width: {
       type: String,
-      default: '50%',
+      default: '',
     },
     height: {
       type: String,
-      default: '50%',
+      default: '',
     },
     fullscreen: {
       type: Boolean,
       default: false,
+    },
+    showModalLayer: {
+      type: Boolean,
+      default: true,
+    },
+    closeOnClickModal: {
+      type: Boolean,
+      default: false,
+    },
+    lockScroll: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: {
@@ -98,12 +118,11 @@ export default {
      * body에 ev-window-modal DIV를 append하는 로직
      */
     const initWrapperDiv = () => {
-      const root = document.createElement('div');
-      root.id = 'ev-window-modal';
-      root.setAttribute('style', 'position: absolute; top: 0; left: 0;');
-      const hasRoot = document.getElementById('ev-window-modal');
-      if (!hasRoot) {
-        document.body.appendChild(root);
+      const root = document.getElementById('ev-window-modal');
+      if (!root) {
+        const rootDiv = document.createElement('div');
+        rootDiv.id = 'ev-window-modal';
+        document.body.appendChild(rootDiv);
       }
     };
     initWrapperDiv();
@@ -115,18 +134,57 @@ export default {
           height: '100%',
         };
       }
+      let widthObj = {};
+      let heightObj = {};
+      if (props.width) {
+        widthObj = {
+          width: props.width,
+        };
+      }
+      if (props.height) {
+        heightObj = {
+          height: props.height,
+        };
+      }
       return {
-        width: props.width,
-        height: props.height,
+        ...widthObj,
+        ...heightObj,
       };
     });
     /**
      * [x] 클릭 시 닫는 기능
      */
-    const closeWin = () => {
+    const closeWin = (from) => {
+      if (from === 'layer' && !props.closeOnClickModal) {
+        return;
+      }
       emit('update:visible', false);
     };
-
+    const setBodyLock = (val) => {
+      if (val) {
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+      } else {
+        const root = document.getElementById('ev-window-modal');
+        const lockChildren = root.getElementsByClassName('lock-scroll');
+        if (lockChildren.length === 1) {
+          document.body.style.width = 'auto';
+          document.body.style.height = 'auto';
+          document.body.style.overflow = 'visible';
+        }
+      }
+    };
+    onMounted(() => {
+      if (props.visible && props.lockScroll) {
+        setBodyLock(true);
+      }
+    });
+    watch(() => props.visible, (val) => {
+      if (props.lockScroll) {
+        setBodyLock(val);
+      }
+    });
     return {
       windowStyle,
       closeWin,
@@ -138,26 +196,26 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-window-wrapper {
-  display: flex;
+.ev-window-dim-layer {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 700;
   width: 100vw;
   height: 100vh;
-  justify-content: center;
-  align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity .2s ease-in-out;
+  z-index: 700;
 }
-
 .ev-window {
   $padding-vertical: 20px;
   $padding-horizontal: 17px;
 
   display: flex;
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  max-width: 100%;
   max-height: 100%;
   flex-direction: column;
   box-sizing: border-box;
@@ -165,14 +223,16 @@ export default {
   background-color: #FDFDFD;
   border: 1px solid #E3E3E3;
   transition: opacity .2s ease-in-out, transform .3s ease-in-out;
+  transform: translate(-50%, -50%);
   font-size: $font-size-medium;
   line-height: 1.5em;
+  z-index: 700;
 
   &-fade-enter-active,
   &-fade-leave-active {
     .ev-window {
       opacity: 0;
-      transform: translateY(-10%);
+      transform: translate(-50%, -60%);
     }
   }
 

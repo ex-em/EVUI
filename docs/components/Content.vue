@@ -14,9 +14,7 @@ export default {
 @import '../style/index.scss';
 
 .evui-content {
-  height: 100%;
   padding: 30px 40px;
-  overflow: auto;
 
   @include themify() {
     color: themed('font-color-base');
