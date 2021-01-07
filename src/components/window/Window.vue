@@ -64,7 +64,7 @@
 </template>
 
 <script>
-  import { computed, watch, onMounted } from 'vue';
+import { computed, watch, onMounted, onUnmounted } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -160,7 +160,7 @@ export default {
       }
       emit('update:visible', false);
     };
-    const setBodyLock = (val) => {
+    const setBodyLock = (val, type) => {
       if (val) {
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
@@ -168,7 +168,7 @@ export default {
       } else {
         const root = document.getElementById('ev-window-modal');
         const lockChildren = root.getElementsByClassName('lock-scroll');
-        if (lockChildren.length === 1) {
+        if (lockChildren.length === 1 || type === 'all') {
           document.body.style.width = 'auto';
           document.body.style.height = 'auto';
           document.body.style.overflow = 'visible';
@@ -180,6 +180,7 @@ export default {
         setBodyLock(true);
       }
     });
+    onUnmounted(() => setBodyLock(false, 'all'));
     watch(() => props.visible, (val) => {
       if (props.lockScroll) {
         setBodyLock(val);
