@@ -5,16 +5,22 @@
       class="ev-time-picker-range"
     >
       <div
-        :class="{ 'wrong-type': isWrongTypeStart }"
+        :class="{
+          error: isWrongType.rangeStart,
+          clearable,
+          disabled,
+          readonly,
+        }"
         class="ev-time-picker-wrapper"
       >
         <input
           v-model="startTime"
           class="ev-input"
+          :disabled="disabled"
+          :readonly="readonly"
           placeholder="start time"
           @focus="focusInputStartTime"
           @blur="blurInputStartTime"
-          @input="inputStartTime"
           @change="changeStartTime"
         />
         <ev-icon
@@ -30,16 +36,22 @@
       </div>
       <p class="tilde">~</p>
       <div
-        :class="{ 'wrong-type': isWrongTypeEnd }"
+        :class="{
+          error: isWrongType.rangeEnd,
+          clearable,
+          disabled,
+          readonly,
+        }"
         class="ev-time-picker-wrapper"
       >
         <input
           v-model="endTime"
           class="ev-input"
+          :disabled="disabled"
+          :readonly="readonly"
           placeholder="end time"
           @focus="focusInputEndTime"
           @blur="blurInputEndTime"
-          @input="inputEndTime"
           @change="changeEndTime"
         />
         <ev-icon
@@ -59,16 +71,22 @@
       class="ev-time-picker-single"
     >
       <div
-        :class="{ 'wrong-type': isWrongType }"
+        :class="{
+          error: isWrongType.single,
+          clearable,
+          disabled,
+          readonly,
+        }"
         class="ev-time-picker-wrapper"
       >
         <input
           v-model="time"
           class="ev-input"
+          :disabled="disabled"
+          :readonly="readonly"
           placeholder="Enter time"
           @focus="focusInputTime"
           @blur="blurInputTime"
-          @input="inputTime"
           @change="changeTime"
         />
         <ev-icon
@@ -87,7 +105,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 
 export default {
   name: 'EvTimePicker',
@@ -104,21 +122,46 @@ export default {
       type: Boolean,
       default: false,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
-    'update:modelValue': null,
+    'update:modelValue': (time) => {
+      const timeRegexExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
+      if (Array.isArray(time)) {
+        // range mode
+        const startTime = time[0];
+        const endTime = time[1];
+        return timeRegexExp.test(startTime) && timeRegexExp.test(endTime);
+      }
+      // single mode
+      return timeRegexExp.test(time);
+    },
     focus: null,
     blur: null,
-    input: null,
     change: null,
   },
   setup(props, { emit }) {
     let startTime = ref('');
     let endTime = ref('');
     let time = ref('');
-    const isWrongType = ref(false);
-    const isWrongTypeStart = ref(false);
-    const isWrongTypeEnd = ref(false);
+    const previousValue = reactive({
+      singleTime: props.modelValue,
+      rangeStartTime: props.modelValue[0] || '',
+      rangeEndTime: props.modelValue[1] || '',
+    });
+    const isWrongType = reactive({
+      single: false,
+      rangeStart: false,
+      rangeEnd: false,
+    });
 
     if (props.type === 'range') {
       if (Array.isArray(props.modelValue)) {
@@ -135,14 +178,25 @@ export default {
     };
 
     const validRange = () => {
-      // check type first
-      isWrongTypeStart.value = !validTimeExp(startTime.value);
-      isWrongTypeEnd.value = !validTimeExp(endTime.value);
+      if (!validTimeExp(startTime.value)) {
+        startTime.value = previousValue.rangeStartTime;
+      } else {
+        previousValue.rangeStartTime = startTime.value;
+      }
+
+      if (!validTimeExp(endTime.value)) {
+        endTime.value = previousValue.rangeEndTime;
+      } else {
+        previousValue.rangeEndTime = endTime.value;
+      }
+
+      isWrongType.rangeStart = !validTimeExp(startTime.value);
+      isWrongType.rangeEnd = !validTimeExp(endTime.value);
 
       // check range
       if (endTime.value < startTime.value) {
-        isWrongTypeStart.value = true;
-        isWrongTypeEnd.value = true;
+        isWrongType.rangeStart = true;
+        isWrongType.rangeEnd = true;
         console.log('The end time should be greater than the start time.');
       }
     };
@@ -156,13 +210,9 @@ export default {
       emit('blur', e);
     };
 
-    const inputStartTime = (e) => {
-      emit('input', e, startTime.value);
-      emit('update:modelValue', [startTime.value, endTime.value]);
-    };
-
     const changeStartTime = (e) => {
       validRange();
+      emit('update:modelValue', [startTime.value, endTime.value]);
       emit('change', e, [startTime.value, endTime.value]);
     };
 
@@ -179,13 +229,9 @@ export default {
       emit('blur', e);
     };
 
-    const inputEndTime = (e) => {
-      emit('input', e, endTime.value);
-      emit('update:modelValue', [startTime.value, endTime.value]);
-    };
-
     const changeEndTime = (e) => {
       validRange();
+      emit('update:modelValue', [startTime.value, endTime.value]);
       emit('change', e, [startTime.value, endTime.value]);
     };
 
@@ -202,13 +248,16 @@ export default {
       emit('blur', e);
     };
 
-    const inputTime = (e) => {
-      emit('input', e, time.value);
-      emit('update:modelValue', time.value);
-    };
-
     const changeTime = (e) => {
-      isWrongType.value = !validTimeExp(time.value);
+      if (!validTimeExp(time.value)) {
+        time.value = previousValue.singleTime;
+      } else {
+        previousValue.singleTime = time.value;
+      }
+
+      isWrongType.single = !validTimeExp(time.value);
+
+      emit('update:modelValue', time.value);
       emit('change', e, time.value);
     };
 
@@ -220,31 +269,28 @@ export default {
       startTime,
       endTime,
       time,
-      isWrongTypeStart,
-      isWrongTypeEnd,
       isWrongType,
+      previousValue,
       clearContents,
       clearStartTime,
       clearEndTime,
       focusInputTime,
       blurInputTime,
-      inputTime,
       changeTime,
       focusInputStartTime,
       blurInputStartTime,
-      inputStartTime,
       changeStartTime,
       focusInputEndTime,
       blurInputEndTime,
-      inputEndTime,
       changeEndTime,
     };
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../style/index.scss';
+@import '../../style/components/input.scss';
 
 .ev-time-picker {
   width: 100%;
@@ -270,29 +316,7 @@ export default {
     height: 100%;
 
     .ev-input {
-      width: 100%;
-      height: 100%;
       padding: 0 30px;
-
-      @include evThemify() {
-        border: 1px solid evThemed('border-base');
-      }
-
-      &:hover, &:focus {
-        @include evThemify() {
-          border: 1px solid evThemed('primary');
-        }
-      }
-
-      &:focus {
-        outline: none;
-      }
-    }
-  }
-
-  .wrong-type {
-    @include evThemify() {
-      border: 2px solid evThemed('error');
     }
   }
 

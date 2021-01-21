@@ -29,6 +29,22 @@
       clearable
     />
   </div>
+  <div class="case">
+    <p class="case-title">Disabled</p>
+    <ev-time-picker
+      v-model="disabledTime"
+      type="single"
+      disabled
+    />
+  </div>
+  <div class="case">
+    <p class="case-title">ReadOnly</p>
+    <ev-time-picker
+      v-model="readOnlyTime"
+      type="single"
+      readonly
+    />
+  </div>
 </template>
 
 <script>
@@ -37,8 +53,10 @@ import { ref } from 'vue';
 export default {
   setup() {
     const commonTime = ref('');
+    const readOnlyTime = ref('00:00');
     const clearableTime = ref('01:00');
-    const rangeTime = ref(['12:00', '23:00']);
+    const disabledTime = ref('09:00');
+    const rangeTime = ref(['12:00', '23:59']);
     const changeTime = (e, value) => {
       console.log(e, value);
     };
@@ -46,7 +64,9 @@ export default {
     return {
       commonTime,
       clearableTime,
+      disabledTime,
       rangeTime,
+      readOnlyTime,
       changeTime,
     };
   },
