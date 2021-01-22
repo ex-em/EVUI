@@ -23,6 +23,7 @@ import loadingProps from 'docs/views/loading/props';
 import progressProps from 'docs/views/progress/props';
 import menuProps from 'docs/views/menu/props';
 import treeProps from 'docs/views/tree/props';
+import timePickerProps from 'docs/views/timePicker/props';
 
 const routes = [
   {
@@ -170,6 +171,15 @@ const routes = [
     name: 'Scheduler',
     component: PageView,
     props: schedulerProps,
+    meta: {
+      category: 'Form',
+    },
+  },
+  {
+    path: '/timePicker',
+    name: 'TimePicker',
+    component: PageView,
+    props: timePickerProps,
     meta: {
       category: 'Form',
     },
