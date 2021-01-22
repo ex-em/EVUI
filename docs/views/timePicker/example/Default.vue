@@ -21,13 +21,25 @@
       {{ commonTime }}
     </div>
   </div>
-  <div class="case">
+  <div class="case clearable-example">
     <p class="case-title">Clearable</p>
     <ev-time-picker
       v-model="clearableTime"
       type="single"
       clearable
     />
+    <div class="description blank-mb">
+      <span class="badge">Time</span>
+      {{ clearableTime }}
+    </div>
+    <ev-time-picker
+      v-model="clearableRangeTime"
+      clearable
+    />
+    <div class="description">
+      <span class="badge">Time</span>
+      {{ clearableRangeTime }}
+    </div>
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
@@ -52,11 +64,12 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const commonTime = ref('');
+    const commonTime = ref('09:00');
     const readOnlyTime = ref('00:00');
     const clearableTime = ref('01:00');
     const disabledTime = ref('09:00');
     const rangeTime = ref(['12:00', '23:59']);
+    const clearableRangeTime = ref(['07:00', '17:30']);
     const changeTime = (e, value) => {
       console.log(e, value);
     };
@@ -64,6 +77,7 @@ export default {
     return {
       commonTime,
       clearableTime,
+      clearableRangeTime,
       disabledTime,
       rangeTime,
       readOnlyTime,
@@ -74,4 +88,9 @@ export default {
 </script>
 
 <style lang="scss">
+.clearable-example {
+  .blank-mb {
+    margin-bottom: 25px;
+  }
+}
 </style>
