@@ -24,6 +24,7 @@ import progressProps from 'docs/views/progress/props';
 import menuProps from 'docs/views/menu/props';
 import treeProps from 'docs/views/tree/props';
 import timePickerProps from 'docs/views/timePicker/props';
+import barChartProps from 'docs/views/barChart/props';
 
 const routes = [
   {
@@ -212,7 +213,8 @@ const routes = [
   {
     path: '/barChart',
     name: 'BarChart',
-    component: () => import(/* webpackChunkName: "barChart" */ '../views/barChart'),
+    component: PageView,
+    props: barChartProps,
     meta: {
       category: 'Chart',
     },
