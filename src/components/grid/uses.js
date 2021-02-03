@@ -14,29 +14,20 @@ export const commonFunctions = () => {
      * @param {object} column - 컬럼 정보
      * @returns {boolean} 사용자 지정 컬럼 유무
      */
-    const isRenderer = (column = {}) => column.render && column.render.use;
-    const getComponentName = (type) => {
-        switch (type) {
-            case 'checkbox':
-                return 'CheckboxRenderer';
-            case 'button': {
-                return 'ButtonRenderer';
+    const isRenderer = (column = {}) => !!column?.render?.use;
+    const getComponentName = (type = '') => {
+        const setUpperCaseFirstStr = str => str.charAt(0).toUpperCase() + str.slice(1);
+        const rendererStr = 'Renderer';
+        let typeStr = '';
+        if (type.indexOf('_') !== -1) {
+            const typeStrArray = type.split('_');
+            for (let ix = 0; ix < typeStrArray.length; ix++) {
+                typeStr += setUpperCaseFirstStr(typeStrArray[ix]);
             }
-            case 'inputNumber': {
-                return 'InputNumberRenderer';
-            }
-            case 'select': {
-                return 'SelectRenderer';
-            }
-            case 'toggle': {
-                return 'ToggleRenderer';
-            }
-            case 'progress': {
-                return 'ProgressRenderer';
-            }
-            default:
-                return '';
+        } else {
+            typeStr = setUpperCaseFirstStr(type);
         }
+        return typeStr + rendererStr;
     };
     /**
      * 데이터 타입에 따라 변환된 데이터을 반환한다.
@@ -139,7 +130,7 @@ export const scrollEvent = (params) => {
 
 export const resizeEvent = (params) => {
     const { props } = getCurrentInstance();
-    const { resizeInfo, dom, checkInfo, stores, isRenderer } = params;
+    const { resizeInfo, dom, checkInfo, stores, isRenderer, updateVScroll } = params;
     /**
      * 해당 컬럼 인덱스가 마지막인지 확인한다.
      *
@@ -217,7 +208,13 @@ export const resizeEvent = (params) => {
         });
 
         if (remainWidth) {
-            stores.orderedColumns[stores.orderedColumns.length - 1].width += remainWidth;
+            let index = stores.orderedColumns.length - 1;
+            let lastColumn = stores.orderedColumns[index];
+            while (lastColumn.hide) {
+                index -= 1;
+                lastColumn = stores.orderedColumns[index];
+            }
+            lastColumn.width += remainWidth;
         }
     };
     /**
@@ -237,6 +234,7 @@ export const resizeEvent = (params) => {
         }
 
         calculatedColumn();
+        updateVScroll();
     };
     /**
      * column resize 이벤트를 처리한다.
@@ -314,6 +312,10 @@ export const clickEvent = (params) => {
      * @param {array} row - row 데이터
      */
     const onRowClick = (event, row) => {
+        if (event.target && event.target.parentElement
+            && event.target.parentElement.classList.contains('row-checkbox-input')) {
+            return false;
+        }
         if (selectInfo.useSelect) {
             const cellInfo = event.target.dataset;
             const rowData = row[ROW_DATA_INDEX];
@@ -323,6 +325,7 @@ export const clickEvent = (params) => {
             emit('update:selected', rowData);
             emit('click-row', event, rowIndex, cellInfo.name, cellInfo.index, rowData);
         }
+        return true;
     };
     /**
      * row dblclick 이벤트를 처리한다.
