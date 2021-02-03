@@ -54,7 +54,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    filteredValue: {
+    searchWord: {
       type: String,
       default: '',
     },
@@ -247,9 +247,9 @@ export default {
         const node = nodeObj.node;
         node.visible = true;
         // make children invisible, traverse down
-        makeChildrenInvisible(nodeObj.node);
+        makeChildrenInvisible(node);
         // make parent visible, traverse up
-        const parentKey = allNodeInfo[nodeObj.node.nodeKey].parent;
+        const parentKey = allNodeInfo[node.nodeKey].parent;
         makeParentVisible(parentKey);
       });
     }
@@ -260,9 +260,9 @@ export default {
     });
 
 
-    watch(() => props.filteredValue, (newFilteredValue) => {
-      if (newFilteredValue) {
-        filterNode(newFilteredValue);
+    watch(() => props.searchWord, (newSearchWord) => {
+      if (newSearchWord) {
+        filterNode(newSearchWord);
       } else {
         allNodeInfo.forEach((nodeObj) => {
           const node = nodeObj.node;

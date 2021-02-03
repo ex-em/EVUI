@@ -86,9 +86,9 @@
       @search="searchInput"
     />
     <ev-tree
-      :data="searchExExData"
+      :data="searchExData"
       :use-checkbox="true"
-      :filtered-value="searchValue"
+      :search-word="searchValue"
     />
     <div class="description">
       'ev-text-field' 컴포넌트를 사용해 필터링할 단어를 검색하면 'ev-tree' 컴포넌트 내부에서 검색되는 구조입니다.
@@ -287,7 +287,7 @@ export default {
         ],
       },
     ]);
-    const searchExExData = ref([
+    const searchExData = ref([
       {
         title: 'Root',
         expand: true,
@@ -419,7 +419,7 @@ export default {
       disableExData,
       contextmenuExData,
       iconClassExData,
-      searchExExData,
+      searchExData,
       menuItems,
       clickedNodeInfo,
       dbclickedNodeInfo,
