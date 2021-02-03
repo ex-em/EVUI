@@ -1,12 +1,12 @@
 <template>
   <ev-checkbox
-    v-model:modelValue="mv"
+    v-model="mv"
     :label="option.label"
     @change="clickedHandler"
   />
 </template>
 <script>
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 export default {
   props: {
@@ -19,10 +19,15 @@ export default {
       default: () => ({ message: '' }),
     },
   },
+  emits: {
+    'change-renderer': null,
+  },
   setup(props, { emit }) {
-    const mv = ref(props.item.value);
+    const mv = computed({
+      get: () => props.item.value,
+      set: val => emit('change-renderer', props.item.rowIndex, props.item.cellIndex, val),
+    });
     const clickedHandler = (e) => {
-      emit('change-renderer', props.item.rowIndex, props.item.cellIndex, e, props.item.value);
       if (props.option.onClick) {
         props.option.onClick(e);
       }

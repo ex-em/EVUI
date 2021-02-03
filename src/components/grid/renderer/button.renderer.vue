@@ -6,7 +6,10 @@
     size="small"
     @click="clickedHandler"
   >
-    <ev-icon v-if="option.btnIcon" :icon="option.btnIcon" />
+    <ev-icon
+      v-if="option.btnIcon"
+      :icon="option.btnIcon"
+    />
     {{ option.btnName }}
   </ev-button>
 </template>

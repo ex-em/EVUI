@@ -3,11 +3,10 @@
     v-model="mv"
     :max="option.maxValue || 100"
     :min="option.minValue || 0"
-    @change="clickedHandler"
   />
 </template>
 <script>
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 export default {
   props: {
@@ -20,15 +19,15 @@ export default {
       default: () => ({ message: '' }),
     },
   },
+  emits: {
+    'change-renderer': null,
+  },
   setup(props, { emit }) {
-    const mv = ref(props.item.value);
-    const clickedHandler = (newValue) => {
-      if (newValue !== props.item.value) {
-        emit('change-renderer', props.item.rowIndex, props.item.cellIndex, newValue, props.item.value);
-      }
-    };
+    const mv = computed({
+      get: () => props.item.value,
+      set: val => emit('change-renderer', props.item.rowIndex, props.item.cellIndex, val),
+    });
     return {
-      clickedHandler,
       mv,
     };
   },
