@@ -1,16 +1,19 @@
 <template>
   <div
+    ref="grid-wrapper"
+    v-resize="onResize"
     class="grid-wrapper"
     :style="`width: ${gridWidth}; height: ${gridHeight};`"
   >
     <!--Table-->
     <div
       v-cloak
+      ref="grid"
       :class="{
-            table: true,
-            adjust: adjust,
-            'non-header': !showHeader,
-          }"
+        table: true,
+        adjust: adjust,
+        'non-header': !showHeader,
+      }"
     >
       <!--Header-->
       <div
@@ -27,8 +30,8 @@
           >
             <ev-checkbox
               v-if="useCheckbox.use
-                        && useCheckbox.headerCheck
-                        && useCheckbox.mode !== 'single'"
+                && useCheckbox.headerCheck
+                && useCheckbox.mode !== 'single'"
               v-model="isHeaderChecked"
               @change="onCheckAll"
             />
@@ -42,36 +45,34 @@
               v-if="!column.hide"
               :data-index="index"
               :class="{
-                    column: true,
-                    render: isRenderer(column),
-                  }"
+                column: true,
+                render: isRenderer(column),
+              }"
               :style="`
-                    width: ${column.width}px;
-                    min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;
-                  `"
+                width: ${column.width}px;
+                min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
             >
               <!--Filter Status-->
               <span
                 v-if="isFiltering
-                          &&filterList[column.field]
-                          &&filterList[column.field].find(item => item.use)"
+                  &&filterList[column.field]
+                  &&filterList[column.field].find(item => item.use)"
                 class="column-filter-status"
               >
-                  <ev-icon icon="ev-icon-filter"/>
-                </span>
+                <ev-icon icon="ev-icon-filter"/>
+              </span>
               <!--Column Name-->
               <span
                 :title="column.caption"
                 class="column-name"
                 @click.stop="onSort(column.field)"
               >
-                  {{ column.caption }}
-                </span>
+                {{ column.caption }}
+              </span>
               <!--Sort Icon-->
               <ev-icon
                 v-if="sortField === column.field"
-                :icon="`${sortOrder === 'desc' ?
-                            'ev-icon-triangle-down' : 'ev-icon-triangle-up'}`"
+                :icon="`${sortOrder === 'desc' ? 'ev-icon-triangle-down' : 'ev-icon-triangle-up'}`"
               />
               <!--Filter Button-->
               <span
@@ -79,8 +80,8 @@
                 class="column-filter"
                 @click.capture="onClickFilter(column)"
               >
-                  <ev-icon icon="ev-icon-hamburger2"/>
-                </span>
+                <ev-icon icon="ev-icon-hamburger2"/>
+              </span>
               <!--Column Resize-->
               <span
                 class="column-resize"
@@ -94,10 +95,10 @@
       <div
         ref="body"
         :class="{
-              'table-body': true,
-              'bottom-border': !viewStore.length ? false : true,
-              stripe: isStripeStyle
-            }"
+          'table-body': true,
+          'bottom-border': !viewStore.length ? false : true,
+          stripe: isStripeStyle
+        }"
         @scroll="onScroll"
         @contextmenu="onContextMenu($event)"
         @contextmenu.prevent="menu.show"
@@ -114,9 +115,7 @@
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
             :data-index="rowIndex"
-            :class="{
-                  selected: row[2] === selectedRow
-                }"
+            :class="{ selected: row[2] === selectedRow }"
             @click="onRowClick($event, row)"
             @dblclick="onRowDblClick($event, row)"
           >
@@ -128,6 +127,7 @@
             >
               <ev-checkbox
                 v-model="row[1]"
+                class="row-checkbox-input"
                 @change="onCheck($event, row)"
               />
             </td>
@@ -138,26 +138,25 @@
                 :data-name="column.field"
                 :data-index="column.index"
                 :class="{
-                        [column.type]: column.type,
-                        [column.align]: column.align,
-                        render: isRenderer(column)
-                      }"
+                  [column.type]: column.type,
+                  [column.align]: column.align,
+                  render: isRenderer(column)
+                }"
                 :style="`
-                        width: ${column.width}px;
-                        height: ${rowHeight}px;
-                        line-height: ${rowHeight}px;
-                        min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;
-                      `"
+                  width: ${column.width}px;
+                  height: ${rowHeight}px;
+                  line-height: ${rowHeight}px;
+                  min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
               >
                 <component
                   :is="getComponentName(column.render.type)"
                   v-if="isRenderer(column)"
                   :item="{
-                          row: row[2],
-                          rowIndex: row[0],
-                          cellIndex: column.index,
-                          value: row[2][column.index],
-                        }"
+                    row: row[2],
+                    rowIndex: row[0],
+                    cellIndex: column.index,
+                    value: row[2][column.index],
+                  }"
                   :option="column.render.option"
                   @change-renderer="updateData"
                 />
@@ -165,8 +164,8 @@
                   v-else
                   :title="getConvertValue(column.type, row[2][column.index])"
                 >
-                      {{ getConvertValue(column.type, row[2][column.index]) }}
-                    </span>
+                  {{ getConvertValue(column.type, row[2][column.index]) }}
+                </span>
               </td>
             </template>
           </tr>
@@ -203,7 +202,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, computed, watch, onMounted } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted } from 'vue';
 import FilterWindow from './grid.filter.window';
 import CheckboxRenderer from './renderer/checkbox.renderer';
 import ButtonRenderer from './renderer/button.renderer';
@@ -258,9 +257,17 @@ export default {
       default: () => [],
     },
     option: {
-      type: [Array],
-      default: () => [],
+      type: Object,
+      default: () => {},
     },
+  },
+  emits: {
+    'update:selected': null,
+    'click-row': null,
+    'dblclick-row': null,
+    'update:checked': null,
+    'check-one': null,
+    'check-all': null,
   },
   setup(props) {
     const {
@@ -271,13 +278,14 @@ export default {
       setPixelUnit,
     } = commonFunctions();
 
-    const showHeader = ref(computed(() =>
-      (props.option.showHeader === undefined ? true : props.option.showHeader)));
-    const isStripeStyle = ref(computed(() => (props.option.stripeRows || false)));
+    const showHeader = computed(() =>
+      (props.option.showHeader === undefined ? true : props.option.showHeader));
+    const isStripeStyle = computed(() => (props.option.stripeRows || false));
     const dom = reactive({
       body: null,
       header: null,
       resizeLine: null,
+      'grid-wrapper': null,
     });
     const filterInfo = reactive({
       filterList: {},
@@ -318,7 +326,7 @@ export default {
     });
     const selectInfo = reactive({
       useSelect: props.option.useSelect === undefined ? true : props.option.useSelect,
-      selectedRow: computed(() => (props.selected)),
+      selectedRow: props.selected,
     });
     const sortInfo = reactive({
       setSorting: false,
@@ -335,8 +343,8 @@ export default {
       rendererMinWidth: 80,
       showResizeLine: false,
       adjust: computed(() => (props.option.adjust || false)),
-      columnWidth: computed(() => (props.option.columnWidth || 80)),
-      scrollWidth: props.option.scrollWidth || 20,
+      columnWidth: props.option.columnWidth || 80,
+      scrollWidth: props.option.scrollWidth || 17,
       rowHeight: computed(() =>
         (props.option.rowHeight && props.option.rowHeight > 35 ? props.option.rowHeight : 35)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
@@ -348,12 +356,6 @@ export default {
       updateHScroll,
       onScroll,
     } = scrollEvent({ scrollInfo, stores, dom, resizeInfo });
-
-    const {
-      calculatedColumn,
-      onResize,
-      onColumnResize,
-    } = resizeEvent({ resizeInfo, dom, checkInfo, stores, isRenderer });
 
     const {
       onRowClick,
@@ -390,6 +392,12 @@ export default {
       setFilter,
       updateVScroll,
     });
+
+    const {
+      calculatedColumn,
+      onResize,
+      onColumnResize,
+    } = resizeEvent({ resizeInfo, dom, checkInfo, stores, isRenderer, updateVScroll });
 
     const {
       setContextMenu,
@@ -440,10 +448,13 @@ export default {
         checkInfo.checkedRows = value;
       },
     );
-    // TEST
     watch(
-      () => [resizeInfo.adjust, resizeInfo.columnWidth],
+      () => [resizeInfo.adjust, props.option.columnWidth, resizeInfo.gridWidth],
       () => {
+        resizeInfo.columnWidth = props.option.columnWidth;
+        const gridWrapper = dom['grid-wrapper'];
+        gridWrapper.style.width = resizeInfo.gridWidth;
+        gridWrapper.style.height = resizeInfo.gridHeight;
         stores.orderedColumns.map((column) => {
           const item = column;
 
@@ -454,10 +465,8 @@ export default {
           return item;
         }, this);
         onResize();
-        updateVScroll();
       },
     );
-    //
     return {
       showHeader,
       isStripeStyle,
@@ -555,7 +564,7 @@ export default {
 
   &:nth-last-child(1) {
     border-right: 0;
-    margin-right: +20px;
+    margin-right: 20px;
 
     .column-resize {
       cursor: default !important;
