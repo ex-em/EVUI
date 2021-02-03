@@ -1,102 +1,122 @@
 <template>
-  <ev-window
-    v-model:visible="showWindow"
-    :width="'500px'"
-    :height="'510px'"
-    :title="`Setting Filter(${targetColumn.caption})`"
-    @update:visible="onCloseWindow"
-  >
-    <!--Contents-->
-    <div class="grid-filter">
-      <div class="grid-filter-header">
-        <!--Add Button-->
-        <ev-button size="small" @click="onAdd">Add</ev-button>
-        <ev-button size="small" :disabled="!checked.length" @click="onDelete">Delete</ev-button>
-      </div>
-      <div class="grid-filter-body">
-        <!--Add Form-->
-        <div
-          v-if="showAddForm"
-          class="grid-filter-add-wrap"
-        >
-          <div class="grid-filter-add-item">
-            <div class="form-row-contents">
-              <div class="form-row">
-                <span class="form-row-title wide">Type</span>
-                <div class="form-row-contents">
-                  <ev-select
-                    v-model="addInfo.type"
-                    :items="types"
-                    class="item-input"
-                  />
+  <div>
+    <ev-window
+      v-model:visible="showWindow"
+      :width="'500px'"
+      :height="'510px'"
+      :title="`Setting Filter(${targetColumn.caption})`"
+    >
+      <!--Contents-->
+      <div class="grid-filter">
+        <div class="grid-filter-header">
+          <!--Add Button-->
+          <ev-button
+            size="small"
+            @click="onAdd"
+          >
+            Add
+          </ev-button>
+          <ev-button
+            size="small"
+            :disabled="!checked.length"
+            @click="onDelete"
+          >
+            Delete
+          </ev-button>
+        </div>
+        <div class="grid-filter-body">
+          <!--Add Form-->
+          <div
+            v-if="showAddForm"
+            class="grid-filter-add-wrap"
+          >
+            <div class="grid-filter-add-item">
+              <div class="form-row-contents">
+                <div class="form-row">
+                  <span class="form-row-title wide">Type</span>
+                  <div class="form-row-contents">
+                    <ev-select
+                      v-model="addInfo.type"
+                      :items="types"
+                      class="item-input"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div class="form-row">
-                <span class="form-row-title wide">Comparison</span>
-                <div class="form-row-contents">
-                  <ev-select
-                    v-model="addInfo.comparison"
-                    :items="getList(targetColumn.type)"
-                    class="item-input"
-                  />
+                <div class="form-row">
+                  <span class="form-row-title wide">Comparison</span>
+                  <div class="form-row-contents">
+                    <ev-select
+                      v-model="addInfo.comparison"
+                      :items="getList(targetColumn.type)"
+                      class="item-input"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div class="form-row">
-                <span class="form-row-title wide">Value</span>
-                <div class="form-row-contents">
-                  <ev-text-field
-                    v-model.trim="addInfo.value"
-                    type="text"
-                    placeholder="Please enter the content"
-                    class="item-input"
-                  />
+                <div class="form-row">
+                  <span class="form-row-title wide">Value</span>
+                  <div class="form-row-contents">
+                    <ev-text-field
+                      v-model.trim="addInfo.value"
+                      type="text"
+                      placeholder="Please enter the content"
+                      class="item-input"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="split-line"/>
+            <div class="confirm-wrap">
+              <!--Save Button-->
+              <ev-button
+                size="small"
+                @click="onSave"
+              >
+                Save
+              </ev-button>
+              <ev-button
+                size="small"
+                @click="onCancel"
+              >
+                Cancel
+              </ev-button>
+            </div>
           </div>
-          <div class="split-line"/>
-          <div class="confirm-wrap">
-            <!--Save Button-->
-            <ev-button size="small" @click="onSave">Save</ev-button>
-            <ev-button size="small" @click="onCancel">Cancel</ev-button>
-          </div>
+          <!--Grid-->
+          <ev-grid
+            v-model:checked="checked"
+            :rows="tableData"
+            :columns="columns"
+            :width="`100%`"
+            :height="gridHeight"
+            :option="{
+            adjust: true,
+            useFilter: false,
+            useCheckbox: {
+              use: true,
+              mode: 'multi',
+              headerCheck: true,
+            }
+          }"
+          />
+          <!--Apply Button-->
+          <ev-button
+            class="applyBtn"
+            type="primary"
+            @click="onApply"
+          >
+            Apply
+          </ev-button>
         </div>
-        <!--Grid-->
-        <ev-grid
-          v-model:checked="checked"
-          :rows="tableData"
-          :columns="columns"
-          :width="`100%`"
-          :height="gridHeight"
-          :option="{
-              adjust: true,
-              useFilter: false,
-              useCheckbox: {
-                use: true,
-                mode: 'multi',
-                headerCheck: true,
-              }
-            }"
-        />
-        <!--Apply Button-->
-        <ev-button class="applyBtn" type="primary" @click="onApply">Apply</ev-button>
       </div>
-    </div>
-  </ev-window>
+    </ev-window>
+  </div>
 </template>
 
 <script>
 import { ref, reactive, toRefs, watch, computed } from 'vue';
 
 export default {
-  filters: {
-    capitalize(value) {
-      if (!value) {
-        return '';
-      }
-      return value.charAt(0).toUpperCase() + value.slice(1);
-    },
-  },
   props: {
     /**
      * 필터 팝업 표시 유무
@@ -120,8 +140,11 @@ export default {
       default: () => [],
     },
   },
+  emits: {
+    'apply-filter': null,
+    'before-close': null,
+  },
   setup(props, { emit }) {
-    const showWindow = ref(computed(() => (props.isShow)));
     const showAddForm = ref(false);
     const gridHeight = ref(320);
     const gridInfo = reactive({
@@ -153,6 +176,21 @@ export default {
           { name: '<', value: '<' },
           { name: '=', value: '=' },
         ],
+      },
+    });
+    const showWindow = computed({
+      get: () => props.isShow,
+      set: (val) => {
+        if (!val) {
+          gridInfo.checked.length = 0;
+          gridInfo.tableData.length = 0;
+          gridHeight.value = 320;
+          showAddForm.value = false;
+          /**
+           * 필터 팝업 종료 전 이벤트
+           */
+          emit('before-close');
+        }
       },
     });
     /**
