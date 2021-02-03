@@ -115,12 +115,12 @@ export default {
         node.nodeKey = keyCounter++;
 
         // add 'selected' property for highlighting clicked node
-        if (!('selected' in node)) {
+        if (!Object.hasOwnProperty.call(node, 'selected')) {
           node.selected = false;
         }
 
         // add 'visible' property for filtering node
-        if (!('visible' in node)) {
+        if (!Object.hasOwnProperty.call(node, 'visible')) {
           node.visible = true;
         }
 
