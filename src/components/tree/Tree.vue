@@ -54,6 +54,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    filteredValue: {
+      type: String,
+      default: '',
+    },
   },
   emits: {
     'click-node': null,
@@ -113,6 +117,11 @@ export default {
         // add 'selected' property for highlighting clicked node
         if (!('selected' in node)) {
           node.selected = false;
+        }
+
+        // add 'visible' property for filtering node
+        if (!('visible' in node)) {
+          node.visible = true;
         }
 
         // check 'value' property and add nodeKey if same value already exists
@@ -205,9 +214,61 @@ export default {
       showContextMenu(e);
     };
 
+    function makeChildrenInvisible(node) {
+      if (node.children) {
+        node.children.forEach((child) => {
+          child.visible = false; // eslint-disable-line no-param-reassign
+          makeChildrenInvisible(child);
+        });
+      }
+    }
+
+    function makeParentVisible(parentKey) {
+      if (!parentKey && parentKey !== 0) {
+        return;
+      }
+
+      const parent = allNodeInfo[parentKey];
+      parent.node.visible = true;
+      if (parent.parent !== undefined) {
+        makeParentVisible(parent.parent);
+      }
+    }
+
+    function filterNode(value) {
+      allNodeInfo.forEach((nodeObj) => {
+        const node = nodeObj.node;
+        node.visible = false;
+      });
+
+      const filteredNodes = allNodeInfo.filter(nodeObj => nodeObj.node.title.includes(value));
+
+      filteredNodes.forEach((nodeObj) => {
+        const node = nodeObj.node;
+        node.visible = true;
+        // make children invisible, traverse down
+        makeChildrenInvisible(nodeObj.node);
+        // make parent visible, traverse up
+        const parentKey = allNodeInfo[nodeObj.node.nodeKey].parent;
+        makeParentVisible(parentKey);
+      });
+    }
+
     watch(props.data, (newData) => {
       treeNodeData = newData;
       allNodeInfo = getAllNodeInfo();
+    });
+
+
+    watch(() => props.filteredValue, (newFilteredValue) => {
+      if (newFilteredValue) {
+        filterNode(newFilteredValue);
+      } else {
+        allNodeInfo.forEach((nodeObj) => {
+          const node = nodeObj.node;
+          node.visible = true;
+        });
+      }
     });
 
     onMounted(() => {
@@ -234,5 +295,5 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 </style>
