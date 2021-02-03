@@ -9,19 +9,19 @@
       :width="widthMV"
       :height="heightMV"
       :option="{
-          adjust: adjustMV,
-          showHeader: showHeaderMV,
-          stripeRows: isStripeStyleMV,
-          rowHeight: rowHeightMV,
-          columnWidth: columnWidthMV,
-          useFilter: useFilterMV,
-          useCheckbox: {
-            use: useCheckboxMV,
-            mode: checkboxModeMV,
-            headerCheck: headerCheckMV,
-          },
-          customContextMenu: menuItems,
-        }"
+        adjust: adjustMV,
+        showHeader: showHeaderMV,
+        stripeRows: isStripeStyleMV,
+        rowHeight: rowHeightMV,
+        columnWidth: columnWidthMV,
+        useFilter: useFilterMV,
+        useCheckbox: {
+          use: useCheckboxMV,
+          mode: checkboxModeMV,
+          headerCheck: headerCheckMV,
+        },
+        customContextMenu: menuItems,
+      }"
       @check-one="onCheckedRow"
       @check-all="onAllCheckedRow"
       @click-row="onClickRow"
@@ -236,13 +236,13 @@ export default {
       checked.value = [];
     };
     const onCheckedRow = (e, index, rowData) => {
-      checkedRowsMV.value = rowData;
+      checkedRowsMV.value = `${rowData}`;
     };
     const onDoubleClickRow = (e) => {
-      DbClickedRowsMV.value = e.rowData;
+      DbClickedRowsMV.value = `${e.rowData}`;
     };
     const onClickRow = (e, rowIdx, cellName, cellIdx, rowData) => {
-      clickedRowMV.value = rowData;
+      clickedRowMV.value = `${rowData}`;
     };
     const onAllCheckedRow = (check) => {
       console.log(`All Check : ${check}`);
@@ -254,7 +254,7 @@ export default {
         'Denmark', 'Mexico', 'Indonesia', 'Sudan', 'Libya',
         'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
       ];
-      const state = ['normal', 'warning', 'critical'];
+      // const state = ['normal', 'warning', 'critical'];
       const temp = [];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
@@ -262,11 +262,11 @@ export default {
           countries[ix % 20],
           Math.random() * 10000,
           Math.random() * 100,
-          // Math.random() * 1000,
+          Math.random() * 1000,
           true,
           true,
           Math.floor(Math.random() * (100 - 0 + 1)) + 0,
-          state[ix % 3],
+         'critical',
         ]);
       }
       tableData.value = temp;
@@ -276,15 +276,14 @@ export default {
       { caption: 'Country', field: 'country', type: 'string' },
       { caption: 'Area', field: 'area', type: 'number', hide: true },
       { caption: 'Population', field: 'population', type: 'number' },
-      // { caption: 'GDP', field: 'gdp', type: 'number' },
+      { caption: 'GDP', field: 'gdp', type: 'number' },
       {
         caption: 'Information',
         field: 'information',
         type: 'boolean',
-        width: 80,
         render: {
           use: true,
-          type: 'button',
+          type: 'toggle',
           option: {
             onClick: onClickButton,
             btnName: 'View Info',
@@ -314,40 +313,40 @@ export default {
         width: 100,
         render: {
           use: true,
-          type: 'inputNumber',
+          type: 'input_number',
           option: {
             minValue: 0,
             maxValue: 100,
           },
         },
       },
-      {
-        caption: 'State',
-        field: 'state',
-        type: 'string',
-        width: 100,
-        render: {
-          use: true,
-          type: 'select',
-          option: {
-            selectItem: [
-              {
-                name: 'normal',
-                value: 'normal',
-              }, {
-                name: 'warning',
-                value: 'warning',
-              }, {
-                name: 'critical',
-                value: 'critical',
-              },
-            ],
-          },
-        },
-      },
+      // {
+      //   caption: 'State',
+      //   field: 'state',
+      //   type: 'string',
+      //   width: 300,
+      //   render: {
+      //     use: true,
+      //     type: 'select',
+      //     option: {
+      //       selectItem: [
+      //         {
+      //           name: 'normal',
+      //           value: 'normal',
+      //         }, {
+      //           name: 'warning',
+      //           value: 'warning',
+      //         }, {
+      //           name: 'critical',
+      //           value: 'critical',
+      //         },
+      //       ],
+      //     },
+      //   },
+      // },
     ]);
 
-    getData(100, 0);
+    getData(50, 0);
     return {
       columns,
       tableData,
