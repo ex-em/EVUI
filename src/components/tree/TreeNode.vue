@@ -1,5 +1,8 @@
 <template>
-  <ul class="ev-tree-children">
+  <ul
+    v-show="treeData.visible"
+    class="ev-tree-children"
+  >
     <li>
       <span
         :class="{ expand: treeData.expand }"
@@ -161,7 +164,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $expand-toggle-icon-size: 13px;
 
 @import '../../style/index.scss';

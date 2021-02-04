@@ -29,7 +29,7 @@
   <div class="case">
     <p class="case-title">Dblclick-node</p>
     <ev-tree
-      :data="commonData"
+      :data="dbClickedData"
       @dblclick-node="getDblClickedNode"
     />
     <div class="description">
@@ -75,6 +75,23 @@
     <ev-tree :data="iconClassExData"/>
     <div class="description">
       'iconClass'속성을 사용하면 트리 노드 내부에 아이콘을 추가 수 있습니다.
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Filter node</p>
+    <ev-text-field
+      v-model="searchVm"
+      placeholder="Search"
+      type="search"
+      @search="searchInput"
+    />
+    <ev-tree
+      :data="searchExData"
+      :use-checkbox="true"
+      :search-word="searchValue"
+    />
+    <div class="description">
+      'ev-text-field' 컴포넌트를 사용해 필터링할 단어를 검색하면 'ev-tree' 컴포넌트 내부에서 검색되는 구조입니다.
     </div>
   </div>
 </template>
@@ -148,6 +165,36 @@ export default {
               {
                 title: 'Child BB',
                 checked: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    const dbClickedData = ref([
+      {
+        title: 'Root',
+        value: 'root',
+        expand: true,
+        children: [
+          {
+            title: 'Parent A',
+            value: 'p1',
+            expand: true,
+            children: [
+              {
+                title: 'Leaf AA',
+                value: 'p1a',
+                expand: true,
+                children: [
+                  {
+                    title: 'Leaf AAA',
+                  },
+                ],
+              },
+              {
+                title: 'Leaf AB',
+                value: 'p1b',
               },
             ],
           },
@@ -240,6 +287,96 @@ export default {
         ],
       },
     ]);
+    const searchExData = ref([
+      {
+        title: 'Root',
+        expand: true,
+        children: [
+          {
+            title: 'Parent A',
+            expand: true,
+            iconClass: 'ev-icon-folder',
+            children: [
+              {
+                title: 'Leaf AA',
+                expand: true,
+                iconClass: 'ev-icon-document-vertically',
+                children: [
+                  {
+                    title: 'Leaf AA_a1',
+                    expand: true,
+                    iconClass: 'ev-icon-folder',
+                    children: [
+                      {
+                        title: 'Team AAA_a1',
+                        iconClass: 'ev-icon-folder',
+                        children: [
+                          {
+                            title: 'Member A',
+                            iconClass: 'ev-icon-dolphin',
+                          },
+                          {
+                            title: 'tEAm C',
+                            expand: true,
+                            iconClass: 'ev-icon-folder',
+                            children: [
+                              {
+                                title: 'I am leaf.',
+                              },
+                              {
+                                title: 'I am another leaf.',
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      {
+                        title: 'Team A',
+                        iconClass: 'ev-icon-folder',
+                        children: [{
+                          title: 'I am a member of Team A.',
+                          iconClass: 'ev-icon-user2',
+                        }],
+                      },
+                    ],
+                  },
+                  {
+                    title: 'Leaf AA_a2',
+                  },
+                ],
+              },
+              {
+                title: 'Leaf AB',
+                expand: true,
+                iconClass: 'ev-icon-folder',
+                children: [
+                  {
+                    title: 'Leaf AB_b1',
+                    iconClass: 'ev-icon-moon',
+                  },
+                  {
+                    title: 'Leaf AB_b2',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Parent B',
+            expand: true,
+            iconClass: 'ev-icon-folder2',
+            children: [
+              {
+                title: 'Leaf BA',
+              },
+              {
+                title: 'Leaf BB',
+              },
+            ],
+          },
+        ],
+      },
+    ]);
 
     const clickedNodeInfo = ref({});
     const checkedNodeInfo = ref({});
@@ -269,20 +406,31 @@ export default {
       dbclickedNodeInfo.value = clickedNode;
     };
 
+    const searchVm = ref('');
+    const searchValue = ref('');
+    const searchInput = (val) => {
+      searchValue.value = val;
+    };
+
     return {
       commonData,
       checkboxExampleData,
+      dbClickedData,
       disableExData,
       contextmenuExData,
       iconClassExData,
+      searchExData,
       menuItems,
       clickedNodeInfo,
       dbclickedNodeInfo,
       checkedNodeInfo,
       contextMenuInfo,
+      searchValue,
+      searchVm,
       getCheckedNode,
       getClickedNode,
       getDblClickedNode,
+      searchInput,
     };
   },
 };
