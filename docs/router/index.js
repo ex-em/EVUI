@@ -177,6 +177,15 @@ const routes = [
     },
   },
   {
+    path: '/timePicker',
+    name: 'TimePicker',
+    component: PageView,
+    props: timePickerProps,
+    meta: {
+      category: 'Form',
+    },
+  },
+  {
     path: '/grid',
     name: 'Grid',
     component: PageView,
