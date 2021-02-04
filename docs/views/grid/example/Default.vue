@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <p class="case-title">Common</p>
+    <p class="case-title">Grid</p>
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
@@ -286,10 +286,6 @@ export default {
           type: 'toggle',
           option: {
             onClick: onClickButton,
-            btnName: 'View Info',
-            btnType: 'primary',
-            btnShape: 'square',
-            btnIcon: 'ev-icon-document-search',
           },
         },
       },
@@ -306,20 +302,36 @@ export default {
           },
         },
       },
-      {
-        caption: 'Size',
-        field: 'size',
-        type: 'number',
-        width: 100,
-        render: {
-          use: true,
-          type: 'input_number',
-          option: {
-            minValue: 0,
-            maxValue: 100,
-          },
-        },
-      },
+      // {
+      //   caption: 'Information',
+      //   field: 'information',
+      //   type: 'boolean',
+      //   render: {
+      //     use: true,
+      //     type: 'button',
+      //     option: {
+      //       onClick: onClickButton,
+      //       btnName: 'View Info',
+      //       btnType: 'primary',
+      //       btnShape: 'square',
+      //       btnIcon: 'ev-icon-document-search',
+      //     },
+      //   },
+      // },
+      // {
+      //   caption: 'Size',
+      //   field: 'size',
+      //   type: 'number',
+      //   width: 100,
+      //   render: {
+      //     use: true,
+      //     type: 'input_number',
+      //     option: {
+      //       minValue: 0,
+      //       maxValue: 100,
+      //     },
+      //   },
+      // },
       // {
       //   caption: 'State',
       //   field: 'state',
