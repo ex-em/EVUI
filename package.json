@@ -33,7 +33,7 @@
     "babel-eslint": "^10.1.0",
     "codesandbox": "^2.2.0",
     "eslint": "^7.2.0",
-    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-exem": "^3.0.3",
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-vue": "^7.0.0-0",
     "highlight.js": "^10.2.0",

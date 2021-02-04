@@ -66,7 +66,6 @@ $file-path: './assets/fonts/';
 }
 .evui-wrapper {
   position: relative;
-  height: 100vh;
   padding: $header-height 0 0 $nav-width;
   font-size: $font-size-base;
 }

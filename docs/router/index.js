@@ -23,6 +23,7 @@ import loadingProps from 'docs/views/loading/props';
 import progressProps from 'docs/views/progress/props';
 import menuProps from 'docs/views/menu/props';
 import treeProps from 'docs/views/tree/props';
+import timePickerProps from 'docs/views/timePicker/props';
 import gridProps from 'docs/views/grid/props';
 
 const routes = [

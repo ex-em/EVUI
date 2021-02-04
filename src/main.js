@@ -13,7 +13,7 @@ import EvInputNumber from '@/components/inputNumber/';
 import EvSlider from '@/components/slider/';
 import EvIcon from '@/components/icon/';
 import EvCalendar from '@/components/calendar/';
-import EvTimePicker from '@/components/datePicker/';
+import EvDatePicker from '@/components/datePicker/';
 import EvMessage from '@/components/message/';
 import EvNotification from '@/components/notification/';
 import EvMessageBox from '@/components/messageBox/';
@@ -24,6 +24,7 @@ import EvLoading from '@/components/loading/';
 import EvProgress from '@/components/progress/';
 import EvMenu from '@/components/menu/';
 import EvTree from '@/components/tree/';
+import EvTimePicker from '@/components/timePicker/';
 import EvGrid from '@/components/grid/';
 import { version } from '../package.json';
 
@@ -43,7 +44,7 @@ const components = [
   EvSlider,
   EvIcon,
   EvCalendar,
-  EvTimePicker,
+  EvDatePicker,
   EvScheduler,
   EvContextMenu,
   EvWindow,
@@ -51,6 +52,7 @@ const components = [
   EvProgress,
   EvMenu,
   EvTree,
+  EvTimePicker,
   EvGrid,
 ];
 
@@ -89,7 +91,7 @@ export {
   EvSlider,
   EvIcon,
   EvCalendar,
-  EvTimePicker,
+  EvDatePicker,
   EvScheduler,
   EvContextMenu,
   EvWindow,
@@ -97,6 +99,7 @@ export {
   EvProgress,
   EvMenu,
   EvTree,
+  EvTimePicker,
   EvGrid,
 };
 
