@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import TreeNode from './TreeNode';
 
 export default {
@@ -260,15 +260,21 @@ export default {
     });
 
 
+    let timer;
     watch(() => props.searchWord, (newSearchWord) => {
-      if (newSearchWord) {
-        filterNode(newSearchWord);
-      } else {
-        allNodeInfo.forEach((nodeObj) => {
-          const node = nodeObj.node;
-          node.visible = true;
-        });
+      if (timer) {
+        clearTimeout(timer);
       }
+      timer = setTimeout(() => {
+        if (newSearchWord) {
+          filterNode(newSearchWord);
+        } else {
+          allNodeInfo.forEach((nodeObj) => {
+            const node = nodeObj.node;
+            node.visible = true;
+          });
+        }
+      }, 200);
     });
 
     onMounted(() => {
@@ -279,6 +285,11 @@ export default {
           title: node.title,
           value: node.value,
         })));
+      }
+    });
+    onBeforeUnmount(() => {
+      if (timer) {
+        clearTimeout(timer);
       }
     });
 
