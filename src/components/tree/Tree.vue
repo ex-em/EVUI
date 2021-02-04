@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
 import TreeNode from './TreeNode';
 
 export default {
@@ -53,6 +53,10 @@ export default {
     contextMenuItems: {
       type: Array,
       default: () => [],
+    },
+    searchWord: {
+      type: String,
+      default: '',
     },
   },
   emits: {
@@ -111,8 +115,13 @@ export default {
         node.nodeKey = keyCounter++;
 
         // add 'selected' property for highlighting clicked node
-        if (!('selected' in node)) {
+        if (!Object.hasOwnProperty.call(node, 'selected')) {
           node.selected = false;
+        }
+
+        // add 'visible' property for filtering node
+        if (!Object.hasOwnProperty.call(node, 'visible')) {
+          node.visible = true;
         }
 
         // check 'value' property and add nodeKey if same value already exists
@@ -205,9 +214,67 @@ export default {
       showContextMenu(e);
     };
 
+    function makeChildrenInvisible(node) {
+      if (node.children) {
+        node.children.forEach((child) => {
+          child.visible = false; // eslint-disable-line no-param-reassign
+          makeChildrenInvisible(child);
+        });
+      }
+    }
+
+    function makeParentVisible(parentKey) {
+      if (!parentKey && parentKey !== 0) {
+        return;
+      }
+
+      const parent = allNodeInfo[parentKey];
+      parent.node.visible = true;
+      if (parent.parent !== undefined) {
+        makeParentVisible(parent.parent);
+      }
+    }
+
+    function filterNode(value) {
+      allNodeInfo.forEach((nodeObj) => {
+        const node = nodeObj.node;
+        node.visible = false;
+      });
+
+      const filteredNodes = allNodeInfo.filter(nodeObj => nodeObj.node.title.includes(value));
+
+      filteredNodes.forEach((nodeObj) => {
+        const node = nodeObj.node;
+        node.visible = true;
+        // make children invisible, traverse down
+        makeChildrenInvisible(node);
+        // make parent visible, traverse up
+        const parentKey = allNodeInfo[node.nodeKey].parent;
+        makeParentVisible(parentKey);
+      });
+    }
+
     watch(props.data, (newData) => {
       treeNodeData = newData;
       allNodeInfo = getAllNodeInfo();
+    });
+
+
+    let timer;
+    watch(() => props.searchWord, (newSearchWord) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        if (newSearchWord) {
+          filterNode(newSearchWord);
+        } else {
+          allNodeInfo.forEach((nodeObj) => {
+            const node = nodeObj.node;
+            node.visible = true;
+          });
+        }
+      }, 200);
     });
 
     onMounted(() => {
@@ -218,6 +285,11 @@ export default {
           title: node.title,
           value: node.value,
         })));
+      }
+    });
+    onBeforeUnmount(() => {
+      if (timer) {
+        clearTimeout(timer);
       }
     });
 
@@ -234,5 +306,5 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 </style>

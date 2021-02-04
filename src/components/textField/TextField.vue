@@ -168,9 +168,7 @@ export default {
 
     // search input
     const searchValue = () => {
-      if (mv.value && mv.value.trim()) {
-        emit('search', mv.value);
-      }
+      emit('search', mv.value);
     };
     const keyupInput = (e) => {
       if (props.type === 'search'
