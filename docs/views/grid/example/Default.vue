@@ -22,7 +22,7 @@
         },
         customContextMenu: menuItems,
       }"
-      @check-one="onCheckedRow"
+      @check-row="onCheckedRow"
       @check-all="onAllCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
@@ -36,7 +36,6 @@
             <div class="form-row-contents">
               <ev-text-field
                 v-model="widthMV"
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -45,7 +44,6 @@
             <div class="form-row-contents">
               <ev-text-field
                 v-model="heightMV"
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -59,7 +57,6 @@
                 :step="10"
                 :max="150"
                 :min="35"
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -71,7 +68,6 @@
                 :step="20"
                 :max="300"
                 :min="40"
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -160,7 +156,6 @@
                 v-model="checkedRowsMV"
                 type="textarea"
                 readonly
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -173,7 +168,6 @@
                 v-model="clickedRowMV"
                 type="textarea"
                 readonly
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -184,7 +178,6 @@
                 v-model="DbClickedRowsMV"
                 type="textarea"
                 readonly
-                style="width: 200px;"
               />
             </div>
           </div>
@@ -425,5 +418,9 @@ export default {
 
 .text {
   margin: 5px;
+}
+
+.ev-text-field, .ev-input-number {
+  width: 200px;
 }
 </style>

@@ -68,17 +68,17 @@ export const commonFunctions = () => {
 };
 
 export const scrollEvent = (params) => {
-  const { scrollInfo, stores, dom, resizeInfo } = params;
+  const { scrollInfo, stores, elementInfo, resizeInfo } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
   const updateVScroll = () => {
-    const el = dom.body;
+    const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
-    const rowCount = el.clientHeight > rowHeight
-      ? Math.ceil(el.clientHeight / rowHeight) : stores.store.length;
+    const rowCount = bodyEl.clientHeight > rowHeight
+      ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
     const totalScrollHeight = stores.store.length * rowHeight;
-    let firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
+    let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
     if (firstVisibleIndex > stores.store.length - 1) {
       firstVisibleIndex = 0;
     }
@@ -97,8 +97,8 @@ export const scrollEvent = (params) => {
    * 수평 스크롤의 위치 계산 후 적용한다.
    */
   const updateHScroll = () => {
-    const headerEl = dom.header;
-    const bodyEl = dom.body;
+    const headerEl = elementInfo.header;
+    const bodyEl = elementInfo.body;
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
   };
@@ -106,9 +106,9 @@ export const scrollEvent = (params) => {
    * scroll 이벤트를 처리한다.
    */
   const onScroll = () => {
-    const el = dom.body;
-    const scrollTop = el.scrollTop;
-    const scrollLeft = el.scrollLeft;
+    const bodyEl = elementInfo.body;
+    const scrollTop = bodyEl.scrollTop;
+    const scrollLeft = bodyEl.scrollLeft;
     const lastTop = scrollInfo.lastScroll.top;
     const lastLeft = scrollInfo.lastScroll.left;
     const isHorizontal = !(scrollLeft === lastLeft);
@@ -130,7 +130,7 @@ export const scrollEvent = (params) => {
 
 export const resizeEvent = (params) => {
   const { props } = getCurrentInstance();
-  const { resizeInfo, dom, checkInfo, stores, isRenderer, updateVScroll } = params;
+  const { resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll } = params;
   /**
    * 해당 컬럼 인덱스가 마지막인지 확인한다.
    *
@@ -157,9 +157,9 @@ export const resizeEvent = (params) => {
     let columnWidth = resizeInfo.columnWidth;
     let remainWidth = 0;
     if (resizeInfo.adjust) {
-      const el = dom.body;
-      let elWidth = el.offsetWidth;
-      const elHeight = el.offsetHeight;
+      const bodyEl = elementInfo.body;
+      let elWidth = bodyEl.offsetWidth;
+      const elHeight = bodyEl.offsetHeight;
       const result = stores.orderedColumns.reduce((acc, column) => {
         if (column.hide) {
           return acc;
@@ -218,7 +218,7 @@ export const resizeEvent = (params) => {
     }
   };
   /**
-   * dom resize 이벤트를 처리한다.
+   * grid resize 이벤트를 처리한다.
    */
   const onResize = () => {
     if (resizeInfo.adjust) {
@@ -245,7 +245,7 @@ export const resizeEvent = (params) => {
   const onColumnResize = (columnIndex, event) => {
     if (!isLastColumn(columnIndex)) {
       let nextColumnIndex = columnIndex + 1;
-      const headerEl = dom.header;
+      const headerEl = elementInfo.header;
       const headerLeft = headerEl.getBoundingClientRect().left;
       const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
       while (stores.orderedColumns[nextColumnIndex].hide) {
@@ -258,7 +258,7 @@ export const resizeEvent = (params) => {
       const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
       const columnRect = columnEl.getBoundingClientRect();
       const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - nextMinWidth;
-      const resizeLineEl = dom.resizeLine;
+      const resizeLineEl = elementInfo.resizeLine;
       const minLeft = columnRect.left - headerLeft + minWidth;
       const startLeft = columnRect.right - headerLeft;
       const startMouseLeft = event.clientX;
@@ -401,7 +401,7 @@ export const checkEvent = (params) => {
 
     checkInfo.prevCheckedRow = row.slice();
     emit('update:checked', checkInfo.checkedRows);
-    emit('check-one', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
+    emit('check-row', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
   };
   /**
    * all checkbox click 이벤트를 처리한다.
@@ -647,7 +647,7 @@ export const filterEvent = (params) => {
   return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter };
 };
 
-export const ContextMenuEvent = (params) => {
+export const contextMenuEvent = (params) => {
   const { emit } = getCurrentInstance();
   const { contextInfo, stores, filterInfo, selectInfo, setStore } = params;
   /**

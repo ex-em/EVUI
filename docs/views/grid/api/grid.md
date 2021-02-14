@@ -11,7 +11,7 @@
     :width="widthMV"
     :height="heightMV"
     :option="{}"
-    @check-one="onCheckedRow"
+    @check-row="onCheckedRow"
     @check-all="onAllCheckedRow"
     @click-row="onClickRow"
     @dblclick-row="onDoubleClickRow"
@@ -47,7 +47,7 @@
 ### Event
 | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | check-one | event | row의 체크박스가 체크 되었을때 호출 된다. |
+ | check-row | event | row의 체크박스가 체크 되었을때 호출 된다. |
  | check-all | event | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 row의 체크박스를 체크 한다. |
  | click-row | newValue | row가 클릭 되었을 때 호출 된다. |
  | dblclick-row | newValue | row가 더블 클릭 되었을 때 호출 된다. |

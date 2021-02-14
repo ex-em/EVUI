@@ -315,11 +315,9 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior() {
-    const scrollTarget = document.getElementsByClassName('evui-content')[0];
-    scrollTarget.scrollTo({
+    return {
       top: 0,
-      behavior: 'smooth',
-    });
+    };
   },
 });
 

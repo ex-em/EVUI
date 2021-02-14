@@ -54,9 +54,7 @@
             >
               <!--Filter Status-->
               <span
-                v-if="isFiltering
-                  &&filterList[column.field]
-                  &&filterList[column.field].find(item => item.use)"
+                v-if="isFiltering && filterList[column.field]?.find(item => item.use)"
                 class="column-filter-status"
               >
                 <ev-icon icon="ev-icon-filter"/>
@@ -96,7 +94,7 @@
         ref="body"
         :class="{
           'table-body': true,
-          'bottom-border': !viewStore.length ? false : true,
+          'bottom-border': !!viewStore.length,
           stripe: isStripeStyle
         }"
         @scroll="onScroll"
@@ -217,7 +215,7 @@ import {
   checkEvent,
   sortEvent,
   filterEvent,
-  ContextMenuEvent,
+  contextMenuEvent,
   storeEvent,
 } from './uses';
 
@@ -258,7 +256,7 @@ export default {
     },
     option: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
   },
   emits: {
@@ -266,7 +264,7 @@ export default {
     'click-row': null,
     'dblclick-row': null,
     'update:checked': null,
-    'check-one': null,
+    'check-row': null,
     'check-all': null,
   },
   setup(props) {
@@ -281,7 +279,7 @@ export default {
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const isStripeStyle = computed(() => (props.option.stripeRows || false));
-    const dom = reactive({
+    const elementInfo = reactive({
       body: null,
       header: null,
       resizeLine: null,
@@ -355,7 +353,7 @@ export default {
       updateVScroll,
       updateHScroll,
       onScroll,
-    } = scrollEvent({ scrollInfo, stores, dom, resizeInfo });
+    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo });
 
     const {
       onRowClick,
@@ -397,12 +395,12 @@ export default {
       calculatedColumn,
       onResize,
       onColumnResize,
-    } = resizeEvent({ resizeInfo, dom, checkInfo, stores, isRenderer, updateVScroll });
+    } = resizeEvent({ resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll });
 
     const {
       setContextMenu,
       onContextMenu,
-    } = ContextMenuEvent({ contextInfo, stores, filterInfo, selectInfo, setStore });
+    } = contextMenuEvent({ contextInfo, stores, filterInfo, selectInfo, setStore });
 
     onMounted(() => {
       calculatedColumn();
@@ -452,7 +450,7 @@ export default {
       () => [resizeInfo.adjust, props.option.columnWidth, resizeInfo.gridWidth],
       () => {
         resizeInfo.columnWidth = props.option.columnWidth;
-        const gridWrapper = dom['grid-wrapper'];
+        const gridWrapper = elementInfo['grid-wrapper'];
         gridWrapper.style.width = resizeInfo.gridWidth;
         gridWrapper.style.height = resizeInfo.gridHeight;
         stores.orderedColumns.map((column) => {
@@ -470,7 +468,7 @@ export default {
     return {
       showHeader,
       isStripeStyle,
-      ...toRefs(dom),
+      ...toRefs(elementInfo),
       ...toRefs(stores),
       ...toRefs(filterInfo),
       ...toRefs(scrollInfo),
