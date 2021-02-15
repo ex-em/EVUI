@@ -151,7 +151,6 @@ export const useWrapper = (param) => {
 
 export const useAPI = (param) => {
   const forceUpdate = () => {
-    console.log('forceUpdate');
     if (param.isInit.value) {
       param.evChart.value.update({
         updateSeries: false,
