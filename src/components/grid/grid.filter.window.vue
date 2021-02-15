@@ -151,9 +151,9 @@ export default {
       tableData: [],
       checked: [],
       columns: [
-        { caption: 'Type', field: 'type', type: 'String', width: 60 },
-        { caption: 'Comparison', field: 'comparison', type: 'String', width: 120 },
-        { caption: 'Value', field: 'value', type: 'String' },
+        { caption: 'Type', field: 'type', type: 'string', width: 60 },
+        { caption: 'Comparison', field: 'comparison', type: 'string', width: 120 },
+        { caption: 'Value', field: 'value', type: 'string' },
       ],
       addInfo: {
         type: 'AND',

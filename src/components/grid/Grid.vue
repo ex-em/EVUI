@@ -287,15 +287,14 @@ export default {
     });
     const filterInfo = reactive({
       filterList: {},
-      isFiltering: false,
+      isFiltering: computed(() =>
+        (props.option.useFilter === undefined ? true : props.option.useFilter)),
       setFiltering: false,
       showFilterWindow: false,
       currentFilter: {
         column: {},
         items: [],
       },
-      useFilter: computed(() =>
-        (props.option.useFilter === undefined ? true : props.option.useFilter)),
     });
     const stores = reactive({
       tableData: props.rows,
@@ -461,8 +460,15 @@ export default {
           }
 
           return item;
-        }, this);
+        });
         onResize();
+      },
+    );
+    watch(
+      () => filterInfo.isFiltering,
+      () => {
+        stores.filteredStore = [];
+        setStore([], false);
       },
     );
     return {
