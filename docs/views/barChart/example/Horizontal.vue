@@ -1,33 +1,34 @@
 <template>
   <ev-chart
-    ref="chart"
     :data="chartData"
     :options="chartOptions"
-    @click="onClick"
   />
 </template>
 
 <script>
-  import { ref } from 'vue';
-
   export default {
     setup() {
-      const chart = ref(null);
-
       const chartData = {
         series: {
           series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
+          series3: { name: 'series#3' },
+          series4: { name: 'series#4' },
         },
-        labels: ['value1', 'value2', 'value3', 'value5', 'value5'],
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         data: {
-          series1: [100, 150, 51, 150, 350],
+          series1: [100, 150, 51, 40, 50],
+          series2: [110, 100, 151, 50, 250],
+          series3: [200, 40, 50, 100, 250],
+          series4: [80, 100, 151, 150, 250],
         },
       };
 
       const chartOptions = {
         type: 'bar',
-        thickness: 0.8,
         width: '100%',
+        height: '100%',
+        thickness: 0.8,
         title: {
           text: 'Chart Title',
           show: true,
@@ -36,35 +37,22 @@
           show: true,
           position: 'right',
         },
+        horizontal: true,
         axesX: [{
-          type: 'step',
-          showGrid: false,
-          labelStyle: {
-            fitWidth: true,
-            fitDir: 'left',
-          },
-        }],
-        axesY: [{
-          showAxis: true,
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
           showGrid: false,
         }],
-        selectItem: {
-          use: true,
-        },
-      };
-
-      const onClick = (target) => {
-        alert(`${target.label} is clicked.`);
+        axesY: [{
+          type: 'step',
+          showGrid: false,
+        }],
       };
 
       return {
-        chart,
         chartData,
         chartOptions,
-        onClick,
       };
     },
   };
