@@ -9,15 +9,11 @@
 
 <script>
   import { onMounted, onBeforeUnmount } from 'vue';
-  import resize from 'vue-resize-directive';
   import EvChart from './chart.core';
   import { useAPI, useModel, useWrapper } from './uses';
 
   export default {
     name: 'EvChart',
-    directives: {
-      resize,
-    },
     props: {
       options: {
         type: Object,
@@ -77,11 +73,9 @@
         evChart.value.destroy();
       });
 
-
-      // TODO: Resize
       const onResize = () => {
-        if (isInit) {
-          evChart.resize();
+        if (isInit.value) {
+          evChart.value.resize();
         }
       };
 

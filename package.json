@@ -18,6 +18,7 @@
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
     "vue-resize-directive": "^1.2.0",
+    "vue-resize-observer": "^2.0.15",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
