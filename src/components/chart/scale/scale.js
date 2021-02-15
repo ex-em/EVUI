@@ -62,7 +62,7 @@ class Scale {
     let maxValue;
     let minValue;
 
-    if (this.range && this.range.length === 2) {
+    if (this.range?.length === 2) {
       maxValue = this.range[1];
       minValue = this.range[0];
     } else {
