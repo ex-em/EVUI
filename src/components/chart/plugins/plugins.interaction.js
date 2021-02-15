@@ -75,8 +75,8 @@ const modules = {
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
       }
 
-      if (typeof this.listeners.dblclick === 'function') {
-        this.listeners.dblclick(args);
+      if (typeof this.listeners['dbl-click'] === 'function') {
+        this.listeners['dbl-click'](args);
       }
     };
 

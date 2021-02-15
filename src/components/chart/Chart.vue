@@ -1,158 +1,101 @@
 <template>
   <div
     ref="wrapper"
-    v-resize.debounce="onResize"
+    v-resize="onResize"
     :style="wrapperStyle"
     class="ev-chart"
   />
 </template>
 
 <script>
-  import { ref } from 'vue';
+  import { onMounted, onBeforeUnmount } from 'vue';
   import resize from 'vue-resize-directive';
+  import EvChart from './chart.core';
+  import { useAPI, useModel, useWrapper } from './uses';
 
   export default {
     name: 'EvChart',
     directives: {
       resize,
     },
-    props: {},
-    emits: {},
+    props: {
+      options: {
+        type: Object,
+        default: () => ({}),
+      },
+      data: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    emits: {
+      click: null,
+      'dbl-click': null,
+    },
     setup() {
-      const wrapperStyle = ref(null);
-      const onResize = () => {};
+      const {
+        isInit,
+        evChart,
+        eventListeners,
+        normalizedData,
+        normalizedOptions,
+      } = useModel();
+
+      const {
+        wrapper,
+        wrapperStyle,
+      } = useWrapper(
+        normalizedOptions,
+      );
+
+      const {
+        forceUpdate,
+        selectItemByLabel,
+      } = useAPI(
+        isInit,
+        evChart,
+      );
+
+      onMounted(() => {
+        evChart.value = new EvChart(
+          wrapper.value,
+          normalizedData,
+          normalizedOptions,
+          eventListeners,
+        );
+
+        const timer = setTimeout(() => {
+          if (evChart.value) {
+            evChart.value.init();
+            isInit.value = true;
+          }
+          clearTimeout(timer);
+        }, 1);
+      });
+
+      onBeforeUnmount(() => {
+        evChart.value.destroy();
+      });
+
+
+      // TODO: Resize
+      const onResize = () => {
+        if (isInit) {
+          evChart.resize();
+        }
+      };
 
       return {
+        wrapper,
         wrapperStyle,
         onResize,
+        forceUpdate,
+        selectItemByLabel,
       };
     },
   };
 </script>
 
 <style lang="scss">
-  @import '../../style/index.scss';
-
-  .ev-chart-wrapper {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .ev-chart-container {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-  }
-
-  .ev-chart-title {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding-left: 10px;
-    word-wrap: normal;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    user-select: none;
-  }
-
-  .ev-chart-legend {
-    position: absolute;
-    overflow: hidden;
-  }
-
-  .ev-chart-legend-box {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .ev-chart-legend-container {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .ev-chart-legend-color {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translate(0, -50%);
-    width: 18px;
-    height: 4px;
-  }
-
-  .ev-chart-legend-name {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    margin-left: 24px;
-    padding-right: 16px;
-    user-select: none;
-    font-weight: 400;
-    transform: translate(0, -50%);
-
-    &:hover {
-      font-weight: bold;
-    }
-  }
-
-  .ev-chart-legend-value {
-    float: right;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .ev-chart-resize-bar {
-    position: absolute;
-    background: transparent;
-    opacity: 0.5;
-    z-index: 10;
-  }
-
-  .ev-chart-resize-bar:hover {
-    background-color: #E2E2E2;
-  }
-
-  .ev-chart-resize-ghost {
-    position: absolute;
-    width: 4px;
-    height: 100%;
-    cursor: col-resize;
-    opacity: 0.5;
-    background-color: #E2E2E2;
-  }
-
-  .ev-chart-resize-ghost.horizontal {
-    width: 100%;
-    height: 4px;
-    cursor: row-resize;
-  }
-
-  .ev-chart-tooltip {
-    position: absolute;
-    z-index: 850;
-    top: 0;
-    left: 0;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    padding-right: 17px;
-  }
-
-  .ev-chart-tooltip-canvas {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+  @import 'style/chart.scss';
 </style>
