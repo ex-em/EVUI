@@ -26,6 +26,17 @@ $ev-themes: (
     -------------------------- */
     slider-mark-background: #F8F8F8,
     tooltip-background: $color-black,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #7F7F7F,
+    grid-bottom-border: #CFCFCF,
+    grid-row-selected: rgba(#DBF0F9, 0.6),
+    grid-cell-text: rgba(#191919, 0.8),
+    grid-row-stripe: rgba(#E5E5E5, 0.6),
+    grid-filter-add-background: #E5E5E5,
+    grid-filter-add-label: #4C4C4C,
+    grid-filter-add-split: #B2B2B2,
   ),
   dark: (
     /* primary color
