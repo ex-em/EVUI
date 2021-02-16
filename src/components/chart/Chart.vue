@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount } from 'vue';
+  import { onMounted, onBeforeUnmount, nextTick } from 'vue';
   import EvChart from './chart.core';
   import { useAPI, useModel, useWrapper } from './uses';
 
@@ -60,10 +60,12 @@
           eventListeners,
         );
 
-        if (evChart.value) {
-          evChart.value.init();
-          isInit.value = true;
-        }
+        nextTick(() => {
+          if (evChart.value) {
+            evChart.value.init();
+            isInit.value = true;
+          }
+        });
       });
 
       onBeforeUnmount(() => {
