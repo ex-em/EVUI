@@ -1,6 +1,6 @@
 {
   "name": "evui",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
@@ -22,6 +22,8 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^4.0.0-0",
     "vue-resize-observer": "^2.0.15"
   },
   "devDependencies": {
@@ -52,8 +54,6 @@
     "stylelint-webpack-plugin": "^2.1.0",
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0",
-    "vue-template-compiler": "^2.6.12",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vue-template-compiler": "^2.6.12"
   }
 }
