@@ -1,25 +1,27 @@
 {
   "name": "evui",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:lib": "vue-cli-service build --target lib --name evui_test2 src/main.js && rimraf ./dist/demo.html",
     "test:unit": "vue-cli-service test:unit",
     "lint": "eslint src test docs",
     "docs": "vue-cli-service serve --port 9999 docs/main.js",
     "docs_build": "vue-cli-service build docs/main.js"
   },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "dist/evui_test2.umd.js",
   "dependencies": {
-    "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
-    "vue-resize-observer": "^2.0.15",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vue-resize-observer": "^2.0.15"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -30,6 +32,7 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/test-utils": "^2.0.0-0",
+    "axios": "^0.20.0",
     "babel-eslint": "^10.1.0",
     "codesandbox": "^2.2.0",
     "eslint": "^7.2.0",
@@ -48,6 +51,8 @@
     "stylelint-webpack-plugin": "^2.1.0",
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.12",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^4.0.0-0"
   }
 }

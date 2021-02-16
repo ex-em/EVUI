@@ -5,6 +5,9 @@ module.exports = {
   devServer: {
     overlay: false,
   },
+  css: {
+    extract: false,
+  },
   chainWebpack: (config) => {
     config.module
       .rule('raw')
