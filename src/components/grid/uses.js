@@ -536,18 +536,18 @@ export const filterEvent = (params) => {
    */
   const stringFilter = (item, condition) => {
     const comparison = condition.comparison;
-    const value = condition.value;
-    const index = condition.index;
+    const conditionValue = condition.value;
+    const value = item[ROW_DATA_INDEX][condition.index];
     let result;
 
     if (comparison === 'Equal') {
-      result = item[ROW_DATA_INDEX][index] === value;
+      result = value === conditionValue;
     } else if (comparison === 'Not Equal') {
-      result = item[ROW_DATA_INDEX][index] !== value;
+      result = value !== conditionValue;
     } else if (comparison === 'Like') {
-      result = likeSearch(`%${value}%`, item[ROW_DATA_INDEX][index]);
+      result = likeSearch(`%${conditionValue}%`, value);
     } else if (comparison === 'Not Like') {
-      result = !likeSearch(`%${value}%`, item[ROW_DATA_INDEX][index]);
+      result = !likeSearch(`%${conditionValue}%`, value);
     }
 
     return result;
@@ -557,20 +557,24 @@ export const filterEvent = (params) => {
    *
    * @param {array} item - row 데이터
    * @param {object} condition - 필터 정보
+   * @param {string} filterType - 데이터 유형
    * @returns {boolean} 확인 결과
    */
-  const numberFilter = (item, condition) => {
+  const numberFilter = (item, condition, filterType) => {
     const comparison = condition.comparison;
-    const value = condition.value;
-    const index = condition.index;
+    const conditionValue = Number(condition.value);
+    let value = Number(item[ROW_DATA_INDEX][condition.index]);
     let result;
+    if (filterType === 'float') {
+      value = Number(value.toFixed(3));
+    }
 
     if (comparison === '=') {
-      result = item[ROW_DATA_INDEX][index] === value;
+      result = value === conditionValue;
     } else if (comparison === '>') {
-      result = item[ROW_DATA_INDEX][index] > value;
+      result = value > conditionValue;
     } else if (comparison === '<') {
-      result = item[ROW_DATA_INDEX][index] < value;
+      result = value < conditionValue;
     }
 
     return result;
@@ -588,7 +592,7 @@ export const filterEvent = (params) => {
     const filteredData = [];
 
     for (let ix = 0; ix < data.length; ix++) {
-      if (filterFn(data[ix], condition)) {
+      if (filterFn(data[ix], condition, filterType)) {
         filteredData.push(data[ix]);
       }
     }

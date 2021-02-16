@@ -702,7 +702,6 @@ export default {
     text-overflow: ellipsis;
 
     @include evThemify() {
-      color: evThemed('grid-cell-text');
       border-right: 1px solid evThemed('grid-bottom-border');
     }
 

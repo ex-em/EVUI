@@ -268,8 +268,8 @@ export default {
       { caption: 'ID', field: 'id', type: 'number' },
       { caption: 'Country', field: 'country', type: 'string' },
       { caption: 'Area', field: 'area', type: 'number', hide: true },
-      { caption: 'Population', field: 'population', type: 'number' },
-      { caption: 'GDP', field: 'gdp', type: 'number' },
+      { caption: 'Population', field: 'population', type: 'float' },
+      { caption: 'GDP', field: 'gdp', type: 'float' },
       {
         caption: 'Information',
         field: 'information',

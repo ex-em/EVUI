@@ -176,6 +176,11 @@ export default {
           { name: '<', value: '<' },
           { name: '=', value: '=' },
         ],
+        float: [
+          { name: '>', value: '>' },
+          { name: '<', value: '<' },
+          { name: '=', value: '=' },
+        ],
       },
     });
     const showWindow = computed({
