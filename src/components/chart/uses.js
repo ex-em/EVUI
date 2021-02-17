@@ -121,7 +121,7 @@ export const useModel = () => {
   };
 };
 
-export const useWrapper = (param) => {
+export const useWrapper = (options) => {
   const wrapper = ref();
 
   const wrapperStyle = computed(() => {
@@ -138,34 +138,13 @@ export const useWrapper = (param) => {
     };
 
     return {
-      width: getChartSize(getQuantity(param.width)),
-      height: getChartSize(getQuantity(param.height)),
+      width: getChartSize(getQuantity(options.width)),
+      height: getChartSize(getQuantity(options.height)),
     };
   });
 
   return {
     wrapper,
     wrapperStyle,
-  };
-};
-
-export const useAPI = (param) => {
-  const forceUpdate = () => {
-    if (param.isInit.value) {
-      param.evChart.value.update({
-        updateSeries: false,
-        updateSelTip: {
-          update: false,
-          keepDomain: false,
-        },
-      });
-    }
-  };
-
-  const selectItemByLabel = label => param.evChart.selectItemByLabel(label);
-
-  return {
-    forceUpdate,
-    selectItemByLabel,
   };
 };

@@ -10,7 +10,7 @@
 <script>
   import { onMounted, onBeforeUnmount, nextTick } from 'vue';
   import EvChart from './chart.core';
-  import { useAPI, useModel, useWrapper } from './uses';
+  import { useModel, useWrapper } from './uses';
 
   export default {
     name: 'EvChart',
@@ -23,11 +23,14 @@
         type: Object,
         default: () => ({}),
       },
+      selectedLabel: {
+        type: String,
+      },
     },
-    emits: {
-      click: null,
-      'dbl-click': null,
-    },
+    emits: [
+      'click',
+      'dbl-click',
+    ],
     setup() {
       const {
         isInit,
@@ -42,14 +45,6 @@
         wrapperStyle,
       } = useWrapper(
         normalizedOptions,
-      );
-
-      const {
-        forceUpdate,
-        selectItemByLabel,
-      } = useAPI(
-        isInit,
-        evChart,
       );
 
       onMounted(() => {
@@ -72,19 +67,40 @@
         evChart.value.destroy();
       });
 
+      let timer = null;
       const onResize = () => {
         if (isInit.value) {
           evChart.value.resize();
+
+          if (timer) {
+            clearTimeout(timer);
+          }
+
+          timer = setTimeout(() => {
+            if (isInit.value) {
+              evChart.value.update({
+                updateSeries: false,
+                updateSelTip: {
+                  update: false,
+                  keepDomain: false,
+                },
+              });
+            }
+          }, 300);
         }
       };
 
       return {
+        evChart,
         wrapper,
         wrapperStyle,
         onResize,
-        forceUpdate,
-        selectItemByLabel,
       };
+    },
+    methods: {
+      selectItemByLabel(label) {
+        this.evChart.value.selectItemByLabel(label);
+      },
     },
   };
 </script>

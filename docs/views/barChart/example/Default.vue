@@ -1,10 +1,15 @@
 <template>
-  <ev-chart
-    ref="chart"
-    :data="chartData"
-    :options="chartOptions"
-    @click="onClick"
-  />
+  <div>
+    <ev-chart
+      ref="chart"
+      :data="chartData"
+      :options="chartOptions"
+      @click="onClick"
+    />
+    <ev-button @click="selectValue1">
+      select Value1
+    </ev-button>
+  </div>
 </template>
 
 <script>
@@ -53,6 +58,7 @@
         }],
         selectItem: {
           use: true,
+          showTextTip: true,
         },
       };
 
@@ -60,15 +66,23 @@
         alert(`${target.label} is clicked.`);
       };
 
+      const selectValue1 = () => {
+        chart.value.selectItemByLabel('value1');
+      };
+
       return {
         chart,
         chartData,
         chartOptions,
         onClick,
+        selectValue1,
       };
     },
   };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+  .ev-button {
+    margin-top: 50px;
+  }
 </style>
