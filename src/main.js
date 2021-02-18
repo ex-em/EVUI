@@ -26,6 +26,7 @@ import EvMenu from '@/components/menu/';
 import EvTree from '@/components/tree/';
 import EvTimePicker from '@/components/timePicker/';
 import EvGrid from '@/components/grid/';
+import EvChart from '@/components/chart/';
 import { version } from '../package.json';
 
 const components = [
@@ -54,6 +55,7 @@ const components = [
   EvTree,
   EvTimePicker,
   EvGrid,
+  EvChart,
 ];
 
 const install = (app) => {
@@ -101,6 +103,7 @@ export {
   EvTree,
   EvTimePicker,
   EvGrid,
+  EvChart,
 };
 
 export default EVUI;
