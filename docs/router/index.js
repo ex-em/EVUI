@@ -28,6 +28,7 @@ import gridProps from 'docs/views/grid/props';
 import barChartProps from 'docs/views/barChart/props';
 import lineChartProps from 'docs/views/lineChart/props';
 import scatterChartProps from 'docs/views/scatterChart/props';
+import comboChartProps from 'docs/views/comboChart/props';
 
 const routes = [
   {
@@ -252,7 +253,8 @@ const routes = [
   {
     path: '/comboChart',
     name: 'ComboChart',
-    component: () => import(/* webpackChunkName: "comboChart" */ '../views/comboChart'),
+    component: PageView,
+    props: comboChartProps,
     meta: {
       category: 'Chart',
     },
