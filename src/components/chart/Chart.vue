@@ -52,12 +52,13 @@
             eventListeners,
         );
 
-        nextTick(() => {
+        const timer = setTimeout(() => {
           if (evChart.value) {
             evChart.value.init();
             isInit.value = true;
           }
-        });
+          clearTimeout(timer);
+        }, 1);
       });
 
       onBeforeUnmount(() => {
