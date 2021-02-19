@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, nextTick } from 'vue';
+  import { onMounted, onBeforeUnmount } from 'vue';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
 
