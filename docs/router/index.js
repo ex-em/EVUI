@@ -214,9 +214,9 @@ const routes = [
   {
     path: '/barChart',
     name: 'BarChart',
-    component: () => import(/* webpackChunkName: "treeTable" */ '../views/barChart'),
+    component: () => import(/* webpackChunkName: "barChart" */ '../views/barChart'),
     meta: {
-      category: 'Table',
+      category: 'Chart',
     },
   },
   {

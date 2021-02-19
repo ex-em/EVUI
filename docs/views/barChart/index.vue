@@ -1,6 +1,6 @@
 <template>
   <div class="article-title">
-    <h1> bar Chart </h1>
+    <h1> bar chart </h1>
     <br>
     <p>
       TABTABTABTABTABTAB
