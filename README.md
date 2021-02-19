@@ -1,4 +1,4 @@
-# [WIP] evui3.0
+# evui 3.0
 
 ## Project setup
 ```
