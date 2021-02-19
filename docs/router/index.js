@@ -29,6 +29,7 @@ import barChartProps from 'docs/views/barChart/props';
 import lineChartProps from 'docs/views/lineChart/props';
 import scatterChartProps from 'docs/views/scatterChart/props';
 import comboChartProps from 'docs/views/comboChart/props';
+import pieChartProps from 'docs/views/pieChart/props';
 
 const routes = [
   {
@@ -245,7 +246,8 @@ const routes = [
   {
     path: '/pieChart',
     name: 'PieChart',
-    component: () => import(/* webpackChunkName: "pieChart" */ '../views/pieChart'),
+    component: PageView,
+    props: pieChartProps,
     meta: {
       category: 'Chart',
     },
