@@ -10,6 +10,8 @@ import Horizontal from './example/Horizontal';
 import HorizontalRaw from '!!raw-loader!./example/Horizontal';
 import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
+import Event from './example/Event';
+import EventRaw from '!!raw-loader!./example/Event';
 
 export default {
   mdText,
@@ -38,6 +40,11 @@ export default {
       description: 'RealTime 처리를 위한 차트입니다.',
       component: Time,
       parsedData: parseComponent(TimeRaw),
+    },
+    Event: {
+      description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
+      component: Event,
+      parsedData: parseComponent(EventRaw),
     },
   },
 };

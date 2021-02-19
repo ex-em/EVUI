@@ -71,7 +71,6 @@ const chartData = {
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | showIndicator | Boolean | false | Indicator 표시 여부 | | 
   | range | Array | null | 축에 표시할 값의 min, max | [0, 100] |
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)

@@ -10,7 +10,7 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1' },
+          series1: { name: 'series#1'},
           series2: { name: 'series#2' },
           series3: { name: 'series#3' },
           series4: { name: 'series#4' },

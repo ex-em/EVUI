@@ -1,27 +1,37 @@
 <template>
-  <div>
+  <div class="case">
     <ev-chart
-      ref="chart"
       :data="chartData"
       :options="chartOptions"
-      @click="onClick"
     />
-    <ev-button @click="selectValue1">
-      select Value1
-    </ev-button>
+  </div>
+  <div class="case">
+    <ev-chart
+      :data="chartData2"
+      :options="chartOptions"
+    />
+    <div class="description">
+      막대 별 값 표시. ( 막대가 작은 경우 표시되지 않음 )
+    </div>
   </div>
 </template>
 
 <script>
-  import { ref } from 'vue';
-
   export default {
     setup() {
-      const chart = ref(null);
-
       const chartData = {
         series: {
           series1: { name: 'series#1' },
+        },
+        labels: ['value1', 'value2', 'value3', 'value5', 'value5'],
+        data: {
+          series1: [100, 150, 51, 150, 350],
+        },
+      };
+
+      const chartData2 = {
+        series: {
+          series1: { name: 'series#1', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
         },
         labels: ['value1', 'value2', 'value3', 'value5', 'value5'],
         data: {
@@ -56,33 +66,16 @@
           autoScaleRatio: 0.1,
           showGrid: false,
         }],
-        selectItem: {
-          use: true,
-          showTextTip: true,
-        },
-      };
-
-      const onClick = (target) => {
-        console.log(`${target.label} is clicked.`);
-      };
-
-      const selectValue1 = () => {
-        chart.value.selectItemByLabel('value1');
       };
 
       return {
-        chart,
         chartData,
+        chartData2,
         chartOptions,
-        onClick,
-        selectValue1,
       };
     },
   };
 </script>
 
 <style lang="scss" scoped>
-  .ev-button {
-    margin-top: 50px;
-  }
 </style>
