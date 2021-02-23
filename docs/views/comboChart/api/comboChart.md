@@ -5,7 +5,6 @@
 <ev-chart
     :data="차트데이터"
     :options="차트속성"
-    :listeners="차트클릭/더블클릭이벤트"
 />
 ```
 
