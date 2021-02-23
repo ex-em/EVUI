@@ -8,8 +8,8 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, watch } from 'vue';
-  import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
+  import { onMounted, onBeforeUnmount, watchEffect } from 'vue';
+  import { cloneDeep, defaultsDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
 
@@ -71,7 +71,7 @@
         evChart.destroy();
       });
 
-      watch(() => props.options, (curr) => {
+      watchEffect(() => props.options, (curr) => {
         const newOpt = defaultsDeep({}, curr, normalizedOptions);
         evChart.options = cloneDeep(newOpt);
         evChart.update({
@@ -80,7 +80,7 @@
         });
       }, { deep: true });
 
-      watch(() => props.data, (curr) => {
+      watchEffect(() => props.data, (curr) => {
         const newData = defaultsDeep({}, curr, normalizedData);
         const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
         evChart.data = cloneDeep(newData);
@@ -102,20 +102,7 @@
         }
       };
 
-      let timer = null;
-      const onResize = () => {
-        if (isInit) {
-          evChart.resize();
-
-          if (timer) {
-            clearTimeout(timer);
-          }
-
-          timer = setTimeout(() => {
-            redrawChart();
-          }, 300);
-        }
-      };
+      const onResize = debounce(redrawChart, 300);
 
       const selectItemByLabel = (label) => {
         evChart.selectItemByLabel(label);
