@@ -5,6 +5,9 @@ module.exports = {
   devServer: {
     overlay: false,
   },
+  css: {
+    extract: false,
+  },
   chainWebpack: (config) => {
     config.module
       .rule('raw')
@@ -23,6 +26,14 @@ module.exports = {
         '@': path.join(__dirname, 'src/'),
         docs: path.join(__dirname, 'docs/'),
       },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,
+          loader: 'url-loader?limit=8192',
+        },
+      ],
     },
     plugins: [
       new StyleLintPlugin({

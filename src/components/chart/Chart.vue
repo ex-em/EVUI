@@ -8,7 +8,8 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, nextTick } from 'vue';
+  import { onMounted, onBeforeUnmount, watch } from 'vue';
+  import { cloneDeep, defaultsDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
 
@@ -28,10 +29,11 @@
       'click',
       'dbl-click',
     ],
-    setup() {
+    setup(props) {
+      let evChart = {};
+      let isInit = false;
+
       const {
-        isInit,
-        evChart,
         eventListeners,
         normalizedData,
         normalizedOptions,
@@ -41,63 +43,77 @@
         wrapper,
         wrapperStyle,
       } = useWrapper(
-          normalizedOptions,
+        normalizedOptions,
       );
 
-      onMounted(() => {
-        evChart.value = new EvChart(
-            wrapper.value,
-            normalizedData,
-            normalizedOptions,
-            eventListeners,
+      const createChart = () => {
+        evChart = new EvChart(
+          wrapper.value,
+          normalizedData,
+          normalizedOptions,
+          eventListeners,
         );
+      };
 
-        nextTick(() => {
-          if (evChart.value) {
-            evChart.value.init();
-            isInit.value = true;
-          }
-        });
-      });
-
-      onBeforeUnmount(() => {
-        evChart.value.destroy();
-      });
-
-      let timer = null;
-      const onResize = () => {
-        if (isInit.value) {
-          evChart.value.resize();
-
-          if (timer) {
-            clearTimeout(timer);
-          }
-
-          timer = setTimeout(() => {
-            if (isInit.value) {
-              evChart.value.update({
-                updateSeries: false,
-                updateSelTip: {
-                  update: false,
-                  keepDomain: false,
-                },
-              });
-            }
-          }, 300);
+      const drawChart = () => {
+        if (evChart) {
+          evChart.init();
+          isInit = true;
         }
       };
 
+      onMounted(async () => {
+        await createChart();
+        await drawChart();
+
+        await watch(() => props.options, (curr) => {
+          const newOpt = defaultsDeep({}, curr, normalizedOptions);
+          evChart.options = cloneDeep(newOpt);
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
+        }, { deep: true });
+
+        await watch(() => props.data, (curr) => {
+          const newData = defaultsDeep({}, curr, normalizedData);
+          const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
+          evChart.data = cloneDeep(newData);
+          evChart.update({
+            updateSeries: isUpdateSeries,
+            updateSelTip: { update: true, keepDomain: false },
+          });
+        }, { deep: true });
+      });
+
+      onBeforeUnmount(() => {
+        evChart.destroy();
+      });
+
+      const redrawChart = () => {
+        if (isInit) {
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: {
+              update: false,
+              keepDomain: false,
+            },
+          });
+        }
+      };
+
+      const onResize = debounce(redrawChart, 300);
+
+      const selectItemByLabel = (label) => {
+        evChart.selectItemByLabel(label);
+      };
+
       return {
-        evChart,
         wrapper,
         wrapperStyle,
         onResize,
+        selectItemByLabel,
       };
-    },
-    methods: {
-      selectItemByLabel(label) {
-        this.evChart.value.selectItemByLabel(label);
-      },
     },
   };
 </script>
