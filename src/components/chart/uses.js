@@ -1,5 +1,5 @@
-import { ref, reactive, computed, watch, getCurrentInstance, nextTick } from 'vue';
-import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
+import { ref, computed, getCurrentInstance, nextTick } from 'vue';
+import { defaultsDeep } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 
 const DEFAULT_OPTIONS = {
