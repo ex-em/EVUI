@@ -13,7 +13,7 @@
         select Value1
       </ev-button>
       <br><br>
-      <div class="description">
+      <div>
         <div class="badge yellow">
           클릭된 라벨
         </div>
