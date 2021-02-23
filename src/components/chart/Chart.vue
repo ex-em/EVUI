@@ -41,24 +41,28 @@
         wrapper,
         wrapperStyle,
       } = useWrapper(
-          normalizedOptions,
+        normalizedOptions,
       );
 
-      onMounted(() => {
+      const createChart = () => {
         evChart.value = new EvChart(
-            wrapper.value,
-            normalizedData,
-            normalizedOptions,
-            eventListeners,
+          wrapper.value,
+          normalizedData,
+          normalizedOptions,
+          eventListeners,
         );
+      };
 
-        const timer = setTimeout(() => {
-          if (evChart.value) {
-            evChart.value.init();
-            isInit.value = true;
-          }
-          clearTimeout(timer);
-        }, 1);
+      const drawChart = () => {
+        if (evChart.value) {
+          evChart.value.init();
+          isInit.value = true;
+        }
+      };
+
+      onMounted(async () => {
+        await createChart();
+        await drawChart();
       });
 
       onBeforeUnmount(() => {
