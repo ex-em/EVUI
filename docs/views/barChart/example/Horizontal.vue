@@ -10,17 +10,11 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1'},
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
+          series1: { name: 'series#1', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
         },
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         data: {
           series1: [100, 150, 51, 40, 50],
-          series2: [110, 100, 151, 50, 250],
-          series3: [200, 40, 50, 100, 250],
-          series4: [80, 100, 151, 150, 250],
         },
       };
 
