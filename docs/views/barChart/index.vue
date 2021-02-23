@@ -42,9 +42,10 @@
       <br><br>
       <ev-input-number
         v-model="thicknessSize"
-        step="0.1"
-        min="0"
-        max="1"
+        :step="0.1"
+        :min="0"
+        :max="1"
+        :precision="1"
       />
     </div>
   </div>
