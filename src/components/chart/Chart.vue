@@ -66,7 +66,7 @@
         await createChart();
         await drawChart();
 
-        watch(() => props.options, (curr) => {
+        await watch(() => props.options, (curr) => {
           const newOpt = defaultsDeep({}, curr, normalizedOptions);
           evChart.options = cloneDeep(newOpt);
           evChart.update({
@@ -75,7 +75,7 @@
           });
         }, { deep: true });
 
-        watch(() => props.data, (curr) => {
+        await watch(() => props.data, (curr) => {
           const newData = defaultsDeep({}, curr, normalizedData);
           const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
           evChart.data = cloneDeep(newData);
