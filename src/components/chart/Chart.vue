@@ -69,6 +69,18 @@
         evChart.value.destroy();
       });
 
+      const redrawChart = () => {
+        if (isInit.value) {
+          evChart.value.update({
+            updateSeries: false,
+            updateSelTip: {
+              update: false,
+              keepDomain: false,
+            },
+          });
+        }
+      };
+
       let timer = null;
       const onResize = () => {
         if (isInit.value) {
@@ -79,15 +91,7 @@
           }
 
           timer = setTimeout(() => {
-            if (isInit.value) {
-              evChart.value.update({
-                updateSeries: false,
-                updateSelTip: {
-                  update: false,
-                  keepDomain: false,
-                },
-              });
-            }
+            redrawChart();
           }, 300);
         }
       };
