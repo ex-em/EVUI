@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, watchEffect } from 'vue';
+  import { onMounted, onBeforeUnmount, watch } from 'vue';
   import { cloneDeep, defaultsDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
@@ -65,30 +65,30 @@
       onMounted(async () => {
         await createChart();
         await drawChart();
+
+        watch(() => props.options, (curr) => {
+          const newOpt = defaultsDeep({}, curr, normalizedOptions);
+          evChart.options = cloneDeep(newOpt);
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
+        }, { deep: true });
+
+        watch(() => props.data, (curr) => {
+          const newData = defaultsDeep({}, curr, normalizedData);
+          const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
+          evChart.data = cloneDeep(newData);
+          evChart.update({
+            updateSeries: isUpdateSeries,
+            updateSelTip: { update: true, keepDomain: false },
+          });
+        }, { deep: true });
       });
 
       onBeforeUnmount(() => {
         evChart.destroy();
       });
-
-      watchEffect(() => props.options, (curr) => {
-        const newOpt = defaultsDeep({}, curr, normalizedOptions);
-        evChart.options = cloneDeep(newOpt);
-        evChart.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-        });
-      }, { deep: true });
-
-      watchEffect(() => props.data, (curr) => {
-        const newData = defaultsDeep({}, curr, normalizedData);
-        const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
-        evChart.data = cloneDeep(newData);
-        evChart.update({
-          updateSeries: isUpdateSeries,
-          updateSelTip: { update: true, keepDomain: false },
-        });
-      }, { deep: true });
 
       const redrawChart = () => {
         if (isInit) {
