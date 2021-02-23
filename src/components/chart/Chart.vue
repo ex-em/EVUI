@@ -8,7 +8,8 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount } from 'vue';
+  import { onMounted, onBeforeUnmount, watch } from 'vue';
+  import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
 
@@ -28,10 +29,11 @@
       'click',
       'dbl-click',
     ],
-    setup() {
+    setup(props) {
+      let evChart = {};
+      let isInit = false;
+
       const {
-        isInit,
-        evChart,
         eventListeners,
         normalizedData,
         normalizedOptions,
@@ -45,7 +47,7 @@
       );
 
       const createChart = () => {
-        evChart.value = new EvChart(
+        evChart = new EvChart(
           wrapper.value,
           normalizedData,
           normalizedOptions,
@@ -54,9 +56,9 @@
       };
 
       const drawChart = () => {
-        if (evChart.value) {
-          evChart.value.init();
-          isInit.value = true;
+        if (evChart) {
+          evChart.init();
+          isInit = true;
         }
       };
 
@@ -66,12 +68,31 @@
       });
 
       onBeforeUnmount(() => {
-        evChart.value.destroy();
+        evChart.destroy();
       });
 
+      watch(() => props.options, (curr) => {
+        const newOpt = defaultsDeep({}, curr, normalizedOptions);
+        evChart.options = cloneDeep(newOpt);
+        evChart.update({
+          updateSeries: false,
+          updateSelTip: { update: false, keepDomain: false },
+        });
+      }, { deep: true });
+
+      watch(() => props.data, (curr) => {
+        const newData = defaultsDeep({}, curr, normalizedData);
+        const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
+        evChart.data = cloneDeep(newData);
+        evChart.update({
+          updateSeries: isUpdateSeries,
+          updateSelTip: { update: true, keepDomain: false },
+        });
+      }, { deep: true });
+
       const redrawChart = () => {
-        if (isInit.value) {
-          evChart.value.update({
+        if (isInit) {
+          evChart.update({
             updateSeries: false,
             updateSelTip: {
               update: false,
@@ -83,8 +104,8 @@
 
       let timer = null;
       const onResize = () => {
-        if (isInit.value) {
-          evChart.value.resize();
+        if (isInit) {
+          evChart.resize();
 
           if (timer) {
             clearTimeout(timer);
@@ -96,17 +117,16 @@
         }
       };
 
+      const selectItemByLabel = (label) => {
+        evChart.selectItemByLabel(label);
+      };
+
       return {
-        evChart,
         wrapper,
         wrapperStyle,
         onResize,
+        selectItemByLabel,
       };
-    },
-    methods: {
-      selectItemByLabel(label) {
-        this.evChart.value.selectItemByLabel(label);
-      },
     },
   };
 </script>

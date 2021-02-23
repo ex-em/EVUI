@@ -76,9 +76,6 @@ const DEFAULT_DATA = {
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
 
-  const isInit = ref(false);
-  const evChart = reactive({});
-
   const normalizedOptions = defaultsDeep({}, props.options, DEFAULT_OPTIONS);
   const normalizedData = defaultsDeep(props.data, DEFAULT_DATA);
 
@@ -93,28 +90,7 @@ export const useModel = () => {
     },
   };
 
-  watch(() => props.options, (curr) => {
-    const newOpt = defaultsDeep({}, curr, normalizedOptions);
-    evChart.value.options = cloneDeep(newOpt);
-    evChart.value.update({
-      updateSeries: false,
-      updateSelTip: { update: false, keepDomain: false },
-    });
-  }, { deep: true });
-
-  watch(() => props.data, (curr) => {
-    const newData = defaultsDeep({}, curr, normalizedData);
-    const isUpdateSeries = !isEqual(newData.series, evChart.value.data.series);
-    evChart.value.data = cloneDeep(newData);
-    evChart.value.update({
-      updateSeries: isUpdateSeries,
-      updateSelTip: { update: true, keepDomain: false },
-    });
-  }, { deep: true });
-
   return {
-    isInit,
-    evChart,
     eventListeners,
     normalizedData,
     normalizedOptions,
