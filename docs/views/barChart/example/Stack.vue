@@ -10,10 +10,10 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
+          series1: { name: 'series#1', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
+          series2: { name: 'series#2', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
+          series3: { name: 'series#3', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
+          series4: { name: 'series#4', showValue: { use: true, fontSize: 12, textColor: '#000000' } },
         },
         groups: [
           ['series1', 'series2', 'series3', 'series4'],
