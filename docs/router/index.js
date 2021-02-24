@@ -25,6 +25,11 @@ import menuProps from 'docs/views/menu/props';
 import treeProps from 'docs/views/tree/props';
 import timePickerProps from 'docs/views/timePicker/props';
 import gridProps from 'docs/views/grid/props';
+import barChartProps from 'docs/views/barChart/props';
+import lineChartProps from 'docs/views/lineChart/props';
+import scatterChartProps from 'docs/views/scatterChart/props';
+import comboChartProps from 'docs/views/comboChart/props';
+import pieChartProps from 'docs/views/pieChart/props';
 
 const routes = [
   {
@@ -214,7 +219,8 @@ const routes = [
   {
     path: '/barChart',
     name: 'BarChart',
-    component: () => import(/* webpackChunkName: "barChart" */ '../views/barChart'),
+    component: PageView,
+    props: barChartProps,
     meta: {
       category: 'Chart',
     },
@@ -222,7 +228,8 @@ const routes = [
   {
     path: '/lineChart',
     name: 'LineChart',
-    component: () => import(/* webpackChunkName: "lineChart" */ '../views/lineChart'),
+    component: PageView,
+    props: lineChartProps,
     meta: {
       category: 'Chart',
     },
@@ -230,7 +237,8 @@ const routes = [
   {
     path: '/scatterChart',
     name: 'ScatterChart',
-    component: () => import(/* webpackChunkName: "scatterChart" */ '../views/scatterChart'),
+    component: PageView,
+    props: scatterChartProps,
     meta: {
       category: 'Chart',
     },
@@ -238,7 +246,8 @@ const routes = [
   {
     path: '/pieChart',
     name: 'PieChart',
-    component: () => import(/* webpackChunkName: "pieChart" */ '../views/pieChart'),
+    component: PageView,
+    props: pieChartProps,
     meta: {
       category: 'Chart',
     },
@@ -246,7 +255,8 @@ const routes = [
   {
     path: '/comboChart',
     name: 'ComboChart',
-    component: () => import(/* webpackChunkName: "comboChart" */ '../views/comboChart'),
+    component: PageView,
+    props: comboChartProps,
     meta: {
       category: 'Chart',
     },
