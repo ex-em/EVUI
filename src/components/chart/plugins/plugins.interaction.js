@@ -20,10 +20,6 @@ const modules = {
 
       this.overlayClear();
 
-      if (indicator.use) {
-        this.drawIndicator(offset, indicator.color);
-      }
-
       if (Object.keys(hitInfo.items).length) {
         this.drawItemsHighlight(hitInfo, ctx);
 
@@ -34,6 +30,10 @@ const modules = {
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
+      }
+
+      if (indicator.use) {
+        this.drawIndicator(offset, indicator.color);
       }
     };
 
