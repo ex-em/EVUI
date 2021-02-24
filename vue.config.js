@@ -19,6 +19,14 @@ module.exports = {
       .use('raw-loader')
       .loader('raw-loader')
       .end();
+
+    config.module
+      .rule('fonts')
+      .test(/\.(woff2?|eot|ttf|otf)(\?.*)?$/i)
+      .use('url-loader')
+      .loader('url-loader')
+      .options()
+      .end();
   },
   configureWebpack: {
     resolve: {
@@ -26,14 +34,6 @@ module.exports = {
         '@': path.join(__dirname, 'src/'),
         docs: path.join(__dirname, 'docs/'),
       },
-    },
-    module: {
-      rules: [
-        {
-          test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,
-          loader: 'url-loader?limit=8192',
-        },
-      ],
     },
     plugins: [
       new StyleLintPlugin({

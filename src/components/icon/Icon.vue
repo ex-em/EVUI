@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import '@/style/lib/icon.css';
-
 export default {
   name: 'EvIcon',
   props: {
