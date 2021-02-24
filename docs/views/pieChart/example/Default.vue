@@ -50,6 +50,9 @@
           show: true,
           position: 'right',
         },
+        indicator: {
+          use: false,
+        },
       };
 
       return {
