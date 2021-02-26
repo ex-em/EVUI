@@ -41,4 +41,9 @@ const notification = (options = {}) => {
   wrapper.appendChild(instance.el);
 };
 
+notification.install = (app) => {
+  const global = app.config.globalProperties;
+  global.$notify = notification;
+};
+
 export default notification;

@@ -23,4 +23,10 @@ const message = (options = {}) => {
   render(instance, container);
 };
 
+message.install = (app) => {
+  const global = app.config.globalProperties;
+  global.$message = message;
+  console.log(global);
+};
+
 export default message;

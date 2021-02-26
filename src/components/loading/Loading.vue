@@ -3,7 +3,7 @@
     <teleport to="body">
       <div
         v-if="modelValue"
-        class="ev-loading"
+        class="ev-loading full-screen"
         @[`${clickEventName}`]="closeLoading"
       >
         <div class="ev-loading-spinner">
@@ -97,6 +97,9 @@ export default {
   height: 100%;
   background-color: #000000;
   opacity: 0.5;
+  &.full-screen {
+    position: fixed;
+  }
 }
 .ev-loading-spinner {
   position: absolute;

@@ -14,4 +14,9 @@ const messageBox = (options = {}) => {
   render(instance, container);
 };
 
+messageBox.install = (app) => {
+  const global = app.config.globalProperties;
+  global.$messagebox = messageBox;
+};
+
 export default messageBox;
