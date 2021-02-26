@@ -10,11 +10,11 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1', showValue: { use: true, fontSize: 12, textColor: '#ffffff' } },
+          series1: { name: 'series#1', showValue: { use: true, fontSize: 12, textColor: '#000000', align: 'out' } },
         },
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         data: {
-          series1: [100, 150, 51, 40, 50],
+          series1: [1500, 80, 120, 30, 0],
         },
       };
 
@@ -36,12 +36,15 @@
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
-          showGrid: false,
+          showGrid: true,
         }],
         axesY: [{
           type: 'step',
           showGrid: false,
         }],
+        indicator: {
+          use: false,
+        },
       };
 
       return {

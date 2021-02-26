@@ -10,8 +10,8 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1', color: '#FF00FF' },
-          series2: { name: 'series#2', color: '#00FF00' },
+          series1: { name: 'series#1', color: '#FEC64F', showValue: { use: true } },
+          series2: { name: 'series#2', color: '#48D1CC', showValue: { use: true } },
         },
         labels: [
           'value1',

@@ -35,28 +35,31 @@
         horizontal: false,
         axesX: [{
           type: 'time',
-          showGrid: true,
+          showGrid: false,
           categoryMode: true,
-          timeFormat: 'HH:mm:ss',
+          timeFormat: 'mm:ss',
           interval: 'second',
         }],
         axesY: [{
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
-          showGrid: false,
+          showGrid: true,
         }],
+        maxTip: {
+          use: true,
+          tipBackground: '#DBDBDB',
+          tipTextColor: '#000000',
+        },
       };
 
       const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
         },
         labels: [],
         data: {
           series1: [],
-          series2: [],
         },
       });
 
