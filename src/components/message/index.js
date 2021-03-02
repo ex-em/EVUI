@@ -26,7 +26,6 @@ const message = (options = {}) => {
 message.install = (app) => {
   const global = app.config.globalProperties;
   global.$message = message;
-  console.log(global);
 };
 
 export default message;
