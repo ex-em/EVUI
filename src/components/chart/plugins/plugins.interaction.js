@@ -20,10 +20,6 @@ const modules = {
 
       this.overlayClear();
 
-      if (indicator.use) {
-        this.drawIndicator(offset, indicator.color);
-      }
-
       if (Object.keys(hitInfo.items).length) {
         this.drawItemsHighlight(hitInfo, ctx);
 
@@ -34,6 +30,11 @@ const modules = {
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
+      }
+
+      const isPieChart = this.seriesInfo.charts.pie.length;
+      if (indicator.use && !isPieChart) {
+        this.drawIndicator(offset, indicator.color);
       }
     };
 
