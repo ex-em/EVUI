@@ -23,9 +23,9 @@
       const chartData = {
         series: commonSeries,
         data: {
-          series1: [],
-          series2: [],
-          series3: [],
+          series1: [10],
+          series2: [20],
+          series3: [70],
         },
       };
 
