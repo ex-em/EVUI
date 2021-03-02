@@ -66,9 +66,6 @@
           show: true,
           position: 'right',
         },
-        indicator: {
-          use: false,
-        },
         sunburst: true,
         reverse: false,
         doughnutHoleSize: 0.4,

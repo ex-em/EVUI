@@ -23,9 +23,9 @@
       const chartData = {
         series: commonSeries,
         data: {
-          series1: [10],
-          series2: [20],
-          series3: [70],
+          series1: [],
+          series2: [],
+          series3: [],
         },
       };
 
@@ -49,9 +49,6 @@
         legend: {
           show: true,
           position: 'right',
-        },
-        indicator: {
-          use: false,
         },
       };
 

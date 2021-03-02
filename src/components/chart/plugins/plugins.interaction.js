@@ -32,7 +32,8 @@ const modules = {
         this.hideTooltipDOM();
       }
 
-      if (indicator.use) {
+      const isPieChart = this.seriesInfo.charts.pie.length;
+      if (indicator.use && !isPieChart) {
         this.drawIndicator(offset, indicator.color);
       }
     };

@@ -43,7 +43,6 @@ const chartData =
   | height | String / Number | '100%' | 차트의 높이 | '100%', '150px', 150 |
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
-  | indicator | Object | ([상세](#indicator)) | indicator line(가이드선) 표시 여부 및 속성 |  |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -65,9 +64,3 @@ const chartData =
 | inactive | HexCode(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
-
-#### indicator
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-| --- | ---- | ----- | --- | ----------|
-| use | Boolean | true | Indicator Line 표시 여부 | true /false |
-| color | HexCode(String) | '#EE7F44' | 선 색상 | | 
