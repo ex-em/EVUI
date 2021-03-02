@@ -281,12 +281,8 @@ const modules = {
    * @returns {undefined}
    */
   drawItemsHighlight(hitInfo, ctx) {
-    const { maxHighlight } = hitInfo;
-    const maxSID = maxHighlight ? maxHighlight[0] : null;
-
     Object.keys(hitInfo.items).forEach((sId) => {
-      const isMaxHighlight = maxSID === sId;
-      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx, isMaxHighlight);
+      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx);
     });
   },
 
