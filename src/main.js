@@ -56,6 +56,9 @@ const components = [
   EvTimePicker,
   EvGrid,
   EvChart,
+  EvMessage,
+  EvNotification,
+  EvMessageBox,
 ];
 
 const install = (app) => {
@@ -65,11 +68,6 @@ const install = (app) => {
   components.forEach((component) => {
     app.use(component);
   });
-
-  const global = app.config.globalProperties;
-  global.$message = EvMessage;
-  global.$messagebox = EvMessageBox;
-  global.$notify = EvNotification;
 };
 
 const EVUI = {
@@ -104,6 +102,9 @@ export {
   EvTimePicker,
   EvGrid,
   EvChart,
+  EvMessage,
+  EvNotification,
+  EvMessageBox,
 };
 
 export default EVUI;
