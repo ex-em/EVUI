@@ -17,27 +17,27 @@ export default {
   mdText,
   components: {
     Default: {
-      description: 'Bar Chart는 Category 기반의 데이터를 표현하는 차트로, 각 Category에 대한 값에 따라 Bar의 높이가 결정됩니다. 계열이 여러 개 존재할 경우 동일한 넓이의 Bar를 생성하여 Category 기준으로 각 계열을 표현합니다.',
+      description: 'Bar Chart(막대그래프)는 표현 값에 비례 하여 높이와 길이를 가진 직사각형 막대로 데이터를 표현하는 차트입니다.',
       component: Default,
       parsedData: parseComponent(DefaultRaw),
     },
     Column: {
-      description: 'Category 기반의 막대 데이터를 누적하여 표현합니다.',
+      description: '세로 형태로 사용할 수 있으며 각 Series별로 색상을 직접 지정할 수 있습니다.',
       component: Column,
       parsedData: parseComponent(ColumnRaw),
     },
-    Stack: {
-      description: 'Category 기반의 막대 데이터를 누적하여 표현합니다.',
-      component: Stack,
-      parsedData: parseComponent(StackRaw),
-    },
     Horizontal: {
-      description: 'Horizontal Bar Chart는 각 Category에 대한 Bar의 널이가 나타내는 값에 비례합니다. 계열이 여러개가 존재할 경우 동일한 높이의 Bar를 생성하여 Category 기준으로 각 계열을 표현합니다.',
+      description: '가로 형태로 사용할 수 있으며 Series별로 데이터 라벨 표시 여부 및 속성을 설정 할 수 있습니다.',
       component: Horizontal,
       parsedData: parseComponent(HorizontalRaw),
     },
+    Stack: {
+      description: '동일한 그룹으로 묶인 series들의 데이터를 한 막대에 누적하여 표현할 수 있습니다.',
+      component: Stack,
+      parsedData: parseComponent(StackRaw),
+    },
     Time: {
-      description: 'RealTime 처리를 위한 차트입니다.',
+      description: '실시간으로 데이터를 받아 표현할 수 있으며, 가장 큰 값에 해당하는 막대위에 Tip을 붙일 수 있습니다.',
       component: Time,
       parsedData: parseComponent(TimeRaw),
     },
