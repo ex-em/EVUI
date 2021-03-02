@@ -11,7 +11,6 @@
       :option="{
         adjust: adjustMV,
         showHeader: showHeaderMV,
-        stripeRows: isStripeStyleMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
         useFilter: useFilterMV,
@@ -21,6 +20,11 @@
           headerCheck: headerCheckMV,
         },
         customContextMenu: menuItems,
+        style: {
+          stripe: isStripeStyleMV,
+          // border: 'none',
+          // highlight: 0,
+        },
       }"
       @check-row="onCheckedRow"
       @check-all="onAllCheckedRow"

@@ -19,13 +19,19 @@
       <div
         v-show="showHeader"
         ref="header"
-        class="table-header"
+        :class="{
+          'table-header': true,
+          'non-border': !!borderStyle,
+        }"
       >
         <ul class="column-list">
           <!--Header Checkbox-->
           <li
             v-if="useCheckbox.use"
-            class="column"
+            :class="{
+              'column': true,
+              'non-border': !!borderStyle,
+            }"
             :style="`width: ${minWidth}px;`"
           >
             <ev-checkbox
@@ -47,6 +53,7 @@
               :class="{
                 column: true,
                 render: isRenderer(column),
+                'non-border': !!borderStyle,
               }"
               :style="`
                 width: ${column.width}px;
@@ -95,7 +102,8 @@
         :class="{
           'table-body': true,
           'bottom-border': !!viewStore.length,
-          stripe: isStripeStyle
+          stripe: stripeStyle,
+          'non-border': !!borderStyle,
         }"
         @scroll="onScroll"
         @contextmenu="onContextMenu($event)"
@@ -113,14 +121,22 @@
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
             :data-index="rowIndex"
-            :class="{ selected: row[2] === selectedRow }"
+            :class="{
+              row: true,
+              selected: row[2] === selectedRow,
+              'non-border': !!borderStyle && borderStyle !== 'rows',
+              highlight: row[0] === highlightIdx,
+            }"
             @click="onRowClick($event, row)"
             @dblclick="onRowDblClick($event, row)"
           >
             <!--Row Checkbox-->
             <td
               v-if="useCheckbox.use"
-              class="row-checkbox"
+              :class="{
+                'row-checkbox': true,
+                'non-border': !!borderStyle,
+              }"
               :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
             >
               <ev-checkbox
@@ -138,7 +154,8 @@
                 :class="{
                   [column.type]: column.type,
                   [column.align]: column.align,
-                  render: isRenderer(column)
+                  render: isRenderer(column),
+                  'non-border': !!borderStyle,
                 }"
                 :style="`
                   width: ${column.width}px;
@@ -278,7 +295,10 @@ export default {
 
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
-    const isStripeStyle = computed(() => (props.option.stripeRows || false));
+    const stripeStyle = computed(() => (props.option.style?.stripe || false));
+    const borderStyle = computed(() =>
+      (props.option.style?.border === undefined ? false : props.option.style.border));
+    const highlightIdx = computed(() => (props.option.style?.highlight));
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -473,7 +493,9 @@ export default {
     );
     return {
       showHeader,
-      isStripeStyle,
+      stripeStyle,
+      borderStyle,
+      highlightIdx,
       ...toRefs(elementInfo),
       ...toRefs(stores),
       ...toRefs(filterInfo),
@@ -552,7 +574,6 @@ export default {
 .column {
   display: inline-flex;
   position: relative;
-  //min-width: 75px;
   height: 100%;
   padding: 0 10px;
   line-height: 30px;
@@ -676,20 +697,24 @@ export default {
     }
   }
 
-  tr {
+  .row {
     white-space: nowrap;
 
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
 
-    /* stylelint-disable */
     &.selected {
       @include evThemify() {
         background-color: evThemed('grid-row-selected') !important;
       }
     }
-    /* stylelint-enable */
+
+    &.highlight {
+      background: #5AB7FF;
+      color: #FFFFFF;
+      font-size: 16px;
+    }
   }
 
   td {
@@ -771,5 +796,9 @@ export default {
 
 .ev-checkbox {
   margin: 0;
+}
+
+.non-border {
+  border: none !important;
 }
 </style>

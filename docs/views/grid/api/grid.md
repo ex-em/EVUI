@@ -33,7 +33,6 @@
 | option | Object | {} | 그리드 옵션 |  |
 |  | adjust | false | 그리드의 너비에 맞게 컬럼 너비를 자동으로 조절 한다. |  |
 |  | showHeader | true | 헤더 표시 여부를 설정 한다. |  |
-|  | stripeRows | false | row 배경색 스타일을 설정 한다. |  |
 |  | rowHeight | 35 | row 높이를 설정 한다. | `min-height: 35` |
 |  | columnWidth | 40 | 기본 컬럼 너비를 설정 한다. | `min-width: 40px` |
 |  | useFilter | false | 필터 기능 사용 여부, 컨텍스트 메뉴에서 'Filter On' 메뉴를 클릭하여 설정 한다. |  |
@@ -41,6 +40,10 @@
 |  |  | use | 체크박스 사용 여부 | boolean |
 |  |  | mode | 단일 및 다중 선택 설정 | 'multi', 'single' |
 |  |  | headerCheck | 헤더 체크박스 사용 여부 | boolean |
+|  | style | {} | 그리드의 스타일을 설정한다. |  |
+|  |  | stripe | row의 배경색을 Stripe 스타일로 설정 한다. | boolean |
+|  |  | border | 그리드의 Border 여부를 설정한다. | 'none', 'rows' |
+|  |  | highlight | 지정한 row에 Highlight 효과를 설정한다. | `rowIndex` |
 |  | customContextMenu | [] | 우클릭시 보여지는 컨텍스트 메뉴를 설정 한다. |  |
 |  |  | menuItems | 컨텍스트 메뉴 |  |
 
