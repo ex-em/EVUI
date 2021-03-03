@@ -127,30 +127,18 @@ class Bar {
 
       ctx.fillRect(x, y, w, isHorizontal ? -h : h);
 
-
       if (showValue.use) {
-        ctx.save();
-
-        const value = numberWithComma(isHorizontal ? item.x : item.y);
-
-        ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
-        ctx.fillStyle = showValue.textColor;
-        ctx.lineWidth = 1;
-        ctx.textBaseline = isHorizontal ? 'middle' : 'bottom';
-        ctx.textAlign = 'center';
-
-        const vw = Math.round(ctx.measureText(value).width);
-        const vh = showValue.fontSize + 4;
-
-        if (vw < w && vh < Math.abs(h)) {
-          if (isHorizontal) {
-            ctx.fillText(value, x + w - vw, y - (h / 2));
-          } else {
-            ctx.fillText(value, x + (w / 2), y + h + vh);
-          }
-        }
-
-        ctx.restore();
+        this.drawValueLabels({
+          context: ctx,
+          data: item,
+          positions: {
+            x,
+            y,
+            h,
+            w,
+          },
+          isHighlight: false,
+        });
       }
 
       item.xp = x; // eslint-disable-line
@@ -168,7 +156,6 @@ class Bar {
    * @returns {undefined}
    */
   itemHighlight(item, context) {
-    const isHorizontal = this.isHorizontal;
     const showValue = this.showValue;
 
     const gdata = item.data;
@@ -189,28 +176,17 @@ class Bar {
     ctx.fillRect(x, y, w, h);
 
     if (showValue.use) {
-      ctx.save();
-
-      const value = numberWithComma(isHorizontal ? gdata.x : gdata.y);
-
-      ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
-      ctx.fillStyle = showValue.textColor;
-      ctx.lineWidth = 1;
-      ctx.textBaseline = isHorizontal ? 'middle' : 'bottom';
-      ctx.textAlign = 'center';
-
-      const vw = Math.round(ctx.measureText(value).width);
-      const vh = showValue.fontSize + 4;
-
-      if (vw < w && vh < Math.abs(h)) {
-        if (isHorizontal) {
-          ctx.fillText(value, x + w - vw, y + (h / 2));
-        } else {
-          ctx.fillText(value, x + (w / 2), y + h + vh);
-        }
-      }
-
-      ctx.restore();
+      this.drawValueLabels({
+        context: ctx,
+        data: gdata,
+        positions: {
+          x,
+          y,
+          h,
+          w,
+        },
+        isHighlight: true,
+      });
     }
 
     ctx.restore();
@@ -305,6 +281,67 @@ class Bar {
     }
 
     return item;
+  }
+
+  drawValueLabels({ context, data, positions, isHighlight }) {
+    const isHorizontal = this.isHorizontal;
+    const showValue = this.showValue;
+    const { x, y, w, h } = positions;
+    const ctx = context;
+
+    ctx.save();
+
+    const value = numberWithComma(isHorizontal ? data.x : data.y);
+
+    ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
+    ctx.fillStyle = showValue.textColor;
+    ctx.lineWidth = 1;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = isHorizontal && showValue.align !== 'center' ? 'left' : 'center';
+
+    const vw = Math.round(ctx.measureText(value).width);
+    const vh = showValue.fontSize + 4;
+    const minXPos = x + 10;
+    const minYPos = y - 10;
+    const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
+    const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
+    const centerYHorizontal = isHighlight ? centerY : y - (h / 2);
+
+    switch (showValue.align) {
+      case 'start':
+        if (isHorizontal) {
+          ctx.fillText(value, minXPos, centerYHorizontal);
+        } else {
+          ctx.fillText(value, centerX, minYPos);
+        }
+        break;
+      case 'center':
+        if (isHorizontal) {
+          ctx.fillText(value, centerX, centerYHorizontal);
+        } else {
+          ctx.fillText(value, centerX, centerY);
+        }
+        break;
+      case 'out':
+        if (isHorizontal) {
+          ctx.fillText(value, minXPos + w, centerYHorizontal);
+        } else {
+          ctx.fillText(value, centerX, y + h - (vh / 2));
+        }
+        break;
+      case 'end':
+      default:
+        if (isHorizontal) {
+          const xPos = x + w - (vw * 2);
+          ctx.fillText(value, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+        } else {
+          const yPos = y + h + vh;
+          ctx.fillText(value, centerX, yPos >= minYPos ? minYPos : yPos);
+        }
+        break;
+    }
+
+    ctx.restore();
   }
 }
 
