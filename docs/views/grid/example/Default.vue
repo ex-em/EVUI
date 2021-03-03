@@ -11,7 +11,6 @@
       :option="{
         adjust: adjustMV,
         showHeader: showHeaderMV,
-        stripeRows: isStripeStyleMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
         useFilter: useFilterMV,
@@ -21,6 +20,11 @@
           headerCheck: headerCheckMV,
         },
         customContextMenu: menuItems,
+        style: {
+          stripe: stripeMV,
+          border: borderMV,
+          highlight: highlightMV,
+        },
       }"
       @check-row="onCheckedRow"
       @check-all="onAllCheckedRow"
@@ -113,7 +117,7 @@
             <span class="form-row-title">Stripe Style</span>
             <div class="form-row-contents">
               <ev-toggle
-                v-model="isStripeStyleMV"
+                v-model="stripeMV"
               />
             </div>
           </div>
@@ -182,6 +186,29 @@
             </div>
           </div>
         </div>
+        <div class="form-rows">
+          <div class="form-row">
+            <span class="form-row-title">Highlight</span>
+            <div class="form-row-contents">
+              <ev-input-number
+                v-model="highlightMV"
+                :step="1"
+                :max="100"
+                :min="0"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <span class="form-row-title">Border</span>
+            <div class="form-row-contents">
+              <ev-select
+                v-model="borderMV"
+                :items="items"
+                placeholder="Please select value."
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -199,7 +226,7 @@ export default {
     const heightMV = ref(300);
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
-    const isStripeStyleMV = ref(false);
+    const stripeMV = ref(false);
     const rowHeightMV = ref(35);
     const columnWidthMV = ref(80);
     const useFilterMV = ref(true);
@@ -213,6 +240,22 @@ export default {
       {
         text: 'TEXT1',
         click: () => console.log('CLICK text1'),
+      },
+    ]);
+    const highlightMV = ref(0);
+    const borderMV = ref('');
+    const items = ref([
+      {
+        name: 'default',
+        value: '',
+      },
+      {
+        name: 'none',
+        value: 'none',
+      },
+      {
+        name: 'rows',
+        value: 'rows',
       },
     ]);
     const onClickCheckbox = (e) => {
@@ -361,7 +404,7 @@ export default {
       heightMV,
       adjustMV,
       showHeaderMV,
-      isStripeStyleMV,
+      stripeMV,
       rowHeightMV,
       columnWidthMV,
       useFilterMV,
@@ -372,6 +415,9 @@ export default {
       clickedRowMV,
       DbClickedRowsMV,
       menuItems,
+      highlightMV,
+      borderMV,
+      items,
       onClickCheckbox,
       onClickButton,
       clearData,
