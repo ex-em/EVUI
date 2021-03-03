@@ -21,7 +21,7 @@
         },
         customContextMenu: menuItems,
         style: {
-          stripe: isStripeStyleMV,
+          stripe: stripeMV,
           border: borderMV,
           highlight: highlightMV,
         },
@@ -117,7 +117,7 @@
             <span class="form-row-title">Stripe Style</span>
             <div class="form-row-contents">
               <ev-toggle
-                v-model="isStripeStyleMV"
+                v-model="stripeMV"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export default {
     const heightMV = ref(300);
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
-    const isStripeStyleMV = ref(false);
+    const stripeMV = ref(false);
     const rowHeightMV = ref(35);
     const columnWidthMV = ref(80);
     const useFilterMV = ref(true);
@@ -404,7 +404,7 @@ export default {
       heightMV,
       adjustMV,
       showHeaderMV,
-      isStripeStyleMV,
+      stripeMV,
       rowHeightMV,
       columnWidthMV,
       useFilterMV,
