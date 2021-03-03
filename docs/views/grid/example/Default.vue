@@ -22,8 +22,8 @@
         customContextMenu: menuItems,
         style: {
           stripe: isStripeStyleMV,
-          // border: 'none',
-          // highlight: 0,
+          border: borderMV,
+          highlight: highlightMV,
         },
       }"
       @check-row="onCheckedRow"
@@ -186,6 +186,29 @@
             </div>
           </div>
         </div>
+        <div class="form-rows">
+          <div class="form-row">
+            <span class="form-row-title">Highlight</span>
+            <div class="form-row-contents">
+              <ev-input-number
+                v-model="highlightMV"
+                :step="1"
+                :max="100"
+                :min="0"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <span class="form-row-title">Border</span>
+            <div class="form-row-contents">
+              <ev-select
+                v-model="borderMV"
+                :items="items"
+                placeholder="Please select value."
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -217,6 +240,22 @@ export default {
       {
         text: 'TEXT1',
         click: () => console.log('CLICK text1'),
+      },
+    ]);
+    const highlightMV = ref(0);
+    const borderMV = ref('');
+    const items = ref([
+      {
+        name: 'default',
+        value: '',
+      },
+      {
+        name: 'none',
+        value: 'none',
+      },
+      {
+        name: 'rows',
+        value: 'rows',
       },
     ]);
     const onClickCheckbox = (e) => {
@@ -376,6 +415,9 @@ export default {
       clickedRowMV,
       DbClickedRowsMV,
       menuItems,
+      highlightMV,
+      borderMV,
+      items,
       onClickCheckbox,
       onClickButton,
       clearData,

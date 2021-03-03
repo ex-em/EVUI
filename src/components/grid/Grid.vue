@@ -296,8 +296,7 @@ export default {
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
-    const borderStyle = computed(() =>
-      (props.option.style?.border === undefined ? false : props.option.style.border));
+    const borderStyle = computed(() => (props.option.style?.border || false));
     const highlightIdx = computed(() => (props.option.style?.highlight));
     const elementInfo = reactive({
       body: null,
