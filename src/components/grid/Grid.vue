@@ -298,6 +298,7 @@ export default {
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || false));
     const highlightIdx = computed(() => (props.option.style?.highlight));
+    const rowMinHeight = props.option.rowMinHeight || 35;
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -362,7 +363,7 @@ export default {
       columnWidth: props.option.columnWidth || 80,
       scrollWidth: props.option.scrollWidth || 17,
       rowHeight: computed(() =>
-        (props.option.rowHeight && props.option.rowHeight > 35 ? props.option.rowHeight : 35)),
+        (props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
     });
