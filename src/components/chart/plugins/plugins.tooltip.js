@@ -271,6 +271,8 @@ const modules = {
     });
 
     ctx.restore();
+
+    this.tooltipDOM.style.display = 'block';
   },
 
   /**
@@ -341,6 +343,8 @@ const modules = {
 
     this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width / this.clearRectRatio,
       this.tooltipCanvas.height / this.clearRectRatio);
+
+    this.tooltipDOM.style.display = 'none';
   },
 
   /**
