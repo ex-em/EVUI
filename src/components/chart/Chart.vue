@@ -24,6 +24,10 @@
         type: Object,
         default: () => ({}),
       },
+      resizeTimeout: {
+        type: Number,
+        default: 0,
+      },
     },
     emits: [
       'click',
@@ -102,7 +106,7 @@
         }
       };
 
-      const onResize = debounce(redrawChart, 300);
+      const onResize = debounce(redrawChart, props.resizeTimeout);
 
       const selectItemByLabel = (label) => {
         evChart.selectItemByLabel(label);

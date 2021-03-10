@@ -5,6 +5,7 @@
 <ev-chart
     :data="차트데이터"
     :options="차트속성"
+    :resize-timeout="debounce wait시간(단위: ms)"
 />
 ```
 
@@ -116,3 +117,8 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | true | indicator 사용 여부 | |
 | color | HexCode(String) | '#EE7F44' | 색상  | |
+
+
+### 3. resize-timeout
+- Default : 0
+- debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
