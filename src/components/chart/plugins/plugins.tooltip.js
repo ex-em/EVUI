@@ -32,23 +32,17 @@ const modules = {
 
   /**
    * Set tooltip canvas layout
-   * @param {object} hitInfo    mousemove callback
+   * @param {object} hitInfo    value and mouse position touched
    * @param {object} e          mousemove callback
-   * @param {object} offset     mousemove callback
    *
    * @returns {object} tooltip layout information
    */
-  setTooltipLayout(hitInfo, e, offset) {
+  setTooltipLayout(hitInfo, e) {
     const ctx = this.tooltipCtx;
     const mouseX = e.pageX;
     const mouseY = e.pageY;
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    const bodyWidth = document.body.clientWidth;
-    const bodyHeight = document.body.clientHeight;
 
     const items = hitInfo.items;
-    const [offsetX, offsetY] = offset;
     const [maxSeries, maxValue] = hitInfo.maxTip;
 
     const seriesKeys = Object.keys(items);
@@ -61,8 +55,6 @@ const modules = {
     const titleMargin = 12;
     const titleHeight = 16;
     const scrollWidth = 17;
-    const mouseXIp = 4; // mouseInterpolation
-    const mouseYIp = 10;
 
     const sId = hitInfo.hitId;
     const hitItem = items[sId].data;
@@ -80,48 +72,42 @@ const modules = {
     const nw = Math.round(ctx.measureText(maxSeries).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
     ctx.restore();
-    const width = Math.max((nw + vw), tw) + boxPadding.l + boxPadding.r + colorMargin + valueMargin;
-    const height = boxPadding.t + titleHeight + titleMargin
-      + (seriesLen * textHeight) + (seriesLen * lineSpacing) + boxPadding.b;
 
-    const graphPos = {
-      x1: this.chartRect.x1 + this.labelOffset.left,
-      x2: this.chartRect.x2 - this.labelOffset.right,
-      y1: this.chartRect.y1 + this.labelOffset.top,
-      y2: this.chartRect.y2 - this.labelOffset.bottom,
-    };
+    const getHeight = seriesCnt => boxPadding.t + titleHeight + titleMargin
+        + (seriesCnt * textHeight) + (seriesCnt * lineSpacing) + boxPadding.b;
 
-    this.tooltipDOM.style.width = `${width + scrollWidth}px`;
-    this.tooltipDOM.style.height = `${height + 6}px`;
+    const width = Math.max((nw + vw), tw)
+      + boxPadding.l + boxPadding.r + colorMargin + valueMargin + scrollWidth;
+    let height = getHeight(seriesLen);
+    const tooltipSizeInfo = { nw, width, height };
 
-    let pos = 0; // tooltip position based on mouse cursor position. lb: 0, lt: 1, rb: 2, rt: 3
+    this.tooltipCanvas.width = (width + 6) * this.pixelRatio;
+    this.tooltipCanvas.height = (height + 5) * this.pixelRatio;
+    this.tooltipCanvas.style.width = `${width + 6}px`;
+    this.tooltipCanvas.style.height = `${height + 5}px`;
 
-    if ((offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp))
-      && (offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp))) {
-      if (offsetX > ((graphPos.x2 * 4) / 5) || clientX > ((bodyWidth * 4) / 5)) {
-        this.tooltipDOM.style.left = `${mouseX - (width + 6)}px`;
-      } else {
-        this.tooltipDOM.style.left = `${mouseX + 6}px`;
-        pos += 2;
-      }
+    const bodyWidth = document.body.clientWidth;
+    const bodyHeight = document.body.clientHeight;
 
-      if ((offsetY > (graphPos.y2 / 2) || clientY > ((bodyHeight * 9) / 10))
-        && (clientY > (height + 6))) {
-        this.tooltipDOM.style.top = `${mouseY - height - 6}px`;
-        pos += 1;
-      } else {
-        this.tooltipDOM.style.top = `${mouseY + 6}px`;
-      }
+    this.tooltipDOM.style.left = mouseX > bodyWidth - width - 20
+      ? `${mouseX - width - 20}px`
+      : `${mouseX + 20}px`;
+    this.tooltipDOM.style.width = `${width}px`;
 
-      this.tooltipCanvas.width = (width + 6) * this.pixelRatio;
-      this.tooltipCanvas.height = (height + 5) * this.pixelRatio;
-      this.tooltipCanvas.style.width = `${width + 6}px`;
-      this.tooltipCanvas.style.height = `${height + 5}px`;
+    const scrollbar = this.options.tooltip.scrollbar;
+    if (scrollbar.use && seriesLen > scrollbar.maxSeriesCount) {
+      height = getHeight(scrollbar.maxSeriesCount);
+      this.tooltipDOM.style.overflowY = 'auto';
     } else {
-      pos = -1;
+      this.tooltipDOM.style.overflowY = 'hidden';
     }
 
-    return { nw, width, height, pos };
+    this.tooltipDOM.style.top = mouseY > bodyHeight - height - 20
+      ? `${mouseY - height - 20}px`
+      : `${mouseY + 20}px`;
+    this.tooltipDOM.style.height = `${height}px`;
+
+    return tooltipSizeInfo;
   },
 
   /**
@@ -140,29 +126,21 @@ const modules = {
     const hitAxis = items[sId].axis;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
-    const borderRadius = 8;
     const titleMargin = 12;
     const lineSpacing = 8;
     const colorMargin = 16;
     const textHeight = 14;
-    const { height, pos } = size;
+    const height = size.height;
     const width = size.width - 5;
-    const arrowTY = 30;
-    const arrowBY = -10;
-    const arrowLX = -5;
-    const arrowRX = 5;
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-
-    if (pos < 0) {
-      return;
-    }
+    let borderRadius = 8;
 
     const title = isHorizontal
       ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
       : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
-    let x = pos > 1 ? 5 : 2;
+    let x = 2;
     let y = 2;
 
     x += Util.aliasPixel(x);
@@ -176,39 +154,17 @@ const modules = {
     ctx.fillStyle = opt.backgroundColor;
     ctx.strokeStyle = opt.borderColor;
 
+    if (this.tooltipDOM.style.overflowY === 'auto') {
+      borderRadius = 0;
+      boxPadding.r += 10;
+    }
+
     ctx.beginPath();
     ctx.moveTo(x + borderRadius, y);
-    ctx.lineTo((x + width) - borderRadius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
-
-    // tooltip pos => lb: 0, lt: 1, rb: 2, rt: 3
-    if (pos === 0) {
-      ctx.lineTo(x + width, (y + arrowTY) - borderRadius - 5);
-      ctx.lineTo(x + width + arrowRX, (y + arrowTY) - borderRadius);
-      ctx.lineTo(x + width, ((y + arrowTY) - borderRadius) + 5);
-    } else if (pos === 1) {
-      ctx.lineTo(x + width, (y + height + arrowBY) - borderRadius - 5);
-      ctx.lineTo(x + width + arrowRX, (y + height + arrowBY) - borderRadius);
-      ctx.lineTo(x + width, ((y + height + arrowBY) - borderRadius) + 5);
-    }
-
-    ctx.lineTo(x + width, (y + height) - borderRadius);
-    ctx.quadraticCurveTo(x + width, y + height, (x + width) - borderRadius, y + height);
-    ctx.lineTo(x + borderRadius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, (y + height) - borderRadius);
-
-    if (pos === 2) {
-      ctx.lineTo(x, ((y + arrowTY) - borderRadius) + 5);
-      ctx.lineTo(x + arrowLX, (y + arrowTY) - borderRadius);
-      ctx.lineTo(x, (y + arrowTY) - borderRadius - 5);
-    } else if (pos === 3) {
-      ctx.lineTo(x, ((y + height + arrowBY) - borderRadius) + 5);
-      ctx.lineTo(x + arrowLX, (y + height + arrowBY) - borderRadius);
-      ctx.lineTo(x, (y + height + arrowBY) - borderRadius - 5);
-    }
-
-    ctx.lineTo(x, y + borderRadius);
-    ctx.quadraticCurveTo(x, y, x + borderRadius, y);
+    ctx.arcTo(x + width, y, x + width, y + height, borderRadius);
+    ctx.arcTo(x + width, y + height, x, y + height, borderRadius);
+    ctx.arcTo(x, y + height, x, y, borderRadius);
+    ctx.arcTo(x, y, x + width, y, borderRadius);
     ctx.closePath();
 
     if (opt.useShadow) {
@@ -237,9 +193,36 @@ const modules = {
     y += titleMargin;
 
     ctx.font = 'normal normal lighter 14px Roboto';
-    seriesKeys.forEach((s, index) => {
-      const gdata = items[s].data;
-      const color = items[s].color;
+
+    const seriesList = [];
+    seriesKeys.forEach((seriesName) => {
+      seriesList.push({
+        data: items[seriesName].data,
+        color: items[seriesName].color,
+        name: items[seriesName].name,
+      });
+    });
+
+    if (opt.sortByValue) {
+      seriesList.sort((a, b) => {
+        let prev = a.data.o;
+        let next = b.data.o;
+
+        if (!prev) {
+          prev = isHorizontal ? a.data.x : a.data.y;
+        }
+
+        if (!next) {
+          next = isHorizontal ? b.data.x : b.data.y;
+        }
+        return next - prev;
+      });
+    }
+
+    for (let ix = 0; ix < seriesList.length; ix++) {
+      const gdata = seriesList[ix].data;
+      const color = seriesList[ix].color;
+      const name = seriesList[ix].name;
 
       let value;
 
@@ -250,7 +233,7 @@ const modules = {
       }
 
       let itemX = x + 4;
-      let itemY = y + ((index + 1) * textHeight);
+      let itemY = y + ((ix + 1) * textHeight);
 
       itemX += Util.aliasPixel(itemX);
       itemY += Util.aliasPixel(itemY);
@@ -261,14 +244,14 @@ const modules = {
       ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
       ctx.fillStyle = '#FFFFFF';
       ctx.textBaseline = 'Bottom';
-      ctx.fillText(this.seriesList[s].name, (itemX + colorMargin), itemY);
+      ctx.fillText(name, (itemX + colorMargin), itemY);
       ctx.save();
       ctx.textAlign = 'right';
       ctx.fillText(numberWithComma(value), size.width - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
       y += lineSpacing;
-    });
+    }
 
     ctx.restore();
 
@@ -353,7 +336,6 @@ const modules = {
    *
    * @returns {array} ordered series list by groups
    */
-
   alignSeriesList(sKeys) {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
