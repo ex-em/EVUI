@@ -2,6 +2,7 @@ import { defaultsDeep } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
+import Util from '../helpers/helpers.util';
 
 class Bar {
   constructor(sId, opt, sIdx, isHorizontal) {
@@ -94,7 +95,9 @@ class Bar {
     let categoryPoint = null;
 
     ctx.beginPath();
-    ctx.fillStyle = this.color;
+
+    const opacity = this.state === 'downplay' ? 0.1 : 1;
+    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
 
     this.data.forEach((item, index) => {
       if (isHorizontal) {

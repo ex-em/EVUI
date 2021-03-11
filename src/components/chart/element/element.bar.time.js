@@ -1,5 +1,6 @@
 import Canvas from '../helpers/helpers.canvas';
 import Bar from './element.bar';
+import Util from '../helpers/helpers.util';
 
 class TimeBar extends Bar {
   /**
@@ -60,7 +61,9 @@ class TimeBar extends Bar {
     this.size.ix = barSeriesX;
 
     ctx.beginPath();
-    ctx.fillStyle = this.color;
+
+    const opacity = this.state === 'downplay' ? 0.1 : 1;
+    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
 
     this.data.forEach((item) => {
       if (isHorizontal) {
