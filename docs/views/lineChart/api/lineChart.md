@@ -5,6 +5,7 @@
 <ev-chart
     :data="차트데이터"
     :options="차트속성"
+    :resize-timeout="debounce wait시간(단위: ms)"
 />
 ```
 
@@ -160,3 +161,8 @@ const chartData =
  | click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |
  | dbl-click | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환 |
  * 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
+
+
+### 3. resize-timeout
+- Default : 0
+- debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
