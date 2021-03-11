@@ -34,4 +34,3 @@
 | height | String | '' | <윈도우> 높이 | 
 | show-modal-layer | Boolean | true | 모달창 하단의 dim layer 출력 여부 | true, false |
 | close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |
-| lock-scroll | Boolean | true | 모달 창 노출 시 스크롤 사라짐 여부 | true, false |

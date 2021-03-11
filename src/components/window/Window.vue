@@ -6,10 +6,7 @@
     >
       <div
         v-if="visible"
-        :class="[
-          'ev-window-wrapper',
-          { 'lock-scroll': lockScroll }
-        ]"
+        class="ev-window-wrapper"
       >
         <div
           v-if="showModalLayer"
@@ -64,7 +61,7 @@
 </template>
 
 <script>
-import { computed, watch, onMounted, onUnmounted } from 'vue';
+import { computed, watch, onUnmounted } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -104,10 +101,6 @@ export default {
     closeOnClickModal: {
       type: Boolean,
       default: false,
-    },
-    lockScroll: {
-      type: Boolean,
-      default: true,
     },
   },
   emits: {
@@ -160,32 +153,28 @@ export default {
       }
       emit('update:visible', false);
     };
-    const setBodyLock = (val, type) => {
-      if (val) {
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
-        document.body.style.overflow = 'hidden';
-      } else {
-        const root = document.getElementById('ev-window-modal');
-        const lockChildren = root.getElementsByClassName('lock-scroll');
-        if (lockChildren.length === 1 || type === 'all') {
-          document.body.style.width = 'auto';
-          document.body.style.height = 'auto';
-          document.body.style.overflow = 'visible';
+
+    const wheelHandler = (e) => { e.preventDefault(); };
+    const setScrollLock = (isLock) => {
+      if (isLock) {
+        if (props.fullscreen) {
+          document.body.classList.add('ev-body-scroll-lock');
+        } else {
+          document.addEventListener('wheel', wheelHandler, { passive: false });
         }
+      } else {
+        document.body.classList.remove('ev-body-scroll-lock');
+        document.removeEventListener('wheel', wheelHandler);
       }
     };
-    onMounted(() => {
-      if (props.visible && props.lockScroll) {
-        setBodyLock(true);
-      }
+
+    onUnmounted(() => {
+      setScrollLock(false);
     });
-    onUnmounted(() => setBodyLock(false, 'all'));
-    watch(() => props.visible, (val) => {
-      if (props.lockScroll) {
-        setBodyLock(val);
-      }
+    watch(() => props.visible, (newVal) => {
+      setScrollLock(newVal);
     });
+
     return {
       windowStyle,
       closeWin,
@@ -197,6 +186,9 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
+.ev-body-scroll-lock {
+  overflow-y: hidden !important;
+}
 .ev-window-dim-layer {
   position: fixed;
   top: 0;

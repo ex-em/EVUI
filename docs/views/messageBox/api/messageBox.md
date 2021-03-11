@@ -86,5 +86,4 @@ ctx.$messagebox({
 | confirmBtnText | String | 'OK' | 확인 버튼 문구 | |
 | cancelBtnText | String | 'Cancel' | 취소 버튼 문구 | |
 | closeOnClickModal | Boolean | true | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |
-| lockScroll | Boolean | true | 메시지 창 노출 시 스크롤 사라짐 여부 | true, false |
 | useHTML | Boolean | false | 메시지 창 문구에 HTML 사용 여부. 사용 시 message 속성에 함께 작성 | |

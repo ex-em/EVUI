@@ -133,10 +133,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    lockScroll: {
-      type: Boolean,
-      default: true,
-    },
     useHTML: {
       type: Boolean,
       default: false,
@@ -191,25 +187,19 @@ export default {
       } else if (props.type) {
         state.iconClass = getIconClassName(props.type);
       }
-      if (props.lockScroll) {
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
-        document.body.style.overflow = 'hidden';
-      }
     };
+
+    const wheelHandler = (e) => { e.preventDefault(); };
 
     onMounted(() => {
       setState();
       document.addEventListener('keydown', keydown);
+      document.addEventListener('wheel', wheelHandler, { passive: false });
     });
     watch(() => state.isShow, (val) => {
       if (!val) {
         document.removeEventListener('keydown', keydown);
-        if (props.lockScroll) {
-          document.body.style.width = 'auto';
-          document.body.style.height = 'auto';
-          document.body.style.overflow = 'visible';
-        }
+        document.removeEventListener('wheel', wheelHandler);
       }
     });
     return {
