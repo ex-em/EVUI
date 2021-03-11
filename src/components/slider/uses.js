@@ -7,6 +7,56 @@ export const useModel = () => {
   const { props, emit } = getCurrentInstance();
   const currentValue = ref(props.modelValue);
 
+  const setStepList = () => {
+    if (!props.showStep) {
+      return [];
+    }
+    // step은 이동 단위 기준으로, 입력값에 따라 클릭 및 드레그 시 이동 단위를 나타냄
+    const sliderRange = props.max - props.min;
+    const stepCount = sliderRange / props.step;
+    const stepWidth = convertToPercent(props.step, sliderRange);
+    const result = [];
+    for (let ix = 1; ix < stepCount; ix++) {
+      result.push(ix * stepWidth);
+    }
+    return result;
+  };
+
+  const setMarkList = () => {
+    if (!props.mark || !Object.keys(props.mark).length) {
+      return [];
+    }
+    const getResultList = (obj, type = 'value') => {
+      if (!obj) {
+        return [];
+      }
+      const style = props.mark.style && (typeof props.mark.style === 'object') ? props.mark.style : {};
+      const keyList = Object.keys(obj);
+      const resultList = [];
+      let markVal;
+      for (let ix = 0; ix < keyList.length; ix++) {
+        markVal = +keyList[ix];
+        if (!isNaN(markVal)) {
+          resultList.push({
+            posX: type === 'value' ? convertToPercent(markVal, props.max - props.min) : markVal,
+            label: obj[markVal],
+            style,
+          });
+        }
+      }
+      return resultList;
+    };
+
+    const hasDetailOption = props.mark.value || props.mark.percent;
+    if (!hasDetailOption) {
+      return [...getResultList(props.mark)];
+    }
+    return [
+      ...getResultList(props.mark.value),
+      ...getResultList(props.mark.percent, 'percent'),
+    ];
+  };
+
   const state = reactive({
     isInit: false,
     dragging: false,
@@ -15,12 +65,12 @@ export const useModel = () => {
     rightValue: null,
   });
   const slider = reactive({
-    valueRange: null,
-    stepList: [],
-    markList: [],
+    valueRange: 0,
+    stepList: computed(setStepList),
+    markList: computed(setMarkList),
     offset: {
-      left: null,
-      width: null,
+      left: 0,
+      width: 0,
     },
   });
   const sliderLine = ref();
@@ -95,6 +145,9 @@ export const useModel = () => {
       setHandleValue(curr);
       currentValue.value = curr;
     }
+  });
+  watch(() => props.step, () => {
+    setSliderValue(currentValue.value);
   });
 
   return {
@@ -330,60 +383,8 @@ export const useInit = (params) => {
     state.isInit = true;
   };
 
-  const initStepList = () => {
-    if (!props.showStep) {
-      return;
-    }
-    // step은 이동 단위 기준으로, 입력값에 따라 클릭 및 드레그 시 이동 단위를 나타냄
-    const stepCount = slider.valueRange / props.step;
-    const stepWidth = convertToPercent(props.step, slider.valueRange);
-    const result = [];
-    for (let ix = 1; ix < stepCount; ix++) {
-      result.push(ix * stepWidth);
-    }
-    slider.stepList = result;
-  };
-
-  const initMarkList = () => {
-    if (!props.mark || !Object.keys(props.mark).length) {
-      return;
-    }
-    const getResultList = (obj, type = 'value') => {
-      if (!obj) {
-        return [];
-      }
-      const style = props.mark.style && (typeof props.mark.style === 'object') ? props.mark.style : {};
-      const keyList = Object.keys(obj);
-      const resultList = [];
-      let markVal;
-      for (let ix = 0; ix < keyList.length; ix++) {
-        markVal = +keyList[ix];
-        if (!isNaN(markVal)) {
-          resultList.push({
-            posX: type === 'value' ? convertToPercent(markVal, slider.valueRange) : markVal,
-            label: obj[markVal],
-            style,
-          });
-        }
-      }
-      return resultList;
-    };
-
-    const hasListOption = props.mark.value || props.mark.percent;
-    if (!hasListOption) {
-      slider.markList = getResultList(props.mark);
-    } else {
-      slider.markList = [
-        ...getResultList(props.mark.value),
-        ...getResultList(props.mark.percent, 'percent'),
-      ];
-    }
-  };
-
   onMounted(() => {
     validateProps();
     initValue();
-    initStepList();
-    initMarkList();
   });
 };
