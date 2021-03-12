@@ -69,8 +69,9 @@ class Scatter {
       return item;
     }, this.data[0]);
 
-    ctx.strokeStyle = this.color;
-    ctx.fillStyle = this.pointFill;
+    const opacity = this.state === 'downplay' ? 0.1 : 1;
+    ctx.fillStyle = `rgba(${Util.hexToRgb(this.pointFill)},${opacity})` || '';
+    ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
 
     this.data.forEach((curr) => {
       if (curr.xp !== null && curr.yp !== null) {

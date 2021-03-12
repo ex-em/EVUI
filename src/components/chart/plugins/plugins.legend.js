@@ -322,7 +322,7 @@ const modules = {
         chartRect = this.chartDOM.getBoundingClientRect();
 
         boxStyle.width = `${opt.legend.width - 10}px`; // legendDOM left padding
-        boxStyle.height = `${chartRect.height}px`;
+        boxStyle.maxHeight = `${chartRect.height}px`;
 
         legendStyle.paddingLeft = '10px';
         legendStyle.top = `${title}px`;
@@ -371,7 +371,7 @@ const modules = {
         chartRect = this.chartDOM.getBoundingClientRect();
 
         boxStyle.width = `${opt.legend.width}px`;
-        boxStyle.height = `${chartRect.height}px`;
+        boxStyle.maxHeight = `${chartRect.height}px`;
         boxStyle.display = 'absolute';
         boxStyle.bottom = '0px';
 
