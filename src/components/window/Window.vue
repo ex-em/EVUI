@@ -6,7 +6,10 @@
     >
       <div
         v-if="visible"
-        class="ev-window-wrapper"
+        :class="[
+          'ev-window-wrapper',
+           { 'show-modal': showModalLayer },
+        ]"
       >
         <div
           v-if="showModalLayer"
@@ -61,7 +64,7 @@
 </template>
 
 <script>
-import { computed, watch, onUnmounted } from 'vue';
+import { computed, watch } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -110,8 +113,8 @@ export default {
     /**
      * body에 ev-window-modal DIV를 append하는 로직
      */
+    const root = document.getElementById('ev-window-modal');
     const initWrapperDiv = () => {
-      const root = document.getElementById('ev-window-modal');
       if (!root) {
         const rootDiv = document.createElement('div');
         rootDiv.id = 'ev-window-modal';
@@ -154,23 +157,19 @@ export default {
       emit('update:visible', false);
     };
 
-    const wheelHandler = (e) => { e.preventDefault(); };
     const setScrollLock = (isLock) => {
       if (isLock) {
-        if (props.fullscreen) {
-          document.body.classList.add('ev-body-scroll-lock');
-        } else {
-          document.addEventListener('wheel', wheelHandler, { passive: false });
+        if (props.showModalLayer) {
+          document.body.classList.add('ev-window-scroll-lock');
         }
       } else {
-        document.body.classList.remove('ev-body-scroll-lock');
-        document.removeEventListener('wheel', wheelHandler);
+        const windowCount = root?.getElementsByClassName('show-modal')?.length;
+        if (windowCount === 1) {
+          document.body.classList.remove('ev-window-scroll-lock');
+        }
       }
     };
 
-    onUnmounted(() => {
-      setScrollLock(false);
-    });
     watch(() => props.visible, (newVal) => {
       setScrollLock(newVal);
     });
@@ -186,8 +185,8 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-body-scroll-lock {
-  overflow-y: hidden !important;
+.ev-window-scroll-lock {
+  overflow: hidden !important;
 }
 .ev-window-dim-layer {
   position: fixed;

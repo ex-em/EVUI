@@ -189,17 +189,15 @@ export default {
       }
     };
 
-    const wheelHandler = (e) => { e.preventDefault(); };
-
     onMounted(() => {
       setState();
       document.addEventListener('keydown', keydown);
-      document.addEventListener('wheel', wheelHandler, { passive: false });
+      document.body.classList.add('ev-message-box-scroll-lock');
     });
     watch(() => state.isShow, (val) => {
       if (!val) {
         document.removeEventListener('keydown', keydown);
-        document.removeEventListener('wheel', wheelHandler);
+        document.body.classList.remove('ev-message-box-scroll-lock');
       }
     });
     return {
@@ -213,6 +211,9 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
+.ev-message-box-scroll-lock {
+  overflow: hidden !important;
+}
 #ev-message-box-modal {
   display: flex;
   position: fixed;
