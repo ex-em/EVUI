@@ -1,5 +1,6 @@
 import { merge } from 'lodash-es';
 import { PIE_OPTION, COLOR } from '../helpers/helpers.constant';
+import Util from '../helpers/helpers.util';
 
 class Pie {
   constructor(sId, opt, sIdx) {
@@ -34,9 +35,10 @@ class Pie {
     const radius = param.radius;
     const startAngle = param.startAngle;
     const endAngle = param.endAngle;
+    const opacity = this.state === 'downplay' ? 0.1 : 1;
 
     ctx.beginPath();
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.fill();
