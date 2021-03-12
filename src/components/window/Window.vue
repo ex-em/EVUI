@@ -113,12 +113,13 @@ export default {
     /**
      * body에 ev-window-modal DIV를 append하는 로직
      */
-    const root = document.getElementById('ev-window-modal');
+    let root = document.getElementById('ev-window-modal');
     const initWrapperDiv = () => {
       if (!root) {
         const rootDiv = document.createElement('div');
         rootDiv.id = 'ev-window-modal';
         document.body.appendChild(rootDiv);
+        root = document.getElementById('ev-window-modal');
       }
     };
     initWrapperDiv();
