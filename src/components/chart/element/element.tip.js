@@ -83,7 +83,6 @@ const modules = {
 
     const { type, size } = series;
     const { maxDomain, maxDomainIndex } = series.minMax;
-    const seriesMaxY = series.minMax.maxY;
 
     if (maxDomain === null || maxDomainIndex < 0) {
       return false;
@@ -100,7 +99,7 @@ const modules = {
       }
     }
 
-    let value = seriesMaxY;
+    let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.value !== null) {
@@ -248,8 +247,8 @@ const modules = {
         type: maxTipType,
         width: maxTipWidth,
         height: maxTipHeight,
-        x: tdp,
-        y: gp,
+        x: isHorizontal ? gp : tdp,
+        y: isHorizontal ? tdp : gp,
         opt,
         arrowSize,
         borderRadius,
@@ -260,8 +259,8 @@ const modules = {
     if (opt.showTip && tipType === 'sel') {
       this.showTip({
         context: ctx,
-        x: dp,
-        y: gp,
+        x: isHorizontal ? gp : dp,
+        y: isHorizontal ? dp : gp,
         opt,
         arrowSize,
         isSamePos,
