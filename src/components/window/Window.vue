@@ -172,7 +172,6 @@ export default {
           document.body.classList.add('ev-window-scroll-lock');
         }
       } else {
-        console.log(12321);
         const windowCount = root?.getElementsByClassName('ev-window-wrapper')?.length;
         if (windowCount === 1) {
           document.body.classList.remove('ev-window-scroll-lock');
