@@ -104,7 +104,9 @@ const modules = {
 
     if (this.options?.tooltip?.scrollbar?.use) {
       this.overlayCanvas.addEventListener('wheel', (e) => {
-        if (this.tooltipDOM.style.display === 'block') {
+        const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+
+        if (isTooltipVisible) {
           e.preventDefault();
           this.tooltipDOM.scrollTop += e.deltaY;
         }
