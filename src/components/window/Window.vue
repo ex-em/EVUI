@@ -6,15 +6,13 @@
     >
       <div
         v-if="visible"
-        :class="[
-          'ev-window-wrapper',
-           { 'show-modal': showModalLayer },
-        ]"
+        class="ev-window-wrapper"
       >
         <div
-          v-if="showModalLayer"
+          v-if="isModal"
           class="ev-window-dim-layer"
           @click="closeWin('layer')"
+          @wheel.stop.prevent="() => {}"
         />
         <div
           :class="['ev-window', windowClass]"
@@ -42,7 +40,11 @@
               </p>
             </template>
           </div>
-          <div class="ev-window-content">
+          <div
+            ref="windowContent"
+            class="ev-window-content"
+            @wheel="onWheelContent"
+          >
             <slot />
           </div>
           <div
@@ -64,7 +66,7 @@
 </template>
 
 <script>
-import { computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -97,11 +99,15 @@ export default {
       type: Boolean,
       default: false,
     },
-    showModalLayer: {
+    isModal: {
       type: Boolean,
       default: true,
     },
     closeOnClickModal: {
+      type: Boolean,
+      default: false,
+    },
+    hideScroll: {
       type: Boolean,
       default: false,
     },
@@ -123,6 +129,8 @@ export default {
       }
     };
     initWrapperDiv();
+
+    const windowContent = ref(null);
 
     const windowStyle = computed(() => {
       if (props.fullscreen) {
@@ -158,26 +166,49 @@ export default {
       emit('update:visible', false);
     };
 
-    const setScrollLock = (isLock) => {
-      if (isLock) {
-        if (props.showModalLayer) {
+    const changeBodyCls = (isVisibleModal) => {
+      if (isVisibleModal) {
+        if (props.hideScroll) {
           document.body.classList.add('ev-window-scroll-lock');
         }
       } else {
-        const windowCount = root?.getElementsByClassName('show-modal')?.length;
+        console.log(12321);
+        const windowCount = root?.getElementsByClassName('ev-window-wrapper')?.length;
         if (windowCount === 1) {
           document.body.classList.remove('ev-window-scroll-lock');
         }
       }
     };
 
-    watch(() => props.visible, (newVal) => {
-      setScrollLock(newVal);
-    });
+    const onWheelContent = (e) => {
+      const hasScroll = windowContent.value.scrollHeight > windowContent.value.clientHeight;
+      if (!hasScroll) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      const isMeetTop = windowContent.value.scrollTop === 0;
+      const isMeetBottom = (windowContent.value.scrollHeight - windowContent.value.clientHeight)
+        === windowContent.value.scrollTop;
+      const isUpward = e.deltaY < 0;
+      const isDownward = e.deltaY > 0;
+
+      if ((isMeetBottom && isDownward) || (isMeetTop && isUpward)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    watch(
+      () => props.visible,
+      newVal => changeBodyCls(newVal),
+    );
 
     return {
+      windowContent,
       windowStyle,
       closeWin,
+      onWheelContent,
     };
   },
 };
@@ -188,6 +219,7 @@ export default {
 
 .ev-window-scroll-lock {
   overflow: hidden !important;
+  //padding-right: 15px;
 }
 .ev-window-dim-layer {
   position: fixed;

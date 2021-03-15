@@ -32,5 +32,5 @@
 | icon-class | String | '' | <윈도우> 내부 헤더의 아이콘 | |
 | width | String | '' | <윈도우> 너비 | 
 | height | String | '' | <윈도우> 높이 | 
-| show-modal-layer | Boolean | true | 모달창 하단의 dim layer 출력 여부 | true, false |
+| is-modal | Boolean | true | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
 | close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |
