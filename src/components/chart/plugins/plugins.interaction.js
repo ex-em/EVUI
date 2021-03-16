@@ -24,7 +24,8 @@ const modules = {
         this.drawItemsHighlight(hitInfo, ctx);
 
         if (tooltip.use) {
-          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e));
+          this.setTooltipLayoutPosition(hitInfo, e);
+          this.drawTooltip(hitInfo, this.tooltipCtx);
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
@@ -108,7 +109,7 @@ const modules = {
 
         if (isTooltipVisible) {
           e.preventDefault();
-          this.tooltipDOM.scrollTop += e.deltaY;
+          this.tooltipBodyDOM.scrollTop += e.deltaY;
         }
       });
     }

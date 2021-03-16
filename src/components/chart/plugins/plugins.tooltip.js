@@ -11,12 +11,23 @@ const modules = {
   createTooltipDOM() {
     this.tooltipDOM = document.createElement('div');
     this.tooltipDOM.className = 'ev-chart-tooltip';
+
+    this.tooltipHeaderDOM = document.createElement('div');
+    this.tooltipHeaderDOM.className = 'ev-chart-tooltip-header';
+
+    this.tooltipBodyDOM = document.createElement('div');
+    this.tooltipBodyDOM.className = 'ev-chart-tooltip-body';
+
     this.tooltipCanvas = document.createElement('canvas');
     this.tooltipCanvas.className = 'ev-chart-tooltip-canvas';
     this.tooltipCtx = this.tooltipCanvas.getContext('2d');
 
     this.tooltipDOM.style.display = 'none';
-    this.tooltipDOM.appendChild(this.tooltipCanvas);
+
+    this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
+    this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
+    this.tooltipDOM.appendChild(this.tooltipBodyDOM);
+
     document.body.appendChild(this.tooltipDOM);
 
     if (this.options.tooltip.debouncedHide) {
@@ -31,13 +42,13 @@ const modules = {
   },
 
   /**
-   * Set tooltip canvas layout
+   * Set tooltip DOM's position and style
    * @param {object} hitInfo    value and mouse position touched
    * @param {object} e          mousemove callback
    *
    * @returns {object} tooltip layout information
    */
-  setTooltipLayout(hitInfo, e) {
+  setTooltipLayoutPosition(hitInfo, e) {
     const ctx = this.tooltipCtx;
     const mouseX = e.pageX;
     const mouseY = e.pageY;
@@ -50,96 +61,83 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const lineSpacing = 8;
     const colorMargin = 16;
-    const valueMargin = 20;
+    const valueMargin = 50;
     const textHeight = 14;
-    const titleMargin = 12;
-    const titleHeight = 16;
+    const titleHeight = 30;
     const scrollWidth = 17;
+    const opt = this.options.tooltip;
 
-    const sId = hitInfo.hitId;
-    const hitItem = items[sId].data;
-    const hitAxis = items[sId].axis;
-    const isHorizontal = this.options.horizontal;
+    // calculate height and width of canvas in tooltip DOM
+    const calHeight = seriesCnt => boxPadding.t + (seriesCnt * textHeight)
+      + (seriesCnt * lineSpacing) + boxPadding.b;
 
-    const title = isHorizontal
-      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
-      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
     ctx.save();
-    ctx.font = '16px Roboto';
-    const tw = Math.round(ctx.measureText(title).width);
-
-    ctx.font = '14px Roboto';
+    ctx.font = '12px Roboto';
     const nw = Math.round(ctx.measureText(maxSeries).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
     ctx.restore();
 
-    const getHeight = seriesCnt => boxPadding.t + titleHeight + titleMargin
-        + (seriesCnt * textHeight) + (seriesCnt * lineSpacing) + boxPadding.b;
+    const contentsWidth = nw + vw + boxPadding.l + boxPadding.r
+      + colorMargin + valueMargin + scrollWidth;
+    let contentsHeight = calHeight(seriesLen);
 
-    const width = Math.max((nw + vw), tw)
-      + boxPadding.l + boxPadding.r + colorMargin + valueMargin + scrollWidth;
-    let height = getHeight(seriesLen);
-    const tooltipSizeInfo = { nw, width, height };
+    // set tooltip's width / height
+    this.tooltipCanvas.width = (contentsWidth + 6) * this.pixelRatio;
+    this.tooltipCanvas.height = (contentsHeight + 5) * this.pixelRatio;
+    this.tooltipCanvas.style.width = `${contentsWidth + 6}px`;
+    this.tooltipCanvas.style.height = `${contentsHeight + 5}px`;
 
-    this.tooltipCanvas.width = (width + 6) * this.pixelRatio;
-    this.tooltipCanvas.height = (height + 5) * this.pixelRatio;
-    this.tooltipCanvas.style.width = `${width + 6}px`;
-    this.tooltipCanvas.style.height = `${height + 5}px`;
+    if (opt.scrollbar.use && seriesLen > opt.scrollbar.maxSeriesCount) {
+      this.tooltipBodyDOM.style.overflowY = 'auto';
+      contentsHeight = calHeight(opt.scrollbar.maxSeriesCount);
+    } else {
+      this.tooltipBodyDOM.style.overflowY = 'hidden';
+    }
+    this.tooltipHeaderDOM.style.height = `${titleHeight}px`;
+    this.tooltipDOM.style.height = `${titleHeight + contentsHeight}px`;
+    this.tooltipBodyDOM.style.height = `${contentsHeight}px`;
 
+    // set tooltipDOM's positions
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
-
-    this.tooltipDOM.style.left = mouseX > bodyWidth - width - 20
-      ? `${mouseX - width - 20}px`
+    this.tooltipDOM.style.left = mouseX > bodyWidth - contentsWidth - 20
+      ? `${mouseX - contentsWidth - 20}px`
       : `${mouseX + 20}px`;
-    this.tooltipDOM.style.width = `${width}px`;
-
-    const scrollbar = this.options.tooltip.scrollbar;
-    if (scrollbar.use && seriesLen > scrollbar.maxSeriesCount) {
-      height = getHeight(scrollbar.maxSeriesCount);
-      this.tooltipDOM.style.overflowY = 'auto';
-    } else {
-      this.tooltipDOM.style.overflowY = 'hidden';
-    }
-
-    this.tooltipDOM.style.top = mouseY > bodyHeight - height - 20
-      ? `${mouseY - height - 20}px`
+    this.tooltipDOM.style.top = mouseY > bodyHeight - (titleHeight + contentsHeight) - 20
+      ? `${mouseY - (titleHeight + contentsHeight) - 20}px`
       : `${mouseY + 20}px`;
-    this.tooltipDOM.style.height = `${height}px`;
-
-    return tooltipSizeInfo;
   },
 
   /**
    * Draw tooltip canvas
    * @param {object} hitInfo    mousemove callback
    * @param {object} context    tooltip canvas context
-   * @param {object} size       tooltip size information
    *
    * @returns {undefined}
    */
-  drawTooltip(hitInfo, context, size) {
+  drawTooltip(hitInfo, context) {
     const ctx = context;
-    const sId = hitInfo.hitId;
     const items = hitInfo.items;
+    const sId = hitInfo.hitId;
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
-    const titleMargin = 12;
     const lineSpacing = 8;
     const colorMargin = 16;
     const textHeight = 14;
-    const height = size.height;
-    const width = size.width - 5;
+    const scrollWidth = 17;
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    let borderRadius = 8;
 
-    const title = isHorizontal
+    // draw tooltip Title(axis label)
+    const title = this.options.horizontal
       ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
       : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
+    this.tooltipHeaderDOM.textContent = title;
+
+    // draw tooltip contents (series, value combination)
     let x = 2;
     let y = 2;
 
@@ -149,48 +147,12 @@ const modules = {
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    ctx.lineWidth = 0.5;
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = opt.backgroundColor;
-    ctx.strokeStyle = opt.borderColor;
-
-    if (this.tooltipDOM.style.overflowY === 'auto') {
-      borderRadius = 0;
-      boxPadding.r += 10;
+    if (this.tooltipBodyDOM.style.overflowY === 'auto') {
+      boxPadding.r += scrollWidth;
     }
-
-    ctx.beginPath();
-    ctx.moveTo(x + borderRadius, y);
-    ctx.arcTo(x + width, y, x + width, y + height, borderRadius);
-    ctx.arcTo(x + width, y + height, x, y + height, borderRadius);
-    ctx.arcTo(x, y + height, x, y, borderRadius);
-    ctx.arcTo(x, y, x + width, y, borderRadius);
-    ctx.closePath();
-
-    if (opt.useShadow) {
-      ctx.save();
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
-      ctx.shadowBlur = 2;
-      ctx.shadowColor = `rgba(${Util.hexToRgb('#000000')}, ${opt.shadowOpacity})` || '';
-      ctx.fill();
-      ctx.restore();
-    } else {
-      ctx.fill();
-    }
-
-    ctx.stroke();
 
     x += boxPadding.l;
-    y += boxPadding.t + textHeight;
-
-    ctx.font = 'normal normal normal 16px Roboto';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.lineWidth = 1;
-    ctx.textBaseline = 'Bottom';
-    ctx.fillText(title, x, y);
-
-    y += titleMargin;
+    y += boxPadding.t;
 
     ctx.font = 'normal normal lighter 14px Roboto';
 
@@ -242,18 +204,29 @@ const modules = {
       ctx.fillStyle = color;
 
       ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = opt.fontColor;
       ctx.textBaseline = 'Bottom';
       ctx.fillText(name, (itemX + colorMargin), itemY);
       ctx.save();
       ctx.textAlign = 'right';
-      ctx.fillText(numberWithComma(value), size.width - boxPadding.r, itemY);
+      ctx.fillText(numberWithComma(value), this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
       y += lineSpacing;
     }
 
     ctx.restore();
+
+    // set tooltipDOM's style
+    this.tooltipDOM.style.overflowY = 'hidden';
+    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
+    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
+    this.tooltipDOM.style.color = opt.fontColor;
+
+    if (opt.useShadow) {
+      const shadowColor = `rgba(${Util.hexToRgb('#000000')}, ${opt.shadowOpacity})` || '';
+      this.tooltipDOM.style.boxShadow = `2px 2px 2px ${shadowColor}`;
+    }
 
     this.tooltipDOM.style.display = 'block';
   },

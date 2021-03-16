@@ -36,6 +36,7 @@ const DEFAULT_OPTIONS = {
     use: true,
     sortByValue: true,
     backgroundColor: '#4C4C4C',
+    fontColor: '#FFFFFF',
     borderColor: '#666666',
     shadowOpacity: 0.25,
     useShadow: false,
