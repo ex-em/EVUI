@@ -8,6 +8,7 @@
         v-show="isShow"
         id="ev-message-box-modal"
         @click.self="closeMsg('modal')"
+        @wheel.stop.prevent="() => {}"
       >
         <div
           ref="msgRef"
@@ -192,12 +193,10 @@ export default {
     onMounted(() => {
       setState();
       document.addEventListener('keydown', keydown);
-      document.body.classList.add('ev-message-box-scroll-lock');
     });
     watch(() => state.isShow, (val) => {
       if (!val) {
         document.removeEventListener('keydown', keydown);
-        document.body.classList.remove('ev-message-box-scroll-lock');
       }
     });
     return {
@@ -211,9 +210,6 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
-.ev-message-box-scroll-lock {
-  overflow: hidden !important;
-}
 #ev-message-box-modal {
   display: flex;
   position: fixed;

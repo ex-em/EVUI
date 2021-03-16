@@ -386,7 +386,7 @@ export default {
   }
   @include state('stretch') {
     .ev-tabs-title {
-      width: auto;
+      width: 100%;
     }
   }
 }
@@ -405,6 +405,7 @@ export default {
   }
   .ev-tabs-list {
     display: flex;
+    float: left;
     border-radius: 4px 4px 0 0;
     border-bottom: none !important;
     text-align: center;
