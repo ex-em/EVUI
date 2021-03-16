@@ -6,7 +6,10 @@
     >
       <div
         v-if="visible"
-        class="ev-window-wrapper"
+        :class="[
+          'ev-window-wrapper',
+          { 'hide-scroll-layer': hideScroll },
+        ]"
       >
         <div
           v-if="isModal"
@@ -166,13 +169,13 @@ export default {
       emit('update:visible', false);
     };
 
-    const changeBodyCls = (isVisibleModal) => {
-      if (isVisibleModal) {
+    const changeBodyCls = (isVisible) => {
+      if (isVisible) {
         if (props.hideScroll) {
           document.body.classList.add('ev-window-scroll-lock');
         }
       } else {
-        const windowCount = root?.getElementsByClassName('ev-window-wrapper')?.length;
+        const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
         if (windowCount === 1) {
           document.body.classList.remove('ev-window-scroll-lock');
         }

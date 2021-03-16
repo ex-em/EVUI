@@ -42,6 +42,7 @@
         :icon-class="'ev-icon-info2'"
         :width="'40%'"
         :height="'60%'"
+        :hide-scroll="true"
       >
         <template #header>
           <div>
