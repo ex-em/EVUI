@@ -221,7 +221,6 @@ export default {
 
 .ev-window-scroll-lock {
   overflow: hidden !important;
-  //padding-right: 15px;
 }
 .ev-window-dim-layer {
   position: fixed;
