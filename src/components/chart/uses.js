@@ -34,12 +34,18 @@ const DEFAULT_OPTIONS = {
   combo: false,
   tooltip: {
     use: true,
+    sortByValue: true,
     backgroundColor: '#4C4C4C',
+    fontColor: '#FFFFFF',
     borderColor: '#666666',
     shadowOpacity: 0.25,
     useShadow: false,
     throttledMove: false,
     debouncedHide: false,
+    scrollbar: {
+      use: false,
+      maxSeriesCount: 15,
+    },
   },
   indicator: {
     use: true,
