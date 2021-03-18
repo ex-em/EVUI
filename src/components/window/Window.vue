@@ -8,13 +8,14 @@
         v-if="visible"
         :class="[
           'ev-window-wrapper',
-          { 'lock-scroll': lockScroll }
+          { 'hide-scroll-layer': hideScroll },
         ]"
       >
         <div
-          v-if="showModalLayer"
+          v-if="isModal"
           class="ev-window-dim-layer"
           @click="closeWin('layer')"
+          @wheel.stop.prevent="() => {}"
         />
         <div
           :class="['ev-window', windowClass]"
@@ -42,7 +43,11 @@
               </p>
             </template>
           </div>
-          <div class="ev-window-content">
+          <div
+            ref="windowContent"
+            class="ev-window-content"
+            @wheel="onWheelContent"
+          >
             <slot />
           </div>
           <div
@@ -64,7 +69,7 @@
 </template>
 
 <script>
-import { computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export default {
   name: 'EvWindow',
@@ -97,7 +102,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    showModalLayer: {
+    isModal: {
       type: Boolean,
       default: true,
     },
@@ -105,9 +110,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    lockScroll: {
+    hideScroll: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   emits: {
@@ -117,15 +122,18 @@ export default {
     /**
      * body에 ev-window-modal DIV를 append하는 로직
      */
+    let root = document.getElementById('ev-window-modal');
     const initWrapperDiv = () => {
-      const root = document.getElementById('ev-window-modal');
       if (!root) {
         const rootDiv = document.createElement('div');
         rootDiv.id = 'ev-window-modal';
         document.body.appendChild(rootDiv);
+        root = document.getElementById('ev-window-modal');
       }
     };
     initWrapperDiv();
+
+    const windowContent = ref(null);
 
     const windowStyle = computed(() => {
       if (props.fullscreen) {
@@ -160,35 +168,49 @@ export default {
       }
       emit('update:visible', false);
     };
-    const setBodyLock = (val, type) => {
-      if (val) {
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
-        document.body.style.overflow = 'hidden';
+
+    const changeBodyCls = (isVisible) => {
+      if (isVisible) {
+        if (props.hideScroll) {
+          document.body.classList.add('ev-window-scroll-lock');
+        }
       } else {
-        const root = document.getElementById('ev-window-modal');
-        const lockChildren = root.getElementsByClassName('lock-scroll');
-        if (lockChildren.length === 1 || type === 'all') {
-          document.body.style.width = 'auto';
-          document.body.style.height = 'auto';
-          document.body.style.overflow = 'visible';
+        const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
+        if (windowCount === 1) {
+          document.body.classList.remove('ev-window-scroll-lock');
         }
       }
     };
-    onMounted(() => {
-      if (props.visible && props.lockScroll) {
-        setBodyLock(true);
+
+    const onWheelContent = (e) => {
+      const hasScroll = windowContent.value.scrollHeight > windowContent.value.clientHeight;
+      if (!hasScroll) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
       }
-    });
-    onUnmounted(() => setBodyLock(false, 'all'));
-    watch(() => props.visible, (val) => {
-      if (props.lockScroll) {
-        setBodyLock(val);
+      const isMeetTop = windowContent.value.scrollTop === 0;
+      const isMeetBottom = (windowContent.value.scrollHeight - windowContent.value.clientHeight)
+        === windowContent.value.scrollTop;
+      const isUpward = e.deltaY < 0;
+      const isDownward = e.deltaY > 0;
+
+      if ((isMeetBottom && isDownward) || (isMeetTop && isUpward)) {
+        e.preventDefault();
+        e.stopPropagation();
       }
-    });
+    };
+
+    watch(
+      () => props.visible,
+      newVal => changeBodyCls(newVal),
+    );
+
     return {
+      windowContent,
       windowStyle,
       closeWin,
+      onWheelContent,
     };
   },
 };
@@ -197,6 +219,9 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 
+.ev-window-scroll-lock {
+  overflow: hidden !important;
+}
 .ev-window-dim-layer {
   position: fixed;
   top: 0;

@@ -42,6 +42,7 @@
         :icon-class="'ev-icon-info2'"
         :width="'40%'"
         :height="'60%'"
+        :hide-scroll="true"
       >
         <template #header>
           <div>
@@ -76,11 +77,11 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Hide Modal Layer</p>
+    <p class="case-title">Hide Dim Layer (Modeless)</p>
     <ev-window
       v-model:visible="isVisible4"
       :title="'COMMON TITLE'"
-      :show-modal-layer="false"
+      :is-modal="false"
     >
       <div>COMMON CONTENTS</div>
     </ev-window>
@@ -88,6 +89,24 @@
       <button
         class="btn"
         @click="clickButton4"
+      >
+        click to open window!
+      </button>
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Hide Scroll</p>
+    <ev-window
+      v-model:visible="isVisible5"
+      :title="'COMMON TITLE'"
+      :hide-scroll="true"
+    >
+      <div>HIDE BODY SCROLL WITH CONTENTS</div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton5"
       >
         click to open window!
       </button>
@@ -120,6 +139,11 @@ export default {
       isVisible4.value = true;
     };
 
+    const isVisible5 = ref(false);
+    const clickButton5 = () => {
+      isVisible5.value = true;
+    };
+
     return {
       isVisible1,
       clickButton1,
@@ -129,6 +153,8 @@ export default {
       clickButton3,
       isVisible4,
       clickButton4,
+      isVisible5,
+      clickButton5,
     };
   },
 };
