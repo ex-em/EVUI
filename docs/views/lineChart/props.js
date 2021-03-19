@@ -8,6 +8,8 @@ import Stack from './example/Stack';
 import StackRaw from '!!raw-loader!./example/Stack';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import Tooltip from './example/Tooltip';
+import TooltipRaw from '!!raw-loader!./example/Tooltip';
 
 export default {
   mdText,
@@ -31,6 +33,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    Tooltip: {
+      description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',
+      component: Tooltip,
+      parsedData: parseComponent(TooltipRaw),
     },
   },
 };

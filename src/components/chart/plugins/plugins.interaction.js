@@ -24,9 +24,8 @@ const modules = {
         this.drawItemsHighlight(hitInfo, ctx);
 
         if (tooltip.use) {
-          this.tooltipClear();
-          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-          this.tooltipDOM.style.display = 'block';
+          this.setTooltipLayoutPosition(hitInfo, e);
+          this.drawTooltip(hitInfo, this.tooltipCtx);
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
@@ -51,7 +50,6 @@ const modules = {
 
       if (this.options.tooltip.use) {
         this.tooltipClear();
-        this.tooltipDOM.style.display = 'none';
       }
     };
 
@@ -104,6 +102,17 @@ const modules = {
         this.listeners.click(args);
       }
     };
+
+    if (this.options?.tooltip?.scrollbar?.use) {
+      this.overlayCanvas.addEventListener('wheel', (e) => {
+        const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+
+        if (isTooltipVisible) {
+          e.preventDefault();
+          this.tooltipBodyDOM.scrollTop += e.deltaY;
+        }
+      });
+    }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
     this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
