@@ -23,8 +23,21 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
-  | color | HexCode(String) | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | color | String or Object | COLOR[index] | 특정 색상을 지정하지 않으면 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   | showValue | Object | ([상세](#showvalue)) | 막대 위에 값 표시 여부 및 속성 |  |
+
+#### color Example
+```
+const chartData = {
+    series: {
+      series1: { name: 'series#1' }, // 기본 색상으로 자동 할당
+      series2: { name: 'series#2', color: '#FF00FF' }, // 특정 색상 지정
+      series3: { name: 'series#3', color: [[0, '#FBC2EB'], [1, '#A6C1EE']] }, // 특정 색상으로 그라데이션
+      series4: { name: 'series#3', color: [[], [1, '#ED9B57']] }, // 투명하게 시작하여 특정 색상으로 그라데이션
+    },
+    ... 생략
+}
+```
 
 #### showValue
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
