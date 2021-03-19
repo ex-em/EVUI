@@ -94,7 +94,7 @@ const chartData = {
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
-      - moment의 timeFormat 이용 [참고URL](#https://momentjs.com/docs/#/parsing/string-format/)
+      - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
       
@@ -107,7 +107,7 @@ const chartData = {
    - timeMode
       - Step Axis를 Time 기반으로 변경, default: false
    - timeFormat
-      - moment의 timeFormat 이용 [참고URL](#https://momentjs.com/docs/#/parsing/string-format/)
+      - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 |
