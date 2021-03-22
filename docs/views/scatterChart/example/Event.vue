@@ -3,56 +3,36 @@
     <ev-chart
       :data="chartData"
       :options="chartOptions"
+      @drag-select="onDragSelect"
     />
     <div class="description">
       <span class="description-label">
         데이터 자동 업데이트
       </span>
       <ev-toggle v-model="isLive"/>
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title">
-            Point size
-          </span>
-          <ev-input-number
-            v-model="pointSize"
-            class="component"
-            :min="1"
-          />
-        </div>
-        <div class="row-item">
-          <span class="item-title">
-            Point style
-          </span>
-          <ev-select
-            v-model="pointStyle"
-            :items="pointStyleList"
-            class="component"
-          />
-        </div>
+      <br><br>
+      <div class="badge yellow">
+        선택 영역 내 데이터
       </div>
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title">
-            Series count
-          </span>
-          <ev-input-number
-            v-model="seriesCount"
-            class="component"
-            :min="1"
-            :max="25"
-          />
-        </div>
-        <div class="row-item">
-          <span class="item-title">
-            X axis count
-          </span>
-          <ev-input-number
-            v-model="xAxisDataCount"
-            class="component"
-            :min="5"
-          />
-        </div>
+      <br><br>
+      <div
+        v-for="(row, rowIndex) in selectionItems"
+        :key="rowIndex"
+      >
+        Series Name : {{ row.seriesName }}
+        <br>
+        Items : {{ row.items }}
+        <br><br>
+      </div>
+      <div class="badge yellow">
+        범위 값
+      </div>
+      <br><br>
+      <div v-if="selectionRange.xMin">
+        X min : {{ selectionRange.xMin }} <br>
+        X max : {{ selectionRange.xMax }} <br>
+        Y min : {{ selectionRange.yMin }} <br>
+        Y max : {{ selectionRange.yMax }} <br>
       </div>
     </div>
   </div>
@@ -64,39 +44,10 @@
 
   export default {
     setup() {
-      const pointSize = ref(3);
-      const pointStyle = ref('circle');
-      const seriesCount = ref(3);
-      const xAxisDataCount = ref(10);
-
-      const pointStyleList = [{
-        name: 'Circle (Default)',
-        value: 'circle',
-      }, {
-        name: 'Triangle',
-        value: 'triangle',
-      }, {
-        name: 'Rect',
-        value: 'rect',
-      }, {
-        name: 'RectRounded',
-        value: 'rectRounded',
-      }, {
-        name: 'RectRot',
-        value: 'rectRot',
-      }, {
-        name: 'Cross',
-        value: 'cross',
-      }, {
-        name: 'CrossRot',
-        value: 'crossRot',
-      }, {
-        name: 'Star',
-        value: 'star',
-      }, {
-        name: 'Line',
-        value: 'line',
-      }];
+      const pointSize = 3;
+      const pointStyle = 'circle';
+      const seriesCount = 3;
+      const xAxisDataCount = 10;
 
       const chartData = reactive({
         series: {},
@@ -111,12 +62,8 @@
           text: 'Chart Title',
           show: true,
         },
-        legend: {
-          show: true,
-          position: 'right',
-        },
-        tooltip: {
-          use: true,
+        indicator: {
+          use: false,
         },
         axesX: [{
           type: 'time',
@@ -131,9 +78,17 @@
         }],
       };
 
+      const selectionItems = ref([]);
+      const selectionRange = ref({});
+
+      const onDragSelect = ({ data, range }) => {
+        selectionItems.value = data;
+        selectionRange.value = range;
+      };
+
       const isLive = ref(false);
       const liveInterval = ref();
-      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      let timeValue = +dayjs();
 
       const addRandomChartData = () => {
         timeValue = +dayjs(timeValue).add(1, 'second');
@@ -153,7 +108,7 @@
 
         let seriesName;
         let seriesId;
-        for (let ix = 1; ix <= seriesCount.value; ix++) {
+        for (let ix = 1; ix <= seriesCount; ix++) {
           seriesName = `series#${ix}`;
           seriesId = `series${ix}`;
           chartData.series[seriesId] = {
@@ -174,7 +129,7 @@
         }
 
         let tmpTimeValue;
-        for (let ix = 0; ix < xAxisDataCount.value; ix++) {
+        for (let ix = 0; ix < xAxisDataCount; ix++) {
           tmpTimeValue = +dayjs(timeValue).subtract(ix, 'second');
           chartData.labels.unshift(tmpTimeValue);
 
@@ -198,28 +153,17 @@
         }
       });
 
-      watch(seriesCount, () => {
-        initChartSeries();
-        initChartData();
-      });
-
-      watch(xAxisDataCount, () => {
-        initChartData();
-      });
-
       onBeforeUnmount(() => {
         clearInterval(liveInterval.value);
       });
 
       return {
-        pointSize,
-        pointStyle,
-        pointStyleList,
         chartData,
         chartOptions,
         isLive,
-        seriesCount,
-        xAxisDataCount,
+        selectionItems,
+        selectionRange,
+        onDragSelect,
       };
     },
   };

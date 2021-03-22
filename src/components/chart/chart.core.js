@@ -566,6 +566,11 @@ class EvChart {
     this.labelOffset = this.getLabelOffset();
 
     this.render();
+
+    const isDragMove = this.dragInfo && this.drawSelectionArea;
+    if (isDragMove) {
+      this.drawSelectionArea(this.dragInfo);
+    }
   }
 
   /**

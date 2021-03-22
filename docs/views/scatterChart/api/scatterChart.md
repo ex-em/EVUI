@@ -6,6 +6,7 @@
     :data="차트데이터"
     :options="차트속성"
     :resize-timeout="debounce wait시간(단위: ms)"
+    @drag-select="callback_function"
 />
 ```
 
@@ -25,7 +26,7 @@
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
   | color | String | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   | pointSize | Number | 3 | 차트에 표시될 점의 사이즈 |  |
-  | pointStyle | String | 'circle' | 차트에 표시될 점의 모양 | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line', 'dash' |
+  | pointStyle | String | 'circle' | 차트에 표시될 점의 모양 | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
   
 #### data example
 ```
@@ -59,7 +60,7 @@ const chartData =
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
   | indicator | Object | ([상세](#indicator)) | 지표선 | |
-
+  | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -118,7 +119,25 @@ const chartData =
 | use | Boolean | true | indicator 사용 여부 | |
 | color | HexCode(String) | '#EE7F44' | 색상  | |
 
+    
+#### dragSelection
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | true | drag-select 사용 여부 | true / false |
+| keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
+| fillColor | HexCode(String) | '#38ACEC' | 선택 영역 색상 | |
+| opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 
 ### 3. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
+
+
+>### Event
+
+| 이름 | 파라미터 | 설명 |
+ |------|----------|------|
+ | drag-select | data, range | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
+ 
+ * drag-select는  `dragSelection` 옵션의 `use`값이 `true` 일 때 이벤트를 발생 시킬 수 있다. 
+ 그리고 선택영역은 그래프에 표시된 데이터의 중앙이 포함 되어야 선택영역 내 데이터로 인식 한다.
