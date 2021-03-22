@@ -304,6 +304,7 @@ class Bar {
     const ctx = context;
 
     ctx.save();
+    ctx.beginPath();
 
     const value = numberWithComma(isHorizontal ? data.x : data.y);
 
