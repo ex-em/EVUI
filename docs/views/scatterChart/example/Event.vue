@@ -65,6 +65,10 @@
         indicator: {
           use: false,
         },
+        dragSelection: {
+          use: true,
+          keepDisplay: true,
+        },
         axesX: [{
           type: 'time',
           timeFormat: 'HH:mm:ss',
