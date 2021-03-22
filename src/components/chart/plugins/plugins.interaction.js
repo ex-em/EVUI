@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import { defaultsDeep } from 'lodash-es';
 
 const modules = {
   /**
@@ -13,10 +14,15 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseMove = (e) => {
+      const { indicator, tooltip, type } = this.options;
+
+      if (this.dragInfo?.isMove) {
+        return;
+      }
+
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
       const ctx = this.overlayCtx;
-      const { indicator, tooltip, type } = this.options;
 
       this.overlayClear();
 
@@ -31,8 +37,8 @@ const modules = {
         this.hideTooltipDOM();
       }
 
-      if (type === 'scatter' && this.dragInfo) {
-        this.dragMove(e);
+      if (this.dragInfoBackup) {
+        this.drawSelectionArea(this.dragInfoBackup);
       }
 
       if (indicator.use && type !== 'pie') {
@@ -168,77 +174,81 @@ const modules = {
     };
 
     /**
+     * Calculate drag-section position and size, and drawing drag-section
+     *
+     * @returns {undefined}
+     */
+    const dragMove = (e) => {
+      e.preventDefault();
+      const [aOffsetX, aOffsetY] = this.getMousePosition(e);
+      const dragInfo = this.dragInfo;
+      const { xcp, ycp, range: aRange } = dragInfo;
+
+      let xep;
+      let yep;
+
+      dragInfo.isMove = true;
+
+      if (aOffsetX < aRange.x1) {
+        xep = aRange.x1;
+      } else if (aOffsetX > aRange.x2) {
+        xep = aRange.x2;
+      } else {
+        xep = aOffsetX;
+      }
+
+      if (aOffsetY < aRange.y1) {
+        yep = range.y1;
+      } else if (aOffsetY > aRange.y2) {
+        yep = aRange.y2;
+      } else {
+        yep = aOffsetY;
+      }
+
+      dragInfo.xsp = Math.min(xcp, xep);
+      dragInfo.ysp = Math.min(ycp, yep);
+      dragInfo.width = Math.ceil(Math.abs(xep - xcp));
+      dragInfo.height = Math.ceil(Math.abs(yep - ycp));
+
+      this.overlayClear();
+      this.drawSelectionArea(dragInfo);
+    };
+
+    /**
      * invoking user custom click event width items and range in drag-section
      *
      * @returns {undefined}
      */
-    const dragEnd = (e) => {
-      e.preventDefault();
+    const dragEnd = () => {
       const dragInfo = this.dragInfo;
 
       if (dragInfo?.isMove) {
-        if (!this.options.dragSelection.keepDisplay) {
-          this.overlayClear();
-        }
-
         const args = {
           data: this.findSelectedItems(dragInfo),
           range: this.getSelectionRage(dragInfo),
         };
+
+        this.dragInfoBackup = defaultsDeep({}, dragInfo);
 
         if (typeof this.listeners['drag-select'] === 'function') {
           this.listeners['drag-select'](args);
         }
       }
 
+      if (!this.options.dragSelection.keepDisplay) {
+        this.dragInfoBackup = null;
+        this.overlayClear();
+      }
+
       this.dragInfo = null;
 
+      window.removeEventListener('mousemove', dragMove);
       window.removeEventListener('mouseup', dragEnd);
     };
 
+    window.addEventListener('mousemove', dragMove);
     window.addEventListener('mouseup', dragEnd);
   },
-
-  /**
-   * Calculate drag-section position and size, and drawing drag-section
-   *
-   * @returns {undefined}
-   */
-  dragMove(e) {
-    const [offsetX, offsetY] = this.getMousePosition(e);
-    const dragInfo = this.dragInfo;
-    const { xcp, ycp, range } = dragInfo;
-
-    let xep;
-    let yep;
-
-    dragInfo.isMove = true;
-
-    if (offsetX < range.x1) {
-      xep = range.x1;
-    } else if (offsetX > range.x2) {
-      xep = range.x2;
-    } else {
-      xep = offsetX;
-    }
-
-    if (offsetY < range.y1) {
-      yep = range.y1;
-    } else if (offsetY > range.y2) {
-      yep = range.y2;
-    } else {
-      yep = offsetY;
-    }
-
-    dragInfo.xsp = Math.min(xcp, xep);
-    dragInfo.ysp = Math.min(ycp, yep);
-    dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-    dragInfo.height = Math.ceil(Math.abs(yep - ycp));
-
-    this.overlayClear();
-    this.drawSelectionArea(dragInfo);
-  },
-
 
 /**
    * Draw selection-area
