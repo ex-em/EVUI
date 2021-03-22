@@ -1,3 +1,5 @@
+import Util from './helpers.util';
+
 export default {
   /**
    * Calculate X position
@@ -233,5 +235,42 @@ export default {
     } else {
       ctx.rect(x, y, width, height);
     }
+  },
+
+  /**
+   * create Linear Gradient
+   * @param ctx
+   * @param isHorizontal
+   * @param positions
+   * @param stops
+   * @param opacity
+   *
+   * @returns {object} gradient
+   */
+  createGradient(ctx, isHorizontal, positions, stops, opacity = 1) {
+    const { x, y, w, h } = positions;
+    let gradient;
+
+    if (isHorizontal) {
+      gradient = ctx.createLinearGradient(x, 0, x + w, 0);
+    } else {
+      gradient = ctx.createLinearGradient(0, y, 0, y + h);
+    }
+
+    for (let ix = 0; ix < stops.length; ix++) {
+      let opa;
+      let stop = stops[ix];
+
+      if (!stop.length) {
+        stop = [ix, '#FFFFFF'];
+        opa = 0;
+      } else {
+        opa = opacity;
+      }
+
+      gradient.addColorStop(stop[0], `rgba(${Util.hexToRgb(stop[1])},${opa})`);
+    }
+
+    return gradient;
   },
 };
