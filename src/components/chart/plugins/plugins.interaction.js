@@ -168,48 +168,6 @@ const modules = {
     };
 
     /**
-     * Calculate drag-section position and size, and drawing drag-section
-     *
-     * @returns {undefined}
-     */
-    // const dragMove = (e) => {
-    //   e.preventDefault();
-    //
-    //   const [aOffsetX, aOffsetY] = this.getMousePosition(e);
-    //   const dragInfo = this.dragInfo;
-    //   const { xcp, ycp, range: aRange } = dragInfo;
-    //
-    //   let xep;
-    //   let yep;
-    //
-    //   dragInfo.isMove = true;
-    //
-    //   if (aOffsetX < aRange.x1) {
-    //     xep = aRange.x1;
-    //   } else if (aOffsetX > aRange.x2) {
-    //     xep = aRange.x2;
-    //   } else {
-    //     xep = aOffsetX;
-    //   }
-    //
-    //   if (aOffsetY < aRange.y1) {
-    //     yep = aRange.y1;
-    //   } else if (aOffsetY > aRange.y2) {
-    //     yep = aRange.y2;
-    //   } else {
-    //     yep = aOffsetY;
-    //   }
-    //
-    //   dragInfo.xsp = Math.min(xcp, xep);
-    //   dragInfo.ysp = Math.min(ycp, yep);
-    //   dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-    //   dragInfo.height = Math.ceil(Math.abs(yep - ycp));
-    //
-    //   this.overlayClear();
-    //   this.drawSelectionArea(dragInfo);
-    // };
-
-    /**
      * invoking user custom click event width items and range in drag-section
      *
      * @returns {undefined}
@@ -241,6 +199,11 @@ const modules = {
     window.addEventListener('mouseup', dragEnd);
   },
 
+  /**
+   * Calculate drag-section position and size, and drawing drag-section
+   *
+   * @returns {undefined}
+   */
   dragMove(e) {
     const [offsetX, offsetY] = this.getMousePosition(e);
     const dragInfo = this.dragInfo;
