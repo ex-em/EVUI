@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
@@ -16,7 +16,7 @@ class TimeCategoryScale extends Scale {
    * @returns {string} formatted label
    */
   getLabelFormat(value) {
-    return moment(value).format(this.timeFormat);
+    return dayjs(value).format(this.timeFormat);
   }
 
   /**

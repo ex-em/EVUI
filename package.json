@@ -21,10 +21,11 @@
   "main": "dist/evui.umd.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.4",
     "vue": "^3.0.0",
+    "vue-resize-observer": "^2.0.15",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0",
-    "vue-resize-observer": "^2.0.15"
+    "vuex": "^4.0.0-0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -45,7 +46,6 @@
     "highlight.js": "^10.2.0",
     "lodash-es": "^4.17.15",
     "marked": "^1.1.1",
-    "moment": "^2.27.0",
     "node-sass": "^4.12.0",
     "raw-loader": "^4.0.1",
     "sass-loader": "^8.0.2",
