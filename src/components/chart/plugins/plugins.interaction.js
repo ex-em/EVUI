@@ -14,8 +14,6 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseMove = (e) => {
-      const { indicator, tooltip, type } = this.options;
-
       if (this.dragInfo?.isMove) {
         return;
       }
@@ -23,6 +21,7 @@ const modules = {
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
       const ctx = this.overlayCtx;
+      const { indicator, tooltip, type } = this.options;
 
       this.overlayClear();
 
