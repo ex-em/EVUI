@@ -22,24 +22,24 @@
 
 <script>
   import { ref } from 'vue';
-  import moment from 'moment';
+  import dayjs from 'dayjs';
 
   export default {
     setup() {
-      const time = moment().format('YYYY-MM-DD');
+      const time = dayjs().format('YYYY-MM-DD');
       const chartData = {
         series: {
           series1: { name: 'series#1' },
           series2: { name: 'series#2' },
         },
         labels: [
-          moment(time),
-          moment(time).add(1, 'day'),
-          moment(time).add(2, 'day'),
-          moment(time).add(3, 'day'),
-          moment(time).add(4, 'day'),
-          moment(time).add(5, 'day'),
-          moment(time).add(6, 'day'),
+          dayjs(time),
+          dayjs(time).add(1, 'day'),
+          dayjs(time).add(2, 'day'),
+          dayjs(time).add(3, 'day'),
+          dayjs(time).add(4, 'day'),
+          dayjs(time).add(5, 'day'),
+          dayjs(time).add(6, 'day'),
         ],
         data: {
           series1: [100, 25, 36, 47, 0, 50, 80],

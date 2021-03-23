@@ -77,7 +77,7 @@
 
 <script>
   import { ref, onMounted, reactive } from 'vue';
-  import moment from 'moment';
+  import dayjs from 'dayjs';
 
   export default {
     setup() {
@@ -175,11 +175,11 @@
       });
 
 
-      let timeValue = moment().format('YYYY-MM-DD HH:mm:ss');
+      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
       const addRandomChartData = () => {
-        timeValue = +moment(timeValue).add(1, 'second');
-        chartData.labels.push(+moment(timeValue));
+        timeValue = dayjs(timeValue).add(1, 'second');
+        chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {
           seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);

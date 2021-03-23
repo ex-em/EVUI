@@ -102,7 +102,12 @@ const modules = {
         nameDOM.style.color = opt.inactive;
       } else {
         this.seriesInfo.count++;
-        colorDOM.style.backgroundColor = series.color;
+        if (typeof series.color !== 'string') {
+          colorDOM.style.backgroundColor = series.color[series.color.length - 1][1];
+        } else {
+          colorDOM.style.backgroundColor = series.color;
+        }
+
         nameDOM.style.color = opt.color;
       }
 
@@ -249,7 +254,12 @@ const modules = {
 
     nameDOM.series = series;
 
-    colorDOM.style.backgroundColor = series.color;
+    if (typeof series.color !== 'string') {
+      colorDOM.style.backgroundColor = series.color[series.color.length - 1][1];
+    } else {
+      colorDOM.style.backgroundColor = series.color;
+    }
+
     colorDOM.dataset.type = 'color';
     nameDOM.style.color = opt.color;
     nameDOM.textContent = series.name;

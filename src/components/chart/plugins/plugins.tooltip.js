@@ -1,5 +1,6 @@
 import { numberWithComma } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
+import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
 const modules = {
@@ -201,7 +202,17 @@ const modules = {
       itemY += Util.aliasPixel(itemY);
 
       ctx.beginPath();
-      ctx.fillStyle = color;
+
+      if (typeof color !== 'string') {
+        ctx.fillStyle = Canvas.createGradient(
+          ctx,
+          isHorizontal,
+          { x: itemX - 4, y: itemY, w: 12, h: -12 },
+          color,
+        );
+      } else {
+        ctx.fillStyle = color;
+      }
 
       ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
       ctx.fillStyle = opt.fontColor;

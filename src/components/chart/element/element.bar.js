@@ -99,9 +99,6 @@ class Bar {
 
     ctx.beginPath();
 
-    const opacity = this.state === 'downplay' ? 0.1 : 1;
-    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
-
     this.data.forEach((item, index) => {
       if (isHorizontal) {
         categoryPoint = ysp - (cArea * index) - cPad;
@@ -131,6 +128,20 @@ class Bar {
         h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
       }
 
+      const opacity = this.state === 'downplay' ? 0.1 : 1;
+      if (typeof this.color !== 'string') {
+        ctx.fillStyle = Canvas.createGradient(
+          ctx,
+          isHorizontal,
+          { x, y, w, h },
+          this.color,
+          opacity,
+        );
+      } else {
+        ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
+      }
+
+      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
       this.drawBar({
         ctx,
         positions: { x, y, w, h },
@@ -176,11 +187,18 @@ class Bar {
     const h = gdata.h;
 
     ctx.save();
-    ctx.fillStyle = this.color;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
-    ctx.shadowColor = this.color;
+
+    if (typeof this.color !== 'string') {
+      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, this.color);
+      ctx.fillStyle = grd;
+      ctx.shadowColor = this.color[this.color.length - 1][1];
+    } else {
+      ctx.fillStyle = this.color;
+      ctx.shadowColor = this.color;
+    }
 
     ctx.beginPath();
 

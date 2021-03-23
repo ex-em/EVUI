@@ -29,7 +29,7 @@
   
 #### data example
 ```
-const time = moment().format('YYYY-MM-DD HH:mm:ss');
+const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const chartData = 
   series: {
     series1: { name: 'series1', point: false, fill: true },
@@ -40,10 +40,10 @@ const chartData =
     series2: [5, 2, 0, 8],
   },
   labels: [
-    moment(time),
-    moment(time).add(1, 'day'),
-    moment(time).add(2, 'day'),
-    moment(time).add(3, 'day'),
+    dayjs(time),
+    dayjs(time).add(1, 'day'),
+    dayjs(time).add(2, 'day'),
+    momdayjsme).add(3, 'day'),
   ],
 };
 ```
@@ -81,7 +81,7 @@ const chartData =
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
-      - moment의 timeFormat 이용 [참고URL](#https://momentjs.com/docs/#/parsing/string-format/)
+      - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
 
