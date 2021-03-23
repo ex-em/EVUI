@@ -141,7 +141,6 @@ class Bar {
         ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
       }
 
-      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
       this.drawBar({
         ctx,
         positions: { x, y, w, h },
