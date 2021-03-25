@@ -99,9 +99,17 @@
       }];
 
       const chartData = reactive({
-        series: {},
+        series: {
+          series1: { name: 'series#1', pointSize, pointStyle },
+          series2: { name: 'series#2', pointSize, pointStyle },
+          series3: { name: 'series#3', pointSize, pointStyle },
+        },
         labels: [],
-        data: {},
+        data: {
+          series1: [],
+          series2: [],
+          series3: [],
+        },
       });
 
       const chartOptions = {
@@ -185,7 +193,6 @@
       };
 
       onMounted(() => {
-        initChartSeries();
         initChartData();
       });
 
