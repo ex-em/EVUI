@@ -26,6 +26,7 @@
 
       const chartOptions = {
         type: 'bar',
+        borderRadius: 14,
         axesX: [{
           type: 'step',
         }],

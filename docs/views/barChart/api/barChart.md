@@ -71,6 +71,7 @@ const chartData = {
   | width | String / Number | '100%' | 차트의 너비 | '100%', '150px', 150 | 
   | height | String / Number | '100%' | 차트의 높이 | '100%', '150px', 150 |
   | thickness | Number | 1 | 차트 막대의 너비 | 0.1 ~ 1 |
+  | borderRadius | Number | 0 | 막대 가장자리 부분의 border-radius 값.  | 0 ~ |
   | horizontal | Boolean | false | 차트 막대의 방향 - 수평 전환 여부 | true, false |
   | axesX | Object | 없음 | X축에 대한 속성 | [상세](#axesx-axesy) |
   | axesY | Object | 없음 | Y축에 대한 속성 | [상세](#axesx-axesy) |

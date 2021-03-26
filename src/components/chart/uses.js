@@ -31,6 +31,7 @@ const DEFAULT_OPTIONS = {
   width: '100%',
   height: '100%',
   thickness: 1,
+  borderRadius: 0,
   combo: false,
   tooltip: {
     use: true,
@@ -70,6 +71,12 @@ const DEFAULT_OPTIONS = {
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
   },
+  dragSelection: {
+    use: true,
+    keepDisplay: true,
+    fillColor: '#38acec',
+    opacity: 0.65,
+  },
 };
 
 const DEFAULT_DATA = {
@@ -93,6 +100,10 @@ export const useModel = () => {
     'dbl-click': async (e) => {
       await nextTick();
       emit('dbl-click', e);
+    },
+    'drag-select': async (e) => {
+      await nextTick();
+      emit('drag-select', e);
     },
   };
 

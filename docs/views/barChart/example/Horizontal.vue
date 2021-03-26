@@ -14,7 +14,7 @@
         },
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         data: {
-          series1: [1500, 80, 120, 30, 0],
+          series1: [1500, 180, 30, 10, 0],
         },
       };
 
@@ -32,6 +32,7 @@
           position: 'right',
         },
         horizontal: true,
+        borderRadius: 15,
         axesX: [{
           type: 'linear',
           startToZero: true,

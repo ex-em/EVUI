@@ -175,12 +175,6 @@ export default {
         ctx.lineTo(x + radius, y);
         ctx.closePath();
         break;
-      case 'dash':
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + radius, y);
-        ctx.closePath();
-        break;
       default:
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);

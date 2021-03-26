@@ -87,12 +87,12 @@
           addRandomChartData();
           liveInterval.value = setInterval(addRandomChartData, 1000);
         } else {
-          clearTimeout(liveInterval.value);
+          clearInterval(liveInterval.value);
         }
       });
 
       onBeforeUnmount(() => {
-        clearTimeout(liveInterval.value);
+        clearInterval(liveInterval.value);
       });
 
       return {
