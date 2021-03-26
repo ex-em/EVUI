@@ -337,6 +337,8 @@ class Bar {
       value = numberWithComma(isHorizontal ? data.x : data.y);
     } else if (isStacked) {
       value = numberWithComma(data.o);
+    } else {
+      value = '';
     }
 
     ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
