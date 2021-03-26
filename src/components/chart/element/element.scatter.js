@@ -79,6 +79,23 @@ class Scatter {
       }
     });
   }
+
+  /**
+   *Returns items in range
+   * @param {object} params  range values
+   *
+   * @returns {array}
+   */
+  findItems({ xsp, ysp, width, height }) {
+    const gdata = this.data;
+    const xep = xsp + width;
+    const yep = ysp + height;
+    const items = gdata.filter(seriesData =>
+        (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
+        && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+
+    return items;
+  }
 }
 
 export default Scatter;

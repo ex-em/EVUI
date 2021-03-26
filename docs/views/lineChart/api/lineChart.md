@@ -43,7 +43,7 @@ const chartData =
     dayjs(time),
     dayjs(time).add(1, 'day'),
     dayjs(time).add(2, 'day'),
-    momdayjsme).add(3, 'day'),
+    dayjs(time).add(3, 'day'),
   ],
 };
 ```
