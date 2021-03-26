@@ -91,6 +91,9 @@ class Bar {
     this.size.bPad = bPad;
     this.size.w = w;
     this.size.ix = barSeriesX;
+    this.chartRect = chartRect;
+    this.labelOffset = labelOffset;
+    this.borderRadius = param.borderRadius;
 
     let categoryPoint = null;
 
@@ -138,7 +141,10 @@ class Bar {
         ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
       }
 
-      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+      this.drawBar({
+        ctx,
+        positions: { x, y, w, h },
+      });
 
       if (showValue.use) {
         this.drawValueLabels({
@@ -169,7 +175,8 @@ class Bar {
    * @returns {undefined}
    */
   itemHighlight(item, context) {
-    const { showValue, isHorizontal } = this;
+    const showValue = this.showValue;
+
     const gdata = item.data;
     const ctx = context;
 
@@ -184,7 +191,7 @@ class Bar {
     ctx.shadowBlur = 4;
 
     if (typeof this.color !== 'string') {
-      const grd = Canvas.createGradient(ctx, isHorizontal, { x, y, w, h }, this.color);
+      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, this.color);
       ctx.fillStyle = grd;
       ctx.shadowColor = this.color[this.color.length - 1][1];
     } else {
@@ -192,7 +199,12 @@ class Bar {
       ctx.shadowColor = this.color;
     }
 
-    ctx.fillRect(x, y, w, h);
+    ctx.beginPath();
+
+    this.drawBar({
+      ctx,
+      positions: { x, y, w, h: this.isHorizontal ? -h : h },
+    });
 
     if (showValue.use) {
       this.drawValueLabels({
@@ -309,6 +321,7 @@ class Bar {
     const ctx = context;
 
     ctx.save();
+    ctx.beginPath();
 
     const value = numberWithComma(isHorizontal ? data.x : data.y);
 
@@ -361,6 +374,64 @@ class Bar {
     }
 
     ctx.restore();
+  }
+
+  drawBar({ ctx, positions }) {
+    const isHorizontal = this.isHorizontal;
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const isStackBar = 'stackIndex' in this;
+    const { x, y } = positions;
+    let { w, h } = positions;
+    let r = this.borderRadius;
+
+    // Dont's draw bar that has value 0
+    if (w === 0 || h === 0) {
+      return;
+    }
+
+    if (r && r > 0 && !isStackBar) {
+      const squarePath = new Path2D();
+      squarePath.rect(
+        chartRect.x1 + labelOffset.left,
+        chartRect.y1,
+        chartRect.chartWidth - labelOffset.right,
+        chartRect.chartHeight - labelOffset.bottom,
+      );
+
+      ctx.clip(squarePath);
+
+      ctx.moveTo(x, y);
+
+      if (isHorizontal) {
+        if (h < r * 2) {
+          r = h / 2;
+        }
+
+        w -= r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
+        ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
+      } else {
+        if (w < r * 2) {
+          r = w / 2;
+        }
+
+        h += r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
+        ctx.arcTo(x, y + h - r, x, y + h, r);
+        ctx.lineTo(x, y);
+      }
+
+      ctx.fill();
+      ctx.closePath();
+    } else {
+      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+    }
   }
 }
 
