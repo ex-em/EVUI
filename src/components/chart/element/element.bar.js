@@ -339,11 +339,6 @@ class Bar {
       value = numberWithComma(data.o);
     }
 
-    // Dont's draw label that has value 0
-    if (value === '0') {
-      return;
-    }
-
     ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
     ctx.fillStyle = showValue.textColor;
     ctx.lineWidth = 1;
