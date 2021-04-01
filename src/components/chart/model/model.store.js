@@ -189,14 +189,14 @@ const modules = {
       let gdata = curr;
 
       if (bdata != null && ldata != null) {
-        if (gdata && typeof gdata === 'object') {
+        if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
           odata = isHorizontal ? curr.x : curr.y;
           ldata = isHorizontal ? curr.y : curr.x;
         }
 
         if (sIdx > 0) {
           bdata = isHorizontal ? bdata.x : bdata.y;
-          gdata = bdata + odata;
+          gdata = bdata + (odata.value || odata);
         } else {
           bdata = 0;
           gdata = odata;
@@ -224,7 +224,7 @@ const modules = {
       let gdata = curr;
       let ldata = label[index];
 
-      if (gdata && typeof gdata === 'object') {
+      if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
         gdata = isHorizontal ? curr.x : curr.y;
         ldata = isHorizontal ? curr.y : curr.x;
       }
@@ -248,12 +248,21 @@ const modules = {
    */
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
+    const gdataValue = gdata?.value || gdata;
+    const odataValue = odata?.value || odata;
+    const dataColor = gdata?.color || odata?.color;
 
     if (this.options.horizontal) {
-      data = { x: gdata, y: ldata, o: odata, b: bdata, xp: null, yp: null, w: null, h: null };
+      data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
     } else {
-      data = { x: ldata, y: gdata, o: odata, b: bdata, xp: null, yp: null, w: null, h: null };
+      data = { x: ldata, y: gdataValue, o: odataValue, b: bdata };
     }
+
+    data.xp = null;
+    data.yp = null;
+    data.w = null;
+    data.h = null;
+    data.dataColor = dataColor || null;
 
     return data;
   },
@@ -271,25 +280,28 @@ const modules = {
     if (data.length) {
       return data.reduce((acc, p, index) => {
         const minmax = acc;
-        if (p.x <= minmax.minX) {
-          minmax.minX = (p.x === null) ? 0 : p.x;
-        }
-        if (p.y <= minmax.minY) {
-          minmax.minY = (p.y === null) ? 0 : p.y;
-        }
-        if (p.x >= minmax.maxX) {
-          minmax.maxX = (p.x === null) ? 0 : p.x;
+        const px = p.x?.value || p.x;
+        const py = p.y?.value || p.y;
 
-          if (isHorizontal && p.x !== null) {
-            minmax.maxDomain = p.y;
+        if (px <= minmax.minX) {
+          minmax.minX = (px === null) ? 0 : px;
+        }
+        if (py <= minmax.minY) {
+          minmax.minY = (py === null) ? 0 : py;
+        }
+        if (px >= minmax.maxX) {
+          minmax.maxX = (px === null) ? 0 : px;
+
+          if (isHorizontal && px !== null) {
+            minmax.maxDomain = py;
             minmax.maxDomainIndex = index;
           }
         }
-        if (p.y >= minmax.maxY) {
-          minmax.maxY = (p.y === null) ? 0 : p.y;
+        if (py >= minmax.maxY) {
+          minmax.maxY = (py === null) ? 0 : py;
 
-          if (!isHorizontal && p.y !== null) {
-            minmax.maxDomain = p.x;
+          if (!isHorizontal && py !== null) {
+            minmax.maxDomain = px;
             minmax.maxDomainIndex = index;
           }
         }
