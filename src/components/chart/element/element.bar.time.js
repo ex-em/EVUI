@@ -59,13 +59,13 @@ class TimeBar extends Bar {
     this.size.bPad = bPad;
     this.size.w = w;
     this.size.ix = barSeriesX;
-
-    ctx.beginPath();
-
-    const opacity = this.state === 'downplay' ? 0.1 : 1;
-    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
+    this.chartRect = chartRect;
+    this.labelOffset = labelOffset;
+    this.borderRadius = param.borderRadius;
 
     this.data.forEach((item) => {
+      ctx.beginPath();
+
       if (isHorizontal) {
         x = xsp;
         y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
@@ -103,13 +103,47 @@ class TimeBar extends Bar {
       }
 
       if (x !== null && y !== null) {
-        ctx.fillRect(x, y, w !== subW ? subW : w, isHorizontal ? -h : h);
+        const barColor = item.dataColor || this.color;
+        const opacity = this.state === 'downplay' ? 0.1 : 1;
+
+        if (typeof barColor !== 'string') {
+          w = w !== subW ? subW : w;
+
+          ctx.fillStyle = Canvas.createGradient(
+            ctx,
+            isHorizontal,
+            { x, y, w, h },
+            barColor,
+            opacity,
+          );
+        } else {
+          ctx.fillStyle = `rgba(${Util.hexToRgb(barColor)},${opacity})` || '';
+        }
+
+        this.drawBar({
+          ctx,
+          positions: { x, y, w, h },
+        });
+
+        if (this.showValue.use) {
+          this.drawValueLabels({
+            context: ctx,
+            data: item,
+            positions: {
+              x,
+              y,
+              h,
+              w,
+            },
+            isHighlight: false,
+          });
+        }
       }
       subW = w;
 
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line
-      item.w = w !== subW ? subW : w; // eslint-disable-line
+      item.w = w; // eslint-disable-line
       item.h = isHorizontal ? -h : h; // eslint-disable-line
     });
   }

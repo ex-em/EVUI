@@ -110,6 +110,10 @@ const modules = {
 
         ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
       }
+
+      if (typeof this.listeners.click === 'function') {
+        this.listeners.click(args);
+      }
     };
 
     /**

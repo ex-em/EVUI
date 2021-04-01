@@ -5,6 +5,8 @@
       :options="chartOptions"
     />
     <div class="description">
+      <b>막대 데이터값이 4500보다 큰 경우 빨간색으로 표시</b>
+      <br>
       <span class="toggle-label">데이터 자동 업데이트</span>
       <ev-toggle
         v-model="isLive"
@@ -21,7 +23,7 @@
     setup() {
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1', show: true, type: 'bar', timeMode: true },
+          series1: { name: 'series#1', show: true, type: 'bar', timeMode: true, showValue: { use: true }},
           series3: { name: 'series#2', show: true, type: 'line', combo: true },
         },
         labels: [],
@@ -34,6 +36,7 @@
       const chartOptions = {
         width: '100%',
         height: '80%',
+        thickness: 0.8,
         title: {
           text: 'Chart Title',
           show: true,
@@ -44,7 +47,7 @@
         },
         axesX: [{
           type: 'time',
-          timeFormat: 'HH:mm:ss',
+          timeFormat: 'mm:ss',
           interval: 'second',
         }],
         axesY: [{
@@ -72,7 +75,12 @@
             seriesData.shift();
           }
 
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+          const randomValue = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+          if (randomValue > 4500) {
+            seriesData.push({ value: randomValue, color: '#FF0000' });
+          } else {
+            seriesData.push(randomValue);
+          }
         });
       };
 
