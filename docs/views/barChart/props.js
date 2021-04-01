@@ -24,7 +24,7 @@ export default {
       parsedData: parseComponent(DefaultRaw),
     },
     Column: {
-      description: '세로 형태로 사용할 수 있으며 각 Series별로 색상을 직접 지정할 수 있습니다.',
+      description: '세로 형태로 사용할 수 있으며 각 Series별, data별로 색상을 직접 지정할 수 있습니다.',
       component: Column,
       parsedData: parseComponent(ColumnRaw),
     },
