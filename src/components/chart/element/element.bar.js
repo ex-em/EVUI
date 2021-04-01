@@ -314,6 +314,14 @@ class Bar {
     return item;
   }
 
+  /**
+   * Draw value label if series 'use' of showValue option is true
+   *
+   * @param context           canvas context
+   * @param data              series value data (model.store.js addData return value)
+   * @param positions         series value positions
+   * @param isHighlight       draw label with highlight effect
+   */
   drawValueLabels({ context, data, positions, isHighlight }) {
     const isHorizontal = this.isHorizontal;
     const showValue = this.showValue;
@@ -323,7 +331,15 @@ class Bar {
     ctx.save();
     ctx.beginPath();
 
-    const value = numberWithComma(isHorizontal ? data.x : data.y);
+    let value;
+    const isStacked = !isNaN(data.o);
+    if (data.o === null) {
+      value = numberWithComma(isHorizontal ? data.x : data.y);
+    } else if (isStacked) {
+      value = numberWithComma(data.o);
+    } else {
+      value = '';
+    }
 
     ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
     ctx.fillStyle = showValue.textColor;
