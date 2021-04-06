@@ -262,14 +262,6 @@ const routes = [
     },
   },
   {
-    path: '/reactivityChart',
-    name: 'ReactivityChart',
-    component: () => import(/* webpackChunkName: "reactivityChart" */ '../views/reactivityChart'),
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
     path: '/message',
     name: 'Message',
     component: PageView,

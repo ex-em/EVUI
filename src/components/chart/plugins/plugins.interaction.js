@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import { defaultsDeep } from 'lodash-es';
 
 const modules = {
   /**
@@ -13,10 +14,14 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseMove = (e) => {
+      if (this.dragInfo?.isMove) {
+        return;
+      }
+
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
       const ctx = this.overlayCtx;
-      const { indicator, tooltip } = this.options;
+      const { indicator, tooltip, type } = this.options;
 
       this.overlayClear();
 
@@ -24,16 +29,18 @@ const modules = {
         this.drawItemsHighlight(hitInfo, ctx);
 
         if (tooltip.use) {
-          this.tooltipClear();
-          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-          this.tooltipDOM.style.display = 'block';
+          this.setTooltipLayoutPosition(hitInfo, e);
+          this.drawTooltip(hitInfo, this.tooltipCtx);
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
       }
 
-      const isPieChart = this.seriesInfo.charts.pie.length;
-      if (indicator.use && !isPieChart) {
+      if (this.dragInfoBackup) {
+        this.drawSelectionArea(this.dragInfoBackup);
+      }
+
+      if (indicator.use && type !== 'pie') {
         this.drawIndicator(offset, indicator.color);
       }
     };
@@ -44,14 +51,18 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseLeave = () => {
-      if (this.options.tooltip.throttledMove) {
+      const { tooltip, dragSelection } = this.options;
+
+      if (tooltip.throttledMove) {
         this.onMouseMove.cancel();
       }
-      this.overlayClear();
 
-      if (this.options.tooltip.use) {
+      if (!dragSelection.use || !dragSelection.keepDisplay) {
+        this.overlayClear();
+      }
+
+      if (tooltip.use) {
         this.tooltipClear();
-        this.tooltipDOM.style.display = 'none';
       }
     };
 
@@ -105,10 +116,156 @@ const modules = {
       }
     };
 
+    /**
+     * Start drag-select when dragSelection use option is True and graph type is 'scatter'
+     *
+     * @returns {undefined}
+     */
+    this.onMouseDown = (e) => {
+      const { dragSelection, type } = this.options;
+
+      if (dragSelection.use && type === 'scatter') {
+        this.dragStart(e);
+      }
+    };
+
+    if (this.options?.tooltip?.scrollbar?.use) {
+      this.overlayCanvas.addEventListener('wheel', (e) => {
+        const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+
+        if (isTooltipVisible) {
+          e.preventDefault();
+          this.tooltipBodyDOM.scrollTop += e.deltaY;
+        }
+      });
+    }
+
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
     this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
     this.overlayCanvas.addEventListener('click', this.onClick);
+    this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
+  },
+
+  /**
+   * Start drag-move when the mouse pointer is in the graph
+   *
+   * @returns {undefined}
+   */
+  dragStart(evt) {
+    const [offsetX, offsetY] = this.getMousePosition(evt);
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const range = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
+    // check graph range
+    if (offsetX < range.x1 || offsetX > range.x2
+        || offsetY < range.y1 || offsetY > range.y2
+    ) {
+      return;
+    }
+
+    this.dragInfo = {
+      xcp: offsetX,
+      ycp: offsetY,
+      range,
+    };
+
+    /**
+     * Calculate drag-section position and size, and drawing drag-section
+     *
+     * @returns {undefined}
+     */
+    const dragMove = (e) => {
+      e.preventDefault();
+      const [aOffsetX, aOffsetY] = this.getMousePosition(e);
+      const dragInfo = this.dragInfo;
+      const { xcp, ycp, range: aRange } = dragInfo;
+
+      let xep;
+      let yep;
+
+      dragInfo.isMove = true;
+
+      if (aOffsetX < aRange.x1) {
+        xep = aRange.x1;
+      } else if (aOffsetX > aRange.x2) {
+        xep = aRange.x2;
+      } else {
+        xep = aOffsetX;
+      }
+
+      if (aOffsetY < aRange.y1) {
+        yep = range.y1;
+      } else if (aOffsetY > aRange.y2) {
+        yep = aRange.y2;
+      } else {
+        yep = aOffsetY;
+      }
+
+      dragInfo.xsp = Math.min(xcp, xep);
+      dragInfo.ysp = Math.min(ycp, yep);
+      dragInfo.width = Math.ceil(Math.abs(xep - xcp));
+      dragInfo.height = Math.ceil(Math.abs(yep - ycp));
+
+      this.overlayClear();
+      this.drawSelectionArea(dragInfo);
+    };
+
+    /**
+     * invoking user custom click event width items and range in drag-section
+     *
+     * @returns {undefined}
+     */
+    const dragEnd = () => {
+      const dragInfo = this.dragInfo;
+
+      if (dragInfo?.isMove) {
+        const args = {
+          data: this.findSelectedItems(dragInfo),
+          range: this.getSelectionRage(dragInfo),
+        };
+
+        this.dragInfoBackup = defaultsDeep({}, dragInfo);
+
+        if (typeof this.listeners['drag-select'] === 'function') {
+          this.listeners['drag-select'](args);
+        }
+      }
+
+      if (!this.options.dragSelection.keepDisplay) {
+        this.dragInfoBackup = null;
+        this.overlayClear();
+      }
+
+      this.dragInfo = null;
+
+      window.removeEventListener('mousemove', dragMove);
+      window.removeEventListener('mouseup', dragEnd);
+    };
+
+    window.addEventListener('mousemove', dragMove);
+    window.addEventListener('mouseup', dragEnd);
+  },
+
+/**
+   * Draw selection-area
+   *
+   * @returns {undefined}
+   */
+  drawSelectionArea({ xsp, ysp, width, height }) {
+    const ctx = this.overlayCtx;
+    const { fillColor, opacity } = this.options.dragSelection;
+
+    ctx.fillStyle = fillColor;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(xsp, ysp, width, height);
+    ctx.globalAlpha = 1;
   },
 
   /**
@@ -319,6 +476,86 @@ const modules = {
     }
 
     return { dsIndex, sId };
+  },
+
+  /**
+   * Find items by series within a range
+   * @param {object} param  object for find series items
+   *
+   * @returns {object}
+   */
+  findSelectedItems(range) {
+    const items = [];
+    const sIds = Object.keys(this.seriesList);
+    for (let ix = 0; ix < sIds.length; ix++) {
+      const sId = sIds[ix];
+      const series = this.seriesList[sId];
+      const findFn = series.findItems;
+      if (findFn) {
+        const item = findFn.call(series, range);
+        if (item && item.length) {
+          items.push({
+            seriesName: series.name,
+            seriesId: sId,
+            items: item,
+          });
+        }
+      }
+    }
+
+    return items;
+  },
+
+  /**
+   * Returns the data-based range value for a selection
+   * @param {object} object for calculating data-based range
+   *                 object.range: coordinate-based range in graph
+   * @returns {object}
+   */
+  getSelectionRage({ xsp, ysp, width, height, range }) {
+    const dataRangeX = this.axesSteps.x.length ? this.axesSteps.x[0] : null;
+    const dataRangeY = this.axesSteps.y.length ? this.axesSteps.y[0] : null;
+
+    if (!dataRangeX || !dataRangeY) {
+      return null;
+    }
+
+    const xep = xsp + width;
+    const yep = ysp + height;
+    const graphWidth = dataRangeX.graphMax - dataRangeX.graphMin;
+    const graphHeight = dataRangeY.graphMax - dataRangeY.graphMin;
+
+    const xMinRatio = this.getRatioInRange(range.x1, range.x2, xsp);
+    const xMaxRatio = this.getRatioInRange(range.x1, range.x2, xep);
+    const yMinRatio = this.getRatioInRange(range.y1, range.y2, yep);
+    const yMaxRatio = this.getRatioInRange(range.y1, range.y2, ysp);
+
+    const xMin = dataRangeX.graphMin + graphWidth * xMinRatio;
+    const xMax = dataRangeX.graphMin + graphWidth * xMaxRatio;
+    const yMin = dataRangeY.graphMin + graphHeight * (1 - yMinRatio);
+    const yMax = dataRangeY.graphMin + graphHeight * (1 - yMaxRatio);
+
+    return {
+      xMin: +parseFloat(xMin).toFixed(3),
+      xMax: +parseFloat(xMax).toFixed(3),
+      yMin: +parseFloat(yMin).toFixed(3),
+      yMax: +parseFloat(yMax).toFixed(3),
+    };
+  },
+
+  /**
+   * Returns the position ratio of 'value' between 'min' and 'max'
+   * @param {number} min    min value
+   * @param {number} max    max value
+   * @param {number} value  value is between min and max
+   *
+   * @returns {number}
+   */
+  getRatioInRange(min, max, value) {
+    const total = max - min;
+    const targetValue = value - min;
+
+    return targetValue / total;
   },
 };
 

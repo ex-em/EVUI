@@ -15,7 +15,7 @@
 
 <script>
   import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
-  import moment from 'moment';
+  import dayjs from 'dayjs';
 
   export default {
     setup() {
@@ -62,15 +62,15 @@
 
       const isLive = ref(false);
       const liveInterval = ref();
-      let timeValue = moment().format('YYYY-MM-DD HH:mm:ss');
+      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
       const addRandomChartData = () => {
         if (isLive.value) {
           chartData.labels.shift();
         }
 
-        timeValue = +moment(timeValue).add(1, 'second');
-        chartData.labels.push(+moment(timeValue));
+        timeValue = dayjs(timeValue).add(1, 'second');
+        chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {
           if (isLive.value) {
@@ -92,12 +92,12 @@
           addRandomChartData();
           liveInterval.value = setInterval(addRandomChartData, 1000);
         } else {
-          clearTimeout(liveInterval.value);
+          clearInterval(liveInterval.value);
         }
       });
 
       onBeforeUnmount(() => {
-        clearTimeout(liveInterval.value);
+        clearInterval(liveInterval.value);
       });
 
       return {

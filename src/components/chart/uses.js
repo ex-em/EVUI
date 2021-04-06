@@ -31,15 +31,22 @@ const DEFAULT_OPTIONS = {
   width: '100%',
   height: '100%',
   thickness: 1,
+  borderRadius: 0,
   combo: false,
   tooltip: {
     use: true,
+    sortByValue: true,
     backgroundColor: '#4C4C4C',
+    fontColor: '#FFFFFF',
     borderColor: '#666666',
     shadowOpacity: 0.25,
     useShadow: false,
     throttledMove: false,
     debouncedHide: false,
+    scrollbar: {
+      use: false,
+      maxSeriesCount: 15,
+    },
   },
   indicator: {
     use: true,
@@ -64,6 +71,12 @@ const DEFAULT_OPTIONS = {
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
   },
+  dragSelection: {
+    use: true,
+    keepDisplay: true,
+    fillColor: '#38acec',
+    opacity: 0.65,
+  },
 };
 
 const DEFAULT_DATA = {
@@ -87,6 +100,10 @@ export const useModel = () => {
     'dbl-click': async (e) => {
       await nextTick();
       emit('dbl-click', e);
+    },
+    'drag-select': async (e) => {
+      await nextTick();
+      emit('drag-select', e);
     },
   };
 

@@ -145,7 +145,6 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries() {
-    const thickness = this.options.thickness;
     const maxTip = this.options.maxTip;
 
     const opt = {
@@ -176,7 +175,8 @@ class EvChart {
         if (chartType === 'line' || chartType === 'scatter') {
           series.draw(opt);
         } else if (chartType === 'bar') {
-          series.draw({ thickness, showSeriesCount, showIndex, ...opt });
+          const { thickness, borderRadius } = this.options;
+          series.draw({ thickness, borderRadius, showSeriesCount, showIndex, ...opt });
 
           if (series.show) {
             showIndex++;
@@ -566,6 +566,13 @@ class EvChart {
     this.labelOffset = this.getLabelOffset();
 
     this.render();
+
+    const isDragMove = this.dragInfo && this.drawSelectionArea;
+    if (isDragMove) {
+      this.drawSelectionArea(this.dragInfo);
+    } else if (this.dragInfoBackup) {
+      this.dragInfoBackup = null;
+    }
   }
 
   /**

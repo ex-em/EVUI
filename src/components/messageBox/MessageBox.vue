@@ -8,6 +8,7 @@
         v-show="isShow"
         id="ev-message-box-modal"
         @click.self="closeMsg('modal')"
+        @wheel.stop.prevent="() => {}"
       >
         <div
           ref="msgRef"
@@ -133,10 +134,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    lockScroll: {
-      type: Boolean,
-      default: true,
-    },
     useHTML: {
       type: Boolean,
       default: false,
@@ -191,11 +188,6 @@ export default {
       } else if (props.type) {
         state.iconClass = getIconClassName(props.type);
       }
-      if (props.lockScroll) {
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
-        document.body.style.overflow = 'hidden';
-      }
     };
 
     onMounted(() => {
@@ -205,11 +197,6 @@ export default {
     watch(() => state.isShow, (val) => {
       if (!val) {
         document.removeEventListener('keydown', keydown);
-        if (props.lockScroll) {
-          document.body.style.width = 'auto';
-          document.body.style.height = 'auto';
-          document.body.style.overflow = 'visible';
-        }
       }
     });
     return {

@@ -29,7 +29,7 @@
   
 #### data example
 ```
-const time = moment().format('YYYY-MM-DD HH:mm:ss');
+const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const chartData = 
   series: {
     series1: { name: 'series1', point: false, fill: true },
@@ -40,10 +40,10 @@ const chartData =
     series2: [5, 2, 0, 8],
   },
   labels: [
-    moment(time),
-    moment(time).add(1, 'day'),
-    moment(time).add(2, 'day'),
-    moment(time).add(3, 'day'),
+    dayjs(time),
+    dayjs(time).add(1, 'day'),
+    dayjs(time).add(2, 'day'),
+    dayjs(time).add(3, 'day'),
   ],
 };
 ```
@@ -81,7 +81,7 @@ const chartData =
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
-      - moment의 timeFormat 이용 [참고URL](#https://momentjs.com/docs/#/parsing/string-format/)
+      - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
 
@@ -125,6 +125,14 @@ const chartData =
 | shadowOpacity | Number | 0.25 | 그림자 투명도  | |
 | throttledMove | Boolean | false | 데이터 조회 Throttling 처리 유무  | |
 | debouncedHide | Boolean | false | 좌표 이동 시 tooltip hide 여부  | |
+| sortByValue | Boolean | true | 값을 기준으로 정렬할지의 여부  | |
+| scrollbar | Object | ([상세](#scrollbar)) | 값을 기준으로 정렬할지의 여부  | |
+
+##### scrollbar
+| 이름 | 타입 | 디폴트 | 설명 |
+|-----|------|-------|-----|
+| use | Boolean | false | 스크롤 자동 생성 여부 |
+| maxSeriesCount | Number | 15 | Series개수가 일정이상 넘어가면 스크롤바 생성|
 
 #### indicator
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

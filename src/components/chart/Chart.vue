@@ -32,6 +32,7 @@
     emits: [
       'click',
       'dbl-click',
+      'drag-select',
     ],
     setup(props) {
       let evChart = {};

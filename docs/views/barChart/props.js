@@ -12,6 +12,8 @@ import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import Gradient from './example/Gradient';
+import GradientRaw from '!!raw-loader!./example/Gradient';
 
 export default {
   mdText,
@@ -22,7 +24,7 @@ export default {
       parsedData: parseComponent(DefaultRaw),
     },
     Column: {
-      description: '세로 형태로 사용할 수 있으며 각 Series별로 색상을 직접 지정할 수 있습니다.',
+      description: '세로 형태로 사용할 수 있으며 각 Series별, data별로 색상을 직접 지정할 수 있습니다.',
       component: Column,
       parsedData: parseComponent(ColumnRaw),
     },
@@ -45,6 +47,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    Gradient: {
+      description: '막대에 그라데이션 효과를 줄 수 있습니다.',
+      component: Gradient,
+      parsedData: parseComponent(GradientRaw),
     },
   },
 };

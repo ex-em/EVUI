@@ -91,15 +91,17 @@ class Bar {
     this.size.bPad = bPad;
     this.size.w = w;
     this.size.ix = barSeriesX;
+    this.chartRect = chartRect;
+    this.labelOffset = labelOffset;
+    this.borderRadius = param.borderRadius;
 
     let categoryPoint = null;
 
-    ctx.beginPath();
+    this.data.forEach((dataItem, index) => {
+      ctx.beginPath();
 
-    const opacity = this.state === 'downplay' ? 0.1 : 1;
-    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
+      const item = dataItem;
 
-    this.data.forEach((item, index) => {
       if (isHorizontal) {
         categoryPoint = ysp - (cArea * index) - cPad;
       } else {
@@ -128,7 +130,25 @@ class Bar {
         h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
       }
 
-      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+      const barColor = item.dataColor || this.color;
+      const opacity = this.state === 'downplay' ? 0.1 : 1;
+
+      if (typeof barColor !== 'string') {
+        ctx.fillStyle = Canvas.createGradient(
+          ctx,
+          isHorizontal,
+          { x, y, w, h },
+          barColor,
+          opacity,
+        );
+      } else {
+        ctx.fillStyle = `rgba(${Util.hexToRgb(barColor)},${opacity})` || '';
+      }
+
+      this.drawBar({
+        ctx,
+        positions: { x, y, w, h },
+      });
 
       if (showValue.use) {
         this.drawValueLabels({
@@ -170,13 +190,26 @@ class Bar {
     const h = gdata.h;
 
     ctx.save();
-    ctx.fillStyle = this.color;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
-    ctx.shadowColor = this.color;
 
-    ctx.fillRect(x, y, w, h);
+    const color = item.data.dataColor || this.color;
+    if (typeof color !== 'string') {
+      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color);
+      ctx.fillStyle = grd;
+      ctx.shadowColor = color[color.length - 1][1];
+    } else {
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+    }
+
+    ctx.beginPath();
+
+    this.drawBar({
+      ctx,
+      positions: { x, y, w, h: this.isHorizontal ? -h : h },
+    });
 
     if (showValue.use) {
       this.drawValueLabels({
@@ -286,6 +319,14 @@ class Bar {
     return item;
   }
 
+  /**
+   * Draw value label if series 'use' of showValue option is true
+   *
+   * @param context           canvas context
+   * @param data              series value data (model.store.js addData return value)
+   * @param positions         series value positions
+   * @param isHighlight       draw label with highlight effect
+   */
   drawValueLabels({ context, data, positions, isHighlight }) {
     const isHorizontal = this.isHorizontal;
     const showValue = this.showValue;
@@ -293,8 +334,17 @@ class Bar {
     const ctx = context;
 
     ctx.save();
+    ctx.beginPath();
 
-    const value = numberWithComma(isHorizontal ? data.x : data.y);
+    let value;
+    const isStacked = !isNaN(data.o);
+    if (data.o === null) {
+      value = numberWithComma(isHorizontal ? data.x : data.y);
+    } else if (isStacked) {
+      value = numberWithComma(data.o);
+    } else {
+      value = '';
+    }
 
     ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
     ctx.fillStyle = showValue.textColor;
@@ -345,6 +395,64 @@ class Bar {
     }
 
     ctx.restore();
+  }
+
+  drawBar({ ctx, positions }) {
+    const isHorizontal = this.isHorizontal;
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const isStackBar = 'stackIndex' in this;
+    const { x, y } = positions;
+    let { w, h } = positions;
+    let r = this.borderRadius;
+
+    // Dont's draw bar that has value 0
+    if (w === 0 || h === 0) {
+      return;
+    }
+
+    if (r && r > 0 && !isStackBar) {
+      const squarePath = new Path2D();
+      squarePath.rect(
+        chartRect.x1 + labelOffset.left,
+        chartRect.y1,
+        chartRect.chartWidth - labelOffset.right,
+        chartRect.chartHeight - labelOffset.bottom,
+      );
+
+      ctx.clip(squarePath);
+
+      ctx.moveTo(x, y);
+
+      if (isHorizontal) {
+        if (h < r * 2) {
+          r = h / 2;
+        }
+
+        w -= r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
+        ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
+      } else {
+        if (w < r * 2) {
+          r = w / 2;
+        }
+
+        h += r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
+        ctx.arcTo(x, y + h - r, x, y + h, r);
+        ctx.lineTo(x, y);
+      }
+
+      ctx.fill();
+      ctx.closePath();
+    } else {
+      ctx.fillRect(x, y, w, isHorizontal ? -h : h);
+    }
   }
 }
 
