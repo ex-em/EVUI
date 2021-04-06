@@ -18,8 +18,8 @@
           @wheel.stop.prevent="() => {}"
         />
         <div
-          :class="['ev-window', windowClass]"
-          :style="windowStyle"
+          :class="['ev-window', windowClass, { fullscreen: !!fullscreen }]"
+          :style="style"
         >
           <div
             v-if="$slots.header || iconClass || title"
@@ -90,13 +90,9 @@ export default {
       type: String,
       default: '',
     },
-    width: {
-      type: String,
-      default: '',
-    },
-    height: {
-      type: String,
-      default: '',
+    style: {
+      type: Object,
+      default: () => {},
     },
     fullscreen: {
       type: Boolean,
@@ -135,30 +131,6 @@ export default {
 
     const windowContent = ref(null);
 
-    const windowStyle = computed(() => {
-      if (props.fullscreen) {
-        return {
-          width: '100%',
-          height: '100%',
-        };
-      }
-      let widthObj = {};
-      let heightObj = {};
-      if (props.width) {
-        widthObj = {
-          width: props.width,
-        };
-      }
-      if (props.height) {
-        heightObj = {
-          height: props.height,
-        };
-      }
-      return {
-        ...widthObj,
-        ...heightObj,
-      };
-    });
     /**
      * [x] 클릭 시 닫는 기능
      */
@@ -208,7 +180,6 @@ export default {
 
     return {
       windowContent,
-      windowStyle,
       closeWin,
       onWheelContent,
     };
@@ -239,26 +210,35 @@ export default {
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 50%;
-  height: 50%;
+  width: 50vw;
+  height: 50vh;
   max-width: 100%;
   max-height: 100%;
+  margin-top: -25vh;
+  margin-left: -25vw;
   flex-direction: column;
   box-sizing: border-box;
   border-radius: $default-radius;
   background-color: #FDFDFD;
   border: 1px solid #E3E3E3;
   transition: opacity .2s ease-in-out, transform .3s ease-in-out;
-  transform: translate(-50%, -50%);
   font-size: $font-size-medium;
   line-height: 1.5em;
   z-index: 700;
+
+  &.fullscreen {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
 
   &-fade-enter-active,
   &-fade-leave-active {
     .ev-window {
       opacity: 0;
-      transform: translate(-50%, -60%);
+      transform: translateY(-10%);
     }
   }
 

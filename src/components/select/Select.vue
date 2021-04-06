@@ -374,18 +374,16 @@ export default {
   position: absolute;
   width: 100%;
   max-height: $select-height * 5;
-  background-color: white;
+  background-color: #FCFCFC;
   border: 1px solid #E4E7ED;
   color: #606266;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
   border-radius: 4px;
   z-index: 100;
   cursor: pointer;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
 
   ul {
-    background-color: #0D0D0D;
     list-style: none;
   }
   li {
@@ -417,7 +415,6 @@ export default {
   text-overflow: ellipsis;
   font-size: 15px;
   color: #0D0D0D;
-  background-color: #FCFCFC;
   white-space: nowrap;
   cursor: pointer;
 
