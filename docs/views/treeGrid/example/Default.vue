@@ -1,17 +1,19 @@
 <template>
   <div class="case">
-    <p class="case-title">Grid</p>
+    <p class="case-title">TreeGrid</p>
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
+      :is-tree-grid="true"
       :columns="columns"
-      :rows="tableData"
+      :tree-data="tableData"
       :width="widthMV"
       :height="heightMV"
       :option="{
         adjust: adjustMV,
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
+        // rowMinHeight: 20,
         columnWidth: columnWidthMV,
         useFilter: useFilterMV,
         useCheckbox: {
@@ -25,6 +27,10 @@
           border: borderMV,
           highlight: highlightMV,
         },
+        expandIcon: expandIconMV,
+        collapseIcon: collapseIconMV,
+        parentIcon: parentIconMV,
+        childIcon: childIconMV,
       }"
       @check-row="onCheckedRow"
       @check-all="onAllCheckedRow"
@@ -45,12 +51,6 @@
         </span>
         <ev-toggle
           v-model="adjustMV"
-        />
-        <span class="badge yellow">
-          Use Filter
-        </span>
-        <ev-toggle
-          v-model="useFilterMV"
         />
         <span class="badge yellow">
           Use Checkbox
@@ -170,6 +170,7 @@
             :step="1"
             :max="100"
             :min="0"
+            readonly
           />
         </div>
         <div class="form-row">
@@ -178,7 +179,7 @@
           </span>
           <ev-select
             v-model="borderMV"
-            :items="items"
+            :items="borderItems"
             placeholder="Please select value."
           />
           <button
@@ -192,12 +193,52 @@
           </button>
         </div>
       </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
+            Expand/Collapse Icon
+          </span>
+          <ev-select
+            v-model="iconMV"
+            :items="iconItems"
+            placeholder="Please select value."
+          />
+          <button
+            class="btn"
+            @click="resetTreeIcon"
+          >
+            <ev-icon
+              icon="ev-icon-trash3"
+              size="small"
+            />Reset
+          </button>
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">
+            Data Icon
+          </span>
+          <ev-select
+            v-model="dataIconMV"
+            :items="dataIconItems"
+            placeholder="Please select value."
+          />
+          <button
+            class="btn"
+            @click="resetDataIcon"
+          >
+            <ev-icon
+              icon="ev-icon-trash3"
+              size="small"
+            />Reset
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 export default {
   setup() {
@@ -211,7 +252,7 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(35);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(true);
+    const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
@@ -221,7 +262,7 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: () => alert(`[Menu1] Selected Row Data: ${selected.value}`),
+        click: () => alert(`[Menu1] Selected Index: ${selected.value.index}`),
       }, {
         text: 'Menu2',
         click: () => alert('[Menu2]'),
@@ -229,7 +270,9 @@ export default {
     ]);
     const highlightMV = ref(0);
     const borderMV = ref('');
-    const items = ref([
+    const iconMV = ref('');
+    const dataIconMV = ref('');
+    const borderItems = ref([
       {
         name: 'none',
         value: 'none',
@@ -239,8 +282,42 @@ export default {
         value: 'rows',
       },
     ]);
+    const iconItems = ref([
+      {
+        name: 'plus',
+        value: { expand: 'ev-icon-circle-plus', collapse: 'ev-icon-circle-minus' },
+      },
+      {
+        name: 'arrow',
+        value: { expand: 'ev-icon-s-arrow-down', collapse: 'ev-icon-s-arrow-right' },
+      },
+    ]);
+    const dataIconItems = ref([
+      {
+        name: 'folder',
+        value: { parent: 'ev-icon-folder', child: 'ev-icon-document' },
+      },
+      {
+        name: 'database',
+        value: { parent: 'ev-icon-db', child: 'ev-icon-connection' },
+      },
+      {
+        name: 'none',
+        value: { parent: 'none', child: 'none' },
+      },
+    ]);
+    const expandIconMV = computed(() => (iconMV.value ? iconMV.value.expand : ''));
+    const collapseIconMV = computed(() => (iconMV.value ? iconMV.value.collapse : ''));
+    const parentIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.parent : ''));
+    const childIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.child : ''));
     const resetBorderStyle = () => {
       borderMV.value = '';
+    };
+    const resetTreeIcon = () => {
+      iconMV.value = '';
+    };
+    const resetDataIcon = () => {
+      dataIconMV.value = '';
     };
     const onClickCheckbox = (e) => {
       console.log(`checkbox component click: ${e}`);
@@ -255,134 +332,89 @@ export default {
       checkboxModeMV.value = mode;
       checked.value = [];
     };
-    const onCheckedRow = (e, index, rowData) => {
-      checkedRowsMV.value = `${rowData}`;
+    const onCheckedRow = (e, index) => {
+      checkedRowsMV.value = `Index: ${index}`;
     };
     const onDoubleClickRow = (e) => {
-      DbClickedRowsMV.value = `${e.rowData}`;
+      DbClickedRowsMV.value = `Index: ${e.rowIndex}`;
     };
-    const onClickRow = (e, rowIdx, cellName, cellIdx, rowData) => {
-      clickedRowMV.value = `${rowData}`;
+    const onClickRow = (e, rowIdx) => {
+      clickedRowMV.value = `Index: ${rowIdx}`;
     };
     const onAllCheckedRow = (check) => {
       console.log(`All Check : ${check}`);
     };
-    const getData = (count, startIndex) => {
-      const countries = [
-        'Russia', 'Canada', 'United States', 'China', 'Brazil',
-        'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
-        'Denmark', 'Mexico', 'Indonesia', 'Sudan', 'Libya',
-        'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
-      ];
-      // const state = ['normal', 'warning', 'critical'];
-      const temp = [];
-      for (let ix = startIndex; ix < startIndex + count; ix++) {
-        temp.push([
-          ix + 1,
-          countries[ix % 20],
-          Math.random() * 10000,
-          Math.random() * 100,
-          Math.random() * 1000,
-          true,
-          true,
-          Math.floor(Math.random() * (100 - 0 + 1)) + 0,
-         'critical',
-        ]);
-      }
-      tableData.value = temp;
+    const getData = () => {
+      tableData.value = [{
+        id: 'Exem 1',
+        date: '2016-05-01',
+        name: '1',
+        expand: true,
+        children: [{
+          id: 'Exem 2',
+          date: '2016-05-02',
+          name: '2',
+          expand: false,
+          children: [{
+            id: 'Exem 3',
+            date: '2016-05-02',
+            name: '3',
+          }, {
+            id: 'Exem 4',
+            date: '2016-05-02',
+            name: '4',
+            expand: false,
+            children: [{
+              id: 'Exem 5',
+              date: '2016-05-02',
+              name: '5',
+              children: [{
+                id: 'Exem 51',
+                date: '2016-05-02',
+                name: '51',
+                children: [{
+                  id: 'Exem 52',
+                  date: '2016-05-02',
+                  name: '52',
+                }],
+              }],
+            }, {
+              id: 'Exem 6',
+              date: '2016-05-02',
+              name: '6',
+            }],
+          }],
+        }, {
+          id: 'Exem 7',
+          date: '2016-05-03',
+          name: '7',
+          children: [{
+            id: 'Exem 8',
+            date: '2016-05-03',
+            name: '8',
+          }, {
+            id: 'Exem 9',
+            date: '2016-05-03',
+            name: '9',
+          }, {
+            id: 'Exem 10',
+            date: '2016-05-03',
+            name: '10',
+          }],
+        }, {
+          id: 'Exem 11',
+          date: '2016-05-04',
+          name: '11',
+        }],
+      }];
     };
     const columns = ref([
       { caption: 'ID', field: 'id', type: 'number' },
-      { caption: 'Country', field: 'country', type: 'string' },
-      { caption: 'Area', field: 'area', type: 'number', hide: true },
-      { caption: 'Population', field: 'population', type: 'float' },
-      { caption: 'GDP', field: 'gdp', type: 'float' },
-      {
-        caption: 'Information',
-        field: 'information',
-        type: 'boolean',
-        render: {
-          use: true,
-          type: 'button',
-          option: {
-            onClick: onClickButton,
-            btnName: 'View Info',
-            btnType: 'default',
-            btnShape: 'square',
-            btnIcon: 'ev-icon-document-search',
-          },
-        },
-      },
-      {
-        caption: 'Check',
-        field: 'check',
-        type: 'boolean',
-        render: {
-          use: true,
-          type: 'checkbox',
-          option: {
-            onClick: onClickCheckbox,
-            label: 'check',
-          },
-        },
-      },
-      // {
-      //   caption: 'Information',
-      //   field: 'information',
-      //   type: 'boolean',
-      //   render: {
-      //     use: true,
-      //     type: 'button',
-      //     option: {
-      //       onClick: onClickButton,
-      //       btnName: 'View Info',
-      //       btnType: 'primary',
-      //       btnShape: 'square',
-      //       btnIcon: 'ev-icon-document-search',
-      //     },
-      //   },
-      // },
-      // {
-      //   caption: 'Size',
-      //   field: 'size',
-      //   type: 'number',
-      //   width: 100,
-      //   render: {
-      //     use: true,
-      //     type: 'input_number',
-      //     option: {
-      //       minValue: 0,
-      //       maxValue: 100,
-      //     },
-      //   },
-      // },
-      // {
-      //   caption: 'State',
-      //   field: 'state',
-      //   type: 'string',
-      //   width: 300,
-      //   render: {
-      //     use: true,
-      //     type: 'select',
-      //     option: {
-      //       selectItem: [
-      //         {
-      //           name: 'normal',
-      //           value: 'normal',
-      //         }, {
-      //           name: 'warning',
-      //           value: 'warning',
-      //         }, {
-      //           name: 'critical',
-      //           value: 'critical',
-      //         },
-      //       ],
-      //     },
-      //   },
-      // },
+      { caption: 'Date', field: 'date', type: 'string' },
+      { caption: 'Name', field: 'name', type: 'number' },
     ]);
 
-    getData(50, 0);
+    getData();
     return {
       columns,
       tableData,
@@ -405,7 +437,7 @@ export default {
       menuItems,
       highlightMV,
       borderMV,
-      items,
+      borderItems,
       onClickCheckbox,
       onClickButton,
       clearData,
@@ -415,6 +447,16 @@ export default {
       onClickRow,
       onAllCheckedRow,
       resetBorderStyle,
+      resetTreeIcon,
+      resetDataIcon,
+      iconMV,
+      iconItems,
+      expandIconMV,
+      collapseIconMV,
+      dataIconMV,
+      dataIconItems,
+      parentIconMV,
+      childIconMV,
     };
   },
 };

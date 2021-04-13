@@ -10,6 +10,7 @@
       v-cloak
       ref="grid"
       :class="{
+        'ev-grid': true,
         table: true,
         adjust: adjust,
         'non-header': !showHeader,
@@ -116,74 +117,98 @@
         />
         <table>
           <tbody>
-          <!--Row List-->
-          <tr
-            v-for="(row, rowIndex) in viewStore"
-            :key="rowIndex"
-            :data-index="rowIndex"
-            :class="{
+          <template v-if="isTreeGrid">
+            <tree-grid
+              v-for="(item, idx) in viewStore"
+              :key="idx"
+              :data-index="idx"
+              :tree-data="item"
+              :use-checkbox="useCheckbox"
+              :ordered-columns="orderedColumns"
+              :expand-icon="option.expandIcon"
+              :collapse-icon="option.collapseIcon"
+              :parent-icon="option.parentIcon"
+              :child-icon="option.childIcon"
+              :is-resize="isResize"
+              :row-height="rowHeight"
+              :min-width="minWidth"
+              :is-highlighted="idx === highlightIdx"
+              :border-style="borderStyle"
+              @check-tree-data="onCheck"
+              @expand-tree-data="handleExpand"
+              @click-tree-data="onRowClick"
+              @dbl-click-tree-data="onRowDblClick"
+            />
+          </template>
+          <template v-else>
+            <tr
+              v-for="(row, rowIndex) in viewStore"
+              :key="rowIndex"
+              :data-index="rowIndex"
+              :class="{
               row: true,
               selected: row[2] === selectedRow,
               'non-border': !!borderStyle && borderStyle !== 'rows',
               highlight: row[0] === highlightIdx,
             }"
-            @click="onRowClick($event, row)"
-            @dblclick="onRowDblClick($event, row)"
-          >
-            <!--Row Checkbox-->
-            <td
-              v-if="useCheckbox.use"
-              :class="{
+              @click="onRowClick($event, row)"
+              @dblclick="onRowDblClick($event, row)"
+            >
+              <!--Row Checkbox-->
+              <td
+                v-if="useCheckbox.use"
+                :class="{
                 'row-checkbox': true,
                 'non-border': !!borderStyle,
               }"
-              :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
-            >
-              <ev-checkbox
-                v-model="row[1]"
-                class="row-checkbox-input"
-                @change="onCheck($event, row)"
-              />
-            </td>
-            <!--Cell-->
-            <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
-              <td
-                v-if="!column.hide"
-                :data-name="column.field"
-                :data-index="column.index"
-                :class="{
+                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+              >
+                <ev-checkbox
+                  v-model="row[1]"
+                  class="row-checkbox-input"
+                  @change="onCheck($event, row)"
+                />
+              </td>
+              <!--Cell-->
+              <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
+                <td
+                  v-if="!column.hide"
+                  :data-name="column.field"
+                  :data-index="column.index"
+                  :class="{
                   [column.type]: column.type,
                   [column.align]: column.align,
                   render: isRenderer(column),
                   'non-border': !!borderStyle,
                 }"
-                :style="`
+                  :style="`
                   width: ${column.width}px;
                   height: ${rowHeight}px;
                   line-height: ${rowHeight}px;
                   min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
-              >
-                <component
-                  :is="getComponentName(column.render.type)"
-                  v-if="isRenderer(column)"
-                  :item="{
+                >
+                  <component
+                    :is="getComponentName(column.render.type)"
+                    v-if="isRenderer(column)"
+                    :item="{
                     row: row[2],
                     rowIndex: row[0],
                     cellIndex: column.index,
                     value: row[2][column.index],
                   }"
-                  :option="column.render.option"
-                  @change-renderer="updateData"
-                />
-                <span
-                  v-else
-                  :title="getConvertValue(column.type, row[2][column.index])"
-                >
+                    :option="column.render.option"
+                    @change-renderer="updateData"
+                  />
+                  <span
+                    v-else
+                    :title="getConvertValue(column.type, row[2][column.index])"
+                  >
                   {{ getConvertValue(column.type, row[2][column.index]) }}
                 </span>
-              </td>
-            </template>
-          </tr>
+                </td>
+              </template>
+            </tr>
+          </template>
           </tbody>
         </table>
         <!--vScroll Bottom-->
@@ -224,6 +249,7 @@ import ButtonRenderer from './renderer/button.renderer';
 import InputNumberRenderer from './renderer/inputNumber.renderer';
 import SelectRenderer from './renderer/select.renderer';
 import ToggleRenderer from './renderer/toggle.renderer';
+import TreeGrid from '../treeGrid/TreeGrid';
 import {
   commonFunctions,
   scrollEvent,
@@ -245,6 +271,7 @@ export default {
     InputNumberRenderer,
     SelectRenderer,
     ToggleRenderer,
+    TreeGrid,
   },
   props: {
     columns: {
@@ -264,8 +291,8 @@ export default {
       default: '100%',
     },
     selected: {
-      type: [Array],
-      default: () => [],
+      type: [Array, Object],
+      default: null,
     },
     checked: {
       type: [Array],
@@ -274,6 +301,22 @@ export default {
     option: {
       type: Object,
       default: () => ({}),
+    },
+    treeData: {
+      type: [Array],
+      default: () => [],
+    },
+    expandIcon: {
+      type: String,
+      default: '',
+    },
+    collapseIcon: {
+      type: String,
+      default: '',
+    },
+    isTreeGrid: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: {
@@ -296,7 +339,7 @@ export default {
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
-    const borderStyle = computed(() => (props.option.style?.border || false));
+    const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight));
     const rowMinHeight = props.option.rowMinHeight || 35;
     const elementInfo = reactive({
@@ -325,6 +368,8 @@ export default {
         (filterInfo.isFiltering ? stores.filteredStore : stores.originStore)),
       orderedColumns: computed(() =>
         (props.columns.map((column, index) => ({ index, ...column })))),
+      treeData: [],
+      treeStore: computed(() => (stores.treeData.filter(item => item.show))),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -366,6 +411,7 @@ export default {
         (props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
+      isResize: false,
     });
 
     const {
@@ -423,8 +469,53 @@ export default {
 
     onMounted(() => {
       calculatedColumn();
-      setStore(props.rows);
+      const data = props.isTreeGrid ? props.treeData : props.rows;
+      setStore(data);
     });
+    // tree data init
+    let index = 0;
+    const setTreeData = (treeData, count, isShow, parent) => {
+      treeData.forEach((nodeObj) => {
+        const node = nodeObj;
+        node.level = count;
+        node.expand = node.expand === undefined ? true : node.expand;
+        node.show = isShow;
+        node.checked = false;
+        node.index = index++;
+        node.parent = parent;
+        node.iconClass = 'ev-icon-document';
+        stores.treeData.push(node);
+
+        if (node.children && node.children.length > 0) {
+          node.hasChild = true;
+          node.iconClass = 'ev-icon-folder';
+          setTreeData(node.children, node.level + 1, node.show && node.expand, node);
+        }
+      });
+    };
+    const setExpandNode = (children, isShow) => {
+      children.forEach((nodeObj) => {
+        const node = nodeObj;
+        node.show = isShow;
+
+        if (node.hasChild) {
+          setExpandNode(node.children, node.show && node.expand);
+        }
+      });
+    };
+    const handleExpand = (node) => {
+      const data = node;
+      data.expand = !data.expand;
+      setExpandNode(data.children, data.expand);
+      stores.viewStore = stores.treeStore;
+    };
+
+    watch(
+      () => props.treeData,
+      (value) => {
+        setTreeData(value, 0, true);
+      }, { immediate: true },
+    );
 
     watch(
       () => sortInfo.setSorting,
@@ -447,22 +538,8 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(value);
-      },
-    );
-    watch(
-      () => props.checked,
-      (value) => {
-        const ROW_CHECK_INDEX = 1;
-        const ROW_DATA_INDEX = 2;
-        const store = stores.originStore;
-        if (value.length === 0) {
-          checkInfo.isHeaderChecked = false;
-        }
-        for (let ix = 0; ix < store.length; ix++) {
-          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
-        }
-        checkInfo.checkedRows = value;
+        const data = props.isTreeGrid ? props.treeData : value;
+        setStore(data);
       },
     );
     watch(
@@ -530,6 +607,7 @@ export default {
       updateData,
       setContextMenu,
       onContextMenu,
+      handleExpand,
     };
   },
 };
@@ -769,6 +847,9 @@ export default {
 
     &:last-child {
       border-right: 0;
+    }
+    &.tree-td {
+      text-align: left !important;
     }
     /* stylelint-enable */
   }

@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 export default {
   name: 'EvWindow',

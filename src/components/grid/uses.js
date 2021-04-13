@@ -69,17 +69,19 @@ export const commonFunctions = () => {
 
 export const scrollEvent = (params) => {
   const { scrollInfo, stores, elementInfo, resizeInfo } = params;
+  const { props } = getCurrentInstance();
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
   const updateVScroll = () => {
+    const store = props.isTreeGrid ? stores.treeStore : stores.store;
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     const rowCount = bodyEl.clientHeight > rowHeight
-      ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
-    const totalScrollHeight = stores.store.length * rowHeight;
+      ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+    const totalScrollHeight = store.length * rowHeight;
     let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
-    if (firstVisibleIndex > stores.store.length - 1) {
+    if (firstVisibleIndex > store.length - 1) {
       firstVisibleIndex = 0;
     }
 
@@ -87,8 +89,8 @@ export const scrollEvent = (params) => {
     const firstIndex = Math.max(firstVisibleIndex, 0);
     const lastIndex = lastVisibleIndex;
 
-    stores.viewStore = stores.store.slice(firstIndex, lastIndex);
-    scrollInfo.hasVerticalScrollBar = rowCount < stores.store.length;
+    stores.viewStore = store.slice(firstIndex, lastIndex);
+    scrollInfo.hasVerticalScrollBar = rowCount < store.length;
     scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
     scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
       - scrollInfo.vScrollTopHeight;
@@ -216,6 +218,7 @@ export const resizeEvent = (params) => {
       }
       lastColumn.width += remainWidth;
     }
+    resizeInfo.isResize = !resizeInfo.isResize;
   };
   /**
    * grid resize 이벤트를 처리한다.
@@ -303,7 +306,7 @@ export const resizeEvent = (params) => {
 };
 
 export const clickEvent = (params) => {
-  const { emit } = getCurrentInstance();
+  const { emit, props } = getCurrentInstance();
   const selectInfo = params;
   /**
    * row click 이벤트를 처리한다.
@@ -318,8 +321,8 @@ export const clickEvent = (params) => {
     }
     if (selectInfo.useSelect) {
       const cellInfo = event.target.dataset;
-      const rowData = row[ROW_DATA_INDEX];
-      const rowIndex = row[ROW_INDEX];
+      const rowData = props.isTreeGrid ? row : row[ROW_DATA_INDEX];
+      const rowIndex = props.isTreeGrid ? row.index : row[ROW_INDEX];
 
       selectInfo.selectedRow = rowData;
       emit('update:selected', rowData);
@@ -335,8 +338,8 @@ export const clickEvent = (params) => {
    */
   const onRowDblClick = (event, row) => {
     const cellInfo = event.target.dataset;
-    const rowData = row[ROW_DATA_INDEX];
-    const rowIndex = row[ROW_INDEX];
+    const rowData = props.isTreeGrid ? row : row[ROW_DATA_INDEX];
+    const rowIndex = props.isTreeGrid ? row.index : row[ROW_INDEX];
 
     emit('dblclick-row', {
       event,
@@ -351,57 +354,150 @@ export const clickEvent = (params) => {
 
 export const checkEvent = (params) => {
   const { checkInfo, stores } = params;
-  const { emit } = getCurrentInstance();
+  const { emit, props } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
    *
    * @param {array} row - row 데이터
    */
   const unCheckedRow = (row) => {
-    const index = stores.originStore.findIndex(
-      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
+    if (props.isTreeGrid) {
+      const index = stores.treeData.findIndex(
+        item => item.index === row.index);
 
-    if (index !== -1) {
-      stores.originStore[index][ROW_CHECK_INDEX] = row[ROW_CHECK_INDEX];
+      if (index !== -1) {
+        stores.treeData[index].checked = row.checked;
+      }
+    } else {
+      const index = stores.originStore.findIndex(
+        item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
+
+      if (index !== -1) {
+        stores.originStore[index][ROW_CHECK_INDEX] = row[ROW_CHECK_INDEX];
+      }
+    }
+  };
+  const onCheckChildren = (node) => {
+    if (node.hasChild) {
+      node.children.forEach((children) => {
+        const childNode = children;
+        if (node.checked && !childNode.checked) {
+          checkInfo.checkedRows.push(childNode);
+        }
+        if (!node.checked) {
+          checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== childNode.index);
+        }
+        childNode.checked = node.checked;
+
+        if (childNode.hasChild) {
+          onCheckChildren(childNode);
+        }
+      });
+    }
+  };
+  const onCheckParent = (node) => {
+    const parentNode = node.parent;
+    if (parentNode) {
+      const isCheck = parentNode.children.every(n => n.checked);
+      parentNode.checked = isCheck;
+      if (!parentNode.checked) {
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== parentNode.index);
+      } else {
+        checkInfo.checkedRows.push(parentNode);
+      }
+      if (parentNode.parent) {
+        onCheckParent(parentNode);
+      }
     }
   };
   /**
    * checkbox click 이벤트를 처리한다.
    *
    * @param {object} event - 이벤트 객체
-   * @param {array} row - row 데이터
+   * @param {array} rowData - row 데이터
    */
-  const onCheck = (event, row) => {
-    if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow.length) {
-      checkInfo.prevCheckedRow[ROW_CHECK_INDEX] = false;
-      unCheckedRow(checkInfo.prevCheckedRow);
-    }
-
-    if (row[ROW_CHECK_INDEX]) {
-      if (checkInfo.useCheckbox.mode === 'single') {
-        checkInfo.checkedRows = [row[ROW_DATA_INDEX]];
-      } else {
-        checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
-      }
-
-      if (checkInfo.checkedRows.length === stores.originStore.length) {
+  const onCheck = (event, rowData) => {
+    const isSingleMode = () => checkInfo.useCheckbox.mode === 'single';
+    const checkedHeader = (store) => {
+      if (checkInfo.checkedRows.length === store.length) {
         checkInfo.isHeaderChecked = true;
       }
-    } else {
+    };
+    const unCheckedHeader = () => {
       if (checkInfo.isHeaderChecked) {
         checkInfo.isHeaderChecked = false;
       }
-
-      if (checkInfo.useCheckbox.mode === 'single') {
-        checkInfo.checkedRows = [];
-      } else {
-        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+    };
+    const onSingleMode = (prop) => {
+      if (isSingleMode() && checkInfo.checkedRows.length > 0) {
+        checkInfo.prevCheckedRow[prop] = false;
+        unCheckedRow(checkInfo.prevCheckedRow);
       }
-    }
-
-    checkInfo.prevCheckedRow = row.slice();
-    emit('update:checked', checkInfo.checkedRows);
-    emit('check-row', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
+    };
+    const TreeGridCheck = {
+      addCheckedRow: (row) => {
+        if (isSingleMode()) {
+          checkInfo.checkedRows = [row];
+          return;
+        }
+        onCheckChildren(row);
+        onCheckParent(row);
+        checkInfo.checkedRows.push(row);
+      },
+      removeCheckedRow: (row) => {
+        if (isSingleMode()) {
+          checkInfo.checkedRows = [];
+          return;
+        }
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== row.index);
+      },
+      onChecked: (row) => {
+        onSingleMode('checked');
+        if (row.checked) {
+          TreeGridCheck.addCheckedRow(row);
+          checkedHeader(stores.treeData);
+        } else {
+          unCheckedHeader();
+          TreeGridCheck.removeCheckedRow(row);
+          onCheckChildren(row);
+          onCheckParent(row);
+        }
+        checkInfo.prevCheckedRow = row;
+        emit('update:checked', checkInfo.checkedRows);
+        emit('check-row', event, row.index, row);
+      },
+    };
+    const GridCheck = {
+      addCheckedRow: (row) => {
+        if (isSingleMode()) {
+          checkInfo.checkedRows = [row[ROW_DATA_INDEX]];
+          return;
+        }
+        checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
+      },
+      removeCheckedRow: (row) => {
+        if (isSingleMode()) {
+          checkInfo.checkedRows = [];
+          return;
+        }
+        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+      },
+      onChecked: (row) => {
+        onSingleMode(ROW_CHECK_INDEX);
+        if (row[ROW_CHECK_INDEX]) {
+          GridCheck.addCheckedRow(row);
+          checkedHeader(stores.originStore);
+        } else {
+          unCheckedHeader();
+          GridCheck.removeCheckedRow(row);
+        }
+        checkInfo.prevCheckedRow = row.slice();
+        emit('update:checked', checkInfo.checkedRows);
+        emit('check-row', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
+      },
+    };
+    const Grid = props.isTreeGrid ? TreeGridCheck : GridCheck;
+    Grid.onChecked(rowData);
   };
   /**
    * all checkbox click 이벤트를 처리한다.
@@ -409,17 +505,21 @@ export const checkEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onCheckAll = (event) => {
+    const store = props.isTreeGrid ? stores.treeData : stores.originStore;
     const status = checkInfo.isHeaderChecked;
     const checked = [];
     let item;
-
-    for (let ix = 0; ix < stores.originStore.length; ix++) {
-      item = stores.originStore[ix];
+    for (let ix = 0; ix < store.length; ix++) {
+      item = store[ix];
       if (status) {
-        checked.push(item[ROW_DATA_INDEX]);
+        const checkedItem = props.isTreeGrid ? item : item[ROW_DATA_INDEX];
+        checked.push(checkedItem);
       }
-
-      item[ROW_CHECK_INDEX] = status;
+      if (props.isTreeGrid) {
+        item.checked = status;
+      } else {
+        item[ROW_CHECK_INDEX] = status;
+      }
     }
 
     checkInfo.checkedRows = checked;
@@ -438,6 +538,9 @@ export const sortEvent = (params) => {
    * @param {string} field - 컬럼 field
    */
   const onSort = (field) => {
+    if (props.isTreeGrid) {
+      return;
+    }
     if (sortInfo.sortField === field) {
       sortInfo.sortOrder = sortInfo.sortOrder === 'desc' ? 'asc' : 'desc';
     } else {
@@ -652,7 +755,7 @@ export const filterEvent = (params) => {
 };
 
 export const contextMenuEvent = (params) => {
-  const { emit } = getCurrentInstance();
+  const { emit, props } = getCurrentInstance();
   const { contextInfo, stores, filterInfo, selectInfo, setStore } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -707,7 +810,8 @@ export const contextMenuEvent = (params) => {
     }
 
     if (rowIndex) {
-      const rowData = stores.viewStore[+rowIndex][ROW_DATA_INDEX];
+      const rowData = props.isTreeGrid
+        ? stores.viewStore[+rowIndex] : stores.viewStore[+rowIndex][ROW_DATA_INDEX];
       selectInfo.selectedRow = rowData;
       setContextMenu();
       emit('update:selected', rowData);
