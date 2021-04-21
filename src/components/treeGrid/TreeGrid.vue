@@ -1,115 +1,169 @@
 <template>
-  <tr
-    :class="{
-      'tree-row': true,
-      row: true,
-      'non-border': !!borderStyle && borderStyle !== 'rows',
-    }"
-    @click="onClick($event, node)"
-    @dblclick="onDblClick($event, node)"
+  <div
+    ref="grid-wrapper"
+    v-resize="onResize"
+    :style="gridStyle"
   >
-    <td
-      v-if="useCheckbox.use"
-      :class="{
-        'row-checkbox': true,
-        'non-border': !!borderStyle,
-      }"
-      :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+    <!--Table-->
+    <div
+      v-cloak
+      ref="grid"
+      :class="gridClass"
     >
-      <ev-checkbox
-        v-model="node.checked"
-        class="row-checkbox-input"
-        @change="onCheck($event, node)"
-      />
-    </td>
-    <template
-      v-for="(column, cellIndex) in orderedColumns"
-      :key="cellIndex"
-    >
-      <td
-        v-if="!column.hide"
-        :data-name="column.field"
-        :data-index="column.index"
-        :class="{
-          'tree-td': cellIndex === 0,
-          [column.type]: column.type,
-          [column.align]: column.align,
-          // render: isRenderer(column),
-          'non-border': !!borderStyle,
-        }"
-        :style="`
-          width: ${column.width}px;
-          height: ${rowHeight}px;
-          line-height: ${rowHeight}px;
-          min-width: ${minWidth}px;`"
+      <!--Header-->
+      <div
+        v-show="showHeader"
+        ref="header"
+        :class="headerClass"
       >
-        <span
-          title=""
-        >
-          <span
-            v-if="cellIndex === 0"
-            :style="`margin-left: ${node.level * 13}px`"
+        <ul class="column-list">
+          <!--Header Checkbox-->
+          <li
+            v-if="useCheckbox.use"
+            :class="headerCheckboxClass"
+            :style="`width: ${minWidth}px;`"
           >
-          </span>
-          <span
-            v-if="cellIndex === 0"
-            :class="{
-              expand: node.expand,
-              'ev-tree-toggle': true
-            }"
+            <ev-checkbox
+              v-if="isHeaderCheckbox"
+              v-model="isHeaderChecked"
+              @change="onCheckAll"
+            />
+          </li>
+          <!--Column List-->
+          <template
+            v-for="(column, index) in orderedColumns"
+            :key="index"
           >
-            <template v-if="expandIconClasses(node)">
-              <ev-icon
-                v-if="cellIndex === 0 && node.hasChild"
-                :icon="expandIconClasses(node)"
-                @click="onExpand(node)"
-              />
-              <i></i>
-            </template>
-            <template v-else>
-              <button
-                v-if="cellIndex === 0 && node.hasChild"
-                class="tree-expand-icon"
-                @click="onExpand(node)"
+            <li
+              v-if="!column.hide"
+              :data-index="index"
+              :class="getColumnClass(column)"
+              :style="getColumnStyle(column)"
+            >
+              <!--Column Name-->
+              <span
+                :title="column.caption"
+                class="column-name"
               >
-                <i></i>
-              </button>
-            </template>
-          </span>
-          <span
-            v-if="cellIndex === 0 && isDataIcon"
-            :class="{
-              expand: node.expand,
-              'ev-tree-toggle': true,
-            }"
-          >
-            <span
-              v-if="cellIndex === 0"
-              :class="node.hasChild ? parentIconMV : childIconMV"
-            ><i></i></span>
-          </span>
-          <span style="margin-left: 5px;"></span>{{node[column.field]}}
-        </span>
-      </td>
-    </template>
-  </tr>
+                {{ column.caption }}
+              </span>
+              <!--Column Resize-->
+              <span
+                class="column-resize"
+                @mousedown.stop.left="onColumnResize(index, $event)"
+              />
+            </li>
+          </template>
+        </ul>
+      </div>
+      <!--Body-->
+      <div
+        ref="body"
+        :class="bodyStyle"
+        @scroll="onScroll"
+        @contextmenu="onContextMenu($event)"
+        @contextmenu.prevent="menu.show"
+      >
+        <!--vScroll Top-->
+        <div
+          :style="`height: ${vScrollTopHeight}px;`"
+          class="vscroll-spacer"
+        />
+        <table>
+          <tbody>
+            <tree-grid-node
+              v-for="(item, idx) in viewStore"
+              :key="idx"
+              :selected-data="selectedRow"
+              :node-data="item"
+              :use-checkbox="useCheckbox"
+              :ordered-columns="orderedColumns"
+              :expand-icon="option.expandIcon"
+              :collapse-icon="option.collapseIcon"
+              :parent-icon="option.parentIcon"
+              :child-icon="option.childIcon"
+              :is-resize="isResize"
+              :row-height="rowHeight"
+              :min-width="minWidth"
+              :highlight-index="highlightIdx"
+              :border-style="borderStyle"
+              @check-tree-data="onCheck"
+              @expand-tree-data="handleExpand"
+              @click-tree-data="onRowClick"
+              @dbl-click-tree-data="onRowDblClick"
+            />
+          </tbody>
+        </table>
+        <!--vScroll Bottom-->
+        <div
+          :style="`height: ${vScrollBottomHeight}px;`"
+          class="vscroll-spacer"
+        />
+        <!--Context Menu-->
+        <ev-context-menu
+          ref="menu"
+          :items="contextMenuItems"
+        />
+      </div>
+      <!--Resize Line-->
+      <div
+        v-show="showResizeLine"
+        ref="resizeLine"
+        class="table-resize-line"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import { computed } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted } from 'vue';
+import treeGridNode from './TreeGridNode';
+import {
+  commonFunctions,
+  scrollEvent,
+  resizeEvent,
+  clickEvent,
+  checkEvent,
+  contextMenuEvent,
+  storeEvent,
+  treeEvent,
+} from './uses';
 
 export default {
   name: 'EvTreeGrid',
+  components: {
+    treeGridNode,
+  },
   props: {
+    columns: {
+      type: [Array],
+      default: () => [],
+    },
+    rows: {
+      type: [Array, Object],
+      default: () => null,
+    },
+    width: {
+      type: [String, Number],
+      default: '100%',
+    },
+    height: {
+      type: [String, Number],
+      default: '100%',
+    },
+    selected: {
+      type: [Array, Object],
+      default: null,
+    },
+    checked: {
+      type: [Array],
+      default: () => [],
+    },
+    option: {
+      type: Object,
+      default: () => ({}),
+    },
     treeData: {
-      type: Object,
-      default: () => ({}),
-    },
-    useCheckbox: {
-      type: Object,
-      default: () => ({}),
-    },
-    orderedColumns: {
       type: [Array],
       default: () => [],
     },
@@ -121,69 +175,258 @@ export default {
       type: String,
       default: '',
     },
-    parentIcon: {
-      type: String,
-      default: '',
-    },
-    childIcon: {
-      type: String,
-      default: '',
-    },
-    rowHeight: {
-      type: Number,
-      default: 35,
-    },
-    minWidth: {
-      type: Number,
-      default: 40,
-    },
-    borderStyle: {
-      type: String,
-      default: '',
-    },
-    isHighlighted: {
-      type: Boolean,
-      default: false,
-    },
   },
   emits: {
-    'check-tree-data': null,
-    'expand-tree-data': null,
-    'click-tree-data': null,
-    'dbl-click-tree-data': null,
+    'update:selected': null,
+    'click-row': null,
+    'dblclick-row': null,
+    'update:checked': null,
+    'check-row': null,
+    'check-all': null,
   },
-  setup(props, { emit }) {
-    const onCheck = ($event, data) => {
-      emit('check-tree-data', $event, data);
-    };
-    const onExpand = (data) => {
-      emit('expand-tree-data', data);
-    };
-    const onClick = ($event, data) => {
-      emit('click-tree-data', $event, data);
-    };
-    const onDblClick = ($event, data) => {
-      emit('dbl-click-tree-data', $event, data);
-    };
-    const expandIconClasses = (node) => {
-      const expandIcon = props.expandIcon ? props.expandIcon : '';
-      const collapseIcon = props.expandIcon ? props.collapseIcon : '';
-      return node.expand ? collapseIcon : expandIcon;
-    };
-    const node = computed(() => (props.treeData || {}));
-    const parentIconMV = computed(() => (props.parentIcon || 'tree-parent-icon'));
-    const childIconMV = computed(() => (props.childIcon || 'tree-child-icon'));
-    const isDataIcon = computed(() => ((parentIconMV.value !== 'none' || childIconMV.value !== 'none')));
-    return {
+  setup(props) {
+    const {
+      isRenderer,
+      getComponentName,
+      getConvertValue,
+      getColumnIndex,
+      setPixelUnit,
+    } = commonFunctions();
+    const elementInfo = reactive({
+      body: null,
+      header: null,
+      resizeLine: null,
+      'grid-wrapper': null,
+    });
+    const stores = reactive({
+      tableData: props.rows,
+      viewStore: [],
+      originStore: [],
+      filteredStore: [],
+      store: computed(() => stores.originStore),
+      orderedColumns: computed(() =>
+        (props.columns.map((column, index) => ({ index, ...column })))),
+      treeData: [],
+      treeStore: computed(() => (stores.treeData.filter(item => item.show))),
+    });
+    const checkInfo = reactive({
+      prevCheckedRow: [],
+      isHeaderChecked: false,
+      checkedRows: props.checked,
+      useCheckbox: computed(() => (props.option.useCheckbox || {})),
+    });
+    const scrollInfo = reactive({
+      lastScroll: {
+        top: 0,
+        left: 0,
+      },
+      vScrollTopHeight: 0,
+      vScrollBottomHeight: 0,
+      hasVerticalScrollBar: false,
+    });
+    const selectInfo = reactive({
+      useSelect: props.option.useSelect === undefined ? true : props.option.useSelect,
+      selectedRow: props.selected,
+    });
+    const contextInfo = reactive({
+      menu: null,
+      contextMenuItems: [],
+      customContextMenu: props.option.customContextMenu || [],
+    });
+    const resizeInfo = reactive({
+      minWidth: 40,
+      rendererMinWidth: 80,
+      showResizeLine: false,
+      adjust: computed(() => (props.option.adjust || false)),
+      columnWidth: props.option.columnWidth || 80,
+      scrollWidth: props.option.scrollWidth || 17,
+      rowHeight: computed(() => (props.option.rowHeight || 35)),
+      gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
+      gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
+      isResize: false,
+    });
+    const styleInfo = reactive({
+      showHeader: computed(() =>
+        (props.option.showHeader === undefined ? true : props.option.showHeader)),
+      stripeStyle: computed(() => (props.option.style?.stripe || false)),
+      borderStyle: computed(() => (props.option.style?.border || '')),
+      highlightIdx: computed(() => (props.option.style?.highlight)),
+    });
+
+    const {
+      updateVScroll,
+      updateHScroll,
+      onScroll,
+    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo });
+
+    const {
+      onRowClick,
+      onRowDblClick,
+    } = clickEvent(selectInfo);
+
+    const {
       onCheck,
-      onExpand,
-      onClick,
-      onDblClick,
-      expandIconClasses,
-      parentIconMV,
-      childIconMV,
-      node,
-      isDataIcon,
+      onCheckAll,
+    } = checkEvent({ checkInfo, stores });
+
+    const {
+      setStore,
+      updateData,
+    } = storeEvent({
+      selectInfo,
+      checkInfo,
+      stores,
+      updateVScroll,
+    });
+
+    const {
+      calculatedColumn,
+      onResize,
+      onColumnResize,
+    } = resizeEvent({ resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll });
+
+    const {
+      setContextMenu,
+      onContextMenu,
+    } = contextMenuEvent({ contextInfo, stores, selectInfo });
+
+    const {
+      setTreeData,
+      handleExpand,
+    } = treeEvent({ stores });
+
+    onMounted(() => {
+      calculatedColumn();
+      setTreeData(props.rows, 0, true);
+      setStore(props.rows);
+    });
+    watch(
+      () => props.checked,
+      (value) => {
+        const store = stores.treeData;
+        checkInfo.checkedRows = value;
+        for (let ix = 0; ix < store.length; ix++) {
+          store[ix].checked = value.includes(store[ix]);
+        }
+      },
+    );
+    watch(
+      () => checkInfo.useCheckbox.mode,
+      () => {
+        checkInfo.checkedRows = [];
+        checkInfo.isHeaderChecked = false;
+      },
+    );
+    watch(
+      () => props.rows,
+      () => {
+        setStore(props.treeData);
+      },
+    );
+    watch(
+      () => [resizeInfo.adjust, props.option.columnWidth, resizeInfo.gridWidth],
+      () => {
+        resizeInfo.columnWidth = props.option.columnWidth;
+        const gridWrapper = elementInfo['grid-wrapper'];
+        gridWrapper.style.width = resizeInfo.gridWidth;
+        gridWrapper.style.height = resizeInfo.gridHeight;
+        stores.orderedColumns.map((column) => {
+          const item = column;
+
+          if (!props.columns[column.index].width && !item.resized) {
+            item.width = 0;
+          }
+
+          return item;
+        });
+        onResize();
+      },
+    );
+    const gridStyle = computed(() => ({
+      width: resizeInfo.gridWidth,
+      height: resizeInfo.gridHeight,
+    }));
+    const bodyStyle = computed(() => ({
+      'table-body': true,
+      stripe: styleInfo.stripeStyle,
+      'bottom-border': !!stores.viewStore.length,
+      'non-border': !!styleInfo.borderStyle,
+    }));
+    const gridClass = computed(() => ({
+      table: true,
+      'ev-grid': true,
+      adjust: resizeInfo.adjust,
+      'non-header': !styleInfo.showHeader,
+    }));
+    const headerClass = computed(() => ({
+      'table-header': true,
+      'non-border': !!styleInfo.borderStyle,
+    }));
+    const headerCheckboxClass = computed(() => ({
+      column: true,
+      'non-border': !!styleInfo.borderStyle,
+    }));
+
+    const isHeaderCheckbox = computed(() => (
+      checkInfo.useCheckbox.use
+      && checkInfo.useCheckbox.headerCheck
+      && checkInfo.useCheckbox.mode !== 'single'
+    ));
+
+    const getColumnClass = (column) => {
+      const render = isRenderer(column);
+      return {
+        column: true,
+        render,
+        'non-border': !!styleInfo.borderStyle,
+      };
+    };
+
+    const getColumnStyle = (column) => {
+      const render = isRenderer(column);
+      return {
+        width: `${column.width}px`,
+        'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
+      };
+    };
+
+    return {
+      ...toRefs(styleInfo),
+      ...toRefs(elementInfo),
+      ...toRefs(stores),
+      ...toRefs(scrollInfo),
+      ...toRefs(resizeInfo),
+      ...toRefs(selectInfo),
+      ...toRefs(checkInfo),
+      ...toRefs(contextInfo),
+      isRenderer,
+      getComponentName,
+      getConvertValue,
+      getColumnIndex,
+      setPixelUnit,
+      updateVScroll,
+      updateHScroll,
+      onScroll,
+      calculatedColumn,
+      onResize,
+      onColumnResize,
+      onRowClick,
+      onRowDblClick,
+      onCheck,
+      onCheckAll,
+      setStore,
+      updateData,
+      setContextMenu,
+      onContextMenu,
+      handleExpand,
+      gridStyle,
+      gridClass,
+      headerClass,
+      headerCheckboxClass,
+      isHeaderCheckbox,
+      getColumnClass,
+      getColumnStyle,
+      bodyStyle,
     };
   },
 };
@@ -341,7 +584,7 @@ export default {
 
   &.stripe tr:nth-child(even) {
     @include evThemify() {
-      background-color: evThemed('grid-row-stripe');
+      background: evThemed('grid-row-stripe');
     }
   }
 
@@ -360,7 +603,9 @@ export default {
 
     &.selected {
       @include evThemify() {
-        background-color: evThemed('grid-row-selected') !important;
+        background: evThemed('grid-row-selected') !important;
+        color: #0D0D0D !important;
+        font-size: 15px !important;
       }
     }
 
@@ -457,45 +702,5 @@ export default {
 
 .non-border {
   border: none !important;
-}
-.ev-tree-toggle {
-  display: inline-block;
-  width: 13px;
-  margin-right: 4px;
-  text-align: center;
-  vertical-align: middle;
-
-  .tree-expand-icon {
-    border: none;
-    background: transparent;
-    outline: none;
-    cursor: pointer;
-  }
-  .tree-expand-icon i {
-    display: inline-block;
-    top: -3px;
-    width: 11px;
-    height: 10px;
-    background: url('../../../docs/views/treeGrid/images/tree_icon.png') no-repeat -43px -61px;
-  }
-  &.expand > .tree-expand-icon i {
-    height: 8px;
-    background-position: -15px -63px;
-  }
-  .tree-parent-icon i, .tree-child-icon i {
-    display: inline-block;
-    top: -3px;
-    width: 14px;
-    height: 14px;
-  }
-  .tree-parent-icon i {
-    background: url('../../../docs/views/treeGrid/images/tree_icon.png') no-repeat -39px -35px;
-  }
-  &.expand > .tree-parent-icon i {
-    background-position: -65px -35px;
-  }
-  .tree-child-icon i {
-    background: url('../../../docs/views/treeGrid/images/tree_icon.png') no-repeat -14px -35px;
-  }
 }
 </style>

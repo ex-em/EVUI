@@ -27,7 +27,7 @@
         },
       }"
       @check-row="onCheckedRow"
-      @check-all="onAllCheckedRow"
+      @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
     >
@@ -255,17 +255,18 @@ export default {
       checkboxModeMV.value = mode;
       checked.value = [];
     };
-    const onCheckedRow = (e, index, rowData) => {
-      checkedRowsMV.value = `${rowData}`;
+    const onCheckedRow = () => {
+      let checkedRow = '';
+      for (let i = 0; i < checked.value.length; i++) {
+        checkedRow += JSON.stringify(checked.value[i]);
+      }
+      checkedRowsMV.value = checkedRow;
     };
     const onDoubleClickRow = (e) => {
       DbClickedRowsMV.value = `${e.rowData}`;
     };
-    const onClickRow = (e, rowIdx, cellName, cellIdx, rowData) => {
-      clickedRowMV.value = `${rowData}`;
-    };
-    const onAllCheckedRow = (check) => {
-      console.log(`All Check : ${check}`);
+    const onClickRow = (e) => {
+      clickedRowMV.value = `${e.rowData}`;
     };
     const getData = (count, startIndex) => {
       const countries = [
@@ -382,7 +383,7 @@ export default {
       // },
     ]);
 
-    getData(50, 0);
+    getData(10, 0);
     return {
       columns,
       tableData,
@@ -413,7 +414,6 @@ export default {
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
-      onAllCheckedRow,
       resetBorderStyle,
     };
   },

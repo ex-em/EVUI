@@ -1,19 +1,17 @@
 <template>
   <div class="case">
     <p class="case-title">TreeGrid</p>
-    <ev-grid
+    <ev-tree-grid
       v-model:selected="selected"
       v-model:checked="checked"
-      :is-tree-grid="true"
       :columns="columns"
-      :tree-data="tableData"
+      :rows="tableData"
       :width="widthMV"
       :height="heightMV"
       :option="{
         adjust: adjustMV,
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
-        // rowMinHeight: 20,
         columnWidth: columnWidthMV,
         useFilter: useFilterMV,
         useCheckbox: {
@@ -33,11 +31,11 @@
         childIcon: childIconMV,
       }"
       @check-row="onCheckedRow"
-      @check-all="onAllCheckedRow"
+      @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
     >
-    </ev-grid>
+    </ev-tree-grid>
     <div class="description">
       <div class="form-rows">
         <span class="badge yellow">
@@ -92,7 +90,7 @@
             v-model="rowHeightMV"
             :step="10"
             :max="150"
-            :min="35"
+            :min="10"
           />
         </div>
         <div class="form-row">
@@ -170,7 +168,6 @@
             :step="1"
             :max="100"
             :min="0"
-            readonly
           />
         </div>
         <div class="form-row">
@@ -184,7 +181,7 @@
           />
           <button
             class="btn"
-            @click="resetBorderStyle"
+            @click="onReset('border')"
           >
             <ev-icon
               icon="ev-icon-trash3"
@@ -205,7 +202,7 @@
           />
           <button
             class="btn"
-            @click="resetTreeIcon"
+            @click="onReset('treeIcon')"
           >
             <ev-icon
               icon="ev-icon-trash3"
@@ -224,7 +221,7 @@
           />
           <button
             class="btn"
-            @click="resetDataIcon"
+            @click="onReset('dataIcon')"
           >
             <ev-icon
               icon="ev-icon-trash3"
@@ -259,10 +256,11 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
-    const menuItems = ref([
-      {
+    const menuItems = ref([{
         text: 'Menu1',
-        click: () => alert(`[Menu1] Selected Index: ${selected.value.index}`),
+        click: () => {
+          alert(`[Menu1] Selected Index: ${selected.value.index}`);
+        },
       }, {
         text: 'Menu2',
         click: () => alert('[Menu2]'),
@@ -319,6 +317,21 @@ export default {
     const resetDataIcon = () => {
       dataIconMV.value = '';
     };
+    const onReset = (type) => {
+        switch (type) {
+          case 'border':
+            borderMV.value = '';
+            break;
+          case 'treeIcon':
+            iconMV.value = '';
+            break;
+          case 'dataIcon':
+            dataIconMV.value = '';
+            break;
+          default:
+            break;
+        }
+    };
     const onClickCheckbox = (e) => {
       console.log(`checkbox component click: ${e}`);
     };
@@ -332,17 +345,19 @@ export default {
       checkboxModeMV.value = mode;
       checked.value = [];
     };
-    const onCheckedRow = (e, index) => {
-      checkedRowsMV.value = `Index: ${index}`;
+    const onCheckedRow = () => {
+      let checkedRow = '';
+      for (let i = 0; i < checked.value.length; i++) {
+        const data = checked.value[i];
+        checkedRow += checkedRow ? `, Index: ${data.index}` : `Index: ${data.index}`;
+      }
+      checkedRowsMV.value = checkedRow;
     };
     const onDoubleClickRow = (e) => {
       DbClickedRowsMV.value = `Index: ${e.rowIndex}`;
     };
-    const onClickRow = (e, rowIdx) => {
-      clickedRowMV.value = `Index: ${rowIdx}`;
-    };
-    const onAllCheckedRow = (check) => {
-      console.log(`All Check : ${check}`);
+    const onClickRow = (e) => {
+      clickedRowMV.value = `Index: ${e.rowIndex}`;
     };
     const getData = () => {
       tableData.value = [{
@@ -445,7 +460,6 @@ export default {
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
-      onAllCheckedRow,
       resetBorderStyle,
       resetTreeIcon,
       resetDataIcon,
@@ -457,6 +471,7 @@ export default {
       dataIconItems,
       parentIconMV,
       childIconMV,
+      onReset,
     };
   },
 };

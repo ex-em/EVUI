@@ -117,76 +117,56 @@
         />
         <table>
           <tbody>
-          <template v-if="isTreeGrid">
-            <tree-grid
-              v-for="(item, idx) in viewStore"
-              :key="idx"
-              :data-index="idx"
-              :tree-data="item"
-              :use-checkbox="useCheckbox"
-              :ordered-columns="orderedColumns"
-              :expand-icon="option.expandIcon"
-              :collapse-icon="option.collapseIcon"
-              :parent-icon="option.parentIcon"
-              :child-icon="option.childIcon"
-              :is-resize="isResize"
-              :row-height="rowHeight"
-              :min-width="minWidth"
-              :is-highlighted="idx === highlightIdx"
-              :border-style="borderStyle"
-              @check-tree-data="onCheck"
-              @expand-tree-data="handleExpand"
-              @click-tree-data="onRowClick"
-              @dbl-click-tree-data="onRowDblClick"
-            />
-          </template>
-          <template v-else>
-            <tr
-              v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
-              :data-index="rowIndex"
-              :class="{
+          <!--Row List-->
+          <tr
+            v-for="(row, rowIndex) in viewStore"
+            :key="rowIndex"
+            :data-index="rowIndex"
+            :class="{
               row: true,
               selected: row[2] === selectedRow,
               'non-border': !!borderStyle && borderStyle !== 'rows',
               highlight: row[0] === highlightIdx,
             }"
-              @click="onRowClick($event, row)"
-              @dblclick="onRowDblClick($event, row)"
-            >
-              <!--Row Checkbox-->
-              <td
-                v-if="useCheckbox.use"
-                :class="{
+            @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
+          >
+            <!--Row Checkbox-->
+            <td
+              v-if="useCheckbox.use"
+              :class="{
+                cell: true,
                 'row-checkbox': true,
                 'non-border': !!borderStyle,
               }"
-                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
-              >
-                <ev-checkbox
-                  v-model="row[1]"
-                  class="row-checkbox-input"
-                  @change="onCheck($event, row)"
-                />
-              </td>
-              <!--Cell-->
-              <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
-                <td
-                  v-if="!column.hide"
-                  :data-name="column.field"
-                  :data-index="column.index"
-                  :class="{
+              :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+            >
+              <ev-checkbox
+                v-model="row[1]"
+                class="row-checkbox-input"
+                @change="onCheck($event, row)"
+              />
+            </td>
+            <!--Cell-->
+            <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
+              <td
+                v-if="!column.hide"
+                :data-name="column.field"
+                :data-index="column.index"
+                :class="{
+                  cell: true,
                   [column.type]: column.type,
                   [column.align]: column.align,
                   render: isRenderer(column),
                   'non-border': !!borderStyle,
                 }"
-                  :style="`
+                :style="`
                   width: ${column.width}px;
                   height: ${rowHeight}px;
                   line-height: ${rowHeight}px;
                   min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
-                >
+              >
+                <div>
                   <component
                     :is="getComponentName(column.render.type)"
                     v-if="isRenderer(column)"
@@ -203,12 +183,12 @@
                     v-else
                     :title="getConvertValue(column.type, row[2][column.index])"
                   >
-                  {{ getConvertValue(column.type, row[2][column.index]) }}
-                </span>
-                </td>
-              </template>
-            </tr>
-          </template>
+                    {{ getConvertValue(column.type, row[2][column.index]) }}
+                  </span>
+                </div>
+              </td>
+            </template>
+          </tr>
           </tbody>
         </table>
         <!--vScroll Bottom-->
@@ -249,7 +229,6 @@ import ButtonRenderer from './renderer/button.renderer';
 import InputNumberRenderer from './renderer/inputNumber.renderer';
 import SelectRenderer from './renderer/select.renderer';
 import ToggleRenderer from './renderer/toggle.renderer';
-import TreeGrid from '../treeGrid/TreeGrid';
 import {
   commonFunctions,
   scrollEvent,
@@ -271,7 +250,6 @@ export default {
     InputNumberRenderer,
     SelectRenderer,
     ToggleRenderer,
-    TreeGrid,
   },
   props: {
     columns: {
@@ -291,8 +269,8 @@ export default {
       default: '100%',
     },
     selected: {
-      type: [Array, Object],
-      default: null,
+      type: [Array],
+      default: () => [],
     },
     checked: {
       type: [Array],
@@ -301,22 +279,6 @@ export default {
     option: {
       type: Object,
       default: () => ({}),
-    },
-    treeData: {
-      type: [Array],
-      default: () => [],
-    },
-    expandIcon: {
-      type: String,
-      default: '',
-    },
-    collapseIcon: {
-      type: String,
-      default: '',
-    },
-    isTreeGrid: {
-      type: Boolean,
-      default: false,
     },
   },
   emits: {
@@ -368,8 +330,6 @@ export default {
         (filterInfo.isFiltering ? stores.filteredStore : stores.originStore)),
       orderedColumns: computed(() =>
         (props.columns.map((column, index) => ({ index, ...column })))),
-      treeData: [],
-      treeStore: computed(() => (stores.treeData.filter(item => item.show))),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -411,7 +371,6 @@ export default {
         (props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
-      isResize: false,
     });
 
     const {
@@ -469,53 +428,8 @@ export default {
 
     onMounted(() => {
       calculatedColumn();
-      const data = props.isTreeGrid ? props.treeData : props.rows;
-      setStore(data);
+      setStore(props.rows);
     });
-    // tree data init
-    let index = 0;
-    const setTreeData = (treeData, count, isShow, parent) => {
-      treeData.forEach((nodeObj) => {
-        const node = nodeObj;
-        node.level = count;
-        node.expand = node.expand === undefined ? true : node.expand;
-        node.show = isShow;
-        node.checked = false;
-        node.index = index++;
-        node.parent = parent;
-        node.iconClass = 'ev-icon-document';
-        stores.treeData.push(node);
-
-        if (node.children && node.children.length > 0) {
-          node.hasChild = true;
-          node.iconClass = 'ev-icon-folder';
-          setTreeData(node.children, node.level + 1, node.show && node.expand, node);
-        }
-      });
-    };
-    const setExpandNode = (children, isShow) => {
-      children.forEach((nodeObj) => {
-        const node = nodeObj;
-        node.show = isShow;
-
-        if (node.hasChild) {
-          setExpandNode(node.children, node.show && node.expand);
-        }
-      });
-    };
-    const handleExpand = (node) => {
-      const data = node;
-      data.expand = !data.expand;
-      setExpandNode(data.children, data.expand);
-      stores.viewStore = stores.treeStore;
-    };
-
-    watch(
-      () => props.treeData,
-      (value) => {
-        setTreeData(value, 0, true);
-      }, { immediate: true },
-    );
 
     watch(
       () => sortInfo.setSorting,
@@ -538,8 +452,26 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        const data = props.isTreeGrid ? props.treeData : value;
-        setStore(data);
+        setStore(value);
+      },
+    );
+    watch(
+      () => props.checked,
+      (value) => {
+        const ROW_CHECK_INDEX = 1;
+        const ROW_DATA_INDEX = 2;
+        const store = stores.originStore;
+        checkInfo.checkedRows = value;
+        for (let ix = 0; ix < store.length; ix++) {
+          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
+        }
+      },
+    );
+    watch(
+      () => checkInfo.useCheckbox.mode,
+      () => {
+        checkInfo.checkedRows = [];
+        checkInfo.isHeaderChecked = false;
       },
     );
     watch(
@@ -607,7 +539,6 @@ export default {
       updateData,
       setContextMenu,
       onContextMenu,
-      handleExpand,
     };
   },
 };
@@ -622,11 +553,9 @@ export default {
   width: 100%;
   height: 100%;
   padding-top: $header-height;
-
   &.non-header {
     padding-top: 0;
   }
-
   .table-header {
     overflow: hidden;
     position: absolute;
@@ -664,11 +593,9 @@ export default {
   @include evThemify() {
     border-right: 1px solid evThemed('grid-bottom-border');
   }
-
   &:nth-last-child(1) {
     border-right: 0;
     margin-right: 20px;
-
     .column-resize {
       cursor: default !important;
     }
@@ -727,7 +654,6 @@ export default {
   position: absolute;
   left: 0;
   background-color: transparent;
-
   .ei {
     font-size: 10px;
     vertical-align: top;
@@ -744,7 +670,6 @@ export default {
   right: -5px;
   width: 10px;
   height: 100%;
-
   &:hover {
     cursor: col-resize;
   }
@@ -756,38 +681,34 @@ export default {
   height: 100%;
   overflow: auto;
   overflow-anchor: none;
-
   table {
     clear: both;
     border-spacing: 0;
     border-collapse: collapse;
   }
-
   &.stripe tr:nth-child(even) {
     @include evThemify() {
-      background-color: evThemed('grid-row-stripe');
+      background: evThemed('grid-row-stripe');
     }
   }
-
   &.bottom-border {
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
   }
-
   .row {
     white-space: nowrap;
 
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
-
     &.selected {
       @include evThemify() {
-        background-color: evThemed('grid-row-selected') !important;
+        background: evThemed('grid-row-selected') !important;
+        color: #0D0D0D !important;
+        font-size: 15px !important;
       }
     }
-
     &.highlight {
       background: #5AB7FF;
       color: #FFFFFF;
@@ -795,7 +716,7 @@ export default {
     }
   }
 
-  td {
+  .cell {
     display: inline-block;
     padding: 0 10px;
     text-align: center;
@@ -807,28 +728,27 @@ export default {
     @include evThemify() {
       border-right: 1px solid evThemed('grid-bottom-border');
     }
-
-    /* stylelint-disable */
+    div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     &.row-checkbox {
       display: inline-flex;
       justify-content: center;
       align-items: center;
     }
-
     &.render {
       overflow: initial;
     }
-
     &.number,
     &.float {
       text-align: right;
     }
-
     &.string,
     &.stringnumber {
       text-align: left;
     }
-
     &.center {
       text-align: center;
     }
@@ -844,14 +764,9 @@ export default {
         justify-content: flex-end;
       }
     }
-
     &:last-child {
       border-right: 0;
     }
-    &.tree-td {
-      text-align: left !important;
-    }
-    /* stylelint-enable */
   }
 }
 
