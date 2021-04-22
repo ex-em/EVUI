@@ -293,7 +293,7 @@ export default {
     const {
       setTreeData,
       handleExpand,
-    } = treeEvent({ stores });
+    } = treeEvent({ stores, onResize });
 
     onMounted(() => {
       calculatedColumn();
@@ -323,13 +323,12 @@ export default {
         setStore(props.treeData);
       },
     );
+
     watch(
-      () => [resizeInfo.adjust, props.option.columnWidth, resizeInfo.gridWidth],
-      () => {
-        resizeInfo.columnWidth = props.option.columnWidth;
-        const gridWrapper = elementInfo['grid-wrapper'];
-        gridWrapper.style.width = resizeInfo.gridWidth;
-        gridWrapper.style.height = resizeInfo.gridHeight;
+      () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
+      (value) => {
+        // columnWidth computed readonly
+        resizeInfo.columnWidth = value[3];
         stores.orderedColumns.map((column) => {
           const item = column;
 
@@ -366,13 +365,11 @@ export default {
       column: true,
       'non-border': !!styleInfo.borderStyle,
     }));
-
     const isHeaderCheckbox = computed(() => (
       checkInfo.useCheckbox.use
       && checkInfo.useCheckbox.headerCheck
       && checkInfo.useCheckbox.mode !== 'single'
     ));
-
     const getColumnClass = (column) => {
       const render = isRenderer(column);
       return {
@@ -381,7 +378,6 @@ export default {
         'non-border': !!styleInfo.borderStyle,
       };
     };
-
     const getColumnStyle = (column) => {
       const render = isRenderer(column);
       return {
@@ -433,274 +429,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/index.scss';
-
-.table {
-  $header-height: 33px;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding-top: $header-height;
-
-  &.non-header {
-    padding-top: 0;
-  }
-
-  .table-header {
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: $header-height;
-
-    @include evThemify() {
-      border-top: 2px solid evThemed('grid-header-border');
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-  }
-}
-
-.column-list {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  white-space: nowrap;
-  list-style-type: none;
-}
-
-.column {
-  display: inline-flex;
-  position: relative;
-  height: 100%;
-  padding: 0 10px;
-  line-height: 30px;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  vertical-align: top;
-  user-select: none;
-
-  @include evThemify() {
-    border-right: 1px solid evThemed('grid-bottom-border');
-  }
-
-  &:nth-last-child(1) {
-    border-right: 0;
-    margin-right: 20px;
-
-    .column-resize {
-      cursor: default !important;
-    }
-  }
-  .sort-icon {
-    display: inline-block;
-    float: right;
-    font-size: 14px;
-    line-height: 30px;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
-    }
-  }
-  .ev-icon-filter {
-    font-size: 13px;
-    color: #005CC8;
-  }
-}
-
-.column-name {
-  display: inline-block;
-  float: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: bold;
-  font-size: 14px;
-
-  @include evThemify() {
-    color: evThemed('font-color-base');
-  }
-}
-
-.column-filter {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: transparent;
-  i {
-    margin-right: 2px;
-    font-size: 14px;
-    vertical-align: middle;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
-    }
-  }
-}
-
-.column:hover .column-filter {
-  display: block;
-  cursor: pointer;
-}
-
-.column-filter-status {
-  position: absolute;
-  left: 0;
-  background-color: transparent;
-
-  .ei {
-    font-size: 10px;
-    vertical-align: top;
-
-    @include evThemify() {
-      color: evThemed('color-primary');
-    }
-  }
-}
-
-.column-resize {
-  position: absolute;
-  bottom: 0;
-  right: -5px;
-  width: 10px;
-  height: 100%;
-
-  &:hover {
-    cursor: col-resize;
-  }
-}
-
-.table-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  overflow-anchor: none;
-
-  table {
-    clear: both;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-
-  &.stripe tr:nth-child(even) {
-    @include evThemify() {
-      background: evThemed('grid-row-stripe');
-    }
-  }
-
-  &.bottom-border {
-    @include evThemify() {
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-  }
-
-  .row {
-    white-space: nowrap;
-
-    @include evThemify() {
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-
-    &.selected {
-      @include evThemify() {
-        background: evThemed('grid-row-selected') !important;
-        color: #0D0D0D !important;
-        font-size: 15px !important;
-      }
-    }
-
-    &.highlight {
-      background: #5AB7FF;
-      color: #FFFFFF;
-      font-size: 16px;
-    }
-  }
-
-  td {
-    display: inline-block;
-    padding: 0 10px;
-    text-align: center;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include evThemify() {
-      border-right: 1px solid evThemed('grid-bottom-border');
-    }
-
-    /* stylelint-disable */
-    &.row-checkbox {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &.render {
-      overflow: initial;
-    }
-
-    &.number,
-    &.float {
-      text-align: right;
-    }
-
-    &.string,
-    &.stringnumber {
-      text-align: left;
-    }
-
-    &.center {
-      text-align: center;
-    }
-    &.left {
-      text-align: left;
-      .wrap {
-        justify-content: flex-start;
-      }
-    }
-    &.right {
-      text-align: right;
-      .wrap {
-        justify-content: flex-end;
-      }
-    }
-
-    &:last-child {
-      border-right: 0;
-    }
-    &.tree-td {
-      text-align: left !important;
-    }
-    /* stylelint-enable */
-  }
-}
-
-.table-resize-line {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-
-  @include evThemify() {
-    border-right: 1px solid evThemed('grid-bottom-border');
-  }
-}
-
-.vscroll-spacer {
-  opacity: 0;
-  clear: both;
-}
-
-[v-cloak] {
-  display: none;
-}
-
-.ev-checkbox {
-  margin: 0;
-}
-
-.non-border {
-  border: none !important;
-}
+@import './style/treeGrid.scss';
 </style>

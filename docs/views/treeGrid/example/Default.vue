@@ -259,7 +259,7 @@ export default {
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
-          alert(`[Menu1] Selected Index: ${selected.value.index}`);
+          alert(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value.data)}`);
         },
       }, {
         text: 'Menu2',
@@ -348,16 +348,17 @@ export default {
     const onCheckedRow = () => {
       let checkedRow = '';
       for (let i = 0; i < checked.value.length; i++) {
-        const data = checked.value[i];
-        checkedRow += checkedRow ? `, Index: ${data.index}` : `Index: ${data.index}`;
+        checkedRow += JSON.stringify(checked.value[i].data);
       }
       checkedRowsMV.value = checkedRow;
     };
     const onDoubleClickRow = (e) => {
-      DbClickedRowsMV.value = `Index: ${e.rowIndex}`;
+      const rowData = e.rowData.data;
+      DbClickedRowsMV.value = JSON.stringify(rowData);
     };
     const onClickRow = (e) => {
-      clickedRowMV.value = `Index: ${e.rowIndex}`;
+      const rowData = e.rowData.data;
+      clickedRowMV.value = JSON.stringify(rowData);
     };
     const getData = () => {
       tableData.value = [{

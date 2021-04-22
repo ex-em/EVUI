@@ -383,7 +383,7 @@ export default {
       // },
     ]);
 
-    getData(10, 0);
+    getData(50, 0);
     return {
       columns,
       tableData,

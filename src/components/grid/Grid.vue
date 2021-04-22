@@ -166,25 +166,23 @@
                   line-height: ${rowHeight}px;
                   min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
               >
-                <div>
-                  <component
-                    :is="getComponentName(column.render.type)"
-                    v-if="isRenderer(column)"
-                    :item="{
+                <component
+                  :is="getComponentName(column.render.type)"
+                  v-if="isRenderer(column)"
+                  :item="{
                     row: row[2],
                     rowIndex: row[0],
                     cellIndex: column.index,
                     value: row[2][column.index],
                   }"
-                    :option="column.render.option"
-                    @change-renderer="updateData"
-                  />
-                  <span
-                    v-else
-                    :title="getConvertValue(column.type, row[2][column.index])"
-                  >
-                    {{ getConvertValue(column.type, row[2][column.index]) }}
-                  </span>
+                  :option="column.render.option"
+                  @change-renderer="updateData"
+                />
+                <div
+                  v-else
+                  :title="getConvertValue(column.type, row[2][column.index])"
+                >
+                  {{ getConvertValue(column.type, row[2][column.index]) }}
                 </div>
               </td>
             </template>

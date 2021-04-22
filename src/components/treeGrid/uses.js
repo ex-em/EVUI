@@ -1,4 +1,4 @@
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, nextTick } from 'vue';
 import { isEqual } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
@@ -158,6 +158,10 @@ export const resizeEvent = (params) => {
     stores.viewStore = stores.treeStore;
     const store = stores.viewStore;
     let columnWidth = resizeInfo.columnWidth;
+    if (resizeInfo.columnWidth > 0) {
+      columnWidth = resizeInfo.columnWidth;
+    }
+    columnWidth = resizeInfo.columnWidth;
     let remainWidth = 0;
     if (resizeInfo.adjust) {
       const bodyEl = elementInfo.body;
@@ -177,7 +181,7 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      if (resizeInfo.rowHeight * store.length > elHeight) {
+      if (resizeInfo.rowHeight * store.length > elHeight - resizeInfo.scrollWidth) {
         elWidth -= resizeInfo.scrollWidth;
       }
 
@@ -224,7 +228,8 @@ export const resizeEvent = (params) => {
   /**
    * grid resize 이벤트를 처리한다.
    */
-  const onResize = () => {
+  const onResize = async () => {
+    await nextTick();
     if (resizeInfo.adjust) {
       stores.orderedColumns.map((column) => {
         const item = column;
@@ -609,24 +614,33 @@ export const storeEvent = (params) => {
 };
 
 export const treeEvent = (params) => {
-  const { stores } = params;
+  const { stores, onResize } = params;
   // tree data init
   let index = 0;
+  const filterObj = (keys, obj) => {
+    const newObj = {};
+    Object.keys(obj).forEach((key) => {
+      if (!keys.includes(key)) {
+        newObj[key] = obj[key];
+      }
+    });
+    return newObj;
+  };
   const setTreeData = (treeData, count, isShow, parent) => {
     treeData.forEach((nodeObj) => {
       const node = nodeObj;
+      const dataObj = filterObj('children', nodeObj);
+      node.data = dataObj;
       node.level = count;
       node.expand = node.expand === undefined ? true : node.expand;
       node.show = isShow;
       node.checked = false;
       node.index = index++;
       node.parent = parent;
-      node.iconClass = 'ev-icon-document';
       stores.treeData.push(node);
 
       if (node.children && node.children.length > 0) {
         node.hasChild = true;
-        node.iconClass = 'ev-icon-folder';
         setTreeData(node.children, node.level + 1, node.show && node.expand, node);
       }
     });
@@ -645,6 +659,7 @@ export const treeEvent = (params) => {
     const data = node;
     data.expand = !data.expand;
     setExpandNode(data.children, data.expand);
+    onResize();
   };
   return { setTreeData, handleExpand };
 };
