@@ -221,10 +221,10 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: () => alert(`[Menu1] Selected Row Data: ${selected.value}`),
+        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value}`),
       }, {
         text: 'Menu2',
-        click: () => alert('[Menu2]'),
+        click: () => console.log('[Menu2]'),
       },
     ]);
     const highlightMV = ref(0);

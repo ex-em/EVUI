@@ -205,15 +205,15 @@ export default {
       filteredStore: [],
       store: computed(() => stores.originStore),
       orderedColumns: computed(() =>
-        (props.columns.map((column, index) => ({ index, ...column })))),
+        props.columns.map((column, index) => ({ index, ...column }))),
       treeData: [],
-      treeStore: computed(() => (stores.treeData.filter(item => item.show))),
+      treeStore: computed(() => stores.treeData.filter(item => item.show)),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
       isHeaderChecked: false,
       checkedRows: props.checked,
-      useCheckbox: computed(() => (props.option.useCheckbox || {})),
+      useCheckbox: computed(() => props.option.useCheckbox || {}),
     });
     const scrollInfo = reactive({
       lastScroll: {
@@ -237,10 +237,10 @@ export default {
       minWidth: 40,
       rendererMinWidth: 80,
       showResizeLine: false,
-      adjust: computed(() => (props.option.adjust || false)),
+      adjust: computed(() => props.option.adjust || false),
       columnWidth: props.option.columnWidth || 80,
       scrollWidth: props.option.scrollWidth || 17,
-      rowHeight: computed(() => (props.option.rowHeight || 35)),
+      rowHeight: computed(() => props.option.rowHeight || 35),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
       isResize: false,
@@ -248,9 +248,9 @@ export default {
     const styleInfo = reactive({
       showHeader: computed(() =>
         (props.option.showHeader === undefined ? true : props.option.showHeader)),
-      stripeStyle: computed(() => (props.option.style?.stripe || false)),
-      borderStyle: computed(() => (props.option.style?.border || '')),
-      highlightIdx: computed(() => (props.option.style?.highlight)),
+      stripeStyle: computed(() => props.option.style?.stripe || false),
+      borderStyle: computed(() => props.option.style?.border || ''),
+      highlightIdx: computed(() => props.option.style?.highlight),
     });
 
     const {
