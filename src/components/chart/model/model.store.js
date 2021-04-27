@@ -196,7 +196,7 @@ const modules = {
 
         if (sIdx > 0) {
           bdata = isHorizontal ? bdata.x : bdata.y;
-          gdata = bdata + (odata.value || odata);
+          gdata = bdata + (odata.value ?? odata);
         } else {
           bdata = 0;
           gdata = odata;
@@ -248,9 +248,9 @@ const modules = {
    */
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
-    const gdataValue = gdata?.value || gdata;
-    const odataValue = odata?.value || odata;
-    const dataColor = gdata?.color || odata?.color;
+    const gdataValue = gdata?.value ?? gdata;
+    const odataValue = odata?.value ?? odata;
+    const dataColor = gdata?.color ?? odata?.color;
 
     if (this.options.horizontal) {
       data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };

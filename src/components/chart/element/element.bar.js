@@ -90,6 +90,7 @@ class Bar {
     this.size.cPad = cPad;
     this.size.bPad = bPad;
     this.size.w = w;
+    this.size.h = h;
     this.size.ix = barSeriesX;
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
@@ -358,7 +359,7 @@ class Bar {
     const minYPos = y - 10;
     const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
     const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
-    const centerYHorizontal = isHighlight ? centerY : y - (h / 2);
+    const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
 
     switch (showValue.align) {
       case 'start':
