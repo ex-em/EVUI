@@ -298,14 +298,17 @@ export default {
     }
   }
   &-handle {
+    $handle-size: $handle-height + $handle-padding;
+
     position: absolute;
     top: 50%;
     left: 0;
     z-index: 9;
-    width: $handle-height + $handle-padding;
-    height: $handle-height + $handle-padding;
+    width: $handle-size;
+    height: $handle-size;
     padding: $handle-padding / 2;
-    transform: translate(-50%, -50%);
+    margin-top: ($handle-size / 2) * -1;
+    margin-left: ($handle-size / 2) * -1;
     cursor: grab;
 
     &.dragging {

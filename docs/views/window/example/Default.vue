@@ -21,8 +21,9 @@
     <ev-window
       v-model:visible="isVisible2"
       :title="'CUSTOM TITLE'"
-      :fullscreen="true"
       :icon-class="'ev-icon-binder'"
+      fullscreen
+      hide-scroll
     >
       <div>CUSTOM CONTENTS</div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
