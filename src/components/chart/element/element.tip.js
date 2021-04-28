@@ -83,7 +83,6 @@ const modules = {
 
     const { type, size } = series;
     const { maxDomain, maxDomainIndex } = series.minMax;
-    const seriesMaxY = series.minMax.maxY;
 
     if (maxDomain === null || maxDomainIndex < 0) {
       return false;
@@ -100,7 +99,7 @@ const modules = {
       }
     }
 
-    let value = seriesMaxY;
+    let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.value !== null) {
@@ -125,7 +124,7 @@ const modules = {
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
         cp = ysp - (size.cat * ldata) - size.cPad;
-        dp = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) + halfBarSize;
+        dp = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) - halfBarSize;
       } else {
         halfBarSize = Math.round(size.w / 2);
         cp = xsp + (size.cat * ldata) + size.cPad;
@@ -168,7 +167,7 @@ const modules = {
       gp -= offset;
     }
 
-    if (dp === null || dp < xsp) {
+    if (dp === null) {
       return;
     }
 
@@ -232,12 +231,14 @@ const modules = {
     ctx.font = 'normal normal bold 14px Roboto';
     const maxTipWidth = Math.round(Math.max(ctx.measureText(text).width + 12, 40));
 
-    if (dp + (maxTipWidth / 2) > xep - 10) {
-      maxTipType = 'right';
-      tdp -= (maxTipWidth / 2) - (arrowSize * 2);
-    } else if (dp - (maxTipWidth / 2) < xsp + 10) {
-      maxTipType = 'left';
-      tdp += (maxTipWidth / 2) - (arrowSize * 2);
+    if (!isHorizontal) {
+      if (dp + (maxTipWidth / 2) > xep - 10) {
+        maxTipType = 'right';
+        tdp -= (maxTipWidth / 2) - (arrowSize * 2);
+      } else if (dp - (maxTipWidth / 2) < xsp + 10) {
+        maxTipType = 'left';
+        tdp += (maxTipWidth / 2) - (arrowSize * 2);
+      }
     }
 
     ctx.restore();
@@ -248,8 +249,8 @@ const modules = {
         type: maxTipType,
         width: maxTipWidth,
         height: maxTipHeight,
-        x: tdp,
-        y: gp,
+        x: isHorizontal ? gp + (maxTipWidth / 2) : tdp,
+        y: isHorizontal ? tdp + (maxTipHeight / 2) : gp,
         opt,
         arrowSize,
         borderRadius,
@@ -260,10 +261,9 @@ const modules = {
     if (opt.showTip && tipType === 'sel') {
       this.showTip({
         context: ctx,
-        x: dp,
-        y: gp,
+        x: isHorizontal ? gp : dp,
+        y: isHorizontal ? dp : gp,
         opt,
-        arrowSize,
         isSamePos,
       });
     }
@@ -276,6 +276,7 @@ const modules = {
    * @returns {undefined}
    */
   showTextTip(param) {
+    const isHorizontal = !!this.options.horizontal;
     const { type, width, height, x, y, arrowSize, borderRadius, text, opt } = param;
     const ctx = param.context;
 
@@ -293,24 +294,31 @@ const modules = {
     ctx.beginPath();
     ctx.moveTo(sx + borderRadius, sy);
     ctx.quadraticCurveTo(sx, sy, sx, sy + borderRadius);
+
+    if (isHorizontal) {
+      ctx.lineTo(sx, sy + borderRadius + (arrowSize / 2));
+      ctx.lineTo(sx - arrowSize, ey - (height / 2));
+      ctx.lineTo(sx, ey - borderRadius - (arrowSize / 2));
+    }
+
     ctx.lineTo(sx, ey - borderRadius);
     ctx.quadraticCurveTo(sx, ey, sx + borderRadius, ey);
 
-    if (type === 'left') {
-      ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
-      ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
-      ctx.lineTo(ex - borderRadius, ey);
-    } else if (type === 'right') {
-      ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
-      ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
-      ctx.lineTo(ex - borderRadius, ey);
-    } else {
-      ctx.lineTo(x - arrowSize, ey);
-      ctx.lineTo(x, ey + arrowSize);
-      ctx.lineTo(x + arrowSize, ey);
-      ctx.lineTo(ex - borderRadius, ey);
+    if (!isHorizontal) {
+      if (type === 'left') {
+        ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
+        ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+      } else if (type === 'right') {
+        ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+        ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
+      } else {
+        ctx.lineTo(x - arrowSize, ey);
+        ctx.lineTo(x, ey + arrowSize);
+        ctx.lineTo(x + arrowSize, ey);
+      }
     }
 
+    ctx.lineTo(ex - borderRadius, ey);
     ctx.quadraticCurveTo(ex, ey, ex, ey - borderRadius);
     ctx.lineTo(ex, sy + borderRadius);
     ctx.quadraticCurveTo(ex, sy, ex - borderRadius, sy);
@@ -334,6 +342,7 @@ const modules = {
    * @returns {undefined}
    */
   showTip(param) {
+    const isHorizontal = !!this.options.horizontal;
     const { x, y, opt, isSamePos } = param;
     const ctx = param.context;
     const offset = isSamePos ? 24 : 0;
@@ -343,8 +352,13 @@ const modules = {
     ctx.fillStyle = opt.tipBackground;
     ctx.beginPath();
     ctx.moveTo(x, cy);
-    ctx.lineTo(x + 6, cy - 6);
-    ctx.lineTo(x - 6, cy - 6);
+    if (isHorizontal) {
+      ctx.lineTo(x + 6, cy - 6);
+      ctx.lineTo(x + 6, cy + 6);
+    } else {
+      ctx.lineTo(x + 6, cy - 6);
+      ctx.lineTo(x - 6, cy - 6);
+    }
     ctx.lineTo(x, cy);
     ctx.closePath();
     ctx.fill();
