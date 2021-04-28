@@ -3,6 +3,12 @@ import { defaultsDeep } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 
 const DEFAULT_OPTIONS = {
+  padding: {
+    top: 20,
+    right: 2,
+    left: 2,
+    bottom: 4,
+  },
   border: 2,
   title: {
     show: false,

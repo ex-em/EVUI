@@ -81,6 +81,7 @@ const chartData = {
   | indicator | Object | ([상세](#indicator)) | 지표선 | |
   | maxTip | Object | ([상세](#maxtip)) | 최대값에 tip 표시(값 표시) 여부 및 속성 | |
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
+  | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 | | 
 
 #### axesX axesY
 ##### type 공통

@@ -353,7 +353,7 @@ class EvChart {
   getChartRect() {
     const { width, height } = this.getChartDOMRect();
 
-    const padding = { top: 20, right: 2, left: 2, bottom: 4 };
+    const padding = this.options.padding;
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
