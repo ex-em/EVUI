@@ -10,6 +10,7 @@
       v-cloak
       ref="grid"
       :class="{
+        'ev-grid': true,
         table: true,
         adjust: adjust,
         'non-header': !showHeader,
@@ -134,6 +135,7 @@
             <td
               v-if="useCheckbox.use"
               :class="{
+                cell: true,
                 'row-checkbox': true,
                 'non-border': !!borderStyle,
               }"
@@ -152,6 +154,7 @@
                 :data-name="column.field"
                 :data-index="column.index"
                 :class="{
+                  cell: true,
                   [column.type]: column.type,
                   [column.align]: column.align,
                   render: isRenderer(column),
@@ -175,12 +178,12 @@
                   :option="column.render.option"
                   @change-renderer="updateData"
                 />
-                <span
+                <div
                   v-else
                   :title="getConvertValue(column.type, row[2][column.index])"
                 >
                   {{ getConvertValue(column.type, row[2][column.index]) }}
-                </span>
+                </div>
               </td>
             </template>
           </tr>
@@ -296,7 +299,7 @@ export default {
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
-    const borderStyle = computed(() => (props.option.style?.border || false));
+    const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight));
     const rowMinHeight = props.option.rowMinHeight || 35;
     const elementInfo = reactive({
@@ -456,13 +459,17 @@ export default {
         const ROW_CHECK_INDEX = 1;
         const ROW_DATA_INDEX = 2;
         const store = stores.originStore;
-        if (value.length === 0) {
-          checkInfo.isHeaderChecked = false;
-        }
+        checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
           store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
         }
-        checkInfo.checkedRows = value;
+      },
+    );
+    watch(
+      () => checkInfo.useCheckbox.mode,
+      () => {
+        checkInfo.checkedRows = [];
+        checkInfo.isHeaderChecked = false;
       },
     );
     watch(
@@ -544,11 +551,9 @@ export default {
   width: 100%;
   height: 100%;
   padding-top: $header-height;
-
   &.non-header {
     padding-top: 0;
   }
-
   .table-header {
     overflow: hidden;
     position: absolute;
@@ -586,11 +591,9 @@ export default {
   @include evThemify() {
     border-right: 1px solid evThemed('grid-bottom-border');
   }
-
   &:nth-last-child(1) {
     border-right: 0;
     margin-right: 20px;
-
     .column-resize {
       cursor: default !important;
     }
@@ -649,7 +652,6 @@ export default {
   position: absolute;
   left: 0;
   background-color: transparent;
-
   .ei {
     font-size: 10px;
     vertical-align: top;
@@ -666,7 +668,6 @@ export default {
   right: -5px;
   width: 10px;
   height: 100%;
-
   &:hover {
     cursor: col-resize;
   }
@@ -678,38 +679,34 @@ export default {
   height: 100%;
   overflow: auto;
   overflow-anchor: none;
-
   table {
     clear: both;
     border-spacing: 0;
     border-collapse: collapse;
   }
-
   &.stripe tr:nth-child(even) {
     @include evThemify() {
-      background-color: evThemed('grid-row-stripe');
+      background: evThemed('grid-row-stripe');
     }
   }
-
   &.bottom-border {
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
   }
-
   .row {
     white-space: nowrap;
 
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
-
     &.selected {
       @include evThemify() {
-        background-color: evThemed('grid-row-selected') !important;
+        background: evThemed('grid-row-selected') !important;
+        color: #0D0D0D !important;
+        font-size: 15px !important;
       }
     }
-
     &.highlight {
       background: #5AB7FF;
       color: #FFFFFF;
@@ -717,7 +714,7 @@ export default {
     }
   }
 
-  td {
+  .cell {
     display: inline-block;
     padding: 0 10px;
     text-align: center;
@@ -729,28 +726,27 @@ export default {
     @include evThemify() {
       border-right: 1px solid evThemed('grid-bottom-border');
     }
-
-    /* stylelint-disable */
+    div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     &.row-checkbox {
       display: inline-flex;
       justify-content: center;
       align-items: center;
     }
-
     &.render {
       overflow: initial;
     }
-
     &.number,
     &.float {
       text-align: right;
     }
-
     &.string,
     &.stringnumber {
       text-align: left;
     }
-
     &.center {
       text-align: center;
     }
@@ -766,11 +762,9 @@ export default {
         justify-content: flex-end;
       }
     }
-
     &:last-child {
       border-right: 0;
     }
-    /* stylelint-enable */
   }
 }
 

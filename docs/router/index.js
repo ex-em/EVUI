@@ -30,6 +30,7 @@ import lineChartProps from 'docs/views/lineChart/props';
 import scatterChartProps from 'docs/views/scatterChart/props';
 import comboChartProps from 'docs/views/comboChart/props';
 import pieChartProps from 'docs/views/pieChart/props';
+import treeGridProps from 'docs/views/treeGrid/props';
 
 const routes = [
   {
@@ -209,9 +210,10 @@ const routes = [
     },
   },
   {
-    path: '/treeTable',
-    name: 'TreeTable',
-    component: () => import(/* webpackChunkName: "treeTable" */ '../views/treeTable'),
+    path: '/treeGrid',
+    name: 'TreeGrid',
+    component: PageView,
+    props: treeGridProps,
     meta: {
       category: 'Table',
     },

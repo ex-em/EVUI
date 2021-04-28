@@ -1,9 +1,9 @@
-import { getCurrentInstance } from 'vue';
-import { isEqual, uniqBy } from 'lodash-es';
+import { getCurrentInstance, nextTick } from 'vue';
+import { isEqual } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
-const ROW_INDEX = 0;
-const ROW_CHECK_INDEX = 1;
+// const ROW_INDEX = 0;
+// const ROW_CHECK_INDEX = 1;
 const ROW_DATA_INDEX = 2;
 
 export const commonFunctions = () => {
@@ -73,13 +73,14 @@ export const scrollEvent = (params) => {
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
   const updateVScroll = () => {
+    const store = stores.treeStore;
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     const rowCount = bodyEl.clientHeight > rowHeight
-      ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
-    const totalScrollHeight = stores.store.length * rowHeight;
+      ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+    const totalScrollHeight = store.length * rowHeight;
     let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
-    if (firstVisibleIndex > stores.store.length - 1) {
+    if (firstVisibleIndex > store.length - 1) {
       firstVisibleIndex = 0;
     }
 
@@ -87,8 +88,8 @@ export const scrollEvent = (params) => {
     const firstIndex = Math.max(firstVisibleIndex, 0);
     const lastIndex = lastVisibleIndex;
 
-    stores.viewStore = stores.store.slice(firstIndex, lastIndex);
-    scrollInfo.hasVerticalScrollBar = rowCount < stores.store.length;
+    stores.viewStore = store.slice(firstIndex, lastIndex);
+    scrollInfo.hasVerticalScrollBar = rowCount < store.length;
     scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
     scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
       - scrollInfo.vScrollTopHeight;
@@ -154,7 +155,13 @@ export const resizeEvent = (params) => {
    * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
    */
   const calculatedColumn = () => {
+    stores.viewStore = stores.treeStore;
+    const store = stores.viewStore;
     let columnWidth = resizeInfo.columnWidth;
+    if (resizeInfo.columnWidth > 0) {
+      columnWidth = resizeInfo.columnWidth;
+    }
+    columnWidth = resizeInfo.columnWidth;
     let remainWidth = 0;
     if (resizeInfo.adjust) {
       const bodyEl = elementInfo.body;
@@ -174,7 +181,7 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      if (resizeInfo.rowHeight * props.rows.length > elHeight) {
+      if (resizeInfo.rowHeight * store.length > elHeight - resizeInfo.scrollWidth) {
         elWidth -= resizeInfo.scrollWidth;
       }
 
@@ -216,11 +223,13 @@ export const resizeEvent = (params) => {
       }
       lastColumn.width += remainWidth;
     }
+    resizeInfo.isResize = !resizeInfo.isResize;
   };
   /**
    * grid resize 이벤트를 처리한다.
    */
-  const onResize = () => {
+  const onResize = async () => {
+    await nextTick();
     if (resizeInfo.adjust) {
       stores.orderedColumns.map((column) => {
         const item = column;
@@ -316,8 +325,8 @@ export const clickEvent = (params) => {
     }
     return {
       event,
-      rowData: row[ROW_DATA_INDEX],
-      rowIndex: row[ROW_INDEX],
+      rowData: row,
+      rowIndex: row.index,
       cellName: cellInfo.name,
       cellIndex: cellInfo.index,
     };
@@ -336,9 +345,8 @@ export const clickEvent = (params) => {
         return false;
       }
       if (selectInfo.useSelect) {
-        const rowData = row[ROW_DATA_INDEX];
-        selectInfo.selectedRow = rowData;
-        emit('update:selected', rowData);
+        selectInfo.selectedRow = row;
+        emit('update:selected', row);
         emit('click-row', getClickedRowData(event, row));
       }
       return true;
@@ -352,9 +360,8 @@ export const clickEvent = (params) => {
    */
   const onRowDblClick = (event, row) => {
     clearTimeout(time);
-    const rowData = row[ROW_DATA_INDEX];
-    selectInfo.selectedRow = rowData;
-    emit('update:selected', rowData);
+    selectInfo.selectedRow = row;
+    emit('update:selected', row);
     emit('dblclick-row', getClickedRowData(event, row));
   };
   return { onRowClick, onRowDblClick };
@@ -369,50 +376,100 @@ export const checkEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const unCheckedRow = (row) => {
-    const index = stores.originStore.findIndex(
-      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
+    const index = stores.treeData.findIndex(
+      item => item.index === row.index);
 
     if (index !== -1) {
-      stores.originStore[index][ROW_CHECK_INDEX] = row[ROW_CHECK_INDEX];
+      stores.treeData[index].checked = row.checked;
+    }
+  };
+  const onCheckChildren = (node) => {
+    if (node.hasChild) {
+      node.children.forEach((children) => {
+        const childNode = children;
+        if (node.checked && !childNode.checked) {
+          checkInfo.checkedRows.push(childNode);
+        }
+        if (!node.checked) {
+          checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== childNode.index);
+        }
+        childNode.checked = node.checked;
+
+        if (childNode.hasChild) {
+          onCheckChildren(childNode);
+        }
+      });
+    }
+  };
+  const onCheckParent = (node) => {
+    const parentNode = node.parent;
+    if (parentNode) {
+      const isCheck = parentNode.children.every(n => n.checked);
+      parentNode.checked = isCheck;
+      if (!parentNode.checked) {
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== parentNode.index);
+      } else {
+        checkInfo.checkedRows.push(parentNode);
+      }
+      if (parentNode.parent) {
+        onCheckParent(parentNode);
+      }
     }
   };
   /**
    * checkbox click 이벤트를 처리한다.
    *
    * @param {object} event - 이벤트 객체
-   * @param {array} row - row 데이터
+   * @param {array} rowData - row 데이터
    */
-  const onCheck = (event, row) => {
-    if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow.length) {
-      checkInfo.prevCheckedRow[ROW_CHECK_INDEX] = false;
-      unCheckedRow(checkInfo.prevCheckedRow);
-    }
-
-    if (row[ROW_CHECK_INDEX]) {
-      if (checkInfo.useCheckbox.mode === 'single') {
-        checkInfo.checkedRows = [row[ROW_DATA_INDEX]];
-      } else {
-        checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
-      }
-
-      if (checkInfo.checkedRows.length === stores.originStore.length) {
+  const onCheck = (event, rowData) => {
+    const isSingleMode = () => checkInfo.useCheckbox.mode === 'single';
+    const checkedHeader = (store) => {
+      if (checkInfo.checkedRows.length === store.length) {
         checkInfo.isHeaderChecked = true;
       }
-    } else {
+    };
+    const unCheckedHeader = () => {
       if (checkInfo.isHeaderChecked) {
         checkInfo.isHeaderChecked = false;
       }
-
-      if (checkInfo.useCheckbox.mode === 'single') {
-        checkInfo.checkedRows = [];
-      } else {
-        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+    };
+    const onSingleMode = () => {
+      if (isSingleMode() && checkInfo.checkedRows.length > 0) {
+        checkInfo.prevCheckedRow.checked = false;
+        unCheckedRow(checkInfo.prevCheckedRow);
       }
-    }
+    };
+    const addCheckedRow = (row) => {
+      if (isSingleMode()) {
+        checkInfo.checkedRows = [row];
+        return;
+      }
+      onCheckChildren(row);
+      onCheckParent(row);
+      checkInfo.checkedRows.push(row);
+    };
+    const removeCheckedRow = (row) => {
+      if (isSingleMode()) {
+        checkInfo.checkedRows = [];
+        return;
+      }
+      checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== row.index);
+    };
 
-    checkInfo.prevCheckedRow = row.slice();
+    onSingleMode();
+    if (rowData.checked) {
+      addCheckedRow(rowData);
+      checkedHeader(stores.treeData);
+    } else {
+      unCheckedHeader();
+      removeCheckedRow(rowData);
+      onCheckChildren(rowData);
+      onCheckParent(rowData);
+    }
+    checkInfo.prevCheckedRow = rowData;
     emit('update:checked', checkInfo.checkedRows);
-    emit('check-row', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
+    emit('check-row', event, rowData.index, rowData);
   };
   /**
    * all checkbox click 이벤트를 처리한다.
@@ -420,19 +477,17 @@ export const checkEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onCheckAll = (event) => {
+    const store = stores.treeData;
     const status = checkInfo.isHeaderChecked;
     const checked = [];
     let item;
-
-    for (let ix = 0; ix < stores.originStore.length; ix++) {
-      item = stores.originStore[ix];
+    for (let ix = 0; ix < store.length; ix++) {
+      item = store[ix];
       if (status) {
-        checked.push(item[ROW_DATA_INDEX]);
+        checked.push(item);
       }
-
-      item[ROW_CHECK_INDEX] = status;
+      item.checked = status;
     }
-
     checkInfo.checkedRows = checked;
     emit('update:checked', checked);
     emit('check-all', event, checked);
@@ -440,231 +495,9 @@ export const checkEvent = (params) => {
   return { onCheck, onCheckAll };
 };
 
-export const sortEvent = (params) => {
-  const { sortInfo, stores, getColumnIndex } = params;
-  const { props } = getCurrentInstance();
-  /**
-   * sort 이벤트를 처리한다.
-   *
-   * @param {string} field - 컬럼 field
-   */
-  const onSort = (field) => {
-    if (sortInfo.sortField === field) {
-      sortInfo.sortOrder = sortInfo.sortOrder === 'desc' ? 'asc' : 'desc';
-    } else {
-      sortInfo.sortField = field;
-      sortInfo.sortOrder = 'desc';
-    }
-
-    sortInfo.setSorting = true;
-  };
-  /**
-   * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
-   */
-  const setSort = () => {
-    const index = getColumnIndex(sortInfo.sortField);
-    const desc = (a, b) => (a > b ? -1 : 1);
-    const asc = (a, b) => (a < b ? -1 : 1);
-    const type = props.columns[index].type || 'string';
-    const sortFn = sortInfo.sortOrder === 'desc' ? desc : asc;
-
-    if (type === 'string') {
-      stores.store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
-        b[ROW_DATA_INDEX][index].toLowerCase()));
-    } else {
-      stores.store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index],
-        b[ROW_DATA_INDEX][index]));
-    }
-  };
-  return { onSort, setSort };
-};
-
-export const filterEvent = (params) => {
-  const { props } = getCurrentInstance();
-  const { filterInfo, stores, getColumnIndex } = params;
-  /**
-   * 해당 컬럼에 대한 필터 팝업을 보여준다.
-   *
-   * @param {object} column - 컬럼 정보
-   */
-  const onClickFilter = (column) => {
-    const filter = {
-      column,
-      items: [],
-    };
-    const filterItems = filterInfo.filterList[column.field];
-
-    if (filterItems) {
-      filter.items = filterItems;
-    }
-
-    filterInfo.currentFilter = filter;
-    filterInfo.showFilterWindow = true;
-  };
-  /**
-   * 필터 팝업 관련 데이터 초기화 및 숨김 처리한다.
-   */
-  const onCloseFilterWindow = () => {
-    filterInfo.currentFilter = {
-      column: {},
-      items: [],
-    };
-    filterInfo.showFilterWindow = false;
-  };
-  /**
-   * 전달된 필터 정보를 저장하고 store에 반영한다.
-   *
-   * @param {string} columnField - row 데이터
-   * @param {array} filters - 필터 정보
-   */
-  const onApplyFilter = (columnField, filters) => {
-    filterInfo.filterList[columnField] = filters;
-    stores.filteredStore = [];
-    filterInfo.setFiltering = true;
-  };
-  /**
-   * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
-   *
-   * @param {string} search - 검색 키워드
-   * @param {string} origin - 기준 문자열
-   * @returns {boolean} 문자열 내 키워드 존재 유무
-   */
-  const likeSearch = (search, origin) => {
-    if (typeof search !== 'string' || origin === null) {
-      return false;
-    }
-    let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
-    regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
-
-    return RegExp(`^${regx}$`, 'gi').test(origin);
-  };
-  /**
-   * 필터 조건에 따라 문자열을 확인한다.
-   *
-   * @param {array} item - row 데이터
-   * @param {object} condition - 필터 정보
-   * @returns {boolean} 확인 결과
-   */
-  const stringFilter = (item, condition) => {
-    const comparison = condition.comparison;
-    const conditionValue = condition.value;
-    const value = item[ROW_DATA_INDEX][condition.index];
-    let result;
-
-    if (comparison === 'Equal') {
-      result = value === conditionValue;
-    } else if (comparison === 'Not Equal') {
-      result = value !== conditionValue;
-    } else if (comparison === 'Like') {
-      result = likeSearch(`%${conditionValue}%`, value);
-    } else if (comparison === 'Not Like') {
-      result = !likeSearch(`%${conditionValue}%`, value);
-    }
-
-    return result;
-  };
-  /**
-   * 필터 조건에 따라 숫자를 확인한다.
-   *
-   * @param {array} item - row 데이터
-   * @param {object} condition - 필터 정보
-   * @param {string} filterType - 데이터 유형
-   * @returns {boolean} 확인 결과
-   */
-  const numberFilter = (item, condition, filterType) => {
-    const comparison = condition.comparison;
-    const conditionValue = Number(condition.value);
-    let value = Number(item[ROW_DATA_INDEX][condition.index]);
-    let result;
-    if (filterType === 'float') {
-      value = Number(value.toFixed(3));
-    }
-
-    if (comparison === '=') {
-      result = value === conditionValue;
-    } else if (comparison === '>') {
-      result = value > conditionValue;
-    } else if (comparison === '<') {
-      result = value < conditionValue;
-    }
-
-    return result;
-  };
-  /**
-   * 필터 조건이 적용된 데이터를 반환한다.
-   *
-   * @param {array} data - row 데이터
-   * @param {string} filterType - 데이터 유형
-   * @param {object} condition - 필터 정보
-   * @returns {boolean} 확인 결과
-   */
-  const getFilteredData = (data, filterType, condition) => {
-    const filterFn = filterType === 'string' ? stringFilter : numberFilter;
-    const filteredData = [];
-
-    for (let ix = 0; ix < data.length; ix++) {
-      if (filterFn(data[ix], condition, filterType)) {
-        filteredData.push(data[ix]);
-      }
-    }
-
-    return filteredData;
-  };
-  /**
-   * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore에 저장한다.
-   */
-  const setFilter = () => {
-    let field;
-    let index;
-    let filters;
-    let columnType;
-    let filteredStore = [];
-    let isAppliedFilter = false;
-    const filterByColumn = filterInfo.filterList;
-    const fields = Object.keys(filterByColumn || {});
-    const store = stores.originStore;
-
-    for (let ix = 0; ix < fields.length; ix++) {
-      field = fields[ix];
-      filters = filterByColumn[field];
-      index = getColumnIndex(field);
-      columnType = props.columns[index].type;
-      for (let jx = 0; jx < filters.length; jx++) {
-        const filterItem = filters[jx];
-        if (filterItem.use) {
-          isAppliedFilter = true;
-          if (!filteredStore.length) {
-            filteredStore = getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            });
-          } else if (filterItem.type === 'OR') {
-            filteredStore.push(...getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            }));
-          } else {
-            filteredStore = getFilteredData(filteredStore, columnType, {
-              ...filterItem,
-              index,
-            });
-          }
-        }
-      }
-    }
-
-    if (!isAppliedFilter) {
-      stores.filteredStore = store;
-    } else {
-      stores.filteredStore = uniqBy(filteredStore, JSON.stringify);
-    }
-  };
-  return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter };
-};
-
 export const contextMenuEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { contextInfo, stores, filterInfo, selectInfo, setStore } = params;
+  const { contextInfo, stores, selectInfo } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
    *
@@ -687,18 +520,6 @@ export const contextMenuEvent = (params) => {
 
       menuItems.push(...customItems);
     }
-
-    if (filterInfo.useFilter) {
-      menuItems.push({
-        text: filterInfo.isFiltering ? 'Filter Off' : 'Filter On',
-        iconClass: 'ev-icon-filter',
-        click: () => {
-          filterInfo.isFiltering = !filterInfo.isFiltering;
-          stores.filteredStore = [];
-          setStore([], false);
-        },
-      });
-    }
     contextInfo.contextMenuItems = menuItems;
   };
   /**
@@ -718,7 +539,8 @@ export const contextMenuEvent = (params) => {
     }
 
     if (rowIndex) {
-      const rowData = stores.viewStore[+rowIndex][ROW_DATA_INDEX];
+      const index = stores.viewStore.findIndex(v => v.index === Number(rowIndex));
+      const rowData = stores.viewStore[index];
       selectInfo.selectedRow = rowData;
       setContextMenu();
       emit('update:selected', rowData);
@@ -737,10 +559,6 @@ export const storeEvent = (params) => {
     selectInfo,
     checkInfo,
     stores,
-    sortInfo,
-    filterInfo,
-    setSort,
-    setFilter,
     updateVScroll,
   } = params;
   /**
@@ -756,7 +574,6 @@ export const storeEvent = (params) => {
 
     if (makeIndex) {
       let hasUnChecked = false;
-
       for (let ix = 0; ix < value.length; ix++) {
         checked = props.checked.includes(value[ix]);
         if (!checked) {
@@ -778,15 +595,6 @@ export const storeEvent = (params) => {
       checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
       stores.originStore = store;
     }
-
-    if (filterInfo.isFiltering) {
-      setFilter();
-    }
-
-    if (sortInfo.sortField) {
-      setSort();
-    }
-
     updateVScroll();
   };
   /**
@@ -803,4 +611,55 @@ export const storeEvent = (params) => {
     }
   };
   return { setStore, updateData };
+};
+
+export const treeEvent = (params) => {
+  const { stores, onResize } = params;
+  // tree data init
+  let index = 0;
+  const filterObj = (keys, obj) => {
+    const newObj = {};
+    Object.keys(obj).forEach((key) => {
+      if (!keys.includes(key)) {
+        newObj[key] = obj[key];
+      }
+    });
+    return newObj;
+  };
+  const setTreeData = (treeData, count, isShow, parent) => {
+    treeData.forEach((nodeObj) => {
+      const node = nodeObj;
+      const dataObj = filterObj('children', nodeObj);
+      node.data = dataObj;
+      node.level = count;
+      node.expand = node.expand === undefined ? true : node.expand;
+      node.show = isShow;
+      node.checked = false;
+      node.index = index++;
+      node.parent = parent;
+      stores.treeData.push(node);
+
+      if (node.children && node.children.length > 0) {
+        node.hasChild = true;
+        setTreeData(node.children, node.level + 1, node.show && node.expand, node);
+      }
+    });
+  };
+  const setExpandNode = (children, isShow) => {
+    children.forEach((nodeObj) => {
+      const node = nodeObj;
+      node.show = isShow;
+
+      if (node.hasChild) {
+        setExpandNode(node.children, node.show && node.expand);
+      }
+    });
+  };
+  const handleExpand = (node) => {
+    const data = node;
+    data.expand = !data.expand;
+    setExpandNode(data.children, data.expand);
+    onResize();
+  };
+  return { setTreeData, handleExpand };
 };

@@ -23,7 +23,7 @@
     setup() {
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1', show: true, type: 'bar', timeMode: true, showValue: { use: true }},
+          series1: { name: 'series#1', show: true, type: 'bar', timeMode: true, showValue: { use: true } },
           series3: { name: 'series#2', show: true, type: 'line', combo: true },
         },
         labels: [],

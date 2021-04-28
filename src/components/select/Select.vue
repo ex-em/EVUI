@@ -166,7 +166,7 @@ export default {
   },
   props: {
     modelValue: {
-      type: [Boolean, String, Number, Array],
+      type: [Boolean, String, Number, Array, Object],
       default: null,
     },
     placeholder: {

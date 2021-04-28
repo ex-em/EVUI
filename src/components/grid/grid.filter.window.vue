@@ -2,8 +2,6 @@
   <div>
     <ev-window
       v-model:visible="showWindow"
-      :width="'500px'"
-      :height="'510px'"
       :title="`Setting Filter(${targetColumn.caption})`"
     >
       <!--Contents-->
