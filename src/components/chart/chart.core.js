@@ -354,8 +354,10 @@ class EvChart {
     const { width, height } = this.getChartDOMRect();
 
     const padding = this.options.padding;
-    const chartWidth = width - padding.left - padding.right;
-    const chartHeight = height - padding.top - padding.bottom;
+    const horizontalPadding = padding.left + padding.right;
+    const verticalPadding = padding.top + padding.bottom;
+    const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
+    const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
     const x1 = padding.left;
     const x2 = Math.max(width - padding.right, x1 + 2);
