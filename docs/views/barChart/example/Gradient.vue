@@ -12,8 +12,8 @@
         series: {
           series1: { name: 'series#1' }, // 기본 색상
           series2: { name: 'series#2', color: '#FF00FF' }, // 특정 색상
-          series3: { name: 'series#3', color: [[0, '#FBC2EB'], [1, '#A6C1EE']] }, // 특정 색상으로 그라데이션
-          series4: { name: 'series#3', color: [[], [1, '#ED9B57']] }, // 투명하게 시작하여 특정 색상으로 그라데이션
+          series3: { name: 'series#3', color: [[0, '#FF6767'], [0.5, '#FFD1B9'], [1, '#FF9A67']] }, // 특정 색상으로 그라데이션
+          series4: { name: 'series#4', color: [[], [1, 'rgba(255, 239, 35, 0.5)']] }, // 투명하게 시작하여 특정 색상으로 그라데이션
         },
         labels: ['value1', 'value2', 'value3', 'value5', 'value5'],
         data: {

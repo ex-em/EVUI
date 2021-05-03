@@ -69,9 +69,15 @@ class Scatter {
       return item;
     }, this.data[0]);
 
-    const opacity = this.state === 'downplay' ? 0.1 : 1;
-    ctx.fillStyle = `rgba(${Util.hexToRgb(this.pointFill)},${opacity})` || '';
-    ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
+    const color = this.color;
+    const pointFillColor = this.pointFill;
+    const getOpacity = (colorStr) => {
+      const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
+      return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+    };
+
+    ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
+    ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
 
     this.data.forEach((curr) => {
       if (curr.xp !== null && curr.yp !== null) {

@@ -23,17 +23,19 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
-  | color | String | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   | point | Boolean | true | 선(line) 위에 값 위치 마다 점을 표시할지의 여부 |  |
   | fill | Boolean | false | 선(line) 아래 부분의 영역에 색상을 채울지의 여부. area chart 전환 여부 |  |
+  | color | Hex, RGB, RGBA Code(String) | COLOR[index] | Line 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | Point 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | fillColor | Hex, RGB, RGBA Code(String) | COLOR[index] | Fill 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   
 #### data example
 ```
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const chartData = 
   series: {
-    series1: { name: 'series1', point: false, fill: true },
-    series2: { name: 'series2', point: true, fill: false },
+    series1: { name: 'series1', point: false, fill: true, color: '#FF00Ff', fillColor: '#FF0000' },
+    series2: { name: 'series2', point: true, fill: false, pointFill: '#FF0000' },
   },
   data: {
     series1: [1, 2, 3, 4],
@@ -90,7 +92,7 @@ const chartData =
 | 이름 | 타입 | 디폴트 | 설명 |
 |-----|------|-------|-----|
 | fontSize | Number | 12 | 글자 크기 |
-| color | HexCode (String) | '#25262E' | 글자 색상 |
+| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 |
 | fontFamily | String | 'Roboto' | 폰트 | 
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 |
 | fitDir | String | 'right' | Ellipsis 방향 |
@@ -103,7 +105,7 @@ const chartData =
 | text | String | '' | 타이틀 | | 
 | style | Object | | 타이틀 폰트 스타일 | | 
 | style.fontSize | Number | 15 | 글자 크기 | | 
-| style.color | HexCode(String) | '#000' | 글자 색상 | | 
+| style.color | Hex, RGB, RGBA Code(String) | '#000' | 글자 색상 | | 
 | style.fontFamily | String | 'Roboto' | 글자체 | |  
   
 #### legend
@@ -111,8 +113,8 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | show | Boolean | false | Legend 표시 여부 | true /false |
 | position | String | 'right' | Legend 위치 | 'top', 'right', 'bottom', 'left' |
-| color | HexCode(String) | '#353740' | 폰트 색상 | | 
-| inactive | HexCode(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
+| color | Hex, RGB, RGBA Code(String) | '#353740' | 폰트 색상 | | 
+| inactive | Hex, RGB, RGBA Code(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 
@@ -120,8 +122,8 @@ const chartData =
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | true | tooltip 표시 여부 | true /false |
-| backgroundColor | HexCode(String) | '#4C4C4C' | tooltip 배경 색상  | |
-| borderColor | HexCode(String) | '#666666' | tooltip 테두리 색상  | |
+| backgroundColor | Hex, RGB, RGBA Code(String) | '#4C4C4C' | tooltip 배경 색상  | |
+| borderColor | Hex, RGB, RGBA Code(String) | '#666666' | tooltip 테두리 색상  | |
 | useShadow | Boolean | false | 그림자 사용 여부  | |
 | shadowOpacity | Number | 0.25 | 그림자 투명도  | |
 | throttledMove | Boolean | false | 데이터 조회 Throttling 처리 유무  | |
@@ -139,7 +141,7 @@ const chartData =
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | true | indicator 사용 여부 | |
-| color | HexCode(String) | '#EE7F44' | 색상  | |
+| color | Hex, RGB, RGBA Code(String) | '#EE7F44' | 색상  | |
 
 #### maxTip
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -147,9 +149,9 @@ const chartData =
 | use | Boolean | true | maxTip 표시 여부  | |
 | fixedPosTop | Boolean | false | maxTip 위치를 최대값으로 고정  | |
 | showIndicator | Boolean | false | indicator 표시 여부  | |
-| indicatorColor | HexCode(String) | '#000000' | indicator 색상  | |
-| tipBackground | HexCode(String) | '#000000' | maxTip 배경색상  | |
-| tipTextColor | HexCode(String) | '#FFFFFF' | maxTip 글자 색상  | |
+| indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
+| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
+| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
 
 #### selectItem
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -160,9 +162,9 @@ const chartData =
 | showIndicator | Boolean | false | 선택한 label의 indicator 표시  | |
 | fixedPosTop | Boolean | false | indicator 및 tip의 위치를 최대값으로 고정  | |
 | useApproximateValue | Boolean | false | 가까운 label을 선택  | |
-| indicatorColor | HexCode(String) | '#000000' | indicator 색상  | |
-| tipBackground | HexCode(String) | '#000000' | tip 배경색상  | |
-| tipTextColor | HexCode(String) | '#FFFFFF' | tip 글자 색상  | |
+| indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
+| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
+| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
 
 >### Event
 | 이름 | 파라미터 | 설명 |

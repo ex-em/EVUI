@@ -35,10 +35,12 @@ class Pie {
     const radius = param.radius;
     const startAngle = param.startAngle;
     const endAngle = param.endAngle;
-    const opacity = this.state === 'downplay' ? 0.1 : 1;
+    const color = this.color;
+    const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
+    const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
     ctx.beginPath();
-    ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${opacity})` || '';
+    ctx.fillStyle = Util.colorStringToRgba(color, opacity);
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.fill();

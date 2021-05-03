@@ -237,11 +237,11 @@ export default {
    * @param isHorizontal
    * @param positions
    * @param stops
-   * @param opacity
+   * @param isDownplay
    *
    * @returns {object} gradient
    */
-  createGradient(ctx, isHorizontal, positions, stops, opacity = 1) {
+  createGradient(ctx, isHorizontal, positions, stops, isDownplay) {
     const { x, y, w, h } = positions;
     let gradient;
 
@@ -252,17 +252,12 @@ export default {
     }
 
     for (let ix = 0; ix < stops.length; ix++) {
-      let opa;
-      let stop = stops[ix];
+      const stopIdx = stops[ix][0] ?? 0;
+      const stopColor = stops[ix][1] ?? '#FFFFFF';
+      const noneDownplayOpacity = stopColor.includes('rgba') ? Util.getOpacity(stopColor) : 1;
+      const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
 
-      if (!stop.length) {
-        stop = [ix, '#FFFFFF'];
-        opa = 0;
-      } else {
-        opa = opacity;
-      }
-
-      gradient.addColorStop(stop[0], `rgba(${Util.hexToRgb(stop[1])},${opa})`);
+      gradient.addColorStop(stopIdx, Util.colorStringToRgba(stopColor, opacity));
     }
 
     return gradient;

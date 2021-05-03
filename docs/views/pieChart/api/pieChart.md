@@ -21,12 +21,13 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
+  | color | Hex, RGB, RGBA Code(String) | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   
 #### data example
 ```
 const chartData = 
   series: {
-    series1: { name: 'series1' },
+    series1: { name: 'series1', color: '#FF00FF },
     series2: { name: 'series2' },
   },
   data: {
@@ -54,7 +55,7 @@ const chartData =
 | text | String | '' | 타이틀 | | 
 | style | Object | | 타이틀 폰트 스타일 | | 
 | style.fontSize | Number | 15 | 글자 크기 | | 
-| style.color | HexCode(String) | '#000' | 글자 색상 | | 
+| style.color | Hex, RGB, RGBA Code(String) | '#000' | 글자 색상 | | 
 | style.fontFamily | String | 'Roboto' | 글자체 | |  
   
 #### legend
@@ -62,8 +63,8 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | show | Boolean | false | Legend 표시 여부 | true /false |
 | position | String | 'right' | Legend 위치 | 'top', 'right', 'bottom', 'left' |
-| color | HexCode(String) | '#353740' | 폰트 색상 | | 
-| inactive | HexCode(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
+| color | Hex, RGB, RGBA Code(String) | '#353740' | 폰트 색상 | | 
+| inactive | Hex, RGB, RGBA Code(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 

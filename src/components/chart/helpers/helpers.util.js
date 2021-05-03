@@ -28,6 +28,41 @@ export default {
   },
 
   /**
+   * Transforming color string to rgba code
+   * Return BLACK ('rgba(0, 0, 0, ${opacity})') if fail transforming
+   * @param colorStr        hex color code, rgb, rgba .. etc
+   * @param opacity            color opacity. (default 1)translate
+   * @returns {string} transformed rgba
+   */
+  colorStringToRgba(colorStr, opacity = 1) {
+    const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(colorStr);
+    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(colorStr);
+    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/.exec(colorStr);
+    const noneWhiteSpaceColorStr = colorStr.replace(' ', '');
+
+    if (isHEX) {
+      return `rgba(${this.hexToRgb(noneWhiteSpaceColorStr)},${opacity})`;
+    } else if (isRGB) {
+      return noneWhiteSpaceColorStr.replace(')', `, ${opacity})`).replace('rgb', 'rgba');
+    } else if (isRGBA) {
+      return noneWhiteSpaceColorStr.replace(`${this.getOpacity(colorStr)})`, `${opacity})`);
+    }
+
+    return `rgba(0, 0, 0, ${opacity})`;
+  },
+
+  /**
+   * get opacity value on rgba color string
+   * ex) input  : rgba(255, 255, 255, 0.1)
+   *     return : 0.1
+   * @param rgbaColorString
+   * @returns {string} opacity
+   */
+  getOpacity(rgbaColorString) {
+    return rgbaColorString.replace(' ', '').replace(/^.*,(.+)\)/, '$1');
+  },
+
+  /**
    * To logarithmic scale, compute log value
    * @param {number} value    graph value
    *
