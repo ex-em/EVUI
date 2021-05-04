@@ -35,13 +35,15 @@
         v-show="isExpand"
         :class="['ev-menu-sub', `depth${depth}`]"
       >
-        <menu-item
-          v-for="(menuItem, index) in item.children"
-          :key="`${menuItem.value}_${index}_${depth + 1}`"
+        <component
+          :is="comp"
+          v-for="(menu, index) in item.children"
+          :key="`${menu.value}_${index}_${depth + 1}`"
           :depth="depth + 1"
-          :item="menuItem"
+          :item="menu"
           :selected-item="selectedItem"
           :expandable="expandable"
+          :comp="comp"
           @click="clickMenu"
         />
       </ol>
@@ -51,13 +53,9 @@
 
 <script>
 import { ref, computed } from 'vue';
-import MenuItem from './MenuItem';
 
 export default {
   name: 'MenuItem',
-  components: {
-    MenuItem,
-  },
   props: {
     selectedItem: {
       type: [String, Number],
@@ -90,6 +88,10 @@ export default {
     expandable: {
       type: Boolean,
       default: true,
+    },
+    comp: {
+      type: Object,
+      default: () => {},
     },
   },
   emits: ['click'],

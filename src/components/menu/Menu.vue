@@ -1,11 +1,12 @@
 <template>
   <ul class="ev-menu">
     <menu-item
-      v-for="(menuItem, index) in items"
-      :key="`${menuItem.text}_${index}_0`"
-      :item="menuItem"
+      v-for="(menu, index) in items"
+      :key="`${menu.text}_${index}_0`"
+      :item="menu"
       :selected-item="modelValue"
       :expandable="expandable"
+      :comp="component"
       @click="clickMenu"
     />
   </ul>
@@ -42,8 +43,10 @@ export default {
       emit('change', newMenuItem, prevMenuItem.value);
       prevMenuItem.value = newMenuItem;
     };
+    const component = MenuItem;
     return {
       clickMenu,
+      component,
     };
   },
 };
