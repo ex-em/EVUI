@@ -196,7 +196,7 @@ const modules = {
 
         if (sIdx > 0) {
           bdata = isHorizontal ? bdata.x : bdata.y;
-          gdata = bdata + (odata.value ?? odata);
+          gdata = bdata + (odata?.value ?? odata);
         } else {
           bdata = 0;
           gdata = odata;
