@@ -104,7 +104,8 @@ class TimeBar extends Bar {
 
       if (x !== null && y !== null) {
         const barColor = item.dataColor || this.color;
-        const opacity = this.state === 'downplay' ? 0.1 : 1;
+        const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
+        const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
         if (typeof barColor !== 'string') {
           w = w !== subW ? subW : w;
@@ -114,10 +115,10 @@ class TimeBar extends Bar {
             isHorizontal,
             { x, y, w, h },
             barColor,
-            opacity,
+            opacity === 0.1,
           );
         } else {
-          ctx.fillStyle = `rgba(${Util.hexToRgb(barColor)},${opacity})` || '';
+          ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
         }
 
         this.drawBar({

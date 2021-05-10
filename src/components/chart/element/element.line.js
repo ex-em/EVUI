@@ -16,7 +16,7 @@ class Line {
 
     ['color', 'pointFill', 'fillColor'].forEach((colorProp) => {
       if (this[colorProp] === undefined) {
-        this[colorProp] = COLOR[sIdx];
+        this[colorProp] = colorProp === 'pointFill' ? this.color : COLOR[sIdx];
       }
     });
     this.type = 'line';
@@ -47,18 +47,27 @@ class Line {
     const { ctx, chartRect, labelOffset, axesSteps } = param;
     const extent = this.extent[this.state];
 
-    const blurOpacity = extent.opacity;
     const fillOpacity = this.fillOpacity * extent.opacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
+
+    const getOpacity = (colorStr) => {
+      const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
+      return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+    };
+
+    const mainColor = this.color;
+    const mainColorOpacity = getOpacity(mainColor);
+    const pointFillColor = this.pointFill;
+    const pointFillColorOpacity = getOpacity(pointFillColor);
 
     ctx.beginPath();
     ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${blurOpacity})` || '';
+    ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
 
     if (this.fill) {
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${fillOpacity})` || '';
+      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
     }
 
     let startFillIndex = 0;
@@ -122,7 +131,7 @@ class Line {
     const dataLen = this.data.length;
 
     if (this.fill && dataLen) {
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)},${fillOpacity})` || '';
+      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
       if (this.stackIndex) {
         this.data.slice().reverse().forEach((curr) => {
           x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -139,8 +148,8 @@ class Line {
     }
 
     if (this.point) {
-      ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)},${blurOpacity})` || '';
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.pointFill)},${blurOpacity})` || '';
+      ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
+      ctx.fillStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
 
       this.data.forEach((curr) => {
         if (curr.xp !== null && curr.yp !== null) {
@@ -169,8 +178,8 @@ class Line {
 
     ctx.save();
     if (x !== null && y !== null) {
-      ctx.strokeStyle = `rgba(${Util.hexToRgb(this.color)}, 0)` || '';
-      ctx.fillStyle = `rgba(${Util.hexToRgb(this.color)}, ${this.highlight.maxShadowOpacity})` || '';
+      ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
+      ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
 
       ctx.fillStyle = this.color;

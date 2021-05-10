@@ -132,7 +132,7 @@ class Bar {
       }
 
       const barColor = item.dataColor || this.color;
-      const opacity = this.state === 'downplay' ? 0.1 : 1;
+      const isDownplay = this.state === 'downplay';
 
       if (typeof barColor !== 'string') {
         ctx.fillStyle = Canvas.createGradient(
@@ -140,10 +140,13 @@ class Bar {
           isHorizontal,
           { x, y, w, h },
           barColor,
-          opacity,
+          isDownplay,
         );
       } else {
-        ctx.fillStyle = `rgba(${Util.hexToRgb(barColor)},${opacity})` || '';
+        const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
+        const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
+
+        ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
       }
 
       this.drawBar({

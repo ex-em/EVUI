@@ -235,7 +235,7 @@ const modules = {
     this.tooltipDOM.style.color = opt.fontColor;
 
     if (opt.useShadow) {
-      const shadowColor = `rgba(${Util.hexToRgb('#000000')}, ${opt.shadowOpacity})` || '';
+      const shadowColor = `rgba(0, 0, 0, ${opt.shadowOpacity})`;
       this.tooltipDOM.style.boxShadow = `2px 2px 2px ${shadowColor}`;
     }
 
