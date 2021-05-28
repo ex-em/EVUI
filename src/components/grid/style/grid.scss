@@ -1,0 +1,285 @@
+@import '../../../style/index.scss';
+
+.table {
+  $header-height: 33px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-top: $header-height;
+  &.non-header {
+    padding-top: 0;
+  }
+  .table-header {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: $header-height;
+
+    @include evThemify() {
+      border-top: 2px solid evThemed('grid-header-border');
+      border-bottom: 1px solid evThemed('grid-bottom-border');
+    }
+
+    &.non-border {
+      border-bottom: 2px solid #7F7F7F !important;
+    }
+  }
+}
+
+.column-list {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  list-style-type: none;
+}
+
+.column {
+  display: inline-flex;
+  position: relative;
+  height: 100%;
+  padding: 0 10px;
+  line-height: 30px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: top;
+  user-select: none;
+
+  @include evThemify() {
+    border-right: 1px solid evThemed('grid-bottom-border');
+  }
+  &:nth-last-child(1) {
+    border-right: 0;
+    margin-right: 20px;
+    .column-resize {
+      cursor: default !important;
+    }
+  }
+  .sort-icon {
+    display: inline-block;
+    float: right;
+    font-size: 14px;
+    line-height: 30px;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
+  }
+  .ev-icon-filter {
+    font-size: 13px;
+    color: #005CC8;
+  }
+  &.db-icon, &.user-icon {
+    width: 42px !important;
+    min-width: 42px !important;
+    border-right: 0;
+  }
+}
+
+.column-name {
+  display: inline-block;
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  font-size: 14px;
+
+  @include evThemify() {
+    color: evThemed('font-color-base');
+  }
+}
+
+.column-filter {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: transparent;
+  i {
+    margin-right: 2px;
+    font-size: 14px;
+    vertical-align: middle;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
+  }
+}
+
+.column:hover .column-filter {
+  display: block;
+  cursor: pointer;
+}
+
+.column-filter-status {
+  position: absolute;
+  left: 0;
+  background-color: transparent;
+  .ei {
+    font-size: 10px;
+    vertical-align: top;
+
+    @include evThemify() {
+      color: evThemed('color-primary');
+    }
+  }
+}
+
+.column-resize {
+  position: absolute;
+  bottom: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  &:hover {
+    cursor: col-resize;
+  }
+}
+
+.table-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overflow-anchor: none;
+  table {
+    clear: both;
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+  &.stripe tr:nth-child(even) {
+    @include evThemify() {
+      background: evThemed('grid-row-stripe');
+    }
+  }
+  &.bottom-border {
+    @include evThemify() {
+      border-bottom: 1px solid evThemed('grid-bottom-border');
+    }
+  }
+  .row {
+    white-space: nowrap;
+
+    @include evThemify() {
+      border-bottom: 1px solid evThemed('grid-bottom-border');
+    }
+    &.selected {
+      @include evThemify() {
+        background: evThemed('grid-row-selected') !important;
+        color: #0D0D0D !important;
+        font-size: 15px !important;
+      }
+    }
+    &.highlight {
+      background: #5AB7FF;
+      color: #FFFFFF;
+      font-size: 16px;
+    }
+  }
+
+  .cell {
+    display: inline-block;
+    padding: 0 10px;
+    text-align: center;
+    max-width: 100%;
+    white-space: nowrap;
+    //overflow: hidden;
+    text-overflow: ellipsis;
+
+    @include evThemify() {
+      border-right: 1px solid evThemed('grid-bottom-border');
+    }
+    div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &.row-checkbox {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &.render {
+      overflow: initial;
+    }
+    &.number,
+    &.float {
+      text-align: right;
+    }
+    &.string,
+    &.stringnumber {
+      text-align: left;
+    }
+    &.center {
+      text-align: center;
+    }
+    &.left {
+      text-align: left;
+      .wrap {
+        justify-content: flex-start;
+      }
+    }
+    &.right {
+      text-align: right;
+      .wrap {
+        justify-content: flex-end;
+      }
+    }
+    &:last-child {
+      border-right: 0;
+    }
+    &.user-icon {
+      height: auto !important;
+    }
+    &.db-icon, &.user-icon {
+      width: 42px !important;
+      min-width: 42px !important;
+      border-right: 0;
+    }
+  }
+}
+
+.table-resize-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+
+  @include evThemify() {
+    border-right: 1px solid evThemed('grid-bottom-border');
+  }
+}
+
+.vscroll-spacer {
+  opacity: 0;
+  clear: both;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+.ev-checkbox {
+  margin: 0;
+}
+
+.non-border {
+  border: none !important;
+}
+
+.postgresql {
+  background: url('~@/assets/icon_postgresql.svg') no-repeat center center;
+}
+
+.oracle {
+  background: url('~@/assets/icon_oracle.svg') no-repeat center center;
+}
+
+.mongodb {
+  background: url('~@/assets/icon_mongodb.svg') no-repeat center center;
+}
+
+.mysql {
+  background: url('~@/assets/icon_mysql.svg') no-repeat center center;
+}

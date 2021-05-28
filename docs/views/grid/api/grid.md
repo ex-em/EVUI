@@ -16,6 +16,20 @@
     @click-row="onClickRow"
     @dblclick-row="onDoubleClickRow"
 >
+    <!-- Cell Renderer -->
+    <template v-slot:db-icon>
+        <div class="db-icon"></div>
+    </template>
+    <!-- Toolbar -->
+    <template v-slot:toolbar="{ item }">
+        <ev-text-field
+          v-model="searchVm"
+          class="search"
+          type="search"
+          placeholder="Search"
+          @input="item.onSearch"
+        />
+    </template>
 </ev-grid>
 ```
 
@@ -38,15 +52,24 @@
 |  | columnWidth | 40 | 기본 컬럼 너비를 설정한다. | `min-width: 40px` |
 |  | useFilter | false | 필터 기능 사용 여부, 컨텍스트 메뉴에서 'Filter On' 메뉴를 클릭하여 설정한다. |  |
 |  | useCheckbox | {} | 각 row별 체크박스 사용 여부 및 단일 선택이나 다중 선택을 설정한다. |  |
-|  |  | use | 체크박스 사용 여부 | boolean |
+|  |  | use | 체크박스 사용 여부 | Boolean |
 |  |  | mode | 단일 및 다중 선택 설정 | 'multi', 'single' |
-|  |  | headerCheck | 헤더 체크박스 사용 여부 | boolean |
+|  |  | headerCheck | 헤더 체크박스 사용 여부 | Boolean |
 |  | style | {} | 그리드의 스타일을 설정한다. |  |
-|  |  | stripe | row의 배경색을 Stripe 스타일로 설정한다. | boolean |
+|  |  | stripe | row의 배경색을 Stripe 스타일로 설정한다. | Boolean |
 |  |  | border | 그리드의 Border 여부를 설정한다. | 'none', 'rows' |
 |  |  | highlight | 지정한 row에 Highlight 효과를 설정한다. | `rowIndex` |
 |  | customContextMenu | [] | 우클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
 |  |  | menuItems | 컨텍스트 메뉴 |  |
+
+### Columns
+| 이름 | 타입 | 설명 | 종류 | 필수 |
+| --- | ---- | ----- | ---- | --- |
+| caption | String | 컬럼명 | ex) '인스턴스명' | Y |
+| field | String | 필드명 | ex) 'instance_name' | Y |
+| type | String | 데이터 타입 | 'string', 'number', 'float', 'boolean' | Y |
+| width | Number | 컬럼 넓이 | ex) 150 | N |
+| searchable | Boolean | 검색 대상 여부 | `true`, `false` | N |
 
 ### Event
 | 이름 | 파라미터 | 설명 |
@@ -56,6 +79,3 @@
  | click-row | newValue | row가 클릭 되었을 때 호출된다. |
  | dblclick-row | newValue | row가 더블 클릭 되었을 때 호출된다. |
 
->### 참고
- - <그리드> 셀 내부에 타 컴포넌트를 Rendering 할 수 있다.
- - `ev-button`, `ev-checkbox`, `ev-input-number`, `ev-select` 외 컴포넌트 추가 예정
