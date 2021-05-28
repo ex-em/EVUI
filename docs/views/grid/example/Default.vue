@@ -14,12 +14,12 @@
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
         useFilter: useFilterMV,
+        customContextMenu: menuItems,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
-        customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
           border: borderMV,
@@ -31,7 +31,40 @@
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
     >
+      <!-- renderer start -->
+      <template v-slot:user-icon="{ item }">
+        <div
+          class="user-icon"
+          :style="{
+            background: `url(${loadImage(item.row[2][item.column.index])})no-repeat center center`,
+            ['background-size']: '32px 32px',
+          }"
+        ></div>
+      </template>
+      <template v-slot:userName="{ item }">
+        <a
+          style="text-decoration: underline; cursor: pointer;"
+          @click="item.onDetailPopup(item.row)"
+        >{{item.row[2][item.column.index]}}</a>
+      </template>
+      <template v-slot:gridButton="{ item }">
+        <ev-button
+          type="ghost"
+          size="small"
+          @click="item.onRowDelete(item.row[0])"
+        >
+          Delete
+        </ev-button>
+        <ev-button
+          size="small"
+          @click="item.onRowEdit(item.row)"
+        >
+          Edit
+        </ev-button>
+      </template>
+      <!-- renderer end -->
     </ev-grid>
+    <!-- description -->
     <div class="description">
       <div class="form-rows">
         <span class="badge yellow">
@@ -169,7 +202,7 @@
             v-model="highlightMV"
             :step="1"
             :max="100"
-            :min="0"
+            :min="-1"
           />
         </div>
         <div class="form-row">
@@ -209,7 +242,7 @@ export default {
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
     const stripeMV = ref(false);
-    const rowHeightMV = ref(35);
+    const rowHeightMV = ref(45);
     const columnWidthMV = ref(80);
     const useFilterMV = ref(true);
     const useCheckboxMV = ref(true);
@@ -227,8 +260,8 @@ export default {
         click: () => console.log('[Menu2]'),
       },
     ]);
-    const highlightMV = ref(0);
-    const borderMV = ref('');
+    const highlightMV = ref(-1);
+    const borderMV = ref('rows');
     const items = ref([
       {
         name: 'none',
@@ -239,17 +272,17 @@ export default {
         value: 'rows',
       },
     ]);
+    const columns = ref([
+      { caption: '', field: 'user-icon', type: 'string' },
+      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
+      { caption: 'Role', field: 'role', type: 'string' },
+      { caption: 'Phone', field: 'phone', type: 'string' },
+      { caption: 'Email', field: 'email', type: 'string' },
+      { caption: 'Last Login', field: 'lastLogin', type: 'string' },
+      { caption: '', field: 'gridButton', width: 120 },
+    ]);
     const resetBorderStyle = () => {
       borderMV.value = '';
-    };
-    const onClickCheckbox = (e) => {
-      console.log(`checkbox component click: ${e}`);
-    };
-    const onClickButton = (e) => {
-      console.log(`button component click: ${e}`);
-    };
-    const clearData = () => {
-      tableData.value = [];
     };
     const changeMode = (mode) => {
       checkboxModeMV.value = mode;
@@ -269,119 +302,29 @@ export default {
       clickedRowMV.value = `${e.rowData}`;
     };
     const getData = (count, startIndex) => {
-      const countries = [
-        'Russia', 'Canada', 'United States', 'China', 'Brazil',
-        'Australia', 'India', 'Argentina', 'Kazakhstan', 'Algeria',
-        'Denmark', 'Mexico', 'Indonesia', 'Sudan', 'Libya',
-        'Iran', 'Japan', 'Korea', 'Egypt', 'Ethiopia',
-      ];
-      // const state = ['normal', 'warning', 'critical'];
       const temp = [];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
-          ix + 1,
-          countries[ix % 20],
-          Math.random() * 10000,
-          Math.random() * 100,
-          Math.random() * 1000,
-          true,
-          true,
-          Math.floor(Math.random() * (100 - 0 + 1)) + 0,
-         'critical',
+          `user_${ix + 1}`,
+          `user_${ix + 1}`,
+          'Common',
+          '010-0000-0000',
+          'kmn0827@ex-em.com',
+          '2020.08.04 14:15',
         ]);
       }
       tableData.value = temp;
     };
-    const columns = ref([
-      { caption: 'ID', field: 'id', type: 'number' },
-      { caption: 'Country', field: 'country', type: 'string' },
-      { caption: 'Area', field: 'area', type: 'number', hide: true },
-      { caption: 'Population', field: 'population', type: 'float' },
-      { caption: 'GDP', field: 'gdp', type: 'float' },
-      {
-        caption: 'Information',
-        field: 'information',
-        type: 'boolean',
-        render: {
-          use: true,
-          type: 'button',
-          option: {
-            onClick: onClickButton,
-            btnName: 'View Info',
-            btnType: 'default',
-            btnShape: 'square',
-            btnIcon: 'ev-icon-document-search',
-          },
-        },
-      },
-      {
-        caption: 'Check',
-        field: 'check',
-        type: 'boolean',
-        render: {
-          use: true,
-          type: 'checkbox',
-          option: {
-            onClick: onClickCheckbox,
-            label: 'check',
-          },
-        },
-      },
-      // {
-      //   caption: 'Information',
-      //   field: 'information',
-      //   type: 'boolean',
-      //   render: {
-      //     use: true,
-      //     type: 'button',
-      //     option: {
-      //       onClick: onClickButton,
-      //       btnName: 'View Info',
-      //       btnType: 'primary',
-      //       btnShape: 'square',
-      //       btnIcon: 'ev-icon-document-search',
-      //     },
-      //   },
-      // },
-      // {
-      //   caption: 'Size',
-      //   field: 'size',
-      //   type: 'number',
-      //   width: 100,
-      //   render: {
-      //     use: true,
-      //     type: 'input_number',
-      //     option: {
-      //       minValue: 0,
-      //       maxValue: 100,
-      //     },
-      //   },
-      // },
-      // {
-      //   caption: 'State',
-      //   field: 'state',
-      //   type: 'string',
-      //   width: 300,
-      //   render: {
-      //     use: true,
-      //     type: 'select',
-      //     option: {
-      //       selectItem: [
-      //         {
-      //           name: 'normal',
-      //           value: 'normal',
-      //         }, {
-      //           name: 'warning',
-      //           value: 'warning',
-      //         }, {
-      //           name: 'critical',
-      //           value: 'critical',
-      //         },
-      //       ],
-      //     },
-      //   },
-      // },
-    ]);
+    const loadImage = (fileName) => {
+      /* eslint-disable global-require */
+      try {
+        // eslint-disable-next-line import/no-dynamic-require
+        return require(`@/assets/${fileName}.jpg`);
+      } catch (e) {
+        return require('@/assets/user_default.png');
+      }
+      /* eslint-enable global-require */
+    };
 
     getData(50, 0);
     return {
@@ -407,14 +350,12 @@ export default {
       highlightMV,
       borderMV,
       items,
-      onClickCheckbox,
-      onClickButton,
-      clearData,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
       resetBorderStyle,
+      loadImage,
     };
   },
 };
@@ -440,5 +381,14 @@ export default {
 }
 .ev-toggle {
   margin-right: 10px;
+}
+.user-icon {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #FFFFFF;
+  border-radius: 20px;
+  //background: url('~@/assets/user_1.jpg') no-repeat center center;
+  //background-size: 32px 32px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 </style>

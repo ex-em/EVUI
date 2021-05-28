@@ -160,11 +160,14 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
-      const result = stores.orderedColumns.reduce((acc, column) => {
+      const result = stores.orderedColumns.reduce((acc, c) => {
+        const column = c;
         if (column.hide) {
           return acc;
         }
-
+        if (column.field === 'db-icon' || column.field === 'user-icon') {
+          column.width = resizeInfo.iconWidth;
+        }
         if (column.width) {
           acc.totalWidth += column.width;
         } else {
@@ -243,11 +246,12 @@ export const resizeEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onColumnResize = (columnIndex, event) => {
-    if (!isLastColumn(columnIndex)) {
-      let nextColumnIndex = columnIndex + 1;
-      const headerEl = elementInfo.header;
-      const headerLeft = headerEl.getBoundingClientRect().left;
-      const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
+    let nextColumnIndex = columnIndex + 1;
+    const headerEl = elementInfo.header;
+    const headerLeft = headerEl.getBoundingClientRect().left;
+    const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
+    if (!isLastColumn(columnIndex) && !columnEl.className.includes('db-icon')
+      && !columnEl.className.includes('user-icon')) {
       while (stores.orderedColumns[nextColumnIndex].hide) {
         nextColumnIndex++;
       }
@@ -305,7 +309,6 @@ export const resizeEvent = (params) => {
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
   const selectInfo = params;
-  let time = null;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -329,20 +332,17 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowClick = (event, row) => {
-    clearTimeout(time);
-    time = setTimeout(() => {
-      if (event.target && event.target.parentElement
-        && event.target.parentElement.classList.contains('row-checkbox-input')) {
-        return false;
-      }
-      if (selectInfo.useSelect) {
-        const rowData = row[ROW_DATA_INDEX];
-        selectInfo.selectedRow = rowData;
-        emit('update:selected', rowData);
-        emit('click-row', getClickedRowData(event, row));
-      }
-      return true;
-    }, 300);
+    if (event.target && event.target.parentElement
+      && event.target.parentElement.classList.contains('row-checkbox-input')) {
+      return false;
+    }
+    if (selectInfo.useSelect) {
+      const rowData = row[ROW_DATA_INDEX];
+      selectInfo.selectedRow = rowData;
+      emit('update:selected', rowData);
+      emit('click-row', getClickedRowData(event, row));
+    }
+    return true;
   };
   /**
    * row dblclick 이벤트를 처리한다.
@@ -351,7 +351,6 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    clearTimeout(time);
     const rowData = row[ROW_DATA_INDEX];
     selectInfo.selectedRow = rowData;
     emit('update:selected', rowData);
@@ -361,7 +360,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const { checkInfo, stores } = params;
+  const { checkInfo, stores, filterInfo } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -391,11 +390,19 @@ export const checkEvent = (params) => {
     if (row[ROW_CHECK_INDEX]) {
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [row[ROW_DATA_INDEX]];
+        checkInfo.checkedIndex.clear();
       } else {
         checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
       }
+      checkInfo.checkedIndex.add(row[ROW_INDEX]);
 
-      if (checkInfo.checkedRows.length === stores.originStore.length) {
+      let store = stores.originStore;
+      let checkSize = checkInfo.checkedRows.length;
+      if (filterInfo.isSearch && stores.searchStore) {
+        store = stores.searchStore;
+        checkSize = checkInfo.checkedIndex.size;
+      }
+      if (checkSize >= store.length) {
         checkInfo.isHeaderChecked = true;
       }
     } else {
@@ -405,8 +412,10 @@ export const checkEvent = (params) => {
 
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [];
+        checkInfo.checkedIndex.clear();
       } else {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+        checkInfo.checkedIndex.delete(row[ROW_INDEX]);
       }
     }
 
@@ -423,11 +432,17 @@ export const checkEvent = (params) => {
     const status = checkInfo.isHeaderChecked;
     const checked = [];
     let item;
-
-    for (let ix = 0; ix < stores.originStore.length; ix++) {
-      item = stores.originStore[ix];
+    let store = stores.originStore;
+    if (filterInfo.isSearch && stores.searchStore) {
+      store = stores.searchStore;
+    }
+    for (let ix = 0; ix < store.length; ix++) {
+      item = store[ix];
       if (status) {
         checked.push(item[ROW_DATA_INDEX]);
+        checkInfo.checkedIndex.add(item[ROW_INDEX]);
+      } else {
+        checkInfo.checkedIndex.clear();
       }
 
       item[ROW_CHECK_INDEX] = status;
@@ -469,11 +484,20 @@ export const sortEvent = (params) => {
     const sortFn = sortInfo.sortOrder === 'desc' ? desc : asc;
 
     if (type === 'string') {
-      stores.store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
-        b[ROW_DATA_INDEX][index].toLowerCase()));
+      stores.store.sort((a, b) => {
+        if (typeof a[ROW_DATA_INDEX][index] === 'string') {
+          return sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
+            b[ROW_DATA_INDEX][index].toLowerCase());
+        }
+        return 0;
+      });
     } else {
-      stores.store.sort((a, b) => sortFn(a[ROW_DATA_INDEX][index],
-        b[ROW_DATA_INDEX][index]));
+      stores.store.sort((a, b) => {
+        if (typeof a[ROW_DATA_INDEX][index] === 'number') {
+          return sortFn(a[ROW_DATA_INDEX][index], b[ROW_DATA_INDEX][index]);
+        }
+        return 0;
+      });
     }
   };
   return { onSort, setSort };
@@ -519,7 +543,7 @@ export const filterEvent = (params) => {
    */
   const onApplyFilter = (columnField, filters) => {
     filterInfo.filterList[columnField] = filters;
-    stores.filteredStore = [];
+    stores.filterStore = [];
     filterInfo.setFiltering = true;
   };
   /**
@@ -618,7 +642,7 @@ export const filterEvent = (params) => {
     let index;
     let filters;
     let columnType;
-    let filteredStore = [];
+    let filterStore = [];
     let isAppliedFilter = false;
     const filterByColumn = filterInfo.filterList;
     const fields = Object.keys(filterByColumn || {});
@@ -633,18 +657,18 @@ export const filterEvent = (params) => {
         const filterItem = filters[jx];
         if (filterItem.use) {
           isAppliedFilter = true;
-          if (!filteredStore.length) {
-            filteredStore = getFilteredData(store, columnType, {
+          if (!filterStore.length) {
+            filterStore = getFilteredData(store, columnType, {
               ...filterItem,
               index,
             });
           } else if (filterItem.type === 'OR') {
-            filteredStore.push(...getFilteredData(store, columnType, {
+            filterStore.push(...getFilteredData(store, columnType, {
               ...filterItem,
               index,
             }));
           } else {
-            filteredStore = getFilteredData(filteredStore, columnType, {
+            filterStore = getFilteredData(filterStore, columnType, {
               ...filterItem,
               index,
             });
@@ -654,9 +678,9 @@ export const filterEvent = (params) => {
     }
 
     if (!isAppliedFilter) {
-      stores.filteredStore = store;
+      stores.filterStore = store;
     } else {
-      stores.filteredStore = uniqBy(filteredStore, JSON.stringify);
+      stores.filterStore = uniqBy(filterStore, JSON.stringify);
     }
   };
   return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter };
@@ -694,7 +718,7 @@ export const contextMenuEvent = (params) => {
         iconClass: 'ev-icon-filter',
         click: () => {
           filterInfo.isFiltering = !filterInfo.isFiltering;
-          stores.filteredStore = [];
+          stores.filterStore = [];
           setStore([], false);
         },
       });

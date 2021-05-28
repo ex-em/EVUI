@@ -1,4 +1,39 @@
 <template>
+  <!-- Toolbar -->
+  <toolbar v-if="!!$slots.toolbar" >
+    <template v-slot:toolbarWrapper>
+      <slot
+        name="toolbar"
+        :item="{
+          onRefresh: onRefresh,
+          onDelete: onDelete,
+          onSearch: onSearch,
+        }"
+      >
+      </slot>
+    </template>
+  </toolbar>
+  <!-- Count -->
+  <count>
+    <template v-if="!!option.count" v-slot:countWrapper>
+      <div class="grid-count">
+        <div style="font-weight: bold;">Total {{dbCount.get('total') || 0}}
+        </div>
+        <template
+          v-for="(key) in dbCount"
+          :key="key"
+        >
+          <template v-if="key[0] !== 'total'">
+            <div
+              :class="`${key[0]}`"
+              style="width: 30px;"
+            ></div>
+            <div>{{key[1]}}</div>
+          </template>
+        </template>
+      </div>
+    </template>
+  </count>
   <div
     ref="grid-wrapper"
     v-resize="onResize"
@@ -55,6 +90,7 @@
                 column: true,
                 render: isRenderer(column),
                 'non-border': !!borderStyle,
+                [column.field]: column.field,
               }"
               :style="`
                 width: ${column.width}px;
@@ -82,7 +118,7 @@
               />
               <!--Filter Button-->
               <span
-                v-if="isFiltering"
+                v-if="isFilterButton(column.field)"
                 class="column-filter"
                 @click.capture="onClickFilter(column)"
               >
@@ -159,6 +195,7 @@
                   [column.align]: column.align,
                   render: isRenderer(column),
                   'non-border': !!borderStyle,
+                  [column.field]: column.field,
                 }"
                 :style="`
                   width: ${column.width}px;
@@ -166,24 +203,26 @@
                   line-height: ${rowHeight}px;
                   min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
               >
-                <component
-                  :is="getComponentName(column.render.type)"
-                  v-if="isRenderer(column)"
-                  :item="{
-                    row: row[2],
-                    rowIndex: row[0],
-                    cellIndex: column.index,
-                    value: row[2][column.index],
-                  }"
-                  :option="column.render.option"
-                  @change-renderer="updateData"
-                />
-                <div
-                  v-else
-                  :title="getConvertValue(column.type, row[2][column.index])"
-                >
-                  {{ getConvertValue(column.type, row[2][column.index]) }}
-                </div>
+                <!-- cell renderer -->
+                <template v-if="!!$slots[column.field]">
+                  <slot
+                    :name="column.field"
+                    :item="{
+                      row: row,
+                      column: column,
+                      onRowDelete: onRowDelete,
+                      onRowEdit: onRowEdit,
+                      onDetailPopup: onDetailPopup,
+                    }"
+                  >
+                  </slot>
+                </template>
+                <!-- cell value -->
+                <template v-else>
+                  <div :title="getConvertValue(column.type, row[2][column.index])">
+                    {{ getConvertValue(column.type, row[2][column.index]) }}
+                  </div>
+                </template>
               </td>
             </template>
           </tr>
@@ -215,18 +254,21 @@
         @apply-filter="onApplyFilter"
         @before-close="onCloseFilterWindow"
       />
+      <ev-window
+        v-model:visible="isDetailPopWin"
+        title="DETAIL POPUP"
+      >
+        <div>{{detailPopData}}</div>
+      </ev-window>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted } from 'vue';
+import { reactive, ref, toRefs, computed, watch, onMounted, getCurrentInstance } from 'vue';
 import FilterWindow from './grid.filter.window';
-import CheckboxRenderer from './renderer/checkbox.renderer';
-import ButtonRenderer from './renderer/button.renderer';
-import InputNumberRenderer from './renderer/inputNumber.renderer';
-import SelectRenderer from './renderer/select.renderer';
-import ToggleRenderer from './renderer/toggle.renderer';
+import Toolbar from './grid.toolbar';
+import Count from './grid.count';
 import {
   commonFunctions,
   scrollEvent,
@@ -243,11 +285,8 @@ export default {
   name: 'EvGrid',
   components: {
     FilterWindow,
-    CheckboxRenderer,
-    ButtonRenderer,
-    InputNumberRenderer,
-    SelectRenderer,
-    ToggleRenderer,
+    Toolbar,
+    Count,
   },
   props: {
     columns: {
@@ -295,7 +334,7 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
-
+    const { ctx } = getCurrentInstance();
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
@@ -312,6 +351,7 @@ export default {
       filterList: {},
       isFiltering: computed(() =>
         (props.option.useFilter === undefined ? true : props.option.useFilter)),
+      isSearch: false,
       setFiltering: false,
       showFilterWindow: false,
       currentFilter: {
@@ -320,19 +360,42 @@ export default {
       },
     });
     const stores = reactive({
-      tableData: props.rows,
       viewStore: [],
       originStore: [],
-      filteredStore: [],
-      store: computed(() =>
-        (filterInfo.isFiltering ? stores.filteredStore : stores.originStore)),
+      filterStore: [],
+      store: computed(() => {
+        let store;
+        if (filterInfo.isFiltering) {
+          store = stores.filterStore;
+        } else {
+          store = stores.originStore;
+        }
+        return filterInfo.isSearch ? stores.searchStore : store;
+      }),
       orderedColumns: computed(() =>
         (props.columns.map((column, index) => ({ index, ...column })))),
+      dbCount: computed(() => {
+        const index = getColumnIndex('db-icon');
+        let totalCount = 0;
+        const result = stores.store.reduce((acc, c) => {
+          const item = c;
+          const cellValue = item[2][index];
+          if (acc.has(cellValue)) {
+            acc.set(cellValue, acc.get(cellValue) + 1);
+          } else {
+            acc.set(cellValue, 1);
+          }
+          acc.set('total', ++totalCount);
+          return acc;
+        }, new Map());
+        return new Map([...result.entries()].sort());
+      }),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
       isHeaderChecked: false,
       checkedRows: props.checked,
+      checkedIndex: new Set(),
       useCheckbox: computed(() => (props.option.useCheckbox || {})),
     });
     const scrollInfo = reactive({
@@ -361,6 +424,7 @@ export default {
     const resizeInfo = reactive({
       minWidth: 40,
       rendererMinWidth: 80,
+      iconWidth: 42,
       showResizeLine: false,
       adjust: computed(() => (props.option.adjust || false)),
       columnWidth: props.option.columnWidth || 80,
@@ -385,7 +449,7 @@ export default {
     const {
       onCheck,
       onCheckAll,
-    } = checkEvent({ checkInfo, stores });
+    } = checkEvent({ checkInfo, stores, filterInfo });
 
     const {
       onSort,
@@ -458,7 +522,10 @@ export default {
       (value) => {
         const ROW_CHECK_INDEX = 1;
         const ROW_DATA_INDEX = 2;
-        const store = stores.originStore;
+        let store = stores.originStore;
+        if (filterInfo.isSearch && stores.searchStore) {
+          store = stores.searchStore;
+        }
         checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
           store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
@@ -494,10 +561,109 @@ export default {
     watch(
       () => filterInfo.isFiltering,
       () => {
-        stores.filteredStore = [];
+        stores.filterStore = [];
         setStore([], false);
       },
     );
+    let timer = null;
+    const onSearch = (value) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        filterInfo.isSearch = false;
+        if (value) {
+          const filterStores = stores.store.filter((row) => {
+            let isShow = false;
+            for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
+              let cellData = row[2][ix];
+              const cellInfo = stores.orderedColumns[ix];
+              const type = cellInfo.type;
+              cellData = getConvertValue(type, cellData).toString();
+              // const renderInfo = cellInfo?.render;
+              // renderer, hide,  searchable 제외
+              if (!cellInfo?.hide && (cellInfo?.searchable === undefined || cellInfo?.searchable)) {
+                isShow = cellData.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+              }
+              if (isShow) {
+                break;
+              }
+            }
+            return isShow;
+          });
+
+          filterInfo.isSearch = true;
+          stores.searchStore = JSON.parse(JSON.stringify(filterStores));
+        } else {
+          filterInfo.isSearch = false;
+        }
+        let store = stores.originStore;
+        let checkSize = checkInfo.checkedRows.length;
+        for (let ix = 0; ix < store.length; ix++) {
+          if (checkInfo.checkedIndex.has(store[ix][0])) {
+            store[ix][1] = true;
+          } else {
+            store[ix][1] = false;
+          }
+        }
+        if (filterInfo.isSearch && stores.searchStore) {
+          store = stores.searchStore;
+          checkSize = checkInfo.checkedIndex.size;
+        }
+        if (checkSize >= store.length) {
+          checkInfo.isHeaderChecked = true;
+        } else {
+          checkInfo.isHeaderChecked = false;
+        }
+        setStore([], false);
+      }, 500);
+    };
+    const onRefresh = () => {
+      console.log('On click refresh button');
+    };
+    const onDelete = () => {
+      ctx.$messagebox({
+        title: 'Delete',
+        message: 'Are you sure you want to delete checked item?',
+        iconClass: 'ev-icon-trash3',
+        onClose: (type) => {
+          if (type === 'ok') {
+            stores.originStore = stores.store.filter(item => !item[1]);
+            setStore([], false);
+          }
+        },
+      });
+    };
+    const onRowDelete = (index) => {
+      ctx.$messagebox({
+        title: 'Delete',
+        message: 'Are you sure you want to delete this item?',
+        iconClass: 'ev-icon-trash3',
+        onClose: (type) => {
+          if (type === 'ok') {
+            stores.originStore = stores.store.filter(item => item[0] !== index);
+            setStore([], false);
+          }
+        },
+      });
+      // emit
+    };
+    const onRowEdit = (row) => {
+      ctx.$messagebox({
+        title: 'Edit',
+        message: row[2],
+        iconClass: 'ev-icon-pencil',
+        showCancelBtn: false,
+      });
+      // emit
+    };
+    const isDetailPopWin = ref(false);
+    const detailPopData = ref('');
+    const onDetailPopup = (row) => {
+      isDetailPopWin.value = true;
+      detailPopData.value = row[2];
+    };
+    const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
     return {
       showHeader,
       stripeStyle,
@@ -512,6 +678,8 @@ export default {
       ...toRefs(checkInfo),
       ...toRefs(sortInfo),
       ...toRefs(contextInfo),
+      isDetailPopWin,
+      detailPopData,
       isRenderer,
       getComponentName,
       getConvertValue,
@@ -537,262 +705,22 @@ export default {
       updateData,
       setContextMenu,
       onContextMenu,
+      onRefresh,
+      onDelete,
+      onSearch,
+      onRowEdit,
+      onRowDelete,
+      onDetailPopup,
+      isFilterButton,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import '../../style/index.scss';
-
-.table {
-  $header-height: 33px;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding-top: $header-height;
-  &.non-header {
-    padding-top: 0;
+  @import 'style/grid.scss';
+  .grid-count {
+    display: flex;
+    padding-bottom: 10px;
   }
-  .table-header {
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: $header-height;
-
-    @include evThemify() {
-      border-top: 2px solid evThemed('grid-header-border');
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-  }
-}
-
-.column-list {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  white-space: nowrap;
-  list-style-type: none;
-}
-
-.column {
-  display: inline-flex;
-  position: relative;
-  height: 100%;
-  padding: 0 10px;
-  line-height: 30px;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  vertical-align: top;
-  user-select: none;
-
-  @include evThemify() {
-    border-right: 1px solid evThemed('grid-bottom-border');
-  }
-  &:nth-last-child(1) {
-    border-right: 0;
-    margin-right: 20px;
-    .column-resize {
-      cursor: default !important;
-    }
-  }
-  .sort-icon {
-    display: inline-block;
-    float: right;
-    font-size: 14px;
-    line-height: 30px;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
-    }
-  }
-  .ev-icon-filter {
-    font-size: 13px;
-    color: #005CC8;
-  }
-}
-
-.column-name {
-  display: inline-block;
-  float: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: bold;
-  font-size: 14px;
-
-  @include evThemify() {
-    color: evThemed('font-color-base');
-  }
-}
-
-.column-filter {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: transparent;
-  i {
-    margin-right: 2px;
-    font-size: 14px;
-    vertical-align: middle;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
-    }
-  }
-}
-
-.column:hover .column-filter {
-  display: block;
-  cursor: pointer;
-}
-
-.column-filter-status {
-  position: absolute;
-  left: 0;
-  background-color: transparent;
-  .ei {
-    font-size: 10px;
-    vertical-align: top;
-
-    @include evThemify() {
-      color: evThemed('color-primary');
-    }
-  }
-}
-
-.column-resize {
-  position: absolute;
-  bottom: 0;
-  right: -5px;
-  width: 10px;
-  height: 100%;
-  &:hover {
-    cursor: col-resize;
-  }
-}
-
-.table-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  overflow-anchor: none;
-  table {
-    clear: both;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-  &.stripe tr:nth-child(even) {
-    @include evThemify() {
-      background: evThemed('grid-row-stripe');
-    }
-  }
-  &.bottom-border {
-    @include evThemify() {
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-  }
-  .row {
-    white-space: nowrap;
-
-    @include evThemify() {
-      border-bottom: 1px solid evThemed('grid-bottom-border');
-    }
-    &.selected {
-      @include evThemify() {
-        background: evThemed('grid-row-selected') !important;
-        color: #0D0D0D !important;
-        font-size: 15px !important;
-      }
-    }
-    &.highlight {
-      background: #5AB7FF;
-      color: #FFFFFF;
-      font-size: 16px;
-    }
-  }
-
-  .cell {
-    display: inline-block;
-    padding: 0 10px;
-    text-align: center;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include evThemify() {
-      border-right: 1px solid evThemed('grid-bottom-border');
-    }
-    div {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    &.row-checkbox {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-    }
-    &.render {
-      overflow: initial;
-    }
-    &.number,
-    &.float {
-      text-align: right;
-    }
-    &.string,
-    &.stringnumber {
-      text-align: left;
-    }
-    &.center {
-      text-align: center;
-    }
-    &.left {
-      text-align: left;
-      .wrap {
-        justify-content: flex-start;
-      }
-    }
-    &.right {
-      text-align: right;
-      .wrap {
-        justify-content: flex-end;
-      }
-    }
-    &:last-child {
-      border-right: 0;
-    }
-  }
-}
-
-.table-resize-line {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-
-  @include evThemify() {
-    border-right: 1px solid evThemed('grid-bottom-border');
-  }
-}
-
-.vscroll-spacer {
-  opacity: 0;
-  clear: both;
-}
-
-[v-cloak] {
-  display: none;
-}
-
-.ev-checkbox {
-  margin: 0;
-}
-
-.non-border {
-  border: none !important;
-}
 </style>

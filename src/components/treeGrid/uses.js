@@ -314,7 +314,6 @@ export const resizeEvent = (params) => {
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
   const selectInfo = params;
-  let time = null;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -338,19 +337,16 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowClick = (event, row) => {
-    clearTimeout(time);
-    time = setTimeout(() => {
-      if (event.target && event.target.parentElement
-        && event.target.parentElement.classList.contains('row-checkbox-input')) {
-        return false;
-      }
-      if (selectInfo.useSelect) {
-        selectInfo.selectedRow = row;
-        emit('update:selected', row);
-        emit('click-row', getClickedRowData(event, row));
-      }
-      return true;
-    }, 300);
+    if (event.target && event.target.parentElement
+      && event.target.parentElement.classList.contains('row-checkbox-input')) {
+      return false;
+    }
+    if (selectInfo.useSelect) {
+      selectInfo.selectedRow = row;
+      emit('update:selected', row);
+      emit('click-row', getClickedRowData(event, row));
+    }
+    return true;
   };
   /**
    * row dblclick 이벤트를 처리한다.
@@ -359,7 +355,6 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    clearTimeout(time);
     selectInfo.selectedRow = row;
     emit('update:selected', row);
     emit('dblclick-row', getClickedRowData(event, row));
