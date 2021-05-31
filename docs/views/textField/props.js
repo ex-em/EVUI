@@ -8,6 +8,8 @@ import Search from './example/Search';
 import SearchRaw from '!!raw-loader!./example/Search';
 import Textarea from './example/Textarea';
 import TextareaRaw from '!!raw-loader!./example/Textarea';
+import Icon from './example/Icon';
+import IconRaw from '!!raw-loader!./example/Icon';
 
 export default {
   mdText,
@@ -26,6 +28,11 @@ export default {
       description: '검색 용도로 사용할 수 있는 input 컴포넌트입니다.',
       component: Search,
       parsedData: parseComponent(SearchRaw),
+    },
+    Icon: {
+      description: 'TextField 내에 Prefix, Suffix 아이콘 설정이 가능한 input 컴포넌트입니다.',
+      component: Icon,
+      parsedData: parseComponent(IconRaw),
     },
     Textarea: {
       description: '여러 줄의 문장을 입력할 수 있는 input 컴포넌트입니다.',

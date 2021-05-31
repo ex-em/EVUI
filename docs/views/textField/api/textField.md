@@ -15,6 +15,14 @@ height: 35px;
 /* type = textarea */
 height: 100px;
 ```
+- '#icon-prefix', '#icon-suffix' 을 지정해서 <텍스트필드> 내 아이콘 표시 가능
+```
+<ev-text-field>
+    <template #icon-prefix>
+        <ev-icon icon="ev-icon-search"></ev-icon>
+    </template>
+</ev-text-field>
+```
  
 
 ### Props

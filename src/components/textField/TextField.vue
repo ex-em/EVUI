@@ -9,6 +9,9 @@
       'show-password': showPassword,
       'show-maxlength': showMaxLength,
       [`type-${type}`]: !!type,
+      'ev-text-field-prefix': $slots['icon-prefix'],
+      'ev-text-field-suffix': $slots['icon-suffix'],
+      'ev-text-field-prefix-suffix': $slots['icon-prefix'] && $slots['icon-suffix'],
     }"
   >
     <div
@@ -66,6 +69,18 @@
           @click="searchValue"
         >
           <i class="ev-icon-search"/>
+        </span>
+        <span
+          v-if="$slots['icon-suffix']"
+          class="ev-text-field-icon icon-suffix"
+        >
+          <slot name="icon-suffix"/>
+        </span>
+        <span
+          v-if="$slots['icon-prefix']"
+          class="ev-text-field-icon icon-prefix"
+        >
+          <slot name="icon-prefix"/>
         </span>
       </template>
     </div>
@@ -329,6 +344,30 @@ $icon-width: 14px !default;
     @include evThemify() {
       color: evThemed('error');
     }
+  }
+}
+@include state('ev-text-field-suffix') {
+  .ev-input {
+    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+  }
+  .icon-suffix {
+    font-size: 15px;
+    cursor: default;
+  }
+}
+@include state('ev-text-field-prefix') {
+  .ev-input {
+    padding: 0 $input-default-padding 0 #{$input-default-padding + $icon-width};
+  }
+  .icon-prefix {
+    left: 7px;
+    font-size: 15px;
+    cursor: default;
+  }
+}
+@include state('ev-text-field-prefix-suffix') {
+  .ev-input {
+    padding: 0 #{$input-default-padding + $icon-width};
   }
 }
 </style>
