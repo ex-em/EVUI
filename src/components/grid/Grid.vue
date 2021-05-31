@@ -1,7 +1,7 @@
 <template>
   <!-- Toolbar -->
   <toolbar v-if="!!$slots.toolbar" >
-    <template v-slot:toolbarWrapper>
+    <template #toolbarWrapper>
       <slot
         name="toolbar"
         :item="{
@@ -15,7 +15,7 @@
   </toolbar>
   <!-- Count -->
   <count>
-    <template v-if="!!option.count" v-slot:countWrapper>
+    <template v-if="!!option.count" #countWrapper>
       <div class="grid-count">
         <div style="font-weight: bold;">Total {{dbCount.get('total') || 0}}
         </div>
@@ -722,5 +722,20 @@ export default {
   .grid-count {
     display: flex;
     padding-bottom: 10px;
+  }
+  .postgresql {
+    background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
+  }
+
+  .oracle {
+    background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
+  }
+
+  .mongodb {
+    background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
+  }
+
+  .mysql {
+    background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
   }
 </style>

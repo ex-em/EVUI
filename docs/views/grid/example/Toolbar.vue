@@ -31,7 +31,7 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- toolbar -->
-      <template v-slot:toolbar="{ item }">
+      <template #toolbar="{ item }">
         <ev-button
           type="primary"
           class="refresh"
@@ -67,10 +67,10 @@
         />
       </template>
       <!-- cell renderer -->
-      <template v-slot:db-icon="{ item }">
+      <template #db-icon="{ item }">
         <div :class="`db-icon ${item.row[2][item.column.index]}`"></div>
       </template>
-      <template v-slot:db_version="{ item }">
+      <template #db-version="{ item }">
         <ev-select
           v-model="item.row[2][item.column.index]"
           :items="[
@@ -139,7 +139,7 @@ export default {
       { caption: 'Business Name', field: 'business_name', type: 'string' },
       { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false }, // searchable
       { caption: 'RTS Port', field: 'rts_port', type: 'string' },
-      { caption: 'DB Version', field: 'db_version', type: 'string' },
+      { caption: 'DB Version', field: 'db-version', type: 'string' },
     ]);
     const onCheckedRow = () => {
       let checkedRow = '';
@@ -242,16 +242,16 @@ export default {
   height: 100%;
   align-items: center;
   .postgresql {
-    background: url('~@/assets/icon_postgresql.svg') no-repeat center center;
+    background: url('../../../assets/images/icon_postgresql.svg') no-repeat center center;
   }
   .oracle {
-    background: url('~@/assets/icon_oracle.svg') no-repeat center center;
+    background: url('../../../assets/images/icon_oracle.svg') no-repeat center center;
   }
   .mongodb {
-    background: url('~@/assets/icon_mongodb.svg') no-repeat center center;
+    background: url('../../../assets/images/icon_mongodb.svg') no-repeat center center;
   }
   .mysql {
-    background: url('~@/assets/icon_mysql.svg') no-repeat center center;
+    background: url('../../../assets/images/icon_mysql.svg') no-repeat center center;
   }
 }
 </style>

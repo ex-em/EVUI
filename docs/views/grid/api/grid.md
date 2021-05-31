@@ -16,24 +16,12 @@
     @click-row="onClickRow"
     @dblclick-row="onDoubleClickRow"
 >
-    <!-- Cell Renderer -->
-    <template v-slot:db-icon>
-        <div class="db-icon"></div>
-    </template>
-    <!-- Toolbar -->
-    <template v-slot:toolbar="{ item }">
-        <ev-text-field
-          v-model="searchVm"
-          class="search"
-          type="search"
-          placeholder="Search"
-          @input="item.onSearch"
-        />
-    </template>
+  <template #{필드명}></template>
+  <template #toolbar="{ item }"></template>
 </ev-grid>
 ```
-
- - <그리드>는 위와 같이 사용
+ - `#{필드명}` 지정해서 Cell Render 설정
+ - `#toolbar` 지정해서 Toolbar 표시
 
 ### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |

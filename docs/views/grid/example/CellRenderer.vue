@@ -30,7 +30,7 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- renderer start -->
-      <template v-slot:gridButton="{ item }">
+      <template #gridButton="{ item }">
         <ev-button
           type="ghost"
           size="small"
@@ -45,7 +45,7 @@
           Edit
         </ev-button>
       </template>
-      <template v-slot:check="{ item }">
+      <template #check="{ item }">
         <ev-checkbox
           v-model="item.row[2][item.column.index]"
           label="check"
@@ -53,7 +53,7 @@
           @dblclick.stop=""
         />
       </template>
-      <template v-slot:select="{ item }">
+      <template #select="{ item }">
         <ev-select
           v-model="item.row[2][item.column.index]"
           :items="[
@@ -73,7 +73,7 @@
           @dblclick.stop=""
         />
       </template>
-      <template v-slot:slide="{ item }">
+      <template #slide="{ item }">
         <ev-slider
           v-model="item.row[2][item.column.index]"
           range
@@ -86,14 +86,14 @@
           :show-tooltip="false"
         />
       </template>
-      <template v-slot:custom="{ item }">
+      <template #custom="{ item }">
         <span
           :class="getStateClass(item.row[2][item.column.index])"
         >
           <span class="v-chip__content"> {{ item.row[2][item.column.index] }} </span>
         </span>
       </template>
-      <template v-slot:inputNumber="{ item }">
+      <template #inputNumber="{ item }">
         <ev-input-number
           v-model="item.row[2][item.column.index]"
           :max="100"

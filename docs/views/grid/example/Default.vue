@@ -32,22 +32,18 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- renderer start -->
-      <template v-slot:user-icon="{ item }">
+      <template #user-icon>
         <div
           class="user-icon"
-          :style="{
-            background: `url(${loadImage(item.row[2][item.column.index])})no-repeat center center`,
-            ['background-size']: '32px 32px',
-          }"
         ></div>
       </template>
-      <template v-slot:userName="{ item }">
+      <template #userName="{ item }">
         <a
           style="text-decoration: underline; cursor: pointer;"
           @click="item.onDetailPopup(item.row)"
         >{{item.row[2][item.column.index]}}</a>
       </template>
-      <template v-slot:gridButton="{ item }">
+      <template #gridButton="{ item }">
         <ev-button
           type="ghost"
           size="small"
@@ -319,9 +315,9 @@ export default {
       /* eslint-disable global-require */
       try {
         // eslint-disable-next-line import/no-dynamic-require
-        return require(`@/assets/${fileName}.jpg`);
+        return require(`../../../assets/images/${fileName}.jpg`);
       } catch (e) {
-        return require('@/assets/user_default.png');
+        return require('../../../assets/images/user_default.png');
       }
       /* eslint-enable global-require */
     };
@@ -387,8 +383,8 @@ export default {
   height: 30px;
   border: 1px solid #FFFFFF;
   border-radius: 20px;
-  //background: url('~@/assets/user_1.jpg') no-repeat center center;
-  //background-size: 32px 32px;
+  background: url('../../../assets/images/user_1.jpg') no-repeat center center;
+  background-size: 32px 32px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 </style>
