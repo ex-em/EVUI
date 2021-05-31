@@ -41,6 +41,7 @@ module.exports = {
         'request', // for Express requests
         'res', // for Express responses
         'response', // for Express responses
+        'cur',
       ],
     }],
     indent: 'off',

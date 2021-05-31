@@ -160,16 +160,15 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
-      const result = stores.orderedColumns.reduce((acc, c) => {
-        const column = c;
-        if (column.hide) {
+      const result = stores.orderedColumns.reduce((acc, cur) => {
+        if (cur.hide) {
           return acc;
         }
-        if (column.field === 'db-icon' || column.field === 'user-icon') {
-          column.width = resizeInfo.iconWidth;
+        if (cur.field === 'db-icon' || cur.field === 'user-icon') {
+          cur.width = resizeInfo.iconWidth;
         }
-        if (column.width) {
-          acc.totalWidth += column.width;
+        if (cur.width) {
+          acc.totalWidth += cur.width;
         } else {
           acc.emptyCount++;
         }
