@@ -99,7 +99,7 @@ export default {
       default: '',
     },
     message: {
-      type: String,
+      type: [String, Array],
       default: '',
     },
     iconClass: {

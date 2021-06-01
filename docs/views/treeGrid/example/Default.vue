@@ -338,9 +338,6 @@ export default {
     const onClickButton = (e) => {
       console.log(`button component click: ${e}`);
     };
-    const clearData = () => {
-      tableData.value = [];
-    };
     const changeMode = (mode) => {
       checkboxModeMV.value = mode;
       checked.value = [];
@@ -456,7 +453,6 @@ export default {
       borderItems,
       onClickCheckbox,
       onClickButton,
-      clearData,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,

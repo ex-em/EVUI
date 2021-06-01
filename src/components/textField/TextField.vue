@@ -204,8 +204,8 @@ export default {
       const inputValue = e.target.value;
       if (mv.value !== inputValue) {
         mv.value = inputValue;
-        emit('input', mv.value, e);
       }
+      emit('input', mv.value, e);
     };
     const changeMv = (e) => {
       emit('change', mv.value, e);
