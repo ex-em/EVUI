@@ -36,7 +36,7 @@ export default {
     const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
     const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(noneWhiteSpaceColorStr);
     const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(noneWhiteSpaceColorStr);
-    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/.exec(noneWhiteSpaceColorStr);
+    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(noneWhiteSpaceColorStr);
     let result = '';
 
     if (isHEX) {

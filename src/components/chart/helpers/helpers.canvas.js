@@ -253,7 +253,7 @@ export default {
 
     for (let ix = 0; ix < stops.length; ix++) {
       const stopIdx = stops[ix][0] ?? 0;
-      const stopColor = stops[ix][1] ?? '#FFFFFF';
+      const stopColor = stops[ix][1] ?? 'rgba(255, 255, 255, 0)';
       const noneDownplayOpacity = stopColor.includes('rgba') ? Util.getOpacity(stopColor) : 1;
       const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
 
