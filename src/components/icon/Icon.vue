@@ -4,7 +4,7 @@
       icon,
       { [`ev-icon-${size}`]: !!size },
     ]"
-    @click.stop="onClick"
+    @click="onClick"
     @dblClick="onDblClick"
     @contextmenu="onContextMenu"
   />
