@@ -29,7 +29,7 @@
           dayjs(time).add(6, 'day'),
         ],
         data: {
-          series1: [100, 25, 36, 47, 0, 50, 80],
+          series1: [100, 25, 36, 47, 0, 50, null],
           series2: [80, 36, 25, 47, 15, 100, 0],
         },
       };
@@ -45,18 +45,30 @@
           show: true,
           position: 'right',
         },
+        tooltip: {
+          use: true,
+        },
         axesX: [{
           type: 'time',
-          showGrid: true,
-          categoryMode: true,
+          showGrid: false,
           timeFormat: 'MM/DD',
           interval: 'day',
+          labelStyle: {
+            color: '#A4A4A4',
+            fontSize: '11px',
+            fontFamily: 'Roboto',
+          },
         }],
         axesY: [{
           type: 'linear',
-          showGrid: false,
+          showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
+          labelStyle: {
+            color: '#A4A4A4',
+            fontSize: '11px',
+            fontFamily: 'Roboto',
+          },
         }],
       };
 

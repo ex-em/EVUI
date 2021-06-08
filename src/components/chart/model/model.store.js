@@ -195,7 +195,7 @@ const modules = {
         }
 
         if (sIdx > 0) {
-          bdata = isHorizontal ? bdata.x : bdata.y;
+          bdata = (isHorizontal ? bdata.x : bdata.y) ?? 0;
           gdata = bdata + (odata?.value ?? odata);
         } else {
           bdata = 0;
@@ -221,7 +221,7 @@ const modules = {
     const sdata = [];
 
     data.forEach((curr, index) => {
-      let gdata = curr;
+      let gdata = curr ?? 0;
       let ldata = label[index];
 
       if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
@@ -230,7 +230,7 @@ const modules = {
       }
 
       if (ldata !== null) {
-        sdata.push(this.addData(gdata, ldata));
+        sdata.push(this.addData(gdata, ldata, gdata));
       }
     });
 
@@ -249,7 +249,7 @@ const modules = {
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
     const gdataValue = gdata?.value ?? gdata;
-    const odataValue = odata?.value ?? odata;
+    const odataValue = odata?.value ?? odata ?? 0;
     const dataColor = gdata?.color ?? odata?.color;
 
     if (this.options.horizontal) {
