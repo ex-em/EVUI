@@ -221,7 +221,7 @@ const modules = {
     const sdata = [];
 
     data.forEach((curr, index) => {
-      let gdata = curr ?? 0;
+      let gdata = curr;
       let ldata = label[index];
 
       if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
@@ -249,7 +249,7 @@ const modules = {
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
     const gdataValue = gdata?.value ?? gdata;
-    const odataValue = odata?.value ?? odata ?? 0;
+    const odataValue = odata?.value ?? odata;
     const dataColor = gdata?.color ?? odata?.color;
 
     if (this.options.horizontal) {

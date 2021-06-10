@@ -309,9 +309,11 @@ const modules = {
           let gdata;
 
           if (item.data.o === null) {
-            gdata = isHorizontal ? item.data.x : item.data.y;
+            if (!series.isExistGrp) {
+              gdata = isHorizontal ? item.data.x : item.data.y;
+            }
           } else if (!isNaN(item.data.o)) {
-            gdata = isHorizontal ? item.data.x : item.data.y;
+            gdata = item.data.o;
           }
 
           if (gdata !== null && gdata !== undefined) {
