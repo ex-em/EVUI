@@ -92,9 +92,12 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);
     const ysp = chartRect.y2 - labelOffset.bottom;
 
+    const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+
     this.data.reduce((prev, curr, ix, item) => {
-      x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-      y = Canvas.calculateY(curr.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+      x = getXPos(curr.x);
+      y = getYPos(curr.y);
 
       if (x !== null) {
         x += Util.aliasPixel(x);
@@ -102,7 +105,8 @@ class Line {
 
       if (y === null || x === null) {
         if (ix - 1 > -1) {
-          if (this.fill && prev.y !== null) {
+          // draw fill(area) series not stacked
+          if (this.fill && prev.y !== null && !this.stackIndex) {
             ctx.stroke();
             ctx.lineTo(prev.xp, endPoint);
             ctx.lineTo(item[startFillIndex].xp, endPoint);
@@ -132,12 +136,27 @@ class Line {
 
     if (this.fill && dataLen) {
       ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
-      if (this.stackIndex) {
-        this.data.slice().reverse().forEach((curr) => {
-          x = Canvas.calculateX(curr.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-          y = Canvas.calculateY(curr.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-          ctx.lineTo(x, y);
+      if (this.stackIndex) {
+        const reversedDataList = this.data.slice().reverse();
+        reversedDataList.forEach((curr, ix) => {
+          x = getXPos(curr.x);
+          y = getYPos(curr.b);
+
+          const prev = reversedDataList[ix - 1];
+          if (curr.o !== null) {
+            if (prev && prev.o == null) {
+              ctx.moveTo(x, getYPos(curr.b + curr.o));
+            }
+
+            ctx.lineTo(x, y);
+
+            if (ix === reversedDataList.length - 1) {
+              ctx.lineTo(x, getYPos(curr.b + curr.o));
+            }
+          } else if (prev && prev.o) {
+            ctx.lineTo(getXPos(prev.x), getYPos(prev.b + prev.o));
+          }
         });
       } else if (startFillIndex < dataLen) {
         ctx.lineTo(this.data[dataLen - 1].xp, endPoint);

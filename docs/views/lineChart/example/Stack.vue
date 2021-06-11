@@ -13,11 +13,12 @@
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
       const chartData = {
         series: {
-          series1: { name: 'series#1', fill: true, point: false },
-          series2: { name: 'series#2', fill: true, point: false },
+          series1: { name: 'series#1', fill: true, point: true },
+          series2: { name: 'series#2', fill: true, point: true },
+          series3: { name: 'series#3', fill: true, point: true },
         },
         groups: [
-          ['series1', 'series2'],
+          ['series1', 'series2', 'series3'],
         ],
         labels: [
           dayjs(time),
@@ -29,8 +30,9 @@
           dayjs(time).add(6, 'day'),
         ],
         data: {
-          series1: [100, 25, 36, 47, 0, 50, 0],
-          series2: [80, 36, 25, 47, 15, 100, 0],
+          series1: [100, 25, 47, 47, 40, 50, 100],
+          series2: [100, 25, 47, 47, null, null, null],
+          series3: [100, 50, 50, 50, null, 50, 100],
         },
       };
 
