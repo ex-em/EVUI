@@ -1,42 +1,47 @@
 <template>
-  <!-- Toolbar -->
-  <toolbar v-if="!!$slots.toolbar" >
-    <template #toolbarWrapper>
-      <slot
-        name="toolbar"
-        :item="{
-          onRefresh: onRefresh,
-          onDelete: onDelete,
-          onSearch: onSearch,
-        }"
-      >
-      </slot>
-    </template>
-  </toolbar>
-  <!-- Count -->
-  <count>
-    <template v-if="!!option.count" #countWrapper>
-      <div class="grid-count">
-        <div style="font-weight: bold;">Total {{dbCount.get('total') || 0}}
-        </div>
-        <template
-          v-for="(key) in dbCount"
-          :key="key"
+  <div
+    class="toolbar-wrapper"
+    :style="`width: ${gridWidth};`"
+  >
+    <!-- Toolbar -->
+    <toolbar v-if="!!$slots.toolbar" >
+      <template #toolbarWrapper>
+        <slot
+          name="toolbar"
+          :item="{
+            onRefresh: onRefresh,
+            onDelete: onDelete,
+            onSearch: onSearch,
+          }"
         >
-          <template v-if="key[0] !== 'total'">
-            <div
-              :class="`${key[0]}`"
-              style="width: 30px;"
-            ></div>
-            <div>{{key[1]}}</div>
+        </slot>
+      </template>
+    </toolbar>
+    <!-- Count -->
+    <count>
+      <template v-if="!!option.count" #countWrapper>
+        <div class="grid-count">
+          <div style="font-weight: bold;">Total {{dbCount.get('total') || 0}}</div>
+          <template
+            v-for="(key) in dbCount"
+            :key="key"
+          >
+            <template v-if="key[0] !== 'total'">
+              <div
+                :class="`${key[0]}`"
+                style="width: 30px;"
+              ></div>
+              <div>{{key[1]}}</div>
+            </template>
           </template>
-        </template>
-      </div>
-    </template>
-  </count>
+        </div>
+      </template>
+    </count>
+  </div>
   <div
     ref="grid-wrapper"
     v-resize="onResize"
+    v-bind="$attrs"
     class="grid-wrapper"
     :style="`width: ${gridWidth}; height: ${gridHeight};`"
   >
@@ -225,6 +230,9 @@
                 </template>
               </td>
             </template>
+          </tr>
+          <tr v-if="!viewStore.length">
+            <td class="is-empty">No records</td>
           </tr>
           </tbody>
         </table>
@@ -610,7 +618,7 @@ export default {
           store = stores.searchStore;
           checkSize = checkInfo.checkedIndex.size;
         }
-        if (checkSize >= store.length) {
+        if (store.length > 0 && checkSize >= store.length) {
           checkInfo.isHeaderChecked = true;
         } else {
           checkInfo.isHeaderChecked = false;
