@@ -72,9 +72,13 @@ const modules = {
     const calHeight = seriesCnt => boxPadding.t + (seriesCnt * textHeight)
       + (seriesCnt * lineSpacing) + boxPadding.b;
 
+    // set tooltip canvas width (maxSeries name, label length comparison)
+    const isHorizontal = !!this.options.horizontal;
+    const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
+    const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
     ctx.save();
     ctx.font = '12px Roboto';
-    const nw = Math.round(ctx.measureText(maxSeries).width);
+    const nw = Math.round(ctx.measureText(tooltipValue).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
     ctx.restore();
 

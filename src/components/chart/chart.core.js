@@ -136,7 +136,9 @@ class EvChart {
     this.drawAxis();
     this.drawSeries();
     this.drawTip(hitInfo);
-    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    if (this.bufferCanvas) {
+      this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    }
   }
 
   /**
@@ -335,9 +337,9 @@ class EvChart {
    * @returns {object} chart size information
    */
   getChartDOMRect() {
-    const rect = this.chartDOM.getBoundingClientRect();
-    const width = rect.width || 10;
-    const height = rect.height || 10;
+    const rect = this.chartDOM?.getBoundingClientRect();
+    const width = rect?.width || 10;
+    const height = rect?.height || 10;
 
     this.setWidth(width);
     this.setHeight(height);
@@ -613,13 +615,18 @@ class EvChart {
    */
   clear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
-
-    this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
-      this.displayCanvas.height / this.clearRectRatio);
-    this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
-      this.bufferCanvas.height / this.clearRectRatio);
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-      this.overlayCanvas.height / this.clearRectRatio);
+    if (this.displayCanvas) {
+      this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
+        this.displayCanvas.height / this.clearRectRatio);
+    }
+    if (this.bufferCanvas) {
+      this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
+        this.bufferCanvas.height / this.clearRectRatio);
+    }
+    if (this.overlayCanvas) {
+      this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
+        this.overlayCanvas.height / this.clearRectRatio);
+    }
   }
 
   /**
