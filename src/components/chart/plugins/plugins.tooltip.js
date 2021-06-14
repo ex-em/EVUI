@@ -75,7 +75,7 @@ const modules = {
     // set tooltip canvas width (maxSeries name, label length comparison)
     const isHorizontal = !!this.options.horizontal;
     const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
-    const tooltipValue = label && label.length > maxSeries.length ? label : maxSeries;
+    const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
     ctx.save();
     ctx.font = '12px Roboto';
     const nw = Math.round(ctx.measureText(tooltipValue).width);
