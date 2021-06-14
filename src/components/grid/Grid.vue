@@ -618,7 +618,7 @@ export default {
           store = stores.searchStore;
           checkSize = checkInfo.checkedIndex.size;
         }
-        if (store.length > 0 && checkSize >= store.length) {
+        if (store.length && checkSize >= store.length) {
           checkInfo.isHeaderChecked = true;
         } else {
           checkInfo.isHeaderChecked = false;
