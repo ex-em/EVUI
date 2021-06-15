@@ -72,6 +72,7 @@ const modules = {
         series.groupIndex = gIdx;
         series.isExistGrp = true;
         series.bsId = prev;
+        series.bsIds = group.filter((item, idx) => item !== curr && sIdx > idx);
 
         if (!series.show) {
           interpolation--;

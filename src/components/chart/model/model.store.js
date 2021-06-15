@@ -22,13 +22,13 @@ const modules = {
         } else {
           type.forEach((sId) => {
             const series = this.seriesList[sId];
+            const sData = data[sId];
 
-            if (series && data[sId]) {
+            if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
-                const bs = this.seriesList[series.bsId];
-                series.data = this.addSeriesStackDS(data[sId], label, bs.data, series.stackIndex);
+                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
-                series.data = this.addSeriesDS(data[sId], label);
+                series.data = this.addSeriesDS(sData, label);
               }
               series.minMax = this.getSeriesMinMax(series.data);
             }
@@ -173,20 +173,39 @@ const modules = {
    * Take data and label to create stack data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
-   * @param {array}   base    stacked base data
+   * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
    *
    * @returns {array} data for each series
    */
-  addSeriesStackDS(data, label, base, sIdx = 0) {
+  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
+    const getBaseDataPosition = (baseIndex, dataIndex) => {
+      const nextBaseSeriesIndex = baseIndex - 1;
+      const baseSeries = this.seriesList[bsIds[baseIndex]];
+      const baseDataList = baseSeries.data;
+      const baseData = baseDataList[dataIndex];
+      const position = isHorizontal ? baseData?.x : baseData?.y;
+
+      if (position == null || !baseSeries.show) {
+        if (nextBaseSeriesIndex > -1) {
+          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex);
+        }
+
+        return 0;
+      }
+
+      return position;
+    };
+
     data.forEach((curr, index) => {
-      let bdata = base[index];
-      let odata = curr;
-      let ldata = label[index];
-      let gdata = curr;
+      const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
+      let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
+      let odata = curr; // current series original data
+      let ldata = label[index]; // label data
+      let gdata = curr; // current series data which added previous series's value
 
       if (bdata != null && ldata != null) {
         if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
@@ -194,12 +213,17 @@ const modules = {
           ldata = isHorizontal ? curr.y : curr.x;
         }
 
+        const oData = odata?.value ?? odata;
         if (sIdx > 0) {
-          bdata = isHorizontal ? bdata.x : bdata.y;
-          gdata = bdata + (odata?.value ?? odata);
+          if (oData != null) {
+            gdata = bdata + oData;
+          } else {
+            gdata = null;
+            bdata = 0;
+          }
         } else {
           bdata = 0;
-          gdata = odata;
+          gdata = oData;
         }
 
         sdata.push(this.addData(gdata, ldata, odata, bdata));
@@ -230,7 +254,7 @@ const modules = {
       }
 
       if (ldata !== null) {
-        sdata.push(this.addData(gdata, ldata));
+        sdata.push(this.addData(gdata, ldata, gdata));
       }
     });
 

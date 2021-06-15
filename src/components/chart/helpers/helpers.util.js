@@ -213,11 +213,11 @@ export default {
     };
 
     array.forEach((item) => {
-      if (minMax.max.length < item.length) {
+      if (minMax?.max?.length < item?.length) {
         minMax.max = item;
       }
 
-      if (minMax.min.length > item.length) {
+      if (minMax?.min?.length > item?.length) {
         minMax.min = item;
       }
     });
