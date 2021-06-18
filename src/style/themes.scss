@@ -37,6 +37,11 @@ $ev-themes: (
     grid-filter-add-background: #E5E5E5,
     grid-filter-add-label: #4C4C4C,
     grid-filter-add-split: #B2B2B2,
+
+    /* checkbox
+    -------------------------- */
+    checkbox-border: $color-black,
+    checkbox-icon: $color-white,
   ),
   dark: (
     /* primary color
@@ -63,5 +68,10 @@ $ev-themes: (
     -------------------------- */
     slider-mark-background: #B2B2B2,
     tooltip-background: #555555,
+
+    /* checkbox
+    -------------------------- */
+    checkbox-border: #A8A8A8,
+    checkbox-icon: #252525,
   ),
 ) !default;

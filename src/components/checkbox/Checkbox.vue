@@ -4,6 +4,7 @@
     :class="[
       { disabled, },
       { checked, },
+      { indeterminate, },
     ]"
   >
     <input
@@ -130,29 +131,106 @@ export default {
 </script>
 
 <style lang="scss">
+$checkbox-width: 12px;
+
 @import '../../style/index.scss';
 
 .ev-checkbox {
   margin-right: 30px;
   cursor: pointer;
   user-select: none;
+
   &-label {
-    padding-left: 5px;
+    position: relative;
+    padding-left: $checkbox-width + 5px;
+
+    &::before {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: $checkbox-width;
+      height: $checkbox-width;
+      box-sizing: border-box;
+      border-radius: 2px;
+      transform: translateY(-50%);
+      content: '';
+
+      @include evThemify() {
+        border: 1px solid evThemed('checkbox-border');
+      }
+    }
   }
   &-input {
-    cursor: pointer;
+    @include visible-hide();
   }
 }
 
+@include state('checked') {
+  .ev-checkbox-label {
+    &::before {
+      @include evThemify() {
+        border-color: evThemed('primary');
+        background-color: evThemed('primary');
+      }
+    }
+    &::after {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 3px;
+      height: 7px;
+      transform: rotate(45deg);
+      content: '';
+
+      @include evThemify() {
+        border-right: 2px solid evThemed('checkbox-icon');
+        border-bottom: 2px solid evThemed('checkbox-icon');
+      }
+    }
+  }
+}
+@include state('indeterminate') {
+  .ev-checkbox-label {
+    &::before {
+      @include evThemify() {
+        border-color: evThemed('primary');
+        background-color: evThemed('primary');
+      }
+    }
+    &::after {
+      position: absolute;
+      top: 50%;
+      left: 2px;
+      width: $checkbox-width - 4;
+      height: 2px;
+      border: none !important;
+      transform: translateY(-50%);
+      content: '';
+
+      @include evThemify() {
+        background-color: evThemed('checkbox-icon');
+      }
+    }
+  }
+}
 @include state('disabled') {
   .ev-checkbox-label {
+    cursor: not-allowed !important;
+
     @include evThemify() {
       color: evThemed('disabled');
     }
+    &::before {
+      @include evThemify() {
+        border: 1px solid evThemed('disabled');
+      }
+    }
   }
-  .ev-checkbox-input,
-  .ev-checkbox-label {
-    cursor: not-allowed !important;
+  &.checked .ev-checkbox-label::before {
+    @include evThemify() {
+      background-color: evThemed('disabled');
+    }
   }
 }
 @include state('type-button') {
@@ -189,12 +267,13 @@ export default {
       }
     }
   }
-  .ev-checkbox-input {
-    @include visible-hide();
-  }
   .ev-checkbox-label {
     display: inline-block;
     padding: 7px 12px;
+    &::before,
+    &::after {
+      content: none;
+    }
   }
 }
 </style>
