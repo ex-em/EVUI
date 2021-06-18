@@ -107,7 +107,7 @@ $radio-width: 12px;
       position: absolute;
       top: 50%;
       left: 0;
-      width: $radio-width;;
+      width: $radio-width;
       height: $radio-width;
       box-sizing: border-box;
       border-radius: $radio-width;
