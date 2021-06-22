@@ -5,7 +5,7 @@
         ref="rootMenuList"
         v-model:isShow="isShow"
         v-clickoutside="hide"
-        :class="className"
+        :class="customClass"
         :items="items"
         :style="menuStyle"
         :comp="comp"
@@ -43,7 +43,7 @@ export default {
         return true;
       },
     },
-    className: {
+    customClass: {
       type: String,
       default: '',
     },
