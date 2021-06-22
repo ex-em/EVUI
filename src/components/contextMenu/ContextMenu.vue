@@ -5,6 +5,7 @@
         ref="rootMenuList"
         v-model:isShow="isShow"
         v-clickoutside="hide"
+        :class="customClass"
         :items="items"
         :style="menuStyle"
         :comp="comp"
@@ -42,8 +43,10 @@ export default {
         return true;
       },
     },
-  },
-  emits: {
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   setup() {
     const {
