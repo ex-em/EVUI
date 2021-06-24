@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!!$slots.toolbar || !!option.count"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
@@ -213,8 +214,8 @@
                   <slot
                     :name="column.field"
                     :item="{
-                      row: row,
-                      column: column,
+                      row,
+                      column,
                       onRowDelete: onRowDelete,
                       onRowEdit: onRowEdit,
                       onDetailPopup: onDetailPopup,
