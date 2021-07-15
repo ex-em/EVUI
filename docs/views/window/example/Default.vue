@@ -17,7 +17,7 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Custom</p>
+    <p class="case-title">Nested</p>
     <ev-window
       v-model:visible="isVisible2"
       :title="'CUSTOM TITLE'"
