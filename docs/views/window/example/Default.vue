@@ -23,7 +23,6 @@
       :title="'CUSTOM TITLE'"
       :icon-class="'ev-icon-binder'"
       fullscreen
-      hide-scroll
     >
       <div>CUSTOM CONTENTS</div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -43,7 +42,6 @@
         :icon-class="'ev-icon-info2'"
         :width="'40%'"
         :height="'60%'"
-        :hide-scroll="true"
       >
         <template #header>
           <div>
@@ -96,11 +94,11 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Hide Scroll</p>
+    <p class="case-title">Block Hide Scroll</p>
     <ev-window
       v-model:visible="isVisible5"
       :title="'COMMON TITLE'"
-      :hide-scroll="true"
+      :hide-scroll="false"
     >
       <div>HIDE BODY SCROLL WITH CONTENTS</div>
     </ev-window>

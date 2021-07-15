@@ -35,4 +35,4 @@
 | fullscreen | Boolean | false | 전체 화면 여부 |
 | is-modal | Boolean | true | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
 | close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |
-| hide-scroll | Boolean | false | body 스크롤 lock 여부 |
+| hide-scroll | Boolean | true | body 스크롤 lock 여부 |
