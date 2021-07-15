@@ -46,7 +46,6 @@
           <div
             ref="windowContent"
             class="ev-window-content"
-            @wheel="onWheelContent"
           >
             <slot />
           </div>
@@ -108,7 +107,7 @@ export default {
     },
     hideScroll: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   emits: {
@@ -141,37 +140,26 @@ export default {
       emit('update:visible', false);
     };
 
+    const getScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
+
     const changeBodyCls = (isVisible) => {
+      const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
+      const bodyElem = document.body;
+
       if (isVisible) {
         if (props.hideScroll) {
-          document.body.classList.add('ev-window-scroll-lock');
+          if (!windowCount) {
+            const scrollWidth = getScrollWidth();
+            bodyElem.style.paddingRight = `${scrollWidth}px`;
+          }
+          bodyElem.classList.add('ev-window-scroll-lock');
         }
-      } else {
-        const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
-        if (windowCount === 1) {
-          document.body.classList.remove('ev-window-scroll-lock');
-        }
+      } else if (windowCount === 1) {
+        bodyElem.style.removeProperty('padding-right');
+        bodyElem.classList.remove('ev-window-scroll-lock');
       }
     };
 
-    const onWheelContent = (e) => {
-      const hasScroll = windowContent.value.scrollHeight > windowContent.value.clientHeight;
-      if (!hasScroll) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-      const isMeetTop = windowContent.value.scrollTop === 0;
-      const isMeetBottom = (windowContent.value.scrollHeight - windowContent.value.clientHeight)
-        === windowContent.value.scrollTop;
-      const isUpward = e.deltaY < 0;
-      const isDownward = e.deltaY > 0;
-
-      if ((isMeetBottom && isDownward) || (isMeetTop && isUpward)) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
 
     watch(
       () => props.visible,
@@ -181,7 +169,6 @@ export default {
     return {
       windowContent,
       closeWin,
-      onWheelContent,
     };
   },
 };
