@@ -21,13 +21,18 @@
 #### series
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
+  | show | Boolean |true | 표시 여부 |  |
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
-  | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
-  | point | Boolean | true | 선(line) 위에 값 위치 마다 점을 표시할지의 여부 |  |
-  | fill | Boolean | false | 선(line) 아래 부분의 영역에 색상을 채울지의 여부. area chart 전환 여부 |  |
+  | lineWidth | Number | 2 | 선(line) 두께  | |
   | color | Hex, RGB, RGBA Code(String) | COLOR[index] | Line 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
-  | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | Point 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | fill | Boolean | false | 선(line) 아래 부분의 영역에 색상을 채울지의 여부. area chart 전환 여부 |  |
+  | fillOpacity | Number | 0.4 | fill 영역의 투명도 | |
   | fillColor | Hex, RGB, RGBA Code(String) | COLOR[index] | Fill 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | point | Boolean | true | 선(line) 위에 값 위치 마다 점을 표시할지의 여부 |  |
+  | pointSize | Number | 3 | 점(Point)의 크기 |  |
+  | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | 점(Point) 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
+  | pointStyle | String | 'circle' | 점(Point) 모양 | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
+  | showLegend | Boolean | true | legend 표시 여부 | |
   
 #### data example
 ```
