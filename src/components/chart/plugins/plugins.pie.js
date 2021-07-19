@@ -58,11 +58,17 @@ const modules = {
           }
         }
       }
+
       ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#fff';
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.stroke();
+      if (series?.stroke?.show) {
+        ctx.lineWidth = series.stroke.lineWidth;
+        ctx.strokeStyle = series.stroke.color;
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else {
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      }
+
       ctx.closePath();
     }
   },
@@ -132,10 +138,16 @@ const modules = {
       }
 
       ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#fff';
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.stroke();
+
+      if (series?.stroke?.show) {
+        ctx.lineWidth = series.stroke.lineWidth;
+        ctx.strokeStyle = series.stroke.color;
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else {
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      }
+
       ctx.closePath();
     }
   },
@@ -143,9 +155,11 @@ const modules = {
   /**
    * Draw doughnut hole
    *
+   * @param {Object} series     chart series info
+   *
    * @returns {undefined}
    */
-  drawDoughnutHole() {
+  drawDoughnutHole(series) {
     const ctx = this.bufferCtx;
 
     const centerX = (this.chartRect.chartWidth / 2);
@@ -166,10 +180,16 @@ const modules = {
 
     // inner stroke
     ctx.beginPath();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = this.options.border;
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.stroke();
+
+    if (series?.stroke?.show) {
+      ctx.strokeStyle = series.stroke.color;
+      ctx.lineWidth = series.stroke.lineWidth;
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    } else {
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    }
+
     ctx.closePath();
 
     this.pieDataSet[this.pieDataSet.length - 1].ir = radius;

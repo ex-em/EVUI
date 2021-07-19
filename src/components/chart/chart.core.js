@@ -191,7 +191,7 @@ class EvChart {
           }
 
           if (this.options.doughnutHoleSize > 0) {
-            this.drawDoughnutHole();
+            this.drawDoughnutHole(series);
           }
           break;
         }

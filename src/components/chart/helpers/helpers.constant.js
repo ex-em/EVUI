@@ -64,6 +64,11 @@ export const BAR_OPTION = {
 export const PIE_OPTION = {
   show: true,
   showLegend: true,
+  stroke: {
+    show: false,
+    color: '#FFFFFF',
+    lineWidth: 2,
+  },
 };
 
 export const AXIS_OPTION = {
