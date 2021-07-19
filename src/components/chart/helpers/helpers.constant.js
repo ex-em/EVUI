@@ -65,7 +65,7 @@ export const PIE_OPTION = {
   show: true,
   showLegend: true,
   stroke: {
-    show: false,
+    show: true,
     color: '#FFFFFF',
     lineWidth: 2,
   },
