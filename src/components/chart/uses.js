@@ -93,10 +93,10 @@ const DEFAULT_DATA = {
 };
 
 export const useModel = () => {
-  const { props, emit } = getCurrentInstance();
+  const { emit } = getCurrentInstance();
 
-  const normalizedOptions = defaultsDeep({}, props.options, DEFAULT_OPTIONS);
-  const normalizedData = defaultsDeep(props.data, DEFAULT_DATA);
+  const getNormalizedOptions = options => defaultsDeep({}, options, DEFAULT_OPTIONS);
+  const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
   const eventListeners = {
     click: async (e) => {
@@ -115,8 +115,8 @@ export const useModel = () => {
 
   return {
     eventListeners,
-    normalizedData,
-    normalizedOptions,
+    getNormalizedData,
+    getNormalizedOptions,
   };
 };
 

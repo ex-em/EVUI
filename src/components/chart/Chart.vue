@@ -9,7 +9,7 @@
 
 <script>
   import { onMounted, onBeforeUnmount, watch } from 'vue';
-  import { cloneDeep, defaultsDeep, isEqual, debounce } from 'lodash-es';
+  import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
 
@@ -40,9 +40,12 @@
 
       const {
         eventListeners,
-        normalizedData,
-        normalizedOptions,
+        getNormalizedData,
+        getNormalizedOptions,
       } = useModel();
+
+      const normalizedData = getNormalizedData(props.data);
+      const normalizedOptions = getNormalizedOptions(props.options);
 
       const {
         wrapper,
@@ -71,8 +74,8 @@
         await createChart();
         await drawChart();
 
-        await watch(() => props.options, (curr) => {
-          const newOpt = defaultsDeep({}, curr, normalizedOptions);
+        await watch(() => props.options, (chartOpt) => {
+          const newOpt = getNormalizedOptions(chartOpt);
           evChart.options = cloneDeep(newOpt);
           evChart.update({
             updateSeries: false,
@@ -80,8 +83,8 @@
           });
         }, { deep: true });
 
-        await watch(() => props.data, (curr) => {
-          const newData = defaultsDeep({}, curr, normalizedData);
+        await watch(() => props.data, (chartData) => {
+          const newData = getNormalizedData(chartData);
           const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
           evChart.data = cloneDeep(newData);
           evChart.update({
