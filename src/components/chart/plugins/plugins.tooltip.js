@@ -105,12 +105,19 @@ const modules = {
     // set tooltipDOM's positions
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
-    this.tooltipDOM.style.left = mouseX > bodyWidth - contentsWidth - 20
-      ? `${mouseX - contentsWidth - 20}px`
-      : `${mouseX + 20}px`;
-    this.tooltipDOM.style.top = mouseY > bodyHeight - (titleHeight + contentsHeight) - 20
-      ? `${mouseY - (titleHeight + contentsHeight) - 20}px`
-      : `${mouseY + 20}px`;
+    const distanceMouseAndTooltip = 20;
+    const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
+    const maximumPosY = bodyHeight - (titleHeight + contentsHeight) - distanceMouseAndTooltip;
+    const expectedPosX = mouseX + distanceMouseAndTooltip;
+    const expectedPosY = mouseY + distanceMouseAndTooltip;
+    const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
+    const reversedPosY = mouseY - (titleHeight + contentsHeight) - distanceMouseAndTooltip;
+    this.tooltipDOM.style.left = expectedPosX > maximumPosX
+      ? `${reversedPosX}px`
+      : `${expectedPosX}px`;
+    this.tooltipDOM.style.top = expectedPosY > maximumPosY
+      ? `${reversedPosY}px`
+      : `${expectedPosY}px`;
   },
 
   /**
