@@ -126,13 +126,13 @@ const chartData = {
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
 
 ##### labelStyle
-| 이름 | 타입 | 디폴트 | 설명 |
-|-----|------|-------|-----|
-| fontSize | Number | 12 | 글자 크기 |
-| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 |
-| fontFamily | String | 'Roboto' | 폰트 | 
-| fitWidth | Boolean | false | Label Text Ellipsis 처리 |
-| fitDir | String | 'right' | Ellipsis 방향 |
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| fontSize | Number | 12 | 글자 크기 | |
+| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
+| fontFamily | String | 'Roboto' | 폰트 | |
+| fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
+| fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
   
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
