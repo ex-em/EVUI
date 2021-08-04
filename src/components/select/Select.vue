@@ -12,6 +12,7 @@
       <span
         v-if="!clearable || !isClearableIcon"
         class="ev-input-suffix"
+        @click="clickSelectInput"
       >
         <i
           class="ev-input-suffix-arrow ev-icon-s-arrow-down"
@@ -36,6 +37,7 @@
         <span
           v-if="!clearable || !isClearableIcon"
           class="ev-input-suffix"
+          @click="clickSelectInput"
         >
           <i
             class="ev-input-suffix-arrow ev-icon-s-arrow-down"
