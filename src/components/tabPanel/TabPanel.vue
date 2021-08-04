@@ -31,7 +31,7 @@ export default {
   },
   setup(props) {
     const evTabs = inject('evTabs', null);
-    const mv = computed(() => evTabs.ctx.mv);
+    const mv = computed(() => evTabs);
     const isSelected = computed(() => props.value === mv.value);
 
     return {
