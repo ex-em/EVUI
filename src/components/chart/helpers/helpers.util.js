@@ -224,4 +224,39 @@ export default {
 
     return minMax;
   },
+
+  /**
+   * Truncate the long string to short string with ellipsis until fitting maxWidth
+   * @param {string} str         target string
+   * @param {number} maxWidth    maximum string width on canvas
+   * @param {Object} ctx         canvas context
+   * @param {string} direction   left or right  (default: right)
+   */
+  truncateLabelWithEllipsis(str, maxWidth, ctx, direction = 'right') {
+    if (!str) {
+      return '';
+    }
+
+    if (!maxWidth) {
+      return str;
+    }
+
+    const ellipsis = '…';
+    const ellipsisWidth = ctx.measureText(ellipsis).width;
+
+    let testStr = str;
+    let testStrWidth = ctx.measureText(testStr).width;
+
+    if (testStrWidth <= maxWidth || testStrWidth <= ellipsisWidth) {
+      return str;
+    }
+
+    let len = testStr.length;
+    while (testStrWidth >= maxWidth - ellipsisWidth && len-- > 0) {
+      testStr = direction === 'right' ? testStr.substring(0, len) : testStr.substring(1, testStr.length);
+      testStrWidth = ctx.measureText(testStr).width;
+    }
+
+    return direction === 'right' ? testStr + ellipsis : ellipsis + testStr;
+  },
 };
