@@ -16,7 +16,7 @@
           <span class="item-title">
             스크롤 생성여부
           </span>
-          <ev-toggle v-model="isScrollable"/>
+          <ev-toggle v-model="useScrollbar"/>
         </div>
       </div>
 
@@ -111,7 +111,7 @@
   export default {
     setup() {
       const sortByValue = ref(true);
-      const isScrollable = ref(true);
+      const useScrollbar = ref(true);
       const maxWidth = ref(300);
       const maxHeight = ref(300);
       const useShadow = ref(false);
@@ -200,7 +200,7 @@
           fontColor,
           shadowOpacity,
           useShadow,
-          useScrollbar: isScrollable,
+          useScrollbar,
           maxWidth,
           maxHeight,
           textOverflow,
@@ -229,7 +229,7 @@
         chartData,
         chartOptions,
         sortByValue,
-        isScrollable,
+        useScrollbar,
         maxWidth,
         maxHeight,
         useShadow,
