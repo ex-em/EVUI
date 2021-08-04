@@ -98,12 +98,12 @@ const modules = {
           let line = '';
           for (let jx = 0; jx < name.length; jx++) {
             const char = name[jx];
-            const testText = `${line}${char}`;
-            if (ctx.measureText(testText).width > seriesNameSpaceWidth) {
+            const temp = `${line}${char}`;
+            if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
               line = char;
               textLineCnt += 1;
             } else {
-              line = testText;
+              line = temp;
             }
           }
         }
@@ -281,15 +281,15 @@ const modules = {
 
         for (let jx = 0; jx < name.length; jx++) {
           const char = name[jx];
-          const testText = `${line}${char}`;
+          const temp = `${line}${char}`;
 
-          if (ctx.measureText(testText).width > seriesNameSpaceWidth) {
+          if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
             ctx.fillText(line, xPos, yPosWithWrap);
             line = char;
             textLineCnt += 1;
             yPosWithWrap += TEXT_HEIGHT;
           } else {
-            line = testText;
+            line = temp;
           }
         }
         ctx.fillText(line, xPos, yPosWithWrap);

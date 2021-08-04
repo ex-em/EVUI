@@ -244,19 +244,19 @@ export default {
     const ellipsis = '…';
     const ellipsisWidth = ctx.measureText(ellipsis).width;
 
-    let testStr = str;
-    let testStrWidth = ctx.measureText(testStr).width;
+    let temp = str;
+    let tempWidth = ctx.measureText(temp).width;
 
-    if (testStrWidth <= maxWidth || testStrWidth <= ellipsisWidth) {
+    if (tempWidth <= maxWidth || tempWidth <= ellipsisWidth) {
       return str;
     }
 
-    let len = testStr.length;
-    while (testStrWidth >= maxWidth - ellipsisWidth && len-- > 0) {
-      testStr = direction === 'right' ? testStr.substring(0, len) : testStr.substring(1, testStr.length);
-      testStrWidth = ctx.measureText(testStr).width;
+    let len = temp.length;
+    while (tempWidth >= maxWidth - ellipsisWidth && len-- > 0) {
+      temp = direction === 'right' ? temp.substring(0, len) : temp.substring(1, temp.length);
+      tempWidth = ctx.measureText(temp).width;
     }
 
-    return direction === 'right' ? testStr + ellipsis : ellipsis + testStr;
+    return direction === 'right' ? temp + ellipsis : ellipsis + temp;
   },
 };
