@@ -26,14 +26,14 @@
             텍스트 오버플로우 처리
           </span>
           <ev-select
-              v-model="textOverflow"
-              :items="[{
-                name: 'wrap',
-                value: 'wrap',
-              }, {
-                name: 'ellipsis',
-                value: 'ellipsis',
-              }]"
+            v-model="textOverflow"
+            :items="[{
+              name: 'wrap',
+              value: 'wrap',
+            }, {
+              name: 'ellipsis',
+              value: 'ellipsis',
+            }]"
           />
         </div>
       </div>
@@ -44,22 +44,21 @@
             maxWidth
           </span>
           <ev-input-number
-              v-model="maxWidth"
-              :step="10"
-              :min="100"
-              :max="500"
+            v-model="maxWidth"
+            :step="10"
+            :min="100"
+            :max="500"
           />
         </div>
-
         <div class="row-item">
           <span class="item-title">
             maxHeight
           </span>
           <ev-input-number
-              v-model="maxHeight"
-              :step="10"
-              :min="100"
-              :max="500"
+            v-model="maxHeight"
+            :step="10"
+            :min="100"
+            :max="500"
           />
         </div>
       </div>
@@ -71,7 +70,6 @@
           </span>
           <ev-toggle v-model="useShadow"/>
         </div>
-
         <div class="row-item">
           <span class="item-title">
             그림자 투명도
@@ -92,7 +90,6 @@
           </span>
           <ev-text-field v-model="fontColor"/>
         </div>
-
         <div class="row-item">
           <span class="item-title">
             배경 색상
@@ -207,9 +204,7 @@
         },
       });
 
-
       let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
-
       const addRandomChartData = () => {
         timeValue = dayjs(timeValue).add(1, 'second');
         chartData.labels.push(dayjs(timeValue));
