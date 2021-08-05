@@ -28,7 +28,6 @@
         readonly
         :placeholder="computedPlaceholder"
         :disabled="disabled"
-        @change="changeMv"
         @click="clickSelectInput"
       />
     </template>
@@ -240,7 +239,7 @@ export default {
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
-    } = useDropdown({ mv });
+    } = useDropdown({ mv, changeMv });
 
     return {
       mv,
