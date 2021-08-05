@@ -49,8 +49,10 @@ const DEFAULT_OPTIONS = {
     useShadow: false,
     throttledMove: false,
     debouncedHide: false,
-    useScrollbar: false,
-    textOverflow: 'wrap',
+    scrollbar: {
+      use: false,
+      maxSeriesCount: 15,
+    },
   },
   indicator: {
     use: true,

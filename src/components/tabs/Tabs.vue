@@ -84,7 +84,7 @@
 <script>
 import {
   ref, reactive, computed,
-  provide, triggerRef,
+  provide, getCurrentInstance, triggerRef,
   onBeforeUpdate, nextTick, onUpdated,
 } from 'vue';
 
@@ -131,6 +131,9 @@ export default {
     change: [String, Number],
   },
   setup(props, { emit }) {
+    const instance = getCurrentInstance();
+    provide('evTabs', instance);
+
     const mv = computed({
       get: () => props.modelValue,
       set: (val) => {
@@ -138,8 +141,6 @@ export default {
         emit('change', val);
       },
     });
-
-    provide('evTabs', mv.value);
     const tabList = computed({
       get: () => props.panels,
       set: val => emit('update:panels', val),

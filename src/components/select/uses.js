@@ -82,11 +82,10 @@ export const useModel = () => {
 
   /**
    * 해당 컴포넌트의 v-model값이 변경(change)되는 이벤트
-   * @param e
    */
-  const changeMv = async (e) => {
+  const changeMv = async () => {
     await nextTick();
-    emit('change', mv.value, e);
+    emit('change', mv.value);
   };
 
   return {
@@ -102,7 +101,7 @@ export const useModel = () => {
 
 export const useDropdown = (param) => {
   const { props } = getCurrentInstance();
-  const { mv } = param;
+  const { mv, changeMv } = param;
 
   const isDropbox = ref(false);
   const filterTextRef = ref(props.filterText);
@@ -218,6 +217,7 @@ export const useDropdown = (param) => {
     }
     mv.value = val;
     isDropbox.value = false;
+    changeMv();
   };
   const multipleClickItem = (val) => {
     if (props.filterable) {

@@ -16,7 +16,7 @@
       first selectbox value : {{ selectVal1 }}
     </div>
     <div class="description">
-      change val : {{ selectEventVal.val }} / change e : {{ selectEventVal.e }}
+      change val : {{ selectEventVal.val }}
     </div>
   </div>
   <div class="case">
@@ -142,9 +142,8 @@ export default {
         value: `value${count}`,
       });
     };
-    const changeSelect1 = (val, e) => {
+    const changeSelect1 = (val) => {
       selectEventVal.val = val;
-      selectEventVal.e = e;
     };
 
     const selectVal3 = ref('value1');

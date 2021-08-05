@@ -12,53 +12,25 @@
           </span>
           <ev-toggle v-model="sortByValue"/>
         </div>
+      </div>
+
+      <div class="row">
         <div class="row-item">
           <span class="item-title">
             스크롤 생성여부
           </span>
-          <ev-toggle v-model="useScrollbar"/>
+          <ev-toggle v-model="isScrollable"/>
         </div>
-      </div>
 
-      <div class="row">
         <div class="row-item">
           <span class="item-title">
-            텍스트 오버플로우 처리
-          </span>
-          <ev-select
-            v-model="textOverflow"
-            :items="[{
-              name: 'wrap',
-              value: 'wrap',
-            }, {
-              name: 'ellipsis',
-              value: 'ellipsis',
-            }]"
-          />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title">
-            maxWidth
+            스크롤 생성 기준 개수
           </span>
           <ev-input-number
-            v-model="maxWidth"
-            :step="10"
-            :min="100"
-            :max="500"
-          />
-        </div>
-        <div class="row-item">
-          <span class="item-title">
-            maxHeight
-          </span>
-          <ev-input-number
-            v-model="maxHeight"
-            :step="10"
-            :min="100"
-            :max="500"
+            v-model="maxSeriesCount"
+            :step="1"
+            :min="1"
+            :max="Object.keys(chartData.series).length"
           />
         </div>
       </div>
@@ -70,6 +42,7 @@
           </span>
           <ev-toggle v-model="useShadow"/>
         </div>
+
         <div class="row-item">
           <span class="item-title">
             그림자 투명도
@@ -90,6 +63,7 @@
           </span>
           <ev-text-field v-model="fontColor"/>
         </div>
+
         <div class="row-item">
           <span class="item-title">
             배경 색상
@@ -108,14 +82,12 @@
   export default {
     setup() {
       const sortByValue = ref(true);
-      const useScrollbar = ref(true);
-      const maxWidth = ref(300);
-      const maxHeight = ref(300);
+      const isScrollable = ref(true);
+      const maxSeriesCount = ref(10);
       const useShadow = ref(false);
       const shadowOpacity = ref(0.25);
       const fontColor = ref('#000000');
       const backgroundColor = ref('rgb(210, 234, 227, 0.7)');
-      const textOverflow = ref('wrap');
 
       const chartData = reactive({
         series: {
@@ -139,7 +111,6 @@
           series18: { name: 'series#18', point: false },
           series19: { name: 'series#19', point: false },
           series20: { name: 'series#20', point: false },
-          series21: { name: 'series#21__long____long____long____long____long____long____long____long____long____long____long____long____long____long____long____long____long____long__(end)', point: false },
         },
         labels: [],
         data: {
@@ -163,7 +134,6 @@
           series18: [],
           series19: [],
           series20: [],
-          series21: [],
         },
       });
 
@@ -197,14 +167,16 @@
           fontColor,
           shadowOpacity,
           useShadow,
-          useScrollbar,
-          maxWidth,
-          maxHeight,
-          textOverflow,
+          scrollbar: {
+            use: isScrollable,
+            maxSeriesCount,
+          },
         },
       });
 
+
       let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+
       const addRandomChartData = () => {
         timeValue = dayjs(timeValue).add(1, 'second');
         chartData.labels.push(dayjs(timeValue));
@@ -224,14 +196,12 @@
         chartData,
         chartOptions,
         sortByValue,
-        useScrollbar,
-        maxWidth,
-        maxHeight,
+        isScrollable,
+        maxSeriesCount,
         useShadow,
         shadowOpacity,
         fontColor,
         backgroundColor,
-        textOverflow,
       };
     },
   };
@@ -246,15 +216,15 @@
   .row {
     display: flex;
     margin-top: 15px;
+    justify-content: space-between;
     .row-item {
       display: flex;
-      margin-right: 30px;
       .item-title {
         line-height: 33px;
         margin-right: 3px;
         min-width: 50px;
       }
-      .ev-text-field, .ev-input-number, .ev-select {
+      .ev-text-field, .ev-input-number {
         width: auto;
       }
     }

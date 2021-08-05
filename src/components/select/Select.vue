@@ -28,8 +28,8 @@
         readonly
         :placeholder="computedPlaceholder"
         :disabled="disabled"
-        @change="changeMv"
         @click="clickSelectInput"
+        @input="console.log('change!')"
       />
     </template>
     <template v-else>
@@ -240,7 +240,7 @@ export default {
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
-    } = useDropdown({ mv });
+    } = useDropdown({ mv, changeMv });
 
     return {
       mv,
