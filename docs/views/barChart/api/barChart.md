@@ -166,13 +166,11 @@ const chartData = {
 | throttledMove | Boolean | false | 데이터 조회 Throttling 처리 유무  | |
 | debouncedHide | Boolean | false | 좌표 이동 시 tooltip hide 여부  | |
 | sortByValue | Boolean | true | 값을 기준으로 정렬할지의 여부  | |
-| scrollbar | Object | ([상세](#scrollbar)) | 값을 기준으로 정렬할지의 여부  | |
+| useScrollbar | Boolean | false | 스크롤바 사용 여부  | |
+| maxHeight | Number |  | 툴팁의 최대 높이  | |
+| maxWidth | Number |  | 툴팁의 최대 너비  | |
+| textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
 
-##### scrollbar
-| 이름 | 타입 | 디폴트 | 설명 |
-|-----|------|-------|-----|
-| use | Boolean | false | 스크롤 자동 생성 여부 |
-| maxSeriesCount | Number | 15 | Series개수가 일정이상 넘어가면 스크롤바 생성|
 
 #### indicator
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

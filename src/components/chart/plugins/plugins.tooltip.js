@@ -3,6 +3,14 @@ import debounce from '@/common/utils.debounce';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
+const TITLE_HEIGHT = 30;
+const TEXT_HEIGHT = 14;
+const LINE_SPACING = 8;
+const COLOR_MARGIN = 16;
+const VALUE_MARGIN = 50;
+const SCROLL_WIDTH = 17;
+const FONT_STYLE = 'normal normal lighter 14px Roboto';
+
 const modules = {
   /**
    * Create tooltip DOM
@@ -53,65 +61,94 @@ const modules = {
     const ctx = this.tooltipCtx;
     const mouseX = e.pageX;
     const mouseY = e.pageY;
-
     const items = hitInfo.items;
     const [maxSeries, maxValue] = hitInfo.maxTip;
-
     const seriesKeys = Object.keys(items);
     const seriesLen = seriesKeys.length;
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
-    const lineSpacing = 8;
-    const colorMargin = 16;
-    const valueMargin = 50;
-    const textHeight = 14;
-    const titleHeight = 30;
-    const scrollWidth = 17;
     const opt = this.options.tooltip;
 
-    // calculate height and width of canvas in tooltip DOM
-    const calHeight = seriesCnt => boxPadding.t + (seriesCnt * textHeight)
-      + (seriesCnt * lineSpacing) + boxPadding.b;
 
-    // set tooltip canvas width (maxSeries name, label length comparison)
+    // calculate and decide width of canvas El(contentsWidth)
+    ctx.save();
+    ctx.font = FONT_STYLE;
     const isHorizontal = !!this.options.horizontal;
     const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
     const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
-    ctx.save();
-    ctx.font = '12px Roboto';
     const nw = Math.round(ctx.measureText(tooltipValue).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
-    ctx.restore();
+    const expectedContentsWidth = nw + vw + boxPadding.l + boxPadding.r
+      + COLOR_MARGIN + VALUE_MARGIN + SCROLL_WIDTH;
+    const contentsWidth = expectedContentsWidth > opt.maxWidth
+      ? opt.maxWidth
+      : expectedContentsWidth;
 
-    const contentsWidth = nw + vw + boxPadding.l + boxPadding.r
-      + colorMargin + valueMargin + scrollWidth;
-    let contentsHeight = calHeight(seriesLen);
 
-    // set tooltip's width / height
-    this.tooltipCanvas.width = (contentsWidth + 6) * this.pixelRatio;
-    this.tooltipCanvas.height = (contentsHeight + 5) * this.pixelRatio;
-    this.tooltipCanvas.style.width = `${contentsWidth + 6}px`;
-    this.tooltipCanvas.style.height = `${contentsHeight + 5}px`;
+    // Calculate height of canvas El(tooltip body El) with wrapped line count
+    let textLineCnt = opt.textOverflow === 'wrap' ? 0 : seriesLen;
 
-    if (opt.scrollbar.use && seriesLen > opt.scrollbar.maxSeriesCount) {
+    if (opt.textOverflow === 'wrap') {
+      const seriesNameSpaceWidth = opt.maxWidth - (Math.round(ctx.measureText(maxValue).width)
+        + boxPadding.l + boxPadding.r + COLOR_MARGIN + VALUE_MARGIN + SCROLL_WIDTH);
+
+      // count wrap line
+      const seriesNames = Object.values(items).map(s => s.name);
+      seriesNames.forEach((name) => {
+        if (ctx.measureText(name).width > seriesNameSpaceWidth) {
+          let line = '';
+          for (let jx = 0; jx < name.length; jx++) {
+            const char = name[jx];
+            const temp = `${line}${char}`;
+            if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
+              line = char;
+              textLineCnt += 1;
+            } else {
+              line = temp;
+            }
+          }
+        }
+        textLineCnt += 1;
+      });
+      ctx.restore();
+    }
+
+
+    // Calculate height of canvas El(tooltip body El) with useScrollbar, maxHeight option
+    const expectedContentsHeight = boxPadding.t
+      + (textLineCnt * TEXT_HEIGHT)
+      + (seriesLen * LINE_SPACING)
+      + boxPadding.b;
+
+    let contentsHeight;
+    if (opt.useScrollbar && expectedContentsHeight > opt.maxHeight) {
       this.tooltipBodyDOM.style.overflowY = 'auto';
-      contentsHeight = calHeight(opt.scrollbar.maxSeriesCount);
+      contentsHeight = opt.maxHeight;
     } else {
       this.tooltipBodyDOM.style.overflowY = 'hidden';
+      contentsHeight = expectedContentsHeight;
     }
-    this.tooltipHeaderDOM.style.height = `${titleHeight}px`;
-    this.tooltipDOM.style.height = `${titleHeight + contentsHeight}px`;
-    this.tooltipBodyDOM.style.height = `${contentsHeight}px`;
+
+    // set width / height to all DOM elements (canvas, tooltip(wrapper), header, body)
+    this.tooltipCanvas.width = contentsWidth * this.pixelRatio;
+    this.tooltipCanvas.height = expectedContentsHeight * this.pixelRatio;
+    this.tooltipCanvas.style.width = `${contentsWidth}px`;
+    this.tooltipCanvas.style.height = `${expectedContentsHeight}px`;
+    this.tooltipHeaderDOM.style.width = `${contentsWidth}px`;
+    this.tooltipHeaderDOM.style.height = opt.textOverflow === 'wrap' ? 'auto' : `${TITLE_HEIGHT}px`;
+    this.tooltipDOM.style.height = 'auto';
+    this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
+
 
     // set tooltipDOM's positions
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
     const distanceMouseAndTooltip = 20;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
-    const maximumPosY = bodyHeight - (titleHeight + contentsHeight) - distanceMouseAndTooltip;
+    const maximumPosY = bodyHeight - (TITLE_HEIGHT + contentsHeight) - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
-    const reversedPosY = mouseY - (titleHeight + contentsHeight) - distanceMouseAndTooltip;
+    const reversedPosY = mouseY - (TITLE_HEIGHT + contentsHeight) - distanceMouseAndTooltip;
     this.tooltipDOM.style.left = expectedPosX > maximumPosX
       ? `${reversedPosX}px`
       : `${expectedPosX}px`;
@@ -133,21 +170,21 @@ const modules = {
     const sId = hitInfo.hitId;
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
+    const [, maxValue] = hitInfo.maxTip;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
-    const lineSpacing = 8;
-    const colorMargin = 16;
-    const textHeight = 14;
-    const scrollWidth = 17;
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
 
-    // draw tooltip Title(axis label)
-    const title = this.options.horizontal
+    // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
+    this.tooltipHeaderDOM.textContent = this.options.horizontal
       ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
       : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
-    this.tooltipHeaderDOM.textContent = title;
+    if (opt.textOverflow) {
+      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
+    }
+
 
     // draw tooltip contents (series, value combination)
     let x = 2;
@@ -160,13 +197,13 @@ const modules = {
     ctx.scale(this.pixelRatio, this.pixelRatio);
 
     if (this.tooltipBodyDOM.style.overflowY === 'auto') {
-      boxPadding.r += scrollWidth;
+      boxPadding.r += SCROLL_WIDTH;
     }
 
     x += boxPadding.l;
     y += boxPadding.t;
 
-    ctx.font = 'normal normal lighter 14px Roboto';
+    ctx.font = FONT_STYLE;
 
     const seriesList = [];
     seriesKeys.forEach((seriesName) => {
@@ -193,6 +230,7 @@ const modules = {
       });
     }
 
+    let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
       const gdata = seriesList[ix].data;
       const color = seriesList[ix].color;
@@ -207,8 +245,7 @@ const modules = {
       }
 
       let itemX = x + 4;
-      let itemY = y + ((ix + 1) * textHeight);
-
+      let itemY = y + (textLineCnt * TEXT_HEIGHT);
       itemX += Util.aliasPixel(itemX);
       itemY += Util.aliasPixel(itemY);
 
@@ -225,16 +262,53 @@ const modules = {
         ctx.fillStyle = color;
       }
 
+      // 1. Draw series color
       ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
       ctx.fillStyle = opt.fontColor;
+
+      // 2. Draw series name
       ctx.textBaseline = 'Bottom';
-      ctx.fillText(name, (itemX + colorMargin), itemY);
+      const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
+        - boxPadding.l - boxPadding.r - COLOR_MARGIN - VALUE_MARGIN;
+      const xPos = itemX + COLOR_MARGIN;
+      const yPos = itemY;
+
+      if (seriesNameSpaceWidth > ctx.measureText(name).width) { // draw normally
+        ctx.fillText(name, xPos, yPos);
+      } else if (opt.textOverflow === 'wrap') { // draw with wrap
+        let line = '';
+        let yPosWithWrap = yPos;
+
+        for (let jx = 0; jx < name.length; jx++) {
+          const char = name[jx];
+          const temp = `${line}${char}`;
+
+          if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
+            ctx.fillText(line, xPos, yPosWithWrap);
+            line = char;
+            textLineCnt += 1;
+            yPosWithWrap += TEXT_HEIGHT;
+          } else {
+            line = temp;
+          }
+        }
+        ctx.fillText(line, xPos, yPosWithWrap);
+      } else { // draw with ellipsis
+        const shortSeriesName = Util.truncateLabelWithEllipsis(name, seriesNameSpaceWidth, ctx);
+        ctx.fillText(shortSeriesName, xPos, yPos);
+      }
+
       ctx.save();
+
+      // 3. Draw value
       ctx.textAlign = 'right';
       ctx.fillText(numberWithComma(value), this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
-      y += lineSpacing;
+
+      // 4. add lineSpacing
+      y += LINE_SPACING;
+      textLineCnt += 1;
     }
 
     ctx.restore();

@@ -129,7 +129,7 @@ const modules = {
       }
     };
 
-    if (this.options?.tooltip?.scrollbar?.use) {
+    if (this.options?.tooltip?.useScrollbar) {
       this.overlayCanvas.addEventListener('wheel', (e) => {
         const isTooltipVisible = this.tooltipDOM.style.display === 'block';
 
