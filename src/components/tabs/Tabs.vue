@@ -131,6 +131,11 @@ export default {
     change: [String, Number],
   },
   setup(props, { emit }) {
+    // 드래그 상태 여부 (dragstart ~ dragend)
+    const isDragState = ref(false);
+
+    const tabCloneList = ref([]);
+
     const mv = computed({
       get: () => props.modelValue,
       set: (val) => {
@@ -139,18 +144,17 @@ export default {
       },
     });
 
-    provide('evTabs', mv.value);
+    provide('evTabs', mv);
+
     const tabList = computed({
       get: () => props.panels,
       set: val => emit('update:panels', val),
     });
-    const tabCloneList = ref([]);
-    const isDrag = ref(false);
     const computedTabList = computed(() => {
       if (!props.draggable) {
         return tabList.value;
       }
-      if (!isDrag.value) {
+      if (!isDragState.value) {
         return tabList.value;
       }
       return tabCloneList.value;
@@ -297,7 +301,7 @@ export default {
     const selectIdxCls = idx => props.draggable && dragObj.idx === idx;
 
     /**
-     * 탭 드래그 시작 메소드, isDrag모드 시작
+     * 탭 드래그 시작 메소드, isDragState모드 시작
      * @param item - 선택한 아이템
      */
     const dragstartTab = (item, idx) => {
@@ -307,7 +311,7 @@ export default {
       tabCloneList.value = [...tabList.value];
       dragObj.item = item;
       dragObj.idx = idx;
-      isDrag.value = true;
+      isDragState.value = true;
     };
 
     /**
@@ -325,7 +329,7 @@ export default {
     };
 
     /**
-     * 탭 드래그 종료 메소드, 원래 tabList에 값을 넣고 isDrag모드를 종료
+     * 탭 드래그 종료 메소드, 원래 tabList에 값을 넣고 isDragState모드를 종료
      */
     const dragendTab = () => {
       if (!props.draggable) {
@@ -334,16 +338,13 @@ export default {
       tabList.value = [...tabCloneList.value];
       dragObj.item = {};
       dragObj.idx = null;
-      isDrag.value = false;
+      isDragState.value = false;
       tabCloneList.value.splice(0);
     };
 
     return {
       mv,
-      tabList,
-      tabCloneList,
       computedTabList,
-      isDrag,
       clickTab,
       removeTab,
 
