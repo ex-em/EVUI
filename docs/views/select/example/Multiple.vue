@@ -6,9 +6,13 @@
       :items="items1"
       placeholder="Please select values."
       multiple
+      @change="changeEvent"
     />
     <div class="description">
       first selectbox value : {{ selectVal1 }}
+    </div>
+    <div class="description">
+      change val : {{ changeVal }}
     </div>
   </div>
   <div class="case">
@@ -104,10 +108,16 @@ export default {
         value: 'value7',
       },
     ]);
+    const changeVal = ref();
+    const changeEvent = (val) => {
+      changeVal.value = val;
+    };
 
     return {
       selectVal1,
       items1,
+      changeVal,
+      changeEvent,
     };
   },
 };
