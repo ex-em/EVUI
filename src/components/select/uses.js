@@ -69,24 +69,24 @@ export const useModel = () => {
   };
 
   /**
+   * 해당 컴포넌트의 v-model값이 변경(change)되는 이벤트
+   */
+  const changeMv = async () => {
+    await nextTick();
+    emit('change', mv.value);
+  };
+
+  /**
    * multiple 모드인 경우 선택된 value를 mv에서 삭제하는 로직
    * @param val - tagWrapper에서 [x]클릭된 목록의 value
    */
-  const removeMv = (val) => {
+  const removeMv = async (val) => {
     if (!props.disabled) {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
       mv.value = [...mv.value];
+      await changeMv();
     }
-  };
-
-  /**
-   * 해당 컴포넌트의 v-model값이 변경(change)되는 이벤트
-   * @param e
-   */
-  const changeMv = async (e) => {
-    await nextTick();
-    emit('change', mv.value, e);
   };
 
   return {
@@ -102,7 +102,7 @@ export const useModel = () => {
 
 export const useDropdown = (param) => {
   const { props } = getCurrentInstance();
-  const { mv } = param;
+  const { mv, changeMv } = param;
 
   const isDropbox = ref(false);
   const filterTextRef = ref(props.filterText);
@@ -218,6 +218,7 @@ export const useDropdown = (param) => {
     }
     mv.value = val;
     isDropbox.value = false;
+    changeMv();
   };
   const multipleClickItem = (val) => {
     if (props.filterable) {
@@ -229,6 +230,7 @@ export const useDropdown = (param) => {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
     }
+    changeMv();
   };
   const clickItem = !props.multiple ? singleClickItem : multipleClickItem;
 
