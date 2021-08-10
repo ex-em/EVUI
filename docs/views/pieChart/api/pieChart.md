@@ -22,7 +22,6 @@
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
   | color | Hex, RGB, RGBA Code(String) | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
-  | stroke | Object | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션 | |
 
 #### data example
 ```
@@ -46,8 +45,8 @@ const chartData =
   | height | String / Number | '100%' | 차트의 높이 | '100%', '150px', 150 |
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
-  | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
-   
+  | pie | Object | ([상세](#pie)) | Pie 차트 전용 옵션 | |
+
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
@@ -69,6 +68,11 @@ const chartData =
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 
+#### pie
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| stroke | Object | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션 | |
+| doughnutHoleSize | number | 0 | 내부 hole 사이즈 | 0 ~ 1 |
 
 ### 3. resize-timeout
 - Default : 0
