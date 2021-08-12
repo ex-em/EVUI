@@ -45,8 +45,9 @@ const chartData =
   | height | String / Number | '100%' | 차트의 높이 | '100%', '150px', 150 |
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
-  | pie | Object | ([상세](#pie)) | Pie 차트 전용 옵션 | |
-
+  | doughnutHoleSize | number | 0 | 내부 hole 사이즈 | 0 ~ 1 |
+  | pieStroke | Object | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션 | |
+   
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
@@ -68,11 +69,6 @@ const chartData =
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 
-#### pie
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-| --- | ---- | ----- | --- | ----------|
-| stroke | Object | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션 | |
-| doughnutHoleSize | number | 0 | 내부 hole 사이즈 | 0 ~ 1 |
 
 ### 3. resize-timeout
 - Default : 0

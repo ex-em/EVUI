@@ -31,13 +31,11 @@ const DEFAULT_OPTIONS = {
   itemHighlight: true,
   seriesHighlight: true,
   useSelect: false,
-  pie: {
-    doughnutHoleSize: 0,
-    stroke: {
-      use: true,
-      lineWidth: 2,
-      color: '#FFFFFF',
-    },
+  doughnutHoleSize: 0,
+  pieStroke: {
+    use: true,
+    lineWidth: 2,
+    color: '#FFFFFF',
   },
   reverse: false,
   horizontal: false,

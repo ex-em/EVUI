@@ -68,9 +68,7 @@
         },
         sunburst: true,
         reverse: false,
-        pie: {
-          doughnutHoleSize: 0.4,
-        },
+        doughnutHoleSize: 0.4,
       };
 
       return {

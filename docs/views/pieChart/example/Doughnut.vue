@@ -50,9 +50,7 @@
           show: true,
           position: 'right',
         },
-        pie: {
-          doughnutHoleSize: 0.4,
-        },
+        doughnutHoleSize: 0.4,
       };
 
       return {

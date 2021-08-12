@@ -190,7 +190,7 @@ class EvChart {
             this.drawPie();
           }
 
-          if (this.options.pie?.doughnutHoleSize > 0) {
+          if (this.options.doughnutHoleSize > 0) {
             this.drawDoughnutHole(series);
           }
           break;
