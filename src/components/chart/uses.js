@@ -32,6 +32,11 @@ const DEFAULT_OPTIONS = {
   seriesHighlight: true,
   useSelect: false,
   doughnutHoleSize: 0,
+  pieStroke: {
+    use: true,
+    lineWidth: 2,
+    color: '#FFFFFF',
+  },
   reverse: false,
   horizontal: false,
   width: '100%',

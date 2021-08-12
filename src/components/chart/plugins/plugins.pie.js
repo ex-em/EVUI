@@ -9,6 +9,7 @@ const modules = {
     const ctx = this.bufferCtx;
     const chartRect = this.chartRect;
     const pieDataSet = this.pieDataSet;
+    const pieOption = this.options;
 
     let slice;
     let value;
@@ -17,15 +18,22 @@ const modules = {
     let endAngle;
     let series;
 
-    const centerX = chartRect.chartWidth / 2;
-    const centerY = chartRect.chartHeight / 2;
+    const centerX = chartRect.width / 2;
+    const centerY = chartRect.height / 2;
 
-    const innerRadius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    const innerRadius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(centerX, centerY);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
       const pie = pieDataSet[ix];
-      const radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      if (!pie) {
+        return;
+      }
+
+      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      if (pieOption?.pieStroke?.use) {
+        radius -= pieOption.pieStroke.lineWidth;
+      }
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
@@ -60,9 +68,9 @@ const modules = {
       }
 
       ctx.beginPath();
-      if (series?.stroke?.show) {
-        ctx.lineWidth = series.stroke.lineWidth;
-        ctx.strokeStyle = series.stroke.color;
+      if (pieOption?.pieStroke?.use) {
+        ctx.lineWidth = pieOption.pieStroke.lineWidth;
+        ctx.strokeStyle = pieOption.pieStroke.color;
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
         ctx.stroke();
       } else {
@@ -82,21 +90,29 @@ const modules = {
     const ctx = this.bufferCtx;
     const chartRect = this.chartRect;
     const pieDataSet = this.pieDataSet;
+    const pieOption = this.options;
 
     this.calculateAngle();
 
     let slice;
     let series;
 
-    const centerX = chartRect.chartWidth / 2;
-    const centerY = chartRect.chartHeight / 2;
+    const centerX = chartRect.width / 2;
+    const centerY = chartRect.height / 2;
 
-    const innerRadius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    const innerRadius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(centerX, centerY);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
       const pie = pieDataSet[ix];
-      const radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      if (!pie) {
+        return;
+      }
+
+      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      if (pieOption?.pieStroke?.use) {
+        radius -= pieOption.pieStroke.lineWidth;
+      }
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
@@ -139,9 +155,9 @@ const modules = {
 
       ctx.beginPath();
 
-      if (series?.stroke?.show) {
-        ctx.lineWidth = series.stroke.lineWidth;
-        ctx.strokeStyle = series.stroke.color;
+      if (pieOption?.pieStroke?.use) {
+        ctx.lineWidth = pieOption.pieStroke.lineWidth;
+        ctx.strokeStyle = pieOption.pieStroke.color;
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
         ctx.stroke();
       } else {
@@ -155,17 +171,16 @@ const modules = {
   /**
    * Draw doughnut hole
    *
-   * @param {Object} series     chart series info
-   *
    * @returns {undefined}
    */
-  drawDoughnutHole(series) {
+  drawDoughnutHole() {
     const ctx = this.bufferCtx;
+    const pieOption = this.options;
 
-    const centerX = (this.chartRect.chartWidth / 2);
-    const centerY = (this.chartRect.chartHeight / 2);
+    const centerX = this.chartRect.width / 2;
+    const centerY = this.chartRect.height / 2;
 
-    const radius = Math.min(centerX, centerY) * this.options.doughnutHoleSize;
+    const radius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
@@ -181,9 +196,9 @@ const modules = {
     // inner stroke
     ctx.beginPath();
 
-    if (series?.stroke?.show) {
-      ctx.strokeStyle = series.stroke.color;
-      ctx.lineWidth = series.stroke.lineWidth;
+    if (pieOption?.pieStroke?.use) {
+      ctx.strokeStyle = pieOption.pieStroke.color;
+      ctx.lineWidth = pieOption.pieStroke.lineWidth;
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.stroke();
     } else {
