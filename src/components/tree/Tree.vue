@@ -7,6 +7,7 @@
       :use-checkbox="useCheckbox"
       :expand-icon="expandIcon"
       :collapse-icon="collapseIcon"
+      :comp="component"
       @update-checked-info="updateCheckedInfo"
       @click-node="clickContent"
       @dblclick-node="dblClickContent"
@@ -69,6 +70,7 @@ export default {
     let allNodeInfo = [];
     const contextMenu = ref(null);
     let contextMenuFlag = false; // flag for showing contextMenu or not
+    const component = TreeNode;
 
     function updateTreeUp(nodeKey) {
       const parentKey = allNodeInfo[nodeKey].parent;
@@ -296,6 +298,7 @@ export default {
     return {
       treeNodeData,
       contextMenu,
+      component,
       updateCheckedInfo,
       clickContent,
       dblClickContent,
