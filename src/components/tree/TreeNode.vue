@@ -41,7 +41,8 @@
         </span>
       </div>
       <transition-group name="fade">
-        <tree-node
+        <component
+          :is="comp"
           v-for="(child, i) in childrenInfo"
           v-if="treeData.expand"
           :key="`${child.value}-${i}`"
@@ -49,6 +50,7 @@
           :use-checkbox="useCheckbox"
           :expand-icon="expandIcon"
           :collapse-icon="collapseIcon"
+          :comp="comp"
           @update-checked-info="emitCheckedInfo"
           @click-node="emitClickedContent"
           @dblclick-node="emitDblClickedContent"
@@ -81,6 +83,10 @@ export default {
     collapseIcon: {
       type: String,
       default: '',
+    },
+    comp: {
+      type: Object,
+      default: () => {},
     },
   },
   emits: {
