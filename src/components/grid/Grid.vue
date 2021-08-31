@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!!$slots.toolbar || !!option.count"
+    v-if="!!$slots.toolbar"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
@@ -18,26 +18,6 @@
         </slot>
       </template>
     </toolbar>
-    <!-- Count -->
-    <count>
-      <template v-if="!!option.count" #countWrapper>
-        <div class="grid-count">
-          <div style="font-weight: bold;">Total {{dbCount.get('total') || 0}}</div>
-          <template
-            v-for="(key) in dbCount"
-            :key="key"
-          >
-            <template v-if="key[0] !== 'total'">
-              <div
-                :class="`${key[0]}`"
-                style="width: 30px;"
-              ></div>
-              <div>{{key[1]}}</div>
-            </template>
-          </template>
-        </div>
-      </template>
-    </count>
   </div>
   <div
     ref="grid-wrapper"
@@ -277,7 +257,6 @@
 import { reactive, ref, toRefs, computed, watch, onMounted, getCurrentInstance } from 'vue';
 import FilterWindow from './grid.filter.window';
 import Toolbar from './grid.toolbar';
-import Count from './grid.count';
 import {
   commonFunctions,
   scrollEvent,
@@ -295,7 +274,6 @@ export default {
   components: {
     FilterWindow,
     Toolbar,
-    Count,
   },
   props: {
     columns: {
@@ -348,7 +326,7 @@ export default {
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
-    const highlightIdx = computed(() => (props.option.style?.highlight));
+    const highlightIdx = computed(() => (props.option.style?.highlight || -1));
     const rowMinHeight = props.option.rowMinHeight || 35;
     const elementInfo = reactive({
       body: null,
@@ -383,22 +361,6 @@ export default {
       }),
       orderedColumns: computed(() =>
         (props.columns.map((column, index) => ({ index, ...column })))),
-      dbCount: computed(() => {
-        const index = getColumnIndex('db-icon');
-        let totalCount = 0;
-        const result = stores.store.reduce((acc, c) => {
-          const item = c;
-          const cellValue = item[2][index];
-          if (acc.has(cellValue)) {
-            acc.set(cellValue, acc.get(cellValue) + 1);
-          } else {
-            acc.set(cellValue, 1);
-          }
-          acc.set('total', ++totalCount);
-          return acc;
-        }, new Map());
-        return new Map([...result.entries()].sort());
-      }),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -542,6 +504,12 @@ export default {
       },
     );
     watch(
+      () => props.selected,
+      (value) => {
+        selectInfo.selectedRow = value;
+      },
+    );
+    watch(
       () => checkInfo.useCheckbox.mode,
       () => {
         checkInfo.checkedRows = [];
@@ -575,32 +543,37 @@ export default {
       },
     );
     let timer = null;
-    const onSearch = (value) => {
+    const onSearch = (searchWord) => {
       if (timer) {
         clearTimeout(timer);
       }
       timer = setTimeout(() => {
         filterInfo.isSearch = false;
-        if (value) {
+        if (searchWord) {
           const filterStores = stores.store.filter((row) => {
             let isShow = false;
             for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
-              let cellData = row[2][ix];
-              const cellInfo = stores.orderedColumns[ix];
-              const type = cellInfo.type;
-              cellData = getConvertValue(type, cellData).toString();
-              // const renderInfo = cellInfo?.render;
-              // renderer, hide,  searchable 제외
-              if (!cellInfo?.hide && (cellInfo?.searchable === undefined || cellInfo?.searchable)) {
-                isShow = cellData.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-              }
-              if (isShow) {
-                break;
+              const column = stores.orderedColumns[ix] || {};
+              let columnValue = row[2][ix];
+              let columnType = column.type;
+              if (columnValue) {
+                if (typeof columnValue === 'object') {
+                  columnValue = columnValue[column.field];
+                }
+                if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
+                  if (!columnType) {
+                    columnType = 'string';
+                  }
+                  columnValue = getConvertValue(columnType, columnValue).toString();
+                  isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
+                  if (isShow) {
+                    break;
+                  }
+                }
               }
             }
             return isShow;
           });
-
           filterInfo.isSearch = true;
           stores.searchStore = JSON.parse(JSON.stringify(filterStores));
         } else {
@@ -728,10 +701,6 @@ export default {
 
 <style lang="scss" scoped>
   @import 'style/grid.scss';
-  .grid-count {
-    display: flex;
-    padding-bottom: 10px;
-  }
   .postgresql {
     background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
   }

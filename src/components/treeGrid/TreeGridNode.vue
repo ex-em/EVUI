@@ -63,6 +63,7 @@
           <!--Data Icon-->
           <span
             v-if="cellIndex === 0 && isDataIcon"
+            :title="node[column.field]"
             :class="{
               expand: node.expand,
               'ev-tree-toggle': true,
@@ -74,7 +75,7 @@
               <i></i>
             </span>
           </span>
-          {{node[column.field]}}
+          <span :title="node[column.field]">{{node[column.field]}}</span>
         </div>
       </td>
     </template>
@@ -137,7 +138,7 @@ export default {
     },
     highlightIndex: {
       type: Number,
-      default: 0,
+      default: -1,
     },
   },
   emits: {
