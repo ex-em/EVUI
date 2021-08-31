@@ -18,12 +18,11 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
-        customContextMenu: menuItems,
+        // customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
           border: borderMV,
         },
-        count: true,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"

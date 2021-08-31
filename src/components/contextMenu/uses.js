@@ -46,26 +46,28 @@ export const usePosition = () => {
     isShow.value = true;
     await nextTick();
     const menuListRect = rootMenuList.value?.$el?.children[0].getBoundingClientRect();
-    const menuListHeight = menuListRect.height;
-    const menuListWidth = menuListRect.width;
-    const docHeight = document.documentElement.clientHeight;
-    const docWidth = document.documentElement.clientWidth;
-    const RIGHT_BUFFER_PX = 20;
-    if (docHeight < e.clientY + menuListHeight) {
-      // dropTop
-      menuStyle.top = `${e.pageY - menuListHeight}px`;
-      if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
-        menuStyle.left = `${e.pageX - menuListWidth}px`;
+    if (menuListRect) {
+      const menuListHeight = menuListRect.height;
+      const menuListWidth = menuListRect.width;
+      const docHeight = document.documentElement.clientHeight;
+      const docWidth = document.documentElement.clientWidth;
+      const RIGHT_BUFFER_PX = 20;
+      if (docHeight < e.clientY + menuListHeight) {
+        // dropTop
+        menuStyle.top = `${e.pageY - menuListHeight}px`;
+        if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
+          menuStyle.left = `${e.pageX - menuListWidth}px`;
+        } else {
+          menuStyle.left = `${e.pageX}px`;
+        }
       } else {
-        menuStyle.left = `${e.pageX}px`;
-      }
-    } else {
-      // dropDown
-      menuStyle.top = `${e.pageY}px`;
-      if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
-        menuStyle.left = `${e.pageX - menuListWidth}px`;
-      } else {
-        menuStyle.left = `${e.pageX}px`;
+        // dropDown
+        menuStyle.top = `${e.pageY}px`;
+        if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
+          menuStyle.left = `${e.pageX - menuListWidth}px`;
+        } else {
+          menuStyle.left = `${e.pageX}px`;
+        }
       }
     }
   };

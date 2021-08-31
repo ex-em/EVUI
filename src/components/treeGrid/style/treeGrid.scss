@@ -136,6 +136,7 @@
   overflow-anchor: none;
   table {
     clear: both;
+    width: inherit;
     border-spacing: 0;
     border-collapse: collapse;
   }
@@ -158,14 +159,12 @@
     &.selected {
       @include evThemify() {
         background: evThemed('grid-row-selected') !important;
-        color: #0D0D0D !important;
-        font-size: 15px !important;
+        color: inherit !important;
       }
     }
     &.highlight {
       background: #5AB7FF;
       color: #FFFFFF;
-      font-size: 16px;
     }
   }
 
@@ -252,4 +251,9 @@
 
 .non-border {
   border: none !important;
+}
+
+.is-empty {
+  height: 30px;
+  text-align: center;
 }

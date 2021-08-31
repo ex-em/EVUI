@@ -91,7 +91,11 @@
               @expand-tree-data="handleExpand"
               @click-tree-data="onRowClick"
               @dbl-click-tree-data="onRowDblClick"
-            />
+            >
+            </tree-grid-node>
+            <tr v-if="!viewStore.length">
+              <td class="is-empty">No records</td>
+            </tr>
           </tbody>
         </table>
         <!--vScroll Bottom-->
