@@ -87,12 +87,16 @@ const modules = {
         return;
       }
 
-      const colorDOM = targetDOM.getElementsByClassName('ev-chart-legend-color')[0];
-      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
-      const isActive = !colorDOM.className.includes('inactive');
-      const series = nameDOM.series;
+      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
+      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
+      const isActive = !colorDOM?.className.includes('inactive');
+      const series = nameDOM?.series;
 
       if (isActive && this.seriesInfo.count === 1) {
+        return;
+      }
+
+      if (!colorDOM || !nameDOM) {
         return;
       }
 
@@ -232,6 +236,10 @@ const modules = {
   resetLegend() {
     const legendDOM = this.legendBoxDOM;
 
+    if (!legendDOM) {
+      return;
+    }
+
     while (legendDOM.hasChildNodes()) {
       legendDOM.removeChild(legendDOM.firstChild);
     }
@@ -292,15 +300,19 @@ const modules = {
    */
   setLegendPosition() {
     const opt = this.options;
-    const position = opt.legend.position;
-    const wrapperStyle = this.wrapperDOM.style;
-    const legendStyle = this.legendDOM.style;
-    const boxStyle = this.legendBoxDOM.style;
-    const resizeStyle = this.resizeDOM.style;
+    const position = opt?.legend?.position;
+    const wrapperStyle = this.wrapperDOM?.style;
+    const legendStyle = this.legendDOM?.style;
+    const boxStyle = this.legendBoxDOM?.style;
+    const resizeStyle = this.resizeDOM?.style;
 
     let chartRect;
-    const title = opt.title.show ? opt.title.height : 0;
-    const top = title + opt.legend.height;
+    const title = opt?.title?.show ? opt?.title?.height : 0;
+    const top = title + opt?.legend?.height;
+
+    if (!wrapperStyle || !legendStyle) {
+      return;
+    }
 
     switch (position) {
       case 'top':
@@ -413,8 +425,16 @@ const modules = {
    * @returns {undefined}
    */
   updateLegendContainerSize() {
-    const opt = this.options.legend;
+    if (!this.options || !this.legendBoxDOM) {
+      return;
+    }
+
+    const opt = this.options?.legend;
     const container = this.legendBoxDOM.getElementsByClassName('ev-chart-legend-container');
+
+    if (!container) {
+      return;
+    }
 
     for (let ix = 0; ix < container.length; ix++) {
       if (opt.position === 'top' || opt.position === 'bottom') {
@@ -571,6 +591,10 @@ const modules = {
    * @returns {undefined}
    */
   showLegend() {
+    if (!this.resizeDOM || !this.legendDOM) {
+      return;
+    }
+
     this.resizeDOM.style.display = 'block';
     this.legendDOM.style.display = 'block';
   },
@@ -582,10 +606,14 @@ const modules = {
    */
   hideLegend() {
     const opt = this.options;
-    const wrapperStyle = this.wrapperDOM.style;
-    const resizeStyle = this.resizeDOM.style;
-    const legendStyle = this.legendDOM.style;
-    const title = opt.title.show ? opt.title.height : 0;
+    const wrapperStyle = this.wrapperDOM?.style;
+    const resizeStyle = this.resizeDOM?.style;
+    const legendStyle = this.legendDOM?.style;
+    const title = opt?.title?.show ? opt?.title?.height : 0;
+
+    if (resizeStyle || legendStyle || wrapperStyle) {
+      return;
+    }
 
     resizeStyle.display = 'none';
     legendStyle.display = 'none';
