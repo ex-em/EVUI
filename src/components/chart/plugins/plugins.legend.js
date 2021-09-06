@@ -611,7 +611,7 @@ const modules = {
     const legendStyle = this.legendDOM?.style;
     const title = opt?.title?.show ? opt?.title?.height : 0;
 
-    if (resizeStyle || legendStyle || wrapperStyle) {
+    if (!resizeStyle || !legendStyle || !wrapperStyle) {
       return;
     }
 
