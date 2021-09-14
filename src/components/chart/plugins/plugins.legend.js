@@ -258,6 +258,11 @@ const modules = {
 
     containerDOM.className = 'ev-chart-legend-container';
     colorDOM.className = 'ev-chart-legend-color';
+
+    if (series.type === 'line' && series.point) {
+      colorDOM.className += '--point-line';
+    }
+
     nameDOM.className = 'ev-chart-legend-name';
 
     nameDOM.series = series;

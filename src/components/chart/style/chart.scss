@@ -49,6 +49,22 @@
   transform: translate(0, -50%);
   width: 18px;
   height: 4px;
+
+  &--point-line {
+    @extend .ev-chart-legend-color;
+
+    &::after {
+      display: inline-block;
+      position: absolute;
+      top: -2px;
+      left: 5px;
+      width: 8px;
+      height: 8px;
+      content: ' ';
+      border-radius: 50%;
+      background-color: inherit;
+    }
+  }
 }
 
 .ev-chart-legend-name {
