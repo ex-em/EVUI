@@ -44,7 +44,6 @@
 
 | 이름 | 파라미터 | 설명 |
 | ---- | ------- | ---- |
-| change | newValue | <토글> 내 v-model 변화 이벤트 감지 |
 | mousedown | clickedInfo | 드래그 및 리사이즈를 위한 mousedown 이벤트 감지 |
 | mousedown-mouseup | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mouseup 이벤트 감지 |
 | mousedown-mousemove | clickedInfo | 드래그 및 리사이즈를 위한 mousemove 이벤트 감지 |
