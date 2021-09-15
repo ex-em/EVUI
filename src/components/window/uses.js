@@ -57,7 +57,14 @@ const useModel = () => {
 
     return result || 0;
   };
+
   // set base style
+  const basePosition = reactive({});
+  const baseStyle = computed(() => ({
+    ...props.style,
+    ...basePosition,
+  }));
+
   const getPositionInfo = (position, winSize, compSize) => {
     if (props.fullscreen) {
       return {
@@ -78,10 +85,11 @@ const useModel = () => {
       tempPosition = Math.floor((100 - removePixel(compSize)) / 2);
     }
 
+    const size = position === 'top' ? 'height' : 'width';
     if (tempPosition > 0) {
       styleObj[position] = tempUnit ? `${tempPosition}${tempUnit}` : `${tempPosition}px`;
+      styleObj[size] = compSize;
     } else {
-      const size = position === 'top' ? 'height' : 'width';
       styleObj[position] = 0;
       styleObj[size] = '100%';
     }
@@ -89,7 +97,7 @@ const useModel = () => {
     return styleObj;
   };
 
-  const baseStyle = computed(() => {
+  const setBasePosition = () => {
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
     const evWinWidth = props.style?.width ?? Math.floor(winWidth / 2);
@@ -98,14 +106,11 @@ const useModel = () => {
     const tempTop = getPositionInfo('top', winHeight, evWinHeight);
     const tempLeft = getPositionInfo('left', winWidth, evWinWidth);
 
-    return {
-      position: 'fixed',
-      ...props.style,
-      ...tempTop,
-      ...tempLeft,
-    };
-  },
-  );
+    basePosition.width = tempLeft.width;
+    basePosition.height = tempTop.height;
+    basePosition.top = tempTop.top;
+    basePosition.left = tempLeft.left;
+  };
 
   // close window
   const closeWin = (from) => {
@@ -137,7 +142,12 @@ const useModel = () => {
 
   watch(
     () => props.visible,
-    newVal => changeBodyCls(newVal),
+    (newVal) => {
+      changeBodyCls(newVal);
+      if (newVal) {
+        setBasePosition();
+      }
+    },
   );
 
   return {
@@ -162,6 +172,7 @@ const useMouseEvent = (param) => {
     removePixel,
   } = param;
 
+  const draggingMinSize = 30;
   const grabbingBorderSize = 5;
   const dragStyle = reactive({});
   const clickedInfo = reactive({
@@ -220,7 +231,6 @@ const useMouseEvent = (param) => {
     let height;
     let tMinWidth;
     let tMinHeight;
-    // let tHeaderHeight;
     const windowEl = windowRef.value;
     const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -361,11 +371,30 @@ const useMouseEvent = (param) => {
     clickedInfo.state = 'mousedown-mousemove';
 
     if (props.draggable && clickedInfo.pressedSpot === 'header') {
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
       const diffTop = clickedInfo.clientY - e.clientY;
       const diffLeft = clickedInfo.clientX - e.clientX;
 
-      dragStyle.top = `${clickedInfo.top + -diffTop}px`;
-      dragStyle.left = `${clickedInfo.left + -diffLeft}px`;
+      let tempTop = clickedInfo.top + -diffTop;
+      let tempLeft = clickedInfo.left + -diffLeft;
+
+      if (tempTop < 0) {
+        tempTop = 0;
+      } else if (tempTop > windowHeight - draggingMinSize) {
+        tempTop = Math.floor(windowHeight - draggingMinSize);
+      }
+
+      if (tempLeft < -(clickedInfo.width - draggingMinSize)) {
+        tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
+      } else if (tempLeft > windowWidth - draggingMinSize) {
+        tempLeft = Math.floor(windowWidth - draggingMinSize);
+      }
+
+      setDragStyle({
+        top: `${tempTop}px`,
+        left: `${tempLeft}px`,
+      });
     } else if (props.resizable && clickedInfo.pressedSpot === 'border') {
       resizeWindow(e);
     }

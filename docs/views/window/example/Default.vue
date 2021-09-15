@@ -219,10 +219,10 @@ export default {
       isVisible8.value = true;
     };
 
-    const mousedown = (...rest) => console.log('mousedown', rest);
-    const mouseup = (...rest) => console.log('mousedown-mouseup', rest);
-    const mousemove = (...rest) => console.log('mousedown-mousemove', rest);
-    const resize = (...rest) => console.log('resize', rest);
+    const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
+    const mouseup = event => console.log('mousedown-mouseup', event);
+    const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
+    const resize = (event, positionInfo) => console.log('resize', event, positionInfo);
 
     return {
       isVisible1,

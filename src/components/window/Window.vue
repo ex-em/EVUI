@@ -24,8 +24,8 @@
             ...baseStyle,
             ...dragStyle,
           }"
-          @mousedown="startDrag"
-          @mousemove="moveMouse"
+          @mousedown.prevent="startDrag"
+          @mousemove.prevent="moveMouse"
         >
           <div
             v-if="$slots.header || iconClass || title"
