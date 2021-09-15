@@ -780,7 +780,6 @@ export const storeEvent = (params) => {
       const store = [];
       let checked;
       let selected = false;
-
       if (makeIndex) {
         let hasUnChecked = false;
 
@@ -805,11 +804,9 @@ export const storeEvent = (params) => {
         checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
         stores.originStore = store;
       }
-
       if (filterInfo.isFiltering) {
         setFilter();
       }
-
       if (sortInfo.sortField) {
         setSort();
       }
