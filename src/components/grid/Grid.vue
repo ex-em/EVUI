@@ -443,6 +443,7 @@ export default {
       stores,
       sortInfo,
       filterInfo,
+      elementInfo,
       setSort,
       setFilter,
       updateVScroll,

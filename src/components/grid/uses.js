@@ -1,4 +1,4 @@
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, nextTick } from 'vue';
 import { isEqual, uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
@@ -114,7 +114,7 @@ export const scrollEvent = (params) => {
     const isHorizontal = !(scrollLeft === lastLeft);
     const isVertical = !(scrollTop === lastTop);
 
-    if (isVertical) {
+    if (isVertical && bodyEl.clientHeight) {
       updateVScroll();
     }
 
@@ -236,7 +236,9 @@ export const resizeEvent = (params) => {
     }
 
     calculatedColumn();
-    updateVScroll();
+    if (elementInfo.body?.clientHeight) {
+      updateVScroll();
+    }
   };
   /**
    * column resize 이벤트를 처리한다.
@@ -762,6 +764,7 @@ export const storeEvent = (params) => {
     stores,
     sortInfo,
     filterInfo,
+    elementInfo,
     setSort,
     setFilter,
     updateVScroll,
@@ -773,44 +776,47 @@ export const storeEvent = (params) => {
    * @param {boolean} makeIndex - 인덱스 생성 유무
    */
   const setStore = (value, makeIndex = true) => {
-    const store = [];
-    let checked;
-    let selected = false;
+    nextTick(() => {
+      const store = [];
+      let checked;
+      let selected = false;
 
-    if (makeIndex) {
-      let hasUnChecked = false;
+      if (makeIndex) {
+        let hasUnChecked = false;
 
-      for (let ix = 0; ix < value.length; ix++) {
-        checked = props.checked.includes(value[ix]);
-        if (!checked) {
-          hasUnChecked = true;
+        for (let ix = 0; ix < value.length; ix++) {
+          checked = props.checked.includes(value[ix]);
+          if (!checked) {
+            hasUnChecked = true;
+          }
+
+          if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
+            selectInfo.selectedRow = value[ix];
+            selected = true;
+          }
+
+          store.push([ix, checked, value[ix]]);
         }
 
-        if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
-          selectInfo.selectedRow = value[ix];
-          selected = true;
+        if (!selected) {
+          selectInfo.selectedRow = [];
         }
 
-        store.push([ix, checked, value[ix]]);
+        checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
+        stores.originStore = store;
       }
 
-      if (!selected) {
-        selectInfo.selectedRow = [];
+      if (filterInfo.isFiltering) {
+        setFilter();
       }
 
-      checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
-      stores.originStore = store;
-    }
-
-    if (filterInfo.isFiltering) {
-      setFilter();
-    }
-
-    if (sortInfo.sortField) {
-      setSort();
-    }
-
-    updateVScroll();
+      if (sortInfo.sortField) {
+        setSort();
+      }
+      if (elementInfo.body?.clientHeight) {
+        updateVScroll();
+      }
+    });
   };
   /**
    * 컴포넌트의 변경 데이터를 store에 업데이트한다.
