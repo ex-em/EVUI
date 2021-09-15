@@ -1,12 +1,11 @@
 
->### Desc
+### Desc
  - 태그는 &lt;ev-window&gt;(이하 <윈도우>)로 정의
 
 ```
 <ev-window
     v-mode:visible="Boolean값"
     :title="'타이틀 변수'"
-    :width="'00%'"
     :icon-class="'아이콘 클래스명'"
 >
     내용
@@ -24,7 +23,7 @@
  
 
 
->### Props
+### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
 | v-mode:visible | Boolean | false | <윈도우>의 보임 여부, 양방향 바인딩 | |
@@ -36,3 +35,41 @@
 | is-modal | Boolean | true | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
 | close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |
 | hide-scroll | Boolean | true | body 스크롤 lock 여부 |
+| draggable | Boolean | false | window 헤더를 통한 창 드래그 이동 여부 |
+| resizable | Boolean | false | 마우스 드래그 동작으로 window 크기 조절 여부 |
+| maximizable | Boolean | false | 우측상단 아이콘을 통한 최대화 여부 |
+
+
+### Event
+
+| 이름 | 파라미터 | 설명 |
+| ---- | ------- | ---- |
+| change | newValue | <토글> 내 v-model 변화 이벤트 감지 |
+| mousedown | clickedInfo | 드래그 및 리사이즈를 위한 mousedown 이벤트 감지 |
+| mousedown-mouseup | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mouseup 이벤트 감지 |
+| mousedown-mousemove | clickedInfo | 드래그 및 리사이즈를 위한 mousemove 이벤트 감지 |
+| resize | MouseEvent 객체, positionInfo | 리사이즈를 위한 mousemove 이벤트 감지 |
+
+##### clickedInfo
+```
+{
+    state: '',         // '', 'mousedown', 'mousedown-mousemove'
+    pressedSpot: '',   // '', 'header', 'border'
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    clientX: 0,
+    clientY: 0,
+}
+```
+
+##### positionInfo
+```
+{
+    top: 0,
+    left: 0, 
+    width: 0,
+    height: 0, 
+}
+```
