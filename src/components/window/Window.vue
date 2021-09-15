@@ -104,6 +104,14 @@ export default {
       type: String,
       default: '',
     },
+    width: {
+      type: [String, Number],
+      default: '50vw',
+    },
+    height: {
+      type: [String, Number],
+      default: '50vh',
+    },
     minWidth: {
       type: [String, Number],
       default: 150,
@@ -111,10 +119,6 @@ export default {
     minHeight: {
       type: [String, Number],
       default: 150,
-    },
-    style: {
-      type: Object,
-      default: () => {},
     },
     fullscreen: {
       type: Boolean,
@@ -160,8 +164,8 @@ export default {
       maximizableIcon,
       baseStyle,
       closeWin,
-      numberToPixel,
-      removePixel,
+      numberToUnit,
+      removeUnit,
     } = useModel();
 
     const {
@@ -173,8 +177,8 @@ export default {
       windowRef,
       headerRef,
       isFullExpandWindow,
-      numberToPixel,
-      removePixel,
+      numberToUnit,
+      removeUnit,
     });
 
     return {
