@@ -18,11 +18,18 @@
           @wheel.stop.prevent="() => {}"
         />
         <div
+          ref="windowRef"
           :class="['ev-window', windowClass, { fullscreen: !!fullscreen }]"
-          :style="style"
+          :style="{
+            ...baseStyle,
+            ...dragStyle,
+          }"
+          @mousedown.prevent="startDrag"
+          @mousemove.prevent="moveMouse"
         >
           <div
             v-if="$slots.header || iconClass || title"
+            ref="headerRef"
             class="ev-window-header"
           >
             <template v-if="$slots.header">
@@ -43,10 +50,7 @@
               </p>
             </template>
           </div>
-          <div
-            ref="windowContent"
-            class="ev-window-content"
-          >
+          <div class="ev-window-content">
             <slot />
           </div>
           <div
@@ -55,12 +59,23 @@
           >
             <slot name="footer" />
           </div>
-          <span
-            class="ev-window-close"
-            @click="closeWin"
-          >
-            <i class="ev-icon-close"/>
-          </span>
+          <div class="ev-window-top-right-icon">
+            <span
+              v-if="maximizable && !fullscreen"
+              class="ev-window-maximizable"
+              @click="clickExpandBtn"
+            >
+              <i
+                :class="maximizableIcon"
+              />
+            </span>
+            <span
+              class="ev-window-close"
+              @click="closeWin"
+            >
+              <i class="ev-icon-close"/>
+            </span>
+          </div>
         </div>
       </div>
     </transition>
@@ -68,7 +83,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { useModel, useMouseEvent } from './uses';
 
 export default {
   name: 'EvWindow',
@@ -88,6 +103,14 @@ export default {
     iconClass: {
       type: String,
       default: '',
+    },
+    minWidth: {
+      type: [String, Number],
+      default: 150,
+    },
+    minHeight: {
+      type: [String, Number],
+      default: 150,
     },
     style: {
       type: Object,
@@ -109,66 +132,62 @@ export default {
       type: Boolean,
       default: true,
     },
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
+    resizable: {
+      type: Boolean,
+      default: false,
+    },
+    maximizable: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: {
-    'update:visible': [Boolean],
-  },
-  setup(props, { emit }) {
-    /**
-     * body에 ev-window-modal DIV를 append하는 로직
-     */
-    let root = document.getElementById('ev-window-modal');
-    const initWrapperDiv = () => {
-      if (!root) {
-        const rootDiv = document.createElement('div');
-        rootDiv.id = 'ev-window-modal';
-        document.body.appendChild(rootDiv);
-        root = document.getElementById('ev-window-modal');
-      }
-    };
-    initWrapperDiv();
+  emits: [
+    'update:visible',
+    'mousedown',
+    'mousedown-mouseup',
+    'mousedown-mousemove',
+    'resize',
+  ],
+  setup() {
+    const {
+      windowRef,
+      headerRef,
+      isFullExpandWindow,
+      maximizableIcon,
+      baseStyle,
+      closeWin,
+      numberToPixel,
+      removePixel,
+    } = useModel();
 
-    const windowContent = ref(null);
-
-    /**
-     * [x] 클릭 시 닫는 기능
-     */
-    const closeWin = (from) => {
-      if (from === 'layer' && !props.closeOnClickModal) {
-        return;
-      }
-      emit('update:visible', false);
-    };
-
-    const getScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
-
-    const changeBodyCls = (isVisible) => {
-      const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
-      const bodyElem = document.body;
-
-      if (isVisible) {
-        if (props.hideScroll) {
-          if (!windowCount) {
-            const scrollWidth = getScrollWidth();
-            bodyElem.style.paddingRight = `${scrollWidth}px`;
-          }
-          bodyElem.classList.add('ev-window-scroll-lock');
-        }
-      } else if (windowCount === 1) {
-        bodyElem.style.removeProperty('padding-right');
-        bodyElem.classList.remove('ev-window-scroll-lock');
-      }
-    };
-
-
-    watch(
-      () => props.visible,
-      newVal => changeBodyCls(newVal),
-    );
+    const {
+      dragStyle,
+      startDrag,
+      moveMouse,
+      clickExpandBtn,
+    } = useMouseEvent({
+      windowRef,
+      headerRef,
+      isFullExpandWindow,
+      numberToPixel,
+      removePixel,
+    });
 
     return {
-      windowContent,
+      windowRef,
+      headerRef,
+      baseStyle,
+      dragStyle,
+      maximizableIcon,
+
       closeWin,
+      startDrag,
+      moveMouse,
+      clickExpandBtn,
     };
   },
 };
@@ -195,14 +214,12 @@ export default {
 
   display: flex;
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 0;
+  left: 0;
   width: 50vw;
   height: 50vh;
   max-width: 100%;
   max-height: 100%;
-  margin-top: -25vh;
-  margin-left: -25vw;
   flex-direction: column;
   box-sizing: border-box;
   border-radius: $default-radius;
@@ -254,11 +271,20 @@ export default {
     margin-right: $padding-horizontal;
   }
 
-  &-close {
+  &-top-right-icon {
     position: absolute;
     top: $padding-vertical;
     right: $padding-horizontal;
-    cursor: pointer;
+    > span {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      margin-left: 8px;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
   }
 }
 </style>

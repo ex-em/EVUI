@@ -111,6 +111,67 @@
       </button>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Draggable</p>
+    <ev-window
+      v-model:visible="isVisible6"
+      :title="'DRAGGABLE WINDOW'"
+      draggable
+      @mousedown="mousedown"
+      @mousedown-mouseup="mouseup"
+      @mousedown-mousemove="mousemove"
+    >
+      <div>COMMON CONTENTS</div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton6"
+      >
+        click to open window!
+      </button>
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Resizable</p>
+    <ev-window
+      v-model:visible="isVisible7"
+      :title="'RESIZABLE WINDOW'"
+      resizable
+      @mousedown="mousedown"
+      @mousedown-mouseup="mouseup"
+      @mousedown-mousemove="mousemove"
+      @resize="resize"
+    >
+      <div>COMMON CONTENTS</div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton7"
+      >
+        click to open window!
+      </button>
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Maximizable</p>
+    <ev-window
+      v-model:visible="isVisible8"
+      :title="'MAXIMIZABLE WINDOW'"
+      maximizable
+    >
+      <div>COMMON CONTENTS</div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton8"
+      >
+        click to open window!
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -143,6 +204,26 @@ export default {
       isVisible5.value = true;
     };
 
+    const isVisible6 = ref(false);
+    const clickButton6 = () => {
+      isVisible6.value = true;
+    };
+
+    const isVisible7 = ref(false);
+    const clickButton7 = () => {
+      isVisible7.value = true;
+    };
+
+    const isVisible8 = ref(false);
+    const clickButton8 = () => {
+      isVisible8.value = true;
+    };
+
+    const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
+    const mouseup = event => console.log('mousedown-mouseup', event);
+    const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
+    const resize = (event, positionInfo) => console.log('resize', event, positionInfo);
+
     return {
       isVisible1,
       clickButton1,
@@ -154,6 +235,16 @@ export default {
       clickButton4,
       isVisible5,
       clickButton5,
+      isVisible6,
+      clickButton6,
+      isVisible7,
+      clickButton7,
+      isVisible8,
+      clickButton8,
+      mousedown,
+      mouseup,
+      mousemove,
+      resize,
     };
   },
 };
