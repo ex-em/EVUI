@@ -260,7 +260,7 @@ const modules = {
     colorDOM.className = 'ev-chart-legend-color';
 
     if (series.type === 'line' && series.point) {
-      colorDOM.className += '--point-line';
+      colorDOM.className += ' ev-chart-legend-color--point-line';
     }
 
     nameDOM.className = 'ev-chart-legend-name';
