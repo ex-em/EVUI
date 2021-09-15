@@ -442,7 +442,13 @@ const useMouseEvent = (param) => {
       pressedSpot = 'header';
     }
 
-    // document.body.style.cursor = windowRef.value.style.cursor;
+    if (!pressedSpot
+      || (!props.draggable && pressedSpot === 'header')
+      || (!props.resizable && pressedSpot === 'border')
+    ) {
+      return;
+    }
+
     clickedInfo.state = 'mousedown';
     clickedInfo.pressedSpot = pressedSpot;
     clickedInfo.top = windowRef.value.offsetTop;
