@@ -29,8 +29,11 @@
 | v-mode:visible | Boolean | false | <윈도우>의 보임 여부, 양방향 바인딩 | |
 | title | String, Number | null | <윈도우> 내부 헤더의 타이틀 |
 | window-class | String | '' | <윈도우> 클래스명 사용자 지정 | |
+| width | String, Number | 50vw | <윈도우> 너비 | |
+| height | String, Number | 50vh | <윈도우> 높이 | |
+| min-width | String, Number | 150 | <윈도우> 최소 너비 | |
+| min-height | String, Number | 150 | <윈도우> 최소 높이 | |
 | icon-class | String | '' | <윈도우> 내부 헤더의 아이콘 | |
-| style | Object | {} | <윈도우> 스타일 |
 | fullscreen | Boolean | false | 전체 화면 여부 |
 | is-modal | Boolean | true | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
 | close-on-click-modal | Boolean | false | 모달 레이어 클릭 시 메시지 창 닫기 여부 | true, false |

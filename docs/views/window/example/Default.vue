@@ -137,6 +137,10 @@
     <ev-window
       v-model:visible="isVisible7"
       :title="'RESIZABLE WINDOW'"
+      width="80vw"
+      height="30vh"
+      min-width="50vw"
+      min-height="30vh"
       resizable
       @mousedown="mousedown"
       @mousedown-mouseup="mouseup"

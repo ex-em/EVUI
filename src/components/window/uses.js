@@ -1,4 +1,6 @@
-import { getCurrentInstance, ref, computed, reactive, watch, nextTick } from 'vue';
+import {
+  getCurrentInstance, ref, computed, reactive, watch, nextTick,
+} from 'vue';
 
 const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -21,7 +23,7 @@ const useModel = () => {
 
   initWrapperDiv();
 
-  const numberToPixel = (input) => {
+  const numberToUnit = (input) => {
     let output;
     let result;
 
@@ -43,19 +45,24 @@ const useModel = () => {
     return result;
   };
 
-  const removePixel = (input) => {
-    let result;
-
-    if (typeof input === 'string' && input) {
-      const match = (/^(normal|(\d+(?:\.\d+)?)(px|%|vw|vh)?)$/).exec(input);
-      if (match[2]) {
-        result = +match[2];
-      }
-    } else {
-      result = input;
+  const removeUnit = (input, direction) => {
+    if (typeof input === 'number') {
+      return input;
+    } else if (!input) {
+      return 0;
     }
 
-    return result || 0;
+    let result = 0;
+    const match = (/^(normal|(\d+(?:\.\d+)?)(px|%|vw|vh)?)$/).exec(input);
+
+    if (direction && ['%', 'vw', 'vh'].includes(match[3]) && match[2]) {
+      const standard = direction === 'horizontal' ? window.innerWidth : window.innerHeight;
+      result = Math.floor((standard * +match[2]) / 100);
+    } else if (match[2]) {
+      result = +match[2];
+    }
+
+    return result;
   };
 
   // set base style
@@ -65,51 +72,27 @@ const useModel = () => {
     ...basePosition,
   }));
 
-  const getPositionInfo = (position, winSize, compSize) => {
-    if (props.fullscreen) {
-      return {
-        top: 0,
-        left: 0,
-      };
-    }
-
-    const styleObj = {};
-    let tempPosition;
-    let tempUnit;
-    if (Number.isInteger(+compSize)) {
-      tempPosition = Math.floor((winSize - compSize) / 2);
-    } else if (compSize.includes('px')) {
-      tempPosition = Math.floor((winSize - removePixel(compSize)) / 2);
-    } else {
-      tempUnit = compSize.replace(/[0-9]/g, '');
-      tempPosition = Math.floor((100 - removePixel(compSize)) / 2);
-    }
-
-    const size = position === 'top' ? 'height' : 'width';
-    if (tempPosition > 0) {
-      styleObj[position] = tempUnit ? `${tempPosition}${tempUnit}` : `${tempPosition}px`;
-      styleObj[size] = compSize;
-    } else {
-      styleObj[position] = 0;
-      styleObj[size] = '100%';
-    }
-
-    return styleObj;
-  };
-
   const setBasePosition = () => {
+    if (props.fullscreen) {
+      basePosition.width = '100%';
+      basePosition.height = '100%';
+      basePosition.top = 0;
+      basePosition.left = 0;
+      return;
+    }
+
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
-    const evWinWidth = props.style?.width ?? Math.floor(winWidth / 2);
-    const evWinHeight = props.style?.height ?? Math.floor(winHeight / 2);
+    const evWinWidth = props.width ?? windowRef.value?.offsetWidth ?? Math.floor(winWidth / 2);
+    const evWinHeight = props.height ?? windowRef.value?.offsetHeight ?? Math.floor(winHeight / 2);
 
-    const tempTop = getPositionInfo('top', winHeight, evWinHeight);
-    const tempLeft = getPositionInfo('left', winWidth, evWinWidth);
+    const tempWidth = removeUnit(evWinWidth, 'horizontal');
+    const tempHeight = removeUnit(evWinHeight, 'vertical');
 
-    basePosition.width = tempLeft.width;
-    basePosition.height = tempTop.height;
-    basePosition.top = tempTop.top;
-    basePosition.left = tempLeft.left;
+    basePosition.width = `${tempWidth}px`;
+    basePosition.height = `${tempHeight}px`;
+    basePosition.top = `${Math.floor((winHeight - tempHeight) / 2)}px`;
+    basePosition.left = `${Math.floor((winWidth - tempWidth) / 2)}px`;
   };
 
   // close window
@@ -145,7 +128,9 @@ const useModel = () => {
     (newVal) => {
       changeBodyCls(newVal);
       if (newVal) {
-        setBasePosition();
+        nextTick(() => {
+          setBasePosition();
+        });
       }
     },
   );
@@ -157,8 +142,8 @@ const useModel = () => {
     maximizableIcon,
     baseStyle,
     closeWin,
-    numberToPixel,
-    removePixel,
+    numberToUnit,
+    removeUnit,
   };
 };
 
@@ -168,8 +153,8 @@ const useMouseEvent = (param) => {
     windowRef,
     headerRef,
     isFullExpandWindow,
-    numberToPixel,
-    removePixel,
+    numberToUnit,
+    removeUnit,
   } = param;
 
   const draggingMinSize = 30;
@@ -208,9 +193,9 @@ const useMouseEvent = (param) => {
     const posY = +y - rect.top;
     const headerAreaStyleInfo = headerRef.value.style;
     const headerPaddingInfo = {
-      top: removePixel(headerAreaStyleInfo.paddingTop),
-      left: removePixel(headerAreaStyleInfo.paddingLeft),
-      right: removePixel(headerAreaStyleInfo.paddingRight),
+      top: removeUnit(headerAreaStyleInfo.paddingTop),
+      left: removeUnit(headerAreaStyleInfo.paddingLeft),
+      right: removeUnit(headerAreaStyleInfo.paddingRight),
     };
     const startPosX = headerPaddingInfo.left;
     const endPosX = rect.width - headerPaddingInfo.right;
@@ -261,24 +246,24 @@ const useMouseEvent = (param) => {
     if (hasOwnProperty.call(paramObj, 'minWidth')) {
       tMinWidth = paramObj.minWidth;
     } else {
-      tMinWidth = props.minWidth;
+      tMinWidth = removeUnit(props.minWidth, 'horizontal');
     }
 
     if (hasOwnProperty.call(paramObj, 'minHeight')) {
       tMinHeight = paramObj.minHeight;
     } else {
-      tMinHeight = props.minHeight;
+      tMinHeight = removeUnit(props.minHeight, 'vertical');
     }
 
     width = Math.max(width, tMinWidth);
     height = Math.max(height, tMinHeight);
 
-    dragStyle.top = numberToPixel(top);
-    dragStyle.left = numberToPixel(left);
-    dragStyle.width = numberToPixel(width);
-    dragStyle.height = numberToPixel(height);
-    dragStyle.minWidth = numberToPixel(tMinWidth);
-    dragStyle.minHeight = numberToPixel(tMinHeight);
+    dragStyle.top = numberToUnit(top);
+    dragStyle.left = numberToUnit(left);
+    dragStyle.width = numberToUnit(width);
+    dragStyle.height = numberToUnit(height);
+    dragStyle.minWidth = numberToUnit(tMinWidth);
+    dragStyle.minHeight = numberToUnit(tMinHeight);
   };
 
   const changeMouseCursor = (e) => {
@@ -323,12 +308,12 @@ const useMouseEvent = (param) => {
     const isBottom = grabbingBorderPosInfo.bottom;
     const diffX = e.clientX - clickedInfo.clientX;
     const diffY = e.clientY - clickedInfo.clientY;
-    const minWidth = removePixel(props.minWidth);
-    const minHeight = removePixel(props.minHeight);
+    const minWidth = removeUnit(props.minWidth, 'horizontal');
+    const minHeight = removeUnit(props.minHeight, 'vertical');
     let top = clickedInfo.top;
     let left = clickedInfo.left;
-    let width = windowRef.value.offsetWidth;
-    let height = windowRef.value.offsetHeight;
+    let width = clickedInfo.width;
+    let height = clickedInfo.height;
     const maxTop = (top + clickedInfo.height) - minHeight;
     const maxLeft = (left + clickedInfo.width) - minWidth;
 
