@@ -81,18 +81,27 @@ const useModel = () => {
       return;
     }
 
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-    const evWinWidth = props.width ?? windowRef.value?.offsetWidth ?? Math.floor(winWidth / 2);
-    const evWinHeight = props.height ?? windowRef.value?.offsetHeight ?? Math.floor(winHeight / 2);
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const refWidth = props.width ?? windowRef.value?.offsetWidth ?? Math.floor(windowWidth / 2);
+    const refHeight = props.height ?? windowRef.value?.offsetHeight ?? Math.floor(windowHeight / 2);
 
-    const tempWidth = removeUnit(evWinWidth, 'horizontal');
-    const tempHeight = removeUnit(evWinHeight, 'vertical');
+    const tempWidth = removeUnit(refWidth, 'horizontal');
+    const tempHeight = removeUnit(refHeight, 'vertical');
 
     basePosition.width = `${tempWidth}px`;
     basePosition.height = `${tempHeight}px`;
-    basePosition.top = `${Math.floor((winHeight - tempHeight) / 2)}px`;
-    basePosition.left = `${Math.floor((winWidth - tempWidth) / 2)}px`;
+    basePosition.left = `${Math.floor((windowWidth - tempWidth) / 2)}px`;
+
+    if (props.hideScroll || props.isModal) {
+      basePosition.position = 'fixed';
+      basePosition.top = `${Math.floor((windowHeight - tempHeight) / 2)}px`;
+    } else {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        || document.body.scrollTop || 0;
+      basePosition.position = 'absolute';
+      basePosition.top = `${Math.floor(((windowHeight - tempHeight) / 2) + scrollTop)}px`;
+    }
   };
 
   // close window
@@ -106,20 +115,28 @@ const useModel = () => {
   // props.hideScroll === true 시, body 우측 padding & overflow hidden class 추가
   const getScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
   const changeBodyCls = (isVisible) => {
-    const windowCount = root?.getElementsByClassName('hide-scroll-layer')?.length;
+    const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
+    const allowScrollWindowCnt = root?.getElementsByClassName('scroll-allow')?.length;
     const bodyElem = document.body;
 
     if (isVisible) {
       if (props.hideScroll) {
-        if (!windowCount) {
+        if (!hideScrollWindowCnt) {
           const scrollWidth = getScrollWidth();
           bodyElem.style.paddingRight = `${scrollWidth}px`;
         }
         bodyElem.classList.add('ev-window-scroll-lock');
+      } else if (!props.hideScroll && !props.isModal) {
+        bodyElem.classList.add('ev-window-scroll-allow');
       }
-    } else if (windowCount === 1) {
-      bodyElem.style.removeProperty('padding-right');
-      bodyElem.classList.remove('ev-window-scroll-lock');
+    } else {
+      if (hideScrollWindowCnt === 1) {
+        bodyElem.style.removeProperty('padding-right');
+        bodyElem.classList.remove('ev-window-scroll-lock');
+      }
+      if (allowScrollWindowCnt === 1) {
+        bodyElem.classList.remove('ev-window-scroll-allow');
+      }
     }
   };
 
@@ -302,14 +319,20 @@ const useMouseEvent = (param) => {
 
   // window resize
   const resizeWindow = (e) => {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
     const isTop = grabbingBorderPosInfo.top;
     const isLeft = grabbingBorderPosInfo.left;
     const isRight = grabbingBorderPosInfo.right;
     const isBottom = grabbingBorderPosInfo.bottom;
-    const diffX = e.clientX - clickedInfo.clientX;
-    const diffY = e.clientY - clickedInfo.clientY;
     const minWidth = removeUnit(props.minWidth, 'horizontal');
     const minHeight = removeUnit(props.minHeight, 'vertical');
+    const clientX = e.clientX >= windowWidth ? windowWidth : e.clientX;
+    let clientY = e.clientY >= windowHeight ? windowHeight : e.clientY;
+    clientY = e.clientY > 0 ? clientY : 0;
+    const diffX = clientX - clickedInfo.clientX;
+    const diffY = clientY - clickedInfo.clientY;
+
     let top = clickedInfo.top;
     let left = clickedInfo.left;
     let width = clickedInfo.width;
@@ -343,8 +366,8 @@ const useMouseEvent = (param) => {
       height = clickedInfo.height + diffY;
     }
 
-    width = Math.max(width, minWidth);
-    height = Math.max(height, minHeight);
+    width = Math.min(Math.max(width, minWidth), windowWidth);
+    height = Math.min(Math.max(height, minHeight), windowHeight);
 
     const positionInfo = { top, left, width, height };
     setDragStyle(positionInfo);
@@ -483,6 +506,8 @@ const useMouseEvent = (param) => {
   };
 
   const initWindowInfo = () => {
+    isFullExpandWindow.value = false;
+
     clickedInfo.state = '';
     clickedInfo.pressedSpot = '';
     clickedInfo.top = 0;
