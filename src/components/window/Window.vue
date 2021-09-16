@@ -8,7 +8,8 @@
         v-if="visible"
         :class="[
           'ev-window-wrapper',
-          { 'hide-scroll-layer': hideScroll },
+          { 'scroll-lock': hideScroll },
+          { 'scroll-allow': !hideScroll && !isModal },
         ]"
       >
         <div
@@ -199,9 +200,12 @@ export default {
 
 <style lang="scss">
 @import '../../style/index.scss';
-
 .ev-window-scroll-lock {
   overflow: hidden !important;
+}
+.ev-window-scroll-allow {
+  position: relative !important;
+  overflow-x: hidden !important;
 }
 .ev-window-dim-layer {
   position: fixed;
