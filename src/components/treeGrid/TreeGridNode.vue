@@ -1,7 +1,7 @@
 <template>
   <tr
     :data-index="node.index"
-    :class="getRowClass(node.index)"
+    :class="getRowClass(node)"
     @click="onClick($event, node)"
     @dblclick="onDblClick($event, node)"
   >
@@ -170,11 +170,12 @@ export default {
     const childIconMV = computed(() => (props.childIcon || 'tree-child-icon'));
     const isDataIcon = computed(() => ((parentIconMV.value !== 'none' || childIconMV.value !== 'none')));
 
-    const getRowClass = nodeIndex => ({
+    const getRowClass = nodeInfo => ({
       row: true,
       'tree-row': true,
-      highlight: nodeIndex === props.highlightIndex,
-      selected: nodeIndex === props.selectedData.index,
+      [`tree-row--level-${nodeInfo.level}`]: true,
+      highlight: nodeInfo.index === props.highlightIndex,
+      selected: nodeInfo.index === props.selectedData.index,
       'non-border': !!props.borderStyle && props.borderStyle !== 'rows',
     });
     const checkboxClass = computed(() => ({

@@ -1,14 +1,13 @@
 
 >### Desc
- - 태그는 &lt;ev-grid&gt;(이하 <그리드>)로 정의
+ - 태그는 &lt;ev-tree-grid&gt;(이하 <트리그리드>)로 정의
 
 ```
-<ev-grid
+<ev-tree-grid
     v-model:selected="selectedMV"
     v-model:checked="checkedMV"
-    :is-tree-grid="true"
     :columns="columns"
-    :tree-data="tableData"
+    :rows="tableData"
     :width="widthMV"
     :height="heightMV"
     :option="{}"
@@ -17,19 +16,14 @@
     @click-row="onClickRow"
     @dblclick-row="onDoubleClickRow"
 >
-</ev-grid>
+</ev-tree-grid>
 ```
-
- - <그리드>와 동일하게 사용
- - `is-tree-grid`를 `true`로 설정 (*필수)
- - `tree-data`에 row 데이터를 설정 (*필수)
 
 ### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
 | --- | ---- | ----- | ---- | --- |
-| is-tree-grid | Boolean | true | 트리 그리드 여부 | |
 | columns | Array | [] | 컬럼 리스트 | |
-| tree-data | Array | [] | Tree Data 리스트 | |
+| rows | Array | [] | Tree Data 리스트 | |
 | width | String, Number | '100%' | 그리드 넓이 | '50%', '50px', 50 |
 | height | String, Number | '100%' | 그리드 높이 | '50%', '50px', 50 |
 | selected | Array | [] | 선택된 Row 데이터 |  |
@@ -63,6 +57,3 @@
  | check-all | event | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 Row의 체크박스를 체크한다. |
  | click-row | newValue | Row가 클릭 되었을 때 호출된다. |
  | dblclick-row | newValue | Row가 더블 클릭 되었을 때 호출된다. |
-
- >### 참고
-  - <그리드>와 동일한 기능을 제공 (단, 현재 `Sorting` `Filtering` `Rendering` 기능은 제외)

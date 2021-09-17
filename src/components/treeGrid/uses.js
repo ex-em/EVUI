@@ -1,10 +1,5 @@
 import { getCurrentInstance, nextTick } from 'vue';
-import { isEqual } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
-
-// const ROW_INDEX = 0;
-// const ROW_CHECK_INDEX = 1;
-const ROW_DATA_INDEX = 2;
 
 export const commonFunctions = () => {
   const { props } = getCurrentInstance();
@@ -73,7 +68,7 @@ export const scrollEvent = (params) => {
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
   const updateVScroll = () => {
-    const store = stores.treeStore;
+    const store = stores.showTreeStore;
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     const rowCount = bodyEl.clientHeight > rowHeight
@@ -155,7 +150,7 @@ export const resizeEvent = (params) => {
    * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
    */
   const calculatedColumn = () => {
-    stores.viewStore = stores.treeStore;
+    stores.viewStore = stores.showTreeStore;
     const store = stores.viewStore;
     let columnWidth = resizeInfo.columnWidth;
     if (resizeInfo.columnWidth > 0) {
@@ -371,11 +366,11 @@ export const checkEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const unCheckedRow = (row) => {
-    const index = stores.treeData.findIndex(
+    const index = stores.treeStore.findIndex(
       item => item.index === row.index);
 
     if (index !== -1) {
-      stores.treeData[index].checked = row.checked;
+      stores.treeStore[index].checked = row.checked;
     }
   };
   const onCheckChildren = (node) => {
@@ -455,7 +450,7 @@ export const checkEvent = (params) => {
     onSingleMode();
     if (rowData.checked) {
       addCheckedRow(rowData);
-      checkedHeader(stores.treeData);
+      checkedHeader(stores.treeStore);
     } else {
       unCheckedHeader();
       removeCheckedRow(rowData);
@@ -472,7 +467,7 @@ export const checkEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onCheckAll = (event) => {
-    const store = stores.treeData;
+    const store = stores.treeStore;
     const status = checkInfo.isHeaderChecked;
     const checked = [];
     let item;
@@ -548,66 +543,6 @@ export const contextMenuEvent = (params) => {
   return { setContextMenu, onContextMenu };
 };
 
-export const storeEvent = (params) => {
-  const { props } = getCurrentInstance();
-  const {
-    selectInfo,
-    checkInfo,
-    stores,
-    updateVScroll,
-  } = params;
-  /**
-   * 전달된 데이터를 내부 store 및 속성에 저장한다.
-   *
-   * @param {array} value - row 데이터
-   * @param {boolean} makeIndex - 인덱스 생성 유무
-   */
-  const setStore = (value, makeIndex = true) => {
-    const store = [];
-    let checked;
-    let selected = false;
-
-    if (makeIndex) {
-      let hasUnChecked = false;
-      for (let ix = 0; ix < value.length; ix++) {
-        checked = props.checked.includes(value[ix]);
-        if (!checked) {
-          hasUnChecked = true;
-        }
-
-        if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
-          selectInfo.selectedRow = value[ix];
-          selected = true;
-        }
-
-        store.push([ix, checked, value[ix]]);
-      }
-
-      if (!selected) {
-        selectInfo.selectedRow = [];
-      }
-
-      checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
-      stores.originStore = store;
-    }
-    updateVScroll();
-  };
-  /**
-   * 컴포넌트의 변경 데이터를 store에 업데이트한다.
-   *
-   * @param {number} rowIndex - row 인덱스
-   * @param {number} cellIndex - cell 인덱스
-   * @param {number|string} newValue - 데이터
-   */
-  const updateData = (rowIndex, cellIndex, newValue) => {
-    const row = stores.store.filter(data => data[0] === rowIndex);
-    if (row) {
-      row[0][ROW_DATA_INDEX][cellIndex] = newValue;
-    }
-  };
-  return { setStore, updateData };
-};
-
 export const treeEvent = (params) => {
   const { stores, onResize } = params;
   // tree data init
@@ -621,8 +556,8 @@ export const treeEvent = (params) => {
     });
     return newObj;
   };
-  const setTreeData = (treeData, count, isShow, parent) => {
-    treeData.forEach((nodeObj) => {
+  const setTreeStore = (rows, count, isShow, parent) => {
+    rows.forEach((nodeObj) => {
       const node = nodeObj;
       const dataObj = filterObj('children', nodeObj);
       node.data = dataObj;
@@ -632,11 +567,11 @@ export const treeEvent = (params) => {
       node.checked = false;
       node.index = index++;
       node.parent = parent;
-      stores.treeData.push(node);
+      stores.treeStore.push(node);
 
       if (node.children && node.children.length > 0) {
         node.hasChild = true;
-        setTreeData(node.children, node.level + 1, node.show && node.expand, node);
+        setTreeStore(node.children, node.level + 1, node.show && node.expand, node);
       }
     });
   };
@@ -656,5 +591,5 @@ export const treeEvent = (params) => {
     setExpandNode(data.children, data.expand);
     onResize();
   };
-  return { setTreeData, handleExpand };
+  return { setTreeStore, handleExpand };
 };
