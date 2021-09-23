@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted } from 'vue';
+import { reactive, toRefs, computed, watch, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
 import {
   commonFunctions,
@@ -129,7 +129,6 @@ import {
   clickEvent,
   checkEvent,
   contextMenuEvent,
-  storeEvent,
   treeEvent,
 } from './uses';
 
@@ -167,10 +166,6 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    treeData: {
-      type: [Array],
-      default: () => [],
-    },
     expandIcon: {
       type: String,
       default: '',
@@ -203,15 +198,12 @@ export default {
       'grid-wrapper': null,
     });
     const stores = reactive({
-      tableData: props.rows,
+      treeStore: [],
       viewStore: [],
-      originStore: [],
-      filteredStore: [],
-      store: computed(() => stores.originStore),
+      treeRows: computed(() => JSON.parse(JSON.stringify(props.rows))),
+      showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
-      treeData: [],
-      treeStore: computed(() => stores.treeData.filter(item => item.show)),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -274,16 +266,6 @@ export default {
     } = checkEvent({ checkInfo, stores });
 
     const {
-      setStore,
-      updateData,
-    } = storeEvent({
-      selectInfo,
-      checkInfo,
-      stores,
-      updateVScroll,
-    });
-
-    const {
       calculatedColumn,
       onResize,
       onColumnResize,
@@ -295,19 +277,14 @@ export default {
     } = contextMenuEvent({ contextInfo, stores, selectInfo });
 
     const {
-      setTreeData,
+      setTreeStore,
       handleExpand,
     } = treeEvent({ stores, onResize });
 
-    onMounted(() => {
-      calculatedColumn();
-      setTreeData(props.rows, 0, true);
-      setStore(props.rows);
-    });
     watch(
       () => props.checked,
       (value) => {
-        const store = stores.treeData;
+        const store = stores.treeStore;
         checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
           store[ix].checked = value.includes(store[ix]);
@@ -324,10 +301,14 @@ export default {
     watch(
       () => props.rows,
       () => {
-        setStore(props.treeData);
-      },
+        nextTick(() => {
+          stores.treeStore = [];
+          calculatedColumn();
+          setTreeStore(stores.treeRows, 0, true);
+          updateVScroll();
+        });
+      }, { deep: true, immediate: true },
     );
-
     watch(
       () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
       (value) => {
@@ -414,8 +395,6 @@ export default {
       onRowDblClick,
       onCheck,
       onCheckAll,
-      setStore,
-      updateData,
       setContextMenu,
       onContextMenu,
       handleExpand,
