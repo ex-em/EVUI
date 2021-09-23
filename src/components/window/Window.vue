@@ -25,8 +25,8 @@
             ...baseStyle,
             ...dragStyle,
           }"
-          @mousedown.prevent="startDrag"
-          @mousemove.prevent="moveMouse"
+          @mousedown="startDrag"
+          @mousemove="moveMouse"
         >
           <div
             v-if="$slots.header || iconClass || title"
@@ -205,7 +205,15 @@ export default {
 }
 .ev-window-scroll-allow {
   position: relative !important;
-  overflow-x: hidden !important;
+  &.horizontal-hide {
+    overflow-x: hidden !important;
+  }
+  &.vertical-hide {
+    overflow-y: hidden !important;
+  }
+  &.hide {
+    overflow: hidden !important;
+  }
 }
 .ev-window-dim-layer {
   position: fixed;

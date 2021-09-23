@@ -49,7 +49,7 @@
 | ---- | ------- | ---- |
 | mousedown | clickedInfo | 드래그 및 리사이즈를 위한 mousedown 이벤트 감지 |
 | mousedown-mouseup | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mouseup 이벤트 감지 |
-| mousedown-mousemove | clickedInfo | 드래그 및 리사이즈를 위한 mousemove 이벤트 감지 |
+| mousedown-mousemove | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mousemove 이벤트 감지 |
 | resize | MouseEvent 객체, positionInfo | 리사이즈를 위한 mousemove 이벤트 감지 |
 
 ##### clickedInfo
