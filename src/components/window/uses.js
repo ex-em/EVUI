@@ -2,6 +2,23 @@ import {
   getCurrentInstance, ref, computed, reactive, watch, nextTick,
 } from 'vue';
 
+// 세로 스크롤 너비
+const getVScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
+// 가로 스크롤 너비
+const getHScrollWidth = () => window.innerHeight - document.documentElement.clientHeight;
+// 전체 문서 너비
+const getDocumentWidth = () => Math.max(
+  document.body.scrollWidth, document.documentElement.scrollWidth,
+  document.body.offsetWidth, document.documentElement.offsetWidth,
+  document.body.clientWidth, document.documentElement.clientWidth,
+);
+// 전체 문서 높이
+const getDocumentHeight = () => Math.max(
+  document.body.scrollHeight, document.documentElement.scrollHeight,
+  document.body.offsetHeight, document.documentElement.offsetHeight,
+  document.body.clientHeight, document.documentElement.clientHeight,
+);
+
 const useModel = () => {
   const { props, emit } = getCurrentInstance();
 
@@ -112,8 +129,6 @@ const useModel = () => {
     emit('update:visible', false);
   };
 
-  // props.hideScroll === true 시, body 우측 padding & overflow hidden class 추가
-  const getScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
   const changeBodyCls = (isVisible) => {
     const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
     const allowScrollWindowCnt = root?.getElementsByClassName('scroll-allow')?.length;
@@ -121,13 +136,31 @@ const useModel = () => {
 
     if (isVisible) {
       if (props.hideScroll) {
+        // props.hideScroll === true 시,
+        // body 우측 padding 추가 & overflow hidden class 추가
         if (!hideScrollWindowCnt) {
-          const scrollWidth = getScrollWidth();
+          const scrollWidth = getVScrollWidth();
           bodyElem.style.paddingRight = `${scrollWidth}px`;
         }
         bodyElem.classList.add('ev-window-scroll-lock');
       } else if (!props.hideScroll && !props.isModal) {
-        bodyElem.classList.add('ev-window-scroll-allow');
+        // !props.hideScroll && !props.isModal 시,
+        // body에 position: relative 추가, 스크롤 여부에 따라 overflow-x or y hidden 처리
+        const vScrollWidth = getVScrollWidth();
+        const hScrollWidth = getHScrollWidth();
+        const bodyClassName = ['ev-window-scroll-allow'];
+        if (vScrollWidth > 0 && hScrollWidth === 0) {
+          // 세로 스크롤만 있을 경우 - 가로 스크롤 막음
+          bodyClassName.push('horizontal-hide');
+        } else if (vScrollWidth === 0 && hScrollWidth > 0) {
+          // 가로 스크롤만 있을 경우 - 세로 스크롤 막음
+          bodyClassName.push('vertical-hide');
+        } else if (vScrollWidth === 0 && hScrollWidth === 0) {
+          // 둘다 없을 경우 - 가로&세로 스크롤 막음
+          bodyClassName.push('hide');
+        }
+
+        bodyElem.classList.add(...bodyClassName);
       }
     } else {
       if (hideScrollWindowCnt === 1) {
@@ -135,10 +168,11 @@ const useModel = () => {
         bodyElem.classList.remove('ev-window-scroll-lock');
       }
       if (allowScrollWindowCnt === 1) {
-        bodyElem.classList.remove('ev-window-scroll-allow');
+        bodyElem.classList.remove('ev-window-scroll-allow', 'horizontal-hide', 'vertical-hide', 'hide');
       }
     }
   };
+  setBasePosition();
 
   watch(
     () => props.visible,
@@ -174,9 +208,11 @@ const useMouseEvent = (param) => {
     removeUnit,
   } = param;
 
-  const draggingMinSize = 30;
+  const draggingMinSize = 50;
   const grabbingBorderSize = 5;
   const dragStyle = reactive({});
+  const documentWidth = ref(0);
+  const documentHeight = ref(0);
   const clickedInfo = reactive({
     state: '',
     pressedSpot: '',
@@ -376,26 +412,39 @@ const useMouseEvent = (param) => {
 
   // mousedown > mousemove: 마우스 드래그 중
   const dragging = (e) => {
+    e.preventDefault();
     clickedInfo.state = 'mousedown-mousemove';
 
+    // window header를 통해 mouseMove 됐을 경우
     if (props.draggable && clickedInfo.pressedSpot === 'header') {
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-      const diffTop = clickedInfo.clientY - e.clientY;
-      const diffLeft = clickedInfo.clientX - e.clientX;
+      // 전체 문서 너비&높이 세팅 - mount 때와 드래그 시 수치 다르게 측정되기 때문에 드래그 초기 한번만 세팅
+      if (!documentWidth.value) {
+        documentWidth.value = getDocumentWidth();
+      }
+      if (!documentHeight.value) {
+        documentHeight.value = getDocumentHeight();
+      }
 
-      let tempTop = clickedInfo.top + -diffTop;
-      let tempLeft = clickedInfo.left + -diffLeft;
+      // 스크롤 있을 경우 전체 문서 기준, 없을 경우 clientWidth, Height 기준
+      const windowWidth = props.hideScroll || props.isModal
+        ? document.documentElement.clientWidth : documentWidth.value;
+      const windowHeight = props.hideScroll || props.isModal
+        ? document.documentElement.clientHeight : documentHeight.value;
+      const diffTop = e.clientY - clickedInfo.clientY;
+      const diffLeft = e.clientX - clickedInfo.clientX;
 
-      if (tempTop < 0) {
+      let tempTop = clickedInfo.top + diffTop;
+      let tempLeft = clickedInfo.left + diffLeft;
+
+      if (tempTop < 0) { // 상
         tempTop = 0;
-      } else if (tempTop > windowHeight - draggingMinSize) {
+      } else if (tempTop > windowHeight - draggingMinSize) { // 하
         tempTop = Math.floor(windowHeight - draggingMinSize);
       }
 
-      if (tempLeft < -(clickedInfo.width - draggingMinSize)) {
+      if (tempLeft < -(clickedInfo.width - draggingMinSize)) { // 좌
         tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
-      } else if (tempLeft > windowWidth - draggingMinSize) {
+      } else if (tempLeft > windowWidth - draggingMinSize) { // 우
         tempLeft = Math.floor(windowWidth - draggingMinSize);
       }
 
@@ -407,7 +456,7 @@ const useMouseEvent = (param) => {
       resizeWindow(e);
     }
 
-    emit('mousedown-mousemove', { ...clickedInfo });
+    emit('mousedown-mousemove', e);
   };
 
   // mousedown > mouseup: 마우스 드래그 종료
