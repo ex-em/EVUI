@@ -168,7 +168,7 @@ const useModel = () => {
         bodyElem.classList.remove('ev-window-scroll-lock');
       }
       if (allowScrollWindowCnt === 1) {
-        bodyElem.classList.remove('ev-window-scroll-allow');
+        bodyElem.classList.remove('ev-window-scroll-allow', 'horizontal-hide', 'vertical-hide', 'hide');
       }
     }
   };
