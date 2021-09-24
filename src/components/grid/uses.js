@@ -240,6 +240,13 @@ export const resizeEvent = (params) => {
       updateVScroll();
     }
   };
+
+  const onShow = (isVisible) => {
+    if (isVisible) {
+      onResize();
+    }
+  };
+
   /**
    * column resize 이벤트를 처리한다.
    *
@@ -304,7 +311,7 @@ export const resizeEvent = (params) => {
       document.addEventListener('mouseup', handleMouseUp, { once: true });
     }
   };
-  return { calculatedColumn, onResize, onColumnResize };
+  return { calculatedColumn, onResize, onShow, onColumnResize };
 };
 
 export const clickEvent = (params) => {
