@@ -223,6 +223,10 @@ const useMouseEvent = (param) => {
     clientX: 0,
     clientY: 0,
   });
+  const draggedInfo = reactive({
+    top: 0,
+    left: 0,
+  });
   const grabbingBorderPosInfo = reactive({
     top: false,
     right: false,
@@ -410,7 +414,50 @@ const useMouseEvent = (param) => {
     emit('resize', e, { ...positionInfo });
   };
 
-  // mousedown > mousemove: 마우스 드래그 중
+  // 브라우저 상하 위치 제약
+  const getValidTop = (windowHeight, top) => {
+    let tempTop = top;
+    if (tempTop < 0) { // 상
+      tempTop = 0;
+    } else if (tempTop > windowHeight - draggingMinSize) { // 하
+      tempTop = Math.floor(windowHeight - draggingMinSize);
+    }
+    return tempTop;
+  };
+  // 브라우저 좌우 위치 제약
+  const getValidLeft = (windowWidth, left) => {
+    let tempLeft = left;
+    if (tempLeft < -(clickedInfo.width - draggingMinSize)) { // 좌
+      tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
+    } else if (tempLeft > windowWidth - draggingMinSize) { // 우
+      tempLeft = Math.floor(windowWidth - draggingMinSize);
+    }
+    return tempLeft;
+  };
+
+  // mousedown > wheel: 마우스 휠
+  const wheeling = (e) => {
+    const scrollTop = document.documentElement.scrollTop;
+    if (e.deltaY < 0 && scrollTop <= 0) {
+      return;
+    }
+
+    let tempTop = removeUnit(dragStyle.top) || clickedInfo.top;
+    tempTop += e.deltaY;
+
+    const windowHeight = props.hideScroll || props.isModal
+      ? document.documentElement.clientHeight : documentHeight.value;
+    tempTop = getValidTop(windowHeight, tempTop);
+
+    clickedInfo.top = tempTop;
+
+    setDragStyle({
+      top: `${tempTop}px`,
+      left: dragStyle.left,
+    });
+  };
+
+  // mousedown > mousemove: 마우스 드래그
   const dragging = (e) => {
     e.preventDefault();
     clickedInfo.state = 'mousedown-mousemove';
@@ -430,17 +477,52 @@ const useMouseEvent = (param) => {
         ? document.documentElement.clientWidth : documentWidth.value;
       const windowHeight = props.hideScroll || props.isModal
         ? document.documentElement.clientHeight : documentHeight.value;
+
       const diffTop = e.clientY - clickedInfo.clientY;
       const diffLeft = e.clientX - clickedInfo.clientX;
 
       let tempTop = clickedInfo.top + diffTop;
       let tempLeft = clickedInfo.left + diffLeft;
 
-      if (tempTop < 0) { // 상
-        tempTop = 0;
-      } else if (tempTop > windowHeight - draggingMinSize) { // 하
-        tempTop = Math.floor(windowHeight - draggingMinSize);
+      // 스크롤 허용 & 드래그 시 브라우저 상하단 위치에서 스크롤 이동
+      if (!props.hideScroll && !props.isModal) {
+        let [x, y] = [0, 0];
+        const moveScrollSize = 10;
+        const scrollTop = document.documentElement.scrollTop;
+
+        if (e.clientY < draggingMinSize && scrollTop > 0) { // 상
+          tempTop = draggedInfo.top || tempTop;
+          clickedInfo.clientY = e.clientY;
+          clickedInfo.top = tempTop;
+          y = -moveScrollSize;
+          tempTop -= moveScrollSize;
+        } else if (e.clientY > document.documentElement.clientHeight - draggingMinSize) { // 하
+          tempTop = draggedInfo.top || tempTop;
+          clickedInfo.clientY = e.clientY;
+          clickedInfo.top = tempTop;
+          y = moveScrollSize;
+          tempTop += moveScrollSize;
+        } else if (e.clientX < draggingMinSize) { // 좌
+          tempLeft = draggedInfo.left || tempLeft;
+          clickedInfo.clientX = e.clientX;
+          clickedInfo.left = tempLeft;
+          x = -moveScrollSize;
+          tempLeft -= moveScrollSize;
+        } else if (e.clientX > document.documentElement.clientWidth - draggingMinSize) { // 우
+          tempLeft = draggedInfo.left || tempLeft;
+          clickedInfo.clientX = e.clientX;
+          clickedInfo.left = tempLeft;
+          x = moveScrollSize;
+          tempLeft += moveScrollSize;
+        }
+
+        document.documentElement.scrollBy(x, y);
+        draggedInfo.top = tempTop;
+        draggedInfo.left = tempLeft;
       }
+
+      tempTop = getValidTop(windowHeight, tempTop);
+      tempLeft = getValidLeft(windowWidth, tempLeft);
 
       if (tempLeft < -(clickedInfo.width - draggingMinSize)) { // 좌
         tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
@@ -466,6 +548,7 @@ const useMouseEvent = (param) => {
 
     emit('mousedown-mouseup', e);
 
+    window.removeEventListener('wheel', wheeling);
     window.removeEventListener('mousemove', dragging);
     window.removeEventListener('mouseup', endDrag);
   };
@@ -517,6 +600,7 @@ const useMouseEvent = (param) => {
 
     emit('mousedown', { ...clickedInfo });
 
+    window.addEventListener('wheel', wheeling);
     window.addEventListener('mousemove', dragging);
     window.addEventListener('mouseup', endDrag);
   };
@@ -565,6 +649,9 @@ const useMouseEvent = (param) => {
     clickedInfo.height = 0;
     clickedInfo.clientX = 0;
     clickedInfo.clientY = 0;
+
+    draggedInfo.top = 0;
+    draggedInfo.left = 0;
 
     grabbingBorderPosInfo.top = false;
     grabbingBorderPosInfo.left = false;
