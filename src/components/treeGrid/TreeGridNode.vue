@@ -173,9 +173,9 @@ export default {
     const getRowClass = nodeInfo => ({
       row: true,
       'tree-row': true,
-      [`tree-row--level-${nodeInfo.level}`]: true,
-      highlight: nodeInfo.index === props.highlightIndex,
-      selected: nodeInfo.index === props.selectedData.index,
+      [`tree-row--level-${nodeInfo?.level}`]: true,
+      highlight: nodeInfo?.index === props.highlightIndex,
+      selected: nodeInfo?.index === props.selectedData?.index,
       'non-border': !!props.borderStyle && props.borderStyle !== 'rows',
     });
     const checkboxClass = computed(() => ({
