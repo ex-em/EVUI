@@ -22,6 +22,10 @@
   <div
     ref="grid-wrapper"
     v-resize="onResize"
+    v-observe-visibility="{
+      callback: onShow,
+      once: true,
+    }"
     v-bind="$attrs"
     class="grid-wrapper"
     :style="`width: ${gridWidth}; height: ${gridHeight};`"
@@ -452,6 +456,7 @@ export default {
     const {
       calculatedColumn,
       onResize,
+      onShow,
       onColumnResize,
     } = resizeEvent({ resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll });
 
@@ -673,6 +678,7 @@ export default {
       onScroll,
       calculatedColumn,
       onResize,
+      onShow,
       onColumnResize,
       onRowClick,
       onRowDblClick,
