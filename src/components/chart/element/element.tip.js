@@ -16,7 +16,7 @@ const modules = {
 
     if (maxTipOpt.use || selectItemOpt.use) {
       const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      const selSID = hitInfo && hitInfo.sId ? hitInfo.sId : maxSID;
+      const selSID = (hitInfo && hitInfo.sId ? hitInfo.sId : this.lastHitInfo?.sId) ?? maxSID;
 
       const maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
       const selArgs = this.calculateTipInfo(this.seriesList[selSID], 'sel', hitInfo);
@@ -43,6 +43,10 @@ const modules = {
         if (selectItemOpt.showIndicator) {
           this.drawFixedIndicator({ opt: selectItemOpt, ...selArgs });
         }
+      }
+
+      if (hitInfo && hitInfo.label !== null) {
+        this.lastHitInfo = hitInfo;
       }
     }
   },
