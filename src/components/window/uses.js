@@ -99,12 +99,14 @@ const useModel = () => {
 
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop
       || document.body.scrollTop || 0;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+      || document.body.scrollLeft || 0;
 
     basePosition.width = numberToUnit(props.width);
     basePosition.height = numberToUnit(props.height);
     basePosition.position = 'absolute';
     basePosition.top = `calc(((100vh - ${basePosition.height}) / 2) + ${scrollTop}px)`;
-    basePosition.left = `calc((100vw - ${basePosition.width}) / 2)`;
+    basePosition.left = `calc(((100vw - ${basePosition.width}) / 2) + ${scrollLeft}px)`;
 
     if (removeUnit(props.width, 'horizontal') > window.innerWidth) {
       basePosition.left = 0;
