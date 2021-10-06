@@ -215,12 +215,15 @@ export default {
     overflow: hidden !important;
   }
 }
+.ev-window-open {
+  position: relative !important;
+}
 .ev-window-dim-layer {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 700;
 }
@@ -229,7 +232,7 @@ export default {
   $padding-horizontal: 17px;
 
   display: flex;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 50vw;
