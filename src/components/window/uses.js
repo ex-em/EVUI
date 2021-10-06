@@ -37,7 +37,6 @@ const useModel = () => {
       root = document.getElementById('ev-window-modal');
     }
   };
-
   initWrapperDiv();
 
   const numberToUnit = (input) => {
@@ -98,26 +97,22 @@ const useModel = () => {
       return;
     }
 
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const refWidth = props.width ?? windowRef.value?.offsetWidth ?? Math.floor(windowWidth / 2);
-    const refHeight = props.height ?? windowRef.value?.offsetHeight ?? Math.floor(windowHeight / 2);
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      || document.body.scrollTop || 0;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+      || document.body.scrollLeft || 0;
 
-    const tempWidth = removeUnit(refWidth, 'horizontal');
-    const tempHeight = removeUnit(refHeight, 'vertical');
+    basePosition.width = numberToUnit(props.width);
+    basePosition.height = numberToUnit(props.height);
+    basePosition.position = 'absolute';
+    basePosition.top = `calc(((100vh - ${basePosition.height}) / 2) + ${scrollTop}px)`;
+    basePosition.left = `calc(((100vw - ${basePosition.width}) / 2) + ${scrollLeft}px)`;
 
-    basePosition.width = `${tempWidth}px`;
-    basePosition.height = `${tempHeight}px`;
-    basePosition.left = `${Math.floor((windowWidth - tempWidth) / 2)}px`;
-
-    if (props.hideScroll || props.isModal) {
-      basePosition.position = 'fixed';
-      basePosition.top = `${Math.floor((windowHeight - tempHeight) / 2)}px`;
-    } else {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-        || document.body.scrollTop || 0;
-      basePosition.position = 'absolute';
-      basePosition.top = `${Math.floor(((windowHeight - tempHeight) / 2) + scrollTop)}px`;
+    if (removeUnit(props.width, 'horizontal') > window.innerWidth) {
+      basePosition.left = 0;
+    }
+    if (removeUnit(props.height, 'vertical') > window.innerHeight) {
+      basePosition.top = `${scrollTop}px`;
     }
   };
 
@@ -130,6 +125,7 @@ const useModel = () => {
   };
 
   const changeBodyCls = (isVisible) => {
+    const windowCnt = root?.getElementsByClassName('ev-window-wrapper')?.length;
     const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
     const allowScrollWindowCnt = root?.getElementsByClassName('scroll-allow')?.length;
     const bodyElem = document.body;
@@ -162,6 +158,7 @@ const useModel = () => {
 
         bodyElem.classList.add(...bodyClassName);
       }
+      bodyElem.classList.add('ev-window-open');
     } else {
       if (hideScrollWindowCnt === 1) {
         bodyElem.style.removeProperty('padding-right');
@@ -169,6 +166,9 @@ const useModel = () => {
       }
       if (allowScrollWindowCnt === 1) {
         bodyElem.classList.remove('ev-window-scroll-allow', 'horizontal-hide', 'vertical-hide', 'hide');
+      }
+      if (windowCnt === 1) {
+        bodyElem.classList.remove('ev-window-open');
       }
     }
   };
@@ -523,12 +523,6 @@ const useMouseEvent = (param) => {
 
       tempTop = getValidTop(windowHeight, tempTop);
       tempLeft = getValidLeft(windowWidth, tempLeft);
-
-      if (tempLeft < -(clickedInfo.width - draggingMinSize)) { // 좌
-        tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
-      } else if (tempLeft > windowWidth - draggingMinSize) { // 우
-        tempLeft = Math.floor(windowWidth - draggingMinSize);
-      }
 
       setDragStyle({
         top: `${tempTop}px`,
