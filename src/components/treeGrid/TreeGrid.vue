@@ -186,8 +186,9 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
+    'update-tree-data': null,
   },
-  setup(props) {
+  setup(props, { emit }) {
     const {
       isRenderer,
       getComponentName,
@@ -290,9 +291,13 @@ export default {
       () => props.checked,
       (value) => {
         const store = stores.treeStore;
+        checkInfo.isHeaderChecked = false;
         checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
           store[ix].checked = value.includes(store[ix]);
+        }
+        if (value.length && store.length === value.length) {
+          checkInfo.isHeaderChecked = true;
         }
       },
     );
@@ -311,6 +316,7 @@ export default {
           calculatedColumn();
           setTreeStore(stores.treeRows, 0, true);
           updateVScroll();
+          emit('update-tree-data', stores.treeRows);
         });
       }, { deep: true, immediate: true },
     );
