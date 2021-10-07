@@ -251,6 +251,8 @@ class Scale {
               borderRadius: 2,
               arrowSize: 2,
               text: labelText,
+              backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
+              textColor: options?.selectItem?.labelTipStyle?.textColor,
             });
           }
         }

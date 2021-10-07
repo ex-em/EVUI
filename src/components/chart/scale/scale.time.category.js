@@ -195,6 +195,8 @@ class TimeCategoryScale extends Scale {
               borderRadius: 2,
               arrowSize: 2,
               text: labelText,
+              backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
+              textColor: this.options?.selectItem?.labelTipStyle?.textColor,
             });
           }
         }

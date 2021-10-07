@@ -266,13 +266,22 @@ export default {
    * @returns {undefined}
    */
   showLabelTip(param) {
-    const { ctx, width, height, x, y, arrowSize, borderRadius, text } = param;
+    const {
+      ctx,
+      width,
+      height,
+      x,
+      y,
+      arrowSize,
+      borderRadius,
+      text,
+      backgroundColor,
+      textColor,
+    } = param;
     const sx = x - (width / 2);
     const ex = x + (width / 2);
     const sy = y - height;
     const ey = y;
-    const backgroundColor = this.options?.selectItem?.labelTipStyle?.backgroundColor;
-    const textColor = this.options?.selectItem?.labelTipStyle?.textColor;
 
     ctx.beginPath();
     ctx.save();
