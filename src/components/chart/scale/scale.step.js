@@ -2,8 +2,8 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class StepScale extends Scale {
-  constructor(type, opt, ctx, labels) {
-    super(type, opt, ctx);
+  constructor(type, opt, ctx, labels, options) {
+    super(type, opt, ctx, options);
     this.labels = labels;
   }
 
@@ -55,7 +55,7 @@ class StepScale extends Scale {
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo) {
     const ctx = this.ctx;
     const labels = this.labels;
     const aPos = {
@@ -121,6 +121,22 @@ class StepScale extends Scale {
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+        if (this.options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
+          const selectedLabel = hitInfo.label;
+          if (selectedLabel === labelText) {
+            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+            Util.showLabelTip({
+              ctx: this.ctx,
+              width: Math.round(ctx.measureText(selectedLabel).width) + 20,
+              height,
+              x: labelCenter + (labelGap / 2),
+              y: labelPoint + (height - 2),
+              borderRadius: 2,
+              arrowSize: 2,
+              text: labelText,
+            });
+          }
+        }
 
         if (index > 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);

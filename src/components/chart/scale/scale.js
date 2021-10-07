@@ -3,7 +3,7 @@ import { AXIS_OPTION, AXIS_UNITS } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
 class Scale {
-  constructor(type, opt, ctx) {
+  constructor(type, opt, ctx, options) {
     const merged = defaultsDeep({}, opt, AXIS_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
@@ -12,6 +12,7 @@ class Scale {
     this.type = type;
     this.ctx = ctx;
     this.units = AXIS_UNITS[this.type];
+    this.options = options;
 
     if (!this.position) {
       this.position = type === 'x' ? 'bottom' : 'left';
@@ -156,8 +157,9 @@ class Scale {
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo) {
     const ctx = this.ctx;
+    const options = this.options;
     const aPos = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,
@@ -234,7 +236,24 @@ class Scale {
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
-
+        if (options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
+          const selectedLabel = this.getLabelFormat(
+            Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+          );
+          if (selectedLabel === labelText) {
+            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+            Util.showLabelTip({
+              ctx: this.ctx,
+              width: Math.round(ctx.measureText(selectedLabel).width) + 20,
+              height,
+              x: labelCenter,
+              y: labelPoint + (height - 2),
+              borderRadius: 2,
+              arrowSize: 2,
+              text: labelText,
+            });
+          }
+        }
         if (this.showIndicator) {
           ctx.moveTo(linePosition, offsetPoint + 6);
           ctx.lineTo(linePosition, offsetPoint);
