@@ -31,7 +31,7 @@ const modules = {
           const series = this.seriesList[sId];
           const hasData = series.data.find(data =>
             (isHorizontal ? data.y : data?.x === hitItemData));
-          if (hasData && !hitInfo.items[sId]) {
+          if (hasData && !hitInfo.items[sId] && series?.show) {
             const item = {};
             item.color = series.color;
             item.hit = false;
