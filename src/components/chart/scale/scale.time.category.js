@@ -188,12 +188,12 @@ class TimeCategoryScale extends Scale {
             const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
             Util.showLabelTip({
               ctx: this.ctx,
-              width: Math.round(ctx.measureText(selectedLabel).width) + 20,
+              width: Math.round(ctx.measureText(selectedLabel).width) + 10,
               height,
               x: labelCenter,
               y: labelPoint + (height - 2),
               borderRadius: 2,
-              arrowSize: 2,
+              arrowSize: 3,
               text: labelText,
               backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
               textColor: this.options?.selectItem?.labelTipStyle?.textColor,
