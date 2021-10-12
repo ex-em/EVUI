@@ -20,7 +20,7 @@ const modules = {
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
-      if (tooltip?.showByValue && hitInfo?.items) {
+      if (tooltip?.showAllValueInRange && hitInfo?.items) {
         const isHorizontal = !!this.options.horizontal;
         const hitItemId = Object.keys(hitInfo.items)[0];
         const hitItemData = isHorizontal
