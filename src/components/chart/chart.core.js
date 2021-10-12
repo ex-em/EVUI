@@ -133,7 +133,7 @@ class EvChart {
   drawChart(hitInfo) {
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
-    this.drawAxis();
+    this.drawAxis(hitInfo);
     this.drawSeries();
     this.drawTip(hitInfo);
     if (this.bufferCanvas) {
@@ -209,20 +209,20 @@ class EvChart {
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
     const labels = this.data.labels;
-
+    const options = this.options;
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
-          return new LinearScale(dir, axis, ctx);
+          return new LinearScale(dir, axis, ctx, options);
         case 'time':
           if (axis.categoryMode) {
-            return new TimeCategoryScale(dir, axis, ctx, labels);
+            return new TimeCategoryScale(dir, axis, ctx, labels, options);
           }
-          return new TimeScale(dir, axis, ctx);
+          return new TimeScale(dir, axis, ctx, options);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':
-          return new StepScale(dir, axis, ctx, labels);
+          return new StepScale(dir, axis, ctx, labels, options);
         default:
           return false;
       }
@@ -248,9 +248,9 @@ class EvChart {
    *
    * @returns {undefined}
    */
-  drawAxis() {
+  drawAxis(hitInfo) {
     this.axesX.forEach((axis, index) => {
-      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.x[index]);
+      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.x[index], hitInfo);
     });
 
     this.axesY.forEach((axis, index) => {
