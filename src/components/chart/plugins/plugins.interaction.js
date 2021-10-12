@@ -17,11 +17,33 @@ const modules = {
       if (this.dragInfo?.isMove) {
         return;
       }
-
+      const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
+      if (tooltip?.showAllValueInRange && hitInfo?.items) {
+        const isHorizontal = !!this.options.horizontal;
+        const hitItemId = Object.keys(hitInfo.items)[0];
+        const hitItemData = isHorizontal
+          ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
+        const sIds = Object.keys(this.seriesList);
+        for (let ix = 0; ix < sIds.length; ix++) {
+          const sId = sIds[ix];
+          const series = this.seriesList[sId];
+          const hasData = series.data.find(data =>
+            (isHorizontal ? data.y : data?.x === hitItemData));
+          if (hasData && !hitInfo.items[sId] && series?.show) {
+            const item = {};
+            item.color = series.color;
+            item.hit = false;
+            item.name = series.name;
+            item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+            item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
+            item.data = hasData;
+            hitInfo.items[sId] = item;
+          }
+        }
+      }
       const ctx = this.overlayCtx;
-      const { indicator, tooltip, type } = this.options;
 
       this.overlayClear();
 
