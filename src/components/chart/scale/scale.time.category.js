@@ -4,9 +4,10 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
-  constructor(type, opt, ctx, labels) {
+  constructor(type, opt, ctx, labels, options) {
     super(type, opt, ctx);
     this.labels = labels;
+    this.options = options;
   }
 
   /**
@@ -101,7 +102,7 @@ class TimeCategoryScale extends Scale {
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo) {
     const ctx = this.ctx;
     const labels = this.labels;
     const aPos = {
@@ -179,7 +180,26 @@ class TimeCategoryScale extends Scale {
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
-
+        if (this.options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
+          const selectedLabel = this.getLabelFormat(
+            Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+          );
+          if (selectedLabel === labelText) {
+            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+            Util.showLabelTip({
+              ctx: this.ctx,
+              width: Math.round(ctx.measureText(selectedLabel).width) + 10,
+              height,
+              x: labelCenter,
+              y: labelPoint + (height - 2),
+              borderRadius: 2,
+              arrowSize: 3,
+              text: labelText,
+              backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
+              textColor: this.options?.selectItem?.labelTipStyle?.textColor,
+            });
+          }
+        }
         if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);

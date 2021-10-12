@@ -259,4 +259,57 @@ export default {
 
     return direction === 'right' ? temp + ellipsis : ellipsis + temp;
   },
+  /**
+   * Draw text tip
+   * @param {object} param     object for drawing text tip
+   *
+   * @returns {undefined}
+   */
+  showLabelTip(param) {
+    const {
+      ctx,
+      width,
+      height,
+      x,
+      y,
+      arrowSize,
+      borderRadius,
+      text,
+      backgroundColor,
+      textColor,
+    } = param;
+    const sx = x - (width / 2);
+    const ex = x + (width / 2);
+    const sy = y - height;
+    const ey = y;
+
+    ctx.beginPath();
+    ctx.save();
+    ctx.fillStyle = backgroundColor || '#E96E2C';
+    ctx.strokeStyle = backgroundColor || '#E96E2C';
+    ctx.shadowBlur = 0;
+    ctx.moveTo(sx + borderRadius, sy);
+    ctx.quadraticCurveTo(sx, sy, sx, sy + borderRadius);
+    ctx.lineTo(sx, ey - borderRadius);
+    ctx.quadraticCurveTo(sx, ey, sx + borderRadius, ey);
+    ctx.lineTo(ex - borderRadius, ey);
+    ctx.quadraticCurveTo(ex, ey, ex, ey - borderRadius);
+    ctx.lineTo(ex, sy + borderRadius);
+    ctx.quadraticCurveTo(ex, sy, ex - borderRadius, sy);
+    ctx.lineTo(x - arrowSize, sy);
+    ctx.lineTo(x, sy - arrowSize);
+    ctx.lineTo(x + arrowSize, sy);
+    ctx.lineTo(sx + borderRadius, sy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.font = 'normal normal bold 12px Roboto';
+    ctx.fillStyle = textColor || '#FFF';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.restore();
+    ctx.beginPath();
+  },
 };
