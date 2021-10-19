@@ -21,17 +21,17 @@
     setup() {
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
+          series1: { name: 'series#1', point: false },
+          // series2: { name: 'series#2' },
+          // series3: { name: 'series#3' },
+          // series4: { name: 'series#4' },
         },
         labels: [],
         data: {
           series1: [],
-          series2: [],
-          series3: [],
-          series4: [],
+          // series2: [],
+          // series3: [],
+          // series4: [],
         },
       });
 
@@ -51,12 +51,32 @@
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
+          plotLines: [{
+            color: '#BC80BD',
+            lineWidth: 2,
+            value: 100.5,
+            lineStyle: 'dash',
+          }, {
+            color: '#FF00FF',
+            lineWidth: 2,
+            value: 340.5,
+          }],
         }],
         axesY: [{
           type: 'linear',
           showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
+          plotLines: [{
+            color: '#FF0000',
+            lineWidth: 2,
+            value: 60.5,
+            lineStyle: 'dash',
+          }, {
+            color: '#000000',
+            lineWidth: 2,
+            value: 50.5,
+          }],
         }],
       };
 

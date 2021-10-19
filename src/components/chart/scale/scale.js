@@ -256,11 +256,6 @@ class Scale {
             });
           }
         }
-        if (this.showIndicator) {
-          ctx.moveTo(linePosition, offsetPoint + 6);
-          ctx.lineTo(linePosition, offsetPoint);
-        }
-
         if (ix !== 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
@@ -273,11 +268,6 @@ class Scale {
           linePosition += 1;
         }
 
-        if (this.showIndicator) {
-          ctx.moveTo(offsetPoint - 6, linePosition);
-          ctx.lineTo(offsetPoint, linePosition);
-        }
-
         if (ix !== 0 && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
@@ -286,6 +276,37 @@ class Scale {
 
       ctx.stroke();
       ctx.closePath();
+    }
+
+    // draw plot line
+    if (this.plotLines?.length) {
+      const padding = aliasPixel + 1;
+
+      this.plotLines.forEach((plotLine) => {
+        const { color, lineWidth, lineStyle, value } = plotLine;
+        ctx.beginPath();
+        ctx.save();
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = color;
+
+        if (lineStyle === 'dash') {
+          ctx.setLineDash([10, 5]);
+        }
+
+        if (this.type === 'x') {
+          const dp = aPos.x1 + value;
+          ctx.moveTo(dp, aPos.y2 + padding);
+          ctx.lineTo(dp, aPos.y1 + padding);
+        } else {
+          const dp = aPos.y2 - value;
+          ctx.moveTo(aPos.x1 + padding, dp);
+          ctx.lineTo(aPos.x2 + padding, dp);
+        }
+
+        ctx.stroke();
+        ctx.restore();
+        ctx.closePath();
+      });
     }
   }
 }
