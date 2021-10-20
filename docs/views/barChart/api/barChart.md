@@ -47,6 +47,7 @@ const chartData = {
 | fontColor | Hex, RGB, RGBA Code(String) | '#000000' | 글자 색상  | |
 | fontSize | Number | 12 | 글자 크기 | |
 | align | String | 'end' | tooltip 테두리 색상  | 'start', 'center', 'end', 'out' |
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 
 #### data example
 ```
@@ -99,6 +100,7 @@ const chartData = {
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
+  | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 
 ##### linear type
    - interval (Axis Label 표기를 위한 interval)
@@ -171,7 +173,7 @@ const chartData = {
 | maxWidth | Number |  | 툴팁의 최대 너비  | |
 | textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
-
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 
 #### indicator
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
