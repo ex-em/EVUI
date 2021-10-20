@@ -301,8 +301,9 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
+      const formattedTxt = opt.formatter ? opt.formatter(value) : numberWithComma(value);
       ctx.textAlign = 'right';
-      ctx.fillText(numberWithComma(value), this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 

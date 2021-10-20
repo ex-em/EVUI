@@ -58,6 +58,7 @@ export const BAR_OPTION = {
     use: false,
     fontSize: 12,
     textColor: '#000000',
+    formatter: null,
   },
 };
 

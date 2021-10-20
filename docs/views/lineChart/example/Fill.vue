@@ -45,9 +45,17 @@
         axesX: [{
           type: 'time',
           showGrid: false,
-          categoryMode: true,
           timeFormat: 'MM/DD',
           interval: 'day',
+          formatter: (value) => {
+            const day = dayjs(value).format('MM/DD');
+
+            if (day === '10/25') {
+              return `${day} (Peak!)`;
+            }
+
+            return day;
+          },
         }],
         axesY: [{
           type: 'linear',

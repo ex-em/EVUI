@@ -10,6 +10,10 @@ class TimeScale extends Scale {
    * @returns {string} formatted label
    */
   getLabelFormat(value) {
+    if (this.formatter) {
+      return this.formatter(value);
+    }
+
     return dayjs(value).format(this.timeFormat);
   }
 

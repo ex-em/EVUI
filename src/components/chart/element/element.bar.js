@@ -333,67 +333,68 @@ class Bar {
    */
   drawValueLabels({ context, data, positions, isHighlight }) {
     const isHorizontal = this.isHorizontal;
-    const showValue = this.showValue;
+    const { fontSize, textColor, align, formatter } = this.showValue;
     const { x, y, w, h } = positions;
     const ctx = context;
 
     ctx.save();
     ctx.beginPath();
 
+    ctx.font = `normal normal normal ${fontSize}px Roboto`;
+    ctx.fillStyle = textColor;
+    ctx.lineWidth = 1;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = isHorizontal && align !== 'center' ? 'left' : 'center';
+
     let value;
     const isStacked = !isNaN(data.o);
     if (data.o === null) {
-      value = numberWithComma(isHorizontal ? data.x : data.y);
+      value = isHorizontal ? data.x : data.y;
     } else if (isStacked) {
-      value = numberWithComma(data.o);
+      value = data.o;
     } else {
       value = '';
     }
 
-    ctx.font = `normal normal normal ${showValue.fontSize}px Roboto`;
-    ctx.fillStyle = showValue.textColor;
-    ctx.lineWidth = 1;
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = isHorizontal && showValue.align !== 'center' ? 'left' : 'center';
-
-    const vw = Math.round(ctx.measureText(value).width);
-    const vh = showValue.fontSize + 4;
+    const formattedTxt = formatter ? formatter(value) : Util.labelSignFormat(value);
+    const vw = Math.round(ctx.measureText(formattedTxt).width);
+    const vh = fontSize + 4;
     const minXPos = x + 10;
     const minYPos = y - 10;
     const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
     const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
     const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
 
-    switch (showValue.align) {
+    switch (align) {
       case 'start':
         if (isHorizontal) {
-          ctx.fillText(value, minXPos, centerYHorizontal);
+          ctx.fillText(formattedTxt, minXPos, centerYHorizontal);
         } else {
-          ctx.fillText(value, centerX, minYPos);
+          ctx.fillText(formattedTxt, centerX, minYPos);
         }
         break;
       case 'center':
         if (isHorizontal) {
-          ctx.fillText(value, centerX, centerYHorizontal);
+          ctx.fillText(formattedTxt, centerX, centerYHorizontal);
         } else {
-          ctx.fillText(value, centerX, centerY);
+          ctx.fillText(formattedTxt, centerX, centerY);
         }
         break;
       case 'out':
         if (isHorizontal) {
-          ctx.fillText(value, minXPos + w, centerYHorizontal);
+          ctx.fillText(formattedTxt, minXPos + w, centerYHorizontal);
         } else {
-          ctx.fillText(value, centerX, y + h - (vh / 2));
+          ctx.fillText(formattedTxt, centerX, y + h - (vh / 2));
         }
         break;
       case 'end':
       default:
         if (isHorizontal) {
           const xPos = x + w - (vw * 2);
-          ctx.fillText(value, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+          ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
         } else {
           const yPos = y + h + vh;
-          ctx.fillText(value, centerX, yPos >= minYPos ? minYPos : yPos);
+          ctx.fillText(formattedTxt, centerX, yPos >= minYPos ? minYPos : yPos);
         }
         break;
     }

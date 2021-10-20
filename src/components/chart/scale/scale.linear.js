@@ -9,6 +9,10 @@ class LinearScale extends Scale {
    * @returns {string} formatted label
    */
   getLabelFormat(value) {
+    if (this.formatter) {
+      return this.formatter(value);
+    }
+
     return Util.labelSignFormat(value, this.decimalPoint);
   }
 

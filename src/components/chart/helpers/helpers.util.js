@@ -133,11 +133,11 @@ export default {
   /**
    * Create sign format with number
    * @param {number} value           graph value
-   * @param {string} decimalPoint    decimal point
+   * @param {number} decimalPoint    decimal point
    *
    * @returns {string} signed value
    */
-  labelSignFormat(value, decimalPoint) {
+  labelSignFormat(value, decimalPoint = 0) {
     const quad = quadrillion(1);
     const trill = trillion(1);
     const billi = billions(1);
