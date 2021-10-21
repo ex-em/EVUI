@@ -303,6 +303,19 @@ class Line {
 
     return item;
   }
+
+  /**
+   * Returns items in range
+   * @param {object} params  range values
+   *
+   * @returns {array}
+   */
+  findItems({ xsp, width }) {
+    console.log(this.data);
+    const xep = xsp + width;
+
+    return this.data.filter(seriesData => (xsp - 1 <= seriesData.xp) && (seriesData.xp <= xep + 1));
+  }
 }
 
 export default Line;

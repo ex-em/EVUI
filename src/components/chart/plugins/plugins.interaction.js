@@ -146,8 +146,8 @@ const modules = {
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
-      if (dragSelection.use && type === 'scatter') {
-        this.dragStart(e);
+      if (dragSelection.use && (type === 'scatter' || type === 'line')) {
+        this.dragStart(e, type);
       }
     };
 
@@ -174,7 +174,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  dragStart(evt) {
+  dragStart(evt, type) {
     const [offsetX, offsetY] = this.getMousePosition(evt);
     const chartRect = this.chartRect;
     const labelOffset = this.labelOffset;
@@ -231,9 +231,9 @@ const modules = {
       }
 
       dragInfo.xsp = Math.min(xcp, xep);
-      dragInfo.ysp = Math.min(ycp, yep);
+      dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
       dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-      dragInfo.height = Math.ceil(Math.abs(yep - ycp));
+      dragInfo.height = type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
 
       this.overlayClear();
       this.drawSelectionArea(dragInfo);
