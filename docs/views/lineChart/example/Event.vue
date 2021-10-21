@@ -61,7 +61,6 @@
         axesX: [{
           type: 'time',
           showGrid: false,
-          categoryMode: true,
           timeFormat: 'YYYY-MM-DD',
           interval: 'day',
         }],
@@ -79,12 +78,12 @@
 
       const clickedLabel = ref("''");
       const onClick = (target) => {
-        clickedLabel.value = target.label;
+        clickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
       };
 
       const dblClickedLabel = ref("''");
       const onDblClick = (target) => {
-        dblClickedLabel.value = target.label;
+        dblClickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
       };
 
       return {
