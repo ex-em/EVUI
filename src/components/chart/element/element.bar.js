@@ -1,5 +1,4 @@
 import { defaultsDeep } from 'lodash-es';
-import { numberWithComma } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
