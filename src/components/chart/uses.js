@@ -81,9 +81,9 @@ const DEFAULT_OPTIONS = {
     tipTextColor: '#FFFFFF',
   },
   dragSelection: {
-    use: true,
+    use: false,
     keepDisplay: true,
-    fillColor: '#38acec',
+    fillColor: '#38ACEC',
     opacity: 0.65,
   },
 };
