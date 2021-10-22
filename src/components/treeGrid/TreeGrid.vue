@@ -1,5 +1,23 @@
 <template>
   <div
+    v-if="!!$slots.toolbar"
+    class="toolbar-wrapper"
+    :style="`width: ${gridWidth};`"
+  >
+    <!-- Toolbar -->
+    <toolbar v-if="!!$slots.toolbar" >
+      <template #toolbarWrapper>
+        <slot
+          name="toolbar"
+          :item="{
+            onSearch: onSearch,
+          }"
+        >
+        </slot>
+      </template>
+    </toolbar>
+  </div>
+  <div
     ref="grid-wrapper"
     v-resize="onResize"
     v-observe-visibility="{
@@ -126,6 +144,7 @@
 <script>
 import { reactive, toRefs, computed, watch, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
+import Toolbar from './treeGrid.toolbar';
 import {
   commonFunctions,
   scrollEvent,
@@ -140,6 +159,7 @@ export default {
   name: 'EvTreeGrid',
   components: {
     treeGridNode,
+    Toolbar,
   },
   props: {
     columns: {
@@ -337,6 +357,61 @@ export default {
         onResize();
       },
     );
+    const makeParentShow = (data) => {
+      if (data.parent === undefined) {
+        return;
+      }
+      const parent = data.parent;
+      parent.show = true;
+      parent.expand = true;
+      makeParentShow(parent);
+    };
+    let timer = null;
+    const onSearch = (searchWord) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        stores.treeStore.forEach((row) => {
+          const data = row;
+          data.show = false;
+        });
+        if (searchWord) {
+          const filterStores = stores.treeStore.filter((row) => {
+            let isShow = false;
+            for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
+              const column = stores.orderedColumns[ix] || {};
+              let columnValue = row[column.field];
+              let columnType = column.type;
+              if (columnValue) {
+                if (!columnType) {
+                  columnType = 'string';
+                }
+                columnValue = getConvertValue(columnType, columnValue).toString();
+                isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
+                if (isShow) {
+                  break;
+                }
+              }
+            }
+            return isShow;
+          });
+          filterStores.forEach((row) => {
+            const data = row;
+            data.show = true;
+            makeParentShow(data);
+          });
+        } else { // 검색결과 없으면 다 show (문제점 : 처음상태와 다르게 다 보여주게됨)
+          stores.treeStore.forEach((row) => {
+            const data = row;
+            data.show = true;
+          });
+        }
+        calculatedColumn();
+        updateVScroll();
+        console.log('search..', stores.treeStore, stores.showTreeStore);
+      }, 500);
+    };
     const gridStyle = computed(() => ({
       width: resizeInfo.gridWidth,
       height: resizeInfo.gridHeight,
@@ -409,6 +484,7 @@ export default {
       onCheckAll,
       setContextMenu,
       onContextMenu,
+      onSearch,
       handleExpand,
       gridStyle,
       gridClass,
