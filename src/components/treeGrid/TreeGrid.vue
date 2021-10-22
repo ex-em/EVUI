@@ -373,8 +373,8 @@ export default {
       }
       timer = setTimeout(() => {
         stores.treeStore.forEach((row) => {
-          const data = row;
-          data.show = false;
+          // eslint-disable-next-line no-param-reassign
+          row.show = false;
         });
         if (searchWord) {
           const filterStores = stores.treeStore.filter((row) => {
@@ -397,19 +397,18 @@ export default {
             return isShow;
           });
           filterStores.forEach((row) => {
-            const data = row;
-            data.show = true;
-            makeParentShow(data);
+            // eslint-disable-next-line no-param-reassign
+            row.show = true;
+            makeParentShow(row);
           });
-        } else { // 검색결과 없으면 다 show (문제점 : 처음상태와 다르게 다 보여주게됨)
+        } else {
           stores.treeStore.forEach((row) => {
-            const data = row;
-            data.show = true;
+            // eslint-disable-next-line no-param-reassign
+            row.show = true;
           });
         }
         calculatedColumn();
         updateVScroll();
-        console.log('search..', stores.treeStore, stores.showTreeStore);
       }, 500);
     };
     const gridStyle = computed(() => ({
