@@ -148,7 +148,7 @@ const chartData =
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
-| use | Boolean | true | drag-select 사용 여부 | true / false |
+| use | Boolean | false | drag-select 사용 여부 | true / false |
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |

@@ -8,6 +8,8 @@ import Stack from './example/Stack';
 import StackRaw from '!!raw-loader!./example/Stack';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import DragSelection from './example/DragSelection';
+import DragSelectionRaw from '!!raw-loader!./example/DragSelection';
 import Tooltip from './example/Tooltip';
 import TooltipRaw from '!!raw-loader!./example/Tooltip';
 
@@ -33,6 +35,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    DragSelection: {
+      description: 'Drag Select 이벤트 등록이 가능 합니다',
+      component: DragSelection,
+      parsedData: parseComponent(DragSelectionRaw),
     },
     Tooltip: {
       description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',

@@ -1,5 +1,10 @@
 <template>
   <section
+    v-resize="onResize"
+    v-observe-visibility="{
+      callback: onResize,
+      once: true,
+    }"
     class="ev-tabs"
     :class="{
       closable,
@@ -85,7 +90,7 @@
 import {
   ref, reactive, computed,
   provide, triggerRef,
-  onBeforeUpdate, nextTick, onUpdated,
+  onBeforeUpdate, nextTick,
 } from 'vue';
 
 export default {
@@ -215,16 +220,6 @@ export default {
       }
     });
 
-    // 최초 렌더링 시 El의 너비 확인
-    nextTick(() => {
-      observeListEl();
-    });
-
-    // 화면 업데이트 시 El의 너비 확인
-    onUpdated(() => {
-      observeListEl();
-    });
-
     /**
      *  탭 클릭 로직
      */
@@ -342,6 +337,10 @@ export default {
       tabCloneList.value.splice(0);
     };
 
+    const onResize = () => {
+      observeListEl();
+    };
+
     return {
       mv,
       computedTabList,
@@ -359,6 +358,8 @@ export default {
       dragendTab,
       dragSelectCls,
       selectIdxCls,
+
+      onResize,
     };
   },
 };
