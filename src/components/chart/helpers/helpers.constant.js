@@ -95,6 +95,23 @@ export const AXIS_OPTION = {
   },
 };
 
+export const PLOT_LINE_OPTION = {
+  color: '#FF0000',
+  lineWidth: 1,
+};
+
+export const PLOT_LINE_LABEL_OPTION = {
+  fontSize: 12,
+  fontColor: '#FF0000',
+  fillColor: '#FFFFFF',
+  lineColor: '#FF0000',
+  lineWidth: 0,
+  fontWeight: 400,
+  fontFamily: 'Roboto',
+  verticalAlign: 'middle',
+  textAlign: 'center',
+};
+
 export const TIME_INTERVALS = {
   millisecond: {
     common: true,
