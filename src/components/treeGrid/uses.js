@@ -583,19 +583,7 @@ export const treeEvent = (params) => {
   const setExpandNode = (children, isShow, isFilter) => {
     children.forEach((nodeObj) => {
       const node = nodeObj;
-      if (isFilter) {
-        if (isShow) {
-          if (node.isFilter) {
-            node.show = true;
-          } else {
-            node.show = false;
-          }
-        } else {
-          node.show = isShow;
-        }
-      } else {
-        node.show = isShow;
-      }
+      node.show = isFilter && isShow ? node.isFilter : isShow;
       if (node.hasChild) {
         setExpandNode(node.children, node.show && node.expand, node.isFilter);
       }
@@ -629,9 +617,8 @@ export const filterEvent = (params) => {
     }
     timer = setTimeout(() => {
       stores.treeStore.forEach((row) => {
-        const node = row;
-        node.show = false;
-        node.isFilter = false;
+        row.show = false;
+        row.isFilter = false;
       });
       if (searchWord) {
         const filterStores = stores.treeStore.filter((row) => {
@@ -655,16 +642,14 @@ export const filterEvent = (params) => {
           return isSameWord;
         });
         filterStores.forEach((row) => {
-          const node = row;
-          node.show = true;
-          node.isFilter = true;
-          makeParentShow(node);
+          row.show = true;
+          row.isFilter = true;
+          makeParentShow(row);
         });
       } else {
         stores.treeStore.forEach((row) => {
-          const node = row;
-          node.show = true;
-          node.isFilter = false;
+          row.show = true;
+          row.isFilter = false;
         });
       }
       calculatedColumn();
