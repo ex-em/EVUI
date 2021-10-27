@@ -28,21 +28,21 @@ module.exports = {
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': ['error', {
-      props: true,
-      ignorePropertyModificationsFor: [
-        'state', // for vuex state
-        'acc', // for reduce accumulators
-        'accumulator', // for reduce accumulators
-        'e', // for e.returnvalue
-        'series',
-        'sId',
-        'ctx',
-        'req', // for Express requests
-        'request', // for Express requests
-        'res', // for Express responses
-        'response', // for Express responses
-        'cur',
-      ],
+      props: false,
+      // ignorePropertyModificationsFor: [
+      //   'state', // for vuex state
+      //   'acc', // for reduce accumulators
+      //   'accumulator', // for reduce accumulators
+      //   'e', // for e.returnvalue
+      //   'series',
+      //   'sId',
+      //   'ctx',
+      //   'req', // for Express requests
+      //   'request', // for Express requests
+      //   'res', // for Express responses
+      //   'response', // for Express responses
+      //   'cur',
+      // ],
     }],
     indent: 'off',
     'linebreak-style': 0,

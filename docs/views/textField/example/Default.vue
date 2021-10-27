@@ -111,7 +111,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .case .ev-text-field {
   width: 300px;
   margin-right: 15px;

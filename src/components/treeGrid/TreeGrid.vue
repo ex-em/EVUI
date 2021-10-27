@@ -1,5 +1,23 @@
 <template>
   <div
+    v-if="!!$slots.toolbar"
+    class="toolbar-wrapper"
+    :style="`width: ${gridWidth};`"
+  >
+    <!-- Toolbar -->
+    <toolbar v-if="!!$slots.toolbar" >
+      <template #toolbarWrapper>
+        <slot
+          name="toolbar"
+          :item="{
+            onSearch,
+          }"
+        >
+        </slot>
+      </template>
+    </toolbar>
+  </div>
+  <div
     ref="grid-wrapper"
     v-resize="onResize"
     v-observe-visibility="{
@@ -126,6 +144,7 @@
 <script>
 import { reactive, toRefs, computed, watch, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
+import Toolbar from './treeGrid.toolbar';
 import {
   commonFunctions,
   scrollEvent,
@@ -134,12 +153,14 @@ import {
   checkEvent,
   contextMenuEvent,
   treeEvent,
+  filterEvent,
 } from './uses';
 
 export default {
   name: 'EvTreeGrid',
   components: {
     treeGridNode,
+    Toolbar,
   },
   props: {
     columns: {
@@ -287,6 +308,10 @@ export default {
       handleExpand,
     } = treeEvent({ stores, onResize });
 
+    const {
+      onSearch,
+    } = filterEvent({ stores, getConvertValue, calculatedColumn, updateVScroll });
+
     watch(
       () => props.checked,
       (value) => {
@@ -409,6 +434,7 @@ export default {
       onCheckAll,
       setContextMenu,
       onContextMenu,
+      onSearch,
       handleExpand,
       gridStyle,
       gridClass,
