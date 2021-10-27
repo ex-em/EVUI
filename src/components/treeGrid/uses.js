@@ -572,29 +572,104 @@ export const treeEvent = (params) => {
       node.checked = false;
       node.index = index++;
       node.parent = parent;
+      node.isFilter = false;
       stores.treeStore.push(node);
-
       if (node.children && node.children.length > 0) {
         node.hasChild = true;
         setTreeStore(node.children, node.level + 1, node.show && node.expand, node);
       }
     });
   };
-  const setExpandNode = (children, isShow) => {
+  const setExpandNode = (children, isShow, isFilter) => {
     children.forEach((nodeObj) => {
       const node = nodeObj;
-      node.show = isShow;
-
+      if (isFilter) {
+        if (isShow) {
+          if (node.isFilter) {
+            node.show = true;
+          } else {
+            node.show = false;
+          }
+        } else {
+          node.show = isShow;
+        }
+      } else {
+        node.show = isShow;
+      }
       if (node.hasChild) {
-        setExpandNode(node.children, node.show && node.expand);
+        setExpandNode(node.children, node.show && node.expand, node.isFilter);
       }
     });
   };
   const handleExpand = (node) => {
     const data = node;
     data.expand = !data.expand;
-    setExpandNode(data.children, data.expand);
+    setExpandNode(data.children, data.expand, data.isFilter);
     onResize();
   };
   return { setTreeStore, handleExpand };
+};
+
+export const filterEvent = (params) => {
+  const { stores, getConvertValue, calculatedColumn, updateVScroll } = params;
+  const makeParentShow = (data) => {
+    if (!data?.parent) {
+      return;
+    }
+    const { parent } = data;
+    parent.show = true;
+    parent.expand = true;
+    parent.isFilter = true;
+    makeParentShow(parent);
+  };
+  let timer = null;
+  const onSearch = (searchWord) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      stores.treeStore.forEach((row) => {
+        const node = row;
+        node.show = false;
+        node.isFilter = false;
+      });
+      if (searchWord) {
+        const filterStores = stores.treeStore.filter((row) => {
+          let isSameWord = false;
+          for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
+            const column = stores.orderedColumns[ix] || {};
+            let columnValue = row[column.field];
+            let columnType = column.type;
+            if (columnValue) {
+              if (!columnType) {
+                columnType = 'string';
+              }
+              columnValue = getConvertValue(columnType, columnValue).toString();
+              isSameWord = columnValue.toLowerCase()
+                .includes(searchWord.toString().toLowerCase());
+              if (isSameWord) {
+                break;
+              }
+            }
+          }
+          return isSameWord;
+        });
+        filterStores.forEach((row) => {
+          const node = row;
+          node.show = true;
+          node.isFilter = true;
+          makeParentShow(node);
+        });
+      } else {
+        stores.treeStore.forEach((row) => {
+          const node = row;
+          node.show = true;
+          node.isFilter = false;
+        });
+      }
+      calculatedColumn();
+      updateVScroll();
+    }, 500);
+  };
+  return { onSearch };
 };

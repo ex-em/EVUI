@@ -71,24 +71,23 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
-    const menuItems = ref([{
-      text: 'Menu1',
-      click: () => {
-        console.log(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value.data)}`);
+    const menuItems = ref([
+      {
+        text: 'Menu1',
+        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value.data}`),
+      }, {
+        text: 'Menu2',
+        click: () => console.log('[Menu2]'),
       },
-    }, {
-      text: 'Menu2',
-      click: () => console.log('[Menu2]'),
-    },
     ]);
     const borderMV = ref('');
     const searchVm = ref('');
     const onCheckedRow = () => {
       let checkedRow = '';
-      for (let i = 0; i < checked.value.length; i++) {
-        checkedRow += JSON.stringify(checked.value[i].data);
-      }
-      checkedRowsMV.value = checkedRow;
+      checkedRowsMV.value = checked.value.reduce((prev, curr) => {
+        checkedRow += JSON.stringify(curr?.data);
+        return checkedRow;
+      }, JSON.stringify(checked.value[0]?.data));
     };
     const onDoubleClickRow = (e) => {
       const rowData = e.rowData.data;
@@ -214,7 +213,7 @@ export default {
   width: 50%;
 }
 .ev-text-field, .ev-input-number, .ev-select {
-  width: 80%;
+  width: 30%;
 }
 .badge {
   margin-bottom: 2px;

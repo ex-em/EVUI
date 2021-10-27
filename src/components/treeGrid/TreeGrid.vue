@@ -10,7 +10,7 @@
         <slot
           name="toolbar"
           :item="{
-            onSearch: onSearch,
+            onSearch,
           }"
         >
         </slot>
@@ -153,6 +153,7 @@ import {
   checkEvent,
   contextMenuEvent,
   treeEvent,
+  filterEvent,
 } from './uses';
 
 export default {
@@ -307,6 +308,10 @@ export default {
       handleExpand,
     } = treeEvent({ stores, onResize });
 
+    const {
+      onSearch,
+    } = filterEvent({ stores, getConvertValue, calculatedColumn, updateVScroll });
+
     watch(
       () => props.checked,
       (value) => {
@@ -357,60 +362,6 @@ export default {
         onResize();
       },
     );
-    const makeParentShow = (data) => {
-      if (data.parent === undefined) {
-        return;
-      }
-      const parent = data.parent;
-      parent.show = true;
-      parent.expand = true;
-      makeParentShow(parent);
-    };
-    let timer = null;
-    const onSearch = (searchWord) => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        stores.treeStore.forEach((row) => {
-          // eslint-disable-next-line no-param-reassign
-          row.show = false;
-        });
-        if (searchWord) {
-          const filterStores = stores.treeStore.filter((row) => {
-            let isShow = false;
-            for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
-              const column = stores.orderedColumns[ix] || {};
-              let columnValue = row[column.field];
-              let columnType = column.type;
-              if (columnValue) {
-                if (!columnType) {
-                  columnType = 'string';
-                }
-                columnValue = getConvertValue(columnType, columnValue).toString();
-                isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
-                if (isShow) {
-                  break;
-                }
-              }
-            }
-            return isShow;
-          });
-          filterStores.forEach((row) => {
-            // eslint-disable-next-line no-param-reassign
-            row.show = true;
-            makeParentShow(row);
-          });
-        } else {
-          stores.treeStore.forEach((row) => {
-            // eslint-disable-next-line no-param-reassign
-            row.show = true;
-          });
-        }
-        calculatedColumn();
-        updateVScroll();
-      }, 500);
-    };
     const gridStyle = computed(() => ({
       width: resizeInfo.gridWidth,
       height: resizeInfo.gridHeight,

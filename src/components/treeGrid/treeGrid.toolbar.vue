@@ -14,11 +14,11 @@ export default {
 @import '../../style/index.scss';
 .treeGridToolbar {
   margin-bottom: 10px;
+  overflow: hidden;
 }
 .treeGridToolbar > .search {
   float: right;
-  width: auto !important;
-  margin-right: 0 !important;
+  margin-right: 0;
 }
 .treeGridToolbar > .ev-button {
   margin: 0 2px 0 2px;
