@@ -11,7 +11,11 @@ class TimeScale extends Scale {
    */
   getLabelFormat(value) {
     if (this.formatter) {
-      return this.formatter(value);
+      const formattedLabel = this.formatter(value);
+
+      if (typeof formattedLabel === 'string') {
+        return formattedLabel;
+      }
     }
 
     return dayjs(value).format(this.timeFormat);

@@ -355,7 +355,15 @@ class Bar {
       value = '';
     }
 
-    const formattedTxt = formatter ? formatter(value) : Util.labelSignFormat(value);
+    let formattedTxt;
+    if (formatter) {
+      formattedTxt = formatter(value);
+    }
+
+    if (!formatter || typeof formattedTxt !== 'string') {
+      formattedTxt = Util.labelSignFormat(value);
+    }
+
     const vw = Math.round(ctx.measureText(formattedTxt).width);
     const vh = fontSize + 4;
     const minXPos = x + 10;

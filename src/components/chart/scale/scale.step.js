@@ -168,7 +168,11 @@ class StepScale extends Scale {
    */
   getLabelFormat(value, maxWidth) {
     if (this.formatter) {
-      return this.formatter(value);
+      const formattedLabel = this.formatter(value);
+
+      if (typeof formattedLabel === 'string') {
+        return formattedLabel;
+      }
     }
 
     return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
