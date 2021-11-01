@@ -36,6 +36,15 @@
           startToZero: true,
           autoScaleRatio: 0.1,
         }],
+        legend: {
+          show: true,
+          position: 'bottom',
+          height: 50,
+          padding: {
+            left: 60,
+            top: 20,
+          },
+        },
       };
 
       return {
