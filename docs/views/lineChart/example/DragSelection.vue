@@ -3,19 +3,34 @@
     <ev-chart
       :data="chartData"
       :options="chartOptions"
-      @click="onClick"
-      @dbl-click="onDblClick"
+      @drag-select="onDragSelect"
     />
     <div class="description">
-      <div class="badge yellow">
-        클릭된 라벨
-      </div>
-      {{ clickedLabel }}
+      <div class="badge yellow"> 선택 영역 내 데이터 </div>
       <br><br>
-      <div class="badge yellow">
-        더블 클릭된 라벨
+      <div
+        v-for="(row, rowIndex) in selectionItems"
+        :key="rowIndex"
+      >
+        <span> Series Name : {{ row.seriesName }} </span>
+        <br>
+        <div
+          v-for="(item, itemIndex) in row.items"
+          :key="itemIndex"
+        >
+          <span>x : {{ convertToDateString(item.x) }}</span>
+          <span>y : {{ item.y }}</span>
+        </div>
+        <br><br>
       </div>
-      {{ dblClickedLabel }}
+      <div class="badge yellow"> 범위 값 </div>
+      <br><br>
+      <div v-if="selectionRange.xMin">
+        <p> X min : {{ convertToDateString(selectionRange.xMin) }} </p>
+        <p> X max : {{ convertToDateString(selectionRange.xMax) }} </p>
+        <p> Y min : {{ selectionRange.yMin }} </p>
+        <p> Y max : {{ selectionRange.yMax }} </p>
+      </div>
     </div>
   </div>
 </template>
@@ -60,8 +75,8 @@
         },
         axesX: [{
           type: 'time',
-          showGrid: false,
-          timeFormat: 'YYYY-MM-DD',
+          showGrid: true,
+          timeFormat: 'MM/DD',
           interval: 'day',
         }],
         axesY: [{
@@ -70,33 +85,37 @@
           startToZero: true,
           autoScaleRatio: 0.1,
         }],
-        selectItem: {
+        dragSelection: {
           use: true,
-          showTextTip: true,
+          keepDisplay: true,
         },
       };
 
-      const clickedLabel = ref("''");
-      const onClick = (target) => {
-        clickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
+      const selectionItems = ref([]);
+      const selectionRange = ref({});
+      const onDragSelect = ({ data, range }) => {
+        selectionItems.value = data;
+        selectionRange.value = range;
       };
 
-      const dblClickedLabel = ref("''");
-      const onDblClick = (target) => {
-        dblClickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
-      };
+      const convertToDateString = value => dayjs(value).format('MM/DD');
 
       return {
         chartData,
         chartOptions,
-        clickedLabel,
-        dblClickedLabel,
-        onClick,
-        onDblClick,
+        selectionItems,
+        selectionRange,
+        onDragSelect,
+        convertToDateString,
       };
     },
   };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.description {
+  span {
+    margin-right: 15px;
+  }
+}
 </style>

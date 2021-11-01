@@ -1,3 +1,5 @@
+import { defaultsDeep } from 'lodash-es';
+import { PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -157,6 +159,35 @@ class StepScale extends Scale {
     });
 
     ctx.closePath();
+
+    // draw plot line
+    if (this.plotLines?.length) {
+      const padding = aliasPixel + 1;
+      const minX = aPos.x1 + padding;
+      const maxX = aPos.x2;
+      const minY = aPos.y1 + padding;
+      const maxY = aPos.y2;
+
+      this.plotLines.forEach((plotLine) => {
+        if (!plotLine.value) {
+          return;
+        }
+
+        const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
+        const { value, label: labelOpt } = mergedPlotLineOpt;
+        const dataPos = Math.round(startPoint + (labelGap * value)) + (labelGap / 2);
+
+        this.setPlotLineStyle(mergedPlotLineOpt);
+
+        if (this.type === 'x') {
+          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+        } else {
+          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+        }
+
+        ctx.restore();
+      });
+    }
   }
 
   /**
