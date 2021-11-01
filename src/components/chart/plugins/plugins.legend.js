@@ -313,15 +313,18 @@ const modules = {
 
     let chartRect;
     const title = opt?.title?.show ? opt?.title?.height : 0;
-    const top = title + opt?.legend?.height;
+    const positionTop = title + opt?.legend?.height;
+    const { top = 0, bottom = 0, left = 0, right = 0 } = opt?.legend?.padding ?? {};
 
     if (!wrapperStyle || !legendStyle) {
       return;
     }
 
+    boxStyle.padding = `${top}px ${right}px ${bottom}px ${left}px`;
+
     switch (position) {
       case 'top':
-        wrapperStyle.padding = `${top}px 0 0 0`;
+        wrapperStyle.padding = `${positionTop}px 0 0 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
         boxStyle.width = '100%';
@@ -335,7 +338,7 @@ const modules = {
         legendStyle.width = `${chartRect.width}px`;
         legendStyle.height = `${opt.legend.height + 4}px`; // 4 resize bar size
 
-        resizeStyle.top = `${top}px`;
+        resizeStyle.top = `${positionTop}px`;
         resizeStyle.right = '';
         resizeStyle.bottom = '';
         resizeStyle.left = '';
