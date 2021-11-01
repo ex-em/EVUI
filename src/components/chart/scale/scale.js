@@ -1,5 +1,11 @@
+import Canvas from '@/components/chart/helpers/helpers.canvas';
 import { defaultsDeep } from 'lodash-es';
-import { AXIS_OPTION, AXIS_UNITS } from '../helpers/helpers.constant';
+import {
+  AXIS_OPTION,
+  AXIS_UNITS,
+  PLOT_LINE_OPTION,
+  PLOT_LINE_LABEL_OPTION,
+} from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
 class Scale {
@@ -256,11 +262,6 @@ class Scale {
             });
           }
         }
-        if (this.showIndicator) {
-          ctx.moveTo(linePosition, offsetPoint + 6);
-          ctx.lineTo(linePosition, offsetPoint);
-        }
-
         if (ix !== 0 && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
@@ -273,11 +274,6 @@ class Scale {
           linePosition += 1;
         }
 
-        if (this.showIndicator) {
-          ctx.moveTo(offsetPoint - 6, linePosition);
-          ctx.lineTo(offsetPoint, linePosition);
-        }
-
         if (ix !== 0 && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
@@ -287,6 +283,258 @@ class Scale {
       ctx.stroke();
       ctx.closePath();
     }
+
+    // Draw plot line
+    if (this.plotLines?.length) {
+      const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const padding = aliasPixel + 1;
+      const minX = aPos.x1 + padding;
+      const maxX = aPos.x2;
+      const minY = aPos.y1 + padding;
+      const maxY = aPos.y2;
+
+      this.plotLines.forEach((plotLine) => {
+        if (!plotLine.value) {
+          return;
+        }
+
+        const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
+        const { value, label: labelOpt } = mergedPlotLineOpt;
+
+        this.setPlotLineStyle(mergedPlotLineOpt);
+
+        if (this.type === 'x') {
+          const dataX = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
+          this.drawXPlotLine(dataX, minX, maxX, minY, maxY, labelOpt);
+        } else {
+          const dataY = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
+          this.drawYPlotLine(dataY, minX, maxX, minY, maxY, labelOpt);
+        }
+
+        ctx.restore();
+      });
+    }
+  }
+
+  /**
+   * Set plot line style
+   * @param {object} plotLine      plotLine Options
+   *
+   * @returns {undefined}
+   */
+  setPlotLineStyle(plotLine) {
+    const ctx = this.ctx;
+    const { color, lineWidth } = plotLine;
+
+    ctx.beginPath();
+    ctx.save();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
+
+    if (plotLine.segments) {
+      ctx.setLineDash(plotLine.segments);
+    }
+  }
+
+  /**
+   * Draw X Plot line
+   * @param {object} dataX         Data's X Position
+   * @param {number} minX          Min X Position
+   * @param {number} maxX          Max X Position
+   * @param {number} minY          Min Y Position
+   * @param {number} maxY          Max Y Position
+   * @param {object} labelOpt      plotLine Options
+   *
+   * @returns {undefined}
+   */
+  drawXPlotLine(dataX, minX, maxX, minY, maxY, labelOpt) {
+    const ctx = this.ctx;
+
+    if (!dataX || dataX < minX || dataX > maxX) {
+      ctx.closePath();
+      ctx.restore();
+      return;
+    }
+
+    ctx.moveTo(dataX, maxY);
+    ctx.lineTo(dataX, minY);
+
+    ctx.stroke();
+    ctx.restore();
+    ctx.closePath();
+
+    if (labelOpt) {
+      const mergedLabelOpt = defaultsDeep({}, labelOpt, PLOT_LINE_LABEL_OPTION);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.font = Util.getLabelStyle(mergedLabelOpt);
+
+      const {
+        fontSize,
+        labelBoxPadding,
+        labelHalfWidth,
+      } = this.getLabelParameters(mergedLabelOpt);
+
+      if (fontSize <= 0) {
+        return;
+      }
+
+      let textX;
+      switch (mergedLabelOpt.textAlign) {
+        case 'left':
+          textX = dataX - labelHalfWidth - labelBoxPadding;
+          break;
+
+        case 'right':
+          textX = dataX + labelHalfWidth + labelBoxPadding;
+          break;
+
+        case 'center':
+        default:
+          textX = dataX;
+          break;
+      }
+
+      const textY = minY - labelBoxPadding - fontSize;
+
+      this.drawPlotLineLabel(mergedLabelOpt, {
+        top: minY - (labelBoxPadding * 2) - fontSize,
+        bottom: minY - labelBoxPadding,
+        left: textX - labelHalfWidth - labelBoxPadding,
+        right: textX + labelHalfWidth + labelBoxPadding,
+        x: textX,
+        y: textY,
+      });
+    }
+  }
+
+  /**
+   * Draw Y Plot line
+   * @param {object} dataY         Data's Y Position
+   * @param {number} minX          Min X Position
+   * @param {number} maxX          Max X Position
+   * @param {number} minY          Min Y Position
+   * @param {number} maxY          Max Y Position
+   * @param {object} labelOpt      plotLine Options
+   *
+   * @returns {undefined}
+   */
+  drawYPlotLine(dataY, minX, maxX, minY, maxY, labelOpt) {
+    const ctx = this.ctx;
+
+    if (!dataY || dataY > maxY || dataY < minY) {
+      ctx.closePath();
+      ctx.restore();
+      return;
+    }
+
+    ctx.moveTo(minX, dataY);
+    ctx.lineTo(maxX, dataY);
+
+    ctx.stroke();
+    ctx.restore();
+    ctx.closePath();
+
+    if (labelOpt) {
+      const mergedLabelOpt = defaultsDeep({}, labelOpt, PLOT_LINE_LABEL_OPTION);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.font = Util.getLabelStyle(mergedLabelOpt);
+
+      const {
+        fontSize,
+        labelWidth,
+        labelHalfHeight,
+        labelBoxPadding,
+      } = this.getLabelParameters(mergedLabelOpt);
+
+      if (fontSize <= 0) {
+        return;
+      }
+
+      let textY;
+      switch (mergedLabelOpt.verticalAlign) {
+        case 'top':
+          textY = dataY - labelHalfHeight - labelBoxPadding;
+          break;
+
+        case 'bottom':
+          textY = dataY + labelHalfHeight + labelBoxPadding;
+          break;
+
+        case 'middle':
+        default:
+          textY = dataY;
+          break;
+      }
+
+      const textX = maxX + labelWidth + labelBoxPadding;
+
+      this.drawPlotLineLabel(mergedLabelOpt, {
+        top: textY - labelHalfHeight - labelBoxPadding,
+        bottom: textY + labelHalfHeight + labelBoxPadding,
+        left: textX - labelWidth - (labelBoxPadding / 2),
+        right: textX + labelBoxPadding,
+        x: textX,
+        y: textY,
+      });
+    }
+  }
+
+  /**
+   * Calculate Values for drawing label
+   * @param {object} labelOpt      plotLine Options
+   *
+   * @returns {object}
+   */
+  getLabelParameters(labelOpt) {
+    const ctx = this.ctx;
+    const fontSize = labelOpt.fontSize > 20 ? 20 : labelOpt.fontSize;
+    const labelBoxPadding = fontSize / 4;
+    const labelWidth = ctx.measureText(labelOpt.text).width;
+    const labelHalfWidth = labelWidth / 2;
+    const labelHalfHeight = fontSize / 2;
+
+    return {
+      fontSize,
+      labelBoxPadding,
+      labelWidth,
+      labelHalfWidth,
+      labelHalfHeight,
+    };
+  }
+
+  /**
+   * Calculate Values for drawing label
+   * @param {object} labelOpt      plot line Label Options
+   * @param {object} positions     label positions
+   *
+   * @returns {undefined}
+   */
+  drawPlotLineLabel(labelOpt, positions) {
+    const ctx = this.ctx;
+    const { top, bottom, left, right, x, y } = positions;
+
+    ctx.fillStyle = labelOpt.fillColor;
+    ctx.strokeStyle = labelOpt.lineColor;
+    ctx.lineWidth = labelOpt.lineWidth;
+    ctx.moveTo(left, bottom);
+    ctx.lineTo(left, top);
+    ctx.lineTo(right, top);
+    ctx.lineTo(right, bottom);
+    ctx.lineTo(left, bottom);
+    ctx.fill();
+
+    if (labelOpt.lineWidth > 0) {
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = labelOpt.fontColor;
+    ctx.fillText(labelOpt.text, x, y);
+    ctx.closePath();
   }
 }
 

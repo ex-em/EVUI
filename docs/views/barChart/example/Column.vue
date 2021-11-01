@@ -30,6 +30,9 @@
         type: 'bar',
         thickness: 0.8,
         width: '100%',
+        padding: {
+          right: 40,
+        },
         title: {
           text: 'Chart Title',
             show: true,
@@ -51,6 +54,23 @@
           startToZero: true,
           autoScaleRatio: 0.1,
           showGrid: false,
+          plotLines: [{
+            value: 180,
+            color: '#FFA500',
+            label: {
+              text: 'Warning',
+              fontColor: '#FFA500',
+            },
+          }, {
+            value: 300,
+            label: {
+              lineWidth: 1,
+              lineColor: '#000000',
+              fillColor: '#FF0000',
+              fontColor: '#FFFFFF',
+              text: 'Critical',
+            },
+          }],
         }],
       };
 
