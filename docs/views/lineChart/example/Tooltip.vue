@@ -201,6 +201,7 @@
           maxWidth,
           maxHeight,
           textOverflow,
+          formatter: ({ x, y, name }) => console.log(`X: ${x}, Y: ${y}, series name: ${name}`),
         },
       });
 

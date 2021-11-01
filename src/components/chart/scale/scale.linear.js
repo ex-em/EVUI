@@ -9,6 +9,14 @@ class LinearScale extends Scale {
    * @returns {string} formatted label
    */
   getLabelFormat(value) {
+    if (this.formatter) {
+      const formattedLabel = this.formatter(value);
+
+      if (typeof formattedLabel === 'string') {
+        return formattedLabel;
+      }
+    }
+
     return Util.labelSignFormat(value, this.decimalPoint);
   }
 

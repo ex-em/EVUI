@@ -78,7 +78,8 @@ const chartData =
   | interval | String | null | 축에 표시되는 값의 간격 단위 (ex. 'day', 'hour', 'minute'...)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
-      
+  | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
