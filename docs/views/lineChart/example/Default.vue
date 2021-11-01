@@ -19,26 +19,24 @@
 
   export default {
     setup() {
+      const crushTime = ref();
       const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
         },
         labels: [],
         data: {
           series1: [],
-          series2: [],
-          series3: [],
-          series4: [],
         },
       });
 
-      const chartOptions = {
+      const chartOptions = reactive({
         type: 'line',
         width: '100%',
         height: '80%',
+        padding: {
+          right: 40,
+        },
         title: {
           text: 'Chart Title',
           show: true,
@@ -51,14 +49,30 @@
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
+          plotLines: [{
+            color: '#FF0000',
+            value: crushTime,
+            segments: [6, 2],
+            label: {
+              text: 'Crush',
+            },
+          }],
         }],
         axesY: [{
           type: 'linear',
           showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
+          plotLines: [{
+            color: '#FFA500',
+            value: 3000,
+            label: {
+              text: 'Caution',
+              fontColor: '#FFA500',
+            },
+          }],
         }],
-      };
+      });
 
       const isLive = ref(false);
       const liveInterval = ref();
@@ -77,7 +91,12 @@
             seriesData.shift();
           }
 
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+          const randomValue = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+          seriesData.push(randomValue);
+
+          if (randomValue > 4800) {
+            crushTime.value = timeValue;
+          }
         });
       };
 
