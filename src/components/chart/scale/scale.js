@@ -5,6 +5,7 @@ import {
   AXIS_UNITS,
   PLOT_LINE_OPTION,
   PLOT_LINE_LABEL_OPTION,
+  PLOT_BAND_OPTION,
 } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
@@ -284,17 +285,41 @@ class Scale {
       ctx.closePath();
     }
 
-    // Draw plot line
-    if (this.plotLines?.length) {
+    // Draw plot lines and plot bands
+    if (this.plotBands?.length || this.plotLines?.length) {
       const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
       const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
       const padding = aliasPixel + 1;
       const minX = aPos.x1 + padding;
       const maxX = aPos.x2;
-      const minY = aPos.y1 + padding;
-      const maxY = aPos.y2;
+      const minY = aPos.y1 + padding; // top
+      const maxY = aPos.y2; // bottom
 
-      this.plotLines.forEach((plotLine) => {
+      this.plotBands?.forEach((plotBand) => {
+        if (!plotBand.from && !plotBand.to) {
+          return;
+        }
+
+        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+        const { from, to, label: labelOpt } = mergedPlotBandOpt;
+
+        this.setPlotBandStyle(mergedPlotBandOpt);
+
+        if (this.type === 'x') {
+          const fromDataX = Canvas.calculateX(from ?? minX, axisMin, axisMax, xArea, minX);
+          const toDataX = Canvas.calculateX(to ?? maxX, axisMin, axisMax, xArea, minX);
+          this.drawXPlotBand(fromDataX, toDataX, minX, maxX, minY, maxY, labelOpt);
+        } else {
+          const fromDataY = Canvas.calculateY(from ?? axisMin, axisMin, axisMax, yArea, maxY);
+          const toDataY = Canvas.calculateY(to ?? axisMax, axisMin, axisMax, yArea, maxY);
+
+          this.drawYPlotBand(fromDataY, toDataY, minX, maxX, minY, maxY, labelOpt);
+        }
+
+        ctx.restore();
+      });
+
+      this.plotLines?.forEach((plotLine) => {
         if (!plotLine.value) {
           return;
         }
@@ -334,6 +359,101 @@ class Scale {
 
     if (plotLine.segments) {
       ctx.setLineDash(plotLine.segments);
+    }
+  }
+
+  /**
+   * Set plot band style
+   * @param {object} plotBand      plotBand Options
+   *
+   * @returns {undefined}
+   */
+  setPlotBandStyle(plotBand) {
+    const ctx = this.ctx;
+    const { color } = plotBand;
+
+    ctx.beginPath();
+    ctx.save();
+    ctx.fillStyle = color;
+  }
+
+  /**
+   * Draw X Plot band
+   * @param {number} fromDataX     From data's X Position
+   * @param {number} toDataX       To data's X Position
+   * @param {number} minX          Min X Position
+   * @param {number} maxX          Max X Position
+   * @param {number} minY          Min Y Position
+   * @param {number} maxY          Max Y Position
+   * @param {object} labelOpt      plotLine Options
+   *
+   * @returns {undefined}
+   */
+  drawXPlotBand(fromDataX, toDataX, minX, maxX, minY, maxY, labelOpt) {
+    const ctx = this.ctx;
+
+    const checkValidPosition = x => x || x > minX || x < maxX;
+
+    if (!checkValidPosition(fromDataX) || !checkValidPosition(toDataX)) {
+      ctx.closePath();
+      ctx.restore();
+      return;
+    }
+
+    ctx.moveTo(fromDataX, minY);
+    ctx.lineTo(fromDataX, maxY);
+    ctx.lineTo(toDataX, maxY);
+    ctx.lineTo(toDataX, minY);
+    ctx.lineTo(fromDataX, minY);
+
+    ctx.stroke();
+    ctx.fill();
+    ctx.restore();
+    ctx.closePath();
+
+    if (labelOpt) {
+      const mergedLabelOpt = defaultsDeep({}, labelOpt, PLOT_LINE_LABEL_OPTION);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.font = Util.getLabelStyle(mergedLabelOpt);
+
+      const {
+        fontSize,
+        labelBoxPadding,
+        labelHalfWidth,
+      } = this.getLabelParameters(mergedLabelOpt);
+
+      if (fontSize <= 0) {
+        return;
+      }
+
+      let textX;
+      switch (mergedLabelOpt.textAlign) {
+        case 'left':
+          textX = fromDataX + labelHalfWidth + labelBoxPadding;
+          break;
+
+        case 'right':
+          textX = toDataX - labelHalfWidth - labelBoxPadding;
+          break;
+
+        case 'center':
+        default:
+          textX = ((toDataX - fromDataX) / 2) + fromDataX;
+          break;
+      }
+
+      const textY = minY - labelBoxPadding - fontSize;
+
+      this.drawPlotLineLabel(mergedLabelOpt, {
+        top: minY - (labelBoxPadding * 2) - fontSize,
+        bottom: minY - labelBoxPadding,
+        left: textX - labelHalfWidth - labelBoxPadding,
+        right: textX + labelHalfWidth + labelBoxPadding,
+        x: textX,
+        y: textY,
+      });
     }
   }
 
@@ -468,6 +588,86 @@ class Scale {
         case 'middle':
         default:
           textY = dataY;
+          break;
+      }
+
+      const textX = maxX + labelWidth + labelBoxPadding;
+
+      this.drawPlotLineLabel(mergedLabelOpt, {
+        top: textY - labelHalfHeight - labelBoxPadding,
+        bottom: textY + labelHalfHeight + labelBoxPadding,
+        left: textX - labelWidth - (labelBoxPadding / 2),
+        right: textX + labelBoxPadding,
+        x: textX,
+        y: textY,
+      });
+    }
+  }
+
+  /**
+   * Draw Y Plot band
+   * @param {number} fromDataY     From data's Y Position (bottom)
+   * @param {number} toDataY       To data's Y Position (top)
+   * @param {number} minX          Min X Position
+   * @param {number} maxX          Max X Position
+   * @param {number} minY          Min Y Position
+   * @param {number} maxY          Max Y Position
+   * @param {object} labelOpt      plotLine Options
+   *
+   * @returns {undefined}
+   */
+  drawYPlotBand(fromDataY, toDataY, minX, maxX, minY, maxY, labelOpt) {
+    const ctx = this.ctx;
+
+    const checkValidPosition = y => y || y > minY || y < maxY;
+
+    if (!checkValidPosition(fromDataY) || !checkValidPosition(toDataY)) {
+      ctx.closePath();
+      ctx.restore();
+      return;
+    }
+
+    ctx.moveTo(minX, fromDataY);
+    ctx.lineTo(minX, toDataY);
+    ctx.lineTo(maxX, toDataY);
+    ctx.lineTo(maxX, fromDataY);
+    ctx.lineTo(minX, fromDataY);
+
+    ctx.fill();
+    ctx.restore();
+    ctx.closePath();
+
+    if (labelOpt) {
+      const mergedLabelOpt = defaultsDeep({}, labelOpt, PLOT_LINE_LABEL_OPTION);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.font = Util.getLabelStyle(mergedLabelOpt);
+
+      const {
+        fontSize,
+        labelWidth,
+        labelHalfHeight,
+        labelBoxPadding,
+      } = this.getLabelParameters(mergedLabelOpt);
+
+      if (fontSize <= 0) {
+        return;
+      }
+
+      let textY;
+      switch (mergedLabelOpt.verticalAlign) {
+        case 'top':
+          textY = fromDataY + labelHalfHeight + labelBoxPadding;
+          break;
+
+        case 'bottom':
+          textY = toDataY - labelBoxPadding;
+          break;
+
+        case 'middle':
+        default:
+          textY = ((toDataY - fromDataY) / 2) + fromDataY + labelBoxPadding;
           break;
       }
 

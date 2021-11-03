@@ -1,5 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
-import { PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -160,15 +160,34 @@ class StepScale extends Scale {
 
     ctx.closePath();
 
-    // draw plot line
-    if (this.plotLines?.length) {
+    // draw plot lines and plot bands
+    if (this.plotBands?.length || this.plotLines?.length) {
       const padding = aliasPixel + 1;
       const minX = aPos.x1 + padding;
       const maxX = aPos.x2;
       const minY = aPos.y1 + padding;
       const maxY = aPos.y2;
 
-      this.plotLines.forEach((plotLine) => {
+      this.plotBands?.forEach((plotBand) => {
+        if (!plotBand.from && !plotBand.to) {
+          return;
+        }
+
+        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+        const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
+        const fromDataPos = Math.round(startPoint + (labelGap * from));
+        const toDataPos = Math.round(startPoint + (labelGap * to));
+
+        this.setPlotBandStyle(mergedPlotBandOpt);
+
+        if (this.type === 'x') {
+          this.drawXPlotBand(fromDataPos, toDataPos, minX, maxX, minY, maxY, labelOpt);
+        } else {
+          this.drawYPlotBand(fromDataPos, toDataPos, minX, maxX, minY, maxY, labelOpt);
+        }
+      });
+
+      this.plotLines?.forEach((plotLine) => {
         if (!plotLine.value) {
           return;
         }
