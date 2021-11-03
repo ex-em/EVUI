@@ -113,6 +113,11 @@ export const PLOT_LINE_LABEL_OPTION = {
   textAlign: 'center',
 };
 
+export const PLOT_BAND_OPTION = {
+  color: '#FAE59D',
+};
+
+
 export const TIME_INTERVALS = {
   millisecond: {
     common: true,
