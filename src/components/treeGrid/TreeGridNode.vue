@@ -75,7 +75,21 @@
               <i></i>
             </span>
           </span>
-          <span :title="node[column.field]">{{node[column.field]}}</span>
+          <!-- cell renderer -->
+          <template v-if="!!$slots[column.field]">
+            <slot
+              :name="column.field"
+              :item="{
+                node,
+                column,
+              }"
+            >
+            </slot>
+          </template>
+          <!-- cell value -->
+          <template v-else>
+            <span :title="node[column.field]">{{node[column.field]}}</span>
+          </template>
         </div>
       </td>
     </template>

@@ -93,31 +93,50 @@
         />
         <table>
           <tbody>
-            <tree-grid-node
-              v-for="(item, idx) in viewStore"
-              :key="idx"
-              :selected-data="selectedRow"
-              :node-data="item"
-              :use-checkbox="useCheckbox"
-              :ordered-columns="orderedColumns"
-              :expand-icon="option.expandIcon"
-              :collapse-icon="option.collapseIcon"
-              :parent-icon="option.parentIcon"
-              :child-icon="option.childIcon"
-              :is-resize="isResize"
-              :row-height="rowHeight"
-              :min-width="minWidth"
-              :highlight-index="highlightIdx"
-              :border-style="borderStyle"
-              @check-tree-data="onCheck"
-              @expand-tree-data="handleExpand"
-              @click-tree-data="onRowClick"
-              @dbl-click-tree-data="onRowDblClick"
-            >
-            </tree-grid-node>
-            <tr v-if="!viewStore.length">
-              <td class="is-empty">No records</td>
-            </tr>
+          <tree-grid-node
+            v-for="(row, idx) in viewStore"
+            :key="idx"
+            :selected-data="selectedRow"
+            :node-data="row"
+            :use-checkbox="useCheckbox"
+            :ordered-columns="orderedColumns"
+            :expand-icon="option.expandIcon"
+            :collapse-icon="option.collapseIcon"
+            :parent-icon="option.parentIcon"
+            :child-icon="option.childIcon"
+            :is-resize="isResize"
+            :row-height="rowHeight"
+            :min-width="minWidth"
+            :highlight-index="highlightIdx"
+            :border-style="borderStyle"
+            @check-tree-data="onCheck"
+            @expand-tree-data="handleExpand"
+            @click-tree-data="onRowClick"
+            @dbl-click-tree-data="onRowDblClick"
+          >
+            <!--셀렌더러 추가-->
+            <template #check>
+              <slot
+                name="checkWrapper"
+              >
+              </slot>
+            </template>
+            <template #select>
+              <slot
+                name="selectWrapper"
+              >
+              </slot>
+            </template>
+            <template #slide>
+              <slot
+                name="slideWrapper"
+              >
+              </slot>
+            </template>
+          </tree-grid-node>
+          <tr v-if="!viewStore.length">
+            <td class="is-empty">No records</td>
+          </tr>
           </tbody>
         </table>
         <!--vScroll Bottom-->
