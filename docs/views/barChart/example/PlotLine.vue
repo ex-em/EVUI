@@ -48,12 +48,47 @@
             fitWidth: true,
             fitDir: 'left',
           },
+          plotBands: [{
+            color: 'rgba(250, 222, 76, 0.8)',
+            from: 2.5,
+            to: 3.5,
+            label: {
+              text: 'X Plot Band ZONE',
+              fontColor: '#FFA500',
+            },
+          }],
         }],
           axesY: [{
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
           showGrid: false,
+          plotLines: [{
+            value: 180,
+            color: '#FFA500',
+            label: {
+              text: 'Warning',
+              fontColor: '#FFA500',
+            },
+          }, {
+            value: 300,
+            label: {
+              lineWidth: 1,
+              lineColor: '#000000',
+              fillColor: '#FF0000',
+              fontColor: '#FFFFFF',
+              text: 'Critical',
+            },
+          }],
+            plotBands: [{
+              color: 'rgba(104, 173, 244, 0.3)',
+              from: 0, // 생략 가능
+              to: 120,
+              label: {
+                text: 'Y Plot Band',
+                fontColor: '#68ADF4',
+              },
+            }],
         }],
       };
 
@@ -64,6 +99,3 @@
     },
   };
 </script>
-
-<style lang="scss">
-</style>
