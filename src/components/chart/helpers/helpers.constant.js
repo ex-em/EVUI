@@ -114,8 +114,6 @@ export const PLOT_LINE_LABEL_OPTION = {
   textAlign: 'center',
   textOverflow: 'none', // 'none', 'ellipsis'
   maxWidth: null,
-  x: 0,
-  y: 0,
 };
 
 export const PLOT_BAND_OPTION = {
