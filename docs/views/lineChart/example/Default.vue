@@ -82,7 +82,7 @@
             seriesData.shift();
           }
 
-          seriesData.push( Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
         });
       };
 
