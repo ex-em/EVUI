@@ -102,6 +102,7 @@ export const PLOT_LINE_OPTION = {
 };
 
 export const PLOT_LINE_LABEL_OPTION = {
+  show: false,
   fontSize: 12,
   fontColor: '#FF0000',
   fillColor: '#FFFFFF',
@@ -111,6 +112,10 @@ export const PLOT_LINE_LABEL_OPTION = {
   fontFamily: 'Roboto',
   verticalAlign: 'middle',
   textAlign: 'center',
+  textOverflow: 'none', // 'none', 'ellipsis'
+  maxWidth: null,
+  x: 0,
+  y: 0,
 };
 
 export const PLOT_BAND_OPTION = {

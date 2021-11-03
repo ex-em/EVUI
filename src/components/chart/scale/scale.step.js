@@ -175,16 +175,24 @@ class StepScale extends Scale {
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
         const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
-        const fromDataPos = Math.round(startPoint + (labelGap * from));
-        const toDataPos = Math.round(startPoint + (labelGap * to));
+        const fromPos = Math.round(startPoint + (labelGap * from));
+        const toPos = Math.round(startPoint + (labelGap * to));
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
         if (this.type === 'x') {
-          this.drawXPlotBand(fromDataPos, toDataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         } else {
-          this.drawYPlotBand(fromDataPos, toDataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotBandLabelPosition(fromPos, toPos, labelOptions, maxX, minY);
+          this.drawPlotLabel(labelOptions, textXY);
+        }
+
+        ctx.restore();
       });
 
       this.plotLines?.forEach((plotLine) => {
@@ -199,9 +207,15 @@ class StepScale extends Scale {
         this.setPlotLineStyle(mergedPlotLineOpt);
 
         if (this.type === 'x') {
-          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
         } else {
-          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+        }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotLineLabelPosition(dataPos, labelOptions, maxX, minY);
+          this.drawPlotLabel(labelOptions, textXY);
         }
 
         ctx.restore();

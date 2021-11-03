@@ -55,6 +55,7 @@ export default {
           value: chartData.labels[5],
           segments: [6, 2],
           label: {
+            show: true,
             text: 'X Plot Line',
             textAlign: 'right',
           },
@@ -64,6 +65,7 @@ export default {
           from: chartData.labels[2],
           to: chartData.labels[3],
           label: {
+            show: true,
             text: 'X Plot Band ZONE',
             fontColor: '#FFA500',
           },
@@ -79,6 +81,7 @@ export default {
           value: 50,
           segments: [6, 2],
           label: {
+            show: true,
             text: 'Y Plot Line',
           },
         }],
@@ -87,8 +90,10 @@ export default {
           from: 20,
           to: 40,
           label: {
+            show: true,
             text: 'Y Plot Band',
             fontColor: '#FFA500',
+            verticalAlign: 'bottom',
           },
         }],
       }],

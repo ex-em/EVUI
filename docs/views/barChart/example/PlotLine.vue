@@ -31,7 +31,7 @@
         thickness: 0.8,
         width: '100%',
         padding: {
-          right: 40,
+          right: 80,
         },
         title: {
           text: 'Chart Title',
@@ -53,6 +53,7 @@
             from: 2.5,
             to: 3.5,
             label: {
+              show: true,
               text: 'X Plot Band ZONE',
               fontColor: '#FFA500',
             },
@@ -67,12 +68,14 @@
             value: 180,
             color: '#FFA500',
             label: {
+              show: true,
               text: 'Warning',
               fontColor: '#FFA500',
             },
           }, {
             value: 300,
             label: {
+              show: true,
               lineWidth: 1,
               lineColor: '#000000',
               fillColor: '#FF0000',
@@ -85,7 +88,8 @@
               from: 0, // 생략 가능
               to: 120,
               label: {
-                text: 'Y Plot Band',
+                show: true,
+                text: 'Y Plot Band Zone',
                 fontColor: '#68ADF4',
               },
             }],
