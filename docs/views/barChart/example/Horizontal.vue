@@ -64,7 +64,6 @@
         },
         tooltip: {
           use: true,
-          formatter: addUnit,
         },
       };
 

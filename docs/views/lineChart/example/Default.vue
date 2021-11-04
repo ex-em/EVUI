@@ -19,14 +19,21 @@
 
   export default {
     setup() {
-      const crushTime = ref();
       const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
+          series3: { name: 'series#3' },
+          series4: { name: 'series#4' },
+          series5: { name: 'series#5' },
         },
         labels: [],
         data: {
           series1: [],
+          series2: [],
+          series3: [],
+          series4: [],
+          series5: [],
         },
       });
 
@@ -49,28 +56,12 @@
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
-          plotLines: [{
-            color: '#FF0000',
-            value: crushTime,
-            segments: [6, 2],
-            label: {
-              text: 'Crush',
-            },
-          }],
         }],
         axesY: [{
           type: 'linear',
           showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
-          plotLines: [{
-            color: '#FFA500',
-            value: 3000,
-            label: {
-              text: 'Caution',
-              fontColor: '#FFA500',
-            },
-          }],
         }],
       });
 
@@ -91,12 +82,7 @@
             seriesData.shift();
           }
 
-          const randomValue = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-          seriesData.push(randomValue);
-
-          if (randomValue > 4800) {
-            crushTime.value = timeValue;
-          }
+          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
         });
       };
 
