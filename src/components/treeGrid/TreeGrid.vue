@@ -94,10 +94,10 @@
         <table>
           <tbody>
           <tree-grid-node
-            v-for="(row, idx) in viewStore"
+            v-for="(item, idx) in viewStore"
             :key="idx"
             :selected-data="selectedRow"
-            :node-data="row"
+            :node-data="item"
             :use-checkbox="useCheckbox"
             :ordered-columns="orderedColumns"
             :expand-icon="option.expandIcon"
@@ -114,24 +114,21 @@
             @click-tree-data="onRowClick"
             @dbl-click-tree-data="onRowDblClick"
           >
-            <!--셀렌더러 추가-->
-            <template #check>
-              <slot
-                name="checkWrapper"
+            <!-- cell renderer -->
+            <template
+              v-for="(column, cellIndex) in orderedColumns"
+              :key="cellIndex"
+              v-slot:[getSlotName(column.field)] = "{ item }"
+            >
+              <template
+                v-if="!!$slots[column.field]"
               >
-              </slot>
-            </template>
-            <template #select>
-              <slot
-                name="selectWrapper"
-              >
-              </slot>
-            </template>
-            <template #slide>
-              <slot
-                name="slideWrapper"
-              >
-              </slot>
+                <slot
+                  :name="column.field"
+                  :item="item"
+                >
+                </slot>
+              </template>
             </template>
           </tree-grid-node>
           <tr v-if="!viewStore.length">
@@ -425,6 +422,10 @@ export default {
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
       };
     };
+    const getSlotName = (column) => {
+      const slotRename = `${column}Wrapper`;
+      return slotRename;
+    };
 
     return {
       ...toRefs(styleInfo),
@@ -462,6 +463,7 @@ export default {
       isHeaderCheckbox,
       getColumnClass,
       getColumnStyle,
+      getSlotName,
       bodyStyle,
     };
   },

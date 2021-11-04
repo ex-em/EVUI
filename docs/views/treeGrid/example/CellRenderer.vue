@@ -49,67 +49,62 @@
       <!--          Edit-->
       <!--        </ev-button>-->
       <!--      </template>-->
-      <template #checkWrapper="{ item }">
-        <span>{{ item }}</span>
-        <!--        <ev-checkbox-->
-        <!--          v-model="item.row[2][item.column.index]"-->
-        <!--          label="check"-->
-        <!--          @click.stop=""-->
-        <!--          @dblclick.stop=""-->
-        <!--        />-->
+      <template #check="{ item }">
+        <ev-checkbox
+          v-model="item.data"
+          label="check"
+          @click.stop=""
+          @dblclick.stop=""
+        />
       </template>
-      <template #selectWrapper="{ item }">
-        <span>select {{ item }}</span>
-        <!--        <ev-select-->
-        <!--          v-model="item.row[2][item.column.index]"-->
-        <!--          :items="[-->
-        <!--              {-->
-        <!--                name: 'a',-->
-        <!--                value: 'a',-->
-        <!--              }, {-->
-        <!--                name: 'b',-->
-        <!--                value: 'b',-->
-        <!--              }, {-->
-        <!--                name: 'c',-->
-        <!--                value: 'c',-->
-        <!--              },-->
-        <!--            ]"-->
-        <!--          placeholder="Please select value."-->
-        <!--          @click.stop=""-->
-        <!--          @dblclick.stop=""-->
-        <!--        />-->
+      <template #select="{ item }">
+        <ev-select
+          v-model="item.data"
+          :items="[
+            {
+              name: 'a',
+              value: 'a',
+            }, {
+              name: 'b',
+              value: 'b',
+            }, {
+              name: 'c',
+              value: 'c',
+            },
+           ]"
+          placeholder="Please select value."
+          @click.stop=""
+          @dblclick.stop=""
+        />
       </template>
-      <template #slideWrapper="{ item }">
-        <span>slide {{ item }}</span>
-        <!--        <ev-slider-->
-        <!--          v-model="item.row[2][item.column.index]"-->
-        <!--          range-->
-        <!--          readonly-->
-        <!--          :mark="{-->
-        <!--            33.33: 'W',-->
-        <!--            66.66: 'C',-->
-        <!--          }"-->
-        <!--          :color="['#3C81F6', '#FADE4C', '#FF470E']"-->
-        <!--          :show-tooltip="false"-->
-        <!--        />-->
+      <template #slide="{ item }">
+        <ev-slider
+          v-model="item.data"
+          range
+          readonly
+          :mark="{
+            33.33: 'W',
+            66.66: 'C',
+          }"
+          :color="['#3C81F6', '#FADE4C', '#FF470E']"
+          :show-tooltip="false"
+        />
       </template>
       <template #custom="{ item }">
-        <p>custom {{ item }}</p>
-        <!--        <span-->
-        <!--          :class="getStateClass(item.row[2][item.column.index])"-->
-        <!--        >-->
-        <!--          <span class="v-chip__content"> {{ item.row[2][item.column.index] }} </span>-->
-        <!--        </span>-->
+        <span
+          :class="getStateClass(item.data)"
+        >
+          <span class="v-chip__content"> {{ item.data }} </span>
+        </span>
       </template>
       <template #inputNumber="{ item }">
-        <p>inputNumber {{ item }}</p>
-        <!--        <ev-input-number-->
-        <!--          v-model="item.row[2][item.column.index]"-->
-        <!--          :max="100"-->
-        <!--          :min="0"-->
-        <!--          @click.stop="onInputNumberClick"-->
-        <!--          @dblclick.stop=""-->
-        <!--        />-->
+        <ev-input-number
+          v-model="item.data"
+          :max="100"
+          :min="0"
+          @click.stop="onInputNumberClick"
+          @dblclick.stop=""
+        />
       </template>
     </ev-tree-grid>
   </div>
@@ -145,7 +140,6 @@ export default {
         click: () => console.log('[Menu2]'),
       },
     ]);
-    // const highlightMV = ref(0);
     const borderMV = ref('');
     const iconMV = ref('');
     const dataIconMV = ref('');
@@ -187,40 +181,6 @@ export default {
     const collapseIconMV = computed(() => (iconMV.value ? iconMV.value.collapse : ''));
     const parentIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.parent : ''));
     const childIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.child : ''));
-    // const resetBorderStyle = () => {
-    //   borderMV.value = '';
-    // };
-    // const resetTreeIcon = () => {
-    //   iconMV.value = '';
-    // };
-    // const resetDataIcon = () => {
-    //   dataIconMV.value = '';
-    // };
-    // const onReset = (type) => {
-    //   switch (type) {
-    //     case 'border':
-    //       borderMV.value = '';
-    //       break;
-    //     case 'treeIcon':
-    //       iconMV.value = '';
-    //       break;
-    //     case 'dataIcon':
-    //       dataIconMV.value = '';
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // };
-    // const onClickCheckbox = (e) => {
-    //   console.log(`checkbox component click: ${e}`);
-    // };
-    // const onClickButton = (e) => {
-    //   console.log(`button component click: ${e}`);
-    // };
-    // const changeMode = (mode) => {
-    //   checkboxModeMV.value = mode;
-    //   checked.value = [];
-    // };
     const onCheckedRow = () => {
       let checkedRow = '';
       for (let i = 0; i < checked.value.length; i++) {
@@ -416,18 +376,11 @@ export default {
       clickedRowMV,
       DbClickedRowsMV,
       menuItems,
-      // highlightMV,
       borderMV,
       borderItems,
-      // onClickCheckbox,
-      // onClickButton,
-      // changeMode,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
-      // resetBorderStyle,
-      // resetTreeIcon,
-      // resetDataIcon,
       iconMV,
       iconItems,
       expandIconMV,
@@ -436,7 +389,6 @@ export default {
       dataIconItems,
       parentIconMV,
       childIconMV,
-      // onReset,
       onInputNumberClick,
       getStateClass,
     };
