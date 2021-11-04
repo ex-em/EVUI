@@ -14,6 +14,8 @@ import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
 import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
+import PlotLine from './example/PlotLine';
+import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 
 export default {
   mdText,
@@ -52,6 +54,11 @@ export default {
       description: '막대에 그라데이션 효과를 줄 수 있습니다.',
       component: Gradient,
       parsedData: parseComponent(GradientRaw),
+    },
+    'Plot line & Plot band': {
+      description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
+      component: PlotLine,
+      parsedData: parseComponent(PlotLineRaw),
     },
   },
 };

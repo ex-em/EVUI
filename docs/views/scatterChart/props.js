@@ -4,6 +4,8 @@ import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import PlotLine from './example/PlotLine';
+import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 
 export default {
   mdText,
@@ -17,6 +19,11 @@ export default {
       description: 'Drag Select 이벤트 등록이 가능 합니다',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    'Plot line & Plot band': {
+      description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
+      component: PlotLine,
+      parsedData: parseComponent(PlotLineRaw),
     },
   },
 };

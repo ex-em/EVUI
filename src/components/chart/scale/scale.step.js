@@ -1,5 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
-import { PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -160,15 +160,42 @@ class StepScale extends Scale {
 
     ctx.closePath();
 
-    // draw plot line
-    if (this.plotLines?.length) {
+    // draw plot lines and plot bands
+    if (this.plotBands?.length || this.plotLines?.length) {
       const padding = aliasPixel + 1;
       const minX = aPos.x1 + padding;
       const maxX = aPos.x2;
       const minY = aPos.y1 + padding;
       const maxY = aPos.y2;
 
-      this.plotLines.forEach((plotLine) => {
+      this.plotBands?.forEach((plotBand) => {
+        if (!plotBand.from && !plotBand.to) {
+          return;
+        }
+
+        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+        const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
+        const fromPos = Math.round(startPoint + (labelGap * from));
+        const toPos = Math.round(startPoint + (labelGap * to));
+
+        this.setPlotBandStyle(mergedPlotBandOpt);
+
+        if (this.type === 'x') {
+          this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
+        } else {
+          this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
+        }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotBandLabelPosition(fromPos, toPos, labelOptions, maxX, minY);
+          this.drawPlotLabel(labelOptions, textXY);
+        }
+
+        ctx.restore();
+      });
+
+      this.plotLines?.forEach((plotLine) => {
         if (!plotLine.value) {
           return;
         }
@@ -180,9 +207,15 @@ class StepScale extends Scale {
         this.setPlotLineStyle(mergedPlotLineOpt);
 
         if (this.type === 'x') {
-          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
         } else {
-          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY, labelOpt);
+          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+        }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotLineLabelPosition(dataPos, labelOptions, maxX, minY);
+          this.drawPlotLabel(labelOptions, textXY);
         }
 
         ctx.restore();

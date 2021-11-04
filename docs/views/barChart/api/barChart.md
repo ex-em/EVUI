@@ -100,8 +100,9 @@ const chartData = {
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
-  | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
+  | plotBands | Array | ([상세](#plotband)) | plot band(임계영역 표시 용도) 설정 | |
+  | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 
 ##### linear type
    - interval (Axis Label 표기를 위한 interval)
@@ -143,11 +144,20 @@ const chartData = {
 | value | Number(value), Date, Number(Index) | null | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
 | color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
 | segments | Array | null | dash 간격 | [6, 2] |
-| label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlinelabel)) |
+| label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
 
-##### plotLineLabel
+##### plotBand
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
+| from | Number(value), Date, Number(Index) | null | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
+| to | Number(value), Date, Number(Index) | null | 박스를 표시할 종료 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
+| color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
+| label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
+
+##### plotLabel
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| show | Boolean | false | label 표시 여부 | true / false |
 | fontSize | Number | 12 | 폰트 크기 | |
 | fontColor | Hex, RGB, RGBA Code(String) | '#FF0000' | 폰트 색상 | |
 | fillColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | 박스 배경 색상 | |
@@ -157,6 +167,8 @@ const chartData = {
 | fontFamily | String | 'Roboto' | 폰트 스타일 |  |
 | textAlign | String | 'center' | 수평 정렬 | 'left', 'center', 'right' |
 | verticalAlign | String | 'middle' | 수직 정렬 | 'top', 'middle', 'bottom' |
+| textOverflow | String | 'none' | 라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리방안  | 'none', 'ellipsis' |
+| maxWidth | Number | null | 라벨의 최대 너비  |  |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
