@@ -76,19 +76,14 @@
             </span>
           </span>
           <!-- cell renderer -->
-          <template v-if="!!$slots[getSlotName(column.field)]">
+          <template v-if="!!$slots[column.field + 'Node']">
             <slot
-              :name="getSlotName(column.field)"
+              :name="column.field + 'Node'"
               :item="{
                 data: node[column.field],
-                column,
               }"
             >
             </slot>
-          </template>
-          <!-- cell value -->
-          <template v-else>
-            <span :title="node[column.field]">{{node[column.field]}}</span>
           </template>
         </div>
       </td>
@@ -216,10 +211,6 @@ export default {
         'margin-left': `${depthSize}px`,
       };
     };
-    const getSlotName = (column) => {
-      const slotRename = `${column}Wrapper`;
-      return slotRename;
-    };
     return {
       onCheck,
       onExpand,
@@ -235,7 +226,6 @@ export default {
       getColumnClass,
       getColumnStyle,
       getDepthStyle,
-      getSlotName,
     };
   },
 };

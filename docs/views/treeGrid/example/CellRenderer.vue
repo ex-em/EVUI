@@ -34,21 +34,21 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- renderer start -->
-      <!--      <template #gridButton="{ item }">-->
-      <!--        <ev-button-->
-      <!--          type="ghost"-->
-      <!--          size="small"-->
-      <!--          @click="item.onRowDelete(item.row[0])"-->
-      <!--        >-->
-      <!--          Delete-->
-      <!--        </ev-button>-->
-      <!--        <ev-button-->
-      <!--          size="small"-->
-      <!--          @click="item.onRowEdit(item.row)"-->
-      <!--        >-->
-      <!--          Edit-->
-      <!--        </ev-button>-->
-      <!--      </template>-->
+      <template #gridButton>
+        <ev-button
+          type="ghost"
+          size="small"
+          @click="onRowDelete()"
+        >
+          Delete
+        </ev-button>
+        <ev-button
+          size="small"
+          @click="onRowEdit()"
+        >
+          Edit
+        </ev-button>
+      </template>
       <template #check="{ item }">
         <ev-checkbox
           v-model="item.data"
@@ -56,6 +56,7 @@
           @click.stop=""
           @dblclick.stop=""
         />
+        <span>{{item.data}}</span>
       </template>
       <template #select="{ item }">
         <ev-select
@@ -71,7 +72,7 @@
               name: 'c',
               value: 'c',
             },
-           ]"
+          ]"
           placeholder="Please select value."
           @click.stop=""
           @dblclick.stop=""
@@ -197,103 +198,89 @@ export default {
       clickedRowMV.value = JSON.stringify(rowData);
     };
     const getData = () => {
-      const state = ['a', 'b', 'c'];
       tableData.value = [{
-        id: 'Exem 1',
         check: true,
-        select: state[0],
+        select: 'a',
         slide: [33.33, 66.66],
         inputNumber: 10,
         custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
         expand: true,
         children: [{
-          id: 'Exem 2',
           check: true,
-          select: state[0],
+          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           expand: false,
           children: [{
-            id: 'Exem 3',
             check: true,
-            select: state[0],
+            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
-            id: 'Exem 4',
             check: true,
-            select: state[0],
+            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
             expand: false,
             children: [{
-              id: 'Exem 5',
               check: true,
-              select: state[0],
+              select: 'a',
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
               children: [{
-                id: 'Exem 51',
                 check: true,
-                select: state[0],
+                select: 'a',
                 slide: [33.33, 66.66],
                 inputNumber: 10,
                 custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
                 children: [{
-                  id: 'Exem 52',
                   check: true,
-                  select: state[0],
+                  select: 'a',
                   slide: [33.33, 66.66],
                   inputNumber: 10,
                   custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
                 }],
               }],
             }, {
-              id: 'Exem 6',
               check: true,
-              select: state[0],
+              select: 'a',
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
             }],
           }],
         }, {
-          id: 'Exem 7',
           check: true,
-          select: state[0],
+          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           children: [{
-            id: 'Exem 8',
             check: true,
-            select: state[0],
+            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
-            id: 'Exem 9',
             check: true,
-            select: state[0],
+            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
-            id: 'Exem 10',
             check: true,
-            select: state[0],
+            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }],
         }, {
-          id: 'Exem 11',
           check: true,
-          select: state[0],
+          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
@@ -302,14 +289,10 @@ export default {
     };
     const columns = ref([
       {
-        caption: 'ID',
-        field: 'id',
-        type: 'number',
-      },
-      {
         caption: 'Check',
         field: 'check',
         type: 'boolean',
+        width: 140,
       },
       {
         caption: 'Select',
@@ -325,22 +308,28 @@ export default {
         caption: 'InputNumber',
         field: 'inputNumber',
         type: 'number',
-        width: 140,
+        width: 120,
       },
       {
         caption: 'Custom',
         field: 'custom',
         type: 'string',
       },
-      // {
-      //   caption: '',
-      //   field: 'gridButton',
-      //   type: 'boolean',
-      //   width: 120,
-      // },
+      {
+        caption: '',
+        field: 'gridButton',
+        type: 'boolean',
+        width: 120,
+      },
     ]);
     const onInputNumberClick = () => {
       console.log('On click InputNumber');
+    };
+    const onRowDelete = () => {
+      console.log('On click Delete');
+    };
+    const onRowEdit = () => {
+      console.log('On click RowEdit');
     };
     const getStateClass = (value) => {
       let stateColor = 'green';
@@ -390,6 +379,8 @@ export default {
       parentIconMV,
       childIconMV,
       onInputNumberClick,
+      onRowDelete,
+      onRowEdit,
       getStateClass,
     };
   },

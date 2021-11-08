@@ -93,47 +93,48 @@
         />
         <table>
           <tbody>
-          <tree-grid-node
-            v-for="(item, idx) in viewStore"
-            :key="idx"
-            :selected-data="selectedRow"
-            :node-data="item"
-            :use-checkbox="useCheckbox"
-            :ordered-columns="orderedColumns"
-            :expand-icon="option.expandIcon"
-            :collapse-icon="option.collapseIcon"
-            :parent-icon="option.parentIcon"
-            :child-icon="option.childIcon"
-            :is-resize="isResize"
-            :row-height="rowHeight"
-            :min-width="minWidth"
-            :highlight-index="highlightIdx"
-            :border-style="borderStyle"
-            @check-tree-data="onCheck"
-            @expand-tree-data="handleExpand"
-            @click-tree-data="onRowClick"
-            @dbl-click-tree-data="onRowDblClick"
-          >
-            <!-- cell renderer -->
-            <template
-              v-for="(column, cellIndex) in orderedColumns"
-              :key="cellIndex"
-              v-slot:[getSlotName(column.field)] = "{ item }"
+            <tree-grid-node
+              v-for="(node, idx) in viewStore"
+              :key="idx"
+              :selected-data="selectedRow"
+              :node-data="node"
+              :use-checkbox="useCheckbox"
+              :ordered-columns="orderedColumns"
+              :expand-icon="option.expandIcon"
+              :collapse-icon="option.collapseIcon"
+              :parent-icon="option.parentIcon"
+              :child-icon="option.childIcon"
+              :is-resize="isResize"
+              :row-height="rowHeight"
+              :min-width="minWidth"
+              :highlight-index="highlightIdx"
+              :border-style="borderStyle"
+              @check-tree-data="onCheck"
+              @expand-tree-data="handleExpand"
+              @click-tree-data="onRowClick"
+              @dbl-click-tree-data="onRowDblClick"
             >
+              <!-- cell renderer -->
               <template
-                v-if="!!$slots[column.field]"
+                v-for="(column, cellIndex) in orderedColumns"
+                :key="cellIndex"
+                v-slot:[getSlotName(column.field)] = "{ item }"
               >
-                <slot
-                  :name="column.field"
-                  :item="item"
-                >
-                </slot>
+                <template v-if="!!$slots[column.field]">
+                  <slot
+                    :name="column.field"
+                    :item="item"
+                  >
+                  </slot>
+                </template>
+                <template v-else>
+                  <span :title="node[column.field]">{{node[column.field]}}</span>
+                </template>
               </template>
-            </template>
-          </tree-grid-node>
-          <tr v-if="!viewStore.length">
-            <td class="is-empty">No records</td>
-          </tr>
+            </tree-grid-node>
+            <tr v-if="!viewStore.length">
+              <td class="is-empty">No records</td>
+            </tr>
           </tbody>
         </table>
         <!--vScroll Bottom-->
@@ -422,10 +423,7 @@ export default {
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
       };
     };
-    const getSlotName = (column) => {
-      const slotRename = `${column}Wrapper`;
-      return slotRename;
-    };
+    const getSlotName = column => `${column}Node`;
 
     return {
       ...toRefs(styleInfo),
