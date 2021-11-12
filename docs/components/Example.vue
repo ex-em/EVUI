@@ -6,16 +6,22 @@
     <p class="article-description">
       {{ description }}
     </p>
-    <div class="article-example">
+    <div
+        :class="['article-example', { 'vertical-mode':verticalMode }]"
+    >
       <div
         ref="viewArea"
-        class="view"
+        :class="['view', { 'vertical-mode-item':verticalMode }]"
       >
         <component :is="component" />
       </div>
       <div
         v-highlight
-        :class="['code', { 'expend': codeExpend }]"
+        :class="[
+          'code',
+          { 'expend': codeExpend },
+          { 'vertical-mode-item':verticalMode }
+        ]"
       >
         <div
           ref="codeWrapper"
@@ -66,6 +72,10 @@ export default {
     parsedData: {
       type: [String, Object],
       default: null,
+    },
+    verticalMode: {
+      type: Boolean,
+      default: false,
     },
   },
   setup() {
@@ -227,6 +237,12 @@ export default {
       }
     }
   }
+}
+.vertical-mode {
+  display: block !important;
+}
+.vertical-mode-item {
+  width: 100% !important;
 }
 
 @media all and (max-width: 1280px) {

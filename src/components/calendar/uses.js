@@ -154,7 +154,6 @@ const getDateTimeInfoByType = (param, typeToImport) => {
   if (typeToImport === 'sec') return result.sec;
   return result;
 };
-
 /**
  * 이전달, 다음달의 달력 상 연도, 월 정보 구하기
  * @param prevNext - 이전, 다음 여부 ('prev'|'next')
@@ -176,34 +175,92 @@ const getSideMonthCalendarInfo = (prevNext, year, month) => {
 };
 
 /**
+ * timeFormat을 체크하여 timeFormat이 있으면 format에 맞는 형식으로 반환
+ * @param timeFormat -- props.option?.timeFormat
+ * @param dateTimeValue
+ * @param typeToImport
+ * @returns {Object|number}
+ */
+const getTimeInfoByTimeFormat = (timeFormat, dateTimeValue, typeToImport) => {
+  const value = getDateTimeInfoByType(dateTimeValue, typeToImport);
+  if (timeFormat) {
+    const hour = timeFormat?.split(':')[0];
+    const min = timeFormat?.split(':')[1];
+    const sec = timeFormat?.split(':')[2];
+    if (typeToImport === 'hour') {
+      return hour === 'HH' ? value : +hour;
+    } else if (typeToImport === 'min') {
+      return min === 'mm' ? value : +min;
+    } else if (typeToImport === 'sec') {
+      return sec === 'ss' ? value : +sec;
+    }
+  }
+  return value;
+};
+
+/**
+ * 초기 timeFormat에 따른 modelValue update 함수
+ * @param timeFormat - props.options.timeFormat
+ * @param modelValue
+ * @returns string
+ */
+const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
+  const hourByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'hour'));
+  const minByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'min'));
+  const secByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'sec'));
+
+  return `${modelValue.split(' ')[0]} ${hourByTimeFormat}:${minByTimeFormat}:${secByTimeFormat}`;
+};
+
+/**
  * date string 값의 MS 값 구하기
  * @param dateStr
  * @returns {number}
  */
-const getDateMs = dateStr => new Date(`${dateStr} 00:00:00`).getTime();
+const getDateMs = dateStr => new Date(`${dateStr}`).getTime();
 
 export const useModel = () => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
+  const timeFormat = props.options?.timeFormat;
 
-  /**
+      /**
    * 현재 선택된 값, 배열인 경우 반응형을 끊기위해 rest 사용
+   * selectValue ref로 변환하기 전 modelValue timeFormat에 따라 fetch
    * 1) props.mode: 'date' or 'dateTime' > String
    * 2) props.mode: 'dateMulti' or 'dateRange' > [...Array]
    */
   let selectedValue;
-  if (props.mode !== 'dateMulti' && props.mode !== 'dateRange') {
-    if (!props.modelValue
-      || (props.modelValue.length === 10 && dateReg.exec(props.modelValue))
-      || (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue))
+  if (props.mode !== 'dateMulti' && props.mode !== 'dateRange' && props.mode !== 'dateTimeRange') {
+    if (props.modelValue
+      && ((props.modelValue.length === 10 && dateReg.exec(props.modelValue?.toString()))
+      || (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue?.toString())))
     ) {
-      selectedValue = ref(props.modelValue);
+      if (props.mode === 'dateTime') {
+        const modelValue = getChangedValueByTimeFormat(timeFormat, props.modelValue);
+        emit('update:modelValue', modelValue);
+        selectedValue = ref(modelValue);
+      } else {
+        selectedValue = ref(props.modelValue);
+      }
     } else {
       selectedValue = ref('');
     }
   } else if (Array.isArray(props.modelValue)
-    && props.modelValue.every(v => (!v || (v.length === 10 && dateReg.exec(v))))
+    && props.modelValue.every(v => (
+      !v
+      || (v.length === 10 && dateReg.exec(v))
+      || (v.length === 19 && dateTimeReg.exec(v))
+    ))
   ) {
-    selectedValue = ref([...props.modelValue]);
+    if (props.mode === 'dateTimeRange' && props.modelValue.length === 2) {
+      const modelValue = [];
+      modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[0]));
+      modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[1]));
+      emit('update:modelValue', modelValue);
+      selectedValue = ref([...modelValue]);
+    } else {
+      selectedValue = ref([...props.modelValue]);
+    }
   } else {
     selectedValue = ref([]);
   }
@@ -223,6 +280,14 @@ export const useModel = () => {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model must be \'Array\' type.');
       } else if (props.modelValue.length !== 0 && props.modelValue.length !== 2) {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model\'s length is 0 or 2.');
+      } else if (getDateMs(`${props.modelValue[0]} 00:00:00`) > getDateMs(`${props.modelValue[1]} 00:00:00`)) {
+        console.warn('[EVUI][Calendar] When mode is \'dateRange\', fromDate must be less than toDate.');
+      }
+    } else if (props.mode === 'dateTimeRange' && props.modelValue) {
+      if (!Array.isArray(props.modelValue)) {
+        console.warn('[EVUI][Calendar] When mode is \'dateTimeRange\', v-model must be \'Array\' type.');
+      } else if (props.modelValue.length !== 0 && props.modelValue.length !== 2) {
+        console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model\'s length is 0 or 2.');
       } else if (getDateMs(props.modelValue[0]) > getDateMs(props.modelValue[1])) {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', fromDate must be less than toDate.');
       }
@@ -231,18 +296,14 @@ export const useModel = () => {
 
   // 메인(좌측) 달력(연, 월, 시, 분, 초) 페이징 정보
   let mainCalendarPageInfo;
-  if (props.mode !== 'dateRange') {
+  const mainValue = !['dateRange', 'dateTimeRange'].includes(props.mode) ? selectedValue.value : selectedValue.value[0];
+  if (props.mode) {
     mainCalendarPageInfo = reactive({
-      year: getDateTimeInfoByType(selectedValue.value, 'year') || new Date().getFullYear(),
-      month: getDateTimeInfoByType(selectedValue.value, 'month') || new Date().getMonth() + 1,
-      hour: Math.floor(getDateTimeInfoByType(selectedValue.value, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
-      min: Math.floor(getDateTimeInfoByType(selectedValue.value, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
-      sec: Math.floor(getDateTimeInfoByType(selectedValue.value, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
-    });
-  } else if (Array.isArray(selectedValue.value) && selectedValue.value[0]) {
-    mainCalendarPageInfo = reactive({
-      year: getDateTimeInfoByType(selectedValue.value[0], 'year'),
-      month: getDateTimeInfoByType(selectedValue.value[0], 'month'),
+      year: getDateTimeInfoByType(mainValue, 'year') || new Date().getFullYear(),
+      month: getDateTimeInfoByType(mainValue, 'month') || new Date().getMonth() + 1,
+      hour: Math.floor(getDateTimeInfoByType(mainValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
+      min: Math.floor(getDateTimeInfoByType(mainValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
+      sec: Math.floor(getDateTimeInfoByType(mainValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
     });
   } else {
     mainCalendarPageInfo = reactive({
@@ -251,29 +312,36 @@ export const useModel = () => {
     });
   }
 
-  // 'mode: dateRange'인 경우 확장된 달력(연, 월) 페이징 정보
+  // 'mode: dateRange || dateTimeRange', 인 경우 확장된 달력(연, 월) 페이징 정보
   let expandedCalendarPageInfo;
-  if (props.mode === 'dateRange'
+  if ((['dateRange', 'dateTimeRange'].includes(props.mode))
     && Array.isArray(selectedValue.value)
     && selectedValue.value[1]
   ) {
+    const expandedValue = selectedValue.value[1];
     const fromDate = {
       year: getDateTimeInfoByType(selectedValue.value[0], 'year'),
       month: getDateTimeInfoByType(selectedValue.value[0], 'month'),
     };
     const toDate = {
-      year: getDateTimeInfoByType(selectedValue.value[1], 'year'),
-      month: getDateTimeInfoByType(selectedValue.value[1], 'month'),
+      year: getDateTimeInfoByType(expandedValue, 'year'),
+      month: getDateTimeInfoByType(expandedValue, 'month'),
     };
     // fromDate, toDate의 연, 월이 같은 경우의 확장된 달력 페이징 정보는 다음달로 세팅
     if (fromDate.year === toDate.year && fromDate.month === toDate.month) {
       expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
-        'next',
-        mainCalendarPageInfo.year,
-        mainCalendarPageInfo.month,
+          'next',
+          mainCalendarPageInfo.year,
+          mainCalendarPageInfo.month,
       ));
     } else {
       expandedCalendarPageInfo = reactive(toDate);
+    }
+
+    if (props.mode === 'dateTimeRange') {
+      expandedCalendarPageInfo.hour = Math.floor(getDateTimeInfoByType(expandedValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.min = Math.floor(getDateTimeInfoByType(expandedValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.sec = Math.floor(getDateTimeInfoByType(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
     }
   } else {
     expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
@@ -281,22 +349,31 @@ export const useModel = () => {
       mainCalendarPageInfo.year,
       mainCalendarPageInfo.month,
     ));
+
+    if (props.mode === 'dateTimeRange') {
+      expandedCalendarPageInfo.hour = 1;
+      expandedCalendarPageInfo.min = 1;
+      expandedCalendarPageInfo.sec = 1;
+    }
   }
 
   // 현재 달력이 표현되는 월
   const mainCalendarMonth = computed(() =>
-    MONTH_NAME_LIST[props.monthNotation][mainCalendarPageInfo.month - 1]);
+      MONTH_NAME_LIST[props.monthNotation][mainCalendarPageInfo.month - 1]);
   // 다음페이지 달력이 표현되는 월
   const expandedCalendarMonth = computed(() =>
-    MONTH_NAME_LIST[props.monthNotation][expandedCalendarPageInfo.month - 1]);
+      MONTH_NAME_LIST[props.monthNotation][expandedCalendarPageInfo.month - 1]);
   // 현재 달력에 표현되는 타입별 요일
   const dayOfTheWeekList = computed(() =>
     DAY_OF_THE_WEEK_NAME_LIST[props.dayOfTheWeekNotation]);
   // mode: dateRange에 두 달력이 연속적인 경우
   const isContinuousMonths = computed(
-    () => props.mode === 'dateRange'
+    () => (props.mode === 'dateRange'
       && (getSideMonthCalendarInfo('next', mainCalendarPageInfo.year, mainCalendarPageInfo.month).year === expandedCalendarPageInfo.year
-        && getSideMonthCalendarInfo('next', mainCalendarPageInfo.year, mainCalendarPageInfo.month).month === expandedCalendarPageInfo.month));
+        && getSideMonthCalendarInfo('next', mainCalendarPageInfo.year, mainCalendarPageInfo.month).month === expandedCalendarPageInfo.month))
+    || (props.mode === 'dateTimeRange' && (mainCalendarPageInfo.year === expandedCalendarPageInfo.year
+          && mainCalendarPageInfo.month === expandedCalendarPageInfo.month)),
+  );
 
   onBeforeMount(() => {
     validateModelValue();
@@ -322,7 +399,13 @@ export const useCalendarDate = (param) => {
   // dateRange 모드의 확장된 달력 테이블의 날짜 정보
   const expandedCalendarTableInfo = reactive(getMatrixArr(CALENDAR_ROWS, CALENDAR_COLS));
   // 시간박스 정보
-  const timeTableInfo = reactive({
+  const mainTimeTableInfo = reactive({
+    hour: [],
+    min: [],
+    sec: [],
+  });
+  // dateTimeRange 모드의 확장된 달력 테이블의 시간 박스 정보
+  const expandedTimeTableInfo = reactive({
     hour: [],
     min: [],
     sec: [],
@@ -350,7 +433,7 @@ export const useCalendarDate = (param) => {
       ((calendarPageInfo.month + 1) % MONTH_CNT) || MONTH_CNT);
     const YEAR_OF_PREV_MONTH = computed(() => (calendarPageInfo.month === 1
       ? calendarPageInfo.year - 1 : calendarPageInfo.year));
-    const YEAR_OF_NEXT_MONTH = computed(() => (mainCalendarPageInfo.month === 12
+    const YEAR_OF_NEXT_MONTH = computed(() => (calendarPageInfo.month === 12
       ? calendarPageInfo.year + 1 : calendarPageInfo.year));
     // 이번달 1일의 요일
     const dayOfWeekOnThe1stOfThisMonth = computed(() => getDayOfWeekOnThe1stOfMonth(
@@ -379,9 +462,9 @@ export const useCalendarDate = (param) => {
       currDate = formatDateTime({ year, month, date });
       const isDisabled = disabledDate ? disabledDate(new Date(currDate)) : false;
       const inRangeCls = () => {
-        if (props.mode === 'dateRange' && selectedValue.value.length === 2) {
-          if (getDateMs(selectedValue.value[0]) <= getDateMs(currDate)
-            && getDateMs(currDate) <= getDateMs(selectedValue.value[1])
+        if (['dateRange'].includes(props.mode) && selectedValue.value.length === 2) {
+          if (getDateMs(selectedValue.value[0].split(' ')[0]) <= getDateMs(currDate)
+            && getDateMs(currDate) <= getDateMs(selectedValue.value[1].split(' ')[0])
           ) {
             if (getDateMs(selectedValue.value[0]) === getDateMs(selectedValue.value[1])) {
               return ' in-range start-end-date';
@@ -396,13 +479,21 @@ export const useCalendarDate = (param) => {
         }
         return '';
       };
+
+      const isDateRangeSelected = props.mode === 'dateRange'
+          && selectedValue.value?.map(v => v.split(' ')[0]).includes(currDate);
+      // mode:dateTimeRange인 경우는 한 달력에 from, to 선택 못함
+      const index = calendarType !== 'main' | 0;
+      const isDateTimeRangeSelected = props.mode === 'dateTimeRange'
+         && selectedValue.value.length > index && selectedValue.value[index].split(' ')[0].includes(currDate);
+
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[i][j] = {
         monthType: `${monthType}${isDisabled ? ' disabled' : ''}${inRangeCls()}`,
         isToday: TODAY_YMD === currDate,
-        isSelected: props.mode !== 'dateRange'
+        isSelected: !['dateRange', 'dateTimeRange'].includes(props.mode)
           ? selectedValue.value?.includes(currDate)
-          : monthType === '' && selectedValue.value?.includes(currDate),
+          : monthType === '' && (isDateRangeSelected || isDateTimeRangeSelected),
         year,
         month,
         date,
@@ -455,6 +546,9 @@ export const useCalendarDate = (param) => {
    * Calendar 시간 정보 세팅하기
    */
   const setHmsTime = () => {
+    const timeFormat = props.options?.timeFormat;
+    const mainDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[0] : selectedValue.value;
+    const expandedDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[1] : '';
     ['hour', 'min', 'sec'].forEach((v) => {
       let cnt = SEC_CNT;
       if (v === 'hour') {
@@ -462,13 +556,23 @@ export const useCalendarDate = (param) => {
       } else if (v === 'min') {
         cnt = MIN_CNT;
       }
+      const mainTimeValue = mainDateTimeValue && mainDateTimeValue.length > 0
+          ? getTimeInfoByTimeFormat(timeFormat, mainDateTimeValue, v) : -1;
+      const expandedTimeValue = expandedDateTimeValue && expandedDateTimeValue.length > 0
+          ? getTimeInfoByTimeFormat(timeFormat, expandedDateTimeValue, v) : -1;
       for (let i = 0; i < cnt; i++) {
-        timeTableInfo[v][i] = {
+        mainTimeTableInfo[v][i] = {
           timeType: v,
           num: i,
-          isSelected: selectedValue.value && selectedValue.value.length > 0
-            ? getDateTimeInfoByType(selectedValue, v) === i : false,
+          isSelected: mainTimeValue === i,
         };
+        if (props.mode === 'dateTimeRange') {
+          expandedTimeTableInfo[v][i] = {
+            timeType: v,
+            num: i,
+            isSelected: expandedTimeValue === i,
+          };
+        }
       }
     });
   };
@@ -478,22 +582,25 @@ export const useCalendarDate = (param) => {
    * @param timeType - {'hour'|'min'|'sec'}
    * @param i - rows
    * @param j - cols
-   * @returns {object - cellInfo}
+   * @param calendarType - {'main'|'expanded'}
+   * @returns {object} - cellInfo
    */
-  const getTimeInfo = (timeType, i, j) => {
-    const currPage = mainCalendarPageInfo[timeType] - 1;
+  const getTimeInfo = (timeType, i, j, calendarType) => {
+    const pageInfo = calendarType === 'main' ? mainCalendarPageInfo : expandedCalendarPageInfo;
+    const timeInfo = calendarType === 'main' ? mainTimeTableInfo : expandedTimeTableInfo;
+    const currPage = pageInfo[timeType] - 1;
     const currRowIdx = i - 1;
     const currColIdx = j - 1;
     const currIdx = (currPage * CELL_CNT_IN_ONE_PAGE)
       + (currRowIdx * CELL_CNT_IN_ONE_ROW) + currColIdx;
-    return timeTableInfo[timeType][currIdx];
+    return timeInfo[timeType][currIdx];
   };
 
   watch(
     () => props.modelValue,
     (curr) => {
       selectedValue.value = curr;
-      if (props.mode !== 'dateRange') {
+      if (!['dateRange', 'dateTimeRange'].includes(props.mode)) {
         setCalendarDate('main');
         if (props.mode === 'dateTime') {
           setHmsTime();
@@ -508,7 +615,8 @@ export const useCalendarDate = (param) => {
   return {
     mainCalendarTableInfo,
     expandedCalendarTableInfo,
-    timeTableInfo,
+    mainTimeTableInfo,
+    expandedTimeTableInfo,
     setCalendarDate,
     setHmsTime,
     getTimeInfo,
@@ -518,6 +626,7 @@ export const useCalendarDate = (param) => {
 export const useEvent = (param) => {
   const { props, emit } = getCurrentInstance();
   const disabledDate = props.options.disabledDate;
+  const timeFormat = props.options?.timeFormat;
   const {
     selectedValue,
     mainCalendarPageInfo,
@@ -530,6 +639,12 @@ export const useEvent = (param) => {
   const dateRangeClickedDate = ref('');
   // dateRange mode에서 클릭한번 후 커서에 따라 날짜를 마우스오버하는 경우 dynamic argument로 이벤트명 설정
   const calendarEventName = ref(null);
+  // dateTime 또는 dateTimeRange에서 timeFormat이 있는 경우 event 막음
+  const preventTimeEventType = {
+    hour: timeFormat && timeFormat.split(':')[0] !== 'HH',
+    min: timeFormat && timeFormat.split(':')[1] !== 'mm',
+    sec: timeFormat && timeFormat.split(':')[2] !== 'ss',
+  };
 
   /**
    * 입력받은 dateTime object에 calendar date, time 영역 페이지 세팅
@@ -547,13 +662,13 @@ export const useEvent = (param) => {
       calendarPageInfo.month = month;
     }
     if (hour) {
-      mainCalendarPageInfo.hour = hour;
+      calendarPageInfo.hour = hour;
     }
     if (min) {
-      mainCalendarPageInfo.min = min;
+      calendarPageInfo.min = min;
     }
     if (sec) {
-      mainCalendarPageInfo.sec = sec;
+      calendarPageInfo.sec = sec;
     }
   };
 
@@ -566,7 +681,7 @@ export const useEvent = (param) => {
    * @param type - {'prev'|'next'}
    */
   const moveMonth = (calendarType, type) => {
-    const isDateRangeMode = props.mode === 'dateRange';
+    const isDateRangeMode = ['dateRange', 'dateTimeRange'].includes(props.mode);
     let calendarPageInfo = mainCalendarPageInfo;
     if (!isDateRangeMode) {
       if (type === 'prev') {
@@ -591,11 +706,12 @@ export const useEvent = (param) => {
         mainCalendarPageInfo.year,
         mainCalendarPageInfo.month,
       );
+      const targetYearMonth = props.mode === 'dateRange' ? nextYearMonth : mainCalendarPageInfo;
       // 두 달력간의 연속 여부 (메인 달력 + 1Month === 확장된 달력)
       // 연속된 경우 mainCalendar와 expandedCalendar는 서로 같은 달로 이동 불가
       // mainCalendar Month < expandedCalendar Month
-      const isContinuousMonths = expandedCalendarPageInfo.year === nextYearMonth.year
-        && expandedCalendarPageInfo.month === nextYearMonth.month;
+      const isContinuousMonths = expandedCalendarPageInfo.year === targetYearMonth.year
+        && expandedCalendarPageInfo.month === targetYearMonth.month;
       if (type === 'prev') {
         if (isContinuousMonths && calendarType === 'expanded') {
           return;
@@ -632,12 +748,16 @@ export const useEvent = (param) => {
 
   /**
    * Calendar Date 일자 클릭 이벤트
+   * @param calendarType - {main|expanded}
    * @param dateInfo
    */
   const clickDate = (calendarType, dateInfo) => {
     const { year, month, date, monthType } = dateInfo;
     const CURR_DATE_STR = formatDateTime({ year, month, date });
-    const isExistCurrDate = props.modelValue?.includes(CURR_DATE_STR);
+    const isExistCurrDate = props.modelValue ? (Array.isArray(props.modelValue)
+        ? props.modelValue?.map(v => v.split(' ')[0])
+        : props.modelValue.split(' ')[0])
+        .includes(CURR_DATE_STR) : false;
     // 제한된 날짜는 선택할 수 없다.
     if (disabledDate && disabledDate(new Date(CURR_DATE_STR)) && !isExistCurrDate) {
       return;
@@ -671,13 +791,21 @@ export const useEvent = (param) => {
       case 'dateTime': {
         const isExistTime = !!(selectedValue.value?.split(' ')[1]);
         const CURR_TIME_HMS = isExistTime
-          ? selectedValue.value?.split(' ')[1] : '00:00:00';
-        selectedValue.value = `${CURR_DATE_STR} ${CURR_TIME_HMS}`;
+            ? selectedValue.value?.split(' ')[1] : '00:00:00';
+        selectedValue.value = getChangedValueByTimeFormat(
+            timeFormat,
+            `${CURR_DATE_STR} ${CURR_TIME_HMS}`,
+        );
         moveDispCalendarMonth();
-        emit('update:modelValue', `${CURR_DATE_STR} ${CURR_TIME_HMS}`);
+        emit('update:modelValue', selectedValue.value);
         setCalendarDate('main');
         if (!isExistTime) {
-          setCalendarPageInfo('main', { hour: 1, min: 1, sec: 1 });
+          const currTime = selectedValue.value.split(' ')[1].split(':');
+          setCalendarPageInfo('main', {
+            hour: Math.floor(currTime[0] / CELL_CNT_IN_ONE_PAGE) + 1,
+            min: Math.floor(currTime[1] / CELL_CNT_IN_ONE_PAGE) + 1,
+            sec: Math.floor(currTime[2] / CELL_CNT_IN_ONE_PAGE) + 1,
+          });
           setHmsTime();
         }
         break;
@@ -747,6 +875,47 @@ export const useEvent = (param) => {
         }
         break;
       }
+      case 'dateTimeRange': {
+        const currIndex = calendarType !== 'main' | 0;
+        if (!selectedValue.value.length) {
+          const currDate = getChangedValueByTimeFormat(
+              timeFormat,
+              `${CURR_DATE_STR} 00:00:00`,
+          );
+          selectedValue.value.push(currDate);
+          selectedValue.value.push(currDate);
+
+          selectedValue.value?.forEach((currValue, index) => {
+            setCalendarPageInfo(index === 0 ? 'main' : 'expanded', {
+              year: getDateTimeInfoByType(currValue, 'year'),
+              month: getDateTimeInfoByType(currValue, 'month'),
+              hour: Math.floor(getDateTimeInfoByType(currValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1,
+              min: Math.floor(getDateTimeInfoByType(currValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1,
+              sec: Math.floor(getDateTimeInfoByType(currValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
+            });
+          });
+          setHmsTime();
+        } else {
+          const CURR_TIME_HMS = selectedValue.value[currIndex]?.split(' ')[1] || '00:00:00';
+          const currDate = getChangedValueByTimeFormat(
+              timeFormat,
+              `${CURR_DATE_STR} ${CURR_TIME_HMS}`,
+          );
+
+          const fromDate = currIndex ? selectedValue.value[0] : currDate;
+          const toDate = currIndex ? currDate : selectedValue.value[1];
+
+          if (new Date(fromDate).getTime() > new Date(toDate).getTime()) {
+            break;
+          }
+
+          selectedValue.value[currIndex] = currDate;
+          moveDispCalendarMonth();
+        }
+        emit('update:modelValue', [...selectedValue.value]);
+        setCalendarDate(calendarType);
+        break;
+      }
       default:
         break;
     }
@@ -754,102 +923,150 @@ export const useEvent = (param) => {
 
   /**
    * Calendar mode: dateTime인 경우 HMS 이동 화살표 클릭 이벤트
+   * @param calendarType - {main|expanded}
    * @param timeType - {hour|min|sec}
    * @param arrow - {up|down}
    */
-  const clickHmsBtn = (timeType, arrow) => {
+  const clickHmsBtn = (calendarType, timeType, arrow) => {
+    if (preventTimeEventType[timeType]) return;
+    const calendarPageInfo = calendarType === 'expanded'
+      ? expandedCalendarPageInfo : mainCalendarPageInfo;
     const FIRST_PAGE = 1;
     const HOUR_MAX_PAGE = 2;
     const MINUTE_MAX_PAGE = 5;
     const SECOND_MAX_PAGE = 5;
     if (timeType === 'hour') {
-      if (arrow === 'down' && mainCalendarPageInfo.hour < HOUR_MAX_PAGE) {
-        mainCalendarPageInfo.hour++;
-      } else if (arrow === 'up' && mainCalendarPageInfo.hour > FIRST_PAGE) {
-        mainCalendarPageInfo.hour--;
+      if (arrow === 'down' && calendarPageInfo.hour < HOUR_MAX_PAGE) {
+        calendarPageInfo.hour++;
+      } else if (arrow === 'up' && calendarPageInfo.hour > FIRST_PAGE) {
+        calendarPageInfo.hour--;
       }
     } else if (timeType === 'min') {
-      if (arrow === 'down' && mainCalendarPageInfo.min < MINUTE_MAX_PAGE) {
-        mainCalendarPageInfo.min++;
-      } else if (arrow === 'up' && mainCalendarPageInfo.min > FIRST_PAGE) {
-        mainCalendarPageInfo.min--;
+      if (arrow === 'down' && calendarPageInfo.min < MINUTE_MAX_PAGE) {
+        calendarPageInfo.min++;
+      } else if (arrow === 'up' && calendarPageInfo.min > FIRST_PAGE) {
+        calendarPageInfo.min--;
       }
     } else if (timeType === 'sec') {
-      if (arrow === 'down' && mainCalendarPageInfo.sec < SECOND_MAX_PAGE) {
-        mainCalendarPageInfo.sec++;
-      } else if (arrow === 'up' && mainCalendarPageInfo.sec > FIRST_PAGE) {
-        mainCalendarPageInfo.sec--;
+      if (arrow === 'down' && calendarPageInfo.sec < SECOND_MAX_PAGE) {
+        calendarPageInfo.sec++;
+      } else if (arrow === 'up' && calendarPageInfo.sec > FIRST_PAGE) {
+        calendarPageInfo.sec--;
       }
     }
   };
 
   /**
    * Click cell In HMS area
+   * @param calendarType - {main|expanded}
    * @param timeType - {hour|min|sec}
    * @param i - row
    * @param j - col
    */
-  const clickTime = (timeType, i, j) => {
-    const currPage = mainCalendarPageInfo[timeType] - 1;
+  const clickTime = (calendarType, timeType, i, j) => {
+    if (preventTimeEventType[timeType]) return;
+    const calendarPageInfo = calendarType === 'expanded'
+        ? expandedCalendarPageInfo : mainCalendarPageInfo;
+    const currPage = calendarPageInfo[timeType] - 1;
     const currRowIdx = i - 1;
     const currColIdx = j - 1;
     const clickedNum = (currPage * CELL_CNT_IN_ONE_PAGE)
      + (currRowIdx * CELL_CNT_IN_ONE_ROW) + currColIdx;
+    const TODAY = new Date();
+    const TODAY_INFO = {
+      year: TODAY.getFullYear(),
+      month: TODAY.getMonth() + 1,
+      date: TODAY.getDate(),
+    };
+    let EXIST_MODEL = true;
+    let pageUpdateList = [];
+
+    const getTimeValueByType = () => {
+      let targetTimeValue;
+      if (timeType === 'hour') {
+        targetTimeValue = `${lpadToTwoDigits(clickedNum)}:00:00'`;
+      } else if (timeType === 'min') {
+        targetTimeValue = `00:${lpadToTwoDigits(clickedNum)}:00`;
+      } else if (timeType === 'sec') {
+        targetTimeValue = `00:00:${lpadToTwoDigits(clickedNum)}`;
+      }
+      return `${formatDateTime(TODAY_INFO)} ${targetTimeValue}`;
+    };
+
+    const getChangedValue = (targetValue) => {
+      const HOUR_START_IDX = 11;
+      const MIN_START_IDX = 14;
+      const SEC_START_IDX = 17;
+      const REPLACE_TEXT_SIZE = 2;
+      let START_IDX = HOUR_START_IDX;
+      if (timeType === 'min') {
+        START_IDX = MIN_START_IDX;
+      } else if (timeType === 'sec') {
+        START_IDX = SEC_START_IDX;
+      }
+      return `${targetValue?.substr(0, START_IDX)}${lpadToTwoDigits(clickedNum)}${targetValue?.substr(START_IDX + REPLACE_TEXT_SIZE)}`;
+    };
 
     if (props.mode === 'dateTime') {
-      const EXIST_YMD = !!(props.modelValue?.split(' ')[0]);
-      const TODAY = new Date();
-      const TODAY_INFO = {
-        year: TODAY.getFullYear(),
-        month: TODAY.getMonth() + 1,
-        date: TODAY.getDate(),
-      };
       if (!props.modelValue) {
-        if (timeType === 'hour') {
-          selectedValue.value = `${formatDateTime(TODAY_INFO)} ${lpadToTwoDigits(clickedNum)}:00:00`;
-          emit('update:modelValue', `${formatDateTime(TODAY_INFO)} ${lpadToTwoDigits(clickedNum)}:00:00`);
-        } else if (timeType === 'min') {
-          selectedValue.value = `${formatDateTime(TODAY_INFO)} 00:${lpadToTwoDigits(clickedNum)}:00`;
-          emit('update:modelValue', `${formatDateTime(TODAY_INFO)} 00:${lpadToTwoDigits(clickedNum)}:00`);
-        } else if (timeType === 'sec') {
-          selectedValue.value = `${formatDateTime(TODAY_INFO)} 00:00:${lpadToTwoDigits(clickedNum)}`;
-          emit('update:modelValue', `${formatDateTime(TODAY_INFO)} 00:00:${lpadToTwoDigits(clickedNum)}`);
-        }
+        EXIST_MODEL = false;
+        selectedValue.value = getChangedValueByTimeFormat(
+            timeFormat,
+            getTimeValueByType(),
+        );
+        emit('update:modelValue', selectedValue.value);
       } else {
-        const HOUR_START_IDX = 11;
-        const MIN_START_IDX = 14;
-        const SEC_START_IDX = 17;
-        const REPLACE_TEXT_SIZE = 2;
-        let START_IDX = HOUR_START_IDX;
-        if (timeType === 'min') {
-          START_IDX = MIN_START_IDX;
-        } else if (timeType === 'sec') {
-          START_IDX = SEC_START_IDX;
-        }
-        selectedValue.value = `${props.modelValue.substr(0, START_IDX)}${lpadToTwoDigits(clickedNum)}${props.modelValue.substr(START_IDX + REPLACE_TEXT_SIZE)}`;
-        emit('update:modelValue', `${props.modelValue.substr(0, START_IDX)}${lpadToTwoDigits(clickedNum)}${props.modelValue.substr(START_IDX + REPLACE_TEXT_SIZE)}`);
+        selectedValue.value = getChangedValueByTimeFormat(
+            timeFormat,
+            getChangedValue(props.modelValue),
+        );
+        emit('update:modelValue', selectedValue.value);
       }
+      pageUpdateList.push(selectedValue.value);
+    } else {
+      const index = calendarType !== 'main' | 0;
+      if (!props.modelValue.length) {
+        selectedValue.value.push(getChangedValueByTimeFormat(timeFormat, getTimeValueByType()));
+        selectedValue.value.push(getChangedValueByTimeFormat(timeFormat, getTimeValueByType()));
+        EXIST_MODEL = false;
+        pageUpdateList = selectedValue.value;
+      } else {
+        const currDateTime = getChangedValueByTimeFormat(
+            timeFormat,
+            getChangedValue(props.modelValue[index]),
+        );
 
-      // dateTime의 v-model값이 없는 경우 time area를 클릭하였을 때 date의 값은 today로 세팅
-      if (!EXIST_YMD) {
-        setCalendarPageInfo('main', {
-          hour: 1,
-          min: 1,
-          sec: 1,
-          ...{
-            year: TODAY_INFO.year,
-            month: TODAY_INFO.month,
-            [timeType]: Math.floor(clickedNum / CELL_CNT_IN_ONE_PAGE) + 1,
-          },
-        });
-        setCalendarDate('main');
+        const fromDate = index ? selectedValue.value[0] : currDateTime;
+        const toDate = index ? currDateTime : selectedValue.value[1];
+
+        if (new Date(fromDate).getTime() > new Date(toDate).getTime()) {
+          return;
+        }
+
+        selectedValue.value[index] = currDateTime;
       }
-      setHmsTime();
+      emit('update:modelValue', [...selectedValue.value]);
+    }
+    setHmsTime();
+    // dateTime의 v-model값이 없는 경우 time area를 클릭하였을 때 date의 값은 today로 세팅
+    if (!EXIST_MODEL) {
+      pageUpdateList?.forEach((currValue, index) => {
+        const changeCalendarType = index === 0 ? 'main' : 'expanded';
+        setCalendarPageInfo(changeCalendarType, {
+          year: getDateTimeInfoByType(currValue, 'year'),
+          month: getDateTimeInfoByType(currValue, 'month'),
+          hour: Math.floor(getDateTimeInfoByType(currValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1,
+          min: Math.floor(getDateTimeInfoByType(currValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1,
+          sec: Math.floor(getDateTimeInfoByType(currValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
+        });
+        setCalendarDate(changeCalendarType);
+      });
     }
   };
 
   /**
    * Wheel up or wheel down In Calendar Month(tbody) area
+   * @param calendarType - {main|expanded}
    * @param e
    */
   const wheelMonth = (calendarType, e) => {
@@ -859,11 +1076,13 @@ export const useEvent = (param) => {
 
   /**
    * Wheel up or wheel down In Calendar Time(HMS) area
+   * @param calendarType - {main|expanded}
    * @param timeType - {hour|min|sec}
    * @param e
    */
-  const wheelTime = (timeType, e) => {
-    clickHmsBtn(timeType, e.deltaY > 0 ? 'down' : 'up');
+  const wheelTime = (calendarType, timeType, e) => {
+    if (preventTimeEventType[timeType]) return;
+    clickHmsBtn(calendarType, timeType, e.deltaY > 0 ? 'down' : 'up');
   };
 
   /**
@@ -921,5 +1140,6 @@ export const useEvent = (param) => {
     wheelTime,
     calendarEventName,
     onMousemoveDate,
+    preventTimeEventType,
   };
 };
