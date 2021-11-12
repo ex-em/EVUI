@@ -99,6 +99,7 @@ const chartData =
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
+| show | Boolean | true | label 표시 여부 | true / false |
 | fontSize | Number | 12 | 글자 크기 | |
 | color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
 | fontFamily | String | 'Roboto' | 폰트 | |

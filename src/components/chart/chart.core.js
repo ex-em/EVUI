@@ -441,38 +441,42 @@ class EvChart {
     let lh = 0;
 
     axesX.forEach((axis, index) => {
-      lw = range.x[index].size.width + labelBuffer.width;
-      lh = range.x[index].size.height + labelBuffer.height;
+      if (axis.labelStyle?.show) {
+        lw = range.x[index].size.width + labelBuffer.width;
+        lh = range.x[index].size.height + labelBuffer.height;
 
-      if (axis.position === 'bottom') {
-        if (lh > labelOffset.bottom) {
-          labelOffset.bottom = lh;
+        if (axis.position === 'bottom') {
+          if (lh > labelOffset.bottom) {
+            labelOffset.bottom = lh;
+          }
+        } else if (axis.position === 'top') {
+          if (lh > labelOffset.top) {
+            labelOffset.top = lh;
+          }
         }
-      } else if (axis.position === 'top') {
-        if (lh > labelOffset.top) {
-          labelOffset.top = lh;
-        }
+
+        labelOffset.left = (lw / 2) > labelOffset.left ? (lw / 2) : labelOffset.left;
+        labelOffset.right = (lw / 2) > labelOffset.right ? (lw / 2) : labelOffset.right;
       }
-
-      labelOffset.left = (lw / 2) > labelOffset.left ? (lw / 2) : labelOffset.left;
-      labelOffset.right = (lw / 2) > labelOffset.right ? (lw / 2) : labelOffset.right;
     });
 
     axesY.forEach((axis, index) => {
-      lw = Math.max(range.y[index].size.width + labelBuffer.width, 42 + labelBuffer.width);
+      if (axis.labelStyle?.show) {
+        lw = Math.max(range.y[index].size.width + labelBuffer.width, 42 + labelBuffer.width);
 
-      if (axis.position === 'left') {
-        if (lw > labelOffset.left) {
-          labelOffset.left = lw;
+        if (axis.position === 'left') {
+          if (lw > labelOffset.left) {
+            labelOffset.left = lw;
+          }
+        } else if (axis.position === 'right') {
+          if (lw > labelOffset.right) {
+            labelOffset.right = lw;
+          }
         }
-      } else if (axis.position === 'right') {
-        if (lw > labelOffset.right) {
-          labelOffset.right = lw;
-        }
+
+        labelOffset.top = (lh / 2) > labelOffset.top ? (lh / 2) : labelOffset.top;
+        labelOffset.bottom = (lh / 2) > labelOffset.bottom ? (lh / 2) : labelOffset.bottom;
       }
-
-      labelOffset.top = (lh / 2) > labelOffset.top ? (lh / 2) : labelOffset.top;
-      labelOffset.bottom = (lh / 2) > labelOffset.bottom ? (lh / 2) : labelOffset.bottom;
     });
 
     return labelOffset;
