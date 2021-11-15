@@ -6,7 +6,7 @@
         :key="`${item.value}_${idx}`"
         class="ev-menu-li"
         :class="{ disabled: item.disabled }"
-        @click="[item.click && !item.disabled ? item.click() : (() => {})()
+        @click="[item.click && !item.disabled ? item.click(item) : (() => {})()
           , hideAll(item.children)]"
         @mouseenter="!item.disabled ? mouseenterLi($event, item.children) : (() => {})()"
       >
