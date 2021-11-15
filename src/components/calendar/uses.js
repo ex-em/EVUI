@@ -1,5 +1,5 @@
 import {
-  ref, reactive, computed, watch, getCurrentInstance, unref, onBeforeMount,
+  ref, reactive, computed, getCurrentInstance, unref, onBeforeMount, watch,
 } from 'vue';
 import { throttle } from 'lodash-es';
 
@@ -27,6 +27,7 @@ const DAY_OF_THE_WEEK_NAME_LIST = {
   abbrPascalName: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   abbrKorName: ['일', '월', '화', '수', '목', '금', '토'],
 };
+
 const ONE_DAY_MS = 86400000;
 const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
 const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
@@ -235,7 +236,7 @@ export const useModel = () => {
       && ((props.modelValue.length === 10 && dateReg.exec(props.modelValue?.toString()))
       || (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue?.toString())))
     ) {
-      if (props.mode === 'dateTime') {
+      if (props.mode === 'dateTime' && timeFormat) {
         const modelValue = getChangedValueByTimeFormat(timeFormat, props.modelValue);
         emit('update:modelValue', modelValue);
         selectedValue = ref(modelValue);
@@ -252,7 +253,7 @@ export const useModel = () => {
       || (v.length === 19 && dateTimeReg.exec(v))
     ))
   ) {
-    if (props.mode === 'dateTimeRange' && props.modelValue.length === 2) {
+    if (props.mode === 'dateTimeRange' && props.modelValue.length === 2 && timeFormat) {
       const modelValue = [];
       modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[0]));
       modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[1]));
@@ -328,7 +329,7 @@ export const useModel = () => {
       month: getDateTimeInfoByType(expandedValue, 'month'),
     };
     // fromDate, toDate의 연, 월이 같은 경우의 확장된 달력 페이징 정보는 다음달로 세팅
-    if (fromDate.year === toDate.year && fromDate.month === toDate.month) {
+    if (props.mode === 'dateRange' && (fromDate.year === toDate.year && fromDate.month === toDate.month)) {
       expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
           'next',
           mainCalendarPageInfo.year,
@@ -596,22 +597,6 @@ export const useCalendarDate = (param) => {
     return timeInfo[timeType][currIdx];
   };
 
-  watch(
-    () => props.modelValue,
-    (curr) => {
-      selectedValue.value = curr;
-      if (!['dateRange', 'dateTimeRange'].includes(props.mode)) {
-        setCalendarDate('main');
-        if (props.mode === 'dateTime') {
-          setHmsTime();
-        }
-      } else {
-        setCalendarDate('main');
-        setCalendarDate('expanded');
-      }
-    },
-  );
-
   return {
     mainCalendarTableInfo,
     expandedCalendarTableInfo,
@@ -670,6 +655,24 @@ export const useEvent = (param) => {
     if (sec) {
       calendarPageInfo.sec = sec;
     }
+  };
+
+  /**
+   * page를 Array로 담아 페이지 세팅
+   * @param pageList
+   */
+  const updatePageList = (pageList) => {
+    pageList?.forEach((currValue, index) => {
+      const changeCalendarType = index === 0 ? 'main' : 'expanded';
+      setCalendarPageInfo(changeCalendarType, {
+        year: getDateTimeInfoByType(currValue, 'year'),
+        month: getDateTimeInfoByType(currValue, 'month'),
+        hour: Math.floor(getDateTimeInfoByType(currValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1,
+        min: Math.floor(getDateTimeInfoByType(currValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1,
+        sec: Math.floor(getDateTimeInfoByType(currValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
+      });
+      setCalendarDate(changeCalendarType);
+    });
   };
 
   /**
@@ -894,6 +897,8 @@ export const useEvent = (param) => {
               sec: Math.floor(getDateTimeInfoByType(currValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
             });
           });
+          setCalendarDate('main');
+          setCalendarDate('expanded');
           setHmsTime();
         } else {
           const CURR_TIME_HMS = selectedValue.value[currIndex]?.split(' ')[1] || '00:00:00';
@@ -911,9 +916,9 @@ export const useEvent = (param) => {
 
           selectedValue.value[currIndex] = currDate;
           moveDispCalendarMonth();
+          setCalendarDate(calendarType);
         }
         emit('update:modelValue', [...selectedValue.value]);
-        setCalendarDate(calendarType);
         break;
       }
       default:
@@ -1050,17 +1055,7 @@ export const useEvent = (param) => {
     setHmsTime();
     // dateTime의 v-model값이 없는 경우 time area를 클릭하였을 때 date의 값은 today로 세팅
     if (!EXIST_MODEL) {
-      pageUpdateList?.forEach((currValue, index) => {
-        const changeCalendarType = index === 0 ? 'main' : 'expanded';
-        setCalendarPageInfo(changeCalendarType, {
-          year: getDateTimeInfoByType(currValue, 'year'),
-          month: getDateTimeInfoByType(currValue, 'month'),
-          hour: Math.floor(getDateTimeInfoByType(currValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1,
-          min: Math.floor(getDateTimeInfoByType(currValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1,
-          sec: Math.floor(getDateTimeInfoByType(currValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
-        });
-        setCalendarDate(changeCalendarType);
-      });
+      updatePageList(pageUpdateList);
     }
   };
 
@@ -1131,6 +1126,30 @@ export const useEvent = (param) => {
     }
   }, 10);
 
+  const resetCalendarInfo = () => {
+    let pageUpdateList = [];
+
+    if (['date', 'dateTime'].includes(props.mode)) {
+      pageUpdateList.push(selectedValue.value);
+    } else {
+      pageUpdateList = selectedValue.value;
+    }
+
+    updatePageList(pageUpdateList);
+
+    if (['dateTime', 'dateTimeRange'].includes(props.mode)) {
+      setHmsTime();
+    }
+  };
+
+  watch(
+      () => props.modelValue,
+      (curr) => {
+        selectedValue.value = curr;
+        resetCalendarInfo();
+      },
+  );
+
   return {
     clickPrevNextBtn,
     clickDate,
@@ -1138,6 +1157,7 @@ export const useEvent = (param) => {
     clickTime,
     wheelMonth,
     wheelTime,
+    resetCalendarInfo,
     calendarEventName,
     onMousemoveDate,
     preventTimeEventType,

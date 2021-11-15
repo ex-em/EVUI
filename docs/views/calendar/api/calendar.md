@@ -18,6 +18,7 @@
 |  |  | dateTime | 메인 캘린더에 날짜와 시간(HMS)을 선택 | 'YYYY-MM-DD HH:MI:SS' |
 |  |  | dateMulti | 메인 캘린더에 여러 날짜는 선택 | \['YYYY-MM-DD', ...\] |
 |  |  | dateRange | 메인 캘린더와 확장 캘린더에서 fromDate ~ toDate를 선택 | \['YYYY-MM-DD'`(fromDate)`, 'YYYY-MM-DD'`(toDate)`\] |
+|  |  | dateTimeRange | 메인 캘린더와 확장 캘린더에서 fromDateTime ~ toDateTime을 선택 | \['YYYY-MM-DD HH:mm:ss'`(fromDate)`, 'YYYY-MM-DD HH:mm:ss'`(toDate)`\] |
 | monthNotation | String | 'fullName' | 캘린더 헤더의 월 표기방식 | 'fullName', 'abbrName', 'numberName', 'korName' |
 | dayOfTheWeekNotation | String | 'abbrUpperName' | 캘린더의 요일 표기방식 | 'abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName' |
 | options | Object | {} | 캘린더의 세부 옵션 |  |

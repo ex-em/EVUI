@@ -170,7 +170,7 @@ export const useDropdown = (param) => {
         && props?.options?.multiDayLimit > curr.length
       ) {
         return;
-      } else if (props.mode === 'dateTime') {
+      } else if (props.mode === 'dateTime' || props.mode === 'dateTimeRange') {
         currentValue.value = curr;
         return;
       } else if (props.mode === 'date') {
@@ -189,5 +189,202 @@ export const useDropdown = (param) => {
     clickSelectInput,
     clickOutsideDropbox,
     changeDropboxPosition,
+  };
+};
+
+export const useShortcuts = (param) => {
+  const { props } = getCurrentInstance();
+  const { mv } = param;
+
+  let defaultShortcuts = ['lastMonth', 'lastWeek', 'yesterday', 'today'];
+  if (['date', 'dateTime'].includes(props.mode)) {
+    defaultShortcuts = ['yesterday', 'today'];
+  } else if (props.mode === 'dateMulti') {
+    defaultShortcuts = [];
+  }
+
+  const usedShortcuts = reactive([]);
+  props.shortcuts?.forEach((shortcut) => {
+    if (defaultShortcuts.includes(shortcut)) {
+      usedShortcuts.push({
+        key: shortcut,
+        label: shortcut,
+        isActive: false,
+      });
+    }
+  });
+
+  const clearShortcuts = () => {
+    const activeShortcut = usedShortcuts.find(shortcut => shortcut.isActive);
+    if (activeShortcut) {
+      activeShortcut.isActive = false;
+    }
+  };
+
+  const activeShortcut = (targetKey) => {
+    const targetShortcut = usedShortcuts.find(shortcut => shortcut.key === targetKey);
+    if (targetShortcut) {
+      targetShortcut.isActive = true;
+    }
+  };
+
+  /**
+   * 월, 일을 두자리 숫자로 보정
+   * @param num
+   * @returns {string|*}
+   */
+  const lpadToTwoDigits = (num) => {
+    if (num === null) {
+      return '00';
+    } else if (+num < 10) {
+      return `0${num}`;
+    }
+    return num;
+  };
+
+  const formatDate = (targetDate) => {
+    const dateValue = targetDate ? new Date(targetDate) : new Date();
+    const year = dateValue.getFullYear();
+    const month = dateValue.getMonth() + 1;
+    const day = dateValue.getDate();
+    return `${year}-${lpadToTwoDigits(month)}-${lpadToTwoDigits(day)}`;
+  };
+
+  const formatDateTime = (targetDateTime) => {
+    const dateTimeValue = targetDateTime ? new Date(targetDateTime) : new Date();
+    const hour = dateTimeValue.getHours();
+    const min = dateTimeValue.getMinutes();
+    const sec = dateTimeValue.getSeconds();
+    return `${formatDate(dateTimeValue)} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
+  };
+
+  const getChangedDateTime = (hour, min, sec) => {
+    const dateTimeValue = new Date();
+    dateTimeValue.setHours(hour);
+    dateTimeValue.setMinutes(min);
+    dateTimeValue.setSeconds(sec);
+    return dateTimeValue;
+  };
+
+  const initActiveShortcut = () => {
+    clearShortcuts();
+
+    const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
+
+    if (!usedShortcuts.length
+       || props.mode === 'dateMulti'
+       || (isRange && !mv.value.length)
+       || (!isRange && !mv.value)
+    ) {
+      return;
+    }
+    const today = formatDate();
+    const yesterday = formatDate(new Date().setDate(new Date().getDate() - 1));
+    const lastWeek = formatDate(new Date().setDate(new Date().getDate() - 6));
+    const lastMonth = formatDate(new Date().setDate(new Date().getDate() - 30));
+    let targetKey;
+
+    if (isRange) {
+      const [fromDate, toDate] = mv.value;
+      const from = formatDate(fromDate);
+      const to = formatDate(toDate);
+
+      if (to !== today) {
+        return;
+      }
+
+      if (from === lastMonth) {
+        targetKey = 'lastMonth';
+      } else if (from === lastWeek) {
+        targetKey = 'lastWeek';
+      } else if (from === yesterday) {
+        targetKey = 'yesterday';
+      } else if (from === today) {
+        targetKey = 'today';
+      }
+    } else {
+      const date = formatDate(mv.value);
+
+      if (date === yesterday) {
+        targetKey = 'yesterday';
+      } else if (date === today) {
+        targetKey = 'today';
+      }
+    }
+
+    if (targetKey) {
+      activeShortcut(targetKey);
+    }
+  };
+
+  const clickShortcut = (targetKey) => {
+    const currentDate = new Date();
+    const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
+
+    const getChangedValue = (targetDate) => {
+      let subtractDate = 0;
+
+      switch (targetKey) {
+        case 'lastMonth':
+          subtractDate = 30;
+          break;
+        case 'lastWeek':
+          subtractDate = 6;
+          break;
+        case 'yesterday':
+          subtractDate = 1;
+          break;
+        case 'today':
+        default:
+          break;
+      }
+
+      return new Date(targetDate).setDate(currentDate.getDate() - subtractDate);
+    };
+
+    if (isRange) {
+      if (props.mode === 'dateTimeRange') {
+        const fromDate = mv.value[0] ? new Date(mv.value[0]) : new Date();
+        const toDate = mv.value[1] ? new Date(mv.value[1]) : new Date();
+        const from = getChangedDateTime(
+            fromDate.getHours(),
+            fromDate.getMinutes(),
+            fromDate.getSeconds(),
+        );
+        let to = getChangedDateTime(
+            toDate.getHours(),
+            toDate.getMinutes(),
+            toDate.getSeconds(),
+        );
+
+        if (from > to) {
+          to = getChangedDateTime(23, 59, 59);
+        }
+
+        mv.value = [formatDateTime(getChangedValue(from)), formatDateTime(to)];
+      } else {
+        mv.value = [formatDate(getChangedValue(new Date())), formatDate(new Date())];
+      }
+    } else if (props.mode === 'dateTime') {
+     const currDate = mv.value ? new Date(mv.value) : new Date();
+     const changedValue = getChangedDateTime(
+        currDate.getHours(),
+        currDate.getMinutes(),
+        currDate.getSeconds(),
+     );
+     mv.value = formatDateTime(changedValue);
+   } else {
+     const changedValue = getChangedValue(new Date());
+     mv.value = formatDate(changedValue);
+   }
+
+    clearShortcuts();
+    activeShortcut(targetKey);
+  };
+
+  return {
+    usedShortcuts,
+    clickShortcut,
+    initActiveShortcut,
   };
 };

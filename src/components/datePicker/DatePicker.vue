@@ -4,10 +4,10 @@
     v-clickoutside="clickOutsideDropbox"
     class="ev-date-picker"
     :class="{
-      disabled,
+      disabled : $props.disabled,
     }"
   >
-    <template v-if="mode === 'date' || mode === 'dateTime'">
+    <template v-if="$props.mode === 'date' || $props.mode === 'dateTime'">
       <span class="ev-date-picker-prefix-icon">
         <i class="ev-icon-calendar" />
       </span>
@@ -15,8 +15,8 @@
         v-model.trim="currentValue"
         type="text"
         class="ev-input"
-        :placeholder="placeholder"
-        :disabled="disabled"
+        :placeholder="$props.placeholder"
+        :disabled="$props.disabled"
         @click="clickSelectInput"
         @keydown.enter.prevent="validateValue(currentValue)"
         @change="validateValue(currentValue)"
@@ -31,23 +31,23 @@
           type="text"
           class="ev-input readonly"
           readonly
-          :placeholder="placeholder"
-          :disabled="disabled"
+          :placeholder="$props.placeholder"
+          :disabled="$props.disabled"
           @click="clickSelectInput"
         />
         <template
-          v-if="mode === 'dateMulti'
-          && (options.multiType === 'date' || !options.tagShorten)"
+          v-if="$props.mode === 'dateMulti'
+          && ($props.options.multiType === 'date' || !$props.options.tagShorten)"
         >
           <div
             v-for="(item, idx) in mv"
             :key="`${item}_${idx}`"
             class="ev-select-tag"
-            :class="{ num: options.multiType !== 'date' }"
+            :class="{ num: $props.options.multiType !== 'date' }"
           >
             <span class="ev-tag-name"> {{ item }} </span>
             <span
-              v-if="options.multiType === 'date'"
+              v-if="$props.options.multiType === 'date'"
               class="ev-tag-suffix"
               @click.stop="[removeMv(item), changeDropboxPosition()]"
             >
@@ -68,7 +68,7 @@
         </template>
       </div>
     </template>
-    <template v-if="clearable">
+    <template v-if="$props.clearable">
       <span
         v-show="isClearableIcon"
         class="ev-input-suffix"
@@ -82,17 +82,38 @@
         v-if="isDropbox"
         ref="dropbox"
         class="ev-date-picker-dropdown"
-        :class="mode"
+        :class="$props.mode"
         :style="dropboxPosition"
       >
-        <ev-calendar
-          key="fromCalendar"
-          v-model="mv"
-          :mode="mode"
-          :month-notation="monthNotation"
-          :day-of-the-week-notation="dayOfTheWeekNotation"
-          :options="options"
+        <div
+            v-if="usedShortcuts.length"
+            class="ev-date-picker-dropbox__button-layout">
+          <ev-button-group>
+            <ev-button
+               v-for="button in usedShortcuts"
+               :key="button.key"
+               :type="button.isActive ? 'primary' : 'default'"
+               @click="clickShortcut(button.key)"
+            >
+              {{ button.label }}
+            </ev-button>
+          </ev-button-group>
+        </div>
+        <div
+            v-if="usedShortcuts.length"
+            class="ev-date-picker-dropbox__divider"
         />
+        <div
+            :class="{ 'ev-date-picker-dropbox__calendar':usedShortcuts.length }">
+          <ev-calendar
+            key="fromCalendar"
+            v-model="mv"
+            :mode="$props.mode"
+            :month-notation="$props.monthNotation"
+            :day-of-the-week-notation="$props.dayOfTheWeekNotation"
+            :options="$props.options"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -100,7 +121,7 @@
 
 <script>
 import { datePickerClickoutside as clickoutside } from '@/directives/clickoutside';
-import { useModel, useDropdown } from './uses';
+import { useModel, useDropdown, useShortcuts } from './uses';
 
 export default {
   name: 'EvDatePicker',
@@ -116,7 +137,8 @@ export default {
         const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
         if (Array.isArray(value)) {
           return value.every(v => !!(!v
-            || (v.length === 10 && dateReg.exec(v))));
+              || (v.length === 10 && dateReg.exec(v)))
+              || (v.length === 19 && dateTimeReg.exec(v)));
         }
         return !!(!value
           || (value.length === 10 && dateReg.exec(value))
@@ -138,7 +160,7 @@ export default {
     mode: {
       type: String,
       default: 'date',
-      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange']
+      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange']
         .indexOf(value) !== -1,
     },
     monthNotation: {
@@ -160,11 +182,21 @@ export default {
         limit: 1,
         tagShorten: false,
       }),
-      validator: ({ multiType, multiDayLimit, disabledDate, tagShorten }) =>
-        (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
+      validator: ({ multiType, multiDayLimit, disabledDate, tagShorten, timeFormat }) => {
+        const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
+        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
         && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
         && (disabledDate ? typeof disabledDate === 'function' : true)
-        && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true),
+        && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true)
+        && (timeFormat ? typeof timeFormat === 'string' && timeReg.exec(timeFormat) : true);
+      },
+    },
+    shortcuts: {
+      type: Array,
+      default: () => [],
+      validator: value => (value.length
+          ? (!!['lastMonth', 'lastWeek', 'yesterday', 'today']
+              .filter(shortcut => value.includes(shortcut)).length) : true),
     },
   },
   emits: {
@@ -194,6 +226,16 @@ export default {
       currentValue,
     });
 
+    const {
+      usedShortcuts,
+      clickShortcut,
+      initActiveShortcut,
+    } = useShortcuts({
+      mv,
+    });
+
+    initActiveShortcut();
+
     return {
       mv,
       currentValue,
@@ -211,6 +253,9 @@ export default {
       clickSelectInput,
       clickOutsideDropbox,
       changeDropboxPosition,
+
+      usedShortcuts,
+      clickShortcut,
     };
   },
 };
@@ -329,8 +374,26 @@ export default {
   }
 }
 
-.ev-date-picker-dropbox-wrapper {
-  height: 0;
-  z-index: 100;
+.ev-date-picker-dropbox {
+  &-wrapper {
+    height: 0;
+    z-index: 100;
+  }
+
+  &__button-layout {
+    margin: 5px;
+  }
+
+  &__divider {
+    width: 100%;
+    height: 2px;
+    margin: 10px 0;
+    background-color: #E5E5E5;
+  }
+
+  &__calendar {
+    height: 100%;
+    margin: 5px;
+  }
 }
 </style>
