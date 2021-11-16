@@ -131,7 +131,6 @@
         v-model="dateTimeRange2"
         mode="dateTimeRange"
         clearable
-        :shortcuts="['lastMonth', 'lastWeek', 'yesterday', 'today']"
     />
     <div class="description">
       <span class="badge">
