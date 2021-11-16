@@ -196,6 +196,11 @@ export const useShortcuts = (param) => {
   const { props } = getCurrentInstance();
   const { mv } = param;
 
+  /**
+   * shortcuts default 값 세팅
+   * date, dateTime인 경우 'yesterday', 'today'만 가능
+   * dateRange, dateTimeRange인 경우 'lastMonth', 'lastWeek', 'yesterday', 'today' 가능
+   */
   let defaultShortcuts = ['lastMonth', 'lastWeek', 'yesterday', 'today'];
   if (['date', 'dateTime'].includes(props.mode)) {
     defaultShortcuts = ['yesterday', 'today'];
@@ -214,6 +219,9 @@ export const useShortcuts = (param) => {
     }
   });
 
+  /**
+   * active 되어있는 shortcut 제거
+   */
   const clearShortcuts = () => {
     const activeShortcut = usedShortcuts.find(shortcut => shortcut.isActive);
     if (activeShortcut) {
@@ -221,6 +229,10 @@ export const useShortcuts = (param) => {
     }
   };
 
+  /**
+   * targetKey에 해당하는 shortcut을 active
+   * @param targetKey
+   */
   const activeShortcut = (targetKey) => {
     const targetShortcut = usedShortcuts.find(shortcut => shortcut.key === targetKey);
     if (targetShortcut) {
@@ -242,6 +254,11 @@ export const useShortcuts = (param) => {
     return num;
   };
 
+  /**
+   * 'YYYY-MM-DD' 형식으로 format
+   * @param targetDate
+   * @returns string
+   */
   const formatDate = (targetDate) => {
     const dateValue = targetDate ? new Date(targetDate) : new Date();
     const year = dateValue.getFullYear();
@@ -250,6 +267,11 @@ export const useShortcuts = (param) => {
     return `${year}-${lpadToTwoDigits(month)}-${lpadToTwoDigits(day)}`;
   };
 
+  /**
+   * 'YYYY-MM-DD HH:mm:ss' 형식으로 format
+   * @param targetDateTime
+   * @returns string
+   */
   const formatDateTime = (targetDateTime) => {
     const dateTimeValue = targetDateTime ? new Date(targetDateTime) : new Date();
     const hour = dateTimeValue.getHours();
@@ -258,6 +280,13 @@ export const useShortcuts = (param) => {
     return `${formatDate(dateTimeValue)} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
   };
 
+  /**
+   * 시, 분, 초를 원하는 값으로 변환
+   * @param hour
+   * @param min
+   * @param sec
+   * @returns {Date}
+   */
   const getChangedDateTime = (hour, min, sec) => {
     const dateTimeValue = new Date();
     dateTimeValue.setHours(hour);
@@ -266,6 +295,10 @@ export const useShortcuts = (param) => {
     return dateTimeValue;
   };
 
+  /**
+   * 초기 shortcut 세팅
+   * 해당하는 날짜면 active
+   */
   const initActiveShortcut = () => {
     clearShortcuts();
 
@@ -317,6 +350,10 @@ export const useShortcuts = (param) => {
     }
   };
 
+  /**
+   * shortcut을 클릭했을 때 이벤트
+   * @param targetKey
+   */
   const clickShortcut = (targetKey) => {
     const currentDate = new Date();
     const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);

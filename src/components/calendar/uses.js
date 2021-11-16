@@ -1126,6 +1126,9 @@ export const useEvent = (param) => {
     }
   }, 10);
 
+  /**
+   * Calendar Info 전체 업데이트
+   */
   const resetCalendarInfo = () => {
     let pageUpdateList = [];
 
