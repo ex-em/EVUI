@@ -566,7 +566,7 @@ export const useCalendarDate = (param) => {
     const compareDateTimeValue = (calendarType, timeType, value) => {
       const dateTimeValue = calendarType === 'main' ? mainDateTimeValue : expandedDateTimeValue;
       if (!dateTimeValue) {
-        return;
+        return false;
       }
 
       const date = dateTimeValue.split(' ')[0];
