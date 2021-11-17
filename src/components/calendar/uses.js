@@ -565,6 +565,10 @@ export const useCalendarDate = (param) => {
 
     const compareDateTimeValue = (calendarType, timeType, value) => {
       const dateTimeValue = calendarType === 'main' ? mainDateTimeValue : expandedDateTimeValue;
+      if (!dateTimeValue) {
+        return;
+      }
+
       const date = dateTimeValue.split(' ')[0];
       let hour = getDateTimeInfoByType(dateTimeValue, 'hour');
       let min = getDateTimeInfoByType(dateTimeValue, 'min');
