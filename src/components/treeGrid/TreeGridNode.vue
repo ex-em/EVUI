@@ -80,7 +80,7 @@
             <slot
               :name="column.field + 'Node'"
               :item="{
-                data: node[column.field],
+                data: node.data,
               }"
             >
             </slot>

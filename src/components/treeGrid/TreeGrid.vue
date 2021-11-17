@@ -123,7 +123,10 @@
                 <template v-if="!!$slots[column.field]">
                   <slot
                     :name="column.field"
-                    :item="item"
+                    :item="{
+                       data: item.data,
+                       fieldName: column.field
+                    }"
                   >
                   </slot>
                 </template>

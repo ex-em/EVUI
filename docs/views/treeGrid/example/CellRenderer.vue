@@ -51,36 +51,15 @@
       </template>
       <template #check="{ item }">
         <ev-checkbox
-          v-model="item.data"
+          v-model="item.data[item.fieldName]"
           label="check"
-          @click.stop=""
-          @dblclick.stop=""
-        />
-        <span>{{item.data}}</span>
-      </template>
-      <template #select="{ item }">
-        <ev-select
-          v-model="item.data"
-          :items="[
-            {
-              name: 'a',
-              value: 'a',
-            }, {
-              name: 'b',
-              value: 'b',
-            }, {
-              name: 'c',
-              value: 'c',
-            },
-          ]"
-          placeholder="Please select value."
           @click.stop=""
           @dblclick.stop=""
         />
       </template>
       <template #slide="{ item }">
         <ev-slider
-          v-model="item.data"
+          v-model="item.data[item.fieldName]"
           range
           readonly
           :mark="{
@@ -93,14 +72,14 @@
       </template>
       <template #custom="{ item }">
         <span
-          :class="getStateClass(item.data)"
+          :class="getStateClass(item.data[item.fieldName])"
         >
-          <span class="v-chip__content"> {{ item.data }} </span>
+          <span class="v-chip__content"> {{ item.data[item.fieldName] }} </span>
         </span>
       </template>
       <template #inputNumber="{ item }">
         <ev-input-number
-          v-model="item.data"
+          v-model="item.data[item.fieldName]"
           :max="100"
           :min="0"
           @click.stop="onInputNumberClick"
@@ -200,46 +179,39 @@ export default {
     const getData = () => {
       tableData.value = [{
         check: true,
-        select: 'a',
         slide: [33.33, 66.66],
         inputNumber: 10,
         custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
         expand: true,
         children: [{
           check: true,
-          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           expand: false,
           children: [{
             check: true,
-            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
             check: true,
-            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
             expand: false,
             children: [{
               check: true,
-              select: 'a',
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
               children: [{
                 check: true,
-                select: 'a',
                 slide: [33.33, 66.66],
                 inputNumber: 10,
                 custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
                 children: [{
                   check: true,
-                  select: 'a',
                   slide: [33.33, 66.66],
                   inputNumber: 10,
                   custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
@@ -247,7 +219,6 @@ export default {
               }],
             }, {
               check: true,
-              select: 'a',
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
@@ -255,32 +226,27 @@ export default {
           }],
         }, {
           check: true,
-          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           children: [{
             check: true,
-            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
             check: true,
-            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }, {
             check: true,
-            select: 'a',
             slide: [33.33, 66.66],
             inputNumber: 10,
             custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
           }],
         }, {
           check: true,
-          select: 'a',
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
@@ -292,12 +258,7 @@ export default {
         caption: 'Check',
         field: 'check',
         type: 'boolean',
-        width: 140,
-      },
-      {
-        caption: 'Select',
-        field: 'select',
-        type: 'string',
+        width: 170,
       },
       {
         caption: 'Slide',
@@ -314,6 +275,7 @@ export default {
         caption: 'Custom',
         field: 'custom',
         type: 'string',
+        width: 100,
       },
       {
         caption: '',
