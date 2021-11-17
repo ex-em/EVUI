@@ -344,6 +344,12 @@ export default {
       },
     );
     watch(
+      () => props.selected,
+      (value) => {
+        selectInfo.selectedRow = value;
+      },
+    );
+    watch(
       () => checkInfo.useCheckbox.mode,
       () => {
         checkInfo.checkedRows = [];

@@ -220,69 +220,71 @@ class Scale {
       return;
     }
 
-    const labelGap = (endPoint - startPoint) / steps;
-    const ticks = [];
-    let labelCenter = null;
-    let linePosition = null;
+    if (this.labelStyle?.show) {
+      const labelGap = (endPoint - startPoint) / steps;
+      const ticks = [];
+      let labelCenter = null;
+      let linePosition = null;
 
-    ctx.strokeStyle = this.gridLineColor;
-    ctx.lineWidth = 1;
-    aliasPixel = Util.aliasPixel(ctx.lineWidth);
+      ctx.strokeStyle = this.gridLineColor;
+      ctx.lineWidth = 1;
+      aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
-    let labelText;
-    for (let ix = 0; ix <= steps; ix++) {
-      ctx.beginPath();
-      ticks[ix] = axisMin + (ix * stepValue);
+      let labelText;
+      for (let ix = 0; ix <= steps; ix++) {
+        ctx.beginPath();
+        ticks[ix] = axisMin + (ix * stepValue);
 
-      labelCenter = Math.round(startPoint + (labelGap * ix));
-      linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+        labelCenter = Math.round(startPoint + (labelGap * ix));
+        linePosition = labelCenter + aliasPixel;
+        labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
-      let labelPoint;
+        let labelPoint;
 
-      if (this.type === 'x') {
-        labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter, labelPoint);
-        if (options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
-          const selectedLabel = this.getLabelFormat(
-            Math.min(axisMax, hitInfo.label + (0 * stepValue)),
-          );
-          if (selectedLabel === labelText) {
-            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
-            Util.showLabelTip({
-              ctx: this.ctx,
-              width: Math.round(ctx.measureText(selectedLabel).width) + 10,
-              height,
-              x: labelCenter,
-              y: labelPoint + (height - 2),
-              borderRadius: 2,
-              arrowSize: 3,
-              text: labelText,
-              backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
-              textColor: options?.selectItem?.labelTipStyle?.textColor,
-            });
+        if (this.type === 'x') {
+          labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          ctx.fillText(labelText, labelCenter, labelPoint);
+          if (options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
+            const selectedLabel = this.getLabelFormat(
+              Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+            );
+            if (selectedLabel === labelText) {
+              const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+              Util.showLabelTip({
+                ctx: this.ctx,
+                width: Math.round(ctx.measureText(selectedLabel).width) + 10,
+                height,
+                x: labelCenter,
+                y: labelPoint + (height - 2),
+                borderRadius: 2,
+                arrowSize: 3,
+                text: labelText,
+                backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
+                textColor: options?.selectItem?.labelTipStyle?.textColor,
+              });
+            }
+          }
+          if (ix !== 0 && this.showGrid) {
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetCounterPoint);
+          }
+        } else {
+          labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          ctx.fillText(labelText, labelPoint, labelCenter);
+
+          if (ix === steps) {
+            linePosition += 1;
+          }
+
+          if (ix !== 0 && this.showGrid) {
+            ctx.moveTo(offsetPoint, linePosition);
+            ctx.lineTo(offsetCounterPoint, linePosition);
           }
         }
-        if (ix !== 0 && this.showGrid) {
-          ctx.moveTo(linePosition, offsetPoint);
-          ctx.lineTo(linePosition, offsetCounterPoint);
-        }
-      } else {
-        labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if (ix === steps) {
-          linePosition += 1;
-        }
-
-        if (ix !== 0 && this.showGrid) {
-          ctx.moveTo(offsetPoint, linePosition);
-          ctx.lineTo(offsetCounterPoint, linePosition);
-        }
+        ctx.stroke();
+        ctx.closePath();
       }
-
-      ctx.stroke();
-      ctx.closePath();
     }
 
     // Draw plot lines and plot bands

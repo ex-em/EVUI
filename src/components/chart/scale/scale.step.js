@@ -75,98 +75,105 @@ class StepScale extends Scale {
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
     const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
 
-    // label font 설정
-    ctx.font = Util.getLabelStyle(this.labelStyle);
-
-    if (this.type === 'x') {
-      ctx.textAlign = 'center';
-      ctx.textBaseline = this.position === 'top' ? 'bottom' : 'top';
-    } else {
-      ctx.textAlign = this.position === 'left' ? 'right' : 'left';
-      ctx.textBaseline = 'middle';
-    }
-
-    ctx.fillStyle = this.labelStyle.color;
-    ctx.lineWidth = 1;
-    const aliasPixel = Util.aliasPixel(ctx.lineWidth);
-
-    ctx.beginPath();
-    ctx.strokeStyle = this.axisLineColor;
-    if (this.type === 'x') {
-      ctx.moveTo(startPoint, offsetPoint + aliasPixel);
-      ctx.lineTo(endPoint, offsetPoint + aliasPixel);
-    } else {
-      ctx.moveTo(offsetPoint + aliasPixel, startPoint);
-      ctx.lineTo(offsetPoint + aliasPixel, endPoint);
-    }
-    ctx.stroke();
-
-    if (steps === 0) {
-      return;
-    }
-
-    const labelGap = (endPoint - startPoint) / labels.length;
-    let labelCenter = null;
-    let linePosition = null;
-
-    ctx.beginPath();
-    ctx.strokeStyle = this.gridLineColor;
-
-    let labelText;
-    let labelPoint;
-
-    labels.forEach((item, index) => {
-      labelCenter = Math.round(startPoint + (labelGap * index));
-      linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(item, maxWidth);
+    if (this.labelStyle?.show) {
+      // label font 설정
+      ctx.font = Util.getLabelStyle(this.labelStyle);
 
       if (this.type === 'x') {
-        labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
-        if (this.options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
-          const selectedLabel = hitInfo.label;
-          if (selectedLabel === labelText) {
-            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
-            Util.showLabelTip({
-              ctx: this.ctx,
-              width: Math.round(ctx.measureText(selectedLabel).width) + 10,
-              height,
-              x: labelCenter + (labelGap / 2),
-              y: labelPoint + (height - 2),
-              borderRadius: 2,
-              arrowSize: 3,
-              text: labelText,
-              backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
-              textColor: this.options?.selectItem?.labelTipStyle?.textColor,
-            });
-          }
-        }
-
-        if (index > 0 && this.showGrid) {
-          ctx.moveTo(linePosition, offsetPoint);
-          ctx.lineTo(linePosition, offsetCounterPoint);
-        }
+        ctx.textAlign = 'center';
+        ctx.textBaseline = this.position === 'top' ? 'bottom' : 'top';
       } else {
-        labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+        ctx.textAlign = this.position === 'left' ? 'right' : 'left';
+        ctx.textBaseline = 'middle';
+      }
 
-        if (index > 0 && this.showGrid) {
-          ctx.moveTo(offsetPoint, linePosition);
-          ctx.lineTo(offsetCounterPoint, linePosition);
-        }
+      ctx.fillStyle = this.labelStyle.color;
+      ctx.lineWidth = 1;
+      const aliasPixel = Util.aliasPixel(ctx.lineWidth);
+
+      ctx.beginPath();
+      ctx.strokeStyle = this.axisLineColor;
+      if (this.type === 'x') {
+        ctx.moveTo(startPoint, offsetPoint + aliasPixel);
+        ctx.lineTo(endPoint, offsetPoint + aliasPixel);
+      } else {
+        ctx.moveTo(offsetPoint + aliasPixel, startPoint);
+        ctx.lineTo(offsetPoint + aliasPixel, endPoint);
       }
       ctx.stroke();
-    });
 
-    ctx.closePath();
+      if (steps === 0) {
+        return;
+      }
+
+      const labelGap = (endPoint - startPoint) / labels.length;
+      let labelCenter = null;
+      let linePosition = null;
+
+      ctx.beginPath();
+      ctx.strokeStyle = this.gridLineColor;
+
+      let labelText;
+      let labelPoint;
+
+      labels.forEach((item, index) => {
+        labelCenter = Math.round(startPoint + (labelGap * index));
+        linePosition = labelCenter + aliasPixel;
+        labelText = this.getLabelFormat(item, maxWidth);
+
+        if (this.type === 'x') {
+          labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+
+          if (this.options?.selectItem?.showLabelTip
+            && hitInfo?.label
+            && !this.options?.horizontal
+          ) {
+            const selectedLabel = hitInfo.label;
+            if (selectedLabel === labelText) {
+              const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+              Util.showLabelTip({
+                ctx: this.ctx,
+                width: Math.round(ctx.measureText(selectedLabel).width) + 10,
+                height,
+                x: labelCenter + (labelGap / 2),
+                y: labelPoint + (height - 2),
+                borderRadius: 2,
+                arrowSize: 3,
+                text: labelText,
+                backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
+                textColor: this.options?.selectItem?.labelTipStyle?.textColor,
+              });
+            }
+          }
+
+          if (index > 0 && this.showGrid) {
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetCounterPoint);
+          }
+        } else {
+          labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+
+          if (index > 0 && this.showGrid) {
+            ctx.moveTo(offsetPoint, linePosition);
+            ctx.lineTo(offsetCounterPoint, linePosition);
+          }
+        }
+        ctx.stroke();
+      });
+
+      ctx.closePath();
+    }
 
     // draw plot lines and plot bands
     if (this.plotBands?.length || this.plotLines?.length) {
-      const padding = aliasPixel + 1;
+      const padding = Util.aliasPixel(ctx.lineWidth) + 1;
       const minX = aPos.x1 + padding;
       const maxX = aPos.x2;
       const minY = aPos.y1 + padding;
       const maxY = aPos.y2;
+      const labelGap = (endPoint - startPoint) / (this.labelStyle.show ? labels.length : 1);
 
       this.plotBands?.forEach((plotBand) => {
         if (!plotBand.from && !plotBand.to) {

@@ -87,6 +87,7 @@ export const AXIS_OPTION = {
   interval: null,
   decimalPoint: null,
   labelStyle: {
+    show: true,
     fontSize: 12,
     color: '#25262E',
     fontFamily: 'Roboto',
