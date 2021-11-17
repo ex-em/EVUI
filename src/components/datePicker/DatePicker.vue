@@ -188,15 +188,14 @@ export default {
         && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
         && (disabledDate ? typeof disabledDate === 'function' : true)
         && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true)
-        && (timeFormat ? typeof timeFormat === 'string' && timeReg.exec(timeFormat) : true);
+        && Array.isArray(timeFormat)
+            ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
+            : !!(!timeFormat || (timeReg.exec(timeFormat)));
       },
     },
     shortcuts: {
       type: Array,
       default: () => [],
-      validator: value => (value.length
-          ? (!!['lastMonth', 'lastWeek', 'yesterday', 'today']
-              .filter(shortcut => value.includes(shortcut)).length) : true),
     },
   },
   emits: {
@@ -222,19 +221,19 @@ export default {
       clickSelectInput,
       clickOutsideDropbox,
       changeDropboxPosition,
-    } = useDropdown({
-      currentValue,
-    });
+    } = useDropdown();
 
     const {
       usedShortcuts,
       clickShortcut,
-      initActiveShortcut,
+      setActiveShortcut,
     } = useShortcuts({
       mv,
+      currentValue,
+      clickOutsideDropbox,
     });
 
-    initActiveShortcut();
+    setActiveShortcut();
 
     return {
       mv,
@@ -387,7 +386,7 @@ export default {
   &__divider {
     width: 100%;
     height: 2px;
-    margin: 10px 0;
+    margin: 8px 0;
     background-color: #E5E5E5;
   }
 

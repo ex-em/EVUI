@@ -28,4 +28,4 @@
 |  |  | week | 주일(일~토) 선택 | \['YYYY-MM-DD'`일`, 'YYYY-MM-DD'`월`, 'YYYY-MM-DD'`화`, 'YYYY-MM-DD'`수`, 'YYYY-MM-DD'`목`, 'YYYY-MM-DD'`금`, 'YYYY-MM-DD'`토`\] |
 |  | multiDayLimit | 1 | `mode: dateMulti, type: date` 시 선택 일수 제한 |  |
 |  | disabledDate | () => {} | 달력 상 사용불가능 날짜를 함수로 정의 |  |
-|  | timeFormat   | 'HH:mm:ss' | 시간값 선택 범위 설정 <br> 'HH:mm:00'/'HH:55:00'/'10:mm:ss' 으로 사용 가능  |  | 
+|  | timeFormat   | '' | 시간값 선택 범위 설정 <br> 타입: string, Array <br> 단일 캘린더: 'HH:mm:00'/'HH:55:00'/'10:mm:ss'로 사용 가능 <br> 다중 캘린더: ['HH:00:ss', 'HH:59:00'] 로 사용 가능 <br> 숫자로 넘기면 disabled 적용  |  | 

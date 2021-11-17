@@ -5,7 +5,19 @@
       v-model="date1"
       placeholder="Select a date."
       clearable
-      :shortcuts="['yesterday', 'today']"
+      :shortcuts="[{
+          label: 'Yesterday',
+          value: 'yesterday',
+          shortcutDate: () => {
+            return new Date().setDate(new Date().getDate() - 1);
+          }
+        }, {
+          label: 'Today',
+          value: 'today',
+          shortcutDate: () => {
+            return new Date();
+          }
+        }]"
     />
     <ev-date-picker
       v-model="date1"
@@ -116,7 +128,6 @@
         v-model="dateTimeRange1"
         mode="dateTimeRange"
         clearable
-        :shortcuts="['lastMonth', 'lastWeek', 'yesterday', 'today']"
     />
     <div class="description">
       <span class="badge">
@@ -131,6 +142,52 @@
         v-model="dateTimeRange2"
         mode="dateTimeRange"
         clearable
+        :options="{
+          timeFormat: ['HH:00:ss', 'HH:59:ss']
+        }"
+        :shortcuts="[{
+          label: 'LastMonth',
+          value: 'lastMonth',
+          shortcutDate: () => {
+            return [
+                new Date().setDate(new Date().getDate() - 30),
+                new Date(),
+            ]
+          }
+        },{
+          label: 'LastWeek',
+          value: 'lastWeek',
+          shortcutDate: () => {
+            return [
+                new Date().setDate(new Date().getDate() - 6),
+                new Date(),
+            ]
+          }
+        },{
+          label: 'Weekday',
+          value: 'weekday',
+          shortcutDate: () => {
+            return [
+                new Date(
+                    new Date().getFullYear(),
+                    new Date().getMonth(),
+                    new Date().getDate() - new Date().getDay() + 1),
+                new Date(
+                    new Date().getFullYear(),
+                    new Date().getMonth(),
+                new Date().getDate() + (5 - new Date().getDay())),
+            ];
+          }
+        }, {
+          label: 'Today',
+          value: 'today',
+          shortcutDate: () => {
+            return [
+                new Date(),
+                new Date(),
+            ]
+          }
+        }]"
     />
     <div class="description">
       <span class="badge">

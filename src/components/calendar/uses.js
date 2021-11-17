@@ -10,7 +10,7 @@ const HOUR_CNT = 24;
 const MIN_CNT = 60;
 const SEC_CNT = 60;
 const CELL_CNT_IN_ONE_PAGE = 12;
-const CELL_CNT_IN_ONE_ROW = 6;
+const CELL_CNT_IN_ONE_ROW = 4;
 const MONTH_NAME_LIST = {
   fullName: ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'],
@@ -53,7 +53,7 @@ const getSideDateStr = (arr, sideDirection) => {
  * @param num
  * @returns {string|*}
  */
-const lpadToTwoDigits = (num) => {
+export const lpadToTwoDigits = (num) => {
   if (num === null) {
     return '00';
   } else if (+num < 10) {
@@ -205,12 +205,22 @@ const getTimeInfoByTimeFormat = (timeFormat, dateTimeValue, typeToImport) => {
  * @param modelValue
  * @returns string
  */
-const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
+export const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
   const hourByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'hour'));
   const minByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'min'));
   const secByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'sec'));
 
   return `${modelValue.split(' ')[0]} ${hourByTimeFormat}:${minByTimeFormat}:${secByTimeFormat}`;
+};
+
+const compareFromAndToDate = (calendarType, targetDate, modelValue) => {
+  if (!modelValue.length) {
+    return false;
+  }
+  const fromDate = calendarType === 'main' ? targetDate : modelValue[0];
+  const toDate = calendarType === 'expanded' ? targetDate : modelValue[1];
+
+  return +new Date(fromDate) > +new Date(toDate);
 };
 
 /**
@@ -221,7 +231,7 @@ const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
 const getDateMs = dateStr => new Date(`${dateStr}`).getTime();
 
 export const useModel = () => {
-  const { props, emit } = getCurrentInstance();
+  const { props } = getCurrentInstance();
   const timeFormat = props.options?.timeFormat;
 
       /**
@@ -238,7 +248,6 @@ export const useModel = () => {
     ) {
       if (props.mode === 'dateTime' && timeFormat) {
         const modelValue = getChangedValueByTimeFormat(timeFormat, props.modelValue);
-        emit('update:modelValue', modelValue);
         selectedValue = ref(modelValue);
       } else {
         selectedValue = ref(props.modelValue);
@@ -255,9 +264,8 @@ export const useModel = () => {
   ) {
     if (props.mode === 'dateTimeRange' && props.modelValue.length === 2 && timeFormat) {
       const modelValue = [];
-      modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[0]));
-      modelValue.push(getChangedValueByTimeFormat(timeFormat, props.modelValue[1]));
-      emit('update:modelValue', modelValue);
+      modelValue.push(getChangedValueByTimeFormat(timeFormat[0], props.modelValue[0]));
+      modelValue.push(getChangedValueByTimeFormat(timeFormat[1], props.modelValue[1]));
       selectedValue = ref([...modelValue]);
     } else {
       selectedValue = ref([...props.modelValue]);
@@ -462,6 +470,8 @@ export const useCalendarDate = (param) => {
     const setDateInfo = (monthType, i, j) => {
       currDate = formatDateTime({ year, month, date });
       const isDisabled = disabledDate ? disabledDate(new Date(currDate)) : false;
+      const isInvalidDate = props.mode === 'dateTimeRange'
+          && compareFromAndToDate(calendarType, `${currDate} 00:00:00`, selectedValue.value);
       const inRangeCls = () => {
         if (['dateRange'].includes(props.mode) && selectedValue.value.length === 2) {
           if (getDateMs(selectedValue.value[0].split(' ')[0]) <= getDateMs(currDate)
@@ -490,7 +500,7 @@ export const useCalendarDate = (param) => {
 
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[i][j] = {
-        monthType: `${monthType}${isDisabled ? ' disabled' : ''}${inRangeCls()}`,
+        monthType: `${monthType}${isDisabled || isInvalidDate ? ' disabled' : ''}${inRangeCls()}`,
         isToday: TODAY_YMD === currDate,
         isSelected: !['dateRange', 'dateTimeRange'].includes(props.mode)
           ? selectedValue.value?.includes(currDate)
@@ -548,8 +558,30 @@ export const useCalendarDate = (param) => {
    */
   const setHmsTime = () => {
     const timeFormat = props.options?.timeFormat;
+    const mainTimeFormat = Array.isArray(timeFormat) ? timeFormat[0] : timeFormat;
+    const expandedTimeFormat = Array.isArray(timeFormat) ? timeFormat[1] : '';
     const mainDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[0] : selectedValue.value;
     const expandedDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[1] : '';
+
+    const compareDateTimeValue = (calendarType, timeType, value) => {
+      const dateTimeValue = calendarType === 'main' ? mainDateTimeValue : expandedDateTimeValue;
+      const date = dateTimeValue.split(' ')[0];
+      let hour = getDateTimeInfoByType(dateTimeValue, 'hour');
+      let min = getDateTimeInfoByType(dateTimeValue, 'min');
+      let sec = getDateTimeInfoByType(dateTimeValue, 'sec');
+
+      if (timeType === 'hour') {
+        hour = value;
+      } else if (timeType === 'min') {
+        min = value;
+      } else if (timeType === 'sec') {
+        sec = value;
+      }
+
+      const targetDateTimeValue = `${date} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
+      return compareFromAndToDate(calendarType, targetDateTimeValue, selectedValue.value);
+    };
+
     ['hour', 'min', 'sec'].forEach((v) => {
       let cnt = SEC_CNT;
       if (v === 'hour') {
@@ -558,20 +590,22 @@ export const useCalendarDate = (param) => {
         cnt = MIN_CNT;
       }
       const mainTimeValue = mainDateTimeValue && mainDateTimeValue.length > 0
-          ? getTimeInfoByTimeFormat(timeFormat, mainDateTimeValue, v) : -1;
+          ? getTimeInfoByTimeFormat(mainTimeFormat, mainDateTimeValue, v) : -1;
       const expandedTimeValue = expandedDateTimeValue && expandedDateTimeValue.length > 0
-          ? getTimeInfoByTimeFormat(timeFormat, expandedDateTimeValue, v) : -1;
+          ? getTimeInfoByTimeFormat(expandedTimeFormat, expandedDateTimeValue, v) : -1;
       for (let i = 0; i < cnt; i++) {
         mainTimeTableInfo[v][i] = {
           timeType: v,
           num: i,
           isSelected: mainTimeValue === i,
+          isDisabled: props.mode === 'dateTimeRange' && compareDateTimeValue('main', v, i),
         };
         if (props.mode === 'dateTimeRange') {
           expandedTimeTableInfo[v][i] = {
             timeType: v,
             num: i,
             isSelected: expandedTimeValue === i,
+            isDisabled: compareDateTimeValue('expanded', v, i),
           };
         }
       }
@@ -625,10 +659,19 @@ export const useEvent = (param) => {
   // dateRange mode에서 클릭한번 후 커서에 따라 날짜를 마우스오버하는 경우 dynamic argument로 이벤트명 설정
   const calendarEventName = ref(null);
   // dateTime 또는 dateTimeRange에서 timeFormat이 있는 경우 event 막음
+  const mainTimeFormat = Array.isArray(timeFormat) ? timeFormat[0] : timeFormat;
+  const expandedTimeFormat = Array.isArray(timeFormat) ? timeFormat[1] : '';
   const preventTimeEventType = {
-    hour: timeFormat && timeFormat.split(':')[0] !== 'HH',
-    min: timeFormat && timeFormat.split(':')[1] !== 'mm',
-    sec: timeFormat && timeFormat.split(':')[2] !== 'ss',
+    main: {
+      hour: mainTimeFormat && mainTimeFormat.split(':')[0] !== 'HH',
+      min: mainTimeFormat && mainTimeFormat.split(':')[1] !== 'mm',
+      sec: mainTimeFormat && mainTimeFormat.split(':')[2] !== 'ss',
+    },
+    expanded: {
+      hour: expandedTimeFormat && expandedTimeFormat.split(':')[0] !== 'HH',
+      min: expandedTimeFormat && expandedTimeFormat.split(':')[1] !== 'mm',
+      sec: expandedTimeFormat && expandedTimeFormat.split(':')[2] !== 'ss',
+    },
   };
 
   /**
@@ -881,12 +924,20 @@ export const useEvent = (param) => {
       case 'dateTimeRange': {
         const currIndex = calendarType !== 'main' | 0;
         if (!selectedValue.value.length) {
-          const currDate = getChangedValueByTimeFormat(
-              timeFormat,
-              `${CURR_DATE_STR} 00:00:00`,
-          );
-          selectedValue.value.push(currDate);
-          selectedValue.value.push(currDate);
+          let fromDate = `${CURR_DATE_STR} 00:00:00`;
+          let toDate = `${CURR_DATE_STR} 00:00:00`;
+          if (timeFormat && timeFormat.length) {
+            fromDate = getChangedValueByTimeFormat(
+                timeFormat[0],
+                fromDate,
+            );
+            toDate = getChangedValueByTimeFormat(
+                timeFormat[1],
+                toDate,
+            );
+          }
+          selectedValue.value.push(fromDate);
+          selectedValue.value.push(toDate);
 
           selectedValue.value?.forEach((currValue, index) => {
             setCalendarPageInfo(index === 0 ? 'main' : 'expanded', {
@@ -902,10 +953,14 @@ export const useEvent = (param) => {
           setHmsTime();
         } else {
           const CURR_TIME_HMS = selectedValue.value[currIndex]?.split(' ')[1] || '00:00:00';
-          const currDate = getChangedValueByTimeFormat(
-              timeFormat,
-              `${CURR_DATE_STR} ${CURR_TIME_HMS}`,
-          );
+
+          let currDate = `${CURR_DATE_STR} ${CURR_TIME_HMS}`;
+          if (timeFormat && timeFormat.length) {
+            currDate = getChangedValueByTimeFormat(
+                timeFormat[currIndex],
+                currDate,
+            );
+          }
 
           const fromDate = currIndex ? selectedValue.value[0] : currDate;
           const toDate = currIndex ? currDate : selectedValue.value[1];
@@ -933,7 +988,10 @@ export const useEvent = (param) => {
    * @param arrow - {up|down}
    */
   const clickHmsBtn = (calendarType, timeType, arrow) => {
-    if (preventTimeEventType[timeType]) return;
+    if (preventTimeEventType[calendarType][timeType]) {
+      return;
+    }
+
     const calendarPageInfo = calendarType === 'expanded'
       ? expandedCalendarPageInfo : mainCalendarPageInfo;
     const FIRST_PAGE = 1;
@@ -969,7 +1027,10 @@ export const useEvent = (param) => {
    * @param j - col
    */
   const clickTime = (calendarType, timeType, i, j) => {
-    if (preventTimeEventType[timeType]) return;
+    if (preventTimeEventType[calendarType][timeType]) {
+      return;
+    }
+
     const calendarPageInfo = calendarType === 'expanded'
         ? expandedCalendarPageInfo : mainCalendarPageInfo;
     const currPage = calendarPageInfo[timeType] - 1;
@@ -1031,15 +1092,24 @@ export const useEvent = (param) => {
     } else {
       const index = calendarType !== 'main' | 0;
       if (!props.modelValue.length) {
-        selectedValue.value.push(getChangedValueByTimeFormat(timeFormat, getTimeValueByType()));
-        selectedValue.value.push(getChangedValueByTimeFormat(timeFormat, getTimeValueByType()));
+        const timeValue = getTimeValueByType();
+        selectedValue.value = [timeValue, timeValue];
+
+        if (timeFormat && timeFormat.length) {
+          selectedValue.value = [...selectedValue.value
+              .map((v, idx) => getChangedValueByTimeFormat(timeFormat[idx], v))];
+        }
+
         EXIST_MODEL = false;
         pageUpdateList = selectedValue.value;
       } else {
-        const currDateTime = getChangedValueByTimeFormat(
-            timeFormat,
-            getChangedValue(props.modelValue[index]),
-        );
+        let currDateTime = getChangedValue(props.modelValue[index]);
+        if (timeFormat && timeFormat.length) {
+          currDateTime = getChangedValueByTimeFormat(
+              timeFormat[index],
+              currDateTime,
+          );
+        }
 
         const fromDate = index ? selectedValue.value[0] : currDateTime;
         const toDate = index ? currDateTime : selectedValue.value[1];
@@ -1076,7 +1146,10 @@ export const useEvent = (param) => {
    * @param e
    */
   const wheelTime = (calendarType, timeType, e) => {
-    if (preventTimeEventType[timeType]) return;
+    if (preventTimeEventType[calendarType][timeType]) {
+      return;
+    }
+
     clickHmsBtn(calendarType, timeType, e.deltaY > 0 ? 'down' : 'up');
   };
 
@@ -1138,9 +1211,8 @@ export const useEvent = (param) => {
       pageUpdateList = selectedValue.value;
     }
 
-    updatePageList(pageUpdateList);
-
     if (['dateTime', 'dateTimeRange'].includes(props.mode)) {
+      updatePageList(pageUpdateList);
       setHmsTime();
     }
   };

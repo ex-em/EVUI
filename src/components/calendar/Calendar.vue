@@ -72,7 +72,6 @@
         <div
           v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
           :key="`${hmsType}_TITLE`"
-          class="ev-calendar-time-110"
         >
           {{ hmsType }}
         </div>
@@ -87,16 +86,17 @@
               @wheel.prevent="wheelTime('main', timeType, $event)"
             >
               <tr
-                v-for="i in 2"
+                v-for="i in 3"
                 :key="`${timeType}_${i}_tr`"
               >
                 <td
-                  v-for="j in 6"
+                  v-for="j in 4"
                   :key="`${timeType}_${i}_${j}_td`"
                   class="ev-calendar-time-td"
                   :class="{
                     selected: getTimeInfo(timeType, i, j, 'main').isSelected,
-                    disabled: preventTimeEventType[timeType],
+                    disabled: preventTimeEventType.main[timeType]
+                      || getTimeInfo(timeType, i, j, 'main').isDisabled,
                   }"
                   @click="clickTime('main', timeType, i, j)"
                 >
@@ -115,13 +115,13 @@
           <div
             v-for="arrowType in ['up', 'down']"
             :key="`${hmsType}_${arrowType}_btn`"
-            class="ev-calendar-time-55"
+            :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
             @click="clickHmsBtn('main', hmsType, arrowType)"
           >
             <i
               :class="[
                 `ev-icon-arrow-${arrowType}`,
-                { disabled: preventTimeEventType[hmsType] }
+                { disabled: preventTimeEventType.main[hmsType] }
               ]" />
           </div>
         </template>
@@ -203,7 +203,6 @@
         <div
             v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
             :key="`${hmsType}_TITLE`"
-            class="ev-calendar-time-110"
         >
           {{ hmsType }}
         </div>
@@ -218,16 +217,17 @@
                 @wheel.prevent="wheelTime('expanded', timeType, $event)"
             >
             <tr
-                v-for="i in 2"
+                v-for="i in 3"
                 :key="`${timeType}_${i}_tr`"
             >
               <td
-                  v-for="j in 6"
+                  v-for="j in 4"
                   :key="`${timeType}_${i}_${j}_td`"
                   class="ev-calendar-time-td"
                   :class="{
                     selected: getTimeInfo(timeType, i, j, 'expanded').isSelected,
-                    disabled: preventTimeEventType[timeType],
+                    disabled: preventTimeEventType.expanded[timeType]
+                    || getTimeInfo(timeType, i, j, 'expanded').isDisabled,
                   }"
                   @click="clickTime('expanded', timeType, i, j)"
               >
@@ -246,13 +246,13 @@
           <div
               v-for="arrowType in ['up', 'down']"
               :key="`${hmsType}_${arrowType}_btn`"
-              class="ev-calendar-time-55"
+              :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
               @click="clickHmsBtn('expanded', hmsType, arrowType)"
           >
             <i
               :class="[
                 `ev-icon-arrow-${arrowType}`,
-                { disabled: preventTimeEventType[hmsType] }
+                { disabled: preventTimeEventType.expanded[hmsType] }
               ]" />
           </div>
         </template>
@@ -312,7 +312,9 @@ export default {
         return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
         && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
         && (disabledDate ? typeof disabledDate === 'function' : true)
-        && (timeFormat ? typeof timeFormat === 'string' && timeReg.exec(timeFormat) : true);
+        && Array.isArray(timeFormat)
+            ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
+            : !!(!timeFormat || (timeReg.exec(timeFormat)));
       },
     },
   },
@@ -421,7 +423,7 @@ export default {
 .ev-calendar-header {
   display: flex;
   height: 40px;
-  padding: 10px;
+  padding: 10px 8px;
 
   div {
     width: 20px;
@@ -451,7 +453,7 @@ export default {
 }
 
 .ev-calendar-body {
-  padding: 10px;
+  padding: 10px 8px 8px;
   flex: 1;
 }
 
@@ -557,27 +559,11 @@ export default {
 .ev-calendar-time {
   &-area {
     display: flex;
-    width: 270px;
+    width: 195px;
     flex-direction: row;
     border-left: 1px solid #EBEEF5;
     color: #606266;
     box-sizing: content-box;
-  }
-
-  &-110 {
-    width: 40px;
-    height: 110px;
-    line-height: 110px;
-  }
-
-  &-55 {
-    width: 30px;
-    height: 55px;
-    line-height: 55px;
-    &:hover {
-      color: #409EFF;
-      cursor: pointer;
-    }
   }
 }
 
@@ -616,9 +602,32 @@ export default {
 }
 
 .ev-calendar-time-side {
-  font-size: 11px;
+  font-size: 10px;
   text-align: center;
   background-color: #E5E5E5;
+
+  &:first-child {
+    width: 35px;
+
+    & div {
+      height: 110px;
+      line-height: 110px;
+    }
+  }
+
+  &:last-child {
+    width: 30px;
+
+    &:hover {
+      color: #409EFF;
+      cursor: pointer;
+    }
+
+    & div {
+      height: 55px;
+      line-height: 55px;
+    }
+  }
 
   & div:not(:last-child) {
     border-bottom: 1px solid #EBEEF5;
@@ -632,7 +641,7 @@ export default {
   }
 }
 .ev-calendar-time-center {
-  width: 200px;
+  width: 132px;
   height: 100%;
   text-align: center;
   font-size: 12px;
@@ -642,15 +651,15 @@ export default {
   }
 }
 .ev-calendar-time-table {
-  width: 200px;
+  width: 132px;
   height: 110px;
   table-layout: fixed;
   border-collapse: collapse;
   border-spacing: 0;
   user-select: none;
 
-  & tr {
-    height: 55px;
+  tr {
+    height: 33px;
   }
 }
 </style>

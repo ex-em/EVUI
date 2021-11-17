@@ -6,7 +6,7 @@
       class="case-block"
       mode="dateTimeRange"
       :options="{
-        timeFormat: 'HH:mm:00',
+        timeFormat: ['HH:mm:30', 'HH:20:ss'],
       }"
     />
     <div class="description">
