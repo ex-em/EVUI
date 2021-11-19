@@ -1,50 +1,27 @@
 <template>
   <div class="case">
     <ev-tree-grid
-      v-model:selected="selected"
-      v-model:checked="checked"
       :columns="columns"
       :rows="tableData"
-      :width="widthMV"
-      :height="heightMV"
       :option="{
-        adjust: adjustMV,
-        showHeader: showHeaderMV,
-        rowHeight: rowHeightMV,
-        columnWidth: columnWidthMV,
-        useFilter: useFilterMV,
         useCheckbox: {
-          use: useCheckboxMV,
-          mode: checkboxModeMV,
-          headerCheck: headerCheckMV,
+          use: useCheckboxMV.use,
+          headerCheck: useCheckboxMV.headerCheck,
         },
-        customContextMenu: menuItems,
-        style: {
-          stripe: stripeMV,
-          border: borderMV,
-        },
-        expandIcon: expandIconMV,
-        collapseIcon: collapseIconMV,
-        parentIcon: parentIconMV,
-        childIcon: childIconMV,
       }"
-      @check-row="onCheckedRow"
-      @check-all="onCheckedRow"
-      @click-row="onClickRow"
-      @dblclick-row="onDoubleClickRow"
     >
       <!-- renderer start -->
       <template #gridButton>
         <ev-button
           type="ghost"
           size="small"
-          @click="onRowDelete()"
+          @click="onRowDelete"
         >
           Delete
         </ev-button>
         <ev-button
           size="small"
-          @click="onRowEdit()"
+          @click="onRowEdit"
         >
           Edit
         </ev-button>
@@ -90,92 +67,15 @@
   </div>
 </template>
 <script>
-import { ref, computed } from 'vue';
+import { ref, reactive } from 'vue';
 
 export default {
   setup() {
     const tableData = ref([]);
-    const selected = ref([]);
-    const checked = ref([]);
-    const widthMV = ref('100%');
-    const heightMV = ref(300);
-    const adjustMV = ref(true);
-    const showHeaderMV = ref(true);
-    const stripeMV = ref(false);
-    const rowHeightMV = ref(35);
-    const columnWidthMV = ref(80);
-    const useFilterMV = ref(false);
-    const useCheckboxMV = ref(true);
-    const checkboxModeMV = ref('multi');
-    const headerCheckMV = ref(true);
-    const checkedRowsMV = ref();
-    const clickedRowMV = ref();
-    const DbClickedRowsMV = ref();
-    const menuItems = ref([
-      {
-        text: 'Menu1',
-        click: () => console.log(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value.data)}`),
-      }, {
-        text: 'Menu2',
-        click: () => console.log('[Menu2]'),
-      },
-    ]);
-    const borderMV = ref('');
-    const iconMV = ref('');
-    const dataIconMV = ref('');
-    const borderItems = ref([
-      {
-        name: 'none',
-        value: 'none',
-      },
-      {
-        name: 'rows',
-        value: 'rows',
-      },
-    ]);
-    const iconItems = ref([
-      {
-        name: 'plus',
-        value: { expand: 'ev-icon-circle-plus', collapse: 'ev-icon-circle-minus' },
-      },
-      {
-        name: 'arrow',
-        value: { expand: 'ev-icon-s-arrow-down', collapse: 'ev-icon-s-arrow-right' },
-      },
-    ]);
-    const dataIconItems = ref([
-      {
-        name: 'folder',
-        value: { parent: 'ev-icon-folder', child: 'ev-icon-document' },
-      },
-      {
-        name: 'database',
-        value: { parent: 'ev-icon-db', child: 'ev-icon-connection' },
-      },
-      {
-        name: 'none',
-        value: { parent: 'none', child: 'none' },
-      },
-    ]);
-    const expandIconMV = computed(() => (iconMV.value ? iconMV.value.expand : ''));
-    const collapseIconMV = computed(() => (iconMV.value ? iconMV.value.collapse : ''));
-    const parentIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.parent : ''));
-    const childIconMV = computed(() => (dataIconMV.value ? dataIconMV.value.child : ''));
-    const onCheckedRow = () => {
-      let checkedRow = '';
-      for (let i = 0; i < checked.value.length; i++) {
-        checkedRow += JSON.stringify(checked.value[i].data);
-      }
-      checkedRowsMV.value = checkedRow;
-    };
-    const onDoubleClickRow = (e) => {
-      const rowData = e.rowData.data;
-      DbClickedRowsMV.value = JSON.stringify(rowData);
-    };
-    const onClickRow = (e) => {
-      const rowData = e.rowData.data;
-      clickedRowMV.value = JSON.stringify(rowData);
-    };
+    const useCheckboxMV = reactive({
+      use: true,
+      headerCheck: true,
+    });
     const getData = () => {
       tableData.value = [{
         check: true,
@@ -264,6 +164,7 @@ export default {
         caption: 'Slide',
         field: 'slide',
         type: 'string',
+        width: 120,
       },
       {
         caption: 'InputNumber',
@@ -310,36 +211,7 @@ export default {
     return {
       columns,
       tableData,
-      selected,
-      checked,
-      widthMV,
-      heightMV,
-      adjustMV,
-      showHeaderMV,
-      stripeMV,
-      rowHeightMV,
-      columnWidthMV,
-      useFilterMV,
       useCheckboxMV,
-      checkboxModeMV,
-      headerCheckMV,
-      checkedRowsMV,
-      clickedRowMV,
-      DbClickedRowsMV,
-      menuItems,
-      borderMV,
-      borderItems,
-      onCheckedRow,
-      onDoubleClickRow,
-      onClickRow,
-      iconMV,
-      iconItems,
-      expandIconMV,
-      collapseIconMV,
-      dataIconMV,
-      dataIconItems,
-      parentIconMV,
-      childIconMV,
       onInputNumberClick,
       onRowDelete,
       onRowEdit,
