@@ -171,11 +171,13 @@
                 new Date(
                     new Date().getFullYear(),
                     new Date().getMonth(),
-                    new Date().getDate() - new Date().getDay() + 1),
+                    new Date().getDate() - new Date().getDay() + 1
+                ),
                 new Date(
                     new Date().getFullYear(),
                     new Date().getMonth(),
-                new Date().getDate() + (5 - new Date().getDay())),
+                    new Date().getDate() + (5 - new Date().getDay())
+                ),
             ];
           }
         }, {
