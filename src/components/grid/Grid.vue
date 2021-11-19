@@ -469,7 +469,9 @@ export default {
       calculatedColumn();
       setStore(props.rows);
     });
-
+    const ROW_INDEX = 0;
+    const ROW_CHECK_INDEX = 1;
+    const ROW_DATA_INDEX = 2;
     watch(
       () => sortInfo.setSorting,
       (value) => {
@@ -497,15 +499,18 @@ export default {
     watch(
       () => props.checked,
       (value) => {
-        const ROW_CHECK_INDEX = 1;
-        const ROW_DATA_INDEX = 2;
+        checkInfo.checkedRows = value;
+        checkInfo.isHeaderChecked = false;
         let store = stores.originStore;
         if (filterInfo.isSearch && stores.searchStore) {
           store = stores.searchStore;
         }
-        checkInfo.checkedRows = value;
-        for (let ix = 0; ix < store.length; ix++) {
-          store[ix][ROW_CHECK_INDEX] = value.includes(store[ix][ROW_DATA_INDEX]);
+        store.forEach((row) => {
+          row[ROW_CHECK_INDEX] = checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]);
+        });
+        if (checkInfo.checkedRows.length
+          && store.length === checkInfo.checkedRows.length) {
+          checkInfo.isHeaderChecked = true;
         }
       },
     );
@@ -560,7 +565,7 @@ export default {
             let isShow = false;
             for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
               const column = stores.orderedColumns[ix] || {};
-              let columnValue = row[2][ix];
+              let columnValue = row[ROW_DATA_INDEX][ix];
               let columnType = column.type;
               if (columnValue) {
                 if (typeof columnValue === 'object') {
@@ -588,10 +593,10 @@ export default {
         let store = stores.originStore;
         let checkSize = checkInfo.checkedRows.length;
         for (let ix = 0; ix < store.length; ix++) {
-          if (checkInfo.checkedIndex.has(store[ix][0])) {
-            store[ix][1] = true;
+          if (checkInfo.checkedIndex.has(store[ix][ROW_INDEX])) {
+            store[ix][ROW_CHECK_INDEX] = true;
           } else {
-            store[ix][1] = false;
+            store[ix][ROW_CHECK_INDEX] = false;
           }
         }
         if (filterInfo.isSearch && stores.searchStore) {
