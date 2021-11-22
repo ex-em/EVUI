@@ -27,6 +27,9 @@
       v-model="calendar3"
       class="case-block"
       mode="dateTime"
+      :options="{
+        timeFormat: 'HH:20:00',
+      }"
     />
     <br>
     <br>

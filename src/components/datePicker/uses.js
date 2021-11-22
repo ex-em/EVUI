@@ -2,12 +2,14 @@ import {
   ref, reactive, computed, watch,
   nextTick, getCurrentInstance,
 } from 'vue';
+import { getChangedValueByTimeFormat } from '../calendar/uses';
 
 const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
 const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
+  const timeFormat = props.options?.timeFormat;
 
   // Select 컴포넌트의 v-model 값
   const mv = computed({
@@ -15,13 +17,42 @@ export const useModel = () => {
       if (!props.modelValue) {
         return (props.mode === 'date' || props.mode === 'dateTime') ? '' : [];
       }
+      if (['dateTime', 'dateTimeRange'].includes(props.mode) && timeFormat) {
+          if (props.mode === 'dateTime') {
+            return getChangedValueByTimeFormat(timeFormat, props.modelValue);
+          } else if (props.modelValue.length) {
+            const [fromTimeFormat, toTimeFormat] = timeFormat;
+            return [
+                getChangedValueByTimeFormat(fromTimeFormat, props.modelValue[0]),
+                getChangedValueByTimeFormat(toTimeFormat, props.modelValue[1]),
+            ];
+          }
+      }
       return props.modelValue;
     },
     set: value => emit('update:modelValue', value),
   });
 
   // mode: 'date' or 'dateTime'시 input box의 입력된 텍스트값
-  const currentValue = ref(props.modelValue);
+  let currentValue;
+  if (['dateTimeRange', 'dateTime'].includes(props.mode) && timeFormat) {
+    if (props.mode === 'dateTimeRange' && props.modelValue.length) {
+      const [fromDate, toDate] = props.modelValue;
+      const [fromTimeFormat, toTimeFormat] = timeFormat;
+
+      props.modelValue = [
+        getChangedValueByTimeFormat(fromTimeFormat, fromDate),
+        getChangedValueByTimeFormat(toTimeFormat, toDate),
+      ];
+      currentValue = ref(props.modelValue);
+    } else if (props.mode === 'dateTime' && props.modelValue) {
+      currentValue = ref(getChangedValueByTimeFormat(timeFormat, props.modelValue));
+    } else {
+      currentValue = ref(props.modelValue);
+    }
+  } else {
+    currentValue = ref(props.modelValue);
+  }
 
   const validateValue = (curr) => {
     if (props.mode === 'date'
@@ -89,9 +120,8 @@ export const useModel = () => {
   };
 };
 
-export const useDropdown = (param) => {
+export const useDropdown = () => {
   const { props } = getCurrentInstance();
-  const { currentValue } = param;
 
   const isDropbox = ref(false);
   const datePicker = ref(null);
@@ -162,24 +192,6 @@ export const useDropdown = (param) => {
     isDropbox.value = false;
   };
 
-  watch(
-    () => props.modelValue,
-    (curr) => {
-      if (props.mode === 'dateMulti'
-        && props?.options?.multiType === 'date'
-        && props?.options?.multiDayLimit > curr.length
-      ) {
-        return;
-      } else if (props.mode === 'dateTime') {
-        currentValue.value = curr;
-        return;
-      } else if (props.mode === 'date') {
-        currentValue.value = curr;
-      }
-      clickOutsideDropbox();
-    },
-  );
-
   return {
     isDropbox,
     datePicker,
@@ -189,5 +201,203 @@ export const useDropdown = (param) => {
     clickSelectInput,
     clickOutsideDropbox,
     changeDropboxPosition,
+  };
+};
+
+export const useShortcuts = (param) => {
+  const { props } = getCurrentInstance();
+  const { mv, currentValue, clickOutsideDropbox } = param;
+
+  const usedShortcuts = reactive([]);
+  props.shortcuts?.forEach(({ value, label, shortcutDate }) => {
+    usedShortcuts.push({
+      key: value,
+      label,
+      shortcutDate,
+      isActive: false,
+    });
+  });
+
+  /**
+   * active 되어있는 shortcut 제거
+   */
+  const clearShortcuts = () => {
+    const targetShortcut = usedShortcuts.find(shortcut => shortcut.isActive);
+    if (targetShortcut) {
+      targetShortcut.isActive = false;
+    }
+  };
+
+  /**
+   * targetKey에 해당하는 shortcut을 active
+   * @param targetKey
+   */
+  const activeShortcut = (targetKey) => {
+    const targetShortcut = usedShortcuts.find(shortcut => shortcut.key === targetKey);
+    if (targetShortcut) {
+      targetShortcut.isActive = true;
+    }
+  };
+
+  /**
+   * 월, 일을 두자리 숫자로 보정
+   * @param num
+   * @returns {string|*}
+   */
+  const lpadToTwoDigits = (num) => {
+    if (num === null) {
+      return '00';
+    } else if (+num < 10) {
+      return `0${num}`;
+    }
+    return num;
+  };
+
+  /**
+   * 'YYYY-MM-DD' 형식으로 format
+   * @param targetDate
+   * @returns string
+   */
+  const formatDate = (targetDate) => {
+    const dateValue = targetDate ? new Date(targetDate) : new Date();
+    const year = dateValue.getFullYear();
+    const month = dateValue.getMonth() + 1;
+    const day = dateValue.getDate();
+    return `${year}-${lpadToTwoDigits(month)}-${lpadToTwoDigits(day)}`;
+  };
+
+  /**
+   * 'YYYY-MM-DD HH:mm:ss' 형식으로 format
+   * @param targetDateTime
+   * @returns string
+   */
+  const formatDateTime = (targetDateTime) => {
+    const dateTimeValue = targetDateTime ? new Date(targetDateTime) : new Date();
+    const hour = dateTimeValue.getHours();
+    const min = dateTimeValue.getMinutes();
+    const sec = dateTimeValue.getSeconds();
+    return `${formatDate(dateTimeValue)} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
+  };
+
+  /**
+   * 시, 분, 초를 원하는 값으로 변환
+   * @param targetDate
+   * @param hour
+   * @param min
+   * @param sec
+   * @returns {Date}
+   */
+  const getChangedDateTime = (targetDate, hour, min, sec) => {
+    const dateTimeValue = new Date(targetDate);
+    dateTimeValue.setHours(hour);
+    dateTimeValue.setMinutes(min);
+    dateTimeValue.setSeconds(sec);
+    return dateTimeValue;
+  };
+
+  /**
+   * 초기 shortcut 세팅
+   * 해당하는 날짜면 active
+   */
+  const setActiveShortcut = () => {
+    clearShortcuts();
+
+    const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
+
+    if (!usedShortcuts.length
+       || (props.mode === 'dateMulti' && props.options?.multiType !== 'date')
+       || (isRange && !mv.value.length)
+       || (!isRange && !mv.value)
+    ) {
+      return;
+    }
+
+    let targetKey;
+    if (isRange) {
+      const [fromDate, toDate] = mv.value;
+      const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
+        const [sFromDate, sToDate] = shortcutDate();
+        const isCorrectFromDate = formatDate(sFromDate) === formatDate(fromDate);
+        const isCorrectToDate = formatDate(sToDate) === formatDate(toDate);
+        return isCorrectFromDate && isCorrectToDate;
+      });
+      targetKey = targetShortcut?.key;
+    } else {
+      const date = formatDate(mv.value);
+      const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
+        const sDate = formatDate(shortcutDate());
+        return sDate === formatDate(date);
+      });
+      targetKey = targetShortcut?.key;
+    }
+
+    if (targetKey) {
+      activeShortcut(targetKey);
+    }
+  };
+
+  /**
+   * shortcut을 클릭했을 때 이벤트
+   * @param targetKey
+   */
+  const clickShortcut = (targetKey) => {
+    const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
+    const targetShortcut = usedShortcuts.find(({ key }) => key === targetKey);
+
+    if (!targetShortcut) {
+      return;
+    }
+
+    const shortcutDate = targetShortcut.shortcutDate;
+
+    if (isRange) {
+      const [fromDate, toDate] = shortcutDate();
+      if (props.mode === 'dateTimeRange') {
+        const from = getChangedDateTime(fromDate, 0, 0, 0);
+        const to = getChangedDateTime(toDate, 0, 0, 0);
+        const [fromTimeFormat, toTimeFormat] = props.options?.timeFormat;
+
+        mv.value = [
+          getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(from)),
+          getChangedValueByTimeFormat(toTimeFormat, formatDateTime(to)),
+        ];
+      } else {
+        mv.value = [formatDate(fromDate), formatDate(toDate)];
+      }
+    } else {
+      const sDate = shortcutDate();
+      mv.value = props.mode === 'dateTime'
+          ? getChangedValueByTimeFormat(
+              props.options?.timeFormat,
+              formatDateTime(getChangedDateTime(sDate, 0, 0, 0)))
+          : formatDate(sDate);
+    }
+
+    clearShortcuts();
+  };
+
+  watch(
+      () => props.modelValue,
+      (curr) => {
+        setActiveShortcut();
+        if (props.mode === 'dateMulti'
+            && props?.options?.multiType === 'date'
+            && props?.options?.multiDayLimit > curr.length
+        ) {
+          return;
+        } else if (props.mode === 'dateTime' || props.mode === 'dateTimeRange') {
+          currentValue.value = curr;
+          return;
+        } else if (props.mode === 'date') {
+          currentValue.value = curr;
+        }
+        clickOutsideDropbox();
+      },
+  );
+
+  return {
+    usedShortcuts,
+    clickShortcut,
+    setActiveShortcut,
   };
 };

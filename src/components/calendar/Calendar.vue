@@ -65,81 +65,13 @@
     </div>
 
     <div
-      v-if="mode === 'dateRange'"
-      class="ev-calendar-date-area"
-    >
-      <div class="ev-calendar-header">
-        <div>
-          <i
-            class="ev-icon-s-arrow-left move-month-arrow"
-            :class="{ disabled: isContinuousMonths }"
-            @click="clickPrevNextBtn('expanded', 'prev')"
-          />
-        </div>
-        <span class="ev-calendar-year">{{ expandedCalendarPageInfo.year }}</span>
-        <span class="ev-calendar-month">{{ expandedCalendarMonth }}</span>
-        <div>
-          <i
-            class="ev-icon-s-arrow-right move-month-arrow"
-            @click="clickPrevNextBtn('expanded', 'next')"
-          />
-        </div>
-      </div>
-      <div class="ev-calendar-body">
-        <table
-          :key="'expanded_calendar_table'"
-          class="ev-calendar-table"
-        >
-          <thead>
-            <tr>
-              <th
-                v-for="dayOfTheWeek in dayOfTheWeekList"
-                :key="dayOfTheWeek"
-              >
-                {{ dayOfTheWeek }}
-              </th>
-            </tr>
-          </thead>
-          <tbody
-            @wheel.prevent="wheelMonth('expanded', $event)"
-          >
-            <tr
-              v-for="weekInfo in expandedCalendarTableInfo"
-              :key="weekInfo"
-            >
-              <td
-                v-for="dateInfo in weekInfo"
-                :key="dateInfo"
-                class="ev-calendar-date-td"
-                :class="[
-                  { [dateInfo.monthType]: !!dateInfo.monthType },
-                  { today: dateInfo.isToday },
-                  { selected: dateInfo.isSelected },
-                ]"
-                @click="clickDate('expanded', dateInfo)"
-                @[`${calendarEventName}`]="onMousemoveDate('expanded', $event)"
-              >
-                <div>
-                  <span>
-                    {{ dateInfo.date }}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div
-      v-if="mode === 'dateTime'"
+      v-if="['dateTime', 'dateTimeRange'].includes(mode)"
       class="ev-calendar-time-area"
     >
       <div class="ev-calendar-time-side">
         <div
           v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
           :key="`${hmsType}_TITLE`"
-          class="ev-calendar-time-110"
         >
           {{ hmsType }}
         </div>
@@ -151,22 +83,24 @@
         >
           <table class="ev-calendar-time-table">
             <tbody
-              @wheel.prevent="wheelTime(timeType, $event)"
+              @wheel.prevent="wheelTime('main', timeType, $event)"
             >
               <tr
-                v-for="i in 2"
+                v-for="i in 3"
                 :key="`${timeType}_${i}_tr`"
               >
                 <td
-                  v-for="j in 6"
+                  v-for="j in 4"
                   :key="`${timeType}_${i}_${j}_td`"
                   class="ev-calendar-time-td"
                   :class="{
-                    selected: getTimeInfo(timeType, i, j).isSelected,
+                    selected: getTimeInfo(timeType, i, j, 'main').isSelected,
+                    disabled: preventTimeEventType.main[timeType]
+                      || getTimeInfo(timeType, i, j, 'main').isDisabled,
                   }"
-                  @click="clickTime(timeType, i, j)"
+                  @click="clickTime('main', timeType, i, j)"
                 >
-                  <div> {{ getTimeInfo(timeType, i, j).num }} </div>
+                  <div> {{ getTimeInfo(timeType, i, j, 'main').num }} </div>
                 </td>
               </tr>
             </tbody>
@@ -181,10 +115,145 @@
           <div
             v-for="arrowType in ['up', 'down']"
             :key="`${hmsType}_${arrowType}_btn`"
-            class="ev-calendar-time-55"
-            @click="clickHmsBtn(hmsType, arrowType)"
+            :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
+            @click="clickHmsBtn('main', hmsType, arrowType)"
           >
-            <i :class="`ev-icon-arrow-${arrowType}`" />
+            <i
+              :class="[
+                `ev-icon-arrow-${arrowType}`,
+                { disabled: preventTimeEventType.main[hmsType] }
+              ]" />
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div
+        v-if="['dateRange', 'dateTimeRange'].includes(mode)"
+        class="ev-calendar-date-area"
+    >
+      <div class="ev-calendar-header">
+        <div>
+          <i
+              class="ev-icon-s-arrow-left move-month-arrow"
+              :class="{ disabled: isContinuousMonths }"
+              @click="clickPrevNextBtn('expanded', 'prev')"
+          />
+        </div>
+        <span class="ev-calendar-year">{{ expandedCalendarPageInfo.year }}</span>
+        <span class="ev-calendar-month">{{ expandedCalendarMonth }}</span>
+        <div>
+          <i
+              class="ev-icon-s-arrow-right move-month-arrow"
+              @click="clickPrevNextBtn('expanded', 'next')"
+          />
+        </div>
+      </div>
+      <div class="ev-calendar-body">
+        <table
+            :key="'expanded_calendar_table'"
+            class="ev-calendar-table"
+        >
+          <thead>
+          <tr>
+            <th
+                v-for="dayOfTheWeek in dayOfTheWeekList"
+                :key="dayOfTheWeek"
+            >
+              {{ dayOfTheWeek }}
+            </th>
+          </tr>
+          </thead>
+          <tbody
+              @wheel.prevent="wheelMonth('expanded', $event)"
+          >
+          <tr
+              v-for="weekInfo in expandedCalendarTableInfo"
+              :key="weekInfo"
+          >
+            <td
+                v-for="dateInfo in weekInfo"
+                :key="dateInfo"
+                class="ev-calendar-date-td"
+                :class="[
+                  { [dateInfo.monthType]: !!dateInfo.monthType },
+                  { today: dateInfo.isToday },
+                  { selected: dateInfo.isSelected },
+                ]"
+                @click="clickDate('expanded', dateInfo)"
+                @[`${calendarEventName}`]="onMousemoveDate('expanded', $event)"
+            >
+              <div>
+                  <span>
+                    {{ dateInfo.date }}
+                  </span>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div
+        v-if="mode === 'dateTimeRange'"
+        class="ev-calendar-time-area"
+    >
+      <div class="ev-calendar-time-side">
+        <div
+            v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
+            :key="`${hmsType}_TITLE`"
+        >
+          {{ hmsType }}
+        </div>
+      </div>
+      <div class="ev-calendar-time-center">
+        <template
+            v-for="timeType in ['hour', 'min', 'sec']"
+            :key="`${timeType}_table`"
+        >
+          <table class="ev-calendar-time-table">
+            <tbody
+                @wheel.prevent="wheelTime('expanded', timeType, $event)"
+            >
+            <tr
+                v-for="i in 3"
+                :key="`${timeType}_${i}_tr`"
+            >
+              <td
+                  v-for="j in 4"
+                  :key="`${timeType}_${i}_${j}_td`"
+                  class="ev-calendar-time-td"
+                  :class="{
+                    selected: getTimeInfo(timeType, i, j, 'expanded').isSelected,
+                    disabled: preventTimeEventType.expanded[timeType]
+                    || getTimeInfo(timeType, i, j, 'expanded').isDisabled,
+                  }"
+                  @click="clickTime('expanded', timeType, i, j)"
+              >
+                <div> {{ getTimeInfo(timeType, i, j, 'expanded').num }} </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </template>
+      </div>
+      <div class="ev-calendar-time-side">
+        <template
+            v-for="hmsType in ['hour', 'min', 'sec']"
+            :key="`${hmsType}_btn_area`"
+        >
+          <div
+              v-for="arrowType in ['up', 'down']"
+              :key="`${hmsType}_${arrowType}_btn`"
+              :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
+              @click="clickHmsBtn('expanded', hmsType, arrowType)"
+          >
+            <i
+              :class="[
+                `ev-icon-arrow-${arrowType}`,
+                { disabled: preventTimeEventType.expanded[hmsType] }
+              ]" />
           </div>
         </template>
       </div>
@@ -206,7 +275,8 @@ export default {
         const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
         if (Array.isArray(value)) {
           return value.every(v => !!(!v
-            || (v.length === 10 && dateReg.exec(v))));
+            || (v.length === 10 && dateReg.exec(v)))
+            || (v.length === 19 && dateTimeReg.exec(v)));
         }
         return !!(!value
           || (value.length === 10 && dateReg.exec(value))
@@ -216,7 +286,7 @@ export default {
     mode: {
       type: String,
       default: 'date',
-      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange']
+      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange']
         .indexOf(value) !== -1,
     },
     monthNotation: {
@@ -237,10 +307,15 @@ export default {
         multiType: 'date',
         limit: 1,
       }),
-      validator: ({ multiType, multiDayLimit, disabledDate }) =>
-        (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
+      validator: ({ multiType, multiDayLimit, disabledDate, timeFormat }) => {
+        const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
+        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
         && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
-        && (disabledDate ? typeof disabledDate === 'function' : true),
+        && (disabledDate ? typeof disabledDate === 'function' : true)
+        && Array.isArray(timeFormat)
+            ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
+            : !!(!timeFormat || (timeReg.exec(timeFormat)));
+      },
     },
   },
   emits: {
@@ -260,7 +335,8 @@ export default {
     const {
       mainCalendarTableInfo,
       expandedCalendarTableInfo,
-      timeTableInfo,
+      mainTimeTableInfo,
+      expandedTimeTableInfo,
       setCalendarDate,
       setHmsTime,
       getTimeInfo,
@@ -277,8 +353,10 @@ export default {
       clickTime,
       wheelMonth,
       wheelTime,
+      resetCalendarInfo,
       calendarEventName,
       onMousemoveDate,
+      preventTimeEventType,
     } = useEvent({
       selectedValue,
       mainCalendarPageInfo,
@@ -288,10 +366,13 @@ export default {
     });
 
     setCalendarDate('main');
-    if (props.mode === 'dateRange') {
+    if (['dateRange', 'dateTimeRange'].includes(props.mode)) {
       setCalendarDate('expanded');
     }
-    setHmsTime();
+
+    if (['dateTime', 'dateTimeRange'].includes(props.mode)) {
+      setHmsTime();
+    }
 
     return {
       selectedValue,
@@ -304,7 +385,8 @@ export default {
 
       mainCalendarTableInfo,
       expandedCalendarTableInfo,
-      timeTableInfo,
+      mainTimeTableInfo,
+      expandedTimeTableInfo,
       getTimeInfo,
 
       clickPrevNextBtn,
@@ -313,8 +395,10 @@ export default {
       clickTime,
       wheelMonth,
       wheelTime,
+      resetCalendarInfo,
       calendarEventName,
       onMousemoveDate,
+      preventTimeEventType,
     };
   },
 };
@@ -339,7 +423,7 @@ export default {
 .ev-calendar-header {
   display: flex;
   height: 40px;
-  padding: 10px;
+  padding: 10px 8px;
 
   div {
     width: 20px;
@@ -369,7 +453,7 @@ export default {
 }
 
 .ev-calendar-body {
-  padding: 10px;
+  padding: 10px 8px 8px;
   flex: 1;
 }
 
@@ -475,26 +559,11 @@ export default {
 .ev-calendar-time {
   &-area {
     display: flex;
-    width: 300px;
+    width: 195px;
     flex-direction: row;
-    font-size: 12px;
     border-left: 1px solid #EBEEF5;
     color: #606266;
     box-sizing: content-box;
-  }
-
-  &-110 {
-    height: 110px;
-    line-height: 110px;
-  }
-
-  &-55 {
-    height: 55px;
-    line-height: 55px;
-    &:hover {
-      color: #409EFF;
-      cursor: pointer;
-    }
   }
 }
 
@@ -518,36 +587,79 @@ export default {
     background-color: #409EFF;
     text-align: center;
   }
+  &.disabled {
+    background-color: #EEF0F3;
+    opacity: 1;
+    color: #C0C4CC;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+    &.selected:hover {
+      cursor: pointer !important;
+    }
+  }
 }
 
 .ev-calendar-time-side {
-  width: 50px;
+  font-size: 10px;
   text-align: center;
   background-color: #E5E5E5;
+
+  &:first-child {
+    width: 35px;
+
+    & div {
+      height: 110px;
+      line-height: 110px;
+    }
+  }
+
+  &:last-child {
+    width: 30px;
+
+    &:hover {
+      color: #409EFF;
+      cursor: pointer;
+    }
+
+    & div {
+      height: 55px;
+      line-height: 55px;
+    }
+  }
 
   & div:not(:last-child) {
     border-bottom: 1px solid #EBEEF5;
   }
+
+  & div > .disabled {
+    color: #C0C4CC;
+  }
+  & div > .disabled:hover {
+    color: #C0C4CC;
+  }
 }
 .ev-calendar-time-center {
-  width: 200px;
+  width: 132px;
   height: 100%;
   text-align: center;
+  font-size: 12px;
 
   & table:not(:last-child) {
     border-bottom: 1px solid #EBEEF5;
   }
 }
 .ev-calendar-time-table {
-  width: 200px;
+  width: 132px;
   height: 110px;
   table-layout: fixed;
   border-collapse: collapse;
   border-spacing: 0;
   user-select: none;
 
-  & tr {
-    height: 55px;
+  tr {
+    height: 33px;
   }
 }
 </style>

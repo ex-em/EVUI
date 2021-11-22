@@ -33,3 +33,5 @@
 |  | multiDayLimit | 1 | `mode: dateMulti, type: date` 시 선택 일수 제한 |  |
 |  | disabledDate | () => {} | 달력 상 사용불가능 날짜를 함수로 정의 |  |
 |  | tagShorten | false | 선택된 날짜가 연속되는 경우 날짜를 모두 나열하는 것은 default이나, 이를 `fromDate ~ toDate`로 태그를 단축하여 보여주는 기능. (mode: `dateMulti`, options.multiType: `weekday` or `week`), (mode: `dateRange`)인 경우 사용 가능 |  |
+|  | timeFormat   | '' | 시간값 선택 범위 설정 <br> 타입: string, Array <br> 단일 캘린더: 'HH:mm:00'/'HH:55:00'/'10:mm:ss' 로 사용 가능 <br> 다중 캘린더: ['HH:00:ss', 'HH:59:ss'] 로 사용 가능 <br> 숫자로 넘기면 disabled 적용  |  |
+| shortcuts | Array | [] | shortcut 버튼을 이용한 사용자 정의 객체 Array <br> {<br> label: '어제', <br> value: 'yesterday',<br> customDate: (fromDate, toDate) => {}<br> } <br> DateMulti 모드 제외 |  |
