@@ -1,5 +1,5 @@
 <template>
-  <div class="description treeGridToolbar">
+  <div class="description tree-grid-toolbar">
     <slot name="toolbarWrapper"></slot>
   </div>
 </template>
@@ -12,15 +12,15 @@ export default {
 
 <style lang="scss">
 @import '../../style/index.scss';
-.treeGridToolbar {
+.tree-grid-toolbar {
   margin-bottom: 10px;
   overflow: hidden;
 }
-.treeGridToolbar > .search {
+.tree-grid-toolbar > .search {
   float: right;
   margin-right: 0;
 }
-.treeGridToolbar > .ev-button {
+.tree-grid-toolbar > .ev-button {
   margin: 0 2px 0 2px;
 }
 </style>

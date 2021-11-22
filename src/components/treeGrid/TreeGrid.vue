@@ -94,10 +94,10 @@
         <table>
           <tbody>
             <tree-grid-node
-              v-for="(item, idx) in viewStore"
+              v-for="(node, idx) in viewStore"
               :key="idx"
               :selected-data="selectedRow"
-              :node-data="item"
+              :node-data="node"
               :use-checkbox="useCheckbox"
               :ordered-columns="orderedColumns"
               :expand-icon="option.expandIcon"
@@ -114,6 +114,26 @@
               @click-tree-data="onRowClick"
               @dbl-click-tree-data="onRowDblClick"
             >
+              <!-- cell renderer -->
+              <template
+                v-for="(column, cellIndex) in orderedColumns"
+                :key="cellIndex"
+                v-slot:[getSlotName(column.field)] = "{ item }"
+              >
+                <template v-if="!!$slots[column.field]">
+                  <slot
+                    :name="column.field"
+                    :item="{
+                       data: item.data,
+                       fieldName: column.field
+                    }"
+                  >
+                  </slot>
+                </template>
+                <template v-else>
+                  <span :title="node[column.field]">{{node[column.field]}}</span>
+                </template>
+              </template>
             </tree-grid-node>
             <tr v-if="!viewStore.length">
               <td class="is-empty">No records</td>
@@ -412,6 +432,7 @@ export default {
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
       };
     };
+    const getSlotName = column => `${column}Node`;
 
     return {
       ...toRefs(styleInfo),
@@ -449,6 +470,7 @@ export default {
       isHeaderCheckbox,
       getColumnClass,
       getColumnStyle,
+      getSlotName,
       bodyStyle,
     };
   },
