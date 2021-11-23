@@ -207,7 +207,7 @@ export default {
             return false;
           }
           const date = shortcutDate();
-          return (Array.isArray(date) && date.every(d => d instanceof Date))
+          return (Array.isArray(date) && date.every(d => d instanceof Date) && date[0] <= date[1])
               || (typeof date === 'object' && date instanceof Date);
         });
       },

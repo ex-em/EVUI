@@ -280,22 +280,6 @@ export const useShortcuts = (param) => {
   };
 
   /**
-   * 시, 분, 초를 원하는 값으로 변환
-   * @param targetDate
-   * @param hour
-   * @param min
-   * @param sec
-   * @returns {Date}
-   */
-  const getChangedDateTime = (targetDate, hour, min, sec) => {
-    const dateTimeValue = new Date(targetDate);
-    dateTimeValue.setHours(hour);
-    dateTimeValue.setMinutes(min);
-    dateTimeValue.setSeconds(sec);
-    return dateTimeValue;
-  };
-
-  /**
    * 초기 shortcut 세팅
    * 해당하는 날짜면 active
    */
@@ -353,13 +337,11 @@ export const useShortcuts = (param) => {
     if (isRange) {
       const [fromDate, toDate] = shortcutDate();
       if (props.mode === 'dateTimeRange') {
-        const from = getChangedDateTime(fromDate, 0, 0, 0);
-        const to = getChangedDateTime(toDate, 0, 0, 0);
         const [fromTimeFormat, toTimeFormat] = props.options?.timeFormat;
 
         mv.value = [
-          getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(from)),
-          getChangedValueByTimeFormat(toTimeFormat, formatDateTime(to)),
+          getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(fromDate)),
+          getChangedValueByTimeFormat(toTimeFormat, formatDateTime(toDate)),
         ];
       } else {
         mv.value = [formatDate(fromDate), formatDate(toDate)];
@@ -369,7 +351,7 @@ export const useShortcuts = (param) => {
       mv.value = props.mode === 'dateTime'
           ? getChangedValueByTimeFormat(
               props.options?.timeFormat,
-              formatDateTime(getChangedDateTime(sDate, 0, 0, 0)))
+              formatDateTime(sDate))
           : formatDate(sDate);
     }
 
