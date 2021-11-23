@@ -5,19 +5,6 @@
       v-model="date1"
       placeholder="Select a date."
       clearable
-      :shortcuts="[{
-          label: 'Yesterday',
-          value: 'yesterday',
-          shortcutDate: () => {
-            return new Date().setDate(new Date().getDate() - 1);
-          }
-        }, {
-          label: 'Today',
-          value: 'today',
-          shortcutDate: () => {
-            return new Date();
-          }
-        }]"
     />
     <ev-date-picker
       v-model="date1"
@@ -45,6 +32,36 @@
         dateTime1
       </span>
       {{ dateTime1 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Calendar dateTime mode(shortcuts)</p>
+    <ev-date-picker
+        v-model="dateTime2"
+        mode="dateTime"
+        clearable
+        :options="{
+          timeFormat: 'HH:00:ss'
+        }"
+        :shortcuts="[{
+          label: 'Yesterday',
+          value: 'yesterday',
+          shortcutDate: () => {
+            return new Date(new Date().setDate(new Date().getDate() - 1));
+          }
+        }, {
+          label: 'Today',
+          value: 'today',
+          shortcutDate: () => {
+            return new Date();
+          }
+        }]"
+    />
+    <div class="description">
+      <span class="badge">
+        Value
+      </span>
+      {{ dateTime2 }}
     </div>
   </div>
   <div class="case">
@@ -150,7 +167,7 @@
           value: 'lastMonth',
           shortcutDate: () => {
             return [
-                new Date().setDate(new Date().getDate() - 30),
+                new Date(new Date().setDate(new Date().getDate() - 30)),
                 new Date(),
             ]
           }
@@ -159,7 +176,7 @@
           value: 'lastWeek',
           shortcutDate: () => {
             return [
-                new Date().setDate(new Date().getDate() - 6),
+                new Date(new Date().setDate(new Date().getDate() - 6)),
                 new Date(),
             ]
           }
@@ -207,6 +224,7 @@ export default {
   setup() {
     const date1 = ref('2020-09-01');
     const dateTime1 = ref('2020-10-15 13:09:10');
+    const dateTime2 = ref('2021-11-22 13:09:10');
     const dateMulti1 = ref([]);
     const dateMulti2 = ref([]);
     const dateMulti3 = ref([]);
@@ -217,6 +235,7 @@ export default {
     return {
       date1,
       dateTime1,
+      dateTime2,
       dateMulti1,
       dateMulti2,
       dateMulti3,

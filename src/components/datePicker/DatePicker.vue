@@ -196,6 +196,19 @@ export default {
     shortcuts: {
       type: Array,
       default: () => [],
+      validator: (value) => {
+        if (!value.length) {
+          return true;
+        }
+        return value.every(({ shortcutDate }) => {
+          if (typeof shortcutDate !== 'function') {
+            return false;
+          }
+          const date = shortcutDate();
+          return (Array.isArray(date) && date.every(d => d instanceof Date))
+              || (typeof date === 'object' && date instanceof Date);
+        });
+      },
     },
   },
   emits: {
