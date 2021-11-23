@@ -46,15 +46,11 @@
         :shortcuts="[{
           label: 'Yesterday',
           value: 'yesterday',
-          shortcutDate: () => {
-            return new Date(new Date().setDate(new Date().getDate() - 1));
-          }
+          shortcutDate: () => new Date(new Date().setDate(new Date().getDate() - 1))
         }, {
           label: 'Today',
           value: 'today',
-          shortcutDate: () => {
-            return new Date();
-          }
+          shortcutDate: () => new Date()
         }]"
     />
     <div class="description">
@@ -165,47 +161,36 @@
         :shortcuts="[{
           label: 'LastMonth',
           value: 'lastMonth',
-          shortcutDate: () => {
-            return [
-                new Date(new Date().setDate(new Date().getDate() - 30)),
-                new Date(),
-            ]
-          }
+          shortcutDate: () => [
+            new Date(new Date().setDate(new Date().getDate() - 30)),
+            new Date(),
+          ]
         },{
           label: 'LastWeek',
           value: 'lastWeek',
-          shortcutDate: () => {
-            return [
-                new Date(new Date().setDate(new Date().getDate() - 6)),
-                new Date(),
-            ]
-          }
+          shortcutDate: () => [
+            new Date(new Date().setDate(new Date().getDate() - 6)),
+            new Date(),
+          ]
         },{
           label: 'Weekday',
           value: 'weekday',
-          shortcutDate: () => {
-            return [
-                new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    new Date().getDate() - new Date().getDay() + 1
-                ),
-                new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    new Date().getDate() + (5 - new Date().getDay())
-                ),
-            ];
-          }
+          shortcutDate: () => [
+            new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate() - new Date().getDay() + 1
+            ),
+            new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate() + (5 - new Date().getDay())
+            ),
+          ]
         }, {
           label: 'Today',
           value: 'today',
-          shortcutDate: () => {
-            return [
-                new Date(),
-                new Date(),
-            ]
-          }
+          shortcutDate: () => [new Date(), new Date()]
         }]"
     />
     <div class="description">
