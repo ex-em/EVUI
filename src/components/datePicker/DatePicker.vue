@@ -23,7 +23,10 @@
       />
     </template>
     <template v-else>
-      <div class="ev-date-picker-tag-wrapper">
+      <div
+          class="ev-date-picker-tag-wrapper"
+          @click="clickSelectInput"
+      >
         <span class="ev-date-picker-prefix-icon">
           <i class="ev-icon-calendar" />
         </span>
@@ -33,7 +36,6 @@
           readonly
           :placeholder="$props.placeholder"
           :disabled="$props.disabled"
-          @click="clickSelectInput"
         />
         <template
           v-if="$props.mode === 'dateMulti'
@@ -368,6 +370,7 @@ export default {
 
   &.num {
     padding-right: 8px;
+    cursor: pointer;
   }
 
   .ev-tag-suffix {
