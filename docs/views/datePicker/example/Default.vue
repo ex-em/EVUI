@@ -5,19 +5,6 @@
       v-model="date1"
       placeholder="Select a date."
       clearable
-      :shortcuts="[{
-          label: 'Yesterday',
-          value: 'yesterday',
-          shortcutDate: () => {
-            return new Date().setDate(new Date().getDate() - 1);
-          }
-        }, {
-          label: 'Today',
-          value: 'today',
-          shortcutDate: () => {
-            return new Date();
-          }
-        }]"
     />
     <ev-date-picker
       v-model="date1"
@@ -45,6 +32,32 @@
         dateTime1
       </span>
       {{ dateTime1 }}
+    </div>
+  </div>
+  <div class="case">
+    <p class="case-title">Calendar dateTime mode(shortcuts)</p>
+    <ev-date-picker
+        v-model="dateTime2"
+        mode="dateTime"
+        clearable
+        :options="{
+          timeFormat: 'HH:00:ss'
+        }"
+        :shortcuts="[{
+          label: 'Yesterday',
+          value: 'yesterday',
+          shortcutDate: () => new Date(new Date().setDate(new Date().getDate() - 1))
+        }, {
+          label: 'Today',
+          value: 'today',
+          shortcutDate: () => new Date()
+        }]"
+    />
+    <div class="description">
+      <span class="badge">
+        Value
+      </span>
+      {{ dateTime2 }}
     </div>
   </div>
   <div class="case">
@@ -145,51 +158,7 @@
         :options="{
           timeFormat: ['HH:00:ss', 'HH:59:ss']
         }"
-        :shortcuts="[{
-          label: 'LastMonth',
-          value: 'lastMonth',
-          shortcutDate: () => {
-            return [
-                new Date().setDate(new Date().getDate() - 30),
-                new Date(),
-            ]
-          }
-        },{
-          label: 'LastWeek',
-          value: 'lastWeek',
-          shortcutDate: () => {
-            return [
-                new Date().setDate(new Date().getDate() - 6),
-                new Date(),
-            ]
-          }
-        },{
-          label: 'Weekday',
-          value: 'weekday',
-          shortcutDate: () => {
-            return [
-                new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    new Date().getDate() - new Date().getDay() + 1
-                ),
-                new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    new Date().getDate() + (5 - new Date().getDay())
-                ),
-            ];
-          }
-        }, {
-          label: 'Today',
-          value: 'today',
-          shortcutDate: () => {
-            return [
-                new Date(),
-                new Date(),
-            ]
-          }
-        }]"
+        :shortcuts="dateTimeRange2Shortcut"
     />
     <div class="description">
       <span class="badge">
@@ -202,11 +171,13 @@
 
 <script>
 import { ref } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   setup() {
     const date1 = ref('2020-09-01');
     const dateTime1 = ref('2020-10-15 13:09:10');
+    const dateTime2 = ref('2021-11-22 13:09:10');
     const dateMulti1 = ref([]);
     const dateMulti2 = ref([]);
     const dateMulti3 = ref([]);
@@ -214,15 +185,56 @@ export default {
     const dateTimeRange1 = ref([]);
     const dateTimeRange2 = ref(['2021-11-10 16:01:01', '2021-12-10 17:10:15']);
 
+    const currentDate = new Date();
+    currentDate.setHours(0);
+    currentDate.setMinutes(0);
+    currentDate.setSeconds(0);
+
+    const dateTimeRange2Shortcut = [
+        {
+          label: 'LastMonth',
+          value: 'lastMonth',
+          shortcutDate: () => [
+            new Date(cloneDeep(currentDate).setDate(currentDate.getDate() - 30)),
+            currentDate,
+          ],
+      },
+      {
+        label: 'LastWeek',
+        value: 'lastWeek',
+        shortcutDate: () => [
+          new Date(cloneDeep(currentDate).setDate(currentDate.getDate() - 6)),
+          currentDate,
+        ],
+      },
+      {
+        label: 'Weekday',
+        value: 'weekday',
+        shortcutDate: () => [
+          new Date(cloneDeep(currentDate)
+              .setDate(currentDate.getDate() - currentDate.getDay() + 1)),
+          new Date(cloneDeep(currentDate)
+              .setDate(currentDate.getDate() + (5 - currentDate.getDay()))),
+        ],
+      },
+      {
+        label: 'Today',
+        value: 'today',
+        shortcutDate: () => [currentDate, currentDate],
+      },
+    ];
+
     return {
       date1,
       dateTime1,
+      dateTime2,
       dateMulti1,
       dateMulti2,
       dateMulti3,
       dateRange1,
       dateTimeRange1,
       dateTimeRange2,
+      dateTimeRange2Shortcut,
     };
   },
 };

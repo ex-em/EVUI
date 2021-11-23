@@ -23,7 +23,10 @@
       />
     </template>
     <template v-else>
-      <div class="ev-date-picker-tag-wrapper">
+      <div
+          class="ev-date-picker-tag-wrapper"
+          @click="clickSelectInput"
+      >
         <span class="ev-date-picker-prefix-icon">
           <i class="ev-icon-calendar" />
         </span>
@@ -33,7 +36,6 @@
           readonly
           :placeholder="$props.placeholder"
           :disabled="$props.disabled"
-          @click="clickSelectInput"
         />
         <template
           v-if="$props.mode === 'dateMulti'
@@ -196,6 +198,19 @@ export default {
     shortcuts: {
       type: Array,
       default: () => [],
+      validator: (value) => {
+        if (!value.length) {
+          return true;
+        }
+        return value.every(({ shortcutDate }) => {
+          if (typeof shortcutDate !== 'function') {
+            return false;
+          }
+          const date = shortcutDate();
+          return (Array.isArray(date) && date.every(d => d instanceof Date) && date[0] <= date[1])
+              || (typeof date === 'object' && date instanceof Date);
+        });
+      },
     },
   },
   emits: {
@@ -355,6 +370,7 @@ export default {
 
   &.num {
     padding-right: 8px;
+    cursor: pointer;
   }
 
   .ev-tag-suffix {
