@@ -333,16 +333,21 @@ export const useShortcuts = (param) => {
     }
 
     const shortcutDate = targetShortcut.shortcutDate;
+    const timeFormat = props.options?.timeFormat;
 
     if (isRange) {
       const [fromDate, toDate] = shortcutDate();
       if (props.mode === 'dateTimeRange') {
-        const [fromTimeFormat, toTimeFormat] = props.options?.timeFormat;
+        if (timeFormat?.length) {
+          const [fromTimeFormat, toTimeFormat] = timeFormat;
 
-        mv.value = [
-          getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(fromDate)),
-          getChangedValueByTimeFormat(toTimeFormat, formatDateTime(toDate)),
-        ];
+          mv.value = [
+            getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(fromDate)),
+            getChangedValueByTimeFormat(toTimeFormat, formatDateTime(toDate)),
+          ];
+        } else {
+          mv.value = [formatDateTime(fromDate), formatDateTime(toDate)];
+        }
       } else {
         mv.value = [formatDate(fromDate), formatDate(toDate)];
       }
@@ -350,7 +355,7 @@ export const useShortcuts = (param) => {
       const sDate = shortcutDate();
       mv.value = props.mode === 'dateTime'
           ? getChangedValueByTimeFormat(
-              props.options?.timeFormat,
+              timeFormat,
               formatDateTime(sDate))
           : formatDate(sDate);
     }
