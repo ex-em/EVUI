@@ -361,6 +361,7 @@ export const useShortcuts = (param) => {
     }
 
     clearShortcuts();
+    activeShortcut(targetKey);
   };
 
   watch(
