@@ -85,7 +85,7 @@
 
         await watch(() => props.data, (chartData) => {
           const newData = getNormalizedData(chartData);
-          const isUpdateSeries = !isEqual(newData.series, evChart.data.series);
+          const isUpdateSeries = !isEqual(newData, evChart.data);
           evChart.data = cloneDeep(newData);
           evChart.update({
             updateSeries: isUpdateSeries,
