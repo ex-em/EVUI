@@ -26,7 +26,7 @@ const modules = {
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
+                series.data = this.addSeriesStackDS(sData, label, series);
               } else {
                 series.data = this.addSeriesDS(sData, label);
               }
@@ -173,12 +173,12 @@ const modules = {
    * Take data and label to create stack data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
-   * @param {array}   bsIds   stacked base data ID List
-   * @param {number}  sIdx    series ordered index
+   * @param {object}  series  series Information
    *
    * @returns {array} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
+  addSeriesStackDS(data, label, series) {
+    const bsIds = series.bsIds; // stacked base data ID List
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
@@ -201,6 +201,8 @@ const modules = {
     };
 
     data.forEach((curr, index) => {
+      const { stackIndex, show: isShowSeries } = series;
+      const isTop = true; // is top position on stack (Stacked or not, default is true)
       const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
       let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
       let odata = curr; // current series original data
@@ -214,7 +216,7 @@ const modules = {
         }
 
         const oData = odata?.value ?? odata;
-        if (sIdx > 0) {
+        if (stackIndex > 0) {
           if (oData != null) {
             gdata = bdata + oData;
           } else {
@@ -226,7 +228,14 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata));
+        if (gdata && isShowSeries) {
+          for (let idx = baseIndex; idx > -1; idx--) {
+            const prevSeriesData = this.seriesList[bsIds[idx]];
+            prevSeriesData.data[index].isTop = false;
+          }
+        }
+
+        sdata.push(this.addData(gdata, ldata, odata, bdata, isTop));
       }
     });
 
@@ -267,10 +276,11 @@ const modules = {
    * @param {object}  ldata    label data (x-axis value for vertical chart)
    * @param {object}  odata    original data (without stacked value)
    * @param {object}  bdata    base data (stacked value)
+   * @param {boolean} isTop    is top position on stack (Stacked or not, default is true)
 
    * @returns {object} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null) {
+  addData(gdata, ldata, odata = null, bdata = null, isTop = true) {
     let data;
     const gdataValue = gdata?.value ?? gdata;
     const odataValue = odata?.value ?? odata;
@@ -287,6 +297,7 @@ const modules = {
     data.w = null;
     data.h = null;
     data.dataColor = dataColor || null;
+    data.isTop = isTop;
 
     return data;
   },
