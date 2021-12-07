@@ -692,12 +692,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('click', this.onClick);
     }
 
-    if (this.options.tooltip.use) {
-      this.tooltipCanvas.remove();
-      this.tooltipCanvas = null;
-      this.tooltipDOM.remove();
-      this.tooltipDOM = null;
-    }
+    this.destroyTooltip();
 
     this.wrapperDOM = null;
     this.chartDOM = null;
@@ -712,6 +707,20 @@ class EvChart {
 
     while (target.hasChildNodes()) {
       target.removeChild(target.firstChild);
+    }
+  }
+
+  /**
+   * destroy chart tooltip
+   *
+   * @returns {undefined}
+   */
+  destroyTooltip() {
+    if (this.options.tooltip.use) {
+      this.tooltipCanvas.remove();
+      this.tooltipCanvas = null;
+      this.tooltipDOM.remove();
+      this.tooltipDOM = null;
     }
   }
 }

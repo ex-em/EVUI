@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, watch } from 'vue';
+import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
   import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import { useModel, useWrapper } from './uses';
@@ -96,6 +96,10 @@
 
       onBeforeUnmount(() => {
         evChart.destroy();
+      });
+
+      onDeactivated(() => {
+        evChart.destroyTooltip();
       });
 
       const redrawChart = () => {
