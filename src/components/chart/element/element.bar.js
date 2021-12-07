@@ -423,7 +423,7 @@ class Bar {
       return;
     }
 
-    if (isBorderRadius && (isStackBar && isTop)) {
+    if ((!isStackBar && isBorderRadius) || (isStackBar && isBorderRadius && isTop)) {
       try {
         this.drawRoundedRect(ctx, positions);
       } catch (e) {
