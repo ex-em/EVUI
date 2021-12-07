@@ -12,7 +12,7 @@ export default {
    * @returns {any} position
    */
   calculateX(value, min, max, area, startPoint = 0) {
-    if (value === null) {
+    if (value === null || value === undefined) {
       return null;
     }
 
@@ -35,7 +35,7 @@ export default {
    * @returns {any} position
    */
   calculateSubX(value, min, max, area, startPoint = 0) {
-    if (value === null) {
+    if (value === null || value === undefined) {
       return null;
     }
 
@@ -56,7 +56,7 @@ export default {
   calculateY(value, min, max, area, startPoint = 0) {
     let calcY;
 
-    if (value === null) {
+    if (value === null || value === undefined) {
       return null;
     }
 
