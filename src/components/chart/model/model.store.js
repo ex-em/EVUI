@@ -282,8 +282,20 @@ const modules = {
    */
   addData(gdata, ldata, odata = null, bdata = null, isTop = true) {
     let data;
-    const gdataValue = Object.hasOwnProperty.call(gdata, 'value') ? gdata.value : gdata;
-    const odataValue = Object.hasOwnProperty.call(gdata, 'value') ? odata.value : odata;
+    let gdataValue = null;
+    let odataValue = null;
+    let gdataColor = null;
+    let odataColor = null;
+
+    if (gdata) {
+      gdataValue = Object.hasOwnProperty.call(gdata, 'value') ? gdata.value : gdata;
+      gdataColor = Object.hasOwnProperty.call(gdata, 'color') ? gdata.color : null;
+    }
+
+    if (odata) {
+      odataValue = Object.hasOwnProperty.call(odata, 'value') ? odata.value : odata;
+      odataColor = Object.hasOwnProperty.call(odata, 'color') ? odata.color : null;
+    }
 
     if (this.options.horizontal) {
       data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
@@ -295,11 +307,8 @@ const modules = {
     data.yp = null;
     data.w = null;
     data.h = null;
+    data.dataColor = gdataColor ?? odataColor;
     data.isTop = isTop;
-
-    const gDataColor = Object.hasOwnProperty.call(gdata, 'color') ? gdata.color : null;
-    const oDataColor = Object.hasOwnProperty.call(odata, 'color') ? odata.color : null;
-    data.dataColor = gDataColor ?? oDataColor;
 
     return data;
   },
