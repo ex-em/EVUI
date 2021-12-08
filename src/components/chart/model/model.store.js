@@ -287,14 +287,18 @@ const modules = {
     let gdataColor = null;
     let odataColor = null;
 
-    if (gdata) {
-      gdataValue = Object.hasOwnProperty.call(gdata, 'value') ? gdata.value : gdata;
-      gdataColor = Object.hasOwnProperty.call(gdata, 'color') ? gdata.color : null;
+    if (gdata !== null && typeof gdata === 'object') {
+      gdataValue = gdata.value;
+      gdataColor = gdata.color;
+    } else {
+      gdataValue = gdata;
     }
 
-    if (odata) {
-      odataValue = Object.hasOwnProperty.call(odata, 'value') ? odata.value : odata;
-      odataColor = Object.hasOwnProperty.call(odata, 'color') ? odata.color : null;
+    if (odata !== null && typeof odata === 'object') {
+      odataValue = odata.value;
+      odataColor = odata.color;
+    } else {
+      odataValue = odata;
     }
 
     if (this.options.horizontal) {
