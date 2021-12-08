@@ -288,15 +288,15 @@ const modules = {
     let odataColor = null;
 
     if (gdata !== null && typeof gdata === 'object') {
-      gdataValue = Object.hasOwnProperty.call(gdata, 'value') ? gdata.value : null;
-      gdataColor = Object.hasOwnProperty.call(gdata, 'color') ? gdata.color : null;
+      gdataValue = gdata.value;
+      gdataColor = gdata.color;
     } else {
       gdataValue = gdata;
     }
 
     if (odata !== null && typeof odata === 'object') {
-      odataValue = Object.hasOwnProperty.call(odata, 'value') ? odata.value : null;
-      odataColor = Object.hasOwnProperty.call(odata, 'color') ? odata.color : null;
+      odataValue = odata.value;
+      odataColor = odata.color;
     } else {
       odataValue = odata;
     }
