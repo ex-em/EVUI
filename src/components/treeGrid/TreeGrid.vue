@@ -227,7 +227,6 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
-    'update-tree-data': null,
   },
   setup(props) {
     const {
