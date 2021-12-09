@@ -33,9 +33,9 @@
       <template #toolbar="{ item }">
         <ev-button
           type="info"
-          @click="onClickCustom"
+          @click="addNode"
         >
-          Custom
+          Add
         </ev-button>
         <ev-text-field
           v-model="searchVm"
@@ -169,6 +169,14 @@ export default {
     const onClickCustom = () => {
       console.log('On click custom button');
     };
+
+    const addNode = () => {
+      tableData.value[0].children.push({
+        id: 'newenwenwenwenwenwenwenwenw',
+        date: '2016-05-02',
+        name: '3',
+      });
+    };
     getData();
     return {
       columns,
@@ -196,6 +204,7 @@ export default {
       onDoubleClickRow,
       onClickRow,
       onClickCustom,
+      addNode,
     };
   },
 };
