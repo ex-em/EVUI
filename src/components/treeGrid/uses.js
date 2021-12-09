@@ -566,44 +566,46 @@ export const treeEvent = (params) => {
 
     function setNodeData(nodeInfo) {
       const { node, level, isShow, parent } = nodeInfo;
-      node.index = nodeIndex++;
-      node.level = level;
+      if (node !== null && typeof node === 'object') {
+        node.index = nodeIndex++;
+        node.level = level;
 
-      if (!Object.hasOwnProperty.call(node, 'checked')) {
-        node.checked = false;
-      }
+        if (!Object.hasOwnProperty.call(node, 'checked')) {
+          node.checked = false;
+        }
 
-      if (!Object.hasOwnProperty.call(node, 'show')) {
-        node.show = isShow;
-      }
+        if (!Object.hasOwnProperty.call(node, 'show')) {
+          node.show = isShow;
+        }
 
-      if (!Object.hasOwnProperty.call(node, 'expand')) {
-        node.expand = true;
-      }
+        if (!Object.hasOwnProperty.call(node, 'expand')) {
+          node.expand = true;
+        }
 
-      if (!Object.hasOwnProperty.call(node, 'isFilter')) {
-        node.isFilter = false;
-      }
+        if (!Object.hasOwnProperty.call(node, 'isFilter')) {
+          node.isFilter = false;
+        }
 
-      if (!Object.hasOwnProperty.call(node, 'data')) {
-        node.data = getDataObj(node);
-      }
+        if (!Object.hasOwnProperty.call(node, 'data')) {
+          node.data = getDataObj(node);
+        }
 
-      nodeList.push(node);
+        nodeList.push(node);
 
-      if (typeof parent !== 'undefined') {
-        node.parent = parent;
-      }
-      if (node.children) {
-        node.hasChild = true;
-        node.children.forEach(child =>
-          setNodeData({
-            node: child,
-            level: level + 1,
-            isShow: node.show && node.expand,
-            parent: node,
-          }),
-        );
+        if (typeof parent !== 'undefined') {
+          node.parent = parent;
+        }
+        if (node.children) {
+          node.hasChild = true;
+          node.children.forEach(child =>
+            setNodeData({
+              node: child,
+              level: level + 1,
+              isShow: node.show && node.expand,
+              parent: node,
+            }),
+          );
+        }
       }
     }
     setNodeData({
