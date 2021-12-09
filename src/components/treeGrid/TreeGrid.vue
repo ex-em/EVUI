@@ -367,7 +367,7 @@ export default {
       (newData) => {
         stores.treeRows = newData;
         stores.treeStore = setTreeNodeStore();
-        calculatedColumn();
+        onResize();
         updateVScroll();
       }, { deep: true },
     );
