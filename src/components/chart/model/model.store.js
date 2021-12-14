@@ -282,9 +282,24 @@ const modules = {
    */
   addData(gdata, ldata, odata = null, bdata = null, isTop = true) {
     let data;
-    const gdataValue = gdata?.value ?? gdata;
-    const odataValue = odata?.value ?? odata;
-    const dataColor = gdata?.color ?? odata?.color;
+    let gdataValue = null;
+    let odataValue = null;
+    let gdataColor = null;
+    let odataColor = null;
+
+    if (gdata !== null && typeof gdata === 'object') {
+      gdataValue = gdata.value;
+      gdataColor = gdata.color;
+    } else {
+      gdataValue = gdata;
+    }
+
+    if (odata !== null && typeof odata === 'object') {
+      odataValue = odata.value;
+      odataColor = odata.color;
+    } else {
+      odataValue = odata;
+    }
 
     if (this.options.horizontal) {
       data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
@@ -296,7 +311,7 @@ const modules = {
     data.yp = null;
     data.w = null;
     data.h = null;
-    data.dataColor = dataColor || null;
+    data.dataColor = gdataColor ?? odataColor;
     data.isTop = isTop;
 
     return data;

@@ -520,7 +520,7 @@ class EvChart {
       this.seriesList = {};
       this.lastTip = { pos: null, value: null };
 
-      this.createSeriesSet(series, options.type);
+      this.createSeriesSet(series, options.type, options.horizontal);
 
       if (this.legendDOM) {
         this.resetLegend();
