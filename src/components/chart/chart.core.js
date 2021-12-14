@@ -714,6 +714,17 @@ class EvChart {
       target.removeChild(target.firstChild);
     }
   }
+
+  /**
+   * hide chart tooltip
+   *
+   * @returns {undefined}
+   */
+  hideTooltip() {
+    if (this.options.tooltip.use) {
+      this.tooltipDOM.style.display = 'none';
+    }
+  }
 }
 
 export default EvChart;
