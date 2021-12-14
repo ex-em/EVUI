@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 
 export default {
   name: 'EvTextField',
@@ -205,7 +205,9 @@ export default {
       if (mv.value !== inputValue) {
         mv.value = inputValue;
       }
-      emit('input', mv.value, e);
+      nextTick(() => {
+        emit('input', mv.value, e);
+      });
     };
     const changeMv = (e) => {
       emit('change', mv.value, e);
