@@ -550,35 +550,71 @@ export const contextMenuEvent = (params) => {
 
 export const treeEvent = (params) => {
   const { stores, onResize } = params;
-  // tree data init
-  let index = 0;
-  const filterObj = (keys, obj) => {
-    const newObj = {};
-    Object.keys(obj).forEach((key) => {
-      if (!keys.includes(key)) {
-        newObj[key] = obj[key];
+  const setTreeNodeStore = () => {
+    let nodeIndex = 0;
+    const nodeList = [];
+
+    function getDataObj(nodeObj) {
+      const newObj = {};
+      Object.keys(nodeObj).forEach((key) => {
+        if (key !== 'children') {
+          newObj[key] = nodeObj[key];
+        }
+      });
+      return newObj;
+    }
+
+    function setNodeData(nodeInfo) {
+      const { node, level, isShow, parent } = nodeInfo;
+      if (node !== null && typeof node === 'object') {
+        node.index = nodeIndex++;
+        node.level = level;
+
+        if (!Object.hasOwnProperty.call(node, 'checked')) {
+          node.checked = false;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'show')) {
+          node.show = isShow;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'expand')) {
+          node.expand = true;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'isFilter')) {
+          node.isFilter = false;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'data')) {
+          node.data = getDataObj(node);
+        }
+
+        nodeList.push(node);
+
+        if (typeof parent !== 'undefined') {
+          node.parent = parent;
+        }
+        if (node.children) {
+          node.hasChild = true;
+          node.children.forEach(child =>
+            setNodeData({
+              node: child,
+              level: level + 1,
+              isShow: node.show && node.expand,
+              parent: node,
+            }),
+          );
+        }
       }
+    }
+    setNodeData({
+      node: stores.treeRows[0],
+      level: 0,
+      isShow: true,
+      parent: undefined,
     });
-    return newObj;
-  };
-  const setTreeStore = (rows, count, isShow, parent) => {
-    rows.forEach((nodeObj) => {
-      const node = nodeObj;
-      const dataObj = filterObj('children', nodeObj);
-      node.data = dataObj;
-      node.level = count;
-      node.expand = node.expand === undefined ? true : node.expand;
-      node.show = isShow;
-      node.checked = false;
-      node.index = index++;
-      node.parent = parent;
-      node.isFilter = false;
-      stores.treeStore.push(node);
-      if (node.children && node.children.length > 0) {
-        node.hasChild = true;
-        setTreeStore(node.children, node.level + 1, node.show && node.expand, node);
-      }
-    });
+    return nodeList;
   };
   const setExpandNode = (children, isShow, isFilter) => {
     children.forEach((nodeObj) => {
@@ -595,7 +631,7 @@ export const treeEvent = (params) => {
     setExpandNode(data.children, data.expand, data.isFilter);
     onResize();
   };
-  return { setTreeStore, handleExpand };
+  return { setTreeNodeStore, handleExpand };
 };
 
 export const filterEvent = (params) => {

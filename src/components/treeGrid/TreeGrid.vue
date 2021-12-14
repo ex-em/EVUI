@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, nextTick } from 'vue';
+import { reactive, toRefs, computed, watch } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import {
@@ -227,9 +227,8 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
-    'update-tree-data': null,
   },
-  setup(props, { emit }) {
+  setup(props) {
     const {
       isRenderer,
       getComponentName,
@@ -246,7 +245,8 @@ export default {
     const stores = reactive({
       treeStore: [],
       viewStore: [],
-      treeRows: computed(() => JSON.parse(JSON.stringify(props.rows))),
+      filterStore: [],
+      treeRows: props.rows,
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
@@ -324,7 +324,7 @@ export default {
     } = contextMenuEvent({ contextInfo, stores, selectInfo });
 
     const {
-      setTreeStore,
+      setTreeNodeStore,
       handleExpand,
     } = treeEvent({ stores, onResize });
 
@@ -359,17 +359,16 @@ export default {
         checkInfo.isHeaderChecked = false;
       },
     );
+    stores.treeStore = setTreeNodeStore();
+
     watch(
       () => props.rows,
-      () => {
-        nextTick(() => {
-          stores.treeStore = [];
-          calculatedColumn();
-          setTreeStore(stores.treeRows, 0, true);
-          updateVScroll();
-          emit('update-tree-data', stores.treeRows);
-        });
-      }, { deep: true, immediate: true },
+      (newData) => {
+        stores.treeRows = newData;
+        stores.treeStore = setTreeNodeStore();
+        onResize();
+        updateVScroll();
+      }, { deep: true },
     );
     watch(
       () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
