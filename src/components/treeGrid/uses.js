@@ -608,11 +608,13 @@ export const treeEvent = (params) => {
         }
       }
     }
-    setNodeData({
-      node: stores.treeRows[0],
-      level: 0,
-      isShow: true,
-      parent: undefined,
+    stores.treeRows.forEach((root) => {
+      setNodeData({
+        node: root,
+        level: 0,
+        isShow: true,
+        parent: undefined,
+      });
     });
     return nodeList;
   };
