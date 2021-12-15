@@ -721,7 +721,7 @@ class EvChart {
    * @returns {undefined}
    */
   hideTooltip() {
-    if (this.options.tooltip.use) {
+    if (this.options.tooltip.use && this.tooltipDOM?.style) {
       this.tooltipDOM.style.display = 'none';
     }
   }
