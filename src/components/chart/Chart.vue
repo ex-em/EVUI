@@ -99,7 +99,9 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       });
 
       onDeactivated(() => {
-        evChart.hideTooltip();
+        if (evChart && 'hideTooltip' in evChart) {
+          evChart.hideTooltip();
+        }
       });
 
       const redrawChart = () => {
