@@ -467,7 +467,7 @@ export const sortEvent = (params) => {
   const { sortInfo, stores, getColumnIndex } = params;
   const { props } = getCurrentInstance();
   function OrderQueue() {
-    this.orders = ['desc', 'asc', 'init'];
+    this.orders = ['asc', 'desc', 'init'];
     this.dequeue = () => this.orders.shift();
     this.enqueue = o => this.orders.push(o);
   }
@@ -479,7 +479,7 @@ export const sortEvent = (params) => {
    */
   const onSort = (field) => {
     if (sortInfo.sortField !== field) {
-      order.orders = ['desc', 'asc', 'init'];
+      order.orders = ['asc', 'desc', 'init'];
       sortInfo.sortField = field;
     }
     sortInfo.sortOrder = order.dequeue();
