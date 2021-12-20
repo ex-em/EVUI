@@ -2,19 +2,17 @@
   <div class="ev-calendar-wrapper">
     <div class="ev-calendar-date-area">
       <div class="ev-calendar-header">
-        <div>
-          <i
-            class="ev-icon-s-arrow-left move-month-arrow"
-            @click="clickPrevNextBtn('main', 'prev')"
-          />
+        <div @click="clickPrevNextBtn('main', 'prev')">
+          <i class="ev-icon-s-arrow-left move-month-arrow" />
         </div>
         <span class="ev-calendar-year">{{ mainCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ mainCalendarMonth }}</span>
-        <div>
+        <div @click="clickPrevNextBtn('main', 'next')">
           <i
-            class="ev-icon-s-arrow-right move-month-arrow"
-            :class="{ disabled: isContinuousMonths }"
-            @click="clickPrevNextBtn('main', 'next')"
+            :class="[
+                'ev-icon-s-arrow-right move-month-arrow',
+                { disabled: isContinuousMonths },
+            ]"
           />
         </div>
       </div>
@@ -133,20 +131,18 @@
         class="ev-calendar-date-area"
     >
       <div class="ev-calendar-header">
-        <div>
+        <div @click="clickPrevNextBtn('expanded', 'prev')">
           <i
-              class="ev-icon-s-arrow-left move-month-arrow"
-              :class="{ disabled: isContinuousMonths }"
-              @click="clickPrevNextBtn('expanded', 'prev')"
+              :class="[
+                'ev-icon-s-arrow-left move-month-arrow',
+                { disabled: isContinuousMonths },
+            ]"
           />
         </div>
         <span class="ev-calendar-year">{{ expandedCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ expandedCalendarMonth }}</span>
-        <div>
-          <i
-              class="ev-icon-s-arrow-right move-month-arrow"
-              @click="clickPrevNextBtn('expanded', 'next')"
-          />
+        <div @click="clickPrevNextBtn('expanded', 'next')">
+          <i class="ev-icon-s-arrow-right move-month-arrow" />
         </div>
       </div>
       <div class="ev-calendar-body">
@@ -429,6 +425,7 @@ export default {
     width: 20px;
     flex: 1;
     text-align: center;
+    cursor: pointer;
   }
 
   .move-month-arrow {
@@ -437,7 +434,6 @@ export default {
     line-height: 20px;
     color: #606266;
     text-align: center;
-    cursor: pointer;
     &:hover {
       color: #3C81F6;
     }
