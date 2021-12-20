@@ -466,36 +466,50 @@ export const checkEvent = (params) => {
 export const sortEvent = (params) => {
   const { sortInfo, stores, getColumnIndex } = params;
   const { props } = getCurrentInstance();
+  function OrderQueue() {
+    this.orders = ['desc', 'asc', 'init'];
+    this.dequeue = () => this.orders.shift();
+    this.enqueue = o => this.orders.push(o);
+  }
+  const order = new OrderQueue();
   /**
    * sort 이벤트를 처리한다.
    *
    * @param {string} field - 컬럼 field
    */
   const onSort = (field) => {
-    if (sortInfo.sortField === field) {
-      sortInfo.sortOrder = sortInfo.sortOrder === 'desc' ? 'asc' : 'desc';
-    } else {
+    if (sortInfo.sortField !== field) {
+      order.orders = ['desc', 'asc', 'init'];
       sortInfo.sortField = field;
-      sortInfo.sortOrder = 'desc';
     }
+    sortInfo.sortOrder = order.dequeue();
+    order.enqueue(sortInfo.sortOrder);
 
-    sortInfo.setSorting = true;
+    sortInfo.isSorting = true;
   };
   /**
    * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
    */
   const setSort = () => {
+    const setDesc = (a, b) => (a > b ? -1 : 1);
+    const setAsc = (a, b) => (a < b ? -1 : 1);
+    if (sortInfo.sortOrder === 'init' || (!sortInfo.sortField && !sortInfo.isSorting)) {
+      stores.store.sort((a, b) => {
+        if (typeof a[ROW_INDEX] === 'number') {
+          return setAsc(a[ROW_INDEX], b[ROW_INDEX]);
+        }
+        return 0;
+      });
+      return;
+    }
     const index = getColumnIndex(sortInfo.sortField);
-    const desc = (a, b) => (a > b ? -1 : 1);
-    const asc = (a, b) => (a < b ? -1 : 1);
-    const type = props.columns[index].type || 'string';
-    const sortFn = sortInfo.sortOrder === 'desc' ? desc : asc;
-
+    const type = props.columns[index]?.type || 'string';
+    const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     if (type === 'string') {
       stores.store.sort((a, b) => {
         if (typeof a[ROW_DATA_INDEX][index] === 'string') {
-          return sortFn(a[ROW_DATA_INDEX][index].toLowerCase(),
-            b[ROW_DATA_INDEX][index].toLowerCase());
+          return sortFn(a[ROW_DATA_INDEX][index]?.toLowerCase(),
+            b[ROW_DATA_INDEX][index]?.toLowerCase());
         }
         return 0;
       });
