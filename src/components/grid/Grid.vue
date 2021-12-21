@@ -102,10 +102,16 @@
                 {{ column.caption }}
               </span>
               <!--Sort Icon-->
-              <ev-icon
-                v-if="sortField === column.field"
-                :icon="`${sortOrder === 'desc' ? 'ev-icon-triangle-down' : 'ev-icon-triangle-up'}`"
-              />
+              <template v-if="sortField === column.field">
+                <ev-icon
+                  v-if="sortOrder === 'desc'"
+                  icon="ev-icon-triangle-down"
+                />
+                <ev-icon
+                  v-if="sortOrder === 'asc'"
+                  icon="ev-icon-triangle-up"
+                />
+              </template>
               <!--Filter Button-->
               <span
                 v-if="isFilterButton(column.field)"
@@ -387,7 +393,7 @@ export default {
       selectedRow: props.selected,
     });
     const sortInfo = reactive({
-      setSorting: false,
+      isSorting: false,
       sortField: '',
       sortOrder: 'desc',
     });
@@ -473,11 +479,19 @@ export default {
     const ROW_CHECK_INDEX = 1;
     const ROW_DATA_INDEX = 2;
     watch(
-      () => sortInfo.setSorting,
+      () => props.columns,
+      () => {
+        sortInfo.isSorting = false;
+        sortInfo.sortField = '';
+        setSort();
+      }, { deep: true },
+    );
+    watch(
+      () => sortInfo.isSorting,
       (value) => {
         if (value) {
           setStore(stores.originStore, false);
-          sortInfo.setSorting = !value;
+          sortInfo.isSorting = !value;
         }
       },
     );
