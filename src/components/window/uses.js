@@ -89,6 +89,8 @@ const useModel = () => {
   }));
 
   const setBasePosition = () => {
+    basePosition.position = 'fixed';
+
     if (props.fullscreen) {
       basePosition.width = '100%';
       basePosition.height = '100%';
@@ -97,22 +99,33 @@ const useModel = () => {
       return;
     }
 
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      || document.body.scrollTop || 0;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-      || document.body.scrollLeft || 0;
+    const convertedWidth = removeUnit(props.width, 'horizontal');
+    const convertedMinWidth = removeUnit(props.minWidth, 'horizontal');
+    if (convertedWidth < convertedMinWidth) {
+      console.warn('Since width is less than min-width, it is replaced by min-width.');
+      basePosition.width = numberToUnit(props.minWidth);
+    } else {
+      basePosition.width = numberToUnit(props.width);
+    }
 
-    basePosition.width = numberToUnit(props.width);
-    basePosition.height = numberToUnit(props.height);
-    basePosition.position = 'absolute';
-    basePosition.top = `calc(((100vh - ${basePosition.height}) / 2) + ${scrollTop}px)`;
-    basePosition.left = `calc(((100vw - ${basePosition.width}) / 2) + ${scrollLeft}px)`;
+    const convertedHeight = removeUnit(props.height, 'vertical');
+    const convertedMinHeight = removeUnit(props.minHeight, 'vertical');
+    if (convertedHeight < convertedMinHeight) {
+      console.warn('Since height is less than min-height, it is replaced by min-height.');
+      basePosition.height = numberToUnit(props.minHeight);
+    } else {
+      basePosition.height = numberToUnit(props.height);
+    }
+
+    basePosition.top = '50%';
+    basePosition.left = '50%';
+    basePosition.transform = 'translate(-50%, -50%)';
 
     if (removeUnit(props.width, 'horizontal') > window.innerWidth) {
       basePosition.left = 0;
     }
     if (removeUnit(props.height, 'vertical') > window.innerHeight) {
-      basePosition.top = `${scrollTop}px`;
+      basePosition.top = 0;
     }
   };
 
@@ -125,7 +138,6 @@ const useModel = () => {
   };
 
   const changeBodyCls = (isVisible) => {
-    const windowCnt = root?.getElementsByClassName('ev-window-wrapper')?.length;
     const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
     const allowScrollWindowCnt = root?.getElementsByClassName('scroll-allow')?.length;
     const bodyElem = document.body;
@@ -158,7 +170,6 @@ const useModel = () => {
 
         bodyElem.classList.add(...bodyClassName);
       }
-      bodyElem.classList.add('ev-window-open');
     } else {
       if (hideScrollWindowCnt === 1) {
         bodyElem.style.removeProperty('padding-right');
@@ -167,19 +178,16 @@ const useModel = () => {
       if (allowScrollWindowCnt === 1) {
         bodyElem.classList.remove('ev-window-scroll-allow', 'horizontal-hide', 'vertical-hide', 'hide');
       }
-      if (windowCnt === 1) {
-        bodyElem.classList.remove('ev-window-open');
-      }
     }
   };
   setBasePosition();
 
   watch(
     () => props.visible,
-    (newVal) => {
+    async (newVal) => {
       changeBodyCls(newVal);
       if (newVal) {
-        nextTick(() => {
+        await nextTick(() => {
           setBasePosition();
         });
       }
@@ -435,28 +443,6 @@ const useMouseEvent = (param) => {
     return tempLeft;
   };
 
-  // mousedown > wheel: 마우스 휠
-  const wheeling = (e) => {
-    const scrollTop = document.documentElement.scrollTop;
-    if (e.deltaY < 0 && scrollTop <= 0) {
-      return;
-    }
-
-    let tempTop = removeUnit(dragStyle.top) || clickedInfo.top;
-    tempTop += e.deltaY;
-
-    const windowHeight = props.hideScroll || props.isModal
-      ? document.documentElement.clientHeight : documentHeight.value;
-    tempTop = getValidTop(windowHeight, tempTop);
-
-    clickedInfo.top = tempTop;
-
-    setDragStyle({
-      top: `${tempTop}px`,
-      left: dragStyle.left,
-    });
-  };
-
   // mousedown > mousemove: 마우스 드래그
   const dragging = (e) => {
     e.preventDefault();
@@ -542,7 +528,6 @@ const useMouseEvent = (param) => {
 
     emit('mousedown-mouseup', e);
 
-    window.removeEventListener('wheel', wheeling);
     window.removeEventListener('mousemove', dragging);
     window.removeEventListener('mouseup', endDrag);
   };
@@ -594,7 +579,6 @@ const useMouseEvent = (param) => {
 
     emit('mousedown', { ...clickedInfo });
 
-    window.addEventListener('wheel', wheeling);
     window.addEventListener('mousemove', dragging);
     window.addEventListener('mouseup', endDrag);
   };
