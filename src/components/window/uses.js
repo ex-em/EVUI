@@ -5,19 +5,7 @@ import {
 // 세로 스크롤 너비
 const getVScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
 // 가로 스크롤 너비
-const getHScrollWidth = () => window.innerHeight - document.documentElement.clientHeight;
-// 전체 문서 너비
-const getDocumentWidth = () => Math.max(
-  document.body.scrollWidth, document.documentElement.scrollWidth,
-  document.body.offsetWidth, document.documentElement.offsetWidth,
-  document.body.clientWidth, document.documentElement.clientWidth,
-);
-// 전체 문서 높이
-const getDocumentHeight = () => Math.max(
-  document.body.scrollHeight, document.documentElement.scrollHeight,
-  document.body.offsetHeight, document.documentElement.offsetHeight,
-  document.body.clientHeight, document.documentElement.clientHeight,
-);
+// const getHScrollWidth = () => window.innerHeight - document.documentElement.clientHeight;
 
 const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -117,9 +105,8 @@ const useModel = () => {
       basePosition.height = numberToUnit(props.height);
     }
 
-    basePosition.top = '50%';
-    basePosition.left = '50%';
-    basePosition.transform = 'translate(-50%, -50%)';
+    basePosition.top = `calc((100% - ${basePosition.height}) / 2)`;
+    basePosition.left = `calc((100% - ${basePosition.width}) / 2)`;
 
     if (removeUnit(props.width, 'horizontal') > window.innerWidth) {
       basePosition.left = 0;
@@ -139,47 +126,23 @@ const useModel = () => {
 
   const changeBodyCls = (isVisible) => {
     const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
-    const allowScrollWindowCnt = root?.getElementsByClassName('scroll-allow')?.length;
     const bodyElem = document.body;
 
-    if (isVisible) {
+    if (isVisible) { // window open
       if (props.hideScroll) {
-        // props.hideScroll === true 시,
-        // body 우측 padding 추가 & overflow hidden class 추가
+        // hideScroll 시, body 우측 padding 추가 & overflow hidden class 추가
         if (!hideScrollWindowCnt) {
           const scrollWidth = getVScrollWidth();
           bodyElem.style.paddingRight = `${scrollWidth}px`;
         }
         bodyElem.classList.add('ev-window-scroll-lock');
-      } else if (!props.hideScroll && !props.isModal) {
-        // !props.hideScroll && !props.isModal 시,
-        // body에 position: relative 추가, 스크롤 여부에 따라 overflow-x or y hidden 처리
-        const vScrollWidth = getVScrollWidth();
-        const hScrollWidth = getHScrollWidth();
-        const bodyClassName = ['ev-window-scroll-allow'];
-        if (vScrollWidth > 0 && hScrollWidth === 0) {
-          // 세로 스크롤만 있을 경우 - 가로 스크롤 막음
-          bodyClassName.push('horizontal-hide');
-        } else if (vScrollWidth === 0 && hScrollWidth > 0) {
-          // 가로 스크롤만 있을 경우 - 세로 스크롤 막음
-          bodyClassName.push('vertical-hide');
-        } else if (vScrollWidth === 0 && hScrollWidth === 0) {
-          // 둘다 없을 경우 - 가로&세로 스크롤 막음
-          bodyClassName.push('hide');
-        }
-
-        bodyElem.classList.add(...bodyClassName);
       }
-    } else {
-      if (hideScrollWindowCnt === 1) {
-        bodyElem.style.removeProperty('padding-right');
-        bodyElem.classList.remove('ev-window-scroll-lock');
-      }
-      if (allowScrollWindowCnt === 1) {
-        bodyElem.classList.remove('ev-window-scroll-allow', 'horizontal-hide', 'vertical-hide', 'hide');
-      }
+    } else if (props.hideScroll && hideScrollWindowCnt === 1) { // window close
+      bodyElem.style.removeProperty('padding-right');
+      bodyElem.classList.remove('ev-window-scroll-lock');
     }
   };
+
   setBasePosition();
 
   watch(
@@ -219,8 +182,6 @@ const useMouseEvent = (param) => {
   const draggingMinSize = 50;
   const grabbingBorderSize = 5;
   const dragStyle = reactive({});
-  const documentWidth = ref(0);
-  const documentHeight = ref(0);
   const clickedInfo = reactive({
     state: '',
     pressedSpot: '',
@@ -425,6 +386,7 @@ const useMouseEvent = (param) => {
   // 브라우저 상하 위치 제약
   const getValidTop = (windowHeight, top) => {
     let tempTop = top;
+
     if (tempTop < 0) { // 상
       tempTop = 0;
     } else if (tempTop > windowHeight - draggingMinSize) { // 하
@@ -450,62 +412,13 @@ const useMouseEvent = (param) => {
 
     // window header를 통해 mouseMove 됐을 경우
     if (props.draggable && clickedInfo.pressedSpot === 'header') {
-      // 전체 문서 너비&높이 세팅 - mount 때와 드래그 시 수치 다르게 측정되기 때문에 드래그 초기 한번만 세팅
-      if (!documentWidth.value) {
-        documentWidth.value = getDocumentWidth();
-      }
-      if (!documentHeight.value) {
-        documentHeight.value = getDocumentHeight();
-      }
-
-      // 스크롤 있을 경우 전체 문서 기준, 없을 경우 clientWidth, Height 기준
-      const windowWidth = props.hideScroll || props.isModal
-        ? document.documentElement.clientWidth : documentWidth.value;
-      const windowHeight = props.hideScroll || props.isModal
-        ? document.documentElement.clientHeight : documentHeight.value;
-
+      const windowWidth = document.documentElement.clientWidth;
+      const windowHeight = document.documentElement.clientHeight;
       const diffTop = e.clientY - clickedInfo.clientY;
       const diffLeft = e.clientX - clickedInfo.clientX;
 
       let tempTop = clickedInfo.top + diffTop;
       let tempLeft = clickedInfo.left + diffLeft;
-
-      // 스크롤 허용 & 드래그 시 브라우저 상하단 위치에서 스크롤 이동
-      if (!props.hideScroll && !props.isModal) {
-        let [x, y] = [0, 0];
-        const moveScrollSize = 10;
-        const scrollTop = document.documentElement.scrollTop;
-
-        if (e.clientY < draggingMinSize && scrollTop > 0) { // 상
-          tempTop = draggedInfo.top || tempTop;
-          clickedInfo.clientY = e.clientY;
-          clickedInfo.top = tempTop;
-          y = -moveScrollSize;
-          tempTop -= moveScrollSize;
-        } else if (e.clientY > document.documentElement.clientHeight - draggingMinSize) { // 하
-          tempTop = draggedInfo.top || tempTop;
-          clickedInfo.clientY = e.clientY;
-          clickedInfo.top = tempTop;
-          y = moveScrollSize;
-          tempTop += moveScrollSize;
-        } else if (e.clientX < draggingMinSize) { // 좌
-          tempLeft = draggedInfo.left || tempLeft;
-          clickedInfo.clientX = e.clientX;
-          clickedInfo.left = tempLeft;
-          x = -moveScrollSize;
-          tempLeft -= moveScrollSize;
-        } else if (e.clientX > document.documentElement.clientWidth - draggingMinSize) { // 우
-          tempLeft = draggedInfo.left || tempLeft;
-          clickedInfo.clientX = e.clientX;
-          clickedInfo.left = tempLeft;
-          x = moveScrollSize;
-          tempLeft += moveScrollSize;
-        }
-
-        document.documentElement.scrollBy(x, y);
-        draggedInfo.top = tempTop;
-        draggedInfo.left = tempLeft;
-      }
 
       tempTop = getValidTop(windowHeight, tempTop);
       tempLeft = getValidLeft(windowWidth, tempLeft);
@@ -593,14 +506,7 @@ const useMouseEvent = (param) => {
   const clickExpandBtn = () => {
     isFullExpandWindow.value = !isFullExpandWindow.value;
     nextTick(() => {
-      if (!isFullExpandWindow.value) {
-        setDragStyle({
-          top: beforeExpandPosInfo.top,
-          left: beforeExpandPosInfo.left,
-          width: beforeExpandPosInfo.width,
-          height: beforeExpandPosInfo.height,
-        });
-      } else {
+      if (isFullExpandWindow.value) {
         beforeExpandPosInfo.top = windowRef.value.offsetTop;
         beforeExpandPosInfo.left = windowRef.value.offsetLeft;
         beforeExpandPosInfo.width = windowRef.value.offsetWidth;
@@ -612,7 +518,21 @@ const useMouseEvent = (param) => {
           width: document.body.clientWidth,
           height: document.body.clientHeight,
         });
+      } else {
+        setDragStyle({
+          top: beforeExpandPosInfo.top,
+          left: beforeExpandPosInfo.left,
+          width: beforeExpandPosInfo.width,
+          height: beforeExpandPosInfo.height,
+        });
       }
+
+      emit('expand', {
+        top: beforeExpandPosInfo.top,
+        left: beforeExpandPosInfo.left,
+        width: beforeExpandPosInfo.width,
+        height: beforeExpandPosInfo.height,
+      });
     });
   };
 

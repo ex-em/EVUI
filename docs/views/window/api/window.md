@@ -25,7 +25,7 @@
 
 ### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
-| --- | ---- | ----- | ---- | --- |
+| --- | --- | --- | --- | --- |
 | v-mode:visible | Boolean | false | <윈도우>의 보임 여부, 양방향 바인딩 | |
 | title | String, Number | null | <윈도우> 내부 헤더의 타이틀 |
 | window-class | String | '' | <윈도우> 클래스명 사용자 지정 | |
@@ -46,11 +46,12 @@
 ### Event
 
 | 이름 | 파라미터 | 설명 |
-| ---- | ------- | ---- |
+| --- | --- | --- | --- | --- |
 | mousedown | clickedInfo | 드래그 및 리사이즈를 위한 mousedown 이벤트 감지 |
-| mousedown-mouseup | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mouseup 이벤트 감지 |
+| mousedown-mouseup | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mouseup 이벤트 감지   |
 | mousedown-mousemove | MouseEvent 객체 | 드래그 및 리사이즈를 위한 mousemove 이벤트 감지 |
 | resize | MouseEvent 객체, positionInfo | 리사이즈를 위한 mousemove 이벤트 감지 |
+| expand | 최대화 이전 스타일 window 정보 | 최대화 버튼 클릭 시 click 이벤트 감지 |
 
 ##### clickedInfo
 ```
