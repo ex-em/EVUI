@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import { useModel, useMouseEvent } from './uses';
+import { useEscKeydownEvent, useModel, useMouseEvent } from './uses';
 
 export default {
   name: 'EvWindow',
@@ -149,6 +149,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    escClose: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'update:visible',
@@ -159,6 +163,7 @@ export default {
   ],
   setup() {
     const {
+      inputRef,
       windowRef,
       headerRef,
       isFullExpandWindow,
@@ -182,7 +187,10 @@ export default {
       removeUnit,
     });
 
+    useEscKeydownEvent({ closeWin, windowRef });
+
     return {
+      inputRef,
       windowRef,
       headerRef,
       baseStyle,
