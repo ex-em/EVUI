@@ -686,6 +686,7 @@ const activeWindows = (() => {
   return {
     add(activeWindow) {
       if (activeWindow == null) return;
+
       activeWindow.sequence = sequence++;
       windows.push(activeWindow);
 
@@ -716,11 +717,10 @@ const activeWindows = (() => {
 
 const getZIndexFromElement = (element) => {
   const zIndex = window.getComputedStyle(element).getPropertyValue('z-index').trim();
-  const DEFAULT_WINDOW_Z_INDEX = 700;
 
-  if (isNaN(zIndex)) return DEFAULT_WINDOW_Z_INDEX;
+  if (!zIndex || isNaN(zIndex)) return 700; // window 초기 z-index 값
 
-  return isNaN(parseInt(zIndex)) ? DEFAULT_WINDOW_Z_INDEX : parseInt(zIndex);
+  return parseInt(zIndex);
 };
 
 const useEscKeydownEvent = ({ closeWin, windowRef }) => {
@@ -764,7 +764,7 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     const topActiveWindow = activeWindowSorted[0];
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
-    // esc 눌러도 외부 Window는 닫히지 않고, 내부 Window 수동으로 닫힌 후에 닫히도록 하기 위해
+    // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
     if (topActiveWindow.escClose === false) return;
 
     topActiveWindow.closeWin();
