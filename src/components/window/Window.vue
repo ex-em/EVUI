@@ -163,7 +163,6 @@ export default {
   ],
   setup() {
     const {
-      inputRef,
       windowRef,
       headerRef,
       isFullExpandWindow,
@@ -190,7 +189,6 @@ export default {
     useEscKeydownEvent({ closeWin, windowRef });
 
     return {
-      inputRef,
       windowRef,
       headerRef,
       baseStyle,

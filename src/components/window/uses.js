@@ -679,23 +679,28 @@ const useMouseEvent = (param) => {
   };
 };
 
-const openWindows = (() => {
+const activeWindows = (() => {
   let windows = [];
+  let sequence = 0;
 
   return {
-    add(openWindow) {
-      if (openWindow == null) return;
-      windows.push(openWindow);
+    add(activeWindow) {
+      if (activeWindow == null) return;
+      activeWindow.sequence = sequence++;
+      windows.push(activeWindow);
+
+      // eslint-disable-next-line consistent-return
+      return activeWindow.sequence;
     },
-    remove(closeWindow) {
-      if (closeWindow == null) return;
-      windows = windows.filter(openWindow => openWindow.sequence !== closeWindow.sequence);
+    remove(inactiveWindow) {
+      if (inactiveWindow == null) return;
+      windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
     },
     get windows() {
       return windows.slice();
     },
-    getWindowBySequence(sequence) {
-      return windows.find(openWindow => openWindow.sequence === sequence);
+    getWindowBySequence(targetSequence) {
+      return windows.find(activeWindow => activeWindow.sequence === targetSequence);
     },
     isEmpty() {
       return windows.length <= 0;
@@ -709,17 +714,13 @@ const openWindows = (() => {
   };
 })();
 
-const getNextSequence = (() => {
-  let sequence = 0;
-  return () => sequence++;
-})();
-
 const getZIndexFromElement = (element) => {
-  const zIndex = window.getComputedStyle(element).getPropertyValue('z-index');
+  const zIndex = window.getComputedStyle(element).getPropertyValue('z-index').trim();
+  const DEFAULT_WINDOW_Z_INDEX = 700;
 
-  if (Number.isNaN(zIndex)) return 700; // window 초기 z-index 값
+  if (isNaN(zIndex)) return DEFAULT_WINDOW_Z_INDEX;
 
-  return parseInt(zIndex);
+  return isNaN(parseInt(zIndex)) ? DEFAULT_WINDOW_Z_INDEX : parseInt(zIndex);
 };
 
 const useEscKeydownEvent = ({ closeWin, windowRef }) => {
@@ -727,10 +728,8 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
 
   let sequence = null;
 
-  const addOpenWindow = () => {
-    sequence = getNextSequence();
-
-    openWindows.add({
+  const addActiveWindow = () => {
+     sequence = activeWindows.add({
       sequence,
       closeWin,
       elem: windowRef.value,
@@ -738,12 +737,12 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     });
   };
 
-  const removeCloseWindow = (closeWindow) => {
-    openWindows.remove(closeWindow);
+  const removeInactiveWindow = (inactiveWindow) => {
+    activeWindows.remove(inactiveWindow);
   };
 
   const keydownEsc = (event) => {
-    if (openWindows.isEmpty()) return;
+    if (activeWindows.isEmpty()) return;
 
     const { code } = event;
     if (code !== 'Escape') return;
@@ -757,36 +756,36 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
       return 1;
     };
 
-    const openWindowSorted = Array.prototype.map.call(openWindows.windows, openWindow => ({
-      ...openWindow,
-      zIndex: getZIndexFromElement(openWindow.elem),
+    const activeWindowSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
+      ...activeWindow,
+      zIndex: getZIndexFromElement(activeWindow.elem),
     })).sort(compare);
 
-    const topOpenWindow = openWindowSorted[0];
+    const topActiveWindow = activeWindowSorted[0];
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 내부 Window 수동으로 닫힌 후에 닫히도록 하기 위해
-    if (topOpenWindow.escClose === false) return;
+    if (topActiveWindow.escClose === false) return;
 
-    topOpenWindow.closeWin();
+    topActiveWindow.closeWin();
   };
 
   const addKeydownEvtHandler = () => {
-    if (openWindows.isFirstWindowOpen()) {
+    if (activeWindows.isFirstWindowOpen()) {
       document.addEventListener('keydown', keydownEsc);
     }
   };
 
   const removeKeydownEvtHandler = () => {
-    if (openWindows.isLastWindowClose()) {
+    if (activeWindows.isLastWindowClose()) {
       document.removeEventListener('keydown', keydownEsc);
     }
   };
 
   onMounted(() => {
     // visible 초기값이 true
-    if (props.visible === true) {
-      addOpenWindow();
+    if (props.visible) {
+      addActiveWindow();
       addKeydownEvtHandler();
     }
   });
@@ -795,12 +794,12 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     () => props.visible,
     (newVal) => {
       nextTick(() => {
-        if (newVal === true) {
-          addOpenWindow();
+        if (newVal) {
+          addActiveWindow();
           addKeydownEvtHandler();
         } else {
-          const closeWindow = openWindows.getWindowBySequence(sequence);
-          removeCloseWindow(closeWindow);
+          const inactiveWindow = activeWindows.getWindowBySequence(sequence);
+          removeInactiveWindow(inactiveWindow);
           removeKeydownEvtHandler();
         }
       });
