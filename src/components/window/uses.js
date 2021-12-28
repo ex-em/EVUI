@@ -685,7 +685,7 @@ const activeWindows = (() => {
 
   return {
     add(activeWindow) {
-      if (activeWindow == null) return;
+      if (activeWindow === null || activeWindow === undefined) return;
 
       activeWindow.sequence = sequence++;
       windows.push(activeWindow);
@@ -694,7 +694,7 @@ const activeWindows = (() => {
       return activeWindow.sequence;
     },
     remove(inactiveWindow) {
-      if (inactiveWindow == null) return;
+      if (inactiveWindow === null || inactiveWindow === undefined) return;
       windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
     },
     get windows() {
