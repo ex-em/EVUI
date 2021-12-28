@@ -1,5 +1,5 @@
 import {
-  getCurrentInstance, ref, computed, reactive, watch, nextTick,
+  getCurrentInstance, ref, computed, reactive, watch, nextTick, onMounted,
 } from 'vue';
 
 // 세로 스크롤 너비
@@ -583,7 +583,136 @@ const useMouseEvent = (param) => {
   };
 };
 
+const activeWindows = (() => {
+  let windows = [];
+  let sequence = 0;
+
+  return {
+    add(activeWindow) {
+      if (activeWindow === null || activeWindow === undefined) return;
+
+      activeWindow.sequence = sequence++;
+      windows.push(activeWindow);
+
+      // eslint-disable-next-line consistent-return
+      return activeWindow.sequence;
+    },
+    remove(inactiveWindow) {
+      if (inactiveWindow === null || inactiveWindow === undefined) return;
+      windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
+    },
+    get windows() {
+      return windows.slice();
+    },
+    getWindowBySequence(targetSequence) {
+      return windows.find(activeWindow => activeWindow.sequence === targetSequence);
+    },
+    isEmpty() {
+      return windows.length <= 0;
+    },
+    isFirstWindowOpen() {
+      return windows.length === 1;
+    },
+    isLastWindowClose() {
+      return windows.length === 0;
+    },
+  };
+})();
+
+const getZIndexFromElement = (element) => {
+  const zIndex = window.getComputedStyle(element).getPropertyValue('z-index').trim();
+
+  if (!zIndex || isNaN(zIndex)) return 700; // window 초기 z-index 값
+
+  return parseInt(zIndex);
+};
+
+const useEscKeydownEvent = ({ closeWin, windowRef }) => {
+  const { props } = getCurrentInstance();
+
+  let sequence = null;
+
+  const addActiveWindow = () => {
+     sequence = activeWindows.add({
+      sequence,
+      closeWin,
+      elem: windowRef.value,
+      escClose: props.escClose,
+    });
+  };
+
+  const removeInactiveWindow = (inactiveWindow) => {
+    activeWindows.remove(inactiveWindow);
+  };
+
+  const keydownEsc = (event) => {
+    if (activeWindows.isEmpty()) return;
+
+    const { code } = event;
+    if (code !== 'Escape') return;
+
+    // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 앞에 위치
+    const compare = (window1, window2) => {
+      if (window1.zIndex > window2.zIndex) return -1;
+      if (window1.zIndex < window2.zIndex) return 1;
+
+      if (window1.sequence > window2.sequence) return -1;
+      return 1;
+    };
+
+    const activeWindowSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
+      ...activeWindow,
+      zIndex: getZIndexFromElement(activeWindow.elem),
+    })).sort(compare);
+
+    const topActiveWindow = activeWindowSorted[0];
+
+    // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
+    // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
+    if (topActiveWindow.escClose === false) return;
+
+    topActiveWindow.closeWin();
+  };
+
+  const addKeydownEvtHandler = () => {
+    if (activeWindows.isFirstWindowOpen()) {
+      document.addEventListener('keydown', keydownEsc);
+    }
+  };
+
+  const removeKeydownEvtHandler = () => {
+    if (activeWindows.isLastWindowClose()) {
+      document.removeEventListener('keydown', keydownEsc);
+    }
+  };
+
+  onMounted(() => {
+    // visible 초기값이 true
+    if (props.visible) {
+      addActiveWindow();
+      addKeydownEvtHandler();
+    }
+  });
+
+  watch(
+    () => props.visible,
+    (newVal) => {
+      nextTick(() => {
+        if (newVal) {
+          addActiveWindow();
+          addKeydownEvtHandler();
+        } else {
+          const inactiveWindow = activeWindows.getWindowBySequence(sequence);
+          removeInactiveWindow(inactiveWindow);
+          removeKeydownEvtHandler();
+        }
+      });
+    },
+  );
+};
+
 export {
   useModel,
   useMouseEvent,
+  useEscKeydownEvent,
 };

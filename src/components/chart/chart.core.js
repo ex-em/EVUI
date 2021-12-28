@@ -523,7 +523,7 @@ class EvChart {
       this.createSeriesSet(series, options.type, options.horizontal);
 
       if (this.legendDOM) {
-        this.resetLegend();
+        this.updateLegend();
       }
     }
 
