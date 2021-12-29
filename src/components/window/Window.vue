@@ -160,6 +160,7 @@ export default {
     'mousedown-mouseup',
     'mousedown-mousemove',
     'resize',
+    'expand',
   ],
   setup() {
     const {

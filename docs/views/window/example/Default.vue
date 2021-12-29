@@ -3,9 +3,9 @@
     <p class="case-title">Common</p>
     <ev-window
       v-model:visible="isVisible1"
-      :title="'COMMON TITLE'"
+      title="WINDOW TITLE"
     >
-      <div>COMMON CONTENTS</div>
+      <div>visible prop을 통해 윈도우를 여닫을 수 있습니다.</div>
     </ev-window>
     <div class="description">
       <button
@@ -20,51 +20,50 @@
     <p class="case-title">Nested</p>
     <ev-window
       v-model:visible="isVisible2"
-      :title="'CUSTOM TITLE'"
-      :icon-class="'ev-icon-binder'"
+      title="WINDOW TITLE"
+      icon-class="ev-icon-binder"
       fullscreen
     >
-      <div>CUSTOM CONTENTS</div>
-      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-      <template #footer>
-        <div>FOOTER</div>
+      <template #header>
+        <p class="nested-btn">
+          #header slot을 활용하여 상단 타이틀 영역을 변경할 수 있습니다.
+          <span class="header-right-icon">
+            <i class="ev-icon-moon" />
+            <i class="ev-icon-shard" />
+          </span>
+        </p>
       </template>
+      <div>
+        window를 중첩하여 사용할 수 있습니다.<br/>
+        하단 버튼을 통해 중첩 window를 열어보세요!
+      </div>
+      <span class="height-box"/>
       <button
         class="nested-btn"
         @click="clickButton3"
       >
         click to nested window!
       </button>
-      <ev-window
-        v-model:visible="isVisible3"
-        :title="'NESTED TITLE'"
-        :icon-class="'ev-icon-info2'"
-        :width="'40%'"
-        :height="'60%'"
-      >
-        <template #header>
-          <div>
-            NESTED TITLE >
-          </div>
-          <div class="header-right-title">
-            CUSTOM TITLE
-          </div>
-          <span class="header-right-icon">
-            <i class="ev-icon-calendar" />
-            <i class="ev-icon-shard" />
-          </span>
-        </template>
-        <div>
-          NESTED CONTENTS
-        </div>
-        <template #footer>
-          <div>NESTED FOOTER</div>
-        </template>
-      </ev-window>
-      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-      <div>CUSTOM CONTENTS</div>
+      <span class="height-box" />
+      <div>default slot의 길이가 길어질 경우 window 중앙에 스크롤이 생깁니다.</div>
+      <span class="height-box" />
+      <template #footer>
+        <div>#footer slot을 활용하여 하단 콘텐츠를 넣을 수 있습니다.</div>
+      </template>
+    </ev-window>
+    <ev-window
+      v-model:visible="isVisible3"
+      title="[NESTED] WINDOW TITLE"
+      icon-class="ev-icon-pig"
+      width="40%"
+      height="60%"
+    >
+      <div>
+        NESTED CONTENTS
+      </div>
+      <template #footer>
+        <div>NESTED FOOTER</div>
+      </template>
     </ev-window>
     <div class="description">
       <button
@@ -79,10 +78,10 @@
     <p class="case-title">Hide Dim Layer (Modeless)</p>
     <ev-window
       v-model:visible="isVisible4"
-      :title="'COMMON TITLE'"
+      title="WINDOW TITLE"
       :is-modal="false"
     >
-      <div>COMMON CONTENTS</div>
+      <div>is-modal prop을 활용하여 window 아래 modal 레이어를 지울 수 있습니다.</div>
     </ev-window>
     <div class="description">
       <button
@@ -97,10 +96,10 @@
     <p class="case-title">Block Hide Scroll</p>
     <ev-window
       v-model:visible="isVisible5"
-      :title="'COMMON TITLE'"
+      title="WINDOW TITLE"
       :hide-scroll="false"
     >
-      <div>HIDE BODY SCROLL WITH CONTENTS</div>
+      <div>hide-scroll prop을 활용하여 body의 스크롤을 보이게 할 수 있습니다.</div>
     </ev-window>
     <div class="description">
       <button
@@ -112,65 +111,65 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Draggable</p>
+    <p class="case-title">Draggable / Resizable / Maximizable</p>
     <ev-window
       v-model:visible="isVisible6"
-      :title="'DRAGGABLE WINDOW'"
+      title="첫번째 WINDOW"
       draggable
-      @mousedown="mousedown"
-      @mousedown-mouseup="mouseup"
-      @mousedown-mousemove="mousemove"
-    >
-      <div>COMMON CONTENTS</div>
-    </ev-window>
-    <div class="description">
-      <button
-        class="btn"
-        @click="clickButton6"
-      >
-        click to open window!
-      </button>
-    </div>
-  </div>
-  <div class="case">
-    <p class="case-title">Resizable</p>
-    <ev-window
-      v-model:visible="isVisible7"
-      :title="'RESIZABLE WINDOW'"
-      width="80vw"
-      height="30vh"
-      min-width="50vw"
-      min-height="30vh"
       resizable
+      maximizable
       @mousedown="mousedown"
       @mousedown-mouseup="mouseup"
       @mousedown-mousemove="mousemove"
       @resize="resize"
     >
-      <div>COMMON CONTENTS</div>
-    </ev-window>
-    <div class="description">
+      <div>
+        Draggable & Resizable & Maximizable 기능을 사용할 수 있습니다.
+      </div>
+      <span class="height-box" />
       <button
-        class="btn"
+        class="nested-btn"
         @click="clickButton7"
       >
-        click to open window!
+        click to open nested window!
       </button>
-    </div>
-  </div>
-  <div class="case">
-    <p class="case-title">Maximizable</p>
+    </ev-window>
     <ev-window
-      v-model:visible="isVisible8"
-      :title="'MAXIMIZABLE WINDOW'"
+      v-model:visible="isVisible7"
+      title="[NESTED] 두번째 WINDOW"
+      width="80vw"
+      height="30vh"
+      min-width="50vw"
+      min-height="30vh"
+      draggable
+      resizable
       maximizable
     >
-      <div>COMMON CONTENTS</div>
+      <button
+        class="nested-btn"
+        @click="clickButton8"
+      >
+        click to open nested window!
+      </button>
     </ev-window>
+    <ev-window
+      v-model:visible="isVisible8"
+      title="[NESTED] 세번째 WINDOW"
+      :is-modal="false"
+      :hide-scroll="false"
+      width="30vw"
+      height="40vh"
+      draggable
+      resizable
+      maximizable
+    >
+      <div>WINDOW CONTENTS</div>
+    </ev-window>
+
     <div class="description">
       <button
         class="btn"
-        @click="clickButton8"
+        @click="clickButton6"
       >
         click to open window!
       </button>
@@ -223,6 +222,12 @@ export default {
       isVisible8.value = true;
     };
 
+    // Test
+    const isVisible9 = ref(false);
+    const clickButton9 = () => {
+      isVisible9.value = true;
+    };
+
     const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
     const mouseup = event => console.log('mousedown-mouseup', event);
     const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
@@ -245,6 +250,8 @@ export default {
       clickButton7,
       isVisible8,
       clickButton8,
+      isVisible9,
+      clickButton9,
       mousedown,
       mouseup,
       mousemove,
@@ -271,7 +278,11 @@ export default {
     background-color: $color-yellow;
   }
 }
-
+.height-box {
+  display: block;
+  height: 300px;
+  background-color: #F5F5F5;
+}
 .header-right-title {
   margin-left: 10px;
 }
