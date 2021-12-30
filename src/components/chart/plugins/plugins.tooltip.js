@@ -219,11 +219,11 @@ const modules = {
         let prev = a.data.o;
         let next = b.data.o;
 
-        if (!prev) {
+        if (prev === null || prev === undefined) {
           prev = isHorizontal ? a.data.x : a.data.y;
         }
 
-        if (!next) {
+        if (next === null || next === undefined) {
           next = isHorizontal ? b.data.x : b.data.y;
         }
         return next - prev;
