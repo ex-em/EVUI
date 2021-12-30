@@ -175,7 +175,7 @@ const modules = {
    * @returns {undefined}
    */
   dragStart(evt, type) {
-    const [offsetX, offsetY] = this.getMousePosition(evt);
+    let [offsetX, offsetY] = this.getMousePosition(evt);
     const chartRect = this.chartRect;
     const labelOffset = this.labelOffset;
     const range = {
@@ -185,11 +185,20 @@ const modules = {
       y2: chartRect.y2 - labelOffset.bottom,
     };
 
-    // check graph range
-    if (offsetX < range.x1 || offsetX > range.x2
-        || offsetY < range.y1 || offsetY > range.y2
-    ) {
-      return;
+    if (offsetX < range.x1) {
+      offsetX = range.x1;
+    }
+
+    if (offsetX > range.x2) {
+      offsetX = range.x2;
+    }
+
+    if (offsetY < range.y1) {
+      offsetY = range.y1;
+    }
+
+    if (offsetY > range.y2) {
+      offsetY = range.y2;
     }
 
     this.dragInfo = {
