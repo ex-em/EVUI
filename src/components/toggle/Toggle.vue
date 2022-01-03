@@ -4,6 +4,7 @@
     :class="{
       checked: modelValue,
       disabled,
+      readonly,
     }"
     :style="{
       width: `${width}px`,
@@ -21,6 +22,10 @@ export default {
   name: 'EvToggle',
   props: {
     modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    readonly: {
       type: Boolean,
       default: false,
     },
@@ -51,7 +56,7 @@ export default {
       },
     });
     const clickMv = () => {
-      if (!props.disabled) {
+      if (!props.disabled && !props.readonly) {
         mv.value = !mv.value;
       }
     };
@@ -95,12 +100,14 @@ export default {
     left: calc(100% - 17px);
   }
 
+  &.readonly {
+    opacity: .6;
+    cursor: default;
+  }
+
   &.disabled {
     opacity: .6;
-
-    &:hover {
-      cursor: not-allowed;
-    }
+    cursor: not-allowed;
   }
 }
 

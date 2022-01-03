@@ -12,12 +12,13 @@
 
 >### Props
 
- | 이름 | 타입 | 디폴트 | 설명 | 종류 |
-  |------|--------|------|------|------|
-  | v-model | Boolean | false | <토글>에서 선택된 값 | |
-  | disabled | Boolean | false | <토글> 사용 여부 | |
-  | width | Number | 40 | <토글> width size | |
-  | activeColor | String | '#409EFF' | <토글> 활성화 시 색상 | |
+ | 이름            | 타입 | 디폴트 | 설명 | 종류 |
+ |---------------|------|--------|------|------|
+  | v-model       | Boolean | false | <토글>에서 선택된 값 | |
+  | readonly      | Boolean | false | <토글> 읽기전용 여부 | |
+  | disabled      | Boolean | false | <토글> 사용 여부 | |
+  | width         | Number | 40 | <토글> width size | |
+  | activeColor   | String | '#409EFF' | <토글> 활성화 시 색상 | |
   | inactiveColor | String | '#DCDFE6' | <토글> 비활성화 시 색상 | |
 
 >### Event

@@ -9,6 +9,13 @@
     </div>
   </div>
   <div class="case">
+    <p class="case-title">Readonly</p>
+    <ev-toggle
+      v-model="checkVal1"
+      readonly
+    />
+  </div>
+  <div class="case">
     <p class="case-title">Disabled</p>
     <ev-toggle
       v-model="checkVal1"
