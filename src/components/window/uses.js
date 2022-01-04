@@ -1,5 +1,14 @@
 import {
-  getCurrentInstance, ref, computed, reactive, watch, nextTick, onMounted,
+  getCurrentInstance,
+  ref,
+  computed,
+  reactive,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+  onBeforeUpdate,
+  onUpdated,
 } from 'vue';
 
 // 세로 스크롤 너비
@@ -631,9 +640,10 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   const { props } = getCurrentInstance();
 
   let sequence = null;
+  let isActiveStatus = false;
 
   const addActiveWindow = () => {
-     sequence = activeWindows.add({
+    sequence = activeWindows.add({
       sequence,
       closeWin,
       elem: windowRef.value,
@@ -651,13 +661,13 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     const { code } = event;
     if (code !== 'Escape') return;
 
-    // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 앞에 위치
+    // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 뒤에 위치
     const compare = (window1, window2) => {
-      if (window1.zIndex > window2.zIndex) return -1;
-      if (window1.zIndex < window2.zIndex) return 1;
+      if (window1.zIndex > window2.zIndex) return 1;
+      if (window1.zIndex < window2.zIndex) return -1;
 
-      if (window1.sequence > window2.sequence) return -1;
-      return 1;
+      if (window1.sequence > window2.sequence) return 1;
+      return -1;
     };
 
     const activeWindowSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
@@ -665,7 +675,7 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
       zIndex: getZIndexFromElement(activeWindow.elem),
     })).sort(compare);
 
-    const topActiveWindow = activeWindowSorted[0];
+    const topActiveWindow = activeWindowSorted[activeWindowSorted.length - 1];
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
@@ -686,27 +696,53 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     }
   };
 
+  const setWindowActive = () => {
+    isActiveStatus = true;
+    addActiveWindow();
+    addKeydownEvtHandler();
+  };
+
+  const setWindowInactive = () => {
+    const inactiveWindow = activeWindows.getWindowBySequence(sequence);
+    removeInactiveWindow(inactiveWindow);
+    removeKeydownEvtHandler();
+    isActiveStatus = false;
+  };
+
   onMounted(() => {
     // visible 초기값이 true
-    if (props.visible) {
-      addActiveWindow();
-      addKeydownEvtHandler();
+    if (props.visible && isActiveStatus === false) {
+      setWindowActive();
+    }
+  });
+
+  onUpdated(() => {
+    // visible 값이 false -> true로 변경되었을 때
+    if (props.visible && isActiveStatus === false) {
+      setWindowActive();
+    }
+  });
+
+  onBeforeUpdate(() => {
+    // visible 값이 true -> false로 변경되었을 때
+    if (props.visible === false && isActiveStatus) {
+      setWindowInactive();
+    }
+  });
+
+  onBeforeUnmount(() => {
+    if (props.visible && isActiveStatus) {
+      setWindowInactive();
     }
   });
 
   watch(
-    () => props.visible,
-    (newVal) => {
-      nextTick(() => {
-        if (newVal) {
-          addActiveWindow();
-          addKeydownEvtHandler();
-        } else {
-          const inactiveWindow = activeWindows.getWindowBySequence(sequence);
-          removeInactiveWindow(inactiveWindow);
-          removeKeydownEvtHandler();
-        }
-      });
+    () => props.escClose,
+    (escClose) => {
+      if (isActiveStatus) {
+        const currentWindow = activeWindows.getWindowBySequence(sequence);
+        if (currentWindow) currentWindow.escClose = escClose;
+      }
     },
   );
 };
