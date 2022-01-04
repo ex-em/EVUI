@@ -618,10 +618,7 @@ const activeWindows = (() => {
       return windows.length <= 0;
     },
     isFirstWindowOpen() {
-      return windows.length === 1;
-    },
-    isLastWindowClose() {
-      return windows.length === 0;
+      return sequence === 1;
     },
   };
 })();
@@ -682,28 +679,17 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     topActiveWindow.closeWin();
   };
 
-  const addKeydownEvtHandler = () => {
+  const setWindowActive = () => {
+    isActiveStatus = true;
+    addActiveWindow();
     if (activeWindows.isFirstWindowOpen()) {
       document.addEventListener('keydown', keydownEsc);
     }
   };
 
-  const removeKeydownEvtHandler = () => {
-    if (activeWindows.isLastWindowClose()) {
-      document.removeEventListener('keydown', keydownEsc);
-    }
-  };
-
-  const setWindowActive = () => {
-    isActiveStatus = true;
-    addActiveWindow();
-    addKeydownEvtHandler();
-  };
-
   const setWindowInactive = () => {
     const inactiveWindow = activeWindows.getWindowBySequence(sequence);
     removeInactiveWindow(inactiveWindow);
-    removeKeydownEvtHandler();
     isActiveStatus = false;
   };
 
