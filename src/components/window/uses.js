@@ -7,8 +7,6 @@ import {
   nextTick,
   onMounted,
   onBeforeUnmount,
-  onBeforeUpdate,
-  onUpdated,
 } from 'vue';
 
 // 세로 스크롤 너비
@@ -679,7 +677,7 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
-    if (topActiveWindow.escClose === false) return;
+    if (!topActiveWindow.escClose) return;
 
     topActiveWindow.closeWin();
   };
@@ -711,22 +709,8 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
 
   onMounted(() => {
     // visible 초기값이 true
-    if (props.visible && isActiveStatus === false) {
+    if (props.visible && !isActiveStatus) {
       setWindowActive();
-    }
-  });
-
-  onUpdated(() => {
-    // visible 값이 false -> true로 변경되었을 때
-    if (props.visible && isActiveStatus === false) {
-      setWindowActive();
-    }
-  });
-
-  onBeforeUpdate(() => {
-    // visible 값이 true -> false로 변경되었을 때
-    if (props.visible === false && isActiveStatus) {
-      setWindowInactive();
     }
   });
 
@@ -734,6 +718,20 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     if (props.visible && isActiveStatus) {
       setWindowInactive();
     }
+  });
+
+  watch(
+    () => props.visible,
+    (visible) => {
+      nextTick(() => {
+        if (visible && !isActiveStatus) {
+          // visible 값이 false -> true로 변경되었을 때
+          setWindowActive();
+        } else if (!visible && isActiveStatus) {
+          // visible 값이 true -> false로 변경되었을 때
+          setWindowInactive();
+        }
+      });
   });
 
   watch(
