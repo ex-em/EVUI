@@ -246,6 +246,7 @@ export default {
       treeStore: [],
       viewStore: [],
       filterStore: [],
+      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       treeRows: props.rows,
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
@@ -330,20 +331,22 @@ export default {
 
     const {
       onSearch,
-    } = filterEvent({ stores, getConvertValue, calculatedColumn, updateVScroll });
+    } = filterEvent({ checkInfo, stores, getConvertValue, calculatedColumn, updateVScroll });
 
     watch(
       () => props.checked,
       (value) => {
-        const store = stores.treeStore;
+        let store = stores.treeStore;
+        if (stores.searchStore.length > 0) {
+          store = stores.searchStore;
+        }
+        const isCheck = store.every(n => n.checked === true);
         checkInfo.isHeaderChecked = false;
         checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {
           store[ix].checked = value.includes(store[ix]);
         }
-        if (value.length && store.length === value.length) {
-          checkInfo.isHeaderChecked = true;
-        }
+        checkInfo.isHeaderChecked = isCheck;
       },
     );
     watch(
