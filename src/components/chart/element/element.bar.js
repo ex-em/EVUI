@@ -151,7 +151,6 @@ class Bar {
       this.drawBar({
         ctx,
         positions: { x, y, w, h },
-        isTop: item.isTop,
       });
 
       if (showValue.use) {
@@ -213,7 +212,6 @@ class Bar {
     this.drawBar({
       ctx,
       positions: { x, y, w, h: this.isHorizontal ? -h : h },
-      isTop: item.data.isTop,
     });
 
     if (showValue.use) {
@@ -411,7 +409,7 @@ class Bar {
     ctx.restore();
   }
 
-  drawBar({ ctx, positions, isTop }) {
+  drawBar({ ctx, positions }) {
     const isHorizontal = this.isHorizontal;
     const isStackBar = 'stackIndex' in this;
     const isBorderRadius = this.borderRadius && this.borderRadius > 0;
@@ -423,7 +421,7 @@ class Bar {
       return;
     }
 
-    if ((!isStackBar && isBorderRadius) || (isStackBar && isBorderRadius && isTop)) {
+    if (isBorderRadius && !isStackBar) {
       try {
         this.drawRoundedRect(ctx, positions);
       } catch (e) {
