@@ -175,6 +175,111 @@
       </button>
     </div>
   </div>
+
+  <div class="case">
+    <p class="case-title">Esc Key Close</p>
+    <!--Window 1개-->
+    <ev-window
+      v-model:visible="isVisible10"
+      title="Esc Close Available Window"
+      :esc-close="true"
+    >
+      <div>esc-close prop을 통해 윈도우를 여닫을 수 있습니다.</div>
+    </ev-window>
+
+    <!--Window 여러개-->
+    <ev-window
+      v-model:visible="isVisible11[0]"
+      title="첫번째 Window"
+      :esc-close="true"
+      maximizable
+      fullscreen
+    >
+      <div>
+        Nested + Maximizable Window
+        <br />
+        <button class="nested-btn">
+          Esc key로 닫을 수 있습니다.
+        </button>
+      </div>
+    </ev-window>
+    <ev-window
+      v-model:visible="isVisible11[1]"
+      title="두번째 Window"
+      :esc-close="true"
+      width="85%"
+      height="85%"
+      resizable
+    >
+      <div>
+        Resizable Window
+        <br />
+        <button class="nested-btn">
+          Esc key로 닫을 수 있습니다.
+        </button>
+      </div>
+    </ev-window>
+    <ev-window
+      v-model:visible="isVisible11[2]"
+      title="세번째 Window"
+      :esc-close="true"
+      :is-modal="false"
+      width="70%"
+      height="70%"
+      draggable
+    >
+      <div>
+        Draggable Window
+        <br />
+        <button class="nested-btn">
+          Esc key로 닫을 수 있습니다.
+        </button>
+      </div>
+    </ev-window>
+    <ev-window
+      v-model:visible="isVisible11[3]"
+      title="네번째 Window"
+      :esc-close="isEscClose"
+      width="60%"
+      height="60%"
+      draggable
+    >
+      <div>
+        Draggable Window
+        <div class="esc-close-toggle-box">
+          <label>
+            esc-close prop 토글
+            <ev-icon icon="ev-icon-allow2-right" />
+          </label>
+          <ev-toggle
+            v-model="isEscClose"
+            @change="changeEscClose"
+          />
+        </div>
+        <p class="nested-btn">
+          가장 상단에 위치한 Window의 esc-close prop가 false인 경우,
+          <strong>수동으로 닫은 후</strong>에 아래에 있는 Window를 Esc 키로 닫을 수 있습니다.
+        </p>
+      </div>
+    </ev-window>
+
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton10"
+      >
+        click to open window!
+      </button>
+      <br />
+      <br />
+      <button
+        class="btn"
+        @click="clickButton11"
+      >
+        click to open different types of windows!
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -228,6 +333,23 @@ export default {
       isVisible9.value = true;
     };
 
+    const isVisible10 = ref(false);
+    const clickButton10 = () => {
+      isVisible10.value = true;
+    };
+
+    const isVisible11 = ref([false, false, false, false]);
+    const clickButton11 = () => {
+      for (let i = 0; i < isVisible11.value.length; i++) {
+        isVisible11.value[i] = true;
+      }
+    };
+
+    const isEscClose = ref(false);
+    const changeEscClose = (newValue) => {
+      isEscClose.value = newValue;
+    };
+
     const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
     const mouseup = event => console.log('mousedown-mouseup', event);
     const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
@@ -252,6 +374,12 @@ export default {
       clickButton8,
       isVisible9,
       clickButton9,
+      isVisible10,
+      clickButton10,
+      isVisible11,
+      clickButton11,
+      isEscClose,
+      changeEscClose,
       mousedown,
       mouseup,
       mousemove,
@@ -288,5 +416,12 @@ export default {
 }
 .header-right-icon {
   margin-left: 20px;
+}
+.esc-close-toggle-box {
+  display: flex;
+
+  & > * {
+    margin-right: 5px;
+  }
 }
 </style>
