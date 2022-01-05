@@ -106,14 +106,8 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       });
 
       const redrawChart = () => {
-        if (isInit) {
-          evChart.update({
-            updateSeries: false,
-            updateSelTip: {
-              update: false,
-              keepDomain: false,
-            },
-          });
+        if (evChart && 'resize' in evChart && isInit) {
+          evChart.resize();
         }
       };
 

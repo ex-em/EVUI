@@ -90,7 +90,6 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
-    this.initScale();
     this.drawChart();
 
     if (tooltip.use) {
@@ -131,6 +130,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawChart(hitInfo) {
+    this.initScale();
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
@@ -644,8 +644,8 @@ class EvChart {
     this.bufferCtx.restore();
     this.bufferCtx.save();
 
-    this.getChartDOMRect();
     this.initScale();
+    this.chartRect = this.getChartRect();
     this.drawChart();
   }
 
@@ -658,7 +658,6 @@ class EvChart {
   render(hitInfo) {
     this.clear();
     this.chartRect = this.getChartRect();
-    this.initScale();
     this.drawChart(hitInfo);
   }
 
