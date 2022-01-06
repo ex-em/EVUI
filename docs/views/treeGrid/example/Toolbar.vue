@@ -159,6 +159,26 @@ export default {
           date: '2016-05-04',
           name: '11',
         }],
+      }, {
+        id: 'Exem 12',
+        date: '2016-05-01',
+        name: '12',
+        expand: true,
+        children: [{
+          id: 'Exem 13',
+          date: '2016-05-02',
+          name: '13',
+          expand: false,
+          children: [{
+            id: 'Exem 14',
+            date: '2016-05-02',
+            name: '14',
+          }],
+        }, {
+          id: 'Exem 15',
+          date: '2016-05-03',
+          name: '15',
+        }],
       }];
     };
     const columns = ref([

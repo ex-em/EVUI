@@ -418,11 +418,14 @@ export const checkEvent = (params) => {
    * @param {array} rowData - row 데이터
    */
   const onCheck = (event, rowData) => {
+    let store = stores.treeStore;
+    if (stores.searchStore.length > 0) {
+      store = stores.searchStore;
+    }
     const isSingleMode = () => checkInfo.useCheckbox.mode === 'single';
-    const checkedHeader = (store) => {
-      if (checkInfo.checkedRows.length === store.length) {
-        checkInfo.isHeaderChecked = true;
-      }
+    const checkedHeader = (checkStore) => {
+      const isCheck = checkStore.every(n => n.checked === true);
+      checkInfo.isHeaderChecked = isCheck;
     };
     const unCheckedHeader = () => {
       if (checkInfo.isHeaderChecked) {
@@ -455,7 +458,7 @@ export const checkEvent = (params) => {
     onSingleMode();
     if (rowData.checked) {
       addCheckedRow(rowData);
-      checkedHeader(stores.treeStore);
+      checkedHeader(store);
     } else {
       unCheckedHeader();
       removeCheckedRow(rowData);
@@ -472,10 +475,13 @@ export const checkEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onCheckAll = (event) => {
-    const store = stores.treeStore;
     const status = checkInfo.isHeaderChecked;
     const checked = [];
     let item;
+    let store = stores.treeStore;
+    if (status && stores.searchStore.length > 0) {
+      store = stores.searchStore;
+    }
     for (let ix = 0; ix < store.length; ix++) {
       item = store[ix];
       if (status) {
@@ -484,6 +490,11 @@ export const checkEvent = (params) => {
       item.checked = status;
     }
     checkInfo.checkedRows = checked;
+    if (stores.searchStore.length > 0) {
+      store.forEach((node) => {
+        onCheckChildren(node);
+      });
+    }
     emit('update:checked', checked);
     emit('check-all', event, checked);
   };
@@ -637,7 +648,7 @@ export const treeEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
-  const { stores, getConvertValue, calculatedColumn, updateVScroll } = params;
+  const { checkInfo, stores, getConvertValue, calculatedColumn, updateVScroll } = params;
   const makeParentShow = (data) => {
     if (!data?.parent) {
       return;
@@ -654,26 +665,29 @@ export const filterEvent = (params) => {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
-      stores.treeStore.forEach((row) => {
+      let store = stores.treeStore;
+      store.forEach((row) => {
         row.show = false;
         row.isFilter = false;
       });
       if (searchWord) {
-        const filterStores = stores.treeStore.filter((row) => {
+        const filterStores = store.filter((row) => {
           let isSameWord = false;
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
             let columnValue = row[column.field];
             let columnType = column.type;
             if (columnValue) {
-              if (!columnType) {
-                columnType = 'string';
-              }
-              columnValue = getConvertValue(columnType, columnValue).toString();
-              isSameWord = columnValue.toLowerCase()
-                .includes(searchWord.toString().toLowerCase());
-              if (isSameWord) {
-                break;
+              if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
+                if (!columnType) {
+                  columnType = 'string';
+                }
+                columnValue = getConvertValue(columnType, columnValue).toString();
+                isSameWord = columnValue.toLowerCase()
+                  .includes(searchWord.toString().toLowerCase());
+                if (isSameWord) {
+                  break;
+                }
               }
             }
           }
@@ -685,11 +699,16 @@ export const filterEvent = (params) => {
           makeParentShow(row);
         });
       } else {
-        stores.treeStore.forEach((row) => {
+        store.forEach((row) => {
           row.show = true;
           row.isFilter = false;
         });
       }
+      if (stores.searchStore.length > 0) {
+        store = stores.searchStore;
+      }
+      const isCheck = store.every(n => n.checked === true);
+      checkInfo.isHeaderChecked = isCheck;
       calculatedColumn();
       updateVScroll();
     }, 500);
