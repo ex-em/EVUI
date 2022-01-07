@@ -608,12 +608,14 @@ const activeWindows = (() => {
       if (inactiveWindow === null || inactiveWindow === undefined) return;
       windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
     },
+
     get windows() {
       return windows.slice();
     },
     getWindowBySequence(targetSequence) {
       return windows.find(activeWindow => activeWindow.sequence === targetSequence);
     },
+
     isEmpty() {
       return windows.length <= 0;
     },
@@ -631,6 +633,24 @@ const getZIndexFromElement = (element) => {
   return parseInt(zIndex);
 };
 
+const getActiveWindowsOrderByZIndexAsc = () => {
+  // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 뒤에 위치
+  const compareByZIndex = (window1, window2) => {
+    if (window1.zIndex > window2.zIndex) return 1;
+    if (window1.zIndex < window2.zIndex) return -1;
+
+    if (window1.sequence > window2.sequence) return 1;
+    return -1;
+  };
+
+  const activeWindowsSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
+    ...activeWindow,
+    zIndex: getZIndexFromElement(activeWindow.elem),
+  })).sort(compareByZIndex);
+
+  return activeWindowsSorted;
+};
+
 const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   const { props } = getCurrentInstance();
 
@@ -638,12 +658,13 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   let isActiveStatus = false;
 
   const addActiveWindow = () => {
-    sequence = activeWindows.add({
+    const windowSequence = activeWindows.add({
       sequence,
       closeWin,
       elem: windowRef.value,
       escClose: props.escClose,
     });
+    return windowSequence;
   };
 
   const removeInactiveWindow = (inactiveWindow) => {
@@ -656,21 +677,8 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     const { code } = event;
     if (code !== 'Escape') return;
 
-    // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 뒤에 위치
-    const compare = (window1, window2) => {
-      if (window1.zIndex > window2.zIndex) return 1;
-      if (window1.zIndex < window2.zIndex) return -1;
-
-      if (window1.sequence > window2.sequence) return 1;
-      return -1;
-    };
-
-    const activeWindowSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
-      ...activeWindow,
-      zIndex: getZIndexFromElement(activeWindow.elem),
-    })).sort(compare);
-
-    const topActiveWindow = activeWindowSorted[activeWindowSorted.length - 1];
+    const activeWindowsSorted = getActiveWindowsOrderByZIndexAsc();
+    const topActiveWindow = activeWindowsSorted[activeWindowsSorted.length - 1];
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
@@ -681,7 +689,10 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
 
   const setWindowActive = () => {
     isActiveStatus = true;
-    addActiveWindow();
+    sequence = addActiveWindow();
+    // DOM의 dataset에 sequence 값 추가해 식별 가능하도록
+    windowRef.value.dataset.sequence = sequence;
+
     if (activeWindows.isFirstWindowOpen()) {
       document.addEventListener('keydown', keydownEsc);
     }
@@ -731,8 +742,137 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   );
 };
 
+const zIndexService = (() => {
+  const LOWER = 700;
+  const UPPER = 750;
+
+  const INCREMENT = 1;
+  const PADDING = INCREMENT * 3;
+
+  const UPPER_LIMIT = UPPER - PADDING;
+
+  let current = LOWER;
+
+  return {
+    getNext() {
+      if (current >= UPPER_LIMIT) {
+        return UPPER_LIMIT;
+      }
+      current += INCREMENT;
+      return current;
+    },
+    getNextOverLimit() {
+      return UPPER_LIMIT + INCREMENT;
+    },
+    getPrevFrom(index) {
+      const prev = current - (index * INCREMENT);
+
+      if (prev <= LOWER) return LOWER;
+      return prev;
+    },
+    isUpperLimitClose() {
+      return current >= UPPER_LIMIT;
+    },
+    resetToLower() {
+      current = LOWER;
+    },
+    get allocableCount() {
+      return Math.floor((UPPER_LIMIT - LOWER) / INCREMENT);
+    },
+  };
+})();
+
+const useClickEventForIncreaseZIndex = ({ windowRef }) => {
+  const { props } = getCurrentInstance();
+
+  const setZIndexToWindow = () => {
+    // Window가 1번째로 열릴 때, z-index 값을 시작값으로 설정
+    if (activeWindows.length === 1) {
+      zIndexService.resetToLower();
+    }
+    windowRef.value.style.zIndex = zIndexService.getNext();
+  };
+
+  // 할당하려는 z-index 값이 내부적으로 설정한 최대값일 때
+  const reassignZIndex = () => {
+    const activeWindowsOrderByZIndexAsc = getActiveWindowsOrderByZIndexAsc();
+
+    // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
+    const overCountLimit = activeWindows.windows.length > zIndexService.allocableCount;
+    if (overCountLimit) {
+      const activeWindowsOrderByZIndexDesc = activeWindowsOrderByZIndexAsc.reverse();
+      // z-index 기준 내림차순으로 정렬한 Window의 z-index 값을 UPPER에서 LOWER로 1씩 감소한 값 할당
+      activeWindowsOrderByZIndexDesc.forEach((activeWindow, idx) => {
+        activeWindow.elem.style.zIndex = zIndexService.getPrevFrom(idx);
+      });
+
+      // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
+      windowRef.value.style.zIndex = zIndexService.getNextOverLimit();
+
+      return false;
+    }
+
+    // 최대 갯수를 초과하지 않는 경우라면 아래 코드 실행
+    zIndexService.resetToLower();
+
+    activeWindowsOrderByZIndexAsc.forEach((activeWindow) => {
+      activeWindow.elem.style.zIndex = zIndexService.getNext();
+    });
+
+    // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
+    windowRef.value.style.zIndex = zIndexService.getNext();
+
+    return true;
+  };
+
+  const checkLimitAndSetZIndex = () => {
+    if (zIndexService.isUpperLimitClose()) {
+      reassignZIndex();
+      return;
+    }
+
+    setZIndexToWindow();
+  };
+
+  const increaseZIndex = () => {
+    // X 버튼을 클릭했을 때는 Window가 닫힌 상태여서 value 참조할 수 없기 때문
+    if (!windowRef.value) return;
+
+    if (!props.increaseZindexOnClick) return;
+
+    const activeWindowsSorted = getActiveWindowsOrderByZIndexAsc();
+    const topActiveWindow = activeWindowsSorted[activeWindowsSorted.length - 1];
+
+    const isAlreadyTop = String(topActiveWindow.sequence) === windowRef.value.dataset.sequence;
+    if (isAlreadyTop) return;
+
+    checkLimitAndSetZIndex();
+  };
+
+  onMounted(() => {
+    if (props.visible) {
+      checkLimitAndSetZIndex();
+    }
+  });
+
+  watch(
+    () => props.visible,
+    (visible) => {
+      nextTick(() => {
+        if (visible) {
+          checkLimitAndSetZIndex();
+        }
+      });
+    });
+
+  return {
+    increaseZIndex,
+  };
+};
+
 export {
   useModel,
   useMouseEvent,
   useEscKeydownEvent,
+  useClickEventForIncreaseZIndex,
 };
