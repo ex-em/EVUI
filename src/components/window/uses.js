@@ -747,7 +747,7 @@ const zIndexService = (() => {
   const UPPER = 750;
 
   const INCREMENT = 1;
-  const PADDING = INCREMENT * 3;
+  const PADDING = INCREMENT * 2;
 
   const UPPER_LIMIT = UPPER - PADDING;
 
@@ -793,57 +793,58 @@ const useClickEventForIncreaseZIndex = ({ windowRef }) => {
     windowRef.value.style.zIndex = zIndexService.getNext();
   };
 
-  // 할당하려는 z-index 값이 내부적으로 설정한 최대값일 때
-  const reassignZIndex = () => {
-    const activeWindowsOrderByZIndexAsc = getActiveWindowsOrderByZIndexAsc();
+  const sameAsCurrent = windowData => String(windowData.sequence) === windowRef.value.dataset.sequence;
 
-    // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
+  // 할당하려는 z-index 값이 최대값일 때
+  const reassignZIndex = () => {
+    const activeWindowsZIndexAsc = getActiveWindowsOrderByZIndexAsc();
+
     const overCountLimit = activeWindows.windows.length > zIndexService.allocableCount;
+    // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
     if (overCountLimit) {
-      const activeWindowsOrderByZIndexDesc = activeWindowsOrderByZIndexAsc.reverse();
+      const activeWindowsZIndexDesc = activeWindowsZIndexAsc.reverse();
+
       // z-index 기준 내림차순으로 정렬한 Window의 z-index 값을 UPPER에서 LOWER로 1씩 감소한 값 할당
-      activeWindowsOrderByZIndexDesc.forEach((activeWindow, idx) => {
-        activeWindow.elem.style.zIndex = zIndexService.getPrevFrom(idx);
+      let interval = 0;
+      activeWindowsZIndexDesc.forEach((activeWindow) => {
+        if (sameAsCurrent(activeWindow)) return;
+        activeWindow.elem.style.zIndex = zIndexService.getPrevFrom(interval++);
       });
 
       // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
       windowRef.value.style.zIndex = zIndexService.getNextOverLimit();
+    } else {
+      zIndexService.resetToLower();
 
-      return false;
+      activeWindowsZIndexAsc.forEach((activeWindow) => {
+        if (sameAsCurrent(activeWindow)) return;
+
+        activeWindow.elem.style.zIndex = zIndexService.getNext();
+      });
+
+      // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
+      windowRef.value.style.zIndex = zIndexService.getNext();
     }
-
-    // 최대 갯수를 초과하지 않는 경우라면 아래 코드 실행
-    zIndexService.resetToLower();
-
-    activeWindowsOrderByZIndexAsc.forEach((activeWindow) => {
-      activeWindow.elem.style.zIndex = zIndexService.getNext();
-    });
-
-    // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
-    windowRef.value.style.zIndex = zIndexService.getNext();
-
-    return true;
   };
 
   const checkLimitAndSetZIndex = () => {
     if (zIndexService.isUpperLimitClose()) {
       reassignZIndex();
-      return;
+    } else {
+      setZIndexToWindow();
     }
-
-    setZIndexToWindow();
   };
 
   const increaseZIndex = () => {
-    // X 버튼을 클릭했을 때는 Window가 닫힌 상태여서 value 참조할 수 없기 때문
+    // X 버튼을 클릭했을 때
     if (!windowRef.value) return;
 
-    if (!props.increaseZindexOnClick) return;
+    if (!props.increaseZIndexOnClick) return;
 
     const activeWindowsSorted = getActiveWindowsOrderByZIndexAsc();
     const topActiveWindow = activeWindowsSorted[activeWindowsSorted.length - 1];
 
-    const isAlreadyTop = String(topActiveWindow.sequence) === windowRef.value.dataset.sequence;
+    const isAlreadyTop = sameAsCurrent(topActiveWindow);
     if (isAlreadyTop) return;
 
     checkLimitAndSetZIndex();

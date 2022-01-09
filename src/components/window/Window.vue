@@ -27,6 +27,7 @@
           }"
           @mousedown="startDrag"
           @mousemove="moveMouse"
+          @click="increaseZIndex"
         >
           <div
             v-if="$slots.header || iconClass || title"
@@ -84,11 +85,17 @@
 </template>
 
 <script>
-import { useEscKeydownEvent, useModel, useMouseEvent } from './uses';
+import { useEscKeydownEvent, useClickEventForIncreaseZIndex, useModel, useMouseEvent } from './uses';
 
 export default {
   name: 'EvWindow',
   props: {
+    style: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
     visible: {
       type: Boolean,
       default: false,
@@ -153,6 +160,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    increaseZIndexOnClick: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: [
     'update:visible',
@@ -189,6 +200,8 @@ export default {
 
     useEscKeydownEvent({ closeWin, windowRef });
 
+    const { increaseZIndex } = useClickEventForIncreaseZIndex({ windowRef });
+
     return {
       windowRef,
       headerRef,
@@ -200,6 +213,8 @@ export default {
       startDrag,
       moveMouse,
       clickExpandBtn,
+
+      increaseZIndex,
     };
   },
 };

@@ -280,6 +280,39 @@
       </button>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Increase z-index</p>
+    <ev-window
+      v-for="(_, idx) in isVisible12"
+      :key="idx"
+      v-model:visible="isVisible12[idx]"
+      :title="`No. ${idx + 1}`"
+      :is-modal="false"
+      :esc-close="true"
+      draggable
+      width="300px"
+      height="300px"
+      :style="{
+        transform: randomPositions[idx],
+      }"
+    >
+      <div
+        :style="{
+          backgroundColor: randomColors[idx],
+          width: '100%',
+          height: '100%',
+        }"
+      ></div>
+    </ev-window>
+    <div class="description">
+      <button
+        class="btn"
+        @click="clickButton12"
+      >
+        click to open stacked windows!
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -345,6 +378,23 @@ export default {
       }
     };
 
+    const isVisible12 = ref([
+      false, false, false, false, false,
+      false, false,
+    ]);
+    const randomColors = Array(isVisible12.value.length)
+      .fill(null)
+      .map(() => `rgb(${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())})`);
+    const randomPositions = Array(isVisible12.value.length)
+      .fill(null)
+      .map(() => `translate(${Math.floor(400 * (Math.random() - 0.5))}px, ${Math.floor(400 * (Math.random() - 0.5))}px)`);
+
+    const clickButton12 = () => {
+      for (let i = 0; i < isVisible12.value.length; i++) {
+        isVisible12.value[i] = true;
+      }
+    };
+
     const isEscClose = ref(false);
     const changeEscClose = (newValue) => {
       isEscClose.value = newValue;
@@ -378,6 +428,10 @@ export default {
       clickButton10,
       isVisible11,
       clickButton11,
+      isVisible12,
+      randomColors,
+      randomPositions,
+      clickButton12,
       isEscClose,
       changeEscClose,
       mousedown,
