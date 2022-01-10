@@ -19,7 +19,7 @@
  - `<template #header> 내용 </template>`을 사용 시 header slot에 들어감  
  - width는 최대 100%이며, string값으로 입력하는 너비 값
  - <윈도우> 컴포넌트 초기에 body에 DIV(id: ev-window-modal)가 append되며, 해당 DIV 자식으로 돔이 추가되어 렌더링
- - z-index는 700
+ - z-index는 [700, 750)
  
 
 

@@ -283,40 +283,62 @@
   <div class="case">
     <p class="case-title">Increase z-index</p>
     <ev-window
-      v-for="(_, idx) in isVisible12"
-      :key="idx"
-      v-model:visible="isVisible12[idx]"
-      :title="`No. ${idx + 1}`"
-      :is-modal="false"
-      :esc-close="true"
-      draggable
-      width="300px"
-      height="300px"
-      :style="{
+        v-model:visible="isVisible13"
+        title="Increase z-index"
+        :is-modal="false"
+        :esc-close="true"
+        :increase-z-index-on-click="false"
+        maximizable
+        fullscreen
+    >
+      <div>
+        <p>
+          <i class="ev-icon-moon" />
+          쌓여있는 Window를 클릭하면 가장 상단에 배치됩니다.
+          <br/>
+          <i class="ev-icon-moon" />
+          해당 Window는 increase-z-index-on-click prop의 값이 false여서 클릭해도 상단으로 배치되지 않습니다.
+          <br/>
+          <i class="ev-icon-moon" />
+          Esc 키로 Window를 닫을 수 있습니다.
+        </p>
+        <ev-window
+          v-for="(_, idx) in isVisible12"
+          :key="idx"
+          v-model:visible="isVisible12[idx]"
+          :title="`No. ${idx + 1}`"
+          :is-modal="false"
+          :esc-close="true"
+          draggable
+          width="300px"
+          height="300px"
+          :style="{
         transform: randomPositions[idx],
       }"
-    >
-      <div
-        :style="{
+        >
+          <div
+            :style="{
           backgroundColor: randomColors[idx],
           width: '100%',
           height: '100%',
         }"
-      ></div>
+          ></div>
+        </ev-window>
+      </div>
     </ev-window>
     <div class="description">
       <button
         class="btn"
-        @click="clickButton12"
+        @click="clickButton13"
       >
-        click to open stacked windows!
+        click to open window!
       </button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 
 export default {
   setup() {
@@ -382,6 +404,7 @@ export default {
       false, false, false, false, false,
       false, false,
     ]);
+
     const randomColors = Array(isVisible12.value.length)
       .fill(null)
       .map(() => `rgb(${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())})`);
@@ -389,11 +412,18 @@ export default {
       .fill(null)
       .map(() => `translate(${Math.floor(400 * (Math.random() - 0.5))}px, ${Math.floor(400 * (Math.random() - 0.5))}px)`);
 
-    const clickButton12 = () => {
-      for (let i = 0; i < isVisible12.value.length; i++) {
-        isVisible12.value[i] = true;
-      }
+    const isVisible13 = ref(false);
+    const clickButton13 = () => {
+      isVisible13.value = true;
     };
+
+    watch(isVisible13, (isVisible) => {
+      nextTick(() => {
+        for (let i = 0; i < isVisible12.value.length; i++) {
+          isVisible12.value[i] = isVisible;
+        }
+      });
+    });
 
     const isEscClose = ref(false);
     const changeEscClose = (newValue) => {
@@ -431,7 +461,8 @@ export default {
       isVisible12,
       randomColors,
       randomPositions,
-      clickButton12,
+      isVisible13,
+      clickButton13,
       isEscClose,
       changeEscClose,
       mousedown,
