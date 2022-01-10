@@ -102,6 +102,68 @@ class Scatter {
 
     return items;
   }
+
+  /**
+   * Draw item highlight
+   * @param {object}   item       object for drawing series data
+   * @param {object}   context    canvas context
+   * @param {boolean}  isMax      determines if this series has max value
+   *
+   * @returns {undefined}
+   */
+  itemHighlight(item, context) {
+    const gdata = item.data;
+    const ctx = context;
+
+    const x = gdata.xp;
+    const y = gdata.yp;
+
+    ctx.save();
+    if (x !== null && y !== null) {
+      ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
+      ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
+
+      ctx.fillStyle = this.color;
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
+
+      ctx.fillStyle = '#fff';
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, x, y);
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Find graph item for tooltip
+   * @param {array}  offset       mouse position
+   *
+   * @returns {object} graph item
+   */
+  findGraphData(offset) {
+    const xp = offset[0]; // 486
+    const yp = offset[1]; // 109.5
+    const item = { data: null, hit: false, color: this.color };
+    const pointSize = this.pointSize;
+    const gdata = this.data;
+
+    const foundItem = gdata.find((data) => {
+      const x = data.xp;
+      const y = data.yp;
+
+      return (x - pointSize <= xp)
+        && (xp <= x + pointSize)
+        && (y - pointSize <= yp)
+        && (yp <= y + pointSize);
+    });
+
+    if (foundItem) {
+      item.data = foundItem;
+      item.hit = true;
+    }
+
+    return item;
+  }
 }
 
 export default Scatter;

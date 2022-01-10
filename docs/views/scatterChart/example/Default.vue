@@ -5,10 +5,6 @@
       :options="chartOptions"
     />
     <div class="description">
-      <span class="description-label">
-        데이터 자동 업데이트
-      </span>
-      <ev-toggle v-model="isLive"/>
       <div class="row">
         <div class="row-item">
           <span class="item-title">
@@ -31,36 +27,12 @@
           />
         </div>
       </div>
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title">
-            Series count
-          </span>
-          <ev-input-number
-            v-model="seriesCount"
-            class="component"
-            :min="1"
-            :max="25"
-          />
-        </div>
-        <div class="row-item">
-          <span class="item-title">
-            X axis count
-          </span>
-          <ev-input-number
-            v-model="xAxisDataCount"
-            class="component"
-            :min="5"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
-  import dayjs from 'dayjs';
+  import { ref, reactive } from 'vue';
 
   export default {
     setup() {
@@ -102,121 +74,112 @@
         series: {
           series1: { name: 'series#1', pointSize, pointStyle },
           series2: { name: 'series#2', pointSize, pointStyle },
-          series3: { name: 'series#3', pointSize, pointStyle },
         },
-        labels: [],
         data: {
-          series1: [],
-          series2: [],
-          series3: [],
+          series1: [
+            [134, 51], [67, 59], [19, 49], [15, 63], [55, 53],
+            [161, 51], [167, 59], [159, 49], [157, 63], [155, 53],
+            [170, 59], [159, 47], [166, 69], [176, 66], [160, 75],
+            [172, 55], [170, 54], [172, 62], [153, 42], [160, 50],
+            [147, 49], [168, 49], [175, 73], [157, 47], [167, 68],
+            [159, 50], [175, 82], [166, 57], [176, 87], [170, 72],
+          ],
+          series2: [
+            [9, 51], [72, 59], [0, 49], [57, 63], [15, 53],
+            [174, 65], [175, 71], [200, 80], [186, 72], [187, 78],
+            [181, 74], [184, 86], [184, 78], [175, 62], [184, 81],
+            [180, 76], [177, 83], [192, 90], [176, 74], [174, 71],
+            [184, 79], [192, 93], [171, 70], [173, 72], [176, 85],
+            [176, 78], [180, 77], [172, 66], [176, 86], [173, 81],
+          ],
         },
       });
 
       const chartOptions = {
         type: 'scatter',
         width: '100%',
-        title: {
-          text: 'Chart Title',
-          show: true,
-        },
-        legend: {
-          show: true,
-          position: 'right',
-        },
-        tooltip: {
-          use: true,
-        },
+        height: '100%',
+        padding: { top: 20, right: 2, bottom: 4, left: 2 },
         axesX: [{
-          type: 'time',
-          timeFormat: 'HH:mm:ss',
-          interval: 'second',
+          type: 'linear',
+          showAxis: true,
+          startToZero: true,
+          autoScaleRatio: null,
+          showGrid: true,
+          axisLineColor: '#C9CFDC',
+          gridLineColor: '#C9CFDC',
+          interval: null,
+          labelStyle: {
+            show: true,
+            fontSize: 12,
+            color: '#25262E',
+            fontFamily: 'Roboto',
+            fitWidth: false,
+            fitDir: 'right',
+          },
+          plotLines: [],
+          plotBands: [],
+          formatter: null,
         }],
         axesY: [{
           type: 'linear',
+          showAxis: true,
+          startToZero: false,
+          autoScaleRatio: null,
           showGrid: true,
-          startToZero: true,
-          autoScaleRatio: 0.1,
+          axisLineColor: '#C9CFDC',
+          gridLineColor: '#C9CFDC',
+          interval: null,
+          labelStyle: {
+            show: true,
+            fontSize: 12,
+            color: '#25262E',
+            fontFamily: 'Roboto',
+            fitWidth: false,
+            fitDir: 'right',
+          },
+          plotLines: [],
+          plotBands: [],
+          formatter: null,
         }],
+        title: {
+          text: '',
+          show: false,
+        },
+        legend: {
+          show: false,
+          position: 'right',
+          color: '#353740',
+          inactive: '#aaa',
+          width: 140,
+          height: 24,
+          padding: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        indicator: {
+          use: true,
+          color: '#EE7F44',
+        },
+        tooltip: {
+          use: true,
+          backgroundColor: '#4C4C4C',
+          borderColor: '#666666',
+          useShadow: false,
+          shadowOpacity: 0.25,
+          throttledMove: false,
+          debouncedHide: false,
+          sortByValue: true,
+          useScrollbar: false,
+          textOverflow: 'wrap',
+          showAllValueInRange: false,
+          formatter: null,
+        },
+        dragSelection: {
+          use: false,
+          keepDisplay: true,
+          fillColor: '#38ACEC',
+          opacity: 0.65,
+        },
       };
-
-      const isLive = ref(false);
-      const liveInterval = ref();
-      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
-
-      const addRandomChartData = () => {
-        timeValue = +dayjs(timeValue).add(1, 'second');
-        chartData.labels.shift();
-        chartData.labels.push(timeValue);
-
-        Object.values(chartData.data).forEach((seriesData) => {
-          seriesData.shift();
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-        });
-      };
-
-      const initChartSeries = () => {
-        chartData.series = {};
-        chartData.labels.length = 0;
-        chartData.data = {};
-
-        let seriesName;
-        let seriesId;
-        for (let ix = 1; ix <= seriesCount.value; ix++) {
-          seriesName = `series#${ix}`;
-          seriesId = `series${ix}`;
-          chartData.series[seriesId] = {
-            name: seriesName,
-            pointSize,
-            pointStyle,
-          };
-
-          chartData.data[seriesId] = [];
-        }
-      };
-
-      const initChartData = () => {
-        const dataKeys = Object.keys(chartData.data);
-        chartData.labels.length = 0;
-        for (let ix = 0; ix < dataKeys.length; ix++) {
-          chartData.data[dataKeys[ix]].length = 0;
-        }
-
-        let tmpTimeValue;
-        for (let ix = 0; ix < xAxisDataCount.value; ix++) {
-          tmpTimeValue = +dayjs(timeValue).subtract(ix, 'second');
-          chartData.labels.unshift(tmpTimeValue);
-
-          Object.values(chartData.data).forEach((seriesData) => {
-            seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-          });
-        }
-      };
-
-      onMounted(() => {
-        initChartData();
-      });
-
-      watch(isLive, (newValue) => {
-        if (newValue) {
-          addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 1000);
-        } else {
-          clearInterval(liveInterval.value);
-        }
-      });
-
-      watch(seriesCount, () => {
-        initChartSeries();
-        initChartData();
-      });
-
-      watch(xAxisDataCount, () => {
-        initChartData();
-      });
-
-      onBeforeUnmount(() => {
-        clearInterval(liveInterval.value);
-      });
 
       return {
         pointSize,
@@ -224,7 +187,6 @@
         pointStyleList,
         chartData,
         chartOptions,
-        isLive,
         seriesCount,
         xAxisDataCount,
       };
