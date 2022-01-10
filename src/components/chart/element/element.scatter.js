@@ -141,8 +141,8 @@ class Scatter {
    * @returns {object} graph item
    */
   findGraphData(offset) {
-    const xp = offset[0]; // 486
-    const yp = offset[1]; // 109.5
+    const xp = offset[0];
+    const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
     const pointSize = this.pointSize;
     const gdata = this.data;
