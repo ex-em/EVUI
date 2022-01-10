@@ -655,7 +655,6 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   const { props } = getCurrentInstance();
 
   let sequence = null;
-  let isActiveStatus = false;
 
   const addActiveWindow = () => {
     const windowSequence = activeWindows.add({
@@ -688,7 +687,6 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   };
 
   const setWindowActive = () => {
-    isActiveStatus = true;
     sequence = addActiveWindow();
     // DOM의 dataset에 sequence 값 추가해 식별 가능하도록
     windowRef.value.dataset.sequence = sequence;
@@ -701,30 +699,39 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   const setWindowInactive = () => {
     const inactiveWindow = activeWindows.getWindowBySequence(sequence);
     removeInactiveWindow(inactiveWindow);
-    isActiveStatus = false;
   };
 
+  // 실행 시점(=Window 열림): visible 초기값이 true일 때
   onMounted(() => {
-    // visible 초기값이 true
-    if (props.visible && !isActiveStatus) {
+    if (props.visible) {
       setWindowActive();
     }
   });
 
+  /*
+    실행 시점(=Window 닫힘):
+      예시1. 배열을 통해 Window 여러 개 띄울 때, 배열 원소 삭제로 인해 해당 Window가 닫히는 경우
+      예시2. key값의 변동으로 이전과 다른 Window라는 것이 확실할 때
+  */
   onBeforeUnmount(() => {
-    if (props.visible && isActiveStatus) {
+    if (props.visible) {
       setWindowInactive();
     }
   });
 
+  /*
+    실행 시점:
+      1. visible 값이 false -> true로 변했을 때(=Window 열림)
+      2. visible 값이 true -> false로 변했을 때(=Window 닫힙)
+  */
   watch(
     () => props.visible,
     (visible) => {
       nextTick(() => {
-        if (visible && !isActiveStatus) {
+        if (visible) {
           // visible 값이 false -> true로 변경되었을 때
           setWindowActive();
-        } else if (!visible && isActiveStatus) {
+        } else {
           // visible 값이 true -> false로 변경되었을 때
           setWindowInactive();
         }
@@ -734,10 +741,8 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   watch(
     () => props.escClose,
     (escClose) => {
-      if (isActiveStatus) {
-        const currentWindow = activeWindows.getWindowBySequence(sequence);
-        if (currentWindow) currentWindow.escClose = escClose;
-      }
+      const currentWindow = activeWindows.getWindowBySequence(sequence);
+      if (currentWindow) currentWindow.escClose = escClose;
     },
   );
 };
@@ -785,12 +790,24 @@ const zIndexService = (() => {
 const useClickEventForIncreaseZIndex = ({ windowRef }) => {
   const { props } = getCurrentInstance();
 
-  const setZIndexToWindow = () => {
+  const setZIndexToWindow = ({ elem, zIndex }) => {
+    // 모달인 경우에는 dim layer도 같이 z-index 높여준다.
+    if (props.isModal) {
+      const dimLayerElem = elem.parentElement.getElementsByClassName('ev-window-dim-layer')[0];
+      dimLayerElem.style.zIndex = zIndex;
+    }
+
+    elem.style.zIndex = zIndex;
+  };
+
+  const assignZIndex = () => {
     // Window가 1번째로 열릴 때, z-index 값을 시작값으로 설정
-    if (activeWindows.length === 1) {
+    if (activeWindows.windows.length === 1) {
       zIndexService.resetToLower();
     }
-    windowRef.value.style.zIndex = zIndexService.getNext();
+
+    const nextZIndex = zIndexService.getNext();
+    setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
   };
 
   const sameAsCurrent = windowData => String(windowData.sequence) === windowRef.value.dataset.sequence;
@@ -808,22 +825,27 @@ const useClickEventForIncreaseZIndex = ({ windowRef }) => {
       let interval = 0;
       activeWindowsZIndexDesc.forEach((activeWindow) => {
         if (sameAsCurrent(activeWindow)) return;
-        activeWindow.elem.style.zIndex = zIndexService.getPrevFrom(interval++);
+
+        const prevZIndex = zIndexService.getPrevFrom(interval++);
+        setZIndexToWindow({ elem: activeWindow.elem, zIndex: prevZIndex });
       });
 
       // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
-      windowRef.value.style.zIndex = zIndexService.getNextOverLimit();
+      const nextZIndex = zIndexService.getNextOverLimit();
+      setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
     } else {
       zIndexService.resetToLower();
 
       activeWindowsZIndexAsc.forEach((activeWindow) => {
         if (sameAsCurrent(activeWindow)) return;
 
-        activeWindow.elem.style.zIndex = zIndexService.getNext();
+        const nextZIndex = zIndexService.getNext();
+        setZIndexToWindow({ elem: activeWindow.elem, zIndex: nextZIndex });
       });
 
       // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
-      windowRef.value.style.zIndex = zIndexService.getNext();
+      const nextZIndex = zIndexService.getNext();
+      setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
     }
   };
 
@@ -831,7 +853,7 @@ const useClickEventForIncreaseZIndex = ({ windowRef }) => {
     if (zIndexService.isUpperLimitClose()) {
       reassignZIndex();
     } else {
-      setZIndexToWindow();
+      assignZIndex();
     }
   };
 
@@ -850,21 +872,27 @@ const useClickEventForIncreaseZIndex = ({ windowRef }) => {
     checkLimitAndSetZIndex();
   };
 
-  onMounted(() => {
+  let timer = null;
+  const visibleFnInTimeout = () => {
     if (props.visible) {
       checkLimitAndSetZIndex();
     }
+  };
+
+  onMounted(() => {
+    timer = setTimeout(visibleFnInTimeout, 0);
   });
 
   watch(
     () => props.visible,
-    (visible) => {
-      nextTick(() => {
-        if (visible) {
-          checkLimitAndSetZIndex();
-        }
-      });
-    });
+    (visible, prevVisible) => {
+    if (!prevVisible) {
+      timer = setTimeout(visibleFnInTimeout, 0);
+    } else if (!visible) {
+      clearTimeout(timer);
+    }
+  });
+
 
   return {
     increaseZIndex,

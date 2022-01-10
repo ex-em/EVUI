@@ -293,6 +293,13 @@
     >
       <div>
         <p>
+          <button
+            class="nested-btn"
+            @click="clickButton12"
+          >
+            nested 열기
+          </button>
+          <br />
           <i class="ev-icon-moon" />
           쌓여있는 Window를 클릭하면 가장 상단에 배치됩니다.
           <br/>
@@ -313,15 +320,15 @@
           width="300px"
           height="300px"
           :style="{
-        transform: randomPositions[idx],
-      }"
+            transform: randomPositions[idx],
+          }"
         >
           <div
             :style="{
-          backgroundColor: randomColors[idx],
-          width: '100%',
-          height: '100%',
-        }"
+              backgroundColor: randomColors[idx],
+              width: '100%',
+              height: '100%',
+            }"
           ></div>
         </ev-window>
       </div>
@@ -404,6 +411,11 @@ export default {
       false, false, false, false, false,
       false, false,
     ]);
+    const clickButton12 = () => {
+      for (let i = 0; i < isVisible12.value.length; i++) {
+        isVisible12.value[i] = true;
+      }
+    };
 
     const randomColors = Array(isVisible12.value.length)
       .fill(null)
@@ -418,6 +430,7 @@ export default {
     };
 
     watch(isVisible13, (isVisible) => {
+      if (isVisible) return;
       nextTick(() => {
         for (let i = 0; i < isVisible12.value.length; i++) {
           isVisible12.value[i] = isVisible;
@@ -459,6 +472,7 @@ export default {
       isVisible11,
       clickButton11,
       isVisible12,
+      clickButton12,
       randomColors,
       randomPositions,
       isVisible13,
