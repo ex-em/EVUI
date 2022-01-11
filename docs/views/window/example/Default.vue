@@ -283,12 +283,12 @@
   <div class="case">
     <p class="case-title">Focusable</p>
     <ev-window
-        v-model:visible="isVisible13"
-        title="Focusable"
-        :is-modal="false"
-        :esc-close="true"
-        maximizable
-        fullscreen
+      v-model:visible="isVisible13"
+      title="Focusable"
+      :is-modal="false"
+      :esc-close="true"
+      maximizable
+      fullscreen
     >
       <div>
         <p>
@@ -312,9 +312,9 @@
           배경 윈도우를 닫으면 전체 Window가 닫힙니다.
         </p>
         <ev-window
-          v-for="(visible, idx) in isVisible12"
+          v-for="(_, idx) in isVisible12"
           :key="idx"
-          v-model:visible="visible.value"
+          v-model:visible="isVisible12[idx]"
           :title="`No. ${idx + 1}`"
           :is-modal="false"
           :esc-close="true"
@@ -411,12 +411,12 @@ export default {
     };
 
     const isVisible12 = ref([
-      { value: false }, { value: false }, { value: false }, { value: false },
-      { value: false }, { value: false }, { value: false },
+      false, false, false, false, false,
+      false, false,
     ]);
     const clickButton12 = () => {
       for (let i = 0; i < isVisible12.value.length; i++) {
-        isVisible12.value[i].value = true;
+        isVisible12.value[i] = true;
       }
     };
 

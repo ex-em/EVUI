@@ -659,7 +659,7 @@ const zIndexService = (() => {
     resetToLower() {
       current = LOWER;
     },
-    get allocableCount() {
+    getAllocableCount() {
       return Math.floor((UPPER_LIMIT - LOWER) / INCREMENT);
     },
   };
@@ -772,7 +772,7 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
   const reassignZIndex = () => {
     const activeWindowsZIndexAsc = getActiveWindowsOrderByZIndexAsc();
 
-    const overCountLimit = activeWindows.windows.length > zIndexService.allocableCount;
+    const overCountLimit = activeWindows.windows.length > zIndexService.getAllocableCount();
     // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
     if (overCountLimit) {
       const activeWindowsZIndexDesc = activeWindowsZIndexAsc.reverse();
