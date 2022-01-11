@@ -147,6 +147,7 @@ const modules = {
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line')) {
+        this.removeSelectionArea();
         this.dragStart(e, type);
       }
     };
@@ -270,8 +271,7 @@ const modules = {
       }
 
       if (!this.options.dragSelection.keepDisplay) {
-        this.dragInfoBackup = null;
-        this.overlayClear();
+        this.removeSelectionArea();
       }
 
       this.dragInfo = null;
@@ -297,6 +297,14 @@ const modules = {
     ctx.globalAlpha = opacity;
     ctx.fillRect(xsp, ysp, width, height);
     ctx.globalAlpha = 1;
+  },
+
+  /** Remove drag selection area
+   *
+   */
+  removeSelectionArea() {
+    this.dragInfoBackup = null;
+    this.overlayClear();
   },
 
   /**
