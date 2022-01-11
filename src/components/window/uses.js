@@ -766,7 +766,8 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
     setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
   };
 
-  const sameAsCurrent = windowData => String(windowData.sequence) === windowRef.value.dataset.sequence;
+  const sameAsCurrent = windowData => String(windowData.sequence)
+    === windowRef.value.dataset.sequence;
 
   // 할당하려는 z-index 값이 상한일 때
   const reassignZIndex = () => {
