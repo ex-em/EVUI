@@ -9,11 +9,7 @@
       <template #toolbarWrapper>
         <slot
           name="toolbar"
-          :item="{
-            onRefresh: onRefresh,
-            onDelete: onDelete,
-            onSearch: onSearch,
-          }"
+          :item="{ onSearch: onSearch }"
         >
         </slot>
       </template>
@@ -206,9 +202,6 @@
                     :item="{
                       row,
                       column,
-                      onRowDelete: onRowDelete,
-                      onRowEdit: onRowEdit,
-                      onDetailPopup: onDetailPopup,
                     }"
                   >
                   </slot>
@@ -253,18 +246,12 @@
         @apply-filter="onApplyFilter"
         @before-close="onCloseFilterWindow"
       />
-      <ev-window
-        v-model:visible="isDetailPopWin"
-        title="DETAIL POPUP"
-      >
-        <div>{{detailPopData}}</div>
-      </ev-window>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, ref, toRefs, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted } from 'vue';
 import FilterWindow from './grid.filter.window';
 import Toolbar from './grid.toolbar';
 import {
@@ -331,7 +318,6 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
-    const { ctx } = getCurrentInstance();
     const showHeader = computed(() =>
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
@@ -625,51 +611,6 @@ export default {
         setStore([], false);
       }, 500);
     };
-    const onRefresh = () => {
-      console.log('On click refresh button');
-    };
-    const onDelete = () => {
-      ctx.$messagebox({
-        title: 'Delete',
-        message: 'Are you sure you want to delete checked item?',
-        iconClass: 'ev-icon-trash3',
-        onClose: (type) => {
-          if (type === 'ok') {
-            stores.originStore = stores.store.filter(item => !item[1]);
-            setStore([], false);
-          }
-        },
-      });
-    };
-    const onRowDelete = (index) => {
-      ctx.$messagebox({
-        title: 'Delete',
-        message: 'Are you sure you want to delete this item?',
-        iconClass: 'ev-icon-trash3',
-        onClose: (type) => {
-          if (type === 'ok') {
-            stores.originStore = stores.store.filter(item => item[0] !== index);
-            setStore([], false);
-          }
-        },
-      });
-      // emit
-    };
-    const onRowEdit = (row) => {
-      ctx.$messagebox({
-        title: 'Edit',
-        message: row[2],
-        iconClass: 'ev-icon-pencil',
-        showCancelBtn: false,
-      });
-      // emit
-    };
-    const isDetailPopWin = ref(false);
-    const detailPopData = ref('');
-    const onDetailPopup = (row) => {
-      isDetailPopWin.value = true;
-      detailPopData.value = row[2];
-    };
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
     return {
       showHeader,
@@ -685,8 +626,6 @@ export default {
       ...toRefs(checkInfo),
       ...toRefs(sortInfo),
       ...toRefs(contextInfo),
-      isDetailPopWin,
-      detailPopData,
       isRenderer,
       getComponentName,
       getConvertValue,
@@ -713,12 +652,7 @@ export default {
       updateData,
       setContextMenu,
       onContextMenu,
-      onRefresh,
-      onDelete,
       onSearch,
-      onRowEdit,
-      onRowDelete,
-      onDetailPopup,
       isFilterButton,
     };
   },

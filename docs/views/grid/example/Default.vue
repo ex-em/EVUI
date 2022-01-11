@@ -33,28 +33,16 @@
     >
       <!-- renderer start -->
       <template #user-icon>
-        <div
-          class="user-icon"
-        ></div>
+        <div class="user-icon"/>
       </template>
-      <template #userName="{ item }">
-        <a
-          style="text-decoration: underline; cursor: pointer;"
-          @click="item.onDetailPopup(item.row)"
-        >{{item.row[2][item.column.index]}}</a>
-      </template>
-      <template #gridButton="{ item }">
+      <template #gridButton>
         <ev-button
           type="ghost"
           size="small"
-          @click="item.onRowDelete(item.row[0])"
         >
           Delete
         </ev-button>
-        <ev-button
-          size="small"
-          @click="item.onRowEdit(item.row)"
-        >
+        <ev-button size="small">
           Edit
         </ev-button>
       </template>
