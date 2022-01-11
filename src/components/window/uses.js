@@ -608,17 +608,59 @@ const activeWindows = (() => {
       if (inactiveWindow === null || inactiveWindow === undefined) return;
       windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
     },
+
     get windows() {
       return windows.slice();
     },
     getWindowBySequence(targetSequence) {
       return windows.find(activeWindow => activeWindow.sequence === targetSequence);
     },
+
     isEmpty() {
       return windows.length <= 0;
     },
     isFirstWindowOpen() {
       return sequence === 1;
+    },
+  };
+})();
+
+const zIndexService = (() => {
+  const LOWER = 700;
+  const UPPER = 750;
+
+  const INCREMENT = 1;
+  const PADDING = INCREMENT * 2;
+
+  const UPPER_LIMIT = UPPER - PADDING;
+
+  let current = LOWER;
+
+  return {
+    getNext() {
+      if (current >= UPPER_LIMIT) {
+        return UPPER_LIMIT;
+      }
+      current += INCREMENT;
+      return current;
+    },
+    getNextOverLimit() {
+      return UPPER_LIMIT + INCREMENT;
+    },
+    getPrevFrom(index) {
+      const prev = current - (index * INCREMENT);
+
+      if (prev <= LOWER) return LOWER;
+      return prev;
+    },
+    isUpperLimitClose() {
+      return current >= UPPER_LIMIT;
+    },
+    resetToLower() {
+      current = LOWER;
+    },
+    getAllocableCount() {
+      return Math.floor((UPPER_LIMIT - LOWER) / INCREMENT);
     },
   };
 })();
@@ -631,19 +673,39 @@ const getZIndexFromElement = (element) => {
   return parseInt(zIndex);
 };
 
-const useEscKeydownEvent = ({ closeWin, windowRef }) => {
+const getActiveWindowsOrderByZIndexAsc = () => {
+  // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 뒤에 위치
+  const compareByZIndex = (window1, window2) => {
+    if (window1.zIndex > window2.zIndex) return 1;
+    if (window1.zIndex < window2.zIndex) return -1;
+
+    if (window1.sequence > window2.sequence) return 1;
+    return -1;
+  };
+
+  const activeWindowsSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
+    ...activeWindow,
+    zIndex: getZIndexFromElement(activeWindow.elem),
+  })).sort(compareByZIndex);
+
+  return activeWindowsSorted;
+};
+
+const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
   const { props } = getCurrentInstance();
 
   let sequence = null;
-  let isActiveStatus = false;
+  let timer = null;
 
+  // escClose 관련 로직 시작
   const addActiveWindow = () => {
-    sequence = activeWindows.add({
+    const windowSequence = activeWindows.add({
       sequence,
       closeWin,
       elem: windowRef.value,
       escClose: props.escClose,
     });
+    return windowSequence;
   };
 
   const removeInactiveWindow = (inactiveWindow) => {
@@ -656,21 +718,8 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
     const { code } = event;
     if (code !== 'Escape') return;
 
-    // zIndex 클수록, 최근에 열린 것일수록(sequence 클수록) 뒤에 위치
-    const compare = (window1, window2) => {
-      if (window1.zIndex > window2.zIndex) return 1;
-      if (window1.zIndex < window2.zIndex) return -1;
-
-      if (window1.sequence > window2.sequence) return 1;
-      return -1;
-    };
-
-    const activeWindowSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
-      ...activeWindow,
-      zIndex: getZIndexFromElement(activeWindow.elem),
-    })).sort(compare);
-
-    const topActiveWindow = activeWindowSorted[activeWindowSorted.length - 1];
+    const activeWindowsSorted = getActiveWindowsOrderByZIndexAsc();
+    const topActiveWindow = activeWindowsSorted[activeWindowsSorted.length - 1];
 
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
@@ -680,8 +729,10 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   };
 
   const setWindowActive = () => {
-    isActiveStatus = true;
-    addActiveWindow();
+    sequence = addActiveWindow();
+    // DOM의 dataset에 sequence 값 추가해 식별 가능하도록
+    windowRef.value.dataset.sequence = sequence;
+
     if (activeWindows.isFirstWindowOpen()) {
       document.addEventListener('keydown', keydownEsc);
     }
@@ -690,32 +741,136 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   const setWindowInactive = () => {
     const inactiveWindow = activeWindows.getWindowBySequence(sequence);
     removeInactiveWindow(inactiveWindow);
-    isActiveStatus = false;
+  };
+  // escClose 관련 로직 끝
+
+
+  // focusable 관련 로직 시작
+  const setZIndexToWindow = ({ elem, zIndex }) => {
+    // 모달인 경우에는 dim layer도 같이 z-index 높여준다.
+    if (props.isModal) {
+      const dimLayerElem = elem.parentElement.getElementsByClassName('ev-window-dim-layer')[0];
+      dimLayerElem.style.zIndex = zIndex;
+    }
+
+    elem.style.zIndex = zIndex;
   };
 
+  const assignZIndex = () => {
+    // Window가 1번째로 열릴 때, z-index 값을 시작값으로 설정
+    if (activeWindows.windows.length === 1) {
+      zIndexService.resetToLower();
+    }
+
+    const nextZIndex = zIndexService.getNext();
+    setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
+  };
+
+  const sameAsCurrent = windowData => String(windowData.sequence) === windowRef.value.dataset.sequence;
+
+  // 할당하려는 z-index 값이 상한일 때
+  const reassignZIndex = () => {
+    const activeWindowsZIndexAsc = getActiveWindowsOrderByZIndexAsc();
+
+    const overCountLimit = activeWindows.windows.length > zIndexService.getAllocableCount();
+    // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
+    if (overCountLimit) {
+      const activeWindowsZIndexDesc = activeWindowsZIndexAsc.reverse();
+
+      // z-index 기준 내림차순으로 정렬한 Window의 z-index 값을 UPPER에서 LOWER로 1씩 감소한 값 할당
+      let interval = 0;
+      activeWindowsZIndexDesc.forEach((activeWindow) => {
+        if (sameAsCurrent(activeWindow)) return;
+
+        const prevZIndex = zIndexService.getPrevFrom(interval++);
+        setZIndexToWindow({ elem: activeWindow.elem, zIndex: prevZIndex });
+      });
+
+      // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
+      const nextZIndex = zIndexService.getNextOverLimit();
+      setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
+    } else {
+      zIndexService.resetToLower();
+
+      activeWindowsZIndexAsc.forEach((activeWindow) => {
+        if (sameAsCurrent(activeWindow)) return;
+
+        const nextZIndex = zIndexService.getNext();
+        setZIndexToWindow({ elem: activeWindow.elem, zIndex: nextZIndex });
+      });
+
+      // 가장 상단으로 와야하는 현재 Window의 z-index 값을 최대로
+      const nextZIndex = zIndexService.getNext();
+      setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
+    }
+  };
+
+  const checkLimitAndSetZIndex = () => {
+    if (zIndexService.isUpperLimitClose()) {
+      reassignZIndex();
+    } else {
+      assignZIndex();
+    }
+  };
+
+  const setFocus = () => {
+    // X 버튼을 클릭했을 때
+    if (!windowRef.value) return;
+
+    // focusable prop이 false인 경우에는 z-index를 높이지 않는다.
+    if (!props.focusable) return;
+
+    const activeWindowsSorted = getActiveWindowsOrderByZIndexAsc();
+    const topActiveWindow = activeWindowsSorted[activeWindowsSorted.length - 1];
+
+    const isAlreadyTop = sameAsCurrent(topActiveWindow);
+    if (isAlreadyTop) return;
+
+    checkLimitAndSetZIndex();
+  };
+  // focusable 관련 로직 끝
+
+
+  /*
+    실행 시점(=Window 열림):
+      visible 초기값이 true일 때 watch를 실행시키지 않아 onMounted hook 사용
+  */
   onMounted(() => {
-    // visible 초기값이 true
-    if (props.visible && !isActiveStatus) {
+    if (props.visible) {
       setWindowActive();
+      timer = setTimeout(checkLimitAndSetZIndex, 0);
     }
   });
 
+  /*
+    실행 시점(=Window 닫힘):
+      예시. 배열을 통해 Window 여러 개 띄울 때, 배열 원소 삭제로 인해 해당 Window가 닫히는 경우
+      unmount가 발생해서 watch를 실행히시키지 않아 onBeforeUnmount hook 사용
+  */
   onBeforeUnmount(() => {
-    if (props.visible && isActiveStatus) {
+    if (props.visible) {
       setWindowInactive();
+      clearTimeout(timer);
     }
   });
 
+  /*
+    실행 시점:
+      1. visible 값이 false -> true로 변했을 때(=Window 열림)
+      2. visible 값이 true -> false로 변했을 때(=Window 닫힙)
+  */
   watch(
     () => props.visible,
     (visible) => {
       nextTick(() => {
-        if (visible && !isActiveStatus) {
+        if (visible) {
           // visible 값이 false -> true로 변경되었을 때
           setWindowActive();
-        } else if (!visible && isActiveStatus) {
+          timer = setTimeout(checkLimitAndSetZIndex, 0);
+        } else {
           // visible 값이 true -> false로 변경되었을 때
           setWindowInactive();
+          clearTimeout(timer);
         }
       });
   });
@@ -723,16 +878,19 @@ const useEscKeydownEvent = ({ closeWin, windowRef }) => {
   watch(
     () => props.escClose,
     (escClose) => {
-      if (isActiveStatus) {
-        const currentWindow = activeWindows.getWindowBySequence(sequence);
-        if (currentWindow) currentWindow.escClose = escClose;
-      }
+      if (!props.visible) return;
+      const currentWindow = activeWindows.getWindowBySequence(sequence);
+      if (currentWindow) currentWindow.escClose = escClose;
     },
   );
+
+  return {
+    setFocus,
+  };
 };
 
 export {
   useModel,
   useMouseEvent,
-  useEscKeydownEvent,
+  useEscCloseAndFocusable,
 };
