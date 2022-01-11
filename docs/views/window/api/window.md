@@ -24,25 +24,25 @@
 
 
 ### Props
-| 이름                        | 타입             | 디폴트   | 설명                                             | 종류          |
-|---------------------------|----------------|-------|------------------------------------------------|-------------|
-| v-mode:visible            | Boolean        | false | <윈도우>의 보임 여부, 양방향 바인딩                          |             |
-| title                     | String, Number | null  | <윈도우> 내부 헤더의 타이틀                               |
-| window-class              | String         | ''    | <윈도우> 클래스명 사용자 지정                              |             |
-| width                     | String, Number | 50vw  | <윈도우> 너비                                       |             |
-| height                    | String, Number | 50vh  | <윈도우> 높이                                       |             |
-| min-width                 | String, Number | 150   | <윈도우> 최소 너비                                    |             |
-| min-height                | String, Number | 150   | <윈도우> 최소 높이                                    |             |
-| icon-class                | String         | ''    | <윈도우> 내부 헤더의 아이콘                               |             |
-| fullscreen                | Boolean        | false | 전체 화면 여부                                       |
-| is-modal                  | Boolean        | true  | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
-| close-on-click-modal      | Boolean        | false | 모달 레이어 클릭 시 메시지 창 닫기 여부                        | true, false |
-| hide-scroll               | Boolean        | true  | body 스크롤 lock 여부                               |
-| draggable                 | Boolean        | false | window 헤더를 통한 창 드래그 이동 여부                      |
-| resizable                 | Boolean        | false | 마우스 드래그 동작으로 window 크기 조절 여부                   |
-| maximizable               | Boolean        | false | 우측상단 아이콘을 통한 최대화 여부                            |
-| esc-close                 | Boolean        | false | esc 키 눌렀을 때 window 창 닫기 여부                     | true, false |
-| increase-z-index-on-click | Boolean        | true  | window 클릭 시 가장 상단으로 배치 여부                      | true, false |
+| 이름                   | 타입             | 디폴트   | 설명                                             | 종류          |
+|----------------------|----------------|-------|------------------------------------------------|-------------|
+| v-mode:visible       | Boolean        | false | <윈도우>의 보임 여부, 양방향 바인딩                          |             |
+| title                | String, Number | null  | <윈도우> 내부 헤더의 타이틀                               |
+| window-class         | String         | ''    | <윈도우> 클래스명 사용자 지정                              |             |
+| width                | String, Number | 50vw  | <윈도우> 너비                                       |             |
+| height               | String, Number | 50vh  | <윈도우> 높이                                       |             |
+| min-width            | String, Number | 150   | <윈도우> 최소 너비                                    |             |
+| min-height           | String, Number | 150   | <윈도우> 최소 높이                                    |             |
+| icon-class           | String         | ''    | <윈도우> 내부 헤더의 아이콘                               |             |
+| fullscreen           | Boolean        | false | 전체 화면 여부                                       |
+| is-modal             | Boolean        | true  | 모달창 여부. 즉, dim layer 출력 여부(modal vs. modeless) | true, false |
+| close-on-click-modal | Boolean        | false | 모달 레이어 클릭 시 메시지 창 닫기 여부                        | true, false |
+| hide-scroll          | Boolean        | true  | body 스크롤 lock 여부                               |
+| draggable            | Boolean        | false | window 헤더를 통한 창 드래그 이동 여부                      |
+| resizable            | Boolean        | false | 마우스 드래그 동작으로 window 크기 조절 여부                   |
+| maximizable          | Boolean        | false | 우측상단 아이콘을 통한 최대화 여부                            |
+| esc-close            | Boolean        | false | esc 키 눌렀을 때 window 창 닫기 여부                     | true, false |
+| focusable            | Boolean        | false | window 클릭 시 가장 상단으로 배치 여부                      | true, false |
 
 ### Event
 

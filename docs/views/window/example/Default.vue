@@ -281,13 +281,12 @@
     </div>
   </div>
   <div class="case">
-    <p class="case-title">Increase z-index</p>
+    <p class="case-title">Focusable</p>
     <ev-window
         v-model:visible="isVisible13"
-        title="Increase z-index"
+        title="Focusable"
         :is-modal="false"
         :esc-close="true"
-        :increase-z-index-on-click="false"
         maximizable
         fullscreen
     >
@@ -297,17 +296,20 @@
             class="nested-btn"
             @click="clickButton12"
           >
-            nested 열기
+            click to open stacked windows!
           </button>
           <br />
           <i class="ev-icon-moon" />
-          쌓여있는 Window를 클릭하면 가장 상단에 배치됩니다.
+          쌓여있는 윈도우 중 1개를 클릭하면 가장 상단에 올라옵니다.
           <br/>
           <i class="ev-icon-moon" />
-          해당 Window는 increase-z-index-on-click prop의 값이 false여서 클릭해도 상단으로 배치되지 않습니다.
+          배경 윈도우는 focusable prop의 값이 false여서 클릭해도 상단으로 배치되지 않습니다.
           <br/>
           <i class="ev-icon-moon" />
-          Esc 키로 Window를 닫을 수 있습니다.
+          Esc 키로 개별 윈도우를 닫을 수 있습니다.
+          <br/>
+          <i class="ev-icon-moon" />
+          배경 윈도우를 닫으면 전체 Window가 닫힙니다.
         </p>
         <ev-window
           v-for="(_, idx) in isVisible12"
@@ -316,6 +318,7 @@
           :title="`No. ${idx + 1}`"
           :is-modal="false"
           :esc-close="true"
+          :focusable="true"
           draggable
           width="300px"
           height="300px"

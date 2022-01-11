@@ -27,7 +27,7 @@
           }"
           @mousedown="startDrag"
           @mousemove="moveMouse"
-          @click="increaseZIndex"
+          @click="setFocus"
         >
           <div
             v-if="$slots.header || iconClass || title"
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { useEscKeydownEvent, useClickEventForIncreaseZIndex, useModel, useMouseEvent } from './uses';
+import { useEscCloseAndFocusable, useModel, useMouseEvent } from './uses';
 
 export default {
   name: 'EvWindow',
@@ -160,9 +160,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    increaseZIndexOnClick: {
+    focusable: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   emits: [
@@ -198,9 +198,7 @@ export default {
       removeUnit,
     });
 
-    useEscKeydownEvent({ closeWin, windowRef });
-
-    const { increaseZIndex } = useClickEventForIncreaseZIndex({ windowRef });
+    const { setFocus } = useEscCloseAndFocusable({ closeWin, windowRef });
 
     return {
       windowRef,
@@ -214,7 +212,7 @@ export default {
       moveMouse,
       clickExpandBtn,
 
-      increaseZIndex,
+      setFocus,
     };
   },
 };
