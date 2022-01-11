@@ -16,7 +16,6 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
   | data   | Object | {} | 차트에 표시할 시리즈 별 데이터 |  |
-  | labels | Array  | [] | 축의 각 눈금에 해당하는 명칭, line Chart 에서는 time만 인정 |  |
 
 #### series
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -37,8 +36,8 @@ const chartData =
     series2: { name: 'series2', pointSize: 6, pointStyle: 'rect' },
   },
   data: {
-    series1: [[dayjs(time), 1], [dayjs(time).add(1, 'day'), 2], [dayjs(time).add(2, 'day'), 3]],
-    series2: [[dayjs(time), 4], [dayjs(time).add(1, 'day'), 5]],
+    series1: [{ x: dayjs(time), y: 1 }, { x: dayjs(time).add(1, 'day'), y: 2 }, { x: dayjs(time).add(2, 'day'), y: 3 }],
+    series2: [{ x: dayjs(time), y: 4 }, { x: dayjs(time).add(1, 'day'), y: 5, color: '#FF0000' }],
   },
 };
 ```
@@ -53,7 +52,6 @@ const chartData =
   | axesY | Object | 없음 | Y축에 대한 속성 | [상세](#axesx-axesy) |
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
-  | indicator | Object | ([상세](#indicator)) | 지표선 | |
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
@@ -150,13 +148,6 @@ const chartData =
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
-
-#### indicator
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-| --- | ---- | ----- | --- | ----------|
-| use | Boolean | true | indicator 사용 여부 | |
-| color | Hex, RGB, RGBA Code(String) | '#EE7F44' | 색상  | |
-
     
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

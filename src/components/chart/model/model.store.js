@@ -25,7 +25,7 @@ const modules = {
             const sData = data[sId];
 
             if (series && sData) {
-              series.data = this.addSereisDSforScatter(sData);
+              series.data = this.addSeriesDSforScatter(sData);
               series.minMax = this.getSeriesMinMax(series.data);
             }
           });
@@ -272,18 +272,20 @@ const modules = {
   },
 
   /**
-   *
-   * @param data
+   * Take data to create data for each series
+   * @param {array}  data   data array for each series
+   * @returns {array} data info added position and etc
    */
-  addSereisDSforScatter(data) {
-    const sdata = [];
+  addSeriesDSforScatter(data) {
+    return data.map((item) => {
+      const ldata = item.x;
+      const gdata = {
+        value: item.y,
+        color: item?.color || null,
+      };
 
-    data.forEach((curr) => {
-      const [ldata, gdata] = curr;
-      sdata.push(this.addData(gdata, ldata, gdata));
+      return this.addData(gdata, ldata, gdata);
     });
-
-    return sdata;
   },
 
   /**

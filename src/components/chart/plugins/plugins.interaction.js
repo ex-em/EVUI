@@ -62,7 +62,7 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie') {
+      if (indicator.use && type !== 'pie' && type !== 'scatter') {
         this.drawIndicator(offset, indicator.color);
       }
     };

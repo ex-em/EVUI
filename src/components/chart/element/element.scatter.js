@@ -69,18 +69,19 @@ class Scatter {
       return item;
     }, this.data[0]);
 
-    const color = this.color;
-    const pointFillColor = this.pointFill;
     const getOpacity = (colorStr) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
       return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
     };
 
-    ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
-    ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
-
     this.data.forEach((curr) => {
       if (curr.xp !== null && curr.yp !== null) {
+        const color = curr.dataColor || this.color;
+        ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
+
+        const pointFillColor = curr.dataColor || this.pointFill;
+        ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
+
         Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
       }
     });
@@ -120,11 +121,15 @@ class Scatter {
 
     ctx.save();
     if (x !== null && y !== null) {
-      ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
-      ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
+      const color = gdata.dataColor || this.color;
+      const pointFillColor = gdata.dataColor || this.pointFill;
+
+      ctx.strokeStyle = Util.colorStringToRgba(color, 0);
+
+      ctx.fillStyle = Util.colorStringToRgba(pointFillColor, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
 
-      ctx.fillStyle = this.color;
+      ctx.fillStyle = color;
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
 
       ctx.fillStyle = '#fff';
