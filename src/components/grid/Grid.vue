@@ -93,7 +93,7 @@
               <span
                 :title="column.caption"
                 class="column-name"
-                @click.stop="onSort(column.field)"
+                @click.stop="onSort(column)"
               >
                 {{ column.caption }}
               </span>
