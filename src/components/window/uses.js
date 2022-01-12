@@ -56,7 +56,7 @@ const useModel = () => {
     return result;
   };
 
-  const removeUnit = (input, direction) => {
+  const removeUnit = (input, direction = 'horizontal') => {
     if (typeof input === 'number') {
       return input;
     } else if (!input) {
@@ -226,9 +226,9 @@ const useMouseEvent = (param) => {
     const posY = +y - rect.top;
     const headerAreaStyleInfo = headerRef.value.style;
     const headerPaddingInfo = {
-      top: removeUnit(headerAreaStyleInfo.paddingTop),
-      left: removeUnit(headerAreaStyleInfo.paddingLeft),
-      right: removeUnit(headerAreaStyleInfo.paddingRight),
+      top: removeUnit(headerAreaStyleInfo.paddingTop, 'vertical'),
+      left: removeUnit(headerAreaStyleInfo.paddingLeft, 'horizontal'),
+      right: removeUnit(headerAreaStyleInfo.paddingRight, 'horizontal'),
     };
     const startPosX = headerPaddingInfo.left;
     const endPosX = rect.width - headerPaddingInfo.right;
@@ -279,17 +279,17 @@ const useMouseEvent = (param) => {
     if (hasOwnProperty.call(paramObj, 'minWidth')) {
       tMinWidth = paramObj.minWidth;
     } else {
-      tMinWidth = removeUnit(props.minWidth, 'horizontal');
+      tMinWidth = props.minWidth;
     }
 
     if (hasOwnProperty.call(paramObj, 'minHeight')) {
       tMinHeight = paramObj.minHeight;
     } else {
-      tMinHeight = removeUnit(props.minHeight, 'vertical');
+      tMinHeight = props.minHeight;
     }
 
-    width = Math.max(width, tMinWidth);
-    height = Math.max(height, tMinHeight);
+    width = removeUnit(width, 'horizontal') > removeUnit(tMinWidth, 'horizontal') ? width : tMinWidth;
+    height = removeUnit(height, 'vertical') > removeUnit(tMinHeight, 'vertical') ? height : tMinHeight;
 
     dragStyle.top = numberToUnit(top);
     dragStyle.left = numberToUnit(left);
@@ -433,6 +433,8 @@ const useMouseEvent = (param) => {
       setDragStyle({
         top: `${tempTop}px`,
         left: `${tempLeft}px`,
+        width: props.width,
+        height: props.height,
       });
     } else if (props.resizable && clickedInfo.pressedSpot === 'border') {
       resizeWindow(e);
