@@ -709,6 +709,7 @@ export const filterEvent = (params) => {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
+      filterInfo.isSearch = false;
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
@@ -733,8 +734,6 @@ export const filterEvent = (params) => {
         });
         filterInfo.isSearch = true;
         filterInfo.searchWord = searchWord;
-      } else {
-        filterInfo.isSearch = false;
       }
       const store = stores.store;
       let checkedCount = 0;
