@@ -709,22 +709,18 @@ export const filterEvent = (params) => {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
-      filterInfo.isSearch = false;
       if (searchWord) {
-        const filterStores = stores.store.filter((row) => {
+        stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
             let columnValue = row[ROW_DATA_INDEX][ix];
-            let columnType = column.type;
+            const columnType = column.type || 'string';
             if (columnValue) {
               if (typeof columnValue === 'object') {
                 columnValue = columnValue[column.field];
               }
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
-                if (!columnType) {
-                  columnType = 'string';
-                }
                 columnValue = getConvertValue(columnType, columnValue).toString();
                 isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
                 if (isShow) {
@@ -737,7 +733,6 @@ export const filterEvent = (params) => {
         });
         filterInfo.isSearch = true;
         filterInfo.searchWord = searchWord;
-        stores.searchStore = filterStores.slice();
       } else {
         filterInfo.isSearch = false;
       }
