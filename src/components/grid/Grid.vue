@@ -334,13 +334,14 @@ export default {
       filterList: {},
       isFiltering: computed(() =>
         (props.option.useFilter === undefined ? true : props.option.useFilter)),
-      isSearch: false,
       setFiltering: false,
       showFilterWindow: false,
       currentFilter: {
         column: {},
         items: [],
       },
+      isSearch: false,
+      searchWord: '',
     });
     const stores = reactive({
       viewStore: [],
@@ -428,7 +429,15 @@ export default {
       onCloseFilterWindow,
       onApplyFilter,
       setFilter,
-    } = filterEvent({ filterInfo, stores, getColumnIndex });
+      onSearch,
+    } = filterEvent({
+      filterInfo,
+      stores,
+      checkInfo,
+      getColumnIndex,
+      getConvertValue,
+      updateVScroll,
+    });
 
     const {
       setStore,
@@ -494,22 +503,23 @@ export default {
       () => props.rows,
       (value) => {
         setStore(value);
+        onSearch(filterInfo.searchWord);
       },
     );
     watch(
       () => props.checked,
-      (value) => {
-        checkInfo.checkedRows = value;
+      (checkedList) => {
+        checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
-        let store = stores.originStore;
-        if (filterInfo.isSearch && stores.searchStore) {
-          store = stores.searchStore;
-        }
+        checkInfo.checkedIndex.clear();
+        const store = stores.store;
         store.forEach((row) => {
-          row[ROW_CHECK_INDEX] = checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]);
+          row[ROW_CHECK_INDEX] = checkedList.includes(row[ROW_DATA_INDEX]);
+          if (row[ROW_CHECK_INDEX]) {
+            checkInfo.checkedIndex.add(row[ROW_INDEX]);
+          }
         });
-        if (checkInfo.checkedRows.length
-          && store.length === checkInfo.checkedRows.length) {
+        if (checkedList.length && checkedList.length === store.length) {
           checkInfo.isHeaderChecked = true;
         }
       },
@@ -553,64 +563,6 @@ export default {
         setStore([], false);
       },
     );
-    let timer = null;
-    const onSearch = (searchWord) => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        filterInfo.isSearch = false;
-        if (searchWord) {
-          const filterStores = stores.store.filter((row) => {
-            let isShow = false;
-            for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
-              const column = stores.orderedColumns[ix] || {};
-              let columnValue = row[ROW_DATA_INDEX][ix];
-              let columnType = column.type;
-              if (columnValue) {
-                if (typeof columnValue === 'object') {
-                  columnValue = columnValue[column.field];
-                }
-                if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
-                  if (!columnType) {
-                    columnType = 'string';
-                  }
-                  columnValue = getConvertValue(columnType, columnValue).toString();
-                  isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
-                  if (isShow) {
-                    break;
-                  }
-                }
-              }
-            }
-            return isShow;
-          });
-          filterInfo.isSearch = true;
-          stores.searchStore = JSON.parse(JSON.stringify(filterStores));
-        } else {
-          filterInfo.isSearch = false;
-        }
-        let store = stores.originStore;
-        let checkSize = checkInfo.checkedRows.length;
-        for (let ix = 0; ix < store.length; ix++) {
-          if (checkInfo.checkedIndex.has(store[ix][ROW_INDEX])) {
-            store[ix][ROW_CHECK_INDEX] = true;
-          } else {
-            store[ix][ROW_CHECK_INDEX] = false;
-          }
-        }
-        if (filterInfo.isSearch && stores.searchStore) {
-          store = stores.searchStore;
-          checkSize = checkInfo.checkedIndex.size;
-        }
-        if (store.length && checkSize >= store.length) {
-          checkInfo.isHeaderChecked = true;
-        } else {
-          checkInfo.isHeaderChecked = false;
-        }
-        setStore([], false);
-      }, 500);
-    };
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
     return {
       showHeader,
