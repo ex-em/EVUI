@@ -6,54 +6,74 @@
       @drag-select="onDragSelect"
     />
     <div class="description">
-      <span class="description-label">
-        데이터 자동 업데이트
-      </span>
-      <ev-toggle v-model="isLive"/>
-      <br><br>
-      <div class="badge yellow">
-        선택 영역 내 데이터
+      <div class="one-row">
+        <p class="badge yellow">
+          선택 영역 내 데이터
+        </p>
+        <div
+            v-for="(row, rowIndex) in selectionItems"
+            :key="rowIndex"
+        >
+          <i>{{ row.seriesName }}</i>
+          <p v-for="(item, itemIdx) in row.items"
+             :key="itemIdx"
+          >
+            <b>x</b>: {{ getDateString(item.x) }} <b>y</b>: {{ item.y }}
+          </p>
+          <br><br>
+        </div>
       </div>
-      <br><br>
-      <div
-        v-for="(row, rowIndex) in selectionItems"
-        :key="rowIndex"
-      >
-        Series Name : {{ row.seriesName }}
-        <br>
-        Items : {{ row.items }}
-        <br><br>
-      </div>
-      <div class="badge yellow">
-        범위 값
-      </div>
-      <br><br>
-      <div v-if="selectionRange.xMin">
-        X min : {{ selectionRange.xMin }} <br>
-        X max : {{ selectionRange.xMax }} <br>
-        Y min : {{ selectionRange.yMin }} <br>
-        Y max : {{ selectionRange.yMax }} <br>
+      <div class="one-row">
+        <p class="badge yellow">
+          범위 값
+        </p>
+        <div v-if="selectionRange.xMin">
+          <p><b>X min</b> : {{ getDateString(selectionRange.xMin) }} </p>
+          <p><b>X max</b> : {{ getDateString(selectionRange.xMax) }} </p>
+          <p><b>Y min</b> : {{ selectionRange.yMin }} </p>
+          <p><b>Y max</b> : {{ selectionRange.yMax }} </p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
+  import { ref } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
     setup() {
-      const pointSize = 3;
-      const pointStyle = 'circle';
-      const seriesCount = 3;
-      const xAxisDataCount = 10;
+      const currentTime = dayjs();
 
-      const chartData = reactive({
-        series: {},
-        labels: [],
-        data: {},
-      });
+      const chartData = {
+        series: {
+          series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
+          series3: { name: 'series#2' },
+        },
+        data: {
+          series1: [
+            { x: currentTime, y: 1 },
+            { x: currentTime.add(1, 'second'), y: 20 },
+            { x: currentTime.add(1, 'second'), y: 30 },
+            { x: currentTime.add(2, 'second'), y: 10 },
+          ],
+          series2: [
+            { x: currentTime, y: 20 },
+            { x: currentTime.add(2, 'second'), y: 20 },
+            { x: currentTime.add(3, 'second'), y: 13 },
+            { x: currentTime.add(4, 'second'), y: 1 },
+          ],
+          series3: [
+            { x: currentTime, y: 30 },
+            { x: currentTime.add(2, 'second'), y: 5 },
+            { x: currentTime.add(3, 'second'), y: 23 },
+            { x: currentTime.add(4, 'second'), y: 40 },
+            { x: currentTime.add(4, 'second'), y: 20 },
+          ],
+        },
+      };
 
       const chartOptions = {
         type: 'scatter',
@@ -90,107 +110,32 @@
         selectionRange.value = range;
       };
 
-      const isLive = ref(false);
-      const liveInterval = ref();
-      let timeValue = +dayjs();
-
-      const addRandomChartData = () => {
-        timeValue = +dayjs(timeValue).add(1, 'second');
-        chartData.labels.shift();
-        chartData.labels.push(timeValue);
-
-        Object.values(chartData.data).forEach((seriesData) => {
-          seriesData.shift();
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-        });
-      };
-
-      const initChartSeries = () => {
-        chartData.series = {};
-        chartData.labels.length = 0;
-        chartData.data = {};
-
-        let seriesName;
-        let seriesId;
-        for (let ix = 1; ix <= seriesCount; ix++) {
-          seriesName = `series#${ix}`;
-          seriesId = `series${ix}`;
-          chartData.series[seriesId] = {
-            name: seriesName,
-            pointSize,
-            pointStyle,
-          };
-
-          chartData.data[seriesId] = [];
-        }
-      };
-
-      const initChartData = () => {
-        const dataKeys = Object.keys(chartData.data);
-        chartData.labels.length = 0;
-        for (let ix = 0; ix < dataKeys.length; ix++) {
-          chartData.data[dataKeys[ix]].length = 0;
-        }
-
-        let tmpTimeValue;
-        for (let ix = 0; ix < xAxisDataCount; ix++) {
-          tmpTimeValue = +dayjs(timeValue).subtract(ix, 'second');
-          chartData.labels.unshift(tmpTimeValue);
-
-          Object.values(chartData.data).forEach((seriesData) => {
-            seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-          });
-        }
-      };
-
-      onMounted(() => {
-        initChartSeries();
-        initChartData();
-      });
-
-      watch(isLive, (newValue) => {
-        if (newValue) {
-          addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 1000);
-        } else {
-          clearInterval(liveInterval.value);
-        }
-      });
-
-      onBeforeUnmount(() => {
-        clearInterval(liveInterval.value);
-      });
+      const getDateString = x => dayjs(x).format('HH:mm:ss');
 
       return {
         chartData,
         chartOptions,
-        isLive,
         selectionItems,
         selectionRange,
         onDragSelect,
+        getDateString,
       };
     },
   };
 </script>
 
 <style lang="scss" scoped>
-  .description-label {
-    vertical-align: top;
-    margin-right: 3px;
-  }
+.description-label {
+  vertical-align: top;
+  margin-right: 3px;
+}
 
-  .row {
-    display: flex;
-    margin-top: 15px;
-    justify-content: space-between;
-    .row-item {
-      flex: 1;
-      display: flex;
-      .item-title {
-        line-height: 33px;
-        margin-right: 3px;
-        min-width: 80px;
-      }
-    }
+.one-row {
+  width: 100%;
+  margin: 15px 0 15px 0;
+
+  p {
+    margin-top: 3px;
   }
+}
 </style>

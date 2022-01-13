@@ -19,6 +19,16 @@ const modules = {
           } else {
             this.createPieDataSet(data, type);
           }
+        } else if (typeKey === 'scatter') {
+          type.forEach((sId) => {
+            const series = this.seriesList[sId];
+            const sData = data[sId];
+
+            if (series && sData) {
+              series.data = this.addSeriesDSforScatter(sData);
+              series.minMax = this.getSeriesMinMax(series.data);
+            }
+          });
         } else {
           type.forEach((sId) => {
             const series = this.seriesList[sId];
@@ -262,6 +272,23 @@ const modules = {
   },
 
   /**
+   * Take data to create data for each series
+   * @param {array}  data   data array for each series
+   * @returns {array} data info added position and etc
+   */
+  addSeriesDSforScatter(data) {
+    return data.map((item) => {
+      const ldata = item.x;
+      const gdata = {
+        value: item.y,
+        color: item?.color || null,
+      };
+
+      return this.addData(gdata, ldata, gdata);
+    });
+  },
+
+  /**
    * Take data to create data object for graph
    * @param {object}  gdata    graph data (y-axis value for vertical chart)
    * @param {object}  ldata    label data (x-axis value for vertical chart)
@@ -483,17 +510,17 @@ const modules = {
 
         if (smm && series.show) {
           if (!isHorizontal) {
-            if (smm.minX && ((!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)))) {
+            if (smm.minX && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
               minmax.x[axisX].min = smm.minX;
             }
-            if (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min)) {
+            if (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min)) {
               minmax.y[axisY].min = smm.minY;
             }
           } else {
-            if (!minmax.x[axisX].min || (smm.minX < minmax.x[axisX].min)) {
+            if (minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)) {
               minmax.x[axisX].min = smm.minX;
             }
-            if (smm.minY && (!minmax.y[axisY].min || (smm.minY < minmax.y[axisY].min))) {
+            if (smm.minY && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
               minmax.y[axisY].min = smm.minY;
             }
           }

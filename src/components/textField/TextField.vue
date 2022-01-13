@@ -61,7 +61,7 @@
           :class="{ 'on': isPasswordVisible }"
           @click="changePasswordVisible"
         >
-          <i class="ev-icon-radio-on"/>
+          <i :class="isPasswordVisible ? 'ev-icon-visibility' : 'ev-icon-visibility-off'"/>
         </span>
         <span
           v-if="type === 'search'"
