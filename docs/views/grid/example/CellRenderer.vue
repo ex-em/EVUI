@@ -149,6 +149,7 @@ export default {
         caption: 'Slide',
         field: 'slide',
         type: 'string',
+        sortable: false,
       },
       {
         caption: 'InputNumber',

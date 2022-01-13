@@ -260,7 +260,7 @@ export default {
       { caption: '', field: 'user-icon', type: 'string' },
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
       { caption: 'Role', field: 'role', type: 'string' },
-      { caption: 'Phone', field: 'phone', type: 'string' },
+      { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string' },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
       { caption: '', field: 'gridButton', width: 120 },

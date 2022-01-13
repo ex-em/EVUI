@@ -463,17 +463,20 @@ export const sortEvent = (params) => {
   /**
    * sort 이벤트를 처리한다.
    *
-   * @param {string} field - 컬럼 field
+   * @param {object} column - 컬럼 정보
    */
-  const onSort = (field) => {
-    if (sortInfo.sortField !== field) {
-      order.orders = ['asc', 'desc', 'init'];
-      sortInfo.sortField = field;
-    }
-    sortInfo.sortOrder = order.dequeue();
-    order.enqueue(sortInfo.sortOrder);
+  const onSort = (column) => {
+    const sortable = column.sortable === undefined ? true : column.sortable;
+    if (sortable) {
+      if (sortInfo.sortField !== column?.field) {
+        order.orders = ['asc', 'desc', 'init'];
+        sortInfo.sortField = column?.field;
+      }
+      sortInfo.sortOrder = order.dequeue();
+      order.enqueue(sortInfo.sortOrder);
 
-    sortInfo.isSorting = true;
+      sortInfo.isSorting = true;
+    }
   };
   /**
    * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.

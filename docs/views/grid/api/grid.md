@@ -57,7 +57,8 @@
 | field | String | 필드명 | ex) 'instance_name' | Y |
 | type | String | 데이터 타입 | 'string', 'number', 'float', 'boolean' | Y |
 | width | Number | 컬럼 넓이 | ex) 150 | N |
-| searchable | Boolean | 검색 대상 여부 | `true`, `false` | N |
+| searchable | Boolean | 검색 대상 여부 | Boolean | N |
+| sortable | Boolean | 정렬 대상 여부 | Boolean | N |
 
 ### Event
 | 이름 | 파라미터 | 설명 |
