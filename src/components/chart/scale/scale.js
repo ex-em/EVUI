@@ -312,10 +312,20 @@ class Scale {
         if (this.type === 'x') {
           fromPos = Canvas.calculateX(from ?? minX, axisMin, axisMax, xArea, minX);
           toPos = Canvas.calculateX(to ?? maxX, axisMin, axisMax, xArea, minX);
+
+          if (fromPos === null || toPos === null) {
+            return;
+          }
+
           this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         } else {
           fromPos = Canvas.calculateY(from ?? axisMin, axisMin, axisMax, yArea, maxY);
           toPos = Canvas.calculateY(to ?? axisMax, axisMin, axisMax, yArea, maxY);
+
+          if (fromPos === null || toPos === null) {
+            return;
+          }
+
           this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         }
 
@@ -341,9 +351,19 @@ class Scale {
         let dataPos;
         if (this.type === 'x') {
           dataPos = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
+
+          if (dataPos === null) {
+            return;
+          }
+
           this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
         } else {
           dataPos = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
+
+          if (dataPos === null) {
+            return;
+          }
+
           this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
         }
 
