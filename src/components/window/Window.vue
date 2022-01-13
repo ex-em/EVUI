@@ -27,6 +27,7 @@
           }"
           @mousedown="startDrag"
           @mousemove="moveMouse"
+          @click="setFocus"
         >
           <div
             v-if="$slots.header || iconClass || title"
@@ -84,11 +85,17 @@
 </template>
 
 <script>
-import { useEscKeydownEvent, useModel, useMouseEvent } from './uses';
+import { useEscCloseAndFocusable, useModel, useMouseEvent } from './uses';
 
 export default {
   name: 'EvWindow',
   props: {
+    style: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
     visible: {
       type: Boolean,
       default: false,
@@ -153,6 +160,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    focusable: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'update:visible',
@@ -187,7 +198,7 @@ export default {
       removeUnit,
     });
 
-    useEscKeydownEvent({ closeWin, windowRef });
+    const { setFocus } = useEscCloseAndFocusable({ closeWin, windowRef });
 
     return {
       windowRef,
@@ -200,6 +211,8 @@ export default {
       startDrag,
       moveMouse,
       clickExpandBtn,
+
+      setFocus,
     };
   },
 };

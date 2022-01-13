@@ -33,28 +33,16 @@
     >
       <!-- renderer start -->
       <template #user-icon>
-        <div
-          class="user-icon"
-        ></div>
+        <div class="user-icon"/>
       </template>
-      <template #userName="{ item }">
-        <a
-          style="text-decoration: underline; cursor: pointer;"
-          @click="item.onDetailPopup(item.row)"
-        >{{item.row[2][item.column.index]}}</a>
-      </template>
-      <template #gridButton="{ item }">
+      <template #gridButton>
         <ev-button
           type="ghost"
           size="small"
-          @click="item.onRowDelete(item.row[0])"
         >
           Delete
         </ev-button>
-        <ev-button
-          size="small"
-          @click="item.onRowEdit(item.row)"
-        >
+        <ev-button size="small">
           Edit
         </ev-button>
       </template>
@@ -272,7 +260,7 @@ export default {
       { caption: '', field: 'user-icon', type: 'string' },
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
       { caption: 'Role', field: 'role', type: 'string' },
-      { caption: 'Phone', field: 'phone', type: 'string' },
+      { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string' },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
       { caption: '', field: 'gridButton', width: 120 },

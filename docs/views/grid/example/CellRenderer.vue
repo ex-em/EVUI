@@ -30,18 +30,14 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- renderer start -->
-      <template #gridButton="{ item }">
+      <template #gridButton>
         <ev-button
           type="ghost"
           size="small"
-          @click="item.onRowDelete(item.row[0])"
         >
           Delete
         </ev-button>
-        <ev-button
-          size="small"
-          @click="item.onRowEdit(item.row)"
-        >
+        <ev-button size="small">
           Edit
         </ev-button>
       </template>
@@ -153,6 +149,7 @@ export default {
         caption: 'Slide',
         field: 'slide',
         type: 'string',
+        sortable: false,
       },
       {
         caption: 'InputNumber',
