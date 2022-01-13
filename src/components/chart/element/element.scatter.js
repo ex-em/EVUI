@@ -69,18 +69,19 @@ class Scatter {
       return item;
     }, this.data[0]);
 
-    const color = this.color;
-    const pointFillColor = this.pointFill;
     const getOpacity = (colorStr) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
       return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
     };
 
-    ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
-    ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
-
     this.data.forEach((curr) => {
       if (curr.xp !== null && curr.yp !== null) {
+        const color = curr.dataColor || this.color;
+        ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
+
+        const pointFillColor = curr.dataColor || this.pointFill;
+        ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
+
         Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
       }
     });
@@ -101,6 +102,72 @@ class Scatter {
         && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
 
     return items;
+  }
+
+  /**
+   * Draw item highlight
+   * @param {object}   item       object for drawing series data
+   * @param {object}   context    canvas context
+   * @param {boolean}  isMax      determines if this series has max value
+   *
+   * @returns {undefined}
+   */
+  itemHighlight(item, context) {
+    const gdata = item.data;
+    const ctx = context;
+
+    const x = gdata.xp;
+    const y = gdata.yp;
+
+    ctx.save();
+    if (x !== null && y !== null) {
+      const color = gdata.dataColor || this.color;
+      const pointFillColor = gdata.dataColor || this.pointFill;
+
+      ctx.strokeStyle = Util.colorStringToRgba(color, 0);
+
+      ctx.fillStyle = Util.colorStringToRgba(pointFillColor, this.highlight.maxShadowOpacity);
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
+
+      ctx.fillStyle = color;
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
+
+      ctx.fillStyle = '#fff';
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, x, y);
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Find graph item for tooltip
+   * @param {array}  offset       mouse position
+   *
+   * @returns {object} graph item
+   */
+  findGraphData(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const pointSize = this.pointSize;
+    const gdata = this.data;
+
+    const foundItem = gdata.find((data) => {
+      const x = data.xp;
+      const y = data.yp;
+
+      return (x - pointSize <= xp)
+        && (xp <= x + pointSize)
+        && (y - pointSize <= yp)
+        && (yp <= y + pointSize);
+    });
+
+    if (foundItem) {
+      item.data = foundItem;
+      item.hit = true;
+    }
+
+    return item;
   }
 }
 

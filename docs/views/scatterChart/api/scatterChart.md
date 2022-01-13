@@ -16,8 +16,6 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
   | data   | Object | {} | 차트에 표시할 시리즈 별 데이터 |  |
-  | groups | Array  | [] | Stack 차트를 위한 시리즈 그룹을 지정 |  |
-  | labels | Array  | [] | 축의 각 눈금에 해당하는 명칭, line Chart 에서는 time만 인정 |  |
 
 #### series
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -38,15 +36,9 @@ const chartData =
     series2: { name: 'series2', pointSize: 6, pointStyle: 'rect' },
   },
   data: {
-    series1: [1, 2, 3, 4],
-    series2: [5, 2, 0, 8],
+    series1: [{ x: dayjs(time), y: 1 }, { x: dayjs(time).add(1, 'day'), y: 2 }, { x: dayjs(time).add(2, 'day'), y: 3 }],
+    series2: [{ x: dayjs(time), y: 4 }, { x: dayjs(time).add(1, 'day'), y: 5, color: '#FF0000' }],
   },
-  labels: [
-    dayjs(time),
-    dayjs(time).add(1, 'day'),
-    dayjs(time).add(2, 'day'),
-    dayjs(time).add(3, 'day'),
-  ],
 };
 ```
   
@@ -60,15 +52,15 @@ const chartData =
   | axesY | Object | 없음 | Y축에 대한 속성 | [상세](#axesx-axesy) |
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
-  | indicator | Object | ([상세](#indicator)) | 지표선 | |
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
-  | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 | 
+  | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
+  | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | type | String | | 축의 유형 | [time](#time-type) |
+  | type | String | | 축의 유형 | [time](#time-type), [linear](#linear-type) |
   | showAxis | Boolean | true | 축 표시 여부 | true / false | 
   | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
   | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
@@ -86,9 +78,13 @@ const chartData =
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
-   - categoryMode
-      - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
 
+##### linear type
+- interval (Axis Label 표기를 위한 interval)
+    - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
+- Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
+    - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+    - 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
@@ -152,13 +148,6 @@ const chartData =
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
-
-#### indicator
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-| --- | ---- | ----- | --- | ----------|
-| use | Boolean | true | indicator 사용 여부 | |
-| color | Hex, RGB, RGBA Code(String) | '#EE7F44' | 색상  | |
-
     
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -167,6 +156,25 @@ const chartData =
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
+
+#### tooltip
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | tooltip 표시 여부 | true /false |
+| backgroundColor | Hex, RGB, RGBA Code(String) | '#4C4C4C' | tooltip 배경 색상  | |
+| borderColor | Hex, RGB, RGBA Code(String) | '#666666' | tooltip 테두리 색상  | |
+| useShadow | Boolean | false | 그림자 사용 여부  | |
+| shadowOpacity | Number | 0.25 | 그림자 투명도  | |
+| throttledMove | Boolean | false | 데이터 조회 Throttling 처리 유무  | |
+| debouncedHide | Boolean | false | 좌표 이동 시 tooltip hide 여부  | |
+| sortByValue | Boolean | true | 값을 기준으로 정렬할지의 여부  | |
+| useScrollbar | Boolean | false | 스크롤바 사용 여부  | |
+| maxHeight | Number |  | 툴팁의 최대 높이  | |
+| maxWidth | Number |  | 툴팁의 최대 너비  | |
+| textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
+| showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({x, y, name}) => y + '%' |
+
 
 ### 3. resize-timeout
 - Default : 0
