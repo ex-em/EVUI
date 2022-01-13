@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch } from 'vue';
+import { reactive, toRefs, computed, watch, onActivated, onMounted } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import {
@@ -333,6 +333,12 @@ export default {
       onSearch,
     } = filterEvent({ checkInfo, stores, getConvertValue, calculatedColumn, updateVScroll });
 
+    onMounted(() => {
+      stores.treeStore = setTreeNodeStore();
+    });
+    onActivated(() => {
+      updateVScroll();
+    });
     watch(
       () => props.checked,
       (value) => {
@@ -362,8 +368,6 @@ export default {
         checkInfo.isHeaderChecked = false;
       },
     );
-    stores.treeStore = setTreeNodeStore();
-
     watch(
       () => props.rows,
       (newData) => {

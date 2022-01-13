@@ -251,7 +251,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted } from 'vue';
+import { reactive, toRefs, computed, watch, onActivated, onMounted } from 'vue';
 import FilterWindow from './grid.filter.window';
 import Toolbar from './grid.toolbar';
 import {
@@ -460,6 +460,9 @@ export default {
     onMounted(() => {
       calculatedColumn();
       setStore(props.rows);
+    });
+    onActivated(() => {
+      updateVScroll();
     });
     const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
