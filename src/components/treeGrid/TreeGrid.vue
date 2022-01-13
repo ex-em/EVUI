@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onActivated, onMounted } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import {

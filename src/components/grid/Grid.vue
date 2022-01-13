@@ -251,7 +251,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onActivated, onMounted } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated } from 'vue';
 import FilterWindow from './grid.filter.window';
 import Toolbar from './grid.toolbar';
 import {
