@@ -473,6 +473,11 @@ export default {
     const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
     const ROW_DATA_INDEX = 2;
+    const clearCheckInfo = () => {
+      checkInfo.checkedRows = [];
+      checkInfo.checkedIndex.clear();
+      checkInfo.isHeaderChecked = false;
+    };
     watch(
       () => props.columns,
       () => {
@@ -503,7 +508,9 @@ export default {
       () => props.rows,
       (value) => {
         setStore(value);
-        onSearch(filterInfo.searchWord);
+        if (filterInfo.isSearch) {
+          onSearch(filterInfo.searchWord);
+        }
       },
     );
     watch(
@@ -522,6 +529,7 @@ export default {
         if (checkedList.length && checkedList.length === store.length) {
           checkInfo.isHeaderChecked = true;
         }
+        updateVScroll();
       },
     );
     watch(
@@ -533,8 +541,15 @@ export default {
     watch(
       () => checkInfo.useCheckbox.mode,
       () => {
-        checkInfo.checkedRows = [];
-        checkInfo.isHeaderChecked = false;
+        clearCheckInfo();
+      },
+    );
+    watch(
+      () => props.checked.length,
+      (checkedSize) => {
+        if (!checkedSize) {
+          clearCheckInfo();
+        }
       },
     );
     watch(
