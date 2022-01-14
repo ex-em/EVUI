@@ -1,4 +1,4 @@
-import { getCurrentInstance, nextTick } from 'vue';
+import { getCurrentInstance } from 'vue';
 import { isEqual, uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
@@ -368,7 +368,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const { checkInfo, stores, filterInfo } = params;
+  const { checkInfo, stores } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -404,20 +404,12 @@ export const checkEvent = (params) => {
       }
       checkInfo.checkedIndex.add(row[ROW_INDEX]);
 
-      let store = stores.originStore;
-      let checkSize = checkInfo.checkedRows.length;
-      if (filterInfo.isSearch && stores.searchStore) {
-        store = stores.searchStore;
-        checkSize = checkInfo.checkedIndex.size;
-      }
-      if (checkSize >= store.length) {
+      const store = stores.store;
+      const isAllChecked = store.every(d => d[ROW_CHECK_INDEX]);
+      if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
       }
     } else {
-      if (checkInfo.isHeaderChecked) {
-        checkInfo.isHeaderChecked = false;
-      }
-
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [];
         checkInfo.checkedIndex.clear();
@@ -425,8 +417,8 @@ export const checkEvent = (params) => {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
         checkInfo.checkedIndex.delete(row[ROW_INDEX]);
       }
+      checkInfo.isHeaderChecked = false;
     }
-
     checkInfo.prevCheckedRow = row.slice();
     emit('update:checked', checkInfo.checkedRows);
     emit('check-row', event, row[ROW_INDEX], row[ROW_DATA_INDEX]);
@@ -437,28 +429,24 @@ export const checkEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onCheckAll = (event) => {
-    const status = checkInfo.isHeaderChecked;
-    const checked = [];
-    let item;
-    let store = stores.originStore;
-    if (filterInfo.isSearch && stores.searchStore) {
-      store = stores.searchStore;
-    }
-    for (let ix = 0; ix < store.length; ix++) {
-      item = store[ix];
-      if (status) {
-        checked.push(item[ROW_DATA_INDEX]);
-        checkInfo.checkedIndex.add(item[ROW_INDEX]);
+    const isHeaderChecked = checkInfo.isHeaderChecked;
+    const store = stores.store;
+    store.forEach((row) => {
+      if (isHeaderChecked) {
+        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX])) {
+          checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
+        }
+        if (!checkInfo.checkedIndex.has(row[ROW_INDEX])) {
+          checkInfo.checkedIndex.add(row[ROW_INDEX]);
+        }
       } else {
-        checkInfo.checkedIndex.clear();
+        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+        checkInfo.checkedIndex.delete(row[ROW_INDEX]);
       }
-
-      item[ROW_CHECK_INDEX] = status;
-    }
-
-    checkInfo.checkedRows = checked;
-    emit('update:checked', checked);
-    emit('check-all', event, checked);
+      row[ROW_CHECK_INDEX] = isHeaderChecked;
+    });
+    emit('update:checked', checkInfo.checkedRows);
+    emit('check-all', event, checkInfo.checkedRows);
   };
   return { onCheck, onCheckAll };
 };
@@ -530,7 +518,14 @@ export const sortEvent = (params) => {
 
 export const filterEvent = (params) => {
   const { props } = getCurrentInstance();
-  const { filterInfo, stores, getColumnIndex } = params;
+  const {
+    filterInfo,
+    stores,
+    checkInfo,
+    getColumnIndex,
+    getConvertValue,
+    updateVScroll,
+  } = params;
   /**
    * 해당 컬럼에 대한 필터 팝업을 보여준다.
    *
@@ -708,7 +703,57 @@ export const filterEvent = (params) => {
       stores.filterStore = uniqBy(filterStore, JSON.stringify);
     }
   };
-  return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter };
+  let timer = null;
+  const onSearch = (searchWord) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      filterInfo.isSearch = false;
+      filterInfo.searchWord = searchWord;
+      if (searchWord) {
+        stores.searchStore = stores.store.filter((row) => {
+          let isShow = false;
+          for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
+            const column = stores.orderedColumns[ix] || {};
+            let columnValue = row[ROW_DATA_INDEX][ix];
+            const columnType = column.type || 'string';
+            if (columnValue) {
+              if (typeof columnValue === 'object') {
+                columnValue = columnValue[column.field];
+              }
+              if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
+                columnValue = getConvertValue(columnType, columnValue).toString();
+                isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
+                if (isShow) {
+                  break;
+                }
+              }
+            }
+          }
+          return isShow;
+        });
+        filterInfo.isSearch = true;
+      }
+      const store = stores.store;
+      let checkedCount = 0;
+      for (let ix = 0; ix < store.length; ix++) {
+        if (checkInfo.checkedIndex.has(store[ix][ROW_INDEX])) {
+          store[ix][ROW_CHECK_INDEX] = true;
+          checkedCount += 1;
+        } else {
+          store[ix][ROW_CHECK_INDEX] = false;
+        }
+      }
+      if (store.length && store.length === checkedCount) {
+        checkInfo.isHeaderChecked = true;
+      } else {
+        checkInfo.isHeaderChecked = false;
+      }
+      updateVScroll();
+    }, 500);
+  };
+  return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter, onSearch };
 };
 
 export const contextMenuEvent = (params) => {
@@ -797,47 +842,40 @@ export const storeEvent = (params) => {
    * 전달된 데이터를 내부 store 및 속성에 저장한다.
    *
    * @param {array} value - row 데이터
-   * @param {boolean} makeIndex - 인덱스 생성 유무
+   * @param {boolean} isMakeIndex - 인덱스 생성 유무
    */
-  const setStore = (value, makeIndex = true) => {
-    nextTick(() => {
-      const store = [];
-      let checked;
-      let selected = false;
-      if (makeIndex) {
-        let hasUnChecked = false;
-
-        for (let ix = 0; ix < value.length; ix++) {
-          checked = props.checked.includes(value[ix]);
-          if (!checked) {
-            hasUnChecked = true;
-          }
-
-          if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
-            selectInfo.selectedRow = value[ix];
-            selected = true;
-          }
-
-          store.push([ix, checked, value[ix]]);
+  const setStore = (value, isMakeIndex = true) => {
+    const store = [];
+    let checked;
+    let selected = false;
+    if (isMakeIndex) {
+      let hasUnChecked = false;
+      for (let ix = 0; ix < value.length; ix++) {
+        checked = props.checked.includes(value[ix]);
+        if (!checked) {
+          hasUnChecked = true;
         }
-
-        if (!selected) {
-          selectInfo.selectedRow = [];
+        if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
+          selectInfo.selectedRow = value[ix];
+          selected = true;
         }
-
-        checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
-        stores.originStore = store;
+        store.push([ix, checked, value[ix]]);
       }
-      if (filterInfo.isFiltering) {
-        setFilter();
+      if (!selected) {
+        selectInfo.selectedRow = [];
       }
-      if (sortInfo.sortField) {
-        setSort();
-      }
-      if (elementInfo.body?.clientHeight) {
-        updateVScroll();
-      }
-    });
+      checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
+      stores.originStore = store;
+    }
+    if (filterInfo.isFiltering) {
+      setFilter();
+    }
+    if (sortInfo.sortField) {
+      setSort();
+    }
+    if (elementInfo.body?.clientHeight) {
+      updateVScroll();
+    }
   };
   /**
    * 컴포넌트의 변경 데이터를 store에 업데이트한다.
