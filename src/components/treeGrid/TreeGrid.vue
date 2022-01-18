@@ -346,7 +346,7 @@ export default {
         if (stores.searchStore.length > 0) {
           store = stores.searchStore;
         }
-        const isCheck = store.every(n => n.checked === true);
+        const isCheck = store.length > 0 && store.every(n => n.checked === true);
         checkInfo.isHeaderChecked = false;
         checkInfo.checkedRows = value;
         for (let ix = 0; ix < store.length; ix++) {

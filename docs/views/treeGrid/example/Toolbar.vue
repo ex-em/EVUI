@@ -98,88 +98,37 @@ export default {
       clickedRowMV.value = JSON.stringify(rowData);
     };
     const getData = () => {
-      tableData.value = [{
-        id: 'Exem 1',
-        date: '2016-05-01',
-        name: '1',
-        expand: true,
-        children: [{
-          id: 'Exem 2',
-          date: '2016-05-02',
-          name: '2',
-          expand: false,
-          children: [{
-            id: 'Exem 3',
-            date: '2016-05-02',
-            name: '3',
-          }, {
-            id: 'Exem 4',
-            date: '2016-05-02',
-            name: '4',
-            expand: false,
-            children: [{
-              id: 'Exem 5',
-              date: '2016-05-02',
-              name: '5',
-              children: [{
-                id: 'Exem 51',
-                date: '2016-05-02',
-                name: '51',
-                children: [{
-                  id: 'Exem 52',
-                  date: '2016-05-02',
-                  name: '52',
-                }],
-              }],
-            }, {
-              id: 'Exem 6',
-              date: '2016-05-02',
-              name: '6',
-            }],
-          }],
-        }, {
-          id: 'Exem 7',
-          date: '2016-05-03',
-          name: '7',
-          children: [{
-            id: 'Exem 8',
-            date: '2016-05-03',
-            name: '8',
-          }, {
-            id: 'Exem 9',
-            date: '2016-05-03',
-            name: '9',
-          }, {
-            id: 'Exem 10',
-            date: '2016-05-03',
-            name: '10',
-          }],
-        }, {
-          id: 'Exem 11',
-          date: '2016-05-04',
-          name: '11',
-        }],
-      }, {
-        id: 'Exem 12',
-        date: '2016-05-01',
-        name: '12',
-        expand: true,
-        children: [{
-          id: 'Exem 13',
-          date: '2016-05-02',
-          name: '13',
-          expand: false,
-          children: [{
-            id: 'Exem 14',
-            date: '2016-05-02',
-            name: '14',
-          }],
-        }, {
-          id: 'Exem 15',
-          date: '2016-05-03',
-          name: '15',
-        }],
-      }];
+      tableData.value = [
+        {
+          id: 'attributes.ini',
+          children: [
+            {
+              id: 'pythontrace',
+              children: [
+                { id: 'level' },
+                { id: 'trace_errors' },
+                { id: 'trace_indexes' },
+                { id: 'truncate_doclists' },
+              ],
+            },
+          ],
+        },
+        {
+          id: 'diserver.ini',
+          children: [
+            { id: 'api' },
+            { id: 'blobs' },
+            { id: 'connection' },
+            { id: 'make' },
+          ],
+        },
+        {
+          id: 'docstore.ini',
+          children: [
+            { id: 'docstore' },
+          ],
+        },
+      ];
     };
     const columns = ref([
       { caption: 'ID', field: 'id', type: 'number' },
