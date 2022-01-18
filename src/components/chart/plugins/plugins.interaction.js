@@ -48,7 +48,9 @@ const modules = {
       this.overlayClear();
 
       if (Object.keys(hitInfo.items).length) {
-        this.drawItemsHighlight(hitInfo, ctx);
+        if (this.options.type !== 'scatter' || tooltip.use) {
+          this.drawItemsHighlight(hitInfo, ctx);
+        }
 
         if (tooltip.use) {
           this.setTooltipLayoutPosition(hitInfo, e);
