@@ -100,11 +100,13 @@ export const useModel = () => {
   const { emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
+    const normalizedOptions = defaultsDeep({}, options, DEFAULT_OPTIONS);
+
     if (options.type === 'scatter') {
-      DEFAULT_OPTIONS.tooltip.use = false;
+      normalizedOptions.tooltip.use = false;
     }
 
-    return defaultsDeep({}, options, DEFAULT_OPTIONS);
+    return normalizedOptions;
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
