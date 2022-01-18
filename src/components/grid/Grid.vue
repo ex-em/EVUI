@@ -522,17 +522,15 @@ export default {
         checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
         checkInfo.checkedIndex.clear();
-        if (checkedList.length) {
-          const store = stores.store;
+        const store = stores.store;
+        if (store.length) {
           store.forEach((row) => {
             row[ROW_CHECK_INDEX] = checkedList.includes(row[ROW_DATA_INDEX]);
             if (row[ROW_CHECK_INDEX]) {
               checkInfo.checkedIndex.add(row[ROW_INDEX]);
             }
           });
-          if (checkedList.length === store.length) {
-            checkInfo.isHeaderChecked = true;
-          }
+          checkInfo.isHeaderChecked = checkedList.length === store.length;
         }
         updateVScroll();
       },
