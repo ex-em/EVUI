@@ -159,6 +159,7 @@ const chartData =
 | width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
+| allowResize | Boolean | false | Legend 영역 리사이즈 가능 여부 | |
 
 #### tooltip
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

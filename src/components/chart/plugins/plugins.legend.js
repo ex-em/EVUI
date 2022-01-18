@@ -9,12 +9,15 @@ const modules = {
     this.legendDOM.className = 'ev-chart-legend';
     this.legendBoxDOM = document.createElement('div');
     this.legendBoxDOM.className = 'ev-chart-legend-box';
-    this.resizeDOM = document.createElement('div');
-    this.resizeDOM.className = 'ev-chart-resize-bar';
-    this.ghostDOM = document.createElement('div');
-    this.ghostDOM.className = 'ev-chart-resize-ghost';
 
-    this.wrapperDOM.appendChild(this.resizeDOM);
+    if (this.options?.legend?.allowResize) {
+      this.resizeDOM = document.createElement('div');
+      this.resizeDOM.className = 'ev-chart-resize-bar';
+      this.ghostDOM = document.createElement('div');
+      this.ghostDOM.className = 'ev-chart-resize-ghost';
+      this.wrapperDOM.appendChild(this.resizeDOM);
+    }
+
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
   },
@@ -212,10 +215,12 @@ const modules = {
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
-    this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
 
-    this.mouseMove = this.onMouseMove.bind(this); // resizing function
-    this.mouseUp = this.onMouseUp.bind(this); // resizing function
+    if (this.resizeDOM) {
+      this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
+      this.mouseMove = this.onMouseMove.bind(this); // resizing function
+      this.mouseUp = this.onMouseUp.bind(this); // resizing function
+    }
   },
 
   /**
@@ -338,14 +343,16 @@ const modules = {
         legendStyle.width = `${chartRect.width}px`;
         legendStyle.height = `${opt.legend.height + 4}px`; // 4 resize bar size
 
-        resizeStyle.top = `${positionTop}px`;
-        resizeStyle.right = '';
-        resizeStyle.bottom = '';
-        resizeStyle.left = '';
+        if (resizeStyle) {
+          resizeStyle.top = `${positionTop}px`;
+          resizeStyle.right = '';
+          resizeStyle.bottom = '';
+          resizeStyle.left = '';
 
-        resizeStyle.width = `${chartRect.width}px`;
-        resizeStyle.height = '4px';
-        resizeStyle.cursor = 'row-resize';
+          resizeStyle.width = `${chartRect.width}px`;
+          resizeStyle.height = '4px';
+          resizeStyle.cursor = 'row-resize';
+        }
         break;
       case 'right':
         wrapperStyle.padding = `${title}px ${opt.legend.width}px 0 0`;
@@ -363,14 +370,16 @@ const modules = {
         legendStyle.width = `${opt.legend.width}px`;
         legendStyle.height = `${chartRect.height}px`;
 
-        resizeStyle.top = `${title}px`;
-        resizeStyle.right = `${opt.legend.width}px`;
-        resizeStyle.bottom = '';
-        resizeStyle.left = '';
+        if (resizeStyle) {
+          resizeStyle.top = `${title}px`;
+          resizeStyle.right = `${opt.legend.width}px`;
+          resizeStyle.bottom = '';
+          resizeStyle.left = '';
 
-        resizeStyle.width = '4px';
-        resizeStyle.height = `${chartRect.height}px`;
-        resizeStyle.cursor = 'col-resize';
+          resizeStyle.width = '4px';
+          resizeStyle.height = `${chartRect.height}px`;
+          resizeStyle.cursor = 'col-resize';
+        }
         break;
       case 'bottom':
         wrapperStyle.padding = `${title}px 0 ${opt.legend.height}px 0`;
@@ -387,14 +396,16 @@ const modules = {
         legendStyle.width = `${chartRect.width}px`;
         legendStyle.height = `${opt.legend.height + 4}px`; // 4 resize bar size
 
-        resizeStyle.top = '';
-        resizeStyle.right = '';
-        resizeStyle.bottom = `${opt.legend.height}px`;
-        resizeStyle.left = '';
+        if (resizeStyle) {
+          resizeStyle.top = '';
+          resizeStyle.right = '';
+          resizeStyle.bottom = `${opt.legend.height}px`;
+          resizeStyle.left = '';
 
-        resizeStyle.width = `${chartRect.width}px`;
-        resizeStyle.height = '4px';
-        resizeStyle.cursor = 'row-resize';
+          resizeStyle.width = `${chartRect.width}px`;
+          resizeStyle.height = '4px';
+          resizeStyle.cursor = 'row-resize';
+        }
         break;
       case 'left':
         wrapperStyle.padding = `${title}px 0 0 ${opt.legend.width}px`;
@@ -413,14 +424,16 @@ const modules = {
         legendStyle.width = `${opt.legend.width}px`;
         legendStyle.height = `${chartRect.height}px`;
 
-        resizeStyle.top = `${title}px`;
-        resizeStyle.right = '';
-        resizeStyle.bottom = '';
-        resizeStyle.left = `${opt.legend.width}px`;
+        if (resizeStyle) {
+          resizeStyle.top = `${title}px`;
+          resizeStyle.right = '';
+          resizeStyle.bottom = '';
+          resizeStyle.left = `${opt.legend.width}px`;
 
-        resizeStyle.width = '4px';
-        resizeStyle.height = `${chartRect.height}px`;
-        resizeStyle.cursor = 'col-resize';
+          resizeStyle.width = '4px';
+          resizeStyle.height = `${chartRect.height}px`;
+          resizeStyle.cursor = 'col-resize';
+        }
         break;
       default:
         break;
@@ -599,12 +612,13 @@ const modules = {
    * @returns {undefined}
    */
   showLegend() {
-    if (!this.resizeDOM || !this.legendDOM) {
-      return;
+    if (this.resizeDOM) {
+      this.resizeDOM.style.display = 'block';
     }
 
-    this.resizeDOM.style.display = 'block';
-    this.legendDOM.style.display = 'block';
+    if (this.legendDOM) {
+      this.legendDOM.style.display = 'block';
+    }
   },
 
   /**
@@ -619,13 +633,15 @@ const modules = {
     const legendStyle = this.legendDOM?.style;
     const title = opt?.title?.show ? opt?.title?.height : 0;
 
-    if (!resizeStyle || !legendStyle || !wrapperStyle) {
+    if (!legendStyle || !wrapperStyle) {
       return;
     }
 
-    resizeStyle.display = 'none';
-    legendStyle.display = 'none';
+    if (resizeStyle) {
+      resizeStyle.display = 'none';
+    }
 
+    legendStyle.display = 'none';
     legendStyle.width = '0';
     legendStyle.height = '0';
     wrapperStyle.padding = `${title}px 0 0 0`;

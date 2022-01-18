@@ -27,6 +27,7 @@ const DEFAULT_OPTIONS = {
     inactive: '#aaa',
     width: 140,
     height: 24,
+    allowResize: false,
   },
   itemHighlight: true,
   seriesHighlight: true,
