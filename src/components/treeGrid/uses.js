@@ -655,9 +655,26 @@ export const filterEvent = (params) => {
     }
     const { parent } = data;
     parent.show = true;
-    parent.expand = true;
     parent.isFilter = true;
     makeParentShow(parent);
+  };
+  const makeChildShow = (data) => {
+    if (!data?.children) {
+      return;
+    }
+    const { children } = data;
+    children.forEach((node) => {
+      const childNode = node;
+      if (childNode.parent.show && childNode.parent.expand) {
+        childNode.show = true;
+      } else {
+        childNode.show = false;
+      }
+      childNode.isFilter = true;
+      if (childNode.hasChild) {
+        makeChildShow(childNode);
+      }
+    });
   };
   let timer = null;
   const onSearch = (searchWord) => {
@@ -695,19 +712,28 @@ export const filterEvent = (params) => {
         });
         filterStores.forEach((row) => {
           row.show = true;
+          if (row.parent && !row.parent.expand) {
+            row.show = false;
+          }
           row.isFilter = true;
           makeParentShow(row);
+          makeChildShow(row);
         });
       } else {
         store.forEach((row) => {
           row.show = true;
           row.isFilter = false;
         });
+        store.forEach((row) => {
+          if (row.hasChild) {
+            makeChildShow(row);
+          }
+        });
       }
       if (stores.searchStore.length > 0) {
         store = stores.searchStore;
       }
-      const isCheck = store.every(n => n.checked === true);
+      const isCheck = store.length > 0 && store.every(n => n.checked === true);
       checkInfo.isHeaderChecked = isCheck;
       calculatedColumn();
       updateVScroll();

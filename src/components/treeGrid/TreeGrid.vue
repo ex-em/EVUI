@@ -341,18 +341,20 @@ export default {
     });
     watch(
       () => props.checked,
-      (value) => {
+      (checkedList) => {
         let store = stores.treeStore;
         if (stores.searchStore.length > 0) {
           store = stores.searchStore;
         }
-        const isCheck = store.every(n => n.checked === true);
+        checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
-        checkInfo.checkedRows = value;
-        for (let ix = 0; ix < store.length; ix++) {
-          store[ix].checked = value.includes(store[ix]);
+        if (store.length) {
+          store.forEach((row) => {
+            row.checked = checkedList.includes(row);
+          });
+          checkInfo.isHeaderChecked = store.every(n => n.checked === true);
         }
-        checkInfo.isHeaderChecked = isCheck;
+        updateVScroll();
       },
     );
     watch(
