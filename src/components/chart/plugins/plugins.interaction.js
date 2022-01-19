@@ -97,7 +97,7 @@ const modules = {
      */
     this.onDblClick = (e) => {
       const selectItem = this.options.selectItem;
-      const args = {};
+      const args = { e };
 
       if (selectItem.use) {
         const offset = this.getMousePosition(e);
@@ -122,8 +122,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onClick = (e) => {
-      const args = {};
-
+      const args = { e };
       if (this.options.selectItem.use) {
         const offset = this.getMousePosition(e);
         const hitInfo = this.findClickedData(offset);
@@ -136,7 +135,9 @@ const modules = {
       }
 
       if (typeof this.listeners.click === 'function') {
-        this.listeners.click(args);
+        if (!this.dragInfoBackup) {
+          this.listeners.click(args);
+        }
       }
     };
 
@@ -256,11 +257,12 @@ const modules = {
      *
      * @returns {undefined}
      */
-    const dragEnd = () => {
+    const dragEnd = (e) => {
       const dragInfo = this.dragInfo;
 
       if (dragInfo?.isMove) {
         const args = {
+          e,
           data: this.findSelectedItems(dragInfo),
           range: this.getSelectionRage(dragInfo),
         };

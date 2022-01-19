@@ -164,18 +164,10 @@
           padding: { top: 0, right: 0, bottom: 0, left: 0 },
         },
         tooltip: {
-          use: true,
-          backgroundColor: '#4C4C4C',
-          borderColor: '#666666',
-          useShadow: false,
-          shadowOpacity: 0.25,
-          throttledMove: false,
-          debouncedHide: false,
-          sortByValue: true,
-          useScrollbar: false,
-          textOverflow: 'wrap',
-          showAllValueInRange: false,
-          formatter: null,
+          use: false,
+        },
+        selectItem: {
+          use: false,
         },
         dragSelection: {
           use: false,
