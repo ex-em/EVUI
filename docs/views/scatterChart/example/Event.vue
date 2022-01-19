@@ -4,6 +4,8 @@
       :data="chartData"
       :options="chartOptions"
       @drag-select="onDragSelect"
+      @click="onClick"
+      @dbl-click="onDblClick"
     />
     <div class="description">
       <div class="one-row">
@@ -32,6 +34,26 @@
           <p><b>X max</b> : {{ getDateString(selectionRange.xMax) }} </p>
           <p><b>Y min</b> : {{ selectionRange.yMin }} </p>
           <p><b>Y max</b> : {{ selectionRange.yMax }} </p>
+        </div>
+      </div>
+      <div class="one-row">
+        <p class="badge yellow">
+          클릭 정보
+        </p>
+        <div v-if="clickedInfo">
+          <p><b>label</b> : {{ clickedInfo.label }} </p>
+          <p><b>value</b> : {{ clickedInfo.value }} </p>
+          <p><b>series ID</b> : {{ clickedInfo.sId }} </p>
+        </div>
+      </div>
+      <div class="one-row">
+        <p class="badge yellow">
+          더블 클릭 정보
+        </p>
+        <div v-if="dblClickedInfo">
+          <p><b>label</b> : {{ dblClickedInfo.label }} </p>
+          <p><b>value</b> : {{ dblClickedInfo.value }} </p>
+          <p><b>series ID</b> : {{ dblClickedInfo.sId }} </p>
         </div>
       </div>
     </div>
@@ -100,6 +122,12 @@
           startToZero: true,
           autoScaleRatio: 0.1,
         }],
+        selectItem: {
+          use: true,
+        },
+        tooltip: {
+          use: true,
+        },
       };
 
       const selectionItems = ref([]);
@@ -110,6 +138,21 @@
         selectionRange.value = range;
       };
 
+
+      const dblClickedInfo = ref(null);
+      const onDblClick = ({ e, label, value, sId }) => {
+        dblClickedInfo.value = { e, label, value, sId };
+      };
+
+      const clickedInfo = ref(null);
+      const onClick = ({ e, label, value, sId }) => {
+        clickedInfo.value = { e, label, value, sId };
+
+        // Clear drag selection info
+        selectionItems.value = [];
+        selectionRange.value = {};
+      };
+
       const getDateString = x => dayjs(x).format('HH:mm:ss');
 
       return {
@@ -117,7 +160,11 @@
         chartOptions,
         selectionItems,
         selectionRange,
+        clickedInfo,
+        dblClickedInfo,
         onDragSelect,
+        onClick,
+        onDblClick,
         getDateString,
       };
     },

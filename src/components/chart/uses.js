@@ -102,7 +102,7 @@ export const useModel = () => {
   const getNormalizedOptions = (options) => {
     const normalizedOptions = defaultsDeep({}, options, DEFAULT_OPTIONS);
 
-    if (options.type === 'scatter') {
+    if (options.type === 'scatter' && !options?.tooltip) {
       normalizedOptions.tooltip.use = false;
     }
 
