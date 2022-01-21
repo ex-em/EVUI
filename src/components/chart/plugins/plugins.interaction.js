@@ -260,7 +260,7 @@ const modules = {
     const dragEnd = (e) => {
       const dragInfo = this.dragInfo;
 
-      if (dragInfo?.isMove) {
+      if (dragInfo?.isMove && dragInfo?.width > 1 && dragInfo?.height > 1) {
         const args = {
           e,
           data: this.findSelectedItems(dragInfo),
@@ -581,10 +581,10 @@ const modules = {
     const yMax = dataRangeY.graphMin + graphHeight * (1 - yMaxRatio);
 
     return {
-      xMin: +parseFloat(xMin).toFixed(3),
-      xMax: +parseFloat(xMax).toFixed(3),
-      yMin: +parseFloat(yMin).toFixed(3),
-      yMax: +parseFloat(yMax).toFixed(3),
+      xMin: Math.max(+parseFloat(xMin).toFixed(3), dataRangeX.graphMin),
+      xMax: Math.min(+parseFloat(xMax).toFixed(3), dataRangeX.graphMax),
+      yMin: Math.max(+parseFloat(yMin).toFixed(3), dataRangeY.graphMin),
+      yMax: Math.min(+parseFloat(yMax).toFixed(3), dataRangeY.graphMax),
     };
   },
 
