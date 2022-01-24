@@ -18,6 +18,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        searchValue: searchVm,
         customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
@@ -30,19 +31,24 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- toolbar -->
-      <template #toolbar="{ item }">
+      <template #toolbar>
         <ev-button
           type="info"
           @click="addNode"
         >
           Add
         </ev-button>
+        <ev-button
+          type="info"
+          @click="onClickCustom"
+        >
+          Set Search Value
+        </ev-button>
         <ev-text-field
           v-model="searchVm"
           class="search"
           type="search"
           placeholder="Search"
-          @input="item.onSearch"
         />
       </template>
     </ev-tree-grid>
@@ -136,7 +142,7 @@ export default {
       { caption: 'Name', field: 'name', type: 'number' },
     ]);
     const onClickCustom = () => {
-      console.log('On click custom button');
+      searchVm.value = 'diserver';
     };
 
     const addNode = () => {
