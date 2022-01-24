@@ -7,10 +7,7 @@
     <!-- Toolbar -->
     <toolbar v-if="!!$slots.toolbar" >
       <template #toolbarWrapper>
-        <slot
-          name="toolbar"
-          :item="{ onSearch: onSearch }"
-        >
+        <slot name="toolbar">
         </slot>
       </template>
     </toolbar>
@@ -341,7 +338,7 @@ export default {
         items: [],
       },
       isSearch: false,
-      searchWord: '',
+      searchValue: computed(() => (props.option.searchValue || '')),
     });
     const stores = reactive({
       viewStore: [],
@@ -512,7 +509,7 @@ export default {
       (value) => {
         setStore(value);
         if (filterInfo.isSearch) {
-          onSearch(filterInfo.searchWord);
+          onSearch(filterInfo.searchValue);
         }
       },
     );
@@ -580,6 +577,12 @@ export default {
         stores.filterStore = [];
         setStore([], false);
       },
+    );
+    watch(
+      () => filterInfo.searchValue,
+      (value) => {
+        onSearch(value);
+      }, { immediate: true },
     );
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
     return {

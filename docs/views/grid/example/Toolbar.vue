@@ -18,6 +18,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        searchValue: searchVm,
         // customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
@@ -30,18 +31,16 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- toolbar -->
-      <template #toolbar="{ item }">
+      <template #toolbar>
         <ev-button
           type="primary"
           class="refresh"
-          @click="item.onRefresh"
         >
           Refresh
         </ev-button>
         <ev-button
           type="primary"
           class="delete"
-          @click="item.onDelete"
         >
           Delete
         </ev-button>
@@ -49,11 +48,11 @@
           type="info"
           @click="onClickCustom"
         >
-          Custom1
+          Set Search Value
         </ev-button>
         <ev-button
           type="info"
-          @click="onClickCustom"
+          @click="onClickCustom2"
         >
           Custom2
         </ev-button>
@@ -62,7 +61,6 @@
           class="search"
           type="search"
           placeholder="Search"
-          @input="item.onSearch"
         />
       </template>
       <!-- cell renderer -->
@@ -180,6 +178,9 @@ export default {
       tableData.value = temp;
     };
     const onClickCustom = () => {
+      searchVm.value = 'AIX';
+    };
+    const onClickCustom2 = () => {
       console.log('On click custom button');
     };
 
@@ -210,6 +211,7 @@ export default {
       onDoubleClickRow,
       onClickRow,
       onClickCustom,
+      onClickCustom2,
     };
   },
 };
