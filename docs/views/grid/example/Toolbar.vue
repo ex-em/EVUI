@@ -31,7 +31,7 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- toolbar -->
-      <template #toolbar>
+      <template #toolbar="{ item }">
         <ev-button
           type="primary"
           class="refresh"
@@ -61,6 +61,7 @@
           class="search"
           type="search"
           placeholder="Search"
+          @input="item.onSearch"
         />
       </template>
       <!-- cell renderer -->
