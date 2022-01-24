@@ -31,7 +31,7 @@
       @dblclick-row="onDoubleClickRow"
     >
       <!-- toolbar -->
-      <template #toolbar>
+      <template #toolbar="{ item }">
         <ev-button
           type="info"
           @click="addNode"
@@ -49,6 +49,7 @@
           class="search"
           type="search"
           placeholder="Search"
+          @input="item.onSearch"
         />
       </template>
     </ev-tree-grid>

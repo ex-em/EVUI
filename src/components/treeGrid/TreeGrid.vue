@@ -7,7 +7,12 @@
     <!-- Toolbar -->
     <toolbar v-if="!!$slots.toolbar" >
       <template #toolbarWrapper>
-        <slot name="toolbar">
+        <slot
+          name="toolbar"
+          :item="{
+            onSearch,
+          }"
+        >
         </slot>
       </template>
     </toolbar>
@@ -395,7 +400,7 @@ export default {
     watch(
       () => searchValue.value,
       (value) => {
-        onSearch(value);
+        onSearch(value?.value ?? value);
       }, { immediate: true },
     );
     const gridStyle = computed(() => ({
