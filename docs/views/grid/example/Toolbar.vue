@@ -52,9 +52,8 @@
         </ev-button>
         <ev-button
           type="info"
-          @click="onClickCustom2"
         >
-          Custom2
+          Custom
         </ev-button>
         <ev-text-field
           v-model="searchVm"
@@ -181,10 +180,6 @@ export default {
     const onClickCustom = () => {
       searchVm.value = 'AIX';
     };
-    const onClickCustom2 = () => {
-      console.log('On click custom button');
-    };
-
     getData(7, 0);
     return {
       columns,
@@ -212,7 +207,6 @@ export default {
       onDoubleClickRow,
       onClickRow,
       onClickCustom,
-      onClickCustom2,
     };
   },
 };
