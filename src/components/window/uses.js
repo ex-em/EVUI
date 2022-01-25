@@ -433,8 +433,8 @@ const useMouseEvent = (param) => {
       setDragStyle({
         top: `${tempTop}px`,
         left: `${tempLeft}px`,
-        width: props.width,
-        height: props.height,
+        width: dragStyle.width ?? props.width,
+        height: dragStyle.height ?? props.height,
       });
     } else if (props.resizable && clickedInfo.pressedSpot === 'border') {
       resizeWindow(e);
