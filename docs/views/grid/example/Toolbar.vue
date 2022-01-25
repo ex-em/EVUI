@@ -18,6 +18,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        searchValue: searchVm,
         // customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
@@ -34,14 +35,12 @@
         <ev-button
           type="primary"
           class="refresh"
-          @click="item.onRefresh"
         >
           Refresh
         </ev-button>
         <ev-button
           type="primary"
           class="delete"
-          @click="item.onDelete"
         >
           Delete
         </ev-button>
@@ -49,13 +48,12 @@
           type="info"
           @click="onClickCustom"
         >
-          Custom1
+          Set Search Value
         </ev-button>
         <ev-button
           type="info"
-          @click="onClickCustom"
         >
-          Custom2
+          Custom
         </ev-button>
         <ev-text-field
           v-model="searchVm"
@@ -180,9 +178,8 @@ export default {
       tableData.value = temp;
     };
     const onClickCustom = () => {
-      console.log('On click custom button');
+      searchVm.value = 'AIX';
     };
-
     getData(7, 0);
     return {
       columns,

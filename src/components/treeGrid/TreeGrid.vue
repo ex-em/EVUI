@@ -242,6 +242,7 @@ export default {
       resizeLine: null,
       'grid-wrapper': null,
     });
+    const searchValue = computed(() => (props.option.searchValue || ''));
     const stores = reactive({
       treeStore: [],
       viewStore: [],
@@ -395,6 +396,12 @@ export default {
         });
         onResize();
       },
+    );
+    watch(
+      () => searchValue.value,
+      (value) => {
+        onSearch(value?.value ?? value);
+      }, { immediate: true },
     );
     const gridStyle = computed(() => ({
       width: resizeInfo.gridWidth,

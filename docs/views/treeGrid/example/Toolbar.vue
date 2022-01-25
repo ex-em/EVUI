@@ -18,6 +18,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        searchValue: searchVm,
         customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
@@ -36,6 +37,12 @@
           @click="addNode"
         >
           Add
+        </ev-button>
+        <ev-button
+          type="info"
+          @click="onClickCustom"
+        >
+          Set Search Value
         </ev-button>
         <ev-text-field
           v-model="searchVm"
@@ -136,7 +143,7 @@ export default {
       { caption: 'Name', field: 'name', type: 'number' },
     ]);
     const onClickCustom = () => {
-      console.log('On click custom button');
+      searchVm.value = 'diserver';
     };
 
     const addNode = () => {
