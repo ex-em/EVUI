@@ -496,21 +496,32 @@ export const sortEvent = (params) => {
     const index = getColumnIndex(sortInfo.sortField);
     const type = props.columns[index]?.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
-    if (type === 'string') {
-      stores.store.sort((a, b) => {
-        if (typeof a[ROW_DATA_INDEX][index] === 'string') {
-          return sortFn(a[ROW_DATA_INDEX][index]?.toLowerCase(),
-            b[ROW_DATA_INDEX][index]?.toLowerCase());
-        }
-        return 0;
-      });
-    } else {
-      stores.store.sort((a, b) => {
-        if (typeof a[ROW_DATA_INDEX][index] === 'number') {
-          return sortFn(a[ROW_DATA_INDEX][index], b[ROW_DATA_INDEX][index]);
-        }
-        return 0;
-      });
+    switch (type) {
+      case 'string':
+        stores.store.sort((a, b) => {
+          if (typeof a[ROW_DATA_INDEX][index] === 'string') {
+            return sortFn(a[ROW_DATA_INDEX][index]?.toLowerCase(),
+              b[ROW_DATA_INDEX][index]?.toLowerCase());
+          }
+          return 0;
+        });
+        break;
+      case 'stringNumber':
+        stores.store.sort((a, b) => {
+          if (typeof a[ROW_DATA_INDEX][index] === 'string' || typeof a[ROW_DATA_INDEX][index] === 'number') {
+            return sortFn(Number(a[ROW_DATA_INDEX][index]), Number(b[ROW_DATA_INDEX][index]));
+          }
+          return 0;
+        });
+        break;
+      default:
+        stores.store.sort((a, b) => {
+          if (typeof a[ROW_DATA_INDEX][index] === 'number' || typeof a[ROW_DATA_INDEX][index] === 'boolean') {
+            return sortFn(a[ROW_DATA_INDEX][index], b[ROW_DATA_INDEX][index]);
+          }
+          return 0;
+        });
+        break;
     }
   };
   return { onSort, setSort };
