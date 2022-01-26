@@ -105,13 +105,20 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         }
       });
 
-      const redrawChart = () => {
-        if (evChart && 'resize' in evChart && isInit) {
-          evChart.resize();
+      const redraw = () => {
+        if (evChart && isInit) {
+          evChart.update({
+            updateSeries: true,
+            updateSelTip: { update: true, keepDomain: false },
+          });
         }
       };
 
-      const onResize = debounce(redrawChart, props.resizeTimeout);
+      const onResize = debounce(() => {
+        if (evChart && 'resize' in evChart && isInit) {
+          evChart.resize();
+        }
+      }, props.resizeTimeout);
 
       const selectItemByLabel = (label) => {
         evChart.selectItemByLabel(label);
@@ -121,6 +128,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         wrapper,
         wrapperStyle,
         onResize,
+        redraw,
         selectItemByLabel,
       };
     },
