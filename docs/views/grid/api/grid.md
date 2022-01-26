@@ -55,7 +55,7 @@
 | --- | ---- | ----- | ---- | --- |
 | caption | String | 컬럼명 | ex) '인스턴스명' | Y |
 | field | String | 필드명 | ex) 'instance_name' | Y |
-| type | String | 데이터 타입 | 'string', 'number', 'float', 'boolean' | Y |
+| type | String | 데이터 타입 | 'string', 'number', 'stringNumber', 'float', 'boolean' | Y |
 | width | Number | 컬럼 넓이 | ex) 150 | N |
 | searchable | Boolean | 검색 대상 여부 | Boolean | N |
 | sortable | Boolean | 정렬 대상 여부 | Boolean | N |

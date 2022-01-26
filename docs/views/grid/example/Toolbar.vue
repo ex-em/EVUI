@@ -135,8 +135,9 @@ export default {
       { caption: 'Instance Name', field: 'instance_name', type: 'string', width: 100 },
       { caption: 'Business Name', field: 'business_name', type: 'string' },
       { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false }, // searchable
-      { caption: 'RTS Port', field: 'rts_port', type: 'string' },
+      { caption: 'RTS Port', field: 'rts_port', type: 'stringNumber' },
       { caption: 'DB Version', field: 'db-version', type: 'string' },
+      { caption: 'Lock', field: 'is_lock', type: 'boolean' },
     ]);
     const onCheckedRow = () => {
       let checkedRow = '';
@@ -164,6 +165,7 @@ export default {
       const portList = ['4004', '25080', '25090'];
       const dbList = ['postgresql', 'oracle', 'mongodb', 'mysql'];
       const dbVersionList = ['10gR2', '19c', '12c', '11gR2', '920'];
+      const isLock = [true, false];
       const temp = [];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
@@ -173,6 +175,7 @@ export default {
           IPList[ix],
           portList[ix % 3],
           dbVersionList[ix % 5],
+          isLock[ix % 2],
         ]);
       }
       tableData.value = temp;
