@@ -508,7 +508,7 @@ export const sortEvent = (params) => {
         break;
       case 'stringNumber':
         stores.store.sort((a, b) => {
-          if (typeof a[ROW_DATA_INDEX][index] === 'string') {
+          if (typeof a[ROW_DATA_INDEX][index] === 'string' || typeof a[ROW_DATA_INDEX][index] === 'number') {
             return sortFn(Number(a[ROW_DATA_INDEX][index]), Number(b[ROW_DATA_INDEX][index]));
           }
           return 0;
