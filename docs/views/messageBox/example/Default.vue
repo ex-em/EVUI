@@ -43,7 +43,7 @@
     </ev-button>
   </div>
   <div class="case">
-    <p class="case-title">On/Off Element</p>
+    <p class="case-title">On/Off Element And Focusable</p>
     <ev-button
       @click="showConfirm"
     >
@@ -58,6 +58,11 @@
       @click="showClose"
     >
       Hide Close
+    </ev-button>
+    <ev-button
+      @click="showPlain"
+    >
+      Hide Cancel, Confirm
     </ev-button>
   </div>
   <div class="case">
@@ -141,6 +146,8 @@ export default {
         message: 'Hide cancel button.',
         iconClass: 'ev-icon-getmore',
         showCancelBtn: false,
+        focusable: true,
+        onClose: type => console.log(`[ type = '${type}' ] Hide Cancel`),
       });
     };
     const showCancel = () => {
@@ -149,6 +156,8 @@ export default {
         message: 'Hide confirm button.',
         iconClass: 'ev-icon-getmore',
         showConfirmBtn: false,
+        focusable: true,
+        onClose: type => console.log(`[ type = '${type}' ] Hide Confirm`),
       });
     };
     const showClose = () => {
@@ -157,6 +166,19 @@ export default {
         message: 'Hide close button.',
         iconClass: 'ev-icon-getmore',
         showClose: false,
+        focusable: true,
+        onClose: type => console.log(`[ type = '${type}' ] Hide Close`),
+      });
+    };
+    const showPlain = () => {
+      ctx.$messagebox({
+        title: 'On/Off Element',
+        message: 'Hide cancel, confirm button.',
+        iconClass: 'ev-icon-getmore',
+        showCancelBtn: false,
+        showConfirmBtn: false,
+        focusable: true,
+        onClose: type => console.log(`[ type = '${type}' ] Hide Cancel, Confirm`),
       });
     };
     const showCustomText = () => {
@@ -195,6 +217,7 @@ export default {
       showConfirm,
       showCancel,
       showClose,
+      showPlain,
       showCustomText,
       onCloseMsg,
       showOnClose,

@@ -14,11 +14,12 @@
           ref="msgRef"
           class="ev-message-box"
           :class="{
-          [`type-${type}`]: !!type,
-          'show-close': showClose,
-          'has-icon': !!iconClass,
-          'has-title': !!title,
-        }"
+            [`type-${type}`]: !!type,
+            'show-close': showClose,
+            'has-icon': !!iconClass,
+            'has-title': !!title,
+          }"
+          tabindex="-1"
         >
           <span
             v-if="iconClass"
@@ -52,6 +53,7 @@
               v-if="showCancelBtn"
               size="small"
               class="ev-message-box-cancel"
+              :auto-focus="hasFocus('cancelBtn')"
               @click="closeMsg('cancel')"
             >
               {{ cancelBtnText }}
@@ -61,6 +63,7 @@
               type="primary"
               size="small"
               class="ev-message-box-confirm"
+              :auto-focus="hasFocus('confirmBtn')"
               @click="closeMsg('ok')"
             >
               {{ confirmBtnText }}
@@ -80,7 +83,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch, onMounted } from 'vue';
+import { reactive, toRefs, watch, onMounted, ref } from 'vue';
 import EvButton from '@/components/button/Button.vue';
 
 export default {
@@ -142,8 +145,14 @@ export default {
       type: Function,
       default: null,
     },
+    focusable: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
+    const msgRef = ref(null);
+
     const state = reactive({
       isShow: true,
       iconClass: '',
@@ -190,9 +199,27 @@ export default {
       }
     };
 
+    const hasFocus = (type) => {
+      if (!props.focusable) return false;
+
+      switch (type) {
+        case 'confirmBtn':
+          return props.showConfirmBtn;
+        case 'cancelBtn':
+          return !props.showConfirmBtn && props.showCancelBtn;
+        case 'messagebox':
+          return !props.showConfirmBtn && !props.showCancelBtn;
+        default:
+          return false;
+      }
+    };
+
     onMounted(() => {
       setState();
       document.addEventListener('keydown', keydown);
+      if (hasFocus('messagebox')) {
+        msgRef.value.focus();
+      }
     });
     watch(() => state.isShow, (val) => {
       if (!val) {
@@ -202,6 +229,8 @@ export default {
     return {
       closeMsg,
       ...toRefs(state),
+      msgRef,
+      hasFocus,
     };
   },
 };
