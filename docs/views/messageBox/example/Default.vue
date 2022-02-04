@@ -142,7 +142,7 @@ export default {
     };
     const showConfirm = () => {
       ctx.$messagebox({
-        title: 'On/Off Element',
+        title: 'On/Off Element And Focusable',
         message: 'Hide cancel button.',
         iconClass: 'ev-icon-getmore',
         showCancelBtn: false,
@@ -152,7 +152,7 @@ export default {
     };
     const showCancel = () => {
       ctx.$messagebox({
-        title: 'On/Off Element',
+        title: 'On/Off Element And Focusable',
         message: 'Hide confirm button.',
         iconClass: 'ev-icon-getmore',
         showConfirmBtn: false,
@@ -162,7 +162,7 @@ export default {
     };
     const showClose = () => {
       ctx.$messagebox({
-        title: 'On/Off Element',
+        title: 'On/Off Element And Focusable',
         message: 'Hide close button.',
         iconClass: 'ev-icon-getmore',
         showClose: false,
@@ -172,7 +172,7 @@ export default {
     };
     const showPlain = () => {
       ctx.$messagebox({
-        title: 'On/Off Element',
+        title: 'On/Off Element And Focusable',
         message: 'Hide cancel, confirm button.',
         iconClass: 'ev-icon-getmore',
         showCancelBtn: false,
