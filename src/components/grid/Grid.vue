@@ -471,7 +471,7 @@ export default {
       setStore(props.rows);
     });
     onActivated(() => {
-      updateVScroll();
+      onResize();
     });
     const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
@@ -584,7 +584,10 @@ export default {
     watch(
       () => filterInfo.searchValue,
       (value) => {
-        onSearch(value?.value ?? value);
+        const searchValue = value?.value ?? value;
+        if (searchValue) {
+          onSearch(searchValue);
+        }
       }, { immediate: true },
     );
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
