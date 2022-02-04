@@ -70,24 +70,26 @@ export const scrollEvent = (params) => {
   const updateVScroll = () => {
     const store = stores.showTreeStore;
     const bodyEl = elementInfo.body;
-    const rowHeight = resizeInfo.rowHeight;
-    const rowCount = bodyEl.clientHeight > rowHeight
-      ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
-    const totalScrollHeight = store.length * rowHeight;
-    let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
-    if (firstVisibleIndex > store.length - 1) {
-      firstVisibleIndex = 0;
+    if (bodyEl) {
+      const rowHeight = resizeInfo.rowHeight;
+      const rowCount = bodyEl.clientHeight > rowHeight
+        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const totalScrollHeight = store.length * rowHeight;
+      let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
+      if (firstVisibleIndex > store.length - 1) {
+        firstVisibleIndex = 0;
+      }
+
+      const lastVisibleIndex = firstVisibleIndex + rowCount;
+      const firstIndex = Math.max(firstVisibleIndex, 0);
+      const lastIndex = lastVisibleIndex;
+
+      stores.viewStore = store.slice(firstIndex, lastIndex);
+      scrollInfo.hasVerticalScrollBar = rowCount < store.length;
+      scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
+      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
+        - scrollInfo.vScrollTopHeight;
     }
-
-    const lastVisibleIndex = firstVisibleIndex + rowCount;
-    const firstIndex = Math.max(firstVisibleIndex, 0);
-    const lastIndex = lastVisibleIndex;
-
-    stores.viewStore = store.slice(firstIndex, lastIndex);
-    scrollInfo.hasVerticalScrollBar = rowCount < store.length;
-    scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-    scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
-      - scrollInfo.vScrollTopHeight;
   };
   /**
    * 수평 스크롤의 위치 계산 후 적용한다.
@@ -110,7 +112,7 @@ export const scrollEvent = (params) => {
     const isHorizontal = !(scrollLeft === lastLeft);
     const isVertical = !(scrollTop === lastTop);
 
-    if (isVertical) {
+    if (isVertical && bodyEl.clientHeight) {
       updateVScroll();
     }
 
@@ -223,22 +225,25 @@ export const resizeEvent = (params) => {
   /**
    * grid resize 이벤트를 처리한다.
    */
-  const onResize = async () => {
-    await nextTick();
-    if (resizeInfo.adjust) {
-      stores.orderedColumns.map((column) => {
-        const item = column;
+  const onResize = () => {
+    nextTick(() => {
+      if (resizeInfo.adjust) {
+        stores.orderedColumns.map((column) => {
+          const item = column;
 
-        if (!props.columns[column.index].width && !item.resized) {
-          item.width = 0;
-        }
+          if (!props.columns[column.index].width && !item.resized) {
+            item.width = 0;
+          }
 
-        return item;
-      }, this);
-    }
+          return item;
+        }, this);
+      }
 
-    calculatedColumn();
-    updateVScroll();
+      calculatedColumn();
+      if (elementInfo.body?.clientHeight) {
+        updateVScroll();
+      }
+    });
   };
   const onShow = (isVisible) => {
     if (isVisible) {
@@ -603,7 +608,7 @@ export const treeEvent = (params) => {
 
         nodeList.push(node);
 
-        if (typeof parent !== 'undefined') {
+        if (!Object.hasOwnProperty.call(node, 'parent')) {
           node.parent = parent;
         }
         if (node.children) {
@@ -648,7 +653,7 @@ export const treeEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
-  const { checkInfo, stores, getConvertValue, calculatedColumn, updateVScroll } = params;
+  const { checkInfo, stores, getConvertValue, onResize } = params;
   const makeParentShow = (data) => {
     if (!data?.parent) {
       return;
@@ -735,8 +740,7 @@ export const filterEvent = (params) => {
       }
       const isCheck = store.length > 0 && store.every(n => n.checked === true);
       checkInfo.isHeaderChecked = isCheck;
-      calculatedColumn();
-      updateVScroll();
+      onResize();
     }, 500);
   };
   return { onSearch };
