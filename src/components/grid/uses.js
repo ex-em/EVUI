@@ -1,4 +1,4 @@
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, nextTick } from 'vue';
 import { isEqual, uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
@@ -75,23 +75,25 @@ export const scrollEvent = (params) => {
   const updateVScroll = () => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
-    const rowCount = bodyEl.clientHeight > rowHeight
-      ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
-    const totalScrollHeight = stores.store.length * rowHeight;
-    let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
-    if (firstVisibleIndex > stores.store.length - 1) {
-      firstVisibleIndex = 0;
+    if (bodyEl) {
+      const rowCount = bodyEl.clientHeight > rowHeight
+        ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
+      const totalScrollHeight = stores.store.length * rowHeight;
+      let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
+      if (firstVisibleIndex > stores.store.length - 1) {
+        firstVisibleIndex = 0;
+      }
+
+      const lastVisibleIndex = firstVisibleIndex + rowCount;
+      const firstIndex = Math.max(firstVisibleIndex, 0);
+      const lastIndex = lastVisibleIndex;
+
+      stores.viewStore = stores.store.slice(firstIndex, lastIndex);
+      scrollInfo.hasVerticalScrollBar = rowCount < stores.store.length;
+      scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
+      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
+        - scrollInfo.vScrollTopHeight;
     }
-
-    const lastVisibleIndex = firstVisibleIndex + rowCount;
-    const firstIndex = Math.max(firstVisibleIndex, 0);
-    const lastIndex = lastVisibleIndex;
-
-    stores.viewStore = stores.store.slice(firstIndex, lastIndex);
-    scrollInfo.hasVerticalScrollBar = rowCount < stores.store.length;
-    scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-    scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
-      - scrollInfo.vScrollTopHeight;
   };
   /**
    * 수평 스크롤의 위치 계산 후 적용한다.
@@ -114,7 +116,7 @@ export const scrollEvent = (params) => {
     const isHorizontal = !(scrollLeft === lastLeft);
     const isVertical = !(scrollTop === lastTop);
 
-    if (isVertical && bodyEl.clientHeight) {
+    if (isVertical && bodyEl?.clientHeight) {
       updateVScroll();
     }
 
@@ -223,22 +225,24 @@ export const resizeEvent = (params) => {
    * grid resize 이벤트를 처리한다.
    */
   const onResize = () => {
-    if (resizeInfo.adjust) {
-      stores.orderedColumns.map((column) => {
-        const item = column;
+    nextTick(() => {
+      if (resizeInfo.adjust) {
+        stores.orderedColumns.map((column) => {
+          const item = column;
 
-        if (!props.columns[column.index].width && !item.resized) {
-          item.width = 0;
-        }
+          if (!props.columns[column.index].width && !item.resized) {
+            item.width = 0;
+          }
 
-        return item;
-      }, this);
-    }
+          return item;
+        }, this);
+      }
 
-    calculatedColumn();
-    if (elementInfo.body?.clientHeight) {
-      updateVScroll();
-    }
+      calculatedColumn();
+      if (elementInfo.body?.clientHeight) {
+        updateVScroll();
+      }
+    });
   };
 
   const onShow = (isVisible) => {
@@ -747,14 +751,12 @@ export const filterEvent = (params) => {
       }
       const store = stores.store;
       let checkedCount = 0;
-      for (let ix = 0; ix < store.length; ix++) {
-        if (checkInfo.checkedIndex.has(store[ix][ROW_INDEX])) {
-          store[ix][ROW_CHECK_INDEX] = true;
+      store.forEach((row) => {
+        row[ROW_CHECK_INDEX] = checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]);
+        if (row[ROW_CHECK_INDEX]) {
           checkedCount += 1;
-        } else {
-          store[ix][ROW_CHECK_INDEX] = false;
         }
-      }
+      });
       if (store.length && store.length === checkedCount) {
         checkInfo.isHeaderChecked = true;
       } else {

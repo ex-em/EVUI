@@ -1,5 +1,6 @@
 <template>
   <button
+    ref="buttonRef"
     class="ev-button"
     :class="{
       disabled,
@@ -17,6 +18,8 @@
 </template>
 
 <script>
+import { onMounted, ref } from 'vue';
+
 export default {
   name: 'EvButton',
   props: {
@@ -51,6 +54,19 @@ export default {
   },
   emits: {
     click: null,
+  },
+  setup(props) {
+    const buttonRef = ref(null);
+
+    onMounted(() => {
+      if (props.autoFocus) {
+        buttonRef.value.focus();
+      }
+    });
+
+    return {
+      buttonRef,
+    };
   },
 };
 </script>

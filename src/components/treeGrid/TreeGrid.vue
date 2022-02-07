@@ -332,13 +332,13 @@ export default {
 
     const {
       onSearch,
-    } = filterEvent({ checkInfo, stores, getConvertValue, calculatedColumn, updateVScroll });
+    } = filterEvent({ checkInfo, stores, getConvertValue, onResize });
 
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
     });
     onActivated(() => {
-      updateVScroll();
+      onResize();
     });
     watch(
       () => props.checked,
@@ -377,7 +377,6 @@ export default {
         stores.treeRows = newData;
         stores.treeStore = setTreeNodeStore();
         onResize();
-        updateVScroll();
       }, { deep: true },
     );
     watch(
@@ -400,7 +399,10 @@ export default {
     watch(
       () => searchValue.value,
       (value) => {
-        onSearch(value?.value ?? value);
+        const searchWord = value?.value ?? value;
+        if (searchWord) {
+          onSearch(searchWord);
+        }
       }, { immediate: true },
     );
     const gridStyle = computed(() => ({
