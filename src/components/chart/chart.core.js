@@ -13,7 +13,7 @@ import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options, listeners) {
+  constructor(target, data, options, listeners, defaultSelectInfo) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
     Object.assign(this, Title);
     Object.assign(this, Legend);
@@ -63,6 +63,8 @@ class EvChart {
       charts: { pie: [], bar: [], line: [], scatter: [] },
       count: 0,
     };
+
+    this.defaultSelectInfo = defaultSelectInfo;
   }
 
   /**
@@ -197,6 +199,26 @@ class EvChart {
         }
       }
     }
+  }
+
+  /**
+   * Draw Tip with hitInfo and defaultSelectInfo
+   * @param hitInfo
+   */
+  drawTip(hitInfo) {
+    let tipLocationInfo;
+
+    if (hitInfo) {
+      tipLocationInfo = hitInfo;
+    } else if (this.lastHitInfo) {
+      tipLocationInfo = this.lastHitInfo;
+    } else if (this.defaultSelectInfo) {
+      tipLocationInfo = this.getItem(this.defaultSelectInfo, false);
+    } else {
+      tipLocationInfo = null;
+    }
+
+    this.drawTips(tipLocationInfo);
   }
 
   /**

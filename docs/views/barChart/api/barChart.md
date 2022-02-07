@@ -3,6 +3,7 @@
 
 ```
 <ev-chart
+    v-model="선택된 데이터 정보"
     :data="차트데이터"
     :options="차트속성"
     :resize-timeout="debounce wait시간(단위: ms)"
@@ -10,7 +11,19 @@
 ```
 
 >## Props
-### 1. data  
+### 1. v-model
+ - option에서 [selectItem](#selectitem) 옵션을 사용할 경우 유효한 바인딩
+ - 현재 선택된 Item에 대한 정보 (seriesID, dataIndex)
+#### Example
+```
+const selectedData = ref({
+    seriesID: 'series1', // Series ID (key)
+    dataIndex: 0, // 몇번째 데이터인지
+});
+```
+
+
+### 2. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
@@ -66,7 +79,7 @@ const chartData = {
 }
 ```
   
-### 2. options 
+### 3. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | '' | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
@@ -241,15 +254,16 @@ const chartData = {
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
 
->### Event
-| 이름 | 파라미터 | 설명 |
- |------|----------|------|
- | click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |
- | dbl-click | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환 |
- * 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
 
-
-### 3. resize-timeout
+### 4. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
+
+
+### 5. Event
+| 이름 | 파라미터 | 설명 |
+ |------|----------|------|
+| click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |
+| dbl-click | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환 |
+* 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
 

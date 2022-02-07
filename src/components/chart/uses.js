@@ -1,5 +1,5 @@
 import { ref, computed, getCurrentInstance, nextTick } from 'vue';
-import { defaultsDeep } from 'lodash-es';
+import { cloneDeep, defaultsDeep } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 
 const DEFAULT_OPTIONS = {
@@ -97,7 +97,7 @@ const DEFAULT_DATA = {
 };
 
 export const useModel = () => {
-  const { emit } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
     const normalizedOptions = defaultsDeep({}, options, DEFAULT_OPTIONS);
@@ -110,9 +110,14 @@ export const useModel = () => {
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
+  const selectInfo = cloneDeep(props.modelValue);
+
   const eventListeners = {
     click: async (e) => {
       await nextTick();
+      if (e.label) {
+        emit('update:modelValue', { seriesID: e.seriesId, dataIndex: e.dataIndex });
+      }
       emit('click', e);
     },
     'dbl-click': async (e) => {
@@ -127,6 +132,7 @@ export const useModel = () => {
 
   return {
     eventListeners,
+    selectInfo,
     getNormalizedData,
     getNormalizedOptions,
   };
