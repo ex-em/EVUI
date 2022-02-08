@@ -1,6 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
+      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
       @click="onClick"
@@ -86,11 +87,17 @@
         dblClickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
       };
 
+      const defaultSelectItem = ref({
+        seriesID: 'series1',
+        dataIndex: chartData.data.series1.length - 1,
+      });
+
       return {
         chartData,
         chartOptions,
         clickedLabel,
         dblClickedLabel,
+        defaultSelectItem,
         onClick,
         onDblClick,
       };

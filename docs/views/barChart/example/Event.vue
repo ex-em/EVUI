@@ -2,6 +2,7 @@
   <div class="case">
     <ev-chart
       ref="chart"
+      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
       @click="onClick"
@@ -9,11 +10,16 @@
     />
     <div class="description">
       <ev-button
-        @click="selectValue1">
-        select Value1
+        @click="toggleSelectData">
+        select toggle 1 - 2
       </ev-button>
       <br><br>
       <div>
+        <div class="badge yellow">
+          기본 선택값 v-model
+        </div>
+        {{ defaultSelectItem }}
+        <br><br>
         <div class="badge yellow">
           클릭된 라벨
         </div>
@@ -38,10 +44,12 @@
       const chartData = {
         series: {
           series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
         },
         labels: ['value1', 'value2', 'value3', 'value4', 'value5'],
         data: {
           series1: [100, 150, 51, 150, 350],
+          series2: [100, 150, 51, 150, 450],
         },
       };
 
@@ -75,6 +83,12 @@
         selectItem: {
           use: true,
           showTextTip: true,
+          tipBackground: '#FF00FF',
+        },
+        maxTip: {
+          use: true,
+          showTextTip: true,
+          tipBackground: '#FF0000',
         },
       };
 
@@ -88,8 +102,14 @@
         dblClickedLabel.value = target.label;
       };
 
-      const selectValue1 = () => {
-        chart.value.selectItemByLabel('value1');
+      const defaultSelectItem = ref({
+        seriesID: 'series1',
+        dataIndex: 1,
+      });
+
+      const toggleSelectData = () => {
+        const idx = defaultSelectItem.value.dataIndex;
+        defaultSelectItem.value.dataIndex = idx === 1 ? 2 : 1;
       };
 
       return {
@@ -98,9 +118,10 @@
         chartOptions,
         clickedLabel,
         dblClickedLabel,
+        defaultSelectItem,
         onClick,
         onDblClick,
-        selectValue1,
+        toggleSelectData,
       };
     },
   };

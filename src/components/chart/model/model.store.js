@@ -387,43 +387,16 @@ const modules = {
   },
 
   /**
-   * Get graph item by label index
-   * @param {number} pos  label index position
-   *
-   * @returns {object} graph item
-   */
-  getItemByLabelIndex(pos) {
-    if (pos < 0) {
-      return false;
-    }
-
-    return this.getItem(pos);
-  },
-
-  /**
-   * Get graph item by label
-   * @param {any} label  label value for searching graph item
-   *
-   * @returns {object} graph item
-   */
-  getItemByLabel(label) {
-    if (label === null || label === undefined) {
-      return false;
-    }
-
-    const labels = this.data.labels;
-    const labelIndex = labels && labels.indexOf ? labels.indexOf(label) : -1;
-
-    return this.getItem(labelIndex);
-  },
-
-  /**
    * Get graph items for each series by label index
    * @param {number} labelIndex  label index
    *
    * @returns {object} graph item
    */
-  getItem(labelIndex) {
+  getItemByLabelIndex(labelIndex) {
+    if (labelIndex < 0) {
+      return false;
+    }
+
     const sIds = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -477,6 +450,91 @@ const modules = {
     }
 
     return findInfo;
+  },
+
+  getItem({ seriesID, dataIndex }, useApproximate = false) {
+    const dataInfo = this.getDataByValues(seriesID, dataIndex);
+    return this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate);
+  },
+  /**
+   *
+   * @param seriesID
+   * @param dataIndex
+   * @returns {*}
+   */
+  getDataByValues(seriesID, dataIndex) {
+    const series = this.seriesList[seriesID];
+    if (!series || isNaN(dataIndex) || dataIndex < 0 || series?.data.length <= dataIndex) {
+      return false;
+    }
+
+    return series.data[dataIndex];
+  },
+
+  /**
+   * Find graph item by position x and y
+   * @param {array}   offset          position x and y
+   * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
+   *
+   * @returns {object} clicked item information
+   */
+  getItemByPosition(offset, useApproximate = false) {
+    const sIds = Object.keys(this.seriesList);
+    const isHorizontal = !!this.options.horizontal;
+
+    let maxl = null;
+    let maxp = null;
+    let maxg = null;
+    let maxSID = '';
+    let acc = 0;
+    let useStack = false;
+    let maxIndex = null;
+
+    for (let ix = 0; ix < sIds.length; ix++) {
+      const sId = sIds[ix];
+      const series = this.seriesList[sId];
+      const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
+
+      if (findFn) {
+        const item = findFn.call(series, offset, isHorizontal);
+        const data = item.data;
+        const index = item.index;
+
+        if (data) {
+          const ldata = isHorizontal ? data.y : data.x;
+          const lp = isHorizontal ? data.yp : data.xp;
+
+          if (ldata !== null && ldata !== undefined) {
+            const g = isHorizontal ? data.o || data.x : data.o || data.y;
+
+            if (series.stackIndex) {
+              acc += !isNaN(data.o) ? data.o : 0;
+              useStack = true;
+            } else {
+              acc += data.y;
+            }
+
+            if (maxg === null || maxg <= g) {
+              maxg = g;
+              maxSID = sId;
+              maxl = ldata;
+              maxp = lp;
+              maxIndex = index;
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      label: maxl,
+      pos: maxp,
+      value: maxg === null ? 0 : maxg,
+      sId: maxSID,
+      acc,
+      useStack,
+      maxIndex,
+    };
   },
 
   /**

@@ -1,6 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
+      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
     />
@@ -51,15 +52,22 @@
           tipBackground: '#DBDBDB',
           tipTextColor: '#000000',
         },
+        selectItem: {
+          use: true,
+          showTextTip: true,
+          tipBackground: '#FF00FF',
+        },
       };
 
       const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
         },
         labels: [],
         data: {
           series1: [],
+          series2: [],
         },
       });
 
@@ -103,10 +111,16 @@
         clearTimeout(liveInterval.value);
       });
 
+      const defaultSelectItem = ref({
+        seriesID: 'series1',
+        dataIndex: 9,
+      });
+
       return {
         chartData,
         chartOptions,
         isLive,
+        defaultSelectItem,
       };
     },
   };

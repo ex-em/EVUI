@@ -16,6 +16,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
   export default {
     name: 'EvChart',
     props: {
+      selectedItem: {
+        type: Object,
+        default: null,
+      },
       options: {
         type: Object,
         default: () => ({}),
@@ -33,6 +37,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'click',
       'dbl-click',
       'drag-select',
+      'update:selectedItem',
     ],
     setup(props) {
       let evChart = {};
@@ -40,6 +45,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
 
       const {
         eventListeners,
+        selectInfo,
         getNormalizedData,
         getNormalizedOptions,
       } = useModel();
@@ -60,6 +66,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           normalizedData,
           normalizedOptions,
           eventListeners,
+          selectInfo,
         );
       };
 
@@ -93,6 +100,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
             updateSelTip: { update: true, keepDomain: false },
           });
         }, { deep: true });
+
+        await watch(() => props.selectedItem, (newValue) => {
+          if (newValue?.seriesID && !isNaN(newValue?.dataIndex)) {
+            evChart.selectItemByData(newValue);
+          }
+        }, { deep: true });
       });
 
       onBeforeUnmount(() => {
@@ -120,16 +133,11 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         }
       }, props.resizeTimeout);
 
-      const selectItemByLabel = (label) => {
-        evChart.selectItemByLabel(label);
-      };
-
       return {
         wrapper,
         wrapperStyle,
         onResize,
         redraw,
-        selectItemByLabel,
       };
     },
   };

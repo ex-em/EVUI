@@ -3,23 +3,21 @@ import Canvas from '../helpers/helpers.canvas';
 
 const modules = {
   /**
-   * Draw TextTip with hitInfo
-   * @param {object} [hitInfo=undefined]    mouse hit information
+   * Draw TextTip with tip's locationInfo
+   * @param {object} [tipLocationInfo=undefined]   tip location information
    *
    * @returns {undefined}
    */
-  drawTip(hitInfo) {
+  drawTips(tipLocationInfo) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
     const selectItemOpt = opt.selectItem;
+    let maxArgs;
 
-    if (maxTipOpt.use || selectItemOpt.use) {
+    if (maxTipOpt.use) {
       const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      const selSID = (hitInfo && hitInfo.sId ? hitInfo.sId : this.lastHitInfo?.sId) ?? maxSID;
-
-      const maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
-      const selArgs = this.calculateTipInfo(this.seriesList[selSID], 'sel', hitInfo);
+      maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
 
       if (maxTipOpt.use && maxArgs) {
         this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
@@ -28,11 +26,25 @@ const modules = {
           this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
         }
       }
+    }
+
+    if (selectItemOpt.use && tipLocationInfo) {
+      const seriesInfo = this.seriesList[tipLocationInfo?.sId];
+
+      if (!seriesInfo?.show) {
+        return;
+      }
+
+      const selArgs = this.calculateTipInfo(
+        seriesInfo,
+        'sel',
+        tipLocationInfo,
+      );
 
       if (selectItemOpt.use && selArgs) {
         let isSamePos = false;
 
-        if (maxTipOpt.use && maxArgs && maxArgs.dp === selArgs.dp) {
+        if (maxTipOpt.use && maxArgs?.dp === selArgs.dp) {
           isSamePos = true;
         }
 
@@ -45,8 +57,8 @@ const modules = {
         }
       }
 
-      if (hitInfo && hitInfo.label !== null) {
-        this.lastHitInfo = hitInfo;
+      if (tipLocationInfo && tipLocationInfo.label !== null) {
+        this.lastHitInfo = tipLocationInfo;
       }
     }
   },

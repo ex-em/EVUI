@@ -101,7 +101,7 @@ const modules = {
 
       if (selectItem.use) {
         const offset = this.getMousePosition(e);
-        const hitInfo = this.findClickedData(offset, selectItem.useApproximateValue);
+        const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
 
 
         if (hitInfo.label !== null) {
@@ -125,13 +125,18 @@ const modules = {
       const args = { e };
       if (this.options.selectItem.use) {
         const offset = this.getMousePosition(e);
-        const hitInfo = this.findClickedData(offset);
+        const hitInfo = this.getItemByPosition(offset, false);
 
         if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
-        ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+        ({
+          label: args.label,
+          value: args.value,
+          sId: args.seriesId,
+          maxIndex: args.dataIndex,
+        } = hitInfo);
       }
 
       if (typeof this.listeners.click === 'function') {
@@ -398,129 +403,20 @@ const modules = {
   },
 
   /**
-   * Find clicked graph item on mouse position
-   * @param {array}   offset          return value from getMousePosition()
-   * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    *
-   * @returns {object} clicked item information
+   * @param targetInfo
+   * @returns {boolean}
    */
-  findClickedData(offset, useApproximate) {
-    const sIds = Object.keys(this.seriesList);
-    const isHorizontal = !!this.options.horizontal;
+  selectItemByData(targetInfo) {
+    const foundInfo = this.getItem(targetInfo, false);
 
-    let maxl = null;
-    let maxp = null;
-    let maxg = null;
-    let maxSID = '';
-    let acc = 0;
-    let useStack = false;
-    let maxIndex = null;
-
-    for (let ix = 0; ix < sIds.length; ix++) {
-      const sId = sIds[ix];
-      const series = this.seriesList[sId];
-      const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
-
-      if (findFn) {
-        const item = findFn.call(series, offset, isHorizontal);
-        const data = item.data;
-        const index = item.index;
-
-        if (data) {
-          const ldata = isHorizontal ? data.y : data.x;
-          const lp = isHorizontal ? data.yp : data.xp;
-
-          if (ldata !== null && ldata !== undefined) {
-            const g = isHorizontal ? data.o || data.x : data.o || data.y;
-
-            if (series.stackIndex) {
-              acc += !isNaN(data.o) ? data.o : 0;
-              useStack = true;
-            } else {
-              acc += data.y;
-            }
-
-            if (maxg === null || maxg <= g) {
-              maxg = g;
-              maxSID = sId;
-              maxl = ldata;
-              maxp = lp;
-              maxIndex = index;
-            }
-          }
-        }
-      }
-    }
-
-    return {
-      label: maxl,
-      pos: maxp,
-      value: maxg === null ? 0 : maxg,
-      sId: maxSID,
-      acc,
-      useStack,
-      maxIndex,
-    };
-  },
-
-  /**
-   * Find graph item by label entered from user
-   * @param {any} label   label value
-   *
-   * @returns {boolean} if it wasn't able to find it, return false. if not, return true and render.
-   */
-  selectItemByLabel(label) {
-    const findInfo = this.getItemByLabel(label);
-
-    if (findInfo) {
-      this.render(findInfo);
+    if (foundInfo) {
+      this.render(foundInfo);
     } else {
       return false;
     }
 
     return true;
-  },
-  findHitItem2(offset) {
-    const mouseX = offset[0];
-    const mouseY = offset[1];
-
-    const width = this.chartRect.chartWidth;
-    const height = this.chartRect.chartHeight;
-    const centerX = (width / 2) + this.chartRect.padding.left;
-    const centerY = (height / 2) + this.chartRect.padding.top;
-
-    const dx = mouseX - centerX;
-    const dy = mouseY - centerY;
-
-    let angle;
-    angle = ((Math.atan2(-dy, -dx) * 180) / Math.PI) - 90;
-    angle = angle < 0 ? 360 + angle : angle;
-    const rad = ((angle * Math.PI) / 180) + (1.5 * Math.PI);
-    const distance = Math.round(Math.sqrt((dx ** 2) + (dy ** 2)));
-
-    const graphData = this.graphData;
-    let gdata;
-    let dsIndex = null;
-    let sId = null;
-
-    for (let ix = 0, ixLen = graphData.length; ix < ixLen; ix++) {
-      gdata = graphData[ix];
-      if (distance > gdata.ir && distance < gdata.or) {
-        dsIndex = ix;
-      }
-    }
-
-    if (graphData[dsIndex]) {
-      for (let ix = 0, ixLen = graphData[dsIndex].data.length; ix < ixLen; ix++) {
-        gdata = graphData[dsIndex].data[ix];
-
-        if (rad > gdata.sa && rad < gdata.ea) {
-          sId = gdata.id;
-        }
-      }
-    }
-
-    return { dsIndex, sId };
   },
 
   /**
