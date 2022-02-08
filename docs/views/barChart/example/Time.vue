@@ -62,10 +62,12 @@
       const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
+          series2: { name: 'series#2' },
         },
         labels: [],
         data: {
           series1: [],
+          series2: [],
         },
       });
 
