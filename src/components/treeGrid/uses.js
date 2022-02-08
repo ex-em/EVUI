@@ -1,4 +1,5 @@
 import { getCurrentInstance, nextTick } from 'vue';
+import { cloneDeep } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 export const commonFunctions = () => {
@@ -613,6 +614,7 @@ export const treeEvent = (params) => {
         }
         if (node.children) {
           node.hasChild = true;
+          node.children = cloneDeep(node.children);
           node.children.forEach(child =>
             setNodeData({
               node: child,
