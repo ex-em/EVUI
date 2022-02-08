@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
-      v-model="defaultSelectItem"
+      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
       @click="onClick"

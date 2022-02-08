@@ -3,7 +3,7 @@
 
 ```
 <ev-chart
-    v-model="선택된 데이터 정보"
+    v-model:selectedItem="선택된 데이터 정보"
     :data="차트데이터"
     :options="차트속성"
     :resize-timeout="debounce wait시간(단위: ms)"

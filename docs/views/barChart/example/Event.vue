@@ -2,7 +2,7 @@
   <div class="case">
     <ev-chart
       ref="chart"
-      v-model="defaultSelectData"
+      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
       @click="onClick"
@@ -18,7 +18,7 @@
         <div class="badge yellow">
           기본 선택값 v-model
         </div>
-        {{ defaultSelectData }}
+        {{ defaultSelectItem }}
         <br><br>
         <div class="badge yellow">
           클릭된 라벨
@@ -102,14 +102,14 @@
         dblClickedLabel.value = target.label;
       };
 
-      const defaultSelectData = ref({
+      const defaultSelectItem = ref({
         seriesID: 'series1',
         dataIndex: 1,
       });
 
       const toggleSelectData = () => {
-        const idx = defaultSelectData.value.dataIndex;
-        defaultSelectData.value.dataIndex = idx === 1 ? 2 : 1;
+        const idx = defaultSelectItem.value.dataIndex;
+        defaultSelectItem.value.dataIndex = idx === 1 ? 2 : 1;
       };
 
       return {
@@ -118,7 +118,7 @@
         chartOptions,
         clickedLabel,
         dblClickedLabel,
-        defaultSelectData,
+        defaultSelectItem,
         onClick,
         onDblClick,
         toggleSelectData,

@@ -110,13 +110,13 @@ export const useModel = () => {
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
-  const selectInfo = cloneDeep(props.modelValue);
+  const selectInfo = cloneDeep(props.selectedItem);
 
   const eventListeners = {
     click: async (e) => {
       await nextTick();
       if (e.label) {
-        emit('update:modelValue', { seriesID: e.seriesId, dataIndex: e.dataIndex });
+        emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
       }
       emit('click', e);
     },

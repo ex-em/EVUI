@@ -16,7 +16,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
   export default {
     name: 'EvChart',
     props: {
-      modelValue: {
+      selectedItem: {
         type: Object,
         default: null,
       },
@@ -37,7 +37,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'click',
       'dbl-click',
       'drag-select',
-      'update:modelValue',
+      'update:selectedItem',
     ],
     setup(props) {
       let evChart = {};
@@ -101,7 +101,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           });
         }, { deep: true });
 
-        await watch(() => props.modelValue, (newValue) => {
+        await watch(() => props.selectedItem, (newValue) => {
           if (newValue?.seriesID && !isNaN(newValue?.dataIndex)) {
             evChart.selectItemByData(newValue);
           }
