@@ -11,12 +11,12 @@
 ```
 
 >## Props
-### 1. v-model
+### 1. v-model:selectedItem
 - option에서 [selectItem](#selectitem) 옵션을 사용할 경우 유효한 바인딩
 - 현재 선택된 Item에 대한 정보 (seriesID, dataIndex)
 #### Example
 ```
-const selectedData = ref({
+const selectedItem = ref({
     seriesID: 'series1', // Series ID (key)
     dataIndex: 0, // 몇번째 데이터인지
 });
