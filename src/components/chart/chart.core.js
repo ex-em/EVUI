@@ -555,7 +555,6 @@ class EvChart {
       if (!updateSelTip.keepDomain) {
         this.lastTip.pos = null;
         this.lastHitInfo = null;
-        this.defaultSelectInfo = null;
       }
     }
 
