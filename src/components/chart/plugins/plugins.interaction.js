@@ -408,6 +408,7 @@ const modules = {
    * @returns {boolean}
    */
   selectItemByData(targetInfo) {
+    this.defaultSelectInfo = targetInfo;
     const foundInfo = this.getItem(targetInfo, false);
 
     if (foundInfo) {
