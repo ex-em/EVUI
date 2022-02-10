@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue';
+import { reactive, toRefs, onMounted, onBeforeUnmount } from 'vue';
 
 export default {
   name: 'EvMessage',
@@ -125,8 +125,9 @@ export default {
       startTimer();
       document.addEventListener('keydown', keydown);
     });
-    onUnmounted(() => {
+    onBeforeUnmount(() => {
       document.removeEventListener('keydown', keydown);
+      clearTimer();
     });
     return {
       startTimer,
