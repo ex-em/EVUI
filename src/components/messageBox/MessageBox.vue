@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch, onMounted, ref } from 'vue';
+import { reactive, toRefs, watch, onMounted, ref, onBeforeUnmount } from 'vue';
 import EvButton from '@/components/button/Button.vue';
 
 export default {
@@ -225,6 +225,9 @@ export default {
       if (!val) {
         document.removeEventListener('keydown', keydown);
       }
+    });
+    onBeforeUnmount(() => {
+      document.removeEventListener('keydown', keydown);
     });
     return {
       closeMsg,
