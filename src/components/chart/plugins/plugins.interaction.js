@@ -160,15 +160,17 @@ const modules = {
       }
     };
 
-    if (this.options?.tooltip?.useScrollbar) {
-      this.overlayCanvas.addEventListener('wheel', (e) => {
-        const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+    this.onWheel = (e) => {
+      const isTooltipVisible = this.tooltipDOM.style.display === 'block';
 
-        if (isTooltipVisible) {
-          e.preventDefault();
-          this.tooltipBodyDOM.scrollTop += e.deltaY;
-        }
-      });
+      if (isTooltipVisible) {
+        e.preventDefault();
+        this.tooltipBodyDOM.scrollTop += e.deltaY;
+      }
+    };
+
+    if (this.options?.tooltip?.useScrollbar) {
+      this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
     }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);

@@ -77,6 +77,7 @@
           <ev-input-number
             v-model="shadowOpacity"
             :step="0.05"
+            :precision="2"
             :min="0"
             :max="1"
           />

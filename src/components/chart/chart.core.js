@@ -712,6 +712,8 @@ class EvChart {
       this.overlayCanvas.removeEventListener('mouseleave', this.onMouseLeave);
       this.overlayCanvas.removeEventListener('dblclick', this.onDblClick);
       this.overlayCanvas.removeEventListener('click', this.onClick);
+      this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
+      this.overlayCanvas.removeEventListener('wheel', this.onWheel);
     }
 
     if (this.options.tooltip.use) {
