@@ -9,6 +9,11 @@
     />
     <div class="description">
       <div class="badge yellow">
+        기본 선택값 v-model
+      </div>
+      {{ defaultSelectItem }}
+      <br><br>
+      <div class="badge yellow">
         클릭된 라벨
       </div>
       {{ clickedLabel }}
@@ -69,11 +74,18 @@
           type: 'linear',
           showGrid: true,
           startToZero: true,
-          autoScaleRatio: 0.1,
+          autoScaleRatio: 0.3,
         }],
         selectItem: {
           use: true,
           showTextTip: true,
+          tipText: 'label',
+          fixedPosTop: true,
+          showIndicator: true,
+        },
+        maxTip: {
+          use: true,
+          tipBackground: '#FF00FF',
         },
       };
 
@@ -89,7 +101,7 @@
 
       const defaultSelectItem = ref({
         seriesID: 'series1',
-        dataIndex: chartData.data.series1.length - 1,
+        dataIndex: 3,
       });
 
       return {

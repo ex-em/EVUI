@@ -73,6 +73,7 @@ const DEFAULT_OPTIONS = {
   selectItem: {
     use: false,
     showTextTip: false,
+    tipText: 'value',
     showTip: false,
     showIndicator: false,
     fixedPosTop: false,

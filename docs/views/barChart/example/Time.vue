@@ -1,7 +1,6 @@
 <template>
   <div class="case">
     <ev-chart
-      v-model:selectedItem="defaultSelectItem"
       :data="chartData"
       :options="chartOptions"
     />
@@ -51,11 +50,6 @@
           use: true,
           tipBackground: '#DBDBDB',
           tipTextColor: '#000000',
-        },
-        selectItem: {
-          use: true,
-          showTextTip: true,
-          tipBackground: '#FF00FF',
         },
       };
 
@@ -111,16 +105,10 @@
         clearTimeout(liveInterval.value);
       });
 
-      const defaultSelectItem = ref({
-        seriesID: 'series1',
-        dataIndex: 9,
-      });
-
       return {
         chartData,
         chartOptions,
         isLive,
-        defaultSelectItem,
       };
     },
   };

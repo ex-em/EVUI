@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 
 const modules = {
@@ -12,23 +13,10 @@ const modules = {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
-    const selectItemOpt = opt.selectItem;
+    const selTipOpt = opt.selectItem;
     let maxArgs;
 
-    if (maxTipOpt.use) {
-      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
-
-      if (maxTipOpt.use && maxArgs) {
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
-
-        if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
-        }
-      }
-    }
-
-    if (selectItemOpt.use && tipLocationInfo) {
+    if (selTipOpt.use && tipLocationInfo) {
       const seriesInfo = this.seriesList[tipLocationInfo?.sId];
 
       if (!seriesInfo?.show) {
@@ -41,24 +29,46 @@ const modules = {
         tipLocationInfo,
       );
 
-      if (selectItemOpt.use && selArgs) {
+      if (selArgs) {
         let isSamePos = false;
 
         if (maxTipOpt.use && maxArgs?.dp === selArgs.dp) {
           isSamePos = true;
         }
 
-        if (selectItemOpt.showTextTip || selectItemOpt.showTip) {
-          this.drawTextTip({ opt: selectItemOpt, tipType: 'sel', isSamePos, ...selArgs });
+        if (selTipOpt.showTextTip || selTipOpt.showTip) {
+          if (selTipOpt.tipText === 'label') {
+            const axisOpt = isHorizontal ? opt.axesY[0] : opt.axesX[0];
+            const label = selArgs.label;
+            selArgs.text = axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
+          } else {
+            selArgs.text = numberWithComma(selArgs.value);
+          }
+
+          this.drawTextTip({ opt: selTipOpt, tipType: 'sel', isSamePos, ...selArgs });
         }
 
-        if (selectItemOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: selectItemOpt, ...selArgs });
+        if (selTipOpt.showIndicator) {
+          this.drawFixedIndicator({ opt: selTipOpt, ...selArgs });
         }
       }
 
       if (tipLocationInfo && tipLocationInfo.label !== null) {
         this.lastHitInfo = tipLocationInfo;
+      }
+    }
+
+    if (maxTipOpt.use) {
+      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
+      maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
+
+      if (maxTipOpt.use && maxArgs) {
+        maxArgs.text = numberWithComma(maxArgs.value);
+        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
+
+        if (maxTipOpt.showIndicator) {
+          this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
+        }
       }
     }
   },
@@ -116,19 +126,24 @@ const modules = {
     }
 
     let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
-
+    let label;
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.value !== null) {
         value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+        label = hitInfo.label;
         lastTip.value = value;
+        lastTip.label = label;
       } else if (lastTip.value !== null) {
         value = lastTip.value;
+        label = lastTip.label;
       } else if (lastTip.pos !== null) {
         const item = type === 'bar'
           ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
 
         value = item.useStack ? item.acc : item.value;
+        label = item.label;
         lastTip.value = value;
+        lastTip.label = label;
       }
     }
 
@@ -157,7 +172,7 @@ const modules = {
     }
 
     const sizeObj = { xArea, yArea, graphX, graphY, xsp, xep, ysp };
-    const dataObj = { dp, value, text: numberWithComma(value), type };
+    const dataObj = { dp, value, label, type };
 
     return { ...sizeObj, ...dataObj };
   },
