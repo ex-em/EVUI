@@ -585,9 +585,7 @@ export default {
       () => props.option.searchValue,
       (value) => {
         const searchValue = value?.value ?? value;
-        if (searchValue) {
-          onSearch(searchValue);
-        }
+        onSearch(searchValue);
       }, { immediate: true, deep: true },
     );
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
