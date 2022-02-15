@@ -341,7 +341,7 @@ export default {
         items: [],
       },
       isSearch: false,
-      searchValue: computed(() => (props.option.searchValue || '')),
+      searchWord: '',
     });
     const stores = reactive({
       viewStore: [],
@@ -512,7 +512,7 @@ export default {
       (value) => {
         setStore(value);
         if (filterInfo.isSearch) {
-          onSearch(filterInfo.searchValue);
+          onSearch(filterInfo.searchWord);
         }
       },
     );
@@ -582,13 +582,13 @@ export default {
       },
     );
     watch(
-      () => filterInfo.searchValue,
+      () => props.option.searchValue,
       (value) => {
         const searchValue = value?.value ?? value;
         if (searchValue) {
           onSearch(searchValue);
         }
-      }, { immediate: true },
+      }, { immediate: true, deep: true },
     );
     const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
     return {
