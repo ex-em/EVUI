@@ -1,5 +1,4 @@
 import { getCurrentInstance, nextTick } from 'vue';
-import { cloneDeep } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 export const commonFunctions = () => {
@@ -403,7 +402,7 @@ export const checkEvent = (params) => {
     }
   };
   const onCheckParent = (node) => {
-    const parentNode = node.parent;
+    const parentNode = stores.treeStore.find(n => n.index === node.parent);
     if (parentNode) {
       const isCheck = parentNode.children.every(n => n.checked);
       parentNode.checked = isCheck;
@@ -412,7 +411,7 @@ export const checkEvent = (params) => {
       } else {
         checkInfo.checkedRows.push(parentNode);
       }
-      if (parentNode.parent) {
+      if (Object.hasOwnProperty.call(parentNode, 'parent')) {
         onCheckParent(parentNode);
       }
     }
@@ -610,11 +609,13 @@ export const treeEvent = (params) => {
         nodeList.push(node);
 
         if (!Object.hasOwnProperty.call(node, 'parent')) {
-          node.parent = parent;
+          if (parent) {
+            // parent 의 index 만 가지고 있기
+            node.parent = parent.index;
+          }
         }
         if (node.children) {
           node.hasChild = true;
-          node.children = cloneDeep(node.children);
           node.children.forEach(child =>
             setNodeData({
               node: child,
@@ -631,7 +632,6 @@ export const treeEvent = (params) => {
         node: root,
         level: 0,
         isShow: true,
-        parent: undefined,
       });
     });
     return nodeList;
@@ -657,25 +657,25 @@ export const treeEvent = (params) => {
 export const filterEvent = (params) => {
   const { checkInfo, stores, getConvertValue, onResize } = params;
   const makeParentShow = (data) => {
-    if (!data?.parent) {
+    if (!Object.hasOwnProperty.call(data, 'parent')) {
       return;
     }
-    const { parent } = data;
-    parent.show = true;
-    parent.isFilter = true;
-    makeParentShow(parent);
+    const parentNode = stores.treeStore.find(n => n.index === data.parent);
+    parentNode.show = true;
+    parentNode.isFilter = true;
+    makeParentShow(parentNode);
   };
   const makeChildShow = (data) => {
-    if (!data?.children) {
+    if (!Object.hasOwnProperty.call(data, 'children')) {
       return;
     }
     const { children } = data;
     children.forEach((node) => {
       const childNode = node;
-      if (childNode.parent.show && childNode.parent.expand) {
-        childNode.show = true;
-      } else {
-        childNode.show = false;
+      childNode.show = false;
+      if (Object.hasOwnProperty.call(childNode, 'parent')) {
+        const parentNode = stores.treeStore.find(n => n.index === childNode.parent);
+        childNode.show = parentNode.show && parentNode.expand;
       }
       childNode.isFilter = true;
       if (childNode.hasChild) {
@@ -719,8 +719,9 @@ export const filterEvent = (params) => {
         });
         filterStores.forEach((row) => {
           row.show = true;
-          if (row.parent && !row.parent.expand) {
-            row.show = false;
+          if (Object.hasOwnProperty.call(row, 'parent')) {
+            const parentNode = stores.treeStore.find(n => n.index === row.parent);
+            row.show = parentNode.expand;
           }
           row.isFilter = true;
           makeParentShow(row);
@@ -732,9 +733,8 @@ export const filterEvent = (params) => {
           row.isFilter = false;
         });
         store.forEach((row) => {
-          if (row.hasChild) {
-            makeChildShow(row);
-          }
+          makeParentShow(row);
+          makeChildShow(row);
         });
       }
       if (stores.searchStore.length > 0) {
