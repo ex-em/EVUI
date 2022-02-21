@@ -690,6 +690,7 @@ export const filterEvent = (params) => {
     }
     timer = setTimeout(() => {
       let store = stores.treeStore;
+      stores.searchWord = searchWord;
       store.forEach((row) => {
         row.show = false;
         row.isFilter = false;

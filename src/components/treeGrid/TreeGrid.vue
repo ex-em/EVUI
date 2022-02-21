@@ -242,7 +242,6 @@ export default {
       resizeLine: null,
       'grid-wrapper': null,
     });
-    const searchValue = computed(() => (props.option.searchValue || ''));
     const stores = reactive({
       treeStore: [],
       viewStore: [],
@@ -252,6 +251,7 @@ export default {
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
+      searchWord: '',
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -397,12 +397,9 @@ export default {
       },
     );
     watch(
-      () => searchValue.value,
+      () => props.option.searchValue,
       (value) => {
-        const searchWord = value?.value ?? value;
-        if (searchWord) {
-          onSearch(searchWord);
-        }
+        onSearch(value?.value ?? value);
       }, { immediate: true },
     );
     const gridStyle = computed(() => ({
