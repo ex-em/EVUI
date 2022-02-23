@@ -41,8 +41,9 @@
         <ev-button
           type="primary"
           class="delete"
+          @click="onClickAdd"
         >
-          Delete
+          Add
         </ev-button>
         <ev-button
           type="info"
@@ -181,9 +182,12 @@ export default {
       tableData.value = temp;
     };
     const onClickCustom = () => {
-      searchVm.value = 'AIX';
+      searchVm.value = '2016';
     };
     getData(7, 0);
+    const onClickAdd = () => {
+      tableData.value.push(['oracle', 'LIN12G', 'LIN12G', '10.10.30.10', '2016']);
+    };
     return {
       columns,
       tableData,
@@ -210,6 +214,7 @@ export default {
       onDoubleClickRow,
       onClickRow,
       onClickCustom,
+      onClickAdd,
     };
   },
 };

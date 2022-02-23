@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import {
@@ -242,7 +242,6 @@ export default {
       resizeLine: null,
       'grid-wrapper': null,
     });
-    const searchValue = computed(() => (props.option.searchValue || ''));
     const stores = reactive({
       treeStore: [],
       viewStore: [],
@@ -252,6 +251,7 @@ export default {
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
+      searchWord: '',
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -351,7 +351,7 @@ export default {
         checkInfo.isHeaderChecked = false;
         if (store.length) {
           store.forEach((row) => {
-            row.checked = checkedList.includes(row);
+            row.checked = !!checkedList.find(c => c.index === row.index);
           });
           checkInfo.isHeaderChecked = store.every(n => n.checked === true);
         }
@@ -382,7 +382,6 @@ export default {
     watch(
       () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
       (value) => {
-        // columnWidth computed readonly
         resizeInfo.columnWidth = value[3];
         stores.orderedColumns.map((column) => {
           const item = column;
@@ -397,12 +396,13 @@ export default {
       },
     );
     watch(
-      () => searchValue.value,
+      () => props.option.searchValue,
       (value) => {
-        const searchWord = value?.value ?? value;
-        if (searchWord) {
-          onSearch(searchWord);
-        }
+        nextTick(() => {
+          if (value !== undefined) {
+            onSearch(value?.value ?? value);
+          }
+        });
       }, { immediate: true },
     );
     const gridStyle = computed(() => ({
