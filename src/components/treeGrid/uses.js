@@ -1,5 +1,4 @@
 import { getCurrentInstance, nextTick } from 'vue';
-import { cloneDeep } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 export const commonFunctions = () => {
@@ -614,7 +613,6 @@ export const treeEvent = (params) => {
         }
         if (node.children) {
           node.hasChild = true;
-          node.children = cloneDeep(node.children);
           node.children.forEach(child =>
             setNodeData({
               node: child,
@@ -689,6 +687,7 @@ export const filterEvent = (params) => {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
+      stores.searchWord = searchWord;
       let store = stores.treeStore;
       store.forEach((row) => {
         row.show = false;
@@ -732,9 +731,8 @@ export const filterEvent = (params) => {
           row.isFilter = false;
         });
         store.forEach((row) => {
-          if (row.hasChild) {
-            makeChildShow(row);
-          }
+          makeParentShow(row);
+          makeChildShow(row);
         });
       }
       if (stores.searchStore.length > 0) {

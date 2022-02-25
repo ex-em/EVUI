@@ -725,6 +725,7 @@ export const filterEvent = (params) => {
     }
     timer = setTimeout(() => {
       filterInfo.isSearch = false;
+      filterInfo.searchWord = searchWord;
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
