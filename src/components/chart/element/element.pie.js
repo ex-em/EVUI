@@ -20,31 +20,36 @@ class Pie {
     this.sId = sId;
     this.data = [];
     this.type = 'pie';
+    this.centerX = 0;
+    this.centerY = 0;
+    this.radius = 0;
+    this.startAngle = 0;
+    this.endAngle = 0;
+    this.slice = null;
+    this.state = null;
+    this.ctx = null;
   }
 
   /**
    * Draw series data
-   * @param {object} param     object for drawing series data
+   * @param context
    *
    * @returns {undefined}
    */
-  draw(param) {
-    const ctx = param.ctx;
-    const centerX = param.centerX;
-    const centerY = param.centerY;
-    const radius = param.radius;
-    const startAngle = param.startAngle;
-    const endAngle = param.endAngle;
+  draw(context) {
+    this.ctx = context;
+
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
     const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
-    ctx.beginPath();
-    ctx.fillStyle = Util.colorStringToRgba(color, opacity);
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-    ctx.fill();
-    ctx.closePath();
+    this.ctx.beginPath();
+    this.slice = new Path2D();
+    this.slice.moveTo(this.centerX, this.centerY);
+    this.slice.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle);
+    this.ctx.fillStyle = Util.colorStringToRgba(color, opacity);
+    this.ctx.fill(this.slice);
+    this.ctx.closePath();
   }
 
   /**
@@ -53,37 +58,46 @@ class Pie {
    *
    * @returns {object} graph item
    */
-  findGraphRange(offset) {
-    const xp = offset[0];
-    const yp = offset[1];
-    const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data;
+  findGraphData([offsetX, offsetY]) {
+    const item = { data: null, hit: false, color: null, index: -1 };
 
-    let s = 0;
-    let e = gdata.length - 1;
-
-    while (s <= e) {
-      const m = Math.floor((s + e) / 2);
-      const sx = gdata[m].xp;
-      const sy = gdata[m].yp;
-      const ex = sx + gdata[m].w;
-      const ey = sy + gdata[m].h;
-
-      if ((sx - 4 <= xp) && (xp <= ex + 4)) {
-        item.data = gdata[m];
-
-        if ((ey - 4 <= yp) && (yp <= sy + 4)) {
-          item.hit = true;
-        }
-        return item;
-      } else if (sx + 4 < xp) {
-        s = m + 1;
-      } else {
-        e = m - 1;
-      }
+    if (this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
+      item.data = this.data;
+      item.hit = true;
+      item.color = this.color;
+      item.index = 0;
     }
 
     return item;
+  }
+
+  /**
+   * Draw item highlight
+   *
+   * @param item {object} object for drawing series data
+   * @param context {CanvasRenderingContext2D} canvas context
+   *
+   * @returns {undefined}
+   */
+  itemHighlight(item, context) {
+    const ctx = context;
+
+    ctx.save();
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 4;
+
+    const color = item.data.dataColor || this.color;
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+
+    ctx.beginPath();
+    ctx.moveTo(this.centerX, this.centerY);
+    ctx.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle);
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.restore();
   }
 }
 

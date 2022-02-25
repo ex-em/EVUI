@@ -355,7 +355,7 @@ const modules = {
       if (series.findGraphData) {
         const item = series.findGraphData(offset, isHorizontal);
 
-        if (item.data) {
+        if (item?.data) {
           let gdata;
 
           if (item.data.o === null) {
