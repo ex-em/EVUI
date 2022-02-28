@@ -1,8 +1,9 @@
 import { getCurrentInstance, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
 
-export const commonFunctions = () => {
+export const commonFunctions = (params) => {
   const { props } = getCurrentInstance();
+  const { checkInfo } = params;
   /**
    * 해당 컬럼이 사용자 지정 컬럼인지 확인한다.
    *
@@ -59,7 +60,24 @@ export const commonFunctions = () => {
     }
     return size;
   };
-  return { isRenderer, getComponentName, getConvertValue, getColumnIndex, setPixelUnit };
+  const checkHeader = (rows) => {
+    checkInfo.isHeaderChecked = !!rows.length && rows.every(row => row.checked);
+    const disabledList = rows.filter(row => row._disabled);
+    if (disabledList.length) {
+      const checkedList = rows.filter(row => row.checked);
+      if (disabledList.length + checkedList.length === rows.length) {
+        checkInfo.isHeaderChecked = true;
+      }
+    }
+  };
+  return {
+    isRenderer,
+    getComponentName,
+    getConvertValue,
+    getColumnIndex,
+    setPixelUnit,
+    checkHeader,
+  };
 };
 
 export const scrollEvent = (params) => {
@@ -368,7 +386,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const { checkInfo, stores } = params;
+  const { checkInfo, stores, checkHeader } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -387,13 +405,14 @@ export const checkEvent = (params) => {
     if (node.hasChild) {
       node.children.forEach((children) => {
         const childNode = children;
-        if (node.checked && !childNode.checked) {
+        if (node.checked && !childNode.checked && !childNode._disabled) {
           checkInfo.checkedRows.push(childNode);
         }
         if (!node.checked) {
-          checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== childNode.index);
+          checkInfo.checkedRows = checkInfo.checkedRows
+            .filter(checked => checked.index !== childNode.index);
         }
-        childNode.checked = node.checked;
+        childNode.checked = node.checked && !childNode._disabled;
 
         if (childNode.hasChild) {
           onCheckChildren(childNode);
@@ -405,9 +424,17 @@ export const checkEvent = (params) => {
     const parentNode = node.parent;
     if (parentNode) {
       const isCheck = parentNode.children.every(n => n.checked);
-      parentNode.checked = isCheck;
+      parentNode.checked = isCheck && !parentNode._disabled;
+      const disabledList = parentNode.children.filter(n => n._disabled);
+      if (disabledList.length) {
+        const checkedList = parentNode.children.filter(n => n.checked);
+        if (disabledList.length + checkedList.length === parentNode.children.length) {
+          parentNode.checked = true;
+        }
+      }
       if (!parentNode.checked) {
-        checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== parentNode.index);
+        checkInfo.checkedRows = checkInfo.checkedRows
+          .filter(checked => checked.index !== parentNode.index);
       } else {
         checkInfo.checkedRows.push(parentNode);
       }
@@ -423,16 +450,9 @@ export const checkEvent = (params) => {
    * @param {array} rowData - row 데이터
    */
   const onCheck = (event, rowData) => {
-    let store = stores.treeStore;
-    if (stores.searchStore.length > 0) {
-      store = stores.searchStore;
-    }
+    const store = stores.store;
     const isSingleMode = () => checkInfo.useCheckbox.mode === 'single';
-    const checkedHeader = (checkStore) => {
-      const isCheck = checkStore.every(n => n.checked === true);
-      checkInfo.isHeaderChecked = isCheck;
-    };
-    const unCheckedHeader = () => {
+    const unCheckHeader = () => {
       if (checkInfo.isHeaderChecked) {
         checkInfo.isHeaderChecked = false;
       }
@@ -463,9 +483,9 @@ export const checkEvent = (params) => {
     onSingleMode();
     if (rowData.checked) {
       addCheckedRow(rowData);
-      checkedHeader(store);
+      checkHeader(store);
     } else {
-      unCheckedHeader();
+      unCheckHeader();
       removeCheckedRow(rowData);
       onCheckChildren(rowData);
       onCheckParent(rowData);
@@ -481,27 +501,20 @@ export const checkEvent = (params) => {
    */
   const onCheckAll = (event) => {
     const status = checkInfo.isHeaderChecked;
-    const checked = [];
-    let item;
-    let store = stores.treeStore;
-    if (status && stores.searchStore.length > 0) {
-      store = stores.searchStore;
-    }
-    for (let ix = 0; ix < store.length; ix++) {
-      item = store[ix];
-      if (status) {
-        checked.push(item);
+    const store = stores.store;
+    store.forEach((row) => {
+      row.checked = status && !row._disabled;
+      if (row.checked) {
+        if (!checkInfo.checkedRows.find(checked => checked.index === row.index)) {
+          checkInfo.checkedRows.push(row);
+        }
+      } else {
+        checkInfo.checkedRows = checkInfo.checkedRows
+          .filter(checked => checked.index !== row.index);
       }
-      item.checked = status;
-    }
-    checkInfo.checkedRows = checked;
-    if (stores.searchStore.length > 0) {
-      store.forEach((node) => {
-        onCheckChildren(node);
-      });
-    }
-    emit('update:checked', checked);
-    emit('check-all', event, checked);
+    });
+    emit('update:checked', checkInfo.checkedRows);
+    emit('check-all', event, checkInfo.checkedRows);
   };
   return { onCheck, onCheckAll };
 };
@@ -653,7 +666,7 @@ export const treeEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
-  const { checkInfo, stores, getConvertValue, onResize } = params;
+  const { stores, filterInfo, getConvertValue, onResize, checkHeader } = params;
   const makeParentShow = (data) => {
     if (!data?.parent) {
       return;
@@ -687,8 +700,9 @@ export const filterEvent = (params) => {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
-      stores.searchWord = searchWord;
-      let store = stores.treeStore;
+      filterInfo.isSearch = false;
+      filterInfo.searchWord = searchWord;
+      const store = stores.treeStore;
       store.forEach((row) => {
         row.show = false;
         row.isFilter = false;
@@ -725,6 +739,7 @@ export const filterEvent = (params) => {
           makeParentShow(row);
           makeChildShow(row);
         });
+        filterInfo.isSearch = true;
       } else {
         store.forEach((row) => {
           row.show = true;
@@ -735,11 +750,7 @@ export const filterEvent = (params) => {
           makeChildShow(row);
         });
       }
-      if (stores.searchStore.length > 0) {
-        store = stores.searchStore;
-      }
-      const isCheck = store.length > 0 && store.every(n => n.checked === true);
-      checkInfo.isHeaderChecked = isCheck;
+      checkHeader(stores.store);
       onResize();
     }, 500);
   };

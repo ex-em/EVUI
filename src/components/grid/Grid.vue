@@ -348,12 +348,7 @@ export default {
       originStore: [],
       filterStore: [],
       store: computed(() => {
-        let store;
-        if (filterInfo.isFiltering) {
-          store = stores.filterStore;
-        } else {
-          store = stores.originStore;
-        }
+        const store = filterInfo.isFiltering ? stores.filterStore : stores.originStore;
         return filterInfo.isSearch ? stores.searchStore : store;
       }),
       orderedColumns: computed(() =>
