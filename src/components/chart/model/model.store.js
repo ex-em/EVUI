@@ -20,9 +20,9 @@ const modules = {
             this.createPieDataSet(data, seriesIDs);
           }
         } else if (typeKey === 'scatter') {
-          seriesIDs.forEach((sId) => {
-            const series = this.seriesList[sId];
-            const sData = data[sId];
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
 
             if (series && sData) {
               series.data = this.addSeriesDSforScatter(sData);
@@ -30,9 +30,9 @@ const modules = {
             }
           });
         } else {
-          seriesIDs.forEach((sId) => {
-            const series = this.seriesList[sId];
-            const sData = data[sId];
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
