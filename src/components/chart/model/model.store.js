@@ -10,19 +10,19 @@ const modules = {
    */
   createDataSet(data, label) {
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
-      const type = this.seriesInfo.charts[typeKey];
+      const seriesIDs = this.seriesInfo.charts[typeKey];
 
-      if (type.length) {
+      if (seriesIDs.length) {
         if (typeKey === 'pie') {
           if (this.options.sunburst) {
             this.createSunburstDataSet(data);
           } else {
-            this.createPieDataSet(data, type);
+            this.createPieDataSet(data, seriesIDs);
           }
         } else if (typeKey === 'scatter') {
-          type.forEach((sId) => {
-            const series = this.seriesList[sId];
-            const sData = data[sId];
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
 
             if (series && sData) {
               series.data = this.addSeriesDSforScatter(sData);
@@ -30,9 +30,9 @@ const modules = {
             }
           });
         } else {
-          type.forEach((sId) => {
-            const series = this.seriesList[sId];
-            const sData = data[sId];
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
@@ -153,25 +153,22 @@ const modules = {
 
   /**
    * Take chart data and to create normalized pie data
-   * @param {object}  data    chart series info
+   * @param {object}  data    chart data
+   * @param {String[]}  seriesIDs     chart series info
    *
    * @returns {undefined}
    */
-  createPieDataSet(data, pie) {
+  createPieDataSet(data, seriesIDs) {
     this.pieDataSet = [];
     const ds = this.pieDataSet;
+    ds[0] = { data: [], ir: 0, or: 0, total: 0 };
 
-    pie.forEach((sId) => {
-      data[sId].forEach((value, index) => {
-        if (!ds[index]) {
-          ds[index] = { data: [], ir: 0, or: 0, total: 0 };
-        }
-
-        if (this.seriesList[sId].show) {
-          ds[index].total += value || 0;
-          ds[index].data.push({ id: sId, value, sa: 0, ea: 0 });
-        }
-      });
+    seriesIDs.forEach((sId) => {
+      if (this.seriesList[sId].show) {
+        const value = data[sId][0] ?? 0;
+        ds[0].total += value;
+        ds[0].data.push({ id: sId, value, sa: 0, ea: 0 });
+      }
     });
 
     ds.forEach((item) => {

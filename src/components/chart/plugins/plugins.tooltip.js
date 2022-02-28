@@ -177,9 +177,11 @@ const modules = {
     const opt = this.options.tooltip;
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    this.tooltipHeaderDOM.textContent = this.options.horizontal
-      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
-      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    if (this.axesX.length && this.axesY.length) {
+      this.tooltipHeaderDOM.textContent = this.options.horizontal
+        ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
+        : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    }
 
     if (opt.textOverflow) {
       this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
@@ -303,11 +305,18 @@ const modules = {
       // 3. Draw value
       let formattedTxt;
       if (opt.formatter) {
-        formattedTxt = opt.formatter({
-          x: this.options.horizontal ? value : hitItem.x,
-          y: this.options.horizontal ? hitItem.y : value,
-          name,
-        });
+        if (this.options.type === 'pie') {
+          formattedTxt = opt.formatter({
+            value,
+            name,
+          });
+        } else {
+          formattedTxt = opt.formatter({
+            x: this.options.horizontal ? value : hitItem.x,
+            y: this.options.horizontal ? hitItem.y : value,
+            name,
+          });
+        }
       }
 
       if (!opt.formatter || typeof formattedTxt !== 'string') {
@@ -349,7 +358,12 @@ const modules = {
    */
   drawItemsHighlight(hitInfo, ctx) {
     Object.keys(hitInfo.items).forEach((sId) => {
-      this.seriesList[sId].itemHighlight(hitInfo.items[sId], ctx);
+      const series = this.seriesList[sId];
+      series.itemHighlight(hitInfo.items[sId], ctx);
+
+      if (series.type === 'sunburst' || series.type === 'doughnut') {
+        this.drawDoughnutHole(ctx);
+      }
     });
   },
 

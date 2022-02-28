@@ -177,7 +177,7 @@ class Bar {
   /**
    * Draw item highlight
    * @param {object}  item       object for drawing series data
-   * @param {object}  context    canvas context
+   * @param {CanvasRenderingContext2D}  context    canvas context
    *
    * @returns {undefined}
    */

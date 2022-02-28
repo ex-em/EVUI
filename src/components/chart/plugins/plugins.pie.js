@@ -10,6 +10,7 @@ const modules = {
     const chartRect = this.chartRect;
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
+    const isDoughnut = !!pieOption.doughnutHoleSize;
 
     let slice;
     let value;
@@ -54,14 +55,15 @@ const modules = {
           series = this.seriesList[slice.id];
 
           if (value) {
-            series.draw({
-              ctx,
-              centerX,
-              centerY,
-              radius,
-              startAngle,
-              endAngle,
-            });
+            series.type = isDoughnut ? 'doughnut' : 'pie';
+            series.centerX = centerX;
+            series.centerY = centerY;
+            series.radius = radius;
+            series.startAngle = startAngle;
+            series.endAngle = endAngle;
+            series.data = { o: value };
+
+            series.draw(ctx);
             startAngle += sliceAngle;
           }
         }
@@ -141,14 +143,15 @@ const modules = {
           series = this.seriesList[slice.id];
 
           if (slice.value) {
-            series.draw({
-              ctx,
-              centerX,
-              centerY,
-              radius,
-              startAngle: slice.sa,
-              endAngle: slice.ea,
-            });
+            series.type = 'sunburst';
+            series.centerX = centerX;
+            series.centerY = centerY;
+            series.radius = radius;
+            series.startAngle = slice.sa;
+            series.endAngle = slice.ea;
+            series.data = { o: slice.value };
+
+            series.draw(ctx);
           }
         }
       }
@@ -170,11 +173,9 @@ const modules = {
 
   /**
    * Draw doughnut hole
-   *
-   * @returns {undefined}
+   * @param ctx
    */
-  drawDoughnutHole() {
-    const ctx = this.bufferCtx;
+  drawDoughnutHole(ctx = this.bufferCtx) {
     const pieOption = this.options;
 
     const centerX = this.chartRect.width / 2;
