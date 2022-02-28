@@ -7,114 +7,121 @@
       disabled : $props.disabled,
     }"
   >
-    <template v-if="$props.mode === 'date' || $props.mode === 'dateTime'">
-      <span class="ev-date-picker-prefix-icon">
-        <i class="ev-icon-calendar" />
-      </span>
-      <input
-        v-model.trim="currentValue"
-        type="text"
-        class="ev-input"
-        :placeholder="$props.placeholder"
-        :disabled="$props.disabled"
-        @click="clickSelectInput"
-        @keydown.enter.prevent="validateValue(currentValue)"
-        @change="validateValue(currentValue)"
-      />
-    </template>
-    <template v-else>
-      <div
-          class="ev-date-picker-tag-wrapper"
-          @click="clickSelectInput"
-      >
+    <div
+      ref="datePickerWrapper"
+      class="ev-date-picker__wrapper"
+    >
+      <template v-if="$props.mode === 'date' || $props.mode === 'dateTime'">
         <span class="ev-date-picker-prefix-icon">
           <i class="ev-icon-calendar" />
         </span>
         <input
+          v-model.trim="currentValue"
           type="text"
-          class="ev-input readonly"
-          readonly
+          class="ev-input"
           :placeholder="$props.placeholder"
           :disabled="$props.disabled"
+          @click="clickSelectInput"
+          @keydown.enter.prevent="validateValue(currentValue)"
+          @change="validateValue(currentValue)"
         />
-        <template
-          v-if="$props.mode === 'dateMulti'
-          && ($props.options.multiType === 'date' || !$props.options.tagShorten)"
+      </template>
+      <template v-else>
+        <div
+          class="ev-date-picker-tag-wrapper"
+          @click="clickSelectInput"
+        >
+          <span class="ev-date-picker-prefix-icon">
+            <i class="ev-icon-calendar" />
+          </span>
+          <input
+            type="text"
+            class="ev-input readonly"
+            readonly
+            :placeholder="$props.placeholder"
+            :disabled="$props.disabled"
+          />
+          <template
+            v-if="$props.mode === 'dateMulti'
+            && ($props.options.multiType === 'date' || !$props.options.tagShorten)"
+          >
+            <div
+              v-for="(item, idx) in mv"
+              :key="`${item}_${idx}`"
+              class="ev-select-tag"
+              :class="{ num: $props.options.multiType !== 'date' }"
+            >
+              <span class="ev-tag-name"> {{ item }} </span>
+              <span
+                v-if="$props.options.multiType === 'date'"
+                class="ev-tag-suffix"
+                @click.stop="[removeMv(item), changeDropboxPosition()]"
+              >
+              <i class="ev-tag-suffix-close ev-icon-error" />
+            </span>
+            </div>
+          </template>
+          <template v-else-if="mv[0] && mv[mv.length - 1]">
+            <div class="ev-select-tag num">
+              <span class="ev-tag-name"> {{ mv[0] }} </span>
+            </div>
+            <div class="ev-select-tag num">
+              <span class="ev-tag-name"> ~ </span>
+            </div>
+            <div class="ev-select-tag num">
+              <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template v-if="$props.clearable">
+        <span
+          v-show="isClearableIcon"
+          class="ev-input-suffix"
+          @click.stop="[removeAllMv(), clickOutsideDropbox()]"
+        >
+          <i class="ev-icon-error" />
+        </span>
+      </template>
+      <div class="ev-date-picker-dropbox-wrapper">
+        <div
+          v-if="isDropbox"
+          ref="dropbox"
+          class="ev-date-picker-dropdown"
+          :class="$props.mode"
+          :style="dropboxPosition"
         >
           <div
-            v-for="(item, idx) in mv"
-            :key="`${item}_${idx}`"
-            class="ev-select-tag"
-            :class="{ num: $props.options.multiType !== 'date' }"
-          >
-            <span class="ev-tag-name"> {{ item }} </span>
-            <span
-              v-if="$props.options.multiType === 'date'"
-              class="ev-tag-suffix"
-              @click.stop="[removeMv(item), changeDropboxPosition()]"
-            >
-            <i class="ev-tag-suffix-close ev-icon-error" />
-          </span>
-          </div>
-        </template>
-        <template v-else-if="mv[0] && mv[mv.length - 1]">
-          <div class="ev-select-tag num">
-            <span class="ev-tag-name"> {{ mv[0] }} </span>
-          </div>
-          <div class="ev-select-tag num">
-            <span class="ev-tag-name"> ~ </span>
-          </div>
-          <div class="ev-select-tag num">
-            <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
-          </div>
-        </template>
-      </div>
-    </template>
-    <template v-if="$props.clearable">
-      <span
-        v-show="isClearableIcon"
-        class="ev-input-suffix"
-        @click.stop="[removeAllMv(), clickOutsideDropbox()]"
-      >
-        <i class="ev-icon-error" />
-      </span>
-    </template>
-    <div class="ev-date-picker-dropbox-wrapper">
-      <div
-        v-if="isDropbox"
-        ref="dropbox"
-        class="ev-date-picker-dropdown"
-        :class="$props.mode"
-        :style="dropboxPosition"
-      >
-        <div
             v-if="usedShortcuts.length"
-            class="ev-date-picker-dropbox__button-layout">
-          <ev-button-group>
-            <ev-button
-               v-for="button in usedShortcuts"
-               :key="button.key"
-               :type="button.isActive ? 'primary' : 'default'"
-               @click="clickShortcut(button.key)"
-            >
-              {{ button.label }}
-            </ev-button>
-          </ev-button-group>
-        </div>
-        <div
+            class="ev-date-picker-dropbox__button-layout"
+          >
+            <ev-button-group>
+              <ev-button
+                v-for="button in usedShortcuts"
+                :key="button.key"
+                :type="button.isActive ? 'primary' : 'default'"
+                @click="clickShortcut(button.key)"
+              >
+                {{ button.label }}
+              </ev-button>
+            </ev-button-group>
+          </div>
+          <div
             v-if="usedShortcuts.length"
             class="ev-date-picker-dropbox__divider"
-        />
-        <div
-            :class="{ 'ev-date-picker-dropbox__calendar':usedShortcuts.length }">
-          <ev-calendar
-            key="fromCalendar"
-            v-model="mv"
-            :mode="$props.mode"
-            :month-notation="$props.monthNotation"
-            :day-of-the-week-notation="$props.dayOfTheWeekNotation"
-            :options="$props.options"
           />
+          <div
+            :class="{ 'ev-date-picker-dropbox__calendar':usedShortcuts.length }"
+          >
+            <ev-calendar
+              key="fromCalendar"
+              v-model="mv"
+              :mode="$props.mode"
+              :month-notation="$props.monthNotation"
+              :day-of-the-week-notation="$props.dayOfTheWeekNotation"
+              :options="$props.options"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -230,6 +237,7 @@ export default {
     const {
       isDropbox,
       datePicker,
+      datePickerWrapper,
       dropbox,
       itemWrapper,
       dropboxPosition,
@@ -261,6 +269,7 @@ export default {
 
       isDropbox,
       datePicker,
+      datePickerWrapper,
       dropbox,
       itemWrapper,
       dropboxPosition,
@@ -279,13 +288,18 @@ export default {
 @import '../../style/index.scss';
 
 .ev-date-picker {
-  $select-height: 35px;
+  $select-height: $input-default-height;
   display: block;
   position: relative;
   width: 100%;
-  min-height: $select-height;
 
   @import '../../style/components/input.scss';
+
+  &__wrapper {
+    position: relative;
+    min-height: $select-height;
+  }
+
   .ev-input {
     $calendar-icon-width: 30px;
     position: absolute;
@@ -312,15 +326,12 @@ export default {
     height: 100%;
     align-items: center;
     cursor: pointer;
-
-
     &:hover {
       color: #409EFF;
     }
   }
 
   .ev-date-picker-tag-wrapper {
-    $select-height: 35px;
     display: flex;
     width: 100%;
     height: 100%;
