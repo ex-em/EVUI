@@ -125,6 +125,7 @@ export const useDropdown = () => {
 
   const isDropbox = ref(false);
   const datePicker = ref(null);
+  const datePickerWrapper = ref(null);
   const dropbox = ref(null);
   const itemWrapper = ref(null);
   const dropboxPosition = reactive({
@@ -138,7 +139,7 @@ export const useDropdown = () => {
    */
   const changeDropboxPosition = async () => {
     await nextTick();
-    const datePickerRect = datePicker.value?.getBoundingClientRect();
+    const datePickerRect = datePickerWrapper.value?.getBoundingClientRect();
     const dropboxRect = dropbox.value?.getBoundingClientRect();
     const datePickerHeight = datePickerRect.height;
     const datePickerY = datePickerRect.y;
@@ -195,6 +196,7 @@ export const useDropdown = () => {
   return {
     isDropbox,
     datePicker,
+    datePickerWrapper,
     dropbox,
     itemWrapper,
     dropboxPosition,
