@@ -71,32 +71,6 @@ class Pie {
   }
 
   /**
-   * Find graph item
-   * @param {array}    offset          mouse position
-   *
-   * @returns {object} graph item
-   */
-  findGraphRange(offset) {
-    const xp = offset[0];
-    const yp = offset[1];
-    const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data;
-
-    let s = 0;
-    let e = gdata.length - 1;
-
-    if (this.show && this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
-      item.type = this.type;
-      item.data = this.data;
-      item.hit = true;
-      item.color = this.color;
-      item.index = 0;
-    }
-
-    return item;
-  }
-
-  /**
    * Draw item highlight
    *
    * @param item {object} object for drawing series data
