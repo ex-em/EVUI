@@ -25,11 +25,17 @@
           border: borderMV,
           highlight: highlightMV,
         },
+        page: {
+          use: true, // pagination
+          dataCount: 50,
+          isInfinite: true, // use && isInfinite === infinite scroll
+        },
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
+      @scroll-end="requestRowData"
     >
       <!-- renderer start -->
       <template #user-icon>
@@ -290,7 +296,7 @@ export default {
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           `user_${ix + 1}`,
-          `user_${ix + 1}`,
+          ix + 1,
           'Common',
           '010-0000-0000',
           'kmn0827@ex-em.com',
@@ -308,6 +314,11 @@ export default {
         return require('../../../assets/images/user_default.png');
       }
       /* eslint-enable global-require */
+    };
+    const requestRowData = () => {
+      if (tableData.value.length < 1000) {
+        getData(tableData.value.length + 50, 0);
+      }
     };
 
     getData(50, 0);
@@ -340,6 +351,7 @@ export default {
       onClickRow,
       resetBorderStyle,
       loadImage,
+      requestRowData,
     };
   },
 };
