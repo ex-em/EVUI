@@ -303,7 +303,7 @@ export default {
           '2020.08.04 14:15',
         ]);
       }
-      tableData.value = temp;
+      return temp;
     };
     const loadImage = (fileName) => {
       /* eslint-disable global-require */
@@ -317,11 +317,15 @@ export default {
     };
     const requestRowData = () => {
       if (tableData.value.length < 1000) {
-        getData(tableData.value.length + 50, 0);
+        const newData = getData(50, tableData.value.length);
+        tableData.value = [
+          ...tableData.value,
+          ...newData,
+        ];
       }
     };
 
-    getData(50, 0);
+    tableData.value = getData(50, 0);
     return {
       columns,
       tableData,
