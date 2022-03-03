@@ -37,7 +37,7 @@ const modules = {
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
-                series.data = this.addSeriesStackDS(sData, label, series.sbsIds, series.stackIndex);
+                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
                 series.data = this.addSeriesDS(sData, label);
               }
