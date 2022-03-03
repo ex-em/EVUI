@@ -31,13 +31,13 @@ const modules = {
             }
           });
         } else {
-          seriesIDs.forEach((sId) => {
-            const series = this.seriesList[sId];
-            const sData = data[sId];
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
+                series.data = this.addSeriesStackDS(sData, label, series.sbsIds, series.stackIndex);
               } else {
                 series.data = this.addSeriesDS(sData, label);
               }

@@ -188,7 +188,6 @@ const modules = {
 
     const centerX = width / 2;
     const centerY = height / 2;
-
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
     const radius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;

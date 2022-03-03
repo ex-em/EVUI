@@ -71,6 +71,26 @@ class Pie {
   }
 
   /**
+   * Find graph item
+   * @param {array}    offset          mouse position
+   *
+   * @returns {object} graph item
+   */
+  findGraphData([offsetX, offsetY]) {
+    const item = { data: null, hit: false, color: null, index: -1 };
+
+    if (this.show && this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
+      item.type = this.type;
+      item.data = this.data;
+      item.hit = true;
+      item.color = this.color;
+      item.index = 0;
+    }
+
+    return item;
+  }
+
+  /**
    * Draw item highlight
    *
    * @param item {object} object for drawing series data
