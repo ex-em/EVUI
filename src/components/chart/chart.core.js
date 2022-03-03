@@ -1,5 +1,6 @@
 import throttle from '@/common/utils.throttle';
 import Model from './model';
+import Util from './helpers/helpers.util';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
 import LogarithmicScale from './scale/scale.logarithmic';
@@ -136,7 +137,7 @@ class EvChart {
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
-    this.drawSeries();
+    this.drawSeries(hitInfo);
     this.drawTip(hitInfo);
     if (this.bufferCanvas) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
@@ -148,7 +149,7 @@ class EvChart {
    *
    * @returns {undefined}
    */
-  drawSeries() {
+  drawSeries(hitInfo) {
     const maxTip = this.options.maxTip;
 
     const opt = {
@@ -186,10 +187,14 @@ class EvChart {
             showIndex++;
           }
         } else {
+          const selectInfo = hitInfo
+            ?? this.lastHitInfo
+            ?? { sId: this.defaultSelectInfo?.seriesID };
+
           if (this.options.sunburst) {
-            this.drawSunburst();
+            this.drawSunburst(selectInfo);
           } else {
-            this.drawPie();
+            this.drawPie(selectInfo);
           }
 
           if (this.options.doughnutHoleSize > 0) {
@@ -206,6 +211,10 @@ class EvChart {
    * @param hitInfo
    */
   drawTip(hitInfo) {
+    if (Util.isPieType(hitInfo?.type)) {
+      return;
+    }
+
     let tipLocationInfo;
 
     if (hitInfo) {

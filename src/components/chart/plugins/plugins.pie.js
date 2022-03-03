@@ -3,13 +3,16 @@ const modules = {
   /**
    * Draw series data
    *
+   * @params hitInfo
+   *
    * @returns {undefined}
    */
-  drawPie() {
+  drawPie(hitInfo) {
     const ctx = this.bufferCtx;
     const chartRect = this.chartRect;
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
+    const padding = this.options.padding;
     const isDoughnut = !!pieOption.doughnutHoleSize;
 
     let slice;
@@ -22,8 +25,10 @@ const modules = {
     const centerX = chartRect.width / 2;
     const centerY = chartRect.height / 2;
 
-    const innerRadius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
-    const outerRadius = Math.min(centerX, centerY);
+    const chartWidth = centerX - (padding.left + padding.right);
+    const chartHeight = centerY - (padding.bottom + padding.top);
+    const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+    const outerRadius = Math.min(chartWidth, chartHeight);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
       const pie = pieDataSet[ix];
@@ -55,6 +60,17 @@ const modules = {
           series = this.seriesList[slice.id];
 
           if (value) {
+            const strokeOptions = { ...pieOption.pieStroke };
+            if (pie.data.length === 1 && pieOption.pieStroke.use) {
+              strokeOptions.use = false;
+
+              ctx.lineWidth = pieOption.pieStroke.lineWidth;
+              ctx.strokeStyle = pieOption.pieStroke.color;
+              ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+              ctx.stroke();
+            }
+
+            series.isSelect = hitInfo?.sId === slice.id;
             series.type = isDoughnut ? 'doughnut' : 'pie';
             series.centerX = centerX;
             series.centerY = centerY;
@@ -63,47 +79,39 @@ const modules = {
             series.endAngle = endAngle;
             series.data = { o: value };
 
-            series.draw(ctx);
+            series.draw(ctx, strokeOptions);
             startAngle += sliceAngle;
           }
         }
       }
-
-      ctx.beginPath();
-      if (pieOption?.pieStroke?.use) {
-        ctx.lineWidth = pieOption.pieStroke.lineWidth;
-        ctx.strokeStyle = pieOption.pieStroke.color;
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.stroke();
-      } else {
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      }
-
-      ctx.closePath();
     }
   },
 
   /**
    * Draw series data
    *
+   * @params hitInfo
+   *
    * @returns {undefined}
    */
-  drawSunburst() {
+  drawSunburst(hitInfo) {
     const ctx = this.bufferCtx;
-    const chartRect = this.chartRect;
+    const { width, height } = this.chartRect;
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
+    const padding = this.options.padding;
 
     this.calculateAngle();
 
     let slice;
     let series;
 
-    const centerX = chartRect.width / 2;
-    const centerY = chartRect.height / 2;
-
-    const innerRadius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
-    const outerRadius = Math.min(centerX, centerY);
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const chartWidth = centerX - (padding.left + padding.right);
+    const chartHeight = centerY - (padding.bottom + padding.top);
+    const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+    const outerRadius = Math.min(chartWidth, chartHeight);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
       const pie = pieDataSet[ix];
@@ -143,6 +151,17 @@ const modules = {
           series = this.seriesList[slice.id];
 
           if (slice.value) {
+            const strokeOptions = { ...pieOption.pieStroke };
+            if (pie.data.length === 1 && pieOption.pieStroke.use) {
+              strokeOptions.use = false;
+
+              ctx.lineWidth = pieOption.pieStroke.lineWidth;
+              ctx.strokeStyle = pieOption.pieStroke.color;
+              ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+              ctx.stroke();
+            }
+
+            series.isSelect = hitInfo?.sId === slice.id;
             series.type = 'sunburst';
             series.centerX = centerX;
             series.centerY = centerY;
@@ -151,23 +170,10 @@ const modules = {
             series.endAngle = slice.ea;
             series.data = { o: slice.value };
 
-            series.draw(ctx);
+            series.draw(ctx, strokeOptions);
           }
         }
       }
-
-      ctx.beginPath();
-
-      if (pieOption?.pieStroke?.use) {
-        ctx.lineWidth = pieOption.pieStroke.lineWidth;
-        ctx.strokeStyle = pieOption.pieStroke.color;
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.stroke();
-      } else {
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      }
-
-      ctx.closePath();
     }
   },
 
@@ -177,11 +183,16 @@ const modules = {
    */
   drawDoughnutHole(ctx = this.bufferCtx) {
     const pieOption = this.options;
+    const { width, height } = this.chartRect;
+    const padding = this.options.padding;
 
-    const centerX = this.chartRect.width / 2;
-    const centerY = this.chartRect.height / 2;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
-    const radius = Math.min(centerX, centerY) * pieOption.doughnutHoleSize;
+    const chartWidth = centerX - (padding.left + padding.right);
+    const chartHeight = centerY - (padding.bottom + padding.top);
+    const radius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
@@ -195,18 +206,14 @@ const modules = {
     ctx.restore();
 
     // inner stroke
-    ctx.beginPath();
-
     if (pieOption?.pieStroke?.use) {
+      ctx.beginPath();
       ctx.strokeStyle = pieOption.pieStroke.color;
       ctx.lineWidth = pieOption.pieStroke.lineWidth;
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.stroke();
-    } else {
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.closePath();
     }
-
-    ctx.closePath();
 
     this.pieDataSet[this.pieDataSet.length - 1].ir = radius;
   },

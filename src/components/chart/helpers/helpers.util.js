@@ -312,4 +312,12 @@ export default {
     ctx.restore();
     ctx.beginPath();
   },
+
+  isPieType(type) {
+    return type === 'pie' || type === 'doughnut' || type === 'sunburst';
+  },
+
+  isDoughnutHole(type) {
+    return type === 'doughnut' || type === 'sunburst';
+  },
 };

@@ -48,5 +48,6 @@
 <style lang="scss" scoped>
   .case {
     height: 100%;
+    background-color: #EEEEEE;
   }
 </style>

@@ -406,12 +406,27 @@ const modules = {
 
   /**
    *
-   * @param targetInfo
+   * @param targetInfo {object}  '{ dataIndex: number, seriesID: string }'
+   * @param chartType {string}  'bar', 'line', 'pie', 'scatter'
+   *
    * @returns {boolean}
    */
-  selectItemByData(targetInfo) {
+  selectItemByData(targetInfo, chartType) {
     this.defaultSelectInfo = targetInfo;
-    const foundInfo = this.getItem(targetInfo, false);
+
+    let foundInfo;
+    if (chartType === 'pie') {
+      foundInfo = {
+        type: 'pie',
+        sId: targetInfo.seriesID,
+      };
+    } else {
+      if (isNaN(targetInfo?.dataIndex)) {
+        return false;
+      }
+
+      foundInfo = this.getItem(targetInfo, false);
+    }
 
     if (foundInfo) {
       this.render(foundInfo);

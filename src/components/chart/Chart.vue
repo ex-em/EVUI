@@ -102,9 +102,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         }, { deep: true });
 
         await watch(() => props.selectedItem, (newValue) => {
-          if (newValue?.seriesID && !isNaN(newValue?.dataIndex)) {
-            evChart.selectItemByData(newValue);
+          if (!newValue?.seriesID) {
+            return;
           }
+
+          const chartType = props.options?.type;
+          evChart.selectItemByData(newValue, chartType);
         }, { deep: true });
       });
 
