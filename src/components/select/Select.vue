@@ -8,31 +8,11 @@
       disabled,
     }"
   >
-    <template v-if="!multiple">
-      <span
-        v-if="!clearable || !isClearableIcon"
-        class="ev-input-suffix"
-        @click="clickSelectInput"
-      >
-        <i
-          class="ev-input-suffix-arrow ev-icon-s-arrow-down"
-          :class="{
-            selected: isDropbox,
-          }"
-        />
-      </span>
-      <input
-        v-model="selectedModel"
-        type="text"
-        class="ev-input"
-        readonly
-        :placeholder="computedPlaceholder"
-        :disabled="disabled"
-        @click="clickSelectInput"
-      />
-    </template>
-    <template v-else>
-      <div class="ev-select-tag-wrapper">
+    <div
+      ref="selectWrapper"
+      class="ev-select__wrapper"
+    >
+      <template v-if="!multiple">
         <span
           v-if="!clearable || !isClearableIcon"
           class="ev-input-suffix"
@@ -46,66 +26,90 @@
           />
         </span>
         <input
+          v-model="selectedModel"
           type="text"
-          class="ev-input multiple"
+          class="ev-input"
           readonly
           :placeholder="computedPlaceholder"
           :disabled="disabled"
           @click="clickSelectInput"
         />
-        <template v-if="!collapseTags">
-          <div
-            v-for="item in selectedModel"
-            :key="item"
-            class="ev-select-tag"
+      </template>
+      <template v-else>
+        <div class="ev-select-tag-wrapper">
+          <span
+            v-if="!clearable || !isClearableIcon"
+            class="ev-input-suffix"
+            @click="clickSelectInput"
           >
-            <span class="ev-tag-name">
-              {{ item.name }}
-            </span>
-            <span
-              class="ev-tag-suffix"
-              @click.stop="[removeMv(item.value), changeDropboxPosition()]"
+            <i
+              class="ev-input-suffix-arrow ev-icon-s-arrow-down"
+              :class="{
+                selected: isDropbox,
+              }"
+            />
+          </span>
+          <input
+            type="text"
+            class="ev-input multiple"
+            readonly
+            :placeholder="computedPlaceholder"
+            :disabled="disabled"
+            @click="clickSelectInput"
+          />
+          <template v-if="!collapseTags">
+            <div
+              v-for="item in selectedModel"
+              :key="item"
+              class="ev-select-tag"
             >
-              <i class="ev-tag-suffix-close ev-icon-error" />
-            </span>
-          </div>
-        </template>
-        <template v-else>
-          <div
-            v-if="selectedModel.length"
-            class="ev-select-tag"
-          >
-            <span class="ev-tag-name">
-              {{ selectedModel[0].name }}
-            </span>
-            <span
-              class="ev-tag-suffix"
-              @click.stop="[removeMv(selectedModel[0].value), changeDropboxPosition()]"
+              <span class="ev-tag-name">
+                {{ item.name }}
+              </span>
+              <span
+                class="ev-tag-suffix"
+                @click.stop="[removeMv(item.value), changeDropboxPosition()]"
+              >
+                <i class="ev-tag-suffix-close ev-icon-error" />
+              </span>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              v-if="selectedModel.length"
+              class="ev-select-tag"
             >
-              <i class="ev-tag-suffix-close ev-icon-error" />
-            </span>
-          </div>
-          <div
-            v-if="selectedModel.length > 1"
-            class="ev-select-tag num"
-          >
-            <span class="ev-tag-name">
-              + {{ selectedModel.length - 1 }}
-            </span>
-          </div>
-        </template>
-      </div>
-    </template>
-    <template v-if="clearable">
-      <span
-        v-show="isClearableIcon"
-        class="ev-input-suffix"
-        @click.stop="[removeAllMv(), clickOutsideDropbox()]"
-      >
-        <i class="ev-icon-error" />
-      </span>
-    </template>
-    <div class="ev-select-dropbox-wrapper">
+              <span class="ev-tag-name">
+                {{ selectedModel[0].name }}
+              </span>
+              <span
+                class="ev-tag-suffix"
+                @click.stop="[removeMv(selectedModel[0].value), changeDropboxPosition()]"
+              >
+                <i class="ev-tag-suffix-close ev-icon-error" />
+              </span>
+            </div>
+            <div
+              v-if="selectedModel.length > 1"
+              class="ev-select-tag num"
+            >
+              <span class="ev-tag-name">
+                + {{ selectedModel.length - 1 }}
+              </span>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template v-if="clearable">
+        <span
+          v-show="isClearableIcon"
+          class="ev-input-suffix"
+          @click.stop="[removeAllMv(), clickOutsideDropbox()]"
+        >
+          <i class="ev-icon-error" />
+        </span>
+      </template>
+      <div class="ev-select-dropbox-wrapper">
       <div
         v-if="isDropbox"
         ref="dropbox"
@@ -152,6 +156,7 @@
           </ul>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -228,6 +233,7 @@ export default {
 
     const {
       select,
+      selectWrapper,
       dropbox,
       itemWrapper,
       isDropbox,
@@ -251,6 +257,7 @@ export default {
       removeAllMv,
 
       select,
+      selectWrapper,
       dropbox,
       itemWrapper,
       isDropbox,
@@ -271,21 +278,18 @@ export default {
 @import '../../style/index.scss';
 
 .ev-select {
-  $select-height: 35px;
+  $select-height: $input-default-height;
   display: block;
   position: relative;
   width: 100%;
-  min-height: $select-height;
   border-radius: $default-radius;
   cursor: pointer;
 
-  &.disabled {
-    background-color: #F5F7FA;
-    border-color: #E4E7ED;
-    color: #C0C4CC;
-  }
-
   @import '../../style/components/input.scss';
+
+  &__wrapper {
+    position: relative;
+  }
   .ev-input {
     padding: 0 30px 0 15px;
     border: 1px solid #B2B2B2;
@@ -320,7 +324,6 @@ export default {
   }
 
   .ev-select-tag-wrapper {
-    $select-height: 35px;
     display: flex;
     width: 100%;
     height: 100%;
@@ -371,7 +374,7 @@ export default {
 }
 
 .ev-select-dropbox {
-  $select-height: 35px;
+  $select-height: $input-default-height;
   position: absolute;
   width: 100%;
   max-height: $select-height * 5;

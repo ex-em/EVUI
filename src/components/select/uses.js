@@ -107,6 +107,7 @@ export const useDropdown = (param) => {
   const isDropbox = ref(false);
   const filterTextRef = ref(props.filterText);
   const select = ref(null);
+  const selectWrapper = ref(null);
   const dropbox = ref(null);
   const itemWrapper = ref(null);
   const dropboxPosition = reactive({
@@ -131,8 +132,8 @@ export const useDropdown = (param) => {
    */
   const changeDropboxPosition = async () => {
     await nextTick();
-    const selectHeight = select.value?.getBoundingClientRect().height;
-    const selectY = select.value?.getBoundingClientRect().y;
+    const selectHeight = selectWrapper.value?.getBoundingClientRect().height;
+    const selectY = selectWrapper.value?.getBoundingClientRect().y;
     const dropboxHeight = dropbox.value?.getBoundingClientRect().height;
     const docHeight = document.documentElement.clientHeight;
     if (docHeight < selectY + selectHeight + dropboxHeight) {
@@ -245,6 +246,7 @@ export const useDropdown = (param) => {
 
   return {
     select,
+    selectWrapper,
     dropbox,
     itemWrapper,
     isDropbox,

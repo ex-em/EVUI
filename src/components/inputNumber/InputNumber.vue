@@ -6,28 +6,30 @@
       readonly,
     }"
   >
-    <span
-      v-for="type in ['up', 'down']"
-      :key="`step-arrow-${type}`"
-      :class="['ev-input-number-icon', `step-${type}`]"
-      @click="stepValue(type)"
-    >
-      <i :class="`ev-icon-s-arrow-${type}`" />
-    </span>
-    <input
-      v-model.trim="currentValue"
-      class="ev-input"
-      type="text"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :readonly="readonly"
-      @focus="focusInput"
-      @blur="blurInput"
-      @change="changeMv"
-      @keydown.up.prevent="stepValue('up')"
-      @keydown.down.prevent="stepValue('down')"
-      @keydown.enter.prevent="validateValue(currentValue)"
-    />
+    <div class="ev-input-number__wrapper">
+      <span
+        v-for="type in ['up', 'down']"
+        :key="`step-arrow-${type}`"
+        :class="['ev-input-number-icon', `step-${type}`]"
+        @click="stepValue(type)"
+      >
+        <i :class="`ev-icon-s-arrow-${type}`" />
+      </span>
+      <input
+        v-model.trim="currentValue"
+        class="ev-input"
+        type="text"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        @focus="focusInput"
+        @blur="blurInput"
+        @change="changeMv"
+        @keydown.up.prevent="stepValue('up')"
+        @keydown.down.prevent="stepValue('down')"
+        @keydown.enter.prevent="validateValue(currentValue)"
+      />
+    </div>
   </div>
 </template>
 
@@ -135,6 +137,9 @@ export default {
         border: 1px solid evThemed('primary');
       }
     }
+  }
+  &__wrapper {
+    position: relative;
   }
   .ev-input {
     $number-arrow-btn-width: 30px;

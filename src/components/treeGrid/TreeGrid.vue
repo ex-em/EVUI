@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import {
@@ -229,29 +229,26 @@ export default {
     'check-all': null,
   },
   setup(props) {
-    const {
-      isRenderer,
-      getComponentName,
-      getConvertValue,
-      getColumnIndex,
-      setPixelUnit,
-    } = commonFunctions();
     const elementInfo = reactive({
       body: null,
       header: null,
       resizeLine: null,
       'grid-wrapper': null,
     });
-    const searchValue = computed(() => (props.option.searchValue || ''));
+    const filterInfo = reactive({
+      isSearch: false,
+      searchWord: '',
+    });
     const stores = reactive({
       treeStore: [],
       viewStore: [],
       filterStore: [],
-      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       treeRows: props.rows,
+      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
+      store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -259,6 +256,14 @@ export default {
       checkedRows: props.checked,
       useCheckbox: computed(() => props.option.useCheckbox || {}),
     });
+    const {
+      isRenderer,
+      getComponentName,
+      getConvertValue,
+      getColumnIndex,
+      setPixelUnit,
+      checkHeader,
+    } = commonFunctions({ checkInfo });
     const scrollInfo = reactive({
       lastScroll: {
         top: 0,
@@ -296,7 +301,6 @@ export default {
       borderStyle: computed(() => props.option.style?.border || ''),
       highlightIdx: computed(() => props.option.style?.highlight),
     });
-
     const {
       updateVScroll,
       updateHScroll,
@@ -311,7 +315,7 @@ export default {
     const {
       onCheck,
       onCheckAll,
-    } = checkEvent({ checkInfo, stores });
+    } = checkEvent({ checkInfo, stores, checkHeader });
 
     const {
       calculatedColumn,
@@ -332,7 +336,7 @@ export default {
 
     const {
       onSearch,
-    } = filterEvent({ checkInfo, stores, getConvertValue, onResize });
+    } = filterEvent({ stores, filterInfo, getConvertValue, onResize, checkHeader });
 
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
@@ -343,17 +347,14 @@ export default {
     watch(
       () => props.checked,
       (checkedList) => {
-        let store = stores.treeStore;
-        if (stores.searchStore.length > 0) {
-          store = stores.searchStore;
-        }
+        const store = stores.store;
         checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
         if (store.length) {
           store.forEach((row) => {
-            row.checked = checkedList.includes(row);
+            row.checked = !!checkedList.find(c => c.index === row.index);
           });
-          checkInfo.isHeaderChecked = store.every(n => n.checked === true);
+          checkHeader(store);
         }
         updateVScroll();
       },
@@ -380,9 +381,14 @@ export default {
       }, { deep: true },
     );
     watch(
+      () => stores.treeStore.length,
+      () => {
+        checkHeader(stores.store);
+      },
+    );
+    watch(
       () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
       (value) => {
-        // columnWidth computed readonly
         resizeInfo.columnWidth = value[3];
         stores.orderedColumns.map((column) => {
           const item = column;
@@ -397,12 +403,13 @@ export default {
       },
     );
     watch(
-      () => searchValue.value,
+      () => props.option.searchValue,
       (value) => {
-        const searchWord = value?.value ?? value;
-        if (searchWord) {
-          onSearch(searchWord);
-        }
+        nextTick(() => {
+          if (value !== undefined) {
+            onSearch(value?.value ?? value);
+          }
+        });
       }, { immediate: true },
     );
     const gridStyle = computed(() => ({
@@ -455,6 +462,7 @@ export default {
       ...toRefs(styleInfo),
       ...toRefs(elementInfo),
       ...toRefs(stores),
+      ...toRefs(filterInfo),
       ...toRefs(scrollInfo),
       ...toRefs(resizeInfo),
       ...toRefs(selectInfo),

@@ -76,8 +76,14 @@ class Pie {
    *
    * @returns {object} graph item
    */
-  findGraphData([offsetX, offsetY]) {
-    const item = { data: null, hit: false, color: null, index: -1 };
+  findGraphRange(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    let s = 0;
+    let e = gdata.length - 1;
 
     if (this.show && this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
       item.type = this.type;

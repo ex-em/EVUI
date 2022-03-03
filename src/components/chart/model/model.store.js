@@ -11,14 +11,14 @@ const modules = {
    */
   createDataSet(data, label) {
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
-      const seriesIDs = this.seriesInfo.charts[typeKey];
+      const type = this.seriesInfo.charts[typeKey];
 
-      if (seriesIDs.length) {
+      if (type.length) {
         if (typeKey === 'pie') {
           if (this.options.sunburst) {
             this.createSunburstDataSet(data);
           } else {
-            this.createPieDataSet(data, seriesIDs);
+            this.createPieDataSet(data, type);
           }
         } else if (typeKey === 'scatter') {
           seriesIDs.forEach((sId) => {
