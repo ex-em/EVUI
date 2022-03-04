@@ -28,9 +28,10 @@
           더블 클릭된 정보
         </div>
         {{ dblClickedInfo }}
+      </div>
     </div>
   </div>
-</div></template>
+</template>
 
 <script>
 import { reactive, ref } from 'vue';

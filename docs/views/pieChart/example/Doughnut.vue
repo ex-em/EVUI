@@ -28,7 +28,6 @@
       const chartOptions = {
         type: 'pie',
         width: '100%',
-        height: '50%',
         title: {
           text: 'Chart Title',
           show: true,
