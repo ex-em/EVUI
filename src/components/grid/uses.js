@@ -68,7 +68,8 @@ export const commonFunctions = () => {
 };
 
 export const scrollEvent = (params) => {
-  const { scrollInfo, stores, elementInfo, resizeInfo } = params;
+  const { emit } = getCurrentInstance();
+  const { scrollInfo, stores, elementInfo, resizeInfo, pageInfo } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
@@ -93,6 +94,16 @@ export const scrollEvent = (params) => {
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
       scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
         - scrollInfo.vScrollTopHeight;
+      if (scrollInfo.vScrollBottomHeight === 0) {
+        pageInfo.prevPage = pageInfo.currentPage;
+        pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.dataCount) + 1;
+        emit('scroll-end', {
+          startIndex: lastIndex,
+          dataCount: pageInfo.dataCount,
+          prevPage: pageInfo.prevPage,
+          currentPage: pageInfo.currentPage,
+        });
+      }
     }
   };
   /**

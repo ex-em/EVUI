@@ -149,7 +149,7 @@
           <tr
             v-for="(row, rowIndex) in viewStore"
             :key="rowIndex"
-            :data-index="rowIndex"
+            :data-index="row[0]"
             :class="{
               row: true,
               selected: row[2] === selectedRow,
@@ -309,6 +309,7 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
+    'scroll-end': null,
   },
   setup(props) {
     const {
@@ -397,12 +398,20 @@ export default {
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
     });
+    const pageInfo = reactive({
+      currentPage: 1,
+      prevPage: 0,
+      startIndex: 0,
+      use: computed(() => (props.option.page?.use || false)),
+      dataCount: computed(() => (props.option.page?.dataCount || 50)),
+      isInfinite: computed(() => (props.option.page?.isInfinite || false)),
+    });
 
     const {
       updateVScroll,
       updateHScroll,
       onScroll,
-    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo });
+    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo, pageInfo });
 
     const {
       onRowClick,
@@ -594,6 +603,7 @@ export default {
       ...toRefs(stores),
       ...toRefs(filterInfo),
       ...toRefs(scrollInfo),
+      ...toRefs(pageInfo),
       ...toRefs(resizeInfo),
       ...toRefs(selectInfo),
       ...toRefs(checkInfo),
