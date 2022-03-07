@@ -1,4 +1,5 @@
 import { reverse } from 'lodash-es';
+import Util from '../helpers/helpers.util';
 
 const modules = {
   /**
@@ -476,20 +477,21 @@ const modules = {
    * @returns {object} clicked item information
    */
   getItemByPosition(offset, useApproximate = false) {
-    const sIds = Object.keys(this.seriesList);
+    const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
-    let maxl = null;
-    let maxp = null;
-    let maxg = null;
-    let maxSID = '';
+    let maxType = null;
+    let maxLabel = null;
+    let maxValuePos = null;
+    let maxValue = null;
+    let maxSeriesID = '';
     let acc = 0;
     let useStack = false;
     let maxIndex = null;
 
-    for (let ix = 0; ix < sIds.length; ix++) {
-      const sId = sIds[ix];
-      const series = this.seriesList[sId];
+    for (let ix = 0; ix < seriesIDs.length; ix++) {
+      const seriesID = seriesIDs[ix];
+      const series = this.seriesList[seriesID];
       const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
@@ -498,25 +500,35 @@ const modules = {
         const index = item.index;
 
         if (data) {
-          const ldata = isHorizontal ? data.y : data.x;
-          const lp = isHorizontal ? data.yp : data.xp;
+          if (Util.isPieType(item.type)) {
+            maxLabel = seriesID;
+            maxSeriesID = seriesID;
+            maxValuePos = (data.ea - data.sa) / 2;
+            maxValue = data.o;
+            maxIndex = data.index;
+            maxType = item.type;
+          } else {
+            const ldata = isHorizontal ? data.y : data.x;
+            const lp = isHorizontal ? data.yp : data.xp;
 
-          if (ldata !== null && ldata !== undefined) {
-            const g = isHorizontal ? data.o || data.x : data.o || data.y;
+            if (ldata !== null && ldata !== undefined) {
+              const g = isHorizontal ? data.o || data.x : data.o || data.y;
 
-            if (series.stackIndex) {
-              acc += !isNaN(data.o) ? data.o : 0;
-              useStack = true;
-            } else {
-              acc += data.y;
-            }
+              if (series.stackIndex) {
+                acc += !isNaN(data.o) ? data.o : 0;
+                useStack = true;
+              } else {
+                acc += data.y;
+              }
 
-            if (maxg === null || maxg <= g) {
-              maxg = g;
-              maxSID = sId;
-              maxl = ldata;
-              maxp = lp;
-              maxIndex = index;
+              if (maxValue === null || maxValue <= g) {
+                maxValue = g;
+                maxSeriesID = seriesID;
+                maxLabel = ldata;
+                maxValuePos = lp;
+                maxIndex = index;
+                maxType = series.type;
+              }
             }
           }
         }
@@ -524,10 +536,11 @@ const modules = {
     }
 
     return {
-      label: maxl,
-      pos: maxp,
-      value: maxg === null ? 0 : maxg,
-      sId: maxSID,
+      type: maxType,
+      label: maxLabel,
+      pos: maxValuePos,
+      value: maxValue ?? 0,
+      sId: maxSeriesID,
       acc,
       useStack,
       maxIndex,

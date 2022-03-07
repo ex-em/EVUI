@@ -18,6 +18,7 @@ class Pie {
     }
 
     this.sId = sId;
+    this.show = true;
     this.data = [];
     this.type = 'pie';
     this.centerX = 0;
@@ -28,28 +29,45 @@ class Pie {
     this.slice = null;
     this.state = null;
     this.ctx = null;
+    this.isSelect = false;
   }
 
   /**
    * Draw series data
    * @param context
+   * @param strokeOptions
+   *
    *
    * @returns {undefined}
    */
-  draw(context) {
-    this.ctx = context;
+  draw(context, strokeOptions) {
+    const ctx = context ?? this.ctx;
+    const slice = new Path2D();
+
+    const radius = this.isSelect ? this.radius + 5 : this.radius;
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
     const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
-    this.ctx.beginPath();
-    this.slice = new Path2D();
-    this.slice.moveTo(this.centerX, this.centerY);
-    this.slice.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle);
-    this.ctx.fillStyle = Util.colorStringToRgba(color, opacity);
-    this.ctx.fill(this.slice);
-    this.ctx.closePath();
+    ctx.beginPath();
+    slice.moveTo(this.centerX, this.centerY);
+    slice.arc(this.centerX, this.centerY, radius, this.startAngle, this.endAngle);
+    slice.lineTo(this.centerX, this.centerY);
+    ctx.fillStyle = Util.colorStringToRgba(color, opacity);
+    ctx.fill(slice);
+
+    if (strokeOptions.use) {
+      ctx.lineCap = 'round';
+      ctx.lineWidth = strokeOptions?.lineWidth;
+      ctx.strokeStyle = strokeOptions?.color;
+      ctx.stroke(slice);
+    }
+
+    ctx.closePath();
+
+    this.slice = slice;
+    this.ctx = ctx;
   }
 
   /**
@@ -61,7 +79,8 @@ class Pie {
   findGraphData([offsetX, offsetY]) {
     const item = { data: null, hit: false, color: null, index: -1 };
 
-    if (this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
+    if (this.show && this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
+      item.type = this.type;
       item.data = this.data;
       item.hit = true;
       item.color = this.color;
@@ -81,6 +100,7 @@ class Pie {
    */
   itemHighlight(item, context) {
     const ctx = context;
+    const radius = this.isSelect ? this.radius + 5 : this.radius;
 
     ctx.save();
     ctx.shadowOffsetX = 0;
@@ -93,7 +113,8 @@ class Pie {
 
     ctx.beginPath();
     ctx.moveTo(this.centerX, this.centerY);
-    ctx.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle);
+    ctx.arc(this.centerX, this.centerY, radius, this.startAngle, this.endAngle);
+    ctx.lineTo(this.centerX, this.centerY);
     ctx.fill();
     ctx.closePath();
 

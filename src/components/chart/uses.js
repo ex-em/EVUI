@@ -107,6 +107,15 @@ export const useModel = () => {
       normalizedOptions.tooltip.use = false;
     }
 
+    if (options.type === 'pie' && !options?.padding) {
+      normalizedOptions.padding = {
+        top: 2,
+        right: 2,
+        left: 2,
+        bottom: 4,
+      };
+}
+
     return normalizedOptions;
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);

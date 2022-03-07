@@ -25,11 +25,17 @@
           border: borderMV,
           highlight: highlightMV,
         },
+        page: {
+          use: true, // pagination
+          dataCount: 50,
+          isInfinite: true, // use && isInfinite === infinite scroll
+        },
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
+      @scroll-end="requestRowData"
     >
       <!-- renderer start -->
       <template #user-icon>
@@ -290,14 +296,14 @@ export default {
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           `user_${ix + 1}`,
-          `user_${ix + 1}`,
+          ix + 1,
           'Common',
           '010-0000-0000',
           'kmn0827@ex-em.com',
           '2020.08.04 14:15',
         ]);
       }
-      tableData.value = temp;
+      return temp;
     };
     const loadImage = (fileName) => {
       /* eslint-disable global-require */
@@ -309,8 +315,17 @@ export default {
       }
       /* eslint-enable global-require */
     };
+    const requestRowData = () => {
+      if (tableData.value.length < 1000) {
+        const newData = getData(50, tableData.value.length);
+        tableData.value = [
+          ...tableData.value,
+          ...newData,
+        ];
+      }
+    };
 
-    getData(50, 0);
+    tableData.value = getData(50, 0);
     return {
       columns,
       tableData,
@@ -340,6 +355,7 @@ export default {
       onClickRow,
       resetBorderStyle,
       loadImage,
+      requestRowData,
     };
   },
 };
