@@ -28,6 +28,7 @@ import EvTimePicker from '@/components/timePicker/';
 import EvGrid from '@/components/grid/';
 import EvChart from '@/components/chart/';
 import EvTreeGrid from '@/components/treeGrid/';
+import EvPagination from '@/components/pagination/';
 import { version } from '../package.json';
 
 const components = [
@@ -61,6 +62,7 @@ const components = [
   EvNotification,
   EvMessageBox,
   EvTreeGrid,
+  EvPagination,
 ];
 
 const install = (app) => {
@@ -108,6 +110,7 @@ export {
   EvNotification,
   EvMessageBox,
   EvTreeGrid,
+  EvPagination,
 };
 
 export default EVUI;

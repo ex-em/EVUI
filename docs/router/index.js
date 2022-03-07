@@ -31,6 +31,7 @@ import scatterChartProps from 'docs/views/scatterChart/props';
 import comboChartProps from 'docs/views/comboChart/props';
 import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
+import paginationProps from 'docs/views/pagination/props';
 
 const routes = [
   {
@@ -187,6 +188,15 @@ const routes = [
     name: 'TimePicker',
     component: PageView,
     props: timePickerProps,
+    meta: {
+      category: 'Form',
+    },
+  },
+  {
+    path: '/pagination',
+    name: 'Pagination',
+    component: PageView,
+    props: paginationProps,
     meta: {
       category: 'Form',
     },
