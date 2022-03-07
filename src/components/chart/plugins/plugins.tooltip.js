@@ -361,7 +361,7 @@ const modules = {
       const series = this.seriesList[sId];
       series.itemHighlight(hitInfo.items[sId], ctx);
 
-      if (series.type === 'sunburst' || series.type === 'doughnut') {
+      if (Util.isDoughnutHole(series.type)) {
         this.drawDoughnutHole(ctx);
       }
     });
