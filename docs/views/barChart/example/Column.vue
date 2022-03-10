@@ -11,7 +11,7 @@
       const chartData = {
         series: {
           series1: { name: 'series#1', color: '#FEC64F', showValue: { use: true } },
-          series2: { name: 'series#2', color: '#48D1CC', showValue: { use: true } },
+          series2: { name: 'series#2', color: '#48D1CC', showValue: { use: true, decimalPoint: 1 } },
         },
         labels: [
           'value1',
@@ -22,7 +22,7 @@
         ],
         data: {
           series1: [100, 150, 51, 150, { value: 350, color: '#FF0000' }],
-          series2: [150, 100, 151, 50, 250],
+          series2: [150.0, 100.2, 151.433, 50.221, 250.123],
         },
       };
 

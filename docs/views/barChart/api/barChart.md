@@ -61,6 +61,7 @@ const chartData = {
 | fontSize | Number | 12 | 글자 크기 | |
 | align | String | 'end' | tooltip 테두리 색상  | 'start', 'center', 'end', 'out' |
 | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+| decimalPoint | Number | 0 | 소수점 자릿수  |  |
 
 #### data example
 ```
@@ -122,6 +123,9 @@ const chartData = {
       - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
    - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+   - decimalPoint
+     - 소수점 자릿수 표시 (default: 0)
+     
       
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -135,7 +139,9 @@ const chartData = {
    - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
    - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표
-      
+   - decimalPoint
+       - 소수점 자릿수 표시 (default: 0)
+     
 ##### step type
    - timeMode
       - Step Axis를 Time 기반으로 변경, default: false
