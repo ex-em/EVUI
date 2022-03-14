@@ -161,25 +161,23 @@ class Pie {
       formattedTxt = Util.labelSignFormat(value);
     }
 
-    const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
-    const valueHeight = fontSize + 4;
-    const innerAngle = ((this.endAngle - this.startAngle) * 180) / Math.PI;
     const ratio = 1.8;
+    const radius = this.radius - this.doughnutHoleSize;
+    const innerAngle = ((this.endAngle - this.startAngle) * 180) / Math.PI;
+    const valueHeight = fontSize + 4;
+    const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
 
     if (innerAngle >= valueWidth * ratio
       && innerAngle >= valueHeight * ratio
-      && this.radius - this.doughnutHoleSize >= valueWidth * ratio
-      && this.radius - this.doughnutHoleSize >= valueHeight * ratio
+      && radius >= valueWidth * ratio
+      && radius >= valueHeight * ratio
     ) {
-      const halfRadius = ((this.radius - this.doughnutHoleSize) / 2) + this.doughnutHoleSize;
+      const halfRadius = (radius / 2) + this.doughnutHoleSize;
       const centerAngle = ((this.endAngle - this.startAngle) / 2) + this.startAngle;
-      const xPos = halfRadius * Math.cos(centerAngle);
-      const yPos = halfRadius * Math.sin(centerAngle);
+      const xPos = halfRadius * Math.cos(centerAngle) + this.centerX;
+      const yPos = halfRadius * Math.sin(centerAngle) + this.centerY;
 
-      const x = xPos + this.centerX;
-      const y = yPos + this.centerY;
-
-      ctx.fillText(formattedTxt, x, y);
+      ctx.fillText(formattedTxt, xPos, yPos);
     }
 
     ctx.restore();
