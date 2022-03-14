@@ -24,6 +24,7 @@ class Pie {
     this.centerX = 0;
     this.centerY = 0;
     this.radius = 0;
+    this.doughnutHoleSize = 0;
     this.startAngle = 0;
     this.endAngle = 0;
     this.slice = null;
@@ -45,6 +46,7 @@ class Pie {
     const slice = new Path2D();
 
     const radius = this.isSelect ? this.radius + 5 : this.radius;
+    const doughnutHoleRadius = this.radius * this.doughnutHoleSize;
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
@@ -62,6 +64,10 @@ class Pie {
       ctx.lineWidth = strokeOptions?.lineWidth;
       ctx.strokeStyle = strokeOptions?.color;
       ctx.stroke(slice);
+    }
+
+    if (this.showValue?.use) {
+      this.drawValueLabels(ctx, doughnutHoleRadius);
     }
 
     ctx.closePath();
@@ -101,6 +107,7 @@ class Pie {
   itemHighlight(item, context) {
     const ctx = context;
     const radius = this.isSelect ? this.radius + 5 : this.radius;
+    const doughnutHoleRadius = this.radius * this.doughnutHoleSize;
 
     ctx.save();
     ctx.shadowOffsetX = 0;
@@ -116,7 +123,64 @@ class Pie {
     ctx.arc(this.centerX, this.centerY, radius, this.startAngle, this.endAngle);
     ctx.lineTo(this.centerX, this.centerY);
     ctx.fill();
+
+    if (this.showValue?.use) {
+      this.drawValueLabels(ctx, doughnutHoleRadius);
+    }
+
     ctx.closePath();
+    ctx.restore();
+  }
+
+  /**
+   * Draw value label if series 'use' of showValue option is true
+   *
+   * @param context           canvas context
+   */
+  drawValueLabels(context) {
+    const { fontSize, textColor, formatter } = this.showValue;
+    const ctx = context;
+
+    ctx.save();
+    ctx.beginPath();
+
+    ctx.font = `normal normal normal ${fontSize}px Roboto`;
+    ctx.fillStyle = textColor;
+    ctx.lineWidth = 1;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const value = this.data.o;
+
+    let formattedTxt;
+    if (formatter) {
+      formattedTxt = formatter(value);
+    }
+
+    if (!formatter || typeof formattedTxt !== 'string') {
+      formattedTxt = Util.labelSignFormat(value);
+    }
+
+    const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
+    const valueHeight = fontSize + 4;
+    const innerAngle = ((this.endAngle - this.startAngle) * 180) / Math.PI;
+    const ratio = 1.8;
+
+    if (innerAngle >= valueWidth * ratio
+      && innerAngle >= valueHeight * ratio
+      && this.radius - this.doughnutHoleSize >= valueWidth * ratio
+      && this.radius - this.doughnutHoleSize >= valueHeight * ratio
+    ) {
+      const halfRadius = ((this.radius - this.doughnutHoleSize) / 2) + this.doughnutHoleSize;
+      const centerAngle = ((this.endAngle - this.startAngle) / 2) + this.startAngle;
+      const xPos = halfRadius * Math.cos(centerAngle);
+      const yPos = halfRadius * Math.sin(centerAngle);
+
+      const x = xPos + this.centerX;
+      const y = yPos + this.centerY;
+
+      ctx.fillText(formattedTxt, x, y);
+    }
 
     ctx.restore();
   }
