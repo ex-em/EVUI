@@ -19,16 +19,17 @@
           headerCheck: headerCheckMV,
         },
         searchValue: searchVm,
-        // customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
           border: borderMV,
         },
+        page: pageInfo,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
+      @request-data="onRequestData"
     >
       <!-- toolbar -->
       <template #toolbar="{ item }">
@@ -95,11 +96,43 @@
         />
       </template>
     </ev-grid>
+    <div class="description">
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">Current Page</span>
+          <ev-input-number v-model="pageInfo.currentPage" :min="1"/>
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">Visible Page</span>
+          <ev-input-number v-model="pageInfo.visiblePage" :min="7"/>
+        </div>
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">Order</span>
+          <ev-select
+            v-model="pageInfo.order"
+            :items="orderItems"
+            placeholder="Please select value."
+          />
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">Data per page</span>
+          <ev-input-number v-model="pageInfo.perPage" />
+        </div>
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">Page Info</span>
+          <ev-toggle v-model="pageInfo.showPageInfo"/>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, reactive, computed } from 'vue';
 
 export default {
   setup() {
@@ -138,7 +171,7 @@ export default {
       { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false }, // searchable
       { caption: 'RTS Port', field: 'rts_port', type: 'stringNumber' },
       { caption: 'DB Version', field: 'db-version', type: 'string' },
-      { caption: 'Lock', field: 'is_lock', type: 'boolean' },
+      { caption: 'Lock', field: 'is_lock', type: 'boolean', searchable: false },
     ]);
     const onCheckedRow = () => {
       let checkedRow = '';
@@ -171,9 +204,9 @@ export default {
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           dbList[ix % 4],
-          instanceList[ix],
-          instanceList[ix],
-          IPList[ix],
+          instanceList[ix % 12],
+          instanceList[ix % 12],
+          IPList[ix % 12],
           portList[ix % 3],
           dbVersionList[ix % 5],
           isLock[ix % 2],
@@ -184,10 +217,28 @@ export default {
     const onClickCustom = () => {
       searchVm.value = '2016';
     };
-    getData(7, 0);
+    const pageInfo = reactive({
+      use: true,
+      visiblePage: 7,
+      currentPage: 3,
+      perPage: 7,
+      order: 'center',
+      showPageInfo: true,
+      total: computed(() => tableData.value.length),
+      useClient: true,
+    });
+    getData(30, 0);
     const onClickAdd = () => {
       tableData.value.push(['oracle', 'LIN12G', 'LIN12G', '10.10.30.10', '2016']);
     };
+    const onRequestData = (e) => {
+      pageInfo.currentPage = e.pageInfo.currentPage;
+    };
+    const orderItems = ref([
+      { name: 'left', value: 'left' },
+      { name: 'right', value: 'right' },
+      { name: 'center', value: 'center' },
+    ]);
     return {
       columns,
       tableData,
@@ -210,36 +261,32 @@ export default {
       menuItems,
       borderMV,
       searchVm,
+      orderItems,
+      pageInfo,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
       onClickCustom,
       onClickAdd,
+      onRequestData,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.description {
-  min-width: 200px;
-}
 .form-rows {
   display: flex;
-  margin-bottom: 5px;
 }
 .form-row {
-  width: 50%;
-}
-.ev-text-field, .ev-input-number, .ev-select {
-  width: 80%;
-}
-.badge {
-  margin-bottom: 2px;
-  margin-right: 5px !important;
+  flex: 1;
+  margin: 5px;
+  .badge {
+    margin-bottom: 3px;
+  }
 }
 .ev-toggle {
-  margin-right: 10px;
+  display: block;
 }
 .db-icon {
   width: 100%;

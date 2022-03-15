@@ -1,259 +1,270 @@
 <template>
-  <div
-    v-if="!!$slots.toolbar"
-    class="toolbar-wrapper"
-    :style="`width: ${gridWidth};`"
-  >
-    <!-- Toolbar -->
-    <toolbar v-if="!!$slots.toolbar" >
-      <template #toolbarWrapper>
-        <slot
-          name="toolbar"
-          :item="{ onSearch: onSearch }"
-        >
-        </slot>
-      </template>
-    </toolbar>
-  </div>
-  <div
-    ref="grid-wrapper"
-    v-resize="onResize"
-    v-observe-visibility="{
-      callback: onShow,
-      once: true,
-    }"
-    v-bind="$attrs"
-    class="grid-wrapper"
-    :style="`width: ${gridWidth}; height: ${gridHeight};`"
-  >
-    <!--Table-->
+  <div>
     <div
-      v-cloak
-      ref="grid"
-      :class="{
-        'ev-grid': true,
-        table: true,
-        adjust: adjust,
-        'non-header': !showHeader,
-      }"
+      v-if="$slots.toolbar"
+      class="toolbar-wrapper"
+      :style="`width: ${gridWidth};`"
     >
-      <!--Header-->
+      <!-- Toolbar -->
+      <toolbar>
+        <template #toolbarWrapper>
+          <slot
+            name="toolbar"
+            :item="{ onSearch: onSearch }"
+          />
+        </template>
+      </toolbar>
+    </div>
+    <div
+      ref="grid-wrapper"
+      v-resize="onResize"
+      v-observe-visibility="{
+        callback: onShow,
+        once: true,
+      }"
+      v-bind="$attrs"
+      class="grid-wrapper"
+      :style="`width: ${gridWidth}; height: ${gridHeight};`"
+    >
+      <!-- Table -->
       <div
-        v-show="showHeader"
-        ref="header"
+        v-cloak
+        ref="grid"
         :class="{
-          'table-header': true,
-          'non-border': !!borderStyle,
+          'ev-grid': true,
+          table: true,
+          adjust: adjust,
+          'non-header': !showHeader,
         }"
       >
-        <ul class="column-list">
-          <!--Header Checkbox-->
-          <li
-            v-if="useCheckbox.use"
-            :class="{
-              'column': true,
-              'non-border': !!borderStyle,
-            }"
-            :style="`width: ${minWidth}px;`"
-          >
-            <ev-checkbox
-              v-if="useCheckbox.use
-                && useCheckbox.headerCheck
-                && useCheckbox.mode !== 'single'"
-              v-model="isHeaderChecked"
-              @change="onCheckAll"
-            />
-          </li>
-          <!--Column List-->
-          <template
-            v-for="(column, index) in orderedColumns"
-            :key="index"
-          >
-            <li
-              v-if="!column.hide"
-              :data-index="index"
-              :class="{
-                column: true,
-                render: isRenderer(column),
-                'non-border': !!borderStyle,
-                [column.field]: column.field,
-              }"
-              :style="`
-                width: ${column.width}px;
-                min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
-            >
-              <!--Filter Status-->
-              <span
-                v-if="isFiltering && filterList[column.field]?.find(item => item.use)"
-                class="column-filter-status"
-              >
-                <ev-icon icon="ev-icon-filter"/>
-              </span>
-              <!--Column Name-->
-              <span
-                :title="column.caption"
-                class="column-name"
-                @click.stop="onSort(column)"
-              >
-                {{ column.caption }}
-              </span>
-              <!--Sort Icon-->
-              <template v-if="sortField === column.field">
-                <ev-icon
-                  v-if="sortOrder === 'desc'"
-                  icon="ev-icon-triangle-down"
-                />
-                <ev-icon
-                  v-if="sortOrder === 'asc'"
-                  icon="ev-icon-triangle-up"
-                />
-              </template>
-              <!--Filter Button-->
-              <span
-                v-if="isFilterButton(column.field)"
-                class="column-filter"
-                @click.capture="onClickFilter(column)"
-              >
-                <ev-icon icon="ev-icon-hamburger2"/>
-              </span>
-              <!--Column Resize-->
-              <span
-                class="column-resize"
-                @mousedown.stop.left="onColumnResize(index, $event)"
-              />
-            </li>
-          </template>
-        </ul>
-      </div>
-      <!--Body-->
-      <div
-        ref="body"
-        :class="{
-          'table-body': true,
-          'bottom-border': !!viewStore.length,
-          stripe: stripeStyle,
-          'non-border': !!borderStyle,
-        }"
-        @scroll="onScroll"
-        @contextmenu="onContextMenu($event)"
-        @contextmenu.prevent="menu.show"
-      >
-        <!--vScroll Top-->
+        <!-- Header -->
         <div
-          :style="`height: ${vScrollTopHeight}px;`"
-          class="vscroll-spacer"
-        />
-        <table>
-          <tbody>
-          <!--Row List-->
-          <tr
-            v-for="(row, rowIndex) in viewStore"
-            :key="rowIndex"
-            :data-index="row[0]"
-            :class="{
-              row: true,
-              selected: row[2] === selectedRow,
-              'non-border': !!borderStyle && borderStyle !== 'rows',
-              highlight: row[0] === highlightIdx,
-            }"
-            @click="onRowClick($event, row)"
-            @dblclick="onRowDblClick($event, row)"
-          >
-            <!--Row Checkbox-->
-            <td
+          v-show="showHeader"
+          ref="header"
+          :class="{
+            'table-header': true,
+            'non-border': !!borderStyle,
+          }"
+        >
+          <ul class="column-list">
+            <!-- Header Checkbox -->
+            <li
               v-if="useCheckbox.use"
               :class="{
-                cell: true,
-                'row-checkbox': true,
+                'column': true,
                 'non-border': !!borderStyle,
               }"
-              :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+              :style="`width: ${minWidth}px;`"
             >
               <ev-checkbox
-                v-model="row[1]"
-                class="row-checkbox-input"
-                @change="onCheck($event, row)"
+                v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
+                v-model="isHeaderChecked"
+                @change="onCheckAll"
               />
-            </td>
-            <!--Cell-->
-            <template v-for="(column, cellIndex) in orderedColumns" :key="cellIndex">
-              <td
+            </li>
+            <!-- Column List -->
+            <template
+              v-for="(column, index) in orderedColumns"
+              :key="index"
+            >
+              <li
                 v-if="!column.hide"
-                :data-name="column.field"
-                :data-index="column.index"
+                :data-index="index"
                 :class="{
-                  cell: true,
-                  [column.type]: column.type,
-                  [column.align]: column.align,
+                  column: true,
                   render: isRenderer(column),
                   'non-border': !!borderStyle,
                   [column.field]: column.field,
                 }"
-                :style="`
-                  width: ${column.width}px;
-                  height: ${rowHeight}px;
-                  line-height: ${rowHeight}px;
-                  min-width: ${isRenderer(column) ? rendererMinWidth : minWidth}px;`"
+                :style="{
+                  width: `${column.width}px`,
+                  'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                }"
               >
-                <!-- cell renderer -->
-                <template v-if="!!$slots[column.field]">
-                  <slot
-                    :name="column.field"
-                    :item="{
-                      row,
-                      column,
+                <!-- Filter Status -->
+                <span
+                  v-if="isFiltering && filterList[column.field]?.find(item => item.use)"
+                  class="column-filter-status"
+                >
+                  <ev-icon icon="ev-icon-filter"/>
+                </span>
+                <!-- Column Name -->
+                <span
+                  :title="column.caption"
+                  class="column-name"
+                  @click.stop="onSort(column)"
+                >
+                  {{ column.caption }}
+                </span>
+                <!-- Sort Icon -->
+                <template v-if="sortField === column.field">
+                  <ev-icon
+                    v-if="sortOrder === 'desc'"
+                    icon="ev-icon-triangle-down"
+                  />
+                  <ev-icon
+                    v-if="sortOrder === 'asc'"
+                    icon="ev-icon-triangle-up"
+                  />
+                </template>
+                <!-- Filter Button -->
+                <span
+                  v-if="isFilterButton(column.field)"
+                  class="column-filter"
+                  @click.capture="onClickFilter(column)"
+                >
+                  <ev-icon icon="ev-icon-hamburger2"/>
+                </span>
+                <!-- Column Resize -->
+                <span
+                  class="column-resize"
+                  @mousedown.stop.left="onColumnResize(index, $event)"
+                />
+              </li>
+            </template>
+          </ul>
+        </div>
+        <!-- Body -->
+        <div
+          ref="body"
+          :class="{
+            'table-body': true,
+            'bottom-border': !!viewStore.length,
+            stripe: stripeStyle,
+            'non-border': !!borderStyle,
+          }"
+          @scroll="onScroll"
+          @contextmenu="onContextMenu($event)"
+          @contextmenu.prevent="menu.show"
+        >
+          <!-- vScroll Top -->
+          <div
+            :style="`height: ${vScrollTopHeight}px;`"
+            class="vscroll-spacer"
+          />
+          <table>
+            <tbody>
+              <!-- Row List -->
+              <tr
+                v-for="(row, rowIndex) in viewStore"
+                :key="rowIndex"
+                :data-index="row[0]"
+                :class="{
+                  row: true,
+                  selected: row[2] === selectedRow,
+                  'non-border': !!borderStyle && borderStyle !== 'rows',
+                  highlight: row[0] === highlightIdx,
+                }"
+                @click="onRowClick($event, row)"
+                @dblclick="onRowDblClick($event, row)"
+              >
+                <!-- Row Checkbox -->
+                <td
+                  v-if="useCheckbox.use"
+                  :class="{
+                    cell: true,
+                    'row-checkbox': true,
+                    'non-border': !!borderStyle,
+                  }"
+                  :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+                >
+                  <ev-checkbox
+                    v-model="row[1]"
+                    class="row-checkbox-input"
+                    @change="onCheck($event, row)"
+                  />
+                </td>
+                <!-- Cell -->
+                <template
+                  v-for="(column, cellIndex) in orderedColumns"
+                  :key="cellIndex"
+                >
+                  <td
+                    v-if="!column.hide"
+                    :data-name="column.field"
+                    :data-index="column.index"
+                    :class="{
+                      cell: true,
+                      [column.type]: column.type,
+                      [column.align]: column.align,
+                      render: isRenderer(column),
+                      'non-border': !!borderStyle,
+                      [column.field]: column.field,
+                    }"
+                    :style="{
+                      width: `${column.width}px`,
+                      height: `${rowHeight}px`,
+                      'line-height': `${rowHeight}px`,
+                      'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
                     }"
                   >
-                  </slot>
+                    <!-- Cell Renderer -->
+                    <template v-if="!!$slots[column.field]">
+                      <slot
+                        :name="column.field"
+                        :item="{ row, column }"
+                      />
+                    </template>
+                    <!-- Cell Value -->
+                    <template v-else>
+                      <div :title="getConvertValue(column.type, row[2][column.index])">
+                        {{ getConvertValue(column.type, row[2][column.index]) }}
+                      </div>
+                    </template>
+                  </td>
                 </template>
-                <!-- cell value -->
-                <template v-else>
-                  <div :title="getConvertValue(column.type, row[2][column.index])">
-                    {{ getConvertValue(column.type, row[2][column.index]) }}
-                  </div>
-                </template>
-              </td>
-            </template>
-          </tr>
-          <tr v-if="!viewStore.length">
-            <td class="is-empty">No records</td>
-          </tr>
-          </tbody>
-        </table>
-        <!--vScroll Bottom-->
+              </tr>
+              <tr v-if="!viewStore.length">
+                <td class="is-empty">No records</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- vScroll Bottom -->
+          <div
+            :style="`height: ${vScrollBottomHeight}px;`"
+            class="vscroll-spacer"
+          />
+          <!-- Context Menu -->
+          <ev-context-menu
+            ref="menu"
+            :items="contextMenuItems"
+          />
+        </div>
+        <!-- Resize Line -->
         <div
-          :style="`height: ${vScrollBottomHeight}px;`"
-          class="vscroll-spacer"
+          v-show="showResizeLine"
+          ref="resizeLine"
+          class="table-resize-line"
         />
-        <!--Context Menu-->
-        <ev-context-menu
-          ref="menu"
-          :items="contextMenuItems"
+        <!-- Filter Window -->
+        <filter-window
+          v-show="showFilterWindow"
+          :is-show="showFilterWindow"
+          :target-column="currentFilter.column"
+          :filter-items="currentFilter.items"
+          @apply-filter="onApplyFilter"
+          @before-close="onCloseFilterWindow"
         />
       </div>
-      <!--Resize Line-->
-      <div
-        v-show="showResizeLine"
-        ref="resizeLine"
-        class="table-resize-line"
-      />
-      <!--Filter Window-->
-      <filter-window
-        v-show="showFilterWindow"
-        :is-show="showFilterWindow"
-        :target-column="currentFilter.column"
-        :filter-items="currentFilter.items"
-        @apply-filter="onApplyFilter"
-        @before-close="onCloseFilterWindow"
-      />
     </div>
+    <pagination
+      v-if="usePage && !isInfinite"
+      v-model="currentPage"
+      :total="store.length"
+      :per-page="perPage"
+      :visible-page="visiblePage"
+      :show-page-info="showPageInfo"
+      :order="order"
+    >
+    </pagination>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated } from 'vue';
-import FilterWindow from './grid.filter.window';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import Toolbar from './grid.toolbar';
+import Pagination from './grid.pagination';
+import FilterWindow from './grid.filter.window';
 import {
   commonFunctions,
   scrollEvent,
@@ -264,13 +275,15 @@ import {
   filterEvent,
   contextMenuEvent,
   storeEvent,
+  pagingEvent,
 } from './uses';
 
 export default {
   name: 'EvGrid',
   components: {
-    FilterWindow,
     Toolbar,
+    Pagination,
+    FilterWindow,
   },
   props: {
     columns: {
@@ -309,7 +322,7 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
-    'scroll-end': null,
+    'request-data': null,
   },
   setup(props) {
     const {
@@ -348,12 +361,28 @@ export default {
       viewStore: [],
       originStore: [],
       filterStore: [],
+      pagingStore: [],
       store: computed(() => {
         const store = filterInfo.isFiltering ? stores.filterStore : stores.originStore;
         return filterInfo.isSearch ? stores.searchStore : store;
       }),
       orderedColumns: computed(() =>
         (props.columns.map((column, index) => ({ index, ...column })))),
+    });
+    const pageInfo = reactive({
+      usePage: computed(() => (props.option.page?.use || false)),
+      useClient: props.option.page?.useClient || false,
+      isInfinite: computed(() => (props.option.page?.isInfinite || false)),
+      startIndex: 0,
+      prevPage: 0,
+      currentPage: 0,
+      total: computed(() => (props.option.page?.total || 0)),
+      perPage: computed(() => (props.option.page?.perPage || 20)),
+      visiblePage: computed(() => (props.option.page?.visiblePage || 8)),
+      order: computed(() => (props.option.page?.order || 'center')),
+      showPageInfo: computed(() => (props.option.page?.showPageInfo || false)),
+      isClientPaging: computed(() =>
+        pageInfo.useClient && pageInfo.usePage && !pageInfo.isInfinite),
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -398,20 +427,24 @@ export default {
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
     });
-    const pageInfo = reactive({
-      currentPage: 1,
-      prevPage: 0,
-      startIndex: 0,
-      use: computed(() => (props.option.page?.use || false)),
-      dataCount: computed(() => (props.option.page?.dataCount || 50)),
-      isInfinite: computed(() => (props.option.page?.isInfinite || false)),
-    });
+    const {
+      getPagingData,
+      updatePagingInfo,
+    } = pagingEvent({ stores, pageInfo, sortInfo, filterInfo });
 
     const {
       updateVScroll,
       updateHScroll,
       onScroll,
-    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo, pageInfo });
+    } = scrollEvent({
+      scrollInfo,
+      stores,
+      elementInfo,
+      resizeInfo,
+      pageInfo,
+      getPagingData,
+      updatePagingInfo,
+    });
 
     const {
       onRowClick,
@@ -421,12 +454,12 @@ export default {
     const {
       onCheck,
       onCheckAll,
-    } = checkEvent({ checkInfo, stores, filterInfo });
+    } = checkEvent({ checkInfo, stores, pageInfo, getPagingData, updatePagingInfo });
 
     const {
       onSort,
       setSort,
-    } = sortEvent({ sortInfo, stores, getColumnIndex });
+    } = sortEvent({ sortInfo, stores, getColumnIndex, updatePagingInfo });
 
     const {
       onClickFilter,
@@ -438,14 +471,16 @@ export default {
       filterInfo,
       stores,
       checkInfo,
+      pageInfo,
       getColumnIndex,
       getConvertValue,
       updateVScroll,
+      getPagingData,
+      updatePagingInfo,
     });
 
     const {
       setStore,
-      updateData,
     } = storeEvent({
       selectInfo,
       checkInfo,
@@ -463,7 +498,15 @@ export default {
       onResize,
       onShow,
       onColumnResize,
-    } = resizeEvent({ resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll });
+    } = resizeEvent({
+      resizeInfo,
+      elementInfo,
+      checkInfo,
+      stores,
+      filterInfo,
+      isRenderer,
+      updateVScroll,
+    });
 
     const {
       setContextMenu,
@@ -526,7 +569,10 @@ export default {
         checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
         checkInfo.checkedIndex.clear();
-        const store = stores.store;
+        let store = stores.store;
+        if (pageInfo.isClientPaging) {
+          store = getPagingData();
+        }
         if (store.length) {
           store.forEach((row) => {
             row[ROW_CHECK_INDEX] = checkedList.includes(row[ROW_DATA_INDEX]);
@@ -591,9 +637,42 @@ export default {
         if (value !== undefined) {
           onSearch(value?.value ?? value);
         }
-      }, { immediate: true, deep: true },
+      }, { immediate: true },
     );
-    const isFilterButton = field => filterInfo.isFiltering && field !== 'db-icon' && field !== 'user-icon';
+    const isFilterButton = field => filterInfo.isFiltering
+      && field !== 'db-icon'
+      && field !== 'user-icon';
+    watch(
+      () => props.option.page?.currentPage,
+      (value) => {
+        const current = value <= 0 ? 1 : value;
+        pageInfo.currentPage = !props.option.page?.isInfinite ? current : 1;
+      }, { immediate: true },
+    );
+    watch(
+      () => [pageInfo.currentPage, pageInfo.perPage],
+      (currentVal, beforeVal) => {
+        nextTick(() => {
+          if (pageInfo.isClientPaging) {
+            pageInfo.prevPage = beforeVal[0];
+            if (stores.store.length <= pageInfo.perPage) {
+              stores.pagingStore = stores.store;
+            } else {
+              const start = (currentVal[0] - 1) * pageInfo.perPage;
+              const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+              stores.pagingStore = stores.store.slice(start, end);
+              elementInfo.body.scrollTop = 0;
+              pageInfo.startIndex = start;
+            }
+            checkInfo.isHeaderChecked = stores.pagingStore.length
+              && stores.pagingStore.every(d => d[ROW_CHECK_INDEX]);
+          }
+          updatePagingInfo();
+
+          updateVScroll();
+        });
+      },
+    );
     return {
       showHeader,
       stripeStyle,
@@ -632,7 +711,6 @@ export default {
       onApplyFilter,
       setFilter,
       setStore,
-      updateData,
       setContextMenu,
       onContextMenu,
       onSearch,

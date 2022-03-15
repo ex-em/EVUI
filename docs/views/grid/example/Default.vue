@@ -25,17 +25,13 @@
           border: borderMV,
           highlight: highlightMV,
         },
-        page: {
-          use: true, // pagination
-          dataCount: 50,
-          isInfinite: true, // use && isInfinite === infinite scroll
-        },
+        page: pageInfo,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
-      @scroll-end="requestRowData"
+      @request-data="onRequestData"
     >
       <!-- renderer start -->
       <template #user-icon>
@@ -220,7 +216,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, reactive, computed } from 'vue';
 
 export default {
   setup() {
@@ -264,7 +260,7 @@ export default {
     ]);
     const columns = ref([
       { caption: '', field: 'user-icon', type: 'string' },
-      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
+      { caption: 'Name', field: 'userName', type: 'stringNumber', width: 80 },
       { caption: 'Role', field: 'role', type: 'string' },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string' },
@@ -315,8 +311,8 @@ export default {
       }
       /* eslint-enable global-require */
     };
-    const requestRowData = () => {
-      if (tableData.value.length < 1000) {
+    const onRequestData = (e) => {
+      if (e?.scrollEnd && tableData.value.length < 1000) {
         const newData = getData(50, tableData.value.length);
         tableData.value = [
           ...tableData.value,
@@ -324,6 +320,13 @@ export default {
         ];
       }
     };
+    const pageInfo = reactive({
+      use: true,
+      isInfinite: true,
+      perPage: 50,
+      total: computed(() => tableData.value.length),
+      useClient: true,
+    });
 
     tableData.value = getData(50, 0);
     return {
@@ -349,13 +352,14 @@ export default {
       highlightMV,
       borderMV,
       items,
+      pageInfo,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
       resetBorderStyle,
       loadImage,
-      requestRowData,
+      onRequestData,
     };
   },
 };
