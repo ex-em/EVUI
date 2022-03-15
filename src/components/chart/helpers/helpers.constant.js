@@ -71,6 +71,12 @@ export const PIE_OPTION = {
     color: '#FFFFFF',
     lineWidth: 2,
   },
+  showValue: {
+    use: false,
+    fontSize: 12,
+    textColor: '#000000',
+    formatter: null,
+  },
 };
 
 export const AXIS_OPTION = {

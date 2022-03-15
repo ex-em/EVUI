@@ -8,6 +8,8 @@ import Sunburst from './example/Sunburst';
 import SunburstRaw from '!!raw-loader!./example/Sunburst';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import ShowValue from './example/ShowValue';
+import ShowValueRaw from '!!raw-loader!./example/ShowValue';
 
 export default {
   mdText,
@@ -26,6 +28,11 @@ export default {
       description: 'Sunburst Chart는 Doughnut을 계층적으로 데이터를 시각화 합니다.',
       component: Sunburst,
       parsedData: parseComponent(SunburstRaw),
+    },
+    ShowValue: {
+      description: 'ShowValue 옵션 설정으로 value 값을 표시합니다.',
+      component: ShowValue,
+      parsedData: parseComponent(ShowValueRaw),
     },
     Event: {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',

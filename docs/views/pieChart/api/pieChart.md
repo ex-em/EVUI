@@ -34,6 +34,7 @@ const selectedItem = ref({
   | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
   | color | Hex, RGB, RGBA Code(String) | COLOR[index] | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   | stroke | Object | { use: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션 | |
+  | showValue | Object | ([상세](#showvalue)) | 조각 위에 값 표시 여부 및 속성 |  |
 
 #### data example
 ```
@@ -48,6 +49,14 @@ const chartData =
   },
 };
 ```
+#### showValue
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | data label 표시 여부 | true /false |
+| textColor | Hex, RGB, RGBA Code(String) | '#000000' | 글자 색상  | |
+| fontSize | Number | 12 | 글자 크기 | |
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+
   
 ### 3. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
