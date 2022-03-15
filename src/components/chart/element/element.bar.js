@@ -332,7 +332,7 @@ class Bar {
    */
   drawValueLabels({ context, data, positions, isHighlight }) {
     const isHorizontal = this.isHorizontal;
-    const { fontSize, textColor, align, formatter } = this.showValue;
+    const { fontSize, textColor, align, formatter, decimalPoint } = this.showValue;
     const { x, y, w, h } = positions;
     const ctx = context;
 
@@ -361,7 +361,7 @@ class Bar {
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {
-      formattedTxt = Util.labelSignFormat(value);
+      formattedTxt = Util.labelSignFormat(value, decimalPoint);
     }
 
     const vw = Math.round(ctx.measureText(formattedTxt).width);

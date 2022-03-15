@@ -59,6 +59,7 @@ export const BAR_OPTION = {
     fontSize: 12,
     textColor: '#000000',
     formatter: null,
+    decimalPoint: 0,
   },
 };
 
