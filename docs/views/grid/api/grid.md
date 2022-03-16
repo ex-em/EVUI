@@ -49,6 +49,16 @@
 |  |  | highlight | 지정한 row에 Highlight 효과를 설정한다. | `rowIndex` |
 |  | customContextMenu | [] | 우클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
 |  |  | menuItems | 컨텍스트 메뉴 |  |
+|  | page | {} | 페이지 설정 |  |
+|  |  | use | 페이지 사용 여부 | Boolean |
+|  |  | isInfinite | Infinite Scroll 사용 여부 | Boolean |
+|  |  | useClient | client-side Paging 사용 여부 | Boolean |
+|  |  | total | 총 항목 수 | Number |
+|  |  | perPage | 각 페이지의 항목 수 | Number |
+|  |  | currentPage | 현재 페이지 번호 | Number |
+|  |  | visiblePage | 보여지는 Pagination 버튼 수 | Number |
+|  |  | order | Pagination 위치 | 'center', 'left', 'right' |
+|  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |
@@ -63,8 +73,8 @@
 ### Event
 | 이름 | 파라미터 | 설명 |
  | ---- | ------- | ---- |
- | check-row | event | row의 체크박스가 체크 되었을때 호출된다. |
- | check-all | event | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 row의 체크박스를 체크한다. |
- | click-row | newValue | row가 클릭 되었을 때 호출된다. |
- | dblclick-row | newValue | row가 더블 클릭 되었을 때 호출된다. |
-
+ | check-row | event, row, index | row의 체크박스가 체크 되었을때 호출된다. |
+ | check-all | event, rows | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 row의 체크박스를 체크한다. |
+ | click-row | event, row | row가 클릭 되었을 때 호출된다. |
+ | dblclick-row | event, row | row가 더블 클릭 되었을 때 호출된다. |
+ | page-change | event | page 정보가 변경되었을 때 호출된다. |

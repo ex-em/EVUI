@@ -942,7 +942,7 @@ export const pagingEvent = (params) => {
     return stores.store.slice(start, end);
   };
   const updatePagingInfo = (eventName) => {
-    emit('request-data', {
+    emit('page-change', {
       eventName,
       pageInfo: {
         currentPage: pageInfo.currentPage,

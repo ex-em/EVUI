@@ -322,7 +322,7 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
-    'request-data': null,
+    'page-change': null,
   },
   setup(props) {
     const {

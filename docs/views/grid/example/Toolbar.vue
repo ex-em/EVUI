@@ -29,7 +29,7 @@
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
-      @request-data="onRequestData"
+      @page-change="onRequestData"
     >
       <!-- toolbar -->
       <template #toolbar="{ item }">

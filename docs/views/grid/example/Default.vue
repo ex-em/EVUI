@@ -31,7 +31,7 @@
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
-      @request-data="onRequestData"
+      @page-change="onRequestData"
     >
       <!-- renderer start -->
       <template #user-icon>
