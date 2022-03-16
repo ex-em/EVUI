@@ -323,6 +323,9 @@ export default {
     'page-change': null,
   },
   setup(props) {
+    const ROW_INDEX = 0;
+    const ROW_CHECK_INDEX = 1;
+    const ROW_DATA_INDEX = 2;
     const {
       isRenderer,
       getComponentName,
@@ -425,6 +428,14 @@ export default {
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
     });
+    const clearCheckInfo = () => {
+      checkInfo.checkedRows = [];
+      checkInfo.checkedIndex.clear();
+      checkInfo.isHeaderChecked = false;
+      stores.store.forEach((row) => {
+        row[ROW_CHECK_INDEX] = false;
+      });
+    };
     const {
       getPagingData,
       updatePagingInfo,
@@ -435,6 +446,7 @@ export default {
       sortInfo,
       filterInfo,
       elementInfo,
+      clearCheckInfo,
     });
 
     const {
@@ -525,17 +537,6 @@ export default {
     onActivated(() => {
       onResize();
     });
-    const ROW_INDEX = 0;
-    const ROW_CHECK_INDEX = 1;
-    const ROW_DATA_INDEX = 2;
-    const clearCheckInfo = () => {
-      checkInfo.checkedRows = [];
-      checkInfo.checkedIndex.clear();
-      checkInfo.isHeaderChecked = false;
-      stores.store.forEach((row) => {
-        row[ROW_CHECK_INDEX] = false;
-      });
-    };
     watch(
       () => props.columns,
       () => {
@@ -550,6 +551,11 @@ export default {
         if (value) {
           setStore(stores.originStore, false);
           sortInfo.isSorting = !value;
+          if (pageInfo.isClientPaging) {
+            pageInfo.currentPage = 1;
+            stores.pagingStore = getPagingData();
+            clearCheckInfo();
+          }
         }
       },
     );

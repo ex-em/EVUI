@@ -935,6 +935,7 @@ export const pagingEvent = (params) => {
     sortInfo,
     filterInfo,
     elementInfo,
+    clearCheckInfo,
   } = params;
   const getPagingData = () => {
     const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
@@ -965,6 +966,7 @@ export const pagingEvent = (params) => {
     if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
       pageInfo.currentPage = 1;
       elementInfo.body.scrollTop = 0;
+      clearCheckInfo();
     }
   };
   const changePage = (beforeVal) => {
