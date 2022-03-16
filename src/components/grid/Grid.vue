@@ -430,7 +430,14 @@ export default {
     const {
       getPagingData,
       updatePagingInfo,
-    } = pagingEvent({ stores, pageInfo, sortInfo, filterInfo });
+      changePage,
+    } = pagingEvent({
+      stores,
+      pageInfo,
+      sortInfo,
+      filterInfo,
+      elementInfo,
+    });
 
     const {
       updateVScroll,
@@ -527,6 +534,9 @@ export default {
       checkInfo.checkedRows = [];
       checkInfo.checkedIndex.clear();
       checkInfo.isHeaderChecked = false;
+      stores.store.forEach((row) => {
+        row[ROW_CHECK_INDEX] = false;
+      });
     };
     watch(
       () => props.columns,
@@ -636,6 +646,9 @@ export default {
       (value) => {
         if (value !== undefined) {
           onSearch(value?.value ?? value);
+          if (pageInfo.isClientPaging) {
+            clearCheckInfo();
+          }
         }
       }, { immediate: true },
     );
@@ -653,22 +666,10 @@ export default {
       () => [pageInfo.currentPage, pageInfo.perPage],
       (currentVal, beforeVal) => {
         nextTick(() => {
-          if (pageInfo.isClientPaging) {
-            pageInfo.prevPage = beforeVal[0];
-            if (stores.store.length <= pageInfo.perPage) {
-              stores.pagingStore = stores.store;
-            } else {
-              const start = (currentVal[0] - 1) * pageInfo.perPage;
-              const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
-              stores.pagingStore = stores.store.slice(start, end);
-              elementInfo.body.scrollTop = 0;
-              pageInfo.startIndex = start;
-            }
-            checkInfo.isHeaderChecked = stores.pagingStore.length
-              && stores.pagingStore.every(d => d[ROW_CHECK_INDEX]);
+          changePage(beforeVal[0]);
+          if (pageInfo.isClientPaging && currentVal[0] !== beforeVal[0]) {
+            clearCheckInfo();
           }
-          updatePagingInfo();
-
           updateVScroll();
         });
       },

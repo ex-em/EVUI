@@ -289,11 +289,12 @@ export default {
     };
     const getData = (count, startIndex) => {
       const temp = [];
+      const roles = ['Common', 'Admin'];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           `user_${ix + 1}`,
           ix + 1,
-          'Common',
+          roles[ix % 2],
           '010-0000-0000',
           'kmn0827@ex-em.com',
           '2020.08.04 14:15',
@@ -312,7 +313,9 @@ export default {
       /* eslint-enable global-require */
     };
     const onRequestData = (e) => {
-      if (e?.scrollEnd && tableData.value.length < 1000) {
+      if (e.eventName?.onSort || e.eventName?.onSearch) {
+        tableData.value = getData(50, 0);
+      } else if (e.eventName?.onScrollEnd && tableData.value.length < 1000) {
         const newData = getData(50, tableData.value.length);
         tableData.value = [
           ...tableData.value,

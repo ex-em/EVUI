@@ -100,11 +100,17 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Current Page</span>
-          <ev-input-number v-model="pageInfo.currentPage" :min="1"/>
+          <ev-input-number
+            v-model="pageInfo.currentPage"
+            :min="1"
+          />
         </div>
         <div class="form-row">
           <span class="badge yellow">Visible Page</span>
-          <ev-input-number v-model="pageInfo.visiblePage" :min="7"/>
+          <ev-input-number
+            v-model="pageInfo.visiblePage"
+            :min="7"
+          />
         </div>
       </div>
       <div class="form-rows">
@@ -118,7 +124,10 @@
         </div>
         <div class="form-row">
           <span class="badge yellow">Data per page</span>
-          <ev-input-number v-model="pageInfo.perPage" />
+          <ev-input-number
+            v-model="pageInfo.perPage"
+            :min="1"
+          />
         </div>
       </div>
       <div class="form-rows">

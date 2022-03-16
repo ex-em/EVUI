@@ -80,7 +80,7 @@ export const scrollEvent = (params) => {
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
-  const updateVScroll = () => {
+  const updateVScroll = (isScroll) => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     if (bodyEl) {
@@ -105,11 +105,11 @@ export const scrollEvent = (params) => {
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
       scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
         - scrollInfo.vScrollTopHeight;
-      if (pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
+      if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
         pageInfo.startIndex = lastIndex;
-        updatePagingInfo();
+        updatePagingInfo({ onScrollEnd: true });
       }
     }
   };
@@ -135,7 +135,7 @@ export const scrollEvent = (params) => {
     const isVertical = !(scrollTop === lastTop);
 
     if (isVertical && bodyEl?.clientHeight) {
-      updateVScroll();
+      updateVScroll(true);
     }
 
     if (isHorizontal) {
@@ -504,7 +504,7 @@ export const sortEvent = (params) => {
       order.enqueue(sortInfo.sortOrder);
 
       sortInfo.isSorting = true;
-      updatePagingInfo();
+      updatePagingInfo({ onSort: true });
     }
   };
   /**
@@ -796,7 +796,7 @@ export const filterEvent = (params) => {
         stores.pagingStore = getPagingData();
       }
 
-      updatePagingInfo();
+      updatePagingInfo({ onSearch: true });
       updateVScroll();
     }, 500);
   };
@@ -929,14 +929,21 @@ export const storeEvent = (params) => {
 
 export const pagingEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { stores, pageInfo, sortInfo, filterInfo } = params;
+  const {
+    stores,
+    pageInfo,
+    sortInfo,
+    filterInfo,
+    elementInfo,
+  } = params;
   const getPagingData = () => {
     const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
     const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
     return stores.store.slice(start, end);
   };
-  const updatePagingInfo = () => {
+  const updatePagingInfo = (eventName) => {
     emit('request-data', {
+      eventName,
       pageInfo: {
         currentPage: pageInfo.currentPage,
         prevPage: pageInfo.prevPage,
@@ -955,6 +962,25 @@ export const pagingEvent = (params) => {
           .map(d => d.field),
       },
     });
+    if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
+      pageInfo.currentPage = 1;
+      elementInfo.body.scrollTop = 0;
+    }
   };
-  return { getPagingData, updatePagingInfo };
+  const changePage = (beforeVal) => {
+    if (pageInfo.isClientPaging) {
+      pageInfo.prevPage = beforeVal;
+      if (stores.store.length <= pageInfo.perPage) {
+        stores.pagingStore = stores.store;
+      } else {
+        const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
+        const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+        stores.pagingStore = stores.store.slice(start, end);
+        elementInfo.body.scrollTop = 0;
+        pageInfo.startIndex = start;
+      }
+    }
+    updatePagingInfo({ onChangePage: true });
+  };
+  return { getPagingData, updatePagingInfo, changePage };
 };
