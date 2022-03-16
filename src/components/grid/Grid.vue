@@ -1,263 +1,261 @@
 <template>
-  <div>
+  <div
+    v-if="$slots.toolbar"
+    class="toolbar-wrapper"
+    :style="`width: ${gridWidth};`"
+  >
+    <!-- Toolbar -->
+    <toolbar>
+      <template #toolbarWrapper>
+        <slot
+          name="toolbar"
+          :item="{ onSearch: onSearch }"
+        />
+      </template>
+    </toolbar>
+  </div>
+  <div
+    ref="grid-wrapper"
+    v-resize="onResize"
+    v-observe-visibility="{
+      callback: onShow,
+      once: true,
+    }"
+    v-bind="$attrs"
+    class="grid-wrapper"
+    :style="`width: ${gridWidth}; height: ${gridHeight};`"
+  >
+    <!-- Table -->
     <div
-      v-if="$slots.toolbar"
-      class="toolbar-wrapper"
-      :style="`width: ${gridWidth};`"
-    >
-      <!-- Toolbar -->
-      <toolbar>
-        <template #toolbarWrapper>
-          <slot
-            name="toolbar"
-            :item="{ onSearch: onSearch }"
-          />
-        </template>
-      </toolbar>
-    </div>
-    <div
-      ref="grid-wrapper"
-      v-resize="onResize"
-      v-observe-visibility="{
-        callback: onShow,
-        once: true,
+      v-cloak
+      ref="grid"
+      :class="{
+        'ev-grid': true,
+        table: true,
+        adjust: adjust,
+        'non-header': !showHeader,
       }"
-      v-bind="$attrs"
-      class="grid-wrapper"
-      :style="`width: ${gridWidth}; height: ${gridHeight};`"
     >
-      <!-- Table -->
+      <!-- Header -->
       <div
-        v-cloak
-        ref="grid"
+        v-show="showHeader"
+        ref="header"
         :class="{
-          'ev-grid': true,
-          table: true,
-          adjust: adjust,
-          'non-header': !showHeader,
+          'table-header': true,
+          'non-border': !!borderStyle,
         }"
       >
-        <!-- Header -->
-        <div
-          v-show="showHeader"
-          ref="header"
-          :class="{
-            'table-header': true,
-            'non-border': !!borderStyle,
-          }"
-        >
-          <ul class="column-list">
-            <!-- Header Checkbox -->
+        <ul class="column-list">
+          <!-- Header Checkbox -->
+          <li
+            v-if="useCheckbox.use"
+            :class="{
+              'column': true,
+              'non-border': !!borderStyle,
+            }"
+            :style="`width: ${minWidth}px;`"
+          >
+            <ev-checkbox
+              v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
+              v-model="isHeaderChecked"
+              @change="onCheckAll"
+            />
+          </li>
+          <!-- Column List -->
+          <template
+            v-for="(column, index) in orderedColumns"
+            :key="index"
+          >
             <li
-              v-if="useCheckbox.use"
+              v-if="!column.hide"
+              :data-index="index"
               :class="{
-                'column': true,
+                column: true,
+                render: isRenderer(column),
                 'non-border': !!borderStyle,
+                [column.field]: column.field,
               }"
-              :style="`width: ${minWidth}px;`"
+              :style="{
+                width: `${column.width}px`,
+                'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+              }"
             >
-              <ev-checkbox
-                v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
-                v-model="isHeaderChecked"
-                @change="onCheckAll"
+              <!-- Filter Status -->
+              <span
+                v-if="isFiltering && filterList[column.field]?.find(item => item.use)"
+                class="column-filter-status"
+              >
+                <ev-icon icon="ev-icon-filter"/>
+              </span>
+              <!-- Column Name -->
+              <span
+                :title="column.caption"
+                class="column-name"
+                @click.stop="onSort(column)"
+              >
+                {{ column.caption }}
+              </span>
+              <!-- Sort Icon -->
+              <template v-if="sortField === column.field">
+                <ev-icon
+                  v-if="sortOrder === 'desc'"
+                  icon="ev-icon-triangle-down"
+                />
+                <ev-icon
+                  v-if="sortOrder === 'asc'"
+                  icon="ev-icon-triangle-up"
+                />
+              </template>
+              <!-- Filter Button -->
+              <span
+                v-if="isFilterButton(column.field)"
+                class="column-filter"
+                @click.capture="onClickFilter(column)"
+              >
+                <ev-icon icon="ev-icon-hamburger2"/>
+              </span>
+              <!-- Column Resize -->
+              <span
+                class="column-resize"
+                @mousedown.stop.left="onColumnResize(index, $event)"
               />
             </li>
-            <!-- Column List -->
-            <template
-              v-for="(column, index) in orderedColumns"
-              :key="index"
-            >
-              <li
-                v-if="!column.hide"
-                :data-index="index"
-                :class="{
-                  column: true,
-                  render: isRenderer(column),
-                  'non-border': !!borderStyle,
-                  [column.field]: column.field,
-                }"
-                :style="{
-                  width: `${column.width}px`,
-                  'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                }"
-              >
-                <!-- Filter Status -->
-                <span
-                  v-if="isFiltering && filterList[column.field]?.find(item => item.use)"
-                  class="column-filter-status"
-                >
-                  <ev-icon icon="ev-icon-filter"/>
-                </span>
-                <!-- Column Name -->
-                <span
-                  :title="column.caption"
-                  class="column-name"
-                  @click.stop="onSort(column)"
-                >
-                  {{ column.caption }}
-                </span>
-                <!-- Sort Icon -->
-                <template v-if="sortField === column.field">
-                  <ev-icon
-                    v-if="sortOrder === 'desc'"
-                    icon="ev-icon-triangle-down"
-                  />
-                  <ev-icon
-                    v-if="sortOrder === 'asc'"
-                    icon="ev-icon-triangle-up"
-                  />
-                </template>
-                <!-- Filter Button -->
-                <span
-                  v-if="isFilterButton(column.field)"
-                  class="column-filter"
-                  @click.capture="onClickFilter(column)"
-                >
-                  <ev-icon icon="ev-icon-hamburger2"/>
-                </span>
-                <!-- Column Resize -->
-                <span
-                  class="column-resize"
-                  @mousedown.stop.left="onColumnResize(index, $event)"
-                />
-              </li>
-            </template>
-          </ul>
-        </div>
-        <!-- Body -->
+          </template>
+        </ul>
+      </div>
+      <!-- Body -->
+      <div
+        ref="body"
+        :class="{
+          'table-body': true,
+          'bottom-border': !!viewStore.length,
+          stripe: stripeStyle,
+          'non-border': !!borderStyle,
+        }"
+        @scroll="onScroll"
+        @contextmenu="onContextMenu($event)"
+        @contextmenu.prevent="menu.show"
+      >
+        <!-- vScroll Top -->
         <div
-          ref="body"
-          :class="{
-            'table-body': true,
-            'bottom-border': !!viewStore.length,
-            stripe: stripeStyle,
-            'non-border': !!borderStyle,
-          }"
-          @scroll="onScroll"
-          @contextmenu="onContextMenu($event)"
-          @contextmenu.prevent="menu.show"
-        >
-          <!-- vScroll Top -->
-          <div
-            :style="`height: ${vScrollTopHeight}px;`"
-            class="vscroll-spacer"
-          />
-          <table>
-            <tbody>
-              <!-- Row List -->
-              <tr
-                v-for="(row, rowIndex) in viewStore"
-                :key="rowIndex"
-                :data-index="row[0]"
+          :style="`height: ${vScrollTopHeight}px;`"
+          class="vscroll-spacer"
+        />
+        <table>
+          <tbody>
+            <!-- Row List -->
+            <tr
+              v-for="(row, rowIndex) in viewStore"
+              :key="rowIndex"
+              :data-index="row[0]"
+              :class="{
+                row: true,
+                selected: row[2] === selectedRow,
+                'non-border': !!borderStyle && borderStyle !== 'rows',
+                highlight: row[0] === highlightIdx,
+              }"
+              @click="onRowClick($event, row)"
+              @dblclick="onRowDblClick($event, row)"
+            >
+              <!-- Row Checkbox -->
+              <td
+                v-if="useCheckbox.use"
                 :class="{
-                  row: true,
-                  selected: row[2] === selectedRow,
-                  'non-border': !!borderStyle && borderStyle !== 'rows',
-                  highlight: row[0] === highlightIdx,
+                  cell: true,
+                  'row-checkbox': true,
+                  'non-border': !!borderStyle,
                 }"
-                @click="onRowClick($event, row)"
-                @dblclick="onRowDblClick($event, row)"
+                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
               >
-                <!-- Row Checkbox -->
+                <ev-checkbox
+                  v-model="row[1]"
+                  class="row-checkbox-input"
+                  @change="onCheck($event, row)"
+                />
+              </td>
+              <!-- Cell -->
+              <template
+                v-for="(column, cellIndex) in orderedColumns"
+                :key="cellIndex"
+              >
                 <td
-                  v-if="useCheckbox.use"
+                  v-if="!column.hide"
+                  :data-name="column.field"
+                  :data-index="column.index"
                   :class="{
                     cell: true,
-                    'row-checkbox': true,
+                    [column.type]: column.type,
+                    [column.align]: column.align,
+                    render: isRenderer(column),
                     'non-border': !!borderStyle,
+                    [column.field]: column.field,
                   }"
-                  :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+                  :style="{
+                    width: `${column.width}px`,
+                    height: `${rowHeight}px`,
+                    'line-height': `${rowHeight}px`,
+                    'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                  }"
                 >
-                  <ev-checkbox
-                    v-model="row[1]"
-                    class="row-checkbox-input"
-                    @change="onCheck($event, row)"
-                  />
+                  <!-- Cell Renderer -->
+                  <template v-if="!!$slots[column.field]">
+                    <slot
+                      :name="column.field"
+                      :item="{ row, column }"
+                    />
+                  </template>
+                  <!-- Cell Value -->
+                  <template v-else>
+                    <div :title="getConvertValue(column.type, row[2][column.index])">
+                      {{ getConvertValue(column.type, row[2][column.index]) }}
+                    </div>
+                  </template>
                 </td>
-                <!-- Cell -->
-                <template
-                  v-for="(column, cellIndex) in orderedColumns"
-                  :key="cellIndex"
-                >
-                  <td
-                    v-if="!column.hide"
-                    :data-name="column.field"
-                    :data-index="column.index"
-                    :class="{
-                      cell: true,
-                      [column.type]: column.type,
-                      [column.align]: column.align,
-                      render: isRenderer(column),
-                      'non-border': !!borderStyle,
-                      [column.field]: column.field,
-                    }"
-                    :style="{
-                      width: `${column.width}px`,
-                      height: `${rowHeight}px`,
-                      'line-height': `${rowHeight}px`,
-                      'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                    }"
-                  >
-                    <!-- Cell Renderer -->
-                    <template v-if="!!$slots[column.field]">
-                      <slot
-                        :name="column.field"
-                        :item="{ row, column }"
-                      />
-                    </template>
-                    <!-- Cell Value -->
-                    <template v-else>
-                      <div :title="getConvertValue(column.type, row[2][column.index])">
-                        {{ getConvertValue(column.type, row[2][column.index]) }}
-                      </div>
-                    </template>
-                  </td>
-                </template>
-              </tr>
-              <tr v-if="!viewStore.length">
-                <td class="is-empty">No records</td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- vScroll Bottom -->
-          <div
-            :style="`height: ${vScrollBottomHeight}px;`"
-            class="vscroll-spacer"
-          />
-          <!-- Context Menu -->
-          <ev-context-menu
-            ref="menu"
-            :items="contextMenuItems"
-          />
-        </div>
-        <!-- Resize Line -->
+              </template>
+            </tr>
+            <tr v-if="!viewStore.length">
+              <td class="is-empty">No records</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- vScroll Bottom -->
         <div
-          v-show="showResizeLine"
-          ref="resizeLine"
-          class="table-resize-line"
+          :style="`height: ${vScrollBottomHeight}px;`"
+          class="vscroll-spacer"
         />
-        <!-- Filter Window -->
-        <filter-window
-          v-show="showFilterWindow"
-          :is-show="showFilterWindow"
-          :target-column="currentFilter.column"
-          :filter-items="currentFilter.items"
-          @apply-filter="onApplyFilter"
-          @before-close="onCloseFilterWindow"
+        <!-- Context Menu -->
+        <ev-context-menu
+          ref="menu"
+          :items="contextMenuItems"
         />
       </div>
+      <!-- Resize Line -->
+      <div
+        v-show="showResizeLine"
+        ref="resizeLine"
+        class="table-resize-line"
+      />
+      <!-- Filter Window -->
+      <filter-window
+        v-show="showFilterWindow"
+        :is-show="showFilterWindow"
+        :target-column="currentFilter.column"
+        :filter-items="currentFilter.items"
+        @apply-filter="onApplyFilter"
+        @before-close="onCloseFilterWindow"
+      />
     </div>
-    <pagination
-      v-if="usePage && !isInfinite"
-      v-model="currentPage"
-      :total="store.length"
-      :per-page="perPage"
-      :visible-page="visiblePage"
-      :show-page-info="showPageInfo"
-      :order="order"
-    >
-    </pagination>
   </div>
+  <pagination
+    v-if="usePage && !isInfinite"
+    v-model="currentPage"
+    :total="store.length"
+    :per-page="perPage"
+    :visible-page="visiblePage"
+    :show-page-info="showPageInfo"
+    :order="order"
+  >
+  </pagination>
 </template>
 
 <script>
@@ -658,7 +656,7 @@ export default {
     watch(
       () => props.option.page?.currentPage,
       (value) => {
-        const current = value <= 0 ? 1 : value;
+        const current = !value ? 1 : value;
         pageInfo.currentPage = !props.option.page?.isInfinite ? current : 1;
       }, { immediate: true },
     );
