@@ -30,12 +30,19 @@ const modules = {
    * @returns {undefined}
    */
   initLegend() {
+    this.isHeatMapType = this.options.type === 'heatMap';
     if (!this.isInitLegend) {
       this.createLegendLayout();
-      this.initEvent();
     }
 
-    this.addLegendList();
+    if (this.isHeatMapType) {
+      this.initEventForColorLegend();
+      this.addColorLegendList();
+    } else {
+      this.initEvent();
+      this.addLegendList();
+    }
+
     this.isInitLegend = true;
     this.isLegendMove = false;
   },
@@ -66,12 +73,41 @@ const modules = {
     });
   },
 
+  addColorLegendList() {
+    const seriesList = this.seriesList;
+
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp && series.showLegend) {
+        const { colorAxis, countOpt } = series;
+        colorAxis.forEach((colorItem, index) => {
+          const minCount = countOpt.interval * index;
+          const maxCount = countOpt.interval * (index + 1);
+          this.addLegend({
+            cId: colorItem.id,
+            color: colorItem.value,
+            name: `${minCount} - ${maxCount}`,
+          });
+        });
+        if (countOpt.existError) {
+          this.addLegend({
+            cId: 'color#error',
+            color: series.errorColor,
+            name: 'error',
+          });
+        }
+      }
+    });
+  },
+
   /**
    * Initialize legend event
    *
    * @returns {undefined}
    */
   initEvent() {
+    if (this.isInitLegend) {
+      return;
+    }
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
@@ -223,6 +259,62 @@ const modules = {
     }
   },
 
+  initEventForColorLegend() {
+    if (this.isInitLegend) {
+      return;
+    }
+    /**
+     * callback for legendBoxDOM hovering
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxOver = (e) => {
+      const type = e.target.dataset.type;
+
+      let targetDOM;
+      if (type === 'container') {
+        targetDOM = e.target;
+      } else if (type === 'name' || type === 'color') {
+        targetDOM = e.target.parentElement;
+      } else {
+        return;
+      }
+      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
+      const targetId = nameDOM.series.cId;
+
+      Object.values(this.seriesList).forEach((series) => {
+        series.data.forEach((item) => {
+          item.state = item.cId === targetId ? 'highlight' : 'downplay';
+        });
+      });
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
+    };
+
+    /**
+     * callback for mouseleave event on legendBoxDOM
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxLeave = () => {
+      Object.values(this.seriesList).forEach((series) => {
+        series.data.forEach((item) => {
+          item.state = 'normal';
+        });
+      });
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
+    };
+    this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
+    this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
+  },
+
   /**
    * To update legend, reset all process.
    *
@@ -230,7 +322,11 @@ const modules = {
    */
   updateLegend() {
     this.resetLegend();
-    this.addLegendList();
+    if (this.isHeatMapType) {
+      this.addColorLegendList();
+    } else {
+      this.addLegendList();
+    }
   },
 
   /**
@@ -269,7 +365,6 @@ const modules = {
     }
 
     nameDOM.className = 'ev-chart-legend-name';
-
     nameDOM.series = series;
 
     if (typeof series.color !== 'string') {

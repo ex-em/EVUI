@@ -310,6 +310,13 @@ const modules = {
             value,
             name,
           });
+        } else if (this.options.type === 'heatMap') {
+          formattedTxt = opt.formatter({
+            x: this.options.horizontal ? hitItem.y : hitItem.x,
+            y: this.options.horizontal ? hitItem.x : hitItem.y,
+            name,
+            value,
+          });
         } else {
           formattedTxt = opt.formatter({
             x: this.options.horizontal ? value : hitItem.x,

@@ -32,6 +32,7 @@ import comboChartProps from 'docs/views/comboChart/props';
 import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
 import paginationProps from 'docs/views/pagination/props';
+import heatMapProps from 'docs/views/heatMap/props';
 
 const routes = [
   {
@@ -269,6 +270,15 @@ const routes = [
     name: 'ComboChart',
     component: PageView,
     props: comboChartProps,
+    meta: {
+      category: 'Chart',
+    },
+  },
+  {
+    path: '/heatMap',
+    name: 'HeatMap',
+    component: PageView,
+    props: heatMapProps,
     meta: {
       category: 'Chart',
     },

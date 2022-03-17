@@ -64,7 +64,7 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie' && type !== 'scatter') {
+      if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         this.drawIndicator(offset, indicator.color);
       }
     };
@@ -439,7 +439,7 @@ const modules = {
 
   /**
    * Find items by series within a range
-   * @param {object} param  object for find series items
+   * @param {object} range  object for find series items
    *
    * @returns {object}
    */

@@ -30,6 +30,17 @@ const modules = {
               series.minMax = this.getSeriesMinMax(series.data);
             }
           });
+        } else if (typeKey === 'heatMap') {
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
+
+            if (series && sData && !series.data.length) {
+              series.data = this.addSeriesDSForHeatMap(sData);
+              series.minMax = this.getSeriesMinMaxForHeatMap(series.data, series.spaces);
+              series.countOpt = this.getSeriesCountOptForHeatMap(series.data, series.colorAxis);
+            }
+          });
         } else {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
@@ -287,6 +298,25 @@ const modules = {
   },
 
   /**
+   * Take data to create data for each series
+   * @param {array} data data array for each series
+   * @returns {array} data info added position and etc
+   */
+  addSeriesDSForHeatMap(data) {
+    return data.map(item => ({
+      x: item.x,
+      y: item.y,
+      o: item.count,
+      xp: null,
+      yp: null,
+      dataColor: null,
+      count: item.count,
+      cId: null,
+      state: item.state || null,
+    }));
+  },
+
+  /**
    * Take data to create data object for graph
    * @param {object}  gdata    graph data (y-axis value for vertical chart)
    * @param {object}  ldata    label data (x-axis value for vertical chart)
@@ -382,6 +412,53 @@ const modules = {
     }
 
     return def;
+  },
+
+  /**
+   * Take series data to create min/max info for each series
+   * @param data
+   * @param spaces
+   * @returns {*|{maxDomain: null, minY: null, minX: null, maxY: null, maxX: null}}
+   */
+  getSeriesMinMaxForHeatMap(data, spaces) {
+    const axesXOption = this.options.axesX[0];
+    const axesYOption = this.options.axesY[0];
+    const seriesMinMax = this.getSeriesMinMax(data);
+
+    if (!axesXOption.startToZero || seriesMinMax.minX > 0) {
+      const xSpace = spaces.x ? (spaces.x - 1)
+          : (seriesMinMax.maxX - seriesMinMax.minX);
+      const xStep = (seriesMinMax.maxX - seriesMinMax.minX) / xSpace;
+      seriesMinMax.minX = seriesMinMax.minX < xStep ? 0 : seriesMinMax.minX - xStep;
+    }
+
+    if (!axesYOption.startToZero || seriesMinMax.minY > 0) {
+      const ySpace = spaces.y ? (spaces.y - 1)
+          : (seriesMinMax.maxY - seriesMinMax.minY);
+      const yStep = (seriesMinMax.maxY - seriesMinMax.minY) / ySpace;
+      seriesMinMax.minY = seriesMinMax.minY < yStep ? 0 : seriesMinMax.minY - yStep;
+    }
+
+    return seriesMinMax;
+  },
+
+  getSeriesCountOptForHeatMap(data, colorAxis) {
+    let maxCount = 0;
+    let isExistError = false;
+    data.forEach(({ count }) => {
+      if (maxCount < count) {
+        maxCount = count;
+      }
+      if (count < 0) {
+        isExistError = true;
+      }
+    });
+    const countInterval = Math.ceil(maxCount / colorAxis.length);
+    return {
+      max: maxCount,
+      interval: countInterval,
+      existError: isExistError,
+    };
   },
 
   /**
@@ -578,7 +655,8 @@ const modules = {
 
         if (smm && series.show) {
           if (!isHorizontal) {
-            if (smm.minX && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
+            if (smm.minX !== null
+                && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
               minmax.x[axisX].min = smm.minX;
             }
             if (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min)) {
@@ -588,7 +666,8 @@ const modules = {
             if (minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)) {
               minmax.x[axisX].min = smm.minX;
             }
-            if (smm.minY && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
+            if (smm.minY !== null
+                && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
               minmax.y[axisY].min = smm.minY;
             }
           }
