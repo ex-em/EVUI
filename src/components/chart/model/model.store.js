@@ -529,8 +529,14 @@ const modules = {
 
   getItem({ seriesID, dataIndex }, useApproximate = false) {
     const dataInfo = this.getDataByValues(seriesID, dataIndex);
+
+    if (!dataInfo || !dataInfo?.xp || !dataInfo?.yp) {
+      return null;
+    }
+
     return this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate);
   },
+
   /**
    *
    * @param seriesID
