@@ -14,7 +14,7 @@ export default {
       parsedData: parseComponent(DefaultRaw),
     },
     Event: {
-      description: 'Drag Select, Click, Double Click 이벤트 등록이 가능 합니다',
+      description: 'Drag Select, Click, Double Click 이벤트 등록이 가능 합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
     },

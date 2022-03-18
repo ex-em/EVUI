@@ -82,19 +82,14 @@ const modules = {
         colorAxis.forEach((colorItem, index) => {
           const minCount = countOpt.interval * index;
           const maxCount = countOpt.interval * (index + 1);
+          const name = countOpt.existError && index === colorAxis.length - 1
+            ? 'error' : `${minCount} - ${maxCount}`;
           this.addLegend({
             cId: colorItem.id,
             color: colorItem.value,
-            name: `${minCount} - ${maxCount}`,
+            name,
           });
         });
-        if (countOpt.existError) {
-          this.addLegend({
-            cId: 'color#error',
-            color: series.errorColor,
-            name: 'error',
-          });
-        }
       }
     });
   },
@@ -294,8 +289,8 @@ const modules = {
       const targetId = nameDOM.series.cId;
 
       Object.values(this.seriesList).forEach((series) => {
-        series.data.forEach((item) => {
-          item.state = item.cId === targetId ? 'highlight' : 'downplay';
+        series.colorAxis.forEach((colorItem) => {
+          colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
         });
       });
 
@@ -312,7 +307,7 @@ const modules = {
      */
     this.onLegendBoxLeave = () => {
       Object.values(this.seriesList).forEach((series) => {
-        series.data.forEach((item) => {
+        series.colorAxis.forEach((item) => {
           item.state = 'normal';
         });
       });

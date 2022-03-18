@@ -1,10 +1,8 @@
 <template>
-  <div class="case">
-    <ev-chart
+  <ev-chart
       :data="chartData"
       :options="chartOptions"
-    />
-  </div>
+  />
 </template>
 
 <script>

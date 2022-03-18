@@ -36,10 +36,10 @@ const modules = {
             const series = this.seriesList[seriesID];
             const sData = data[seriesID];
 
-            if (series && sData && !series.data.length) {
+            if (series && sData) {
               series.data = this.addSeriesDSForHeatMap(sData);
               series.minMax = this.getSeriesMinMaxForHeatMap(series.data, series.spaces);
-              series.countOpt = this.getSeriesCountOptForHeatMap(series.data, series.colorAxis);
+              series.countOpt = this.getSeriesCountOptForHeatMap(series);
             }
           });
         } else {
@@ -313,7 +313,6 @@ const modules = {
       dataColor: null,
       count: item.count,
       cId: null,
-      state: item.state || null,
     }));
   },
 
@@ -473,7 +472,12 @@ const modules = {
     return seriesMinMax;
   },
 
-  getSeriesCountOptForHeatMap(data, colorAxis) {
+  getSeriesCountOptForHeatMap(series) {
+    const data = series.data;
+    const colorOpt = series.colorOpt;
+    const colorAxis = series.colorAxis;
+    const categoryCnt = colorOpt.categoryCnt;
+
     let maxCount = 0;
     let isExistError = false;
     data.forEach(({ count }) => {
@@ -484,7 +488,14 @@ const modules = {
         isExistError = true;
       }
     });
-    const countInterval = Math.ceil(maxCount / colorAxis.length);
+    const countInterval = Math.ceil(maxCount / categoryCnt);
+    if (isExistError && colorAxis.length === categoryCnt) {
+      colorAxis.push({
+        id: `color#${categoryCnt}`,
+        value: colorOpt.error,
+        state: 'normal',
+      });
+    }
     return {
       max: maxCount,
       interval: countInterval,

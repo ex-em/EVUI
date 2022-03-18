@@ -128,6 +128,21 @@ export const PLOT_BAND_OPTION = {
   color: '#FAE59D',
 };
 
+export const HEAT_MAP_OPTION = {
+  ...LINE_OPTION,
+  colorOpt: {
+    min: '#FFFFFF',
+    max: '#0052FF',
+    categoryCnt: 5,
+    border: '#FFFFFF',
+    error: '#FF0000',
+  },
+  spaces: {
+    x: 0,
+    y: 0,
+  },
+};
+
 
 export const TIME_INTERVALS = {
   millisecond: {

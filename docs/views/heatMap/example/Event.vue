@@ -8,13 +8,17 @@
       @dbl-click="onDblClick"
     />
     <div class="description">
+      <span class="toggle-label">데이터 자동 업데이트</span>
+      <ev-toggle
+        v-model="isLive"
+      />
       <div class="one-row">
         <p class="badge yellow">
           선택 영역 내 데이터
         </p>
         <div
-            v-for="(row, rowIndex) in selectionItems"
-            :key="rowIndex"
+          v-for="(row, rowIndex) in selectionItems"
+          :key="rowIndex"
         >
           <i>{{ row.seriesName }}</i>
           <p v-for="(item, itemIdx) in row.items"
@@ -60,12 +64,11 @@
 </div></template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue';
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
     setup() {
-      const currentTime = dayjs();
       const chartData = reactive({
         series: {
           series1: {
@@ -74,7 +77,7 @@ import { onMounted, reactive, ref } from 'vue';
               min: '#B3E148',
               max: '#6B9900',
               categoryCnt: 5,
-              border: '#242426',
+              border: '#FFFFFF',
               error: '#FF5A5A',
             },
             spaces: {
@@ -132,7 +135,6 @@ import { onMounted, reactive, ref } from 'vue';
         selectionRange.value = range;
       };
 
-
       const dblClickedInfo = ref(null);
       const onDblClick = ({ e, label, value, sId }) => {
         dblClickedInfo.value = { e, label, value, sId };
@@ -149,47 +151,59 @@ import { onMounted, reactive, ref } from 'vue';
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');
 
+      const isLive = ref(false);
+      const liveInterval = ref();
+      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+
       const addRandomChartData = () => {
         const seriesData = chartData.data.series1;
         const seriesSpaces = chartData.series.series1.spaces;
-        const timeValue = currentTime.add(Math.floor(Math.random() * seriesSpaces.x), 'second');
         const maxRandomValue = seriesSpaces.y * 2;
-        let randomValue = Math.floor((Math.random() * maxRandomValue)) + 2;
-        randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
-        const randomCount = Math.floor(Math.random() * 5000);
-        const item = { x: timeValue, y: randomValue, count: randomCount };
-        if (!seriesData.find(({ x, y }) => x === timeValue && y === randomValue)) {
-          seriesData.push(item);
-        }
-      };
 
-      const addRandomErrorData = () => {
-        const seriesData = chartData.data.series1;
-        const seriesSpaces = chartData.series.series1.spaces;
-        const timeValue = currentTime.add(Math.floor(Math.random() * seriesSpaces.x), 'second');
-        const maxRandomValue = seriesSpaces.y * 2;
-        let randomValue = Math.floor((Math.random() * maxRandomValue)) + 2;
-        randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
-        const index = seriesData.findIndex(({ x, y }) => x === timeValue && y === randomValue);
-        const item = {
-          x: timeValue,
-          y: randomValue,
-          count: -1,
-        };
-        if (index > -1) {
-          seriesData.splice(index, 1, item);
-        } else {
-          seriesData.push(item);
+        timeValue = dayjs(timeValue).add(1, 'second');
+
+        if (isLive.value) {
+          seriesData.splice(0, 15);
+        }
+
+        for (let iy = 0; iy < 15; iy++) {
+          let randomValue = Math.floor(Math.random() * maxRandomValue) + 2;
+          randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
+          let randomCount = Math.floor(Math.random() * 5000);
+          if (randomCount > 4500) {
+            randomCount = -1;
+          }
+          const item = {
+            x: timeValue,
+            y: randomValue,
+            count: randomCount,
+          };
+          // eslint-disable-next-line no-loop-func
+          const targetIndex = seriesData.findIndex(({ x, y }) =>
+              new Date(x).getTime() === new Date(timeValue).getTime() && y === randomValue);
+          if (targetIndex === -1) {
+            seriesData.push(item);
+          }
         }
       };
 
       onMounted(() => {
-        for (let ix = 0; ix < 450; ix++) {
+        for (let ix = 0; ix < 60; ix++) {
           addRandomChartData();
         }
-        for (let ix = 0; ix < 50; ix++) {
-          addRandomErrorData();
+      });
+
+      watch(isLive, (newValue) => {
+        if (newValue) {
+          addRandomChartData();
+          liveInterval.value = setInterval(addRandomChartData, 1000);
+        } else {
+          clearInterval(liveInterval.value);
         }
+      });
+
+      onBeforeUnmount(() => {
+        clearInterval(liveInterval.value);
       });
 
       return {
@@ -199,6 +213,7 @@ import { onMounted, reactive, ref } from 'vue';
         selectionRange,
         dblClickedInfo,
         clickedInfo,
+        isLive,
         onDragSelect,
         onDblClick,
         onClick,
