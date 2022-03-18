@@ -176,7 +176,7 @@ export default {
       () => pageCount.value,
       (value) => {
         if (current.value > value) {
-          changePage(1);
+          changePage(value);
         }
       },
     );
