@@ -39,7 +39,7 @@ const modules = {
             if (series && sData) {
               series.data = this.addSeriesDSForHeatMap(sData);
               series.minMax = this.getSeriesMinMaxForHeatMap(series.data, series.spaces);
-              series.countOpt = this.getSeriesCountOptForHeatMap(series);
+              series.valueOpt = this.getSeriesValueOptForHeatMap(series);
             }
           });
         } else {
@@ -307,11 +307,11 @@ const modules = {
     return data.map(item => ({
       x: item.x,
       y: item.y,
-      o: item.count,
+      o: item.value,
       xp: null,
       yp: null,
       dataColor: null,
-      count: item.count,
+      value: item.value,
       cId: null,
     }));
   },
@@ -472,23 +472,23 @@ const modules = {
     return seriesMinMax;
   },
 
-  getSeriesCountOptForHeatMap(series) {
+  getSeriesValueOptForHeatMap(series) {
     const data = series.data;
     const colorOpt = series.colorOpt;
     const colorAxis = series.colorAxis;
     const categoryCnt = colorOpt.categoryCnt;
 
-    let maxCount = 0;
+    let maxValue = 0;
     let isExistError = false;
-    data.forEach(({ count }) => {
-      if (maxCount < count) {
-        maxCount = count;
+    data.forEach(({ value }) => {
+      if (maxValue < value) {
+        maxValue = value;
       }
-      if (count < 0) {
+      if (value < 0) {
         isExistError = true;
       }
     });
-    const countInterval = Math.ceil(maxCount / categoryCnt);
+    const valueInterval = Math.ceil(maxValue / categoryCnt);
     if (isExistError && colorAxis.length === categoryCnt) {
       colorAxis.push({
         id: `color#${categoryCnt}`,
@@ -497,8 +497,8 @@ const modules = {
       });
     }
     return {
-      max: maxCount,
-      interval: countInterval,
+      max: maxValue,
+      interval: valueInterval,
       existError: isExistError,
     };
   },

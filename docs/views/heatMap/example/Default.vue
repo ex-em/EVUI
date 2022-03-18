@@ -63,7 +63,7 @@ import { onMounted, reactive } from 'vue';
         for (let ix = 1; ix <= spaceX; ix++) {
           for (let iy = 2; iy <= spaceY * 2; iy += 2) {
             const randomCount = Math.floor(Math.random() * 5000) + 1;
-            chartData.data.series1.push({ x: ix, y: iy, count: randomCount });
+            chartData.data.series1.push({ x: ix, y: iy, value: randomCount });
           }
         }
       };

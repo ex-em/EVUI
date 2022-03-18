@@ -27,7 +27,7 @@ class HeatMap {
       w: 0,
       h: 0,
     };
-    this.countOpt = {
+    this.valueOpt = {
       max: 0,
       interval: 0,
     };
@@ -68,14 +68,14 @@ class HeatMap {
     return colorAxis;
   }
 
-  getColorIndex(count) {
-    const existError = this.countOpt.existError;
+  getColorIndex(value) {
+    const existError = this.valueOpt.existError;
     const maxIndex = this.colorAxis.length;
-    if (count < 0) {
+    if (value < 0) {
       return maxIndex - 1;
     }
 
-    const colorIndex = Math.floor(count / this.countOpt.interval);
+    const colorIndex = Math.floor(value / this.valueOpt.interval);
     if (colorIndex >= maxIndex) {
       return existError ? maxIndex - 2 : maxIndex - 1;
     }
@@ -114,12 +114,12 @@ class HeatMap {
       item.xp = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
       item.yp = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-      const { xp, yp, o: count } = item;
+      const { xp, yp, o: value } = item;
 
       if (xp !== null && yp !== null) {
-        const colorIndex = this.getColorIndex(count);
+        const colorIndex = this.getColorIndex(value);
         const opacity = this.colorAxis[colorIndex].state === 'downplay' ? 0.1 : 1;
-        item.dataColor = count < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
+        item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
         item.cId = this.colorAxis[colorIndex].id;
         ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
         ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);

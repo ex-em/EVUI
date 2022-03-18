@@ -45,9 +45,9 @@ const chartData =
   },
   data: {
     series1: [
-      { x: dayjs(time), y: 1, count: 1 },
-      { x: dayjs(time).add(1, 'day'), y: 2, count: 2 },
-      { x: dayjs(time).add(2, 'day'), y: 3, count: 3 }
+      { x: dayjs(time), y: 1, value: 1 },
+      { x: dayjs(time).add(1, 'day'), y: 2, value: 2 },
+      { x: dayjs(time).add(2, 'day'), y: 3, value: 3 }
     ],
   },
 };
@@ -59,7 +59,7 @@ const chartData =
   | max | number | | max color | '#5586EB' | 
   | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
   | border | string | '#FF0000' | series item border color 지정 |  |
-  | error | string | '#FFFFFF' | series error color (count가 -1인 경우 error로 인식) |  |
+  | error | string | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 
 ### 2. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

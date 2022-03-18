@@ -179,7 +179,7 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
           const item = {
             x: timeValue,
             y: randomValue,
-            count: randomCount,
+            value: randomCount,
           };
           // eslint-disable-next-line no-loop-func
           const targetIndex = seriesData.findIndex(({ x, y }) =>
