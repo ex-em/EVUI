@@ -78,7 +78,7 @@ import { onMounted, reactive, ref } from 'vue';
               error: '#FF5A5A',
             },
             spaces: {
-              x: 420,
+              x: 60,
               y: 20,
             },
           },
@@ -158,14 +158,37 @@ import { onMounted, reactive, ref } from 'vue';
         randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
         const randomCount = Math.floor(Math.random() * 5000);
         const item = { x: timeValue, y: randomValue, count: randomCount };
-        if (!seriesData.includes(item)) {
+        if (!seriesData.find(({ x, y }) => x === timeValue && y === randomValue)) {
+          seriesData.push(item);
+        }
+      };
+
+      const addRandomErrorData = () => {
+        const seriesData = chartData.data.series1;
+        const seriesSpaces = chartData.series.series1.spaces;
+        const timeValue = currentTime.add(Math.floor(Math.random() * seriesSpaces.x), 'second');
+        const maxRandomValue = seriesSpaces.y * 2;
+        let randomValue = Math.floor((Math.random() * maxRandomValue)) + 2;
+        randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
+        const index = seriesData.findIndex(({ x, y }) => x === timeValue && y === randomValue);
+        const item = {
+          x: timeValue,
+          y: randomValue,
+          count: -1,
+        };
+        if (index > -1) {
+          seriesData.splice(index, 1, item);
+        } else {
           seriesData.push(item);
         }
       };
 
       onMounted(() => {
-        for (let ix = 0; ix < 1000; ix++) {
+        for (let ix = 0; ix < 450; ix++) {
           addRandomChartData();
+        }
+        for (let ix = 0; ix < 50; ix++) {
+          addRandomErrorData();
         }
       });
 
