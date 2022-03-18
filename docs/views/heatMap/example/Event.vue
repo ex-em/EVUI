@@ -163,7 +163,10 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         timeValue = dayjs(timeValue).add(1, 'second');
 
         if (isLive.value) {
-          seriesData.splice(0, 15);
+          const spliceTimeValue = seriesData[0].x;
+          const spliceData = seriesData.filter(({ x }) =>
+              new Date(x).getTime() === new Date(spliceTimeValue).getTime());
+          seriesData.splice(0, spliceData.length);
         }
 
         for (let iy = 0; iy < 15; iy++) {
