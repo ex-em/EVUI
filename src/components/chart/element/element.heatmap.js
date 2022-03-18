@@ -75,8 +75,8 @@ class HeatMap {
 
     drawItem(ctx, xp, yp) {
         ctx.beginPath();
-        ctx.fillRect(xp - this.size.w, yp, this.size.w, this.size.h);
         ctx.strokeRect(xp - this.size.w, yp, this.size.w, this.size.h);
+        ctx.fillRect(xp - this.size.w, yp, this.size.w, this.size.h);
         ctx.closePath();
         ctx.stroke();
     }

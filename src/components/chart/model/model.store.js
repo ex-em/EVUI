@@ -1,5 +1,6 @@
 import { reverse } from 'lodash-es';
 import Util from '../helpers/helpers.util';
+import { TIME_INTERVALS } from '../helpers/helpers.constant';
 
 const modules = {
   /**
@@ -414,6 +415,42 @@ const modules = {
     return def;
   },
 
+  adjustMinMax(max, min, opt, space) {
+    if ((opt.type === 'time' && opt.categoryMode) || opt.type === 'step') {
+      return {
+        max,
+        min,
+      };
+    }
+
+    let targetMax = max;
+    let targetMin = min;
+    if (targetMax > 0 && opt.interval && space) {
+      if (targetMax < (opt.interval * space)) {
+        targetMax += opt.interval;
+      }
+    }
+
+    let targetInterval = opt.interval;
+    if (opt.type === 'time') {
+      if (typeof targetInterval === 'string') {
+        targetInterval = TIME_INTERVALS[targetInterval].size;
+      } else if (typeof targetInterval === 'object') {
+        targetInterval = targetInterval.time * TIME_INTERVALS[targetInterval.unit].size;
+      }
+    }
+
+    if (!opt.startToZero || targetMin > 0) {
+      const targetSpace = space ? (space - 1) : (targetMax - targetMin);
+      const targetStep = targetInterval || Math.ceil((max - targetMin) / targetSpace);
+        targetMin = targetMin < targetStep ? 0 : targetMin - targetStep;
+    }
+
+    return {
+      max: targetMax,
+      min: targetMin,
+    };
+  },
   /**
    * Take series data to create min/max info for each series
    * @param data
@@ -425,19 +462,13 @@ const modules = {
     const axesYOption = this.options.axesY[0];
     const seriesMinMax = this.getSeriesMinMax(data);
 
-    if (!axesXOption.startToZero || seriesMinMax.minX > 0) {
-      const xSpace = spaces.x ? (spaces.x - 1)
-          : (seriesMinMax.maxX - seriesMinMax.minX);
-      const xStep = (seriesMinMax.maxX - seriesMinMax.minX) / xSpace;
-      seriesMinMax.minX = seriesMinMax.minX < xStep ? 0 : seriesMinMax.minX - xStep;
-    }
+    const adjustX = this.adjustMinMax(seriesMinMax.maxX, seriesMinMax.minX, axesXOption, spaces.x);
+    seriesMinMax.maxX = adjustX.max;
+    seriesMinMax.minX = adjustX.min;
 
-    if (!axesYOption.startToZero || seriesMinMax.minY > 0) {
-      const ySpace = spaces.y ? (spaces.y - 1)
-          : (seriesMinMax.maxY - seriesMinMax.minY);
-      const yStep = (seriesMinMax.maxY - seriesMinMax.minY) / ySpace;
-      seriesMinMax.minY = seriesMinMax.minY < yStep ? 0 : seriesMinMax.minY - yStep;
-    }
+    const adjustY = this.adjustMinMax(seriesMinMax.maxY, seriesMinMax.minY, axesYOption, spaces.y);
+    seriesMinMax.maxY = adjustY.max;
+    seriesMinMax.minY = adjustY.min;
 
     return seriesMinMax;
   },

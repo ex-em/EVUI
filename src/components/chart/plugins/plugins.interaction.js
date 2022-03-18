@@ -154,7 +154,7 @@ const modules = {
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
-      if (dragSelection.use && (type === 'scatter' || type === 'line')) {
+      if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -251,9 +251,11 @@ const modules = {
       }
 
       dragInfo.xsp = Math.min(xcp, xep);
-      dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
+      dragInfo.ysp = type === 'scatter' || type === 'heatMap' ? Math.min(ycp, yep) : aRange.y1;
       dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-      dragInfo.height = type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
+      dragInfo.height = type === 'scatter' || type === 'heatMap'
+          ? Math.ceil(Math.abs(yep - ycp))
+          : aRange.y2 - aRange.y1;
 
       this.overlayClear();
       this.drawSelectionArea(dragInfo);

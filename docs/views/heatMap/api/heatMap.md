@@ -21,27 +21,46 @@
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
-  | type | String | 'bar' | 시리즈에 해당하는 데이터 표현 방식 | 'bar', 'pie', 'line', 'scatter' |
-  | color | Hex, RGB, RGBA Code(String) | COLOR[index] | 점(Point) 바깥쪽 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
-  | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | 점(Point) 안쪽 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
-  | pointSize | Number | 3 | 차트에 표시될 점의 사이즈 |  |
-  | pointStyle | String | 'circle' | 차트에 표시될 점의 모양 | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
+  | colorOpt | Object | {} | 개수에 따른 색상 옵션 | ([상세](#coloropt)) |
+  | spaces | Object | {} | x, y축의 칸 개수 |  |
   
 #### data example
 ```
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
 const chartData = 
   series: {
-    series1: { name: 'series1', pointSize: 5, pointStyle: 'circle' },
-    series2: { name: 'series2', pointSize: 6, pointStyle: 'rect' },
+    series1: {
+      name: 'series#1',
+      colorOpt: {
+        min: '#E5FFFF',
+        max: '#5586EB',
+        categoryCnt: 3,
+        border: '#242426',
+      },
+      spaces: {
+        x: 3,
+        y: 3,
+      },
+    },
   },
   data: {
-    series1: [{ x: dayjs(time), y: 1 }, { x: dayjs(time).add(1, 'day'), y: 2 }, { x: dayjs(time).add(2, 'day'), y: 3 }],
-    series2: [{ x: dayjs(time), y: 4 }, { x: dayjs(time).add(1, 'day'), y: 5, color: '#FF0000' }],
+    series1: [
+      { x: dayjs(time), y: 1, count: 1 },
+      { x: dayjs(time).add(1, 'day'), y: 2, count: 2 },
+      { x: dayjs(time).add(2, 'day'), y: 3, count: 3 }
+    ],
   },
 };
 ```
-  
+#### colorOpt
+  | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
+  | min | number | | min color | '#FFFFFF' |
+  | max | number | | max color | '#5586EB' | 
+  | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
+  | border | string | '#FF0000' | series item border color 지정 |  |
+  | error | string | '#FFFFFF' | series error color (count가 -1인 경우 error로 인식) |  |
+
 ### 2. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
@@ -67,10 +86,8 @@ const chartData =
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | interval | String | null | 축에 표시되는 값의 간격 단위 (ex. 'day', 'hour', 'minute'...)
+  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#linear-type) |
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
-  | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
-  | plotBands | Array | ([상세](#plotband)) | plot band(임계영역 표시 용도) 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 
 ##### time type
@@ -84,7 +101,6 @@ const chartData =
     - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
     - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
-    - 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
@@ -94,38 +110,6 @@ const chartData =
 | fontFamily | String | 'Roboto' | 폰트 | |
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
-
-##### plotLine
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-|-----|------|-------|-----|-----|
-| value | Number(value), Date, Number(Index) | null | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
-| segments | Array | null | dash 간격 | [6, 2] |
-| label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
-
-##### plotBand
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-|-----|------|-------|-----|-----|
-| from | Number(value), Date, Number(Index) | null | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| to | Number(value), Date, Number(Index) | null | 박스를 표시할 종료 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
-| label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
-
-##### plotLabel
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-|-----|------|-------|-----|-----|
-| show | Boolean | false | label 표시 여부 | true / false |
-| fontSize | Number | 12 | 폰트 크기 | |
-| fontColor | Hex, RGB, RGBA Code(String) | '#FF0000' | 폰트 색상 | |
-| fillColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | 박스 배경 색상 | |
-| lineColor | Hex, RGB, RGBA Code(String) | '#FF0000' | 박스 테두리 선 색상 | |
-| lineWidth | Number | 0 | 테두리 선 굵기 | 1 ~ |
-| fontWeight | Number | 400 | 폰트 굵기 |  |
-| fontFamily | String | 'Roboto' | 폰트 스타일 |  |
-| textAlign | String | 'center' | 수평 정렬 | 'left', 'center', 'right' |
-| verticalAlign | String | 'middle' | 수직 정렬 | 'top', 'middle', 'bottom' |
-| textOverflow | String | 'none' | 라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리방안  | 'none', 'ellipsis' |
-| maxWidth | Number | null | 라벨의 최대 너비  |  |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
