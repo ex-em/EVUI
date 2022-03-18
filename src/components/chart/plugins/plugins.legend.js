@@ -106,13 +106,24 @@ const modules = {
       if (isActive) {
         this.seriesInfo.count--;
         colorDOM.style.backgroundColor = opt.inactive;
+        colorDOM.style.borderColor = opt.inactive;
         nameDOM.style.color = opt.inactive;
       } else {
         this.seriesInfo.count++;
+
+        let seriesColor;
         if (typeof series.color !== 'string') {
-          colorDOM.style.backgroundColor = series.color[series.color.length - 1][1];
+          seriesColor = series.color[series.color.length - 1][1];
         } else {
-          colorDOM.style.backgroundColor = series.color;
+          seriesColor = series.color;
+        }
+
+        if (series.type === 'line' && series.fill) {
+          colorDOM.style.height = '8px';
+          colorDOM.style.backgroundColor = `${seriesColor}80`;
+          colorDOM.style.border = `1px solid ${seriesColor}`;
+        } else {
+          colorDOM.style.backgroundColor = seriesColor;
         }
 
         nameDOM.style.color = opt.color;
@@ -264,7 +275,7 @@ const modules = {
     containerDOM.className = 'ev-chart-legend-container';
     colorDOM.className = 'ev-chart-legend-color';
 
-    if (series.type === 'line' && series.point) {
+    if (series.type === 'line' && series.point && !series.fill) {
       colorDOM.className += ' ev-chart-legend-color--point-line';
     }
 
@@ -272,10 +283,19 @@ const modules = {
 
     nameDOM.series = series;
 
+    let seriesColor;
     if (typeof series.color !== 'string') {
-      colorDOM.style.backgroundColor = series.color[series.color.length - 1][1];
+      seriesColor = series.color[series.color.length - 1][1];
     } else {
-      colorDOM.style.backgroundColor = series.color;
+      seriesColor = series.color;
+    }
+
+    if (series.type === 'line' && series.fill) {
+      colorDOM.style.height = '8px';
+      colorDOM.style.backgroundColor = `${seriesColor}80`;
+      colorDOM.style.border = `1px solid ${seriesColor}`;
+    } else {
+      colorDOM.style.backgroundColor = seriesColor;
     }
 
     colorDOM.dataset.type = 'color';
