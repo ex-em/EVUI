@@ -5,7 +5,7 @@
       :total="total"
       :per-page="perPage"
       :visible-page="visiblePage"
-      :page-info="isPageInfo"
+      :show-page-info="isPageInfo"
       :order="order"
     >
     </ev-pagination>
@@ -17,7 +17,10 @@
         </div>
         <div class="form-row">
           <span class="badge yellow">Visible Page</span>
-          <ev-input-number v-model="visiblePage" />
+          <ev-input-number
+            v-model="visiblePage"
+            :min="7"
+          />
         </div>
       </div>
       <div class="form-rows">

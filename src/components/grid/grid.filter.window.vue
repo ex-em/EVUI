@@ -115,6 +115,7 @@
 import { ref, reactive, toRefs, watch, computed } from 'vue';
 
 export default {
+  name: 'EvGridFilterWindow',
   props: {
     /**
      * 필터 팝업 표시 유무

@@ -1,13 +1,13 @@
 <template>
   <nav class="pagination">
     <!-- Page Info -->
-    <small v-if="pageInfo" class="pagination-info">
+    <small v-if="showPageInfo" class="pagination-info">
       <template v-if="perPage === 1">
-        {{ numberWithComma(firstData) }} / {{ numberWithComma(total) }}
+        {{ firstData }} / {{ total }}
       </template>
       <template v-else>
-        {{ numberWithComma(firstData) }} - {{ numberWithComma(Math.min(current * perPage, total)) }}
-        / {{ numberWithComma(total) }}
+        {{ firstData }} - {{ Math.min(current * perPage, total) }}
+        / {{ total }}
       </template>
     </small>
     <ul class="pagination-list" :style="listClasses">
@@ -49,7 +49,6 @@
 <script>
 import { computed, nextTick, watch } from 'vue';
 import EvIcon from '@/components/icon/Icon';
-import { numberWithComma } from '@/common/utils';
 import pageButton from './pageButton';
 
 export default {
@@ -59,8 +58,14 @@ export default {
     pageButton,
   },
   props: {
-    total: [Number, String],
-    visiblePage: [Number, String],
+    total: {
+      type: [Number, String],
+      default: 0,
+    },
+    visiblePage: {
+      type: [Number, String],
+      default: 8,
+    },
     perPage: {
       type: [Number, String],
       default: 20,
@@ -69,8 +74,10 @@ export default {
       type: [Number, String],
       default: 1,
     },
-    size: String,
-    pageInfo: Boolean,
+    showPageInfo: {
+      type: Boolean,
+      default: false,
+    },
     order: {
       type: String,
       default: 'left',
@@ -82,9 +89,10 @@ export default {
     change: null,
   },
   setup(props, { emit }) {
-    const visiblePage = computed(() => props.visiblePage || 8);
+    const visiblePage = computed(() => (props.visiblePage > 7 ? props.visiblePage : 7));
     const current = computed(() => props.modelValue);
-    const pageCount = computed(() => Math.ceil(props.total / props.perPage));
+    const pageCount = computed(() => (props.total === 0
+      ? 1 : Math.ceil(props.total / props.perPage)));
     const hasPrev = computed(() => current.value > 1);
     const hasNext = computed(() => current.value < pageCount.value);
     const firstData = computed(() => {
@@ -168,7 +176,7 @@ export default {
       () => pageCount.value,
       (value) => {
         if (current.value > value) {
-          changePage(1);
+          changePage(value);
         }
       },
     );
@@ -190,7 +198,6 @@ export default {
       current,
       changePage,
       getPage,
-      numberWithComma,
     };
   },
 };
@@ -206,9 +213,7 @@ export default {
     padding-right: 10px;
     background: center center no-repeat;
     background-size: 16px;
-    background-color: #FFFFFF;
     cursor: pointer;
-    color: #303133;
     &:hover {
       color: #1A6AFE;
     }
@@ -238,7 +243,6 @@ export default {
     cursor: not-allowed;
     opacity: 0.5;
     color: #C0C4CC;
-    background-color: #FFFFFF;
   }
   &-list {
     display: flex;
@@ -255,7 +259,6 @@ export default {
       padding: 0 4px;
       justify-content: center;
       align-items: center;
-      background: #FFFFFF;
       font-size: 14px;
       min-width: 32px;
       line-height: 32px;

@@ -68,20 +68,31 @@ export const commonFunctions = () => {
 };
 
 export const scrollEvent = (params) => {
-  const { emit } = getCurrentInstance();
-  const { scrollInfo, stores, elementInfo, resizeInfo, pageInfo } = params;
+  const {
+    scrollInfo,
+    stores,
+    elementInfo,
+    resizeInfo,
+    pageInfo,
+    getPagingData,
+    updatePagingInfo,
+  } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
-  const updateVScroll = () => {
+  const updateVScroll = (isScroll) => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     if (bodyEl) {
+      let store = stores.store;
+      if (pageInfo.isClientPaging) {
+        store = getPagingData();
+      }
       const rowCount = bodyEl.clientHeight > rowHeight
-        ? Math.ceil(bodyEl.clientHeight / rowHeight) : stores.store.length;
-      const totalScrollHeight = stores.store.length * rowHeight;
+        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const totalScrollHeight = store.length * rowHeight;
       let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
-      if (firstVisibleIndex > stores.store.length - 1) {
+      if (firstVisibleIndex > store.length - 1) {
         firstVisibleIndex = 0;
       }
 
@@ -89,20 +100,16 @@ export const scrollEvent = (params) => {
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
 
-      stores.viewStore = stores.store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < stores.store.length;
+      stores.viewStore = store.slice(firstIndex, lastIndex);
+      scrollInfo.hasVerticalScrollBar = rowCount < store.length;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
       scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
         - scrollInfo.vScrollTopHeight;
-      if (scrollInfo.vScrollBottomHeight === 0) {
+      if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
-        pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.dataCount) + 1;
-        emit('scroll-end', {
-          startIndex: lastIndex,
-          dataCount: pageInfo.dataCount,
-          prevPage: pageInfo.prevPage,
-          currentPage: pageInfo.currentPage,
-        });
+        pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
+        pageInfo.startIndex = lastIndex;
+        updatePagingInfo({ onScrollEnd: true });
       }
     }
   };
@@ -128,7 +135,7 @@ export const scrollEvent = (params) => {
     const isVertical = !(scrollTop === lastTop);
 
     if (isVertical && bodyEl?.clientHeight) {
-      updateVScroll();
+      updateVScroll(true);
     }
 
     if (isHorizontal) {
@@ -383,7 +390,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const { checkInfo, stores } = params;
+  const { checkInfo, stores, pageInfo, getPagingData } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -419,7 +426,10 @@ export const checkEvent = (params) => {
       }
       checkInfo.checkedIndex.add(row[ROW_INDEX]);
 
-      const store = stores.store;
+      let store = stores.store;
+      if (pageInfo.isClientPaging) {
+        store = getPagingData();
+      }
       const isAllChecked = store.every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
@@ -445,7 +455,10 @@ export const checkEvent = (params) => {
    */
   const onCheckAll = (event) => {
     const isHeaderChecked = checkInfo.isHeaderChecked;
-    const store = stores.store;
+    let store = stores.store;
+    if (pageInfo.isClientPaging) {
+      store = getPagingData();
+    }
     store.forEach((row) => {
       if (isHeaderChecked) {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX])) {
@@ -467,7 +480,7 @@ export const checkEvent = (params) => {
 };
 
 export const sortEvent = (params) => {
-  const { sortInfo, stores, getColumnIndex } = params;
+  const { sortInfo, stores, getColumnIndex, updatePagingInfo } = params;
   const { props } = getCurrentInstance();
   function OrderQueue() {
     this.orders = ['asc', 'desc', 'init'];
@@ -491,6 +504,7 @@ export const sortEvent = (params) => {
       order.enqueue(sortInfo.sortOrder);
 
       sortInfo.isSorting = true;
+      updatePagingInfo({ onSort: true });
     }
   };
   /**
@@ -548,9 +562,12 @@ export const filterEvent = (params) => {
     filterInfo,
     stores,
     checkInfo,
+    pageInfo,
     getColumnIndex,
     getConvertValue,
     updateVScroll,
+    getPagingData,
+    updatePagingInfo,
   } = params;
   /**
    * 해당 컬럼에 대한 필터 팝업을 보여준다.
@@ -774,6 +791,12 @@ export const filterEvent = (params) => {
       } else {
         checkInfo.isHeaderChecked = false;
       }
+      if (!searchWord && pageInfo.isClientPaging && pageInfo.prevPage) {
+        pageInfo.currentPage = 1;
+        stores.pagingStore = getPagingData();
+      }
+
+      updatePagingInfo({ onSearch: true });
       updateVScroll();
     }, 500);
   };
@@ -901,18 +924,65 @@ export const storeEvent = (params) => {
       updateVScroll();
     }
   };
-  /**
-   * 컴포넌트의 변경 데이터를 store에 업데이트한다.
-   *
-   * @param {number} rowIndex - row 인덱스
-   * @param {number} cellIndex - cell 인덱스
-   * @param {number|string} newValue - 데이터
-   */
-  const updateData = (rowIndex, cellIndex, newValue) => {
-    const row = stores.store.filter(data => data[0] === rowIndex);
-    if (row) {
-      row[0][ROW_DATA_INDEX][cellIndex] = newValue;
+  return { setStore };
+};
+
+export const pagingEvent = (params) => {
+  const { emit } = getCurrentInstance();
+  const {
+    stores,
+    pageInfo,
+    sortInfo,
+    filterInfo,
+    elementInfo,
+    clearCheckInfo,
+  } = params;
+  const getPagingData = () => {
+    const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
+    const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+    return stores.store.slice(start, end);
+  };
+  const updatePagingInfo = (eventName) => {
+    emit('page-change', {
+      eventName,
+      pageInfo: {
+        currentPage: pageInfo.currentPage,
+        prevPage: pageInfo.prevPage,
+        startIndex: pageInfo.startIndex,
+        total: pageInfo.total,
+        perPage: pageInfo.perPage,
+      },
+      sortInfo: {
+        field: sortInfo.sortField,
+        order: sortInfo.sortOrder,
+      },
+      searchInfo: {
+        searchWord: filterInfo.searchWord,
+        searchColumns: stores.orderedColumns
+          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
+          .map(d => d.field),
+      },
+    });
+    if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
+      pageInfo.currentPage = 1;
+      elementInfo.body.scrollTop = 0;
+      clearCheckInfo();
     }
   };
-  return { setStore, updateData };
+  const changePage = (beforeVal) => {
+    if (pageInfo.isClientPaging) {
+      pageInfo.prevPage = beforeVal;
+      if (stores.store.length <= pageInfo.perPage) {
+        stores.pagingStore = stores.store;
+      } else {
+        const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
+        const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+        stores.pagingStore = stores.store.slice(start, end);
+        elementInfo.body.scrollTop = 0;
+        pageInfo.startIndex = start;
+      }
+    }
+    updatePagingInfo({ onChangePage: true });
+  };
+  return { getPagingData, updatePagingInfo, changePage };
 };
