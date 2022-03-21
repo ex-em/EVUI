@@ -54,7 +54,12 @@ const modules = {
 
         if (tooltip.use) {
           this.setTooltipLayoutPosition(hitInfo, e);
-          this.drawTooltip(hitInfo, this.tooltipCtx);
+
+          if (this.options.type === 'heatMap') {
+            this.drawToolTipForHeatMap(hitInfo, this.tooltipCtx);
+          } else {
+            this.drawTooltip(hitInfo, this.tooltipCtx);
+          }
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
@@ -369,7 +374,7 @@ const modules = {
           }
 
           if (gdata !== null && gdata !== undefined) {
-            const sName = `${item.name || series.name}`;
+            const sName = series.name;
             const sw = ctx ? ctx.measureText(sName).width : 1;
 
             item.name = sName;

@@ -114,7 +114,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         axesY: [{
           type: 'linear',
           showGrid: true,
-          interval: 2,
         }],
         selectItem: {
           use: true,

@@ -357,6 +357,106 @@ const modules = {
   },
 
   /**
+   * Draw tooltip canvas for heatmap
+   * @param {object} hitInfo    mousemove callback
+   * @param {object} context    tooltip canvas context
+   *
+   * @returns {undefined}
+   */
+  drawToolTipForHeatMap(hitInfo, context) {
+    const ctx = context;
+    const items = hitInfo.items;
+    const sId = hitInfo.hitId;
+    const hitItem = items[sId].data;
+    const hitAxis = items[sId].axis;
+    const hitColor = items[sId].color;
+    const hitInterval = items[sId].interval;
+    const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
+    const isHorizontal = this.options.horizontal;
+    const opt = this.options.tooltip;
+
+    // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
+    if (this.axesX.length && this.axesY.length) {
+      const axesXY = {
+        x: this.axesX[hitAxis.x],
+        y: this.axesY[hitAxis.y],
+      };
+
+      const maxmin = {
+        x: {
+          max: 0,
+          min: 0,
+        },
+        y: {
+          max: 0,
+          min: 0,
+        },
+      };
+      Object.keys(axesXY).forEach((key) => {
+        const axes = axesXY[key];
+        maxmin[key].min = axes.getLabelFormat(hitItem[key] - hitInterval[key]);
+        maxmin[key].max = axes.getLabelFormat(hitItem[key]);
+      });
+      this.tooltipHeaderDOM.textContent = this.options.horizontal
+        ? `${maxmin.y.min} - ${maxmin.y.max} / ${maxmin.x.min} - ${maxmin.x.max}`
+        : `${maxmin.x.min} - ${maxmin.x.max} / ${maxmin.y.min} - ${maxmin.y.max}`;
+    }
+
+    if (opt.textOverflow) {
+      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
+    }
+
+    // draw tooltip contents (series, value combination)
+    ctx.save();
+    ctx.scale(this.pixelRatio, this.pixelRatio);
+
+    if (this.tooltipBodyDOM.style.overflowY === 'auto') {
+      boxPadding.r += SCROLL_WIDTH;
+    }
+
+    const itemX = boxPadding.l + 2;
+    const itemY = boxPadding.t + TEXT_HEIGHT + 2;
+    const itemValue = hitItem.o > -1 ? hitItem.o : 'error';
+
+    ctx.font = FONT_STYLE;
+
+    ctx.beginPath();
+
+    if (typeof hitColor !== 'string') {
+      ctx.fillStyle = Canvas.createGradient(
+        ctx,
+        isHorizontal,
+        { x: itemX, y: itemY, w: 12, h: -12 },
+        hitColor,
+      );
+    } else {
+      ctx.fillStyle = hitColor;
+    }
+
+    // 1. Draw series color
+    ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
+    ctx.fillStyle = opt.fontColor;
+
+    // 2. Draw series name
+    ctx.textBaseline = 'Bottom';
+    ctx.fillText(itemValue, itemX + COLOR_MARGIN, itemY);
+    ctx.closePath();
+
+    // set tooltipDOM's style
+    this.tooltipDOM.style.overflowY = 'hidden';
+    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
+    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
+    this.tooltipDOM.style.color = opt.fontColor;
+
+    if (opt.useShadow) {
+      const shadowColor = `rgba(0, 0, 0, ${opt.shadowOpacity})`;
+      this.tooltipDOM.style.boxShadow = `2px 2px 2px ${shadowColor}`;
+    }
+
+    this.tooltipDOM.style.display = 'block';
+  },
+
+  /**
    * Draw graph item highlight
    * @param {object} hitInfo    mousemove callback
    * @param {object} ctx        overlayCanvas context
