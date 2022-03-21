@@ -62,6 +62,7 @@ class HeatMap {
          id: `color#${ix}`,
          value: `rgb(${r},${g},${b})`,
          state: 'normal',
+         show: true,
        });
     }
 
@@ -107,8 +108,8 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = Math.round(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
-    this.size.h = Math.round(yArea / (this.spaces.y || (minmaxY.graphMax - minmaxY.graphMin)));
+    this.size.w = Math.floor(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
+    this.size.h = Math.floor(yArea / (this.spaces.y || (minmaxY.graphMax - minmaxY.graphMin)));
 
     this.data.forEach((item) => {
       item.xp = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -121,9 +122,11 @@ class HeatMap {
         const opacity = this.colorAxis[colorIndex].state === 'downplay' ? 0.1 : 1;
         item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
         item.cId = this.colorAxis[colorIndex].id;
-        ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
-        ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
-        this.drawItem(ctx, xp, yp);
+        if (this.colorAxis[colorIndex].show) {
+          ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
+          ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
+          this.drawItem(ctx, xp, yp);
+        }
       }
     });
   }
@@ -177,7 +180,7 @@ class HeatMap {
   findGraphData(offset) {
     const xp = offset[0];
     const yp = offset[1];
-    const item = { data: null, hit: false, color: null };
+    const item = { data: null, hit: false, color: null, name: null };
     const wSize = this.size.w;
     const hSize = this.size.h;
     const gdata = this.data;
@@ -196,6 +199,12 @@ class HeatMap {
       item.data = foundItem;
       item.color = foundItem.dataColor;
       item.hit = true;
+      const foundColorIndex = this.colorAxis
+        .findIndex(colorItem => colorItem.id === foundItem.cId);
+      if (foundColorIndex > -1) {
+        const maxValue = this.valueOpt.interval * (foundColorIndex + 1);
+        item.name = `${maxValue - this.valueOpt.interval} - ${maxValue}`;
+      }
     }
 
     return item;

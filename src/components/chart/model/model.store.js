@@ -494,6 +494,7 @@ const modules = {
         id: `color#${categoryCnt}`,
         value: colorOpt.error,
         state: 'normal',
+        show: true,
       });
     }
     return {

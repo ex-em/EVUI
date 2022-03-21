@@ -369,7 +369,7 @@ const modules = {
           }
 
           if (gdata !== null && gdata !== undefined) {
-            const sName = `${series.name}`;
+            const sName = `${item.name || series.name}`;
             const sw = ctx ? ctx.measureText(sName).width : 1;
 
             item.name = sName;
