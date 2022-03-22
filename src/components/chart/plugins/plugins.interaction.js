@@ -48,7 +48,7 @@ const modules = {
       this.overlayClear();
 
       if (Object.keys(hitInfo.items).length) {
-        if (this.options.type !== 'scatter' || tooltip.use) {
+        if ((type !== 'scatter' && type !== 'heatMap') || tooltip.use) {
           this.drawItemsHighlight(hitInfo, ctx);
         }
 
