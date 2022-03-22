@@ -370,36 +370,15 @@ const modules = {
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
     const hitColor = items[sId].color;
-    const hitInterval = items[sId].interval;
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
     if (this.axesX.length && this.axesY.length) {
-      const axesXY = {
-        x: this.axesX[hitAxis.x],
-        y: this.axesY[hitAxis.y],
-      };
-
-      const maxmin = {
-        x: {
-          max: 0,
-          min: 0,
-        },
-        y: {
-          max: 0,
-          min: 0,
-        },
-      };
-      Object.keys(axesXY).forEach((key) => {
-        const axes = axesXY[key];
-        maxmin[key].min = axes.getLabelFormat(hitItem[key] - hitInterval[key]);
-        maxmin[key].max = axes.getLabelFormat(hitItem[key]);
-      });
       this.tooltipHeaderDOM.textContent = this.options.horizontal
-        ? `${maxmin.y.min} - ${maxmin.y.max} / ${maxmin.x.min} - ${maxmin.x.max}`
-        : `${maxmin.x.min} - ${maxmin.x.max} / ${maxmin.y.min} - ${maxmin.y.max}`;
+        ? `${this.axesY[hitAxis.y].getLabelFormat(hitItem.y)} / ${this.axesX[hitAxis.x].getLabelFormat(hitItem.x)}`
+        : `${this.axesX[hitAxis.x].getLabelFormat(hitItem.x)} / ${this.axesY[hitAxis.y].getLabelFormat(hitItem.y)}`;
     }
 
     if (opt.textOverflow) {

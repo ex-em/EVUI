@@ -23,7 +23,6 @@ class HeatMap {
     this.sId = sId;
     this.data = [];
     this.spaces = opt.spaces || { x: null, y: null };
-    this.interval = { x: null, y: null };
     this.size = {
       w: 0,
       h: 0,
@@ -111,8 +110,6 @@ class HeatMap {
 
     this.size.w = Math.ceil(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
     this.size.h = Math.floor(yArea / (this.spaces.y || (minmaxY.graphMax - minmaxY.graphMin)));
-    this.interval.x = (minmaxX.graphMax - minmaxX.graphMin) / this.spaces.x;
-    this.interval.y = (minmaxY.graphMax - minmaxY.graphMin) / this.spaces.y;
 
     this.data.forEach((item) => {
       item.xp = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -188,10 +185,6 @@ class HeatMap {
       hit: false,
       color: null,
       name: null,
-      interval: {
-        x: 0,
-        y: 0,
-      },
     };
     const wSize = this.size.w;
     const hSize = this.size.h;
@@ -211,7 +204,6 @@ class HeatMap {
       item.data = foundItem;
       item.color = foundItem.dataColor;
       item.hit = true;
-      item.interval = this.interval;
     }
 
     return item;
