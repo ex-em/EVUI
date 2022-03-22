@@ -30,12 +30,20 @@ const modules = {
    * @returns {undefined}
    */
   initLegend() {
+    this.isHeatMapType = this.options.type === 'heatMap';
     if (!this.isInitLegend) {
       this.createLegendLayout();
-      this.initEvent();
     }
 
-    this.addLegendList();
+    if (this.isHeatMapType) {
+      this.initEventForColorLegend();
+      this.addColorLegendList();
+    } else {
+      this.initEvent();
+      this.addLegendList();
+    }
+    this.initResizeEvent();
+
     this.isInitLegend = true;
     this.isLegendMove = false;
   },
@@ -66,12 +74,36 @@ const modules = {
     });
   },
 
+  addColorLegendList() {
+    const seriesList = this.seriesList;
+
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp && series.showLegend) {
+        const { colorAxis, valueOpt } = series;
+        colorAxis.forEach((colorItem, index) => {
+          const maxValue = valueOpt.interval * (index + 1);
+          const minValue = maxValue - valueOpt.interval;
+          const name = valueOpt.existError && index === colorAxis.length - 1
+            ? 'error' : `${minValue} - ${maxValue}`;
+          this.addLegend({
+            cId: colorItem.id,
+            color: colorItem.value,
+            name,
+          });
+        });
+      }
+    });
+  },
+
   /**
    * Initialize legend event
    *
    * @returns {undefined}
    */
   initEvent() {
+    if (this.isInitLegend) {
+      return;
+    }
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
@@ -140,45 +172,6 @@ const modules = {
     };
 
     /**
-     * callback for resizeDOM click event
-     * 1. hide resizeDOM
-     * 2. show ghost DOM on same position with hidden resizeDOM
-     *
-     * @returns {undefined}
-     */
-    this.onResizeMouseDown = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      const opt = this.options;
-      const pos = opt.legend.position;
-      const title = opt.title.show ? opt.title.height : 0;
-
-      const ghostDOM = this.ghostDOM;
-      this.resizeDOM.style.display = 'none';
-      this.wrapperDOM.appendChild(ghostDOM);
-
-      // mouse down 시, resizeDOM의 위치를 기반으로 ghostDOM의 위치를 세팅
-      if (pos === 'left' || pos === 'right') {
-        ghostDOM.style.top = `${title}px`;
-        ghostDOM.style.left = this.resizeDOM.style.left;
-        ghostDOM.style.right = this.resizeDOM.style.right;
-        ghostDOM.style.height = this.resizeDOM.style.height;
-      } else {
-        ghostDOM.classList.add('horizontal');
-
-        if (pos === 'top') {
-          ghostDOM.style.top = this.resizeDOM.style.top;
-        } else if (pos === 'bottom') {
-          ghostDOM.style.bottom = this.resizeDOM.style.bottom;
-        }
-      }
-
-      this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
-      this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
-    };
-
-    /**
      * callback for legendBoxDOM hovering
      *
      * @returns {undefined}
@@ -227,6 +220,161 @@ const modules = {
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
 
+    this.initResizeEvent();
+  },
+
+  initEventForColorLegend() {
+    if (this.isInitLegend) {
+      return;
+    }
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxClick = (e) => {
+      const opt = this.options.legend;
+      const series = Object.values(this.seriesList)[0];
+      const type = e.target.dataset.type;
+
+      let targetDOM;
+      if (type === 'container') {
+        targetDOM = e.target;
+      } else if (type === 'name' || type === 'color') {
+        targetDOM = e.target.parentElement;
+      } else {
+        return;
+      }
+
+      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
+      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
+      const isActive = !colorDOM?.className.includes('inactive');
+      const targetId = nameDOM.series.cId;
+      const activeCount = series.colorAxis.filter(colorItem => colorItem.show).length;
+
+      if (isActive && activeCount === 1) {
+        return;
+      }
+
+      if (!colorDOM || !nameDOM) {
+        return;
+      }
+
+      if (isActive) {
+        colorDOM.style.backgroundColor = opt.inactive;
+        colorDOM.style.borderColor = opt.inactive;
+        nameDOM.style.color = opt.inactive;
+      } else {
+        colorDOM.style.backgroundColor = nameDOM.series.color;
+        nameDOM.style.color = opt.color;
+      }
+
+      const targetIndex = series.colorAxis.findIndex(colorItem => colorItem.id === targetId);
+      if (targetIndex > -1) {
+        series.colorAxis[targetIndex].show = !isActive;
+      }
+
+      colorDOM.classList.toggle('inactive');
+      nameDOM.classList.toggle('inactive');
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: true, keepDomain: true },
+      });
+    };
+    /**
+     * callback for legendBoxDOM hovering
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxOver = (e) => {
+      const type = e.target.dataset.type;
+      const series = Object.values(this.seriesList)[0];
+
+      let targetDOM;
+      if (type === 'container') {
+        targetDOM = e.target;
+      } else if (type === 'name' || type === 'color') {
+        targetDOM = e.target.parentElement;
+      } else {
+        return;
+      }
+      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
+      const targetId = nameDOM.series.cId;
+
+      series.colorAxis.forEach((colorItem) => {
+        colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
+      });
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
+    };
+
+    /**
+     * callback for mouseleave event on legendBoxDOM
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxLeave = () => {
+      const series = Object.values(this.seriesList)[0];
+      series.colorAxis.forEach((item) => {
+        item.state = 'normal';
+      });
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
+    };
+    this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
+    this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
+    this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
+
+    this.initResizeEvent();
+  },
+
+  initResizeEvent() {
+    /**
+     * callback for resizeDOM click event
+     * 1. hide resizeDOM
+     * 2. show ghost DOM on same position with hidden resizeDOM
+     *
+     * @returns {undefined}
+     */
+    this.onResizeMouseDown = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const opt = this.options;
+      const pos = opt.legend.position;
+      const title = opt.title.show ? opt.title.height : 0;
+
+      const ghostDOM = this.ghostDOM;
+      this.resizeDOM.style.display = 'none';
+      this.wrapperDOM.appendChild(ghostDOM);
+
+      // mouse down 시, resizeDOM의 위치를 기반으로 ghostDOM의 위치를 세팅
+      if (pos === 'left' || pos === 'right') {
+        ghostDOM.style.top = `${title}px`;
+        ghostDOM.style.left = this.resizeDOM.style.left;
+        ghostDOM.style.right = this.resizeDOM.style.right;
+        ghostDOM.style.height = this.resizeDOM.style.height;
+      } else {
+        ghostDOM.classList.add('horizontal');
+
+        if (pos === 'top') {
+          ghostDOM.style.top = this.resizeDOM.style.top;
+        } else if (pos === 'bottom') {
+          ghostDOM.style.bottom = this.resizeDOM.style.bottom;
+        }
+      }
+
+      this.wrapperDOM.addEventListener('mousemove', this.mouseMove, false);
+      this.wrapperDOM.addEventListener('mouseup', this.mouseUp, false);
+    };
+
     if (this.resizeDOM) {
       this.resizeDOM.addEventListener('mousedown', this.onResizeMouseDown);
       this.mouseMove = this.onMouseMove.bind(this); // resizing function
@@ -241,7 +389,11 @@ const modules = {
    */
   updateLegend() {
     this.resetLegend();
-    this.addLegendList();
+    if (this.isHeatMapType) {
+      this.addColorLegendList();
+    } else {
+      this.addLegendList();
+    }
   },
 
   /**
@@ -280,7 +432,6 @@ const modules = {
     }
 
     nameDOM.className = 'ev-chart-legend-name';
-
     nameDOM.series = series;
 
     let seriesColor;
@@ -486,7 +637,6 @@ const modules = {
       }
     }
   },
-
   /**
    * When user moves resizeDOM, this function will change css
    *

@@ -3,6 +3,7 @@ import Scatter from '../element/element.scatter';
 import Bar from '../element/element.bar';
 import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
+import HeatMap from '../element/element.heatmap';
 
 const modules = {
   /**
@@ -51,6 +52,9 @@ const modules = {
     } else if (type === 'pie') {
       this.seriesInfo.charts.pie.push(id);
       return new Pie(id, opt, index);
+    } else if (type === 'heatMap') {
+      this.seriesInfo.charts.heatMap.push(id);
+      return new HeatMap(id, opt, index);
     }
 
     return false;

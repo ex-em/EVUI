@@ -1,5 +1,6 @@
 import { reverse } from 'lodash-es';
 import Util from '../helpers/helpers.util';
+import { TIME_INTERVALS } from '../helpers/helpers.constant';
 
 const modules = {
   /**
@@ -28,6 +29,17 @@ const modules = {
             if (series && sData) {
               series.data = this.addSeriesDSforScatter(sData);
               series.minMax = this.getSeriesMinMax(series.data);
+            }
+          });
+        } else if (typeKey === 'heatMap') {
+          seriesIDs.forEach((seriesID) => {
+            const series = this.seriesList[seriesID];
+            const sData = data[seriesID];
+
+            if (series && sData) {
+              series.data = this.addSeriesDSForHeatMap(sData);
+              series.minMax = this.getSeriesMinMaxForHeatMap(series.data, series.spaces);
+              series.valueOpt = this.getSeriesValueOptForHeatMap(series);
             }
           });
         } else {
@@ -287,6 +299,24 @@ const modules = {
   },
 
   /**
+   * Take data to create data for each series
+   * @param {array} data data array for each series
+   * @returns {array} data info added position and etc
+   */
+  addSeriesDSForHeatMap(data) {
+    return data.map(item => ({
+      x: item.x,
+      y: item.y,
+      o: item.value,
+      xp: null,
+      yp: null,
+      dataColor: null,
+      value: item.value,
+      cId: null,
+    }));
+  },
+
+  /**
    * Take data to create data object for graph
    * @param {object}  gdata    graph data (y-axis value for vertical chart)
    * @param {object}  ldata    label data (x-axis value for vertical chart)
@@ -382,6 +412,96 @@ const modules = {
     }
 
     return def;
+  },
+
+  adjustMinMax(max, min, opt, space) {
+    if ((opt.type === 'time' && opt.categoryMode) || opt.type === 'step') {
+      return {
+        max,
+        min,
+      };
+    }
+
+    let targetMax = max;
+    let targetMin = min;
+    if (targetMax > 0 && opt.interval && space) {
+      if (targetMax < (opt.interval * space)) {
+        targetMax += opt.interval;
+      }
+    }
+
+    let targetInterval = opt.interval;
+    if (opt.type === 'time') {
+      if (typeof targetInterval === 'string') {
+        targetInterval = TIME_INTERVALS[targetInterval].size;
+      } else if (typeof targetInterval === 'object') {
+        targetInterval = targetInterval.time * TIME_INTERVALS[targetInterval.unit].size;
+      }
+    }
+
+    if (!opt.startToZero || targetMin > 0) {
+      const targetSpace = space ? (space - 1) : (targetMax - targetMin);
+      const targetStep = targetInterval || Math.ceil((max - targetMin) / targetSpace);
+        targetMin = targetMin < targetStep ? 0 : targetMin - targetStep;
+    }
+
+    return {
+      max: targetMax,
+      min: targetMin,
+    };
+  },
+  /**
+   * Take series data to create min/max info for each series
+   * @param data
+   * @param spaces
+   * @returns {*|{maxDomain: null, minY: null, minX: null, maxY: null, maxX: null}}
+   */
+  getSeriesMinMaxForHeatMap(data, spaces) {
+    const axesXOption = this.options.axesX[0];
+    const axesYOption = this.options.axesY[0];
+    const seriesMinMax = this.getSeriesMinMax(data);
+
+    const adjustX = this.adjustMinMax(seriesMinMax.maxX, seriesMinMax.minX, axesXOption, spaces.x);
+    seriesMinMax.maxX = adjustX.max;
+    seriesMinMax.minX = adjustX.min;
+
+    const adjustY = this.adjustMinMax(seriesMinMax.maxY, seriesMinMax.minY, axesYOption, spaces.y);
+    seriesMinMax.maxY = adjustY.max;
+    seriesMinMax.minY = adjustY.min;
+
+    return seriesMinMax;
+  },
+
+  getSeriesValueOptForHeatMap(series) {
+    const data = series.data;
+    const colorOpt = series.colorOpt;
+    const colorAxis = series.colorAxis;
+    const categoryCnt = colorOpt.categoryCnt;
+
+    let maxValue = 0;
+    let isExistError = false;
+    data.forEach(({ value }) => {
+      if (maxValue < value) {
+        maxValue = value;
+      }
+      if (value < 0) {
+        isExistError = true;
+      }
+    });
+    const valueInterval = Math.ceil(maxValue / categoryCnt);
+    if (isExistError && colorAxis.length === categoryCnt) {
+      colorAxis.push({
+        id: `color#${categoryCnt}`,
+        value: colorOpt.error,
+        state: 'normal',
+        show: true,
+      });
+    }
+    return {
+      max: maxValue,
+      interval: valueInterval,
+      existError: isExistError,
+    };
   },
 
   /**
@@ -584,7 +704,8 @@ const modules = {
 
         if (smm && series.show) {
           if (!isHorizontal) {
-            if (smm.minX && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
+            if (smm.minX !== null
+                && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
               minmax.x[axisX].min = smm.minX;
             }
             if (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min)) {
@@ -594,7 +715,8 @@ const modules = {
             if (minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)) {
               minmax.x[axisX].min = smm.minX;
             }
-            if (smm.minY && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
+            if (smm.minY !== null
+                && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
               minmax.y[axisY].min = smm.minY;
             }
           }

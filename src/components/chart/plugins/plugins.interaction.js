@@ -48,7 +48,7 @@ const modules = {
       this.overlayClear();
 
       if (Object.keys(hitInfo.items).length) {
-        if (this.options.type !== 'scatter' || tooltip.use) {
+        if ((type !== 'scatter' && type !== 'heatMap') || tooltip.use) {
           this.drawItemsHighlight(hitInfo, ctx);
         }
 
@@ -64,7 +64,7 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie' && type !== 'scatter') {
+      if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         this.drawIndicator(offset, indicator.color);
       }
     };
@@ -154,7 +154,7 @@ const modules = {
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
-      if (dragSelection.use && (type === 'scatter' || type === 'line')) {
+      if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -251,9 +251,11 @@ const modules = {
       }
 
       dragInfo.xsp = Math.min(xcp, xep);
-      dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
+      dragInfo.ysp = type === 'scatter' || type === 'heatMap' ? Math.min(ycp, yep) : aRange.y1;
       dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-      dragInfo.height = type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
+      dragInfo.height = type === 'scatter' || type === 'heatMap'
+          ? Math.ceil(Math.abs(yep - ycp))
+          : aRange.y2 - aRange.y1;
 
       this.overlayClear();
       this.drawSelectionArea(dragInfo);
@@ -367,7 +369,7 @@ const modules = {
           }
 
           if (gdata !== null && gdata !== undefined) {
-            const sName = `${series.name}`;
+            const sName = series.name;
             const sw = ctx ? ctx.measureText(sName).width : 1;
 
             item.name = sName;
@@ -439,7 +441,7 @@ const modules = {
 
   /**
    * Find items by series within a range
-   * @param {object} param  object for find series items
+   * @param {object} range  object for find series items
    *
    * @returns {object}
    */

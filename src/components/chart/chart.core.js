@@ -61,7 +61,7 @@ class EvChart {
     this.seriesList = {};
     this.lastTip = { pos: null, value: null };
     this.seriesInfo = {
-      charts: { pie: [], bar: [], line: [], scatter: [] },
+      charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [] },
       count: 0,
     };
 
@@ -177,7 +177,7 @@ class EvChart {
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
 
-        if (chartType === 'line' || chartType === 'scatter') {
+        if (chartType === 'line' || chartType === 'scatter' || chartType === 'heatMap') {
           series.draw(opt);
         } else if (chartType === 'bar') {
           const { thickness, borderRadius } = this.options;
@@ -545,6 +545,7 @@ class EvChart {
           bar: [],
           line: [],
           scatter: [],
+          heatMap: [],
         },
         count: 0,
       };
