@@ -118,9 +118,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         selectItem: {
           use: true,
         },
-        tooltip: {
-          use: true,
-        },
       };
 
       const selectionItems = ref([]);

@@ -51,9 +51,6 @@ import { onMounted, reactive } from 'vue';
           type: 'linear',
           showGrid: true,
         }],
-        tooltip: {
-          use: true,
-        },
       };
 
       const createChartData = () => {

@@ -52,7 +52,7 @@ const modules = {
           this.drawItemsHighlight(hitInfo, ctx);
         }
 
-        if (this.options.type !== 'heatMap' && tooltip.use) {
+        if (tooltip.use) {
           this.setTooltipLayoutPosition(hitInfo, e);
           this.drawTooltip(hitInfo, this.tooltipCtx);
         }
