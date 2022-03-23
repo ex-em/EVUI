@@ -12,6 +12,8 @@ import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import SelectLabel from './example/SelectLabel';
+import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
 import PlotLine from './example/PlotLine';
@@ -49,6 +51,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    'Select Label': {
+      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
+      component: SelectLabel,
+      parsedData: parseComponent(SelectLabelRaw),
     },
     Gradient: {
       description: '막대에 그라데이션 효과를 줄 수 있습니다.',
