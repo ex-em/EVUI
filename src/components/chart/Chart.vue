@@ -20,6 +20,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         type: Object,
         default: null,
       },
+      selectedLabel: {
+        type: Object,
+        default: null,
+      },
       options: {
         type: Object,
         default: () => ({}),
@@ -38,6 +42,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'dbl-click',
       'drag-select',
       'update:selectedItem',
+      'update:selectedLabel',
     ],
     setup(props) {
       let evChart = {};
@@ -45,7 +50,8 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
 
       const {
         eventListeners,
-        selectInfo,
+        selectItemInfo,
+        selectLabelInfo,
         getNormalizedData,
         getNormalizedOptions,
       } = useModel();
@@ -66,7 +72,8 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           normalizedData,
           normalizedOptions,
           eventListeners,
-          selectInfo,
+          selectItemInfo,
+          selectLabelInfo,
         );
       };
 
@@ -104,6 +111,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         await watch(() => props.selectedItem, (newValue) => {
           const chartType = props.options?.type;
           evChart.selectItemByData(newValue, chartType);
+        }, { deep: true });
+
+        await watch(() => props.selectedLabel, (newValue) => {
+          if (newValue.dataIndex) {
+            evChart.renderWithSelectLabel(newValue.dataIndex);
+          }
         }, { deep: true });
       });
 

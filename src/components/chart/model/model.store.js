@@ -674,6 +674,42 @@ const modules = {
   },
 
   /**
+   * Find label info by position x and y
+   * @param {array}   offset          position x and y
+   *
+   * @returns {object} clicked label information
+   */
+  getLabelInfoByPosition(offset) {
+    const [x, y] = offset;
+    const aPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    const scale = this.options.horizontal ? this.axesY[0] : this.axesX[0];
+    const startPoint = aPos[scale.units.rectStart];
+    const endPoint = aPos[scale.units.rectEnd];
+
+    let labelIndex;
+    let hitInfo;
+    if (scale.labels) {
+      const labelGap = (endPoint - startPoint) / scale.labels.length;
+      const index = Math.floor(((this.options.horizontal ? y : x) - startPoint) / labelGap);
+      labelIndex = scale.labels.length > index ? index : -1;
+    } else {
+      hitInfo = this.getItemByPosition(offset, false);
+      labelIndex = hitInfo.maxIndex;
+    }
+
+    return {
+      labelIndex,
+      hitInfo,
+    };
+  },
+
+  /**
    * Create min/max information for all of data
    * @property seriesList
    *

@@ -57,7 +57,7 @@ class StepScale extends Scale {
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo, hitInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo) {
     const ctx = this.ctx;
     const labels = this.labels;
     const aPos = {
@@ -121,14 +121,21 @@ class StepScale extends Scale {
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
 
+        const isBlurredLabel = this.options?.selectLabel?.use
+          && this.options?.selectLabel?.useLabelOpacity
+          && (this.options.horizontal === (this.type === 'y'))
+          && selectLabelInfo?.dataIndex?.length
+          && !selectLabelInfo?.dataIndex?.includes(index);
+        ctx.fillStyle = Util.colorStringToRgba(this.labelStyle.color, isBlurredLabel ? 0.1 : 1);
+
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
           ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
 
-          if (this.options?.selectItem?.showLabelTip
-            && hitInfo?.label
-            && !this.options?.horizontal
-          ) {
+          if (!isBlurredLabel
+              && this.options?.selectItem?.showLabelTip
+              && hitInfo?.label
+              && !this.options?.horizontal) {
             const selectedLabel = hitInfo.label;
             if (selectedLabel === labelText) {
               const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);

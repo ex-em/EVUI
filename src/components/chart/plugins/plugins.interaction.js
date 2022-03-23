@@ -1,5 +1,5 @@
 import { numberWithComma } from '@/common/utils';
-import { defaultsDeep } from 'lodash-es';
+import { cloneDeep, defaultsDeep } from 'lodash-es';
 
 const modules = {
   /**
@@ -137,6 +137,15 @@ const modules = {
           sId: args.seriesId,
           maxIndex: args.dataIndex,
         } = hitInfo);
+      }
+
+      if (this.options.selectLabel.use) {
+        const offset = this.getMousePosition(e);
+        const clickedLabelInfo = this.getLabelInfoByPosition(offset);
+        const selected = this.selectLabel(clickedLabelInfo.labelIndex);
+        this.renderWithSelectLabel(selected.dataIndex);
+
+        args.selected = cloneDeep(this.defaultSelectLabelInfo);
       }
 
       if (typeof this.listeners.click === 'function') {
@@ -414,7 +423,7 @@ const modules = {
    * @returns {boolean}
    */
   selectItemByData(targetInfo, chartType) {
-    this.defaultSelectInfo = targetInfo;
+    this.defaultSelectItemInfo = targetInfo;
 
     let foundInfo;
     if (chartType === 'pie') {
@@ -437,6 +446,59 @@ const modules = {
     }
 
     return true;
+  },
+
+  /**
+   * render after select label by index list
+   * @param indexList {array}  '[0, 1 ...]'
+   */
+  renderWithSelectLabel(indexList) {
+    this.defaultSelectLabelInfo.dataIndex = indexList;
+    this.initSelectedLabelInfo();
+    this.render();
+  },
+
+  /**
+   * init defaultSelectLabelInfo object.
+   * (set each series data and label text)
+   */
+  initSelectedLabelInfo() {
+    const { use, limit } = this.options.selectLabel;
+    const infoObj = this.defaultSelectLabelInfo;
+    if (use && infoObj?.dataIndex) {
+      infoObj.dataIndex.splice(limit);
+      infoObj.label = infoObj.dataIndex.map(i => this.data.labels[i]);
+      const dataEntries = Object.entries(this.data.data);
+      infoObj.data = infoObj.dataIndex.map(labelIdx => Object.fromEntries(
+        dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
+    }
+  },
+
+  /**
+   * Add or delete selected label index, according to policy and option
+   * (set each series data and label text)
+   * @param labelIndex {array}  '[0, 1 ...]'
+   */
+  selectLabel(labelIndex) {
+    const option = this.options?.selectLabel ?? {};
+    const before = this.defaultSelectLabelInfo ?? { dataIndex: [] };
+    const after = cloneDeep(before);
+
+    if (before.dataIndex.includes(labelIndex)) {
+      const idx = before.dataIndex.indexOf(labelIndex);
+      after.dataIndex.splice(idx, 1);
+    } else if (labelIndex > -1) {
+      after.dataIndex.push(labelIndex);
+      if (option.limit > 0 && option.limit < after.dataIndex.length) {
+        if (option.useDeselectOverflow) {
+          after.dataIndex.splice(0, 1);
+        } else {
+          after.dataIndex.pop();
+        }
+      }
+    }
+
+    return after;
   },
 
   /**

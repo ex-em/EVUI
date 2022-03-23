@@ -131,7 +131,13 @@ class Bar {
       }
 
       const barColor = item.dataColor || this.color;
-      const isDownplay = this.state === 'downplay';
+
+      const selectLabelOption = param.selectLabel.option;
+      const selectedLabel = param.selectLabel.selected ?? { dataIndex: [] };
+
+      const isDownplay = selectLabelOption.use && selectLabelOption.useSeriesOpacity
+          ? selectedLabel.dataIndex.length && !selectedLabel.dataIndex.includes(index)
+          : this.state === 'downplay';
 
       if (typeof barColor !== 'string') {
         ctx.fillStyle = Canvas.createGradient(

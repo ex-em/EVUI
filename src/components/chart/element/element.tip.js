@@ -14,9 +14,15 @@ const modules = {
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
     const selTipOpt = opt.selectItem;
+    const labelTipOpt = opt.selectLabel;
     let maxArgs;
+    let isExistSelectedLabel;
 
-    if (selTipOpt.use && tipLocationInfo) {
+    if (labelTipOpt.use && labelTipOpt.showTip) {
+      isExistSelectedLabel = this.drawLabelTip();
+    }
+
+    if (selTipOpt.use && tipLocationInfo && !isExistSelectedLabel) {
       const seriesInfo = this.seriesList[tipLocationInfo?.sId];
 
       if (!seriesInfo?.show) {
@@ -57,8 +63,7 @@ const modules = {
         this.lastHitInfo = tipLocationInfo;
       }
     }
-
-    if (maxTipOpt.use) {
+    if (maxTipOpt.use && !isExistSelectedLabel) {
       const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
       maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
 
@@ -76,7 +81,8 @@ const modules = {
   /**
    * Calculate tip size and contents
    * @param {object} series     series information (max series or selected series)
-   * @param {string} tipType    tip type [sel = user select, max = max value]
+   * @param {string} tipType    tip type
+   * [sel = user select series, label = user select label, max = max value]
    * @param {object} hitInfo    mouse hit information
    *
    * @returns {object} size and tip contents
@@ -220,6 +226,121 @@ const modules = {
     ctx.closePath();
   },
 
+  /**
+   * Draw Selected Label Tip
+   * @returns {boolean} Whether drew at least one tip
+   */
+  drawLabelTip() {
+    const opt = this.options;
+    const isHorizontal = !!opt.horizontal;
+    const labelTipOpt = opt.selectLabel;
+    const { dataIndex, data } = this.defaultSelectLabelInfo;
+    let drawTip = false;
+
+    if (dataIndex.length) {
+      drawTip = true;
+
+      const chartRect = this.chartRect;
+      const labelOffset = this.labelOffset;
+      const aPos = {
+        x1: chartRect.x1 + labelOffset.left,
+        x2: chartRect.x2 - labelOffset.right,
+        y1: chartRect.y1 + labelOffset.top,
+        y2: chartRect.y2 - labelOffset.bottom,
+      };
+
+      const labelAxes = this.options.horizontal ? this.axesY[0] : this.axesX[0];
+      const labelStartPoint = aPos[labelAxes.units.rectStart];
+      const labelEndPoint = aPos[labelAxes.units.rectEnd];
+      const labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
+
+      const valueAxes = this.options.horizontal ? this.axesX[0] : this.axesY[0];
+      const valueStartPoint = aPos[valueAxes.units.rectStart];
+
+      const offset = this.options.type === 'bar' ? 4 : 6;
+      const chartWidth = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+      const chartHeight = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+      dataIndex.forEach((idx, i) => {
+        const labelCenter = Math.round(labelStartPoint + (labelGap * idx));
+        let gp;
+        const dp = labelCenter + (labelGap / 2);
+        if (labelTipOpt.fixedPosTop) {
+          if (isHorizontal) {
+            gp = Canvas.calculateX(
+              this.axesRange.x[0].max,
+              this.axesRange.x[0].min,
+              this.axesRange.x[0].max,
+              chartWidth,
+              valueStartPoint);
+            gp += offset;
+          } else {
+            gp = Canvas.calculateY(
+                this.axesRange.y[0].max,
+                this.axesRange.y[0].min,
+                this.axesRange.y[0].max,
+                chartHeight,
+                valueStartPoint);
+            gp -= offset;
+          }
+        } else if (isHorizontal) {
+          const seriesList = Object.keys(data[i] ?? {});
+          const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
+          const visibleValue = visibleSeries.map(sId => data[i][sId]);
+          const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
+
+          let maxValue;
+          if (isExistGrp) {
+            maxValue = visibleValue.reduce((acc, v) => acc + v) ?? 0;
+          } else if (visibleValue.length) {
+            maxValue = Math.max(...visibleValue);
+          } else {
+            maxValue = this.axesRange.x[0].max;
+          }
+
+          gp = Canvas.calculateX(
+            maxValue,
+            this.axesRange.x[0].min,
+            this.axesRange.x[0].max,
+            chartWidth,
+            valueStartPoint);
+          gp += offset;
+        } else {
+          const seriesList = Object.keys(data[i] ?? {});
+          const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
+          const visibleValue = visibleSeries.map(sId => data[i][sId]);
+          const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
+
+          let maxValue;
+          if (isExistGrp) {
+            maxValue = visibleValue.reduce((acc, v) => acc + v) ?? 0;
+          } else if (visibleValue.length) {
+            maxValue = Math.max(...visibleValue);
+          } else {
+            maxValue = this.axesRange.y[0].max;
+          }
+
+          gp = Canvas.calculateY(
+              maxValue,
+              this.axesRange.y[0].min,
+              this.axesRange.y[0].max,
+              chartHeight,
+              valueStartPoint);
+          gp -= offset;
+        }
+
+        this.showTip({
+          context: this.bufferCtx,
+          x: isHorizontal ? gp : dp,
+          y: isHorizontal ? dp : gp,
+          opt: labelTipOpt,
+          isSamePos: false,
+        });
+      });
+    }
+
+    return drawTip;
+  },
   /**
    * Calculate x, y position to draw text tip
    * @param {object} param     object for drawing text tip

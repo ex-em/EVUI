@@ -82,6 +82,17 @@ const DEFAULT_OPTIONS = {
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
   },
+  selectLabel: {
+    use: false,
+    limit: 1,
+    useDeselectOverflow: false,
+    showTip: false,
+    useSeriesOpacity: true,
+    useLabelOpacity: true,
+    fixedPosTop: false,
+    useApproximateValue: false,
+    tipBackground: '#000000',
+  },
   dragSelection: {
     use: false,
     keepDisplay: true,
@@ -120,13 +131,17 @@ export const useModel = () => {
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
-  const selectInfo = cloneDeep(props.selectedItem);
+  const selectItemInfo = cloneDeep(props.selectedItem);
+  const selectLabelInfo = cloneDeep(props.selectedLabel);
 
   const eventListeners = {
     click: async (e) => {
       await nextTick();
       if (e.label) {
         emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
+      }
+      if (e.selected) {
+        emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
       }
       emit('click', e);
     },
@@ -142,7 +157,8 @@ export const useModel = () => {
 
   return {
     eventListeners,
-    selectInfo,
+    selectItemInfo,
+    selectLabelInfo,
     getNormalizedData,
     getNormalizedOptions,
   };

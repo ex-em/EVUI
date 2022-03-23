@@ -14,7 +14,7 @@ import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options, listeners, defaultSelectInfo) {
+  constructor(target, data, options, listeners, defaultSelectItemInfo, defaultSelectLabelInfo) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
     Object.assign(this, Title);
     Object.assign(this, Legend);
@@ -65,7 +65,8 @@ class EvChart {
       count: 0,
     };
 
-    this.defaultSelectInfo = defaultSelectInfo;
+    this.defaultSelectItemInfo = defaultSelectItemInfo;
+    this.defaultSelectLabelInfo = defaultSelectLabelInfo;
   }
 
   /**
@@ -92,6 +93,7 @@ class EvChart {
 
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
+    this.initSelectedLabelInfo();
 
     this.drawChart();
 
@@ -146,11 +148,12 @@ class EvChart {
 
   /**
    * Draw each series
+   * @param {any} [hitInfo=undefined]    from mousemove callback (object or undefined)
    *
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const maxTip = this.options.maxTip;
+    const { maxTip, selectLabel } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -158,6 +161,7 @@ class EvChart {
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
+      selectLabel: { option: selectLabel, selected: this.defaultSelectLabelInfo },
     };
 
     let showIndex = 0;
@@ -189,7 +193,7 @@ class EvChart {
         } else {
           const selectInfo = hitInfo
             ?? this.lastHitInfo
-            ?? { sId: this.defaultSelectInfo?.seriesID };
+            ?? { sId: this.defaultSelectItemInfo?.seriesID };
 
           if (this.options.sunburst) {
             this.drawSunburst(selectInfo);
@@ -207,7 +211,7 @@ class EvChart {
   }
 
   /**
-   * Draw Tip with hitInfo and defaultSelectInfo
+   * Draw Tip with hitInfo and defaultSelectItemInfo
    * @param hitInfo
    */
   drawTip(hitInfo) {
@@ -221,8 +225,8 @@ class EvChart {
       tipLocationInfo = hitInfo;
     } else if (this.lastHitInfo) {
       tipLocationInfo = this.lastHitInfo;
-    } else if (this.defaultSelectInfo) {
-      tipLocationInfo = this.getItem(this.defaultSelectInfo, false);
+    } else if (this.defaultSelectItemInfo) {
+      tipLocationInfo = this.getItem(this.defaultSelectItemInfo, false);
     } else {
       tipLocationInfo = null;
     }
@@ -281,11 +285,21 @@ class EvChart {
    */
   drawAxis(hitInfo) {
     this.axesX.forEach((axis, index) => {
-      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.x[index], hitInfo);
+      axis.draw(
+        this.chartRect,
+        this.labelOffset,
+        this.axesSteps.x[index],
+        hitInfo,
+        this.defaultSelectLabelInfo);
     });
 
     this.axesY.forEach((axis, index) => {
-      axis.draw(this.chartRect, this.labelOffset, this.axesSteps.y[index]);
+      axis.draw(
+        this.chartRect,
+        this.labelOffset,
+        this.axesSteps.y[index],
+        hitInfo,
+        this.defaultSelectLabelInfo);
     });
   }
 
@@ -605,6 +619,7 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
+    this.initSelectedLabelInfo();
 
     this.render();
 
