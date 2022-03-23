@@ -1,28 +1,25 @@
 <template>
   <div class="case">
     <ev-chart
-      ref="chart1"
+      ref="chart"
       v-model:selectedLabel="defaultSelectLabel"
       :data="chartData1"
       :options="chartOptions1"
       @click="onClick"
     />
     <ev-chart
-      ref="chart2"
       v-model:selectedLabel="defaultSelectLabel"
       :data="chartData2"
       :options="chartOptions2"
       @click="onClick"
     />
     <ev-chart
-      ref="chart3"
       v-model:selectedLabel="defaultSelectLabel"
       :data="chartData3"
       :options="chartOptions3"
       @click="onClick"
     />
     <ev-chart
-      ref="chart4"
       v-model:selectedLabel="defaultSelectLabel"
       :data="chartData4"
       :options="chartOptions4"
@@ -86,10 +83,7 @@ export default {
   components: {},
 
   setup() {
-    const chart1 = ref(null);
-    const chart2 = ref(null);
-    const chart3 = ref(null);
-    const chart4 = ref(null);
+    const chart = ref(null);
 
     const chartData1 = ref({
       series: {
@@ -354,20 +348,17 @@ export default {
         .fill(0).map(() => Math.ceil(Math.random() * 100));
 
       const chartList = [chartData1, chartData2, chartData3, chartData4];
-      chartList.forEach((chart) => {
+      chartList.forEach((c) => {
         const seriesList = ['series1', 'series2'];
         seriesList.forEach((sId) => {
-          chart.value.data[sId] = getRandArr(5);
+          c.value.data[sId] = getRandArr(5);
         });
       });
     };
 
 
     return {
-      chart1,
-      chart2,
-      chart3,
-      chart4,
+      chart,
       chartData1,
       chartData2,
       chartData3,
