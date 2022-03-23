@@ -27,7 +27,6 @@ class Pie {
     this.doughnutHoleSize = 0;
     this.startAngle = 0;
     this.endAngle = 0;
-    this.slice = null;
     this.state = null;
     this.ctx = null;
     this.isSelect = false;
@@ -71,8 +70,6 @@ class Pie {
     }
 
     ctx.closePath();
-
-    this.slice = slice;
     this.ctx = ctx;
   }
 
@@ -84,8 +81,19 @@ class Pie {
    */
   findGraphData([offsetX, offsetY]) {
     const item = { data: null, hit: false, color: null, index: -1 };
+    const {
+      radius,
+      startAngle,
+      endAngle,
+      centerX,
+      centerY,
+    } = this;
 
-    if (this.show && this.ctx?.isPointInPath(this.slice, offsetX, offsetY)) {
+    const distance = Math.sqrt((offsetX - centerX) ** 2 + (offsetY - centerY) ** 2);
+    const radian = (2.5 * Math.PI) - Math.atan2((offsetX - centerX), (offsetY - centerY));
+    const isPointInPath = radius > distance && radian >= startAngle && radian <= endAngle;
+
+    if (this.show && isPointInPath) {
       item.type = this.type;
       item.data = this.data;
       item.hit = true;
