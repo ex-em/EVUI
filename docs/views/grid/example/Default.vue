@@ -310,16 +310,20 @@ export default {
     };
     const onCheckedRow = () => {
       let checkedRow = '';
-      for (let i = 0; i < checked.value.length; i++) {
-        checkedRow += JSON.stringify(checked.value[i]);
-      }
+      checked.value.forEach((row) => {
+        checkedRow += JSON.stringify(row);
+      });
       checkedRowsMV.value = checkedRow;
     };
     const onDoubleClickRow = (e) => {
       DbClickedRowsMV.value = `${e.rowData}`;
     };
-    const onClickRow = (e) => {
-      clickedRowMV.value = `${e.rowData}`;
+    const onClickRow = () => {
+      let clickedRow = '';
+      selected.value.forEach((row) => {
+        clickedRow += JSON.stringify(row);
+      });
+      clickedRowMV.value = clickedRow;
     };
     const getData = (count, startIndex) => {
       const temp = [];
