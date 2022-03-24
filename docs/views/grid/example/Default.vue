@@ -1,7 +1,6 @@
 <template>
   <div class="case">
     <p class="case-title">Grid</p>
-    <ev-button @click="onChangeSelected">change selected</ev-button>
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
@@ -367,15 +366,6 @@ export default {
     });
 
     tableData.value = getData(50, 0);
-    // selected.value = [
-    //   tableData.value[3],
-    //   tableData.value[4],
-    //   tableData.value[5],
-    //   tableData.value[6],
-    // ];
-    const onChangeSelected = () => {
-      selected.value = [tableData.value[3], tableData.value[4]];
-    };
     return {
       columns,
       tableData,
@@ -411,7 +401,6 @@ export default {
       resetBorderStyle,
       loadImage,
       onRequestData,
-      onChangeSelected,
     };
   },
 };

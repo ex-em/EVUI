@@ -18,10 +18,6 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
-        useSelection: {
-          use: true,
-          multiple: true,
-        },
         searchValue: searchVm,
         style: {
           stripe: stripeMV,
