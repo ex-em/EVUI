@@ -441,7 +441,7 @@ const modules = {
 
     if (!opt.startToZero || targetMin > 0) {
       const targetSpace = space ? (space - 1) : (targetMax - targetMin);
-      const targetStep = targetInterval || Math.ceil((max - targetMin) / targetSpace);
+      const targetStep = Math.ceil((max - targetMin) / targetSpace);
         targetMin = targetMin < targetStep ? 0 : targetMin - targetStep;
     }
 
