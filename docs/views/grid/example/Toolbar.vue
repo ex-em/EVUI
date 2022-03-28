@@ -22,6 +22,7 @@
         style: {
           stripe: stripeMV,
           border: borderMV,
+          highlight: highlightMV,
         },
         page: pageInfo,
       }"
@@ -44,7 +45,7 @@
           class="delete"
           @click="onClickAdd"
         >
-          Add
+          highlight
         </ev-button>
         <ev-button
           type="info"
@@ -162,6 +163,7 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
+    const highlightMV = ref(-1);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -229,8 +231,8 @@ export default {
     const pageInfo = reactive({
       use: true,
       visiblePage: 7,
-      currentPage: 3,
-      perPage: 7,
+      currentPage: 1,
+      perPage: 12,
       order: 'center',
       showPageInfo: true,
       total: computed(() => tableData.value.length),
@@ -238,7 +240,8 @@ export default {
     });
     getData(30, 0);
     const onClickAdd = () => {
-      tableData.value.push(['oracle', 'LIN12G', 'LIN12G', '10.10.30.10', '2016']);
+      highlightMV.value = 17;
+      // tableData.value.push(['oracle', 'LIN12G', 'LIN12G', '10.10.30.10', '2016']);
     };
     const onRequestData = (e) => {
       pageInfo.currentPage = e.pageInfo.currentPage;
@@ -272,6 +275,7 @@ export default {
       searchVm,
       orderItems,
       pageInfo,
+      highlightMV,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
