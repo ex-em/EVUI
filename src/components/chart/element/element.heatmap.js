@@ -108,7 +108,7 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = Math.ceil(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
+    this.size.w = Math.floor(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
     this.size.h = Math.floor(yArea / (this.spaces.y || (minmaxY.graphMax - minmaxY.graphMin)));
 
     this.data.forEach((item) => {
