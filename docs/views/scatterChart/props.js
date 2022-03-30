@@ -4,6 +4,8 @@ import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import SelectItem from './example/SelectItem';
+import SelectItemRaw from '!!raw-loader!./example/SelectItem';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 
@@ -14,6 +16,11 @@ export default {
       description: 'Scatter Chart는 데이터의 분포를 시각적으로 인지하도록 합니다.',
       component: Default,
       parsedData: parseComponent(DefaultRaw),
+    },
+    SelectItem: {
+      description: 'Point를 선택 표시할 수 있습니다.',
+      component: SelectItem,
+      parsedData: parseComponent(SelectItemRaw),
     },
     Event: {
       description: 'Drag Select, Click, Double Click 이벤트 등록이 가능 합니다',

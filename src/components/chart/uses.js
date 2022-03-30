@@ -81,6 +81,7 @@ const DEFAULT_OPTIONS = {
     indicatorColor: '#000000',
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
+    useSeriesOpacity: false,
   },
   selectLabel: {
     use: false,
