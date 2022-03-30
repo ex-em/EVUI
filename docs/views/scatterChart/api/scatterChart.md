@@ -11,7 +11,19 @@
 ```
 
 >## Props
-### 1. data  
+### 1. v-model:selectedItem
+- option에서 [selectItem](#selectitem) 옵션을 사용할 경우 유효한 바인딩
+- 현재 선택된 Item에 대한 정보 (seriesID, dataIndex)
+#### Example
+```
+const selectedItem = ref({
+    seriesID: 'series1', // Series ID (key)
+    dataIndex: 0, // 몇번째 데이터인지
+});
+```
+
+
+### 2. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
@@ -42,7 +54,7 @@ const chartData =
 };
 ```
   
-### 2. options 
+### 3. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | '' | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
@@ -55,6 +67,7 @@ const chartData =
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
+  | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
   
 #### axesX axesY
 ##### type 공통
@@ -176,14 +189,27 @@ const chartData =
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
 | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({x, y, name}) => y + '%' |
 
+#### selectItem
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | 차트 아이템 선택 기능  | |
+| showTextTip | Boolean | false | 선택한 위치의 TextTip(text 포함 화살표, 흡사 말풍선) 생성 여부  | |
+| tipText | String | 'value' | 선택한 위치에 TextTip을 생성한다면 어떤 값  | 'value', 'label |
+| showTip | Boolean | false | 선택한 위치의 Tip(화살표) 생성 여부  | |
+| showIndicator | Boolean | false | 선택한 label의 indicator 표시  | |
+| fixedPosTop | Boolean | false | indicator 및 tip의 위치를 최대값으로 고정  | |
+| useApproximateValue | Boolean | false | 가까운 label을 선택  | |
+| indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
+| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
+| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
+| useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |
 
-### 3. resize-timeout
+### 4. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
 
 
->### Event
-
+### 5. Event
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
  | drag-select | data, range | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
