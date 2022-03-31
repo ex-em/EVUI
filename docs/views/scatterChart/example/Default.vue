@@ -38,8 +38,6 @@
     setup() {
       const pointSize = ref(3);
       const pointStyle = ref('circle');
-      const seriesCount = ref(3);
-      const xAxisDataCount = ref(10);
 
       const pointStyleList = [{
         name: 'Circle (Default)',
@@ -183,8 +181,6 @@
         pointStyleList,
         chartData,
         chartOptions,
-        seriesCount,
-        xAxisDataCount,
       };
     },
   };

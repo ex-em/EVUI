@@ -1,5 +1,6 @@
 import { numberWithComma } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
+import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
@@ -342,18 +343,7 @@ const modules = {
 
     ctx.restore();
 
-    // set tooltipDOM's style
-    this.tooltipDOM.style.overflowY = 'hidden';
-    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
-    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
-    this.tooltipDOM.style.color = opt.fontColor;
-
-    if (opt.useShadow) {
-      const shadowColor = `rgba(0, 0, 0, ${opt.shadowOpacity})`;
-      this.tooltipDOM.style.boxShadow = `2px 2px 2px ${shadowColor}`;
-    }
-
-    this.tooltipDOM.style.display = 'block';
+    this.setTooltipDOMStyle(opt);
   },
 
   /**
@@ -421,14 +411,181 @@ const modules = {
     ctx.fillText(itemValue, itemX + COLOR_MARGIN, itemY);
     ctx.closePath();
 
-    // set tooltipDOM's style
-    this.tooltipDOM.style.overflowY = 'hidden';
-    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
-    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
-    this.tooltipDOM.style.color = opt.fontColor;
+    this.setTooltipDOMStyle(opt);
+  },
 
-    if (opt.useShadow) {
-      const shadowColor = `rgba(0, 0, 0, ${opt.shadowOpacity})`;
+  /**
+   *
+   * @param hitInfo
+   * @param context
+   */
+  drawTooltipForScatter(hitInfo, context) {
+    const ctx = context;
+    const items = hitInfo.items;
+    const [, maxValue] = hitInfo.maxTip;
+    const seriesKeys = this.alignSeriesList(Object.keys(items));
+    const boxPadding = { t: 8, b: 8, r: 8, l: 8 };
+    const opt = this.options.tooltip;
+    const xAxisOpt = this.options.axesX[0];
+
+    let x = 2;
+    let y = 2;
+
+    x += Util.aliasPixel(x);
+    y += Util.aliasPixel(y);
+
+    ctx.save();
+    ctx.scale(this.pixelRatio, this.pixelRatio);
+
+    if (this.tooltipBodyDOM.style.overflowY === 'auto') {
+      boxPadding.r += SCROLL_WIDTH;
+    }
+
+    x += boxPadding.l;
+    y += boxPadding.t;
+
+    ctx.font = FONT_STYLE;
+
+    const seriesList = [];
+    seriesKeys.forEach((seriesName) => {
+      seriesList.push({
+        data: items[seriesName].data,
+        color: items[seriesName].color,
+        name: items[seriesName].name,
+      });
+    });
+
+    if (opt.sortByValue) {
+      seriesList.sort((a, b) => {
+        let prev = a.data.o;
+        let next = b.data.o;
+
+        if (prev === null || prev === undefined) {
+          prev = a.data.y;
+        }
+
+        if (next === null || next === undefined) {
+          next = b.data.y;
+        }
+
+        return next - prev;
+      });
+    }
+
+    let textLineCnt = 1;
+    for (let ix = 0; ix < seriesList.length; ix++) {
+      const gdata = seriesList[ix].data;
+      const color = seriesList[ix].color;
+      const name = seriesList[ix].name;
+      const xValue = gdata.x;
+      let yValue;
+      if (gdata.o === null) {
+        yValue = gdata.y;
+      } else if (!isNaN(gdata.o)) {
+        yValue = gdata.o;
+      }
+
+      let itemX = x + 4;
+      let itemY = y + (textLineCnt * TEXT_HEIGHT);
+      itemX += Util.aliasPixel(itemX);
+      itemY += Util.aliasPixel(itemY);
+
+      ctx.beginPath();
+
+      if (typeof color !== 'string') {
+        ctx.fillStyle = Canvas.createGradient(
+          ctx,
+          false,
+          { x: itemX - 4, y: itemY, w: 12, h: -12 },
+          color,
+        );
+      } else {
+        ctx.fillStyle = color;
+      }
+
+      // 1. Draw series color
+      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
+      ctx.fillStyle = opt.fontColor;
+
+      // 2. Draw series name
+      ctx.textBaseline = 'Bottom';
+      const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
+        - boxPadding.l - boxPadding.r - COLOR_MARGIN - VALUE_MARGIN;
+      const xPos = itemX + COLOR_MARGIN;
+      const yPos = itemY;
+
+      if (seriesNameSpaceWidth > ctx.measureText(name).width) { // draw normally
+        ctx.fillText(name, xPos, yPos);
+      } else if (opt.textOverflow === 'wrap') { // draw with wrap
+        let line = '';
+        let yPosWithWrap = yPos;
+
+        for (let jx = 0; jx < name.length; jx++) {
+          const char = name[jx];
+          const temp = `${line}${char}`;
+
+          if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
+            ctx.fillText(line, xPos, yPosWithWrap);
+            line = char;
+            textLineCnt += 1;
+            yPosWithWrap += TEXT_HEIGHT;
+          } else {
+            line = temp;
+          }
+        }
+        ctx.fillText(line, xPos, yPosWithWrap);
+      } else { // draw with ellipsis
+        const shortSeriesName = Util.truncateLabelWithEllipsis(name, seriesNameSpaceWidth, ctx);
+        ctx.fillText(shortSeriesName, xPos, yPos);
+      }
+
+      ctx.save();
+
+      // 3. Draw value
+      let formattedTxt;
+      if (opt.formatter) {
+        formattedTxt = opt.formatter({
+          x: xValue,
+          y: yValue,
+          name,
+        });
+      }
+
+      if (!opt.formatter || typeof formattedTxt !== 'string') {
+        const formattedXValue = xAxisOpt.type === 'time'
+          ? dayjs(xValue).format(xAxisOpt.timeFormat)
+          : numberWithComma(xValue);
+        const formattedYValue = numberWithComma(yValue);
+        formattedTxt = `${formattedXValue}, ${formattedYValue}`;
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.restore();
+      ctx.closePath();
+
+      // 4. add lineSpacing
+      y += LINE_SPACING;
+      textLineCnt += 1;
+    }
+
+    ctx.restore();
+
+    this.setTooltipDOMStyle(opt);
+  },
+
+  /**
+   * set style properties on tooltip DOM
+   * @param tooltipOptions
+   */
+  setTooltipDOMStyle(tooltipOptions) {
+    this.tooltipDOM.style.overflowY = 'hidden';
+    this.tooltipDOM.style.backgroundColor = tooltipOptions.backgroundColor;
+    this.tooltipDOM.style.border = `1px solid ${tooltipOptions.borderColor}`;
+    this.tooltipDOM.style.color = tooltipOptions.fontColor;
+
+    if (tooltipOptions.useShadow) {
+      const shadowColor = `rgba(0, 0, 0, ${tooltipOptions.shadowOpacity})`;
       this.tooltipDOM.style.boxShadow = `2px 2px 2px ${shadowColor}`;
     }
 
