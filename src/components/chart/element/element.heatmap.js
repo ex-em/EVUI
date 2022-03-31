@@ -1,35 +1,21 @@
 import { merge } from 'lodash-es';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
-import { COLOR, HEAT_MAP_OPTION } from '../helpers/helpers.constant';
+import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 
 class HeatMap {
-  constructor(sId, opt, sIdx) {
+  constructor(sId, opt) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
       Object.keys(merged).forEach((key) => {
         this[key] = merged[key];
     });
 
-    ['color', 'pointFill', 'fillColor'].forEach((colorProp) => {
-      if (this[colorProp] === undefined) {
-        this[colorProp] = COLOR[sIdx];
-      }
-    });
-
-    this.colorAxis = this.createColorAxis(opt.colorOpt);
-    this.errorColor = opt.colorOpt.error;
-    this.borderColor = opt.colorOpt.border;
-
     this.sId = sId;
     this.data = [];
-    this.spaces = opt.spaces || { x: null, y: null };
+    this.valueOpt = {};
     this.size = {
       w: 0,
       h: 0,
-    };
-    this.valueOpt = {
-      max: 0,
-      interval: 0,
     };
     this.type = 'heatMap';
   }
@@ -41,7 +27,7 @@ class HeatMap {
    */
   createColorAxis(colorOpt) {
     const colorAxis = [];
-    const { min, max, categoryCnt } = colorOpt;
+    const { min, max, categoryCnt, error, border } = colorOpt;
 
     const minColor = min.includes('#') ? Util.hexToRgb(min) : min;
     const maxColor = max.includes('#') ? Util.hexToRgb(max) : max;
@@ -66,7 +52,18 @@ class HeatMap {
        });
     }
 
-    return colorAxis;
+    if (this.valueOpt.existError) {
+      colorAxis.push({
+        id: `color#${categoryCnt}`,
+        value: colorOpt.error,
+        state: 'normal',
+        show: true,
+      });
+    }
+
+    this.colorAxis = colorAxis;
+    this.errorColor = error;
+    this.borderColor = border;
   }
 
   getColorIndex(value) {
@@ -97,7 +94,7 @@ class HeatMap {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps } = param;
+    const { ctx, chartRect, labelOffset, axesSteps, labels } = param;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
@@ -108,8 +105,8 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = Math.floor(xArea / (this.spaces.x || (minmaxX.graphMax - minmaxX.graphMin)));
-    this.size.h = Math.floor(yArea / (this.spaces.y || (minmaxY.graphMax - minmaxY.graphMin)));
+    this.size.w = xArea / labels.x.length;
+    this.size.h = xArea / labels.y.length;
 
     this.data.forEach((item) => {
       item.xp = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);

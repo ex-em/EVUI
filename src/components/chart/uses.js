@@ -99,6 +99,13 @@ const DEFAULT_OPTIONS = {
     fillColor: '#38ACEC',
     opacity: 0.65,
   },
+  heatMapColor: {
+    min: '#FFFFFF',
+    max: '#0052FF',
+    categoryCnt: 5,
+    border: '#FFFFFF',
+    error: '#FF0000',
+  },
 };
 
 const DEFAULT_DATA = {

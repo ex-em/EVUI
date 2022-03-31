@@ -1,6 +1,5 @@
 import { reverse } from 'lodash-es';
 import Util from '../helpers/helpers.util';
-import { TIME_INTERVALS } from '../helpers/helpers.constant';
 
 const modules = {
   /**
@@ -37,9 +36,9 @@ const modules = {
             const sData = data[seriesID];
 
             if (series && sData) {
-              series.data = this.addSeriesDSForHeatMap(sData);
-              series.minMax = this.getSeriesMinMaxForHeatMap(series.data, series.spaces);
+              series.data = this.addSeriesDSForHeatMap(sData, label);
               series.valueOpt = this.getSeriesValueOptForHeatMap(series);
+              series.createColorAxis(this.options.heatMapColor);
             }
           });
         } else {
@@ -301,19 +300,38 @@ const modules = {
   /**
    * Take data to create data for each series
    * @param {array} data data array for each series
+   * @param {object}  label   chart label
+   *
    * @returns {array} data info added position and etc
    */
-  addSeriesDSForHeatMap(data) {
-    return data.map(item => ({
-      x: item.x,
-      y: item.y,
-      o: item.value,
-      xp: null,
-      yp: null,
-      dataColor: null,
-      value: item.value,
-      cId: null,
-    }));
+  addSeriesDSForHeatMap(data, label) {
+    const sData = [];
+
+    data.forEach((curr, index) => {
+      let gData = label.x[index];
+      let lData = label.y[index];
+
+      if (gData && typeof gData === 'object' && (curr.x || curr.y)) {
+        gData = curr.x;
+        lData = curr.y;
+      }
+
+      if (curr.value !== null) {
+        sData.push({
+          x: gData,
+          y: lData,
+          o: curr.value,
+          xp: null,
+          yp: null,
+          w: null,
+          h: null,
+          dataColor: null,
+          cId: null,
+        });
+      }
+    });
+
+    return sData;
   },
 
   /**
@@ -414,73 +432,14 @@ const modules = {
     return def;
   },
 
-  adjustMinMax(max, min, opt, space) {
-    if ((opt.type === 'time' && opt.categoryMode) || opt.type === 'step') {
-      return {
-        max,
-        min,
-      };
-    }
-
-    let targetMax = max;
-    let targetMin = min;
-    if (targetMax > 0 && opt.interval && space) {
-      if (targetMax < (opt.interval * space)) {
-        targetMax += opt.interval;
-      }
-    }
-
-    let targetInterval = opt.interval;
-    if (opt.type === 'time') {
-      if (typeof targetInterval === 'string') {
-        targetInterval = TIME_INTERVALS[targetInterval].size;
-      } else if (typeof targetInterval === 'object') {
-        targetInterval = targetInterval.time * TIME_INTERVALS[targetInterval.unit].size;
-      }
-    }
-
-    if (!opt.startToZero || targetMin > 0) {
-      const targetSpace = space ? (space - 1) : (targetMax - targetMin);
-      const targetStep = Math.ceil((max - targetMin) / targetSpace);
-        targetMin = targetMin < targetStep ? 0 : targetMin - targetStep;
-    }
-
-    return {
-      max: targetMax,
-      min: targetMin,
-    };
-  },
-  /**
-   * Take series data to create min/max info for each series
-   * @param data
-   * @param spaces
-   * @returns {*|{maxDomain: null, minY: null, minX: null, maxY: null, maxX: null}}
-   */
-  getSeriesMinMaxForHeatMap(data, spaces) {
-    const axesXOption = this.options.axesX[0];
-    const axesYOption = this.options.axesY[0];
-    const seriesMinMax = this.getSeriesMinMax(data);
-
-    const adjustX = this.adjustMinMax(seriesMinMax.maxX, seriesMinMax.minX, axesXOption, spaces.x);
-    seriesMinMax.maxX = adjustX.max;
-    seriesMinMax.minX = adjustX.min;
-
-    const adjustY = this.adjustMinMax(seriesMinMax.maxY, seriesMinMax.minY, axesYOption, spaces.y);
-    seriesMinMax.maxY = adjustY.max;
-    seriesMinMax.minY = adjustY.min;
-
-    return seriesMinMax;
-  },
-
   getSeriesValueOptForHeatMap(series) {
     const data = series.data;
-    const colorOpt = series.colorOpt;
-    const colorAxis = series.colorAxis;
+    const colorOpt = this.options.heatMapColor;
     const categoryCnt = colorOpt.categoryCnt;
 
     let maxValue = 0;
     let isExistError = false;
-    data.forEach(({ value }) => {
+    data.forEach(({ o: value }) => {
       if (maxValue < value) {
         maxValue = value;
       }
@@ -488,18 +447,10 @@ const modules = {
         isExistError = true;
       }
     });
-    const valueInterval = Math.ceil(maxValue / categoryCnt);
-    if (isExistError && colorAxis.length === categoryCnt) {
-      colorAxis.push({
-        id: `color#${categoryCnt}`,
-        value: colorOpt.error,
-        state: 'normal',
-        show: true,
-      });
-    }
+
     return {
       max: maxValue,
-      interval: valueInterval,
+      interval: Math.ceil(maxValue / categoryCnt),
       existError: isExistError,
     };
   },

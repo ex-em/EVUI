@@ -181,7 +181,7 @@ class EvChart {
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
 
-        if (chartType === 'line' || chartType === 'scatter' || chartType === 'heatMap') {
+        if (chartType === 'line' || chartType === 'scatter') {
           series.draw(opt);
         } else if (chartType === 'bar') {
           const { thickness, borderRadius } = this.options;
@@ -190,6 +190,10 @@ class EvChart {
           if (series.show) {
             showIndex++;
           }
+        } else if (chartType === 'heatMap') {
+          const labels = this.data.labels;
+          series.createColorAxis(this.options.heatMapColor);
+          series.draw({ labels, ...opt });
         } else {
           const selectInfo = hitInfo
             ?? this.lastHitInfo
@@ -243,7 +247,9 @@ class EvChart {
    */
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
-    const labels = this.data.labels;
+    const labels = this.options.type === 'heatMap'
+      ? this.data.labels[dir]
+      : this.data.labels;
     const options = this.options;
     return axes.map((axis) => {
       switch (axis.type) {
