@@ -150,7 +150,7 @@
               :data-index="row[0]"
               :class="{
                 row: true,
-                selected: row[2] === selectedRow,
+                selected: row[3],
                 'non-border': !!borderStyle && borderStyle !== 'rows',
                 highlight: row[0] === highlightIdx,
               }"
@@ -323,9 +323,10 @@ export default {
     'page-change': null,
   },
   setup(props) {
-    const ROW_INDEX = 0;
+    // const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
     const ROW_DATA_INDEX = 2;
+    const ROW_SELECT_INDEX = 3;
     const {
       isRenderer,
       getComponentName,
@@ -337,7 +338,7 @@ export default {
       (props.option.showHeader === undefined ? true : props.option.showHeader));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
-    const highlightIdx = computed(() => (props.option.style?.highlight || -1));
+    const highlightIdx = computed(() => (props.option.style?.highlight ?? -1));
     const rowMinHeight = props.option.rowMinHeight || 35;
     const elementInfo = reactive({
       body: null,
@@ -384,12 +385,13 @@ export default {
       showPageInfo: computed(() => (props.option.page?.showPageInfo || false)),
       isClientPaging: computed(() =>
         pageInfo.useClient && pageInfo.usePage && !pageInfo.isInfinite),
+      isHighlight: false,
+      highlightPage: 0,
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
       isHeaderChecked: false,
       checkedRows: props.checked,
-      checkedIndex: new Set(),
       useCheckbox: computed(() => (props.option.useCheckbox || {})),
     });
     const scrollInfo = reactive({
@@ -402,8 +404,14 @@ export default {
       hasVerticalScrollBar: false,
     });
     const selectInfo = reactive({
-      useSelect: props.option.useSelect === undefined ? true : props.option.useSelect,
       selectedRow: props.selected,
+      useSelect: computed(() => props.option?.useSelection?.use ?? true),
+      limitCount: computed(() => {
+        let limit = props.option?.useSelection?.limitCount;
+        limit = !!limit && limit >= 2 ? limit : 0;
+        return limit;
+      }),
+      multiple: computed(() => props.option?.useSelection?.multiple ?? false),
     });
     const sortInfo = reactive({
       isSorting: false,
@@ -430,10 +438,15 @@ export default {
     });
     const clearCheckInfo = () => {
       checkInfo.checkedRows = [];
-      checkInfo.checkedIndex.clear();
       checkInfo.isHeaderChecked = false;
       stores.store.forEach((row) => {
         row[ROW_CHECK_INDEX] = false;
+      });
+    };
+    const clearSelectInfo = () => {
+      selectInfo.selectedRow = [];
+      stores.store.forEach((row) => {
+        row[ROW_SELECT_INDEX] = false;
       });
     };
     const {
@@ -466,7 +479,7 @@ export default {
     const {
       onRowClick,
       onRowDblClick,
-    } = clickEvent(selectInfo);
+    } = clickEvent({ selectInfo });
 
     const {
       onCheck,
@@ -582,7 +595,6 @@ export default {
       (checkedList) => {
         checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
-        checkInfo.checkedIndex.clear();
         let store = stores.store;
         if (pageInfo.isClientPaging) {
           store = getPagingData();
@@ -590,9 +602,6 @@ export default {
         if (store.length) {
           store.forEach((row) => {
             row[ROW_CHECK_INDEX] = checkedList.includes(row[ROW_DATA_INDEX]);
-            if (row[ROW_CHECK_INDEX]) {
-              checkInfo.checkedIndex.add(row[ROW_INDEX]);
-            }
           });
           checkInfo.isHeaderChecked = checkedList.length === store.length;
         }
@@ -601,14 +610,49 @@ export default {
     );
     watch(
       () => props.selected,
-      (value) => {
-        selectInfo.selectedRow = value;
+      (selectedList) => {
+        if (selectInfo.useSelect) {
+          selectInfo.selectedRow = selectedList;
+          stores.store.forEach((row) => {
+            row[ROW_SELECT_INDEX] = selectInfo.selectedRow.includes(row[ROW_DATA_INDEX]);
+          });
+          updateVScroll();
+        }
+      },
+    );
+    watch(
+      () => highlightIdx.value,
+      async (index) => {
+        await nextTick();
+        if (index >= 0) {
+          if (pageInfo.usePage && !pageInfo.isInfinite) {
+            pageInfo.highlightPage = Math.ceil(index / pageInfo.perPage) || 1;
+            if (pageInfo.highlightPage !== pageInfo.currentPage) {
+              pageInfo.currentPage = pageInfo.highlightPage;
+              pageInfo.isHighlight = true;
+              return;
+            }
+          }
+          elementInfo.body.scrollTop = resizeInfo.rowHeight * highlightIdx.value;
+        }
       },
     );
     watch(
       () => checkInfo.useCheckbox.mode,
       () => {
         clearCheckInfo();
+      },
+    );
+    watch(
+      () => selectInfo.useSelect,
+      () => {
+        clearSelectInfo();
+      },
+    );
+    watch(
+      () => selectInfo.multiple,
+      () => {
+        clearSelectInfo();
       },
     );
     watch(
@@ -652,6 +696,7 @@ export default {
           onSearch(value?.value ?? value);
           if (pageInfo.isClientPaging) {
             clearCheckInfo();
+            clearSelectInfo();
           }
         }
       }, { immediate: true },
@@ -667,14 +712,19 @@ export default {
       }, { immediate: true },
     );
     watch(
-      () => [pageInfo.currentPage, pageInfo.perPage],
-      (currentVal, beforeVal) => {
+      () => pageInfo.currentPage,
+      (current, before) => {
         nextTick(() => {
-          changePage(beforeVal[0]);
-          if (pageInfo.isClientPaging && currentVal[0] !== beforeVal[0]) {
+          changePage(before);
+          if (pageInfo.isClientPaging && current !== before) {
             clearCheckInfo();
+            clearSelectInfo();
           }
           updateVScroll();
+          if (current === pageInfo.highlightPage && pageInfo.isHighlight) {
+            elementInfo.body.scrollTop = resizeInfo.rowHeight * highlightIdx.value;
+            pageInfo.isHighlight = !pageInfo.isHighlight;
+          }
         });
       },
     );

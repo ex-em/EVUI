@@ -197,6 +197,7 @@ const modules = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
+        hitInfo: { sId: targetId },
       });
     };
 

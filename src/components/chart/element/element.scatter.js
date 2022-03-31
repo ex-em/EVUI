@@ -69,18 +69,34 @@ class Scatter {
       return item;
     }, this.data[0]);
 
-    const getOpacity = (colorStr) => {
+    const getOpacity = (colorStr, dataIndex) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
-      return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      let resultOpacity = noneDownplayOpacity;
+
+      const { selectInfo } = param;
+      if (selectInfo) {
+        const isSelectedData = selectInfo?.seriesID === this.sId
+          && selectInfo?.dataIndex === dataIndex;
+
+        if (isSelectedData) {
+          resultOpacity = noneDownplayOpacity;
+        } else {
+          resultOpacity = 0.1;
+        }
+      } else {
+        resultOpacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      }
+
+      return resultOpacity;
     };
 
-    this.data.forEach((curr) => {
+    this.data.forEach((curr, idx) => {
       if (curr.xp !== null && curr.yp !== null) {
         const color = curr.dataColor || this.color;
-        ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color));
+        ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color, idx));
 
         const pointFillColor = curr.dataColor || this.pointFill;
-        ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor));
+        ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor, idx));
 
         Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
       }
@@ -148,11 +164,11 @@ class Scatter {
   findGraphData(offset) {
     const xp = offset[0];
     const yp = offset[1];
-    const item = { data: null, hit: false, color: this.color };
+    const item = { data: null, hit: false, color: this.color, index: null };
     const pointSize = this.pointSize;
     const gdata = this.data;
 
-    const foundItem = gdata.find((data) => {
+    const targetIndex = gdata.findIndex((data) => {
       const x = data.xp;
       const y = data.yp;
 
@@ -162,8 +178,9 @@ class Scatter {
         && (yp <= y + pointSize);
     });
 
-    if (foundItem) {
-      item.data = foundItem;
+    if (targetIndex > -1) {
+      item.data = gdata[targetIndex];
+      item.index = targetIndex;
       item.hit = true;
     }
 

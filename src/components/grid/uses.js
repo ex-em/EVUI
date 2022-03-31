@@ -1,10 +1,11 @@
 import { getCurrentInstance, nextTick } from 'vue';
-import { isEqual, uniqBy } from 'lodash-es';
+import { uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 const ROW_INDEX = 0;
 const ROW_CHECK_INDEX = 1;
 const ROW_DATA_INDEX = 2;
+const ROW_SELECT_INDEX = 3;
 
 export const commonFunctions = () => {
   const { props } = getCurrentInstance();
@@ -96,7 +97,7 @@ export const scrollEvent = (params) => {
         firstVisibleIndex = 0;
       }
 
-      const lastVisibleIndex = firstVisibleIndex + rowCount;
+      const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
 
@@ -338,7 +339,7 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const selectInfo = params;
+  const { selectInfo } = params;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -361,17 +362,41 @@ export const clickEvent = (params) => {
    * @param {object} event - 이벤트 객체
    * @param {array} row - row 데이터
    */
+  let timer = null;
   const onRowClick = (event, row) => {
     if (event.target && event.target.parentElement
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
       return false;
     }
-    if (selectInfo.useSelect) {
-      const rowData = row[ROW_DATA_INDEX];
-      selectInfo.selectedRow = rowData;
-      emit('update:selected', rowData);
-      emit('click-row', getClickedRowData(event, row));
-    }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (selectInfo.useSelect) {
+        const rowData = row[ROW_DATA_INDEX];
+        if (row[ROW_SELECT_INDEX]) {
+          row[ROW_SELECT_INDEX] = false;
+          if (selectInfo.multiple) {
+            if (event.ctrlKey) {
+              selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+            } else {
+              selectInfo.selectedRow = [rowData];
+            }
+          } else {
+            selectInfo.selectedRow = [];
+          }
+        } else {
+          row[ROW_SELECT_INDEX] = true;
+          if (event.ctrlKey
+            && selectInfo.multiple
+            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
+            selectInfo.selectedRow.push(rowData);
+          } else {
+            selectInfo.selectedRow = [rowData];
+          }
+        }
+        emit('update:selected', selectInfo.selectedRow);
+        emit('click-row', getClickedRowData(event, row));
+      }
+    }, 100);
     return true;
   };
   /**
@@ -381,9 +406,7 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    const rowData = row[ROW_DATA_INDEX];
-    selectInfo.selectedRow = rowData;
-    emit('update:selected', rowData);
+    clearTimeout(timer);
     emit('dblclick-row', getClickedRowData(event, row));
   };
   return { onRowClick, onRowDblClick };
@@ -420,12 +443,9 @@ export const checkEvent = (params) => {
     if (row[ROW_CHECK_INDEX]) {
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [row[ROW_DATA_INDEX]];
-        checkInfo.checkedIndex.clear();
       } else {
         checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
       }
-      checkInfo.checkedIndex.add(row[ROW_INDEX]);
-
       let store = stores.store;
       if (pageInfo.isClientPaging) {
         store = getPagingData();
@@ -437,10 +457,8 @@ export const checkEvent = (params) => {
     } else {
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [];
-        checkInfo.checkedIndex.clear();
       } else {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
-        checkInfo.checkedIndex.delete(row[ROW_INDEX]);
       }
       checkInfo.isHeaderChecked = false;
     }
@@ -464,12 +482,8 @@ export const checkEvent = (params) => {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX])) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
         }
-        if (!checkInfo.checkedIndex.has(row[ROW_INDEX])) {
-          checkInfo.checkedIndex.add(row[ROW_INDEX]);
-        }
       } else {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
-        checkInfo.checkedIndex.delete(row[ROW_INDEX]);
       }
       row[ROW_CHECK_INDEX] = isHeaderChecked;
     });
@@ -888,30 +902,25 @@ export const storeEvent = (params) => {
   /**
    * 전달된 데이터를 내부 store 및 속성에 저장한다.
    *
-   * @param {array} value - row 데이터
+   * @param {array} rows - row 데이터
    * @param {boolean} isMakeIndex - 인덱스 생성 유무
    */
-  const setStore = (value, isMakeIndex = true) => {
-    const store = [];
-    let checked;
-    let selected = false;
+  const setStore = (rows, isMakeIndex = true) => {
     if (isMakeIndex) {
+      const store = [];
       let hasUnChecked = false;
-      for (let ix = 0; ix < value.length; ix++) {
-        checked = props.checked.includes(value[ix]);
+      rows.forEach((row, idx) => {
+        const checked = props.checked.includes(row);
+        let selected = false;
+        if (selectInfo.useSelect) {
+          selected = props.selected.includes(row);
+        }
         if (!checked) {
           hasUnChecked = true;
         }
-        if (!selected && isEqual(selectInfo.selectedRow, value[ix])) {
-          selectInfo.selectedRow = value[ix];
-          selected = true;
-        }
-        store.push([ix, checked, value[ix]]);
-      }
-      if (!selected) {
-        selectInfo.selectedRow = [];
-      }
-      checkInfo.isHeaderChecked = value.length > 0 ? !hasUnChecked : false;
+        store.push([idx, checked, row, selected]);
+      });
+      checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

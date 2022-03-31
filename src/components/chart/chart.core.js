@@ -153,7 +153,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel } = this.options;
+    const { maxTip, selectLabel, selectItem } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -181,34 +181,74 @@ class EvChart {
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         const series = this.seriesList[chartTypeSet[jx]];
 
-        if (chartType === 'line' || chartType === 'scatter') {
-          series.draw(opt);
-        } else if (chartType === 'bar') {
-          const { thickness, borderRadius } = this.options;
-          series.draw({ thickness, borderRadius, showSeriesCount, showIndex, ...opt });
-
-          if (series.show) {
-            showIndex++;
+        switch (chartType) {
+          case 'line': {
+            series.draw(opt);
+            break;
           }
-        } else if (chartType === 'heatMap') {
-          const labels = this.data.labels;
-          series.createColorAxis(this.options.heatMapColor);
-          series.draw({ labels, ...opt });
-        } else {
-          const selectInfo = hitInfo
-            ?? this.lastHitInfo
-            ?? { sId: this.defaultSelectItemInfo?.seriesID };
-
-          if (this.options.sunburst) {
-            this.drawSunburst(selectInfo);
-          } else {
-            this.drawPie(selectInfo);
+          case 'heatMap': {
+            const labels = this.data.labels;
+            series.createColorAxis(this.options.heatMapColor);
+            series.draw({ labels, ...opt });
+            break;
           }
-
-          if (this.options.doughnutHoleSize > 0) {
-            this.drawDoughnutHole();
+          case 'bar': {
+            const { thickness, borderRadius } = this.options;
+            series.draw({ thickness, borderRadius, showSeriesCount, showIndex, ...opt });
+            if (series.show) {
+              showIndex++;
+            }
+            break;
           }
-          break;
+          case 'pie': {
+            const selectInfo = hitInfo
+              ?? this.lastHitInfo
+              ?? { sId: this.defaultSelectItemInfo?.seriesID };
+
+            if (this.options.sunburst) {
+              this.drawSunburst(selectInfo);
+            } else {
+              this.drawPie(selectInfo);
+            }
+
+            if (this.options.doughnutHoleSize > 0) {
+              this.drawDoughnutHole();
+            }
+            break;
+          }
+          case 'scatter': {
+            if (selectItem.use && selectItem.useSeriesOpacity) {
+              if (hitInfo) {
+                if (hitInfo?.maxIndex || hitInfo?.maxIndex === 0) {
+                  opt.selectInfo = {
+                    seriesID: hitInfo.sId,
+                    dataIndex: hitInfo.maxIndex,
+                  };
+                } else {
+                  opt.selectInfo = null;
+                }
+              } else if (this.lastHitInfo?.maxIndex || this.lastHitInfo?.maxIndex === 0) {
+                opt.selectInfo = {
+                  seriesID: this.lastHitInfo.sId,
+                  dataIndex: this.lastHitInfo.maxIndex,
+                };
+              } else if (this.defaultSelectItemInfo?.dataIndex
+                || this.defaultSelectItemInfo?.dataIndex === 0) {
+                opt.selectInfo = {
+                  seriesID: this.defaultSelectItemInfo.seriesID,
+                  dataIndex: this.defaultSelectItemInfo.dataIndex,
+                };
+              } else {
+                opt.selectInfo = null;
+              }
+            }
+
+            series.draw(opt);
+            break;
+          }
+          default: {
+            break;
+          }
         }
       }
     }
@@ -627,7 +667,7 @@ class EvChart {
     this.labelOffset = this.getLabelOffset();
     this.initSelectedLabelInfo();
 
-    this.render();
+    this.render(updateInfo?.hitInfo);
 
     const isDragMove = this.dragInfo && this.drawSelectionArea;
     if (isDragMove) {

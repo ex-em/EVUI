@@ -51,28 +51,30 @@ const modules = {
             selArgs.text = numberWithComma(selArgs.value);
           }
 
-          this.drawTextTip({ opt: selTipOpt, tipType: 'sel', isSamePos, ...selArgs });
+          this.drawTextTip({ opt: selTipOpt, tipType: 'sel', seriesOpt: seriesInfo, isSamePos, ...selArgs });
         }
 
         if (selTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: selTipOpt, ...selArgs });
+          this.drawFixedIndicator({ opt: selTipOpt, seriesOpt: seriesInfo, ...selArgs });
         }
       }
 
-      if (tipLocationInfo && tipLocationInfo.label !== null) {
+      if (tipLocationInfo && tipLocationInfo?.label && tipLocationInfo?.label === 0) {
         this.lastHitInfo = tipLocationInfo;
       }
     }
+
     if (maxTipOpt.use && !isExistSelectedLabel) {
       const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      maxArgs = this.calculateTipInfo(this.seriesList[maxSID], 'max', null);
+      const seriesInfo = this.seriesList[maxSID];
+      maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
 
       if (maxTipOpt.use && maxArgs) {
         maxArgs.text = numberWithComma(maxArgs.value);
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', ...maxArgs });
+        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
 
         if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, ...maxArgs });
+          this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
         }
       }
     }
@@ -175,6 +177,14 @@ const modules = {
         xArea - size.comboOffset,
         xsp + (size.comboOffset / 2),
       );
+    } else if (type === 'scatter') {
+      dp = Canvas.calculateX(
+        ldata,
+        graphX.graphMin,
+        graphX.graphMax,
+        xArea,
+        xsp,
+      );
     }
 
     const sizeObj = { xArea, yArea, graphX, graphY, xsp, xep, ysp };
@@ -185,8 +195,14 @@ const modules = {
   drawFixedIndicator(param) {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt } = param;
-    const offset = type === 'bar' ? 0 : 3;
+    const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt, seriesOpt } = param;
+    let offset = 0;
+
+    if (type === 'line') {
+      offset += 3;
+    } else if (type === 'scatter') {
+      offset += seriesOpt?.pointSize ?? 0;
+    }
 
     let gp;
 
@@ -351,12 +367,20 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
     const { graphX, graphY, xArea, yArea, xsp, xep, ysp } = param;
-    const { dp, value, text, opt, type, tipType, isSamePos } = param;
+    const { dp, value, text, opt, type, tipType, isSamePos, seriesOpt } = param;
 
     const arrowSize = 4;
     const maxTipHeight = 20;
     const borderRadius = 4;
-    const offset = type === 'bar' ? 4 : 6;
+
+    let offset = 1;
+    if (type === 'line') {
+      offset += 6;
+    } else if (type === 'scatter') {
+      offset += seriesOpt?.pointSize;
+    } else if (type === 'bar') {
+      offset += 4;
+    }
 
     let gp;
     let tdp = dp;

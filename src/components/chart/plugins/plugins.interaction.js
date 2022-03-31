@@ -54,7 +54,11 @@ const modules = {
 
         if (tooltip.use) {
           this.setTooltipLayoutPosition(hitInfo, e);
-          this.drawTooltip(hitInfo, this.tooltipCtx);
+          if (type === 'scatter') {
+            this.drawTooltipForScatter(hitInfo, this.tooltipCtx);
+          } else {
+            this.drawTooltip(hitInfo, this.tooltipCtx);
+          }
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();

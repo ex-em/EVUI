@@ -20,6 +20,11 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        useSelection: {
+          use: useSelectionMV,
+          multiple: isSelectionMultiple,
+          limitCount: limitMV,
+        },
         style: {
           stripe: stripeMV,
           border: borderMV,
@@ -82,6 +87,30 @@
         </span>
         <ev-toggle
           v-model="stripeMV"
+        />
+      </div>
+      <div class="form-rows">
+        <span class="badge yellow">
+          Use Selection
+        </span>
+        <ev-toggle
+          v-model="useSelectionMV"
+        />
+        <span class="badge yellow">
+          Multiple Selection
+        </span>
+        <ev-toggle
+          v-model="isSelectionMultiple"
+        />
+        <span class="badge yellow">
+          Limit Count
+        </span>
+        <ev-select
+          v-model="limitMV"
+          :items="limitItems"
+          :style="{ width: '200px' }"
+          clearable
+          placeholder="Please select value."
         />
       </div>
       <div class="form-rows">
@@ -198,17 +227,9 @@
           <ev-select
             v-model="borderMV"
             :items="items"
+            clearable
             placeholder="Please select value."
           />
-          <button
-            class="btn"
-            @click="resetBorderStyle"
-          >
-            <ev-icon
-              icon="ev-icon-trash3"
-              size="small"
-            />Reset
-          </button>
         </div>
       </div>
     </div>
@@ -237,6 +258,8 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
+    const useSelectionMV = ref(true);
+    const isSelectionMultiple = ref(false);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -258,6 +281,17 @@ export default {
         value: 'rows',
       },
     ]);
+    const limitMV = ref(2);
+    const limitItems = ref([
+      {
+        name: '2',
+        value: 2,
+      },
+      {
+        name: '4',
+        value: 4,
+      },
+    ]);
     const columns = ref([
       { caption: '', field: 'user-icon', type: 'string' },
       { caption: 'Name', field: 'userName', type: 'stringNumber', width: 80 },
@@ -276,16 +310,20 @@ export default {
     };
     const onCheckedRow = () => {
       let checkedRow = '';
-      for (let i = 0; i < checked.value.length; i++) {
-        checkedRow += JSON.stringify(checked.value[i]);
-      }
+      checked.value.forEach((row) => {
+        checkedRow += JSON.stringify(row);
+      });
       checkedRowsMV.value = checkedRow;
     };
     const onDoubleClickRow = (e) => {
       DbClickedRowsMV.value = `${e.rowData}`;
     };
-    const onClickRow = (e) => {
-      clickedRowMV.value = `${e.rowData}`;
+    const onClickRow = () => {
+      let clickedRow = '';
+      selected.value.forEach((row) => {
+        clickedRow += JSON.stringify(row);
+      });
+      clickedRowMV.value = clickedRow;
     };
     const getData = (count, startIndex) => {
       const temp = [];
@@ -356,6 +394,10 @@ export default {
       borderMV,
       items,
       pageInfo,
+      isSelectionMultiple,
+      useSelectionMV,
+      limitMV,
+      limitItems,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,
