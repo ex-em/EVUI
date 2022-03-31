@@ -12,7 +12,7 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useFilter: useFilterMV,
+        useFilter: false,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
@@ -117,7 +117,6 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(35);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(true);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
@@ -160,7 +159,8 @@ export default {
       {
         caption: 'Custom',
         field: 'custom',
-        type: 'string',
+        type: 'number',
+        align: 'center',
       },
       {
         caption: '',
@@ -203,9 +203,9 @@ export default {
     const getStateClass = (value) => {
       let stateColor = 'green';
       if (value >= 70) {
-        stateColor = 'yellow';
-      } else if (value >= 50) {
         stateColor = 'red';
+      } else if (value >= 50) {
+        stateColor = 'yellow';
       }
       return {
         'v-chip': true,
@@ -227,7 +227,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
       headerCheckMV,

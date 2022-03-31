@@ -12,7 +12,7 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useFilter: useFilterMV,
+        useFilter: false,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
@@ -154,9 +154,8 @@ export default {
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
     const stripeMV = ref(false);
-    const rowHeightMV = ref(35);
+    const rowHeightMV = ref(38);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(true);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
@@ -173,16 +172,15 @@ export default {
         click: () => console.log('[Menu2]'),
       },
     ]);
-    const borderMV = ref('');
+    const borderMV = ref('none');
     const searchVm = ref('');
     const columns = ref([
       { caption: '', field: 'db-icon', type: 'string' },
-      { caption: 'Instance Name', field: 'instance_name', type: 'string', width: 100 },
-      { caption: 'Business Name', field: 'business_name', type: 'string' },
-      { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false }, // searchable
-      { caption: 'RTS Port', field: 'rts_port', type: 'stringNumber' },
+      { caption: 'Instance Name', field: 'instance_name', type: 'string', width: 130 },
+      { caption: 'Business Name', field: 'business_name', type: 'string', width: 130 },
+      { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false },
+      { caption: 'RTS Port', field: 'rts_port', type: 'stringNumber', width: 80 },
       { caption: 'DB Version', field: 'db-version', type: 'string' },
-      { caption: 'Lock', field: 'is_lock', type: 'boolean', searchable: false },
     ]);
     const onCheckedRow = () => {
       let checkedRow = '';
@@ -210,7 +208,6 @@ export default {
       const portList = ['4004', '25080', '25090'];
       const dbList = ['postgresql', 'oracle', 'mongodb', 'mysql'];
       const dbVersionList = ['10gR2', '19c', '12c', '11gR2', '920'];
-      const isLock = [true, false];
       const temp = [];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
@@ -220,7 +217,6 @@ export default {
           IPList[ix % 12],
           portList[ix % 3],
           dbVersionList[ix % 5],
-          isLock[ix % 2],
         ]);
       }
       tableData.value = temp;
@@ -231,8 +227,8 @@ export default {
     const pageInfo = reactive({
       use: true,
       visiblePage: 7,
-      currentPage: 1,
-      perPage: 12,
+      currentPage: 3,
+      perPage: 9,
       order: 'center',
       showPageInfo: true,
       total: computed(() => tableData.value.length),
@@ -263,7 +259,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
       headerCheckMV,

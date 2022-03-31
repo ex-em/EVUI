@@ -108,7 +108,7 @@
               </template>
               <!-- Filter Button -->
               <span
-                v-if="isFilterButton(column.field)"
+                v-if="isFiltering"
                 class="column-filter"
                 @click.capture="onClickFilter(column)"
               >
@@ -206,8 +206,8 @@
                   </template>
                   <!-- Cell Value -->
                   <template v-else>
-                    <div :title="getConvertValue(column.type, row[2][column.index])">
-                      {{ getConvertValue(column.type, row[2][column.index]) }}
+                    <div :title="getConvertValue(column, row[2][column.index])">
+                      {{ getConvertValue(column, row[2][column.index]) }}
                     </div>
                   </template>
                 </td>
@@ -246,7 +246,20 @@
       />
     </div>
   </div>
-  <pagination
+  <!-- Summary -->
+  <grid-summary
+    v-if="useSummary"
+    :ordered-columns="orderedColumns"
+    :stores="stores"
+    :use-checkbox="useCheckbox.use"
+    :style-option="{
+      borderStyle,
+      minWidth,
+      rowHeight,
+    }"
+  />
+  <!-- Pagination -->
+  <grid-pagination
     v-if="usePage && !isInfinite"
     v-model="currentPage"
     :total="store.length"
@@ -254,15 +267,15 @@
     :visible-page="visiblePage"
     :show-page-info="showPageInfo"
     :order="order"
-  >
-  </pagination>
+  />
 </template>
 
 <script>
 import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import Toolbar from './grid.toolbar';
-import Pagination from './grid.pagination';
 import FilterWindow from './grid.filter.window';
+import GridPagination from './grid.pagination';
+import GridSummary from './grid.summary';
 import {
   commonFunctions,
   scrollEvent,
@@ -280,8 +293,9 @@ export default {
   name: 'EvGrid',
   components: {
     Toolbar,
-    Pagination,
     FilterWindow,
+    GridPagination,
+    GridSummary,
   },
   props: {
     columns: {
@@ -334,8 +348,8 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
-    const showHeader = computed(() =>
-      (props.option.showHeader === undefined ? true : props.option.showHeader));
+    const showHeader = computed(() => (props.option.showHeader ?? true));
+    const useSummary = computed(() => (props.option?.useSummary || false));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight ?? -1));
@@ -348,8 +362,7 @@ export default {
     });
     const filterInfo = reactive({
       filterList: {},
-      isFiltering: computed(() =>
-        (props.option.useFilter === undefined ? true : props.option.useFilter)),
+      isFiltering: computed(() => (props.option.useFilter ?? false)),
       setFiltering: false,
       showFilterWindow: false,
       currentFilter: {
@@ -701,9 +714,6 @@ export default {
         }
       }, { immediate: true },
     );
-    const isFilterButton = field => filterInfo.isFiltering
-      && field !== 'db-icon'
-      && field !== 'user-icon';
     watch(
       () => props.option.page?.currentPage,
       (value) => {
@@ -733,6 +743,8 @@ export default {
       stripeStyle,
       borderStyle,
       highlightIdx,
+      useSummary,
+      stores,
       ...toRefs(elementInfo),
       ...toRefs(stores),
       ...toRefs(filterInfo),
@@ -769,7 +781,6 @@ export default {
       setContextMenu,
       onContextMenu,
       onSearch,
-      isFilterButton,
     };
   },
 };
