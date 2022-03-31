@@ -33,18 +33,18 @@ export const commonFunctions = () => {
   /**
    * 데이터 타입에 따라 변환된 데이터을 반환한다.
    *
-   * @param {string} type - 데이터 유형
+   * @param {object} column - 컬럼 정보
    * @param {number|string} value - 데이터
    * @returns {number|string} 변환된 데이터
    */
-  const getConvertValue = (type, value) => {
+  const getConvertValue = (column, value) => {
     let convertValue = value;
 
-    if (type === 'number') {
+    if (column.type === 'number') {
       convertValue = numberWithComma(value);
       convertValue = convertValue === false ? value : convertValue;
-    } else if (type === 'float') {
-      convertValue = value.toFixed(3);
+    } else if (column.type === 'float') {
+      convertValue = convertValue.toFixed(column.decimal ?? 3);
     }
 
     return convertValue;
@@ -774,13 +774,13 @@ export const filterEvent = (params) => {
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
             let columnValue = row[ROW_DATA_INDEX][ix];
-            const columnType = column.type || 'string';
+            column.type = column.type || 'string';
             if (columnValue) {
               if (typeof columnValue === 'object') {
                 columnValue = columnValue[column.field];
               }
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
-                columnValue = getConvertValue(columnType, columnValue).toString();
+                columnValue = getConvertValue(column, columnValue).toString();
                 isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
                 if (isShow) {
                   break;
