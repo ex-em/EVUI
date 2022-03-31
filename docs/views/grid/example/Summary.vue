@@ -57,7 +57,6 @@ export default {
   setup() {
     const totalSummaryType = ref('sum');
     const usedSummaryType = ref('average');
-    const totalSummaryRenderer = computed(() => `${totalSummaryType.value}: {0}`);
     const summaryTypes = ref([
       { name: 'sum', value: 'sum' },
       { name: 'average', value: 'average' },
@@ -78,7 +77,7 @@ export default {
         field: 'total_mb',
         type: 'number',
         summaryType: totalSummaryType,
-        summaryRenderer: totalSummaryRenderer, // text + 해당 컬럼 값 계산
+        summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
       },
       { caption: 'Used (MB)',
         field: 'used_mb',
