@@ -244,7 +244,15 @@ class Scale {
           && (this.options.horizontal === (this.type === 'y'))
           && selectLabelInfo?.dataIndex?.length
           && !selectLabelInfo?.dataIndex?.includes(ix);
-        ctx.fillStyle = Util.colorStringToRgba(this.labelStyle.color, isBlurredLabel ? 0.1 : 1);
+
+        const labelColor = this.labelStyle.color;
+        let defaultOpacity = 1;
+
+        if (Util.getColorStringType(labelColor) === 'RGBA') {
+          defaultOpacity = Util.getOpacity(labelColor);
+        }
+
+        ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
 
         let labelPoint;
 
