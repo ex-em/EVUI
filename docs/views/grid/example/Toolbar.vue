@@ -12,7 +12,7 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useFilter: useFilterMV,
+        useFilter: false,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
@@ -154,9 +154,8 @@ export default {
     const adjustMV = ref(true);
     const showHeaderMV = ref(true);
     const stripeMV = ref(false);
-    const rowHeightMV = ref(35);
+    const rowHeightMV = ref(38);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(true);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
@@ -173,7 +172,7 @@ export default {
         click: () => console.log('[Menu2]'),
       },
     ]);
-    const borderMV = ref('');
+    const borderMV = ref('none');
     const searchVm = ref('');
     const columns = ref([
       { caption: '', field: 'db-icon', type: 'string' },
@@ -231,8 +230,8 @@ export default {
     const pageInfo = reactive({
       use: true,
       visiblePage: 7,
-      currentPage: 1,
-      perPage: 12,
+      currentPage: 3,
+      perPage: 9,
       order: 'center',
       showPageInfo: true,
       total: computed(() => tableData.value.length),
@@ -263,7 +262,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
       headerCheckMV,

@@ -71,11 +71,6 @@
     font-size: 13px;
     color: #005CC8;
   }
-  &.db-icon, &.user-icon {
-    width: 42px !important;
-    min-width: 42px !important;
-    border-right: 0;
-  }
 }
 
 .column-name {
@@ -227,14 +222,6 @@
       }
     }
     &:last-child {
-      border-right: 0;
-    }
-    &.user-icon {
-      height: auto !important;
-    }
-    &.db-icon, &.user-icon {
-      width: 42px !important;
-      min-width: 42px !important;
       border-right: 0;
     }
   }

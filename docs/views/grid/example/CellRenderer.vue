@@ -203,9 +203,9 @@ export default {
     const getStateClass = (value) => {
       let stateColor = 'green';
       if (value >= 70) {
-        stateColor = 'yellow';
-      } else if (value >= 50) {
         stateColor = 'red';
+      } else if (value >= 50) {
+        stateColor = 'yellow';
       }
       return {
         'v-chip': true,

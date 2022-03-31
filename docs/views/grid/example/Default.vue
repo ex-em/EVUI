@@ -1,6 +1,5 @@
 <template>
   <div class="case">
-    <p class="case-title">Grid</p>
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
@@ -38,22 +37,6 @@
       @dblclick-row="onDoubleClickRow"
       @page-change="onRequestData"
     >
-      <!-- renderer start -->
-      <template #user-icon>
-        <div class="user-icon"/>
-      </template>
-      <template #gridButton>
-        <ev-button
-          type="ghost"
-          size="small"
-        >
-          Delete
-        </ev-button>
-        <ev-button size="small">
-          Edit
-        </ev-button>
-      </template>
-      <!-- renderer end -->
     </ev-grid>
     <!-- description -->
     <div class="description">
@@ -293,13 +276,11 @@ export default {
       },
     ]);
     const columns = ref([
-      { caption: '', field: 'user-icon', type: 'string' },
-      { caption: 'Name', field: 'userName', type: 'stringNumber', width: 80 },
-      { caption: 'Role', field: 'role', type: 'string' },
+      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
+      { caption: 'Role', field: 'role', type: 'string', width: 100 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      { caption: 'Email', field: 'email', type: 'string' },
+      { caption: 'Email', field: 'email', type: 'string', width: 200 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
-      { caption: '', field: 'gridButton', width: 120 },
     ]);
     const resetBorderStyle = () => {
       borderMV.value = '';
@@ -331,7 +312,6 @@ export default {
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           `user_${ix + 1}`,
-          ix + 1,
           roles[ix % 2],
           '010-0000-0000',
           'kmn0827@ex-em.com',
@@ -339,16 +319,6 @@ export default {
         ]);
       }
       return temp;
-    };
-    const loadImage = (fileName) => {
-      /* eslint-disable global-require */
-      try {
-        // eslint-disable-next-line import/no-dynamic-require
-        return require(`../../../assets/images/${fileName}.jpg`);
-      } catch (e) {
-        return require('../../../assets/images/user_default.png');
-      }
-      /* eslint-enable global-require */
     };
     const onRequestData = (e) => {
       if (e.eventName?.onSort || e.eventName?.onSearch) {
@@ -403,7 +373,6 @@ export default {
       onDoubleClickRow,
       onClickRow,
       resetBorderStyle,
-      loadImage,
       onRequestData,
     };
   },
@@ -430,14 +399,5 @@ export default {
 }
 .ev-toggle {
   margin-right: 10px;
-}
-.user-icon {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #FFFFFF;
-  border-radius: 20px;
-  background: url('../../../assets/images/user_1.jpg') no-repeat center center;
-  background-size: 32px 32px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 }
 </style>
