@@ -247,62 +247,19 @@
     </div>
   </div>
   <!-- Summary -->
-  <div
+  <grid-summary
     v-if="useSummary"
-    class="table-summary"
-  >
-    <ul class="column-list">
-      <li
-        v-if="useCheckbox.use"
-        :class="{
-          'column': true,
-          'non-border': !!borderStyle,
-        }"
-        :style="{
-          'width': `${minWidth}px`,
-          'line-height': `${rowHeight}px`
-        }"
-      >
-        <span :style="`height: ${rowHeight};`" />
-      </li>
-      <template
-        v-for="(column, index) in orderedColumns"
-        :key="`summary_${index}`"
-      >
-        <li
-          v-if="!column.hide"
-          :class="{
-            column: true,
-            'non-border': !!borderStyle,
-            [column.type]: column.type,
-            [column.align]: column.align,
-          }"
-          :style="{
-            width: `${column.width}px`,
-            'min-width': `${minWidth}px`,
-            'line-height': `${rowHeight}px`,
-          }"
-        >
-          <span
-            v-if="column.summaryType || column.summaryRenderer"
-            :style="{
-              width: '100%',
-              height: `${rowHeight}px`,
-            }"
-          >
-            <template v-if="column.summaryRenderer">
-              {{ getSummaryRenderer(column) }}
-            </template>
-            <template v-else>
-              {{ getSummaryValue(column, column.summaryType)}}
-            </template>
-          </span>
-          <span v-else :style="`height: ${rowHeight};`" />
-        </li>
-      </template>
-    </ul>
-  </div>
-  <pagination
+    :ordered-columns="orderedColumns"
+    :stores="stores"
+    :use-checkbox="useCheckbox.use"
+    :style-option="{
+      borderStyle,
+      minWidth,
+      rowHeight,
+    }"
+  />
+  <!-- Pagination -->
+  <grid-pagination
     v-if="usePage && !isInfinite"
     v-model="currentPage"
     :total="store.length"
@@ -310,15 +267,15 @@
     :visible-page="visiblePage"
     :show-page-info="showPageInfo"
     :order="order"
-  >
-  </pagination>
+  />
 </template>
 
 <script>
 import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import Toolbar from './grid.toolbar';
-import Pagination from './grid.pagination';
 import FilterWindow from './grid.filter.window';
+import GridPagination from './grid.pagination';
+import GridSummary from './grid.summary';
 import {
   commonFunctions,
   scrollEvent,
@@ -336,8 +293,9 @@ export default {
   name: 'EvGrid',
   components: {
     Toolbar,
-    Pagination,
     FilterWindow,
+    GridPagination,
+    GridSummary,
   },
   props: {
     columns: {
@@ -780,71 +738,13 @@ export default {
         });
       },
     );
-    const getSummaryValue = (column, summaryType) => {
-      let result = '';
-      const columnIndex = getColumnIndex(column.field);
-      if (columnIndex >= 0) {
-        if (summaryType === 'count') {
-          return stores.store.length;
-        }
-        if (column.type === 'number' || column.type === 'float') {
-          const columnValues = stores.store.map(rows => rows[ROW_DATA_INDEX][columnIndex]);
-          switch (summaryType) {
-            case 'sum':
-              result = columnValues.reduce((prev, curr) => {
-                const value = Number(curr);
-                if (!Number.isNaN(value)) {
-                  return prev + curr;
-                }
-                return prev;
-              }, 0);
-              break;
-            case 'average':
-              result = columnValues.reduce((prev, curr) => {
-                const value = Number(curr);
-                if (!Number.isNaN(value)) {
-                  return prev + curr;
-                }
-                return prev;
-              }, 0) / columnValues.length;
-              if (result % 1 !== 0) {
-                result = result.toFixed(1);
-              }
-              break;
-            case 'max':
-              result = Math.max(...columnValues);
-              break;
-            case 'min':
-              result = Math.min(...columnValues);
-              break;
-            default:
-              break;
-          }
-          result = getConvertValue(column, result);
-        }
-      }
-      return result;
-    };
-    const getSummaryRenderer = (column) => {
-      const str = column.summaryRenderer;
-      const summaryData = column.summaryData ? column.summaryData : [];
-      const fields = [column.field, ...summaryData];
-      let result = str;
-      fields.forEach((name, idx) => {
-        const columnIndex = getColumnIndex(name);
-        if (columnIndex >= 0) {
-          const value = getSummaryValue(stores.orderedColumns[columnIndex], column.summaryType);
-          result = result.replace(`{${idx}}`, value);
-        }
-      });
-      return result;
-    };
     return {
       showHeader,
       stripeStyle,
       borderStyle,
       highlightIdx,
       useSummary,
+      stores,
       ...toRefs(elementInfo),
       ...toRefs(stores),
       ...toRefs(filterInfo),
@@ -881,8 +781,6 @@ export default {
       setContextMenu,
       onContextMenu,
       onSearch,
-      getSummaryValue,
-      getSummaryRenderer,
     };
   },
 };
