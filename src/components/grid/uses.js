@@ -97,7 +97,7 @@ export const scrollEvent = (params) => {
         firstVisibleIndex = 0;
       }
 
-      const lastVisibleIndex = firstVisibleIndex + rowCount;
+      const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
 
