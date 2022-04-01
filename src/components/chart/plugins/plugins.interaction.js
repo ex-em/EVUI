@@ -468,8 +468,12 @@ const modules = {
    */
   initSelectedLabelInfo() {
     const { use, limit } = this.options.selectLabel;
-    const infoObj = this.defaultSelectLabelInfo;
-    if (use && infoObj?.dataIndex) {
+
+    if (use) {
+      if (!this.defaultSelectLabelInfo) {
+        this.defaultSelectLabelInfo = { dataIndex: [] };
+      }
+      const infoObj = this.defaultSelectLabelInfo;
       infoObj.dataIndex.splice(limit);
       infoObj.label = infoObj.dataIndex.map(i => this.data.labels[i]);
       const dataEntries = Object.entries(this.data.data);
