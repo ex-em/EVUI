@@ -222,6 +222,19 @@ const chartData =
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
 
+#### selectLabel
+| 이름                 | 타입                          | 디폴트       | 설명                                    | 종류(예시) |
+|--------------------|-----------------------------|-----------|---------------------------------------| ----------|
+| use                | Boolean                     | false     | 차트 라벨 선택 기능                           | |
+| limit              | Number                      | 1         | 선택할 라벨의 최대 갯수                         | |
+| useDeselectOverflow | Boolean                     | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부 | |
+| showTip            | Boolean                     | false     | 선택한 위치의 Tip(화살표) 생성 여부                | |
+| useSeriesOpacity   | Boolean                     | true      | 시리즈 opacity 변경 여부                     | |
+| useLabelOpacity   | Boolean                     | true      | Axes Label opacity 변경 여부              | |
+| fixedPosTop        | Boolean                     | false     | tip의 위치를 최대값으로 고정                     | |
+| useApproximateValue | Boolean                     | false     | 가까운 label을 선택                         | |
+| tipBackground      | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                              | |
+
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|

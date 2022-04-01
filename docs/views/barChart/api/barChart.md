@@ -270,7 +270,7 @@ const chartData = {
 | useDeselectOverflow | Boolean                     | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부 | |
 | showTip             | Boolean                     | false     | 선택한 위치의 Tip(화살표) 생성 여부                | |
 | useSeriesOpacity    | Boolean                     | true      | 시리즈 opacity 변경 여부                     | |
-| useLabelOpacity     | Boolean                     | true      | 선택한 위치의 Tip(화살표) 생성 여부                | |
+| useLabelOpacity     | Boolean                     | true      | Axes Label opacity 변경 여부              | |
 | fixedPosTop         | Boolean                     | false     | tip의 위치를 최대값으로 고정                     | |
 | useApproximateValue | Boolean                     | false     | 가까운 label을 선택                         | |
 | tipBackground       | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                              | |
