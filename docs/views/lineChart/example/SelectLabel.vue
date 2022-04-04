@@ -14,16 +14,14 @@
       @click="onClick"
     />
     <div class="description">
-      <ev-button @click="togglePosition">
-        Tip Position
-      </ev-button>
-      <span class="left">
+      <ev-toggle v-model="isFixedPosTop" />
+      <span>
         tip 위치를 최상단에 고정
       </span>
       <br>
       <br>
       <ev-toggle v-model="isLive" />
-      <span class="left">
+      <span>
         데이터 자동 업데이트
       </span>
       <br>
@@ -91,6 +89,8 @@ export default {
         series5: [],
       },
     });
+    const isFixedPosTop = ref(false);
+
     const chartOptions1 = ref({
       type: 'line',
       width: '100%',
@@ -118,7 +118,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -152,7 +152,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -168,12 +168,6 @@ export default {
     const defaultSelectLabel = ref({
       dataIndex: [1],
     });
-
-    const togglePosition = () => {
-      const b = chartOptions1.value.selectLabel.fixedPosTop;
-      chartOptions1.value.selectLabel.fixedPosTop = !b;
-      chartOptions2.value.selectLabel.fixedPosTop = !b;
-    };
 
     const isLive = ref(false);
     const liveInterval = ref();
@@ -230,9 +224,9 @@ export default {
       chartOptions2,
       clickedLabel,
       defaultSelectLabel,
+      isFixedPosTop,
       isLive,
       onClick,
-      togglePosition,
     };
   },
 };
@@ -241,10 +235,5 @@ export default {
 <style lang="scss" scoped>
   .description {
     position: relative;
-  }
-  .left {
-    position: absolute;
-    left: 160px;
-    padding-top: 10px;
   }
 </style>

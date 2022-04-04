@@ -34,9 +34,7 @@
       </span>
       <br>
       <br>
-      <ev-button @click="togglePosition">
-        Tip Position
-      </ev-button>
+      <ev-toggle v-model="isFixedPosTop" />
       <span class="left">
         tip 위치를 최상단에 고정
       </span>
@@ -132,6 +130,8 @@ export default {
       },
     });
 
+    const isFixedPosTop = ref(false);
+
     const chartOptions1 = ref({
       type: 'bar',
       thickness: 0.8,
@@ -164,7 +164,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -208,7 +208,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -252,7 +252,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -296,7 +296,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -327,14 +327,6 @@ export default {
       arr.push((arr.pop() + 1) % 5);
     };
 
-    const togglePosition = () => {
-      const b = chartOptions1.value.selectLabel.fixedPosTop;
-      chartOptions1.value.selectLabel.fixedPosTop = !b;
-      chartOptions2.value.selectLabel.fixedPosTop = !b;
-      chartOptions3.value.selectLabel.fixedPosTop = !b;
-      chartOptions4.value.selectLabel.fixedPosTop = !b;
-    };
-
     const toggleOverflow = () => {
       const b = chartOptions1.value.selectLabel.useDeselectOverflow;
       chartOptions1.value.selectLabel.useDeselectOverflow = !b;
@@ -363,6 +355,7 @@ export default {
       chartData2,
       chartData3,
       chartData4,
+      isFixedPosTop,
       chartOptions1,
       chartOptions2,
       chartOptions3,
@@ -372,7 +365,6 @@ export default {
       defaultSelectLabel,
       onClick,
       toggleSelectData,
-      togglePosition,
       toggleOverflow,
       updateData,
     };
