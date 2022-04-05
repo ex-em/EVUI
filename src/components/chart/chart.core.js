@@ -187,9 +187,12 @@ class EvChart {
             break;
           }
           case 'heatMap': {
-            const labels = this.data.labels;
-            series.createColorAxis(this.options.heatMapColor);
-            series.draw({ labels, ...opt });
+            const { axesX, axesY } = this.options;
+            const axesType = {
+              x: axesX,
+              y: axesY,
+            };
+            series.draw({ ...opt, axesType });
             break;
           }
           case 'bar': {

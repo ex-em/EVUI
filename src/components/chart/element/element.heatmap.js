@@ -1,17 +1,19 @@
 import { merge } from 'lodash-es';
-import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 
 class HeatMap {
-  constructor(sId, opt) {
+  constructor(sId, opt, colorOpt) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
       Object.keys(merged).forEach((key) => {
         this[key] = merged[key];
     });
 
+    this.createColorAxis(colorOpt);
+
     this.sId = sId;
     this.data = [];
+    this.labels = {};
     this.valueOpt = {};
     this.size = {
       w: 0,
@@ -52,15 +54,6 @@ class HeatMap {
        });
     }
 
-    if (this.valueOpt.existError) {
-      colorAxis.push({
-        id: `color#${categoryCnt}`,
-        value: colorOpt.error,
-        state: 'normal',
-        show: true,
-      });
-    }
-
     this.colorAxis = colorAxis;
     this.errorColor = error;
     this.borderColor = border;
@@ -81,12 +74,56 @@ class HeatMap {
     return colorIndex;
   }
 
-  drawItem(ctx, xp, yp) {
+  drawItem(ctx, xp, yp, aliasPixel) {
     ctx.beginPath();
-    ctx.strokeRect(xp - this.size.w, yp + Math.SQRT2, this.size.w, this.size.h);
-    ctx.fillRect(xp - this.size.w, yp + Math.SQRT2, this.size.w, this.size.h);
+    if (this.borderColor) {
+      const sizeW = this.size.w - aliasPixel;
+      const sizeH = this.size.h - aliasPixel;
+      ctx.strokeRect(xp + aliasPixel, yp + aliasPixel, sizeW, sizeH);
+      ctx.fillRect(xp + aliasPixel, yp + aliasPixel, sizeW, sizeH);
+    } else {
+      ctx.fillRect(
+        xp,
+        yp - aliasPixel,
+        this.size.w + aliasPixel,
+        this.size.h + aliasPixel,
+      );
+    }
     ctx.closePath();
-    ctx.stroke();
+  }
+
+  calculateXY(dir, value, startPoint, area, max, min) {
+    let point = null;
+
+    if (this.labels[dir] && this.labels[dir].length) {
+      const index = this.labels[dir].findIndex(label => label === value);
+
+      if (index > -1) {
+        point = dir === 'x'
+          ? startPoint + (this.size.w * index)
+          : startPoint - (this.size.h * (index + 1));
+      }
+    } else {
+      if (value > max || value < min) {
+        return null;
+      }
+
+      const scalingFactor = area / (max - min);
+      point = dir === 'x'
+        ? startPoint + (scalingFactor * (value - min))
+        : startPoint - (scalingFactor * (value - (min || 0)));
+    }
+
+    return point;
+  }
+
+  getSize(dir, area, minMax, axesType) {
+    const axes = axesType[dir][0];
+    const isCategoryMode = axes.type === 'step' || (axes.type === 'time' && axes.categoryMode);
+    const steps = isCategoryMode
+      ? this.labels[dir].length
+      : this.spaces[dir] || (minMax.graphMax - minMax.graphMin);
+    return area / steps;
   }
 
   draw(param) {
@@ -94,7 +131,7 @@ class HeatMap {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps, labels } = param;
+    const { ctx, chartRect, labelOffset, axesSteps, axesType } = param;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
@@ -105,27 +142,115 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = xArea / labels.x.length;
-    this.size.h = xArea / labels.y.length;
+    this.size.w = this.getSize('x', xArea, minmaxX, axesType);
+    this.size.h = this.getSize('y', yArea, minmaxY, axesType);
 
     this.data.forEach((item) => {
-      item.xp = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-      item.yp = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+      item.xp = this.calculateXY('x', item.x, xsp, xArea, minmaxX.graphMax, minmaxX.graphMin);
+      item.yp = this.calculateXY('y', item.y, ysp, yArea, minmaxY.graphMax, minmaxY.graphMin);
+      item.w = this.size.w;
+      item.h = this.size.h;
 
       const { xp, yp, o: value } = item;
 
-      if (xp !== null && yp !== null) {
+      if (xp !== null && yp !== null && value) {
         const colorIndex = this.getColorIndex(value);
         const opacity = this.colorAxis[colorIndex].state === 'downplay' ? 0.1 : 1;
         item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
         item.cId = this.colorAxis[colorIndex].id;
         if (this.colorAxis[colorIndex].show) {
-          ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
+          if (this.borderColor) {
+            ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
+          }
           ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
-          this.drawItem(ctx, xp, yp);
+          this.drawItem(ctx, xp, yp, Util.aliasPixel(1));
+        }
+
+        if (this.showValue.use) {
+          this.drawValueLabels({
+            context: ctx,
+            data: item,
+            positions: {
+              x: xp,
+              y: yp,
+              w: item.w,
+              h: item.h,
+            },
+          });
         }
       }
     });
+  }
+
+  /**
+   * Draw value label if series 'use' of showValue option is true
+   *
+   * @param context           canvas context
+   * @param data              series value data (model.store.js addData return value)
+   */
+  drawValueLabels({ context, data }) {
+    const { fontSize, textColor, align, formatter, decimalPoint } = this.showValue;
+    const { xp: x, yp: y, w, h } = data;
+    const ctx = context;
+
+    ctx.save();
+    ctx.beginPath();
+
+    ctx.font = `normal normal normal ${fontSize}px Roboto`;
+    ctx.fillStyle = textColor;
+    ctx.lineWidth = 1;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = align !== 'center' ? 'left' : 'center';
+
+    const value = data.o;
+
+    let formattedTxt;
+    if (formatter) {
+      formattedTxt = formatter(value);
+    }
+
+    if (!formatter || typeof formattedTxt !== 'string') {
+      formattedTxt = Util.labelSignFormat(value, decimalPoint);
+    }
+
+    const vw = Math.round(ctx.measureText(formattedTxt).width);
+    const vh = fontSize;
+    const centerX = x + (w / 2);
+    const centerY = y + (h / 2);
+
+    if (vw >= w || formattedTxt < 0) {
+      return;
+    }
+
+    switch (align) {
+      case 'top': {
+        const xPos = centerX - (vw / 2);
+        const yPos = centerY - (vh / 2);
+        ctx.fillText(formattedTxt, xPos, yPos);
+        break;
+      }
+      case 'right': {
+        const xPos = x + w - vw;
+        ctx.fillText(formattedTxt, xPos, centerY);
+        break;
+      }
+      case 'bottom': {
+        const xPos = centerX - (vw / 2);
+        const yPos = centerY + (vh / 2);
+        ctx.fillText(formattedTxt, xPos, yPos);
+        break;
+      }
+      case 'left':
+        ctx.fillText(formattedTxt, x, centerY);
+        break;
+      default: {
+        const xPos = centerX - (vw / 2);
+        ctx.fillText(formattedTxt, xPos, centerY);
+        break;
+      }
+    }
+
+    ctx.restore();
   }
 
   /**
@@ -183,16 +308,13 @@ class HeatMap {
       color: null,
       name: null,
     };
-    const wSize = this.size.w;
-    const hSize = this.size.h;
     const gdata = this.data;
 
     const foundItem = gdata.find((data) => {
-      const x = data.xp;
-      const y = data.yp;
+      const { xp: x, yp: y, w: wSize, h: hSize } = data;
 
-      return (x - wSize <= xp)
-        && (xp <= x)
+      return (x <= xp)
+        && (xp <= x + wSize)
         && (y <= yp)
         && (yp <= y + hSize);
     });
