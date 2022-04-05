@@ -814,7 +814,7 @@ export const filterEvent = (params) => {
       onResize();
     }, 500);
   };
-  return { onSearch, makeParentShow };
+  return { onSearch };
 };
 
 export const pagingEvent = (params) => {

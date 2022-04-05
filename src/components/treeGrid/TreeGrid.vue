@@ -437,7 +437,6 @@ export default {
 
     const {
       onSearch,
-      makeParentShow,
     } = filterEvent({
       stores,
       filterInfo,
@@ -488,25 +487,55 @@ export default {
       () => styleInfo.highlightIdx,
       async (index) => {
         await nextTick();
+        const setChildShow = (data) => {
+          if (!data?.children) {
+            return;
+          }
+          const { children } = data;
+          children.forEach((node) => {
+            const childNode = node;
+            if (childNode.parent.show && childNode.parent.expand) {
+              childNode.show = true;
+            } else {
+              childNode.show = false;
+            }
+            childNode.isFilter = true;
+            if (childNode.hasChild) {
+              setChildShow(childNode);
+            }
+          });
+        };
+        const setParentShow = (data) => {
+          if (!data?.parent) {
+            return;
+          }
+          const { parent } = data;
+          parent.show = true;
+          parent.isFilter = true;
+          parent.expand = true;
+          setChildShow(parent);
+          setParentShow(parent);
+        };
         if (index >= 0) {
+          const highlightNode = stores.store.find(node => node.index === index);
+          if (!highlightNode) {
+            return;
+          }
+          // highlightNode parents 자동 펼치기
+          highlightNode.show = true;
+          highlightNode.isFilter = true;
+          setParentShow(highlightNode);
           if (pageInfo.usePage && !pageInfo.isInfinite) {
-            const highlightNode = stores.store.find(s => s.index === index);
-            if (highlightNode) {
-              highlightNode.show = true;
-              highlightNode.isFilter = true;
-              makeParentShow(highlightNode); // highlightNode parents 펼치기
-              const highlightNodeIndex = (stores.showTreeStore
+            const highlightNodeIndex = (stores.showTreeStore
                 .map(node => node.index)
                 .indexOf(highlightNode.index)
-              ) + 1;
-              pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) || 1;
-            }
+              ) + 1; // tree 에 보여지는 데이터 기준으로 index 다시 구하기
+            pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) || 1;
             if (pageInfo.highlightPage !== pageInfo.currentPage) {
               pageInfo.currentPage = pageInfo.highlightPage;
               pageInfo.isHighlight = true;
               return;
             }
-            updateVScroll();
           }
           elementInfo.body.scrollTop = resizeInfo.rowHeight * styleInfo.highlightIdx;
         }
