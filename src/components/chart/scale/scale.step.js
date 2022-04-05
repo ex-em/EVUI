@@ -182,7 +182,10 @@ class StepScale extends Scale {
       });
 
       if (this.rangeMode && this.showGrid) {
-        const labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
+        let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
+        if (isNaN(labelLastText)) {
+          labelLastText = 'Max';
+        }
         labelCenter = Math.round(startPoint + (labelGap * labels.length));
         linePosition = labelCenter + aliasPixel;
 
