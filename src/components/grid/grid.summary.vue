@@ -84,6 +84,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isTree: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const ROW_DATA_INDEX = 2;
@@ -112,13 +116,18 @@ export default {
           return stores.value.store.length;
         }
         if (column.type === 'number' || column.type === 'float') {
-          const columnValues = stores.value.store.map(rows => rows[ROW_DATA_INDEX][columnIndex]);
+          let columnValues = [];
+          if (props.isTree) {
+            columnValues = stores.value.store.map(node => node.data?.[column.field]);
+          } else {
+            columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
+          }
           switch (summaryType) {
             case 'sum':
               result = columnValues.reduce((prev, curr) => {
                 const value = Number(curr);
                 if (!Number.isNaN(value)) {
-                  return prev + curr;
+                  return prev + value;
                 }
                 return prev;
               }, 0);
@@ -127,7 +136,7 @@ export default {
               result = columnValues.reduce((prev, curr) => {
                 const value = Number(curr);
                 if (!Number.isNaN(value)) {
-                  return prev + curr;
+                  return prev + value;
                 }
                 return prev;
               }, 0) / columnValues.length;
@@ -180,8 +189,10 @@ export default {
 <style lang="scss" scoped>
 @import 'style/grid.scss';
 .grid-summary {
-  background-color: #F8F9F9;
-  border-bottom: 1px solid #CFCFCF;
+  @include evThemify() {
+    border-bottom: 1px solid evThemed('disabled');
+    background-color: evThemed('background-lighten');
+  }
   .non-border {
     border-bottom: none !important;
   }
@@ -190,7 +201,10 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 14px;
-    color: #737373;
+
+    @include evThemify() {
+      color: evThemed('font-color-base');
+    }
   }
   .column {
     &.number,

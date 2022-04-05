@@ -81,7 +81,7 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value.data}`),
+        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value[0].data}`),
       }, {
         text: 'Menu2',
         click: () => console.log('[Menu2]'),

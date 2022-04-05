@@ -24,8 +24,7 @@
       }"
     >
       <template #increment_mb="{ item }">
-        {{ `${numberWithComma(item.row[2][item.column.index])}
-        (${item.row[2][item.column.index + 1]}%)` }}
+        {{ getIncrementValue(item) }}
       </template>
     </ev-grid>
     <div class="description">
@@ -115,6 +114,11 @@ export default {
       total: computed(() => tableData.value.length),
       useClient: true,
     });
+    const getIncrementValue = (item) => {
+      const row = item.row[2];
+      const columnIndex = item.column.index;
+      return `${numberWithComma(row[columnIndex])}(${row[columnIndex + 1]}%)`;
+    };
     return {
       columns,
       tableData,
@@ -124,7 +128,7 @@ export default {
       totalSummaryType,
       summaryTypes,
       usedSummaryType,
-      numberWithComma,
+      getIncrementValue,
     };
   },
 };

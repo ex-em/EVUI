@@ -1,19 +1,18 @@
 <template>
   <div
-    v-if="!!$slots.toolbar"
+    v-if="$slots.toolbar"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
-    <toolbar v-if="!!$slots.toolbar" >
+    <toolbar>
       <template #toolbarWrapper>
         <slot
           name="toolbar"
           :item="{
             onSearch,
           }"
-        >
-        </slot>
+        />
       </template>
     </toolbar>
   </div>
@@ -26,20 +25,20 @@
     }"
     :style="gridStyle"
   >
-    <!--Table-->
+    <!-- Table -->
     <div
       v-cloak
       ref="grid"
       :class="gridClass"
     >
-      <!--Header-->
+      <!-- Header -->
       <div
         v-show="showHeader"
         ref="header"
         :class="headerClass"
       >
         <ul class="column-list">
-          <!--Header Checkbox-->
+          <!-- Header Checkbox -->
           <li
             v-if="useCheckbox.use"
             :class="headerCheckboxClass"
@@ -51,7 +50,7 @@
               @change="onCheckAll"
             />
           </li>
-          <!--Column List-->
+          <!-- Column List -->
           <template
             v-for="(column, index) in orderedColumns"
             :key="index"
@@ -62,14 +61,14 @@
               :class="getColumnClass(column)"
               :style="getColumnStyle(column)"
             >
-              <!--Column Name-->
+              <!-- Column Name -->
               <span
                 :title="column.caption"
                 class="column-name"
               >
                 {{ column.caption }}
               </span>
-              <!--Column Resize-->
+              <!-- Column Resize -->
               <span
                 class="column-resize"
                 @mousedown.stop.left="onColumnResize(index, $event)"
@@ -78,7 +77,7 @@
           </template>
         </ul>
       </div>
-      <!--Body-->
+      <!-- Body -->
       <div
         ref="body"
         :class="bodyStyle"
@@ -86,7 +85,7 @@
         @contextmenu="onContextMenu($event)"
         @contextmenu.prevent="menu.show"
       >
-        <!--vScroll Top-->
+        <!-- vScroll Top -->
         <div
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
@@ -114,7 +113,7 @@
               @click-tree-data="onRowClick"
               @dbl-click-tree-data="onRowDblClick"
             >
-              <!-- cell renderer -->
+              <!-- Cell Renderer -->
               <template
                 v-for="(column, cellIndex) in orderedColumns"
                 :key="cellIndex"
@@ -131,7 +130,9 @@
                   </slot>
                 </template>
                 <template v-else>
-                  <span :title="node[column.field]">{{node[column.field]}}</span>
+                  <span :title="getConvertValue(column, node[column.field])">
+                    {{ getConvertValue(column, node[column.field]) }}
+                  </span>
                 </template>
               </template>
             </tree-grid-node>
@@ -140,18 +141,18 @@
             </tr>
           </tbody>
         </table>
-        <!--vScroll Bottom-->
+        <!-- vScroll Bottom -->
         <div
           :style="`height: ${vScrollBottomHeight}px;`"
           class="vscroll-spacer"
         />
-        <!--Context Menu-->
+        <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
           :items="contextMenuItems"
         />
       </div>
-      <!--Resize Line-->
+      <!-- Resize Line -->
       <div
         v-show="showResizeLine"
         ref="resizeLine"
@@ -159,12 +160,37 @@
       />
     </div>
   </div>
+  <!-- Summary -->
+  <grid-summary
+    v-if="useSummary"
+    :is-tree="true"
+    :ordered-columns="orderedColumns"
+    :stores="stores"
+    :use-checkbox="useCheckbox.use"
+    :style-option="{
+      borderStyle,
+      minWidth,
+      rowHeight,
+    }"
+  />
+  <!-- Pagination -->
+  <grid-pagination
+    v-if="usePage && !isInfinite"
+    v-model="currentPage"
+    :total="showTreeStore.length"
+    :per-page="perPage"
+    :visible-page="visiblePage"
+    :show-page-info="showPageInfo"
+    :order="order"
+  />
 </template>
 
 <script>
 import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
+import GridPagination from '../grid/grid.pagination';
+import GridSummary from '../grid/grid.summary';
 import {
   commonFunctions,
   scrollEvent,
@@ -174,6 +200,7 @@ import {
   contextMenuEvent,
   treeEvent,
   filterEvent,
+  pagingEvent,
 } from './uses';
 
 export default {
@@ -181,6 +208,8 @@ export default {
   components: {
     treeGridNode,
     Toolbar,
+    GridPagination,
+    GridSummary,
   },
   props: {
     columns: {
@@ -200,8 +229,8 @@ export default {
       default: '100%',
     },
     selected: {
-      type: [Array, Object],
-      default: null,
+      type: [Array],
+      default: () => [],
     },
     checked: {
       type: [Array],
@@ -227,8 +256,10 @@ export default {
     'update:checked': null,
     'check-row': null,
     'check-all': null,
+    'page-change': null,
   },
   setup(props) {
+    const useSummary = computed(() => (props.option?.useSummary || false));
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -243,12 +274,30 @@ export default {
       treeStore: [],
       viewStore: [],
       filterStore: [],
+      pagingStore: [],
       treeRows: props.rows,
       searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       orderedColumns: computed(() =>
         props.columns.map((column, index) => ({ index, ...column }))),
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
+    });
+    const pageInfo = reactive({
+      usePage: computed(() => (props.option.page?.use || false)),
+      useClient: props.option.page?.useClient || false,
+      isInfinite: computed(() => (props.option.page?.isInfinite || false)),
+      startIndex: 0,
+      prevPage: 0,
+      currentPage: 0,
+      total: computed(() => (props.option.page?.total || 0)),
+      perPage: computed(() => (props.option.page?.perPage || 20)),
+      visiblePage: computed(() => (props.option.page?.visiblePage || 8)),
+      order: computed(() => (props.option.page?.order || 'center')),
+      showPageInfo: computed(() => (props.option.page?.showPageInfo || false)),
+      isClientPaging: computed(() =>
+        pageInfo.useClient && pageInfo.usePage && !pageInfo.isInfinite),
+      isHighlight: false,
+      highlightPage: 0,
     });
     const checkInfo = reactive({
       prevCheckedRow: [],
@@ -274,8 +323,14 @@ export default {
       hasVerticalScrollBar: false,
     });
     const selectInfo = reactive({
-      useSelect: props.option.useSelect === undefined ? true : props.option.useSelect,
       selectedRow: props.selected,
+      useSelect: computed(() => props.option?.useSelection?.use ?? true),
+      limitCount: computed(() => {
+        let limit = props.option?.useSelection?.limitCount;
+        limit = !!limit && limit >= 2 ? limit : 0;
+        return limit;
+      }),
+      multiple: computed(() => props.option?.useSelection?.multiple ?? false),
     });
     const contextInfo = reactive({
       menu: null,
@@ -299,13 +354,45 @@ export default {
         (props.option.showHeader === undefined ? true : props.option.showHeader)),
       stripeStyle: computed(() => props.option.style?.stripe || false),
       borderStyle: computed(() => props.option.style?.border || ''),
-      highlightIdx: computed(() => props.option.style?.highlight),
+      highlightIdx: computed(() => props.option.style?.highlight ?? -1),
+    });
+    const clearSelectInfo = () => {
+      selectInfo.selectedRow.length = 0;
+      stores.store.forEach((row) => {
+        row.selected = false;
+      });
+    };
+    const clearCheckInfo = () => {
+      checkInfo.isHeaderChecked = false;
+      checkInfo.checkedRows.length = 0;
+      stores.store.forEach((row) => {
+        row.checked = false;
+      });
+    };
+    const {
+      getPagingData,
+      updatePagingInfo,
+      changePage,
+    } = pagingEvent({
+      stores,
+      pageInfo,
+      filterInfo,
+      elementInfo,
+      clearCheckInfo,
     });
     const {
       updateVScroll,
       updateHScroll,
       onScroll,
-    } = scrollEvent({ scrollInfo, stores, elementInfo, resizeInfo });
+    } = scrollEvent({
+      scrollInfo,
+      stores,
+      elementInfo,
+      resizeInfo,
+      pageInfo,
+      getPagingData,
+      updatePagingInfo,
+    });
 
     const {
       onRowClick,
@@ -315,14 +402,28 @@ export default {
     const {
       onCheck,
       onCheckAll,
-    } = checkEvent({ checkInfo, stores, checkHeader });
+    } = checkEvent({
+      checkInfo,
+      stores,
+      checkHeader,
+      pageInfo,
+      getPagingData,
+      updatePagingInfo,
+    });
 
     const {
       calculatedColumn,
       onResize,
       onShow,
       onColumnResize,
-    } = resizeEvent({ resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll });
+    } = resizeEvent({
+      resizeInfo,
+      elementInfo,
+      checkInfo,
+      stores,
+      isRenderer,
+      updateVScroll,
+    });
 
     const {
       setContextMenu,
@@ -336,7 +437,17 @@ export default {
 
     const {
       onSearch,
-    } = filterEvent({ stores, filterInfo, getConvertValue, onResize, checkHeader });
+      makeParentShow,
+    } = filterEvent({
+      stores,
+      filterInfo,
+      pageInfo,
+      getConvertValue,
+      onResize,
+      checkHeader,
+      getPagingData,
+      updatePagingInfo,
+    });
 
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
@@ -344,10 +455,14 @@ export default {
     onActivated(() => {
       onResize();
     });
+
     watch(
       () => props.checked,
       (checkedList) => {
-        const store = stores.store;
+        let store = stores.store;
+        if (pageInfo.isClientPaging) {
+          store = getPagingData();
+        }
         checkInfo.checkedRows = checkedList;
         checkInfo.isHeaderChecked = false;
         if (store.length) {
@@ -361,8 +476,40 @@ export default {
     );
     watch(
       () => props.selected,
-      (value) => {
-        selectInfo.selectedRow = value;
+      (selectedList) => {
+        selectInfo.selectedRow = selectedList;
+        stores.store.forEach((row) => {
+          row.selected = !!selectInfo.selectedRow.find(s => s.index === row.index);
+        });
+        updateVScroll();
+      }, { deep: true },
+    );
+    watch(
+      () => styleInfo.highlightIdx,
+      async (index) => {
+        await nextTick();
+        if (index >= 0) {
+          if (pageInfo.usePage && !pageInfo.isInfinite) {
+            const highlightNode = stores.store.find(s => s.index === index);
+            if (highlightNode) {
+              highlightNode.show = true;
+              highlightNode.isFilter = true;
+              makeParentShow(highlightNode); // highlightNode parents 펼치기
+              const highlightNodeIndex = (stores.showTreeStore
+                .map(node => node.index)
+                .indexOf(highlightNode.index)
+              ) + 1;
+              pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) || 1;
+            }
+            if (pageInfo.highlightPage !== pageInfo.currentPage) {
+              pageInfo.currentPage = pageInfo.highlightPage;
+              pageInfo.isHighlight = true;
+              return;
+            }
+            updateVScroll();
+          }
+          elementInfo.body.scrollTop = resizeInfo.rowHeight * styleInfo.highlightIdx;
+        }
       },
     );
     watch(
@@ -370,6 +517,18 @@ export default {
       () => {
         checkInfo.checkedRows = [];
         checkInfo.isHeaderChecked = false;
+      },
+    );
+    watch(
+      () => selectInfo.useSelect,
+      () => {
+        clearSelectInfo();
+      },
+    );
+    watch(
+      () => selectInfo.multiple,
+      () => {
+        clearSelectInfo();
       },
     );
     watch(
@@ -408,9 +567,37 @@ export default {
         nextTick(() => {
           if (value !== undefined) {
             onSearch(value?.value ?? value);
+            if (pageInfo.isClientPaging) {
+              clearCheckInfo();
+              clearSelectInfo();
+            }
           }
         });
       }, { immediate: true },
+    );
+    watch(
+      () => props.option.page?.currentPage,
+      (value) => {
+        const current = !value ? 1 : value;
+        pageInfo.currentPage = !props.option.page?.isInfinite ? current : 1;
+      }, { immediate: true },
+    );
+    watch(
+      () => pageInfo.currentPage,
+      (current, before) => {
+        nextTick(() => {
+          changePage(before);
+          if (pageInfo.isClientPaging && current !== before) {
+            clearCheckInfo();
+            clearSelectInfo();
+          }
+          updateVScroll();
+          if (current === pageInfo.highlightPage && pageInfo.isHighlight) {
+            elementInfo.body.scrollTop = resizeInfo.rowHeight * styleInfo.highlightIdx;
+            pageInfo.isHighlight = !pageInfo.isHighlight;
+          }
+        });
+      },
     );
     const gridStyle = computed(() => ({
       width: resizeInfo.gridWidth,
@@ -459,6 +646,14 @@ export default {
     const getSlotName = column => `${column}Node`;
 
     return {
+      gridStyle,
+      gridClass,
+      headerClass,
+      headerCheckboxClass,
+      isHeaderCheckbox,
+      bodyStyle,
+      useSummary,
+      stores,
       ...toRefs(styleInfo),
       ...toRefs(elementInfo),
       ...toRefs(stores),
@@ -468,6 +663,7 @@ export default {
       ...toRefs(selectInfo),
       ...toRefs(checkInfo),
       ...toRefs(contextInfo),
+      ...toRefs(pageInfo),
       isRenderer,
       getComponentName,
       getConvertValue,
@@ -488,15 +684,9 @@ export default {
       onContextMenu,
       onSearch,
       handleExpand,
-      gridStyle,
-      gridClass,
-      headerClass,
-      headerCheckboxClass,
-      isHeaderCheckbox,
       getColumnClass,
       getColumnStyle,
       getSlotName,
-      bodyStyle,
     };
   },
 };

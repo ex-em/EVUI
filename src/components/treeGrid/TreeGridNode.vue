@@ -26,7 +26,7 @@
       <td
         v-if="!column.hide"
         :data-name="column.field"
-        :data-index="column.index"
+        :data-index="node.index"
         :class="getColumnClass(column, cellIndex)"
         :style="getColumnStyle(column)"
       >
@@ -83,8 +83,7 @@
               :item="{
                 data: node.data,
               }"
-            >
-            </slot>
+            />
           </template>
         </div>
       </td>
@@ -185,7 +184,7 @@ export default {
       'tree-row': true,
       [`tree-row--level-${nodeInfo?.level}`]: true,
       highlight: nodeInfo?.index === props.highlightIndex,
-      selected: nodeInfo?.index === props.selectedData?.index,
+      selected: nodeInfo.selected,
       'non-border': !!props.borderStyle && props.borderStyle !== 'rows',
     });
     const checkboxClass = computed(() => ({
@@ -213,17 +212,17 @@ export default {
       };
     };
     return {
+      parentIconMV,
+      childIconMV,
+      node,
+      isDataIcon,
+      checkboxClass,
       onCheck,
       onExpand,
       onClick,
       onDblClick,
       expandIconClasses,
-      parentIconMV,
-      childIconMV,
-      node,
-      isDataIcon,
       getRowClass,
-      checkboxClass,
       getColumnClass,
       getColumnStyle,
       getDepthStyle,
