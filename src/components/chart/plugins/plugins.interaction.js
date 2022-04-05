@@ -56,6 +56,8 @@ const modules = {
           this.setTooltipLayoutPosition(hitInfo, e);
           if (type === 'scatter') {
             this.drawTooltipForScatter(hitInfo, this.tooltipCtx);
+          } else if (type === 'heatMap') {
+            this.drawToolTipForHeatMap(hitInfo, this.tooltipCtx);
           } else {
             this.drawTooltip(hitInfo, this.tooltipCtx);
           }
@@ -112,7 +114,7 @@ const modules = {
           this.render(hitInfo);
         }
 
-        ({ label: args.label, value: args.value, sId: args.seriesId } = hitInfo);
+        ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
       }
 
       if (typeof this.listeners['dbl-click'] === 'function') {
@@ -140,6 +142,7 @@ const modules = {
           value: args.value,
           sId: args.seriesId,
           maxIndex: args.dataIndex,
+          acc: args.acc,
         } = hitInfo);
       }
 

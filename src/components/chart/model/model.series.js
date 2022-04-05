@@ -54,7 +54,7 @@ const modules = {
       return new Pie(id, opt, index);
     } else if (type === 'heatMap') {
       this.seriesInfo.charts.heatMap.push(id);
-      return new HeatMap(id, opt);
+      return new HeatMap(id, opt, this.options.heatMapColor);
     }
 
     return false;

@@ -104,7 +104,7 @@ const DEFAULT_OPTIONS = {
     min: '#FFFFFF',
     max: '#0052FF',
     categoryCnt: 5,
-    border: '#FFFFFF',
+    border: null,
     error: '#FF0000',
   },
 };

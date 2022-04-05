@@ -36,9 +36,10 @@ const modules = {
             const sData = data[seriesID];
 
             if (series && sData) {
-              series.data = this.addSeriesDSForHeatMap(sData, label);
+              series.labels = label;
+              series.data = this.addSeriesDSForHeatMap(sData);
+              series.minMax = this.getSeriesMinMax(series.data);
               series.valueOpt = this.getSeriesValueOptForHeatMap(series);
-              series.createColorAxis(this.options.heatMapColor);
             }
           });
         } else {
@@ -304,34 +305,18 @@ const modules = {
    *
    * @returns {array} data info added position and etc
    */
-  addSeriesDSForHeatMap(data, label) {
-    const sData = [];
-
-    data.forEach((curr, index) => {
-      let gData = label.x[index];
-      let lData = label.y[index];
-
-      if (gData && typeof gData === 'object' && (curr.x || curr.y)) {
-        gData = curr.x;
-        lData = curr.y;
-      }
-
-      if (curr.value !== null) {
-        sData.push({
-          x: gData,
-          y: lData,
-          o: curr.value,
-          xp: null,
-          yp: null,
-          w: null,
-          h: null,
-          dataColor: null,
-          cId: null,
-        });
-      }
-    });
-
-    return sData;
+  addSeriesDSForHeatMap(data) {
+    return data.map(({ x, y, value }) => ({
+      x,
+      y,
+      o: value,
+      xp: null,
+      yp: null,
+      w: null,
+      h: null,
+      dataColor: null,
+      cId: null,
+    }));
   },
 
   /**
@@ -447,6 +432,15 @@ const modules = {
         isExistError = true;
       }
     });
+
+    if (isExistError) {
+      series.colorAxis.push({
+        id: `color#${categoryCnt}`,
+        value: colorOpt.error,
+        state: 'normal',
+        show: true,
+      });
+    }
 
     return {
       max: maxValue,

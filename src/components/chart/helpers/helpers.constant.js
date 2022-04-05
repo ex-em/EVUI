@@ -143,10 +143,6 @@ export const HEAT_MAP_OPTION = {
     formatter: null,
     decimalPoint: 0,
   },
-  spaces: {
-    x: 0,
-    y: 0,
-  },
 };
 
 

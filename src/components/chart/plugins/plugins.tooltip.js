@@ -311,13 +311,6 @@ const modules = {
             value,
             name,
           });
-        } else if (this.options.type === 'heatMap') {
-          formattedTxt = opt.formatter({
-            x: this.options.horizontal ? hitItem.y : hitItem.x,
-            y: this.options.horizontal ? hitItem.x : hitItem.y,
-            name,
-            value,
-          });
         } else {
           formattedTxt = opt.formatter({
             x: this.options.horizontal ? value : hitItem.x,
@@ -363,12 +356,13 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
+    let xValue = '';
+    let yValue = '';
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    if (this.axesX.length && this.axesY.length) {
-      this.tooltipHeaderDOM.textContent = this.options.horizontal
-        ? `${this.axesY[hitAxis.y].getLabelFormat(hitItem.y)} / ${this.axesX[hitAxis.x].getLabelFormat(hitItem.x)}`
-        : `${this.axesX[hitAxis.x].getLabelFormat(hitItem.x)} / ${this.axesY[hitAxis.y].getLabelFormat(hitItem.y)}`;
+    if (this.axesX.length) {
+      xValue = this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+      this.tooltipHeaderDOM.textContent = xValue;
     }
 
     if (opt.textOverflow) {
@@ -402,13 +396,35 @@ const modules = {
       ctx.fillStyle = hitColor;
     }
 
-    // 1. Draw series color
+    // 1. Draw value color
     ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
     ctx.fillStyle = opt.fontColor;
 
-    // 2. Draw series name
+    // 2. Draw value y names
     ctx.textBaseline = 'Bottom';
-    ctx.fillText(itemValue, itemX + COLOR_MARGIN, itemY);
+    if (this.axesY.length) {
+      yValue = this.axesY[hitAxis.y].getLabelFormat(hitItem.y);
+      ctx.fillText(yValue, itemX + COLOR_MARGIN, itemY);
+    }
+
+    // 3. Draw value
+    let formattedTxt;
+    if (opt.formatter) {
+      formattedTxt = opt.formatter({
+        x: xValue,
+        y: yValue,
+        value: itemValue,
+      });
+    }
+
+    if ((!opt.formatter || typeof formattedTxt !== 'string') && itemValue !== 'error') {
+      formattedTxt = numberWithComma(itemValue);
+    } else {
+      formattedTxt = itemValue;
+    }
+
+    ctx.textAlign = 'right';
+    ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
     ctx.closePath();
 
     this.setTooltipDOMStyle(opt);

@@ -92,7 +92,7 @@ class HeatMap {
     ctx.closePath();
   }
 
-  calculateXY(dir, value, startPoint, area, max, min) {
+  calculateXY(dir, value, startPoint) {
     let point = null;
 
     if (this.labels[dir] && this.labels[dir].length) {
@@ -103,27 +103,9 @@ class HeatMap {
           ? startPoint + (this.size.w * index)
           : startPoint - (this.size.h * (index + 1));
       }
-    } else {
-      if (value > max || value < min) {
-        return null;
-      }
-
-      const scalingFactor = area / (max - min);
-      point = dir === 'x'
-        ? startPoint + (scalingFactor * (value - min))
-        : startPoint - (scalingFactor * (value - (min || 0)));
     }
 
     return point;
-  }
-
-  getSize(dir, area, minMax, axesType) {
-    const axes = axesType[dir][0];
-    const isCategoryMode = axes.type === 'step' || (axes.type === 'time' && axes.categoryMode);
-    const steps = isCategoryMode
-      ? this.labels[dir].length
-      : this.spaces[dir] || (minMax.graphMax - minMax.graphMin);
-    return area / steps;
   }
 
   draw(param) {
@@ -131,10 +113,7 @@ class HeatMap {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps, axesType } = param;
-
-    const minmaxX = axesSteps.x[this.xAxisIndex];
-    const minmaxY = axesSteps.y[this.yAxisIndex];
+    const { ctx, chartRect, labelOffset } = param;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
@@ -142,12 +121,12 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = this.getSize('x', xArea, minmaxX, axesType);
-    this.size.h = this.getSize('y', yArea, minmaxY, axesType);
+    this.size.w = xArea / this.labels.x.length;
+    this.size.h = yArea / this.labels.y.length;
 
     this.data.forEach((item) => {
-      item.xp = this.calculateXY('x', item.x, xsp, xArea, minmaxX.graphMax, minmaxX.graphMin);
-      item.yp = this.calculateXY('y', item.y, ysp, yArea, minmaxY.graphMax, minmaxY.graphMin);
+      item.xp = this.calculateXY('x', item.x, xsp);
+      item.yp = this.calculateXY('y', item.y, ysp);
       item.w = this.size.w;
       item.h = this.size.h;
 

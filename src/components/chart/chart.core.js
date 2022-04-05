@@ -182,17 +182,9 @@ class EvChart {
         const series = this.seriesList[chartTypeSet[jx]];
 
         switch (chartType) {
-          case 'line': {
-            series.draw(opt);
-            break;
-          }
+          case 'line':
           case 'heatMap': {
-            const { axesX, axesY } = this.options;
-            const axesType = {
-              x: axesX,
-              y: axesY,
-            };
-            series.draw({ ...opt, axesType });
+            series.draw(opt);
             break;
           }
           case 'bar': {
