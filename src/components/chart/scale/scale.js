@@ -164,7 +164,7 @@ class Scale {
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo) {
     const ctx = this.ctx;
     const options = this.options;
     const aPos = {
@@ -239,12 +239,6 @@ class Scale {
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
-        const isBlurredLabel = this.options?.selectLabel?.use
-          && this.options?.selectLabel?.useLabelOpacity
-          && (this.options.horizontal === (this.type === 'y'))
-          && selectLabelInfo?.dataIndex?.length
-          && !selectLabelInfo?.dataIndex?.includes(ix);
-
         const labelColor = this.labelStyle.color;
         let defaultOpacity = 1;
 
@@ -252,17 +246,14 @@ class Scale {
           defaultOpacity = Util.getOpacity(labelColor);
         }
 
-        ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+        ctx.fillStyle = Util.colorStringToRgba(labelColor, defaultOpacity);
 
         let labelPoint;
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
           ctx.fillText(labelText, labelCenter, labelPoint);
-          if (!isBlurredLabel
-              && options?.selectItem?.showLabelTip
-              && hitInfo?.label
-              && !this.options?.horizontal) {
+          if (options?.selectItem?.showLabelTip && hitInfo?.label && !this.options?.horizontal) {
             const selectedLabel = this.getLabelFormat(
               Math.min(axisMax, hitInfo.label + (0 * stepValue)),
             );

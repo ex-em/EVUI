@@ -250,7 +250,7 @@ const modules = {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
-    const { dataIndex, data } = this.defaultSelectLabelInfo;
+    const { dataIndex, data, label } = this.defaultSelectLabelInfo;
     let drawTip = false;
 
     if (dataIndex.length) {
@@ -264,86 +264,82 @@ const modules = {
         y1: chartRect.y1 + labelOffset.top,
         y2: chartRect.y2 - labelOffset.bottom,
       };
+      const labelAxes = isHorizontal ? this.axesY[0] : this.axesX[0];
+      const valueAxes = isHorizontal ? this.axesX[0] : this.axesY[0];
+      const valueAxesRange = isHorizontal ? this.axesRange.x[0] : this.axesRange.y[0];
+      const valuePositionCalcFunction = isHorizontal ? Canvas.calculateX : Canvas.calculateY;
+      const labelPositionCalcFunction = isHorizontal ? Canvas.calculateY : Canvas.calculateX;
 
-      const labelAxes = this.options.horizontal ? this.axesY[0] : this.axesX[0];
-      const labelStartPoint = aPos[labelAxes.units.rectStart];
-      const labelEndPoint = aPos[labelAxes.units.rectEnd];
-      const labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
-
-      const valueAxes = this.options.horizontal ? this.axesX[0] : this.axesY[0];
-      const valueStartPoint = aPos[valueAxes.units.rectStart];
-
-      const offset = this.options.type === 'bar' ? 4 : 6;
       const chartWidth = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
       const chartHeight = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const valueSpace = isHorizontal ? chartWidth : chartHeight;
+      const valueStartPoint = aPos[valueAxes.units.rectStart];
+      let offset = this.options.type === 'bar' ? 4 : 6;
+      offset *= isHorizontal ? 1 : -1;
 
-      dataIndex.forEach((idx, i) => {
-        const labelCenter = Math.round(labelStartPoint + (labelGap * idx));
-        let gp;
-        const dp = labelCenter + (labelGap / 2);
+      const seriesList = Object.keys(this.seriesList ?? {});
+      const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
+      const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
+      const groups = this.data.groups?.[0] ?? [];
+
+      let gp;
+      let dp;
+      let value;
+      let labelStartPoint;
+      let labelEndPoint;
+      let labelGap;
+      let graphX;
+      let lineSeries;
+      let sizeObj;
+
+      if (labelAxes.labels) {
+        labelStartPoint = aPos[labelAxes.units.rectStart];
+        labelEndPoint = aPos[labelAxes.units.rectEnd];
+        labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
+      } else {
+        graphX = this.axesSteps.x[0];
+        lineSeries = seriesList.find(sId => this.seriesList[sId]?.type === 'line');
+        sizeObj = this.seriesList[lineSeries].size;
+      }
+
+      data.forEach((selectedData, i) => {
         if (labelTipOpt.fixedPosTop) {
-          if (isHorizontal) {
-            gp = Canvas.calculateX(
-              this.axesRange.x[0].max,
-              this.axesRange.x[0].min,
-              this.axesRange.x[0].max,
-              chartWidth,
-              valueStartPoint);
-            gp += offset;
-          } else {
-            gp = Canvas.calculateY(
-                this.axesRange.y[0].max,
-                this.axesRange.y[0].min,
-                this.axesRange.y[0].max,
-                chartHeight,
-                valueStartPoint);
-            gp -= offset;
-          }
-        } else if (isHorizontal) {
-          const seriesList = Object.keys(data[i] ?? {});
-          const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
-          const visibleValue = visibleSeries.map(sId => data[i][sId]);
-          const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
-
-          let maxValue;
-          if (isExistGrp) {
-            maxValue = visibleValue.reduce((acc, v) => acc + v) ?? 0;
-          } else if (visibleValue.length) {
-            maxValue = Math.max(...visibleValue);
-          } else {
-            maxValue = this.axesRange.x[0].max;
-          }
-
-          gp = Canvas.calculateX(
-            maxValue,
-            this.axesRange.x[0].min,
-            this.axesRange.x[0].max,
-            chartWidth,
-            valueStartPoint);
-          gp += offset;
+          value = valueAxesRange.max;
+        } else if (isExistGrp) {
+          const sumValue = visibleSeries.reduce((ac, sId) => (
+            groups.includes(sId) ? ac + (selectedData[sId]?.value ?? selectedData[sId]) : ac), 0);
+          const nonGroupValues = visibleSeries
+            .filter(sId => !groups.includes(sId))
+            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+          value = Math.max(...nonGroupValues, sumValue);
+        } else if (visibleSeries.length) {
+          const visibleValue = visibleSeries
+            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+          value = Math.max(...visibleValue);
         } else {
-          const seriesList = Object.keys(data[i] ?? {});
-          const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
-          const visibleValue = visibleSeries.map(sId => data[i][sId]);
-          const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
-
-          let maxValue;
-          if (isExistGrp) {
-            maxValue = visibleValue.reduce((acc, v) => acc + v) ?? 0;
-          } else if (visibleValue.length) {
-            maxValue = Math.max(...visibleValue);
-          } else {
-            maxValue = this.axesRange.y[0].max;
-          }
-
-          gp = Canvas.calculateY(
-              maxValue,
-              this.axesRange.y[0].min,
-              this.axesRange.y[0].max,
-              chartHeight,
-              valueStartPoint);
-          gp -= offset;
+          value = valueAxesRange.max;
         }
+
+        if (labelAxes.labels) {
+          const labelCenter = Math.round(labelStartPoint + (labelGap * dataIndex[i]));
+
+          dp = labelCenter + (labelGap / 2);
+        } else {
+          dp = labelPositionCalcFunction(
+            label[i],
+            graphX.graphMin,
+            graphX.graphMax,
+            chartWidth - sizeObj.comboOffset,
+            aPos.x1 + (sizeObj.comboOffset / 2),
+          );
+        }
+        gp = valuePositionCalcFunction(
+          value,
+          valueAxesRange.min,
+          valueAxesRange.max,
+          valueSpace,
+          valueStartPoint);
+        gp += offset;
 
         this.showTip({
           context: this.bufferCtx,
