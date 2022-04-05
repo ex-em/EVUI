@@ -6,6 +6,8 @@ import CellRenderer from './example/CellRenderer';
 import CellRendererRaw from '!!raw-loader!./example/CellRenderer';
 import Toolbar from './example/Toolbar';
 import ToolbarRaw from '!!raw-loader!./example/Toolbar';
+import Summary from './example/Summary';
+import SummaryRaw from '!!raw-loader!./example/Summary';
 
 export default {
   mdText,
@@ -22,6 +24,10 @@ export default {
     Toolbar: {
       component: Toolbar,
       parsedData: parseComponent(ToolbarRaw),
+    },
+    Summary: {
+      component: Summary,
+      parsedData: parseComponent(SummaryRaw),
     },
   },
 };
