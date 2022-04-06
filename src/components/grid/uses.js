@@ -38,7 +38,7 @@ export const commonFunctions = () => {
    * @returns {number|string} 변환된 데이터
    */
   const getConvertValue = (column, value) => {
-    let convertValue = value;
+    let convertValue = column.type === 'number' || column.type === 'float' ? Number(value) : value;
 
     if (column.type === 'number') {
       convertValue = numberWithComma(value);

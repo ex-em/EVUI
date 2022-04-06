@@ -28,18 +28,18 @@ export const commonFunctions = (params) => {
   /**
    * 데이터 타입에 따라 변환된 데이터을 반환한다.
    *
-   * @param {string} type - 데이터 유형
+   * @param {object} column - 컬럼 정보
    * @param {number|string} value - 데이터
    * @returns {number|string} 변환된 데이터
    */
-  const getConvertValue = (type, value) => {
-    let convertValue = value;
+  const getConvertValue = (column, value) => {
+    let convertValue = column.type === 'number' || column.type === 'float' ? Number(value) : value;
 
-    if (type === 'number') {
+    if (column.type === 'number') {
       convertValue = numberWithComma(value);
       convertValue = convertValue === false ? value : convertValue;
-    } else if (type === 'float') {
-      convertValue = value.toFixed(3);
+    } else if (column.type === 'float') {
+      convertValue = convertValue.toFixed(column.decimal ?? 3);
     }
 
     return convertValue;
@@ -81,12 +81,23 @@ export const commonFunctions = (params) => {
 };
 
 export const scrollEvent = (params) => {
-  const { scrollInfo, stores, elementInfo, resizeInfo } = params;
+  const {
+    scrollInfo,
+    stores,
+    elementInfo,
+    resizeInfo,
+    pageInfo,
+    getPagingData,
+    updatePagingInfo,
+  } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
-  const updateVScroll = () => {
-    const store = stores.showTreeStore;
+  const updateVScroll = (isScroll) => {
+    let store = stores.showTreeStore;
+    if (pageInfo.isClientPaging) {
+      store = getPagingData();
+    }
     const bodyEl = elementInfo.body;
     if (bodyEl) {
       const rowHeight = resizeInfo.rowHeight;
@@ -98,7 +109,7 @@ export const scrollEvent = (params) => {
         firstVisibleIndex = 0;
       }
 
-      const lastVisibleIndex = firstVisibleIndex + rowCount;
+      const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
 
@@ -107,6 +118,12 @@ export const scrollEvent = (params) => {
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
       scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
         - scrollInfo.vScrollTopHeight;
+      if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
+        pageInfo.prevPage = pageInfo.currentPage;
+        pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
+        pageInfo.startIndex = lastIndex;
+        updatePagingInfo({ onScrollEnd: true });
+      }
     }
   };
   /**
@@ -131,7 +148,7 @@ export const scrollEvent = (params) => {
     const isVertical = !(scrollTop === lastTop);
 
     if (isVertical && bodyEl.clientHeight) {
-      updateVScroll();
+      updateVScroll(true);
     }
 
     if (isHorizontal) {
@@ -359,16 +376,40 @@ export const clickEvent = (params) => {
    * @param {object} event - 이벤트 객체
    * @param {array} row - row 데이터
    */
+  let timer = null;
   const onRowClick = (event, row) => {
     if (event.target && event.target.parentElement
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
       return false;
     }
-    if (selectInfo.useSelect) {
-      selectInfo.selectedRow = row;
-      emit('update:selected', row);
-      emit('click-row', getClickedRowData(event, row));
-    }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (selectInfo.useSelect) {
+        if (row.selected) {
+          row.selected = false;
+          if (selectInfo.multiple) {
+            if (event.ctrlKey) {
+              selectInfo.selectedRow = selectInfo.selectedRow.filter(s => s.index !== row.index);
+            } else {
+              selectInfo.selectedRow = [row];
+            }
+          } else {
+            selectInfo.selectedRow = [];
+          }
+        } else {
+          row.selected = true;
+          if (event.ctrlKey
+            && selectInfo.multiple
+            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
+            selectInfo.selectedRow.push(row);
+          } else {
+            selectInfo.selectedRow = [row];
+          }
+        }
+        emit('update:selected', selectInfo.selectedRow);
+        emit('click-row', getClickedRowData(event, row));
+      }
+    }, 100);
     return true;
   };
   /**
@@ -378,15 +419,20 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    selectInfo.selectedRow = row;
-    emit('update:selected', row);
+    clearTimeout(timer);
     emit('dblclick-row', getClickedRowData(event, row));
   };
   return { onRowClick, onRowDblClick };
 };
 
 export const checkEvent = (params) => {
-  const { checkInfo, stores, checkHeader } = params;
+  const {
+    checkInfo,
+    stores,
+    checkHeader,
+    pageInfo,
+    getPagingData,
+  } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -450,7 +496,10 @@ export const checkEvent = (params) => {
    * @param {array} rowData - row 데이터
    */
   const onCheck = (event, rowData) => {
-    const store = stores.store;
+    let store = stores.store;
+    if (pageInfo.isClientPaging) {
+      store = getPagingData();
+    }
     const isSingleMode = () => checkInfo.useCheckbox.mode === 'single';
     const unCheckHeader = () => {
       if (checkInfo.isHeaderChecked) {
@@ -501,7 +550,10 @@ export const checkEvent = (params) => {
    */
   const onCheckAll = (event) => {
     const status = checkInfo.isHeaderChecked;
-    const store = stores.store;
+    let store = stores.store;
+    if (pageInfo.isClientPaging) {
+      store = getPagingData();
+    }
     store.forEach((row) => {
       row.checked = status && !row._disabled;
       if (row.checked) {
@@ -553,21 +605,14 @@ export const contextMenuEvent = (params) => {
    */
   const onContextMenu = (event) => {
     const target = event.target;
-    const tagName = target.tagName.toLowerCase();
-    let rowIndex;
-
-    if (tagName === 'td') {
-      rowIndex = target.parentElement.dataset.index;
-    } else {
-      rowIndex = target.parentElement.parentElement.dataset.index;
-    }
+    const rowIndex = target.parentElement.dataset.index;
 
     if (rowIndex) {
       const index = stores.viewStore.findIndex(v => v.index === Number(rowIndex));
       const rowData = stores.viewStore[index];
-      selectInfo.selectedRow = rowData;
+      selectInfo.selectedRow = [rowData];
       setContextMenu();
-      emit('update:selected', rowData);
+      emit('update:selected', selectInfo.selectedRow);
     } else {
       selectInfo.selectedRow = [];
       setContextMenu(false);
@@ -601,6 +646,10 @@ export const treeEvent = (params) => {
 
         if (!Object.hasOwnProperty.call(node, 'checked')) {
           node.checked = false;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'selected')) {
+          node.selected = false;
         }
 
         if (!Object.hasOwnProperty.call(node, 'show')) {
@@ -666,7 +715,16 @@ export const treeEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
-  const { stores, filterInfo, getConvertValue, onResize, checkHeader } = params;
+  const {
+    stores,
+    filterInfo,
+    pageInfo,
+    getConvertValue,
+    onResize,
+    checkHeader,
+    getPagingData,
+    updatePagingInfo,
+  } = params;
   const makeParentShow = (data) => {
     if (!data?.parent) {
       return;
@@ -713,13 +771,10 @@ export const filterEvent = (params) => {
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
             let columnValue = row[column.field];
-            let columnType = column.type;
+            column.type = column.type || 'string';
             if (columnValue) {
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
-                if (!columnType) {
-                  columnType = 'string';
-                }
-                columnValue = getConvertValue(columnType, columnValue).toString();
+                columnValue = getConvertValue(column, columnValue).toString();
                 isSameWord = columnValue.toLowerCase()
                   .includes(searchWord.toString().toLowerCase());
                 if (isSameWord) {
@@ -750,9 +805,69 @@ export const filterEvent = (params) => {
           makeChildShow(row);
         });
       }
+      if (!searchWord && pageInfo.isClientPaging && pageInfo.prevPage) {
+        pageInfo.currentPage = 1;
+        stores.pagingStore = getPagingData();
+      }
+      updatePagingInfo({ onSearch: true });
       checkHeader(stores.store);
       onResize();
     }, 500);
   };
   return { onSearch };
+};
+
+export const pagingEvent = (params) => {
+  const { emit } = getCurrentInstance();
+  const {
+    stores,
+    pageInfo,
+    filterInfo,
+    elementInfo,
+    clearCheckInfo,
+  } = params;
+  const getPagingData = () => {
+    const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
+    const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+    return stores.showTreeStore.slice(start, end);
+  };
+  const updatePagingInfo = (eventName) => {
+    emit('page-change', {
+      eventName,
+      pageInfo: {
+        currentPage: pageInfo.currentPage,
+        prevPage: pageInfo.prevPage,
+        startIndex: pageInfo.startIndex,
+        total: pageInfo.total,
+        perPage: pageInfo.perPage,
+      },
+      searchInfo: {
+        searchWord: filterInfo.searchWord,
+        searchColumns: stores.orderedColumns
+          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
+          .map(d => d.field),
+      },
+    });
+    if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
+      pageInfo.currentPage = 1;
+      elementInfo.body.scrollTop = 0;
+      clearCheckInfo();
+    }
+  };
+  const changePage = (beforeVal) => {
+    if (pageInfo.isClientPaging) {
+      pageInfo.prevPage = beforeVal;
+      if (stores.showTreeStore.length <= pageInfo.perPage) {
+        stores.pagingStore = stores.showTreeStore;
+      } else {
+        const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
+        const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
+        stores.pagingStore = stores.showTreeStore.slice(start, end);
+        elementInfo.body.scrollTop = 0;
+        pageInfo.startIndex = start;
+      }
+    }
+    updatePagingInfo({ onChangePage: true });
+  };
+  return { getPagingData, updatePagingInfo, changePage };
 };

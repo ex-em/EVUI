@@ -19,6 +19,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        useSelection: useSelection,
         customContextMenu: menuItems,
         style: {
           stripe: stripeMV,
@@ -29,6 +30,8 @@
         collapseIcon: collapseIconMV,
         parentIcon: parentIconMV,
         childIcon: childIconMV,
+        page: pageInfo,
+        useSummary: true,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
@@ -61,6 +64,30 @@
         </span>
         <ev-toggle
           v-model="stripeMV"
+        />
+      </div>
+      <div class="form-rows">
+        <span class="badge yellow">
+          Use Selection
+        </span>
+        <ev-toggle
+          v-model="useSelection.use"
+        />
+        <span class="badge yellow">
+          Multiple Selection
+        </span>
+        <ev-toggle
+          v-model="useSelection.multiple"
+        />
+        <span class="badge yellow">
+          Limit Count
+        </span>
+        <ev-select
+          v-model="useSelection.limitCount"
+          :items="limitItems"
+          :style="{ width: '200px' }"
+          clearable
+          placeholder="Please select value."
         />
       </div>
       <div class="form-rows">
@@ -167,7 +194,6 @@
             v-model="highlightMV"
             :step="1"
             :max="100"
-            :min="0"
           />
         </div>
         <div class="form-row">
@@ -235,7 +261,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 
 export default {
   setup() {
@@ -259,14 +285,14 @@ export default {
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
-          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value.data)}`);
+          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value[0].data)}`);
         },
       }, {
         text: 'Menu2',
         click: () => console.log('[Menu2]'),
       },
     ]);
-    const highlightMV = ref(0);
+    const highlightMV = ref(-1);
     const borderMV = ref('');
     const iconMV = ref('');
     const dataIconMV = ref('');
@@ -424,11 +450,42 @@ export default {
     const columns = ref([
       { caption: 'ID', field: 'id', type: 'number' },
       { caption: 'Date', field: 'date', type: 'string' },
-      { caption: 'Name', field: 'name', type: 'number' },
+      {
+        caption: 'Name',
+        field: 'name',
+        type: 'float',
+        summaryType: 'sum',
+        summaryRenderer: 'Sum: {0}',
+        decimal: 1,
+      },
     ]);
+    const limitItems = ref([
+      {
+        name: '2',
+        value: 2,
+      },
+      {
+        name: '4',
+        value: 4,
+      },
+    ]);
+    const useSelection = reactive({
+      use: true,
+      multiple: true,
+      limitCount: 2,
+    });
+    const pageInfo = reactive({
+      use: true,
+      // isInfinite: true,
+      perPage: 5,
+      total: computed(() => tableData.value.length),
+      useClient: true,
+      showPageInfo: true,
+    });
 
     getData();
     return {
+      pageInfo,
       columns,
       tableData,
       selected,
@@ -451,6 +508,16 @@ export default {
       highlightMV,
       borderMV,
       borderItems,
+      iconMV,
+      iconItems,
+      expandIconMV,
+      collapseIconMV,
+      dataIconMV,
+      dataIconItems,
+      parentIconMV,
+      childIconMV,
+      limitItems,
+      useSelection,
       onClickCheckbox,
       onClickButton,
       changeMode,
@@ -460,14 +527,6 @@ export default {
       resetBorderStyle,
       resetTreeIcon,
       resetDataIcon,
-      iconMV,
-      iconItems,
-      expandIconMV,
-      collapseIconMV,
-      dataIconMV,
-      dataIconItems,
-      parentIconMV,
-      childIconMV,
       onReset,
     };
   },
