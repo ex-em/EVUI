@@ -261,14 +261,20 @@ class HeatMap {
     const gdata = this.data;
     const xep = xsp + width;
     const yep = ysp + height;
-    return gdata.filter(({ xp, yp, w, h }) =>
-      ((xp <= xsp && xp + w >= xsp) && (yp <= ysp && yp + h >= ysp))
-      || ((xp <= xep && xp + w >= xep) && (yp <= ysp && yp + h >= ysp))
-      || ((xp <= xsp && xp + w >= xsp) && (yp <= yep && yp + h >= yep))
-      || ((xp <= xep && xp + w >= xep) && (yp <= yep && yp + h >= yep))
-      || ((xp >= xsp && xp <= xep) && (yp >= ysp && yp <= yep))
-      || ((xp >= xsp && xp <= xep) && (yp + h >= ysp && yp + h <= yep))
-      || ((xp + w >= xsp && xp + w <= xep) && (yp >= ysp && yp <= yep)));
+    return gdata.filter(({ xp, yp, w, h }) => {
+      const x1 = xp;
+      const x2 = xp + w;
+      const y1 = yp;
+      const y2 = yp + h;
+
+      return ((x1 <= xsp && x2 >= xsp) && (y1 <= ysp && y2 >= ysp))
+         || ((x1 <= xep && x2 >= xep) && (y1 <= ysp && y2 >= ysp))
+         || ((x1 <= xsp && x2 >= xsp) && (y1 <= yep && y2 >= yep))
+         || ((x1 <= xep && x2 >= xep) && (y1 <= yep && y2 >= yep))
+         || ((x1 >= xsp && x1 <= xep) && (y1 >= ysp && y1 <= yep))
+         || ((x1 >= xsp && x1 <= xep) && (y2 >= ysp && y2 <= yep))
+         || ((x2 >= xsp && x2 <= xep) && (y1 >= ysp && y1 <= yep));
+    });
   }
 
   /**
