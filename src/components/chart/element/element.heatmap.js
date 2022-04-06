@@ -139,7 +139,8 @@ class HeatMap {
       let h = this.size.h;
       const value = item.o;
 
-      if (xp !== null && yp !== null && value) {
+      if (xp !== null && yp !== null
+         && (value !== null && value !== undefined)) {
         const colorIndex = this.getColorIndex(value);
         const opacity = this.colorAxis[colorIndex].state === 'downplay' ? 0.1 : 1;
         item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
@@ -155,20 +156,20 @@ class HeatMap {
             w -= (lineWidth * 1.5);
             h -= (lineWidth * 2);
           }
-        }
-        this.drawItem(ctx, xp, yp, w, h);
+          this.drawItem(ctx, xp, yp, w, h);
 
-        if (this.showValue.use) {
-          this.drawValueLabels({
-            context: ctx,
-            data: item,
-            positions: {
-              x: xp,
-              y: yp,
-              w,
-              h,
-            },
-          });
+          if (this.showValue.use) {
+            this.drawValueLabels({
+              context: ctx,
+              data: item,
+              positions: {
+                x: xp,
+                y: yp,
+                w,
+                h,
+              },
+            });
+          }
         }
 
         item.xp = xp;
@@ -260,9 +261,14 @@ class HeatMap {
     const gdata = this.data;
     const xep = xsp + width;
     const yep = ysp + height;
-    return gdata.filter(seriesData =>
-      (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
-        && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+    return gdata.filter(({ xp, yp, w, h }) =>
+      ((xp <= xsp && xp + w >= xsp) && (yp <= ysp && yp + h >= ysp))
+      || ((xp <= xep && xp + w >= xep) && (yp <= ysp && yp + h >= ysp))
+      || ((xp <= xsp && xp + w >= xsp) && (yp <= yep && yp + h >= yep))
+      || ((xp <= xep && xp + w >= xep) && (yp <= yep && yp + h >= yep))
+      || ((xp >= xsp && xp <= xep) && (yp >= ysp && yp <= yep))
+      || ((xp >= xsp && xp <= xep) && (yp + h >= ysp && yp + h <= yep))
+      || ((xp + w >= xsp && xp + w <= xep) && (yp >= ysp && yp <= yep)));
   }
 
   /**
@@ -278,13 +284,29 @@ class HeatMap {
 
     const x = gdata.xp;
     const y = gdata.yp;
+    const w = gdata.w;
+    const h = gdata.h;
 
     ctx.save();
     if (x !== null && y !== null) {
       const color = gdata.dataColor;
       ctx.strokeStyle = Util.colorStringToRgba(color, 1);
       ctx.fillStyle = Util.colorStringToRgba(color, this.highlight.maxShadowOpacity);
-      this.drawItem(ctx, x, y);
+      ctx.shadowColor = color;
+      this.drawItem(ctx, x, y, w, h);
+
+      if (this.showValue.use) {
+        this.drawValueLabels({
+          context: ctx,
+          data: gdata,
+          positions: {
+            x,
+            y,
+            w,
+            h,
+          },
+        });
+      }
     }
 
     ctx.restore();

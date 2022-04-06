@@ -44,7 +44,7 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
         },
         data: {
           series1: [
-            { x: dayjs(timeValue), y: 0, value: 46 },
+            { x: dayjs(timeValue), y: 0, value: 0 },
             { x: dayjs(timeValue), y: 1, value: 22 },
             { x: dayjs(timeValue), y: 3, value: 15 },
             { x: dayjs(timeValue), y: 4, value: 8 },
