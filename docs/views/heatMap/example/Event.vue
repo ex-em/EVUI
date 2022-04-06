@@ -114,8 +114,10 @@ import { onMounted, reactive, ref } from 'vue';
           min: '#A1CDF9',
           max: '#336fe9',
           categoryCnt: 3,
-          border: '#FFFFFF',
           error: '#F9E469',
+          stroke: {
+            show: true,
+          },
         },
         tooltip: {
           use: true,

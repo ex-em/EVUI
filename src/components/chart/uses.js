@@ -104,7 +104,11 @@ const DEFAULT_OPTIONS = {
     min: '#FFFFFF',
     max: '#0052FF',
     categoryCnt: 5,
-    border: null,
+    stroke: {
+      show: false,
+      color: '#FFFFFF',
+      lineWidth: 1,
+    },
     error: '#FF0000',
   },
 };

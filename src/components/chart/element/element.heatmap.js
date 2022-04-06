@@ -29,7 +29,7 @@ class HeatMap {
    */
   createColorAxis(colorOpt) {
     const colorAxis = [];
-    const { min, max, categoryCnt, error, border } = colorOpt;
+    const { min, max, categoryCnt, error, stroke } = colorOpt;
 
     const minColor = min.includes('#') ? Util.hexToRgb(min) : min;
     const maxColor = max.includes('#') ? Util.hexToRgb(max) : max;
@@ -56,37 +56,36 @@ class HeatMap {
 
     this.colorAxis = colorAxis;
     this.errorColor = error;
-    this.borderColor = border;
+    this.stroke = stroke;
   }
 
   getColorIndex(value) {
     const existError = this.valueOpt.existError;
-    const maxIndex = this.colorAxis.length;
-    if (value < 0) {
-      return maxIndex - 1;
+    const maxIndex = this.colorAxis.length - 1;
+    if (existError && value < 0) {
+      return maxIndex;
     }
 
     const colorIndex = Math.floor(value / this.valueOpt.interval);
     if (colorIndex >= maxIndex) {
-      return existError ? maxIndex - 2 : maxIndex - 1;
+      return existError ? maxIndex - 1 : maxIndex;
     }
 
     return colorIndex;
   }
 
-  drawItem(ctx, xp, yp, aliasPixel) {
+  drawItem(ctx, x, y, w, h) {
     ctx.beginPath();
-    if (this.borderColor) {
-      const sizeW = this.size.w - aliasPixel;
-      const sizeH = this.size.h - aliasPixel;
-      ctx.strokeRect(xp + aliasPixel, yp + aliasPixel, sizeW, sizeH);
-      ctx.fillRect(xp + aliasPixel, yp + aliasPixel, sizeW, sizeH);
+    if (this.stroke.show) {
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x, y, w, h);
     } else {
+      const aliasPixel = Util.aliasPixel(1);
       ctx.fillRect(
-        xp,
-        yp - aliasPixel,
-        this.size.w + aliasPixel,
-        this.size.h + aliasPixel,
+        x,
+        y - aliasPixel,
+        w + aliasPixel,
+        h + aliasPixel,
       );
     }
     ctx.closePath();
@@ -102,6 +101,15 @@ class HeatMap {
         point = dir === 'x'
           ? startPoint + (this.size.w * index)
           : startPoint - (this.size.h * (index + 1));
+      } else {
+        const timeIndex = this.labels[dir].findIndex(label =>
+          new Date(label).getTime() === new Date(value).getTime(),
+        );
+        if (timeIndex > -1) {
+          point = dir === 'x'
+            ? startPoint + (this.size.w * timeIndex)
+            : startPoint - (this.size.h * (timeIndex + 1));
+        }
       }
     }
 
@@ -125,12 +133,11 @@ class HeatMap {
     this.size.h = yArea / this.labels.y.length;
 
     this.data.forEach((item) => {
-      item.xp = this.calculateXY('x', item.x, xsp);
-      item.yp = this.calculateXY('y', item.y, ysp);
-      item.w = this.size.w;
-      item.h = this.size.h;
-
-      const { xp, yp, o: value } = item;
+      let xp = this.calculateXY('x', item.x, xsp);
+      let yp = this.calculateXY('y', item.y, ysp);
+      let w = this.size.w;
+      let h = this.size.h;
+      const value = item.o;
 
       if (xp !== null && yp !== null && value) {
         const colorIndex = this.getColorIndex(value);
@@ -138,12 +145,18 @@ class HeatMap {
         item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
         item.cId = this.colorAxis[colorIndex].id;
         if (this.colorAxis[colorIndex].show) {
-          if (this.borderColor) {
-            ctx.strokeStyle = Util.colorStringToRgba(this.borderColor, opacity);
-          }
           ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
-          this.drawItem(ctx, xp, yp, Util.aliasPixel(1));
+          if (this.stroke.show) {
+            const { color, lineWidth } = this.stroke;
+            ctx.strokeStyle = Util.colorStringToRgba(color, opacity);
+            ctx.lineWidth = lineWidth;
+            xp += lineWidth;
+            yp += (lineWidth * 1.5);
+            w -= (lineWidth * 1.5);
+            h -= (lineWidth * 2);
+          }
         }
+        this.drawItem(ctx, xp, yp, w, h);
 
         if (this.showValue.use) {
           this.drawValueLabels({
@@ -152,11 +165,16 @@ class HeatMap {
             positions: {
               x: xp,
               y: yp,
-              w: item.w,
-              h: item.h,
+              w,
+              h,
             },
           });
         }
+
+        item.xp = xp;
+        item.yp = yp;
+        item.w = w;
+        item.h = h;
       }
     });
   }
@@ -167,9 +185,9 @@ class HeatMap {
    * @param context           canvas context
    * @param data              series value data (model.store.js addData return value)
    */
-  drawValueLabels({ context, data }) {
+  drawValueLabels({ context, data, positions }) {
     const { fontSize, textColor, align, formatter, decimalPoint } = this.showValue;
-    const { xp: x, yp: y, w, h } = data;
+    const { x, y, w, h } = positions;
     const ctx = context;
 
     ctx.save();

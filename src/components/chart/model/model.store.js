@@ -433,7 +433,7 @@ const modules = {
       }
     });
 
-    if (isExistError) {
+    if (isExistError && series.colorAxis.length === categoryCnt) {
       series.colorAxis.push({
         id: `color#${categoryCnt}`,
         value: colorOpt.error,

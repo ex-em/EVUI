@@ -34,6 +34,8 @@
 | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 | decimalPoint | Number | 0 | 소수점 자릿수  |  |
 
+- 글자 크기가 heatMap의 item의 크기를 벗어나게되면 그려지지 않습니다.
+
 #### data example
 ```
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
