@@ -699,8 +699,8 @@ const modules = {
       const index = Math.floor(((this.options.horizontal ? y : x) - startPoint) / labelGap);
       labelIndex = scale.labels.length > index ? index : -1;
     } else {
-      hitInfo = this.getItemByPosition(offset, false);
-      labelIndex = hitInfo.maxIndex;
+      hitInfo = this.getItemByPosition(offset, this.options.selectLabel.useApproximateValue);
+      labelIndex = hitInfo.maxIndex ?? -1;
     }
 
     return {

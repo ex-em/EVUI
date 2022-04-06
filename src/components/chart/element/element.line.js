@@ -44,15 +44,22 @@ class Line {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps } = param;
+    const { ctx, chartRect, labelOffset, axesSteps, selectLabel } = param;
     const extent = this.extent[this.state];
+    const selectLabelOption = selectLabel.option;
+    const selectedLabel = selectLabel.selected;
+    const isExistSelectedLabel = selectLabelOption.use
+      && selectLabelOption.useSeriesOpacity
+      && selectedLabel.dataIndex?.length > 0;
+    const downplayOpacity = this.extent.downplay.opacity;
 
-    const fillOpacity = this.fillOpacity * extent.opacity;
+    const fillOpacity = isExistSelectedLabel
+      ? this.fillOpacity * downplayOpacity : this.fillOpacity * extent.opacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
     const getOpacity = (colorStr) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
-      return this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      return this.state === 'downplay' || isExistSelectedLabel ? 0.1 : noneDownplayOpacity;
     };
 
     const mainColor = this.color;
@@ -165,14 +172,18 @@ class Line {
 
       ctx.fill();
     }
-
-    if (this.point) {
+    if (this.point || isExistSelectedLabel) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
-      ctx.fillStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
+      const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
 
-      this.data.forEach((curr) => {
+      this.data.forEach((curr, i) => {
         if (curr.xp !== null && curr.yp !== null) {
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+          ctx.fillStyle = isExistSelectedLabel && selectedLabel.dataIndex.includes(i)
+            ? focusStyle : blurStyle;
+          if (this.point || selectedLabel.dataIndex.includes(i)) {
+            Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+          }
         }
       });
     }

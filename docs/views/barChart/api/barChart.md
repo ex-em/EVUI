@@ -22,8 +22,19 @@ const selectedItem = ref({
 });
 ```
 
+### 2. v-model:selectedLabel
+- option에서 [selectLabel](#selectlabel) 옵션을 사용할 경우 유효한 바인딩
+- 현재 선택된 Label의 인덱스 대한 정보 (dataIndex)
+- 차트 클릭이 아니라 특정 위치의 label 을 선택하고 싶은 경우 바인딩 하고, dataIndex 배열의 값으로 차트를 컨트롤 한다.
+#### Example
+```
+const selectedLabel = ref({
+    dataIndex: [0], // option 에 설정한 limit 갯수 까지 선택 가능.
+});
+```
 
-### 2. data  
+
+### 3. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
@@ -80,7 +91,7 @@ const chartData = {
 }
 ```
   
-### 3. options 
+### 4. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | '' | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
@@ -270,17 +281,17 @@ const chartData = {
 | useDeselectOverflow | Boolean                     | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부 | |
 | showTip             | Boolean                     | false     | 선택한 위치의 Tip(화살표) 생성 여부                | |
 | useSeriesOpacity    | Boolean                     | true      | 시리즈 opacity 변경 여부                     | |
-| useLabelOpacity     | Boolean                     | true      | 선택한 위치의 Tip(화살표) 생성 여부                | |
+| useLabelOpacity     | Boolean                     | true      | Axes Label opacity 변경 여부              | |
 | fixedPosTop         | Boolean                     | false     | tip의 위치를 최대값으로 고정                     | |
 | useApproximateValue | Boolean                     | false     | 가까운 label을 선택                         | |
 | tipBackground       | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                              | |
 
-### 4. resize-timeout
+### 5. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
 
 
-### 5. Event
+### 6. Event
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
 | click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |
