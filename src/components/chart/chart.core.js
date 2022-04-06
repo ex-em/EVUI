@@ -282,7 +282,9 @@ class EvChart {
    */
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
-    const labels = this.data.labels;
+    const labels = this.options.type === 'heatMap'
+      ? this.data.labels[dir]
+      : this.data.labels;
     const options = this.options;
     return axes.map((axis) => {
       switch (axis.type) {

@@ -8,10 +8,6 @@
       @dbl-click="onDblClick"
     />
     <div class="description">
-      <span class="toggle-label">데이터 자동 업데이트</span>
-      <ev-toggle
-        v-model="isLive"
-      />
       <div class="one-row">
         <p class="badge yellow">
           선택 영역 내 데이터
@@ -45,9 +41,9 @@
           클릭 정보
         </p>
         <div v-if="clickedInfo">
-          <p><b>label</b> : {{ clickedInfo.label }} </p>
+          <p><b>label[x]</b> : {{ clickedInfo.label }} </p>
+          <p><b>label[y]</b> : {{ clickedInfo.acc }} </p>
           <p><b>value</b> : {{ clickedInfo.value }} </p>
-          <p><b>series ID</b> : {{ clickedInfo.sId }} </p>
         </div>
       </div>
       <div class="one-row">
@@ -55,16 +51,16 @@
           더블 클릭 정보
         </p>
         <div v-if="dblClickedInfo">
-          <p><b>label</b> : {{ dblClickedInfo.label }} </p>
+          <p><b>label[x]</b> : {{ dblClickedInfo.label }} </p>
+          <p><b>label[y]</b> : {{ dblClickedInfo.acc }} </p>
           <p><b>value</b> : {{ dblClickedInfo.value }} </p>
-          <p><b>series ID</b> : {{ dblClickedInfo.sId }} </p>
         </div>
       </div>
   </div>
 </div></template>
 
 <script>
-import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -73,18 +69,11 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         series: {
           series1: {
             name: 'series#1',
-            colorOpt: {
-              min: '#B3E148',
-              max: '#6B9900',
-              categoryCnt: 5,
-              border: '#FFFFFF',
-              error: '#FF5A5A',
-            },
-            spaces: {
-              x: 60,
-              y: 20,
-            },
           },
+        },
+        labels: {
+          x: [],
+          y: [],
         },
         data: {
           series1: [],
@@ -110,12 +99,27 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
+          categoryMode: true,
+          showGrid: false,
         }],
         axesY: [{
-          type: 'linear',
-          showGrid: true,
+          type: 'step',
+          autoScaleRatio: 0.1,
+          showGrid: false,
         }],
         selectItem: {
+          use: true,
+        },
+        heatMapColor: {
+          min: '#A1CDF9',
+          max: '#336fe9',
+          categoryCnt: 3,
+          error: '#F9E469',
+          stroke: {
+            show: true,
+          },
+        },
+        tooltip: {
           use: true,
         },
       };
@@ -129,13 +133,13 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
       };
 
       const dblClickedInfo = ref(null);
-      const onDblClick = ({ e, label, value, sId }) => {
-        dblClickedInfo.value = { e, label, value, sId };
+      const onDblClick = ({ e, label, value, sId, acc }) => {
+        dblClickedInfo.value = { e, label, value, sId, acc };
       };
 
       const clickedInfo = ref(null);
-      const onClick = ({ e, label, value, sId }) => {
-        clickedInfo.value = { e, label, value, sId };
+      const onClick = ({ e, label, value, sId, acc }) => {
+        clickedInfo.value = { e, label, value, sId, acc };
 
         // Clear drag selection info
         selectionItems.value = [];
@@ -144,39 +148,29 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');
 
-      const isLive = ref(false);
-      const liveInterval = ref();
       let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
       const addRandomChartData = () => {
         const seriesData = chartData.data.series1;
-        const seriesSpaces = chartData.series.series1.spaces;
-        const maxRandomValue = seriesSpaces.y * 2;
 
         timeValue = dayjs(timeValue).add(1, 'second');
+        chartData.labels.x.push(timeValue);
 
-        if (isLive.value) {
-          const spliceTimeValue = seriesData[0].x;
-          const spliceData = seriesData.filter(({ x }) =>
-              new Date(x).getTime() === new Date(spliceTimeValue).getTime());
-          seriesData.splice(0, spliceData.length);
-        }
-
-        for (let iy = 0; iy < 15; iy++) {
-          let randomValue = Math.floor(Math.random() * maxRandomValue) + 2;
-          randomValue = randomValue % 2 === 0 ? randomValue : randomValue - 1;
-          let randomCount = Math.floor(Math.random() * 5000);
-          if (randomCount > 4500) {
-            randomCount = -1;
+        for (let iv = 0; iv <= 10; iv++) {
+          const yRandomIndex = Math.floor(Math.random() * 5);
+          const yValue = chartData.labels.y[yRandomIndex];
+          let randomValue = Math.floor(Math.random() * 5000) + 1;
+          if (randomValue > 4500) {
+            randomValue = -1;
           }
           const item = {
             x: timeValue,
-            y: randomValue,
-            value: randomCount,
+            y: yValue,
+            value: randomValue,
           };
           // eslint-disable-next-line no-loop-func
           const targetIndex = seriesData.findIndex(({ x, y }) =>
-              new Date(x).getTime() === new Date(timeValue).getTime() && y === randomValue);
+              new Date(x).getTime() === new Date(timeValue).getTime() && y === yValue);
           if (targetIndex === -1) {
             seriesData.push(item);
           }
@@ -184,22 +178,13 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
       };
 
       onMounted(() => {
-        for (let ix = 0; ix < 60; ix++) {
+        for (let iy = 2; iy <= 10; iy += 2) {
+          chartData.labels.y.push(iy);
+        }
+
+        for (let ix = 0; ix < 30; ix++) {
           addRandomChartData();
         }
-      });
-
-      watch(isLive, (newValue) => {
-        if (newValue) {
-          addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 1000);
-        } else {
-          clearInterval(liveInterval.value);
-        }
-      });
-
-      onBeforeUnmount(() => {
-        clearInterval(liveInterval.value);
       });
 
       return {
@@ -209,7 +194,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         selectionRange,
         dblClickedInfo,
         clickedInfo,
-        isLive,
         onDragSelect,
         onDblClick,
         onClick,

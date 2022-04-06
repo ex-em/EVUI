@@ -100,6 +100,17 @@ const DEFAULT_OPTIONS = {
     fillColor: '#38ACEC',
     opacity: 0.65,
   },
+  heatMapColor: {
+    min: '#FFFFFF',
+    max: '#0052FF',
+    categoryCnt: 5,
+    stroke: {
+      show: false,
+      color: '#FFFFFF',
+      lineWidth: 1,
+    },
+    error: '#FF0000',
+  },
 };
 
 const DEFAULT_DATA = {

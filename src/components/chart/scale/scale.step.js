@@ -7,6 +7,7 @@ class StepScale extends Scale {
   constructor(type, opt, ctx, labels, options) {
     super(type, opt, ctx, options);
     this.labels = labels;
+    this.rangeMode = opt.rangeMode;
   }
 
   /**
@@ -138,7 +139,8 @@ class StepScale extends Scale {
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          ctx.fillText(labelText, labelCenter + (labelGap / 2), labelPoint);
+          const xPoint = this.rangeMode ? labelCenter : labelCenter + (labelGap / 2);
+          ctx.fillText(labelText, xPoint, labelPoint);
 
           if (!isBlurredLabel
               && this.options?.selectItem?.showLabelTip
@@ -168,7 +170,8 @@ class StepScale extends Scale {
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          ctx.fillText(labelText, labelPoint, labelCenter + (labelGap / 2));
+          const yPoint = this.rangeMode ? labelCenter : labelCenter + (labelGap / 2);
+          ctx.fillText(labelText, labelPoint, yPoint);
 
           if (index > 0 && this.showGrid) {
             ctx.moveTo(offsetPoint, linePosition);
@@ -177,6 +180,26 @@ class StepScale extends Scale {
         }
         ctx.stroke();
       });
+
+      if (this.rangeMode && this.showGrid) {
+        let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
+        if (isNaN(labelLastText)) {
+          labelLastText = 'Max';
+        }
+        labelCenter = Math.round(startPoint + (labelGap * labels.length));
+        linePosition = labelCenter + aliasPixel;
+
+        if (this.type === 'x') {
+          ctx.fillText(labelLastText, labelCenter, labelPoint);
+          ctx.moveTo(linePosition, offsetPoint);
+          ctx.lineTo(linePosition, offsetCounterPoint);
+        } else {
+          ctx.fillText(labelLastText, labelPoint, labelCenter);
+          ctx.moveTo(offsetPoint, linePosition);
+          ctx.lineTo(offsetCounterPoint, linePosition);
+        }
+        ctx.stroke();
+      }
 
       ctx.closePath();
     }

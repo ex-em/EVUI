@@ -13,17 +13,29 @@
 >## Props
 ### 1. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
-  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
+  |------------ |-----------|---------|------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
   | data   | Object | {} | 차트에 표시할 시리즈 별 데이터 |  |
+  | labels | Object | {} | 축의 각 눈금에 해당하는 명칭 |  |
 
 #### series
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
-  | colorOpt | Object | {} | 개수에 따른 색상 옵션 | ([상세](#coloropt)) |
-  | spaces | Object | {} | x, y축의 칸 개수 |  |
-  
+  | showValue | Object | ([상세](#showvalue)) | 막대 위에 값 표시 여부 및 속성 |  |
+
+#### showValue
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | data label 표시 여부 | true /false |
+| textColor | Hex, RGB, RGBA Code(String) | '#000000' | 글자 색상  | |
+| fontSize | Number | 12 | 글자 크기 | |
+| align | String | 'center' | 글자 정렬  | 'top', 'right', 'bottom', 'left' |
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+| decimalPoint | Number | 0 | 소수점 자릿수  |  |
+
+- 글자 크기가 heatMap의 item의 크기를 벗어나게되면 그려지지 않습니다.
+
 #### data example
 ```
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
@@ -31,35 +43,26 @@ const chartData =
   series: {
     series1: {
       name: 'series#1',
-      colorOpt: {
-        min: '#E5FFFF',
-        max: '#5586EB',
-        categoryCnt: 3,
-        border: '#242426',
-      },
-      spaces: {
-        x: 3,
-        y: 3,
-      },
     },
   },
   data: {
     series1: [
-      { x: dayjs(time), y: 1, value: 1 },
-      { x: dayjs(time).add(1, 'day'), y: 2, value: 2 },
-      { x: dayjs(time).add(2, 'day'), y: 3, value: 3 }
+      { x: 'Jan', y: '2018', value: 1 },
+      { x: 'Jan', y: '2020', value: 2 },
+      { x: 'Feb', y: '2019', value: 3 },
+      { x: 'Feb', y: '2022', value: 4 },
+      { x: 'May', y: '2021', value: 5 },
+      { x: 'Jun', y: '2021', value: 6 },
+      { x: 'Aug', y: '2021', value: 7 },
+      { x: 'Aug', y: '2022', value: 8 },
     ],
+  },
+  labels: {
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    y: ['2018', '2019', '2020', '2021', '2022'],
   },
 };
 ```
-#### colorOpt
-  | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | min | number | | min color | '#FFFFFF' |
-  | max | number | | max color | '#5586EB' | 
-  | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
-  | border | string | '#FF0000' | series item border color 지정 |  |
-  | error | string | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 
 ### 2. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -74,12 +77,13 @@ const chartData =
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
+  | heatMapColor | Object | ([상세](#heatMapColor)) | color 옵션 | |
   
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-  | type | String | | 축의 유형 | [time](#time-type), [linear](#linear-type) |
+  | type | String | | 축의 유형 | [time](#time-type)(categoryMode), [step](#step-type) |
   | showAxis | Boolean | true | 축 표시 여부 | true / false | 
   | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
   | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
@@ -95,12 +99,14 @@ const chartData =
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
+   - categoryMode
+      - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
 
-##### linear type
-- interval (Axis Label 표기를 위한 interval)
-    - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
-- Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
-    - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+##### step type
+   - rangeMode
+      - 축에 표시할 값을 line에 표시할지의 여부 
+      - labels 구성이 number로 이루어진 경우 range로 표현하고 싶을 때 사용
+
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
@@ -160,11 +166,18 @@ const chartData =
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
 | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({x, y, name}) => y + '%' |
 
+#### heatMapColor
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
+| min | number | | min color | '#FFFFFF' |
+| max | number | | max color | '#5586EB' | 
+| categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
+| border | string | '#FF0000' | series item border color 지정 |  |
+| error | string | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 
 ### 3. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
-
 
 >### Event
 

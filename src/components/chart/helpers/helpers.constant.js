@@ -129,17 +129,19 @@ export const PLOT_BAND_OPTION = {
 };
 
 export const HEAT_MAP_OPTION = {
-  ...LINE_OPTION,
-  colorOpt: {
-    min: '#FFFFFF',
-    max: '#0052FF',
-    categoryCnt: 5,
-    border: '#FFFFFF',
-    error: '#FF0000',
+  show: true,
+  highlight: {
+    maxShadowOpacity: 0.4,
   },
-  spaces: {
-    x: 0,
-    y: 0,
+  xAxisIndex: 0,
+  yAxisIndex: 0,
+  showLegend: true,
+  showValue: {
+    use: false,
+    fontSize: 12,
+    textColor: '#000000',
+    formatter: null,
+    decimalPoint: 0,
   },
 };
 

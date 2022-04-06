@@ -14,17 +14,12 @@ import { onMounted, reactive } from 'vue';
         series: {
           series1: {
             name: 'series#1',
-            colorOpt: {
-              min: '#E5FFFF',
-              max: '#5586EB',
-              categoryCnt: 5,
-              border: '#242426',
-            },
-            spaces: {
-              x: 30,
-              y: 20,
-            },
           },
+        },
+        labels: {
+          x: ['12a', '1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a',
+              '12p', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '10p', '11p'],
+          y: ['SUN', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'SAT'],
         },
         data: {
           series1: [],
@@ -43,24 +38,33 @@ import { onMounted, reactive } from 'vue';
           use: false,
         },
         axesX: [{
-          type: 'linear',
-          showAxis: true,
-          autoScaleRatio: null,
+          type: 'step',
+          showAxis: false,
         }],
         axesY: [{
-          type: 'linear',
-          showGrid: true,
+          type: 'step',
         }],
+        heatMapColor: {
+          min: '#FFC19E',
+          max: '#CC3D3D',
+          categoryCnt: 5,
+        },
+        tooltip: {
+          use: true,
+        },
       };
 
       const createChartData = () => {
-        const spaceX = chartData.series.series1.spaces.x;
-        const spaceY = chartData.series.series1.spaces.y;
-
-        for (let ix = 1; ix <= spaceX; ix++) {
-          for (let iy = 2; iy <= spaceY * 2; iy += 2) {
-            const randomCount = Math.floor(Math.random() * 5000) + 1;
-            chartData.data.series1.push({ x: ix, y: iy, value: randomCount });
+        const labelX = chartData.labels.x;
+        const labelY = chartData.labels.y;
+        for (let ix = 0; ix < labelX.length; ix++) {
+          for (let iy = 0; iy < labelY.length; iy++) {
+            const randomCount = Math.floor(Math.random() * 500) + 1;
+            chartData.data.series1.push({
+              x: labelX[ix],
+              y: labelY[iy],
+              value: randomCount,
+            });
           }
         }
       };
