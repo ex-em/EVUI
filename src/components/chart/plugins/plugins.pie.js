@@ -27,6 +27,11 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+      return;
+    }
+
     const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(chartWidth, chartHeight);
 
@@ -109,8 +114,14 @@ const modules = {
 
     const centerX = width / 2;
     const centerY = height / 2;
+
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+      return;
+    }
+
     const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(chartWidth, chartHeight);
 
@@ -190,8 +201,14 @@ const modules = {
 
     const centerX = width / 2;
     const centerY = height / 2;
+
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+      return;
+    }
+
     const radius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
 
     ctx.save();
