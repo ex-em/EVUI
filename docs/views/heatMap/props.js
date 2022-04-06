@@ -16,7 +16,7 @@ export default {
       parsedData: parseComponent(DefaultRaw),
     },
     Time: {
-      description: '실시간으로 데이터를 받아 표현할 수 있습니다.',
+      description: '실시간으로 데이터를 받아 표현할 수 있습니다. (rangeMode 사용)',
       component: Time,
       parsedData: parseComponent(TimeRaw),
     },
