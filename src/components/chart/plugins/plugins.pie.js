@@ -27,7 +27,8 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if (chartWidth < 0 || chartHeight < 0) {
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
       return;
     }
 
@@ -116,7 +117,8 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if (chartWidth < 0 || chartHeight < 0) {
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
       return;
     }
 
@@ -202,7 +204,8 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if (chartWidth < 0 || chartHeight < 0) {
+    if ((typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)) {
       return;
     }
 
