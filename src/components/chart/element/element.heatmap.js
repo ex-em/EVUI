@@ -151,9 +151,9 @@ class HeatMap {
             const { color, lineWidth } = this.stroke;
             ctx.strokeStyle = Util.colorStringToRgba(color, opacity);
             ctx.lineWidth = lineWidth;
-            xp += lineWidth;
+            xp += (lineWidth * 1.5);
             yp += (lineWidth * 1.5);
-            w -= (lineWidth * 1.5);
+            w -= (lineWidth * 2);
             h -= (lineWidth * 2);
           }
           this.drawItem(ctx, xp, yp, w, h);

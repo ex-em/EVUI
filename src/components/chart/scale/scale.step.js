@@ -181,7 +181,7 @@ class StepScale extends Scale {
         ctx.stroke();
       });
 
-      if (this.rangeMode && this.showGrid) {
+      if (this.rangeMode) {
         let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
         if (isNaN(labelLastText)) {
           labelLastText = 'Max';
@@ -191,12 +191,16 @@ class StepScale extends Scale {
 
         if (this.type === 'x') {
           ctx.fillText(labelLastText, labelCenter, labelPoint);
-          ctx.moveTo(linePosition, offsetPoint);
-          ctx.lineTo(linePosition, offsetCounterPoint);
+          if (this.showGrid) {
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetCounterPoint);
+          }
         } else {
           ctx.fillText(labelLastText, labelPoint, labelCenter);
-          ctx.moveTo(offsetPoint, linePosition);
-          ctx.lineTo(offsetCounterPoint, linePosition);
+          if (this.showGrid) {
+            ctx.moveTo(offsetPoint, linePosition);
+            ctx.lineTo(offsetCounterPoint, linePosition);
+          }
         }
         ctx.stroke();
       }
