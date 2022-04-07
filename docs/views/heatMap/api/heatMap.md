@@ -108,7 +108,6 @@ const chartData =
 ##### step type
    - rangeMode
       - 축에 표시할 값을 line에 표시할지의 여부 
-      - labels 구성이 number로 이루어진 경우 range로 표현하고 싶을 때 사용
 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
