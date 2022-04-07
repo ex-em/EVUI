@@ -101,6 +101,9 @@ const chartData =
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
+   - rangeMode
+      - categoryMode인 경우만 사용 가능
+      - 축에 표시할 값을 line에 표시할지의 여부
 
 ##### step type
    - rangeMode

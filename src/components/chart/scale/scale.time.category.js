@@ -164,7 +164,7 @@ class TimeCategoryScale extends Scale {
     }
 
     const graphGap = (endPoint - startPoint) / (labels.length || 1);
-    if (this.categoryMode) {
+    if (this.categoryMode && !this.rangeMode) {
       startPoint += Math.ceil(graphGap / 2) - 2;
     }
 
@@ -176,6 +176,7 @@ class TimeCategoryScale extends Scale {
     ctx.strokeStyle = this.gridLineColor;
 
     let labelText;
+    let labelPoint;
     for (let ix = 0; ix < oriSteps; ix += count) {
       ticks[ix] = axisMin + (ix * stepValue);
 
@@ -197,8 +198,6 @@ class TimeCategoryScale extends Scale {
       }
 
       ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
-
-      let labelPoint;
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
@@ -240,6 +239,31 @@ class TimeCategoryScale extends Scale {
         }
       }
 
+      ctx.stroke();
+    }
+
+    if (this.categoryMode && this.rangeMode && (count * steps) === oriSteps) {
+      const diffTime = dayjs(labels[1]).diff(dayjs(labels[0]));
+      const labelLastText = this.getLabelFormat(
+        dayjs(labels[labels.length - 1] + diffTime),
+      );
+
+      labelCenter = Math.round(startPoint + (graphGap * labels.length));
+      linePosition = labelCenter + aliasPixel;
+
+      if (this.type === 'x') {
+        ctx.fillText(labelLastText, labelCenter, labelPoint);
+        if (this.showGrid) {
+          ctx.moveTo(linePosition, offsetPoint);
+          ctx.lineTo(linePosition, offsetCounterPoint);
+        }
+      } else {
+        ctx.fillText(labelLastText, labelPoint, labelCenter);
+        if (this.showGrid) {
+          ctx.moveTo(offsetPoint, linePosition);
+          ctx.lineTo(offsetCounterPoint, linePosition);
+        }
+      }
       ctx.stroke();
     }
 
