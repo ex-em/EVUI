@@ -457,16 +457,21 @@ export default {
 
     watch(
       () => props.checked,
-      (checkedList) => {
+      (value) => {
+        checkInfo.checkedRows = value;
+      },
+    );
+    watch(
+      () => checkInfo.checkedRows,
+      (value) => {
+        checkInfo.isHeaderChecked = false;
         let store = stores.store;
         if (pageInfo.isClientPaging) {
           store = getPagingData();
         }
-        checkInfo.checkedRows = checkedList;
-        checkInfo.isHeaderChecked = false;
         if (store.length) {
           store.forEach((row) => {
-            row.checked = !!checkedList.find(c => c.index === row.index);
+            row.checked = !!value.find(checkedRow => checkedRow.index === row.index);
           });
           checkHeader(store);
         }
@@ -475,12 +480,21 @@ export default {
     );
     watch(
       () => props.selected,
-      (selectedList) => {
-        selectInfo.selectedRow = selectedList;
-        stores.store.forEach((row) => {
-          row.selected = !!selectInfo.selectedRow.find(s => s.index === row.index);
-        });
-        updateVScroll();
+      (value) => {
+        if (selectInfo.useSelect) {
+          selectInfo.selectedRow = value;
+        }
+      },
+    );
+    watch(
+      () => selectInfo.selectedRow,
+      (value) => {
+        if (selectInfo.useSelect) {
+          stores.store.forEach((row) => {
+            row.selected = !!value.find(selectedRow => selectedRow.index === row.index);
+          });
+          updateVScroll();
+        }
       }, { deep: true },
     );
     watch(

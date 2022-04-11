@@ -605,8 +605,13 @@ export default {
     );
     watch(
       () => props.checked,
-      (checkedList) => {
-        checkInfo.checkedRows = checkedList;
+      (value) => {
+        checkInfo.checkedRows = value;
+      },
+    );
+    watch(
+      () => checkInfo.checkedRows,
+      (value) => {
         checkInfo.isHeaderChecked = false;
         let store = stores.store;
         if (pageInfo.isClientPaging) {
@@ -614,20 +619,27 @@ export default {
         }
         if (store.length) {
           store.forEach((row) => {
-            row[ROW_CHECK_INDEX] = checkedList.includes(row[ROW_DATA_INDEX]);
+            row[ROW_CHECK_INDEX] = value.includes(row[ROW_DATA_INDEX]);
           });
-          checkInfo.isHeaderChecked = checkedList.length === store.length;
+          checkInfo.isHeaderChecked = value.length === store.length;
         }
         updateVScroll();
       },
     );
     watch(
       () => props.selected,
-      (selectedList) => {
+      (value) => {
         if (selectInfo.useSelect) {
-          selectInfo.selectedRow = selectedList;
+          selectInfo.selectedRow = value;
+        }
+      },
+    );
+    watch(
+      () => selectInfo.selectedRow,
+      (value) => {
+        if (selectInfo.useSelect) {
           stores.store.forEach((row) => {
-            row[ROW_SELECT_INDEX] = selectInfo.selectedRow.includes(row[ROW_DATA_INDEX]);
+            row[ROW_SELECT_INDEX] = value.includes(row[ROW_DATA_INDEX]);
           });
           updateVScroll();
         }
