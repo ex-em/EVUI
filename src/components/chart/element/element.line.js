@@ -147,6 +147,8 @@ class Line {
       if (this.stackIndex) {
         const reversedDataList = this.data.slice().reverse();
         reversedDataList.forEach((curr, ix) => {
+          ctx.beginPath();
+
           x = getXPos(curr.x);
           y = getYPos(curr.b);
 
