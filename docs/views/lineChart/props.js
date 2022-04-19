@@ -16,6 +16,8 @@ import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
+import SelectSeries from './example/SelectSeries';
+import SelectSeriesRaw from '!!raw-loader!./example/SelectSeries';
 
 export default {
   mdText,
@@ -44,6 +46,11 @@ export default {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: SelectLabel,
       parsedData: parseComponent(SelectLabelRaw),
+    },
+    'Select Series': {
+      description: '선택한 시리즈가 하이라이트 되어 보이는 기능입니다.',
+      component: SelectSeries,
+      parsedData: parseComponent(SelectSeriesRaw),
     },
     DragSelection: {
       description: 'Drag Select 이벤트 등록이 가능 합니다',

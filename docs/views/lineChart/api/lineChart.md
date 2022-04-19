@@ -33,7 +33,18 @@ const selectedLabel = ref({
 });
 ```
 
-### 3. data  
+### 3. v-model:selectedSeries
+- option에서 [selectSeries](#selectseries) 옵션을 사용할 경우 유효한 바인딩
+- 현재 선택된 시리즈의 ID 값의 배열 (seriesId)
+- 차트 클릭이 아니라 특정 시리즈를 선택하고 싶은 경우 바인딩 하고, seriesId 배열의 값으로 차트를 컨트롤 한다.
+#### Example
+```
+const selectedSeries = ref({
+    seriesId: ['series1'], // option 에 설정한 limit 갯수 까지 선택 가능.
+});
+```
+
+### 4. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
@@ -78,7 +89,7 @@ const chartData =
 };
 ```
   
-### 4. options 
+### 5. options 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | '' | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
@@ -245,6 +256,13 @@ const chartData =
 | useApproximateValue | Boolean                     | false     | 가까운 label을 선택                         | |
 | tipBackground      | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                              | |
 
+#### selectSeries
+| 이름                 | 타입                          | 디폴트       | 설명                                    | 종류(예시) |
+|--------------------|-----------------------------|-----------|---------------------------------------| ----------|
+| use                | Boolean                     | false     | 차트 라벨 선택 기능                           | |
+| limit              | Number                      | 1         | 선택할 라벨의 최대 갯수                         | |
+| useDeselectOverflow | Boolean                     | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부 | |
+
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
@@ -254,12 +272,12 @@ const chartData =
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 
 
-### 5. resize-timeout
+### 6. resize-timeout
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
 
 
-### 6. Event
+### 7. Event
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
 | click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |

@@ -24,6 +24,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         type: Object,
         default: null,
       },
+      selectedSeries: {
+        type: Object,
+        default: null,
+      },
       options: {
         type: Object,
         default: () => ({}),
@@ -43,6 +47,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'drag-select',
       'update:selectedItem',
       'update:selectedLabel',
+      'update:selectedSeries',
     ],
     setup(props) {
       let evChart = {};
@@ -52,6 +57,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         eventListeners,
         selectItemInfo,
         selectLabelInfo,
+        selectSeriesInfo,
         getNormalizedData,
         getNormalizedOptions,
       } = useModel();
@@ -67,13 +73,20 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       );
 
       const createChart = () => {
+        let selected;
+        if (normalizedOptions.selectLabel.use) {
+          selected = selectLabelInfo;
+        } else if (normalizedOptions.selectSeries.use) {
+          selected = selectSeriesInfo;
+        }
+
         evChart = new EvChart(
           wrapper.value,
           normalizedData,
           normalizedOptions,
           eventListeners,
           selectItemInfo,
-          selectLabelInfo,
+          selected,
         );
       };
 
@@ -115,7 +128,13 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
 
         await watch(() => props.selectedLabel, (newValue) => {
           if (newValue.dataIndex) {
-            evChart.renderWithSelectLabel(newValue.dataIndex);
+            evChart.renderWithSelected(newValue.dataIndex);
+          }
+        }, { deep: true });
+
+        await watch(() => props.selectedSeries, (newValue) => {
+          if (newValue.seriesId) {
+            evChart.renderWithSelected(newValue.seriesId);
           }
         }, { deep: true });
       });
