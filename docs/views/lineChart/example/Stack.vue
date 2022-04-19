@@ -13,12 +13,13 @@
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
       const chartData = {
         series: {
-          series1: { name: 'series#1', fill: true, point: true },
-          series2: { name: 'series#2', fill: true, point: true },
-          series3: { name: 'series#3', fill: true, point: true },
+          series1: { name: 'series#1', fill: true, point: false },
+          series2: { name: 'series#2', fill: true, point: false, show: true },
+          series3: { name: 'series#3', fill: true, point: false },
+          series4: { name: 'series#4', fill: true, point: false, show: true },
         },
         groups: [
-          ['series1', 'series2', 'series3'],
+          ['series1', 'series2', 'series3', 'series4'],
         ],
         labels: [
           dayjs(time),
@@ -28,11 +29,15 @@
           dayjs(time).add(4, 'day'),
           dayjs(time).add(5, 'day'),
           dayjs(time).add(6, 'day'),
+          dayjs(time).add(7, 'day'),
         ],
         data: {
-          series1: [100, 25, 47, 47, 40, 50, 100],
-          series2: [100, 25, 47, 47, null, null, null],
-          series3: [100, 50, 50, 50, null, 50, 100],
+          // series1: [100, 25, 47, 47, null, 50, 100],
+          // series2: [100, 25, 47, 47, null, null, null],
+          series3: [100, 50, 47, 50, 40, null, 50, 100],
+          series1: [100, 25, 47, 47, 40, 50, 100, 100],
+          series2: [100, 25, 47, 47, 40, null, 100, 100],
+          series4: [100, 50, 50, 50, 40, 100, 100, 100],
         },
       };
 

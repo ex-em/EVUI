@@ -1,11 +1,11 @@
 <template>
-  <nav class="evui-navigation">
-    <ev-menu
-      v-model="currentMenu"
-      :items="menu"
-      @change="changeMenu"
-    />
-  </nav>
+<!--  <nav class="evui-navigation">-->
+<!--    <ev-menu-->
+<!--      v-model="currentMenu"-->
+<!--      :items="menu"-->
+<!--      @change="changeMenu"-->
+<!--    />-->
+<!--  </nav>-->
 </template>
 
 <script>

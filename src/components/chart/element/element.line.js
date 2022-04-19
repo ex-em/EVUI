@@ -68,8 +68,7 @@ class Line {
     const pointFillColorOpacity = getOpacity(pointFillColor);
 
     ctx.beginPath();
-    ctx.save();
-    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
 
@@ -170,6 +169,8 @@ class Line {
         ctx.lineTo(this.data[startFillIndex].xp, endPoint);
       }
 
+      ctx.closePath();
+      ctx.stroke();
       ctx.fill();
     }
     if (this.point || isExistSelectedLabel) {

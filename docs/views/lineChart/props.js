@@ -27,45 +27,45 @@ export default {
       component: Default,
       parsedData: parseComponent(DefaultRaw),
     },
-    Fill: {
-      description: 'Line Chart의 Fill 옵션을 이용하여 각 계열 데이터의 양을 좀 더 쉽게 인지할 수 있도록 합니다.',
-      component: Fill,
-      parsedData: parseComponent(FillRaw),
-    },
+    // Fill: {
+    //   description: 'Line Chart의 Fill 옵션을 이용하여 각 계열 데이터의 양을 좀 더 쉽게 인지할 수 있도록 합니다.',
+    //   component: Fill,
+    //   parsedData: parseComponent(FillRaw),
+    // },
     Stack: {
       description: 'Stack Line Chart는 계열의 순서에 맞춰 데이터를 누적하여 각 계열의 데이터 비교를 시각적으로 판단하는데 도움을 줍니다.',
       component: Stack,
       parsedData: parseComponent(StackRaw),
     },
-    Event: {
-      description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
-      component: Event,
-      parsedData: parseComponent(EventRaw),
-    },
-    'Select Label': {
-      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
-      component: SelectLabel,
-      parsedData: parseComponent(SelectLabelRaw),
-    },
-    'Select Series': {
-      description: '선택한 시리즈가 하이라이트 되어 보이는 기능입니다.',
-      component: SelectSeries,
-      parsedData: parseComponent(SelectSeriesRaw),
-    },
-    DragSelection: {
-      description: 'Drag Select 이벤트 등록이 가능 합니다',
-      component: DragSelection,
-      parsedData: parseComponent(DragSelectionRaw),
-    },
-    Tooltip: {
-      description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',
-      component: Tooltip,
-      parsedData: parseComponent(TooltipRaw),
-    },
-    'Plot line & Plot band': {
-      description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
-      component: PlotLine,
-      parsedData: parseComponent(PlotLineRaw),
-    },
+    // Event: {
+    //   description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
+    //   component: Event,
+    //   parsedData: parseComponent(EventRaw),
+    // },
+    // 'Select Label': {
+    //   description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
+    //   component: SelectLabel,
+    //   parsedData: parseComponent(SelectLabelRaw),
+    // },
+    // 'Select Series': {
+    //   description: '선택한 시리즈가 하이라이트 되어 보이는 기능입니다.',
+    //   component: SelectSeries,
+    //   parsedData: parseComponent(SelectSeriesRaw),
+    // },
+    // DragSelection: {
+    //   description: 'Drag Select 이벤트 등록이 가능 합니다',
+    //   component: DragSelection,
+    //   parsedData: parseComponent(DragSelectionRaw),
+    // },
+    // Tooltip: {
+    //   description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',
+    //   component: Tooltip,
+    //   parsedData: parseComponent(TooltipRaw),
+    // },
+    // 'Plot line & Plot band': {
+    //   description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
+    //   component: PlotLine,
+    //   parsedData: parseComponent(PlotLineRaw),
+    // },
   },
 };

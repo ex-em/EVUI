@@ -1,125 +1,428 @@
 <template>
-  <div class="case">
-    <ev-chart
+  <ev-chart
       :data="chartData"
       :options="chartOptions"
-    />
-    <div class="description">
-      <span class="toggle-label">데이터 자동 업데이트</span>
-      <ev-toggle
-        v-model="isLive"
-      />
-    </div>
-  </div>
+  />
 </template>
 
 <script>
-  import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
-  import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
-  export default {
-    setup() {
-      const chartData = reactive({
-        series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
-          series5: { name: 'series#5' },
+export default {
+  setup() {
+    const blksHit = [
+      [
+        1649812225,
+        67029,
+        67029,
+      ],
+      [
+        1649812230,
+        45436,
+        45436,
+      ],
+      [
+        1649812235,
+        43489,
+        43489,
+      ],
+      [
+        1649812240,
+        68574,
+        68574,
+      ],
+      [
+        1649812245,
+        44093,
+        44093,
+      ],
+      [
+        1649812250,
+        38916,
+        38916,
+      ],
+      [
+        1649812255,
+        5506,
+        5506,
+      ],
+      [
+        1649812260,
+        null,
+        null,
+      ],
+      [
+        1649812265,
+        43630,
+        43630,
+      ],
+      [
+        1649812270,
+        42741,
+        42741,
+      ],
+      [
+        1649812275,
+        67534,
+        67534,
+      ],
+      [
+        1649812280,
+        25145,
+        25145,
+      ],
+      [
+        1649812285,
+        24362,
+        24362,
+      ],
+      [
+        1649812290,
+        42925,
+        42925,
+      ],
+      [
+        1649812295,
+        63314,
+        63314,
+      ],
+      [
+        1649812300,
+        44126,
+        44126,
+      ],
+      [
+        1649812305,
+        25937,
+        25937,
+      ],
+      [
+        1649812310,
+        39379,
+        39379,
+      ],
+      [
+        1649812315,
+        51188,
+        51188,
+      ],
+      [
+        1649812320,
+        44893,
+        44893,
+      ],
+      [
+        1649812325,
+        43168,
+        43168,
+      ],
+      [
+        1649812330,
+        68967,
+        68967,
+      ],
+      [
+        1649812335,
+        43248,
+        43248,
+      ],
+      [
+        1649812340,
+        45119,
+        45119,
+      ],
+      [
+        1649812345,
+        55195,
+        55195,
+      ],
+      [
+        1649812350,
+        34001,
+        34001,
+      ],
+      [
+        1649812355,
+        43867,
+        43867,
+      ],
+      [
+        1649812360,
+        45495,
+        45495,
+      ],
+      [
+        1649812365,
+        67924,
+        67924,
+      ],
+      [
+        1649812370,
+        28968,
+        28968,
+      ],
+      [
+        1649812375,
+        34968,
+        34968,
+      ],
+      [
+        1649812380,
+        null,
+        null,
+      ],
+      [
+        1649812385,
+        44420,
+        44420,
+      ],
+      [
+        1649812390,
+        48013,
+        48013,
+      ],
+      [
+        1649812395,
+        68331,
+        68331,
+      ],
+    ];
+    const blksRead = [
+      [
+        1649812225,
+        0,
+        0,
+      ],
+      [
+        1649812230,
+        0,
+        0,
+      ],
+      [
+        1649812235,
+        0,
+        0,
+      ],
+      [
+        1649812240,
+        0,
+        0,
+      ],
+      [
+        1649812245,
+        0,
+        0,
+      ],
+      [
+        1649812250,
+        0,
+        0,
+      ],
+      [
+        1649812255,
+        0,
+        0,
+      ],
+      [
+        1649812260,
+        null,
+        null,
+      ],
+      [
+        1649812265,
+        0,
+        0,
+      ],
+      [
+        1649812270,
+        0,
+        0,
+      ],
+      [
+        1649812275,
+        0,
+        0,
+      ],
+      [
+        1649812280,
+        0,
+        0,
+      ],
+      [
+        1649812285,
+        0,
+        0,
+      ],
+      [
+        1649812290,
+        0,
+        0,
+      ],
+      [
+        1649812295,
+        0,
+        0,
+      ],
+      [
+        1649812300,
+        0,
+        0,
+      ],
+      [
+        1649812305,
+        0,
+        0,
+      ],
+      [
+        1649812310,
+        0,
+        0,
+      ],
+      [
+        1649812315,
+        0,
+        0,
+      ],
+      [
+        1649812320,
+        0,
+        0,
+      ],
+      [
+        1649812325,
+        0,
+        0,
+      ],
+      [
+        1649812330,
+        0,
+        0,
+      ],
+      [
+        1649812335,
+        0,
+        0,
+      ],
+      [
+        1649812340,
+        0,
+        0,
+      ],
+      [
+        1649812345,
+        0,
+        0,
+      ],
+      [
+        1649812350,
+        0,
+        0,
+      ],
+      [
+        1649812355,
+        0,
+        0,
+      ],
+      [
+        1649812360,
+        0,
+        0,
+      ],
+      [
+        1649812365,
+        0,
+        0,
+      ],
+      [
+        1649812370,
+        0,
+        0,
+      ],
+      [
+        1649812375,
+        0,
+        0,
+      ],
+      [
+        1649812380,
+        null,
+        null,
+      ],
+      [
+        1649812385,
+        0,
+        0,
+      ],
+      [
+        1649812390,
+        0,
+        0,
+      ],
+      [
+        1649812395,
+        0,
+        0,
+      ],
+    ];
+    const chartData = {
+      series: {
+        series1: { name: 'blkshit', fill: true, point: false },
+        series2: { name: 'blksread', fill: true, point: false },
+      },
+      groups: [
+        ['series1', 'series2'],
+      ],
+      labels: blksHit.map(value => dayjs.unix(value[0])),
+      data: {
+        series1: blksHit.map(value => value[1]),
+        series2: blksRead.map(value => (value[1] !== null && value[1] >= 0 ? value[1] + 50000 : null)),
+      },
+    };
+    const chartOptions = {
+      type: 'line',
+      width: '100%',
+      title: {
+        text: 'Physical + Logical IO',
+        show: true,
+      },
+      legend: {
+        show: true,
+        position: 'right',
+      },
+      tooltip: {
+        use: true,
+      },
+      axesX: [{
+        type: 'time',
+        showGrid: false,
+        timeFormat: 'YYYY-MM-DD',
+        interval: 'day',
+        labelStyle: {
+          color: '#A4A4A4',
+          fontSize: '11px',
+          fontFamily: 'Roboto',
         },
-        labels: [],
-        data: {
-          series1: [],
-          series2: [],
-          series3: [],
-          series4: [],
-          series5: [],
+      }],
+      axesY: [{
+        type: 'linear',
+        showGrid: true,
+        startToZero: true,
+        autoScaleRatio: 0.1,
+        labelStyle: {
+          color: '#A4A4A4',
+          fontSize: '11px',
+          fontFamily: 'Roboto',
         },
-      });
+      }],
+    };
 
-      const chartOptions = reactive({
-        type: 'line',
-        width: '100%',
-        height: '80%',
-        padding: {
-          right: 40,
-        },
-        title: {
-          text: 'Chart Title',
-          show: true,
-        },
-        legend: {
-          show: true,
-          position: 'right',
-        },
-        axesX: [{
-          type: 'time',
-          timeFormat: 'HH:mm:ss',
-          interval: 'second',
-        }],
-        axesY: [{
-          type: 'linear',
-          showGrid: true,
-          startToZero: true,
-          autoScaleRatio: 0.1,
-        }],
-      });
-
-      const isLive = ref(false);
-      const liveInterval = ref();
-      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
-
-      const addRandomChartData = () => {
-        if (isLive.value) {
-          chartData.labels.shift();
-        }
-
-        timeValue = dayjs(timeValue).add(1, 'second');
-        chartData.labels.push(dayjs(timeValue));
-
-        Object.values(chartData.data).forEach((seriesData) => {
-          if (isLive.value) {
-            seriesData.shift();
-          }
-
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-        });
-      };
-
-      onMounted(() => {
-        for (let ix = 0; ix < 60; ix++) {
-          addRandomChartData();
-        }
-      });
-
-      watch(isLive, (newValue) => {
-        if (newValue) {
-          addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 1000);
-        } else {
-          clearInterval(liveInterval.value);
-        }
-      });
-
-      onBeforeUnmount(() => {
-        clearInterval(liveInterval.value);
-      });
-
-      return {
-        chartData,
-        chartOptions,
-        isLive,
-      };
-    },
-  };
+    return {
+      chartData,
+      chartOptions,
+    };
+  },
+};
 </script>
 
-<style lang="scss" scoped>
-  .case {
-    height: 100%;
-  }
-  .toggle-label {
-    vertical-align: top;
-    margin-right: 7px;
-  }
+<style lang="scss">
 </style>
