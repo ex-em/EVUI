@@ -203,7 +203,7 @@ const modules = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
-        hitInfo: { sId: targetId },
+        hitInfo: { sId: targetId, type: this.options.type },
       });
     };
 
