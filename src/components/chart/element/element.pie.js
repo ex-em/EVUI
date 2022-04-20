@@ -45,7 +45,6 @@ class Pie {
     const slice = new Path2D();
 
     const radius = this.isSelect ? this.radius + 5 : this.radius;
-    const doughnutHoleRadius = this.radius * this.doughnutHoleSize;
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
@@ -66,7 +65,7 @@ class Pie {
     }
 
     if (this.showValue?.use) {
-      this.drawValueLabels(ctx, doughnutHoleRadius);
+      this.drawValueLabels(ctx);
     }
 
     ctx.closePath();
@@ -115,7 +114,6 @@ class Pie {
   itemHighlight(item, context) {
     const ctx = context;
     const radius = this.isSelect ? this.radius + 5 : this.radius;
-    const doughnutHoleRadius = this.radius * this.doughnutHoleSize;
 
     ctx.save();
     ctx.shadowOffsetX = 0;
@@ -133,7 +131,7 @@ class Pie {
     ctx.fill();
 
     if (this.showValue?.use) {
-      this.drawValueLabels(ctx, doughnutHoleRadius);
+      this.drawValueLabels(ctx);
     }
 
     ctx.closePath();
@@ -146,19 +144,9 @@ class Pie {
    * @param context           canvas context
    */
   drawValueLabels(context) {
-    const { fontSize, textColor, formatter } = this.showValue;
     const ctx = context;
-
-    ctx.save();
-    ctx.beginPath();
-
-    ctx.font = `normal normal normal ${fontSize}px Roboto`;
-    ctx.fillStyle = textColor;
-    ctx.lineWidth = 1;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
     const value = this.data.o;
+    const { fontSize, textColor, formatter } = this.showValue;
 
     let formattedTxt;
     if (formatter) {
@@ -180,15 +168,27 @@ class Pie {
       && radius >= valueWidth * ratio
       && radius >= valueHeight * ratio
     ) {
+      ctx.save();
+      ctx.beginPath();
+
+      const noneDownplayOpacity = textColor.includes('rgba') ? Util.getOpacity(textColor) : 1;
+      const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+
+      ctx.font = `normal normal normal ${fontSize}px Roboto`;
+      ctx.fillStyle = Util.colorStringToRgba(textColor, opacity);
+      ctx.lineWidth = 1;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
       const halfRadius = (radius / 2) + this.doughnutHoleSize;
       const centerAngle = ((this.endAngle - this.startAngle) / 2) + this.startAngle;
       const xPos = halfRadius * Math.cos(centerAngle) + this.centerX;
       const yPos = halfRadius * Math.sin(centerAngle) + this.centerY;
 
       ctx.fillText(formattedTxt, xPos, yPos);
-    }
 
-    ctx.restore();
+      ctx.restore();
+    }
   }
 }
 
