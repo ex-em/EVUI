@@ -172,6 +172,7 @@
       minWidth,
       rowHeight,
     }"
+    :scroll-left="summaryScroll"
   />
   <!-- Pagination -->
   <grid-pagination
@@ -186,7 +187,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import GridPagination from '../grid/grid.pagination';
@@ -380,6 +381,7 @@ export default {
       elementInfo,
       clearCheckInfo,
     });
+    const summaryScroll = ref(0);
     const {
       updateVScroll,
       updateHScroll,
@@ -390,6 +392,7 @@ export default {
       elementInfo,
       resizeInfo,
       pageInfo,
+      summaryScroll,
       getPagingData,
       updatePagingInfo,
     });
@@ -689,6 +692,7 @@ export default {
     const getSlotName = column => `${column}Node`;
 
     return {
+      summaryScroll,
       gridStyle,
       gridClass,
       headerClass,
