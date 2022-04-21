@@ -100,7 +100,8 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         await watch(() => props.data, (chartData) => {
           const newData = getNormalizedData(chartData);
           const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
-              || !isEqual(newData.groups, evChart.data.groups);
+              || !isEqual(newData.groups, evChart.data.groups)
+              || props.options.type === 'heatMap';
           evChart.data = cloneDeep(newData);
           evChart.update({
             updateSeries: isUpdateSeries,

@@ -408,7 +408,7 @@ const modules = {
     }
 
     // 3. Draw value
-    let formattedTxt;
+    let formattedTxt = itemValue;
     if (opt.formatter) {
       formattedTxt = opt.formatter({
         x: xValue,
@@ -419,8 +419,6 @@ const modules = {
 
     if ((!opt.formatter || typeof formattedTxt !== 'string') && itemValue !== 'error') {
       formattedTxt = numberWithComma(itemValue);
-    } else {
-      formattedTxt = itemValue;
     }
 
     ctx.textAlign = 'right';

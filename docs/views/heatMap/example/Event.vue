@@ -104,7 +104,6 @@ import { onMounted, reactive, ref } from 'vue';
         }],
         axesY: [{
           type: 'step',
-          autoScaleRatio: 0.1,
           showGrid: false,
         }],
         selectItem: {

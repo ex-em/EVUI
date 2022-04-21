@@ -77,8 +77,8 @@ class HeatMap {
   drawItem(ctx, x, y, w, h) {
     ctx.beginPath();
     if (this.stroke.show) {
-      ctx.fillRect(x, y, w, h);
       ctx.strokeRect(x, y, w, h);
+      ctx.fillRect(x, y, w, h);
     } else {
       const aliasPixel = Util.aliasPixel(1);
       ctx.fillRect(
@@ -148,8 +148,11 @@ class HeatMap {
         if (this.colorAxis[colorIndex].show) {
           ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
           if (this.stroke.show) {
-            const { color, lineWidth } = this.stroke;
-            ctx.strokeStyle = Util.colorStringToRgba(color, opacity);
+            const { color, lineWidth, opacity: sOpacity } = this.stroke;
+            ctx.strokeStyle = Util.colorStringToRgba(
+              color,
+              opacity === 1 ? sOpacity : opacity,
+            );
             ctx.lineWidth = lineWidth;
             xp += (lineWidth * 1.5);
             yp += (lineWidth * 1.5);
@@ -216,7 +219,7 @@ class HeatMap {
     const centerX = x + (w / 2);
     const centerY = y + (h / 2);
 
-    if (vw >= w || formattedTxt < 0) {
+    if (vw >= w || vh >= h || formattedTxt < 0) {
       return;
     }
 
@@ -267,13 +270,10 @@ class HeatMap {
       const y1 = yp;
       const y2 = yp + h;
 
-      return ((x1 <= xsp && x2 >= xsp) && (y1 <= ysp && y2 >= ysp))
-         || ((x1 <= xep && x2 >= xep) && (y1 <= ysp && y2 >= ysp))
-         || ((x1 <= xsp && x2 >= xsp) && (y1 <= yep && y2 >= yep))
-         || ((x1 <= xep && x2 >= xep) && (y1 <= yep && y2 >= yep))
-         || ((x1 >= xsp && x1 <= xep) && (y1 >= ysp && y1 <= yep))
+      return ((x1 >= xsp && x1 <= xep) && (y1 >= ysp && y1 <= yep))
          || ((x1 >= xsp && x1 <= xep) && (y2 >= ysp && y2 <= yep))
-         || ((x2 >= xsp && x2 <= xep) && (y1 >= ysp && y1 <= yep));
+         || ((x2 >= xsp && x2 <= xep) && (y1 >= ysp && y1 <= yep))
+        || ((x2 >= xsp && x2 <= xep) && (y2 >= ysp && y2 <= yep));
     });
   }
 
@@ -351,6 +351,114 @@ class HeatMap {
     }
 
     return item;
+  }
+
+  findBlockRange({ xcp, xep, ycp, yep, range }) {
+    const { x: labelX, y: labelY } = this.labels;
+
+    const blockRange = {
+      xsp: Math.min(xcp, xep),
+      ysp: Math.min(ycp, yep),
+      width: Math.ceil(Math.abs(xep - xcp)),
+      height: Math.ceil(Math.abs(yep - ycp)),
+    };
+
+    if (labelX.length && labelY.length) {
+      const { x1, x2, y1, y2 } = range;
+      const gapX = (x2 - x1) / labelX.length;
+      const gapY = (y2 - y1) / labelY.length;
+
+      const point = {
+        xsp: xcp,
+        xep,
+        ysp: ycp,
+        yep,
+      };
+
+      const setPoint = (type, dir) => {
+        let itemPoint;
+        let list;
+        let target;
+        let gap;
+        let key;
+        let start;
+        const isStart = dir === 'start';
+
+        if (type === 'x') {
+          list = labelX;
+          gap = gapX;
+          target = isStart ? Math.min(xcp, xep) : Math.max(xcp, xep);
+          key = isStart ? 'xsp' : 'xep';
+          start = x1;
+        } else {
+          list = labelY;
+          gap = gapY;
+          target = isStart ? Math.min(ycp, yep) : Math.max(ycp, yep);
+          key = isStart ? 'ysp' : 'yep';
+          start = y1;
+        }
+
+        const findItem = list.findIndex((item, index) => {
+          itemPoint = Math.round(start + (gap * index)) + Util.aliasPixel(1);
+          return itemPoint <= target && target <= itemPoint + gap;
+        });
+
+        if (findItem > -1) {
+          point[key] = isStart ? itemPoint : itemPoint + gap;
+        }
+      };
+
+      setPoint('x', 'start');
+      setPoint('x', 'end');
+      setPoint('y', 'start');
+      setPoint('y', 'end');
+
+      blockRange.xsp = Math.min(point.xsp, point.xep);
+      blockRange.ysp = Math.min(point.ysp, point.yep);
+      blockRange.width = Math.abs(point.xep - point.xsp);
+      blockRange.height = Math.abs(point.yep - point.ysp);
+    }
+
+    return blockRange;
+  }
+
+  findSelectionRange(rangeInfo) {
+    const { xcp, ycp, width, height, range } = rangeInfo;
+
+    let selectionRange = null;
+
+    const { x1, x2, y1, y2 } = range;
+    const { x: labelX, y: labelY } = this.labels;
+
+    if (labelX.length && labelY.length) {
+      const gapX = (x2 - x1) / labelX.length;
+      const gapY = (y2 - y1) / labelY.length;
+
+      const xsp = xcp;
+      const xep = xcp + width;
+      const ysp = ycp;
+      const yep = ycp + height;
+
+      const xIndex = {
+        min: Math.floor((xsp - x1) / gapX),
+        max: Math.floor((xep - x1 - gapX) / gapX),
+      };
+
+      const lastIndexY = labelY.length - 1;
+      const yIndex = {
+        min: lastIndexY - Math.floor((yep - y1 - gapY) / gapY),
+        max: lastIndexY - Math.floor((ysp - y1) / gapY),
+      };
+
+      selectionRange = {
+        xMin: labelX[xIndex.min],
+        xMax: labelX[xIndex.max],
+        yMin: labelY[yIndex.min],
+        yMax: labelY[yIndex.max],
+      };
+    }
+
+    return selectionRange;
   }
 }
 
