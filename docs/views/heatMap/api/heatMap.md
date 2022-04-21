@@ -171,19 +171,19 @@ const chartData =
 #### heatMapColor
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
-| min | number | | min color | '#FFFFFF' |
-| max | number | | max color | '#5586EB' | 
+| min | Hex, RGB, RGBA Code(String) | '#FFFFFF' | min color |  |
+| max | Hex, RGB, RGBA Code(String) | '#5586EB' | max color |  | 
 | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
 | stroke | object | ([상세](#stroke)) | series stroke 지정 |  |
-| error | string | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
+| error | Hex, RGB, RGBA Code(String) | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 
 ##### stroke
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | show | boolean | false | stroke 사용 여부 | |
-| color | string | '#FFFFFF' | stroke color 지정 | |
+| color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | stroke color 지정 | |
 | lineWidth | number | 1 | stroke 선 굵기 지정 | |
-| opacity | number | 1 | stroke opacity 지정 | |
+| opacity | number | 1 | stroke opacity 지정 | 0.1 ~ 1 |
 
 ### 3. resize-timeout
 - Default : 0
