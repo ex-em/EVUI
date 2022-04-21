@@ -143,46 +143,46 @@
         />
         <table>
           <tbody>
-            <!-- Row List -->
-            <tr
-              v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
-              :data-index="row[0]"
-              :class="{
+          <!-- Row List -->
+          <tr
+            v-for="(row, rowIndex) in viewStore"
+            :key="rowIndex"
+            :data-index="row[0]"
+            :class="{
                 row: true,
                 selected: row[3],
                 'non-border': !!borderStyle && borderStyle !== 'rows',
                 highlight: row[0] === highlightIdx,
               }"
-              @click="onRowClick($event, row)"
-              @dblclick="onRowDblClick($event, row)"
-            >
-              <!-- Row Checkbox -->
-              <td
-                v-if="useCheckbox.use"
-                :class="{
+            @click="onRowClick($event, row)"
+            @dblclick="onRowDblClick($event, row)"
+          >
+            <!-- Row Checkbox -->
+            <td
+              v-if="useCheckbox.use"
+              :class="{
                   cell: true,
                   'row-checkbox': true,
                   'non-border': !!borderStyle,
                 }"
-                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
-              >
-                <ev-checkbox
-                  v-model="row[1]"
-                  class="row-checkbox-input"
-                  @change="onCheck($event, row)"
-                />
-              </td>
-              <!-- Cell -->
-              <template
-                v-for="(column, cellIndex) in orderedColumns"
-                :key="cellIndex"
-              >
-                <td
-                  v-if="!column.hide"
-                  :data-name="column.field"
-                  :data-index="column.index"
-                  :class="{
+              :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+            >
+              <ev-checkbox
+                v-model="row[1]"
+                class="row-checkbox-input"
+                @change="onCheck($event, row)"
+              />
+            </td>
+            <!-- Cell -->
+            <template
+              v-for="(column, cellIndex) in orderedColumns"
+              :key="cellIndex"
+            >
+              <td
+                v-if="!column.hide"
+                :data-name="column.field"
+                :data-index="column.index"
+                :class="{
                     cell: true,
                     [column.type]: column.type,
                     [column.align]: column.align,
@@ -190,32 +190,32 @@
                     'non-border': !!borderStyle,
                     [column.field]: column.field,
                   }"
-                  :style="{
+                :style="{
                     width: `${column.width}px`,
                     height: `${rowHeight}px`,
                     'line-height': `${rowHeight}px`,
                     'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
                   }"
-                >
-                  <!-- Cell Renderer -->
-                  <template v-if="!!$slots[column.field]">
-                    <slot
-                      :name="column.field"
-                      :item="{ row, column }"
-                    />
-                  </template>
-                  <!-- Cell Value -->
-                  <template v-else>
-                    <div :title="getConvertValue(column, row[2][column.index])">
-                      {{ getConvertValue(column, row[2][column.index]) }}
-                    </div>
-                  </template>
-                </td>
-              </template>
-            </tr>
-            <tr v-if="!viewStore.length">
-              <td class="is-empty">No records</td>
-            </tr>
+              >
+                <!-- Cell Renderer -->
+                <div v-if="!!$slots[column.field]">
+                  <slot
+                    :name="column.field"
+                    :item="{ row, column }"
+                  />
+                </div>
+                <!-- Cell Value -->
+                <template v-else>
+                  <div :title="getConvertValue(column, row[2][column.index])">
+                    {{ getConvertValue(column, row[2][column.index]) }}
+                  </div>
+                </template>
+              </td>
+            </template>
+          </tr>
+          <tr v-if="!viewStore.length">
+            <td class="is-empty">No records</td>
+          </tr>
           </tbody>
         </table>
         <!-- vScroll Bottom -->
@@ -257,6 +257,7 @@
       minWidth,
       rowHeight,
     }"
+    :scroll-left-value="summaryScrollVal"
   />
   <!-- Pagination -->
   <grid-pagination
@@ -271,7 +272,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref } from 'vue';
 import Toolbar from './grid.toolbar';
 import FilterWindow from './grid.filter.window';
 import GridPagination from './grid.pagination';
@@ -474,7 +475,7 @@ export default {
       elementInfo,
       clearCheckInfo,
     });
-
+    const summaryScrollVal = ref(0);
     const {
       updateVScroll,
       updateHScroll,
@@ -487,6 +488,7 @@ export default {
       pageInfo,
       getPagingData,
       updatePagingInfo,
+      summaryScrollVal,
     });
 
     const {
@@ -751,6 +753,7 @@ export default {
       },
     );
     return {
+      summaryScrollVal,
       showHeader,
       stripeStyle,
       borderStyle,
@@ -799,20 +802,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import 'style/grid.scss';
-  .postgresql {
-    background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
-  }
+@import 'style/grid.scss';
+.postgresql {
+  background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
+}
 
-  .oracle {
-    background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
-  }
+.oracle {
+  background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
+}
 
-  .mongodb {
-    background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
-  }
+.mongodb {
+  background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
+}
 
-  .mysql {
-    background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
-  }
+.mysql {
+  background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
+}
 </style>

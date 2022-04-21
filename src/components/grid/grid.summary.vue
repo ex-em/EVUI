@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="summaryRef"
     :class="{
       'grid-summary': true,
       'non-border': styleInfo.borderStyle === 'none',
@@ -44,12 +45,18 @@
               height: `${styleInfo.rowHeight}px`,
             }"
           >
-            <template v-if="column.summaryRenderer">
+            <div
+              v-if="column.summaryRenderer"
+              :title="getSummaryRenderer(column)"
+            >
               {{ getSummaryRenderer(column) }}
-            </template>
-            <template v-else>
+            </div>
+            <div
+              v-else
+              :title="getSummaryValue(column, column.summaryType)"
+            >
               {{ getSummaryValue(column, column.summaryType)}}
-            </template>
+            </div>
           </span>
           <span
             v-else
@@ -62,7 +69,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, watch, ref, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
 
 export default {
@@ -88,8 +95,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    scrollLeftValue: {
+      type: Number,
+      default: 0,
+    },
   },
   setup(props) {
+    const summaryRef = ref();
     const ROW_DATA_INDEX = 2;
     const stores = computed(() => props.stores);
     const columns = computed(() => props.orderedColumns);
@@ -102,7 +114,8 @@ export default {
         convertValue = numberWithComma(value);
         convertValue = convertValue === false ? value : convertValue;
       } else if (column.type === 'float') {
-        convertValue = convertValue.toFixed(column.decimal ?? 3);
+        const floatValue = convertValue.toFixed(column.decimal ?? 3);
+        convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       }
 
       return convertValue;
@@ -175,10 +188,19 @@ export default {
       });
       return result;
     };
+    watch(
+      () => props.scrollLeftValue,
+      (val) => {
+        nextTick(() => {
+          summaryRef.value.scrollLeft = val;
+        });
+      },
+    );
     return {
       columns,
       styleInfo,
       showCheckbox,
+      summaryRef,
       getSummaryValue,
       getSummaryRenderer,
     };
@@ -189,6 +211,9 @@ export default {
 <style lang="scss" scoped>
 @import 'style/grid.scss';
 .grid-summary {
+  width: 100%;
+  overflow: hidden;
+
   @include evThemify() {
     border-bottom: 1px solid evThemed('disabled');
     background-color: evThemed('background-lighten');
@@ -201,6 +226,11 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 14px;
+    > div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     @include evThemify() {
       color: evThemed('font-color-base');
