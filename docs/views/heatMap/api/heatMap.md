@@ -174,8 +174,16 @@ const chartData =
 | min | number | | min color | '#FFFFFF' |
 | max | number | | max color | '#5586EB' | 
 | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
-| border | string | '#FF0000' | series item border color 지정 |  |
+| stroke | object | ([상세](#stroke)) | series stroke 지정 |  |
 | error | string | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
+
+##### stroke
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| show | boolean | false | stroke 사용 여부 | |
+| color | string | '#FFFFFF' | stroke color 지정 | |
+| lineWidth | number | 1 | stroke 선 굵기 지정 | |
+| opacity | number | 1 | stroke opacity 지정 | |
 
 ### 3. resize-timeout
 - Default : 0
