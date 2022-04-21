@@ -44,7 +44,8 @@ export const commonFunctions = () => {
       convertValue = numberWithComma(value);
       convertValue = convertValue === false ? value : convertValue;
     } else if (column.type === 'float') {
-      convertValue = convertValue.toFixed(column.decimal ?? 3);
+      const floatValue = convertValue.toFixed(column.decimal ?? 3);
+      convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
     return convertValue;
@@ -77,6 +78,7 @@ export const scrollEvent = (params) => {
     pageInfo,
     getPagingData,
     updatePagingInfo,
+    summaryScrollVal,
   } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
@@ -122,6 +124,7 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
+    summaryScrollVal.value = bodyEl.scrollLeft;
   };
   /**
    * scroll 이벤트를 처리한다.

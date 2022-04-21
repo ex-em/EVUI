@@ -8,7 +8,7 @@
       width="100%"
       height="300"
       :option="{
-        adjust: true,
+        adjust: false,
         rowHeight: 45,
         useFilter: false,
         useCheckbox: {
@@ -90,23 +90,48 @@ export default {
         summaryData: ['diff'],
         summaryRenderer: '{0}({1}%)', // 다른 컬럼과 같이 계산
       },
-      { caption: 'Diff', field: 'diff', type: 'float', decimal: 1, hide: true },
+      { caption: 'Diff', field: 'diff', type: 'float', decimal: 1, hide: false },
+      { caption: 'test',
+        field: 'test1',
+        type: 'number',
+        summaryType: 'sum',
+      },
+      { caption: 'test',
+        field: 'test2',
+        type: 'number',
+        summaryType: 'sum',
+      },
+      { caption: 'test',
+        field: 'test3',
+        type: 'number',
+        summaryType: 'sum',
+      },
+      { caption: 'test',
+        field: 'test4',
+        type: 'number',
+        summaryType: 'sum',
+      },
+      { caption: 'test',
+        field: 'test5',
+        type: 'number',
+        summaryType: 'sum',
+      },
     ]);
     tableData.value = [
-      ['HIDB_DATA_1', 30000, 27506, 7185, 4.7],
-      ['HIDB_DATA_2', 29000, 23659, 0, 0],
-      ['HIDB_LARGE_1', 28000, 21695, 1185, -4.7],
-      ['HIDB_INDEX_1', 27000, 23685, 0, 0],
-      ['HIDB_INDEX_2', 26000, 23535, 0, 0],
-      ['HIDB_INDEX_3', 25000, 23659, 0, 0],
-      ['HIDB_L_INDEX_1', 24000, 23695, 0, 0],
-      ['HIDB_L_INDEX_2', 23000, 21691, 0, 0],
-      ['HIDB_L_INDEX_3', 22000, 20021, 0, 0],
-      ['HIDB_DATA_3', 21000, 14485, 0, 0],
-      ['HIDB_DATA_4', 20000, 14396, 2185, -11],
-      ['SYSAUX', 11000, 9485, 0, -11],
-      ['USERS', 10000, 6485, 0, 0],
-      ['UNDOTBS1', 9000, 3486, 0, 0],
+      ['HIDB_DATA_1', 30000, 27506, 7185, 2000, 1, 1, 1, 2, 3],
+      ['HIDB_DATA_2', 29000, 23659, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_LARGE_1', 28000, 21695, 1185, -4.7, 1, 1, 1, 2, 3],
+      ['HIDB_INDEX_1', 27000, 23685, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_INDEX_2', 26000, 23535, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_INDEX_3', 25000, 23659, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_L_INDEX_1', 24000, 23695, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_L_INDEX_2', 23000, 21691, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_L_INDEX_3', 22000, 20021, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_DATA_3', 21000, 14485, 0, 0, 1, 1, 1, 2, 3],
+      ['HIDB_DATA_4', 20000, 14396, 2185, -11, 1, 1, 1, 2, 3],
+      ['SYSAUX', 11000, 9485, 0, -11, 1, 1, 1, 2, 3],
+      ['USERS', 10000, 6485, 0, 0, 1, 1, 1, 2, 3],
+      ['UNDOTBS1', 9000, 3486, 0, 0, 1, 1, 1, 2, 3],
     ];
     const pageInfo = reactive({
       use: false,
@@ -117,7 +142,9 @@ export default {
     const getIncrementValue = (item) => {
       const row = item.row[2];
       const columnIndex = item.column.index;
-      return `${numberWithComma(row[columnIndex])}(${row[columnIndex + 1]}%)`;
+      let floatValue = row[columnIndex + 1];
+      floatValue = floatValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return `${numberWithComma(row[columnIndex])}(${floatValue}%)`;
     };
     return {
       columns,
