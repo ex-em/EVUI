@@ -431,16 +431,12 @@ const modules = {
         maxValue = Math.max(maxValue, value);
       }
 
-      if (value >= 0) {
-        if (minValue === undefined) {
-          minValue = value;
-        } else {
-          minValue = Math.min(minValue, value);
-        }
-      }
-
       if (value < 0) {
         isExistError = true;
+      } else if (minValue === undefined) {
+        minValue = value;
+      } else {
+        minValue = Math.min(minValue, value);
       }
     });
 

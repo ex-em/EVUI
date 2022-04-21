@@ -354,7 +354,7 @@ class HeatMap {
   }
 
   findBlockRange({ xcp, xep, ycp, yep, range }) {
-    const { x: labelX, y: labelY } = this.labels;
+    const labels = this.labels;
 
     const blockRange = {
       xsp: Math.min(xcp, xep),
@@ -363,10 +363,10 @@ class HeatMap {
       height: Math.ceil(Math.abs(yep - ycp)),
     };
 
-    if (labelX.length && labelY.length) {
+    if (labels.x.length && labels.y.length) {
       const { x1, x2, y1, y2 } = range;
-      const gapX = (x2 - x1) / labelX.length;
-      const gapY = (y2 - y1) / labelY.length;
+      const gapX = (x2 - x1) / labels.x.length;
+      const gapY = (y2 - y1) / labels.y.length;
 
       const point = {
         xsp: xcp,
@@ -375,43 +375,33 @@ class HeatMap {
         yep,
       };
 
-      const setPoint = (type, dir) => {
+      const setPoint = (dir, target, key) => {
         let itemPoint;
-        let list;
-        let target;
         let gap;
-        let key;
-        let start;
-        const isStart = dir === 'start';
+        let startPoint;
 
-        if (type === 'x') {
-          list = labelX;
+        if (dir === 'x') {
           gap = gapX;
-          target = isStart ? Math.min(xcp, xep) : Math.max(xcp, xep);
-          key = isStart ? 'xsp' : 'xep';
-          start = x1;
+          startPoint = x1;
         } else {
-          list = labelY;
           gap = gapY;
-          target = isStart ? Math.min(ycp, yep) : Math.max(ycp, yep);
-          key = isStart ? 'ysp' : 'yep';
-          start = y1;
+          startPoint = y1;
         }
 
-        const findItem = list.findIndex((item, index) => {
-          itemPoint = Math.round(start + (gap * index)) + Util.aliasPixel(1);
+        const findItem = labels[dir].findIndex((item, index) => {
+          itemPoint = Math.round(startPoint + (gap * index)) + Util.aliasPixel(1);
           return itemPoint <= target && target <= itemPoint + gap;
         });
 
         if (findItem > -1) {
-          point[key] = isStart ? itemPoint : itemPoint + gap;
+          point[key] = ['xsp', 'ysp'].includes(key) ? itemPoint : itemPoint + gap;
         }
       };
 
-      setPoint('x', 'start');
-      setPoint('x', 'end');
-      setPoint('y', 'start');
-      setPoint('y', 'end');
+      setPoint('x', Math.min(xcp, xep), 'xsp');
+      setPoint('x', Math.max(xcp, xep), 'xep');
+      setPoint('y', Math.min(ycp, yep), 'ysp');
+      setPoint('y', Math.max(ycp, yep), 'yep');
 
       blockRange.xsp = Math.min(point.xsp, point.xep);
       blockRange.ysp = Math.min(point.ysp, point.yep);
