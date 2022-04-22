@@ -67,7 +67,10 @@ class Bar {
 
     const dArea = isHorizontal ? yArea : xArea;
     const cArea = dArea / (this.data.length || 1);
-    const cPad = 2;
+    let cPad = ((isHorizontal ? yArea : xArea) * param.cPadRatio) / this.data.length;
+    if (cPad < 2) {
+      cPad = 2;
+    }
 
     let bArea;
     let w;

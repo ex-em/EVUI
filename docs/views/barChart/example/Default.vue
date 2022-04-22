@@ -20,6 +20,7 @@
 
       const chartOptions = {
         type: 'bar',
+        cPadRatio: 0.1,
         axesX: [{
           type: 'step',
         }],
