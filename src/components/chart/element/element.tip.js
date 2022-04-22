@@ -250,7 +250,7 @@ const modules = {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
-    const { dataIndex, data, label } = this.defaultSelectLabelInfo;
+    const { dataIndex, data, label } = this.defaultSelectInfo;
     let drawTip = false;
 
     if (dataIndex.length) {

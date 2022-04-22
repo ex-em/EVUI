@@ -627,6 +627,101 @@ const modules = {
   },
 
   /**
+   * Find seriesId by position x and y
+   * @param {array}   offset          position x and y
+   *
+   * @returns {object} clicked series id
+   */
+  getSeriesIdByPosition(offset) {
+    const [clickedX, clickedY] = offset;
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const aPos = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+    const valueAxes = this.axesY[0];
+    const labelAxes = this.axesX[0];
+    const valueStartPoint = aPos[valueAxes.units.rectStart];
+    const valueEndPoint = aPos[valueAxes.units.rectEnd];
+    const labelStartPoint = aPos[labelAxes.units.rectStart];
+    const labelEndPoint = aPos[labelAxes.units.rectEnd];
+
+    const result = { sId: null };
+
+    if (clickedY > valueEndPoint && clickedY < valueStartPoint
+      && clickedX < labelEndPoint && clickedX > labelStartPoint) {
+      let hitSeries;
+      let positionList;
+      const hitItem = this.findHitItem(offset);
+      const hitSeriesList = Object.keys(hitItem.items);
+
+      switch (this.options.type) {
+        case 'line': {
+          const orderedSeriesList = this.seriesInfo.charts.line;
+          const isStackChart = Object.values(this.seriesList).some(({ stackIndex }) => stackIndex);
+
+          if (hitSeriesList.length) { // 클릭한 위치에 data 가 존재하는 경우
+            if (isStackChart) {
+              positionList = orderedSeriesList.filter(sId => hitSeriesList.includes(sId))
+                .map(sId => ({ sId, position: hitItem.items[sId]?.data?.yp }));
+              hitSeries = positionList.find(({ position }) => clickedY > position)?.sId;
+            } else {
+              hitSeries = Object.entries(hitItem.items).find(([, { hit }]) => hit)?.[0];
+            }
+          } else { // 클릭한 위치에 data 가 존재하지 않는 경우
+            const visibleSeriesList = orderedSeriesList.filter(sId => this.seriesList[sId].show);
+            positionList = visibleSeriesList.map(sId => ({
+              sId,
+              position: this.seriesList[sId].data?.map(({ xp, yp }) => [xp, yp]),
+            }));
+            const dataIndex = positionList[0].position?.findIndex(([xp]) => xp >= clickedX);
+            const vectorList = positionList.map(({ sId, position }) => ({
+              sId,
+              vector: { start: position[dataIndex - 1], end: position[dataIndex] },
+            }));
+
+            // canvas 의 클릭 위치값은 제 4 사분면의 위치이므로 clickedY, y1, y2 의 값은 음수를 취한다.
+            if (isStackChart) {
+              hitSeries = vectorList.find(({ vector }) => {
+                const [x1, y1] = vector.start;
+                const [x2, y2] = vector.end;
+                const v1 = [x2 - x1, y1 - y2];
+                const v2 = [x2 - clickedX, clickedY - y2];
+                const xp = v1[0] * v2[1] - v1[1] * v2[0];
+
+                return vector.start.every(v => typeof v === 'number')
+                  && vector.end.every(v => typeof v === 'number')
+                  && xp > 0;
+              })?.sId;
+            } else {
+              hitSeries = vectorList.find(({ vector }) => {
+                const [x1, y1] = vector.start;
+                const [x2, y2] = vector.end;
+                const a = (y1 - y2) / (x2 - x1);
+                const b = -1;
+                const c = -y1 - a * x1;
+                const distance = Math.abs(a * clickedX - b * clickedY + c)
+                  / Math.sqrt(a ** 2 + b ** 2);
+
+                return distance < 3;
+              })?.sId;
+            }
+          }
+          break;
+        }
+        default:
+          break;
+      }
+
+      result.sId = hitSeries;
+    }
+
+    return result;
+  },
+  /**
    * Find label info by position x and y
    * @param {array}   offset          position x and y
    *

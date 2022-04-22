@@ -14,7 +14,7 @@ import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options, listeners, defaultSelectItemInfo, defaultSelectLabelInfo) {
+  constructor(target, data, options, listeners, defaultSelectItemInfo, defaultSelectInfo) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
     Object.assign(this, Title);
     Object.assign(this, Legend);
@@ -66,7 +66,7 @@ class EvChart {
     };
 
     this.defaultSelectItemInfo = defaultSelectItemInfo;
-    this.defaultSelectLabelInfo = defaultSelectLabelInfo;
+    this.defaultSelectInfo = defaultSelectInfo;
   }
 
   /**
@@ -93,7 +93,7 @@ class EvChart {
 
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedLabelInfo();
+    this.initSelectedInfo();
 
     this.drawChart();
 
@@ -153,7 +153,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -161,7 +161,8 @@ class EvChart {
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
-      selectLabel: { option: selectLabel, selected: this.defaultSelectLabelInfo },
+      selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
+      selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
     };
 
     let showIndex = 0;
@@ -331,7 +332,7 @@ class EvChart {
         this.labelOffset,
         this.axesSteps.x[index],
         hitInfo,
-        this.defaultSelectLabelInfo);
+        this.defaultSelectInfo);
     });
 
     this.axesY.forEach((axis, index) => {
@@ -340,7 +341,7 @@ class EvChart {
         this.labelOffset,
         this.axesSteps.y[index],
         hitInfo,
-        this.defaultSelectLabelInfo);
+        this.defaultSelectInfo);
     });
   }
 
@@ -660,7 +661,7 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedLabelInfo();
+    this.initSelectedInfo();
 
     this.render(updateInfo?.hitInfo);
 

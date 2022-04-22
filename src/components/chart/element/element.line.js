@@ -102,7 +102,8 @@ class Line {
     const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
-    this.data.reduce((prev, curr, ix, item) => {
+    // draw line
+    this.data.reduce((prev, curr, ix) => {
       x = getXPos(curr.x);
       y = getYPos(curr.y);
 
@@ -110,22 +111,12 @@ class Line {
         x += Util.aliasPixel(x);
       }
 
-      if (y === null || x === null) {
-        if (ix - 1 > -1) {
-          // draw fill(area) series not stacked
-          if (this.fill && prev.y !== null && !this.stackIndex) {
-            ctx.stroke();
-            ctx.lineTo(prev.xp, endPoint);
-            ctx.lineTo(item[startFillIndex].xp, endPoint);
+      if (ix === 0) {
+        ctx.moveTo(x, y);
+      }
 
-            ctx.fill();
-            ctx.beginPath();
-          }
-        }
-
-        startFillIndex = ix + 1;
-      } else if (ix === 0 || prev.y === null || curr.y === null
-        || prev.x === null || curr.x === null) {
+      const isNullValue = prev.y === null || curr.y === null || prev.x === null || curr.x === null;
+      if (isNullValue) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -139,41 +130,45 @@ class Line {
 
     ctx.stroke();
 
-    const dataLen = this.data.length;
+    // draw fill
+    if (this.fill && this.data.length) {
+      ctx.beginPath();
 
-    if (this.fill && dataLen) {
       ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
 
-      if (this.stackIndex) {
-        const reversedDataList = this.data.slice().reverse();
-        reversedDataList.forEach((curr, ix) => {
-          ctx.beginPath();
+      this.data.forEach((currData, ix) => {
+        const isEmptyPoint = data => data?.x === null || data?.y === null
+          || data?.x === undefined || data?.y === undefined;
 
-          x = getXPos(curr.x);
-          y = getYPos(curr.b);
+        const nextData = this.data[ix + 1];
 
-          const prev = reversedDataList[ix - 1];
-          if (curr.o !== null) {
-            if (prev && prev.o == null) {
-              ctx.moveTo(x, getYPos(curr.b + curr.o));
-            }
+        if (isEmptyPoint(currData)) {
+          startFillIndex = ix + 1;
 
-            ctx.lineTo(x, y);
-
-            if (ix === reversedDataList.length - 1) {
-              ctx.lineTo(x, getYPos(curr.b + curr.o));
-            }
-          } else if (prev && prev.o) {
-            ctx.lineTo(getXPos(prev.x), getYPos(prev.b + prev.o));
+          if (!isEmptyPoint(nextData)) {
+            ctx.moveTo(nextData.xp, nextData.yp);
           }
-        });
-      } else if (startFillIndex < dataLen) {
-        ctx.lineTo(this.data[dataLen - 1].xp, endPoint);
-        ctx.lineTo(this.data[startFillIndex].xp, endPoint);
-      }
+
+          return;
+        }
+
+        ctx.lineTo(currData.xp, currData.yp);
+
+        if (isEmptyPoint(nextData)) {
+          for (let jx = ix; jx >= startFillIndex; jx--) {
+            const prevData = this.data[jx];
+            const xp = prevData.xp;
+            const bp = getYPos(prevData.b) ?? endPoint;
+            ctx.lineTo(xp, bp);
+          }
+
+          ctx.closePath();
+        }
+      });
 
       ctx.fill();
     }
+
     if (this.point || isExistSelectedLabel) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);

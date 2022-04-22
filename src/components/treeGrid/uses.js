@@ -39,7 +39,8 @@ export const commonFunctions = (params) => {
       convertValue = numberWithComma(value);
       convertValue = convertValue === false ? value : convertValue;
     } else if (column.type === 'float') {
-      convertValue = convertValue.toFixed(column.decimal ?? 3);
+      const floatValue = convertValue.toFixed(column.decimal ?? 3);
+      convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
     return convertValue;
@@ -87,6 +88,7 @@ export const scrollEvent = (params) => {
     elementInfo,
     resizeInfo,
     pageInfo,
+    summaryScroll,
     getPagingData,
     updatePagingInfo,
   } = params;
@@ -134,6 +136,7 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
+    summaryScroll.value = bodyEl.scrollLeft;
   };
   /**
    * scroll 이벤트를 처리한다.

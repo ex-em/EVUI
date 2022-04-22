@@ -198,12 +198,12 @@
                   }"
                 >
                   <!-- Cell Renderer -->
-                  <template v-if="!!$slots[column.field]">
+                  <div v-if="!!$slots[column.field]">
                     <slot
                       :name="column.field"
                       :item="{ row, column }"
                     />
-                  </template>
+                  </div>
                   <!-- Cell Value -->
                   <template v-else>
                     <div :title="getConvertValue(column, row[2][column.index])">
@@ -257,6 +257,7 @@
       minWidth,
       rowHeight,
     }"
+    :scroll-left="summaryScroll"
   />
   <!-- Pagination -->
   <grid-pagination
@@ -271,7 +272,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref } from 'vue';
 import Toolbar from './grid.toolbar';
 import FilterWindow from './grid.filter.window';
 import GridPagination from './grid.pagination';
@@ -474,7 +475,7 @@ export default {
       elementInfo,
       clearCheckInfo,
     });
-
+    const summaryScroll = ref(0);
     const {
       updateVScroll,
       updateHScroll,
@@ -485,6 +486,7 @@ export default {
       elementInfo,
       resizeInfo,
       pageInfo,
+      summaryScroll,
       getPagingData,
       updatePagingInfo,
     });
@@ -751,6 +753,7 @@ export default {
       },
     );
     return {
+      summaryScroll,
       showHeader,
       stripeStyle,
       borderStyle,

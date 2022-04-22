@@ -94,6 +94,11 @@ const DEFAULT_OPTIONS = {
     useApproximateValue: false,
     tipBackground: '#000000',
   },
+  selectSeries: {
+    use: false,
+    limit: 1,
+    useDeselectOverflow: false,
+  },
   dragSelection: {
     use: false,
     keepDisplay: true,
@@ -146,6 +151,7 @@ export const useModel = () => {
 
   const selectItemInfo = cloneDeep(props.selectedItem);
   const selectLabelInfo = cloneDeep(props.selectedLabel);
+  const selectSeriesInfo = cloneDeep(props.selectedSeries);
 
   const eventListeners = {
     click: async (e) => {
@@ -153,8 +159,11 @@ export const useModel = () => {
       if (e.label) {
         emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
       }
-      if (e.selected) {
+      if (e.selected?.dataIndex) {
         emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+      }
+      if (e.selected?.seriesId) {
+        emit('update:selectedSeries', { seriesId: e.selected.seriesId });
       }
       emit('click', e);
     },
@@ -172,6 +181,7 @@ export const useModel = () => {
     eventListeners,
     selectItemInfo,
     selectLabelInfo,
+    selectSeriesInfo,
     getNormalizedData,
     getNormalizedOptions,
   };

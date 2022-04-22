@@ -144,15 +144,22 @@ const modules = {
           maxIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
-      }
-
-      if (this.options.selectLabel.use) {
+      } else if (this.options.selectLabel.use) {
         const offset = this.getMousePosition(e);
         const clickedLabelInfo = this.getLabelInfoByPosition(offset);
         const selected = this.selectLabel(clickedLabelInfo.labelIndex);
-        this.renderWithSelectLabel(selected.dataIndex);
+        this.renderWithSelected(selected.dataIndex);
 
-        args.selected = cloneDeep(this.defaultSelectLabelInfo);
+        args.selected = cloneDeep(this.defaultSelectInfo);
+      } else if (this.options.selectSeries.use) {
+        const offset = this.getMousePosition(e);
+        const hitInfo = this.getSeriesIdByPosition(offset);
+        if (hitInfo.sId !== null) {
+          const selected = this.selectSeries(hitInfo.sId);
+          this.renderWithSelected(selected.seriesId);
+        }
+
+        args.selected = cloneDeep(this.defaultSelectInfo);
       }
 
       if (typeof this.listeners.click === 'function') {
@@ -467,32 +474,51 @@ const modules = {
   },
 
   /**
-   * render after select label by index list
+   * render after selected label or selected series
    * @param indexList {array}  '[0, 1 ...]'
    */
-  renderWithSelectLabel(indexList) {
-    this.defaultSelectLabelInfo.dataIndex = indexList;
-    this.initSelectedLabelInfo();
+  renderWithSelected(list) {
+    if (this.options.selectLabel.use) {
+      this.defaultSelectInfo.dataIndex = list;
+    } else if (this.options.selectSeries.use) {
+      this.defaultSelectInfo.seriesId = list;
+    }
+    this.initSelectedInfo();
     this.render();
   },
 
   /**
-   * init defaultSelectLabelInfo object.
-   * (set each series data and label text)
+   * init defaultSelectInfo object.
+   * - at selectLabel using: set each series data and label text
+   * - at selectSeries using: set series state
    */
-  initSelectedLabelInfo() {
-    const { use, limit } = this.options.selectLabel;
-
-    if (use) {
-      if (!this.defaultSelectLabelInfo) {
-        this.defaultSelectLabelInfo = { dataIndex: [] };
+  initSelectedInfo() {
+    if (this.options.selectLabel.use) {
+      const { limit } = this.options.selectLabel;
+      if (!this.defaultSelectInfo) {
+        this.defaultSelectInfo = { dataIndex: [] };
       }
-      const infoObj = this.defaultSelectLabelInfo;
+      const infoObj = this.defaultSelectInfo;
       infoObj.dataIndex.splice(limit);
       infoObj.label = infoObj.dataIndex.map(i => this.data.labels[i]);
       const dataEntries = Object.entries(this.data.data);
       infoObj.data = infoObj.dataIndex.map(labelIdx => Object.fromEntries(
         dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
+    } else if (this.options.selectSeries.use) {
+      if (!this.defaultSelectInfo) {
+        this.defaultSelectInfo = { seriesId: [] };
+      }
+
+      const selectedList = this.defaultSelectInfo.seriesId;
+      Object.values(this.seriesList).forEach((series) => {
+        if (!selectedList.length) {
+          series.state = 'normal';
+        } else if (selectedList.includes(series.sId)) {
+          series.state = 'highlight';
+        } else {
+          series.state = 'downplay';
+        }
+      });
     }
   },
 
@@ -503,7 +529,7 @@ const modules = {
    */
   selectLabel(labelIndex) {
     const option = this.options?.selectLabel ?? {};
-    const before = this.defaultSelectLabelInfo ?? { dataIndex: [] };
+    const before = this.defaultSelectInfo ?? { dataIndex: [] };
     const after = cloneDeep(before);
 
     if (before.dataIndex.includes(labelIndex)) {
@@ -516,6 +542,28 @@ const modules = {
           after.dataIndex.splice(0, 1);
         } else {
           after.dataIndex.pop();
+        }
+      }
+    }
+
+    return after;
+  },
+
+  selectSeries(seriesId) {
+    const option = this.options?.selectSeries ?? {};
+    const before = this.defaultSelectInfo ?? { seriesId: [] };
+    const after = cloneDeep(before);
+
+    if (before.seriesId.includes(seriesId)) {
+      const idx = before.seriesId.indexOf(seriesId);
+      after.seriesId.splice(idx, 1);
+    } else if (seriesId) {
+      after.seriesId.push(seriesId);
+      if (option.limit > 0 && option.limit < after.seriesId.length) {
+        if (option.useDeselectOverflow) {
+          after.seriesId.splice(0, 1);
+        } else {
+          after.seriesId.pop();
         }
       }
     }
