@@ -67,9 +67,13 @@ class Bar {
 
     const dArea = isHorizontal ? yArea : xArea;
     const cArea = dArea / (this.data.length || 1);
-    let cPad = ((isHorizontal ? yArea : xArea) * param.cPadRatio) / this.data.length;
-    if (cPad < 2) {
+
+    let cPad;
+    const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
+    if (isUnableToDrawCategoryPadding) {
       cPad = 2;
+    } else {
+      cPad = Math.max((dArea * (param.cPadRatio / 2)) / this.data.length, 2);
     }
 
     let bArea;
