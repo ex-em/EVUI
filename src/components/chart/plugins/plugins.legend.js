@@ -1,3 +1,5 @@
+import Util from '@/components/chart/helpers/helpers.util';
+
 const modules = {
   /**
    * Create legend DOM
@@ -200,10 +202,15 @@ const modules = {
           ? 'highlight' : 'downplay';
       });
 
+      let hitInfo = null;
+      if (Util.isPieType(this.options.type)) {
+        hitInfo = { sId: targetId, type: this.options.type };
+      }
+
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
-        hitInfo: { sId: targetId },
+        hitInfo,
       });
     };
 
