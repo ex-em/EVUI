@@ -43,6 +43,7 @@ const DEFAULT_OPTIONS = {
   width: '100%',
   height: '100%',
   thickness: 1,
+  cPadRatio: 0,
   borderRadius: 0,
   combo: false,
   tooltip: {
