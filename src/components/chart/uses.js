@@ -113,6 +113,7 @@ const DEFAULT_OPTIONS = {
       show: false,
       color: '#FFFFFF',
       lineWidth: 1,
+      opacity: 1,
     },
     error: '#FF0000',
   },

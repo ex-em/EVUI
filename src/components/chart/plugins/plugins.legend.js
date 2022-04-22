@@ -82,13 +82,14 @@ const modules = {
     Object.values(seriesList).forEach((series) => {
       if (!series.isExistGrp && series.showLegend) {
         const { colorAxis, valueOpt } = series;
-        const { max, interval, existError } = valueOpt;
+        const { min, max, interval, existError } = valueOpt;
+        const endIndex = colorAxis.length - 1;
         colorAxis.forEach((colorItem, index) => {
-          const minValue = interval * index;
-          const maxValue = index === colorAxis.length - 1
-            ? max : minValue + interval - 1;
-          const name = existError && index === colorAxis.length - 1
-            ? 'error' : `${minValue} - ${maxValue}`;
+          const minValue = min + (interval * index);
+          const maxValue = index === endIndex
+            ? max : minValue + interval;
+          const name = existError && index === endIndex ? 'error' : `${minValue} - ${maxValue}`;
+
           this.addLegend({
             cId: colorItem.id,
             color: colorItem.value,

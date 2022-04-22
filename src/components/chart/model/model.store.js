@@ -422,14 +422,21 @@ const modules = {
     const colorOpt = this.options.heatMapColor;
     const categoryCnt = colorOpt.categoryCnt;
 
+    let minValue;
     let maxValue = 0;
+
     let isExistError = false;
     data.forEach(({ o: value }) => {
       if (maxValue < value) {
-        maxValue = value;
+        maxValue = Math.max(maxValue, value);
       }
+
       if (value < 0) {
         isExistError = true;
+      } else if (minValue === undefined) {
+        minValue = value;
+      } else {
+        minValue = Math.min(minValue, value);
       }
     });
 
@@ -443,8 +450,9 @@ const modules = {
     }
 
     return {
+      min: minValue,
       max: maxValue,
-      interval: Math.ceil(maxValue / categoryCnt),
+      interval: Math.ceil((maxValue - minValue) / categoryCnt),
       existError: isExistError,
     };
   },

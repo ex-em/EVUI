@@ -7,7 +7,6 @@ class StepScale extends Scale {
   constructor(type, opt, ctx, labels, options) {
     super(type, opt, ctx, options);
     this.labels = labels;
-    this.rangeMode = opt.rangeMode;
   }
 
   /**
@@ -18,7 +17,8 @@ class StepScale extends Scale {
    * @returns {object} min/max value and label
    */
   calculateScaleRange(minMax, chartRect) {
-    const stepMinMax = Util.getStringMinMax(this.labels);
+    const stepMinMax = this.rangeMode
+      ? minMax : Util.getStringMinMax(this.labels);
     const maxValue = stepMinMax.max;
     const minValue = stepMinMax.min;
     const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
@@ -42,9 +42,20 @@ class StepScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
+    let numberOfSteps = this.labels.length;
+    let interval = 1;
+
+    if (this.rangeMode) {
+      const { maxSteps } = range;
+
+      while (numberOfSteps > maxSteps * 2) {
+        interval *= 2;
+        numberOfSteps = Math.round(numberOfSteps / interval);
+      }
+    }
     return {
-      steps: this.labels.length,
-      interval: 1,
+      steps: numberOfSteps,
+      interval,
       graphMin: range.minValue,
       graphMax: range.maxValue,
     };
@@ -68,7 +79,9 @@ class StepScale extends Scale {
       y2: chartRect.y2 - labelOffset.bottom,
     };
 
+    const oriSteps = this.labels.length;
     const steps = stepInfo.steps;
+    const count = stepInfo.interval;
 
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -116,8 +129,10 @@ class StepScale extends Scale {
 
       let labelText;
       let labelPoint;
+      let index;
 
-      labels.forEach((item, index) => {
+      for (index = 0; index < oriSteps; index += count) {
+        const item = this.labels[index];
         labelCenter = Math.round(startPoint + (labelGap * index));
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
@@ -143,9 +158,9 @@ class StepScale extends Scale {
           ctx.fillText(labelText, xPoint, labelPoint);
 
           if (!isBlurredLabel
-              && this.options?.selectItem?.showLabelTip
-              && hitInfo?.label
-              && !this.options?.horizontal) {
+            && this.options?.selectItem?.showLabelTip
+            && hitInfo?.label
+            && !this.options?.horizontal) {
             const selectedLabel = hitInfo.label;
             if (selectedLabel === labelText) {
               const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
@@ -179,9 +194,9 @@ class StepScale extends Scale {
           }
         }
         ctx.stroke();
-      });
+      }
 
-      if (this.rangeMode) {
+      if (this.rangeMode && (index === this.labels.length)) {
         let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
         if (isNaN(labelLastText)) {
           labelLastText = 'Max';

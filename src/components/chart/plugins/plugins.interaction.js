@@ -273,12 +273,21 @@ const modules = {
         yep = aOffsetY;
       }
 
-      dragInfo.xsp = Math.min(xcp, xep);
-      dragInfo.ysp = type === 'scatter' || type === 'heatMap' ? Math.min(ycp, yep) : aRange.y1;
-      dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-      dragInfo.height = type === 'scatter' || type === 'heatMap'
+      if (type === 'heatMap') {
+        const rangeInfo = { xcp, xep, ycp, yep, range: aRange };
+        const { xsp, ysp, width, height } = this.getDragInfoForHeatMap(rangeInfo);
+        dragInfo.xsp = xsp;
+        dragInfo.ysp = ysp;
+        dragInfo.width = width;
+        dragInfo.height = height;
+      } else {
+        dragInfo.xsp = Math.min(xcp, xep);
+        dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
+        dragInfo.width = Math.ceil(Math.abs(xep - xcp));
+        dragInfo.height = type === 'scatter'
           ? Math.ceil(Math.abs(yep - ycp))
           : aRange.y2 - aRange.y1;
+      }
 
       this.overlayClear();
       this.drawSelectionArea(dragInfo);
@@ -296,7 +305,9 @@ const modules = {
         const args = {
           e,
           data: this.findSelectedItems(dragInfo),
-          range: this.getSelectionRage(dragInfo),
+          range: type === 'heatMap'
+            ? this.getSelectionRangeForHeatMap(dragInfo)
+            : this.getSelectionRage(dragInfo),
         };
 
         this.dragInfoBackup = defaultsDeep({}, dragInfo);
@@ -638,6 +649,30 @@ const modules = {
     const targetValue = value - min;
 
     return targetValue / total;
+  },
+
+  getDragInfoForHeatMap(range) {
+    const sId = Object.keys(this.seriesList)[0];
+    return this.seriesList[sId].findBlockRange(range);
+  },
+
+  getSelectionRangeForHeatMap(range) {
+    const dataRangeX = this.axesSteps.x.length ? this.axesSteps.x[0] : null;
+    const dataRangeY = this.axesSteps.y.length ? this.axesSteps.y[0] : null;
+
+    if (!dataRangeX || !dataRangeY) {
+      return null;
+    }
+
+    const sId = Object.keys(this.seriesList)[0];
+    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range);
+
+    return {
+      xMin: xMin ?? dataRangeX.graphMin,
+      xMax: xMax ?? dataRangeX.graphMax,
+      yMin: yMin ?? dataRangeY.graphMin,
+      yMax: yMax ?? dataRangeY.graphMax,
+    };
   },
 };
 
