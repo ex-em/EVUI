@@ -189,8 +189,8 @@ class EvChart {
             break;
           }
           case 'bar': {
-            const { thickness, borderRadius } = this.options;
-            series.draw({ thickness, borderRadius, showSeriesCount, showIndex, ...opt });
+            const { thickness, cPadRatio, borderRadius } = this.options;
+            series.draw({ thickness, cPadRatio, borderRadius, showSeriesCount, showIndex, ...opt });
             if (series.show) {
               showIndex++;
             }
