@@ -93,8 +93,8 @@ export default {
       { caption: 'Diff', field: 'diff', type: 'float', decimal: 1, hide: true },
     ]);
     tableData.value = [
-      ['HIDB_DATA_1', 30000, 27506, 7185, 4.7],
-      ['HIDB_DATA_2', 29000, 23659, 0, 0],
+      ['HIDB_DATA_1', 30000, 27506, 7185, 2000.7],
+      ['HIDB_DATA_2', 29000, 23659, 0, 1500],
       ['HIDB_LARGE_1', 28000, 21695, 1185, -4.7],
       ['HIDB_INDEX_1', 27000, 23685, 0, 0],
       ['HIDB_INDEX_2', 26000, 23535, 0, 0],
@@ -117,7 +117,9 @@ export default {
     const getIncrementValue = (item) => {
       const row = item.row[2];
       const columnIndex = item.column.index;
-      return `${numberWithComma(row[columnIndex])}(${row[columnIndex + 1]}%)`;
+      let floatValue = row[columnIndex + 1];
+      floatValue = floatValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return `${numberWithComma(row[columnIndex])}(${floatValue}%)`;
     };
     return {
       columns,
