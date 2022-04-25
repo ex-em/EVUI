@@ -117,6 +117,7 @@ const DEFAULT_OPTIONS = {
       opacity: 1,
     },
     error: '#FF0000',
+    decimalPoint: 0,
   },
 };
 

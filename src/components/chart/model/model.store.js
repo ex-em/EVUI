@@ -421,6 +421,7 @@ const modules = {
     const data = series.data;
     const colorOpt = this.options.heatMapColor;
     const categoryCnt = colorOpt.categoryCnt;
+    const decimalPoint = colorOpt.decimalPoint;
 
     let minValue;
     let maxValue = 0;
@@ -449,11 +450,17 @@ const modules = {
       });
     }
 
+    let interval = maxValue > minValue ? Math.ceil((maxValue - minValue) / categoryCnt) : 1;
+    if ((maxValue - minValue) <= categoryCnt && decimalPoint > 0) {
+      interval = +((maxValue - minValue) / categoryCnt).toFixed(decimalPoint);
+    }
+
     return {
       min: minValue,
       max: maxValue,
-      interval: Math.ceil((maxValue - minValue) / categoryCnt),
+      interval,
       existError: isExistError,
+      decimalPoint,
     };
   },
 

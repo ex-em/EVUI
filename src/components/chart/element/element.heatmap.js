@@ -60,13 +60,14 @@ class HeatMap {
   }
 
   getColorIndex(value) {
-    const existError = this.valueOpt.existError;
+    const { existError, min, interval } = this.valueOpt;
     const maxIndex = this.colorAxis.length - 1;
     if (existError && value < 0) {
       return maxIndex;
     }
 
-    const colorIndex = Math.floor(value / this.valueOpt.interval);
+    const colorIndex = Math.floor((value - min) / interval);
+
     if (colorIndex >= maxIndex) {
       return existError ? maxIndex - 1 : maxIndex;
     }
@@ -292,9 +293,12 @@ class HeatMap {
     const y = gdata.yp;
     const w = gdata.w;
     const h = gdata.h;
+    const cId = gdata.cId;
+
+    const isShow = this.colorAxis.find(({ id }) => id === cId)?.show;
 
     ctx.save();
-    if (x !== null && y !== null) {
+    if (x !== null && y !== null && isShow) {
       const color = gdata.dataColor;
       ctx.strokeStyle = Util.colorStringToRgba(color, 1);
       ctx.fillStyle = Util.colorStringToRgba(color, this.highlight.maxShadowOpacity);
