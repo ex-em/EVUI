@@ -176,6 +176,7 @@ const chartData =
 | categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
 | stroke | object | ([상세](#stroke)) | series stroke 지정 |  |
 | error | Hex, RGB, RGBA Code(String) | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
+| decimalPoint | number | 0 | 범주 표현 소숫값 처리 | |
 
 ##### stroke
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
