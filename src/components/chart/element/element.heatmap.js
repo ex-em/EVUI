@@ -60,13 +60,13 @@ class HeatMap {
   }
 
   getColorIndex(value) {
-    const { existError, min, interval } = this.valueOpt;
+    const { existError, min, interval, decimalPoint } = this.valueOpt;
     const maxIndex = this.colorAxis.length - 1;
     if (existError && value < 0) {
       return maxIndex;
     }
 
-    const colorIndex = Math.floor((value - min) / interval);
+    const colorIndex = Math.floor(+(value - min).toFixed(decimalPoint) / interval);
 
     if (colorIndex >= maxIndex) {
       return existError ? maxIndex - 1 : maxIndex;

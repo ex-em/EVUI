@@ -53,7 +53,6 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
             { x: dayjs(timeValue).add(2, 'second'), y: 2, value: 11 },
             { x: dayjs(timeValue).add(2, 'second'), y: 3, value: 22 },
             { x: dayjs(timeValue).add(2, 'second'), y: 5, value: 15 },
-            { x: dayjs(timeValue).add(2, 'second'), y: 6, value: 6 },
             { x: dayjs(timeValue).add(4, 'second'), y: 0, value: 36 },
             { x: dayjs(timeValue).add(4, 'second'), y: 1, value: 25 },
             { x: dayjs(timeValue).add(4, 'second'), y: 3, value: 13 },

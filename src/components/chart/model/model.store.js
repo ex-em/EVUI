@@ -450,9 +450,13 @@ const modules = {
       });
     }
 
-    let interval = maxValue > minValue ? Math.ceil((maxValue - minValue) / categoryCnt) : 1;
-    if ((maxValue - minValue) <= categoryCnt && decimalPoint > 0) {
-      interval = +((maxValue - minValue) / categoryCnt).toFixed(decimalPoint);
+    let interval = maxValue > minValue ? Math.floor((maxValue - minValue) / categoryCnt) : 1;
+    if ((maxValue - minValue) <= categoryCnt) {
+      if (decimalPoint > 0) {
+        interval = +((maxValue - minValue) / categoryCnt).toFixed(decimalPoint);
+      } else {
+        interval = 1;
+      }
     }
 
     return {
