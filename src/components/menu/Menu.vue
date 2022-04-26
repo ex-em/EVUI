@@ -6,6 +6,7 @@
       :item="menu"
       :selected-item="modelValue"
       :expandable="expandable"
+      :disabled="disabled"
       :comp="component"
       @click="clickMenu"
     />
@@ -34,14 +35,21 @@ export default {
       type: Boolean,
       default: true,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     const prevMenuItem = ref(props.items.filter(item => props.modelValue === item.value));
-    const clickMenu = (newMenuItem) => {
-      emit('update:modelValue', newMenuItem.value);
-      emit('change', newMenuItem, prevMenuItem.value);
-      prevMenuItem.value = newMenuItem;
+    const clickMenu = (params) => {
+      if (!params.disabled) {
+        const newMenuItem = params.item;
+        emit('update:modelValue', newMenuItem.value);
+        emit('change', newMenuItem, prevMenuItem.value);
+        prevMenuItem.value = newMenuItem;
+      }
     };
     const component = MenuItem;
     return {

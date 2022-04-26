@@ -4,14 +4,17 @@
     :class="[
       'ev-menu-item',
        `depth${depth}`,
-      { active: item.value === selectedItem },
+      { active: !item.disabled && item.value === selectedItem },
     ]">
     <div
       :class="[
         'ev-menu-title',
-        { 'expandable': hasChild && expandable },
+        {
+          'expandable': hasChild && expandable,
+          'disabled': item.disabled,
+        },
       ]"
-      @click="clickMenu(item, depth)"
+      @click="clickMenu({item, depth, disabled: item.disabled})"
     >
       <i
         v-if="!!item.iconClass"
@@ -43,6 +46,7 @@
           :item="menu"
           :selected-item="selectedItem"
           :expandable="expandable"
+          :disabled="disabled"
           :comp="comp"
           @click="clickMenu"
         />
@@ -77,6 +81,9 @@ export default {
         } else if (obj.hidden !== undefined && typeof obj.hidden !== 'boolean') {
           console.warn('[EVUI][Menu] hidden attribute must be \'Boolean\' type.');
           return false;
+        } else if (obj.disabled !== undefined && typeof obj.disabled !== 'boolean') {
+          console.warn('[EVUI][Menu] disabled attribute must be \'Boolean\' type.');
+          return false;
         }
         return true;
       },
@@ -93,6 +100,10 @@ export default {
       type: Object,
       default: () => {},
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['click'],
   setup(props, { emit }) {
@@ -100,13 +111,13 @@ export default {
     const isExpand = ref(defaultExpand);
     const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
 
-    const clickMenu = (menuItem, depth) => {
-      if (hasChild.value && depth === props.depth) {
+    const clickMenu = (params) => {
+      if (hasChild.value && params.depth === props.depth) {
         if (props.expandable) {
           isExpand.value = !isExpand.value;
         }
       } else {
-        emit('click', menuItem, props.depth);
+        emit('click', params);
       }
     };
 
@@ -148,6 +159,13 @@ export default {
   }
   &.expandable {
     padding-right: 27px;
+  }
+  &.disabled {
+    color: #848484 !important;
+    &:hover {
+      cursor: not-allowed;
+      color: #848484 !important;
+    }
   }
   .list-expend-icon {
     position: absolute;
