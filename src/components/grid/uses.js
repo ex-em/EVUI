@@ -874,12 +874,14 @@ export const contextMenuEvent = (params) => {
     } else {
       rowIndex = target.parentElement.parentElement.dataset.index;
     }
-
+    let clickedRow;
     if (rowIndex) {
-      const rowData = stores.viewStore[+rowIndex][ROW_DATA_INDEX];
-      selectInfo.selectedRow = rowData;
+      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
+    }
+    if (clickedRow) {
+      selectInfo.selectedRow = clickedRow;
       setContextMenu();
-      emit('update:selected', rowData);
+      emit('update:selected', clickedRow);
     } else {
       selectInfo.selectedRow = [];
       setContextMenu(false);
