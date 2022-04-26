@@ -82,20 +82,40 @@ const modules = {
     Object.values(seriesList).forEach((series) => {
       if (!series.isExistGrp && series.showLegend) {
         const { colorAxis, valueOpt } = series;
-        const { min, max, interval, existError } = valueOpt;
-        const endIndex = colorAxis.length - 1;
-        colorAxis.forEach((colorItem, index) => {
+        const { min, max, interval, existError, decimalPoint } = valueOpt;
+        const length = colorAxis.length;
+        const endIndex = existError ? length - 2 : length - 1;
+        for (let index = 0; index < length; index++) {
+          const colorItem = colorAxis[index];
           const minValue = min + (interval * index);
-          const maxValue = index === endIndex
-            ? max : minValue + interval;
-          const name = existError && index === endIndex ? 'error' : `${minValue} - ${maxValue}`;
+          let maxValue = minValue + interval;
+          if (index < endIndex) {
+            maxValue -= (0.1 ** decimalPoint);
+          } else {
+            maxValue = max + (0.1 ** decimalPoint);
+          }
+
+          let name = `${minValue.toFixed(decimalPoint)} - ${maxValue.toFixed(decimalPoint)}`;
+          if (min === undefined || max === undefined) {
+            if (index === 0) {
+              name = '0';
+            } else {
+              break;
+            }
+          } else if (existError && index === endIndex + 1) {
+            name = 'error';
+          } else if (minValue > max) {
+            break;
+          } else if (interval <= 1 && decimalPoint === 0) {
+            name = minValue;
+          }
 
           this.addLegend({
             cId: colorItem.id,
             color: colorItem.value,
             name,
           });
-        });
+        }
       }
     });
   },

@@ -356,6 +356,14 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
+
+    const colorAxis = Object.values(this.seriesList)[0].colorAxis;
+    const isShow = colorAxis.find(({ id }) => id === hitItem.cId)?.show;
+    if (!isShow) {
+      this.tooltipClear();
+      return;
+    }
+
     let xValue = '';
     let yValue = '';
 
