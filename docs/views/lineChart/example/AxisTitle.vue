@@ -61,7 +61,7 @@
             />
           </div>
           <div class="section-item">
-            <label>textAlign</label>
+            <label>fontStyle</label>
             <ev-select
                 v-model="option.fontStyle"
                 :items="[{
