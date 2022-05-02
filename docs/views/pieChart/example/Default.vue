@@ -34,6 +34,9 @@
           show: true,
           position: 'right',
         },
+        tooltip: {
+          formatter: ({ value }) => `${value}%`,
+        },
       };
 
       return {

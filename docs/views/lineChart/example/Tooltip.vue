@@ -202,7 +202,10 @@
           maxWidth,
           maxHeight,
           textOverflow,
-          formatter: ({ x, y, name }) => console.log(`X: ${x}, Y: ${y}, series name: ${name}`),
+          formatter: {
+            title: ({ x }) => dayjs(x).format('YYYY-MM-DD HH:mm:ss'),
+            value: ({ y }) => `${y}%`,
+          },
         },
       });
 
