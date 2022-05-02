@@ -127,7 +127,14 @@ export default {
    * @returns {string} computed value
    */
   getLabelStyle(style) {
-    return `normal normal ${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`;
+    const {
+      fontStyle = 'normal',
+      fontWeight = 'norma',
+      fontSize = '12',
+      fontFamily = 'Roboto',
+    } = style;
+
+    return `${fontStyle} normal ${fontWeight} ${fontSize}px ${fontFamily}`;
   },
 
   /**
