@@ -109,8 +109,20 @@ const chartData =
 | maxWidth | Number |  | 툴팁의 최대 너비  | |
 | textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
-| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({ value, name }) => value + '%' |
-
+| formatter | function / Object | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (아래 코드 참고) |
+```
+const chartOptions = {
+    tooltip: {
+        // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
+        formatter: ({ name, value }) => ... ,
+        
+        // 새로운 버전
+        formatter: {
+            value: ({ name, value }) => ...,
+        }
+    },
+}
+```
 #### selectItem
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|

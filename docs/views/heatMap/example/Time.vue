@@ -107,7 +107,10 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
         },
         tooltip: {
           use: true,
-          formatter: ({ value }) => `value: ${value}`,
+          formatter: {
+            title: ({ x }) => dayjs(x).format('HH:mm:ss'),
+            value: ({ value }) => `${value}`,
+          },
         },
       };
 
