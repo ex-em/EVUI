@@ -165,7 +165,6 @@ class Scale {
    * @returns {undefined}
    */
   drawAxisTitle(chartRect, labelOffset) {
-    debugger;
     const titleOpt = this.title;
 
     if (!titleOpt?.use || isNaN(titleOpt.fontSize)) {
