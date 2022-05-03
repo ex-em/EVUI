@@ -54,7 +54,9 @@ const modules = {
       return new Pie(id, opt, index);
     } else if (type === 'heatMap') {
       this.seriesInfo.charts.heatMap.push(id);
-      return new HeatMap(id, opt, this.options.heatMapColor);
+      const { heatMapColor, legend } = this.options;
+      const isGradient = legend.type === 'gradient';
+      return new HeatMap(id, opt, heatMapColor, isGradient);
     }
 
     return false;

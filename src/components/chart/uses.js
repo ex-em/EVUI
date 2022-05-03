@@ -22,6 +22,7 @@ const DEFAULT_OPTIONS = {
   },
   legend: {
     show: true,
+    type: 'icon',
     position: 'right',
     color: '#353740',
     inactive: '#aaa',

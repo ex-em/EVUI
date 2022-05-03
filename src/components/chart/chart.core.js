@@ -8,6 +8,7 @@ import StepScale from './scale/scale.step';
 import TimeCategoryScale from './scale/scale.time.category';
 import Title from './plugins/plugins.title';
 import Legend from './plugins/plugins.legend';
+import GradientLegend from './plugins/plugins.legend.gradient';
 import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
 import Pie from './plugins/plugins.pie';
@@ -22,6 +23,10 @@ class EvChart {
     Object.assign(this, Tooltip);
     Object.assign(this, Pie);
     Object.assign(this, Tip);
+
+    if (options.type === 'heatMap' && options.legend.type === 'gradient') {
+      Object.assign(this, GradientLegend);
+    }
 
     this.target = target;
     this.data = data;
@@ -163,6 +168,7 @@ class EvChart {
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
+      overlayCtx: this.overlayCtx,
     };
 
     let showIndex = 0;

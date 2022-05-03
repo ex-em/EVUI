@@ -444,7 +444,7 @@ const modules = {
     if (isExistError && series.colorAxis.length === categoryCnt) {
       series.colorAxis.push({
         id: `color#${categoryCnt}`,
-        value: colorOpt.error,
+        color: colorOpt.error,
         state: 'normal',
         show: true,
       });

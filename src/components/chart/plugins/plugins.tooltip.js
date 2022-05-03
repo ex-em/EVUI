@@ -3,6 +3,7 @@ import debounce from '@/common/utils.debounce';
 import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
+import { convertToPercent } from '../../../common/utils';
 
 const TITLE_HEIGHT = 30;
 const TEXT_HEIGHT = 14;
@@ -355,10 +356,21 @@ const modules = {
     const hitColor = items[sId].color;
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
+    const isGradient = this.options.legend.type === 'gradient';
     const opt = this.options.tooltip;
+    const series = Object.values(this.seriesList)[0];
 
-    const colorAxis = Object.values(this.seriesList)[0].colorAxis;
-    const isShow = colorAxis.find(({ id }) => id === hitItem.cId)?.show;
+    let isShow = false;
+    if (isGradient) {
+      const { min, max } = series.valueOpt;
+      const ratio = convertToPercent(hitItem.o - min, max - min);
+      const { start, end } = series.colorState;
+      isShow = start <= ratio && ratio <= end;
+    } else {
+      const colorAxis = series.colorAxis;
+      isShow = colorAxis.find(({ id }) => id === hitItem.cId)?.show;
+    }
+
     if (!isShow) {
       this.tooltipClear();
       return;

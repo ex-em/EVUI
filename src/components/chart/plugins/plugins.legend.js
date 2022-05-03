@@ -112,7 +112,7 @@ const modules = {
 
           this.addLegend({
             cId: colorItem.id,
-            color: colorItem.value,
+            color: colorItem.color,
             name,
           });
         }
@@ -510,6 +510,7 @@ const modules = {
     }
     containerDOM.style.height = '18px';
     containerDOM.style.display = 'inline-block';
+    containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);

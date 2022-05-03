@@ -35,14 +35,15 @@ import { onMounted, reactive } from 'vue';
           show: true,
         },
         indicator: {
-          use: false,
+          use: true,
         },
         axesX: [{
           type: 'step',
-          showAxis: false,
+          showGrid: false,
         }],
         axesY: [{
           type: 'step',
+          showGrid: false,
         }],
         heatMapColor: {
           min: '#FFC19E',
@@ -51,6 +52,11 @@ import { onMounted, reactive } from 'vue';
         },
         tooltip: {
           use: true,
+        },
+        legend: {
+          use: true,
+          type: 'gradient',
+          position: 'bottom',
         },
       };
 
