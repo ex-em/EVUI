@@ -93,6 +93,7 @@ const chartData =
   | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#linear-type) |
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+  | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -119,10 +120,22 @@ const chartData =
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
 
+##### title
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| use | Boolean | false | Chart 축(Axis) Title 표시 여부 | true / false |
+| text | String | null | Title 로 표시될 text | |
+| fontSize | Number | 12 | 글자 크기 | |
+| fontWeight | Number | 400 | 글자 굵기 | 100, 200, 300, ... 900 |
+| fontFamily | String | 'Roboto' | 폰트 | |
+| fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
+| textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
+| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
+
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
-| show | Boolean | false | 타이틀 표시 여부 | true /false |
+| show | Boolean | false | 차트 타이틀 표시 여부 | true /false |
 | height | Number | 40 | 타이틀 영역이 높이 | |
 | text | String | '' | 타이틀 | | 
 | style | Object | | 타이틀 폰트 스타일 | | 

@@ -89,6 +89,8 @@ class StepScale extends Scale {
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
     const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
 
+    this.drawAxisTitle(chartRect, labelOffset);
+
     if (this.labelStyle?.show) {
       // label font 설정
       ctx.font = Util.getLabelStyle(this.labelStyle);

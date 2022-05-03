@@ -102,6 +102,16 @@ export const AXIS_OPTION = {
     fitWidth: false,
     fitDir: 'right',
   },
+  title: {
+    use: false,
+    text: null,
+    fontWeight: 400,
+    fontSize: 12,
+    fontFamily: 'Roboto',
+    textAlign: 'right',
+    fontStyle: 'normal',
+    color: '#808080',
+  },
 };
 
 export const PLOT_LINE_OPTION = {
