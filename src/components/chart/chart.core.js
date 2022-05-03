@@ -449,15 +449,31 @@ class EvChart {
     const { width, height } = this.getChartDOMRect();
 
     const padding = this.options.padding;
+    const xAxisTitleOpt = this.options.axesX[0]?.title;
+    const yAxisTitleOpt = this.options.axesY[0]?.title;
+    const titleMargin = 10;
+
+    let xAxisTitleHeight = 0;
+    if (xAxisTitleOpt?.use && xAxisTitleOpt?.text) {
+      const fontSize = isNaN(xAxisTitleOpt?.fontSize) ? 12 : xAxisTitleOpt?.fontSize;
+      xAxisTitleHeight = fontSize + titleMargin;
+    }
+
+    let yAxisTitleHeight = 0;
+    if (yAxisTitleOpt?.use && yAxisTitleOpt?.text) {
+      const fontSize = isNaN(yAxisTitleOpt?.fontSize) ? 12 : yAxisTitleOpt?.fontSize;
+      yAxisTitleHeight = fontSize + titleMargin;
+    }
+
     const horizontalPadding = padding.left + padding.right;
-    const verticalPadding = padding.top + padding.bottom;
+    const verticalPadding = padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight;
     const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
     const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
     const x1 = padding.left;
     const x2 = Math.max(width - padding.right, x1 + 2);
-    const y1 = padding.top;
-    const y2 = Math.max(height - padding.bottom, y1 + 2);
+    const y1 = padding.top + yAxisTitleHeight;
+    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight, y1 + 2);
 
     return {
       x1,

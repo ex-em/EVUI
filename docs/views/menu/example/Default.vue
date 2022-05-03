@@ -24,6 +24,7 @@ export default {
         text: 'Menu Text 01',
         value: 'menu01',
         iconClass: 'ev-icon-s-panel-out',
+        disabled: true,
       },
       {
         text: 'Menu Text 02',
@@ -51,6 +52,7 @@ export default {
               {
                 text: 'Child Text 02-1-4',
                 value: 'menu02-1-4',
+                disabled: true,
               },
             ],
           },

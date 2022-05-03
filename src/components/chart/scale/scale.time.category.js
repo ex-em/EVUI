@@ -132,6 +132,8 @@ class TimeCategoryScale extends Scale {
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
 
+    this.drawAxisTitle(chartRect, labelOffset);
+
     // label font 설정
     ctx.font = Util.getLabelStyle(this.labelStyle);
 

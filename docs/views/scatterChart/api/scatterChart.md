@@ -85,6 +85,7 @@ const chartData =
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
   | plotBands | Array | ([상세](#plotband)) | plot band(임계영역 표시 용도) 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+  | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -107,6 +108,18 @@ const chartData =
 | fontFamily | String | 'Roboto' | 폰트 | |
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
+
+##### title
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| use | Boolean | false | Chart 축(Axis) Title 표시 여부 | true / false |
+| text | String | null | Title 로 표시될 text | |
+| fontSize | Number | 12 | 글자 크기 | |
+| fontWeight | Number | 400 | 글자 굵기 | 100, 200, 300, ... 900 |
+| fontFamily | String | 'Roboto' | 폰트 | |
+| fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
+| textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
+| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
 
 ##### plotLine
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -187,7 +200,20 @@ const chartData =
 | maxWidth | Number |  | 툴팁의 최대 너비  | |
 | textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
-| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({x, y, name}) => y + '%' |
+| formatter | function / Object | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (아래 코드 참고) |
+```
+const chartOptions = {
+    tooltip: {
+        // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
+        formatter: ({ x, y, name }) => ... ,
+        
+        // 새로운 버전
+        formatter: {
+            value: ({ x, y, name }) => ...,
+        }
+    },
+}
+```
 
 #### selectItem
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

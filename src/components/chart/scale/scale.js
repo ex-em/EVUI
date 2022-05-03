@@ -157,6 +157,52 @@ class Scale {
   }
 
   /**
+   * Draw Axis Title
+   *
+   * @param {object} chartRect      min/max information
+   * @param {object} labelOffset    label offset information
+   *
+   * @returns {undefined}
+   */
+  drawAxisTitle(chartRect, labelOffset) {
+    const titleOpt = this.title;
+
+    if (!titleOpt?.use || isNaN(titleOpt.fontSize)) {
+      return;
+    }
+
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.font = Util.getLabelStyle(titleOpt);
+    ctx.fillStyle = titleOpt.color;
+    ctx.textAlign = titleOpt.textAlign;
+
+    const axisLinePosition = {
+      xLeft: chartRect.x1 + labelOffset.left,
+      xRight: chartRect.x2 - labelOffset.right,
+      yTop: chartRect.y1,
+    };
+
+    let titleXPos;
+    let titleYPos;
+
+    const margin = 10;
+    if (this.type === 'x') {
+      titleXPos = axisLinePosition.xRight;
+      titleYPos = chartRect.y2 + titleOpt.fontSize + margin;
+    } else {
+      titleYPos = axisLinePosition.yTop - titleOpt.fontSize - margin;
+      titleXPos = axisLinePosition.xLeft;
+    }
+
+    if (titleXPos > 0 && titleYPos > 0) {
+      ctx.fillText(titleOpt.text, titleXPos, titleYPos);
+    }
+
+    ctx.restore();
+  }
+
+  /**
    * Draw axis
    * @param {object} chartRect      min/max information
    * @param {object} labelOffset    label offset information
@@ -185,6 +231,8 @@ class Scale {
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
 
     let aliasPixel;
+
+    this.drawAxisTitle(chartRect, labelOffset);
 
     // label font 설정
     ctx.font = Util.getLabelStyle(this.labelStyle);

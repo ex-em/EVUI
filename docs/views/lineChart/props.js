@@ -18,6 +18,8 @@ import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 import SelectSeries from './example/SelectSeries';
 import SelectSeriesRaw from '!!raw-loader!./example/SelectSeries';
+import AxisTitle from './example/AxisTitle';
+import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
 
 export default {
   mdText,
@@ -66,6 +68,11 @@ export default {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
       component: PlotLine,
       parsedData: parseComponent(PlotLineRaw),
+    },
+    AxisTitle: {
+      description: '차트 축에 title을 설정할 수 있습니다.',
+      component: AxisTitle,
+      parsedData: parseComponent(AxisTitleRaw),
     },
   },
 };
