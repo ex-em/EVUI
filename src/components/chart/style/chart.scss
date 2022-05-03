@@ -176,6 +176,12 @@
     border: 1px solid #FFFFFF;
     background-color: transparent;
   }
+
+  .ev-chart-legend-overlay-tooltip {
+    position: absolute;
+    font-size: 12px;
+    line-height: 1.4em;
+  }
 }
 
 .ev-chart-resize-bar {

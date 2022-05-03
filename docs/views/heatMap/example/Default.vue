@@ -56,7 +56,6 @@ import { onMounted, reactive } from 'vue';
         legend: {
           use: true,
           type: 'gradient',
-          position: 'bottom',
         },
       };
 

@@ -112,10 +112,6 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
             value: ({ value }) => `${value}`,
           },
         },
-        legend: {
-          use: true,
-          type: 'gradient',
-        },
       };
 
       timeValue = dayjs(timeValue).add(8, 'second');

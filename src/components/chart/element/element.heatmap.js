@@ -116,7 +116,8 @@ class HeatMap {
       const { start, end, min: minColor, max: maxColor, selectedValue } = this.colorState;
       if (value < 0 || (start <= ratio && ratio <= end)) {
         colorState.show = true;
-        colorState.isHighlight = selectedValue && Math.floor(ratio) === Math.floor(selectedValue);
+        colorState.isHighlight = selectedValue
+          && value === (min + Math.round((max - min) * (selectedValue / 100)));
         colorState.opacity = 1;
         colorState.dataColor = value < 0
           ? this.errorColor : this.getColorForGradient(ratio, minColor, maxColor);
