@@ -449,8 +449,8 @@ class EvChart {
     const { width, height } = this.getChartDOMRect();
 
     const padding = this.options.padding;
-    const xAxisTitleOpt = this.options.axesX[0]?.title;
-    const yAxisTitleOpt = this.options.axesY[0]?.title;
+    const xAxisTitleOpt = this.options.axesX?.[0]?.title;
+    const yAxisTitleOpt = this.options.axesY?.[0]?.title;
     const titleMargin = 10;
 
     let xAxisTitleHeight = 0;
