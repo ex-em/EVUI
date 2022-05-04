@@ -147,6 +147,7 @@ const chartData =
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | show | Boolean | false | Legend 표시 여부 | true /false |
+| type | String | 'icon' | Legend type 지정 | 'icon', 'gradient' |
 | position | String | 'right' | Legend 위치 | 'top', 'right', 'bottom', 'left' |
 | color | Hex, RGB, RGBA Code(String) | '#353740' | 폰트 색상 | | 
 | inactive | Hex, RGB, RGBA Code(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
