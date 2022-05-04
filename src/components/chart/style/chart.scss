@@ -145,8 +145,8 @@
       position: absolute;
       top: 4px;
       left: 4px;
-      width: 10px;
-      height: 10px;
+      width: calc(100% - 8px);
+      height: calc(100% - 8px);
       border-radius: 50%;
     }
   }
@@ -175,8 +175,6 @@
     position: absolute;
     top: 1px;
     left: 1px;
-    width: 8px;
-    height: 8px;
     border-radius: 50%;
     border: 1px solid #FFFFFF;
     background-color: transparent;
