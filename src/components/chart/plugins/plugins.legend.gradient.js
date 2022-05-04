@@ -3,7 +3,7 @@ import { convertToPercent } from '../../../common/utils';
 const HANDLE_SIZE = 18;
 
 const MIN_BOX_SIZE = {
-  width: 60,
+  width: 70,
   height: 60,
 };
 
@@ -79,6 +79,7 @@ const modules = {
       this.clearOverlay();
       this.dragInfo.dragging = true;
       this.dragInfo.isStart = targetDOM.className.includes('start');
+      targetDOM.classList.add('dragging');
       this.legendBoxDOM.addEventListener('mousemove', this.onLegendMouseMove, false);
       this.legendBoxDOM.addEventListener('mouseup', this.onLegendMouseUp, false);
     };
@@ -95,7 +96,7 @@ const modules = {
         const dir = isStart ? 'start' : 'end';
 
         const { colorState } = Object.values(this.seriesList)[0];
-        colorState[dir] = value;
+        colorState[0][dir] = value;
 
         this.update({
           updateSeries: false,
@@ -111,6 +112,9 @@ const modules = {
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
       });
+
+      const targetDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-handle dragging')[0];
+      targetDOM?.classList.remove('dragging');
       this.legendBoxDOM.removeEventListener('mouseup', this.onLegendMouseUp, false);
     };
 
@@ -122,22 +126,29 @@ const modules = {
     this.onLegendBoxOver = (e) => {
       const type = e.target.dataset.type;
 
-      if (!['line', 'thumb', 'layer', 'overlay', 'overlay-item'].includes(type)) {
+      const { colorState, valueOpt } = Object.values(this.seriesList)[0];
+      const state = colorState[0];
+
+      if (['line', 'thumb', 'layer', 'overlay', 'overlay-item'].includes(type)) {
+        let value = this.getSelectedValue(e);
+        if (state.start <= value && value <= state.end) {
+          value = this.isSide ? 100 - value : value;
+          state.selectedValue = value;
+          this.createLegendOverlay(value, valueOpt);
+        } else {
+          return;
+        }
+      } else if (['handle', 'handle-btn', 'handle-btn-color'].includes(type)) {
+        state.selectedValue = null;
+        this.clearOverlay();
+      } else {
         return;
       }
 
-      let value = this.getSelectedValue(e);
-      const { colorState, valueOpt } = Object.values(this.seriesList)[0];
-      if (colorState.start <= value && value <= colorState.end) {
-        value = this.isSide ? 100 - value : value;
-        colorState.selectedValue = value;
-        this.createLegendOverlay(value, valueOpt.min, valueOpt.max);
-
-        this.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-        });
-      }
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
     };
 
     /**
@@ -151,7 +162,7 @@ const modules = {
       this.clearOverlay(targetDOM);
 
       const { colorState } = Object.values(this.seriesList)[0];
-      colorState.selectedValue = null;
+      colorState[0].selectedValue = null;
 
       this.update({
         updateSeries: false,
@@ -159,9 +170,9 @@ const modules = {
       });
     };
 
-    this.containerDOM.addEventListener('mousedown', this.onLegendMouseDown);
-    this.containerDOM.addEventListener('mouseover', this.onLegendBoxOver);
-    this.containerDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
+    this.legendBoxDOM.addEventListener('mousedown', this.onLegendMouseDown);
+    this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
+    this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
   },
 
   getSelectedValue(evt) {
@@ -225,8 +236,9 @@ const modules = {
     }
   },
 
-  createLegendOverlay(value, min, max) {
+  createLegendOverlay(value, opt) {
     this.clearOverlay();
+    const { min, max } = opt;
 
     const targetDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-line')[0];
 
@@ -236,7 +248,7 @@ const modules = {
 
     const tooltipDOM = document.createElement('div');
     tooltipDOM.className = 'ev-chart-legend-overlay-tooltip';
-    tooltipDOM.innerText = min + Math.round((max - min) * (value / 100));
+    tooltipDOM.innerText = Math.floor(min + ((max - min) * (value / 100)));
 
     const itemDOM = document.createElement('span');
     itemDOM.className = 'ev-chart-legend-overlay-item';
@@ -361,11 +373,12 @@ const modules = {
   setLegend(series) {
     const dir = this.isSide ? 'top' : 'right';
 
-    const { valueOpt, colorState, getColorForGradient } = series;
+    const { valueOpt, colorState } = series;
 
-    const { min, max, start, end } = colorState;
-    const startColor = getColorForGradient(start, min, max);
-    const endColor = getColorForGradient(end, min, max);
+    const { min, max, decimalPoint } = valueOpt;
+    const { start, end } = colorState[0];
+    const startColor = series.getColorForGradient(start);
+    const endColor = series.getColorForGradient(end);
     let gradient = `linear-gradient(to ${dir}, `;
     gradient += `${startColor}, ${endColor})`;
 
@@ -383,8 +396,8 @@ const modules = {
       labelDOM[0].left = `${start}%`;
       labelDOM[1].left = `${end}%`;
     }
-    const minText = valueOpt.min + Math.round((valueOpt.max - valueOpt.min) * (start / 100));
-    const maxText = valueOpt.min + Math.round((valueOpt.max - valueOpt.min) * (end / 100));
+    const minText = (min + ((max - min) * (start / 100))).toFixed(decimalPoint);
+    const maxText = (min + ((max - min) * (end / 100))).toFixed(decimalPoint);
     labelDOM[0].innerText = this.isSide ? maxText : minText;
     labelDOM[1].innerText = this.isSide ? minText : maxText;
 
@@ -435,6 +448,9 @@ const modules = {
         boxStyle.width = '100%';
         boxStyle.height = `${minHeight}px`;
 
+        legendStyle.width = `${chartRect.width}px`;
+        legendStyle.height = `${minHeight}px`;
+
         legendStyle.top = `${title}px`;
         legendStyle.right = '';
         legendStyle.bottom = '';
@@ -448,6 +464,9 @@ const modules = {
         boxStyle.height = '100%';
         boxStyle.maxHeight = `${chartRect.height}px`;
 
+        legendStyle.width = `${minWidth}px`;
+        legendStyle.height = `${chartRect.height}px`;
+
         legendStyle.top = `${title}px`;
         legendStyle.right = '0px';
         legendStyle.bottom = '';
@@ -459,9 +478,11 @@ const modules = {
 
         boxStyle.paddingTop = `${HANDLE_SIZE + 7}px`;
         boxStyle.width = '100%';
-        boxStyle.height = `${minHeight - 10}px`; // legendDOM top padding
+        boxStyle.height = `${minHeight}px`;
 
-        legendStyle.paddingTop = '10px';
+        legendStyle.width = `${chartRect.width}px`;
+        legendStyle.height = `${minHeight}px`;
+
         legendStyle.top = '';
         legendStyle.right = '';
         legendStyle.bottom = '0px';
@@ -471,11 +492,14 @@ const modules = {
         wrapperStyle.padding = `${title}px 0 0 ${minWidth}px`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
+        boxStyle.display = 'absolute';
+        boxStyle.bottom = '0px';
         boxStyle.width = `${minWidth}px`;
         boxStyle.height = '100%';
         boxStyle.maxHeight = `${chartRect.height}px`;
-        boxStyle.display = 'absolute';
-        boxStyle.bottom = '0px';
+
+        legendStyle.width = `${minWidth}px`;
+        legendStyle.height = `${chartRect.height}px`;
 
         legendStyle.top = `${title}px`;
         legendStyle.right = '';
@@ -486,26 +510,23 @@ const modules = {
         break;
     }
 
+    // set container style
     const width = HANDLE_SIZE;
-    const height = chartRect.height / 2;
-
     if (['top', 'bottom'].includes(position)) {
-      legendStyle.width = `${chartRect.width}px`;
-      legendStyle.height = `${minHeight}px`;
+      const containerSize = chartRect.width / 2;
 
-      containerStyle.left = `${(chartRect.width / 2) - (height / 2)}px`;
-      containerStyle.width = `${height}px`;
+      containerStyle.left = `${(chartRect.width / 2) - (containerSize / 2)}px`;
+      containerStyle.width = `${containerSize}px`;
       containerStyle.height = `${width}px`;
       containerStyle.padding = '4px 0';
       containerStyle.margin = '0 4px';
     } else {
-      legendStyle.width = `${minWidth}px`;
-      legendStyle.height = `${chartRect.height}px`;
+      const containerSize = chartRect.height / 2;
 
-      containerStyle.position = 'absolute';
-      containerStyle.top = `${(chartRect.height / 2) - (height / 2)}px`;
+      containerStyle.top = `${(chartRect.height / 2) - (containerSize / 2)}px`;
+      containerStyle.left = '5px';
       containerStyle.width = `${width}px`;
-      containerStyle.height = `${height}px`;
+      containerStyle.height = `${containerSize}px`;
       containerStyle.padding = '0 4px';
       containerStyle.margin = '4px 0';
     }

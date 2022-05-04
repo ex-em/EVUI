@@ -418,7 +418,7 @@ const modules = {
   },
 
   getSeriesValueOptForHeatMap(series) {
-    const data = series.data;
+    const { data, colorState, isGradient } = series;
     const colorOpt = this.options.heatMapColor;
     const categoryCnt = colorOpt.categoryCnt;
     const decimalPoint = colorOpt.decimalPoint;
@@ -441,8 +441,12 @@ const modules = {
       }
     });
 
-    if (isExistError && series.colorAxis.length === categoryCnt) {
-      series.colorAxis.push({
+    if (
+      isExistError
+      && !isGradient
+      && colorState.length === categoryCnt
+    ) {
+      colorState.push({
         id: `color#${categoryCnt}`,
         color: colorOpt.error,
         state: 'normal',

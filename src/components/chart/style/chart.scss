@@ -127,6 +127,11 @@
   left: 0;
   cursor: pointer;
 
+  &.dragging,
+  &:hover {
+    transform: scale(1.2);
+  }
+
   &-btn {
     width: 100%;
     height: 100%;

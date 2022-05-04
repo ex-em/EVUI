@@ -365,21 +365,20 @@ const modules = {
     const hitColor = items[sId].color;
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
-    const isGradient = this.options.legend.type === 'gradient';
     const opt = this.options.tooltip;
     const valueFormatter = typeof opt.formatter === 'function' ? opt.formatter : opt.formatter?.value;
     const titleFormatter = opt.formatter?.title;
     const series = Object.values(this.seriesList)[0];
 
     let isShow = false;
+    const { colorState, isGradient } = series;
     if (isGradient) {
       const { min, max } = series.valueOpt;
       const ratio = convertToPercent(hitItem.o - min, max - min);
-      const { start, end } = series.colorState;
-      isShow = start <= ratio && ratio <= end;
+      const { start, end } = colorState[0];
+      isShow = (start <= ratio && ratio <= end) || hitItem.o === -1;
     } else {
-      const colorAxis = series.colorAxis;
-      isShow = colorAxis.find(({ id }) => id === hitItem.cId)?.show;
+      isShow = colorState.find(({ id }) => id === hitItem.cId)?.show;
     }
 
     if (!isShow) {

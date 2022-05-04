@@ -53,10 +53,6 @@ import { onMounted, reactive } from 'vue';
         tooltip: {
           use: true,
         },
-        legend: {
-          use: true,
-          type: 'gradient',
-        },
       };
 
       const createChartData = () => {
