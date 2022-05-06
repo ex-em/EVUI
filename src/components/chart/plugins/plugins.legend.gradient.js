@@ -20,6 +20,10 @@ const modules = {
     this.legendBoxDOM.className = 'ev-chart-legend-box';
     this.containerDOM = document.createElement('div');
     this.containerDOM.className = 'ev-chart-legend-container';
+
+    this.legendBoxDOM.appendChild(this.containerDOM);
+    this.legendDOM.appendChild(this.legendBoxDOM);
+    this.wrapperDOM.appendChild(this.legendDOM);
   },
 
   /**
@@ -262,7 +266,7 @@ const modules = {
 
     let itemStyle;
     let tooltipStyle;
-    const position = Math.floor(handleSize / 2) + 12;
+    const position = Math.floor(handleSize / 2) + 14;
     if (this.isSide) {
       tooltipStyle = `top:${100 - value}%;left:${position}px;transform:translateY(-50%);`;
       itemStyle = `top:${100 - value}%;transform:translateY(-50%);`;
@@ -366,22 +370,22 @@ const modules = {
     let gradient = `linear-gradient(to ${dir}, `;
     gradient += `${startColor}, ${endColor})`;
 
-    const labelPosition = Math.floor(handleSize / 2) + 12;
+    const labelPosition = Math.floor(handleSize / 2) + 14;
     let defaultHandleStyle = `width:${handleSize}px;height:${handleSize}px;`;
-    let defaultLabelStyle;
+    let labelStyle;
     let startStyle;
     let endStyle;
     let thumbStyle = `background:${gradient};`;
 
     if (this.isSide) {
       defaultHandleStyle += `margin-top:-${handleSize / 2}px;`;
-      defaultLabelStyle = `left:${labelPosition}px;transform:translateY(-50%);`;
+      labelStyle = `left:${labelPosition}px;transform:translateY(-50%);top:`;
       startStyle = `top:${100 - end}%;`;
       endStyle = `top:${100 - start}%;`;
       thumbStyle += `top:${100 - end}%;height:${end - start}%;`;
     } else {
       defaultHandleStyle += `margin-left:-${handleSize / 2}px;`;
-      defaultLabelStyle = `top:-${labelPosition}px;transform:translateX(-50%);`;
+      labelStyle = `top:-${labelPosition}px;transform:translateX(-50%);left:`;
       startStyle = `left:${start}%;`;
       endStyle = `left:${end}%;`;
       thumbStyle += `left:${start}%;width:${end - start}%;`;
@@ -394,8 +398,8 @@ const modules = {
     thumbDOM.style.cssText = thumbStyle;
 
     const labelDOM = thumbDOM.getElementsByClassName('ev-chart-legend-label');
-    labelDOM[0].style.cssText = defaultLabelStyle + startStyle;
-    labelDOM[1].style.cssText = defaultLabelStyle + endStyle;
+    labelDOM[0].style.cssText = `${labelStyle}0%;`;
+    labelDOM[1].style.cssText = `${labelStyle}100%;`;
     labelDOM[0].innerText = this.isSide ? maxText : minText;
     labelDOM[1].innerText = this.isSide ? minText : maxText;
 
@@ -416,90 +420,76 @@ const modules = {
   setLegendPosition() {
     const opt = this.options;
     const position = opt?.legend?.position;
-    const wrapperStyle = this.wrapperDOM?.style;
-    const legendStyle = this.legendDOM?.style;
-    const boxStyle = this.legendBoxDOM?.style;
-    const containerStyle = this.containerDOM?.style;
     const { width: minWidth, height: minHeight } = MIN_BOX_SIZE;
     const handleSize = this.legendHandleSize;
 
-    let chartRect;
     const title = opt?.title?.show ? opt?.title?.height : 0;
     const positionTop = title + minHeight;
     const { top = 0, bottom = 0, left = 0, right = 0 } = opt?.legend?.padding ?? {};
+    const wrapperStyle = this.wrapperDOM.style;
 
-    if (!wrapperStyle || !legendStyle) {
+    if (!wrapperStyle) {
       return;
     }
 
-    boxStyle.padding = `${top}px ${right}px ${bottom}px ${left}px`;
+    let legendStyle;
+    let boxStyle;
+    let containerStyle;
+    let chartRect;
 
     switch (position) {
       case 'top':
         wrapperStyle.padding = `${positionTop}px 0 0 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
-        boxStyle.paddingTop = `${handleSize + 7}px`;
-        boxStyle.width = '100%';
-        boxStyle.height = `${minHeight}px`;
+        boxStyle = `padding:${handleSize + 7}px ${right}px ${bottom}px ${left}px;`;
+        boxStyle += 'width:100%';
+        boxStyle += `height${minHeight}px;`;
 
-        legendStyle.width = `${chartRect.width}px`;
-        legendStyle.height = `${minHeight}px`;
-
-        legendStyle.top = `${title}px`;
-        legendStyle.right = '';
-        legendStyle.bottom = '';
-        legendStyle.left = '';
+        legendStyle = `width:${chartRect.width}px;`;
+        legendStyle += `height:${minHeight}px;`;
+        legendStyle += `top:${title}px;`;
         break;
       case 'right':
         wrapperStyle.padding = `${title}px ${minWidth}px 0 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
-        boxStyle.width = `${minWidth}px`;
-        boxStyle.height = '100%';
-        boxStyle.maxHeight = `${chartRect.height}px`;
+        boxStyle = `padding:${top}px ${right}px ${bottom}px ${left}px;`;
+        boxStyle += `width:${minWidth}px;`;
+        boxStyle += 'height:100%;';
+        boxStyle += `max-height:${chartRect.height}px;`;
 
-        legendStyle.width = `${minWidth}px`;
-        legendStyle.height = `${chartRect.height}px`;
-
-        legendStyle.top = `${title}px`;
-        legendStyle.right = '0px';
-        legendStyle.bottom = '';
-        legendStyle.left = '';
+        legendStyle = `width:${minWidth}px;`;
+        legendStyle += `height:${chartRect.height}px;`;
+        legendStyle += `top:${title}px;right:0px;`;
         break;
       case 'bottom':
         wrapperStyle.padding = `${title}px 0 ${minHeight}px 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
-        boxStyle.paddingTop = `${handleSize + 7}px`;
-        boxStyle.width = '100%';
-        boxStyle.height = `${minHeight}px`;
+        boxStyle = `padding:${handleSize + 7}px ${right}px ${bottom}px ${left}px;`;
+        boxStyle += 'width:100%;';
+        boxStyle += `height:${minHeight}px;`;
 
-        legendStyle.width = `${chartRect.width}px`;
-        legendStyle.height = `${minHeight}px`;
+        legendStyle = `width:${chartRect.width}px;`;
+        legendStyle += `height:${minHeight}px;`;
 
-        legendStyle.top = '';
-        legendStyle.right = '';
-        legendStyle.bottom = '0px';
-        legendStyle.left = '0px';
+        legendStyle += 'bottom:0px;left:0px;';
         break;
       case 'left':
         wrapperStyle.padding = `${title}px 0 0 ${minWidth}px`;
         chartRect = this.chartDOM.getBoundingClientRect();
 
-        boxStyle.display = 'absolute';
-        boxStyle.bottom = '0px';
-        boxStyle.width = `${minWidth}px`;
-        boxStyle.height = '100%';
-        boxStyle.maxHeight = `${chartRect.height}px`;
+        boxStyle = `padding:${top}px ${right}px ${bottom}px ${left}px;`;
+        boxStyle += 'display:absolute;';
+        boxStyle += 'bottom:0px;';
+        boxStyle += `width:${minWidth}px;`;
+        boxStyle += 'height:100%;';
+        boxStyle += `maxHeight:${chartRect.height}px;`;
 
-        legendStyle.width = `${minWidth}px`;
-        legendStyle.height = `${chartRect.height}px`;
-
-        legendStyle.top = `${title}px`;
-        legendStyle.right = '';
-        legendStyle.bottom = '';
-        legendStyle.left = '0px';
+        legendStyle = `width:${minWidth}px;`;
+        legendStyle += `height:${chartRect.height}px;`;
+        legendStyle += `top:${title}px;left:0px`;
         break;
       default:
         break;
@@ -507,25 +497,25 @@ const modules = {
     if (['top', 'bottom'].includes(position)) {
       const containerSize = chartRect.width / 2;
 
-      containerStyle.left = `${(chartRect.width / 2) - (containerSize / 2)}px`;
-      containerStyle.width = `${containerSize}px`;
-      containerStyle.height = `${handleSize}px`;
-      containerStyle.padding = '4px 0';
-      containerStyle.margin = '0 4px';
+      containerStyle = `left:${(chartRect.width / 2) - (containerSize / 2)}px;`;
+      containerStyle += `width:${containerSize}px;`;
+      containerStyle += `height:${handleSize}px;`;
+      containerStyle += 'padding:4px 0;';
+      containerStyle += 'margin:0 4px;';
     } else {
       const containerSize = chartRect.height / 2;
 
-      containerStyle.top = `${(chartRect.height / 2) - (containerSize / 2)}px`;
-      containerStyle.left = '5px';
-      containerStyle.width = `${handleSize}px`;
-      containerStyle.height = `${containerSize}px`;
-      containerStyle.padding = '0 4px';
-      containerStyle.margin = '4px 0';
+      containerStyle = `top:${(chartRect.height / 2) - (containerSize / 2)}px;`;
+      containerStyle += 'left:5px;';
+      containerStyle += `width:${handleSize}px;`;
+      containerStyle += `height:${containerSize}px;`;
+      containerStyle += 'padding:0 4px;';
+      containerStyle += 'margin:4px 0;';
     }
 
-    this.legendBoxDOM.appendChild(this.containerDOM);
-    this.legendDOM.appendChild(this.legendBoxDOM);
-    this.wrapperDOM.appendChild(this.legendDOM);
+    this.containerDOM.style.cssText = containerStyle;
+    this.legendBoxDOM.style.cssText = boxStyle;
+    this.legendDOM.style.cssText = legendStyle;
   },
 
   /**
