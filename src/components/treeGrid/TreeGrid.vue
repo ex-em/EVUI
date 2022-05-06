@@ -524,6 +524,7 @@ export default {
         };
         const setParentShow = (data) => {
           if (!data?.parent) {
+            setChildShow(data);
             return;
           }
           const { parent } = data;
