@@ -1,6 +1,6 @@
 import { convertToPercent } from '../../../common/utils';
 
-const DEFAULT_HANDLE_SIZE = 22;
+const MAX_HANDLE_SIZE = 28;
 
 const MIN_BOX_SIZE = {
   width: 70,
@@ -345,7 +345,8 @@ const modules = {
   createLegend() {
     const opt = this.options.legend;
     this.isSide = !['top', 'bottom'].includes(opt.position);
-    this.legendHandleSize = (this.isSide ? opt.width : opt.height) ?? DEFAULT_HANDLE_SIZE;
+    const legendSize = this.isSide ? opt.width : opt.height;
+    this.legendHandleSize = legendSize > MAX_HANDLE_SIZE ? MAX_HANDLE_SIZE : legendSize;
     const handleSize = this.legendHandleSize;
 
     const startHandleDOM = this.createLegendHandle(this.isSide ? 'end' : 'start', handleSize);
