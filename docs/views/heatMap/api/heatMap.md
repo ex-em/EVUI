@@ -213,6 +213,7 @@ const chartOptions = {
 | color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | stroke color 지정 | |
 | lineWidth | number | 1 | stroke 선 굵기 지정 | |
 | opacity | number | 1 | stroke opacity 지정 | 0.1 ~ 1 |
+| radius | number | 0 | border radius 조정 | |
 
 ### 3. resize-timeout
 - Default : 0
