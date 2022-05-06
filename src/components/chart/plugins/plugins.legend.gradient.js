@@ -20,10 +20,6 @@ const modules = {
     this.legendBoxDOM.className = 'ev-chart-legend-box';
     this.containerDOM = document.createElement('div');
     this.containerDOM.className = 'ev-chart-legend-container';
-
-    this.legendBoxDOM.appendChild(this.containerDOM);
-    this.legendDOM.appendChild(this.legendBoxDOM);
-    this.wrapperDOM.appendChild(this.legendDOM);
   },
 
   /**
@@ -39,7 +35,7 @@ const modules = {
       this.createLegend();
     }
     const series = Object.values(this.seriesList)[0];
-    this.setLegend(series);
+    this.setLegendStyle(series);
     this.initEvent();
 
     this.isInitLegend = true;
@@ -211,7 +207,7 @@ const modules = {
     this.createLegend();
 
     const series = Object.values(this.seriesList)[0];
-    this.setLegend(series);
+    this.setLegendStyle(series);
   },
 
   /**
@@ -264,19 +260,20 @@ const modules = {
     itemDOM.className = 'ev-chart-legend-overlay-item';
     itemDOM.dataset.type = 'overlay-item';
 
+    let itemStyle;
+    let tooltipStyle;
+    const position = Math.floor(handleSize / 2) + 12;
     if (this.isSide) {
-      tooltipDOM.style.top = `${100 - value}%`;
-      tooltipDOM.style.left = `${handleSize + 2}px`;
-      itemDOM.style.top = `${100 - value}%`;
-      itemDOM.style.transform = 'translateY(-50%)';
+      tooltipStyle = `top:${100 - value}%;left:${position}px;transform:translateY(-50%);`;
+      itemStyle = `top:${100 - value}%;transform:translateY(-50%);`;
     } else {
-      tooltipDOM.style.top = `-${handleSize + 2}px`;
-      tooltipDOM.style.left = `${value}%`;
-      itemDOM.style.left = `${value}%`;
-      itemDOM.style.transform = 'translateX(-50%)';
+      tooltipStyle = `top:-${position}px;left:${value}%;transform:translateX(-50%);`;
+      itemStyle = `left:${value}%;transform:translateX(-50%);`;
     }
-    itemDOM.style.width = `${handleSize - 10}px`;
-    itemDOM.style.height = `${handleSize - 10}px`;
+    itemStyle += `width:${handleSize - 10}px;height:${handleSize - 10}px;`;
+
+    tooltipDOM.style.cssText = tooltipStyle;
+    itemDOM.style.cssText = itemStyle;
 
     overlayDOM.appendChild(tooltipDOM);
     overlayDOM.appendChild(itemDOM);
@@ -289,7 +286,7 @@ const modules = {
     });
   },
 
-  createLegendHandle(type, handleSize) {
+  createLegendHandle(type) {
     const colorBtnDOM = document.createElement('span');
     colorBtnDOM.className = `ev-chart-legend-handle-btn-color ${type}`;
     colorBtnDOM.dataset.type = 'handle-btn-color';
@@ -304,37 +301,19 @@ const modules = {
     handleDOM.className = `ev-chart-legend-handle ${type}`;
     handleDOM.dataset.type = 'handle';
 
-    handleDOM.style.width = `${handleSize}px`;
-    handleDOM.style.height = `${handleSize}px`;
-
     handleDOM.appendChild(btnDOM);
 
     return handleDOM;
   },
 
-  createLegendLabel(thumbDOM) {
-    const labels = [0, 100];
-    const handleSize = this.legendHandleSize;
+  createLegendLabel() {
+    const textDOM = document.createElement('span');
+    textDOM.className = 'ev-chart-legend-label-text';
 
-    labels.forEach((ratio) => {
-      const textDOM = document.createElement('span');
-      textDOM.className = 'ev-chart-legend-label-text';
+    const labelDOM = document.createElement('div');
+    labelDOM.className = 'ev-chart-legend-label';
 
-      const labelDOM = document.createElement('div');
-      labelDOM.className = 'ev-chart-legend-label';
-
-      if (this.isSide) {
-        labelDOM.style.top = `${ratio}%`;
-        labelDOM.style.left = `${handleSize + 2}px`;
-        labelDOM.style.transform = 'translateY(-50%)';
-      } else {
-        labelDOM.style.top = `-${handleSize + 2}px`;
-        labelDOM.style.left = `${ratio}%`;
-        labelDOM.style.transform = 'translateX(-50%)';
-      }
-
-      thumbDOM.appendChild(labelDOM);
-    });
+    return labelDOM;
   },
 
   /**
@@ -359,7 +338,8 @@ const modules = {
     thumbDOM.className = 'ev-chart-legend-thumb';
     thumbDOM.dataset.type = 'thumb';
 
-    this.createLegendLabel(thumbDOM);
+    thumbDOM.appendChild(this.createLegendLabel());
+    thumbDOM.appendChild(this.createLegendLabel());
 
     const lineDOM = document.createElement('div');
     lineDOM.className = 'ev-chart-legend-line';
@@ -368,23 +348,14 @@ const modules = {
     lineDOM.appendChild(lineLayerDOM);
     lineDOM.appendChild(thumbDOM);
 
-    if (this.isSide) {
-      startHandleDOM.style.marginTop = `-${handleSize / 2}px`;
-      endHandleDOM.style.marginTop = `-${handleSize / 2}px`;
-      endHandleDOM.style.top = '100%';
-    } else {
-      startHandleDOM.style.marginLeft = `-${handleSize / 2}px`;
-      endHandleDOM.style.marginLeft = `-${handleSize / 2}px`;
-      endHandleDOM.style.left = '100%';
-    }
-
     this.containerDOM.appendChild(lineDOM);
     this.containerDOM.appendChild(startHandleDOM);
     this.containerDOM.appendChild(endHandleDOM);
   },
 
-  setLegend(series) {
+  setLegendStyle(series) {
     const dir = this.isSide ? 'top' : 'right';
+    const handleSize = this.legendHandleSize;
 
     const { valueOpt, colorState } = series;
 
@@ -395,33 +366,43 @@ const modules = {
     let gradient = `linear-gradient(to ${dir}, `;
     gradient += `${startColor}, ${endColor})`;
 
-    const thumbDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
-    const labelDOM = thumbDOM.getElementsByClassName('ev-chart-legend-label');
-    thumbDOM.style.background = gradient;
+    const labelPosition = Math.floor(handleSize / 2) + 12;
+    let defaultHandleStyle = `width:${handleSize}px;height:${handleSize}px;`;
+    let defaultLabelStyle;
+    let startStyle;
+    let endStyle;
+    let thumbStyle = `background:${gradient};`;
+
     if (this.isSide) {
-      thumbDOM.style.top = `${100 - end}%`;
-      thumbDOM.style.height = `${end - start}%`;
-      labelDOM[0].top = `${100 - end}%`;
-      labelDOM[1].top = `${100 - start}%`;
+      defaultHandleStyle += `margin-top:-${handleSize / 2}px;`;
+      defaultLabelStyle = `left:${labelPosition}px;transform:translateY(-50%);`;
+      startStyle = `top:${100 - end}%;`;
+      endStyle = `top:${100 - start}%;`;
+      thumbStyle += `top:${100 - end}%;height:${end - start}%;`;
     } else {
-      thumbDOM.style.left = `${start}%`;
-      thumbDOM.style.width = `${end - start}%`;
-      labelDOM[0].left = `${start}%`;
-      labelDOM[1].left = `${end}%`;
+      defaultHandleStyle += `margin-left:-${handleSize / 2}px;`;
+      defaultLabelStyle = `top:-${labelPosition}px;transform:translateX(-50%);`;
+      startStyle = `left:${start}%;`;
+      endStyle = `left:${end}%;`;
+      thumbStyle += `left:${start}%;width:${end - start}%;`;
     }
+
     const minText = (min + ((max - min) * (start / 100))).toFixed(decimalPoint);
     const maxText = (min + ((max - min) * (end / 100))).toFixed(decimalPoint);
+
+    const thumbDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
+    thumbDOM.style.cssText = thumbStyle;
+
+    const labelDOM = thumbDOM.getElementsByClassName('ev-chart-legend-label');
+    labelDOM[0].style.cssText = defaultLabelStyle + startStyle;
+    labelDOM[1].style.cssText = defaultLabelStyle + endStyle;
     labelDOM[0].innerText = this.isSide ? maxText : minText;
     labelDOM[1].innerText = this.isSide ? minText : maxText;
 
     const handleDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-handle');
-    if (this.isSide) {
-      handleDOM[0].style.top = `${100 - end}%`;
-      handleDOM[1].style.top = `${100 - start}%`;
-    } else {
-      handleDOM[0].style.left = `${start}%`;
-      handleDOM[1].style.left = `${end}%`;
-    }
+    handleDOM[0].style.cssText = defaultHandleStyle + startStyle;
+    handleDOM[1].style.cssText = defaultHandleStyle + endStyle;
+
     const btnDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-handle-btn-color');
     btnDOM[0].style.backgroundColor = this.isSide ? endColor : startColor;
     btnDOM[1].style.backgroundColor = this.isSide ? startColor : endColor;
@@ -541,6 +522,10 @@ const modules = {
       containerStyle.padding = '0 4px';
       containerStyle.margin = '4px 0';
     }
+
+    this.legendBoxDOM.appendChild(this.containerDOM);
+    this.legendDOM.appendChild(this.legendBoxDOM);
+    this.wrapperDOM.appendChild(this.legendDOM);
   },
 
   /**
@@ -550,7 +535,7 @@ const modules = {
    */
   updateLegendContainerSize() {
     const series = Object.values(this.seriesList)[0];
-    this.setLegend(series);
+    this.setLegendStyle(series);
   },
 
   /**
