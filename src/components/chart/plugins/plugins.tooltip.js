@@ -3,6 +3,7 @@ import debounce from '@/common/utils.debounce';
 import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
+import { convertToPercent } from '../../../common/utils';
 
 const TITLE_HEIGHT = 30;
 const TEXT_HEIGHT = 14;
@@ -367,9 +368,19 @@ const modules = {
     const opt = this.options.tooltip;
     const valueFormatter = typeof opt.formatter === 'function' ? opt.formatter : opt.formatter?.value;
     const titleFormatter = opt.formatter?.title;
+    const series = Object.values(this.seriesList)[0];
 
-    const colorAxis = Object.values(this.seriesList)[0].colorAxis;
-    const isShow = colorAxis.find(({ id }) => id === hitItem.cId)?.show;
+    let isShow = false;
+    const { colorState, isGradient } = series;
+    if (isGradient) {
+      const { min, max } = series.valueOpt;
+      const ratio = convertToPercent(hitItem.o - min, max - min);
+      const { start, end } = colorState[0];
+      isShow = (start <= ratio && ratio <= end) || hitItem.o === -1;
+    } else {
+      isShow = colorState.find(({ id }) => id === hitItem.cId)?.show;
+    }
+
     if (!isShow) {
       this.tooltipClear();
       return;

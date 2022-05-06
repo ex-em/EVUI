@@ -22,6 +22,7 @@ const DEFAULT_OPTIONS = {
   },
   legend: {
     show: true,
+    type: 'icon',
     position: 'right',
     color: '#353740',
     inactive: '#aaa',
@@ -109,12 +110,13 @@ const DEFAULT_OPTIONS = {
   heatMapColor: {
     min: '#FFFFFF',
     max: '#0052FF',
-    categoryCnt: 5,
+    categoryCnt: 1,
     stroke: {
       show: false,
       color: '#FFFFFF',
       lineWidth: 1,
       opacity: 1,
+      radius: 0,
     },
     error: '#FF0000',
     decimalPoint: 0,

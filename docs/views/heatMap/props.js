@@ -6,6 +6,8 @@ import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
 import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
+import Gradient from './example/Gradient';
+import GradientRaw from '!!raw-loader!./example/Gradient';
 
 export default {
   mdText,
@@ -24,6 +26,11 @@ export default {
       description: 'Drag Select, Click, Double Click 이벤트 등록이 가능 합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    Gradient: {
+      description: 'gradient 범주로 표현 가능합니다.',
+      component: Gradient,
+      parsedData: parseComponent(GradientRaw),
     },
   },
 };

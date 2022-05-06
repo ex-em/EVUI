@@ -81,12 +81,12 @@ const modules = {
 
     Object.values(seriesList).forEach((series) => {
       if (!series.isExistGrp && series.showLegend) {
-        const { colorAxis, valueOpt } = series;
+        const { colorState, valueOpt } = series;
         const { min, max, interval, existError, decimalPoint } = valueOpt;
-        const length = colorAxis.length;
+        const length = colorState.length;
         const endIndex = existError ? length - 2 : length - 1;
         for (let index = 0; index < length; index++) {
-          const colorItem = colorAxis[index];
+          const colorItem = colorState[index];
           const minValue = min + (interval * index);
           let maxValue = minValue + interval;
           if (index < endIndex) {
@@ -112,7 +112,7 @@ const modules = {
 
           this.addLegend({
             cId: colorItem.id,
-            color: colorItem.value,
+            color: colorItem.color,
             name,
           });
         }
@@ -292,7 +292,7 @@ const modules = {
       const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
       const isActive = !colorDOM?.className.includes('inactive');
       const targetId = nameDOM.series.cId;
-      const activeCount = series.colorAxis.filter(colorItem => colorItem.show).length;
+      const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
       if (isActive && activeCount === 1) {
         return;
@@ -311,9 +311,9 @@ const modules = {
         nameDOM.style.color = opt.color;
       }
 
-      const targetIndex = series.colorAxis.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = series.colorState.findIndex(colorItem => colorItem.id === targetId);
       if (targetIndex > -1) {
-        series.colorAxis[targetIndex].show = !isActive;
+        series.colorState[targetIndex].show = !isActive;
       }
 
       colorDOM.classList.toggle('inactive');
@@ -344,7 +344,7 @@ const modules = {
       const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
       const targetId = nameDOM.series.cId;
 
-      series.colorAxis.forEach((colorItem) => {
+      series.colorState.forEach((colorItem) => {
         colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
       });
 
@@ -361,7 +361,7 @@ const modules = {
      */
     this.onLegendBoxLeave = () => {
       const series = Object.values(this.seriesList)[0];
-      series.colorAxis.forEach((item) => {
+      series.colorState.forEach((item) => {
         item.state = 'normal';
       });
 
@@ -510,6 +510,7 @@ const modules = {
     }
     containerDOM.style.height = '18px';
     containerDOM.style.display = 'inline-block';
+    containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);

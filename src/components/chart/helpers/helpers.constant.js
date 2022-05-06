@@ -142,6 +142,7 @@ export const HEAT_MAP_OPTION = {
   show: true,
   highlight: {
     maxShadowOpacity: 0.4,
+    brightness: 150,
   },
   xAxisIndex: 0,
   yAxisIndex: 0,

@@ -1,15 +1,17 @@
 import { merge } from 'lodash-es';
 import Util from '../helpers/helpers.util';
 import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
+import { convertToPercent } from '../../../common/utils';
 
 class HeatMap {
-  constructor(sId, opt, colorOpt) {
+  constructor(sId, opt, colorOpt, isGradient) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
       Object.keys(merged).forEach((key) => {
         this[key] = merged[key];
     });
 
-    this.createColorAxis(colorOpt);
+    this.isGradient = isGradient;
+    this.createColorState(colorOpt);
 
     this.sId = sId;
     this.data = [];
@@ -27,41 +29,66 @@ class HeatMap {
    * @param colorOpt
    * @returns {*[]}
    */
-  createColorAxis(colorOpt) {
-    const colorAxis = [];
+  createColorState(colorOpt) {
+    const colorState = [];
+    const regex = /[^0-9]&[^,]/g;
     const { min, max, categoryCnt, error, stroke } = colorOpt;
 
-    const minColor = min.includes('#') ? Util.hexToRgb(min) : min;
-    const maxColor = max.includes('#') ? Util.hexToRgb(max) : max;
+    const minColor = min.includes('#') ? Util.hexToRgb(min) : min.replace(regex, '');
+    const maxColor = max.includes('#') ? Util.hexToRgb(max) : max.replace(regex, '');
 
     const [minR, minG, minB] = minColor.split(',');
     const [maxR, maxG, maxB] = maxColor.split(',');
 
-    const unitR = Math.floor((minR - maxR) / (categoryCnt - 1));
-    const unitG = Math.floor((minG - maxG) / (categoryCnt - 1));
-    const unitB = Math.floor((minB - maxB) / (categoryCnt - 1));
+    if (this.isGradient) {
+      colorState.push({
+        minColor: { minR, minG, minB },
+        maxColor: { maxR, maxG, maxB },
+        categoryCnt,
+        start: 0,
+        end: 100,
+        selectedValue: null,
+      });
+    } else {
+      const unitR = Math.floor((minR - maxR) / (categoryCnt - 1));
+      const unitG = Math.floor((minG - maxG) / (categoryCnt - 1));
+      const unitB = Math.floor((minB - maxB) / (categoryCnt - 1));
 
-    for (let ix = 0; ix < categoryCnt; ix++) {
-       const r = +minR - (unitR * ix);
-       const g = +minG - (unitG * ix);
-       const b = +minB - (unitB * ix);
+      for (let ix = 0; ix < categoryCnt; ix++) {
+        const r = +minR - (unitR * ix);
+        const g = +minG - (unitG * ix);
+        const b = +minB - (unitB * ix);
 
-       colorAxis.push({
-         id: `color#${ix}`,
-         value: `rgb(${r},${g},${b})`,
-         state: 'normal',
-         show: true,
-       });
+        colorState.push({
+          id: `color#${ix}`,
+          color: `rgb(${r},${g},${b})`,
+          state: 'normal',
+          show: true,
+        });
+      }
     }
 
-    this.colorAxis = colorAxis;
+    this.colorState = colorState;
     this.errorColor = error;
     this.stroke = stroke;
   }
 
-  getColorIndex(value) {
+  getColorForGradient(value) {
+    const { minColor, maxColor } = this.colorState[0];
+
+    const { minR, minG, minB } = minColor;
+    const { maxR, maxG, maxB } = maxColor;
+
+    const r = +minR - Math.floor(((minR - maxR) * value) / 100);
+    const g = +minG - Math.floor(((minG - maxG) * value) / 100);
+    const b = +minB - Math.floor(((minB - maxB) * value) / 100);
+
+    return `rgb(${r},${g},${b})`;
+  }
+
+  getColorIndexForIcon(value) {
     const { existError, min, interval, decimalPoint } = this.valueOpt;
-    const maxIndex = this.colorAxis.length - 1;
+    const maxIndex = this.colorState.length - 1;
     if (existError && value < 0) {
       return maxIndex;
     }
@@ -75,11 +102,52 @@ class HeatMap {
     return colorIndex;
   }
 
+  getItemInfo(value) {
+    const { min, max } = this.valueOpt;
+    const itemInfo = {
+      show: false,
+      opacity: 0,
+      dataColor: null,
+      id: null,
+      isHighlight: null,
+    };
+    if (this.isGradient) {
+      const ratio = convertToPercent(value - min, max - min);
+      const { start, end, selectedValue } = this.colorState[0];
+      if (value < 0 || (start <= ratio && ratio <= end)) {
+        itemInfo.show = true;
+        itemInfo.isHighlight = selectedValue !== null
+          && (Math.floor(value) === Math.floor(min + ((max - min) * (selectedValue / 100))));
+        itemInfo.opacity = 1;
+        itemInfo.dataColor = value < 0
+          ? this.errorColor : this.getColorForGradient(ratio);
+      }
+    } else {
+      const colorIndex = this.getColorIndexForIcon(value);
+      const { show, state, color, id } = this.colorState[colorIndex];
+      itemInfo.show = show;
+      itemInfo.opacity = state === 'downplay' ? 0.1 : 1;
+      itemInfo.dataColor = value < 0 ? this.errorColor : color;
+      itemInfo.id = id;
+    }
+    return itemInfo;
+  }
+
   drawItem(ctx, x, y, w, h) {
     ctx.beginPath();
     if (this.stroke.show) {
-      ctx.strokeRect(x, y, w, h);
-      ctx.fillRect(x, y, w, h);
+      const { radius } = this.stroke;
+      if (radius > 0) {
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.fill();
+      } else {
+        ctx.strokeRect(x, y, w, h);
+        ctx.fillRect(x, y, w, h);
+      }
     } else {
       const aliasPixel = Util.aliasPixel(1);
       ctx.fillRect(
@@ -122,7 +190,7 @@ class HeatMap {
       return;
     }
 
-    const { ctx, chartRect, labelOffset } = param;
+    const { ctx, chartRect, labelOffset, overlayCtx } = param;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
@@ -142,11 +210,11 @@ class HeatMap {
 
       if (xp !== null && yp !== null
          && (value !== null && value !== undefined)) {
-        const colorIndex = this.getColorIndex(value);
-        const opacity = this.colorAxis[colorIndex].state === 'downplay' ? 0.1 : 1;
-        item.dataColor = value < 0 ? this.errorColor : this.colorAxis[colorIndex].value;
-        item.cId = this.colorAxis[colorIndex].id;
-        if (this.colorAxis[colorIndex].show) {
+        const { show, opacity, dataColor, id, isHighlight } = this.getItemInfo(value);
+        item.dataColor = dataColor;
+        item.cId = id;
+        ctx.save();
+        if (show) {
           ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
           if (this.stroke.show) {
             const { color, lineWidth, opacity: sOpacity } = this.stroke;
@@ -161,25 +229,25 @@ class HeatMap {
             h -= (lineWidth * 2);
           }
           this.drawItem(ctx, xp, yp, w, h);
+          ctx.restore();
+
+          item.xp = xp;
+          item.yp = yp;
+          item.w = w;
+          item.h = h;
 
           if (this.showValue.use) {
             this.drawValueLabels({
               context: ctx,
               data: item,
-              positions: {
-                x: xp,
-                y: yp,
-                w,
-                h,
-              },
             });
           }
+          if (isHighlight) {
+            this.itemHighlight({
+              data: item,
+            }, overlayCtx);
+          }
         }
-
-        item.xp = xp;
-        item.yp = yp;
-        item.w = w;
-        item.h = h;
       }
     });
   }
@@ -190,9 +258,9 @@ class HeatMap {
    * @param context           canvas context
    * @param data              series value data (model.store.js addData return value)
    */
-  drawValueLabels({ context, data, positions }) {
+  drawValueLabels({ context, data }) {
     const { fontSize, textColor, align, formatter, decimalPoint } = this.showValue;
-    const { x, y, w, h } = positions;
+    const { xp: x, yp: y, w, h, o: value } = data;
     const ctx = context;
 
     ctx.save();
@@ -203,8 +271,6 @@ class HeatMap {
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = align !== 'center' ? 'left' : 'center';
-
-    const value = data.o;
 
     let formattedTxt;
     if (formatter) {
@@ -295,31 +361,36 @@ class HeatMap {
     const h = gdata.h;
     const cId = gdata.cId;
 
-    const isShow = this.colorAxis.find(({ id }) => id === cId)?.show;
-
+    let isShow;
+    if (this.isGradient) {
+      const { min, max } = this.valueOpt;
+      const ratio = convertToPercent(gdata.o - min, max - min);
+      const { start, end } = this.colorState[0];
+      isShow = (start <= ratio && ratio <= end) || gdata.o === -1;
+    } else {
+      isShow = this.colorState.find(({ id }) => id === cId)?.show;
+    }
     ctx.save();
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.shadowBlur = 4;
+
     if (x !== null && y !== null && isShow) {
       const color = gdata.dataColor;
-      ctx.strokeStyle = Util.colorStringToRgba(color, 1);
-      ctx.fillStyle = Util.colorStringToRgba(color, this.highlight.maxShadowOpacity);
-      ctx.shadowColor = color;
-      this.drawItem(ctx, x, y, w, h);
+      ctx.shadowColor = Util.colorStringToRgba('#605F5F');
+      ctx.strokeStyle = Util.colorStringToRgba(color);
+      ctx.fillStyle = Util.colorStringToRgba(color);
+      this.drawItem(ctx, x - 2, y - 2, w + 4, h + 4);
+
+      ctx.restore();
 
       if (this.showValue.use) {
         this.drawValueLabels({
           context: ctx,
           data: gdata,
-          positions: {
-            x,
-            y,
-            w,
-            h,
-          },
         });
       }
     }
-
-    ctx.restore();
   }
 
   /**
