@@ -531,6 +531,7 @@ const modules = {
     const resizeStyle = this.resizeDOM?.style;
 
     let chartRect;
+    let legendPad;
     const title = opt?.title?.show ? opt?.title?.height : 0;
     const positionTop = title + opt?.legend?.height;
     const { top = 0, bottom = 0, left = 0, right = 0 } = opt?.legend?.padding ?? {};
@@ -545,9 +546,10 @@ const modules = {
       case 'top':
         wrapperStyle.padding = `${positionTop}px 0 0 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
+        legendPad = parseInt(legendStyle.paddingTop) + parseInt(legendStyle.paddingBottom);
 
         boxStyle.width = '100%';
-        boxStyle.height = `${opt.legend.height}px`;
+        boxStyle.height = `${opt.legend.height - legendPad}px`;
 
         legendStyle.top = `${title}px`;
         legendStyle.right = '';
@@ -555,7 +557,7 @@ const modules = {
         legendStyle.left = '';
 
         legendStyle.width = `${chartRect.width}px`;
-        legendStyle.height = `${opt.legend.height + 4}px`; // 4 resize bar size
+        legendStyle.height = `${opt.legend.height + (resizeStyle ? 4 : 0)}px`; // 4 resize bar size
 
         if (resizeStyle) {
           resizeStyle.top = `${positionTop}px`;
@@ -598,9 +600,10 @@ const modules = {
       case 'bottom':
         wrapperStyle.padding = `${title}px 0 ${opt.legend.height}px 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
+        legendPad = parseInt(legendStyle.paddingTop) + parseInt(legendStyle.paddingBottom);
 
         boxStyle.width = '100%';
-        boxStyle.height = `${opt.legend.height}px`;
+        boxStyle.height = `${opt.legend.height - legendPad}px`;
 
         legendStyle.top = '';
         legendStyle.right = '';
@@ -608,7 +611,7 @@ const modules = {
         legendStyle.left = '0px';
 
         legendStyle.width = `${chartRect.width}px`;
-        legendStyle.height = `${opt.legend.height + 4}px`; // 4 resize bar size
+        legendStyle.height = `${opt.legend.height + (resizeStyle ? 4 : 0)}px`; // 4 resize bar size
 
         if (resizeStyle) {
           resizeStyle.top = '';
