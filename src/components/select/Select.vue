@@ -118,10 +118,11 @@
       >
         <input
           v-if="filterable"
-          v-model="filterTextRef"
           type="text"
           class="ev-input-query"
           :placeholder="searchPlaceholder"
+          :value="filterTextRef"
+          @input="changeFilterText"
         />
         <div
           ref="itemWrapper"
@@ -242,6 +243,7 @@ export default {
       filteredItems,
       clickSelectInput,
       clickOutsideDropbox,
+      changeFilterText,
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
@@ -266,6 +268,7 @@ export default {
       filteredItems,
       clickSelectInput,
       clickOutsideDropbox,
+      changeFilterText,
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
