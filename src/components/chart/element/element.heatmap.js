@@ -137,7 +137,7 @@ class HeatMap {
     ctx.beginPath();
     if (this.stroke.show) {
       const { radius } = this.stroke;
-      if (radius > 0) {
+      if (radius > 0 && radius < h && radius < w) {
         ctx.moveTo(x + radius, y);
         ctx.arcTo(x + w, y, x + w, y + h, radius);
         ctx.arcTo(x + w, y + h, x, y + h, radius);
