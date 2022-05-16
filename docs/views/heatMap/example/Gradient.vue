@@ -78,7 +78,7 @@ import { reactive } from 'vue';
         },
         legend: {
           type: 'gradient',
-          position: 'bottom',
+          position: 'right',
         },
       };
 

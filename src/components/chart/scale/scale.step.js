@@ -48,11 +48,16 @@ class StepScale extends Scale {
     if (this.rangeMode) {
       const { maxSteps } = range;
 
-      while (numberOfSteps > maxSteps * 2) {
-        interval *= 2;
-        numberOfSteps = Math.round(numberOfSteps / interval);
+      if (maxSteps > 2) {
+        while (numberOfSteps > maxSteps * 2) {
+          interval *= 2;
+          numberOfSteps = Math.round(numberOfSteps / interval);
+        }
+      } else {
+        interval = this.labels.length;
       }
     }
+
     return {
       steps: numberOfSteps,
       interval,
