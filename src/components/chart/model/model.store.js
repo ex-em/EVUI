@@ -698,9 +698,15 @@ const modules = {
               vector: { start: position[dataIndex - 1], end: position[dataIndex] },
             }));
 
+            const isEmptyVector = (arr => !arr || !Array.isArray(arr) || arr?.length !== 2);
+
             // canvas 의 클릭 위치값은 제 4 사분면의 위치이므로 clickedY, y1, y2 의 값은 음수를 취한다.
             if (isStackChart) {
               hitSeries = vectorList.find(({ vector }) => {
+                if (isEmptyVector(vector?.start) && isEmptyVector(vector?.end)) {
+                  return false;
+                }
+
                 const [x1, y1] = vector.start;
                 const [x2, y2] = vector.end;
                 const v1 = [x2 - x1, y1 - y2];
@@ -713,6 +719,10 @@ const modules = {
               })?.sId;
             } else {
               hitSeries = vectorList.find(({ vector }) => {
+                if (isEmptyVector(vector?.start) && isEmptyVector(vector?.end)) {
+                  return false;
+                }
+
                 const [x1, y1] = vector.start;
                 const [x2, y2] = vector.end;
                 const a = (y1 - y2) / (x2 - x1);
