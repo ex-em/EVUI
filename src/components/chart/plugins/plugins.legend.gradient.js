@@ -38,8 +38,10 @@ const modules = {
       this.createLegendLayout();
       this.createLegend();
     }
-    const series = Object.values(this.seriesList)[0];
-    this.setLegendStyle(series);
+
+    Object.values(this.seriesList).forEach((series) => {
+      this.setLegendStyle(series);
+    });
     this.initEvent();
 
     this.isInitLegend = true;
@@ -76,7 +78,12 @@ const modules = {
         return;
       }
 
-      const { colorState } = Object.values(this.seriesList)[0];
+      const seriesList = Object.values(this.seriesList);
+      if (!seriesList.length) {
+        return;
+      }
+
+      const { colorState } = seriesList[0];
       const { start, end } = colorState[0];
 
       colorState[0].selectedValue = null;
@@ -102,7 +109,12 @@ const modules = {
         value = this.isSide ? 100 - value : value;
         const dir = isStart ? 'start' : 'end';
 
-        const { colorState } = Object.values(this.seriesList)[0];
+        const seriesList = Object.values(this.seriesList);
+        if (!seriesList.length) {
+          return;
+        }
+
+        const { colorState } = seriesList[0];
         const { start, end } = colorState[0];
         if ((isStart && value > end) || (!isStart && value < start)) {
           return;
@@ -132,7 +144,12 @@ const modules = {
     this.onLegendBoxOver = (e) => {
       const type = e.target.dataset.type;
 
-      const { colorState, valueOpt } = Object.values(this.seriesList)[0];
+      const seriesList = Object.values(this.seriesList);
+      if (!seriesList.length) {
+        return;
+      }
+
+      const { colorState, valueOpt } = seriesList[0];
       const state = colorState[0];
 
       let value = this.getSelectedValue(e);
@@ -170,7 +187,12 @@ const modules = {
       const targetDOM = lineDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
       this.clearOverlay(targetDOM);
 
-      const { colorState } = Object.values(this.seriesList)[0];
+      const seriesList = Object.values(this.seriesList);
+      if (!seriesList.length) {
+        return;
+      }
+
+      const { colorState } = seriesList[0];
       colorState[0].selectedValue = null;
 
       this.update({
@@ -210,8 +232,9 @@ const modules = {
     this.resetLegend();
     this.createLegend();
 
-    const series = Object.values(this.seriesList)[0];
-    this.setLegendStyle(series);
+    Object.values(this.seriesList).forEach((series) => {
+      this.setLegendStyle(series);
+    });
   },
 
   /**
@@ -249,6 +272,9 @@ const modules = {
     this.clearOverlay();
     const handleSize = this.legendHandleSize;
     const { min, max } = opt;
+    if (min === undefined || max === undefined) {
+      return;
+    }
 
     const targetDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-line')[0];
 
@@ -326,6 +352,10 @@ const modules = {
    * @returns {undefined}
    */
   createLegend() {
+    if (!Object.values(this.seriesList).length) {
+      return;
+    }
+
     const opt = this.options.legend;
     this.isSide = !['top', 'bottom'].includes(opt.position);
     const legendSize = this.isSide ? opt.width : opt.height;
@@ -364,6 +394,7 @@ const modules = {
     const { valueOpt, colorState } = series;
 
     const { min, max, decimalPoint } = valueOpt;
+
     const { start, end } = colorState[0];
     const startColor = series.getColorForGradient(start);
     const endColor = series.getColorForGradient(end);
@@ -400,8 +431,10 @@ const modules = {
     const labelDOM = thumbDOM.getElementsByClassName('ev-chart-legend-label');
     labelDOM[0].style.cssText = `${labelStyle}0%;`;
     labelDOM[1].style.cssText = `${labelStyle}100%;`;
-    labelDOM[0].innerText = this.isSide ? maxText : minText;
-    labelDOM[1].innerText = this.isSide ? minText : maxText;
+    if (min !== undefined && max !== undefined) {
+      labelDOM[0].innerText = this.isSide ? maxText : minText;
+      labelDOM[1].innerText = this.isSide ? minText : maxText;
+    }
 
     const handleDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-handle');
     handleDOM[0].style.cssText = defaultHandleStyle + startStyle;
@@ -524,8 +557,9 @@ const modules = {
    * @returns {undefined}
    */
   updateLegendContainerSize() {
-    const series = Object.values(this.seriesList)[0];
-    this.setLegendStyle(series);
+    Object.values(this.seriesList).forEach((series) => {
+      this.setLegendStyle(series);
+    });
   },
 
   /**
