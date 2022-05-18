@@ -361,7 +361,6 @@ class Bar {
 
     let value;
     const isStacked = truthy(this.stackIndex);
-    debugger;
     if (isStacked) {
       value = data.o;
     } else {
