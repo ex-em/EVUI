@@ -272,7 +272,7 @@ const modules = {
     this.clearOverlay();
     const handleSize = this.legendHandleSize;
     const { min, max } = opt;
-    if (!min || !max) {
+    if (min === undefined || max === undefined) {
       return;
     }
 
@@ -431,7 +431,7 @@ const modules = {
     const labelDOM = thumbDOM.getElementsByClassName('ev-chart-legend-label');
     labelDOM[0].style.cssText = `${labelStyle}0%;`;
     labelDOM[1].style.cssText = `${labelStyle}100%;`;
-    if (min && max) {
+    if (min !== undefined && max !== undefined) {
       labelDOM[0].innerText = this.isSide ? maxText : minText;
       labelDOM[1].innerText = this.isSide ? minText : maxText;
     }
