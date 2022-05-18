@@ -128,6 +128,13 @@ export const useDropdown = (param) => {
   });
 
   /**
+   * filterable 에서 text input 이벤트 핸들러
+   */
+  const changeFilterText = (e) => {
+    filterTextRef.value = e?.target?.value;
+  };
+
+  /**
    * dropdown box 위치 변경하는 메소드
    */
   const changeDropboxPosition = async () => {
@@ -255,6 +262,7 @@ export const useDropdown = (param) => {
     filteredItems,
     clickSelectInput,
     clickOutsideDropbox,
+    changeFilterText,
     changeDropboxPosition,
     clickItem,
     selectedItemClass,
