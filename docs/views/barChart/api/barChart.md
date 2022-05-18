@@ -70,9 +70,11 @@ const chartData = {
 | use | Boolean | false | data label 표시 여부 | true /false |
 | textColor | Hex, RGB, RGBA Code(String) | '#000000' | 글자 색상  | |
 | fontSize | Number | 12 | 글자 크기 | |
-| align | String | 'end' | tooltip 테두리 색상  | 'start', 'center', 'end', 'out' |
+| align | String | 'end' | 텍스트 위치 (막대 시작, 막대 중간, 막대 끝, 막대 바깥쪽)  | 'start', 'center', 'end', 'out' |
 | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
 | decimalPoint | Number | 0 | 소수점 자릿수  |  |
+* Stack Bar Chart의 경우 'out' 은 지원하지 않습니다. 
+* 막대 영역이 좁을 경우 값이 표시되지 않을 수 있습니다.
 
 #### data example
 ```
