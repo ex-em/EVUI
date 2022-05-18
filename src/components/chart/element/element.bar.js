@@ -1,4 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
+import { truthy } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
@@ -359,13 +360,11 @@ class Bar {
     ctx.textAlign = isHorizontal && align !== 'center' ? 'left' : 'center';
 
     let value;
-    const isStacked = !isNaN(data.o);
-    if (data.o === null) {
-      value = isHorizontal ? data.x : data.y;
-    } else if (isStacked) {
+    const isStacked = truthy(this.stackIndex);
+    if (isStacked) {
       value = data.o;
     } else {
-      value = '';
+      value = (isHorizontal ? data.x : data.y) ?? '';
     }
 
     let formattedTxt;
@@ -374,49 +373,73 @@ class Bar {
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {
-      formattedTxt = Util.labelSignFormat(value, decimalPoint);
+      formattedTxt = Util.labelSignFormat(value, decimalPoint) ?? '';
     }
 
-    const vw = Math.round(ctx.measureText(formattedTxt).width);
-    const vh = fontSize + 4;
+    const textWidth = Math.round(ctx.measureText(formattedTxt).width);
+    const textHeight = fontSize + 4;
     const minXPos = x + 10;
     const minYPos = y - 10;
+    const widthFreeSpaceToDraw = w - 10;
+    const heightFreeSpaceToDraw = Math.abs(h + 10);
     const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
     const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
     const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
 
     switch (align) {
-      case 'start':
+      case 'start': {
         if (isHorizontal) {
-          ctx.fillText(formattedTxt, minXPos, centerYHorizontal);
-        } else {
+          if (textWidth < widthFreeSpaceToDraw) {
+            ctx.fillText(formattedTxt, minXPos, centerYHorizontal);
+          }
+        } else if (textHeight < heightFreeSpaceToDraw) {
           ctx.fillText(formattedTxt, centerX, minYPos);
         }
+
         break;
-      case 'center':
+      }
+
+      case 'center': {
         if (isHorizontal) {
-          ctx.fillText(formattedTxt, centerX, centerYHorizontal);
-        } else {
+          if (textWidth < widthFreeSpaceToDraw) {
+            ctx.fillText(formattedTxt, centerX, centerYHorizontal);
+          }
+        } else if (textHeight < heightFreeSpaceToDraw) {
           ctx.fillText(formattedTxt, centerX, centerY);
         }
+
         break;
-      case 'out':
+      }
+
+      case 'out': {
+        if (isStacked) {
+          console.warn('[EVUI][Bar Chart] In case of Stack Bar Chart, \'out\' of \'showValue\'\'s align is not supported.');
+          return;
+        }
+
         if (isHorizontal) {
           ctx.fillText(formattedTxt, minXPos + w, centerYHorizontal);
         } else {
-          ctx.fillText(formattedTxt, centerX, y + h - (vh / 2));
+          ctx.fillText(formattedTxt, centerX, y + h - (textHeight / 2));
         }
+
         break;
-      case 'end':
+      }
+
       default:
+      case 'end': {
         if (isHorizontal) {
-          const xPos = x + w - (vw * 2);
-          ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
-        } else {
-          const yPos = y + h + vh;
+          if (textWidth < widthFreeSpaceToDraw) {
+            const xPos = x + w - (textWidth * 2);
+            ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+          }
+        } else if (textHeight < heightFreeSpaceToDraw) {
+          const yPos = y + h + textHeight;
           ctx.fillText(formattedTxt, centerX, yPos >= minYPos ? minYPos : yPos);
         }
+
         break;
+      }
     }
 
     ctx.restore();

@@ -15,7 +15,10 @@ class HeatMap {
 
     this.sId = sId;
     this.data = [];
-    this.labels = {};
+    this.labels = {
+      x: [],
+      y: [],
+    };
     this.valueOpt = {};
     this.size = {
       w: 0,
