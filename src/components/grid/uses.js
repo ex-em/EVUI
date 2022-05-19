@@ -963,7 +963,7 @@ export const pagingEvent = (params) => {
         currentPage: pageInfo.currentPage,
         prevPage: pageInfo.prevPage,
         startIndex: pageInfo.startIndex,
-        total: pageInfo.total,
+        total: pageInfo.pageTotal,
         perPage: pageInfo.perPage,
       },
       sortInfo: {
