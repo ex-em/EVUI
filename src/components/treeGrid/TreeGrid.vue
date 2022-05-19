@@ -178,7 +178,7 @@
   <grid-pagination
     v-if="usePage && !isInfinite"
     v-model="currentPage"
-    :total="showTreeStore.length"
+    :total="pageTotal"
     :per-page="perPage"
     :visible-page="visiblePage"
     :show-page-info="showPageInfo"
@@ -290,7 +290,7 @@ export default {
       startIndex: 0,
       prevPage: 0,
       currentPage: 0,
-      total: computed(() => (props.option.page?.total || 0)),
+      pageTotal: computed(() => (props.option.page?.total || 0)),
       perPage: computed(() => (props.option.page?.perPage || 20)),
       visiblePage: computed(() => (props.option.page?.visiblePage || 8)),
       order: computed(() => (props.option.page?.order || 'center')),
