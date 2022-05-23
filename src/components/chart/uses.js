@@ -59,6 +59,7 @@ const DEFAULT_OPTIONS = {
     debouncedHide: false,
     useScrollbar: false,
     textOverflow: 'wrap',
+    fontFamily: 'Roboto',
   },
   indicator: {
     use: true,

@@ -1,9 +1,9 @@
-import { numberWithComma } from '@/common/utils';
+import { numberWithComma, convertToPercent } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
 import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
-import { convertToPercent } from '../../../common/utils';
+
 
 const TITLE_HEIGHT = 30;
 const TEXT_HEIGHT = 14;
@@ -11,7 +11,7 @@ const LINE_SPACING = 8;
 const COLOR_MARGIN = 16;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
-const FONT_STYLE = 'normal normal lighter 14px Roboto';
+let fontStyle = 'normal normal lighter 14px Roboto';
 
 const modules = {
   /**
@@ -34,6 +34,7 @@ const modules = {
     this.tooltipCtx = this.tooltipCanvas.getContext('2d');
 
     this.tooltipDOM.style.display = 'none';
+    this.setFontFamily();
 
     this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
     this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
@@ -50,6 +51,15 @@ const modules = {
         this.tooltipDOM.style.display = 'none';
       };
     }
+  },
+
+  /**
+   * set tooltip's font style
+   */
+  setFontFamily() {
+    const fontFamily = this.options?.tooltip?.fontFamily ?? 'Roboto';
+    fontStyle = `normal normal lighter 14px ${fontFamily}`;
+    this.tooltipHeaderDOM.style.fontFamily = fontFamily;
   },
 
   /**
@@ -73,7 +83,7 @@ const modules = {
 
     // calculate and decide width of canvas El(contentsWidth)
     ctx.save();
-    ctx.font = FONT_STYLE;
+    ctx.font = fontStyle;
     const isHorizontal = !!this.options.horizontal;
     const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
     const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
@@ -216,7 +226,7 @@ const modules = {
     x += boxPadding.l;
     y += boxPadding.t;
 
-    ctx.font = FONT_STYLE;
+    ctx.font = fontStyle;
 
     const seriesList = [];
     seriesKeys.forEach((seriesName) => {
@@ -414,7 +424,7 @@ const modules = {
     const itemY = boxPadding.t + TEXT_HEIGHT + 2;
     const itemValue = hitItem.o > -1 ? hitItem.o : 'error';
 
-    ctx.font = FONT_STYLE;
+    ctx.font = fontStyle;
 
     ctx.beginPath();
 
@@ -490,7 +500,7 @@ const modules = {
     x += boxPadding.l;
     y += boxPadding.t;
 
-    ctx.font = FONT_STYLE;
+    ctx.font = fontStyle;
 
     const seriesList = [];
     seriesKeys.forEach((seriesName) => {
