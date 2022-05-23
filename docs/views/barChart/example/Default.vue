@@ -10,9 +10,9 @@
     setup() {
       const chartData = {
         series: {
-          series1: { name: 'series#1' },
+          series1: { name: '시리즈 이름' },
         },
-        labels: ['value1', 'value2', 'value3', 'value5', 'value5'],
+        labels: ['가나다라', '마바사', '아자차', '카타', '파하'],
         data: {
           series1: [100, 150, 51, 150, 350],
         },
