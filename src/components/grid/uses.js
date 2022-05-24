@@ -530,6 +530,8 @@ export const sortEvent = (params) => {
   const setSort = () => {
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
+    const numberSetDesc = (a, b) => ((a === null) - (b === null) || Number(b) - Number(a));
+    const numberSetAsc = (a, b) => ((a === null) - (b === null) || Number(a) - Number(b));
     if (sortInfo.sortOrder === 'init' || (!sortInfo.sortField && !sortInfo.isSorting)) {
       stores.store.sort((a, b) => {
         if (typeof a[ROW_INDEX] === 'number') {
@@ -542,10 +544,13 @@ export const sortEvent = (params) => {
     const index = getColumnIndex(sortInfo.sortField);
     const type = props.columns[index]?.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
+    const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     switch (type) {
       case 'string':
         stores.store.sort((a, b) => {
-          if (typeof a[ROW_DATA_INDEX][index] === 'string') {
+          if (!a[ROW_DATA_INDEX][index] || typeof a[ROW_DATA_INDEX][index] === 'string') {
+            a[ROW_DATA_INDEX][index] = a[ROW_DATA_INDEX][index] || '';
+            b[ROW_DATA_INDEX][index] = b[ROW_DATA_INDEX][index] || '';
             return sortFn(a[ROW_DATA_INDEX][index]?.toLowerCase(),
               b[ROW_DATA_INDEX][index]?.toLowerCase());
           }
@@ -554,16 +559,18 @@ export const sortEvent = (params) => {
         break;
       case 'stringNumber':
         stores.store.sort((a, b) => {
-          if (typeof a[ROW_DATA_INDEX][index] === 'string' || typeof a[ROW_DATA_INDEX][index] === 'number') {
-            return sortFn(Number(a[ROW_DATA_INDEX][index]), Number(b[ROW_DATA_INDEX][index]));
+          if (!a[ROW_DATA_INDEX][index] || typeof a[ROW_DATA_INDEX][index] === 'string' || typeof a[ROW_DATA_INDEX][index] === 'number') {
+            a[ROW_DATA_INDEX][index] = a[ROW_DATA_INDEX][index] === '' ? null : a[ROW_DATA_INDEX][index];
+            b[ROW_DATA_INDEX][index] = b[ROW_DATA_INDEX][index] === '' ? null : b[ROW_DATA_INDEX][index];
+            return numberSortFn(a[ROW_DATA_INDEX][index] ?? null, b[ROW_DATA_INDEX][index] ?? null);
           }
           return 0;
         });
         break;
       default:
         stores.store.sort((a, b) => {
-          if (typeof a[ROW_DATA_INDEX][index] === 'number' || typeof a[ROW_DATA_INDEX][index] === 'boolean') {
-            return sortFn(a[ROW_DATA_INDEX][index], b[ROW_DATA_INDEX][index]);
+          if (!a[ROW_DATA_INDEX][index] || typeof a[ROW_DATA_INDEX][index] === 'number' || typeof a[ROW_DATA_INDEX][index] === 'boolean') {
+            return numberSortFn(a[ROW_DATA_INDEX][index] ?? null, b[ROW_DATA_INDEX][index] ?? null);
           }
           return 0;
         });
