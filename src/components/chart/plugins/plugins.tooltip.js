@@ -187,7 +187,6 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    const valueFormatter = typeof opt.formatter === 'function' ? opt.formatter : opt.formatter?.value;
     const titleFormatter = opt.formatter?.title;
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
@@ -258,14 +257,7 @@ const modules = {
       const gdata = seriesList[ix].data;
       const color = seriesList[ix].color;
       const name = seriesList[ix].name;
-
-      let value;
-
-      if (gdata.o === null) {
-        value = isHorizontal ? gdata.x : gdata.y;
-      } else if (!isNaN(gdata.o)) {
-        value = gdata.o;
-      }
+      const valueText = gdata.formatted;
 
       let itemX = x + 4;
       let itemY = y + (textLineCnt * TEXT_HEIGHT);
@@ -324,28 +316,8 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
-      let formattedTxt;
-      if (valueFormatter) {
-        if (this.options.type === 'pie') {
-          formattedTxt = valueFormatter({
-            value,
-            name,
-          });
-        } else {
-          formattedTxt = valueFormatter({
-            x: this.options.horizontal ? value : hitItem.x,
-            y: this.options.horizontal ? hitItem.y : value,
-            name,
-          });
-        }
-      }
-
-      if (!valueFormatter || typeof formattedTxt !== 'string') {
-        formattedTxt = numberWithComma(value);
-      }
-
       ctx.textAlign = 'right';
-      ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -376,7 +348,6 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    const valueFormatter = typeof opt.formatter === 'function' ? opt.formatter : opt.formatter?.value;
     const titleFormatter = opt.formatter?.title;
     const series = Object.values(this.seriesList)[0];
 
@@ -422,7 +393,7 @@ const modules = {
 
     const itemX = boxPadding.l + 2;
     const itemY = boxPadding.t + TEXT_HEIGHT + 2;
-    const itemValue = hitItem.o > -1 ? hitItem.o : 'error';
+    const valueText = hitItem.formatted;
 
     ctx.font = fontStyle;
 
@@ -450,21 +421,8 @@ const modules = {
     }
 
     // 3. Draw value
-    let formattedTxt = itemValue;
-    if (valueFormatter) {
-      formattedTxt = valueFormatter({
-        x: hitItem.x,
-        y: hitItem.y,
-        value: itemValue,
-      });
-    }
-
-    if ((!valueFormatter || typeof formattedTxt !== 'string') && itemValue !== 'error') {
-      formattedTxt = numberWithComma(itemValue);
-    }
-
     ctx.textAlign = 'right';
-    ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+    ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
     ctx.closePath();
 
     this.setTooltipDOMStyle(opt);
@@ -482,7 +440,6 @@ const modules = {
     const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = { t: 8, b: 8, r: 8, l: 8 };
     const opt = this.options.tooltip;
-    const xAxisOpt = this.options.axesX[0];
 
     let x = 2;
     let y = 2;
@@ -533,13 +490,7 @@ const modules = {
       const gdata = seriesList[ix].data;
       const color = seriesList[ix].color;
       const name = seriesList[ix].name;
-      const xValue = gdata.x;
-      let yValue;
-      if (gdata.o === null) {
-        yValue = gdata.y;
-      } else if (!isNaN(gdata.o)) {
-        yValue = gdata.o;
-      }
+      const valueText = gdata.formatted;
 
       let itemX = x + 4;
       let itemY = y + (textLineCnt * TEXT_HEIGHT);
@@ -598,26 +549,8 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
-      let formattedTxt;
-      const formatter = typeof opt.formatter === 'function' ? opt.formatter : opt.formatter?.value;
-      if (formatter) {
-        formattedTxt = formatter({
-          x: xValue,
-          y: yValue,
-          name,
-        });
-      }
-
-      if (!formatter || typeof formattedTxt !== 'string') {
-        const formattedXValue = xAxisOpt.type === 'time'
-          ? dayjs(xValue).format(xAxisOpt.timeFormat)
-          : numberWithComma(xValue);
-        const formattedYValue = numberWithComma(yValue);
-        formattedTxt = `${formattedXValue}, ${formattedYValue}`;
-      }
-
       ctx.textAlign = 'right';
-      ctx.fillText(formattedTxt, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 

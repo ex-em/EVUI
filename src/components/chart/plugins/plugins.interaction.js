@@ -376,6 +376,10 @@ const modules = {
     const items = {};
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
+    const tooltipOpt = this.options.tooltip;
+    const tooltipValueFormatter = typeof tooltipOpt.formatter === 'function'
+      ? tooltipOpt.formatter
+      : tooltipOpt.formatter?.value;
 
     let hitId = null;
     let maxs = '';
@@ -410,15 +414,41 @@ const modules = {
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
-            const cg = numberWithComma(gdata);
+            let formattedTxt = '';
+            if (tooltipValueFormatter) {
+              if (this.options.type === 'pie') {
+                formattedTxt = tooltipValueFormatter({
+                  value: gdata,
+                  name: sName,
+                });
+              } else if (this.options.type === 'heatMap') {
+                formattedTxt = tooltipValueFormatter({
+                  x: item.data.x,
+                  y: item.data.y,
+                  value: gdata > -1 ? gdata : 'error',
+                });
+              } else {
+                formattedTxt = tooltipValueFormatter({
+                  x: this.options.horizontal ? gdata : item.data.x,
+                  y: this.options.horizontal ? item.data.y : gdata,
+                  name: sName,
+                });
+              }
+            }
+
+            if (!tooltipValueFormatter || typeof formattedTxt !== 'string') {
+              formattedTxt = numberWithComma(gdata);
+            }
+
+            item.data.formatted = formattedTxt;
 
             if (maxsw < sw) {
               maxs = sName;
               maxsw = sw;
             }
 
-            if (maxv.length <= `${cg}`.length) {
-              maxv = `${cg}`;
+            if (maxv.length <= `${formattedTxt}`.length) {
+              maxv = `${formattedTxt}`;
             }
 
             if (maxg === null || maxg <= gdata) {
