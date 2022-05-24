@@ -363,7 +363,7 @@ export const clickEvent = (params) => {
     if (tagName === 'td') {
       cellInfo = event.target.dataset;
     } else {
-      cellInfo = event.target.parentNode.dataset;
+      cellInfo = event.target.closest('td').dataset;
     }
     return {
       event,
