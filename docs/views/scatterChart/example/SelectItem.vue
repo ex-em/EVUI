@@ -91,6 +91,7 @@
         }],
         tooltip: {
           use: true,
+          formatter: ({ x, y }) => `${x}, ${y}`,
         },
         selectItem: {
           use: true,

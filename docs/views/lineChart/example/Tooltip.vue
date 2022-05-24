@@ -204,7 +204,7 @@
           textOverflow,
           formatter: {
             title: ({ x }) => dayjs(x).format('YYYY-MM-DD HH:mm:ss'),
-            value: ({ y }) => `${y}%`,
+            value: ({ y }) => `${y.toFixed(2)}`,
           },
         },
       });
@@ -215,7 +215,7 @@
         chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+          seriesData.push(Math.random());
         });
       };
 
