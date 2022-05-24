@@ -1,9 +1,7 @@
-import { numberWithComma, convertToPercent } from '@/common/utils';
+import { convertToPercent } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
-import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
-
 
 const TITLE_HEIGHT = 30;
 const TEXT_HEIGHT = 14;
