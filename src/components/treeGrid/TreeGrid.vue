@@ -659,8 +659,10 @@ export default {
     const gridClass = computed(() => ({
       table: true,
       'ev-grid': true,
+      'ev-tree-grid': true,
       adjust: resizeInfo.adjust,
       'non-header': !styleInfo.showHeader,
+      'ev-tree-grid--empty': !stores.viewStore.length,
     }));
     const headerClass = computed(() => ({
       'table-header': true,

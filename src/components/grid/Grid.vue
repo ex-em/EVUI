@@ -34,6 +34,7 @@
         table: true,
         adjust: adjust,
         'non-header': !showHeader,
+        'ev-grid--empty': !viewStore.length,
       }"
     >
       <!-- Header -->
