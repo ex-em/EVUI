@@ -205,7 +205,6 @@ const modules = {
       this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
     }
 
-
     // draw tooltip contents (series, value combination)
     let x = 2;
     let y = 2;
@@ -249,6 +248,8 @@ const modules = {
         return next - prev;
       });
     }
+
+    this.setTooltipDOMStyle(opt);
 
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
@@ -325,8 +326,6 @@ const modules = {
     }
 
     ctx.restore();
-
-    this.setTooltipDOMStyle(opt);
   },
 
   /**
@@ -381,6 +380,8 @@ const modules = {
       this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
     }
 
+    this.setTooltipDOMStyle(opt);
+
     // draw tooltip contents (series, value combination)
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
@@ -422,8 +423,6 @@ const modules = {
     ctx.textAlign = 'right';
     ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
     ctx.closePath();
-
-    this.setTooltipDOMStyle(opt);
   },
 
   /**
@@ -482,6 +481,8 @@ const modules = {
         return next - prev;
       });
     }
+
+    this.setTooltipDOMStyle(opt);
 
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
@@ -558,8 +559,6 @@ const modules = {
     }
 
     ctx.restore();
-
-    this.setTooltipDOMStyle(opt);
   },
 
   /**
