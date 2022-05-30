@@ -695,7 +695,7 @@ const modules = {
     }
 
     const sId = Object.keys(this.seriesList)[0];
-    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range);
+    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range) ?? {};
 
     return {
       xMin: xMin ?? dataRangeX.graphMin,
