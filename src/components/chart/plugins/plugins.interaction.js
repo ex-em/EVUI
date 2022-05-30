@@ -489,9 +489,11 @@ const modules = {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      const hasData = series.data.find(data => (isHorizontal
-        ? data?.y === hitItemData
-        : data?.x === hitItemData),
+      const hasData = series.data.find(data => (
+        isHorizontal
+          ? data?.y === hitItemData
+          : data?.x === hitItemData
+        ),
       );
 
       if (hasData && !hitInfo.items[sId] && series?.show) {
