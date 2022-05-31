@@ -183,9 +183,7 @@ const modules = {
     this.onLegendBoxLeave = () => {
       this.legendDragInfo.dragging = false;
 
-      const lineDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-line')[0];
-      const targetDOM = lineDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
-      this.clearOverlay(targetDOM);
+      this.clearOverlay();
 
       const seriesList = Object.values(this.seriesList);
       if (!seriesList.length) {
@@ -256,7 +254,7 @@ const modules = {
 
   clearOverlay() {
     const targetDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-line')[0];
-    const overlayDOM = targetDOM.getElementsByClassName('ev-chart-legend-overlay')[0];
+    const overlayDOM = targetDOM?.getElementsByClassName('ev-chart-legend-overlay')[0];
     if (overlayDOM) {
       targetDOM.removeChild(overlayDOM);
 
@@ -307,13 +305,15 @@ const modules = {
 
     overlayDOM.appendChild(tooltipDOM);
     overlayDOM.appendChild(itemDOM);
-    targetDOM.appendChild(overlayDOM);
+    targetDOM?.appendChild(overlayDOM);
 
-    const thumbDOM = targetDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
-    const labels = thumbDOM.children;
-    labels.forEach((labelDOM) => {
-      labelDOM.style.opacity = 0.2;
-    });
+    const thumbDOM = targetDOM?.getElementsByClassName('ev-chart-legend-thumb')[0];
+    if (thumbDOM) {
+      const labels = thumbDOM.children;
+      labels.forEach((labelDOM) => {
+        labelDOM.style.opacity = 0.2;
+      });
+    }
   },
 
   createLegendHandle(type) {
