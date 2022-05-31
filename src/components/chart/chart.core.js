@@ -755,6 +755,7 @@ class EvChart {
     this.bufferCtx.restore();
     this.bufferCtx.save();
 
+    this.initRect();
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
