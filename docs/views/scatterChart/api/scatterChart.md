@@ -114,12 +114,12 @@ const chartData =
 |-----|------|-------|-----|-----|
 | use | Boolean | false | Chart 축(Axis) Title 표시 여부 | true / false |
 | text | String | null | Title 로 표시될 text | |
-| style.fontSize | Number | 12 | 글자 크기 | |
-| style.fontWeight | Number | 400 | 글자 굵기 | 100, 200, 300, ... 900 |
-| style.fontFamily | String | 'Roboto' | 폰트 | |
-| style.fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
-| style.textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
-| style.color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
+| fontSize | Number | 12 | 글자 크기 | |
+| fontWeight | Number | 400 | 글자 굵기 | 100, 200, 300, ... 900 |
+| fontFamily | String | 'Roboto' | 폰트 | |
+| fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
+| textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
+| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
 
 ##### plotLine
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
