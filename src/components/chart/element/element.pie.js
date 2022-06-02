@@ -150,7 +150,10 @@ class Pie {
 
     let formattedTxt;
     if (formatter) {
-      formattedTxt = formatter(value);
+      formattedTxt = formatter({
+        value,
+        percentage: this.data.percentage,
+      });
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {

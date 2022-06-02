@@ -55,7 +55,7 @@ const chartData =
 | use | Boolean | false | data label 표시 여부 | true /false |
 | textColor | Hex, RGB, RGBA Code(String) | '#000000' | 글자 색상  | |
 | fontSize | Number | 12 | 글자 크기 | |
-| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
+| formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | ({value, percentage}) => percentage + '%' + '(' + value + ')' |
 
   
 ### 3. options 
@@ -119,7 +119,7 @@ const chartOptions = {
         
         // 새로운 버전
         formatter: {
-            value: ({ name, value }) => ...,
+            value: ({ name, value, percentage }) => ...,
         }
     },
 }

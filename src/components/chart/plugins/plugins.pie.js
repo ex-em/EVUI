@@ -21,6 +21,7 @@ const modules = {
     let startAngle = 1.5 * Math.PI;
     let endAngle;
     let series;
+    let percentage;
 
     const centerX = chartRect.width / 2;
     const centerY = chartRect.height / 2;
@@ -57,6 +58,7 @@ const modules = {
         for (let jx = 0; jx < pie.data.length; jx++) {
           slice = pie.data[jx];
           value = slice.value;
+          percentage = (value / pie.total) * 100;
           sliceAngle = 2 * Math.PI * (value / pie.total);
           endAngle = startAngle + sliceAngle;
 
@@ -83,7 +85,7 @@ const modules = {
             series.doughnutHoleSize = radius * (pieOption.doughnutHoleSize ?? 0);
             series.startAngle = startAngle;
             series.endAngle = endAngle;
-            series.data = { o: value };
+            series.data = { o: value, percentage };
 
             series.draw(ctx, strokeOptions);
             startAngle += sliceAngle;
