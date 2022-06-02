@@ -455,7 +455,7 @@ const modules = {
         formattedTxt = tooltipValueFormatter({
           x,
           y,
-          value,
+          value: value > -1 ? value : 'error',
         });
       } else {
         formattedTxt = tooltipValueFormatter({
@@ -494,9 +494,9 @@ const modules = {
       const series = this.seriesList[sId];
 
       const hasData = series.data.find(data => (
-        isHorizontal
-          ? data?.y === hitItemData
-          : data?.x === hitItemData
+          isHorizontal
+            ? data?.y === hitItemData
+            : data?.x === hitItemData
         ),
       );
 
@@ -745,7 +745,7 @@ const modules = {
     }
 
     const sId = Object.keys(this.seriesList)[0];
-    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range);
+    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range) ?? {};
 
     return {
       xMin: xMin ?? dataRangeX.graphMin,
