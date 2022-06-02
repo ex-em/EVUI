@@ -455,7 +455,7 @@ const modules = {
         formattedTxt = tooltipValueFormatter({
           x,
           y,
-          value: value < 0 ? 'error' : value,
+          value,
         });
       } else {
         formattedTxt = tooltipValueFormatter({
@@ -467,7 +467,11 @@ const modules = {
     }
 
     if (value && (!tooltipValueFormatter || typeof formattedTxt !== 'string')) {
-      formattedTxt = numberWithComma(value);
+      if (this.options.type === 'heatMap') {
+        formattedTxt = value < 0 ? 'error' : value;
+      } else {
+        formattedTxt = numberWithComma(value);
+      }
     }
 
     return formattedTxt;
