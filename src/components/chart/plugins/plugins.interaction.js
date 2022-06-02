@@ -467,7 +467,11 @@ const modules = {
     }
 
     if (value && (!tooltipValueFormatter || typeof formattedTxt !== 'string')) {
-      formattedTxt = numberWithComma(value);
+      if (this.options.type === 'heatMap') {
+        formattedTxt = value < 0 ? 'error' : numberWithComma(value);
+      } else {
+        formattedTxt = numberWithComma(value);
+      }
     }
 
     return formattedTxt;
@@ -490,9 +494,9 @@ const modules = {
       const series = this.seriesList[sId];
 
       const hasData = series.data.find(data => (
-        isHorizontal
-          ? data?.y === hitItemData
-          : data?.x === hitItemData
+          isHorizontal
+            ? data?.y === hitItemData
+            : data?.x === hitItemData
         ),
       );
 
