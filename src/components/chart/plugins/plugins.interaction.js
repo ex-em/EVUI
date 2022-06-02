@@ -419,6 +419,7 @@ const modules = {
               if (this.options.type === 'pie') {
                 formattedTxt = tooltipValueFormatter({
                   value: gdata,
+                  percentage: item.data.percentage,
                   name: sName,
                 });
               } else if (this.options.type === 'heatMap') {

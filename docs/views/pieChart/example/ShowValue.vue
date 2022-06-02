@@ -8,7 +8,7 @@
       <div class="row">
         <div class="row-item">
           <span class="item-title">
-            Hole 사이즈
+            doughnutHoleSize
           </span>
           <ev-input-number
             v-model="doughnutHoleSize"
@@ -18,25 +18,17 @@
             :max="0.8"
           />
         </div>
-      </div>
-      <div class="row">
         <div class="row-item">
           <span class="item-title">
-            폰트 크기
+            fontSize
           </span>
           <ev-input-number
-            v-model="fontSize"
-            :step="1"
-            :precision="0"
-            :min="1"
-            :max="30"
+              v-model="fontSize"
+              :step="1"
+              :precision="0"
+              :min="1"
+              :max="30"
           />
-        </div>
-        <div class="row-item">
-          <span class="item-title">
-            폰트 컬러
-          </span>
-          <ev-text-field v-model="textColor"/>
         </div>
       </div>
     </div>
@@ -50,32 +42,19 @@ import { reactive, ref } from 'vue';
     setup() {
       const doughnutHoleSize = ref(0);
       const fontSize = ref(12);
-      const textColor = ref('#000000');
+
+      const formatter = ({ value, percentage }) => `${(+percentage).toFixed(0)}% (${value})`;
 
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1', showValue: { use: true, fontSize, textColor } },
-          series2: { name: 'series#2', showValue: { use: true, fontSize, textColor } },
-          series3: { name: 'series#3', showValue: { use: true, fontSize, textColor } },
-          series4: { name: 'series#4', showValue: { use: true, fontSize, textColor } },
-          series5: { name: 'series#5', showValue: { use: true, fontSize, textColor } },
-          series6: { name: 'series#6', showValue: { use: true, fontSize, textColor } },
-          series7: { name: 'series#7', showValue: { use: true, fontSize, textColor } },
-          series8: { name: 'series#8', showValue: { use: true, fontSize, textColor } },
-          series9: { name: 'series#9', showValue: { use: true, fontSize, textColor } },
-          series10: { name: 'series#10', showValue: { use: true, fontSize, textColor } },
+          series1: { name: 'series#1', showValue: { use: true, fontSize, formatter } },
+          series2: { name: 'series#2', showValue: { use: true, fontSize, formatter } },
+          series3: { name: 'series#3', showValue: { use: true, fontSize, formatter } },
         },
         data: {
           series1: [1],
           series2: [4],
           series3: [9],
-          series4: [16],
-          series5: [25],
-          series6: [36],
-          series7: [49],
-          series8: [64],
-          series9: [81],
-          series10: [100],
         },
       });
 
@@ -91,6 +70,10 @@ import { reactive, ref } from 'vue';
           position: 'right',
         },
         doughnutHoleSize,
+        tooltip: {
+          use: true,
+          formatter,
+        },
       });
 
       return {
@@ -98,7 +81,6 @@ import { reactive, ref } from 'vue';
         chartOptions,
         doughnutHoleSize,
         fontSize,
-        textColor,
       };
     },
   };
