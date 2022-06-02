@@ -455,7 +455,7 @@ const modules = {
         formattedTxt = tooltipValueFormatter({
           x,
           y,
-          value: value > -1 ? value : 'error',
+          value: value < 0 ? 'error' : value,
         });
       } else {
         formattedTxt = tooltipValueFormatter({
