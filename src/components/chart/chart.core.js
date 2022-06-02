@@ -122,14 +122,21 @@ class EvChart {
   initRect() {
     const opt = this.options;
     if (opt.title.show) {
-      this.initTitle();
+      if (!this.isInitTitle) {
+        this.initTitle();
+      }
+
       this.showTitle();
     }
 
     if (opt.legend.show) {
-      this.initLegend();
+      if (!this.isInitLegend) {
+        this.initLegend();
+      }
+
       this.setLegendPosition();
     }
+
     this.chartRect = this.getChartRect();
   }
 
@@ -755,6 +762,7 @@ class EvChart {
     this.bufferCtx.restore();
     this.bufferCtx.save();
 
+    this.initRect();
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
