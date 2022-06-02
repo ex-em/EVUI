@@ -17,32 +17,15 @@ const modules = {
       if (this.dragInfo?.isMove) {
         return;
       }
+
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
+
       if (tooltip?.showAllValueInRange && hitInfo?.items) {
-        const isHorizontal = !!this.options.horizontal;
-        const hitItemId = Object.keys(hitInfo.items)[0];
-        const hitItemData = isHorizontal
-          ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
-        const sIds = Object.keys(this.seriesList);
-        for (let ix = 0; ix < sIds.length; ix++) {
-          const sId = sIds[ix];
-          const series = this.seriesList[sId];
-          const hasData = series.data.find(data =>
-            (isHorizontal ? data.y : data?.x === hitItemData));
-          if (hasData && !hitInfo.items[sId] && series?.show) {
-            const item = {};
-            item.color = series.color;
-            item.hit = false;
-            item.name = series.name;
-            item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
-            item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
-            item.data = hasData;
-            hitInfo.items[sId] = item;
-          }
-        }
+        this.addNotHitInfo(hitInfo);
       }
+
       const ctx = this.overlayCtx;
 
       this.overlayClear();
@@ -376,10 +359,6 @@ const modules = {
     const items = {};
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
-    const tooltipOpt = this.options.tooltip;
-    const tooltipValueFormatter = typeof tooltipOpt.formatter === 'function'
-      ? tooltipOpt.formatter
-      : tooltipOpt.formatter?.value;
 
     let hitId = null;
     let maxs = '';
@@ -414,31 +393,12 @@ const modules = {
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
-            let formattedTxt = '';
-            if (tooltipValueFormatter) {
-              if (this.options.type === 'pie') {
-                formattedTxt = tooltipValueFormatter({
-                  value: gdata,
-                  name: sName,
-                });
-              } else if (this.options.type === 'heatMap') {
-                formattedTxt = tooltipValueFormatter({
-                  x: item.data.x,
-                  y: item.data.y,
-                  value: gdata > -1 ? gdata : 'error',
-                });
-              } else {
-                formattedTxt = tooltipValueFormatter({
-                  x: this.options.horizontal ? gdata : item.data.x,
-                  y: this.options.horizontal ? item.data.y : gdata,
-                  name: sName,
-                });
-              }
-            }
-
-            if (!tooltipValueFormatter || typeof formattedTxt !== 'string') {
-              formattedTxt = numberWithComma(gdata);
-            }
+            const formattedTxt = this.getFormattedTooltipValue({
+              seriesName: sName,
+              value: gdata,
+              x: item.data.x,
+              y: item.data.y,
+            });
 
             item.data.formatted = formattedTxt;
 
@@ -468,6 +428,92 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+
+  /**
+   * get formatted value for tooltip
+   * @param seriesName
+   * @param value
+   * @param x
+   * @param y
+   * @returns {string}
+   */
+  getFormattedTooltipValue({ seriesName, value, x, y }) {
+    const tooltipOpt = this.options.tooltip;
+    const tooltipValueFormatter = typeof tooltipOpt.formatter === 'function'
+      ? tooltipOpt.formatter
+      : tooltipOpt.formatter?.value;
+
+    let formattedTxt = value;
+    if (tooltipValueFormatter) {
+      if (this.options.type === 'pie') {
+        formattedTxt = tooltipValueFormatter({
+          value,
+          name: seriesName,
+        });
+      } else if (this.options.type === 'heatMap') {
+        formattedTxt = tooltipValueFormatter({
+          x,
+          y,
+          value: value > -1 ? value : 'error',
+        });
+      } else {
+        formattedTxt = tooltipValueFormatter({
+          x: this.options.horizontal ? value : x,
+          y: this.options.horizontal ? y : value,
+          name: seriesName,
+        });
+      }
+    }
+
+    if (value && (!tooltipValueFormatter || typeof formattedTxt !== 'string')) {
+      formattedTxt = numberWithComma(value);
+    }
+
+    return formattedTxt;
+  },
+
+  /**
+   * add not hit info
+   * @param hitInfo
+   */
+  addNotHitInfo(hitInfo) {
+    const isHorizontal = !!this.options.horizontal;
+
+    const hitItemId = Object.keys(hitInfo.items)[0];
+    const hitItemData = isHorizontal
+      ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
+
+    const sIds = Object.keys(this.seriesList);
+    for (let ix = 0; ix < sIds.length; ix++) {
+      const sId = sIds[ix];
+      const series = this.seriesList[sId];
+
+      const hasData = series.data.find(data => (
+        isHorizontal
+          ? data?.y === hitItemData
+          : data?.x === hitItemData
+        ),
+      );
+
+      if (hasData && !hitInfo.items[sId] && series?.show) {
+        const item = {};
+        item.color = series.color;
+        item.hit = false;
+        item.name = series.name;
+        item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+        item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
+        item.data = hasData;
+        item.data.formatted = this.getFormattedTooltipValue({
+          seriesName: series.name,
+          value: hasData.o,
+          x: hasData.x,
+          y: hasData.y,
+        });
+
+        hitInfo.items[sId] = item;
+      }
+    }
   },
 
   /**
