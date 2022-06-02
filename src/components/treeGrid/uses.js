@@ -360,10 +360,12 @@ export const clickEvent = (params) => {
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
-    if (tagName === 'td') {
-      cellInfo = event.target.dataset;
-    } else {
-      cellInfo = event.target.closest('td').dataset;
+    if (event.target.offsetParent) {
+      if (tagName === 'td') {
+        cellInfo = event.target.dataset;
+      } else {
+        cellInfo = event.target.closest('td').dataset;
+      }
     }
     return {
       event,
