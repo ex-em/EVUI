@@ -207,11 +207,11 @@ export default {
         ],
       },
       {
-        label: 'Weekday',
-        value: 'weekday',
+        label: 'yesterday',
+        value: 'yesterday',
         shortcutDate: () => [
-          new Date(dayjs(TODAY_0_O_CLOCK_DATE).day(1)),
-          new Date(dayjs(TODAY_0_O_CLOCK_DATE).day(5)),
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE)),
         ],
       },
       {
