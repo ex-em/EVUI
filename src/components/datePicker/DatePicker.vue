@@ -61,16 +61,21 @@
             </span>
             </div>
           </template>
-          <template v-else-if="mv[0] && mv[mv.length - 1]">
-            <div class="ev-select-tag num">
+          <template v-else>
+            <div
+              v-if="mv[0]"
+              class="ev-select-tag num"
+            >
               <span class="ev-tag-name"> {{ mv[0] }} </span>
             </div>
-            <div class="ev-select-tag num">
-              <span class="ev-tag-name"> ~ </span>
-            </div>
-            <div class="ev-select-tag num">
-              <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
-            </div>
+            <template v-if="mv[mv.length - 1]">
+              <div class="ev-select-tag num">
+                <span class="ev-tag-name"> ~ </span>
+              </div>
+              <div class="ev-select-tag num">
+                <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
+              </div>
+            </template>
           </template>
         </div>
       </template>
@@ -95,7 +100,14 @@
             v-if="usedShortcuts.length"
             class="ev-date-picker-dropbox__button-layout"
           >
-            <ev-button-group>
+            <ev-button
+                v-if="usedShortcuts.length === 1"
+                :type="usedShortcuts[0].isActive ? 'primary' : 'default'"
+                @click="clickShortcut(usedShortcuts[0].key)"
+            >
+              {{ usedShortcuts[0].label }}
+            </ev-button>
+            <ev-button-group v-else>
               <ev-button
                 v-for="button in usedShortcuts"
                 :key="button.key"

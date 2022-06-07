@@ -206,6 +206,10 @@ const getTimeInfoByTimeFormat = (timeFormat, dateTimeValue, typeToImport) => {
  * @returns string
  */
 export const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
+  if (!modelValue) {
+    return '';
+  }
+
   const hourByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'hour'));
   const minByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'min'));
   const secByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'sec'));
@@ -224,8 +228,8 @@ const compareFromAndToDateTime = (mode, calendarType, targetDate, modelValue) =>
   let toDateTime = toDate;
   if (!targetDate.split(' ')[1]) {
     if (mode === 'dateTimeRange') {
-      fromDate = fromDateTime.split(' ')[0];
-      toDate = toDateTime.split(' ')[0];
+      fromDate = fromDate.split(' ')[0];
+      toDate = toDate.split(' ')[0];
       const fromTime = modelValue[0].split(' ')[1];
       const toTime = modelValue[1].split(' ')[1];
       fromDateTime = `${fromDate} ${fromTime}`;
@@ -236,7 +240,8 @@ const compareFromAndToDateTime = (mode, calendarType, targetDate, modelValue) =>
     }
   }
 
-  return new Date(fromDateTime).getTime() > +new Date(toDateTime).getTime();
+  return (fromDateTime && toDateTime)
+    && new Date(fromDateTime).getTime() > +new Date(toDateTime).getTime();
 };
 
 /**
@@ -303,16 +308,12 @@ export const useModel = () => {
     } else if (props.mode === 'dateRange' && props.modelValue) {
       if (!Array.isArray(props.modelValue)) {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model must be \'Array\' type.');
-      } else if (props.modelValue.length !== 0 && props.modelValue.length !== 2) {
-        console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model\'s length is 0 or 2.');
       } else if (getDateMs(`${props.modelValue[0]} 00:00:00`) > getDateMs(`${props.modelValue[1]} 00:00:00`)) {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', fromDate must be less than toDate.');
       }
     } else if (props.mode === 'dateTimeRange' && props.modelValue) {
       if (!Array.isArray(props.modelValue)) {
         console.warn('[EVUI][Calendar] When mode is \'dateTimeRange\', v-model must be \'Array\' type.');
-      } else if (props.modelValue.length !== 0 && props.modelValue.length !== 2) {
-        console.warn('[EVUI][Calendar] When mode is \'dateRange\', v-model\'s length is 0 or 2.');
       } else if (getDateMs(props.modelValue[0]) > getDateMs(props.modelValue[1])) {
         console.warn('[EVUI][Calendar] When mode is \'dateRange\', fromDate must be less than toDate.');
       }
@@ -322,10 +323,10 @@ export const useModel = () => {
   // 메인(좌측) 달력(연, 월, 시, 분, 초) 페이징 정보
   let mainCalendarPageInfo;
   const mainValue = !['dateRange', 'dateTimeRange'].includes(props.mode) ? selectedValue.value : selectedValue.value[0];
-  if (props.mode) {
+  if (mainValue?.length) {
     mainCalendarPageInfo = reactive({
-      year: getDateTimeInfoByType(mainValue, 'year') || new Date().getFullYear(),
-      month: getDateTimeInfoByType(mainValue, 'month') || new Date().getMonth() + 1,
+      year: getDateTimeInfoByType(mainValue, 'year'),
+      month: getDateTimeInfoByType(mainValue, 'month'),
       hour: Math.floor(getDateTimeInfoByType(mainValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
       min: Math.floor(getDateTimeInfoByType(mainValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
       sec: Math.floor(getDateTimeInfoByType(mainValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
@@ -334,6 +335,9 @@ export const useModel = () => {
     mainCalendarPageInfo = reactive({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
+      hour: 1,
+      min: 1,
+      sec: 1,
     });
   }
 
@@ -356,17 +360,13 @@ export const useModel = () => {
       expandedCalendarPageInfo.sec = Math.floor(getDateTimeInfoByType(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
     }
   } else {
-    expandedCalendarPageInfo = reactive(getSideMonthCalendarInfo(
-      'next',
-      mainCalendarPageInfo.year,
-      mainCalendarPageInfo.month,
-    ));
-
-    if (props.mode === 'dateTimeRange') {
-      expandedCalendarPageInfo.hour = 1;
-      expandedCalendarPageInfo.min = 1;
-      expandedCalendarPageInfo.sec = 1;
-    }
+    expandedCalendarPageInfo = reactive({
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+      hour: 1,
+      min: 1,
+      sec: 1,
+    });
   }
 
   // 현재 달력이 표현되는 월
@@ -401,7 +401,7 @@ export const useModel = () => {
 };
 
 export const useCalendarDate = (param) => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   const { selectedValue, mainCalendarPageInfo, expandedCalendarPageInfo } = param;
 
   // 메인 달력 테이블의 날짜 정보 (6X7, 2차원배열)
@@ -421,6 +421,41 @@ export const useCalendarDate = (param) => {
     sec: [],
   });
 
+  const getModelValue = ({ isRangeMode, calendarType, disabledDate }) => {
+    let modelValue = '';
+
+    // check disabled date
+    if (isRangeMode) {
+      if (calendarType === 'main' && selectedValue.value[0]) {
+        if (disabledDate && disabledDate(new Date(selectedValue.value[0]))) {
+          selectedValue.value[0] = '';
+          emit('update:modelValue', [...selectedValue.value]);
+        }
+      } else if (calendarType === 'expanded' && selectedValue.value[1]) {
+        if (disabledDate && disabledDate(new Date(selectedValue.value[1]))) {
+          selectedValue.value[1] = '';
+          emit('update:modelValue', [...selectedValue.value]);
+        }
+      }
+      modelValue = selectedValue.value[+(calendarType !== 'main')];
+    } else if (props.mode === 'dateMulti') {
+      selectedValue.value.forEach((value, index) => {
+        if (disabledDate && disabledDate(new Date(value))) {
+          selectedValue.value.splice(index, 1);
+          emit('update:modelValue', [...selectedValue.value]);
+        }
+      });
+    } else {
+      if (disabledDate && disabledDate(new Date(selectedValue.value))) {
+        selectedValue.value = '';
+        emit('update:modelValue', selectedValue.value);
+      }
+      modelValue = selectedValue.value;
+    }
+
+    return modelValue;
+  };
+
   /**
    * Dropdown Calendar 날짜 정보 세팅하기
    * @param calendarType - 달력 종류 ('main'|'expanded')
@@ -430,7 +465,18 @@ export const useCalendarDate = (param) => {
       ? expandedCalendarPageInfo : mainCalendarPageInfo;
     const calendarTableInfo = calendarType === 'expanded'
       ? expandedCalendarTableInfo : mainCalendarTableInfo;
-    const disabledDate = props.options.disabledDate;
+
+    let disabledDate = props.options.disabledDate;
+    if (disabledDate && Array.isArray(disabledDate)) {
+      disabledDate = calendarType === 'main' ? disabledDate[0] : disabledDate[1];
+    }
+    const isRangeMode = ['dateRange', 'dateTimeRange'].includes(props.mode);
+
+    const modelValue = getModelValue({
+      isRangeMode,
+      calendarType,
+      disabledDate,
+    });
 
     const TODAY_YMD = formatDateTime({
       year: new Date().getFullYear(),
@@ -470,22 +516,26 @@ export const useCalendarDate = (param) => {
     // date 숫자 및 속성 세팅
     const setDateInfo = (monthType, i, j) => {
       currDate = formatDateTime({ year, month, date });
-      const isRangeMode = ['dateRange', 'dateTimeRange'].includes(props.mode);
-      const isDisabled = disabledDate ? disabledDate(new Date(currDate)) : false;
       const isInvalidDate = isRangeMode
           && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value);
 
-      const index = calendarType !== 'main' | 0;
+      // time 모드인 경우 현재 값의 시간을 가지고 테스트
+      const timeValue = props.mode.includes('Time') ? modelValue?.split(' ')[1] : '';
+
+      const isDisabled = disabledDate && disabledDate(new Date(`${currDate} ${timeValue ?? ''}`));
+
+      const index = +(calendarType !== 'main');
       const isRangeSelected = isRangeMode && selectedValue.value.length > index
           && selectedValue.value[index].split(' ')[0].includes(currDate);
+      const isSelected = !isDisabled && (isRangeMode
+        ? monthType === '' && isRangeSelected
+        : selectedValue.value?.includes(currDate));
 
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[i][j] = {
         monthType: `${monthType}${isDisabled || isInvalidDate ? ' disabled' : ''}`,
         isToday: TODAY_YMD === currDate,
-        isSelected: isRangeMode
-          ? monthType === '' && isRangeSelected
-          : selectedValue.value?.includes(currDate),
+        isSelected,
         year,
         month,
         date,
@@ -539,13 +589,17 @@ export const useCalendarDate = (param) => {
    */
   const setHmsTime = () => {
     const timeFormat = props.options?.timeFormat;
+    const disabledDate = props.options?.disabledDate;
     const mainTimeFormat = Array.isArray(timeFormat) ? timeFormat[0] : timeFormat;
     const expandedTimeFormat = Array.isArray(timeFormat) ? timeFormat[1] : '';
     const mainDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[0] : selectedValue.value;
     const expandedDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[1] : '';
+    const mainDisabledDate = Array.isArray(disabledDate) ? disabledDate[0] : disabledDate;
+    const expandedDisabledDate = Array.isArray(disabledDate) ? disabledDate[1] : disabledDate;
 
     const compareDateTimeValue = (calendarType, timeType, value) => {
       const dateTimeValue = calendarType === 'main' ? mainDateTimeValue : expandedDateTimeValue;
+      const disabledDateFunc = calendarType === 'main' ? mainDisabledDate : expandedDisabledDate;
       if (!dateTimeValue) {
         return false;
       }
@@ -564,6 +618,10 @@ export const useCalendarDate = (param) => {
       }
 
       const targetDateTimeValue = `${date} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
+      if (disabledDateFunc && disabledDateFunc(new Date(targetDateTimeValue))) {
+        return true;
+      }
+
       return compareFromAndToDateTime(
           props.mode,
           calendarType,
@@ -584,18 +642,20 @@ export const useCalendarDate = (param) => {
       const expandedTimeValue = expandedDateTimeValue && expandedDateTimeValue.length > 0
           ? getTimeInfoByTimeFormat(expandedTimeFormat, expandedDateTimeValue, v) : -1;
       for (let i = 0; i < cnt; i++) {
-        mainTimeTableInfo[v][i] = {
+        let isDisabled = props.mode === 'dateTimeRange' && compareDateTimeValue('main', v, i);
+          mainTimeTableInfo[v][i] = {
           timeType: v,
           num: i,
-          isSelected: mainTimeValue === i,
-          isDisabled: props.mode === 'dateTimeRange' && compareDateTimeValue('main', v, i),
+          isSelected: !isDisabled && mainTimeValue === i,
+          isDisabled,
         };
         if (props.mode === 'dateTimeRange') {
+          isDisabled = compareDateTimeValue('expanded', v, i);
           expandedTimeTableInfo[v][i] = {
             timeType: v,
             num: i,
-            isSelected: expandedTimeValue === i,
-            isDisabled: compareDateTimeValue('expanded', v, i),
+            isSelected: !isDisabled && expandedTimeValue === i,
+            isDisabled,
           };
         }
       }
@@ -634,12 +694,13 @@ export const useCalendarDate = (param) => {
 
 export const useEvent = (param) => {
   const { props, emit } = getCurrentInstance();
-  const disabledDate = props.options.disabledDate;
   const timeFormat = props.options?.timeFormat;
   const {
     selectedValue,
     mainCalendarPageInfo,
     expandedCalendarPageInfo,
+    mainTimeTableInfo,
+    expandedTimeTableInfo,
     setCalendarDate,
     setHmsTime,
   } = param;
@@ -787,6 +848,11 @@ export const useEvent = (param) => {
         ? props.modelValue?.map(v => v.split(' ')[0])
         : props.modelValue.split(' ')[0])
         .includes(CURR_DATE_STR) : false;
+
+    let disabledDate = props.options.disabledDate;
+    if (disabledDate && Array.isArray(disabledDate)) {
+      disabledDate = calendarType === 'main' ? disabledDate[0] : disabledDate[1];
+    }
     // 제한된 날짜는 선택할 수 없다.
     if (disabledDate && disabledDate(new Date(CURR_DATE_STR)) && !isExistCurrDate) {
       return;
@@ -812,13 +878,12 @@ export const useEvent = (param) => {
 
     const setRangeModeDateByIndex = (currIndex, currDate) => {
       if (compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value)) {
-        return false;
+        return;
       }
 
       selectedValue.value[currIndex] = currDate;
       moveDispCalendarMonth();
       updateCalendarPage(selectedValue.value);
-      return true;
     };
 
     switch (props.mode) {
@@ -997,11 +1062,18 @@ export const useEvent = (param) => {
 
     const calendarPageInfo = calendarType === 'expanded'
         ? expandedCalendarPageInfo : mainCalendarPageInfo;
+    const timeInfo = calendarType === 'main'
+      ? mainTimeTableInfo : expandedTimeTableInfo;
     const currPage = calendarPageInfo[timeType] - 1;
     const currRowIdx = i - 1;
     const currColIdx = j - 1;
     const clickedNum = (currPage * CELL_CNT_IN_ONE_PAGE)
      + (currRowIdx * CELL_CNT_IN_ONE_ROW) + currColIdx;
+
+    if (timeInfo[timeType][clickedNum]?.isDisabled) {
+      return;
+    }
+
     const TODAY = new Date();
     const TODAY_INFO = {
       year: TODAY.getFullYear(),
@@ -1164,31 +1236,22 @@ export const useEvent = (param) => {
     }
   }, 10);
 
-  /**
-   * Calendar Info 전체 업데이트
-   */
-  const resetCalendarInfo = () => {
-    let valueListByUpdatePage = [];
-
-    if (['date', 'dateTime'].includes(props.mode)) {
-      valueListByUpdatePage.push(selectedValue.value);
-    } else {
-      valueListByUpdatePage = selectedValue.value;
-    }
-
-    if (['dateTime', 'dateTimeRange'].includes(props.mode)) {
-      updateCalendarPage(valueListByUpdatePage);
-      setHmsTime();
-    }
-  };
-
   watch(
-      () => props.modelValue,
-      (curr) => {
-        selectedValue.value = curr;
-        resetCalendarInfo();
-      },
-  );
+    () => props.modelValue,
+    (curr) => {
+      selectedValue.value = curr;
+
+      if (props.mode.includes('Time')) {
+        let updateValue = [];
+        if (props.mode === 'dateTime') {
+          updateValue = [selectedValue.value];
+        } else if (props.mode === 'dateTimeRange') {
+          updateValue = selectedValue.value;
+        }
+        updateCalendarPage(updateValue);
+        setHmsTime();
+      }
+  });
 
   return {
     clickPrevNextBtn,
@@ -1197,7 +1260,6 @@ export const useEvent = (param) => {
     clickTime,
     wheelMonth,
     wheelTime,
-    resetCalendarInfo,
     calendarEventName,
     onMousemoveDate,
     preventTimeEventType,
