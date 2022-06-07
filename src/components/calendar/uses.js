@@ -441,12 +441,16 @@ export const useCalendarDate = (param) => {
         }
       }
     } else if (props.mode === 'dateMulti') {
+      let isUpdate = false;
       selectedValue.value.forEach((value, index) => {
         if (disabledDate && disabledDate(new Date(value))) {
           selectedValue.value.splice(index, 1);
-          emit('update:modelValue', [...selectedValue.value]);
+          isUpdate = true;
         }
       });
+      if (isUpdate) {
+        emit('update:modelValue', [...selectedValue.value]);
+      }
     } else if (disabledDate && disabledDate(new Date(selectedValue.value))) {
         selectedValue.value = '';
         emit('update:modelValue', selectedValue.value);
