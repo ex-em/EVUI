@@ -43,15 +43,7 @@
         :options="{
           timeFormat: 'HH:00:ss'
         }"
-        :shortcuts="[{
-          label: 'Yesterday',
-          value: 'yesterday',
-          shortcutDate: () => new Date(new Date().setDate(new Date().getDate() - 1))
-        }, {
-          label: 'Today',
-          value: 'today',
-          shortcutDate: () => new Date()
-        }]"
+        :shortcuts="dateTime2Shortcut"
     />
     <div class="description">
       <span class="badge">
@@ -189,6 +181,16 @@ export default {
     const TODAY_0_O_CLOCK_DATE = new Date(dayjs()
         .format('YYYY-MM-DD 00:00:00'));
 
+    const dateTime2Shortcut = [{
+      label: 'Yesterday',
+      value: 'yesterday',
+      shortcutDate: () => new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
+    }, {
+      label: 'Today',
+      value: 'today',
+      shortcutDate: () => new Date(TODAY_0_O_CLOCK_DATE),
+    }];
+
     const dateTimeRange2Shortcut = [
         {
           label: 'LastMonth',
@@ -236,6 +238,7 @@ export default {
       date1,
       dateTime1,
       dateTime2,
+      dateTime2Shortcut,
       dateMulti1,
       dateMulti2,
       dateMulti3,
