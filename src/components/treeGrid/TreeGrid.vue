@@ -178,7 +178,7 @@
   <grid-pagination
     v-if="usePage && !isInfinite"
     v-model="currentPage"
-    :total="pageTotal"
+    :total="showTreeStore.length"
     :per-page="perPage"
     :visible-page="visiblePage"
     :show-page-info="showPageInfo"
@@ -543,19 +543,24 @@ export default {
           highlightNode.show = true;
           highlightNode.isFilter = true;
           setParentShow(highlightNode);
+          // tree 에 보여지는 데이터 기준으로 index 다시 구하기
+          const highlightNodeIndex = stores.showTreeStore
+            .map(node => node.index)
+            .indexOf(highlightNode.index);
           if (pageInfo.usePage && !pageInfo.isInfinite) {
-            const highlightNodeIndex = (stores.showTreeStore
-                .map(node => node.index)
-                .indexOf(highlightNode.index)
-              ) + 1; // tree 에 보여지는 데이터 기준으로 index 다시 구하기
-            pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) || 1;
+            if (highlightNodeIndex === pageInfo.perPage) {
+              pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) + 1 || 1;
+            } else {
+              pageInfo.highlightPage = Math.ceil(highlightNodeIndex / pageInfo.perPage) || 1;
+            }
+            // 페이지 이동
             if (pageInfo.highlightPage !== pageInfo.currentPage) {
               pageInfo.currentPage = pageInfo.highlightPage;
               pageInfo.isHighlight = true;
               return;
             }
           }
-          elementInfo.body.scrollTop = resizeInfo.rowHeight * styleInfo.highlightIdx;
+          elementInfo.body.scrollTop = resizeInfo.rowHeight * highlightNodeIndex;
         }
       },
     );
@@ -640,7 +645,10 @@ export default {
           }
           updateVScroll();
           if (current === pageInfo.highlightPage && pageInfo.isHighlight) {
-            elementInfo.body.scrollTop = resizeInfo.rowHeight * styleInfo.highlightIdx;
+            const highlightNodeIndex = stores.pagingStore
+              .map(node => node.index)
+              .indexOf(styleInfo.highlightIdx);
+            elementInfo.body.scrollTop = resizeInfo.rowHeight * highlightNodeIndex;
             pageInfo.isHighlight = !pageInfo.isHighlight;
           }
         });
