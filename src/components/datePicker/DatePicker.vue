@@ -207,7 +207,7 @@ export default {
         const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
         return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
         && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
-        && (disabledDate ? typeof disabledDate === 'function' : true)
+        && (disabledDate ? (typeof disabledDate === 'function' || Array.isArray(disabledDate)) : true)
         && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true)
         && Array.isArray(timeFormat)
             ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
