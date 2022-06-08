@@ -173,8 +173,6 @@ export default {
       label = assignLabelWith(value, milli, 'M');
     } else if (value >= killo) {
       label = assignLabelWith(value, 1000, 'K');
-    } else if (value < 1 && value > 0) {
-      label = value.toFixed(1);
     } else {
       label = value.toFixed(decimalPoint);
     }
