@@ -397,7 +397,11 @@ export const useShortcuts = (param) => {
             && props?.options?.multiDayLimit > curr.length
         ) {
           return;
-        } else if (props.mode === 'dateTime' || props.mode === 'dateTimeRange') {
+        } else if (
+          props.mode === 'dateRange'
+          || props.mode === 'dateTime'
+          || props.mode === 'dateTimeRange'
+        ) {
           currentValue.value = curr;
           return;
         } else if (props.mode === 'date') {
