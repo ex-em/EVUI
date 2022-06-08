@@ -330,10 +330,11 @@ export const useShortcuts = (param) => {
       }
       targetKey = targetShortcut?.key;
     } else {
-      const date = formatDate(mv.value);
+      const formatFunc = props.mode === 'dateTime' ? formatDateTime : formatDate;
+      const date = formatFunc(mv.value);
       const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
-        const sDate = formatDate(shortcutDate());
-        return sDate === formatDate(date);
+        const sDate = formatFunc(shortcutDate());
+        return sDate === date;
       });
       targetKey = targetShortcut?.key;
     }
