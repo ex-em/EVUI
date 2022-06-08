@@ -1,6 +1,7 @@
 <template>
   <header class="evui-header">
     <h1 class="evui-header-logo">EVUI</h1>
+    <span class="evui-header-version">{{ `v.${version}` }}</span>
     <p class="evui-header-name">EXEM Visualization UI</p>
     <span
       class="evui-header-theme"
@@ -15,6 +16,7 @@
 
 <script>
 import { computed } from 'vue';
+import { version } from '../../package.json';
 
 export default {
   props: {
@@ -37,6 +39,7 @@ export default {
     const themeIcon = computed(() => (theme.value === 'light' ? 'ev-icon-sun' : 'ev-icon-moon'));
 
     return {
+      version,
       theme,
       themeIcon,
       changeTheme,
@@ -68,11 +71,18 @@ a {
     left: 10px;
     width: 110px;
     height: 30px;
-    background: url('http://evui.ex-em.com/wp-content/uploads/2017/11/evui_1.png') left center no-repeat;
+    background: url('../assets/images/evui_logo.png') left center no-repeat;
     background-size: contain;
     transform: translateY(-50%);
 
     @include font-hide();
+  }
+  &-version {
+    position: absolute;
+    top: 43%;
+    left: 110px;
+    font-size: $font-size-large;
+    color: #E8E8E8;
   }
   &-name {
     font-size: $font-size-large;
