@@ -36,7 +36,7 @@ export const useModel = () => {
   // mode: 'date' or 'dateTime'시 input box의 입력된 텍스트값
   let currentValue;
   if (['dateTimeRange', 'dateTime'].includes(props.mode) && timeFormat) {
-    if (props.mode === 'dateTimeRange' && props.modelValue.length) {
+    if (props.mode === 'dateTimeRange' && Array.isArray(props.modelValue) && props.modelValue.length === 2) {
       const [fromDate, toDate] = props.modelValue;
       const [fromTimeFormat, toTimeFormat] = timeFormat;
 
@@ -300,19 +300,41 @@ export const useShortcuts = (param) => {
 
     let targetKey;
     if (isRange) {
+      const timeFormat = props.options?.timeFormat;
       const [fromDate, toDate] = mv.value;
-      const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
-        const [sFromDate, sToDate] = shortcutDate();
-        const isCorrectFromDate = formatDate(sFromDate) === formatDate(fromDate);
-        const isCorrectToDate = formatDate(sToDate) === formatDate(toDate);
-        return isCorrectFromDate && isCorrectToDate;
-      });
+      let targetShortcut;
+      if (props.mode === 'dateTimeRange' && timeFormat?.length) {
+        targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
+          const [sFromDate, sToDate] = shortcutDate();
+          const [fromTimeFormat, toTimeFormat] = timeFormat;
+          const formatFromDate = getChangedValueByTimeFormat(
+            fromTimeFormat,
+            formatDateTime(sFromDate),
+          );
+          const formatToDate = getChangedValueByTimeFormat(
+            toTimeFormat,
+            formatDateTime(sToDate),
+          );
+          const isCorrectFromDate = formatFromDate === formatDateTime(fromDate);
+          const isCorrectToDate = formatToDate === formatDateTime(toDate);
+          return isCorrectFromDate && isCorrectToDate;
+        });
+      } else {
+        targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
+          const [sFromDate, sToDate] = shortcutDate();
+          const formatFunc = props.mode === 'dateTimeRange' ? formatDateTime : formatDate;
+          const isCorrectFromDate = formatFunc(sFromDate) === formatFunc(fromDate);
+          const isCorrectToDate = formatFunc(sToDate) === formatFunc(toDate);
+          return isCorrectFromDate && isCorrectToDate;
+        });
+      }
       targetKey = targetShortcut?.key;
     } else {
-      const date = formatDate(mv.value);
+      const formatFunc = props.mode === 'dateTime' ? formatDateTime : formatDate;
+      const date = formatFunc(mv.value);
       const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
-        const sDate = formatDate(shortcutDate());
-        return sDate === formatDate(date);
+        const sDate = formatFunc(shortcutDate());
+        return sDate === date;
       });
       targetKey = targetShortcut?.key;
     }
@@ -375,7 +397,11 @@ export const useShortcuts = (param) => {
             && props?.options?.multiDayLimit > curr.length
         ) {
           return;
-        } else if (props.mode === 'dateTime' || props.mode === 'dateTimeRange') {
+        } else if (
+          props.mode === 'dateRange'
+          || props.mode === 'dateTime'
+          || props.mode === 'dateTimeRange'
+        ) {
           currentValue.value = curr;
           return;
         } else if (props.mode === 'date') {

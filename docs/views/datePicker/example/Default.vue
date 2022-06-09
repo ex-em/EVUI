@@ -43,15 +43,7 @@
         :options="{
           timeFormat: 'HH:00:ss'
         }"
-        :shortcuts="[{
-          label: 'Yesterday',
-          value: 'yesterday',
-          shortcutDate: () => new Date(new Date().setDate(new Date().getDate() - 1))
-        }, {
-          label: 'Today',
-          value: 'today',
-          shortcutDate: () => new Date()
-        }]"
+        :shortcuts="dateTime2Shortcut"
     />
     <div class="description">
       <span class="badge">
@@ -156,7 +148,8 @@
         mode="dateTimeRange"
         clearable
         :options="{
-          timeFormat: ['HH:00:ss', 'HH:59:ss']
+          timeFormat: ['HH:mm:00', 'HH:mm:00'],
+          disabledDate: disabledDateTime,
         }"
         :shortcuts="dateTimeRange2Shortcut"
     />
@@ -170,8 +163,8 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { computed, ref } from 'vue';
+import dayjs from 'dayjs';
 
 export default {
   setup() {
@@ -183,51 +176,69 @@ export default {
     const dateMulti3 = ref([]);
     const dateRange1 = ref([]);
     const dateTimeRange1 = ref([]);
-    const dateTimeRange2 = ref(['2021-11-10 16:01:01', '2021-12-10 17:10:15']);
+    const dateTimeRange2 = ref(['2022-06-07 16:01:01', '2022-06-08 17:10:15']);
 
-    const currentDate = new Date();
-    currentDate.setHours(0);
-    currentDate.setMinutes(0);
-    currentDate.setSeconds(0);
+    const TODAY_0_O_CLOCK_DATE = new Date(dayjs()
+        .format('YYYY-MM-DD 00:00:00'));
+
+    const dateTime2Shortcut = [{
+      label: 'Yesterday',
+      value: 'yesterday',
+      shortcutDate: () => new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
+    }, {
+      label: 'Today',
+      value: 'today',
+      shortcutDate: () => new Date(TODAY_0_O_CLOCK_DATE),
+    }];
 
     const dateTimeRange2Shortcut = [
         {
           label: 'LastMonth',
           value: 'lastMonth',
           shortcutDate: () => [
-            new Date(cloneDeep(currentDate).setDate(currentDate.getDate() - 30)),
-            currentDate,
+            new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'month')),
+            new Date(TODAY_0_O_CLOCK_DATE),
           ],
       },
       {
         label: 'LastWeek',
         value: 'lastWeek',
         shortcutDate: () => [
-          new Date(cloneDeep(currentDate).setDate(currentDate.getDate() - 6)),
-          currentDate,
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'week')),
+          new Date(TODAY_0_O_CLOCK_DATE),
         ],
       },
       {
-        label: 'Weekday',
-        value: 'weekday',
+        label: 'yesterday',
+        value: 'yesterday',
         shortcutDate: () => [
-          new Date(cloneDeep(currentDate)
-              .setDate(currentDate.getDate() - currentDate.getDay() + 1)),
-          new Date(cloneDeep(currentDate)
-              .setDate(currentDate.getDate() + (5 - currentDate.getDay()))),
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE)),
         ],
       },
       {
         label: 'Today',
         value: 'today',
-        shortcutDate: () => [currentDate, currentDate],
+        shortcutDate: () => [
+          new Date(TODAY_0_O_CLOCK_DATE),
+          new Date(+TODAY_0_O_CLOCK_DATE + (1000 * 60 * 30)),
+        ],
       },
     ];
+
+    const disabledDateTime = computed(() => [
+      time => (+time < +new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'month')))
+            || (+time > +new Date(dateTimeRange2.value[1]) - (1000 * 60 * 30)
+             && +time <= +new Date(dateTimeRange2.value[1])),
+      time => (+time < +new Date(dateTimeRange2.value[0]) + (1000 * 60 * 30))
+            || (+time >= +new Date(dayjs(TODAY_0_O_CLOCK_DATE).add(2, 'day'))),
+    ]);
 
     return {
       date1,
       dateTime1,
       dateTime2,
+      dateTime2Shortcut,
       dateMulti1,
       dateMulti2,
       dateMulti3,
@@ -235,6 +246,7 @@ export default {
       dateTimeRange1,
       dateTimeRange2,
       dateTimeRange2Shortcut,
+      disabledDateTime,
     };
   },
 };
