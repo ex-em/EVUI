@@ -511,8 +511,7 @@ const modules = {
         item.data.formatted = this.getFormattedTooltipValue({
           seriesName: series.name,
           value: hasData.o,
-          x: hasData.x,
-          y: hasData.y,
+          itemData: hasData,
         });
 
         hitInfo.items[sId] = item;
