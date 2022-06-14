@@ -105,10 +105,11 @@ class Scale {
   /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
+   * @param {number | undefined} decimalPoint
    *
    * @returns {object} steps, interval, min/max graph value
    */
-  calculateSteps(range) {
+  calculateSteps(range, decimalPoint) {
     const { maxValue, minValue } = range;
     let { maxSteps } = range;
 
@@ -127,7 +128,11 @@ class Scale {
     numberOfSteps = Math.round(graphRange / interval);
 
     if (maxValue === 1) {
-      if (maxSteps > 2) {
+      if (!decimalPoint) {
+        interval = 1;
+        numberOfSteps = 1;
+        maxSteps = 1;
+      } else if (maxSteps > 2) {
         interval = 0.2;
         numberOfSteps = 5;
         maxSteps = 5;
