@@ -453,6 +453,7 @@ const modules = {
     while (legendDOM.hasChildNodes()) {
       legendDOM.removeChild(legendDOM.firstChild);
     }
+    this.seriesInfo.count = 0;
   },
 
   /**
