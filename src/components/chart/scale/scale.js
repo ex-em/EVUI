@@ -127,7 +127,11 @@ class Scale {
     numberOfSteps = Math.round(graphRange / interval);
 
     if (maxValue === 1) {
-      if (maxSteps > 2) {
+      if (!this.decimalPoint) {
+        interval = 1;
+        numberOfSteps = 1;
+        maxSteps = 1;
+      } else if (maxSteps > 2) {
         interval = 0.2;
         numberOfSteps = 5;
         maxSteps = 5;

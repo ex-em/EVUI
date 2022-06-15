@@ -381,7 +381,6 @@ class EvChart {
         minSteps: this.labelRange.y[index].min,
         maxSteps: this.labelRange.y[index].max,
       };
-
       return axis.calculateSteps(range);
     });
 
