@@ -371,7 +371,7 @@ class EvChart {
         minSteps: this.labelRange.x[index].min,
         maxSteps: this.labelRange.x[index].max,
       };
-      return axis.calculateSteps(range, axis.decimalPoint);
+      return axis.calculateSteps(range);
     });
 
     const axesYMinMax = this.axesY.map((axis, index) => {
@@ -381,8 +381,7 @@ class EvChart {
         minSteps: this.labelRange.y[index].min,
         maxSteps: this.labelRange.y[index].max,
       };
-
-      return axis.calculateSteps(range, axis.decimalPoint);
+      return axis.calculateSteps(range);
     });
 
     return { x: axesXMinMax, y: axesYMinMax };
