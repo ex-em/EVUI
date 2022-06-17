@@ -101,6 +101,7 @@ export const AXIS_OPTION = {
     fontWeight: 400,
     fitWidth: false,
     fitDir: 'right',
+    alignToGridLine: false,
   },
   title: {
     use: false,

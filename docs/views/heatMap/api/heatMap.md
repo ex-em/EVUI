@@ -102,13 +102,10 @@ const chartData =
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
-   - rangeMode
-      - categoryMode인 경우만 사용 가능
-      - 축에 표시할 값을 line에 표시할지의 여부
+   - labelStyle > alignToGridLine
+     - categoryMode만 사용
 
 ##### step type
-   - rangeMode
-      - 축에 표시할 값을 line에 표시할지의 여부 
 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -119,6 +116,7 @@ const chartData =
 | fontFamily | String | 'Roboto' | 폰트 | |
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
+| alignToGridLine | Boolean | false | 축 line에 표시할지의 여부 | |
 
 ##### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
