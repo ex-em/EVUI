@@ -89,14 +89,14 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
             unit: 'second',
           },
           labelStyle: {
-            displayLine: true,
+            alignToGridLine: true,
           },
         }],
         axesY: [{
           type: 'step',
           showGrid: true,
           labelStyle: {
-            displayLine: true,
+            alignToGridLine: true,
           },
         }],
         heatMapColor: {
