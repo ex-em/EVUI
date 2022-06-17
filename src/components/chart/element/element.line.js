@@ -21,7 +21,6 @@ class Line {
     });
     this.type = 'line';
     this.sId = sId;
-    this.state = 'normal';
     this.extent = {
       downplay: { opacity: 0.1, lineWidth: 1 },
       normal: { opacity: 1, lineWidth: 1 },
@@ -44,28 +43,37 @@ class Line {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps, selectLabel } = param;
-    const extent = this.extent[this.state];
-    const selectLabelOption = selectLabel.option;
-    const selectedLabel = selectLabel.selected;
-    const isExistSelectedLabel = selectLabelOption.use
-      && selectLabelOption.useSeriesOpacity
-      && selectedLabel.dataIndex?.length > 0;
-    const downplayOpacity = this.extent.downplay.opacity;
+    const {
+      ctx, chartRect,
+      labelOffset, axesSteps,
+      selectLabel, selectSeries, legendHitInfo,
+    } = param;
 
-    const fillOpacity = isExistSelectedLabel
-      ? this.fillOpacity * downplayOpacity : this.fillOpacity * extent.opacity;
-    const lineWidth = this.lineWidth * extent.lineWidth;
+    // about selectLabel
+    const selectLabelOption = selectLabel?.option;
+    const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
+    const selectedLabelIndexList = selectLabel?.selected?.dataIndex ?? [];
 
-    const getOpacity = (colorStr) => {
-      const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
-      return this.state === 'downplay' || isExistSelectedLabel ? 0.1 : noneDownplayOpacity;
-    };
+    // set Style
+    let extent;
+    if (legendHitInfo) {
+      extent = this.extent[legendHitInfo?.sId === this.sId ? 'highlight' : 'downplay'];
+    } else if (selectSeries?.option?.use) {
+      const isSelectedSeries = selectSeries?.selected?.seriesId?.includes(this.sId);
+      extent = this.extent[isSelectedSeries ? 'highlight' : 'downplay'];
+    } else if (useSelectLabel && selectedLabelIndexList.length) {
+      extent = this.extent.downplay;
+    } else {
+      extent = this.extent.normal;
+    }
 
+    const getOpacity = colorStr => (colorStr.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
     const pointFillColorOpacity = getOpacity(pointFillColor);
+    const fillOpacity = getOpacity(mainColor) * this.fillOpacity;
+    const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();
     ctx.save();
@@ -169,18 +177,21 @@ class Line {
       ctx.fill();
     }
 
-    if (this.point || isExistSelectedLabel) {
+    // Draw points
+    if (this.point || useSelectLabel) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
 
-      this.data.forEach((curr, i) => {
-        if (curr.xp !== null && curr.yp !== null) {
-          ctx.fillStyle = isExistSelectedLabel && selectedLabel.dataIndex.includes(i)
-            ? focusStyle : blurStyle;
-          if (this.point || selectedLabel.dataIndex.includes(i)) {
-            Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
-          }
+      this.data.forEach((curr, ix) => {
+        const isSelectedLabel = selectedLabelIndexList.includes(ix);
+        if (curr.xp === null || curr.yp === null) {
+          return;
+        }
+
+        if (this.point || isSelectedLabel) {
+          ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
+          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
         }
       });
     }

@@ -140,12 +140,16 @@ class Bar {
 
       const barColor = item.dataColor || this.color;
 
-      const selectLabelOption = param.selectLabel.option;
-      const selectedLabel = param.selectLabel.selected ?? { dataIndex: [] };
+      const legendHitInfo = param?.legendHitInfo;
+      const selectLabelOption = param?.selectLabel?.option;
+      const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
+      let isDownplay = false;
 
-      const isDownplay = selectLabelOption.use && selectLabelOption.useSeriesOpacity
-          ? selectedLabel.dataIndex.length && !selectedLabel.dataIndex.includes(index)
-          : this.state === 'downplay';
+      if (legendHitInfo) {
+        isDownplay = legendHitInfo?.sId !== this.sId;
+      } else if (selectLabelOption?.use && selectLabelOption?.useSeriesOpacity) {
+        isDownplay = selectedLabelList.length && !selectedLabelList.includes(index);
+      }
 
       if (typeof barColor !== 'string') {
         ctx.fillStyle = Canvas.createGradient(

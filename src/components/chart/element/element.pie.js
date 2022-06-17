@@ -27,7 +27,6 @@ class Pie {
     this.doughnutHoleSize = 0;
     this.startAngle = 0;
     this.endAngle = 0;
-    this.state = null;
     this.ctx = null;
     this.isSelect = false;
   }
@@ -48,7 +47,7 @@ class Pie {
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
-    const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+    const opacity = this.isDownplay ? 0.1 : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);
@@ -120,7 +119,7 @@ class Pie {
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
 
-    const color = item.data.dataColor || this.color;
+    const color = item?.data?.dataColor || this.color;
     ctx.fillStyle = color;
     ctx.shadowColor = color;
 

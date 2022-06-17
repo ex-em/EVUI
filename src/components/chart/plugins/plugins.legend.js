@@ -214,24 +214,14 @@ const modules = {
       }
       const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
       const targetId = nameDOM.series.sId;
-      const selectSeriesOption = this.options.selectSeries;
-      const selectedList = this.defaultSelectInfo?.seriesId ?? [];
-
-      Object.values(this.seriesList).forEach((series) => {
-        series.state = series.sId === targetId
-        || (selectSeriesOption.use && selectedList.includes(targetId))
-          ? 'highlight' : 'downplay';
-      });
-
-      let hitInfo = null;
-      if (Util.isPieType(this.options.type)) {
-        hitInfo = { sId: targetId, type: this.options.type };
-      }
+      const legendHitInfo = { sId: targetId, type: this.options.type };
 
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
-        hitInfo,
+        hitInfo: {
+          legend: legendHitInfo,
+        },
       });
     };
 
@@ -241,20 +231,12 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxLeave = () => {
-      const selectSeriesOption = this.options.selectSeries;
-      const selectedList = this.defaultSelectInfo?.seriesId ?? [];
-      Object.values(this.seriesList).forEach((series) => {
-        if (selectSeriesOption.use && selectedList.length) {
-          series.state = selectedList.includes(series.sId)
-            ? 'highlight' : 'downplay';
-        } else {
-          series.state = 'normal';
-        }
-      });
-
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
+        hitInfo: {
+          legend: null,
+        },
       });
     };
 

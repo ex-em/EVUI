@@ -152,7 +152,7 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
-    this.drawTip(hitInfo);
+    this.drawTip();
     if (this.bufferCanvas) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
@@ -160,7 +160,7 @@ class EvChart {
 
   /**
    * Draw each series
-   * @param {any} [hitInfo=undefined]    from mousemove callback (object or undefined)
+   * @param {any} [hitInfo=undefined]   legend mouseover callback (object or undefined)
    *
    * @returns {undefined}
    */
@@ -198,26 +198,47 @@ class EvChart {
         switch (chartType) {
           case 'line':
           case 'heatMap': {
-            series.draw(opt);
+            const legendHitInfo = hitInfo?.legend;
+
+            series.draw({
+              legendHitInfo,
+              ...opt,
+            });
             break;
           }
           case 'bar': {
+            const legendHitInfo = hitInfo?.legend;
             const { thickness, cPadRatio, borderRadius } = this.options;
-            series.draw({ thickness, cPadRatio, borderRadius, showSeriesCount, showIndex, ...opt });
+
+            series.draw({
+              thickness,
+              cPadRatio,
+              borderRadius,
+              showSeriesCount,
+              showIndex,
+              legendHitInfo,
+              ...opt,
+            });
+
             if (series.show) {
               showIndex++;
             }
             break;
           }
           case 'pie': {
-            const selectInfo = hitInfo
-              ?? this.lastHitInfo
-              ?? { sId: this.defaultSelectItemInfo?.seriesID };
+            const selectInfo = this.lastHitInfo ?? { sId: this.defaultSelectItemInfo?.seriesID };
+            const legendHitInfo = hitInfo?.legend;
 
             if (this.options.sunburst) {
-              this.drawSunburst(selectInfo);
+              this.drawSunburst({
+                selectInfo,
+                legendHitInfo,
+              });
             } else {
-              this.drawPie(selectInfo);
+              this.drawPie({
+                selectInfo,
+                legendHitInfo,
+              });
             }
 
             if (this.options.doughnutHoleSize > 0) {
@@ -226,33 +247,30 @@ class EvChart {
             break;
           }
           case 'scatter': {
+            const legendHitInfo = hitInfo?.legend;
+
+            let selectInfo;
             if (selectItem.use && selectItem.useSeriesOpacity) {
-              if (hitInfo) {
-                if (hitInfo?.maxIndex || hitInfo?.maxIndex === 0) {
-                  opt.selectInfo = {
-                    seriesID: hitInfo.sId,
-                    dataIndex: hitInfo.maxIndex,
-                  };
-                } else {
-                  opt.selectInfo = null;
-                }
-              } else if (this.lastHitInfo?.maxIndex || this.lastHitInfo?.maxIndex === 0) {
-                opt.selectInfo = {
-                  seriesID: this.lastHitInfo.sId,
-                  dataIndex: this.lastHitInfo.maxIndex,
+              const lastHitInfo = this.lastHitInfo;
+              const defaultSelectInfo = this.defaultSelectItemInfo;
+
+              if (lastHitInfo?.maxIndex || lastHitInfo?.maxIndex === 0) {
+                selectInfo = {
+                  seriesID: lastHitInfo.sId,
+                  dataIndex: lastHitInfo.maxIndex,
                 };
-              } else if (this.defaultSelectItemInfo?.dataIndex
-                || this.defaultSelectItemInfo?.dataIndex === 0) {
-                opt.selectInfo = {
-                  seriesID: this.defaultSelectItemInfo.seriesID,
-                  dataIndex: this.defaultSelectItemInfo.dataIndex,
-                };
+              } else if (defaultSelectInfo?.dataIndex || defaultSelectInfo?.dataIndex === 0) {
+                selectInfo = { ...defaultSelectInfo };
               } else {
-                opt.selectInfo = null;
+                selectInfo = null;
               }
             }
 
-            series.draw(opt);
+            series.draw({
+              legendHitInfo,
+              selectInfo,
+              ...opt,
+            });
             break;
           }
           default: {
@@ -265,18 +283,11 @@ class EvChart {
 
   /**
    * Draw Tip with hitInfo and defaultSelectItemInfo
-   * @param hitInfo
    */
-  drawTip(hitInfo) {
-    if (Util.isPieType(hitInfo?.type)) {
-      return;
-    }
-
+  drawTip() {
     let tipLocationInfo;
 
-    if (hitInfo) {
-      tipLocationInfo = hitInfo;
-    } else if (this.lastHitInfo) {
+    if (this.lastHitInfo) {
       tipLocationInfo = this.lastHitInfo;
     } else if (this.defaultSelectItemInfo) {
       tipLocationInfo = this.getItem(this.defaultSelectItemInfo, false);

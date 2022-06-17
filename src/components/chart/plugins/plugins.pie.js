@@ -77,7 +77,9 @@ const modules = {
               ctx.stroke();
             }
 
-            series.isSelect = hitInfo?.sId === slice.id;
+            const { selectInfo, legendHitInfo } = hitInfo;
+            series.isSelect = selectInfo?.sId === slice.id;
+            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
             series.type = isDoughnut ? 'doughnut' : 'pie';
             series.centerX = centerX;
             series.centerY = centerY;
@@ -175,7 +177,9 @@ const modules = {
               ctx.stroke();
             }
 
-            series.isSelect = hitInfo?.sId === slice.id;
+            const { selectInfo, legendHitInfo } = hitInfo;
+            series.isSelect = selectInfo?.sId === slice.id;
+            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
             series.type = 'sunburst';
             series.centerX = centerX;
             series.centerY = centerY;
