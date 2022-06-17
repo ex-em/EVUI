@@ -101,6 +101,7 @@ export const AXIS_OPTION = {
     fontWeight: 400,
     fitWidth: false,
     fitDir: 'right',
+    displayLine: false,
   },
   title: {
     use: false,

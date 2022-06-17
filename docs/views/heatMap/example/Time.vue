@@ -83,17 +83,21 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
           type: 'time',
           timeFormat: 'HH:mm:ss',
           categoryMode: true,
-          rangeMode: true,
           showGrid: false,
           interval: {
             time: 2,
             unit: 'second',
           },
+          labelStyle: {
+            displayLine: true,
+          },
         }],
         axesY: [{
           type: 'step',
           showGrid: true,
-          rangeMode: true,
+          labelStyle: {
+            displayLine: true,
+          },
         }],
         heatMapColor: {
           min: '#E1FBAD',

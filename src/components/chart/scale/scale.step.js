@@ -17,7 +17,7 @@ class StepScale extends Scale {
    * @returns {object} min/max value and label
    */
   calculateScaleRange(minMax, chartRect) {
-    const stepMinMax = this.rangeMode
+    const stepMinMax = this.labelStyle.displayLine
       ? minMax : Util.getStringMinMax(this.labels);
     const maxValue = stepMinMax.max;
     const minValue = stepMinMax.min;
@@ -45,7 +45,8 @@ class StepScale extends Scale {
     let numberOfSteps = this.labels.length;
     let interval = 1;
 
-    if (this.rangeMode) {
+    const isNumbersArray = this.labels.every(label => !isNaN(label));
+    if (this.labelStyle.displayLine && isNumbersArray) {
       const { maxSteps } = range;
 
       if (maxSteps > 2) {
@@ -128,6 +129,7 @@ class StepScale extends Scale {
       }
 
       const labelGap = (endPoint - startPoint) / labels.length;
+      const labelDisplayLine = this.labelStyle.displayLine;
       let labelCenter = null;
       let linePosition = null;
 
@@ -161,7 +163,7 @@ class StepScale extends Scale {
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          const xPoint = this.rangeMode ? labelCenter : labelCenter + (labelGap / 2);
+          const xPoint = labelDisplayLine ? labelCenter : labelCenter + (labelGap / 2);
           ctx.fillText(labelText, xPoint, labelPoint);
 
           if (!isBlurredLabel
@@ -192,7 +194,7 @@ class StepScale extends Scale {
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          const yPoint = this.rangeMode ? labelCenter : labelCenter + (labelGap / 2);
+          const yPoint = labelDisplayLine ? labelCenter : labelCenter + (labelGap / 2);
           ctx.fillText(labelText, labelPoint, yPoint);
 
           if (index > 0 && this.showGrid) {
@@ -203,7 +205,7 @@ class StepScale extends Scale {
         ctx.stroke();
       }
 
-      if (this.rangeMode && (index === this.labels.length)) {
+      if (labelDisplayLine && (index === this.labels.length)) {
         let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
         if (isNaN(labelLastText)) {
           labelLastText = 'Max';

@@ -165,8 +165,9 @@ class TimeCategoryScale extends Scale {
       return;
     }
 
+    const labelDisplayLine = this.labelStyle.displayLine;
     const graphGap = (endPoint - startPoint) / (labels.length || 1);
-    if (this.categoryMode && !this.rangeMode) {
+    if (this.categoryMode && !labelDisplayLine) {
       startPoint += Math.ceil(graphGap / 2) - 2;
     }
 
@@ -244,7 +245,7 @@ class TimeCategoryScale extends Scale {
       ctx.stroke();
     }
 
-    if (this.categoryMode && this.rangeMode && (count * steps) === oriSteps) {
+    if (this.categoryMode && labelDisplayLine && (count * steps) === oriSteps) {
       const diffTime = dayjs(labels[1]).diff(dayjs(labels[0]));
       const labelLastText = this.getLabelFormat(
         dayjs(labels[labels.length - 1] + diffTime),
