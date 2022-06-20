@@ -1,6 +1,5 @@
 import throttle from '@/common/utils.throttle';
 import Model from './model';
-import Util from './helpers/helpers.util';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
 import LogarithmicScale from './scale/scale.logarithmic';

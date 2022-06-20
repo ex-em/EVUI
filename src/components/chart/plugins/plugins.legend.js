@@ -1,5 +1,3 @@
-import Util from '@/components/chart/helpers/helpers.util';
-
 const modules = {
   /**
    * Create legend DOM
