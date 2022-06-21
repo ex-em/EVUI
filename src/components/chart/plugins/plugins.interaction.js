@@ -469,7 +469,7 @@ const modules = {
     }
 
     if (value && (!tooltipValueFormatter || typeof formattedTxt !== 'string')) {
-      if (this.options.type === 'heatMap') {
+      if (opt.type === 'heatMap') {
         formattedTxt = value < 0 ? 'error' : numberWithComma(value);
       } else {
         formattedTxt = numberWithComma(value);
