@@ -482,41 +482,61 @@ const modules = {
    * @param hitInfo
    */
   addNotHitInfo(hitInfo) {
+    const ctx = this.tooltipCtx;
     const isHorizontal = !!this.options.horizontal;
-
     const hitItemId = Object.keys(hitInfo.items)[0];
     const hitItemData = isHorizontal
       ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
+    let maxSeriesName = '';
+    let maxValueTxt = '';
 
     const sIds = Object.keys(this.seriesList);
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      const hasData = series.data.find(data => (
-          isHorizontal
-            ? data?.y === hitItemData
-            : data?.x === hitItemData
-        ),
-      );
+      if (series?.show) {
+        const hasData = series.data.find(data => (
+            isHorizontal
+              ? data?.y === hitItemData
+              : data?.x === hitItemData
+          ),
+        );
 
-      if (hasData && !hitInfo.items[sId] && series?.show) {
-        const item = {};
-        item.color = series.color;
-        item.hit = false;
-        item.name = series.name;
-        item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
-        item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
-        item.data = hasData;
-        item.data.formatted = this.getFormattedTooltipValue({
+        const formattedValue = this.getFormattedTooltipValue({
           seriesName: series.name,
-          value: hasData.o,
+          value: hasData?.o,
           itemData: hasData,
         });
 
-        hitInfo.items[sId] = item;
+        if (hasData && !hitInfo.items[sId]) {
+          const item = {};
+          item.color = series.color;
+          item.hit = false;
+          item.name = series.name;
+          item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+          item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
+          item.data = hasData;
+          item.data.formatted = formattedValue;
+
+          hitInfo.items[sId] = item;
+        }
+
+        const maxSeriesNameWidth = ctx ? ctx.measureText(maxSeriesName).width : 1;
+        const seriesNameWidth = ctx ? ctx.measureText(series.name).width : 1;
+        if (maxSeriesNameWidth < seriesNameWidth) {
+          maxSeriesName = series.name;
+        }
+
+        const maxValueWidth = ctx ? ctx.measureText(maxValueTxt).width : 1;
+        const valueWidth = ctx ? ctx.measureText(`${formattedValue}`).width : 1;
+        if (maxValueWidth < valueWidth) {
+          maxValueTxt = `${formattedValue}`;
+        }
       }
     }
+
+    hitInfo.maxTip = [maxSeriesName, maxValueTxt];
   },
 
   /**
