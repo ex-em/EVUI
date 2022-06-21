@@ -587,17 +587,6 @@ const modules = {
       if (!this.defaultSelectInfo) {
         this.defaultSelectInfo = { seriesId: [] };
       }
-
-      const selectedList = this.defaultSelectInfo.seriesId;
-      Object.values(this.seriesList).forEach((series) => {
-        if (!selectedList.length) {
-          series.state = 'normal';
-        } else if (selectedList.includes(series.sId)) {
-          series.state = 'highlight';
-        } else {
-          series.state = 'downplay';
-        }
-      });
     }
   },
 

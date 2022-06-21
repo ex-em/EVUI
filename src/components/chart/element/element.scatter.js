@@ -71,23 +71,16 @@ class Scatter {
 
     const getOpacity = (colorStr, dataIndex) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
-      let resultOpacity = noneDownplayOpacity;
+      let isDownplay = false;
 
-      const { selectInfo } = param;
-      if (selectInfo) {
-        const isSelectedData = selectInfo?.seriesID === this.sId
-          && selectInfo?.dataIndex === dataIndex;
-
-        if (isSelectedData) {
-          resultOpacity = noneDownplayOpacity;
-        } else {
-          resultOpacity = 0.1;
-        }
-      } else {
-        resultOpacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      const { selectInfo, legendHitInfo } = param;
+      if (legendHitInfo) {
+        isDownplay = legendHitInfo.sId !== this.sId;
+      } else if (selectInfo) {
+        isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
       }
 
-      return resultOpacity;
+      return isDownplay ? 0.1 : noneDownplayOpacity;
     };
 
     this.data.forEach((curr, idx) => {
