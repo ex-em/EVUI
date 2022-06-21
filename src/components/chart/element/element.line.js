@@ -58,7 +58,7 @@ class Line {
     let extent;
     if (legendHitInfo) {
       extent = this.extent[legendHitInfo?.sId === this.sId ? 'highlight' : 'downplay'];
-    } else if (selectSeries?.option?.use) {
+    } else if (selectSeries?.option?.use && selectSeries?.selected?.seriesId?.length) {
       const isSelectedSeries = selectSeries?.selected?.seriesId?.includes(this.sId);
       extent = this.extent[isSelectedSeries ? 'highlight' : 'downplay'];
     } else if (useSelectLabel && selectedLabelIndexList.length) {
