@@ -55,6 +55,9 @@
           autoScaleRatio: 0.1,
           showGrid: false,
         }],
+        tooltip: {
+          showAllValueInRange: true,
+        },
       };
 
       return {
