@@ -21,8 +21,8 @@
           'value5',
         ],
         data: {
-          series1: [100, 150, 51, 150, { value: 350, color: '#FF0000' }],
-          series2: [150.0, 100.2, 151.433, 50.221, 250.123],
+          series1: [null, 150, 0, 150, { value: 350, color: '#FF0000' }],
+          series2: [null, 100.2, 0, 50.221, 250.123],
         },
       };
 
@@ -57,6 +57,7 @@
         }],
         tooltip: {
           showAllValueInRange: true,
+          formatter: ({ y }) => `${y}`,
         },
       };
 
