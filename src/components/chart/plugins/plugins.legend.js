@@ -1,3 +1,5 @@
+import Util from '../helpers/helpers.util';
+
 const modules = {
   /**
    * Create legend DOM
@@ -18,8 +20,48 @@ const modules = {
       this.wrapperDOM.appendChild(this.resizeDOM);
     }
 
+    if (this.useTable) {
+      this.legendTableDOM = document.createElement('table');
+      this.legendTableDOM.className = 'ev-chart-legend--table';
+      this.setLegendColumnHeader();
+      this.legendBoxDOM.appendChild(this.legendTableDOM);
+      this.legendDOM.style.overflow = 'auto';
+    }
+
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
+  },
+
+  /**
+   * Create and append Table Header DOM
+   * Only chartOption > legend > table > use : true
+   *
+   * @returns {undefined}
+   */
+  setLegendColumnHeader() {
+    const tableOpt = this.options.legend?.table;
+    const columns = tableOpt.columns;
+    const columnKeyList = ['', ...Object.keys(columns)];
+
+    columnKeyList.forEach((key) => {
+      const columnNameDOM = document.createElement('th');
+      columnNameDOM.className = 'ev-chart-legend--table__column-name';
+
+      if (columns[key]?.use || key === '') {
+        const columnOpt = columns[key];
+        const keyText = !columnOpt?.title && columnOpt?.title !== ''
+          ? key.toUpperCase()
+          : columnOpt.title;
+
+        columnNameDOM.textContent = keyText;
+        columnNameDOM.setAttribute('title', keyText);
+        columnNameDOM.dataset.type = keyText;
+
+        Util.setDOMStyle(columnNameDOM, tableOpt?.style?.header);
+
+        this.legendTableDOM.append(columnNameDOM);
+      }
+    });
   },
 
   /**
@@ -31,6 +73,8 @@ const modules = {
    */
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
+    this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+
     if (!this.isInitLegend) {
       this.createLegendLayout();
     }
@@ -42,6 +86,7 @@ const modules = {
       this.initEvent();
       this.addLegendList();
     }
+
     this.initResizeEvent();
 
     this.isInitLegend = true;
@@ -61,19 +106,37 @@ const modules = {
 
     groups.forEach((group) => {
       group.slice().reverse().forEach((sId) => {
-        if (seriesList[sId] && seriesList[sId].showLegend) {
-          this.addLegend(seriesList[sId]);
+        const series = seriesList[sId];
+
+        if (series && series.showLegend) {
+          if (this.useTable) {
+            this.addLegendWithValues(series);
+          } else {
+            this.addLegend(series);
+          }
         }
       });
     });
 
     Object.values(seriesList).forEach((series) => {
-      if (!series.isExistGrp && series.showLegend) {
+      if (series.isExistGrp || !series.showLegend) {
+        return;
+      }
+
+      if (this.useTable) {
+        this.addLegendWithValues(series);
+      } else {
         this.addLegend(series);
       }
     });
   },
 
+  /**
+   * Add Legend with Color Information
+   * Only Heatmap chart
+   *
+   * @returns {undefined}
+   */
   addColorLegendList() {
     const seriesList = this.seriesList;
 
@@ -119,6 +182,31 @@ const modules = {
   },
 
   /**
+   * Get Container DOM by Event Object
+   * @param e Event
+   *
+   * @returns {Element}
+   */
+  getContainerDOM(e) {
+    let targetDOM = null;
+    const type = e.target.dataset.type;
+
+    const childTypes = ['name', 'color', 'min', 'max', 'avg', 'total', 'last'];
+
+    if (type === 'container') {
+      targetDOM = e.target;
+    } else if (childTypes.includes(type)) {
+      targetDOM = e.target.parentElement;
+
+      if (!targetDOM?.series) {
+        targetDOM = targetDOM.parentElement;
+      }
+    }
+
+    return targetDOM;
+  },
+
+  /**
    * Initialize legend event
    *
    * @returns {undefined}
@@ -127,6 +215,14 @@ const modules = {
     if (this.isInitLegend) {
       return;
     }
+
+    const classList = {
+      container: `ev-chart-legend${this.useTable ? '--table__container' : '-container'}`,
+      color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
+      name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
+      value: `ev-chart-legend${this.useTable ? '--table__value' : '-value'}`,
+    };
+
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
@@ -134,22 +230,19 @@ const modules = {
      */
     this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
-      const type = e.target.dataset.type;
 
-      let targetDOM;
-      if (type === 'container') {
-        targetDOM = e.target;
-      } else if (type === 'name' || type === 'color') {
-        targetDOM = e.target.parentElement;
-      } else {
+      const targetDOM = this.getContainerDOM(e);
+      if (!targetDOM) {
         return;
       }
 
-      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
-      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
-      const isActive = !colorDOM?.className.includes('inactive');
-      const series = nameDOM?.series;
+      const series = targetDOM?.series;
 
+      const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
+      const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
+      const valueDOMList = targetDOM?.getElementsByClassName(classList.value);
+
+      const isActive = !targetDOM?.className.includes('inactive');
       if (isActive && this.seriesInfo.count === 1) {
         return;
       }
@@ -160,9 +253,14 @@ const modules = {
 
       if (isActive) {
         this.seriesInfo.count--;
-        colorDOM.style.backgroundColor = opt.inactive;
-        colorDOM.style.borderColor = opt.inactive;
-        nameDOM.style.color = opt.inactive;
+
+        const inactiveColor = opt.inactive;
+        colorDOM.style.backgroundColor = inactiveColor;
+        colorDOM.style.borderColor = inactiveColor;
+        nameDOM.style.color = inactiveColor;
+        valueDOMList?.forEach((dom) => {
+          dom.style.color = inactiveColor;
+        });
       } else {
         this.seriesInfo.count++;
 
@@ -182,11 +280,14 @@ const modules = {
         }
 
         nameDOM.style.color = opt.color;
+        valueDOMList?.forEach((dom) => {
+          const style = opt.table?.columns[dom.dataset.type]?.style;
+          dom.style.color = style?.color ? style.color : opt.color;
+        });
       }
 
       series.show = !series.show;
-      colorDOM.classList.toggle('inactive');
-      nameDOM.classList.toggle('inactive');
+      targetDOM.classList.toggle('inactive');
 
       this.update({
         updateSeries: false,
@@ -200,18 +301,12 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxOver = (e) => {
-      const type = e.target.dataset.type;
-
-      let targetDOM;
-      if (type === 'container') {
-        targetDOM = e.target;
-      } else if (type === 'name' || type === 'color') {
-        targetDOM = e.target.parentElement;
-      } else {
+      const targetDOM = this.getContainerDOM(e);
+      if (!targetDOM) {
         return;
       }
-      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
-      const targetId = nameDOM.series.sId;
+
+      const targetId = targetDOM?.series?.sId;
       const legendHitInfo = { sId: targetId, type: this.options.type };
 
       this.update({
@@ -245,10 +340,15 @@ const modules = {
     this.initResizeEvent();
   },
 
+  /**
+   * Init Event on Color Legend
+   * Only Heatmap
+   */
   initEventForColorLegend() {
     if (this.isInitLegend) {
       return;
     }
+
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
@@ -257,21 +357,16 @@ const modules = {
     this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
       const series = Object.values(this.seriesList)[0];
-      const type = e.target.dataset.type;
 
-      let targetDOM;
-      if (type === 'container') {
-        targetDOM = e.target;
-      } else if (type === 'name' || type === 'color') {
-        targetDOM = e.target.parentElement;
-      } else {
+      const targetDOM = this.getContainerDOM(e);
+      if (!targetDOM) {
         return;
       }
 
       const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
       const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
+      const targetId = targetDOM?.series?.cId;
       const isActive = !colorDOM?.className.includes('inactive');
-      const targetId = nameDOM.series.cId;
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
       if (isActive && activeCount === 1) {
@@ -287,7 +382,7 @@ const modules = {
         colorDOM.style.borderColor = opt.inactive;
         nameDOM.style.color = opt.inactive;
       } else {
-        colorDOM.style.backgroundColor = nameDOM.series.color;
+        colorDOM.style.backgroundColor = targetDOM?.series?.color;
         nameDOM.style.color = opt.color;
       }
 
@@ -304,25 +399,21 @@ const modules = {
         updateSelTip: { update: true, keepDomain: true },
       });
     };
+
     /**
      * callback for legendBoxDOM hovering
      *
      * @returns {undefined}
      */
     this.onLegendBoxOver = (e) => {
-      const type = e.target.dataset.type;
-      const series = Object.values(this.seriesList)[0];
+      const series = Object.values(this.seriesList)?.[0];
 
-      let targetDOM;
-      if (type === 'container') {
-        targetDOM = e.target;
-      } else if (type === 'name' || type === 'color') {
-        targetDOM = e.target.parentElement;
-      } else {
+      const targetDOM = this.getContainerDOM(e);
+      if (!targetDOM) {
         return;
       }
-      const nameDOM = targetDOM.getElementsByClassName('ev-chart-legend-name')[0];
-      const targetId = nameDOM.series.cId;
+
+      const targetId = targetDOM?.series?.cId;
 
       series.colorState.forEach((colorItem) => {
         colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
@@ -350,6 +441,7 @@ const modules = {
         updateSelTip: { update: false, keepDomain: false },
       });
     };
+
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
@@ -411,6 +503,7 @@ const modules = {
    */
   updateLegend() {
     this.resetLegend();
+
     if (this.isHeatMapType) {
       this.addColorLegendList();
     } else {
@@ -419,21 +512,79 @@ const modules = {
   },
 
   /**
+   * To update value text on legend table
+   * Only chartOption > legend > table > use : true
+   *
+   * @returns {undefined}
+   */
+  updateLegendTableValues() {
+    const columns = this.options?.legend?.table?.columns;
+    const aggregations = this.getAggregations();
+    const rowDOMList = this.legendBoxDOM?.getElementsByClassName('ev-chart-legend--table__row');
+
+    rowDOMList.forEach((row) => {
+      const valueDOMList = row?.getElementsByClassName('ev-chart-legend--table__value');
+
+      valueDOMList.forEach((dom) => {
+        const key = dom.dataset.type;
+        if (key === 'name') {
+          return;
+        }
+
+        const seriesId = row.series.sId;
+        const value = +aggregations?.[seriesId]?.[key];
+        dom.textContent = this.getFormattedValue(columns[key], value);
+      });
+    });
+  },
+
+  /**
+   * Force Update Legend. Remove and Create
+   *
+   * @returns {undefined}
+   */
+  forceUpdateLegend() {
+    this.destroyLegend();
+    this.initLegend();
+  },
+
+  /**
    * To update legend, remove all of legendBoxDOM's children
    *
    * @returns {undefined}
    */
   resetLegend() {
-    const legendDOM = this.legendBoxDOM;
+    const legendBoxDOM = this.legendBoxDOM;
+
+    if (!legendBoxDOM) {
+      return;
+    }
+
+    while (legendBoxDOM.hasChildNodes()) {
+      legendBoxDOM.removeChild(legendBoxDOM.firstChild);
+    }
+
+    this.seriesInfo.count = 0;
+  },
+
+  /**
+   * To update legend, remove all of legendBoxDOM's children
+   *
+   * @returns {undefined}
+   */
+  destroyLegend() {
+    const legendDOM = this.legendDOM;
 
     if (!legendDOM) {
       return;
     }
 
-    while (legendDOM.hasChildNodes()) {
-      legendDOM.removeChild(legendDOM.firstChild);
-    }
-    this.seriesInfo.count = 0;
+    legendDOM.remove();
+
+    this.legendDOM = null;
+    this.legendBoxDOM = null;
+    this.resizeDOM = null;
+    this.isInitLegend = false;
   },
 
   /**
@@ -448,6 +599,8 @@ const modules = {
     const nameDOM = document.createElement('div');
 
     containerDOM.className = 'ev-chart-legend-container';
+    containerDOM.series = series;
+
     colorDOM.className = 'ev-chart-legend-color';
 
     if (series.type === 'line' && series.point && !series.fill) {
@@ -455,7 +608,6 @@ const modules = {
     }
 
     nameDOM.className = 'ev-chart-legend-name';
-    nameDOM.series = series;
 
     let seriesColor;
     if (typeof series.color !== 'string') {
@@ -496,6 +648,115 @@ const modules = {
 
     this.legendBoxDOM.appendChild(containerDOM);
     this.seriesInfo.count++;
+  },
+
+  /**
+   * Add Legend Items With aggregation Values
+   * Only chartOption > legend > table > use : true
+   * @param series
+   */
+  addLegendWithValues(series) {
+    const opt = this.options.legend;
+    const columns = opt?.table?.columns;
+
+    const aggregations = this.getAggregations()?.[series?.sId];
+    if (!aggregations || !columns) {
+      return;
+    }
+
+    // create row
+    const rowDOM = document.createElement('tr');
+    rowDOM.className = 'ev-chart-legend--table__row';
+    Util.setDOMStyle(rowDOM, opt.table?.style?.row);
+    rowDOM.series = series;
+    rowDOM.dataset.type = 'container';
+
+    // create td - color
+    const colorWrapperDOM = document.createElement('td');
+    colorWrapperDOM.className = 'ev-chart-legend--table__color-wrapper';
+    colorWrapperDOM.dataset.type = 'color';
+
+    const colorDOM = document.createElement('div');
+    colorDOM.className = 'ev-chart-legend--table__color';
+    colorDOM.dataset.type = 'color';
+
+    let seriesColor;
+    if (typeof series.color !== 'string') {
+      seriesColor = series.color[series.color.length - 1][1];
+    } else {
+      seriesColor = series.color;
+    }
+
+    switch (series.type) {
+      case 'line': {
+        if (series.fill) {
+          colorDOM.style.backgroundColor = `${seriesColor}80`;
+          colorDOM.style.border = `1px solid ${seriesColor}`;
+        } else {
+          if (series.point) {
+            colorDOM.className += ' ev-chart-legend--table__color--point-line';
+          }
+
+          colorDOM.className += ' ev-chart-legend--table__color--line';
+          colorDOM.style.backgroundColor = seriesColor;
+        }
+        break;
+      }
+
+      case 'bar':
+      case 'pie':
+      default: {
+        colorDOM.style.height = '10px';
+        colorDOM.style.backgroundColor = seriesColor;
+        break;
+      }
+    }
+
+    if (series.type === 'line' && series.fill) {
+      colorDOM.style.height = '8px';
+      colorDOM.style.backgroundColor = `${seriesColor}80`;
+      colorDOM.style.border = `1px solid ${seriesColor}`;
+    } else {
+      colorDOM.style.backgroundColor = seriesColor;
+    }
+
+    colorWrapperDOM.appendChild(colorDOM);
+    rowDOM.appendChild(colorWrapperDOM);
+
+    // create td - name
+    if (columns.name.use) {
+      const nameDOM = document.createElement('td');
+      nameDOM.className = 'ev-chart-legend--table__name';
+      nameDOM.style.color = opt.color;
+      nameDOM.textContent = series.name;
+      nameDOM.setAttribute('title', series.name);
+      nameDOM.dataset.type = 'name';
+      Util.setDOMStyle(nameDOM, columns?.name?.style);
+      rowDOM.appendChild(nameDOM);
+    }
+
+    // create td - values
+    const columnKeyList = Object.keys(columns);
+    columnKeyList?.forEach((key) => {
+      if (key === 'name') {
+        return;
+      }
+
+      if (columns[key].use) {
+        const formattedTxt = this.getFormattedValue(columns[key], +aggregations[key]);
+        const valueDOM = document.createElement('td');
+        valueDOM.className = 'ev-chart-legend--table__value';
+        valueDOM.style.color = opt.color;
+        valueDOM.textContent = formattedTxt;
+        valueDOM.dataset.type = key.toString();
+        Util.setDOMStyle(valueDOM, columns[key]?.style);
+
+        rowDOM.appendChild(valueDOM);
+      }
+    });
+
+    this.seriesInfo.count++;
+    this.legendTableDOM.appendChild(rowDOM);
   },
 
   /**
@@ -664,6 +925,7 @@ const modules = {
       }
     }
   },
+
   /**
    * When user moves resizeDOM, this function will change css
    *
@@ -843,6 +1105,28 @@ const modules = {
     legendStyle.height = '0';
     wrapperStyle.padding = `${title}px 0 0 0`;
   },
+
+  /**
+   * Get formatted value by formatter function
+   * Only chartOption > legend > table > use : true
+   * @param formatter
+   * @param decimalPoint
+   * @param value
+   * @returns {string}
+   */
+  getFormattedValue({ formatter, decimalPoint }, value) {
+    let formattedTxt;
+    if (formatter) {
+      formattedTxt = formatter(value);
+    }
+
+    if (!formatter || typeof formattedTxt !== 'string') {
+      formattedTxt = Util.labelSignFormat(value, decimalPoint);
+    }
+
+    return formattedTxt;
+  },
+
 };
 
 export default modules;

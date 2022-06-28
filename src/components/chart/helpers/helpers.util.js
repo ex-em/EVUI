@@ -325,4 +325,14 @@ export default {
   isDoughnutHole(type) {
     return type === 'doughnut' || type === 'sunburst';
   },
+
+  setDOMStyle(targetDOM, styleObject) {
+    if (!targetDOM || !styleObject) {
+      return;
+    }
+
+    Object.keys(styleObject)?.forEach((key) => {
+      targetDOM.style[key] = styleObject[key];
+    });
+  },
 };

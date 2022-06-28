@@ -29,6 +29,29 @@ const DEFAULT_OPTIONS = {
     width: 140,
     height: 24,
     allowResize: false,
+    table: {
+      use: false,
+      columns: {
+        name: {
+          use: true,
+        },
+        min: {
+          use: false,
+        },
+        max: {
+          use: false,
+        },
+        avg: {
+          use: false,
+        },
+        total: {
+          use: false,
+        },
+        last: {
+          use: false,
+        },
+      },
+    },
   },
   itemHighlight: true,
   seriesHighlight: true,

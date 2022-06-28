@@ -937,6 +937,31 @@ const modules = {
 
     return null;
   },
+
+  /**
+   * Get Aggregations (
+   * @returns {{}}
+   */
+  getAggregations() {
+    const allData = this.data.data;
+    const series = this.data.series;
+    const aggregationDataSet = {};
+    const seriesIds = Object.keys(series);
+
+    seriesIds?.forEach((sId) => {
+      const dataList = allData[sId].map(data => (data.value ? data.value : data));
+
+      const min = (Math.min(...dataList));
+      const max = (Math.max(...dataList));
+      const total = (dataList.reduce((a, b) => a + b, 0));
+      const avg = (total / dataList.length || 0);
+      const last = (dataList[dataList.length - 1]);
+
+      aggregationDataSet[sId] = { min, max, avg, total, last };
+    });
+
+    return aggregationDataSet;
+  },
 };
 
 export default modules;

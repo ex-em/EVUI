@@ -620,7 +620,7 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const { updateSeries, updateSelTip } = updateInfo;
+    const { updateSeries, updateSelTip, updateLegend, updateData } = updateInfo;
 
     if (!this.isInit) {
       return;
@@ -680,10 +680,16 @@ class EvChart {
     }
 
     if (options.legend.show) {
+      const useTable = !!options?.legend?.table?.use;
+
       if (!this.isInitLegend) {
         this.initLegend();
       } else if (updateSeries) {
         this.updateLegend();
+      } else if (updateLegend) {
+        this.forceUpdateLegend();
+      } else if (useTable && updateData) {
+        this.updateLegendTableValues();
       }
 
       this.setLegendPosition();

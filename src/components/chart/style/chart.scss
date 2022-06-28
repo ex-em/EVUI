@@ -30,11 +30,7 @@
 .ev-chart-legend {
   position: absolute;
   overflow: hidden;
-}
-
-.ev-chart-legend-box {
-  overflow-x: hidden;
-  overflow-y: auto;
+  padding: 5px 0 0 0;
 }
 
 .ev-chart-legend-container {
@@ -93,6 +89,78 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.ev-chart-legend--table {
+  $ev-chart-legend-table-row-padding: 3px;
+  $ev-chart-legend-table-color-width: 18px;
+
+  width: 100%;
+  font-size: 12px;
+  user-select: none;
+  border-collapse: collapse;
+
+  td, th {
+    padding: $ev-chart-legend-table-row-padding;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__row {
+    cursor: pointer;
+    min-height: 18px;
+
+    &:hover {
+      font-weight: bold;
+    }
+  }
+
+  &__color {
+    width: 18px;
+
+    &-wrapper {
+      position: relative;
+      min-width: 18px;
+    }
+
+    &--line {
+      height: 4px;
+    }
+
+    &--point-line {
+      position: absolute;
+      top: 50%;
+      left: $ev-chart-legend-table-row-padding;
+      transform: translate(0, -50%);
+      height: 4px;
+
+      &::after {
+        display: inline-block;
+        position: absolute;
+        top: -2px;
+        left: 5px;
+        width: 8px;
+        height: 8px;
+        content: ' ';
+        border-radius: 50%;
+        background-color: inherit;
+      }
+    }
+  }
+
+  &__name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__value {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .ev-chart-legend-line {

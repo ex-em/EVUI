@@ -103,10 +103,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
 
         await watch(() => props.options, (chartOpt) => {
           const newOpt = getNormalizedOptions(chartOpt);
+          const isUpdateLegend = !isEqual(newOpt.legend, evChart.options.legend);
           evChart.options = cloneDeep(newOpt);
           evChart.update({
             updateSeries: false,
             updateSelTip: { update: false, keepDomain: false },
+            updateLegend: isUpdateLegend,
           });
         }, { deep: true });
 
@@ -115,10 +117,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
               || !isEqual(newData.groups, evChart.data.groups)
               || props.options.type === 'heatMap';
+          const isUpdateData = !isEqual(newData.data, evChart.data);
           evChart.data = cloneDeep(newData);
           evChart.update({
             updateSeries: isUpdateSeries,
             updateSelTip: { update: true, keepDomain: false },
+            updateData: isUpdateData,
           });
         }, { deep: true });
 
