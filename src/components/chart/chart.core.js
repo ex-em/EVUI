@@ -680,7 +680,9 @@ class EvChart {
     }
 
     if (options.legend.show) {
-      const useTable = !!options?.legend?.table?.use;
+      const useTable = !!options.legend?.table?.use
+        && options.type !== 'heatmap'
+        && options.type !== 'scatter';
 
       if (!this.isInitLegend) {
         this.initLegend();
