@@ -84,7 +84,7 @@ class Bar {
     bArea = cArea > (cPad * 2) ? (cArea - (cPad * 2)) : cArea;
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
-    const size = Math.round(bArea * thickness);
+    const size = Math.ceil(bArea * thickness);
 
     w = isHorizontal ? null : size;
     h = isHorizontal ? size : null;

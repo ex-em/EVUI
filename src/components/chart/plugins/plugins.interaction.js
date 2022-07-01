@@ -438,36 +438,38 @@ const modules = {
    * @returns {string}
    */
   getFormattedTooltipValue({ seriesName, value, itemData }) {
-    const tooltipOpt = this.options.tooltip;
-    const tooltipValueFormatter = typeof tooltipOpt.formatter === 'function'
-      ? tooltipOpt.formatter
-      : tooltipOpt.formatter?.value;
+    const opt = this.options;
+    const isHorizontal = !!opt.horizontal;
+    const tooltipOpt = opt.tooltip;
+    const tooltipValueFormatter = typeof tooltipOpt?.formatter === 'function'
+      ? tooltipOpt?.formatter
+      : tooltipOpt?.formatter?.value;
 
     let formattedTxt = value;
     if (tooltipValueFormatter) {
-      if (this.options.type === 'pie') {
+      if (opt.type === 'pie') {
         formattedTxt = tooltipValueFormatter({
           value,
           name: seriesName,
-          percentage: itemData.percentage,
+          percentage: itemData?.percentage,
         });
-      } else if (this.options.type === 'heatMap') {
+      } else if (opt.type === 'heatMap') {
         formattedTxt = tooltipValueFormatter({
-          x: itemData.x,
-          y: itemData.y,
+          x: itemData?.x,
+          y: itemData?.y,
           value: value > -1 ? value : 'error',
         });
       } else {
         formattedTxt = tooltipValueFormatter({
-          x: this.options.horizontal ? value : itemData.x,
-          y: this.options.horizontal ? itemData.y : value,
+          x: isHorizontal ? value : itemData?.x,
+          y: isHorizontal ? itemData?.y : value,
           name: seriesName,
         });
       }
     }
 
     if (value && (!tooltipValueFormatter || typeof formattedTxt !== 'string')) {
-      if (this.options.type === 'heatMap') {
+      if (opt.type === 'heatMap') {
         formattedTxt = value < 0 ? 'error' : numberWithComma(value);
       } else {
         formattedTxt = numberWithComma(value);

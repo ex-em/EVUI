@@ -47,6 +47,10 @@ const modules = {
         radius -= pieOption.pieStroke.lineWidth;
       }
 
+      if (radius < 0) {
+        return;
+      }
+
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
         pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
@@ -138,6 +142,10 @@ const modules = {
       let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
       if (pieOption?.pieStroke?.use) {
         radius -= pieOption.pieStroke.lineWidth;
+      }
+
+      if (radius < 0) {
+        return;
       }
 
       pie.or = radius;
