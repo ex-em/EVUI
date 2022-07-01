@@ -585,6 +585,7 @@ const modules = {
     this.legendBoxDOM = null;
     this.resizeDOM = null;
     this.isInitLegend = false;
+    this.seriesInfo.count = 0;
   },
 
   /**
@@ -598,7 +599,7 @@ const modules = {
     const colorDOM = document.createElement('span');
     const nameDOM = document.createElement('div');
 
-    containerDOM.className = 'ev-chart-legend-container';
+    containerDOM.className = `ev-chart-legend-container ${!series.show ? ' inactive' : ''}`;
     containerDOM.series = series;
 
     colorDOM.className = 'ev-chart-legend-color';
@@ -609,8 +610,11 @@ const modules = {
 
     nameDOM.className = 'ev-chart-legend-name';
 
+    // set series color
     let seriesColor;
-    if (typeof series.color !== 'string') {
+    if (!series.show) {
+      seriesColor = opt.inactive;
+    } else if (typeof series.color !== 'string') {
       seriesColor = series.color[series.color.length - 1][1];
     } else {
       seriesColor = series.color;
@@ -618,7 +622,7 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = `${seriesColor}80`;
+      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -647,7 +651,9 @@ const modules = {
     containerDOM.dataset.type = 'container';
 
     this.legendBoxDOM.appendChild(containerDOM);
-    this.seriesInfo.count++;
+    if (series.show) {
+      this.seriesInfo.count++;
+    }
   },
 
   /**
@@ -666,7 +672,7 @@ const modules = {
 
     // create row
     const rowDOM = document.createElement('tr');
-    rowDOM.className = 'ev-chart-legend--table__row';
+    rowDOM.className = `ev-chart-legend--table__row ${!series.show ? ' inactive' : ''}`;
     Util.setDOMStyle(rowDOM, opt.table?.style?.row);
     rowDOM.series = series;
     rowDOM.dataset.type = 'container';
@@ -680,8 +686,11 @@ const modules = {
     colorDOM.className = 'ev-chart-legend--table__color';
     colorDOM.dataset.type = 'color';
 
+    // set series color
     let seriesColor;
-    if (typeof series.color !== 'string') {
+    if (!series.show) {
+      seriesColor = opt.inactive;
+    } else if (typeof series.color !== 'string') {
       seriesColor = series.color[series.color.length - 1][1];
     } else {
       seriesColor = series.color;
@@ -714,7 +723,7 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = `${seriesColor}80`;
+      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -724,16 +733,19 @@ const modules = {
     rowDOM.appendChild(colorWrapperDOM);
 
     // create td - name
-    if (columns.name.use) {
-      const nameDOM = document.createElement('td');
-      nameDOM.className = 'ev-chart-legend--table__name';
-      nameDOM.style.color = opt.color;
-      nameDOM.textContent = series.name;
-      nameDOM.setAttribute('title', series.name);
-      nameDOM.dataset.type = 'name';
-      Util.setDOMStyle(nameDOM, columns?.name?.style);
-      rowDOM.appendChild(nameDOM);
+    const nameDOM = document.createElement('td');
+    nameDOM.className = 'ev-chart-legend--table__name';
+    nameDOM.style.color = series.show ? opt.color : opt.inactive;
+    nameDOM.textContent = series.name;
+    nameDOM.setAttribute('title', series.name);
+    nameDOM.dataset.type = 'name';
+    Util.setDOMStyle(nameDOM, columns?.name?.style);
+
+    if (!series.show) {
+      nameDOM.style.color = opt.inactive;
     }
+
+    rowDOM.appendChild(nameDOM);
 
     // create td - values
     const columnKeyList = Object.keys(columns);
@@ -746,17 +758,23 @@ const modules = {
         const formattedTxt = this.getFormattedValue(columns[key], +aggregations[key]);
         const valueDOM = document.createElement('td');
         valueDOM.className = 'ev-chart-legend--table__value';
-        valueDOM.style.color = opt.color;
+        valueDOM.style.color = series.show ? opt.color : opt.inactive;
         valueDOM.textContent = formattedTxt;
         valueDOM.dataset.type = key.toString();
         Util.setDOMStyle(valueDOM, columns[key]?.style);
+
+        if (!series.show) {
+          valueDOM.style.color = opt.inactive;
+        }
 
         rowDOM.appendChild(valueDOM);
       }
     });
 
-    this.seriesInfo.count++;
     this.legendTableDOM.appendChild(rowDOM);
+    if (series.show) {
+      this.seriesInfo.count++;
+    }
   },
 
   /**

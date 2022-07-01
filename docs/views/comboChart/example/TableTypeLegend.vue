@@ -78,11 +78,6 @@
         <div class="section-item" />
 
         <div class="section-item">
-          <label title="Table - Series Name 값 표시 여부">name</label>
-          <ev-toggle v-model="useName"/>
-        </div>
-
-        <div class="section-item">
           <label title="Table - minimum 값 표시 여부">min</label>
           <ev-toggle v-model="useMin"/>
         </div>
@@ -141,7 +136,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
       const useTable = ref(true);
       const width = ref(140);
       const height = ref(150);
-      const useName = ref(true);
       const useMin = ref(true);
       const useMax = ref(true);
       const useAvg = ref(true);
@@ -186,7 +180,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
             },
             columns: {
               name: {
-                use: useName,
                 title: 'Name',
                 style: {
                   minWidth: '100px',
@@ -275,7 +268,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         useTable,
         width,
         height,
-        useName,
         useMin,
         useMax,
         useAvg,

@@ -32,9 +32,7 @@ const DEFAULT_OPTIONS = {
     table: {
       use: false,
       columns: {
-        name: {
-          use: true,
-        },
+        name: {},
         min: {
           use: false,
         },

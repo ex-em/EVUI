@@ -36,7 +36,6 @@
             use: true,
             columns: {
               name: {
-                use: true,
                 title: 'Series name',
                 style: {
                   width: '140px',
