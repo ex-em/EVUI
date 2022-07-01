@@ -29,6 +29,34 @@ const DEFAULT_OPTIONS = {
     width: 140,
     height: 24,
     allowResize: false,
+    table: {
+      use: false,
+      columns: {
+        name: {
+          title: 'Name',
+        },
+        min: {
+          title: 'MIN',
+          use: false,
+        },
+        max: {
+          title: 'MAX',
+          use: false,
+        },
+        avg: {
+          title: 'AVG',
+          use: false,
+        },
+        total: {
+          title: 'TOTAL',
+          use: false,
+        },
+        last: {
+          title: 'LAST',
+          use: false,
+        },
+      },
+    },
   },
   itemHighlight: true,
   seriesHighlight: true,

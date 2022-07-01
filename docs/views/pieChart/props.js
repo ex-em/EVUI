@@ -10,6 +10,8 @@ import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
 import ShowValue from './example/ShowValue';
 import ShowValueRaw from '!!raw-loader!./example/ShowValue';
+import Legend from './example/Legend';
+import LegendRaw from '!!raw-loader!./example/Legend';
 
 export default {
   mdText,
@@ -38,6 +40,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    Legend: {
+      description: 'Legend 영역에 Series Color, Name, Value 등을 표시할 수 있습니다.',
+      component: Legend,
+      parsedData: parseComponent(LegendRaw),
     },
   },
 };
