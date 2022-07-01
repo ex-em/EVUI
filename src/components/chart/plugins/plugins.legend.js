@@ -41,7 +41,7 @@ const modules = {
   setLegendColumnHeader() {
     const tableOpt = this.options.legend?.table;
     const columns = tableOpt.columns;
-    const columnKeyList = ['', ...Object.keys(columns)];
+    const columnKeyList = ['', '', ...Object.keys(columns)];
 
     columnKeyList.forEach((key) => {
       const columnNameDOM = document.createElement('th');
