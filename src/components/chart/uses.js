@@ -32,20 +32,27 @@ const DEFAULT_OPTIONS = {
     table: {
       use: false,
       columns: {
-        name: {},
+        name: {
+          title: 'Name',
+        },
         min: {
+          title: 'MIN',
           use: false,
         },
         max: {
+          title: 'MAX',
           use: false,
         },
         avg: {
+          title: 'AVG',
           use: false,
         },
         total: {
+          title: 'TOTAL',
           use: false,
         },
         last: {
+          title: 'LAST',
           use: false,
         },
       },

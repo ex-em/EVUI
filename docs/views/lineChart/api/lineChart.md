@@ -217,12 +217,12 @@ const chartData =
 | style.row | Object | null | table row의 CSS style | { borderBottom: '1px solid #DBDBDB' } |
 | style.header | Object | null | table header의 CSS Style | { fontSize: '15px' } |
 | columns | Object | (아래 각 항목 참고)| | | 
-| columns.name | Object | { } | Series Name 표시 관련 옵션 | { title: '시리즈명', style: {...} }| 
-| columns.min | Object | { use: false } | Minimum Value 표시 관련 옵션 | { use: true, title: '최솟값', style: {...}, formatter: (v) => `${v.toFixed(2)}` }| 
-| columns.max | Object | { use: false } | Maximum Value 표시 관련 옵션 | { use: true, title: '최댓값', style: {...}, decimalPoint: 2 }| 
-| columns.avg | Object | { use: false } | Average Value 표시 관련 옵션 | { use: true, title: '평균', style: {...}, decimalPoint: 2 }| 
-| columns.total | Object | { use: false } | Total Value 표시 관련 옵션 | { use: true, title: '합계', style: {...}, decimalPoint: 2 }| 
-| columns.last | Object | { use: false } | Last Value 표시 관련 옵션 | { use: true, title: 'Current', style: {...}, decimalPoint: 2 }| 
+| columns.name | Object | { title: 'Name' } | Series Name 표시 관련 옵션 | { title: '시리즈명', style: {...} }| 
+| columns.min | Object | { use: false, title: 'MIN' } | Minimum Value 표시 관련 옵션 | { use: true, title: '최솟값', style: {...}, formatter: (v) => `${v.toFixed(2)}` }| 
+| columns.max | Object | { use: false, title: 'MAX' } | Maximum Value 표시 관련 옵션 | { use: true, title: '최댓값', style: {...}, decimalPoint: 2 }| 
+| columns.avg | Object | { use: false, title: 'AVG' } | Average Value 표시 관련 옵션 | { use: true, title: '평균', style: {...}, decimalPoint: 2 }| 
+| columns.total | Object | { use: false, title: 'TOTAL' } | Total Value 표시 관련 옵션 | { use: true, title: '합계', style: {...}, decimalPoint: 2 }| 
+| columns.last | Object | { use: false, title: 'LAST' } | Last Value 표시 관련 옵션 | { use: true, title: 'Current', style: {...}, decimalPoint: 2 }| 
 
 
 #### tooltip

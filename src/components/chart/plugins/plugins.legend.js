@@ -41,17 +41,15 @@ const modules = {
   setLegendColumnHeader() {
     const tableOpt = this.options.legend?.table;
     const columns = tableOpt.columns;
-    const columnKeyList = ['', '', ...Object.keys(columns)];
+    const columnKeyList = ['color', ...Object.keys(columns)];
 
     columnKeyList.forEach((key) => {
       const columnNameDOM = document.createElement('th');
       columnNameDOM.className = 'ev-chart-legend--table__column-name';
 
-      if (columns[key]?.use || key === '') {
+      if (columns[key]?.use || key === 'color' || key === 'name') {
         const columnOpt = columns[key];
-        const keyText = !columnOpt?.title && columnOpt?.title !== ''
-          ? key.toUpperCase()
-          : columnOpt.title;
+        const keyText = columnOpt?.title ?? '';
 
         columnNameDOM.textContent = keyText;
         columnNameDOM.setAttribute('title', keyText);
