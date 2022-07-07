@@ -227,7 +227,7 @@ const compareFromAndToDateTime = (mode, calendarType, targetDate, modelValue) =>
   let fromDateTime = fromDate;
   let toDateTime = toDate;
   if (!targetDate.split(' ')[1]) {
-    if (mode === 'dateTimeRange') {
+    if (mode === 'dateTimeRange' && targetDate !== fromDate.split(' ')[0]) {
       fromDate = fromDate.split(' ')[0];
       toDate = toDate.split(' ')[0];
       const fromTime = modelValue[0].split(' ')[1];
