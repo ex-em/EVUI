@@ -898,7 +898,7 @@ export const contextMenuEvent = (params) => {
     if (clickedRow) {
       selectInfo.selectedRow = clickedRow;
       setContextMenu();
-      emit('update:selected', clickedRow);
+      emit('update:selected', [clickedRow]);
     } else {
       selectInfo.selectedRow = [];
       setContextMenu(false);
