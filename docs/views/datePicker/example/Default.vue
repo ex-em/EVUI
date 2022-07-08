@@ -226,10 +226,10 @@ export default {
       },
     ];
 
+    // toDate - fromDate 최소 선택 시간: 30분, 최대 선택 날짜: 한달
     const disabledDateTime = computed(() => [
-      time => (+time < +new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'month')))
-            || (+time > +new Date(dateTimeRange2.value[1]) - (1000 * 60 * 30)
-             && +time <= +new Date(dateTimeRange2.value[1])),
+      time => +time > +new Date(dateTimeRange2.value[1]) - (1000 * 60 * 30)
+            || +time < +new Date(dayjs(dateTimeRange2.value[1]).subtract(1, 'month')),
       time => (+time < +new Date(dateTimeRange2.value[0]) + (1000 * 60 * 30))
             || (+time >= +new Date(dayjs(TODAY_0_O_CLOCK_DATE).add(2, 'day'))),
     ]);
@@ -251,9 +251,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.case-block {
-  border: 1px solid black;
-}
-</style>
