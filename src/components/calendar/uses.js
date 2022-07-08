@@ -532,7 +532,8 @@ export const useCalendarDate = (param) => {
       // time 모드인 경우 현재 값의 시간을 가지고 테스트
       const timeValue = modelValue?.split(' ')[1] ?? '';
 
-      const isDisabled = disabledDate && disabledDate(new Date(`${currDate} ${timeValue}`));
+      const isDisabled = disabledDate
+        ? disabledDate(new Date(`${currDate} ${timeValue}`)) : isInvalidDate;
 
       const index = +(calendarType !== 'main');
       const isRangeSelected = isRangeMode && selectedValue.value.length > index
@@ -543,7 +544,7 @@ export const useCalendarDate = (param) => {
 
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[i][j] = {
-        monthType: `${monthType}${isDisabled || isInvalidDate ? ' disabled' : ''}`,
+        monthType: `${monthType}${isDisabled ? ' disabled' : ''}`,
         isToday: TODAY_YMD === currDate,
         isSelected,
         year,
@@ -632,7 +633,7 @@ export const useCalendarDate = (param) => {
         return true;
       }
 
-      return compareFromAndToDateTime(
+      return !disabledDateFunc && compareFromAndToDateTime(
           props.mode,
           calendarType,
           targetDateTimeValue,
@@ -887,7 +888,8 @@ export const useEvent = (param) => {
     };
 
     const setRangeModeDateByIndex = (currIndex, currDate) => {
-      if (compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value)) {
+      if (!disabledDate
+        && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value)) {
         return;
       }
 
@@ -1156,13 +1158,6 @@ export const useEvent = (param) => {
               timeFormat[index],
               currDateTime,
           );
-        }
-
-        const fromDate = index ? selectedValue.value[0] : currDateTime;
-        const toDate = index ? currDateTime : selectedValue.value[1];
-
-        if (new Date(fromDate).getTime() > new Date(toDate).getTime()) {
-          return;
         }
 
         selectedValue.value[index] = currDateTime;
