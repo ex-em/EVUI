@@ -16,18 +16,19 @@ runs:
     - name: Send jandi
       shell: bash
       run: |
-        COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+        RAW_COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+        COMMIT_MESSAGE="$(echo ${RAW_COMMIT_MESSAGE@Q} | tr -d "$'")"
         
         if [ "${{ inputs.status }}" = "success" ]; then
           curl \
           -X POST "${{ inputs.jandi_incoming_url }}" \
           -H "Accept: application/vnd.tosslab.jandi-v2+json" \
           -H "Content-Type: application/json" \
-          --data-binary '{"body":"📢 EVUI CI/CD Notification - ✅ Deployment succeeded", "connectColor":"#4285F6", "connectInfo":[{"title":"Commit message","description":"- '"${COMMIT_MESSAGE}"'"},{"title":"EVUI document","description":"- [[EVUI]](https://ex-em.github.io/EVUI)"}]}'
+          --data-binary '{"body":"📢 EVUI CI/CD Notification - ✅ Deployment succeeded", "connectColor":"#4285F6", "connectInfo":[{"title":"Commit message","description":"'"${COMMIT_MESSAGE}"'"},{"title":"EVUI document","description":"- [[EVUI]](https://ex-em.github.io/EVUI)"}]}'
         else
           curl \
           -X POST "${{ inputs.jandi_incoming_url }}" \
           -H "Accept: application/vnd.tosslab.jandi-v2+json" \
           -H "Content-Type: application/json" \
-          --data-binary '{"body":"📢 EVUI CI/CD Notification - ⛔ Deployment failed", "connectColor":"#FF4C15", "connectInfo":[{"title":"Commit message","description":"- '"${COMMIT_MESSAGE}"'"},{"title":"Error log","description":"- [[Workflow]](https://github.com/'"${GITHUB_REPOSITORY}"'/actions/runs/'"${GITHUB_RUN_ID}"')"}]}'
+          --data-binary '{"body":"📢 EVUI CI/CD Notification - ⛔ Deployment failed", "connectColor":"#FF4C15", "connectInfo":[{"title":"Commit message","description":"'"${COMMIT_MESSAGE}"'"},{"title":"Error log","description":"- [[Workflow]](https://github.com/'"${GITHUB_REPOSITORY}"'/actions/runs/'"${GITHUB_RUN_ID}"')"}]}'
         fi
