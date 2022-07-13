@@ -47,7 +47,7 @@
     "gh-pages": "^4.0.0",
     "highlight.js": "^10.2.0",
     "lodash-es": "^4.17.15",
-    "marked": "^1.1.1",
+    "marked": "^4.0.10",
     "node-sass": "^4.12.0",
     "raw-loader": "^4.0.1",
     "sass-loader": "^8.0.2",
