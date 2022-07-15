@@ -26,6 +26,9 @@ const modules = {
       this.setLegendColumnHeader();
       this.legendBoxDOM.appendChild(this.legendTableDOM);
       this.legendDOM.style.overflow = 'auto';
+    } else {
+      this.legendBoxDOM.style.overflowX = 'hidden';
+      this.legendBoxDOM.style.overflowY = 'auto';
     }
 
     this.legendDOM.appendChild(this.legendBoxDOM);
