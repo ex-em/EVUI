@@ -168,25 +168,6 @@ export const resizeEvent = (params) => {
   const { props } = getCurrentInstance();
   const { resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll } = params;
   /**
-   * 해당 컬럼 인덱스가 마지막인지 확인한다.
-   *
-   * @param {number} index - 컬럼 인덱스
-   * @returns {boolean} 마지막 컬럼 유무
-   */
-  const isLastColumn = (index) => {
-    const columns = stores.orderedColumns;
-    let lastIndex = -1;
-
-    for (let ix = columns.length - 1; ix >= 0; ix--) {
-      if (!columns[ix].hide) {
-        lastIndex = ix;
-        break;
-      }
-    }
-
-    return lastIndex === index;
-  };
-  /**
    * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
    */
   const calculatedColumn = () => {
@@ -295,61 +276,54 @@ export const resizeEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onColumnResize = (columnIndex, event) => {
-    if (!isLastColumn(columnIndex)) {
-      let nextColumnIndex = columnIndex + 1;
-      const headerEl = elementInfo.header;
-      const headerLeft = headerEl.getBoundingClientRect().left;
-      const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
-      while (stores.orderedColumns[nextColumnIndex].hide) {
-        nextColumnIndex++;
+    const headerEl = elementInfo.header;
+    const bodyEl = elementInfo.body;
+    const headerLeft = headerEl.getBoundingClientRect().left;
+    const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
+    const minWidth = isRenderer(stores.orderedColumns[columnIndex])
+      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+    const columnRect = columnEl.getBoundingClientRect();
+    const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
+    const resizeLineEl = elementInfo.resizeLine;
+    const minLeft = columnRect.left - headerLeft + minWidth;
+    const startLeft = columnRect.right - headerLeft;
+    const startMouseLeft = event.clientX;
+    const startColumnLeft = columnRect.left - headerLeft;
+
+    resizeLineEl.style.left = `${startLeft}px`;
+
+    resizeInfo.showResizeLine = true;
+
+    const handleMouseMove = (evt) => {
+      const deltaLeft = evt.clientX - startMouseLeft;
+      const proxyLeft = startLeft + deltaLeft;
+      let resizeWidth = Math.max(minLeft, proxyLeft);
+
+      resizeWidth = Math.min(maxRight, resizeWidth);
+
+      resizeLineEl.style.left = `${resizeWidth}px`;
+    };
+
+    const handleMouseUp = () => {
+      const destLeft = parseInt(resizeLineEl.style.left, 10);
+      const changedWidth = destLeft - startColumnLeft;
+
+      if (stores.orderedColumns[columnIndex]) {
+        stores.orderedColumns[columnIndex].width = changedWidth;
+        stores.orderedColumns.map((column) => {
+          const item = column;
+          item.resized = true;
+          return item;
+        });
       }
-      const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-        ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
-      const nextMinWidth = isRenderer(stores.orderedColumns[nextColumnIndex])
-        ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
-      const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
-      const columnRect = columnEl.getBoundingClientRect();
-      const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - nextMinWidth;
-      const resizeLineEl = elementInfo.resizeLine;
-      const minLeft = columnRect.left - headerLeft + minWidth;
-      const startLeft = columnRect.right - headerLeft;
-      const startMouseLeft = event.clientX;
-      const startColumnLeft = columnRect.left - headerLeft;
 
-      resizeLineEl.style.left = `${startLeft}px`;
+      resizeInfo.showResizeLine = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      onResize();
+    };
 
-      resizeInfo.showResizeLine = true;
-
-      const handleMouseMove = (evt) => {
-        const deltaLeft = evt.clientX - startMouseLeft;
-        const proxyLeft = startLeft + deltaLeft;
-        let resizeWidth = Math.max(minLeft, proxyLeft);
-
-        resizeWidth = Math.min(maxRight, resizeWidth);
-
-        resizeLineEl.style.left = `${resizeWidth}px`;
-      };
-
-      const handleMouseUp = () => {
-        const destLeft = parseInt(resizeLineEl.style.left, 10);
-        const changedWidth = destLeft - startColumnLeft;
-
-        if (stores.orderedColumns[columnIndex]) {
-          const columnWidth = stores.orderedColumns[columnIndex].width;
-          stores.orderedColumns[columnIndex].width = changedWidth;
-          stores.orderedColumns[columnIndex].resized = true;
-          stores.orderedColumns[nextColumnIndex].width += (columnWidth - changedWidth);
-          stores.orderedColumns[nextColumnIndex].resized = true;
-        }
-
-        resizeInfo.showResizeLine = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        onResize();
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp, { once: true });
-    }
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp, { once: true });
   };
   return { calculatedColumn, onResize, onShow, onColumnResize };
 };
@@ -364,15 +338,15 @@ export const clickEvent = (params) => {
       if (tagName === 'td') {
         cellInfo = event.target.dataset;
       } else {
-        cellInfo = event.target.closest('td').dataset;
+        cellInfo = event.target.closest('td')?.dataset;
       }
     }
     return {
       event,
       rowData: row,
       rowIndex: row.index,
-      cellName: cellInfo.name,
-      cellIndex: cellInfo.index,
+      cellName: cellInfo?.name,
+      cellIndex: cellInfo?.index,
     };
   };
   /**
