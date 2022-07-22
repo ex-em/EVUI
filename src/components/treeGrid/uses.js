@@ -338,15 +338,15 @@ export const clickEvent = (params) => {
       if (tagName === 'td') {
         cellInfo = event.target.dataset;
       } else {
-        cellInfo = event.target.closest('td')?.dataset;
+        cellInfo = event.target.closest('td')?.dataset ?? {};
       }
     }
     return {
       event,
       rowData: row,
       rowIndex: row.index,
-      cellName: cellInfo?.name,
-      cellIndex: cellInfo?.index,
+      cellName: cellInfo.name,
+      cellIndex: cellInfo.index,
     };
   };
   /**

@@ -265,52 +265,50 @@ export const resizeEvent = (params) => {
     const bodyEl = elementInfo.body;
     const headerLeft = headerEl.getBoundingClientRect().left;
     const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
-    if (!columnEl.className.includes('db-icon') && !columnEl.className.includes('user-icon')) {
-      const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-        ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
-      const columnRect = columnEl.getBoundingClientRect();
-      const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
-      const resizeLineEl = elementInfo.resizeLine;
-      const minLeft = columnRect.left - headerLeft + minWidth;
-      const startLeft = columnRect.right - headerLeft;
-      const startMouseLeft = event.clientX;
-      const startColumnLeft = columnRect.left - headerLeft;
+    const minWidth = isRenderer(stores.orderedColumns[columnIndex])
+      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+    const columnRect = columnEl.getBoundingClientRect();
+    const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
+    const resizeLineEl = elementInfo.resizeLine;
+    const minLeft = columnRect.left - headerLeft + minWidth;
+    const startLeft = columnRect.right - headerLeft;
+    const startMouseLeft = event.clientX;
+    const startColumnLeft = columnRect.left - headerLeft;
 
-      resizeLineEl.style.left = `${startLeft}px`;
+    resizeLineEl.style.left = `${startLeft}px`;
 
-      resizeInfo.showResizeLine = true;
+    resizeInfo.showResizeLine = true;
 
-      const handleMouseMove = (evt) => {
-        const deltaLeft = evt.clientX - startMouseLeft;
-        const proxyLeft = startLeft + deltaLeft;
-        let resizeWidth = Math.max(minLeft, proxyLeft);
+    const handleMouseMove = (evt) => {
+      const deltaLeft = evt.clientX - startMouseLeft;
+      const proxyLeft = startLeft + deltaLeft;
+      let resizeWidth = Math.max(minLeft, proxyLeft);
 
-        resizeWidth = Math.min(maxRight, resizeWidth);
+      resizeWidth = Math.min(maxRight, resizeWidth);
 
-        resizeLineEl.style.left = `${resizeWidth}px`;
-      };
+      resizeLineEl.style.left = `${resizeWidth}px`;
+    };
 
-      const handleMouseUp = () => {
-        const destLeft = parseInt(resizeLineEl.style.left, 10);
-        const changedWidth = destLeft - startColumnLeft;
+    const handleMouseUp = () => {
+      const destLeft = parseInt(resizeLineEl.style.left, 10);
+      const changedWidth = destLeft - startColumnLeft;
 
-        if (stores.orderedColumns[columnIndex]) {
-          stores.orderedColumns[columnIndex].width = changedWidth;
-          stores.orderedColumns.map((column) => {
-            const item = column;
-            item.resized = true;
-            return item;
-          });
-        }
+      if (stores.orderedColumns[columnIndex]) {
+        stores.orderedColumns[columnIndex].width = changedWidth;
+        stores.orderedColumns.map((column) => {
+          const item = column;
+          item.resized = true;
+          return item;
+        });
+      }
 
-        resizeInfo.showResizeLine = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        onResize();
-      };
+      resizeInfo.showResizeLine = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      onResize();
+    };
 
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp, { once: true });
-    }
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp, { once: true });
   };
   return { calculatedColumn, onResize, onShow, onColumnResize };
 };
