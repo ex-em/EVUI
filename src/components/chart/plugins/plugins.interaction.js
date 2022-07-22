@@ -112,7 +112,7 @@ const modules = {
      */
     this.onClick = (e) => {
       const args = { e };
-      if (this.options.selectItem.use) {
+      if (this.options.selectItem.use && this.options.selectItem.useClick) {
         const offset = this.getMousePosition(e);
         const hitInfo = this.getItemByPosition(offset, false);
 
@@ -127,14 +127,14 @@ const modules = {
           maxIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
-      } else if (this.options.selectLabel.use) {
+      } else if (this.options.selectLabel.use && this.options.selectLabel.useClick) {
         const offset = this.getMousePosition(e);
         const clickedLabelInfo = this.getLabelInfoByPosition(offset);
         const selected = this.selectLabel(clickedLabelInfo.labelIndex);
         this.renderWithSelected(selected.dataIndex);
 
         args.selected = cloneDeep(this.defaultSelectInfo);
-      } else if (this.options.selectSeries.use) {
+      } else if (this.options.selectSeries.use && this.options.selectSeries.useClick) {
         const offset = this.getMousePosition(e);
         const hitInfo = this.getSeriesIdByPosition(offset);
         if (hitInfo.sId !== null) {
