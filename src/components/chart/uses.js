@@ -103,6 +103,7 @@ const DEFAULT_OPTIONS = {
   },
   selectItem: {
     use: false,
+    useClick: true,
     showTextTip: false,
     tipText: 'value',
     showTip: false,
@@ -116,6 +117,7 @@ const DEFAULT_OPTIONS = {
   },
   selectLabel: {
     use: false,
+    useClick: true,
     limit: 1,
     useDeselectOverflow: false,
     showTip: false,
@@ -127,6 +129,7 @@ const DEFAULT_OPTIONS = {
   },
   selectSeries: {
     use: false,
+    useClick: true,
     limit: 1,
     useDeselectOverflow: false,
   },
