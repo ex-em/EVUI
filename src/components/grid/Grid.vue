@@ -144,7 +144,7 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
-        <table>
+        <table ref="grid-table">
           <tbody>
             <!-- Row List -->
             <tr
@@ -363,6 +363,7 @@ export default {
       header: null,
       resizeLine: null,
       'grid-wrapper': null,
+      'grid-table': null,
     });
     const filterInfo = reactive({
       filterList: {},

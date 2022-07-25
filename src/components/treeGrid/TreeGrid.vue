@@ -90,7 +90,7 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
-        <table>
+        <table ref="grid-table">
           <tbody>
             <tree-grid-node
               v-for="(node, idx) in viewStore"
@@ -266,6 +266,7 @@ export default {
       header: null,
       resizeLine: null,
       'grid-wrapper': null,
+      'grid-table': null,
     });
     const filterInfo = reactive({
       isSearch: false,

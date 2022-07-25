@@ -114,7 +114,7 @@ export const scrollEvent = (params) => {
       const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
-      const tableEl = bodyEl.children[1];
+      const tableEl = elementInfo['grid-table'];
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
       scrollInfo.hasVerticalScrollBar = rowCount < store.length
@@ -136,7 +136,7 @@ export const scrollEvent = (params) => {
   const updateHScroll = () => {
     const headerEl = elementInfo.header;
     const bodyEl = elementInfo.body;
-    const tableEl = bodyEl.children[1];
+    const tableEl = elementInfo['grid-table'];
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
     summaryScroll.value = bodyEl.scrollLeft;
