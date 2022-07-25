@@ -79,6 +79,8 @@
               :style="{
                 width: `${column.width}px`,
                 'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                'margin-right': (orderedColumns.length - 1 === index
+                && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
             >
               <!-- Filter Status -->
@@ -142,7 +144,7 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
-        <table>
+        <table ref="table">
           <tbody>
             <!-- Row List -->
             <tr
@@ -359,6 +361,7 @@ export default {
     const elementInfo = reactive({
       body: null,
       header: null,
+      table: null,
       resizeLine: null,
       'grid-wrapper': null,
     });
@@ -417,6 +420,7 @@ export default {
       vScrollTopHeight: 0,
       vScrollBottomHeight: 0,
       hasVerticalScrollBar: false,
+      hasHorizontalScrollBar: false,
     });
     const selectInfo = reactive({
       selectedRow: props.selected,
@@ -443,7 +447,7 @@ export default {
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
-      adjust: computed(() => (props.option.adjust || false)),
+      adjust: props.option.adjust || false,
       columnWidth: props.option.columnWidth || 80,
       scrollWidth: props.option.scrollWidth || 17,
       rowHeight: computed(() =>
@@ -552,6 +556,7 @@ export default {
       filterInfo,
       isRenderer,
       updateVScroll,
+      updateHScroll,
     });
 
     const {
@@ -692,7 +697,7 @@ export default {
       },
     );
     watch(
-      () => [resizeInfo.adjust, props.option.columnWidth, resizeInfo.gridWidth],
+      () => [props.option.columnWidth, resizeInfo.gridWidth],
       () => {
         resizeInfo.columnWidth = props.option.columnWidth;
         const gridWrapper = elementInfo['grid-wrapper'];
