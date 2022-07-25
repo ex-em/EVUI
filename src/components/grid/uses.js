@@ -102,9 +102,11 @@ export const scrollEvent = (params) => {
       const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
       const firstIndex = Math.max(firstVisibleIndex, 0);
       const lastIndex = lastVisibleIndex;
+      const tableEl = bodyEl.children[1];
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length;
+      scrollInfo.hasVerticalScrollBar = rowCount < store.length
+        || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
       scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
         - scrollInfo.vScrollTopHeight;
@@ -122,6 +124,13 @@ export const scrollEvent = (params) => {
   const updateHScroll = () => {
     const headerEl = elementInfo.header;
     const bodyEl = elementInfo.body;
+    const tableEl = bodyEl.children[1];
+
+    if (bodyEl.clientWidth < tableEl.clientWidth) {
+      scrollInfo.hasHorizontalScrollBar = true;
+    } else {
+      scrollInfo.hasHorizontalScrollBar = false;
+    }
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
     summaryScroll.value = bodyEl.scrollLeft;
@@ -154,7 +163,15 @@ export const scrollEvent = (params) => {
 
 export const resizeEvent = (params) => {
   const { props } = getCurrentInstance();
-  const { resizeInfo, elementInfo, checkInfo, stores, isRenderer, updateVScroll } = params;
+  const {
+    resizeInfo,
+    elementInfo,
+    checkInfo,
+    stores,
+    isRenderer,
+    updateVScroll,
+    updateHScroll,
+  } = params;
   /**
    * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
    */
@@ -244,6 +261,9 @@ export const resizeEvent = (params) => {
       calculatedColumn();
       if (elementInfo.body?.clientHeight) {
         updateVScroll();
+      }
+      if (elementInfo.body?.clientWidth) {
+        updateHScroll();
       }
     });
   };

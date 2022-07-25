@@ -8,7 +8,7 @@
       :width="widthMV"
       :height="heightMV"
       :option="{
-        adjust: adjustMV,
+        adjust: true,
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
@@ -46,12 +46,6 @@
         </span>
         <ev-toggle
           v-model="showHeaderMV"
-        />
-        <span class="badge yellow">
-          Adjust
-        </span>
-        <ev-toggle
-          v-model="adjustMV"
         />
         <span class="badge yellow">
           Use Filter
@@ -229,7 +223,6 @@ export default {
     const checked = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
-    const adjustMV = ref(true);
     const showHeaderMV = ref(true);
     const stripeMV = ref(false);
     const rowHeightMV = ref(45);
@@ -347,7 +340,6 @@ export default {
       checked,
       widthMV,
       heightMV,
-      adjustMV,
       showHeaderMV,
       stripeMV,
       rowHeightMV,
