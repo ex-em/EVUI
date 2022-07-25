@@ -138,14 +138,9 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
     const tableEl = bodyEl.children[1];
 
-    if (bodyEl.clientWidth < tableEl.clientWidth) {
-      scrollInfo.hasHorizontalScrollBar = true;
-    } else {
-      scrollInfo.hasHorizontalScrollBar = false;
-    }
-
     headerEl.scrollLeft = bodyEl.scrollLeft;
     summaryScroll.value = bodyEl.scrollLeft;
+    scrollInfo.hasHorizontalScrollBar = bodyEl.clientWidth < tableEl.clientWidth;
   };
   /**
    * scroll 이벤트를 처리한다.
