@@ -781,9 +781,9 @@ export const filterEvent = (params) => {
           let isShow = false;
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = row[ROW_DATA_INDEX][ix];
+            let columnValue = row[ROW_DATA_INDEX][ix] ?? null;
             column.type = column.type || 'string';
-            if (columnValue) {
+            if (columnValue !== null) {
               if (typeof columnValue === 'object') {
                 columnValue = columnValue[column.field];
               }

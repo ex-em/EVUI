@@ -764,9 +764,9 @@ export const filterEvent = (params) => {
           let isSameWord = false;
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = row[column.field];
+            let columnValue = row[column.field] ?? null;
             column.type = column.type || 'string';
-            if (columnValue) {
+            if (columnValue !== null) {
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
                 columnValue = getConvertValue(column, columnValue).toString();
                 isSameWord = columnValue.toLowerCase()
