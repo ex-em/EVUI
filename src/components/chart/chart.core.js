@@ -792,9 +792,11 @@ class EvChart {
    * @returns {undefined}
    */
   render(hitInfo) {
-    this.clear();
-    this.chartRect = this.getChartRect();
-    this.drawChart(hitInfo);
+    if (this.isInit) {
+      this.clear();
+      this.chartRect = this.getChartRect();
+      this.drawChart(hitInfo);
+    }
   }
 
   /**
