@@ -50,7 +50,7 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'update:selectedSeries',
     ],
     setup(props) {
-      let evChart = {};
+      let evChart = null;
       let isInit = false;
 
       const {
@@ -98,8 +98,11 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       };
 
       watch(() => props.options, (chartOpt) => {
-        const newOpt = getNormalizedOptions(chartOpt);
+        if (!isInit) {
+          return;
+        }
 
+        const newOpt = getNormalizedOptions(chartOpt);
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
 
         evChart.options = cloneDeep(newOpt);
@@ -112,8 +115,11 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       }, { deep: true });
 
       watch(() => props.data, (chartData) => {
-        const newData = getNormalizedData(chartData);
+        if (!isInit) {
+          return;
+        }
 
+        const newData = getNormalizedData(chartData);
         const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
             || !isEqual(newData.groups, evChart.data.groups)
             || props.options.type === 'heatMap';
@@ -130,18 +136,29 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       }, { deep: true });
 
       watch(() => props.selectedItem, (newValue) => {
-        const chartType = props.options?.type;
+        if (!isInit) {
+          return;
+        }
 
+        const chartType = props.options.type;
         evChart.selectItemByData(newValue, chartType);
       }, { deep: true });
 
       watch(() => props.selectedLabel, (newValue) => {
+        if (!isInit) {
+          return;
+        }
+
         if (newValue.dataIndex) {
           evChart.renderWithSelected(newValue.dataIndex);
         }
       }, { deep: true });
 
       watch(() => props.selectedSeries, (newValue) => {
+        if (!isInit) {
+          return;
+        }
+
         if (newValue.seriesId) {
           evChart.renderWithSelected(newValue.seriesId);
         }
@@ -153,28 +170,38 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       });
 
       onBeforeUnmount(() => {
+        if (!isInit) {
+          return;
+        }
+
         evChart.destroy();
       });
 
       onDeactivated(() => {
-        if (evChart && 'hideTooltip' in evChart) {
-          evChart.hideTooltip();
+        if (!isInit) {
+          return;
         }
+
+        evChart.hideTooltip();
       });
 
       const redraw = () => {
-        if (evChart && isInit) {
-          evChart.update({
-            updateSeries: true,
-            updateSelTip: { update: true, keepDomain: false },
-          });
+        if (!isInit) {
+          return;
         }
+
+        evChart.update({
+          updateSeries: true,
+          updateSelTip: { update: true, keepDomain: false },
+        });
       };
 
       const onResize = debounce(() => {
-        if (evChart && 'resize' in evChart && isInit) {
-          evChart.resize();
+        if (!isInit) {
+          return;
         }
+
+        evChart.resize();
       }, props.resizeTimeout);
 
       return {
