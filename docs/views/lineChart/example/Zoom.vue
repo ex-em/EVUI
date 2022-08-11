@@ -1,8 +1,9 @@
 <template>
-  <div ref="zoomRef" class="case">
-    <ev-chart-zoom
-      :options="chartZoomOption"
-    >
+  <div
+    ref="zoomRef"
+    class="case"
+  >
+    <ev-chart-zoom :options="chartZoomOption">
       <ev-chart
         :data="chartData"
         :options="chartOption"
@@ -13,15 +14,11 @@
       />
       <div class="description">
         <span class="toggle-label">토글 레전드</span>
-        <ev-toggle
-          v-model="isShowToggleLegend"
-        />
+        <ev-toggle v-model="isShowToggleLegend"/>
         <br/>
         <br/>
         <span class="toggle-label">차트 넓히기</span>
-        <ev-toggle
-          v-model="isExpandChartArea"
-        />
+        <ev-toggle v-model="isExpandChartArea"/>
       </div>
     </ev-chart-zoom>
   </div>

@@ -1,16 +1,22 @@
 <template>
-  <div ref="evChartZoomRef" class="ev-chart-zoom__wrapper">
-      <div class="ev-icon" :style="iconStyle">
-        <ev-icon
-          v-for="(iconName, type) in chartZoomOptions.icon.type"
-          :key="`${type}-${iconName}`"
-          :icon="iconName"
-          :size="chartZoomOptions.icon.size"
-          :title="type"
-          @click="(e) => onClick(e, type)"
-        />
-      </div>
-      <slot />
+  <div
+    ref="evChartZoomRef"
+    class="ev-chart-zoom__wrapper"
+  >
+    <div
+      class="ev-icon"
+      :style="iconStyle"
+    >
+      <ev-icon
+        v-for="(iconName, type) in chartZoomOptions.icon.type"
+        :key="`${type}-${iconName}`"
+        :icon="iconName"
+        :size="chartZoomOptions.icon.size"
+        :title="type"
+        @click="(e) => onClick(e, type)"
+      />
+    </div>
+    <slot />
   </div>
 </template>
 
@@ -59,20 +65,20 @@ export default {
 
       evChartInfo.props = slots.default(evChartInfo.dom).reduce(
         (acc, { type, props: evChartProps }) => {
-        if (type?.name === 'EvChart') {
-          if (!evChartProps.options?.dragSelection?.use) {
-            evChartProps.options.dragSelection = {
-              use: true,
-              keepDisplay: true,
-            };
+          if (type?.name === 'EvChart') {
+            if (!evChartProps.options?.dragSelection?.use) {
+              evChartProps.options.dragSelection = {
+                use: true,
+                keepDisplay: true,
+              };
+            }
+
+            acc.push(evChartProps);
           }
 
-          acc.push(evChartProps);
-        }
-
-        return acc;
-      }, [],
-    );
+          return acc;
+        }, [],
+      );
 
       evChartClone.data = cloneDeep(evChartInfo.props.map(({ data }) => data));
 
@@ -164,8 +170,8 @@ export default {
 
   .ev-icon {
     position: absolute;
-    right: 30px;
     top: 13px;
+    right: 30px;
     z-index: 1;
 
     i:hover {
@@ -177,10 +183,10 @@ export default {
       color: var(--color-hover);
       font-weight: bold;
     }
+  }
 
-    i + i {
-      margin-left: 10px;
-    }
+  i + i {
+    margin-left: 10px;
   }
 }
 </style>

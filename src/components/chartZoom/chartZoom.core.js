@@ -180,8 +180,8 @@ export default class EvChartZoom {
       return [displayCanvas, animationCanvas];
     });
 
-    for (let i = 0; i < displayAnimaionCanvas.length; i++) {
-      const [displayCanvas, animationCanvas] = displayAnimaionCanvas[i];
+    for (let idx = 0; idx < displayAnimaionCanvas.length; idx++) {
+      const [displayCanvas, animationCanvas] = displayAnimaionCanvas[idx];
 
       const animationCtx = animationCanvas.getContext('2d');
 
@@ -209,7 +209,7 @@ export default class EvChartZoom {
       ).then((isAnimationFinish) => {
         animationCanvas.style.display = 'none';
 
-        if (isAnimationFinish && i === displayAnimaionCanvas.length - 1) {
+        if (isAnimationFinish && idx === displayAnimaionCanvas.length - 1) {
           this.isAnimationFinish = isAnimationFinish;
           this.executeZoom(newZoomStartIdx, newZoomEndIdx);
           this.setZoomAreaMemory(newZoomStartIdx, newZoomEndIdx);
@@ -352,9 +352,7 @@ export default class EvChartZoom {
       return requestAnimationFrame(() => animate(responseFinishStatus));
     };
 
-    return new Promise((response) => {
-      animate(response);
-    });
+    return new Promise(response => animate(response));
   }
 
   updateEvChartCloneData(evChartClone) {
