@@ -73,14 +73,15 @@
 </template>
 
 <script type="text/babel">
-  // const typeMap = {
-  //   success: 'success',
-  //   info: 'info',
-  //   warning: 'warning',
-  //   error: 'error',
-  // };
+  import EvButton from '@/components/button/button';
+  import EvIcon from '@/components/icon/icon';
 
   export default {
+    name: 'EvMessageBox',
+    components: {
+      EvButton,
+      EvIcon,
+    },
     data() {
       return {
         type: 'info',

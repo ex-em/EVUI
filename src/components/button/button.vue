@@ -15,6 +15,7 @@
   const prefixCls = 'ev-btn';
 
   export default {
+    name: 'EvButton',
     props: {
       htmlType: {
         type: String,
