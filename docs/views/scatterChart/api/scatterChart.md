@@ -227,13 +227,25 @@ const chartOptions = {
 | fixedPosTop | Boolean | false | indicator 및 tip의 위치를 최대값으로 고정  | |
 | useApproximateValue | Boolean | false | 가까운 label을 선택  | |
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
-| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
-| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
-| tipHeight | Number | 20 | tip 높이  | |
-| tipFontSize  | Number | 14 | tip 폰트 크기 | |
-| tipFontFamily | String | 'Roboto' | tip 폰트 | |
-| tipFontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
+| tipStyle | Object | ([상세](#tipstyle)) | tip 스타일을 설정
 | useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |
+
+##### etc.
+| 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
+| ------ | ------ | ---- | -----| --------- |
+| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
+| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
+* 3.4 버전부터 없어지는 옵션입니다.
+
+##### tipStyle
+| 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
+| ------ | ------ | ---- | -----| --------- |
+| height | Number | 20 | tip 높이 | |
+| background | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
+| textColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
+| fontSize  | Number | 14 | tip 폰트 크기 | |
+| fontFamily | String | 'Roboto' | tip 폰트 | |
+| fontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
 
 ### 4. resize-timeout
 - Default : 0

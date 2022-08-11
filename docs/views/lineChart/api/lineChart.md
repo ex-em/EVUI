@@ -271,12 +271,14 @@ const chartOptions = {
 | fixedPosTop | Boolean | false | maxTip 위치를 최대값으로 고정  | |
 | showIndicator | Boolean | false | indicator 표시 여부  | |
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
+| tipStyle | Object | ([상세](#tipstyle)) | tip 스타일을 설정
+
+##### etc.
+| 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
+| ------ | ------ | ---- | -----| --------- |
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
-| tipHeight | Number | 20 | tip 높이  | |
-| tipFontSize  | Number | 14 | tip 폰트 크기 | |
-| tipFontFamily | String | 'Roboto' | tip 폰트 | |
-| tipFontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
+* 3.4 버전부터 없어지는 옵션입니다.
 
 #### selectItem
 | 이름                  | 타입 | 디폴트       | 설명                                                | 종류(예시) |
@@ -290,12 +292,24 @@ const chartOptions = {
 | fixedPosTop         | Boolean | false     | indicator 및 tip의 위치를 최대값으로 고정 | |
 | useApproximateValue | Boolean | false     | 가까운 label을 선택 | |
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상 | |
-| tipBackground       | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상 | |
-| tipTextColor        | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상 | |
-| tipHeight           | Number | 20 | tip 높이  | |
-| tipFontSize         | Number | 14 | tip 폰트 크기 | |
-| tipFontFamily       | String | 'Roboto' | tip 폰트 | |
-| tipFontWeight       | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
+| tipStyle | Object | ([상세](#tipstyle)) | tip 스타일을 설정
+
+##### etc.
+| 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
+| ------ | ------ | ---- | -----| --------- |
+| tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
+| tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
+* 3.4 버전부터 없어지는 옵션입니다.
+
+##### tipStyle
+| 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
+| ------ | ------ | ---- | -----| --------- |
+| height | Number | 20 | tip 높이 | |
+| background | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
+| textColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
+| fontSize  | Number | 14 | tip 폰트 크기 | |
+| fontFamily | String | 'Roboto' | tip 폰트 | |
+| fontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
 
 #### selectLabel
 | 이름                 | 타입                          | 디폴트       | 설명                                                | 종류(예시) |
@@ -326,7 +340,6 @@ const chartOptions = {
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
-
 
 ### 6. resize-timeout
 - Default : 0

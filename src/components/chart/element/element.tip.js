@@ -368,11 +368,11 @@ const modules = {
     const arrowSize = 4;
     const borderRadius = 4;
     const {
-      tipFontSize: fontSize,
-      tipFontFamily: fontFamily,
-      tipFontWeight: fontWeight,
-      tipHeight: maxTipHeight,
-    } = opt;
+      fontSize,
+      fontFamily,
+      fontWeight,
+      height: maxTipHeight,
+    } = opt.tipStyle;
     const textStyle = `normal normal ${fontWeight} ${fontSize}px ${fontFamily}`;
 
     let offset = 1;
@@ -468,7 +468,7 @@ const modules = {
     ctx.save();
     ctx.font = textStyle;
 
-    ctx.fillStyle = opt.tipBackground;
+    ctx.fillStyle = opt.tipBackground ?? opt.tipStyle.background;
     ctx.shadowBlur = 0;
 
     ctx.beginPath();
@@ -508,7 +508,7 @@ const modules = {
     ctx.restore();
     ctx.save();
     ctx.font = textStyle;
-    ctx.fillStyle = opt.tipTextColor;
+    ctx.fillStyle = opt.tipTextColor ?? opt.tipStyle.textColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillText(`${text}`, x, sy + (height / 2));
@@ -529,7 +529,7 @@ const modules = {
     const cy = y - offset;
     ctx.save();
 
-    ctx.fillStyle = opt.tipBackground;
+    ctx.fillStyle = opt.tipBackground ?? opt.tipStyle.background;
     ctx.beginPath();
     ctx.moveTo(x, cy);
     if (isHorizontal) {
