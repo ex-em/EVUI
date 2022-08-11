@@ -97,20 +97,20 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         }
       };
 
+      watch(() => props.options, (chartOpt) => {
+        const newOpt = getNormalizedOptions(chartOpt);
+        const isUpdateLegend = !isEqual(newOpt.legend, evChart.options.legend);
+        evChart.options = cloneDeep(newOpt);
+        evChart.update({
+          updateSeries: false,
+          updateSelTip: { update: false, keepDomain: false },
+          updateLegend: isUpdateLegend,
+        });
+      }, { deep: true });
+
       onMounted(async () => {
         await createChart();
         await drawChart();
-
-        await watch(() => props.options, (chartOpt) => {
-          const newOpt = getNormalizedOptions(chartOpt);
-          const isUpdateLegend = !isEqual(newOpt.legend, evChart.options.legend);
-          evChart.options = cloneDeep(newOpt);
-          evChart.update({
-            updateSeries: false,
-            updateSelTip: { update: false, keepDomain: false },
-            updateLegend: isUpdateLegend,
-          });
-        }, { deep: true });
 
         await watch(() => props.data, (chartData) => {
           const newData = getNormalizedData(chartData);

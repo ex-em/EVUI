@@ -7,6 +7,8 @@ import FillRaw from '!!raw-loader!./example/Fill';
 import Stack from './example/Stack';
 import StackRaw from '!!raw-loader!./example/Stack';
 import Event from './example/Event';
+import Zoom from './example/Zoom';
+import ZoomRaw from '!!raw-loader!./example/Zoom';
 import EventRaw from '!!raw-loader!./example/Event';
 import DragSelection from './example/DragSelection';
 import DragSelectionRaw from '!!raw-loader!./example/DragSelection';
@@ -24,6 +26,11 @@ import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
 export default {
   mdText,
   components: {
+    Zoom: {
+      description: 'Line Chart 줌 기능입니다.',
+      component: Zoom,
+      parsedData: parseComponent(ZoomRaw),
+    },
     Default: {
       description: 'Line Chart는 각각의 데이터를 선으로 연결하여 추이를 시각적으로 인지하는 차트입니다.',
       component: Default,

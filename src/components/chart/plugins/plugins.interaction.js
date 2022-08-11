@@ -111,6 +111,9 @@ const modules = {
      * @returns {undefined}
      */
     this.onClick = (e) => {
+      if (this.options?.zoom?.use) {
+        return;
+      }
       const args = { e };
       if (this.options.selectItem.use) {
         const offset = this.getMousePosition(e);
@@ -295,13 +298,31 @@ const modules = {
 
         this.dragInfoBackup = defaultsDeep({}, dragInfo);
 
-        if (typeof this.listeners['drag-select'] === 'function') {
+        if (typeof this.listeners['drag-select'] === 'function' && !this.options?.zoom?.use) {
           this.listeners['drag-select'](args);
-        }
-      }
+        } else {
+          const {
+            xsp,
+            range: chartRange,
+            width: dragWidth,
+          } = dragInfo;
+          const dragXsp = xsp - chartRange.x1;
 
-      if (!this.options.dragSelection.keepDisplay) {
-        this.removeSelectionArea();
+          args.range.dragSelectionInfo = {
+            dragXsp,
+            dragXep: dragXsp + dragWidth,
+            exceptAxesYChartWidth: chartRange.x2 - chartRange.x1,
+            exceptAxesXChartHeight: chartRange.y2 - chartRange.y1,
+            chartRange,
+            chartTitle: this.options.title.text,
+          };
+
+          this.options.zoom.getRangeInfo(args);
+        }
+
+        if (!this.options.dragSelection.keepDisplay) {
+          this.removeSelectionArea();
+        }
       }
 
       this.dragInfo = null;
