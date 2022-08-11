@@ -229,7 +229,11 @@ const chartOptions = {
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | tip 글자 색상  | |
-| useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |
+| tipHeight | Number | 20 | tip 높이  | |
+| tipFontSize  | Number | 14 | tip 폰트 크기 | |
+| tipFontFamily | String | 'Roboto' | tip 폰트 | |
+| tipFontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
+| useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |                                     | |
 
 ### 4. resize-timeout
 - Default : 0

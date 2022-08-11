@@ -100,6 +100,10 @@ const DEFAULT_OPTIONS = {
     indicatorColor: '#000000',
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
+    tipHeight: 20,
+    tipFontSize: 14,
+    tipFontFamily: 'Roboto',
+    tipFontWeight: 400,
   },
   selectItem: {
     use: false,
@@ -113,6 +117,10 @@ const DEFAULT_OPTIONS = {
     indicatorColor: '#000000',
     tipBackground: '#000000',
     tipTextColor: '#FFFFFF',
+    tipHeight: 20,
+    tipFontSize: 14,
+    tipFontFamily: 'Roboto',
+    tipFontWeight: 400,
     useSeriesOpacity: false,
   },
   selectLabel: {
