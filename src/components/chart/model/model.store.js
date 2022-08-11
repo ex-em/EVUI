@@ -339,14 +339,14 @@ const modules = {
       gdataValue = gdata.value;
       gdataColor = gdata.color;
     } else {
-      gdataValue = gdata;
+      gdataValue = gdata ?? null;
     }
 
     if (odata !== null && typeof odata === 'object') {
       odataValue = odata.value;
       odataColor = odata.color;
     } else {
-      odataValue = odata;
+      odataValue = odata ?? null;
     }
 
     if (this.options.horizontal) {

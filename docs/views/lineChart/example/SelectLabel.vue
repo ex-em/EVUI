@@ -14,6 +14,12 @@
       @click="onClick"
     />
     <div class="description">
+      <ev-toggle v-model="isUseClick" />
+      <span>
+        클릭 기능 enable ( false 일때는 v-model 값으로 변경 )
+      </span>
+      <br>
+      <br>
       <ev-toggle v-model="isFixedPosTop" />
       <span>
         tip 위치를 최상단에 고정
@@ -89,6 +95,7 @@ export default {
         series5: [],
       },
     });
+    const isUseClick = ref(true);
     const isFixedPosTop = ref(false);
 
     const chartOptions1 = ref({
@@ -115,6 +122,7 @@ export default {
       }],
       selectLabel: {
         use: true,
+        useClick: isUseClick,
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
@@ -149,6 +157,7 @@ export default {
       }],
       selectLabel: {
         use: true,
+        useClick: isUseClick,
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
@@ -224,6 +233,7 @@ export default {
       chartOptions2,
       clickedLabel,
       defaultSelectLabel,
+      isUseClick,
       isFixedPosTop,
       isLive,
       onClick,

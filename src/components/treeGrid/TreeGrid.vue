@@ -59,7 +59,7 @@
               v-if="!column.hide"
               :data-index="index"
               :class="getColumnClass(column)"
-              :style="getColumnStyle(column)"
+              :style="getColumnStyle(column, index)"
             >
               <!-- Column Name -->
               <span
@@ -90,7 +90,7 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
-        <table>
+        <table ref="table">
           <tbody>
             <tree-grid-node
               v-for="(node, idx) in viewStore"
@@ -264,6 +264,7 @@ export default {
     const elementInfo = reactive({
       body: null,
       header: null,
+      table: null,
       resizeLine: null,
       'grid-wrapper': null,
     });
@@ -322,6 +323,7 @@ export default {
       vScrollTopHeight: 0,
       vScrollBottomHeight: 0,
       hasVerticalScrollBar: false,
+      hasHorizontalScrollBar: false,
     });
     const selectInfo = reactive({
       selectedRow: props.selected,
@@ -342,7 +344,7 @@ export default {
       minWidth: 40,
       rendererMinWidth: 80,
       showResizeLine: false,
-      adjust: computed(() => props.option.adjust || false),
+      adjust: props.option.adjust || false,
       columnWidth: props.option.columnWidth || 80,
       scrollWidth: props.option.scrollWidth || 17,
       rowHeight: computed(() => props.option.rowHeight || 35),
@@ -426,6 +428,7 @@ export default {
       stores,
       isRenderer,
       updateVScroll,
+      updateHScroll,
     });
 
     const {
@@ -595,7 +598,7 @@ export default {
       },
     );
     watch(
-      () => [props.width, props.height, resizeInfo.adjust, props.option.columnWidth],
+      () => [props.width, props.height, props.option.columnWidth],
       (value) => {
         resizeInfo.columnWidth = value[3];
         stores.orderedColumns.map((column) => {
@@ -690,11 +693,14 @@ export default {
         'non-border': !!styleInfo.borderStyle,
       };
     };
-    const getColumnStyle = (column) => {
+    const getColumnStyle = (column, index) => {
       const render = isRenderer(column);
       return {
         width: `${column.width}px`,
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
+        'margin-right': (stores.orderedColumns.length - 1 === index
+          && scrollInfo.hasVerticalScrollBar
+          && scrollInfo.hasHorizontalScrollBar) ? `${resizeInfo.scrollWidth}px` : '0px',
       };
     };
     const getSlotName = column => `${column}Node`;

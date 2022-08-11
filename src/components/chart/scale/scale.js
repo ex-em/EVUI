@@ -120,7 +120,7 @@ class Scale {
       increase += interval;
     }
 
-    const graphMax = increase > maxValue ? maxValue : increase;
+    const graphMax = increase;
     const graphMin = minValue;
     const graphRange = graphMax - graphMin;
 

@@ -99,49 +99,57 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
 
       watch(() => props.options, (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
-        const isUpdateLegend = !isEqual(newOpt.legend, evChart.options.legend);
+
+        const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
+
         evChart.options = cloneDeep(newOpt);
+
         evChart.update({
           updateSeries: false,
           updateSelTip: { update: false, keepDomain: false },
-          updateLegend: isUpdateLegend,
+          updateLegend: isUpdateLegendType,
         });
+      }, { deep: true });
+
+      watch(() => props.data, (chartData) => {
+        const newData = getNormalizedData(chartData);
+
+        const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
+            || !isEqual(newData.groups, evChart.data.groups)
+            || props.options.type === 'heatMap';
+
+        const isUpdateData = !isEqual(newData.data, evChart.data);
+
+        evChart.data = cloneDeep(newData);
+
+        evChart.update({
+          updateSeries: isUpdateSeries,
+          updateSelTip: { update: true, keepDomain: false },
+          updateData: isUpdateData,
+        });
+      }, { deep: true });
+
+      watch(() => props.selectedItem, (newValue) => {
+        const chartType = props.options?.type;
+
+        evChart.selectItemByData(newValue, chartType);
+      }, { deep: true });
+
+      watch(() => props.selectedLabel, (newValue) => {
+        if (newValue.dataIndex) {
+          evChart.renderWithSelected(newValue.dataIndex);
+        }
+      }, { deep: true });
+
+      watch(() => props.selectedSeries, (newValue) => {
+        if (newValue.seriesId) {
+          evChart.renderWithSelected(newValue.seriesId);
+        }
       }, { deep: true });
 
       onMounted(async () => {
         await createChart();
         await drawChart();
-
-        await watch(() => props.data, (chartData) => {
-          const newData = getNormalizedData(chartData);
-          const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
-              || !isEqual(newData.groups, evChart.data.groups)
-              || props.options.type === 'heatMap';
-          const isUpdateData = !isEqual(newData.data, evChart.data);
-          evChart.data = cloneDeep(newData);
-          evChart.update({
-            updateSeries: isUpdateSeries,
-            updateSelTip: { update: true, keepDomain: false },
-            updateData: isUpdateData,
-          });
-        }, { deep: true });
-
-        await watch(() => props.selectedItem, (newValue) => {
-          const chartType = props.options?.type;
-          evChart.selectItemByData(newValue, chartType);
-        }, { deep: true });
-
-        await watch(() => props.selectedLabel, (newValue) => {
-          if (newValue.dataIndex) {
-            evChart.renderWithSelected(newValue.dataIndex);
-          }
-        }, { deep: true });
-
-        await watch(() => props.selectedSeries, (newValue) => {
-          if (newValue.seriesId) {
-            evChart.renderWithSelected(newValue.seriesId);
-          }
-        }, { deep: true });
       });
 
       onBeforeUnmount(() => {

@@ -59,9 +59,6 @@
   }
   &:nth-last-child(1) {
     border-right: 0;
-    .column-resize {
-      cursor: default !important;
-    }
   }
   .sort-icon {
     display: inline-block;
