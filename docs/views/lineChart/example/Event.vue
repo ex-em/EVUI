@@ -85,7 +85,9 @@
         },
         maxTip: {
           use: true,
-          tipBackground: '#FF00FF',
+          tipStyle: {
+            background: '#FF00FF',
+          },
         },
       };
 
