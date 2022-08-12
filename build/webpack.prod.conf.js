@@ -32,7 +32,10 @@ const webpackConfig = merge(webpackBaseConfig, {
   plugins: [
     new CleanWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'production',
+      DEBUG: false,
+    }),
     new CompressionPlugin({
       filename: '[path].gz[query]',
       algorithm: 'gzip',
