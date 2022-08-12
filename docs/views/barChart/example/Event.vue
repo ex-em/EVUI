@@ -83,12 +83,16 @@
         selectItem: {
           use: true,
           showTextTip: true,
-          tipBackground: '#FF00FF',
+          tipStyle: {
+            background: '#FF00FF',
+          },
         },
         maxTip: {
           use: true,
           showTextTip: true,
-          tipBackground: '#FF0000',
+          tipStyle: {
+            background: '#FF0000',
+          },
         },
       };
 

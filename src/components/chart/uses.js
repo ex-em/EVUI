@@ -98,8 +98,14 @@ const DEFAULT_OPTIONS = {
     fixedPosTop: false,
     showIndicator: false,
     indicatorColor: '#000000',
-    tipBackground: '#000000',
-    tipTextColor: '#FFFFFF',
+    tipStyle: {
+      height: 20,
+      background: '#000000',
+      textColor: '#FFFFFF',
+      fontSize: 14,
+      fontFamily: 'Roboto',
+      fontWeight: 400,
+    },
   },
   selectItem: {
     use: false,
@@ -111,8 +117,14 @@ const DEFAULT_OPTIONS = {
     fixedPosTop: false,
     useApproximateValue: false,
     indicatorColor: '#000000',
-    tipBackground: '#000000',
-    tipTextColor: '#FFFFFF',
+    tipStyle: {
+      height: 20,
+      background: '#000000',
+      textColor: '#FFFFFF',
+      fontSize: 14,
+      fontFamily: 'Roboto',
+      fontWeight: 400,
+    },
     useSeriesOpacity: false,
   },
   selectLabel: {

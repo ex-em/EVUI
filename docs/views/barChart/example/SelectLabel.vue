@@ -173,7 +173,9 @@ export default {
       maxTip: {
         use: true,
         showTextTip: true,
-        tipBackground: '#FF0000',
+        tipStyle: {
+          background: '#FF0000',
+        },
       },
     });
     const chartOptions2 = ref({
@@ -217,7 +219,9 @@ export default {
       maxTip: {
         use: true,
         showTextTip: true,
-        tipBackground: '#FF0000',
+        tipStyle: {
+          background: '#FF0000',
+        },
       },
     });
     const chartOptions3 = ref({
@@ -261,7 +265,9 @@ export default {
       maxTip: {
         use: true,
         showTextTip: true,
-        tipBackground: '#FF0000',
+        tipStyle: {
+          background: '#FF0000',
+        },
       },
     });
     const chartOptions4 = ref({
@@ -305,7 +311,9 @@ export default {
       maxTip: {
         use: true,
         showTextTip: true,
-        tipBackground: '#FF0000',
+        tipStyle: {
+          background: '#FF0000',
+        },
       },
     });
 
