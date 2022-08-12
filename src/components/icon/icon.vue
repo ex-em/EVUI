@@ -12,6 +12,7 @@
   const prefixCls = 'ei';
 
   export default {
+    name: 'EvIcon',
     props: {
       type: {
         type: String,
