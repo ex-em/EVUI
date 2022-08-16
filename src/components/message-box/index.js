@@ -1,3 +1,7 @@
-import MessageBox from './message-box';
+import MessageBox from './message-box.vue';
+import MessageBoxFn from './message-box';
 
-export default MessageBox;
+export {
+  MessageBox,
+  MessageBoxFn,
+};

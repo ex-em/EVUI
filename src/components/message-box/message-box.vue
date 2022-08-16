@@ -73,15 +73,7 @@
 </template>
 
 <script type="text/babel">
-  import EvButton from '@/components/button/button';
-  import EvIcon from '@/components/icon/icon';
-
   export default {
-    name: 'EvMessageBox',
-    components: {
-      EvButton,
-      EvIcon,
-    },
     data() {
       return {
         type: 'info',
