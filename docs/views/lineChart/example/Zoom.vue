@@ -13,6 +13,17 @@
         :options="chartOption2"
       />
       <div class="description">
+        <p class="case-title">줌 버퍼 메모리</p>
+        <ev-input-number
+          v-model="bufferMemoryCnt"
+          :min="1"
+          :max="1000"
+        />
+        <br/>
+        <br/>
+        <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
+        <br/>
+        <br/>
         <span class="toggle-label">토글 레전드</span>
         <ev-toggle v-model="isShowToggleLegend"/>
         <br/>
@@ -32,15 +43,16 @@ export default {
   setup() {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
+    const bufferMemoryCnt = ref(5);
     const zoomRef = ref();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
     const chartZoomOption = reactive({
       icon: {
         type: {
-          reset: 'ev-icon-refresh',
-          previous: 'ev-icon-undo',
-          latest: 'ev-icon-redo',
+          previous: 'ev-icon-allow2-left',
+          latest: 'ev-icon-allow2-right',
+          reset: 'ev-icon-redo',
           dragZoom: 'ev-icon-zoomin',
         },
         size: 'medium',
@@ -152,11 +164,30 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < 20; ix++) {
+      for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
         addRandomChartData();
       }
     });
 
+    const onUpdateChartData = () => {
+      const init = (data) => {
+        data.labels.length = 0;
+        const seriesKeyArr = Object.keys(data.data);
+
+        for (let i = 0; i < seriesKeyArr.length; i++) {
+          const series = seriesKeyArr[i];
+
+          data.data[series].length = 0;
+        }
+      };
+
+      init(chartData);
+      init(chartData2);
+
+      for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
+        addRandomChartData();
+      }
+    };
 
     watch(isShowToggleLegend, (isShow) => {
       chartOption.legend.show = isShow;
@@ -175,6 +206,10 @@ export default {
       }
     });
 
+    watch(bufferMemoryCnt, (cnt) => {
+      chartZoomOption.bufferMemoryCnt = cnt;
+    }, { immediate: true });
+
     return {
       chartZoomOption,
       chartData,
@@ -184,6 +219,8 @@ export default {
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,
+      onUpdateChartData,
+      bufferMemoryCnt,
     };
   },
 };

@@ -4,12 +4,14 @@
     class="ev-chart-zoom__wrapper"
   >
     <div
+      ref="iconRef"
       class="ev-icon"
       :style="iconStyle"
     >
       <ev-icon
         v-for="(iconName, type) in chartZoomOptions.icon.type"
         :key="`${type}-${iconName}`"
+        :class="type"
         :icon="iconName"
         :size="chartZoomOptions.icon.size"
         :title="type"
@@ -37,12 +39,16 @@ export default {
   setup(props, { slots }) {
     const evChartInfo = reactive({
       dom: {},
-      props: {},
+      props: {
+        data: [],
+        options: [],
+      },
     });
     const evChartClone = { data: {} };
     let evChartZoom = {};
 
     const evChartZoomRef = ref();
+    const iconRef = ref();
     const isUseZoomMode = ref(false);
 
     const {
@@ -63,35 +69,28 @@ export default {
     onMounted(() => {
       evChartInfo.dom = evChartZoomRef.value.querySelectorAll('.ev-chart-container');
 
-      evChartInfo.props = slots.default(evChartInfo.dom).reduce(
-        (acc, { type, props: evChartProps }) => {
-          if (type?.name === 'EvChart') {
-            if (!evChartProps.options?.dragSelection?.use) {
-              evChartProps.options.dragSelection = {
-                use: true,
-                keepDisplay: true,
-              };
-            }
+      slots.default(evChartInfo.dom).forEach(({ type, props: { data, options } }) => {
+        if (type?.name === 'EvChart') {
+          if (!options?.dragSelection?.use) {
+            options.dragSelection = {
+              use: true,
+              keepDisplay: true,
+            };
 
-            acc.push(evChartProps);
+            evChartInfo.props.data.push(data);
+            evChartInfo.props.options.push(options);
           }
+        }
+      });
 
-          return acc;
-        }, [],
-      );
-
-      evChartClone.data = cloneDeep(evChartInfo.props.map(({ data }) => data));
+      evChartClone.data = cloneDeep(evChartInfo.props.data);
 
       evChartZoom = new EvChartZoom(
         evChartInfo,
         evChartClone,
+        props.options,
+        iconRef.value,
       );
-    });
-
-    watch(() => evChartInfo.props, (evChartProps) => {
-      evChartClone.data = cloneDeep(evChartProps.map(({ data }) => data));
-
-      evChartZoom.updateEvChartCloneData(evChartClone);
     });
 
     const getRangeInfo = (zoomInfo) => {
@@ -100,25 +99,47 @@ export default {
       }
     };
 
-    const onClickUseDragZoom = ({ target }) => {
+    const setEvChartOptions = () => {
       const defaultDragType = 'dragZoom';
-      isUseZoomMode.value = !isUseZoomMode.value;
 
-      target.classList.toggle('active');
-
-      evChartInfo.props.forEach(({ options }) => {
-        options.zoom = {
+      evChartInfo.props.options.forEach((option) => {
+        option.zoom = {
           use: isUseZoomMode.value,
           type: defaultDragType,
           getRangeInfo,
         };
 
-        options.dragSelection = {
+        option.dragSelection = {
           use: true,
           keepDisplay: !isUseZoomMode.value,
         };
       });
+    };
 
+    watch(() => evChartInfo.props.data, (evChartProps) => {
+      if (!evChartZoom.isExecuteZoom) {
+        evChartClone.data = cloneDeep(evChartProps);
+        isUseZoomMode.value = false;
+
+        setEvChartOptions();
+
+        evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      }
+
+      evChartZoom.isExecuteZoom = false;
+    }, { deep: true });
+
+    const onClickUseDragZoom = ({ target }) => {
+      if (evChartClone.data[0].labels.length <= 1) {
+        return;
+      }
+
+      isUseZoomMode.value = !isUseZoomMode.value;
+      target.classList.toggle('active');
+
+      setEvChartOptions();
+
+      evChartZoom.setIconStyle(isUseZoomMode.value);
       evChartZoom.moveZoomArea(isUseZoomMode.value, 'wheel');
     };
 
@@ -155,6 +176,7 @@ export default {
 
     return {
       evChartZoomRef,
+      iconRef,
       chartZoomOptions,
       iconStyle,
       onClick,
@@ -173,6 +195,11 @@ export default {
     top: 13px;
     right: 30px;
     z-index: 1;
+
+    i {
+      pointer-events: none;
+      opacity: 0.5;
+    }
 
     i:hover {
       color: var(--color-hover);

@@ -1,9 +1,13 @@
 export default class EvChartZoom {
-  constructor(evChartInfo, evChartClone) {
+  constructor(evChartInfo, evChartClone, evChartZoomOptions, iconRef) {
     this.evChartProps = evChartInfo.props;
     this.evChartCloneData = evChartClone.data;
+    this.evChartZoomOptions = evChartZoomOptions;
+    this.setIcon(iconRef);
+
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
+
     this.isAnimationFinish = true;
 
     this.zoomAreaMemory = {
@@ -14,6 +18,17 @@ export default class EvChartZoom {
 
     this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
     this.evChartDomContainers = this.drawAnimationCanvas(evChartInfo.dom);
+  }
+
+  setIcon(iconRef) {
+    const dragZoomIcon = iconRef.querySelector('.dragZoom');
+
+    this.resetIcon = iconRef.querySelector('.reset');
+    this.previousIcon = iconRef.querySelector('.previous');
+    this.latestIcon = iconRef.querySelector('.latest');
+    this.dragZoomIcon = dragZoomIcon;
+
+    this.iconStyle(dragZoomIcon, 'enable');
   }
 
   drawAnimationCanvas(evChartDom) {
@@ -31,6 +46,7 @@ export default class EvChartZoom {
 
   moveZoomArea(isUseZoomMode, mode) {
     const toggleEventListener = isUseZoomMode ? 'addEventListener' : 'removeEventListener';
+    this.isUseZoomMode = isUseZoomMode;
 
     if (!this.isAnimationFinish) {
       return;
@@ -101,16 +117,17 @@ export default class EvChartZoom {
       exceptAxesYChartWidth,
       chartTitle,
     } = dragSelectionInfo;
+    const { options: evChartOptions, data: evChartData } = this.evChartProps;
 
-    const dragChartIdx = this.evChartProps.length > 1 ? this.evChartProps.findIndex(
-      ({ options: { title } }) => title.text === chartTitle,
+    const dragChartIdx = evChartOptions.length > 1 ? evChartOptions.findIndex(
+      ({ title }) => title.text === chartTitle,
     ) : 0;
 
-    if (this.evChartProps[dragChartIdx].options?.axesX[0]?.type === 'time') {
+    if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
       const zoomSeries = zoomInfoData[dragChartIdx].items;
       const zoomStartDate = zoomSeries[0].x;
       const zoomEndDate = zoomSeries[zoomSeries.length - 1].x;
-      const currentChartDataLabels = this.evChartProps[dragChartIdx].data.labels;
+      const currentChartDataLabels = evChartData[dragChartIdx].labels;
       const cloneChartDataLabels = this.evChartCloneData[dragChartIdx].labels;
       const [currentZoomStartIdx, currentZoomEndIdx] = this.zoomAreaMemory.current[0];
 
@@ -219,38 +236,48 @@ export default class EvChartZoom {
   }
 
   setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction) {
-    const currentZoomArea = this.zoomAreaMemory.current.pop();
+    const { previous, current, latest } = this.zoomAreaMemory;
+    const currentZoomArea = current.pop();
+    const { bufferMemoryCnt } = this.evChartZoomOptions;
 
     if (direction) {
+      if (previous.length >= bufferMemoryCnt) {
+        previous.splice(0, previous.length - bufferMemoryCnt + 1);
+      }
+
       this.zoomAreaMemory[direction].push(currentZoomArea);
     } else {
-      this.zoomAreaMemory.previous.push(currentZoomArea);
-      this.zoomAreaMemory.latest.length = 0;
+      previous.push(currentZoomArea);
+      latest.length = 0;
     }
 
-    this.zoomAreaMemory.current.push([zoomStartIdx, zoomEndIdx]);
+    current.push([zoomStartIdx, zoomEndIdx]);
+
+    this.setIconStyle(this.isUseZoomMode);
   }
 
   executeZoom(zoomStartIdx, zoomEndIdx) {
+    this.isExecuteZoom = true;
+
     for (let idx = 0; idx < this.evChartCloneData.length; idx++) {
       const {
         data: cloneData,
         labels: cloneLabels,
         series: cloneSeries,
       } = this.evChartCloneData[idx];
-      const { data } = this.evChartProps[idx];
+      const evChartData = this.evChartProps.data[idx];
 
       const cloneSeriesNames = Object.keys(cloneSeries);
 
       for (let jdx = 0; jdx < cloneSeriesNames.length; jdx++) {
         const cloneSeriesName = cloneSeriesNames[jdx];
 
-        data.data[cloneSeriesName] = cloneData[cloneSeriesName].filter(
+        evChartData.data[cloneSeriesName] = cloneData[cloneSeriesName].filter(
           (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
         );
       }
 
-      data.labels = cloneLabels.filter(
+      evChartData.labels = cloneLabels.filter(
         (l, labelIdx) => zoomStartIdx <= labelIdx && zoomEndIdx >= labelIdx,
       );
     }
@@ -355,16 +382,48 @@ export default class EvChartZoom {
     return new Promise(response => animate(response));
   }
 
-  updateEvChartCloneData(evChartClone) {
+  updateEvChartCloneData(evChartClone, isUseZoomMode) {
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
     this.evChartCloneData = evChartClone.data;
+    this.dragZoomIcon.classList.remove('active');
 
     this.zoomAreaMemory = {
       previous: [],
       current: [[0, cloneLabelsLastIdx]],
       latest: [],
     };
+
+    this.setIconStyle(isUseZoomMode);
+  }
+
+  setIconStyle(isUseZoomMode) {
+    const toggleIconStyle = (icon, condition) => {
+      if (condition) {
+        this.iconStyle(icon, 'enable');
+      } else {
+        this.iconStyle(icon, 'disable');
+      }
+    };
+
+    if (isUseZoomMode) {
+      const { previous, latest } = this.zoomAreaMemory;
+
+      toggleIconStyle(this.previousIcon, previous.length);
+      toggleIconStyle(this.latestIcon, latest.length);
+      this.iconStyle(this.resetIcon, 'enable');
+    } else {
+      toggleIconStyle(this.resetIcon);
+      toggleIconStyle(this.previousIcon);
+      toggleIconStyle(this.latestIcon);
+    }
+  }
+
+  iconStyle(icon, mode) {
+    const [opacity, pointerEvents] = mode === 'enable' ? [1, 'initial'] : [0.5, 'none'];
+
+    icon.style.opacity = opacity;
+    icon.style.pointerEvents = pointerEvents;
   }
 
   initZoom() {
