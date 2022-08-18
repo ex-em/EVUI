@@ -9,13 +9,13 @@
       :style="iconStyle"
     >
       <ev-icon
-        v-for="(iconName, type) in chartZoomOptions.icon.type"
+        v-for="(iconName, type) in chartZoomOptions.toolbar.icon.type"
         :key="`${type}-${iconName}`"
         :class="type"
         :icon="iconName"
-        :size="chartZoomOptions.icon.size"
+        :size="chartZoomOptions.toolbar.icon.size"
         :title="type"
-        @click="(e) => onClick(e, type)"
+        @click="onClick($event, type)"
       />
     </div>
     <slot />
@@ -45,7 +45,7 @@ export default {
       },
     });
     const evChartClone = { data: {} };
-    let evChartZoom = {};
+    let evChartZoom = null;
 
     const evChartZoomRef = ref();
     const iconRef = ref();
@@ -55,10 +55,18 @@ export default {
       getNormalizedOptions,
     } = useModel();
 
-    const chartZoomOptions = computed(() => getNormalizedOptions(props.options));
+    const chartZoomOptions = computed(() => {
+      const options = getNormalizedOptions(props.options);
+
+      if (evChartZoom) {
+        evChartZoom.setEvChartZoomOptions(options);
+      }
+
+      return options;
+    });
 
     const iconStyle = computed(() => {
-      const { icon: { hoverColor, color } } = chartZoomOptions.value;
+      const { toolbar: { icon: { hoverColor, color } } } = chartZoomOptions.value;
 
       return {
         '--color-hover': hoverColor,
@@ -69,28 +77,32 @@ export default {
     onMounted(() => {
       evChartInfo.dom = evChartZoomRef.value.querySelectorAll('.ev-chart-container');
 
-      slots.default(evChartInfo.dom).forEach(({ type, props: { data, options } }) => {
-        if (type?.name === 'EvChart') {
-          if (!options?.dragSelection?.use) {
-            options.dragSelection = {
-              use: true,
-              keepDisplay: true,
-            };
+      if (evChartInfo.dom.length) {
+        slots.default(evChartInfo.dom).forEach(({ type, props: { data, options } }) => {
+          if (type?.name === 'EvChart') {
+            if (!options?.dragSelection?.use) {
+              options.dragSelection = {
+                use: true,
+                keepDisplay: true,
+              };
 
-            evChartInfo.props.data.push(data);
-            evChartInfo.props.options.push(options);
+              evChartInfo.props.data.push(data);
+              evChartInfo.props.options.push(options);
+            }
           }
-        }
-      });
+        });
+      }
 
-      evChartClone.data = cloneDeep(evChartInfo.props.data);
+      if (evChartInfo.props.data.length) {
+        evChartClone.data = cloneDeep(evChartInfo.props.data);
 
-      evChartZoom = new EvChartZoom(
-        evChartInfo,
-        evChartClone,
-        props.options,
-        iconRef.value,
-      );
+        evChartZoom = new EvChartZoom(
+          evChartInfo,
+          evChartClone,
+          chartZoomOptions.value,
+          iconRef.value,
+        );
+      }
     });
 
     const getRangeInfo = (zoomInfo) => {
@@ -117,6 +129,10 @@ export default {
     };
 
     watch(() => evChartInfo.props.data, (evChartProps) => {
+      if (!evChartZoom.isAnimationFinish) {
+        return;
+      }
+
       if (!evChartZoom.isExecuteZoom) {
         evChartClone.data = cloneDeep(evChartProps);
         isUseZoomMode.value = false;
@@ -140,34 +156,24 @@ export default {
       setEvChartOptions();
 
       evChartZoom.setIconStyle(isUseZoomMode.value);
-      evChartZoom.moveZoomArea(isUseZoomMode.value, 'wheel');
-    };
-
-    const onClickPreviousZoom = (iconType) => {
-      evChartZoom.moveZoomArea(isUseZoomMode.value, iconType);
-    };
-
-    const onClickLatestZoom = (iconType) => {
-      evChartZoom.moveZoomArea(isUseZoomMode.value, iconType);
-    };
-
-    const onClickInitZoom = () => {
-      evChartZoom.initZoom();
+      evChartZoom.setEventListener(isUseZoomMode.value);
     };
 
     const onClick = (e, iconType) => {
+      if (!evChartZoom.isAnimationFinish) {
+        return;
+      }
+
       switch (iconType) {
         case 'dragZoom':
           onClickUseDragZoom(e);
           break;
         case 'reset':
-          onClickInitZoom();
+          evChartZoom.initZoom();
           break;
         case 'previous':
-          onClickPreviousZoom(iconType);
-          break;
         case 'latest':
-          onClickLatestZoom(iconType);
+          evChartZoom.clickMoveZoomArea(iconType);
           break;
         default:
           break;

@@ -2,7 +2,8 @@ export default class EvChartZoom {
   constructor(evChartInfo, evChartClone, evChartZoomOptions, iconRef) {
     this.evChartProps = evChartInfo.props;
     this.evChartCloneData = evChartClone.data;
-    this.evChartZoomOptions = evChartZoomOptions;
+
+    this.setEvChartZoomOptions(evChartZoomOptions);
     this.setIcon(iconRef);
 
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
@@ -18,6 +19,10 @@ export default class EvChartZoom {
 
     this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
     this.evChartDomContainers = this.drawAnimationCanvas(evChartInfo.dom);
+  }
+
+  setEvChartZoomOptions(options) {
+    this.evChartZoomOptions = options;
   }
 
   setIcon(iconRef) {
@@ -44,29 +49,13 @@ export default class EvChartZoom {
     return evChartDom;
   }
 
-  moveZoomArea(isUseZoomMode, mode) {
+  setEventListener(isUseZoomMode) {
     const toggleEventListener = isUseZoomMode ? 'addEventListener' : 'removeEventListener';
     this.isUseZoomMode = isUseZoomMode;
 
-    if (!this.isAnimationFinish) {
-      return;
-    }
-
-    switch (mode) {
-      case 'wheel':
-        this.evChartDomContainers.forEach((dom) => {
-          dom[toggleEventListener]('wheel', this.wrapWheelMoveZoomArea);
-        });
-        break;
-      case 'previous':
-      case 'latest':
-        if (isUseZoomMode) {
-          this.clickMoveZoomArea(mode);
-        }
-        break;
-      default:
-        break;
-    }
+    this.evChartDomContainers.forEach((dom) => {
+      dom[toggleEventListener]('wheel', this.wrapWheelMoveZoomArea);
+    });
   }
 
   wheelMoveZoomArea(e) {
@@ -386,7 +375,10 @@ export default class EvChartZoom {
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
     this.evChartCloneData = evChartClone.data;
-    this.dragZoomIcon.classList.remove('active');
+
+    if (this.dragZoomIcon) {
+      this.dragZoomIcon.classList.remove('active');
+    }
 
     this.zoomAreaMemory = {
       previous: [],
@@ -420,6 +412,10 @@ export default class EvChartZoom {
   }
 
   iconStyle(icon, mode) {
+    if (!icon) {
+      return;
+    }
+
     const [opacity, pointerEvents] = mode === 'enable' ? [1, 'initial'] : [0.5, 'none'];
 
     icon.style.opacity = opacity;

@@ -3,14 +3,14 @@
     ref="zoomRef"
     class="case"
   >
-    <ev-chart-zoom :options="chartZoomOption">
+    <ev-chart-zoom :options="chartZoomOptions">
       <ev-chart
         :data="chartData"
-        :options="chartOption"
+        :options="chartOptions"
       />
       <ev-chart
         :data="chartData2"
-        :options="chartOption2"
+        :options="chartOptions2"
       />
       <div class="description">
         <p class="case-title">줌 버퍼 메모리</p>
@@ -47,17 +47,19 @@ export default {
     const zoomRef = ref();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-    const chartZoomOption = reactive({
-      icon: {
-        type: {
-          previous: 'ev-icon-allow2-left',
-          latest: 'ev-icon-allow2-right',
-          reset: 'ev-icon-redo',
-          dragZoom: 'ev-icon-zoomin',
+    const chartZoomOptions = reactive({
+      toolbar: {
+        icon: {
+          type: {
+            previous: 'ev-icon-allow2-left',
+            latest: 'ev-icon-allow2-right',
+            reset: 'ev-icon-redo',
+            dragZoom: 'ev-icon-zoomin',
+          },
+          size: 'medium',
+          color: '#0D0D0D',
+          hoverColor: '#1a6afe',
         },
-        size: 'medium',
-        color: '#0D0D0D',
-        hoverColor: '#1a6afe',
       },
     });
 
@@ -93,7 +95,7 @@ export default {
       },
     });
 
-    const chartOption = reactive({
+    const chartOptions = reactive({
       type: 'line',
       width: '100%',
       title: {
@@ -117,7 +119,7 @@ export default {
       }],
     });
 
-    const chartOption2 = reactive({
+    const chartOptions2 = reactive({
       type: 'line',
       width: '100%',
       title: {
@@ -190,8 +192,8 @@ export default {
     };
 
     watch(isShowToggleLegend, (isShow) => {
-      chartOption.legend.show = isShow;
-      chartOption2.legend.show = isShow;
+      chartOptions.legend.show = isShow;
+      chartOptions2.legend.show = isShow;
     });
 
     watch(isExpandChartArea, (isExpand) => {
@@ -207,15 +209,15 @@ export default {
     });
 
     watch(bufferMemoryCnt, (cnt) => {
-      chartZoomOption.bufferMemoryCnt = cnt;
+      chartZoomOptions.bufferMemoryCnt = cnt;
     }, { immediate: true });
 
     return {
-      chartZoomOption,
+      chartZoomOptions,
       chartData,
       chartData2,
-      chartOption,
-      chartOption2,
+      chartOptions,
+      chartOptions2,
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,
