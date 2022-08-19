@@ -78,8 +78,10 @@ export default {
       evChartInfo.dom = evChartZoomRef.value.querySelectorAll('.ev-chart-container');
 
       if (evChartInfo.dom.length) {
-        slots.default(evChartInfo.dom).forEach(({ type, props: { data, options } }) => {
+        slots.default(evChartInfo.dom).forEach(({ type, props: evChartProps }) => {
           if (type?.name === 'EvChart') {
+            const { options, data } = evChartProps;
+
             if (!options?.dragSelection?.use) {
               options.dragSelection = {
                 use: true,

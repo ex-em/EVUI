@@ -113,7 +113,7 @@ export default class EvChartZoom {
     ) : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
-      const zoomSeries = zoomInfoData[dragChartIdx].items;
+      const zoomSeries = zoomInfoData[0].items;
       const zoomStartDate = zoomSeries[0].x;
       const zoomEndDate = zoomSeries[zoomSeries.length - 1].x;
       const currentChartDataLabels = evChartData[dragChartIdx].labels;

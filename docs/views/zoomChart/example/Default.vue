@@ -12,6 +12,10 @@
         :data="chartData2"
         :options="chartOptions2"
       />
+      <ev-chart
+        :data="chartData3"
+        :options="chartOptions3"
+      />
       <div class="description">
         <p class="case-title">줌 버퍼 메모리</p>
         <ev-input-number
@@ -95,6 +99,16 @@ export default {
       },
     });
 
+    const chartData3 = reactive({
+      series: {
+        series11: { name: 'series#11' },
+      },
+      labels: [],
+      data: {
+        series11: [],
+      },
+    });
+
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
@@ -151,16 +165,46 @@ export default {
       },
     });
 
+    const chartOptions3 = reactive({
+      type: 'line',
+      width: '100%',
+      title: {
+        text: 'Chart Title3',
+        show: true,
+      },
+      legend: {
+        show: false,
+        position: 'right',
+      },
+      axesX: [{
+        type: 'time',
+        showGrid: false,
+        timeFormat: 'HH:mm:ss',
+        interval: 'second',
+      }],
+      axesY: [{
+        type: 'linear',
+        showGrid: false,
+        startToZero: true,
+        autoScaleRatio: 0.1,
+      }],
+    });
+
     const addRandomChartData = () => {
       timeValue = dayjs(timeValue).add(1, 'second');
       chartData.labels.push(dayjs(timeValue));
       chartData2.labels.push(dayjs(timeValue));
+      chartData3.labels.push(dayjs(timeValue));
 
       Object.values(chartData.data).forEach((seriesData) => {
         seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
       });
 
       Object.values(chartData2.data).forEach((seriesData) => {
+        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+      });
+
+      Object.values(chartData3.data).forEach((seriesData) => {
         seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
       });
     };
@@ -185,6 +229,7 @@ export default {
 
       init(chartData);
       init(chartData2);
+      init(chartData3);
 
       for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
         addRandomChartData();
@@ -194,6 +239,7 @@ export default {
     watch(isShowToggleLegend, (isShow) => {
       chartOptions.legend.show = isShow;
       chartOptions2.legend.show = isShow;
+      chartOptions3.legend.show = isShow;
     });
 
     watch(isExpandChartArea, (isExpand) => {
@@ -216,8 +262,10 @@ export default {
       chartZoomOptions,
       chartData,
       chartData2,
+      chartData3,
       chartOptions,
       chartOptions2,
+      chartOptions3,
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,
