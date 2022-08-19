@@ -67,8 +67,10 @@
           use: true,
           showIndicator: true,
           indicatorColor: '#FF0000',
-          tipBackground: '#000000',
-          tipTextColor: '#FFFFFF',
+          tipStyle: {
+            background: '#000000',
+            textColor: '#FFFFFF',
+          },
         },
       };
 

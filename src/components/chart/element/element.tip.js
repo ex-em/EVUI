@@ -366,8 +366,14 @@ const modules = {
     const { dp, value, text, opt, type, tipType, isSamePos, seriesOpt } = param;
 
     const arrowSize = 4;
-    const maxTipHeight = 20;
     const borderRadius = 4;
+    const {
+      fontSize,
+      fontFamily,
+      fontWeight,
+      height: maxTipHeight,
+    } = opt.tipStyle;
+    const textStyle = `normal normal ${fontWeight} ${fontSize}px ${fontFamily}`;
 
     let offset = 1;
     if (type === 'line') {
@@ -400,7 +406,7 @@ const modules = {
     let maxTipType = 'center';
 
     ctx.save();
-    ctx.font = 'normal normal bold 14px Roboto';
+    ctx.font = textStyle;
     const maxTipWidth = Math.round(Math.max(ctx.measureText(text).width + 12, 40));
 
     if (!isHorizontal) {
@@ -427,6 +433,7 @@ const modules = {
         arrowSize,
         borderRadius,
         text,
+        textStyle,
       });
     }
 
@@ -449,7 +456,8 @@ const modules = {
    */
   showTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const { type, width, height, x, y, arrowSize, borderRadius, text, opt } = param;
+    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle } = param;
+
     const ctx = param.context;
 
     const sx = x - (width / 2);
@@ -458,9 +466,9 @@ const modules = {
     const ey = y;
 
     ctx.save();
-    ctx.font = 'normal normal bold 14px Roboto';
+    ctx.font = textStyle;
 
-    ctx.fillStyle = opt.tipBackground;
+    ctx.fillStyle = opt.tipBackground ?? opt.tipStyle.background;
     ctx.shadowBlur = 0;
 
     ctx.beginPath();
@@ -499,8 +507,8 @@ const modules = {
     ctx.fill();
     ctx.restore();
     ctx.save();
-    ctx.font = 'normal normal bold 14px Roboto';
-    ctx.fillStyle = opt.tipTextColor;
+    ctx.font = textStyle;
+    ctx.fillStyle = opt.tipTextColor ?? opt.tipStyle.textColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.fillText(`${text}`, x, sy + (height / 2));
@@ -521,7 +529,7 @@ const modules = {
     const cy = y - offset;
     ctx.save();
 
-    ctx.fillStyle = opt.tipBackground;
+    ctx.fillStyle = opt.tipBackground ?? opt.tipStyle.background;
     ctx.beginPath();
     ctx.moveTo(x, cy);
     if (isHorizontal) {

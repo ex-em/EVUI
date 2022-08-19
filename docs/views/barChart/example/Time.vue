@@ -48,8 +48,10 @@
         }],
         maxTip: {
           use: true,
-          tipBackground: '#DBDBDB',
-          tipTextColor: '#000000',
+          tipStyle: {
+            background: '#DBDBDB',
+            textColor: '#000000',
+          },
         },
       };
 
