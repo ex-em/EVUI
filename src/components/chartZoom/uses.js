@@ -1,16 +1,29 @@
 import { defaultsDeep } from 'lodash-es';
 
 const DEFAULT_OPTIONS = {
-  icon: {
-    type: {
-      reset: '',
-      previous: '',
-      latest: '',
-      dragZoom: '',
+  toolbar: {
+    items: {
+      previous: {
+        icon: 'ev-icon-allow2-left',
+        size: 'medium',
+        title: 'Previous',
+      },
+      latest: {
+        icon: 'ev-icon-allow2-right',
+        size: 'medium',
+        title: 'Latest',
+      },
+      reset: {
+        icon: 'ev-icon-redo',
+        size: 'medium',
+        title: 'Reset',
+      },
+      dragZoom: {
+        icon: 'ev-icon-zoomin',
+        size: 'medium',
+        title: 'Drag Zoom',
+      },
     },
-    size: 'medium',
-    color: '#0D0D0D',
-    hoverColor: '#1a6afe',
   },
   bufferMemoryCnt: 100,
 };

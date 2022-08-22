@@ -4,18 +4,17 @@
     class="ev-chart-zoom__wrapper"
   >
     <div
-      ref="iconRef"
-      class="ev-icon"
-      :style="iconStyle"
+      ref="toolbarIconRef"
+      class="ev-chart-zoom__wrapper__toolbar-icon"
     >
       <ev-icon
-        v-for="(iconName, type) in chartZoomOptions.toolbar.icon.type"
-        :key="`${type}-${iconName}`"
-        :class="type"
-        :icon="iconName"
-        :size="chartZoomOptions.toolbar.icon.size"
-        :title="type"
-        @click="onClick($event, type)"
+        v-for="(option, iconType) in chartZoomOptions.toolbar.items"
+        :key="`${iconType}-${option.icon}`"
+        :class="iconType"
+        :icon="option.icon"
+        :size="option.size"
+        :title="option.title"
+        @click="onClick($event, iconType)"
       />
     </div>
     <slot />
@@ -48,7 +47,7 @@ export default {
     let evChartZoom = null;
 
     const evChartZoomRef = ref();
-    const iconRef = ref();
+    const toolbarIconRef = ref();
     const isUseZoomMode = ref(false);
 
     const {
@@ -63,15 +62,6 @@ export default {
       }
 
       return options;
-    });
-
-    const iconStyle = computed(() => {
-      const { toolbar: { icon: { hoverColor, color } } } = chartZoomOptions.value;
-
-      return {
-        '--color-hover': hoverColor,
-        color,
-      };
     });
 
     onMounted(() => {
@@ -102,7 +92,7 @@ export default {
           evChartInfo,
           evChartClone,
           chartZoomOptions.value,
-          iconRef.value,
+          toolbarIconRef.value,
         );
       }
     });
@@ -184,9 +174,8 @@ export default {
 
     return {
       evChartZoomRef,
-      iconRef,
+      toolbarIconRef,
       chartZoomOptions,
-      iconStyle,
       onClick,
     };
   },
@@ -198,7 +187,7 @@ export default {
 .ev-chart-zoom__wrapper {
   position: relative;
 
-  .ev-icon {
+  &__toolbar-icon {
     position: absolute;
     top: 13px;
     right: 30px;
@@ -207,15 +196,10 @@ export default {
     i {
       pointer-events: none;
       opacity: 0.5;
-    }
-
-    i:hover {
-      color: var(--color-hover);
       cursor: pointer;
     }
 
     .active {
-      color: var(--color-hover);
       font-weight: bold;
     }
   }

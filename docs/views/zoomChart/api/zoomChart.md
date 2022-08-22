@@ -28,40 +28,52 @@
 | bufferMemoryCnt | Number | 100             | 차트 줌 버퍼 메모리 제한 설정  | 100이면 최신 100개의 zoom 기록만 저장 됨 |
 
 #### toolbar
-| 이름            | 타입       | 디폴트                 | 설명                                    | 종류(예시) |
-|----------|---------------------|---------------------------------------|-------------------------|---------------------------------------------------|
-| icon          | Object   | ([상세](#icon))       | toolbar에 사용할 아이콘 설정 |
+| 이름    | 타입       | 디폴트            | 설명                   | 종류(예시) |
+|-------|---------------------|----------------|----------------------|---------------------------------------------------|
+| items | Object   | ([상세](#items)) | toolbar에 사용할 아이콘 설정 (설정한 아이콘에 따라 기능이 활성화 됨)  |
 
-##### icon
-| 이름         | 타입                          | 디폴트           | 설명                                | 종류(예시)     |
-|------------|-----------------------------|---------------|-----------------------------------|------------|
-| type       | Object                      | ([상세](#type)) | 아이콘 종류 설정 (설정한 아이콘에 따라 기능이 활성화 됨) |            |
-| size       | String                      | 'medium'      | 아이콘 사이즈                           | 'small', 'medium', 'large'  |
-| color      | Hex, RGB, RGBA Code(String) | '#0D0D0D'     | 아이콘 색상                            |            |
-| hoverColor | Hex, RGB, RGBA Code(String)                     | '#1a6afe'     | 아이콘 마우스 호버 시 색상                   |            |
+##### items
+| 이름       | 타입     | 디폴트                                     | 설명           | 종류(예시)             |
+|----------|--------|-----------------------------------------|--------------|--------------------|
+| previous | Object | ([상세](#previous-latest-reset-dragzoom)) | 줌 이전 기록으로 이동 | |
+| latest   | Object | ([상세](#previous-latest-reset-dragzoom))                       | 줌 최근 기록으로 이동 |  |
+| reset    | Object | ([상세](#previous-latest-reset-dragzoom))                       | 줌 초기화        |  |
+| dragZoom | Object | ([상세](#previous-latest-reset-dragzoom))                       | drag 줌 기능    |  |
 
-###### type
-| 이름       | 타입 | 디폴트 | 설명           | 종류(예시)             |
-|----------|------|-------|--------------|--------------------|
-| previous | String | '' | 줌 이전 기록으로 이동 | [ev icon](../icon) |
-| latest   | String | '' | 줌 최근 기록으로 이동 | [ev icon](../icon) |
-| reset    | String | '' | 줌 초기화        | [ev icon](../icon) |
-| dragZoom | String | '' | drag 줌 기능    | [ev icon](../icon) |
+###### previous latest reset dragZoom
+###### type 공통
+| 이름         |  타입 | 디폴트           | 설명                  | 종류(예시)                      |
+|------------|--------|---------------|---------------------|-----------------------------|
+| icon       | String | 'ev-icon-allow2-left', 'ev-icon-allow2-right', 'ev-icon-redo', 'ev-icon-zoomin'| 아이콘 모양 설정           | [ev icon](../icon)                        |
+| size       | String | 'medium'      | 아이콘 사이즈             | 'small', 'medium', 'large'  |
+| title      | String | 'Previous', 'Latest', 'Reset', 'Drag Zoom'     | 마우스 호버 시 보이는 아이콘 이름 |                             |
 
-###### type Example
+###### icon Example
 ```
-const chartZoomOptions = {
-    toobar: {
-        icon: {
-            type: {
-                previous: 'ev-icon-allow2-left',
-                latest: 'ev-icon-allow2-right',
-                reset: 'ev-icon-redo',
-                dragZoom: 'ev-icon-zoomin',
-            }
-            ... 생략
-        }
-    },
-    ... 생략
-}
+const chartZoomOptions ={
+      toolbar: {
+        items: {
+          previous: {
+            icon: 'ev-icon-allow2-left',
+            size: 'medium',
+            title: 'Previous',
+          },
+          latest: {
+            icon: 'ev-icon-allow2-right',
+            size: 'medium',
+            title: 'Latest',
+          },
+          reset: {
+            icon: 'ev-icon-redo',
+            size: 'medium',
+            title: 'Reset',
+          },
+          dragZoom: {
+            icon: 'ev-icon-zoomin',
+            size: 'medium',
+            title: 'Drag Zoom',
+          },
+        },
+      },
+    }
 ```
