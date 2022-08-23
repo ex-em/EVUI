@@ -533,7 +533,7 @@ const modules = {
         }
 
         const seriesId = row.series.sId;
-        const value = +aggregations?.[seriesId]?.[key];
+        const value = aggregations?.[seriesId]?.[key];
         dom.textContent = this.getFormattedValue(columns[key], value);
       });
     });
@@ -756,7 +756,7 @@ const modules = {
       }
 
       if (columns[key].use) {
-        const formattedTxt = this.getFormattedValue(columns[key], +aggregations[key]);
+        const formattedTxt = this.getFormattedValue(columns[key], aggregations[key]);
         const valueDOM = document.createElement('td');
         valueDOM.className = 'ev-chart-legend--table__value';
         valueDOM.style.color = series.show ? opt.color : opt.inactive;
@@ -1134,13 +1134,17 @@ const modules = {
    * @returns {string}
    */
   getFormattedValue({ formatter, decimalPoint }, value) {
+    if (value === undefined || value === null) {
+      return 'Null';
+    }
+
     let formattedTxt;
     if (formatter) {
-      formattedTxt = formatter(value);
+      formattedTxt = formatter(+value);
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {
-      formattedTxt = Util.labelSignFormat(value, decimalPoint);
+      formattedTxt = Util.labelSignFormat(+value, decimalPoint);
     }
 
     return formattedTxt;
