@@ -335,4 +335,12 @@ export default {
       targetDOM.style[key] = styleObject[key];
     });
   },
+
+  checkSafeInteger(value) {
+    if (value === null || value === undefined) {
+      return false;
+    }
+
+    return value <= Number.MAX_SAFE_INTEGER && value >= Number.MIN_SAFE_INTEGER;
+  },
 };

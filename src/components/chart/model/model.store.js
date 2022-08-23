@@ -949,13 +949,23 @@ const modules = {
     const seriesIds = Object.keys(series);
 
     seriesIds?.forEach((sId) => {
-      const dataList = allData[sId].map(data => (data.value ? data.value : data));
-
-      const min = (Math.min(...dataList));
-      const max = (Math.max(...dataList));
-      const total = (dataList.reduce((a, b) => a + b, 0));
-      const avg = (total / dataList.length || 0);
+      const dataList = allData[sId].map(data => (data?.value ? data.value : data));
       const last = (dataList[dataList.length - 1]);
+
+      const dataListExcludedNull = dataList.filter(value => value !== undefined && value !== null);
+      const min = (Math.min(...dataListExcludedNull));
+      const max = (Math.max(...dataListExcludedNull));
+      const total = (dataListExcludedNull.reduce((a, b) => a + b, 0));
+      const avg = (total / dataListExcludedNull.length || 0);
+
+      if (!Util.checkSafeInteger(min)
+        || !Util.checkSafeInteger(max)
+        || !Util.checkSafeInteger(avg)
+        || !Util.checkSafeInteger(total)
+        || !Util.checkSafeInteger(last)
+      ) {
+        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less then -9007199254740991.');
+      }
 
       aggregationDataSet[sId] = { min, max, avg, total, last };
     });

@@ -201,15 +201,16 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
               avg: {
                 use: useAvg,
                 decimalPoint: 4,
+                formatter: value => `${value.toFixed(0)}`,
               },
               total: {
                 use: useTotal,
                 decimalPoint: 4,
+                formatter: value => `${value.toFixed(0)}`,
               },
               last: {
                 use: useLast,
                 title: 'CURRENT',
-                formatter: value => `${value.toFixed(0)}`,
                 style: {
                   color: '#219EBC',
                 },
@@ -223,7 +224,7 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
       const liveInterval = ref();
       let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-      const addRandomChartData = () => {
+      const addRandomChartData = (ix) => {
         if (isLive.value) {
           chartData.labels.shift();
         }
@@ -236,13 +237,13 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
             seriesData.shift();
           }
 
-          seriesData.push(Math.random() * (100 - 1) + 1);
+          seriesData.push(ix > 6 ? null : Math.random() * (100 - 1) + 1);
         });
       };
 
       onMounted(() => {
         for (let ix = 0; ix < 10; ix++) {
-          addRandomChartData();
+          addRandomChartData(ix);
         }
       });
 
