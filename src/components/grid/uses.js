@@ -871,18 +871,13 @@ export const contextMenuEvent = (params) => {
    */
   const onContextMenu = (event) => {
     const target = event.target;
-    const tagName = target.tagName.toLowerCase();
-    let rowIndex;
+    const rowIndex = target.closest('.row').dataset.index;
 
-    if (tagName === 'td') {
-      rowIndex = target.parentElement.dataset.index;
-    } else {
-      rowIndex = target.parentElement.parentElement.dataset.index;
-    }
     let clickedRow;
     if (rowIndex) {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
+
     if (clickedRow) {
       selectInfo.selectedRow = clickedRow;
       setContextMenu();
