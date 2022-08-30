@@ -1,6 +1,7 @@
-import { ref, computed, getCurrentInstance, nextTick } from 'vue';
-import { cloneDeep, defaultsDeep } from 'lodash-es';
+import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated } from 'vue';
+import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
+import EvChartZoom from '@/components/chart/chartZoom.core';
 
 const DEFAULT_OPTIONS = {
   padding: {
@@ -151,6 +152,34 @@ const DEFAULT_OPTIONS = {
     fillColor: '#38ACEC',
     opacity: 0.65,
   },
+  zoom: {
+    bufferMemoryCnt: 100,
+    toolbar: {
+      show: false,
+      items: {
+        previous: {
+          icon: 'ev-icon-allow2-left',
+          size: 'medium',
+          title: 'Previous',
+        },
+        latest: {
+          icon: 'ev-icon-allow2-right',
+          size: 'medium',
+          title: 'Latest',
+        },
+        reset: {
+          icon: 'ev-icon-redo',
+          size: 'medium',
+          title: 'Reset',
+        },
+        dragZoom: {
+          icon: 'ev-icon-zoomin',
+          size: 'medium',
+          title: 'Drag Zoom',
+        },
+      },
+    },
+  },
   heatMapColor: {
     min: '#FFFFFF',
     max: '#0052FF',
@@ -260,5 +289,189 @@ export const useWrapper = (options) => {
   return {
     wrapper,
     wrapperStyle,
+  };
+};
+
+
+export const useZoomModel = (
+  evChartNormalizedOptions,
+  { wrapper: evChartWrapper, evChartGroupRef },
+) => {
+  const { props, slots } = getCurrentInstance();
+
+  const isExecuteZoom = ref(false);
+  const isUseZoomMode = ref(false);
+  const evChartToolbarRef = ref();
+
+  const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
+
+  let evChartZoom = null;
+  const evChartInfo = reactive({
+    dom: [],
+    props: {
+      data: [],
+      options: [],
+    },
+  });
+  const evChartClone = { data: [], options: [] };
+
+  const getRangeInfo = (zoomInfo) => {
+    if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
+      evChartZoom.dragZoom(zoomInfo);
+    }
+  };
+
+  const setEvChartOptions = () => {
+    evChartInfo.props.options.forEach((option, idx) => {
+      option.zoom = {
+        ...option.zoom,
+        use: isUseZoomMode.value,
+        getRangeInfo,
+      };
+
+      if (isUseZoomMode.value) {
+        option.dragSelection = {
+          ...option.dragSelection,
+          use: true,
+          keepDisplay: false,
+        };
+      } else {
+        const {
+          use: originUseOption,
+          keepDisplay: originKeepDisplayOption,
+        } = evChartClone.options[idx].dragSelection ?? {};
+
+        option.dragSelection = {
+          use: !!originUseOption,
+          keepDisplay: !!originKeepDisplayOption,
+        };
+      }
+    });
+  };
+
+  const createEvChartZoom = () => {
+    if (evChartGroupRef) {
+      evChartInfo.dom = evChartGroupRef.value.querySelectorAll('.ev-chart-container');
+
+      if (evChartInfo.dom.length) {
+        slots.default(evChartInfo.dom).forEach(({ type, props: evChartProps }) => {
+          if (type?.name === 'EvChart') {
+            const { options, data } = evChartProps;
+
+            evChartInfo.props.data.push(data);
+            evChartInfo.props.options.push(options);
+          }
+        });
+      }
+    } else {
+      evChartInfo.dom = [evChartWrapper.value.querySelector('.ev-chart-container')];
+      evChartInfo.props.data.push(props.data);
+      evChartInfo.props.options.push(props.options);
+    }
+
+    if (evChartInfo.props.data.length) {
+      evChartClone.data = cloneDeep(evChartInfo.props.data);
+      evChartClone.options = cloneDeep(evChartInfo.props.options);
+
+      evChartZoom = new EvChartZoom(
+        evChartInfo,
+        evChartClone,
+        evChartZoomOptions,
+        evChartToolbarRef.value,
+        isExecuteZoom,
+      );
+    }
+  };
+
+  const toggleUseZoom = (target) => {
+    if (evChartClone.data[0].labels.length <= 1) {
+      return;
+    }
+
+    isUseZoomMode.value = !isUseZoomMode.value;
+
+    if (target) {
+      target.classList.toggle('active');
+    } else {
+      const dragZoomIcon = evChartToolbarRef.value.querySelector('.dragZoom');
+
+      dragZoomIcon.classList.toggle('active');
+    }
+
+    setEvChartOptions();
+
+    evChartZoom.setIconStyle(isUseZoomMode.value);
+    evChartZoom.setEventListener(isUseZoomMode.value);
+  };
+
+  const onClickToolbar = (e, iconType) => {
+    if (!evChartZoom.isAnimationFinish) {
+      return;
+    }
+
+    switch (iconType) {
+      case 'dragZoom':
+        toggleUseZoom(e.target);
+        break;
+      case 'reset':
+        evChartZoom.initZoom();
+        break;
+      case 'previous':
+      case 'latest':
+        evChartZoom.clickMoveZoomArea(iconType);
+        break;
+      default:
+        break;
+    }
+  };
+
+  onUpdated(() => {
+    evChartZoom.setIcon(evChartToolbarRef.value);
+  });
+
+  const setOptionsForUseZoom = (newOpt) => {
+    const isUpdateZoomOptions = !isEqual(newOpt.zoom, evChartZoomOptions.zoom);
+
+    if (isUpdateZoomOptions) {
+      evChartZoomOptions.zoom = newOpt.zoom;
+
+      if (evChartZoom) {
+        if (!evChartZoomOptions.zoom.toolbar.show && isUseZoomMode.value) {
+          toggleUseZoom();
+        }
+
+        evChartZoom.setEvChartZoomOptions(evChartZoomOptions);
+      } else if (evChartZoomOptions.zoom.toolbar.show && !evChartGroupRef) {
+        createEvChartZoom();
+      }
+    }
+  };
+
+  const setDataForUseZoom = (newData) => {
+    if (!evChartZoom?.isAnimationFinish) {
+      return;
+    }
+
+    if (!isExecuteZoom.value && evChartZoom) {
+      evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
+      isUseZoomMode.value = false;
+
+      setEvChartOptions();
+
+      evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+    }
+
+    isExecuteZoom.value = false;
+  };
+
+  return {
+    evChartZoomOptions,
+    evChartInfo,
+    evChartToolbarRef,
+
+    createEvChartZoom,
+    setOptionsForUseZoom,
+    setDataForUseZoom,
+    onClickToolbar,
   };
 };
