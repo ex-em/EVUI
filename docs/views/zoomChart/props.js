@@ -9,7 +9,7 @@ export default {
   mdText,
   components: {
     Default: {
-      description: 'Line Chart의 Zoom 옵션을 이용하여 확대/축소 기능을 사용할 수 있습니다.',
+      description: 'Chart의 Zoom 옵션을 이용하여 확대/축소 기능을 사용할 수 있습니다.',
       component: Default,
       parsedData: parseComponent(DefaultRaw),
     },

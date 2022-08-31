@@ -4,8 +4,8 @@
     class="case"
   >
     <ev-chart-group
-      v-model:zoom-start-idx="zoomStartIdx"
-      v-model:zoom-end-idx="zoomEndIdx"
+      v-model:zoomStartIdx="zoomStartIdx"
+      v-model:zoomEndIdx="zoomEndIdx"
       :options="chartGroupOptions"
     >
       <ev-chart
