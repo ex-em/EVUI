@@ -1,5 +1,12 @@
 export default class EvChartZoom {
-  constructor(evChartInfo, evChartClone, evChartZoomOptions, evChartToolbarRef, isExecuteZoom) {
+  constructor(
+    evChartInfo,
+    evChartClone,
+    evChartZoomOptions,
+    evChartToolbarRef,
+    isExecuteZoom,
+    emitFunc,
+  ) {
     this.isExecuteZoom = isExecuteZoom;
     this.evChartProps = evChartInfo.props;
     this.evChartCloneData = evChartClone.data;
@@ -17,6 +24,13 @@ export default class EvChartZoom {
       current: [[0, cloneLabelsLastIdx]],
       latest: [],
     };
+
+    if (emitFunc) {
+      this.emitFunc = emitFunc;
+
+      emitFunc.updateZoomStartIdx(0);
+      emitFunc.updateZoomEndIdx(cloneLabelsLastIdx);
+    }
 
     this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
     this.evChartDomContainers = this.drawAnimationCanvas(evChartInfo.dom);
@@ -89,6 +103,7 @@ export default class EvChartZoom {
       zoomMoveEndIdx = zoomEndIdx + 1;
     }
 
+    this.isExecuteZoomAtToolbar = true;
     this.executeZoom(zoomMoveStartIdx, zoomMoveEndIdx);
     this.zoomAreaMemory.current[0] = [zoomMoveStartIdx, zoomMoveEndIdx];
   }
@@ -100,17 +115,12 @@ export default class EvChartZoom {
 
     const [zoomStartIdx, zoomEndIdx] = this.zoomAreaMemory[direction].pop();
 
+    this.isExecuteZoomAtToolbar = true;
     this.executeZoom(zoomStartIdx, zoomEndIdx);
     this.setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction === 'previous' ? 'latest' : 'previous');
   }
 
-  dragZoom(zoomInfo) {
-    const {
-      data: zoomInfoData,
-      range: {
-        dragSelectionInfo,
-      },
-    } = zoomInfo;
+  dragZoom({ data: zoomInfoData, range: { dragSelectionInfo } }) {
     const {
       dragXsp,
       dragXep,
@@ -216,6 +226,7 @@ export default class EvChartZoom {
       }
 
       this.isAnimationFinish = false;
+      this.isExecuteZoomAtToolbar = true;
       this.executeDragZoomAnimation(
         displayCanvas,
         animationCtx,
@@ -261,6 +272,11 @@ export default class EvChartZoom {
         (l, labelIdx) => zoomStartIdx <= labelIdx && zoomEndIdx >= labelIdx,
       );
     }
+
+    if (this.emitFunc) {
+      this.emitFunc.updateZoomStartIdx(zoomStartIdx);
+      this.emitFunc.updateZoomEndIdx(zoomEndIdx);
+    }
   }
 
   updateEvChartCloneData(evChartClone, isUseZoomMode) {
@@ -277,6 +293,11 @@ export default class EvChartZoom {
       current: [[0, cloneLabelsLastIdx]],
       latest: [],
     };
+
+    if (this.emitFunc) {
+      this.emitFunc.updateZoomStartIdx(0);
+      this.emitFunc.updateZoomEndIdx(cloneLabelsLastIdx);
+    }
 
     this.setIconStyle(isUseZoomMode);
   }
@@ -443,6 +464,7 @@ export default class EvChartZoom {
     const cloneLabelsLastIdx = this.cloneLabelsLastIdx;
 
     if (currentZoomStartIdx !== 0 || currentZoomEndIdx !== cloneLabelsLastIdx) {
+      this.isExecuteZoomAtToolbar = true;
       this.executeZoom(0, cloneLabelsLastIdx);
       this.setZoomAreaMemory(0, cloneLabelsLastIdx);
     }

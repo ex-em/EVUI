@@ -297,7 +297,7 @@ export const useZoomModel = (
   evChartNormalizedOptions,
   { wrapper: evChartWrapper, evChartGroupRef },
 ) => {
-  const { props, slots } = getCurrentInstance();
+  const { props, slots, emit } = getCurrentInstance();
 
   const isExecuteZoom = ref(false);
   const isUseZoomMode = ref(false);
@@ -373,12 +373,18 @@ export const useZoomModel = (
       evChartClone.data = cloneDeep(evChartInfo.props.data);
       evChartClone.options = cloneDeep(evChartInfo.props.options);
 
+      const emitFunc = {
+        updateZoomStartIdx: startIdx => emit('update:zoomStartIdx', startIdx),
+        updateZoomEndIdx: endIdx => emit('update:zoomEndIdx', endIdx),
+      };
+
       evChartZoom = new EvChartZoom(
         evChartInfo,
         evChartClone,
         evChartZoomOptions,
         evChartToolbarRef.value,
         isExecuteZoom,
+        emitFunc,
       );
     }
   };
@@ -426,7 +432,9 @@ export const useZoomModel = (
   };
 
   onUpdated(() => {
-    evChartZoom.setIcon(evChartToolbarRef.value);
+    if (evChartToolbarRef.value) {
+      evChartZoom.setIcon(evChartToolbarRef.value);
+    }
   });
 
   const setOptionsForUseZoom = (newOpt) => {
@@ -464,6 +472,18 @@ export const useZoomModel = (
     isExecuteZoom.value = false;
   };
 
+  const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
+    if (evChartZoom.isExecuteZoomAtToolbar) {
+      evChartZoom.isExecuteZoomAtToolbar = false;
+      return;
+    }
+
+    if (isUseZoomMode.value) {
+      evChartZoom.executeZoom(zoomStartIdx, zoomEndIdx);
+      evChartZoom.setZoomAreaMemory(zoomStartIdx, zoomEndIdx);
+    }
+  };
+
   return {
     evChartZoomOptions,
     evChartInfo,
@@ -472,6 +492,7 @@ export const useZoomModel = (
     createEvChartZoom,
     setOptionsForUseZoom,
     setDataForUseZoom,
+    controlZoomIdx,
     onClickToolbar,
   };
 };

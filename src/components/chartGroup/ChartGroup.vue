@@ -33,7 +33,19 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    zoomStartIdx: {
+      type: Number,
+      default: 0,
+    },
+    zoomEndIdx: {
+      type: Number,
+      default: 0,
+    },
   },
+  emits: [
+    'update:zoomStartIdx',
+    'update:zoomEndIdx',
+  ],
   setup(props) {
     const {
       getNormalizedOptions,
@@ -52,6 +64,7 @@ export default {
       createEvChartZoom,
       setOptionsForUseZoom,
       setDataForUseZoom,
+      controlZoomIdx,
       onClickToolbar,
     } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
 
@@ -68,6 +81,10 @@ export default {
 
       setOptionsForUseZoom(newOpt);
     }, { deep: true });
+
+    watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
+      controlZoomIdx(zoomStartIdx, zoomEndIdx);
+    });
 
     return {
       evChartGroupRef,

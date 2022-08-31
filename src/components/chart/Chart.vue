@@ -54,6 +54,14 @@
         type: Number,
         default: 0,
       },
+      zoomStartIdx: {
+        type: Number,
+        default: 0,
+      },
+      zoomEndIdx: {
+        type: Number,
+        default: 0,
+      },
     },
     emits: [
       'click',
@@ -62,6 +70,8 @@
       'update:selectedItem',
       'update:selectedLabel',
       'update:selectedSeries',
+      'update:zoomStartIdx',
+      'update:zoomEndIdx',
     ],
     setup(props) {
       let evChart = null;
@@ -93,6 +103,7 @@
         createEvChartZoom,
         setOptionsForUseZoom,
         setDataForUseZoom,
+        controlZoomIdx,
         onClickToolbar,
       } = useZoomModel(
         normalizedOptions,
@@ -181,6 +192,12 @@
           evChart.renderWithSelected(newValue.seriesId);
         }
       }, { deep: true, flush: 'post' });
+
+      if (!isChartGroup) {
+        watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
+          controlZoomIdx(zoomStartIdx, zoomEndIdx);
+        });
+      }
 
       onMounted(async () => {
         await createChart();

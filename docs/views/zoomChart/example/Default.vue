@@ -4,11 +4,22 @@
     class="case"
   >
     <ev-chart
+      v-model:zoom-start-idx="zoomStartIdx"
+      v-model:zoom-end-idx="zoomEndIdx"
       :data="chartData"
       :options="chartOptions"
     />
 
     <div class="description">
+      <p class="case-title">줌 Start / End 인덱스 조절 (줌 모드에서 사용 가능)</p>
+      <div class="zoom-idx__wrapper">
+        <ev-input-number
+          v-model="zoomStartIdx"
+        />
+        <ev-input-number
+          v-model="zoomEndIdx"
+        />
+      </div>
       <p class="case-title">줌 버퍼 메모리</p>
       <ev-input-number
         v-model="bufferMemoryCnt"
@@ -42,6 +53,8 @@ export default {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
     const bufferMemoryCnt = ref(5);
+    const zoomStartIdx = ref(0);
+    const zoomEndIdx = ref(0);
     const zoomRef = ref();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
@@ -174,6 +187,8 @@ export default {
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,
+      zoomStartIdx,
+      zoomEndIdx,
       bufferMemoryCnt,
       onHideToolbar,
       onUpdateChartData,
@@ -183,4 +198,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.zoom-idx__wrapper {
+  display: flex;
+
+  .ev-input-number {
+    width: 100%;
+  }
+}
 </style>
