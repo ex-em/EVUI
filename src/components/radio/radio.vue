@@ -231,7 +231,7 @@ export default {
   }
 
   .disabled {
-    .ev-radio-label {
+    .ev-radio-label:not(.button) {
       cursor: not-allowed;
 
       @include evThemify() {
@@ -243,9 +243,25 @@ export default {
       }
     }
 
+    .ev-radio-label.button {
+      cursor: not-allowed;
+
+      @include evThemify() {
+        color: evThemed('button-disabled');
+      }
+    }
+
     .ev-radio-input {
-      &:checked + .ev-radio-label:before {
+      &:checked + .ev-radio-label:not(.button):before {
         border: 1px solid $color-not-allow;
+      }
+
+      &:checked + .ev-radio-label.button {
+        @include evThemify() {
+          color: evThemed('button-disabled');
+          background-color: evThemed('button-disabled-bg');
+          border-color: evThemed('button-disabled-border');
+        }
       }
 
       &:checked + .ev-radio-label:after {
