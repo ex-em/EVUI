@@ -28,6 +28,7 @@ import gridProps from 'docs/views/grid/props';
 import barChartProps from 'docs/views/barChart/props';
 import lineChartProps from 'docs/views/lineChart/props';
 import scatterChartProps from 'docs/views/scatterChart/props';
+import zoomChartProps from 'docs/views/zoomChart/props';
 import comboChartProps from 'docs/views/comboChart/props';
 import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
@@ -279,6 +280,15 @@ const routes = [
     name: 'HeatMap',
     component: PageView,
     props: heatMapProps,
+    meta: {
+      category: 'Chart',
+    },
+  },
+  {
+    path: '/zoomChart',
+    name: 'ZoomChart',
+    component: PageView,
+    props: zoomChartProps,
     meta: {
       category: 'Chart',
     },

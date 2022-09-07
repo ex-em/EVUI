@@ -1,5 +1,15 @@
 <template>
   <div
+    v-if="zoomOptions.toolbar.show && !isChartGroup"
+    ref="evChartToolbarRef"
+  >
+    <ev-chart-toolbar
+      :toolbar="zoomOptions.toolbar"
+      @on-click-toolbar="onClickToolbar"
+    />
+  </div>
+
+  <div
     ref="wrapper"
     v-resize="onResize"
     :style="wrapperStyle"
@@ -8,13 +18,17 @@
 </template>
 
 <script>
-import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
+  import { onMounted, onBeforeUnmount, watch, onDeactivated, inject, toRef } from 'vue';
   import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
-  import { useModel, useWrapper } from './uses';
+  import EvChartToolbar from './ChartToolbar';
+  import { useModel, useWrapper, useZoomModel } from './uses';
 
   export default {
     name: 'EvChart',
+    components: {
+      EvChartToolbar,
+    },
     props: {
       selectedItem: {
         type: Object,
@@ -40,6 +54,14 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         type: Number,
         default: 0,
       },
+      zoomStartIdx: {
+        type: Number,
+        default: 0,
+      },
+      zoomEndIdx: {
+        type: Number,
+        default: 0,
+      },
     },
     emits: [
       'click',
@@ -48,9 +70,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       'update:selectedItem',
       'update:selectedLabel',
       'update:selectedSeries',
+      'update:zoomStartIdx',
+      'update:zoomEndIdx',
     ],
     setup(props) {
       let evChart = null;
+      const isChartGroup = inject('isChartGroup', false);
 
       const {
         eventListeners,
@@ -69,6 +94,20 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         wrapperStyle,
       } = useWrapper(
         normalizedOptions,
+      );
+
+      const {
+        evChartZoomOptions,
+        evChartToolbarRef,
+
+        createEvChartZoom,
+        setOptionsForUseZoom,
+        setDataForUseZoom,
+        controlZoomIdx,
+        onClickToolbar,
+      } = useZoomModel(
+        normalizedOptions,
+        { wrapper, evChartGroupRef: null },
       );
 
       const createChart = () => {
@@ -92,6 +131,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
       const drawChart = () => {
         if (evChart) {
           evChart.init();
+
+          if (!isChartGroup && normalizedOptions.zoom.toolbar.show) {
+            createEvChartZoom();
+          }
         }
       };
 
@@ -106,6 +149,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           updateSelTip: { update: false, keepDomain: false },
           updateLegend: isUpdateLegendType,
         });
+
+        if (!isChartGroup) {
+          setOptionsForUseZoom(newOpt);
+        }
       }, { deep: true, flush: 'post' });
 
       watch(() => props.data, (chartData) => {
@@ -123,6 +170,10 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           updateSelTip: { update: true, keepDomain: false },
           updateData: isUpdateData,
         });
+
+        if (!isChartGroup) {
+          setDataForUseZoom(newData);
+        }
       }, { deep: true, flush: 'post' });
 
       watch(() => props.selectedItem, (newValue) => {
@@ -141,6 +192,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
           evChart.renderWithSelected(newValue.seriesId);
         }
       }, { deep: true, flush: 'post' });
+
+      if (!isChartGroup) {
+        watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
+          controlZoomIdx(zoomStartIdx, zoomEndIdx);
+        });
+      }
 
       onMounted(async () => {
         await createChart();
@@ -179,6 +236,12 @@ import { onMounted, onBeforeUnmount, watch, onDeactivated } from 'vue';
         wrapperStyle,
         onResize,
         redraw,
+
+        evChartToolbarRef,
+        isChartGroup,
+        onClickToolbar,
+        normalizedOptions,
+        zoomOptions: toRef(evChartZoomOptions, 'zoom'),
       };
     },
   };
