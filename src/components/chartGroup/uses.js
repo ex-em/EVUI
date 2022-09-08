@@ -5,7 +5,7 @@ const DEFAULT_OPTIONS = {
   zoom: {
     bufferMemoryCnt: 100,
     toolbar: {
-      show: false,
+      show: true,
       items: {
         previous: {
           icon: 'ev-icon-allow2-left',

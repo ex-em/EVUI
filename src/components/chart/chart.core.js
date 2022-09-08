@@ -14,14 +14,24 @@ import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options, listeners, defaultSelectItemInfo, defaultSelectInfo) {
+  constructor(
+    target,
+    data,
+    options,
+    listeners,
+    defaultSelectItemInfo,
+    defaultSelectInfo,
+  ) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
-    Object.assign(this, Title);
-    Object.assign(this, Legend);
-    Object.assign(this, Interaction);
     Object.assign(this, Tooltip);
-    Object.assign(this, Pie);
+    Object.assign(this, Interaction);
     Object.assign(this, Tip);
+
+    if (!options.brush) {
+      Object.assign(this, Legend);
+      Object.assign(this, Pie);
+      Object.assign(this, Title);
+    }
 
     if (options.type === 'heatMap' && options.legend.type === 'gradient') {
       Object.assign(this, GradientLegend);
@@ -33,9 +43,9 @@ class EvChart {
     this.listeners = listeners;
 
     this.wrapperDOM = document.createElement('div');
-    this.wrapperDOM.className = 'ev-chart-wrapper';
+    this.wrapperDOM.className = options.brush ? 'ev-chart-brush-wrapper' : 'ev-chart-wrapper';
     this.chartDOM = document.createElement('div');
-    this.chartDOM.className = 'ev-chart-container';
+    this.chartDOM.className = options.brush ? 'ev-chart-brush-container' : 'ev-chart-container';
     this.wrapperDOM.appendChild(this.chartDOM);
     this.target.appendChild(this.wrapperDOM);
 
@@ -46,7 +56,7 @@ class EvChart {
     this.bufferCanvas.setAttribute('style', 'display: block;');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
     this.overlayCanvas = document.createElement('canvas');
-    this.overlayCanvas.setAttribute('style', 'display: block;');
+    this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
     this.overlayCtx = this.overlayCanvas.getContext('2d');
 
     this.pixelRatio = window.devicePixelRatio || 1;
@@ -774,7 +784,7 @@ class EvChart {
    *
    * @returns {undefined}
    */
-  resize() {
+  resize(promiseRes) {
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
@@ -783,6 +793,10 @@ class EvChart {
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
+
+    if (promiseRes) {
+      promiseRes(true);
+    }
   }
 
   /**

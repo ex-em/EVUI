@@ -12,7 +12,7 @@
 
     <div class="description">
       <p class="case-title">줌 Start / End 인덱스 조절 (줌 모드에서 사용 가능)</p>
-      <div class="zoom-idx__wrapper">
+      <div class="input-wrapper">
         <ev-input-number
           v-model="zoomStartIdx"
         />
@@ -31,7 +31,7 @@
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
       <br/>
       <br/>
-      <ev-button @click="onHideToolbar">툴바 생성/제거</ev-button>
+      <ev-button @click="onToggleToolbar">툴바 생성/제거</ev-button>
       <br/>
       <br/>
       <span class="toggle-label">토글 레전드</span>
@@ -177,7 +177,7 @@ export default {
       chartOptions.zoom.bufferMemoryCnt = cnt;
     }, { immediate: true });
 
-    const onHideToolbar = () => {
+    const onToggleToolbar = () => {
       chartOptions.zoom.toolbar.show = !chartOptions.zoom.toolbar.show;
     };
 
@@ -190,7 +190,7 @@ export default {
       zoomStartIdx,
       zoomEndIdx,
       bufferMemoryCnt,
-      onHideToolbar,
+      onToggleToolbar,
       onUpdateChartData,
     };
   },
@@ -198,7 +198,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.zoom-idx__wrapper {
+.input-wrapper {
   display: flex;
 
   .ev-input-number {

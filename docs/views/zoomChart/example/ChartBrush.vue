@@ -12,14 +12,17 @@
         :data="chartData"
         :options="chartOptions"
       />
+      <ev-chart-brush :options="brushOptions"/>
       <ev-chart
         :data="chartData2"
         :options="chartOptions2"
       />
+      <ev-chart-brush :options="brushOptions2"/>
       <ev-chart
         :data="chartData3"
         :options="chartOptions3"
       />
+      <ev-chart-brush :options="brushOptions3"/>
     </ev-chart-group>
 
     <div class="description">
@@ -43,6 +46,9 @@
       <br/>
       <br/>
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
+      <br/>
+      <br/>
+      <ev-button @click="onToggleBrush">Brush 생성/제거</ev-button>
       <br/>
       <br/>
       <ev-button @click="onToggleToolbar">툴바 생성/제거</ev-button>
@@ -241,6 +247,24 @@ export default {
       },
     });
 
+    const brushOptions = reactive({
+      show: true,
+      chartIdx: 0,
+      height: 90,
+    });
+
+    const brushOptions2 = reactive({
+      show: true,
+      chartIdx: 1,
+      height: 90,
+    });
+
+    const brushOptions3 = reactive({
+      show: true,
+      chartIdx: 2,
+      height: 90,
+    });
+
     const addRandomChartData = () => {
       timeValue = dayjs(timeValue).add(1, 'second');
       chartData.labels.push(dayjs(timeValue));
@@ -291,6 +315,12 @@ export default {
       chartGroupOptions.zoom.toolbar.show = !chartGroupOptions.zoom.toolbar.show;
     };
 
+    const onToggleBrush = () => {
+      brushOptions.show = !brushOptions.show;
+      brushOptions2.show = !brushOptions2.show;
+      brushOptions3.show = !brushOptions3.show;
+    };
+
     watch(isShowToggleLegend, (isShow) => {
       chartOptions.legend.show = isShow;
       chartOptions2.legend.show = isShow;
@@ -321,6 +351,9 @@ export default {
       chartOptions,
       chartOptions2,
       chartOptions3,
+      brushOptions,
+      brushOptions2,
+      brushOptions3,
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,
@@ -329,6 +362,7 @@ export default {
       bufferMemoryCnt,
       onUpdateChartData,
       onToggleToolbar,
+      onToggleBrush,
     };
   },
 };

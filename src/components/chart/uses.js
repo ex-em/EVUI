@@ -304,6 +304,7 @@ export const useZoomModel = (
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
+  const brushIdx = reactive({ start: 0, end: 0 });
 
   let evChartZoom = null;
   const evChartInfo = reactive({
@@ -313,7 +314,7 @@ export const useZoomModel = (
       options: [],
     },
   });
-  const evChartClone = { data: [], options: [] };
+  const evChartClone = reactive({ data: null, options: null });
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -328,6 +329,7 @@ export const useZoomModel = (
         use: isUseZoomMode.value,
         getRangeInfo,
       };
+      option.chartIdx = idx;
 
       if (isUseZoomMode.value) {
         option.dragSelection = {
@@ -384,6 +386,7 @@ export const useZoomModel = (
         evChartZoomOptions,
         evChartToolbarRef.value,
         isExecuteZoom,
+        brushIdx,
         emitFunc,
       );
     }
@@ -456,17 +459,18 @@ export const useZoomModel = (
   };
 
   const setDataForUseZoom = (newData) => {
-    if (!evChartZoom?.isAnimationFinish) {
-      return;
-    }
-
-    if (!isExecuteZoom.value && evChartZoom) {
+    if (!isExecuteZoom.value) {
       evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
       isUseZoomMode.value = false;
 
       setEvChartOptions();
 
-      evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      brushIdx.start = 0;
+      brushIdx.end = evChartClone.data[0].labels.length - 1;
+
+      if (evChartZoom) {
+        evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      }
     }
 
     isExecuteZoom.value = false;
@@ -488,6 +492,8 @@ export const useZoomModel = (
     evChartZoomOptions,
     evChartInfo,
     evChartToolbarRef,
+    evChartClone,
+    brushIdx,
 
     createEvChartZoom,
     setOptionsForUseZoom,

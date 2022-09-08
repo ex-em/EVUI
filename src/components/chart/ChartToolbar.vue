@@ -33,9 +33,8 @@ export default {
 
   &__icon {
     position: absolute;
-    top: 13px;
     right: 30px;
-    z-index: 1;
+    z-index: 3;
 
     i {
       pointer-events: none;

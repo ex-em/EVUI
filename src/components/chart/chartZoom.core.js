@@ -5,11 +5,13 @@ export default class EvChartZoom {
     evChartZoomOptions,
     evChartToolbarRef,
     isExecuteZoom,
+    brushIdx,
     emitFunc,
   ) {
     this.isExecuteZoom = isExecuteZoom;
     this.evChartProps = evChartInfo.props;
     this.evChartCloneData = evChartClone.data;
+    this.brushIdx = brushIdx;
 
     this.setEvChartZoomOptions(evChartZoomOptions);
     this.setIcon(evChartToolbarRef);
@@ -130,7 +132,7 @@ export default class EvChartZoom {
     const { options: evChartOptions, data: evChartData } = this.evChartProps;
 
     const dragChartIdx = evChartOptions.length > 1 ? evChartOptions.findIndex(
-      ({ title }) => title.text === chartTitle,
+      ({ title }) => (title.text ?? '') === chartTitle,
     ) : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
@@ -272,6 +274,9 @@ export default class EvChartZoom {
         (l, labelIdx) => zoomStartIdx <= labelIdx && zoomEndIdx >= labelIdx,
       );
     }
+
+    this.brushIdx.start = zoomStartIdx;
+    this.brushIdx.end = zoomEndIdx;
 
     if (this.emitFunc) {
       this.emitFunc.updateZoomStartIdx(zoomStartIdx);

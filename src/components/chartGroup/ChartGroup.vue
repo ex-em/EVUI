@@ -61,12 +61,18 @@ export default {
       evChartZoomOptions,
       evChartInfo,
       evChartToolbarRef,
+      evChartClone,
+      brushIdx,
+
       createEvChartZoom,
       setOptionsForUseZoom,
       setDataForUseZoom,
       controlZoomIdx,
       onClickToolbar,
     } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
+
+    provide('evChartClone', evChartClone);
+    provide('brushIdx', brushIdx);
 
     onMounted(() => {
       createEvChartZoom();
