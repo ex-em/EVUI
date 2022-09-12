@@ -29,7 +29,8 @@ export default {
     let evChartBrush = null;
 
     const injectEvChartClone = inject('evChartClone', { data: [], options: [] });
-    const injectBrushIdx = inject('brushIdx', { start: 0, end: 0 });
+    const injectBrushIdx = inject('brushIdx', { start: 0, end: 0, isExecutedByBrush: false });
+    const injectIsUseZoomMode = inject('isUseZoomMode', false);
 
     const {
       getNormalizedBrushOptions,
@@ -53,8 +54,8 @@ export default {
     const evChartOption = computed(() => {
       const option = {
         ...(injectEvChartClone.options ?? [])[evChartBrushOptions.value.chartIdx],
-        chartIdx: evChartBrushOptions.value.chartIdx,
         brush: true,
+        brushButtonColor: evChartBrushOptions.value.buttonColor,
         height: evChartBrushOptions.value.height,
         title: {
           show: false,
@@ -129,6 +130,7 @@ export default {
         evChart,
         evChartData,
         evChartOption,
+        injectIsUseZoomMode,
         injectBrushIdx,
         evChartBrushRef,
       );
@@ -146,7 +148,7 @@ export default {
       }
     };
 
-    watch(injectBrushIdx, () => {
+    watch(() => [injectBrushIdx.start, injectBrushIdx.end], () => {
       if (evChartBrushRef.value) {
         drawChartBrush();
       }

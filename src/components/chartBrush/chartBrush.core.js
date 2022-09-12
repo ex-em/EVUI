@@ -1,86 +1,222 @@
+import { throttle } from 'lodash-es';
+
 export default class EvChartBrush {
-  constructor(evChart, evChartData, evChartOption, brushIdx, evChartBrushRef) {
+  constructor(evChart, evChartData, evChartOption, isUseZoomMode, brushIdx, evChartBrushRef) {
     this.evChart = evChart;
     this.evChartData = evChartData;
     this.evChartOption = evChartOption;
+    this.isUseZooMode = isUseZoomMode;
     this.brushIdx = brushIdx;
     this.evChartBrushRef = evChartBrushRef;
   }
 
   init(isResize) {
-    const { chartRect, labelOffset } = this.evChart;
+    if (this.brushIdx.start > this.brushIdx.end) {
+      return;
+    }
 
-    if (chartRect && labelOffset) {
-      if (this.brushIdx.start > this.brushIdx.end) {
-        return;
-      }
+    const existedBrushCanvas = this.evChartBrushRef.value.querySelector('.brush-canvas');
 
-      const evChartRange = {
-        x1: chartRect.x1 + labelOffset.left,
-        x2: chartRect.x2 - labelOffset.right,
-        y1: chartRect.y1 + labelOffset.top,
-        y2: chartRect.y2 - labelOffset.bottom,
-      };
+    if (!existedBrushCanvas) {
+      const brushCanvas = document.createElement('canvas');
 
-      const existedBrushCanvas = this.evChartBrushRef.value.querySelector('.brush-canvas');
+      brushCanvas.setAttribute('class', 'brush-canvas');
+      brushCanvas.setAttribute('style', 'display: block; z-index: 1; cursor: initial;');
 
-      if (!existedBrushCanvas) {
-        const brushCanvas = document.createElement('canvas');
+      const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
+      evChartBrushContainer.appendChild(brushCanvas);
 
-        brushCanvas.setAttribute('class', 'brush-canvas');
-        brushCanvas.setAttribute('style', 'display: block; z-index: 1;');
-
-        const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
-        evChartBrushContainer.appendChild(brushCanvas);
-
-        brushCanvas.style.position = 'absolute';
-        brushCanvas.style.top = `${evChartRange.y1}px`;
-        brushCanvas.style.left = `${evChartRange.x1}px`;
-
-        this.drawBrushRect(brushCanvas, evChartRange);
-      } else {
-        this.drawBrushRect(existedBrushCanvas, evChartRange, isResize);
-      }
+      this.drawBrushRect(brushCanvas);
+      this.addEvent(brushCanvas);
+    } else {
+      this.drawBrushRect(existedBrushCanvas, isResize);
     }
   }
 
-  drawBrushRect(canvas, evChartRange, isResize) {
+  drawBrushRect(brushCanvas, isResize) {
+    const { chartRect, labelOffset } = this.evChart;
+    if (!chartRect && !labelOffset) {
+      return;
+    }
+
+    const evChartRange = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
     const pixelRatio = window.devicePixelRatio || 1;
-    const brushCanvasWidth = evChartRange.x2 - evChartRange.x1;
+    const brushButtonWidth = 6;
+    const brushCanvasWidth = evChartRange.x2 - evChartRange.x1 + brushButtonWidth;
     const brushCanvasHeight = evChartRange.y2 - evChartRange.y1;
 
-    const isEqualWidth = canvas.width === Math.floor(
-      (brushCanvasWidth) * pixelRatio,
-    );
+    const isEqualWidth = brushCanvas.width === Math.floor(brushCanvasWidth * pixelRatio);
 
     if (isResize && isEqualWidth) {
       return;
     }
 
     const labelEndIdx = this.evChartData.value.labels.length - 1;
-    const axesXInterval = brushCanvasWidth / labelEndIdx;
+    const axesXInterval = (evChartRange.x2 - evChartRange.x1) / labelEndIdx;
     const brushRectX = this.brushIdx.start * axesXInterval * pixelRatio;
     const brushRectWidth = (
       brushCanvasWidth - (labelEndIdx - (this.brushIdx.end - this.brushIdx.start)) * axesXInterval
     ) * pixelRatio;
+    const brushRectHeight = this.evChartOption.value.height - evChartRange.y1;
+    const brushButtonLeftXPos = brushRectX;
+    const brushButtonRightXPos = brushRectX + brushRectWidth - brushButtonWidth;
 
-    if (!isEqualWidth) {
-      canvas.width = (brushCanvasWidth) * pixelRatio;
-      canvas.style.width = `${brushCanvasWidth}px`;
-      canvas.height = (brushCanvasHeight) * pixelRatio;
-      canvas.style.height = `${brushCanvasHeight}px`;
+    this.evBrushChartPos = {
+      leftX: (brushButtonLeftXPos / pixelRatio) + evChartRange.x1,
+      rightX: (brushButtonRightXPos / pixelRatio) + evChartRange.x1,
+      width: brushButtonWidth,
+      leftLabelX: evChartRange.x1 - (brushButtonWidth / 2),
+      axesXInterval,
+    };
+    this.evChart.evBrushChartPos = this.evBrushChartPos;
+
+    if (!brushCanvas.style.position) {
+      brushCanvas.style.position = 'absolute';
+      brushCanvas.style.top = `${evChartRange.y1}px`;
+      brushCanvas.style.left = `${evChartRange.x1 - (brushButtonWidth / 2)}px`;
     }
 
-    const ctx = canvas.getContext('2d');
+    if (!isEqualWidth) {
+      brushCanvas.width = (brushCanvasWidth * pixelRatio);
+      brushCanvas.style.width = `${brushCanvasWidth}px`;
+      brushCanvas.height = brushCanvasHeight * pixelRatio;
+      brushCanvas.style.height = `${brushCanvasHeight}px`;
+    }
+
+    const ctx = brushCanvas.getContext('2d');
+
     ctx.clearRect(
       0,
       0,
-      (brushCanvasWidth) * pixelRatio,
-      this.evChartOption.value.height - evChartRange.y1,
+      brushCanvasWidth * pixelRatio,
+      brushCanvasHeight * pixelRatio,
     );
 
     ctx.fillStyle = this.evChartOption.value.dragSelection.fillColor;
     ctx.globalAlpha = this.evChartOption.value.dragSelection.opacity;
-    ctx.fillRect(brushRectX, 0, brushRectWidth, this.evChartOption.value.height - evChartRange.y1);
+    ctx.fillRect(brushRectX, 0, brushRectWidth, brushRectHeight);
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = this.evChartOption.value.brushButtonColor;
+    ctx.fillRect(brushButtonLeftXPos, 0, brushButtonWidth, brushRectHeight);
+    ctx.fillRect(brushButtonRightXPos, 0, brushButtonWidth, brushRectHeight);
+  }
+
+  addEvent(brushCanvas) {
+    if (!this.overlayCanvas) {
+      if (this.evChartBrushRef.value.querySelector('.overlay-canvas')) {
+        this.overlayCanvas = this.evChartBrushRef.value.querySelector('.overlay-canvas');
+      }
+    }
+
+    let isClickBrushButton = false;
+    let beforeMouseXPos = 0;
+    let curClickButtonType = null;
+
+    const onMouseMove = (e) => {
+      const evBrushChartPos = this.evBrushChartPos;
+
+      if (brushCanvas.style.cursor === 'initial' && this.isUseZooMode.value) {
+        brushCanvas.style.cursor = 'ew-resize';
+      }
+
+      if (isClickBrushButton) {
+        if (!this.isUseZooMode.value) {
+          return;
+        }
+
+        if (!curClickButtonType) {
+          this.brushIdx.isExecutedByBrush = true;
+          const calDisToCurMouseX = xPos => Math.abs(
+            evBrushChartPos[xPos] - evBrushChartPos.leftLabelX - e.offsetX,
+          );
+
+          curClickButtonType = calDisToCurMouseX('rightX') > calDisToCurMouseX('leftX') ? 'leftX' : 'rightX';
+          return;
+        }
+
+        const brushButtonSensitivity = evBrushChartPos.axesXInterval / 3;
+        if (e.offsetX > beforeMouseXPos) {
+          const isMoveRight = e.offsetX - (
+            evBrushChartPos[curClickButtonType] - evBrushChartPos.leftLabelX
+          ) > brushButtonSensitivity;
+
+          if (isMoveRight && curClickButtonType === 'leftX') {
+            if (this.brushIdx.start < this.brushIdx.end - 1) {
+              this.brushIdx.start += 1;
+            }
+          } else if (isMoveRight && curClickButtonType === 'rightX') {
+            if (this.brushIdx.end !== this.evChartData.value.labels.length - 1) {
+              this.brushIdx.end += 1;
+            }
+          }
+        } else if (e.offsetX < beforeMouseXPos) {
+          const isMoveLeft = evBrushChartPos[curClickButtonType]
+            - evBrushChartPos.leftLabelX - e.offsetX > brushButtonSensitivity;
+
+          if (isMoveLeft && curClickButtonType === 'leftX') {
+            if (this.brushIdx.start !== 0) {
+              this.brushIdx.start -= 1;
+            }
+          } else if (isMoveLeft && curClickButtonType === 'rightX') {
+            if (this.brushIdx.start < this.brushIdx.end - 1) {
+              this.brushIdx.end -= 1;
+            }
+          }
+        }
+
+        beforeMouseXPos = e.offsetX;
+      } else {
+        const moveRight = xPos =>
+          e.offsetX + evBrushChartPos.leftLabelX - evBrushChartPos.width > evBrushChartPos[xPos];
+        const moveLeft = xPos =>
+          e.offsetX + evBrushChartPos.leftLabelX + evBrushChartPos.width < evBrushChartPos[xPos];
+
+        const isCurMouseXOutsideBrush = moveLeft('leftX') || moveRight('rightX');
+        const isCurMouseXInsideBrush = moveRight('leftX') && moveLeft('rightX');
+
+        if (isCurMouseXOutsideBrush) {
+          this.overlayCanvas.style['z-index'] = 2;
+          brushCanvas.style['z-index'] = 1;
+        }
+
+        if (isCurMouseXInsideBrush) {
+          this.overlayCanvas.style['z-index'] = 2;
+          brushCanvas.style['z-index'] = 1;
+        }
+      }
+    };
+
+    const onMouseDown = (e) => {
+      e.preventDefault();
+      isClickBrushButton = true;
+    };
+
+    const initState = () => {
+      brushCanvas.style.cursor = 'initial';
+      this.brushIdx.isExecutedByBrush = false;
+      isClickBrushButton = false;
+      beforeMouseXPos = 0;
+      curClickButtonType = null;
+    };
+
+    const onMouseUp = () => {
+     initState();
+    };
+
+    const onMouseLeave = () => {
+     initState();
+    };
+
+    brushCanvas.addEventListener('mousemove', throttle(onMouseMove, 50));
+    brushCanvas.addEventListener('mousedown', onMouseDown);
+    brushCanvas.addEventListener('mouseup', onMouseUp);
+    brushCanvas.addEventListener('mouseleave', onMouseLeave);
   }
 }

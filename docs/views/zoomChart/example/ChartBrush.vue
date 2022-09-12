@@ -18,11 +18,6 @@
         :options="chartOptions2"
       />
       <ev-chart-brush :options="brushOptions2"/>
-      <ev-chart
-        :data="chartData3"
-        :options="chartOptions3"
-      />
-      <ev-chart-brush :options="brushOptions3"/>
     </ev-chart-group>
 
     <div class="description">
@@ -141,24 +136,6 @@ export default {
       },
     });
 
-    const chartData3 = reactive({
-      series: {
-        series1: { name: 'series#1', fill: false, point: true },
-        series2: { name: 'series#2', fill: false, point: true },
-        series3: { name: 'series#3', fill: false, point: true },
-        series4: { name: 'series#4', fill: false, point: true },
-        series5: { name: 'series#5', fill: false, point: true },
-      },
-      labels: [],
-      data: {
-        series1: [],
-        series2: [],
-        series3: [],
-        series4: [],
-        series5: [],
-      },
-    });
-
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
@@ -215,71 +192,31 @@ export default {
       },
     });
 
-    const chartOptions3 = reactive({
-      type: 'line',
-      width: '100%',
-      title: {
-        text: '그룹에 있는 차트 3',
-        show: true,
-      },
-      legend: {
-        show: false,
-        position: 'right',
-      },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
-      maxTip: {
-        use: true,
-        showIndicator: true,
-        indicatorColor: '#FF0000',
-        tipBackground: '#000000',
-        tipTextColor: '#FFFFFF',
-      },
-    });
-
     const brushOptions = reactive({
       show: true,
       chartIdx: 0,
-      height: 90,
+      height: 100,
+      buttonColor: '#FF0000',
     });
 
     const brushOptions2 = reactive({
       show: true,
       chartIdx: 1,
-      height: 90,
-    });
+      height: 100,
+      buttonColor: '#FF0000',
 
-    const brushOptions3 = reactive({
-      show: true,
-      chartIdx: 2,
-      height: 90,
     });
 
     const addRandomChartData = () => {
       timeValue = dayjs(timeValue).add(1, 'second');
       chartData.labels.push(dayjs(timeValue));
       chartData2.labels.push(dayjs(timeValue));
-      chartData3.labels.push(dayjs(timeValue));
 
       Object.values(chartData.data).forEach((seriesData) => {
         seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
       });
 
       Object.values(chartData2.data).forEach((seriesData) => {
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-      });
-
-      Object.values(chartData3.data).forEach((seriesData) => {
         seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
       });
     };
@@ -304,7 +241,6 @@ export default {
 
       init(chartData);
       init(chartData2);
-      init(chartData3);
 
       for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
         addRandomChartData();
@@ -318,13 +254,11 @@ export default {
     const onToggleBrush = () => {
       brushOptions.show = !brushOptions.show;
       brushOptions2.show = !brushOptions2.show;
-      brushOptions3.show = !brushOptions3.show;
     };
 
     watch(isShowToggleLegend, (isShow) => {
       chartOptions.legend.show = isShow;
       chartOptions2.legend.show = isShow;
-      chartOptions3.legend.show = isShow;
     });
 
     watch(isExpandChartArea, (isExpand) => {
@@ -347,13 +281,10 @@ export default {
       chartGroupOptions,
       chartData,
       chartData2,
-      chartData3,
       chartOptions,
       chartOptions2,
-      chartOptions3,
       brushOptions,
       brushOptions2,
-      brushOptions3,
       isShowToggleLegend,
       isExpandChartArea,
       zoomRef,

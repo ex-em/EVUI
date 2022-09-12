@@ -57,6 +57,7 @@ class EvChart {
     this.bufferCtx = this.bufferCanvas.getContext('2d');
     this.overlayCanvas = document.createElement('canvas');
     this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
+    this.overlayCanvas.setAttribute('class', 'overlay-canvas');
     this.overlayCtx = this.overlayCanvas.getContext('2d');
 
     this.pixelRatio = window.devicePixelRatio || 1;

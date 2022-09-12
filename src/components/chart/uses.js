@@ -304,7 +304,7 @@ export const useZoomModel = (
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
-  const brushIdx = reactive({ start: 0, end: 0 });
+  const brushIdx = reactive({ start: 0, end: 0, isExecutedByBrush: false });
 
   let evChartZoom = null;
   const evChartInfo = reactive({
@@ -329,7 +329,6 @@ export const useZoomModel = (
         use: isUseZoomMode.value,
         getRangeInfo,
       };
-      option.chartIdx = idx;
 
       if (isUseZoomMode.value) {
         option.dragSelection = {
@@ -477,9 +476,9 @@ export const useZoomModel = (
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
-    if (evChartZoom.isExecuteZoomAtToolbar) {
-      evChartZoom.isExecuteZoomAtToolbar = false;
-      return;
+    if (evChartZoom.isExecutedByToolbar && !brushIdx.isExecutedByBrush) {
+        evChartZoom.isExecutedByToolbar = false;
+        return;
     }
 
     if (isUseZoomMode.value) {
@@ -493,6 +492,7 @@ export const useZoomModel = (
     evChartInfo,
     evChartToolbarRef,
     evChartClone,
+    isUseZoomMode,
     brushIdx,
 
     createEvChartZoom,

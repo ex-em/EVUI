@@ -62,6 +62,7 @@ export default {
       evChartInfo,
       evChartToolbarRef,
       evChartClone,
+      isUseZoomMode,
       brushIdx,
 
       createEvChartZoom,
@@ -72,6 +73,7 @@ export default {
     } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
 
     provide('evChartClone', evChartClone);
+    provide('isUseZoomMode', isUseZoomMode);
     provide('brushIdx', brushIdx);
 
     onMounted(() => {
@@ -89,7 +91,15 @@ export default {
     }, { deep: true });
 
     watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
-      controlZoomIdx(zoomStartIdx, zoomEndIdx);
+      if (!brushIdx.isExecutedByBrush) {
+        controlZoomIdx(zoomStartIdx, zoomEndIdx);
+      }
+    });
+
+    watch(() => [brushIdx.start, brushIdx.end], ([brushStartIdx, brushEndIdx]) => {
+      if (brushIdx.isExecutedByBrush) {
+        controlZoomIdx(brushStartIdx, brushEndIdx);
+      }
     });
 
     return {

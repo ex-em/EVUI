@@ -18,6 +18,28 @@ const modules = {
         return;
       }
 
+      if (this.options.brush) {
+        if (!this.brushCanvas) {
+          if (e.path[0].nextSibling.className === 'brush-canvas') {
+            this.brushCanvas = e.path[0].nextSibling;
+          }
+        } else {
+          const isCurMouseXInsideBrushBtn = xPos =>
+            e.offsetX + this.evBrushChartPos.width >= this.evBrushChartPos[xPos]
+            && e.offsetX - this.evBrushChartPos.width <= this.evBrushChartPos[xPos];
+
+          if (isCurMouseXInsideBrushBtn('leftX')) {
+            this.overlayCanvas.style['z-index'] = 1;
+            this.brushCanvas.style['z-index'] = 2;
+          }
+
+          if (isCurMouseXInsideBrushBtn('rightX')) {
+            this.overlayCanvas.style['z-index'] = 1;
+            this.brushCanvas.style['z-index'] = 2;
+          }
+        }
+      }
+
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
