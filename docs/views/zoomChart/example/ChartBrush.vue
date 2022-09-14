@@ -196,15 +196,12 @@ export default {
       show: true,
       chartIdx: 0,
       height: 100,
-      buttonColor: '#FF0000',
     });
 
     const brushOptions2 = reactive({
       show: true,
       chartIdx: 1,
       height: 100,
-      buttonColor: '#FF0000',
-
     });
 
     const addRandomChartData = () => {

@@ -1,4 +1,4 @@
-import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated } from 'vue';
+import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated, watch } from 'vue';
 import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
@@ -304,7 +304,12 @@ export const useZoomModel = (
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
-  const brushIdx = reactive({ start: 0, end: 0, isExecutedByBrush: false });
+  const brushIdx = reactive({
+    start: 0,
+    end: 0,
+    isExecutedByButton: false,
+    isExecutedByWheel: false,
+  });
 
   let evChartZoom = null;
   const evChartInfo = reactive({
@@ -476,7 +481,7 @@ export const useZoomModel = (
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
-    if (evChartZoom.isExecutedByToolbar && !brushIdx.isExecutedByBrush) {
+    if (evChartZoom.isExecutedByToolbar) {
         evChartZoom.isExecutedByToolbar = false;
         return;
     }
@@ -486,6 +491,28 @@ export const useZoomModel = (
       evChartZoom.setZoomAreaMemory(zoomStartIdx, zoomEndIdx);
     }
   };
+
+  watch(() => [
+    brushIdx.start,
+    brushIdx.end,
+  ], () => {
+    if (!brushIdx.isExecutedByButton && !brushIdx.isExecutedByWheel) {
+        return;
+    }
+
+    evChartZoom.executeZoom(brushIdx.start, brushIdx.end);
+  });
+
+  watch(() => [
+    brushIdx.isExecutedByButton,
+    brushIdx.isExecutedByWheel,
+  ], (newVal, oldVal) => {
+    if (oldVal[0] && !newVal[0]) {
+      evChartZoom.setZoomAreaMemory(brushIdx.start, brushIdx.end);
+    } else if (oldVal[1] && !newVal[1]) {
+      evChartZoom.zoomAreaMemory.current[0] = [brushIdx.start, brushIdx.end];
+    }
+  });
 
   return {
     evChartZoomOptions,

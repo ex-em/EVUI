@@ -91,15 +91,11 @@ export default {
     }, { deep: true });
 
     watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
-      if (!brushIdx.isExecutedByBrush) {
-        controlZoomIdx(zoomStartIdx, zoomEndIdx);
+      if (brushIdx.isExecutedByButton || brushIdx.isExecutedByWheel) {
+        return;
       }
-    });
 
-    watch(() => [brushIdx.start, brushIdx.end], ([brushStartIdx, brushEndIdx]) => {
-      if (brushIdx.isExecutedByBrush) {
-        controlZoomIdx(brushStartIdx, brushEndIdx);
-      }
+      controlZoomIdx(zoomStartIdx, zoomEndIdx);
     });
 
     return {

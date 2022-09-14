@@ -4,7 +4,6 @@ const DEFAULT_OPTIONS = {
   show: true,
   chartIdx: 0,
   height: 100,
-  buttonColor: '',
 };
 
 // eslint-disable-next-line import/prefer-default-export

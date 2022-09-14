@@ -8,6 +8,9 @@ export default class EvChartBrush {
     this.isUseZooMode = isUseZoomMode;
     this.brushIdx = brushIdx;
     this.evChartBrushRef = evChartBrushRef;
+
+    this.evChart.brushIdx = brushIdx;
+    this.evChart.isUseZoomMode = isUseZoomMode;
   }
 
   init(isResize) {
@@ -70,8 +73,8 @@ export default class EvChartBrush {
     this.evBrushChartPos = {
       leftX: (brushButtonLeftXPos / pixelRatio) + evChartRange.x1,
       rightX: (brushButtonRightXPos / pixelRatio) + evChartRange.x1,
-      width: brushButtonWidth,
-      leftLabelX: evChartRange.x1 - (brushButtonWidth / 2),
+      buttonWidth: brushButtonWidth,
+      x1: evChartRange.x1 - (brushButtonWidth / 2),
       axesXInterval,
     };
     this.evChart.evBrushChartPos = this.evBrushChartPos;
@@ -101,9 +104,6 @@ export default class EvChartBrush {
     ctx.fillStyle = this.evChartOption.value.dragSelection.fillColor;
     ctx.globalAlpha = this.evChartOption.value.dragSelection.opacity;
     ctx.fillRect(brushRectX, 0, brushRectWidth, brushRectHeight);
-
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = this.evChartOption.value.brushButtonColor;
     ctx.fillRect(brushButtonLeftXPos, 0, brushButtonWidth, brushRectHeight);
     ctx.fillRect(brushButtonRightXPos, 0, brushButtonWidth, brushRectHeight);
   }
@@ -132,9 +132,9 @@ export default class EvChartBrush {
         }
 
         if (!curClickButtonType) {
-          this.brushIdx.isExecutedByBrush = true;
+          this.brushIdx.isExecutedByButton = true;
           const calDisToCurMouseX = xPos => Math.abs(
-            evBrushChartPos[xPos] - evBrushChartPos.leftLabelX - e.offsetX,
+            evBrushChartPos[xPos] - evBrushChartPos.x1 - e.offsetX,
           );
 
           curClickButtonType = calDisToCurMouseX('rightX') > calDisToCurMouseX('leftX') ? 'leftX' : 'rightX';
@@ -144,7 +144,7 @@ export default class EvChartBrush {
         const brushButtonSensitivity = evBrushChartPos.axesXInterval / 3;
         if (e.offsetX > beforeMouseXPos) {
           const isMoveRight = e.offsetX - (
-            evBrushChartPos[curClickButtonType] - evBrushChartPos.leftLabelX
+            evBrushChartPos[curClickButtonType] - evBrushChartPos.x1
           ) > brushButtonSensitivity;
 
           if (isMoveRight && curClickButtonType === 'leftX') {
@@ -158,7 +158,7 @@ export default class EvChartBrush {
           }
         } else if (e.offsetX < beforeMouseXPos) {
           const isMoveLeft = evBrushChartPos[curClickButtonType]
-            - evBrushChartPos.leftLabelX - e.offsetX > brushButtonSensitivity;
+            - evBrushChartPos.x1 - e.offsetX > brushButtonSensitivity;
 
           if (isMoveLeft && curClickButtonType === 'leftX') {
             if (this.brushIdx.start !== 0) {
@@ -174,9 +174,9 @@ export default class EvChartBrush {
         beforeMouseXPos = e.offsetX;
       } else {
         const moveRight = xPos =>
-          e.offsetX + evBrushChartPos.leftLabelX - evBrushChartPos.width > evBrushChartPos[xPos];
+          e.offsetX + evBrushChartPos.x1 - evBrushChartPos.buttonWidth > evBrushChartPos[xPos];
         const moveLeft = xPos =>
-          e.offsetX + evBrushChartPos.leftLabelX + evBrushChartPos.width < evBrushChartPos[xPos];
+          e.offsetX + evBrushChartPos.x1 + evBrushChartPos.buttonWidth < evBrushChartPos[xPos];
 
         const isCurMouseXOutsideBrush = moveLeft('leftX') || moveRight('rightX');
         const isCurMouseXInsideBrush = moveRight('leftX') && moveLeft('rightX');
@@ -200,18 +200,20 @@ export default class EvChartBrush {
 
     const initState = () => {
       brushCanvas.style.cursor = 'initial';
-      this.brushIdx.isExecutedByBrush = false;
+      this.brushIdx.isExecutedByButton = false;
       isClickBrushButton = false;
       beforeMouseXPos = 0;
       curClickButtonType = null;
     };
 
     const onMouseUp = () => {
-     initState();
+      initState();
     };
 
     const onMouseLeave = () => {
-     initState();
+      if (isClickBrushButton) {
+        initState();
+      }
     };
 
     brushCanvas.addEventListener('mousemove', throttle(onMouseMove, 50));

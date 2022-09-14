@@ -275,7 +275,7 @@ export default class EvChartZoom {
       );
     }
 
-    if (!this.brushIdx.isExecutedByBrush) {
+    if (!this.brushIdx.isExecutedByButton && !this.brushIdx.isExecutedByWheel) {
       this.brushIdx.start = zoomStartIdx;
       this.brushIdx.end = zoomEndIdx;
     }

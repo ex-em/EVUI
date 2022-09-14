@@ -25,8 +25,8 @@ const modules = {
           }
         } else {
           const isCurMouseXInsideBrushBtn = xPos =>
-            e.offsetX + this.evBrushChartPos.width >= this.evBrushChartPos[xPos]
-            && e.offsetX - this.evBrushChartPos.width <= this.evBrushChartPos[xPos];
+            e.offsetX + this.evBrushChartPos.buttonWidth >= this.evBrushChartPos[xPos]
+            && e.offsetX - this.evBrushChartPos.buttonWidth <= this.evBrushChartPos[xPos];
 
           if (isCurMouseXInsideBrushBtn('leftX')) {
             this.overlayCanvas.style['z-index'] = 1;
@@ -85,7 +85,47 @@ const modules = {
      *
      * @returns {undefined}
      */
+
+    const onBrushMoveWheel = (e) => {
+      if (this.isUseZoomMode.value) {
+        e.preventDefault();
+        this.brushIdx.isExecutedByWheel = true;
+        if (this.brushIdx.start === this.brushIdx.end) {
+          return;
+        }
+
+        if (e.deltaY > 0) {
+          if (!this.brushIdx.start) {
+            return;
+          }
+
+          this.brushIdx.start -= 1;
+          this.brushIdx.end -= 1;
+        } else {
+          if (this.brushIdx.end === this.data.labels.length - 1) {
+            return;
+          }
+
+          this.brushIdx.start += 1;
+          this.brushIdx.end += 1;
+        }
+      }
+    };
+
+    const onMouseOver = () => {
+      this.overlayCanvas.addEventListener('wheel', onBrushMoveWheel);
+    };
+
+    if (this.options.brush) {
+      this.overlayCanvas.addEventListener('mouseover', onMouseOver);
+    }
+
     this.onMouseLeave = () => {
+      if (this.options.brush) {
+        this.overlayCanvas.removeEventListener('mouseover', onMouseOver);
+        this.brushIdx.isExecutedByWheel = false;
+      }
+
       const { tooltip, dragSelection } = this.options;
 
       if (tooltip.throttledMove) {
