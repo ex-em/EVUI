@@ -216,7 +216,7 @@ export default class EvChartBrush {
       }
     };
 
-    brushCanvas.addEventListener('mousemove', throttle(onMouseMove, 50));
+    brushCanvas.addEventListener('mousemove', throttle(onMouseMove, 10));
     brushCanvas.addEventListener('mousedown', onMouseDown);
     brushCanvas.addEventListener('mouseup', onMouseUp);
     brushCanvas.addEventListener('mouseleave', onMouseLeave);

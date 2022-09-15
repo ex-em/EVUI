@@ -57,16 +57,42 @@ export default {
     );
 
     const evChartOption = computed(() => {
+      const chartOption = (injectEvChartClone.options ?? [])[evChartBrushOptions.value.chartIdx];
+
       const option = {
-        ...(injectEvChartClone.options ?? [])[evChartBrushOptions.value.chartIdx],
+        ...chartOption,
         brush: true,
         height: evChartBrushOptions.value.height,
+        zoom: {
+          use: false,
+        },
+        dragSelection: {
+          use: false,
+        },
         title: {
           show: false,
         },
         legend: {
           show: false,
         },
+        selectLabel: {
+          use: false,
+        },
+        selectSeries: {
+          use: false,
+        },
+        axesX: [{
+          ...chartOption?.axesX?.[0],
+          title: {
+            use: false,
+          },
+        }],
+        axesY: [{
+          ...chartOption?.axesY?.[0],
+          title: {
+            use: false,
+          },
+        }],
       };
 
       return getNormalizedOptions(option);

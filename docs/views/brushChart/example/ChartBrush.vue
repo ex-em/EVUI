@@ -67,7 +67,7 @@ export default {
   setup() {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
-    const bufferMemoryCnt = ref(5);
+    const bufferMemoryCnt = ref(10);
     const zoomRef = ref();
     const zoomStartIdx = ref(0);
     const zoomEndIdx = ref(0);
@@ -139,10 +139,6 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      title: {
-        text: '그룹에 있는 차트 1',
-        show: true,
-      },
       legend: {
         show: false,
         position: 'right',
@@ -163,10 +159,6 @@ export default {
     const chartOptions2 = reactive({
       type: 'line',
       width: '100%',
-      title: {
-        text: '그룹에 있는 차트 2',
-        show: true,
-      },
       legend: {
         show: false,
         position: 'right',

@@ -319,7 +319,7 @@ export const useZoomModel = (
       options: [],
     },
   });
-  const evChartClone = reactive({ data: null, options: null });
+  const evChartClone = reactive({ data: null, options: [] });
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -377,7 +377,7 @@ export const useZoomModel = (
 
     if (evChartInfo.props.data.length) {
       evChartClone.data = cloneDeep(evChartInfo.props.data);
-      evChartClone.options = cloneDeep(evChartInfo.props.options);
+      evChartClone.options = evChartInfo.props.options;
 
       const emitFunc = {
         updateZoomStartIdx: startIdx => emit('update:zoomStartIdx', startIdx),
@@ -506,10 +506,16 @@ export const useZoomModel = (
   watch(() => [
     brushIdx.isExecutedByButton,
     brushIdx.isExecutedByWheel,
-  ], (newVal, oldVal) => {
-    if (oldVal[0] && !newVal[0]) {
+  ], ([
+    curIsExecutedByButton,
+    curIsExecutedByWheel,
+  ], [
+    prevIsExecutedByButton,
+    prevIsExecutedByWheel,
+  ]) => {
+    if (prevIsExecutedByButton && !curIsExecutedByButton) {
       evChartZoom.setZoomAreaMemory(brushIdx.start, brushIdx.end);
-    } else if (oldVal[1] && !newVal[1]) {
+    } else if (prevIsExecutedByWheel && !curIsExecutedByWheel) {
       evChartZoom.zoomAreaMemory.current[0] = [brushIdx.start, brushIdx.end];
     }
   });

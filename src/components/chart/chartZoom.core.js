@@ -132,7 +132,7 @@ export default class EvChartZoom {
     const { options: evChartOptions, data: evChartData } = this.evChartProps;
 
     const dragChartIdx = evChartOptions.length > 1 ? evChartOptions.findIndex(
-      ({ title }) => (title.text ?? '') === chartTitle,
+      option => (option?.title?.text ?? '') === chartTitle,
     ) : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {

@@ -173,7 +173,8 @@ const modules = {
      * @returns {undefined}
      */
     this.onClick = (e) => {
-      if (this.options?.zoom?.use) {
+      if (this.isMouseMove) {
+        this.isMouseMove = false;
         return;
       }
       const args = { e };
@@ -304,6 +305,7 @@ const modules = {
       let yep;
 
       dragInfo.isMove = true;
+      this.isMouseMove = true;
 
       if (aOffsetX < aRange.x1) {
         xep = aRange.x1;

@@ -66,7 +66,7 @@ export default {
   setup() {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
-    const bufferMemoryCnt = ref(5);
+    const bufferMemoryCnt = ref(10);
     const zoomRef = ref();
     const zoomStartIdx = ref(0);
     const zoomEndIdx = ref(0);
