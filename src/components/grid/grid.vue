@@ -246,7 +246,10 @@ export default {
   data() {
     return {
       originStore: [],
+      testStore: [],
+      previousFilterCount: 0,
       filteredStore: [],
+      isFilteredStore: false,
       viewStore: [],
       orderedColumns: [],
       sortOrder: 'desc',
@@ -463,9 +466,11 @@ export default {
           });
 
         menuItems.push(...customItems);
+        console.log('menuItems : ', menuItems);
       }
 
       if (this.useFilter) {
+        console.log('useFilter');
         menuItems.push({
           text: this.isFiltering ? 'Filter Off' : 'Filter On',
           itemId: 'set_filter',
@@ -552,16 +557,16 @@ export default {
      */
     numberFilter(item, condition) {
       const comparison = condition.comparison;
-      const value = condition.value;
+      const value = Number(condition.value);
       const index = condition.index;
       let result;
-
+      // console.log('@@@@@', parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, '')), '@@@@@');
       if (comparison === '=') {
-        result = item[ROW_DATA_INDEX][index] === value;
+        result = parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, '')) === value;
       } else if (comparison === '>') {
-        result = item[ROW_DATA_INDEX][index] > value;
+        result = parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, '')) > value;
       } else if (comparison === '<') {
-        result = item[ROW_DATA_INDEX][index] < value;
+        result = parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, '')) < value;
       }
 
       return result;
@@ -575,7 +580,11 @@ export default {
      * @returns {boolean} 확인 결과
      */
     getFilteredData(data, filterType, condition) {
+      console.log('@@ data :', data);
+      console.log('@@ filterType :', filterType);
+      console.log('@@ condition :', condition);
       const filterFn = filterType === 'string' ? this.stringFilter : this.numberFilter;
+      console.log('@@ filterFn : ', filterFn);
       const filteredData = [];
 
       for (let ix = 0; ix < data.length; ix++) {
@@ -598,34 +607,100 @@ export default {
       let isAppliedFilter = false;
       const filterByColumn = this.filterList;
       const fields = Object.keys(filterByColumn || {});
+      console.log('set fields name : ', fields);
       const store = this.originStore;
+      console.log('store : ', store);
 
       for (let ix = 0; ix < fields.length; ix++) {
         field = fields[ix];
+        // console.log('field : ', field);
         filters = filterByColumn[field];
+        // console.log('filters : ', filters);
         index = this.getColumnIndex(field);
+        // console.log('index : ', index);
         columnType = this.columns[index].type;
+        // console.log('columnType : ', columnType);
+        filters = filters.filter(filter => filter.use === true);
+        console.log('필터링 filters : ', filters);
+
         for (let jx = 0; jx < filters.length; jx++) {
           const filterItem = filters[jx];
-          if (filterItem.use) {
+          // if (filterItem.use) {
             isAppliedFilter = true;
-            if (!filteredStore.length) {
-              filteredStore = this.getFilteredData(store, columnType, {
-                ...filterItem,
-                index,
-              });
+            // if (!filteredStore.length) {
+            //   console.log('#### filteredStore에 length가 0 ####');
+            //   filteredStore = this.getFilteredData(store, columnType, {
+            //     ...filterItem,
+            //     index,
+            //   });
+            // } else if (filterItem.type === 'OR') {
+            //   console.log('#### filterItem.type이 OR ####');
+            //   filteredStore.push(...this.getFilteredData(store, columnType, {
+            //     ...filterItem,
+            //     index,
+            //   }));
+            // } else {
+            //   console.log('#### 일반 적인 경우 ####');
+            //   filteredStore = this.getFilteredData(filteredStore, columnType, {
+            //     ...filterItem,
+            //     index,
+            //   });
+            // }
+            //
+            // 수정하고 있는 코드
+            //
+            if (filterItem.type === 'AND') {
+              console.log('filterItem.type === AND');
+              if (filteredStore.length === 0 && filters.length === 1) {
+                // console.log('최초 AND 조건을 적용할때는 filteredStore.length가 0', filteredStore);
+                filteredStore = this.getFilteredData(store, columnType, {
+                  ...filterItem,
+                  index,
+                });
+                this.testStore = filteredStore;
+                console.log('필터링 적용된 결과 [ filteredStore가 아직 빈 배열이고, 적용하려는 filters 조건이 1개일때 전역에 저장된것 확인 ] : ', this.testStore);
+              } else if (filters.length > 1) {
+                console.log('필터링 적용된 결과 [ 이전에 필터링 된 값이 저장 되어 있는 filteredStore ] : ', this.testStore);
+                filters.forEach(filter => console.log('** 하하 **', filter.value, '** 히히 **', filter.comparison, '** 호호 **', filterItem.value));
+                // if (filterItem.comparison === '=') {
+                //   console.log('= 일때 처리');
+                //
+                //
+                //
+                //   // eslint-disable-next-line array-callback-return,no-mixed-operators
+                //   const errorLogic = filters.filter(filter => filter.value === filterItem.value);
+                // eslint-disable-next-line max-len
+                //   console.log('크거나 작은 값을 선택하는것도 있고 equal도 있는데 equal이랑 value 값이 똑같다', errorLogic); // 성립할 수 없는 식
+                //   if (errorLogic === undefined || errorLogic.length === 1) {
+                //     filteredStore = this.getFilteredData(store, columnType, {
+                //       ...filterItem,
+                //       index,
+                //     });
+                //     this.testStore = filteredStore;
+                //   } else {
+                //     this.testStore = [];
+                //     filteredStore = this.getFilteredData(this.testStore, columnType, {
+                //       ...filterItem,
+                //       index,
+                //     });
+                //   }
+                // } else {
+                //   console.log('ㅋㅋㅋㅋ');
+                //   filteredStore = this.getFilteredData(store, columnType, {
+                //     ...filterItem,
+                //     index,
+                //   });
+                // }
+                // }
+              }
             } else if (filterItem.type === 'OR') {
+              console.log('#### filterItem.type이 OR ####');
               filteredStore.push(...this.getFilteredData(store, columnType, {
                 ...filterItem,
                 index,
               }));
-            } else {
-              filteredStore = this.getFilteredData(filteredStore, columnType, {
-                ...filterItem,
-                index,
-              });
             }
-          }
+          // }
         }
       }
 
@@ -785,6 +860,9 @@ export default {
      * @param {array} filters - 필터 정보
      */
     onApplyFilter(columnField, filters) {
+      console.log('columnField : ', columnField);
+      console.log('filters : ', filters);
+      console.log('this.filterList : ', this.filterList);
       this.$set(this.filterList, columnField, filters);
       this.filteredStore = [];
 
