@@ -154,7 +154,7 @@
           `${prefixCls}`,
           { [`${prefixCls}-disabled`]: this.disabled },
           { focus: this.focus },
-          { error: this.cssError },
+          { error: this.cssError || this.customErrorMsg },
         ];
       },
       wrapStyle() {
