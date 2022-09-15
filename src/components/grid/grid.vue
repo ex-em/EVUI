@@ -1019,11 +1019,11 @@ export default {
 
       const nextColumnIndex = columnIndex + 1;
       const headerEl = this.$refs.header;
+      const bodyEl = this.$refs.body;
       const headerLeft = headerEl.getBoundingClientRect().left;
       const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
-      const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
       const columnRect = columnEl.getBoundingClientRect();
-      const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - 40;
+      const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
       const resizeLineEl = this.$refs.resizeLine;
       const minLeft = columnRect.left - headerLeft + 40;
       const startLeft = columnRect.right - headerLeft;
