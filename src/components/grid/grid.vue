@@ -466,11 +466,9 @@ export default {
           });
 
         menuItems.push(...customItems);
-        console.log('menuItems : ', menuItems);
       }
 
       if (this.useFilter) {
-        console.log('useFilter');
         menuItems.push({
           text: this.isFiltering ? 'Filter Off' : 'Filter On',
           itemId: 'set_filter',
@@ -559,13 +557,19 @@ export default {
       const comparison = condition.comparison;
       const value = Number(condition.value);
       const index = condition.index;
+      let itemData;
+      if (typeof item[ROW_DATA_INDEX][index] === 'string') {
+        itemData = parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, ''));
+      } else if (typeof item[ROW_DATA_INDEX][index] === 'number') {
+        itemData = item[ROW_DATA_INDEX][index];
+      }
       let result;
       if (comparison === '=') {
-        result = Number(item[ROW_DATA_INDEX][index]) === value;
+        result = itemData === value;
       } else if (comparison === '>') {
-        result = Number(item[ROW_DATA_INDEX][index]) > value;
+        result = itemData > value;
       } else if (comparison === '<') {
-        result = Number(item[ROW_DATA_INDEX][index]) < value;
+        result = itemData < value;
       }
 
       return result;
@@ -579,9 +583,6 @@ export default {
      * @returns {boolean} 확인 결과
      */
     getFilteredData(data, filterType, condition) {
-      console.log(data);
-      console.log(filterType);
-      console.log(condition);
       const filterFn = filterType === 'string' ? this.stringFilter : this.numberFilter;
       const filteredData = [];
 
@@ -590,7 +591,6 @@ export default {
           filteredData.push(data[ix]);
         }
       }
-      console.log('결과 filteredData : ', filteredData);
       return filteredData;
     },
     /**
@@ -610,45 +610,32 @@ export default {
 
       for (let ix = 0; ix < fields.length; ix++) {
         field = fields[ix];
-        // console.log('field : ', field);
         filters = filterByColumn[field].filter(filterItem => filterItem.use === true);
-        console.log('filters : ', filters);
         index = this.getColumnIndex(field);
-        // console.log('index : ', index);
         columnType = this.columns[index].type;
-        // console.log('columnType : ', columnType);
 
         for (let jx = 0; jx < filters.length; jx++) {
           const filterItem = filters[jx];
           isAppliedFilter = true;
-          if (count === 1) {
-            filteredStore = this.getFilteredData(filteredStore, columnType, {
-              ...filterItem,
-              index,
-            });
-            console.log('피카추', filteredStore);
-            count = 0;
-          } else if (!filteredStore.length) {
-            console.log('#### filteredStore에 length가 0 ####', !filteredStore.length);
-            console.log('store : ', store);
+          if (!filteredStore.length) {
             filteredStore = this.getFilteredData(store, columnType, {
               ...filterItem,
               index,
             });
-            console.log('라이추', filteredStore);
             count = 1;
-          } else if (filterItem.type === 'OR') {
-            console.log('#### filterItem.type이 OR ####');
-            filteredStore.push(...this.getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            }));
-          } else {
-            console.log('#### 일반 적인 경우 ####', filteredStore);
+          } else if (count === 1) {
             filteredStore = this.getFilteredData(filteredStore, columnType, {
               ...filterItem,
               index,
             });
+            if (filteredStore.length !== 0) {
+              count = 0;
+            }
+          } else if (filterItem.type === 'OR') {
+            filteredStore.push(...this.getFilteredData(store, columnType, {
+              ...filterItem,
+              index,
+            }));
           }
         }
       }
@@ -809,9 +796,6 @@ export default {
      * @param {array} filters - 필터 정보
      */
     onApplyFilter(columnField, filters) {
-      console.log('columnField : ', columnField);
-      console.log('filters : ', filters);
-      console.log('this.filterList : ', this.filterList);
       this.$set(this.filterList, columnField, filters);
       this.filteredStore = [];
 
