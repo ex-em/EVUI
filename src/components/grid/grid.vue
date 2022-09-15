@@ -246,10 +246,7 @@ export default {
   data() {
     return {
       originStore: [],
-      testStore: [],
-      previousFilterCount: 0,
       filteredStore: [],
-      isFilteredStore: false,
       viewStore: [],
       orderedColumns: [],
       sortOrder: 'desc',
