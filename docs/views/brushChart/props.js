@@ -2,8 +2,8 @@ import { parseComponent } from 'vue-template-compiler';
 import mdText from '!!raw-loader!./api/brushChart.md';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
-import ChartBrush from './example/ChartBrush';
-import ChartBrushRaw from '!!raw-loader!./example/ChartBrush';
+import Default from './example/Default';
+import DefaultRaw from '!!raw-loader!./example/Default';
 import AxisTitle from './example/AxisTitle';
 import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
 import SelectLabel from './example/SelectLabel';
@@ -20,8 +20,8 @@ export default {
   components: {
     Default: {
       description: 'Chart와 Brush를 Chart Group로 감싸 차트의 줌 위치와 원본 차트를 보여주는 Brush 기능을 사용할 수 있습니다.',
-      component: ChartBrush,
-      parsedData: parseComponent(ChartBrushRaw),
+      component: Default,
+      parsedData: parseComponent(DefaultRaw),
     },
     Tooltip: {
       description: '기존 Chart의 Tooltip 기능이 Brush에도 동일하게 보여집니다.',
