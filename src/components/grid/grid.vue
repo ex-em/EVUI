@@ -599,7 +599,8 @@ export default {
       let filters;
       let columnType;
       let filteredStore = [];
-      let count = 0;
+      let filterFlag = false;
+      let andFlag = false;
       let isAppliedFilter = false;
       const filterByColumn = this.filterList;
       const fields = Object.keys(filterByColumn || {});
@@ -614,33 +615,24 @@ export default {
         for (let jx = 0; jx < filters.length; jx++) {
           const filterItem = filters[jx];
           isAppliedFilter = true;
-          if (filterItem.type === 'OR') {
-            filteredStore.push(...this.getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            }));
-          } else if (count === 1) {
-            filteredStore = this.getFilteredData(filteredStore, columnType, {
-              ...filterItem,
-              index,
-            });
-            if (!filteredStore.length) {
-              count = 1;
-            } else {
-              count = 0;
-            }
-          } else if (!filteredStore.length) {
+          if (!filterFlag) {
             filteredStore = this.getFilteredData(store, columnType, {
               ...filterItem,
               index,
             });
-            count = 1;
+            filterFlag = true;
+          } if (filterItem.type === 'OR' && !andFlag) {
+            filteredStore.push(...this.getFilteredData(store, columnType, {
+              ...filterItem,
+              index,
+            }));
           } else {
             filteredStore = this.getFilteredData(filteredStore, columnType, {
               ...filterItem,
               index,
             });
           }
+          andFlag = filterItem.type !== 'OR';
         }
       }
 
