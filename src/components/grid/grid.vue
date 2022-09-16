@@ -614,25 +614,32 @@ export default {
         for (let jx = 0; jx < filters.length; jx++) {
           const filterItem = filters[jx];
           isAppliedFilter = true;
-          if (!filteredStore.length) {
-            filteredStore = this.getFilteredData(store, columnType, {
+          if (filterItem.type === 'OR') {
+            filteredStore.push(...this.getFilteredData(store, columnType, {
               ...filterItem,
               index,
-            });
-            count = 1;
+            }));
           } else if (count === 1) {
             filteredStore = this.getFilteredData(filteredStore, columnType, {
               ...filterItem,
               index,
             });
-            if (filteredStore.length !== 0) {
+            if (!filteredStore.length) {
+              count = 1;
+            } else {
               count = 0;
             }
-          } else if (filterItem.type === 'OR') {
-            filteredStore.push(...this.getFilteredData(store, columnType, {
+          } else if (!filteredStore.length) {
+            filteredStore = this.getFilteredData(store, columnType, {
               ...filterItem,
               index,
-            }));
+            });
+            count = 1;
+          } else {
+            filteredStore = this.getFilteredData(filteredStore, columnType, {
+              ...filterItem,
+              index,
+            });
           }
         }
       }
