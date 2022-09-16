@@ -1024,10 +1024,13 @@ export default {
         return;
       }
 
-      const nextColumnIndex = columnIndex + 1;
+      let nextColumnIndex = columnIndex + 1;
       const headerEl = this.$refs.header;
       const headerLeft = headerEl.getBoundingClientRect().left;
       const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
+      while (this.orderedColumns[nextColumnIndex].hide) {
+        nextColumnIndex++;
+      }
       const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
       const columnRect = columnEl.getBoundingClientRect();
       const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - 40;
