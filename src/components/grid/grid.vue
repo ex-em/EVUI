@@ -552,16 +552,21 @@ export default {
      */
     numberFilter(item, condition) {
       const comparison = condition.comparison;
-      const value = condition.value;
+      const value = Number(condition.value);
       const index = condition.index;
+      let itemData;
+      if (typeof item[ROW_DATA_INDEX][index] === 'string') {
+        itemData = parseFloat(item[ROW_DATA_INDEX][index].replace(/,/g, ''));
+      } else if (typeof item[ROW_DATA_INDEX][index] === 'number') {
+        itemData = item[ROW_DATA_INDEX][index];
+      }
       let result;
-
       if (comparison === '=') {
-        result = item[ROW_DATA_INDEX][index] === value;
+        result = itemData === value;
       } else if (comparison === '>') {
-        result = item[ROW_DATA_INDEX][index] > value;
+        result = itemData > value;
       } else if (comparison === '<') {
-        result = item[ROW_DATA_INDEX][index] < value;
+        result = itemData < value;
       }
 
       return result;
@@ -583,7 +588,6 @@ export default {
           filteredData.push(data[ix]);
         }
       }
-
       return filteredData;
     },
     /**
@@ -595,6 +599,8 @@ export default {
       let filters;
       let columnType;
       let filteredStore = [];
+      let filterFlag = false;
+      let andFlag = false;
       let isAppliedFilter = false;
       const filterByColumn = this.filterList;
       const fields = Object.keys(filterByColumn || {});
@@ -602,30 +608,31 @@ export default {
 
       for (let ix = 0; ix < fields.length; ix++) {
         field = fields[ix];
-        filters = filterByColumn[field];
+        filters = filterByColumn[field].filter(filterItem => filterItem.use === true);
         index = this.getColumnIndex(field);
         columnType = this.columns[index].type;
+
         for (let jx = 0; jx < filters.length; jx++) {
           const filterItem = filters[jx];
-          if (filterItem.use) {
-            isAppliedFilter = true;
-            if (!filteredStore.length) {
-              filteredStore = this.getFilteredData(store, columnType, {
-                ...filterItem,
-                index,
-              });
-            } else if (filterItem.type === 'OR') {
-              filteredStore.push(...this.getFilteredData(store, columnType, {
-                ...filterItem,
-                index,
-              }));
-            } else {
-              filteredStore = this.getFilteredData(filteredStore, columnType, {
-                ...filterItem,
-                index,
-              });
-            }
+          isAppliedFilter = true;
+          if (!filterFlag) {
+            filteredStore = this.getFilteredData(store, columnType, {
+              ...filterItem,
+              index,
+            });
+            filterFlag = true;
+          } if (filterItem.type === 'OR' && !andFlag) {
+            filteredStore.push(...this.getFilteredData(store, columnType, {
+              ...filterItem,
+              index,
+            }));
+          } else {
+            filteredStore = this.getFilteredData(filteredStore, columnType, {
+              ...filterItem,
+              index,
+            });
           }
+          andFlag = filterItem.type !== 'OR';
         }
       }
 
