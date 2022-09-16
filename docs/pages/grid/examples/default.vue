@@ -113,7 +113,7 @@
         checked: [],
         columns: [
           { caption: 'ID', field: 'id', type: 'number', width: 50 },
-          { caption: 'Country', field: 'country', type: 'string' },
+          { caption: 'Country', field: 'country', type: 'string', hide: true },
           { caption: 'Area', field: 'area', type: 'number', hide: true },
           { caption: 'Population', field: 'population', type: 'number' },
           { caption: 'GDP', field: 'gdp', type: 'number' },
