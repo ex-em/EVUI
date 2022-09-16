@@ -62,7 +62,6 @@ export default {
       evChartInfo,
       evChartToolbarRef,
       evChartClone,
-      isUseZoomMode,
       brushIdx,
 
       createEvChartZoom,
@@ -73,7 +72,7 @@ export default {
     } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
 
     provide('evChartClone', evChartClone);
-    provide('isUseZoomMode', isUseZoomMode);
+    provide('evChartInfo', evChartInfo);
     provide('brushIdx', brushIdx);
 
     onMounted(() => {

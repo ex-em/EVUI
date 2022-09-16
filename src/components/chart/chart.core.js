@@ -782,6 +782,8 @@ class EvChart {
 
   /**
    * Resize chart
+   * @param {Function} promiseRes After evChart resize completes,
+   *   callback completion status with promiseRes to draw a Brush over it.
    *
    * @returns {undefined}
    */

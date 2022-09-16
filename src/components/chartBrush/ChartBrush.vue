@@ -28,14 +28,14 @@ export default {
     let evChart = null;
     let evChartBrush = null;
 
-    const injectEvChartClone = inject('evChartClone', { data: [], options: [] });
+    const injectEvChartClone = inject('evChartClone', { data: [] });
+    const injectEvChartInfo = inject('evChartInfo', { props: { options: [] } });
     const injectBrushIdx = inject('brushIdx', {
       start: 0,
       end: 0,
       isExecutedByButton: false,
       isExecutedByWheel: false,
     });
-    const injectIsUseZoomMode = inject('isUseZoomMode', false);
 
     const {
       getNormalizedBrushOptions,
@@ -57,7 +57,7 @@ export default {
     );
 
     const evChartOption = computed(() => {
-      const chartOption = (injectEvChartClone.options ?? [])[evChartBrushOptions.value.chartIdx];
+      const chartOption = injectEvChartInfo.props.options[evChartBrushOptions.value.chartIdx];
 
       const option = {
         ...chartOption,
@@ -160,7 +160,6 @@ export default {
         evChart,
         evChartData,
         evChartOption,
-        injectIsUseZoomMode,
         injectBrushIdx,
         evChartBrushRef,
       );
@@ -218,9 +217,10 @@ export default {
       if (evChart && 'resize' in evChart) {
         const resize = new Promise(resolve => evChart.resize(resolve));
 
-        resize.then((res) => {
-          if (res) {
-            drawChartBrush(res);
+        resize.then((isResizeDone) => {
+          // evChart의 resize 완료 후 brush draw 작업이 진행되어야 합니다.
+          if (isResizeDone) {
+            drawChartBrush(isResizeDone);
           }
         });
       }

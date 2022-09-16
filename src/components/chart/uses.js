@@ -319,7 +319,7 @@ export const useZoomModel = (
       options: [],
     },
   });
-  const evChartClone = reactive({ data: null, options: [] });
+  const evChartClone = reactive({ data: null, options: null });
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -377,7 +377,7 @@ export const useZoomModel = (
 
     if (evChartInfo.props.data.length) {
       evChartClone.data = cloneDeep(evChartInfo.props.data);
-      evChartClone.options = evChartInfo.props.options;
+      evChartClone.options = cloneDeep(evChartInfo.props.options);
 
       const emitFunc = {
         updateZoomStartIdx: startIdx => emit('update:zoomStartIdx', startIdx),
@@ -525,7 +525,6 @@ export const useZoomModel = (
     evChartInfo,
     evChartToolbarRef,
     evChartClone,
-    isUseZoomMode,
     brushIdx,
 
     createEvChartZoom,

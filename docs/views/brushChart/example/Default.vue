@@ -43,10 +43,12 @@
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
       <br/>
       <br/>
-      <ev-button @click="onToggleBrush">Brush 생성/제거</ev-button>
+      <span class="toggle-label">Brush 생성</span>
+      <ev-toggle v-model="isShowBrush"/>
       <br/>
       <br/>
-      <ev-button @click="onToggleToolbar">툴바 생성/제거</ev-button>
+      <span class="toggle-label">툴바 생성</span>
+      <ev-toggle v-model="isShowToolbar"/>
       <br/>
       <br/>
       <span class="toggle-label">토글 레전드</span>
@@ -67,6 +69,8 @@ export default {
   setup() {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
+    const isShowBrush = ref(true);
+    const isShowToolbar = ref(false);
     const bufferMemoryCnt = ref(10);
     const zoomRef = ref();
     const zoomStartIdx = ref(0);
@@ -75,9 +79,9 @@ export default {
 
     const chartGroupOptions = reactive({
       zoom: {
-        bufferMemoryCnt: 5,
+        bufferMemoryCnt: 10,
         toolbar: {
-          show: true,
+          show: isShowToolbar,
           items: {
             previous: {
               icon: 'ev-icon-allow2-left',
@@ -185,13 +189,13 @@ export default {
     });
 
     const brushOptions = reactive({
-      show: true,
+      show: isShowBrush,
       chartIdx: 0,
       height: 100,
     });
 
     const brushOptions2 = reactive({
-      show: true,
+      show: isShowBrush,
       chartIdx: 1,
       height: 100,
     });
@@ -236,15 +240,6 @@ export default {
       }
     };
 
-    const onToggleToolbar = () => {
-      chartGroupOptions.zoom.toolbar.show = !chartGroupOptions.zoom.toolbar.show;
-    };
-
-    const onToggleBrush = () => {
-      brushOptions.show = !brushOptions.show;
-      brushOptions2.show = !brushOptions2.show;
-    };
-
     watch(isShowToggleLegend, (isShow) => {
       chartOptions.legend.show = isShow;
       chartOptions2.legend.show = isShow;
@@ -275,14 +270,14 @@ export default {
       brushOptions,
       brushOptions2,
       isShowToggleLegend,
+      isShowToolbar,
+      isShowBrush,
       isExpandChartArea,
       zoomRef,
       zoomStartIdx,
       zoomEndIdx,
       bufferMemoryCnt,
       onUpdateChartData,
-      onToggleToolbar,
-      onToggleBrush,
     };
   },
 };

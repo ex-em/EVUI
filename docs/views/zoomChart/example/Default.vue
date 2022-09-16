@@ -31,7 +31,8 @@
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
       <br/>
       <br/>
-      <ev-button @click="onToggleToolbar">툴바 생성/제거</ev-button>
+      <span class="toggle-label">툴바 생성</span>
+      <ev-toggle v-model="isShowToolbar"/>
       <br/>
       <br/>
       <span class="toggle-label">토글 레전드</span>
@@ -52,6 +53,7 @@ export default {
   setup() {
     const isShowToggleLegend = ref(false);
     const isExpandChartArea = ref(false);
+    const isShowToolbar = ref(true);
     const bufferMemoryCnt = ref(10);
     const zoomStartIdx = ref(0);
     const zoomEndIdx = ref(0);
@@ -96,7 +98,7 @@ export default {
       zoom: {
         bufferMemoryCnt: 5,
         toolbar: {
-          show: true,
+          show: isShowToolbar,
           items: {
             previous: {
               icon: 'ev-icon-allow2-left',
@@ -177,10 +179,6 @@ export default {
       chartOptions.zoom.bufferMemoryCnt = cnt;
     }, { immediate: true });
 
-    const onToggleToolbar = () => {
-      chartOptions.zoom.toolbar.show = !chartOptions.zoom.toolbar.show;
-    };
-
     return {
       chartData,
       chartOptions,
@@ -190,7 +188,7 @@ export default {
       zoomStartIdx,
       zoomEndIdx,
       bufferMemoryCnt,
-      onToggleToolbar,
+      isShowToolbar,
       onUpdateChartData,
     };
   },

@@ -87,28 +87,26 @@ const modules = {
      */
 
     const onBrushMoveWheel = (e) => {
-      if (this.isUseZoomMode.value) {
-        e.preventDefault();
-        this.brushIdx.isExecutedByWheel = true;
-        if (this.brushIdx.start === this.brushIdx.end) {
+      e.preventDefault();
+      this.brushIdx.isExecutedByWheel = true;
+      if (this.brushIdx.start === this.brushIdx.end) {
+        return;
+      }
+
+      if (e.deltaY > 0) {
+        if (!this.brushIdx.start) {
           return;
         }
 
-        if (e.deltaY > 0) {
-          if (!this.brushIdx.start) {
-            return;
-          }
-
-          this.brushIdx.start -= 1;
-          this.brushIdx.end -= 1;
-        } else {
-          if (this.brushIdx.end === this.data.labels.length - 1) {
-            return;
-          }
-
-          this.brushIdx.start += 1;
-          this.brushIdx.end += 1;
+        this.brushIdx.start -= 1;
+        this.brushIdx.end -= 1;
+      } else {
+        if (this.brushIdx.end === this.data.labels.length - 1) {
+          return;
         }
+
+        this.brushIdx.start += 1;
+        this.brushIdx.end += 1;
       }
     };
 

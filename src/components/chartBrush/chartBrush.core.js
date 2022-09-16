@@ -1,16 +1,14 @@
 import { throttle } from 'lodash-es';
 
 export default class EvChartBrush {
-  constructor(evChart, evChartData, evChartOption, isUseZoomMode, brushIdx, evChartBrushRef) {
+  constructor(evChart, evChartData, evChartOption, brushIdx, evChartBrushRef) {
     this.evChart = evChart;
     this.evChartData = evChartData;
     this.evChartOption = evChartOption;
-    this.isUseZooMode = isUseZoomMode;
     this.brushIdx = brushIdx;
     this.evChartBrushRef = evChartBrushRef;
 
     this.evChart.brushIdx = brushIdx;
-    this.evChart.isUseZoomMode = isUseZoomMode;
   }
 
   init(isResize) {
@@ -24,7 +22,7 @@ export default class EvChartBrush {
       const brushCanvas = document.createElement('canvas');
 
       brushCanvas.setAttribute('class', 'brush-canvas');
-      brushCanvas.setAttribute('style', 'display: block; z-index: 1; cursor: initial;');
+      brushCanvas.setAttribute('style', 'display: block; z-index: 1; cursor: ew-resize;');
 
       const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
       evChartBrushContainer.appendChild(brushCanvas);
@@ -122,15 +120,7 @@ export default class EvChartBrush {
     const onMouseMove = (e) => {
       const evBrushChartPos = this.evBrushChartPos;
 
-      if (brushCanvas.style.cursor === 'initial' && this.isUseZooMode.value) {
-        brushCanvas.style.cursor = 'ew-resize';
-      }
-
       if (isClickBrushButton) {
-        if (!this.isUseZooMode.value) {
-          return;
-        }
-
         if (!curClickButtonType) {
           this.brushIdx.isExecutedByButton = true;
           const calDisToCurMouseX = xPos => Math.abs(
@@ -173,13 +163,13 @@ export default class EvChartBrush {
 
         beforeMouseXPos = e.offsetX;
       } else {
-        const moveRight = xPos =>
+        const isMoveRight = xPos =>
           e.offsetX + evBrushChartPos.x1 - evBrushChartPos.buttonWidth > evBrushChartPos[xPos];
-        const moveLeft = xPos =>
+        const isMoveLeft = xPos =>
           e.offsetX + evBrushChartPos.x1 + evBrushChartPos.buttonWidth < evBrushChartPos[xPos];
 
-        const isCurMouseXOutsideBrush = moveLeft('leftX') || moveRight('rightX');
-        const isCurMouseXInsideBrush = moveRight('leftX') && moveLeft('rightX');
+        const isCurMouseXOutsideBrush = isMoveLeft('leftX') || isMoveRight('rightX');
+        const isCurMouseXInsideBrush = isMoveRight('leftX') && isMoveLeft('rightX');
 
         if (isCurMouseXOutsideBrush) {
           this.overlayCanvas.style['z-index'] = 2;
@@ -199,7 +189,6 @@ export default class EvChartBrush {
     };
 
     const initState = () => {
-      brushCanvas.style.cursor = 'initial';
       this.brushIdx.isExecutedByButton = false;
       isClickBrushButton = false;
       beforeMouseXPos = 0;
