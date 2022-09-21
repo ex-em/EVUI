@@ -33,8 +33,8 @@ export default {
     const injectBrushIdx = inject('brushIdx', {
       start: 0,
       end: 0,
-      isExecutedByButton: false,
-      isExecutedByWheel: false,
+      isUseButton: false,
+      isUseScroll: false,
     });
 
     const {
@@ -52,16 +52,29 @@ export default {
       getNormalizedOptions,
     } = useModel();
 
-    const evChartData = computed(() =>
-      getNormalizedData((injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx]),
-    );
+    const evChartData = computed(() => {
+      const data = getNormalizedData(
+        (injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx],
+      );
+
+      const seriesInfo = Object.values(data.series);
+
+      seriesInfo.forEach((series) => {
+        series.point = false;
+      });
+
+      return data;
+    });
 
     const evChartOption = computed(() => {
       const chartOption = injectEvChartInfo.props.options[evChartBrushOptions.value.chartIdx];
 
       const option = {
         ...chartOption,
-        brush: true,
+        brush: {
+          use: true,
+          ...evChartBrushOptions.value,
+        },
         height: evChartBrushOptions.value.height,
         zoom: {
           use: false,
@@ -74,12 +87,6 @@ export default {
         },
         legend: {
           show: false,
-        },
-        selectLabel: {
-          use: false,
-        },
-        selectSeries: {
-          use: false,
         },
         axesX: [{
           ...chartOption?.axesX?.[0],
@@ -105,17 +112,27 @@ export default {
       evChartOption.value,
     );
 
-    watch(evChartOption, (newOpt) => {
-      if (evChart) {
-        const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
+    watch(evChartOption, (newOpt, prevOpt) => {
+      if (newOpt.brush.chartIdx <= injectEvChartClone.data?.length - 1) {
+        if (evChart) {
+          const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
 
-        evChart.options = cloneDeep(newOpt);
+          evChart.options = cloneDeep(newOpt);
 
-        evChart.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-          updateLegend: isUpdateLegendType,
-        });
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+            updateLegend: isUpdateLegendType,
+          });
+        }
+
+        if (evChartBrush) {
+          const isUpdateBrushOptions = !isEqual(prevOpt.brush, newOpt.brush);
+
+          if (isUpdateBrushOptions) {
+            evChartBrush.removeBrushWrapper();
+          }
+        }
       }
     });
 
@@ -178,7 +195,10 @@ export default {
     };
 
     watch(() => [injectBrushIdx.start, injectBrushIdx.end], () => {
-      if (evChartBrushRef.value) {
+      if (
+        evChartBrushRef.value
+        && evChartOption.value.brush.chartIdx <= injectEvChartClone.data?.length - 1
+      ) {
         drawChartBrush();
       }
     });
@@ -194,16 +214,24 @@ export default {
 
     onUpdated(async () => {
       if (evChartBrushOptions.value.show) {
-        await createChart();
-        await drawChart();
-        createChartBrush();
-        drawChartBrush();
+        if (evChartOption.value.brush.chartIdx <= injectEvChartClone.data?.length - 1) {
+          await createChart();
+          await drawChart();
+          createChartBrush();
+          drawChartBrush();
+        } else {
+          evChartBrush.removeBrushCanvas();
+        }
       }
     });
 
     onBeforeUnmount(() => {
       if (evChart && 'destroy' in evChart) {
         evChart.destroy();
+      }
+
+      if (evChartBrush) {
+        evChartBrush.destroy();
       }
     });
 
@@ -213,12 +241,16 @@ export default {
       }
     });
 
+    /**
+     * @param {boolean} isResizeDone resizing complete status
+     *
+     * @returns {undefined}
+     */
     const onResize = debounce(() => {
       if (evChart && 'resize' in evChart) {
         const resize = new Promise(resolve => evChart.resize(resolve));
 
         resize.then((isResizeDone) => {
-          // evChart의 resize 완료 후 brush draw 작업이 진행되어야 합니다.
           if (isResizeDone) {
             drawChartBrush(isResizeDone);
           }

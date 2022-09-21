@@ -307,8 +307,8 @@ export const useZoomModel = (
   const brushIdx = reactive({
     start: 0,
     end: 0,
-    isExecutedByButton: false,
-    isExecutedByWheel: false,
+    isUseButton: false,
+    isUseScroll: false,
   });
 
   let evChartZoom = null;
@@ -481,8 +481,8 @@ export const useZoomModel = (
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
-    if (evChartZoom.isExecutedByToolbar) {
-        evChartZoom.isExecutedByToolbar = false;
+    if (evChartZoom.isUseToolbar) {
+        evChartZoom.isUseToolbar = false;
         return;
     }
 
@@ -496,7 +496,7 @@ export const useZoomModel = (
     brushIdx.start,
     brushIdx.end,
   ], () => {
-    if (!brushIdx.isExecutedByButton && !brushIdx.isExecutedByWheel) {
+    if (!brushIdx.isUseButton && !brushIdx.isUseScroll) {
         return;
     }
 
@@ -504,18 +504,18 @@ export const useZoomModel = (
   });
 
   watch(() => [
-    brushIdx.isExecutedByButton,
-    brushIdx.isExecutedByWheel,
+    brushIdx.isUseButton,
+    brushIdx.isUseScroll,
   ], ([
-    curIsExecutedByButton,
-    curIsExecutedByWheel,
+    curIsUseButton,
+    curIsUseScroll,
   ], [
-    prevIsExecutedByButton,
-    prevIsExecutedByWheel,
+    prevIsUseButton,
+    prevIsUseScroll,
   ]) => {
-    if (prevIsExecutedByButton && !curIsExecutedByButton) {
+    if (prevIsUseButton && !curIsUseButton) {
       evChartZoom.setZoomAreaMemory(brushIdx.start, brushIdx.end);
-    } else if (prevIsExecutedByWheel && !curIsExecutedByWheel) {
+    } else if (prevIsUseScroll && !curIsUseScroll) {
       evChartZoom.zoomAreaMemory.current[0] = [brushIdx.start, brushIdx.end];
     }
   });

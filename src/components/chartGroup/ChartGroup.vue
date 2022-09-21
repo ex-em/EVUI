@@ -90,7 +90,7 @@ export default {
     }, { deep: true });
 
     watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
-      if (brushIdx.isExecutedByButton || brushIdx.isExecutedByWheel) {
+      if (brushIdx.isUseButton || brushIdx.isUseScroll) {
         return;
       }
 

@@ -1,19 +1,15 @@
 import { parseComponent } from 'vue-template-compiler';
 import mdText from '!!raw-loader!./api/brushChart.md';
-import PlotLine from './example/PlotLine';
-import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
-import AxisTitle from './example/AxisTitle';
-import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
-import SelectLabel from './example/SelectLabel';
-import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
-import SelectSeries from './example/SelectSeries';
-import SelectSeriesRaw from '!!raw-loader!./example/SelectSeries';
-import Tooltip from './example/Tooltip';
-import TooltipRaw from '!!raw-loader!./example/Tooltip';
+import UseDebounce from './example/UseDebounce';
+import UseDebounceRaw from '!!raw-loader!./example/UseDebounce';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import PlotLine from './example/PlotLine';
+import PlotLineRaw from '!!raw-loader!./example/PlotLine';
+import AxisTitle from './example/AxisTitle';
+import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
 
 export default {
   mdText,
@@ -23,33 +19,23 @@ export default {
       component: Default,
       parsedData: parseComponent(DefaultRaw),
     },
-    Tooltip: {
-      description: '기존 Chart의 Tooltip 기능이 Brush에도 동일하게 보여집니다.',
-      component: Tooltip,
-      parsedData: parseComponent(TooltipRaw),
+    UseDebounce: {
+      description: 'Brush의 useDebounce 옵션을 이용하여 true(Default)이면 조절 된 Brush 영역의 마지막을 가지고 차트가 업데이트 되고 false이면 Brush 영역 조절과 동시에 차트가 업데이트 됩니다.',
+      component: UseDebounce,
+      parsedData: parseComponent(UseDebounceRaw),
+    },
+    Event: {
+      description: '1. Brush 영역 조절, 2. wheel/mouse drag 를 이용한 Brush 영역 이동, 3. Brush 영역 외 영역을 클릭 시 해당 영역으로 순간 이동이 가능합니다.',
+      component: Event,
+      parsedData: parseComponent(EventRaw),
     },
     'Plot line & Plot band': {
       description: '기존 Chart에 표시 된 배경과 선이 Brush에도 동일하게 그려집니다.',
       component: PlotLine,
       parsedData: parseComponent(PlotLineRaw),
     },
-    Event: {
-      description: 'Brush에서 Click, Double Click 등 이벤트를 사용할 수 없습니다.',
-      component: Event,
-      parsedData: parseComponent(EventRaw),
-    },
-    'Select Label': {
-      description: 'Brush에서는 전체 Label을 보여주게 됩니다.',
-      component: SelectLabel,
-      parsedData: parseComponent(SelectLabelRaw),
-    },
-    'Select Series': {
-      description: 'Brush에서는 전체 Series를 보여주게 됩니다.',
-      component: SelectSeries,
-      parsedData: parseComponent(SelectSeriesRaw),
-    },
     AxisTitle: {
-      description: 'Brush에서는 X Axis, Y Axis Title 표시를 사용할 수 없습니다.',
+      description: 'Brush에서는 X Axis, Y Axis Title이 표시되지 않습니다.',
       component: AxisTitle,
       parsedData: parseComponent(AxisTitleRaw),
     },

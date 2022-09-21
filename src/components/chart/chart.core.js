@@ -23,11 +23,11 @@ class EvChart {
     defaultSelectInfo,
   ) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
-    Object.assign(this, Tooltip);
-    Object.assign(this, Interaction);
-    Object.assign(this, Tip);
 
     if (!options.brush) {
+      Object.assign(this, Tooltip);
+      Object.assign(this, Interaction);
+      Object.assign(this, Tip);
       Object.assign(this, Legend);
       Object.assign(this, Pie);
       Object.assign(this, Title);
@@ -55,20 +55,25 @@ class EvChart {
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.setAttribute('style', 'display: block;');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
-    this.overlayCanvas = document.createElement('canvas');
-    this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
-    this.overlayCanvas.setAttribute('class', 'overlay-canvas');
-    this.overlayCtx = this.overlayCanvas.getContext('2d');
 
     this.pixelRatio = window.devicePixelRatio || 1;
     this.oldPixelRatio = this.pixelRatio;
 
     this.chartDOM.appendChild(this.displayCanvas);
-    this.chartDOM.appendChild(this.overlayCanvas);
 
-    this.overlayCanvas.style.position = 'absolute';
-    this.overlayCanvas.style.top = '0px';
-    this.overlayCanvas.style.left = '0px';
+    if (!this.options.brush) {
+      this.overlayCanvas = document.createElement('canvas');
+      this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
+      this.overlayCanvas.setAttribute('class', 'overlay-canvas');
+      this.overlayCtx = this.overlayCanvas.getContext('2d');
+
+      this.chartDOM.appendChild(this.overlayCanvas);
+
+      this.overlayCanvas.style.position = 'absolute';
+      this.overlayCanvas.style.top = '0px';
+      this.overlayCanvas.style.left = '0px';
+    }
+
 
     this.isInitLegend = false;
     this.isInitTitle = false;
@@ -108,19 +113,25 @@ class EvChart {
 
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedInfo();
+
+    if (!this.options.brush) {
+      this.initSelectedInfo();
+    }
 
     this.drawChart();
 
-    if (tooltip.use) {
-      this.createTooltipDOM();
+    if (!this.options.brush) {
+      if (tooltip.use) {
+        this.createTooltipDOM();
 
-      if (tooltip.throttledMove) {
-        this.onMouseMove = throttle(this.onMouseMove, 30);
+        if (tooltip.throttledMove) {
+          this.onMouseMove = throttle(this.onMouseMove, 30);
+        }
       }
+
+      this.createEventFunctions();
     }
 
-    this.createEventFunctions();
     this.isInit = true;
   }
 
@@ -162,7 +173,11 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
-    this.drawTip();
+
+    if (!this.options.brush) {
+      this.drawTip();
+    }
+
     if (this.bufferCanvas) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
@@ -448,7 +463,10 @@ class EvChart {
     }
 
     this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
-    this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+
+    if (!this.options.brush) {
+      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+    }
   }
 
   /**
@@ -529,8 +547,11 @@ class EvChart {
     this.displayCanvas.style.width = `${width}px`;
     this.bufferCanvas.width = width * this.pixelRatio;
     this.bufferCanvas.style.width = `${width}px`;
-    this.overlayCanvas.width = width * this.pixelRatio;
-    this.overlayCanvas.style.width = `${width}px`;
+
+    if (!this.options.brush) {
+      this.overlayCanvas.width = width * this.pixelRatio;
+      this.overlayCanvas.style.width = `${width}px`;
+    }
   }
 
   /**
@@ -548,8 +569,11 @@ class EvChart {
     this.displayCanvas.style.height = `${height}px`;
     this.bufferCanvas.height = height * this.pixelRatio;
     this.bufferCanvas.style.height = `${height}px`;
-    this.overlayCanvas.height = height * this.pixelRatio;
-    this.overlayCanvas.style.height = `${height}px`;
+
+    if (!this.options.brush) {
+      this.overlayCanvas.height = height * this.pixelRatio;
+      this.overlayCanvas.style.height = `${height}px`;
+    }
   }
 
   /**
@@ -718,7 +742,9 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedInfo();
+    if (!this.options.brush) {
+      this.initSelectedInfo();
+    }
 
     this.render(updateInfo?.hitInfo);
 
@@ -849,7 +875,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
     }
 
-    if (this.options.tooltip.use) {
+    if (this.options.tooltip.use && !this.options.brush) {
       this.tooltipCanvas.remove();
       this.tooltipCanvas = null;
       this.tooltipDOM.remove();

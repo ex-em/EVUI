@@ -18,28 +18,6 @@ const modules = {
         return;
       }
 
-      if (this.options.brush) {
-        if (!this.brushCanvas) {
-          if (e.path[0].nextSibling.className === 'brush-canvas') {
-            this.brushCanvas = e.path[0].nextSibling;
-          }
-        } else {
-          const isCurMouseXInsideBrushBtn = xPos =>
-            e.offsetX + this.evBrushChartPos.buttonWidth >= this.evBrushChartPos[xPos]
-            && e.offsetX - this.evBrushChartPos.buttonWidth <= this.evBrushChartPos[xPos];
-
-          if (isCurMouseXInsideBrushBtn('leftX')) {
-            this.overlayCanvas.style['z-index'] = 1;
-            this.brushCanvas.style['z-index'] = 2;
-          }
-
-          if (isCurMouseXInsideBrushBtn('rightX')) {
-            this.overlayCanvas.style['z-index'] = 1;
-            this.brushCanvas.style['z-index'] = 2;
-          }
-        }
-      }
-
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -86,44 +64,7 @@ const modules = {
      * @returns {undefined}
      */
 
-    const onBrushMoveWheel = (e) => {
-      e.preventDefault();
-      this.brushIdx.isExecutedByWheel = true;
-      if (this.brushIdx.start === this.brushIdx.end) {
-        return;
-      }
-
-      if (e.deltaY > 0) {
-        if (!this.brushIdx.start) {
-          return;
-        }
-
-        this.brushIdx.start -= 1;
-        this.brushIdx.end -= 1;
-      } else {
-        if (this.brushIdx.end === this.data.labels.length - 1) {
-          return;
-        }
-
-        this.brushIdx.start += 1;
-        this.brushIdx.end += 1;
-      }
-    };
-
-    const onMouseOver = () => {
-      this.overlayCanvas.addEventListener('wheel', onBrushMoveWheel);
-    };
-
-    if (this.options.brush) {
-      this.overlayCanvas.addEventListener('mouseover', onMouseOver);
-    }
-
     this.onMouseLeave = () => {
-      if (this.options.brush) {
-        this.overlayCanvas.removeEventListener('mouseover', onMouseOver);
-        this.brushIdx.isExecutedByWheel = false;
-      }
-
       const { tooltip, dragSelection } = this.options;
 
       if (tooltip.throttledMove) {

@@ -2,6 +2,7 @@ import { defaultsDeep } from 'lodash-es';
 
 const DEFAULT_OPTIONS = {
   show: true,
+  useDebounce: true,
   chartIdx: 0,
   height: 100,
 };
