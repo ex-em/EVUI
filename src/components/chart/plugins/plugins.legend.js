@@ -176,6 +176,7 @@ const modules = {
             cId: colorItem.id,
             color: colorItem.color,
             name,
+            show: true,
           });
         }
       }
