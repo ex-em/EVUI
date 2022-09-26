@@ -27,14 +27,37 @@
           />
         </div>
       </div>
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            Max Value
+          </span>
+            <ev-input-number
+              v-model="maxValue"
+              class="component"
+              :min="1"
+            />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Display Overflow
+          </span>
+          <ev-checkbox
+            v-model="displayOverflow"
+            class="check-box"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
+import EvCheckbox from '@/components/checkbox/Checkbox';
 
   export default {
+    components: { EvCheckbox },
     setup() {
       const pointSize = ref(3);
       const pointStyle = ref('circle');
@@ -101,7 +124,10 @@
         },
       });
 
-      const chartOptions = {
+      const maxValue = ref(60);
+      const displayOverflow = ref(true);
+
+      const chartOptions = computed(() => ({
         type: 'scatter',
         width: '100%',
         height: '100%',
@@ -135,7 +161,7 @@
           showGrid: true,
           axisLineColor: '#C9CFDC',
           gridLineColor: '#C9CFDC',
-          interval: null,
+          interval: 1,
           labelStyle: {
             show: true,
             fontSize: 12,
@@ -147,6 +173,7 @@
           plotLines: [],
           plotBands: [],
           formatter: null,
+          range: [0, maxValue.value],
         }],
         title: {
           text: '',
@@ -173,13 +200,16 @@
           fillColor: '#38ACEC',
           opacity: 0.65,
         },
-      };
+        displayOverflow: displayOverflow.value,
+      }));
 
       return {
         pointSize,
         pointStyle,
         pointStyleList,
         chartData,
+        maxValue,
+        displayOverflow,
         chartOptions,
       };
     },
@@ -204,6 +234,10 @@
         margin-right: 3px;
         min-width: 80px;
       }
+    }
+    .check-box {
+      display: flex;
+      margin-left: 4px;
     }
   }
 </style>

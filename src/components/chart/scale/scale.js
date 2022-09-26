@@ -344,7 +344,7 @@ class Scale {
           ctx.fillText(labelText, labelPoint, labelCenter);
 
           if (ix === steps) {
-            linePosition += 1;
+            linePosition -= 1;
           }
 
           if (ix !== 0 && this.showGrid) {
