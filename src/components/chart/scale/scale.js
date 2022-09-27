@@ -340,12 +340,14 @@ class Scale {
             ctx.lineTo(linePosition, offsetCounterPoint);
           }
         } else {
+          if (ix === steps) {
+            linePosition -= 1;
+            labelText += this.options.displayOverflow ? '+' : '';
+          }
+
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
           ctx.fillText(labelText, labelPoint, labelCenter);
 
-          if (ix === steps) {
-            linePosition -= 1;
-          }
 
           if (ix !== 0 && this.showGrid) {
             ctx.moveTo(offsetPoint, linePosition);
