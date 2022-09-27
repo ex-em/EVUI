@@ -76,6 +76,7 @@
     setup(props) {
       let evChart = null;
       const injectIsChartGroup = inject('isChartGroup', false);
+      const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
 
       const {
         eventListeners,
@@ -125,6 +126,7 @@
           eventListeners,
           selectItemInfo,
           selected,
+          injectBrushSeries,
         );
       };
 

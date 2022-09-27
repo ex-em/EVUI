@@ -21,6 +21,7 @@ class EvChart {
     listeners,
     defaultSelectItemInfo,
     defaultSelectInfo,
+    brushSeries,
   ) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
 
@@ -37,6 +38,7 @@ class EvChart {
       Object.assign(this, GradientLegend);
     }
 
+    this.brushSeries = brushSeries;
     this.target = target;
     this.data = data;
     this.options = options;
@@ -61,7 +63,7 @@ class EvChart {
 
     this.chartDOM.appendChild(this.displayCanvas);
 
-    if (!this.options.brush) {
+    if (!options.brush) {
       this.overlayCanvas = document.createElement('canvas');
       this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
       this.overlayCanvas.setAttribute('class', 'overlay-canvas');
@@ -114,24 +116,20 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
-    if (!this.options.brush) {
-      this.initSelectedInfo();
-    }
+    this.initSelectedInfo?.();
 
     this.drawChart();
 
-    if (!this.options.brush) {
-      if (tooltip.use) {
-        this.createTooltipDOM();
 
-        if (tooltip.throttledMove) {
-          this.onMouseMove = throttle(this.onMouseMove, 30);
-        }
+    if (tooltip.use) {
+      this.createTooltipDOM();
+
+      if (tooltip.throttledMove) {
+        this.onMouseMove = throttle(this.onMouseMove, 30);
       }
-
-      this.createEventFunctions();
     }
 
+    this.createEventFunctions?.();
     this.isInit = true;
   }
 
@@ -174,9 +172,7 @@ class EvChart {
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
 
-    if (!this.options.brush) {
-      this.drawTip();
-    }
+    this.drawTip();
 
     if (this.bufferCanvas) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
@@ -190,7 +186,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries, brush } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -201,6 +197,7 @@ class EvChart {
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
       overlayCtx: this.overlayCtx,
+      isBrush: !!brush,
     };
 
     let showIndex = 0;
@@ -320,7 +317,7 @@ class EvChart {
       tipLocationInfo = null;
     }
 
-    this.drawTips(tipLocationInfo);
+    this.drawTips?.(tipLocationInfo);
   }
 
   /**
@@ -464,7 +461,7 @@ class EvChart {
 
     this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
 
-    if (!this.options.brush) {
+    if (this.overlayCtx) {
       this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
     }
   }
@@ -548,7 +545,7 @@ class EvChart {
     this.bufferCanvas.width = width * this.pixelRatio;
     this.bufferCanvas.style.width = `${width}px`;
 
-    if (!this.options.brush) {
+    if (this.overlayCanvas) {
       this.overlayCanvas.width = width * this.pixelRatio;
       this.overlayCanvas.style.width = `${width}px`;
     }
@@ -570,7 +567,7 @@ class EvChart {
     this.bufferCanvas.height = height * this.pixelRatio;
     this.bufferCanvas.style.height = `${height}px`;
 
-    if (!this.options.brush) {
+    if (this.overlayCanvas) {
       this.overlayCanvas.height = height * this.pixelRatio;
       this.overlayCanvas.style.height = `${height}px`;
     }
@@ -742,9 +739,8 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    if (!this.options.brush) {
-      this.initSelectedInfo();
-    }
+
+    this.initSelectedInfo?.();
 
     this.render(updateInfo?.hitInfo);
 
@@ -875,7 +871,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
     }
 
-    if (this.options.tooltip.use && !this.options.brush) {
+    if (this.options.tooltip.use) {
       this.tooltipCanvas.remove();
       this.tooltipCanvas = null;
       this.tooltipDOM.remove();

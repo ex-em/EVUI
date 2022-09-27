@@ -50,12 +50,14 @@ export default {
     const {
       getNormalizedOptions,
       isExecuteZoom,
+      brushSeries,
       evChartGroupRef,
     } = useGroupModel();
 
     const normalizedOptions = getNormalizedOptions(props.options);
     provide('isExecuteZoom', isExecuteZoom);
     provide('isChartGroup', true);
+    provide('brushSeries', brushSeries);
 
     const {
       evChartZoomOptions,

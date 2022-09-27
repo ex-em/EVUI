@@ -90,7 +90,7 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const isShowToggleLegend = ref(false);
+    const isShowToggleLegend = ref(true);
     const isExpandChartArea = ref(false);
     const isShowBrush = ref(true);
     const isShowToolbar = ref(false);
@@ -175,7 +175,7 @@ export default {
         text: 'useDebounce: true (설정에서 변경 가능)',
       },
       legend: {
-        show: false,
+        show: isShowToggleLegend,
         position: 'right',
       },
       axesX: [{
@@ -199,7 +199,7 @@ export default {
         text: 'useDebounce: false (설정에서 변경 가능)',
       },
       legend: {
-        show: false,
+        show: isShowToggleLegend,
         position: 'right',
       },
       axesX: [{

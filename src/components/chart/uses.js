@@ -335,6 +335,8 @@ export const useZoomModel = (
         getRangeInfo,
       };
 
+      option.chartIdx = idx;
+
       if (isUseZoomMode.value) {
         option.dragSelection = {
           ...option.dragSelection,

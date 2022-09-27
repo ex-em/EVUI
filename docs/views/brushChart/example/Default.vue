@@ -76,7 +76,7 @@ export default {
       type: 'line',
       width: '100%',
       legend: {
-        show: false,
+        show: true,
         position: 'right',
       },
       axesX: [{
