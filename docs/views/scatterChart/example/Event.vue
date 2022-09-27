@@ -20,7 +20,7 @@
           <p v-for="(item, itemIdx) in row.items"
              :key="itemIdx"
           >
-            <b>x</b>: {{ getDateString(item.x) }} <b>y</b>: {{ item.y }}
+            <b>x</b>: {{ getDateString(item.x) }} <b>y</b>: {{ item.o }}
           </p>
           <br><br>
         </div>
