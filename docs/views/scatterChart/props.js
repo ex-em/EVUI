@@ -8,6 +8,8 @@ import SelectItem from './example/SelectItem';
 import SelectItemRaw from '!!raw-loader!./example/SelectItem';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
+import DisplayOverflow from './example/DisplayOverflow';
+import DisplayOverflowRaw from '!!raw-loader!./example/DisplayOverflow';
 
 export default {
   mdText,
@@ -31,6 +33,11 @@ export default {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
       component: PlotLine,
       parsedData: parseComponent(PlotLineRaw),
+    },
+    'Display Overflow': {
+      description: 'range 옵션으로 지정한 Y축의 최댓값을 표시합니다.',
+      component: DisplayOverflow,
+      parsedData: parseComponent(DisplayOverflowRaw),
     },
   },
 };

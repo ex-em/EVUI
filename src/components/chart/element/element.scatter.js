@@ -40,11 +40,11 @@ class Scatter {
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
     const axesSteps = param.axesSteps;
+    const displayOverflow = param.displayOverflow;
 
     let x;
     let y;
     let aliasPixel;
-
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
@@ -52,6 +52,13 @@ class Scatter {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
+
+    if (displayOverflow) {
+      this.data = this.data.map(val => ({
+        ...val,
+        y: val.y > minmaxY.graphMax ? minmaxY.graphMax : val.y,
+      }));
+    }
 
     this.data.forEach((item) => {
       x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -61,7 +68,6 @@ class Scatter {
         aliasPixel = Util.aliasPixel(x);
         x += aliasPixel;
       }
-
 
       item.xp = x; // eslint-disable-line
       item.yp = y; // eslint-disable-line
