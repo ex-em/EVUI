@@ -68,7 +68,7 @@ const chartData =
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
-  
+  | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | 
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

@@ -186,7 +186,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries, brush } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -198,6 +198,7 @@ class EvChart {
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
       overlayCtx: this.overlayCtx,
       isBrush: !!brush,
+      displayOverflow,
     };
 
     let showIndex = 0;
