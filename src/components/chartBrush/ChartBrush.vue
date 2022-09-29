@@ -199,7 +199,7 @@ export default {
       evChartBrush = new EvChartBrush(
         evChart,
         evChartData,
-        evChartOption,
+        evChartBrushOptions,
         injectBrushIdx,
         evChartBrushRef,
       );

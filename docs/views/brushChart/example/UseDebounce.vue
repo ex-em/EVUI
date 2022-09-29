@@ -228,6 +228,10 @@ export default {
       useDebounce: isUseDebounce,
       chartIdx: brushChartIdx,
       height: 80,
+      selection: {
+        fillColor: 'gray',
+        opacity: 0.5,
+      },
     });
 
     const brushOptions2 = reactive({

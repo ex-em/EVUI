@@ -5,6 +5,10 @@ const DEFAULT_OPTIONS = {
   useDebounce: true,
   chartIdx: 0,
   height: 100,
+  selection: {
+    fillColor: '#38ACEC',
+    opacity: 0.65,
+  },
 };
 
 // eslint-disable-next-line import/prefer-default-export

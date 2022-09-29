@@ -1,14 +1,14 @@
 import { throttle, debounce } from 'lodash-es';
 
 export default class EvChartBrush {
-  constructor(evChart, evChartData, evChartOption, brushIdx, evChartBrushRef) {
+  constructor(evChart, evChartData, evChartBrushOptions, brushIdx, evChartBrushRef) {
     this.evChart = evChart;
     this.evChartData = evChartData;
-    this.evChartOption = evChartOption;
+    this.evChartBrushOptions = evChartBrushOptions;
     this.evChartBrushRef = evChartBrushRef;
 
     this.brushIdx = brushIdx;
-    if (evChartOption.value.brush.useDebounce) {
+    if (evChartBrushOptions.value.useDebounce) {
       this.debounceBrushIdx = { start: brushIdx.start, end: brushIdx.end };
     }
   }
@@ -80,7 +80,7 @@ export default class EvChartBrush {
         labelEndIdx - (brushIdx.end - brushIdx.start)
       ) * axesXInterval
     ) * pixelRatio;
-    const brushRectHeight = this.evChartOption.value.height - evChartRange.y1;
+    const brushRectHeight = this.evChartBrushOptions.value.height - evChartRange.y1;
     const brushButtonLeftXPos = brushRectX;
     const brushButtonRightXPos = brushRectX + brushRectWidth;
 
@@ -106,8 +106,8 @@ export default class EvChartBrush {
       brushCanvasHeight * pixelRatio,
     );
 
-    ctx.fillStyle = this.evChartOption.value.dragSelection.fillColor;
-    ctx.globalAlpha = this.evChartOption.value.dragSelection.opacity;
+    ctx.fillStyle = this.evChartBrushOptions.value.selection.fillColor;
+    ctx.globalAlpha = this.evChartBrushOptions.value.selection.opacity;
     ctx.fillRect(brushRectX, 0, brushRectWidth, brushRectHeight);
     ctx.fillRect(brushButtonLeftXPos, 0, brushButtonWidth, brushRectHeight);
     ctx.fillRect(brushButtonRightXPos - brushButtonWidth, 0, brushButtonWidth, brushRectHeight);
