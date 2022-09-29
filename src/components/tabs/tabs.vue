@@ -149,8 +149,10 @@
           const addValue = value[value.length - 1].value;
 
           this.tabList = value.slice();
-          this.$emit('change-tab', this.activeTab, addValue);
+
+          const prevActiveTab = this.activeTab;
           this.activeTab = addValue;
+          this.$emit('change-tab', prevActiveTab, this.activeTab);
         } else {
           this.tabList = value.slice();
         }
@@ -361,8 +363,9 @@
          * @property {string} oldTab - 이전 탭 키값
          * @property {string} newTab - 현재 탭 키값
          */
-        this.$emit('change-tab', this.activeTab, value);
+        const prevActiveTab = this.activeTab;
         this.activeTab = value;
+        this.$emit('change-tab', prevActiveTab, this.activeTab);
       },
       /**
        * 탭 제거에 대해서 처리한다.
