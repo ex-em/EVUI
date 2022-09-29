@@ -96,7 +96,7 @@ export default {
       show: isShowBrush,
       useDebounce: isUseDebounce,
       chartIdx: 0,
-      height: 100,
+      height: 80,
     });
 
     const addRandomChartData = () => {

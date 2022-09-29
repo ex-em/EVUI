@@ -24,7 +24,7 @@ export default class EvChartBrush {
       const brushCanvas = document.createElement('canvas');
 
       brushCanvas.setAttribute('class', 'brush-canvas');
-      brushCanvas.setAttribute('style', 'display: block; z-index: 1; cursor: ew-resize;');
+      brushCanvas.setAttribute('style', 'display: block; z-index: 1;');
 
       const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
 
@@ -121,28 +121,16 @@ export default class EvChartBrush {
   }
 
   addEvent() {
+    let mousePosition;
+
     this.onMouseDown = (e) => {
       e.preventDefault();
 
-      const calDisToCurMouseX = xPos => Math.abs(this.evChartBrushPos[xPos] - e.offsetX);
-      const buttonType = calDisToCurMouseX('rightX') > calDisToCurMouseX('leftX') ? 'leftX' : 'rightX';
-      this.curMouseDownButtonType = buttonType;
-
-      const isMoveRight = xPos => e.offsetX > this.evChartBrushPos[xPos];
-      const isMoveLeft = xPos => e.offsetX < this.evChartBrushPos[xPos];
-
-      const isMouseDownOutsideBrush = isMoveLeft('leftX') || isMoveRight('rightX');
-      const isMouseDownInsideBrush = isMoveRight('leftX') && isMoveLeft('rightX');
-
-      const isMouseDownBrushBtn = xPos =>
-        e.offsetX + this.evChartBrushPos.buttonWidth >= this.evChartBrushPos[xPos]
-        && e.offsetX - this.evChartBrushPos.buttonWidth <= this.evChartBrushPos[xPos];
-
-      if (isMouseDownBrushBtn(buttonType)) {
+      if (mousePosition.isInsideButton) {
         this.clickBrushInsideX = -1;
-      } else if (isMouseDownInsideBrush) {
+      } else if (mousePosition.isInsideBrush) {
         this.clickBrushInsideX = e.offsetX;
-      } else if (isMouseDownOutsideBrush) {
+      } else if (mousePosition.isOutsideBrush) {
         this.teleportBrush(e);
       }
     };
@@ -151,7 +139,9 @@ export default class EvChartBrush {
       if (this.clickBrushInsideX) {
         this.mouseDownAndMove(e);
       } else {
-        this.changeCursor(e);
+        mousePosition = this.getMousePosition(e);
+
+        this.changeCursor(mousePosition);
       }
     };
     this.onMouseMove = throttle(onMouseMove, 5);
@@ -178,6 +168,30 @@ export default class EvChartBrush {
     this.onWheelDebounce = debounce(onWheelDebounce, 100);
 
     this.setEventListener('addEventListener');
+  }
+
+  getMousePosition(e) {
+    const calDisToCurMouseX = xPos => Math.abs(this.evChartBrushPos[xPos] - e.offsetX);
+    const buttonType = calDisToCurMouseX('rightX') > calDisToCurMouseX('leftX') ? 'leftX' : 'rightX';
+
+    this.curBrushButtonType = buttonType;
+
+    const isMoveRight = xPos => e.offsetX > this.evChartBrushPos[xPos];
+    const isMoveLeft = xPos => e.offsetX < this.evChartBrushPos[xPos];
+
+    const isOutsideBrush = isMoveLeft('leftX') || isMoveRight('rightX');
+    const isInsideBrush = isMoveRight('leftX') && isMoveLeft('rightX');
+
+    const isInsideButton = e.offsetX + this.evChartBrushPos.buttonWidth
+      >= this.evChartBrushPos[buttonType]
+      && e.offsetX - this.evChartBrushPos.buttonWidth
+      <= this.evChartBrushPos[buttonType];
+
+    return {
+      isInsideButton,
+      isInsideBrush,
+      isOutsideBrush,
+    };
   }
 
   destroy() {
@@ -280,20 +294,14 @@ export default class EvChartBrush {
     this.brushIdx.isUseScroll = true;
   }
 
-  changeCursor(e) {
-    const isMoveRight = xPos => e.offsetX > this.evChartBrushPos[xPos];
-    const isMoveLeft = xPos => e.offsetX < this.evChartBrushPos[xPos];
-
-    const isCurMouseXOutsideBrush = isMoveLeft('leftX') || isMoveRight('rightX');
-    const isCurMouseXInsideBrush = isMoveRight('leftX') && isMoveLeft('rightX');
-
-    if (isCurMouseXOutsideBrush) {
-      if (this.brushCanvas.style.cursor === 'ew-resize') {
-        this.brushCanvas.style.cursor = 'initial';
-      }
-    } else if (isCurMouseXInsideBrush) {
-      if (this.brushCanvas.style.cursor === 'initial') {
+  changeCursor(mousePosition) {
+    if (mousePosition.isOutsideBrush) {
+      this.brushCanvas.style.cursor = 'pointer';
+    } else if (mousePosition.isInsideBrush) {
+      if (mousePosition.isInsideButton) {
         this.brushCanvas.style.cursor = 'ew-resize';
+      } else {
+        this.brushCanvas.style.cursor = 'grab';
       }
     }
   }
@@ -310,11 +318,11 @@ export default class EvChartBrush {
           this.clickBrushInsideX = e.offsetX + moveSensitive;
         }
       } else {
-        const isMoveRight = e.offsetX - this.evChartBrushPos[this.curMouseDownButtonType]
+        const isMoveRight = e.offsetX - this.evChartBrushPos[this.curBrushButtonType]
           > moveSensitive;
 
         if (isMoveRight) {
-          mode = this.curMouseDownButtonType === 'leftX' ? 'decrease' : 'increase';
+          mode = this.curBrushButtonType === 'leftX' ? 'decrease' : 'increase';
         }
       }
     } else if (e.offsetX < this.beforeMouseXPos) {
@@ -325,11 +333,11 @@ export default class EvChartBrush {
           this.clickBrushInsideX = e.offsetX - moveSensitive;
         }
       } else {
-        const isMoveLeft = this.evChartBrushPos[this.curMouseDownButtonType] - e.offsetX
+        const isMoveLeft = this.evChartBrushPos[this.curBrushButtonType] - e.offsetX
           > moveSensitive;
 
         if (isMoveLeft) {
-          mode = this.curMouseDownButtonType === 'leftX' ? 'increase' : 'decrease';
+          mode = this.curBrushButtonType === 'leftX' ? 'increase' : 'decrease';
         }
       }
     }
@@ -371,7 +379,7 @@ export default class EvChartBrush {
         this.brushIdx.isUseScroll = true;
         break;
       case 'increase':
-        if (this.curMouseDownButtonType === 'leftX') {
+        if (this.curBrushButtonType === 'leftX') {
           if (!brushIdx.start) {
             return;
           }
@@ -392,7 +400,7 @@ export default class EvChartBrush {
           return;
         }
 
-        if (this.curMouseDownButtonType === 'leftX') {
+        if (this.curBrushButtonType === 'leftX') {
           brushIdx.start += 1;
         } else {
           brushIdx.end -= 1;
@@ -435,7 +443,7 @@ export default class EvChartBrush {
       if (isUpdateBrushIdx) {
         this.clickBrushInsideX = null;
         this.beforeMouseXPos = null;
-        this.curMouseDownButtonType = null;
+        this.curBrushButtonType = null;
 
         this.brushIdx.isUseButton = false;
         this.brushIdx.isUseScroll = false;
