@@ -50,8 +50,8 @@ export default {
       zoom: {
         toolbar: {
           show: isShowToolbar,
-          },
         },
+      },
     });
 
     const chartData = reactive({

@@ -231,7 +231,8 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxClick = (e) => {
-      const { legend: opt, chartIdx } = this.options;
+      const { legend: opt } = this.options;
+      const { chartIdx } = this.data;
 
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {

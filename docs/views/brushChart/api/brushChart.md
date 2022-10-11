@@ -32,6 +32,7 @@
 | chartIdx    | Number  | 0                  | Chart Group으로 묶여있는 chart 중 몇 번째의(인덱스) 차트를 브러쉬에 보여줄지 설정                  |                              |
 | height      | Number  | 100                | 차트 브러쉬의 높이 설정                                                           |                                 |
 | useDebounce | Boolean | true               | true 이면 마지막 브러쉬 영역으로 차트가 업데이트 되고 false 이면 브러쉬 영역 조절에 따라 동시에 차트도 업데이트 됨. |                                 |
+| showLabel   | Boolean | false              | Brush의 x, y 축 라벨을 보여줄지 설정                                               |                                 |
 | selection   | Object  | ([상세](#selection)) | Brush 영역의 스타일 설정                                                        |                                 |
 
 #### selection
