@@ -47,6 +47,7 @@ class Line {
       ctx, chartRect,
       labelOffset, axesSteps,
       selectLabel, selectSeries, legendHitInfo,
+      isBrush,
     } = param;
 
     // about selectLabel
@@ -178,7 +179,7 @@ class Line {
     }
 
     // Draw points
-    if (this.point || useSelectLabel) {
+    if (!isBrush && (this.point || useSelectLabel)) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);

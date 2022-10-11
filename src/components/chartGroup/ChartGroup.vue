@@ -50,23 +50,32 @@ export default {
     const {
       getNormalizedOptions,
       isExecuteZoom,
+      brushSeries,
       evChartGroupRef,
     } = useGroupModel();
 
     const normalizedOptions = getNormalizedOptions(props.options);
     provide('isExecuteZoom', isExecuteZoom);
     provide('isChartGroup', true);
+    provide('brushSeries', brushSeries);
 
     const {
       evChartZoomOptions,
       evChartInfo,
       evChartToolbarRef,
+      evChartClone,
+      brushIdx,
+
       createEvChartZoom,
       setOptionsForUseZoom,
       setDataForUseZoom,
       controlZoomIdx,
       onClickToolbar,
     } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
+
+    provide('evChartClone', evChartClone);
+    provide('evChartInfo', evChartInfo);
+    provide('brushIdx', brushIdx);
 
     onMounted(() => {
       createEvChartZoom();
@@ -83,6 +92,10 @@ export default {
     }, { deep: true });
 
     watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
+      if (brushIdx.isUseButton || brushIdx.isUseScroll) {
+        return;
+      }
+
       controlZoomIdx(zoomStartIdx, zoomEndIdx);
     });
 

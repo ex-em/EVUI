@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { defaultsDeep } from 'lodash-es';
 
 const DEFAULT_OPTIONS = {
@@ -36,12 +36,13 @@ const DEFAULT_OPTIONS = {
 export const useGroupModel = () => {
   const isExecuteZoom = ref(false);
   const evChartGroupRef = ref();
-
+  const brushSeries = reactive({ list: [], chartIdx: null });
   const getNormalizedOptions = options => defaultsDeep({}, options, DEFAULT_OPTIONS);
 
   return {
     getNormalizedOptions,
     isExecuteZoom,
+    brushSeries,
     evChartGroupRef,
   };
 };

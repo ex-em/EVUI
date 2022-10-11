@@ -231,7 +231,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxClick = (e) => {
-      const opt = this.options.legend;
+      const { legend: opt, chartIdx } = this.options;
 
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
@@ -290,6 +290,14 @@ const modules = {
 
       series.show = !series.show;
       targetDOM.classList.toggle('inactive');
+
+      if (this.brushSeries) {
+        const seriesList = [...this.brushSeries.list];
+        seriesList[chartIdx] = this.seriesList;
+
+        this.brushSeries.list = seriesList;
+        this.brushSeries.chartIdx = chartIdx;
+      }
 
       this.update({
         updateSeries: false,

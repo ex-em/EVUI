@@ -1,4 +1,4 @@
-import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated } from 'vue';
+import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated, watch } from 'vue';
 import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
@@ -304,6 +304,12 @@ export const useZoomModel = (
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
+  const brushIdx = reactive({
+    start: 0,
+    end: 0,
+    isUseButton: false,
+    isUseScroll: false,
+  });
 
   let evChartZoom = null;
   const evChartInfo = reactive({
@@ -313,7 +319,7 @@ export const useZoomModel = (
       options: [],
     },
   });
-  const evChartClone = { data: [], options: [] };
+  const evChartClone = reactive({ data: null, options: null });
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -328,6 +334,8 @@ export const useZoomModel = (
         use: isUseZoomMode.value,
         getRangeInfo,
       };
+
+      option.chartIdx = idx;
 
       if (isUseZoomMode.value) {
         option.dragSelection = {
@@ -384,6 +392,7 @@ export const useZoomModel = (
         evChartZoomOptions,
         evChartToolbarRef.value,
         isExecuteZoom,
+        brushIdx,
         emitFunc,
       );
     }
@@ -456,26 +465,27 @@ export const useZoomModel = (
   };
 
   const setDataForUseZoom = (newData) => {
-    if (!evChartZoom?.isAnimationFinish) {
-      return;
-    }
-
-    if (!isExecuteZoom.value && evChartZoom) {
+    if (!isExecuteZoom.value) {
       evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
       isUseZoomMode.value = false;
 
       setEvChartOptions();
 
-      evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      brushIdx.start = 0;
+      brushIdx.end = evChartClone.data[0].labels.length - 1;
+
+      if (evChartZoom) {
+        evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      }
     }
 
     isExecuteZoom.value = false;
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
-    if (evChartZoom.isExecuteZoomAtToolbar) {
-      evChartZoom.isExecuteZoomAtToolbar = false;
-      return;
+    if (evChartZoom.isUseToolbar) {
+        evChartZoom.isUseToolbar = false;
+        return;
     }
 
     if (isUseZoomMode.value) {
@@ -484,10 +494,40 @@ export const useZoomModel = (
     }
   };
 
+  watch(() => [
+    brushIdx.start,
+    brushIdx.end,
+  ], () => {
+    if (!brushIdx.isUseButton && !brushIdx.isUseScroll) {
+        return;
+    }
+
+    evChartZoom.executeZoom(brushIdx.start, brushIdx.end);
+  });
+
+  watch(() => [
+    brushIdx.isUseButton,
+    brushIdx.isUseScroll,
+  ], ([
+    curIsUseButton,
+    curIsUseScroll,
+  ], [
+    prevIsUseButton,
+    prevIsUseScroll,
+  ]) => {
+    if (prevIsUseButton && !curIsUseButton) {
+      evChartZoom.setZoomAreaMemory(brushIdx.start, brushIdx.end);
+    } else if (prevIsUseScroll && !curIsUseScroll) {
+      evChartZoom.zoomAreaMemory.current[0] = [brushIdx.start, brushIdx.end];
+    }
+  });
+
   return {
     evChartZoomOptions,
     evChartInfo,
     evChartToolbarRef,
+    evChartClone,
+    brushIdx,
 
     createEvChartZoom,
     setOptionsForUseZoom,

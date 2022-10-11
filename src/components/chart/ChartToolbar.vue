@@ -29,14 +29,11 @@ export default {
 
 <style lang="scss" scoped>
 .ev-chart__toolbar__wrapper {
-  position: relative;
+  height: 30px;
+  text-align: right;
+  padding-right: 30px;
 
   &__icon {
-    position: absolute;
-    top: 13px;
-    right: 30px;
-    z-index: 1;
-
     i {
       pointer-events: none;
       opacity: 0.5;
