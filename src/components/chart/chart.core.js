@@ -314,6 +314,8 @@ class EvChart {
       tipLocationInfo = this.lastHitInfo;
     } else if (this.defaultSelectItemInfo) {
       tipLocationInfo = this.getItem(this.defaultSelectItemInfo, false);
+    } else if (this.defaultSelectInfo && this.options.selectLabel.use) {
+      tipLocationInfo = this.getItem(this.defaultSelectInfo, false);
     } else {
       tipLocationInfo = null;
     }

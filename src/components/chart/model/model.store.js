@@ -538,14 +538,43 @@ const modules = {
     return findInfo;
   },
 
-  getItem({ seriesID, dataIndex }, useApproximate = false) {
-    const dataInfo = this.getDataByValues(seriesID, dataIndex);
+  getItem(selectedInfo, useApproximate = false) {
+    const { seriesID, dataIndex } = selectedInfo;
 
-    if (!dataInfo || !dataInfo?.xp || !dataInfo?.yp) {
-      return null;
+    let itemPosition;
+    if ('seriesID' in selectedInfo) {
+      const dataInfo = this.getDataByValues(seriesID, dataIndex);
+
+      if (!dataInfo || !dataInfo?.xp || !dataInfo?.yp) {
+        return null;
+      }
+
+      itemPosition = [this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate)];
+    } else {
+      const seriesList = Object.entries(this.seriesList);
+      let firShowSeriesID;
+
+      for (let i = 0; i < seriesList.length; i++) {
+        const [id, info] = seriesList[i];
+
+        if (info.show) {
+          firShowSeriesID = id;
+          break;
+        }
+      }
+
+      itemPosition = dataIndex.map((idx) => {
+        const dataInfo = this.getDataByValues(firShowSeriesID, idx);
+
+        if (!dataInfo || !dataInfo?.xp || !dataInfo?.yp) {
+          return null;
+        }
+
+        return this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate);
+      });
     }
 
-    return this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate);
+    return itemPosition;
   },
 
   /**

@@ -18,49 +18,57 @@ const modules = {
     let maxArgs;
     let isExistSelectedLabel;
 
-    if (labelTipOpt.use && labelTipOpt.showTip) {
-      isExistSelectedLabel = this.drawLabelTip();
-    }
+    const executeDrawTip = (tipOpt) => {
+      tipLocationInfo.forEach((tipInfo) => {
+        if (tipInfo && !isExistSelectedLabel) {
+          const seriesInfo = this.seriesList[tipInfo?.sId];
 
-    if (selTipOpt.use && tipLocationInfo && !isExistSelectedLabel) {
-      const seriesInfo = this.seriesList[tipLocationInfo?.sId];
-
-      if (!seriesInfo?.show) {
-        return;
-      }
-
-      const selArgs = this.calculateTipInfo(
-        seriesInfo,
-        'sel',
-        tipLocationInfo,
-      );
-
-      if (selArgs) {
-        let isSamePos = false;
-
-        if (maxTipOpt.use && maxArgs?.dp === selArgs.dp) {
-          isSamePos = true;
-        }
-
-        if (selTipOpt.showTextTip || selTipOpt.showTip) {
-          if (selTipOpt.tipText === 'label') {
-            const axisOpt = isHorizontal ? opt.axesY[0] : opt.axesX[0];
-            const label = selArgs.label;
-            selArgs.text = axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
-          } else {
-            selArgs.text = numberWithComma(selArgs.value);
+          if (!seriesInfo?.show) {
+            return;
           }
 
-          this.drawTextTip({ opt: selTipOpt, tipType: 'sel', seriesOpt: seriesInfo, isSamePos, ...selArgs });
-        }
+          const selArgs = this.calculateTipInfo(
+            seriesInfo,
+            'sel',
+            tipInfo,
+          );
 
-        if (selTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: selTipOpt, seriesOpt: seriesInfo, ...selArgs });
-        }
-      }
+          if (selArgs) {
+            let isSamePos = false;
 
-      if (tipLocationInfo && tipLocationInfo?.label && tipLocationInfo?.label === 0) {
-        this.lastHitInfo = tipLocationInfo;
+            if (maxTipOpt.use && maxArgs?.dp === selArgs.dp) {
+              isSamePos = true;
+            }
+
+            if (tipOpt.showTextTip || tipOpt.showTip) {
+              if (tipOpt.tipText === 'label') {
+                const axisOpt = isHorizontal ? opt.axesY[0] : opt.axesX[0];
+                const label = selArgs.label;
+                selArgs.text = axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
+              } else {
+                selArgs.text = numberWithComma(selArgs.value);
+              }
+
+              this.drawTextTip({ opt: tipOpt, tipType: 'sel', seriesOpt: seriesInfo, isSamePos, ...selArgs });
+            }
+
+            if (tipOpt.showIndicator) {
+              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ...selArgs });
+            }
+          }
+
+          if (tipInfo && tipInfo?.label && tipInfo?.label === 0) {
+            this.lastHitInfo = tipInfo;
+          }
+        }
+      });
+    };
+
+    if (tipLocationInfo) {
+      if (selTipOpt.use) {
+        executeDrawTip(selTipOpt);
+      } else if (labelTipOpt.use) {
+        executeDrawTip(labelTipOpt);
       }
     }
 

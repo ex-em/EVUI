@@ -131,6 +131,7 @@ const DEFAULT_OPTIONS = {
   selectLabel: {
     use: false,
     useClick: true,
+    tipText: 'value',
     limit: 1,
     useDeselectOverflow: false,
     showTip: false,
@@ -139,6 +140,17 @@ const DEFAULT_OPTIONS = {
     fixedPosTop: false,
     useApproximateValue: false,
     tipBackground: '#000000',
+    indicatorColor: '#000000',
+    tipStyle: {
+      height: 20,
+      background: '#000000',
+      textColor: '#FFFFFF',
+      fontSize: 14,
+      fontFamily: 'Roboto',
+      fontWeight: 400,
+    },
+    showTextTip: false,
+    showIndicator: false,
   },
   selectSeries: {
     use: false,
@@ -203,7 +215,7 @@ const DEFAULT_DATA = {
   data: {},
 };
 
-export const useModel = () => {
+export const useModel = (selectedLabel) => {
   const { props, emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
@@ -227,7 +239,7 @@ export const useModel = () => {
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
   const selectItemInfo = cloneDeep(props.selectedItem);
-  const selectLabelInfo = cloneDeep(props.selectedLabel);
+  const selectLabelInfo = cloneDeep(props.selectedLabel ?? selectedLabel?.value);
   const selectSeriesInfo = cloneDeep(props.selectedSeries);
 
   const eventListeners = {
@@ -237,7 +249,11 @@ export const useModel = () => {
         emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
       }
       if (e.selected?.dataIndex) {
-        emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+        if (selectedLabel?.value) {
+          selectedLabel.value.dataIndex = e.selected.dataIndex;
+        } else {
+          emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+        }
       }
       if (e.selected?.seriesId) {
         emit('update:selectedSeries', { seriesId: e.selected.seriesId });
@@ -296,6 +312,7 @@ export const useWrapper = (options) => {
 export const useZoomModel = (
   evChartNormalizedOptions,
   { wrapper: evChartWrapper, evChartGroupRef },
+  selectedLabelOrItem,
 ) => {
   const { props, slots, emit } = getCurrentInstance();
 
@@ -335,8 +352,6 @@ export const useZoomModel = (
         getRangeInfo,
       };
 
-      option.chartIdx = idx;
-
       if (isUseZoomMode.value) {
         option.dragSelection = {
           ...option.dragSelection,
@@ -361,10 +376,14 @@ export const useZoomModel = (
     if (evChartGroupRef) {
       evChartInfo.dom = evChartGroupRef.value.querySelectorAll('.ev-chart-container');
 
+      let chartIdx = 0;
       if (evChartInfo.dom.length) {
         slots.default(evChartInfo.dom).forEach(({ type, props: evChartProps }) => {
           if (type?.name === 'EvChart') {
             const { options, data } = evChartProps;
+
+            data.chartIdx = chartIdx;
+            chartIdx++;
 
             evChartInfo.props.data.push(data);
             evChartInfo.props.options.push(options);
@@ -497,12 +516,33 @@ export const useZoomModel = (
   watch(() => [
     brushIdx.start,
     brushIdx.end,
-  ], () => {
-    if (!brushIdx.isUseButton && !brushIdx.isUseScroll) {
-        return;
+  ], ([
+    curBrushStartIdx,
+    curBrushEndIdx,
+  ], [
+    prevBrushStartIdx,
+  ]) => {
+    if (selectedLabelOrItem?.value) {
+      if (typeof selectedLabelOrItem.value.dataIndex === 'number') {
+        if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+          selectedLabelOrItem.value.dataIndex -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+        } else {
+          selectedLabelOrItem.value.dataIndex += prevBrushStartIdx - curBrushStartIdx;
+        }
+      } else {
+        for (let idx = 0; idx < selectedLabelOrItem.value.dataIndex.length; idx++) {
+          if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+            selectedLabelOrItem.value.dataIndex[idx] -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+          } else {
+            selectedLabelOrItem.value.dataIndex[idx] += prevBrushStartIdx - curBrushStartIdx;
+          }
+        }
+      }
     }
 
-    evChartZoom.executeZoom(brushIdx.start, brushIdx.end);
+    if (brushIdx.isUseButton || brushIdx.isUseScroll) {
+      evChartZoom.executeZoom(curBrushStartIdx, curBrushEndIdx);
+    }
   });
 
   watch(() => [

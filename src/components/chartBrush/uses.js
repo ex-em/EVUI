@@ -5,6 +5,7 @@ const DEFAULT_OPTIONS = {
   useDebounce: true,
   chartIdx: 0,
   height: 100,
+  showLabel: false,
   selection: {
     fillColor: '#38ACEC',
     opacity: 0.65,
