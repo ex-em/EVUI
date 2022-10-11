@@ -120,6 +120,7 @@ class EvChart {
 
     this.drawChart();
 
+
     if (tooltip.use) {
       this.createTooltipDOM();
 
