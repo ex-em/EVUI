@@ -21,6 +21,11 @@ const modules = {
     }
 
     const opt = this.options.title;
+
+    if (this.titleDOM.textContent === opt.text) {
+      return;
+    }
+
     Object.keys(opt.style).forEach((key) => {
       this.titleDOM.style[key] = opt.style[key];
     });

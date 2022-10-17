@@ -705,10 +705,7 @@ class EvChart {
 
     // title update
     if (options.title.show) {
-      if (!this.isInitTitle) {
-        this.initTitle();
-      }
-
+      this.initTitle();
       this.showTitle();
     } else if (this.isInitTitle) {
       this.hideTitle();

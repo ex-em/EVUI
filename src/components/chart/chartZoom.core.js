@@ -438,7 +438,7 @@ export default class EvChartZoom {
       }
     };
 
-    if (isUseZoomMode) {
+    if (isUseZoomMode && this.dragZoomIcon.classList.contains('active')) {
       const { previous, latest } = this.zoomAreaMemory;
 
       toggleIconStyle(this.previousIcon, previous.length);
