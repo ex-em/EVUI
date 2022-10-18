@@ -232,7 +232,7 @@ export const useModel = (selectedLabel) => {
         left: 2,
         bottom: 4,
       };
-}
+    }
 
     return normalizedOptions;
   };
@@ -308,7 +308,6 @@ export const useWrapper = (options) => {
   };
 };
 
-
 export const useZoomModel = (
   evChartNormalizedOptions,
   { wrapper: evChartWrapper, evChartGroupRef },
@@ -323,7 +322,7 @@ export const useZoomModel = (
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
   const brushIdx = reactive({
     start: 0,
-    end: 0,
+    end: -1,
     isUseButton: false,
     isUseScroll: false,
   });
@@ -337,6 +336,7 @@ export const useZoomModel = (
     },
   });
   const evChartClone = reactive({ data: null, options: null });
+  const brushChartIdx = ref([]);
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -387,6 +387,8 @@ export const useZoomModel = (
 
             evChartInfo.props.data.push(data);
             evChartInfo.props.options.push(options);
+          } else if (type?.name === 'EvChartBrush') {
+            brushChartIdx.value.push(evChartProps?.options?.chartIdx ?? 0);
           }
         });
       }
@@ -490,8 +492,15 @@ export const useZoomModel = (
 
       setEvChartOptions();
 
-      brushIdx.start = 0;
-      brushIdx.end = evChartClone.data[0].labels.length - 1;
+      brushIdx.end = -1;
+      for (let i = 0; i < brushChartIdx.value.length; i++) {
+        const data = evChartClone.data[brushChartIdx.value[i]];
+
+        if (data.labels.length) {
+          brushIdx.start = 0;
+          brushIdx.end = data.labels.length - 1;
+        }
+      }
 
       if (evChartZoom) {
         evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);

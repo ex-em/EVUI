@@ -32,7 +32,7 @@ export default {
     const injectEvChartInfo = inject('evChartInfo', { props: { options: [] } });
     const injectBrushIdx = inject('brushIdx', {
       start: 0,
-      end: 0,
+      end: -1,
       isUseButton: false,
       isUseScroll: false,
     });
