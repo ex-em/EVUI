@@ -15,6 +15,8 @@ export default class EvChartBrush {
 
   init(isResize) {
     if (this.brushIdx.start > this.brushIdx.end) {
+      this.initEventState();
+      this.removeBrushCanvas();
       return;
     }
 
@@ -72,52 +74,55 @@ export default class EvChartBrush {
     const brushIdx = this.debounceBrushIdx ?? this.brushIdx;
 
     const labelEndIdx = this.evChartData.value.labels.length - 1;
-    this.labelEndIdx = labelEndIdx;
-    const axesXInterval = (evChartRange.x2 - evChartRange.x1) / labelEndIdx;
-    const brushRectX = brushIdx.start * axesXInterval * pixelRatio;
-    const brushRectWidth = (
-      brushCanvasWidth - (
-        labelEndIdx - (brushIdx.end - brushIdx.start)
-      ) * axesXInterval
-    ) * pixelRatio;
-    const brushRectHeight = this.evChartBrushOptions.value.height - evChartRange.y1;
-    const brushButtonLeftXPos = brushRectX;
-    const brushButtonRightXPos = brushRectX + brushRectWidth;
 
-    if (!brushCanvas.style.position) {
-      brushCanvas.style.position = 'absolute';
-      brushCanvas.style.top = `${evChartRange.y1}px`;
-      brushCanvas.style.left = `${evChartRange.x1 - (brushButtonWidth / 2)}px`;
+    if (labelEndIdx >= 0) {
+      this.labelEndIdx = labelEndIdx;
+      const axesXInterval = (evChartRange.x2 - evChartRange.x1) / labelEndIdx;
+      const brushRectX = brushIdx.start * axesXInterval * pixelRatio;
+      const brushRectWidth = (
+        brushCanvasWidth - (
+          labelEndIdx - (brushIdx.end - brushIdx.start)
+        ) * axesXInterval
+      ) * pixelRatio;
+      const brushRectHeight = this.evChartBrushOptions.value.height - evChartRange.y1;
+      const brushButtonLeftXPos = brushRectX;
+      const brushButtonRightXPos = brushRectX + brushRectWidth;
+
+      if (!brushCanvas.style.position) {
+        brushCanvas.style.position = 'absolute';
+        brushCanvas.style.top = `${evChartRange.y1}px`;
+        brushCanvas.style.left = `${evChartRange.x1 - (brushButtonWidth / 2)}px`;
+      }
+
+      if (!isEqualWidth) {
+        brushCanvas.width = (brushCanvasWidth * pixelRatio);
+        brushCanvas.style.width = `${brushCanvasWidth}px`;
+        brushCanvas.height = brushCanvasHeight * pixelRatio;
+        brushCanvas.style.height = `${brushCanvasHeight}px`;
+      }
+
+      const ctx = brushCanvas.getContext('2d');
+
+      ctx.clearRect(
+        0,
+        0,
+        brushCanvasWidth * pixelRatio,
+        brushCanvasHeight * pixelRatio,
+      );
+
+      ctx.fillStyle = this.evChartBrushOptions.value.selection.fillColor;
+      ctx.globalAlpha = this.evChartBrushOptions.value.selection.opacity;
+      ctx.fillRect(brushRectX, 0, brushRectWidth, brushRectHeight);
+      ctx.fillRect(brushButtonLeftXPos, 0, brushButtonWidth, brushRectHeight);
+      ctx.fillRect(brushButtonRightXPos - brushButtonWidth, 0, brushButtonWidth, brushRectHeight);
+
+      this.evChartBrushPos = {
+        leftX: brushButtonLeftXPos / pixelRatio,
+        rightX: brushButtonRightXPos / pixelRatio,
+        buttonWidth: brushButtonWidth,
+        axesXInterval,
+      };
     }
-
-    if (!isEqualWidth) {
-      brushCanvas.width = (brushCanvasWidth * pixelRatio);
-      brushCanvas.style.width = `${brushCanvasWidth}px`;
-      brushCanvas.height = brushCanvasHeight * pixelRatio;
-      brushCanvas.style.height = `${brushCanvasHeight}px`;
-    }
-
-    const ctx = brushCanvas.getContext('2d');
-
-    ctx.clearRect(
-      0,
-      0,
-      brushCanvasWidth * pixelRatio,
-      brushCanvasHeight * pixelRatio,
-    );
-
-    ctx.fillStyle = this.evChartBrushOptions.value.selection.fillColor;
-    ctx.globalAlpha = this.evChartBrushOptions.value.selection.opacity;
-    ctx.fillRect(brushRectX, 0, brushRectWidth, brushRectHeight);
-    ctx.fillRect(brushButtonLeftXPos, 0, brushButtonWidth, brushRectHeight);
-    ctx.fillRect(brushButtonRightXPos - brushButtonWidth, 0, brushButtonWidth, brushRectHeight);
-
-    this.evChartBrushPos = {
-      leftX: brushButtonLeftXPos / pixelRatio,
-      rightX: brushButtonRightXPos / pixelRatio,
-      buttonWidth: brushButtonWidth,
-      axesXInterval,
-    };
   }
 
   addEvent() {

@@ -78,7 +78,7 @@
       const injectIsChartGroup = inject('isChartGroup', false);
       const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
       const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
-      const injectBrushIdx = inject('brushIdx', { start: 0, end: 0 });
+      const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
 
       const {
         eventListeners,
