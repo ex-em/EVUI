@@ -87,7 +87,7 @@ export default {
       selectLabel: {
         use: true,
         useClick: true,
-        limit: 3,
+        limit: 2,
         useDeselectOverflow: true,
         useApproximateValue: true,
         tipBackground: '#FF0000',
@@ -122,7 +122,7 @@ export default {
     });
 
     const defaultGroupSelectLabel = ref({
-      dataIndex: [1, 3, 7],
+      dataIndex: [0, 100],
     });
 
     const clickedLabel = ref("''");
@@ -152,7 +152,7 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < 10; ix++) {
+      for (let ix = 0; ix < 500; ix++) {
         addRandomChartData();
       }
     });
