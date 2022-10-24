@@ -246,12 +246,14 @@ class Line {
     let s = 0;
     let e = gdata.length - 1;
 
+    const xpInterval = gdata[1].xp - gdata[0].xp < 6 ? 1.5 : 6;
+
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
       const x = gdata[m].xp;
       const y = gdata[m].yp;
 
-      if ((x - 6 <= xp) && (xp <= x + 6)) {
+      if ((x - xpInterval < xp) && (xp < x + xpInterval)) {
         item.data = gdata[m];
         item.index = m;
 
@@ -259,10 +261,10 @@ class Line {
           item.hit = true;
         }
         return item;
-      } else if (x + 6 < xp) {
-        s = m + 1;
-      } else {
+      } else if (x + xpInterval > xp) {
         e = m - 1;
+      } else {
+        s = m + 1;
       }
     }
 
