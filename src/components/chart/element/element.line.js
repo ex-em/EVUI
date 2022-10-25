@@ -243,28 +243,30 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
-    let s = 0;
-    let e = gdata.length - 1;
+    if (gdata.length) {
+      let s = 0;
+      let e = gdata.length - 1;
 
-    const xpInterval = gdata[1].xp - gdata[0].xp < 6 ? 1.5 : 6;
+      const xpInterval = gdata[1]?.xp - gdata[0].xp < 6 ? 1.5 : 6;
 
-    while (s <= e) {
-      const m = Math.floor((s + e) / 2);
-      const x = gdata[m].xp;
-      const y = gdata[m].yp;
+      while (s <= e) {
+        const m = Math.floor((s + e) / 2);
+        const x = gdata[m].xp;
+        const y = gdata[m].yp;
 
-      if ((x - xpInterval < xp) && (xp < x + xpInterval)) {
-        item.data = gdata[m];
-        item.index = m;
+        if ((x - xpInterval < xp) && (xp < x + xpInterval)) {
+          item.data = gdata[m];
+          item.index = m;
 
-        if ((y - 6 <= yp) && (yp <= y + 6)) {
-          item.hit = true;
+          if ((y - 6 <= yp) && (yp <= y + 6)) {
+            item.hit = true;
+          }
+          return item;
+        } else if (x + xpInterval > xp) {
+          e = m - 1;
+        } else {
+          s = m + 1;
         }
-        return item;
-      } else if (x + xpInterval > xp) {
-        e = m - 1;
-      } else {
-        s = m + 1;
       }
     }
 
