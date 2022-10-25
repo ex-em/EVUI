@@ -243,7 +243,7 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
-    if (gdata.length) {
+    if (gdata?.length) {
       let s = 0;
       let e = gdata.length - 1;
 
