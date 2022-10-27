@@ -25,8 +25,7 @@ export default class EvChartBrush {
     this.evChart = evChart;
     this.evChartBrushOptions = evChartBrushOptions;
     this.evChartBrushRef = evChartBrushRef;
-
-    this.labelEndIdx = evChartData.value.labels.length - 1;
+    this.evChartData = evChartData;
 
     this.brushIdx = brushIdx;
     if (evChartBrushOptions.value.useDebounce) {
@@ -69,6 +68,9 @@ export default class EvChartBrush {
       return;
     }
 
+    const labelEndIdx = this.evChartData.value.labels.length - 1;
+    this.labelEndIdx = labelEndIdx;
+
     const evChartRange = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,
@@ -82,7 +84,7 @@ export default class EvChartBrush {
       return;
     }
 
-    if (this.labelEndIdx >= 0) {
+    if (labelEndIdx >= 0) {
       const brushPosInfo = this.setBrushXAndWidth(canvasPosInfo, offsetX, isDebounce, mode);
 
       if (canvasPosInfo && brushPosInfo) {
