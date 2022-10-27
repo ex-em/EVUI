@@ -596,7 +596,7 @@ export default class EvChartBrush {
           axesXInterval,
         } = this.brushPosInfo;
 
-        if ((this.brushIdx.isUseButton || this.isUseBrushGrab)) {
+        if (this.brushIdx.isUseButton || this.isUseBrushGrab) {
           brushStartIdx = brushRectX / axesXInterval;
           brushEndIdx = this.labelEndIdx - (
             (brushCanvasWidth - (brushRectX + brushRectWidth)) / axesXInterval
