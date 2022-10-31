@@ -176,6 +176,7 @@ const modules = {
             cId: colorItem.id,
             color: colorItem.color,
             name,
+            show: true,
           });
         }
       }
@@ -230,7 +231,8 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxClick = (e) => {
-      const opt = this.options.legend;
+      const { legend: opt } = this.options;
+      const { chartIdx } = this.data;
 
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
@@ -289,6 +291,14 @@ const modules = {
 
       series.show = !series.show;
       targetDOM.classList.toggle('inactive');
+
+      if (this.brushSeries) {
+        const seriesList = [...this.brushSeries.list];
+        seriesList[chartIdx] = this.seriesList;
+
+        this.brushSeries.list = seriesList;
+        this.brushSeries.chartIdx = chartIdx;
+      }
 
       this.update({
         updateSeries: false,

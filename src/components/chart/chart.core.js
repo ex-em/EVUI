@@ -14,28 +14,40 @@ import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
 class EvChart {
-  constructor(target, data, options, listeners, defaultSelectItemInfo, defaultSelectInfo) {
+  constructor(
+    target,
+    data,
+    options,
+    listeners,
+    defaultSelectItemInfo,
+    defaultSelectInfo,
+    brushSeries,
+  ) {
     Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
-    Object.assign(this, Title);
-    Object.assign(this, Legend);
-    Object.assign(this, Interaction);
-    Object.assign(this, Tooltip);
-    Object.assign(this, Pie);
-    Object.assign(this, Tip);
+
+    if (!options.brush) {
+      Object.assign(this, Tooltip);
+      Object.assign(this, Interaction);
+      Object.assign(this, Tip);
+      Object.assign(this, Legend);
+      Object.assign(this, Pie);
+      Object.assign(this, Title);
+    }
 
     if (options.type === 'heatMap' && options.legend.type === 'gradient') {
       Object.assign(this, GradientLegend);
     }
 
+    this.brushSeries = brushSeries;
     this.target = target;
     this.data = data;
     this.options = options;
     this.listeners = listeners;
 
     this.wrapperDOM = document.createElement('div');
-    this.wrapperDOM.className = 'ev-chart-wrapper';
+    this.wrapperDOM.className = options.brush ? 'ev-chart-brush-wrapper' : 'ev-chart-wrapper';
     this.chartDOM = document.createElement('div');
-    this.chartDOM.className = 'ev-chart-container';
+    this.chartDOM.className = options.brush ? 'ev-chart-brush-container' : 'ev-chart-container';
     this.wrapperDOM.appendChild(this.chartDOM);
     this.target.appendChild(this.wrapperDOM);
 
@@ -45,19 +57,25 @@ class EvChart {
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.setAttribute('style', 'display: block;');
     this.bufferCtx = this.bufferCanvas.getContext('2d');
-    this.overlayCanvas = document.createElement('canvas');
-    this.overlayCanvas.setAttribute('style', 'display: block;');
-    this.overlayCtx = this.overlayCanvas.getContext('2d');
 
     this.pixelRatio = window.devicePixelRatio || 1;
     this.oldPixelRatio = this.pixelRatio;
 
     this.chartDOM.appendChild(this.displayCanvas);
-    this.chartDOM.appendChild(this.overlayCanvas);
 
-    this.overlayCanvas.style.position = 'absolute';
-    this.overlayCanvas.style.top = '0px';
-    this.overlayCanvas.style.left = '0px';
+    if (!options.brush) {
+      this.overlayCanvas = document.createElement('canvas');
+      this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
+      this.overlayCanvas.setAttribute('class', 'overlay-canvas');
+      this.overlayCtx = this.overlayCanvas.getContext('2d');
+
+      this.chartDOM.appendChild(this.overlayCanvas);
+
+      this.overlayCanvas.style.position = 'absolute';
+      this.overlayCanvas.style.top = '0px';
+      this.overlayCanvas.style.left = '0px';
+    }
+
 
     this.isInitLegend = false;
     this.isInitTitle = false;
@@ -97,9 +115,11 @@ class EvChart {
 
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedInfo();
+
+    this.initSelectedInfo?.();
 
     this.drawChart();
+
 
     if (tooltip.use) {
       this.createTooltipDOM();
@@ -109,7 +129,7 @@ class EvChart {
       }
     }
 
-    this.createEventFunctions();
+    this.createEventFunctions?.();
     this.isInit = true;
   }
 
@@ -151,7 +171,9 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
+
     this.drawTip();
+
     if (this.bufferCanvas) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
@@ -164,7 +186,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -175,6 +197,8 @@ class EvChart {
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
       overlayCtx: this.overlayCtx,
+      isBrush: !!brush,
+      displayOverflow,
     };
 
     let showIndex = 0;
@@ -290,11 +314,13 @@ class EvChart {
       tipLocationInfo = this.lastHitInfo;
     } else if (this.defaultSelectItemInfo) {
       tipLocationInfo = this.getItem(this.defaultSelectItemInfo, false);
+    } else if (this.defaultSelectInfo && this.options.selectLabel.use) {
+      tipLocationInfo = this.getItem(this.defaultSelectInfo, false);
     } else {
       tipLocationInfo = null;
     }
 
-    this.drawTips(tipLocationInfo);
+    this.drawTips?.(tipLocationInfo);
   }
 
   /**
@@ -437,7 +463,10 @@ class EvChart {
     }
 
     this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
-    this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+
+    if (this.overlayCtx) {
+      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+    }
   }
 
   /**
@@ -518,8 +547,11 @@ class EvChart {
     this.displayCanvas.style.width = `${width}px`;
     this.bufferCanvas.width = width * this.pixelRatio;
     this.bufferCanvas.style.width = `${width}px`;
-    this.overlayCanvas.width = width * this.pixelRatio;
-    this.overlayCanvas.style.width = `${width}px`;
+
+    if (this.overlayCanvas) {
+      this.overlayCanvas.width = width * this.pixelRatio;
+      this.overlayCanvas.style.width = `${width}px`;
+    }
   }
 
   /**
@@ -537,8 +569,11 @@ class EvChart {
     this.displayCanvas.style.height = `${height}px`;
     this.bufferCanvas.height = height * this.pixelRatio;
     this.bufferCanvas.style.height = `${height}px`;
-    this.overlayCanvas.height = height * this.pixelRatio;
-    this.overlayCanvas.style.height = `${height}px`;
+
+    if (this.overlayCanvas) {
+      this.overlayCanvas.height = height * this.pixelRatio;
+      this.overlayCanvas.style.height = `${height}px`;
+    }
   }
 
   /**
@@ -672,6 +707,8 @@ class EvChart {
     if (options.title.show) {
       if (!this.isInitTitle) {
         this.initTitle();
+      } else {
+        this.updateTitle();
       }
 
       this.showTitle();
@@ -707,7 +744,8 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
-    this.initSelectedInfo();
+
+    this.initSelectedInfo?.();
 
     this.render(updateInfo?.hitInfo);
 
@@ -771,10 +809,12 @@ class EvChart {
 
   /**
    * Resize chart
+   * @param {Function} promiseRes After evChart resize completes,
+   *   callback completion status with promiseRes to draw a Brush over it.
    *
    * @returns {undefined}
    */
-  resize() {
+  resize(promiseRes) {
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
@@ -783,6 +823,10 @@ class EvChart {
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
+
+    if (promiseRes) {
+      promiseRes(true);
+    }
   }
 
   /**

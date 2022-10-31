@@ -29,6 +29,7 @@ import barChartProps from 'docs/views/barChart/props';
 import lineChartProps from 'docs/views/lineChart/props';
 import scatterChartProps from 'docs/views/scatterChart/props';
 import zoomChartProps from 'docs/views/zoomChart/props';
+import brushChartProps from 'docs/views/brushChart/props';
 import comboChartProps from 'docs/views/comboChart/props';
 import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
@@ -289,6 +290,15 @@ const routes = [
     name: 'ZoomChart',
     component: PageView,
     props: zoomChartProps,
+    meta: {
+      category: 'Chart',
+    },
+  },
+  {
+    path: '/brushChart',
+    name: 'BrushChart',
+    component: PageView,
+    props: brushChartProps,
     meta: {
       category: 'Chart',
     },

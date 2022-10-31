@@ -119,6 +119,7 @@
       v-model="dateRange1"
       mode="dateRange"
       clearable
+      :shortcuts="dateTimeRange2Shortcut"
     />
     <div class="description">
       <span class="badge">
@@ -196,7 +197,7 @@ export default {
           label: 'LastMonth',
           value: 'lastMonth',
           shortcutDate: () => [
-            new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'month')),
+            new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(30, 'd')),
             new Date(TODAY_0_O_CLOCK_DATE),
           ],
       },
@@ -204,7 +205,7 @@ export default {
         label: 'LastWeek',
         value: 'lastWeek',
         shortcutDate: () => [
-          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'week')),
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(6, 'day')),
           new Date(TODAY_0_O_CLOCK_DATE),
         ],
       },

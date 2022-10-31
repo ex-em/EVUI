@@ -15,6 +15,7 @@
 
 ```
 <ev-chart-group
+   v-model:groupSelectedLabel="각 차트에 라벨 표시"
    v-model:zoomStartIdx="줌 StartIdx 조절"
    v-model:zoomEndIdx="줌 EndIdx 조절"
    :options="차트 그룹 속성"
@@ -35,7 +36,17 @@
 <br/>
 
 >## Props
-### 1. v-model:zoomStartIdx
+### 1. v-model:groupSelectedLabel
+- 현재 선택 된 label 인덱스에 대한 정보 
+
+#### Example
+```
+const groupSelectLabel = ref({
+    dataIndex: [1, 3, 7],
+});;
+```
+
+### 2. v-model:zoomStartIdx
  - option에서 zoom 옵션을 사용할 경우 유효한 바인딩
  - 현재 차트의 시작 인덱스에 대한 정보
  - zoomStartIdx를 이용하여 줌의 시작 인덱스를 조정 가능
@@ -44,7 +55,8 @@
 ```
 const zoomStartIdx = ref(0);
 ```
-### 2. v-model:zoomEndIdx
+
+### 3. v-model:zoomEndIdx
  - option에서 zoom 옵션을 사용할 경우 유효한 바인딩
  - 현재 차트의 마지막 인덱스에 대한 정보
  - zoomEndIdx를 이용하여 줌의 마지막 인덱스를 조정 가능

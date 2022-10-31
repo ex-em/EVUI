@@ -28,6 +28,7 @@ import EvTimePicker from '@/components/timePicker/';
 import EvGrid from '@/components/grid/';
 import EvChart from '@/components/chart/';
 import EvChartGroup from '@/components/chartGroup/';
+import EvChartBrush from '@/components/chartBrush/';
 import EvTreeGrid from '@/components/treeGrid/';
 import EvPagination from '@/components/pagination/';
 import { version } from '../package.json';
@@ -60,6 +61,7 @@ const components = [
   EvGrid,
   EvChart,
   EvChartGroup,
+  EvChartBrush,
   EvMessage,
   EvNotification,
   EvMessageBox,

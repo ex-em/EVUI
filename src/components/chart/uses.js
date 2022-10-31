@@ -1,4 +1,4 @@
-import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated } from 'vue';
+import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated, watch } from 'vue';
 import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
@@ -131,6 +131,7 @@ const DEFAULT_OPTIONS = {
   selectLabel: {
     use: false,
     useClick: true,
+    tipText: 'value',
     limit: 1,
     useDeselectOverflow: false,
     showTip: false,
@@ -139,6 +140,17 @@ const DEFAULT_OPTIONS = {
     fixedPosTop: false,
     useApproximateValue: false,
     tipBackground: '#000000',
+    indicatorColor: '#000000',
+    tipStyle: {
+      height: 20,
+      background: '#000000',
+      textColor: '#FFFFFF',
+      fontSize: 14,
+      fontFamily: 'Roboto',
+      fontWeight: 400,
+    },
+    showTextTip: false,
+    showIndicator: false,
   },
   selectSeries: {
     use: false,
@@ -203,7 +215,7 @@ const DEFAULT_DATA = {
   data: {},
 };
 
-export const useModel = () => {
+export const useModel = (selectedLabel) => {
   const { props, emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
@@ -220,14 +232,14 @@ export const useModel = () => {
         left: 2,
         bottom: 4,
       };
-}
+    }
 
     return normalizedOptions;
   };
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
   const selectItemInfo = cloneDeep(props.selectedItem);
-  const selectLabelInfo = cloneDeep(props.selectedLabel);
+  const selectLabelInfo = cloneDeep(props.selectedLabel ?? selectedLabel?.value);
   const selectSeriesInfo = cloneDeep(props.selectedSeries);
 
   const eventListeners = {
@@ -237,7 +249,11 @@ export const useModel = () => {
         emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
       }
       if (e.selected?.dataIndex) {
-        emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+        if (selectedLabel?.value) {
+          selectedLabel.value.dataIndex = e.selected.dataIndex;
+        } else {
+          emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+        }
       }
       if (e.selected?.seriesId) {
         emit('update:selectedSeries', { seriesId: e.selected.seriesId });
@@ -292,10 +308,10 @@ export const useWrapper = (options) => {
   };
 };
 
-
 export const useZoomModel = (
   evChartNormalizedOptions,
   { wrapper: evChartWrapper, evChartGroupRef },
+  selectedLabelOrItem,
 ) => {
   const { props, slots, emit } = getCurrentInstance();
 
@@ -304,6 +320,12 @@ export const useZoomModel = (
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
+  const brushIdx = reactive({
+    start: 0,
+    end: -1,
+    isUseButton: false,
+    isUseScroll: false,
+  });
 
   let evChartZoom = null;
   const evChartInfo = reactive({
@@ -313,7 +335,8 @@ export const useZoomModel = (
       options: [],
     },
   });
-  const evChartClone = { data: [], options: [] };
+  const evChartClone = reactive({ data: null, options: null });
+  const brushChartIdx = ref([]);
 
   const getRangeInfo = (zoomInfo) => {
     if (zoomInfo.data.length && zoomInfo.range && isUseZoomMode.value) {
@@ -353,13 +376,19 @@ export const useZoomModel = (
     if (evChartGroupRef) {
       evChartInfo.dom = evChartGroupRef.value.querySelectorAll('.ev-chart-container');
 
+      let chartIdx = 0;
       if (evChartInfo.dom.length) {
         slots.default(evChartInfo.dom).forEach(({ type, props: evChartProps }) => {
           if (type?.name === 'EvChart') {
             const { options, data } = evChartProps;
 
+            data.chartIdx = chartIdx;
+            chartIdx++;
+
             evChartInfo.props.data.push(data);
             evChartInfo.props.options.push(options);
+          } else if (type?.name === 'EvChartBrush') {
+            brushChartIdx.value.push(evChartProps?.options?.chartIdx ?? 0);
           }
         });
       }
@@ -384,6 +413,7 @@ export const useZoomModel = (
         evChartZoomOptions,
         evChartToolbarRef.value,
         isExecuteZoom,
+        brushIdx,
         emitFunc,
       );
     }
@@ -456,26 +486,34 @@ export const useZoomModel = (
   };
 
   const setDataForUseZoom = (newData) => {
-    if (!evChartZoom?.isAnimationFinish) {
-      return;
-    }
-
-    if (!isExecuteZoom.value && evChartZoom) {
+    if (!isExecuteZoom.value) {
       evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
       isUseZoomMode.value = false;
 
       setEvChartOptions();
 
-      evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      brushIdx.end = -1;
+      for (let i = 0; i < brushChartIdx.value.length; i++) {
+        const data = evChartClone.data[brushChartIdx.value[i]];
+
+        if (data.labels.length) {
+          brushIdx.start = 0;
+          brushIdx.end = data.labels.length - 1;
+        }
+      }
+
+      if (evChartZoom) {
+        evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+      }
     }
 
     isExecuteZoom.value = false;
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
-    if (evChartZoom.isExecuteZoomAtToolbar) {
-      evChartZoom.isExecuteZoomAtToolbar = false;
-      return;
+    if (evChartZoom.isUseToolbar) {
+        evChartZoom.isUseToolbar = false;
+        return;
     }
 
     if (isUseZoomMode.value) {
@@ -484,10 +522,61 @@ export const useZoomModel = (
     }
   };
 
+  watch(() => [
+    brushIdx.start,
+    brushIdx.end,
+  ], ([
+    curBrushStartIdx,
+    curBrushEndIdx,
+  ], [
+    prevBrushStartIdx,
+  ]) => {
+    if (selectedLabelOrItem?.value) {
+      if (typeof selectedLabelOrItem.value.dataIndex === 'number') {
+        if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+          selectedLabelOrItem.value.dataIndex -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+        } else {
+          selectedLabelOrItem.value.dataIndex += prevBrushStartIdx - curBrushStartIdx;
+        }
+      } else {
+        for (let idx = 0; idx < selectedLabelOrItem.value.dataIndex.length; idx++) {
+          if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+            selectedLabelOrItem.value.dataIndex[idx] -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+          } else {
+            selectedLabelOrItem.value.dataIndex[idx] += prevBrushStartIdx - curBrushStartIdx;
+          }
+        }
+      }
+    }
+
+    if (brushIdx.isUseButton || brushIdx.isUseScroll) {
+      evChartZoom.executeZoom(curBrushStartIdx, curBrushEndIdx);
+    }
+  });
+
+  watch(() => [
+    brushIdx.isUseButton,
+    brushIdx.isUseScroll,
+  ], ([
+    curIsUseButton,
+    curIsUseScroll,
+  ], [
+    prevIsUseButton,
+    prevIsUseScroll,
+  ]) => {
+    if (prevIsUseButton && !curIsUseButton) {
+      evChartZoom.setZoomAreaMemory(brushIdx.start, brushIdx.end);
+    } else if (prevIsUseScroll && !curIsUseScroll) {
+      evChartZoom.zoomAreaMemory.current[0] = [brushIdx.start, brushIdx.end];
+    }
+  });
+
   return {
     evChartZoomOptions,
     evChartInfo,
     evChartToolbarRef,
+    evChartClone,
+    brushIdx,
 
     createEvChartZoom,
     setOptionsForUseZoom,

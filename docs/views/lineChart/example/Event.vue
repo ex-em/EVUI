@@ -27,13 +27,13 @@
 </template>
 
 <script>
-  import { ref } from 'vue';
+  import { ref, reactive } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
     setup() {
       const time = dayjs().format('YYYY-MM-DD');
-      const chartData = {
+      const chartData = reactive({
         series: {
           series1: { name: 'series#1' },
           series2: { name: 'series#2' },
@@ -51,9 +51,9 @@
           series1: [100, 25, 36, 47, 0, 50, 80],
           series2: [80, 36, 25, 47, 15, 100, 0],
         },
-      };
+      });
 
-      const chartOptions = {
+      const chartOptions = reactive({
         type: 'line',
         width: '100%',
         title: {
@@ -89,7 +89,12 @@
             background: '#FF00FF',
           },
         },
-      };
+        zoom: {
+          toolbar: {
+            show: true,
+          },
+        },
+      });
 
       const clickedLabel = ref("''");
       const onClick = (target) => {

@@ -1,6 +1,6 @@
 <template>
-  <div class="ev-chart__toolbar__wrapper">
-    <div class="ev-chart__toolbar__wrapper__icon">
+  <div class="ev-chart-toolbar">
+    <div class="ev-chart-toolbar__icon">
       <ev-icon
         v-for="(option, iconType) in $props.toolbar.items"
         :key="`${iconType}-${option.icon}`"
@@ -28,15 +28,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.ev-chart__toolbar__wrapper {
-  position: relative;
+.ev-chart-toolbar {
+  height: 30px;
+  text-align: right;
+  padding-right: 30px;
 
   &__icon {
-    position: absolute;
-    top: 13px;
-    right: 30px;
-    z-index: 1;
-
     i {
       pointer-events: none;
       opacity: 0.5;

@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="zoomOptions.toolbar.show && !isChartGroup"
+    v-if="zoomOptions.toolbar.show && !injectIsChartGroup"
     ref="evChartToolbarRef"
   >
     <ev-chart-toolbar
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, watch, onDeactivated, inject, toRef } from 'vue';
+  import { onMounted, onBeforeUnmount, watch, onDeactivated, inject, toRef, computed } from 'vue';
   import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import EvChartToolbar from './ChartToolbar';
@@ -75,7 +75,10 @@
     ],
     setup(props) {
       let evChart = null;
-      const isChartGroup = inject('isChartGroup', false);
+      const injectIsChartGroup = inject('isChartGroup', false);
+      const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
+      const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
+      const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
 
       const {
         eventListeners,
@@ -84,10 +87,12 @@
         selectSeriesInfo,
         getNormalizedData,
         getNormalizedOptions,
-      } = useModel();
+      } = useModel(injectGroupSelectedLabel);
 
       const normalizedData = getNormalizedData(props.data);
       const normalizedOptions = getNormalizedOptions(props.options);
+      const selectedLabel = computed(() => props.selectedLabel);
+      const selectedItem = computed(() => props.selectedItem);
 
       const {
         wrapper,
@@ -108,6 +113,7 @@
       } = useZoomModel(
         normalizedOptions,
         { wrapper, evChartGroupRef: null },
+        props.selectedLabel ? selectedLabel : selectedItem,
       );
 
       const createChart = () => {
@@ -125,6 +131,7 @@
           eventListeners,
           selectItemInfo,
           selected,
+          injectBrushSeries,
         );
       };
 
@@ -132,7 +139,7 @@
         if (evChart) {
           evChart.init();
 
-          if (!isChartGroup && normalizedOptions.zoom.toolbar.show) {
+          if (!injectIsChartGroup && normalizedOptions.zoom.toolbar.show) {
             createEvChartZoom();
           }
         }
@@ -150,7 +157,7 @@
           updateLegend: isUpdateLegendType,
         });
 
-        if (!isChartGroup) {
+        if (!injectIsChartGroup) {
           setOptionsForUseZoom(newOpt);
         }
       }, { deep: true, flush: 'post' });
@@ -171,17 +178,37 @@
           updateData: isUpdateData,
         });
 
-        if (!isChartGroup) {
+        if (!injectIsChartGroup && isUpdateData) {
           setDataForUseZoom(newData);
         }
       }, { deep: true, flush: 'post' });
 
-      watch(() => props.selectedItem, (newValue) => {
+      if (injectIsChartGroup && !injectGroupSelectedLabel?.value) {
+        watch(() => injectBrushIdx.start, (curBrushStartIdx, prevBrushStartIdx) => {
+          if (selectedLabel?.value) {
+            for (let idx = 0; idx < selectedLabel.value.dataIndex.length; idx++) {
+              if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+                selectedLabel.value.dataIndex[idx] -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+              } else {
+                selectedLabel.value.dataIndex[idx] += prevBrushStartIdx - curBrushStartIdx;
+              }
+            }
+          } else if (selectedItem?.value) {
+            if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
+              selectedItem.value.dataIndex -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
+            } else {
+              selectedItem.value.dataIndex += prevBrushStartIdx - curBrushStartIdx;
+            }
+          }
+        });
+      }
+
+      watch(() => selectedItem.value, (newValue) => {
         const chartType = props.options.type;
         evChart.selectItemByData(newValue, chartType);
       }, { deep: true, flush: 'post' });
 
-      watch(() => props.selectedLabel, (newValue) => {
+      watch(() => (injectGroupSelectedLabel?.value ?? selectedLabel.value), (newValue) => {
         if (newValue.dataIndex) {
           evChart.renderWithSelected(newValue.dataIndex);
         }
@@ -193,7 +220,7 @@
         }
       }, { deep: true, flush: 'post' });
 
-      if (!isChartGroup) {
+      if (!injectIsChartGroup) {
         watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
           controlZoomIdx(zoomStartIdx, zoomEndIdx);
         });
@@ -238,7 +265,7 @@
         redraw,
 
         evChartToolbarRef,
-        isChartGroup,
+        injectIsChartGroup,
         onClickToolbar,
         normalizedOptions,
         zoomOptions: toRef(evChartZoomOptions, 'zoom'),

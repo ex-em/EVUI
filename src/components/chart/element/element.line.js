@@ -47,6 +47,7 @@ class Line {
       ctx, chartRect,
       labelOffset, axesSteps,
       selectLabel, selectSeries, legendHitInfo,
+      isBrush,
     } = param;
 
     // about selectLabel
@@ -178,7 +179,7 @@ class Line {
     }
 
     // Draw points
-    if (this.point || useSelectLabel) {
+    if (!isBrush && (this.point || useSelectLabel)) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
@@ -242,26 +243,30 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
-    let s = 0;
-    let e = gdata.length - 1;
+    if (gdata?.length) {
+      let s = 0;
+      let e = gdata.length - 1;
 
-    while (s <= e) {
-      const m = Math.floor((s + e) / 2);
-      const x = gdata[m].xp;
-      const y = gdata[m].yp;
+      const xpInterval = gdata[1]?.xp - gdata[0].xp < 6 ? 1.5 : 6;
 
-      if ((x - 6 <= xp) && (xp <= x + 6)) {
-        item.data = gdata[m];
-        item.index = m;
+      while (s <= e) {
+        const m = Math.floor((s + e) / 2);
+        const x = gdata[m].xp;
+        const y = gdata[m].yp;
 
-        if ((y - 6 <= yp) && (yp <= y + 6)) {
-          item.hit = true;
+        if ((x - xpInterval < xp) && (xp < x + xpInterval)) {
+          item.data = gdata[m];
+          item.index = m;
+
+          if ((y - 6 <= yp) && (yp <= y + 6)) {
+            item.hit = true;
+          }
+          return item;
+        } else if (x + xpInterval > xp) {
+          e = m - 1;
+        } else {
+          s = m + 1;
         }
-        return item;
-      } else if (x + 6 < xp) {
-        s = m + 1;
-      } else {
-        e = m - 1;
       }
     }
 
