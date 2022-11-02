@@ -31,6 +31,8 @@ import EvChartGroup from '@/components/chartGroup/';
 import EvChartBrush from '@/components/chartBrush/';
 import EvTreeGrid from '@/components/treeGrid/';
 import EvPagination from '@/components/pagination/';
+import VueResizeObserver from 'vue-resize-observer';
+import ObserveVisibility from 'vue3-observe-visibility';
 import { version } from '../package.json';
 
 const components = [
@@ -73,9 +75,13 @@ const install = (app) => {
   if (!app) {
     return;
   }
+
   components.forEach((component) => {
     app.use(component);
   });
+
+  app.use(VueResizeObserver);
+  app.use(ObserveVisibility);
 };
 
 const EVUI = {
