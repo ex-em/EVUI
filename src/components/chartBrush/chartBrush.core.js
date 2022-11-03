@@ -352,7 +352,7 @@ export default class EvChartBrush {
     }
 
     const evChartBrushContainer = this.evChartBrushContainer;
-    while (evChartBrushContainer.hasChildNodes()) {
+    while (evChartBrushContainer?.hasChildNodes()) {
       evChartBrushContainer.removeChild(evChartBrushContainer.firstChild);
     }
   }
