@@ -20,14 +20,7 @@ const modules = {
       this.createTitle();
     }
 
-    const opt = this.options.title;
-    Object.keys(opt.style).forEach((key) => {
-      this.titleDOM.style[key] = opt.style[key];
-    });
-
-    this.titleDOM.textContent = opt.text;
-    this.titleDOM.style.height = `${opt.height}px`;
-    this.titleDOM.style.lineHeight = `${opt.height}px`;
+    this.updateTitle();
 
     this.isInitTitle = true;
   },
@@ -50,6 +43,18 @@ const modules = {
   hideTitle() {
     this.titleDOM.style.display = 'none';
     this.wrapperDOM.style.paddingTop = '0px';
+  },
+
+  updateTitle() {
+    const opt = this.options.title;
+
+    Object.keys(opt.style).forEach((key) => {
+      this.titleDOM.style[key] = opt.style[key];
+    });
+
+    this.titleDOM.textContent = opt.text;
+    this.titleDOM.style.height = `${opt.height}px`;
+    this.titleDOM.style.lineHeight = `${opt.height}px`;
   },
 };
 

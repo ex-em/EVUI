@@ -311,7 +311,7 @@ class Scale {
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          if (options?.brush?.showLabel || !options.brush) {
+          if (options?.brush?.showLabel || !options?.brush) {
             ctx.fillText(labelText, labelCenter, labelPoint);
           }
 
@@ -344,7 +344,7 @@ class Scale {
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          if (options?.brush?.showLabel || !options.brush) {
+          if (options?.brush?.showLabel || !options?.brush) {
             ctx.fillText(labelText, labelPoint, labelCenter);
           }
 

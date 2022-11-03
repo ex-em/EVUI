@@ -47,10 +47,11 @@ export default {
     },
   },
   emits: [
+    'update:groupSelectedLabel',
     'update:zoomStartIdx',
     'update:zoomEndIdx',
   ],
-  setup(props) {
+  setup(props, { emit }) {
     const {
       getNormalizedOptions,
       isExecuteZoom,
@@ -62,8 +63,10 @@ export default {
     provide('isExecuteZoom', isExecuteZoom);
     provide('isChartGroup', true);
     provide('brushSeries', brushSeries);
-
-    const groupSelectedLabel = computed(() => props.groupSelectedLabel);
+    const groupSelectedLabel = computed({
+      get: () => props.groupSelectedLabel,
+      set: val => emit('update:groupSelectedLabel', val),
+    });
     provide('groupSelectedLabel', groupSelectedLabel);
 
     const {

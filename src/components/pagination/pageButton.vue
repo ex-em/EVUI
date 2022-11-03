@@ -7,6 +7,7 @@
     }"
     v-bind="$attrs"
     :aria-current="page.isCurrent"
+    @click.stop="page.click"
   >
     <slot>{{ page.number }}</slot>
   </span>

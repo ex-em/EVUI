@@ -707,6 +707,8 @@ class EvChart {
     if (options.title.show) {
       if (!this.isInitTitle) {
         this.initTitle();
+      } else {
+        this.updateTitle();
       }
 
       this.showTitle();
