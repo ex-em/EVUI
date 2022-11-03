@@ -208,7 +208,7 @@
       <div class="ev-calendar-time-side">
         <div
             v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
-            :key="`${hmsType}_TITLE`"
+            :key="`${hmsType}_label`"
             class="ev-calendar-time-side--label"
         >
           {{ hmsType }}
@@ -414,10 +414,6 @@ export default {
 </script>
 
 <style lang="scss">
-$arrow-hover-bg-color: #ADB5BD;
-$item-hover-bg-color: #C7DBE6;
-$animate-ease-in: 0.3s ease-in;
-
 @import '../../style/index.scss';
 
 .ev-calendar-wrapper {
