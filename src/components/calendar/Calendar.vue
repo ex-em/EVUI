@@ -2,17 +2,20 @@
   <div class="ev-calendar-wrapper">
     <div class="ev-calendar-date-area">
       <div class="ev-calendar-header">
-        <div @click="clickPrevNextBtn('main', 'prev')">
-          <i class="ev-icon-s-arrow-left move-month-arrow" />
+        <div
+          class="move-month-arrow"
+          @click="clickPrevNextBtn('main', 'prev')">
+          <i class="ev-icon-s-arrow-left move-month-arrow-icon" />
         </div>
         <span class="ev-calendar-year">{{ mainCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ mainCalendarMonth }}</span>
-        <div @click="clickPrevNextBtn('main', 'next')">
-          <i
-            :class="[
-                'ev-icon-s-arrow-right move-month-arrow',
-                { disabled: isContinuousMonths },
-            ]"
+        <div
+          :class="[
+            'move-month-arrow',
+            { disabled: isContinuousMonths }
+          ]"
+          @click="clickPrevNextBtn('main', 'next')">
+          <i class="ev-icon-s-arrow-right move-month-arrow-icon"
           />
         </div>
       </div>
@@ -69,7 +72,8 @@
       <div class="ev-calendar-time-side">
         <div
           v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
-          :key="`${hmsType}_TITLE`"
+          :key="`${hmsType}_label`"
+          class="ev-calendar-time-side--label"
         >
           {{ hmsType }}
         </div>
@@ -113,14 +117,16 @@
           <div
             v-for="arrowType in ['up', 'down']"
             :key="`${hmsType}_${arrowType}_btn`"
-            :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
+            :class="[
+              'ev-calendar-time-side--btn',
+              `arrow-${hmsType}`,
+              { disabled: preventTimeEventType.main[hmsType] }
+            ]"
             @click="clickHmsBtn('main', hmsType, arrowType)"
           >
             <i
-              :class="[
-                `ev-icon-arrow-${arrowType}`,
-                { disabled: preventTimeEventType.main[hmsType] }
-              ]" />
+              :class="`ev-icon-arrow-${arrowType}`"
+            />
           </div>
         </template>
       </div>
@@ -131,18 +137,22 @@
         class="ev-calendar-date-area"
     >
       <div class="ev-calendar-header">
-        <div @click="clickPrevNextBtn('expanded', 'prev')">
-          <i
-              :class="[
-                'ev-icon-s-arrow-left move-month-arrow',
-                { disabled: isContinuousMonths },
+        <div
+            :class="[
+              'move-month-arrow',
+              { disabled: isContinuousMonths }
             ]"
-          />
+            @click="clickPrevNextBtn('expanded', 'prev')"
+        >
+          <i class="ev-icon-s-arrow-left move-month-arrow-icon"/>
         </div>
         <span class="ev-calendar-year">{{ expandedCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ expandedCalendarMonth }}</span>
-        <div @click="clickPrevNextBtn('expanded', 'next')">
-          <i class="ev-icon-s-arrow-right move-month-arrow" />
+        <div
+          class="move-month-arrow"
+          @click="clickPrevNextBtn('expanded', 'next')"
+        >
+          <i class="ev-icon-s-arrow-right move-month-arrow-icon" />
         </div>
       </div>
       <div class="ev-calendar-body">
@@ -199,6 +209,7 @@
         <div
             v-for="hmsType in ['HOUR', 'MIN', 'SEC']"
             :key="`${hmsType}_TITLE`"
+            class="ev-calendar-time-side--label"
         >
           {{ hmsType }}
         </div>
@@ -242,14 +253,16 @@
           <div
               v-for="arrowType in ['up', 'down']"
               :key="`${hmsType}_${arrowType}_btn`"
-              :class="hmsType === 'hour' ? 'arrow-hour' : 'arrow-other'"
+              :class="[
+                'ev-calendar-time-side--btn',
+                `arrow-${hmsType}`,
+                { disabled: preventTimeEventType.expanded[hmsType] }
+               ]"
               @click="clickHmsBtn('expanded', hmsType, arrowType)"
           >
             <i
-              :class="[
-                `ev-icon-arrow-${arrowType}`,
-                { disabled: preventTimeEventType.expanded[hmsType] }
-              ]" />
+              :class="`ev-icon-arrow-${arrowType}`"
+            />
           </div>
         </template>
       </div>
@@ -401,6 +414,10 @@ export default {
 </script>
 
 <style lang="scss">
+$arrow-hover-bg-color: #ADB5BD;
+$item-hover-bg-color: #C7DBE6;
+$animate-ease-in: 0.3s ease-in;
+
 @import '../../style/index.scss';
 
 .ev-calendar-wrapper {
@@ -418,38 +435,46 @@ export default {
 
 .ev-calendar-header {
   display: flex;
-  height: 40px;
-  padding: 10px 8px;
+  height: 43px;
+  padding: 12px 15px 10px;
 
-  div {
-    width: 20px;
+  .move-month-arrow {
+    height: 24px;
     flex: 1;
     text-align: center;
     cursor: pointer;
-  }
+    line-height: 24px;
+    border-radius: 5px;
 
-  .move-month-arrow {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    color: #606266;
-    text-align: center;
-    &:hover {
-      color: #3C81F6;
+    &-icon {
+      color: #606266;
+      text-align: center;
     }
+
+    &:not(.disabled):hover {
+      i {
+        color: #409EFF;
+      }
+    }
+
     &.disabled {
-      color: #C0C4CC;
+      cursor: not-allowed;
+
+      i {
+        color: #C0C4CC;
+      }
     }
   }
 
   span {
-    flex: 2;
+    flex: 3;
     text-align: center;
+    line-height: 24px;
   }
 }
 
 .ev-calendar-body {
-  padding: 10px 8px 8px;
+  padding: 8px 8px;
   flex: 1;
 }
 
@@ -504,6 +529,11 @@ export default {
     text-align: center;
   }
 
+  &:not(.selected):not(.disabled):hover {
+    cursor: pointer;
+    color: #409EFF;
+  }
+
   &.selected span {
     color: #FFFFFF;
     background-color: #409EFF;
@@ -527,11 +557,6 @@ export default {
     width: 30px;
     margin: 5px auto;
     border-radius: 30px;
-  }
-
-  &:hover {
-    color: #409EFF;
-    cursor: pointer;
   }
 
   &.disabled {
@@ -564,24 +589,25 @@ export default {
 }
 
 .ev-calendar-time-td {
-  &:hover {
-    color: #409EFF;
-    cursor: pointer;
-  }
-  &.selected {
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-  }
-  &.selected div {
+  & div {
     width: 24px;
     height: 24px;
+    margin: 0 auto;
     line-height: 24px;
     border-radius: 50%;
+    text-align: center;
+  }
+  &:not(.selected) {
+    &:hover {
+      cursor: pointer;
+      div {
+        color: #409EFF;
+      }
+    }
+  }
+  &.selected div {
     color: #FFFFFF;
     background-color: #409EFF;
-    text-align: center;
   }
   &.disabled {
     background-color: #EEF0F3;
@@ -604,36 +630,38 @@ export default {
 
   &:first-child {
     width: 35px;
-
-    & div {
-      height: 110px;
-      line-height: 110px;
-    }
   }
 
   &:last-child {
     width: 30px;
+  }
 
-    &:hover {
-      color: #409EFF;
-      cursor: pointer;
+  &--label {
+    height: 110px;
+    line-height: 110px;
+  }
+
+  &--btn {
+    height: 55px;
+    line-height: 55px;
+
+    &.disabled {
+      color: #C0C4CC;
+      cursor: not-allowed;
+
+      &:hover {
+        color: #C0C4CC;
+      }
     }
 
-    & div {
-      height: 55px;
-      line-height: 55px;
+    &:not(.disabled):hover {
+      color: #409EFF;
+      cursor: pointer;
     }
   }
 
   & div:not(:last-child) {
     border-bottom: 1px solid #EBEEF5;
-  }
-
-  & div > .disabled {
-    color: #C0C4CC;
-  }
-  & div > .disabled:hover {
-    color: #C0C4CC;
   }
 }
 .ev-calendar-time-center {
