@@ -1246,7 +1246,9 @@ export const useEvent = (param) => {
     (curr) => {
       selectedValue.value = curr;
 
-      if (props.mode.includes('Time')) {
+      if (props.mode === 'dateRange') {
+        updateCalendarPage(selectedValue.value);
+      } else if (props.mode.includes('Time')) {
         let updateValue = [];
         if (props.mode === 'dateTime') {
           updateValue = [selectedValue.value];

@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <ev-chart-group>
+    <ev-chart-group :options="brushOptions">
       <ev-chart
         v-model:selectedItem="defaultSelectItem"
         :data="chartData"
@@ -94,6 +94,14 @@ export default {
       },
     });
 
+    const brushOptions = reactive({
+      zoom: {
+        toolbar: {
+          show: true,
+        },
+      },
+    });
+
     const clickedLabel = ref("''");
     const onClick = (target) => {
       clickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
@@ -106,12 +114,13 @@ export default {
 
     const defaultSelectItem = ref({
       seriesID: '',
-      dataIndex: 0,
+      dataIndex: null,
     });
 
     return {
       chartData,
       chartOptions,
+      brushOptions,
       clickedLabel,
       dblClickedLabel,
       defaultSelectItem,

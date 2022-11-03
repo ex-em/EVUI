@@ -311,7 +311,10 @@ class Scale {
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          ctx.fillText(labelText, labelCenter, labelPoint);
+          if (options?.brush?.showLabel || !options?.brush) {
+            ctx.fillText(labelText, labelCenter, labelPoint);
+          }
+
           if (!isBlurredLabel
             && options?.selectItem?.showLabelTip
             && hitInfo?.label
@@ -341,7 +344,9 @@ class Scale {
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          ctx.fillText(labelText, labelPoint, labelCenter);
+          if (options?.brush?.showLabel || !options?.brush) {
+            ctx.fillText(labelText, labelPoint, labelCenter);
+          }
 
           if (ix === steps) {
             linePosition -= 1;

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { onMounted, watch, provide, toRef } from 'vue';
+import { onMounted, watch, provide, toRef, computed } from 'vue';
 import evChartToolbar from '../chart/ChartToolbar';
 import { useGroupModel } from './uses';
 import { useZoomModel } from '../chart/uses';
@@ -41,12 +41,17 @@ export default {
       type: Number,
       default: 0,
     },
+    groupSelectedLabel: {
+      type: Object,
+      default: null,
+    },
   },
   emits: [
+    'update:groupSelectedLabel',
     'update:zoomStartIdx',
     'update:zoomEndIdx',
   ],
-  setup(props) {
+  setup(props, { emit }) {
     const {
       getNormalizedOptions,
       isExecuteZoom,
@@ -58,6 +63,11 @@ export default {
     provide('isExecuteZoom', isExecuteZoom);
     provide('isChartGroup', true);
     provide('brushSeries', brushSeries);
+    const groupSelectedLabel = computed({
+      get: () => props.groupSelectedLabel,
+      set: val => emit('update:groupSelectedLabel', val),
+    });
+    provide('groupSelectedLabel', groupSelectedLabel);
 
     const {
       evChartZoomOptions,
@@ -71,7 +81,11 @@ export default {
       setDataForUseZoom,
       controlZoomIdx,
       onClickToolbar,
-    } = useZoomModel(normalizedOptions, { wrapper: null, evChartGroupRef });
+    } = useZoomModel(
+      normalizedOptions,
+      { wrapper: null, evChartGroupRef },
+      groupSelectedLabel,
+    );
 
     provide('evChartClone', evChartClone);
     provide('evChartInfo', evChartInfo);
