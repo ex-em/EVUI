@@ -351,9 +351,12 @@ export default class EvChartBrush {
       this.brushCanvas = null;
     }
 
-    const evChartBrushContainer = this.evChartBrushContainer;
-    while (evChartBrushContainer.hasChildNodes()) {
-      evChartBrushContainer.removeChild(evChartBrushContainer.firstChild);
+    if (this.evChartBrushContainer) {
+      const evChartBrushContainer = this.evChartBrushContainer;
+
+      while (evChartBrushContainer.hasChildNodes()) {
+        evChartBrushContainer.removeChild(evChartBrushContainer.firstChild);
+      }
     }
   }
 
