@@ -566,11 +566,11 @@ const modules = {
       itemPosition = dataIndex.map((idx) => {
         const dataInfo = this.getDataByValues(firShowSeriesID, idx);
 
-        if (!dataInfo || !dataInfo?.xp || !dataInfo?.yp) {
+        if (!dataInfo) {
           return null;
         }
 
-        return this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate);
+        return this.getItemByPosition([dataInfo?.xp ?? 0, dataInfo?.yp ?? 0], useApproximate);
       });
     }
 
