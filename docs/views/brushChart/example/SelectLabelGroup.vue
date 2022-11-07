@@ -151,11 +151,11 @@ export default {
           seriesData.push(idx ? val3 : val4);
         });
       } else {
-        Object.values(chartData.data).forEach((seriesData, idx) => {
+        Object.values(chartData.data).forEach((seriesData) => {
           seriesData.push(null);
         });
 
-        Object.values(chartData2.data).forEach((seriesData, idx) => {
+        Object.values(chartData2.data).forEach((seriesData) => {
           seriesData.push(null);
         });
       }
