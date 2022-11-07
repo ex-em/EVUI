@@ -122,7 +122,7 @@ export default {
     });
 
     const defaultGroupSelectLabel = ref({
-      dataIndex: [0, 100],
+      dataIndex: [0, 3],
     });
 
     const clickedLabel = ref("''");
@@ -130,7 +130,7 @@ export default {
       clickedLabel.value = target.selected.label.map(label => dayjs(label).format('YYYY-MM-DD'));
     };
 
-    const addRandomChartData = () => {
+    const addRandomChartData = (ix) => {
       timeValue = dayjs(timeValue).add(1, 'day');
       const date = dayjs(timeValue);
 
@@ -142,18 +142,28 @@ export default {
       const val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       const val4 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
 
-      Object.values(chartData.data).forEach((seriesData, idx) => {
-        seriesData.push(idx ? val : val2);
-      });
+      if (ix >= 2) {
+        Object.values(chartData.data).forEach((seriesData, idx) => {
+          seriesData.push(idx ? val : val2);
+        });
 
-      Object.values(chartData2.data).forEach((seriesData, idx) => {
-        seriesData.push(idx ? val3 : val4);
-      });
+        Object.values(chartData2.data).forEach((seriesData, idx) => {
+          seriesData.push(idx ? val3 : val4);
+        });
+      } else {
+        Object.values(chartData.data).forEach((seriesData, idx) => {
+          seriesData.push(null);
+        });
+
+        Object.values(chartData2.data).forEach((seriesData, idx) => {
+          seriesData.push(null);
+        });
+      }
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < 500; ix++) {
-        addRandomChartData();
+      for (let ix = 0; ix < 10; ix++) {
+        addRandomChartData(ix);
       }
     });
 

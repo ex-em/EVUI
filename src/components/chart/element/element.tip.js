@@ -18,9 +18,13 @@ const modules = {
     let maxArgs;
     let isExistSelectedLabel;
 
-    const executeDrawTip = (tipOpt) => {
+    if (labelTipOpt.use && labelTipOpt.showTip) {
+      isExistSelectedLabel = this.drawLabelTip();
+    }
+
+    const executeDrawIndicator = (tipOpt) => {
       tipLocationInfo.forEach((tipInfo) => {
-        if (tipInfo && !isExistSelectedLabel) {
+        if (tipInfo) {
           const seriesInfo = this.seriesList[tipInfo?.sId];
 
           if (!seriesInfo?.show) {
@@ -64,11 +68,11 @@ const modules = {
       });
     };
 
-    if (tipLocationInfo) {
+    if (tipLocationInfo && !isExistSelectedLabel) {
       if (selTipOpt.use) {
-        executeDrawTip(selTipOpt);
-      } else if (labelTipOpt.use) {
-        executeDrawTip(labelTipOpt);
+        executeDrawIndicator(selTipOpt);
+      } else if (labelTipOpt.use && opt.type === 'line') {
+        executeDrawIndicator(labelTipOpt);
       }
     }
 
