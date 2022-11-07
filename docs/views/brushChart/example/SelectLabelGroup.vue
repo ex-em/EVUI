@@ -130,39 +130,39 @@ export default {
       clickedLabel.value = target.selected.label.map(label => dayjs(label).format('YYYY-MM-DD'));
     };
 
-    const addRandomChartData = (ix) => {
+    const addRandomChartLabel = () => {
       timeValue = dayjs(timeValue).add(1, 'day');
       const date = dayjs(timeValue);
 
       chartData.labels.push(date);
       chartData2.labels.push(date);
+    };
 
-      const val = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val2 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val4 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+    const addRandomChartData = (ix) => {
+      let val;
+      let val2;
+      let val3;
+      let val4;
 
-      if (ix >= 2) {
-        Object.values(chartData.data).forEach((seriesData, idx) => {
-          seriesData.push(idx ? val : val2);
-        });
-
-        Object.values(chartData2.data).forEach((seriesData, idx) => {
-          seriesData.push(idx ? val3 : val4);
-        });
-      } else {
-        Object.values(chartData.data).forEach((seriesData) => {
-          seriesData.push(null);
-        });
-
-        Object.values(chartData2.data).forEach((seriesData) => {
-          seriesData.push(null);
-        });
+      if (ix >= 3) {
+        val = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+        val2 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+        val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+        val4 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
       }
+
+      Object.values(chartData.data).forEach((seriesData, idx) => {
+        seriesData.push(idx ? val : val2);
+      });
+
+      Object.values(chartData2.data).forEach((seriesData, idx) => {
+        seriesData.push(idx ? val3 : val4);
+      });
     };
 
     onMounted(() => {
       for (let ix = 0; ix < 10; ix++) {
+        addRandomChartLabel();
         addRandomChartData(ix);
       }
     });
