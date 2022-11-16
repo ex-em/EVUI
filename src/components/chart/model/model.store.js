@@ -797,7 +797,7 @@ const modules = {
 
     let labelIndex;
     let hitInfo;
-    if (scale.labels) {
+    if (scale?.labels?.length) {
       const labelGap = (endPoint - startPoint) / scale.labels.length;
       const index = Math.floor(((horizontal ? y : x) - startPoint) / labelGap);
       labelIndex = scale.labels.length > index ? index : -1;
