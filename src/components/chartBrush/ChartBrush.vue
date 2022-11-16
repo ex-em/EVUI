@@ -160,7 +160,7 @@ export default {
 
           const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-          if (seriesList) {
+          if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
             Object.keys(data.series).forEach((series) => {
               if (!('show' in data.series[series])) {
                 data.series[series].show = seriesList[series]?.show ?? true;
@@ -242,7 +242,7 @@ export default {
         if (evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1) {
           const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-          if (seriesList) {
+          if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
             Object.keys(evChartData.value.series).forEach((series) => {
               if (!('show' in evChartData.value.series[series])) {
                 evChartData.value.series[series].show = seriesList[series]?.show ?? true;
