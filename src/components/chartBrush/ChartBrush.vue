@@ -162,7 +162,9 @@ export default {
 
           if (seriesList) {
             Object.keys(data.series).forEach((series) => {
-              data.series[series].show = seriesList[series].show;
+              if (!('show' in data.series[series])) {
+                data.series[series].show = seriesList[series]?.show ?? true;
+              }
             });
           }
 
@@ -242,7 +244,9 @@ export default {
 
           if (seriesList) {
             Object.keys(evChartData.value.series).forEach((series) => {
-              evChartData.value.series[series].show = seriesList[series].show;
+              if (!('show' in evChartData.value.series[series])) {
+                evChartData.value.series[series].show = seriesList[series]?.show ?? true;
+              }
             });
           }
 

@@ -72,10 +72,11 @@ const zoomEndIdx = ref(0);
 | zoom            | Object | ([상세](#zoom)) | 차트 줌 설정 |                              |
 
 #### zoom
-| 이름              | 타입 | 디폴트              | 설명                     | 종류(예시)                       | 
-|-----------------|------------------|--------------------|------------------------|---------------------------------------------------|
-| toolbar         | Object | ([상세](#toolbar)) | 차트 줌을 제어할 수 있는 toolbar |                              |
-| bufferMemoryCnt | Number | 100             | 차트 줌 버퍼 메모리 제한 설정      | 100이면 최신 100개의 zoom 기록만 저장 됨 |
+| 이름                 | 타입 | 디폴트              | 설명                         | 종류(예시)                       | 
+|--------------------|------------------|--------------------|----------------------------|---------------------------------------------------|
+| toolbar            | Object | ([상세](#toolbar)) | 차트 줌을 제어할 수 있는 toolbar     |                              |
+| bufferMemoryCnt    | Number | 100             | 차트 줌 버퍼 메모리 제한 설정          | 100이면 최신 100개의 zoom 기록만 저장 됨 |
+| useResetZoomMemory | Boolean | true             | 데이트 업데이트시 줌 메모리를 초기화 할지 설정 |  |
 
 #### toolbar
 | 이름    | 타입      | 디폴트            | 설명                                         | 종류(예시) |
@@ -104,6 +105,7 @@ const zoomEndIdx = ref(0);
 const options = {
     zoom: {
     bufferMemoryCnt: 100,
+    useResetZoomMemory: true,
     toolbar: {
       show: true,
       items: {

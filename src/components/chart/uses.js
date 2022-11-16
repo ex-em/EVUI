@@ -166,6 +166,7 @@ const DEFAULT_OPTIONS = {
   },
   zoom: {
     bufferMemoryCnt: 100,
+    useResetZoomMemory: true,
     toolbar: {
       show: false,
       items: {
@@ -488,22 +489,29 @@ export const useZoomModel = (
   const setDataForUseZoom = (newData) => {
     if (!isExecuteZoom.value) {
       evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
-      isUseZoomMode.value = false;
 
-      setEvChartOptions();
+      if (evChartZoomOptions.zoom.useResetZoomMemory) {
+        isUseZoomMode.value = false;
 
-      brushIdx.end = -1;
-      for (let i = 0; i < brushChartIdx.value.length; i++) {
-        const data = evChartClone.data[brushChartIdx.value[i]];
+        setEvChartOptions();
 
-        if (data.labels.length) {
-          brushIdx.start = 0;
-          brushIdx.end = data.labels.length - 1;
+        brushIdx.end = -1;
+        for (let i = 0; i < brushChartIdx.value.length; i++) {
+          const data = evChartClone.data[brushChartIdx.value[i]];
+
+          if (data.labels.length) {
+            brushIdx.start = 0;
+            brushIdx.end = data.labels.length - 1;
+          }
         }
       }
 
       if (evChartZoom) {
-        evChartZoom.updateEvChartCloneData(evChartClone, isUseZoomMode.value);
+        evChartZoom.updateEvChartCloneData(
+          evChartClone,
+          isUseZoomMode.value,
+          evChartZoomOptions.zoom.useResetZoomMemory,
+        );
       }
     }
 
