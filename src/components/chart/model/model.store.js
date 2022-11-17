@@ -993,7 +993,7 @@ const modules = {
         || !Util.checkSafeInteger(total)
         || !Util.checkSafeInteger(last)
       ) {
-        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less then -9007199254740991.');
+        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less than -9007199254740991.');
       }
 
       aggregationDataSet[sId] = { min, max, avg, total, last };
