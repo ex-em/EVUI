@@ -48,6 +48,7 @@ export default {
 
     const chartGroupOptions = reactive({
       zoom: {
+        useResetZoomMemory: false,
         toolbar: {
           show: isShowToolbar,
         },
@@ -109,7 +110,7 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < Math.ceil(Math.random() * 1000); ix++) {
+      for (let ix = 0; ix < 100; ix++) {
         addRandomChartData();
       }
     });
@@ -128,7 +129,7 @@ export default {
 
       init(chartData);
 
-      for (let ix = 0; ix < Math.ceil(Math.random() * 1000); ix++) {
+      for (let ix = 0; ix < 100; ix++) {
         addRandomChartData();
       }
     };

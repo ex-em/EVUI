@@ -494,21 +494,12 @@ export const useZoomModel = (
         isUseZoomMode.value = false;
 
         setEvChartOptions();
-
-        brushIdx.end = -1;
-        for (let i = 0; i < brushChartIdx.value.length; i++) {
-          const data = evChartClone.data[brushChartIdx.value[i]];
-
-          if (data.labels.length) {
-            brushIdx.start = 0;
-            brushIdx.end = data.labels.length - 1;
-          }
-        }
       }
 
       if (evChartZoom) {
         evChartZoom.updateEvChartCloneData(
           evChartClone,
+          brushChartIdx,
           isUseZoomMode.value,
           evChartZoomOptions.zoom.useResetZoomMemory,
         );
