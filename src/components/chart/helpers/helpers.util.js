@@ -336,11 +336,14 @@ export default {
     });
   },
 
+  /**
+   * Check the value exceeds 9007199254740991 or less than -9007199254740991
+   * null =>  safe Integer
+   * string and undefined => Not Safe Integer
+   * @param {any} value
+   * @returns {boolean}
+   */
   checkSafeInteger(value) {
-    if (value === null || value === undefined) {
-      return false;
-    }
-
     return value <= Number.MAX_SAFE_INTEGER && value >= Number.MIN_SAFE_INTEGER;
   },
 };
