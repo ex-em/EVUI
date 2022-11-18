@@ -790,18 +790,28 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    const scale = this.options.horizontal ? this.axesY[0] : this.axesX[0];
+    const { horizontal, selectLabel } = this.options;
+    const scale = horizontal ? this.axesY[0] : this.axesX[0];
     const startPoint = aPos[scale.units.rectStart];
     const endPoint = aPos[scale.units.rectEnd];
 
     let labelIndex;
     let hitInfo;
-    if (scale.labels) {
+    if (scale?.labels?.length) {
       const labelGap = (endPoint - startPoint) / scale.labels.length;
-      const index = Math.floor(((this.options.horizontal ? y : x) - startPoint) / labelGap);
+      const index = Math.floor(((horizontal ? y : x) - startPoint) / labelGap);
       labelIndex = scale.labels.length > index ? index : -1;
     } else {
-      hitInfo = this.getItemByPosition(offset, this.options.selectLabel.useApproximateValue);
+      let offsetX;
+      if (x < startPoint) {
+        offsetX = startPoint;
+      } else if (x > endPoint) {
+        offsetX = endPoint;
+      } else {
+        offsetX = x;
+      }
+
+      hitInfo = this.getItemByPosition([offsetX, y], selectLabel?.useApproximateValue);
       labelIndex = hitInfo.maxIndex ?? -1;
     }
 
@@ -993,7 +1003,7 @@ const modules = {
         || !Util.checkSafeInteger(total)
         || !Util.checkSafeInteger(last)
       ) {
-        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less then -9007199254740991.');
+        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less than -9007199254740991.');
       }
 
       aggregationDataSet[sId] = { min, max, avg, total, last };

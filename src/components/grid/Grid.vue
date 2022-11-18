@@ -82,6 +82,7 @@
                 'margin-right': (orderedColumns.length - 1 === index
                 && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
+              @click.stop="onSort(column)"
             >
               <!-- Filter Status -->
               <span
@@ -94,7 +95,6 @@
               <span
                 :title="column.caption"
                 class="column-name"
-                @click.stop="onSort(column)"
               >
                 {{ column.caption }}
               </span>
@@ -113,7 +113,7 @@
               <span
                 v-if="isFiltering"
                 class="column-filter"
-                @click.capture="onClickFilter(column)"
+                @click.stop="onClickFilter(column)"
               >
                 <ev-icon icon="ev-icon-hamburger2"/>
               </span>
