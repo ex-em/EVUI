@@ -549,7 +549,11 @@ const modules = {
         return null;
       }
 
-      itemPosition = [this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate)];
+      itemPosition = [this.getItemByPosition(
+        [dataInfo.xp, dataInfo.yp],
+        useApproximate,
+        dataIndex,
+      )];
     } else {
       const seriesList = Object.entries(this.seriesList);
       let firShowSeriesID;
@@ -570,7 +574,11 @@ const modules = {
           return null;
         }
 
-        return this.getItemByPosition([dataInfo?.xp ?? 0, dataInfo?.yp ?? 0], useApproximate);
+        return this.getItemByPosition(
+          [dataInfo?.xp ?? 0, dataInfo?.yp ?? 0],
+          useApproximate,
+          idx,
+        );
       });
     }
 
@@ -596,10 +604,10 @@ const modules = {
    * Find graph item by position x and y
    * @param {array}   offset          position x and y
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
-   *
+   * @param {number} dataIndex        selected data index
    * @returns {object} clicked item information
    */
-  getItemByPosition(offset, useApproximate = false) {
+  getItemByPosition(offset, useApproximate = false, dataIndex) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -618,7 +626,7 @@ const modules = {
       const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
-        const item = findFn.call(series, offset, isHorizontal);
+        const item = findFn.call(series, offset, isHorizontal, dataIndex);
         const data = item.data;
         const index = item.index;
 
@@ -790,6 +798,10 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
+    const seiresList = this.data.series;
+    const pointSize = Object.values(seiresList).sort(
+      (a, b) => b.pointSize ?? 0 - a.pointSize ?? 0,
+    )[0]?.pointSize ?? 3; // default pointSize 3
     const { horizontal, selectLabel } = this.options;
     const scale = horizontal ? this.axesY[0] : this.axesX[0];
     const startPoint = aPos[scale.units.rectStart];
@@ -803,15 +815,22 @@ const modules = {
       labelIndex = scale.labels.length > index ? index : -1;
     } else {
       let offsetX;
-      if (x < startPoint) {
+      let dataIndex;
+      if (x < startPoint - pointSize) {
         offsetX = startPoint;
-      } else if (x > endPoint) {
+        dataIndex = 0;
+      } else if (x > endPoint + pointSize) {
         offsetX = endPoint;
+        dataIndex = this.data.labels.length - 1;
       } else {
         offsetX = x;
       }
 
-      hitInfo = this.getItemByPosition([offsetX, y], selectLabel?.useApproximateValue);
+      hitInfo = this.getItemByPosition(
+        [offsetX, y],
+        selectLabel?.useApproximateValue,
+        dataIndex,
+      );
       labelIndex = hitInfo.maxIndex ?? -1;
     }
 
