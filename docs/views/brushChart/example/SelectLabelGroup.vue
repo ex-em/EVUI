@@ -89,7 +89,7 @@ export default {
         useClick: true,
         limit: 2,
         useDeselectOverflow: true,
-        useApproximateValue: true,
+        useApproximateValue: false,
         tipBackground: '#FF0000',
         useSeriesOpacity: false,
         useLabelOpacity: false,
