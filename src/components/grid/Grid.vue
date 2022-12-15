@@ -609,6 +609,7 @@ export default {
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
+        onResize();
       }, { deep: true },
     );
     watch(
