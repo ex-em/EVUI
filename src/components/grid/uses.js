@@ -176,6 +176,7 @@ export const resizeEvent = (params) => {
     if (resizeInfo.adjust) {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
+      const elHeight = bodyEl.offsetHeight;
       const result = stores.orderedColumns.reduce((acc, cur) => {
         if (cur.hide) {
           return acc;
@@ -192,7 +193,9 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      elWidth -= resizeInfo.scrollWidth;
+      if (resizeInfo.rowHeight * props.rows.length > elHeight) {
+        elWidth -= resizeInfo.scrollWidth;
+      }
 
       if (checkInfo.useCheckbox.use) {
         elWidth -= resizeInfo.minWidth;
