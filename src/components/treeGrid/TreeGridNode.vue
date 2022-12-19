@@ -33,13 +33,13 @@
         <div>
           <!--Level Depth-->
           <span
-            v-if="cellIndex === $props.treeLevelIndex"
+            v-if="cellIndex === expandColumnIdx"
             :style="getDepthStyle(node.level)"
           >
           </span>
           <!--Expand Icon-->
           <span
-            v-if="cellIndex === $props.treeLevelIndex"
+            v-if="cellIndex === expandColumnIdx"
             :class="{
               expand: node.expand,
               'ev-tree-toggle': true
@@ -63,7 +63,7 @@
           </span>
           <!--Data Icon-->
           <span
-            v-if="cellIndex === $props.treeLevelIndex && isDataIcon"
+            v-if="cellIndex === expandColumnIdx && isDataIcon"
             :title="node[column.field]"
             :class="{
               expand: node.expand,
@@ -149,10 +149,6 @@ export default {
       type: Number,
       default: -1,
     },
-    treeLevelIndex: {
-      type: Number,
-      default: 0,
-    },
   },
   emits: {
     'check-tree-data': null,
@@ -183,6 +179,10 @@ export default {
     const childIconMV = computed(() => (props.childIcon || 'tree-child-icon'));
     const isDataIcon = computed(() => ((parentIconMV.value !== 'none' || childIconMV.value !== 'none')));
 
+    const expandColumnIdx = computed(() => {
+      const expandColumnIndex = props.orderedColumns.findIndex(v => v.expandColumn);
+      return expandColumnIndex > -1 ? expandColumnIndex : 0;
+    });
     const getRowClass = nodeInfo => ({
       row: true,
       'tree-row': true,
@@ -221,6 +221,7 @@ export default {
       node,
       isDataIcon,
       checkboxClass,
+      expandColumnIdx,
       onCheck,
       onExpand,
       onClick,

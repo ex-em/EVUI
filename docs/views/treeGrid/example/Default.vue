@@ -32,7 +32,6 @@
         childIcon: childIconMV,
         page: pageInfo,
         useSummary: true,
-        treeLevelIndex: treeLevelIndexMV,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
@@ -76,12 +75,14 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
-            Tree Level Index
+            Expand Column Index
           </span>
           <ev-input-number
-            v-model="treeLevelIndexMV"
+            v-model="expandColumnMV"
             :step="1"
-            :max="columns.length-1"
+            :max="columns.length - 1"
+            :min="0"
+            @change="changeExpandTreeColumn"
           />
         </div>
         <div class="form-row">
@@ -288,7 +289,7 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
-    const treeLevelIndexMV = ref(0);
+    const expandColumnMV = ref(0);
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
@@ -466,6 +467,12 @@ export default {
         decimal: 1,
       },
     ]);
+    const changeExpandTreeColumn = (idx) => {
+      columns.value.forEach((val) => {
+        delete val.expandColumn;
+      });
+      columns.value[idx] = { ...columns.value[idx], expandColumn: true };
+    };
     const limitItems = ref([
       {
         name: '2',
@@ -524,7 +531,7 @@ export default {
       childIconMV,
       limitItems,
       useSelection,
-      treeLevelIndexMV,
+      expandColumnMV,
       onClickCheckbox,
       onClickButton,
       changeMode,
@@ -535,6 +542,7 @@ export default {
       resetTreeIcon,
       resetDataIcon,
       onReset,
+      changeExpandTreeColumn,
     };
   },
 };
