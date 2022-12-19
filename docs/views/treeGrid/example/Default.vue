@@ -32,6 +32,7 @@
         childIcon: childIconMV,
         page: pageInfo,
         useSummary: true,
+        treeIndex: treeIndexMV,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
@@ -59,8 +60,6 @@
         <ev-toggle
           v-model="stripeMV"
         />
-      </div>
-      <div class="form-rows">
         <span class="badge yellow">
           Use Selection
         </span>
@@ -73,16 +72,30 @@
         <ev-toggle
           v-model="useSelection.multiple"
         />
-        <span class="badge yellow">
-          Limit Count
-        </span>
-        <ev-select
-          v-model="useSelection.limitCount"
-          :items="limitItems"
-          :style="{ width: '200px' }"
-          clearable
-          placeholder="Please select value."
-        />
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
+            Tree Index
+          </span>
+          <ev-input-number
+            v-model="treeIndexMV"
+            :step="1"
+            :max="columns.length-1"
+          />
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">
+            Limit Count
+          </span>
+          <ev-select
+            v-model="useSelection.limitCount"
+            :items="limitItems"
+            :style="{ width: '200px' }"
+            clearable
+            placeholder="Please select value."
+          />
+        </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
@@ -275,6 +288,7 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
+    const treeIndexMV = ref(0);
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
@@ -510,6 +524,7 @@ export default {
       childIconMV,
       limitItems,
       useSelection,
+      treeIndexMV,
       onClickCheckbox,
       onClickButton,
       changeMode,

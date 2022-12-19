@@ -108,6 +108,7 @@
               :min-width="minWidth"
               :highlight-index="highlightIdx"
               :border-style="borderStyle"
+              :tree-index="option.treeIndex"
               @check-tree-data="onCheck"
               @expand-tree-data="handleExpand"
               @click-tree-data="onRowClick"
