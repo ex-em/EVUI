@@ -67,7 +67,7 @@
 |  | collapseIcon     | 'tree-expand-icon' | collapse 상태인 노드의 아이콘                    | `ev-icon`                |
 |  | parentIcon       | 'tree-parent-icon' | 자식 노드가 있는 노드의 아이콘                       | `ev-icon`, 'none'        |
 |  | childIcon        | 'tree-child-icon'  | 자식 노드가 없는 노드의 아이콘                       | `ev-icon`, 'none'        |
-|  | treeIndex        | 0                  | Tree Level 보여줄 수 있는 Index 설정            | Number                   |
+|  | treeLevelIndex        | 0                  | Tree Level 보여줄 수 있는 Index 설정            | Number                   |
 
 
 ### Columns

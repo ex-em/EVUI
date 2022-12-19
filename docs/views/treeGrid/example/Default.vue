@@ -32,7 +32,7 @@
         childIcon: childIconMV,
         page: pageInfo,
         useSummary: true,
-        treeIndex: treeIndexMV,
+        treeLevelIndex: treeLevelIndexMV,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"
@@ -76,10 +76,10 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
-            Tree Index
+            Tree Level Index
           </span>
           <ev-input-number
-            v-model="treeIndexMV"
+            v-model="treeLevelIndexMV"
             :step="1"
             :max="columns.length-1"
           />
@@ -288,7 +288,7 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
-    const treeIndexMV = ref(0);
+    const treeLevelIndexMV = ref(0);
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
@@ -524,7 +524,7 @@ export default {
       childIconMV,
       limitItems,
       useSelection,
-      treeIndexMV,
+      treeLevelIndexMV,
       onClickCheckbox,
       onClickButton,
       changeMode,

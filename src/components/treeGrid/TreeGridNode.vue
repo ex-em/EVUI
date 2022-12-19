@@ -33,13 +33,13 @@
         <div>
           <!--Level Depth-->
           <span
-            v-if="cellIndex === $props.treeIndex"
+            v-if="cellIndex === $props.treeLevelIndex"
             :style="getDepthStyle(node.level)"
           >
           </span>
           <!--Expand Icon-->
           <span
-            v-if="cellIndex === $props.treeIndex"
+            v-if="cellIndex === $props.treeLevelIndex"
             :class="{
               expand: node.expand,
               'ev-tree-toggle': true
@@ -63,7 +63,7 @@
           </span>
           <!--Data Icon-->
           <span
-            v-if="cellIndex === $props.treeIndex && isDataIcon"
+            v-if="cellIndex === $props.treeLevelIndex && isDataIcon"
             :title="node[column.field]"
             :class="{
               expand: node.expand,
@@ -149,7 +149,7 @@ export default {
       type: Number,
       default: -1,
     },
-    treeIndex: {
+    treeLevelIndex: {
       type: Number,
       default: 0,
     },
