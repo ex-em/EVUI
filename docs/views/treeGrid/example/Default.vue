@@ -59,8 +59,6 @@
         <ev-toggle
           v-model="stripeMV"
         />
-      </div>
-      <div class="form-rows">
         <span class="badge yellow">
           Use Selection
         </span>
@@ -73,16 +71,32 @@
         <ev-toggle
           v-model="useSelection.multiple"
         />
-        <span class="badge yellow">
-          Limit Count
-        </span>
-        <ev-select
-          v-model="useSelection.limitCount"
-          :items="limitItems"
-          :style="{ width: '200px' }"
-          clearable
-          placeholder="Please select value."
-        />
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
+            Expand Column Index
+          </span>
+          <ev-input-number
+            v-model="expandColumnMV"
+            :step="1"
+            :max="columns.length - 1"
+            :min="0"
+            @change="changeExpandTreeColumn"
+          />
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">
+            Limit Count
+          </span>
+          <ev-select
+            v-model="useSelection.limitCount"
+            :items="limitItems"
+            :style="{ width: '200px' }"
+            clearable
+            placeholder="Please select value."
+          />
+        </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
@@ -275,6 +289,7 @@ export default {
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
+    const expandColumnMV = ref(0);
     const menuItems = ref([{
         text: 'Menu1',
         click: () => {
@@ -452,6 +467,12 @@ export default {
         decimal: 1,
       },
     ]);
+    const changeExpandTreeColumn = (idx) => {
+      columns.value.forEach((val) => {
+        val.expandColumn = false;
+      });
+      columns.value[idx] = { ...columns.value[idx], expandColumn: true };
+    };
     const limitItems = ref([
       {
         name: '2',
@@ -510,6 +531,7 @@ export default {
       childIconMV,
       limitItems,
       useSelection,
+      expandColumnMV,
       onClickCheckbox,
       onClickButton,
       changeMode,
@@ -520,6 +542,7 @@ export default {
       resetTreeIcon,
       resetDataIcon,
       onReset,
+      changeExpandTreeColumn,
     };
   },
 };
