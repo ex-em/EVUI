@@ -181,7 +181,7 @@ export default {
 
     const expandColumnIdx = computed(() => {
       const expandColumnIndex = props.orderedColumns.findIndex(v => v.expandColumn);
-      return expandColumnIndex > -1 ? expandColumnIndex : 0;
+      return expandColumnIndex > 0 ? expandColumnIndex : 0;
     });
     const getRowClass = nodeInfo => ({
       row: true,
