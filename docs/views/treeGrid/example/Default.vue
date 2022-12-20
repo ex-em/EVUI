@@ -469,7 +469,7 @@ export default {
     ]);
     const changeExpandTreeColumn = (idx) => {
       columns.value.forEach((val) => {
-        delete val.expandColumn;
+        val.expandColumn = false;
       });
       columns.value[idx] = { ...columns.value[idx], expandColumn: true };
     };
