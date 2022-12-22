@@ -349,6 +349,7 @@ const modules = {
     const series = Object.values(this.seriesList)[0];
 
     let isShow = false;
+    let valueText = hitItem.formatted;
     const { colorState, isGradient } = series;
     if (isGradient) {
       const { min, max } = series.valueOpt;
@@ -356,7 +357,9 @@ const modules = {
       const { start, end } = colorState[0];
       isShow = (start <= ratio && ratio <= end) || hitItem.o === -1;
     } else {
-      isShow = colorState.find(({ id }) => id === hitItem.cId)?.show;
+      const colorItem = colorState.find(({ id }) => id === hitItem.cId);
+      isShow = colorItem?.show;
+      valueText = colorItem?.label ?? valueText;
     }
 
     if (!isShow) {
@@ -392,7 +395,6 @@ const modules = {
 
     const itemX = boxPadding.l + 2;
     const itemY = boxPadding.t + TEXT_HEIGHT + 2;
-    const valueText = hitItem.formatted;
 
     ctx.font = fontStyle;
 
