@@ -8,6 +8,8 @@ import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
 import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
+import Custom from './example/Custom';
+import CustomRaw from '!!raw-loader!./example/Custom';
 
 export default {
   mdText,
@@ -27,10 +29,15 @@ export default {
       component: Event,
       parsedData: parseComponent(EventRaw),
     },
-    Gradient: {
+    'Gradient Legend': {
       description: 'gradient 범주로 표현 가능합니다.',
       component: Gradient,
       parsedData: parseComponent(GradientRaw),
+    },
+    'Custom Legend': {
+      description: '범주의 색상, label을 지정할 수 있습니다.',
+      component: Custom,
+      parsedData: parseComponent(CustomRaw),
     },
   },
 };

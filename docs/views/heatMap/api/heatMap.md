@@ -77,7 +77,7 @@ const chartData =
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
-  | heatMapColor | Object | ([상세](#heatMapColor)) | color 옵션 | |
+  | heatMapColor | Object | ([상세](#heatmap-color)) | color 옵션 | |
   
 #### axesX axesY
 ##### type 공통
@@ -90,10 +90,10 @@ const chartData =
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#linear-type) |
-  | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
+  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#step-type) |
+  | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
-  | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
+  | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 | |  
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -107,7 +107,7 @@ const chartData =
 
 ##### step type
 
-##### labelStyle
+##### label style
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | show | Boolean | true | label 표시 여부 | true / false |
@@ -118,7 +118,7 @@ const chartData =
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
 | alignToGridLine | Boolean | false | 축 line에 표시할지의 여부 | |
 
-##### title
+##### axes title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | use | Boolean | false | Chart 축(Axis) Title 표시 여부 | true / false |
@@ -194,14 +194,14 @@ const chartOptions = {
     },
 }
 ```
-
-#### heatMapColor
+#### heatmap color
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
 | min | Hex, RGB, RGBA Code(String) | '#FFFFFF' | min color |  |
 | max | Hex, RGB, RGBA Code(String) | '#5586EB' | max color |  | 
-| categoryCnt | number | 5 | color min - max 그라데이션 분류 개수 | |
-| stroke | object | ([상세](#stroke)) | series stroke 지정 |  |
+| categoryCnt | number | 5 | color min - max 그라데이션 범주 개수 | |
+| categoryColors | Array | [] | 범주별 color, label 지정 | [{ color: '#FFFFFF', label: 'A' }] |
+| stroke | Object | ([상세](#stroke)) | series stroke 지정 |  |
 | error | Hex, RGB, RGBA Code(String) | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 | decimalPoint | number | 0 | 범주 표현 소숫값 처리 | |
 

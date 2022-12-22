@@ -147,8 +147,9 @@ const modules = {
         const { min, max, interval, existError, decimalPoint } = valueOpt;
         const length = colorState.length;
         const endIndex = existError ? length - 2 : length - 1;
+
         for (let index = 0; index < length; index++) {
-          const colorItem = colorState[index];
+          const { id, color, label = '' } = colorState[index];
           const minValue = min + (interval * index);
           let maxValue = minValue + interval;
           if (index < endIndex) {
@@ -157,24 +158,25 @@ const modules = {
             maxValue = max + (0.1 ** decimalPoint);
           }
 
-          let name = `${minValue.toFixed(decimalPoint)} - ${maxValue.toFixed(decimalPoint)}`;
-          if (min === undefined || max === undefined) {
-            if (index === 0) {
-              name = '0';
-            } else {
+          let name = label;
+          if (!name) {
+            name = `${minValue.toFixed(decimalPoint)} - ${maxValue.toFixed(decimalPoint)}`;
+            if (min === undefined || max === undefined) {
+              if (index === 0) {
+                name = '0';
+              } else {
+                break;
+              }
+            } else if (minValue > max) {
               break;
+            } else if (interval <= 1 && decimalPoint === 0) {
+              name = minValue;
             }
-          } else if (existError && index === endIndex + 1) {
-            name = 'error';
-          } else if (minValue > max) {
-            break;
-          } else if (interval <= 1 && decimalPoint === 0) {
-            name = minValue;
           }
 
           this.addLegend({
-            cId: colorItem.id,
-            color: colorItem.color,
+            cId: id,
+            color,
             name,
             show: true,
           });
