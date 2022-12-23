@@ -1,7 +1,7 @@
 <template>
   <ev-chart
-      :data="chartData"
-      :options="chartOptions"
+    :data="chartData"
+    :options="chartOptions"
   />
 </template>
 
@@ -24,7 +24,6 @@ import { onMounted, reactive } from 'vue';
           series1: [],
         },
       });
-
 
       const chartOptions = {
         type: 'heatMap',
