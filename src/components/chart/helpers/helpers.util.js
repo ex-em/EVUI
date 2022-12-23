@@ -129,7 +129,7 @@ export default {
   getLabelStyle(style) {
     const {
       fontStyle = 'normal',
-      fontWeight = 'norma',
+      fontWeight = 'normal',
       fontSize = '12',
       fontFamily = 'Roboto',
     } = style;
