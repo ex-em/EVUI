@@ -197,6 +197,7 @@ const DEFAULT_OPTIONS = {
     min: '#FFFFFF',
     max: '#0052FF',
     categoryCnt: 1,
+    categoryColors: [],
     stroke: {
       show: false,
       color: '#FFFFFF',

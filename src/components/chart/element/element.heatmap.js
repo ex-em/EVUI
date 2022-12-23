@@ -35,7 +35,7 @@ class HeatMap {
   createColorState(colorOpt) {
     const colorState = [];
     const regex = /[^0-9]&[^,]/g;
-    const { min, max, categoryCnt, error, stroke } = colorOpt;
+    const { min, max, categoryCnt, categoryColors, error, stroke } = colorOpt;
 
     const minColor = min.includes('#') ? Util.hexToRgb(min) : min.replace(regex, '');
     const maxColor = max.includes('#') ? Util.hexToRgb(max) : max.replace(regex, '');
@@ -51,6 +51,17 @@ class HeatMap {
         start: 0,
         end: 100,
         selectedValue: null,
+      });
+    } else if (categoryColors.length) {
+      colorOpt.categoryCnt = categoryColors.length;
+      categoryColors.forEach(({ color, label }, ix) => {
+        colorState.push({
+          id: `color#${ix}`,
+          color,
+          label,
+          state: 'normal',
+          show: true,
+        });
       });
     } else {
       const unitR = Math.floor((minR - maxR) / (categoryCnt - 1));

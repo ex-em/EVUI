@@ -450,6 +450,7 @@ const modules = {
         id: `color#${categoryCnt}`,
         color: colorOpt.error,
         state: 'normal',
+        label: 'Error',
         show: true,
       });
     }
