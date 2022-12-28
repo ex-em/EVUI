@@ -398,10 +398,9 @@ const modules = {
       const offset = 6 * (isHorizontal ? 1 : -1);
       const gp = aPos[valueAxes.units.rectEnd] + offset;
 
-      let dp;
       dataIndex?.forEach((index) => {
         const labelCenter = Math.round(labelStartPoint + (labelGap * index));
-        dp = labelCenter + (labelGap / 2);
+        const dp = labelCenter + (labelGap / 2);
 
         this.showTip({
           context: this.bufferCtx,

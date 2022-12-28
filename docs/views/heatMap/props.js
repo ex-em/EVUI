@@ -16,6 +16,11 @@ import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 export default {
   mdText,
   components: {
+    SelectLabel: {
+      description: '범주의 색상, label을 지정할 수 있습니다.',
+      component: SelectLabel,
+      parsedData: parseComponent(SelectLabelRaw),
+    },
     Default: {
       description: 'HeatMap은 데이터의 분포를 색상에 따라 시각적으로 인지하도록 합니다',
       component: Default,
@@ -40,11 +45,6 @@ export default {
       description: '범주의 색상, label을 지정할 수 있습니다.',
       component: Category,
       parsedData: parseComponent(CategoryRaw),
-    },
-    SelectLabel: {
-      description: '범주의 색상, label을 지정할 수 있습니다.',
-      component: SelectLabel,
-      parsedData: parseComponent(SelectLabelRaw),
     },
   },
 };

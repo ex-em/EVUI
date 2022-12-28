@@ -75,10 +75,8 @@
 
 <script>
 import { reactive, ref, watch } from 'vue';
-import EvInputNumber from '../../../../src/components/inputNumber/InputNumber';
 
   export default {
-    components: { EvInputNumber },
     setup() {
       const timeList = ['04-06', '06-09', '09-11', '11-14', '14-16', '16-18', '18-21', '21-24', '24-04'];
       const dayList = ['Weekday', 'Saturday', 'Sunday'];
@@ -229,7 +227,6 @@ import EvInputNumber from '../../../../src/components/inputNumber/InputNumber';
         },
       });
 
-
       const chartOptions2 = reactive({
         type: 'heatMap',
         width: '100%',
@@ -325,14 +322,13 @@ import EvInputNumber from '../../../../src/components/inputNumber/InputNumber';
       };
 
       watch(isLive, (newVal) => {
-          if (newVal) {
-            addRandomChartData();
-            liveInterval = setInterval(addRandomChartData, 2000);
-          } else {
-            clearInterval(liveInterval);
-          }
-        },
-      );
+        if (newVal) {
+          addRandomChartData();
+          liveInterval = setInterval(addRandomChartData, 2000);
+        } else {
+          clearInterval(liveInterval);
+        }
+      });
 
       return {
         chartData1,
