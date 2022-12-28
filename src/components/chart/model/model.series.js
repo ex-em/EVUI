@@ -56,7 +56,7 @@ const modules = {
       this.seriesInfo.charts.heatMap.push(id);
       const { heatMapColor, legend } = this.options;
       const isGradient = legend.type === 'gradient';
-      return new HeatMap(id, opt, heatMapColor, isGradient);
+      return new HeatMap(id, opt, heatMapColor, isHorizontal, isGradient);
     }
 
     return false;

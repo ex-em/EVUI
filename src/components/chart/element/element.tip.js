@@ -19,7 +19,8 @@ const modules = {
     let isExistSelectedLabel;
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
-      isExistSelectedLabel = this.drawLabelTip();
+      const isHeatMap = opt.type === 'heatMap';
+      isExistSelectedLabel = isHeatMap ? this.drawLabelTipForHeatMap() : this.drawLabelTip();
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -365,6 +366,56 @@ const modules = {
 
     return drawTip;
   },
+
+  /**
+   * Draw Selected Label Tip
+   * @returns {boolean} Whether drew at least one tip
+   */
+  drawLabelTipForHeatMap() {
+    const opt = this.options;
+    const isHorizontal = !!opt.horizontal;
+    const labelTipOpt = opt.selectLabel;
+    const { dataIndex } = this.defaultSelectInfo;
+    let drawTip = false;
+
+    if (dataIndex) {
+      drawTip = true;
+
+      const chartRect = this.chartRect;
+      const labelOffset = this.labelOffset;
+      const aPos = {
+        x1: chartRect.x1 + labelOffset.left,
+        x2: chartRect.x2 - labelOffset.right,
+        y1: chartRect.y1 + labelOffset.top,
+        y2: chartRect.y2 - labelOffset.bottom,
+      };
+      const labelAxes = isHorizontal ? this.axesY[0] : this.axesX[0];
+      const labelStartPoint = aPos[labelAxes.units.rectStart];
+      const labelEndPoint = aPos[labelAxes.units.rectEnd];
+      const labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
+
+      const valueAxes = isHorizontal ? this.axesX[0] : this.axesY[0];
+      const offset = 6 * (isHorizontal ? 1 : -1);
+      const gp = aPos[valueAxes.units.rectEnd] + offset;
+
+      let dp;
+      dataIndex?.forEach((index) => {
+        const labelCenter = Math.round(labelStartPoint + (labelGap * index));
+        dp = labelCenter + (labelGap / 2);
+
+        this.showTip({
+          context: this.bufferCtx,
+          x: isHorizontal ? gp : dp,
+          y: isHorizontal ? dp : gp,
+          opt: labelTipOpt,
+          isSamePos: false,
+        });
+      });
+    }
+
+    return drawTip;
+  },
+
   /**
    * Calculate x, y position to draw text tip
    * @param {object} param     object for drawing text tip

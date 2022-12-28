@@ -420,7 +420,7 @@ const modules = {
   getSeriesValueOptForHeatMap(series) {
     const { data, colorState, isGradient } = series;
     const colorOpt = this.options.heatMapColor;
-    const categoryCnt = colorOpt.categoryCnt;
+    const categoryCnt = colorOpt.categoryColors.length || colorOpt.categoryCnt;
     const decimalPoint = colorOpt.decimalPoint;
 
     let minValue;
