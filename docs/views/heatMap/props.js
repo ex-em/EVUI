@@ -42,7 +42,7 @@ export default {
       parsedData: parseComponent(CategoryRaw),
     },
     SelectLabel: {
-      description: '범주의 색상, label을 지정할 수 있습니다.',
+      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: SelectLabel,
       parsedData: parseComponent(SelectLabelRaw),
     },
