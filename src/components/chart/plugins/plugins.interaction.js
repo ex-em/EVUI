@@ -619,10 +619,16 @@ const modules = {
    */
   initSelectedInfo() {
     if (this.options.selectLabel.use) {
-      const { limit } = this.options.selectLabel;
       if (!this.defaultSelectInfo) {
         this.defaultSelectInfo = { dataIndex: [] };
       }
+
+      if (this.options.type === 'heatMap') {
+        this.initSelectedInfoForHeatMap();
+        return;
+      }
+
+      const { limit } = this.options.selectLabel;
       const infoObj = this.defaultSelectInfo;
       infoObj.dataIndex.splice(limit);
       infoObj.label = infoObj.dataIndex.map(i => this.data.labels[i]);
@@ -634,6 +640,26 @@ const modules = {
         this.defaultSelectInfo = { seriesId: [] };
       }
     }
+  },
+
+  /**
+   * init defaultSelectInfo object for HeatMap.
+   * - at selectLabel using: set each series data and label text
+   */
+  initSelectedInfoForHeatMap() {
+    const { limit } = this.options.selectLabel;
+    const isHorizontal = this.options.horizontal;
+
+    const infoObj = this.defaultSelectInfo;
+    infoObj.dataIndex.splice(limit);
+
+    const targetLabel = isHorizontal ? 'y' : 'x';
+    infoObj.label = infoObj.dataIndex.map(i => this.data.labels[targetLabel][i]);
+
+    const dataValues = Object.values(this.data.data)[0];
+    infoObj.data = dataValues.filter(({ x, y }) =>
+      (infoObj.label.includes(isHorizontal ? y : x)),
+    );
   },
 
   /**

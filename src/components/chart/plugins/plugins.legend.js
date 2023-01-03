@@ -427,6 +427,7 @@ const modules = {
       }
 
       const targetId = targetDOM?.series?.cId;
+      const legendHitInfo = { sId: targetId, type: this.options.type };
 
       series.colorState.forEach((colorItem) => {
         colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
@@ -435,6 +436,9 @@ const modules = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
+        hitInfo: {
+          legend: legendHitInfo,
+        },
       });
     };
 

@@ -4,12 +4,13 @@ import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 import { convertToPercent } from '../../../common/utils';
 
 class HeatMap {
-  constructor(sId, opt, colorOpt, isGradient) {
+  constructor(sId, opt, colorOpt, isHorizontal, isGradient) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
       Object.keys(merged).forEach((key) => {
         this[key] = merged[key];
     });
 
+    this.isHorizontal = isHorizontal;
     this.isGradient = isGradient;
     this.createColorState(colorOpt);
 
@@ -53,7 +54,6 @@ class HeatMap {
         selectedValue: null,
       });
     } else if (categoryColors.length) {
-      colorOpt.categoryCnt = categoryColors.length;
       categoryColors.forEach(({ color, label }, ix) => {
         colorState.push({
           id: `color#${ix}`,
@@ -120,7 +120,7 @@ class HeatMap {
     const { min, max } = this.valueOpt;
     const itemInfo = {
       show: false,
-      opacity: 0,
+      opacity: 1,
       dataColor: null,
       id: null,
       isHighlight: null,
@@ -132,7 +132,6 @@ class HeatMap {
         itemInfo.show = true;
         itemInfo.isHighlight = selectedValue !== null
           && (Math.floor(value) === Math.floor(min + ((max - min) * (selectedValue / 100))));
-        itemInfo.opacity = 1;
         itemInfo.dataColor = value < 0
           ? this.errorColor : this.getColorForGradient(ratio);
       }
@@ -151,12 +150,17 @@ class HeatMap {
     ctx.beginPath();
     if (this.stroke.show) {
       const { radius } = this.stroke;
-      if (radius > 0 && radius < h && radius < w) {
-        ctx.moveTo(x + radius, y);
-        ctx.arcTo(x + w, y, x + w, y + h, radius);
-        ctx.arcTo(x + w, y + h, x, y + h, radius);
-        ctx.arcTo(x, y + h, x, y, radius);
-        ctx.arcTo(x, y, x + w, y, radius);
+      if (radius > 0) {
+        const minSize = Math.min(w, h);
+        let borderRadius = radius;
+        if (borderRadius > (minSize / 2)) {
+          borderRadius = Math.floor(minSize / 2);
+        }
+        ctx.moveTo(x, y);
+        ctx.arcTo(x + w, y, x + w, y + h, borderRadius);
+        ctx.arcTo(x + w, y + h, x, y + h, borderRadius);
+        ctx.arcTo(x, y + h, x, y, borderRadius);
+        ctx.arcTo(x, y, x + w, y, borderRadius);
         ctx.fill();
       } else {
         ctx.strokeRect(x, y, w, h);
@@ -204,7 +208,14 @@ class HeatMap {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, overlayCtx } = param;
+    const {
+      ctx,
+      chartRect,
+      labelOffset,
+      overlayCtx,
+      selectLabel,
+      legendHitInfo,
+    } = param;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
@@ -220,16 +231,35 @@ class HeatMap {
       let yp = this.calculateXY('y', item.y, ysp);
       let w = this.size.w;
       let h = this.size.h;
+
       const value = item.o;
 
       if (xp !== null && yp !== null
          && (value !== null && value !== undefined)) {
-        const { show, opacity, dataColor, id, isHighlight } = this.getItemInfo(value);
+        const {
+          show,
+          opacity,
+          dataColor,
+          id,
+          isHighlight,
+        } = this.getItemInfo(value);
+
         item.dataColor = dataColor;
         item.cId = id;
         ctx.save();
+
+        const selectLabelOption = selectLabel?.option;
+        const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
+        let itemOpacity = opacity;
+        if (!legendHitInfo && useSelectLabel) {
+          const selectedLabelList = selectLabel?.selected?.label;
+          const isDownplay = selectedLabelList.length
+            && !selectedLabelList.includes(this.isHorizontal ? item.y : item.x);
+          itemOpacity = isDownplay ? 0.1 : 1;
+        }
+
         if (show) {
-          ctx.fillStyle = Util.colorStringToRgba(item.dataColor, opacity);
+          ctx.fillStyle = Util.colorStringToRgba(item.dataColor, itemOpacity);
           if (this.stroke.show) {
             const { color, lineWidth, opacity: sOpacity } = this.stroke;
             ctx.strokeStyle = Util.colorStringToRgba(
@@ -237,8 +267,8 @@ class HeatMap {
               opacity === 1 ? sOpacity : opacity,
             );
             ctx.lineWidth = lineWidth;
-            xp += (lineWidth * 1.5);
-            yp += (lineWidth * 1.5);
+            xp += (lineWidth * 2);
+            yp += (lineWidth);
             w -= (lineWidth * 2);
             h -= (lineWidth * 2);
           }

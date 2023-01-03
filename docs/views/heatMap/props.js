@@ -10,6 +10,8 @@ import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
 import Category from './example/Category';
 import CategoryRaw from '!!raw-loader!./example/Category';
+import SelectLabel from './example/SelectLabel';
+import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 
 export default {
   mdText,
@@ -38,6 +40,11 @@ export default {
       description: '범주의 색상, label을 지정할 수 있습니다.',
       component: Category,
       parsedData: parseComponent(CategoryRaw),
+    },
+    SelectLabel: {
+      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
+      component: SelectLabel,
+      parsedData: parseComponent(SelectLabelRaw),
     },
   },
 };

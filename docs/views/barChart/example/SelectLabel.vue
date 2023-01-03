@@ -332,7 +332,10 @@ export default {
 
     const toggleSelectData = () => {
       const arr = defaultSelectLabel.value.dataIndex;
-      arr.push((arr.pop() + 1) % 5);
+      const newIndex = (arr.pop() + 1) % 9;
+      if (!arr.includes(newIndex)) {
+        arr.push(newIndex);
+      }
     };
 
     const toggleOverflow = () => {

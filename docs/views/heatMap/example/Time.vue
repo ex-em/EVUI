@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -43,28 +43,7 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
           y: [0, 1, 2, 3, 4, 5],
         },
         data: {
-          series1: [
-            { x: dayjs(timeValue), y: 0, value: 0 },
-            { x: dayjs(timeValue), y: 1, value: 22 },
-            { x: dayjs(timeValue), y: 3, value: 15 },
-            { x: dayjs(timeValue), y: 4, value: 8 },
-            { x: dayjs(timeValue), y: 5, value: 10 },
-            { x: dayjs(timeValue).add(2, 'second'), y: 0, value: 42 },
-            { x: dayjs(timeValue).add(2, 'second'), y: 2, value: 11 },
-            { x: dayjs(timeValue).add(2, 'second'), y: 3, value: 22 },
-            { x: dayjs(timeValue).add(2, 'second'), y: 5, value: 15 },
-            { x: dayjs(timeValue).add(4, 'second'), y: 0, value: 36 },
-            { x: dayjs(timeValue).add(4, 'second'), y: 1, value: 25 },
-            { x: dayjs(timeValue).add(4, 'second'), y: 3, value: 13 },
-            { x: dayjs(timeValue).add(4, 'second'), y: 4, value: 9 },
-            { x: dayjs(timeValue).add(6, 'second'), y: 0, value: 45 },
-            { x: dayjs(timeValue).add(6, 'second'), y: 2, value: 39 },
-            { x: dayjs(timeValue).add(6, 'second'), y: 3, value: 3 },
-            { x: dayjs(timeValue).add(8, 'second'), y: 0, value: 50 },
-            { x: dayjs(timeValue).add(8, 'second'), y: 1, value: 44 },
-            { x: dayjs(timeValue).add(8, 'second'), y: 4, value: 2 },
-            { x: dayjs(timeValue).add(8, 'second'), y: 5, value: 8 },
-          ],
+          series1: [],
         },
       });
 
@@ -134,32 +113,43 @@ import { onBeforeUnmount, reactive, ref, watch } from 'vue';
         timeValue = dayjs(timeValue).add(2, 'second');
         chartData.labels.x.push(timeValue);
 
-        for (let iv = 0; iv <= 5; iv++) {
-          const yRandomIndex = Math.floor(Math.random() * 6);
-          const yValue = chartData.labels.y[yRandomIndex];
-          const randomValue = Math.floor(Math.random() * 50);
-          const item = {
+        const labelY = chartData.labels.y;
+        for (let iy = 0; iy < labelY.length; iy++) {
+          const randomCount = Math.floor(Math.random() * 50) + 1;
+          chartData.data.series1.push({
             x: timeValue,
-            y: yValue,
-            value: randomValue,
-          };
-
-          // eslint-disable-next-line no-loop-func
-          const targetIndex = seriesData.findIndex(({ x, y }) =>
-              new Date(x).getTime() === new Date(timeValue).getTime() && y === yValue);
-          if (targetIndex === -1) {
-            seriesData.push(item);
-          }
+            y: labelY[iy],
+            value: randomCount,
+          });
         }
       };
 
       watch(isLive, (newValue) => {
         if (newValue) {
           addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 2000);
+          liveInterval.value = setInterval(addRandomChartData, 1000);
         } else {
           clearInterval(liveInterval.value);
         }
+      });
+
+      const createChartData = () => {
+        const labelX = chartData.labels.x;
+        const labelY = chartData.labels.y;
+        for (let ix = 0; ix < labelX.length; ix++) {
+          for (let iy = 0; iy < labelY.length; iy++) {
+            const randomCount = Math.floor(Math.random() * 50) + 1;
+            chartData.data.series1.push({
+              x: dayjs(labelX[ix]),
+              y: labelY[iy],
+              value: randomCount,
+            });
+          }
+        }
+      };
+
+      onMounted(() => {
+        createChartData();
       });
 
       onBeforeUnmount(() => {
