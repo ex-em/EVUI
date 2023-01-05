@@ -1,11 +1,11 @@
 <template>
   <div class="case">
     <ev-chart
-        ref="evChartRef"
-        v-model:selectedItem="defaultSelectItem"
-        :data="chartData"
-        :options="chartOptions"
-        @click="onClick"
+      ref="evChartRef"
+      v-model:selectedItem="defaultSelectItem"
+      :data="chartData"
+      :options="chartOptions"
+      @click="onClick"
     />
     <div class="description">
       <div class="option">
@@ -15,6 +15,18 @@
       <div class="option">
         <ev-toggle v-model="showBorder" />
         <span>showBorder</span>
+      </div>
+      <div class="option">
+        <ev-toggle v-model="useClick" />
+        <span>클릭 기능 enable ( false 일때는 v-model 값으로만 변경 )</span>
+      </div>
+      <div class="option">
+        <ev-button @click="updateSelectedItem">
+          select by v-model
+        </ev-button>
+        <span>
+          차트 클릭이 아닌 v-model:selectedItem 에 바인딩한 dataIndex를 변경하여 항목 선택
+        </span>
       </div>
       <div>
         <div class="badge yellow">
@@ -74,6 +86,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
 
       const useSeriesOpacity = ref(true);
       const showBorder = ref(false);
+      const useClick = ref(true);
 
       const chartOptions = reactive({
         type: 'heatMap',
@@ -108,28 +121,42 @@ import { nextTick, reactive, ref, watch } from 'vue';
         selectItem: {
           use: true,
           useSeriesOpacity,
+          useClick,
           showBorder,
           borderStyle: {
-            color: '#C21339',
-            lineWidth: 1,
-            radius: 8,
+            color: '#E84855',
+            lineWidth: 4,
+            radius: 1,
           },
         },
       });
 
       const evChartRef = ref();
       const lastSelectItem = ref(null);
-      const defaultSelectItem = ref(null);
+      const defaultSelectItem = ref({
+        seriesID: 'series1',
+        dataIndex: 1,
+      });
       const clickedItem = ref();
       const onClick = (target) => {
         clickedItem.value = target;
-        if (defaultSelectItem.value
-            && defaultSelectItem.value?.dataIndex === lastSelectItem.value?.dataIndex) {
+
+        const isEqualItem = defaultSelectItem.value?.dataIndex === lastSelectItem.value?.dataIndex;
+        if (
+          defaultSelectItem.value
+          && isEqualItem
+          && useClick.value
+        ) {
           defaultSelectItem.value = null;
           lastSelectItem.value = null;
         } else {
           lastSelectItem.value = { ...defaultSelectItem.value };
         }
+      };
+
+      const updateSelectedItem = () => {
+        const dataLength = Object.values(chartData.data)[0].length;
+        defaultSelectItem.value.dataIndex = Math.floor(Math.random() * dataLength);
       };
 
       watch(defaultSelectItem, async (val) => {
@@ -146,8 +173,10 @@ import { nextTick, reactive, ref, watch } from 'vue';
         clickedItem,
         useSeriesOpacity,
         showBorder,
+        useClick,
         evChartRef,
         onClick,
+        updateSelectedItem,
       };
     },
   };

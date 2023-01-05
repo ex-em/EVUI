@@ -47,7 +47,6 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         },
       });
 
-
       const chartOptions = {
         type: 'heatMap',
         width: '100%',
@@ -84,7 +83,7 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
           rangeCount: 4,
           stroke: {
             show: true,
-            color: '#000000',
+            color: '#FFFFFF',
             lineWidth: 1,
           },
         },

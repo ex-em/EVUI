@@ -242,7 +242,10 @@ class EvChart {
             series.draw({
               legendHitInfo,
               selectInfo,
-              selectItem,
+              selectItem: {
+                option: selectItem,
+                selected: selectInfo,
+              },
               ...opt,
             });
             break;

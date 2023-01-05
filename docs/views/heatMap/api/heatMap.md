@@ -78,7 +78,8 @@ const chartData =
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   | heatMapColor | Object | ([상세](#heatmap-color)) | color 옵션 | |
-  | selectLabel  | Object | ([상세](#selectlabel)) | 차트 라벨 선택 기능 활성화 여부 및 속성 | | 
+  | selectItem   | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | |
+  | selectLabel  | Object | ([상세](#selectlabel)) | 차트 라벨 선택 기능 활성화 여부 및 속성 | |
   
 #### axesX axesY
 ##### type 공통
@@ -214,6 +215,24 @@ const chartOptions = {
 | lineWidth | number | 1 | stroke 선 굵기 지정 | |
 | opacity | number | 1 | stroke opacity 지정 | 0.1 ~ 1 |
 | radius | number | 0 | border radius 조정 | |
+
+#### selectItem
+| 이름                  | 타입                          | 디폴트                 | 설명                                                              | 종류(예시) |
+|----------------------|------------------------------|-----------------------|-------------------------------------------------------------------|-----------
+| use                 | Boolean                       | false                 | 차트 아이템 선택 기능                                                | |
+| useClick            | Boolean                       | true                  | 클릭 이벤트 사용 여부 (v-model에 바인딩한 변수로만 컨트롤 하려 할때 false) | |
+| useBorder           | Boolean                       | false                 | 선택한 항목의 border 표시 여부                                        | |
+| borderStyle         | Object                        | ([상세](#borderstyle)) | border 스타일을 설정                                                | |
+| useSeriesOpacity    | Boolean                       | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부                                 | |
+
+##### borderStyle
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | stroke color 지정 | |
+| lineWidth | number | 1 | border 선 굵기 지정 | |
+| opacity | number | 1 | border opacity 지정 | 0.1 ~ 1 |
+| radius | number | 0 | border radius 조정 | |
+
 
 #### selectLabel
 | 이름                  | 타입                          | 디폴트       | 설명                                                          | 종류(예시) |

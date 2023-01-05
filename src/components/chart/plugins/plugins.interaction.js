@@ -18,7 +18,6 @@ const modules = {
         return;
       }
 
-
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);

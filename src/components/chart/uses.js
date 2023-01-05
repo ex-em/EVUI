@@ -129,7 +129,7 @@ const DEFAULT_OPTIONS = {
     useSeriesOpacity: false,
     showBorder: false,
     borderStyle: {
-      color: '#F4D90C',
+      color: '#FFFFFF',
       lineWidth: 1,
       opacity: 1,
       radius: 0,
