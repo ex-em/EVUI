@@ -228,7 +228,7 @@ const chartOptions = {
 ##### borderStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
-| color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | stroke color 지정 | |
+| color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | border color 지정 | |
 | lineWidth | number | 1 | border 선 굵기 지정 | |
 | opacity | number | 1 | border opacity 지정 | 0.1 ~ 1 |
 | radius | number | 0 | border radius 조정 | |

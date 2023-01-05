@@ -193,14 +193,5 @@ import { nextTick, reactive, ref, watch } from 'vue';
     line-height: 20px;
     margin: 10px 0;
   }
-
-  .ev-input-number + span {
-    line-height: 35px;
-  }
-
-  .ev-button {
-    height: 20px;
-    line-height: 20px !important;
-  }
 }
 </style>
