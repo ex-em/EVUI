@@ -127,6 +127,13 @@ const DEFAULT_OPTIONS = {
       fontWeight: 400,
     },
     useSeriesOpacity: false,
+    showBorder: false,
+    borderStyle: {
+      color: '#F4D90C',
+      lineWidth: 1,
+      opacity: 1,
+      radius: 0,
+    },
   },
   selectLabel: {
     use: false,
@@ -196,8 +203,8 @@ const DEFAULT_OPTIONS = {
   heatMapColor: {
     min: '#FFFFFF',
     max: '#0052FF',
-    categoryCnt: 1,
-    categoryColors: [],
+    rangeCount: 1,
+    colorsByRange: [],
     stroke: {
       show: false,
       color: '#FFFFFF',

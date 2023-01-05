@@ -197,7 +197,7 @@ import { reactive, ref, watch } from 'vue';
           showGrid: false,
         }],
         heatMapColor: {
-          categoryColors: [
+          colorsByRange: [
             { color: '#F2F2F2', label: '< 20' },
             { color: '#C4DBD1', label: '20 - 39' },
             { color: '#96C4B0', label: '40 - 59' },
@@ -248,7 +248,7 @@ import { reactive, ref, watch } from 'vue';
           showGrid: false,
         }],
         heatMapColor: {
-          categoryColors: [
+          colorsByRange: [
             { color: '#F2F2F2', label: '< 20' },
             { color: '#C4DBD1', label: '20 - 39' },
             { color: '#96C4B0', label: '40 - 59' },

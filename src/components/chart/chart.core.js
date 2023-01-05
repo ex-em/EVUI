@@ -219,12 +219,30 @@ class EvChart {
         const series = this.seriesList[chartTypeSet[jx]];
 
         switch (chartType) {
-          case 'line':
-          case 'heatMap': {
+          case 'line': {
             const legendHitInfo = hitInfo?.legend;
 
             series.draw({
               legendHitInfo,
+              ...opt,
+            });
+            break;
+          }
+          case 'heatMap': {
+            const legendHitInfo = hitInfo?.legend;
+
+            let selectInfo;
+            const defaultSelectInfo = this.defaultSelectItemInfo;
+            if (defaultSelectInfo?.dataIndex || defaultSelectInfo?.dataIndex === 0) {
+              selectInfo = { ...defaultSelectInfo };
+            } else {
+              selectInfo = null;
+            }
+
+            series.draw({
+              legendHitInfo,
+              selectInfo,
+              selectItem,
               ...opt,
             });
             break;
@@ -718,7 +736,7 @@ class EvChart {
 
     if (options.legend.show) {
       const useTable = !!options.legend?.table?.use
-        && options.type !== 'heatmap'
+        && options.type !== 'heatMap'
         && options.type !== 'scatter';
 
       if (!this.isInitLegend) {

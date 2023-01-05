@@ -420,7 +420,7 @@ const modules = {
   getSeriesValueOptForHeatMap(series) {
     const { data, colorState, isGradient } = series;
     const colorOpt = this.options.heatMapColor;
-    const categoryCnt = colorOpt.categoryColors.length || colorOpt.categoryCnt;
+    const rangeCount = colorOpt.colorsByRange.length || colorOpt.rangeCount;
     const decimalPoint = colorOpt.decimalPoint;
 
     let minValue;
@@ -444,10 +444,10 @@ const modules = {
     if (
       isExistError
       && !isGradient
-      && colorState.length === categoryCnt
+      && colorState.length === rangeCount
     ) {
       colorState.push({
-        id: `color#${categoryCnt}`,
+        id: `color#${rangeCount}`,
         color: colorOpt.error,
         state: 'normal',
         label: 'Error',
@@ -455,10 +455,10 @@ const modules = {
       });
     }
 
-    let interval = maxValue > minValue ? Math.floor((maxValue - minValue) / categoryCnt) : 1;
-    if ((maxValue - minValue) <= categoryCnt) {
+    let interval = maxValue > minValue ? Math.floor((maxValue - minValue) / rangeCount) : 1;
+    if ((maxValue - minValue) <= rangeCount) {
       if (decimalPoint > 0) {
-        interval = +((maxValue - minValue) / categoryCnt).toFixed(decimalPoint);
+        interval = +((maxValue - minValue) / rangeCount).toFixed(decimalPoint);
       } else {
         interval = 1;
       }

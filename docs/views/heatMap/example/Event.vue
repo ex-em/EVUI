@@ -112,7 +112,7 @@ import { onMounted, reactive, ref } from 'vue';
         heatMapColor: {
           min: '#A1CDF9',
           max: '#336fe9',
-          categoryCnt: 3,
+          rangeCount: 3,
           error: '#F9E469',
           stroke: {
             show: true,

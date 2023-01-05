@@ -44,7 +44,7 @@ import { onMounted, reactive } from 'vue';
           showGrid: false,
         }],
         heatMapColor: {
-          categoryColors: [
+          colorsByRange: [
             { color: '#4FD4B6', label: 'Low' },
             { color: '#6DB9E3', label: 'Medium' },
             { color: '#5A4BE1', label: 'High' },

@@ -81,10 +81,10 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         heatMapColor: {
           min: '#E1FBAD',
           max: '#5B904B',
-          categoryCnt: 4,
+          rangeCount: 4,
           stroke: {
             show: true,
-            color: '#FFFFFF',
+            color: '#000000',
             lineWidth: 1,
           },
         },

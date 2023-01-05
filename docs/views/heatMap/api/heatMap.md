@@ -200,8 +200,8 @@ const chartOptions = {
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
 | min | Hex, RGB, RGBA Code(String) | '#FFFFFF' | min color |  |
 | max | Hex, RGB, RGBA Code(String) | '#5586EB' | max color |  | 
-| categoryCnt | number | 5 | color min - max 그라데이션 범주 개수 | |
-| categoryColors | Array | [] | 범주별 color, label 지정 | [{ color: '#FFFFFF', label: 'A' }] |
+| rangeCount | number | 5 | color min - max 그라데이션 범위 개수 | |
+| colorsByRange | Array | [] | 범위별 color, label 지정 | [{ color: '#FFFFFF', label: 'A' }] |
 | stroke | Object | ([상세](#stroke)) | series stroke 지정 |  |
 | error | Hex, RGB, RGBA Code(String) | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 | decimalPoint | number | 0 | 범주 표현 소숫값 처리 | |

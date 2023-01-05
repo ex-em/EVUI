@@ -8,14 +8,21 @@ import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
 import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
-import Category from './example/Category';
-import CategoryRaw from '!!raw-loader!./example/Category';
+import ColorsByRange from './example/ColorsByRange';
+import ColorsByRangeRaw from '!!raw-loader!./example/ColorsByRange';
 import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
+import SelectItem from './example/SelectItem';
+import SelectItemRaw from '!!raw-loader!./example/SelectItem';
 
 export default {
   mdText,
   components: {
+    SelectItem: {
+      description: '선택한 아이템이 하이라이트 되는 기능입니다.',
+      component: SelectItem,
+      parsedData: parseComponent(SelectItemRaw),
+    },
     Default: {
       description: 'HeatMap은 데이터의 분포를 색상에 따라 시각적으로 인지하도록 합니다',
       component: Default,
@@ -36,10 +43,10 @@ export default {
       component: Gradient,
       parsedData: parseComponent(GradientRaw),
     },
-    'Category Legend': {
-      description: '범주의 색상, label을 지정할 수 있습니다.',
-      component: Category,
-      parsedData: parseComponent(CategoryRaw),
+    'Separate Colors By Range': {
+      description: '범위별 색상과 라벨을 지정할 수 있습니다.',
+      component: ColorsByRange,
+      parsedData: parseComponent(ColorsByRangeRaw),
     },
     SelectLabel: {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
