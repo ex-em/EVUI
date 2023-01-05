@@ -85,7 +85,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
       });
 
       const useSeriesOpacity = ref(true);
-      const showBorder = ref(false);
+      const showBorder = ref(true);
       const useClick = ref(true);
 
       const chartOptions = reactive({
@@ -109,6 +109,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
           rangeCount: 3,
           min: '#FCEFB4',
           max: '#F9DC5C',
+          decimalPoint: 1,
           stroke: {
             show: true,
             lineWidth: 1,

@@ -278,7 +278,8 @@ class HeatMap {
           let borderOpt = this.stroke;
           const selectItemOption = selectItem?.option;
           const useSelectItem = selectItemOption?.use && selectItemOption?.showBorder;
-          if (useSelectItem && index === selectItem?.selected?.dataIndex) {
+          const isHit = (index === selectItem?.selected?.dataIndex);
+          if (useSelectItem && isHit) {
             borderOpt = {
               show: selectItemOption?.showBorder,
               ...selectItemOption?.borderStyle,
