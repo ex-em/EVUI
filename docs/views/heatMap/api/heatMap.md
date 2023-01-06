@@ -224,6 +224,7 @@ const chartOptions = {
 | useBorder           | Boolean                       | false                 | 선택한 항목의 border 표시 여부                                        | |
 | borderStyle         | Object                        | ([상세](#borderstyle)) | border 스타일을 설정                                                | |
 | useSeriesOpacity    | Boolean                       | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부                                 | |
+| useDeselectItem     | Boolean                       | false | 선택된 항목을 클릭했을 때 선택 해제 여부
 
 ##### borderStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

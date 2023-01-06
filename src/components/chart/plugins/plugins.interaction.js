@@ -573,6 +573,7 @@ const modules = {
    * @returns {boolean}
    */
   selectItemByData(targetInfo, chartType) {
+    const prevSelectedItem = { ...this.defaultSelectItemInfo };
     this.defaultSelectItemInfo = targetInfo;
 
     let foundInfo;
@@ -587,6 +588,13 @@ const modules = {
       }
 
       foundInfo = this.getItem(targetInfo, false);
+
+      if (chartType === 'heatMap'
+        && this.options.selectItem.useDeselectItem) {
+        if (targetInfo?.dataIndex === prevSelectedItem?.dataIndex) {
+          this.defaultSelectItemInfo = null;
+        }
+      }
     }
 
     if (foundInfo) {

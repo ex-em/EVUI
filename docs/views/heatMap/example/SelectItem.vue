@@ -28,6 +28,10 @@
           차트 클릭이 아닌 v-model:selectedItem 에 바인딩한 dataIndex를 변경하여 항목 선택
         </span>
       </div>
+      <div class="option">
+        <ev-toggle v-model="useDeselectItem" />
+        <span>선택된 항목을 클릭했을 때 deselect 여부</span>
+      </div>
       <div>
         <div class="badge yellow">
           v-model:selectedItem
@@ -45,7 +49,7 @@
 </template>
 
 <script>
-import { nextTick, reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 
   export default {
     setup() {
@@ -87,6 +91,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
       const useSeriesOpacity = ref(true);
       const showBorder = ref(true);
       const useClick = ref(true);
+      const useDeselectItem = ref(false);
 
       const chartOptions = reactive({
         type: 'heatMap',
@@ -129,11 +134,11 @@ import { nextTick, reactive, ref, watch } from 'vue';
             lineWidth: 4,
             radius: 1,
           },
+          useDeselectItem,
         },
       });
 
       const evChartRef = ref();
-      const lastSelectItem = ref(null);
       const defaultSelectItem = ref({
         seriesID: 'series1',
         dataIndex: 1,
@@ -141,31 +146,12 @@ import { nextTick, reactive, ref, watch } from 'vue';
       const clickedItem = ref();
       const onClick = (target) => {
         clickedItem.value = target;
-
-        const isEqualItem = defaultSelectItem.value?.dataIndex === lastSelectItem.value?.dataIndex;
-        if (
-          defaultSelectItem.value
-          && isEqualItem
-          && useClick.value
-        ) {
-          defaultSelectItem.value = null;
-          lastSelectItem.value = null;
-        } else {
-          lastSelectItem.value = { ...defaultSelectItem.value };
-        }
       };
 
       const updateSelectedItem = () => {
         const dataLength = Object.values(chartData.data)[0].length;
         defaultSelectItem.value.dataIndex = Math.floor(Math.random() * dataLength);
       };
-
-      watch(defaultSelectItem, async (val) => {
-        if (!val) {
-          await nextTick();
-          evChartRef.value?.redraw();
-        }
-      });
 
       return {
         chartData,
@@ -176,6 +162,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
         showBorder,
         useClick,
         evChartRef,
+        useDeselectItem,
         onClick,
         updateSelectedItem,
       };
@@ -193,6 +180,11 @@ import { nextTick, reactive, ref, watch } from 'vue';
     height: 30px;
     line-height: 20px;
     margin: 10px 0;
+  }
+
+  .ev-button {
+    height: 20px;
+    line-height: 20px !important;
   }
 }
 </style>

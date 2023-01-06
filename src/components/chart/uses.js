@@ -127,6 +127,7 @@ const DEFAULT_OPTIONS = {
       fontWeight: 400,
     },
     useSeriesOpacity: false,
+    useDeselectItem: false,
     showBorder: false,
     borderStyle: {
       color: '#FFFFFF',
