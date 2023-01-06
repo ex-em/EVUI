@@ -257,9 +257,11 @@ export const useModel = (selectedLabel) => {
       await nextTick();
       if (e.label) {
         let selectedItem = { seriesID: e.seriesId, dataIndex: e.dataIndex };
-        if (e.deselect) {
-          selectedItem = null;
-          delete e?.deselect;
+        if ('deselect' in e) {
+          if (e.deselect) {
+            selectedItem = null;
+          }
+          delete e.deselect;
         }
         emit('update:selectedItem', selectedItem);
       }
