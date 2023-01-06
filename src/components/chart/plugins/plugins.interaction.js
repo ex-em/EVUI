@@ -121,10 +121,6 @@ const modules = {
         const offset = this.getMousePosition(e);
         const hitInfo = this.getItemByPosition(offset, false);
 
-        if (hitInfo.label !== null) {
-          this.render(hitInfo);
-        }
-
         ({
           label: args.label,
           value: args.value,
@@ -132,6 +128,14 @@ const modules = {
           maxIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
+
+        if (this.options.type === 'heatMap') {
+          args.deselect = this.setDeselectItem(hitInfo);
+        }
+
+        if (hitInfo.label !== null) {
+          this.render(hitInfo);
+        }
       } else if (this.options.selectLabel.use && this.options.selectLabel.useClick) {
         const offset = this.getMousePosition(e);
         const clickedLabelInfo = this.getLabelInfoByPosition(offset);
@@ -573,7 +577,6 @@ const modules = {
    * @returns {boolean}
    */
   selectItemByData(targetInfo, chartType) {
-    const prevSelectedItem = { ...this.defaultSelectItemInfo };
     this.defaultSelectItemInfo = targetInfo;
 
     let foundInfo;
@@ -588,13 +591,6 @@ const modules = {
       }
 
       foundInfo = this.getItem(targetInfo, false);
-
-      if (chartType === 'heatMap'
-        && this.options.selectItem.useDeselectItem) {
-        if (targetInfo?.dataIndex === prevSelectedItem?.dataIndex) {
-          this.defaultSelectItemInfo = null;
-        }
-      }
     }
 
     if (foundInfo) {
@@ -821,6 +817,19 @@ const modules = {
       yMin: yMin ?? dataRangeY.graphMin,
       yMax: yMax ?? dataRangeY.graphMax,
     };
+  },
+
+  setDeselectItem(hitInfo) {
+    let deselect = false;
+    if (this.options.selectItem.useDeselectItem) {
+      const isEqualSelectItem = hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex;
+      if (!isNaN(hitInfo?.maxIndex) && isEqualSelectItem) {
+        deselect = true;
+        this.defaultSelectItemInfo = null;
+        return true;
+      }
+    }
+    return deselect;
   },
 };
 

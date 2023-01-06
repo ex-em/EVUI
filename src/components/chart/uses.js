@@ -256,7 +256,12 @@ export const useModel = (selectedLabel) => {
     click: async (e) => {
       await nextTick();
       if (e.label) {
-        emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
+        let selectedItem = { seriesID: e.seriesId, dataIndex: e.dataIndex };
+        if (e.deselect) {
+          selectedItem = null;
+          delete e?.deselect;
+        }
+        emit('update:selectedItem', selectedItem);
       }
       if (e.selected?.dataIndex) {
         if (selectedLabel?.value) {
