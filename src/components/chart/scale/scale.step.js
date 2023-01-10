@@ -110,7 +110,7 @@ class StepScale extends Scale {
       }
 
       ctx.fillStyle = this.labelStyle.color;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = this.axisLineWidth;
       const aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
       ctx.beginPath();

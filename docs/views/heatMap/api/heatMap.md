@@ -89,6 +89,7 @@ const chartData =
   | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
   | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
+  | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
   | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#step-type) |
