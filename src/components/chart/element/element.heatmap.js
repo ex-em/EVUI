@@ -36,7 +36,7 @@ class HeatMap {
   createColorState(colorOpt) {
     const colorState = [];
     const regex = /[^0-9]&[^,]/g;
-    const { min, max, categoryCnt, categoryColors, error, stroke } = colorOpt;
+    const { min, max, rangeCount, colorsByRange, error, stroke } = colorOpt;
 
     const minColor = min.includes('#') ? Util.hexToRgb(min) : min.replace(regex, '');
     const maxColor = max.includes('#') ? Util.hexToRgb(max) : max.replace(regex, '');
@@ -48,13 +48,13 @@ class HeatMap {
       colorState.push({
         minColor: { minR, minG, minB },
         maxColor: { maxR, maxG, maxB },
-        categoryCnt,
+        rangeCount,
         start: 0,
         end: 100,
         selectedValue: null,
       });
-    } else if (categoryColors.length) {
-      categoryColors.forEach(({ color, label }, ix) => {
+    } else if (colorsByRange.length) {
+      colorsByRange.forEach(({ color, label }, ix) => {
         colorState.push({
           id: `color#${ix}`,
           color,
@@ -64,11 +64,11 @@ class HeatMap {
         });
       });
     } else {
-      const unitR = Math.floor((minR - maxR) / (categoryCnt - 1));
-      const unitG = Math.floor((minG - maxG) / (categoryCnt - 1));
-      const unitB = Math.floor((minB - maxB) / (categoryCnt - 1));
+      const unitR = Math.floor((minR - maxR) / (rangeCount - 1));
+      const unitG = Math.floor((minG - maxG) / (rangeCount - 1));
+      const unitB = Math.floor((minB - maxB) / (rangeCount - 1));
 
-      for (let ix = 0; ix < categoryCnt; ix++) {
+      for (let ix = 0; ix < rangeCount; ix++) {
         const r = +minR - (unitR * ix);
         const g = +minG - (unitG * ix);
         const b = +minB - (unitB * ix);
@@ -100,7 +100,7 @@ class HeatMap {
     return `rgb(${r},${g},${b})`;
   }
 
-  getColorIndexForIcon(value) {
+  getColorIndexByValue(value) {
     const { existError, min, interval, decimalPoint } = this.valueOpt;
     const maxIndex = this.colorState.length - 1;
     if (existError && value < 0) {
@@ -136,7 +136,7 @@ class HeatMap {
           ? this.errorColor : this.getColorForGradient(ratio);
       }
     } else {
-      const colorIndex = this.getColorIndexForIcon(value);
+      const colorIndex = this.getColorIndexByValue(value);
       const { show, state, color, id } = this.colorState[colorIndex];
       itemInfo.show = show;
       itemInfo.opacity = state === 'downplay' ? 0.1 : 1;
@@ -146,21 +146,22 @@ class HeatMap {
     return itemInfo;
   }
 
-  drawItem(ctx, x, y, w, h) {
+  drawItem(ctx, x, y, w, h, borderOpt) {
     ctx.beginPath();
-    if (this.stroke.show) {
-      const { radius } = this.stroke;
+    if (borderOpt.show) {
+      const { radius } = borderOpt;
       if (radius > 0) {
         const minSize = Math.min(w, h);
-        let borderRadius = radius;
-        if (borderRadius > (minSize / 2)) {
-          borderRadius = Math.floor(minSize / 2);
+        let r = radius;
+        if (r > (minSize / 2)) {
+          r = Math.floor(minSize / 2);
         }
-        ctx.moveTo(x, y);
-        ctx.arcTo(x + w, y, x + w, y + h, borderRadius);
-        ctx.arcTo(x + w, y + h, x, y + h, borderRadius);
-        ctx.arcTo(x, y + h, x, y, borderRadius);
-        ctx.arcTo(x, y, x + w, y, borderRadius);
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.stroke();
         ctx.fill();
       } else {
         ctx.strokeRect(x, y, w, h);
@@ -215,6 +216,7 @@ class HeatMap {
       overlayCtx,
       selectLabel,
       legendHitInfo,
+      selectItem,
     } = param;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
@@ -226,8 +228,28 @@ class HeatMap {
     this.size.w = xArea / this.labels.x.length;
     this.size.h = yArea / this.labels.y.length;
 
-    this.data.forEach((item) => {
-      let xp = this.calculateXY('x', item.x, xsp);
+    const getOpacity = (item, opacity, index) => {
+      const selectLabelOption = selectLabel?.option;
+      const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
+      const selectItemOption = selectItem?.option;
+      const useSelectItem = selectItemOption?.use && selectItemOption?.useSeriesOpacity;
+      if (!legendHitInfo) {
+        let isDownplay = false;
+        if (useSelectItem) {
+          isDownplay = selectItem?.selected && index !== selectItem?.selected?.dataIndex;
+        } else if (useSelectLabel) {
+          const selectedLabelList = selectLabel?.selected?.label;
+          isDownplay = selectedLabelList.length
+            && !selectedLabelList.includes(this.isHorizontal ? item.y : item.x);
+        }
+        return isDownplay ? 0.1 : 1;
+      }
+      return opacity;
+    };
+
+    this.data.forEach((item, index) => {
+      const axisLineWidth = 1;
+      let xp = this.calculateXY('x', item.x, xsp) + axisLineWidth;
       let yp = this.calculateXY('y', item.y, ysp);
       let w = this.size.w;
       let h = this.size.h;
@@ -244,35 +266,42 @@ class HeatMap {
           isHighlight,
         } = this.getItemInfo(value);
 
+        const itemOpacity = getOpacity(item, opacity, index);
+
         item.dataColor = dataColor;
         item.cId = id;
         ctx.save();
 
-        const selectLabelOption = selectLabel?.option;
-        const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
-        let itemOpacity = opacity;
-        if (!legendHitInfo && useSelectLabel) {
-          const selectedLabelList = selectLabel?.selected?.label;
-          const isDownplay = selectedLabelList.length
-            && !selectedLabelList.includes(this.isHorizontal ? item.y : item.x);
-          itemOpacity = isDownplay ? 0.1 : 1;
-        }
-
         if (show) {
           ctx.fillStyle = Util.colorStringToRgba(item.dataColor, itemOpacity);
-          if (this.stroke.show) {
-            const { color, lineWidth, opacity: sOpacity } = this.stroke;
+
+          let borderOpt = this.stroke;
+          const selectItemOption = selectItem?.option;
+          const useSelectItem = selectItemOption?.use && selectItemOption?.showBorder;
+          const isHit = (index === selectItem?.selected?.dataIndex);
+          if (useSelectItem && isHit) {
+            borderOpt = {
+              show: selectItemOption?.showBorder,
+              ...selectItemOption?.borderStyle,
+            };
+          }
+
+          if (borderOpt.show) {
+            const { color, lineWidth, opacity: borderOpacity } = borderOpt;
             ctx.strokeStyle = Util.colorStringToRgba(
               color,
-              opacity === 1 ? sOpacity : opacity,
+              itemOpacity === 1 ? borderOpacity : itemOpacity,
             );
+
             ctx.lineWidth = lineWidth;
-            xp += (lineWidth * 2);
-            yp += (lineWidth);
-            w -= (lineWidth * 2);
-            h -= (lineWidth * 2);
+
+            xp += (lineWidth * 0.5);
+            yp += (lineWidth * 0.5);
+            w -= (lineWidth);
+            h -= (lineWidth);
           }
-          this.drawItem(ctx, xp, yp, w, h);
+
+          this.drawItem(ctx, xp, yp, w, h, borderOpt);
           ctx.restore();
 
           item.xp = xp;
@@ -399,10 +428,10 @@ class HeatMap {
     const gdata = item.data;
     const ctx = context;
 
-    const x = gdata.xp;
-    const y = gdata.yp;
-    const w = gdata.w;
-    const h = gdata.h;
+    let x = gdata.xp;
+    let y = gdata.yp;
+    let w = gdata.w;
+    let h = gdata.h;
     const cId = gdata.cId;
 
     let isShow;
@@ -415,16 +444,24 @@ class HeatMap {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
     ctx.save();
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
 
     if (x !== null && y !== null && isShow) {
       const color = gdata.dataColor;
-      ctx.shadowColor = Util.colorStringToRgba('#605F5F');
+      ctx.shadowColor = Util.colorStringToRgba('#959494');
       ctx.strokeStyle = Util.colorStringToRgba(color);
       ctx.fillStyle = Util.colorStringToRgba(color);
-      this.drawItem(ctx, x - 2, y - 2, w + 4, h + 4);
+
+      if (this.stroke.show) {
+        const { lineWidth } = this.stroke;
+        x += (lineWidth * 0.5);
+        y += (lineWidth * 0.5);
+        w -= (lineWidth);
+        h -= (lineWidth);
+      }
+      this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
 
       ctx.restore();
 
@@ -454,7 +491,7 @@ class HeatMap {
     };
     const gdata = this.data;
 
-    const foundItem = gdata.find((data) => {
+    const itemIndex = gdata.findIndex((data) => {
       const { xp: x, yp: y, w: wSize, h: hSize } = data;
 
       return (x <= xp)
@@ -463,9 +500,11 @@ class HeatMap {
         && (yp <= y + hSize);
     });
 
-    if (foundItem) {
+    if (itemIndex > -1) {
+      const foundItem = gdata[itemIndex];
       item.data = foundItem;
       item.color = foundItem.dataColor;
+      item.index = itemIndex;
       item.hit = true;
     }
 
