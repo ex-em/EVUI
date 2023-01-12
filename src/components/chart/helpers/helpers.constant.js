@@ -86,6 +86,7 @@ export const AXIS_OPTION = {
   startToZero: false,
   showAxis: true,
   axisLineColor: '#C9CFDC',
+  axisLineWidth: 1,
   showGrid: true,
   gridLineColor: '#C9CFDC',
   showIndicator: false,

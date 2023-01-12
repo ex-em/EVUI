@@ -251,7 +251,7 @@ class Scale {
     }
 
     if (this.showAxis) {
-      ctx.lineWidth = 2;
+      ctx.lineWidth = this.axisLineWidth;
       aliasPixel = Util.aliasPixel(ctx.lineWidth);
 
       ctx.beginPath();

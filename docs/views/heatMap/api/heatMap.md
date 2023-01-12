@@ -78,7 +78,8 @@ const chartData =
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   | heatMapColor | Object | ([상세](#heatmap-color)) | color 옵션 | |
-  | selectLabel  | Object | ([상세](#selectlabel)) | 차트 라벨 선택 기능 활성화 여부 및 속성 | | 
+  | selectItem   | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | |
+  | selectLabel  | Object | ([상세](#selectlabel)) | 차트 라벨 선택 기능 활성화 여부 및 속성 | |
   
 #### axesX axesY
 ##### type 공통
@@ -89,6 +90,7 @@ const chartData =
   | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
   | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
+  | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
   | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#step-type) |
@@ -200,8 +202,8 @@ const chartOptions = {
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
 | min | Hex, RGB, RGBA Code(String) | '#FFFFFF' | min color |  |
 | max | Hex, RGB, RGBA Code(String) | '#5586EB' | max color |  | 
-| categoryCnt | number | 5 | color min - max 그라데이션 범주 개수 | |
-| categoryColors | Array | [] | 범주별 color, label 지정 | [{ color: '#FFFFFF', label: 'A' }] |
+| rangeCount | number | 5 | color min - max 그라데이션 범위 개수 | |
+| colorsByRange | Array | [] | 범위별 color, label 지정 | [{ color: '#FFFFFF', label: 'A' }] |
 | stroke | Object | ([상세](#stroke)) | series stroke 지정 |  |
 | error | Hex, RGB, RGBA Code(String) | '#FFFFFF' | series error color (value가 -1인 경우 error로 인식) |  |
 | decimalPoint | number | 0 | 범주 표현 소숫값 처리 | |
@@ -214,6 +216,25 @@ const chartOptions = {
 | lineWidth | number | 1 | stroke 선 굵기 지정 | |
 | opacity | number | 1 | stroke opacity 지정 | 0.1 ~ 1 |
 | radius | number | 0 | border radius 조정 | |
+
+#### selectItem
+| 이름                  | 타입                          | 디폴트                 | 설명                                                              | 종류(예시) |
+|----------------------|------------------------------|-----------------------|-------------------------------------------------------------------|-----------
+| use                 | Boolean                       | false                 | 차트 아이템 선택 기능                                                | |
+| useClick            | Boolean                       | true                  | 클릭 이벤트 사용 여부 (v-model에 바인딩한 변수로만 컨트롤 하려 할때 false) | |
+| useBorder           | Boolean                       | false                 | 선택한 항목의 border 표시 여부                                        | |
+| borderStyle         | Object                        | ([상세](#borderstyle)) | border 스타일을 설정                                                | |
+| useSeriesOpacity    | Boolean                       | false                 | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부                  | |
+| useDeselectItem     | Boolean                       | false                 | 선택된 항목을 클릭했을 때 선택 해제 여부                                 | |
+
+##### borderStyle
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| color | Hex, RGB, RGBA Code(String) | '#FFFFFF' | border color 지정 | |
+| lineWidth | number | 1 | border 선 굵기 지정 | |
+| opacity | number | 1 | border opacity 지정 | 0.1 ~ 1 |
+| radius | number | 0 | border radius 조정 | |
+
 
 #### selectLabel
 | 이름                  | 타입                          | 디폴트       | 설명                                                          | 종류(예시) |

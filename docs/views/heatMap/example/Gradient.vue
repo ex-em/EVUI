@@ -64,7 +64,7 @@ import { reactive } from 'vue';
         heatMapColor: {
           min: '#F9945A',
           max: '#9D3B02',
-          categoryCnt: 4,
+          rangeCount: 4,
           stroke: {
             show: true,
             color: '#FFFFFF',

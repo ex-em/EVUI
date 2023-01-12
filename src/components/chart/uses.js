@@ -127,6 +127,14 @@ const DEFAULT_OPTIONS = {
       fontWeight: 400,
     },
     useSeriesOpacity: false,
+    useDeselectItem: false,
+    showBorder: false,
+    borderStyle: {
+      color: '#FFFFFF',
+      lineWidth: 1,
+      opacity: 1,
+      radius: 0,
+    },
   },
   selectLabel: {
     use: false,
@@ -196,8 +204,8 @@ const DEFAULT_OPTIONS = {
   heatMapColor: {
     min: '#FFFFFF',
     max: '#0052FF',
-    categoryCnt: 1,
-    categoryColors: [],
+    rangeCount: 1,
+    colorsByRange: [],
     stroke: {
       show: false,
       color: '#FFFFFF',
@@ -248,7 +256,14 @@ export const useModel = (selectedLabel) => {
     click: async (e) => {
       await nextTick();
       if (e.label) {
-        emit('update:selectedItem', { seriesID: e.seriesId, dataIndex: e.dataIndex });
+        let selectedItem = { seriesID: e.seriesId, dataIndex: e.dataIndex };
+        if ('deselect' in e) {
+          if (e.deselect) {
+            selectedItem = null;
+          }
+          delete e.deselect;
+        }
+        emit('update:selectedItem', selectedItem);
       }
       if (e.selected?.dataIndex) {
         if (selectedLabel?.value) {

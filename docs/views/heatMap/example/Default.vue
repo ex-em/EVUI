@@ -48,7 +48,7 @@ import { onMounted, reactive } from 'vue';
         heatMapColor: {
           min: '#FFC19E',
           max: '#CC3D3D',
-          categoryCnt: 5,
+          rangeCount: 5,
         },
         tooltip: {
           use: true,
