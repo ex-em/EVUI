@@ -25,6 +25,12 @@ runs:
           -H "Accept: application/vnd.tosslab.jandi-v2+json" \
           -H "Content-Type: application/json" \
           --data-binary '{"body":"📢 EVUI CI/CD Notification - ✅ Deployment succeeded", "connectColor":"#4285F6", "connectInfo":[{"title":"Commit message","description":"'"${COMMIT_MESSAGE}"'"},{"title":"EVUI document","description":"- [[EVUI]](https://ex-em.github.io/EVUI)"}]}'
+        elif [ "${{ inputs.status }}" = "release" ]; then          
+          curl \
+          -X POST "${{ inputs.jandi_incoming_url }}" \
+          -H "Accept: application/vnd.tosslab.jandi-v2+json" \
+          -H "Content-Type: application/json" \
+          --data-binary '{"body":"📢 EVUI CI/CD Notification -  🎉 Release succeeded", "connectColor":"#00FF7F", "connectInfo":[{"title":"[Release Note](${{ github.event.release.html_url }})","description":""},{"title":"Release Version: ${{ github.event.release.tag_name }}","description":""}]}'
         else
           curl \
           -X POST "${{ inputs.jandi_incoming_url }}" \
