@@ -81,10 +81,12 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value[0].data}`),
+        click: (param) => {
+          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`);
+        },
       }, {
         text: 'Menu2',
-        click: () => console.log('[Menu2]'),
+        click: param => console.log('[Menu2]', param),
       },
     ]);
     const borderMV = ref('');

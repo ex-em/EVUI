@@ -290,18 +290,19 @@ export default {
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
     const expandColumnMV = ref(0);
-    const menuItems = ref([{
+    const menuItems = ref([
+      {
         text: 'Menu1',
-        click: () => {
-          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(selected.value[0].data)}`);
+        click: (param) => {
+          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`);
         },
       }, {
         text: 'Menu2',
-        click: () => console.log('[Menu2]'),
+        click: param => console.log('[Menu2]', param),
       },
     ]);
     const highlightMV = ref(-1);
-    const borderMV = ref('');
+    const borderMV =menuItems ref('');
     const iconMV = ref('');
     const dataIconMV = ref('');
     const borderItems = ref([
