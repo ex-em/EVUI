@@ -302,7 +302,7 @@ export default {
       },
     ]);
     const highlightMV = ref(-1);
-    const borderMV =menuItems ref('');
+    const borderMV = ref('');
     const iconMV = ref('');
     const dataIconMV = ref('');
     const borderItems = ref([
