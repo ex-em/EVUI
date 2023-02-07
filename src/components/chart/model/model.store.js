@@ -608,7 +608,12 @@ const modules = {
    * @param {number} dataIndex        selected data index
    * @returns {object} clicked item information
    */
-  getItemByPosition(offset, useApproximate = false, dataIndex) {
+  getItemByPosition(
+    offset,
+    useApproximate = false,
+    dataIndex,
+    isSelectLabel = false,
+  ) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -627,7 +632,7 @@ const modules = {
       const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
-        const item = findFn.call(series, offset, isHorizontal, dataIndex);
+        const item = findFn.call(series, offset, isHorizontal, dataIndex, isSelectLabel);
         const data = item.data;
         const index = item.index;
 
@@ -831,6 +836,7 @@ const modules = {
         [offsetX, y],
         selectLabel?.useApproximateValue,
         dataIndex,
+        true,
       );
       labelIndex = hitInfo.maxIndex ?? -1;
     }
