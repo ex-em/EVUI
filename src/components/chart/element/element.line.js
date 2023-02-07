@@ -238,11 +238,11 @@ class Line {
    * @param {array}    offset          mouse position
    * @param {boolean}  isHorizontal
    * @param {number}   dataIndex       selected label data index
-   * @param {boolean}  isSelectLabel   used to display select label at tooltip location
+   * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex, isSelectLabel) {
+  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem) {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
@@ -252,6 +252,9 @@ class Line {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
+      } else if (this.show && typeof this.beforeFindItemIndex === 'number' && useSelectLabelOrItem) {
+        item.data = gdata[this.beforeFindItemIndex];
+        item.index = this.beforeFindItemIndex;
       } else {
         let s = 0;
         let e = gdata.length - 1;
@@ -265,31 +268,25 @@ class Line {
           if (x - xpInterval < xp && xp < x + xpInterval) {
             const curXpInterval = gdata[m]?.xp - (gdata[m - 1]?.xp ?? 0);
 
-            // 간격(curXpInterval)이 존재할 때만 수행
             if (gdata[m - 1]?.xp && gdata[m + 1]?.xp && curXpInterval > 0) {
               const leftXp = xp - gdata[m - 1].xp;
               const midXp = Math.abs(xp - gdata[m].xp);
               const rightXp = gdata[m + 1].xp - xp;
 
               if (
-                !isSelectLabel
-                && Math.abs(this.beforeMouseXp - xp + 0.5) >= curXpInterval
+                Math.abs(this.beforeMouseXp - xp + 0.5) >= curXpInterval
                 && (this.beforeFindItemIndex === m || midXp === rightXp || midXp === leftXp)
               ) {
-                // 마우스 이동했지만 이전과 현재 툴팁이 같거나 간격이 같을 때
                 if (this.beforeMouseXp - xp > 0) {
-                  // 좌측 이동 (인덱스 -1)
                   item.data = gdata[this.beforeFindItemIndex - 1];
                   item.index = this.beforeFindItemIndex - 1;
                 } else if (this.beforeMouseXp - xp <= 0) {
-                  // 우측 이동 (인덱스 +1)
                   item.data = gdata[this.beforeFindItemIndex + 1];
                   item.index = this.beforeFindItemIndex + 1;
                 }
               } else {
                 const closeXp = Math.min(leftXp, midXp, rightXp);
 
-                // 마우스 위치와 가까운 값 확인.
                 if (closeXp === leftXp) {
                   item.data = gdata[m - 1];
                   item.index = m - 1;
@@ -320,10 +317,12 @@ class Line {
       }
     }
 
+    if (!useSelectLabelOrItem) {
+      this.beforeMouseXp = xp;
 
-    this.beforeMouseXp = xp;
-    if (typeof item.index === 'number') {
-      this.beforeFindItemIndex = item.index;
+      if (typeof item.index === 'number') {
+        this.beforeFindItemIndex = item.index;
+      }
     }
 
     return item;

@@ -554,6 +554,7 @@ const modules = {
         [dataInfo.xp, dataInfo.yp],
         useApproximate,
         dataIndex,
+        true,
       )];
     } else {
       const seriesList = Object.entries(this.seriesList);
@@ -579,6 +580,7 @@ const modules = {
           [dataInfo?.xp ?? 0, dataInfo?.yp ?? 0],
           useApproximate,
           idx,
+          true,
         );
       });
     }
@@ -606,13 +608,15 @@ const modules = {
    * @param {array}   offset          position x and y
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    * @param {number} dataIndex        selected data index
+   * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
+   *
    * @returns {object} clicked item information
    */
   getItemByPosition(
     offset,
     useApproximate = false,
     dataIndex,
-    isSelectLabel = false,
+    useSelectLabelOrItem = false,
   ) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
@@ -632,7 +636,13 @@ const modules = {
       const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
-        const item = findFn.call(series, offset, isHorizontal, dataIndex, isSelectLabel);
+        const item = findFn.call(
+          series,
+          offset,
+          isHorizontal,
+          dataIndex,
+          useSelectLabelOrItem,
+        );
         const data = item.data;
         const index = item.index;
 
