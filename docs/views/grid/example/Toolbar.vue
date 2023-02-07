@@ -163,15 +163,6 @@ export default {
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
     const highlightMV = ref(-1);
-    const menuItems = ref([
-      {
-        text: 'Menu1',
-        click: () => console.log(`[Menu1] Selected Row Data: ${selected.value}`),
-      }, {
-        text: 'Menu2',
-        click: () => console.log('[Menu2]'),
-      },
-    ]);
     const borderMV = ref('none');
     const searchVm = ref('');
     const columns = ref([
@@ -265,7 +256,6 @@ export default {
       checkedRowsMV,
       clickedRowMV,
       DbClickedRowsMV,
-      menuItems,
       borderMV,
       searchVm,
       orderItems,
