@@ -27,6 +27,9 @@ class Line {
       highlight: { opacity: 1, lineWidth: 2 },
     };
     this.data = [];
+    this.beforeMouseXp = 0;
+    this.beforeMouseYp = 0;
+    this.beforeFindItemIndex = -1;
     this.size = {
       comboOffset: 0,
     };
@@ -233,24 +236,30 @@ class Line {
 
   /**
    * Find graph item
-   * @param {array}  offset       mouse position
+   * @param {array}    offset          mouse position
+   * @param {boolean}  isHorizontal
+   * @param {number}   dataIndex       selected label data index
+   * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex) {
+  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem) {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
+    const SPARE_XP = 0.5;
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
+      } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
+        item.data = gdata[this.beforeFindItemIndex];
+        item.index = this.beforeFindItemIndex;
       } else {
         let s = 0;
         let e = gdata.length - 1;
-
         const xpInterval = gdata[1]?.xp - gdata[0].xp < 6 ? 1.5 : 6;
 
         while (s <= e) {
@@ -258,20 +267,67 @@ class Line {
           const x = gdata[m].xp;
           const y = gdata[m].yp;
 
-          if ((x - xpInterval < xp) && (xp < x + xpInterval)) {
-            item.data = gdata[m];
-            item.index = m;
+          if (x - xpInterval < xp && xp < x + xpInterval) {
+            const curXpInterval = gdata[m]?.xp - (gdata[m - 1]?.xp ?? 0);
+
+            if (gdata[m - 1]?.xp && gdata[m + 1]?.xp && curXpInterval > 0) {
+              const leftXp = xp - gdata[m - 1].xp;
+              const midXp = Math.abs(xp - gdata[m].xp);
+              const rightXp = gdata[m + 1].xp - xp;
+
+              if (
+                Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP
+                && (this.beforeFindItemIndex === m || midXp === rightXp || midXp === leftXp)
+              ) {
+                if (this.beforeMouseXp - xp > 0) {
+                  item.data = gdata[this.beforeFindItemIndex - 1];
+                  item.index = this.beforeFindItemIndex - 1;
+                } else if (this.beforeMouseXp - xp < 0) {
+                  item.data = gdata[this.beforeFindItemIndex + 1];
+                  item.index = this.beforeFindItemIndex + 1;
+                } else if (this.beforeMouseYp !== yp) {
+                  item.data = gdata[this.beforeFindItemIndex];
+                  item.index = this.beforeFindItemIndex;
+                }
+              } else {
+                const closeXp = Math.min(leftXp, midXp, rightXp);
+
+                if (closeXp === leftXp) {
+                  item.data = gdata[m - 1];
+                  item.index = m - 1;
+                } else if (closeXp === rightXp) {
+                  item.data = gdata[m + 1];
+                  item.index = m + 1;
+                } else {
+                  item.data = gdata[m];
+                  item.index = m;
+                }
+              }
+            } else {
+              item.data = gdata[m];
+              item.index = m;
+            }
 
             if ((y - 6 <= yp) && (yp <= y + 6)) {
               item.hit = true;
             }
-            return item;
+
+            break;
           } else if (x + xpInterval > xp) {
             e = m - 1;
           } else {
             s = m + 1;
           }
         }
+      }
+    }
+
+    if (!useSelectLabelOrItem) {
+      this.beforeMouseXp = xp;
+      this.beforeMouseYp = yp;
+
+      if (typeof item.index === 'number') {
+        this.beforeFindItemIndex = item.index;
       }
     }
 

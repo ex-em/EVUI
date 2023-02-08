@@ -144,7 +144,7 @@ export default {
       let val3;
       let val4;
 
-      if (ix >= 3) {
+      if (ix < 20 || ix > 40) {
         val = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
         val2 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
         val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
@@ -161,7 +161,7 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < 10; ix++) {
+      for (let ix = 0; ix < 400; ix++) {
         addRandomChartLabel();
         addRandomChartData(ix);
       }
