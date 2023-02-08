@@ -28,6 +28,7 @@ class Line {
     };
     this.data = [];
     this.beforeMouseXp = 0;
+    this.beforeMouseYp = 0;
     this.beforeFindItemIndex = -1;
     this.size = {
       comboOffset: 0,
@@ -247,12 +248,13 @@ class Line {
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
+    const SPARE_XP = 0.5;
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
-      } else if (this.show && typeof this.beforeFindItemIndex === 'number' && useSelectLabelOrItem) {
+      } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
@@ -274,15 +276,18 @@ class Line {
               const rightXp = gdata[m + 1].xp - xp;
 
               if (
-                Math.abs(this.beforeMouseXp - xp + 0.5) >= curXpInterval
+                Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP
                 && (this.beforeFindItemIndex === m || midXp === rightXp || midXp === leftXp)
               ) {
                 if (this.beforeMouseXp - xp > 0) {
                   item.data = gdata[this.beforeFindItemIndex - 1];
                   item.index = this.beforeFindItemIndex - 1;
-                } else if (this.beforeMouseXp - xp <= 0) {
+                } else if (this.beforeMouseXp - xp < 0) {
                   item.data = gdata[this.beforeFindItemIndex + 1];
                   item.index = this.beforeFindItemIndex + 1;
+                } else if (this.beforeMouseYp !== yp) {
+                  item.data = gdata[this.beforeFindItemIndex];
+                  item.index = this.beforeFindItemIndex;
                 }
               } else {
                 const closeXp = Math.min(leftXp, midXp, rightXp);
@@ -319,6 +324,7 @@ class Line {
 
     if (!useSelectLabelOrItem) {
       this.beforeMouseXp = xp;
+      this.beforeMouseYp = yp;
 
       if (typeof item.index === 'number') {
         this.beforeFindItemIndex = item.index;
