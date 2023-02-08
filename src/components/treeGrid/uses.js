@@ -585,6 +585,8 @@ export const contextMenuEvent = (params) => {
             menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
           }
 
+          menuItem.selectedRow = row ?? [];
+
           return menuItem;
         });
 
