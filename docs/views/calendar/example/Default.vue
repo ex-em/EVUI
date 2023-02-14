@@ -133,7 +133,7 @@ export default {
     const calendar2 = ref('2020-09-15');
     const calendar3 = ref(null);
     const calendar4 = ref('2020-10-14 14:38:01');
-    const calendar5 = ref(['2020-10-21', '2020-11-01']);
+    const calendar5 = ref(['2020-10-21', '2020-11-02']);
     const calendar6 = ref([]);
     const calendar7 = ref([]);
     const calendar8 = ref(['2020-10-21', '2020-11-05']);

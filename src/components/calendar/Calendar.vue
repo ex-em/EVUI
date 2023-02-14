@@ -10,10 +10,7 @@
         <span class="ev-calendar-year">{{ mainCalendarPageInfo.year }}</span>
         <span class="ev-calendar-month">{{ mainCalendarMonth }}</span>
         <div
-          :class="[
-            'move-month-arrow',
-            { disabled: isContinuousMonths }
-          ]"
+          class="move-month-arrow"
           @click="clickPrevNextBtn('main', 'next')">
           <i class="ev-icon-s-arrow-right move-month-arrow-icon"
           />
@@ -138,10 +135,7 @@
     >
       <div class="ev-calendar-header">
         <div
-            :class="[
-              'move-month-arrow',
-              { disabled: isContinuousMonths }
-            ]"
+            class="move-month-arrow"
             @click="clickPrevNextBtn('expanded', 'prev')"
         >
           <i class="ev-icon-s-arrow-left move-month-arrow-icon"/>
@@ -338,7 +332,6 @@ export default {
       mainCalendarMonth,
       expandedCalendarMonth,
       dayOfTheWeekList,
-      isContinuousMonths,
     } = useModel();
 
     const {
@@ -391,7 +384,6 @@ export default {
       mainCalendarMonth,
       expandedCalendarMonth,
       dayOfTheWeekList,
-      isContinuousMonths,
 
       mainCalendarTableInfo,
       expandedCalendarTableInfo,

@@ -18,15 +18,16 @@
         <input
           v-model.trim="currentValue"
           type="text"
-          class="ev-input"
+          :class="['ev-input', {readonly : $props.readonly}]"
           :placeholder="$props.placeholder"
+          :readonly="$props.readonly"
           :disabled="$props.disabled"
           @click="clickSelectInput"
           @keydown.enter.prevent="validateValue(currentValue)"
           @change="validateValue(currentValue)"
         />
       </template>
-      <template v-else>
+      <template v-else-if="$props.mode === 'dateMulti' || $props.readonly">
         <div
           class="ev-date-picker-tag-wrapper"
           @click="clickSelectInput"
@@ -76,6 +77,35 @@
                 <span class="ev-tag-name"> {{ mv[mv.length - 1] }} </span>
               </div>
             </template>
+          </template>
+        </div>
+      </template>
+      <template v-else>
+        <div
+          class="ev-date-picker-input-wrapper"
+          @click="clickSelectInput"
+        >
+          <span class="ev-date-picker-prefix-icon">
+            <i class="ev-icon-calendar" />
+          </span>
+          <input
+            v-model.trim="currentValue[0]"
+            type="text"
+            class="ev-date-picker-range-input"
+            @keydown.enter.prevent="validateValue(currentValue)"
+            @change="validateValue(currentValue)"
+          />
+          <template v-if="currentValue[currentValue.length - 1]">
+            <div class="ev-date-picker-range-separator">
+              <span class="ev-tag-name"> ~ </span>
+            </div>
+            <input
+              v-model.trim="currentValue[currentValue.length - 1]"
+              type="text"
+              class="ev-date-picker-range-input"
+              @keydown.enter.prevent="validateValue(currentValue)"
+              @change="validateValue(currentValue)"
+            />
           </template>
         </div>
       </template>
@@ -173,6 +203,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    readonly: {
+      type: Boolean,
+      default: true,
     },
     clearable: {
       type: Boolean,
@@ -330,6 +364,19 @@ export default {
     }
   }
 
+  &-range-input {
+    position: relative;
+    width: 100%;
+    outline: 0;
+    padding: 0 $input-default-padding 0 $input-default-padding;
+    border: none;
+    flex: 1;
+  }
+
+  &-range-separator {
+    border: none;
+  }
+
   .ev-input-suffix {
     display: flex;
     position: absolute;
@@ -343,7 +390,8 @@ export default {
     }
   }
 
-  .ev-date-picker-tag-wrapper {
+  .ev-date-picker-tag-wrapper,
+  .ev-date-picker-input-wrapper {
     display: flex;
     width: 100%;
     height: 100%;
@@ -351,6 +399,25 @@ export default {
     padding: 3px 30px 3px 30px;
     flex-wrap: wrap;
     align-items: center;
+  }
+
+  .ev-date-picker-input-wrapper {
+    transition: border $animate-base;
+    outline: 0;
+    background-color: transparent;
+    border-radius: $default-radius;
+
+    @include evThemify() {
+      border: 1px solid evThemed('border-base');
+      color: evThemed('font-base');
+    }
+
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid evThemed('primary');
+      }
+    }
   }
 }
 

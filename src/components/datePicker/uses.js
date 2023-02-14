@@ -10,6 +10,7 @@ const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
   const timeFormat = props.options?.timeFormat;
+  const isRangeMode = ['dateTimeRange', 'dateRange', 'dateMulti'].includes(props.mode);
 
   // Select 컴포넌트의 v-model 값
   const mv = computed({
@@ -28,7 +29,7 @@ export const useModel = () => {
             ];
           }
       }
-      return props.modelValue;
+      return isRangeMode ? [...props.modelValue] : props.modelValue;
     },
     set: value => emit('update:modelValue', value),
   });
@@ -44,27 +45,35 @@ export const useModel = () => {
         getChangedValueByTimeFormat(fromTimeFormat, fromDate),
         getChangedValueByTimeFormat(toTimeFormat, toDate),
       ];
-      currentValue = ref(props.modelValue);
+      currentValue = ref([...props.modelValue]);
     } else if (props.mode === 'dateTime' && props.modelValue) {
       currentValue = ref(getChangedValueByTimeFormat(timeFormat, props.modelValue));
     } else {
       currentValue = ref(props.modelValue);
     }
   } else {
-    currentValue = ref(props.modelValue);
+    currentValue = ref(isRangeMode ? [...props.modelValue] : props.modelValue);
   }
 
   const validateValue = (curr) => {
-    if (props.mode === 'date'
-      && (curr.length !== 10 || !dateReg.exec(curr))
-    ) {
-      currentValue.value = mv.value;
-    } else if (props.mode === 'dateTime'
-      && (curr.length !== 19 || !dateTimeReg.exec(curr))
-    ) {
-      currentValue.value = mv.value;
+    const dateRule = date => date.length === 10 && dateReg.exec(date);
+    const dateTimeRule = date => date.length === 19 && dateTimeReg.exec(date);
+
+    let isValid = true;
+    if (props.mode === 'date' && !dateRule(curr)) {
+      isValid = false;
+    } else if (props.mode === 'dateTime' && !dateTimeRule(curr)) {
+      isValid = false;
+    } else if (props.mode === 'dateRange' && curr.some(value => !dateRule(value))) {
+      isValid = false;
+    } else if (props.mode === 'dateTimeRange' && curr.some(value => !dateTimeRule(value))) {
+      isValid = false;
+    }
+
+    if (isValid) {
+      mv.value = isRangeMode ? [...curr] : curr;
     } else {
-      mv.value = curr;
+      currentValue.value = isRangeMode ? [...mv.value] : mv.value;
     }
   };
 
@@ -178,7 +187,7 @@ export const useDropdown = () => {
    */
   const clickSelectInput = async () => {
     if (!props.disabled) {
-      isDropbox.value = !isDropbox.value;
+      isDropbox.value = props.readonly ? !isDropbox.value : true;
       if (isDropbox.value) {
         await changeDropboxPosition();
       }
@@ -399,14 +408,16 @@ export const useShortcuts = (param) => {
           return;
         } else if (
           props.mode === 'dateRange'
-          || props.mode === 'dateTime'
           || props.mode === 'dateTimeRange'
         ) {
+          currentValue.value = [...curr];
+          return;
+        } else if (props.mode === 'dateTime') {
           currentValue.value = curr;
           return;
-        } else if (props.mode === 'date') {
-          currentValue.value = curr;
         }
+
+        currentValue.value = curr;
         clickOutsideDropbox();
       },
   );
