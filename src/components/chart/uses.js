@@ -479,7 +479,7 @@ export const useZoomModel = (
   };
 
   onUpdated(() => {
-    if (evChartToolbarRef.value) {
+    if (evChartZoom && evChartToolbarRef.value) {
       evChartZoom.setIcon(evChartToolbarRef.value);
     }
   });
