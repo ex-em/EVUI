@@ -39,7 +39,7 @@ const selectedLabel = ref({
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
   | data   | Object | {} | 차트에 표시할 시리즈 별 데이터 |  |
-  | groups | Array  | [] | Stack 차트를 위한 시리즈 그룹을 지정 |  |
+  | groups | Array  | [] | Stack, Overlapping 차트를 위한 시리즈 그룹을 지정 |  |
   | labels | Array  | [] | 축의 각 눈금에 해당하는 명칭 |  |
 
 #### series
@@ -128,6 +128,7 @@ const chartData = {
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
   | range | Array | null | 축에 표시할 값의 min, max | [0, 100] |
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
+  | overlapping | Boolean | false | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. | true / false |     
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |

@@ -11,11 +11,18 @@ const modules = {
    * @param {object}  series          chart series info
    * @param {string}  defaultType     default series type in options
    * @param {boolean} isHorizontal    determines if a horizontal option's value
+   * @param {object}  groups          group info
    *
    * @returns {undefined}
    */
-  createSeriesSet(series, defaultType, isHorizontal) {
-    Object.keys(series).forEach((key, index) => {
+  createSeriesSet(series, defaultType, isHorizontal, groups) {
+    let seriesKeys = Object.keys(series);
+
+    if (this.options.overlapping) {
+      seriesKeys = this.getOverlappingSeriesKeys(series, defaultType, groups);
+    }
+
+    seriesKeys.forEach((key, index) => {
       const type = series[key].type || defaultType;
       this.seriesList[key] = this.addSeries({
         type,
@@ -25,6 +32,30 @@ const modules = {
         isHorizontal,
       });
     });
+  },
+
+  getOverlappingSeriesKeys(series, defaultType, groups) {
+    const barSeries = [];
+    const otherSeries = [];
+    const allGroups = groups.flat();
+
+    Object.keys(series).forEach((key) => {
+      const type = series[key].type || defaultType;
+      const isOverlappingBar = type === 'bar' && allGroups.length;
+
+      if (isOverlappingBar) {
+        const overlappingIdx = allGroups.findIndex(group => group === key);
+        barSeries.push({ key, overlappingIdx });
+      } else {
+        otherSeries.push({ key });
+      }
+    });
+
+    // 큰 값을 가지는 series가 먼저 그려지도록 groups에서 지정한 순서의 역순으로 정렬
+    barSeries.sort((a, b) => b.overlappingIdx - a.overlappingIdx);
+
+    return [...barSeries, ...otherSeries]
+        .map(({ key }) => key);
   },
 
   /**

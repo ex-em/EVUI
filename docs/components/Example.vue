@@ -3,9 +3,9 @@
     <h3 class="article-title">
       {{ title }}
     </h3>
-    <p class="article-description">
-      {{ description }}
-    </p>
+    <p
+      class="article-description"
+      v-html="description" />
     <div
         :class="['article-example', { 'vertical-mode':verticalMode }]"
     >
