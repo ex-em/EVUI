@@ -1,9 +1,9 @@
 <template>
   <div class="case">
-    <p class="case-title">Calendar date mode (readonly: false)</p>
+    <p class="case-title">Calendar date mode (enable text input)</p>
     <ev-date-picker
       v-model="date1"
-      :readonly="false"
+      :enable-text-input="true"
       placeholder="Select a date."
       clearable
     />
@@ -41,7 +41,7 @@
       v-model="dateTime2"
       mode="dateTime"
       clearable
-      :readonly="false"
+      :enable-text-input="true"
       :options="{
         timeFormat: 'HH:00:ss'
       }"
@@ -116,11 +116,11 @@
     </div>
   </div>
   <div class="case ev-date-picker__date-range">
-    <p class="case-title">Calendar dateRange mode (readonly: false)</p>
+    <p class="case-title">Calendar dateRange mode (enable text input)</p>
     <ev-date-picker
         v-model="dateRange2"
         mode="dateRange"
-        :readonly="false"
+        :enable-text-input="true"
         clearable
     />
     <div class="description">
@@ -177,11 +177,11 @@
       {{ dateTimeRange2 }}
     </div>
     <div class="case ev-date-picker__date-time-range">
-      <p class="case-title">Calendar dateTimeRange mode (readonly: false)</p>
+      <p class="case-title">Calendar dateTimeRange mode (enable text input)</p>
       <ev-date-picker
           v-model="dateTimeRange3"
           mode="dateTimeRange"
-          :readonly="false"
+          :enable-text-input="true"
           clearable
       />
       <div class="description">

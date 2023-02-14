@@ -18,16 +18,16 @@
         <input
           v-model.trim="currentValue"
           type="text"
-          :class="['ev-input', {readonly : $props.readonly}]"
+          :class="['ev-input', {readonly : !$props.enableTextInput}]"
           :placeholder="$props.placeholder"
-          :readonly="$props.readonly"
+          :readonly="!$props.enableTextInput"
           :disabled="$props.disabled"
           @click="clickSelectInput"
           @keydown.enter.prevent="validateValue(currentValue)"
           @change="validateValue(currentValue)"
         />
       </template>
-      <template v-else-if="$props.mode === 'dateMulti' || $props.readonly">
+      <template v-else-if="$props.mode === 'dateMulti' || !$props.enableTextInput">
         <div
           class="ev-date-picker-tag-wrapper"
           @click="clickSelectInput"
@@ -204,11 +204,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    readonly: {
-      type: Boolean,
-      default: true,
-    },
     clearable: {
+      type: Boolean,
+      default: false,
+    },
+    enableTextInput: {
       type: Boolean,
       default: false,
     },

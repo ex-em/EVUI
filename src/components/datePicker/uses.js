@@ -187,7 +187,7 @@ export const useDropdown = () => {
    */
   const clickSelectInput = async () => {
     if (!props.disabled) {
-      isDropbox.value = props.readonly ? !isDropbox.value : true;
+      isDropbox.value = props.enableTextInput ? true : !isDropbox.value;
       if (isDropbox.value) {
         await changeDropboxPosition();
       }
