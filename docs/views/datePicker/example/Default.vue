@@ -1,8 +1,9 @@
 <template>
   <div class="case">
-    <p class="case-title">Calendar date mode</p>
+    <p class="case-title">Calendar date mode (enable text input)</p>
     <ev-date-picker
       v-model="date1"
+      :enable-text-input="true"
       placeholder="Select a date."
       clearable
     />
@@ -37,13 +38,14 @@
   <div class="case">
     <p class="case-title">Calendar dateTime mode(shortcuts)</p>
     <ev-date-picker
-        v-model="dateTime2"
-        mode="dateTime"
-        clearable
-        :options="{
-          timeFormat: 'HH:00:ss'
-        }"
-        :shortcuts="dateTime2Shortcut"
+      v-model="dateTime2"
+      mode="dateTime"
+      clearable
+      :enable-text-input="true"
+      :options="{
+        timeFormat: 'HH:00:ss'
+      }"
+      :shortcuts="dateTime2Shortcut"
     />
     <div class="description">
       <span class="badge">
@@ -113,8 +115,23 @@
       {{ dateMulti3 }}
     </div>
   </div>
+  <div class="case ev-date-picker__date-range">
+    <p class="case-title">Calendar dateRange mode (enable text input)</p>
+    <ev-date-picker
+        v-model="dateRange2"
+        mode="dateRange"
+        :enable-text-input="true"
+        clearable
+    />
+    <div class="description">
+      <span class="badge">
+        Value
+      </span>
+      {{ dateRange2 }}
+    </div>
+  </div>
   <div class="case">
-    <p class="case-title">Calendar dateRange mode</p>
+    <p class="case-title">Calendar dateRange mode (shortcut)</p>
     <ev-date-picker
       v-model="dateRange1"
       mode="dateRange"
@@ -147,7 +164,6 @@
     <ev-date-picker
         v-model="dateTimeRange2"
         mode="dateTimeRange"
-        clearable
         :options="{
           timeFormat: ['HH:mm:00', 'HH:mm:00'],
           disabledDate: disabledDateTime,
@@ -159,6 +175,21 @@
         Value
       </span>
       {{ dateTimeRange2 }}
+    </div>
+    <div class="case ev-date-picker__date-time-range">
+      <p class="case-title">Calendar dateTimeRange mode (enable text input)</p>
+      <ev-date-picker
+          v-model="dateTimeRange3"
+          mode="dateTimeRange"
+          :enable-text-input="true"
+          clearable
+      />
+      <div class="description">
+      <span class="badge">
+        Value
+      </span>
+        {{ dateTimeRange3 }}
+      </div>
     </div>
   </div>
 </template>
@@ -176,8 +207,10 @@ export default {
     const dateMulti2 = ref([]);
     const dateMulti3 = ref([]);
     const dateRange1 = ref([]);
+    const dateRange2 = ref(['2023-02-12', '2023-02-13']);
     const dateTimeRange1 = ref([]);
     const dateTimeRange2 = ref(['2022-06-07 16:01:01', '2022-06-08 17:10:15']);
+    const dateTimeRange3 = ref(['2023-02-14 10:00:00', '2023-02-14 11:00:00']);
 
     const TODAY_0_O_CLOCK_DATE = new Date(dayjs()
         .format('YYYY-MM-DD 00:00:00'));
@@ -244,11 +277,28 @@ export default {
       dateMulti2,
       dateMulti3,
       dateRange1,
+      dateRange2,
       dateTimeRange1,
       dateTimeRange2,
       dateTimeRange2Shortcut,
+      dateTimeRange3,
       disabledDateTime,
     };
   },
 };
 </script>
+<style lang="scss">
+.ev-date-picker__date-range {
+  .ev-date-picker-range-input {
+    width: 100px;
+    flex: none;
+  }
+}
+.ev-date-picker__date-time-range {
+  .ev-date-picker-range-input {
+    width: 155px;
+    flex: none;
+    text-align: center;
+  }
+}
+</style>

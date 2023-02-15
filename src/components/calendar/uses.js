@@ -379,11 +379,11 @@ export const useModel = () => {
   const dayOfTheWeekList = computed(() =>
     DAY_OF_THE_WEEK_NAME_LIST[props.dayOfTheWeekNotation]);
   // mode: dateRange에 두 달력이 연속적인 경우
-  const isContinuousMonths = computed(
-    () => ['dateRange', 'dateTimeRange'].includes(props.mode)
-        && (mainCalendarPageInfo.year === expandedCalendarPageInfo.year
-        && mainCalendarPageInfo.month === expandedCalendarPageInfo.month),
-  );
+  // const isContinuousMonths = computed(
+  //   () => ['dateRange', 'dateTimeRange'].includes(props.mode)
+  //       && (mainCalendarPageInfo.year === expandedCalendarPageInfo.year
+  //       && mainCalendarPageInfo.month === expandedCalendarPageInfo.month),
+  // );
 
   onBeforeMount(() => {
     validateModelValue();
@@ -396,12 +396,12 @@ export const useModel = () => {
     mainCalendarMonth,
     expandedCalendarMonth,
     dayOfTheWeekList,
-    isContinuousMonths,
+    // isContinuousMonths,
   };
 };
 
 export const useCalendarDate = (param) => {
-  const { props, emit } = getCurrentInstance();
+  const { props } = getCurrentInstance();
   const { selectedValue, mainCalendarPageInfo, expandedCalendarPageInfo } = param;
 
   // 메인 달력 테이블의 날짜 정보 (6X7, 2차원배열)
@@ -422,42 +422,6 @@ export const useCalendarDate = (param) => {
   });
 
   /**
-   * calendar setting 하기 전 선택된 날짜가 disabledDate에 포함되는지 체크
-   * @param isRangeMode
-   * @param calendarType
-   * @param disabledDate
-   */
-  const checkDisabledDate = ({ isRangeMode, calendarType, disabledDate }) => {
-    if (isRangeMode) {
-      if (calendarType === 'main' && selectedValue.value[0]) {
-        if (disabledDate && disabledDate(new Date(selectedValue.value[0]))) {
-          selectedValue.value[0] = '';
-          emit('update:modelValue', [...selectedValue.value]);
-        }
-      } else if (calendarType === 'expanded' && selectedValue.value[1]) {
-        if (disabledDate && disabledDate(new Date(selectedValue.value[1]))) {
-          selectedValue.value[1] = '';
-          emit('update:modelValue', [...selectedValue.value]);
-        }
-      }
-    } else if (props.mode === 'dateMulti') {
-      let isUpdate = false;
-      selectedValue.value.forEach((value, index) => {
-        if (disabledDate && disabledDate(new Date(value))) {
-          selectedValue.value.splice(index, 1);
-          isUpdate = true;
-        }
-      });
-      if (isUpdate) {
-        emit('update:modelValue', [...selectedValue.value]);
-      }
-    } else if (disabledDate && disabledDate(new Date(selectedValue.value))) {
-        selectedValue.value = '';
-        emit('update:modelValue', selectedValue.value);
-      }
-  };
-
-  /**
    * Dropdown Calendar 날짜 정보 세팅하기
    * @param calendarType - 달력 종류 ('main'|'expanded')
    */
@@ -473,41 +437,33 @@ export const useCalendarDate = (param) => {
     }
     const isRangeMode = ['dateRange', 'dateTimeRange'].includes(props.mode);
 
-    checkDisabledDate({
-      isRangeMode,
-      calendarType,
-      disabledDate,
-    });
-
     const TODAY_YMD = formatDateTime({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: new Date().getDate(),
     });
-    const PREV_MONTH = computed(() =>
-      ((MONTH_CNT + calendarPageInfo.month - 1) % MONTH_CNT) || MONTH_CNT);
-    const NEXT_MONTH = computed(() =>
-      ((calendarPageInfo.month + 1) % MONTH_CNT) || MONTH_CNT);
-    const YEAR_OF_PREV_MONTH = computed(() => (calendarPageInfo.month === 1
-      ? calendarPageInfo.year - 1 : calendarPageInfo.year));
-    const YEAR_OF_NEXT_MONTH = computed(() => (calendarPageInfo.month === 12
-      ? calendarPageInfo.year + 1 : calendarPageInfo.year));
+    const PREV_MONTH = ((MONTH_CNT + calendarPageInfo.month - 1) % MONTH_CNT) || MONTH_CNT;
+    const NEXT_MONTH = ((calendarPageInfo.month + 1) % MONTH_CNT) || MONTH_CNT;
+    const YEAR_OF_PREV_MONTH = (calendarPageInfo.month === 1
+      ? calendarPageInfo.year - 1 : calendarPageInfo.year);
+    const YEAR_OF_NEXT_MONTH = calendarPageInfo.month === 12
+      ? calendarPageInfo.year + 1 : calendarPageInfo.year;
     // 이번달 1일의 요일
-    const dayOfWeekOnThe1stOfThisMonth = computed(() => getDayOfWeekOnThe1stOfMonth(
+    const dayOfWeekOnThe1stOfThisMonth = getDayOfWeekOnThe1stOfMonth(
       calendarPageInfo.year,
       calendarPageInfo.month,
-    ));
+    );
     // 저번달 마지막 날짜
-    const lastDateOfPrevMonth = computed(() => getLastDateOfMonth(
+    const lastDateOfPrevMonth = getLastDateOfMonth(
       calendarPageInfo.month === 1
         ? calendarPageInfo.year - 1 : calendarPageInfo.year,
       (MONTH_CNT + calendarPageInfo.month - 1) % MONTH_CNT || MONTH_CNT,
-    ));
+    );
     // 이번달 마지막 날짜
-    const lastDateOfThisMonth = computed(() => getLastDateOfMonth(
+    const lastDateOfThisMonth = getLastDateOfMonth(
       calendarPageInfo.year,
       calendarPageInfo.month,
-    ));
+    );
 
     let modelValue = '';
     if (props.mode.includes('Time')) {
@@ -526,7 +482,7 @@ export const useCalendarDate = (param) => {
     // date 숫자 및 속성 세팅
     const setDateInfo = (monthType, i, j) => {
       currDate = formatDateTime({ year, month, date });
-      const isInvalidDate = isRangeMode
+      const isInvalidDate = isRangeMode && !disabledDate
           && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value);
 
       // time 모드인 경우 현재 값의 시간을 가지고 테스트
@@ -537,10 +493,9 @@ export const useCalendarDate = (param) => {
 
       const index = +(calendarType !== 'main');
       const isRangeSelected = isRangeMode && selectedValue.value.length > index
-          && selectedValue.value[index].split(' ')[0].includes(currDate);
-      const isSelected = !isDisabled && (isRangeMode
-        ? monthType === '' && isRangeSelected
-        : selectedValue.value?.includes(currDate));
+          && selectedValue.value?.[index]?.includes(currDate);
+      const isSelected = !isDisabled
+        && (isRangeMode ? isRangeSelected : selectedValue.value?.includes(currDate));
 
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[i][j] = {
@@ -557,11 +512,11 @@ export const useCalendarDate = (param) => {
       for (let j = 0; j < CALENDAR_COLS; j++) {
         if (i === 0) {
           // 첫번째 주
-          if (dayOfWeekOnThe1stOfThisMonth.value !== 0) {
-            if (j < dayOfWeekOnThe1stOfThisMonth.value) {
-              year = YEAR_OF_PREV_MONTH.value;
-              month = PREV_MONTH.value;
-              date = lastDateOfPrevMonth.value - dayOfWeekOnThe1stOfThisMonth.value + 1 + j;
+          if (dayOfWeekOnThe1stOfThisMonth !== 0) {
+            if (j < dayOfWeekOnThe1stOfThisMonth) {
+              year = YEAR_OF_PREV_MONTH;
+              month = PREV_MONTH;
+              date = lastDateOfPrevMonth - dayOfWeekOnThe1stOfThisMonth + 1 + j;
               setDateInfo('prev', i, j);
             } else {
               monthDate++;
@@ -571,17 +526,17 @@ export const useCalendarDate = (param) => {
               setDateInfo('', i, j);
             }
           } else {
-            year = YEAR_OF_PREV_MONTH.value;
-            month = PREV_MONTH.value;
-            date = lastDateOfPrevMonth.value - 6 + j;
+            year = YEAR_OF_PREV_MONTH;
+            month = PREV_MONTH;
+            date = lastDateOfPrevMonth - 6 + j;
             setDateInfo('prev', i, j);
           }
-        } else if (lastDateOfThisMonth.value <= monthDate) {
+        } else if (lastDateOfThisMonth <= monthDate) {
           // 마지막 -1, 마지막 주의 다음달 날짜
           monthDate++;
-          year = YEAR_OF_NEXT_MONTH.value;
-          month = NEXT_MONTH.value;
-          date = monthDate - lastDateOfThisMonth.value;
+          year = YEAR_OF_NEXT_MONTH;
+          month = NEXT_MONTH;
+          date = monthDate - lastDateOfThisMonth;
           setDateInfo('next', i, j);
         } else {
           // 첫번째 주를 제외한 이번달 날짜
@@ -791,50 +746,24 @@ export const useEvent = (param) => {
   const moveMonth = (calendarType, type) => {
     const isDateRangeMode = ['dateRange', 'dateTimeRange'].includes(props.mode);
     let calendarPageInfo = mainCalendarPageInfo;
-    if (!isDateRangeMode) {
-      if (type === 'prev') {
-        if (calendarPageInfo.month === 1) {
-          calendarPageInfo.year -= 1;
-          calendarPageInfo.month = 12;
-        } else {
-          calendarPageInfo.month -= 1;
-        }
-      } else if (calendarPageInfo.month === 12) {
+    if (isDateRangeMode) {
+      calendarPageInfo = calendarType === 'expanded'
+        ? expandedCalendarPageInfo : mainCalendarPageInfo;
+    }
+
+    if (type === 'prev') {
+      if (calendarPageInfo.month === 1) {
+        calendarPageInfo.year -= 1;
+        calendarPageInfo.month = 12;
+      } else {
+        calendarPageInfo.month -= 1;
+      }
+    } else if (calendarPageInfo.month === 12) {
         calendarPageInfo.year += 1;
         calendarPageInfo.month = 1;
       } else {
         calendarPageInfo.month += 1;
       }
-    } else {
-      calendarPageInfo = calendarType === 'expanded'
-        ? expandedCalendarPageInfo : mainCalendarPageInfo;
-
-      // 두 달력간의 연속 여부 (메인 달력 + 1Month === 확장된 달력)
-      // mainCalendar Month < expandedCalendar Month
-      const isContinuousMonths = expandedCalendarPageInfo.year === mainCalendarPageInfo.year
-        && expandedCalendarPageInfo.month === mainCalendarPageInfo.month;
-      if (type === 'prev') {
-        if (isContinuousMonths && calendarType === 'expanded') {
-          return;
-        }
-        if (calendarPageInfo.month === 1) {
-          calendarPageInfo.year -= 1;
-          calendarPageInfo.month = 12;
-        } else {
-          calendarPageInfo.month -= 1;
-        }
-      } else {
-        if (isContinuousMonths && calendarType === 'main') {
-          return;
-        }
-        if (calendarPageInfo.month === 12) {
-          calendarPageInfo.year += 1;
-          calendarPageInfo.month = 1;
-        } else {
-          calendarPageInfo.month += 1;
-        }
-      }
-    }
   };
 
   /**
@@ -895,7 +824,14 @@ export const useEvent = (param) => {
 
       selectedValue.value[currIndex] = currDate;
       moveDispCalendarMonth();
-      updateCalendarPage(selectedValue.value);
+      setCalendarPageInfo(calendarType, {
+        year: getDateTimeInfoByType(currDate, 'year'),
+        month: getDateTimeInfoByType(currDate, 'month'),
+        hour: Math.floor(getDateTimeInfoByType(currDate, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1,
+        min: Math.floor(getDateTimeInfoByType(currDate, 'min') / CELL_CNT_IN_ONE_PAGE) + 1,
+        sec: Math.floor(getDateTimeInfoByType(currDate, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1,
+      });
+      setCalendarDate(calendarType);
     };
 
     switch (props.mode) {
@@ -1241,19 +1177,54 @@ export const useEvent = (param) => {
     }
   }, 10);
 
+  /**
+   * calendar setting 하기 전 선택된 날짜가 disabledDate에 포함되는지 체크
+   * @param currValue
+   */
+  const checkDisabledDate = (currValue) => {
+    const isRangeMode = ['dateRange', 'dateMulti', 'dateTimeRange'].includes(props.mode);
+    const disabledDate = props.options.disabledDate;
+    if (isRangeMode) {
+      let [disabledFromDate, disabledToDate] = [disabledDate, disabledDate];
+      if (disabledDate && Array.isArray(disabledDate)) {
+        [disabledFromDate, disabledToDate] = disabledDate;
+      }
+
+      if (currValue[0] && disabledFromDate && disabledFromDate(new Date(currValue[0]))) {
+        return true;
+      } else if (currValue[1] && disabledToDate && disabledToDate(new Date(currValue[1]))) {
+        return true;
+      } else if (!disabledDate
+        && compareFromAndToDateTime(props.mode, 'main', currValue[0], currValue)) {
+        return true;
+      }
+    } else if (props.mode === 'dateMulti') {
+      return currValue.some(value => disabledDate && disabledDate(new Date(value)));
+    } else if (disabledDate && disabledDate(new Date(currValue))) {
+      return true;
+    }
+    return false;
+  };
+
   watch(
     () => props.modelValue,
     (curr) => {
-      selectedValue.value = curr;
+      if (checkDisabledDate(curr)) {
+        emit('update:modelValue', selectedValue.value);
+        return;
+      }
+
+      const isRangeMode = ['dateRange', 'dateMulti', 'dateTimeRange'].includes(props.mode);
+      selectedValue.value = isRangeMode ? [...curr] : curr;
 
       if (props.mode === 'dateRange') {
-        updateCalendarPage(selectedValue.value);
+        updateCalendarPage(curr);
       } else if (props.mode.includes('Time')) {
         let updateValue = [];
         if (props.mode === 'dateTime') {
-          updateValue = [selectedValue.value];
+          updateValue = [curr];
         } else if (props.mode === 'dateTimeRange') {
-          updateValue = selectedValue.value;
+          updateValue = curr;
         }
         updateCalendarPage(updateValue);
         setHmsTime();
