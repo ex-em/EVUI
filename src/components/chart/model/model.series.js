@@ -18,7 +18,7 @@ const modules = {
   createSeriesSet(series, defaultType, isHorizontal, groups) {
     let seriesKeys = Object.keys(series);
 
-    if (this.options.overlapping) {
+    if (this.options.overlapping.use) {
       seriesKeys = this.getOverlappingSeriesKeys(series, defaultType, groups);
     }
 
@@ -110,6 +110,7 @@ const modules = {
         series.isExistGrp = true;
         series.bsId = prev;
         series.bsIds = group.filter((item, idx) => item !== curr && sIdx > idx);
+        series.isOverlapping = this.options.overlapping.use;
 
         if (!series.show) {
           interpolation--;

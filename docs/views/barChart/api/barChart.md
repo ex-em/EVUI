@@ -128,7 +128,7 @@ const chartData = {
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
   | range | Array | null | 축에 표시할 값의 min, max | [0, 100] |
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
-  | overlapping | Boolean | false | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. | true / false |     
+  | overlapping | Object | ([상세](#overlapping)) | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. |  |   
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
@@ -165,6 +165,11 @@ const chartData = {
       - Step Axis를 Time 기반으로 변경, default: false
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
+
+##### overlapping
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| use | Boolean | false | overlapping 사용 여부 | true / false |
 
 ##### labelStyle
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

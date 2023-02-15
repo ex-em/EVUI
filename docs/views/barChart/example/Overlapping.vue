@@ -35,7 +35,9 @@ export default {
         position: 'right',
       },
       horizontal: false,
-      overlapping: true,
+      overlapping: {
+        use: true,
+      },
       axesX: [{
         type: 'step',
         showGrid: false,
