@@ -17,7 +17,7 @@
 | v-model | String, Array | '' | 컴포넌트 입력 값, String 타입인 경우는 'YYYY-MM-DD' 또는 'YYYY-MM-DD HH:MI:SS'의 형태로 작성해야하며, Array 타입인 경우는 배열 내에 'YYYY-MM-DD' 형식에 맞는 String 값을 넣어야한다.  | |
 | placeholder | String | '' | 인풋박스의 placeholder |  |
 | disabled | Boolean | false | <데이트피커> 사용여부 |  |
-| enableTextInput | Boolean | true | <데이트피커> 텍스트 입력 활성화  |  |
+| enableTextInput | Boolean | false | <데이트피커> 텍스트 입력 활성화  |  |
 | clearable | Boolean | false | <데이트피커> 내 선택된 항목을 모두 clear할 수 있는 아이콘 사용 여부 |  |
 | mode | String | 'date' | 캘린더 모드 | 'date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange' |
 |  |  | date(default) | 메인 캘린더에서 날짜를 선택(사용자가 인풋에 직접 입력 가능) | 'YYYY-MM-DD' |
