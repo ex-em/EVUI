@@ -70,6 +70,9 @@ const DEFAULT_OPTIONS = {
   },
   reverse: false,
   horizontal: false,
+  overlapping: {
+    use: false,
+  },
   width: '100%',
   height: '100%',
   thickness: 1,

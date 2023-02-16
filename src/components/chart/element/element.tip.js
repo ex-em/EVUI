@@ -292,7 +292,8 @@ const modules = {
 
       const seriesList = Object.keys(this.seriesList ?? {});
       const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
-      const isExistGrp = seriesList.some(sId => this.seriesList[sId].isExistGrp);
+      const isExistGrp = seriesList
+          .some(sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping);
       const groups = this.data.groups?.[0] ?? [];
 
       let gp;

@@ -48,7 +48,7 @@ const modules = {
             const sData = data[seriesID];
 
             if (series && sData) {
-              if (series.isExistGrp && series.stackIndex) {
+              if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
                 series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
                 series.data = this.addSeriesDS(sData, label);

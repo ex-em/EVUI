@@ -100,7 +100,7 @@ class EvChart {
     const { series, data, labels, groups } = this.data;
     const { type, axesX, axesY, tooltip, horizontal } = this.options;
 
-    this.createSeriesSet(series, type, horizontal);
+    this.createSeriesSet(series, type, horizontal, groups);
     if (groups.length) {
       this.addGroupInfo(groups);
     }
@@ -702,7 +702,7 @@ class EvChart {
       this.seriesList = {};
       this.lastTip = { pos: null, value: null };
 
-      this.createSeriesSet(series, options.type, options.horizontal);
+      this.createSeriesSet(series, options.type, options.horizontal, groups);
 
       if (this.legendDOM) {
         this.updateLegend();

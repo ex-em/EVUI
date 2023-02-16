@@ -18,6 +18,8 @@ import Gradient from './example/Gradient';
 import GradientRaw from '!!raw-loader!./example/Gradient';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
+import Overlapping from './example/Overlapping';
+import OverlappingRaw from '!!raw-loader!./example/Overlapping';
 
 export default {
   mdText,
@@ -41,6 +43,13 @@ export default {
       description: '동일한 그룹으로 묶인 series들의 데이터를 한 막대에 누적하여 표현할 수 있습니다.',
       component: Stack,
       parsedData: parseComponent(StackRaw),
+    },
+    Overlapping: {
+      description: `동일한 그룹으로 묶인 series들의 데이터를 한 막대에 겹쳐서 표현할 수 있습니다.<br/>
+          2개의 시리즈에 한정해 사용하는 것을 권장하며, data 속성의 groups에서 지정한 시리즈 순서대로 이전 시리즈에 포함되는 값은 항상 다음 시리즈에 속하는 값보다 작거나 같아야 합니다.<br/>
+          초과의 값을 가지면 가려질 수 있습니다.`,
+      component: Overlapping,
+      parsedData: parseComponent(OverlappingRaw),
     },
     Time: {
       description: '실시간으로 데이터를 받아 표현할 수 있으며, 가장 큰 값에 해당하는 막대위에 Tip을 붙일 수 있습니다.',
