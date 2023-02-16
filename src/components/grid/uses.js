@@ -873,7 +873,7 @@ export const contextMenuEvent = (params) => {
    */
   const onContextMenu = (event) => {
     const target = event.target;
-    const rowIndex = target.closest('.row').dataset.index;
+    const rowIndex = target.closest('.row')?.dataset?.index;
 
     let clickedRow;
     if (rowIndex) {
