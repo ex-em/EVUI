@@ -601,7 +601,7 @@ export const contextMenuEvent = (params) => {
    */
   const onContextMenu = (event) => {
     const target = event.target;
-    const rowIndex = target.closest('.row').dataset.index;
+    const rowIndex = target.closest('.row')?.dataset?.index;
 
     if (rowIndex) {
       const index = stores.viewStore.findIndex(v => v.index === Number(rowIndex));
