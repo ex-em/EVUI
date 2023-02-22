@@ -102,9 +102,9 @@ export const useModel = () => {
 
     if (isValid) {
       mv.value = isRangeMode ? [...curr] : curr;
-    } else {
-      currentValue.value = isRangeMode ? [...mv.value] : mv.value;
     }
+
+    currentValue.value = isRangeMode ? [...mv.value] : mv.value;
   };
 
   // clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부
