@@ -58,7 +58,6 @@ import { reactive, ref } from 'vue';
           type: 'step',
           showGrid: false,
         }],
-        itemHighlight: false,
         heatMapColor: {
           colorsByRange: [
             { color: '#EAE2B7', label: 'Normal' },
