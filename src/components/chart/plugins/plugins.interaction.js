@@ -1,5 +1,5 @@
 import { numberWithComma } from '@/common/utils';
-import { cloneDeep, defaultsDeep } from 'lodash-es';
+import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
 
 const modules = {
   /**
@@ -116,9 +116,22 @@ const modules = {
         this.isMouseMove = false;
         return;
       }
+
       const args = { e };
-      if (this.options.selectItem.use && this.options.selectItem.useClick) {
-        const offset = this.getMousePosition(e);
+      const offset = this.getMousePosition(e);
+
+      const {
+        type: chartType,
+        selectItem: selectItemOpt,
+        selectLabel: selectLabelOpt,
+        selectSeries: selectSeriesOpt,
+      } = this.options;
+
+      const useSelectItem = selectItemOpt?.use && selectItemOpt?.useClick;
+      const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+      const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
+
+      const setSelectedItemInfo = () => {
         const hitInfo = this.getItemByPosition(offset, false);
 
         ({
@@ -129,29 +142,87 @@ const modules = {
           acc: args.acc,
         } = hitInfo);
 
-        if (this.options.type === 'heatMap') {
-          args.deselect = this.setDeselectItem(hitInfo);
+        args.selected = {
+          eventTarget: 'item',
+          seriesId: this.isDeselectItem(hitInfo) ? null : hitInfo.sId,
+          dataIndex: this.isDeselectItem(hitInfo) ? null : hitInfo.maxIndex,
+        };
+      };
+
+      const setSelectedLabelInfo = (axisDirection) => {
+        const hitInfo = this.getLabelInfoByPosition(offset, axisDirection);
+        const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, axisDirection);
+        this.defaultSelectInfo.dataIndex = allSelectedList.dataIndex;
+
+        if (axisDirection) {
+          this.defaultSelectInfo.targetAxis = axisDirection;
         }
 
-        if (hitInfo.label !== null) {
-          this.render(hitInfo);
-        }
-      } else if (this.options.selectLabel.use && this.options.selectLabel.useClick) {
-        const offset = this.getMousePosition(e);
-        const clickedLabelInfo = this.getLabelInfoByPosition(offset);
-        const selected = this.selectLabel(clickedLabelInfo.labelIndex);
-        this.renderWithSelected(selected.dataIndex);
+        args.selected = {
+          eventTarget: 'label',
+          ...cloneDeep(this.defaultSelectInfo),
+        };
+      };
 
-        args.selected = cloneDeep(this.defaultSelectInfo);
-      } else if (this.options.selectSeries.use && this.options.selectSeries.useClick) {
-        const offset = this.getMousePosition(e);
-        const hitInfo = this.getSeriesIdByPosition(offset);
+      const setSelectedSeriesInfo = () => {
+        const hitInfo = this.getSeriesInfoByPosition(offset);
         if (hitInfo.sId !== null) {
-          const selected = this.selectSeries(hitInfo.sId);
-          this.renderWithSelected(selected.seriesId);
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
+          this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
         }
 
-        args.selected = cloneDeep(this.defaultSelectInfo);
+        args.selected = {
+          eventTarget: 'series',
+          ...cloneDeep(this.defaultSelectInfo),
+        };
+      };
+
+      switch (chartType) {
+        case 'line': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          } else if (useSelectSeries) {
+            setSelectedSeriesInfo();
+          }
+          break;
+        }
+
+        case 'bar':
+        case 'heatMap': {
+          if (useSelectItem && useSelectLabel) {
+            const { useBothAxis } = selectLabelOpt;
+
+            const location = this.getClickedLocation(offset);
+
+            if (location === 'chartBackground') {
+              this.clearSelectedLabelInfo();
+              args.deselected = { eventTarget: 'label' };
+              setSelectedItemInfo();
+            } else if (location === 'yAxis' || location === 'xAxis') {
+              this.clearSelectedItemInfo();
+              args.deselected = { eventTarget: 'item' };
+              setSelectedLabelInfo(useBothAxis ? location : null);
+            }
+          } else if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          }
+          break;
+        }
+
+        case 'pie':
+        case 'scatter': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          }
+          break;
+        }
+
+        default:
+          break;
       }
 
       if (typeof this.listeners.click === 'function') {
@@ -300,7 +371,7 @@ const modules = {
           data: this.findSelectedItems(dragInfo),
           range: type === 'heatMap'
             ? this.getSelectionRangeForHeatMap(dragInfo)
-            : this.getSelectionRage(dragInfo),
+            : this.getSelectionRange(dragInfo),
         };
 
         this.dragInfoBackup = defaultsDeep({}, dragInfo);
@@ -570,11 +641,12 @@ const modules = {
   },
 
   /**
-   *
+   * Select Item
+   * Set backup data that selected item information
+   * render chart
    * @param targetInfo {object}  '{ dataIndex: number, seriesID: string }'
-   * @param chartType {string}  'bar', 'line', 'pie', 'scatter'
+   * @param chartType {string}  'bar', 'line', 'pie', 'scatter', 'heatMap'
    *
-   * @returns {boolean}
    */
   selectItemByData(targetInfo, chartType) {
     this.defaultSelectItemInfo = targetInfo;
@@ -586,95 +658,104 @@ const modules = {
         sId: targetInfo.seriesID,
       };
     } else {
-      if (isNaN(targetInfo?.dataIndex)) {
-        return false;
-      }
-
-      foundInfo = this.getItem(targetInfo, false);
+      foundInfo = isNaN(targetInfo?.dataIndex) ? null : this.getItem(targetInfo, false);
     }
 
-    if (foundInfo) {
-      this.render(foundInfo);
-    } else {
-      return false;
-    }
-
-    return true;
+    this.render(foundInfo);
   },
 
   /**
-   * render after selected label or selected series
-   * @param indexList {array}  '[0, 1 ...]'
+   * Select Label
+   * set backup data that selected label information list
+   * render chart
+   * @param labelIndexList {number[]}
+   * @param targetAxis {string | null}
+   * @returns {boolean}
    */
-  renderWithSelected(list) {
-    if (this.options.selectLabel.use) {
-      this.defaultSelectInfo.dataIndex = list;
-    } else if (this.options.selectSeries.use) {
-      this.defaultSelectInfo.seriesId = list;
-    }
-    this.initSelectedInfo();
+  selectLabelByData(labelIndexList, targetAxis) {
+    this.defaultSelectInfo = this.getSelectedLabelInfo(labelIndexList, targetAxis);
     this.render();
   },
 
   /**
-   * init defaultSelectInfo object.
-   * - at selectLabel using: set each series data and label text
-   * - at selectSeries using: set series state
+   * Select Series
+   * set backup data that selected series information list
+   * render chart
+   * @param seriesIdList {number[]}  '
+   * @returns {boolean}
    */
-  initSelectedInfo() {
-    if (this.options.selectLabel.use) {
-      if (!this.defaultSelectInfo) {
-        this.defaultSelectInfo = { dataIndex: [] };
-      }
-
-      if (this.options.type === 'heatMap') {
-        this.initSelectedInfoForHeatMap();
-        return;
-      }
-
-      const { limit } = this.options.selectLabel;
-      const infoObj = this.defaultSelectInfo;
-      infoObj.dataIndex.splice(limit);
-      infoObj.label = infoObj.dataIndex.map(i => this.data.labels[i]);
-      const dataEntries = Object.entries(this.data.data);
-      infoObj.data = infoObj.dataIndex.map(labelIdx => Object.fromEntries(
-        dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
-    } else if (this.options.selectSeries.use) {
-      if (!this.defaultSelectInfo) {
-        this.defaultSelectInfo = { seriesId: [] };
-      }
-    }
+  selectSeriesByData(seriesIdList) {
+    this.defaultSelectInfo.seriesId = seriesIdList;
+    this.render();
   },
 
+
   /**
-   * init defaultSelectInfo object for HeatMap.
-   * - at selectLabel using: set each series data and label text
+   * Get each series data and label text
+   * @param labelIndexList{number[]}
+   * @param targetAxis{string | null}
+   * @returns {object[]}
    */
-  initSelectedInfoForHeatMap() {
-    const { limit } = this.options.selectLabel;
-    const isHorizontal = this.options.horizontal;
+  getSelectedLabelInfo(labelIndexList, targetAxis) {
+    const { selectLabel: selectLabelOpt, type: chartType, horizontal } = this.options;
+    const result = cloneDeep(this.defaultSelectInfo);
+    result.dataIndex = labelIndexList;
 
-    const infoObj = this.defaultSelectInfo;
-    infoObj.dataIndex.splice(limit);
+    switch (chartType) {
+      case 'bar':
+      case 'line': {
+        result.dataIndex.splice(selectLabelOpt.limit);
 
-    const targetLabel = isHorizontal ? 'y' : 'x';
-    infoObj.label = infoObj.dataIndex.map(i => this.data.labels[targetLabel][i]);
+        result.label = result.dataIndex.map(i => this.data.labels[i]);
 
-    const dataValues = Object.values(this.data.data)[0];
-    infoObj.data = dataValues.filter(({ x, y }) =>
-      (infoObj.label.includes(isHorizontal ? y : x)),
-    );
+        const dataEntries = Object.entries(this.data.data);
+        result.data = result.dataIndex.map(labelIdx => Object.fromEntries(
+          dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
+        break;
+      }
+
+      case 'heatMap': {
+        const { limit, useBothAxis } = this.options.selectLabel;
+
+        result.dataIndex.splice(limit);
+
+        let targetAxisDirection;
+        if (useBothAxis) {
+          targetAxisDirection = targetAxis === 'yAxis' ? 'y' : 'x';
+        } else {
+          targetAxisDirection = horizontal ? 'y' : 'x';
+        }
+
+        result.label = result.dataIndex.map(i => this.data.labels[targetAxisDirection][i]);
+
+        const dataValues = Object.values(this.data.data)[0];
+        result.data = dataValues.filter(({ x, y }) =>
+          (result.label.includes(targetAxisDirection === 'y' ? y : x)),
+        );
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    return result;
   },
 
   /**
    * Add or delete selected label index, according to policy and option
-   * (set each series data and label text)
-   * @param labelIndex {array}  '[0, 1 ...]'
+   * @param labelIndex {number[]}
+   * @param targetAxis {string | null}
+   * @returns after {number[]}  '[0, 1 ...]' result Label index List
    */
-  selectLabel(labelIndex) {
+  updateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
-    const before = this.defaultSelectInfo ?? { dataIndex: [] };
+    const before = this.defaultSelectInfo ?? { dataIndex: [], targetAxis: null };
     const after = cloneDeep(before);
+
+    if (before?.targetAxis !== targetAxis) {
+      this.clearSelectedLabelInfo();
+    }
 
     if (before.dataIndex.includes(labelIndex)) {
       const idx = before.dataIndex.indexOf(labelIndex);
@@ -693,7 +774,12 @@ const modules = {
     return after;
   },
 
-  selectSeries(seriesId) {
+  /**
+   * Add or delete selected series Index,according to policy and option
+   * @param seriesId {number}
+   * @returns after {number[]}  '[0, 1 ...]' result series Id List
+   */
+  updateSelectedSeriesInfo(seriesId) {
     const option = this.options?.selectSeries ?? {};
     const before = this.defaultSelectInfo ?? { seriesId: [] };
     const after = cloneDeep(before);
@@ -749,7 +835,7 @@ const modules = {
    *                 object.range: coordinate-based range in graph
    * @returns {object}
    */
-  getSelectionRage({ xsp, ysp, width, height, range }) {
+  getSelectionRange({ xsp, ysp, width, height, range }) {
     const dataRangeX = this.axesSteps.x.length ? this.axesSteps.x[0] : null;
     const dataRangeY = this.axesSteps.y.length ? this.axesSteps.y[0] : null;
 
@@ -819,17 +905,66 @@ const modules = {
     };
   },
 
-  setDeselectItem(hitInfo) {
-    let deselect = false;
-    if (this.options.selectItem.useDeselectItem) {
-      const isEqualSelectItem = hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex;
-      if (!isNaN(hitInfo?.maxIndex) && isEqualSelectItem) {
-        deselect = true;
-        this.defaultSelectItemInfo = null;
-        return true;
-      }
+  /**
+   * Check hitInfo is deselected Item through re-click
+   * @param hitInfo
+   * @returns {boolean}
+   */
+  isDeselectItem(hitInfo) {
+    return this.options.selectItem.useDeselectItem
+      && hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex
+      && !isNaN(hitInfo?.maxIndex);
+  },
+
+  /**
+   * Get mouse click location (xAxis, yAxis, chartBackground, canvas)
+   * @param offset
+   * @returns {string}
+   */
+  getClickedLocation(offset) {
+    const [offsetX, offsetY] = offset;
+
+    const aPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+    const xAxisStartPoint = aPos[this.axesX[0].units.rectStart];
+    const xAxisEndPoint = aPos[this.axesX[0].units.rectEnd];
+    const yAxisStartPoint = aPos[this.axesY[0].units.rectStart];
+    const yAxisEndPoint = aPos[this.axesY[0].units.rectEnd];
+
+    if (
+      inRange(offsetX, this.chartRect.x1, aPos.x1)
+      && inRange(offsetY, yAxisStartPoint, yAxisEndPoint)
+    ) {
+      return 'yAxis';
+    } else if (
+      inRange(offsetX, xAxisStartPoint, xAxisEndPoint)
+      && inRange(offsetY, aPos.y2, this.chartRect.y2)) {
+      return 'xAxis';
+    } else if (
+      inRange(offsetX, aPos.x1, aPos.x2)
+      && inRange(offsetY, aPos.y1, aPos.y2)) {
+      return 'chartBackground';
     }
-    return deselect;
+
+    return 'canvas';
+  },
+
+  /**
+   * Clear 'defaultSelectInfo'
+   */
+  clearSelectedLabelInfo() {
+    this.defaultSelectInfo = { dataIndex: [] };
+  },
+
+  /**
+   * Clear 'defaultSelectItemInfo'
+   */
+  clearSelectedItemInfo() {
+    this.defaultSelectItemInfo = null;
   },
 };
 

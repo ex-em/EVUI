@@ -569,7 +569,7 @@ const modules = {
         }
       }
 
-      itemPosition = dataIndex.map((idx) => {
+      itemPosition = dataIndex?.map((idx) => {
         const dataInfo = this.getDataByValues(firShowSeriesID, idx);
 
         if (!dataInfo) {
@@ -700,7 +700,7 @@ const modules = {
    *
    * @returns {object} clicked series id
    */
-  getSeriesIdByPosition(offset) {
+  getSeriesInfoByPosition(offset) {
     const [clickedX, clickedY] = offset;
     const chartRect = this.chartRect;
     const labelOffset = this.labelOffset;
@@ -802,10 +802,11 @@ const modules = {
   /**
    * Find label info by position x and y
    * @param {array}   offset          position x and y
+   * @param {string | null}  targetAxis    target Axis Location ('xAxis', 'yAxis' , null)
    *
    * @returns {object} clicked label information
    */
-  getLabelInfoByPosition(offset) {
+  getLabelInfoByPosition(offset, targetAxis) {
     const [x, y] = offset;
     const aPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
@@ -814,12 +815,21 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    const seiresList = this.data.series;
-    const pointSize = Object.values(seiresList).sort(
+    const seriesList = this.data.series;
+    const pointSize = Object.values(seriesList).sort(
       (a, b) => b.pointSize ?? 0 - a.pointSize ?? 0,
     )[0]?.pointSize ?? 3; // default pointSize 3
     const { horizontal, selectLabel } = this.options;
-    const scale = horizontal ? this.axesY[0] : this.axesX[0];
+
+    let scale;
+    if (targetAxis === 'xAxis') {
+      scale = this.axesX[0];
+    } else if (targetAxis === 'yAxis') {
+      scale = this.axesY[0];
+    } else {
+      scale = horizontal ? this.axesY[0] : this.axesX[0];
+    }
+
     const startPoint = aPos[scale.units.rectStart];
     const endPoint = aPos[scale.units.rectEnd];
 
@@ -827,7 +837,8 @@ const modules = {
     let hitInfo;
     if (scale?.labels?.length) {
       const labelGap = (endPoint - startPoint) / scale.labels.length;
-      const index = Math.floor(((horizontal ? y : x) - startPoint) / labelGap);
+      const isYAxis = targetAxis === 'yAxis' || horizontal;
+      const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);
       labelIndex = scale.labels.length > index ? index : -1;
     } else {
       let offsetX;

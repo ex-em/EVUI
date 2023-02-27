@@ -69,13 +69,15 @@ class StepScale extends Scale {
 
   /**
    * Draw axis
-   * @param {object} chartRect      min/max information
-   * @param {object} labelOffset    label offset information
-   * @param {object} stepInfo       label steps information
+   * @param {object} chartRect  min/max information
+   * @param {object} labelOffset  label offset information
+   * @param {object} stepInfo  label steps information
+   * @param {object} hitInfo  legend Hit Info
+   * @param {object} selectedLabelInfo Selected Label Info
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo, selectedLabelInfo) {
     const ctx = this.ctx;
     const labels = this.labels;
     const aPos = {
@@ -146,11 +148,24 @@ class StepScale extends Scale {
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
 
-        const isBlurredLabel = this.options?.selectLabel?.use
-          && this.options?.selectLabel?.useLabelOpacity
-          && (this.options.horizontal === (this.type === 'y'))
-          && selectLabelInfo?.dataIndex?.length
-          && !selectLabelInfo?.dataIndex?.includes(index);
+        const {
+          selectLabel: selectLabelOpt,
+          selectItem: selectItemOpt,
+          horizontal,
+        } = this.options;
+
+        let targetAxis;
+        if (selectedLabelInfo?.targetAxis) {
+          targetAxis = selectedLabelInfo?.targetAxis === 'yAxis' ? 'y' : 'x';
+        } else {
+          targetAxis = horizontal ? 'y' : 'x';
+        }
+
+        const isBlurredLabel = selectLabelOpt?.use
+          && selectLabelOpt?.useLabelOpacity
+          && targetAxis === this.type
+          && selectedLabelInfo?.dataIndex?.length
+          && !selectedLabelInfo?.dataIndex?.includes(index);
 
         const labelColor = this.labelStyle.color;
         let defaultOpacity = 1;
@@ -167,9 +182,9 @@ class StepScale extends Scale {
           ctx.fillText(labelText, xPoint, labelPoint);
 
           if (!isBlurredLabel
-            && this.options?.selectItem?.showLabelTip
+            && selectItemOpt?.showLabelTip
             && hitInfo?.label
-            && !this.options?.horizontal) {
+            && !horizontal) {
             const selectedLabel = hitInfo.label;
             if (selectedLabel === labelText) {
               const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
@@ -182,8 +197,8 @@ class StepScale extends Scale {
                 borderRadius: 2,
                 arrowSize: 3,
                 text: labelText,
-                backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
-                textColor: this.options?.selectItem?.labelTipStyle?.textColor,
+                backgroundColor: selectItemOpt?.labelTipStyle?.backgroundColor,
+                textColor: selectItemOpt?.labelTipStyle?.textColor,
               });
             }
           }

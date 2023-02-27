@@ -237,17 +237,18 @@ const chartOptions = {
 
 
 #### selectLabel
-| 이름                  | 타입                          | 디폴트       | 설명                                                          | 종류(예시) |
-|-----------------------|------------------------------|-------------|--------------------------------------------------------------|-----------|
-| use                 | Boolean                        | false     | 차트 라벨 선택 기능                                                  | |
+| 이름                  | 타입                          | 디폴트       | 설명                                                | 종류(예시) |
+|---------------------|------------------------------|-------------|---------------------------------------------------|-----------|
+| use                 | Boolean                        | false     | 차트 라벨 선택 기능                                       | |
 | useClick            | Boolean                        | true      | 클릭 이벤트 사용 여부 (v-model에 바인딩한 변수로만 컨트롤 하려 할때 false) | |
-| limit               | Number                         | 1         | 선택할 라벨의 최대 갯수                                               | |
-| useDeselectOverflow | Boolean                        | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부                    | |
-| showTip             | Boolean                        | false     | 선택한 label의 Tip(화살표) 생성 여부                                   | |
-| useSeriesOpacity    | Boolean                        | true      | 시리즈 opacity 변경 여부                                             | |
-| useLabelOpacity     | Boolean                        | true      | Axes Label opacity 변경 여부                                        | |
-| useApproximateValue | Boolean                        | false     | 가까운 label을 선택                                                  | |
-| tipBackground       | Hex, RGB, RGBA Code(String)    | '#000000' | tip 배경색상                                                        | |
+| limit               | Number                         | 1         | 선택할 라벨의 최대 갯수                                     | |
+| useDeselectOverflow | Boolean                        | false     | limit 를 넘어 클릭 했을때 자동 deselect 를 할지 여부             | |
+| showTip             | Boolean                        | false     | 선택한 label의 Tip(화살표) 생성 여부                         | |
+| useSeriesOpacity    | Boolean                        | true      | 시리즈 opacity 변경 여부                                 | |
+| useLabelOpacity     | Boolean                        | true      | Axes Label opacity 변경 여부                          | |
+| useApproximateValue | Boolean                        | false     | 가까운 label을 선택                                     | |
+| useBothAxis         | Boolean                        | false     | X축, Y축 두개 모두 이벤트 적용할지의 여부                         | |
+| tipBackground       | Hex, RGB, RGBA Code(String)    | '#000000' | tip 배경색상                                          | |
 
 ### 3. resize-timeout
 - Default : 0
