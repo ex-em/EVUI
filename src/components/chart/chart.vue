@@ -152,6 +152,7 @@
             useShadow: false,
             throttledMove: false,
             debouncedHide: false,
+            useScrollbar: false,
           },
           indicator: {
             use: true,

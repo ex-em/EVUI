@@ -29,8 +29,9 @@ const modules = {
 
         if (tooltip.use) {
           this.tooltipClear();
-          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-          this.tooltipDOM.style.display = 'block';
+          // eslint-disable-next-line max-len
+          this.setTooltipLayoutPosition(hitInfo, e);
+          this.drawTooltip(hitInfo, this.tooltipCtx);
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
@@ -90,7 +91,7 @@ const modules = {
 
       if (this.options.selectItem.use) {
         const offset = this.getMousePosition(e);
-        const hitInfo = this.findClickedData(offset);
+        const hitInfo = this.findClickedData(offset, false);
 
         if (hitInfo.label !== null) {
           this.render(hitInfo);
@@ -104,10 +105,24 @@ const modules = {
       }
     };
 
+    this.onWheel = (e) => {
+      const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+
+      if (isTooltipVisible) {
+        e.preventDefault();
+        this.tooltipBodyDOM.scrollTop += e.deltaY;
+      }
+    };
+
+    if (this.options?.tooltip?.useScrollbar) {
+      this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
+    }
+
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
     this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
     this.overlayCanvas.addEventListener('click', this.onClick);
+    this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
   },
 
   /**
