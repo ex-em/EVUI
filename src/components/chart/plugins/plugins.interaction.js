@@ -149,13 +149,13 @@ const modules = {
         };
       };
 
-      const setSelectedLabelInfo = (axisDirection) => {
-        const hitInfo = this.getLabelInfoByPosition(offset, axisDirection);
-        const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, axisDirection);
+      const setSelectedLabelInfo = (targetAxis) => {
+        const hitInfo = this.getLabelInfoByPosition(offset, targetAxis);
+        const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, targetAxis);
         this.defaultSelectInfo.dataIndex = allSelectedList.dataIndex;
 
-        if (axisDirection) {
-          this.defaultSelectInfo.targetAxis = axisDirection;
+        if (targetAxis) {
+          this.defaultSelectInfo.targetAxis = allSelectedList.dataIndex?.length ? targetAxis : null;
         }
 
         args.selected = {

@@ -209,9 +209,8 @@
       }, { deep: true, flush: 'post' });
 
       watch(() => (injectGroupSelectedLabel?.value ?? selectedLabel.value), (newValue) => {
-        if (newValue.dataIndex) {
-          const isHorizontal = !!normalizedOptions?.horizontal;
-          evChart.selectLabelByData(newValue.dataIndex, newValue.targetAxis ?? (isHorizontal ? 'yAxis' : 'xAxis'));
+        if (newValue?.dataIndex) {
+          evChart.selectLabelByData(newValue.dataIndex, newValue?.targetAxis);
         }
       }, { deep: true, flush: 'post' });
 

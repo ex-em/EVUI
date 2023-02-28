@@ -61,8 +61,8 @@ import { reactive, ref } from 'vue';
         heatMapColor: {
           colorsByRange: [
             { color: '#EAE2B7', label: 'Normal' },
-            { color: '#fcbf49', label: 'Caution' },
-            { color: '#d62828', label: 'Crush' },
+            { color: '#FCBF49', label: 'Caution' },
+            { color: '#D62828', label: 'Crush' },
           ],
           decimalPoint: 1,
           stroke: {
