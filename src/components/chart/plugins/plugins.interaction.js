@@ -1,4 +1,4 @@
-import { numberWithComma } from '@/common/utils';
+import { numberWithComma, truthy } from '@/common/utils';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
 
 const modules = {
@@ -142,26 +142,32 @@ const modules = {
           acc: args.acc,
         } = hitInfo);
 
-        args.selected = {
-          eventTarget: 'item',
-          seriesId: this.isDeselectItem(hitInfo) ? null : hitInfo.sId,
-          dataIndex: this.isDeselectItem(hitInfo) ? null : hitInfo.maxIndex,
-        };
+        if (hitInfo?.sId) {
+          args.selected = {
+            eventTarget: 'item',
+            seriesId: this.isDeselectItem(hitInfo) ? null : hitInfo.sId,
+            dataIndex: this.isDeselectItem(hitInfo) ? null : hitInfo.maxIndex,
+          };
+        }
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
         const hitInfo = this.getLabelInfoByPosition(offset, targetAxis);
-        const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, targetAxis);
-        this.defaultSelectInfo.dataIndex = allSelectedList.dataIndex;
+        if (truthy(hitInfo.labelIndex)) {
+          const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, targetAxis);
+          this.defaultSelectInfo.dataIndex = allSelectedList.dataIndex;
 
-        if (targetAxis) {
-          this.defaultSelectInfo.targetAxis = allSelectedList.dataIndex?.length ? targetAxis : null;
+          if (targetAxis) {
+            this.defaultSelectInfo.targetAxis = allSelectedList.dataIndex?.length
+              ? targetAxis
+              : null;
+          }
+
+          args.selected = {
+            eventTarget: 'label',
+            ...cloneDeep(this.defaultSelectInfo),
+          };
         }
-
-        args.selected = {
-          eventTarget: 'label',
-          ...cloneDeep(this.defaultSelectInfo),
-        };
       };
 
       const setSelectedSeriesInfo = () => {
@@ -169,12 +175,12 @@ const modules = {
         if (hitInfo.sId !== null) {
           const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
-        }
 
-        args.selected = {
-          eventTarget: 'series',
-          ...cloneDeep(this.defaultSelectInfo),
-        };
+          args.selected = {
+            eventTarget: 'series',
+            ...cloneDeep(this.defaultSelectInfo),
+          };
+        }
       };
 
       switch (chartType) {
@@ -189,7 +195,15 @@ const modules = {
           break;
         }
 
-        case 'bar':
+        case 'bar': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          }
+          break;
+        }
+
         case 'heatMap': {
           if (useSelectItem && useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
@@ -913,6 +927,7 @@ const modules = {
   isDeselectItem(hitInfo) {
     return this.options.selectItem.useDeselectItem
       && hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex
+      && hitInfo?.sId === this.defaultSelectItemInfo?.seriesID
       && !isNaN(hitInfo?.maxIndex);
   },
 

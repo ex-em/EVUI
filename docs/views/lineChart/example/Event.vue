@@ -89,11 +89,6 @@
             background: '#FF00FF',
           },
         },
-        zoom: {
-          toolbar: {
-            show: true,
-          },
-        },
       });
 
       const clickedLabel = ref("''");
