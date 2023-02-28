@@ -146,13 +146,16 @@
           combo: false,
           tooltip: {
             use: true,
+            sortByValue: true,
             backgroundColor: '#4C4C4C',
+            fontColor: '#FFFFFF',
             borderColor: '#666666',
             shadowOpacity: 0.25,
             useShadow: false,
             throttledMove: false,
             debouncedHide: false,
             useScrollbar: false,
+            textOverflow: 'wrap',
           },
           indicator: {
             use: true,
@@ -339,13 +342,27 @@
     left: 0;
     overflow-y: hidden;
     overflow-x: hidden;
-    padding-right: 17px;
-  }
+    border-radius: 8px;
 
-  .ev-chart-tooltip-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
+    .ev-chart-tooltip-header {
+      padding: 8px 16px 0 16px;
+      font-family: Roboto, serif;
+      overflow: hidden;
+      font-size: 16px;
+
+      &--wrap {
+        word-wrap: break-word;
+      }
+
+      &--ellipsis {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .ev-chart-tooltip-body {
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
   }
 </style>

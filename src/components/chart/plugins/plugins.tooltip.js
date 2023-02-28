@@ -1,6 +1,5 @@
-// import { numberWithComma } from '@/common/utils';
+import { numberWithComma } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
-import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
 const TITLE_HEIGHT = 30;
@@ -9,6 +8,7 @@ const LINE_SPACING = 8;
 const COLOR_MARGIN = 16;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
+const FONT_STYLE = 'normal normal lighter 14px Roboto';
 
 const modules = {
   /**
@@ -31,7 +31,7 @@ const modules = {
     this.tooltipCtx = this.tooltipCanvas.getContext('2d');
 
     this.tooltipDOM.style.display = 'none';
-    this.tooltipDOM.appendChild(this.tooltipCanvas);
+    this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
     this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
     this.tooltipDOM.appendChild(this.tooltipBodyDOM);
 
@@ -49,10 +49,9 @@ const modules = {
   },
 
   /**
-   * Set tooltip canvas layout
-   * @param {object} hitInfo    mousemove callback
+   * Set tooltip DOM's position and style
+   * @param {object} hitInfo    value and mouse position touched
    * @param {object} e          mousemove callback
-   * @param {object} offset     mousemove callback
    *
    * @returns {object} tooltip layout information
    */
@@ -70,7 +69,7 @@ const modules = {
 
     // calculate and decide width of canvas El(contentsWidth)
     ctx.save();
-    // ctx.font = fontStyle;
+    ctx.font = FONT_STYLE;
     const isHorizontal = !!this.options.horizontal;
     const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
     const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
@@ -174,21 +173,11 @@ const modules = {
     const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    const titleFormatter = opt.formatter?.title;
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    if (this.axesX.length && this.axesY.length) {
-      if (titleFormatter) {
-        this.tooltipHeaderDOM.textContent = titleFormatter({
-          x: hitItem.x,
-          y: hitItem.y,
-        });
-      } else {
-        this.tooltipHeaderDOM.textContent = this.options.horizontal
-          ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
-          : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
-      }
-    }
+    this.tooltipHeaderDOM.textContent = this.options.horizontal
+      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
+      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
 
     if (opt.textOverflow) {
       this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
@@ -211,6 +200,8 @@ const modules = {
     x += boxPadding.l;
     y += boxPadding.t;
 
+    ctx.font = FONT_STYLE;
+
     const seriesList = [];
     seriesKeys.forEach((seriesName) => {
       seriesList.push({
@@ -220,6 +211,22 @@ const modules = {
       });
     });
 
+    if (opt.sortByValue) {
+      seriesList.sort((a, b) => {
+        let prev = a.data.o;
+        let next = b.data.o;
+
+        if (!prev) {
+          prev = isHorizontal ? a.data.x : a.data.y;
+        }
+
+        if (!next) {
+          next = isHorizontal ? b.data.x : b.data.y;
+        }
+        return next - prev;
+      });
+    }
+
     this.setTooltipDOMStyle(opt);
 
     let textLineCnt = 1;
@@ -227,7 +234,14 @@ const modules = {
       const gdata = seriesList[ix].data;
       const color = seriesList[ix].color;
       const name = seriesList[ix].name;
-      const valueText = gdata.formatted;
+
+      let value;
+
+      if (gdata.o === null) {
+        value = isHorizontal ? gdata.x : gdata.y;
+      } else if (!isNaN(gdata.o)) {
+        value = gdata.o;
+      }
 
       let itemX = x + 4;
       let itemY = y + (textLineCnt * TEXT_HEIGHT);
@@ -235,17 +249,7 @@ const modules = {
       itemY += Util.aliasPixel(itemY);
 
       ctx.beginPath();
-
-      if (typeof color !== 'string') {
-        ctx.fillStyle = Canvas.createGradient(
-          ctx,
-          isHorizontal,
-          { x: itemX - 4, y: itemY, w: 12, h: -12 },
-          color,
-        );
-      } else {
-        ctx.fillStyle = color;
-      }
+      ctx.fillStyle = color;
 
       // 1. Draw series color
       ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
@@ -287,7 +291,7 @@ const modules = {
 
       // 3. Draw value
       ctx.textAlign = 'right';
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(numberWithComma(value), this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -295,7 +299,6 @@ const modules = {
       y += LINE_SPACING;
       textLineCnt += 1;
     }
-
     ctx.restore();
   },
 
@@ -389,6 +392,8 @@ const modules = {
 
     this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width / this.clearRectRatio,
       this.tooltipCanvas.height / this.clearRectRatio);
+
+    this.tooltipDOM.style.display = 'none';
   },
 
   /**
@@ -397,7 +402,6 @@ const modules = {
    *
    * @returns {array} ordered series list by groups
    */
-
   alignSeriesList(sKeys) {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
