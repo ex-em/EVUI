@@ -79,6 +79,7 @@
       const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
       const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
       const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
+      const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
 
       const {
         eventListeners,
@@ -114,6 +115,7 @@
         normalizedOptions,
         { wrapper, evChartGroupRef: null },
         props.selectedLabel ? selectedLabel : selectedItem,
+        injectEvChartPropsInGroup,
       );
 
       const createChart = () => {

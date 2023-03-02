@@ -39,26 +39,28 @@ export default class EvChartBrush {
       return;
     }
 
-    const existedBrushCanvas = this.evChartBrushRef.value.querySelector('.brush-canvas');
+    if (this.evChartBrushRef?.value) {
+      const existedBrushCanvas = this.evChartBrushRef.value.querySelector('.brush-canvas');
 
-    if (!existedBrushCanvas) {
-      const brushCanvas = document.createElement('canvas');
+      if (!existedBrushCanvas) {
+        const brushCanvas = document.createElement('canvas');
 
-      brushCanvas.setAttribute('class', 'brush-canvas');
-      brushCanvas.setAttribute('style', 'display: block; z-index: 1;');
+        brushCanvas.setAttribute('class', 'brush-canvas');
+        brushCanvas.setAttribute('style', 'display: block; z-index: 1;');
 
-      const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
+        const evChartBrushContainer = this.evChartBrushRef.value.querySelector('.ev-chart-brush-container');
 
-      if (evChartBrushContainer) {
-        this.brushCanvas = brushCanvas;
-        evChartBrushContainer.appendChild(brushCanvas);
-        this.evChartBrushContainer = evChartBrushContainer;
+        if (evChartBrushContainer) {
+          this.brushCanvas = brushCanvas;
+          evChartBrushContainer.appendChild(brushCanvas);
+          this.evChartBrushContainer = evChartBrushContainer;
 
-        this.drawBrushRect({ brushCanvas });
-        this.addEvent(brushCanvas);
+          this.drawBrushRect({ brushCanvas });
+          this.addEvent(brushCanvas);
+        }
+      } else {
+        this.drawBrushRect({ brushCanvas: existedBrushCanvas, isResize });
       }
-    } else {
-      this.drawBrushRect({ brushCanvas: existedBrushCanvas, isResize });
     }
   }
 

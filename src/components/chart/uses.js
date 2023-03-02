@@ -1,4 +1,14 @@
-import { ref, computed, getCurrentInstance, nextTick, reactive, onUpdated, watch } from 'vue';
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  getCurrentInstance,
+  nextTick,
+  onUpdated,
+  onMounted,
+  onBeforeUnmount,
+} from 'vue';
 import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
@@ -332,8 +342,21 @@ export const useZoomModel = (
   evChartNormalizedOptions,
   { wrapper: evChartWrapper, evChartGroupRef },
   selectedLabelOrItem,
+  evChartPropsInGroup,
 ) => {
-  const { props, slots, emit } = getCurrentInstance();
+  const { props, emit, type } = getCurrentInstance();
+
+  onMounted(() => {
+    if (evChartPropsInGroup?.value && type?.name === 'EvChart') {
+      evChartPropsInGroup.value.push(props);
+    }
+  });
+
+  onBeforeUnmount(() => {
+    if (evChartPropsInGroup?.value?.length) {
+      evChartPropsInGroup.value.length = 0;
+    }
+  });
 
   const isExecuteZoom = ref(false);
   const isUseZoomMode = ref(false);
@@ -393,23 +416,17 @@ export const useZoomModel = (
   };
 
   const createEvChartZoom = () => {
-    if (evChartGroupRef) {
+    if (evChartGroupRef?.value) {
       evChartInfo.dom = evChartGroupRef.value.querySelectorAll('.ev-chart-container');
 
-      let chartIdx = 0;
       if (evChartInfo.dom.length) {
-        slots.default(evChartInfo.dom).forEach(({ type, props: evChartProps }) => {
-          if (type?.name === 'EvChart') {
-            const { options, data } = evChartProps;
+        evChartPropsInGroup.value.forEach(({ data, options }, idx) => {
+          data.chartIdx = idx;
 
-            data.chartIdx = chartIdx;
-            chartIdx++;
+          evChartInfo.props.data.push(data);
+          evChartInfo.props.options.push(options);
 
-            evChartInfo.props.data.push(data);
-            evChartInfo.props.options.push(options);
-          } else if (type?.name === 'EvChartBrush') {
-            brushChartIdx.value.push(evChartProps?.options?.chartIdx ?? 0);
-          }
+          brushChartIdx.value.push(idx);
         });
       }
     } else {

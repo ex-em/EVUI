@@ -37,6 +37,7 @@ const DEFAULT_OPTIONS = {
 export const useGroupModel = () => {
   const isExecuteZoom = ref(false);
   const evChartGroupRef = ref();
+  const evChartPropsInGroup = ref([]);
   const brushSeries = reactive({ list: [], chartIdx: null });
   const getNormalizedOptions = options => defaultsDeep({}, options, DEFAULT_OPTIONS);
 
@@ -45,5 +46,6 @@ export const useGroupModel = () => {
     isExecuteZoom,
     brushSeries,
     evChartGroupRef,
+    evChartPropsInGroup,
   };
 };
