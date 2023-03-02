@@ -115,6 +115,7 @@
                       'ev-calendar-selector',
                       { selected: colInfo.isSelected },
                       { today: colInfo.today },
+                      { disabled: colInfo.disabled }
                     ]"
                   >
                     {{ colInfo.label }}
@@ -493,7 +494,7 @@ $calendar-active-color: #409EFF;
   opacity: 1;
   cursor: pointer;
 
-  &:hover:not(.selected):not(.today) {
+  &:not(.selected):not(.today):not(.disabled):hover {
     transition: color $animate-base;
     color: $calendar-active-color;
     opacity: 0.7;
@@ -507,6 +508,11 @@ $calendar-active-color: #409EFF;
     border-radius: 5px;
     background-color: $calendar-active-color;
     color: #FFFFFF;
+  }
+
+  &.disabled {
+    color: #C0C4CC;
+    cursor: not-allowed;
   }
 }
 
@@ -633,7 +639,7 @@ $calendar-active-color: #409EFF;
     border-radius: 50%;
     text-align: center;
   }
-  &:not(.selected) {
+  &:not(.selected):not(.disabled) {
     &:hover {
       cursor: pointer;
       div {

@@ -80,24 +80,24 @@ export const useModel = () => {
   const validateValue = (curr) => {
     const dateRule = targetDate => !!(targetDate.length === 10 && dateReg.exec(targetDate));
     const dateTimeRule = targetDate => !!(targetDate.length === 19 && dateTimeReg.exec(targetDate));
-    const checkInvalidDateOfMonth = (targetDate) => {
+    const checkValidDate = (targetDate) => {
       const dateValue = targetDate.split(' ')[0];
       const year = +dateValue.split('-')[0];
       const month = +dateValue.split('-')[1];
       const date = +dateValue.split('-')[2];
       const lastDateOfMonth = getLastDateOfMonth(year, month);
-      return +date <= lastDateOfMonth;
+      return +date <= lastDateOfMonth && year >= new Date(0).getFullYear();
     };
 
     let isValid = true;
     if (props.mode === 'date') {
-      isValid = dateRule(curr) && checkInvalidDateOfMonth(curr);
+      isValid = dateRule(curr) && checkValidDate(curr);
     } else if (props.mode === 'dateTime') {
-      isValid = dateTimeRule(curr) && checkInvalidDateOfMonth(curr);
+      isValid = dateTimeRule(curr) && checkValidDate(curr);
     } else if (props.mode === 'dateRange') {
-      isValid = curr.every(value => dateRule(value) && checkInvalidDateOfMonth(value));
+      isValid = curr.every(value => dateRule(value) && checkValidDate(value));
     } else if (props.mode === 'dateTimeRange') {
-      isValid = curr.every(value => dateTimeRule(value) && checkInvalidDateOfMonth(value));
+      isValid = curr.every(value => dateTimeRule(value) && checkValidDate(value));
     }
 
     if (isValid) {

@@ -40,6 +40,7 @@ const LIST_TYPE = {
 };
 
 const ONE_DAY_MS = 86400000;
+const MIN_DATE_MS = +new Date('1970-01-01 00:00:00'); // javascript 객체 최소 시간
 const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
 const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
 
@@ -508,14 +509,16 @@ export const useCalendarDate = (param) => {
    */
   const setCalendarYear = (calendarType) => {
     let yearValue = calendarYearRangeInfo[calendarType].start;
-    const todayYear = new Date().getFullYear();
+    const thisYear = new Date().getFullYear();
+    const minYear = new Date(MIN_DATE_MS).getFullYear();
     for (let i = 0; i < CALENDAR_YEAR_ROWS; i++) {
       for (let j = 0; j < CALENDAR_YEAR_COLS; j++) {
         calendarYearTableInfo[calendarType][i][j] = {
           label: yearValue,
           value: yearValue,
-          today: yearValue === todayYear,
+          today: yearValue === thisYear,
           isSelected: yearValue === calendarPageInfo[calendarType].year,
+          disabled: (yearValue < minYear),
         };
         yearValue++;
       }
@@ -601,18 +604,21 @@ export const useCalendarDate = (param) => {
     // date 숫자 및 속성 세팅
     const setDateInfo = (monthType, i, j) => {
       currDate = formatDateTime({ year, month, date });
-      const isInvalidDate = isRangeMode && !disabledDate
-          && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value);
 
       // time 모드인 경우 현재 값의 시간을 가지고 테스트
       const timeValue = modelValue?.split(' ')[1] ?? '';
 
-      const isDisabled = disabledDate
-        ? disabledDate(new Date(`${currDate} ${timeValue}`)) : isInvalidDate;
+      // range 모드인 경우 from 날짜가 to 날짜를 넘는지 확인 || 최소 날짜보다 이전 날짜인지 확인
+      const isInvalidDate = (isRangeMode && !disabledDate
+        && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value))
+          || (+new Date(`${currDate} ${timeValue}`) < MIN_DATE_MS);
+
+      const isDisabled = (disabledDate && disabledDate(new Date(`${currDate}${timeValue}`)))
+        || isInvalidDate;
 
       const index = +(calendarType !== 'main');
       const isRangeSelected = isRangeMode && selectedValue.value.length > index
-          && selectedValue.value?.[index]?.includes(currDate);
+        && selectedValue.value?.[index]?.includes(currDate);
       const isSelected = !isDisabled
         && (isRangeMode ? isRangeSelected : selectedValue.value?.includes(currDate));
 
@@ -864,11 +870,10 @@ export const useEvent = (param) => {
    */
   const moveYear = (calendarType, type) => {
     const increaseValue = selectedListType[calendarType] === LIST_TYPE.MONTH ? 1 : 20;
-    if (type === 'prev') {
-      calendarPageInfo[calendarType].year -= increaseValue;
-    } else {
-      calendarPageInfo[calendarType].year += increaseValue;
-    }
+    const offset = type === 'prev' ? -increaseValue : increaseValue;
+    const minYear = new Date(MIN_DATE_MS).getFullYear();
+    const movedYear = calendarPageInfo[calendarType].year + offset;
+    calendarPageInfo[calendarType].year = (movedYear < minYear) ? minYear : movedYear;
   };
 
   /**
@@ -880,6 +885,10 @@ export const useEvent = (param) => {
     const pageInfo = calendarPageInfo[calendarType];
 
     if (type === 'prev') {
+      const minYear = new Date(MIN_DATE_MS).getFullYear();
+      if (pageInfo.year === minYear && pageInfo.month === 1) {
+        return;
+      }
       if (pageInfo.month === 1) {
         pageInfo.year -= 1;
         pageInfo.month = 12;
@@ -943,6 +952,10 @@ export const useEvent = (param) => {
    */
   const clickYearMonth = (calendarType, clickedInfo) => {
     const { value } = clickedInfo;
+
+    if (clickedInfo.disabled) {
+      return;
+    }
 
     if (selectedListType[calendarType] === LIST_TYPE.YEAR) {
       calendarPageInfo[calendarType].year = value;
