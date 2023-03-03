@@ -1,7 +1,7 @@
 import { merge } from 'lodash-es';
+import { convertToPercent, truthy } from '@/common/utils';
 import Util from '../helpers/helpers.util';
 import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
-import { convertToPercent } from '../../../common/utils';
 
 class HeatMap {
   constructor(sId, opt, colorOpt, isHorizontal, isGradient) {
@@ -229,18 +229,28 @@ class HeatMap {
     this.size.h = yArea / this.labels.y.length;
 
     const getOpacity = (item, opacity, index) => {
-      const selectLabelOption = selectLabel?.option;
-      const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
-      const selectItemOption = selectItem?.option;
-      const useSelectItem = selectItemOption?.use && selectItemOption?.useSeriesOpacity;
       if (!legendHitInfo) {
-        let isDownplay = false;
-        if (useSelectItem) {
-          isDownplay = selectItem?.selected && index !== selectItem?.selected?.dataIndex;
-        } else if (useSelectLabel) {
-          const selectedLabelList = selectLabel?.selected?.label;
-          isDownplay = selectedLabelList.length
-            && !selectedLabelList.includes(this.isHorizontal ? item.y : item.x);
+        let isDownplay;
+        const {
+          option: selectedItemOpt,
+          selected: selectedItem,
+        } = selectItem;
+
+        const {
+          option: selectedLabelOpt,
+          selected: selectedLabel,
+        } = selectLabel;
+
+        const isSelectedItem = truthy(selectedItem?.dataIndex) && selectedItem?.dataIndex > -1;
+        const isSelectedLabel = selectedLabel?.label?.length > 0;
+        if (isSelectedItem) {
+          isDownplay = selectedItemOpt.useSeriesOpacity
+            ? index !== selectedItem?.dataIndex
+            : false;
+        } else if (isSelectedLabel) {
+          isDownplay = selectedLabelOpt.useSeriesOpacity
+            ? !selectedLabel?.label?.includes(this.getItemLabel(selectLabel, item))
+            : false;
         }
         return isDownplay ? 0.1 : 1;
       }
@@ -607,6 +617,20 @@ class HeatMap {
     }
 
     return selectionRange;
+  }
+
+  getItemLabel(selectLabel, item) {
+    const {
+      option: selectedLabelOpt,
+      selected: selectedLabel,
+    } = selectLabel;
+
+    let targetLabel = this.isHorizontal ? item.y : item.x;
+    if (selectedLabelOpt?.useBothAxis && selectedLabel?.targetAxis) {
+      targetLabel = selectedLabel?.targetAxis === 'yAxis' ? item.y : item.x;
+    }
+
+    return targetLabel;
   }
 }
 

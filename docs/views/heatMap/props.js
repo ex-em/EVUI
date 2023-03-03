@@ -14,6 +14,8 @@ import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 import SelectItem from './example/SelectItem';
 import SelectItemRaw from '!!raw-loader!./example/SelectItem';
+import SelectBoth from './example/SelectBoth';
+import SelectBothRaw from '!!raw-loader!./example/SelectBoth';
 
 export default {
   mdText,
@@ -52,6 +54,11 @@ export default {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: SelectLabel,
       parsedData: parseComponent(SelectLabelRaw),
+    },
+    SelectBoth: {
+      description: '아이템을 선택 기능과 라벨 선택 기능을 동시에 사용할 수 있습니다.',
+      component: SelectBoth,
+      parsedData: parseComponent(SelectBothRaw),
     },
   },
 };

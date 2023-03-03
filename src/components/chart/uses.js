@@ -162,6 +162,7 @@ const DEFAULT_OPTIONS = {
     },
     showTextTip: false,
     showIndicator: false,
+    useBothAxis: false,
   },
   selectSeries: {
     use: false,
@@ -228,7 +229,7 @@ const DEFAULT_DATA = {
   data: {},
 };
 
-export const useModel = (selectedLabel) => {
+export const useModel = (injectGroupSelectedLabel) => {
   const { props, emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
@@ -252,32 +253,56 @@ export const useModel = (selectedLabel) => {
   const getNormalizedData = data => defaultsDeep(data, DEFAULT_DATA);
 
   const selectItemInfo = cloneDeep(props.selectedItem);
-  const selectLabelInfo = cloneDeep(props.selectedLabel ?? selectedLabel?.value);
+  const selectLabelInfo = cloneDeep(props.selectedLabel ?? injectGroupSelectedLabel?.value);
   const selectSeriesInfo = cloneDeep(props.selectedSeries);
 
   const eventListeners = {
     click: async (e) => {
       await nextTick();
-      if (e.label) {
-        let selectedItem = { seriesID: e.seriesId, dataIndex: e.dataIndex };
-        if ('deselect' in e) {
-          if (e.deselect) {
-            selectedItem = null;
+      const { seriesId, dataIndex, eventTarget, targetAxis } = e?.selected ?? {};
+      const { eventTarget: deselectedEventTarget } = e?.deselected ?? {};
+
+      switch (eventTarget) {
+        case 'item': {
+          if (seriesId !== null) {
+            emit('update:selectedItem', {
+              seriesID: seriesId,
+              dataIndex,
+            });
+            if (deselectedEventTarget === 'label') {
+              emit('update:selectedLabel', { dataIndex: [] });
+            }
+          } else {
+            emit('update:selectedItem', null);
           }
-          delete e.deselect;
+          break;
         }
-        emit('update:selectedItem', selectedItem);
-      }
-      if (e.selected?.dataIndex) {
-        if (selectedLabel?.value) {
-          selectedLabel.value.dataIndex = e.selected.dataIndex;
-        } else {
-          emit('update:selectedLabel', { dataIndex: e.selected.dataIndex });
+
+        case 'label': {
+          if (injectGroupSelectedLabel?.value) {
+            injectGroupSelectedLabel.value.dataIndex = dataIndex;
+          } else {
+            emit('update:selectedLabel', {
+              dataIndex,
+              targetAxis,
+            });
+
+            if (deselectedEventTarget === 'item') {
+              emit('update:selectedItem', null);
+            }
+          }
+          break;
         }
+
+        case 'series': {
+          emit('update:selectedSeries', { seriesId });
+          break;
+        }
+
+        default:
+          break;
       }
-      if (e.selected?.seriesId) {
-        emit('update:selectedSeries', { seriesId: e.selected.seriesId });
-      }
+
       emit('click', e);
     },
     'dbl-click': async (e) => {

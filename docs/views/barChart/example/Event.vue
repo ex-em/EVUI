@@ -86,6 +86,7 @@
           tipStyle: {
             background: '#FF00FF',
           },
+          useDeselectItem: true,
         },
         maxTip: {
           use: true,

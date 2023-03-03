@@ -209,14 +209,14 @@
       }, { deep: true, flush: 'post' });
 
       watch(() => (injectGroupSelectedLabel?.value ?? selectedLabel.value), (newValue) => {
-        if (newValue.dataIndex) {
-          evChart.renderWithSelected(newValue.dataIndex);
+        if (newValue?.dataIndex) {
+          evChart.selectLabelByData(newValue.dataIndex, newValue?.targetAxis);
         }
       }, { deep: true, flush: 'post' });
 
       watch(() => props.selectedSeries, (newValue) => {
         if (newValue.seriesId) {
-          evChart.renderWithSelected(newValue.seriesId);
+          evChart.selectSeriesByData(newValue.seriesId);
         }
       }, { deep: true, flush: 'post' });
 

@@ -116,7 +116,7 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
-    this.initSelectedInfo?.();
+    this.initDefaultSelectInfo();
 
     this.drawChart();
 
@@ -161,7 +161,7 @@ class EvChart {
 
   /**
    * To draw canvas chart, it processes several sequential jobs
-   * @param {any} [hitInfo=undefined]    from mousemove callback (object or undefined)
+   * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
    *
    * @returns {undefined}
    */
@@ -186,7 +186,14 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow } = this.options;
+    const {
+      maxTip,
+      selectLabel,
+      selectItem,
+      selectSeries,
+      brush,
+      displayOverflow,
+    } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -196,6 +203,7 @@ class EvChart {
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
+      selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
       overlayCtx: this.overlayCtx,
       isBrush: !!brush,
       displayOverflow,
@@ -231,21 +239,8 @@ class EvChart {
           case 'heatMap': {
             const legendHitInfo = hitInfo?.legend;
 
-            let selectInfo;
-            const defaultSelectInfo = this.defaultSelectItemInfo;
-            if (defaultSelectInfo?.dataIndex || defaultSelectInfo?.dataIndex === 0) {
-              selectInfo = { ...defaultSelectInfo };
-            } else {
-              selectInfo = null;
-            }
-
             series.draw({
               legendHitInfo,
-              selectInfo,
-              selectItem: {
-                option: selectItem,
-                selected: selectInfo,
-              },
               ...opt,
             });
             break;
@@ -766,7 +761,7 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
-    this.initSelectedInfo?.();
+    this.initDefaultSelectInfo();
 
     this.render(updateInfo?.hitInfo);
 
@@ -928,6 +923,32 @@ class EvChart {
   hideTooltip() {
     if (this.options.tooltip.use && this.tooltipDOM?.style) {
       this.tooltipDOM.style.display = 'none';
+    }
+  }
+
+  /**
+   * init defaultSelectInfo (for selectLabel, selectSeries options)
+   */
+  initDefaultSelectInfo() {
+    const {
+      type: chartType,
+      selectLabel,
+      selectSeries,
+    } = this.options;
+
+    if (selectLabel.use) {
+      let targetAxis = null;
+      if (chartType === 'heatMap' && selectLabel?.useBothAxis) {
+        targetAxis = this.defaultSelectInfo?.targetAxis;
+      }
+
+      this.defaultSelectInfo = !this.defaultSelectInfo?.dataIndex
+        ? { dataIndex: [], label: [], data: [] }
+        : this.getSelectedLabelInfoWithLabelData(this.defaultSelectInfo.dataIndex, targetAxis);
+    }
+
+    if (selectSeries.use && !this.defaultSelectInfo) {
+      this.defaultSelectInfo = { seriesId: [] };
     }
   }
 }
