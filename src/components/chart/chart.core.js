@@ -943,8 +943,8 @@ class EvChart {
       }
 
       this.defaultSelectInfo = !this.defaultSelectInfo?.dataIndex
-        ? { dataIndex: [] }
-        : this.getSelectedLabelInfo(this.defaultSelectInfo.dataIndex, targetAxis);
+        ? { dataIndex: [], label: [], data: [] }
+        : this.getSelectedLabelInfoWithLabelData(this.defaultSelectInfo.dataIndex, targetAxis);
     }
 
     if (selectSeries.use && !this.defaultSelectInfo) {

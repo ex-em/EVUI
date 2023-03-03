@@ -1,4 +1,4 @@
-import { numberWithComma, truthy } from '@/common/utils';
+import { numberWithComma } from '@/common/utils';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
 
 const modules = {
@@ -152,22 +152,24 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const hitInfo = this.getLabelInfoByPosition(offset, targetAxis);
-        if (truthy(hitInfo.labelIndex)) {
-          const allSelectedList = this.updateSelectedLabelInfo(hitInfo.labelIndex, targetAxis);
-          this.defaultSelectInfo.dataIndex = allSelectedList.dataIndex;
+        const {
+          labelIndex: clickedLabelIndex,
+        } = this.getLabelInfoByPosition(offset, targetAxis);
 
-          if (targetAxis) {
-            this.defaultSelectInfo.targetAxis = allSelectedList.dataIndex?.length
-              ? targetAxis
-              : null;
-          }
+        const {
+          dataIndex: dataIndexList,
+        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
 
-          args.selected = {
-            eventTarget: 'label',
-            ...cloneDeep(this.defaultSelectInfo),
-          };
+        this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
+
+        if (targetAxis) {
+          this.defaultSelectInfo.targetAxis = dataIndexList?.length ? targetAxis : null;
         }
+
+        args.selected = {
+          eventTarget: 'label',
+          ...cloneDeep(this.defaultSelectInfo),
+        };
       };
 
       const setSelectedSeriesInfo = () => {
@@ -687,7 +689,7 @@ const modules = {
    * @returns {boolean}
    */
   selectLabelByData(labelIndexList, targetAxis) {
-    this.defaultSelectInfo = this.getSelectedLabelInfo(labelIndexList, targetAxis);
+    this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(labelIndexList, targetAxis);
     this.render();
   },
 
@@ -710,7 +712,7 @@ const modules = {
    * @param targetAxis{string | null}
    * @returns {object[]}
    */
-  getSelectedLabelInfo(labelIndexList, targetAxis) {
+  getSelectedLabelInfoWithLabelData(labelIndexList, targetAxis) {
     const { selectLabel: selectLabelOpt, type: chartType, horizontal } = this.options;
     const result = cloneDeep(this.defaultSelectInfo);
     result.dataIndex = labelIndexList;
@@ -758,18 +760,17 @@ const modules = {
 
   /**
    * Add or delete selected label index, according to policy and option
-   * @param labelIndex {number[]}
+   * @param labelIndex {number}
    * @param targetAxis {string | null}
    * @returns after {number[]}  '[0, 1 ...]' result Label index List
    */
-  updateSelectedLabelInfo(labelIndex, targetAxis) {
+  regulateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
-    const before = this.defaultSelectInfo ?? { dataIndex: [], targetAxis: null };
-    const after = cloneDeep(before);
+    const before = this.defaultSelectInfo?.targetAxis === targetAxis
+      ? { ...this.defaultSelectInfo, targetAxis }
+      : { dataIndex: [], targetAxis };
 
-    if (before?.targetAxis !== targetAxis) {
-      this.clearSelectedLabelInfo();
-    }
+    const after = cloneDeep(before);
 
     if (before.dataIndex.includes(labelIndex)) {
       const idx = before.dataIndex.indexOf(labelIndex);

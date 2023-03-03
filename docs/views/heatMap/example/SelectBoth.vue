@@ -87,7 +87,7 @@ import { reactive, ref } from 'vue';
         selectLabel: {
           use: true,
           useClick: true,
-          limit: 1,
+          limit: 3,
           useDeselectOverflow: true,
           useSeriesOpacity: true,
           useLabelOpacity: true,
