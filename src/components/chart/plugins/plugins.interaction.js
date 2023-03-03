@@ -29,8 +29,8 @@ const modules = {
 
         if (tooltip.use) {
           this.tooltipClear();
-          this.drawTooltip(hitInfo, this.tooltipCtx, this.setTooltipLayout(hitInfo, e, offset));
-          this.tooltipDOM.style.display = 'block';
+          this.setTooltipLayoutPosition(hitInfo, e);
+          this.drawTooltip(hitInfo, this.tooltipCtx);
         }
       } else if (tooltip.use) {
         this.hideTooltipDOM();
@@ -80,6 +80,15 @@ const modules = {
       }
     };
 
+    this.onWheel = (e) => {
+      const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+
+      if (isTooltipVisible) {
+        e.preventDefault();
+        this.tooltipBodyDOM.scrollTop += e.deltaY;
+      }
+    };
+
     /**
      * Dealing with graph item select and invoking user custom click event
      *
@@ -104,6 +113,9 @@ const modules = {
       }
     };
 
+    if (this.options?.tooltip?.useScrollbar) {
+      this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
+    }
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
     this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);

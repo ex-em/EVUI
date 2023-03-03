@@ -28,6 +28,79 @@ export default {
   },
 
   /**
+   * Check color string and return what type it is. ('HEX', 'RGB', 'RGBA' or 'NONE')
+   * @param colorStr
+   * @returns {string} color type
+   */
+  getColorStringType(colorStr) {
+    const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
+    const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(noneWhiteSpaceColorStr);
+    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(noneWhiteSpaceColorStr);
+    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(noneWhiteSpaceColorStr);
+    let result = '';
+
+    if (isHEX) {
+      result = 'HEX';
+    } else if (isRGB) {
+      result = 'RGB';
+    } else if (isRGBA) {
+      result = 'RGBA';
+    } else {
+      result = 'NONE';
+    }
+
+    return result;
+  },
+
+  /**
+   * Transforming color string to rgba code
+   * Return BLACK ('rgba(0, 0, 0, ${opacity})') if fail transforming
+   * @param colorStr        hex color code, rgb, rgba .. etc
+   * @param opacity            color opacity. (default 1)translate
+   * @returns {string} transformed rgba
+   */
+  colorStringToRgba(colorStr, opacity = 1) {
+    const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
+    const colorType = this.getColorStringType(noneWhiteSpaceColorStr);
+    let resultRGBA = '';
+
+    switch (colorType) {
+      case 'HEX':
+        resultRGBA = `rgba(${this.hexToRgb(noneWhiteSpaceColorStr)},${opacity})`;
+        break;
+      case 'RGB':
+        resultRGBA = noneWhiteSpaceColorStr.replace(')', `, ${opacity})`).replace('rgb', 'rgba');
+        break;
+      case 'RGBA':
+        resultRGBA = noneWhiteSpaceColorStr.replace(`${this.getOpacity(colorStr)})`, `${opacity})`);
+        break;
+      default:
+        resultRGBA = `rgba(0, 0, 0, ${opacity})`;
+        break;
+    }
+
+    return resultRGBA;
+  },
+
+  /**
+   * get opacity value on rgba color string
+   * ex) input  : rgba(255, 255, 255, 0.1)
+   *     return : 0.1
+   * @param rgbaColorString
+   * @returns {string} opacity
+   */
+  getOpacity(rgbaColorString) {
+    const noneWhiteSpaceColorStr = rgbaColorString.replace(/ /g, '');
+    const colorType = this.getColorStringType(noneWhiteSpaceColorStr);
+
+    if (colorType === 'RGBA') {
+      return noneWhiteSpaceColorStr.replace(/^.*,(.+)\)/, '$1');
+    }
+
+    return '1';
+  },
+
+  /**
    * To logarithmic scale, compute log value
    * @param {number} value    graph value
    *
@@ -150,5 +223,40 @@ export default {
     });
 
     return minMax;
+  },
+
+  /**
+   * Truncate the long string to short string with ellipsis until fitting maxWidth
+   * @param {string} str         target string
+   * @param {number} maxWidth    maximum string width on canvas
+   * @param {Object} ctx         canvas context
+   * @param {string} direction   left or right  (default: right)
+   */
+  truncateLabelWithEllipsis(str, maxWidth, ctx, direction = 'right') {
+    if (!str) {
+      return '';
+    }
+
+    if (!maxWidth) {
+      return str;
+    }
+
+    const ellipsis = '…';
+    const ellipsisWidth = ctx.measureText(ellipsis).width;
+
+    let temp = str;
+    let tempWidth = ctx.measureText(temp).width;
+
+    if (tempWidth <= maxWidth || tempWidth <= ellipsisWidth) {
+      return str;
+    }
+
+    let len = temp.length;
+    while (tempWidth >= maxWidth - ellipsisWidth && len-- > 0) {
+      temp = direction === 'right' ? temp.substring(0, len) : temp.substring(1, temp.length);
+      tempWidth = ctx.measureText(temp).width;
+    }
+
+    return direction === 'right' ? temp + ellipsis : ellipsis + temp;
   },
 };
