@@ -613,7 +613,7 @@ export const useCalendarDate = (param) => {
         && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value))
           || (+new Date(`${currDate} ${timeValue}`) < MIN_DATE_MS);
 
-      const isDisabled = (disabledDate && disabledDate(new Date(`${currDate}${timeValue}`)))
+      const isDisabled = (disabledDate && disabledDate(new Date(`${currDate} ${timeValue}`)))
         || isInvalidDate;
 
       const index = +(calendarType !== 'main');
