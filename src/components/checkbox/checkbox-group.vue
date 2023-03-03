@@ -26,13 +26,11 @@
         },
       },
     },
-    data() {
-      return {
-        bindValue: this.value,
-      };
-    },
     componentName: 'CheckboxGroup',
     computed: {
+      bindValue() {
+        return this.value;
+      },
     },
     watch: {
       value(array) {
