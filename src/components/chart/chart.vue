@@ -363,6 +363,18 @@
     .ev-chart-tooltip-body {
       overflow-x: hidden;
       overflow-y: hidden;
+      &::-webkit-scrollbar {
+        width: 10px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #404040;
+        border-radius: 10px;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: grey;
+        border-radius: 10px;
+        box-shadow: inset 0px 0px 5px white;
+      }
     }
   }
 </style>
