@@ -6,8 +6,6 @@ import {
   getCurrentInstance,
   nextTick,
   onUpdated,
-  onMounted,
-  onBeforeUnmount,
 } from 'vue';
 import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
@@ -344,19 +342,7 @@ export const useZoomModel = (
   selectedLabelOrItem,
   evChartPropsInGroup,
 ) => {
-  const { props, emit, type } = getCurrentInstance();
-
-  onMounted(() => {
-    if (evChartPropsInGroup?.value && type?.name === 'EvChart') {
-      evChartPropsInGroup.value.push(props);
-    }
-  });
-
-  onBeforeUnmount(() => {
-    if (evChartPropsInGroup?.value?.length) {
-      evChartPropsInGroup.value.length = 0;
-    }
-  });
+  const { props, emit } = getCurrentInstance();
 
   const isExecuteZoom = ref(false);
   const isUseZoomMode = ref(false);

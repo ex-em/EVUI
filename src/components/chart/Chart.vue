@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="zoomOptions.toolbar.show && !injectIsChartGroup"
+    v-if="zoomOptions.toolbar?.show && !injectIsChartGroup"
     ref="evChartToolbarRef"
   >
     <ev-chart-toolbar
@@ -111,7 +111,7 @@
         setDataForUseZoom,
         controlZoomIdx,
         onClickToolbar,
-      } = useZoomModel(
+      } = injectIsChartGroup ? {} : useZoomModel(
         normalizedOptions,
         { wrapper, evChartGroupRef: null },
         props.selectedLabel ? selectedLabel : selectedItem,
@@ -229,6 +229,10 @@
       }
 
       onMounted(async () => {
+        if (injectEvChartPropsInGroup?.value) {
+          injectEvChartPropsInGroup.value.push(props);
+        }
+
         await createChart();
         await drawChart();
       });
@@ -236,6 +240,10 @@
       onBeforeUnmount(() => {
         if (evChart && 'destroy' in evChart) {
           evChart.destroy();
+        }
+
+        if (injectEvChartPropsInGroup?.value?.length) {
+          injectEvChartPropsInGroup.value.length = 0;
         }
       });
 
@@ -270,7 +278,7 @@
         injectIsChartGroup,
         onClickToolbar,
         normalizedOptions,
-        zoomOptions: toRef(evChartZoomOptions, 'zoom'),
+        zoomOptions: toRef(evChartZoomOptions ?? { zoom: {} }, 'zoom'),
       };
     },
   };
