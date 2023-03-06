@@ -186,6 +186,16 @@ const modules = {
       };
 
       switch (chartType) {
+        default:
+        case 'bar': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          }
+          break;
+        }
+
         case 'line': {
           if (useSelectItem) {
             setSelectedItemInfo();
@@ -193,15 +203,6 @@ const modules = {
             setSelectedLabelInfo();
           } else if (useSelectSeries) {
             setSelectedSeriesInfo();
-          }
-          break;
-        }
-
-        case 'bar': {
-          if (useSelectItem) {
-            setSelectedItemInfo();
-          } else if (useSelectLabel) {
-            setSelectedLabelInfo();
           }
           break;
         }
@@ -236,9 +237,6 @@ const modules = {
           }
           break;
         }
-
-        default:
-          break;
       }
 
       if (typeof this.listeners.click === 'function') {
@@ -718,6 +716,7 @@ const modules = {
     result.dataIndex = labelIndexList;
 
     switch (chartType) {
+      default:
       case 'bar':
       case 'line': {
         result.dataIndex.splice(selectLabelOpt.limit);
@@ -750,9 +749,6 @@ const modules = {
         );
         break;
       }
-
-      default:
-        break;
     }
 
     return result;

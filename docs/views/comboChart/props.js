@@ -10,6 +10,8 @@ import StackLineStackBar from './example/StackLineStackBar';
 import StackLineStackBarRaw from '!!raw-loader!./example/StackLineStackBar';
 import TableTypeLegend from './example/TableTypeLegend';
 import TableTypeLegendRaw from '!!raw-loader!./example/TableTypeLegend';
+import LineBarSelectLabel from './example/LineBarSelectLabel';
+import LineBarSelectLabelRaw from '!!raw-loader!./example/LineBarSelectLabel';
 
 export default {
   mdText,
@@ -38,6 +40,11 @@ export default {
       description: 'Legend 영역에 Series Color, Name, Value 등을 표시할 수 있습니다.',
       component: TableTypeLegend,
       parsedData: parseComponent(TableTypeLegendRaw),
+    },
+    SelectLabel: {
+      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
+      component: LineBarSelectLabel,
+      parsedData: parseComponent(LineBarSelectLabelRaw),
     },
   },
 };
