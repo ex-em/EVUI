@@ -2,7 +2,7 @@ import {
   ref, reactive, computed, watch,
   nextTick, getCurrentInstance,
 } from 'vue';
-import { getChangedValueByTimeFormat } from '../calendar/uses';
+import { getChangedValueByTimeFormat, getLastDateOfMonth } from '../calendar/uses';
 
 const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
 const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
@@ -12,26 +12,44 @@ export const useModel = () => {
   const timeFormat = props.options?.timeFormat;
   const isRangeMode = ['dateTimeRange', 'dateRange', 'dateMulti'].includes(props.mode);
 
+  /**
+   * time 이 포함된 mode 인 경우 timeFormat 에 따라 값 변경
+   * @returns {string | string[]}
+   */
+  const getDateTimeValue = (currValue) => {
+    let dateTimeValue;
+    if (props.mode === 'dateTime') {
+      dateTimeValue = getChangedValueByTimeFormat(timeFormat, currValue);
+    } else if (props.modelValue.length) {
+      const [fromTimeFormat, toTimeFormat] = timeFormat;
+      dateTimeValue = [
+        getChangedValueByTimeFormat(fromTimeFormat, currValue[0]),
+        getChangedValueByTimeFormat(toTimeFormat, currValue[1]),
+      ];
+    }
+    return dateTimeValue;
+  };
+
   // Select 컴포넌트의 v-model 값
   const mv = computed({
     get: () => {
       if (!props.modelValue) {
         return (props.mode === 'date' || props.mode === 'dateTime') ? '' : [];
       }
+
       if (['dateTime', 'dateTimeRange'].includes(props.mode) && timeFormat) {
-          if (props.mode === 'dateTime') {
-            return getChangedValueByTimeFormat(timeFormat, props.modelValue);
-          } else if (props.modelValue.length) {
-            const [fromTimeFormat, toTimeFormat] = timeFormat;
-            return [
-                getChangedValueByTimeFormat(fromTimeFormat, props.modelValue[0]),
-                getChangedValueByTimeFormat(toTimeFormat, props.modelValue[1]),
-            ];
-          }
+        return getDateTimeValue(props.modelValue);
       }
+
       return isRangeMode ? [...props.modelValue] : props.modelValue;
     },
-    set: value => emit('update:modelValue', value),
+    set: (value) => {
+      if (['dateTime', 'dateTimeRange'].includes(props.mode) && timeFormat) {
+         emit('update:modelValue', getDateTimeValue(value));
+         return;
+      }
+      emit('update:modelValue', value);
+    },
   });
 
   // mode: 'date' or 'dateTime'시 input box의 입력된 텍스트값
@@ -55,26 +73,38 @@ export const useModel = () => {
     currentValue = ref(isRangeMode ? [...props.modelValue] : props.modelValue);
   }
 
+  /**
+   * Datepicker valid 체크
+   * @param curr
+   */
   const validateValue = (curr) => {
-    const dateRule = date => date.length === 10 && dateReg.exec(date);
-    const dateTimeRule = date => date.length === 19 && dateTimeReg.exec(date);
+    const dateRule = targetDate => !!(targetDate.length === 10 && dateReg.exec(targetDate));
+    const dateTimeRule = targetDate => !!(targetDate.length === 19 && dateTimeReg.exec(targetDate));
+    const checkValidDate = (targetDate) => {
+      const dateValue = targetDate.split(' ')[0];
+      const year = +dateValue.split('-')[0];
+      const month = +dateValue.split('-')[1];
+      const date = +dateValue.split('-')[2];
+      const lastDateOfMonth = getLastDateOfMonth(year, month);
+      return +date <= lastDateOfMonth && year >= new Date(0).getFullYear();
+    };
 
     let isValid = true;
-    if (props.mode === 'date' && !dateRule(curr)) {
-      isValid = false;
-    } else if (props.mode === 'dateTime' && !dateTimeRule(curr)) {
-      isValid = false;
-    } else if (props.mode === 'dateRange' && curr.some(value => !dateRule(value))) {
-      isValid = false;
-    } else if (props.mode === 'dateTimeRange' && curr.some(value => !dateTimeRule(value))) {
-      isValid = false;
+    if (props.mode === 'date') {
+      isValid = dateRule(curr) && checkValidDate(curr);
+    } else if (props.mode === 'dateTime') {
+      isValid = dateTimeRule(curr) && checkValidDate(curr);
+    } else if (props.mode === 'dateRange') {
+      isValid = curr.every(value => dateRule(value) && checkValidDate(value));
+    } else if (props.mode === 'dateTimeRange') {
+      isValid = curr.every(value => dateTimeRule(value) && checkValidDate(value));
     }
 
     if (isValid) {
       mv.value = isRangeMode ? [...curr] : curr;
-    } else {
-      currentValue.value = isRangeMode ? [...mv.value] : mv.value;
     }
+
+    currentValue.value = isRangeMode ? [...mv.value] : mv.value;
   };
 
   // clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부

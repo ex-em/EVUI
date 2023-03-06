@@ -57,12 +57,14 @@ export default {
       isExecuteZoom,
       brushSeries,
       evChartGroupRef,
+      evChartPropsInGroup,
     } = useGroupModel();
 
     const normalizedOptions = getNormalizedOptions(props.options);
     provide('isExecuteZoom', isExecuteZoom);
     provide('isChartGroup', true);
     provide('brushSeries', brushSeries);
+    provide('evChartPropsInGroup', evChartPropsInGroup);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
       set: val => emit('update:groupSelectedLabel', val),
@@ -85,6 +87,7 @@ export default {
       normalizedOptions,
       { wrapper: null, evChartGroupRef },
       groupSelectedLabel,
+      evChartPropsInGroup,
     );
 
     provide('evChartClone', evChartClone);

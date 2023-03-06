@@ -4,6 +4,9 @@
     <ev-calendar
       v-model="calendar1"
       class="case-block"
+      :options="{
+        disabledDate: (time) => time.getTime() > Date.now()
+      }"
     />
     <ev-calendar
       v-model="calendar2"
@@ -59,7 +62,7 @@
       :options="{
         multiType: 'date',
         multiDayLimit: 3,
-        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6,
+        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6
       }"
     />
     <div class="description">
@@ -77,7 +80,7 @@
       mode="dateMulti"
       :options="{
         multiType: 'weekday',
-        disabledDate: (time) => time.getTime() <= Date.now(),
+        disabledDate: (time) => time.getTime() <= Date.now()
       }"
     />
     <div class="description">
@@ -95,7 +98,7 @@
       mode="dateMulti"
       :options="{
         multiType: 'week',
-        disabledDate: (time) => time.getTime() > Date.now(),
+        disabledDate: (time) => time.getTime() > Date.now()
       }"
     />
     <div class="description">
@@ -112,7 +115,7 @@
       class="case-block"
       mode="dateRange"
       :options="{
-        disabledDate: (time) => time.getDay() === 2 || time.getDay() === 4,
+        disabledDate: (time) => time.getDay() === 2 || time.getDay() === 4
       }"
     />
     <div class="description">
