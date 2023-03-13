@@ -114,6 +114,16 @@ export const AXIS_OPTION = {
     fontStyle: 'normal',
     color: '#808080',
   },
+  scrollbar: {
+    use: false,
+    maxTickCount: null,
+    width: 140,
+    height: 24,
+    thumbColor: '#CCCCCC',
+    thumbRadius: 2,
+    trackColor: '#FFFFFF',
+    showButton: true,
+  },
 };
 
 export const PLOT_LINE_OPTION = {

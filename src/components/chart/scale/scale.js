@@ -10,8 +10,8 @@ import {
 import Util from '../helpers/helpers.util';
 
 class Scale {
-  constructor(type, opt, ctx, options) {
-    const merged = defaultsDeep({}, opt, AXIS_OPTION);
+  constructor(type, axisOpt, ctx, options) {
+    const merged = defaultsDeep({}, axisOpt, AXIS_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
     });
@@ -63,16 +63,18 @@ class Scale {
   /**
    * Calculate min/max value, label and size information for axis
    * @param {object} minMax    min/max information
+   * @param {object} scrollbarOpt scrollbar option
    *
    * @returns {object} min/max value and label
    */
-  calculateScaleRange(minMax) {
+  calculateScaleRange(minMax, scrollbarOpt) {
     let maxValue;
     let minValue;
 
-    if (this.range?.length === 2) {
-      maxValue = this.range[1];
-      minValue = this.range[0];
+    const range = scrollbarOpt.use ? scrollbarOpt.range : this.range;
+    if (range?.length === 2) {
+      maxValue = range[1];
+      minValue = range[0];
     } else {
       maxValue = minMax.max;
       minValue = minMax.min;

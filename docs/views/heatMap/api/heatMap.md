@@ -93,7 +93,8 @@ const chartData =
   | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#step-type) |
+  | range | Array | null | 축에 표시할 값의 min, max  (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [time](#time-type), [step](#step-type) |
+  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) | |
   | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 | |  
@@ -105,10 +106,13 @@ const chartData =
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
-   - labelStyle > alignToGridLine
-     - categoryMode만 사용
+      - 축의 label을 축 line에 표시하고 싶은 경우 label style 옵션의 alignToGridLine을 true로 변경
+   - range
+     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
 
 ##### step type
+   - range
+      - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
 
 ##### label style
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

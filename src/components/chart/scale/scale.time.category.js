@@ -4,8 +4,8 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
-  constructor(type, opt, ctx, labels, options) {
-    super(type, opt, ctx);
+  constructor(type, axisOpt, ctx, labels, options) {
+    super(type, axisOpt, ctx);
     this.labels = labels;
     this.options = options;
   }
@@ -166,7 +166,7 @@ class TimeCategoryScale extends Scale {
     }
 
     const alignToGridLine = this.labelStyle.alignToGridLine;
-    const graphGap = (endPoint - startPoint) / (labels.length || 1);
+    const graphGap = (endPoint - startPoint) / (oriSteps || 1);
     if (this.categoryMode && !alignToGridLine) {
       startPoint += Math.ceil(graphGap / 2) - 2;
     }

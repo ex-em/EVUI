@@ -132,3 +132,7 @@ export function getPrecision(v) {
   const decimal = v?.toString().split('.')[1] || 0;
   return decimal ? decimal.length : 0;
 }
+
+export function checkNullAndUndefined(value) {
+  return value === null || value === undefined;
+}
