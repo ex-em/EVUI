@@ -142,13 +142,25 @@ class Bar {
 
       const legendHitInfo = param?.legendHitInfo;
       const selectLabelOption = param?.selectLabel?.option;
+      const selectItemOption = param?.selectItem?.option;
       const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
+      const {
+        dataIndex: selectedItemDataIndex,
+        seriesID: selectedItemSeriesId,
+      } = param?.selectItem?.selected ?? {};
+
       let isDownplay = false;
 
       if (legendHitInfo) {
         isDownplay = legendHitInfo?.sId !== this.sId;
       } else if (selectLabelOption?.use && selectLabelOption?.useSeriesOpacity) {
         isDownplay = selectedLabelList.length && !selectedLabelList.includes(index);
+      } else if (truthy(selectedItemDataIndex) && selectItemOption?.useSeriesOpacity) {
+        if (this.isExistGrp) {
+          isDownplay = selectedItemDataIndex !== index;
+        } else {
+          isDownplay = selectedItemDataIndex !== index || selectedItemSeriesId !== this.sId;
+        }
       }
 
       if (typeof barColor !== 'string') {
