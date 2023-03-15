@@ -10,9 +10,24 @@
     />
     <div class="description">
       <ev-button
-        @click="toggleSelectData">
+          @click="toggleSelectData">
         select toggle 1 - 2
       </ev-button>
+      <br><br>
+      <div class="badge yellow">
+        useSeriesOpacity
+      </div>
+      <ev-toggle v-model="useSeriesOpacity"/>
+      <br><br>
+      <div class="badge yellow">
+        showTextTip
+      </div>
+      <ev-toggle v-model="showTextTip"/>
+      <br><br>
+      <div class="badge yellow">
+        useMaxTip
+      </div>
+      <ev-toggle v-model="useMaxTip"/>
       <br><br>
       <div>
         <div class="badge yellow">
@@ -35,7 +50,7 @@
 </template>
 
 <script>
-  import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
   export default {
     setup() {
@@ -53,7 +68,10 @@
         },
       };
 
-      const chartOptions = {
+      const useSeriesOpacity = ref(true);
+      const showTextTip = ref(false);
+      const useMaxTip = ref(false);
+      const chartOptions = reactive({
         type: 'bar',
         thickness: 0.8,
         width: '100%',
@@ -82,20 +100,21 @@
         }],
         selectItem: {
           use: true,
-          showTextTip: true,
+          showTextTip,
           tipStyle: {
             background: '#FF00FF',
           },
           useDeselectItem: true,
+          useSeriesOpacity,
         },
         maxTip: {
-          use: true,
+          use: useMaxTip,
           showTextTip: true,
           tipStyle: {
             background: '#FF0000',
           },
         },
-      };
+      });
 
       const clickedLabel = ref("''");
       const onClick = (target) => {
@@ -124,6 +143,9 @@
         clickedLabel,
         dblClickedLabel,
         defaultSelectItem,
+        useSeriesOpacity,
+        showTextTip,
+        useMaxTip,
         onClick,
         onDblClick,
         toggleSelectData,
