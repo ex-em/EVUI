@@ -36,10 +36,8 @@ const modules = {
             const sData = data[seriesID];
 
             if (series && sData) {
-              // series.labels.x = this.getFilteredLabels(label.x, 'x');
-              // series.labels.y = this.getFilteredLabels(label.y, 'y');
               series.labels = label;
-              series.data = this.addSeriesDSForHeatMap(sData, series.labels);
+              series.data = this.addSeriesDSForHeatMap(sData);
               series.minMax = this.getSeriesMinMax(series.data);
               series.valueOpt = this.getSeriesValueOptForHeatMap(series);
             }
@@ -192,23 +190,6 @@ const modules = {
   },
 
   /**
-   * Take chart label
-   * @param rawLabel
-   * @param dir - axes direction ('x' | 'y')
-   * @returns Array
-   */
-  getFilteredLabels(rawLabel, dir = '') {
-    const key = dir || (this.horizontal ? 'y' : 'x');
-    const scrollOpt = this.scrollOpt[key];
-    if (scrollOpt.use && scrollOpt.range) {
-      const [startIndex, endIndex] = scrollOpt.range;
-      return rawLabel.filter((label, index) => (index >= startIndex && index <= endIndex));
-    }
-
-    return [...rawLabel];
-  },
-
-  /**
    * Take data and label to create stack data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
@@ -320,41 +301,21 @@ const modules = {
   /**
    * Take data to create data for each series
    * @param {array} data data array for each series
-   * @param {object}  label   chart label
    *
    * @returns {array} data info added position and etc
    */
-  addSeriesDSForHeatMap(data, label) {
-    const { axesX, axesY } = this.options;
-    const isInRange = (value, dir) => {
-      const type = dir === 'x' ? axesX?.[0]?.type : axesY?.[0]?.type;
-      if (type === 'time') {
-        const timeValue = +new Date(value);
-        const startValue = +new Date(label[dir][0]);
-        const endValue = +new Date(label[dir].at(-1));
-        return startValue <= timeValue && timeValue <= endValue;
-      } else if (type === 'step') {
-        return label[dir].includes(value);
-      }
-      return true;
-    };
-
-    return data.reduce((acc, { x, y, value }) => {
-      if (isInRange(x, 'x') && isInRange(y, 'y')) {
-        acc.push({
-          x,
-          y,
-          o: value,
-          xp: null,
-          yp: null,
-          w: null,
-          h: null,
-          dataColor: null,
-          cId: null,
-        });
-      }
-      return acc;
-    }, []);
+  addSeriesDSForHeatMap(data) {
+    return data.map(({ x, y, value }) => ({
+      x,
+      y,
+      o: value,
+      xp: null,
+      yp: null,
+      w: null,
+      h: null,
+      dataColor: null,
+      cId: null,
+    }));
   },
 
   /**
