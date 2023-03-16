@@ -135,6 +135,7 @@ const chartData = {
   | plotBands | Array | ([상세](#plotband)) | plot band(임계영역 표시 용도) 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
+  | scrollbar | Object | ([상세](#axes-scrollbar)) | 라벨 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.) | |
 
 ##### linear type
    - interval (Axis Label 표기를 위한 interval)
@@ -232,6 +233,16 @@ const chartData = {
 | verticalAlign | String | 'middle' | 수직 정렬 | 'top', 'middle', 'bottom' |
 | textOverflow | String | 'none' | 라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리방안  | 'none', 'ellipsis' |
 | maxWidth | Number | null | 라벨의 최대 너비  |  |
+
+##### axes scrollbar
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| use | Boolean | false | 스크롤 사용 여부 | true / false |
+| width | Number | 14 | 스크롤 넓이 (y축일 때 적용) | |
+| height | Number | 14 | 스크롤 높이 (x축일 때 적용) | |
+| background | Hex, RGB, RGBA Code(String) | '#F2F2F2' | 스크롤 track 배경 색상 | |
+| showButton | Boolean | false | 스크롤 버튼 표시 여부 | |
+| thumbStyle | Object | | 스크롤 thumb 스타일 설정 | { <br> background: '#929292', radius: 0 <br>} |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

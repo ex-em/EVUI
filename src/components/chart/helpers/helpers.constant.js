@@ -116,13 +116,14 @@ export const AXIS_OPTION = {
   },
   scrollbar: {
     use: false,
-    maxTickCount: null,
-    width: 140,
-    height: 24,
-    thumbColor: '#CCCCCC',
-    thumbRadius: 2,
-    trackColor: '#FFFFFF',
+    width: 14,
+    height: 14,
+    background: '#F2F2F2',
     showButton: true,
+    thumbStyle: {
+      background: '#929292',
+      radius: 0,
+    },
   },
 };
 

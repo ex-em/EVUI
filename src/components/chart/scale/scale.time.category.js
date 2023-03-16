@@ -191,7 +191,8 @@ class TimeCategoryScale extends Scale {
         && this.options?.selectLabel?.useLabelOpacity
         && (this.options.horizontal === (this.type === 'y'))
         && selectLabelInfo?.dataIndex?.length
-        && !selectLabelInfo?.dataIndex?.includes(ix);
+        && !selectLabelInfo?.label
+          .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
 
       const labelColor = this.labelStyle.color;
       let defaultOpacity = 1;

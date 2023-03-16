@@ -42,7 +42,6 @@ class EvChart {
 
     this.brushSeries = brushSeries;
     this.target = target;
-    this.rawData = Object.assign({}, data);
     this.data = data;
     this.options = options;
     this.listeners = listeners;
@@ -83,8 +82,10 @@ class EvChart {
     this.isInitLegend = false;
     this.isInitTitle = false;
     this.isInit = false;
-    this.scrollbarX = { init: false };
-    this.scrollbarY = { init: false };
+    this.scrollbar = {
+      x: { isInit: false },
+      y: { isInit: false },
+    };
     this.seriesList = {};
     this.lastTip = { pos: null, value: null };
     this.seriesInfo = {
@@ -125,7 +126,6 @@ class EvChart {
 
     this.drawChart();
 
-
     if (tooltip.use) {
       this.createTooltipDOM();
 
@@ -161,7 +161,9 @@ class EvChart {
       this.setLegendPosition();
     }
 
-    this.initScrollbar();
+    if (opt.axesX?.[0]?.scrollbar?.use || opt.axesY?.[0]?.scrollbar?.use) {
+      this.initScrollbar();
+    }
 
     this.chartRect = this.getChartRect();
   }
@@ -178,6 +180,10 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
+
+    if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
+      this.updateScrollbarPosition();
+    }
 
     this.drawTip();
 
@@ -386,8 +392,8 @@ class EvChart {
    */
   getAxesRange() {
     /* eslint-disable max-len */
-    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.scrollbarX, this.chartRect));
-    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.scrollbarY, this.chartRect));
+    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.scrollbar.x, this.chartRect));
+    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.scrollbar.y, this.chartRect));
     /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
@@ -538,15 +544,29 @@ class EvChart {
       yAxisTitleHeight = fontSize + titleMargin;
     }
 
-    const horizontalPadding = padding.left + padding.right;
-    const verticalPadding = padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight;
+    const xAxisScrollOpt = this.scrollbar.x;
+    const yAxisScrollOpt = this.scrollbar.y;
+
+    let xAxisScrollHeight = 0;
+    if (xAxisScrollOpt?.use) {
+      xAxisScrollHeight = xAxisScrollOpt?.height;
+    }
+
+    let yAxisScrollWidth = 0;
+    if (yAxisScrollOpt?.use) {
+      yAxisScrollWidth = yAxisScrollOpt?.width;
+    }
+
+    const horizontalPadding = padding.left + padding.right + yAxisScrollWidth;
+    const verticalPadding = padding.top + padding.bottom
+        + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
     const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
     const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
     const x1 = padding.left;
-    const x2 = Math.max(width - padding.right, x1 + 2);
+    const x2 = Math.max(width - padding.right - yAxisScrollWidth, x1 + 2);
     const y1 = padding.top + yAxisTitleHeight;
-    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight, y1 + 2);
+    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight - xAxisScrollHeight, y1 + 2);
 
     return {
       x1,
@@ -688,6 +708,8 @@ class EvChart {
     if (!this.isInit) {
       return;
     }
+
+    this.updateScrollbar?.();
 
     this.resetProps();
 

@@ -188,14 +188,18 @@ class HeatMap {
     let point = null;
 
     if (this.labels[dir] && this.labels[dir].length) {
-      const index = this.labels[dir].findIndex(label => label === value);
+      let index = this.labels[dir].findIndex(label => label === value);
+
+      if (index === -1) {
+        index = this.labels[dir].findIndex(label => +label === +value);
+      }
 
       const { minIndex, maxIndex, graphMin, graphMax } = minMax;
-      if (truthyNumber(minIndex) && index < minIndex) {
+      if (truthyNumber(maxIndex) && index > maxIndex) {
         return null;
       }
 
-      if (truthyNumber(maxIndex) && index > maxIndex) {
+      if (truthyNumber(minIndex) && index < minIndex) {
         return null;
       }
 
@@ -205,19 +209,13 @@ class HeatMap {
         }
       }
 
+      const startIndex = minIndex ?? this.labels[dir].findIndex(label => +label === +graphMin);
+
       if (index > -1) {
+        index -= (startIndex > -1 ? startIndex : 0);
         point = dir === 'x'
           ? startPoint + (this.size.w * index)
           : startPoint - (this.size.h * (index + 1));
-      } else {
-        const timeIndex = this.labels[dir].findIndex(label =>
-          new Date(label).getTime() === new Date(value).getTime(),
-        );
-        if (timeIndex > -1) {
-          point = dir === 'x'
-            ? startPoint + (this.size.w * timeIndex)
-            : startPoint - (this.size.h * (timeIndex + 1));
-        }
       }
     }
 

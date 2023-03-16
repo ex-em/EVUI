@@ -98,6 +98,7 @@ const chartData =
   | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 | |  
+  | scrollbar | Object | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.) | |
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -136,6 +137,16 @@ const chartData =
 | fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
 | textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
 | color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
+
+##### axes scrollbar
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| use | Boolean | false | 스크롤 사용 여부 | true / false |
+| width | Number | 14 | 스크롤 넓이 (y축일 때 적용) | |
+| height | Number | 14 | 스크롤 높이 (x축일 때 적용) | |
+| background | Hex, RGB, RGBA Code(String) | '#F2F2F2' | 스크롤 track 배경 색상 | |
+| showButton | Boolean | false | 스크롤 버튼 표시 여부 | true / false |
+| thumbStyle | Object | | 스크롤 thumb 스타일 설정 | { <br> background: '#929292', radius: 0 <br>} |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

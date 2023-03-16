@@ -1,6 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
 import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
-import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -28,7 +27,7 @@ class StepScale extends Scale {
     let maxIndex = this.labels.length - 1;
     let labelCount = this.labels.length;
 
-    const range = scrollbarOpt.use ? scrollbarOpt.range : this.range;
+    const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (range?.length) {
       [minIndex, maxIndex] = range;
       maxValue = this.labels[maxIndex];
@@ -72,13 +71,17 @@ class StepScale extends Scale {
 
     const oriSteps = numberOfSteps;
     const isNumbersArray = this.labels.every(label => !isNaN(label));
-    if (this.labelStyle.alignToGridLine && isNumbersArray && maxSteps <= 2) {
-      interval = oriSteps;
-    } else {
-      while (numberOfSteps > maxSteps * 2) {
-        interval *= 2;
-        numberOfSteps = Math.round(numberOfSteps / interval);
+    if (this.labelStyle.alignToGridLine && isNumbersArray) {
+      if (maxSteps > 2) {
+        while (numberOfSteps > maxSteps * 2) {
+          interval *= 2;
+          numberOfSteps = Math.round(numberOfSteps / interval);
+        }
+      } else {
+        interval = oriSteps;
       }
+    } else if (numberOfSteps > maxSteps * 2) {
+      interval *= 2;
     }
 
     return {
@@ -114,14 +117,13 @@ class StepScale extends Scale {
 
     const steps = stepInfo.steps;
     const count = stepInfo.interval;
-    const minValue = stepInfo.graphMin;
-    const minIndex = this.labels.findIndex(label => label === minValue);
+    const startIndex = stepInfo.minIndex;
 
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
-    const maxWidth = chartRect.chartWidth / (this.labels.length + 2);
+    const maxWidth = chartRect.chartWidth / (steps + 2);
 
     this.drawAxisTitle(chartRect, labelOffset);
 
@@ -164,13 +166,13 @@ class StepScale extends Scale {
       ctx.beginPath();
       ctx.strokeStyle = this.gridLineColor;
 
-      const startIndex = (minIndex < 0 || !truthyNumber(minIndex)) ? 0 : minIndex;
       let labelText;
       let labelPoint;
       let index;
 
-      for (index = startIndex || 0; index < steps; index += count) {
-        const item = this.labels[index];
+      for (index = 0; index < steps; index += count) {
+        const labelIndex = startIndex + index;
+        const item = this.labels[labelIndex];
         labelCenter = Math.round(startPoint + (labelGap * index));
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
@@ -192,7 +194,7 @@ class StepScale extends Scale {
           && selectLabelOpt?.useLabelOpacity
           && targetAxis === this.type
           && selectedLabelInfo?.dataIndex?.length
-          && !selectedLabelInfo?.dataIndex?.includes(index);
+          && !selectedLabelInfo?.dataIndex?.includes(labelIndex);
 
         const labelColor = this.labelStyle.color;
         let defaultOpacity = 1;

@@ -71,7 +71,7 @@ class Scale {
     let maxValue;
     let minValue;
 
-    const range = scrollbarOpt.use ? scrollbarOpt.range : this.range;
+    const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (range?.length === 2) {
       maxValue = range[1];
       minValue = range[0];

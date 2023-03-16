@@ -20,6 +20,8 @@ import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import Overlapping from './example/Overlapping';
 import OverlappingRaw from '!!raw-loader!./example/Overlapping';
+import Scrollbar from './example/Scrollbar';
+import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
 
 export default {
   mdText,
@@ -75,6 +77,11 @@ export default {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
       component: PlotLine,
       parsedData: parseComponent(PlotLineRaw),
+    },
+    Scrollbar: {
+      description: '차트 축의 range 설정하여 scrollbar를 이용하여 차트 축을 이동할 수 있습니다.',
+      component: Scrollbar,
+      parsedData: parseComponent(ScrollbarRaw),
     },
   },
 };
