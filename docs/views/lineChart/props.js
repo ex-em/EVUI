@@ -12,6 +12,8 @@ import DragSelection from './example/DragSelection';
 import DragSelectionRaw from '!!raw-loader!./example/DragSelection';
 import Tooltip from './example/Tooltip';
 import TooltipRaw from '!!raw-loader!./example/Tooltip';
+import TooltipHtml from './example/TooltipHtml';
+import TooltipHtmlRaw from '!!raw-loader!./example/TooltipHtml';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import SelectLabel from './example/SelectLabel';
@@ -63,6 +65,11 @@ export default {
       description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',
       component: Tooltip,
       parsedData: parseComponent(TooltipRaw),
+    },
+    'Custom Tooltip': {
+      description: 'Tooltip의 내용을 HTML로 가공하여 구성할 수 있습니다.',
+      component: TooltipHtml,
+      parsedData: parseComponent(TooltipHtmlRaw),
     },
     'Plot line & Plot band': {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',

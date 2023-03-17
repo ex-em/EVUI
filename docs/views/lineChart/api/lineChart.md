@@ -248,12 +248,21 @@ const chartData =
 const chartOptions = {
     tooltip: {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
+        // return type : string
         formatter: ({ x, y, name }) => ... ,
         
         // value + title Formatter
+        // return type : string
         formatter: {
             title: ({ x, y }) => ...,
             value: ({ x, y, name }) => ...,
+        }
+        
+        // custom formatter (html)
+        // return type : string
+        // 주의: 사용하시는 방법에 따라 차트의 성능이 저하될 수 있습니다.
+        formatter: {
+            html: (seiresList) =>  `<div class="customClass">${seriesList[0].name} : ${seriesList[0].data.y}</div>`
         }
     },
 }

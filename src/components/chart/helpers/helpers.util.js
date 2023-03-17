@@ -346,4 +346,15 @@ export default {
   checkSafeInteger(value) {
     return value <= Number.MAX_SAFE_INTEGER && value >= Number.MIN_SAFE_INTEGER;
   },
+
+  /**
+   * Convert html(string) To Element
+   * @param htmlString
+   * @returns {ChildNode}
+   */
+  htmlToElement(htmlString) {
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+    return template.content.firstChild;
+  },
 };

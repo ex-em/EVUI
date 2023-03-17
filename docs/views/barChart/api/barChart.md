@@ -126,7 +126,7 @@ const chartData = {
   | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | range | Array | null | 축에 표시할 값의 min, max (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [0, 100] |
+  | range | Array | null | 축에 표시할 값의 min, max | [0, 100] |
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
   | overlapping | Object | ([상세](#overlapping)) | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. |  |   
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
@@ -143,8 +143,6 @@ const chartData = {
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
    - decimalPoint
      - 소수점 자릿수 표시 (default: 0)
-   - range
-     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
      
       
 ##### time type
@@ -154,8 +152,6 @@ const chartData = {
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
-   - range
-     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
       
 ##### Logarithmic type
    - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
@@ -163,16 +159,12 @@ const chartData = {
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표
    - decimalPoint
        - 소수점 자릿수 표시 (default: 0)
-   - range
-     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
      
 ##### step type
    - timeMode
       - Step Axis를 Time 기반으로 변경, default: false
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
-   - range
-     - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
 
 ##### overlapping
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -294,12 +286,21 @@ const chartData = {
 const chartOptions = {
     tooltip: {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
+        // return type : string
         formatter: ({ x, y, name }) => ... ,
         
         // value + title Formatter
+        // return type : string
         formatter: {
             title: ({ x, y }) => ...,
             value: ({ x, y, name }) => ...,
+        }
+        
+        // custom formatter (html)
+        // return type : string
+        // 주의: 사용하시는 방법에 따라 차트의 성능이 저하될 수 있습니다.
+        formatter: {
+            html: (seiresList) =>  `<div class="customClass">${seriesList[0].name} : ${seriesList[0].data.y}</div>`
         }
     },
 }
@@ -328,19 +329,18 @@ const chartOptions = {
 * 3.4 버전부터 없어지는 옵션입니다.
 
 #### selectItem
-| 이름                  | 타입                          | 디폴트               | 설명                                                | 종류(예시) |
-|---------------------|-----------------------------|-------------------|---------------------------------------------------| ----------|
-| use                 | Boolean                     | false             | 차트 아이템 선택 기능                                      | |
-| useClick            | Boolean                     | true              | 클릭 이벤트 사용 여부 (v-model에 바인딩한 변수로만 컨트롤 하려 할때 false) | |
-| showTextTip         | Boolean                     | false             | 선택한 위치의 TextTip(text 포함 화살표, 흡사 말풍선) 생성 여부        | |
-| tipText             | String                      | 'value'           | 선택한 위치에 TextTip을 생성한다면 어떤 값                       | 'value', 'label |
-| showTip             | Boolean                     | false             | 선택한 위치의 Tip(화살표) 생성 여부                            | |
-| showIndicator       | Boolean                     | false             | 선택한 label의 indicator 표시                           | |
-| fixedPosTop         | Boolean                     | false             | indicator 및 tip의 위치를 최대값으로 고정                     | |
-| useApproximateValue | Boolean                     | false             | 가까운 label을 선택                                     | |
-| indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000'         | indicator 색상                                      | |
-| useSeriesOpacity    | Boolean                     | false             | 선택된 항목 외 다른 항목들의 색상을 반투명하게 처리할지의 여부               | |
-| tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                       
+| 이름 | 타입 | 디폴트 | 설명                                                | 종류(예시) |
+| --- | ---- | ----- |---------------------------------------------------| ----------|
+| use | Boolean | false | 차트 아이템 선택 기능                                      | |
+| useClick            | Boolean | true      | 클릭 이벤트 사용 여부 (v-model에 바인딩한 변수로만 컨트롤 하려 할때 false) | |
+| showTextTip | Boolean | false | 선택한 위치의 TextTip(text 포함 화살표, 흡사 말풍선) 생성 여부 | |
+| tipText | String | 'value' | 선택한 위치에 TextTip을 생성한다면 어떤 값 | 'value', 'label |
+| showTip | Boolean | false | 선택한 위치의 Tip(화살표) 생성 여부 | |
+| showIndicator | Boolean | false | 선택한 label의 indicator 표시 | |
+| fixedPosTop | Boolean | false | indicator 및 tip의 위치를 최대값으로 고정 | |
+| useApproximateValue | Boolean | false | 가까운 label을 선택 | |
+| indicatorColor | Hex, RGB, RGBA Code(String)| '#000000' | indicator 색상 | |
+| tipStyle | Object | ([상세](#tipstyle)) | tip 스타일을 설정
 
 ##### etc.
 | 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |

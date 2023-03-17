@@ -93,12 +93,10 @@ const chartData =
   | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | range | Array | null | 축에 표시할 값의 min, max  (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [time](#time-type), [step](#step-type) |
-  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) | |
+  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |  [time](#time-type), [linear](#step-type) |
   | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 | |
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 | |  
-  | scrollbar | Object | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.) | |
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
@@ -107,13 +105,10 @@ const chartData =
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
-      - 축의 label을 축 line에 표시하고 싶은 경우 label style 옵션의 alignToGridLine을 true로 변경
-   - range
-     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
+   - labelStyle > alignToGridLine
+     - categoryMode만 사용
 
 ##### step type
-   - range
-      - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
 
 ##### label style
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -137,16 +132,6 @@ const chartData =
 | fontStyle | String | 'normal' | 폰트 스타일 | 'normal', 'italic' |
 | textAlign | String | 'right' | 텍스트 정렬| 'right', 'left', 'center' |
 | color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
-
-##### axes scrollbar
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-|-----|------|-------|-----|-----|
-| use | Boolean | false | 스크롤 사용 여부 | true / false |
-| width | Number | 14 | 스크롤 넓이 (y축일 때 적용) | |
-| height | Number | 14 | 스크롤 높이 (x축일 때 적용) | |
-| background | Hex, RGB, RGBA Code(String) | '#F2F2F2' | 스크롤 track 배경 색상 | |
-| showButton | Boolean | false | 스크롤 버튼 표시 여부 | true / false |
-| thumbStyle | Object | | 스크롤 thumb 스타일 설정 | { <br> background: '#929292', radius: 0 <br>} |
 
 #### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -202,12 +187,21 @@ const chartData =
 const chartOptions = {
     tooltip: {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
+        // return type : string
         formatter: ({ x, y, value }) => ... ,
         
         // value + title Formatter
+        // return type : string
         formatter: {
             title: ({ x, y }) => ...,
             value: ({ x, y, value }) => ...,
+        }
+        
+        // custom formatter (html)
+        // return type : string
+        // 주의: 사용하시는 방법에 따라 차트의 성능이 저하될 수 있습니다.
+        formatter: {
+            html: ([item]) =>  `<div class="customClass">${item.name} : ${item.data.y}</div>`
         }
     },
 }
