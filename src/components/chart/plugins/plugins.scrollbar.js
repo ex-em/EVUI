@@ -57,7 +57,7 @@ const module = {
   updateScrollbarInfo(dir) {
     const { axesX, axesY } = this.options;
     const newOpt = dir === 'x' ? axesX : axesY;
-    if (!this.scrollbar[dir].isInit && newOpt?.[0]?.range) {
+    if (!this.scrollbar[dir].isInit && newOpt?.[0]?.scrollbar?.use && newOpt?.[0]?.range) {
       this.initScrollbarInfo(newOpt, dir);
       return;
     } else if (!newOpt?.[0].scrollbar?.use || checkNullAndUndefined(newOpt?.[0]?.range)) {
