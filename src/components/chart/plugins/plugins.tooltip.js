@@ -34,9 +34,11 @@ const modules = {
     this.tooltipDOM.style.display = 'none';
     this.setFontFamily();
 
-    this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
-    this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
-    this.tooltipDOM.appendChild(this.tooltipBodyDOM);
+    if (!this.options.tooltip?.formatter?.dom) {
+      this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
+      this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
+      this.tooltipDOM.appendChild(this.tooltipBodyDOM);
+    }
 
     document.body.appendChild(this.tooltipDOM);
 
@@ -561,6 +563,72 @@ const modules = {
     }
 
     ctx.restore();
+  },
+
+  setCustomTooltipLayoutPosition(hitInfo, e) {
+    const mouseX = e.pageX;
+    const mouseY = e.pageY;
+
+    const customTooltipEl = document.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
+    if (!customTooltipEl) {
+      return;
+    }
+
+    const contentsWidth = customTooltipEl.offsetWidth;
+    const contentsHeight = customTooltipEl.offsetHeight;
+
+    this.tooltipDOM.style.height = 'auto';
+    this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
+
+    const bodyWidth = document.body.clientWidth;
+    const bodyHeight = document.body.clientHeight;
+    const distanceMouseAndTooltip = 20;
+    const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
+    const maximumPosY = bodyHeight - (TITLE_HEIGHT + contentsHeight) - distanceMouseAndTooltip;
+    const expectedPosX = mouseX + distanceMouseAndTooltip;
+    const expectedPosY = mouseY + distanceMouseAndTooltip;
+    const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
+    const reversedPosY = mouseY - (TITLE_HEIGHT + contentsHeight) - distanceMouseAndTooltip;
+    this.tooltipDOM.style.left = expectedPosX > maximumPosX
+      ? `${reversedPosX}px`
+      : `${expectedPosX}px`;
+    this.tooltipDOM.style.top = expectedPosY > maximumPosY
+      ? `${reversedPosY}px`
+      : `${expectedPosY}px`;
+
+    this.tooltipDOM.style.display = 'block';
+  },
+
+  /**
+   * Draw User Custom Tooltip (tooltip > formatter > html)
+   * call "formatter > html" and append to tooltip DOM
+   * @param hitInfoItems
+   */
+  drawCustomTooltip(hitInfoItems) {
+    const opt = this.options?.tooltip;
+    if (opt.formatter?.html) {
+      this.tooltipDOM.innerHTML = '';
+
+      const seriesList = [];
+      Object.keys(hitInfoItems).forEach((sId) => {
+        seriesList.push({
+          sId,
+          data: hitInfoItems[sId].data,
+          color: hitInfoItems[sId].color,
+          name: hitInfoItems[sId].name,
+        });
+      });
+
+      const userCustomTooltipBody = Util.htmlToElement(opt?.formatter?.html((seriesList)));
+      if (userCustomTooltipBody) {
+        this.tooltipDOM.appendChild(userCustomTooltipBody);
+      }
+
+      this.tooltipDOM.style.overflowY = 'hidden';
+      this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
+      this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
+      this.tooltipDOM.style.color = opt.fontColor;
+    }
   },
 
   /**

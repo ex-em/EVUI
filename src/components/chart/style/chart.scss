@@ -318,10 +318,50 @@
     }
   }
 
-
   .ev-chart-tooltip-body {
     overflow-x: hidden;
     overflow-y: hidden;
+  }
+
+  .ev-chart-tooltip-custom {
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    &__header {
+      @extend .ev-chart-tooltip-header;
+    }
+
+    &__body {
+      padding: 8px 20px 8px 16px;
+      overflow-x: hidden;
+      overflow-y: hidden;
+
+      .row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .series-name {
+        flex: auto;
+      }
+
+      .value {
+        text-align: right;
+      }
+
+      .color-rect {
+        width: 12px;
+        height: 12px;
+        margin-right: 16px;
+      }
+
+      .color-circle {
+        border-radius: 12px;
+
+        @extend .color-rect;
+      }
+    }
   }
 }
 

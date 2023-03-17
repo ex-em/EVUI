@@ -36,13 +36,18 @@ const modules = {
         }
 
         if (tooltip.use) {
-          this.setTooltipLayoutPosition(hitInfo, e);
-          if (type === 'scatter') {
-            this.drawTooltipForScatter(hitInfo, this.tooltipCtx);
-          } else if (type === 'heatMap') {
-            this.drawToolTipForHeatMap(hitInfo, this.tooltipCtx);
+          if (tooltip?.formatter?.html) {
+            this.drawCustomTooltip(hitInfo?.items);
+            this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
-            this.drawTooltip(hitInfo, this.tooltipCtx);
+            this.setTooltipLayoutPosition(hitInfo, e);
+            if (type === 'scatter') {
+              this.drawTooltipForScatter(hitInfo, this.tooltipCtx);
+            } else if (type === 'heatMap') {
+              this.drawToolTipForHeatMap(hitInfo, this.tooltipCtx);
+            } else {
+              this.drawTooltip(hitInfo, this.tooltipCtx);
+            }
           }
         }
       } else if (tooltip.use) {
