@@ -1,6 +1,7 @@
 import { numberWithComma } from '@/common/utils';
 import dayjs from 'dayjs';
 import Canvas from '../helpers/helpers.canvas';
+import { truthyNumber } from '../../../common/utils';
 
 const modules = {
   /**
@@ -173,6 +174,16 @@ const modules = {
     let dp;
 
     if (type === 'bar') {
+      const scrollbarOpt = isHorizontal ? this.scrollbar.y : this.scrollbar.x;
+      if (scrollbarOpt?.use) {
+        const [min, max] = scrollbarOpt?.range ?? [];
+        if (ldata >= min && ldata <= max) {
+          ldata -= (min ?? 0);
+        } else {
+          return false;
+        }
+      }
+
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
         cp = ysp - (size.cat * ldata) - size.cPad;
@@ -282,6 +293,7 @@ const modules = {
       const valueAxesRange = isHorizontal ? this.axesRange.x[0] : this.axesRange.y[0];
       const valuePositionCalcFunction = isHorizontal ? Canvas.calculateX : Canvas.calculateY;
       const labelPositionCalcFunction = isHorizontal ? Canvas.calculateY : Canvas.calculateX;
+      const scrollbarOpt = isHorizontal ? this.scrollbar.y : this.scrollbar.x;
 
       const chartWidth = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
       const chartHeight = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
@@ -305,11 +317,24 @@ const modules = {
       let graphX;
       let lineSeries;
       let sizeObj;
+      let startIndex = 0;
+      let endIndex = labelAxes.labels?.length;
 
       if (labelAxes.labels) {
+        let labelCount = labelAxes.labels.length;
+        if (scrollbarOpt?.use) {
+          const { range, interval, type } = scrollbarOpt;
+          const [min, max] = range;
+          if (truthyNumber(min) && truthyNumber(max)) {
+            labelCount = Math.floor((+max - +min) / interval) + 1;
+            startIndex = type === 'step' ? min : labelAxes.labels.findIndex(v => v === +min);
+            endIndex = type === 'step' ? max : labelAxes.labels.findIndex(v => v === +max);
+          }
+        }
+
         labelStartPoint = aPos[labelAxes.units.rectStart];
         labelEndPoint = aPos[labelAxes.units.rectEnd];
-        labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
+        labelGap = (labelEndPoint - labelStartPoint) / labelCount;
       } else {
         graphX = this.axesSteps.x[0];
         lineSeries = seriesList.find(sId => this.seriesList[sId]?.type === 'line');
@@ -335,8 +360,12 @@ const modules = {
         }
 
         if (labelAxes.labels) {
-          const labelCenter = Math.round(labelStartPoint + (labelGap * dataIndex[i]));
+          if (dataIndex[i] < startIndex || dataIndex[i] > endIndex) {
+            return;
+          }
 
+          const labelIndex = dataIndex[i] - startIndex;
+          const labelCenter = Math.round(labelStartPoint + (labelGap * labelIndex));
           dp = labelCenter + (labelGap / 2);
         } else {
           dp = labelPositionCalcFunction(

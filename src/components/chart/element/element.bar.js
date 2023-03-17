@@ -1,5 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
-import { truthy } from '@/common/utils';
+import { truthy, truthyNumber } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
@@ -61,20 +61,33 @@ class Bar {
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
+    let totalCount = this.data.length;
+    let minIndex;
+    let maxIndex;
+    if (isHorizontal) {
+      [minIndex, maxIndex] = [minmaxY.minIndex, minmaxY.maxIndex];
+    } else {
+      [minIndex, maxIndex] = [minmaxX.minIndex, minmaxX.maxIndex];
+    }
+
+    if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
+      totalCount = (maxIndex - minIndex) + 1;
+    }
+
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
+    const cArea = dArea / (totalCount || 1);
 
     let cPad;
     const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
     if (isUnableToDrawCategoryPadding) {
       cPad = 2;
     } else {
-      cPad = Math.max((dArea * (param.cPadRatio / 2)) / this.data.length, 2);
+      cPad = Math.max((dArea * (param.cPadRatio / 2)) / totalCount, 2);
     }
 
     let bArea;
@@ -102,6 +115,7 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
+    this.range = [minIndex, maxIndex];
 
     let categoryPoint = null;
 
@@ -110,10 +124,16 @@ class Bar {
 
       const item = dataItem;
 
+      if (truthyNumber(minIndex) && index < minIndex) {
+        return;
+      } else if (truthyNumber(minIndex) && index > maxIndex) {
+        return;
+      }
+
       if (isHorizontal) {
-        categoryPoint = ysp - (cArea * index) - cPad;
+        categoryPoint = ysp - (cArea * (index - (minIndex || 0))) - cPad;
       } else {
-        categoryPoint = xsp + (cArea * index) + cPad;
+        categoryPoint = xsp + (cArea * (index - (minIndex || 0))) + cPad;
       }
 
       if (isHorizontal) {
@@ -284,8 +304,14 @@ class Bar {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
+    let totalCount = gdata.length;
+    const [min, max] = this.range;
+    if (truthyNumber(min) && truthyNumber(max)) {
+      totalCount = (max - min) + 1;
+    }
+
     let s = 0;
-    let e = gdata.length - 1;
+    let e = totalCount - 1;
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
@@ -324,8 +350,14 @@ class Bar {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
+    let totalCount = gdata.length;
+    const [min, max] = this.range;
+    if (truthyNumber(min) && truthyNumber(max)) {
+      totalCount = (max - min) + 1;
+    }
+
     let s = 0;
-    let e = gdata.length - 1;
+    let e = totalCount - 1;
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);

@@ -8,6 +8,7 @@ import TimeCategoryScale from './scale/scale.time.category';
 import Title from './plugins/plugins.title';
 import Legend from './plugins/plugins.legend';
 import GradientLegend from './plugins/plugins.legend.gradient';
+import Scrollbar from './plugins/plugins.scrollbar';
 import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
 import Pie from './plugins/plugins.pie';
@@ -32,6 +33,7 @@ class EvChart {
       Object.assign(this, Legend);
       Object.assign(this, Pie);
       Object.assign(this, Title);
+      Object.assign(this, Scrollbar);
     }
 
     if (options.type === 'heatMap' && options.legend.type === 'gradient') {
@@ -80,6 +82,10 @@ class EvChart {
     this.isInitLegend = false;
     this.isInitTitle = false;
     this.isInit = false;
+    this.scrollbar = {
+      x: { isInit: false },
+      y: { isInit: false },
+    };
     this.seriesList = {};
     this.lastTip = { pos: null, value: null };
     this.seriesInfo = {
@@ -120,7 +126,6 @@ class EvChart {
 
     this.drawChart();
 
-
     if (tooltip.use) {
       this.createTooltipDOM();
 
@@ -156,6 +161,10 @@ class EvChart {
       this.setLegendPosition();
     }
 
+    if (opt.axesX?.[0]?.scrollbar?.use || opt.axesY?.[0]?.scrollbar?.use) {
+      this.initScrollbar();
+    }
+
     this.chartRect = this.getChartRect();
   }
 
@@ -171,6 +180,10 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
+
+    if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
+      this.updateScrollbarPosition();
+    }
 
     this.drawTip();
 
@@ -348,9 +361,10 @@ class EvChart {
    */
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
-    const labels = this.options.type === 'heatMap'
-      ? this.data.labels[dir]
-      : this.data.labels;
+
+    const isHeatMapType = (this.options.type === 'heatMap');
+    const labels = isHeatMapType ? this.data.labels[dir] : this.data.labels;
+
     const options = this.options;
     return axes.map((axis) => {
       switch (axis.type) {
@@ -378,8 +392,8 @@ class EvChart {
    */
   getAxesRange() {
     /* eslint-disable max-len */
-    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.chartRect));
-    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.chartRect));
+    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.scrollbar.x, this.chartRect));
+    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.scrollbar.y, this.chartRect));
     /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
@@ -420,6 +434,8 @@ class EvChart {
       const range = {
         minValue: this.axesRange.x[index].min,
         maxValue: this.axesRange.x[index].max,
+        minIndex: this.axesRange.x[index].minIndex,
+        maxIndex: this.axesRange.x[index].maxIndex,
         minSteps: this.labelRange.x[index].min,
         maxSteps: this.labelRange.x[index].max,
       };
@@ -430,6 +446,8 @@ class EvChart {
       const range = {
         minValue: this.axesRange.y[index].min,
         maxValue: this.axesRange.y[index].max,
+        minIndex: this.axesRange.y[index].minIndex,
+        maxIndex: this.axesRange.y[index].maxIndex,
         minSteps: this.labelRange.y[index].min,
         maxSteps: this.labelRange.y[index].max,
       };
@@ -526,15 +544,29 @@ class EvChart {
       yAxisTitleHeight = fontSize + titleMargin;
     }
 
-    const horizontalPadding = padding.left + padding.right;
-    const verticalPadding = padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight;
+    const xAxisScrollOpt = this.scrollbar.x;
+    const yAxisScrollOpt = this.scrollbar.y;
+
+    let xAxisScrollHeight = 0;
+    if (xAxisScrollOpt?.use) {
+      xAxisScrollHeight = xAxisScrollOpt?.height;
+    }
+
+    let yAxisScrollWidth = 0;
+    if (yAxisScrollOpt?.use) {
+      yAxisScrollWidth = yAxisScrollOpt?.width;
+    }
+
+    const horizontalPadding = padding.left + padding.right + yAxisScrollWidth;
+    const verticalPadding = padding.top + padding.bottom
+        + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
     const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
     const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
     const x1 = padding.left;
-    const x2 = Math.max(width - padding.right, x1 + 2);
+    const x2 = Math.max(width - padding.right - yAxisScrollWidth, x1 + 2);
     const y1 = padding.top + yAxisTitleHeight;
-    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight, y1 + 2);
+    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight - xAxisScrollHeight, y1 + 2);
 
     return {
       x1,
@@ -676,6 +708,8 @@ class EvChart {
     if (!this.isInit) {
       return;
     }
+
+    this.updateScrollbar?.();
 
     this.resetProps();
 
@@ -876,6 +910,9 @@ class EvChart {
         this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick);
         this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver);
         this.legendBoxDOM.removeEventListener('mouseleave', this.onLegendBoxLeave);
+        if (this.options.legend.type === 'gradient') {
+          this.legendBoxDOM.removeEventListener('mousedown', this.onLegendMouseDown);
+        }
       }
 
       if (this.resizeDOM) {

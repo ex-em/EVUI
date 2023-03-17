@@ -16,6 +16,8 @@ import SelectItem from './example/SelectItem';
 import SelectItemRaw from '!!raw-loader!./example/SelectItem';
 import SelectBoth from './example/SelectBoth';
 import SelectBothRaw from '!!raw-loader!./example/SelectBoth';
+import Scrollbar from './example/Scrollbar';
+import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
 
 export default {
   mdText,
@@ -59,6 +61,11 @@ export default {
       description: '아이템을 선택 기능과 라벨 선택 기능을 동시에 사용할 수 있습니다.',
       component: SelectBoth,
       parsedData: parseComponent(SelectBothRaw),
+    },
+    Scrollbar: {
+      description: '차트 축의 range 설정하여 scrollbar를 이용하여 차트 축을 이동할 수 있습니다.',
+      component: Scrollbar,
+      parsedData: parseComponent(ScrollbarRaw),
     },
   },
 };

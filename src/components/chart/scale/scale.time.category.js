@@ -4,8 +4,8 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
-  constructor(type, opt, ctx, labels, options) {
-    super(type, opt, ctx);
+  constructor(type, axisOpt, ctx, labels, options) {
+    super(type, axisOpt, ctx);
     this.labels = labels;
     this.options = options;
   }
@@ -166,7 +166,7 @@ class TimeCategoryScale extends Scale {
     }
 
     const alignToGridLine = this.labelStyle.alignToGridLine;
-    const graphGap = (endPoint - startPoint) / (labels.length || 1);
+    const graphGap = (endPoint - startPoint) / (oriSteps || 1);
     if (this.categoryMode && !alignToGridLine) {
       startPoint += Math.ceil(graphGap / 2) - 2;
     }
@@ -191,7 +191,8 @@ class TimeCategoryScale extends Scale {
         && this.options?.selectLabel?.useLabelOpacity
         && (this.options.horizontal === (this.type === 'y'))
         && selectLabelInfo?.dataIndex?.length
-        && !selectLabelInfo?.dataIndex?.includes(ix);
+        && !selectLabelInfo?.label
+          .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
 
       const labelColor = this.labelStyle.color;
       let defaultOpacity = 1;

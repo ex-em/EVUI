@@ -34,7 +34,7 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
         },
         labels: {
           x: [
-            timeValue,
+            dayjs(timeValue),
             dayjs(timeValue).add(2, 'second'),
             dayjs(timeValue).add(4, 'second'),
             dayjs(timeValue).add(6, 'second'),

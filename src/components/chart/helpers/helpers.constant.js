@@ -114,6 +114,17 @@ export const AXIS_OPTION = {
     fontStyle: 'normal',
     color: '#808080',
   },
+  scrollbar: {
+    use: false,
+    width: 14,
+    height: 14,
+    background: '#F2F2F2',
+    showButton: true,
+    thumbStyle: {
+      background: '#929292',
+      radius: 0,
+    },
+  },
 };
 
 export const PLOT_LINE_OPTION = {

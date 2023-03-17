@@ -301,7 +301,6 @@ const modules = {
   /**
    * Take data to create data for each series
    * @param {array} data data array for each series
-   * @param {object}  label   chart label
    *
    * @returns {array} data info added position and etc
    */
@@ -363,6 +362,7 @@ const modules = {
 
     return data;
   },
+
 
   /**
    * Take series data to create min/max info for each series
@@ -822,12 +822,16 @@ const modules = {
     const { horizontal, selectLabel } = this.options;
 
     let scale;
+    let scrollbarOpt;
     if (targetAxis === 'xAxis') {
       scale = this.axesX[0];
+      scrollbarOpt = this.scrollbar.x;
     } else if (targetAxis === 'yAxis') {
       scale = this.axesY[0];
+      scrollbarOpt = this.scrollbar.y;
     } else {
       scale = horizontal ? this.axesY[0] : this.axesX[0];
+      scrollbarOpt = horizontal ? this.scrollbar.y : this.scrollbar.x;
     }
 
     const startPoint = aPos[scale.units.rectStart];
@@ -835,7 +839,21 @@ const modules = {
 
     let labelIndex;
     let hitInfo;
-    if (scale?.labels?.length) {
+    if (scrollbarOpt?.use && scale?.labels?.length) {
+      const { type, range, interval = 1 } = scrollbarOpt;
+      const [min, max] = range ?? [0, scale.labels.length];
+      const labelCount = Math.floor((+max - +min) / interval) + 1;
+      const labelGap = (endPoint - startPoint) / labelCount;
+
+      const isYAxis = targetAxis === 'yAxis' || horizontal;
+      const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);
+      if (type === 'step') {
+        labelIndex = min + index;
+      } else {
+        const minIndex = scale?.labels.findIndex(label => label === +min);
+        labelIndex = minIndex + index;
+      }
+    } else if (scale?.labels?.length) {
       const labelGap = (endPoint - startPoint) / scale.labels.length;
       const isYAxis = targetAxis === 'yAxis' || horizontal;
       const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);

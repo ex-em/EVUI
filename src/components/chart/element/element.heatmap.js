@@ -1,5 +1,5 @@
 import { merge } from 'lodash-es';
-import { convertToPercent, truthy } from '@/common/utils';
+import { convertToPercent, truthy, truthyNumber, checkNullAndUndefined } from '@/common/utils';
 import Util from '../helpers/helpers.util';
 import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 
@@ -148,6 +148,11 @@ class HeatMap {
 
   drawItem(ctx, x, y, w, h, borderOpt) {
     ctx.beginPath();
+
+    if (w < 0 || h < 0) {
+      return;
+    }
+
     if (borderOpt.show) {
       const { radius } = borderOpt;
       if (radius > 0) {
@@ -179,25 +184,38 @@ class HeatMap {
     ctx.closePath();
   }
 
-  calculateXY(dir, value, startPoint) {
+  calculateXY(dir, value, startPoint, minMax) {
     let point = null;
 
     if (this.labels[dir] && this.labels[dir].length) {
-      const index = this.labels[dir].findIndex(label => label === value);
+      let index = this.labels[dir].findIndex(label => label === value);
+
+      if (index === -1) {
+        index = this.labels[dir].findIndex(label => +label === +value);
+      }
+
+      const { minIndex, maxIndex, graphMin, graphMax } = minMax;
+      if (truthyNumber(maxIndex) && index > maxIndex) {
+        return null;
+      }
+
+      if (truthyNumber(minIndex) && index < minIndex) {
+        return null;
+      }
+
+      if (checkNullAndUndefined(minIndex) && checkNullAndUndefined(maxIndex)) {
+        if (value < graphMin || value > graphMax) {
+          return null;
+        }
+      }
+
+      const startIndex = minIndex ?? this.labels[dir].findIndex(label => +label === +graphMin);
 
       if (index > -1) {
+        index -= (startIndex > -1 ? startIndex : 0);
         point = dir === 'x'
           ? startPoint + (this.size.w * index)
           : startPoint - (this.size.h * (index + 1));
-      } else {
-        const timeIndex = this.labels[dir].findIndex(label =>
-          new Date(label).getTime() === new Date(value).getTime(),
-        );
-        if (timeIndex > -1) {
-          point = dir === 'x'
-            ? startPoint + (this.size.w * timeIndex)
-            : startPoint - (this.size.h * (timeIndex + 1));
-        }
       }
     }
 
@@ -217,6 +235,7 @@ class HeatMap {
       selectLabel,
       legendHitInfo,
       selectItem,
+      axesSteps,
     } = param;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
@@ -225,8 +244,11 @@ class HeatMap {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    this.size.w = xArea / this.labels.x.length;
-    this.size.h = yArea / this.labels.y.length;
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    this.size.w = xArea / minmaxX.oriSteps;
+    this.size.h = yArea / minmaxY.oriSteps;
 
     const getOpacity = (item, opacity, index) => {
       if (!legendHitInfo) {
@@ -259,8 +281,8 @@ class HeatMap {
 
     this.data.forEach((item, index) => {
       const axisLineWidth = 1;
-      let xp = this.calculateXY('x', item.x, xsp) + axisLineWidth;
-      let yp = this.calculateXY('y', item.y, ysp);
+      let xp = this.calculateXY('x', item.x, xsp, minmaxX);
+      let yp = this.calculateXY('y', item.y, ysp, minmaxY);
       let w = this.size.w;
       let h = this.size.h;
 
@@ -303,13 +325,17 @@ class HeatMap {
               itemOpacity === 1 ? borderOpacity : itemOpacity,
             );
 
-            ctx.lineWidth = lineWidth;
-
-            xp += (lineWidth * 0.5);
-            yp += (lineWidth * 0.5);
-            w -= (lineWidth);
-            h -= (lineWidth);
+            // item 사이즈 보다 border 선 굵기가 큰 경우 lineWidth props 무시
+            if (lineWidth < w && lineWidth < h) {
+              ctx.lineWidth = lineWidth;
+              xp += (lineWidth * 0.5);
+              yp += (lineWidth * 0.5);
+              w -= (lineWidth);
+              h -= (lineWidth);
+            }
           }
+
+          xp += axisLineWidth;
 
           this.drawItem(ctx, xp, yp, w, h, borderOpt);
           ctx.restore();
@@ -466,10 +492,13 @@ class HeatMap {
 
       if (this.stroke.show) {
         const { lineWidth } = this.stroke;
-        x += (lineWidth * 0.5);
-        y += (lineWidth * 0.5);
-        w -= (lineWidth);
-        h -= (lineWidth);
+        if (lineWidth < w && lineWidth < h) {
+          ctx.lineWidth = lineWidth;
+          x += (lineWidth * 0.5);
+          y += (lineWidth * 0.5);
+          w -= (lineWidth);
+          h -= (lineWidth);
+        }
       }
       this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
 
