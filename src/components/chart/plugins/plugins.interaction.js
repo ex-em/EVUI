@@ -230,7 +230,9 @@ const modules = {
           } else if (useSelectItem) {
             setSelectedItemInfo();
           } else if (useSelectLabel) {
-            setSelectedLabelInfo();
+            const { useBothAxis } = selectLabelOpt;
+            const location = this.getClickedLocation(offset);
+            setSelectedLabelInfo(useBothAxis ? location : null);
           }
           break;
         }

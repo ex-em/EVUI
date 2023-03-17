@@ -178,7 +178,7 @@ const modules = {
       if (scrollbarOpt?.use) {
         const [min, max] = scrollbarOpt?.range ?? [];
         if (ldata >= min && ldata <= max) {
-          ldata -= min ?? 0;
+          ldata -= (min ?? 0);
         } else {
           return false;
         }

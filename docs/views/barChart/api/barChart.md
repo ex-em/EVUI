@@ -126,7 +126,7 @@ const chartData = {
   | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
   | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
   | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | range | Array | null | 축에 표시할 값의 min, max | [0, 100] |
+  | range | Array | null | 축에 표시할 값의 min, max (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [0, 100] |
   | horizontal | Boolean | null | horizontal Bar 차트 표시를 위한 속성 | true / false | 
   | overlapping | Object | ([상세](#overlapping)) | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. |  |   
   | interval | String | null | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)
@@ -143,6 +143,8 @@ const chartData = {
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
    - decimalPoint
      - 소수점 자릿수 표시 (default: 0)
+   - range
+     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
      
       
 ##### time type
@@ -152,6 +154,8 @@ const chartData = {
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
    - categoryMode
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
+   - range
+     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
       
 ##### Logarithmic type
    - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
@@ -159,12 +163,16 @@ const chartData = {
       - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표
    - decimalPoint
        - 소수점 자릿수 표시 (default: 0)
+   - range
+     - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
      
 ##### step type
    - timeMode
       - Step Axis를 Time 기반으로 변경, default: false
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
+   - range
+     - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
 
 ##### overlapping
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
