@@ -709,7 +709,7 @@ class EvChart {
       return;
     }
 
-    this.updateScrollbar?.();
+    this.updateScrollbar?.(updateData);
 
     this.resetProps();
 

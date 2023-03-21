@@ -71,16 +71,17 @@ const module = {
   /**
    * update scrollbar information
    */
-  updateScrollbar() {
-    this.updateScrollbarInfo('x');
-    this.updateScrollbarInfo('y');
+  updateScrollbar(updateData) {
+    this.updateScrollbarInfo('x', updateData);
+    this.updateScrollbarInfo('y', updateData);
   },
 
   /**
    * Updated scrollbar information with updated axis information
    * @param dir axis direction (x | y)
+   * @param updateData is update data
    */
-  updateScrollbarInfo(dir) {
+  updateScrollbarInfo(dir, updateData) {
     const { axesX, axesY } = this.options;
     const newOpt = dir === 'x' ? axesX : axesY;
     if (!this.scrollbar[dir].isInit && newOpt?.[0]?.scrollbar?.use && newOpt?.[0]?.range) {
@@ -93,7 +94,7 @@ const module = {
 
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
-    if (isUpdateAxesRange) {
+    if (isUpdateAxesRange || updateData) {
       this.scrollbar[dir].range = newOpt?.[0]?.range || null;
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
