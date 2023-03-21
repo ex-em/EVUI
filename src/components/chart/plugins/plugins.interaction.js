@@ -213,6 +213,7 @@ const modules = {
         }
 
         case 'heatMap': {
+          const isHorizontal = !!this.options.horizontal;
           if (useSelectItem && useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
 
@@ -225,13 +226,27 @@ const modules = {
             } else if (location === 'yAxis' || location === 'xAxis') {
               this.clearSelectedItemInfo();
               args.deselected = { eventTarget: 'item' };
-              setSelectedLabelInfo(useBothAxis ? location : null);
+
+              if (!useBothAxis) {
+                const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+                if (location !== selectLabelAxis) {
+                  return;
+                }
+              }
+              setSelectedLabelInfo(location, useBothAxis);
             }
           } else if (useSelectItem) {
             setSelectedItemInfo();
           } else if (useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
             const location = this.getClickedLocation(offset);
+
+            if (!useBothAxis && location !== 'chartBackground') {
+              const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+              if (location !== selectLabelAxis) {
+                return;
+              }
+            }
             setSelectedLabelInfo(useBothAxis ? location : null);
           }
           break;
@@ -769,7 +784,7 @@ const modules = {
    */
   regulateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
-    const before = this.defaultSelectInfo?.targetAxis === targetAxis
+    const before = targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
       ? { ...this.defaultSelectInfo, targetAxis }
       : { dataIndex: [], targetAxis };
 

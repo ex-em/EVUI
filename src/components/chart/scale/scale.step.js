@@ -2,6 +2,7 @@ import { defaultsDeep } from 'lodash-es';
 import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
+import { truthyNumber } from '../../../common/utils';
 
 class StepScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
@@ -29,10 +30,14 @@ class StepScale extends Scale {
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (range?.length) {
-      [minIndex, maxIndex] = range;
-      maxValue = this.labels[maxIndex];
-      minValue = this.labels[minIndex];
-      labelCount = maxIndex - minIndex + 1;
+      const [min, max] = range;
+      if (truthyNumber(min) && truthyNumber(max)) {
+        minIndex = min < minIndex ? minIndex : min;
+        maxIndex = max > maxIndex ? maxIndex : max;
+        maxValue = this.labels[maxIndex];
+        minValue = this.labels[minIndex];
+        labelCount = maxIndex - minIndex + 1;
+      }
     }
 
     const maxWidth = chartRect.chartWidth / (labelCount + 2);

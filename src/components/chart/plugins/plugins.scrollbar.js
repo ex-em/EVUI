@@ -33,13 +33,39 @@ const module = {
 
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range || null;
-      scrollbarOpt.interval = null;
 
       this.createScrollbarLayout(dir);
       this.createScrollbar(dir);
       this.createScrollEvent(dir);
       scrollbarOpt.isInit = true;
     }
+  },
+
+  checkValidRange(dir) {
+    const scrollbarOpt = this.scrollbar[dir];
+    const axesType = scrollbarOpt.type;
+
+    if (scrollbarOpt.range?.length) {
+      const [min, max] = scrollbarOpt.range;
+
+      if (!(truthyNumber(min) && truthyNumber(max))) {
+        return true;
+      }
+
+      if (axesType === 'step') {
+        const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
+        if (min < 0 || max > labels.length - 1) {
+          return true;
+        }
+      } else {
+        const minMax = this.minMax[dir]?.[0];
+        if (+min < +minMax.min || +max > +minMax.max) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   },
 
   /**
@@ -78,10 +104,16 @@ const module = {
    */
   updateScrollbarPosition() {
     if (this.scrollbar.x?.use && this.scrollbar.x?.isInit) {
+      if (this.checkValidRange('x')) {
+        return;
+      }
       this.setScrollbarPosition('x');
     }
 
     if (this.scrollbar.y?.use && this.scrollbar.y?.isInit) {
+      if (this.checkValidRange('y')) {
+        return;
+      }
       this.setScrollbarPosition('y');
     }
   },
@@ -252,13 +284,13 @@ const module = {
     if (scrollbarOpt.showButton) {
       const upBtnDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-button-up');
       const endPosition = Math.floor(trackSize - thumbSize.size);
-      const upBtnOpacity = Math.floor(thumbSize.position) === endPosition ? 0.5 : 1;
+      const upBtnOpacity = Math.floor(thumbSize.position) > endPosition ? 0.5 : 1;
       upBtnDOM[0].style.cssText = `background-color: ${scrollbarOpt.background};${upBtnStyle}`;
       upBtnDOM[0].style.opacity = upBtnOpacity;
       upBtnDOM[0].children[0].style.display = 'block';
       const downBtnDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-button-down');
       downBtnDOM[0].style.cssText = `background-color: ${scrollbarOpt.background};${downBtnStyle}`;
-      downBtnDOM[0].style.opacity = Math.floor(thumbSize.position) === 0 ? 0.5 : 1;
+      downBtnDOM[0].style.opacity = Math.floor(thumbSize.position) < 0 ? 0.5 : 1;
       downBtnDOM[0].children[0].style.display = 'block';
     }
   },
@@ -287,16 +319,19 @@ const module = {
       thumbSize = intervalSize * range;
       thumbPosition = intervalSize * min;
     } else {
-      const minMax = this.minMax[dir];
-      const graphRange = (+minMax[0].max) - (+minMax[0].min);
+      const axisOpt = dir === 'x' ? this.axesX : this.axesY;
+      const minMax = this.minMax[dir]?.[0];
+      const graphRange = (+minMax.max) - (+minMax.min);
       const range = (+max) - (+min);
-      interval = this.axesX?.[0]?.getInterval({
-        min: minMax[0].min,
-        max: minMax[0].max,
-        maxSteps: this.labelRange[dir].max,
-      });
+      if (axesType === 'time') {
+        interval = axisOpt?.[0]?.getInterval({
+          minValue: minMax.min,
+          maxValue: minMax.max,
+          maxSteps: this.labelRange[dir]?.[0]?.max,
+        });
+      }
       steps = Math.ceil(graphRange / interval) + 1;
-      startValue = +minMax[0].min;
+      startValue = +minMax.min;
 
       const intervalSize = trackSize / steps;
       const count = (range / interval) + 1;
@@ -312,8 +347,6 @@ const module = {
     return {
       size: thumbSize,
       position: thumbPosition,
-      background: scrollbarOpt.background,
-      radius: scrollbarOpt.radius,
     };
   },
 
@@ -584,7 +617,10 @@ const module = {
     if (scrollbarXDOM) {
       scrollbarXDOM.remove();
       this.scrollbar[dir] = { isInit: false };
-      this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, false);
+
+      if (dir === 'y') {
+        this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, false);
+      }
     }
   },
 };

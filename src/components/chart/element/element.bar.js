@@ -305,7 +305,7 @@ class Bar {
     const gdata = this.data;
 
     let totalCount = gdata.length;
-    const [min, max] = this.range;
+    const [min, max] = this.range ?? [];
     if (truthyNumber(min) && truthyNumber(max)) {
       totalCount = (max - min) + 1;
     }
@@ -351,7 +351,7 @@ class Bar {
     const gdata = this.data;
 
     let totalCount = gdata.length;
-    const [min, max] = this.range;
+    const [min, max] = this.range ?? [];
     if (truthyNumber(min) && truthyNumber(max)) {
       totalCount = (max - min) + 1;
     }

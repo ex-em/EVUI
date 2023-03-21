@@ -180,7 +180,8 @@ class TimeCategoryScale extends Scale {
 
     let labelText;
     let labelPoint;
-    for (let ix = 0; ix < oriSteps; ix += count) {
+    let ix;
+    for (ix = 0; ix < oriSteps; ix += count) {
       ticks[ix] = axisMin + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
@@ -246,13 +247,13 @@ class TimeCategoryScale extends Scale {
       ctx.stroke();
     }
 
-    if (this.categoryMode && alignToGridLine && (count * steps) === oriSteps) {
+    if (this.categoryMode && alignToGridLine && (ix * count) === oriSteps) {
       const diffTime = dayjs(labels[1]).diff(dayjs(labels[0]));
       const labelLastText = this.getLabelFormat(
-        dayjs(labels[labels.length - 1] + diffTime),
+        dayjs(ticks[oriSteps - 1] + diffTime),
       );
 
-      labelCenter = Math.round(startPoint + (graphGap * labels.length));
+      labelCenter = Math.round(startPoint + (graphGap * oriSteps));
       linePosition = labelCenter + aliasPixel;
 
       if (this.type === 'x') {
