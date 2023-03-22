@@ -2,7 +2,7 @@
 
 ### Project setup
 ```
-npm install
+npm i -D evui
 ```
 
 ### Compiles library for product
