@@ -11,6 +11,9 @@ npm run build:lib
 ```
 
 ### Compiles and hot-reloads for development document project
+- Node 12 is required to run the official documentation locally.
+- We will upload the node version later.
+- DOCUMENT : https://ex-em.github.io/EVUI
 ```
 npm run docs
 ```
@@ -30,11 +33,3 @@ npm run build
 npm run test:unit
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
