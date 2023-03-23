@@ -182,18 +182,19 @@ class Line {
     }
 
     // Draw points
-    if (!isBrush && (this.point || useSelectLabel)) {
+    if (!isBrush) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
 
       this.data.forEach((curr, ix) => {
-        const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (curr.xp === null || curr.yp === null) {
           return;
         }
 
-        if (this.point || isSelectedLabel) {
+        const isSingle = this.data[ix - 1]?.o === null && this.data[ix + 1]?.o === null;
+        const isSelectedLabel = selectedLabelIndexList.includes(ix);
+        if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
           Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
         }
