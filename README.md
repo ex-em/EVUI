@@ -33,3 +33,31 @@ npm run build
 npm run test:unit
 ```
 
+### Use Vue3 Project
+```
+// main.ts
+import App from '@/App.vue';
+import EVUI from 'evui';
+
+const app = createApp(App);
+
+app.use(EVUI);
+
+app.mount('#app');
+```
+
+### Using Message Component
+```
+// main.ts
+import App from '@/App.vue';
+import { EvMessageBox, EvMessage, EvNotification } from 'evui';
+
+const app = createApp(App);
+
+app.use(EVUI);
+app.config.globalProperties.$messagebox = EvMessageBox;
+app.config.globalProperties.$messagex = EvMessage;
+app.config.globalProperties.$notify = EvNotification;
+
+app.mount('#app');
+```
