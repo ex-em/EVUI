@@ -250,6 +250,11 @@ class HeatMap {
     this.size.w = xArea / minmaxX.oriSteps;
     this.size.h = yArea / minmaxY.oriSteps;
 
+    this.filterdCount = {
+      x: minmaxX.oriSteps,
+      y: minmaxY.oriSteps,
+    };
+
     const getOpacity = (item, opacity, index) => {
       if (!legendHitInfo) {
         let isDownplay;
@@ -337,13 +342,13 @@ class HeatMap {
 
           xp += axisLineWidth;
 
-          this.drawItem(ctx, xp, yp, w, h, borderOpt);
-          ctx.restore();
-
           item.xp = xp;
           item.yp = yp;
           item.w = w;
           item.h = h;
+
+          this.drawItem(ctx, xp, yp, w, h, borderOpt);
+          ctx.restore();
 
           if (this.showValue.use) {
             this.drawValueLabels({
@@ -479,16 +484,17 @@ class HeatMap {
     } else {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
+
     ctx.save();
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
 
     if (x !== null && y !== null && isShow) {
-      const color = gdata.dataColor;
+      const color = Util.colorStringToRgba(gdata.dataColor);
       ctx.shadowColor = Util.colorStringToRgba('#959494');
-      ctx.strokeStyle = Util.colorStringToRgba(color);
-      ctx.fillStyle = Util.colorStringToRgba(color);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
 
       if (this.stroke.show) {
         const { lineWidth } = this.stroke;
@@ -500,6 +506,7 @@ class HeatMap {
           h -= (lineWidth);
         }
       }
+
       this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
 
       ctx.restore();
@@ -552,6 +559,7 @@ class HeatMap {
 
   findBlockRange({ xcp, xep, ycp, yep, range }) {
     const labels = this.labels;
+    const axesLineWidth = 1;
 
     const blockRange = {
       xsp: Math.min(xcp, xep),
@@ -561,9 +569,12 @@ class HeatMap {
     };
 
     if (labels.x.length && labels.y.length) {
+      const labelXCount = this.filterdCount?.x ?? labels.x.length;
+      const labelYCount = this.filterdCount?.y ?? labels.y.length;
+
       const { x1, x2, y1, y2 } = range;
-      const gapX = (x2 - x1) / labels.x.length;
-      const gapY = (y2 - y1) / labels.y.length;
+      const gapX = (x2 - x1) / labelXCount;
+      const gapY = (y2 - y1) / labelYCount;
 
       const point = {
         xsp: xcp,
@@ -579,14 +590,14 @@ class HeatMap {
 
         if (dir === 'x') {
           gap = gapX;
-          startPoint = x1;
+          startPoint = x1 + axesLineWidth;
         } else {
           gap = gapY;
           startPoint = y1;
         }
 
         const findItem = labels[dir].findIndex((item, index) => {
-          itemPoint = Math.round(startPoint + (gap * index)) + Util.aliasPixel(1);
+          itemPoint = startPoint + (gap * index);
           return itemPoint <= target && target <= itemPoint + gap;
         });
 
