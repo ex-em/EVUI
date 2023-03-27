@@ -82,7 +82,6 @@
                 'margin-right': (orderedColumns.length - 1 === index
                 && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
-              @click.stop="onSort(column)"
             >
               <!-- Filter Status -->
               <span
@@ -95,20 +94,21 @@
               <span
                 :title="column.caption"
                 class="column-name"
+                @click.stop="onSort(column)"
               >
                 {{ column.caption }}
+                <!-- Sort Icon -->
+                <template v-if="sortField === column.field">
+                  <ev-icon
+                    v-if="sortOrder === 'desc'"
+                    icon="ev-icon-triangle-down"
+                  />
+                  <ev-icon
+                    v-if="sortOrder === 'asc'"
+                    icon="ev-icon-triangle-up"
+                  />
+                </template>
               </span>
-              <!-- Sort Icon -->
-              <template v-if="sortField === column.field">
-                <ev-icon
-                  v-if="sortOrder === 'desc'"
-                  icon="ev-icon-triangle-down"
-                />
-                <ev-icon
-                  v-if="sortOrder === 'asc'"
-                  icon="ev-icon-triangle-up"
-                />
-              </template>
               <!-- Filter Button -->
               <span
                 v-if="isFiltering"
