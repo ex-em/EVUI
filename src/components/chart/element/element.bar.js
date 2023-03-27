@@ -115,7 +115,7 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
-    this.range = [minIndex, maxIndex];
+    this.filteredCount = totalCount;
 
     let categoryPoint = null;
 
@@ -304,11 +304,7 @@ class Bar {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
-    let totalCount = gdata.length;
-    const [min, max] = this.range ?? [];
-    if (truthyNumber(min) && truthyNumber(max)) {
-      totalCount = (max - min) + 1;
-    }
+    const totalCount = this.filteredCount ?? gdata.length;
 
     let s = 0;
     let e = totalCount - 1;
@@ -350,11 +346,7 @@ class Bar {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
 
-    let totalCount = gdata.length;
-    const [min, max] = this.range ?? [];
-    if (truthyNumber(min) && truthyNumber(max)) {
-      totalCount = (max - min) + 1;
-    }
+    const totalCount = this.filteredCount ?? gdata.length;
 
     let s = 0;
     let e = totalCount - 1;
