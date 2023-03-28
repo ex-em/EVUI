@@ -370,9 +370,9 @@ class Scale {
       const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
       const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
       const padding = aliasPixel + 1;
-      const minX = aPos.x1 + padding;
-      const maxX = aPos.x2;
-      const minY = aPos.y1 + padding; // top
+      const minX = aPos.x1;
+      const maxX = aPos.x2 + padding;
+      const minY = aPos.y1 - padding; // top
       const maxY = aPos.y2; // bottom
 
       this.plotBands?.forEach((plotBand) => {
@@ -417,7 +417,7 @@ class Scale {
       });
 
       this.plotLines?.forEach((plotLine) => {
-        if (!plotLine.value) {
+        if (typeof +plotLine.value !== 'number') {
           return;
         }
 
