@@ -5,6 +5,8 @@ const DEFAULT_OPTIONS = {
   zoom: {
     bufferMemoryCnt: 100,
     keepZoomStatus: false,
+    useAnimation: true,
+    useWheelMove: true,
     toolbar: {
       show: false,
       items: {

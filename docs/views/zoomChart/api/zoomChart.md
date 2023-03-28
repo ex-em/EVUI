@@ -77,6 +77,8 @@ const zoomEndIdx = ref(0);
 | toolbar            | Object | ([상세](#toolbar)) | 차트 줌을 제어할 수 있는 toolbar                          |                              |
 | bufferMemoryCnt    | Number | 100              | 차트 줌 버퍼 메모리 제한 설정                               | 100이면 최신 100개의 zoom 기록만 저장 됨 |
 | keepZoomStatus | Boolean | false            | 데이트 업데이트시 기존 줌 상태(줌 영역, 메모리, 아이콘 활성화)를 유지할 지 설정 |  |
+| useAnimation       | Boolean | true             | 차트 줌 애니메이션을 사용할지 설정          |  |
+| useWheelMove       | Boolean | true             | 마우스 휠을 이용하여 차트 줌 영역을 이동할지 설정 |  |
 
 #### toolbar
 | 이름    | 타입      | 디폴트            | 설명                                         | 종류(예시) |

@@ -187,6 +187,8 @@ const DEFAULT_OPTIONS = {
   zoom: {
     bufferMemoryCnt: 100,
     keepZoomStatus: false,
+    useAnimation: true,
+    useWheelMove: true,
     toolbar: {
       show: false,
       items: {
@@ -527,7 +529,7 @@ export const useZoomModel = (
           toggleUseZoom();
         }
 
-        evChartZoom.setEvChartZoomOptions(evChartZoomOptions);
+        evChartZoom.setEvChartZoomOptions(evChartZoomOptions.zoom);
       } else if (evChartZoomOptions.zoom.toolbar.show && !evChartGroupRef) {
         createEvChartZoom();
       }

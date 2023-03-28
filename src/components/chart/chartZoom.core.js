@@ -13,7 +13,8 @@ export default class EvChartZoom {
     this.evChartCloneData = evChartClone.data;
     this.brushIdx = brushIdx;
 
-    this.setEvChartZoomOptions(evChartZoomOptions);
+    const zoomOptions = evChartZoomOptions.zoom;
+    this.setEvChartZoomOptions(zoomOptions);
     this.setIcon(evChartToolbarRef);
 
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
@@ -34,8 +35,13 @@ export default class EvChartZoom {
       emitFunc.updateZoomEndIdx(cloneLabelsLastIdx);
     }
 
-    this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
-    this.evChartDomContainers = this.drawAnimationCanvas(evChartInfo.dom);
+
+    if (zoomOptions.useWheelMove) {
+      this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
+    }
+
+    this.evChartDomContainers = zoomOptions.useAnimation
+      ? this.drawAnimationCanvas(evChartInfo.dom) : evChartInfo.dom;
   }
 
   setEvChartZoomOptions(options) {
@@ -178,13 +184,18 @@ export default class EvChartZoom {
 
       const newDragEndAxesX = calculateAxesXPosition(newZoomEndIdx);
 
-      this.dragZoomAnimation(
-        dragSelectionInfo,
-        newZoomStartIdx,
-        newZoomEndIdx,
-        newDragStartAxesX,
-        newDragEndAxesX,
-      );
+      if (this.evChartZoomOptions.useAnimation) {
+        this.dragZoomAnimation(
+          dragSelectionInfo,
+          newZoomStartIdx,
+          newZoomEndIdx,
+          newDragStartAxesX,
+          newDragEndAxesX,
+        );
+      } else {
+        this.executeZoom(newZoomStartIdx, newZoomEndIdx);
+        this.setZoomAreaMemory(newZoomStartIdx, newZoomEndIdx);
+      }
     }
   }
 
@@ -358,7 +369,7 @@ export default class EvChartZoom {
 
     const { previous, current, latest } = this.zoomAreaMemory;
     const currentZoomArea = current.pop();
-    const { bufferMemoryCnt } = this.evChartZoomOptions.zoom;
+    const { bufferMemoryCnt } = this.evChartZoomOptions;
 
     if (direction) {
       if (previous.length >= bufferMemoryCnt) {
