@@ -77,6 +77,8 @@ export default {
     const chartGroupOptions = reactive({
       zoom: {
         bufferMemoryCnt: 5,
+        useAnimation: false,
+        useWheelMove: false,
         toolbar: {
           show: isShowToolbar,
           items: {
