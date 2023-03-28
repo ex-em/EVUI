@@ -302,13 +302,35 @@ export default class EvChartZoom {
     evChartClone,
     brushChartIdx,
     isUseZoomMode,
-    isResetZoomMemory,
+    isKeepZoomStatus,
   ) {
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
     this.evChartCloneData = evChartClone.data;
 
-    if (isResetZoomMemory) {
+    if (isKeepZoomStatus) {
+      const curZoomMemory = this.zoomAreaMemory.current[0];
+      let zoomStartIdx = curZoomMemory[0];
+      let zoomEndIdx = curZoomMemory[1];
+
+      if (zoomStartIdx === 0 && zoomEndIdx === -1) {
+        zoomStartIdx = 0;
+        zoomEndIdx = cloneLabelsLastIdx;
+
+        this.zoomAreaMemory = {
+          previous: [],
+          current: [[zoomStartIdx, zoomEndIdx]],
+          latest: [],
+        };
+      }
+
+      if (this.emitFunc) {
+        this.emitFunc.updateZoomStartIdx(zoomStartIdx);
+        this.emitFunc.updateZoomEndIdx(zoomEndIdx);
+      }
+
+      this.executeZoom(zoomStartIdx, zoomEndIdx);
+    } else {
       if (this.dragZoomIcon) {
         this.dragZoomIcon.classList.remove('active');
       }
@@ -325,11 +347,8 @@ export default class EvChartZoom {
       }
 
       this.setIconStyle(isUseZoomMode);
-    } else if (this.brushIdx.end !== -1) {
-      this.setZoomAreaMemory(0, cloneLabelsLastIdx);
+      this.setBrushIdx(evChartClone, brushChartIdx);
     }
-
-    this.setBrushIdx(evChartClone, brushChartIdx);
   }
 
   setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction) {

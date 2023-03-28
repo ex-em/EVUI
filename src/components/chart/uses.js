@@ -186,7 +186,7 @@ const DEFAULT_OPTIONS = {
   },
   zoom: {
     bufferMemoryCnt: 100,
-    useResetZoomMemory: true,
+    keepZoomStatus: false,
     toolbar: {
       show: false,
       items: {
@@ -371,6 +371,7 @@ export const useZoomModel = (
 
   const isExecuteZoom = ref(false);
   const isUseZoomMode = ref(false);
+  const isUpdateDataForUseZoom = ref(true);
   const evChartToolbarRef = ref();
 
   const evChartZoomOptions = reactive({ zoom: evChartNormalizedOptions.zoom });
@@ -534,26 +535,32 @@ export const useZoomModel = (
   };
 
   const setDataForUseZoom = (newData) => {
-    if (!isExecuteZoom.value) {
-      evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
+    if (isUpdateDataForUseZoom.value) {
+      if (!isExecuteZoom.value) {
+        evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
 
-      if (evChartZoomOptions.zoom.useResetZoomMemory) {
-        isUseZoomMode.value = false;
+        if (evChartZoomOptions.zoom.keepZoomStatus) {
+          isUpdateDataForUseZoom.value = false;
+        } else {
+          isUseZoomMode.value = false;
 
-        setEvChartOptions();
+          setEvChartOptions();
+        }
+
+        if (evChartZoom) {
+          evChartZoom.updateEvChartCloneData(
+            evChartClone,
+            brushChartIdx,
+            isUseZoomMode.value,
+            evChartZoomOptions.zoom.keepZoomStatus,
+          );
+        }
       }
 
-      if (evChartZoom) {
-        evChartZoom.updateEvChartCloneData(
-          evChartClone,
-          brushChartIdx,
-          isUseZoomMode.value,
-          evChartZoomOptions.zoom.useResetZoomMemory,
-        );
-      }
+      isExecuteZoom.value = false;
+    } else {
+      isUpdateDataForUseZoom.value = true;
     }
-
-    isExecuteZoom.value = false;
   };
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {

@@ -170,7 +170,7 @@
             || !isEqual(newData.groups, evChart.data.groups)
             || props.options.type === 'heatMap';
 
-        const isUpdateData = !isEqual(newData.data, evChart.data);
+        const isUpdateData = !isEqual(newData, evChart.data);
 
         evChart.data = cloneDeep(newData);
 

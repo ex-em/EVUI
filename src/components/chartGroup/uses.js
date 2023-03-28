@@ -4,7 +4,7 @@ import { defaultsDeep } from 'lodash-es';
 const DEFAULT_OPTIONS = {
   zoom: {
     bufferMemoryCnt: 100,
-    useResetZoomMemory: true,
+    keepZoomStatus: false,
     toolbar: {
       show: false,
       items: {
