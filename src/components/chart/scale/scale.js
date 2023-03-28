@@ -372,7 +372,7 @@ class Scale {
       const padding = aliasPixel + 1;
       const minX = aPos.x1;
       const maxX = aPos.x2 + padding;
-      const minY = aPos.y1; // top
+      const minY = aPos.y1 - padding; // top
       const maxY = aPos.y2; // bottom
 
       this.plotBands?.forEach((plotBand) => {
