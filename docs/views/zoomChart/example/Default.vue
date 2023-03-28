@@ -97,6 +97,7 @@ export default {
       }],
       zoom: {
         bufferMemoryCnt: 5,
+        keepZoomStatus: true,
         toolbar: {
           show: isShowToolbar,
           items: {
@@ -135,7 +136,7 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
+      for (let ix = 0; ix < 300; ix++) {
         addRandomChartData();
       }
     });
@@ -154,7 +155,7 @@ export default {
 
       init(chartData);
 
-      for (let ix = 0; ix < Math.ceil(Math.random() * 100); ix++) {
+      for (let ix = 0; ix < 300; ix++) {
         addRandomChartData();
       }
     };

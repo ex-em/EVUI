@@ -41,14 +41,14 @@ export default {
   setup() {
     const isExpandChartArea = ref(false);
     const isShowBrush = ref(true);
-    const isShowToolbar = ref(false);
+    const isShowToolbar = ref(true);
     const isUseDebounce = ref(true);
     const zoomRef = ref();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
     const chartGroupOptions = reactive({
       zoom: {
-        useResetZoomMemory: false,
+        keepZoomStatus: true,
         toolbar: {
           show: isShowToolbar,
         },
