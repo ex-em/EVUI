@@ -469,10 +469,10 @@ class HeatMap {
     const gdata = item.data;
     const ctx = context;
 
-    let x = gdata.xp;
-    let y = gdata.yp;
-    let w = gdata.w;
-    let h = gdata.h;
+    const x = gdata.xp;
+    const y = gdata.yp;
+    const w = gdata.w;
+    const h = gdata.h;
     const cId = gdata.cId;
 
     let isShow;
@@ -484,7 +484,6 @@ class HeatMap {
     } else {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
-
     ctx.save();
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
@@ -495,17 +494,6 @@ class HeatMap {
       ctx.shadowColor = Util.colorStringToRgba('#959494');
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
-
-      if (this.stroke.show) {
-        const { lineWidth } = this.stroke;
-        if (lineWidth < w && lineWidth < h) {
-          ctx.lineWidth = lineWidth;
-          x += (lineWidth * 0.5);
-          y += (lineWidth * 0.5);
-          w -= (lineWidth);
-          h -= (lineWidth);
-        }
-      }
 
       this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
 
