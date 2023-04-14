@@ -24,13 +24,12 @@ const module = {
    */
   initScrollbarInfo(axisOpt, dir) {
     const scrollbarOpt = this.scrollbar[dir];
+    const merged = defaultsDeep({}, axisOpt?.[0]?.scrollbar, AXIS_OPTION.scrollbar);
+    Object.keys(merged).forEach((key) => {
+      scrollbarOpt[key] = merged[key];
+    });
 
     if (!scrollbarOpt.isInit) {
-      const merged = defaultsDeep({}, axisOpt?.[0]?.scrollbar, AXIS_OPTION.scrollbar);
-      Object.keys(merged).forEach((key) => {
-        scrollbarOpt[key] = merged[key];
-      });
-
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range || null;
 
@@ -505,7 +504,7 @@ const module = {
       scrollbarYDOM.addEventListener('click', this.onScrollbarClick);
       scrollbarYDOM.addEventListener('mousedown', this.onScrollbarDown);
       scrollbarYDOM.addEventListener('mouseleave', this.onScrollbarLeave);
-      this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel);
+      this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel, { passive: false });
     }
   },
 
@@ -620,7 +619,7 @@ const module = {
       this.scrollbar[dir] = { isInit: false };
 
       if (dir === 'y') {
-        this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, false);
+        this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, { passive: false });
       }
     }
   },
