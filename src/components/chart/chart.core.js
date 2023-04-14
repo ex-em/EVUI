@@ -182,6 +182,7 @@ class EvChart {
     this.drawSeries(hitInfo);
 
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
+      this.initScrollbar();
       this.updateScrollbarPosition();
     }
 
