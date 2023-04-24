@@ -1,5 +1,6 @@
 <template>
   <div
+    :key="componentKey"
     :style="{} | gridStyleFilter({width: width, height: height})"
     style="position: relative;"
   >
@@ -276,6 +277,10 @@
     },
 
     props: {
+      componentKey: {
+        type: Number,
+        default: 0,
+      },
       width: {
         type: [String, Number],
         default: '100%',
@@ -428,6 +433,12 @@
             this.resultData = this.originData.slice(start, end);
           }
         },
+      },
+    },
+    watch: {
+      componentKey() {
+        this.originData = this.$props.records;
+        this.draw();
       },
     },
     created() {
