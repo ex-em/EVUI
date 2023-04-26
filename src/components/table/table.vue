@@ -919,6 +919,10 @@
         }
       },
       movePage(value) {
+        document.querySelector('.evui-table-body').scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
         switch (value) {
           case 'start':
                 this.currentPageInput = 1;
