@@ -960,6 +960,7 @@
         this.virtualTop = 0;
         this.virtualBottom = 0;
         this.$refs.evuiGridRecords.scrollTop = 0;
+        this.currentPage = 1;
         if (this.pagination) {
           const gridBody = this.$refs.evuiGridBody;
 
