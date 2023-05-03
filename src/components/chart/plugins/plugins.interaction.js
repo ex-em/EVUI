@@ -241,13 +241,16 @@ const modules = {
             const { useBothAxis } = selectLabelOpt;
             const location = this.getClickedLocation(offset);
 
-            if (!useBothAxis && location !== 'chartBackground') {
+            if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
               const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
               if (location !== selectLabelAxis) {
                 return;
               }
             }
-            setSelectedLabelInfo(useBothAxis ? location : null);
+
+            if (location !== 'canvas') {
+              setSelectedLabelInfo(useBothAxis ? location : null);
+            }
           }
           break;
         }
@@ -568,8 +571,7 @@ const modules = {
    * get formatted value for tooltip
    * @param seriesName
    * @param value
-   * @param x
-   * @param y
+   * @param itemData
    * @returns {string}
    */
   getFormattedTooltipValue({ seriesName, value, itemData }) {
