@@ -948,7 +948,6 @@
         }
       },
       draw() {
-        console.log('aaa');
         // 그리드박스 높이 너비 가져오기
         this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
         this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
