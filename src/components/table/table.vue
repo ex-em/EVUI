@@ -431,7 +431,7 @@
       },
     },
     watch: {
-      componentKey() {
+      records() {
         this.originData = this.$props.records;
         this.draw();
       },
@@ -914,10 +914,7 @@
         }
       },
       movePage(value) {
-        document.querySelector('.evui-table-body').scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
+        this.resetScrollTop();
         switch (value) {
           case 'start':
                 this.currentPageInput = 1;
@@ -947,7 +944,14 @@
           this.originData.push(row);
         }
       },
+      resetScrollTop() {
+        document.querySelector('.evui-table-body').scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      },
       draw() {
+        this.resetScrollTop();
         // 그리드박스 높이 너비 가져오기
         this.gridBoxHeight = this.$refs.evuiGrid.clientHeight;
         this.gridBoxWidth = this.$refs.evuiGrid.clientWidth;
