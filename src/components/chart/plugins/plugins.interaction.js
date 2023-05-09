@@ -1,5 +1,6 @@
 import { numberWithComma } from '@/common/utils';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
+import dayjs from 'dayjs';
 
 const modules = {
   /**
@@ -18,7 +19,8 @@ const modules = {
         return;
       }
 
-      const { indicator, tooltip, type } = this.options;
+      const args = { e };
+      const { indicator, tooltip, type, horizontal, axesX, axesY } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
 
@@ -60,6 +62,180 @@ const modules = {
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         this.drawIndicator(offset, indicator.color);
+      }
+
+      if (type !== 'pie') {
+        if (typeof this.listeners['mouse-move'] === 'function') {
+          const location = this.getCurMouseLocation(offset);
+
+          const curMousePosInfo = {
+            location,
+            labelIdx: -1,
+            labelVal: '',
+            dataIdx: -1,
+            maxDataVal: '',
+            originVal: '',
+          };
+
+          if (location === 'chartBackground') {
+            const { maxHighlight, items } = hitInfo;
+            if (maxHighlight?.length) {
+              const [seriesName, value] = maxHighlight;
+
+              if (items[seriesName]) {
+                curMousePosInfo.dataIdx = items[seriesName].index;
+                curMousePosInfo.maxDataVal = value;
+                curMousePosInfo.originVal = hitInfo;
+              }
+            }
+          } else if (location === 'xAxis' || location === 'yAxis') {
+            const aPos = {
+              x1: this.chartRect.x1 + this.labelOffset.left,
+              x2: this.chartRect.x2 - this.labelOffset.right,
+              y1: this.chartRect.y1 + this.labelOffset.top,
+              y2: this.chartRect.y2 - this.labelOffset.bottom,
+            };
+
+            const {
+              labelIndex,
+            } = this.getLabelInfoByPosition(offset, location);
+
+            const label = this.getCurMousePosLabelInfoWithLabelData(labelIndex, location);
+
+            if (type === 'heatMap') {
+              if (horizontal) {
+                if (location === 'xAxis') {
+                  const xAxisStartPoint = aPos[this.axesX[0].units.rectStart];
+                  const xAxisEndPoint = aPos[this.axesX[0].units.rectEnd];
+
+                  const xlocation = (xAxisEndPoint - xAxisStartPoint) / this.axesSteps.x[0].steps;
+
+                  curMousePosInfo.labelIdx = Math.floor((offset[0] - xAxisStartPoint) / xlocation);
+                  const testVal = this.getCurMousePosLabelInfoWithLabelData(curMousePosInfo.labelIdx, location);
+
+                  curMousePosInfo.labelVal = axesX[0].type === 'time' ? dayjs(testVal).format(axesX[0].timeFormat) : testVal;
+                  curMousePosInfo.originVal = axesX[0].type === 'time' ? dayjs(testVal) : testVal;
+                } else {
+                  curMousePosInfo.labelIdx = labelIndex;
+                  curMousePosInfo.labelVal = axesY[0].type === 'time' ? dayjs(label).format(axesY[0].timeFormat) : label;
+                  curMousePosInfo.originVal = axesY[0].type === 'time' ? dayjs(label) : label;
+                }
+              } else {
+                curMousePosInfo.labelIdx = labelIndex;
+
+                if (location === 'xAxis') {
+                  curMousePosInfo.labelVal = axesX[0].type === 'time' ? dayjs(label).format(axesX[0].timeFormat) : label;
+                  curMousePosInfo.originVal = axesX[0].type === 'time' ? dayjs(label) : label;
+                } else {
+                  curMousePosInfo.labelVal = axesY[0].type === 'time' ? dayjs(label).format(axesY[0].timeFormat) : label;
+                  curMousePosInfo.originVal = axesY[0].type === 'time' ? dayjs(label) : label;
+                }
+              }
+            } else {
+              let stepVal = null;
+              if (horizontal) {
+                if (location === 'xAxis') {
+                  const xAxisStartPoint = aPos[this.axesX[0].units.rectStart];
+                  const xAxisEndPoint = aPos[this.axesX[0].units.rectEnd];
+
+                  const xlocation = (xAxisEndPoint - xAxisStartPoint) / this.axesSteps.x[0].steps;
+                  const curStepIdx = Math.floor(
+                    (offset[0] - xAxisStartPoint + (this.axesRange.x[0].size.width / 2)) / xlocation
+                  );
+                  const axesWidth = this.axesRange.x[0].size.width / 2;
+
+                  if (
+                    ((xlocation * curStepIdx) + axesWidth > offset[0] - xAxisStartPoint)
+                    && ((xlocation * curStepIdx) - axesWidth < offset[0] - xAxisStartPoint)
+                  ) {
+                    const val = (curStepIdx * this.axesSteps.x[0].interval) + this.axesSteps.x[0].graphMin;
+                    stepVal = axesX[0].type === 'time' ? dayjs(val).format(axesX[0].timeFormat) : val;
+                    curMousePosInfo.originVal = axesX[0].type === 'time' ? dayjs(val) : val;
+                  }
+                } else {
+                  if (labelIndex > -1) {
+                    curMousePosInfo.labelIdx = labelIndex;
+                    curMousePosInfo.labelVal = axesY[0].type === 'time' ? dayjs(label).format(axesY[0].timeFormat) : label;
+                    curMousePosInfo.originVal = axesY[0].type === 'time' ? dayjs(label) : label;
+                  } else {
+                    const yAxisStartPoint = aPos[this.axesY[0].units.rectStart];
+                    const yAxisEndPoint = aPos[this.axesY[0].units.rectEnd];
+
+                    const ylocation = (yAxisStartPoint - yAxisEndPoint) / this.axesSteps.y[0].steps;
+                    const curStepIdx = Math.floor(
+                      (offset[1] - yAxisEndPoint + (this.axesRange.y[0].size.height / 2)) / ylocation
+                    );
+                    const axesHeight = this.axesRange.y[0].size.height / 2;
+
+                    if (
+                      ((ylocation * curStepIdx) + axesHeight > offset[1] - yAxisEndPoint)
+                      && ((ylocation * curStepIdx) - axesHeight < offset[1] - yAxisEndPoint)
+                    ) {
+                      const val = (
+                        (this.axesSteps.y[0].steps - curStepIdx) * this.axesSteps.y[0].interval
+                      ) + this.axesSteps.y[0].graphMin;
+
+                      stepVal = axesY[0].type === 'time' ? dayjs(val).format(axesY[0].timeFormat) : val;
+                      curMousePosInfo.originVal = axesY[0].type === 'time' ? dayjs(val) : val;
+                    }
+                  }
+                }
+              } else {
+                if (location === 'xAxis') {
+                  if (labelIndex > -1) {
+                    curMousePosInfo.labelIdx = labelIndex;
+                    curMousePosInfo.labelVal = axesX[0].type === 'time' ? dayjs(label).format(axesX[0].timeFormat) : label;
+                    curMousePosInfo.originVal = axesX[0].type === 'time' ? dayjs(label) : label;
+                  } else {
+                    const xAxisStartPoint = aPos[this.axesX[0].units.rectStart];
+                    const xAxisEndPoint = aPos[this.axesX[0].units.rectEnd];
+
+                    const xlocation = (xAxisEndPoint - xAxisStartPoint) / this.axesSteps.x[0].steps;
+                    const curStepIdx = Math.floor(
+                      (offset[0] - xAxisStartPoint + (this.axesRange.x[0].size.width / 2)) / xlocation
+                    );
+                    const axesWidth = this.axesRange.x[0].size.width / 2;
+
+                    if (
+                      ((xlocation * curStepIdx) + axesWidth > offset[0] - xAxisStartPoint)
+                      && ((xlocation * curStepIdx) - axesWidth < offset[0] - xAxisStartPoint)
+                    ) {
+                      const val = (curStepIdx * this.axesSteps.x[0].interval) + this.axesSteps.x[0].graphMin;
+
+                      stepVal = axesX[0].type === 'time' ? dayjs(val).format(axesX[0].timeFormat) : val;
+                      curMousePosInfo.originVal = axesX[0].type === 'time' ? dayjs(val) : val;
+                    }
+                  }
+                } else {
+                  const yAxisStartPoint = aPos[this.axesY[0].units.rectStart];
+                  const yAxisEndPoint = aPos[this.axesY[0].units.rectEnd];
+
+                  const ylocation = (yAxisStartPoint - yAxisEndPoint) / this.axesSteps.y[0].steps;
+                  const curStepIdx = Math.floor(
+                    (offset[1] - yAxisEndPoint + (this.axesRange.y[0].size.height / 2)) / ylocation
+                  );
+                  const axesHeight = this.axesRange.y[0].size.height / 2;
+
+                  if (
+                    ((ylocation * curStepIdx) + axesHeight > offset[1] - yAxisEndPoint)
+                    && ((ylocation * curStepIdx) - axesHeight < offset[1] - yAxisEndPoint)
+                  ) {
+                    const val = ((this.axesSteps.y[0].steps - curStepIdx) * this.axesSteps.y[0].interval) + this.axesSteps.y[0].graphMin;
+                    stepVal = axesY[0].type === 'time' ? dayjs(val).format(axesY[0].timeFormat) : val;
+                    curMousePosInfo.originVal = axesY[0].type === 'time' ? dayjs(val) : val;
+                  }
+                }
+              }
+
+              if (stepVal !== null) {
+                curMousePosInfo.labelVal = stepVal;
+              }
+            }
+          }
+
+          args.curMousePosInfo = curMousePosInfo;
+          this.listeners['mouse-move'](args);
+        }
       }
     };
 
@@ -217,7 +393,7 @@ const modules = {
           if (useSelectItem && useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
 
-            const location = this.getClickedLocation(offset);
+            const location = this.getCurMouseLocation(offset);
 
             if (location === 'chartBackground') {
               this.clearSelectedLabelInfo();
@@ -239,7 +415,7 @@ const modules = {
             setSelectedItemInfo();
           } else if (useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
-            const location = this.getClickedLocation(offset);
+            const location = this.getCurMouseLocation(offset);
 
             if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
               const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
@@ -734,6 +910,28 @@ const modules = {
    * @param targetAxis{string | null}
    * @returns {object[]}
    */
+  getCurMousePosLabelInfoWithLabelData(labelIndex, targetAxis) {
+    const { type: chartType } = this.options;
+
+    let label;
+    switch (chartType) {
+      default:
+      case 'bar':
+      case 'line': {
+        label = this.data.labels[labelIndex];
+        break;
+      }
+
+      case 'heatMap': {
+        const targetAxisDirection = targetAxis === 'yAxis' ? 'y' : 'x';
+        label = this.data.labels[targetAxisDirection][labelIndex];
+        break;
+      }
+    }
+
+    return label;
+  },
+
   getSelectedLabelInfoWithLabelData(labelIndexList, targetAxis) {
     const { selectLabel: selectLabelOpt, type: chartType, horizontal } = this.options;
     const result = cloneDeep(this.defaultSelectInfo);
@@ -957,7 +1155,7 @@ const modules = {
    * @param offset
    * @returns {string}
    */
-  getClickedLocation(offset) {
+  getCurMouseLocation(offset) {
     const [offsetX, offsetY] = offset;
 
     const aPos = {

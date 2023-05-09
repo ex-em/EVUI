@@ -67,6 +67,7 @@
       'click',
       'dbl-click',
       'drag-select',
+      'mouse-move',
       'update:selectedItem',
       'update:selectedLabel',
       'update:selectedSeries',
