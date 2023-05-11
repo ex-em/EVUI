@@ -855,7 +855,7 @@ const modules = {
       }
     } else if (scale?.labels?.length) {
       const labelGap = (endPoint - startPoint) / scale.labels.length;
-      const isYAxis = targetAxis === 'yAxis' || horizontal;
+      const isYAxis = targetAxis === 'yAxis';
       const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);
       labelIndex = scale.labels.length > index ? index : -1;
     } else {
@@ -884,6 +884,92 @@ const modules = {
       labelIndex,
       hitInfo,
     };
+  },
+
+  /**
+   * Get current mouse target label value in label array or calculated using mouse position
+   * @param {string}   targetAxis          target Axis Location ('xAxis', 'yAxis')
+   * @param {array}  offset    return value from getMousePosition()
+   * @param {number}  labelIndex
+   *
+   * @returns {object} current mouse target label value
+   */
+  getCurMouseLabelVal(targetAxis, offset, labelIndex) {
+    const { type: chartType, horizontal } = this.options;
+    const isXAxis = targetAxis === 'xAxis';
+    const targetAxisDirection = isXAxis ? 'x' : 'y';
+
+    let labelVal = '';
+    let labelIdx = -1;
+
+    const findLabelValInLabelArr = () => {
+      let result = '';
+      switch (chartType) {
+        case 'bar':
+        case 'line': {
+          result = (
+            (horizontal && !isXAxis)
+            || (!horizontal && isXAxis)
+          ) ? this.data.labels[labelIndex] : '';
+          break;
+        }
+        case 'heatMap': {
+          result = this.data.labels[targetAxisDirection][labelIndex];
+          break;
+        }
+        default:
+          break;
+      }
+
+      return result;
+    };
+
+    const calLabelValUseMousePos = () => {
+      let result = '';
+      const aPos = {
+        x1: this.chartRect.x1 + this.labelOffset.left,
+        x2: this.chartRect.x2 - this.labelOffset.right,
+        y1: this.chartRect.y1 + this.labelOffset.top,
+        y2: this.chartRect.y2 - this.labelOffset.bottom,
+      };
+      const {
+        steps,
+        interval: labelValInterval,
+        graphMin,
+      } = this.axesSteps[targetAxisDirection][0];
+      const {
+        width: labelWidth,
+        height: labelHeight,
+      } = this.axesRange[targetAxisDirection][0].size;
+      const axes = isXAxis ? this.axesX : this.axesY;
+      const axisStartPoint = aPos[axes[0].units.rectStart];
+      const axisEndPoint = aPos[axes[0].units.rectEnd];
+      const curMousePosInAxis = Math.abs(offset[isXAxis ? 0 : 1] - axisStartPoint);
+      const labelMidLength = (isXAxis ? labelWidth : labelHeight) / 2;
+      const labelPosInterval = Math.abs(axisStartPoint - axisEndPoint) / steps;
+      const labelStep = Math.floor((curMousePosInAxis + labelMidLength) / labelPosInterval);
+
+      if (
+        ((labelPosInterval * labelStep) + labelMidLength > curMousePosInAxis)
+        && ((labelPosInterval * labelStep) - labelMidLength < curMousePosInAxis)
+      ) {
+        result = (labelStep * labelValInterval) + graphMin;
+      }
+
+      return result;
+    };
+
+    if (typeof labelIndex === 'number') {
+      labelVal = findLabelValInLabelArr();
+      labelIdx = labelIndex;
+    }
+
+    if (!labelVal) {
+      labelVal = calLabelValUseMousePos();
+      labelIdx = -1;
+    }
+
+    return { labelVal, labelIdx };
   },
 
   /**
