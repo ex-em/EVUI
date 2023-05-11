@@ -177,6 +177,8 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
+      const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
+
       const result = stores.orderedColumns.reduce((acc, cur) => {
         if (cur.hide) {
           return acc;
@@ -193,7 +195,6 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
       if (rowHeight * props.rows.length > elHeight) {
         elWidth -= resizeInfo.scrollWidth;
       }
