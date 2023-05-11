@@ -529,7 +529,7 @@ const modules = {
     } else if (location === 'xAxis' || location === 'yAxis') {
       const { axesX, axesY } = this.options;
 
-      const setCurMousePosLabelInfo = (axes, labelIdx, labelVal) => {
+      const setCurMouseLabelVal = (axes, labelIdx, labelVal) => {
         curMouseTargetVal.labelIdx = labelIdx;
         curMouseTargetVal.labelVal = axes[0].type === 'time' ? dayjs(labelVal).format(axes[0].timeFormat) : labelVal;
         curMouseTargetVal.originVal = axes[0].type === 'time' ? dayjs(labelVal) : labelVal;
@@ -542,7 +542,7 @@ const modules = {
         const { labelVal, labelIdx } = this.getCurMouseLabelVal(targetAxis, offset, labelIndex);
         const axesOpt = targetAxis === 'xAxis' ? axesX : axesY;
 
-        setCurMousePosLabelInfo(axesOpt, labelIdx, labelVal);
+        setCurMouseLabelVal(axesOpt, labelIdx, labelVal);
       };
 
       setAxisLabelInfo(location);
