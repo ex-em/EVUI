@@ -193,7 +193,8 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      if (resizeInfo.rowHeight * props.rows.length > elHeight) {
+      const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
+      if (rowHeight * props.rows.length > elHeight) {
         elWidth -= resizeInfo.scrollWidth;
       }
 
