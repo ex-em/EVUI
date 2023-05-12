@@ -177,6 +177,9 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
+      const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
+      const scrollWidth = elWidth - bodyEl.clientWidth;
+
       const result = stores.orderedColumns.reduce((acc, cur) => {
         if (cur.hide) {
           return acc;
@@ -193,8 +196,8 @@ export const resizeEvent = (params) => {
         return acc;
       }, { totalWidth: 0, emptyCount: 0 });
 
-      if (resizeInfo.rowHeight * props.rows.length > elHeight) {
-        elWidth -= resizeInfo.scrollWidth;
+      if (rowHeight * props.rows.length > elHeight) {
+        elWidth -= scrollWidth;
       }
 
       if (checkInfo.useCheckbox.use) {
