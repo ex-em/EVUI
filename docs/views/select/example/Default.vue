@@ -192,6 +192,26 @@ export default {
         name: 'name33',
         value: 'value33',
       },
+      {
+        name: '인스턴스 A',
+        value: 'instance A',
+      },
+      {
+        name: '인스턴스 B',
+        value: 'instance B',
+      },
+      {
+        name: '인스턴트 식품',
+        value: 'instant grocery',
+      },
+      {
+        name: 'A 인스턴스',
+        value: 'A instance',
+      },
+      {
+        name: 'B 인스턴스',
+        value: 'B instance',
+      },
     ]);
     const isDisabled = ref(true);
     const disableSelect = () => { isDisabled.value = !isDisabled.value; };
