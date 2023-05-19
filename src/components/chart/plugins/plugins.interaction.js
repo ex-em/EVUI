@@ -1017,7 +1017,7 @@ const modules = {
   },
 
   /**
-   * Get mouse click location (xAxis, yAxis, chartBackground, canvas)
+   * Get current mouse location (xAxis, yAxis, chartBackground, canvas)
    * @param offset
    * @returns {string}
    */
