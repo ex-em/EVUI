@@ -392,5 +392,6 @@ const chartOptions = {
  |------|----------|------|
 | click | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환 |
 | dbl-click | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환 |
+| mouse-move |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                 |
 * 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
 

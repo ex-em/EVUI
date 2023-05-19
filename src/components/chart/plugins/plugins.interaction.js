@@ -1,5 +1,6 @@
 import { numberWithComma } from '@/common/utils';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
+import dayjs from 'dayjs';
 
 const modules = {
   /**
@@ -18,6 +19,7 @@ const modules = {
         return;
       }
 
+      const args = { e };
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -60,6 +62,14 @@ const modules = {
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         this.drawIndicator(offset, indicator.color);
+      }
+
+      if (typeof this.listeners['mouse-move'] === 'function') {
+        if (type !== 'pie') {
+          args.curMouseTargetVal = this.getCurMouseTargetVal(offset, hitInfo);
+        }
+
+        this.listeners['mouse-move'](args);
       }
     };
 
@@ -217,7 +227,7 @@ const modules = {
           if (useSelectItem && useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
 
-            const location = this.getClickedLocation(offset);
+            const location = this.getCurMouseLocation(offset);
 
             if (location === 'chartBackground') {
               this.clearSelectedLabelInfo();
@@ -239,7 +249,7 @@ const modules = {
             setSelectedItemInfo();
           } else if (useSelectLabel) {
             const { useBothAxis } = selectLabelOpt;
-            const location = this.getClickedLocation(offset);
+            const location = this.getCurMouseLocation(offset);
 
             if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
               const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
@@ -487,6 +497,61 @@ const modules = {
   },
 
   /**
+   * Get current mouse target value on canvas
+   * @param {array} offset  return value from getMousePosition()
+   * @param {object} hitInfo  return value from findHitItem()
+   *
+   * @returns {object} current mouse target value
+   */
+  getCurMouseTargetVal(offset, hitInfo) {
+    const location = this.getCurMouseLocation(offset);
+
+    const curMouseTargetVal = {
+      location,
+      labelIdx: -1,
+      labelVal: '',
+      dataIdx: -1,
+      maxDataVal: '',
+      originVal: '',
+    };
+
+    if (location === 'chartBackground') {
+      const { maxHighlight, items } = hitInfo;
+      if (maxHighlight?.length) {
+        const [seriesName, value] = maxHighlight;
+
+        if (items[seriesName]) {
+          curMouseTargetVal.dataIdx = items[seriesName].index;
+          curMouseTargetVal.maxDataVal = value;
+          curMouseTargetVal.originVal = hitInfo;
+        }
+      }
+    } else if (location === 'xAxis' || location === 'yAxis') {
+      const { axesX, axesY } = this.options;
+
+      const setCurMouseLabelVal = (axes, labelIdx, labelVal) => {
+        curMouseTargetVal.labelIdx = labelIdx;
+        curMouseTargetVal.labelVal = axes[0].type === 'time' ? dayjs(labelVal).format(axes[0].timeFormat) : labelVal;
+        curMouseTargetVal.originVal = axes[0].type === 'time' ? dayjs(labelVal) : labelVal;
+      };
+
+      const setAxisLabelInfo = (targetAxis) => {
+        const {
+          labelIndex,
+        } = this.getLabelInfoByPosition(offset, location);
+        const { labelVal, labelIdx } = this.getCurMouseLabelVal(targetAxis, offset, labelIndex);
+        const axesOpt = targetAxis === 'xAxis' ? axesX : axesY;
+
+        setCurMouseLabelVal(axesOpt, labelIdx, labelVal);
+      };
+
+      setAxisLabelInfo(location);
+    }
+
+    return curMouseTargetVal;
+  },
+
+  /**
    * Find graph item on mouse position
    * @param {array} offset    return value from getMousePosition()
    *
@@ -727,7 +792,6 @@ const modules = {
     this.render();
   },
 
-
   /**
    * Get each series data and label text
    * @param labelIndexList{number[]}
@@ -953,11 +1017,11 @@ const modules = {
   },
 
   /**
-   * Get mouse click location (xAxis, yAxis, chartBackground, canvas)
+   * Get current mouse location (xAxis, yAxis, chartBackground, canvas)
    * @param offset
    * @returns {string}
    */
-  getClickedLocation(offset) {
+  getCurMouseLocation(offset) {
     const [offsetX, offsetY] = offset;
 
     const aPos = {

@@ -323,6 +323,10 @@ export const useModel = (injectGroupSelectedLabel) => {
       await nextTick();
       emit('drag-select', e);
     },
+    'mouse-move': async (e) => {
+      await nextTick();
+      emit('mouse-move', e);
+    },
   };
 
   return {
