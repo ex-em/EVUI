@@ -340,21 +340,12 @@ export default {
       'grid-wrapper': null,
     });
     const filterInfo = reactive({
-      filterList: {},
-      isFiltering: computed(() => (props.option.useFilter ?? false)),
-      setFiltering: false,
-      showFilterWindow: false,
-      currentFilter: {
-        column: {},
-        items: [],
-      },
       isSearch: false,
       searchWord: '',
     });
     const stores = reactive({
       viewStore: [],
       originStore: [],
-      filterStore: [],
       pagingStore: [],
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.originStore)),
       orderedColumns: computed(() =>
@@ -483,17 +474,12 @@ export default {
     } = sortEvent({ sortInfo, stores, getColumnIndex, updatePagingInfo });
 
     const {
-      onClickFilter,
-      onCloseFilterWindow,
-      onApplyFilter,
-      setFilter,
       onSearch,
     } = filterEvent({
       filterInfo,
       stores,
       checkInfo,
       pageInfo,
-      getColumnIndex,
       getConvertValue,
       updateVScroll,
       getPagingData,
@@ -507,10 +493,8 @@ export default {
       checkInfo,
       stores,
       sortInfo,
-      filterInfo,
       elementInfo,
       setSort,
-      setFilter,
       updateVScroll,
     });
 
@@ -533,7 +517,11 @@ export default {
     const {
       setContextMenu,
       onContextMenu,
-    } = contextMenuEvent({ contextInfo, stores, filterInfo, selectInfo, setStore });
+    } = contextMenuEvent({
+      contextInfo,
+      stores,
+      selectInfo,
+    });
 
     onMounted(() => {
       calculatedColumn();
@@ -561,15 +549,6 @@ export default {
             stores.pagingStore = getPagingData();
             clearCheckInfo();
           }
-        }
-      },
-    );
-    watch(
-      () => filterInfo.setFiltering,
-      (value) => {
-        if (value) {
-          setStore([], false);
-          filterInfo.setFiltering = !value;
         }
       },
     );
@@ -687,13 +666,6 @@ export default {
         onResize();
       },
     );
-    // watch(
-    //   () => filterInfo.isFiltering,
-    //   () => {
-    //     stores.filterStore = [];
-    //     setStore([], false);
-    //   },
-    // );
     watch(
       () => props.option.searchValue,
       (value) => {
@@ -766,10 +738,6 @@ export default {
       onCheckAll,
       onSort,
       setSort,
-      onClickFilter,
-      onCloseFilterWindow,
-      onApplyFilter,
-      setFilter,
       setStore,
       setContextMenu,
       onContextMenu,
