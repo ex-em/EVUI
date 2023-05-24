@@ -52,6 +52,7 @@
         </span>
         <ev-toggle
           v-model="useFilterMV"
+          readonly
         />
         <span class="badge yellow">
           Use Checkbox
@@ -227,7 +228,7 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(45);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(true);
+    const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
