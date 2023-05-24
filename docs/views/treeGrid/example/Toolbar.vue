@@ -12,7 +12,6 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useFilter: useFilterMV,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
@@ -71,7 +70,6 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(35);
     const columnWidthMV = ref(80);
-    const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
     const headerCheckMV = ref(true);
@@ -168,7 +166,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
       headerCheckMV,
