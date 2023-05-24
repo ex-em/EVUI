@@ -1,5 +1,5 @@
 <template>
-  <div class="description gridToolbar">
+  <div class="gridToolbar">
     <slot name="toolbarWrapper"></slot>
   </div>
 </template>
@@ -13,6 +13,7 @@ export default {
 <style lang="scss">
 @import '../../style/index.scss';
 .gridToolbar {
+  height: 30px;
   margin-bottom: 10px;
 }
 .gridToolbar > .search {

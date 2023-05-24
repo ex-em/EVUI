@@ -34,30 +34,6 @@
     >
       <!-- toolbar -->
       <template #toolbar="{ item }">
-        <ev-button
-          type="primary"
-          class="refresh"
-        >
-          Refresh
-        </ev-button>
-        <ev-button
-          type="primary"
-          class="delete"
-          @click="onClickAdd"
-        >
-          highlight
-        </ev-button>
-        <ev-button
-          type="info"
-          @click="onClickCustom"
-        >
-          Set Search Value
-        </ev-button>
-        <ev-button
-          type="info"
-        >
-          Custom
-        </ev-button>
         <ev-text-field
           v-model="searchVm"
           class="search"
@@ -212,9 +188,6 @@ export default {
       }
       tableData.value = temp;
     };
-    const onClickCustom = () => {
-      searchVm.value = '2016';
-    };
     const pageInfo = reactive({
       use: true,
       visiblePage: 7,
@@ -226,10 +199,6 @@ export default {
       useClient: true,
     });
     getData(30, 0);
-    const onClickAdd = () => {
-      highlightMV.value = 17;
-      // tableData.value.push(['oracle', 'LIN12G', 'LIN12G', '10.10.30.10', '2016']);
-    };
     const onRequestData = (e) => {
       pageInfo.currentPage = e.pageInfo.currentPage;
     };
@@ -264,8 +233,6 @@ export default {
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
-      onClickCustom,
-      onClickAdd,
       onRequestData,
     };
   },
