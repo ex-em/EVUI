@@ -2,6 +2,11 @@ import {
   ref, reactive, computed, watch,
   nextTick, getCurrentInstance,
 } from 'vue';
+import {
+  getRegExp,
+  engToKor,
+  korToEng,
+} from 'korean-regexp';
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -124,7 +129,14 @@ export const useDropdown = (param) => {
       return props.items;
     }
     const trimText = filterTextRef.value?.trim();
-    return props.items.filter(v => v.name.toUpperCase().includes(trimText.toUpperCase())) || [];
+    const korean = engToKor(trimText);
+    const eng = korToEng(trimText);
+
+    return props.items.filter(({ name }) => (
+      name.search(getRegExp(trimText)) > -1
+        || name.search(getRegExp(korean)) > -1
+        || name.search(getRegExp(eng)) > -1
+        ));
   });
 
   /**
