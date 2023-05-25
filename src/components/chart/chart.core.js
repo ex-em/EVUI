@@ -104,14 +104,18 @@ class EvChart {
    */
   init() {
     const { series, data, labels, groups } = this.data;
-    const { type, axesX, axesY, tooltip, horizontal } = this.options;
+    const { type, axesX, axesY, tooltip, horizontal, realTimeScatter } = this.options;
 
     this.createSeriesSet(series, type, horizontal, groups);
     if (groups.length) {
       this.addGroupInfo(groups);
     }
 
-    this.createDataSet(data, labels);
+    if (realTimeScatter?.use) {
+      this.createRealTimeScatterDataSet(data);
+    } else {
+      this.createDataSet(data, labels);
+    }
     this.minMax = this.getStoreMinMax();
 
     this.initRect();
@@ -232,6 +236,8 @@ class EvChart {
       }
     });
 
+    const duple = new Set();
+
     const chartKeys = Object.keys(this.seriesInfo.charts);
     for (let ix = 0; ix < chartKeys.length; ix++) {
       const chartType = chartKeys[ix];
@@ -322,6 +328,7 @@ class EvChart {
             series.draw({
               legendHitInfo,
               selectInfo,
+              duple,
               ...opt,
             });
             break;
@@ -752,7 +759,11 @@ class EvChart {
       this.addGroupInfo(groups);
     }
 
-    this.createDataSet(data, labels);
+    if (this.options.realTimeScatter?.use) {
+      this.createRealTimeScatterDataSet(data);
+    } else {
+      this.createDataSet(data, labels);
+    }
 
     // title update
     if (options.title.show) {

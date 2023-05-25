@@ -1,5 +1,6 @@
 import Line from '../element/element.line';
 import Scatter from '../element/element.scatter';
+import RealTimeScatter from '../element/element.realtime.scatter';
 import Bar from '../element/element.bar';
 import TimeBar from '../element/element.bar.time';
 import Pie from '../element/element.pie';
@@ -70,9 +71,12 @@ const modules = {
     if (type === 'line') {
       this.seriesInfo.charts.line.push(id);
       return new Line(id, opt, index);
-    } else if (type === 'scatter') {
+    } else if (type === 'scatter' && !this.options.realTimeScatter?.use) {
       this.seriesInfo.charts.scatter.push(id);
       return new Scatter(id, opt, index);
+    } else if (type === 'scatter' && this.options.realTimeScatter?.use) {
+      this.seriesInfo.charts.scatter.push(id);
+      return new RealTimeScatter(id, opt, index);
     } else if (type === 'bar') {
       this.seriesInfo.charts.bar.push(id);
 
