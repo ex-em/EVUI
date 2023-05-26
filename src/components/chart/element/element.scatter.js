@@ -4,7 +4,7 @@ import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
 class Scatter {
-  constructor(sId, opt, sIdx) {
+  constructor(sId, opt, sIdx, realTimeScatter = false) {
     const merged = merge({}, LINE_OPTION, opt);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
@@ -14,7 +14,7 @@ class Scatter {
       this.name = `series-${sIdx}`;
     }
 
-    ['color', 'pointFill', 'fillColor'].forEach((colorProp) => {
+    ['color', 'pointFill', 'fillColor', 'overflowColor'].forEach((colorProp) => {
       if (this[colorProp] === undefined) {
         this[colorProp] = COLOR[sIdx];
       }
@@ -23,6 +23,7 @@ class Scatter {
     this.sId = sId;
     this.data = [];
     this.type = 'scatter';
+    this.realTimeScatter = realTimeScatter;
   }
 
   /**
@@ -36,11 +37,7 @@ class Scatter {
       return;
     }
 
-    const ctx = param.ctx;
-    const chartRect = param.chartRect;
-    const labelOffset = param.labelOffset;
-    const axesSteps = param.axesSteps;
-    const displayOverflow = param.displayOverflow;
+    const { ctx, chartRect, labelOffset, axesSteps, displayOverflow, duple } = param;
 
     let x;
     let y;
@@ -52,28 +49,6 @@ class Scatter {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
-
-    if (displayOverflow) {
-      this.data = this.data.map(val => ({
-        ...val,
-        y: val.y > minmaxY.graphMax ? minmaxY.graphMax : val.y,
-      }));
-    }
-
-    this.data.forEach((item) => {
-      x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-      y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-
-      if (x !== null) {
-        aliasPixel = Util.aliasPixel(x);
-        x += aliasPixel;
-      }
-
-      item.xp = x; // eslint-disable-line
-      item.yp = y; // eslint-disable-line
-
-      return item;
-    }, this.data[0]);
 
     const getOpacity = (colorStr, dataIndex) => {
       const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
@@ -89,17 +64,90 @@ class Scatter {
       return isDownplay ? 0.1 : noneDownplayOpacity;
     };
 
-    this.data.forEach((curr, idx) => {
-      if (curr.xp !== null && curr.yp !== null) {
-        const color = curr.dataColor || this.color;
-        ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color, idx));
+    const defaultScatterDraw = () => {
+      this.data.forEach((item, idx) => {
+        x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+        y = Canvas.calculateY(
+          displayOverflow && item.y > minmaxY.graphMax
+            ? minmaxY.graphMax
+            : item.y,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea,
+          ysp,
+        );
 
-        const pointFillColor = curr.dataColor || this.pointFill;
-        ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor, idx));
+        if (x !== null) {
+          aliasPixel = Util.aliasPixel(x);
+          x += aliasPixel;
+        }
 
-        Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+        item.xp = x; // eslint-disable-line
+        item.yp = y; // eslint-disable-line
+
+        if (item.xp !== null && item.yp !== null) {
+          const color = item.dataColor || this.color;
+          ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color, idx));
+
+          const pointFillColor = item.dataColor || this.pointFill;
+          ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor, idx));
+
+          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+        }
+      });
+    };
+
+    const realTimeScatterDraw = () => {
+      const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+      const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
+
+      for (let i = 0; i < this.data[this.sId].dataGroup.length; i++) {
+        for (let j = 0; j < this.data[this.sId].dataGroup[i].data.length; j++) {
+          const item = this.data[this.sId].dataGroup[i].data[j];
+
+          if (!duple.has(`${item.x}${item.y}`)) {
+            duple.add(`${item.x}${item.y}`);
+
+            x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+            y = Canvas.calculateY(
+              displayOverflow && item.y > minmaxY.graphMax
+                ? minmaxY.graphMax
+                : item.y,
+              minmaxY.graphMin,
+              minmaxY.graphMax,
+              yArea,
+              ysp,
+            );
+
+            if (x !== null) {
+              aliasPixel = Util.aliasPixel(x);
+              x += aliasPixel;
+            }
+
+            item.xp = x;
+            item.yp = y;
+
+            if (item.xp !== null && item.yp !== null) {
+              const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
+              const color = overflowColor || item.color || this.color;
+
+              ctx.strokeStyle = color;
+
+              const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
+              ctx.fillStyle = pointFillColor;
+
+              Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            }
+          }
+        }
       }
-    });
+    };
+
+    if (this.realTimeScatter) {
+      realTimeScatterDraw();
+    } else {
+      defaultScatterDraw();
+    }
   }
 
   /**
@@ -112,9 +160,31 @@ class Scatter {
     const gdata = this.data;
     const xep = xsp + width;
     const yep = ysp + height;
-    const items = gdata.filter(seriesData =>
+    let items = [];
+
+    const defaultScatterFindItems = () => {
+      items = gdata.filter(seriesData =>
         (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
         && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+    };
+
+    const realTimeScatterFindItems = () => {
+      for (let i = 0; i < gdata[this.sId].dataGroup.length; i++) {
+        const obj = gdata[this.sId].dataGroup[i];
+        for (let j = 0; j < obj.data.length; j++) {
+          if (xsp - 1 <= obj.data[j].xp && obj.data[j].xp <= xep + 1
+            && ysp - 1 <= obj.data[j].yp && obj.data[j].yp <= yep + 1) {
+            items.push(obj.data[j]);
+          }
+        }
+      }
+    };
+
+    if (this.realTimeScatter) {
+      realTimeScatterFindItems();
+    } else {
+      defaultScatterFindItems();
+    }
 
     return items;
   }
@@ -161,6 +231,8 @@ class Scatter {
    * @returns {object} graph item
    */
   findGraphData(offset) {
+    if (this.realTimeScatter) return false;
+
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color, index: null };
