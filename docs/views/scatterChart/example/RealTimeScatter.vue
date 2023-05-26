@@ -21,33 +21,32 @@ import { ref, shallowRef, watch, onUnmounted } from 'vue';
 export default {
   setup() {
     const isRealTime = ref(true);
-    const pointSize = ref(0.5);
 
     const series = {
-      errorData: {
-        name: 'errorData',
-        pointSize,
-        color: '#df6264',
-        pointFill: '#df6264',
-        overflowColor: '#ff00ff',
+      series1: {
+        name: 'series1',
+        pointSize: 0.5,
+        color: '#DF6264',
+        pointFill: '#DF6264',
+        overflowColor: '#FF00FF',
       },
-      normalData: {
-        name: 'normalData',
-        pointSize,
-        color: '#3ca0ff',
-        pointFill: '#3ca0ff',
-        overflowColor: '#a3d3ff',
+      series2: {
+        name: 'series2',
+        pointSize: 0.5,
+        color: '#3CA0FF',
+        pointFill: '#3CA0FF',
+        overflowColor: '#A3D3FF',
       },
     };
 
-    let normalData = [];
-    let errorData = [];
+    let series2 = [];
+    let series1 = [];
     // chartData를 shallowRef or shallowReactive로 선언하여야합니다.
     const chartData = shallowRef({
       series,
       data: {
-        errorData,
-        normalData,
+        series1,
+        series2,
       },
     });
 
@@ -135,8 +134,8 @@ export default {
 
     let data;
     function getTransactionMonitorListHandler() {
-      normalData = [];
-      errorData = [];
+      series1 = [];
+      series2 = [];
 
       if (isInit) {
         data = generateData(10000);
@@ -151,12 +150,12 @@ export default {
         const errorCount = data[i].errorCount;
 
         if (errorCount === 1) {
-          errorData.push({
+          series1.push({
             x: time,
             y: elapsedTime / 1000,
           });
         } else {
-          normalData.push({
+          series2.push({
             x: time,
             y: elapsedTime / 1000,
           });
@@ -166,8 +165,8 @@ export default {
       chartData.value = {
         series,
         data: {
-          errorData,
-          normalData,
+          series1,
+          series2,
         },
       };
     }
@@ -191,7 +190,6 @@ export default {
 
     return {
       isRealTime,
-      pointSize,
       chartData,
       chartOptions,
     };
