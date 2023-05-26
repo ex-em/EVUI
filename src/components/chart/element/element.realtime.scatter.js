@@ -53,6 +53,8 @@ class RealTimeScatter {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
+    const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+    const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
 
     for (let i = 0; i < this.data[this.sId].dataGroup.length; i++) {
       for (let j = 0; j < this.data[this.sId].dataGroup[i].data.length; j++) {
@@ -89,7 +91,7 @@ class RealTimeScatter {
             const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
             ctx.fillStyle = pointFillColor;
 
-            Canvas.drawPoint(ctx, this.pointStyle.value, this.pointSize.value, item.xp, item.yp);
+            Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
           }
         }
       }

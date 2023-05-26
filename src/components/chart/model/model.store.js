@@ -72,7 +72,7 @@ const modules = {
     const keys = Object.keys(datas);
 
     if (!this.isInit) {
-      this.realTimeScatterInfo = {};
+      this.dataSet = {};
     }
 
     const minMaxValues = {
@@ -89,21 +89,21 @@ const modules = {
       let lastTransactionTime = 0;
 
       if (!this.isInit) {
-        this.realTimeScatterInfo[key] = {
+        this.dataSet[key] = {
           dataGroup: [],
-          range: this.options.realTimeScatter.range || 5, // 6 분
+          range: this.options.realTimeScatter.range || 300, // default 총 5분, 초 단위
           startIndex: 0,
           endIndex: 0,
           length: 0,
           fromTime: 0,
           toTime: 0,
         };
-        this.realTimeScatterInfo[key].dataGroup = [];
-        this.realTimeScatterInfo[key].length = this.realTimeScatterInfo[key].range * 60;
-        this.realTimeScatterInfo[key].toTime = Math.floor(Date.now() / 1000) * 1000;
-        this.realTimeScatterInfo[key].fromTime = this.realTimeScatterInfo[key].toTime
-          - this.realTimeScatterInfo[key].length * 1000;
-        this.realTimeScatterInfo[key].endIndex = this.realTimeScatterInfo[key].length - 1;
+        this.dataSet[key].dataGroup = [];
+        this.dataSet[key].length = this.dataSet[key].range;
+        this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
+        this.dataSet[key].fromTime = this.dataSet[key].toTime
+          - this.dataSet[key].length * 1000;
+        this.dataSet[key].endIndex = this.dataSet[key].length - 1;
       }
 
       for (let i = 0; i < storeLength; i++) {
@@ -116,66 +116,66 @@ const modules = {
 
       lastTransactionTime = Math.floor(lastTransactionTime / 1000) * 1000;
       if (
-        (this.realTimeScatterInfo[key].toTime - lastTransactionTime) / 1000
-        > this.realTimeScatterInfo[key].length && key === ''
+        (this.dataSet[key].toTime - lastTransactionTime) / 1000
+        > this.dataSet[key].length && key === ''
       ) {
         return;
       }
 
-      let gapCount = (lastTransactionTime - this.realTimeScatterInfo[key].toTime) / 1000;
+      let gapCount = (lastTransactionTime - this.dataSet[key].toTime) / 1000;
       if (gapCount > 0) {
-        this.realTimeScatterInfo[key].toTime = lastTransactionTime;
-        this.realTimeScatterInfo[key].fromTime = lastTransactionTime
-          - this.realTimeScatterInfo[key].length * 1000;
+        this.dataSet[key].toTime = lastTransactionTime;
+        this.dataSet[key].fromTime = lastTransactionTime
+          - this.dataSet[key].length * 1000;
       }
 
       if (!this.isInit) {
-        for (let i = 0; i < this.realTimeScatterInfo[key].length; i++) {
-          this.realTimeScatterInfo[key].dataGroup[i] = {
+        for (let i = 0; i < this.dataSet[key].length; i++) {
+          this.dataSet[key].dataGroup[i] = {
             data: [],
             max: 0,
             min: Infinity,
           };
         }
       } else if (gapCount > 0) {
-        if (gapCount >= this.realTimeScatterInfo[key].length) {
-          for (let i = 0; i < this.realTimeScatterInfo[key].length; i++) {
-            this.realTimeScatterInfo[key].dataGroup[i].data.length = 0;
-            this.realTimeScatterInfo[key].dataGroup[i].max = 0;
-            this.realTimeScatterInfo[key].dataGroup[i].min = Infinity;
+        if (gapCount >= this.dataSet[key].length) {
+          for (let i = 0; i < this.dataSet[key].length; i++) {
+            this.dataSet[key].dataGroup[i].data.length = 0;
+            this.dataSet[key].dataGroup[i].max = 0;
+            this.dataSet[key].dataGroup[i].min = Infinity;
           }
 
-          this.realTimeScatterInfo[key].startIndex = 0;
-          this.realTimeScatterInfo[key].endIndex = this.realTimeScatterInfo[key].length - 1;
+          this.dataSet[key].startIndex = 0;
+          this.dataSet[key].endIndex = this.dataSet[key].length - 1;
         } else {
           while (gapCount > 0) {
             if (
-              this.realTimeScatterInfo[key].dataGroup[this.realTimeScatterInfo[key].startIndex]
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex]
                === null
             ) {
-              this.realTimeScatterInfo[key].dataGroup[this.realTimeScatterInfo[key].startIndex] = {
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex] = {
                 data: [],
                 max: 0,
                 min: Infinity,
               };
             } else {
-              this.realTimeScatterInfo[key]
-                .dataGroup[this.realTimeScatterInfo[key].startIndex].data.length = 0;
-              this.realTimeScatterInfo[key]
-                .dataGroup[this.realTimeScatterInfo[key].startIndex].max = 0;
-              this.realTimeScatterInfo[key]
-                .dataGroup[this.realTimeScatterInfo[key].startIndex].min = Infinity;
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].data.length = 0;
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].max = 0;
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].min = Infinity;
             }
 
-            ++this.realTimeScatterInfo[key].startIndex;
+            ++this.dataSet[key].startIndex;
 
-            if (this.realTimeScatterInfo[key].startIndex >= this.realTimeScatterInfo[key].length) {
-              this.realTimeScatterInfo[key].startIndex = 0;
+            if (this.dataSet[key].startIndex >= this.dataSet[key].length) {
+              this.dataSet[key].startIndex = 0;
             }
 
-            ++this.realTimeScatterInfo[key].endIndex;
-            if (this.realTimeScatterInfo[key].endIndex >= this.realTimeScatterInfo[key].length) {
-              this.realTimeScatterInfo[key].endIndex = 0;
+            ++this.dataSet[key].endIndex;
+            if (this.dataSet[key].endIndex >= this.dataSet[key].length) {
+              this.dataSet[key].endIndex = 0;
             }
             --gapCount;
           }
@@ -186,25 +186,25 @@ const modules = {
         const item = data[i];
         const transactionTime = Math.floor(item.x / 1000) * 1000;
 
-        if (this.realTimeScatterInfo[key].fromTime <= transactionTime) {
-          let index = this.realTimeScatterInfo[key].endIndex
-          - (this.realTimeScatterInfo[key].toTime - transactionTime) / 1000;
+        if (this.dataSet[key].fromTime <= transactionTime) {
+          let index = this.dataSet[key].endIndex
+          - (this.dataSet[key].toTime - transactionTime) / 1000;
           if (index < 0) {
-            index = this.realTimeScatterInfo[key].length + index;
+            index = this.dataSet[key].length + index;
           }
 
-          this.realTimeScatterInfo[key].dataGroup[index].data.push({
+          this.dataSet[key].dataGroup[index].data.push({
             x: item.x,
             y: item.y,
             color: item.color,
           });
 
-          this.realTimeScatterInfo[key].dataGroup[index].max = Math.max(
-            this.realTimeScatterInfo[key].dataGroup[index].max,
+          this.dataSet[key].dataGroup[index].max = Math.max(
+            this.dataSet[key].dataGroup[index].max,
             item.y,
           );
-          this.realTimeScatterInfo[key].dataGroup[index].min = Math.min(
-            this.realTimeScatterInfo[key].dataGroup[index].min,
+          this.dataSet[key].dataGroup[index].min = Math.min(
+            this.dataSet[key].dataGroup[index].min,
             item.y,
           );
         }
@@ -215,25 +215,25 @@ const modules = {
         minY: Infinity,
       };
 
-      for (let i = 0; i < this.realTimeScatterInfo[key].length; i++) {
-        if (this.realTimeScatterInfo[key].dataGroup[i].max > tempMinMax.maxY) {
-          tempMinMax.maxY = this.realTimeScatterInfo[key].dataGroup[i].max;
+      for (let i = 0; i < this.dataSet[key].length; i++) {
+        if (this.dataSet[key].dataGroup[i].max > tempMinMax.maxY) {
+          tempMinMax.maxY = this.dataSet[key].dataGroup[i].max;
         }
 
-        if (this.realTimeScatterInfo[key].dataGroup[i].min < tempMinMax.minY) {
-          tempMinMax.minY = this.realTimeScatterInfo[key].dataGroup[i].min;
+        if (this.dataSet[key].dataGroup[i].min < tempMinMax.minY) {
+          tempMinMax.minY = this.dataSet[key].dataGroup[i].min;
         }
       }
 
       minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
       minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
-      minMaxValues.fromTime = this.realTimeScatterInfo[key].fromTime;
-      minMaxValues.toTime = this.realTimeScatterInfo[key].toTime;
+      minMaxValues.fromTime = this.dataSet[key].fromTime;
+      minMaxValues.toTime = this.dataSet[key].toTime;
     }
 
     this.seriesInfo.charts.scatter.forEach((seriesID) => {
       const series = this.seriesList[seriesID];
-      series.data = this.realTimeScatterInfo;
+      series.data = this.dataSet;
       series.minMax = {
         minX: dayjs(minMaxValues.fromTime),
         minY: minMaxValues.minY,

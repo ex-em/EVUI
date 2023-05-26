@@ -92,7 +92,7 @@ export default {
       displayOverflow: true,
       realTimeScatter: {
         use: true,
-        range: 5, // 총 5분
+        range: 300, // 총 5분, 초 단위
       },
     });
 
