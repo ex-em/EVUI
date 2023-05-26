@@ -99,16 +99,12 @@ export default {
     let transactionMonitorTimeoutId;
 
     let isInit = true;
-    function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-    function generateData(num) {
+    const generateData = (num) => {
       const data = [];
 
-      function floor(number) {
-        return Math.floor(number / 1000) * 1000;
-      }
+      const floor = number => Math.floor(number / 1000) * 1000;
 
       for (let i = 0; i < num; i++) {
         let randomTime = 0;
@@ -130,18 +126,18 @@ export default {
         });
       }
       return data;
-    }
+    };
 
     let data;
-    function getTransactionMonitorListHandler() {
+    const getTransactionMonitorListHandler = () => {
       series1 = [];
       series2 = [];
 
       if (isInit) {
-        data = generateData(10000);
+        data = generateData(1000000);
         isInit = false;
       } else {
-        data = generateData(100);
+        data = generateData(10000);
       }
 
       for (let i = 0; i < data.length; i++) {
@@ -169,16 +165,18 @@ export default {
           series2,
         },
       };
-    }
+    };
 
     getTransactionMonitorListHandler();
 
+    const tick = () => {
+      getTransactionMonitorListHandler();
+      transactionMonitorTimeoutId = setTimeout(tick, 3000);
+    };
+
     watch(() => isRealTime.value, () => {
       if (isRealTime.value) {
-        transactionMonitorTimeoutId = setTimeout(function tick() {
-          getTransactionMonitorListHandler();
-          transactionMonitorTimeoutId = setTimeout(tick, 3000);
-        }, 3000);
+        transactionMonitorTimeoutId = setTimeout(tick, 3000);
       } else {
         clearTimeout(transactionMonitorTimeoutId);
       }
