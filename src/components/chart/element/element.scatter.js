@@ -64,26 +64,30 @@ class Scatter {
       return isDownplay ? 0.1 : noneDownplayOpacity;
     };
 
+    const calcItem = (item) => {
+      x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+      y = Canvas.calculateY(
+        displayOverflow && item.y > minmaxY.graphMax
+          ? minmaxY.graphMax
+          : item.y,
+        minmaxY.graphMin,
+        minmaxY.graphMax,
+        yArea,
+        ysp,
+      );
+
+      if (x !== null) {
+        aliasPixel = Util.aliasPixel(x);
+        x += aliasPixel;
+      }
+
+      item.xp = x;
+      item.yp = y;
+    };
+
     const defaultScatterDraw = () => {
       this.data.forEach((item, idx) => {
-        x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-        y = Canvas.calculateY(
-          displayOverflow && item.y > minmaxY.graphMax
-            ? minmaxY.graphMax
-            : item.y,
-          minmaxY.graphMin,
-          minmaxY.graphMax,
-          yArea,
-          ysp,
-        );
-
-        if (x !== null) {
-          aliasPixel = Util.aliasPixel(x);
-          x += aliasPixel;
-        }
-
-        item.xp = x; // eslint-disable-line
-        item.yp = y; // eslint-disable-line
+        calcItem(item);
 
         if (item.xp !== null && item.yp !== null) {
           const color = item.dataColor || this.color;
@@ -108,24 +112,7 @@ class Scatter {
           if (!duple.has(`${item.x}${item.y}`)) {
             duple.add(`${item.x}${item.y}`);
 
-            x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-            y = Canvas.calculateY(
-              displayOverflow && item.y > minmaxY.graphMax
-                ? minmaxY.graphMax
-                : item.y,
-              minmaxY.graphMin,
-              minmaxY.graphMax,
-              yArea,
-              ysp,
-            );
-
-            if (x !== null) {
-              aliasPixel = Util.aliasPixel(x);
-              x += aliasPixel;
-            }
-
-            item.xp = x;
-            item.yp = y;
+            calcItem(item);
 
             if (item.xp !== null && item.yp !== null) {
               const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
