@@ -86,7 +86,7 @@ const modules = {
       const key = keys[x];
       const data = datas[key];
       const storeLength = data.length;
-      let lastTransactionTime = 0;
+      let lastTime = 0;
 
       if (!this.isInit) {
         this.dataSet[key] = {
@@ -109,23 +109,23 @@ const modules = {
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
 
-        if (lastTransactionTime < item.x) {
-          lastTransactionTime = item.x;
+        if (lastTime < item.x) {
+          lastTime = item.x;
         }
       }
 
-      lastTransactionTime = Math.floor(lastTransactionTime / 1000) * 1000;
+      lastTime = Math.floor(lastTime / 1000) * 1000;
       if (
-        (this.dataSet[key].toTime - lastTransactionTime) / 1000
+        (this.dataSet[key].toTime - lastTime) / 1000
         > this.dataSet[key].length && key === ''
       ) {
         return;
       }
 
-      let gapCount = (lastTransactionTime - this.dataSet[key].toTime) / 1000;
+      let gapCount = (lastTime - this.dataSet[key].toTime) / 1000;
       if (gapCount > 0) {
-        this.dataSet[key].toTime = lastTransactionTime;
-        this.dataSet[key].fromTime = lastTransactionTime
+        this.dataSet[key].toTime = lastTime;
+        this.dataSet[key].fromTime = lastTime
           - this.dataSet[key].length * 1000;
       }
 

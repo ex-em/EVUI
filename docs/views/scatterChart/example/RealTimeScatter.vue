@@ -96,7 +96,7 @@ export default {
       },
     });
 
-    let transactionMonitorTimeoutId;
+    let customIntervalId;
 
     let isInit = true;
     const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -107,53 +107,52 @@ export default {
       const floor = number => Math.floor(number / 1000) * 1000;
 
       for (let i = 0; i < num; i++) {
-        let randomTime = 0;
-        let randomElapsedTime = 0;
+        let randomX = 0;
+        let randomY = 0;
         if (!isInit) {
-          randomTime = floor(Date.now() + getRandomInt(-3000, 0)); // -3초 ~ 현재
-          randomElapsedTime = floor(getRandomInt(3000, 95000));
+          randomX = floor(Date.now() + getRandomInt(-3000, 0)); // -3초 ~ 현재
+          randomY = floor(getRandomInt(3000, 95000));
         } else {
-          randomTime = floor(Date.now() + getRandomInt(-300000, 0)); // -5분 ~ 현재
-          randomElapsedTime = floor(getRandomInt(3000, 57000));
+          randomX = floor(Date.now() + getRandomInt(-300000, 0)); // -5분 ~ 현재
+          randomY = floor(getRandomInt(3000, 57000));
         }
-        const randomErrorCount = getRandomInt(0, 1);
+        const randomType = getRandomInt(0, 1);
 
         data.push({
-          time: randomTime,
-          elapsedTime: randomElapsedTime,
-          count: 1,
-          errorCount: randomErrorCount,
+          x: randomX,
+          y: randomY,
+          type: randomType,
         });
       }
       return data;
     };
 
     let data;
-    const getTransactionMonitorListHandler = () => {
+    const setDataHandler = () => {
       series1 = [];
       series2 = [];
 
       if (isInit) {
-        data = generateData(1000000);
+        data = generateData(10000);
         isInit = false;
       } else {
-        data = generateData(10000);
+        data = generateData(100);
       }
 
       for (let i = 0; i < data.length; i++) {
-        const time = data[i].time;
-        const elapsedTime = data[i].elapsedTime;
-        const errorCount = data[i].errorCount;
+        const dataX = data[i].x;
+        const dataY = data[i].y;
+        const type = data[i].type;
 
-        if (errorCount === 1) {
+        if (type === 1) {
           series1.push({
-            x: time,
-            y: elapsedTime / 1000,
+            x: dataX,
+            y: dataY / 1000,
           });
         } else {
           series2.push({
-            x: time,
-            y: elapsedTime / 1000,
+            x: dataX,
+            y: dataY / 1000,
           });
         }
       }
@@ -167,23 +166,23 @@ export default {
       };
     };
 
-    getTransactionMonitorListHandler();
+    setDataHandler();
 
     const tick = () => {
-      getTransactionMonitorListHandler();
-      transactionMonitorTimeoutId = setTimeout(tick, 3000);
+      setDataHandler();
+      customIntervalId = setTimeout(tick, 3000);
     };
 
     watch(() => isRealTime.value, () => {
       if (isRealTime.value) {
-        transactionMonitorTimeoutId = setTimeout(tick, 3000);
+        customIntervalId = setTimeout(tick, 3000);
       } else {
-        clearTimeout(transactionMonitorTimeoutId);
+        clearTimeout(customIntervalId);
       }
     }, { immediate: true });
 
     onUnmounted(() => {
-      clearTimeout(transactionMonitorTimeoutId);
+      clearTimeout(customIntervalId);
     });
 
     return {
