@@ -91,15 +91,13 @@ const modules = {
       if (!this.isInit) {
         this.dataSet[key] = {
           dataGroup: [],
-          range: this.options.realTimeScatter.range || 300, // default 총 5분, 초 단위
           startIndex: 0,
           endIndex: 0,
           length: 0,
           fromTime: 0,
           toTime: 0,
         };
-        this.dataSet[key].dataGroup = [];
-        this.dataSet[key].length = this.dataSet[key].range;
+        this.dataSet[key].length = this.options.realTimeScatter.range || 300;
         this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
         this.dataSet[key].fromTime = this.dataSet[key].toTime
           - this.dataSet[key].length * 1000;
