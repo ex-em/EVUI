@@ -27,6 +27,131 @@ class Scatter {
   }
 
   /**
+   * Calculate opacity for a data item in the series.
+   * @param {object} param - The parameter object passed to the draw function.
+   * @param {string} colorStr - The color string of the item.
+   * @param {number} dataIndex - The index of the item in the data array.
+   *
+   * @returns {number} - The calculated opacity level for the item.
+   */
+  getOpacity(param, colorStr, dataIndex) {
+    const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
+    let isDownplay = false;
+
+    const { selectInfo, legendHitInfo } = param;
+    if (legendHitInfo) {
+      isDownplay = legendHitInfo.sId !== this.sId;
+    } else if (selectInfo) {
+      isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
+    }
+
+    return isDownplay ? 0.1 : noneDownplayOpacity;
+  }
+
+  /**
+   * Calculate x and y coordinates for a data item in the series.
+   * @param {object} item - The data item for which coordinates are to be calculated.
+   * @param {object} param - The parameter object passed to the draw function.
+   *
+   * @returns {undefined}
+   */
+  calcItem(item, param) {
+    const { chartRect, labelOffset, axesSteps, displayOverflow } = param;
+
+    let aliasPixel;
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const xsp = chartRect.x1 + labelOffset.left;
+    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    let x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    const y = Canvas.calculateY(
+      displayOverflow && item.y > minmaxY.graphMax
+        ? minmaxY.graphMax
+        : item.y,
+      minmaxY.graphMin,
+      minmaxY.graphMax,
+      yArea,
+      ysp,
+    );
+
+    if (x !== null) {
+      aliasPixel = Util.aliasPixel(x);
+      x += aliasPixel;
+    }
+
+    item.xp = x;
+    item.yp = y;
+  }
+
+  /**
+   * Draw default scatter chart
+   * @param {object} param - The parameter object passed to the draw function.
+   *
+   * @returns {undefined}
+   */
+  defaultScatterDraw(param) {
+    const { ctx } = param;
+
+    this.data.forEach((item, idx) => {
+      this.calcItem(item, param);
+
+      if (item.xp !== null && item.yp !== null) {
+        const color = item.dataColor || this.color;
+        ctx.strokeStyle = Util.colorStringToRgba(color, this.getOpacity(param, color, idx));
+
+        const pointFillColor = item.dataColor || this.pointFill;
+        ctx.fillStyle = Util.colorStringToRgba(
+          pointFillColor,
+          this.getOpacity(param, pointFillColor, idx),
+        );
+
+        Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+      }
+    });
+  }
+
+  /**
+   * Draw real time scatter chart
+   * @param {object} param - The parameter object passed to the draw function.
+   *
+   * @returns {undefined}
+   */
+  realTimeScatterDraw(param) {
+    const { ctx, axesSteps, duple } = param;
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+    const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+    const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
+
+    for (let i = 0; i < this.data[this.sId].dataGroup.length; i++) {
+      for (let j = 0; j < this.data[this.sId].dataGroup[i].data.length; j++) {
+        const item = this.data[this.sId].dataGroup[i].data[j];
+
+        if (!duple.has(`${item.x}${item.y}`)) {
+          duple.add(`${item.x}${item.y}`);
+
+          this.calcItem(item, param);
+
+          if (item.xp !== null && item.yp !== null) {
+            const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
+            const color = overflowColor || item.color || this.color;
+
+            ctx.strokeStyle = color;
+
+            const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
+            ctx.fillStyle = pointFillColor;
+
+            Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Draw series data
    * @param {object} param     object for drawing series data
    *
@@ -37,104 +162,41 @@ class Scatter {
       return;
     }
 
-    const { ctx, chartRect, labelOffset, axesSteps, displayOverflow, duple } = param;
-
-    let x;
-    let y;
-    let aliasPixel;
-    const minmaxX = axesSteps.x[this.xAxisIndex];
-    const minmaxY = axesSteps.y[this.yAxisIndex];
-
-    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
-    const ysp = chartRect.y2 - labelOffset.bottom;
-
-    const getOpacity = (colorStr, dataIndex) => {
-      const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
-      let isDownplay = false;
-
-      const { selectInfo, legendHitInfo } = param;
-      if (legendHitInfo) {
-        isDownplay = legendHitInfo.sId !== this.sId;
-      } else if (selectInfo) {
-        isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
-      }
-
-      return isDownplay ? 0.1 : noneDownplayOpacity;
-    };
-
-    const calcItem = (item) => {
-      x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-      y = Canvas.calculateY(
-        displayOverflow && item.y > minmaxY.graphMax
-          ? minmaxY.graphMax
-          : item.y,
-        minmaxY.graphMin,
-        minmaxY.graphMax,
-        yArea,
-        ysp,
-      );
-
-      if (x !== null) {
-        aliasPixel = Util.aliasPixel(x);
-        x += aliasPixel;
-      }
-
-      item.xp = x;
-      item.yp = y;
-    };
-
-    const defaultScatterDraw = () => {
-      this.data.forEach((item, idx) => {
-        calcItem(item);
-
-        if (item.xp !== null && item.yp !== null) {
-          const color = item.dataColor || this.color;
-          ctx.strokeStyle = Util.colorStringToRgba(color, getOpacity(color, idx));
-
-          const pointFillColor = item.dataColor || this.pointFill;
-          ctx.fillStyle = Util.colorStringToRgba(pointFillColor, getOpacity(pointFillColor, idx));
-
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
-        }
-      });
-    };
-
-    const realTimeScatterDraw = () => {
-      const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
-      const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
-
-      for (let i = 0; i < this.data[this.sId].dataGroup.length; i++) {
-        for (let j = 0; j < this.data[this.sId].dataGroup[i].data.length; j++) {
-          const item = this.data[this.sId].dataGroup[i].data[j];
-
-          if (!duple.has(`${item.x}${item.y}`)) {
-            duple.add(`${item.x}${item.y}`);
-
-            calcItem(item);
-
-            if (item.xp !== null && item.yp !== null) {
-              const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
-              const color = overflowColor || item.color || this.color;
-
-              ctx.strokeStyle = color;
-
-              const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
-              ctx.fillStyle = pointFillColor;
-
-              Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
-            }
-          }
-        }
-      }
-    };
-
     if (this.realTimeScatter) {
-      realTimeScatterDraw();
+      this.realTimeScatterDraw(param);
     } else {
-      defaultScatterDraw();
+      this.defaultScatterDraw(param);
     }
+  }
+
+  /**
+   * Filters and returns data items based on input coordinates
+   *
+   * @param {Array} data - The data to filter
+   * @param {number} xsp - Start X coordinate
+   * @param {number} ysp - Start Y coordinate
+   * @param {number} xep - End X coordinate
+   * @param {number} yep - End Y coordinate
+   * @returns {Array} Filtered data items
+   */
+  findItemsInRange(data, xsp, ysp, xep, yep) {
+    return data.filter(seriesData =>
+      (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
+      && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+  }
+
+  defaultScatterFindItems(gdata, xsp, ysp, xep, yep) {
+    return this.findItemsInRange(gdata, xsp, ysp, xep, yep);
+  }
+
+  realTimeScatterFindItems(gdata, xsp, ysp, xep, yep) {
+    const items = [];
+    for (let i = 0; i < gdata[this.sId].dataGroup.length; i++) {
+      const obj = gdata[this.sId].dataGroup[i];
+      items.push(...this.findItemsInRange(obj.data, xsp, ysp, xep, yep));
+    }
+
+    return items;
   }
 
   /**
@@ -149,28 +211,10 @@ class Scatter {
     const yep = ysp + height;
     let items = [];
 
-    const defaultScatterFindItems = () => {
-      items = gdata.filter(seriesData =>
-        (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
-        && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
-    };
-
-    const realTimeScatterFindItems = () => {
-      for (let i = 0; i < gdata[this.sId].dataGroup.length; i++) {
-        const obj = gdata[this.sId].dataGroup[i];
-        for (let j = 0; j < obj.data.length; j++) {
-          if (xsp - 1 <= obj.data[j].xp && obj.data[j].xp <= xep + 1
-            && ysp - 1 <= obj.data[j].yp && obj.data[j].yp <= yep + 1) {
-            items.push(obj.data[j]);
-          }
-        }
-      }
-    };
-
     if (this.realTimeScatter) {
-      realTimeScatterFindItems();
+      items = this.realTimeScatterFindItems(gdata, xsp, ysp, xep, yep);
     } else {
-      defaultScatterFindItems();
+      items = this.defaultScatterFindItems(gdata, xsp, ysp, xep, yep);
     }
 
     return items;
