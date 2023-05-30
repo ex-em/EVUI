@@ -70,10 +70,6 @@
       color: evThemed('font-color-base');
     }
   }
-  .ev-icon-filter {
-    font-size: 13px;
-    color: #005CC8;
-  }
 }
 
 .column-name {
@@ -87,41 +83,6 @@
 
   @include evThemify() {
     color: evThemed('font-color-base');
-  }
-}
-
-.column-filter {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: transparent;
-  i {
-    margin-right: 2px;
-    font-size: 14px;
-    vertical-align: middle;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
-    }
-  }
-}
-
-.column:hover .column-filter {
-  display: block;
-  cursor: pointer;
-}
-
-.column-filter-status {
-  position: absolute;
-  left: 0;
-  background-color: transparent;
-  .ei {
-    font-size: 10px;
-    vertical-align: top;
-
-    @include evThemify() {
-      color: evThemed('color-primary');
-    }
   }
 }
 

@@ -1,5 +1,4 @@
 import { getCurrentInstance, nextTick } from 'vue';
-import { uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 const ROW_INDEX = 0;
@@ -582,195 +581,17 @@ export const sortEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
-  const { props } = getCurrentInstance();
   const {
     filterInfo,
     stores,
     checkInfo,
     pageInfo,
-    getColumnIndex,
     getConvertValue,
     updateVScroll,
     getPagingData,
     updatePagingInfo,
   } = params;
-  /**
-   * 해당 컬럼에 대한 필터 팝업을 보여준다.
-   *
-   * @param {object} column - 컬럼 정보
-   */
-  const onClickFilter = (column) => {
-    const filter = {
-      column,
-      items: [],
-    };
-    const filterItems = filterInfo.filterList[column.field];
 
-    if (filterItems) {
-      filter.items = filterItems;
-    }
-
-    filterInfo.currentFilter = filter;
-    filterInfo.showFilterWindow = true;
-  };
-  /**
-   * 필터 팝업 관련 데이터 초기화 및 숨김 처리한다.
-   */
-  const onCloseFilterWindow = () => {
-    filterInfo.currentFilter = {
-      column: {},
-      items: [],
-    };
-    filterInfo.showFilterWindow = false;
-  };
-  /**
-   * 전달된 필터 정보를 저장하고 store에 반영한다.
-   *
-   * @param {string} columnField - row 데이터
-   * @param {array} filters - 필터 정보
-   */
-  const onApplyFilter = (columnField, filters) => {
-    filterInfo.filterList[columnField] = filters;
-    stores.filterStore = [];
-    filterInfo.setFiltering = true;
-  };
-  /**
-   * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
-   *
-   * @param {string} search - 검색 키워드
-   * @param {string} origin - 기준 문자열
-   * @returns {boolean} 문자열 내 키워드 존재 유무
-   */
-  const likeSearch = (search, origin) => {
-    if (typeof search !== 'string' || origin === null) {
-      return false;
-    }
-    let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
-    regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
-
-    return RegExp(`^${regx}$`, 'gi').test(origin);
-  };
-  /**
-   * 필터 조건에 따라 문자열을 확인한다.
-   *
-   * @param {array} item - row 데이터
-   * @param {object} condition - 필터 정보
-   * @returns {boolean} 확인 결과
-   */
-  const stringFilter = (item, condition) => {
-    const comparison = condition.comparison;
-    const conditionValue = condition.value;
-    const value = item[ROW_DATA_INDEX][condition.index];
-    let result;
-
-    if (comparison === 'Equal') {
-      result = value === conditionValue;
-    } else if (comparison === 'Not Equal') {
-      result = value !== conditionValue;
-    } else if (comparison === 'Like') {
-      result = likeSearch(`%${conditionValue}%`, value);
-    } else if (comparison === 'Not Like') {
-      result = !likeSearch(`%${conditionValue}%`, value);
-    }
-
-    return result;
-  };
-  /**
-   * 필터 조건에 따라 숫자를 확인한다.
-   *
-   * @param {array} item - row 데이터
-   * @param {object} condition - 필터 정보
-   * @param {string} filterType - 데이터 유형
-   * @returns {boolean} 확인 결과
-   */
-  const numberFilter = (item, condition, filterType) => {
-    const comparison = condition.comparison;
-    const conditionValue = Number(condition.value);
-    let value = Number(item[ROW_DATA_INDEX][condition.index]);
-    let result;
-    if (filterType === 'float') {
-      value = Number(value.toFixed(3));
-    }
-
-    if (comparison === '=') {
-      result = value === conditionValue;
-    } else if (comparison === '>') {
-      result = value > conditionValue;
-    } else if (comparison === '<') {
-      result = value < conditionValue;
-    }
-
-    return result;
-  };
-  /**
-   * 필터 조건이 적용된 데이터를 반환한다.
-   *
-   * @param {array} data - row 데이터
-   * @param {string} filterType - 데이터 유형
-   * @param {object} condition - 필터 정보
-   * @returns {boolean} 확인 결과
-   */
-  const getFilteredData = (data, filterType, condition) => {
-    const filterFn = filterType === 'string' ? stringFilter : numberFilter;
-    const filteredData = [];
-
-    for (let ix = 0; ix < data.length; ix++) {
-      if (filterFn(data[ix], condition, filterType)) {
-        filteredData.push(data[ix]);
-      }
-    }
-
-    return filteredData;
-  };
-  /**
-   * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore에 저장한다.
-   */
-  const setFilter = () => {
-    let field;
-    let index;
-    let filters;
-    let columnType;
-    let filterStore = [];
-    let isAppliedFilter = false;
-    const filterByColumn = filterInfo.filterList;
-    const fields = Object.keys(filterByColumn || {});
-    const store = stores.originStore;
-
-    for (let ix = 0; ix < fields.length; ix++) {
-      field = fields[ix];
-      filters = filterByColumn[field];
-      index = getColumnIndex(field);
-      columnType = props.columns[index].type;
-      for (let jx = 0; jx < filters.length; jx++) {
-        const filterItem = filters[jx];
-        if (filterItem.use) {
-          isAppliedFilter = true;
-          if (!filterStore.length) {
-            filterStore = getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            });
-          } else if (filterItem.type === 'OR') {
-            filterStore.push(...getFilteredData(store, columnType, {
-              ...filterItem,
-              index,
-            }));
-          } else {
-            filterStore = getFilteredData(filterStore, columnType, {
-              ...filterItem,
-              index,
-            });
-          }
-        }
-      }
-    }
-
-    if (!isAppliedFilter) {
-      stores.filterStore = store;
-    } else {
-      stores.filterStore = uniqBy(filterStore, JSON.stringify);
-    }
-  };
   let timer = null;
   const onSearch = (searchWord) => {
     if (timer) {
@@ -825,12 +646,16 @@ export const filterEvent = (params) => {
       updateVScroll();
     }, 500);
   };
-  return { onClickFilter, onCloseFilterWindow, onApplyFilter, setFilter, onSearch };
+  return { onSearch };
 };
 
 export const contextMenuEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { contextInfo, stores, filterInfo, selectInfo, setStore } = params;
+  const {
+    contextInfo,
+    stores,
+    selectInfo,
+  } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
    *
@@ -856,17 +681,6 @@ export const contextMenuEvent = (params) => {
       menuItems.push(...customItems);
     }
 
-    if (filterInfo.useFilter) {
-      menuItems.push({
-        text: filterInfo.isFiltering ? 'Filter Off' : 'Filter On',
-        iconClass: 'ev-icon-filter',
-        click: () => {
-          filterInfo.isFiltering = !filterInfo.isFiltering;
-          stores.filterStore = [];
-          setStore([], false);
-        },
-      });
-    }
     contextInfo.contextMenuItems = menuItems;
   };
   /**
@@ -903,10 +717,8 @@ export const storeEvent = (params) => {
     checkInfo,
     stores,
     sortInfo,
-    filterInfo,
     elementInfo,
     setSort,
-    setFilter,
     updateVScroll,
   } = params;
   /**
@@ -932,9 +744,6 @@ export const storeEvent = (params) => {
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       stores.originStore = store;
-    }
-    if (filterInfo.isFiltering) {
-      setFilter();
     }
     if (sortInfo.sortField) {
       setSort();
