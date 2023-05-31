@@ -182,11 +182,11 @@ const modules = {
 
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
-        const eventTime = Math.floor(item.x / 1000) * 1000;
+        const xAxisTime = Math.floor(item.x / 1000) * 1000;
 
-        if (this.dataSet[key].fromTime <= eventTime) {
+        if (this.dataSet[key].fromTime <= xAxisTime) {
           let index = this.dataSet[key].endIndex
-          - (this.dataSet[key].toTime - eventTime) / 1000;
+          - (this.dataSet[key].toTime - xAxisTime) / 1000;
           if (index < 0) {
             index = this.dataSet[key].length + index;
           }
