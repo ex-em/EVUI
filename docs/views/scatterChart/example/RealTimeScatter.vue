@@ -96,7 +96,7 @@ export default {
       },
     });
 
-    let customIntervalId;
+    let timeoutId;
 
     let isInit = true;
     const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -170,19 +170,19 @@ export default {
 
     const tick = () => {
       setDataHandler();
-      customIntervalId = setTimeout(tick, 3000);
+      timeoutId = setTimeout(tick, 3000);
     };
 
     watch(() => isRealTime.value, () => {
       if (isRealTime.value) {
-        customIntervalId = setTimeout(tick, 3000);
+        timeoutId = setTimeout(tick, 3000);
       } else {
-        clearTimeout(customIntervalId);
+        clearTimeout(timeoutId);
       }
     }, { immediate: true });
 
     onUnmounted(() => {
-      clearTimeout(customIntervalId);
+      clearTimeout(timeoutId);
     });
 
     return {
