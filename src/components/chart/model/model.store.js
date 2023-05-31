@@ -1,4 +1,5 @@
 import { reverse } from 'lodash-es';
+import dayjs from 'dayjs';
 import Util from '../helpers/helpers.util';
 
 const modules = {
@@ -58,6 +59,185 @@ const modules = {
           });
         }
       }
+    });
+  },
+
+  /**
+   * Take chart data and create a two-dimensional array, specify max/min and delete/add over time.
+   * @param {object}  datas    chart series info
+   *
+   * @returns {undefined}
+   */
+  createRealTimeScatterDataSet(datas) {
+    const keys = Object.keys(datas);
+
+    if (!this.isInit) {
+      this.dataSet = {};
+    }
+
+    const minMaxValues = {
+      maxY: 0,
+      minY: Infinity,
+      fromTime: 0,
+      toTime: 0,
+    };
+
+    for (let x = 0; x < keys.length; x++) {
+      const key = keys[x];
+      const data = datas[key];
+      const storeLength = data.length;
+      let lastTime = 0;
+
+      if (!this.isInit) {
+        this.dataSet[key] = {
+          dataGroup: [],
+          startIndex: 0,
+          endIndex: 0,
+          length: 0,
+          fromTime: 0,
+          toTime: 0,
+        };
+        this.dataSet[key].length = this.options.realTimeScatter.range || 300;
+        this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
+        this.dataSet[key].fromTime = this.dataSet[key].toTime
+          - this.dataSet[key].length * 1000;
+        this.dataSet[key].endIndex = this.dataSet[key].length - 1;
+      }
+
+      for (let i = 0; i < storeLength; i++) {
+        const item = data[i];
+
+        if (lastTime < item.x) {
+          lastTime = item.x;
+        }
+      }
+
+      lastTime = Math.floor(lastTime / 1000) * 1000;
+      if (
+        (this.dataSet[key].toTime - lastTime) / 1000
+        > this.dataSet[key].length && key === ''
+      ) {
+        return;
+      }
+
+      let gapCount = (lastTime - this.dataSet[key].toTime) / 1000;
+      if (gapCount > 0) {
+        this.dataSet[key].toTime = lastTime;
+        this.dataSet[key].fromTime = lastTime
+          - this.dataSet[key].length * 1000;
+      }
+
+      if (!this.isInit) {
+        for (let i = 0; i < this.dataSet[key].length; i++) {
+          this.dataSet[key].dataGroup[i] = {
+            data: [],
+            max: 0,
+            min: Infinity,
+          };
+        }
+      } else if (gapCount > 0) {
+        if (gapCount >= this.dataSet[key].length) {
+          for (let i = 0; i < this.dataSet[key].length; i++) {
+            this.dataSet[key].dataGroup[i].data.length = 0;
+            this.dataSet[key].dataGroup[i].max = 0;
+            this.dataSet[key].dataGroup[i].min = Infinity;
+          }
+
+          this.dataSet[key].startIndex = 0;
+          this.dataSet[key].endIndex = this.dataSet[key].length - 1;
+        } else {
+          while (gapCount > 0) {
+            if (
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex]
+               === null
+            ) {
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex] = {
+                data: [],
+                max: 0,
+                min: Infinity,
+              };
+            } else {
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].data.length = 0;
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].max = 0;
+              this.dataSet[key]
+                .dataGroup[this.dataSet[key].startIndex].min = Infinity;
+            }
+
+            ++this.dataSet[key].startIndex;
+
+            if (this.dataSet[key].startIndex >= this.dataSet[key].length) {
+              this.dataSet[key].startIndex = 0;
+            }
+
+            ++this.dataSet[key].endIndex;
+            if (this.dataSet[key].endIndex >= this.dataSet[key].length) {
+              this.dataSet[key].endIndex = 0;
+            }
+            --gapCount;
+          }
+        }
+      }
+
+      for (let i = 0; i < storeLength; i++) {
+        const item = data[i];
+        const xAxisTime = Math.floor(item.x / 1000) * 1000;
+
+        if (this.dataSet[key].fromTime <= xAxisTime) {
+          let index = this.dataSet[key].endIndex
+          - (this.dataSet[key].toTime - xAxisTime) / 1000;
+          if (index < 0) {
+            index = this.dataSet[key].length + index;
+          }
+
+          this.dataSet[key].dataGroup[index].data.push({
+            x: item.x,
+            y: item.y,
+            color: item.color,
+          });
+
+          this.dataSet[key].dataGroup[index].max = Math.max(
+            this.dataSet[key].dataGroup[index].max,
+            item.y,
+          );
+          this.dataSet[key].dataGroup[index].min = Math.min(
+            this.dataSet[key].dataGroup[index].min,
+            item.y,
+          );
+        }
+      }
+
+      const tempMinMax = {
+        maxY: 0,
+        minY: Infinity,
+      };
+
+      for (let i = 0; i < this.dataSet[key].length; i++) {
+        if (this.dataSet[key].dataGroup[i].max > tempMinMax.maxY) {
+          tempMinMax.maxY = this.dataSet[key].dataGroup[i].max;
+        }
+
+        if (this.dataSet[key].dataGroup[i].min < tempMinMax.minY) {
+          tempMinMax.minY = this.dataSet[key].dataGroup[i].min;
+        }
+      }
+
+      minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
+      minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
+      minMaxValues.fromTime = this.dataSet[key].fromTime;
+      minMaxValues.toTime = this.dataSet[key].toTime;
+    }
+
+    this.seriesInfo.charts.scatter.forEach((seriesID) => {
+      const series = this.seriesList[seriesID];
+      series.data = this.dataSet;
+      series.minMax = {
+        minX: dayjs(minMaxValues.fromTime),
+        minY: minMaxValues.minY,
+        maxX: dayjs(minMaxValues.toTime),
+        maxY: minMaxValues.maxY,
+      };
     });
   },
 

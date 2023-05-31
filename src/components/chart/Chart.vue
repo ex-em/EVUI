@@ -127,9 +127,13 @@
           selected = selectSeriesInfo;
         }
 
+        const chartData = props.options.realTimeScatter?.use
+          ? { ...props.data, groups: [], labels: [] }
+          : normalizedData;
+
         evChart = new EvChart(
           wrapper.value,
-          normalizedData,
+          chartData,
           normalizedOptions,
           eventListeners,
           selectItemInfo,
@@ -166,14 +170,16 @@
       }, { deep: true, flush: 'post' });
 
       watch(() => props.data, (chartData) => {
-        const newData = getNormalizedData(chartData);
+        const newData = props.options.realTimeScatter?.use
+          ? { ...chartData, groups: [], labels: [] }
+          : getNormalizedData(chartData);
         const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
             || !isEqual(newData.groups, evChart.data.groups)
             || props.options.type === 'heatMap';
 
         const isUpdateData = !isEqual(newData, evChart.data);
 
-        evChart.data = cloneDeep(newData);
+        evChart.data = props.options.realTimeScatter?.use ? newData : cloneDeep(newData);
 
         evChart.update({
           updateSeries: isUpdateSeries,

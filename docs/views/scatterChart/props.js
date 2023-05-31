@@ -10,6 +10,8 @@ import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from '!!raw-loader!./example/DisplayOverflow';
+import RealTimeScatter from './example/RealTimeScatter';
+import RealTimeScatterRaw from '!!raw-loader!./example/RealTimeScatter';
 
 export default {
   mdText,
@@ -38,6 +40,11 @@ export default {
       description: 'range 옵션으로 지정한 Y축의 최댓값을 표시합니다.',
       component: DisplayOverflow,
       parsedData: parseComponent(DisplayOverflowRaw),
+    },
+    RealTimeScatter: {
+      description: '실시간으로 대량의 데이터를 처리합니다.',
+      component: RealTimeScatter,
+      parsedData: parseComponent(RealTimeScatterRaw),
     },
   },
 };

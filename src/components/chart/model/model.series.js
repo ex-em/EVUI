@@ -72,7 +72,7 @@ const modules = {
       return new Line(id, opt, index);
     } else if (type === 'scatter') {
       this.seriesInfo.charts.scatter.push(id);
-      return new Scatter(id, opt, index);
+      return new Scatter(id, opt, index, this.options.realTimeScatter?.use);
     } else if (type === 'bar') {
       this.seriesInfo.charts.bar.push(id);
 
