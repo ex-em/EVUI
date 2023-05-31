@@ -27,6 +27,24 @@ class Scatter {
   }
 
   /**
+   * Draw series data
+   * @param {object} param     object for drawing series data
+   *
+   * @returns {undefined}
+   */
+  draw(param) {
+    if (!this.show) {
+      return;
+    }
+
+    if (this.realTimeScatter) {
+      this.realTimeScatterDraw(param);
+    } else {
+      this.defaultScatterDraw(param);
+    }
+  }
+
+  /**
    * Calculate opacity for a data item in the series.
    * @param {object} param - The parameter object passed to the draw function.
    * @param {string} colorStr - The color string of the item.
@@ -148,24 +166,6 @@ class Scatter {
           }
         }
       }
-    }
-  }
-
-  /**
-   * Draw series data
-   * @param {object} param     object for drawing series data
-   *
-   * @returns {undefined}
-   */
-  draw(param) {
-    if (!this.show) {
-      return;
-    }
-
-    if (this.realTimeScatter) {
-      this.realTimeScatterDraw(param);
-    } else {
-      this.defaultScatterDraw(param);
     }
   }
 
