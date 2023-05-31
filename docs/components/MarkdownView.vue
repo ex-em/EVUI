@@ -346,6 +346,7 @@ export default {
 .markdown h6 {
   margin-bottom: 0;
   margin-top: 0;
+  scroll-margin-top: 80px;
 }
 
 .markdown h1 {
