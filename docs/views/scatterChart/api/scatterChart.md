@@ -68,7 +68,8 @@ const chartData =
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
-  | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | 
+  | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | |
+  | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -239,6 +240,14 @@ const chartOptions = {
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상  | |
 | tipStyle | Object | ([상세](#tipstyle)) | tip 스타일을 설정
 | useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |
+
+#### realTimeScatter
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | 실시간 데이터 처리 여부  | |
+| range | Number | 300 | 현재 시간을 기점으로 초단위로 범위 설정 | 300일 경우: -5분 ~ 현재 |
+* [axesX](#axesx-axesy)의 type(축의 유형)이 'time'이여야 합니다.
+* 페이지단에서 chartData를 shallowRef / shallowReactive로 선언해야 합니다.
 
 ##### etc.
 | 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
