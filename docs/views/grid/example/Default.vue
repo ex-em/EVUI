@@ -22,7 +22,6 @@
         useSelection: {
           use: useSelectionMV,
           multiple: isSelectionMultiple,
-          limitCount: limitMV,
         },
         style: {
           stripe: stripeMV,
@@ -79,16 +78,6 @@
         </span>
         <ev-toggle
           v-model="isSelectionMultiple"
-        />
-        <span class="badge yellow">
-          Limit Count
-        </span>
-        <ev-select
-          v-model="limitMV"
-          :items="limitItems"
-          :style="{ width: '200px' }"
-          clearable
-          placeholder="Please select value."
         />
       </div>
       <div class="form-rows">
@@ -258,17 +247,6 @@ export default {
         value: 'rows',
       },
     ]);
-    const limitMV = ref(2);
-    const limitItems = ref([
-      {
-        name: '2',
-        value: 2,
-      },
-      {
-        name: '4',
-        value: 4,
-      },
-    ]);
     const columns = ref([
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
       { caption: 'Role', field: 'role', type: 'string', width: 100 },
@@ -359,8 +337,6 @@ export default {
       pageInfo,
       isSelectionMultiple,
       useSelectionMV,
-      limitMV,
-      limitItems,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,

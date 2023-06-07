@@ -388,11 +388,6 @@ export default {
     const selectInfo = reactive({
       selectedRow: props.selected,
       useSelect: computed(() => props.option?.useSelection?.use ?? true),
-      limitCount: computed(() => {
-        let limit = props.option?.useSelection?.limitCount;
-        limit = !!limit && limit >= 2 ? limit : 0;
-        return limit;
-      }),
       multiple: computed(() => props.option?.useSelection?.multiple ?? false),
     });
     const sortInfo = reactive({

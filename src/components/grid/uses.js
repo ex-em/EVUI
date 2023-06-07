@@ -365,7 +365,8 @@ export const clickEvent = (params) => {
     timer = setTimeout(() => {
       if (selectInfo.useSelect) {
         const rowData = row[ROW_DATA_INDEX];
-        if (row[ROW_SELECT_INDEX]) {
+        const selected = row[ROW_SELECT_INDEX];
+        if (selected) {
           row[ROW_SELECT_INDEX] = false;
           if (selectInfo.multiple) {
             if (event.ctrlKey) {
@@ -378,9 +379,7 @@ export const clickEvent = (params) => {
           }
         } else {
           row[ROW_SELECT_INDEX] = true;
-          if (event.ctrlKey
-            && selectInfo.multiple
-            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
+          if (selectInfo.multiple && event.ctrlKey) {
             selectInfo.selectedRow.push(rowData);
           } else {
             selectInfo.selectedRow = [rowData];
