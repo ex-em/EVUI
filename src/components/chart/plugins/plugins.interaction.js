@@ -15,7 +15,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseMove = (e) => {
-      if (this.dragInfo?.isMove) {
+      if (this.dragInfo?.isMove || this.options.touchSelection?.use) {
         return;
       }
 
@@ -80,13 +80,13 @@ const modules = {
      */
 
     this.onMouseLeave = () => {
-      const { tooltip, dragSelection } = this.options;
+      const { tooltip, dragSelection, touchSelection } = this.options;
 
       if (tooltip.throttledMove) {
         this.onMouseMove.cancel();
       }
 
-      if (!dragSelection.use || !dragSelection.keepDisplay) {
+      if ((!dragSelection.use || !dragSelection.keepDisplay) && !touchSelection?.use) {
         this.overlayClear();
       }
 
@@ -265,19 +265,45 @@ const modules = {
           break;
         }
 
-        case 'pie':
+        case 'pie': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          }
+
+          break;
+        }
+
         case 'scatter': {
           if (useSelectItem) {
             setSelectedItemInfo();
           }
+
+          if (this.options.touchSelection?.use && e.pointerType !== 'mouse') {
+            let touchInfo = this.setTouchInfo(e);
+            this.overlayClear();
+
+            if (e.layerX < touchInfo.range.x1
+              || e.layerY < touchInfo.range.y1
+              || e.layerX > touchInfo.range.x2
+              || e.layerY > touchInfo.range.y2) {
+              this.isOverlay = false;
+            } else {
+              touchInfo = this.setTouchBoxDimensions(touchInfo);
+              this.isOverlay = true;
+              this.drawSelectionArea(touchInfo);
+            }
+
+            args.touchInfo = touchInfo;
+            args.touchData = this.findSelectedItems(touchInfo);
+            args.touchRange = this.getSelectionRange(touchInfo, 'touch');
+          }
+
           break;
         }
       }
 
-      if (typeof this.listeners.click === 'function') {
-        if (!this.dragInfoBackup) {
-          this.listeners.click(args);
-        }
+      if (typeof this.listeners.click === 'function' && !this.dragInfoBackup) {
+        this.listeners.click(args);
       }
     };
 
@@ -313,6 +339,8 @@ const modules = {
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
     this.overlayCanvas.addEventListener('click', this.onClick);
     this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
+
+    window.addEventListener('click', e => this.touchSelectionDestroy(e));
   },
 
   /**
@@ -469,7 +497,11 @@ const modules = {
    */
   drawSelectionArea({ xsp, ysp, width, height }) {
     const ctx = this.overlayCtx;
-    const { fillColor, opacity } = this.options.dragSelection;
+    const curFeature = this.options.dragSelection?.use
+      ? this.options.dragSelection
+      : this.options.touchSelection;
+
+    const { fillColor, opacity } = curFeature;
 
     ctx.fillStyle = fillColor;
     ctx.globalAlpha = opacity;
@@ -549,6 +581,95 @@ const modules = {
     }
 
     return curMouseTargetVal;
+  },
+
+  /**
+   * Processes touch event to determine touch position within the chart.
+   *
+   * @param {TouchEvent} event - the touch event to process
+   * @returns {object} - the processed touch information
+   */
+  setTouchInfo(event) {
+    let [offsetX, offsetY] = this.getMousePosition(event);
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const range = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
+    offsetX = Math.max(range.x1, Math.min(offsetX, range.x2));
+    offsetY = Math.max(range.y1, Math.min(offsetY, range.y2));
+
+    return {
+      xcp: offsetX,
+      ycp: offsetY,
+      range,
+    };
+  },
+
+  /**
+   * Adjusts the touch box dimensions based on the provided touch information.
+   *
+   * @param {object} touchInfo - The touch information including touch position and plotting range
+   * @returns {object} - The adjusted touch information
+   */
+  setTouchBoxDimensions(touchInfo) {
+    const boxSize = this.options.touchSelection?.size || 50;
+    const halfBoxSize = boxSize / 2;
+    const { xcp, ycp, range } = touchInfo;
+    let xsp = xcp - halfBoxSize;
+    let ysp = ycp - halfBoxSize;
+    let width = boxSize;
+    let height = boxSize;
+
+    this.boxOverflow = {
+      x1: false,
+      x2: false,
+      y1: false,
+      y2: false,
+    };
+
+    if (xcp < range.x1 + halfBoxSize) {
+      xsp = range.x1;
+      width = halfBoxSize - (range.x1 - xcp);
+      this.boxOverflow.x1 = true;
+    }
+    if (xcp > range.x2 - halfBoxSize) {
+      width = halfBoxSize - (xcp - range.x2);
+      this.boxOverflow.x2 = true;
+    }
+    if (ycp < range.y1 + halfBoxSize) {
+      ysp = range.y1;
+      height = halfBoxSize - (range.y1 - ycp);
+      this.boxOverflow.y1 = true;
+    }
+    if (ycp > range.y2 - halfBoxSize) {
+      height = halfBoxSize - (ycp - range.y2);
+      this.boxOverflow.y2 = true;
+    }
+
+    touchInfo.xsp = xsp;
+    touchInfo.ysp = ysp;
+    touchInfo.width = width;
+    touchInfo.height = height;
+
+    return touchInfo;
+  },
+
+  /**
+   * Handles the termination of a touch selection.
+   *
+   * @param {TouchEvent} e - the touch event to process
+   * @returns {undefined}
+   */
+  touchSelectionDestroy(e) {
+    if (this.options.touchSelection?.use && e.target !== this.overlayCanvas && this.isOverlay) {
+      this.isOverlay = false;
+      this.overlayClear();
+    }
   },
 
   /**
@@ -934,7 +1055,7 @@ const modules = {
    *                 object.range: coordinate-based range in graph
    * @returns {object}
    */
-  getSelectionRange({ xsp, ysp, width, height, range }) {
+  getSelectionRange({ xsp, ysp, width, height, range }, type) {
     const dataRangeX = this.axesSteps.x.length ? this.axesSteps.x[0] : null;
     const dataRangeY = this.axesSteps.y.length ? this.axesSteps.y[0] : null;
 
@@ -952,16 +1073,24 @@ const modules = {
     const yMinRatio = this.getRatioInRange(range.y1, range.y2, yep);
     const yMaxRatio = this.getRatioInRange(range.y1, range.y2, ysp);
 
-    const xMin = dataRangeX.graphMin + graphWidth * xMinRatio;
-    const xMax = dataRangeX.graphMin + graphWidth * xMaxRatio;
-    const yMin = dataRangeY.graphMin + graphHeight * (1 - yMinRatio);
-    const yMax = dataRangeY.graphMin + graphHeight * (1 - yMaxRatio);
+    const xMin = type === 'touch' && this.boxOverflow?.x1
+      ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
+      : Math.max(dataRangeX.graphMin + graphWidth * xMinRatio, dataRangeX.graphMin);
+    const xMax = type === 'touch' && this.boxOverflow?.x2
+      ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
+      : Math.min(dataRangeX.graphMin + graphWidth * xMaxRatio, dataRangeX.graphMax);
+    const yMin = type === 'touch' && this.boxOverflow?.y2
+      ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
+      : Math.max(dataRangeY.graphMin + graphHeight * (1 - yMinRatio), dataRangeY.graphMin);
+    const yMax = type === 'touch' && this.boxOverflow?.y1
+      ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
+      : Math.min(dataRangeY.graphMin + graphHeight * (1 - yMaxRatio), dataRangeY.graphMax);
 
     return {
-      xMin: Math.max(+parseFloat(xMin).toFixed(3), dataRangeX.graphMin),
-      xMax: Math.min(+parseFloat(xMax).toFixed(3), dataRangeX.graphMax),
-      yMin: Math.max(+parseFloat(yMin).toFixed(3), dataRangeY.graphMin),
-      yMax: Math.min(+parseFloat(yMax).toFixed(3), dataRangeY.graphMax),
+      xMin: +xMin.toFixed(3),
+      xMax: +xMax.toFixed(3),
+      yMin: +yMin.toFixed(3),
+      yMax: +yMax.toFixed(3),
     };
   },
 

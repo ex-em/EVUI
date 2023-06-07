@@ -65,6 +65,7 @@ const chartData =
   | title | Object | ([상세](#title)) | 차트 상단에 위치할 차트 제목 표시 여부 및 속성 |  |
   | legend | Object | ([상세](#legend)) | 차트의 범례 표시 여부 및 속성 |  |
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
+  | touchSelection | Object | ([상세](#touchselection)) | touch-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
@@ -183,6 +184,14 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | drag-select 사용 여부 | true / false |
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
+| fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
+| opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
+
+#### touchSelection
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+| --- | ---- | ----- | --- | ----------|
+| use | Boolean | false | drag-select 사용 여부 | true / false |
+| size | number | 50 | 선택 영역 크기 | |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 

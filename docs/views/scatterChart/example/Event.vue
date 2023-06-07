@@ -128,6 +128,12 @@
         tooltip: {
           use: true,
         },
+        touchSelection: {
+          use: true,
+          size: 50,
+          fillColor: '#38ACEC',
+          opacity: 0.65,
+        },
       };
 
       const selectionItems = ref([]);
@@ -145,12 +151,18 @@
       };
 
       const clickedInfo = ref(null);
-      const onClick = ({ e, label, value, sId }) => {
+      const onClick = ({ e, label, value, sId, touchData, touchRange }) => {
         clickedInfo.value = { e, label, value, sId };
 
         // Clear drag selection info
         selectionItems.value = [];
         selectionRange.value = {};
+
+        if (e.pointerType !== 'mouse') {
+          clickedInfo.value = null;
+          selectionItems.value = touchData;
+          selectionRange.value = touchRange;
+        }
       };
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');
