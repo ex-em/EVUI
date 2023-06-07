@@ -362,7 +362,7 @@ export const clickEvent = (params) => {
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
       return false;
     }
-    const onKeyPress = (keyType, selected, selectedRow) => {
+    const onMultiSelectByKey = (keyType, selected, selectedRow) => {
       if (keyType === 'ctrl') { // ctrl
         if (selected) {
           selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
@@ -412,7 +412,7 @@ export const clickEvent = (params) => {
         }
 
         if (selectInfo.multiple) { // multi select
-          onKeyPress(keyType, selected, rowData);
+          onMultiSelectByKey(keyType, selected, rowData);
         } else if (selected) { // single select
           selectInfo.selectedRow = [];
         } else {
