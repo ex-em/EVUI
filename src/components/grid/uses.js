@@ -361,29 +361,41 @@ export const clickEvent = (params) => {
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
       return false;
     }
+    const onKeyPress = (keyType, selected, selectedRow) => {
+      if (keyType === 'ctrl') { // ctrl
+        if (selected) {
+          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+        } else {
+          selectInfo.selectedRow.push(selectedRow);
+        }
+      } else if (!keyType) {
+        if (selected) {
+          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+        } else {
+          selectInfo.selectedRow = [selectedRow];
+        }
+      }
+    };
+
     clearTimeout(timer);
     timer = setTimeout(() => {
       if (selectInfo.useSelect) {
         const rowData = row[ROW_DATA_INDEX];
         const selected = row[ROW_SELECT_INDEX];
-        if (selected) {
-          row[ROW_SELECT_INDEX] = false;
-          if (selectInfo.multiple) {
-            if (event.ctrlKey) {
-              selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
-            } else {
-              selectInfo.selectedRow = [rowData];
-            }
-          } else {
-            selectInfo.selectedRow = [];
-          }
+        row[ROW_SELECT_INDEX] = !row[ROW_SELECT_INDEX];
+        let keyType = '';
+        if (event.shiftKey) {
+          keyType = 'shift';
+        } else if (event.ctrlKey) {
+          keyType = 'ctrl';
+        }
+
+        if (selectInfo.multiple) { // 멀티 선택
+          onKeyPress(keyType, selected, rowData);
+        } else if (selected) {
+          selectInfo.selectedRow = [];
         } else {
-          row[ROW_SELECT_INDEX] = true;
-          if (selectInfo.multiple && event.ctrlKey) {
-            selectInfo.selectedRow.push(rowData);
-          } else {
-            selectInfo.selectedRow = [rowData];
-          }
+          selectInfo.selectedRow = [rowData];
         }
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
