@@ -363,13 +363,7 @@ export const clickEvent = (params) => {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
-      if (keyType === 'ctrl') { // ctrl
-        if (selected) {
-          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
-        } else {
-          selectInfo.selectedRow.push(selectedRow);
-        }
-      } else if (keyType === 'shift') { // shift
+      if (keyType === 'shift') { // shift
         const rowIndex = row[ROW_INDEX];
         if (lastIndex > -1) {
           for (
@@ -379,7 +373,9 @@ export const clickEvent = (params) => {
           ) {
             if (!selected) {
               stores.originStore[i][ROW_SELECT_INDEX] = true;
-              selectInfo.selectedRow.push(stores.originStore[i][ROW_DATA_INDEX]);
+              if (lastIndex !== i) {
+                selectInfo.selectedRow.push(stores.originStore[i][ROW_DATA_INDEX]);
+              }
             } else {
               stores.originStore[i][ROW_SELECT_INDEX] = false;
               const deselectedIndex = selectInfo.selectedRow
@@ -389,12 +385,10 @@ export const clickEvent = (params) => {
             }
           }
         }
-      } else if (!keyType) { // default
-        if (selected) {
-          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
-        } else {
-          selectInfo.selectedRow.push(selectedRow);
-        }
+      } else if (selected) {
+        selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+      } else {
+        selectInfo.selectedRow.push(selectedRow);
       }
     };
 
