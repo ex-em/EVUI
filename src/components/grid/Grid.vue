@@ -457,7 +457,7 @@ export default {
     const {
       onRowClick,
       onRowDblClick,
-    } = clickEvent({ selectInfo });
+    } = clickEvent({ selectInfo, stores });
 
     const {
       onCheck,

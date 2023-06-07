@@ -332,7 +332,7 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { selectInfo } = params;
+  const { selectInfo, stores } = params;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -356,6 +356,7 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   let timer = null;
+  let lastIndex = -1;
   const onRowClick = (event, row) => {
     if (event.target && event.target.parentElement
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
@@ -368,11 +369,31 @@ export const clickEvent = (params) => {
         } else {
           selectInfo.selectedRow.push(selectedRow);
         }
-      } else if (!keyType) {
+      } else if (keyType === 'shift') { // shift
+        const rowIndex = row[ROW_INDEX];
+        if (lastIndex > -1) {
+          for (
+            let i = Math.min(rowIndex, lastIndex);
+            i <= Math.max(rowIndex, lastIndex);
+            i++
+          ) {
+            if (!selected) {
+              stores.originStore[i][ROW_SELECT_INDEX] = true;
+              selectInfo.selectedRow.push(stores.originStore[i][ROW_DATA_INDEX]);
+            } else {
+              stores.originStore[i][ROW_SELECT_INDEX] = false;
+              const deselectedIndex = selectInfo.selectedRow
+                .findIndex(
+                  sr => sr === stores.originStore[i][ROW_DATA_INDEX]);
+              selectInfo.selectedRow.splice(deselectedIndex, 1);
+            }
+          }
+        }
+      } else if (!keyType) { // default
         if (selected) {
           selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
         } else {
-          selectInfo.selectedRow = [selectedRow];
+          selectInfo.selectedRow.push(selectedRow);
         }
       }
     };
@@ -390,13 +411,14 @@ export const clickEvent = (params) => {
           keyType = 'ctrl';
         }
 
-        if (selectInfo.multiple) { // 멀티 선택
+        if (selectInfo.multiple) { // multi select
           onKeyPress(keyType, selected, rowData);
-        } else if (selected) {
+        } else if (selected) { // single select
           selectInfo.selectedRow = [];
         } else {
           selectInfo.selectedRow = [rowData];
         }
+        lastIndex = row[ROW_INDEX];
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
       }
