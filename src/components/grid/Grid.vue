@@ -87,20 +87,23 @@
               <span
                 :title="column.caption"
                 class="column-name"
-                @click.stop="onSort(column)"
               >
                 {{ column.caption }}
                 <!-- Sort Icon -->
-                <template v-if="sortField === column.field">
-                  <ev-icon
-                    v-if="sortOrder === 'desc'"
-                    icon="ev-icon-triangle-down"
+                <span @click.stop="onSort(column)">
+                  <span
+                    class="icon-sort icon-sort--basic"
                   />
-                  <ev-icon
-                    v-if="sortOrder === 'asc'"
-                    icon="ev-icon-triangle-up"
-                  />
-                </template>
+                  <template v-if="sortField === column.field">
+                    <span
+                      :class="[
+                        'icon-sort',
+                        { 'icon-sort--desc': sortOrder === 'desc' },
+                        { 'icon-sort--asc': sortOrder === 'asc' },
+                      ]"
+                    />
+                  </template>
+                </span>
               </span>
               <!-- Column Resize -->
               <span
@@ -406,7 +409,7 @@ export default {
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
-      minWidth: 40,
+      minWidth: 60,
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
@@ -750,4 +753,30 @@ export default {
 
 <style lang="scss" scoped>
   @import 'style/grid.scss';
+  .icon-sort {
+    position: absolute;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    transform: translateY(-50%);
+    &:hover {
+      cursor: pointer;
+    }
+    &--basic {
+      visibility: hidden;
+      background: url('../../../docs/assets/images/icon-sort.svg') no-repeat center center;
+    }
+    &--asc {
+      background: url('../../../docs/assets/images/icon-sort-asc.svg') no-repeat center center;
+    }
+    &--desc {
+      background: url('../../../docs/assets/images/icon-sort-desc.svg') no-repeat center center;
+    }
+  }
+  .column:hover {
+    .icon-sort--basic {
+      visibility: visible;
+    }
+  }
 </style>
