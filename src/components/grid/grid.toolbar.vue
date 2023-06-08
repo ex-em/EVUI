@@ -24,4 +24,12 @@ export default {
 .gridToolbar > .ev-button {
   margin: 0 2px 0 2px;
 }
+.gridToolbar > .column-setting__icon {
+  float: right;
+  width: 24px;
+  height: 24px;
+  margin-top: 5px;
+  cursor: pointer;
+  background: url('../../../docs/assets/images/icon-option.svg') no-repeat center center;
+}
 </style>

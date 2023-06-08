@@ -609,6 +609,7 @@ export const sortEvent = (params) => {
 
 export const filterEvent = (params) => {
   const {
+    columnSettingInfo,
     filterInfo,
     stores,
     checkInfo,
@@ -630,9 +631,13 @@ export const filterEvent = (params) => {
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
+          const rowData = columnSettingInfo.isFilteringColumn ? row[ROW_DATA_INDEX]
+              .filter((data, idx) => columnSettingInfo.visibleColumnIdx
+                .includes(idx)) : row[ROW_DATA_INDEX];
+
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = row[ROW_DATA_INDEX][ix] ?? null;
+            let columnValue = rowData[ix] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
               if (typeof columnValue === 'object') {
@@ -840,4 +845,47 @@ export const pagingEvent = (params) => {
     updatePagingInfo({ onChangePage: true });
   };
   return { getPagingData, updatePagingInfo, changePage };
+};
+
+export const columnSettingEvent = (params) => {
+  const { props } = getCurrentInstance();
+  const {
+    stores,
+    columnSettingInfo,
+    calculatedColumn,
+    onSearch,
+  } = params;
+  const setColumnSetting = () => {
+    columnSettingInfo.isShowColumnSetting = true;
+  };
+  const onApplyColumn = (columns) => {
+    stores.filteredColumns = props.columns
+    .filter(cur => columns.includes(cur.field))
+    .map((cur, index) => ({
+      index,
+      ...cur,
+    }));
+
+    // 컬럼 너비 다시 계산
+    calculatedColumn();
+
+    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(column => column.index);
+    const originColumnIdx = stores.originColumns.map(column => column.index);
+    const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
+    columnSettingInfo.isFilteringColumn = visibleColumnIdx !== originColumnIdx.length;
+
+    // 컬럼을 필터링했을 때, 검색어가 있는 경우 재검색
+    if (props.option.searchValue) {
+      onSearch(props.option.searchValue);
+    }
+  };
+
+  const setColumnHidden = (val) => {
+    const columns = columnSettingInfo.isFilteringColumn
+      ? stores.filteredColumns : stores.originColumns;
+    stores.filteredColumns = columns.filter(column => column.field !== val);
+    columnSettingInfo.hiddenColumn = val;
+  };
+
+  return { setColumnSetting, onApplyColumn, setColumnHidden };
 };
