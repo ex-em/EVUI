@@ -332,7 +332,7 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { selectInfo } = params;
+  const { selectInfo, stores } = params;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -356,36 +356,63 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   let timer = null;
+  let lastIndex = -1;
   const onRowClick = (event, row) => {
     if (event.target && event.target.parentElement
       && event.target.parentElement.classList.contains('row-checkbox-input')) {
       return false;
     }
+    const onMultiSelectByKey = (keyType, selected, selectedRow) => {
+      if (keyType === 'shift') { // shift
+        const rowIndex = row[ROW_INDEX];
+        if (lastIndex > -1) {
+          for (
+            let i = Math.min(rowIndex, lastIndex);
+            i <= Math.max(rowIndex, lastIndex);
+            i++
+          ) {
+            if (!selected) {
+              stores.originStore[i][ROW_SELECT_INDEX] = true;
+              if (lastIndex !== i) {
+                selectInfo.selectedRow.push(stores.originStore[i][ROW_DATA_INDEX]);
+              }
+            } else {
+              stores.originStore[i][ROW_SELECT_INDEX] = false;
+              const deselectedIndex = selectInfo.selectedRow
+                .findIndex(
+                  sr => sr === stores.originStore[i][ROW_DATA_INDEX]);
+              selectInfo.selectedRow.splice(deselectedIndex, 1);
+            }
+          }
+        }
+      } else if (selected) {
+        selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+      } else {
+        selectInfo.selectedRow.push(selectedRow);
+      }
+    };
+
     clearTimeout(timer);
     timer = setTimeout(() => {
       if (selectInfo.useSelect) {
         const rowData = row[ROW_DATA_INDEX];
-        if (row[ROW_SELECT_INDEX]) {
-          row[ROW_SELECT_INDEX] = false;
-          if (selectInfo.multiple) {
-            if (event.ctrlKey) {
-              selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
-            } else {
-              selectInfo.selectedRow = [rowData];
-            }
-          } else {
-            selectInfo.selectedRow = [];
-          }
-        } else {
-          row[ROW_SELECT_INDEX] = true;
-          if (event.ctrlKey
-            && selectInfo.multiple
-            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
-            selectInfo.selectedRow.push(rowData);
-          } else {
-            selectInfo.selectedRow = [rowData];
-          }
+        const selected = row[ROW_SELECT_INDEX];
+        row[ROW_SELECT_INDEX] = !row[ROW_SELECT_INDEX];
+        let keyType = '';
+        if (event.shiftKey) {
+          keyType = 'shift';
+        } else if (event.ctrlKey) {
+          keyType = 'ctrl';
         }
+
+        if (selectInfo.multiple) { // multi select
+          onMultiSelectByKey(keyType, selected, rowData);
+        } else if (selected) { // single select
+          selectInfo.selectedRow = [];
+        } else {
+          selectInfo.selectedRow = [rowData];
+        }
+        lastIndex = row[ROW_INDEX];
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
       }
