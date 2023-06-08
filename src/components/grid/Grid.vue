@@ -750,19 +750,4 @@ export default {
 
 <style lang="scss" scoped>
   @import 'style/grid.scss';
-  .postgresql {
-    background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
-  }
-
-  .oracle {
-    background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
-  }
-
-  .mongodb {
-    background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
-  }
-
-  .mysql {
-    background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
-  }
 </style>
