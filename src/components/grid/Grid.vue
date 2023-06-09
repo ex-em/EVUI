@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="$slots.toolbar || useColumnSetting"
+    ref="toolbarWrapper"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
@@ -9,7 +10,6 @@
       <template #toolbarWrapper>
         <span
           v-if="useColumnSetting"
-          ref="columnSettingIcon"
           class="column-setting__icon"
           @click="setColumnSetting"
         />
@@ -341,7 +341,7 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
-    const columnSettingIcon = ref(null);
+    const toolbarWrapper = ref(null);
     const showHeader = computed(() => (props.option.showHeader ?? true));
     const useColumnSetting = computed(() => (props.option?.useColumnSetting || false));
     const useSummary = computed(() => (props.option?.useSummary || false));
@@ -555,7 +555,7 @@ export default {
       onSearch,
     });
 
-    provide('columnSettingIcon', columnSettingIcon);
+    provide('toolbarWrapper', toolbarWrapper);
 
     onMounted(() => {
       calculatedColumn();
@@ -744,7 +744,7 @@ export default {
       highlightIdx,
       useSummary,
       useColumnSetting,
-      columnSettingIcon,
+      toolbarWrapper,
       stores,
       ...toRefs(elementInfo),
       ...toRefs(stores),

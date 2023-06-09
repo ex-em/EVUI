@@ -52,7 +52,7 @@
 
 <script>
 import { clickoutside } from '@/directives/clickoutside';
-import { computed, inject, nextTick, onBeforeMount, reactive, ref, watch, watchEffect } from 'vue';
+import { computed, inject, nextTick, onBeforeMount, reactive, ref, watch } from 'vue';
 
 export default {
   name: 'EVGridColumnSetting',
@@ -97,7 +97,7 @@ export default {
     let timer = null;
     let lastCheckedColumn = null;
 
-    const columnSettingIcon = inject('columnSettingIcon');
+    const toolbarWrapperDiv = inject('toolbarWrapper');
     const columnSettingStyle = reactive({
       top: null,
       left: null,
@@ -131,12 +131,26 @@ export default {
       }, 500);
     };
 
+    const initSearchValue = () => {
+      searchVm.value = '';
+      isSearch.value = false;
+      searchColumnList.value.length = 0;
+    };
+
+    const initValue = () => {
+      const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
+      checkColumnGroup.value = columns.map(col => col.label || []);
+
+      initSearchValue();
+    };
+
     const onApplyColumn = () => {
-      applyColumnList.value = columnList.value
+      applyColumnList.value = originColumnList.value
         .filter(col => checkColumnGroup.value.includes(col.label));
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
+      initSearchValue();
       isShowColumnSetting.value = false;
     };
 
@@ -149,15 +163,6 @@ export default {
         }));
 
       checkColumnGroup.value = originColumnList.value?.map(col => col.label) || [];
-    };
-
-    const initValue = () => {
-      const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
-      checkColumnGroup.value = columns.map(col => col.label || []);
-
-      searchVm.value = '';
-      isSearch.value = false;
-      searchColumnList.value.length = 0;
     };
 
     const hideColumnSetting = () => {
@@ -181,23 +186,22 @@ export default {
       setColumns();
     }, { immediate: true });
 
-    watchEffect(async () => {
+    watch(() => isShowColumnSetting.value, async () => {
       if (!isShowColumnSetting.value) {
         return;
       }
       await nextTick();
 
       const columnSettingWrapperRect = columnSettingWrapper.value?.getBoundingClientRect();
-      const columnSettingIconRect = columnSettingIcon.value?.getBoundingClientRect();
-      const COLUMN_SETTING_WIDTH = columnSettingWrapperRect?.width;
-      const COLUMN_SETTING_ICON_SIZE = columnSettingIconRect?.width;
-      const top = columnSettingIcon.value?.offsetTop;
-      const left = columnSettingIcon.value?.offsetLeft;
+      const toolbarWrapperDivRect = toolbarWrapperDiv.value?.getBoundingClientRect();
 
-      if (COLUMN_SETTING_WIDTH && COLUMN_SETTING_ICON_SIZE && top && left) {
-        columnSettingStyle.top = `${top + (COLUMN_SETTING_ICON_SIZE + 5)}px`;
-        columnSettingStyle.left = `${left - (COLUMN_SETTING_WIDTH - COLUMN_SETTING_ICON_SIZE)}px`;
-      }
+      const columnSettingWidth = columnSettingWrapperRect?.width;
+      const toolbarHeight = toolbarWrapperDivRect?.height;
+      const columnSettingTop = toolbarWrapperDivRect?.top + document.documentElement.scrollTop;
+      const columnSettingRight = toolbarWrapperDivRect?.right;
+
+      columnSettingStyle.top = `${columnSettingTop + toolbarHeight}px`;
+      columnSettingStyle.left = `${columnSettingRight - columnSettingWidth}px`;
     });
 
     watch(() => props.hiddenColumn, (value) => {
@@ -237,6 +241,7 @@ export default {
   border: 1px solid #D0D0D0;
   background: #FFFFFF;
   font-size: 12px;
+  z-index: 1;
   &__header {
     padding: 10px;
 
