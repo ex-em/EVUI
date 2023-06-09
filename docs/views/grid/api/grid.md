@@ -45,7 +45,6 @@
 |  | useSelection | {} | 각 row별 선택 여부 및 단일 선택이나 다중 선택을 설정한다. |  |
 |  |  | use | Selection 사용 여부 | Boolean |
 |  |  | multiple | 다중 선택 설정 여부  | Boolean |
-|  |  | limitCount | 선택 가능한 row의 수를 제한 | Number |
 |  | style | {} | 그리드의 스타일을 설정한다. |  |
 |  |  | stripe | row의 배경색을 Stripe 스타일로 설정한다. | Boolean |
 |  |  | border | 그리드의 Border 여부를 설정한다. | 'none', 'rows' |
@@ -63,6 +62,7 @@
 |  |  | order | Pagination 위치 | 'center', 'left', 'right' |
 |  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
 |  | useSummary | false | 하단에 summary row 가 표시 된다. | Boolean |
+|  | useColumnSetting | false | 컬럼 목록 설정 여부  | Boolean |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |
