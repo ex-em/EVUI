@@ -73,11 +73,14 @@
 }
 
 .column-name {
-  display: inline-block;
+  display: -webkit-box;
   float: left;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   font-weight: bold;
   font-size: 14px;
 

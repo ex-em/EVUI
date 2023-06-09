@@ -418,7 +418,7 @@ export default {
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
-      minWidth: 60,
+      minWidth: 80,
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
