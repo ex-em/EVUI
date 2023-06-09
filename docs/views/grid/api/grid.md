@@ -62,6 +62,7 @@
 |  |  | order | Pagination 위치 | 'center', 'left', 'right' |
 |  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
 |  | useSummary | false | 하단에 summary row 가 표시 된다. | Boolean |
+|  | useColumnSetting | false | 컬럼 목록 설정 여부  | Boolean |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |
