@@ -552,7 +552,6 @@ export default {
     } = columnSettingEvent({
       stores,
       columnSettingInfo,
-      calculatedColumn,
       onSearch,
     });
 

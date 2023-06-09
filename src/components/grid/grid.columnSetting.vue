@@ -112,7 +112,9 @@ export default {
     };
 
     const onSearchColumn = (searchWord) => {
-      clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
 
       timer = setTimeout(() => {
         isSearch.value = false;
@@ -120,9 +122,9 @@ export default {
         if (searchWord) {
           const lowerCasedSearchWord = searchWord.toString().toLowerCase();
           searchColumnList.value = originColumnList.value.filter((column) => {
-              const columnName = column.label.toString().toLowerCase();
-              return columnName.includes(lowerCasedSearchWord);
-            });
+            const columnName = column.label.toString().toLowerCase();
+            return columnName.includes(lowerCasedSearchWord);
+          });
 
           isSearch.value = true;
         }
