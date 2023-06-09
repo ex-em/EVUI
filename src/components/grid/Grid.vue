@@ -8,8 +8,9 @@
     <!-- Toolbar -->
     <toolbar>
       <template #toolbarWrapper>
-        <span
+        <ev-icon
           v-if="useColumnSetting"
+          icon="ev-icon-server"
           class="column-setting__icon"
           @click="setColumnSetting"
         />

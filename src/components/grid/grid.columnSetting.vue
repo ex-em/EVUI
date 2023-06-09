@@ -38,7 +38,6 @@
         <div class="ev-grid-column-setting__footer">
           <ev-button
             type="primary"
-            size="small"
             :disabled="isDisabled"
             @click="onApplyColumn"
           >
@@ -233,7 +232,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import 'style/grid.scss';
 .ev-grid-column-setting {
   position: absolute;
@@ -251,13 +250,20 @@ export default {
   }
 
   &__content {
-    height: 100px;
-    padding: 5px 10px;
+    height: 120px;
+    padding: 0 10px;
     overflow: auto;
 
     .ev-checkbox {
       display: block;
-      padding: 5px 0;
+      padding: 10px 0;
+
+      .ev-checkbox-label {
+        display: inline-block;
+        width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 

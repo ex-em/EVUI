@@ -26,9 +26,8 @@ export default {
 }
 .gridToolbar > .column-setting__icon {
   float: right;
-  width: 24px;
-  height: 24px;
-  margin-top: 5px;
+  margin-top: 10px;
+  margin-left: 10px;
   cursor: pointer;
   background: url('../../../docs/assets/images/icon-option.svg') no-repeat center center;
 }
