@@ -816,13 +816,6 @@ export default {
     }
     &--basic {
       visibility: hidden;
-      //background: url('~docs/assets/images/icon-sort.svg') no-repeat center center;
-    }
-    &--asc {
-      background: url('~docs/assets/images/icon-sort-asc.svg') no-repeat center center;
-    }
-    &--desc {
-      background: url('~docs/assets/images/icon-sort-desc.svg') no-repeat center center;
     }
   }
   .column:hover {
