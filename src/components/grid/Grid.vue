@@ -93,19 +93,16 @@
                 {{ column.caption }}
                 <!-- Sort Icon -->
                 <span @click.stop="onSort(column)">
-                  <span
+                  <grid-sort-button
                     v-if="column.sortable === undefined ? true : column.sortable"
+                    :icon="'basic'"
                     class="icon-sort icon-sort--basic"
                   />
-                  <template v-if="sortField === column.field">
-                    <span
-                      :class="[
-                        'icon-sort',
-                        { 'icon-sort--desc': sortOrder === 'desc' },
-                        { 'icon-sort--asc': sortOrder === 'asc' },
-                      ]"
-                    />
-                  </template>
+                  <grid-sort-button
+                    v-if="sortField === column.field"
+                    :icon="sortOrder"
+                    class="icon-sort"
+                  />
                 </span>
               </span>
               <!-- Column Resize -->
@@ -265,6 +262,7 @@ import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, re
 import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
+import GridSortButton from './grid.sortButton';
 import {
   commonFunctions,
   scrollEvent,
@@ -284,6 +282,7 @@ export default {
     Toolbar,
     GridPagination,
     GridSummary,
+    GridSortButton,
   },
   props: {
     columns: {
@@ -777,7 +776,7 @@ export default {
     }
     &--basic {
       visibility: hidden;
-      background: url('~docs/assets/images/icon-sort.svg') no-repeat center center;
+      //background: url('~docs/assets/images/icon-sort.svg') no-repeat center center;
     }
     &--asc {
       background: url('~docs/assets/images/icon-sort-asc.svg') no-repeat center center;
