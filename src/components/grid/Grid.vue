@@ -82,6 +82,8 @@
                 'margin-right': (orderedColumns.length - 1 === index
                 && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
+              @click="onColumnContextMenu($event, column)"
+              @click.prevent="columnMenu.show"
             >
               <!-- Column Name -->
               <span
@@ -218,6 +220,10 @@
         <ev-context-menu
           ref="menu"
           :items="contextMenuItems"
+        />
+        <ev-context-menu
+          ref="columnMenu"
+          :items="columnMenuItems"
         />
       </div>
       <!-- Resize Line -->
@@ -401,11 +407,13 @@ export default {
     const sortInfo = reactive({
       isSorting: false,
       sortField: '',
-      sortOrder: 'desc',
+      sortOrder: '',
     });
     const contextInfo = reactive({
       menu: null,
+      columnMenu: null,
       contextMenuItems: [],
+      columnMenuItems: [],
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
@@ -521,10 +529,12 @@ export default {
     const {
       setContextMenu,
       onContextMenu,
+      onColumnContextMenu,
     } = contextMenuEvent({
       contextInfo,
       stores,
       selectInfo,
+      onSort,
     });
 
     onMounted(() => {
@@ -746,6 +756,7 @@ export default {
       setContextMenu,
       onContextMenu,
       onSearch,
+      onColumnContextMenu,
     };
   },
 };
