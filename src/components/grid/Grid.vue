@@ -94,6 +94,7 @@
                 <!-- Sort Icon -->
                 <span @click.stop="onSort(column)">
                   <span
+                    v-if="column.sortable === undefined ? true : column.sortable"
                     class="icon-sort icon-sort--basic"
                   />
                   <template v-if="sortField === column.field">

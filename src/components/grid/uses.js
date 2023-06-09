@@ -694,15 +694,18 @@ export const contextMenuEvent = (params) => {
   };
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
+      const sortable = column.sortable === undefined ? true : column.sortable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
           iconClass: 'ev-icon-allow2-up',
+          disabled: !sortable,
           click: () => onSort(column, 'asc'),
         },
         {
           text: 'Descending',
           iconClass: 'ev-icon-allow2-down',
+          disabled: !sortable,
           click: () => onSort(column, 'desc'),
         },
         {
