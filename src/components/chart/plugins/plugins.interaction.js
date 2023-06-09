@@ -206,7 +206,7 @@ const modules = {
           if (useSelectItem) {
             setSelectedItemInfo();
           } else if (useSelectLabel) {
-            setSelectedLabelInfo();
+            setSelectedLabelInfo(this.options.horizontal ? 'yAxis' : 'xAxis');
           }
           break;
         }
@@ -243,7 +243,7 @@ const modules = {
                   return;
                 }
               }
-              setSelectedLabelInfo(location, useBothAxis);
+              setSelectedLabelInfo(location);
             }
           } else if (useSelectItem) {
             setSelectedItemInfo();
