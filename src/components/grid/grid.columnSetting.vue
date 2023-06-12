@@ -263,7 +263,6 @@ export default {
         width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
     }
   }

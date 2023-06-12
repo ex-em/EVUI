@@ -95,28 +95,25 @@
                 'margin-right': (orderedColumns.length - 1 === index
                 && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
-              @click="onColumnContextMenu($event, column)"
-              @click.prevent="columnMenu.show"
             >
               <!-- Column Name -->
               <span
                 :title="column.caption"
                 class="column-name"
+                @click.stop="onSort(column)"
               >
                 {{ column.caption }}
                 <!-- Sort Icon -->
-                <span @click.stop="onSort(column)">
-                  <grid-sort-button
-                    v-if="column.sortable === undefined ? true : column.sortable"
-                    :icon="'basic'"
-                    class="icon-sort icon-sort--basic"
+                <template v-if="sortField === column.field">
+                  <ev-icon
+                    v-if="sortOrder === 'desc'"
+                    icon="ev-icon-triangle-down"
                   />
-                  <grid-sort-button
-                    v-if="sortField === column.field"
-                    :icon="sortOrder"
-                    class="icon-sort"
+                  <ev-icon
+                    v-if="sortOrder === 'asc'"
+                    icon="ev-icon-triangle-up"
                   />
-                </span>
+                </template>
               </span>
               <!-- Column Resize -->
               <span
@@ -232,10 +229,6 @@
           ref="menu"
           :items="contextMenuItems"
         />
-        <ev-context-menu
-          ref="columnMenu"
-          :items="columnMenuItems"
-        />
       </div>
       <!-- Resize Line -->
       <div
@@ -276,7 +269,6 @@ import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
 import ColumnSetting from './grid.columnSetting.vue';
-import GridSortButton from './grid.sortButton';
 import {
   commonFunctions,
   scrollEvent,
@@ -298,7 +290,6 @@ export default {
     GridPagination,
     GridSummary,
     ColumnSetting,
-    GridSortButton,
   },
   props: {
     columns: {
@@ -428,17 +419,15 @@ export default {
     const sortInfo = reactive({
       isSorting: false,
       sortField: '',
-      sortOrder: '',
+      sortOrder: 'desc',
     });
     const contextInfo = reactive({
       menu: null,
-      columnMenu: null,
       contextMenuItems: [],
-      columnMenuItems: [],
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
-      minWidth: 80,
+      minWidth: 40,
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
@@ -551,12 +540,10 @@ export default {
     const {
       setContextMenu,
       onContextMenu,
-      onColumnContextMenu,
     } = contextMenuEvent({
       contextInfo,
       stores,
       selectInfo,
-      onSort,
     });
 
     const {
@@ -796,7 +783,6 @@ export default {
       setColumnSetting,
       onApplyColumn,
       setColumnHidden,
-      onColumnContextMenu,
     };
   },
 };
@@ -804,23 +790,19 @@ export default {
 
 <style lang="scss" scoped>
   @import 'style/grid.scss';
-  .icon-sort {
-    position: absolute;
-    top: 50%;
-    width: 24px;
-    height: 24px;
-    background-size: contain;
-    transform: translateY(-50%);
-    &:hover {
-      cursor: pointer;
-    }
-    &--basic {
-      visibility: hidden;
-    }
+  .postgresql {
+    background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
   }
-  .column:hover {
-    .icon-sort--basic {
-      visibility: visible;
-    }
+
+  .oracle {
+    background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
+  }
+
+  .mongodb {
+    background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
+  }
+
+  .mysql {
+    background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
   }
 </style>
