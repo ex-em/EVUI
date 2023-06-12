@@ -358,8 +358,8 @@ export const clickEvent = (params) => {
   let timer = null;
   let lastIndex = -1;
   const onRowClick = (event, row) => {
-    if (event.target && event.target.parentElement
-      && event.target.parentElement.classList.contains('row-checkbox-input')) {
+    if (event.target.parentElement.classList?.contains('row-checkbox-input')
+      || event.target.classList?.contains('row-contextmenu__btn')) {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
@@ -525,13 +525,21 @@ export const sortEvent = (params) => {
    * sort 이벤트를 처리한다.
    *
    * @param {object} column - 컬럼 정보
+   * @param {string} 정렬 순서
    */
-  const onSort = (column) => {
+  const onSort = (column, sortOrder) => {
     const sortable = column.sortable === undefined ? true : column.sortable;
     if (sortable) {
       if (sortInfo.sortField !== column?.field) {
         order.orders = ['asc', 'desc', 'init'];
         sortInfo.sortField = column?.field;
+      }
+      if (sortOrder) {
+        order.orders = ['asc', 'desc', 'init'];
+        if (sortOrder === 'desc') {
+          sortInfo.sortOrder = order.dequeue();
+          order.enqueue(sortInfo.sortOrder);
+        }
       }
       sortInfo.sortOrder = order.dequeue();
       order.enqueue(sortInfo.sortOrder);
@@ -687,6 +695,9 @@ export const contextMenuEvent = (params) => {
     contextInfo,
     stores,
     selectInfo,
+    onSort,
+    setColumnHidden,
+    useColumnSetting,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -715,6 +726,31 @@ export const contextMenuEvent = (params) => {
 
     contextInfo.contextMenuItems = menuItems;
   };
+  const onColumnContextMenu = (event, column) => {
+    if (event.target.className === 'column-name') {
+      const sortable = column.sortable === undefined ? true : column.sortable;
+      contextInfo.columnMenuItems = [
+        {
+          text: 'Ascending',
+          iconClass: 'ev-icon-allow2-up',
+          disabled: !sortable,
+          click: () => onSort(column, 'asc'),
+        },
+        {
+          text: 'Descending',
+          iconClass: 'ev-icon-allow2-down',
+          disabled: !sortable,
+          click: () => onSort(column, 'desc'),
+        },
+        {
+          text: 'Hide',
+          iconClass: 'ev-icon-visibility-off',
+          disabled: !useColumnSetting.value,
+          click: () => setColumnHidden(column.field),
+        },
+      ];
+    }
+  };
   /**
    * 마우스 우클릭 이벤트를 처리한다.
    *
@@ -723,7 +759,10 @@ export const contextMenuEvent = (params) => {
   const onContextMenu = (event) => {
     const target = event.target;
     const rowIndex = target.closest('.row')?.dataset?.index;
-
+    if (target.classList.contains('row-contextmenu__btn')) {
+      setContextMenu();
+      return;
+    }
     let clickedRow;
     if (rowIndex) {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
@@ -739,7 +778,11 @@ export const contextMenuEvent = (params) => {
       emit('update:selected', []);
     }
   };
-  return { setContextMenu, onContextMenu };
+  return {
+    setContextMenu,
+    onContextMenu,
+    onColumnContextMenu,
+  };
 };
 
 export const storeEvent = (params) => {
