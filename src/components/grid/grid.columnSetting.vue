@@ -16,7 +16,6 @@
             @input="onSearchColumn"
           />
         </div>
-        <div class="ev-grid-column-setting-line" />
         <div class="ev-grid-column-setting__content">
           <template v-if="columnList.length">
             <ev-checkbox-group
@@ -34,7 +33,6 @@
             <p class="is-empty"> No records </p>
           </template>
         </div>
-        <div class="ev-grid-column-setting-line" />
         <div class="ev-grid-column-setting__footer">
           <ev-button
             type="primary"
@@ -197,21 +195,18 @@ export default {
       const columnSettingWidth = columnSettingWrapperRect?.width;
       const toolbarHeight = toolbarWrapperDivRect?.height;
       const columnSettingTop = toolbarWrapperDivRect?.top + document.documentElement.scrollTop;
-      const columnSettingRight = toolbarWrapperDivRect?.right;
+      const columnSettingRight = toolbarWrapperDivRect?.right + document.documentElement.scrollLeft;
 
       columnSettingStyle.top = `${columnSettingTop + toolbarHeight}px`;
       columnSettingStyle.left = `${columnSettingRight - columnSettingWidth}px`;
     });
 
     watch(() => props.hiddenColumn, (value) => {
-      let filterColumns = [];
+      const filterColumns = applyColumnList.value.length
+        ? applyColumnList.value.filter(col => col.text !== value)
+        : originColumnList.value.filter(col => col.text !== value);
 
-      if (applyColumnList.value.length) {
-        filterColumns = applyColumnList.value.filter(col => col.text !== value);
-      } else {
-        filterColumns = originColumnList.value.filter(col => col.text !== value);
-        applyColumnList.value = filterColumns;
-      }
+      applyColumnList.value = filterColumns;
       checkColumnGroup.value = filterColumns.map(col => col.label);
     });
 
@@ -252,6 +247,8 @@ export default {
   &__content {
     height: 120px;
     padding: 0 10px;
+    border-top: 1px solid #CED4DA;
+    border-bottom: 1px solid #CED4DA;
     overflow: auto;
 
     .ev-checkbox {
@@ -263,6 +260,7 @@ export default {
         width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
@@ -274,10 +272,6 @@ export default {
     .ev-button {
       margin-left: auto;
     }
-  }
-
-  &-line {
-    border: 1px solid #D0D0D0;
   }
 }
 </style>

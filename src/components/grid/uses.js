@@ -857,8 +857,7 @@ export const columnSettingEvent = (params) => {
   const setColumnSetting = () => {
     columnSettingInfo.isShowColumnSetting = true;
   };
-  const onApplyColumn = (columns) => {
-    stores.filteredColumns = stores.originColumns.filter(cur => columns.includes(cur.field));
+  const setFilteringColumn = () => {
     columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(column => column.index);
 
     const originColumnIdx = stores.originColumns.map(column => column.index);
@@ -870,12 +869,16 @@ export const columnSettingEvent = (params) => {
       onSearch(props.option.searchValue);
     }
   };
-
+  const onApplyColumn = (columns) => {
+    stores.filteredColumns = stores.originColumns.filter(cur => columns.includes(cur.field));
+    setFilteringColumn();
+  };
   const setColumnHidden = (val) => {
     const columns = columnSettingInfo.isFilteringColumn
       ? stores.filteredColumns : stores.originColumns;
     stores.filteredColumns = columns.filter(column => column.field !== val);
     columnSettingInfo.hiddenColumn = val;
+    setFilteringColumn();
   };
 
   return { setColumnSetting, onApplyColumn, setColumnHidden };
