@@ -24,9 +24,4 @@ export default {
 .gridToolbar > .ev-button {
   margin: 0 2px 0 2px;
 }
-.gridToolbar > .column-setting__icon {
-  float: right;
-  margin: 10px;
-  cursor: pointer;
-}
 </style>

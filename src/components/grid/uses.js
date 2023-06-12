@@ -525,21 +525,13 @@ export const sortEvent = (params) => {
    * sort 이벤트를 처리한다.
    *
    * @param {object} column - 컬럼 정보
-   * @param {string} 정렬 순서
    */
-  const onSort = (column, sortOrder) => {
+  const onSort = (column) => {
     const sortable = column.sortable === undefined ? true : column.sortable;
     if (sortable) {
       if (sortInfo.sortField !== column?.field) {
         order.orders = ['asc', 'desc', 'init'];
         sortInfo.sortField = column?.field;
-      }
-      if (sortOrder) {
-        order.orders = ['asc', 'desc', 'init'];
-        if (sortOrder === 'desc') {
-          sortInfo.sortOrder = order.dequeue();
-          order.enqueue(sortInfo.sortOrder);
-        }
       }
       sortInfo.sortOrder = order.dequeue();
       order.enqueue(sortInfo.sortOrder);
@@ -617,7 +609,6 @@ export const sortEvent = (params) => {
 
 export const filterEvent = (params) => {
   const {
-    columnSettingInfo,
     filterInfo,
     stores,
     checkInfo,
@@ -639,13 +630,9 @@ export const filterEvent = (params) => {
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
-          const rowData = columnSettingInfo.isFilteringColumn ? row[ROW_DATA_INDEX]
-              .filter((data, idx) => columnSettingInfo.visibleColumnIdx
-                .includes(idx)) : row[ROW_DATA_INDEX];
-
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = rowData[ix] ?? null;
+            let columnValue = row[ROW_DATA_INDEX][ix] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
               if (typeof columnValue === 'object') {
@@ -695,7 +682,6 @@ export const contextMenuEvent = (params) => {
     contextInfo,
     stores,
     selectInfo,
-    onSort,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -724,29 +710,6 @@ export const contextMenuEvent = (params) => {
 
     contextInfo.contextMenuItems = menuItems;
   };
-  const onColumnContextMenu = (event, column) => {
-    if (event.target.className === 'column-name') {
-      const sortable = column.sortable === undefined ? true : column.sortable;
-      contextInfo.columnMenuItems = [
-        {
-          text: 'Ascending',
-          iconClass: 'ev-icon-allow2-up',
-          disabled: !sortable,
-          click: () => onSort(column, 'asc'),
-        },
-        {
-          text: 'Descending',
-          iconClass: 'ev-icon-allow2-down',
-          disabled: !sortable,
-          click: () => onSort(column, 'desc'),
-        },
-        {
-          text: 'Hide',
-          iconClass: 'ev-icon-visibility-off',
-        },
-      ];
-    }
-  };
   /**
    * 마우스 우클릭 이벤트를 처리한다.
    *
@@ -771,7 +734,7 @@ export const contextMenuEvent = (params) => {
       emit('update:selected', []);
     }
   };
-  return { setContextMenu, onContextMenu, onColumnContextMenu };
+  return { setContextMenu, onContextMenu };
 };
 
 export const storeEvent = (params) => {
@@ -877,38 +840,4 @@ export const pagingEvent = (params) => {
     updatePagingInfo({ onChangePage: true });
   };
   return { getPagingData, updatePagingInfo, changePage };
-};
-
-export const columnSettingEvent = (params) => {
-  const { props } = getCurrentInstance();
-  const {
-    stores,
-    columnSettingInfo,
-    onSearch,
-  } = params;
-  const setColumnSetting = () => {
-    columnSettingInfo.isShowColumnSetting = true;
-  };
-  const onApplyColumn = (columns) => {
-    stores.filteredColumns = stores.originColumns.filter(cur => columns.includes(cur.field));
-    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(column => column.index);
-
-    const originColumnIdx = stores.originColumns.map(column => column.index);
-    const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
-    columnSettingInfo.isFilteringColumn = (visibleColumnIdx !== originColumnIdx.length);
-
-    // 컬럼을 필터링했을 때, 검색어가 있는 경우 재검색
-    if (props.option.searchValue) {
-      onSearch(props.option.searchValue);
-    }
-  };
-
-  const setColumnHidden = (val) => {
-    const columns = columnSettingInfo.isFilteringColumn
-      ? stores.filteredColumns : stores.originColumns;
-    stores.filteredColumns = columns.filter(column => column.field !== val);
-    columnSettingInfo.hiddenColumn = val;
-  };
-
-  return { setColumnSetting, onApplyColumn, setColumnHidden };
 };

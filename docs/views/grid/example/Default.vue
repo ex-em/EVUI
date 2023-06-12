@@ -12,7 +12,6 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useColumnSetting: useColumnSettingMV,
         useFilter: useFilterMV,
         customContextMenu: menuItems,
         useCheckbox: {
@@ -79,12 +78,6 @@
         </span>
         <ev-toggle
           v-model="isSelectionMultiple"
-        />
-        <span class="badge yellow">
-          Use Column Setting
-        </span>
-        <ev-toggle
-          v-model="useColumnSettingMV"
         />
       </div>
       <div class="form-rows">
@@ -224,7 +217,6 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(45);
     const columnWidthMV = ref(80);
-    const useColumnSettingMV = ref(true);
     const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
@@ -331,7 +323,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useColumnSettingMV,
       useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
