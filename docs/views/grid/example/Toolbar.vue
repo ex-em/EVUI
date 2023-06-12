@@ -13,7 +13,6 @@
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
         useFilter: false,
-        useColumnSetting: true,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
