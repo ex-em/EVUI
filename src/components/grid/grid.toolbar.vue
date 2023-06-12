@@ -26,10 +26,10 @@ export default {
 }
 .gridToolbar > .column-setting__icon {
   float: right;
-  width: 24px;
-  height: 24px;
-  padding-top: 5px;
   margin: 0 5px;
   cursor: pointer;
+  &:hover {
+    opacity: 0.6;
+  }
 }
 </style>
