@@ -1,18 +1,40 @@
 <template>
   <div
-    v-if="$slots.toolbar"
+    v-if="$slots.toolbar || useColumnSetting"
+    ref="toolbarWrapper"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
     <toolbar>
       <template #toolbarWrapper>
+        <span
+          v-if="useColumnSetting"
+          class="column-setting__icon"
+          @click="setColumnSetting"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="6.49805" cy="11.998" r="1.5"
+                    transform="rotate(-90 6.49805 11.998)" fill="#ADB5BD"/>
+            <circle cx="11.998" cy="11.998" r="1.5"
+                    transform="rotate(-90 11.998 11.998)" fill="#ADB5BD"/>
+            <path d="M17.498 10.498C18.3265 10.498 18.998 11.1696 18.998 11.998C18.998
+            12.8265 18.3265 13.498 17.498 13.498C16.6696 13.498 15.998 12.8265 15.998
+            11.998C15.998 11.1696 16.6696 10.498 17.498 10.498Z" fill="#ADB5BD"/>
+          </svg>
+        </span>
         <slot
           name="toolbar"
           :item="{ onSearch: onSearch }"
         />
       </template>
     </toolbar>
+    <column-setting
+      v-model:is-show="isShowColumnSetting"
+      :columns="$props.columns"
+      :hidden-column="hiddenColumn"
+      @apply-column="onApplyColumn"
+    />
   </div>
   <div
     ref="grid-wrapper"
@@ -251,10 +273,11 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref, provide } from 'vue';
 import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
+import ColumnSetting from './grid.columnSetting.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -266,6 +289,7 @@ import {
   contextMenuEvent,
   storeEvent,
   pagingEvent,
+  columnSettingEvent,
 } from './uses';
 
 export default {
@@ -274,6 +298,7 @@ export default {
     Toolbar,
     GridPagination,
     GridSummary,
+    ColumnSetting,
   },
   props: {
     columns: {
@@ -326,7 +351,9 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
+    const toolbarWrapper = ref(null);
     const showHeader = computed(() => (props.option.showHeader ?? true));
+    const useColumnSetting = computed(() => (props.option?.useColumnSetting || false));
     const useSummary = computed(() => (props.option?.useSummary || false));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
@@ -343,13 +370,21 @@ export default {
       isSearch: false,
       searchWord: '',
     });
+    const columnSettingInfo = reactive({
+      isShowColumnSetting: false,
+      isFilteringColumn: false, // hide된 컬럼이 있는지
+      visibleColumnIdx: [], // 보여지는 컬럼의 인덱스 목록
+      hiddenColumn: '',
+    });
     const stores = reactive({
       viewStore: [],
       originStore: [],
       pagingStore: [],
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.originStore)),
-      orderedColumns: computed(() =>
-        (props.columns.map((column, index) => ({ index, ...column })))),
+      filteredColumns: [],
+      originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
+      orderedColumns: computed(() => (stores.filteredColumns.length
+        ? stores.filteredColumns : stores.originColumns)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
@@ -472,6 +507,7 @@ export default {
     const {
       onSearch,
     } = filterEvent({
+      columnSettingInfo,
       filterInfo,
       stores,
       checkInfo,
@@ -511,6 +547,16 @@ export default {
     });
 
     const {
+      setColumnSetting,
+      onApplyColumn,
+      setColumnHidden,
+    } = columnSettingEvent({
+      stores,
+      columnSettingInfo,
+      onSearch,
+    });
+
+    const {
       setContextMenu,
       onContextMenu,
     } = contextMenuEvent({
@@ -518,6 +564,8 @@ export default {
       stores,
       selectInfo,
     });
+
+    provide('toolbarWrapper', toolbarWrapper);
 
     onMounted(() => {
       calculatedColumn();
@@ -705,6 +753,8 @@ export default {
       borderStyle,
       highlightIdx,
       useSummary,
+      useColumnSetting,
+      toolbarWrapper,
       stores,
       ...toRefs(elementInfo),
       ...toRefs(stores),
@@ -716,6 +766,7 @@ export default {
       ...toRefs(checkInfo),
       ...toRefs(sortInfo),
       ...toRefs(contextInfo),
+      ...toRefs(columnSettingInfo),
       isRenderer,
       getComponentName,
       getConvertValue,
@@ -738,6 +789,9 @@ export default {
       setContextMenu,
       onContextMenu,
       onSearch,
+      setColumnSetting,
+      onApplyColumn,
+      setColumnHidden,
     };
   },
 };
