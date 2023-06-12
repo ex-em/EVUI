@@ -114,8 +114,8 @@
                         'line-height': `${rowHeight}px`,
                       }"
                     >
-                    <slot name="sortIcon" />
-                  </span>
+                      <slot name="sortIcon" />
+                    </span>
                     <span
                       v-if="sortField === column.field"
                       :class="[{
