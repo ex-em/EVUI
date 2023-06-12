@@ -44,9 +44,6 @@
         />
       </template>
       <!-- cell renderer -->
-      <template #db-icon="{ item }">
-        <div :class="`db-icon ${item.row[2][item.column.index]}`"></div>
-      </template>
       <template #db-version="{ item }">
         <ev-select
           v-model="item.row[2][item.column.index]"
@@ -143,7 +140,6 @@ export default {
     const borderMV = ref('none');
     const searchVm = ref('');
     const columns = ref([
-      { caption: '', field: 'db-icon', type: 'string' },
       { caption: 'Instance Name', field: 'instance_name', type: 'string', width: 130 },
       { caption: 'Business Name', field: 'business_name', type: 'string', width: 130 },
       { caption: 'IP Address', field: 'ip_address', type: 'string', searchable: false },
@@ -174,12 +170,10 @@ export default {
         '10.10.32.227', '10.10.31.95', '10.10.31.97',
       ];
       const portList = ['4004', '25080', '25090'];
-      const dbList = ['postgresql', 'oracle', 'mongodb', 'mysql'];
       const dbVersionList = ['10gR2', '19c', '12c', '11gR2', '920'];
       const temp = [];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
-          dbList[ix % 4],
           instanceList[ix % 12],
           instanceList[ix % 12],
           IPList[ix % 12],
@@ -253,22 +247,5 @@ export default {
 }
 .ev-toggle {
   display: block;
-}
-.db-icon {
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  .postgresql {
-    background: url('../../../assets/images/icon_postgresql.svg') no-repeat center center;
-  }
-  .oracle {
-    background: url('../../../assets/images/icon_oracle.svg') no-repeat center center;
-  }
-  .mongodb {
-    background: url('../../../assets/images/icon_mongodb.svg') no-repeat center center;
-  }
-  .mysql {
-    background: url('../../../assets/images/icon_mysql.svg') no-repeat center center;
-  }
 }
 </style>

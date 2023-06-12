@@ -56,28 +56,41 @@
 
   @include evThemify() {
     border-right: 1px solid evThemed('grid-bottom-border');
+    background: evThemed('background-base');
   }
   &:nth-last-child(1) {
     border-right: 0;
   }
-  .sort-icon {
-    display: inline-block;
-    float: right;
-    font-size: 14px;
-    line-height: 30px;
-
-    @include evThemify() {
-      color: evThemed('font-color-base');
+  .column-sort__icon {
+    position: absolute;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    transform: translateY(-50%);
+    &:hover {
+      cursor: pointer;
+    }
+    &--basic {
+      visibility: hidden;
+    }
+  }
+  :hover {
+    .column-sort__icon--basic {
+      visibility: visible;
     }
   }
 }
 
 .column-name {
-  display: inline-block;
+  display: -webkit-box;
   float: left;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   font-weight: bold;
   font-size: 14px;
 
@@ -120,31 +133,38 @@
     }
   }
   .row {
+    color: inherit;
     white-space: nowrap;
 
     @include evThemify() {
+      background: evThemed('background-base');
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
     &.selected {
       @include evThemify() {
-        background: evThemed('grid-row-selected') !important;
-        color: inherit !important;
-        font-size: inherit !important;
+        background: evThemed('grid-row-selected');
+        color: inherit;
+        font-size: inherit;
       }
     }
     &.highlight {
       background: #5AB7FF;
       color: #FFFFFF;
     }
+    &:hover {
+      .row-contextmenu__btn {
+        visibility: visible;
+      }
+    }
   }
 
   .cell {
     display: inline-block;
     padding: 0 10px;
+    background: inherit;
     text-align: center;
     max-width: 100%;
     white-space: nowrap;
-    //overflow: hidden;
     text-overflow: ellipsis;
 
     @include evThemify() {
@@ -154,6 +174,11 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .row-contextmenu__btn {
+      visibility: hidden;
+      vertical-align: middle;
+      cursor: pointer;
     }
     &.row-checkbox {
       display: inline-flex;

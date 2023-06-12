@@ -31,9 +31,10 @@ $ev-themes: (
     -------------------------- */
     grid-header-border: #7F7F7F,
     grid-bottom-border: #CFCFCF,
-    grid-row-selected: rgba(#DBF0F9, 0.6),
+    grid-row-selected: #DBF0F9,
     grid-cell-text: rgba(#191919, 0.8),
-    grid-row-stripe: rgba(#E5E5E5, 0.6),
+    grid-row-stripe: #E5E5E5,
+    grid-background: #FFFFFF,
   ),
   dark: (
     /* primary color
@@ -60,5 +61,9 @@ $ev-themes: (
     -------------------------- */
     slider-mark-background: #B2B2B2,
     tooltip-background: #555555,
+
+    /* grid
+    -------------------------- */
+    grid-background: #0D0D0D,
   ),
 ) !default;

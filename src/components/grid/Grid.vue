@@ -8,21 +8,11 @@
     <!-- Toolbar -->
     <toolbar>
       <template #toolbarWrapper>
-        <span
+        <grid-option-button
           v-if="useColumnSetting"
           class="column-setting__icon"
           @click="setColumnSetting"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="6.49805" cy="11.998" r="1.5"
-                    transform="rotate(-90 6.49805 11.998)" fill="#ADB5BD"/>
-            <circle cx="11.998" cy="11.998" r="1.5"
-                    transform="rotate(-90 11.998 11.998)" fill="#ADB5BD"/>
-            <path d="M17.498 10.498C18.3265 10.498 18.998 11.1696 18.998 11.998C18.998
-            12.8265 18.3265 13.498 17.498 13.498C16.6696 13.498 15.998 12.8265 15.998
-            11.998C15.998 11.1696 16.6696 10.498 17.498 10.498Z" fill="#ADB5BD"/>
-          </svg>
-        </span>
+        />
         <slot
           name="toolbar"
           :item="{ onSearch: onSearch }"
@@ -52,9 +42,9 @@
       v-cloak
       ref="grid"
       :class="{
-        'ev-grid': true,
         table: true,
         adjust: adjust,
+        'ev-grid': true,
         'non-header': !showHeader,
         'ev-grid--empty': !viewStore.length,
       }"
@@ -101,28 +91,39 @@
               :style="{
                 width: `${column.width}px`,
                 'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                'margin-right': (orderedColumns.length - 1 === index
-                && hasVerticalScrollBar && hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'margin-right': orderedColumns.length - 1 === index
+                && (hasVerticalScrollBar || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
             >
               <!-- Column Name -->
               <span
                 :title="column.caption"
                 class="column-name"
-                @click.stop="onSort(column)"
+                @click="onColumnContextMenu($event, column)"
+                @click.prevent="columnMenu.show"
               >
                 {{ column.caption }}
                 <!-- Sort Icon -->
-                <template v-if="sortField === column.field">
-                  <ev-icon
-                    v-if="sortOrder === 'desc'"
-                    icon="ev-icon-triangle-down"
+                <span @click.stop="onSort(column)">
+                  <grid-sort-button
+                    v-if="column.sortable === undefined ? true : column.sortable"
+                    class="column-sort__icon column-sort__icon--basic"
+                    :icon="'basic'"
+                    :style="{
+                      height: `${rowHeight}px`,
+                      'line-height': `${rowHeight}px`,
+                    }"
                   />
-                  <ev-icon
-                    v-if="sortOrder === 'asc'"
-                    icon="ev-icon-triangle-up"
+                  <grid-sort-button
+                    v-if="sortField === column.field"
+                    class="column-sort__icon"
+                    :icon="sortOrder"
+                    :style="{
+                      height: `${rowHeight}px`,
+                      'line-height': `${rowHeight}px`,
+                    }"
                   />
-                </template>
+                </span>
               </span>
               <!-- Column Resize -->
               <span
@@ -131,15 +132,32 @@
               />
             </li>
           </template>
+          <!-- Row Contextmenu Column -->
+          <li
+            v-if="$props.option.customContextMenu?.length"
+            :class="{
+              column: true,
+              'non-border': !!borderStyle,
+            }"
+            :style="{
+              position: 'sticky',
+              right: 0,
+              width: '40px',
+              'min-width': '40px',
+              'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
+                ? `${scrollWidth}px` : '0px',
+            }"
+          >
+          </li>
         </ul>
       </div>
       <!-- Body -->
       <div
         ref="body"
         :class="{
+          stripe: stripeStyle,
           'table-body': true,
           'bottom-border': !!viewStore.length,
-          stripe: stripeStyle,
           'non-border': !!borderStyle,
         }"
         @scroll="onScroll"
@@ -161,8 +179,8 @@
               :class="{
                 row: true,
                 selected: row[3],
-                'non-border': !!borderStyle && borderStyle !== 'rows',
                 highlight: row[0] === highlightIdx,
+                'non-border': !!borderStyle && borderStyle !== 'rows',
               }"
               @click="onRowClick($event, row)"
               @dblclick="onRowDblClick($event, row)"
@@ -194,11 +212,11 @@
                   :data-index="column.index"
                   :class="{
                     cell: true,
+                    render: isRenderer(column),
                     [column.type]: column.type,
                     [column.align]: column.align,
-                    render: isRenderer(column),
-                    'non-border': !!borderStyle,
                     [column.field]: column.field,
+                    'non-border': !!borderStyle,
                   }"
                   :style="{
                     width: `${column.width}px`,
@@ -222,6 +240,28 @@
                   </template>
                 </td>
               </template>
+              <!-- Row Contextmenu Button -->
+              <td
+                v-if="$props.option.customContextMenu?.length"
+                :class="{
+                  cell: true,
+                  'non-border': !!borderStyle,
+                }"
+                :style="{
+                  position: 'sticky',
+                  right: 0,
+                  width: '40px',
+                  height: `${rowHeight}px`,
+                  'min-width': '40px',
+                  'line-height': `${rowHeight}px`,
+                }"
+              >
+                <grid-option-button
+                  class="row-contextmenu__btn"
+                  @click="onContextMenu($event)"
+                  @click.prevent="menu.show"
+                />
+              </td>
             </tr>
             <tr v-if="!viewStore.length">
               <td class="is-empty">No records</td>
@@ -237,6 +277,10 @@
         <ev-context-menu
           ref="menu"
           :items="contextMenuItems"
+        />
+        <ev-context-menu
+          ref="columnMenu"
+          :items="columnMenuItems"
         />
       </div>
       <!-- Resize Line -->
@@ -278,6 +322,8 @@ import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
 import ColumnSetting from './grid.columnSetting.vue';
+import GridSortButton from './grid.sortButton';
+import GridOptionButton from './grid.optionButton.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -299,6 +345,8 @@ export default {
     GridPagination,
     GridSummary,
     ColumnSetting,
+    GridSortButton,
+    GridOptionButton,
   },
   props: {
     columns: {
@@ -428,15 +476,17 @@ export default {
     const sortInfo = reactive({
       isSorting: false,
       sortField: '',
-      sortOrder: 'desc',
+      sortOrder: '',
     });
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
+      columnMenu: null,
+      columnMenuItems: [],
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
-      minWidth: 40,
+      minWidth: 80,
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
@@ -559,10 +609,14 @@ export default {
     const {
       setContextMenu,
       onContextMenu,
+      onColumnContextMenu,
     } = contextMenuEvent({
       contextInfo,
       stores,
       selectInfo,
+      onSort,
+      setColumnHidden,
+      useColumnSetting,
     });
 
     provide('toolbarWrapper', toolbarWrapper);
@@ -792,6 +846,7 @@ export default {
       setColumnSetting,
       onApplyColumn,
       setColumnHidden,
+      onColumnContextMenu,
     };
   },
 };
@@ -799,19 +854,4 @@ export default {
 
 <style lang="scss" scoped>
   @import 'style/grid.scss';
-  .postgresql {
-    background: url('../../../docs/assets/images/icon_postgresql.svg') no-repeat center center;
-  }
-
-  .oracle {
-    background: url('../../../docs/assets/images/icon_oracle.svg') no-repeat center center;
-  }
-
-  .mongodb {
-    background: url('../../../docs/assets/images/icon_mongodb.svg') no-repeat center center;
-  }
-
-  .mysql {
-    background: url('../../../docs/assets/images/icon_mysql.svg') no-repeat center center;
-  }
 </style>
