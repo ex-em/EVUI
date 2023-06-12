@@ -94,13 +94,13 @@
                 'margin-right': orderedColumns.length - 1 === index
                 && (hasVerticalScrollBar || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
               }"
-              @click="onColumnContextMenu($event, column)"
-              @click.prevent="columnMenu.show"
             >
               <!-- Column Name -->
               <span
                 :title="column.caption"
                 class="column-name"
+                @click="onColumnContextMenu($event, column)"
+                @click.prevent="columnMenu.show"
               >
                 {{ column.caption }}
                 <!-- Sort Icon -->
