@@ -598,6 +598,7 @@ export default {
 
     const {
       setColumnSetting,
+      initColumnSettingInfo,
       onApplyColumn,
       setColumnHidden,
     } = columnSettingEvent({
@@ -633,6 +634,7 @@ export default {
       () => {
         sortInfo.isSorting = false;
         sortInfo.sortField = '';
+        initColumnSettingInfo();
         setSort();
       }, { deep: true },
     );

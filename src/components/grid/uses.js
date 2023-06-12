@@ -900,6 +900,13 @@ export const columnSettingEvent = (params) => {
   const setColumnSetting = () => {
     columnSettingInfo.isShowColumnSetting = true;
   };
+  const initColumnSettingInfo = () => {
+    stores.filteredColumns.length = 0;
+    columnSettingInfo.isShowColumnSetting = false;
+    columnSettingInfo.isFilteringColumn = false;
+    columnSettingInfo.visibleColumnIdx = [];
+    columnSettingInfo.hiddenColumn = '';
+  };
   const setFilteringColumn = () => {
     columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(column => column.index);
 
@@ -919,10 +926,14 @@ export const columnSettingEvent = (params) => {
   const setColumnHidden = (val) => {
     const columns = columnSettingInfo.isFilteringColumn
       ? stores.filteredColumns : stores.originColumns;
+
+    if (columns.length === 1) {
+      return;
+    }
     stores.filteredColumns = columns.filter(column => column.field !== val);
     columnSettingInfo.hiddenColumn = val;
     setFilteringColumn();
   };
 
-  return { setColumnSetting, onApplyColumn, setColumnHidden };
+  return { setColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden };
 };
