@@ -118,6 +118,10 @@ export default {
   height: 30px;
   line-height: 30px;
   padding: 2px 25px;
+  i {
+    height: 30px;
+    line-height: 30px;
+  }
 
   &:not(:last-child) {
     border-bottom: 1px dotted #D0D0D0;
