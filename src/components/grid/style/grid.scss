@@ -79,6 +79,9 @@
     .column-sort__icon--basic {
       visibility: visible;
     }
+    .column-sort__icon--asc, .column-sort__icon--desc {
+      visibility: hidden;
+    }
   }
 }
 

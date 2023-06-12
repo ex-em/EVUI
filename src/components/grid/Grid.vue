@@ -105,24 +105,57 @@
                 {{ column.caption }}
                 <!-- Sort Icon -->
                 <span @click.stop="onSort(column)">
-                  <grid-sort-button
-                    v-if="column.sortable === undefined ? true : column.sortable"
-                    class="column-sort__icon column-sort__icon--basic"
-                    :icon="'basic'"
-                    :style="{
-                      height: `${rowHeight}px`,
-                      'line-height': `${rowHeight}px`,
-                    }"
-                  />
-                  <grid-sort-button
-                    v-if="sortField === column.field"
-                    class="column-sort__icon"
-                    :icon="sortOrder"
-                    :style="{
-                      height: `${rowHeight}px`,
-                      'line-height': `${rowHeight}px`,
-                    }"
-                  />
+                  <template v-if="!!$slots.sortIcon">
+                    <span
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      class="column-sort__icon column-sort__icon--basic"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    >
+                      <slot name="sortIcon" />
+                    </span>
+                    <span
+                      v-if="sortField === column.field"
+                      :class="[{
+                        'column-sort__icon': true,
+                        'column-sort__icon--asc': sortOrder === 'asc',
+                        'column-sort__icon--desc': sortOrder === 'desc',
+                      }]"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    >
+                      <slot :name="`sortIcon_${sortOrder}`" />
+                    </span>
+                  </template>
+                  <template v-else>
+                    <grid-sort-button
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      class="column-sort__icon column-sort__icon--basic"
+                      :icon="'basic'"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    />
+                    <grid-sort-button
+                      v-if="sortField === column.field"
+                      :class="[{
+                        'column-sort__icon': true,
+                        'column-sort__icon--asc': sortOrder === 'asc',
+                        'column-sort__icon--desc': sortOrder === 'desc',
+                      }]"
+                      :icon="sortOrder"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                        visibility: !!sortOrder ? hidden : true,
+                      }"
+                    />
+                  </template>
                 </span>
               </span>
               <!-- Column Resize -->
