@@ -525,7 +525,7 @@ export const sortEvent = (params) => {
    * sort 이벤트를 처리한다.
    *
    * @param {object} column - 컬럼 정보
-   * @param {string} 정렬 순서
+   * @param {string} sortOrder - 정렬 순서
    */
   const onSort = (column, sortOrder) => {
     const sortable = column.sortable === undefined ? true : column.sortable;

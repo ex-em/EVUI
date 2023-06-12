@@ -42,9 +42,9 @@
       v-cloak
       ref="grid"
       :class="{
-        'ev-grid': true,
         table: true,
         adjust: adjust,
+        'ev-grid': true,
         'non-header': !showHeader,
         'ev-grid--empty': !viewStore.length,
       }"
@@ -132,6 +132,7 @@
               />
             </li>
           </template>
+          <!-- Row Contextmenu Column -->
           <li
             v-if="$props.option.customContextMenu?.length"
             :class="{
@@ -154,9 +155,9 @@
       <div
         ref="body"
         :class="{
+          stripe: stripeStyle,
           'table-body': true,
           'bottom-border': !!viewStore.length,
-          stripe: stripeStyle,
           'non-border': !!borderStyle,
         }"
         @scroll="onScroll"
@@ -178,8 +179,8 @@
               :class="{
                 row: true,
                 selected: row[3],
-                'non-border': !!borderStyle && borderStyle !== 'rows',
                 highlight: row[0] === highlightIdx,
+                'non-border': !!borderStyle && borderStyle !== 'rows',
               }"
               @click="onRowClick($event, row)"
               @dblclick="onRowDblClick($event, row)"
@@ -211,11 +212,11 @@
                   :data-index="column.index"
                   :class="{
                     cell: true,
+                    render: isRenderer(column),
                     [column.type]: column.type,
                     [column.align]: column.align,
-                    render: isRenderer(column),
-                    'non-border': !!borderStyle,
                     [column.field]: column.field,
+                    'non-border': !!borderStyle,
                   }"
                   :style="{
                     width: `${column.width}px`,
@@ -239,6 +240,7 @@
                   </template>
                 </td>
               </template>
+              <!-- Row Contextmenu Button -->
               <td
                 v-if="$props.option.customContextMenu?.length"
                 :class="{
