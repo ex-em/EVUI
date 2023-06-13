@@ -136,3 +136,17 @@ export function getPrecision(v) {
 export function checkNullAndUndefined(value) {
   return value === null || value === undefined;
 }
+
+/**
+ * Check if the device is mobile
+ * @returns {boolean}
+ */
+export function mobileCheck() {
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    )
+    || 'ontouchstart' in window
+    || navigator.maxTouchPoints
+  );
+}

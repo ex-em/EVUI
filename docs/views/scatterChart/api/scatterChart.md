@@ -183,8 +183,10 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | drag-select 사용 여부 | true / false |
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
+| size | number | 50 | 모바일에서 선택 영역 크기 | only mobile |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
+* PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 
 #### tooltip
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

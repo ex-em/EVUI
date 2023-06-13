@@ -61,7 +61,7 @@
 </template>
 
 <script>
-  import { ref } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -97,7 +97,7 @@
         },
       };
 
-      const chartOptions = {
+      const chartOptions = reactive({
         type: 'scatter',
         width: '100%',
         title: {
@@ -128,7 +128,7 @@
         tooltip: {
           use: true,
         },
-      };
+      });
 
       const selectionItems = ref([]);
       const selectionRange = ref({});
@@ -137,7 +137,6 @@
         selectionItems.value = data;
         selectionRange.value = range;
       };
-
 
       const dblClickedInfo = ref(null);
       const onDblClick = ({ e, label, value, sId }) => {
@@ -149,11 +148,27 @@
         clickedInfo.value = { e, label, value, sId };
 
         // Clear drag selection info
-        selectionItems.value = [];
-        selectionRange.value = {};
+        if (e.pointerType === 'mouse') {
+          selectionItems.value = [];
+          selectionRange.value = {};
+        }
       };
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');
+
+      const mobileCheck = () => (
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          )
+          || 'ontouchstart' in window
+          || navigator.maxTouchPoints
+        );
+
+      onMounted(() => {
+        if (mobileCheck()) {
+          chartOptions.dragSelection.keepDisplay = false;
+        }
+      });
 
       return {
         chartData,

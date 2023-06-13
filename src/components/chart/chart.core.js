@@ -1,4 +1,5 @@
 import throttle from '@/common/utils.throttle';
+import { mobileCheck } from '@/common/utils';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -40,6 +41,7 @@ class EvChart {
       Object.assign(this, GradientLegend);
     }
 
+    this.isMobile = mobileCheck();
     this.brushSeries = brushSeries;
     this.target = target;
     this.data = data;
@@ -844,8 +846,8 @@ class EvChart {
   overlayClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-      this.overlayCanvas.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas?.width / this.clearRectRatio,
+      this.overlayCanvas?.height / this.clearRectRatio);
   }
 
   /**
@@ -877,6 +879,7 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
+    this.isMobile = mobileCheck();
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
