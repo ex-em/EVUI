@@ -61,7 +61,7 @@
 </template>
 
 <script>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -155,20 +155,6 @@
       };
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');
-
-      const mobileCheck = () => (
-          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
-          )
-          || 'ontouchstart' in window
-          || navigator.maxTouchPoints
-        );
-
-      onMounted(() => {
-        if (mobileCheck()) {
-          chartOptions.dragSelection.keepDisplay = false;
-        }
-      });
 
       return {
         chartData,
