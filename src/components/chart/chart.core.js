@@ -879,7 +879,6 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
-    this.isMobile = mobileCheck();
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
