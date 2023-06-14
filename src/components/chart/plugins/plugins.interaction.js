@@ -283,7 +283,7 @@ const modules = {
             let touchInfo = this.setTouchInfo(e);
             this.overlayClear();
 
-            if (!this.options.dragSelection.keepDisplay
+            if (this.options.dragSelection.keepDisplay
               && (e.layerX < touchInfo.range.x1
               || e.layerY < touchInfo.range.y1
               || e.layerX > touchInfo.range.x2
@@ -293,6 +293,13 @@ const modules = {
               touchInfo = this.setTouchBoxDimensions(touchInfo);
               this.isOverlay = true;
               this.drawSelectionArea(touchInfo);
+            }
+
+            if (!this.options.dragSelection.keepDisplay) {
+              setTimeout(() => {
+                this.isOverlay = false;
+                this.overlayClear();
+              }, 100);
             }
 
             args.e = e;
@@ -665,7 +672,7 @@ const modules = {
   },
 
   /**
-   * Handles the termination of a touch selection.
+   * Remove a touch selection.
    *
    * @param {TouchEvent} e - the touch event to process
    * @returns {undefined}
@@ -675,7 +682,6 @@ const modules = {
       this.options.dragSelection?.use
       && e.target !== this.overlayCanvas
       && this.isOverlay
-      && !this.options.dragSelection?.keepDisplay
     ) {
       this.isOverlay = false;
       this.overlayClear();
