@@ -327,7 +327,7 @@
   <!-- Summary -->
   <grid-summary
     v-if="useSummary"
-    :ordered-columns="orderedColumns"
+    :origin-columns="originColumns"
     :stores="stores"
     :use-checkbox="useCheckbox.use"
     :style-option="{
@@ -880,7 +880,6 @@ export default {
       onSearch,
       setColumnSetting,
       onApplyColumn,
-      setColumnHidden,
       onColumnContextMenu,
     };
   },
