@@ -327,7 +327,7 @@
   <!-- Summary -->
   <grid-summary
     v-if="useSummary"
-    :origin-columns="originColumns"
+    :ordered-columns="orderedColumns"
     :stores="stores"
     :use-checkbox="useCheckbox.use"
     :style-option="{

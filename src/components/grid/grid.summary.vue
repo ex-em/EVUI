@@ -79,7 +79,7 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    originColumns: {
+    orderedColumns: {
       type: Object,
       default: () => ({}),
     },
@@ -104,7 +104,7 @@ export default {
     const summaryRef = ref();
     const ROW_DATA_INDEX = 2;
     const stores = computed(() => props.stores);
-    const columns = computed(() => props.originColumns);
+    const columns = computed(() => props.orderedColumns);
     const showCheckbox = computed(() => props.useCheckbox);
     const styleInfo = computed(() => props.styleOption);
     const getConvertValue = (column, value) => {
@@ -180,7 +180,7 @@ export default {
         const columnIndex = getColumnIndex(name);
         if (columnIndex >= 0) {
           const value = getSummaryValue(
-            stores.value.originColumns[columnIndex],
+            stores.value.orderedColumns[columnIndex],
             column.summaryType,
           );
           result = result.replace(`{${idx}}`, value);
