@@ -90,7 +90,6 @@ export default {
     const columnList = computed(() => (isSearch.value
       ? searchColumnList.value : originColumnList.value));
     const isDisabled = computed(() => !columnList.value.length);
-
     let timer = null;
     let lastCheckedColumn = null;
 
@@ -158,8 +157,8 @@ export default {
           label: col.caption,
           text: col.field,
         }));
-
       checkColumnGroup.value = originColumnList.value?.map(col => col.label) || [];
+      applyColumnList.value.length = 0;
     };
 
     const hideColumnSetting = () => {
@@ -181,7 +180,7 @@ export default {
 
     watch(() => props.columns, () => {
       setColumns();
-    }, { immediate: true });
+    }, { immediate: true, deep: true });
 
     watch(() => isShowColumnSetting.value, async () => {
       if (!isShowColumnSetting.value) {
@@ -228,7 +227,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'style/grid.scss';
 .ev-grid-column-setting {
   position: absolute;
   width: 180px;
@@ -256,7 +254,6 @@ export default {
       padding: 10px 0;
 
       .ev-checkbox-label {
-        display: inline-block;
         width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;

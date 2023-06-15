@@ -152,7 +152,7 @@
                       :style="{
                         height: `${rowHeight}px`,
                         'line-height': `${rowHeight}px`,
-                        visibility: !!sortOrder ? hidden : true,
+                        visibility: !!sortOrder ? column.hidden : true,
                       }"
                     />
                   </template>
@@ -667,8 +667,8 @@ export default {
       () => {
         sortInfo.isSorting = false;
         sortInfo.sortField = '';
-        initColumnSettingInfo();
         setSort();
+        initColumnSettingInfo();
       }, { deep: true },
     );
     watch(
