@@ -260,6 +260,10 @@ export default {
         white-space: nowrap;
       }
     }
+    .is-empty {
+      height: 30px;
+      text-align: center;
+    }
   }
 
   &__footer {
