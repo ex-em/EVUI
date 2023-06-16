@@ -896,6 +896,7 @@ export const columnSettingEvent = (params) => {
     stores,
     columnSettingInfo,
     onSearch,
+    onResize,
   } = params;
   const setColumnSetting = () => {
     columnSettingInfo.isShowColumnSetting = true;
@@ -918,6 +919,7 @@ export const columnSettingEvent = (params) => {
     if (props.option.searchValue) {
       onSearch(props.option.searchValue);
     }
+    onResize();
   };
   const onApplyColumn = (columns) => {
     columnSettingInfo.hiddenColumn = '';

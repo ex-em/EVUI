@@ -638,6 +638,7 @@ export default {
       stores,
       columnSettingInfo,
       onSearch,
+      onResize,
     });
 
     const {
