@@ -923,7 +923,8 @@ export const columnSettingEvent = (params) => {
   };
   const onApplyColumn = (columns) => {
     columnSettingInfo.hiddenColumn = '';
-    stores.filteredColumns = stores.originColumns.filter(cur => columns.includes(cur.field));
+    stores.filteredColumns = stores.originColumns
+      .filter(cur => columns.includes(cur.field) || !cur.caption);
     setFilteringColumn();
   };
   const setColumnHidden = (val) => {
