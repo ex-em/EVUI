@@ -16,7 +16,7 @@
       :readonly="readonly"
       @change="changeMv"
     />
-    <span class="ev-checkbox-label">
+    <span class="ev-checkbox-label" :title="label">
       <template v-if="$slots.default">
         <slot />
       </template>

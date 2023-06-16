@@ -566,15 +566,15 @@ export const sortEvent = (params) => {
       return;
     }
     const index = getColumnIndex(sortInfo.sortField);
-    const type = stores.orderedColumns[index]?.type || 'string';
+    const type = stores.originColumns[index]?.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
       let aCol = a[ROW_DATA_INDEX][index];
       let bCol = b[ROW_DATA_INDEX][index];
       if (a[ROW_DATA_INDEX][index] && typeof a[ROW_DATA_INDEX][index] === 'object') {
-        aCol = a[ROW_DATA_INDEX][index][stores.orderedColumns[index]?.field];
-        bCol = b[ROW_DATA_INDEX][index][stores.orderedColumns[index]?.field];
+        aCol = a[ROW_DATA_INDEX][index][stores.originColumns[index]?.field];
+        bCol = b[ROW_DATA_INDEX][index][stores.originColumns[index]?.field];
       }
       return { aCol, bCol };
     };
@@ -745,7 +745,7 @@ export const contextMenuEvent = (params) => {
         {
           text: 'Hide',
           iconClass: 'ev-icon-visibility-off',
-          disabled: !useColumnSetting.value,
+          disabled: !useColumnSetting.value || stores.orderedColumns.length === 1,
           click: () => setColumnHidden(column.field),
         },
       ];
@@ -896,6 +896,7 @@ export const columnSettingEvent = (params) => {
     stores,
     columnSettingInfo,
     onSearch,
+    onResize,
   } = params;
   const setColumnSetting = () => {
     columnSettingInfo.isShowColumnSetting = true;
@@ -918,9 +919,12 @@ export const columnSettingEvent = (params) => {
     if (props.option.searchValue) {
       onSearch(props.option.searchValue);
     }
+    onResize();
   };
   const onApplyColumn = (columns) => {
-    stores.filteredColumns = stores.originColumns.filter(cur => columns.includes(cur.field));
+    columnSettingInfo.hiddenColumn = '';
+    stores.filteredColumns = stores.originColumns
+      .filter(cur => columns.includes(cur.field) || !cur.caption);
     setFilteringColumn();
   };
   const setColumnHidden = (val) => {

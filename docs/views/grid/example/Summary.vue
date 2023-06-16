@@ -11,6 +11,7 @@
         adjust: true,
         rowHeight: 45,
         useFilter: false,
+        useColumnSetting: true,
         useCheckbox: {
           use: true,
           mode: 'multi',
