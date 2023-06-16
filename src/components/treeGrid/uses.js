@@ -567,7 +567,13 @@ export const checkEvent = (params) => {
 
 export const contextMenuEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { contextInfo, stores, selectInfo } = params;
+  const {
+    contextInfo,
+    stores,
+    selectInfo,
+    setColumnHidden,
+    useColumnSetting,
+  } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
    *
@@ -594,6 +600,20 @@ export const contextMenuEvent = (params) => {
     }
     contextInfo.contextMenuItems = menuItems;
   };
+  const onColumnContextMenu = (event, column) => {
+    if (event.target.className.includes('column-name--click')) {
+      contextInfo.columnMenuItems = [
+        {
+          text: 'Hide',
+          iconClass: 'ev-icon-visibility-off',
+          disabled: !useColumnSetting.value || stores.orderedColumns.length === 1,
+          click: () => setColumnHidden(column.field),
+        },
+      ];
+    } else {
+      contextInfo.columnMenuItems.length = 0;
+    }
+  };
   /**
    * 마우스 우클릭 이벤트를 처리한다.
    *
@@ -615,7 +635,11 @@ export const contextMenuEvent = (params) => {
       emit('update:selected', []);
     }
   };
-  return { setContextMenu, onContextMenu };
+  return {
+    setContextMenu,
+    onContextMenu,
+    onColumnContextMenu,
+  };
 };
 
 export const treeEvent = (params) => {

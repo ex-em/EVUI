@@ -1,12 +1,18 @@
 <template>
   <div
-    v-if="$slots.toolbar"
+    v-if="$slots.toolbar || useColumnSetting"
+    ref="toolbarWrapper"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
     <toolbar>
       <template #toolbarWrapper>
+        <grid-option-button
+          v-if="useColumnSetting"
+          class="column-setting__icon"
+          @click="setColumnSetting"
+        />
         <slot
           name="toolbar"
           :item="{
@@ -15,6 +21,12 @@
         />
       </template>
     </toolbar>
+    <column-setting
+      v-model:is-show="isShowColumnSetting"
+      :columns="$props.columns"
+      :hidden-column="hiddenColumn"
+      @apply-column="onApplyColumn"
+    />
   </div>
   <div
     ref="grid-wrapper"
@@ -64,7 +76,12 @@
               <!-- Column Name -->
               <span
                 :title="column.caption"
-                class="column-name"
+                :class="[
+                  'column-name',
+                  {'column-name--click' : useColumnSetting}
+                ]"
+                @click="onColumnContextMenu($event, column)"
+                @click.prevent="columnMenu.show"
               >
                 {{ column.caption }}
               </span>
@@ -151,6 +168,10 @@
           ref="menu"
           :items="contextMenuItems"
         />
+        <ev-context-menu
+          ref="columnMenu"
+          :items="columnMenuItems"
+        />
       </div>
       <!-- Resize Line -->
       <div
@@ -187,11 +208,13 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref } from 'vue';
+import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref, provide } from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import GridPagination from '../grid/grid.pagination';
 import GridSummary from '../grid/grid.summary';
+import GridOptionButton from '../grid/grid.optionButton.vue';
+import ColumnSetting from '../grid/grid.columnSetting.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -203,10 +226,15 @@ import {
   filterEvent,
   pagingEvent,
 } from './uses';
+import {
+  columnSettingEvent,
+} from '../grid/uses';
 
 export default {
   name: 'EvTreeGrid',
   components: {
+    ColumnSetting,
+    GridOptionButton,
     treeGridNode,
     Toolbar,
     GridPagination,
@@ -260,6 +288,8 @@ export default {
     'page-change': null,
   },
   setup(props) {
+    const toolbarWrapper = ref(null);
+    const useColumnSetting = computed(() => (props.option?.useColumnSetting || false));
     const useSummary = computed(() => (props.option?.useSummary || false));
     const elementInfo = reactive({
       body: null,
@@ -272,17 +302,25 @@ export default {
       isSearch: false,
       searchWord: '',
     });
+    const columnSettingInfo = reactive({
+      isShowColumnSetting: false,
+      isFilteringColumn: false, // hide된 컬럼이 있는지
+      visibleColumnIdx: [], // 보여지는 컬럼의 인덱스 목록
+      hiddenColumn: '',
+    });
     const stores = reactive({
       treeStore: [],
       viewStore: [],
       filterStore: [],
       pagingStore: [],
-      treeRows: props.rows,
-      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
-      orderedColumns: computed(() =>
-        props.columns.map((column, index) => ({ index, ...column }))),
+      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
+      treeRows: props.rows,
+      filteredColumns: [],
+      originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
+      orderedColumns: computed(() => (stores.filteredColumns.length
+        ? stores.filteredColumns : stores.originColumns)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
@@ -338,6 +376,8 @@ export default {
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
+      columnMenu: null,
+      columnMenuItems: [],
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
@@ -432,11 +472,6 @@ export default {
     });
 
     const {
-      setContextMenu,
-      onContextMenu,
-    } = contextMenuEvent({ contextInfo, stores, selectInfo });
-
-    const {
       setTreeNodeStore,
       handleExpand,
     } = treeEvent({ stores, onResize });
@@ -454,6 +489,32 @@ export default {
       updatePagingInfo,
     });
 
+    const {
+      setColumnSetting,
+      initColumnSettingInfo,
+      onApplyColumn,
+      setColumnHidden,
+    } = columnSettingEvent({
+      stores,
+      columnSettingInfo,
+      onSearch,
+      onResize,
+    });
+
+    const {
+      setContextMenu,
+      onContextMenu,
+      onColumnContextMenu,
+    } = contextMenuEvent({
+      contextInfo,
+      stores,
+      selectInfo,
+      setColumnHidden,
+      useColumnSetting,
+    });
+
+    provide('toolbarWrapper', toolbarWrapper);
+
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
     });
@@ -461,6 +522,12 @@ export default {
       onResize();
     });
 
+    watch(
+      () => props.columns,
+      () => {
+        initColumnSettingInfo();
+      }, { deep: true },
+    );
     watch(
       () => props.checked,
       (value) => {
@@ -706,6 +773,7 @@ export default {
     const getSlotName = column => `${column}Node`;
 
     return {
+      toolbarWrapper,
       summaryScroll,
       gridStyle,
       gridClass,
@@ -714,6 +782,7 @@ export default {
       isHeaderCheckbox,
       bodyStyle,
       useSummary,
+      useColumnSetting,
       stores,
       ...toRefs(styleInfo),
       ...toRefs(elementInfo),
@@ -725,6 +794,7 @@ export default {
       ...toRefs(checkInfo),
       ...toRefs(contextInfo),
       ...toRefs(pageInfo),
+      ...toRefs(columnSettingInfo),
       isRenderer,
       getComponentName,
       getConvertValue,
@@ -748,6 +818,9 @@ export default {
       getColumnClass,
       getColumnStyle,
       getSlotName,
+      setColumnSetting,
+      onApplyColumn,
+      onColumnContextMenu,
     };
   },
 };
