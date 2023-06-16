@@ -12,6 +12,7 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
+        useColumnSetting: true,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
