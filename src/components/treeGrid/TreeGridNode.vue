@@ -30,7 +30,7 @@
         :class="getColumnClass(column, cellIndex)"
         :style="getColumnStyle(column)"
       >
-        <div class="cell-content">
+        <div class="td-content">
           <!--Level Depth-->
           <span
             v-if="cellIndex === expandColumnIdx"
