@@ -288,16 +288,16 @@ const modules = {
               || e.layerY < touchInfo.range.y1
               || e.layerX > touchInfo.range.x2
               || e.layerY > touchInfo.range.y2)) {
-              this.isOverlay = false;
+              this.isTouchOverlay = false;
             } else {
               touchInfo = this.setTouchBoxDimensions(touchInfo);
-              this.isOverlay = true;
+              this.isTouchOverlay = true;
               this.drawSelectionArea(touchInfo);
             }
 
             if (!this.options.dragSelection.keepDisplay) {
               setTimeout(() => {
-                this.isOverlay = false;
+                this.isTouchOverlay = false;
                 this.overlayClear();
               }, 100);
             }
@@ -356,7 +356,8 @@ const modules = {
     this.overlayCanvas.addEventListener('click', this.onClick);
     this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
 
-    window.addEventListener('click', e => this.dragTouchSelectionDestroy(e));
+    this.dragTouchSelectionEvent = e => this.dragTouchSelectionDestroy(e);
+    window.addEventListener('click', this.dragTouchSelectionEvent);
   },
 
   /**
@@ -681,9 +682,9 @@ const modules = {
     if (
       this.options.dragSelection?.use
       && e.target !== this.overlayCanvas
-      && this.isOverlay
+      && this.isTouchOverlay
     ) {
-      this.isOverlay = false;
+      this.isTouchOverlay = false;
       this.overlayClear();
     }
   },

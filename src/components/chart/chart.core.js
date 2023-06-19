@@ -846,7 +846,7 @@ class EvChart {
   overlayClear() {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas?.width / this.clearRectRatio,
+    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
       this.overlayCanvas?.height / this.clearRectRatio);
   }
 
@@ -941,6 +941,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('click', this.onClick);
       this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
+      window.removeEventListener('click', this.dragTouchSelectionEvent);
     }
 
     if (this.options.tooltip.use) {
