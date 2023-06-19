@@ -184,9 +184,10 @@
     }
     &.tree-td {
       text-align: left !important;
-      .cell-content {
+      .td-content {
         display: flex;
         position: relative;
+        align-items: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
