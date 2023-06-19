@@ -61,7 +61,7 @@
 </template>
 
 <script>
-  import { ref, reactive } from 'vue';
+  import { ref } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -97,7 +97,7 @@
         },
       };
 
-      const chartOptions = reactive({
+      const chartOptions = {
         type: 'scatter',
         width: '100%',
         title: {
@@ -128,7 +128,7 @@
         tooltip: {
           use: true,
         },
-      });
+      };
 
       const selectionItems = ref([]);
       const selectionRange = ref({});
