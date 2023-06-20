@@ -297,12 +297,23 @@
                   'line-height': `${rowHeight}px`,
                 }"
               >
-                <ev-icon
-                  icon="ev-icon-warning2"
-                  class="row-contextmenu__btn"
-                  @click="onContextMenu($event)"
-                  @click.prevent="menu.show"
-                />
+                <template v-if="$slots.contextmenuIcon">
+                  <span
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  >
+                    <slot name="contextmenuIcon"></slot>
+                  </span>
+                </template>
+                <template v-else>
+                  <ev-icon
+                    icon="ev-icon-warning2"
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  />
+                </template>
               </td>
             </tr>
             <tr v-if="!viewStore.length">
