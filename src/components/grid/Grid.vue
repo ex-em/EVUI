@@ -175,8 +175,8 @@
             :style="{
               position: 'sticky',
               right: 0,
-              width: '40px',
-              'min-width': '40px',
+              width: '30px',
+              'min-width': '30px',
               'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
                 ? `${scrollWidth}px` : '0px',
             }"
@@ -277,19 +277,20 @@
               <td
                 v-if="$props.option.customContextMenu?.length"
                 :class="{
-                  cell: true,
+                  'row-contextmenu': true,
                   'non-border': !!borderStyle,
                 }"
                 :style="{
                   position: 'sticky',
                   right: 0,
-                  width: '40px',
+                  width: '30px',
                   height: `${rowHeight}px`,
-                  'min-width': '40px',
+                  'min-width': '30px',
                   'line-height': `${rowHeight}px`,
                 }"
               >
-                <grid-option-button
+                <ev-icon
+                  icon="ev-icon-warning2"
                   class="row-contextmenu__btn"
                   @click="onContextMenu($event)"
                   @click.prevent="menu.show"

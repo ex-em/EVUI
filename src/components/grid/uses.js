@@ -183,9 +183,6 @@ export const resizeEvent = (params) => {
         if (cur.hide) {
           return acc;
         }
-        if (cur.field === 'db-icon' || cur.field === 'user-icon') {
-          cur.width = resizeInfo.iconWidth;
-        }
         if (cur.width) {
           acc.totalWidth += cur.width;
         } else {
@@ -358,8 +355,9 @@ export const clickEvent = (params) => {
   let timer = null;
   let lastIndex = -1;
   const onRowClick = (event, row) => {
+    debugger;
     if (event.target.parentElement.classList?.contains('row-checkbox-input')
-      || event.target.classList?.contains('row-contextmenu__btn')) {
+      || event.target.closest('td').classList.contains('row-contextmenu')) {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
@@ -762,10 +760,6 @@ export const contextMenuEvent = (params) => {
   const onContextMenu = (event) => {
     const target = event.target;
     const rowIndex = target.closest('.row')?.dataset?.index;
-    if (target.classList.contains('row-contextmenu__btn')) {
-      setContextMenu();
-      return;
-    }
     let clickedRow;
     if (rowIndex) {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
