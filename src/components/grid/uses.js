@@ -363,7 +363,6 @@ export const clickEvent = (params) => {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
-      debugger;
       if (keyType === 'shift') {
         const rowIndex = row[ROW_INDEX];
         if (lastIndex > -1) {
