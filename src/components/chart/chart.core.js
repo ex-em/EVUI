@@ -847,7 +847,7 @@ class EvChart {
     this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
 
     this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-      this.overlayCanvas?.height / this.clearRectRatio);
+      this.overlayCanvas.height / this.clearRectRatio);
   }
 
   /**
