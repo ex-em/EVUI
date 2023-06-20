@@ -363,7 +363,8 @@ export const clickEvent = (params) => {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
-      if (keyType === 'shift') { // shift
+      debugger;
+      if (keyType === 'shift') {
         const rowIndex = row[ROW_INDEX];
         if (lastIndex > -1) {
           for (
@@ -385,10 +386,12 @@ export const clickEvent = (params) => {
             }
           }
         }
-      } else if (selected) {
-        selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
-      } else {
-        selectInfo.selectedRow.push(selectedRow);
+      } else if (keyType === 'ctrl') {
+        if (!selected) {
+          selectInfo.selectedRow.push(selectedRow);
+        } else {
+          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+        }
       }
     };
 
@@ -405,7 +408,7 @@ export const clickEvent = (params) => {
           keyType = 'ctrl';
         }
 
-        if (selectInfo.multiple) { // multi select
+        if (selectInfo.multiple && keyType) { // multi select
           onMultiSelectByKey(keyType, selected, rowData);
         } else if (selected) { // single select
           selectInfo.selectedRow = [];
