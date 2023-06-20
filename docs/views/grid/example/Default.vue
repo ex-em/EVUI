@@ -8,7 +8,7 @@
       :width="widthMV"
       :height="heightMV"
       :option="{
-        adjust: false,
+        adjust: true,
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,

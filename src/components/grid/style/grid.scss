@@ -59,12 +59,12 @@
   vertical-align: top;
   user-select: none;
 
-  @include evThemify() {
-    border-right: 1px solid evThemed('grid-bottom-border');
-  }
-  &:nth-last-child(1) {
-    border-right: 0;
-  }
+  //@include evThemify() {
+  //  border-right: 1px solid evThemed('grid-bottom-border');
+  //}
+  //&:nth-last-child(1) {
+  //  border-right: 0;
+  //}
   .column-sort__icon {
     position: absolute;
     top: 50%;
@@ -173,9 +173,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 
-    @include evThemify() {
-      border-right: 1px solid evThemed('grid-bottom-border');
-    }
+    //@include evThemify() {
+    //  border-right: 1px solid evThemed('grid-bottom-border');
+    //}
     div {
       white-space: nowrap;
       overflow: hidden;
@@ -212,9 +212,9 @@
         justify-content: flex-end;
       }
     }
-    &:last-child {
-      border-right: 0;
-    }
+    //&:last-child {
+    //  border-right: 0;
+    //}
   }
 }
 

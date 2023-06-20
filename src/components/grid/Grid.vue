@@ -66,7 +66,10 @@
               'column': true,
               'non-border': !!borderStyle,
             }"
-            :style="`width: ${minWidth}px;`"
+            :style="{
+              width: `${minWidth}px`,
+              'border-right': '1px solid #CFCFCF'
+            }"
           >
             <ev-checkbox
               v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
@@ -91,8 +94,9 @@
               :style="{
                 width: `${column.width}px`,
                 'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                'margin-right': orderedColumns.length - 1 === index
-                && (hasVerticalScrollBar || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'margin-right': orderedColumns.length - 1 === index && (hasVerticalScrollBar
+                  || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'border-right': orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
               }"
             >
               <!-- Column Name -->
@@ -173,8 +177,6 @@
               'non-border': !!borderStyle,
             }"
             :style="{
-              position: 'sticky',
-              right: 0,
               width: '30px',
               'min-width': '30px',
               'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
@@ -226,7 +228,11 @@
                   'row-checkbox': true,
                   'non-border': !!borderStyle,
                 }"
-                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+                :style="{
+                  width: `${minWidth}px`,
+                  height: `${rowHeight}px`,
+                  'border-right': '1px solid #CFCFCF',
+                }"
               >
                 <ev-checkbox
                   v-model="row[1]"
@@ -256,6 +262,8 @@
                     height: `${rowHeight}px`,
                     'line-height': `${rowHeight}px`,
                     'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                    'border-right': orderedColumns.length - 1 === column.index
+                      ? 'none' : '1px solid #CFCFCF',
                   }"
                 >
                   <!-- Cell Renderer -->
@@ -628,6 +636,7 @@ export default {
       isRenderer,
       updateVScroll,
       updateHScroll,
+      contextInfo,
     });
 
     const {
