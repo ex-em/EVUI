@@ -379,9 +379,10 @@ export const clickEvent = (params) => {
             } else {
               stores.originStore[i][ROW_SELECT_INDEX] = false;
               const deselectedIndex = selectInfo.selectedRow
-                .findIndex(
-                  sr => sr === stores.originStore[i][ROW_DATA_INDEX]);
-              selectInfo.selectedRow.splice(deselectedIndex, 1);
+                .indexOf(stores.originStore[i][ROW_DATA_INDEX]);
+              if (deselectedIndex > -1) {
+                selectInfo.selectedRow.splice(deselectedIndex, 1);
+              }
             }
           }
         }
