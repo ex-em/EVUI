@@ -426,12 +426,17 @@ export default {
       type: [Array],
       default: () => [],
     },
+    contextmenuInfo: {
+      type: [Array],
+      default: () => [],
+    },
     option: {
       type: Object,
       default: () => ({}),
     },
   },
   emits: {
+    'update:contextmenuInfo': null,
     'update:selected': null,
     'click-row': null,
     'dblclick-row': null,

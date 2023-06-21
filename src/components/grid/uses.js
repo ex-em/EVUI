@@ -765,6 +765,11 @@ export const contextMenuEvent = (params) => {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
 
+    if (event.target.closest('td')?.classList?.contains('row-contextmenu')) {
+      setContextMenu();
+      emit('update:contextmenuInfo', [clickedRow]);
+      return;
+    }
     if (clickedRow) {
       selectInfo.selectedRow = clickedRow;
       setContextMenu();
