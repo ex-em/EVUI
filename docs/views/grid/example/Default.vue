@@ -251,7 +251,7 @@ export default {
         click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
       }, {
         text: 'Menu2',
-        click: () => console.log('[Menu2]', contextmenuInfo.value),
+        click: param => console.log('[Menu2]', param.contextMenuInfo),
       },
     ]);
     const highlightMV = ref(-1);

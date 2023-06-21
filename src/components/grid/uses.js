@@ -691,7 +691,6 @@ export const filterEvent = (params) => {
 };
 
 export const contextMenuEvent = (params) => {
-  const { emit } = getCurrentInstance();
   const {
     contextInfo,
     stores,
@@ -718,6 +717,7 @@ export const contextMenuEvent = (params) => {
           }
 
           menuItem.selectedRow = row ?? [];
+          menuItem.contextMenuInfo = [selectInfo.contextMenuInfo];
 
           return menuItem;
         });
@@ -765,8 +765,8 @@ export const contextMenuEvent = (params) => {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
+      selectInfo.contextMenuInfo = [clickedRow];
       setContextMenu();
-      emit('update:contextmenuInfo', [clickedRow]);
     }
   };
   return {
