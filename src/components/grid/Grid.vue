@@ -526,7 +526,7 @@ export default {
       hasHorizontalScrollBar: false,
     });
     const selectInfo = reactive({
-      contextMenuInfo: props.contextmenuInfo,
+      contextmenuInfo: props.contextmenuInfo,
       selectedRow: props.selected,
       useSelect: computed(() => props.option?.useSelection?.use ?? true),
       multiple: computed(() => props.option?.useSelection?.multiple ?? false),

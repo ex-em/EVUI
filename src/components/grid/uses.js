@@ -717,7 +717,7 @@ export const contextMenuEvent = (params) => {
           }
 
           menuItem.selectedRow = row ?? [];
-          menuItem.contextMenuInfo = [selectInfo.contextMenuInfo];
+          menuItem.contextmenuInfo = [selectInfo.contextmenuInfo];
 
           return menuItem;
         });
@@ -765,7 +765,7 @@ export const contextMenuEvent = (params) => {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
-      selectInfo.contextMenuInfo = [clickedRow];
+      selectInfo.contextmenuInfo = [clickedRow];
       setContextMenu();
     }
   };

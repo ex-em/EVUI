@@ -3,7 +3,6 @@
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
-      v-model:contextmenuInfo="contextmenuInfo"
       :columns="columns"
       :rows="tableData"
       :width="widthMV"
@@ -227,7 +226,6 @@ export default {
   setup() {
     const tableData = ref([]);
     const selected = ref([]);
-    const contextmenuInfo = ref([]);
     const checked = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
@@ -251,7 +249,7 @@ export default {
         click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
       }, {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param.contextMenuInfo),
+        click: param => console.log('[Menu2]', param.contextmenuInfo),
       },
     ]);
     const highlightMV = ref(-1);
@@ -332,7 +330,6 @@ export default {
 
     tableData.value = getData(50, 0);
     return {
-      contextmenuInfo,
       columns,
       tableData,
       selected,
