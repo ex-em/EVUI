@@ -760,24 +760,13 @@ export const contextMenuEvent = (params) => {
   const onContextMenu = (event) => {
     const target = event.target;
     const rowIndex = target.closest('.row')?.dataset?.index;
-    let clickedRow;
+    let clickedRow = null;
     if (rowIndex) {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
-
-    if (event.target.closest('td')?.classList?.contains('row-contextmenu')) {
+    if (clickedRow) {
       setContextMenu();
       emit('update:contextmenuInfo', [clickedRow]);
-      return;
-    }
-    if (clickedRow) {
-      selectInfo.selectedRow = clickedRow;
-      setContextMenu();
-      emit('update:selected', [clickedRow]);
-    } else {
-      selectInfo.selectedRow = [];
-      setContextMenu(false);
-      emit('update:selected', []);
     }
   };
   return {
