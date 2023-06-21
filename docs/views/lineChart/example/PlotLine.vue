@@ -54,6 +54,7 @@ export default {
           color: '#FF0000',
           value: chartData.labels[5],
           segments: [6, 2],
+          lineWidth: 1,
           label: {
             show: true,
             text: 'X Plot Line',
@@ -80,6 +81,7 @@ export default {
           color: '#FF0000',
           value: 50,
           segments: [6, 2],
+          lineWidth: 1,
           label: {
             show: true,
             text: 'Y Plot Line',

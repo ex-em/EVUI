@@ -527,7 +527,7 @@ class Scale {
 
   /**
    * Draw X Plot line
-   * @param {object} dataX         Data's X Position
+   * @param {number} dataX         Data's X Position
    * @param {number} minX          Min X Position
    * @param {number} maxX          Max X Position
    * @param {number} minY          Min Y Position
@@ -544,8 +544,11 @@ class Scale {
       return;
     }
 
-    ctx.moveTo(dataX, maxY);
-    ctx.lineTo(dataX, minY);
+    let dataXPos = dataX;
+    dataXPos += Util.aliasPixel(ctx.lineWidth);
+
+    ctx.moveTo(dataXPos, maxY);
+    ctx.lineTo(dataXPos, minY);
 
     ctx.stroke();
     ctx.restore();
@@ -554,7 +557,7 @@ class Scale {
 
   /**
    * Draw Y Plot line
-   * @param {object} dataY         Data's Y Position
+   * @param {number} dataY         Data's Y Position
    * @param {number} minX          Min X Position
    * @param {number} maxX          Max X Position
    * @param {number} minY          Min Y Position
@@ -571,8 +574,11 @@ class Scale {
       return;
     }
 
-    ctx.moveTo(minX, dataY);
-    ctx.lineTo(maxX, dataY);
+    let dataYPos = dataY;
+    dataYPos += Util.aliasPixel(ctx.lineWidth);
+
+    ctx.moveTo(minX, dataYPos);
+    ctx.lineTo(maxX, dataYPos);
 
     ctx.stroke();
     ctx.restore();
