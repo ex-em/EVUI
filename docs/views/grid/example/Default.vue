@@ -268,7 +268,7 @@ export default {
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
       { caption: 'Role', field: 'role', type: 'string', width: 100 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      { caption: 'Email', field: 'email', type: 'string', width: 200 },
+      { caption: 'Email', field: 'email', type: 'string', width: 150 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
     ]);
     const resetBorderStyle = () => {

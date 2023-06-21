@@ -66,7 +66,10 @@
               'column': true,
               'non-border': !!borderStyle,
             }"
-            :style="`width: ${minWidth}px;`"
+            :style="{
+              width: `${minWidth}px`,
+              'border-right': '1px solid #CFCFCF'
+            }"
           >
             <ev-checkbox
               v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
@@ -91,8 +94,9 @@
               :style="{
                 width: `${column.width}px`,
                 'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                'margin-right': orderedColumns.length - 1 === index
-                && (hasVerticalScrollBar || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'margin-right': orderedColumns.length - 1 === index && (hasVerticalScrollBar
+                  || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'border-right': orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
               }"
             >
               <!-- Column Name -->
@@ -173,10 +177,8 @@
               'non-border': !!borderStyle,
             }"
             :style="{
-              position: 'sticky',
-              right: 0,
-              width: '40px',
-              'min-width': '40px',
+              width: '30px',
+              'min-width': '30px',
               'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
                 ? `${scrollWidth}px` : '0px',
             }"
@@ -226,7 +228,11 @@
                   'row-checkbox': true,
                   'non-border': !!borderStyle,
                 }"
-                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+                :style="{
+                  width: `${minWidth}px`,
+                  height: `${rowHeight}px`,
+                  'border-right': '1px solid #CFCFCF',
+                }"
               >
                 <ev-checkbox
                   v-model="row[1]"
@@ -256,6 +262,8 @@
                     height: `${rowHeight}px`,
                     'line-height': `${rowHeight}px`,
                     'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                    'border-right': orderedColumns.length - 1 === column.index
+                      ? 'none' : '1px solid #CFCFCF',
                   }"
                 >
                   <!-- Cell Renderer -->
@@ -277,23 +285,35 @@
               <td
                 v-if="$props.option.customContextMenu?.length"
                 :class="{
-                  cell: true,
+                  'row-contextmenu': true,
                   'non-border': !!borderStyle,
                 }"
                 :style="{
                   position: 'sticky',
                   right: 0,
-                  width: '40px',
+                  width: '30px',
                   height: `${rowHeight}px`,
-                  'min-width': '40px',
+                  'min-width': '30px',
                   'line-height': `${rowHeight}px`,
                 }"
               >
-                <grid-option-button
-                  class="row-contextmenu__btn"
-                  @click="onContextMenu($event)"
-                  @click.prevent="menu.show"
-                />
+                <template v-if="$slots.contextmenuIcon">
+                  <span
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  >
+                    <slot name="contextmenuIcon"></slot>
+                  </span>
+                </template>
+                <template v-else>
+                  <ev-icon
+                    icon="ev-icon-warning2"
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  />
+                </template>
               </td>
             </tr>
             <tr v-if="!viewStore.length">
@@ -627,6 +647,7 @@ export default {
       isRenderer,
       updateVScroll,
       updateHScroll,
+      contextInfo,
     });
 
     const {
