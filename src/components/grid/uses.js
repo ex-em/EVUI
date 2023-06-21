@@ -765,7 +765,7 @@ export const contextMenuEvent = (params) => {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
-      selectInfo.contextmenuInfo = [clickedRow];
+      selectInfo.contextmenuInfo = clickedRow;
       setContextMenu();
     }
   };

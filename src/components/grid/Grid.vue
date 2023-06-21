@@ -426,10 +426,6 @@ export default {
       type: [Array],
       default: () => [],
     },
-    contextmenuInfo: {
-      type: [Array],
-      default: () => [],
-    },
     option: {
       type: Object,
       default: () => ({}),
