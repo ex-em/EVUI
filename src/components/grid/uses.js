@@ -357,7 +357,7 @@ export const clickEvent = (params) => {
   let lastIndex = -1;
   const onRowClick = (event, row) => {
     if (event.target.parentElement.classList?.contains('row-checkbox-input')
-      || event.target.closest('td').classList?.contains('row-contextmenu')) {
+      || event.target.closest('td')?.classList?.contains('row-contextmenu')) {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
@@ -691,7 +691,6 @@ export const filterEvent = (params) => {
 };
 
 export const contextMenuEvent = (params) => {
-  const { emit } = getCurrentInstance();
   const {
     contextInfo,
     stores,
@@ -718,6 +717,7 @@ export const contextMenuEvent = (params) => {
           }
 
           menuItem.selectedRow = row ?? [];
+          menuItem.contextmenuInfo = [selectInfo.contextmenuInfo];
 
           return menuItem;
         });
@@ -760,19 +760,13 @@ export const contextMenuEvent = (params) => {
   const onContextMenu = (event) => {
     const target = event.target;
     const rowIndex = target.closest('.row')?.dataset?.index;
-    let clickedRow;
+    let clickedRow = null;
     if (rowIndex) {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
-
     if (clickedRow) {
-      selectInfo.selectedRow = clickedRow;
+      selectInfo.contextmenuInfo = clickedRow;
       setContextMenu();
-      emit('update:selected', [clickedRow]);
-    } else {
-      selectInfo.selectedRow = [];
-      setContextMenu(false);
-      emit('update:selected', []);
     }
   };
   return {
