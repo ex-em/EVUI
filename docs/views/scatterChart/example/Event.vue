@@ -138,7 +138,6 @@
         selectionRange.value = range;
       };
 
-
       const dblClickedInfo = ref(null);
       const onDblClick = ({ e, label, value, sId }) => {
         dblClickedInfo.value = { e, label, value, sId };
@@ -149,8 +148,10 @@
         clickedInfo.value = { e, label, value, sId };
 
         // Clear drag selection info
-        selectionItems.value = [];
-        selectionRange.value = {};
+        if (e.pointerType === 'mouse') {
+          selectionItems.value = [];
+          selectionRange.value = {};
+        }
       };
 
       const getDateString = x => dayjs(x).format('HH:mm:ss');

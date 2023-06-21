@@ -181,6 +181,7 @@ const DEFAULT_OPTIONS = {
   dragSelection: {
     use: false,
     keepDisplay: true,
+    size: 50,
     fillColor: '#38ACEC',
     opacity: 0.65,
   },
