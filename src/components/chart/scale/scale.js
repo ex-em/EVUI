@@ -10,7 +10,7 @@ import {
 import Util from '../helpers/helpers.util';
 
 class Scale {
-  constructor(type, axisOpt, ctx, options) {
+  constructor(type, axisOpt, ctx, labels, options) {
     const merged = defaultsDeep({}, axisOpt, AXIS_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
@@ -19,6 +19,7 @@ class Scale {
     this.type = type;
     this.ctx = ctx;
     this.units = AXIS_UNITS[this.type];
+    this.labels = labels;
     this.options = options;
 
     if (!this.position) {
@@ -275,10 +276,22 @@ class Scale {
     }
 
     if (this.labelStyle?.show) {
-      const labelGap = (endPoint - startPoint) / steps;
+      const distance = endPoint - startPoint;
+      const labelGap = distance / steps;
       const ticks = [];
+      const size = stepInfo.interval;
       let labelCenter = null;
       let linePosition = null;
+      let offsetStartPoint = startPoint;
+      let axisMinForLabel = axisMin;
+
+      if (this.type === 'x' && options?.axesX[0].flow && this.labels.length !== steps + 1) {
+        const axisMinByMinutes = Math.floor(axisMin / size) * size;
+        if (axisMinByMinutes !== +axisMin) {
+          axisMinForLabel = axisMinByMinutes + size;
+          offsetStartPoint += (distance / (axisMax - axisMin)) * (axisMinForLabel - axisMin);
+        }
+      }
 
       ctx.strokeStyle = this.gridLineColor;
       ctx.lineWidth = 1;
@@ -286,82 +299,85 @@ class Scale {
 
       let labelText;
       for (let ix = 0; ix <= steps; ix++) {
-        ctx.beginPath();
-        ticks[ix] = axisMin + (ix * stepValue);
+        labelCenter = Math.round(offsetStartPoint + (labelGap * ix));
 
-        labelCenter = Math.round(startPoint + (labelGap * ix));
-        linePosition = labelCenter + aliasPixel;
-        labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+        if (labelCenter <= endPoint || this.type !== 'x' || !options?.axesX[0].flow || this.labels.length === steps + 1) {
+          ctx.beginPath();
+          ticks[ix] = axisMinForLabel + (ix * stepValue);
 
-        const isBlurredLabel = this.options?.selectLabel?.use
-          && this.options?.selectLabel?.useLabelOpacity
-          && (this.options.horizontal === (this.type === 'y'))
-          && selectLabelInfo?.dataIndex?.length
-          && !selectLabelInfo?.label
-            .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
+          linePosition = labelCenter + aliasPixel;
+          labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
-        const labelColor = this.labelStyle.color;
-        let defaultOpacity = 1;
+          const isBlurredLabel = this.options?.selectLabel?.use
+            && this.options?.selectLabel?.useLabelOpacity
+            && (this.options.horizontal === (this.type === 'y'))
+            && selectLabelInfo?.dataIndex?.length
+            && !selectLabelInfo?.label
+              .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
 
-        if (Util.getColorStringType(labelColor) === 'RGBA') {
-          defaultOpacity = Util.getOpacity(labelColor);
-        }
+          const labelColor = this.labelStyle.color;
+          let defaultOpacity = 1;
 
-        ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
-
-        let labelPoint;
-
-        if (this.type === 'x') {
-          labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          if (options?.brush?.showLabel || !options?.brush) {
-            ctx.fillText(labelText, labelCenter, labelPoint);
+          if (Util.getColorStringType(labelColor) === 'RGBA') {
+            defaultOpacity = Util.getOpacity(labelColor);
           }
 
-          if (!isBlurredLabel
-            && options?.selectItem?.showLabelTip
-            && hitInfo?.label
-            && !this.options?.horizontal) {
-            const selectedLabel = this.getLabelFormat(
-              Math.min(axisMax, hitInfo.label + (0 * stepValue)),
-            );
-            if (selectedLabel === labelText) {
-              const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
-              Util.showLabelTip({
-                ctx: this.ctx,
-                width: Math.round(ctx.measureText(selectedLabel).width) + 10,
-                height,
-                x: labelCenter,
-                y: labelPoint + (height - 2),
-                borderRadius: 2,
-                arrowSize: 3,
-                text: labelText,
-                backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
-                textColor: options?.selectItem?.labelTipStyle?.textColor,
-              });
+          ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+
+          let labelPoint;
+
+          if (this.type === 'x') {
+            labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+            if (options?.brush?.showLabel || !options?.brush) {
+              ctx.fillText(labelText, labelCenter, labelPoint);
+            }
+
+            if (!isBlurredLabel
+              && options?.selectItem?.showLabelTip
+              && hitInfo?.label
+              && !this.options?.horizontal) {
+              const selectedLabel = this.getLabelFormat(
+                Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+              );
+              if (selectedLabel === labelText) {
+                const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+                Util.showLabelTip({
+                  ctx: this.ctx,
+                  width: Math.round(ctx.measureText(selectedLabel).width) + 10,
+                  height,
+                  x: labelCenter,
+                  y: labelPoint + (height - 2),
+                  borderRadius: 2,
+                  arrowSize: 3,
+                  text: labelText,
+                  backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
+                  textColor: options?.selectItem?.labelTipStyle?.textColor,
+                });
+              }
+            }
+            if ((ix !== 0 || options?.axesX[0].flow) && this.showGrid) {
+              ctx.moveTo(linePosition, offsetPoint);
+              ctx.lineTo(linePosition, offsetCounterPoint);
+            }
+          } else {
+            labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+            if (options?.brush?.showLabel || !options?.brush) {
+              ctx.fillText(labelText, labelPoint, labelCenter);
+            }
+
+            if (ix === steps) {
+              linePosition -= 1;
+            }
+
+            if (ix !== 0 && this.showGrid) {
+              ctx.moveTo(offsetPoint, linePosition);
+              ctx.lineTo(offsetCounterPoint, linePosition);
             }
           }
-          if (ix !== 0 && this.showGrid) {
-            ctx.moveTo(linePosition, offsetPoint);
-            ctx.lineTo(linePosition, offsetCounterPoint);
-          }
-        } else {
-          labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          if (options?.brush?.showLabel || !options?.brush) {
-            ctx.fillText(labelText, labelPoint, labelCenter);
-          }
 
-          if (ix === steps) {
-            linePosition -= 1;
-          }
-
-          if (ix !== 0 && this.showGrid) {
-            ctx.moveTo(offsetPoint, linePosition);
-            ctx.lineTo(offsetCounterPoint, linePosition);
-          }
+          ctx.stroke();
+          ctx.closePath();
         }
-
-        ctx.stroke();
-        ctx.closePath();
       }
     }
 

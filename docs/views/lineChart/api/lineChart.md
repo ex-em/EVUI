@@ -124,6 +124,11 @@ const chartData =
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
 
+##### axesX
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부  | |
+
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
