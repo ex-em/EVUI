@@ -479,6 +479,7 @@ export default {
     const filterInfo = reactive({
       isSearch: false,
       searchWord: '',
+      isFiltering: false,
       isShowFilterSetting: false,
       filterSettingPosition: {
         left: 0,
@@ -497,7 +498,12 @@ export default {
       viewStore: [],
       originStore: [],
       pagingStore: [],
-      store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.originStore)),
+      searchStore: [],
+      filterStore: [],
+      store: computed(() => {
+        const store = filterInfo.isFiltering ? stores.filterStore : stores.originStore;
+        return filterInfo.isSearch ? stores.searchStore : store;
+      }),
       filteredColumns: [],
       originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
@@ -626,6 +632,7 @@ export default {
 
     const {
       onSearch,
+      setFilter,
     } = filterEvent({
       columnSettingInfo,
       filterInfo,
@@ -636,6 +643,7 @@ export default {
       updateVScroll,
       getPagingData,
       updatePagingInfo,
+      getColumnIndex,
     });
 
     const {
@@ -646,8 +654,10 @@ export default {
       stores,
       sortInfo,
       elementInfo,
+      filterInfo,
       setSort,
       updateVScroll,
+      setFilter,
     });
 
     const {
@@ -878,6 +888,9 @@ export default {
     const onApplyFilter = (field, list) => {
       filterInfo.filteringItemsByColumn[field] = list;
       filterInfo.isShowFilterSetting = false;
+      filterInfo.isFiltering = true;
+      stores.filterStore = [];
+      setStore([], false);
     };
     return {
       onApplyFilter,
