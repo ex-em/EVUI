@@ -729,22 +729,24 @@ export const filterEvent = (params) => {
       const columnType = props.columns[index].type;
 
       filters.forEach((filterItem) => {
-        isApply = true;
-        if (!filterStore.length) {
-          filterStore = getFilteringData(originStore, columnType, {
-            ...filterItem,
-            index,
-          });
-        } else if (filterItem.operator === 'or') {
-          filterStore.push(...getFilteringData(originStore, columnType, {
-            ...filterItem,
-            index,
-          }));
-        } else {
-          filterStore = getFilteringData(filterStore, columnType, {
-            ...filterItem,
-            index,
-          });
+        if (filterItem.value) { // 입력한 값이 있어야함
+          isApply = true;
+          if (!filterStore.length) {
+            filterStore = getFilteringData(originStore, columnType, {
+              ...filterItem,
+              index,
+            });
+          } else if (filterItem.operator === 'or') {
+            filterStore.push(...getFilteringData(originStore, columnType, {
+              ...filterItem,
+              index,
+            }));
+          } else {
+            filterStore = getFilteringData(filterStore, columnType, {
+              ...filterItem,
+              index,
+            });
+          }
         }
       });
     });
