@@ -256,22 +256,6 @@ export default {
     padding: 0 10px;
     border-top: 1px solid #CED4DA;
     border-bottom: 1px solid #CED4DA;
-
-    .ev-checkbox {
-      display: block;
-      padding: 10px 0;
-
-      .ev-checkbox-label {
-        width: 120px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
-    .is-empty {
-      height: 30px;
-      text-align: center;
-    }
   }
 
   &__footer {
