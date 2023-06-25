@@ -698,6 +698,7 @@ export const contextMenuEvent = (params) => {
     onSort,
     setColumnHidden,
     useColumnSetting,
+    filterInfo,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -742,6 +743,18 @@ export const contextMenuEvent = (params) => {
           iconClass: 'ev-icon-allow2-down',
           disabled: !sortable,
           click: () => onSort(column, 'desc'),
+        },
+        {
+          text: 'Filter',
+          iconClass: 'ev-icon-filter-list',
+          click: () => {
+            filterInfo.filterSettingPosition = {
+              top: contextInfo.columnMenu.menuStyle.top,
+              left: contextInfo.columnMenu.menuStyle.left,
+            };
+            filterInfo.isShowFilterSetting = true;
+            filterInfo.filteringColumn = column;
+          },
         },
         {
           text: 'Hide',

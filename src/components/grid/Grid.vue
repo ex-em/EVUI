@@ -25,6 +25,13 @@
       :hidden-column="hiddenColumn"
       @apply-column="onApplyColumn"
     />
+    <filter-setting
+      v-model:is-show="isShowFilterSetting"
+      v-model:items="filteringItemsByColumn"
+      :column="filteringColumn"
+      :position="filterSettingPosition"
+      @apply-filtering="onApplyFilter"
+    />
   </div>
   <div
     ref="grid-wrapper"
@@ -375,6 +382,7 @@ import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
 import ColumnSetting from './grid.columnSetting.vue';
+import filterSetting from './grid.filterSetting.vue';
 import GridSortButton from './grid.sortButton';
 import GridOptionButton from './grid.optionButton.vue';
 import {
@@ -398,6 +406,7 @@ export default {
     GridPagination,
     GridSummary,
     ColumnSetting,
+    filterSetting,
     GridSortButton,
     GridOptionButton,
   },
@@ -470,6 +479,13 @@ export default {
     const filterInfo = reactive({
       isSearch: false,
       searchWord: '',
+      isShowFilterSetting: false,
+      filterSettingPosition: {
+        left: 0,
+        top: 0,
+      },
+      filteringColumn: null,
+      filteringItemsByColumn: {},
     });
     const columnSettingInfo = reactive({
       isShowColumnSetting: false,
@@ -674,6 +690,7 @@ export default {
       onSort,
       setColumnHidden,
       useColumnSetting,
+      filterInfo,
     });
 
     provide('toolbarWrapper', toolbarWrapper);
@@ -858,7 +875,12 @@ export default {
         });
       },
     );
+    const onApplyFilter = (field, list) => {
+      filterInfo.filteringItemsByColumn[field] = list;
+      filterInfo.isShowFilterSetting = false;
+    };
     return {
+      onApplyFilter,
       summaryScroll,
       showHeader,
       stripeStyle,

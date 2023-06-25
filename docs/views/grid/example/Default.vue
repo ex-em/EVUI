@@ -267,6 +267,7 @@ export default {
     const columns = ref([
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
       { caption: 'Role', field: 'role', type: 'string', width: 100 },
+      { caption: 'number', field: 'number', type: 'number', width: 100 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string', width: 150 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
@@ -302,6 +303,7 @@ export default {
         temp.push([
           `user_${ix + 1}`,
           roles[ix % 2],
+          ix,
           '010-0000-0000',
           'kmn0827@ex-em.com',
           '2020.08.04 14:15',
