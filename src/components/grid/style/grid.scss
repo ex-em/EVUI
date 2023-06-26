@@ -35,7 +35,6 @@
   .row-contextmenu__btn {
     display: none;
     vertical-align: middle;
-    cursor: pointer;
   }
 }
 
@@ -162,6 +161,10 @@
     &:hover {
       .row-contextmenu__btn {
         display: grid;
+        &:hover {
+          cursor: pointer;
+          opacity: 0.6;
+        }
       }
     }
   }

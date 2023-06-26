@@ -36,17 +36,7 @@
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
       @page-change="onRequestData"
-    >
-      <template #sortIcon>
-        <ev-icon icon="ev-icon-menu2" />
-      </template>
-      <template #sortIcon_desc>
-        <ev-icon icon="ev-icon-triangle-down" />
-      </template>
-      <template #sortIcon_asc>
-        <ev-icon icon="ev-icon-triangle-up" />
-      </template>
-    </ev-grid>
+    />
     <!-- description -->
     <div class="description">
       <div class="form-rows">

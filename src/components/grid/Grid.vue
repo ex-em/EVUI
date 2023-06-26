@@ -314,7 +314,7 @@
                   </span>
                 </template>
                 <template v-else>
-                  <ev-icon
+                  <grid-option-button
                     icon="ev-icon-warning2"
                     class="row-contextmenu__btn"
                     @click="onContextMenu($event)"
