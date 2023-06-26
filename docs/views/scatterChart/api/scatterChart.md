@@ -92,7 +92,7 @@ const chartData =
 ##### axesX
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
-| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, categoryMode일 때는 작동하지 않음.  | |
+| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, time type에서만 사용하길 권장.<br>categoryMode일 때는 작동하지 않음. | |
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
