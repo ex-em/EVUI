@@ -35,7 +35,6 @@
   .row-contextmenu__btn {
     display: none;
     vertical-align: middle;
-    cursor: pointer;
   }
 }
 
@@ -162,6 +161,10 @@
     &:hover {
       .row-contextmenu__btn {
         display: grid;
+        &:hover {
+          cursor: pointer;
+          opacity: 0.6;
+        }
       }
     }
   }
@@ -250,3 +253,68 @@
   height: 30px;
   text-align: center;
 }
+
+.filtering-items {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+  position: absolute;
+  padding: 8px;
+  flex-direction: row;
+  align-items: center;
+  z-index: 1;
+  border-radius: 4px;
+  &-expand {
+    &:hover {
+      cursor: pointer;
+      color: #0077FF;
+    }
+  }
+  &__item {
+    padding: 4px;
+    border-radius: 4px;
+    background: #EAF2FA;
+    &:hover {
+      cursor: pointer;
+      border: 1px solid #198FFF;
+    }
+    &--title {
+      color: #0077FF;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    &--value {
+      display: inline-block;
+      max-width: 80px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    &--remove {
+      vertical-align: middle;
+      margin-left: 6px;
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+    &.non-display {
+      display: none;
+    }
+  }
+}
+.ev-grid-filtering-items {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+  position: relative;
+  padding: 10px;
+  align-items: center;
+  border: 1px solid #CED4DA;
+  background: #FFFFFF;
+  border-radius: 4px;
+  overflow: auto;
+  max-width: 500px;
+  max-height: 100px;
+}
+

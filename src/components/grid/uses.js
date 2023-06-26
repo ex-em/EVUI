@@ -1,4 +1,5 @@
 import { getCurrentInstance, nextTick } from 'vue';
+import { uniqBy } from 'lodash-es';
 import { numberWithComma } from '@/common/utils';
 
 const ROW_INDEX = 0;
@@ -617,6 +618,7 @@ export const sortEvent = (params) => {
 };
 
 export const filterEvent = (params) => {
+  const { props } = getCurrentInstance();
   const {
     columnSettingInfo,
     filterInfo,
@@ -627,7 +629,157 @@ export const filterEvent = (params) => {
     updateVScroll,
     getPagingData,
     updatePagingInfo,
+    getColumnIndex,
   } = params;
+  /**
+   * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
+   *
+   * @param {string} search - 검색 키워드
+   * @param {string} origin - 기준 문자열
+   * @returns {boolean} 문자열 내 키워드 존재 유무
+   */
+  const findLike = (search, origin, pos) => {
+    if (typeof search !== 'string' || origin === null) {
+      return false;
+    }
+    let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
+    regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
+    let regValue = `^${regx}$`;
+    if (pos) {
+      if (pos === 'start') {
+        regValue = `^${regx}`;
+      } else if (pos === 'end') {
+        regValue = `${regx}$`;
+      }
+    }
+    return RegExp(regValue, 'gi').test(origin);
+  };
+  /**
+   * 필터 조건에 따라 문자열을 확인한다.
+   *
+   * @param {array} item - row 데이터
+   * @param {object} condition - 필터 정보
+   * @returns {boolean} 확인 결과
+   */
+  const stringFilter = (item, condition) => {
+    const comparison = condition.comparison;
+    const conditionValue = condition.value;
+    const value = item[ROW_DATA_INDEX][condition.index];
+    let result;
+    debugger;
+    if (comparison === '=') {
+      result = value === conditionValue;
+    } else if (comparison === '!=') {
+      result = value !== conditionValue;
+    } else if (comparison === '%s%') {
+      result = findLike(`%${conditionValue}%`, value);
+    } else if (comparison === 'notLike') {
+      result = !findLike(`%${conditionValue}%`, value);
+    } else if (comparison === 's%') {
+      result = findLike(`${conditionValue}`, value, 'start');
+    } else if (comparison === '%s') {
+      result = findLike(`${conditionValue}`, value, 'end');
+    } else if (comparison === 'isEmpty') {
+      result = value === undefined || value === null || value === '';
+    } else if (comparison === 'isNotEmpty') {
+      result = !!value;
+    }
+
+    return result;
+  };
+  /**
+   * 필터 조건에 따라 숫자를 확인한다.
+   *
+   * @param {array} item - row 데이터
+   * @param {object} condition - 필터 정보
+   * @param {string} columnType - 데이터 유형
+   * @returns {boolean} 확인 결과
+   */
+  const numberFilter = (item, condition, columnType) => {
+    const comparison = condition.comparison;
+    const conditionValue = Number(condition.value);
+    let value = Number(item[ROW_DATA_INDEX][condition.index]);
+    let result;
+    if (columnType === 'float') {
+      value = Number(value.toFixed(3));
+    }
+
+    if (comparison === '=') {
+      result = value === conditionValue;
+    } else if (comparison === '>') {
+      result = value > conditionValue;
+    } else if (comparison === '<') {
+      result = value < conditionValue;
+    } else if (comparison === '<=') {
+      result = value <= conditionValue;
+    } else if (comparison === '>=') {
+      result = value >= conditionValue;
+    } else if (comparison === '!=') {
+      result = value !== conditionValue;
+    } else if (comparison === 'isEmpty') {
+      result = value === undefined || value === null;
+    } else if (comparison === 'isNotEmpty') {
+      result = !!value;
+    }
+
+    return result;
+  };
+  /**
+   * 필터 조건이 적용된 데이터를 반환한다.
+   *
+   * @param {array} data - row 데이터
+   * @param {string} columnType - 데이터 유형
+   * @param {object} condition - 필터 정보
+   * @returns {boolean} 확인 결과
+   */
+  const getFilteringData = (data, columnType, condition) => {
+    const filterFn = columnType === 'string' || columnType === 'stringNumber'
+      ? stringFilter : numberFilter;
+    return data.filter(row => filterFn(row, condition, columnType)) || [];
+  };
+  /**
+   * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore 에 저장한다.
+   */
+  const setFilter = () => {
+    let filterStore = [];
+    let isApply = false;
+
+    const filteringItemsByColumn = filterInfo.filteringItemsByColumn;
+    const fields = Object.keys(filteringItemsByColumn);
+    const originStore = stores.originStore;
+
+    fields.forEach((field) => {
+      const filters = filteringItemsByColumn[field];
+      const index = getColumnIndex(field);
+      const columnType = props.columns[index].type;
+
+      filters.forEach((filterItem) => {
+        isApply = true;
+        if (!filterStore.length) {
+          filterStore = getFilteringData(originStore, columnType, {
+            ...filterItem,
+            index,
+          });
+        } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
+          filterStore.push(...getFilteringData(originStore, columnType, {
+            ...filterItem,
+            index,
+          }));
+        } else {
+          filterStore = getFilteringData(filterStore, columnType, {
+            ...filterItem,
+            index,
+          });
+        }
+      });
+    });
+
+    if (!isApply) {
+      stores.filterStore = originStore;
+    } else {
+      stores.filterStore = uniqBy(filterStore, JSON.stringify);
+    }
+  };
 
   let timer = null;
   const onSearch = (searchWord) => {
@@ -687,7 +839,7 @@ export const filterEvent = (params) => {
       updateVScroll();
     }, 500);
   };
-  return { onSearch };
+  return { onSearch, setFilter };
 };
 
 export const contextMenuEvent = (params) => {
@@ -698,6 +850,7 @@ export const contextMenuEvent = (params) => {
     onSort,
     setColumnHidden,
     useColumnSetting,
+    filterInfo,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -744,6 +897,19 @@ export const contextMenuEvent = (params) => {
           click: () => onSort(column, 'desc'),
         },
         {
+          text: 'Filter',
+          iconClass: 'ev-icon-filter-list',
+          click: () => {
+            filterInfo.filterSettingPosition = {
+              top: contextInfo.columnMenu.menuStyle.top,
+              left: contextInfo.columnMenu.menuStyle.left,
+            };
+            filterInfo.isShowFilterSetting = true;
+            filterInfo.filteringColumn = column;
+          },
+          disabled: !filterInfo.isFiltering,
+        },
+        {
           text: 'Hide',
           iconClass: 'ev-icon-visibility-off',
           disabled: !useColumnSetting.value || stores.orderedColumns.length === 1,
@@ -784,8 +950,10 @@ export const storeEvent = (params) => {
     stores,
     sortInfo,
     elementInfo,
+    filterInfo,
     setSort,
     updateVScroll,
+    setFilter,
   } = params;
   /**
    * 전달된 데이터를 내부 store 및 속성에 저장한다.
@@ -810,6 +978,9 @@ export const storeEvent = (params) => {
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       stores.originStore = store;
+    }
+    if (filterInfo.isFiltering) {
+      setFilter();
     }
     if (sortInfo.sortField) {
       setSort();
