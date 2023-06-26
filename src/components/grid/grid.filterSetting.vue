@@ -69,15 +69,9 @@
 <script>
 import { clickoutside } from '@/directives/clickoutside';
 import { computed, ref, watch } from 'vue';
-import EvTextField from '@/components/textField/TextField';
-import EvSelect from '@/components/select/Select';
 
 export default {
   name: 'EVGridFilterSetting',
-  components: {
-    EvSelect,
-    EvTextField,
-  },
   directives: {
     clickoutside,
   },
