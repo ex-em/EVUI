@@ -379,12 +379,12 @@ class EvChart {
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
-          return new LinearScale(dir, axis, ctx, options);
+          return new LinearScale(dir, axis, ctx, labels, options);
         case 'time':
           if (axis.categoryMode) {
             return new TimeCategoryScale(dir, axis, ctx, labels, options);
           }
-          return new TimeScale(dir, axis, ctx, options);
+          return new TimeScale(dir, axis, ctx, labels, options);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':

@@ -5,11 +5,6 @@ import Util from '../helpers/helpers.util';
 import { truthyNumber } from '../../../common/utils';
 
 class StepScale extends Scale {
-  constructor(type, axisOpt, ctx, labels, options) {
-    super(type, axisOpt, ctx, options);
-    this.labels = labels;
-  }
-
   /**
    * Calculate min/max value, label and size information for step scale
    * @param {object} minMax       min/max information (unused on step scale)
