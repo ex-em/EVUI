@@ -139,7 +139,7 @@ const chartData = {
 ##### axesX
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
-| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부  | |
+| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, categoryMode일 때는 작동하지 않음.  | |
 
 ##### linear type
    - interval (Axis Label 표기를 위한 interval)
@@ -161,7 +161,10 @@ const chartData = {
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
    - range
      - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
-      
+   - flow
+     - 시간에 따라 x축 label이 움직일지의 여부
+     - categoryMode일 때는 작동하지 않음.
+
 ##### Logarithmic type
    - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
    - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
