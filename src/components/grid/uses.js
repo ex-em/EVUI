@@ -666,7 +666,7 @@ export const filterEvent = (params) => {
     const conditionValue = condition.value;
     const value = item[ROW_DATA_INDEX][condition.index];
     let result;
-
+    debugger;
     if (comparison === '=') {
       result = value === conditionValue;
     } else if (comparison === '!=') {
@@ -679,6 +679,10 @@ export const filterEvent = (params) => {
       result = findLike(`${conditionValue}`, value, 'start');
     } else if (comparison === '%s') {
       result = findLike(`${conditionValue}`, value, 'end');
+    } else if (comparison === 'isEmpty') {
+      result = value === undefined || value === null || value === '';
+    } else if (comparison === 'isNotEmpty') {
+      result = !!value;
     }
 
     return result;
@@ -710,8 +714,12 @@ export const filterEvent = (params) => {
       result = value <= conditionValue;
     } else if (comparison === '>=') {
       result = value >= conditionValue;
-    } else {
+    } else if (comparison === '!=') {
       result = value !== conditionValue;
+    } else if (comparison === 'isEmpty') {
+      result = value === undefined || value === null;
+    } else if (comparison === 'isNotEmpty') {
+      result = !!value;
     }
 
     return result;
@@ -746,24 +754,22 @@ export const filterEvent = (params) => {
       const columnType = props.columns[index].type;
 
       filters.forEach((filterItem) => {
-        if (filterItem.value) { // 입력한 값이 있어야함
-          isApply = true;
-          if (!filterStore.length) {
-            filterStore = getFilteringData(originStore, columnType, {
-              ...filterItem,
-              index,
-            });
-          } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
-            filterStore.push(...getFilteringData(originStore, columnType, {
-              ...filterItem,
-              index,
-            }));
-          } else {
-            filterStore = getFilteringData(filterStore, columnType, {
-              ...filterItem,
-              index,
-            });
-          }
+        isApply = true;
+        if (!filterStore.length) {
+          filterStore = getFilteringData(originStore, columnType, {
+            ...filterItem,
+            index,
+          });
+        } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
+          filterStore.push(...getFilteringData(originStore, columnType, {
+            ...filterItem,
+            index,
+          }));
+        } else {
+          filterStore = getFilteringData(filterStore, columnType, {
+            ...filterItem,
+            index,
+          });
         }
       });
     });

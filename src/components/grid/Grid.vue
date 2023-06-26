@@ -21,6 +21,14 @@
               ? '1px solid #CED4DA' : 'none',
           }"
         >
+          <ev-icon
+            class="filtering-items__item--remove"
+            icon="ev-icon-s-close"
+            :style="{
+              'margin-left': 0,
+            }"
+            @click="removeAllFiltering"
+          />
           <template
             v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
             :key="idx"
@@ -1027,10 +1035,9 @@ export default {
       selectedFilteringItems.value = filters;
       if (filters?.length > 1) { // open filtering items box
         isShowFilteringItemsBox.value = true;
-        const x = filteringItemsRef.value.offsetLeft;
-        const y = filteringItemsRef.value.offsetTop
-          + filteringItemsRef.value.getBoundingClientRect().height
-          + 3;
+        const x = filteringItemsRef.value.getBoundingClientRect().left;
+        const y = filteringItemsRef.value.getBoundingClientRect().top
+          + filteringItemsRef.value.getBoundingClientRect().height;
         filteringItemsBoxPosition.boxTop = `${y}px`;
         filteringItemsBoxPosition.boxLeft = `${x}px`;
       }
@@ -1090,6 +1097,13 @@ export default {
       if (!filterInfo.filteringItemsByColumn[field].length) {
         delete filterInfo.filteringItemsByColumn[field];
       }
+      stores.filterStore = [];
+      setStore([], false);
+    };
+
+    const removeAllFiltering = () => {
+      filterInfo.filteringColumn = null;
+      filterInfo.filteringItemsByColumn = {};
       stores.filterStore = [];
       setStore([], false);
     };
@@ -1164,6 +1178,7 @@ export default {
       ...toRefs(filteringItemsBoxPosition),
       removeFiltering,
       removeColumnFiltering,
+      removeAllFiltering,
       onExpandFilteringItems,
       setColumnFilteringItems,
       onChangeOperator,

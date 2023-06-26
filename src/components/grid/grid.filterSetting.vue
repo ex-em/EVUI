@@ -32,10 +32,12 @@
               v-model="item.comparison"
               class="ev-grid-filter-setting__row--comparison"
               :items="items2"
+              @change="changeComparison(item.comparison, idx)"
             />
             <ev-text-field
               v-model="item.value"
               class="ev-grid-filter-setting__row--value"
+              :disabled="item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'"
             />
             <div
               class="ev-grid-filter-setting__row--button"
@@ -123,14 +125,18 @@ export default {
       { name: '=', value: '=' }, // is
       { name: '!=', value: '!=' }, // is not
     ];
+    const commonItems = [
+      { name: 'Is empty', value: 'isEmpty' },
+      { name: 'Is not empty', value: 'isNotEmpty' },
+    ];
     const getComparisonItems = (columnType) => {
       if (columnType === 'string' || columnType === 'stringNumber') {
-        return stringItems;
+        return [...stringItems, ...commonItems];
       } else if (columnType === 'number' || columnType === 'float') {
-        return numberItems;
+        return [...numberItems, ...commonItems];
       } else if (columnType === 'boolean') {
         return [
-          { name: '=', value: '=' },
+          { name: 'Is', value: 'is' },
         ];
       }
       return [];
@@ -152,7 +158,13 @@ export default {
       if (filteringItems.value.length > 1) {
         filteringItems.value.splice(idx, 1);
       } else if (idx === 0) {
+        filteringItems.value[0].comparison = '=';
         filteringItems.value[0].value = '';
+      }
+    };
+    const changeComparison = (comparison, idx) => {
+      if (comparison === 'isEmpty' || comparison === 'isNotEmpty') {
+        filteringItems.value[idx].value = '';
       }
     };
     const changeOperator = (val) => {
@@ -162,7 +174,8 @@ export default {
       emit(
         'apply-filtering',
         columnField.value,
-        filteringItems.value.filter(item => item.value),
+        filteringItems.value.filter(item => item.value
+          || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'),
       );
     };
     watch(
@@ -195,6 +208,7 @@ export default {
       removeRow,
       changeOperator,
       applyFiltering,
+      changeComparison,
     };
   },
 };
