@@ -666,7 +666,7 @@ export const filterEvent = (params) => {
     const conditionValue = condition.value;
     const value = item[ROW_DATA_INDEX][condition.index];
     let result;
-    debugger;
+
     if (comparison === '=') {
       result = value === conditionValue;
     } else if (comparison === '!=') {
