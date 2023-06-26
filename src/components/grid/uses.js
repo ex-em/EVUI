@@ -736,7 +736,7 @@ export const filterEvent = (params) => {
               ...filterItem,
               index,
             });
-          } else if (filterItem.operator === 'or') {
+          } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
             filterStore.push(...getFilteringData(originStore, columnType, {
               ...filterItem,
               index,
