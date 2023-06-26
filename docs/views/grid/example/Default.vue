@@ -266,10 +266,10 @@ export default {
     ]);
     const columns = ref([
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
-      { caption: 'Role', field: 'role', type: 'string', width: 100 },
-      { caption: 'number', field: 'number', type: 'number', width: 100 },
+      { caption: 'Role', field: 'role', type: 'string', width: 80 },
+      { caption: 'number', field: 'number', type: 'number', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      { caption: 'Email', field: 'email', type: 'string', width: 150 },
+      { caption: 'Email', field: 'email', type: 'string', width: 80 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
     ]);
     const resetBorderStyle = () => {
