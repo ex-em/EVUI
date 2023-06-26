@@ -159,7 +159,11 @@ export default {
       filteringItems.value = filteringItems.value.map(item => ({ ...item, operator: val }));
     };
     const applyFiltering = () => {
-      emit('apply-filtering', columnField.value, filteringItems.value);
+      emit(
+        'apply-filtering',
+        columnField.value,
+        filteringItems.value.filter(item => item.value),
+      );
     };
     watch(
       () => props.isShow,
