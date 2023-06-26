@@ -20,6 +20,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        useFilter: true,
         useSelection: {
           use: useSelectionMV,
           multiple: isSelectionMultiple,
