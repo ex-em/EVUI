@@ -1069,7 +1069,7 @@ export default {
     };
 
     const onApplyFilter = async (field, list) => {
-      if (!list.length) {
+      if (!list?.length) {
         delete filterInfo.filteringItemsByColumn[field];
       } else {
         filterInfo.filteringItemsByColumn[field] = list;
