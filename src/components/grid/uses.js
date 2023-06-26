@@ -638,14 +638,21 @@ export const filterEvent = (params) => {
    * @param {string} origin - 기준 문자열
    * @returns {boolean} 문자열 내 키워드 존재 유무
    */
-  const findLike = (search, origin) => {
+  const findLike = (search, origin, pos) => {
     if (typeof search !== 'string' || origin === null) {
       return false;
     }
     let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
     regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
-
-    return RegExp(`^${regx}$`, 'gi').test(origin);
+    let regValue = `^${regx}$`;
+    if (pos) {
+      if (pos === 'start') {
+        regValue = `^${regx}`;
+      } else if (pos === 'end') {
+        regValue = `${regx}$`;
+      }
+    }
+    return RegExp(regValue, 'gi').test(origin);
   };
   /**
    * 필터 조건에 따라 문자열을 확인한다.
@@ -668,6 +675,10 @@ export const filterEvent = (params) => {
       result = findLike(`%${conditionValue}%`, value);
     } else if (comparison === 'notLike') {
       result = !findLike(`%${conditionValue}%`, value);
+    } else if (comparison === 's%') {
+      result = findLike(`${conditionValue}`, value, 'start');
+    } else if (comparison === '%s') {
+      result = findLike(`${conditionValue}`, value, 'end');
     }
 
     return result;
@@ -695,6 +706,12 @@ export const filterEvent = (params) => {
       result = value > conditionValue;
     } else if (comparison === '<') {
       result = value < conditionValue;
+    } else if (comparison === '<=') {
+      result = value <= conditionValue;
+    } else if (comparison === '>=') {
+      result = value >= conditionValue;
+    } else {
+      result = value !== conditionValue;
     }
 
     return result;
@@ -884,6 +901,7 @@ export const contextMenuEvent = (params) => {
             filterInfo.isShowFilterSetting = true;
             filterInfo.filteringColumn = column;
           },
+          disabled: !filterInfo.isFiltering,
         },
         {
           text: 'Hide',
