@@ -1,4 +1,5 @@
 import throttle from '@/common/utils.throttle';
+import { mobileCheck } from '@/common/utils';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -40,6 +41,7 @@ class EvChart {
       Object.assign(this, GradientLegend);
     }
 
+    this.isMobile = mobileCheck();
     this.brushSeries = brushSeries;
     this.target = target;
     this.data = data;
@@ -377,12 +379,12 @@ class EvChart {
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
-          return new LinearScale(dir, axis, ctx, options);
+          return new LinearScale(dir, axis, ctx, labels, options);
         case 'time':
           if (axis.categoryMode) {
             return new TimeCategoryScale(dir, axis, ctx, labels, options);
           }
-          return new TimeScale(dir, axis, ctx, options);
+          return new TimeScale(dir, axis, ctx, labels, options);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':
@@ -939,6 +941,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('click', this.onClick);
       this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
+      window.removeEventListener('click', this.dragTouchSelectionEvent);
     }
 
     if (this.options.tooltip.use) {

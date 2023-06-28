@@ -30,7 +30,7 @@
         :class="getColumnClass(column, cellIndex)"
         :style="getColumnStyle(column)"
       >
-        <div>
+        <div class="td-content">
           <!--Level Depth-->
           <span
             v-if="cellIndex === expandColumnIdx"
@@ -76,6 +76,7 @@
               <i></i>
             </span>
           </span>
+          <div class="slot-wrapper">
           <!-- cell renderer -->
           <template v-if="!!$slots[column.field + 'Node']">
             <slot
@@ -85,6 +86,7 @@
               }"
             />
           </template>
+          </div>
         </div>
       </td>
     </template>
@@ -276,5 +278,9 @@ export default {
   .tree-child-icon i {
     background: url('./tree_icon.png') no-repeat -14px -35px;
   }
+}
+.slot-wrapper {
+  position: relative;
+  flex: 1;
 }
 </style>

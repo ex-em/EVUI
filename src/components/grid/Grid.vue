@@ -8,6 +8,115 @@
     <!-- Toolbar -->
     <toolbar>
       <template #toolbarWrapper>
+        <!-- Filtering Column Items -->
+        <div
+          v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
+          ref="filteringItemsRef"
+          class="filtering-items"
+          :style="{
+            width: `${filteringItemsWidth}px`,
+            background: !isShowColumnFilteringItems && isExpandColumnFilteringItems
+              ? '#FFFFFF' : 'none',
+            border: !isShowColumnFilteringItems && isExpandColumnFilteringItems
+              ? '1px solid #CED4DA' : 'none',
+          }"
+        >
+          <ev-icon
+            class="filtering-items__item--remove"
+            icon="ev-icon-s-close"
+            :style="{
+              'margin-left': 0,
+            }"
+            @click="removeAllFiltering"
+          />
+          <template
+            v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
+            :key="idx"
+          >
+            <template v-if="idx === 0">
+              <ev-icon
+                icon="ev-icon-filter-list"
+                class="filtering-items-expand"
+                @click="onExpandFilteringItems"
+              />
+              Filter ({{ Object.keys(filteringItemsByColumn).length }})
+            </template>
+            <ev-select
+              v-if="idx === 1"
+              v-model="columnOperator"
+              class="ev-grid-filter-setting__row--operator"
+              :items="operatorItems"
+              @change="onChangeOperator"
+            />
+            <div
+              class="filtering-items__item"
+              @click="onClickFilteringItem(field, filteringItemsByColumn[field])"
+            >
+              <span class="filtering-items__item--title">
+                {{ field }}
+              </span>
+              <span
+                v-if="filteringItemsByColumn[field].length < 2"
+                class="filtering-items__item--value"
+                :title="`${filteringItemsByColumn[field][0].value}`"
+              >
+                {{ filteringItemsByColumn[field][0].comparison }}
+                {{ filteringItemsByColumn[field][0].value }}
+              </span>
+              <span
+                v-else
+                class="filtering-items__item--value"
+              >
+                + {{ filteringItemsByColumn[field].length }}
+              </span>
+              <ev-icon
+                class="filtering-items__item--remove"
+                icon="ev-icon-s-close"
+                @click="removeColumnFiltering(field)"
+              />
+            </div>
+          </template>
+        </div>
+        <!-- Filtering Items Box -->
+        <template v-if="isFiltering && isShowFilteringItemsBox">
+          <teleport to="#ev-grid-filtering-items-modal">
+            <section
+              v-clickoutside="() => { isShowFilteringItemsBox = false }"
+              class="ev-grid-filtering-items"
+              :style="{
+                top: boxTop,
+                left: boxLeft,
+              }"
+            >
+              <template
+                v-for="(field, idx) in selectedFilteringItems"
+                :key="idx"
+              >
+                <ev-select
+                  v-if="idx === 1"
+                  v-model="field.operator"
+                  class="ev-grid-filter-setting__row--operator"
+                  disabled
+                  :items="operatorItems"
+                />
+                <div class="filtering-items__item">
+                  <span class="filtering-items__item--title">
+                    {{ selectedFilteringFiled }}
+                  </span>
+                  <span class="filtering-items__item--value">
+                    {{ field.comparison }}
+                    {{ field.value }}
+                  </span>
+                  <ev-icon
+                    class="filtering-items__item--remove"
+                    icon="ev-icon-s-close"
+                    @click="removeFiltering({field: selectedFilteringFiled, idx})"
+                  />
+                </div>
+              </template>
+            </section>
+          </teleport>
+        </template>
         <grid-option-button
           v-if="useColumnSetting"
           class="column-setting__icon"
@@ -24,6 +133,13 @@
       :columns="$props.columns"
       :hidden-column="hiddenColumn"
       @apply-column="onApplyColumn"
+    />
+    <filter-setting
+      v-model:is-show="isShowFilterSetting"
+      v-model:items="filteringItemsByColumn"
+      :column="filteringColumn"
+      :position="filterSettingPosition"
+      @apply-filtering="onApplyFilter"
     />
   </div>
   <div
@@ -66,7 +182,10 @@
               'column': true,
               'non-border': !!borderStyle,
             }"
-            :style="`width: ${minWidth}px;`"
+            :style="{
+              width: `${minWidth}px`,
+              'border-right': '1px solid #CFCFCF'
+            }"
           >
             <ev-checkbox
               v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
@@ -91,8 +210,9 @@
               :style="{
                 width: `${column.width}px`,
                 'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                'margin-right': orderedColumns.length - 1 === index
-                && (hasVerticalScrollBar || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'margin-right': orderedColumns.length - 1 === index && (hasVerticalScrollBar
+                  || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
+                'border-right': orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
               }"
             >
               <!-- Column Name -->
@@ -173,10 +293,8 @@
               'non-border': !!borderStyle,
             }"
             :style="{
-              position: 'sticky',
-              right: 0,
-              width: '40px',
-              'min-width': '40px',
+              width: '30px',
+              'min-width': '30px',
               'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
                 ? `${scrollWidth}px` : '0px',
             }"
@@ -226,7 +344,11 @@
                   'row-checkbox': true,
                   'non-border': !!borderStyle,
                 }"
-                :style="`width: ${minWidth}px; height: ${rowHeight}px;`"
+                :style="{
+                  width: `${minWidth}px`,
+                  height: `${rowHeight}px`,
+                  'border-right': '1px solid #CFCFCF',
+                }"
               >
                 <ev-checkbox
                   v-model="row[1]"
@@ -256,6 +378,8 @@
                     height: `${rowHeight}px`,
                     'line-height': `${rowHeight}px`,
                     'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                    'border-right': orderedColumns.length - 1 === column.index
+                      ? 'none' : '1px solid #CFCFCF',
                   }"
                 >
                   <!-- Cell Renderer -->
@@ -277,23 +401,35 @@
               <td
                 v-if="$props.option.customContextMenu?.length"
                 :class="{
-                  cell: true,
+                  'row-contextmenu': true,
                   'non-border': !!borderStyle,
                 }"
                 :style="{
                   position: 'sticky',
                   right: 0,
-                  width: '40px',
+                  width: '30px',
                   height: `${rowHeight}px`,
-                  'min-width': '40px',
+                  'min-width': '30px',
                   'line-height': `${rowHeight}px`,
                 }"
               >
-                <grid-option-button
-                  class="row-contextmenu__btn"
-                  @click="onContextMenu($event)"
-                  @click.prevent="menu.show"
-                />
+                <template v-if="$slots.contextmenuIcon">
+                  <span
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  >
+                    <slot name="contextmenuIcon"></slot>
+                  </span>
+                </template>
+                <template v-else>
+                  <grid-option-button
+                    icon="ev-icon-warning2"
+                    class="row-contextmenu__btn"
+                    @click="onContextMenu($event)"
+                    @click.prevent="menu.show"
+                  />
+                </template>
               </td>
             </tr>
             <tr v-if="!viewStore.length">
@@ -350,11 +486,24 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref, provide } from 'vue';
+import {
+  reactive,
+  toRefs,
+  computed,
+  watch,
+  onMounted,
+  onActivated,
+  nextTick,
+  ref,
+  provide,
+  onBeforeMount,
+} from 'vue';
+import { clickoutside } from '@/directives/clickoutside';
 import Toolbar from './grid.toolbar';
 import GridPagination from './grid.pagination';
 import GridSummary from './grid.summary';
 import ColumnSetting from './grid.columnSetting.vue';
+import filterSetting from './grid.filterSetting.vue';
 import GridSortButton from './grid.sortButton';
 import GridOptionButton from './grid.optionButton.vue';
 import {
@@ -373,11 +522,15 @@ import {
 
 export default {
   name: 'EvGrid',
+  directives: {
+    clickoutside,
+  },
   components: {
     Toolbar,
     GridPagination,
     GridSummary,
     ColumnSetting,
+    filterSetting,
     GridSortButton,
     GridOptionButton,
   },
@@ -450,6 +603,15 @@ export default {
     const filterInfo = reactive({
       isSearch: false,
       searchWord: '',
+      isFiltering: computed(() => (props.option.useFilter ?? false)),
+      isShowFilterSetting: false,
+      filterSettingPosition: {
+        left: 0,
+        top: 0,
+      },
+      filteringColumn: null,
+      filteringItemsByColumn: {},
+      columnOperator: 'and',
     });
     const columnSettingInfo = reactive({
       isShowColumnSetting: false,
@@ -461,7 +623,12 @@ export default {
       viewStore: [],
       originStore: [],
       pagingStore: [],
-      store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.originStore)),
+      searchStore: [],
+      filterStore: [],
+      store: computed(() => {
+        const store = filterInfo.isFiltering ? stores.filterStore : stores.originStore;
+        return filterInfo.isSearch ? stores.searchStore : store;
+      }),
       filteredColumns: [],
       originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
@@ -502,6 +669,7 @@ export default {
       hasHorizontalScrollBar: false,
     });
     const selectInfo = reactive({
+      contextmenuInfo: props.contextmenuInfo,
       selectedRow: props.selected,
       useSelect: computed(() => props.option?.useSelection?.use ?? true),
       multiple: computed(() => props.option?.useSelection?.multiple ?? false),
@@ -589,6 +757,7 @@ export default {
 
     const {
       onSearch,
+      setFilter,
     } = filterEvent({
       columnSettingInfo,
       filterInfo,
@@ -599,6 +768,7 @@ export default {
       updateVScroll,
       getPagingData,
       updatePagingInfo,
+      getColumnIndex,
     });
 
     const {
@@ -609,8 +779,10 @@ export default {
       stores,
       sortInfo,
       elementInfo,
+      filterInfo,
       setSort,
       updateVScroll,
+      setFilter,
     });
 
     const {
@@ -627,6 +799,7 @@ export default {
       isRenderer,
       updateVScroll,
       updateHScroll,
+      contextInfo,
     });
 
     const {
@@ -652,13 +825,16 @@ export default {
       onSort,
       setColumnHidden,
       useColumnSetting,
+      filterInfo,
     });
 
     provide('toolbarWrapper', toolbarWrapper);
 
+    const filteringItemsWidth = ref(0);
     onMounted(() => {
       calculatedColumn();
       setStore(props.rows);
+      filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
     onActivated(() => {
       onResize();
@@ -668,7 +844,10 @@ export default {
       () => {
         sortInfo.isSorting = false;
         sortInfo.sortField = '';
-        setSort();
+        filterInfo.filteringColumn = null;
+        filterInfo.filteringItemsByColumn = {};
+        stores.filterStore = [];
+        setStore([], false);
         initColumnSettingInfo();
       }, { deep: true },
     );
@@ -836,6 +1015,111 @@ export default {
         });
       },
     );
+    const filteringItemsBoxPosition = reactive({
+      boxTop: 0,
+      boxLeft: 0,
+    });
+    const filteringItemsRef = ref(null);
+    const isShowFilteringItemsBox = ref(false);
+    const isShowColumnFilteringItems = ref(false);
+    const selectedFilteringFiled = ref('');
+    const selectedFilteringItems = ref([]);
+    const operatorItems = [
+      { name: 'AND', value: 'and' },
+      { name: 'OR', value: 'or' },
+    ];
+    const isExpandColumnFilteringItems = ref(false);
+
+    const onClickFilteringItem = (field, filters) => {
+      selectedFilteringFiled.value = field;
+      selectedFilteringItems.value = filters;
+      if (filters?.length > 1) { // open filtering items box
+        isShowFilteringItemsBox.value = true;
+        const x = filteringItemsRef.value.getBoundingClientRect().left;
+        const y = filteringItemsRef.value.getBoundingClientRect().top
+          + filteringItemsRef.value.getBoundingClientRect().height;
+        filteringItemsBoxPosition.boxTop = `${y}px`;
+        filteringItemsBoxPosition.boxLeft = `${x}px`;
+      }
+    };
+
+    const onChangeOperator = () => {
+      stores.filterStore = [];
+      setStore([], false);
+    };
+
+    const setColumnFilteringItems = () => {
+      isExpandColumnFilteringItems.value = true;
+      const conditionItems = filteringItemsRef.value
+        .getElementsByClassName('filtering-items__item');
+      let hasHiddenElement = false;
+
+      for (let i = 0; i < conditionItems.length; i++) {
+        const itemEl = conditionItems[i];
+        itemEl.classList.remove('non-display');
+        const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
+        const { top } = itemEl.getBoundingClientRect(); // rect height: 27
+        if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
+          isExpandColumnFilteringItems.value = false;
+          hasHiddenElement = true;
+        }
+
+        itemEl.classList.toggle('non-display', hasHiddenElement);
+      }
+    };
+
+    const onApplyFilter = async (field, list) => {
+      if (!list?.length) {
+        delete filterInfo.filteringItemsByColumn[field];
+      } else {
+        filterInfo.filteringItemsByColumn[field] = list;
+        isShowColumnFilteringItems.value = true;
+        await nextTick();
+        setColumnFilteringItems();
+      }
+      filterInfo.isShowFilterSetting = false; // filter setting close
+      stores.filterStore = [];
+      setStore([], false);
+    };
+
+    const onExpandFilteringItems = () => {
+      isShowColumnFilteringItems.value = !isShowColumnFilteringItems.value;
+      setColumnFilteringItems();
+    };
+
+    const removeColumnFiltering = (field) => {
+      delete filterInfo.filteringItemsByColumn[field];
+      stores.filterStore = [];
+      setStore([], false);
+    };
+    const removeFiltering = ({ field, idx }) => {
+      filterInfo.filteringItemsByColumn[field].splice(idx, 1);
+      if (!filterInfo.filteringItemsByColumn[field].length) {
+        delete filterInfo.filteringItemsByColumn[field];
+      }
+      stores.filterStore = [];
+      setStore([], false);
+    };
+
+    const removeAllFiltering = () => {
+      filterInfo.filteringColumn = null;
+      filterInfo.filteringItemsByColumn = {};
+      stores.filterStore = [];
+      setStore([], false);
+    };
+
+    const initWrapperDiv = () => {
+      const root = document.createElement('div');
+      root.id = 'ev-grid-filtering-items-modal';
+      root.setAttribute('style', 'position: absolute; top: 0; left: 0;');
+      const hasRoot = document.getElementById('ev-grid-filtering-items-modal');
+      if (!hasRoot) {
+        document.body.appendChild(root);
+      }
+    };
+
+    onBeforeMount(() => initWrapperDiv());
+
     return {
       summaryScroll,
       showHeader,
@@ -882,11 +1166,29 @@ export default {
       setColumnSetting,
       onApplyColumn,
       onColumnContextMenu,
+      // filtering
+      filteringItemsWidth,
+      isExpandColumnFilteringItems,
+      isShowColumnFilteringItems,
+      operatorItems,
+      selectedFilteringItems,
+      selectedFilteringFiled,
+      filteringItemsRef,
+      isShowFilteringItemsBox,
+      ...toRefs(filteringItemsBoxPosition),
+      removeFiltering,
+      removeColumnFiltering,
+      removeAllFiltering,
+      onExpandFilteringItems,
+      setColumnFilteringItems,
+      onChangeOperator,
+      onApplyFilter,
+      onClickFilteringItem,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-  @import 'style/grid.scss';
+@import 'style/grid.scss';
 </style>

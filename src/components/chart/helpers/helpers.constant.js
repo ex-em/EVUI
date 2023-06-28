@@ -127,11 +127,6 @@ export const AXIS_OPTION = {
   },
 };
 
-export const PLOT_LINE_OPTION = {
-  color: '#FF0000',
-  lineWidth: 1,
-};
-
 export const PLOT_LINE_LABEL_OPTION = {
   show: false,
   fontSize: 12,
@@ -145,6 +140,12 @@ export const PLOT_LINE_LABEL_OPTION = {
   textAlign: 'center',
   textOverflow: 'none', // 'none', 'ellipsis'
   maxWidth: null,
+};
+
+export const PLOT_LINE_OPTION = {
+  color: '#FF0000',
+  lineWidth: 1,
+  label: PLOT_LINE_LABEL_OPTION,
 };
 
 export const PLOT_BAND_OPTION = {

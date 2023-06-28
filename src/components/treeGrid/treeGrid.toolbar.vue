@@ -24,4 +24,12 @@ export default {
 .tree-grid-toolbar > .ev-button {
   margin: 0 2px 0 2px;
 }
+.tree-grid-toolbar > .column-setting__icon {
+  float: right;
+  margin: 0 5px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.6;
+  }
+}
 </style>

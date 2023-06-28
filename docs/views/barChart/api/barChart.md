@@ -136,6 +136,11 @@ const chartData = {
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
 
+##### axesX
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, time type에서만 사용하길 권장.<br>categoryMode일 때는 작동하지 않음. | |
+
 ##### linear type
    - interval (Axis Label 표기를 위한 interval)
       - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
@@ -156,7 +161,10 @@ const chartData = {
       - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
    - range
      - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
-      
+   - flow
+     - 시간에 따라 x축 label이 움직일지의 여부
+     - categoryMode일 때는 작동하지 않음.
+
 ##### Logarithmic type
    - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
    - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
@@ -207,6 +215,7 @@ const chartData = {
 | value | Number(value), Date, Number(Index) | null | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
 | color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
 | segments | Array | null | dash 간격 | [6, 2] |
+| lineWidth | Number | 1 | 선 굵기 |  |
 | label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
 
 ##### plotBand

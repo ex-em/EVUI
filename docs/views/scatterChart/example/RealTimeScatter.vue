@@ -50,7 +50,7 @@ export default {
       },
     });
 
-    const chartOptions = ref({
+    const chartOptions = {
       type: 'scatter',
       width: '100%',
       height: '100%',
@@ -69,6 +69,7 @@ export default {
           fontFamily: 'Roboto',
           fitDir: 'right',
         },
+        flow: true,
       }],
       axesY: [{
         type: 'linear',
@@ -94,7 +95,7 @@ export default {
         use: true,
         range: 300, // 총 5분, 초 단위
       },
-    });
+    };
 
     let timeoutId;
 

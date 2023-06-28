@@ -4,12 +4,6 @@ import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
-  constructor(type, axisOpt, ctx, labels, options) {
-    super(type, axisOpt, ctx);
-    this.labels = labels;
-    this.options = options;
-  }
-
   /**
    * Transforming label by designated format
    * @param {number} value       label value

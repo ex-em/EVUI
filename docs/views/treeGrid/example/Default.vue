@@ -13,6 +13,7 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
+        useColumnSetting: useColumnSettingMV,
         useCheckbox: {
           use: useCheckboxMV,
           mode: checkboxModeMV,
@@ -58,6 +59,8 @@
         <ev-toggle
           v-model="stripeMV"
         />
+      </div>
+      <div class="form-rows">
         <span class="badge yellow">
           Use Selection
         </span>
@@ -69,6 +72,12 @@
         </span>
         <ev-toggle
           v-model="useSelection.multiple"
+        />
+        <span class="badge yellow">
+          Use Column Setting
+        </span>
+        <ev-toggle
+          v-model="useColumnSettingMV"
         />
       </div>
       <div class="form-rows">
@@ -288,6 +297,7 @@ export default {
     const clickedRowMV = ref();
     const DbClickedRowsMV = ref();
     const expandColumnMV = ref(0);
+    const useColumnSettingMV = ref(true);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -530,6 +540,7 @@ export default {
       limitItems,
       useSelection,
       expandColumnMV,
+      useColumnSettingMV,
       onClickCheckbox,
       onClickButton,
       changeMode,

@@ -89,11 +89,19 @@ const chartData =
   | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
   | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
 
+##### axesX
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, time type에서만 사용하길 권장.<br>categoryMode일 때는 작동하지 않음. | |
+
 ##### time type
    - interval (Axis Label 표기를 위한 interval)
       - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
    - timeFormat
       - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
+   - flow
+      - 시간에 따라 x축 label이 움직일지의 여부
+      - categoryMode일 때는 작동하지 않음.
 
 ##### linear type
 - interval (Axis Label 표기를 위한 interval)
@@ -129,6 +137,7 @@ const chartData =
 | value | Number(value), Date, Number(Index) | null | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
 | color | Hex, RGB, RGBA Code(String) | '#FF0000' | 선 색상 | |
 | segments | Array | null | dash 간격 | [6, 2] |
+| lineWidth | Number | 1 | 선 굵기 |  |
 | label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
 
 ##### plotBand
@@ -183,8 +192,10 @@ const chartData =
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | drag-select 사용 여부 | true / false |
 | keepDisplay | Boolean | true | 드래그 후 선택영역 유지 여부  | true / false  |
+| size | number | 50 | 모바일에서 선택 영역 크기 | only mobile |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
+* PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 
 #### tooltip
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

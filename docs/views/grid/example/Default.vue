@@ -20,6 +20,7 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        useFilter: true,
         useSelection: {
           use: useSelectionMV,
           multiple: isSelectionMultiple,
@@ -36,17 +37,7 @@
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
       @page-change="onRequestData"
-    >
-      <template #sortIcon>
-        <ev-icon icon="ev-icon-menu2" />
-      </template>
-      <template #sortIcon_desc>
-        <ev-icon icon="ev-icon-triangle-down" />
-      </template>
-      <template #sortIcon_asc>
-        <ev-icon icon="ev-icon-triangle-up" />
-      </template>
-    </ev-grid>
+    />
     <!-- description -->
     <div class="description">
       <div class="form-rows">
@@ -249,7 +240,7 @@ export default {
         click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
       }, {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: param => console.log('[Menu2]', param.contextmenuInfo),
       },
     ]);
     const highlightMV = ref(-1);
@@ -266,9 +257,10 @@ export default {
     ]);
     const columns = ref([
       { caption: 'Name', field: 'userName', type: 'string', width: 80 },
-      { caption: 'Role', field: 'role', type: 'string', width: 100 },
+      { caption: 'Role', field: 'role', type: 'string', width: 80 },
+      { caption: 'number', field: 'number', type: 'number', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      { caption: 'Email', field: 'email', type: 'string', width: 200 },
+      { caption: 'Email', field: 'email', type: 'string', width: 80 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
     ]);
     const resetBorderStyle = () => {
@@ -302,6 +294,7 @@ export default {
         temp.push([
           `user_${ix + 1}`,
           roles[ix % 2],
+          ix,
           '010-0000-0000',
           'kmn0827@ex-em.com',
           '2020.08.04 14:15',
