@@ -21,6 +21,7 @@
             <ev-select
               v-model="item.operator"
               class="ev-grid-filter-setting__row--operator"
+              :title="getSelectTitle(items1, item.operator)"
               :items="items1"
               :disabled="idx > 1"
               :style="{
@@ -31,6 +32,7 @@
             <ev-select
               v-model="item.comparison"
               class="ev-grid-filter-setting__row--comparison"
+              :title="getSelectTitle(items2, item.comparison)"
               :items="items2"
               @change="changeComparison(item.comparison, idx)"
             />
@@ -204,6 +206,8 @@ export default {
       },
     );
 
+    const getSelectTitle = (items, title) => items.find(item => item.value === title)?.name || '';
+
     return {
       filteringItems,
       isShowFilterSetting,
@@ -214,6 +218,7 @@ export default {
       changeOperator,
       applyFiltering,
       changeComparison,
+      getSelectTitle,
     };
   },
 };
