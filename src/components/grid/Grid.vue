@@ -21,25 +21,29 @@
               ? '1px solid #CED4DA' : 'none',
           }"
         >
-          <ev-icon
-            class="filtering-items__item--remove"
-            icon="ev-icon-s-close"
-            :style="{
-              'margin-left': 0,
-            }"
-            @click="removeAllFiltering"
-          />
           <template
             v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
             :key="idx"
           >
             <template v-if="idx === 0">
-              <ev-icon
-                icon="ev-icon-filter-list"
-                class="filtering-items-expand"
+              <div
+                class="filtering-items__item filtering-items__item--filter"
                 @click="onExpandFilteringItems"
-              />
-              Filter ({{ Object.keys(filteringItemsByColumn).length }})
+              >
+                <ev-icon
+                  icon="ev-icon-filter-list"
+                  class="filtering-items-expand"
+                />
+                <span class="filtering-items__item--title">
+                   Filter ({{ Object.keys(filteringItemsByColumn).length }})
+                </span>
+                <ev-icon
+                  class="filtering-items__item--remove"
+                  icon="ev-icon-s-close"
+                  style="margin-left: 0;"
+                  @click.stop="removeAllFiltering"
+                />
+              </div>
             </template>
             <ev-select
               v-if="idx === 1"
@@ -50,18 +54,21 @@
             />
             <div
               class="filtering-items__item"
-              @click="onClickFilteringItem(field, filteringItemsByColumn[field])"
+              @click="onClickFilteringItem(
+                filteringItemsByColumn[field]?.[0].caption,
+                filteringItemsByColumn[field]
+                )"
             >
               <span class="filtering-items__item--title">
-                {{ field }}
+                {{ filteringItemsByColumn[field]?.[0].caption }}
               </span>
               <span
                 v-if="filteringItemsByColumn[field].length < 2"
                 class="filtering-items__item--value"
                 :title="`${filteringItemsByColumn[field][0].value}`"
               >
-                {{ filteringItemsByColumn[field][0].comparison }}
-                {{ filteringItemsByColumn[field][0].value }}
+                {{ filteringItemsByColumn[field]?.[0].comparison }}
+                {{ filteringItemsByColumn[field]?.[0].value }}
               </span>
               <span
                 v-else

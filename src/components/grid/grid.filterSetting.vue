@@ -21,6 +21,7 @@
             <ev-select
               v-model="item.operator"
               class="ev-grid-filter-setting__row--operator"
+              :title="getSelectTitle(items1, item.operator)"
               :items="items1"
               :disabled="idx > 1"
               :style="{
@@ -31,6 +32,7 @@
             <ev-select
               v-model="item.comparison"
               class="ev-grid-filter-setting__row--comparison"
+              :title="getSelectTitle(items2, item.comparison)"
               :items="items2"
               @change="changeComparison(item.comparison, idx)"
             />
@@ -104,7 +106,11 @@ export default {
   },
   setup(props, { emit }) {
     const filteringItems = ref([]);
-    const columnField = computed(() => props.column?.field);
+    const filteringColumn = computed(() => props.column);
+    // const columnField = computed(() => {
+    //   console.log(props.column);
+    //   return props.column?.field;
+    // });
     const items1 = [
       { name: 'AND', value: 'and' },
       { name: 'OR', value: 'or' },
@@ -173,7 +179,7 @@ export default {
     const applyFiltering = () => {
       emit(
         'apply-filtering',
-        columnField.value,
+        filteringColumn.value.field,
         filteringItems.value.filter(item => item.value
           || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'),
       );
@@ -182,15 +188,16 @@ export default {
       () => props.isShow,
       (isShow) => {
         const rowList = [];
-        if (isShow && columnField.value) {
-          if (!props.items[columnField.value]?.length) {
+        if (isShow && filteringColumn.value.field) {
+          if (!props.items[filteringColumn.value.field]?.length) {
             rowList.push({
               comparison: '=',
               operator: 'and',
               value: '',
+              caption: filteringColumn.value.caption,
             });
           } else {
-            props.items[columnField.value].forEach((row) => {
+            props.items[filteringColumn.value.field].forEach((row) => {
               rowList.push(row);
             });
           }
@@ -198,6 +205,8 @@ export default {
         }
       },
     );
+
+    const getSelectTitle = (items, title) => items.find(item => item.value === title)?.name || '';
 
     return {
       filteringItems,
@@ -209,6 +218,7 @@ export default {
       changeOperator,
       applyFiltering,
       changeComparison,
+      getSelectTitle,
     };
   },
 };

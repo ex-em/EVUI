@@ -665,13 +665,12 @@ export const filterEvent = (params) => {
   const stringFilter = (item, condition) => {
     const comparison = condition.comparison;
     const conditionValue = condition.value;
-    const value = item[ROW_DATA_INDEX][condition.index];
+    const value = `${item[ROW_DATA_INDEX][condition.index]}`;
     let result;
-
     if (comparison === '=') {
-      result = value === conditionValue;
+      result = conditionValue.toLowerCase() === value.toLowerCase();
     } else if (comparison === '!=') {
-      result = value !== conditionValue;
+      result = conditionValue.toLowerCase() !== value.toLowerCase();
     } else if (comparison === '%s%') {
       result = findLike(`%${conditionValue}%`, value);
     } else if (comparison === 'notLike') {
@@ -756,7 +755,7 @@ export const filterEvent = (params) => {
 
       filters.forEach((filterItem) => {
         isApply = true;
-        if (!filterStore.length) {
+        if (!filterStore.length && Object.keys(filteringItemsByColumn).length < 2) {
           filterStore = getFilteringData(originStore, columnType, {
             ...filterItem,
             index,
@@ -884,6 +883,7 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
+      const filterable = column.filterable === undefined ? true : column.filterable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
@@ -901,6 +901,14 @@ export const contextMenuEvent = (params) => {
           text: 'Filter',
           iconClass: 'ev-icon-filter-list',
           click: () => {
+            const docWidth = document.documentElement.clientWidth;
+            const clientX = contextInfo.columnMenu.menuStyle.clientX;
+            const pageX = contextInfo.columnMenu.menuStyle.pageX;
+            const MODAL_WIDTH = 350;
+            const isOver = docWidth < clientX + MODAL_WIDTH;
+            if (isOver) {
+              contextInfo.columnMenu.menuStyle.left = `${pageX - MODAL_WIDTH}px`;
+            }
             filterInfo.filterSettingPosition = {
               top: contextInfo.columnMenu.menuStyle.top,
               left: contextInfo.columnMenu.menuStyle.left,
@@ -908,7 +916,7 @@ export const contextMenuEvent = (params) => {
             filterInfo.isShowFilterSetting = true;
             filterInfo.filteringColumn = column;
           },
-          disabled: !filterInfo.isFiltering,
+          disabled: !filterable,
         },
         {
           text: 'Hide',

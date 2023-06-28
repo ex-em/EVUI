@@ -35,6 +35,9 @@ export const usePosition = () => {
     top: null,
     left: null,
     right: null,
+    pageY: null,
+    pageX: null,
+    clientX: null,
   });
 
   /**
@@ -52,6 +55,9 @@ export const usePosition = () => {
       const docHeight = document.documentElement.clientHeight;
       const docWidth = document.documentElement.clientWidth;
       const RIGHT_BUFFER_PX = 20;
+      menuStyle.pageX = e.pageX;
+      menuStyle.pageY = e.pageY;
+      menuStyle.clientX = e.clientX;
       if (docHeight < e.clientY + menuListHeight) {
         // dropTop
         menuStyle.top = `${e.pageY - menuListHeight}px`;
