@@ -4,13 +4,27 @@
     <ev-checkbox-group
       v-model="checkboxGroup"
     >
-      <ev-checkbox label="Option A">A</ev-checkbox>
-      <ev-checkbox label="Option B" />
+      <ev-checkbox
+        label="Option A"
+        tooltip-title="1번 옵션"
+      >
+        A
+      </ev-checkbox>
+      <ev-checkbox
+        label="Option B"
+        tooltip-title="2번 옵션"
+      />
       <div>
-        <ev-checkbox label="Option C" />
+        <ev-checkbox
+          label="Option C"
+          tooltip-title="3번 옵션"
+        />
       </div>
       <div>
-        <ev-checkbox label="Option D" />
+        <ev-checkbox
+          label="Option D"
+          tooltip-title="4번 옵션"
+        />
       </div>
     </ev-checkbox-group>
     <div class="description">
