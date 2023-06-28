@@ -756,7 +756,7 @@ export const filterEvent = (params) => {
 
       filters.forEach((filterItem) => {
         isApply = true;
-        if (!filterStore.length) {
+        if (!filterStore.length && Object.keys(filteringItemsByColumn).length < 2) {
           filterStore = getFilteringData(originStore, columnType, {
             ...filterItem,
             index,
