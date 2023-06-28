@@ -21,25 +21,29 @@
               ? '1px solid #CED4DA' : 'none',
           }"
         >
-          <ev-icon
-            class="filtering-items__item--remove"
-            icon="ev-icon-s-close"
-            :style="{
-              'margin-left': 0,
-            }"
-            @click="removeAllFiltering"
-          />
           <template
             v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
             :key="idx"
           >
             <template v-if="idx === 0">
-              <ev-icon
-                icon="ev-icon-filter-list"
-                class="filtering-items-expand"
+              <div
+                class="filtering-items__item filtering-items__item--filter"
                 @click="onExpandFilteringItems"
-              />
-              Filter ({{ Object.keys(filteringItemsByColumn).length }})
+              >
+                <ev-icon
+                  icon="ev-icon-filter-list"
+                  class="filtering-items-expand"
+                />
+                <span class="filtering-items__item--title">
+                   Filter ({{ Object.keys(filteringItemsByColumn).length }})
+                </span>
+                <ev-icon
+                  class="filtering-items__item--remove"
+                  icon="ev-icon-s-close"
+                  style="margin-left: 0;"
+                  @click.stop="removeAllFiltering"
+                />
+              </div>
             </template>
             <ev-select
               v-if="idx === 1"
