@@ -901,6 +901,14 @@ export const contextMenuEvent = (params) => {
           text: 'Filter',
           iconClass: 'ev-icon-filter-list',
           click: () => {
+            const docWidth = document.documentElement.clientWidth;
+            const clientX = contextInfo.columnMenu.menuStyle.clientX;
+            const pageX = contextInfo.columnMenu.menuStyle.pageX;
+            const MODAL_WIDTH = 350;
+            const isOver = docWidth < clientX + MODAL_WIDTH;
+            if (isOver) {
+              contextInfo.columnMenu.menuStyle.left = `${pageX - MODAL_WIDTH}px`;
+            }
             filterInfo.filterSettingPosition = {
               top: contextInfo.columnMenu.menuStyle.top,
               left: contextInfo.columnMenu.menuStyle.left,
