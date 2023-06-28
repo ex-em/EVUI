@@ -50,10 +50,13 @@
             />
             <div
               class="filtering-items__item"
-              @click="onClickFilteringItem(field, filteringItemsByColumn[field])"
+              @click="onClickFilteringItem(
+                filteringItemsByColumn[field][0].caption,
+                filteringItemsByColumn[field]
+                )"
             >
               <span class="filtering-items__item--title">
-                {{ field }}
+                {{ filteringItemsByColumn[field][0].caption }}
               </span>
               <span
                 v-if="filteringItemsByColumn[field].length < 2"

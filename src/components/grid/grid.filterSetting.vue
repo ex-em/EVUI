@@ -104,7 +104,11 @@ export default {
   },
   setup(props, { emit }) {
     const filteringItems = ref([]);
-    const columnField = computed(() => props.column?.field);
+    const filteringColumn = computed(() => props.column);
+    // const columnField = computed(() => {
+    //   console.log(props.column);
+    //   return props.column?.field;
+    // });
     const items1 = [
       { name: 'AND', value: 'and' },
       { name: 'OR', value: 'or' },
@@ -173,7 +177,7 @@ export default {
     const applyFiltering = () => {
       emit(
         'apply-filtering',
-        columnField.value,
+        filteringColumn.value.field,
         filteringItems.value.filter(item => item.value
           || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'),
       );
@@ -182,15 +186,16 @@ export default {
       () => props.isShow,
       (isShow) => {
         const rowList = [];
-        if (isShow && columnField.value) {
-          if (!props.items[columnField.value]?.length) {
+        if (isShow && filteringColumn.value.field) {
+          if (!props.items[filteringColumn.value.field]?.length) {
             rowList.push({
               comparison: '=',
               operator: 'and',
               value: '',
+              caption: filteringColumn.value.caption,
             });
           } else {
-            props.items[columnField.value].forEach((row) => {
+            props.items[filteringColumn.value.field].forEach((row) => {
               rowList.push(row);
             });
           }
