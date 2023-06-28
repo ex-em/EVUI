@@ -277,6 +277,7 @@ export const resizeEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   const onColumnResize = (columnIndex, event) => {
+    event.preventDefault();
     const headerEl = elementInfo.header;
     const bodyEl = elementInfo.body;
     const headerLeft = headerEl.getBoundingClientRect().left;
@@ -1102,4 +1103,32 @@ export const columnSettingEvent = (params) => {
   };
 
   return { setColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden };
+};
+
+export const dragEvent = ({ stores }) => {
+  const setColumnMoving = (currentIndex, droppedIndex) => {
+    const oldIndex = parseInt(currentIndex, 10);
+    const newPositionIndex = parseInt(droppedIndex, 10);
+    const columns = stores.filteredColumns.length ? stores.filteredColumns : stores.orderedColumns;
+    const movedColumn = columns[oldIndex];
+    columns.splice(oldIndex, 1);
+    stores.movedColumns = columns.splice(newPositionIndex, 0, movedColumn);
+  };
+  const onDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index);
+  };
+  const onDragOver = (e) => {
+    e.preventDefault();
+  };
+  const onDrop = (e) => {
+    e.preventDefault();
+    const currentIndex = e.dataTransfer.getData('text/plain');
+    const droppedIndex = e.target.parentNode.dataset.index;
+    setColumnMoving(currentIndex, droppedIndex);
+  };
+  return {
+    onDragStart,
+    onDragOver,
+    onDrop,
+  };
 };
