@@ -16,7 +16,10 @@
       :readonly="readonly"
       @change="changeMv"
     />
-    <span class="ev-checkbox-label" :title="label">
+    <span
+      ref="checkboxLabel"
+      class="ev-checkbox-label"
+    >
       <template v-if="$slots.default">
         <slot />
       </template>
@@ -28,7 +31,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, nextTick, inject } from 'vue';
+import { ref, computed, watch, nextTick, inject, onMounted } from 'vue';
 
 export default {
   name: 'EvCheckbox',
@@ -40,6 +43,10 @@ export default {
     label: {
       type: [String, Number, Boolean, Symbol],
       default: null,
+    },
+    tooltipTitle: {
+      type: String,
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -60,6 +67,20 @@ export default {
     change: null,
   },
   setup(props, { emit }) {
+    /**
+     * checkbox label Ref
+     */
+    const checkboxLabel = ref();
+
+    /**
+     * checkbox label의 title(마우스 호버 시 보이는 내용)사용 되는
+     * tooltipTitle props의 값이 있을 시 태그에 title 속성 추가
+     */
+    onMounted(() => {
+      if (checkboxLabel.value && props.tooltipTitle) {
+        checkboxLabel.value.title = props.tooltipTitle;
+      }
+    });
     /**
      * checkbox Ref
      */
@@ -121,6 +142,7 @@ export default {
 
     return {
       mv,
+      checkboxLabel,
       checkbox,
       checked,
       changeMv,

@@ -42,6 +42,7 @@
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | v-model | String, Number, Boolean, Symbol, Array | null | <체크박스그룹>내 선택된 <체크박스> label 값으로, 해당 값은 바인딩되어 동적으로 변함 | |
   | disabled | Boolean | false | HTML element disabled attribute |  |
+  | tooltipTitle | String | '' | 마우스 호버 시 보이는 타이틀 설정 |  |
   | v-model:indeterminate | Boolean | false | HTML5 checkbox indeterminate attribute |  |
 
 

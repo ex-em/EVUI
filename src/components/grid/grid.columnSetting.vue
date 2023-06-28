@@ -26,6 +26,7 @@
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
                 :label="column?.label"
+                :tooltip-title="column?.label ?? ''"
               />
             </ev-checkbox-group>
           </template>
