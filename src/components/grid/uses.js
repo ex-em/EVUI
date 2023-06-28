@@ -672,7 +672,7 @@ export const filterEvent = (params) => {
     if (comparison === '=') {
       result = comparisonValue.test(conditionValue);
     } else if (comparison === '!=') {
-      result = value !== conditionValue;
+      result = !comparisonValue.test(conditionValue);
     } else if (comparison === '%s%') {
       result = findLike(`%${conditionValue}%`, value);
     } else if (comparison === 'notLike') {
