@@ -666,10 +666,11 @@ export const filterEvent = (params) => {
     const comparison = condition.comparison;
     const conditionValue = condition.value;
     const value = item[ROW_DATA_INDEX][condition.index];
+    const comparisonValue = new RegExp(value, 'gi');
     let result;
 
     if (comparison === '=') {
-      result = value === conditionValue;
+      result = comparisonValue.test(conditionValue);
     } else if (comparison === '!=') {
       result = value !== conditionValue;
     } else if (comparison === '%s%') {
