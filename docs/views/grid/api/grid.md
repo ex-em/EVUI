@@ -74,6 +74,7 @@
 | width | Number | 컬럼 넓이 | ex) 150 | N |
 | searchable | Boolean | 검색 대상 여부 | Boolean | N |
 | sortable | Boolean | 정렬 대상 여부 | Boolean | N |
+| filterable | Boolean | 필터 대상 여부 | Boolean | N |
 | align | String | 사용자 지정 정렬 | 'center', 'left', 'right' | N |
 | decimal | Number | 데이터 타입이 float 일 때 소수점 자리 표시 수 | ex) 0~20 (디폴트: 3 ) | N |
 | summaryType | String | 계산 타입 | 'sum', 'average', 'max', 'min', 'count' | N |

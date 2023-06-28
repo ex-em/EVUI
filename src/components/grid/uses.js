@@ -885,6 +885,7 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
+      const filterable = column.filterable === undefined ? true : column.filterable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
@@ -917,7 +918,7 @@ export const contextMenuEvent = (params) => {
             filterInfo.isShowFilterSetting = true;
             filterInfo.filteringColumn = column;
           },
-          disabled: !filterInfo.isFiltering,
+          disabled: !filterable,
         },
         {
           text: 'Hide',

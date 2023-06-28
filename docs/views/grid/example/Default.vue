@@ -256,7 +256,7 @@ export default {
       },
     ]);
     const columns = ref([
-      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
+      { caption: 'Name', field: 'userName', type: 'string', width: 80, filterable: false },
       { caption: 'Role', field: 'role', type: 'string', width: 80 },
       { caption: 'number', field: 'number', type: 'number', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
