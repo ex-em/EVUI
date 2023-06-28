@@ -198,6 +198,7 @@
             v-for="(column, index) in orderedColumns"
             :key="index"
           >
+            <!-- Header -->
             <li
               v-if="!column.hide"
               :data-index="index"
@@ -214,6 +215,10 @@
                   || hasHorizontalScrollBar) ? `${scrollWidth}px` : '0px',
                 'border-right': orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
               }"
+              :draggable="true"
+              @dragstart="onDragStart"
+              @dragover="onDragOver"
+              @drop="onDrop"
             >
               <!-- Column Name -->
               <span
@@ -378,7 +383,7 @@
                     height: `${rowHeight}px`,
                     'line-height': `${rowHeight}px`,
                     'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                    'border-right': orderedColumns.length - 1 === column.index
+                    'border-right': orderedColumns.length - 1 === cellIndex
                       ? 'none' : '1px solid #CFCFCF',
                   }"
                 >
@@ -518,6 +523,7 @@ import {
   storeEvent,
   pagingEvent,
   columnSettingEvent,
+  dragEvent,
 } from './uses';
 
 export default {
@@ -630,9 +636,13 @@ export default {
         return filterInfo.isSearch ? stores.searchStore : store;
       }),
       filteredColumns: [],
+      movedColumns: [],
       originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
-      orderedColumns: computed(() => (stores.filteredColumns.length
-        ? stores.filteredColumns : stores.originColumns)),
+      orderedColumns: computed(() => {
+        const columns = stores.filteredColumns.length
+          ? stores.filteredColumns : stores.originColumns;
+        return stores.movedColumns.length ? stores.movedColumns : columns;
+      }),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
@@ -827,6 +837,12 @@ export default {
       useColumnSetting,
       filterInfo,
     });
+
+    const {
+      onDragStart,
+      onDragOver,
+      onDrop,
+    } = dragEvent({ stores });
 
     provide('toolbarWrapper', toolbarWrapper);
 
@@ -1184,6 +1200,10 @@ export default {
       onChangeOperator,
       onApplyFilter,
       onClickFilteringItem,
+      // drag
+      onDragStart,
+      onDragOver,
+      onDrop,
     };
   },
 };
