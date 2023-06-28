@@ -665,14 +665,12 @@ export const filterEvent = (params) => {
   const stringFilter = (item, condition) => {
     const comparison = condition.comparison;
     const conditionValue = condition.value;
-    const value = item[ROW_DATA_INDEX][condition.index];
-    const comparisonValue = new RegExp(value, 'gi');
+    const value = `${item[ROW_DATA_INDEX][condition.index]}`;
     let result;
-
     if (comparison === '=') {
-      result = comparisonValue.test(conditionValue);
+      result = conditionValue.toLowerCase() === value.toLowerCase();
     } else if (comparison === '!=') {
-      result = !comparisonValue.test(conditionValue);
+      result = conditionValue.toLowerCase() !== value.toLowerCase();
     } else if (comparison === '%s%') {
       result = findLike(`%${conditionValue}%`, value);
     } else if (comparison === 'notLike') {
