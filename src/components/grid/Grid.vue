@@ -504,6 +504,7 @@ import {
   computed,
   watch,
   onMounted,
+  onUpdated,
   onActivated,
   nextTick,
   ref,
@@ -857,10 +858,12 @@ export default {
     onMounted(() => {
       calculatedColumn();
       setStore(props.rows);
-      filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
     onActivated(() => {
       onResize();
+    });
+    onUpdated(() => {
+      filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
     watch(
       () => props.columns,
