@@ -358,8 +358,7 @@ export const clickEvent = (params) => {
   let timer = null;
   let lastIndex = -1;
   const onRowClick = (event, row) => {
-    if (event.target.parentElement.classList?.contains('row-checkbox-input')
-      || event.target.closest('td')?.classList?.contains('row-contextmenu')) {
+    if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
