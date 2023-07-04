@@ -36,7 +36,14 @@
               :items="items2"
               @change="changeComparison(item.comparison, idx)"
             />
+            <ev-select
+              v-if="$props.column.type === 'boolean'"
+              v-model="item.value"
+              class="ev-grid-filter-setting__row--comparison"
+              :items="booleanItems"
+            />
             <ev-text-field
+              v-else
               v-model="item.value"
               class="ev-grid-filter-setting__row--value"
               :disabled="item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'"
@@ -115,6 +122,10 @@ export default {
       { name: 'AND', value: 'and' },
       { name: 'OR', value: 'or' },
     ];
+    const booleanItems = [
+      { name: 'true', value: 'true' },
+      { name: 'false', value: 'false' },
+    ];
     const numberItems = [
       { name: '=', value: '=' },
       { name: '!=', value: '!=' },
@@ -142,7 +153,7 @@ export default {
         return [...numberItems, ...commonItems];
       } else if (columnType === 'boolean') {
         return [
-          { name: 'Is', value: 'is' },
+          { name: '=', value: '=' },
         ];
       }
       return [];
@@ -153,7 +164,7 @@ export default {
       set: val => emit('update:isShow', val),
     });
     const addRow = () => {
-      const operator = filteringItems.value.length > 2 ? filteringItems.value[2].operator : 'and';
+      const operator = filteringItems.value.length >= 2 ? filteringItems.value[1].operator : 'and';
       filteringItems.value.push({
         comparison: '=',
         operator,
@@ -226,6 +237,7 @@ export default {
       isShowFilterSetting,
       items1,
       items2,
+      booleanItems,
       addRow,
       removeRow,
       changeOperator,
