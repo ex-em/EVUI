@@ -671,7 +671,10 @@ export const filterEvent = (params) => {
   const stringFilter = (item, condition) => {
     const comparison = condition.comparison;
     const conditionValue = condition.value;
-    const value = `${item[ROW_DATA_INDEX][condition.index]}`;
+    let value = item[ROW_DATA_INDEX][condition.index];
+    if (value || value === 0) {
+      value = `${item[ROW_DATA_INDEX][condition.index]}`;
+    }
     let result;
     if (comparison === '=') {
       result = conditionValue.toLowerCase() === value.toLowerCase();
@@ -723,7 +726,7 @@ export const filterEvent = (params) => {
     } else if (comparison === '!=') {
       result = value !== conditionValue;
     } else if (comparison === 'isEmpty') {
-      result = value === undefined || value === null;
+      result = value === undefined || value === null || isNaN(value);
     } else if (comparison === 'isNotEmpty') {
       result = !!value;
     }
@@ -753,7 +756,7 @@ export const filterEvent = (params) => {
     const filteringItemsByColumn = filterInfo.filteringItemsByColumn;
     const fields = Object.keys(filteringItemsByColumn);
     const originStore = stores.originStore;
-
+    let filteredOnce = false;
     fields.forEach((field) => {
       const filters = filteringItemsByColumn[field];
       const index = getColumnIndex(field);
@@ -761,7 +764,7 @@ export const filterEvent = (params) => {
 
       filters.forEach((filterItem) => {
         isApply = true;
-        if (!filterStore.length && Object.keys(filteringItemsByColumn).length < 2) {
+        if (!filterStore.length && !filteredOnce) {
           filterStore = getFilteringData(originStore, columnType, {
             ...filterItem,
             index,
@@ -777,6 +780,7 @@ export const filterEvent = (params) => {
             index,
           });
         }
+        filteredOnce = true;
       });
     });
 
