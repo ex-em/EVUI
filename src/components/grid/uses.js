@@ -332,7 +332,7 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { selectInfo, stores } = params;
+  const { selectInfo, stores, setContextMenu } = params;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -357,10 +357,11 @@ export const clickEvent = (params) => {
    */
   let timer = null;
   let lastIndex = -1;
-  const onRowClick = (event, row) => {
+  const onRowClick = (event, row, isRight) => {
     if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
       return false;
     }
+    const isContextmenu = !!event.target.closest('td')?.classList?.contains('row-contextmenu');
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
       if (keyType === 'shift') {
         const rowIndex = row[ROW_INDEX];
@@ -409,6 +410,11 @@ export const clickEvent = (params) => {
 
         if (selectInfo.multiple && keyType) { // multi select
           onMultiSelectByKey(keyType, selected, rowData);
+        } else if (isRight || isContextmenu) {
+          selectInfo.selectedRow = [...selectInfo.selectedRow];
+          if (!selectInfo.selectedRow.includes(rowData)) {
+            selectInfo.selectedRow = [rowData];
+          }
         } else if (selected) { // single select
           selectInfo.selectedRow = [];
         } else {
@@ -417,6 +423,7 @@ export const clickEvent = (params) => {
         lastIndex = row[ROW_INDEX];
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
+        setContextMenu();
       }
     }, 100);
     return true;
@@ -940,7 +947,7 @@ export const contextMenuEvent = (params) => {
     }
     if (clickedRow) {
       selectInfo.contextmenuInfo = [clickedRow];
-      setContextMenu();
+      // setContextMenu();
     }
   };
   return {

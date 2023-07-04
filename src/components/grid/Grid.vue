@@ -339,6 +339,7 @@
                 'non-border': !!borderStyle && borderStyle !== 'rows',
               }"
               @click="onRowClick($event, row)"
+              @contextmenu="onRowClick($event, row, true)"
               @dblclick="onRowDblClick($event, row)"
             >
               <!-- Row Checkbox -->
@@ -759,11 +760,6 @@ export default {
     });
 
     const {
-      onRowClick,
-      onRowDblClick,
-    } = clickEvent({ selectInfo, stores });
-
-    const {
       onCheck,
       onCheckAll,
     } = checkEvent({ checkInfo, stores, pageInfo, getPagingData, updatePagingInfo });
@@ -845,6 +841,11 @@ export default {
       useColumnSetting,
       filterInfo,
     });
+
+    const {
+      onRowClick,
+      onRowDblClick,
+    } = clickEvent({ selectInfo, stores, setContextMenu });
 
     const {
       onDragStart,
