@@ -153,7 +153,7 @@ export default {
       set: val => emit('update:isShow', val),
     });
     const addRow = () => {
-      const operator = filteringItems.value.length > 2 ? filteringItems.value[2].operator : 'and';
+      const operator = filteringItems.value.length >= 2 ? filteringItems.value[1].operator : 'and';
       filteringItems.value.push({
         comparison: '=',
         operator,
