@@ -1,6 +1,6 @@
 <template>
   <template v-if="isShowFilterSetting">
-    <teleport to="#ev-grid-column-setting-modal">
+    <teleport to="#ev-grid-filter-setting-modal">
       <section
         v-clickoutside="() => { isShowFilterSetting = false }"
         class="ev-grid-filter-setting"
@@ -72,7 +72,7 @@
 
 <script>
 import { clickoutside } from '@/directives/clickoutside';
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 
 export default {
   name: 'EVGridFilterSetting',
@@ -208,6 +208,19 @@ export default {
 
     const getSelectTitle = (items, title) => items.find(item => item.value === title)?.name || '';
 
+    const initWrapperDiv = () => {
+      const root = document.createElement('div');
+      root.id = 'ev-grid-filter-setting-modal';
+      root.setAttribute('style', 'position: absolute; top: 0; left: 0;');
+      const hasRoot = document.getElementById('ev-grid-filter-setting-modal');
+      if (!hasRoot) {
+        document.body.appendChild(root);
+      }
+    };
+
+    onBeforeMount(() => {
+      initWrapperDiv();
+    });
     return {
       filteringItems,
       isShowFilterSetting,

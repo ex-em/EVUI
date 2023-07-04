@@ -358,8 +358,7 @@ export const clickEvent = (params) => {
   let timer = null;
   let lastIndex = -1;
   const onRowClick = (event, row) => {
-    if (event.target.parentElement.classList?.contains('row-checkbox-input')
-      || event.target.closest('td')?.classList?.contains('row-contextmenu')) {
+    if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
       return false;
     }
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
@@ -861,16 +860,15 @@ export const contextMenuEvent = (params) => {
     const menuItems = [];
 
     if (useCustom && contextInfo.customContextMenu.length) {
-      const row = selectInfo.selectedRow;
       const customItems = contextInfo.customContextMenu.map(
         (item) => {
           const menuItem = item;
           if (menuItem.validate) {
-            menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+            menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
           }
 
-          menuItem.selectedRow = row ?? [];
-          menuItem.contextmenuInfo = [selectInfo.contextmenuInfo];
+          menuItem.selectedRow = selectInfo.selectedRow ?? [];
+          menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
 
           return menuItem;
         });
@@ -883,7 +881,8 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
-      const filterable = column.filterable === undefined ? true : column.filterable;
+      const filterable = filterInfo.isFiltering
+        && column.filterable === undefined ? true : column.filterable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
@@ -940,7 +939,7 @@ export const contextMenuEvent = (params) => {
       clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
-      selectInfo.contextmenuInfo = clickedRow;
+      selectInfo.contextmenuInfo = [clickedRow];
       setContextMenu();
     }
   };

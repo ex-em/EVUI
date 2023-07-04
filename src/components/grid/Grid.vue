@@ -141,13 +141,6 @@
       :hidden-column="hiddenColumn"
       @apply-column="onApplyColumn"
     />
-    <filter-setting
-      v-model:is-show="isShowFilterSetting"
-      v-model:items="filteringItemsByColumn"
-      :column="filteringColumn"
-      :position="filterSettingPosition"
-      @apply-filtering="onApplyFilter"
-    />
   </div>
   <div
     ref="grid-wrapper"
@@ -495,6 +488,13 @@
     :show-page-info="showPageInfo"
     :order="order"
   />
+  <filter-setting
+    v-model:is-show="isShowFilterSetting"
+    v-model:items="filteringItemsByColumn"
+    :column="filteringColumn"
+    :position="filterSettingPosition"
+    @apply-filtering="onApplyFilter"
+  />
 </template>
 
 <script>
@@ -504,6 +504,7 @@ import {
   computed,
   watch,
   onMounted,
+  onUpdated,
   onActivated,
   nextTick,
   ref,
@@ -857,10 +858,12 @@ export default {
     onMounted(() => {
       calculatedColumn();
       setStore(props.rows);
-      filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
     onActivated(() => {
       onResize();
+    });
+    onUpdated(() => {
+      filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
     watch(
       () => props.columns,
