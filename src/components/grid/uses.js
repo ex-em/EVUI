@@ -1079,11 +1079,12 @@ export const columnSettingEvent = (params) => {
     columnSettingInfo.hiddenColumn = '';
   };
   const setFilteringColumn = () => {
-    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(column => column.index);
+    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
 
-    const originColumnIdx = stores.originColumns.map(column => column.index);
+    const originColumnIdx = stores.originColumns.filter(col => !col.hide).map(col => col.index);
     const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
-    columnSettingInfo.isFilteringColumn = (visibleColumnIdx !== originColumnIdx.length);
+
+    columnSettingInfo.isFilteringColumn = (visibleColumnIdx.length !== originColumnIdx.length);
 
     // 컬럼을 필터링했을 때, 검색어가 있는 경우 재검색
     if (props.option.searchValue) {
@@ -1094,17 +1095,18 @@ export const columnSettingEvent = (params) => {
   const onApplyColumn = (columns) => {
     columnSettingInfo.hiddenColumn = '';
     stores.filteredColumns = stores.originColumns
-      .filter(cur => columns.includes(cur.field) || !cur.caption);
+      .filter(col => columns.includes(col.field) || !col.caption);
     setFilteringColumn();
   };
   const setColumnHidden = (val) => {
-    const columns = columnSettingInfo.isFilteringColumn
-      ? stores.filteredColumns : stores.originColumns;
+    const columns = (columnSettingInfo.isFilteringColumn
+      ? stores.filteredColumns : stores.originColumns)
+      .filter(col => !col.hide);
 
     if (columns.length === 1) {
       return;
     }
-    stores.filteredColumns = columns.filter(column => column.field !== val);
+    stores.filteredColumns = columns.filter(col => col.field !== val);
     columnSettingInfo.hiddenColumn = val;
     setFilteringColumn();
   };
