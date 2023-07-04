@@ -733,6 +733,18 @@ export const filterEvent = (params) => {
 
     return result;
   };
+  const booleanFilter = (item, condition) => {
+    const comparison = condition.comparison;
+    const conditionValue = condition.value;
+    const value = `${item[ROW_DATA_INDEX][condition.index]}`;
+    let result;
+
+    if (comparison === '=') {
+      result = value === conditionValue;
+    }
+
+    return result;
+  };
   /**
    * 필터 조건이 적용된 데이터를 반환한다.
    *
@@ -742,8 +754,11 @@ export const filterEvent = (params) => {
    * @returns {boolean} 확인 결과
    */
   const getFilteringData = (data, columnType, condition) => {
-    const filterFn = columnType === 'string' || columnType === 'stringNumber'
+    let filterFn = columnType === 'string' || columnType === 'stringNumber'
       ? stringFilter : numberFilter;
+    if (columnType === 'boolean') {
+      filterFn = booleanFilter;
+    }
     return data.filter(row => filterFn(row, condition, columnType)) || [];
   };
   /**

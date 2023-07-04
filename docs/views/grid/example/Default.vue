@@ -259,6 +259,7 @@ export default {
       { caption: 'Name', field: 'userName', type: 'string', width: 80, filterable: false },
       { caption: 'Role', field: 'role', type: 'string', width: 80 },
       { caption: 'number', field: 'number', type: 'number', width: 80 },
+      { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string', width: 80 },
       { caption: 'Last Login', field: 'lastLogin', type: 'string' },
@@ -290,11 +291,13 @@ export default {
     const getData = (count, startIndex) => {
       const temp = [];
       const roles = ['Common', 'Admin'];
+      const booleans = [true, false];
       for (let ix = startIndex; ix < startIndex + count; ix++) {
         temp.push([
           `user_${ix + 1}`,
           roles[ix % 2],
           ix,
+          booleans[ix % 2],
           '010-0000-0000',
           'kmn0827@ex-em.com',
           '2020.08.04 14:15',
