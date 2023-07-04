@@ -141,13 +141,6 @@
       :hidden-column="hiddenColumn"
       @apply-column="onApplyColumn"
     />
-    <filter-setting
-      v-model:is-show="isShowFilterSetting"
-      v-model:items="filteringItemsByColumn"
-      :column="filteringColumn"
-      :position="filterSettingPosition"
-      @apply-filtering="onApplyFilter"
-    />
   </div>
   <div
     ref="grid-wrapper"
@@ -494,6 +487,13 @@
     :visible-page="visiblePage"
     :show-page-info="showPageInfo"
     :order="order"
+  />
+  <filter-setting
+    v-model:is-show="isShowFilterSetting"
+    v-model:items="filteringItemsByColumn"
+    :column="filteringColumn"
+    :position="filterSettingPosition"
+    @apply-filtering="onApplyFilter"
   />
 </template>
 
