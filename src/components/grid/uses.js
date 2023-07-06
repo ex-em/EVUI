@@ -644,25 +644,26 @@ export const filterEvent = (params) => {
   /**
    * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
    *
-   * @param {string} search - 검색 키워드
-   * @param {string} origin - 기준 문자열
+   * @param {string} conditionValue - 검색 키워드
+   * @param {string} value - 기준 문자열
+   * @param {string} pos - 시작, 끝나는 문자열
    * @returns {boolean} 문자열 내 키워드 존재 유무
    */
-  const findLike = (search, origin, pos) => {
+  const findLike = (conditionValue, value, pos) => {
     if (typeof search !== 'string' || origin === null) {
       return false;
     }
-    let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
-    regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
-    let regValue = `^${regx}$`;
+    const baseValueLower = value.toLowerCase();
+    const conditionValueLower = conditionValue.toLowerCase();
+    let result = baseValueLower.includes(conditionValueLower);
     if (pos) {
       if (pos === 'start') {
-        regValue = `^${regx}`;
+        result = baseValueLower.startsWith(conditionValueLower);
       } else if (pos === 'end') {
-        regValue = `${regx}$`;
+        result = baseValueLower.endsWith(conditionValueLower);
       }
     }
-    return RegExp(regValue, 'gi').test(origin);
+    return result;
   };
   /**
    * 필터 조건에 따라 문자열을 확인한다.
@@ -684,13 +685,13 @@ export const filterEvent = (params) => {
     } else if (comparison === '!=') {
       result = conditionValue.toLowerCase() !== value.toLowerCase();
     } else if (comparison === '%s%') {
-      result = findLike(`%${conditionValue}%`, value);
+      result = findLike(conditionValue, value);
     } else if (comparison === 'notLike') {
-      result = !findLike(`%${conditionValue}%`, value);
+      result = !findLike(conditionValue, value);
     } else if (comparison === 's%') {
-      result = findLike(`${conditionValue}`, value, 'start');
+      result = findLike(conditionValue, value, 'start');
     } else if (comparison === '%s') {
-      result = findLike(`${conditionValue}`, value, 'end');
+      result = findLike(conditionValue, value, 'end');
     } else if (comparison === 'isEmpty') {
       result = value === undefined || value === null || value === '';
     } else if (comparison === 'isNotEmpty') {
