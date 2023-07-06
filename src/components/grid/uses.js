@@ -769,33 +769,36 @@ export const filterEvent = (params) => {
    * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore 에 저장한다.
    */
   const setFilter = () => {
-    let filterStore = [];
-    let isApply = false;
-
     const filteringItemsByColumn = filterInfo.filteringItemsByColumn;
     const fields = Object.keys(filteringItemsByColumn);
     const originStore = stores.originStore;
+    let filterStore = [];
     let filteredOnce = false;
+
     fields.forEach((field) => {
       const filters = filteringItemsByColumn[field];
       const index = getColumnIndex(field);
       const columnType = props.columns[index].type;
 
-      filters.forEach((filterItem) => {
-        isApply = true;
+      filters.forEach((item, ix) => {
         if (!filterStore.length && !filteredOnce) {
           filterStore = getFilteringData(originStore, columnType, {
-            ...filterItem,
+            ...item,
             index,
           });
-        } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
+        } else if (ix === 0 && filterInfo.columnOperator === 'or') {
           filterStore.push(...getFilteringData(originStore, columnType, {
-            ...filterItem,
+            ...item,
+            index,
+          }));
+        } else if (item.operator === 'or') {
+          filterStore.push(...getFilteringData(originStore, columnType, {
+            ...item,
             index,
           }));
         } else {
           filterStore = getFilteringData(filterStore, columnType, {
-            ...filterItem,
+            ...item,
             index,
           });
         }
@@ -803,7 +806,7 @@ export const filterEvent = (params) => {
       });
     });
 
-    if (!isApply) {
+    if (!filteredOnce) {
       stores.filterStore = originStore;
     } else {
       stores.filterStore = uniqBy(filterStore, JSON.stringify);
