@@ -1072,7 +1072,7 @@ export default {
       if (filters?.length > 1) { // open filtering items box
         isShowFilteringItemsBox.value = true;
         const x = filteringItemsRef.value.getBoundingClientRect().left;
-        const y = filteringItemsRef.value.getBoundingClientRect().top
+        const y = window.pageYOffset + filteringItemsRef.value.getBoundingClientRect().top
           + filteringItemsRef.value.getBoundingClientRect().height;
         filteringItemsBoxPosition.boxTop = `${y}px`;
         filteringItemsBoxPosition.boxLeft = `${x}px`;
