@@ -701,6 +701,7 @@ export default {
       isSorting: false,
       sortField: '',
       sortOrder: '',
+      sortColumn: {},
     });
     const contextInfo = reactive({
       menu: null,
@@ -771,7 +772,7 @@ export default {
     const {
       onSort,
       setSort,
-    } = sortEvent({ sortInfo, stores, getColumnIndex, updatePagingInfo });
+    } = sortEvent({ sortInfo, stores, updatePagingInfo });
 
     const {
       onSearch,

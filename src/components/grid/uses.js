@@ -526,7 +526,7 @@ export const checkEvent = (params) => {
 };
 
 export const sortEvent = (params) => {
-  const { sortInfo, stores, getColumnIndex, updatePagingInfo } = params;
+  const { sortInfo, stores, updatePagingInfo } = params;
   function OrderQueue() {
     this.orders = ['asc', 'desc', 'init'];
     this.dequeue = () => this.orders.shift();
@@ -542,6 +542,7 @@ export const sortEvent = (params) => {
   const onSort = (column, sortOrder) => {
     const sortable = column.sortable === undefined ? true : column.sortable;
     if (sortable) {
+      sortInfo.sortColumn = column;
       if (sortInfo.sortField !== column?.field) {
         order.orders = ['asc', 'desc', 'init'];
         sortInfo.sortField = column?.field;
@@ -577,8 +578,8 @@ export const sortEvent = (params) => {
       });
       return;
     }
-    const index = getColumnIndex(sortInfo.sortField);
-    const type = stores.originColumns[index]?.type || 'string';
+    const index = sortInfo.sortColumn.index;
+    const type = sortInfo.sortColumn.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
@@ -651,7 +652,7 @@ export const filterEvent = (params) => {
    */
   const findLike = (conditionValue, value, pos) => {
     if (typeof conditionValue !== 'string' || value === null) {
-      return;
+      return false;
     }
     const baseValueLower = value.toLowerCase();
     const conditionValueLower = conditionValue.toLowerCase();
