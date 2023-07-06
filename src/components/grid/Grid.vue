@@ -54,9 +54,12 @@
             />
             <div
               class="filtering-items__item"
-              @click="onClickFilteringItem(
-                filteringItemsByColumn[field]?.[0].caption,
-                filteringItemsByColumn[field]
+              @click.stop="onClickFilteringItem(
+                {
+                  caption: filteringItemsByColumn[field]?.[0].caption,
+                  field: field,
+                },
+                filteringItemsByColumn[field],
                 )"
             >
               <span class="filtering-items__item--title">
@@ -108,7 +111,7 @@
                 />
                 <div class="filtering-items__item">
                   <span class="filtering-items__item--title">
-                    {{ selectedFilteringFiled }}
+                    {{ selectedFilteringColumn.caption }}
                   </span>
                   <span class="filtering-items__item--value">
                     {{ field.comparison }}
@@ -117,7 +120,11 @@
                   <ev-icon
                     class="filtering-items__item--remove"
                     icon="ev-icon-s-close"
-                    @click="removeFiltering({field: selectedFilteringFiled, idx})"
+                    @click="removeFiltering(
+                      {
+                        field: selectedFilteringColumn.field,
+                        idx,
+                      })"
                   />
                 </div>
               </template>
@@ -1049,7 +1056,10 @@ export default {
     const filteringItemsRef = ref(null);
     const isShowFilteringItemsBox = ref(false);
     const isShowColumnFilteringItems = ref(false);
-    const selectedFilteringFiled = ref('');
+    const selectedFilteringColumn = reactive({
+      caption: '',
+      field: '',
+    });
     const selectedFilteringItems = ref([]);
     const operatorItems = [
       { name: 'AND', value: 'and' },
@@ -1057,8 +1067,9 @@ export default {
     ];
     const isExpandColumnFilteringItems = ref(false);
 
-    const onClickFilteringItem = (field, filters) => {
-      selectedFilteringFiled.value = field;
+    const onClickFilteringItem = ({ caption, field }, filters) => {
+      selectedFilteringColumn.caption = caption;
+      selectedFilteringColumn.field = field;
       selectedFilteringItems.value = filters;
       if (filters?.length > 1) { // open filtering items box
         isShowFilteringItemsBox.value = true;
@@ -1120,7 +1131,7 @@ export default {
       setStore([], false);
     };
     const removeFiltering = ({ field, idx }) => {
-      filterInfo.filteringItemsByColumn[field].splice(idx, 1);
+      filterInfo.filteringItemsByColumn[field]?.splice(idx, 1);
       if (!filterInfo.filteringItemsByColumn[field].length) {
         delete filterInfo.filteringItemsByColumn[field];
       }
@@ -1199,7 +1210,7 @@ export default {
       isShowColumnFilteringItems,
       operatorItems,
       selectedFilteringItems,
-      selectedFilteringFiled,
+      selectedFilteringColumn,
       filteringItemsRef,
       isShowFilteringItemsBox,
       ...toRefs(filteringItemsBoxPosition),
