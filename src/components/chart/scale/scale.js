@@ -73,8 +73,13 @@ class Scale {
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (range?.length === 2) {
-      maxValue = range[1] > +minMax.max ? +minMax.max : range[1];
-      minValue = range[0] < +minMax.min ? +minMax.min : range[0];
+      if (this.options.type === 'heatMap') {
+        maxValue = range[1] > +minMax.max ? +minMax.max : range[1];
+        minValue = range[0] < +minMax.min ? +minMax.min : range[0];
+      } else {
+        maxValue = range[1];
+        minValue = range[0];
+      }
     } else {
       maxValue = minMax.max;
       minValue = minMax.min;
