@@ -650,8 +650,8 @@ export const filterEvent = (params) => {
    * @returns {boolean} 문자열 내 키워드 존재 유무
    */
   const findLike = (conditionValue, value, pos) => {
-    if (typeof search !== 'string' || origin === null) {
-      return false;
+    if (typeof conditionValue !== 'string' || value === null) {
+      return;
     }
     const baseValueLower = value.toLowerCase();
     const conditionValueLower = conditionValue.toLowerCase();
