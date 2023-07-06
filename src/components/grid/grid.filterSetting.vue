@@ -80,6 +80,7 @@
 <script>
 import { clickoutside } from '@/directives/clickoutside';
 import { computed, onBeforeMount, ref, watch } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: 'EVGridFilterSetting',
@@ -199,8 +200,9 @@ export default {
       () => props.isShow,
       (isShow) => {
         const rowList = [];
+        const items = cloneDeep(props.items);
         if (isShow && filteringColumn.value.field) {
-          if (!props.items[filteringColumn.value.field]?.length) {
+          if (!items[filteringColumn.value.field]?.length) {
             rowList.push({
               comparison: '=',
               operator: 'and',
@@ -208,7 +210,7 @@ export default {
               caption: filteringColumn.value.caption,
             });
           } else {
-            props.items[filteringColumn.value.field].forEach((row) => {
+            items[filteringColumn.value.field].forEach((row) => {
               rowList.push(row);
             });
           }
