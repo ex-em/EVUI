@@ -178,6 +178,7 @@ export const resizeEvent = (params) => {
     isRenderer,
     updateVScroll,
     updateHScroll,
+    contextInfo,
   } = params;
   /**
    * 고정 너비, 스크롤 유무 등에 따른 컬럼 너비를 계산한다.
@@ -207,7 +208,7 @@ export const resizeEvent = (params) => {
         }
 
         return acc;
-      }, { totalWidth: 0, emptyCount: 0 });
+      }, { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 });
 
       if (resizeInfo.rowHeight * store.length > elHeight - resizeInfo.scrollWidth) {
         elWidth -= resizeInfo.scrollWidth;
@@ -373,7 +374,8 @@ export const clickEvent = (params) => {
   let timer = null;
   const onRowClick = (event, row) => {
     if (event.target && event.target.parentElement
-      && event.target.parentElement.classList.contains('row-checkbox-input')) {
+      && (event.target.parentElement.classList.contains('row-checkbox-input')
+        || event.target.closest('td')?.classList?.contains('row-contextmenu'))) {
       return false;
     }
     clearTimeout(timer);
