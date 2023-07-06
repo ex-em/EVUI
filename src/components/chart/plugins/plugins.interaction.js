@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import throttle from '@/common/utils.throttle';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
 import dayjs from 'dayjs';
 
@@ -348,6 +349,9 @@ const modules = {
 
     if (this.options?.tooltip?.useScrollbar) {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
+    }
+    if (this.options?.tooltip?.throttledMove) {
+      this.onMouseMove = throttle(this.onMouseMove, 30);
     }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
