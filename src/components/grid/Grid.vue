@@ -325,7 +325,6 @@
         }"
         @scroll="onScroll"
         @contextmenu="onContextMenu($event)"
-        @contextmenu.prevent="menu.show"
       >
         <!-- vScroll Top -->
         <div
@@ -430,7 +429,6 @@
                   <span
                     class="row-contextmenu__btn"
                     @click="onContextMenu($event)"
-                    @click.prevent="menu.show"
                   >
                     <slot name="contextmenuIcon"></slot>
                   </span>
@@ -440,7 +438,6 @@
                     icon="ev-icon-warning2"
                     class="row-contextmenu__btn"
                     @click="onContextMenu($event)"
-                    @click.prevent="menu.show"
                   />
                 </template>
               </td>
@@ -852,7 +849,7 @@ export default {
     const {
       onRowClick,
       onRowDblClick,
-    } = clickEvent({ selectInfo, stores, setContextMenu });
+    } = clickEvent({ selectInfo, stores });
 
     const {
       onDragStart,

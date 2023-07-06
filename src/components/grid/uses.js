@@ -332,7 +332,7 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { selectInfo, stores, setContextMenu } = params;
+  const { selectInfo, stores } = params;
   const getClickedRowData = (event, row) => {
     const tagName = event.target.tagName.toLowerCase();
     let cellInfo = {};
@@ -355,7 +355,7 @@ export const clickEvent = (params) => {
    * @param {object} event - 이벤트 객체
    * @param {array} row - row 데이터
    */
-  let timer = null;
+  let clickTimer = null;
   let lastIndex = -1;
   const onRowClick = (event, row, isRight) => {
     if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
@@ -395,8 +395,10 @@ export const clickEvent = (params) => {
       }
     };
 
-    clearTimeout(timer);
-    timer = setTimeout(() => {
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+    clickTimer = setTimeout(() => {
       if (selectInfo.useSelect) {
         const rowData = row[ROW_DATA_INDEX];
         const selected = row[ROW_SELECT_INDEX];
@@ -423,7 +425,6 @@ export const clickEvent = (params) => {
         lastIndex = row[ROW_INDEX];
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
-        setContextMenu();
       }
     }, 100);
     return true;
@@ -435,7 +436,9 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    clearTimeout(timer);
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
     emit('dblclick-row', getClickedRowData(event, row));
   };
   return { onRowClick, onRowDblClick };
@@ -806,12 +809,12 @@ export const filterEvent = (params) => {
     }
   };
 
-  let timer = null;
+  let searchTimer = null;
   const onSearch = (searchWord) => {
-    if (timer) {
-      clearTimeout(timer);
+    if (searchTimer) {
+      clearTimeout(searchTimer);
     }
-    timer = setTimeout(() => {
+    searchTimer = setTimeout(() => {
       filterInfo.isSearch = false;
       filterInfo.searchWord = searchWord;
       if (searchWord) {
@@ -880,35 +883,65 @@ export const contextMenuEvent = (params) => {
   /**
    * 컨텍스트 메뉴를 설정한다.
    *
-   * @param {boolean} useCustom - 사용자 지정 메뉴 사용 유무
+   * @param {object} event - 이벤트 객체
    */
-  const setContextMenu = (useCustom = true) => {
-    const menuItems = [];
-
-    if (useCustom && contextInfo.customContextMenu.length) {
-      const customItems = contextInfo.customContextMenu.map(
-        (item) => {
-          const menuItem = item;
-          if (menuItem.validate) {
-            menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
-          }
-
-          menuItem.selectedRow = selectInfo.selectedRow ?? [];
-          menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
-
-          return menuItem;
-        });
-
-      menuItems.push(...customItems);
+  let contextmenuTimer = null;
+  const setContextMenu = (e) => {
+    if (contextmenuTimer) {
+      clearTimeout(contextmenuTimer);
     }
+    const menuItems = [];
+    contextmenuTimer = setTimeout(() => {
+      if (contextInfo.customContextMenu.length) {
+        const customItems = contextInfo.customContextMenu.map(
+          (item) => {
+            const menuItem = item;
+            if (menuItem.validate) {
+              menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
+            }
 
-    contextInfo.contextMenuItems = menuItems;
+            menuItem.selectedRow = selectInfo.selectedRow ?? [];
+            menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
+
+            return menuItem;
+          });
+
+        menuItems.push(...customItems);
+      }
+
+      contextInfo.contextMenuItems = menuItems;
+      contextInfo.menu.show(e);
+    }, 200);
   };
+  /**
+   * 마우스 우클릭 이벤트를 처리한다.
+   *
+   * @param {object} event - 이벤트 객체
+   */
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    const target = e.target;
+    const rowIndex = target.closest('.row')?.dataset?.index;
+    let clickedRow = null;
+    if (rowIndex) {
+      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
+    }
+    if (clickedRow) {
+      selectInfo.contextmenuInfo = [clickedRow];
+      setContextMenu(e);
+    }
+  };
+  /**
+   * 컬럼 기능을 수행하는 Contextmenu 를 생성한다.
+   *
+   * @param {object} event - 이벤트 객체
+   * @param {object} column - 컬럼 정보
+   */
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
-        && column.filterable === undefined ? true : column.filterable;
+      && column.filterable === undefined ? true : column.filterable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
@@ -950,23 +983,6 @@ export const contextMenuEvent = (params) => {
           click: () => setColumnHidden(column.field),
         },
       ];
-    }
-  };
-  /**
-   * 마우스 우클릭 이벤트를 처리한다.
-   *
-   * @param {object} event - 이벤트 객체
-   */
-  const onContextMenu = (event) => {
-    const target = event.target;
-    const rowIndex = target.closest('.row')?.dataset?.index;
-    let clickedRow = null;
-    if (rowIndex) {
-      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
-    }
-    if (clickedRow) {
-      selectInfo.contextmenuInfo = [clickedRow];
-      // setContextMenu();
     }
   };
   return {
