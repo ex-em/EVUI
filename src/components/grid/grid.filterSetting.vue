@@ -47,6 +47,7 @@
               v-model="item.value"
               class="ev-grid-filter-setting__row--value"
               :disabled="item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'"
+              @input="validateValue($props.column.type, item)"
             />
             <div
               class="ev-grid-filter-setting__row--button"
@@ -234,6 +235,12 @@ export default {
     onBeforeMount(() => {
       initWrapperDiv();
     });
+
+    const validateValue = (type, item) => {
+      if (type === 'number' || type === 'float') {
+        item.value = item.value.trim();
+      }
+    };
     return {
       filteringItems,
       isShowFilterSetting,
@@ -246,6 +253,7 @@ export default {
       applyFiltering,
       changeComparison,
       getSelectTitle,
+      validateValue,
     };
   },
 };
