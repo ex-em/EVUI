@@ -56,22 +56,22 @@
               class="filtering-items__item"
               @click.stop="onClickFilteringItem(
                 {
-                  caption: filteringItemsByColumn[field]?.[0].caption,
+                  caption: filteringItemsByColumn[field]?.[idx].caption,
                   field: field,
                 },
                 filteringItemsByColumn[field],
                 )"
             >
               <span class="filtering-items__item--title">
-                {{ filteringItemsByColumn[field]?.[0].caption }}
+                {{ filteringItemsByColumn[field]?.[idx].caption }}
               </span>
               <span
                 v-if="filteringItemsByColumn[field].length < 2"
                 class="filtering-items__item--value"
-                :title="`${filteringItemsByColumn[field][0].value}`"
+                :title="`${filteringItemsByColumn[field][idx].value}`"
               >
-                {{ filteringItemsByColumn[field]?.[0].comparison }}
-                {{ filteringItemsByColumn[field]?.[0].value }}
+                {{ filteringItemsByColumn[field]?.[idx].comparison }}
+                {{ filteringItemsByColumn[field]?.[idx].value }}
               </span>
               <span
                 v-else

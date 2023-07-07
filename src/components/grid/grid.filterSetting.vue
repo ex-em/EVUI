@@ -171,6 +171,7 @@ export default {
         comparison: '=',
         operator,
         value: '',
+        caption: filteringColumn.value.caption,
       });
     };
     const removeRow = (idx) => {
