@@ -33,6 +33,7 @@ const module = {
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range || null;
 
+      this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
       this.createScrollbar(dir);
       this.createScrollEvent(dir);
@@ -40,31 +41,29 @@ const module = {
     }
   },
 
-  checkValidRange(dir) {
+  initScrollbarRange(dir) {
     const scrollbarOpt = this.scrollbar[dir];
     const axesType = scrollbarOpt.type;
 
     if (scrollbarOpt.range?.length) {
       const [min, max] = scrollbarOpt.range;
+      let limitMin;
+      let limitMax;
 
-      if (!(truthyNumber(min) && truthyNumber(max))) {
-        return true;
-      }
-
-      if (axesType === 'step') {
-        const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
-        if (min < 0 || max > labels.length - 1) {
-          return true;
+      if ((truthyNumber(min) && truthyNumber(max))) {
+        if (axesType === 'step') {
+          const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
+          limitMin = 0;
+          limitMax = labels.length - 1;
+        } else {
+          const minMax = this.minMax[dir]?.[0];
+          limitMin = +minMax.min;
+          limitMax = +minMax.max;
         }
-      } else {
-        const minMax = this.minMax[dir]?.[0];
-        if (+min < +minMax.min || +max > +minMax.max) {
-          return true;
-        }
+        scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
+        scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
       }
     }
-
-    return false;
   },
 
   /**
@@ -95,6 +94,7 @@ const module = {
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
       this.scrollbar[dir].range = newOpt?.[0]?.range || null;
+      this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
   },
@@ -104,16 +104,10 @@ const module = {
    */
   updateScrollbarPosition() {
     if (this.scrollbar.x?.use && this.scrollbar.x?.isInit) {
-      if (this.checkValidRange('x')) {
-        return;
-      }
       this.setScrollbarPosition('x');
     }
 
     if (this.scrollbar.y?.use && this.scrollbar.y?.isInit) {
-      if (this.checkValidRange('y')) {
-        return;
-      }
       this.setScrollbarPosition('y');
     }
   },
