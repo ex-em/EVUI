@@ -56,22 +56,27 @@
               class="filtering-items__item"
               @click.stop="onClickFilteringItem(
                 {
-                  caption: filteringItemsByColumn[field]?.[idx].caption,
+                  caption: filteringItemsByColumn[field]
+                  ?.[filteringItemsByColumn[field].length - 1].caption,
                   field: field,
                 },
                 filteringItemsByColumn[field],
                 )"
             >
               <span class="filtering-items__item--title">
-                {{ filteringItemsByColumn[field]?.[idx].caption }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].caption }}
               </span>
               <span
                 v-if="filteringItemsByColumn[field].length < 2"
                 class="filtering-items__item--value"
-                :title="`${filteringItemsByColumn[field][idx].value}`"
+                :title="`${filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].value}`"
               >
-                {{ filteringItemsByColumn[field]?.[idx].comparison }}
-                {{ filteringItemsByColumn[field]?.[idx].value }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].comparison }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].value }}
               </span>
               <span
                 v-else
@@ -1132,6 +1137,7 @@ export default {
       filterInfo.filteringItemsByColumn[field]?.splice(idx, 1);
       if (!filterInfo.filteringItemsByColumn[field].length) {
         delete filterInfo.filteringItemsByColumn[field];
+        isShowFilteringItemsBox.value = false;
       }
       stores.filterStore = [];
       setStore([], false);
