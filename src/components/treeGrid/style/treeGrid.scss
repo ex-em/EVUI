@@ -28,6 +28,10 @@
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
   }
+  .row-contextmenu__btn {
+    display: none;
+    vertical-align: middle;
+  }
 }
 
 .column-list {
@@ -134,6 +138,15 @@
       background: #5AB7FF;
       color: #FFFFFF;
     }
+    &:hover {
+      .row-contextmenu__btn {
+        display: grid;
+        &:hover {
+          cursor: pointer;
+          opacity: 0.6;
+        }
+      }
+    }
   }
 
   .cell {
@@ -184,7 +197,7 @@
     }
     &.tree-td {
       text-align: left !important;
-      .td-content {
+      .td-content__wrapper {
         display: flex;
         position: relative;
         align-items: center;

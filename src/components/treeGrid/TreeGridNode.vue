@@ -8,9 +8,11 @@
     <td
       v-if="useCheckbox.use"
       :class="checkboxClass"
-      :style="`
-        width: ${minWidth}px;
-        height: ${rowHeight}px;`"
+      :style="{
+        width: `${minWidth}px`,
+        height: `${rowHeight}px`,
+        'border-right': '1px solid #CFCFCF',
+      }"
     >
       <ev-checkbox
         v-model="node.checked"
@@ -28,9 +30,9 @@
         :data-name="column.field"
         :data-index="node.index"
         :class="getColumnClass(column, cellIndex)"
-        :style="getColumnStyle(column)"
+        :style="getColumnStyle(column, cellIndex)"
       >
-        <div class="td-content">
+        <div class="td-content__wrapper">
           <!--Level Depth-->
           <span
             v-if="cellIndex === expandColumnIdx"
@@ -76,7 +78,7 @@
               <i></i>
             </span>
           </span>
-          <div class="slot-wrapper">
+          <div class="td-content">
           <!-- cell renderer -->
           <template v-if="!!$slots[column.field + 'Node']">
             <slot
@@ -90,14 +92,52 @@
         </div>
       </td>
     </template>
+    <!-- Row Contextmenu Button -->
+    <td
+      v-if="customContextMenu?.length"
+      :class="{
+        'row-contextmenu': true,
+        'non-border': !!borderStyle,
+      }"
+      :style="{
+        position: 'sticky',
+        right: 0,
+        width: '30px',
+        height: `${rowHeight}px`,
+        'min-width': '30px',
+        'line-height': `${rowHeight}px`,
+      }"
+    >
+      <template v-if="$slots.contextmenuIconNode">
+        <span
+          class="row-contextmenu__btn"
+          @click="onContextMenu($event)"
+          @click.prevent="menuRef.show"
+        >
+          <slot
+            name="contextmenuIconNode"
+          />
+        </span>
+      </template>
+      <template v-else>
+        <grid-option-button
+          icon="ev-icon-warning2"
+          class="row-contextmenu__btn"
+          @click="onContextMenu($event)"
+          @click.prevent="menuRef.show"
+        />
+      </template>
+    </td>
   </tr>
 </template>
 
 <script>
 import { computed } from 'vue';
+import GridOptionButton from '@/components/grid/grid.optionButton.vue';
 
 export default {
   name: 'TreeGridNode',
+  components: { GridOptionButton },
   props: {
     dataIndex: {
       type: Number,
@@ -135,6 +175,14 @@ export default {
       type: String,
       default: '',
     },
+    customContextMenu: {
+      type: [Array],
+      default: () => [],
+    },
+    menuRef: {
+      type: Object,
+      default: null,
+    },
     rowHeight: {
       type: Number,
       default: 35,
@@ -157,6 +205,7 @@ export default {
     'expand-tree-data': null,
     'click-tree-data': null,
     'dbl-click-tree-data': null,
+    'context-menu': null,
   },
   setup(props, { emit }) {
     const onCheck = ($event, data) => {
@@ -170,6 +219,9 @@ export default {
     };
     const onDblClick = ($event, data) => {
       emit('dbl-click-tree-data', $event, data);
+    };
+    const onContextMenu = ($event) => {
+      emit('context-menu', $event);
     };
     const expandIconClasses = (node) => {
       const expandIcon = props.expandIcon ? props.expandIcon : '';
@@ -205,11 +257,13 @@ export default {
       [column.align]: column.align,
       'non-border': !!props.borderStyle,
     });
-    const getColumnStyle = column => ({
+    const getColumnStyle = (column, cellIndex) => ({
       width: `${column.width}px`,
       height: `${props.rowHeight}px`,
       'line-height': `${props.rowHeight}px`,
       'min-width': `${props.minWidth}px`,
+      'border-right': props.orderedColumns.length - 1 === cellIndex
+        ? 'none' : '1px solid #CFCFCF',
     });
     const getDepthStyle = (nodeLevel) => {
       const depthSize = nodeLevel * 13;
@@ -228,6 +282,7 @@ export default {
       onExpand,
       onClick,
       onDblClick,
+      onContextMenu,
       expandIconClasses,
       getRowClass,
       getColumnClass,
@@ -279,7 +334,7 @@ export default {
     background: url('./tree_icon.png') no-repeat -14px -35px;
   }
 }
-.slot-wrapper {
+.td-content {
   position: relative;
   flex: 1;
 }
