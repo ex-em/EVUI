@@ -87,7 +87,7 @@
               <ev-icon
                 class="filtering-items__item--remove"
                 icon="ev-icon-s-close"
-                @click="removeColumnFiltering(field)"
+                @click="onApplyFilter(field, [])"
               />
             </div>
           </template>
@@ -1091,21 +1091,22 @@ export default {
 
     const setColumnFilteringItems = () => {
       isExpandColumnFilteringItems.value = true;
-      const conditionItems = filteringItemsRef.value
-        .getElementsByClassName('filtering-items__item');
       let hasHiddenElement = false;
+      const conditionItems = filteringItemsRef.value
+        ?.getElementsByClassName('filtering-items__item');
+      if (conditionItems) {
+        for (let i = 0; i < conditionItems.length; i++) {
+          const itemEl = conditionItems[i];
+          itemEl.classList.remove('non-display');
+          const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
+          const { top } = itemEl.getBoundingClientRect(); // rect height: 27
+          if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
+            isExpandColumnFilteringItems.value = false;
+            hasHiddenElement = true;
+          }
 
-      for (let i = 0; i < conditionItems.length; i++) {
-        const itemEl = conditionItems[i];
-        itemEl.classList.remove('non-display');
-        const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
-        const { top } = itemEl.getBoundingClientRect(); // rect height: 27
-        if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
-          isExpandColumnFilteringItems.value = false;
-          hasHiddenElement = true;
+          itemEl.classList.toggle('non-display', hasHiddenElement);
         }
-
-        itemEl.classList.toggle('non-display', hasHiddenElement);
       }
     };
 
@@ -1115,9 +1116,9 @@ export default {
       } else {
         filterInfo.filteringItemsByColumn[field] = list;
         isShowColumnFilteringItems.value = true;
-        await nextTick();
-        setColumnFilteringItems();
       }
+      await nextTick();
+      setColumnFilteringItems();
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
       setStore([], false);
@@ -1128,11 +1129,6 @@ export default {
       setColumnFilteringItems();
     };
 
-    const removeColumnFiltering = (field) => {
-      delete filterInfo.filteringItemsByColumn[field];
-      stores.filterStore = [];
-      setStore([], false);
-    };
     const removeFiltering = ({ field, idx }) => {
       filterInfo.filteringItemsByColumn[field]?.splice(idx, 1);
       if (!filterInfo.filteringItemsByColumn[field].length) {
@@ -1219,7 +1215,6 @@ export default {
       isShowFilteringItemsBox,
       ...toRefs(filteringItemsBoxPosition),
       removeFiltering,
-      removeColumnFiltering,
       removeAllFiltering,
       onExpandFilteringItems,
       setColumnFilteringItems,

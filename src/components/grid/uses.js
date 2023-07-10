@@ -792,12 +792,12 @@ export const filterEvent = (params) => {
             ...item,
             index,
           }));
-        } else if (item.operator === 'or') {
+        } else if (ix !== 0 && item.operator === 'or') {
           filterStore.push(...getFilteringData(originStore, columnType, {
             ...item,
             index,
           }));
-        } else {
+        } else { // (ix === 0 && filterInfo.columnOperator === 'and') || item.operator === 'and'
           filterStore = getFilteringData(filterStore, columnType, {
             ...item,
             index,
