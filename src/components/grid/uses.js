@@ -334,7 +334,7 @@ export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
   const { selectInfo, stores } = params;
   const getClickedRowData = (event, row) => {
-    const tagName = event.target.tagName.toLowerCase();
+    const tagName = event.target.tagName?.toLowerCase();
     let cellInfo = {};
     if (tagName === 'td') {
       cellInfo = event.target.dataset;
@@ -654,8 +654,8 @@ export const filterEvent = (params) => {
     if (typeof conditionValue !== 'string' || value === null) {
       return false;
     }
-    const baseValueLower = value.toLowerCase();
-    const conditionValueLower = conditionValue.toLowerCase();
+    const baseValueLower = value?.toLowerCase();
+    const conditionValueLower = conditionValue?.toLowerCase();
     let result = baseValueLower.includes(conditionValueLower);
     if (pos) {
       if (pos === 'start') {
@@ -682,9 +682,9 @@ export const filterEvent = (params) => {
     }
     let result;
     if (comparison === '=') {
-      result = conditionValue.toLowerCase() === value.toLowerCase();
+      result = conditionValue?.toLowerCase() === value?.toLowerCase();
     } else if (comparison === '!=') {
-      result = conditionValue.toLowerCase() !== value.toLowerCase();
+      result = conditionValue?.toLowerCase() !== value?.toLowerCase();
     } else if (comparison === '%s%') {
       result = findLike(conditionValue, value);
     } else if (comparison === 'notLike') {
@@ -792,12 +792,12 @@ export const filterEvent = (params) => {
             ...item,
             index,
           }));
-        } else if (item.operator === 'or') {
+        } else if (ix !== 0 && item.operator === 'or') {
           filterStore.push(...getFilteringData(originStore, columnType, {
             ...item,
             index,
           }));
-        } else {
+        } else { // (ix === 0 && filterInfo.columnOperator === 'and') || item.operator === 'and'
           filterStore = getFilteringData(filterStore, columnType, {
             ...item,
             index,
