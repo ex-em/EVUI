@@ -775,11 +775,14 @@ export const filterEvent = (params) => {
     const originStore = stores.originStore;
     let filterStore = [];
     let filteredOnce = false;
+    let prevStore = [];
 
-    fields.forEach((field) => {
+    fields.forEach((field, idx) => {
       const filters = filteringItemsByColumn[field];
       const index = getColumnIndex(field);
       const columnType = props.columns[index].type;
+      const OR = idx > 0 && filterInfo.columnOperator === 'or';
+      const AND = idx > 0 && filterInfo.columnOperator === 'and';
 
       filters.forEach((item, ix) => {
         if (!filterStore.length && !filteredOnce) {
@@ -787,17 +790,24 @@ export const filterEvent = (params) => {
             ...item,
             index,
           });
-        } else if (ix === 0 && filterInfo.columnOperator === 'or') {
+        } else if (AND && item.operator === 'or') {
+          if (ix > 0) {
+            filterStore.push(...getFilteringData(prevStore, columnType, {
+              ...item,
+              index,
+            }));
+          } else { // ix === 0
+            filterStore = getFilteringData(prevStore, columnType, {
+              ...item,
+              index,
+            });
+          }
+        } else if (OR || item.operator === 'or') {
           filterStore.push(...getFilteringData(originStore, columnType, {
             ...item,
             index,
           }));
-        } else if (ix !== 0 && item.operator === 'or') {
-          filterStore.push(...getFilteringData(originStore, columnType, {
-            ...item,
-            index,
-          }));
-        } else { // (ix === 0 && filterInfo.columnOperator === 'and') || item.operator === 'and'
+        } else {
           filterStore = getFilteringData(filterStore, columnType, {
             ...item,
             index,
@@ -805,6 +815,7 @@ export const filterEvent = (params) => {
         }
         filteredOnce = true;
       });
+      prevStore = JSON.parse(JSON.stringify(filterStore));
     });
 
     if (!filteredOnce) {
