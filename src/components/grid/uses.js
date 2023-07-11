@@ -781,7 +781,7 @@ export const filterEvent = (params) => {
       const filters = filteringItemsByColumn[field];
       const index = getColumnIndex(field);
       const columnType = props.columns[index].type;
-      const OR = idx > 0 && filterInfo.columnOperator === 'or';
+      const OR = filterInfo.columnOperator === 'or';
       const AND = idx > 0 && filterInfo.columnOperator === 'and';
 
       filters.forEach((item, ix) => {
@@ -802,7 +802,7 @@ export const filterEvent = (params) => {
               index,
             });
           }
-        } else if (OR || item.operator === 'or') {
+        } else if ((ix === 0 && OR) || (ix !== 0 && item.operator === 'or')) {
           filterStore.push(...getFilteringData(originStore, columnType, {
             ...item,
             index,
