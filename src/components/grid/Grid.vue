@@ -54,21 +54,29 @@
             />
             <div
               class="filtering-items__item"
-              @click="onClickFilteringItem(
-                filteringItemsByColumn[field]?.[0].caption,
-                filteringItemsByColumn[field]
+              @click.stop="onClickFilteringItem(
+                {
+                  caption: filteringItemsByColumn[field]
+                  ?.[filteringItemsByColumn[field].length - 1].caption,
+                  field: field,
+                },
+                filteringItemsByColumn[field],
                 )"
             >
               <span class="filtering-items__item--title">
-                {{ filteringItemsByColumn[field]?.[0].caption }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].caption }}
               </span>
               <span
                 v-if="filteringItemsByColumn[field].length < 2"
                 class="filtering-items__item--value"
-                :title="`${filteringItemsByColumn[field][0].value}`"
+                :title="`${filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].value}`"
               >
-                {{ filteringItemsByColumn[field]?.[0].comparison }}
-                {{ filteringItemsByColumn[field]?.[0].value }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].comparison }}
+                {{ filteringItemsByColumn[field]
+                ?.[filteringItemsByColumn[field].length - 1].value }}
               </span>
               <span
                 v-else
@@ -79,7 +87,7 @@
               <ev-icon
                 class="filtering-items__item--remove"
                 icon="ev-icon-s-close"
-                @click="removeColumnFiltering(field)"
+                @click="onApplyFilter(field, [])"
               />
             </div>
           </template>
@@ -108,7 +116,7 @@
                 />
                 <div class="filtering-items__item">
                   <span class="filtering-items__item--title">
-                    {{ selectedFilteringFiled }}
+                    {{ selectedFilteringColumn.caption }}
                   </span>
                   <span class="filtering-items__item--value">
                     {{ field.comparison }}
@@ -117,7 +125,11 @@
                   <ev-icon
                     class="filtering-items__item--remove"
                     icon="ev-icon-s-close"
-                    @click="removeFiltering({field: selectedFilteringFiled, idx})"
+                    @click="removeFiltering(
+                      {
+                        field: selectedFilteringColumn.field,
+                        idx,
+                      })"
                   />
                 </div>
               </template>
@@ -318,7 +330,6 @@
         }"
         @scroll="onScroll"
         @contextmenu="onContextMenu($event)"
-        @contextmenu.prevent="menu.show"
       >
         <!-- vScroll Top -->
         <div
@@ -423,7 +434,6 @@
                   <span
                     class="row-contextmenu__btn"
                     @click="onContextMenu($event)"
-                    @click.prevent="menu.show"
                   >
                     <slot name="contextmenuIcon"></slot>
                   </span>
@@ -433,7 +443,6 @@
                     icon="ev-icon-warning2"
                     class="row-contextmenu__btn"
                     @click="onContextMenu($event)"
-                    @click.prevent="menu.show"
                   />
                 </template>
               </td>
@@ -697,6 +706,7 @@ export default {
       isSorting: false,
       sortField: '',
       sortOrder: '',
+      sortColumn: {},
     });
     const contextInfo = reactive({
       menu: null,
@@ -767,7 +777,7 @@ export default {
     const {
       onSort,
       setSort,
-    } = sortEvent({ sortInfo, stores, getColumnIndex, updatePagingInfo });
+    } = sortEvent({ sortInfo, stores, updatePagingInfo });
 
     const {
       onSearch,
@@ -845,7 +855,7 @@ export default {
     const {
       onRowClick,
       onRowDblClick,
-    } = clickEvent({ selectInfo, stores, setContextMenu });
+    } = clickEvent({ selectInfo, stores });
 
     const {
       onDragStart,
@@ -1049,7 +1059,10 @@ export default {
     const filteringItemsRef = ref(null);
     const isShowFilteringItemsBox = ref(false);
     const isShowColumnFilteringItems = ref(false);
-    const selectedFilteringFiled = ref('');
+    const selectedFilteringColumn = reactive({
+      caption: '',
+      field: '',
+    });
     const selectedFilteringItems = ref([]);
     const operatorItems = [
       { name: 'AND', value: 'and' },
@@ -1057,13 +1070,14 @@ export default {
     ];
     const isExpandColumnFilteringItems = ref(false);
 
-    const onClickFilteringItem = (field, filters) => {
-      selectedFilteringFiled.value = field;
+    const onClickFilteringItem = ({ caption, field }, filters) => {
+      selectedFilteringColumn.caption = caption;
+      selectedFilteringColumn.field = field;
       selectedFilteringItems.value = filters;
       if (filters?.length > 1) { // open filtering items box
         isShowFilteringItemsBox.value = true;
         const x = filteringItemsRef.value.getBoundingClientRect().left;
-        const y = filteringItemsRef.value.getBoundingClientRect().top
+        const y = window.pageYOffset + filteringItemsRef.value.getBoundingClientRect().top
           + filteringItemsRef.value.getBoundingClientRect().height;
         filteringItemsBoxPosition.boxTop = `${y}px`;
         filteringItemsBoxPosition.boxLeft = `${x}px`;
@@ -1077,21 +1091,22 @@ export default {
 
     const setColumnFilteringItems = () => {
       isExpandColumnFilteringItems.value = true;
-      const conditionItems = filteringItemsRef.value
-        .getElementsByClassName('filtering-items__item');
       let hasHiddenElement = false;
+      const conditionItems = filteringItemsRef.value
+        ?.getElementsByClassName('filtering-items__item');
+      if (conditionItems) {
+        for (let i = 0; i < conditionItems.length; i++) {
+          const itemEl = conditionItems[i];
+          itemEl.classList.remove('non-display');
+          const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
+          const { top } = itemEl.getBoundingClientRect(); // rect height: 27
+          if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
+            isExpandColumnFilteringItems.value = false;
+            hasHiddenElement = true;
+          }
 
-      for (let i = 0; i < conditionItems.length; i++) {
-        const itemEl = conditionItems[i];
-        itemEl.classList.remove('non-display');
-        const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
-        const { top } = itemEl.getBoundingClientRect(); // rect height: 27
-        if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
-          isExpandColumnFilteringItems.value = false;
-          hasHiddenElement = true;
+          itemEl.classList.toggle('non-display', hasHiddenElement);
         }
-
-        itemEl.classList.toggle('non-display', hasHiddenElement);
       }
     };
 
@@ -1101,9 +1116,9 @@ export default {
       } else {
         filterInfo.filteringItemsByColumn[field] = list;
         isShowColumnFilteringItems.value = true;
-        await nextTick();
-        setColumnFilteringItems();
       }
+      await nextTick();
+      setColumnFilteringItems();
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
       setStore([], false);
@@ -1114,15 +1129,11 @@ export default {
       setColumnFilteringItems();
     };
 
-    const removeColumnFiltering = (field) => {
-      delete filterInfo.filteringItemsByColumn[field];
-      stores.filterStore = [];
-      setStore([], false);
-    };
     const removeFiltering = ({ field, idx }) => {
-      filterInfo.filteringItemsByColumn[field].splice(idx, 1);
+      filterInfo.filteringItemsByColumn[field]?.splice(idx, 1);
       if (!filterInfo.filteringItemsByColumn[field].length) {
         delete filterInfo.filteringItemsByColumn[field];
+        isShowFilteringItemsBox.value = false;
       }
       stores.filterStore = [];
       setStore([], false);
@@ -1199,12 +1210,11 @@ export default {
       isShowColumnFilteringItems,
       operatorItems,
       selectedFilteringItems,
-      selectedFilteringFiled,
+      selectedFilteringColumn,
       filteringItemsRef,
       isShowFilteringItemsBox,
       ...toRefs(filteringItemsBoxPosition),
       removeFiltering,
-      removeColumnFiltering,
       removeAllFiltering,
       onExpandFilteringItems,
       setColumnFilteringItems,

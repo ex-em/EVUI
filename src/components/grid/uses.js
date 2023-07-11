@@ -332,9 +332,9 @@ export const resizeEvent = (params) => {
 
 export const clickEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const { selectInfo, stores, setContextMenu } = params;
+  const { selectInfo, stores } = params;
   const getClickedRowData = (event, row) => {
-    const tagName = event.target.tagName.toLowerCase();
+    const tagName = event.target.tagName?.toLowerCase();
     let cellInfo = {};
     if (tagName === 'td') {
       cellInfo = event.target.dataset;
@@ -355,7 +355,7 @@ export const clickEvent = (params) => {
    * @param {object} event - 이벤트 객체
    * @param {array} row - row 데이터
    */
-  let timer = null;
+  let clickTimer = null;
   let lastIndex = -1;
   const onRowClick = (event, row, isRight) => {
     if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
@@ -395,8 +395,10 @@ export const clickEvent = (params) => {
       }
     };
 
-    clearTimeout(timer);
-    timer = setTimeout(() => {
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+    clickTimer = setTimeout(() => {
       if (selectInfo.useSelect) {
         const rowData = row[ROW_DATA_INDEX];
         const selected = row[ROW_SELECT_INDEX];
@@ -423,7 +425,6 @@ export const clickEvent = (params) => {
         lastIndex = row[ROW_INDEX];
         emit('update:selected', selectInfo.selectedRow);
         emit('click-row', getClickedRowData(event, row));
-        setContextMenu();
       }
     }, 100);
     return true;
@@ -435,7 +436,9 @@ export const clickEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onRowDblClick = (event, row) => {
-    clearTimeout(timer);
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
     emit('dblclick-row', getClickedRowData(event, row));
   };
   return { onRowClick, onRowDblClick };
@@ -523,7 +526,7 @@ export const checkEvent = (params) => {
 };
 
 export const sortEvent = (params) => {
-  const { sortInfo, stores, getColumnIndex, updatePagingInfo } = params;
+  const { sortInfo, stores, updatePagingInfo } = params;
   function OrderQueue() {
     this.orders = ['asc', 'desc', 'init'];
     this.dequeue = () => this.orders.shift();
@@ -539,6 +542,7 @@ export const sortEvent = (params) => {
   const onSort = (column, sortOrder) => {
     const sortable = column.sortable === undefined ? true : column.sortable;
     if (sortable) {
+      sortInfo.sortColumn = column;
       if (sortInfo.sortField !== column?.field) {
         order.orders = ['asc', 'desc', 'init'];
         sortInfo.sortField = column?.field;
@@ -574,8 +578,8 @@ export const sortEvent = (params) => {
       });
       return;
     }
-    const index = getColumnIndex(sortInfo.sortField);
-    const type = stores.originColumns[index]?.type || 'string';
+    const index = sortInfo.sortColumn.index;
+    const type = sortInfo.sortColumn.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
@@ -641,25 +645,26 @@ export const filterEvent = (params) => {
   /**
    * 전달받은 문자열 내 해당 키워드가 존재하는지 확인한다.
    *
-   * @param {string} search - 검색 키워드
-   * @param {string} origin - 기준 문자열
+   * @param {string} conditionValue - 검색 키워드
+   * @param {string} value - 기준 문자열
+   * @param {string} pos - 시작, 끝나는 문자열
    * @returns {boolean} 문자열 내 키워드 존재 유무
    */
-  const findLike = (search, origin, pos) => {
-    if (typeof search !== 'string' || origin === null) {
+  const findLike = (conditionValue, value, pos) => {
+    if (typeof conditionValue !== 'string' || value === null) {
       return false;
     }
-    let regx = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1');
-    regx = regx.replace(/%/g, '.*').replace(/_/g, '.');
-    let regValue = `^${regx}$`;
+    const baseValueLower = value?.toLowerCase();
+    const conditionValueLower = conditionValue?.toLowerCase();
+    let result = baseValueLower.includes(conditionValueLower);
     if (pos) {
       if (pos === 'start') {
-        regValue = `^${regx}`;
+        result = baseValueLower.startsWith(conditionValueLower);
       } else if (pos === 'end') {
-        regValue = `${regx}$`;
+        result = baseValueLower.endsWith(conditionValueLower);
       }
     }
-    return RegExp(regValue, 'gi').test(origin);
+    return result;
   };
   /**
    * 필터 조건에 따라 문자열을 확인한다.
@@ -677,17 +682,17 @@ export const filterEvent = (params) => {
     }
     let result;
     if (comparison === '=') {
-      result = conditionValue.toLowerCase() === value.toLowerCase();
+      result = conditionValue?.toLowerCase() === value?.toLowerCase();
     } else if (comparison === '!=') {
-      result = conditionValue.toLowerCase() !== value.toLowerCase();
+      result = conditionValue?.toLowerCase() !== value?.toLowerCase();
     } else if (comparison === '%s%') {
-      result = findLike(`%${conditionValue}%`, value);
+      result = findLike(conditionValue, value);
     } else if (comparison === 'notLike') {
-      result = !findLike(`%${conditionValue}%`, value);
+      result = !findLike(conditionValue, value);
     } else if (comparison === 's%') {
-      result = findLike(`${conditionValue}`, value, 'start');
+      result = findLike(conditionValue, value, 'start');
     } else if (comparison === '%s') {
-      result = findLike(`${conditionValue}`, value, 'end');
+      result = findLike(conditionValue, value, 'end');
     } else if (comparison === 'isEmpty') {
       result = value === undefined || value === null || value === '';
     } else if (comparison === 'isNotEmpty') {
@@ -765,33 +770,36 @@ export const filterEvent = (params) => {
    * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore 에 저장한다.
    */
   const setFilter = () => {
-    let filterStore = [];
-    let isApply = false;
-
     const filteringItemsByColumn = filterInfo.filteringItemsByColumn;
     const fields = Object.keys(filteringItemsByColumn);
     const originStore = stores.originStore;
+    let filterStore = [];
     let filteredOnce = false;
+
     fields.forEach((field) => {
       const filters = filteringItemsByColumn[field];
       const index = getColumnIndex(field);
       const columnType = props.columns[index].type;
 
-      filters.forEach((filterItem) => {
-        isApply = true;
+      filters.forEach((item, ix) => {
         if (!filterStore.length && !filteredOnce) {
           filterStore = getFilteringData(originStore, columnType, {
-            ...filterItem,
+            ...item,
             index,
           });
-        } else if (filterItem.operator === 'or' || filterInfo.columnOperator === 'or') {
+        } else if (ix === 0 && filterInfo.columnOperator === 'or') {
           filterStore.push(...getFilteringData(originStore, columnType, {
-            ...filterItem,
+            ...item,
             index,
           }));
-        } else {
+        } else if (ix !== 0 && item.operator === 'or') {
+          filterStore.push(...getFilteringData(originStore, columnType, {
+            ...item,
+            index,
+          }));
+        } else { // (ix === 0 && filterInfo.columnOperator === 'and') || item.operator === 'and'
           filterStore = getFilteringData(filterStore, columnType, {
-            ...filterItem,
+            ...item,
             index,
           });
         }
@@ -799,19 +807,19 @@ export const filterEvent = (params) => {
       });
     });
 
-    if (!isApply) {
+    if (!filteredOnce) {
       stores.filterStore = originStore;
     } else {
       stores.filterStore = uniqBy(filterStore, JSON.stringify);
     }
   };
 
-  let timer = null;
+  let searchTimer = null;
   const onSearch = (searchWord) => {
-    if (timer) {
-      clearTimeout(timer);
+    if (searchTimer) {
+      clearTimeout(searchTimer);
     }
-    timer = setTimeout(() => {
+    searchTimer = setTimeout(() => {
       filterInfo.isSearch = false;
       filterInfo.searchWord = searchWord;
       if (searchWord) {
@@ -880,35 +888,65 @@ export const contextMenuEvent = (params) => {
   /**
    * 컨텍스트 메뉴를 설정한다.
    *
-   * @param {boolean} useCustom - 사용자 지정 메뉴 사용 유무
+   * @param {object} event - 이벤트 객체
    */
-  const setContextMenu = (useCustom = true) => {
-    const menuItems = [];
-
-    if (useCustom && contextInfo.customContextMenu.length) {
-      const customItems = contextInfo.customContextMenu.map(
-        (item) => {
-          const menuItem = item;
-          if (menuItem.validate) {
-            menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
-          }
-
-          menuItem.selectedRow = selectInfo.selectedRow ?? [];
-          menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
-
-          return menuItem;
-        });
-
-      menuItems.push(...customItems);
+  let contextmenuTimer = null;
+  const setContextMenu = (e) => {
+    if (contextmenuTimer) {
+      clearTimeout(contextmenuTimer);
     }
+    const menuItems = [];
+    contextmenuTimer = setTimeout(() => {
+      if (contextInfo.customContextMenu.length) {
+        const customItems = contextInfo.customContextMenu.map(
+          (item) => {
+            const menuItem = item;
+            if (menuItem.validate) {
+              menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
+            }
 
-    contextInfo.contextMenuItems = menuItems;
+            menuItem.selectedRow = selectInfo.selectedRow ?? [];
+            menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
+
+            return menuItem;
+          });
+
+        menuItems.push(...customItems);
+      }
+
+      contextInfo.contextMenuItems = menuItems;
+      contextInfo.menu.show(e);
+    }, 200);
   };
+  /**
+   * 마우스 우클릭 이벤트를 처리한다.
+   *
+   * @param {object} event - 이벤트 객체
+   */
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    const target = e.target;
+    const rowIndex = target.closest('.row')?.dataset?.index;
+    let clickedRow = null;
+    if (rowIndex) {
+      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
+    }
+    if (clickedRow) {
+      selectInfo.contextmenuInfo = [clickedRow];
+      setContextMenu(e);
+    }
+  };
+  /**
+   * 컬럼 기능을 수행하는 Contextmenu 를 생성한다.
+   *
+   * @param {object} event - 이벤트 객체
+   * @param {object} column - 컬럼 정보
+   */
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
-        && column.filterable === undefined ? true : column.filterable;
+      && column.filterable === undefined ? true : column.filterable;
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
@@ -950,23 +988,6 @@ export const contextMenuEvent = (params) => {
           click: () => setColumnHidden(column.field),
         },
       ];
-    }
-  };
-  /**
-   * 마우스 우클릭 이벤트를 처리한다.
-   *
-   * @param {object} event - 이벤트 객체
-   */
-  const onContextMenu = (event) => {
-    const target = event.target;
-    const rowIndex = target.closest('.row')?.dataset?.index;
-    let clickedRow = null;
-    if (rowIndex) {
-      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
-    }
-    if (clickedRow) {
-      selectInfo.contextmenuInfo = [clickedRow];
-      // setContextMenu();
     }
   };
   return {

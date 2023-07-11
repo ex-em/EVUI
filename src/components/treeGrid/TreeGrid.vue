@@ -54,7 +54,10 @@
           <li
             v-if="useCheckbox.use"
             :class="headerCheckboxClass"
-            :style="`width: ${minWidth}px;`"
+            :style="{
+              width: `${minWidth}px`,
+              'border-right': '1px solid #CFCFCF',
+            }"
           >
             <ev-checkbox
               v-if="isHeaderCheckbox"
@@ -92,6 +95,21 @@
               />
             </li>
           </template>
+          <!-- Row Contextmenu Column -->
+          <li
+            v-if="$props.option.customContextMenu?.length"
+            :class="{
+              column: true,
+              'non-border': !!borderStyle,
+            }"
+            :style="{
+              width: '30px',
+              'min-width': '30px',
+              'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
+                ? `${scrollWidth}px` : '0px',
+            }"
+          >
+          </li>
         </ul>
       </div>
       <!-- Body -->
@@ -120,6 +138,8 @@
               :collapse-icon="option.collapseIcon"
               :parent-icon="option.parentIcon"
               :child-icon="option.childIcon"
+              :custom-context-menu="customContextMenu"
+              :menu-ref="menu"
               :is-resize="isResize"
               :row-height="rowHeight"
               :min-width="minWidth"
@@ -129,6 +149,7 @@
               @expand-tree-data="handleExpand"
               @click-tree-data="onRowClick"
               @dbl-click-tree-data="onRowDblClick"
+              @context-menu="onContextMenu"
             >
               <!-- Cell Renderer -->
               <template
@@ -151,6 +172,14 @@
                     {{ getConvertValue(column, node[column.field]) }}
                   </span>
                 </template>
+              </template>
+              <template
+                v-if="$slots.contextmenuIcon"
+                #contextmenuIconNode
+              >
+                <slot
+                  name="contextmenuIcon"
+                />
               </template>
             </tree-grid-node>
             <tr v-if="!viewStore.length">
@@ -469,6 +498,7 @@ export default {
       isRenderer,
       updateVScroll,
       updateHScroll,
+      contextInfo,
     });
 
     const {
@@ -768,6 +798,7 @@ export default {
         'margin-right': (stores.orderedColumns.length - 1 === index
           && scrollInfo.hasVerticalScrollBar
           && scrollInfo.hasHorizontalScrollBar) ? `${resizeInfo.scrollWidth}px` : '0px',
+        'border-right': stores.orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
       };
     };
     const getSlotName = column => `${column}Node`;

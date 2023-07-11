@@ -1,4 +1,5 @@
 import { numberWithComma } from '@/common/utils';
+import throttle from '@/common/utils.throttle';
 import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
 import dayjs from 'dayjs';
 
@@ -33,11 +34,9 @@ const modules = {
       this.overlayClear();
 
       if (Object.keys(hitInfo.items).length) {
-        if ((type !== 'scatter' && type !== 'heatMap') || tooltip.use) {
-          this.drawItemsHighlight(hitInfo, ctx);
-        }
-
         if (tooltip.use) {
+          this.drawItemsHighlight(hitInfo, ctx);
+
           if (tooltip?.formatter?.html) {
             this.drawCustomTooltip(hitInfo?.items);
             this.setCustomTooltipLayoutPosition(hitInfo, e);
@@ -348,6 +347,9 @@ const modules = {
 
     if (this.options?.tooltip?.useScrollbar) {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
+    }
+    if (this.options?.tooltip?.throttledMove) {
+      this.onMouseMove = throttle(this.onMouseMove, 30);
     }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);

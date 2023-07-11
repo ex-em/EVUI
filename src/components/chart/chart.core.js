@@ -1,4 +1,3 @@
-import throttle from '@/common/utils.throttle';
 import { mobileCheck } from '@/common/utils';
 import Model from './model';
 import TimeScale from './scale/scale.time';
@@ -134,10 +133,6 @@ class EvChart {
 
     if (tooltip.use) {
       this.createTooltipDOM();
-
-      if (tooltip.throttledMove) {
-        this.onMouseMove = throttle(this.onMouseMove, 30);
-      }
     }
 
     this.createEventFunctions?.();
