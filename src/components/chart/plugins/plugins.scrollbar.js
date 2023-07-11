@@ -31,7 +31,7 @@ const module = {
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
-      scrollbarOpt.range = axisOpt?.[0]?.range || null;
+      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
 
       this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
@@ -44,15 +44,15 @@ const module = {
   initScrollbarRange(dir) {
     const scrollbarOpt = this.scrollbar[dir];
     const axesType = scrollbarOpt.type;
+    const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
 
-    if (scrollbarOpt.range?.length) {
+    if (scrollbarOpt.range?.length && labels.length) {
       const [min, max] = scrollbarOpt.range;
       let limitMin;
       let limitMax;
 
       if ((truthyNumber(min) && truthyNumber(max))) {
         if (axesType === 'step') {
-          const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
           limitMin = 0;
           limitMax = labels.length - 1;
         } else {
@@ -93,7 +93,7 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      this.scrollbar[dir].range = newOpt?.[0]?.range || null;
+      this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
