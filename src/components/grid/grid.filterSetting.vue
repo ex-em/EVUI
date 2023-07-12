@@ -58,12 +58,6 @@
               />
             </div>
           </div>
-          <div class="ev-grid-filter-setting__row--button add">
-            <ev-icon
-              icon="ev-icon-add"
-              @click="addRow"
-            />
-          </div>
         </div>
         <div class="ev-grid-filter-setting__footer">
           <ev-button
