@@ -733,7 +733,7 @@ export const filterEvent = (params) => {
     } else if (comparison === 'isEmpty') {
       result = value === undefined || value === null || isNaN(value);
     } else if (comparison === 'isNotEmpty') {
-      result = !!value;
+      result = !!value || value === 0;
     }
 
     return result;
