@@ -10,7 +10,7 @@ import {
 import Util from '../helpers/helpers.util';
 
 class Scale {
-  constructor(type, axisOpt, ctx, labels, options) {
+  constructor(type, axisOpt, ctx, options) {
     const merged = defaultsDeep({}, axisOpt, AXIS_OPTION);
     Object.keys(merged).forEach((key) => {
       this[key] = merged[key];
@@ -19,7 +19,6 @@ class Scale {
     this.type = type;
     this.ctx = ctx;
     this.units = AXIS_UNITS[this.type];
-    this.labels = labels;
     this.options = options;
 
     if (!this.position) {
@@ -219,10 +218,13 @@ class Scale {
    * @param {object} chartRect      min/max information
    * @param {object} labelOffset    label offset information
    * @param {object} stepInfo       label steps information
+   * @param {object} hitInfo        hit information
+   * @param {object} selectLabelInfo selected label information
+   * @param {object} dataLabels     data label information, x axis only
    *
    * @returns {undefined}
    */
-  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo) {
+  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo, dataLabels) {
     const ctx = this.ctx;
     const options = this.options;
     const aPos = {
@@ -290,7 +292,7 @@ class Scale {
       let offsetStartPoint = startPoint;
       let axisMinForLabel = axisMin;
 
-      if (this.type === 'x' && options?.axesX[0].flow && this.labels.length !== steps + 1) {
+      if (this.type === 'x' && options?.axesX[0].flow && dataLabels.length !== steps + 1) {
         const axisMinByMinutes = Math.floor(axisMin / size) * size;
         if (axisMinByMinutes !== +axisMin) {
           axisMinForLabel = axisMinByMinutes + size;
@@ -306,7 +308,7 @@ class Scale {
       for (let ix = 0; ix <= steps; ix++) {
         labelCenter = Math.round(offsetStartPoint + (labelGap * ix));
 
-        if (labelCenter <= endPoint || this.type !== 'x' || !options?.axesX[0].flow || this.labels.length === steps + 1) {
+        if (labelCenter <= endPoint || this.type !== 'x' || !options?.axesX[0].flow || dataLabels.length === steps + 1) {
           ctx.beginPath();
           ticks[ix] = axisMinForLabel + (ix * stepValue);
 

@@ -374,12 +374,12 @@ class EvChart {
     return axes.map((axis) => {
       switch (axis.type) {
         case 'linear':
-          return new LinearScale(dir, axis, ctx, labels, options);
+          return new LinearScale(dir, axis, ctx, options);
         case 'time':
           if (axis.categoryMode) {
             return new TimeCategoryScale(dir, axis, ctx, labels, options);
           }
-          return new TimeScale(dir, axis, ctx, labels, options);
+          return new TimeScale(dir, axis, ctx, options);
         case 'log':
           return new LogarithmicScale(dir, axis, ctx);
         case 'step':
@@ -416,7 +416,8 @@ class EvChart {
         this.labelOffset,
         this.axesSteps.x[index],
         hitInfo,
-        this.defaultSelectInfo);
+        this.defaultSelectInfo,
+        this.data.labels);
     });
 
     this.axesY.forEach((axis, index) => {
