@@ -958,6 +958,9 @@ export const contextMenuEvent = (params) => {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
       && column.filterable === undefined ? true : column.filterable;
+      if (!sortable && !filterable) {
+        return;
+      }
       contextInfo.columnMenuItems = [
         {
           text: 'Ascending',
