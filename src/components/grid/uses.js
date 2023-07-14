@@ -711,7 +711,7 @@ export const filterEvent = (params) => {
    */
   const numberFilter = (item, condition, columnType) => {
     const comparison = condition.comparison;
-    const conditionValue = Number(condition.value);
+    const conditionValue = Number(condition.value.replace(/,/g, '')); // 콤마 제거
     let value = Number(item[ROW_DATA_INDEX][condition.index]);
     let result;
     if (columnType === 'float') {

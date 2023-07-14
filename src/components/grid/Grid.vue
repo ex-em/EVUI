@@ -123,7 +123,7 @@
                   </span>
                   <span class="filtering-items__item--value">
                     {{ field.comparison }}
-                    {{ field.value }}
+                    {{ field.value.toLocaleString('en') }}
                   </span>
                   <ev-icon
                     class="filtering-items__item--remove"
