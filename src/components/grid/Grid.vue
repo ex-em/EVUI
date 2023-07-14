@@ -10,87 +10,89 @@
       <template #toolbarWrapper>
         <!-- Filtering Column Items -->
         <div
-          v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
-          ref="filteringItemsRef"
-          class="filtering-items"
-          :style="{
-            width: `${filteringItemsWidth}px`,
-            background: !isShowColumnFilteringItems && isExpandColumnFilteringItems
-              ? '#FFFFFF' : 'none',
-            border: !isShowColumnFilteringItems && isExpandColumnFilteringItems
-              ? '1px solid #CED4DA' : 'none',
-          }"
+          class="filtering-column-items"
+          :style="{ width: `${filteringItemsWidth + 40}px` }"
         >
-          <template
-            v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
-            :key="idx"
+          <div
+            v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
+            ref="filteringItemsRef"
+            v-clickoutside="() => { if (!isShowColumnFilteringItems) onExpandFilteringItems(); }"
+            class="filtering-items"
+            :style="filteringItemsStyle"
           >
-            <template v-if="idx === 0">
+            <template
+              v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
+              :key="idx"
+            >
+              <template v-if="idx === 0">
+                <div
+                  class="filtering-items__item filtering-items__item--filter"
+                  @click="onExpandFilteringItems"
+                >
+                  <ev-icon
+                    icon="ev-icon-filter-list"
+                    class="filtering-items-expand"
+                  />
+                  <span class="filtering-items__item--title">
+                    Filter ({{ Object.keys(filteringItemsByColumn).length }})
+                  </span>
+                  <ev-icon
+                    class="filtering-items__item--remove"
+                    icon="ev-icon-s-close"
+                    style="margin-left: 0;"
+                    @click.stop="removeAllFiltering"
+                  />
+                </div>
+              </template>
+              <ev-select
+                v-if="idx === 1"
+                v-model="columnOperator"
+                :items="operatorItems"
+                class="ev-grid-filter-setting__row--operator"
+                @change="onChangeOperator"
+              />
               <div
-                class="filtering-items__item filtering-items__item--filter"
-                @click="onExpandFilteringItems"
+                class="filtering-items__item"
+                @click.stop="onClickFilteringItem({
+                  caption: getFilteringItemByField(field)?.caption,
+                  field: field,
+                },
+                filteringItemsByColumn[field])"
               >
-                <ev-icon
-                  icon="ev-icon-filter-list"
-                  class="filtering-items-expand"
-                />
                 <span class="filtering-items__item--title">
-                   Filter ({{ Object.keys(filteringItemsByColumn).length }})
+                  {{ getFilteringItemByField(field)?.caption }}
+                </span>
+                <span
+                  v-if="filteringItemsByColumn[field].length < 2"
+                  class="filtering-items__item--value"
+                  :title="getFilteringItemByField(field)?.value"
+                >
+                  {{ getFilteringItemByField(field)?.comparison }}
+                  {{ getFilteringItemByField(field)?.value }}
+                </span>
+                <span
+                  v-else
+                  class="filtering-items__item--value"
+                >
+                  + {{ filteringItemsByColumn[field].length }}
                 </span>
                 <ev-icon
                   class="filtering-items__item--remove"
                   icon="ev-icon-s-close"
-                  style="margin-left: 0;"
-                  @click.stop="removeAllFiltering"
+                  @click="onApplyFilter(field, [])"
                 />
               </div>
             </template>
-            <ev-select
-              v-if="idx === 1"
-              v-model="columnOperator"
-              class="ev-grid-filter-setting__row--operator"
-              :items="operatorItems"
-              @change="onChangeOperator"
-            />
-            <div
-              class="filtering-items__item"
-              @click.stop="onClickFilteringItem(
-                {
-                  caption: filteringItemsByColumn[field]
-                  ?.[filteringItemsByColumn[field].length - 1].caption,
-                  field: field,
-                },
-                filteringItemsByColumn[field],
-                )"
-            >
-              <span class="filtering-items__item--title">
-                {{ filteringItemsByColumn[field]
-                ?.[filteringItemsByColumn[field].length - 1].caption }}
-              </span>
-              <span
-                v-if="filteringItemsByColumn[field].length < 2"
-                class="filtering-items__item--value"
-                :title="`${filteringItemsByColumn[field]
-                ?.[filteringItemsByColumn[field].length - 1].value}`"
-              >
-                {{ filteringItemsByColumn[field]
-                ?.[filteringItemsByColumn[field].length - 1].comparison }}
-                {{ filteringItemsByColumn[field]
-                ?.[filteringItemsByColumn[field].length - 1].value }}
-              </span>
-              <span
-                v-else
-                class="filtering-items__item--value"
-              >
-                + {{ filteringItemsByColumn[field].length }}
-              </span>
-              <ev-icon
-                class="filtering-items__item--remove"
-                icon="ev-icon-s-close"
-                @click="onApplyFilter(field, [])"
-              />
-            </div>
-          </template>
+          </div>
+          <!-- +N Count-->
+          <div
+            v-if="isShowColumnFilteringItems
+            && Object.keys(filteringItemsByColumn).length && hiddenFilteringItemsCount > 0"
+            class="filtering-items__item filtering-items__item--count"
+            @click="onExpandFilteringItems"
+          >
+            + {{ hiddenFilteringItemsCount }}
+          </div>
         </div>
         <!-- Filtering Items Box -->
         <template v-if="isFiltering && isShowFilteringItemsBox">
@@ -1068,7 +1070,7 @@ export default {
       { name: 'AND', value: 'and' },
       { name: 'OR', value: 'or' },
     ];
-    const isExpandColumnFilteringItems = ref(false);
+    const hiddenFilteringItemsCount = ref(0);
 
     const onClickFilteringItem = ({ caption, field }, filters) => {
       selectedFilteringColumn.caption = caption;
@@ -1089,8 +1091,10 @@ export default {
       setStore([], false);
     };
 
-    const setColumnFilteringItems = () => {
-      isExpandColumnFilteringItems.value = true;
+    const setColumnFilteringItems = (flag) => {
+      if (flag && isShowColumnFilteringItems.value) {
+        hiddenFilteringItemsCount.value = 0;
+      }
       let hasHiddenElement = false;
       const conditionItems = filteringItemsRef.value
         ?.getElementsByClassName('filtering-items__item');
@@ -1101,8 +1105,13 @@ export default {
           const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
           const { top } = itemEl.getBoundingClientRect(); // rect height: 27
           if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
-            isExpandColumnFilteringItems.value = false;
             hasHiddenElement = true;
+            if (flag) {
+              if (i === 0) {
+                hiddenFilteringItemsCount.value = 0;
+              }
+              hiddenFilteringItemsCount.value++;
+            }
           }
 
           itemEl.classList.toggle('non-display', hasHiddenElement);
@@ -1118,7 +1127,7 @@ export default {
         isShowColumnFilteringItems.value = true;
       }
       await nextTick();
-      setColumnFilteringItems();
+      setColumnFilteringItems(true);
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
       setStore([], false);
@@ -1126,7 +1135,7 @@ export default {
 
     const onExpandFilteringItems = () => {
       isShowColumnFilteringItems.value = !isShowColumnFilteringItems.value;
-      setColumnFilteringItems();
+      setColumnFilteringItems(isShowColumnFilteringItems.value);
     };
 
     const removeFiltering = ({ field, idx }) => {
@@ -1135,6 +1144,7 @@ export default {
         delete filterInfo.filteringItemsByColumn[field];
         isShowFilteringItemsBox.value = false;
       }
+      setColumnFilteringItems(true);
       stores.filterStore = [];
       setStore([], false);
     };
@@ -1144,6 +1154,23 @@ export default {
       filterInfo.filteringItemsByColumn = {};
       stores.filterStore = [];
       setStore([], false);
+    };
+
+    const filteringItemsStyle = computed(() => {
+      if (isShowColumnFilteringItems.value) {
+        return {
+          width: `${filteringItemsWidth.value}px`,
+          background: 'none',
+        };
+      }
+      return {
+        width: `${filteringItemsWidth.value}px`,
+      };
+    });
+
+    const getFilteringItemByField = (field) => {
+      const filteringFieldInfo = filterInfo.filteringItemsByColumn[field];
+      return filteringFieldInfo?.[filteringFieldInfo.length - 1];
     };
 
     const initWrapperDiv = () => {
@@ -1206,13 +1233,14 @@ export default {
       onColumnContextMenu,
       // filtering
       filteringItemsWidth,
-      isExpandColumnFilteringItems,
       isShowColumnFilteringItems,
       operatorItems,
       selectedFilteringItems,
       selectedFilteringColumn,
       filteringItemsRef,
       isShowFilteringItemsBox,
+      filteringItemsStyle,
+      hiddenFilteringItemsCount,
       ...toRefs(filteringItemsBoxPosition),
       removeFiltering,
       removeAllFiltering,
@@ -1221,6 +1249,7 @@ export default {
       onChangeOperator,
       onApplyFilter,
       onClickFilteringItem,
+      getFilteringItemByField,
       // drag
       onDragStart,
       onDragOver,
