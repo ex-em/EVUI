@@ -109,13 +109,14 @@
                 v-for="(field, idx) in selectedFilteringItems"
                 :key="idx"
               >
-                <ev-select
+                <div
                   v-if="idx === 1"
-                  v-model="field.operator"
-                  class="ev-grid-filter-setting__row--operator"
-                  disabled
-                  :items="operatorItems"
-                />
+                  class="filtering-items__item filtering-items__item--operator"
+                >
+                  <span class="filtering-items__item--value">
+                    {{ field.operator?.toUpperCase() }}
+                  </span>
+                </div>
                 <div class="filtering-items__item">
                   <span class="filtering-items__item--title">
                     {{ selectedFilteringColumn.caption }}

@@ -233,7 +233,7 @@ export default {
 
     const validateValue = (type, item) => {
       if (type === 'number' || type === 'float') {
-        item.value = item.value.trim();
+        item.value = item.value.replace(/[^0-9.]/g, '');
       }
     };
     return {

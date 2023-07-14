@@ -320,6 +320,16 @@
       top: 10px;
       right: 0;
     }
+    &--operator {
+      width: 50px;
+      background: #DCDFE6;
+      text-align: center;
+      &:hover {
+        cursor: initial;
+        margin: inherit;
+        border: none;
+      }
+    }
     &.non-display {
       display: none;
     }
