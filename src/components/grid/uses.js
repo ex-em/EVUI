@@ -959,6 +959,7 @@ export const contextMenuEvent = (params) => {
       const filterable = filterInfo.isFiltering
       && column.filterable === undefined ? true : column.filterable;
       if (!sortable && !filterable) {
+        contextInfo.columnMenuItems = [];
         return;
       }
       contextInfo.columnMenuItems = [

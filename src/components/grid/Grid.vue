@@ -52,7 +52,7 @@
                 @change="onChangeOperator"
               />
               <div
-                class="filtering-items__item"
+                class="filtering-items__item non-display"
                 @click.stop="onClickFilteringItem({
                   caption: getFilteringItemByField(field)?.caption,
                   field: field,
@@ -88,7 +88,7 @@
           <div
             v-if="isShowColumnFilteringItems
             && Object.keys(filteringItemsByColumn).length && hiddenFilteringItemsCount > 0"
-            class="filtering-items__item filtering-items__item--count"
+            class="filtering-items filtering-items--count"
             @click="onExpandFilteringItems"
           >
             + {{ hiddenFilteringItemsCount }}
@@ -1096,27 +1096,31 @@ export default {
       if (flag && isShowColumnFilteringItems.value) {
         hiddenFilteringItemsCount.value = 0;
       }
-      let hasHiddenElement = false;
       const conditionItems = filteringItemsRef.value
         ?.getElementsByClassName('filtering-items__item');
+      const hiddenItemList = [];
       if (conditionItems) {
         for (let i = 0; i < conditionItems.length; i++) {
           const itemEl = conditionItems[i];
           itemEl.classList.remove('non-display');
-          const filteringBoxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
-          const { top } = itemEl.getBoundingClientRect(); // rect height: 27
-          if (isShowColumnFilteringItems.value && (top - filteringBoxTop > 27)) {
-            hasHiddenElement = true;
+          const boxTop = filteringItemsRef.value.getBoundingClientRect()?.top;
+          const boxScrollTop = filteringItemsRef.value.scrollTop;
+          const { top } = itemEl.getBoundingClientRect();
+          if (isShowColumnFilteringItems.value
+            && (top - boxTop > itemEl.offsetHeight - boxScrollTop)) {
             if (flag) {
               if (i === 0) {
                 hiddenFilteringItemsCount.value = 0;
               }
               hiddenFilteringItemsCount.value++;
             }
+            hiddenItemList.push(itemEl);
           }
-
-          itemEl.classList.toggle('non-display', hasHiddenElement);
         }
+        conditionItems.forEach((item) => {
+          const isHidden = hiddenItemList.includes(item);
+          item.classList.toggle('non-display', isHidden);
+        });
       }
     };
 

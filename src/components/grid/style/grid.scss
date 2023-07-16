@@ -265,6 +265,8 @@
   align-items: center;
   z-index: 1;
   border-radius: 4px;
+  max-height: 106px;
+  overflow: auto;
 
   @include evThemify() {
     background: evThemed('grid-background');
@@ -275,14 +277,29 @@
       color: #0077FF;
     }
   }
+  &--count {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    padding: 4px;
+    border-radius: 4px;
+    background: #EAF2FA;
+    &:hover {
+      cursor: pointer;
+      padding: 3.5px;
+      border: 1px solid #198FFF !important;
+      box-sizing: border-box;
+    }
+  }
   &__item {
     padding: 4px;
     border-radius: 4px;
     background: #EAF2FA;
     &:hover {
       cursor: pointer;
-      margin: -0.3px;
+      padding: 3.5px;
       border: 1px solid #198FFF;
+      box-sizing: border-box;
     }
     &--filter {
       font-weight: bold;
@@ -311,11 +328,6 @@
       &:hover {
         opacity: 0.6;
       }
-    }
-    &--count {
-      position: absolute;
-      top: 10px;
-      right: 0;
     }
     &--operator {
       width: 50px;
