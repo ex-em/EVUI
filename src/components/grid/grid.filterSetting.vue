@@ -233,7 +233,8 @@ export default {
 
     const validateValue = (type, item) => {
       if (type === 'number' || type === 'float') {
-        item.value = item.value.trim();
+        // 숫자, 마침표, 콤마만 입력 가능
+        item.value = item.value.replace(/[^0-9.,]/g, '');
       }
     };
     return {
