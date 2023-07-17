@@ -189,7 +189,11 @@ class EvChart {
 
     this.drawTip();
 
-    if (this.bufferCanvas) {
+    if (
+      this.bufferCanvas
+      && this.bufferCanvas?.width > 1
+      && this.bufferCanvas?.height > 1
+    ) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
   }
