@@ -266,7 +266,6 @@
   z-index: 1;
   border-radius: 4px;
   max-height: 106px;
-  overflow: auto;
 
   @include evThemify() {
     background: evThemed('grid-background');

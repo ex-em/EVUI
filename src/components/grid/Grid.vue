@@ -1166,10 +1166,12 @@ export default {
         return {
           width: `${filteringItemsWidth.value}px`,
           background: 'none',
+          'overflow-y': 'hidden',
         };
       }
       return {
         width: `${filteringItemsWidth.value}px`,
+        'overflow-y': 'auto',
       };
     });
 
