@@ -80,8 +80,6 @@ class StepScale extends Scale {
       } else {
         interval = oriSteps;
       }
-    } else if (numberOfSteps > maxSteps * 2) {
-      interval *= 2;
     }
 
     return {
