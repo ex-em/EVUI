@@ -94,51 +94,6 @@
             + {{ hiddenFilteringItemsCount }}
           </div>
         </div>
-        <!-- Filtering Items Box -->
-        <template v-if="isFiltering && isShowFilteringItemsBox">
-          <teleport to="#ev-grid-filtering-items-modal">
-            <section
-              v-clickoutside="() => { isShowFilteringItemsBox = false }"
-              class="ev-grid-filtering-items"
-              :style="{
-                top: boxTop,
-                left: boxLeft,
-              }"
-            >
-              <template
-                v-for="(field, idx) in selectedFilteringItems"
-                :key="idx"
-              >
-                <div
-                  v-if="idx === 1"
-                  class="filtering-items__item filtering-items__item--operator"
-                >
-                  <span class="filtering-items__item--value">
-                    {{ field.operator?.toUpperCase() }}
-                  </span>
-                </div>
-                <div class="filtering-items__item">
-                  <span class="filtering-items__item--title">
-                    {{ selectedFilteringColumn.caption }}
-                  </span>
-                  <span class="filtering-items__item--value">
-                    {{ field.comparison }}
-                    {{ field.value.toLocaleString('en') }}
-                  </span>
-                  <ev-icon
-                    class="filtering-items__item--remove"
-                    icon="ev-icon-s-close"
-                    @click="removeFiltering(
-                      {
-                        field: selectedFilteringColumn.field,
-                        idx,
-                      })"
-                  />
-                </div>
-              </template>
-            </section>
-          </teleport>
-        </template>
         <grid-option-button
           v-if="useColumnSetting"
           class="column-setting__icon"
