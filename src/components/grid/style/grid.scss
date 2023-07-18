@@ -251,24 +251,32 @@
   text-align: center;
 }
 
-.filtering-column-items {
+.filtering {
   position: relative;
 }
 
 .filtering-items {
   display: flex;
+  position: absolute;
+  width: inherit;
   flex-flow: row wrap;
   gap: 10px;
-  position: absolute;
   padding: 8px;
   flex-direction: row;
   align-items: center;
   z-index: 1;
   border-radius: 4px;
   max-height: 106px;
+  background: none;
 
-  @include evThemify() {
-    background: evThemed('grid-background');
+  &__hidden-items {
+    max-height: 106px;
+    overflow-y: auto;
+
+    @include evThemify() {
+      border: 1px solid evThemed('grid-bottom-border');
+      background: evThemed('grid-background');
+    }
   }
   &-expand {
     &:hover {
