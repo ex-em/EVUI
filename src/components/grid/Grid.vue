@@ -10,85 +10,80 @@
       <template #toolbarWrapper>
         <!-- Filtering Column Items -->
         <div
-          class="filtering-column-items"
-          :style="{ width: `${filteringItemsWidth + 40}px` }"
+          v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
+          ref="filteringItemsRef"
+          v-clickoutside="() => { if (!isShowColumnFilteringItems) onExpandFilteringItems(); }"
+          class="filtering-items"
+          :style="filteringItemsStyle"
         >
-          <div
-            v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
-            ref="filteringItemsRef"
-            v-clickoutside="() => { if (!isShowColumnFilteringItems) onExpandFilteringItems(); }"
-            class="filtering-items"
-            :style="filteringItemsStyle"
+          <template
+            v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
+            :key="idx"
           >
-            <template
-              v-for="(field, idx) in Object.keys(filteringItemsByColumn)"
-              :key="idx"
-            >
-              <template v-if="idx === 0">
-                <div
-                  class="filtering-items__item filtering-items__item--filter"
-                  @click="onExpandFilteringItems"
-                >
-                  <ev-icon
-                    icon="ev-icon-filter-list"
-                    class="filtering-items-expand"
-                  />
-                  <span class="filtering-items__item--title">
+            <template v-if="idx === 0">
+              <div
+                class="filtering-items__item filtering-items__item--filter"
+                @click="onExpandFilteringItems"
+              >
+                <ev-icon
+                  icon="ev-icon-filter-list"
+                  class="filtering-items-expand"
+                />
+                <span class="filtering-items__item--title">
                     Filter ({{ Object.keys(filteringItemsByColumn).length }})
                   </span>
-                  <ev-icon
-                    class="filtering-items__item--remove"
-                    icon="ev-icon-s-close"
-                    style="margin-left: 0;"
-                    @click.stop="removeAllFiltering"
-                  />
-                </div>
-              </template>
-              <ev-select
-                v-if="idx === 1"
-                v-model="columnOperator"
-                :items="operatorItems"
-                class="ev-grid-filter-setting__row--operator"
-                @change="onChangeOperator"
-              />
-              <div
-                class="filtering-items__item non-display"
-                @click.stop="onClickFilteringItem({
+                <ev-icon
+                  class="filtering-items__item--remove"
+                  icon="ev-icon-s-close"
+                  style="margin-left: 0;"
+                  @click.stop="removeAllFiltering"
+                />
+              </div>
+            </template>
+            <ev-select
+              v-if="idx === 1"
+              v-model="columnOperator"
+              :items="operatorItems"
+              class="ev-grid-filter-setting__row--operator"
+              @change="onChangeOperator"
+            />
+            <div
+              class="filtering-items__item non-display"
+              @click.stop="onClickFilteringItem({
                   caption: getFilteringItemByField(field)?.caption,
                   field: field,
                 },
                 filteringItemsByColumn[field])"
-              >
+            >
                 <span class="filtering-items__item--title">
                   {{ getFilteringItemByField(field)?.caption }}
                 </span>
-                <span
-                  v-if="filteringItemsByColumn[field].length < 2"
-                  class="filtering-items__item--value"
-                  :title="getFilteringItemByField(field)?.value"
-                >
+              <span
+                v-if="filteringItemsByColumn[field].length < 2"
+                class="filtering-items__item--value"
+                :title="getFilteringItemByField(field)?.value"
+              >
                   {{ getFilteringItemByField(field)?.comparison }}
                   {{ getFilteringItemByField(field)?.value }}
                 </span>
-                <span
-                  v-else
-                  class="filtering-items__item--value"
-                >
+              <span
+                v-else
+                class="filtering-items__item--value"
+              >
                   + {{ filteringItemsByColumn[field].length }}
                 </span>
-                <ev-icon
-                  class="filtering-items__item--remove"
-                  icon="ev-icon-s-close"
-                  @click="onApplyFilter(field, [])"
-                />
-              </div>
-            </template>
-          </div>
+              <ev-icon
+                class="filtering-items__item--remove"
+                icon="ev-icon-s-close"
+                @click="onApplyFilter(field, [])"
+              />
+            </div>
+          </template>
           <!-- +N Count-->
           <div
             v-if="isShowColumnFilteringItems
             && Object.keys(filteringItemsByColumn).length && hiddenFilteringItemsCount > 0"
-            class="filtering-items filtering-items--count"
+            class="filtering-items__item filtering-items__item--count"
             @click="onExpandFilteringItems"
           >
             + {{ hiddenFilteringItemsCount }}
