@@ -25,13 +25,13 @@
               <template v-if="idx === 0">
                 <div
                   class="filtering-items__item filtering-items__item--filter"
-                  @click="onExpandFilteringItems"
+                  @click.stop="onExpandFilteringItems"
                 >
                   <ev-icon
                     icon="ev-icon-filter-list"
                     class="filtering-items-expand"
                   />
-                  <span class="filtering-items__item--title">
+                  <span>
                     Filter ({{ Object.keys(filteringItemsByColumn).length }})
                   </span>
                   <ev-icon
@@ -46,7 +46,7 @@
                 v-if="idx === 1"
                 v-model="columnOperator"
                 :items="operatorItems"
-                class="ev-grid-filter-setting__row--operator"
+                class="filtering-items__item--operator"
                 @change="onChangeOperator"
               />
               <div
@@ -60,13 +60,13 @@
               >
                 <span class="filtering-items__item--title">
                   {{ getFilteringItemByField(field)?.caption }}
+                  {{ getFilteringItemByField(field)?.comparison }}
                 </span>
                 <span
                   v-if="filteringItemsByColumn[field].length < 2"
                   class="filtering-items__item--value"
                   :title="getFilteringItemByField(field)?.value"
                 >
-                  {{ getFilteringItemByField(field)?.comparison }}
                   {{ getFilteringItemByField(field)?.value }}
                 </span>
                 <span
@@ -113,13 +113,13 @@
               >
                 <span class="filtering-items__item--title">
                   {{ getFilteringItemByField(field)?.caption }}
+                  {{ getFilteringItemByField(field)?.comparison }}
                 </span>
                 <span
                   v-if="hiddenFilteringItemsByColumn[field].length < 2"
                   class="filtering-items__item--value"
                   :title="getFilteringItemByField(field)?.value"
                 >
-                  {{ getFilteringItemByField(field)?.comparison }}
                   {{ getFilteringItemByField(field)?.value }}
                 </span>
                 <span
@@ -1094,8 +1094,8 @@ export default {
       setStore([], false);
     };
 
-    const setColumnFilteringItems = (flag) => {
-      if (flag && isShowColumnFilteringItems.value) {
+    const setColumnFilteringItems = async (isInit) => {
+      if (isInit && isShowColumnFilteringItems.value) {
         hiddenFilteringItemsCount.value = 0;
       }
       const conditionItems = filteringItemsRef.value
@@ -1144,9 +1144,15 @@ export default {
       setStore([], false);
     };
 
+    let expandTimer = null;
     const onExpandFilteringItems = () => {
-      isShowColumnFilteringItems.value = !isShowColumnFilteringItems.value;
-      setColumnFilteringItems(isShowColumnFilteringItems.value);
+      if (expandTimer) {
+        clearTimeout(expandTimer);
+      }
+      expandTimer = setTimeout(() => {
+        isShowColumnFilteringItems.value = !isShowColumnFilteringItems.value;
+        setColumnFilteringItems(isShowColumnFilteringItems.value);
+      }, 150);
     };
 
     const removeAllFiltering = () => {
