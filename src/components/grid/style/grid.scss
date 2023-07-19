@@ -266,7 +266,7 @@
   align-items: center;
   z-index: 1;
   border-radius: 4px;
-  max-height: 106px;
+  max-height: 120px;
   background: none;
 
   &__hidden-items {
@@ -343,7 +343,6 @@
     &--operator {
       width: 80px;
       height: 26px !important;
-      text-align: center;
       .ev-input {
         height: 26px !important;
       }
