@@ -660,9 +660,9 @@ export default {
       movedColumns: [],
       originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
       orderedColumns: computed(() => {
-        const columns = stores.filteredColumns.length
-          ? stores.filteredColumns : stores.originColumns;
-        return stores.movedColumns.length ? stores.movedColumns : columns;
+        const columns = stores.movedColumns.length
+          ? stores.movedColumns : stores.originColumns;
+        return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
     });
     const pageInfo = reactive({
