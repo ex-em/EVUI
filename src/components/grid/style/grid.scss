@@ -251,24 +251,32 @@
   text-align: center;
 }
 
-.filtering-column-items {
+.filtering {
   position: relative;
 }
 
 .filtering-items {
   display: flex;
+  position: absolute;
+  width: inherit;
   flex-flow: row wrap;
   gap: 10px;
-  position: absolute;
   padding: 8px;
   flex-direction: row;
   align-items: center;
   z-index: 1;
   border-radius: 4px;
-  max-height: 106px;
+  max-height: 120px;
+  background: none;
 
-  @include evThemify() {
-    background: evThemed('grid-background');
+  &__hidden-items {
+    max-height: 106px;
+    overflow-y: auto;
+
+    @include evThemify() {
+      border: 1px solid evThemed('grid-bottom-border');
+      background: evThemed('grid-background');
+    }
   }
   &-expand {
     &:hover {
@@ -291,37 +299,41 @@
     }
   }
   &__item {
-    padding: 4px;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 10px;
+    border: 1px solid #CED4DA;
     border-radius: 4px;
     background: #EAF2FA;
+    font-size: 13px;
+    text-align: center;
     &:hover {
       cursor: pointer;
-      padding: 3.5px;
       border: 1px solid #198FFF;
-      box-sizing: border-box;
     }
     &--filter {
       font-weight: bold;
       border: 1px solid #198FFF;
+      color: #198FFF;
       i {
-        color: #0077FF;
         vertical-align: middle;
       }
     }
     &--title {
-      color: #0077FF;
       margin-right: 6px;
       vertical-align: middle;
     }
     &--value {
       display: inline-block;
       max-width: 80px;
+      color: #198FFF;
       text-overflow: ellipsis;
       overflow: hidden;
       vertical-align: middle;
       white-space: nowrap;
     }
     &--remove {
+      color: initial;
       vertical-align: middle;
       margin-left: 6px;
       &:hover {
@@ -329,9 +341,11 @@
       }
     }
     &--operator {
-      width: 50px;
-      background: #DCDFE6;
-      text-align: center;
+      width: 80px;
+      height: 26px !important;
+      .ev-input {
+        height: 26px !important;
+      }
       &:hover {
         cursor: initial;
         margin: inherit;
