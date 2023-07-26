@@ -237,7 +237,18 @@
 </template>
 
 <script>
-import { reactive, toRefs, computed, watch, onMounted, onActivated, nextTick, ref, provide } from 'vue';
+import {
+  reactive,
+  toRefs,
+  computed,
+  watch,
+  onActivated,
+  nextTick,
+  ref,
+  provide,
+  onMounted,
+  onUnmounted,
+} from 'vue';
 import treeGridNode from './TreeGridNode';
 import Toolbar from './treeGrid.toolbar';
 import GridPagination from '../grid/grid.pagination';
@@ -545,9 +556,28 @@ export default {
 
     provide('toolbarWrapper', toolbarWrapper);
 
+    const onMouseWheel = (e) => {
+      if (e.type === 'wheel') {
+        contextInfo.menu?.hide(e);
+      }
+      if (e.type === 'scroll' && !e.target.classList?.contains('table-body')
+        && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')) {
+        contextInfo.columnMenu?.hide(e);
+        columnSettingInfo.isShowColumnSetting = false;
+      }
+    };
+
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
+      document.addEventListener('wheel', onMouseWheel, { capture: false });
+      document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
+
+    onUnmounted(() => {
+      document.removeEventListener('wheel', onMouseWheel);
+      document.removeEventListener('scroll', onMouseWheel);
+    });
+
     onActivated(() => {
       onResize();
     });
