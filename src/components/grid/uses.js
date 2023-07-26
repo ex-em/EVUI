@@ -1154,16 +1154,22 @@ export const columnSettingEvent = (params) => {
     }
     onResize();
   };
-  const onApplyColumn = (columns) => {
-    columnSettingInfo.hiddenColumn = '';
+  const onApplyColumn = (columnNames) => {
+    const columns = stores.orderedColumns.filter(col => !col.hide);
+    const isSameColumn = columnNames.length === columns.length
+      && columns.every(col => columnNames.includes(col.field));
+
+    if (isSameColumn) {
+      return;
+    }
+
     stores.filteredColumns = stores.originColumns
-      .filter(col => columns.includes(col.field) || !col.caption);
+      .filter(col => columnNames.includes(col.field) || !col.caption);
+    columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
   };
   const setColumnHidden = (val) => {
-    const columns = (columnSettingInfo.isFilteringColumn
-      ? stores.filteredColumns : stores.originColumns)
-      .filter(col => !col.hide);
+    const columns = stores.orderedColumns.filter(col => !col.hide);
 
     if (columns.length === 1) {
       return;
@@ -1180,10 +1186,18 @@ export const dragEvent = ({ stores }) => {
   const setColumnMoving = (currentIndex, droppedIndex) => {
     const oldIndex = parseInt(currentIndex, 10);
     const newPositionIndex = parseInt(droppedIndex, 10);
-    const columns = stores.filteredColumns.length ? stores.filteredColumns : stores.orderedColumns;
+
+    const columns = [...stores.orderedColumns];
     const movedColumn = columns[oldIndex];
+
     columns.splice(oldIndex, 1);
-    stores.movedColumns = columns.splice(newPositionIndex, 0, movedColumn);
+    columns.splice(newPositionIndex, 0, movedColumn);
+
+    if (stores.filteredColumns.length) {
+      stores.filteredColumns = columns;
+    } else {
+      stores.movedColumns = columns;
+    }
   };
   const onDragStart = (e) => {
     e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index);
