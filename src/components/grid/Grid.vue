@@ -521,7 +521,7 @@ import {
   nextTick,
   ref,
   provide,
-  onBeforeMount,
+  onBeforeMount, onUnmounted,
 } from 'vue';
 import { clickoutside } from '@/directives/clickoutside';
 import { cloneDeep } from 'lodash-es';
@@ -620,6 +620,7 @@ export default {
     const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight ?? -1));
     const rowMinHeight = props.option.rowMinHeight || 35;
+    const filteringItemsWidth = ref(0);
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -868,17 +869,38 @@ export default {
 
     provide('toolbarWrapper', toolbarWrapper);
 
-    const filteringItemsWidth = ref(0);
+    const onMouseWheel = (e) => {
+      if (e.type === 'wheel') {
+        contextInfo.menu?.hide(e);
+      }
+      if (e.type === 'scroll' && !e.target.classList?.contains('table-body')
+      && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')) {
+        contextInfo.columnMenu?.hide(e);
+        columnSettingInfo.isShowColumnSetting = false;
+        filterInfo.isShowFilterSetting = false;
+      }
+    };
+
     onMounted(() => {
       calculatedColumn();
       setStore(props.rows);
+      document.addEventListener('wheel', onMouseWheel, { capture: false });
+      document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
+
+    onUnmounted(() => {
+      document.removeEventListener('wheel', onMouseWheel);
+      document.removeEventListener('scroll', onMouseWheel);
+    });
+
     onActivated(() => {
       onResize();
     });
+
     onUpdated(() => {
       filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
     });
+
     watch(
       () => props.columns,
       () => {
