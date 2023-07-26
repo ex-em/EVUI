@@ -147,6 +147,5 @@ export function mobileCheck() {
       navigator.userAgent,
     )
     || 'ontouchstart' in window
-    || navigator.maxTouchPoints
   );
 }
