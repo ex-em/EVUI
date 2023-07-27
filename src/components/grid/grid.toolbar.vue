@@ -26,7 +26,7 @@ export default {
 }
 .gridToolbar > .column-setting__icon {
   float: right;
-  margin: 0 5px;
+  margin: 10px 5px;
   cursor: pointer;
   &:hover {
     opacity: 0.6;
