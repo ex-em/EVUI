@@ -316,7 +316,9 @@
       border: 1px solid #198FFF;
       color: #198FFF;
       i {
-        vertical-align: middle;
+        &:not(.filtering-items-expand) {
+          vertical-align: middle;
+        }
       }
     }
     &--title {

@@ -14,6 +14,13 @@
           :style="{ width: `${filteringItemsWidth}px` }"
         >
           <div
+            v-if="isFiltering && !Object.keys(filteringItemsByColumn).length"
+            class="filtering-items filtering-items--used"
+          >
+            <ev-icon icon="ev-icon-filter-list" />
+            <span>Filter</span>
+          </div>
+          <div
             v-if="isFiltering && Object.keys(filteringItemsByColumn).length"
             ref="filteringItemsRef"
             class="filtering-items"
@@ -874,7 +881,8 @@ export default {
         contextInfo.menu?.hide(e);
       }
       if (e.type === 'scroll' && !e.target.classList?.contains('table-body')
-      && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')) {
+      && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
+      && !e.target.offsetParent?.classList?.contains('ev-text-field-wrapper')) {
         contextInfo.columnMenu?.hide(e);
         columnSettingInfo.isShowColumnSetting = false;
         filterInfo.isShowFilterSetting = false;
