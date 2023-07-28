@@ -158,11 +158,10 @@ class Line {
             minValueYBottomPos = data.y;
           }
         });
-
         const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
-        gradient.addColorStop(0, Util.colorStringToRgba(mainColor, fillOpacity));
-        gradient.addColorStop(0.5, Util.colorStringToRgba(mainColor, fillOpacity));
-        gradient.addColorStop(1, mainColor);
+        gradient.addColorStop(0, fillColor);
+        gradient.addColorStop(0.5, fillColor);
+        gradient.addColorStop(1, (extent.opacity < 1 ? fillColor : mainColor));
 
         ctx.fillStyle = gradient;
       } else {
