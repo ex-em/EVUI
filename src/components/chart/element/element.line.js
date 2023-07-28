@@ -146,7 +146,28 @@ class Line {
     if (this.fill && this.data.length) {
       ctx.beginPath();
 
-      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
+      const fillColor = Util.colorStringToRgba(mainColor, fillOpacity);
+
+      if (this.fill?.gradient) {
+        let maxValueYPos = this.data[0].yp;
+        let minValueYBottomPos = this.data[0].y;
+        this.data.forEach((data) => {
+          if (data.yp && data.yp <= maxValueYPos) {
+            maxValueYPos = data.yp;
+          } else if (data.y && data.y >= minValueYBottomPos) {
+            minValueYBottomPos = data.y;
+          }
+        });
+
+        const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
+        gradient.addColorStop(0, Util.colorStringToRgba(mainColor, fillOpacity));
+        gradient.addColorStop(0.5, Util.colorStringToRgba(mainColor, fillOpacity));
+        gradient.addColorStop(1, mainColor);
+
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = fillColor;
+      }
 
       this.data.forEach((currData, ix) => {
         const isEmptyPoint = data => data?.x === null || data?.y === null
