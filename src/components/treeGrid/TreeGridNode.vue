@@ -133,7 +133,7 @@
 
 <script>
 import { computed } from 'vue';
-import GridOptionButton from '@/components/grid/grid.optionButton.vue';
+import GridOptionButton from '@/components/grid/icon/icon-option-button.vue';
 
 export default {
   name: 'TreeGridNode',
@@ -312,7 +312,7 @@ export default {
     top: -3px;
     width: 11px;
     height: 10px;
-    background: url('./tree_icon.png') no-repeat -43px -61px;
+    background: url('icon/icon-tree.png') no-repeat -43px -61px;
   }
   &.expand > .tree-expand-icon i {
     height: 8px;
@@ -325,13 +325,13 @@ export default {
     height: 14px;
   }
   .tree-parent-icon i {
-    background: url('./tree_icon.png') no-repeat -39px -35px;
+    background: url('icon/icon-tree.png') no-repeat -39px -35px;
   }
   &.expand > .tree-parent-icon i {
     background-position: -65px -35px;
   }
   .tree-child-icon i {
-    background: url('./tree_icon.png') no-repeat -14px -35px;
+    background: url('icon/icon-tree.png') no-repeat -14px -35px;
   }
 }
 .td-content {
