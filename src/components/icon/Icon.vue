@@ -21,7 +21,6 @@ export default {
     size: {
       type: String,
       default: '',
-      validator: val => ['', 'small', 'medium', 'large'].includes(val),
     },
   },
   emits: {
