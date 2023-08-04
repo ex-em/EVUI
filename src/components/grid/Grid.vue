@@ -881,6 +881,7 @@ export default {
         contextInfo.menu?.hide(e);
       }
       if (e.type === 'scroll' && !e.target.classList?.contains('table-body')
+      && !e.target.offsetParent?.classList?.contains('ev-select-dropbox')
       && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
       && !e.target.offsetParent?.classList?.contains('ev-text-field-wrapper')) {
         contextInfo.columnMenu?.hide(e);
