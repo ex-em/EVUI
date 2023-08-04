@@ -85,10 +85,6 @@ class Line {
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
 
-    if (this.fill) {
-      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
-    }
-
     let startFillIndex = 0;
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
