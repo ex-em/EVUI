@@ -250,11 +250,11 @@ import {
   onUnmounted,
 } from 'vue';
 import treeGridNode from './TreeGridNode';
-import Toolbar from './treeGrid.toolbar';
-import GridPagination from '../grid/grid.pagination';
-import GridSummary from '../grid/grid.summary';
-import GridOptionButton from '../grid/grid.optionButton.vue';
-import ColumnSetting from '../grid/grid.columnSetting.vue';
+import Toolbar from './TreeGridToolbar';
+import GridPagination from '../grid/GridPagination';
+import GridSummary from '../grid/GridSummary';
+import GridOptionButton from '../grid/icon/icon-option-button.vue';
+import ColumnSetting from '../grid/GridColumnSetting.vue';
 import {
   commonFunctions,
   scrollEvent,
