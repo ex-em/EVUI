@@ -34,7 +34,6 @@ export default {
     type: {
       type: String,
       default: 'default',
-      validator: val => ['default', 'primary', 'info', 'warning', 'error', 'ghost', 'dashed', 'text'].includes(val),
     },
     htmlType: {
       type: String,
@@ -44,12 +43,10 @@ export default {
     shape: {
       type: String,
       default: 'square',
-      validator: val => ['square', 'radius', 'circle'].includes(val),
     },
     size: {
       type: String,
       default: 'medium',
-      validator: val => ['small', 'medium', 'large'].includes(val),
     },
   },
   emits: {
