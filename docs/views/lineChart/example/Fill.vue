@@ -13,8 +13,7 @@
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
       const chartData = {
         series: {
-          series1: { name: 'series#1', fill: true, point: false },
-          series2: { name: 'series#2', fill: true, point: false },
+          series1: { name: 'series#1', fill: { gradient: true }, point: false },
         },
         labels: [
           dayjs(time),
@@ -26,8 +25,7 @@
           dayjs(time).add(6, 'day'),
         ],
         data: {
-          series1: [100, 25, 36, 47, 0, 50, 80],
-          series2: [80, 36, 25, 47, 15, 100, 0],
+          series1: [50, 25, 36, 47, 50, 50, 50],
         },
       };
 
@@ -63,15 +61,6 @@
           startToZero: true,
           autoScaleRatio: 0.1,
         }],
-        maxTip: {
-          use: true,
-          showIndicator: true,
-          indicatorColor: '#FF0000',
-          tipStyle: {
-            background: '#000000',
-            textColor: '#FFFFFF',
-          },
-        },
       };
 
       return {

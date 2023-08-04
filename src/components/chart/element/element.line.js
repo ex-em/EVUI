@@ -85,10 +85,6 @@ class Line {
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
 
-    if (this.fill) {
-      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
-    }
-
     let startFillIndex = 0;
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
@@ -146,7 +142,27 @@ class Line {
     if (this.fill && this.data.length) {
       ctx.beginPath();
 
-      ctx.fillStyle = Util.colorStringToRgba(mainColor, fillOpacity);
+      const fillColor = Util.colorStringToRgba(mainColor, fillOpacity);
+
+      if (this.fill?.gradient) {
+        let maxValueYPos = this.data[0].yp;
+        let minValueYBottomPos = this.data[0].y;
+        this.data.forEach((data) => {
+          if (data.yp && data.yp <= maxValueYPos) {
+            maxValueYPos = data.yp;
+          } else if (data.y && data.y >= minValueYBottomPos) {
+            minValueYBottomPos = data.y;
+          }
+        });
+        const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
+        gradient.addColorStop(0, fillColor);
+        gradient.addColorStop(0.5, fillColor);
+        gradient.addColorStop(1, (extent.opacity < 1 ? fillColor : mainColor));
+
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = fillColor;
+      }
 
       this.data.forEach((currData, ix) => {
         const isEmptyPoint = data => data?.x === null || data?.y === null
