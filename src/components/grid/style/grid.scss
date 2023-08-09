@@ -348,10 +348,8 @@
     }
     &--operator {
       width: 80px;
-      ::v-deep {
-        .ev-input {
-          height: 26px !important;
-        }
+      :deep(.ev-input) {
+        height: 26px !important;
       }
     }
     &.non-display {
