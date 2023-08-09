@@ -306,6 +306,7 @@ export const resizeEvent = (params) => {
     const startMouseLeft = event.clientX;
     const startColumnLeft = columnRect.left - headerLeft;
 
+    bodyEl.style.overflow = 'auto';
     resizeLineEl.style.left = `${startLeft}px`;
 
     resizeInfo.showResizeLine = true;
