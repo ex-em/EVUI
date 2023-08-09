@@ -249,12 +249,12 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
-import treeGridNode from './TreeGridNode';
+import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
 import GridSummary from '../grid/GridSummary';
-import GridOptionButton from '../grid/icon/icon-option-button.vue';
 import ColumnSetting from '../grid/GridColumnSetting.vue';
+import GridOptionButton from '../grid/icon/icon-option-button.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -273,12 +273,12 @@ import {
 export default {
   name: 'EvTreeGrid',
   components: {
-    ColumnSetting,
-    GridOptionButton,
-    treeGridNode,
+    TreeGridNode,
     Toolbar,
     GridPagination,
     GridSummary,
+    ColumnSetting,
+    GridOptionButton,
   },
   props: {
     columns: {

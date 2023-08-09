@@ -536,7 +536,7 @@ import Toolbar from './GridToolbar';
 import GridPagination from './GridPagination';
 import GridSummary from './GridSummary';
 import ColumnSetting from './GridColumnSetting.vue';
-import filterSetting from './GridFilterSetting.vue';
+import FilterSetting from './GridFilterSetting.vue';
 import GridSortButton from './icon/icon-sort-button';
 import GridOptionButton from './icon/icon-option-button.vue';
 import {
@@ -564,7 +564,7 @@ export default {
     GridPagination,
     GridSummary,
     ColumnSetting,
-    filterSetting,
+    FilterSetting,
     GridSortButton,
     GridOptionButton,
   },
