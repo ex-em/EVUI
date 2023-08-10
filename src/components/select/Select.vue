@@ -109,65 +109,132 @@
           <i class="ev-icon-error" />
         </span>
       </template>
-      <div class="ev-select-dropbox-wrapper">
-      <div
-        v-if="isDropbox"
-        ref="dropbox"
-        class="ev-select-dropbox"
-        :style="dropboxPosition"
-      >
-        <input
-          v-if="filterable"
-          type="text"
-          class="ev-input-query"
-          :placeholder="searchPlaceholder"
-          :value="filterTextRef"
-          @input="changeFilterText"
-        />
-        <div
-          ref="itemWrapper"
-          class="ev-select-dropbox-list"
-        >
-          <ul
-            v-if="filteredItems.length"
-            class="ev-select-dropbox-ul"
+      <template v-if="!multiple">
+        <div class="ev-select-dropbox-wrapper">
+          <div
+            v-if="isDropbox"
+            ref="dropbox"
+            class="ev-select-dropbox"
+            :style="dropboxPosition"
           >
-            <li
-              v-for="(item, idx) in filteredItems"
-              :key="`${item.value}_${idx}`"
-              class="ev-select-dropbox-item"
-              :class="{
-              selected: selectedItemClass(item.value),
-              disabled: item.disabled
-            }"
-              :title="item.name"
-              @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
+            <input
+              v-if="filterable"
+              type="text"
+              class="ev-input-query"
+              :placeholder="searchPlaceholder"
+              :value="filterTextRef"
+              @input="changeFilterText"
+            />
+            <div
+              ref="itemWrapper"
+              class="ev-select-dropbox-list"
             >
-              <i
-                v-if="item.iconClass"
-                :class="item.iconClass"
-              />
-              {{ item.name }}
-            </li>
-          </ul>
-          <ul v-else>
-            <li class="ev-select-dropbox-item disabled">
-              {{ noMatchingText }}
-            </li>
-          </ul>
+              <ul
+                v-if="filteredItems.length"
+                class="ev-select-dropbox-ul"
+              >
+                <li
+                  v-for="(item, idx) in filteredItems"
+                  :key="`${item.value}_${idx}`"
+                  class="ev-select-dropbox-item"
+                  :class="{
+                    selected: selectedItemClass(item.value),
+                    disabled: item.disabled
+                  }"
+                  :title="item.name"
+                  @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
+                >
+                  <i
+                    v-if="item.iconClass"
+                    :class="item.iconClass"
+                  />
+                  {{ item.name }}
+                </li>
+              </ul>
+              <ul v-else>
+                <li class="ev-select-dropbox-item disabled">
+                  {{ noMatchingText }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </template>
+      <template v-else>
+        <div class="ev-select-dropbox-wrapper">
+          <div
+            v-if="isDropbox"
+            ref="dropbox"
+            class="ev-select-dropbox"
+            :style="dropboxPosition"
+          >
+            <input
+              v-if="filterable"
+              type="text"
+              class="ev-input-query"
+              :placeholder="searchPlaceholder"
+              :value="filterTextRef"
+              @input="changeFilterText"
+            />
+            <div
+              ref="itemWrapper"
+              class="ev-select-dropbox-list"
+            >
+              <ev-checkbox-group
+                v-model="mv"
+              >
+                <ul
+                  v-if="filteredItems.length"
+                  class="ev-select-dropbox-ul"
+                >
+                  <li
+                    v-for="(item, idx) in filteredItems"
+                    :key="`${item.value}_${idx}`"
+                    class="ev-select-dropbox-item"
+                    :class="{
+                      selected: selectedItemClass(item.value),
+                      disabled: item.disabled
+                    }"
+                    :title="item.name"
+                    @click.self.prevent="[clickItem(item.value), changeDropboxPosition()]"
+                  >
+                    <ev-checkbox
+                      :label="item.value"
+                    >
+                      <i
+                        v-if="item.iconClass"
+                        :class="item.iconClass"
+                      />
+                      {{ item.name }}
+                    </ev-checkbox>
+                  </li>
+                </ul>
+                <ul v-else>
+                  <li class="ev-select-dropbox-item disabled">
+                    {{ noMatchingText }}
+                  </li>
+                </ul>
+              </ev-checkbox-group>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
+import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
+import EvCheckbox from '@/components/checkbox/Checkbox';
 import { useModel, useDropdown } from './uses';
 
 export default {
   name: 'EvSelect',
+  components: {
+    EvCheckbox,
+    EvCheckboxGroup,
+  },
   directives: {
     clickoutside,
   },
