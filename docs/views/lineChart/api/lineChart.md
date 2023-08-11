@@ -217,7 +217,8 @@ const chartData =
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
 | allowResize | Boolean | false | Legend 영역 리사이즈 가능 여부 | |
-| table | Object | ([상세](#legendtable)) | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 | | 
+| table | Object | ([상세](#legendtable)) | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 | |
+| stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
 
 ##### legendTable
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
