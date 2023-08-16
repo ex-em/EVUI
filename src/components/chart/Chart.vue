@@ -18,7 +18,17 @@
 </template>
 
 <script>
-  import { onMounted, onBeforeUnmount, watch, onDeactivated, inject, toRef, computed } from 'vue';
+  import {
+    onMounted,
+    onBeforeUnmount,
+    onActivated,
+    onDeactivated,
+    inject,
+    watch,
+    ref,
+    toRef,
+    computed,
+  } from 'vue';
   import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
   import EvChartToolbar from './ChartToolbar';
@@ -76,6 +86,7 @@
     ],
     setup(props) {
       let evChart = null;
+      const isMounted = ref(false);
       const injectIsChartGroup = inject('isChartGroup', false);
       const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
       const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
@@ -242,6 +253,8 @@
 
         await createChart();
         await drawChart();
+
+        isMounted.value = true;
       });
 
       onBeforeUnmount(() => {
@@ -252,6 +265,8 @@
         if (injectEvChartPropsInGroup?.value?.length) {
           injectEvChartPropsInGroup.value.length = 0;
         }
+
+        isMounted.value = false;
       });
 
       onDeactivated(() => {
@@ -274,6 +289,12 @@
           evChart.resize();
         }
       }, props.resizeTimeout);
+
+      onActivated(() => {
+        if (isMounted.value) {
+          onResize();
+        }
+      });
 
       return {
         wrapper,
