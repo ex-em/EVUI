@@ -41,7 +41,7 @@ export default {
       default: false,
     },
     label: {
-      type: [String, Number, Boolean, Symbol],
+      type: [String, Number, Boolean, Symbol, Object],
       default: null,
     },
     tooltipTitle: {
