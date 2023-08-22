@@ -269,6 +269,10 @@
   max-height: 120px;
   background: none;
 
+  &--used {
+    padding-top: 16px;
+  }
+
   &__hidden-items {
     max-height: 106px;
     overflow-y: auto;
@@ -344,14 +348,8 @@
     }
     &--operator {
       width: 80px;
-      height: 26px !important;
-      .ev-input {
+      :deep(.ev-input) {
         height: 26px !important;
-      }
-      &:hover {
-        cursor: initial;
-        margin: inherit;
-        border: none;
       }
     }
     &.non-display {
