@@ -606,6 +606,7 @@ export default {
     'check-row': null,
     'check-all': null,
     'page-change': null,
+    'sort-column': null,
   },
   setup(props) {
     // const ROW_INDEX = 0;
