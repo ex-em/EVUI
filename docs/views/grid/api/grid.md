@@ -89,3 +89,4 @@
  | click-row | event, row | row가 클릭 되었을 때 호출된다. |
  | dblclick-row | event, row | row가 더블 클릭 되었을 때 호출된다. |
  | page-change | event | page 정보가 변경되었을 때 호출된다. |
+ | sort-column | event | column을 기준으로 정렬이 변경되었을 때 호출된다. |

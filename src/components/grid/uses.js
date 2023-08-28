@@ -528,6 +528,7 @@ export const checkEvent = (params) => {
 
 export const sortEvent = (params) => {
   const { sortInfo, stores, updatePagingInfo } = params;
+  const { emit } = getCurrentInstance();
   function OrderQueue() {
     this.orders = ['asc', 'desc', 'init'];
     this.dequeue = () => this.orders.shift();
@@ -560,6 +561,11 @@ export const sortEvent = (params) => {
 
       sortInfo.isSorting = true;
       updatePagingInfo({ onSort: true });
+      emit('sort-column', {
+        field: sortInfo.sortField,
+        order: sortInfo.sortOrder,
+        column: sortInfo.sortColumn,
+      });
     }
   };
   /**
