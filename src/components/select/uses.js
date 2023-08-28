@@ -226,6 +226,17 @@ export const useDropdown = (param) => {
     isDropbox.value = false;
   };
 
+  const allCheck = ref(false);
+  const changeAllCheck = (isCheckBoxLabel) => {
+    if (!isCheckBoxLabel) {
+      allCheck.value = !allCheck.value;
+    }
+    if (allCheck.value) {
+      mv.value = filteredItems.value.map(item => item.value);
+    } else {
+      mv.value = [];
+    }
+  };
   /**
    * 항목 클릭하여 선택하는 이벤트
    * 항목 내 disabled인 경우 클릭 로직을 타지 않게 한다.
@@ -250,6 +261,7 @@ export const useDropdown = (param) => {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
     }
+    allCheck.value = mv.value.length === filteredItems.value.length;
     changeMv();
   };
   const clickItem = !props.multiple ? singleClickItem : multipleClickItem;
@@ -263,6 +275,10 @@ export const useDropdown = (param) => {
   const multipleSelectedCls = val => mv.value.includes(val);
   const selectedItemClass = !props.multiple ? singleSelectedCls : multipleSelectedCls;
 
+  watch(() => mv.value, (curr) => {
+    allCheck.value = curr.length === filteredItems.value.length;
+    changeDropboxPosition();
+  });
   return {
     select,
     selectWrapper,
@@ -278,5 +294,7 @@ export const useDropdown = (param) => {
     changeDropboxPosition,
     clickItem,
     selectedItemClass,
+    allCheck,
+    changeAllCheck,
   };
 };

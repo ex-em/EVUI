@@ -72,6 +72,7 @@
       placeholder="Please select values."
       multiple
       checkable
+      all-check-label="Select All"
       @change="changeEvent"
     />
     <div class="description">

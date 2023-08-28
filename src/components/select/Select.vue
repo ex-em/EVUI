@@ -126,6 +126,20 @@
           />
           <template v-if="checkable">
             <div
+              v-if="multiple"
+              class="ev-select-dropbox-item all-check"
+              :class="{
+              selected: allCheck
+            }"
+              @click.self.prevent="[changeAllCheck(false), changeDropboxPosition()]"
+            >
+              <ev-checkbox
+                v-model="allCheck"
+                :label="allCheckLabel"
+                @change="[changeAllCheck(true), changeDropboxPosition()]"
+              />
+            </div>
+            <div
               ref="itemWrapper"
               class="ev-select-dropbox-list"
             >
@@ -300,6 +314,10 @@ export default {
       type: String,
       default: '',
     },
+    allCheckLabel: {
+      type: String,
+      default: 'Select All',
+    },
   },
   emits: {
     'update:modelValue': null,
@@ -331,6 +349,8 @@ export default {
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
+      allCheck,
+      changeAllCheck,
     } = useDropdown({ mv, changeMv });
 
     return {
@@ -356,6 +376,8 @@ export default {
       changeDropboxPosition,
       clickItem,
       selectedItemClass,
+      allCheck,
+      changeAllCheck,
     };
   },
 };
@@ -520,5 +542,11 @@ export default {
     opacity: 1;
     color: #C0C4CC;
   }
+}
+
+.all-check {
+  height: 35px;
+  line-height: 38px;
+  border-bottom: 1px solid;
 }
 </style>
