@@ -226,12 +226,9 @@ export const useDropdown = (param) => {
     isDropbox.value = false;
   };
 
-  const allCheck = ref(false);
-  const changeAllCheck = (isCheckBoxLabel) => {
-    if (!isCheckBoxLabel) {
-      allCheck.value = !allCheck.value;
-    }
-    if (allCheck.value) {
+const allCheck = computed(() => mv.value.length === filteredItems.value.length);
+  const changeAllCheck = () => {
+    if (!allCheck.value) {
       mv.value = filteredItems.value.map(item => item.value);
     } else {
       mv.value = [];
@@ -261,7 +258,6 @@ export const useDropdown = (param) => {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
     }
-    allCheck.value = mv.value.length === filteredItems.value.length;
     changeMv();
   };
   const clickItem = !props.multiple ? singleClickItem : multipleClickItem;
@@ -275,10 +271,6 @@ export const useDropdown = (param) => {
   const multipleSelectedCls = val => mv.value.includes(val);
   const selectedItemClass = !props.multiple ? singleSelectedCls : multipleSelectedCls;
 
-  watch(() => mv.value, (curr) => {
-    allCheck.value = curr.length === filteredItems.value.length;
-    changeDropboxPosition();
-  });
   return {
     select,
     selectWrapper,

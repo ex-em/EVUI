@@ -129,14 +129,14 @@
               v-if="multiple"
               class="ev-select-dropbox-item all-check"
               :class="{
-              selected: allCheck
+                selected: allCheck
             }"
-              @click.self.prevent="[changeAllCheck(false), changeDropboxPosition()]"
+              @click.self.prevent="[changeAllCheck(), changeDropboxPosition()]"
             >
               <ev-checkbox
                 v-model="allCheck"
                 :label="allCheckLabel"
-                @change="[changeAllCheck(true), changeDropboxPosition()]"
+                @change="[changeAllCheck(), changeDropboxPosition()]"
               />
             </div>
             <div
@@ -156,8 +156,8 @@
                       :key="`${item.value}_${idx}`"
                       class="ev-select-dropbox-item"
                       :class="{
-                      selected: selectedItemClass(item.value),
-                      disabled: item.disabled
+                        selected: selectedItemClass(item.value),
+                        disabled: item.disabled
                     }"
                       :title="item.name"
                       @click.self.prevent="[clickItem(item.value), changeDropboxPosition()]"
