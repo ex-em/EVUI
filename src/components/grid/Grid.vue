@@ -673,7 +673,6 @@ export default {
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
-      isMoved: false,
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),

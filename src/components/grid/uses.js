@@ -1167,17 +1167,20 @@ export const columnSettingEvent = (params) => {
     const isSameColumn = columnNames.length === columns.length
       && columns.every(col => columnNames.includes(col.field));
 
-    if (isSameColumn && stores.isMoved) {
+    if (isSameColumn) {
       return;
     }
 
     stores.filteredColumns = stores.originColumns
-      .filter(col => columnNames.includes(col.field) || !col.caption);
-    stores.filteredColumns.forEach((col) => {
-      if (col?.hiddenDisplay) {
-        col.hiddenDisplay = false;
-      }
-    });
+      .filter((col) => {
+        if (columnNames.includes(col.field) || !col.caption) {
+          if (col?.hiddenDisplay) {
+            col.hiddenDisplay = false;
+          }
+          return true;
+        }
+        return false;
+      });
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
   };
@@ -1211,7 +1214,6 @@ export const dragEvent = ({ stores }) => {
     } else {
       stores.movedColumns = columns;
     }
-    stores.isMoved = true;
   };
   const onDragStart = (e) => {
     e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index);

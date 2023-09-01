@@ -134,9 +134,24 @@ export default {
       searchColumnList.value.length = 0;
     };
 
+    const initValue = () => {
+      const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
+      checkColumnGroup.value = columns
+        .filter(col => !col.checked)
+        .map(col => col.label);
+      initSearchValue();
+    };
     const onApplyColumn = () => {
       applyColumnList.value = originColumnList.value
-        .filter(col => checkColumnGroup.value.includes(col.label));
+        .filter((col) => {
+          if (checkColumnGroup.value.includes(col.label)) {
+            if (col?.checked) {
+              col.checked = false;
+            }
+            return true;
+          }
+          return false;
+        });
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
@@ -152,13 +167,15 @@ export default {
           text: col.field,
           checked: col.hiddenDisplay,
         }));
-      checkColumnGroup.value = originColumnList.value?.filter(col => !col.checked) || [];
-      checkColumnGroup.value = checkColumnGroup.value?.map(col => col.label) || [];
+      checkColumnGroup.value = originColumnList.value
+        .filter(col => !col.checked)
+        .map(col => col.label);
       applyColumnList.value.length = 0;
     };
 
     const hideColumnSetting = () => {
       isShowColumnSetting.value = false;
+      initValue();
     };
 
     const initWrapperDiv = () => {
