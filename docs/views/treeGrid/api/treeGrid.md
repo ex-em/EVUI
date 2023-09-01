@@ -76,6 +76,7 @@
 | field           | String  | 필드명                                                | ex) 'instance_name'                              | Y |
 | type            | String  | 데이터 타입                                             | 'string', 'number', 'stringNumber', 'float', 'boolean' | Y |
 | hide            | Boolean | 컬럼 숨김 여부                                           | Boolean                                          | N |
+| hiddenDisplay | Boolean | 컬럼 목록 체크 여부 | Boolean | N |
 | width           | Number  | 컬럼 넓이                                              | ex) 150                                          | N |
 | searchable      | Boolean | 검색 대상 여부                                           | Boolean                                          | N |
 | align           | String  | 사용자 지정 정렬                                          | 'center', 'left', 'right'                        | N |

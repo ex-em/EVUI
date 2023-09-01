@@ -220,7 +220,7 @@
           >
             <!-- Header -->
             <li
-              v-if="!column.hide"
+              v-if="!column.hide && !column.hiddenDisplay"
               :data-index="index"
               :class="{
                 column: true,
@@ -387,7 +387,7 @@
                 :key="cellIndex"
               >
                 <td
-                  v-if="!column.hide"
+                  v-if="!column.hide && !column.hiddenDisplay"
                   :data-name="column.field"
                   :data-index="column.index"
                   :class="{
@@ -673,6 +673,7 @@ export default {
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
+      isMoved: false,
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),

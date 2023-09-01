@@ -26,7 +26,7 @@
       :key="cellIndex"
     >
       <td
-        v-if="!column.hide"
+        v-if="!column.hide && !column.hiddenDisplay"
         :data-name="column.field"
         :data-index="node.index"
         :class="getColumnClass(column, cellIndex)"

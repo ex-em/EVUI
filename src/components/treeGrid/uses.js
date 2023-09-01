@@ -197,7 +197,7 @@ export const resizeEvent = (params) => {
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
       const result = stores.orderedColumns.reduce((acc, column) => {
-        if (column.hide) {
+        if (column.hide || column.hiddenDisplay) {
           return acc;
         }
 
