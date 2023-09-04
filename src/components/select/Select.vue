@@ -131,12 +131,12 @@
               :class="{
                 selected: allCheck
             }"
-              @click.self.prevent="[changeAllCheck(), changeDropboxPosition()]"
+              @click.self.prevent="[changeAllCheck(false), changeDropboxPosition()]"
             >
               <ev-checkbox
                 v-model="allCheck"
                 :label="allCheckLabel"
-                @change="[changeAllCheck(), changeDropboxPosition()]"
+                @change="[changeAllCheck(true), changeDropboxPosition()]"
               />
             </div>
             <div
