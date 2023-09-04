@@ -71,7 +71,7 @@
             :key="index"
           >
             <li
-              v-if="!column.hide"
+              v-if="!column.hide && !column.hiddenDisplay"
               :data-index="index"
               :class="getColumnClass(column)"
               :style="getColumnStyle(column, index)"

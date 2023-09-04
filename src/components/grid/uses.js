@@ -182,7 +182,7 @@ export const resizeEvent = (params) => {
       const scrollWidth = elWidth - bodyEl.clientWidth;
 
       const result = stores.orderedColumns.reduce((acc, cur) => {
-        if (cur.hide) {
+        if (cur.hide || cur.hiddenDisplay) {
           return acc;
         }
         if (cur.width) {
@@ -1150,7 +1150,8 @@ export const columnSettingEvent = (params) => {
   const setFilteringColumn = () => {
     columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
 
-    const originColumnIdx = stores.originColumns.filter(col => !col.hide).map(col => col.index);
+    const originColumnIdx = stores.originColumns.filter(col => (!col.hide || col.hiddenDisplay))
+      .map(col => col.index);
     const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
 
     columnSettingInfo.isFilteringColumn = (visibleColumnIdx.length !== originColumnIdx.length);
@@ -1162,7 +1163,7 @@ export const columnSettingEvent = (params) => {
     onResize();
   };
   const onApplyColumn = (columnNames) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide);
+    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
     const isSameColumn = columnNames.length === columns.length
       && columns.every(col => columnNames.includes(col.field));
 
@@ -1171,12 +1172,20 @@ export const columnSettingEvent = (params) => {
     }
 
     stores.filteredColumns = stores.originColumns
-      .filter(col => columnNames.includes(col.field) || !col.caption);
+      .filter((col) => {
+        if (columnNames.includes(col.field) || !col.caption) {
+          if (col?.hiddenDisplay) {
+            col.hiddenDisplay = false;
+          }
+          return true;
+        }
+        return false;
+      });
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
   };
   const setColumnHidden = (val) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide);
+    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
 
     if (columns.length === 1) {
       return;
