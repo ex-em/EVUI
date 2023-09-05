@@ -9,7 +9,17 @@
 </template>
 
 <script>
-import { inject, watch, computed, onMounted, onBeforeUnmount, onDeactivated, onUpdated } from 'vue';
+import {
+  inject,
+  watch,
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  onDeactivated,
+  onActivated,
+  onUpdated,
+} from 'vue';
 import { cloneDeep, debounce, isEqual } from 'lodash-es';
 import EvChart from '../chart/chart.core';
 import { useModel, useWrapper } from '../chart/uses';
@@ -28,6 +38,7 @@ export default {
     let evChart = null;
     let evChartBrush = null;
 
+    const isMounted = ref(false);
     const injectEvChartClone = inject('evChartClone', { data: [] });
     const injectEvChartInfo = inject('evChartInfo', { props: { options: [] } });
     const injectBrushIdx = inject('brushIdx', {
@@ -235,6 +246,8 @@ export default {
         createChartBrush();
         drawChartBrush();
       }
+
+      isMounted.value = true;
     });
 
     onUpdated(async () => {
@@ -266,6 +279,8 @@ export default {
       if (evChartBrush) {
         evChartBrush.destroy();
       }
+
+      isMounted.value = false;
     });
 
     onDeactivated(() => {
@@ -290,6 +305,12 @@ export default {
         });
       }
     }, 0);
+
+    onActivated(() => {
+      if (isMounted.value) {
+        onResize();
+      }
+    });
 
     return {
       evChartBrushOptions,
