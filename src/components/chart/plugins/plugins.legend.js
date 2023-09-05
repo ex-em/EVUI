@@ -234,6 +234,9 @@ const modules = {
      */
     this.onLegendBoxClick = (e) => {
       const { legend: opt } = this.options;
+      if (opt?.stopClickEvt) {
+        return;
+      }
       const { chartIdx } = this.data;
 
       const targetDOM = this.getContainerDOM(e);
@@ -369,6 +372,9 @@ const modules = {
      */
     this.onLegendBoxClick = (e) => {
       const opt = this.options.legend;
+      if (opt?.stopClickEvt) {
+        return;
+      }
       const series = Object.values(this.seriesList)[0];
 
       const targetDOM = this.getContainerDOM(e);
