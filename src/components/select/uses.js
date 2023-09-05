@@ -275,12 +275,13 @@ export const useDropdown = (param) => {
   const multipleSelectedCls = val => mv.value.includes(val);
   const selectedItemClass = !props.multiple ? singleSelectedCls : multipleSelectedCls;
 
-  if (props.multiple && props.checkable) {
-    watch(() => mv.value, (curr) => {
+  watch(() => mv.value, (curr) => {
+    if (props.multiple && props.checkable) {
       allCheck.value = curr.length === filteredItems.value.length;
       changeDropboxPosition();
-    });
-  }
+    }
+  });
+
   return {
     select,
     selectWrapper,
