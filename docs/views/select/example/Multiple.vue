@@ -64,6 +64,21 @@
       first selectbox value : {{ selectVal1 }}
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Multiple Checkable Select</p>
+    <ev-select
+      v-model="selectVal1"
+      :items="items1"
+      placeholder="Please select values."
+      multiple
+      checkable
+      all-check-label="Select All"
+      @change="changeEvent"
+    />
+    <div class="description">
+      first selectbox value : {{ selectVal1 }}
+    </div>
+  </div>
 </template>
 
 <script>

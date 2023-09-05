@@ -84,6 +84,16 @@
       val : {{ selectVal5 }}
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Checkable Select</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      checkable
+      placeholder="Please select value."
+      @change="changeSelect1"
+    />
+  </div>
 </template>
 
 <script>

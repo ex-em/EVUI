@@ -34,6 +34,7 @@
   | filterable | Boolean | false | <셀렉트> 항목들 필터링 기능 사용여부 |  |
   | searchPlaceholder | String | '' | <셀렉트> 필터링의 표기문구 |  |
   | noMatchingText | String | '' | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
+  | checkable      | Boolean | false | <셀렉트> 체크박스 여부 |  |
 - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫혀야한다.
 
 2) 멀티 셀렉트 사용 시
@@ -50,6 +51,7 @@
   | filterable | Boolean | false | <셀렉트> 항목들 필터링 기능 사용여부 |  |
   | searchPlaceholder | String | '' | <셀렉트> 필터링의 표기문구 |  |
   | noMatchingText | String | '' | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
+  | checkable         | Boolean | false | <셀렉트> 체크박스 여부 |  |
 - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫히지 말아야 한다.
 
 >### Event
