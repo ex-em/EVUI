@@ -113,6 +113,7 @@ class EvChart {
     }
 
     if (realTimeScatter?.use) {
+      this.dataSet = {};
       this.createRealTimeScatterDataSet(data);
     } else {
       this.createDataSet(data, labels);
@@ -723,6 +724,7 @@ class EvChart {
 
     this.resetProps();
 
+    this.updateSeries = updateSeries;
     if (updateSeries) {
       this.seriesInfo = null;
       this.seriesList = null;

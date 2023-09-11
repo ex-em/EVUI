@@ -71,10 +71,6 @@ const modules = {
   createRealTimeScatterDataSet(datas) {
     const keys = Object.keys(datas);
 
-    if (!this.isInit) {
-      this.dataSet = {};
-    }
-
     const minMaxValues = {
       maxY: 0,
       minY: Infinity,
@@ -88,14 +84,19 @@ const modules = {
       const storeLength = data.length;
       let lastTime = 0;
 
-      if (!this.isInit) {
-        this.dataSet[key] = {
+      if (!this.isInit || this.updateSeries) {
+        const defaultValues = {
           dataGroup: [],
           startIndex: 0,
           endIndex: 0,
           length: 0,
           fromTime: 0,
           toTime: 0,
+        };
+
+        this.dataSet[key] = {
+          ...defaultValues,
+          ...this.dataSet[key],
         };
         this.dataSet[key].length = this.options.realTimeScatter.range || 300;
         this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
@@ -127,12 +128,17 @@ const modules = {
           - this.dataSet[key].length * 1000;
       }
 
-      if (!this.isInit) {
+      if (!this.isInit || this.updateSeries) {
         for (let i = 0; i < this.dataSet[key].length; i++) {
-          this.dataSet[key].dataGroup[i] = {
+          const defaultValues = {
             data: [],
             max: 0,
             min: Infinity,
+          };
+
+          this.dataSet[key].dataGroup[i] = {
+            ...defaultValues,
+            ...this.dataSet[key].dataGroup[i],
           };
         }
       } else if (gapCount > 0) {
