@@ -130,6 +130,7 @@ export default {
       {
         name: 'name6',
         value: 'value6',
+        disabled: true,
       },
       {
         name: 'name7',
@@ -197,6 +198,7 @@ export default {
       {
         name: 'name23',
         value: 'value23',
+        disabled: true,
       },
       {
         name: 'name33',

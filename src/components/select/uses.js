@@ -232,7 +232,7 @@ export const useDropdown = (param) => {
       allCheck.value = !allCheck.value;
     }
     if (allCheck.value) {
-      mv.value = filteredItems.value.map(item => item.value);
+      mv.value = filteredItems.value.filter(item => !item.disabled).map(item => item.value);
     } else {
       mv.value = [];
     }
@@ -261,7 +261,7 @@ export const useDropdown = (param) => {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
     }
-    allCheck.value = mv.value.length === filteredItems.value.length;
+    allCheck.value = mv.value.length === filteredItems.value.filter(item => !item.disabled).length;
     changeMv();
   };
   const clickItem = !props.multiple ? singleClickItem : multipleClickItem;
@@ -277,7 +277,7 @@ export const useDropdown = (param) => {
 
   watch(() => mv.value, (curr) => {
     if (props.multiple && props.checkable) {
-      allCheck.value = curr.length === filteredItems.value.length;
+      allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
       changeDropboxPosition();
     }
   });

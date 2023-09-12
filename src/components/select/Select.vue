@@ -160,10 +160,12 @@
                         disabled: item.disabled
                     }"
                       :title="item.name"
-                      @click.self.prevent="[clickItem(item.value), changeDropboxPosition()]"
+                      @click.self.prevent="item.disabled
+                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
                     >
                       <ev-checkbox
                         :label="item.value"
+                        :disabled="item.disabled"
                       >
                         <i
                           v-if="item.iconClass"
@@ -194,10 +196,12 @@
                     disabled: item.disabled
                   }"
                     :title="item.name"
-                    @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
+                    @click.stop.prevent="item.disabled
+                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
                   >
                     <ev-checkbox
                       :model-value="mv === item.value"
+                      :disabled="item.disabled"
                     >
                       <i
                         v-if="item.iconClass"
@@ -228,7 +232,8 @@
                     disabled: item.disabled
                   }"
                   :title="item.name"
-                  @click.stop.prevent="[clickItem(item.value), changeDropboxPosition()]"
+                  @click.stop.prevent="item.disabled
+                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
                 >
                   <i
                     v-if="item.iconClass"
@@ -541,6 +546,7 @@ export default {
   &.disabled {
     opacity: 1;
     color: #C0C4CC;
+    cursor: not-allowed;
   }
 }
 
