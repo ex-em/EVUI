@@ -150,7 +150,9 @@ export default {
         }
       }
 
-      flattenChildren(treeNodeData[0]);
+      if (treeNodeData.length) {
+        flattenChildren(treeNodeData[0]);
+      }
       return flatTree;
     }
 
