@@ -59,6 +59,10 @@ export default {
       type: String,
       default: '',
     },
+    searchIncludeChildren: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
     'click-node': null,
@@ -216,6 +220,21 @@ export default {
       showContextMenu(e);
     };
 
+    const isIncluded = (value, searchWord) => value.toLowerCase()
+        .includes(searchWord.toString().toLowerCase());
+
+    const makeChildrenVisible = (node) => {
+      if (node.children) {
+        const isSearchedChildren = !!(node.children
+            .filter(child => isIncluded(child.title, props.searchWord))?.length);
+        node.children.forEach((child) => {
+          makeChildrenVisible(child);
+          child.visible = (isSearchedChildren && isIncluded(child.title, props.searchWord))
+              || !isSearchedChildren;
+        });
+      }
+    };
+
     function makeChildrenInvisible(node) {
       if (node.children) {
         node.children.forEach((child) => {
@@ -243,13 +262,18 @@ export default {
         node.visible = false;
       });
 
-      const filteredNodes = allNodeInfo.filter(nodeObj => nodeObj.node.title.includes(value));
+      const filteredNodes = allNodeInfo
+          .filter(nodeObj => isIncluded(nodeObj.node.title, value));
 
       filteredNodes.forEach((nodeObj) => {
         const node = nodeObj.node;
         node.visible = true;
-        // make children invisible, traverse down
-        makeChildrenInvisible(node);
+        if (props.searchIncludeChildren) {
+          makeChildrenVisible(node);
+        } else {
+          // make children invisible, traverse down
+          makeChildrenInvisible(node);
+        }
         // make parent visible, traverse up
         const parentKey = allNodeInfo[node.nodeKey].parent;
         makeParentVisible(parentKey);
