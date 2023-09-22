@@ -309,10 +309,7 @@ export default {
       rebuildTree();
       const checkedNodes = getCheckedNodes();
       if (checkedNodes.length) {
-        emit('check', checkedNodes.map(node => ({
-          title: node.title,
-          value: node.value,
-        })));
+        emit('check', checkedNodes);
       }
     });
     onBeforeUnmount(() => {
