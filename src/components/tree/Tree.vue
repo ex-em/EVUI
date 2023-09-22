@@ -59,6 +59,10 @@ export default {
       type: String,
       default: '',
     },
+    searchIncludeChildren: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
     'click-node': null,
@@ -146,7 +150,9 @@ export default {
         }
       }
 
-      flattenChildren(treeNodeData[0]);
+      if (treeNodeData.length) {
+        flattenChildren(treeNodeData[0]);
+      }
       return flatTree;
     }
 
@@ -179,11 +185,7 @@ export default {
       node.indeterminate = false;
       updateTreeUp(nodeKey); // propagate up
       updateTreeDown(node, { checked: isChecked, indeterminate: false }); // reset `indeterminate`
-      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked)
-        .map(obj => ({
-            title: obj.node.title,
-            value: obj.node.value,
-          }));
+      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
       emit('check', checkedNodes);
       rebuildTree();
     }
@@ -216,6 +218,21 @@ export default {
       showContextMenu(e);
     };
 
+    const isIncluded = (value, searchWord) => value.toLowerCase()
+        .includes(searchWord.toLowerCase());
+
+    const makeChildrenVisible = (node) => {
+      if (node.children) {
+        const isSearchedChildren = !!(node.children
+            .filter(child => isIncluded(child.title, props.searchWord))?.length);
+        node.children.forEach((child) => {
+          makeChildrenVisible(child);
+          child.visible = (isSearchedChildren && isIncluded(child.title, props.searchWord))
+              || !isSearchedChildren;
+        });
+      }
+    };
+
     function makeChildrenInvisible(node) {
       if (node.children) {
         node.children.forEach((child) => {
@@ -243,13 +260,18 @@ export default {
         node.visible = false;
       });
 
-      const filteredNodes = allNodeInfo.filter(nodeObj => nodeObj.node.title.includes(value));
+      const filteredNodes = allNodeInfo
+          .filter(nodeObj => isIncluded(nodeObj.node.title, value));
 
       filteredNodes.forEach((nodeObj) => {
         const node = nodeObj.node;
         node.visible = true;
-        // make children invisible, traverse down
-        makeChildrenInvisible(node);
+        if (props.searchIncludeChildren) {
+          makeChildrenVisible(node);
+        } else {
+          // make children invisible, traverse down
+          makeChildrenInvisible(node);
+        }
         // make parent visible, traverse up
         const parentKey = allNodeInfo[node.nodeKey].parent;
         makeParentVisible(parentKey);
@@ -283,10 +305,7 @@ export default {
       rebuildTree();
       const checkedNodes = getCheckedNodes();
       if (checkedNodes.length) {
-        emit('check', checkedNodes.map(node => ({
-          title: node.title,
-          value: node.value,
-        })));
+        emit('check', checkedNodes);
       }
     });
     onBeforeUnmount(() => {
