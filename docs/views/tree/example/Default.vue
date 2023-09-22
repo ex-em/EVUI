@@ -80,7 +80,7 @@
   <div class="case">
     <p class="case-title">Filter node</p>
     <div class="option">
-      <span>부모의 자식까지 검색 여부</span>
+      <span>부모가 검색될 경우 자식 노드까지 보일지 여부</span>
       <ev-toggle v-model="searchIncludeChildren" />
     </div>
     <ev-text-field
