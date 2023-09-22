@@ -79,6 +79,10 @@
   </div>
   <div class="case">
     <p class="case-title">Filter node</p>
+    <div class="option">
+      <span>부모의 자식까지 검색 여부</span>
+      <ev-toggle v-model="searchIncludeChildren" />
+    </div>
     <ev-text-field
       v-model="searchVm"
       placeholder="Search"
@@ -89,6 +93,7 @@
       :data="searchExData"
       :use-checkbox="true"
       :search-word="searchValue"
+      :search-include-children="searchIncludeChildren"
     />
     <div class="description">
       'ev-text-field' 컴포넌트를 사용해 필터링할 단어를 검색하면 'ev-tree' 컴포넌트 내부에서 검색되는 구조입니다.
@@ -316,7 +321,7 @@ export default {
                             iconClass: 'ev-icon-dolphin',
                           },
                           {
-                            title: 'tEAm C',
+                            title: 'Team C',
                             expand: true,
                             iconClass: 'ev-icon-folder',
                             children: [
@@ -408,6 +413,7 @@ export default {
 
     const searchVm = ref('');
     const searchValue = ref('');
+    const searchIncludeChildren = ref(false);
     const searchInput = (val) => {
       searchValue.value = val;
     };
@@ -427,6 +433,7 @@ export default {
       contextMenuInfo,
       searchValue,
       searchVm,
+      searchIncludeChildren,
       getCheckedNode,
       getClickedNode,
       getDblClickedNode,
@@ -436,5 +443,9 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.option {
+  display: flex;
+  gap: 10px;
+}
 </style>

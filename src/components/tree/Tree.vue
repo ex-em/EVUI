@@ -185,11 +185,7 @@ export default {
       node.indeterminate = false;
       updateTreeUp(nodeKey); // propagate up
       updateTreeDown(node, { checked: isChecked, indeterminate: false }); // reset `indeterminate`
-      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked)
-        .map(obj => ({
-            title: obj.node.title,
-            value: obj.node.value,
-          }));
+      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
       emit('check', checkedNodes);
       rebuildTree();
     }
@@ -223,7 +219,7 @@ export default {
     };
 
     const isIncluded = (value, searchWord) => value.toLowerCase()
-        .includes(searchWord.toString().toLowerCase());
+        .includes(searchWord.toLowerCase());
 
     const makeChildrenVisible = (node) => {
       if (node.children) {
