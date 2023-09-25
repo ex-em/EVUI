@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import TreeNode from './TreeNode';
 
 export default {
@@ -70,7 +70,7 @@ export default {
     check: Array,
   },
   setup(props, { emit }) {
-    let treeNodeData = reactive(props.data);
+    const treeNodeData = ref(props.data);
     let allNodeInfo = [];
     const contextMenu = ref(null);
     let contextMenuFlag = false; // flag for showing contextMenu or not
@@ -150,8 +150,8 @@ export default {
         }
       }
 
-      if (treeNodeData.length) {
-        flattenChildren(treeNodeData[0]);
+      if (treeNodeData.value.length) {
+        flattenChildren(treeNodeData.value[0]);
       }
       return flatTree;
     }
@@ -185,7 +185,7 @@ export default {
       node.indeterminate = false;
       updateTreeUp(nodeKey); // propagate up
       updateTreeDown(node, { checked: isChecked, indeterminate: false }); // reset `indeterminate`
-      const checkedNodes = allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
+      const checkedNodes = getCheckedNodes();
       emit('check', checkedNodes);
       rebuildTree();
     }
@@ -278,9 +278,11 @@ export default {
       });
     }
 
-    watch(props.data, (newData) => {
-      treeNodeData = newData;
+    watch(() => props.data, (newData) => {
+      treeNodeData.value = newData;
       allNodeInfo = getAllNodeInfo();
+    }, {
+      deep: true,
     });
 
 
