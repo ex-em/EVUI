@@ -447,7 +447,7 @@ export const clickEvent = (params) => {
 
 export const checkEvent = (params) => {
   const { checkInfo, stores, pageInfo, getPagingData } = params;
-  const { emit } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
    *
@@ -483,7 +483,10 @@ export const checkEvent = (params) => {
       if (pageInfo.isClientPaging) {
         store = getPagingData();
       }
-      const isAllChecked = store.every(d => d[ROW_CHECK_INDEX]);
+
+      const isAllChecked = store
+        .filter(rowData => !props.uncheckableRows.includes(rowData[ROW_DATA_INDEX]))
+        .every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
       }
@@ -511,14 +514,18 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
+      const isDisabledCheckbox = props.uncheckableRows.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
-        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX])) {
+        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !isDisabledCheckbox) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
         }
       } else {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
       }
-      row[ROW_CHECK_INDEX] = isHeaderChecked;
+
+      if (!isDisabledCheckbox) {
+        row[ROW_CHECK_INDEX] = isHeaderChecked;
+      }
     });
     emit('update:checked', checkInfo.checkedRows);
     emit('check-all', event, checkInfo.checkedRows);
@@ -1044,6 +1051,7 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
+        const isDisabledCheckbox = props.uncheckableRows.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
@@ -1051,9 +1059,10 @@ export const storeEvent = (params) => {
         if (!checked) {
           hasUnChecked = true;
         }
-        store.push([idx, checked, row, selected]);
+        store.push([idx, checked, row, selected, isDisabledCheckbox]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
+      checkInfo.isHeaderDisabled = rows.length === props.uncheckableRows.length;
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

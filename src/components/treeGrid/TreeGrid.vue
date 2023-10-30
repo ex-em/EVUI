@@ -62,6 +62,7 @@
             <ev-checkbox
               v-if="isHeaderCheckbox"
               v-model="isHeaderChecked"
+              :disabled="isHeaderDisabled"
               @change="onCheckAll"
             />
           </li>
@@ -382,6 +383,7 @@ export default {
     const checkInfo = reactive({
       prevCheckedRow: [],
       isHeaderChecked: false,
+      isHeaderDisabled: false,
       checkedRows: props.checked,
       useCheckbox: computed(() => props.option.useCheckbox || {}),
     });

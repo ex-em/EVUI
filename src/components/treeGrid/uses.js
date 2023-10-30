@@ -66,9 +66,11 @@ export const commonFunctions = (params) => {
     const disabledList = rows.filter(row => row._disabled);
     if (disabledList.length) {
       const checkedList = rows.filter(row => row.checked);
-      if (disabledList.length + checkedList.length === rows.length) {
-        checkInfo.isHeaderChecked = true;
-      }
+      const isAllDisabled = disabledList.length === rows.length;
+
+      checkInfo.isHeaderChecked = !isAllDisabled
+        && (disabledList.length + checkedList.length === rows.length);
+      checkInfo.isHeaderDisabled = isAllDisabled;
     }
   };
   return {
@@ -662,7 +664,7 @@ export const treeEvent = (params) => {
     }
 
     function setNodeData(nodeInfo) {
-      const { node, level, isShow, parent } = nodeInfo;
+      const { node, level, isShow, parent, isDisabled } = nodeInfo;
       if (node !== null && typeof node === 'object') {
         node.index = nodeIndex++;
         node.level = level;
@@ -687,6 +689,10 @@ export const treeEvent = (params) => {
           node.isFilter = false;
         }
 
+        if (!Object.hasOwnProperty.call(node, '_disabled')) {
+          node._disabled = isDisabled;
+        }
+
         if (!Object.hasOwnProperty.call(node, 'data')) {
           node.data = getDataObj(node);
         }
@@ -704,6 +710,7 @@ export const treeEvent = (params) => {
               level: level + 1,
               isShow: node.show && node.expand,
               parent: node,
+              isDisabled: node._disabled,
             }),
           );
         }
@@ -715,6 +722,7 @@ export const treeEvent = (params) => {
         level: 0,
         isShow: true,
         parent: undefined,
+        isDisabled: false,
       });
     });
     return nodeList;

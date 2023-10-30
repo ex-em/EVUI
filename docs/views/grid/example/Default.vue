@@ -5,6 +5,7 @@
       v-model:checked="checked"
       :columns="columns"
       :rows="tableData"
+      :uncheckable-rows="uncheckableRows"
       :width="widthMV"
       :height="heightMV"
       :option="{
@@ -218,6 +219,7 @@ export default {
     const tableData = ref([]);
     const selected = ref([]);
     const checked = ref([]);
+    const uncheckableRows = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
     const showHeaderMV = ref(true);
@@ -325,11 +327,13 @@ export default {
     });
 
     tableData.value = getData(50, 0);
+    uncheckableRows.value = [tableData.value[0]];
     return {
       columns,
       tableData,
       selected,
       checked,
+      uncheckableRows,
       widthMV,
       heightMV,
       showHeaderMV,
