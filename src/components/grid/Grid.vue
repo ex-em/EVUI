@@ -954,6 +954,10 @@ export default {
         onResize();
       }, { deep: true },
     );
+    watch(() => props.uncheckableRows,
+      () => {
+      setStore(props.rows);
+      }, { deep: true });
     watch(
       () => props.checked,
       (value) => {
