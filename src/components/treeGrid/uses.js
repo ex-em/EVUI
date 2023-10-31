@@ -63,7 +63,7 @@ export const commonFunctions = (params) => {
   };
   const checkHeader = (rows) => {
     checkInfo.isHeaderChecked = !!rows.length && rows.every(row => row.checked);
-    const disabledList = rows.filter(row => row._disabled);
+    const disabledList = rows.filter(row => row.disabled);
     if (disabledList.length) {
       const checkedList = rows.filter(row => row.checked);
       const isAllDisabled = rows.every(row => disabledList.includes(row));
@@ -450,14 +450,14 @@ export const checkEvent = (params) => {
     if (node.hasChild) {
       node.children.forEach((children) => {
         const childNode = children;
-        if (node.checked && !childNode.checked && !childNode._disabled) {
+        if (node.checked && !childNode.checked && !childNode.disabled) {
           checkInfo.checkedRows.push(childNode);
         }
         if (!node.checked) {
           checkInfo.checkedRows = checkInfo.checkedRows
             .filter(checked => checked.index !== childNode.index);
         }
-        childNode.checked = node.checked && !childNode._disabled;
+        childNode.checked = node.checked && !childNode.disabled;
 
         if (childNode.hasChild) {
           onCheckChildren(childNode);
@@ -469,8 +469,8 @@ export const checkEvent = (params) => {
     const parentNode = node.parent;
     if (parentNode) {
       const isCheck = parentNode.children.every(n => n.checked);
-      parentNode.checked = isCheck && !parentNode._disabled;
-      const disabledList = parentNode.children.filter(n => n._disabled);
+      parentNode.checked = isCheck && !parentNode.disabled;
+      const disabledList = parentNode.children.filter(n => n.disabled);
       if (disabledList.length) {
         const checkedList = parentNode.children.filter(n => n.checked);
         if (disabledList.length + checkedList.length === parentNode.children.length) {
@@ -554,7 +554,7 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      row.checked = status && !row._disabled;
+      row.checked = status && !row.disabled;
       if (row.checked) {
         if (!checkInfo.checkedRows.find(checked => checked.index === row.index)) {
           checkInfo.checkedRows.push(row);
@@ -689,8 +689,8 @@ export const treeEvent = (params) => {
           node.isFilter = false;
         }
 
-        if (!Object.hasOwnProperty.call(node, '_disabled')) {
-          node._disabled = isDisabled;
+        if (!Object.hasOwnProperty.call(node, 'disabled')) {
+          node.disabled = isDisabled;
         }
 
         if (!Object.hasOwnProperty.call(node, 'data')) {
@@ -710,7 +710,7 @@ export const treeEvent = (params) => {
               level: level + 1,
               isShow: node.show && node.expand,
               parent: node,
-              isDisabled: node._disabled,
+              isDisabled: node.disabled,
             }),
           );
         }
