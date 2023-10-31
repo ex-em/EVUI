@@ -1056,13 +1056,13 @@ export const storeEvent = (params) => {
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
         }
-        if (!checked) {
+        if (!checked && !isDisabledCheckbox) {
           hasUnChecked = true;
         }
         store.push([idx, checked, row, selected, isDisabledCheckbox]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
-      checkInfo.isHeaderDisabled = rows.length === props.uncheckableRows.length;
+      checkInfo.isHeaderDisabled = rows.every(row => props.uncheckableRows.includes(row));
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

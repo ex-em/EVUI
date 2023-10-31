@@ -66,7 +66,7 @@ export const commonFunctions = (params) => {
     const disabledList = rows.filter(row => row._disabled);
     if (disabledList.length) {
       const checkedList = rows.filter(row => row.checked);
-      const isAllDisabled = disabledList.length === rows.length;
+      const isAllDisabled = rows.every(row => disabledList.includes(row));
 
       checkInfo.isHeaderChecked = !isAllDisabled
         && (disabledList.length + checkedList.length === rows.length);
