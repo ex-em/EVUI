@@ -79,11 +79,12 @@ export const scrollEvent = (params) => {
     summaryScroll,
     getPagingData,
     updatePagingInfo,
+    useRowDetail,
   } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
-  const updateVScroll = (isScroll) => {
+  const updateVScrollBase = (isScroll) => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     if (bodyEl) {
@@ -116,6 +117,21 @@ export const scrollEvent = (params) => {
         pageInfo.startIndex = lastIndex;
         updatePagingInfo({ onScrollEnd: true });
       }
+    }
+  };
+
+  /**
+   *  rowDetail slot 시에는 가상 스크롤을 적용하지 않는다.
+   */
+  const updateVScroll = (isScroll) => {
+    if (useRowDetail) {
+      let store = stores.store;
+      if (pageInfo.isClientPaging) {
+        store = getPagingData();
+      }
+      stores.viewStore = store;
+    } else {
+      updateVScrollBase(isScroll);
     }
   };
   /**

@@ -347,114 +347,121 @@
         <table ref="table">
           <tbody>
             <!-- Row List -->
-            <tr
+            <template
               v-for="(row, rowIndex) in viewStore"
               :key="rowIndex"
-              :data-index="row[0]"
-              :class="{
-                row: true,
-                selected: row[3],
-                highlight: row[0] === highlightIdx,
-                'non-border': !!borderStyle && borderStyle !== 'rows',
-              }"
-              @click="onRowClick($event, row)"
-              @contextmenu="onRowClick($event, row, true)"
-              @dblclick="onRowDblClick($event, row)"
             >
-              <!-- Row Checkbox -->
-              <td
-                v-if="useCheckbox.use"
+              <tr
+                :data-index="row[0]"
                 :class="{
-                  cell: true,
-                  'row-checkbox': true,
-                  'non-border': !!borderStyle,
+                  row: true,
+                  selected: row[3],
+                  highlight: row[0] === highlightIdx,
+                  'non-border': !!borderStyle && borderStyle !== 'rows',
                 }"
-                :style="{
-                  width: `${minWidth}px`,
-                  height: `${rowHeight}px`,
-                  'border-right': '1px solid #CFCFCF',
-                }"
+                @click="onRowClick($event, row)"
+                @contextmenu="onRowClick($event, row, true)"
+                @dblclick="onRowDblClick($event, row)"
               >
-                <ev-checkbox
-                  v-model="row[1]"
-                  class="row-checkbox-input"
-                  @change="onCheck($event, row)"
-                />
-              </td>
-              <!-- Cell -->
-              <template
-                v-for="(column, cellIndex) in orderedColumns"
-                :key="cellIndex"
-              >
+                <!-- Row Checkbox -->
                 <td
-                  v-if="!column.hide && !column.hiddenDisplay"
-                  :data-name="column.field"
-                  :data-index="column.index"
+                  v-if="useCheckbox.use"
                   :class="{
                     cell: true,
-                    render: isRenderer(column),
-                    [column.type]: column.type,
-                    [column.align]: column.align,
-                    [column.field]: column.field,
+                    'row-checkbox': true,
                     'non-border': !!borderStyle,
                   }"
                   :style="{
-                    width: `${column.width}px`,
+                    width: `${minWidth}px`,
                     height: `${rowHeight}px`,
-                    'line-height': `${rowHeight}px`,
-                    'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
-                    'border-right': orderedColumns.length - 1 === cellIndex
-                      ? 'none' : '1px solid #CFCFCF',
+                    'border-right': '1px solid #CFCFCF',
                   }"
                 >
-                  <!-- Cell Renderer -->
-                  <div v-if="!!$slots[column.field]">
-                    <slot
-                      :name="column.field"
-                      :item="{ row, column }"
-                    />
-                  </div>
-                  <!-- Cell Value -->
-                  <template v-else>
-                    <div :title="getConvertValue(column, row[2][column.index])">
-                      {{ getConvertValue(column, row[2][column.index]) }}
+                  <ev-checkbox
+                    v-model="row[1]"
+                    class="row-checkbox-input"
+                    @change="onCheck($event, row)"
+                  />
+                </td>
+                <!-- Cell -->
+                <template
+                  v-for="(column, cellIndex) in orderedColumns"
+                  :key="cellIndex"
+                >
+                  <td
+                    v-if="!column.hide && !column.hiddenDisplay"
+                    :data-name="column.field"
+                    :data-index="column.index"
+                    :class="{
+                      cell: true,
+                      render: isRenderer(column),
+                      [column.type]: column.type,
+                      [column.align]: column.align,
+                      [column.field]: column.field,
+                      'non-border': !!borderStyle,
+                    }"
+                    :style="{
+                      width: `${column.width}px`,
+                      height: `${rowHeight}px`,
+                      'line-height': `${rowHeight}px`,
+                      'min-width': `${isRenderer(column) ? rendererMinWidth : minWidth}px`,
+                      'border-right': orderedColumns.length - 1 === cellIndex
+                        ? 'none' : '1px solid #CFCFCF',
+                    }"
+                  >
+                    <!-- Cell Renderer -->
+                    <div v-if="!!$slots[column.field]">
+                      <slot
+                        :name="column.field"
+                        :item="{ row, column }"
+                      />
                     </div>
+                    <!-- Cell Value -->
+                    <template v-else>
+                      <div :title="getConvertValue(column, row[2][column.index])">
+                        {{ getConvertValue(column, row[2][column.index]) }}
+                      </div>
+                    </template>
+                  </td>
+                </template>
+                <!-- Row Contextmenu Button -->
+                <td
+                  v-if="$props.option.customContextMenu?.length"
+                  :class="{
+                    'row-contextmenu': true,
+                    'non-border': !!borderStyle,
+                  }"
+                  :style="{
+                    position: 'sticky',
+                    right: 0,
+                    width: '30px',
+                    height: `${rowHeight}px`,
+                    'min-width': '30px',
+                    'line-height': `${rowHeight}px`,
+                  }"
+                >
+                  <template v-if="$slots.contextmenuIcon">
+                    <span
+                      class="row-contextmenu__btn"
+                      @click="onContextMenu($event)"
+                    >
+                      <slot name="contextmenuIcon"></slot>
+                    </span>
+                  </template>
+                  <template v-else>
+                    <grid-option-button
+                      icon="ev-icon-warning2"
+                      class="row-contextmenu__btn"
+                      @click="onContextMenu($event)"
+                    />
                   </template>
                 </td>
-              </template>
-              <!-- Row Contextmenu Button -->
-              <td
-                v-if="$props.option.customContextMenu?.length"
-                :class="{
-                  'row-contextmenu': true,
-                  'non-border': !!borderStyle,
-                }"
-                :style="{
-                  position: 'sticky',
-                  right: 0,
-                  width: '30px',
-                  height: `${rowHeight}px`,
-                  'min-width': '30px',
-                  'line-height': `${rowHeight}px`,
-                }"
-              >
-                <template v-if="$slots.contextmenuIcon">
-                  <span
-                    class="row-contextmenu__btn"
-                    @click="onContextMenu($event)"
-                  >
-                    <slot name="contextmenuIcon"></slot>
-                  </span>
-                </template>
-                <template v-else>
-                  <grid-option-button
-                    icon="ev-icon-warning2"
-                    class="row-contextmenu__btn"
-                    @click="onContextMenu($event)"
-                  />
-                </template>
-              </td>
-            </tr>
+              </tr>
+              <slot
+                name="rowDetail"
+                :item="{ row }"
+              />
+            </template>
             <tr v-if="!viewStore.length">
               <td class="is-empty">No records</td>
             </tr>
@@ -608,7 +615,7 @@ export default {
     'page-change': null,
     'sort-column': null,
   },
-  setup(props) {
+  setup(props, { slots }) {
     // const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
     const ROW_DATA_INDEX = 2;
@@ -777,6 +784,7 @@ export default {
       resizeInfo,
       pageInfo,
       summaryScroll,
+      useRowDetail: slots?.rowDetail,
       getPagingData,
       updatePagingInfo,
     });

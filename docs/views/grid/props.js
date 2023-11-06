@@ -8,6 +8,8 @@ import Toolbar from './example/Toolbar';
 import ToolbarRaw from '!!raw-loader!./example/Toolbar';
 import Summary from './example/Summary';
 import SummaryRaw from '!!raw-loader!./example/Summary';
+import RowDetail from './example/RowDetail.vue';
+import RowDetailRaw from '!!raw-loader!./example/RowDetail.vue';
 
 export default {
   mdText,
@@ -28,6 +30,10 @@ export default {
     Summary: {
       component: Summary,
       parsedData: parseComponent(SummaryRaw),
+    },
+    RowDetail: {
+      component: RowDetail,
+      parsedData: parseComponent(RowDetailRaw),
     },
   },
 };

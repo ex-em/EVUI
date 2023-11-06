@@ -18,10 +18,12 @@
 >
   <template #{필드명}></template>
   <template #toolbar="{ item }"></template>
+  <template #rowDetail="{ item }"></template>
 </ev-grid>
 ```
  - `#{필드명}` 지정해서 Cell Render 설정
  - `#toolbar` 지정해서 Toolbar 표시
+ - `#rowDetail` Row 하단에 사용자 정의 컴포넌트 표현, 사용시 가상스크롤 미적용
 
 ### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
