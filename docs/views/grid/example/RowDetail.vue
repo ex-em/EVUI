@@ -11,8 +11,8 @@
       <!-- cell renderer slot -->
       <template #toggle="{ item }">
         <div
-            class="toggle-wrapper"
-            @click="expendedRowDetail(item.row)"
+          class="toggle-wrapper"
+          @click="expendedRowDetail(item.row)"
         >
           <ev-icon
             icon="ev-icon-s-play"
@@ -40,7 +40,6 @@
 <script>
 import { ref } from 'vue';
 import RowDetailContent from './partitals/RowDetailContent.vue';
-
 
 export default {
   components: {
