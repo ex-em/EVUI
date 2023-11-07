@@ -7,7 +7,15 @@
     v-model:selected="selectedMV"
     v-model:checked="checkedMV"
     :columns="columns"
-    :rows="tableData"
+    :rows="[
+      {
+        tableData,
+        expand: false,
+        disabled: false,
+        children: [{ ... }]
+      }
+      ...
+    ]"
     :width="widthMV"
     :height="heightMV"
     :option="{}"
@@ -28,6 +36,10 @@
 | --- |------------------|--------------------|-----------------------------------------|--------------------------|
 | columns | Array            | []                 | 컬럼 리스트                                  |                          |
 | rows | Array            | []                 | Tree Data 리스트                           |                          |
+|  | {}    |    | Tree Grid의 각 Row 데이터에 연결된 속성 | |
+|  |    | expand   | 부모 Row 데이터에 대한 확장 여부  | true, false |
+|  |    | disabled   | Row 데이터의 체크박스에 대한 비활성화 처리  | true, false |
+|  |    | children   | 자식 데이터  | Array |
 | width | String, Number   | '100%'             | 그리드 넓이                                  | '50%', '50px', 50        |
 | height | String, Number   | '100%'             | 그리드 높이                                  | '50%', '50px', 50        |
 | selected | Array            | []                 | 선택된 Row 데이터                             |                          |

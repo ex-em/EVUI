@@ -8,6 +8,7 @@
     v-model:checked="checkedMV"
     :columns="columns"
     :rows="tableData"
+    :uncheckable-rows="uncheckableRows"
     :width="widthMV"
     :height="heightMV"
     :option="{}"
