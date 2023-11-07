@@ -9,6 +9,7 @@
       text: '텍스트명',
       iconClass: '텍스트 앞에 위치하는 아이콘 태그 클래스명',
       disabled: true, // Boolean - 사용여부
+      isShowMenu: true, // Boolean - 항목 클릭시에도 메뉴 유지
       click: () => { ... }, // 클릭 시 발생하는 메소드
     },
     { ... },
