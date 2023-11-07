@@ -574,8 +574,9 @@ export const contextMenuEvent = (params) => {
     contextInfo,
     stores,
     selectInfo,
+    useGridSetting,
+    columnSettingInfo,
     setColumnHidden,
-    useColumnSetting,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -609,7 +610,7 @@ export const contextMenuEvent = (params) => {
         {
           text: 'Hide',
           iconClass: 'ev-icon-visibility-off',
-          disabled: !useColumnSetting.value || stores.orderedColumns.length === 1,
+          disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
           click: () => setColumnHidden(column.field),
         },
       ];
@@ -638,10 +639,36 @@ export const contextMenuEvent = (params) => {
       emit('update:selected', []);
     }
   };
+  /**
+   * 상단 우측의 Grid 옵션에 대한 Contextmenu 를 생성한다.
+   *
+   * @param {object} event - 이벤트 객체
+   */
+  const onGridSettingContextMenu = (e) => {
+    const columnListMenu = {
+      text: 'Column List',
+      isShowMenu: true,
+      click: () => {
+        columnSettingInfo.isShowColumnSetting = true;
+        contextInfo.isShowMenuOnClick = true;
+      },
+    };
+
+    if (contextInfo.customGridSettingContextMenu.length) {
+      contextInfo.gridSettingContextMenuItems = [
+        ...contextInfo.customGridSettingContextMenu,
+        columnListMenu,
+      ];
+    } else {
+      contextInfo.gridSettingContextMenuItems = [columnListMenu];
+    }
+    contextInfo.gridSettingMenu.show(e);
+  };
   return {
     setContextMenu,
     onContextMenu,
     onColumnContextMenu,
+    onGridSettingContextMenu,
   };
 };
 

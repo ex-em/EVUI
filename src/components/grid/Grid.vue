@@ -1,7 +1,7 @@
 <template>
   <div
-    v-if="$slots.toolbar || useColumnSetting"
-    ref="toolbarWrapper"
+    v-if="$slots.toolbar || useGridSetting"
+    ref="toolbarRef"
     class="toolbar-wrapper"
     :style="`width: ${gridWidth};`"
   >
@@ -145,9 +145,9 @@
           </div>
         </div>
         <grid-option-button
-          v-if="useColumnSetting"
-          class="column-setting__icon"
-          @click="setColumnSetting"
+          v-if="useGridSetting"
+          class="grid-setting__icon"
+          @click="setGridSetting($event)"
         />
         <slot
           name="toolbar"
@@ -155,12 +155,6 @@
         />
       </template>
     </toolbar>
-    <column-setting
-      v-model:is-show="isShowColumnSetting"
-      :columns="$props.columns"
-      :hidden-column="hiddenColumn"
-      @apply-column="onApplyColumn"
-    />
   </div>
   <div
     ref="grid-wrapper"
@@ -474,6 +468,11 @@
           ref="columnMenu"
           :items="columnMenuItems"
         />
+        <ev-context-menu
+          ref="gridSettingMenu"
+          :items="gridSettingContextMenuItems"
+          :is-show-menu-on-click="isShowMenuOnClick"
+        />
       </div>
       <!-- Resize Line -->
       <div
@@ -514,6 +513,15 @@
     :position="filterSettingPosition"
     @apply-filtering="onApplyFilter"
   />
+  <!-- Column Setting -->
+  <column-setting
+    v-model:is-show="isShowColumnSetting"
+    v-model:is-show-menu-on-click="isShowMenuOnClick"
+    :columns="$props.columns"
+    :hidden-column="hiddenColumn"
+    :position="columnSettingPosition"
+    @apply-column="onApplyColumn"
+  />
 </template>
 
 <script>
@@ -527,7 +535,6 @@ import {
   onActivated,
   nextTick,
   ref,
-  provide,
   onBeforeMount, onUnmounted,
 } from 'vue';
 import { clickoutside } from '@/directives/clickoutside';
@@ -620,9 +627,9 @@ export default {
       getColumnIndex,
       setPixelUnit,
     } = commonFunctions();
-    const toolbarWrapper = ref(null);
+    const toolbarRef = ref(null);
+    const useGridSetting = computed(() => (props.option?.useGridSetting?.use || false));
     const showHeader = computed(() => (props.option.showHeader ?? true));
-    const useColumnSetting = computed(() => (props.option?.useColumnSetting || false));
     const useSummary = computed(() => (props.option?.useSummary || false));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
@@ -654,6 +661,11 @@ export default {
       isFilteringColumn: false, // hide된 컬럼이 있는지
       visibleColumnIdx: [], // 보여지는 컬럼의 인덱스 목록
       hiddenColumn: '',
+      columnSettingPosition: {
+        top: 0,
+        left: 0,
+        columnListMenuWidth: 0,
+      },
     });
     const stores = reactive({
       viewStore: [],
@@ -726,6 +738,12 @@ export default {
       columnMenu: null,
       columnMenuItems: [],
       customContextMenu: props.option.customContextMenu || [],
+      gridSettingMenu: null,
+      gridSettingContextMenuItems: [],
+      customGridSettingContextMenu: computed(
+        () => props.option?.useGridSetting?.customContextMenu || [],
+      ),
+      isShowMenuOnClick: false,
     });
     const resizeInfo = reactive({
       minWidth: 80,
@@ -839,13 +857,14 @@ export default {
     });
 
     const {
-      setColumnSetting,
+      setPositionColumnSetting,
       initColumnSettingInfo,
       onApplyColumn,
       setColumnHidden,
     } = columnSettingEvent({
       stores,
       columnSettingInfo,
+      contextInfo,
       onSearch,
       onResize,
     });
@@ -854,14 +873,16 @@ export default {
       setContextMenu,
       onContextMenu,
       onColumnContextMenu,
+      onGridSettingContextMenu,
     } = contextMenuEvent({
       contextInfo,
       stores,
       selectInfo,
-      onSort,
-      setColumnHidden,
-      useColumnSetting,
+      useGridSetting,
       filterInfo,
+      columnSettingInfo,
+      setColumnHidden,
+      onSort,
     });
 
     const {
@@ -875,7 +896,17 @@ export default {
       onDrop,
     } = dragEvent({ stores });
 
-    provide('toolbarWrapper', toolbarWrapper);
+    const setGridSetting = (e) => {
+      contextInfo.gridSettingContextMenuItems.length = 0;
+      if (
+        contextInfo.customGridSettingContextMenu.length
+        || props.option?.useGridSetting?.mode === 'menu'
+      ) {
+        onGridSettingContextMenu(e);
+      } else {
+        columnSettingInfo.isShowColumnSetting = true;
+      }
+    };
 
     const onMouseWheel = (e) => {
       if (e.type === 'wheel') {
@@ -885,9 +916,11 @@ export default {
       && !e.target.offsetParent?.classList?.contains('ev-select-dropbox')
       && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
       && !e.target.offsetParent?.classList?.contains('ev-text-field-wrapper')) {
-        contextInfo.columnMenu?.hide(e);
-        columnSettingInfo.isShowColumnSetting = false;
         filterInfo.isShowFilterSetting = false;
+        columnSettingInfo.isShowColumnSetting = false;
+        contextInfo.isShowMenuOnClick = false;
+        contextInfo.columnMenu?.hide(e);
+        contextInfo.gridSettingMenu?.hide();
       }
     };
 
@@ -909,6 +942,14 @@ export default {
 
     onUpdated(() => {
       filteringItemsWidth.value = elementInfo['grid-wrapper']?.offsetWidth / 1.5 || 0;
+    });
+
+    watch(() => columnSettingInfo.isShowColumnSetting, (isShowColumnSetting) => {
+      if (!isShowColumnSetting) {
+        contextInfo.gridSettingMenu?.hide();
+        return;
+      }
+      setPositionColumnSetting(toolbarRef.value);
     });
 
     watch(
@@ -1224,8 +1265,8 @@ export default {
       borderStyle,
       highlightIdx,
       useSummary,
-      useColumnSetting,
-      toolbarWrapper,
+      useGridSetting,
+      toolbarRef,
       stores,
       ...toRefs(elementInfo),
       ...toRefs(stores),
@@ -1260,7 +1301,7 @@ export default {
       setContextMenu,
       onContextMenu,
       onSearch,
-      setColumnSetting,
+      setGridSetting,
       onApplyColumn,
       onColumnContextMenu,
       // filtering

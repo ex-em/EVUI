@@ -899,9 +899,10 @@ export const contextMenuEvent = (params) => {
     stores,
     selectInfo,
     onSort,
-    setColumnHidden,
-    useColumnSetting,
     filterInfo,
+    useGridSetting,
+    columnSettingInfo,
+    setColumnHidden,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -1006,16 +1007,43 @@ export const contextMenuEvent = (params) => {
         {
           text: 'Hide',
           iconClass: 'ev-icon-visibility-off',
-          disabled: !useColumnSetting.value || stores.orderedColumns.length === 1,
+          disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
           click: () => setColumnHidden(column.field),
         },
       ];
     }
   };
+  /**
+   * 상단 우측의 Grid 옵션에 대한 Contextmenu 를 생성한다.
+   *
+   * @param {object} event - 이벤트 객체
+   */
+  const onGridSettingContextMenu = (e) => {
+    const columnListMenu = {
+      text: 'Column List',
+      isShowMenu: true,
+      click: () => {
+        columnSettingInfo.isShowColumnSetting = true;
+        contextInfo.isShowMenuOnClick = true;
+      },
+    };
+
+    if (contextInfo.customGridSettingContextMenu.length) {
+      contextInfo.gridSettingContextMenuItems = [
+        ...contextInfo.customGridSettingContextMenu,
+        columnListMenu,
+      ];
+    } else {
+      contextInfo.gridSettingContextMenuItems = [columnListMenu];
+    }
+    contextInfo.gridSettingMenu.show(e);
+  };
+
   return {
     setContextMenu,
     onContextMenu,
     onColumnContextMenu,
+    onGridSettingContextMenu,
   };
 };
 
@@ -1134,12 +1162,39 @@ export const columnSettingEvent = (params) => {
   const {
     stores,
     columnSettingInfo,
+    contextInfo,
     onSearch,
     onResize,
   } = params;
-  const setColumnSetting = () => {
-    columnSettingInfo.isShowColumnSetting = true;
+
+  const setPositionColumnSetting = (toolbarRef) => {
+    if (!columnSettingInfo.isShowColumnSetting) {
+      return;
+    }
+    columnSettingInfo.columnSettingPosition.columnListMenuWidth = 0;
+
+    if (
+      props.option?.useGridSetting?.use === 'menu'
+      || contextInfo.gridSettingContextMenuItems.length
+    ) {
+      // 컨텍스트 메뉴 형태인 경우
+      const columnListMenu = contextInfo.gridSettingContextMenuItems.length - 1;
+      const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0]
+        .children[columnListMenu].getBoundingClientRect();
+
+      columnSettingInfo.columnSettingPosition.columnListMenuWidth = columnListMenuRect.width;
+      columnSettingInfo.columnSettingPosition.top = columnListMenuRect.top;
+      columnSettingInfo.columnSettingPosition.left = columnListMenuRect.right;
+    } else {
+      // 컬럼 리스트만 있는 경우
+      const toolbarRefDivRect = toolbarRef?.getBoundingClientRect();
+      const toolbarHeight = toolbarRefDivRect?.height;
+
+      columnSettingInfo.columnSettingPosition.top = toolbarRefDivRect?.top + toolbarHeight;
+      columnSettingInfo.columnSettingPosition.left = toolbarRefDivRect?.right;
+    }
   };
+
   const initColumnSettingInfo = () => {
     stores.filteredColumns.length = 0;
     columnSettingInfo.isShowColumnSetting = false;
@@ -1195,7 +1250,12 @@ export const columnSettingEvent = (params) => {
     setFilteringColumn();
   };
 
-  return { setColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden };
+  return {
+    setPositionColumnSetting,
+    initColumnSettingInfo,
+    onApplyColumn,
+    setColumnHidden,
+  };
 };
 
 export const dragEvent = ({ stores }) => {

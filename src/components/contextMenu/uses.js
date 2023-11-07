@@ -29,6 +29,8 @@ export const useModel = () => {
 };
 
 export const usePosition = () => {
+  const { props } = getCurrentInstance();
+  const isShowMenuOnClick = computed(() => props.isShowMenuOnClick);
   const isShow = ref(false);
   const rootMenuList = ref(null);
   const menuStyle = reactive({
@@ -84,6 +86,9 @@ export const usePosition = () => {
    */
   const hide = async () => {
     await nextTick();
+    if (isShowMenuOnClick.value) {
+      return;
+    }
     isShow.value = false;
   };
 
@@ -196,6 +201,16 @@ export const useMenuList = () => {
     }
   };
 
+  const handleItemClick = (item) => {
+    if (item.click && !item.disabled) {
+      item.click(item);
+    }
+
+    if (!item.isShowMenu) {
+      hideAll(item.children);
+    }
+  };
+
   return {
     computedIsShow,
     isExistChild,
@@ -203,6 +218,7 @@ export const useMenuList = () => {
     childMenu,
     menuStyle,
     childrenItems,
+    handleItemClick,
     mouseenterLi,
     hideAll,
   };
