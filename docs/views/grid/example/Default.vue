@@ -12,7 +12,11 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useColumnSetting: useColumnSettingMV,
+        useGridSetting: {
+          use: useGridSettingMV,
+          mode: gridSettingModeMV,
+          customContextMenu: gridSettingMenuItems,
+        },
         useFilter: useFilterMV,
         customContextMenu: menuItems,
         useCheckbox: {
@@ -80,12 +84,33 @@
         <ev-toggle
           v-model="isSelectionMultiple"
         />
-        <span class="badge yellow">
-          Use Column Setting
-        </span>
-        <ev-toggle
-          v-model="useColumnSettingMV"
-        />
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
+            Use Grid Setting
+          </span>
+          <ev-toggle
+            v-model="useGridSettingMV"
+          />
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">
+            Grid Setting Mode
+          </span>
+          <ev-radio-group
+            v-model="gridSettingModeMV"
+            type="button"
+            @change="changeGridSettingMode"
+          >
+            <ev-radio label="default" />
+            <ev-radio label="menu" />
+          </ev-radio-group>
+          <span class="badge">
+            Mode
+          </span>
+          {{ gridSettingModeMV }}
+        </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
@@ -224,7 +249,6 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(45);
     const columnWidthMV = ref(80);
-    const useColumnSettingMV = ref(true);
     const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
@@ -234,6 +258,9 @@ export default {
     const DbClickedRowsMV = ref();
     const useSelectionMV = ref(true);
     const isSelectionMultiple = ref(false);
+    const useGridSettingMV = ref(true);
+    const gridSettingModeMV = ref('default');
+    const gridSettingMenuItems = ref([]);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -288,6 +315,19 @@ export default {
       });
       clickedRowMV.value = clickedRow;
     };
+    const changeGridSettingMode = (mode) => {
+      gridSettingModeMV.value = mode;
+      if (mode === 'menu') {
+        gridSettingMenuItems.value = [
+          {
+            text: 'Menu1',
+            click: param => console.log(`[Menu1]: ${param}`),
+          },
+        ];
+      } else {
+        gridSettingMenuItems.value = [];
+      }
+    };
     const getData = (count, startIndex) => {
       const temp = [];
       const roles = ['Common', 'Admin'];
@@ -336,7 +376,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useColumnSettingMV,
       useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
@@ -351,12 +390,16 @@ export default {
       pageInfo,
       isSelectionMultiple,
       useSelectionMV,
+      useGridSettingMV,
+      gridSettingModeMV,
+      gridSettingMenuItems,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
       resetBorderStyle,
       onRequestData,
+      changeGridSettingMode,
     };
   },
 };

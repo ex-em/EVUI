@@ -62,7 +62,10 @@
 |  |  | order | Pagination 위치 | 'center', 'left', 'right' |
 |  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
 |  | useSummary | false | 하단에 summary row 가 표시 된다. | Boolean |
-|  | useColumnSetting | false | 컬럼 목록 설정 여부  | Boolean |
+|  | useGridSetting | {} | 그리드 옵션 설정  | |
+|  |  | use | 그리드 옵션 설정 사용 여부 | Boolean |
+|  |  | mode | 그리드 옵션 모드 선택 설정 | 'default', 'menu' |
+|  |  | customContextMenu | mode가 'menu'인 경우, 그리드옵션 클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |
