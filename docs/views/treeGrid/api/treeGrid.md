@@ -9,9 +9,11 @@
     :columns="columns"
     :rows="[
       {
-        tableData,
+        checked: false,
+        selected: false,
+        show: false,
         expand: false,
-        disabled: false,
+        uncheckable: false,
         children: [{ ... }]
       }
       ...
@@ -37,8 +39,11 @@
 | columns | Array            | []                 | 컬럼 리스트                                  |                          |
 | rows | Array            | []                 | Tree Data 리스트                           |                          |
 |  | {}    |    | Tree Grid의 각 Row 데이터에 연결된 속성 | |
-|  |    | expand   | 부모 Row 데이터에 대한 확장 여부  | true, false |
-|  |    | disabled   | Row 데이터의 체크박스에 대한 비활성화 처리  | true, false |
+|  |    | checked   | Row 데이터 체크 여부  | true, false |
+|  |    | selected   | Row 데이터 선택 여부  | true, false |
+|  |    | show  | Row 데이터 표시 여부  | true, false |
+|  |    | expand   | Row 데이터 확장 여부  | true, false |
+|  |    | uncheckable   | Row 데이터의 체크박스에 대한 비활성화 처리  | true, false |
 |  |    | children   | 자식 데이터  | Array |
 | width | String, Number   | '100%'             | 그리드 넓이                                  | '50%', '50px', 50        |
 | height | String, Number   | '100%'             | 그리드 높이                                  | '50%', '50px', 50        |

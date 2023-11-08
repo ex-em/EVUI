@@ -63,14 +63,14 @@ export const commonFunctions = (params) => {
   };
   const checkHeader = (rows) => {
     checkInfo.isHeaderChecked = !!rows.length && rows.every(row => row.checked);
-    const disabledList = rows.filter(row => row.disabled);
-    if (disabledList.length) {
+    const uncheckableList = rows.filter(row => row.uncheckable);
+    if (uncheckableList.length) {
       const checkedList = rows.filter(row => row.checked);
-      const isAllDisabled = rows.every(row => disabledList.includes(row));
+      const isAllUncheckable = rows.every(row => uncheckableList.includes(row));
 
-      checkInfo.isHeaderChecked = !isAllDisabled
-        && (disabledList.length + checkedList.length === rows.length);
-      checkInfo.isHeaderDisabled = isAllDisabled;
+      checkInfo.isHeaderChecked = !isAllUncheckable
+        && (uncheckableList.length + checkedList.length === rows.length);
+      checkInfo.isHeaderUncheckable = isAllUncheckable;
     }
   };
   return {
@@ -450,14 +450,14 @@ export const checkEvent = (params) => {
     if (node.hasChild) {
       node.children.forEach((children) => {
         const childNode = children;
-        if (node.checked && !childNode.checked && !childNode.disabled) {
+        if (node.checked && !childNode.checked && !childNode.uncheckable) {
           checkInfo.checkedRows.push(childNode);
         }
         if (!node.checked) {
           checkInfo.checkedRows = checkInfo.checkedRows
             .filter(checked => checked.index !== childNode.index);
         }
-        childNode.checked = node.checked && !childNode.disabled;
+        childNode.checked = node.checked && !childNode.uncheckable;
 
         if (childNode.hasChild) {
           onCheckChildren(childNode);
@@ -469,11 +469,11 @@ export const checkEvent = (params) => {
     const parentNode = node.parent;
     if (parentNode) {
       const isCheck = parentNode.children.every(n => n.checked);
-      parentNode.checked = isCheck && !parentNode.disabled;
-      const disabledList = parentNode.children.filter(n => n.disabled);
-      if (disabledList.length) {
+      parentNode.checked = isCheck && !parentNode.uncheckable;
+      const uncheckableList = parentNode.children.filter(n => n.uncheckable);
+      if (uncheckableList.length) {
         const checkedList = parentNode.children.filter(n => n.checked);
-        if (disabledList.length + checkedList.length === parentNode.children.length) {
+        if (uncheckableList.length + checkedList.length === parentNode.children.length) {
           parentNode.checked = true;
         }
       }
@@ -554,7 +554,7 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      row.checked = status && !row.disabled;
+      row.checked = status && !row.uncheckable;
       if (row.checked) {
         if (!checkInfo.checkedRows.find(checked => checked.index === row.index)) {
           checkInfo.checkedRows.push(row);
@@ -664,7 +664,7 @@ export const treeEvent = (params) => {
     }
 
     function setNodeData(nodeInfo) {
-      const { node, level, isShow, parent, isDisabled } = nodeInfo;
+      const { node, level, isShow, parent, uncheckable } = nodeInfo;
       if (node !== null && typeof node === 'object') {
         node.index = nodeIndex++;
         node.level = level;
@@ -689,8 +689,8 @@ export const treeEvent = (params) => {
           node.isFilter = false;
         }
 
-        if (!Object.hasOwnProperty.call(node, 'disabled')) {
-          node.disabled = isDisabled;
+        if (!Object.hasOwnProperty.call(node, 'uncheckable')) {
+          node.uncheckable = uncheckable;
         }
 
         if (!Object.hasOwnProperty.call(node, 'data')) {
@@ -710,7 +710,7 @@ export const treeEvent = (params) => {
               level: level + 1,
               isShow: node.show && node.expand,
               parent: node,
-              isDisabled: node.disabled,
+              uncheckable: node.uncheckable,
             }),
           );
         }
@@ -722,7 +722,7 @@ export const treeEvent = (params) => {
         level: 0,
         isShow: true,
         parent: undefined,
-        isDisabled: false,
+        uncheckable: false,
       });
     });
     return nodeList;

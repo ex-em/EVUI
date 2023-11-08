@@ -485,7 +485,7 @@ export const checkEvent = (params) => {
       }
 
       const isAllChecked = store
-        .filter(rowData => !props.uncheckableRows.includes(rowData[ROW_DATA_INDEX]))
+        .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
         .every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
@@ -514,7 +514,7 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      const isDisabledCheckbox = props.uncheckableRows.includes(row[ROW_DATA_INDEX]);
+      const isDisabledCheckbox = props.uncheckable.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !isDisabledCheckbox) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
@@ -1051,7 +1051,7 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
-        const isDisabledCheckbox = props.uncheckableRows.includes(row);
+        const isDisabledCheckbox = props.uncheckable.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
@@ -1062,7 +1062,7 @@ export const storeEvent = (params) => {
         store.push([idx, checked, row, selected, isDisabledCheckbox]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
-      checkInfo.isHeaderDisabled = rows.every(row => props.uncheckableRows.includes(row));
+      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row));
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

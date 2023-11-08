@@ -415,13 +415,13 @@ export default {
             id: 'Exem 3',
             date: '2016-05-02',
             name: '3',
-            disabled: true,
+            uncheckable: true,
           }, {
             id: 'Exem 4',
             date: '2016-05-02',
             name: '4',
             expand: false,
-            disabled: true,
+            uncheckable: true,
             children: [{
               id: 'Exem 5',
               date: '2016-05-02',

@@ -16,7 +16,7 @@
     >
       <ev-checkbox
         v-model="node.checked"
-        :disabled="node.disabled"
+        :disabled="node.uncheckable"
         class="row-checkbox-input"
         @change="onCheck($event, node)"
       />

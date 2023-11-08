@@ -210,7 +210,7 @@
             <ev-checkbox
               v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
               v-model="isHeaderChecked"
-              :disabled="isHeaderDisabled"
+              :disabled="isHeaderUncheckable"
               @change="onCheckAll"
             />
           </li>
@@ -595,7 +595,7 @@ export default {
       type: [Array],
       default: () => [],
     },
-    uncheckableRows: {
+    uncheckable: {
       type: [Array],
       default: () => [],
     },
@@ -701,7 +701,7 @@ export default {
     const checkInfo = reactive({
       prevCheckedRow: [],
       isHeaderChecked: false,
-      isHeaderDisabled: false,
+      isHeaderUncheckable: false,
       checkedRows: props.checked,
       useCheckbox: computed(() => (props.option.useCheckbox || {})),
     });
@@ -954,7 +954,7 @@ export default {
         onResize();
       }, { deep: true },
     );
-    watch(() => props.uncheckableRows,
+    watch(() => props.uncheckable,
       () => {
       setStore(props.rows);
       }, { deep: true });
