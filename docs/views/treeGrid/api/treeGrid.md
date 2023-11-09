@@ -90,7 +90,7 @@
 | 이름              | 타입      | 설명                                                 | 종류                                               | 필수 |
 |-----------------|---------|----------------------------------------------------|--------------------------------------------------| --- |
 | caption         | String  | 컬럼명                                                | ex) '인스턴스명'                                      | Y |
-| field           | String  | 필드명                                                | ex) 'instance_name'                              | Y |
+| field  | String  | 필드명 <br> ('index', 'level', 'parent', 'children', 'checked', 'selected', 'expand', 'show', 'isFilter', 'uncheckable'와 같은 필드명은  Tree Option과 관련된 속성 명칭으로 중복 사용을 피하도록 권고함) | ex) 'instance_name'  | Y |
 | type            | String  | 데이터 타입                                             | 'string', 'number', 'stringNumber', 'float', 'boolean' | Y |
 | hide            | Boolean | 컬럼 숨김 여부                                           | Boolean                                          | N |
 | hiddenDisplay | Boolean | 컬럼 목록 체크 여부 | Boolean | N |
