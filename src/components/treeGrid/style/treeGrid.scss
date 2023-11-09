@@ -70,6 +70,16 @@
       color: evThemed('font-color-base');
     }
   }
+  &.checkbox-all {
+    padding: 0;
+    .ev-checkbox {
+      display: inline-flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
 .column-name {

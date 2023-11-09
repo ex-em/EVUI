@@ -64,6 +64,17 @@
   //&:nth-last-child(1) {
   //  border-right: 0;
   //}
+  &.checkbox-all {
+    padding: 0;
+    .ev-checkbox {
+      display: inline-flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   .column-sort__icon {
     position: absolute;
     top: 50%;

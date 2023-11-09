@@ -200,6 +200,7 @@
             v-if="useCheckbox.use"
             :class="{
               'column': true,
+              'checkbox-all': true,
               'non-border': !!borderStyle,
             }"
             :style="{
