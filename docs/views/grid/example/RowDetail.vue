@@ -84,11 +84,7 @@ export default {
         ]);
       }
     };
-    const onExpandRow = (a, b, c, d) => {
-      console.log(a);
-      console.log(b);
-      console.log(c);
-      console.log(d);
+    const onExpandRow = () => {
       let result = '';
       expandedRowsMV.value.forEach((row) => {
         result += JSON.stringify(row);
