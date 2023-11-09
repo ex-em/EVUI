@@ -213,6 +213,17 @@
               @change="onCheckAll"
             />
           </li>
+          <li
+            v-if="useRowDetail"
+            :class="{
+              'column': true,
+              'non-border': !!borderStyle,
+            }"
+            :style="{
+              width: `${minWidth}px`,
+              'border-right': '1px solid #CFCFCF'
+            }"
+          />
           <!-- Column List -->
           <template
             v-for="(column, index) in orderedColumns"
@@ -383,6 +394,28 @@
                     @change="onCheck($event, row)"
                   />
                 </td>
+                <!-- Row Detail toggle -->
+                <td
+                  v-if="useRowDetail"
+                  :class="{
+                    cell: true,
+                    'row-detail-toggle': true,
+                    'non-border': !!borderStyle,
+                    'row-detail-toggle--expanded': row[4],
+                  }"
+                  :style="{
+                    width: `${minWidth}px`,
+                    height: `${rowHeight}px`,
+                    'border-right': '1px solid #CFCFCF',
+                  }"
+                >
+                  <ev-icon
+                    v-model="row[4]"
+                    icon="ev-icon-s-play"
+                    class="row-detail-toggle-icon"
+                    @click.stop="onExpanded($event, row)"
+                  />
+                </td>
                 <!-- Cell -->
                 <template
                   v-for="(column, cellIndex) in orderedColumns"
@@ -457,11 +490,15 @@
                   </template>
                 </td>
               </tr>
-              <slot
-                name="rowDetail"
-                :item="{ row }"
-              />
-            </template>
+              <tr
+                v-if="useRowDetail && $slots?.rowDetail && row[4]"
+              >
+                <slot
+                  name="rowDetail"
+                  :item="{ row }"
+                />
+              </tr>
+             </template>
             <tr v-if="!viewStore.length">
               <td class="is-empty">No records</td>
             </tr>
@@ -552,6 +589,7 @@ import {
   resizeEvent,
   clickEvent,
   checkEvent,
+  expandEvent,
   sortEvent,
   filterEvent,
   contextMenuEvent,
@@ -600,6 +638,10 @@ export default {
       type: [Array],
       default: () => [],
     },
+    expanded: {
+      type: [Array],
+      default: () => [],
+    },
     option: {
       type: Object,
       default: () => ({}),
@@ -614,12 +656,15 @@ export default {
     'check-all': null,
     'page-change': null,
     'sort-column': null,
+    'expand-row': null,
+    'update:expanded': null,
   },
-  setup(props, { slots }) {
+  setup(props) {
     // const ROW_INDEX = 0;
     const ROW_CHECK_INDEX = 1;
     const ROW_DATA_INDEX = 2;
     const ROW_SELECT_INDEX = 3;
+    const ROW_EXPAND_INDEX = 4;
     const {
       isRenderer,
       getComponentName,
@@ -705,6 +750,10 @@ export default {
       checkedRows: props.checked,
       useCheckbox: computed(() => (props.option.useCheckbox || {})),
     });
+    const expandedInfo = reactive({
+      expandedRows: props.expanded,
+      useRowDetail: computed(() => props.option?.rowDetail?.use ?? false),
+    });
     const scrollInfo = reactive({
       lastScroll: {
         top: 0,
@@ -735,7 +784,7 @@ export default {
       customContextMenu: props.option.customContextMenu || [],
     });
     const resizeInfo = reactive({
-      minWidth: 80,
+      minWidth: 40,
       rendererMinWidth: 80,
       iconWidth: 42,
       showResizeLine: false,
@@ -759,6 +808,12 @@ export default {
       stores.store.forEach((row) => {
         row[ROW_SELECT_INDEX] = false;
       });
+    };
+    const clearExpandedInfo = () => {
+      stores.store.forEach((row) => {
+        row[ROW_EXPAND_INDEX] = false;
+      });
+      expandedInfo.expandedRows = [];
     };
     const {
       getPagingData,
@@ -784,7 +839,7 @@ export default {
       resizeInfo,
       pageInfo,
       summaryScroll,
-      useRowDetail: slots?.rowDetail,
+      expandedInfo,
       getPagingData,
       updatePagingInfo,
     });
@@ -793,6 +848,13 @@ export default {
       onCheck,
       onCheckAll,
     } = checkEvent({ checkInfo, stores, pageInfo, getPagingData, updatePagingInfo });
+
+    const {
+      onExpanded,
+    } = expandEvent({
+      expandedInfo,
+      stores,
+    });
 
     const {
       onSort,
@@ -824,6 +886,7 @@ export default {
       sortInfo,
       elementInfo,
       filterInfo,
+      expandedInfo,
       setSort,
       updateVScroll,
       setFilter,
@@ -838,6 +901,7 @@ export default {
       resizeInfo,
       elementInfo,
       checkInfo,
+      expandedInfo,
       stores,
       filterInfo,
       isRenderer,
@@ -1041,8 +1105,17 @@ export default {
       },
     );
     watch(
+      () => props.expanded.length,
+      (expendedSize) => {
+        if (!expendedSize) {
+          clearExpandedInfo();
+        }
+      },
+    );
+    watch(
       () => [props.option.columnWidth, resizeInfo.gridWidth],
-      () => {
+      async () => {
+        await nextTick();
         resizeInfo.columnWidth = props.option.columnWidth;
         const gridWrapper = elementInfo['grid-wrapper'];
         gridWrapper.style.width = resizeInfo.gridWidth;
@@ -1225,7 +1298,13 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
+    const getWidth = (w) => {
+      console.log(w);
+      return w;
+    };
+
     return {
+      getWidth,
       summaryScroll,
       showHeader,
       stripeStyle,
@@ -1243,6 +1322,7 @@ export default {
       ...toRefs(resizeInfo),
       ...toRefs(selectInfo),
       ...toRefs(checkInfo),
+      ...toRefs(expandedInfo),
       ...toRefs(sortInfo),
       ...toRefs(contextInfo),
       ...toRefs(columnSettingInfo),
@@ -1262,6 +1342,7 @@ export default {
       onRowDblClick,
       onCheck,
       onCheckAll,
+      onExpanded,
       onSort,
       setSort,
       setStore,

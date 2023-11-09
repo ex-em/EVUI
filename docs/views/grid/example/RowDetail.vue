@@ -1,44 +1,48 @@
 <template>
   <div class="case">
     <ev-grid
+      v-model:expanded="expandedRowsMV"
       :columns="columns"
       :rows="rows"
       :height="400"
       :option="{
         adjust: true,
+        rowDetail: {
+          use: useRowDetail,
+        }
       }"
+      @expand-row="onExpandRow"
     >
-      <!-- cell renderer slot -->
-      <template #toggle="{ item }">
-        <div
-          class="toggle-wrapper"
-          @click="expendedRowDetail(item.row)"
-        >
-          <ev-icon
-            icon="ev-icon-s-play"
-            :class="{
-              toggle: true,
-              expended: item.row[2][0],
-            }"
-          />
-        </div>
-      </template>
-
-      <!-- expended row slot -->
       <template #rowDetail="{ item }">
-        <div class="row-detail-wrapper">
-          <row-detail-content
-            v-if="item.row[2][0]"
-            :data="item.row[2]"
-          />
-        </div>
+        <row-detail-content
+          :data="item.row[2]"
+        />
       </template>
     </ev-grid>
+    <div class="description">
+      <div class="form-rows">
+        <span class="badge yellow">
+          Use Row Detail
+        </span>
+        <ev-toggle
+            v-model="useRowDetail"
+        />
+      </div>
+      <div class="form-row">
+        <span class="badge yellow">
+          Expanded Row
+        </span>
+        <ev-text-field
+            v-model="expandedRowText"
+            type="textarea"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import RowDetailContent from './partitals/RowDetailContent.vue';
 
 export default {
@@ -47,9 +51,6 @@ export default {
   },
   setup() {
     const columns = [
-      {
-        caption: '', field: 'toggle', type: 'boolean', width: 80,
-      },
       {
         caption: 'Name', field: 'name', type: 'string',
       },
@@ -67,14 +68,14 @@ export default {
       },
     ];
     const rows = ref([]);
-
-
+    const useRowDetail = ref(true);
+    const expandedRowsMV = ref([]);
+    const expandedRowText = ref('');
     const pushData = () => {
       const startIdx = rows.value.length + 1;
 
       for (let ix = startIdx; ix < startIdx + 30; ix++) {
         rows.value.push([
-          (ix === 1),
           `name-${ix}`,
           `column1-${ix}`,
           `column2-${ix}`,
@@ -83,36 +84,51 @@ export default {
         ]);
       }
     };
-    const expendedRowDetail = (row) => {
-      const idx = row[0];
-      rows.value[idx][0] = !rows.value[idx][0];
+    const onExpandRow = (a, b, c, d) => {
+      console.log(a);
+      console.log(b);
+      console.log(c);
+      console.log(d);
+      let result = '';
+      expandedRowsMV.value.forEach((row) => {
+        result += JSON.stringify(row);
+      });
+      expandedRowText.value = result;
     };
 
     pushData();
 
+    watch(useRowDetail, () => {
+      onExpandRow();
+    });
+
     return {
       columns,
       rows,
-      expendedRowDetail,
+      useRowDetail,
+      expandedRowsMV,
+      expandedRowText,
+      onExpandRow,
     };
   },
 };
 </script>
 
 <style lang="scss">
-@import '../../../style/index.scss';
-
-.toggle-wrapper {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-}
-.toggle {
-  transition: transform $animate-fast;
-  &.expended {
-    transform: rotate(90deg);
+.description {
+  .form-rows {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .ev-text-field, .ev-input-number, .ev-select {
+    width: 80%;
+  }
+  .badge {
+    margin-bottom: 2px;
+    margin-right: 5px !important;
+  }
+  .ev-toggle {
+    margin-right: 10px;
   }
 }
 </style>

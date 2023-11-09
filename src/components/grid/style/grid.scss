@@ -183,9 +183,31 @@
       text-overflow: ellipsis;
     }
     &.row-checkbox {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
+      padding: 0;
+      .ev-checkbox {
+        display: inline-flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    &.row-detail-toggle {
+      padding: 0;
+      .row-detail-toggle-icon {
+        display: inline-flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform $animate-fast;
+      }
+      &--expanded {
+        .row-detail-toggle-icon {
+          transform: rotate(90deg);
+        }
+      }
     }
     &.render {
       overflow: initial;
