@@ -15,7 +15,6 @@
         columnWidth: columnWidthMV,
         useGridSetting: {
           use: useGridSettingMV,
-          mode: gridSettingModeMV,
           customContextMenu: gridSettingMenuItems,
         },
         useCheckbox: {
@@ -77,33 +76,12 @@
         <ev-toggle
           v-model="useSelection.multiple"
         />
-      </div>
-      <div class="form-rows">
-        <div class="form-row">
-          <span class="badge yellow">
+        <span class="badge yellow">
             Use Grid Setting
           </span>
-          <ev-toggle
-            v-model="useGridSettingMV"
-          />
-        </div>
-        <div class="form-row">
-          <span class="badge yellow">
-            Grid Setting Mode
-          </span>
-          <ev-radio-group
-            v-model="gridSettingModeMV"
-            type="button"
-            @change="changeGridSettingMode"
-          >
-            <ev-radio label="default" />
-            <ev-radio label="menu" />
-          </ev-radio-group>
-          <span class="badge">
-            Mode
-          </span>
-          {{ gridSettingModeMV }}
-        </div>
+        <ev-toggle
+          v-model="useGridSettingMV"
+        />
       </div>
       <div class="form-rows">
         <div class="form-row">
@@ -323,8 +301,12 @@ export default {
     const DbClickedRowsMV = ref();
     const expandColumnMV = ref(0);
     const useGridSettingMV = ref(true);
-    const gridSettingModeMV = ref('default');
-    const gridSettingMenuItems = ref([]);
+    const gridSettingMenuItems = ref([
+      {
+        text: 'Menu1',
+        click: param => console.log(`[Menu1]: ${param}`),
+      },
+    ]);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -407,19 +389,6 @@ export default {
     };
     const onClickButton = (e) => {
       console.log(`button component click: ${e}`);
-    };
-    const changeGridSettingMode = (mode) => {
-      gridSettingModeMV.value = mode;
-      if (mode === 'menu') {
-        gridSettingMenuItems.value = [
-          {
-          text: 'Menu1',
-          click: param => console.log(`[Menu1]: ${param}`),
-          },
-        ];
-      } else {
-        gridSettingMenuItems.value = [];
-      }
     };
     const changeMode = (mode) => {
       checkboxModeMV.value = mode;
@@ -581,7 +550,6 @@ export default {
       useSelection,
       expandColumnMV,
       useGridSettingMV,
-      gridSettingModeMV,
       gridSettingMenuItems,
       onClickCheckbox,
       onClickButton,
@@ -594,7 +562,6 @@ export default {
       resetDataIcon,
       onReset,
       changeExpandTreeColumn,
-      changeGridSettingMode,
     };
   },
 };

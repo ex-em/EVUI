@@ -14,7 +14,6 @@
         columnWidth: columnWidthMV,
         useGridSetting: {
           use: useGridSettingMV,
-          mode: gridSettingModeMV,
           customContextMenu: gridSettingMenuItems,
         },
         useFilter: useFilterMV,
@@ -84,33 +83,12 @@
         <ev-toggle
           v-model="isSelectionMultiple"
         />
-      </div>
-      <div class="form-rows">
-        <div class="form-row">
-          <span class="badge yellow">
+        <span class="badge yellow">
             Use Grid Setting
           </span>
-          <ev-toggle
-            v-model="useGridSettingMV"
-          />
-        </div>
-        <div class="form-row">
-          <span class="badge yellow">
-            Grid Setting Mode
-          </span>
-          <ev-radio-group
-            v-model="gridSettingModeMV"
-            type="button"
-            @change="changeGridSettingMode"
-          >
-            <ev-radio label="default" />
-            <ev-radio label="menu" />
-          </ev-radio-group>
-          <span class="badge">
-            Mode
-          </span>
-          {{ gridSettingModeMV }}
-        </div>
+        <ev-toggle
+          v-model="useGridSettingMV"
+        />
       </div>
       <div class="form-rows">
         <div class="form-row">
@@ -259,8 +237,12 @@ export default {
     const useSelectionMV = ref(true);
     const isSelectionMultiple = ref(false);
     const useGridSettingMV = ref(true);
-    const gridSettingModeMV = ref('default');
-    const gridSettingMenuItems = ref([]);
+    const gridSettingMenuItems = ref([
+      {
+        text: 'Menu1',
+        click: param => console.log(`[Menu1]: ${param}`),
+      },
+    ]);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -314,19 +296,6 @@ export default {
         clickedRow += JSON.stringify(row);
       });
       clickedRowMV.value = clickedRow;
-    };
-    const changeGridSettingMode = (mode) => {
-      gridSettingModeMV.value = mode;
-      if (mode === 'menu') {
-        gridSettingMenuItems.value = [
-          {
-            text: 'Menu1',
-            click: param => console.log(`[Menu1]: ${param}`),
-          },
-        ];
-      } else {
-        gridSettingMenuItems.value = [];
-      }
     };
     const getData = (count, startIndex) => {
       const temp = [];
@@ -391,7 +360,6 @@ export default {
       isSelectionMultiple,
       useSelectionMV,
       useGridSettingMV,
-      gridSettingModeMV,
       gridSettingMenuItems,
       changeMode,
       onCheckedRow,
@@ -399,7 +367,6 @@ export default {
       onClickRow,
       resetBorderStyle,
       onRequestData,
-      changeGridSettingMode,
     };
   },
 };

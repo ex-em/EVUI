@@ -65,8 +65,7 @@
 |  | useSummary       | false              | 하단에 summary row 가 표시 된다.                | Boolean                  |
 |  | useGridSetting | {} | 그리드 옵션 설정  | |
 |  |  | use | 그리드 옵션 설정 사용 여부 | Boolean |
-|  |  | mode | 그리드 옵션 모드 선택 설정 | 'default', 'menu' |
-|  |  | customContextMenu | mode가 'menu'인 경우, 그리드옵션 클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
+|  |  | customContextMenu | 그리드옵션 클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
 |  | expandIcon       | 'tree-expand-icon' | expand 상태인 노드의 아이콘                      | `ev-icon`                |
 |  | collapseIcon     | 'tree-expand-icon' | collapse 상태인 노드의 아이콘                    | `ev-icon`                |
 |  | parentIcon       | 'tree-parent-icon' | 자식 노드가 있는 노드의 아이콘                       | `ev-icon`, 'none'        |

@@ -1173,10 +1173,7 @@ export const columnSettingEvent = (params) => {
     }
     columnSettingInfo.columnSettingPosition.columnListMenuWidth = 0;
 
-    if (
-      props.option?.useGridSetting?.mode === 'menu'
-      || contextInfo.gridSettingContextMenuItems.length
-    ) {
+    if (contextInfo.gridSettingContextMenuItems.length) {
       // 컨텍스트 메뉴 형태인 경우
       const columnListMenu = contextInfo.gridSettingContextMenuItems.length - 1;
       const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0]

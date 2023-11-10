@@ -898,10 +898,7 @@ export default {
 
     const setGridSetting = (e) => {
       contextInfo.gridSettingContextMenuItems.length = 0;
-      if (
-        contextInfo.customGridSettingContextMenu.length
-        || props.option?.useGridSetting?.mode === 'menu'
-      ) {
+      if (contextInfo.customGridSettingContextMenu.length) {
         onGridSettingContextMenu(e);
       } else {
         columnSettingInfo.isShowColumnSetting = true;
