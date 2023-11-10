@@ -176,6 +176,11 @@
       }
     }
   }
+  .row-contextmenu {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .cell {
     display: inline-block;

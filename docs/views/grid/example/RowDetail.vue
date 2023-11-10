@@ -7,6 +7,7 @@
       :height="400"
       :option="{
         adjust: true,
+        customContextMenu: menuItems,
         rowDetail: {
           use: useRowDetail,
         }
@@ -33,8 +34,8 @@
           Expanded Row
         </span>
         <ev-text-field
-            v-model="expandedRowText"
-            type="textarea"
+          v-model="expandedRowText"
+          type="textarea"
         />
       </div>
     </div>
@@ -50,6 +51,15 @@ export default {
     RowDetailContent,
   },
   setup() {
+    const menuItems = ref([
+      {
+        text: 'Menu1',
+        click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
+      }, {
+        text: 'Menu2',
+        click: param => console.log('[Menu2]', param.contextmenuInfo),
+      },
+    ]);
     const columns = [
       {
         caption: 'Name', field: 'name', type: 'string',
@@ -99,6 +109,7 @@ export default {
     });
 
     return {
+      menuItems,
       columns,
       rows,
       useRowDetail,
