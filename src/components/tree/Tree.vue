@@ -14,7 +14,7 @@
       @show-context-menu="getContextMenuFlag"
       @contextmenu.prevent="showContextMenu"
     />
-    <div v-if="!treeNodeData.length">No data</div>
+    <div v-if="!treeNodeData.length">{{ emptyText }}</div>
     <ev-context-menu
       v-if="contextMenuItems.length"
       ref="contextMenu"
