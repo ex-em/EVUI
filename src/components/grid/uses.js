@@ -6,6 +6,7 @@ const ROW_INDEX = 0;
 const ROW_CHECK_INDEX = 1;
 const ROW_DATA_INDEX = 2;
 const ROW_SELECT_INDEX = 3;
+const ROW_EXPAND_INDEX = 4;
 
 export const commonFunctions = () => {
   const { props } = getCurrentInstance();
@@ -79,11 +80,12 @@ export const scrollEvent = (params) => {
     summaryScroll,
     getPagingData,
     updatePagingInfo,
+    expandedInfo,
   } = params;
   /**
    * 수직 스크롤의 위치 계산 후 적용한다.
    */
-  const updateVScroll = (isScroll) => {
+  const updateVScrollBase = (isScroll) => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
     if (bodyEl) {
@@ -116,6 +118,23 @@ export const scrollEvent = (params) => {
         pageInfo.startIndex = lastIndex;
         updatePagingInfo({ onScrollEnd: true });
       }
+    }
+  };
+
+  /**
+   *  rowDetail slot 시에는 가상 스크롤을 적용하지 않는다.
+   */
+  const updateVScroll = (isScroll) => {
+    if (expandedInfo.useRowDetail) {
+      let store = stores.store;
+      if (pageInfo.isClientPaging) {
+        store = getPagingData();
+      }
+      stores.viewStore = store;
+      scrollInfo.vScrollTopHeight = 0;
+      scrollInfo.vScrollBottomHeight = 0;
+    } else {
+      updateVScrollBase(isScroll);
     }
   };
   /**
@@ -162,6 +181,7 @@ export const resizeEvent = (params) => {
     resizeInfo,
     elementInfo,
     checkInfo,
+    expandedInfo,
     stores,
     isRenderer,
     updateVScroll,
@@ -199,6 +219,10 @@ export const resizeEvent = (params) => {
       }
 
       if (checkInfo.useCheckbox.use) {
+        elWidth -= resizeInfo.minWidth;
+      }
+
+      if (expandedInfo.useRowDetail) {
         elWidth -= resizeInfo.minWidth;
       }
 
@@ -524,6 +548,34 @@ export const checkEvent = (params) => {
     emit('check-all', event, checkInfo.checkedRows);
   };
   return { onCheck, onCheckAll };
+};
+
+export const expandEvent = (params) => {
+  const { expandedInfo } = params;
+  const { emit } = getCurrentInstance();
+
+  /**
+   * expand click 이벤트를 처리한다.
+   *
+   * @param {object} event - 이벤트 객체
+   * @param {array} row - row 데이터
+   */
+  const onExpanded = (event, row) => {
+    const data = row[ROW_DATA_INDEX];
+    const index = expandedInfo.expandedRows.indexOf(data);
+    if (index === -1) {
+      expandedInfo.expandedRows.push(data);
+    } else {
+      expandedInfo.expandedRows.splice(index, 1);
+    }
+    row[ROW_EXPAND_INDEX] = !row[ROW_EXPAND_INDEX];
+    emit('update:expanded', expandedInfo.expandedRows);
+    emit('expand-row', event, row[ROW_DATA_INDEX], row[ROW_EXPAND_INDEX], row[ROW_INDEX]);
+  };
+
+  return {
+    onExpanded,
+  };
 };
 
 export const sortEvent = (params) => {
@@ -1028,6 +1080,7 @@ export const storeEvent = (params) => {
     sortInfo,
     elementInfo,
     filterInfo,
+    expandedInfo,
     setSort,
     updateVScroll,
     setFilter,
@@ -1051,7 +1104,11 @@ export const storeEvent = (params) => {
         if (!checked) {
           hasUnChecked = true;
         }
-        store.push([idx, checked, row, selected]);
+        let expanded = false;
+        if (expandedInfo.useRowDetail) {
+          expanded = props.expanded.includes(row);
+        }
+        store.push([idx, checked, row, selected, expanded]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       stores.originStore = store;
