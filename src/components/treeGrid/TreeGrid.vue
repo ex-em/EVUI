@@ -843,6 +843,7 @@ export default {
     }));
     const headerCheckboxClass = computed(() => ({
       column: true,
+      'checkbox-all': true,
       'non-border': !!styleInfo.borderStyle,
     }));
     const isHeaderCheckbox = computed(() => (
