@@ -84,8 +84,8 @@
           v-model="isSelectionMultiple"
         />
         <span class="badge yellow">
-            Use Grid Setting
-          </span>
+          Use Grid Setting
+        </span>
         <ev-toggle
           v-model="useGridSettingMV"
         />
