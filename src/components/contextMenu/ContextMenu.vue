@@ -47,6 +47,10 @@ export default {
       type: String,
       default: '',
     },
+    isShowMenuOnClick: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup() {
     const {

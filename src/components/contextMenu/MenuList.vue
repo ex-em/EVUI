@@ -6,8 +6,7 @@
         :key="`${item.value}_${idx}`"
         class="ev-menu-li"
         :class="{ disabled: item.disabled }"
-        @click="[item.click && !item.disabled ? item.click(item) : (() => {})()
-          , hideAll(item.children)]"
+        @click="handleItemClick(item)"
         @mouseenter="!item.disabled ? mouseenterLi($event, item.children) : (() => {})()"
       >
         <i
@@ -17,7 +16,7 @@
         />
         {{ item.text }}
         <i
-          v-if="item.children"
+          v-if="item.children || item.isShowMenu"
           class="ev-menu-li-suffix ev-icon-arrow-right2"
         />
       </li>
@@ -77,6 +76,7 @@ export default {
       menuStyle,
       childrenItems,
 
+      handleItemClick,
       mouseenterLi,
       hideAll,
     } = useMenuList();
@@ -89,6 +89,7 @@ export default {
       menuStyle,
       childrenItems,
 
+      handleItemClick,
       mouseenterLi,
       hideAll,
     };

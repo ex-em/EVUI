@@ -18,6 +18,9 @@
           mode: checkboxModeMV,
           headerCheck: headerCheckMV,
         },
+        useGridSetting: {
+          use: true,
+        },
         customContextMenu: menuItems,
         style: {
           stripe: stripeMV,

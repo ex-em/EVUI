@@ -9,6 +9,7 @@
       text: '텍스트명',
       iconClass: '텍스트 앞에 위치하는 아이콘 태그 클래스명',
       disabled: true, // Boolean - 사용여부
+      isShowMenu: true, // Boolean - 항목 클릭시에도 메뉴 유지
       click: () => { ... }, // 클릭 시 발생하는 메소드
     },
     { ... },
@@ -38,5 +39,7 @@
 | | | text | <컨텍스트메뉴> 항목 텍스트 | |
 | | | icon-class | <컨텍스트메뉴> 항목 텍스트 앞에 위치하는 <i> 클래스 | |
 | | | disabled | <컨텍스트메뉴> 항목 사용 여부 | false, true |
+| | | isShowMenu | 클릭한 항목 선택 후에도 <컨텍스트 메뉴> 유지 | false, true |
 | | | click | <컨텍스트메뉴> 항목 클릭 시 발생하는 메소드 |  |
 | customClass | String | '' | <컨텍스트메뉴>에 지정할 클래스명 | |
+| isShowMenuOnClick | Boolean | false | <컨텍스트 메뉴> 항목 및 영역 외 클릭 시에도 메뉴 유지 | |

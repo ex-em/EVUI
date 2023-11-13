@@ -13,7 +13,10 @@
         showHeader: showHeaderMV,
         rowHeight: rowHeightMV,
         columnWidth: columnWidthMV,
-        useColumnSetting: useColumnSettingMV,
+        useGridSetting: {
+          use: useGridSettingMV,
+          customContextMenu: gridSettingMenuItems,
+        },
         useFilter: useFilterMV,
         customContextMenu: menuItems,
         useCheckbox: {
@@ -82,10 +85,10 @@
           v-model="isSelectionMultiple"
         />
         <span class="badge yellow">
-          Use Column Setting
+          Use Grid Setting
         </span>
         <ev-toggle
-          v-model="useColumnSettingMV"
+          v-model="useGridSettingMV"
         />
       </div>
       <div class="form-rows">
@@ -226,7 +229,6 @@ export default {
     const stripeMV = ref(false);
     const rowHeightMV = ref(45);
     const columnWidthMV = ref(80);
-    const useColumnSettingMV = ref(true);
     const useFilterMV = ref(false);
     const useCheckboxMV = ref(true);
     const checkboxModeMV = ref('multi');
@@ -236,6 +238,13 @@ export default {
     const DbClickedRowsMV = ref();
     const useSelectionMV = ref(true);
     const isSelectionMultiple = ref(false);
+    const useGridSettingMV = ref(true);
+    const gridSettingMenuItems = ref([
+      {
+        text: 'Menu1',
+        click: param => console.log(`[Menu1]: ${param}`),
+      },
+    ]);
     const menuItems = ref([
       {
         text: 'Menu1',
@@ -340,7 +349,6 @@ export default {
       stripeMV,
       rowHeightMV,
       columnWidthMV,
-      useColumnSettingMV,
       useFilterMV,
       useCheckboxMV,
       checkboxModeMV,
@@ -355,6 +363,8 @@ export default {
       pageInfo,
       isSelectionMultiple,
       useSelectionMV,
+      useGridSettingMV,
+      gridSettingMenuItems,
       changeMode,
       onCheckedRow,
       onDoubleClickRow,

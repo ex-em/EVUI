@@ -50,7 +50,14 @@
 
 <script>
 import { clickoutside } from '@/directives/clickoutside';
-import { computed, inject, nextTick, onBeforeMount, reactive, ref, watch } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeMount,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
 
 export default {
   name: 'EVGridColumnSetting',
@@ -70,9 +77,22 @@ export default {
       type: String,
       default: '',
     },
+    position: {
+      type: Object,
+      default: () => ({
+        top: 0,
+        left: 0,
+        columnListMenuWidth: 0,
+      }),
+    },
+    isShowMenuOnClick: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {
-    'update:isShow': null,
+    'update:isShow': [Boolean],
+    'update:isShowMenuOnClick': [Boolean],
     'apply-column': null,
   },
   setup(props, { emit }) {
@@ -93,11 +113,13 @@ export default {
     const isDisabled = computed(() => !columnList.value.length);
     let timer = null;
     let lastCheckedColumn = null;
-
-    const toolbarWrapperDiv = inject('toolbarWrapper');
     const columnSettingStyle = reactive({
       top: null,
       left: null,
+    });
+    const computedIsShowMenuOnClick = computed({
+      get: () => props.isShowMenuOnClick,
+      set: val => emit('update:isShowMenuOnClick', val),
     });
 
     const onCheckColumn = (columns) => {
@@ -155,8 +177,8 @@ export default {
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
-      initSearchValue();
       isShowColumnSetting.value = false;
+      computedIsShowMenuOnClick.value = false;
     };
 
     const setColumns = () => {
@@ -175,7 +197,7 @@ export default {
 
     const hideColumnSetting = () => {
       isShowColumnSetting.value = false;
-      initValue();
+      computedIsShowMenuOnClick.value = false;
     };
 
     const initWrapperDiv = () => {
@@ -188,6 +210,29 @@ export default {
       }
     };
 
+    const setPosition = async () => {
+      await nextTick();
+
+      const docWidth = document.documentElement.clientWidth;
+      const columnSettingWrapperRect = columnSettingWrapper.value?.getBoundingClientRect();
+      const columnSettingWidth = columnSettingWrapperRect?.width;
+      const { top, left, columnListMenuWidth } = props.position;
+      let columnSettingLeft;
+
+      if (columnListMenuWidth) { // 컨텍스트 메뉴일 때
+        columnSettingLeft = left;
+
+        if (docWidth < left + columnSettingWidth) {
+          columnSettingLeft = left - columnSettingWidth - columnListMenuWidth;
+        }
+      } else {
+        columnSettingLeft = left - columnSettingWidth;
+      }
+
+      columnSettingStyle.top = `${top + document.documentElement.scrollTop}px`;
+      columnSettingStyle.left = `${columnSettingLeft + document.documentElement.scrollLeft}px`;
+    };
+
     onBeforeMount(() => initWrapperDiv());
 
     watch(() => props.columns, () => {
@@ -195,21 +240,11 @@ export default {
     }, { immediate: true, deep: true });
 
     watch(() => isShowColumnSetting.value, async () => {
-      if (!isShowColumnSetting.value) {
-        return;
+      initValue();
+
+      if (isShowColumnSetting.value) {
+        await setPosition();
       }
-      await nextTick();
-
-      const columnSettingWrapperRect = columnSettingWrapper.value?.getBoundingClientRect();
-      const toolbarWrapperDivRect = toolbarWrapperDiv.value?.getBoundingClientRect();
-
-      const columnSettingWidth = columnSettingWrapperRect?.width;
-      const toolbarHeight = toolbarWrapperDivRect?.height;
-      const columnSettingTop = toolbarWrapperDivRect?.top + document.documentElement.scrollTop;
-      const columnSettingRight = toolbarWrapperDivRect?.right + document.documentElement.scrollLeft;
-
-      columnSettingStyle.top = `${columnSettingTop + toolbarHeight}px`;
-      columnSettingStyle.left = `${columnSettingRight - columnSettingWidth}px`;
     });
 
     watch(() => props.hiddenColumn, (value) => {

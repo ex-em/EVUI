@@ -8,7 +8,9 @@
           use: useCheckboxMV.use,
           headerCheck: useCheckboxMV.headerCheck,
         },
-        useColumnSetting: true,
+        useGridSetting: {
+          use: true,
+        },
       }"
     >
       <!-- renderer start -->
