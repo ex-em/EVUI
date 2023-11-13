@@ -393,7 +393,7 @@
                   <ev-checkbox
                     v-model="row[1]"
                     class="row-checkbox-input"
-                    :disabled="row[4]"
+                    :disabled="row[5]"
                     @change="onCheck($event, row)"
                   />
                 </td>
