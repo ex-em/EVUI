@@ -3,6 +3,7 @@
     <ev-grid
       v-model:selected="selected"
       v-model:checked="checked"
+      :uncheckable="uncheckable"
       :columns="columns"
       :rows="tableData"
       :width="widthMV"
@@ -218,6 +219,7 @@ export default {
     const tableData = ref([]);
     const selected = ref([]);
     const checked = ref([]);
+    const uncheckable = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
     const showHeaderMV = ref(true);
@@ -325,11 +327,13 @@ export default {
     });
 
     tableData.value = getData(50, 0);
+    uncheckable.value = [tableData.value[0]];
     return {
       columns,
       tableData,
       selected,
       checked,
+      uncheckable,
       widthMV,
       heightMV,
       showHeaderMV,

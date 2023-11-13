@@ -471,7 +471,7 @@ export const clickEvent = (params) => {
 
 export const checkEvent = (params) => {
   const { checkInfo, stores, pageInfo, getPagingData } = params;
-  const { emit } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
    *
@@ -507,7 +507,10 @@ export const checkEvent = (params) => {
       if (pageInfo.isClientPaging) {
         store = getPagingData();
       }
-      const isAllChecked = store.every(d => d[ROW_CHECK_INDEX]);
+
+      const isAllChecked = store
+        .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
+        .every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
       }
@@ -535,14 +538,18 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
+      const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
-        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX])) {
+        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !uncheckable) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
         }
       } else {
         checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
       }
-      row[ROW_CHECK_INDEX] = isHeaderChecked;
+
+      if (!uncheckable) {
+        row[ROW_CHECK_INDEX] = isHeaderChecked;
+      }
     });
     emit('update:checked', checkInfo.checkedRows);
     emit('check-all', event, checkInfo.checkedRows);
@@ -1097,20 +1104,22 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
+        const uncheckable = props.uncheckable.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
         }
-        if (!checked) {
+        if (!checked && !uncheckable) {
           hasUnChecked = true;
         }
         let expanded = false;
         if (expandedInfo.useRowDetail) {
           expanded = props.expanded.includes(row);
         }
-        store.push([idx, checked, row, selected, expanded]);
+        store.push([idx, checked, row, selected, expanded, uncheckable]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
+      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row));
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {
