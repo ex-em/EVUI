@@ -19,10 +19,12 @@
 >
   <template #{필드명}></template>
   <template #toolbar="{ item }"></template>
+  <template #rowDetail="{ item }"></template>
 </ev-grid>
 ```
  - `#{필드명}` 지정해서 Cell Render 설정
  - `#toolbar` 지정해서 Toolbar 표시
+ - `#rowDetail` Row 하단에 사용자 정의 컴포넌트 표현, 사용시 가상스크롤 미적용 rowDetail 옵션과 같이 사용
 
 ### Props
 | 이름 | 타입 | 디폴트 | 설명 | 종류 |
@@ -34,6 +36,7 @@
 | selected | Array | [] | 선택된 row 데이터 |  |
 | checked | Array | [] | 체크된 row 데이터 |  |
 | uncheckable | Array | [] | 체크할 수 없는 row 데이터 |  |
+| expanded | Array | [] | 확장된 Row 데이터 |  |
 | option | Object | {} | 그리드 옵션 |  |
 |  | adjust | false | 그리드의 너비에 맞게 컬럼 너비를 자동으로 조절한다. |  |
 |  | showHeader | true | 헤더 표시 여부를 설정한다. |  |
@@ -63,6 +66,8 @@
 |  |  | visiblePage | 보여지는 Pagination 버튼 수 | Number |
 |  |  | order | Pagination 위치 | 'center', 'left', 'right' |
 |  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
+|  | rowDetail | {} | rowDetail 설정 | |
+|  |  | use | rowDetail 사용여부 | Boolean |
 |  | useSummary | false | 하단에 summary row 가 표시 된다. | Boolean |
 |  | useColumnSetting | false | 컬럼 목록 설정 여부  | Boolean |
 
@@ -93,3 +98,4 @@
  | dblclick-row | event, row | row가 더블 클릭 되었을 때 호출된다. |
  | page-change | event | page 정보가 변경되었을 때 호출된다. |
  | sort-column | event | column을 기준으로 정렬이 변경되었을 때 호출된다. |
+ | expand-row | event, row, isExpand, index | row가 확장되었을 때 호출된다. |
