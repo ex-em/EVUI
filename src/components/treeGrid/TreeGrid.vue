@@ -57,6 +57,7 @@
               v-if="isHeaderCheckbox"
               v-model="isHeaderChecked"
               :disabled="isHeaderUncheckable"
+              :indeterminate="isHeaderIndeterminate"
               @change="onCheckAll"
             />
           </li>
@@ -396,6 +397,7 @@ export default {
       prevCheckedRow: [],
       isHeaderChecked: false,
       isHeaderUncheckable: false,
+      isHeaderIndeterminate: false,
       checkedRows: props.checked,
       useCheckbox: computed(() => props.option.useCheckbox || {}),
     });
@@ -467,9 +469,11 @@ export default {
     };
     const clearCheckInfo = () => {
       checkInfo.isHeaderChecked = false;
+      checkInfo.isHeaderIndeterminate = false;
       checkInfo.checkedRows.length = 0;
       stores.store.forEach((row) => {
         row.checked = false;
+        row.indeterminate = false;
       });
     };
     const {
