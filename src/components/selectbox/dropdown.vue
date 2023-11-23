@@ -181,14 +181,19 @@
     height: 100%;
     padding: 3px;
   }
-
+  
   .ev-dropdown-multiple-input-area .input-text {
     width: 100%;
     height: 100%;
     border: 1px solid #CCCCCC;
+    padding: 0 5px 0 5px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+  }
+
+  .ev-dropdown-multiple-input-area .input-text:focus {
+    outline: none;
   }
 
   /**  ev-dropdown > ev-dropdown-listbox-wrap **/
