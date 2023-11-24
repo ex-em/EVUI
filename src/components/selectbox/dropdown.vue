@@ -181,7 +181,7 @@
     height: 100%;
     padding: 3px;
   }
-  
+
   .ev-dropdown-multiple-input-area .input-text {
     width: 100%;
     height: 100%;
