@@ -498,6 +498,7 @@ class Calendar {
     });
 
     if (mouseoverFlag) {
+      // FIXME - 마우스오버 시 cursor pointer로 변경하는 위치
       this.overCanvas.style.cursor = 'pointer';
     } else {
       this.overCanvas.style.cursor = 'default';
@@ -1757,7 +1758,7 @@ class Calendar {
       ctx.lineTo(x - (Math.sin(this.toRadians(angle)) * length), y);
     }
     ctx.strokeStyle = this.options.colors[this.options.theme].triangle;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
     ctx.restore();
@@ -1765,24 +1766,22 @@ class Calendar {
 
   // 삼각형 안에 (px,py)이 존재하는지 확인
   existTriangle(x, y, direction, l, px, py) {
-    const length = l + 1;
+    const length = l + 5;
     const vs = [];
     if (direction === 'right' || direction === 'left') {
       const v1 = {
-        x: direction === 'right'
-          ? x + (Math.cos(this.toRadians(30)) * length)
-          : x - (Math.cos(this.toRadians(30)) * length),
-        y,
+        x: x + (Math.cos(this.toRadians(30)) * length),
+        y: y - (Math.sin(this.toRadians(30)) * length),
       };
       vs.push(v1);
       const v2 = {
-        x,
+        x: x - (Math.cos(this.toRadians(30)) * length),
         y: y - (Math.sin(this.toRadians(30)) * length),
       };
       vs.push(v2);
       const v3 = {
         x,
-        y: y + (Math.sin(this.toRadians(30)) * length),
+        y: y + (length),
       };
       vs.push(v3);
     } else if (direction === 'top' || direction === 'bottom') {
