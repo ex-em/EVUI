@@ -498,10 +498,15 @@ class Calendar {
     });
 
     if (mouseoverFlag) {
-      // FIXME - 마우스오버 시 cursor pointer로 변경하는 위치
       this.overCanvas.style.cursor = 'pointer';
+      this.makeHoverdTriangleHighlight(e);
     } else {
+      const pickerAreaTotal = this.coordinate.pickerArea.total;
       this.overCanvas.style.cursor = 'default';
+      this.clearCanvas(overCtx,
+        pickerAreaTotal.startX, pickerAreaTotal.startY,
+        pickerAreaTotal.width, pickerAreaTotal.height,
+      );
     }
   }
 
@@ -1735,7 +1740,9 @@ class Calendar {
   }
 
   // 중심점을 기준으로 left, right 방향으로 삼각형 그리기
-  drawTriangle(context, x, y, direction, length) {
+  drawTriangle(context,
+    x, y, direction, length,
+    color = this.options.colors[this.options.theme].triangle) {
     const ctx = context;
     const angle = 42;
     ctx.save();
@@ -1757,11 +1764,25 @@ class Calendar {
       ctx.lineTo(x, y + (Math.cos(this.toRadians(angle)) * length));
       ctx.lineTo(x - (Math.sin(this.toRadians(angle)) * length), y);
     }
-    ctx.strokeStyle = this.options.colors[this.options.theme].triangle;
+    ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
     ctx.restore();
+  }
+
+  makeHoverdTriangleHighlight(e) {
+    const ctx = this.overCtx;
+    const brightPoint = this.coordinate.pickerArea.arrow.filter(v => this.existTriangle(
+      v.centerX, v.centerY, v.direction, v.length,
+      e.offsetX, e.offsetY,
+    ));
+    if (brightPoint && brightPoint.length > 0) {
+      this.drawTriangle(
+        ctx, brightPoint[0].centerX, brightPoint[0].centerY,
+        brightPoint[0].direction, brightPoint[0].length, '#696969',
+      );
+    }
   }
 
   // 삼각형 안에 (px,py)이 존재하는지 확인
