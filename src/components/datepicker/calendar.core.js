@@ -1780,7 +1780,8 @@ class Calendar {
     if (brightPoint && brightPoint.length > 0) {
       this.drawTriangle(
         ctx, brightPoint[0].centerX, brightPoint[0].centerY,
-        brightPoint[0].direction, brightPoint[0].length, '#696969',
+        brightPoint[0].direction, brightPoint[0].length,
+        this.options.colors[this.options.theme].dayColor,
       );
     }
   }
