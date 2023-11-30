@@ -497,16 +497,16 @@ class Calendar {
       });
     });
 
+    const pickerAreaTotal = this.coordinate.pickerArea.total;
+    this.clearCanvas(overCtx,
+      pickerAreaTotal.startX, pickerAreaTotal.startY,
+      pickerAreaTotal.width, pickerAreaTotal.height,
+    );
     if (mouseoverFlag) {
       this.overCanvas.style.cursor = 'pointer';
-      this.makeHoverdTriangleHighlight(e);
+      this.makeHoveredTriangleHighlight(e);
     } else {
-      const pickerAreaTotal = this.coordinate.pickerArea.total;
       this.overCanvas.style.cursor = 'default';
-      this.clearCanvas(overCtx,
-        pickerAreaTotal.startX, pickerAreaTotal.startY,
-        pickerAreaTotal.width, pickerAreaTotal.height,
-      );
     }
   }
 
@@ -1771,7 +1771,7 @@ class Calendar {
     ctx.restore();
   }
 
-  makeHoverdTriangleHighlight(e) {
+  makeHoveredTriangleHighlight(e) {
     const ctx = this.overCtx;
     const brightPoint = this.coordinate.pickerArea.arrow.filter(v => this.existTriangle(
       v.centerX, v.centerY, v.direction, v.length,
