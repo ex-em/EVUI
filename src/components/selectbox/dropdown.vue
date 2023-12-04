@@ -186,9 +186,14 @@
     width: 100%;
     height: 100%;
     border: 1px solid #CCCCCC;
+    padding: 0 5px 0 5px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   /**  ev-dropdown > ev-dropdown-listbox-wrap **/

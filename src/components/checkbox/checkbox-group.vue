@@ -59,12 +59,14 @@
       onChange(e) {
         const bindValue = this.bindValue;
         const targetValue = e.target.value;
-        if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
-          bindValue.push(targetValue);
-        } else if (!e.currentTarget.checked && bindValue.indexOf(targetValue) > -1) {
-          bindValue.splice(bindValue.indexOf(targetValue), 1);
-        }
-        this.$parent.$emit('input', bindValue);
+        this.$nextTick(() => {
+          if (e.currentTarget.checked && bindValue.indexOf(targetValue) === -1) {
+            bindValue.push(targetValue);
+          } else if (!e.currentTarget.checked && bindValue.indexOf(targetValue) > -1) {
+            bindValue.splice(bindValue.indexOf(targetValue), 1);
+          }
+          this.$parent.$emit('input', bindValue);
+        });
       },
     },
   };
