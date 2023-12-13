@@ -44,7 +44,7 @@
           />
         </div>
       </div>
-      <div class="form-rows summary-toggle">
+      <div class="form-rows summary-decimal">
         <div class="form-row">
           <span class="badge yellow">
             Summary Decimal
@@ -163,7 +163,7 @@ export default {
 .form-rows {
   display: flex;
 
-  &.summary-toggle {
+  &.summary-decimal {
     width: 50%;
   }
 }
