@@ -88,6 +88,7 @@
 | align | String | 사용자 지정 정렬 | 'center', 'left', 'right' | N |
 | decimal | Number | 데이터 타입이 float 일 때 소수점 자리 표시 수 | ex) 0~20 (디폴트: 3 ) | N |
 | summaryType | String | 계산 타입 | 'sum', 'average', 'max', 'min', 'count' | N |
+| summaryDecimal | Number | Summary 계산 타입 중 'sum', 'average'를 선택한 경우 소수점 표현 자리수 | ex) 0~20 (디폴트: 3 ) | N |
 | summaryRenderer | String | Summary 에 표시할 텍스트 또는 계산 값 | ex) 'Sum: {0}' | N |
 | summaryData | Array | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용 | ex) '{0}({1}%)' | N |
 
