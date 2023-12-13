@@ -20,6 +20,7 @@
   ],
   "main": "dist/evui.umd.js",
   "dependencies": {
+    "bignumber.js": "^9.1.2",
     "core-js": "^3.6.5",
     "dayjs": "^1.10.4",
     "korean-regexp": "^1.0.10",
