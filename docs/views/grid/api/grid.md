@@ -24,44 +24,46 @@
  - `#toolbar` 지정해서 Toolbar 표시
 
 ### Props
-| 이름 | 타입 | 디폴트 | 설명 | 종류 |
-| --- | ---- | ----- | ---- | --- |
-| columns | Array | [] | 컬럼 리스트 | |
-| rows | Array | [] | row 리스트 | |
-| width | String, Number | '100%' | 그리드 넓이 | '50%', '50px', 50 |
-| height | String, Number | '100%' | 그리드 높이 | '50%', '50px', 50 |
-| selected | Array | [] | 선택된 row 데이터 |  |
-| checked | Array | [] | 체크된 row 데이터 |  |
-| option | Object | {} | 그리드 옵션 |  |
-|  | adjust | false | 그리드의 너비에 맞게 컬럼 너비를 자동으로 조절한다. |  |
-|  | showHeader | true | 헤더 표시 여부를 설정한다. |  |
-|  | rowHeight | 35 | row 높이를 설정한다. | `min-height: 35` |
-|  | rowMinHeight | null | row 높이를 `min-height`보다 작게 설정한다. |  |
-|  | columnWidth | 40 | 기본 컬럼 너비를 설정한다. | `min-width: 40px` |
-|  | useCheckbox | {} | 각 row별 체크박스 사용 여부 및 단일 선택이나 다중 선택을 설정한다. |  |
-|  |  | use | 체크박스 사용 여부 | Boolean |
-|  |  | mode | 단일 및 다중 선택 설정 | 'multi', 'single' |
-|  |  | headerCheck | 헤더 체크박스 사용 여부 | Boolean |
-|  | useSelection | {} | 각 row별 선택 여부 및 단일 선택이나 다중 선택을 설정한다. |  |
-|  |  | use | Selection 사용 여부 | Boolean |
-|  |  | multiple | 다중 선택 설정 여부  | Boolean |
-|  | style | {} | 그리드의 스타일을 설정한다. |  |
-|  |  | stripe | row의 배경색을 Stripe 스타일로 설정한다. | Boolean |
-|  |  | border | 그리드의 Border 여부를 설정한다. | 'none', 'rows' |
-|  |  | highlight | 지정한 row에 Highlight 효과를 설정한다. | `rowIndex` |
-|  | customContextMenu | [] | 우클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
-|  |  | menuItems | 컨텍스트 메뉴 |  |
-|  | page | {} | 페이지 설정 |  |
-|  |  | use | 페이지 사용 여부 | Boolean |
-|  |  | isInfinite | Infinite Scroll 사용 여부 | Boolean |
-|  |  | useClient | client-side Paging 사용 여부 | Boolean |
-|  |  | total | 총 항목 수 | Number |
-|  |  | perPage | 각 페이지의 항목 수 | Number |
-|  |  | currentPage | 현재 페이지 번호 | Number |
-|  |  | visiblePage | 보여지는 Pagination 버튼 수 | Number |
-|  |  | order | Pagination 위치 | 'center', 'left', 'right' |
-|  |  | showPageInfo | 페이지 정보 표시 여부 | Boolean |
-|  | useSummary | false | 하단에 summary row 가 표시 된다. | Boolean |
+| 이름       | 타입                | 디폴트          | 설명                                       | 종류                        |
+|----------|-------------------|--------------|------------------------------------------|---------------------------|
+| columns  | Array             | []           | 컬럼 리스트                                   |                           |
+| rows     | Array             | []           | row 리스트                                  |                           |
+| width    | String, Number    | '100%'       | 그리드 넓이                                   | '50%', '50px', 50         |
+| height   | String, Number    | '100%'       | 그리드 높이                                   | '50%', '50px', 50         |
+| selected | Array             | []           | 선택된 row 데이터                              |                           |
+| checked  | Array             | []           | 체크된 row 데이터                              |                           |
+| option   | Object            | {}           | 그리드 옵션                                   |                           |
+|          | adjust            | false        | 그리드의 너비에 맞게 컬럼 너비를 자동으로 조절한다.            |                           |
+|          | showHeader        | true         | 헤더 표시 여부를 설정한다.                          |                           |
+|          | rowHeight         | 35           | row 높이를 설정한다.                            | `min-height: 35`          |
+|          | rowMinHeight      | null         | row 높이를 `min-height`보다 작게 설정한다.          |                           |
+|          | columnWidth       | 40           | 기본 컬럼 너비를 설정한다.                          | `min-width: 40px`         |
+|          | useCheckbox       | {}           | 각 row별 체크박스 사용 여부 및 단일 선택이나 다중 선택을 설정한다. |                           |
+|          |                   | use          | 체크박스 사용 여부                               | Boolean                   |
+|          |                   | mode         | 단일 및 다중 선택 설정                            | 'multi', 'single'         |
+|          |                   | headerCheck  | 헤더 체크박스 사용 여부                            | Boolean                   |
+|          | useSelection      | {}           | 각 row별 선택 여부 및 단일 선택이나 다중 선택을 설정한다.      |                           |
+|          |                   | use          | Selection 사용 여부                          | Boolean                   |
+|          |                   | multiple     | 다중 선택 설정 여부                              | Boolean                   |
+|          | style             | {}           | 그리드의 스타일을 설정한다.                          |                           |
+|          |                   | stripe       | row의 배경색을 Stripe 스타일로 설정한다.              | Boolean                   |
+|          |                   | border       | 그리드의 Border 여부를 설정한다.                    | 'none', 'rows'            |
+|          |                   | highlight    | 지정한 row에 Highlight 효과를 설정한다.             | `rowIndex`                |
+|          | customContextMenu | []           | 우클릭시 보여지는 컨텍스트 메뉴를 설정한다.                 |                           |
+|          |                   | menuItems    | 컨텍스트 메뉴                                  |                           |
+|          | page              | {}           | 페이지 설정                                   |                           |
+|          |                   | use          | 페이지 사용 여부                                | Boolean                   |
+|          |                   | isInfinite   | Infinite Scroll 사용 여부                    | Boolean                   |
+|          |                   | useClient    | client-side Paging 사용 여부                 | Boolean                   |
+|          |                   | total        | 총 항목 수                                   | Number                    |
+|          |                   | perPage      | 각 페이지의 항목 수                              | Number                    |
+|          |                   | currentPage  | 현재 페이지 번호                                | Number                    |
+|          |                   | visiblePage  | 보여지는 Pagination 버튼 수                     | Number                    |
+|          |                   | order        | Pagination 위치                            | 'center', 'left', 'right' |
+|          |                   | showPageInfo | 페이지 정보 표시 여부                             | Boolean                   |
+|          | summary           | {}           | 하단에 summary row 가 표시 된다.                 |                           |
+|          |                   | use          | Summary 사용 여부                            | Boolean                   |
+|          |                   | decimal      | Summary 소수점 표현 단위                        | Number                    |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |

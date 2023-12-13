@@ -20,7 +20,7 @@
           border: 'rows',
         },
         page: pageInfo,
-        useSummary: true,
+        summary: summaryInfo,
       }"
     >
       <template #increment_mb="{ item }">
@@ -41,6 +41,19 @@
           <ev-select
             v-model="usedSummaryType"
             :items="summaryTypes"
+          />
+        </div>
+      </div>
+      <div class="form-rows summary-decimal">
+        <div class="form-row">
+          <span class="badge yellow">
+            Summary Decimal
+          </span>
+          <ev-input-number
+            v-model="summaryInfo.decimal"
+            :step="1"
+            :min="0"
+            :max="300"
           />
         </div>
       </div>
@@ -110,14 +123,18 @@ export default {
       ['HIDB_DATA_3', '25080', -10, 14485, 0, 0],
       ['HIDB_DATA_4', '', 20000, 14396, 2185, -11],
       ['SYSAUX', '', 11000, 9485, 0, -11],
-      ['USERS', '4004', 10000, 6485, 0, 0],
-      ['UNDOTBS1', '4004', 9000, 3486, 0, 0],
+      ['USERS', '4004', 0.1, 6485, 0, 0],
+      ['UNDOTBS1', '4004', 0.2, 3486, 0, 0],
     ];
     const pageInfo = reactive({
       use: false,
       perPage: 8,
       total: computed(() => tableData.value.length),
       useClient: true,
+    });
+    const summaryInfo = reactive({
+      use: true,
+      decimal: 1,
     });
     const getIncrementValue = (item) => {
       const row = item.row[2];
@@ -135,6 +152,7 @@ export default {
       totalSummaryType,
       summaryTypes,
       usedSummaryType,
+      summaryInfo,
       getIncrementValue,
     };
   },
@@ -144,6 +162,10 @@ export default {
 <style lang="scss" scoped>
 .form-rows {
   display: flex;
+
+  &.summary-decimal {
+    width: 50%;
+  }
 }
 .form-row {
   flex: 1;
