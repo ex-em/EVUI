@@ -178,10 +178,10 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = bigNumberCalculation.divide?.(sumValue, columnValues.length);
-              if (result % 1 !== 0) {
-                result = result.toFixed(1);
-              }
+              result = bigNumberCalculation.floor?.(
+                bigNumberCalculation.divide?.(sumValue, columnValues.length),
+                (props.decimal ?? 0),
+              );
               break;
             }
             case 'max': {
