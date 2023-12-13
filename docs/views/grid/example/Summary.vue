@@ -19,8 +19,7 @@
         style: {
           border: 'rows',
         },
-        page: pageInfo,
-        summary: summaryInfo,
+        useSummary: true,
       }"
     >
       <template #increment_mb="{ item }">
@@ -37,20 +36,31 @@
           />
         </div>
         <div class="form-row">
+          <span class="badge yellow">
+            Total (MB) Summary Decimal
+          </span>
+          <ev-input-number
+            v-model="totalSummaryDecimal"
+            :step="1"
+            :min="0"
+            :max="300"
+          />
+        </div>
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
           <span class="badge yellow">Used (MB)</span>
           <ev-select
             v-model="usedSummaryType"
             :items="summaryTypes"
           />
         </div>
-      </div>
-      <div class="form-rows summary-decimal">
         <div class="form-row">
           <span class="badge yellow">
-            Summary Decimal
+            Used (MB) Summary Decimal
           </span>
           <ev-input-number
-            v-model="summaryInfo.decimal"
+            v-model="usedSummaryDecimal"
             :step="1"
             :min="0"
             :max="300"
@@ -68,7 +78,9 @@ import { numberWithComma } from '@/common/utils';
 export default {
   setup() {
     const totalSummaryType = ref('sum');
+    const totalSummaryDecimal = ref(1);
     const usedSummaryType = ref('average');
+    const usedSummaryDecimal = ref(3);
     const summaryTypes = ref([
       { name: 'sum', value: 'sum' },
       { name: 'average', value: 'average' },
@@ -94,11 +106,13 @@ export default {
         field: 'total_mb',
         type: 'number',
         summaryType: totalSummaryType,
+        summaryDecimal: totalSummaryDecimal,
         summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
       },
       { caption: 'Used (MB)',
         field: 'used_mb',
         type: 'number',
+        summaryDecimal: usedSummaryDecimal,
         summaryType: usedSummaryType, // type 만 지정
       },
       { caption: 'Increment (MB)',
@@ -132,10 +146,6 @@ export default {
       total: computed(() => tableData.value.length),
       useClient: true,
     });
-    const summaryInfo = reactive({
-      use: true,
-      decimal: 1,
-    });
     const getIncrementValue = (item) => {
       const row = item.row[2];
       const columnIndex = item.column.index;
@@ -150,9 +160,10 @@ export default {
       checked,
       pageInfo,
       totalSummaryType,
+      totalSummaryDecimal,
       summaryTypes,
       usedSummaryType,
-      summaryInfo,
+      usedSummaryDecimal,
       getIncrementValue,
     };
   },

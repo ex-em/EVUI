@@ -237,7 +237,6 @@
       rowHeight,
     }"
     :scroll-left="summaryScroll"
-    :decimal="summaryDecimal"
   />
   <!-- Pagination -->
   <grid-pagination
@@ -328,6 +327,7 @@ export default {
       setPixelUnit,
     } = commonFunctions();
     const showHeader = computed(() => (props.option.showHeader ?? true));
+    const useSummary = computed(() => (props.option?.useSummary || false));
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight ?? -1));
@@ -412,10 +412,6 @@ export default {
         (props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight)),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
-    });
-    const summaryInfo = reactive({
-      useSummary: computed(() => props.option.summary?.use || false),
-      summaryDecimal: computed(() => props.option.summary?.decimal || 0),
     });
     const clearCheckInfo = () => {
       checkInfo.checkedRows = [];
@@ -705,6 +701,7 @@ export default {
     return {
       summaryScroll,
       showHeader,
+      useSummary,
       stripeStyle,
       borderStyle,
       highlightIdx,
@@ -719,7 +716,6 @@ export default {
       ...toRefs(checkInfo),
       ...toRefs(sortInfo),
       ...toRefs(contextInfo),
-      ...toRefs(summaryInfo),
       isRenderer,
       getComponentName,
       getConvertValue,
