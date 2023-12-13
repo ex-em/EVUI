@@ -30,7 +30,6 @@
         parentIcon: parentIconMV,
         childIcon: childIconMV,
         page: pageInfo,
-        useSummary: true,
       }"
       @check-row="onCheckedRow"
       @check-all="onCheckedRow"

@@ -71,6 +71,7 @@
 <script>
 import { computed, watch, ref, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
+import BigNumber from 'bignumber.js';
 
 export default {
   name: 'EvGridSummary',
@@ -99,6 +100,10 @@ export default {
       type: Number,
       default: 0,
     },
+    decimal: {
+      type: Number,
+      default: 0,
+    },
   },
   setup(props) {
     const summaryRef = ref();
@@ -120,6 +125,24 @@ export default {
 
       return convertValue;
     };
+    const getSumValueWithBigNumber = (
+      num1, num2,
+    ) => new BigNumber(num1).plus(new BigNumber(num2)).toNumber();
+
+    const getDivideValueWithBigNumber = (
+      dividend, divisor,
+    ) => new BigNumber(dividend).dividedBy(new BigNumber((divisor))).toNumber();
+
+    const getFloorValueWithBigNumber = (
+      num, decimal,
+    ) => new BigNumber(num).decimalPlaces(decimal, BigNumber.ROUND_DOWN).toNumber();
+
+    const bigNumberCalculation = {
+      sum: getSumValueWithBigNumber,
+      divide: getDivideValueWithBigNumber,
+      floor: getFloorValueWithBigNumber,
+    };
+
     const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
     const getSummaryValue = (column, summaryType) => {
       let result = '';
@@ -136,33 +159,41 @@ export default {
             columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
           }
           switch (summaryType) {
-            case 'sum':
-              result = columnValues.reduce((prev, curr) => {
+            case 'sum': {
+              const sumValue = columnValues.reduce((prev, curr) => {
                 const value = Number(curr);
                 if (!Number.isNaN(value)) {
-                  return prev + value;
+                  return bigNumberCalculation.sum?.(prev, value);
                 }
                 return prev;
               }, 0);
+              result = bigNumberCalculation.floor?.(sumValue, (props.decimal ?? 0));
               break;
-            case 'average':
-              result = columnValues.reduce((prev, curr) => {
+            }
+            case 'average': {
+              const sumValue = columnValues.reduce((prev, curr) => {
                 const value = Number(curr);
                 if (!Number.isNaN(value)) {
-                  return prev + value;
+                  return bigNumberCalculation.sum?.(prev, value);
                 }
                 return prev;
-              }, 0) / columnValues.length;
+              }, 0);
+              result = bigNumberCalculation.divide?.(sumValue, columnValues.length);
               if (result % 1 !== 0) {
                 result = result.toFixed(1);
               }
               break;
-            case 'max':
-              result = Math.max(...columnValues);
+            }
+            case 'max': {
+              const filteredNullValues = columnValues.filter(value => value != null);
+              result = filteredNullValues.length ? Math.max(...filteredNullValues) : '';
               break;
-            case 'min':
-              result = Math.min(...columnValues);
+            }
+            case 'min': {
+              const filteredNullValues = columnValues.filter(value => value != null);
+              result = filteredNullValues.length ? Math.min(...filteredNullValues) : '';
               break;
+            }
             default:
               break;
           }
