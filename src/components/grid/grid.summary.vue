@@ -53,9 +53,9 @@
             </div>
             <div
               v-else
-              :title="getSummaryValue(column, column.summaryType)"
+              :title="getSummaryValue(column)"
             >
-              {{ getSummaryValue(column, column.summaryType)}}
+              {{ getSummaryValue(column)}}
             </div>
           </span>
           <span
@@ -100,26 +100,46 @@ export default {
       type: Number,
       default: 0,
     },
-    decimal: {
-      type: Number,
-      default: 0,
-    },
   },
   setup(props) {
+    const DECIMAL = {
+      max: 20,
+      default: 3,
+    };
     const summaryRef = ref();
     const ROW_DATA_INDEX = 2;
     const stores = computed(() => props.stores);
     const columns = computed(() => props.orderedColumns);
     const showCheckbox = computed(() => props.useCheckbox);
     const styleInfo = computed(() => props.styleOption);
+
+    const getValidDecimal = (decimal) => {
+      if (decimal == null || decimal < 0) {
+        return DECIMAL.default;
+      }
+
+      if (decimal > DECIMAL.max) {
+        return DECIMAL.max;
+      }
+
+      return decimal;
+    };
+
     const getConvertValue = (column, value) => {
+      if (typeof value === 'string' && value.length === 0) {
+        return value;
+      }
+
+      const { type, decimal } = column;
       let convertValue = value;
 
-      if (column.type === 'number') {
+      if (type === 'number') {
         convertValue = numberWithComma(value);
         convertValue = convertValue === false ? value : convertValue;
-      } else if (column.type === 'float') {
-        const floatValue = convertValue.toFixed(column.decimal ?? 3);
+      } else if (type === 'float') {
+        const floatValue = convertValue.toFixed(
+          getValidDecimal(getValidDecimal(decimal ?? DECIMAL.default)),
+        );
         convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       }
 
@@ -144,17 +164,24 @@ export default {
     };
 
     const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
-    const getSummaryValue = (column, summaryType) => {
+    const getSummaryValue = (column) => {
+      const {
+        type,
+        field,
+        summaryType,
+        summaryDecimal,
+      } = column;
+
       let result = '';
-      const columnIndex = getColumnIndex(column.field);
+      const columnIndex = getColumnIndex(field);
       if (columnIndex >= 0) {
         if (summaryType === 'count') {
           return stores.value.store.length;
         }
-        if (column.type === 'number' || column.type === 'float') {
+        if (type === 'number' || type === 'float') {
           let columnValues = [];
           if (props.isTree) {
-            columnValues = stores.value.store.map(node => node.data?.[column.field]);
+            columnValues = stores.value.store.map(node => node.data?.[field]);
           } else {
             columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
           }
@@ -167,7 +194,10 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = bigNumberCalculation.floor?.(sumValue, (props.decimal ?? 0));
+
+              result = sumValue && bigNumberCalculation.floor?.(
+                sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default),
+              );
               break;
             }
             case 'average': {
@@ -178,9 +208,9 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = bigNumberCalculation.floor?.(
+              result = sumValue && bigNumberCalculation.floor?.(
                 bigNumberCalculation.divide?.(sumValue, columnValues.length),
-                (props.decimal ?? 0),
+                getValidDecimal(summaryDecimal ?? DECIMAL.default),
               );
               break;
             }
@@ -210,10 +240,7 @@ export default {
       fields.forEach((name, idx) => {
         const columnIndex = getColumnIndex(name);
         if (columnIndex >= 0) {
-          const value = getSummaryValue(
-            stores.value.orderedColumns[columnIndex],
-            column.summaryType,
-          );
+          const value = getSummaryValue(stores.value.orderedColumns[columnIndex]);
           result = result.replace(`{${idx}}`, value);
         }
       });
