@@ -358,10 +358,29 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
-  scrollBehavior() {
-    return {
-      top: 0,
-    };
+  scrollBehavior(to) {
+    // hash 가 존재하는 경우 hash 위치로 스크롤 하되, header 높이만큼 더 올려야 한다.
+    const result = to.hash ? { el: to.hash, top: 60 } : { top: 0 };
+
+    // 사용자가 직접 url 에 hash 를 입력한 경우나, hash 가 존재하는 url 링크를 타고와서 이동하는 경우에는
+    // vue-router 에서 scrollBehavior 를 이용한 스크롤이 이동된 뒤에
+    // browser 의 기본 동작으로 인해 id tag 의 위치로 스크롤이 다시 이동 되는데,
+    // header 때문에 정확한 위치로 이동하지 않는 문제가 있어서 비동기 로직이 추가 된다.
+    if (document.readyState === 'loading') {
+      return new Promise((resolve) => {
+        window.addEventListener('load', () => {
+          resolve(result);
+        }, { once: true });
+      });
+    }
+    if (window.event?.type === 'popstate') {
+      return new Promise((resolve) => {
+        window.addEventListener('hashchange', () => {
+          resolve(result);
+        }, { once: true });
+      });
+    }
+    return result;
   },
 });
 
