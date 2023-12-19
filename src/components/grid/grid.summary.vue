@@ -169,6 +169,7 @@ export default {
         type,
         field,
         summaryType,
+        summaryOnlyTopParent,
         summaryDecimal,
       } = column;
 
@@ -181,7 +182,17 @@ export default {
         if (type === 'number' || type === 'float') {
           let columnValues = [];
           if (props.isTree) {
-            columnValues = stores.value.store.map(node => node.data?.[field]);
+            columnValues = stores.value.store.reduce((acc, cur) => {
+              if (summaryOnlyTopParent) {
+                if (!cur.parent) {
+                  acc.push(cur.data?.[field]);
+                }
+              } else {
+                acc.push(cur.data?.[field]);
+              }
+
+              return acc;
+            }, []);
           } else {
             columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
           }
