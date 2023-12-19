@@ -131,7 +131,16 @@ export default {
         if (column.type === 'number' || column.type === 'float') {
           let columnValues = [];
           if (props.isTree) {
-            columnValues = stores.value.store.map(node => node.data?.[column.field]);
+            columnValues = stores.value.store.reduce((acc, cur) => {
+                if (column.summaryOnlyTopParent) {
+                  if (!cur.parent) {
+                    acc.push(cur.data?.[column.field]);
+                  }
+                } else {
+                  acc.push(cur.data?.[column.field]);
+                }
+                return acc;
+              }, []);
           } else {
             columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
           }

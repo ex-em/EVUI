@@ -101,6 +101,7 @@
 | align           | String  | 사용자 지정 정렬                                          | 'center', 'left', 'right'                        | N |
 | decimal         | Number  | 데이터 타입이 float 일 때 소수점 자리 표시 수                      | ex) 0~20 (디폴트: 3 )                               | N |
 | summaryType     | String  | 계산 타입                                              | 'sum', 'average', 'max', 'min', 'count'          | N |
+| summaryOnlyTopParent | Boolean | 최상위 부모만 summary 계산을 할지 선택                          | Boolean                                                | N |
 | summaryRenderer | String  | Summary 에 표시할 텍스트 또는 계산 값                          | ex) 'Sum: {0}'                                   | N |
 | summaryData     | Array   | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용          | ex) '{0}({1}%)'                                  | N |
 | expandColumn    | Boolean | 트리그리드를 확장하는데 사용하는 컬럼을 의미, 설정하지 않으면 자동으로 첫번째 컬럼에 적용 | ex) 'expandColumn: true'                         | N |
