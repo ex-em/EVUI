@@ -26,18 +26,17 @@
             :after-type="`check`"
             @on-click="onCheckAll"
           />
-        </li>
-        <li
-          v-for="(column, index) in orderedColumns"
-          v-if="!column.hide"
-          :key="index"
-          :data-index="index"
-          :style="`width: ${column.width}px;`"
-          :class="{
-              column: true,
-              render: isRenderer(column),
-            }"
-        >
+        </li><li
+        v-for="(column, index) in orderedColumns"
+        v-if="!column.hide"
+        :key="index"
+        :data-index="index"
+        :style="`width: ${column.width}px;`"
+        :class="{
+            column: true,
+            render: isRenderer(column),
+          }"
+      >
           <span
             v-if="isFiltering &&
             filterList[column.field] &&
@@ -70,7 +69,7 @@
           />
         </li>
         <li
-          :style="`width: ${hasVerticalScrollBar ? scrollWidth : 0}px;`"
+          :style="`width: ${(hasVerticalScrollBar && hasHorizontalScrollBar) ? scrollWidth : 0}px;`"
           class="column-dummy"
         />
       </ul>
@@ -345,19 +344,6 @@ export default {
      * @param {number} index - 컬럼 인덱스
      * @returns {boolean} 마지막 컬럼 유무
      */
-    isLastColumn(index) {
-      const columns = this.orderedColumns;
-      let lastIndex = -1;
-
-      for (let ix = columns.length - 1; ix >= 0; ix--) {
-        if (!columns[ix].hide) {
-          lastIndex = ix;
-          break;
-        }
-      }
-
-      return lastIndex === index;
-    },
     /**
      * 전달받은 필드명과 일치하는 컬럼 인덱스를 반환한다.
      *
