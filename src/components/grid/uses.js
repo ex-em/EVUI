@@ -309,7 +309,6 @@ export const resizeEvent = (params) => {
     const minWidth = isRenderer(stores.orderedColumns[columnIndex])
       ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
     const columnRect = columnEl.getBoundingClientRect();
-    const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
     const resizeLineEl = elementInfo.resizeLine;
     const minLeft = columnRect.left - headerLeft + minWidth;
     const startLeft = columnRect.right - headerLeft;
@@ -324,9 +323,7 @@ export const resizeEvent = (params) => {
     const handleMouseMove = (evt) => {
       const deltaLeft = evt.clientX - startMouseLeft;
       const proxyLeft = startLeft + deltaLeft;
-      let resizeWidth = Math.max(minLeft, proxyLeft);
-
-      resizeWidth = Math.min(maxRight, resizeWidth);
+      const resizeWidth = Math.max(minLeft, proxyLeft);
 
       resizeLineEl.style.left = `${resizeWidth}px`;
     };
