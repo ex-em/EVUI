@@ -45,29 +45,31 @@
           >
             <ev-icon :cls="'ei-filter'"/>
           </span>
-        <span
-          :title="column.caption"
-          class="column-name"
-          @click.stop="onSort(column.field)"
-        >{{ column.caption }}</span>
-        <ev-icon
-          v-if="sortField === column.field"
-          :cls="`${sortOrder === 'desc' ? 'ei-text-vertical' : 'ei-text-up'} sort-icon`"
-        />
-        <span
-          v-if="isFiltering"
-          class="column-filter"
-          @click.stop.prevent="onClickFilter(column)"
-        >
+          <span
+            :title="column.caption"
+            class="column-name"
+            @click.stop="onSort(column.field)"
+          >
+            {{ column.caption }}
+          </span>
+          <ev-icon
+            v-if="sortField === column.field"
+            :cls="`${sortOrder === 'desc' ? 'ei-text-vertical' : 'ei-text-up'} sort-icon`"
+          />
+          <span
+            v-if="isFiltering"
+            class="column-filter"
+            @click.stop.prevent="onClickFilter(column)"
+          >
             <ev-icon :cls="'ei-filter-list set-filter-icon'"/>
           </span>
-        <span
-          class="column-resize"
-          @mousedown.stop.left="onColumnResize(index, $event)"
-        />
-      </li>
+          <span
+            class="column-resize"
+            @mousedown.stop.left="onColumnResize(index, $event)"
+          />
+        </li>
         <li
-          :style="`width: ${hasVerticalScrollBar ? scrollWidth : 0}px;`"
+          :style="`width: ${(hasVerticalScrollBar && hasHorizontalScrollBar) ? scrollWidth : 0}px;`"
           class="column-dummy"
         />
       </ul>
@@ -85,7 +87,7 @@
         :style="`height: ${vScrollTopHeight}px;`"
         class="vscroll-spacer"
       />
-      <table>
+      <table ref="table">
         <tbody>
         <tr
           v-if="!viewStore.length"
@@ -265,6 +267,7 @@ export default {
       vScrollTopHeight: 0,
       vScrollBottomHeight: 0,
       hasVerticalScrollBar: false,
+      hasHorizontalScrollBar: false,
       showColumnOption: false,
       showResizeLine: false,
       showFilterWindow: false,
@@ -341,19 +344,6 @@ export default {
      * @param {number} index - 컬럼 인덱스
      * @returns {boolean} 마지막 컬럼 유무
      */
-    isLastColumn(index) {
-      const columns = this.orderedColumns;
-      let lastIndex = -1;
-
-      for (let ix = columns.length - 1; ix >= 0; ix--) {
-        if (!columns[ix].hide) {
-          lastIndex = ix;
-          break;
-        }
-      }
-
-      return lastIndex === index;
-    },
     /**
      * 전달받은 필드명과 일치하는 컬럼 인덱스를 반환한다.
      *
@@ -694,21 +684,23 @@ export default {
     updateHScroll() {
       const headerEl = this.$refs.header;
       const bodyEl = this.$refs.body;
+      const tableEl = this.$refs.table;
 
       headerEl.scrollLeft = bodyEl.scrollLeft;
+      this.hasHorizontalScrollBar = bodyEl.clientWidth < tableEl.clientWidth;
     },
     /**
      * 수직 스크롤의 위치 계산 후 적용한다.
      */
     updateVScroll() {
-      const el = this.$refs.body;
+      const bodyEl = this.$refs.body;
       const offset = 5;
       const rowHeight = this.rowHeight;
       const store = this.isFiltering ? this.filteredStore : this.originStore;
-      const rowCount = el.clientHeight > rowHeight
-        ? Math.ceil(el.clientHeight / rowHeight) : store.length;
+      const rowCount = bodyEl.clientHeight > rowHeight
+        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
       const totalScrollHeight = store.length * rowHeight;
-      let firstVisibleIndex = Math.floor(el.scrollTop / rowHeight);
+      let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
       if (firstVisibleIndex > store.length - 1) {
         firstVisibleIndex = 0;
       }
@@ -716,8 +708,10 @@ export default {
       const lastVisibleIndex = firstVisibleIndex + rowCount;
       const firstIndex = Math.max(firstVisibleIndex - offset, 0);
       const lastIndex = lastVisibleIndex + offset;
+      const tableEl = this.$refs.table;
 
-      this.hasVerticalScrollBar = rowCount < store.length;
+      this.hasVerticalScrollBar = rowCount < store.length
+        || bodyEl.clientHeight < tableEl.clientHeight;
       this.viewStore = store.slice(firstIndex, lastIndex);
 
       this.vScrollTopHeight = firstIndex * rowHeight;
@@ -1006,6 +1000,13 @@ export default {
 
       this.calculatedColumn();
       this.$forceUpdate();
+
+      if (this.$refs.body?.clientHeight) {
+        this.updateVScroll();
+      }
+      if (this.$refs.body?.clientWidth) {
+        this.updateHScroll();
+      }
     },
     onShow(isVisible) {
       if (isVisible) {
@@ -1020,26 +1021,20 @@ export default {
      * @param {object} event - 이벤트 객체
      */
     onColumnResize(columnIndex, event) {
-      if (this.isLastColumn(columnIndex)) {
-        return;
-      }
-
-      let nextColumnIndex = columnIndex + 1;
+      event.preventDefault();
       const headerEl = this.$refs.header;
+      const bodyEl = this.$refs.body;
       const headerLeft = headerEl.getBoundingClientRect().left;
       const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
-      while (this.orderedColumns[nextColumnIndex].hide) {
-        nextColumnIndex++;
-      }
-      const nextColumnEl = headerEl.querySelector(`li[data-index="${nextColumnIndex}"]`);
+      const minWidth = 40;
       const columnRect = columnEl.getBoundingClientRect();
-      const maxRight = nextColumnEl.getBoundingClientRect().right - headerLeft - 40;
       const resizeLineEl = this.$refs.resizeLine;
-      const minLeft = columnRect.left - headerLeft + 40;
+      const minLeft = columnRect.left - headerLeft + minWidth;
       const startLeft = columnRect.right - headerLeft;
       const startMouseLeft = event.clientX;
       const startColumnLeft = columnRect.left - headerLeft;
 
+      bodyEl.style.overflow = 'auto';
       resizeLineEl.style.left = `${startLeft}px`;
 
       this.showResizeLine = true;
@@ -1047,9 +1042,7 @@ export default {
       const handleMouseMove = (evt) => {
         const deltaLeft = evt.clientX - startMouseLeft;
         const proxyLeft = startLeft + deltaLeft;
-        let resizeWidth = Math.max(minLeft, proxyLeft);
-
-        resizeWidth = Math.min(maxRight, resizeWidth);
+        const resizeWidth = Math.max(minLeft, proxyLeft);
 
         resizeLineEl.style.left = `${resizeWidth}px`;
       };
@@ -1059,11 +1052,12 @@ export default {
         const changedWidth = destLeft - startColumnLeft;
 
         if (this.orderedColumns[columnIndex]) {
-          const columnWidth = this.orderedColumns[columnIndex].width;
           this.orderedColumns[columnIndex].width = changedWidth;
-          this.orderedColumns[columnIndex].resized = true;
-          this.orderedColumns[nextColumnIndex].width += (columnWidth - changedWidth);
-          this.orderedColumns[nextColumnIndex].resized = true;
+          this.orderedColumns.map((column) => {
+            const item = column;
+            item.resized = true;
+            return item;
+          });
         }
 
         this.showResizeLine = false;
@@ -1142,10 +1136,6 @@ $header-height: 33px;
 
   &:nth-last-child(2) {
     border-right: 0;
-
-    .column-resize {
-      cursor: default !important;
-    }
   }
 
   .sort-icon {
