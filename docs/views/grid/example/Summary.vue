@@ -106,7 +106,7 @@ export default {
         type: 'number',
         summaryType: totalSummaryType,
         summaryDecimal: totalSummaryDecimal,
-        // summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
+        summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
       },
       { caption: 'Used (MB)',
         field: 'used_mb',
