@@ -40,10 +40,34 @@
           />
         </div>
         <div class="form-row">
+          <span class="badge yellow">
+            Total (MB) Summary Decimal
+          </span>
+          <ev-input-number
+            v-model="totalSummaryDecimal"
+            :step="1"
+            :min="0"
+            :max="20"
+          />
+        </div>
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
           <span class="badge yellow">Used (MB)</span>
           <ev-select
             v-model="usedSummaryType"
             :items="summaryTypes"
+          />
+        </div>
+        <div class="form-row">
+          <span class="badge yellow">
+            Used (MB) Summary Decimal
+          </span>
+          <ev-input-number
+            v-model="usedSummaryDecimal"
+            :step="1"
+            :min="0"
+            :max="20"
           />
         </div>
       </div>
@@ -58,7 +82,9 @@ import { numberWithComma } from '@/common/utils';
 export default {
   setup() {
     const totalSummaryType = ref('sum');
+    const totalSummaryDecimal = ref(1);
     const usedSummaryType = ref('average');
+    const usedSummaryDecimal = ref(3);
     const summaryTypes = ref([
       { name: 'sum', value: 'sum' },
       { name: 'average', value: 'average' },
@@ -79,11 +105,13 @@ export default {
         field: 'total_mb',
         type: 'number',
         summaryType: totalSummaryType,
-        summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
+        summaryDecimal: totalSummaryDecimal,
+        // summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
       },
       { caption: 'Used (MB)',
         field: 'used_mb',
         type: 'number',
+        summaryDecimal: usedSummaryDecimal,
         summaryType: usedSummaryType, // type 만 지정
       },
       { caption: 'Increment (MB)',
@@ -96,11 +124,11 @@ export default {
       { caption: 'Diff', field: 'diff', type: 'float', decimal: 1, hide: true },
     ]);
     tableData.value = [
-      ['HIDB_DATA_1', 30000, 27506, 7185, 2000.7],
-      ['HIDB_DATA_2', 29000, 23659, 0, 1500],
-      ['HIDB_LARGE_1', 28000, 21695, 1185, -4.7],
-      ['HIDB_INDEX_1', 27000, 23685, 0, 0],
-      ['HIDB_INDEX_2', 26000, 23535, 0, 0],
+      ['HIDB_DATA_1', 30000.12, 27506, 7185, 2000.7],
+      ['HIDB_DATA_2', 29000.234, 23659, 0, 1500],
+      ['HIDB_LARGE_1', 28000.3456, 21695, 1185, -4.7],
+      ['HIDB_INDEX_1', 27000.45678, 23685, 0, 0],
+      ['HIDB_INDEX_2', 26000.567891, 23535, 0, 0],
       ['HIDB_INDEX_3', 25000, 23659, 0, 0],
       ['HIDB_L_INDEX_1', 24000, 23695, 0, 0],
       ['HIDB_L_INDEX_2', 23000, 21691, 0, 0],
@@ -131,8 +159,10 @@ export default {
       checked,
       pageInfo,
       totalSummaryType,
+      totalSummaryDecimal,
       summaryTypes,
       usedSummaryType,
+      usedSummaryDecimal,
       getIncrementValue,
     };
   },

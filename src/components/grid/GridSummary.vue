@@ -53,9 +53,9 @@
             </div>
             <div
               v-else
-              :title="getSummaryValue(column, column.summaryType)"
+              :title="getSummaryValue(column)"
             >
-              {{ getSummaryValue(column, column.summaryType)}}
+              {{ getSummaryValue(column)}}
             </div>
           </span>
           <span
@@ -71,6 +71,7 @@
 <script>
 import { computed, watch, ref, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
+import { bnDivide, bnFloor, bnPlus } from '@/common/utils.bignumber';
 
 export default {
   name: 'EvGridSummary',
@@ -101,34 +102,64 @@ export default {
     },
   },
   setup(props) {
+    const DECIMAL = {
+      max: 20,
+      default: 3,
+    };
     const summaryRef = ref();
     const ROW_DATA_INDEX = 2;
     const stores = computed(() => props.stores);
     const columns = computed(() => props.orderedColumns);
     const showCheckbox = computed(() => props.useCheckbox);
     const styleInfo = computed(() => props.styleOption);
+
+    const getValidDecimal = (decimal) => {
+      if (decimal == null || decimal < 0) {
+        return DECIMAL.default;
+      }
+
+      if (decimal > DECIMAL.max) {
+        return DECIMAL.max;
+      }
+
+      return decimal;
+    };
+
     const getConvertValue = (column, value) => {
+      if (typeof value === 'string' && value.length === 0) {
+        return value;
+      }
+
+      const { type, decimal } = column;
       let convertValue = value;
 
-      if (column.type === 'number') {
+      if (type === 'number') {
         convertValue = numberWithComma(value);
         convertValue = convertValue === false ? value : convertValue;
-      } else if (column.type === 'float') {
-        const floatValue = convertValue.toFixed(column.decimal ?? 3);
+      } else if (type === 'float') {
+        const floatValue = convertValue.toFixed(getValidDecimal(decimal ?? DECIMAL.default));
         convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       }
 
       return convertValue;
     };
+
     const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
-    const getSummaryValue = (column, summaryType) => {
+    const getSummaryValue = (column) => {
+      const {
+        type,
+        field,
+        summaryType,
+        summaryDecimal,
+      } = column;
+
       let result = '';
-      const columnIndex = getColumnIndex(column.field);
+      const columnIndex = getColumnIndex(field);
       if (columnIndex >= 0) {
         if (summaryType === 'count') {
           return stores.value.store.length;
         }
-        if (column.type === 'number' || column.type === 'float') {
+        if (type === 'number' || type === 'float') {
           let columnValues = [];
           if (props.isTree) {
             columnValues = stores.value.store.reduce((acc, cur) => {
@@ -145,33 +176,44 @@ export default {
             columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
           }
           switch (summaryType) {
-            case 'sum':
-              result = columnValues.reduce((prev, curr) => {
-                const value = Number(curr);
-                if (!Number.isNaN(value)) {
-                  return prev + value;
+            case 'sum': {
+              const sumValue = columnValues.reduce((prev, curr) => {
+                // const value = Number(curr);
+                if (!Number.isNaN(curr)) {
+                  return bnPlus(prev, curr);
                 }
                 return prev;
               }, 0);
+
+              result = sumValue && bnFloor(
+                sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default),
+              );
               break;
-            case 'average':
-              result = columnValues.reduce((prev, curr) => {
+            }
+            case 'average': {
+              const sumValue = columnValues.reduce((prev, curr) => {
                 const value = Number(curr);
                 if (!Number.isNaN(value)) {
-                  return prev + value;
+                  return bnPlus(prev, value);
                 }
                 return prev;
-              }, 0) / columnValues.length;
-              if (result % 1 !== 0) {
-                result = result.toFixed(1);
-              }
+              }, 0);
+              result = sumValue && bnFloor(
+                bnDivide(sumValue, columnValues.length),
+                getValidDecimal(summaryDecimal ?? DECIMAL.default),
+              );
               break;
-            case 'max':
-              result = Math.max(...columnValues);
+            }
+            case 'max': {
+              const filteredNullValues = columnValues.filter(value => value != null);
+              result = filteredNullValues.length ? Math.max(...filteredNullValues) : '';
               break;
-            case 'min':
-              result = Math.min(...columnValues);
+            }
+            case 'min': {
+              const filteredNullValues = columnValues.filter(value => value != null);
+              result = filteredNullValues.length ? Math.min(...filteredNullValues) : '';
               break;
+            }
             default:
               break;
           }
@@ -188,10 +230,7 @@ export default {
       fields.forEach((name, idx) => {
         const columnIndex = getColumnIndex(name);
         if (columnIndex >= 0) {
-          const value = getSummaryValue(
-            stores.value.orderedColumns[columnIndex],
-            column.summaryType,
-          );
+          const value = getSummaryValue(stores.value.orderedColumns[columnIndex]);
           result = result.replace(`{${idx}}`, value);
         }
       });
