@@ -574,6 +574,7 @@ const modules = {
       return;
     }
 
+    this.tooltipDOM.style.display = 'block';
     const contentsWidth = customTooltipEl.offsetWidth;
     const contentsHeight = customTooltipEl.offsetHeight;
 
@@ -595,8 +596,6 @@ const modules = {
     this.tooltipDOM.style.top = expectedPosY > maximumPosY
       ? `${reversedPosY}px`
       : `${expectedPosY}px`;
-
-    this.tooltipDOM.style.display = 'block';
   },
 
   /**
