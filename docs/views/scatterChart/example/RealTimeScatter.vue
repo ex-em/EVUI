@@ -1,6 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
+      v-model:realTimeScatterReset="resetFlag"
       :data="chartData"
       :options="chartOptions"
     />
@@ -10,13 +11,35 @@
           <label>데이터 자동 업데이트</label>
           <ev-toggle v-model="isRealTime" />
         </div>
+        <div class="row-item">
+          <span class="item-title">
+            데이터 초기화
+          </span>
+          <ev-button
+            class="component"
+            @click="dataReset"
+          >
+            reset
+          </ev-button>
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            change range (s)
+          </span>
+          <ev-input-number
+            v-model="realTimeScatterRange"
+            class="component"
+            :min="50"
+            :step="50"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, shallowRef, watch, onUnmounted } from 'vue';
+import { ref, shallowRef, watch, onUnmounted, reactive } from 'vue';
 
 export default {
   setup() {
@@ -50,15 +73,16 @@ export default {
       },
     });
 
-    const chartOptions = {
+    const realTimeScatterRange = ref(300);
+    const chartOptions = reactive({
       type: 'scatter',
       width: '100%',
       height: '100%',
       padding: { top: 20, right: 2, bottom: 4, left: 2 },
       axesX: [{
         type: 'time',
-        timeFormat: 'HH:mm',
-        interval: 'minute',
+        timeFormat: 'HH:mm:ss',
+        interval: 'second',
         showAxis: true,
         showGrid: false,
         axisLineColor: '#C9CFDC',
@@ -93,9 +117,9 @@ export default {
       displayOverflow: true,
       realTimeScatter: {
         use: true,
-        range: 300, // 총 5분, 초 단위
+        range: realTimeScatterRange.value, // 총 5분, 초 단위
       },
-    };
+    });
 
     let timeoutId;
 
@@ -182,6 +206,22 @@ export default {
       }
     }, { immediate: true });
 
+    watch(() => realTimeScatterRange.value, () => {
+      chartOptions.realTimeScatter.range = realTimeScatterRange.value;
+    });
+
+    const resetFlag = ref(false);
+    const dataReset = () => {
+      resetFlag.value = true;
+      chartData.value = {
+        series,
+        data: {
+          series1: [],
+          series2: [],
+        },
+      };
+    };
+
     onUnmounted(() => {
       clearTimeout(timeoutId);
     });
@@ -190,6 +230,9 @@ export default {
       isRealTime,
       chartData,
       chartOptions,
+      realTimeScatterRange,
+      resetFlag,
+      dataReset,
     };
   },
 };

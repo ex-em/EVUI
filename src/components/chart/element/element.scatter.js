@@ -144,9 +144,9 @@ class Scatter {
     const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
 
-    for (let i = 0; i < this.data[this.sId].dataGroup.length; i++) {
-      for (let j = 0; j < this.data[this.sId].dataGroup[i].data.length; j++) {
-        const item = this.data[this.sId].dataGroup[i].data[j];
+    for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
+      for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
+        const item = this.data[this.sId]?.dataGroup[i]?.data[j];
 
         if (!duple.has(`${item.x}${item.y}`)) {
           duple.add(`${item.x}${item.y}`);
