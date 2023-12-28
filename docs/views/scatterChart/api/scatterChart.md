@@ -294,4 +294,4 @@ const chartOptions = {
 
 ### 6. v-model:realTimeScatterReset
 - realTimeScatter 옵션을 사용할 때, 내부 데이터를 모두 초기화하고 싶을 때 사용.
-- realTimeScatterReset가 true가 되면 데이터를 모두 초기화하고 자동으로 false로 바뀜. 초기화하고 싶을 때마다 true로 바꿔주면 됩니다.
+- realTimeScatterReset이 true가 되면 데이터를 모두 초기화하고 자동으로 false로 바뀜. 초기화하고 싶을 때마다 true로 바꿔주면 됩니다.
