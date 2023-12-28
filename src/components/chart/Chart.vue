@@ -72,6 +72,10 @@
         type: Number,
         default: 0,
       },
+      realTimeScatterReset: {
+        type: Boolean,
+        default: false,
+      },
     },
     emits: [
       'click',
@@ -83,8 +87,9 @@
       'update:selectedSeries',
       'update:zoomStartIdx',
       'update:zoomEndIdx',
+      'update:realTimeScatterReset',
     ],
-    setup(props) {
+    setup(props, { emit }) {
       let evChart = null;
       const isMounted = ref(false);
       const injectIsChartGroup = inject('isChartGroup', false);
@@ -245,6 +250,18 @@
           controlZoomIdx(zoomStartIdx, zoomEndIdx);
         });
       }
+
+      watch(() => props.realTimeScatterReset, (flag) => {
+        if (flag) {
+          Object.keys(evChart.dataSet).forEach((series) => {
+            if (evChart.dataSet[series]) {
+              evChart.dataSet[series].dataGroup = [];
+            }
+          });
+
+          emit('update:realTimeScatterReset', false);
+        }
+      });
 
       onMounted(async () => {
         if (injectEvChartPropsInGroup?.value) {

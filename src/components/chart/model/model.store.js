@@ -81,7 +81,7 @@ const modules = {
     for (let x = 0; x < keys.length; x++) {
       const key = keys[x];
       const data = datas[key];
-      const storeLength = data.length;
+      const storeLength = data?.length;
       let lastTime = 0;
 
       if (!this.isInit || this.updateSeries) {
@@ -98,12 +98,12 @@ const modules = {
           ...defaultValues,
           ...this.dataSet[key],
         };
-        this.dataSet[key].length = this.options.realTimeScatter.range || 300;
-        this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
-        this.dataSet[key].fromTime = this.dataSet[key].toTime
-          - this.dataSet[key].length * 1000;
-        this.dataSet[key].endIndex = this.dataSet[key].length - 1;
       }
+
+      this.dataSet[key].length = this.options.realTimeScatter.range || 300;
+      this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
+      this.dataSet[key].fromTime = this.dataSet[key].toTime - this.dataSet[key].length * 1000;
+      this.dataSet[key].endIndex = this.dataSet[key].length - 1;
 
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
@@ -128,20 +128,19 @@ const modules = {
           - this.dataSet[key].length * 1000;
       }
 
-      if (!this.isInit || this.updateSeries) {
-        for (let i = 0; i < this.dataSet[key].length; i++) {
-          const defaultValues = {
-            data: [],
-            max: 0,
-            min: Infinity,
-          };
+      for (let i = 0; i < this.dataSet[key].length; i++) {
+        const defaultValues = {
+          data: [],
+          max: 0,
+          min: Infinity,
+        };
 
-          this.dataSet[key].dataGroup[i] = {
-            ...defaultValues,
-            ...this.dataSet[key].dataGroup[i],
-          };
-        }
-      } else if (gapCount > 0) {
+        this.dataSet[key].dataGroup[i] = {
+          ...defaultValues,
+          ...this.dataSet[key].dataGroup[i],
+        };
+      }
+      if (gapCount > 0) {
         if (gapCount >= this.dataSet[key].length) {
           for (let i = 0; i < this.dataSet[key].length; i++) {
             this.dataSet[key].dataGroup[i].data.length = 0;

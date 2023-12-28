@@ -291,3 +291,7 @@ const chartOptions = {
  
  * drag-select는  `dragSelection` 옵션의 `use`값이 `true` 일 때 이벤트를 발생 시킬 수 있다. 
  그리고 선택영역은 그래프에 표시된 데이터의 중앙이 포함 되어야 선택영역 내 데이터로 인식 한다.
+
+### 6. v-model:realTimeScatterResetFlag
+- realTimeScatter 옵션을 사용할 때, 내부 데이터를 모두 초기화하고 싶을 때 사용.
+- realTimeScatterResetFlag가 true가 되면 데이터를 모두 초기화하고 자동으로 false로 바뀜. 초기화하고 싶을 때마다 true로 바꿔주면 됩니다.
