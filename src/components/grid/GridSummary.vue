@@ -178,9 +178,9 @@ export default {
           switch (summaryType) {
             case 'sum': {
               const sumValue = columnValues.reduce((prev, curr) => {
-                // const value = Number(curr);
-                if (!Number.isNaN(curr)) {
-                  return bnPlus(prev, curr);
+                const value = Number(curr);
+                if (!Number.isNaN(value)) {
+                  return bnPlus(prev, value);
                 }
                 return prev;
               }, 0);
