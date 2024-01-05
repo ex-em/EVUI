@@ -263,6 +263,16 @@
         }
       });
 
+      watch(() => props.options.realTimeScatter?.use, (use) => {
+        evChart.options.realTimeScatter.use = use ?? false;
+
+        evChart.update({
+          updateSeries: true,
+          updateSelTip: { update: false, keepDomain: false },
+          updateData: false,
+        });
+      });
+
       onMounted(async () => {
         if (injectEvChartPropsInGroup?.value) {
           injectEvChartPropsInGroup.value.push(props);
