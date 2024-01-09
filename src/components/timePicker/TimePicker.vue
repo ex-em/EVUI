@@ -14,7 +14,7 @@
         class="ev-time-picker-wrapper"
       >
         <input
-          v-model="startTime"
+          v-model="time[0]"
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
@@ -45,7 +45,7 @@
         class="ev-time-picker-wrapper"
       >
         <input
-          v-model="endTime"
+          v-model="time[1]"
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 
 export default {
   name: 'EvTimePicker',
@@ -152,30 +152,30 @@ export default {
     change: null,
   },
   setup(props, { emit }) {
-    let startTime = ref('00:00');
-    let endTime = ref('23:59');
-    let time = ref('00:00');
+    const time = computed({
+      get: () => props.modelValue,
+      set: (value) => {
+        if (props.type === 'range') {
+          if (Array.isArray(value)) {
+            const startTime = (value[0] > value[1] ? '00:00' : value[0]);
+            const endTime = (startTime.value > value[1] ? '23:59' : value[1]);
+
+            emit('update:modelValue', [startTime, endTime]);
+          }
+        } else {
+          emit('update:modelValue', value);
+        }
+      },
+    }); // <string | string[]>
+
+    const previousValue = ref(
+      Array.isArray(time.value) ? [`${time.value[0]}`, `${time.value[1]}`] : `${time.value}`,
+    ); // <string | string[]>
+
     const isWrongType = reactive({
       single: false,
       rangeStart: false,
       rangeEnd: false,
-    });
-
-    if (props.type === 'range') {
-      if (Array.isArray(props.modelValue)) {
-        startTime = ref(props.modelValue[0] > props.modelValue[1] ? '00:00' : props.modelValue[0]);
-        endTime = ref(startTime.value > props.modelValue[1] ? '23:59' : props.modelValue[1]);
-      }
-      emit('update:modelValue', [startTime.value, endTime.value]);
-    } else {
-      time = ref(props.modelValue || '00:00');
-      emit('update:modelValue', time.value);
-    }
-
-    const previousValue = reactive({
-      singleTime: time.value,
-      rangeStartTime: startTime.value,
-      rangeEndTime: endTime.value,
     });
 
     const validTimeExp = (timeExp) => {
@@ -184,26 +184,28 @@ export default {
     };
 
     const setValidStartTime = () => {
-      if (!validTimeExp(startTime.value)) {
-        startTime.value = previousValue.rangeStartTime;
+      if (!Array.isArray(time.value)) return;
+      if (!validTimeExp(time.value[0])) {
+        time.value[0] = previousValue.value[0];
       }
-      if (endTime.value && (startTime.value > endTime.value)) {
-        startTime.value = endTime.value;
+      if (time.value[1] && (time.value[0] > time.value[1])) {
+        time.value[0] = time.value[1];
       }
-      previousValue.rangeStartTime = startTime.value;
+      previousValue.value[0] = time.value[0];
     };
 
     const setValidEndTime = () => {
-      if (!validTimeExp(endTime.value)) {
-        endTime.value = previousValue.rangeEndTime;
+      if (!Array.isArray(time.value)) return;
+      if (!validTimeExp(time.value[1])) {
+        time.value[1] = previousValue.value[1];
       }
-      if (startTime.value && (startTime.value > endTime.value)) {
-        endTime.value = previousValue.rangeEndTime;
-        if (startTime.value > previousValue.rangeEndTime) {
-          endTime.value = startTime.value;
+      if (time.value[0] && (time.value[0] > time.value[1])) {
+        time.value[1] = previousValue.value[1];
+        if (time.value[0] > previousValue.value[1]) {
+          time.value[1] = time.value[0];
         }
       }
-      previousValue.rangeEndTime = endTime.value;
+      previousValue.value[1] = time.value[1];
     };
 
     // startTime event for range type
@@ -218,14 +220,12 @@ export default {
     const changeStartTime = (e) => {
       setValidStartTime();
       isWrongType.rangeStart = false;
-      emit('update:modelValue', [startTime.value, endTime.value]);
-      emit('change', e, [startTime.value, endTime.value]);
+      emit('change', e, time.value);
     };
 
     const clearStartTime = () => {
-      startTime.value = '';
+      time.value[0] = '';
       isWrongType.rangeStart = true;
-      emit('update:modelValue', [startTime.value, endTime.value]);
     };
 
     // endTime event for range type
@@ -240,14 +240,12 @@ export default {
     const changeEndTime = (e) => {
       setValidEndTime();
       isWrongType.rangeEnd = false;
-      emit('update:modelValue', [startTime.value, endTime.value]);
-      emit('change', e, [startTime.value, endTime.value]);
+      emit('change', e, time.value);
     };
 
     const clearEndTime = () => {
-      endTime.value = '';
+      time.value[1] = '';
       isWrongType.rangeEnd = true;
-      emit('update:modelValue', [startTime.value, endTime.value]);
     };
 
     // event for single type
@@ -261,26 +259,23 @@ export default {
 
     const changeTime = (e) => {
       if (!validTimeExp(time.value)) {
-        time.value = previousValue.singleTime;
+        time.value = previousValue.value;
       } else {
-        previousValue.singleTime = time.value;
+        previousValue.value = time.value;
       }
 
       isWrongType.single = !validTimeExp(time.value);
 
-      emit('update:modelValue', time.value);
       emit('change', e, time.value);
     };
 
     const clearContents = () => {
       time.value = '';
       isWrongType.single = true;
-      emit('update:modelValue', time.value);
     };
 
+
     return {
-      startTime,
-      endTime,
       time,
       isWrongType,
       previousValue,
