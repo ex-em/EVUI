@@ -764,6 +764,9 @@ class EvChart {
     }
 
     if (this.options.realTimeScatter?.use) {
+      if (!this.dataSet) {
+        this.dataSet = {};
+      }
       this.createRealTimeScatterDataSet(data);
     } else {
       this.createDataSet(data, labels);
