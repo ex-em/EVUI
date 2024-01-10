@@ -115,7 +115,7 @@ export default {
       default: '',
       validator: (time) => {
         const timeRegexExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-        if (Array.isArray(time) && !timeRegexExp.test(time[0]) && timeRegexExp.test(time[1])) {
+        if (Array.isArray(time) && (!timeRegexExp.test(time[0]) || !timeRegexExp.test(time[1]))) {
           // range mode
           console.warn('Please check the time format in the Timepicker.');
           return false;
@@ -273,7 +273,6 @@ export default {
       time.value = '';
       isWrongType.single = true;
     };
-
 
     return {
       time,
