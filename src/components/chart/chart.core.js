@@ -328,7 +328,7 @@ class EvChart {
             }
 
             if (this.options.realTimeScatter?.use) {
-              series = this.seriesList[chartTypeSet[chartTypeSet.length - 1 - jx]];
+              series = this.seriesList[chartTypeSet.at(-1 - jx)];
             }
 
             series.draw({
