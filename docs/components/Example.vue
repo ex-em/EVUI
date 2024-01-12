@@ -1,6 +1,15 @@
 <template>
   <article class="article-wrapper">
-    <h3 class="article-title">
+    <h3
+      :id="kebabCase(title)"
+      class="article-title"
+    >
+      <a
+        class="article-title-anchor"
+        @click="$router.push({ hash: `#${kebabCase(title)}` })"
+      >
+        ¶
+      </a>
       {{ title }}
     </h3>
     <p
@@ -49,6 +58,7 @@
 
 <script>
 import { ref, onMounted } from 'vue';
+import { kebabCase } from 'lodash-es';
 import highlight from 'docs/directives/highlight';
 
 export default {
@@ -95,6 +105,7 @@ export default {
     });
 
     return {
+      kebabCase,
       codeExpend,
       codeWrapper,
       clickExpend,
@@ -126,6 +137,20 @@ export default {
   margin-bottom: 20px;
   font-size: 23px;
   font-weight: bold;
+  &-anchor {
+    float: left;
+    margin-left: -1em;
+    color: $color-blue;
+    opacity: 0;
+    cursor: pointer;
+    text-decoration: none;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &:hover .article-title-anchor {
+    opacity: 1;
+  }
 }
 .article-description {
   margin-bottom: 30px;
