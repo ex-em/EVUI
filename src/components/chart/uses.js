@@ -100,6 +100,7 @@ const DEFAULT_OPTIONS = {
     useScrollbar: false,
     textOverflow: 'wrap',
     fontFamily: 'Roboto',
+    colorShape: 'rect',
   },
   indicator: {
     use: true,
