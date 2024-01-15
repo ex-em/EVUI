@@ -253,7 +253,7 @@
 
       watch(() => props.realTimeScatterReset, (flag) => {
         if (flag) {
-          Object.keys(evChart.dataSet).forEach((series) => {
+          Object.keys(evChart.dataSet ?? {}).forEach((series) => {
             if (evChart.dataSet[series]) {
               evChart.dataSet[series].dataGroup = [];
             }

@@ -246,7 +246,7 @@ class EvChart {
       const chartTypeSet = this.seriesInfo.charts[chartType];
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
-        const series = this.seriesList[chartTypeSet[jx]];
+        let series = this.seriesList[chartTypeSet[jx]];
 
         switch (chartType) {
           case 'line': {
@@ -325,6 +325,10 @@ class EvChart {
               } else {
                 selectInfo = null;
               }
+            }
+
+            if (this.options.realTimeScatter?.use) {
+              series = this.seriesList[chartTypeSet.at(-1 - jx)];
             }
 
             series.draw({
