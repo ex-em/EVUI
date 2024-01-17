@@ -170,6 +170,24 @@ const modules = {
   },
 
   /**
+   * Draw series color shape
+   * @param {object} context    tooltip canvas context
+   * @param {string} shape  // 'circle' | 'rect' (default)
+   * @param {object} centerPosition  // {x: number, y: number}
+   */
+  drawSeriesColorShape(context, shape, centerPosition) {
+    const { x, y } = centerPosition;
+
+    if (shape === 'circle') {
+      context.beginPath();
+      context.arc(x - 2, y - 4, 6, 0, 2 * Math.PI);
+      context.fill();
+    } else {
+      context.fillRect(x - 4, y - 12, 12, 12);
+    }
+  },
+
+  /**
    * Draw tooltip canvas
    * @param {object} hitInfo    mousemove callback
    * @param {object} context    tooltip canvas context
@@ -279,13 +297,7 @@ const modules = {
       }
 
       // 1. Draw series color
-      if (opt.colorShape === 'circle') {
-        ctx.beginPath();
-        ctx.arc(itemX - 2, itemY - 4, 6, 0, 2 * Math.PI);
-        ctx.fill();
-      } else {
-        ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-      }
+      this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
       ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
@@ -421,16 +433,10 @@ const modules = {
     }
 
     // 1. Draw value color
-    if (opt.colorShape === 'circle') {
-      ctx.beginPath();
-      ctx.arc(itemX - 2, itemY - 4, 6, 0, 2 * Math.PI);
-      ctx.fill();
-    } else {
-      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-    }
-    ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
+    this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
     // 2. Draw value y names
+    ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
     ctx.textBaseline = 'Bottom';
     if (this.axesY.length) {
       ctx.fillText(this.axesY[hitAxis.y].getLabelFormat(hitItem.y), itemX + COLOR_MARGIN, itemY);
@@ -527,17 +533,10 @@ const modules = {
       }
 
       // 1. Draw series color
-      if (opt.colorShape === 'circle') {
-        ctx.beginPath();
-        ctx.arc(itemX - 2, itemY - 4, 6, 0, 2 * Math.PI);
-        ctx.fill();
-      } else {
-        ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-      }
-
-      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
+      this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
+      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - COLOR_MARGIN - VALUE_MARGIN;
