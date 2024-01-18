@@ -103,6 +103,7 @@ export const AXIS_OPTION = {
     fitWidth: false,
     fitDir: 'right',
     alignToGridLine: false,
+    padding: 0,
   },
   title: {
     use: false,

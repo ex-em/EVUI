@@ -184,12 +184,13 @@ export default {
    * Calculate text size with html
    * @param {string} text         text is needed to check size
    * @param {string} fontStyle    text font style
+   * @param {number} padding      user define text padding
    *
    * @returns {object} text size information
    */
-  calcTextSize(text, fontStyle) {
+  calcTextSize(text, fontStyle, padding = 0) {
     const calc = document.createElement('span');
-    const style = `visibility:hidden; position:absolute; top:-10000px; font: ${fontStyle};`;
+    const style = `visibility:hidden; position:absolute; top:-10000px; font: ${fontStyle}; padding: 0 ${padding}px`;
 
     calc.setAttribute('style', style);
     calc.style.font = fontStyle;

@@ -105,7 +105,11 @@ class Scale {
       max: maxValue,
       minLabel,
       maxLabel,
-      size: Util.calcTextSize(maxLabel, Util.getLabelStyle(this.labelStyle)),
+      size: Util.calcTextSize(
+        maxLabel,
+        Util.getLabelStyle(this.labelStyle),
+        this.labelStyle?.padding,
+      ),
     };
   }
 
