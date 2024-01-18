@@ -199,23 +199,26 @@ const chartData =
 * PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 
 #### tooltip
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-| --- | ---- | ----- | --- | ----------|
-| use | Boolean | false | tooltip 표시 여부 | true /false |
-| backgroundColor | Hex, RGB, RGBA Code(String) | '#4C4C4C' | tooltip 배경 색상  | |
-| borderColor | Hex, RGB, RGBA Code(String) | '#666666' | tooltip 테두리 색상  | |
-| useShadow | Boolean | false | 그림자 사용 여부  | |
-| shadowOpacity | Number | 0.25 | 그림자 투명도  | |
-| throttledMove | Boolean | false | 데이터 조회 Throttling 처리 유무  | |
-| debouncedHide | Boolean | false | 좌표 이동 시 tooltip hide 여부  | |
-| sortByValue | Boolean | true | 값을 기준으로 정렬할지의 여부  | |
-| useScrollbar | Boolean | false | 스크롤바 사용 여부  | |
-| maxHeight | Number |  | 툴팁의 최대 높이  | |
-| maxWidth | Number |  | 툴팁의 최대 너비  | |
-| textOverflow | String | 'wrap' | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis |
-| fontFamily | String | 'Roboto' | 툴팁에 표시될 폰트  | 'Roboto', 'serif |
-| showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
-| formatter | function / Object | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (아래 코드 참고) |
+| 이름                  | 타입                          | 디폴트       | 설명                                   | 종류(예시)                                                              |
+|---------------------|-----------------------------|-----------|--------------------------------------|---------------------------------------------------------------------|
+| use                 | Boolean                     | false     | tooltip 표시 여부                        | true /false                                                         |
+| backgroundColor     | Hex, RGB, RGBA Code(String) | '#4C4C4C' | tooltip 배경 색상                        |                                                                     |
+| borderColor         | Hex, RGB, RGBA Code(String) | '#666666' | tooltip 테두리 색상                       |                                                                     |
+| useShadow           | Boolean                     | false     | 그림자 사용 여부                            |                                                                     |
+| shadowOpacity       | Number                      | 0.25      | 그림자 투명도                              |                                                                     |
+| throttledMove       | Boolean                     | false     | 데이터 조회 Throttling 처리 유무              |                                                                     |
+| debouncedHide       | Boolean                     | false     | 좌표 이동 시 tooltip hide 여부              |                                                                     |
+| sortByValue         | Boolean                     | true      | 값을 기준으로 정렬할지의 여부                     |                                                                     |
+| useScrollbar        | Boolean                     | false     | 스크롤바 사용 여부                           |                                                                     |
+| maxHeight           | Number                      |           | 툴팁의 최대 높이                            |                                                                     |
+| maxWidth            | Number                      |           | 툴팁의 최대 너비                            |                                                                     |
+| textOverflow        | String                      | 'wrap'    | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis'                                                  |
+| fontFamily          | String                      | 'Roboto'  | 툴팁에 표시될 폰트                           | 'Roboto', 'serif'                                                   |
+| fontColor           | Hex code (string), Object   | '#000000' | 툴팁에 표시될 폰트 컬러                        | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
+| fontSize            | Object                      | { title: 16, contents: 14 } | 툴팁에 표시될 폰트 사이즈  | |
+| colorShape | String | 'rect' | 툴팁에 표시될 series color의 모양 | 'rect', 'circle' |
+| showAllValueInRange | Boolean                     | false     | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
+| formatter           | function / Object           | null      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용      | (아래 코드 참고)                                                          |
 ```
 const chartOptions = {
     tooltip: {
