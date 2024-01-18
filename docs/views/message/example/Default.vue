@@ -72,6 +72,11 @@
       Show HTML
     </ev-button>
   </div>
+  <div class="case">
+    <p class="case-title">Close from outside</p>
+    <ev-button @click="showForLong">Show forever</ev-button>
+    <ev-button v-show="isMessageShown" @click="hide">Hide</ev-button>
+  </div>
 </template>
 
 <script>
@@ -80,6 +85,7 @@ import { ref, getCurrentInstance } from 'vue';
 export default {
   setup() {
     const { ctx } = getCurrentInstance();
+
     const showInfo = () => {
       ctx.$message('Infomation. This is an Info type message.');
     };
@@ -135,6 +141,20 @@ export default {
         useHTML: true,
       });
     };
+    const isMessageShown = ref(false);
+    let hideFunction = () => {};
+    const showForLong = () => {
+      const { hide } = ctx.$message({
+        message: 'This message stays long time until you press close button.',
+        duration: 10000000,
+      });
+      hideFunction = hide;
+      isMessageShown.value = true;
+    };
+    const hide = () => {
+      isMessageShown.value = false;
+      hideFunction();
+    };
     return {
       showInfo,
       showSuccess,
@@ -146,6 +166,9 @@ export default {
       onCloseMsg,
       showOnClose,
       showHTML,
+      showForLong,
+      hide,
+      isMessageShown,
     };
   },
 };
