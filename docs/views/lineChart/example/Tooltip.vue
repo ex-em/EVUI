@@ -87,15 +87,45 @@
       <div class="row">
         <div class="row-item">
           <span class="item-title">
-            글자 색상
-          </span>
-          <ev-text-field v-model="fontColor"/>
-        </div>
-        <div class="row-item">
-          <span class="item-title">
             배경 색상
           </span>
           <ev-text-field v-model="backgroundColor"/>
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            series color 모양
+          </span>
+          <ev-select
+              v-model="colorShape"
+              :items="colorShapeList"
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <h3> Font Color </h3>
+      </div>
+
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            Title
+          </span>
+          <ev-text-field v-model="titleFontColor"/>
+        </div>
+
+        <div class="row-item">
+          <span class="item-title">
+            Label
+          </span>
+          <ev-text-field v-model="labelFontColor"/>
+        </div>
+
+        <div class="row-item">
+          <span class="item-title">
+            Value
+          </span>
+          <ev-text-field v-model="valueFontColor"/>
         </div>
       </div>
     </div>
@@ -115,8 +145,19 @@
       const useShadow = ref(false);
       const shadowOpacity = ref(0.25);
       const fontColor = ref('#000000');
-      const backgroundColor = ref('rgb(210, 234, 227, 0.7)');
+      const backgroundColor = ref('rgb(210, 234, 227, 1)');
       const textOverflow = ref('wrap');
+      const colorShape = ref('rect');
+      const colorShapeList = [{
+        name: 'rect (Default)',
+        value: 'rect',
+      }, {
+        name: 'circle',
+        value: 'circle',
+      }];
+      const titleFontColor = ref('#005CB5');
+      const labelFontColor = ref('#FF8C40');
+      const valueFontColor = ref('#FF00FF');
 
       const chartData = reactive({
         series: {
@@ -195,7 +236,6 @@
           use: true,
           sortByValue,
           backgroundColor,
-          fontColor,
           shadowOpacity,
           useShadow,
           useScrollbar,
@@ -205,6 +245,12 @@
           formatter: {
             title: ({ x }) => dayjs(x).format('YYYY-MM-DD HH:mm:ss'),
             value: ({ y }) => `${y.toFixed(2)}`,
+          },
+          colorShape,
+          fontColor: {
+            title: titleFontColor,
+            label: labelFontColor,
+            value: valueFontColor,
           },
         },
       });
@@ -237,6 +283,11 @@
         fontColor,
         backgroundColor,
         textOverflow,
+        colorShape,
+        colorShapeList,
+        titleFontColor,
+        labelFontColor,
+        valueFontColor,
       };
     },
   };

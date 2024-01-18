@@ -3,8 +3,8 @@ import debounce from '@/common/utils.debounce';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
-const TITLE_HEIGHT = 30;
-const TEXT_HEIGHT = 14;
+const TITLE_HEIGHT = 35;
+const TEXT_HEIGHT = 20;
 const LINE_SPACING = 8;
 const COLOR_MARGIN = 16;
 const VALUE_MARGIN = 50;
@@ -77,7 +77,7 @@ const modules = {
     const [maxSeries, maxValue] = hitInfo.maxTip;
     const seriesKeys = Object.keys(items);
     const seriesLen = seriesKeys.length;
-    const boxPadding = { t: 8, b: 8, r: 20, l: 16 };
+    const boxPadding = { t: 10, b: 4, r: 20, l: 16 };
     const opt = this.options.tooltip;
 
 
@@ -167,6 +167,24 @@ const modules = {
     this.tooltipDOM.style.top = expectedPosY > maximumPosY
       ? `${reversedPosY}px`
       : `${expectedPosY}px`;
+  },
+
+  /**
+   * Draw series color shape
+   * @param {object} context    tooltip canvas context
+   * @param {string} shape  // 'circle' | 'rect' (default)
+   * @param {object} centerPosition  // {x: number, y: number}
+   */
+  drawSeriesColorShape(context, shape, centerPosition) {
+    const { x, y } = centerPosition;
+
+    if (shape === 'circle') {
+      context.beginPath();
+      context.arc(x - 2, y - 4, 6, 0, 2 * Math.PI);
+      context.fill();
+    } else {
+      context.fillRect(x - 4, y - 12, 12, 12);
+    }
   },
 
   /**
@@ -279,10 +297,10 @@ const modules = {
       }
 
       // 1. Draw series color
-      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-      ctx.fillStyle = opt.fontColor;
+      this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
+      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - COLOR_MARGIN - VALUE_MARGIN;
@@ -317,6 +335,7 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
+      ctx.fillStyle = opt.fontColor?.value ?? opt.fontColor;
       ctx.textAlign = 'right';
       ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
@@ -414,10 +433,10 @@ const modules = {
     }
 
     // 1. Draw value color
-    ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-    ctx.fillStyle = opt.fontColor;
+    this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
     // 2. Draw value y names
+    ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
     ctx.textBaseline = 'Bottom';
     if (this.axesY.length) {
       ctx.fillText(this.axesY[hitAxis.y].getLabelFormat(hitItem.y), itemX + COLOR_MARGIN, itemY);
@@ -514,10 +533,10 @@ const modules = {
       }
 
       // 1. Draw series color
-      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
-      ctx.fillStyle = opt.fontColor;
+      this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
+      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - COLOR_MARGIN - VALUE_MARGIN;
@@ -626,7 +645,7 @@ const modules = {
       this.tooltipDOM.style.overflowY = 'hidden';
       this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
       this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
-      this.tooltipDOM.style.color = opt.fontColor;
+      this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
     }
   },
 
@@ -638,7 +657,7 @@ const modules = {
     this.tooltipDOM.style.overflowY = 'hidden';
     this.tooltipDOM.style.backgroundColor = tooltipOptions.backgroundColor;
     this.tooltipDOM.style.border = `1px solid ${tooltipOptions.borderColor}`;
-    this.tooltipDOM.style.color = tooltipOptions.fontColor;
+    this.tooltipDOM.style.color = tooltipOptions.fontColor?.title ?? tooltipOptions.fontColor;
 
     if (tooltipOptions.useShadow) {
       const shadowColor = `rgba(0, 0, 0, ${tooltipOptions.shadowOpacity})`;
