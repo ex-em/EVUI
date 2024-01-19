@@ -718,7 +718,13 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const { updateSeries, updateSelTip, updateLegend, updateData } = updateInfo;
+    const {
+      updateSeries,
+      updateSelTip,
+      updateLegend,
+      updateData,
+      updateTooltipFormatter,
+    } = updateInfo;
 
     if (!this.isInit) {
       return;
@@ -789,6 +795,7 @@ class EvChart {
       this.hideTitle();
     }
 
+    // legend Update
     if (options.legend.show) {
       const useTable = !!options.legend?.table?.use
         && options.type !== 'heatMap'
@@ -810,6 +817,13 @@ class EvChart {
     } else if (this.isInitLegend) {
       this.hideLegend();
     }
+
+    // Tooltip Update
+    if (updateTooltipFormatter) {
+      this.tooltipDOM.innerHTML = '';
+      this.createTooltipDOM();
+    }
+
     this.chartRect = this.getChartRect();
 
     this.minMax = this.getStoreMinMax();
