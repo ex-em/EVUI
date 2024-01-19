@@ -219,6 +219,9 @@ const modules = {
           ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
           : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
       }
+    } else {
+      // Pie Chart
+      this.tooltipHeaderDOM.style.display = 'none';
     }
 
     if (opt.textOverflow) {
