@@ -118,7 +118,7 @@ const chartData =
 | fontFamily | String | 'Roboto' | 폰트 | |
 | fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
 | fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
- | padding |  Number | 0 | (X축, linear, time타입에만 해당) label의 좌우 여백 | 0 |
+| padding |  Number | 0 | (X축, linear, time타입에만 해당) label의 좌우 여백 | 0 |
 
 ##### title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
@@ -216,6 +216,7 @@ const chartData =
 | textOverflow        | String                      | 'wrap'    | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis'                                                  |
 | fontFamily          | String                      | 'Roboto'  | 툴팁에 표시될 폰트                           | 'Roboto', 'serif'                                                   |
 | fontColor           | Hex code (string), Object   | '#000000' | 툴팁에 표시될 폰트 컬러                        | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
+| fontSize            | Object                      | { title: 16, contents: 14 } | 툴팁에 표시될 폰트 사이즈  | |
 | colorShape | String | 'rect' | 툴팁에 표시될 series color의 모양 | 'rect', 'circle' |
 | showAllValueInRange | Boolean                     | false     | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
 | formatter           | function / Object           | null      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용      | (아래 코드 참고)                                                          |

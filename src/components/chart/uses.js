@@ -101,6 +101,10 @@ const DEFAULT_OPTIONS = {
     textOverflow: 'wrap',
     fontFamily: 'Roboto',
     colorShape: 'rect',
+    fontSize: {
+      title: 16,
+      contents: 14,
+    },
   },
   indicator: {
     use: true,

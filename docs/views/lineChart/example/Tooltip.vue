@@ -128,6 +128,35 @@
           <ev-text-field v-model="valueFontColor"/>
         </div>
       </div>
+
+      <div class="row">
+        <h3> Font Size </h3>
+      </div>
+
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            title
+          </span>
+          <ev-input-number
+              v-model="titleFontSize"
+              :step="1"
+              :min="10"
+              :max="50"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            contents
+          </span>
+          <ev-input-number
+              v-model="contentsFontSize"
+              :step="1"
+              :min="10"
+              :max="50"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -158,6 +187,8 @@
       const titleFontColor = ref('#005CB5');
       const labelFontColor = ref('#FF8C40');
       const valueFontColor = ref('#FF00FF');
+      const titleFontSize = ref(16);
+      const contentsFontSize = ref(14);
 
       const chartData = reactive({
         series: {
@@ -252,6 +283,10 @@
             label: labelFontColor,
             value: valueFontColor,
           },
+          fontSize: {
+            title: titleFontSize,
+            contents: contentsFontSize,
+          },
         },
       });
 
@@ -288,6 +323,8 @@
         titleFontColor,
         labelFontColor,
         valueFontColor,
+        titleFontSize,
+        contentsFontSize,
       };
     },
   };
