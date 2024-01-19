@@ -20,7 +20,10 @@ const message = (options = {}) => {
     componentObj,
     msgOption,
   );
+
   render(instance, container);
+
+  return instance.component.exposed;
 };
 
 message.install = (app) => {

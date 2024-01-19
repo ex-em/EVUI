@@ -87,7 +87,7 @@ export default {
       default: null,
     },
   },
-  setup(props) {
+  setup(props, context) {
     const state = reactive({
       timer: null,
       isShow: true,
@@ -120,6 +120,9 @@ export default {
         closeMsg();
       }
     };
+    const hide = () => {
+      closeMsg();
+    };
 
     onMounted(() => {
       startTimer();
@@ -129,11 +132,14 @@ export default {
       document.removeEventListener('keydown', keydown);
       clearTimer();
     });
+
+    context.expose({ hide });
     return {
       startTimer,
       clearTimer,
       closeMsg,
       ...toRefs(state),
+      hide,
     };
   },
 };
