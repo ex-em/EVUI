@@ -1,12 +1,21 @@
 <template>
-  <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-  />
+  <div class="case">
+    <ev-chart
+        :data="chartData"
+        :options="chartOptions"
+    />
+    <div class="description">
+      <span class="toggle-label">HTML Tooltip 사용</span>
+      <ev-toggle
+          v-model="useHtml"
+      />
+    </div>
+  </div>
+
 </template>
 
 <script>
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
@@ -24,6 +33,31 @@ export default {
         series3: [],
       },
     });
+
+    const useHtml = ref(true);
+    const htmlTooltipFormatter = {
+      html: (seriesList) => {
+        let result = '<div class="ev-chart-tooltip-custom" style="width: 250px">';
+        result += `<div class="ev-chart-tooltip-custom__header"> ${dayjs(seriesList?.[0]?.data?.x).format('mm:ss')}</div>`;
+        result += '<div class="ev-chart-tooltip-custom__body">';
+        seriesList.forEach((series) => {
+          result += '<br/>';
+          result += '<div class="row">';
+          result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
+          result += `<div class="series-name">${series.name} 값 </div>`;
+          result += `<div class="value">${series.data?.y}</div>`;
+          result += '</div>';
+          result += '<div class="row">';
+          result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
+          result += '<div class="series-name">전체 합계 </div>';
+          result += `<div class="value">${chartData.data[series?.sId].reduce((a, b) => a + b, 0)}</div>`;
+          result += '</div>';
+        });
+
+        result += '</div></div>';
+        return result;
+      },
+    };
 
     const chartOptions = reactive({
       type: 'line',
@@ -49,30 +83,17 @@ export default {
       }],
       tooltip: {
         use: true,
-        formatter: {
-          html: (seriesList) => {
-            let result = '<div class="ev-chart-tooltip-custom" style="width: 250px">';
-            result += `<div class="ev-chart-tooltip-custom__header"> ${dayjs(seriesList?.[0]?.data?.x).format('mm:ss')}</div>`;
-            result += '<div class="ev-chart-tooltip-custom__body">';
-            seriesList.forEach((series) => {
-              result += '<br/>';
-              result += '<div class="row">';
-              result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
-              result += `<div class="series-name">${series.name} 값 </div>`;
-              result += `<div class="value">${series.data?.y}</div>`;
-              result += '</div>';
-              result += '<div class="row">';
-              result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
-              result += '<div class="series-name">전체 합계 </div>';
-              result += `<div class="value">${chartData.data[series?.sId].reduce((a, b) => a + b, 0)}</div>`;
-              result += '</div>';
-            });
-
-            result += '</div></div>';
-            return result;
-          },
-        },
       },
+    });
+
+    watch(useHtml, () => {
+      if (useHtml.value) {
+        chartOptions.tooltip.formatter = htmlTooltipFormatter;
+      } else {
+        chartOptions.tooltip.formatter = null;
+      }
+    }, {
+      immediate: true,
     });
 
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
@@ -94,6 +115,7 @@ export default {
     return {
       chartData,
       chartOptions,
+      useHtml,
     };
   },
 };
