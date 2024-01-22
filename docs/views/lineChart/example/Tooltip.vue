@@ -157,6 +157,57 @@
           />
         </div>
       </div>
+
+      <div class="row">
+        <h3> Row Padding </h3>
+      </div>
+
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            left
+          </span>
+          <ev-input-number
+            v-model="leftPadding"
+            :step="1"
+            :min="0"
+            :max="50"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            right
+          </span>
+          <ev-input-number
+            v-model="rightPadding"
+            :step="1"
+            :min="0"
+            :max="50"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            top
+          </span>
+          <ev-input-number
+              v-model="topPadding"
+              :step="1"
+              :min="0"
+              :max="50"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            bottom
+          </span>
+          <ev-input-number
+              v-model="bottomPadding"
+              :step="1"
+              :min="0"
+              :max="50"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -189,6 +240,10 @@
       const valueFontColor = ref('#FF00FF');
       const titleFontSize = ref(16);
       const contentsFontSize = ref(14);
+      const leftPadding = ref(16);
+      const rightPadding = ref(20);
+      const topPadding = ref(0);
+      const bottomPadding = ref(8);
 
       const chartData = reactive({
         series: {
@@ -287,6 +342,12 @@
             title: titleFontSize,
             contents: contentsFontSize,
           },
+          rowPadding: {
+            left: leftPadding,
+            right: rightPadding,
+            top: topPadding,
+            bottom: bottomPadding,
+          },
         },
       });
 
@@ -325,6 +386,10 @@
         valueFontColor,
         titleFontSize,
         contentsFontSize,
+        leftPadding,
+        rightPadding,
+        topPadding,
+        bottomPadding,
       };
     },
   };
