@@ -129,6 +129,7 @@ const chartData =
 | fontColor | Hex code (string), Object   | '#000000' | 툴팁에 표시될 폰트 컬러 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
 | fontSize            | Object                      | { title: 16, contents: 14 } | 툴팁에 표시될 폰트 사이즈  | |
 | colorShape | String | 'rect' | 툴팁에 표시될 series color의 모양 | 'rect', 'circle' |
+| rowPadding | Object | { top: 0, bottom: 8, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값 | |
 | showAllValueInRange | Boolean | false | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
 | formatter | function / Object | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (아래 코드 참고) |
 ```

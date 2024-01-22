@@ -69,6 +69,22 @@ const modules = {
     return (this.options?.tooltip?.fontSize?.contents ?? 14) + 2;
   },
 
+  getBoxPadding() {
+    const {
+      top = 0,
+      right = 20,
+      bottom = 8,
+      left = 16,
+    } = this.options?.tooltip?.rowPadding ?? {};
+
+    return {
+      t: top,
+      l: left,
+      b: bottom,
+      r: right,
+    };
+  },
+
   /**
    * Set tooltip DOM's position and style
    * @param {object} hitInfo    value and mouse position touched
@@ -84,7 +100,7 @@ const modules = {
     const [maxSeries, maxValue] = hitInfo.maxTip;
     const seriesKeys = Object.keys(items);
     const seriesLen = seriesKeys.length;
-    const boxPadding = { t: 0, b: 8, r: 20, l: 16 };
+    const boxPadding = this.getBoxPadding();
     const opt = this.options.tooltip;
     const seriesColorMarginRight = this.getColorMargin();
 
@@ -214,7 +230,7 @@ const modules = {
     const hitAxis = items[sId].axis;
     const [, maxValue] = hitInfo.maxTip;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
-    const boxPadding = { t: 0, b: 8, r: 20, l: 16 };
+    const boxPadding = this.getBoxPadding();
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
     const titleFormatter = opt.formatter?.title;
@@ -380,7 +396,7 @@ const modules = {
     const hitItem = items[sId].data;
     const hitAxis = items[sId].axis;
     const hitColor = items[sId].color;
-    const boxPadding = { t: 0, b: 8, r: 20, l: 16 };
+    const boxPadding = this.getBoxPadding();
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
     const titleFormatter = opt.formatter?.title;
@@ -480,7 +496,7 @@ const modules = {
     const items = hitInfo.items;
     const [, maxValue] = hitInfo.maxTip;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
-    const boxPadding = { t: 0, b: 8, r: 8, l: 8 };
+    const boxPadding = this.getBoxPadding();
     const opt = this.options.tooltip;
     const textHeight = this.getTextHeight();
     const seriesColorMarginRight = this.getColorMargin();
