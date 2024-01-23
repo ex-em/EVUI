@@ -151,6 +151,7 @@ export default {
         field,
         summaryType,
         summaryDecimal,
+        summaryOnlyTopParent,
       } = column;
 
       let result = '';
@@ -163,12 +164,12 @@ export default {
           let columnValues = [];
           if (props.isTree) {
             columnValues = stores.value.store.reduce((acc, cur) => {
-                if (column.summaryOnlyTopParent) {
+                if (summaryOnlyTopParent) {
                   if (!cur.parent) {
-                    acc.push(cur.data?.[column.field]);
+                    acc.push(cur.data?.[field]);
                   }
                 } else {
-                  acc.push(cur.data?.[column.field]);
+                  acc.push(cur.data?.[field]);
                 }
                 return acc;
               }, []);
