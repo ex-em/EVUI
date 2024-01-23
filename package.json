@@ -27,7 +27,8 @@
     "vue-resize-observer": "^2.0.15",
     "vue3-observe-visibility": "^0.1.2",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "bignumber.js": "^9.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
