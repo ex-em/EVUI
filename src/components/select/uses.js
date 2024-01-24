@@ -277,7 +277,11 @@ export const useDropdown = (param) => {
 
   watch(() => mv.value, (curr) => {
     if (props.multiple && props.checkable) {
-      allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
+      if (curr.length === 0) {
+        allCheck.value = false;
+      } else {
+        allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
+      }
       changeDropboxPosition();
     }
   });
