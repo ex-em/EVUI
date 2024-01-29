@@ -1025,21 +1025,19 @@ export const contextMenuEvent = (params) => {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
       && column.filterable === undefined ? true : column.filterable;
-      if (!sortable && !filterable) {
-        contextInfo.columnMenuItems = [];
-        return;
-      }
-      contextInfo.columnMenuItems = [
+      const columnMenuItems = [
         {
           text: 'Ascending',
           iconClass: 'ev-icon-allow2-up',
           disabled: !sortable,
+          hidden: contextInfo.hiddenColumnMenuItem?.ascending,
           click: () => onSort(column, 'asc'),
         },
         {
           text: 'Descending',
           iconClass: 'ev-icon-allow2-down',
           disabled: !sortable,
+          hidden: contextInfo.hiddenColumnMenuItem?.descending,
           click: () => onSort(column, 'desc'),
         },
         {
@@ -1062,14 +1060,25 @@ export const contextMenuEvent = (params) => {
             filterInfo.filteringColumn = column;
           },
           disabled: !filterable,
+          hidden: contextInfo.hiddenColumnMenuItem?.filter,
         },
         {
           text: 'Hide',
           iconClass: 'ev-icon-visibility-off',
           disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
+          hidden: contextInfo.hiddenColumnMenuItem?.hide,
           click: () => setColumnHidden(column.field),
         },
       ];
+      contextInfo.columnMenuItems = [];
+      if (!sortable && !filterable) {
+        return;
+      }
+      columnMenuItems.forEach((item) => {
+        if (!item.hidden) {
+          contextInfo.columnMenuItems.push(item);
+        }
+      });
     }
   };
   /**

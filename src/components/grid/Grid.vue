@@ -801,6 +801,7 @@ export default {
       contextMenuItems: [],
       columnMenu: null,
       columnMenuItems: [],
+      hiddenColumnMenuItem: props.option.hiddenColumnMenuItem || {},
       customContextMenu: props.option.customContextMenu || [],
       gridSettingMenu: null,
       gridSettingContextMenuItems: [],
