@@ -1074,11 +1074,7 @@ export const contextMenuEvent = (params) => {
       if (!sortable && !filterable) {
         return;
       }
-      columnMenuItems.forEach((item) => {
-        if (!item.hidden) {
-          contextInfo.columnMenuItems.push(item);
-        }
-      });
+      contextInfo.columnMenuItems = columnMenuItems.filter(item => !item.hidden);
     }
   };
   /**
