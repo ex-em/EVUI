@@ -190,14 +190,14 @@ export const useMenuList = () => {
   /**
    * 항목에 마우스엔터 시 발생하는 이벤트
    * @param e - 마우스 이벤트 (showChild에 넘김)
-   * @param children - 자식 리스트
+   * @param item - 마우스오버된 메뉴
    * @returns null
    */
-  const mouseenterLi = async (e, children) => {
-    if (!children || !Array.isArray(children)) {
+  const mouseenterLi = async (e, item) => {
+    if (!item.children || !Array.isArray(item.children) || item.disabled) {
       hideChild();
     } else {
-      await showChild(e, children);
+      await showChild(e, item.children);
     }
   };
 
