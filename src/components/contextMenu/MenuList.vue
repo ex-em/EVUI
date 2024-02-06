@@ -7,7 +7,7 @@
         class="ev-menu-li"
         :class="{ disabled: item.disabled }"
         @click="handleItemClick(item)"
-        @mouseenter="!item.disabled ? mouseenterLi($event, item.children) : (() => {})()"
+        @mouseenter="mouseenterLi($event, item)"
       >
         <i
           v-if="!!item.iconClass"

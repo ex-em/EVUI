@@ -120,7 +120,6 @@ export default {
       },
       {
         text: 'TEXT2',
-        disabled: true,
         iconClass: 'ev-icon-s-pause',
         children: [
           {
@@ -137,6 +136,7 @@ export default {
       },
       {
         text: 'TEXT3',
+        disabled: true,
       },
     ]);
 
