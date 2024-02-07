@@ -737,6 +737,7 @@ const modules = {
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
+              seriesId: sId,
               seriesName: sName,
               value: gdata,
               itemData: item.data,
@@ -774,12 +775,13 @@ const modules = {
 
   /**
    * get formatted value for tooltip
+   * @param seriesId
    * @param seriesName
    * @param value
    * @param itemData
    * @returns {string}
    */
-  getFormattedTooltipValue({ seriesName, value, itemData }) {
+  getFormattedTooltipValue({ seriesId, seriesName, value, itemData }) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
@@ -794,18 +796,21 @@ const modules = {
           value,
           name: seriesName,
           percentage: itemData?.percentage,
+          seriesId,
         });
       } else if (opt.type === 'heatMap') {
         formattedTxt = tooltipValueFormatter({
           x: itemData?.x,
           y: itemData?.y,
           value: value > -1 ? value : 'error',
+          seriesId,
         });
       } else {
         formattedTxt = tooltipValueFormatter({
           x: isHorizontal ? value : itemData?.x,
           y: isHorizontal ? itemData?.y : value,
           name: seriesName,
+          seriesId,
         });
       }
     }
@@ -848,6 +853,7 @@ const modules = {
         );
 
         const formattedValue = this.getFormattedTooltipValue({
+          seriesId: sId,
           seriesName: series.name,
           value: hasData?.o,
           itemData: hasData,

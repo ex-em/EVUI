@@ -208,13 +208,13 @@ const chartOptions = {
     tooltip: {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
         // return type : string
-        formatter: ({ x, y, value }) => ... ,
+        formatter: ({ x, y, value, seriesId }) => ... ,
         
         // value + title Formatter
         // return type : string
         formatter: {
             title: ({ x, y }) => ...,
-            value: ({ x, y, value }) => ...,
+            value: ({ x, y, value, seriesId }) => ...,
         }
         
         // custom formatter (html)
