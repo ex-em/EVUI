@@ -14,7 +14,7 @@
       @show-context-menu="getContextMenuFlag"
       @contextmenu.prevent="showContextMenu"
     />
-    <div v-if="!treeNodeData.length">{{ emptyText }}</div>
+    <div v-if="isShowEmptyText">{{ emptyText }}</div>
     <ev-context-menu
       v-if="contextMenuItems.length"
       ref="contextMenu"
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import TreeNode from './TreeNode';
 
 export default {
@@ -278,6 +278,9 @@ export default {
       });
     }
 
+    const isShowEmptyText = computed(() => !treeNodeData.value.length
+        || treeNodeData.value.every(node => !node.visible));
+
     watch(() => props.data, (newData) => {
       treeNodeData.value = newData;
       allNodeInfo = getAllNodeInfo();
@@ -320,6 +323,7 @@ export default {
       treeNodeData,
       contextMenu,
       component,
+      isShowEmptyText,
       updateCheckedInfo,
       clickContent,
       dblClickContent,
