@@ -6,6 +6,7 @@ import Util from '../helpers/helpers.util';
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
+const HEADER_DOM_PADDING = 15;
 
 const modules = {
   /**
@@ -173,19 +174,21 @@ const modules = {
     this.tooltipHeaderDOM.style.height = 'auto';
     this.tooltipDOM.style.height = 'auto';
     this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
+    this.tooltipDOM.style.display = 'block';
 
 
     // set tooltipDOM's positions
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
     const distanceMouseAndTooltip = 20;
-    const tooltipDOMSize = this.tooltipDOM?.getBoundingClientRect();
+    const tooltipDOMHeight = this.tooltipDOM?.offsetHeight
+      || (opt?.fontSize?.title ?? 16 + HEADER_DOM_PADDING) + contentsHeight;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
-    const maximumPosY = bodyHeight - tooltipDOMSize.height - distanceMouseAndTooltip;
+    const maximumPosY = bodyHeight - tooltipDOMHeight - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
-    const reversedPosY = mouseY - tooltipDOMSize.height - distanceMouseAndTooltip;
+    const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
     this.tooltipDOM.style.left = expectedPosX > maximumPosX
       ? `${reversedPosX}px`
       : `${expectedPosX}px`;
