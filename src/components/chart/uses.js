@@ -107,10 +107,11 @@ const DEFAULT_OPTIONS = {
     },
     rowPadding: {
       top: 0,
-      bottom: 8,
+      bottom: 3,
       right: 20,
       left: 16,
     },
+    showHeader: true,
   },
   indicator: {
     use: true,

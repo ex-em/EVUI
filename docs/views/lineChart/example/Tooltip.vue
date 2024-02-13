@@ -208,6 +208,15 @@
           />
         </div>
       </div>
+
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            Header 표시 여부
+          </span>
+          <ev-toggle v-model="showHeader"/>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -244,6 +253,7 @@
       const rightPadding = ref(20);
       const topPadding = ref(0);
       const bottomPadding = ref(8);
+      const showHeader = ref(true);
 
       const chartData = reactive({
         series: {
@@ -348,6 +358,7 @@
             top: topPadding,
             bottom: bottomPadding,
           },
+          showHeader,
         },
       });
 
@@ -390,6 +401,7 @@
         rightPadding,
         topPadding,
         bottomPadding,
+        showHeader,
       };
     },
   };
