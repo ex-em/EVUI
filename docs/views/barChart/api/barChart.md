@@ -334,6 +334,7 @@ const chartOptions = {
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | true | indicator 사용 여부 | |
 | color | HexCode(String) | '#EE7F44' | 색상  | |
+| segments | Array | null | dash 간격 | [6, 2] |
 
 #### maxTip
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
