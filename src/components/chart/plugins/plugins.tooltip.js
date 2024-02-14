@@ -6,7 +6,7 @@ import Util from '../helpers/helpers.util';
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
-const HEADER_DOM_PADDING = 15;
+const BODY_PADDING = 8;
 
 const modules = {
   /**
@@ -74,7 +74,7 @@ const modules = {
     const {
       top = 0,
       right = 20,
-      bottom = 8,
+      bottom = 3,
       left = 16,
     } = this.options?.tooltip?.rowPadding ?? {};
 
@@ -105,6 +105,30 @@ const modules = {
     const opt = this.options.tooltip;
     const seriesColorMarginRight = this.getColorMargin();
 
+    // Draw hidden tooltip header DOM to calculate height
+    const sId = hitInfo.hitId;
+    const hitItem = items[sId].data;
+    const hitAxis = items[sId].axis;
+    const titleFormatter = opt.formatter?.title;
+
+    if (this.axesX.length && this.axesY.length && opt.showHeader) {
+      if (titleFormatter) {
+        this.tooltipHeaderDOM.textContent = titleFormatter({
+          x: hitItem.x,
+          y: hitItem.y,
+        });
+      } else {
+        this.tooltipHeaderDOM.textContent = this.options.horizontal
+          ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
+          : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+      }
+    }
+
+    if (opt.textOverflow) {
+      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
+    }
+
+    this.tooltipHeaderDOM.style.visibility = 'hidden';
 
     // calculate and decide width of canvas El(contentsWidth)
     ctx.save();
@@ -176,13 +200,12 @@ const modules = {
     this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
     this.tooltipDOM.style.display = 'block';
 
-
     // set tooltipDOM's positions
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
     const distanceMouseAndTooltip = 20;
     const tooltipDOMHeight = this.tooltipDOM?.offsetHeight
-      || (opt?.fontSize?.title ?? 16 + HEADER_DOM_PADDING) + contentsHeight;
+      || this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
     const maximumPosY = bodyHeight - tooltipDOMHeight - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
@@ -228,37 +251,19 @@ const modules = {
   drawTooltip(hitInfo, context) {
     const ctx = context;
     const items = hitInfo.items;
-    const sId = hitInfo.hitId;
-    const hitItem = items[sId].data;
-    const hitAxis = items[sId].axis;
     const [, maxValue] = hitInfo.maxTip;
     const seriesKeys = this.alignSeriesList(Object.keys(items));
     const boxPadding = this.getBoxPadding();
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    const titleFormatter = opt.formatter?.title;
     const textHeight = this.getTextHeight();
     const seriesColorMarginRight = this.getColorMargin();
 
-    // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
+    // draw Tooltip header DOM
     if (this.axesX.length && this.axesY.length && opt.showHeader) {
-      if (titleFormatter) {
-        this.tooltipHeaderDOM.textContent = titleFormatter({
-          x: hitItem.x,
-          y: hitItem.y,
-        });
-      } else {
-        this.tooltipHeaderDOM.textContent = this.options.horizontal
-          ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
-          : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
-      }
+      this.tooltipHeaderDOM.style.visibility = 'visible';
     } else {
-      // Pie Chart
       this.tooltipHeaderDOM.style.display = 'none';
-    }
-
-    if (opt.textOverflow) {
-      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
     }
 
     // draw tooltip contents (series, value combination)
@@ -402,7 +407,6 @@ const modules = {
     const boxPadding = this.getBoxPadding();
     const isHorizontal = this.options.horizontal;
     const opt = this.options.tooltip;
-    const titleFormatter = opt.formatter?.title;
     const series = Object.values(this.seriesList)[0];
     const textHeight = this.getTextHeight();
     const seriesColorMarginRight = this.getColorMargin();
@@ -426,20 +430,11 @@ const modules = {
       return;
     }
 
-    // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    if (this.axesX.length) {
-      if (titleFormatter) {
-        this.tooltipHeaderDOM.textContent = titleFormatter({
-          x: hitItem.x,
-          y: hitItem.y,
-        });
-      } else {
-        this.tooltipHeaderDOM.textContent = this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
-      }
-    }
-
-    if (opt.textOverflow) {
-      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
+    // draw Tooltip header DOM
+    if (this.axesX.length && this.axesY.length && opt.showHeader) {
+      this.tooltipHeaderDOM.style.visibility = 'visible';
+    } else {
+      this.tooltipHeaderDOM.style.display = 'none';
     }
 
     this.setTooltipDOMStyle(opt);
@@ -503,6 +498,13 @@ const modules = {
     const opt = this.options.tooltip;
     const textHeight = this.getTextHeight();
     const seriesColorMarginRight = this.getColorMargin();
+
+    // draw Tooltip header DOM
+    if (this.axesX.length && this.axesY.length && opt.showHeader) {
+      this.tooltipHeaderDOM.style.visibility = 'visible';
+    } else {
+      this.tooltipHeaderDOM.style.display = 'none';
+    }
 
     let x = 2;
     let y = 2;
