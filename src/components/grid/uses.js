@@ -176,7 +176,7 @@ export const scrollEvent = (params) => {
 };
 
 export const resizeEvent = (params) => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   const {
     resizeInfo,
     elementInfo,
@@ -344,6 +344,7 @@ export const resizeEvent = (params) => {
       resizeInfo.showResizeLine = false;
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
+      emit('resize:column', columnIndex, stores.orderedColumns[columnIndex]);
     };
 
     document.addEventListener('mousemove', handleMouseMove);

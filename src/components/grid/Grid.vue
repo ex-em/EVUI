@@ -495,7 +495,7 @@
                   :item="{ row }"
                 />
               </tr>
-             </template>
+            </template>
             <tr v-if="!viewStore.length">
               <td class="is-empty">No records</td>
             </tr>
@@ -672,6 +672,7 @@ export default {
     'sort-column': null,
     'expand-row': null,
     'update:expanded': null,
+    'resize:column': (index, column) => index >= 0 && column,
   },
   setup(props) {
     // const ROW_INDEX = 0;
