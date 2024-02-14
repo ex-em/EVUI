@@ -241,7 +241,7 @@ const modules = {
     const seriesColorMarginRight = this.getColorMargin();
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    if (this.axesX.length && this.axesY.length) {
+    if (this.axesX.length && this.axesY.length && opt.showHeader) {
       if (titleFormatter) {
         this.tooltipHeaderDOM.textContent = titleFormatter({
           x: hitItem.x,
@@ -750,30 +750,30 @@ const modules = {
     };
     const mouseXIp = 1; // mouseInterpolation
     const mouseYIp = 10;
+    const options = this.options;
 
     if (offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp)
       && offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp)) {
-      if (this.options.horizontal) {
-        ctx.beginPath();
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+
+      if (options.indicator?.segments) {
+        ctx.setLineDash(options.indicator.segments);
+      }
+
+      if (options.horizontal) {
         ctx.moveTo(graphPos.x1, offsetY + 0.5);
         ctx.lineTo(graphPos.x2, offsetY + 0.5);
-        ctx.stroke();
-        ctx.restore();
-        ctx.closePath();
       } else {
-        ctx.beginPath();
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
         ctx.moveTo(offsetX + 0.5, graphPos.y1);
         ctx.lineTo(offsetX + 0.5, graphPos.y2);
-        ctx.stroke();
-        ctx.restore();
-        ctx.closePath();
       }
+
+      ctx.stroke();
+      ctx.restore();
+      ctx.closePath();
     }
   },
 
