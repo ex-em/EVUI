@@ -115,6 +115,7 @@ const DEFAULT_OPTIONS = {
   indicator: {
     use: true,
     color: '#EE7F44',
+    segments: null,
   },
   maxTip: {
     use: false,
