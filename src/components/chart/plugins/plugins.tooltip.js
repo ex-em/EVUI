@@ -238,7 +238,7 @@ const modules = {
     const seriesColorMarginRight = this.getColorMargin();
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    if (this.axesX.length && this.axesY.length) {
+    if (this.axesX.length && this.axesY.length && opt.showHeader) {
       if (titleFormatter) {
         this.tooltipHeaderDOM.textContent = titleFormatter({
           x: hitItem.x,
