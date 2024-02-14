@@ -672,7 +672,7 @@ export default {
     'sort-column': null,
     'expand-row': null,
     'update:expanded': null,
-    'resize:column': (index, column) => index >= 0 && column,
+    'resize:column': column => column,
   },
   setup(props) {
     // const ROW_INDEX = 0;

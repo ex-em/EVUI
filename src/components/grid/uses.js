@@ -344,7 +344,7 @@ export const resizeEvent = (params) => {
       resizeInfo.showResizeLine = false;
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
-      emit('resize:column', columnIndex, stores.orderedColumns[columnIndex]);
+      emit('resize:column', stores.orderedColumns[columnIndex]);
     };
 
     document.addEventListener('mousemove', handleMouseMove);

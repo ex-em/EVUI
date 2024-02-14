@@ -102,8 +102,8 @@ export default {
       });
       expandedRowText.value = result;
     };
-    const onResizeColumn = (index, column) => {
-      console.log('[onResizeColumn]', index, column);
+    const onResizeColumn = (column) => {
+      console.log('[onResizeColumn]', column);
     };
 
     pushData();
