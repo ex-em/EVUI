@@ -4,6 +4,9 @@
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
+  "engines": {
+    "node": "<=12.0.0"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
