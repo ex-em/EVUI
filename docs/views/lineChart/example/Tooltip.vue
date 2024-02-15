@@ -359,6 +359,7 @@
             bottom: bottomPadding,
           },
           showHeader,
+          debouncedHide: true,
         },
       });
 
