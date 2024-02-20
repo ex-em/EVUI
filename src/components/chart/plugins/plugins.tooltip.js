@@ -633,7 +633,7 @@ const modules = {
     const mouseX = e.pageX;
     const mouseY = e.pageY;
 
-    const customTooltipEl = document.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
+    const customTooltipEl = this.tooltipDOM.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
     if (!customTooltipEl && !this.tooltipDOM) {
       return;
     }
