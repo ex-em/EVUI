@@ -208,7 +208,8 @@ class Line {
           return;
         }
 
-        const isSingle = this.data[ix - 1]?.o === null && this.data[ix + 1]?.o === null;
+        const isSingle = Util.isNullOrUndefined(this.data[ix - 1]?.o)
+          && Util.isNullOrUndefined(this.data[ix + 1]?.o);
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;

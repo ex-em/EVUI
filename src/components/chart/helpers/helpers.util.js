@@ -358,4 +358,13 @@ export default {
     template.innerHTML = htmlString.trim();
     return template.content.firstChild;
   },
+
+  /**
+   * Check The value is null or undefined
+   * @param { number | undefined | null } value
+   * @returns {boolean}
+   */
+  isNullOrUndefined(value) {
+    return value === null || value === undefined;
+  },
 };
