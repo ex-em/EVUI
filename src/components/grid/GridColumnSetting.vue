@@ -214,8 +214,11 @@ export default {
       await nextTick();
 
       const docWidth = document.documentElement.clientWidth;
+      const docHeight = document.documentElement.clientHeight;
       const columnSettingWrapperRect = columnSettingWrapper.value?.getBoundingClientRect();
       const columnSettingWidth = columnSettingWrapperRect?.width;
+      const columnSettingHeight = columnSettingWrapperRect?.height;
+
       const { top, left, columnListMenuWidth } = props.position;
       let columnSettingLeft;
 
@@ -228,8 +231,8 @@ export default {
       } else {
         columnSettingLeft = left - columnSettingWidth;
       }
-
-      columnSettingStyle.top = `${top + document.documentElement.scrollTop}px`;
+      const maximumPosY = docHeight - columnSettingHeight;
+      columnSettingStyle.top = `${Math.min(top, maximumPosY) + document.documentElement.scrollTop}px`;
       columnSettingStyle.left = `${columnSettingLeft + document.documentElement.scrollLeft}px`;
     };
 
