@@ -336,7 +336,9 @@ export const resizeEvent = (params) => {
         stores.orderedColumns[columnIndex].width = changedWidth;
         stores.orderedColumns.map((column) => {
           const item = column;
-          item.resized = true;
+          if (columnIndex === column.index) {
+            item.resized = true;
+          }
           return item;
         });
       }
