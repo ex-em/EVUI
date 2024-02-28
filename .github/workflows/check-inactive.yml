@@ -10,6 +10,7 @@ on:
 jobs:
   check-inactive:
     runs-on: ubuntu-latest
+    if: github.repository == 'ex-em/EVUI'
     steps:
       - name: check-inactive
         uses: actions-cool/issues-helper@v3

@@ -1,0 +1,20 @@
+name: Issue Remove Inactive
+
+on:
+  issues:
+    types: [edited]
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  issue-remove-inactive:
+    runs-on: ubuntu-latest
+    if: github.repository == 'ex-em/EVUI'
+    steps:
+      - name: remove inactive
+        if: github.event.issue.state == 'open' && github.actor == github.event.issue.user.login
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'remove-labels'
+          issue-number: ${{ github.event.issue.number }}
+          labels: 'inactive'
