@@ -334,11 +334,7 @@ export const resizeEvent = (params) => {
 
       if (stores.orderedColumns[columnIndex]) {
         stores.orderedColumns[columnIndex].width = changedWidth;
-        stores.orderedColumns.map((column) => {
-          const item = column;
-          item.resized = true;
-          return item;
-        });
+        stores.orderedColumns[columnIndex].resized = true;
       }
 
       resizeInfo.showResizeLine = false;
