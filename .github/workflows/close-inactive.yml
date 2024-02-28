@@ -1,0 +1,20 @@
+name: Close Inactive Issues
+# inactive 면서 15일동안 활동이 없는 이슈를 닫음
+
+on:
+  schedule:
+    - cron: "0 0 */7 * *"
+# 7일마다 실행
+
+jobs:
+  check-need-info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: close-issues
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'close-issues'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          labels: 'inactive'
+          inactive-day: 15
+          body: '오래된 이슈는 닫고 있어요. 필요하다면 다시 열어주세요. :smile:'
