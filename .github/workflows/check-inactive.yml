@@ -4,8 +4,8 @@ name: Check inactive
 
 on:
   schedule:
-    - cron: "0 0 1 * *"
-# 매일 1일마다 실행
+    - cron: "0 15 * * *"
+# 한국시간 매일 자정에 실행
 
 jobs:
   check-inactive:
