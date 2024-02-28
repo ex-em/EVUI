@@ -18,8 +18,3 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      - name: Send Jandi
-        uses: ./.github/actions/jandi-notify
-        with:
-          status: release
-          jandi_incoming_url: ${{ secrets.JANDI_INCOMING_URL }}
