@@ -3,6 +3,8 @@ name: Deploy Docs
 on:
   push:
     branches: [ "3.0" ]
+    paths:
+      - "docs/**"
 
 jobs:
   deploy:
