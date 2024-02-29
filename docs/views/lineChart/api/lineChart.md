@@ -67,6 +67,7 @@ const selectedSeries = ref({
   | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | 점(Point) 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용         |                                                                                   |
   | pointStyle | String                      | 'circle' | 점(Point) 모양                                                         | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
   | showLegend | Boolean                     | true | legend 표시 여부                                                        |                                                                                   |
+  | passingValue | number                      | null            | data가 passingValue와 같을 경우 (data: null/undefined 제외 ) 다음값으로 선을 이어가며 point도 그리지 않고 tooltip에 나오지 않음 | -1                                                                                |
   
 #### data example
 ```
