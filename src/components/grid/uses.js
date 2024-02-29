@@ -1021,21 +1021,21 @@ export const contextMenuEvent = (params) => {
       && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
-          text: 'Ascending',
+          text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
           iconClass: 'ev-icon-allow2-up',
           disabled: !sortable,
           hidden: contextInfo.hiddenColumnMenuItem?.ascending,
           click: () => onSort(column, 'asc'),
         },
         {
-          text: 'Descending',
+          text: contextInfo.columnMenuTextInfo?.descending ?? 'Descending',
           iconClass: 'ev-icon-allow2-down',
           disabled: !sortable,
           hidden: contextInfo.hiddenColumnMenuItem?.descending,
           click: () => onSort(column, 'desc'),
         },
         {
-          text: 'Filter',
+          text: contextInfo.columnMenuTextInfo?.filter ?? 'Filter',
           iconClass: 'ev-icon-filter-list',
           click: () => {
             const docWidth = document.documentElement.clientWidth;
@@ -1057,7 +1057,7 @@ export const contextMenuEvent = (params) => {
           hidden: contextInfo.hiddenColumnMenuItem?.filter,
         },
         {
-          text: 'Hide',
+          text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
           iconClass: 'ev-icon-visibility-off',
           disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
           hidden: contextInfo.hiddenColumnMenuItem?.hide,
@@ -1078,7 +1078,7 @@ export const contextMenuEvent = (params) => {
    */
   const onGridSettingContextMenu = (e) => {
     const columnListMenu = {
-      text: 'Column List',
+      text: columnSettingInfo.columnSettingTextInfo?.columnList ?? 'Column List',
       isShowMenu: true,
       click: () => {
         columnSettingInfo.isShowColumnSetting = true;
