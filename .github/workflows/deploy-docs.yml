@@ -3,6 +3,8 @@ name: Deploy Docs
 on:
   push:
     branches: [ "3.0" ]
+    paths:
+      - "docs/**"
 
 jobs:
   deploy:
@@ -36,16 +38,3 @@ jobs:
         with:
           github_token: ${{ secrets.GH_ACTIONS_TOKEN }}
           publish_dir: ./dist
-
-      - name: Send jandi when failed
-        if: ${{ failure() }}
-        uses: ./.github/actions/jandi-notify
-        with:
-          jandi_incoming_url: ${{ secrets.JANDI_INCOMING_URL }}
-
-      - name: Send jandi if completed
-        if: ${{ success() }}
-        uses: ./.github/actions/jandi-notify
-        with:
-          status: success
-          jandi_incoming_url: ${{ secrets.JANDI_INCOMING_URL }}
