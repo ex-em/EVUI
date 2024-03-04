@@ -83,10 +83,17 @@
 |  | useGridSetting | {} | 그리드 옵션 설정  | |
 |  |  | use | 그리드 옵션 설정 사용 여부 | Boolean |
 |  |  | customContextMenu | 그리드옵션 클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
+|  |  | columnMenuText | 컬럼 설정 메뉴의 텍스트를 설정한다.(Default: 'Column List') | String |
+|  |  | searchText | 컬럼 설정창 검색 영역의 placeholder 텍스트를 설정한다. (Default: 'Search') | String |
+|  |  | emptyText | 컬럼 설정창에 데이터가 없는 경우 표시되는 텍스트를 설정한다. (Default: 'No records') | String |
+|  |  | okBtnText | 컬럼 설정 완료 버튼의 텍스트를 설정한다. (Default: 'OK') | String |
+|  | columnMenuText | {} | 그리드 헤더 클릭시 보여지는 컨텍스트 메뉴 각 아이템의 텍스트를 설정한다. |  |
+|  |  | hide | Default: 'Hide' | String |
 |  | expandIcon       | 'tree-expand-icon' | expand 상태인 노드의 아이콘                      | `ev-icon`                |
 |  | collapseIcon     | 'tree-expand-icon' | collapse 상태인 노드의 아이콘                    | `ev-icon`                |
 |  | parentIcon       | 'tree-parent-icon' | 자식 노드가 있는 노드의 아이콘                       | `ev-icon`, 'none'        |
 |  | childIcon        | 'tree-child-icon'  | 자식 노드가 없는 노드의 아이콘                       | `ev-icon`, 'none'        |
+|  | emptyText | 'No records' | 데이터가 없는 경우 표시되는 텍스트를 설정한다. | String |
 
 ### Columns
 | 이름              | 타입      | 설명                                                 | 종류                                               | 필수 |

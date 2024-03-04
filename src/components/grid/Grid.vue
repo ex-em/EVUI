@@ -497,7 +497,7 @@
               </tr>
             </template>
             <tr v-if="!viewStore.length">
-              <td class="is-empty">No records</td>
+              <td class="is-empty">{{ emptyText }}</td>
             </tr>
           </tbody>
         </table>
@@ -567,6 +567,7 @@
     :columns="$props.columns"
     :hidden-column="hiddenColumn"
     :position="columnSettingPosition"
+    :text-info="columnSettingTextInfo"
     @apply-column="onApplyColumn"
   />
 </template>
@@ -694,6 +695,7 @@ export default {
     const stripeStyle = computed(() => (props.option.style?.stripe || false));
     const borderStyle = computed(() => (props.option.style?.border || ''));
     const highlightIdx = computed(() => (props.option.style?.highlight ?? -1));
+    const emptyText = computed(() => (props.option.emptyText ?? 'No records'));
     const rowMinHeight = props.option.rowMinHeight || 35;
     const filteringItemsWidth = ref(0);
     const elementInfo = reactive({
@@ -725,6 +727,12 @@ export default {
         top: 0,
         left: 0,
         columnListMenuWidth: 0,
+      },
+      columnSettingTextInfo: {
+        columnList: props.option?.useGridSetting?.columnMenuText ?? 'Column List',
+        search: props.option?.useGridSetting?.searchText ?? 'Search',
+        empty: props.option?.useGridSetting?.emptyText ?? 'No records',
+        ok: props.option?.useGridSetting?.okBtnText ?? 'OK',
       },
     });
     const stores = reactive({
@@ -802,6 +810,7 @@ export default {
       contextMenuItems: [],
       columnMenu: null,
       columnMenuItems: [],
+      columnMenuTextInfo: props.option.columnMenuText || {},
       hiddenColumnMenuItem: props.option.hiddenColumnMenuItem || {},
       customContextMenu: props.option.customContextMenu || [],
       gridSettingMenu: null,
@@ -1366,6 +1375,7 @@ export default {
       useGridSetting,
       toolbarRef,
       stores,
+      emptyText,
       ...toRefs(elementInfo),
       ...toRefs(stores),
       ...toRefs(filterInfo),

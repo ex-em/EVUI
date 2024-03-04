@@ -178,7 +178,7 @@
               </template>
             </tree-grid-node>
             <tr v-if="!viewStore.length">
-              <td class="is-empty">No records</td>
+              <td class="is-empty">{{ emptyText }}</td>
             </tr>
           </tbody>
         </table>
@@ -241,6 +241,7 @@
     :columns="$props.columns"
     :hidden-column="hiddenColumn"
     :position="columnSettingPosition"
+    :text-info="columnSettingTextInfo"
     @apply-column="onApplyColumn"
   />
 </template>
@@ -339,6 +340,7 @@ export default {
     const toolbarRef = ref(null);
     const useGridSetting = computed(() => (props.option?.useGridSetting?.use || false));
     const useSummary = computed(() => (props.option?.useSummary || false));
+    const emptyText = computed(() => (props.option.emptyText ?? 'No records'));
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -359,6 +361,12 @@ export default {
         top: 0,
         left: 0,
         columnListMenuWidth: 0,
+      },
+      columnSettingTextInfo: {
+        columnList: props.option?.useGridSetting?.columnMenuText ?? 'Column List',
+        search: props.option?.useGridSetting?.searchText ?? 'Search',
+        empty: props.option?.useGridSetting?.emptyText ?? 'No records',
+        ok: props.option?.useGridSetting?.okBtnText ?? 'OK',
       },
     });
     const stores = reactive({
@@ -432,6 +440,7 @@ export default {
       contextMenuItems: [],
       columnMenu: null,
       columnMenuItems: [],
+      columnMenuTextInfo: props.option.columnMenuText || {},
       customContextMenu: props.option.customContextMenu || [],
       gridSettingMenu: null,
       gridSettingContextMenuItems: [],
@@ -886,6 +895,7 @@ export default {
       useGridSetting,
       toolbarRef,
       stores,
+      emptyText,
       ...toRefs(styleInfo),
       ...toRefs(elementInfo),
       ...toRefs(stores),

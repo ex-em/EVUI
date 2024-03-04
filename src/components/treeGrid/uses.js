@@ -610,7 +610,7 @@ export const contextMenuEvent = (params) => {
     if (event.target.className.includes('column-name--click')) {
       contextInfo.columnMenuItems = [
         {
-          text: 'Hide',
+          text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
           iconClass: 'ev-icon-visibility-off',
           disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
           click: () => setColumnHidden(column.field),
@@ -648,7 +648,7 @@ export const contextMenuEvent = (params) => {
    */
   const onGridSettingContextMenu = (e) => {
     const columnListMenu = {
-      text: 'Column List',
+      text: columnSettingInfo.columnSettingTextInfo?.columnList ?? 'Column List',
       isShowMenu: true,
       click: () => {
         columnSettingInfo.isShowColumnSetting = true;

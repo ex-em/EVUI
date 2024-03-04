@@ -61,6 +61,11 @@
 |  |  | descending | 내림차순 정렬 | Boolean |
 |  |  | filter | 필터 기능 | Boolean |
 |  |  | hide | 컬럼 숨김 | Boolean |
+|  | columnMenuText | {} | 그리드 헤더 클릭시 보여지는 컨텍스트 메뉴 각 아이템의 텍스트를 설정한다. |  |
+|  |  | ascending | Default: 'Ascending' | String |
+|  |  | descending | Default: 'Descending' | String |
+|  |  | filter | Default: 'Filter' | String |
+|  |  | hide | Default: 'Hide' | String |
 |  | page | {} | 페이지 설정 |  |
 |  |  | use | 페이지 사용 여부 | Boolean |
 |  |  | isInfinite | Infinite Scroll 사용 여부 | Boolean |
@@ -77,6 +82,11 @@
 |  | useGridSetting | {} | 그리드 옵션 설정  | |
 |  |  | use | 그리드 옵션 설정 사용 여부 | Boolean |
 |  |  | customContextMenu | 그리드옵션 클릭시 보여지는 컨텍스트 메뉴를 설정한다. |  |
+|  |  | columnMenuText | 컬럼 설정 메뉴의 텍스트를 설정한다.(Default: 'Column List') | String |
+|  |  | searchText | 컬럼 설정창 검색 영역의 placeholder 텍스트를 설정한다. (Default: 'Search') | String |
+|  |  | emptyText | 컬럼 설정창에 데이터가 없는 경우 표시되는 텍스트를 설정한다. (Default: 'No records') | String |
+|  |  | okBtnText | 컬럼 설정 완료 버튼의 텍스트를 설정한다. (Default: 'OK') | String |
+|  | emptyText | 'No records' | 데이터가 없는 경우 표시되는 텍스트를 설정한다. | String |
 
 ### Columns
 | 이름 | 타입 | 설명 | 종류 | 필수 |

@@ -8,11 +8,11 @@
         :style="columnSettingStyle"
       >
         <div class="ev-grid-column-setting__header">
-          <p class="header-title"> Column List </p>
+          <p class="header-title"> {{ textInfo.columnList }} </p>
           <ev-text-field
             v-model="searchVm"
             type="search"
-            placeholder="Search"
+            :placeholder="textInfo.search"
             @input="onSearchColumn"
           />
         </div>
@@ -31,7 +31,7 @@
             </ev-checkbox-group>
           </template>
           <template v-else>
-            <p class="is-empty"> No records </p>
+            <p class="is-empty"> {{ textInfo.empty }} </p>
           </template>
         </div>
         <div class="ev-grid-column-setting__footer">
@@ -40,7 +40,7 @@
             :disabled="isDisabled"
             @click="onApplyColumn"
           >
-            OK
+            {{ textInfo.ok }}
           </ev-button>
         </div>
       </section>
@@ -88,6 +88,15 @@ export default {
     isShowMenuOnClick: {
       type: Boolean,
       default: false,
+    },
+    textInfo: {
+      type: Object,
+      default: () => ({
+        columnList: 'Column List',
+        search: 'Search',
+        empty: 'No records',
+        ok: 'OK',
+      }),
     },
   },
   emits: {
