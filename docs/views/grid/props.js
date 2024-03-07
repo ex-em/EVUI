@@ -10,6 +10,8 @@ import Summary from './example/Summary';
 import SummaryRaw from '!!raw-loader!./example/Summary';
 import RowDetail from './example/RowDetail.vue';
 import RowDetailRaw from '!!raw-loader!./example/RowDetail.vue';
+import Sort from './example/Sort.vue';
+import SortRaw from '!!raw-loader!./example/Sort.vue';
 
 export default {
   mdText,
@@ -34,6 +36,10 @@ export default {
     RowDetail: {
       component: RowDetail,
       parsedData: parseComponent(RowDetailRaw),
+    },
+    Sort: {
+      component: Sort,
+      parsedData: parseComponent(SortRaw),
     },
   },
 };

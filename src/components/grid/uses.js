@@ -625,6 +625,9 @@ export const sortEvent = (params) => {
    * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
    */
   const setSort = () => {
+    const { field, index } = sortInfo.sortColumn;
+    const customSetDesc = sortInfo.sortFunction?.[field]?.desc ?? null;
+    const customSetAsc = sortInfo.sortFunction?.[field]?.asc ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
     const numberSetDesc = (a, b) => ((a === null) - (b === null) || Number(b) - Number(a));
@@ -638,8 +641,8 @@ export const sortEvent = (params) => {
       });
       return;
     }
-    const index = sortInfo.sortColumn.index;
     const type = sortInfo.sortColumn.type || 'string';
+    const customSortFn = sortInfo.sortOrder === 'desc' ? customSetDesc : customSetAsc;
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
@@ -651,6 +654,14 @@ export const sortEvent = (params) => {
       }
       return { aCol, bCol };
     };
+
+    if (customSortFn) {
+      stores.store.sort((a, b) => {
+        const { aCol, bCol } = getColumnValue(a, b);
+        return customSortFn(aCol, bCol);
+      });
+      return;
+    }
     switch (type) {
       case 'string':
         stores.store.sort((a, b) => {
