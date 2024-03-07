@@ -10,13 +10,13 @@
             asc: (a, b) => {
               return (
                 (a.split('_')[1] === null) - (b.split('_')[1] === null) ||
-                Number(b.split('_')[1]) - Number(a.split('_')[1])
+                Number(a.split('_')[1]) - Number(b.split('_')[1])
               );
             },
             desc: (a, b) => {
               return (
                 (a.split('_')[1] === null) - (b.split('_')[1] === null) ||
-                Number(a.split('_')[1]) - Number(b.split('_')[1])
+                Number(b.split('_')[1]) - Number(a.split('_')[1])
               );
             },
           },
@@ -24,13 +24,13 @@
             asc: (a, b) => {
               return (
                 (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
-                Number(b.split('-')[1]) - Number(a.split('-')[1])
+                Number(a.split('-')[1]) - Number(b.split('-')[1])
               );
             },
             desc: (a, b) => {
               return (
                 (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
-                Number(a.split('-')[1]) - Number(b.split('-')[1])
+                Number(b.split('-')[1]) - Number(a.split('-')[1])
               );
             },
           },
