@@ -43,6 +43,8 @@
 |  | rowHeight | 35 | row 높이를 설정한다. | `min-height: 35` |
 |  | rowMinHeight | null | row 높이를 `min-height`보다 작게 설정한다. |  |
 |  | columnWidth | 40 | 기본 컬럼 너비를 설정한다. | `min-width: 40px` |
+|  | customAscFunction | {} | 그리드 오름차순 정렬 시 사용할 커스텀 함수를 정의한다. 내림차순 정렬 함수는 자동으로 구성된다. |  |
+|  |  | `[Column Field]` | 커스텀 함수, 형태는 `Array.prototype.sort` 함수의 첫 번째 인자와 같다. | (a: any, b: any) => number |
 |  | useCheckbox | {} | 각 row별 체크박스 사용 여부 및 단일 선택이나 다중 선택을 설정한다. |  |
 |  |  | use | 체크박스 사용 여부 | Boolean |
 |  |  | mode | 단일 및 다중 선택 설정 | 'multi', 'single' |
