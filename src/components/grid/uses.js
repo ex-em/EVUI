@@ -626,8 +626,7 @@ export const sortEvent = (params) => {
    */
   const setSort = () => {
     const { field, index } = sortInfo.sortColumn;
-    const customSetDesc = sortInfo.sortFunction?.[field]?.desc ?? null;
-    const customSetAsc = sortInfo.sortFunction?.[field]?.asc ?? null;
+    const customSetAsc = sortInfo.sortFunction?.[field] ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
     const numberSetDesc = (a, b) => ((a === null) - (b === null) || Number(b) - Number(a));
@@ -642,7 +641,6 @@ export const sortEvent = (params) => {
       return;
     }
     const type = sortInfo.sortColumn.type || 'string';
-    const customSortFn = sortInfo.sortOrder === 'desc' ? customSetDesc : customSetAsc;
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
     const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
@@ -655,10 +653,11 @@ export const sortEvent = (params) => {
       return { aCol, bCol };
     };
 
-    if (customSortFn) {
+    if (customSetAsc) {
       stores.store.sort((a, b) => {
         const { aCol, bCol } = getColumnValue(a, b);
-        return customSortFn(aCol, bCol);
+        const compareAscReturn = customSetAsc(aCol, bCol);
+        return sortInfo.sortOrder === 'desc' ? -compareAscReturn : compareAscReturn;
       });
       return;
     }

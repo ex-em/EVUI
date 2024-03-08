@@ -5,45 +5,26 @@
       :rows="tableData"
       :height="500"
       :option="{
-        sort: {
-          field: {
-            asc: (a, b) => {
-              return (
-                (a.split('_')[1] === null) - (b.split('_')[1] === null) ||
-                Number(a.split('_')[1]) - Number(b.split('_')[1])
-              );
-            },
-            desc: (a, b) => {
-              return (
-                (a.split('_')[1] === null) - (b.split('_')[1] === null) ||
-                Number(b.split('_')[1]) - Number(a.split('_')[1])
-              );
-            },
+        customAscFunction: {
+          field: (a, b) => {
+            return (
+              (a.split('_')[1] === null) - (b.split('_')[1] === null) ||
+              Number(a.split('_')[1]) - Number(b.split('_')[1])
+            );
           },
-          value: {
-            asc: (a, b) => {
-              return (
-                (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
-                Number(a.split('-')[1]) - Number(b.split('-')[1])
-              );
-            },
-            desc: (a, b) => {
-              return (
-                (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
-                Number(b.split('-')[1]) - Number(a.split('-')[1])
-              );
-            },
+          value: (a, b) => {
+            return (
+              (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
+               Number(a.split('-')[1]) - Number(b.split('-')[1])
+             );
           },
         },
       }"
     />
-    <!-- description -->
-    <div class="description"></div>
   </div>
 </template>
 
 <script>
-import { cloneDeep } from 'lodash-es';
 import { ref } from 'vue';
 
 const arr = Array.from({ length: 50 }, () => [
@@ -53,7 +34,7 @@ const arr = Array.from({ length: 50 }, () => [
 
 export default {
   setup() {
-    const tableData = ref(cloneDeep(arr));
+    const tableData = ref(arr);
     const columns = ref([
       { caption: 'Field', field: 'field', type: 'string', width: 200 },
       { caption: 'Value', field: 'value', type: 'string', width: 200 },
