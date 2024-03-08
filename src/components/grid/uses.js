@@ -67,7 +67,14 @@ export const commonFunctions = () => {
     }
     return size;
   };
-  return { isRenderer, getComponentName, getConvertValue, getColumnIndex, setPixelUnit };
+
+  return {
+    isRenderer,
+    getComponentName,
+    getConvertValue,
+    getColumnIndex,
+    setPixelUnit,
+  };
 };
 
 export const scrollEvent = (params) => {
@@ -239,7 +246,7 @@ export const resizeEvent = (params) => {
       resizeInfo.columnWidth = columnWidth;
     }
 
-    stores.orderedColumns.map((column) => {
+    stores.orderedColumns.forEach((column) => {
       const item = column;
       const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
       if (item.width && item.width < minWidth) {
@@ -267,7 +274,7 @@ export const resizeEvent = (params) => {
   const onResize = () => {
     nextTick(() => {
       if (resizeInfo.adjust) {
-        stores.orderedColumns.map((column) => {
+        stores.orderedColumns.forEach((column) => {
           const item = column;
 
           if (!props.columns[column.index].width && !item.resized) {
@@ -340,7 +347,13 @@ export const resizeEvent = (params) => {
       resizeInfo.showResizeLine = false;
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
-      emit('resize:column', stores.orderedColumns[columnIndex]);
+
+      emit('resize:column', stores.orderedColumns[columnIndex]);// 기존 적용된 코드를 위해 남겨둠.
+
+      emit('resize-column', {
+        column: stores.orderedColumns[columnIndex],
+        columns: stores.updatedColumns,
+      });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -963,6 +976,7 @@ export const contextMenuEvent = (params) => {
    * @param {object} event - 이벤트 객체
    */
   let contextmenuTimer = null;
+  const { emit } = getCurrentInstance();
   const setContextMenu = (e) => {
     if (contextmenuTimer) {
       clearTimeout(contextmenuTimer);
@@ -993,7 +1007,7 @@ export const contextMenuEvent = (params) => {
   /**
    * 마우스 우클릭 이벤트를 처리한다.
    *
-   * @param {object} event - 이벤트 객체
+   * @param {object} e - 이벤트 객체
    */
   const onContextMenu = (e) => {
     e.preventDefault();
@@ -1061,7 +1075,12 @@ export const contextMenuEvent = (params) => {
           iconClass: 'ev-icon-visibility-off',
           disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
           hidden: contextInfo.hiddenColumnMenuItem?.hide,
-          click: () => setColumnHidden(column.field),
+          click: () => {
+            setColumnHidden(column.field);
+            emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+          },
         },
       ];
       contextInfo.columnMenuItems = [];
@@ -1074,7 +1093,7 @@ export const contextMenuEvent = (params) => {
   /**
    * 상단 우측의 Grid 옵션에 대한 Contextmenu 를 생성한다.
    *
-   * @param {object} event - 이벤트 객체
+   * @param {object} e - 이벤트 객체
    */
   const onGridSettingContextMenu = (e) => {
     const columnListMenu = {
@@ -1223,7 +1242,7 @@ export const pagingEvent = (params) => {
 };
 
 export const columnSettingEvent = (params) => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   const {
     stores,
     columnSettingInfo,
@@ -1291,15 +1310,20 @@ export const columnSettingEvent = (params) => {
     stores.filteredColumns = stores.originColumns
       .filter((col) => {
         if (columnNames.includes(col.field) || !col.caption) {
-          if (col?.hiddenDisplay) {
-            col.hiddenDisplay = false;
-          }
+          // 보여줄 컬럼들은 hiddenDisplay 속성을 false로 전부 적용
+          col.hiddenDisplay = false;
           return true;
         }
+
+        // 보여주지 않을 컬럼들은 hiddenDisplay 속성을 전부 ture로 적용
+        col.hiddenDisplay = true;
         return false;
       });
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
+    emit('change-column-status', {
+      columns: stores.updatedColumns,
+    });
   };
   const setColumnHidden = (val) => {
     const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
@@ -1307,7 +1331,15 @@ export const columnSettingEvent = (params) => {
     if (columns.length === 1) {
       return;
     }
-    stores.filteredColumns = columns.filter(col => col.field !== val);
+    stores.filteredColumns = columns
+      .filter((col) => {
+        if (col.field !== val) {
+          col.hiddenDisplay = false;
+          return true;
+        }
+        col.hiddenDisplay = true;
+        return false;
+      });
     columnSettingInfo.hiddenColumn = val;
     setFilteringColumn();
   };
@@ -1321,6 +1353,7 @@ export const columnSettingEvent = (params) => {
 };
 
 export const dragEvent = ({ stores }) => {
+  const { emit } = getCurrentInstance();
   const setColumnMoving = (currentIndex, droppedIndex) => {
     const oldIndex = parseInt(currentIndex, 10);
     const newPositionIndex = parseInt(droppedIndex, 10);
@@ -1348,6 +1381,10 @@ export const dragEvent = ({ stores }) => {
     const currentIndex = e.dataTransfer.getData('text/plain');
     const droppedIndex = e.target.parentNode.dataset.index;
     setColumnMoving(currentIndex, droppedIndex);
+    emit('change-column-order', {
+      column: stores.orderedColumns[droppedIndex],
+      columns: stores.updatedColumns,
+    });
   };
   return {
     onDragStart,

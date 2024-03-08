@@ -10,6 +10,8 @@ import Summary from './example/Summary';
 import SummaryRaw from '!!raw-loader!./example/Summary';
 import RowDetail from './example/RowDetail.vue';
 import RowDetailRaw from '!!raw-loader!./example/RowDetail.vue';
+import ColumnEvent from './example/ColumnEvent.vue';
+import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
 
 export default {
   mdText,
@@ -34,6 +36,10 @@ export default {
     RowDetail: {
       component: RowDetail,
       parsedData: parseComponent(RowDetailRaw),
+    },
+    ColumnEvent: {
+      component: ColumnEvent,
+      parsedData: parseComponent(ColumnEventRaw),
     },
   },
 };

@@ -108,14 +108,17 @@
 | summaryData | Array | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용 | ex) '{0}({1}%)' | N |
 
 ### Event
-| 이름 | 파라미터 | 설명 |
- | ---- | ------- | ---- |
- | check-row | event, row, index | row의 체크박스가 체크 되었을때 호출된다. |
- | check-all | event, rows | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 row의 체크박스를 체크한다. |
- | click-row | event, row | row가 클릭 되었을 때 호출된다. |
- | dblclick-row | event, row | row가 더블 클릭 되었을 때 호출된다. |
- | page-change | event | page 정보가 변경되었을 때 호출된다. |
- | sort-column | event | column을 기준으로 정렬이 변경되었을 때 호출된다. |
- | expand-row | event, row, isExpand, index | row가 확장되었을 때 호출된다. |
- | update:expanded | rows | row가 확장되었을 때 호출된다. |
- | resize:column | column | column의 width가 resize 됐을때 호출된다. |
+| 이름 | 파라미터                        | 설명                                                                  |
+ | ---- |-----------------------------|---------------------------------------------------------------------|
+ | check-row | event, row, index           | row의 체크박스가 체크 되었을때 호출된다.                                            |
+ | check-all | event, rows                 | 헤더의 체크박스가 체크 되었을때 호출 된다. 전체 row의 체크박스를 체크한다.                        |
+ | click-row | event, row                  | row가 클릭 되었을 때 호출된다.                                                 |
+ | dblclick-row | event, row                  | row가 더블 클릭 되었을 때 호출된다.                                              |
+ | page-change | event                       | page 정보가 변경되었을 때 호출된다.                                              |
+ | sort-column | event                       | column을 기준으로 정렬이 변경되었을 때 호출된다.                                      |
+ | expand-row | event, row, isExpand, index | row가 확장되었을 때 호출된다.                                                  |
+ | update:expanded | rows                        | row가 확장되었을 때 호출된다.                                                  |
+ | resize:column | column                      | column의 width가 resize 됐을때 호출된다.                                     |
+ | resize-column | column, columns             | column의 width가 resize 됐을때 호출된다.                                     |
+ | change-column-order | column, columns             | column의 위치가 변경되었을 때 호출된다.                                           |
+ | change-column-status | columns             | column의 상태(column Show/Hide)가 변경되었을 때 호출된다. |
