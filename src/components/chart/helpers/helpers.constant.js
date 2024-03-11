@@ -43,6 +43,7 @@ export const LINE_OPTION = {
   fill: false,
   fillOpacity: 0.4,
   showLegend: true,
+  passingValue: null,
 };
 
 export const BAR_OPTION = {

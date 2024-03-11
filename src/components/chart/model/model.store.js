@@ -52,7 +52,7 @@ const modules = {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
                 series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
-                series.data = this.addSeriesDS(sData, label);
+                series.data = this.addSeriesDS(sData, label, series.isExistGrp);
               }
               series.minMax = this.getSeriesMinMax(series.data);
             }
@@ -393,8 +393,9 @@ const modules = {
       const baseDataList = baseSeries.data;
       const baseData = baseDataList[dataIndex];
       const position = isHorizontal ? baseData?.x : baseData?.y;
+      const isPassingValue = baseSeries.passingValue === baseData?.o;
 
-      if (position == null || !baseSeries.show) {
+      if (isPassingValue || position == null || !baseSeries.show) {
         if (nextBaseSeriesIndex > -1) {
           return getBaseDataPosition(nextBaseSeriesIndex, dataIndex);
         }
@@ -442,12 +443,14 @@ const modules = {
    * Take data and label to create data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
+   * @param {boolean}  isBase   is Base(bottommost) series at stack chart
    *
    * @returns {array} data for each series
    */
-  addSeriesDS(data, label) {
+  addSeriesDS(data, label, isBase) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
+    const passingValue = this.seriesList[Object.keys(this.seriesList)[0]]?.passingValue;
 
     data.forEach((curr, index) => {
       let gdata = curr;
@@ -459,7 +462,10 @@ const modules = {
       }
 
       if (ldata !== null) {
-        sdata.push(this.addData(gdata, ldata, gdata));
+        const isPassingValueWithStack = isBase
+          && !Util.isNullOrUndefined(passingValue)
+          && gdata === passingValue;
+        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata));
       }
     });
 

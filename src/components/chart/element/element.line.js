@@ -33,6 +33,7 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
+    this.usePassingValue = !!this.passingValue;
   }
 
   /**
@@ -85,7 +86,6 @@ class Line {
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
 
-    let startFillIndex = 0;
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
     let x;
@@ -111,7 +111,8 @@ class Line {
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
     // draw line
-    this.data.reduce((prev, curr, ix) => {
+    let needCutoff = false;
+    this.data.reduce((prev, curr) => {
       x = getXPos(curr.x);
       y = getYPos(curr.y);
 
@@ -119,13 +120,30 @@ class Line {
         x += Util.aliasPixel(x);
       }
 
-      if (ix === 0) {
-        ctx.moveTo(x, y);
+      if (this.usePassingValue) {
+        if (curr.o === this.passingValue) {
+          y = getYPos(prev.y);
+
+          if (prev.o === null) {
+            needCutoff = true;
+          }
+
+          if (this.isExistGrp && !needCutoff) {
+            y = getYPos(curr.b ?? 0);
+            ctx.lineTo(x, y);
+          }
+
+          curr.xp = x;
+          curr.yp = y;
+
+          return curr;
+        }
       }
 
-      const isNullValue = prev.y === null || curr.y === null || prev.x === null || curr.x === null;
-      if (isNullValue) {
+      const isNullValue = Util.isNullOrUndefined(prev.o) || Util.isNullOrUndefined(curr.o);
+      if (isNullValue || needCutoff) {
         ctx.moveTo(x, y);
+        needCutoff = false;
       } else {
         ctx.lineTo(x, y);
       }
@@ -143,7 +161,6 @@ class Line {
       ctx.beginPath();
 
       const fillColor = Util.colorStringToRgba(mainColor, fillOpacity);
-
       if (this.fill?.gradient) {
         let maxValueYPos = this.data[0].yp;
         let minValueYBottomPos = this.data[0].y;
@@ -164,33 +181,60 @@ class Line {
         ctx.fillStyle = fillColor;
       }
 
-      this.data.forEach((currData, ix) => {
-        const isEmptyPoint = data => data?.x === null || data?.y === null
-          || data?.x === undefined || data?.y === undefined;
-
-        const nextData = this.data[ix + 1];
-
-        if (isEmptyPoint(currData)) {
-          startFillIndex = ix + 1;
-
-          if (!isEmptyPoint(nextData)) {
-            ctx.moveTo(nextData.xp, nextData.yp);
+      // Set dataIndex List for filling
+      // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
+      let start = null;
+      let end = null;
+      const valueArray = this.data.map(item => item?.o);
+      const needFillDataIndexList = [];
+      for (let i = 0; i < valueArray.length + 1; i++) {
+        if (Util.isNullOrUndefined(valueArray[i])) {
+          if (start !== null && end !== null) {
+            const temp = valueArray.slice(start, i);
+            const lastNormalValueIndex = temp.findLastIndex(
+              item => item !== Util.isNullOrUndefined(item) && item !== this.passingValue);
+            needFillDataIndexList.push([start, start + lastNormalValueIndex]);
+            start = null;
+            end = null;
           }
+        } else if (valueArray[i] === this.passingValue) {
+          end = i;
+        } else {
+          start = start === null ? i : start;
+          end = i;
+        }
+      }
 
+      // Draw rect for filling
+      needFillDataIndexList.forEach(([startIndex, endIndex]) => {
+        if (startIndex === endIndex) {
+          const singleData = this.data[startIndex];
+          ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
+          ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
+          ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
+          ctx.closePath();
           return;
         }
 
-        ctx.lineTo(currData.xp, currData.yp);
+        for (let ix = startIndex; ix <= endIndex; ix++) {
+          const currData = this.data[ix];
 
-        if (isEmptyPoint(nextData)) {
-          for (let jx = ix; jx >= startFillIndex; jx--) {
-            const prevData = this.data[jx];
-            const xp = prevData.xp;
-            const bp = getYPos(prevData.b) ?? endPoint;
-            ctx.lineTo(xp, bp);
+          if (ix === startIndex) {
+            ctx.moveTo(currData.xp, currData.yp);
+          } else if (this.isExistGrp || this.passingValue !== currData.o) {
+            ctx.lineTo(currData.xp, currData.yp);
           }
 
-          ctx.closePath();
+          if (ix === endIndex) {
+            for (let jx = endIndex; jx >= startIndex; jx--) {
+              const nextData = this.data[jx];
+              const xp = getXPos(nextData.x);
+              const bp = getYPos(nextData.b) ?? endPoint;
+              ctx.lineTo(xp, bp);
+            }
+
+            ctx.closePath();
+          }
         }
       });
 
@@ -204,7 +248,7 @@ class Line {
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
 
       this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null) {
+        if (curr.xp === null || curr.yp === null || curr.o === this.passingValue) {
           return;
         }
 
@@ -233,20 +277,19 @@ class Line {
     const gdata = item.data;
     const ctx = context;
 
-    const x = gdata.xp;
-    const y = gdata.yp;
+    const { xp, yp, o } = gdata;
 
     ctx.save();
-    if (x !== null && y !== null) {
+    if (xp !== null && yp !== null && o !== this.passingValue) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
       ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);
 
       ctx.fillStyle = this.color;
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, xp, yp);
 
       ctx.fillStyle = '#fff';
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, x, y);
+      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, xp, yp);
     }
 
     ctx.restore();
@@ -347,6 +390,10 @@ class Line {
       if (typeof item.index === 'number') {
         this.beforeFindItemIndex = item.index;
       }
+    }
+
+    if (item?.data?.o === this.passingValue) {
+      item.data = null;
     }
 
     return item;

@@ -22,6 +22,8 @@ import SelectSeries from './example/SelectSeries';
 import SelectSeriesRaw from '!!raw-loader!./example/SelectSeries';
 import AxisTitle from './example/AxisTitle';
 import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
+import PassingValue from './example/PassingValue';
+import PassingValueRaw from '!!raw-loader!./example/PassingValue';
 
 export default {
   mdText,
@@ -80,6 +82,11 @@ export default {
       description: '차트 축에 title을 설정할 수 있습니다.',
       component: AxisTitle,
       parsedData: parseComponent(AxisTitleRaw),
+    },
+    PassingValue: {
+      description: 'passingValue를 설정하여 특정 시점에 line을 끊지 않고 자연스럽게 이을 수 있습니다.',
+      component: PassingValue,
+      parsedData: parseComponent(PassingValueRaw),
     },
   },
 };
