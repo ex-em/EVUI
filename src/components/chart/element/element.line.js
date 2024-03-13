@@ -140,7 +140,10 @@ class Line {
         }
       }
 
-      const isNullValue = Util.isNullOrUndefined(prev.o) || Util.isNullOrUndefined(curr.o);
+      const isNullValue = Util.isNullOrUndefined(prev.o)
+        || Util.isNullOrUndefined(curr.o)
+        || Util.isNullOrUndefined(curr.x)
+        || Util.isNullOrUndefined(curr.y);
       if (isNullValue || needCutoff) {
         ctx.moveTo(x, y);
         needCutoff = false;
@@ -308,7 +311,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data;
+    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
     const SPARE_XP = 0.5;
 
     if (gdata?.length) {
@@ -392,7 +395,7 @@ class Line {
       }
     }
 
-    if (item?.data?.o === this.passingValue) {
+    if (this.usePassingValue && item?.data?.o === this.passingValue) {
       item.data = null;
     }
 
@@ -409,7 +412,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data;
+    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
 
     let s = 0;
     let e = gdata.length - 1;
