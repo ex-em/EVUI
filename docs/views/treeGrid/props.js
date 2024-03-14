@@ -6,6 +6,8 @@ import CellRenderer from './example/CellRenderer';
 import CellRendererRaw from '!!raw-loader!./example/CellRenderer';
 import Toolbar from './example/Toolbar';
 import ToolbarRaw from '!!raw-loader!./example/Toolbar';
+import ColumnEvent from './example/ColumnEvent.vue';
+import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
 
 export default {
   mdText,
@@ -22,6 +24,10 @@ export default {
     Toolbar: {
       component: Toolbar,
       parsedData: parseComponent(ToolbarRaw),
+    },
+    ColumnEvent: {
+      component: ColumnEvent,
+      parsedData: parseComponent(ColumnEventRaw),
     },
   },
 };

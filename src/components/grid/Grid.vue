@@ -664,16 +664,18 @@ export default {
   },
   emits: {
     'update:selected': null,
-    'click-row': null,
-    'dblclick-row': null,
     'update:checked': null,
+    'update:expanded': null,
     'check-row': null,
     'check-all': null,
+    'click-row': null,
+    'dblclick-row': null,
     'page-change': null,
     'sort-column': null,
     'expand-row': null,
-    'update:expanded': null,
-    'resize:column': column => column,
+    'resize-column': ({ column, columns }) => ({ column, columns }),
+    'change-column-order': ({ column, columns }) => ({ column, columns }),
+    'change-column-status': ({ columns }) => ({ columns }),
   },
   setup(props) {
     // const ROW_INDEX = 0;
@@ -752,6 +754,14 @@ export default {
         const columns = stores.movedColumns.length
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
+      }),
+      updatedColumns: computed(() => {
+        const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
+        const extraColumns = stores.originColumns?.filter(
+          column => !orderedColumnsIndexes.includes(column.index),
+        );
+        const copyOrderedColumns = cloneDeep(stores.orderedColumns);
+        return [...copyOrderedColumns, ...extraColumns];
       }),
     });
     const pageInfo = reactive({
