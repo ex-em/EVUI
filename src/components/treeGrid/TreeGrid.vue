@@ -258,6 +258,7 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
+import { cloneDeep } from 'lodash-es';
 import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
@@ -329,12 +330,14 @@ export default {
   },
   emits: {
     'update:selected': null,
+    'update:checked': null,
     'click-row': null,
     'dblclick-row': null,
-    'update:checked': null,
     'check-row': null,
     'check-all': null,
     'page-change': null,
+    'resize-column': ({ column, columns }) => ({ column, columns }),
+    'change-column-status': ({ columns }) => ({ columns }),
   },
   setup(props) {
     const toolbarRef = ref(null);
@@ -382,6 +385,14 @@ export default {
       originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
         ? stores.filteredColumns : stores.originColumns)),
+      updatedColumns: computed(() => {
+        const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
+        const extraColumns = stores.originColumns?.filter(
+          column => !orderedColumnsIndexes.includes(column.index),
+        );
+        const copyOrderedColumns = cloneDeep(stores.orderedColumns);
+        return [...copyOrderedColumns, ...extraColumns];
+      }),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),

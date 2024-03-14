@@ -12,6 +12,8 @@ import RowDetail from './example/RowDetail.vue';
 import RowDetailRaw from '!!raw-loader!./example/RowDetail.vue';
 import Sort from './example/Sort.vue';
 import SortRaw from '!!raw-loader!./example/Sort.vue';
+import ColumnEvent from './example/ColumnEvent.vue';
+import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
 
 export default {
   mdText,
@@ -40,6 +42,10 @@ export default {
     Sort: {
       component: Sort,
       parsedData: parseComponent(SortRaw),
+    },
+    ColumnEvent: {
+      component: ColumnEvent,
+      parsedData: parseComponent(ColumnEventRaw),
     },
   },
 };

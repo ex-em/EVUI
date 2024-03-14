@@ -171,7 +171,7 @@ export const scrollEvent = (params) => {
 };
 
 export const resizeEvent = (params) => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
   const {
     resizeInfo,
     elementInfo,
@@ -233,7 +233,7 @@ export const resizeEvent = (params) => {
       resizeInfo.columnWidth = columnWidth;
     }
 
-    stores.orderedColumns.map((column) => {
+    stores.orderedColumns.forEach((column) => {
       const item = column;
       const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
       if (item.width && item.width < minWidth) {
@@ -262,7 +262,7 @@ export const resizeEvent = (params) => {
   const onResize = () => {
     nextTick(() => {
       if (resizeInfo.adjust) {
-        stores.orderedColumns.map((column) => {
+        stores.orderedColumns.forEach((column) => {
           const item = column;
 
           if (!props.columns[column.index].width && !item.resized) {
@@ -329,7 +329,7 @@ export const resizeEvent = (params) => {
 
       if (stores.orderedColumns[columnIndex]) {
         stores.orderedColumns[columnIndex].width = changedWidth;
-        stores.orderedColumns.map((column) => {
+        stores.orderedColumns.forEach((column) => {
           const item = column;
           item.resized = true;
           return item;
@@ -339,6 +339,10 @@ export const resizeEvent = (params) => {
       resizeInfo.showResizeLine = false;
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
+      emit('resize-column', {
+        column: stores.orderedColumns[columnIndex],
+        columns: stores.updatedColumns,
+      });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -613,7 +617,12 @@ export const contextMenuEvent = (params) => {
           text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
           iconClass: 'ev-icon-visibility-off',
           disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
-          click: () => setColumnHidden(column.field),
+          click: () => {
+            setColumnHidden(column.field);
+            emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+          },
         },
       ];
     } else {
@@ -644,7 +653,7 @@ export const contextMenuEvent = (params) => {
   /**
    * 상단 우측의 Grid 옵션에 대한 Contextmenu 를 생성한다.
    *
-   * @param {object} event - 이벤트 객체
+   * @param {object} e - 이벤트 객체
    */
   const onGridSettingContextMenu = (e) => {
     const columnListMenu = {

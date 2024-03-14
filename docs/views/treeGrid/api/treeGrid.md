@@ -121,3 +121,5 @@
 | click-row | event, row | row가 클릭 되었을 때 호출된다. |
 | dblclick-row | event, row | row가 더블 클릭 되었을 때 호출된다. |
 | page-change | event | page 정보가 변경되었을 때 호출된다. |
+| resize-column | column, columns             | column의 width가 resize 됐을때 호출된다.                                     | |
+| change-column-status | columns             | column의 상태(column Show/Hide)가 변경되었을 때 호출된다. |
