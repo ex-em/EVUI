@@ -910,6 +910,9 @@ class EvChart {
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
+    if (this.dragInfoBackup) {
+      this.drawSelectionArea?.(this.dragInfoBackup);
+    }
 
     if (promiseRes) {
       promiseRes(true);

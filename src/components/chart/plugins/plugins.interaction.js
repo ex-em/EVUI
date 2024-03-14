@@ -1,6 +1,6 @@
 import { numberWithComma } from '@/common/utils';
 import throttle from '@/common/utils.throttle';
-import { cloneDeep, defaultsDeep, inRange } from 'lodash-es';
+import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
 import dayjs from 'dayjs';
 
 const modules = {
@@ -514,13 +514,43 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSelectionArea({ xsp, ysp, width, height }) {
+  drawSelectionArea({ xsp, ysp, width, height, range }) {
     const ctx = this.overlayCtx;
     const { fillColor, opacity } = this.options.dragSelection;
 
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const newRange = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
     ctx.fillStyle = fillColor;
     ctx.globalAlpha = opacity;
-    ctx.fillRect(xsp, ysp, width, height);
+
+    if (isEqual(newRange, range)) {
+      ctx.fillRect(xsp, ysp, width, height);
+    } else {
+      const rectWidth = (range.x2 - range.x1);
+      const rectHeight = (range.y2 - range.y1);
+      const newRectWidth = (newRange.x2 - newRange.x1);
+      const newRectHeight = (newRange.y2 - newRange.y1);
+
+      const ratioX = (xsp - range.x1) / rectWidth;
+      const ratioY = (ysp - range.y1) / rectHeight;
+      const newXsp = newRange.x1 + newRectWidth * ratioX;
+      const newYsp = newRange.y1 + newRectHeight * ratioY;
+
+      const ratioWidth = width / rectWidth;
+      const ratioHeight = height / rectHeight;
+      const newWidth = newRectWidth * ratioWidth;
+      const newHeight = newRectHeight * ratioHeight;
+
+      ctx.fillRect(newXsp, newYsp, newWidth, newHeight);
+    }
+
     ctx.globalAlpha = 1;
   },
 
