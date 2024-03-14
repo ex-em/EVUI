@@ -348,8 +348,6 @@ export const resizeEvent = (params) => {
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
 
-      emit('resize:column', stores.orderedColumns[columnIndex]);// 기존 적용된 코드를 위해 남겨둠.
-
       emit('resize-column', {
         column: stores.orderedColumns[columnIndex],
         columns: stores.updatedColumns,

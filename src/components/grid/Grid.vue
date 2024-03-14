@@ -673,7 +673,6 @@ export default {
     'page-change': null,
     'sort-column': null,
     'expand-row': null,
-    'resize:column': column => column, // 기존에 적용된 코드를 위해 남겨둠.
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-order': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
