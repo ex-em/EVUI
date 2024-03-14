@@ -13,7 +13,7 @@
         }
       }"
       @expand-row="onExpandRow"
-      @resize:column="onResizeColumn"
+      @resize-column="onResizeColumn"
     >
       <template #rowDetail="{ item }">
         <row-detail-content
@@ -102,8 +102,8 @@ export default {
       });
       expandedRowText.value = result;
     };
-    const onResizeColumn = (column) => {
-      console.log('[onResizeColumn]', column);
+    const onResizeColumn = (columnInfo) => {
+      console.log('[onResizeColumn]', columnInfo);
     };
 
     pushData();
