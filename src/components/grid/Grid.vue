@@ -804,6 +804,7 @@ export default {
       sortField: '',
       sortOrder: '',
       sortColumn: {},
+      sortFunction: props.option.customAscFunction ?? {},
     });
     const contextInfo = reactive({
       menu: null,
