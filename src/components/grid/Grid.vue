@@ -206,6 +206,7 @@
               v-if="useCheckbox.use && useCheckbox.headerCheck && useCheckbox.mode !== 'single'"
               v-model="isHeaderChecked"
               :disabled="isHeaderUncheckable"
+              :indeterminate="isHeaderIndeterminate"
               @change="onCheckAll"
             />
           </li>
@@ -786,6 +787,7 @@ export default {
       prevCheckedRow: [],
       isHeaderChecked: false,
       isHeaderUncheckable: false,
+      isHeaderIndeterminate: false,
       checkedRows: props.checked,
       useCheckbox: computed(() => (props.option.useCheckbox || {})),
     });
@@ -847,6 +849,7 @@ export default {
     const clearCheckInfo = () => {
       checkInfo.checkedRows = [];
       checkInfo.isHeaderChecked = false;
+      checkInfo.isHeaderIndeterminate = false;
       stores.store.forEach((row) => {
         row[ROW_CHECK_INDEX] = false;
       });
@@ -912,6 +915,7 @@ export default {
     const {
       onSearch,
       setFilter,
+      setHeaderCheckboxByFilter,
     } = filterEvent({
       columnSettingInfo,
       filterInfo,
@@ -1080,7 +1084,7 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(value);
+        setStore(value, !sortInfo.sortField);
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
@@ -1327,6 +1331,8 @@ export default {
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
       setStore([], false);
+
+      setHeaderCheckboxByFilter(stores.filterStore);
     };
 
     let expandTimer = null;

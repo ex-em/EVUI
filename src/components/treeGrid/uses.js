@@ -72,6 +72,9 @@ export const commonFunctions = (params) => {
         && (uncheckableList.length + checkedList.length === rows.length);
       checkInfo.isHeaderUncheckable = isAllUncheckable;
     }
+    checkInfo.isHeaderIndeterminate = !!rows.length
+      && rows.some(row => row.checked || row.indeterminate)
+      && !checkInfo.isHeaderChecked;
   };
   return {
     isRenderer,
@@ -481,6 +484,10 @@ export const checkEvent = (params) => {
           parentNode.checked = true;
         }
       }
+
+      parentNode.indeterminate = !isCheck
+        && parentNode.children.some(n => n.checked || n.indeterminate);
+
       if (!parentNode.checked) {
         checkInfo.checkedRows = checkInfo.checkedRows
           .filter(checked => checked.index !== parentNode.index);
@@ -523,6 +530,7 @@ export const checkEvent = (params) => {
       onCheckChildren(row);
       onCheckParent(row);
       checkInfo.checkedRows.push(row);
+      row.indeterminate = false;
     };
     const removeCheckedRow = (row) => {
       if (isSingleMode()) {
@@ -567,7 +575,9 @@ export const checkEvent = (params) => {
         checkInfo.checkedRows = checkInfo.checkedRows
           .filter(checked => checked.index !== row.index);
       }
+      row.indeterminate = false;
     });
+    checkInfo.isHeaderIndeterminate = false;
     emit('update:checked', checkInfo.checkedRows);
     emit('check-all', event, checkInfo.checkedRows);
   };
@@ -727,6 +737,10 @@ export const treeEvent = (params) => {
 
         if (!Object.hasOwnProperty.call(node, 'uncheckable')) {
           node.uncheckable = uncheckable;
+        }
+
+        if (!Object.hasOwnProperty.call(node, 'indeterminate')) {
+          node.indeterminate = false;
         }
 
         if (!Object.hasOwnProperty.call(node, 'data')) {

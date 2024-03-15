@@ -137,7 +137,11 @@ export default {
      */
     watch(
       () => props.indeterminate,
-      (val) => { checkbox.value.indeterminate = val; },
+      (val) => {
+        nextTick(() => {
+          checkbox.value.indeterminate = val;
+        });
+      }, { immediate: true },
     );
 
     return {
