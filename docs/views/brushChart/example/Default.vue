@@ -19,6 +19,10 @@
       <ev-toggle v-model="isUseDebounce"/>
       <br/>
       <br/>
+      <span class="toggle-label"> useWheelMove 옵션 사용</span>
+      <ev-toggle v-model="isUseWheelMove"/>
+      <br/>
+      <br/>
       <span class="toggle-label">Brush 생성</span>
       <ev-toggle v-model="isShowBrush"/>
       <br/>
@@ -43,6 +47,7 @@ export default {
     const isShowBrush = ref(true);
     const isShowToolbar = ref(true);
     const isUseDebounce = ref(true);
+    const isUseWheelMove = ref(true);
     const zoomRef = ref();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
@@ -96,6 +101,7 @@ export default {
     const brushOptions = reactive({
       show: isShowBrush,
       useDebounce: isUseDebounce,
+      useWheelMove: isUseWheelMove,
       chartIdx: 0,
       height: 80,
     });
@@ -155,6 +161,7 @@ export default {
       isShowBrush,
       isExpandChartArea,
       isUseDebounce,
+      isUseWheelMove,
       zoomRef,
       onUpdateChartData,
     };
