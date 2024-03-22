@@ -372,8 +372,11 @@ export default class EvChartBrush {
     this.brushCanvas[type]('mousedown', this.onMouseDown);
     this.brushCanvas[type]('mouseup', this.onMouseUp);
     this.brushCanvas[type]('mouseleave', this.onMouseLeave);
-    this.brushCanvas[type]('wheel', this.onWheel);
-    this.brushCanvas[type]('wheel', this.onWheelDebounce);
+
+    if (this.evChartBrushOptions.value.useWheelMove) {
+      this.brushCanvas[type]('wheel', this.onWheel);
+      this.brushCanvas[type]('wheel', this.onWheelDebounce);
+    }
   }
 
   removeBrushWrapper() {

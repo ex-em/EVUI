@@ -10,6 +10,7 @@ const DEFAULT_OPTIONS = {
     fillColor: '#38ACEC',
     opacity: 0.65,
   },
+  useWheelMove: true,
 };
 
 // eslint-disable-next-line import/prefer-default-export

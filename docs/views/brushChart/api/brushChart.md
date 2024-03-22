@@ -34,6 +34,7 @@
 | useDebounce | Boolean | true               | true 이면 마지막 브러쉬 영역으로 차트가 업데이트 되고 false 이면 브러쉬 영역 조절에 따라 동시에 차트도 업데이트 됨. |                                 |
 | showLabel   | Boolean | false              | Brush의 x, y 축 라벨을 보여줄지 설정                                               |                                 |
 | selection   | Object  | ([상세](#selection)) | Brush 영역의 스타일 설정                                                        |                                 |
+| useWheelMove | Boolean | true               | Brush 영역에서 마우스 휠을 사용하여 브러쉬를 이동할지 설정                           |                                 |
 
 #### selection
 | 이름         | 타입      | 디폴트  | 설명              | 종류(예시)                       | 
