@@ -15,6 +15,7 @@
         columnWidth: columnWidthMV,
         useGridSetting: {
           use: useGridSettingMV,
+          useDefaultColumnSetting: useGridDefaultSettingMV,
           customContextMenu: gridSettingMenuItems,
         },
         useFilter: useFilterMV,
@@ -84,11 +85,20 @@
         <ev-toggle
           v-model="isSelectionMultiple"
         />
+      </div>
+      <div class="form-rows">
         <span class="badge yellow">
           Use Grid Setting
         </span>
         <ev-toggle
           v-model="useGridSettingMV"
+        />
+        <span class="badge yellow">
+          Use Grid Default Setting
+        </span>
+        <ev-toggle
+          v-model="useGridDefaultSettingMV"
+          :disabled="!useGridSettingMV"
         />
       </div>
       <div class="form-rows">
@@ -239,6 +249,7 @@ export default {
     const useSelectionMV = ref(true);
     const isSelectionMultiple = ref(false);
     const useGridSettingMV = ref(true);
+    const useGridDefaultSettingMV = ref(true);
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
@@ -364,6 +375,7 @@ export default {
       isSelectionMultiple,
       useSelectionMV,
       useGridSettingMV,
+      useGridDefaultSettingMV,
       gridSettingMenuItems,
       changeMode,
       onCheckedRow,
