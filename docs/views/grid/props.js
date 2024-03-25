@@ -49,7 +49,7 @@ export default {
       component: ColumnEvent,
       parsedData: parseComponent(ColumnEventRaw),
     },
-    'Column Setting': {
+    'Custom Column List': {
       component: ColumnSetting,
       parsedData: parseComponent(ColumnSettingRaw),
     },
