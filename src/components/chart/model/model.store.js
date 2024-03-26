@@ -524,10 +524,12 @@ const modules = {
     let odataValue = null;
     let gdataColor = null;
     let odataColor = null;
+    let dataTextColor = null;
 
     if (gdata !== null && typeof gdata === 'object') {
       gdataValue = gdata.value;
       gdataColor = gdata.color;
+      dataTextColor = gdata.textColor;
     } else {
       gdataValue = gdata ?? null;
     }
@@ -550,6 +552,7 @@ const modules = {
     data.w = null;
     data.h = null;
     data.dataColor = gdataColor ?? odataColor;
+    data.dataTextColor = dataTextColor;
 
     return data;
   },

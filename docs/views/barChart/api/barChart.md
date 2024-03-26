@@ -87,7 +87,7 @@ const chartData = {
     data: {
         'series1' : [1, 2, 3, 4],
         'series2' : [5, 2, 0, 8],
-        'series3' : [{ value: 9, color: '#FF0000' }, 2, 8, 2], // 특정 값에 별도의 색상 지정 가능
+        'series3' : [{ value: 9, color: '#FF0000', textColor: '#FFFF00' }, 2, 8, 2], // 특정 값에 별도의 색상 지정 가능
     },
     labels: ['a', 'b', c', 'd'],
 }
