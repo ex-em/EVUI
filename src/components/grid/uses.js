@@ -1377,6 +1377,10 @@ export const dragEvent = ({ stores }) => {
     const oldIndex = parseInt(currentIndex, 10);
     const newPositionIndex = parseInt(droppedIndex, 10);
 
+    if (!Number.isInteger(oldIndex) || !Number.isInteger(newPositionIndex)) {
+      return;
+    }
+
     const columns = [...stores.orderedColumns];
     const movedColumn = columns[oldIndex];
 
