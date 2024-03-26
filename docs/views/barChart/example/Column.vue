@@ -21,7 +21,7 @@
           'value5',
         ],
         data: {
-          series1: [null, 150, 0, 150, { value: 350, color: '#FF0000' }],
+          series1: [null, 150, 0, 150, { value: 350, color: '#FF0000', textColor: '#FFFF00' }],
           series2: [null, 100.2, 0, 50.221, 250.123],
         },
       };

@@ -214,6 +214,7 @@ class Bar {
             w,
           },
           isHighlight: false,
+          textColor: item.dataTextColor,
         });
       }
 
@@ -275,6 +276,7 @@ class Bar {
           w,
         },
         isHighlight: true,
+        textColor: item.data.dataTextColor || item.dataTextColor,
       });
     }
 
@@ -383,10 +385,11 @@ class Bar {
    * @param data              series value data (model.store.js addData return value)
    * @param positions         series value positions
    * @param isHighlight       draw label with highlight effect
+   * @param textColor         data text color
    */
-  drawValueLabels({ context, data, positions, isHighlight }) {
+  drawValueLabels({ context, data, positions, isHighlight, textColor }) {
     const isHorizontal = this.isHorizontal;
-    const { fontSize, textColor, align, formatter, decimalPoint } = this.showValue;
+    const { fontSize, textColor: seriesTextColor, align, formatter, decimalPoint } = this.showValue;
     const { x, y, w, h } = positions;
     const ctx = context;
 
@@ -394,7 +397,7 @@ class Bar {
     ctx.beginPath();
 
     ctx.font = `normal normal normal ${fontSize}px Roboto`;
-    ctx.fillStyle = textColor;
+    ctx.fillStyle = textColor || seriesTextColor;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = isHorizontal && align !== 'center' ? 'left' : 'center';
