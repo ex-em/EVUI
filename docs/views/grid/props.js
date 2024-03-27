@@ -1,5 +1,7 @@
 import { parseComponent } from 'vue-template-compiler';
 import mdText from 'raw-loader!./api/grid.md';
+import ColumnSetting from 'docs/views/grid/example/ColumnSetting.vue';
+import ColumnSettingRaw from '!!raw-loader!./example/ColumnSetting.vue';
 import Default from './example/Default';
 import DefaultRaw from '!!raw-loader!./example/Default';
 import CellRenderer from './example/CellRenderer';
@@ -46,6 +48,10 @@ export default {
     ColumnEvent: {
       component: ColumnEvent,
       parsedData: parseComponent(ColumnEventRaw),
+    },
+    'Custom Column List': {
+      component: ColumnSetting,
+      parsedData: parseComponent(ColumnSettingRaw),
     },
   },
 };

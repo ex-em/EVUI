@@ -8,6 +8,8 @@ import Toolbar from './example/Toolbar';
 import ToolbarRaw from '!!raw-loader!./example/Toolbar';
 import ColumnEvent from './example/ColumnEvent.vue';
 import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
+import ColumnSetting from './example/ColumnSetting.vue';
+import ColumnSettingRaw from '!!raw-loader!./example/ColumnSetting.vue';
 
 export default {
   mdText,
@@ -28,6 +30,10 @@ export default {
     ColumnEvent: {
       component: ColumnEvent,
       parsedData: parseComponent(ColumnEventRaw),
+    },
+    'Custom Column List': {
+      component: ColumnSetting,
+      parsedData: parseComponent(ColumnSettingRaw),
     },
   },
 };

@@ -1114,8 +1114,9 @@ export const contextMenuEvent = (params) => {
    * @param {object} e - 이벤트 객체
    */
   const onGridSettingContextMenu = (e) => {
+    const { useDefaultColumnSetting, columnSettingTextInfo } = columnSettingInfo;
     const columnListMenu = {
-      text: columnSettingInfo.columnSettingTextInfo?.columnList ?? 'Column List',
+      text: columnSettingTextInfo?.columnList ?? 'Column List',
       isShowMenu: true,
       click: () => {
         columnSettingInfo.isShowColumnSetting = true;
@@ -1126,10 +1127,11 @@ export const contextMenuEvent = (params) => {
     if (contextInfo.customGridSettingContextMenu.length) {
       contextInfo.gridSettingContextMenuItems = [
         ...contextInfo.customGridSettingContextMenu,
-        columnListMenu,
       ];
-    } else {
-      contextInfo.gridSettingContextMenuItems = [columnListMenu];
+    }
+
+    if (useDefaultColumnSetting) {
+      contextInfo.gridSettingContextMenuItems.push(columnListMenu);
     }
     contextInfo.gridSettingMenu.show(e);
   };

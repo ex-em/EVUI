@@ -8,7 +8,7 @@
         :style="columnSettingStyle"
       >
         <div class="ev-grid-column-setting__header">
-          <p class="header-title"> {{ textInfo.columnList }} </p>
+          <p class="header-title"> {{ textInfo.title }} </p>
           <ev-text-field
             v-model="searchVm"
             type="search"
@@ -92,7 +92,7 @@ export default {
     textInfo: {
       type: Object,
       default: () => ({
-        columnList: 'Column List',
+        title: 'Column List',
         search: 'Search',
         empty: 'No records',
         ok: 'OK',
