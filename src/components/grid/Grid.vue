@@ -1084,7 +1084,7 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(value, !sortInfo.sortField);
+        setStore(value);
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
