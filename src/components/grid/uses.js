@@ -137,7 +137,7 @@ export const scrollEvent = (params) => {
       if (pageInfo.isClientPaging) {
         store = getPagingData();
       }
-      stores.viewStore = store;
+      stores.viewStore = [...store];
       scrollInfo.vScrollTopHeight = 0;
       scrollInfo.vScrollBottomHeight = 0;
     } else {
@@ -277,8 +277,8 @@ export const resizeEvent = (params) => {
         stores.orderedColumns.forEach((column) => {
           const item = column;
 
-          if (!props.columns[column.index].width && !item.resized) {
-            item.width = 0;
+          if (!item.resized) {
+            item.width = props.columns[column.index].width ?? 0;
           }
 
           return item;
