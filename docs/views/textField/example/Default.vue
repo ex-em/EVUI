@@ -74,6 +74,18 @@
       @input="checkValid"
     />
   </div>
+
+  <div class="case">
+    <p class="case-title">Prevent Alphabet Input</p>
+    <div style="display: flex;">
+      <ev-text-field
+        v-model="modelValue7"
+        placeholder="Try press alphabet key"
+        type="text"
+        @keypress="onKeypress"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -87,6 +99,7 @@ export default {
     const modelValue4 = ref();
     const modelValue5 = ref();
     const modelValue6 = ref('1234가나다');
+    const modelValue7 = ref();
     const errMsg = ref();
     const checkValid = () => {
       const regexp = /^[0-9]*$/;
@@ -97,6 +110,13 @@ export default {
       }
     };
     checkValid();
+    const onKeypress = (e) => {
+      const char = String.fromCharCode(e.keyCode);
+      if (!(/^[A-Za-z]+$/.test(char))) return true;
+      e.preventDefault();
+      return false;
+    };
+
     return {
       modelValue1,
       modelValue2,
@@ -104,7 +124,9 @@ export default {
       modelValue4,
       modelValue5,
       modelValue6,
+      modelValue7,
       checkValid,
+      onKeypress,
       errMsg,
     };
   },

@@ -23,7 +23,7 @@ height: 100px;
     </template>
 </ev-text-field>
 ```
- 
+
 
 ### Props
 
@@ -47,3 +47,4 @@ height: 100px;
  | input | (event, newValue) | 컴포넌트 input 이벤트 발생 시 호출 |
  | change | (event, newValue) | 컴포넌트 change 이벤트 발생 시 호출 |
  | search | newValue | type === 'search'일 경우, 컴포넌트 search 이벤트 발생 시 호출 |
+ | keypress | event | 컴포넌트 keypress 이벤트 발생 시 호출 |

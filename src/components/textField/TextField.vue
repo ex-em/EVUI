@@ -31,6 +31,7 @@
           @blur="blurInput"
           @input="inputMv"
           @change="changeMv"
+          @keypress="keypressEvt"
         />
       </template>
       <template v-else >
@@ -47,6 +48,7 @@
           @input="inputMv"
           @change="changeMv"
           @keyup="keyupInput"
+          @keypress="keypressEvt"
         />
         <span
           v-if="type === 'text' && clearable"
@@ -154,6 +156,7 @@ export default {
     'input',
     'change',
     'search',
+    'keypress',
   ],
   setup(props, { emit }) {
     const mv = computed({
@@ -212,6 +215,9 @@ export default {
     const changeMv = (e) => {
       emit('change', mv.value, e);
     };
+    const keypressEvt = (e) => {
+      emit('keypress', e);
+    };
 
     return {
       mv,
@@ -225,6 +231,7 @@ export default {
       blurInput,
       inputMv,
       changeMv,
+      keypressEvt,
     };
   },
 };
