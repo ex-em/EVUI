@@ -16,6 +16,8 @@ import Sort from './example/Sort.vue';
 import SortRaw from '!!raw-loader!./example/Sort.vue';
 import ColumnEvent from './example/ColumnEvent.vue';
 import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
+import Disabled from './example/Disabled.vue';
+import DisabledRaw from '!!raw-loader!./example/Disabled.vue';
 
 export default {
   mdText,
@@ -52,6 +54,10 @@ export default {
     'Custom Column List': {
       component: ColumnSetting,
       parsedData: parseComponent(ColumnSettingRaw),
+    },
+    Disabled: {
+      component: Disabled,
+      parsedData: parseComponent(DisabledRaw),
     },
   },
 };

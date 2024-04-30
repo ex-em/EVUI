@@ -151,6 +151,10 @@
     color: inherit;
     white-space: nowrap;
 
+    &[disabled=true] {
+      cursor: not-allowed;
+    }
+
     @include evThemify() {
       border-bottom: 1px solid evThemed('grid-bottom-border');
     }
@@ -166,7 +170,7 @@
       color: #FFFFFF;
     }
     &:hover {
-      .row-contextmenu__btn {
+      .row-contextmenu__btn:not([disabled=true]) {
         display: grid;
         &:hover {
           cursor: pointer;
