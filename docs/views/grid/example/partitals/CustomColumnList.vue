@@ -65,8 +65,8 @@ export default {
     };
 
     const setCheckColumn = (columns) => {
-      checkColumnGroup.value = columns.filter(column => !column.hiddenDisplay)
-        .filter(column => !column.hiddenDisplay)
+      checkColumnGroup.value = columns
+        .filter(column => !column.hiddenDisplay && !column.hide)
         .map(column => (column.field));
     };
 
