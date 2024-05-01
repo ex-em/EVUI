@@ -731,8 +731,11 @@ export default {
         left: 0,
         columnListMenuWidth: 0,
       },
+      useDefaultColumnSetting: computed(
+        () => props.option?.useGridSetting?.useDefaultColumnSetting ?? true,
+      ),
       columnSettingTextInfo: {
-        columnList: props.option?.useGridSetting?.columnMenuText ?? 'Column List',
+        title: props.option?.useGridSetting?.columnMenuText ?? 'Column List',
         search: props.option?.useGridSetting?.searchText ?? 'Search',
         empty: props.option?.useGridSetting?.emptyText ?? 'No records',
         ok: props.option?.useGridSetting?.okBtnText ?? 'OK',
@@ -761,7 +764,7 @@ export default {
         const extraColumns = stores.originColumns?.filter(
           column => !orderedColumnsIndexes.includes(column.index),
         );
-        const copyOrderedColumns = cloneDeep(stores.orderedColumns);
+        const copyOrderedColumns = stores.orderedColumns;
         return [...copyOrderedColumns, ...extraColumns];
       }),
     });
@@ -1057,14 +1060,29 @@ export default {
 
     watch(
       () => props.columns,
-      () => {
-        sortInfo.isSorting = false;
-        sortInfo.sortField = '';
-        filterInfo.filteringColumn = null;
-        filterInfo.filteringItemsByColumn = {};
-        stores.filterStore = [];
-        setStore([], false);
-        initColumnSettingInfo();
+      (newColumns, prevColumns) => {
+        const isSameColumns = () => {
+          // Column의 field로 동일한 컬럼인지 확인
+          const newColumnsFields = newColumns.map(column => column.field);
+          const prevColumnsFields = prevColumns.map(column => column.field);
+          return prevColumnsFields.every(field => newColumnsFields.includes(field));
+        };
+
+        if (newColumns.length !== prevColumns.length || !isSameColumns()) {
+          // 동일하지 않은 컬럼으로 변경된 경우 initialize
+          sortInfo.isSorting = false;
+          sortInfo.sortField = '';
+          filterInfo.filteringColumn = null;
+          filterInfo.filteringItemsByColumn = {};
+          stores.filterStore = [];
+          setStore([], false);
+          initColumnSettingInfo();
+        } else if (stores.filteredColumns.length) {
+          // 새로운 컬럼 기준으로 filteredColumns 를 업데이트 한다.
+          stores.filteredColumns = newColumns.filter(
+            column => !column.hidden && !column.hiddenDisplay,
+          );
+        }
       }, { deep: true },
     );
     watch(
