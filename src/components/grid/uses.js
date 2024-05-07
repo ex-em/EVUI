@@ -515,6 +515,7 @@ export const checkEvent = (params) => {
 
       const isAllChecked = store
         .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
+        .filter(rowData => !props.disabled.includes(rowData[ROW_DATA_INDEX]))
         .every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
@@ -545,7 +546,8 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX]);
+      const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX])
+        || props.disabled.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !uncheckable) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
@@ -742,7 +744,8 @@ export const filterEvent = (params) => {
       checkInfo.isHeaderChecked = rowData.length === checkedCount;
       checkInfo.isHeaderIndeterminate = (rowData.length !== checkedCount) && checkedCount > 0;
       checkInfo.isHeaderUncheckable = rowData
-        .every(row => props.uncheckable.includes(row[ROW_DATA_INDEX]));
+        .every(row => props.uncheckable.includes(row[ROW_DATA_INDEX])
+          || props.disabled.includes(row[ROW_DATA_INDEX]));
     }
   };
   /**
@@ -940,8 +943,8 @@ export const filterEvent = (params) => {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
           const rowData = columnSettingInfo.isFilteringColumn ? row[ROW_DATA_INDEX]
-              .filter((data, idx) => columnSettingInfo.visibleColumnIdx
-                .includes(idx)) : row[ROW_DATA_INDEX];
+            .filter((data, idx) => columnSettingInfo.visibleColumnIdx
+              .includes(idx)) : row[ROW_DATA_INDEX];
 
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
@@ -1050,7 +1053,7 @@ export const contextMenuEvent = (params) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
-      && column.filterable === undefined ? true : column.filterable;
+        && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1170,7 +1173,7 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
-        const uncheckable = props.uncheckable.includes(row);
+        const uncheckable = props.uncheckable.includes(row) || props.disabled.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
@@ -1182,11 +1185,13 @@ export const storeEvent = (params) => {
         if (expandedInfo.useRowDetail) {
           expanded = props.expanded.includes(row);
         }
-        store.push([idx, checked, row, selected, expanded, uncheckable]);
+        const disabled = props.disabled.includes(row);
+        store.push([idx, checked, row, selected, expanded, uncheckable, disabled]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       checkInfo.isHeaderIndeterminate = hasUnChecked && !!checkInfo.checkedRows.length;
-      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row));
+      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row)
+        || props.disabled.includes(row));
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

@@ -367,6 +367,7 @@
                   highlight: row[0] === highlightIdx,
                   'non-border': !!borderStyle && borderStyle !== 'rows',
                 }"
+                :disabled="row[ROW_DISABLED_INDEX]"
                 @click="onRowClick($event, row)"
                 @contextmenu="onRowClick($event, row, true)"
                 @dblclick="onRowDblClick($event, row)"
@@ -388,7 +389,7 @@
                   <ev-checkbox
                     v-model="row[1]"
                     class="row-checkbox-input"
-                    :disabled="row[5]"
+                    :disabled="row[5] || row[ROW_DISABLED_INDEX]"
                     @change="onCheck($event, row)"
                   />
                 </td>
@@ -439,12 +440,14 @@
                       'border-right': orderedColumns.length - 1 === cellIndex
                         ? 'none' : '1px solid #CFCFCF',
                     }"
+                    :disabled="row[ROW_DISABLED_INDEX]"
                   >
                     <!-- Cell Renderer -->
                     <div v-if="!!$slots[column.field]">
                       <slot
                         :name="column.field"
                         :item="{ row, column }"
+                        :disabled="row[ROW_DISABLED_INDEX]"
                       />
                     </div>
                     <!-- Cell Value -->
@@ -470,10 +473,12 @@
                     'min-width': '30px',
                     'line-height': `${rowHeight}px`,
                   }"
+                  :disabled="row[ROW_DISABLED_INDEX]"
                 >
                   <template v-if="$slots.contextmenuIcon">
                     <span
                       class="row-contextmenu__btn"
+                      :disabled="row[ROW_DISABLED_INDEX]"
                       @click="onContextMenu($event)"
                     >
                       <slot name="contextmenuIcon"></slot>
@@ -483,6 +488,7 @@
                     <grid-option-button
                       icon="ev-icon-warning2"
                       class="row-contextmenu__btn"
+                      :disabled="row[ROW_DISABLED_INDEX]"
                       @click="onContextMenu($event)"
                     />
                   </template>
@@ -658,6 +664,10 @@ export default {
       type: [Array],
       default: () => [],
     },
+    disabled: {
+      type: [Array],
+      default: () => [],
+    },
     option: {
       type: Object,
       default: () => ({}),
@@ -684,6 +694,7 @@ export default {
     const ROW_DATA_INDEX = 2;
     const ROW_SELECT_INDEX = 3;
     const ROW_EXPAND_INDEX = 4;
+    const ROW_DISABLED_INDEX = 6;
     const {
       isRenderer,
       getComponentName,
@@ -1119,6 +1130,13 @@ export default {
         checkInfo.checkedRows = value;
       },
     );
+    watch(() => props.disabled, () => {
+      if (stores.store.length) {
+        stores.store.forEach((row) => {
+          row[ROW_DISABLED_INDEX] = props.disabled.includes(row[ROW_DATA_INDEX]);
+        });
+      }
+    }, { deep: true });
     watch(
       () => checkInfo.checkedRows,
       (value) => {
@@ -1149,7 +1167,8 @@ export default {
       (value) => {
         if (selectInfo.useSelect) {
           stores.store.forEach((row) => {
-            row[ROW_SELECT_INDEX] = value.includes(row[ROW_DATA_INDEX]);
+            row[ROW_SELECT_INDEX] = value.includes(row[ROW_DATA_INDEX])
+            && !props.disabled.includes(row[ROW_DATA_INDEX]);
           });
           updateVScroll();
         }
@@ -1473,6 +1492,8 @@ export default {
       onDragStart,
       onDragOver,
       onDrop,
+
+      ROW_DISABLED_INDEX,
     };
   },
 };
