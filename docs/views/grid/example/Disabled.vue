@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <ev-grid
-      :disabled-row="disabledRowMv"
+      :disabled="disabledRowMv"
       :columns="columns"
       :rows="rows"
       :height="400"
