@@ -515,7 +515,7 @@ export const checkEvent = (params) => {
 
       const isAllChecked = store
         .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
-        .filter(rowData => !props.disabled.includes(rowData[ROW_DATA_INDEX]))
+        .filter(rowData => !props.disabledRows.includes(rowData[ROW_DATA_INDEX]))
         .every(d => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
@@ -547,7 +547,7 @@ export const checkEvent = (params) => {
     }
     store.forEach((row) => {
       const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX])
-        || props.disabled.includes(row[ROW_DATA_INDEX]);
+        || props.disabledRows.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !uncheckable) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
@@ -745,7 +745,7 @@ export const filterEvent = (params) => {
       checkInfo.isHeaderIndeterminate = (rowData.length !== checkedCount) && checkedCount > 0;
       checkInfo.isHeaderUncheckable = rowData
         .every(row => props.uncheckable.includes(row[ROW_DATA_INDEX])
-          || props.disabled.includes(row[ROW_DATA_INDEX]));
+          || props.disabledRows.includes(row[ROW_DATA_INDEX]));
     }
   };
   /**
@@ -1173,7 +1173,7 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
-        const uncheckable = props.uncheckable.includes(row) || props.disabled.includes(row);
+        const uncheckable = props.uncheckable.includes(row) || props.disabledRows.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
@@ -1185,13 +1185,13 @@ export const storeEvent = (params) => {
         if (expandedInfo.useRowDetail) {
           expanded = props.expanded.includes(row);
         }
-        const disabled = props.disabled.includes(row);
+        const disabled = props.disabledRows.includes(row);
         store.push([idx, checked, row, selected, expanded, uncheckable, disabled]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       checkInfo.isHeaderIndeterminate = hasUnChecked && !!checkInfo.checkedRows.length;
       checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row)
-        || props.disabled.includes(row));
+        || props.disabledRows.includes(row));
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {

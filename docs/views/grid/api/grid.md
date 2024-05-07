@@ -38,7 +38,7 @@
 | uncheckable | Array | []                      | 체크할 수 없는 row 데이터                                                                          |  |
 | expanded | Array | []                      | 확장된 Row 데이터                                                                               |  |
 | option | Object | {}                      | 그리드 옵션                                                                                    |  |
-| disabled | Array | [] | 사용할 수 없는 Row 데이터(uncheckable 상위 호환) |  |
+| disabledRows | Array | [] | 사용할 수 없는 Row 데이터(uncheckable 상위 호환) |  |
 |  | adjust | false                   | 그리드의 너비에 맞게 컬럼 너비를 자동으로 조절한다.                                                             |  |
 |  | showHeader | true                    | 헤더 표시 여부를 설정한다.                                                                           |  |
 |  | rowHeight | 35                      | row 높이를 설정한다.                                                                             | `min-height: 35` |

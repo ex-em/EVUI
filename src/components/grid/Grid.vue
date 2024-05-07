@@ -664,7 +664,7 @@ export default {
       type: [Array],
       default: () => [],
     },
-    disabled: {
+    disabledRows: {
       type: [Array],
       default: () => [],
     },
@@ -1130,10 +1130,10 @@ export default {
         checkInfo.checkedRows = value;
       },
     );
-    watch(() => props.disabled, () => {
+    watch(() => props.disabledRows, () => {
       if (stores.store.length) {
         stores.store.forEach((row) => {
-          row[ROW_DISABLED_INDEX] = props.disabled.includes(row[ROW_DATA_INDEX]);
+          row[ROW_DISABLED_INDEX] = props.disabledRows.includes(row[ROW_DATA_INDEX]);
         });
       }
     }, { deep: true });
@@ -1168,7 +1168,7 @@ export default {
         if (selectInfo.useSelect) {
           stores.store.forEach((row) => {
             row[ROW_SELECT_INDEX] = value.includes(row[ROW_DATA_INDEX])
-            && !props.disabled.includes(row[ROW_DATA_INDEX]);
+            && !props.disabledRows.includes(row[ROW_DATA_INDEX]);
           });
           updateVScroll();
         }
