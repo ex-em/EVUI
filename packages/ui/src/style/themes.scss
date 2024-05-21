@@ -1,0 +1,69 @@
+@use 'variables' as *;
+
+$ev-themes: (
+  light: (
+    /* primary color
+    ------------------------- */
+    primary: #1A6AFE,
+    info: #5AC8FA,
+    success: #00CC47,
+    warning: #FF9500,
+    error: #FF3B30,
+    selected: #730EF4,
+    not-allow: #B01012,
+    disabled: #B2B2B2,
+    default: #666666,
+
+    /* common
+    -------------------------- */
+    font-base: $color-black,
+    border-base: #B2B2B2,
+    border-light: #E3E3E3,
+    background-base: $color-white,
+    background-lighten: rgba(#B2B2B2, 0.1),
+
+    /* components
+    -------------------------- */
+    slider-mark-background: #F8F8F8,
+    tooltip-background: $color-black,
+
+    /* grid
+    -------------------------- */
+    grid-header-border: #7F7F7F,
+    grid-bottom-border: #CFCFCF,
+    grid-row-selected: #DBF0F9,
+    grid-cell-text: rgba(#191919, 0.8),
+    grid-row-stripe: #E5E5E5,
+    grid-background: #FFFFFF,
+  ),
+  dark: (
+    /* primary color
+    ------------------------- */
+    primary: #007AFF,
+    info: #64D2FF,
+    success: #32D74B,
+    warning: #FF9F0A,
+    error: #FF453A,
+    selected: #791BF2,
+    not-allow: #B01012,
+    disabled: #555555,
+    default: #444444,
+
+    /* common
+    -------------------------- */
+    font-base: $color-white,
+    border-base: #666666,
+    border-light: #333333,
+    background-base: $color-black,
+    background-lighten: rgba(#666666, 0.3),
+
+    /* components
+    -------------------------- */
+    slider-mark-background: #B2B2B2,
+    tooltip-background: #555555,
+
+    /* grid
+    -------------------------- */
+    grid-background: #0D0D0D,
+  ),
+) !default;
