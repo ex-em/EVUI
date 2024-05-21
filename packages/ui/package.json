@@ -1,0 +1,52 @@
+{
+  "name": "@evui/ui",
+  "version": "4.0.0-0",
+  "author": "exem <dev_client@ex-em.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "pnpm run type-check && vite build",
+    "build:type": "vue-tsc --declaration --emitDeclarationOnly",
+    "build:global-type": "node ./scripts/buildGlobalType.js",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./style": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    },
+    "./global": {
+      "types": "./global.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.5.1",
+    "glob": "^10.3.15",
+    "sass": "^1.77.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.4.27",
+    "vue-tsc": "^2.0.6"
+  },
+  "peerDependencies": {
+    "vue": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@evui/storybook",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^1.4.0",
+    "@storybook/blocks": "^8.1.1",
+    "@storybook/test": "^8.1.1",
+    "@storybook/vue3": "^8.1.1",
+    "@storybook/vue3-vite": "^8.1.1",
+    "storybook": "^8.1.1"
+  },
+  "dependencies": {
+    "@evui/ui": "workspace:4.0.0-0",
+    "vue": "^3.4.27"
+  }
+}
