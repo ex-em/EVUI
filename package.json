@@ -11,7 +11,9 @@
     "nx": "19.0.4"
   },
   "scripts": {
-    "build": "nx build",
-    "test": "nx test"
+    "build": "nx run-many --target=build --projects=@evui/*",
+    "types-check": "nx run-many --target=type-check --projects=@evui/*",
+    "storybook": "nx run @evui/storybook:storybook",
+    "graph": "nx graph"
   }
 }

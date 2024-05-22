@@ -7,7 +7,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "pnpm run type-check && vite build",
+    "build": "pnpm run type-check && vite build && pnpm run build:global-type",
     "build:type": "vue-tsc --declaration --emitDeclarationOnly",
     "build:global-type": "node ./scripts/buildGlobalType.js",
     "type-check": "vue-tsc --noEmit"
