@@ -11,6 +11,9 @@ importers:
       nx:
         specifier: 19.0.4
         version: 19.0.4
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
 
   apps/storybook:
     dependencies:

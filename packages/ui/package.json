@@ -30,7 +30,8 @@
     },
     "./global": {
       "types": "./global.d.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
