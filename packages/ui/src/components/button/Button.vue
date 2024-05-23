@@ -12,7 +12,7 @@
     :disabled="disabled"
     :autofocus="autoFocus"
     @click="(e) => emit('click', e)"
-    >
+  >
     <slot />
   </button>
 </template>
@@ -22,15 +22,23 @@ import { onMounted, ref } from 'vue';
 
 defineOptions({
   name: 'EvButton',
-})
+});
 
 interface Props {
   disabled?: boolean;
   autoFocus?: boolean;
-  type?: 'default'| 'primary'| 'info'| 'warning'| 'error'| 'ghost'| 'dashed'| 'text';
-  htmlType?: 'button'| 'submit'| 'reset';
-  shape?: 'square'| 'radius'| 'circle';
-  size?: 'large'| 'medium'| 'small';
+  type?:
+    | 'default'
+    | 'primary'
+    | 'info'
+    | 'warning'
+    | 'error'
+    | 'ghost'
+    | 'dashed'
+    | 'text';
+  htmlType?: 'button' | 'submit' | 'reset';
+  shape?: 'square' | 'radius' | 'circle';
+  size?: 'large' | 'medium' | 'small';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,7 +54,7 @@ interface Emit {
   (event: 'click', e: MouseEvent): void;
 }
 const emit = defineEmits<Emit>();
-  const buttonRef = ref<HTMLButtonElement>();
+const buttonRef = ref<HTMLButtonElement>();
 
 onMounted(() => {
   if (props.autoFocus) {
@@ -72,41 +80,39 @@ onMounted(() => {
   color: $color-white;
   transition: opacity $animate-base;
 
-  @each $type in (
-    'default',
-    'primary',
-    'info',
-    'warning',
-    'error',
-    'ghost',
-    'dashed',
-    'text',
-  ) {
+  @each $type
+    in (
+      'default',
+      'primary',
+      'info',
+      'warning',
+      'error',
+      'ghost',
+      'dashed',
+      'text'
+    )
+  {
     &.type-#{$type} {
       @if $type != 'ghost' and $type != 'dashed' and $type != 'text' {
         @include evThemify() {
           border: 1px solid evThemed($type);
           background-color: evThemed($type);
         }
-      }
-
-      @else if $type == 'ghost' {
+      } @else if $type == 'ghost' {
         background-color: transparent;
 
         @include evThemify() {
           border: 1px solid evThemed('border-base');
           color: evThemed('font-base');
         }
-      }
-      @else if $type == 'dashed' {
+      } @else if $type == 'dashed' {
         background-color: transparent;
 
         @include evThemify() {
           border: 1px dashed evThemed('border-base');
           color: evThemed('font-base');
         }
-      }
-      @else if $type == 'text' {
+      } @else if $type == 'text' {
         border: 1px solid transparent;
         background-color: transparent;
 
@@ -116,10 +122,7 @@ onMounted(() => {
       }
     }
   }
-  @each $shape, $radius in (
-    'radius': 40px,
-    'circle': 50%,
-  ) {
+  @each $shape, $radius in ('radius': 40px, 'circle': 50%) {
     &.shape-#{$shape} {
       border-radius: $radius;
 
@@ -129,10 +132,7 @@ onMounted(() => {
       }
     }
   }
-  @each $size, $size-gap in (
-    'large': 5px,
-    'small': -5px,
-  ) {
+  @each $size, $size-gap in ('large': 5px, 'small': -5px) {
     &.size-#{$size} {
       height: $default-height + $size-gap;
       padding: 0 #{$default-padding + $size-gap};
@@ -140,9 +140,7 @@ onMounted(() => {
 
       @if $size == 'small' {
         font-size: $font-size-base;
-      }
-
-      @else if $size == 'large' {
+      } @else if $size == 'large' {
         font-size: $font-size-large;
       }
     }
