@@ -1413,13 +1413,7 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    const getWidth = (w) => {
-      console.log(w);
-      return w;
-    };
-
     return {
-      getWidth,
       summaryScroll,
       showHeader,
       stripeStyle,
