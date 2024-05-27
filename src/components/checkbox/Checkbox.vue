@@ -137,8 +137,8 @@ export default {
      */
     watch(
       () => props.indeterminate,
-      async (val) => {
-        await nextTick(() => {
+      (val) => {
+        nextTick(() => {
           if (!checkbox.value) {
             return;
           }
