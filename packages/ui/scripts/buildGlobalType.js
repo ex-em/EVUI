@@ -1,6 +1,7 @@
 import * as glob from 'glob';
 import * as path from 'path';
 import * as fs from 'fs';
+import { startCase } from 'lodash-es';
 
 fs.writeFileSync(
   './global.d.ts',
@@ -29,10 +30,18 @@ fs.writeFileSync('./global.d.ts', '\n  }', { flag: 'a' });
 
 fs.writeFileSync(
   './global.d.ts',
-  `\n  export interface ComponentCustomProperties {
-  }`,
+  `\n  export interface ComponentCustomProperties {`,
   { flag: 'a' }
 );
 
-fs.writeFileSync('./global.d.ts', `\n}
+['Message'].forEach((notice) => {
+  fs.writeFileSync(
+    './global.d.ts',
+    `\n    $${notice}: typeof import('@evui/ui')['Ev${startCase(notice)}'];`,
+    { flag: 'a' }
+  );
+});
+
+fs.writeFileSync('./global.d.ts', `\n  }
+}
 export {}`, { flag: 'a' });
