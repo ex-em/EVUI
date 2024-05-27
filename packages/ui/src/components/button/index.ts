@@ -5,5 +5,4 @@ EvButton.install = (app: App) => {
   app.component(EvButton.name!, EvButton);
 }
 
-export { EvButton };
 export default EvButton;
