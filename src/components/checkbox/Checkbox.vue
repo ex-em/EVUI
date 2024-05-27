@@ -139,6 +139,9 @@ export default {
       () => props.indeterminate,
       (val) => {
         nextTick(() => {
+          if (!checkbox.value) {
+            return;
+          }
           checkbox.value.indeterminate = val;
         });
       }, { immediate: true },
