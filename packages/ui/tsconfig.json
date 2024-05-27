@@ -1,6 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.json",
-  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "include": ["vite.config.ts", "./src/**/*.ts", "./src/**/*.vue"],
   "exclude": ["node_modules", "dist", "src/global.d.ts"],
   "compilerOptions": {
     "lib": ["esnext", "dom"],
@@ -15,6 +15,11 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noEmit": false
+    "noEmit": false,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   }
 }
