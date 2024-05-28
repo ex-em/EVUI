@@ -15,6 +15,7 @@
     "build": "nx run-many --target=build --projects=@evui/*",
     "types-check": "nx run-many --target=type-check --projects=@evui/*",
     "storybook": "nx run @evui/storybook:storybook",
-    "graph": "nx graph"
+    "graph": "nx graph",
+    "reset": "nx reset"
   }
 }
