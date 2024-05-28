@@ -1119,7 +1119,7 @@ export const contextMenuEvent = (params) => {
   const onGridSettingContextMenu = (e) => {
     const { useDefaultColumnSetting, columnSettingTextInfo } = columnSettingInfo;
     const columnListMenu = {
-      text: columnSettingTextInfo?.columnList ?? 'Column List',
+      text: columnSettingTextInfo?.title ?? 'Column List',
       isShowMenu: true,
       click: () => {
         columnSettingInfo.isShowColumnSetting = true;
