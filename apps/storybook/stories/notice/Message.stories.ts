@@ -32,7 +32,6 @@ const meta: Meta<typeof EvMessage> = {
 export default meta;
 type Story = StoryObj<typeof EvMessage>;
 
-// Story 에 render가 필요 없다면 삭제해주세요.
 const StoryTemplate: Story = {
   render: (args) => ({
     components: { EvMessage, EvButton },
