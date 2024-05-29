@@ -3,7 +3,7 @@ import type { Props } from './message.type';
 import type { App } from 'vue';
 import EvMessage from './Message.vue';
 
-const rootId = 'ev-message-modal';
+const rootId = 'ev-message-box-modal';
 const root = document.createElement('div');
 root.id = rootId;
 
