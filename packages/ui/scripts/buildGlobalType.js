@@ -34,10 +34,10 @@ fs.writeFileSync(
   { flag: 'a' }
 );
 
-['Message'].forEach((notice) => {
+['message', 'messageBox'].forEach((notice) => {
   fs.writeFileSync(
     './global.d.ts',
-    `\n    $${notice}: typeof import('@evui/ui')['Ev${startCase(notice)}'];`,
+    `\n    $${notice}: typeof import('@evui/ui')['Ev${notice.charAt(0).toUpperCase() + notice.slice(1)}'];`,
     { flag: 'a' }
   );
 });
