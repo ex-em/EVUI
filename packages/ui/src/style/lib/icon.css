@@ -1,16 +1,18 @@
 @font-face {
   font-family: 'EVUI';
-  src: url('~@/style/lib/fonts/EVUI.eot');
-  src: url('~@/style/lib/fonts/EVUI.eot#iefix') format('embedded-opentype'),
-    url('~@/style/lib/fonts/EVUI.ttf') format('truetype'),
-    url('~@/style/lib/fonts/EVUI.woff') format('woff'),
-    url('~@/style/lib/fonts/EVUI.svg') format('svg');
+  src: url('/src/assets/fonts/EVUI.eot');
+  src:
+    url('/src/assets/fonts/EVUI.eot#iefix') format('embedded-opentype'),
+    url('/src/assets/fonts/EVUI.ttf') format('truetype'),
+    url('/src/assets/fonts/EVUI.woff') format('woff'),
+    url('/src/assets/fonts/EVUI.svg') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="ev-icon-"], [class*=" ev-icon-"] {
+[class^='ev-icon-'],
+[class*=' ev-icon-'] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'EVUI' !important;
   speak: none;
@@ -18,7 +20,7 @@
   font-weight: normal;
   font-variant: normal;
   text-transform: none;
-  line-hev-iconght: 1;
+  line-height: 1;
 
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
