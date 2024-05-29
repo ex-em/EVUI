@@ -34,7 +34,7 @@ fs.writeFileSync(
   { flag: 'a' }
 );
 
-['message', 'messageBox'].forEach((notice) => {
+['message', 'messageBox', 'notification'].forEach((notice) => {
   fs.writeFileSync(
     './global.d.ts',
     `\n    $${notice}: typeof import('@evui/ui')['Ev${notice.charAt(0).toUpperCase() + notice.slice(1)}'];`,
