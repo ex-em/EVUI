@@ -7,9 +7,10 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "pnpm run type-check && vite build && pnpm run build:global-type",
+    "build": "pnpm run type-check && pnpm run build:global-type && pnpm run build:icon && vite build",
     "build:type": "vue-tsc --declaration --emitDeclarationOnly",
-    "build:global-type": "node ./scripts/buildGlobalType.js",
+    "build:global-type": "tsx ./scripts/buildGlobalType.ts",
+    "build:icon": "tsx ./scripts/buildIcon.ts",
     "type-check": "vue-tsc --noEmit"
   },
   "type": "module",
@@ -19,7 +20,6 @@
   ],
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "style": "dist/style.css",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -27,16 +27,22 @@
       "require": "./dist/index.umd.cjs",
       "types": "./dist/index.d.ts"
     },
+    "./style": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    },
     "./global": {
       "types": "./global.d.ts"
     },
     "./package.json": "./package.json"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/tsconfig": "^0.5.1",
     "glob": "^10.3.15",
     "sass": "^1.77.2",
+    "tsx": "^4.11.0",
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
     "vite-plugin-dts": "^3.9.1",

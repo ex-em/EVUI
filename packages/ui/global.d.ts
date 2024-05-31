@@ -5,6 +5,7 @@ declare module '@vue/runtime-core' {
     EvMessageBox: typeof import('@evui/ui')['EvMessageBox'];
     EvMessage: typeof import('@evui/ui')['EvMessage'];
     EvLoading: typeof import('@evui/ui')['EvLoading'];
+    EvIcon: typeof import('@evui/ui')['EvIcon'];
     EvButton: typeof import('@evui/ui')['EvButton'];
   }
   export interface ComponentCustomProperties {

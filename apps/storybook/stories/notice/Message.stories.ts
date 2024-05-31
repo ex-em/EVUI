@@ -26,8 +26,8 @@ const meta: Meta<typeof EvMessage> = {
     onClose: {
       action: 'close',
     },
-  }
-}
+  },
+};
 
 export default meta;
 type Story = StoryObj<typeof EvMessage>;
@@ -39,7 +39,7 @@ const StoryTemplate: Story = {
       const app = getCurrentInstance()?.appContext.config.globalProperties;
       const onClick = () => {
         app!.$message(args);
-      }
+      };
       return { args, onClick };
     },
     template: `
@@ -49,7 +49,6 @@ const StoryTemplate: Story = {
               `,
   }),
 };
-
 
 export const Default: Story = {
   ...StoryTemplate,
