@@ -1,4 +1,5 @@
 import './style/index.scss';
+import type { App } from 'vue';
 import EvButton from './components/button';
 import EvMessage from './components/message';
 import EvLoading from './components/loading';
@@ -7,7 +8,7 @@ import EvMessageBox from './components/messageBox';
 import EvNotification from './components/notification';
 import EvIcon, { iconList } from './components/icon';
 import EvTextField from './components/textField';
-import type { App } from 'vue';
+import EvToggle from './components/toggle';
 
 export {
   EvButton,
@@ -19,6 +20,7 @@ export {
   EvIcon,
   iconList,
   EvTextField,
+  EvToggle,
 };
 
 const components = [
@@ -30,6 +32,7 @@ const components = [
   EvNotification,
   EvIcon,
   EvTextField,
+  EvToggle,
 ];
 
 export default {
