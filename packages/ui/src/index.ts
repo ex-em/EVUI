@@ -9,6 +9,8 @@ import EvNotification from './components/notification';
 import EvIcon, { iconList } from './components/icon';
 import EvTextField from './components/textField';
 import EvToggle from './components/toggle';
+import EvCheckbox from './components/checkbox/checkbox';
+import EvCheckboxGroup from './components/checkbox/checkboxGroup';
 
 export {
   EvButton,
@@ -21,6 +23,8 @@ export {
   iconList,
   EvTextField,
   EvToggle,
+  EvCheckbox,
+  EvCheckboxGroup,
 };
 
 const components = [
@@ -33,6 +37,8 @@ const components = [
   EvIcon,
   EvTextField,
   EvToggle,
+  EvCheckbox,
+  EvCheckboxGroup,
 ];
 
 export default {
