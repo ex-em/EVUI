@@ -7,6 +7,7 @@ declare module '@vue/runtime-core' {
     EvMessageBox: typeof import('@evui/ui')['EvMessageBox'];
     EvMessage: typeof import('@evui/ui')['EvMessage'];
     EvLoading: typeof import('@evui/ui')['EvLoading'];
+    EvInputNumber: typeof import('@evui/ui')['EvInputNumber'];
     EvIcon: typeof import('@evui/ui')['EvIcon'];
     EvCheckboxGroup: typeof import('@evui/ui')['EvCheckboxGroup'];
     EvCheckbox: typeof import('@evui/ui')['EvCheckbox'];

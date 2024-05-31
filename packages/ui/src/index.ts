@@ -11,6 +11,7 @@ import EvTextField from './components/textField';
 import EvToggle from './components/toggle';
 import EvCheckbox from './components/checkbox/checkbox';
 import EvCheckboxGroup from './components/checkbox/checkboxGroup';
+import EvInputNumber from './components/inputNumber';
 
 export {
   EvButton,
@@ -25,6 +26,7 @@ export {
   EvToggle,
   EvCheckbox,
   EvCheckboxGroup,
+  EvInputNumber,
 };
 
 const components = [
@@ -39,6 +41,7 @@ const components = [
   EvToggle,
   EvCheckbox,
   EvCheckboxGroup,
+  EvInputNumber,
 ];
 
 export default {
