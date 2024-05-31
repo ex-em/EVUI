@@ -6,6 +6,7 @@ import EvProgress from './components/progress';
 import EvMessageBox from './components/messageBox';
 import EvNotification from './components/notification';
 import EvIcon, { iconList } from './components/icon';
+import EvTextField from './components/textField';
 import type { App } from 'vue';
 
 export {
@@ -17,6 +18,7 @@ export {
   EvNotification,
   EvIcon,
   iconList,
+  EvTextField,
 };
 
 const components = [
@@ -27,6 +29,7 @@ const components = [
   EvMessageBox,
   EvNotification,
   EvIcon,
+  EvTextField,
 ];
 
 export default {
