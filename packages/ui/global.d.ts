@@ -8,6 +8,8 @@ declare module '@vue/runtime-core' {
     EvMessage: typeof import('@evui/ui')['EvMessage'];
     EvLoading: typeof import('@evui/ui')['EvLoading'];
     EvIcon: typeof import('@evui/ui')['EvIcon'];
+    EvCheckboxGroup: typeof import('@evui/ui')['EvCheckboxGroup'];
+    EvCheckbox: typeof import('@evui/ui')['EvCheckbox'];
     EvButton: typeof import('@evui/ui')['EvButton'];
   }
   export interface ComponentCustomProperties {
