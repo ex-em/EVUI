@@ -4,21 +4,18 @@ import * as fs from 'fs';
 
 const file = './global.d.ts';
 
-fs.writeFileSync(
-  file,
-  `declare module '@vue/runtime-core' {`,
-  { flag: 'w' }
-);
+fs.writeFileSync(file, `declare module '@vue/runtime-core' {`, { flag: 'w' });
 
 function getAllComponents() {
-  const components = glob.sync('./src/components/**/*.vue', { cwd: process.cwd() });
+  const components = glob.sync('./src/components/**/*.vue', {
+    cwd: process.cwd(),
+  });
   return components.map((component) => path.basename(component, '.vue'));
 }
 
-fs.writeFileSync(
-  file, `\n  export interface GlobalComponents {`,
-  { flag: 'a' }
-);
+fs.writeFileSync(file, `\n  export interface GlobalComponents {`, {
+  flag: 'a',
+});
 const allComponents = getAllComponents();
 allComponents.forEach((component) => {
   fs.writeFileSync(
@@ -29,11 +26,9 @@ allComponents.forEach((component) => {
 });
 fs.writeFileSync(file, '\n  }', { flag: 'a' });
 
-fs.writeFileSync(
-  file,
-  `\n  export interface ComponentCustomProperties {`,
-  { flag: 'a' }
-);
+fs.writeFileSync(file, `\n  export interface ComponentCustomProperties {`, {
+  flag: 'a',
+});
 
 ['message', 'messageBox', 'notification'].forEach((notice) => {
   fs.writeFileSync(
@@ -43,6 +38,10 @@ fs.writeFileSync(
   );
 });
 
-fs.writeFileSync(file, `\n  }
+fs.writeFileSync(
+  file,
+  `\n  }
 }
-export {}`, { flag: 'a' });
+export {}`,
+  { flag: 'a' }
+);

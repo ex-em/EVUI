@@ -1,7 +1,7 @@
 import { type Preview, setup } from '@storybook/vue3';
 import { App } from 'vue';
 import EVUI, { EvMessage, EvMessageBox, EvNotification } from '@evui/ui';
-import '@evui/ui/style'
+import '@evui/ui/style';
 
 setup((app: App) => {
   app.use(EVUI);

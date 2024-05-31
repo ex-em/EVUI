@@ -24,7 +24,7 @@
     "storybook": "^8.1.1"
   },
   "dependencies": {
-    "@evui/ui": "workspace:4.0.0-0",
+    "@evui/ui": "workspace:*",
     "vue": "^3.4.27"
   }
 }
