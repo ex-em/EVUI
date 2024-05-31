@@ -2,6 +2,8 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     EvToggle: typeof import('@evui/ui')['EvToggle'];
     EvTextField: typeof import('@evui/ui')['EvTextField'];
+    EvTabs: typeof import('@evui/ui')['EvTabs'];
+    EvTabPanel: typeof import('@evui/ui')['EvTabPanel'];
     EvProgress: typeof import('@evui/ui')['EvProgress'];
     EvNotification: typeof import('@evui/ui')['EvNotification'];
     EvMessageBox: typeof import('@evui/ui')['EvMessageBox'];
