@@ -14,6 +14,8 @@ import EvCheckboxGroup from './components/checkbox/checkboxGroup';
 import EvInputNumber from './components/inputNumber';
 import EvTabs from './components/tabs';
 import EvTabPanel from './components/tabPanel';
+import EvRadio from './components/radio';
+import EvRadioGroup from './components/radioGroup';
 
 export {
   EvButton,
@@ -31,6 +33,8 @@ export {
   EvInputNumber,
   EvTabs,
   EvTabPanel,
+  EvRadio,
+  EvRadioGroup,
 };
 
 const components = [
@@ -48,6 +52,8 @@ const components = [
   EvInputNumber,
   EvTabs,
   EvTabPanel,
+  EvRadio,
+  EvRadioGroup,
 ];
 
 export default {
