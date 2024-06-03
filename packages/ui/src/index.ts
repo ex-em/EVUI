@@ -16,6 +16,7 @@ import EvTabs from './components/tabs';
 import EvTabPanel from './components/tabPanel';
 import EvRadio from './components/radio';
 import EvRadioGroup from './components/radioGroup';
+import EvPagination from './components/pagination';
 
 export {
   EvButton,
@@ -35,6 +36,7 @@ export {
   EvTabPanel,
   EvRadio,
   EvRadioGroup,
+  EvPagination,
 };
 
 const components = [
@@ -54,6 +56,7 @@ const components = [
   EvTabPanel,
   EvRadio,
   EvRadioGroup,
+  EvPagination,
 ];
 
 export default {
