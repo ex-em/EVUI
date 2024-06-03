@@ -7,6 +7,8 @@ declare module '@vue/runtime-core' {
     EvRadioGroup: typeof import('@evui/ui')['EvRadioGroup'];
     EvRadio: typeof import('@evui/ui')['EvRadio'];
     EvProgress: typeof import('@evui/ui')['EvProgress'];
+    EvPagination: typeof import('@evui/ui')['EvPagination'];
+    EvPageButton: typeof import('@evui/ui')['EvPageButton'];
     EvNotification: typeof import('@evui/ui')['EvNotification'];
     EvMessageBox: typeof import('@evui/ui')['EvMessageBox'];
     EvMessage: typeof import('@evui/ui')['EvMessage'];
