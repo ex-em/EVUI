@@ -1,6 +1,6 @@
 {
   "name": "@evui/ui",
-  "version": "4.0.0-2",
+  "version": "4.0.0-8",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
   "engines": {
@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "bignumber.js": "^9.1.2",
+    "dayjs": "^1.11.11",
     "korean-regexp": "^1.0.12",
     "lodash-es": "^4.17.21",
     "vue-resize-observer": "^2.0.16",

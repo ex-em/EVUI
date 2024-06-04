@@ -1,6 +1,9 @@
 <template>
   <teleport to="#ev-window-modal">
-    <transition name="ev-window-fade" appear>
+    <transition
+      name="ev-window-fade"
+      appear
+    >
       <div
         v-if="visible"
         :class="[
@@ -35,10 +38,16 @@
               <slot name="header" />
             </template>
             <template v-else>
-              <span v-if="iconClass" class="ev-window-icon">
-                <i :class="iconClass" />
+              <span
+                v-if="iconClass"
+                class="ev-window-icon"
+              >
+                <i :class="iconClass"/>
               </span>
-              <p v-if="title" class="ev-window-title">
+              <p
+                v-if="title"
+                class="ev-window-title"
+              >
                 {{ title }}
               </p>
             </template>
@@ -46,7 +55,10 @@
           <div class="ev-window-content">
             <slot />
           </div>
-          <div v-if="$slots.footer" class="ev-window-footer">
+          <div
+            v-if="$slots.footer"
+            class="ev-window-footer"
+          >
             <slot name="footer" />
           </div>
           <div class="ev-window-top-right-icon">
@@ -55,10 +67,15 @@
               class="ev-window-maximizable"
               @click="clickExpandBtn"
             >
-              <i :class="maximizableIcon" />
+              <i
+                :class="maximizableIcon"
+              />
             </span>
-            <span class="ev-window-close" @click="closeWin">
-              <i class="ev-icon-close" />
+            <span
+              class="ev-window-close"
+              @click="closeWin"
+            >
+              <i class="ev-icon-close"/>
             </span>
           </div>
         </div>
@@ -67,45 +84,138 @@
   </teleport>
 </template>
 
-<script setup lang="ts">
-import type { Emit, Props } from './types';
+<script>
 import { useEscCloseAndFocusable, useModel, useMouseEvent } from './uses';
 
-const props = withDefaults(defineProps<Props>(), {
-  style: () => ({}),
-  width: '50vw',
-  height: '50vh',
-  minWidth: 150,
-  minHeight: 150,
-  isModal: true,
-  hideScroll: true,
-});
+export default {
+  name: 'EvWindow',
+  props: {
+    style: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    title: {
+      type: [String, Number],
+      default: null,
+    },
+    windowClass: {
+      type: String,
+      default: '',
+    },
+    iconClass: {
+      type: String,
+      default: '',
+    },
+    width: {
+      type: [String, Number],
+      default: '50vw',
+    },
+    height: {
+      type: [String, Number],
+      default: '50vh',
+    },
+    minWidth: {
+      type: [String, Number],
+      default: 150,
+    },
+    minHeight: {
+      type: [String, Number],
+      default: 150,
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false,
+    },
+    isModal: {
+      type: Boolean,
+      default: true,
+    },
+    closeOnClickModal: {
+      type: Boolean,
+      default: false,
+    },
+    hideScroll: {
+      type: Boolean,
+      default: true,
+    },
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
+    resizable: {
+      type: Boolean,
+      default: false,
+    },
+    maximizable: {
+      type: Boolean,
+      default: false,
+    },
+    escClose: {
+      type: Boolean,
+      default: false,
+    },
+    focusable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:visible',
+    'mousedown',
+    'mousedown-mouseup',
+    'mousedown-mousemove',
+    'resize',
+    'expand',
+  ],
+  setup() {
+    const {
+      windowRef,
+      headerRef,
+      isFullExpandWindow,
+      maximizableIcon,
+      baseStyle,
+      closeWin,
+      numberToUnit,
+      removeUnit,
+    } = useModel();
 
-const emit = defineEmits<Emit>();
-const {
-  windowRef,
-  headerRef,
-  isFullExpandWindow,
-  maximizableIcon,
-  baseStyle,
-  closeWin,
-  numberToUnit,
-  removeUnit,
-} = useModel(props, emit);
+    const {
+      dragStyle,
+      startDrag,
+      moveMouse,
+      clickExpandBtn,
+    } = useMouseEvent({
+      windowRef,
+      headerRef,
+      isFullExpandWindow,
+      numberToUnit,
+      removeUnit,
+    });
 
-const { dragStyle, startDrag, moveMouse, clickExpandBtn } = useMouseEvent(
-  props,
-  emit,
-  {
-    windowRef,
-    headerRef,
-    isFullExpandWindow,
-    numberToUnit,
-    removeUnit,
-  }
-);
+    const { setFocus } = useEscCloseAndFocusable({ closeWin, windowRef });
 
-const { setFocus } = useEscCloseAndFocusable(props, { closeWin, windowRef });
+    return {
+      windowRef,
+      headerRef,
+      baseStyle,
+      dragStyle,
+      maximizableIcon,
+
+      closeWin,
+      startDrag,
+      moveMouse,
+      clickExpandBtn,
+
+      setFocus,
+    };
+  },
+};
 </script>
 
 <style lang="scss">
@@ -152,11 +262,9 @@ const { setFocus } = useEscCloseAndFocusable(props, { closeWin, windowRef });
   flex-direction: column;
   box-sizing: border-box;
   border-radius: $default-radius;
-  background-color: #fdfdfd;
-  border: 1px solid #e3e3e3;
-  transition:
-    opacity 0.2s ease-in-out,
-    transform 0.3s ease-in-out;
+  background-color: #FDFDFD;
+  border: 1px solid #E3E3E3;
+  transition: opacity .2s ease-in-out, transform .3s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
   z-index: 700;

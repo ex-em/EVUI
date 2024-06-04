@@ -1,33 +1,50 @@
 <template>
-  <article v-show="isSelected" class="ev-tab-panel">
+  <article
+    v-show="isSelected"
+    class="ev-tab-panel"
+  >
     <slot />
   </article>
 </template>
 
-<script setup lang="ts">
+<script>
 import { computed, inject } from 'vue';
-import { evTabKey } from '../tabs/provide';
 
-defineOptions({
+export default {
   name: 'EvTabPanel',
-});
-interface Props {
-  value: string | number;
-  text: string | number;
-  disabled: boolean;
-}
-const props = defineProps<Props>();
+  props: {
+    text: {
+      type: [String, Number],
+      default: null,
+    },
+    value: {
+      type: [String, Number],
+      default: null,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+  },
+  setup(props) {
+    const evTabs = inject('evTabs', null);
+    const isSelected = computed(() => props.value === evTabs.value);
 
-const evTabs = inject(evTabKey);
-const isSelected = computed(() => props.value === evTabs?.value);
+    return {
+      isSelected,
+    };
+  },
+};
 </script>
 
 <style lang="scss">
 @import '../../style/index.scss';
 
 .ev-tab {
-  ul,
-  li {
+  ul, li {
     list-style: none;
   }
 

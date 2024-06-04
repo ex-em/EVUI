@@ -8,31 +8,34 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script>
 import { computed, provide, nextTick } from 'vue';
-import { EvRadioGroupChangeKey, EvRadioGroupKey } from './provide';
 
-interface Props {
-  modelValue: string | number | symbol | boolean;
-  type: 'radio' | 'button';
-}
-const props = withDefaults(defineProps<Props>(), {
-  type: 'radio',
-});
-interface Emit {
-  (e: 'update:modelValue', val: string | number | symbol | boolean): void;
-  (e: 'change', val: string | number | symbol | boolean, event: Event): void;
-}
-const emit = defineEmits<Emit>();
-const mv = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val),
-});
-provide(EvRadioGroupKey, mv);
+export default {
+  name: 'EvRadioGroup',
+  props: {
+    modelValue: {
+      type: [String, Number, Symbol, Boolean],
+      default: null,
+    },
+    type: {
+      type: String,
+      default: 'radio',
+    },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    const mv = computed({
+      get: () => props.modelValue,
+      set: val => emit('update:modelValue', val),
+    });
+    provide('EvRadioGroupMv', mv);
 
-const change = async (e: Event) => {
-  await nextTick();
-  emit('change', mv.value, e);
+    const change = async (e) => {
+      await nextTick();
+      emit('change', mv.value, e);
+    };
+    provide('EvRadioGroupChange', change);
+  },
 };
-provide(EvRadioGroupChangeKey, change);
 </script>
