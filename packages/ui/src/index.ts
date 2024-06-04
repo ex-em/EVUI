@@ -21,6 +21,7 @@ import EvSelect from './components/select';
 import EvGrid from './components/grid';
 import EvTreeGrid from './components/treeGrid';
 import EvContextMenu from './components/contextMenu';
+import EvWindow from './components/window';
 
 export {
   EvButton,
@@ -45,6 +46,7 @@ export {
   EvGrid,
   EvTreeGrid,
   EvContextMenu,
+  EvWindow,
 };
 
 const components = [
@@ -69,6 +71,7 @@ const components = [
   EvGrid,
   EvTreeGrid,
   EvContextMenu,
+  EvWindow,
 ];
 
 export default {
