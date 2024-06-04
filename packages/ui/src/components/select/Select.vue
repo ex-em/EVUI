@@ -54,16 +54,10 @@
             :disabled="disabled"
             @click="clickSelectInput"
           />
-          <template
-            v-if="
-              Array.isArray(selectedModel) &&
-              props.multiple &&
-              !props.collapseTags
-            "
-          >
+          <template v-if="!collapseTags">
             <div
               v-for="item in selectedModel"
-              :key="item.name"
+              :key="item"
               class="ev-select-tag"
             >
               <span class="ev-tag-name">
@@ -78,10 +72,7 @@
             </div>
           </template>
           <template v-else>
-            <div
-              v-if="Array.isArray(selectedModel) && selectedModel.length"
-              class="ev-select-tag"
-            >
+            <div v-if="selectedModel.length" class="ev-select-tag">
               <span class="ev-tag-name">
                 {{ selectedModel[0].name }}
               </span>
@@ -94,10 +85,7 @@
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
-            <div
-              v-if="Array.isArray(selectedModel) && selectedModel.length > 1"
-              class="ev-select-tag num"
-            >
+            <div v-if="selectedModel.length > 1" class="ev-select-tag num">
               <span class="ev-tag-name">
                 + {{ selectedModel.length - 1 }}
               </span>
@@ -129,9 +117,9 @@
             :value="filterTextRef"
             @input="changeFilterText"
           />
-          <template v-if="props.checkable">
+          <template v-if="checkable">
             <div
-              v-if="props.multiple"
+              v-if="multiple"
               class="ev-select-dropbox-item all-check"
               :class="{
                 selected: allCheck,
@@ -142,12 +130,12 @@
             >
               <ev-checkbox
                 v-model="allCheck"
-                :label="props.allCheckLabel"
+                :label="allCheckLabel"
                 @change="[changeAllCheck(true), changeDropboxPosition()]"
               />
             </div>
             <div ref="itemWrapper" class="ev-select-dropbox-list">
-              <template v-if="multiple && Array.isArray(mv)">
+              <template v-if="multiple">
                 <ev-checkbox-group v-model="mv">
                   <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
                     <li
@@ -166,7 +154,7 @@
                       "
                     >
                       <ev-checkbox
-                        :label="item.value.toString()"
+                        :label="item.value"
                         :disabled="item.disabled"
                       >
                         <i v-if="item.iconClass" :class="item.iconClass" />
@@ -245,50 +233,137 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script>
+import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
 import EvCheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import { useModel, useDropdown } from './uses';
-import { selectClickoutside as vClickoutside } from '@/directives/clickoutside';
-import type { Props, Emit, ItemType } from './types';
 
-const props = withDefaults(defineProps<Props>(), {
-  searchPlaceholder: 'Please Enter a Search Words.',
-  noMatchingText: 'NO MATCHING DATA',
-  items: () => [] as ItemType[],
-  allCheckLabel: 'Select All',
-});
+export default {
+  name: 'EvSelect',
+  components: {
+    EvCheckbox,
+    EvCheckboxGroup,
+  },
+  directives: {
+    clickoutside,
+  },
+  props: {
+    modelValue: {
+      type: [Boolean, String, Number, Array, Object],
+      default: null,
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    searchPlaceholder: {
+      type: String,
+      default: 'Please Enter a Search Words.',
+    },
+    noMatchingText: {
+      type: String,
+      default: 'NO MATCHING DATA',
+    },
+    items: {
+      type: Array,
+      default: () => [],
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    checkable: {
+      type: Boolean,
+      default: false,
+    },
+    collapseTags: {
+      type: Boolean,
+      default: false,
+    },
+    filterable: {
+      type: Boolean,
+      default: false,
+    },
+    filterText: {
+      type: String,
+      default: '',
+    },
+    allCheckLabel: {
+      type: String,
+      default: 'Select All',
+    },
+  },
+  emits: {
+    'update:modelValue': null,
+    change: null,
+  },
+  setup() {
+    const {
+      mv,
+      selectedModel,
+      computedPlaceholder,
+      isClearableIcon,
+      changeMv,
+      removeMv,
+      removeAllMv,
+    } = useModel();
 
-const emit = defineEmits<Emit>();
+    const {
+      select,
+      selectWrapper,
+      dropbox,
+      itemWrapper,
+      isDropbox,
+      dropboxPosition,
+      filterTextRef,
+      filteredItems,
+      clickSelectInput,
+      clickOutsideDropbox,
+      changeFilterText,
+      changeDropboxPosition,
+      clickItem,
+      selectedItemClass,
+      allCheck,
+      changeAllCheck,
+    } = useDropdown({ mv, changeMv });
 
-const {
-  mv,
-  selectedModel,
-  computedPlaceholder,
-  isClearableIcon,
-  changeMv,
-  removeMv,
-  removeAllMv,
-} = useModel(props as Props, emit);
+    return {
+      mv,
+      selectedModel,
+      computedPlaceholder,
+      isClearableIcon,
+      changeMv,
+      removeMv,
+      removeAllMv,
 
-const {
-  select,
-  selectWrapper,
-  dropbox,
-  itemWrapper,
-  isDropbox,
-  dropboxPosition,
-  filterTextRef,
-  filteredItems,
-  clickSelectInput,
-  clickOutsideDropbox,
-  changeFilterText,
-  changeDropboxPosition,
-  clickItem,
-  selectedItemClass,
-  allCheck,
-  changeAllCheck,
-} = useDropdown(props as Props, { mv, changeMv });
+      select,
+      selectWrapper,
+      dropbox,
+      itemWrapper,
+      isDropbox,
+      dropboxPosition,
+      filterTextRef,
+      filteredItems,
+      clickSelectInput,
+      clickOutsideDropbox,
+      changeFilterText,
+      changeDropboxPosition,
+      clickItem,
+      selectedItemClass,
+      allCheck,
+      changeAllCheck,
+    };
+  },
+};
 </script>
 
 <style lang="scss">

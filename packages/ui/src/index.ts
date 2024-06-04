@@ -22,6 +22,14 @@ import EvGrid from './components/grid';
 import EvTreeGrid from './components/treeGrid';
 import EvContextMenu from './components/contextMenu';
 import EvWindow from './components/window';
+import EvButtonGroup from './components/buttonGroup';
+import EvCalendar from './components/calendar';
+import EvChart from './components/chart';
+import EvMenu from './components/menu';
+import EvScheduler from './components/scheduler';
+import EvSlider from './components/slider';
+import EvTimePicker from './components/timePicker';
+import EvTree from './components/tree';
 
 export {
   EvButton,
@@ -47,6 +55,14 @@ export {
   EvTreeGrid,
   EvContextMenu,
   EvWindow,
+  EvButtonGroup,
+  EvCalendar,
+  EvChart,
+  EvMenu,
+  EvScheduler,
+  EvSlider,
+  EvTimePicker,
+  EvTree,
 };
 
 const components = [
@@ -72,6 +88,14 @@ const components = [
   EvTreeGrid,
   EvContextMenu,
   EvWindow,
+  EvButtonGroup,
+  EvCalendar,
+  EvChart,
+  EvMenu,
+  EvScheduler,
+  EvSlider,
+  EvTimePicker,
+  EvTree,
 ];
 
 export default {

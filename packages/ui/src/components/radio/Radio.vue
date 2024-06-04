@@ -16,7 +16,7 @@
       :value="label"
       :disabled="disabled"
       @change.stop="changeMv"
-    />
+    >
     <span class="ev-radio-label">
       <template v-if="$slots.default">
         <slot />
@@ -28,38 +28,59 @@
   </label>
 </template>
 
-<script setup lang="ts">
+<script>
 import { computed, inject, nextTick } from 'vue';
-import { EvRadioGroupChangeKey, EvRadioGroupKey } from '../radioGroup/provide';
 
-interface Props {
-  modelValue: string | number | symbol | boolean;
-  label: string | number | symbol | boolean;
-  disabled?: boolean;
-  size?: 's' | 'm';
-}
-const props = defineProps<Props>();
+export default {
+  name: 'EvRadio',
+  props: {
+    modelValue: {
+      type: [String, Number, Symbol, Boolean],
+      default: null,
+    },
+    label: {
+      type: [String, Number, Symbol, Boolean],
+      default: null,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    size: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: {
+    'update:modelValue': null,
+    change: null,
+  },
+  setup(props, { emit }) {
+    const mv = inject(
+      'EvRadioGroupMv',
+      computed({
+        get: () => props.modelValue,
+        set: val => emit('update:modelValue', val),
+      }),
+    );
 
-interface Emit {
-  (e: 'update:modelValue', val: string | number | symbol | boolean): void;
-  (e: 'change', val: string | number | symbol | boolean, event: Event): void;
-}
-const emit = defineEmits<Emit>();
+    const changeMv = inject(
+      'EvRadioGroupChange',
+      async (e) => {
+        await nextTick();
+        emit('change', mv.value, e);
+      },
+    );
 
-const mv = inject(
-  EvRadioGroupKey,
-  computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val),
-  })
-);
+    const checked = computed(() => mv.value === props.label);
 
-const changeMv = inject(EvRadioGroupChangeKey, async (e) => {
-  await nextTick();
-  emit('change', mv.value, e);
-});
-
-const checked = computed(() => mv.value === props.label);
+    return {
+      mv,
+      checked,
+      changeMv,
+    };
+  },
+};
 </script>
 
 <style lang="scss">

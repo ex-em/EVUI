@@ -6,7 +6,7 @@
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
-    <grid-toolbar>
+    <toolbar>
       <template #toolbarWrapper>
         <!-- Filtering Items -->
         <div class="filtering" :style="{ width: `${filteringItemsWidth}px` }">
@@ -160,7 +160,7 @@
         />
         <slot name="toolbar" :item="{ onSearch: onSearch }" />
       </template>
-    </grid-toolbar>
+    </toolbar>
   </div>
   <div
     ref="grid-wrapper"
@@ -598,19 +598,15 @@ import {
   onBeforeMount,
   onUnmounted,
 } from 'vue';
-import { cloneDeep } from 'lodash-es';
 import { clickoutside } from '@/directives/clickoutside';
-import EvIcon from '@/components/icon/Icon.vue';
-import EvCheckbox from '@/components/checkbox/Checkbox.vue';
-import EvSelect from '@/components/select/Select.vue';
-import EvContextMenu from '@/components/contextMenu/ContextMenu.vue';
-import GridToolbar from './components/GridToolbar.vue';
-import GridPagination from './components/GridPagination.vue';
-import GridSummary from './components/GridSummary.vue';
-import ColumnSetting from './components/GridColumnSetting.vue';
-import FilterSetting from './components/GridFilterSetting.vue';
-import GridSortButton from './icon/IconSortButton.vue';
-import GridOptionButton from './icon/IconOptionButton.vue';
+import { cloneDeep } from 'lodash-es';
+import Toolbar from './GridToolbar.vue';
+import GridPagination from './GridPagination.vue';
+import GridSummary from './GridSummary.vue';
+import ColumnSetting from './GridColumnSetting.vue';
+import FilterSetting from './GridFilterSetting.vue';
+import GridSortButton from './icon/icon-sort-button.vue';
+import GridOptionButton from './icon/icon-option-button.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -626,6 +622,8 @@ import {
   columnSettingEvent,
   dragEvent,
 } from './uses';
+import { default as vResize } from 'vue-resize-observer';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 
 export default {
   name: 'EvGrid',
@@ -633,11 +631,7 @@ export default {
     clickoutside,
   },
   components: {
-    EvIcon,
-    EvCheckbox,
-    EvSelect,
-    EvContextMenu,
-    GridToolbar,
+    Toolbar,
     GridPagination,
     GridSummary,
     ColumnSetting,

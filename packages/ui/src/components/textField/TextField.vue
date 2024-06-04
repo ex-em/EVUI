@@ -6,9 +6,9 @@
       clearable,
       readonly,
       error: !!errorMsg,
-      'show-password': props.showPassword,
-      'show-maxlength': props.showMaxLength,
-      [`type-${props.type}`]: !!props.type,
+      'show-password': showPassword,
+      'show-maxlength': showMaxLength,
+      [`type-${type}`]: !!type,
       'ev-text-field-prefix': $slots['icon-prefix'],
       'ev-text-field-suffix': $slots['icon-suffix'],
       'ev-text-field-prefix-suffix':
@@ -20,10 +20,10 @@
         <textarea
           v-model="mv"
           class="ev-textarea"
-          :placeholder="props.placeholder"
-          :disabled="props.disabled"
-          :readonly="props.readonly"
-          :maxlength="props.maxLength"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          :readonly="readonly"
+          :maxlength="maxLength"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -101,98 +101,134 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script>
 import { ref, computed, nextTick } from 'vue';
 
-defineOptions({
+export default {
   name: 'EvTextField',
-});
+  props: {
+    modelValue: {
+      type: [String, Number],
+      default: null,
+    },
+    type: {
+      type: String,
+      default: 'text',
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    showPassword: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
+    maxLength: {
+      type: Number,
+      default: null,
+    },
+    showMaxLength: {
+      type: Boolean,
+      default: false,
+    },
+    errorMsg: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update:modelValue', 'focus', 'blur', 'input', 'change', 'search'],
+  setup(props, { emit }) {
+    const mv = computed({
+      get: () => props.modelValue,
+      set: (val) => emit('update:modelValue', val),
+    });
 
-interface Props {
-  modelValue: string;
-  type?: 'text' | 'password' | 'search' | 'textarea';
-  clearable?: boolean;
-  showPassword?: boolean;
-  placeholder?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  maxLength?: number;
-  showMaxLength?: boolean;
-  errorMsg?: string;
-}
+    // password visible on/off
+    const isPasswordVisible = ref(false);
+    const changePasswordVisible = () => {
+      if (props.type === 'password') {
+        isPasswordVisible.value = !isPasswordVisible.value;
+      }
+    };
 
-const props = withDefaults(defineProps<Props>(), {
-  type: 'text',
-});
+    // input type setting
+    const inputType = computed(() => {
+      if (props.type === 'password') {
+        return isPasswordVisible.value ? 'text' : 'password';
+      }
+      isPasswordVisible.value = false;
+      return props.type === 'search' ? 'text' : props.type;
+    });
 
-interface Emits {
-  (event: 'update:modelValue', val: string): void;
-  (event: 'focus', e: FocusEvent): void;
-  (event: 'blur', e: FocusEvent): void;
-  (event: 'input', val: string, e: Event): void;
-  (event: 'change', val: string, e: Event): void;
-  (event: 'search', val: string): void;
-}
-const emit = defineEmits<Emits>();
+    // clear input value
+    const clearValue = () => {
+      mv.value = '';
+    };
 
-const mv = computed<string>({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val),
-});
+    // search input
+    const searchValue = () => {
+      emit('search', mv.value);
+    };
+    const keyupInput = (e) => {
+      if (props.type === 'search' && (e.key === 'Enter' || e.keyCode === 13)) {
+        searchValue();
+      }
+    };
 
-const isPasswordVisible = ref(false);
-const changePasswordVisible = () => {
-  if (props.type === 'password') {
-    isPasswordVisible.value = !isPasswordVisible.value;
-  }
-};
+    // input event
+    const focusInput = (e) => {
+      emit('focus', e);
+    };
+    const blurInput = (e) => {
+      emit('blur', e);
+    };
+    const inputMv = (e) => {
+      const inputValue = e.target.value;
+      if (mv.value !== inputValue) {
+        mv.value = inputValue;
+      }
+      nextTick(() => {
+        emit('input', mv.value, e);
+      });
+    };
+    const changeMv = (e) => {
+      emit('change', mv.value, e);
+    };
 
-const inputType = computed(() => {
-  if (props.type === 'password') {
-    return isPasswordVisible.value ? 'text' : 'password';
-  }
-  isPasswordVisible.value = false;
-  return props.type === 'search' ? 'text' : props.type;
-});
-
-const clearValue = () => {
-  mv.value = '';
-};
-
-const searchValue = () => {
-  emit('search', mv.value);
-};
-const keyupInput = (e: KeyboardEvent) => {
-  if (props.type === 'search' && (e.key === 'Enter' || e.keyCode === 13)) {
-    searchValue();
-  }
-};
-
-const focusInput = (e: FocusEvent) => {
-  emit('focus', e);
-};
-const blurInput = (e: FocusEvent) => {
-  emit('blur', e);
-};
-const inputMv = (e: Event) => {
-  const inputValue = (e.target as HTMLInputElement).value;
-  if (mv.value !== inputValue) {
-    mv.value = inputValue;
-  }
-  nextTick(() => {
-    emit('input', mv.value, e);
-  });
-};
-const changeMv = (e: Event) => {
-  emit('change', mv.value, e);
+    return {
+      mv,
+      inputType,
+      isPasswordVisible,
+      clearValue,
+      changePasswordVisible,
+      searchValue,
+      keyupInput,
+      focusInput,
+      blurInput,
+      inputMv,
+      changeMv,
+    };
+  },
 };
 </script>
 
 <style lang="scss">
-@use 'sass:math';
 $icon-width: 14px !default;
 
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-text-field {
   position: relative;
@@ -200,7 +236,6 @@ $icon-width: 14px !default;
 
   @include clearfix();
 
-  @import '../../style/components/input.scss';
   &:hover {
     .ev-input,
     .ev-textarea {
@@ -216,7 +251,7 @@ $icon-width: 14px !default;
     display: flex;
     position: absolute;
     top: 50%;
-    right: math.div($icon-width, 2);
+    right: #{$icon-width / 2};
     width: $icon-width;
     height: $icon-width;
     cursor: pointer;
