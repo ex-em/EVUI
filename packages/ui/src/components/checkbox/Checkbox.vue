@@ -37,17 +37,19 @@ defineOptions({
 });
 interface Props {
   modelValue: CheckValue | CheckValue[];
-  label: string;
-  tooltipTitle: string;
   disabled: boolean;
   readonly: boolean;
   indeterminate: boolean;
+  label?: string;
+  tooltipTitle?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   disabled: false,
   readonly: false,
   indeterminate: false,
+  label: '',
+  tooltipTitle: '',
 });
 
 interface Emits {

@@ -54,10 +54,16 @@
             :disabled="disabled"
             @click="clickSelectInput"
           />
-          <template v-if="!collapseTags">
+          <template
+            v-if="
+              Array.isArray(selectedModel) &&
+              props.multiple &&
+              !props.collapseTags
+            "
+          >
             <div
               v-for="item in selectedModel"
-              :key="item"
+              :key="item.name"
               class="ev-select-tag"
             >
               <span class="ev-tag-name">
@@ -72,7 +78,10 @@
             </div>
           </template>
           <template v-else>
-            <div v-if="selectedModel.length" class="ev-select-tag">
+            <div
+              v-if="Array.isArray(selectedModel) && selectedModel.length"
+              class="ev-select-tag"
+            >
               <span class="ev-tag-name">
                 {{ selectedModel[0].name }}
               </span>
@@ -85,7 +94,10 @@
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
-            <div v-if="selectedModel.length > 1" class="ev-select-tag num">
+            <div
+              v-if="Array.isArray(selectedModel) && selectedModel.length > 1"
+              class="ev-select-tag num"
+            >
               <span class="ev-tag-name">
                 + {{ selectedModel.length - 1 }}
               </span>
@@ -117,9 +129,9 @@
             :value="filterTextRef"
             @input="changeFilterText"
           />
-          <template v-if="checkable">
+          <template v-if="props.checkable">
             <div
-              v-if="multiple"
+              v-if="props.multiple"
               class="ev-select-dropbox-item all-check"
               :class="{
                 selected: allCheck,
@@ -130,12 +142,12 @@
             >
               <ev-checkbox
                 v-model="allCheck"
-                :label="allCheckLabel"
+                :label="props.allCheckLabel"
                 @change="[changeAllCheck(true), changeDropboxPosition()]"
               />
             </div>
             <div ref="itemWrapper" class="ev-select-dropbox-list">
-              <template v-if="multiple">
+              <template v-if="multiple && Array.isArray(mv)">
                 <ev-checkbox-group v-model="mv">
                   <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
                     <li
@@ -154,7 +166,7 @@
                       "
                     >
                       <ev-checkbox
-                        :label="item.value"
+                        :label="item.value.toString()"
                         :disabled="item.disabled"
                       >
                         <i v-if="item.iconClass" :class="item.iconClass" />
@@ -234,25 +246,16 @@
 </template>
 
 <script setup lang="ts">
-import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
+import EvCheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import { useModel, useDropdown } from './uses';
 import { selectClickoutside as vClickoutside } from './clickoutside';
-import type { Props, Emit } from './types';
+import type { Props, Emit, ItemType } from './types';
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: null,
-  placeholder: '',
   searchPlaceholder: 'Please Enter a Search Words.',
   noMatchingText: 'NO MATCHING DATA',
-  items: () => [],
-  disabled: false,
-  clearable: false,
-  multiple: false,
-  checkable: false,
-  collapseTags: false,
-  filterable: false,
-  filterText: '',
+  items: () => [] as ItemType[],
   allCheckLabel: 'Select All',
 });
 
@@ -266,7 +269,7 @@ const {
   changeMv,
   removeMv,
   removeAllMv,
-} = useModel(props, emit);
+} = useModel(props as Props, emit);
 
 const {
   select,
@@ -285,7 +288,7 @@ const {
   selectedItemClass,
   allCheck,
   changeAllCheck,
-} = useDropdown(props, { mv, changeMv });
+} = useDropdown(props as Props, { mv, changeMv });
 </script>
 
 <style lang="scss">

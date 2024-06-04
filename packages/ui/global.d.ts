@@ -4,6 +4,7 @@ declare module '@vue/runtime-core' {
     EvTextField: typeof import('@evui/ui')['EvTextField'];
     EvTabs: typeof import('@evui/ui')['EvTabs'];
     EvTabPanel: typeof import('@evui/ui')['EvTabPanel'];
+    EvSelect: typeof import('@evui/ui')['EvSelect'];
     EvRadioGroup: typeof import('@evui/ui')['EvRadioGroup'];
     EvRadio: typeof import('@evui/ui')['EvRadio'];
     EvProgress: typeof import('@evui/ui')['EvProgress'];

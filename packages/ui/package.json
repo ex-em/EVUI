@@ -37,7 +37,6 @@
     "./package.json": "./package.json"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/tsconfig": "^0.5.1",
     "glob": "^10.3.15",
@@ -56,6 +55,6 @@
     "access": "public"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21"
+    "korean-regexp": "^1.0.12"
   }
 }
