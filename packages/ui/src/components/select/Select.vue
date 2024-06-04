@@ -249,7 +249,7 @@
 import EvCheckboxGroup from '@/components/checkbox/CheckboxGroup.vue';
 import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import { useModel, useDropdown } from './uses';
-import { selectClickoutside as vClickoutside } from './clickoutside';
+import { selectClickoutside as vClickoutside } from '@/directives/clickoutside';
 import type { Props, Emit, ItemType } from './types';
 
 const props = withDefaults(defineProps<Props>(), {

@@ -69,10 +69,25 @@ importers:
 
   packages/ui:
     dependencies:
+      bignumber.js:
+        specifier: ^9.1.2
+        version: 9.1.2
       korean-regexp:
         specifier: ^1.0.12
         version: 1.0.12
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      vue-resize-observer:
+        specifier: ^2.0.16
+        version: 2.0.16
+      vue3-observe-visibility:
+        specifier: ^1.0.1
+        version: 1.0.1(vue@3.4.27)
     devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
         version: 5.0.4(vite@5.2.11)(vue@3.4.27)
@@ -3485,6 +3500,12 @@ packages:
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
     dev: true
 
+  /@types/lodash-es@4.17.12:
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+    dependencies:
+      '@types/lodash': 4.17.4
+    dev: true
+
   /@types/lodash@4.17.4:
     resolution: {integrity: sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==}
     dev: true
@@ -4073,6 +4094,10 @@ packages:
     resolution: {integrity: sha512-QxD8cf2eVqJOOz63z6JIN9BzvVs/dlySa5HGSBH5xtR8dPteIRQnBxxKqkNTiT6jbDTF6jAfrd4oMcND9RGbQg==}
     engines: {node: '>=0.6'}
     dev: true
+
+  /bignumber.js@9.1.2:
+    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
+    dev: false
 
   /binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -5981,6 +6006,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
@@ -8092,6 +8121,10 @@ packages:
       vue: 3.4.27(typescript@5.4.5)
     dev: true
 
+  /vue-resize-observer@2.0.16:
+    resolution: {integrity: sha512-E6LBZp0KSYAgA7KbqKv6GA4NRj6Q677Ldck5e+nTB2GCjhyPZQzdYJEzIeYoERDuwI6c6OcGF5Vd4a0+rjZECA==}
+    dev: false
+
   /vue-template-compiler@2.7.16:
     resolution: {integrity: sha512-AYbUWAJHLGGQM7+cNTELw+KsOG9nl2CnSv467WobS5Cv9uk3wFcnr1Etsz2sEIHEZvw1U+o9mRlEO6QbZvUPGQ==}
     dependencies:
@@ -8122,6 +8155,14 @@ packages:
       semver: 7.6.2
       typescript: 5.4.5
     dev: true
+
+  /vue3-observe-visibility@1.0.1(vue@3.4.27):
+    resolution: {integrity: sha512-/PL1xopQvQwWVD41hr2gwAGBEPcTCLYz6j5cdbvvLWOvalv2YE29+VJudsotF9ivredlfsRzFOWb63etvcGQQw==}
+    peerDependencies:
+      vue: ^3.x.x
+    dependencies:
+      vue: 3.4.27(typescript@5.4.5)
+    dev: false
 
   /vue@3.4.27(typescript@5.4.5):
     resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}

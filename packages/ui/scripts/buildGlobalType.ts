@@ -7,7 +7,7 @@ const file = './global.d.ts';
 fs.writeFileSync(file, `declare module '@vue/runtime-core' {`, { flag: 'w' });
 
 function getAllComponents() {
-  const components = glob.sync('./src/components/**/*.vue', {
+  const components = glob.sync('./src/components/*/*.vue', {
     cwd: process.cwd(),
   });
   return components.map((component) => path.basename(component, '.vue'));
