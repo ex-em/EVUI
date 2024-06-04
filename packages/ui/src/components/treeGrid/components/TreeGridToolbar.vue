@@ -4,12 +4,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'EvTreeGridToolbar',
-};
-</script>
-
 <style lang="scss">
 @import '../../../style/index.scss';
 .tree-grid-toolbar {

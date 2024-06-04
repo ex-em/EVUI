@@ -6,7 +6,7 @@
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
-    <toolbar>
+    <tree-grid-toolbar>
       <template #toolbarWrapper>
         <grid-option-button
           v-if="useGridSetting"
@@ -20,7 +20,7 @@
           }"
         />
       </template>
-    </toolbar>
+    </tree-grid-toolbar>
   </div>
   <div
     ref="grid-wrapper"
@@ -231,12 +231,13 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
-import TreeGridNode from './TreeGridNode.vue';
-import Toolbar from './TreeGridToolbar.vue';
-import GridPagination from '../../grid/components/GridPagination.vue';
-import GridSummary from '../../grid/components/GridSummary.vue';
-import ColumnSetting from '../../grid/components/GridColumnSetting.vue';
-import GridOptionButton from '../../grid/icon/IconOptionButton.vue';
+import EvCheckbox from '@/components/checkbox/Checkbox.vue';
+import EvContextMenu from '@/components/contextMenu/ContextMenu.vue';
+import GridPagination from '@/components/grid/components/GridPagination.vue';
+import GridSummary from '@/components/grid/components/GridSummary.vue';
+import ColumnSetting from '@/components/grid/components/GridColumnSetting.vue';
+import GridOptionButton from '@/components/grid/icon/IconOptionButton.vue';
+import TreeGridToolbar from './TreeGridToolbar.vue';
 import {
   commonFunctions,
   scrollEvent,
@@ -253,8 +254,9 @@ import { columnSettingEvent } from '../../grid/uses';
 export default {
   name: 'EvTreeGrid',
   components: {
-    TreeGridNode,
-    Toolbar,
+    EvCheckbox,
+    EvContextMenu,
+    TreeGridToolbar,
     GridPagination,
     GridSummary,
     ColumnSetting,
@@ -476,7 +478,7 @@ export default {
     });
     const clearSelectInfo = () => {
       selectInfo.selectedRow.length = 0;
-      stores.store.forEach((row) => {
+      stores.store?.forEach((row) => {
         row.selected = false;
       });
     };
@@ -484,7 +486,7 @@ export default {
       checkInfo.isHeaderChecked = false;
       checkInfo.isHeaderIndeterminate = false;
       checkInfo.checkedRows.length = 0;
-      stores.store.forEach((row) => {
+      stores.store?.forEach((row) => {
         row.checked = false;
         row.indeterminate = false;
       });
@@ -659,7 +661,7 @@ export default {
           store = getPagingData();
         }
         if (store.length) {
-          store.forEach((row) => {
+          store?.forEach((row) => {
             row.checked = !!value.find(
               (checkedRow) => checkedRow.index === row.index
             );
@@ -681,7 +683,7 @@ export default {
       () => selectInfo.selectedRow,
       (value) => {
         if (selectInfo.useSelect) {
-          stores.store.forEach((row) => {
+          stores.store?.forEach((row) => {
             row.selected = !!value.find(
               (selectedRow) => selectedRow.index === row.index
             );
@@ -700,7 +702,7 @@ export default {
             return;
           }
           const { children } = data;
-          children.forEach((node) => {
+          children?.forEach((node) => {
             const childNode = node;
             if (childNode.parent.show && childNode.parent.expand) {
               childNode.show = true;

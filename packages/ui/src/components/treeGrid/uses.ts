@@ -1,28 +1,6 @@
 // @ts-nocheck TODO
 import { getCurrentInstance, nextTick } from 'vue';
-
-export const truthyNumber = (v: unknown) => {
-  return typeof v === 'number' && !Number.isNaN(v);
-};
-
-export const truthy = (...args: any[]) => {
-  return args.every(truthyNumber);
-};
-
-export const numberWithComma = (v: unknown) => {
-  const reg = /\B(?=(\d{3})+(?!\d))/g;
-
-  if (truthy(v)) {
-    if (Number.isInteger(v)) {
-      return v.toString().replace(reg, ',');
-    }
-
-    const part = v.toString().split('.');
-    return part[0].replace(reg, ',') + (part[1] ? `.${part[1]}` : '');
-  }
-
-  return false;
-};
+import { numberWithComma } from '@/common/utils';
 
 export const commonFunctions = (params: { checkInfo: any }) => {
   const { props } = getCurrentInstance()!;
@@ -318,7 +296,7 @@ export const resizeEvent = (params: {
       resizeInfo.columnWidth = columnWidth;
     }
 
-    stores.orderedColumns.forEach((column: any) => {
+    stores.orderedColumns?.forEach((column: any) => {
       const item = column;
       const minWidth = isRenderer(column)
         ? resizeInfo.rendererMinWidth
@@ -349,7 +327,7 @@ export const resizeEvent = (params: {
   const onResize = () => {
     nextTick(() => {
       if (resizeInfo.adjust) {
-        stores.orderedColumns.forEach((column: { index: string | number }) => {
+        stores.orderedColumns?.forEach((column: { index: string | number }) => {
           const item = column;
 
           if (!props.columns[column.index].width && !item.resized) {
@@ -420,7 +398,7 @@ export const resizeEvent = (params: {
 
       if (stores.orderedColumns[columnIndex]) {
         stores.orderedColumns[columnIndex].width = changedWidth;
-        stores.orderedColumns.forEach((column: any) => {
+        stores.orderedColumns?.forEach((column: any) => {
           const item = column;
           item.resized = true;
           return item;
@@ -583,7 +561,7 @@ export const checkEvent = (params: {
     checked: any;
   }) => {
     if (node.hasChild) {
-      node.children.forEach((children: any) => {
+      node.children?.forEach((children: any) => {
         const childNode = children;
         if (node.checked && !childNode.checked && !childNode.uncheckable) {
           checkInfo.checkedRows.push(childNode);
@@ -710,7 +688,7 @@ export const checkEvent = (params: {
     if (pageInfo.isClientPaging) {
       store = getPagingData();
     }
-    store.forEach(
+    store?.forEach(
       (row: {
         checked: any;
         uncheckable: any;
@@ -872,7 +850,7 @@ export const treeEvent = (params: { stores: any; onResize: any }) => {
 
     function getDataObj(nodeObj: { [x: string]: any }) {
       const newObj = {};
-      Object.keys(nodeObj).forEach((key) => {
+      Object.keys(nodeObj)?.forEach((key) => {
         if (key !== 'children') {
           newObj[key] = nodeObj[key];
         }
@@ -931,7 +909,7 @@ export const treeEvent = (params: { stores: any; onResize: any }) => {
         }
         if (node.children) {
           node.hasChild = true;
-          node.children.forEach((child: any) =>
+          node.children?.forEach((child: any) =>
             setNodeData({
               node: child,
               level: level + 1,
@@ -943,7 +921,7 @@ export const treeEvent = (params: { stores: any; onResize: any }) => {
         }
       }
     }
-    stores.treeRows.forEach((root: any) => {
+    stores.treeRows?.forEach((root: any) => {
       setNodeData({
         node: root,
         level: 0,
@@ -955,7 +933,7 @@ export const treeEvent = (params: { stores: any; onResize: any }) => {
     return nodeList;
   };
   const setExpandNode = (children: any[], isShow: any, isFilter: any) => {
-    children.forEach((nodeObj: any) => {
+    children?.forEach((nodeObj: any) => {
       const node = nodeObj;
       node.show = isFilter && isShow ? node.isFilter : isShow;
       if (node.hasChild) {
@@ -1006,7 +984,7 @@ export const filterEvent = (params: {
       return;
     }
     const { children } = data;
-    children.forEach((node: any) => {
+    children?.forEach((node: any) => {
       const childNode = node;
       if (childNode.parent.show && childNode.parent.expand) {
         childNode.show = true;
@@ -1028,7 +1006,7 @@ export const filterEvent = (params: {
       filterInfo.isSearch = false;
       filterInfo.searchWord = searchWord;
       const store = stores.treeStore;
-      store.forEach((row: { show: boolean; isFilter: boolean }) => {
+      store?.forEach((row: { show: boolean; isFilter: boolean }) => {
         row.show = false;
         row.isFilter = false;
       });
@@ -1056,7 +1034,7 @@ export const filterEvent = (params: {
           }
           return isSameWord;
         });
-        filterStores.forEach(
+        filterStores?.forEach(
           (row: {
             show: boolean;
             parent: { expand: any };

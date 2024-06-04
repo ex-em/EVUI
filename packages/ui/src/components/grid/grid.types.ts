@@ -93,3 +93,41 @@ export interface GridOption {
   };
   emptyText?: string;
 }
+
+export interface GridSearchBarOption {
+  use: boolean;
+  mode?: 'full' | 'right' | 'left';
+  placeholder?: string;
+  useClientFilter?: boolean;
+}
+
+export interface BasePaginationProps {
+  current?: number;
+  total: number;
+  visiblePage?: number;
+  align?: 'left' | 'center' | 'right';
+  showSetting?: boolean;
+  showPageInfo?: boolean;
+  perData?: 20 | 30 | 40 | 50;
+}
+export interface PaginationInfo extends BasePaginationProps {
+  use?: boolean;
+  useClient?: boolean;
+}
+
+export interface Props {
+  columns: GridColumn;
+  rows: any[];
+  type?: 'page' | 'widget';
+  disabledRows?: any[];
+  selectedRows?: any[];
+  uncheckable?: any[];
+  checkedRows?: any[];
+  searchWord?: string;
+  option?: GridOption;
+  searchBarOption?: GridSearchBarOption;
+  tooltipOption?: 'list' | 'chip';
+  shownChipCount?: 1;
+  pagination?: PaginationInfo;
+  expanded?: any[];
+}
