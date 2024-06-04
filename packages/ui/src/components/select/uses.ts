@@ -1,6 +1,15 @@
-import { ref, reactive, computed, watch, nextTick } from 'vue';
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  nextTick,
+  type WritableComputedOptions,
+  type WritableComputedRef,
+} from 'vue';
 import { getRegExp, engToKor, korToEng } from 'korean-regexp';
-import type { Props, Emit, ItemType } from './types';
+import type { Props, Emit } from './types';
+import type { CheckValue } from '../checkbox/checkbox.type';
 
 export const useModel = (props: Props, emit: Emit) => {
   /**
@@ -8,49 +17,61 @@ export const useModel = (props: Props, emit: Emit) => {
    * single 모드 : modelValue(String), 없는 경우 null
    * multiple 모드 : modelValue(Array), 없는 경우 []
    */
-  const singleMv = {
+  const singleMv: WritableComputedOptions<CheckValue> = {
     get: () => {
-      if (props.items.some((v) => v.value === props.modelValue)) {
+      if (
+        !Array.isArray(props.modelValue) &&
+        props.items.some((v) => v.value === props.modelValue)
+      ) {
         return props.modelValue;
       }
-      return null;
+      return '';
     },
-    set: (value: ItemType) => emit('update:modelValue', value),
+    set: (value: CheckValue) => emit('update:modelValue', value),
   };
-  const multiMv = {
+  const multiMv: WritableComputedOptions<CheckValue[]> = {
     get: () => {
       if (Array.isArray(props.modelValue)) {
         return props.modelValue;
       }
       return [];
     },
-    set: (value: ItemType) => emit('update:modelValue', value),
+    set: (value: CheckValue[]) => emit('update:modelValue', value),
   };
-  const mv = computed(!props.multiple ? singleMv : multiMv);
+  const mv = props.multiple ? computed(multiMv) : computed(singleMv);
 
   /**
    * 현재 select에서 선택된 항목들
    * single 모드 : { name: 'name', value: 'value' }
    * multiple 모드 : [{ name: 'name', value: 'value' }, {...}]
    */
-  const singleSm = () => props.items.find((v) => v.value === mv.value)?.name;
+  const singleSm = () =>
+    props.items.find((v) => v.value === mv.value)?.name ?? '';
   const multipleSm = () =>
-    props.items.filter((v) => props.modelValue.includes(v.value));
-  const selectedModel = computed(!props.multiple ? singleSm : multipleSm);
+    props.items.filter(
+      (v) =>
+        Array.isArray(props.modelValue) && props.modelValue.includes(v.value)
+    );
+  const selectedModel = props.multiple
+    ? computed(multipleSm)
+    : computed(singleSm);
 
   const computedPlaceholder = computed(() => {
     if (!props.multiple) {
       return props.placeholder;
+    } else {
+      return props.modelValue.length ? '' : props.placeholder;
     }
-    return mv.value.length ? '' : props.placeholder;
   });
 
   /**
    * clearable 모드일 때, 항목(mv) 전체 삭제 아이콘 존재여부
    */
   const singleIci = () => mv.value;
-  const multipleIci = () => mv.value.length;
-  const isClearableIcon = computed(!props.multiple ? singleIci : multipleIci);
+  const multipleIci = () => props.multiple && props.modelValue.length;
+  const isClearableIcon = props.multiple
+    ? computed(multipleIci)
+    : computed(singleIci);
 
   /**
    * clearable모드일 때 [x] 아이콘 클릭 시 mv값을 초기화
@@ -58,10 +79,10 @@ export const useModel = (props: Props, emit: Emit) => {
   const removeAllMv = () => {
     if (!props.disabled) {
       if (!props.multiple) {
-        mv.value = null;
+        mv.value = '';
       } else {
-        mv.value.splice(0);
-        mv.value = [...mv.value];
+        (mv.value as CheckValue[]).splice(0);
+        mv.value = [...(mv.value as CheckValue[])];
       }
     }
   };
@@ -78,11 +99,11 @@ export const useModel = (props: Props, emit: Emit) => {
    * multiple 모드인 경우 선택된 value를 mv에서 삭제하는 로직
    * @param val - tagWrapper에서 [x]클릭된 목록의 value
    */
-  const removeMv = async (val: ItemType) => {
-    if (!props.disabled) {
-      const idx = mv.value.indexOf(val);
-      mv.value.splice(idx, 1);
-      mv.value = [...mv.value];
+  const removeMv = async (val: CheckValue) => {
+    if (!props.disabled && props.multiple) {
+      const idx = (mv.value as CheckValue[]).indexOf(val);
+      (mv.value as CheckValue[]).splice(idx, 1);
+      mv.value = [...(mv.value as CheckValue[])];
       await changeMv();
     }
   };
@@ -101,7 +122,7 @@ export const useModel = (props: Props, emit: Emit) => {
 export const useDropdown = (
   props: Props,
   param: {
-    mv: ItemType;
+    mv: WritableComputedRef<CheckValue[]> | WritableComputedRef<CheckValue>;
     changeMv: () => void;
   }
 ) => {
@@ -172,9 +193,9 @@ export const useDropdown = (
     const SELECTED_CLS = 'selected';
     const childEls = itemWrapper.value.children[0].children;
     const wrapperOffsetTop = itemWrapper.value.offsetTop;
-    let childEl = null;
+    let childEl: HTMLElement | null = null;
     for (let i = 0; i < childEls.length; i++) {
-      childEl = childEls[i];
+      childEl = childEls[i] as HTMLElement;
       if (childEl.classList.contains(SELECTED_CLS)) {
         if (!childEl.offsetTop) {
           return;
@@ -228,6 +249,9 @@ export const useDropdown = (
 
   const allCheck = ref(false);
   const changeAllCheck = (isCheckBoxLabel: boolean) => {
+    if (!props.multiple) {
+      return;
+    }
     if (!isCheckBoxLabel) {
       allCheck.value = !allCheck.value;
     }
@@ -245,7 +269,7 @@ export const useDropdown = (
    * multiple 모드가 아닌경우 리스트 클릭 시 드롭박스를 닫는다.
    * @param val - clicked item value
    */
-  const singleClickItem = (val: ItemType) => {
+  const singleClickItem = (val: CheckValue) => {
     if (props.filterable) {
       filterTextRef.value = '';
     }
@@ -253,7 +277,10 @@ export const useDropdown = (
     isDropbox.value = false;
     changeMv();
   };
-  const multipleClickItem = (val: ItemType) => {
+  const multipleClickItem = (val: CheckValue) => {
+    if (!props.multiple || !Array.isArray(mv.value)) {
+      return;
+    }
     if (props.filterable) {
       filterTextRef.value = '';
     }
@@ -275,8 +302,9 @@ export const useDropdown = (
    * @param val
    * @returns {boolean | array}
    */
-  const singleSelectedCls = (val: ItemType) => val === mv.value;
-  const multipleSelectedCls = (val: ItemType) => mv.value.includes(val);
+  const singleSelectedCls = (val: CheckValue) => val === mv.value;
+  const multipleSelectedCls = (val: CheckValue) =>
+    Array.isArray(mv.value) && mv.value.includes(val);
   const selectedItemClass = !props.multiple
     ? singleSelectedCls
     : multipleSelectedCls;
@@ -284,7 +312,7 @@ export const useDropdown = (
   watch(
     () => mv.value,
     (curr) => {
-      if (props.multiple && props.checkable) {
+      if (props.multiple && props.checkable && Array.isArray(curr)) {
         if (curr.length === 0) {
           allCheck.value = false;
         } else {
