@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { computed, nextTick, watch } from 'vue';
 import EvIcon from '@/components/icon/Icon.vue';
-import pageButton from './PageButton.vue';
+import pageButton from './components/PageButton.vue';
 
 interface Props {
   total: number;

@@ -12,6 +12,7 @@
     "outDir": "dist",
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
+    "allowJs": true,
     "paths": {
       "@/*": ["./src/*"]
     },
