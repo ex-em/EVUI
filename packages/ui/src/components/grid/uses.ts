@@ -1,29 +1,8 @@
-// @ts-nocheck TODO:
+// @ts-nocheck //TODO -
 import { getCurrentInstance, nextTick } from 'vue';
 import { uniqBy } from 'lodash-es';
-
-export const truthyNumber = (v: unknown) => {
-  return typeof v === 'number' && !Number.isNaN(v);
-};
-
-export const truthy = (...args: any[]) => {
-  return args.every(truthyNumber);
-};
-
-export const numberWithComma = (v: unknown) => {
-  const reg = /\B(?=(\d{3})+(?!\d))/g;
-
-  if (truthy(v)) {
-    if (Number.isInteger(v)) {
-      return v.toString().replace(reg, ',');
-    }
-
-    const part = v.toString().split('.');
-    return part[0].replace(reg, ',') + (part[1] ? `.${part[1]}` : '');
-  }
-
-  return false;
-};
+import { numberWithComma } from '@/common/utils';
+import type { GridColumn } from './grid.types';
 
 const ROW_INDEX = 0;
 const ROW_CHECK_INDEX = 1;
@@ -39,7 +18,7 @@ export const commonFunctions = () => {
    * @param {object} column - 컬럼 정보
    * @returns {boolean} 사용자 지정 컬럼 유무
    */
-  const isRenderer = (column: object = {}): boolean => !!column?.render?.use;
+  const isRenderer = (column: GridColumn): boolean => !!column?.render?.use;
   const getComponentName = (type = '') => {
     const setUpperCaseFirstStr = (str: string) =>
       str.charAt(0).toUpperCase() + str.slice(1);
@@ -58,12 +37,12 @@ export const commonFunctions = () => {
   /**
    * 데이터 타입에 따라 변환된 데이터을 반환한다.
    *
-   * @param {object} column - 컬럼 정보
+   * @param {object} GridColumn - 컬럼 정보
    * @param {number|string} value - 데이터
    * @returns {number|string} 변환된 데이터
    */
   const getConvertValue = (
-    column: object,
+    column: GridColumn,
     value: number | string
   ): number | string => {
     let convertValue =

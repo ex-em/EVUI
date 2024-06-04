@@ -70,8 +70,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 interface Emit {
-  (e: 'update:modelValue', val: number | string): void;
-  (e: 'change', val: number | string): void;
+  (e: 'update:modelValue', val: number): void;
+  (e: 'change', val: number): void;
 }
 const emit = defineEmits<Emit>();
 

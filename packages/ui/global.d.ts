@@ -17,6 +17,7 @@ declare module '@vue/runtime-core' {
     EvInputNumber: typeof import('@evui/ui')['EvInputNumber'];
     EvIcon: typeof import('@evui/ui')['EvIcon'];
     EvGrid: typeof import('@evui/ui')['EvGrid'];
+    EvContextMenu: typeof import('@evui/ui')['EvContextMenu'];
     EvCheckboxGroup: typeof import('@evui/ui')['EvCheckboxGroup'];
     EvCheckbox: typeof import('@evui/ui')['EvCheckbox'];
     EvButton: typeof import('@evui/ui')['EvButton'];

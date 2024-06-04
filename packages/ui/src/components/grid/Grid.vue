@@ -6,7 +6,7 @@
     :style="`width: ${gridWidth};`"
   >
     <!-- Toolbar -->
-    <toolbar>
+    <grid-toolbar>
       <template #toolbarWrapper>
         <!-- Filtering Items -->
         <div class="filtering" :style="{ width: `${filteringItemsWidth}px` }">
@@ -160,7 +160,7 @@
         />
         <slot name="toolbar" :item="{ onSearch: onSearch }" />
       </template>
-    </toolbar>
+    </grid-toolbar>
   </div>
   <div
     ref="grid-wrapper"
@@ -598,9 +598,13 @@ import {
   onBeforeMount,
   onUnmounted,
 } from 'vue';
-import { clickoutside } from '@/directives/clickoutside';
 import { cloneDeep } from 'lodash-es';
-import Toolbar from './components/GridToolbar.vue';
+import { clickoutside } from '@/directives/clickoutside';
+import EvIcon from '@/components/icon/Icon.vue';
+import EvCheckbox from '@/components/checkbox/Checkbox.vue';
+import EvSelect from '@/components/select/Select.vue';
+import EvContextMenu from '@/components/contextMenu/ContextMenu.vue';
+import GridToolbar from './components/GridToolbar.vue';
 import GridPagination from './components/GridPagination.vue';
 import GridSummary from './components/GridSummary.vue';
 import ColumnSetting from './components/GridColumnSetting.vue';
@@ -629,7 +633,11 @@ export default {
     clickoutside,
   },
   components: {
-    Toolbar,
+    EvIcon,
+    EvCheckbox,
+    EvSelect,
+    EvContextMenu,
+    GridToolbar,
     GridPagination,
     GridSummary,
     ColumnSetting,

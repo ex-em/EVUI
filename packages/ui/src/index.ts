@@ -19,7 +19,8 @@ import EvRadioGroup from './components/radioGroup';
 import EvPagination from './components/pagination';
 import EvSelect from './components/select';
 import EvGrid from './components/grid';
-// import EvTreeGrid from './components/treeGrid';
+import EvTreeGrid from './components/treeGrid';
+import EvContextMenu from './components/contextMenu';
 
 export {
   EvButton,
@@ -42,7 +43,8 @@ export {
   EvPagination,
   EvSelect,
   EvGrid,
-  // EvTreeGrid,
+  EvTreeGrid,
+  EvContextMenu,
 };
 
 const components = [
@@ -65,7 +67,8 @@ const components = [
   EvPagination,
   EvSelect,
   EvGrid,
-  // EvTreeGrid,
+  EvTreeGrid,
+  EvContextMenu,
 ];
 
 export default {
