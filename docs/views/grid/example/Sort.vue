@@ -14,9 +14,9 @@
           },
           value: (a, b) => {
             return (
-              (a.split('-')[1] === null) - (b.split('-')[1] === null) ||
-               Number(a.split('-')[1]) - Number(b.split('-')[1])
-             );
+              (a[0].split('-')[1] === null) - (b[0].split('-')[1] === null) ||
+              Number(a[0].split('-')[1]) - Number(b[0].split('-')[1])
+            );
           },
         },
       }"
@@ -29,7 +29,7 @@ import { ref } from 'vue';
 
 const arr = Array.from({ length: 50 }, () => [
   `field_${Math.round(Math.random() * 10000)}`,
-  `value-${Math.round(Math.random() * 10000)}`,
+  [`value-${Math.round(Math.random() * 10000)}`, `value-${Math.round(Math.random() * 10000)}`],
 ]);
 
 export default {
