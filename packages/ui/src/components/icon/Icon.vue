@@ -1,48 +1,46 @@
 <template>
   <i
-    :class="[
-      {
-        [`ev-icon-${props.icon}`]: iconList[props.icon],
-        [`ev-icon-${props.size}`]: !!props.size,
-      },
-    ]"
+    :class="[icon, { [`ev-icon-${size}`]: !!size }]"
     @click="onClick"
     @dblClick="onDblClick"
     @contextmenu="onContextMenu"
   />
 </template>
 
-<script setup lang="ts">
-import { iconList } from './icon-list';
-import type { IconName } from './icon-list';
-
-defineOptions({
+<script>
+export default {
   name: 'EvIcon',
-});
-
-interface Props {
-  icon: IconName;
-  size?: 'small' | 'medium' | 'large';
-}
-const props = withDefaults(defineProps<Props>(), {
-  size: 'medium',
-});
-
-interface Emits {
-  (e: 'click', evt: MouseEvent): void;
-  (e: 'dbl-click', evt: MouseEvent): void;
-  (e: 'context-menu', evt: MouseEvent): void;
-}
-const emit = defineEmits<Emits>();
-
-const onClick = (e: MouseEvent) => {
-  emit('click', e);
-};
-const onDblClick = (e: MouseEvent) => {
-  emit('dbl-click', e);
-};
-const onContextMenu = (e: MouseEvent) => {
-  emit('context-menu', e);
+  props: {
+    icon: {
+      type: String,
+      default: '',
+    },
+    size: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: {
+    click: null,
+    'dbl-click': null,
+    'context-menu': null,
+  },
+  setup(props, { emit }) {
+    const onClick = (e) => {
+      emit('click', e);
+    };
+    const onDblClick = (e) => {
+      emit('dbl-click', e);
+    };
+    const onContextMenu = (e) => {
+      emit('context-menu', e);
+    };
+    return {
+      onClick,
+      onDblClick,
+      onContextMenu,
+    };
+  },
 };
 </script>
 

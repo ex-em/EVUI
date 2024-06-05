@@ -30,6 +30,7 @@ import EvScheduler from './components/scheduler';
 import EvSlider from './components/slider';
 import EvTimePicker from './components/timePicker';
 import EvTree from './components/tree';
+import pkg from '../package.json' with { type: 'json' };
 
 export {
   EvButton,
@@ -104,4 +105,5 @@ export default {
       app.component(component.name!, component);
     });
   },
+  version: pkg.version,
 };
