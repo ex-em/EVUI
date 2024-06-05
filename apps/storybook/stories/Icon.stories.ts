@@ -18,7 +18,7 @@ const StoryTemplate: Story = {
     template: `
     <div style="width: 500px; overflow-wrap: anywhere;">
     ${Object.keys(iconList)
-      .map((i) => `<EvIcon icon="${i}" v-bind="args" ></EvIcon>`)
+      .map((i) => `<EvIcon icon="ev-icon-${i}" v-bind="args" ></EvIcon>`)
       .join('  ')}
     </div>
               `,
