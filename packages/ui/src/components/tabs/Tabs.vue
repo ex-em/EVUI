@@ -80,11 +80,15 @@ import {
   onBeforeUpdate,
   nextTick,
 } from 'vue';
-import { default as vResize } from 'vue-resize-observer';
-import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
+import { default as resize } from 'vue-resize-observer';
+import { ObserveVisibility as observeVisibility } from 'vue3-observe-visibility';
 
 export default {
   name: 'EvTabs',
+  directives: {
+    resize,
+    observeVisibility,
+  },
   props: {
     modelValue: {
       type: [String, Number],
