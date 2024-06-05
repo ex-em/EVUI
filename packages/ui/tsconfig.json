@@ -1,7 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.json",
   "include": ["vite.config.ts", "./src/**/*.ts", "./src/**/*.vue"],
-  "exclude": ["node_modules", "dist", "src/global.d.ts"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "lib": ["esnext", "dom"],
     "isolatedModules": true,
@@ -22,6 +22,7 @@
     "strict": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "noImplicitReturns": true
   }
 }

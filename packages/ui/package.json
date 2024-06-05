@@ -7,11 +7,12 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "pnpm run type-check && pnpm run build:global-type && pnpm run build:icon && vite build",
+    "build": "pnpm run clean && pnpm run type-check && pnpm run build:global-type && pnpm run build:icon && vite build",
     "build:type": "vue-tsc --declaration --emitDeclarationOnly",
     "build:global-type": "tsx ./scripts/buildGlobalType.ts",
     "build:icon": "tsx ./scripts/buildIcon.ts",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "type": "module",
   "files": [
