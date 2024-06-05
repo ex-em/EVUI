@@ -25,9 +25,13 @@ import EvChart from '../chart/chart.core';
 import { useModel, useWrapper } from '../chart/uses';
 import EvChartBrush from './chartBrush.core';
 import { useBrushModel } from './uses';
+import { default as resize } from 'vue-resize-observer';
 
 export default {
   name: 'EvChartBrush',
+  directives: {
+    resize,
+  },
   props: {
     options: {
       type: Object,
@@ -47,13 +51,16 @@ export default {
       isUseButton: false,
       isUseScroll: false,
     });
-    const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
+    const injectBrushSeries = inject('brushSeries', {
+      list: [],
+      chartIdx: null,
+    });
 
-    const {
-      getNormalizedBrushOptions,
-    } = useBrushModel();
+    const { getNormalizedBrushOptions } = useBrushModel();
 
-    const evChartBrushOptions = computed(() => getNormalizedBrushOptions(props.options));
+    const evChartBrushOptions = computed(() =>
+      getNormalizedBrushOptions(props.options)
+    );
 
     const {
       eventListeners,
@@ -64,12 +71,15 @@ export default {
       getNormalizedOptions,
     } = useModel();
 
-    const evChartData = computed(() => getNormalizedData(
-      (injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx]),
+    const evChartData = computed(() =>
+      getNormalizedData(
+        (injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx]
+      )
     );
 
     const evChartOption = computed(() => {
-      const chartOption = injectEvChartInfo.props.options[evChartBrushOptions.value.chartIdx];
+      const chartOption =
+        injectEvChartInfo.props.options[evChartBrushOptions.value.chartIdx];
 
       const option = {
         ...chartOption,
@@ -99,43 +109,47 @@ export default {
         selectSeries: {
           use: false,
         },
-        axesX: [{
-          ...chartOption?.axesX?.[0],
-          title: {
-            use: false,
+        axesX: [
+          {
+            ...chartOption?.axesX?.[0],
+            title: {
+              use: false,
+            },
           },
-        }],
-        axesY: [{
-          ...chartOption?.axesY?.[0],
-          title: {
-            use: false,
+        ],
+        axesY: [
+          {
+            ...chartOption?.axesY?.[0],
+            title: {
+              use: false,
+            },
           },
-        }],
+        ],
       };
 
       return getNormalizedOptions(option);
     });
 
-    const {
-      wrapper: evChartBrushRef,
-      wrapperStyle: evChartBrushStyle,
-    } = useWrapper(
-      evChartOption.value,
-    );
+    const { wrapper: evChartBrushRef, wrapperStyle: evChartBrushStyle } =
+      useWrapper(evChartOption.value);
 
-    watch(() => injectBrushSeries.list, () => {
-      if (
-        evChartBrushRef.value
-        && injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
-      ) {
-        evChart.seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
+    watch(
+      () => injectBrushSeries.list,
+      () => {
+        if (
+          evChartBrushRef.value &&
+          injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
+        ) {
+          evChart.seriesList =
+            injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-        evChart.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-        });
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
+        }
       }
-    });
+    );
 
     watch(evChartOption, (newOpt, prevOpt) => {
       if (newOpt.brush.chartIdx <= injectEvChartClone.data?.length - 1) {
@@ -162,33 +176,40 @@ export default {
       }
     });
 
-    watch(() => injectEvChartClone.data, (newData) => {
-      if (evChart) {
-        const data = newData[evChartBrushOptions.value.chartIdx];
+    watch(
+      () => injectEvChartClone.data,
+      (newData) => {
+        if (evChart) {
+          const data = newData[evChartBrushOptions.value.chartIdx];
 
-        if (data) {
-          const isUpdateSeries = !isEqual(data.series, evChart.data.series);
+          if (data) {
+            const isUpdateSeries = !isEqual(data.series, evChart.data.series);
 
-          const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
+            const seriesList =
+              injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-          if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
-            Object.keys(data.series).forEach((series) => {
-              if (!('show' in data.series[series])) {
-                data.series[series].show = seriesList[series]?.show ?? true;
-              }
+            if (
+              typeof seriesList === 'object' &&
+              Object.keys(seriesList).length
+            ) {
+              Object.keys(data.series).forEach((series) => {
+                if (!('show' in data.series[series])) {
+                  data.series[series].show = seriesList[series]?.show ?? true;
+                }
+              });
+            }
+
+            evChart.data = cloneDeep(data);
+
+            evChart.update({
+              updateSeries: isUpdateSeries,
+              updateSelTip: { update: false, keepDomain: false },
+              updateData: false,
             });
           }
-
-          evChart.data = cloneDeep(data);
-
-          evChart.update({
-            updateSeries: isUpdateSeries,
-            updateSelTip: { update: false, keepDomain: false },
-            updateData: false,
-          });
         }
       }
-    });
+    );
 
     const createChart = () => {
       let selected;
@@ -204,7 +225,7 @@ export default {
         evChartOption.value,
         eventListeners,
         selectItemInfo,
-        selected,
+        selected
       );
     };
 
@@ -214,7 +235,7 @@ export default {
         evChartData,
         evChartBrushOptions,
         injectBrushIdx,
-        evChartBrushRef,
+        evChartBrushRef
       );
     };
 
@@ -230,14 +251,18 @@ export default {
       }
     };
 
-    watch(() => [injectBrushIdx.start, injectBrushIdx.end], () => {
-      if (
-        evChartBrushRef.value
-        && evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1
-      ) {
-        drawChartBrush();
+    watch(
+      () => [injectBrushIdx.start, injectBrushIdx.end],
+      () => {
+        if (
+          evChartBrushRef.value &&
+          evChartBrushOptions.value.chartIdx <=
+            injectEvChartClone.data?.length - 1
+        ) {
+          drawChartBrush();
+        }
       }
-    });
+    );
 
     onMounted(async () => {
       if (evChartBrushOptions.value.show) {
@@ -252,13 +277,21 @@ export default {
 
     onUpdated(async () => {
       if (evChartBrushOptions.value.show) {
-        if (evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1) {
-          const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
+        if (
+          evChartBrushOptions.value.chartIdx <=
+          injectEvChartClone.data?.length - 1
+        ) {
+          const seriesList =
+            injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-          if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
+          if (
+            typeof seriesList === 'object' &&
+            Object.keys(seriesList).length
+          ) {
             Object.keys(evChartData.value.series).forEach((series) => {
               if (!('show' in evChartData.value.series[series])) {
-                evChartData.value.series[series].show = seriesList[series]?.show ?? true;
+                evChartData.value.series[series].show =
+                  seriesList[series]?.show ?? true;
               }
             });
           }
@@ -296,7 +329,7 @@ export default {
      */
     const onResize = debounce(() => {
       if (evChart && 'resize' in evChart) {
-        const resize = new Promise(resolve => evChart.resize(resolve));
+        const resize = new Promise((resolve) => evChart.resize(resolve));
 
         resize.then((isResizeDone) => {
           if (isResizeDone) {

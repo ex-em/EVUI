@@ -622,13 +622,15 @@ import {
   columnSettingEvent,
   dragEvent,
 } from './uses';
-import { default as vResize } from 'vue-resize-observer';
-import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
+import { default as resize } from 'vue-resize-observer';
+import { ObserveVisibility as observeVisibility } from 'vue3-observe-visibility';
 
 export default {
   name: 'EvGrid',
   directives: {
     clickoutside,
+    resize,
+    observeVisibility,
   },
   components: {
     Toolbar,

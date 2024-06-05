@@ -249,9 +249,15 @@ import {
   pagingEvent,
 } from './uses';
 import { columnSettingEvent } from '../grid/uses';
+import { default as resize } from 'vue-resize-observer';
+import { ObserveVisibility as observeVisibility } from 'vue3-observe-visibility';
 
 export default {
   name: 'EvTreeGrid',
+  directives: {
+    resize,
+    observeVisibility,
+  },
   components: {
     TreeGridNode,
     Toolbar,
