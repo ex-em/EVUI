@@ -31,7 +31,7 @@ import EvSlider from './components/slider';
 import EvTimePicker from './components/timePicker';
 import EvTree from './components/tree';
 import pkg from '../package.json' with { type: 'json' };
-// @ts-ignore
+// @ts-expect-error ts 지원하지 않습니다.
 import VueResizeObserver from 'vue-resize-observer';
 import ObserveVisibility from 'vue3-observe-visibility';
 
