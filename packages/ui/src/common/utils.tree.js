@@ -14,5 +14,4 @@ function findComponentUpward(context, componentName, componentNames) {
   }
   return parent;
 }
-// eslint-disable-next-line import/prefer-default-export
 export { findComponentUpward };

@@ -31,6 +31,9 @@ import EvSlider from './components/slider';
 import EvTimePicker from './components/timePicker';
 import EvTree from './components/tree';
 import pkg from '../package.json' with { type: 'json' };
+// @ts-ignore
+import VueResizeObserver from 'vue-resize-observer';
+import ObserveVisibility from 'vue3-observe-visibility';
 
 export {
   EvButton,
@@ -104,6 +107,13 @@ export default {
     components.forEach((component) => {
       app.component(component.name!, component);
     });
+
+    app.use(VueResizeObserver);
+    app.use(ObserveVisibility);
+
+    app.config.globalProperties.$message = EvMessage;
+    app.config.globalProperties.$messageBox = EvMessageBox;
+    app.config.globalProperties.$notification = EvNotification;
   },
   version: pkg.version,
 };

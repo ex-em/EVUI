@@ -13,7 +13,10 @@
       :readonly="props.readonly"
       @change="changeMv"
     />
-    <span ref="checkboxLabel" class="ev-checkbox-label">
+    <span
+      ref="checkboxLabel"
+      class="ev-checkbox-label"
+    >
       <template v-if="$slots.default">
         <slot />
       </template>
@@ -44,7 +47,6 @@ interface Props {
   tooltipTitle?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: false,
   disabled: false,
   readonly: false,
   indeterminate: false,

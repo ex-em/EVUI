@@ -8,8 +8,12 @@
     "build": "storybook build"
   },
   "dependencies": {
-    "@evui/ui": "workspace:*",
     "vue": "^3.4.27",
+    "@evui/ui": "workspace:*",
+    "storybook": "^8.1.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-docs": "^8.1.6",
     "@chromatic-com/storybook": "^1.4.0",
     "@storybook/addon-a11y": "^8.1.2",
     "@storybook/addon-actions": "^8.1.2",
@@ -21,7 +25,6 @@
     "@storybook/blocks": "^8.1.1",
     "@storybook/test": "^8.1.1",
     "@storybook/vue3": "^8.1.1",
-    "@storybook/vue3-vite": "^8.1.1",
-    "storybook": "^8.1.1"
+    "@storybook/vue3-vite": "^8.1.1"
   }
 }

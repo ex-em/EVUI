@@ -1,5 +1,5 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.json",
+  "extends": ["@vue/tsconfig/tsconfig.json", "../../tsconfig.json"],
   "include": ["vite.config.ts", "./src/**/*.ts", "./src/**/*.vue"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
@@ -16,13 +16,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noEmit": false,
-
-    /* Linting */
-    "strict": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "noEmit": false
   }
 }

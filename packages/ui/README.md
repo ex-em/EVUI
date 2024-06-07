@@ -1,3 +1,5 @@
+# evui/ui
+
 ## TODO
 
 - [ ] Add Type
@@ -19,10 +21,6 @@ import '@evui/ui/style';
 
 const app = createApp(App);
 app.use(EVUI);
-
-app.config.globalProperties.$message = EvMessage;
-app.config.globalProperties.$messageBox = EvMessageBox;
-app.config.globalProperties.$notification = EvNotification;
 ```
 
 3. Add global type
