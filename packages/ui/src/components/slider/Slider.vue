@@ -71,7 +71,10 @@
           :style="handleBtnStyle"
           class="ev-slider-handle-btn"
         />
-        <div class="ev-slider-tooltip" v-html="formatValue.left" />
+        <div
+          class="ev-slider-tooltip"
+          v-html="formatValue.left"
+        />
       </div>
       <div
         class="ev-slider-handle"
@@ -83,7 +86,10 @@
           :style="handleBtnStyle"
           class="ev-slider-handle-btn"
         />
-        <div class="ev-slider-tooltip" v-html="formatValue.right" />
+        <div
+          class="ev-slider-tooltip"
+          v-html="formatValue.right"
+        />
       </div>
     </div>
     <template v-if="showInput && !range">
@@ -123,8 +129,7 @@ import { useModel, useStyle, useEvent, useInit } from './uses';
 
 export default {
   name: 'EvSlider',
-  components: {
-  },
+  components: {},
   props: {
     modelValue: {
       type: [Number, Array],
@@ -153,7 +158,7 @@ export default {
     step: {
       type: Number,
       default: 1,
-      validator: val => val > 0,
+      validator: (val) => val > 0,
     },
     mark: {
       type: Object,
@@ -180,10 +185,7 @@ export default {
       default: null,
     },
   },
-  emits: [
-    'update:modelValue',
-    'change',
-  ],
+  emits: ['update:modelValue', 'change'],
   setup() {
     const {
       currentValue,
@@ -209,11 +211,7 @@ export default {
       slider,
     });
 
-    const {
-      startDrag,
-      clickSlider,
-      changeInput,
-    } = useEvent({
+    const { startDrag, clickSlider, changeInput } = useEvent({
       currentValue,
       state,
       slider,
@@ -451,7 +449,8 @@ export default {
     padding-bottom: $handle-height;
   }
   @include state('readonly') {
-    &, * {
+    &,
+    * {
       cursor: default !important;
     }
     .ev-slider-handle {
@@ -464,7 +463,8 @@ export default {
     }
   }
   @include state('disabled') {
-    &, * {
+    &,
+    * {
       cursor: not-allowed !important;
     }
     .ev-slider-thumb {

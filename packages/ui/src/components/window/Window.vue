@@ -42,7 +42,7 @@
                 v-if="iconClass"
                 class="ev-window-icon"
               >
-                <i :class="iconClass"/>
+                <i :class="iconClass" />
               </span>
               <p
                 v-if="title"
@@ -67,15 +67,13 @@
               class="ev-window-maximizable"
               @click="clickExpandBtn"
             >
-              <i
-                :class="maximizableIcon"
-              />
+              <i :class="maximizableIcon" />
             </span>
             <span
               class="ev-window-close"
               @click="closeWin"
             >
-              <i class="ev-icon-close"/>
+              <i class="ev-icon-close" />
             </span>
           </div>
         </div>
@@ -185,12 +183,7 @@ export default {
       removeUnit,
     } = useModel();
 
-    const {
-      dragStyle,
-      startDrag,
-      moveMouse,
-      clickExpandBtn,
-    } = useMouseEvent({
+    const { dragStyle, startDrag, moveMouse, clickExpandBtn } = useMouseEvent({
       windowRef,
       headerRef,
       isFullExpandWindow,
@@ -262,9 +255,11 @@ export default {
   flex-direction: column;
   box-sizing: border-box;
   border-radius: $default-radius;
-  background-color: #FDFDFD;
-  border: 1px solid #E3E3E3;
-  transition: opacity .2s ease-in-out, transform .3s ease-in-out;
+  background-color: #fdfdfd;
+  border: 1px solid #e3e3e3;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.3s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
   z-index: 700;

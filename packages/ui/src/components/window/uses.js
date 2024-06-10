@@ -10,7 +10,8 @@ import {
 } from 'vue';
 
 // 세로 스크롤 너비
-const getVScrollWidth = () => window.innerWidth - document.documentElement.clientWidth;
+const getVScrollWidth = () =>
+  window.innerWidth - document.documentElement.clientWidth;
 // 가로 스크롤 너비
 // const getHScrollWidth = () => window.innerHeight - document.documentElement.clientHeight;
 
@@ -20,7 +21,9 @@ const useModel = () => {
   const windowRef = ref();
   const headerRef = ref();
   const isFullExpandWindow = ref(false);
-  const maximizableIcon = computed(() => (isFullExpandWindow.value ? 'ev-icon-compress' : 'ev-icon-expand'));
+  const maximizableIcon = computed(() =>
+    isFullExpandWindow.value ? 'ev-icon-compress' : 'ev-icon-expand'
+  );
 
   // body에 #ev-window-modal div append
   let root = document.getElementById('ev-window-modal');
@@ -39,8 +42,10 @@ const useModel = () => {
     let result;
 
     if (typeof input === 'string' || typeof input === 'number') {
-      const match = (/^(normal|(-*\d+(?:\.\d+)?)(px|%|vw|vh)?)$/).exec(input);
-      output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
+      const match = /^(normal|(-*\d+(?:\.\d+)?)(px|%|vw|vh)?)$/.exec(input);
+      output = match
+        ? { value: +match[2], unit: match[3] || undefined }
+        : undefined;
     } else {
       output = undefined;
     }
@@ -64,10 +69,11 @@ const useModel = () => {
     }
 
     let result = 0;
-    const match = (/^(normal|(\d+(?:\.\d+)?)(px|%|vw|vh)?)$/).exec(input);
+    const match = /^(normal|(\d+(?:\.\d+)?)(px|%|vw|vh)?)$/.exec(input);
 
     if (direction && ['%', 'vw', 'vh'].includes(match[3]) && match[2]) {
-      const standard = direction === 'horizontal' ? window.innerWidth : window.innerHeight;
+      const standard =
+        direction === 'horizontal' ? window.innerWidth : window.innerHeight;
       result = Math.floor((standard * +match[2]) / 100);
     } else if (match[2]) {
       result = +match[2];
@@ -97,7 +103,9 @@ const useModel = () => {
     const convertedWidth = removeUnit(props.width, 'horizontal');
     const convertedMinWidth = removeUnit(props.minWidth, 'horizontal');
     if (convertedWidth < convertedMinWidth) {
-      console.warn('Since width is less than min-width, it is replaced by min-width.');
+      console.warn(
+        'Since width is less than min-width, it is replaced by min-width.'
+      );
       basePosition.width = numberToUnit(props.minWidth);
     } else {
       basePosition.width = numberToUnit(props.width);
@@ -106,7 +114,9 @@ const useModel = () => {
     const convertedHeight = removeUnit(props.height, 'vertical');
     const convertedMinHeight = removeUnit(props.minHeight, 'vertical');
     if (convertedHeight < convertedMinHeight) {
-      console.warn('Since height is less than min-height, it is replaced by min-height.');
+      console.warn(
+        'Since height is less than min-height, it is replaced by min-height.'
+      );
       basePosition.height = numberToUnit(props.minHeight);
     } else {
       basePosition.height = numberToUnit(props.height);
@@ -132,10 +142,12 @@ const useModel = () => {
   };
 
   const changeBodyCls = (isVisible) => {
-    const hideScrollWindowCnt = root?.getElementsByClassName('scroll-lock')?.length;
+    const hideScrollWindowCnt =
+      root?.getElementsByClassName('scroll-lock')?.length;
     const bodyElem = document.body;
 
-    if (isVisible) { // window open
+    if (isVisible) {
+      // window open
       if (props.hideScroll) {
         // hideScroll 시, body 우측 padding 추가 & overflow hidden class 추가
         if (!hideScrollWindowCnt) {
@@ -144,7 +156,8 @@ const useModel = () => {
         }
         bodyElem.classList.add('ev-window-scroll-lock');
       }
-    } else if (props.hideScroll && hideScrollWindowCnt === 1) { // window close
+    } else if (props.hideScroll && hideScrollWindowCnt === 1) {
+      // window close
       bodyElem.style.removeProperty('padding-right');
       bodyElem.classList.remove('ev-window-scroll-lock');
     }
@@ -161,7 +174,7 @@ const useModel = () => {
           setBasePosition();
         });
       }
-    },
+    }
   );
 
   return {
@@ -178,13 +191,8 @@ const useModel = () => {
 
 const useMouseEvent = (param) => {
   const { props, emit } = getCurrentInstance();
-  const {
-    windowRef,
-    headerRef,
-    isFullExpandWindow,
-    numberToUnit,
-    removeUnit,
-  } = param;
+  const { windowRef, headerRef, isFullExpandWindow, numberToUnit, removeUnit } =
+    param;
 
   const draggingMinSize = 50;
   const grabbingBorderSize = 5;
@@ -235,7 +243,9 @@ const useMouseEvent = (param) => {
     const startPosY = headerPaddingInfo.top;
     const endPosY = startPosY + headerRef.value.offsetHeight;
 
-    return posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY;
+    return (
+      posX > startPosX && posX < endPosX && posY > startPosY && posY < endPosY
+    );
   };
 
   const setDragStyle = (paramObj) => {
@@ -288,8 +298,14 @@ const useMouseEvent = (param) => {
       tMinHeight = props.minHeight;
     }
 
-    width = removeUnit(width, 'horizontal') > removeUnit(tMinWidth, 'horizontal') ? width : tMinWidth;
-    height = removeUnit(height, 'vertical') > removeUnit(tMinHeight, 'vertical') ? height : tMinHeight;
+    width =
+      removeUnit(width, 'horizontal') > removeUnit(tMinWidth, 'horizontal')
+        ? width
+        : tMinWidth;
+    height =
+      removeUnit(height, 'vertical') > removeUnit(tMinHeight, 'vertical')
+        ? height
+        : tMinHeight;
 
     dragStyle.top = numberToUnit(top);
     dragStyle.left = numberToUnit(left);
@@ -310,8 +326,8 @@ const useMouseEvent = (param) => {
       const y = e.clientY - rect.top;
       const top = y < grabbingBorderSize;
       const left = x < grabbingBorderSize;
-      const right = x >= (rect.width - grabbingBorderSize);
-      const bottom = y >= (rect.height - grabbingBorderSize);
+      const right = x >= rect.width - grabbingBorderSize;
+      const bottom = y >= rect.height - grabbingBorderSize;
 
       if ((top && left) || (bottom && right)) {
         windowRef.value.style.cursor = 'nwse-resize';
@@ -353,8 +369,8 @@ const useMouseEvent = (param) => {
     let left = clickedInfo.left;
     let width = clickedInfo.width;
     let height = clickedInfo.height;
-    const maxTop = (top + clickedInfo.height) - minHeight;
-    const maxLeft = (left + clickedInfo.width) - minWidth;
+    const maxTop = top + clickedInfo.height - minHeight;
+    const maxLeft = left + clickedInfo.width - minWidth;
 
     if (isTop) {
       top = clickedInfo.top + diffY;
@@ -394,9 +410,11 @@ const useMouseEvent = (param) => {
   const getValidTop = (windowHeight, top) => {
     let tempTop = top;
 
-    if (tempTop < 0) { // 상
+    if (tempTop < 0) {
+      // 상
       tempTop = 0;
-    } else if (tempTop > windowHeight - draggingMinSize) { // 하
+    } else if (tempTop > windowHeight - draggingMinSize) {
+      // 하
       tempTop = Math.floor(windowHeight - draggingMinSize);
     }
     return tempTop;
@@ -404,9 +422,11 @@ const useMouseEvent = (param) => {
   // 브라우저 좌우 위치 제약
   const getValidLeft = (windowWidth, left) => {
     let tempLeft = left;
-    if (tempLeft < -(clickedInfo.width - draggingMinSize)) { // 좌
+    if (tempLeft < -(clickedInfo.width - draggingMinSize)) {
+      // 좌
       tempLeft = -Math.floor(clickedInfo.width - draggingMinSize);
-    } else if (tempLeft > windowWidth - draggingMinSize) { // 우
+    } else if (tempLeft > windowWidth - draggingMinSize) {
+      // 우
       tempLeft = Math.floor(windowWidth - draggingMinSize);
     }
     return tempLeft;
@@ -466,8 +486,8 @@ const useMouseEvent = (param) => {
       const y = e.clientY - clientRect.top;
       const isGrabTop = y < grabbingBorderSize;
       const isGrabLeft = x < grabbingBorderSize;
-      const isGrabRight = x >= (clientRect.width - grabbingBorderSize);
-      const isGrabBottom = y >= (clientRect.height - grabbingBorderSize);
+      const isGrabRight = x >= clientRect.width - grabbingBorderSize;
+      const isGrabBottom = y >= clientRect.height - grabbingBorderSize;
 
       grabbingBorderPosInfo.top = isGrabTop;
       grabbingBorderPosInfo.left = isGrabLeft;
@@ -483,9 +503,10 @@ const useMouseEvent = (param) => {
       pressedSpot = 'header';
     }
 
-    if (!pressedSpot
-      || (!props.draggable && pressedSpot === 'header')
-      || (!props.resizable && pressedSpot === 'border')
+    if (
+      !pressedSpot ||
+      (!props.draggable && pressedSpot === 'header') ||
+      (!props.resizable && pressedSpot === 'border')
     ) {
       return;
     }
@@ -581,7 +602,7 @@ const useMouseEvent = (param) => {
       if (!newVal) {
         initWindowInfo();
       }
-    },
+    }
   );
 
   return {
@@ -608,14 +629,18 @@ const activeWindows = (() => {
     },
     remove(inactiveWindow) {
       if (inactiveWindow === null || inactiveWindow === undefined) return;
-      windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
+      windows = windows.filter(
+        (activeWindow) => activeWindow.sequence !== inactiveWindow.sequence
+      );
     },
 
     get windows() {
       return windows.slice();
     },
     getWindowBySequence(targetSequence) {
-      return windows.find(activeWindow => activeWindow.sequence === targetSequence);
+      return windows.find(
+        (activeWindow) => activeWindow.sequence === targetSequence
+      );
     },
 
     isEmpty() {
@@ -650,7 +675,7 @@ const zIndexService = (() => {
       return UPPER_LIMIT + INCREMENT;
     },
     getPrevFrom(index) {
-      const prev = current - (index * INCREMENT);
+      const prev = current - index * INCREMENT;
 
       if (prev <= LOWER) return LOWER;
       return prev;
@@ -668,7 +693,10 @@ const zIndexService = (() => {
 })();
 
 const getZIndexFromElement = (element) => {
-  const zIndex = window.getComputedStyle(element).getPropertyValue('z-index').trim();
+  const zIndex = window
+    .getComputedStyle(element)
+    .getPropertyValue('z-index')
+    .trim();
 
   if (!zIndex || isNaN(zIndex)) return 700; // window 초기 z-index 값
 
@@ -685,10 +713,12 @@ const getActiveWindowsOrderByZIndexAsc = () => {
     return -1;
   };
 
-  const activeWindowsSorted = Array.prototype.map.call(activeWindows.windows, activeWindow => ({
-    ...activeWindow,
-    zIndex: getZIndexFromElement(activeWindow.elem),
-  })).sort(compareByZIndex);
+  const activeWindowsSorted = Array.prototype.map
+    .call(activeWindows.windows, (activeWindow) => ({
+      ...activeWindow,
+      zIndex: getZIndexFromElement(activeWindow.elem),
+    }))
+    .sort(compareByZIndex);
 
   return activeWindowsSorted;
 };
@@ -746,12 +776,13 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
   };
   // escClose 관련 로직 끝
 
-
   // focusable 관련 로직 시작
   const setZIndexToWindow = ({ elem, zIndex }) => {
     // 모달인 경우에는 dim layer도 같이 z-index 높여준다.
     if (props.isModal) {
-      const dimLayerElem = elem.parentElement.getElementsByClassName('ev-window-dim-layer')[0];
+      const dimLayerElem = elem.parentElement.getElementsByClassName(
+        'ev-window-dim-layer'
+      )[0];
       dimLayerElem.style.zIndex = zIndex;
     }
 
@@ -768,14 +799,15 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
     setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
   };
 
-  const sameAsCurrent = windowData => String(windowData.sequence)
-    === windowRef.value.dataset.sequence;
+  const sameAsCurrent = (windowData) =>
+    String(windowData.sequence) === windowRef.value.dataset.sequence;
 
   // 할당하려는 z-index 값이 상한일 때
   const reassignZIndex = () => {
     const activeWindowsZIndexAsc = getActiveWindowsOrderByZIndexAsc();
 
-    const overCountLimit = activeWindows.windows.length > zIndexService.getAllocableCount();
+    const overCountLimit =
+      activeWindows.windows.length > zIndexService.getAllocableCount();
     // 할당 가능한 z-index 수보다 많은 Window를 띄웠을 때
     if (overCountLimit) {
       const activeWindowsZIndexDesc = activeWindowsZIndexAsc.reverse();
@@ -833,7 +865,6 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
   };
   // focusable 관련 로직 끝
 
-
   /*
     실행 시점(=Window 열림):
       visible 초기값이 true일 때 watch를 실행시키지 않아 onMounted hook 사용
@@ -876,7 +907,8 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
           clearTimeout(timer);
         }
       });
-  });
+    }
+  );
 
   watch(
     () => props.escClose,
@@ -884,7 +916,7 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
       if (!props.visible) return;
       const currentWindow = activeWindows.getWindowBySequence(sequence);
       if (currentWindow) currentWindow.escClose = escClose;
-    },
+    }
   );
 
   return {
@@ -892,8 +924,4 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
   };
 };
 
-export {
-  useModel,
-  useMouseEvent,
-  useEscCloseAndFocusable,
-};
+export { useModel, useMouseEvent, useEscCloseAndFocusable };

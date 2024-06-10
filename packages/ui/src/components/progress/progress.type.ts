@@ -1,6 +1,5 @@
 export type NonEmptyArray<T> = [T, ...T[]];
 
-
 /**
  * NOTE: Vue에서 CssProperties를 사용하면 빌드 후에 문제가 생깁니다.
  */

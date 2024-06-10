@@ -12,7 +12,8 @@ export const commonFunctions = (params) => {
    */
   const isRenderer = (column = {}) => !!column?.render?.use;
   const getComponentName = (type = '') => {
-    const setUpperCaseFirstStr = str => str.charAt(0).toUpperCase() + str.slice(1);
+    const setUpperCaseFirstStr = (str) =>
+      str.charAt(0).toUpperCase() + str.slice(1);
     const rendererStr = 'Renderer';
     let typeStr = '';
     if (type.indexOf('_') !== -1) {
@@ -33,7 +34,10 @@ export const commonFunctions = (params) => {
    * @returns {number|string} 변환된 데이터
    */
   const getConvertValue = (column, value) => {
-    let convertValue = column.type === 'number' || column.type === 'float' ? Number(value) : value;
+    let convertValue =
+      column.type === 'number' || column.type === 'float'
+        ? Number(value)
+        : value;
 
     if (column.type === 'number') {
       convertValue = numberWithComma(value);
@@ -51,7 +55,8 @@ export const commonFunctions = (params) => {
    * @param {string} field - 컬럼 필드명
    * @returns {number} 일치한다면 컬럼 인덱스, 일치하지 않는다면 -1
    */
-  const getColumnIndex = field => props.columns.findIndex(column => column.field === field);
+  const getColumnIndex = (field) =>
+    props.columns.findIndex((column) => column.field === field);
   const setPixelUnit = (value) => {
     let size = value;
     const hasPx = size.toString().indexOf('px') >= 0;
@@ -62,19 +67,24 @@ export const commonFunctions = (params) => {
     return size;
   };
   const checkHeader = (rows) => {
-    checkInfo.isHeaderChecked = !!rows.length && rows.every(row => row.checked);
-    const uncheckableList = rows.filter(row => row.uncheckable);
+    checkInfo.isHeaderChecked =
+      !!rows.length && rows.every((row) => row.checked);
+    const uncheckableList = rows.filter((row) => row.uncheckable);
     if (uncheckableList.length) {
-      const checkedList = rows.filter(row => row.checked);
-      const isAllUncheckable = rows.every(row => uncheckableList.includes(row));
+      const checkedList = rows.filter((row) => row.checked);
+      const isAllUncheckable = rows.every((row) =>
+        uncheckableList.includes(row)
+      );
 
-      checkInfo.isHeaderChecked = !isAllUncheckable
-        && (uncheckableList.length + checkedList.length === rows.length);
+      checkInfo.isHeaderChecked =
+        !isAllUncheckable &&
+        uncheckableList.length + checkedList.length === rows.length;
       checkInfo.isHeaderUncheckable = isAllUncheckable;
     }
-    checkInfo.isHeaderIndeterminate = !!rows.length
-      && rows.some(row => row.checked || row.indeterminate)
-      && !checkInfo.isHeaderChecked;
+    checkInfo.isHeaderIndeterminate =
+      !!rows.length &&
+      rows.some((row) => row.checked || row.indeterminate) &&
+      !checkInfo.isHeaderChecked;
   };
   return {
     isRenderer,
@@ -108,8 +118,10 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
     if (bodyEl) {
       const rowHeight = resizeInfo.rowHeight;
-      const rowCount = bodyEl.clientHeight > rowHeight
-        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const rowCount =
+        bodyEl.clientHeight > rowHeight
+          ? Math.ceil(bodyEl.clientHeight / rowHeight)
+          : store.length;
       const totalScrollHeight = store.length * rowHeight;
       let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
       if (firstVisibleIndex > store.length - 1) {
@@ -122,12 +134,18 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length
-        || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar =
+        rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
-        - scrollInfo.vScrollTopHeight;
-      if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
+      scrollInfo.vScrollBottomHeight =
+        totalScrollHeight -
+        stores.viewStore.length * rowHeight -
+        scrollInfo.vScrollTopHeight;
+      if (
+        isScroll &&
+        pageInfo.isInfinite &&
+        scrollInfo.vScrollBottomHeight === 0
+      ) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
         pageInfo.startIndex = lastIndex;
@@ -145,7 +163,8 @@ export const scrollEvent = (params) => {
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
     summaryScroll.value = bodyEl.scrollLeft;
-    scrollInfo.hasHorizontalScrollBar = bodyEl.clientWidth < tableEl.clientWidth;
+    scrollInfo.hasHorizontalScrollBar =
+      bodyEl.clientWidth < tableEl.clientWidth;
   };
   /**
    * scroll 이벤트를 처리한다.
@@ -201,21 +220,30 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
-      const result = stores.orderedColumns.reduce((acc, column) => {
-        if (column.hide || column.hiddenDisplay) {
+      const result = stores.orderedColumns.reduce(
+        (acc, column) => {
+          if (column.hide || column.hiddenDisplay) {
+            return acc;
+          }
+
+          if (column.width) {
+            acc.totalWidth += column.width;
+          } else {
+            acc.emptyCount++;
+          }
+
           return acc;
+        },
+        {
+          totalWidth: contextInfo.customContextMenu.length ? 30 : 0,
+          emptyCount: 0,
         }
+      );
 
-        if (column.width) {
-          acc.totalWidth += column.width;
-        } else {
-          acc.emptyCount++;
-        }
-
-        return acc;
-      }, { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 });
-
-      if (resizeInfo.rowHeight * store.length > elHeight - resizeInfo.scrollWidth) {
+      if (
+        resizeInfo.rowHeight * store.length >
+        elHeight - resizeInfo.scrollWidth
+      ) {
         elWidth -= resizeInfo.scrollWidth;
       }
 
@@ -225,20 +253,24 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        remainWidth = columnWidth
-          - (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
+        remainWidth =
+          columnWidth -
+          Math.floor(columnWidth / result.emptyCount) * result.emptyCount;
         columnWidth = Math.floor(columnWidth / result.emptyCount);
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
 
-      columnWidth = columnWidth < resizeInfo.minWidth ? resizeInfo.minWidth : columnWidth;
+      columnWidth =
+        columnWidth < resizeInfo.minWidth ? resizeInfo.minWidth : columnWidth;
       resizeInfo.columnWidth = columnWidth;
     }
 
     stores.orderedColumns.forEach((column) => {
       const item = column;
-      const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      const minWidth = isRenderer(column)
+        ? resizeInfo.rendererMinWidth
+        : resizeInfo.minWidth;
       if (item.width && item.width < minWidth) {
         item.width = minWidth;
       }
@@ -302,7 +334,8 @@ export const resizeEvent = (params) => {
     const headerLeft = headerEl.getBoundingClientRect().left;
     const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
     const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      ? resizeInfo.rendererMinWidth
+      : resizeInfo.minWidth;
     const columnRect = columnEl.getBoundingClientRect();
     const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
     const resizeLineEl = elementInfo.resizeLine;
@@ -383,9 +416,12 @@ export const clickEvent = (params) => {
    */
   let timer = null;
   const onRowClick = (event, row) => {
-    if (event.target && event.target.parentElement
-      && (event.target.parentElement.classList.contains('row-checkbox-input')
-        || event.target.closest('td')?.classList?.contains('row-contextmenu'))) {
+    if (
+      event.target &&
+      event.target.parentElement &&
+      (event.target.parentElement.classList.contains('row-checkbox-input') ||
+        event.target.closest('td')?.classList?.contains('row-contextmenu'))
+    ) {
       return false;
     }
     clearTimeout(timer);
@@ -395,7 +431,9 @@ export const clickEvent = (params) => {
           row.selected = false;
           if (selectInfo.multiple) {
             if (event.ctrlKey) {
-              selectInfo.selectedRow = selectInfo.selectedRow.filter(s => s.index !== row.index);
+              selectInfo.selectedRow = selectInfo.selectedRow.filter(
+                (s) => s.index !== row.index
+              );
             } else {
               selectInfo.selectedRow = [row];
             }
@@ -404,9 +442,12 @@ export const clickEvent = (params) => {
           }
         } else {
           row.selected = true;
-          if (event.ctrlKey
-            && selectInfo.multiple
-            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
+          if (
+            event.ctrlKey &&
+            selectInfo.multiple &&
+            (!selectInfo.limitCount ||
+              selectInfo.limitCount > selectInfo.selectedRow.length)
+          ) {
             selectInfo.selectedRow.push(row);
           } else {
             selectInfo.selectedRow = [row];
@@ -432,13 +473,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const {
-    checkInfo,
-    stores,
-    checkHeader,
-    pageInfo,
-    getPagingData,
-  } = params;
+  const { checkInfo, stores, checkHeader, pageInfo, getPagingData } = params;
   const { emit } = getCurrentInstance();
   /**
    * row에 대한 체크 상태를 해제한다.
@@ -447,7 +482,8 @@ export const checkEvent = (params) => {
    */
   const unCheckedRow = (row) => {
     const index = stores.treeStore.findIndex(
-      item => item.index === row.index);
+      (item) => item.index === row.index
+    );
 
     if (index !== -1) {
       stores.treeStore[index].checked = row.checked;
@@ -461,8 +497,9 @@ export const checkEvent = (params) => {
           checkInfo.checkedRows.push(childNode);
         }
         if (!node.checked) {
-          checkInfo.checkedRows = checkInfo.checkedRows
-            .filter(checked => checked.index !== childNode.index);
+          checkInfo.checkedRows = checkInfo.checkedRows.filter(
+            (checked) => checked.index !== childNode.index
+          );
         }
         childNode.checked = node.checked && !childNode.uncheckable;
 
@@ -475,22 +512,27 @@ export const checkEvent = (params) => {
   const onCheckParent = (node) => {
     const parentNode = node.parent;
     if (parentNode) {
-      const isCheck = parentNode.children.every(n => n.checked);
+      const isCheck = parentNode.children.every((n) => n.checked);
       parentNode.checked = isCheck && !parentNode.uncheckable;
-      const uncheckableList = parentNode.children.filter(n => n.uncheckable);
+      const uncheckableList = parentNode.children.filter((n) => n.uncheckable);
       if (uncheckableList.length) {
-        const checkedList = parentNode.children.filter(n => n.checked);
-        if (uncheckableList.length + checkedList.length === parentNode.children.length) {
+        const checkedList = parentNode.children.filter((n) => n.checked);
+        if (
+          uncheckableList.length + checkedList.length ===
+          parentNode.children.length
+        ) {
           parentNode.checked = true;
         }
       }
 
-      parentNode.indeterminate = !isCheck
-        && parentNode.children.some(n => n.checked || n.indeterminate);
+      parentNode.indeterminate =
+        !isCheck &&
+        parentNode.children.some((n) => n.checked || n.indeterminate);
 
       if (!parentNode.checked) {
-        checkInfo.checkedRows = checkInfo.checkedRows
-          .filter(checked => checked.index !== parentNode.index);
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(
+          (checked) => checked.index !== parentNode.index
+        );
       } else {
         checkInfo.checkedRows.push(parentNode);
       }
@@ -537,7 +579,9 @@ export const checkEvent = (params) => {
         checkInfo.checkedRows = [];
         return;
       }
-      checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== row.index);
+      checkInfo.checkedRows = checkInfo.checkedRows.filter(
+        (it) => it.index !== row.index
+      );
     };
 
     onSingleMode();
@@ -568,12 +612,15 @@ export const checkEvent = (params) => {
     store.forEach((row) => {
       row.checked = status && !row.uncheckable;
       if (row.checked) {
-        if (!checkInfo.checkedRows.find(checked => checked.index === row.index)) {
+        if (
+          !checkInfo.checkedRows.find((checked) => checked.index === row.index)
+        ) {
           checkInfo.checkedRows.push(row);
         }
       } else {
-        checkInfo.checkedRows = checkInfo.checkedRows
-          .filter(checked => checked.index !== row.index);
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(
+          (checked) => checked.index !== row.index
+        );
       }
       row.indeterminate = false;
     });
@@ -604,17 +651,16 @@ export const contextMenuEvent = (params) => {
 
     if (useCustom && contextInfo.customContextMenu.length) {
       const row = selectInfo.selectedRow;
-      const customItems = contextInfo.customContextMenu.map(
-        (item) => {
-          const menuItem = item;
-          if (menuItem.validate) {
-            menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
-          }
+      const customItems = contextInfo.customContextMenu.map((item) => {
+        const menuItem = item;
+        if (menuItem.validate) {
+          menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+        }
 
-          menuItem.selectedRow = row ?? [];
+        menuItem.selectedRow = row ?? [];
 
-          return menuItem;
-        });
+        return menuItem;
+      });
 
       menuItems.push(...customItems);
     }
@@ -649,7 +695,9 @@ export const contextMenuEvent = (params) => {
     const rowIndex = target.closest('.row')?.dataset?.index;
 
     if (rowIndex) {
-      const index = stores.viewStore.findIndex(v => v.index === Number(rowIndex));
+      const index = stores.viewStore.findIndex(
+        (v) => v.index === Number(rowIndex)
+      );
       const rowData = stores.viewStore[index];
       selectInfo.selectedRow = [rowData];
       setContextMenu();
@@ -666,7 +714,8 @@ export const contextMenuEvent = (params) => {
    * @param {object} e - 이벤트 객체
    */
   const onGridSettingContextMenu = (e) => {
-    const { useDefaultColumnSetting, columnSettingTextInfo } = columnSettingInfo;
+    const { useDefaultColumnSetting, columnSettingTextInfo } =
+      columnSettingInfo;
     const columnListMenu = {
       text: columnSettingTextInfo?.title ?? 'Column List',
       isShowMenu: true,
@@ -756,14 +805,14 @@ export const treeEvent = (params) => {
         }
         if (node.children) {
           node.hasChild = true;
-          node.children.forEach(child =>
+          node.children.forEach((child) =>
             setNodeData({
               node: child,
               level: level + 1,
               isShow: node.show && node.expand,
               parent: node,
               uncheckable: node.uncheckable,
-            }),
+            })
           );
         }
       }
@@ -856,9 +905,13 @@ export const filterEvent = (params) => {
             let columnValue = row[column.field] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
-              if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
+              if (
+                !column.hide &&
+                (column?.searchable === undefined || column?.searchable)
+              ) {
                 columnValue = getConvertValue(column, columnValue).toString();
-                isSameWord = columnValue.toLowerCase()
+                isSameWord = columnValue
+                  .toLowerCase()
                   .includes(searchWord.toString().toLowerCase());
                 if (isSameWord) {
                   break;
@@ -902,13 +955,7 @@ export const filterEvent = (params) => {
 
 export const pagingEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const {
-    stores,
-    pageInfo,
-    filterInfo,
-    elementInfo,
-    clearCheckInfo,
-  } = params;
+  const { stores, pageInfo, filterInfo, elementInfo, clearCheckInfo } = params;
   const getPagingData = () => {
     const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
     const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
@@ -927,8 +974,10 @@ export const pagingEvent = (params) => {
       searchInfo: {
         searchWord: filterInfo.searchWord,
         searchColumns: stores.orderedColumns
-          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
-          .map(d => d.field),
+          .filter(
+            (c) => !c.hide && (c?.searchable === undefined || c?.searchable)
+          )
+          .map((d) => d.field),
       },
     });
     if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {

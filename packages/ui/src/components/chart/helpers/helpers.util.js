@@ -35,8 +35,14 @@ export default {
   getColorStringType(colorStr) {
     const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
     const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(noneWhiteSpaceColorStr);
-    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(noneWhiteSpaceColorStr);
-    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(noneWhiteSpaceColorStr);
+    const isRGB =
+      /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(
+        noneWhiteSpaceColorStr
+      );
+    const isRGBA =
+      /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(
+        noneWhiteSpaceColorStr
+      );
     let result = '';
 
     if (isHEX) {
@@ -69,10 +75,15 @@ export default {
         resultRGBA = `rgba(${this.hexToRgb(noneWhiteSpaceColorStr)},${opacity})`;
         break;
       case 'RGB':
-        resultRGBA = noneWhiteSpaceColorStr.replace(')', `, ${opacity})`).replace('rgb', 'rgba');
+        resultRGBA = noneWhiteSpaceColorStr
+          .replace(')', `, ${opacity})`)
+          .replace('rgb', 'rgba');
         break;
       case 'RGBA':
-        resultRGBA = noneWhiteSpaceColorStr.replace(`${this.getOpacity(colorStr)})`, `${opacity})`);
+        resultRGBA = noneWhiteSpaceColorStr.replace(
+          `${this.getOpacity(colorStr)})`,
+          `${opacity})`
+        );
         break;
       default:
         resultRGBA = `rgba(0, 0, 0, ${opacity})`;
@@ -259,7 +270,10 @@ export default {
 
     let len = temp.length;
     while (tempWidth >= maxWidth - ellipsisWidth && len-- > 0) {
-      temp = direction === 'right' ? temp.substring(0, len) : temp.substring(1, temp.length);
+      temp =
+        direction === 'right'
+          ? temp.substring(0, len)
+          : temp.substring(1, temp.length);
       tempWidth = ctx.measureText(temp).width;
     }
 
@@ -284,8 +298,8 @@ export default {
       backgroundColor,
       textColor,
     } = param;
-    const sx = x - (width / 2);
-    const ex = x + (width / 2);
+    const sx = x - width / 2;
+    const ex = x + width / 2;
     const sy = y - height;
     const ey = y;
 
@@ -314,7 +328,7 @@ export default {
     ctx.fillStyle = textColor || '#FFF';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.fillText(`${text}`, x, sy + height / 2);
     ctx.restore();
     ctx.beginPath();
   },

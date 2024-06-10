@@ -48,23 +48,34 @@ class Line {
     }
 
     const {
-      ctx, chartRect,
-      labelOffset, axesSteps,
-      selectLabel, selectSeries, legendHitInfo,
+      ctx,
+      chartRect,
+      labelOffset,
+      axesSteps,
+      selectLabel,
+      selectSeries,
+      legendHitInfo,
       isBrush,
     } = param;
 
     // about selectLabel
     const selectLabelOption = selectLabel?.option;
-    const useSelectLabel = selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
+    const useSelectLabel =
+      selectLabelOption?.use && selectLabelOption?.useSeriesOpacity;
     const selectedLabelIndexList = selectLabel?.selected?.dataIndex ?? [];
 
     // set Style
     let extent;
     if (legendHitInfo) {
-      extent = this.extent[legendHitInfo?.sId === this.sId ? 'highlight' : 'downplay'];
-    } else if (selectSeries?.option?.use && selectSeries?.selected?.seriesId?.length) {
-      const isSelectedSeries = selectSeries?.selected?.seriesId?.includes(this.sId);
+      extent =
+        this.extent[legendHitInfo?.sId === this.sId ? 'highlight' : 'downplay'];
+    } else if (
+      selectSeries?.option?.use &&
+      selectSeries?.selected?.seriesId?.length
+    ) {
+      const isSelectedSeries = selectSeries?.selected?.seriesId?.includes(
+        this.sId
+      );
       extent = this.extent[isSelectedSeries ? 'highlight' : 'downplay'];
     } else if (useSelectLabel && selectedLabelIndexList.length) {
       extent = this.extent.downplay;
@@ -72,7 +83,8 @@ class Line {
       extent = this.extent.normal;
     }
 
-    const getOpacity = colorStr => (colorStr.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
+    const getOpacity = (colorStr) =>
+      colorStr.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity;
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
@@ -96,7 +108,8 @@ class Line {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const yArea =
+      chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
     if (this.combo) {
       barAreaByCombo = xArea / (this.data.length || 1);
@@ -104,11 +117,13 @@ class Line {
       this.size.comboOffset = barAreaByCombo;
     }
 
-    const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);
+    const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const getXPos = (val) =>
+      Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    const getYPos = (val) =>
+      Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
     // draw line
     let needCutoff = false;
@@ -140,10 +155,11 @@ class Line {
         }
       }
 
-      const isNullValue = Util.isNullOrUndefined(prev.o)
-        || Util.isNullOrUndefined(curr.o)
-        || Util.isNullOrUndefined(curr.x)
-        || Util.isNullOrUndefined(curr.y);
+      const isNullValue =
+        Util.isNullOrUndefined(prev.o) ||
+        Util.isNullOrUndefined(curr.o) ||
+        Util.isNullOrUndefined(curr.x) ||
+        Util.isNullOrUndefined(curr.y);
       if (isNullValue || needCutoff) {
         ctx.moveTo(x, y);
         needCutoff = false;
@@ -174,10 +190,15 @@ class Line {
             minValueYBottomPos = data.y;
           }
         });
-        const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
+        const gradient = ctx.createLinearGradient(
+          0,
+          chartRect.y2,
+          0,
+          maxValueYPos
+        );
         gradient.addColorStop(0, fillColor);
         gradient.addColorStop(0.5, fillColor);
-        gradient.addColorStop(1, (extent.opacity < 1 ? fillColor : mainColor));
+        gradient.addColorStop(1, extent.opacity < 1 ? fillColor : mainColor);
 
         ctx.fillStyle = gradient;
       } else {
@@ -188,14 +209,17 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => item?.o);
+      const valueArray = this.data.map((item) => item?.o);
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
         if (Util.isNullOrUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => item !== Util.isNullOrUndefined(item) && item !== this.passingValue);
+              (item) =>
+                item !== Util.isNullOrUndefined(item) &&
+                item !== this.passingValue
+            );
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
@@ -214,7 +238,10 @@ class Line {
           const singleData = this.data[startIndex];
           ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
-          ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
+          ctx.lineTo(
+            singleData.xp + lineWidth,
+            getYPos(singleData.b) ?? endPoint
+          );
           ctx.closePath();
           return;
         }
@@ -248,19 +275,34 @@ class Line {
     if (!isBrush) {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
-      const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      const blurStyle = Util.colorStringToRgba(
+        pointFillColor,
+        pointFillColorOpacity
+      );
 
       this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === this.passingValue) {
+        if (
+          curr.xp === null ||
+          curr.yp === null ||
+          curr.o === this.passingValue
+        ) {
           return;
         }
 
-        const isSingle = Util.isNullOrUndefined(this.data[ix - 1]?.o)
-          && Util.isNullOrUndefined(this.data[ix + 1]?.o);
+        const isSingle =
+          Util.isNullOrUndefined(this.data[ix - 1]?.o) &&
+          Util.isNullOrUndefined(this.data[ix + 1]?.o);
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
-          ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+          ctx.fillStyle =
+            isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
+          Canvas.drawPoint(
+            ctx,
+            this.pointStyle,
+            this.pointSize,
+            curr.xp,
+            curr.yp
+          );
         }
       });
     }
@@ -285,14 +327,29 @@ class Line {
     ctx.save();
     if (xp !== null && yp !== null && o !== this.passingValue) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
-      ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);
+      ctx.fillStyle = Util.colorStringToRgba(
+        this.color,
+        this.highlight.maxShadowOpacity
+      );
+      Canvas.drawPoint(
+        ctx,
+        this.pointStyle,
+        this.highlight.maxShadowSize,
+        xp,
+        yp
+      );
 
       ctx.fillStyle = this.color;
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, xp, yp);
 
       ctx.fillStyle = '#fff';
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.defaultSize, xp, yp);
+      Canvas.drawPoint(
+        ctx,
+        this.pointStyle,
+        this.highlight.defaultSize,
+        xp,
+        yp
+      );
     }
 
     ctx.restore();
@@ -311,14 +368,18 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
+    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
     const SPARE_XP = 0.5;
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
-      } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
+      } else if (
+        typeof this.beforeFindItemIndex === 'number' &&
+        this.show &&
+        useSelectLabelOrItem
+      ) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
@@ -340,8 +401,10 @@ class Line {
               const rightXp = gdata[m + 1].xp - xp;
 
               if (
-                Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP
-                && (this.beforeFindItemIndex === m || midXp === rightXp || midXp === leftXp)
+                Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP &&
+                (this.beforeFindItemIndex === m ||
+                  midXp === rightXp ||
+                  midXp === leftXp)
               ) {
                 if (this.beforeMouseXp - xp > 0) {
                   item.data = gdata[this.beforeFindItemIndex - 1];
@@ -372,7 +435,7 @@ class Line {
               item.index = m;
             }
 
-            if ((y - 6 <= yp) && (yp <= y + 6)) {
+            if (y - 6 <= yp && yp <= y + 6) {
               item.hit = true;
             }
 
@@ -412,7 +475,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
+    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
 
     let s = 0;
     let e = gdata.length - 1;
@@ -422,11 +485,11 @@ class Line {
       const x = gdata[m].xp;
       const y = gdata[m].yp;
 
-      if ((x - 2 <= xp) && (xp <= x + 2)) {
+      if (x - 2 <= xp && xp <= x + 2) {
         item.data = gdata[m];
         item.index = m;
 
-        if ((y - 2 <= yp) && (yp <= y + 2)) {
+        if (y - 2 <= yp && yp <= y + 2) {
           item.hit = true;
         }
 
@@ -466,7 +529,9 @@ class Line {
   findItems({ xsp, width }) {
     const xep = xsp + width;
 
-    return this.data.filter(seriesData => (xsp - 1 <= seriesData.xp) && (seriesData.xp <= xep + 1));
+    return this.data.filter(
+      (seriesData) => xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
+    );
   }
 }
 

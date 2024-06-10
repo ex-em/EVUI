@@ -21,7 +21,7 @@ export default {
     }
 
     const scalingFactor = area / (max - min);
-    return Math.ceil(startPoint + (scalingFactor * (value - min)));
+    return Math.ceil(startPoint + scalingFactor * (value - min));
   },
 
   /**
@@ -40,7 +40,7 @@ export default {
     }
 
     const scalingFactor = area / (max - min);
-    return Math.ceil(startPoint + (scalingFactor * (value - min)));
+    return Math.ceil(startPoint + scalingFactor * (value - min));
   },
 
   /**
@@ -66,7 +66,7 @@ export default {
     // Bar차트의 fillRect처리를 위해 invert값 추가 하여 Y값을 처리
     const scalingFactor = area / (max - min);
     if (startPoint) {
-      calcY = startPoint - (scalingFactor * (value - (min || 0)));
+      calcY = startPoint - scalingFactor * (value - (min || 0));
     } else {
       calcY = -(scalingFactor * (value - (min || 0)));
     }
@@ -105,9 +105,9 @@ export default {
         ctx.beginPath();
         edgeLength = (3 * radius) / Math.sqrt(3);
         height = (edgeLength * Math.sqrt(3)) / 2;
-        ctx.moveTo(x - (edgeLength / 2), y + (height / 3));
-        ctx.lineTo(x + (edgeLength / 2), y + (height / 3));
-        ctx.lineTo(x, y - ((2 * height) / 3));
+        ctx.moveTo(x - edgeLength / 2, y + height / 3);
+        ctx.lineTo(x + edgeLength / 2, y + height / 3);
+        ctx.lineTo(x, y - (2 * height) / 3);
         ctx.closePath();
         ctx.fill();
         break;
@@ -205,8 +205,8 @@ export default {
       const r = Math.min(radius, height / 2, width / 2);
       const left = x + r;
       const top = y + r;
-      const right = (x + width) - r;
-      const bottom = (y + height) - r;
+      const right = x + width - r;
+      const bottom = y + height - r;
 
       ctx.moveTo(x, top);
       if (left < right && top < bottom) {
@@ -254,10 +254,15 @@ export default {
     for (let ix = 0; ix < stops.length; ix++) {
       const stopIdx = stops[ix][0] ?? 0;
       const stopColor = stops[ix][1] ?? 'rgba(255, 255, 255, 0)';
-      const noneDownplayOpacity = stopColor.includes('rgba') ? Util.getOpacity(stopColor) : 1;
+      const noneDownplayOpacity = stopColor.includes('rgba')
+        ? Util.getOpacity(stopColor)
+        : 1;
       const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
 
-      gradient.addColorStop(stopIdx, Util.colorStringToRgba(stopColor, opacity));
+      gradient.addColorStop(
+        stopIdx,
+        Util.colorStringToRgba(stopColor, opacity)
+      );
     }
 
     return gradient;

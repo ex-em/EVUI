@@ -8,7 +8,7 @@
         :style="columnSettingStyle"
       >
         <div class="ev-grid-column-setting__header">
-          <p class="header-title"> {{ textInfo.title }} </p>
+          <p class="header-title">{{ textInfo.title }}</p>
           <ev-text-field
             v-model="searchVm"
             type="search"
@@ -31,7 +31,7 @@
             </ev-checkbox-group>
           </template>
           <template v-else>
-            <p class="is-empty"> {{ textInfo.empty }} </p>
+            <p class="is-empty">{{ textInfo.empty }}</p>
           </template>
         </div>
         <div class="ev-grid-column-setting__footer">
@@ -50,14 +50,7 @@
 
 <script>
 import { clickoutside } from '@/directives/clickoutside';
-import {
-  computed,
-  nextTick,
-  onBeforeMount,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, nextTick, onBeforeMount, reactive, ref, watch } from 'vue';
 
 export default {
   name: 'EVGridColumnSetting',
@@ -107,7 +100,7 @@ export default {
   setup(props, { emit }) {
     const isShowColumnSetting = computed({
       get: () => props.isShow,
-      set: val => emit('update:isShow', val),
+      set: (val) => emit('update:isShow', val),
     });
 
     const columnSettingWrapper = ref(null);
@@ -117,8 +110,9 @@ export default {
     const originColumnList = ref([]);
     const searchColumnList = ref([]);
     const applyColumnList = ref([]);
-    const columnList = computed(() => (isSearch.value
-      ? searchColumnList.value : originColumnList.value));
+    const columnList = computed(() =>
+      isSearch.value ? searchColumnList.value : originColumnList.value
+    );
     const isDisabled = computed(() => !columnList.value.length);
     let timer = null;
     let lastCheckedColumn = null;
@@ -128,13 +122,14 @@ export default {
     });
     const computedIsShowMenuOnClick = computed({
       get: () => props.isShowMenuOnClick,
-      set: val => emit('update:isShowMenuOnClick', val),
+      set: (val) => emit('update:isShowMenuOnClick', val),
     });
 
     const onCheckColumn = (columns) => {
       if (columns?.length === 1) {
         lastCheckedColumn = columns[0];
-      } else if (columns?.length < 1 && lastCheckedColumn !== null) { // 최소 한개 컬럼은 선택되도록
+      } else if (columns?.length < 1 && lastCheckedColumn !== null) {
+        // 최소 한개 컬럼은 선택되도록
         checkColumnGroup.value.push(lastCheckedColumn);
       }
     };
@@ -166,24 +161,25 @@ export default {
     };
 
     const initValue = () => {
-      const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
+      const columns = applyColumnList.value.length
+        ? applyColumnList.value
+        : originColumnList.value;
       checkColumnGroup.value = columns
-        .filter(col => !col.checked)
-        .map(col => col.label);
+        .filter((col) => !col.checked)
+        .map((col) => col.label);
       initSearchValue();
     };
     const onApplyColumn = () => {
-      applyColumnList.value = originColumnList.value
-        .filter((col) => {
-          if (checkColumnGroup.value.includes(col.label)) {
-            if (col?.checked) {
-              col.checked = false;
-            }
-            return true;
+      applyColumnList.value = originColumnList.value.filter((col) => {
+        if (checkColumnGroup.value.includes(col.label)) {
+          if (col?.checked) {
+            col.checked = false;
           }
-          return false;
-        });
-      const checkedColumns = applyColumnList.value.map(col => col.text);
+          return true;
+        }
+        return false;
+      });
+      const checkedColumns = applyColumnList.value.map((col) => col.text);
 
       emit('apply-column', checkedColumns);
       isShowColumnSetting.value = false;
@@ -192,15 +188,15 @@ export default {
 
     const setColumns = () => {
       originColumnList.value = props.columns
-        .filter(col => !col.hide && col.caption)
-        .map(col => ({
+        .filter((col) => !col.hide && col.caption)
+        .map((col) => ({
           label: col.caption,
           text: col.field,
           checked: col.hiddenDisplay,
         }));
       checkColumnGroup.value = originColumnList.value
-        .filter(col => !col.checked)
-        .map(col => col.label);
+        .filter((col) => !col.checked)
+        .map((col) => col.label);
       applyColumnList.value.length = 0;
     };
 
@@ -224,14 +220,16 @@ export default {
 
       const docWidth = document.documentElement.clientWidth;
       const docHeight = document.documentElement.clientHeight;
-      const columnSettingWrapperRect = columnSettingWrapper.value?.getBoundingClientRect();
+      const columnSettingWrapperRect =
+        columnSettingWrapper.value?.getBoundingClientRect();
       const columnSettingWidth = columnSettingWrapperRect?.width;
       const columnSettingHeight = columnSettingWrapperRect?.height;
 
       const { top, left, columnListMenuWidth } = props.position;
       let columnSettingLeft;
 
-      if (columnListMenuWidth) { // 컨텍스트 메뉴일 때
+      if (columnListMenuWidth) {
+        // 컨텍스트 메뉴일 때
         columnSettingLeft = left;
 
         if (docWidth < left + columnSettingWidth) {
@@ -247,26 +245,38 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    watch(() => props.columns, () => {
-      setColumns();
-    }, { immediate: true, deep: true });
+    watch(
+      () => props.columns,
+      () => {
+        setColumns();
+      },
+      { immediate: true, deep: true }
+    );
 
-    watch(() => isShowColumnSetting.value, async () => {
-      initValue();
+    watch(
+      () => isShowColumnSetting.value,
+      async () => {
+        initValue();
 
-      if (isShowColumnSetting.value) {
-        await setPosition();
+        if (isShowColumnSetting.value) {
+          await setPosition();
+        }
       }
-    });
+    );
 
-    watch(() => props.hiddenColumn, (value) => {
-      const filterColumns = applyColumnList.value.length
-        ? applyColumnList.value.filter(col => col.text !== value)
-        : originColumnList.value.filter(col => (col.text !== value && !col.checked));
+    watch(
+      () => props.hiddenColumn,
+      (value) => {
+        const filterColumns = applyColumnList.value.length
+          ? applyColumnList.value.filter((col) => col.text !== value)
+          : originColumnList.value.filter(
+              (col) => col.text !== value && !col.checked
+            );
 
-      applyColumnList.value = filterColumns;
-      checkColumnGroup.value = filterColumns.map(col => col.label);
-    });
+        applyColumnList.value = filterColumns;
+        checkColumnGroup.value = filterColumns.map((col) => col.label);
+      }
+    );
 
     return {
       columnSettingWrapper,
@@ -289,8 +299,8 @@ export default {
 .ev-grid-column-setting {
   position: absolute;
   width: 180px;
-  border: 1px solid #D0D0D0;
-  background: #FFFFFF;
+  border: 1px solid #d0d0d0;
+  background: #ffffff;
   font-size: 12px;
   z-index: 1;
   &__header {
@@ -304,8 +314,8 @@ export default {
   &__content {
     height: 120px;
     padding: 0 10px;
-    border-top: 1px solid #CED4DA;
-    border-bottom: 1px solid #CED4DA;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
     overflow: auto;
 
     .ev-checkbox {

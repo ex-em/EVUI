@@ -87,7 +87,10 @@
         </span>
       </template>
     </div>
-    <div v-if="errorMsg" class="ev-text-field-error">
+    <div
+      v-if="errorMsg"
+      class="ev-text-field-error"
+    >
       {{ errorMsg }}
     </div>
     <div

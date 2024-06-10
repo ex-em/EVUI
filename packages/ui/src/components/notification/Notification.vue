@@ -1,5 +1,8 @@
 <template>
-  <transition name="ev-notification-fade" appear>
+  <transition
+    name="ev-notification-fade"
+    appear
+  >
     <div
       v-show="state.isShow"
       class="ev-notification"
@@ -13,15 +16,28 @@
       @mouseleave="startTimer"
       @click="clickMsg"
     >
-      <span v-if="props.iconClass" class="ev-notification-icon">
+      <span
+        v-if="props.iconClass"
+        class="ev-notification-icon"
+      >
         <i :class="props.iconClass" />
       </span>
       <div class="ev-notification-content">
-        <p v-if="props.title" class="title">
+        <p
+          v-if="props.title"
+          class="title"
+        >
           {{ props.title }}
         </p>
-        <p v-if="props.useHTML" class="message" v-html="props.message" />
-        <p v-else class="message">
+        <p
+          v-if="props.useHTML"
+          class="message"
+          v-html="props.message"
+        />
+        <p
+          v-else
+          class="message"
+        >
           {{ props.message }}
         </p>
       </div>

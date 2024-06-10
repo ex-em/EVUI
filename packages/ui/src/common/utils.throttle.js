@@ -73,9 +73,9 @@ function throttle(func, wait, options) {
   }
 
   return debounce(func, wait, {
-    'leading': leading,
-    'maxWait': wait,
-    'trailing': trailing
+    leading: leading,
+    maxWait: wait,
+    trailing: trailing,
   });
 }
 

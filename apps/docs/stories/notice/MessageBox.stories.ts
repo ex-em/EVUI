@@ -11,8 +11,8 @@ const meta: Meta<typeof EvMessageBox> = {
       },
       options: ['success', 'error', 'warning', 'info'],
     },
-  }
-}
+  },
+};
 
 export default meta;
 type Story = StoryObj<typeof EvMessageBox>;
@@ -24,7 +24,7 @@ const StoryTemplate: Story = {
       const app = getCurrentInstance()?.appContext.config.globalProperties;
       const onClick = () => {
         app!.$messageBox(args);
-      }
+      };
       return { args, onClick };
     },
     template: `
@@ -34,7 +34,6 @@ const StoryTemplate: Story = {
               `,
   }),
 };
-
 
 export const Default: Story = {
   ...StoryTemplate,

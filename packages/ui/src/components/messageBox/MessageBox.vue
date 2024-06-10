@@ -1,6 +1,9 @@
 <template>
   <teleport to="body">
-    <transition name="ev-message-box-fade" appear>
+    <transition
+      name="ev-message-box-fade"
+      appear
+    >
       <div
         v-show="state.isShow"
         id="ev-message-box-modal"
@@ -18,11 +21,17 @@
           }"
           tabindex="-1"
         >
-          <span v-if="state.iconClass" class="ev-message-box-icon">
+          <span
+            v-if="state.iconClass"
+            class="ev-message-box-icon"
+          >
             <i :class="state.iconClass" />
           </span>
           <div class="ev-message-box-content">
-            <p v-if="props.title" class="ev-message-box-title">
+            <p
+              v-if="props.title"
+              class="ev-message-box-title"
+            >
               {{ props.title }}
             </p>
             <p
@@ -30,7 +39,10 @@
               class="ev-message-box-message"
               v-html="props.message"
             />
-            <p v-else class="ev-message-box-message">
+            <p
+              v-else
+              class="ev-message-box-message"
+            >
               {{ props.message }}
             </p>
           </div>

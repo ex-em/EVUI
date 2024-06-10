@@ -97,12 +97,15 @@ export default {
   },
   setup(props, { emit }) {
     const treeData = reactive(props.data);
-    const showExpandIcon = computed(() =>
-      (props.data.children && props.data.children.length));
+    const showExpandIcon = computed(
+      () => props.data.children && props.data.children.length
+    );
 
     const expandIconClasses = computed(() => {
       const expandIcon = props.expandIcon ? props.expandIcon : 'ev-icon-s-play';
-      const collapseIcon = props.expandIcon ? props.collapseIcon : 'ev-icon-s-play';
+      const collapseIcon = props.expandIcon
+        ? props.collapseIcon
+        : 'ev-icon-s-play';
       return props.data.expand ? collapseIcon : expandIcon;
     });
 
@@ -228,13 +231,15 @@ $expand-toggle-icon-size: 13px;
   cursor: pointer;
   vertical-align: middle;
 
-  &:hover, &-selected {
+  &:hover,
+  &-selected {
     @include evThemify() {
       color: evThemed('primary') !important;
     }
   }
 
-  &-disabled, &-disabled:hover {
+  &-disabled,
+  &-disabled:hover {
     cursor: not-allowed;
     user-select: none;
 
@@ -289,5 +294,4 @@ $expand-toggle-icon-size: 13px;
     }
   }
 }
-
 </style>

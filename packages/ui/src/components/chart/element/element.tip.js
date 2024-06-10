@@ -21,7 +21,9 @@ const modules = {
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
       const isHeatMap = opt.type === 'heatMap';
-      isExistSelectedLabel = isHeatMap ? this.drawLabelTipForHeatMap() : this.drawLabelTip();
+      isExistSelectedLabel = isHeatMap
+        ? this.drawLabelTipForHeatMap()
+        : this.drawLabelTip();
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -33,11 +35,7 @@ const modules = {
             return;
           }
 
-          const selArgs = this.calculateTipInfo(
-            seriesInfo,
-            'sel',
-            tipInfo,
-          );
+          const selArgs = this.calculateTipInfo(seriesInfo, 'sel', tipInfo);
 
           if (selArgs) {
             let isSamePos = false;
@@ -50,16 +48,29 @@ const modules = {
               if (tipOpt.tipText === 'label') {
                 const axisOpt = isHorizontal ? opt.axesY[0] : opt.axesX[0];
                 const label = selArgs.label;
-                selArgs.text = axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
+                selArgs.text =
+                  axisOpt.type === 'time'
+                    ? dayjs(label).format(axisOpt.timeFormat)
+                    : label;
               } else {
                 selArgs.text = numberWithComma(selArgs.value);
               }
 
-              this.drawTextTip({ opt: tipOpt, tipType: 'sel', seriesOpt: seriesInfo, isSamePos, ...selArgs });
+              this.drawTextTip({
+                opt: tipOpt,
+                tipType: 'sel',
+                seriesOpt: seriesInfo,
+                isSamePos,
+                ...selArgs,
+              });
             }
 
             if (tipOpt.showIndicator) {
-              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ...selArgs });
+              this.drawFixedIndicator({
+                opt: tipOpt,
+                seriesOpt: seriesInfo,
+                ...selArgs,
+              });
             }
           }
 
@@ -85,10 +96,19 @@ const modules = {
 
       if (maxTipOpt.use && maxArgs) {
         maxArgs.text = numberWithComma(maxArgs.value);
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
+        this.drawTextTip({
+          opt: maxTipOpt,
+          tipType: 'max',
+          seriesOpt: seriesInfo,
+          ...maxArgs,
+        });
 
         if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+          this.drawFixedIndicator({
+            opt: maxTipOpt,
+            seriesOpt: seriesInfo,
+            ...maxArgs,
+          });
         }
       }
     }
@@ -119,7 +139,8 @@ const modules = {
       y2: chartRect.y2 - labelOffset.bottom,
     };
 
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const yArea =
+      chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
 
     const graphX = this.axesSteps.x[series.xAxisIndex];
@@ -159,8 +180,10 @@ const modules = {
         value = lastTip.value;
         label = lastTip.label;
       } else if (lastTip.pos !== null) {
-        const item = type === 'bar'
-          ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
+        const item =
+          type === 'bar'
+            ? this.getItemByLabelIndex(lastTip.pos)
+            : this.getItemByLabel(lastTip.pos);
 
         value = item.useStack ? item.acc : item.value;
         label = item.label;
@@ -178,7 +201,7 @@ const modules = {
       if (scrollbarOpt?.use) {
         const [min, max] = scrollbarOpt?.range ?? [];
         if (ldata >= min && ldata <= max) {
-          ldata -= (min ?? 0);
+          ldata -= min ?? 0;
         } else {
           return false;
         }
@@ -186,12 +209,12 @@ const modules = {
 
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
-        cp = ysp - (size.cat * ldata) - size.cPad;
-        dp = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) - halfBarSize;
+        cp = ysp - size.cat * ldata - size.cPad;
+        dp = cp - (size.bar * size.ix - (size.h + size.bPad)) - halfBarSize;
       } else {
         halfBarSize = Math.round(size.w / 2);
-        cp = xsp + (size.cat * ldata) + size.cPad;
-        dp = cp + ((size.bar * size.ix) - (size.w + size.bPad)) + halfBarSize;
+        cp = xsp + size.cat * ldata + size.cPad;
+        dp = cp + (size.bar * size.ix - (size.w + size.bPad)) + halfBarSize;
       }
     } else if (type === 'line') {
       dp = Canvas.calculateX(
@@ -199,7 +222,7 @@ const modules = {
         graphX.graphMin,
         graphX.graphMax,
         xArea - size.comboOffset,
-        xsp + (size.comboOffset / 2),
+        xsp + size.comboOffset / 2
       );
     } else if (type === 'scatter') {
       dp = Canvas.calculateX(
@@ -207,7 +230,7 @@ const modules = {
         graphX.graphMin,
         graphX.graphMax,
         xArea,
-        xsp,
+        xsp
       );
     }
 
@@ -219,7 +242,19 @@ const modules = {
   drawFixedIndicator(param) {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.bufferCtx;
-    const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt, seriesOpt } = param;
+    const {
+      graphX,
+      graphY,
+      xArea,
+      yArea,
+      xsp,
+      ysp,
+      dp,
+      type,
+      value,
+      opt,
+      seriesOpt,
+    } = param;
     let offset = 0;
 
     if (type === 'line') {
@@ -232,15 +267,39 @@ const modules = {
 
     if (opt.fixedPosTop) {
       if (isHorizontal) {
-        gp = Canvas.calculateX(graphX.graphMax, graphX.graphMin, graphX.graphMax, xArea, xsp);
+        gp = Canvas.calculateX(
+          graphX.graphMax,
+          graphX.graphMin,
+          graphX.graphMax,
+          xArea,
+          xsp
+        );
       } else {
-        gp = Canvas.calculateY(graphY.graphMax, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        gp = Canvas.calculateY(
+          graphY.graphMax,
+          graphY.graphMin,
+          graphY.graphMax,
+          yArea,
+          ysp
+        );
         gp -= offset;
       }
     } else if (isHorizontal) {
-      gp = Canvas.calculateX(value, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      gp = Canvas.calculateX(
+        value,
+        graphX.graphMin,
+        graphX.graphMax,
+        xArea,
+        xsp
+      );
     } else {
-      gp = Canvas.calculateY(value, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      gp = Canvas.calculateY(
+        value,
+        graphY.graphMin,
+        graphY.graphMax,
+        yArea,
+        ysp
+      );
       gp -= offset;
     }
 
@@ -290,22 +349,34 @@ const modules = {
       };
       const labelAxes = isHorizontal ? this.axesY[0] : this.axesX[0];
       const valueAxes = isHorizontal ? this.axesX[0] : this.axesY[0];
-      const valueAxesRange = isHorizontal ? this.axesRange.x[0] : this.axesRange.y[0];
-      const valuePositionCalcFunction = isHorizontal ? Canvas.calculateX : Canvas.calculateY;
-      const labelPositionCalcFunction = isHorizontal ? Canvas.calculateY : Canvas.calculateX;
+      const valueAxesRange = isHorizontal
+        ? this.axesRange.x[0]
+        : this.axesRange.y[0];
+      const valuePositionCalcFunction = isHorizontal
+        ? Canvas.calculateX
+        : Canvas.calculateY;
+      const labelPositionCalcFunction = isHorizontal
+        ? Canvas.calculateY
+        : Canvas.calculateX;
       const scrollbarOpt = isHorizontal ? this.scrollbar.y : this.scrollbar.x;
 
-      const chartWidth = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-      const chartHeight = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const chartWidth =
+        chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+      const chartHeight =
+        chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
       const valueSpace = isHorizontal ? chartWidth : chartHeight;
       const valueStartPoint = aPos[valueAxes.units.rectStart];
       let offset = this.options.type === 'bar' ? 4 : 6;
       offset *= isHorizontal ? 1 : -1;
 
       const seriesList = Object.keys(this.seriesList ?? {});
-      const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
-      const isExistGrp = seriesList
-          .some(sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping);
+      const visibleSeries = seriesList.filter(
+        (sId) => this.seriesList[sId].show
+      );
+      const isExistGrp = seriesList.some(
+        (sId) =>
+          this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping
+      );
       const groups = this.data.groups?.[0] ?? [];
 
       let gp;
@@ -327,8 +398,14 @@ const modules = {
           const [min, max] = range;
           if (truthyNumber(min) && truthyNumber(max)) {
             labelCount = Math.floor((+max - +min) / interval) + 1;
-            startIndex = type === 'step' ? min : labelAxes.labels.findIndex(v => v === +min);
-            endIndex = type === 'step' ? max : labelAxes.labels.findIndex(v => v === +max);
+            startIndex =
+              type === 'step'
+                ? min
+                : labelAxes.labels.findIndex((v) => v === +min);
+            endIndex =
+              type === 'step'
+                ? max
+                : labelAxes.labels.findIndex((v) => v === +max);
           }
         }
 
@@ -337,7 +414,9 @@ const modules = {
         labelGap = (labelEndPoint - labelStartPoint) / labelCount;
       } else {
         graphX = this.axesSteps.x[0];
-        lineSeries = seriesList.find(sId => this.seriesList[sId]?.type === 'line');
+        lineSeries = seriesList.find(
+          (sId) => this.seriesList[sId]?.type === 'line'
+        );
         sizeObj = this.seriesList[lineSeries].size;
       }
 
@@ -345,15 +424,21 @@ const modules = {
         if (labelTipOpt.fixedPosTop) {
           value = valueAxesRange.max;
         } else if (isExistGrp) {
-          const sumValue = visibleSeries.reduce((ac, sId) => (
-            groups.includes(sId) ? ac + (selectedData[sId]?.value ?? selectedData[sId]) : ac), 0);
+          const sumValue = visibleSeries.reduce(
+            (ac, sId) =>
+              groups.includes(sId)
+                ? ac + (selectedData[sId]?.value ?? selectedData[sId])
+                : ac,
+            0
+          );
           const nonGroupValues = visibleSeries
-            .filter(sId => !groups.includes(sId))
-            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+            .filter((sId) => !groups.includes(sId))
+            .map((sId) => selectedData[sId]?.value ?? selectedData[sId]);
           value = Math.max(...nonGroupValues, sumValue);
         } else if (visibleSeries.length) {
-          const visibleValue = visibleSeries
-            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+          const visibleValue = visibleSeries.map(
+            (sId) => selectedData[sId]?.value ?? selectedData[sId]
+          );
           value = Math.max(...visibleValue);
         } else {
           value = valueAxesRange.max;
@@ -365,15 +450,17 @@ const modules = {
           }
 
           const labelIndex = dataIndex[i] - startIndex;
-          const labelCenter = Math.round(labelStartPoint + (labelGap * labelIndex));
-          dp = labelCenter + (labelGap / 2);
+          const labelCenter = Math.round(
+            labelStartPoint + labelGap * labelIndex
+          );
+          dp = labelCenter + labelGap / 2;
         } else {
           dp = labelPositionCalcFunction(
             label[i],
             graphX.graphMin,
             graphX.graphMax,
             chartWidth - sizeObj.comboOffset,
-            aPos.x1 + (sizeObj.comboOffset / 2),
+            aPos.x1 + sizeObj.comboOffset / 2
           );
         }
         gp = valuePositionCalcFunction(
@@ -381,7 +468,8 @@ const modules = {
           valueAxesRange.min,
           valueAxesRange.max,
           valueSpace,
-          valueStartPoint);
+          valueStartPoint
+        );
         gp += offset;
 
         this.showTip({
@@ -422,15 +510,16 @@ const modules = {
       const labelAxes = isHorizontal ? this.axesY[0] : this.axesX[0];
       const labelStartPoint = aPos[labelAxes.units.rectStart];
       const labelEndPoint = aPos[labelAxes.units.rectEnd];
-      const labelGap = (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
+      const labelGap =
+        (labelEndPoint - labelStartPoint) / labelAxes.labels.length;
 
       const valueAxes = isHorizontal ? this.axesX[0] : this.axesY[0];
       const offset = 6 * (isHorizontal ? 1 : -1);
       const gp = aPos[valueAxes.units.rectEnd] + offset;
 
       dataIndex?.forEach((index) => {
-        const labelCenter = Math.round(labelStartPoint + (labelGap * index));
-        const dp = labelCenter + (labelGap / 2);
+        const labelCenter = Math.round(labelStartPoint + labelGap * index);
+        const dp = labelCenter + labelGap / 2;
 
         this.showTip({
           context: this.bufferCtx,
@@ -481,17 +570,41 @@ const modules = {
 
     if (opt.fixedPosTop) {
       if (isHorizontal) {
-        gp = Canvas.calculateX(graphX.graphMax, graphX.graphMin, graphX.graphMax, xArea, xsp);
+        gp = Canvas.calculateX(
+          graphX.graphMax,
+          graphX.graphMin,
+          graphX.graphMax,
+          xArea,
+          xsp
+        );
         gp += offset;
       } else {
-        gp = Canvas.calculateY(graphY.graphMax, graphY.graphMin, graphY.graphMax, yArea, ysp);
+        gp = Canvas.calculateY(
+          graphY.graphMax,
+          graphY.graphMin,
+          graphY.graphMax,
+          yArea,
+          ysp
+        );
         gp -= offset;
       }
     } else if (isHorizontal) {
-      gp = Canvas.calculateX(value, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      gp = Canvas.calculateX(
+        value,
+        graphX.graphMin,
+        graphX.graphMax,
+        xArea,
+        xsp
+      );
       gp += offset;
     } else {
-      gp = Canvas.calculateY(value, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      gp = Canvas.calculateY(
+        value,
+        graphY.graphMin,
+        graphY.graphMax,
+        yArea,
+        ysp
+      );
       gp -= offset;
     }
 
@@ -499,15 +612,17 @@ const modules = {
 
     ctx.save();
     ctx.font = textStyle;
-    const maxTipWidth = Math.round(Math.max(ctx.measureText(text).width + 12, 40));
+    const maxTipWidth = Math.round(
+      Math.max(ctx.measureText(text).width + 12, 40)
+    );
 
     if (!isHorizontal) {
-      if (dp + (maxTipWidth / 2) > xep - 10) {
+      if (dp + maxTipWidth / 2 > xep - 10) {
         maxTipType = 'right';
-        tdp -= (maxTipWidth / 2) - (arrowSize * 2);
-      } else if (dp - (maxTipWidth / 2) < xsp + 10) {
+        tdp -= maxTipWidth / 2 - arrowSize * 2;
+      } else if (dp - maxTipWidth / 2 < xsp + 10) {
         maxTipType = 'left';
-        tdp += (maxTipWidth / 2) - (arrowSize * 2);
+        tdp += maxTipWidth / 2 - arrowSize * 2;
       }
     }
 
@@ -519,8 +634,8 @@ const modules = {
         type: maxTipType,
         width: maxTipWidth,
         height: maxTipHeight,
-        x: isHorizontal ? gp + (maxTipWidth / 2) : tdp,
-        y: isHorizontal ? tdp + (maxTipHeight / 2) : gp,
+        x: isHorizontal ? gp + maxTipWidth / 2 : tdp,
+        y: isHorizontal ? tdp + maxTipHeight / 2 : gp,
         opt,
         arrowSize,
         borderRadius,
@@ -548,12 +663,23 @@ const modules = {
    */
   showTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle } = param;
+    const {
+      type,
+      width,
+      height,
+      x,
+      y,
+      arrowSize,
+      borderRadius,
+      text,
+      opt,
+      textStyle,
+    } = param;
 
     const ctx = param.context;
 
-    const sx = x - (width / 2);
-    const ex = x + (width / 2);
+    const sx = x - width / 2;
+    const ex = x + width / 2;
     const sy = y - height;
     const ey = y;
 
@@ -568,9 +694,9 @@ const modules = {
     ctx.quadraticCurveTo(sx, sy, sx, sy + borderRadius);
 
     if (isHorizontal) {
-      ctx.lineTo(sx, sy + borderRadius + (arrowSize / 2));
-      ctx.lineTo(sx - arrowSize, ey - (height / 2));
-      ctx.lineTo(sx, ey - borderRadius - (arrowSize / 2));
+      ctx.lineTo(sx, sy + borderRadius + arrowSize / 2);
+      ctx.lineTo(sx - arrowSize, ey - height / 2);
+      ctx.lineTo(sx, ey - borderRadius - arrowSize / 2);
     }
 
     ctx.lineTo(sx, ey - borderRadius);
@@ -579,9 +705,9 @@ const modules = {
     if (!isHorizontal) {
       if (type === 'left') {
         ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
-        ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+        ctx.lineTo(sx + borderRadius + arrowSize * 2, ey);
       } else if (type === 'right') {
-        ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+        ctx.lineTo(ex - arrowSize * 2 - borderRadius, ey);
         ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
       } else {
         ctx.lineTo(x - arrowSize, ey);
@@ -603,7 +729,7 @@ const modules = {
     ctx.fillStyle = opt.tipTextColor ?? opt.tipStyle.textColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.fillText(`${text}`, x, sy + height / 2);
     ctx.restore();
   },
 

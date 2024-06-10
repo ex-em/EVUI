@@ -28,12 +28,15 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0) ||
+      (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 
-    const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+    const innerRadius =
+      Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(chartWidth, chartHeight);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
@@ -42,7 +45,8 @@ const modules = {
         return;
       }
 
-      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      let radius =
+        outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * ix;
       if (pieOption?.pieStroke?.use) {
         radius -= pieOption.pieStroke.lineWidth;
       }
@@ -53,7 +57,9 @@ const modules = {
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
-        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+        pie.ir =
+          outerRadius -
+          ((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1);
       } else {
         pie.ir = 1;
       }
@@ -83,12 +89,13 @@ const modules = {
 
             const { selectInfo, legendHitInfo } = hitInfo;
             series.isSelect = selectInfo?.sId === slice.id;
-            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
+            series.isDownplay = legendHitInfo && legendHitInfo.sId !== slice.id;
             series.type = isDoughnut ? 'doughnut' : 'pie';
             series.centerX = centerX;
             series.centerY = centerY;
             series.radius = radius;
-            series.doughnutHoleSize = radius * (pieOption.doughnutHoleSize ?? 0);
+            series.doughnutHoleSize =
+              radius * (pieOption.doughnutHoleSize ?? 0);
             series.startAngle = startAngle;
             series.endAngle = endAngle;
             series.data = { o: value, percentage };
@@ -125,12 +132,15 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0) ||
+      (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 
-    const innerRadius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+    const innerRadius =
+      Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
     const outerRadius = Math.min(chartWidth, chartHeight);
 
     for (let ix = 0; ix < pieDataSet.length; ix++) {
@@ -139,7 +149,8 @@ const modules = {
         return;
       }
 
-      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      let radius =
+        outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * ix;
       if (pieOption?.pieStroke?.use) {
         radius -= pieOption.pieStroke.lineWidth;
       }
@@ -150,7 +161,9 @@ const modules = {
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
-        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+        pie.ir =
+          outerRadius -
+          ((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1);
       } else {
         pie.ir = 1;
       }
@@ -187,12 +200,13 @@ const modules = {
 
             const { selectInfo, legendHitInfo } = hitInfo;
             series.isSelect = selectInfo?.sId === slice.id;
-            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
+            series.isDownplay = legendHitInfo && legendHitInfo.sId !== slice.id;
             series.type = 'sunburst';
             series.centerX = centerX;
             series.centerY = centerY;
             series.radius = radius;
-            series.doughnutHoleSize = radius * (pieOption.doughnutHoleSize ?? 0);
+            series.doughnutHoleSize =
+              radius * (pieOption.doughnutHoleSize ?? 0);
             series.startAngle = slice.sa;
             series.endAngle = slice.ea;
             series.data = { o: slice.value };
@@ -218,12 +232,15 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0) ||
+      (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 
-    const radius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
+    const radius =
+      Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
 
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';

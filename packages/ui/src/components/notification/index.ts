@@ -7,12 +7,20 @@ const rootId = 'ev-notification-modal';
 const root = document.createElement('div');
 root.id = rootId;
 
-const positionList = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
+const positionList = [
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+] as const;
 
 const notification = (options: Props | string) => {
-  const position = typeof options === 'string' ? 'top-right' : options.position ?? 'top-right';
+  const position =
+    typeof options === 'string' ? 'top-right' : options.position ?? 'top-right';
   if (!positionList.includes(position)) {
-    console.warn('[EVUI][Notification] The position value is incorrectly entered.');
+    console.warn(
+      '[EVUI][Notification] The position value is incorrectly entered.'
+    );
     return;
   }
 
@@ -33,11 +41,11 @@ const notification = (options: Props | string) => {
 
   const container = document.createElement('div');
   const unmount = () => render(null, container);
-  const msgOption = (typeof options === 'string') ? { message: options, unmount } : { ...options, unmount };
-  const instance = h(
-    Notification,
-    msgOption,
-  );
+  const msgOption =
+    typeof options === 'string'
+      ? { message: options, unmount }
+      : { ...options, unmount };
+  const instance = h(Notification, msgOption);
   render(instance, container);
   wrapper.appendChild(instance.el as Node);
 };

@@ -5,7 +5,9 @@ import BigNumber from 'bignumber.js';
  * @param {Number} value
  * @return {BigNumber}
  */
-function toBigNumber(value) { return new BigNumber(value); }
+function toBigNumber(value) {
+  return new BigNumber(value);
+}
 
 /**
  * plus(+)
@@ -44,7 +46,7 @@ function bnMultiply(num1, num2) {
  * @return {Number}
  */
 function bnDivide(dividend, divisor) {
-  return toBigNumber(dividend).dividedBy(toBigNumber((divisor))).toNumber();
+  return toBigNumber(dividend).dividedBy(toBigNumber(divisor)).toNumber();
 }
 
 /**
@@ -54,14 +56,9 @@ function bnDivide(dividend, divisor) {
  * @return {Number}
  */
 function bnFloor(num, decimal) {
-  return toBigNumber(num).decimalPlaces(decimal, BigNumber.ROUND_DOWN).toNumber();
+  return toBigNumber(num)
+    .decimalPlaces(decimal, BigNumber.ROUND_DOWN)
+    .toNumber();
 }
 
-export {
-  toBigNumber,
-  bnPlus,
-  bnMinus,
-  bnMultiply,
-  bnDivide,
-  bnFloor,
-};
+export { toBigNumber, bnPlus, bnMinus, bnMultiply, bnDivide, bnFloor };

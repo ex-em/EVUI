@@ -3,67 +3,59 @@
 $ev-themes: (
   light: (
     /* primary color
-    ------------------------- */
-    primary: #1A6AFE,
-    info: #5AC8FA,
-    success: #00CC47,
-    warning: #FF9500,
-    error: #FF3B30,
-    selected: #730EF4,
-    not-allow: #B01012,
-    disabled: #B2B2B2,
+    ------------------------- */ primary: #1a6afe,
+    info: #5ac8fa,
+    success: #00cc47,
+    warning: #ff9500,
+    error: #ff3b30,
+    selected: #730ef4,
+    not-allow: #b01012,
+    disabled: #b2b2b2,
     default: #666666,
 
     /* common
-    -------------------------- */
-    font-base: $color-black,
-    border-base: #B2B2B2,
-    border-light: #E3E3E3,
+    -------------------------- */ font-base: $color-black,
+    border-base: #b2b2b2,
+    border-light: #e3e3e3,
     background-base: $color-white,
-    background-lighten: rgba(#B2B2B2, 0.1),
-
+    background-lighten: rgba(#b2b2b2, 0.1),
     /* components
-    -------------------------- */
-    slider-mark-background: #F8F8F8,
+    -------------------------- */ slider-mark-background:
+      #f8f8f8,
     tooltip-background: $color-black,
 
     /* grid
-    -------------------------- */
-    grid-header-border: #7F7F7F,
-    grid-bottom-border: #CFCFCF,
-    grid-row-selected: #DBF0F9,
+    -------------------------- */ grid-header-border: #7f7f7f,
+    grid-bottom-border: #cfcfcf,
+    grid-row-selected: #dbf0f9,
     grid-cell-text: rgba(#191919, 0.8),
-    grid-row-stripe: #E5E5E5,
-    grid-background: #FFFFFF,
+    grid-row-stripe: #e5e5e5,
+    grid-background: #ffffff,
   ),
   dark: (
     /* primary color
-    ------------------------- */
-    primary: #007AFF,
-    info: #64D2FF,
-    success: #32D74B,
-    warning: #FF9F0A,
-    error: #FF453A,
-    selected: #791BF2,
-    not-allow: #B01012,
+    ------------------------- */ primary: #007aff,
+    info: #64d2ff,
+    success: #32d74b,
+    warning: #ff9f0a,
+    error: #ff453a,
+    selected: #791bf2,
+    not-allow: #b01012,
     disabled: #555555,
     default: #444444,
 
     /* common
-    -------------------------- */
-    font-base: $color-white,
+    -------------------------- */ font-base: $color-white,
     border-base: #666666,
     border-light: #333333,
     background-base: $color-black,
     background-lighten: rgba(#666666, 0.3),
-
     /* components
-    -------------------------- */
-    slider-mark-background: #B2B2B2,
+    -------------------------- */ slider-mark-background:
+      #b2b2b2,
     tooltip-background: #555555,
 
     /* grid
-    -------------------------- */
-    grid-background: #0D0D0D,
+    -------------------------- */ grid-background: #0d0d0d,
   ),
 ) !default;

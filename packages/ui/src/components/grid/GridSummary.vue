@@ -10,15 +10,15 @@
       <li
         v-if="showCheckbox"
         :class="{
-          'column': true,
+          column: true,
           'non-border': !!styleInfo.borderStyle,
         }"
         :style="{
-          'width': `${styleInfo.minWidth}px`,
-          'line-height': `${styleInfo.rowHeight}px`
+          width: `${styleInfo.minWidth}px`,
+          'line-height': `${styleInfo.rowHeight}px`,
         }"
       >
-        <span :style="{'height': `${styleInfo.rowHeight}px`}" />
+        <span :style="{ height: `${styleInfo.rowHeight}px` }" />
       </li>
       <template
         v-for="(column, index) in columns"
@@ -55,12 +55,12 @@
               v-else
               :title="getSummaryValue(column)"
             >
-              {{ getSummaryValue(column)}}
+              {{ getSummaryValue(column) }}
             </div>
           </span>
           <span
             v-else
-            :style="{'height': `${styleInfo.rowHeight}px`}"
+            :style="{ height: `${styleInfo.rowHeight}px` }"
           />
         </li>
       </template>
@@ -137,22 +137,20 @@ export default {
         convertValue = numberWithComma(value);
         convertValue = convertValue === false ? value : convertValue;
       } else if (type === 'float') {
-        const floatValue = convertValue.toFixed(getValidDecimal(decimal ?? DECIMAL.default));
+        const floatValue = convertValue.toFixed(
+          getValidDecimal(decimal ?? DECIMAL.default)
+        );
         convertValue = floatValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       }
 
       return convertValue;
     };
 
-    const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
+    const getColumnIndex = (field) =>
+      columns.value.findIndex((column) => column.field === field);
     const getSummaryValue = (column) => {
-      const {
-        type,
-        field,
-        summaryType,
-        summaryDecimal,
-        summaryOnlyTopParent,
-      } = column;
+      const { type, field, summaryType, summaryDecimal, summaryOnlyTopParent } =
+        column;
 
       let result = '';
       const columnIndex = getColumnIndex(field);
@@ -174,7 +172,9 @@ export default {
               return acc;
             }, []);
           } else {
-            columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
+            columnValues = stores.value.store.map(
+              (row) => row[ROW_DATA_INDEX][columnIndex]
+            );
           }
           switch (summaryType) {
             case 'sum': {
@@ -186,9 +186,12 @@ export default {
                 return prev;
               }, 0);
 
-              result = sumValue && bnFloor(
-                sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default),
-              );
+              result =
+                sumValue &&
+                bnFloor(
+                  sumValue,
+                  getValidDecimal(summaryDecimal ?? DECIMAL.default)
+                );
               break;
             }
             case 'average': {
@@ -199,20 +202,30 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = sumValue && bnFloor(
-                bnDivide(sumValue, columnValues.length),
-                getValidDecimal(summaryDecimal ?? DECIMAL.default),
-              );
+              result =
+                sumValue &&
+                bnFloor(
+                  bnDivide(sumValue, columnValues.length),
+                  getValidDecimal(summaryDecimal ?? DECIMAL.default)
+                );
               break;
             }
             case 'max': {
-              const filteredNullValues = columnValues.filter(value => value != null);
-              result = filteredNullValues.length ? Math.max(...filteredNullValues) : '';
+              const filteredNullValues = columnValues.filter(
+                (value) => value != null
+              );
+              result = filteredNullValues.length
+                ? Math.max(...filteredNullValues)
+                : '';
               break;
             }
             case 'min': {
-              const filteredNullValues = columnValues.filter(value => value != null);
-              result = filteredNullValues.length ? Math.min(...filteredNullValues) : '';
+              const filteredNullValues = columnValues.filter(
+                (value) => value != null
+              );
+              result = filteredNullValues.length
+                ? Math.min(...filteredNullValues)
+                : '';
               break;
             }
             default:
@@ -231,7 +244,9 @@ export default {
       fields.forEach((name, idx) => {
         const columnIndex = getColumnIndex(name);
         if (columnIndex >= 0) {
-          const value = getSummaryValue(stores.value.orderedColumns[columnIndex]);
+          const value = getSummaryValue(
+            stores.value.orderedColumns[columnIndex]
+          );
           result = result.replace(`{${idx}}`, value);
         }
       });
@@ -243,7 +258,7 @@ export default {
         nextTick(() => {
           summaryRef.value.scrollLeft = val;
         });
-      },
+      }
     );
     return {
       columns,

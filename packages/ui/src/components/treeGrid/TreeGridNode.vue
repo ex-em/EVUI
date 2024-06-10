@@ -45,14 +45,14 @@
             v-if="cellIndex === expandColumnIdx"
             :class="{
               expand: node.expand,
-              'ev-tree-toggle': true
+              'ev-tree-toggle': true,
             }"
           >
             <template v-if="node.hasChild">
               <ev-icon
                 v-if="expandIconClasses(node)"
                 :icon="expandIconClasses(node)"
-                style="display: block;"
+                style="display: block"
                 @click="onExpand(node)"
               />
               <button
@@ -73,22 +73,20 @@
               'ev-tree-toggle': true,
             }"
           >
-            <span
-              :class="node.hasChild ? parentIconMV : childIconMV"
-            >
+            <span :class="node.hasChild ? parentIconMV : childIconMV">
               <i></i>
             </span>
           </span>
           <div class="td-content">
-          <!-- cell renderer -->
-          <template v-if="!!$slots[column.field + 'Node']">
-            <slot
-              :name="column.field + 'Node'"
-              :item="{
-                data: node.data,
-              }"
-            />
-          </template>
+            <!-- cell renderer -->
+            <template v-if="!!$slots[column.field + 'Node']">
+              <slot
+                :name="column.field + 'Node'"
+                :item="{
+                  data: node.data,
+                }"
+              />
+            </template>
           </div>
         </div>
       </td>
@@ -115,9 +113,7 @@
           @click="onContextMenu($event)"
           @click.prevent="menuRef.show"
         >
-          <slot
-            name="contextmenuIconNode"
-          />
+          <slot name="contextmenuIconNode" />
         </span>
       </template>
       <template v-else>
@@ -229,16 +225,20 @@ export default {
       const collapseIcon = props.expandIcon ? props.collapseIcon : '';
       return node.expand ? collapseIcon : expandIcon;
     };
-    const node = computed(() => (props.nodeData || {}));
-    const parentIconMV = computed(() => (props.parentIcon || 'tree-parent-icon'));
-    const childIconMV = computed(() => (props.childIcon || 'tree-child-icon'));
-    const isDataIcon = computed(() => ((parentIconMV.value !== 'none' || childIconMV.value !== 'none')));
+    const node = computed(() => props.nodeData || {});
+    const parentIconMV = computed(() => props.parentIcon || 'tree-parent-icon');
+    const childIconMV = computed(() => props.childIcon || 'tree-child-icon');
+    const isDataIcon = computed(
+      () => parentIconMV.value !== 'none' || childIconMV.value !== 'none'
+    );
 
     const expandColumnIdx = computed(() => {
-      const expandColumnIndex = props.orderedColumns.findIndex(v => v.expandColumn);
+      const expandColumnIndex = props.orderedColumns.findIndex(
+        (v) => v.expandColumn
+      );
       return expandColumnIndex > 0 ? expandColumnIndex : 0;
     });
-    const getRowClass = nodeInfo => ({
+    const getRowClass = (nodeInfo) => ({
       row: true,
       'tree-row': true,
       [`tree-row--level-${nodeInfo?.level}`]: true,
@@ -263,8 +263,10 @@ export default {
       height: `${props.rowHeight}px`,
       'line-height': `${props.rowHeight}px`,
       'min-width': `${props.minWidth}px`,
-      'border-right': props.orderedColumns.length - 1 === cellIndex
-        ? 'none' : '1px solid #CFCFCF',
+      'border-right':
+        props.orderedColumns.length - 1 === cellIndex
+          ? 'none'
+          : '1px solid #CFCFCF',
     });
     const getDepthStyle = (nodeLevel) => {
       const depthSize = nodeLevel * 13;
@@ -319,7 +321,8 @@ export default {
     height: 8px;
     background-position: -15px -63px;
   }
-  .tree-parent-icon i, .tree-child-icon i {
+  .tree-parent-icon i,
+  .tree-child-icon i {
     display: inline-block;
     top: -3px;
     width: 14px;

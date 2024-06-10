@@ -32,9 +32,17 @@
     :style="gridStyle"
   >
     <!-- Table -->
-    <div v-cloak ref="grid" :class="gridClass">
+    <div
+      v-cloak
+      ref="grid"
+      :class="gridClass"
+    >
       <!-- Header -->
-      <div v-show="showHeader" ref="header" :class="headerClass">
+      <div
+        v-show="showHeader"
+        ref="header"
+        :class="headerClass"
+      >
         <ul class="column-list">
           <!-- Header Checkbox -->
           <li
@@ -54,7 +62,10 @@
             />
           </li>
           <!-- Column List -->
-          <template v-for="(column, index) in orderedColumns" :key="index">
+          <template
+            v-for="(column, index) in orderedColumns"
+            :key="index"
+          >
             <li
               v-if="!column.hide && !column.hiddenDisplay"
               :data-index="index"
@@ -107,7 +118,10 @@
         @contextmenu.prevent="menu.show"
       >
         <!-- vScroll Top -->
-        <div :style="`height: ${vScrollTopHeight}px;`" class="vscroll-spacer" />
+        <div
+          :style="`height: ${vScrollTopHeight}px;`"
+          class="vscroll-spacer"
+        />
         <table ref="table">
           <tbody>
             <tree-grid-node
@@ -138,7 +152,7 @@
               <template
                 v-for="(column, cellIndex) in orderedColumns"
                 :key="cellIndex"
-                v-slot:[getSlotName(column.field)]="{ item }"
+                #[getSlotName(column.field)]="{ item }"
               >
                 <template v-if="!!$slots[column.field]">
                   <slot
@@ -156,7 +170,10 @@
                   </span>
                 </template>
               </template>
-              <template v-if="$slots.contextmenuIcon" #contextmenuIconNode>
+              <template
+                v-if="$slots.contextmenuIcon"
+                #contextmenuIconNode
+              >
                 <slot name="contextmenuIcon" />
               </template>
             </tree-grid-node>
@@ -171,8 +188,14 @@
           class="vscroll-spacer"
         />
         <!-- Context Menu -->
-        <ev-context-menu ref="menu" :items="contextMenuItems" />
-        <ev-context-menu ref="columnMenu" :items="columnMenuItems" />
+        <ev-context-menu
+          ref="menu"
+          :items="contextMenuItems"
+        />
+        <ev-context-menu
+          ref="columnMenu"
+          :items="columnMenuItems"
+        />
         <ev-context-menu
           ref="gridSettingMenu"
           :items="gridSettingContextMenuItems"
@@ -180,7 +203,11 @@
         />
       </div>
       <!-- Resize Line -->
-      <div v-show="showResizeLine" ref="resizeLine" class="table-resize-line" />
+      <div
+        v-show="showResizeLine"
+        ref="resizeLine"
+        class="table-resize-line"
+      />
     </div>
   </div>
   <!-- Summary -->

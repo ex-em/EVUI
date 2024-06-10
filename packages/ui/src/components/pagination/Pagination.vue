@@ -1,13 +1,19 @@
 <template>
   <nav class="pagination">
     <!-- Page Info -->
-    <small v-if="showPageInfo" class="pagination-info">
+    <small
+      v-if="showPageInfo"
+      class="pagination-info"
+    >
       <template v-if="perPage === 1"> {{ firstData }} / {{ total }} </template>
       <template v-else>
         {{ firstData }} - {{ Math.min(current * perPage, total) }} / {{ total }}
       </template>
     </small>
-    <ul class="pagination-list" :style="listClasses">
+    <ul
+      class="pagination-list"
+      :style="listClasses"
+    >
       <!-- Previous -->
       <li :class="{ 'is-disabled': !hasPrev }">
         <page-button
@@ -21,7 +27,10 @@
 
       <!--Pages-->
       <template v-for="page in pagesInRange">
-        <li v-if="page.number === -1" class="pagination-ellipsis">
+        <li
+          v-if="page.number === -1"
+          class="pagination-ellipsis"
+        >
           <span>&hellip;</span>
         </li>
         <li

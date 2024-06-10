@@ -2,22 +2,43 @@ export const AXIS_UNITS = {
   x: {
     rectStart: 'x1',
     rectEnd: 'x2',
-    rectOffsetCounter: position => (position === 'top' ? 'y2' : 'y1'),
-    rectOffset: position => (position === 'top' ? 'y1' : 'y2'),
+    rectOffsetCounter: (position) => (position === 'top' ? 'y2' : 'y1'),
+    rectOffset: (position) => (position === 'top' ? 'y1' : 'y2'),
   },
   y: {
     rectStart: 'y2',
     rectEnd: 'y1',
-    rectOffsetCounter: position => (position === 'left' ? 'x2' : 'x1'),
-    rectOffset: position => (position === 'left' ? 'x1' : 'x2'),
+    rectOffsetCounter: (position) => (position === 'left' ? 'x2' : 'x1'),
+    rectOffset: (position) => (position === 'left' ? 'x1' : 'x2'),
   },
 };
 
 export const COLOR = [
-  '#2b99f0', '#8ac449', '#00C4C5', '#ffde00', '#ff7781', '#8470ff', '#75cd8e',
-  '#48d1cc', '#fec64f', '#fe984f', '#0052ff', '#00a48c', '#83cfde', '#dfe32d',
-  '#ff7d40', '#99c7ff', '#a5fee3', '#0379c9', '#eef093', '#ffa891', '#00c5cd',
-  '#009bc7', '#cacaff', '#ffc125', '#df6264',
+  '#2b99f0',
+  '#8ac449',
+  '#00C4C5',
+  '#ffde00',
+  '#ff7781',
+  '#8470ff',
+  '#75cd8e',
+  '#48d1cc',
+  '#fec64f',
+  '#fe984f',
+  '#0052ff',
+  '#00a48c',
+  '#83cfde',
+  '#dfe32d',
+  '#ff7d40',
+  '#99c7ff',
+  '#a5fee3',
+  '#0379c9',
+  '#eef093',
+  '#ffa891',
+  '#00c5cd',
+  '#009bc7',
+  '#cacaff',
+  '#ffc125',
+  '#df6264',
 ];
 
 // export const COLOR = [
@@ -171,7 +192,6 @@ export const HEAT_MAP_OPTION = {
     decimalPoint: 0,
   },
 };
-
 
 export const TIME_INTERVALS = {
   millisecond: {

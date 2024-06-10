@@ -55,16 +55,44 @@ export default {
     },
     colLabels: {
       type: Array,
-      default: () => (['<span style="color: #FF0000">SUN</span>',
-        'MON', 'TUE', 'WED', 'THU', 'FRI',
-        '<span style="color: #0006F9">SAT</span>']),
+      default: () => [
+        '<span style="color: #FF0000">SUN</span>',
+        'MON',
+        'TUE',
+        'WED',
+        'THU',
+        'FRI',
+        '<span style="color: #0006F9">SAT</span>',
+      ],
     },
     rowLabels: {
       type: Array,
-      default: () => (['00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
-        '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
-        '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-        '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']),
+      default: () => [
+        '00:00',
+        '01:00',
+        '02:00',
+        '03:00',
+        '04:00',
+        '05:00',
+        '06:00',
+        '07:00',
+        '08:00',
+        '09:00',
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '16:00',
+        '17:00',
+        '18:00',
+        '19:00',
+        '20:00',
+        '21:00',
+        '22:00',
+        '23:00',
+      ],
     },
   },
   emits: {
@@ -72,10 +100,7 @@ export default {
     change: Array,
   },
   setup() {
-    const {
-      mv,
-      validateValue,
-    } = useModel();
+    const { mv, validateValue } = useModel();
 
     validateValue();
 
@@ -134,10 +159,10 @@ export default {
 }
 
 .ev-scheduler-body-box {
-  border: 1px solid #CCCCCC;
+  border: 1px solid #cccccc;
 
   &.selected {
-    background-color: #CCEECC;
+    background-color: #cceecc;
   }
 }
 

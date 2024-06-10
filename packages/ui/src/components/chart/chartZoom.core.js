@@ -6,7 +6,7 @@ export default class EvChartZoom {
     evChartToolbarRef,
     isExecuteZoom,
     brushIdx,
-    emitFunc,
+    emitFunc
   ) {
     this.isExecuteZoom = isExecuteZoom;
     this.evChartProps = evChartInfo.props;
@@ -35,13 +35,13 @@ export default class EvChartZoom {
       emitFunc.updateZoomEndIdx(cloneLabelsLastIdx);
     }
 
-
     if (zoomOptions.useWheelMove) {
       this.wrapWheelMoveZoomArea = this.wheelMoveZoomArea.bind(this);
     }
 
     this.evChartDomContainers = zoomOptions.useAnimation
-      ? this.drawAnimationCanvas(evChartInfo.dom) : evChartInfo.dom;
+      ? this.drawAnimationCanvas(evChartInfo.dom)
+      : evChartInfo.dom;
   }
 
   setEvChartZoomOptions(options) {
@@ -77,7 +77,9 @@ export default class EvChartZoom {
   }
 
   setEventListener(isUseZoomMode) {
-    const toggleEventListener = isUseZoomMode ? 'addEventListener' : 'removeEventListener';
+    const toggleEventListener = isUseZoomMode
+      ? 'addEventListener'
+      : 'removeEventListener';
     this.isUseZoomMode = isUseZoomMode;
 
     this.evChartDomContainers.forEach((dom) => {
@@ -125,21 +127,24 @@ export default class EvChartZoom {
 
     this.isUseToolbar = true;
     this.executeZoom(zoomStartIdx, zoomEndIdx);
-    this.setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction === 'previous' ? 'latest' : 'previous');
+    this.setZoomAreaMemory(
+      zoomStartIdx,
+      zoomEndIdx,
+      direction === 'previous' ? 'latest' : 'previous'
+    );
   }
 
   dragZoom({ data: zoomInfoData, range: { dragSelectionInfo } }) {
-    const {
-      dragXsp,
-      dragXep,
-      exceptAxesYChartWidth,
-      chartTitle,
-    } = dragSelectionInfo;
+    const { dragXsp, dragXep, exceptAxesYChartWidth, chartTitle } =
+      dragSelectionInfo;
     const { options: evChartOptions, data: evChartData } = this.evChartProps;
 
-    const dragChartIdx = evChartOptions.length > 1 ? evChartOptions.findIndex(
-      option => (option?.title?.text ?? '') === chartTitle,
-    ) : 0;
+    const dragChartIdx =
+      evChartOptions.length > 1
+        ? evChartOptions.findIndex(
+            (option) => (option?.title?.text ?? '') === chartTitle
+          )
+        : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
       const zoomSeries = zoomInfoData[0].items;
@@ -147,18 +152,20 @@ export default class EvChartZoom {
       const zoomEndDate = zoomSeries[zoomSeries.length - 1].x;
       const currentChartDataLabels = evChartData[dragChartIdx].labels;
       const cloneChartDataLabels = this.evChartCloneData[dragChartIdx].labels;
-      const [currentZoomStartIdx, currentZoomEndIdx] = this.zoomAreaMemory.current[0];
+      const [currentZoomStartIdx, currentZoomEndIdx] =
+        this.zoomAreaMemory.current[0];
 
       let newZoomStartIdx = cloneChartDataLabels.findIndex(
-        label => +label.$d === +zoomStartDate.$d,
+        (label) => +label.$d === +zoomStartDate.$d
       );
 
       let newZoomEndIdx = cloneChartDataLabels.findLastIndex(
-        label => +label.$d === +zoomEndDate.$d,
+        (label) => +label.$d === +zoomEndDate.$d
       );
 
       const calculateAxesXPosition = (zoomIdx) => {
-        const axesXInterval = exceptAxesYChartWidth / (currentChartDataLabels.length - 1);
+        const axesXInterval =
+          exceptAxesYChartWidth / (currentChartDataLabels.length - 1);
 
         return axesXInterval * (zoomIdx - currentZoomStartIdx);
       };
@@ -168,13 +175,16 @@ export default class EvChartZoom {
       if (newZoomStartIdx === newZoomEndIdx) {
         // drag 영역에 한 포인트만 있을 경우
         if (newDragStartAxesX - dragXsp >= dragXep - newDragStartAxesX) {
-            newZoomStartIdx -= 1;
+          newZoomStartIdx -= 1;
         } else {
-            newZoomEndIdx += 1;
+          newZoomEndIdx += 1;
         }
       }
 
-      if (newZoomStartIdx === currentZoomStartIdx && newZoomEndIdx === currentZoomEndIdx) {
+      if (
+        newZoomStartIdx === currentZoomStartIdx &&
+        newZoomEndIdx === currentZoomEndIdx
+      ) {
         return;
       }
 
@@ -190,7 +200,7 @@ export default class EvChartZoom {
           newZoomStartIdx,
           newZoomEndIdx,
           newDragStartAxesX,
-          newDragEndAxesX,
+          newDragEndAxesX
         );
       } else {
         this.executeZoom(newZoomStartIdx, newZoomEndIdx);
@@ -204,21 +214,20 @@ export default class EvChartZoom {
     newZoomStartIdx,
     newZoomEndIdx,
     newDragStartAxesX,
-    newDragEndAxesX,
+    newDragEndAxesX
   ) {
-    const {
-      chartRange,
-      exceptAxesYChartWidth,
-      exceptAxesXChartHeight,
-    } = dragSelectionInfo;
+    const { chartRange, exceptAxesYChartWidth, exceptAxesXChartHeight } =
+      dragSelectionInfo;
     const pixelRatio = window.devicePixelRatio || 1;
 
-    const displayAnimaionCanvas = Array.from(this.evChartDomContainers).map((container) => {
-      const animationCanvas = container.querySelector('.animation-canvas');
-      const displayCanvas = container.children[0];
+    const displayAnimaionCanvas = Array.from(this.evChartDomContainers).map(
+      (container) => {
+        const animationCanvas = container.querySelector('.animation-canvas');
+        const displayCanvas = container.children[0];
 
-      return [displayCanvas, animationCanvas];
-    });
+        return [displayCanvas, animationCanvas];
+      }
+    );
 
     for (let idx = 0; idx < displayAnimaionCanvas.length; idx++) {
       const [displayCanvas, animationCanvas] = displayAnimaionCanvas[idx];
@@ -233,7 +242,6 @@ export default class EvChartZoom {
       animationCanvas.height = exceptAxesXChartHeight * pixelRatio;
       animationCanvas.style.height = `${exceptAxesXChartHeight}px`;
 
-
       if (animationCanvas.style.display === 'none') {
         animationCanvas.style.display = 'block';
       }
@@ -245,7 +253,7 @@ export default class EvChartZoom {
         animationCtx,
         dragSelectionInfo,
         newDragStartAxesX,
-        newDragEndAxesX,
+        newDragEndAxesX
       ).then((isAnimationFinish) => {
         animationCanvas.style.display = 'none';
 
@@ -277,12 +285,12 @@ export default class EvChartZoom {
         const cloneSeriesName = cloneSeriesNames[jdx];
 
         evChartData.data[cloneSeriesName] = cloneData[cloneSeriesName].filter(
-          (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
+          (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx
         );
       }
 
       evChartData.labels = cloneLabels.filter(
-        (l, labelIdx) => zoomStartIdx <= labelIdx && zoomEndIdx >= labelIdx,
+        (l, labelIdx) => zoomStartIdx <= labelIdx && zoomEndIdx >= labelIdx
       );
     }
 
@@ -313,7 +321,7 @@ export default class EvChartZoom {
     evChartClone,
     brushChartIdx,
     isUseZoomMode,
-    isKeepZoomStatus,
+    isKeepZoomStatus
   ) {
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
@@ -377,7 +385,10 @@ export default class EvChartZoom {
       }
 
       this.zoomAreaMemory[direction].push(currentZoomArea);
-    } else if (zoomStartIdx !== currentZoomArea[0] || zoomEndIdx !== currentZoomArea[1]) {
+    } else if (
+      zoomStartIdx !== currentZoomArea[0] ||
+      zoomEndIdx !== currentZoomArea[1]
+    ) {
       if (currentZoomArea[0] === 0 && currentZoomArea[1] === -1) {
         previous.push([0, this.cloneLabelsLastIdx]);
       } else {
@@ -396,13 +407,10 @@ export default class EvChartZoom {
     animationCtx,
     dragSelectionInfo,
     newDragStartAxesX,
-    newDragEndAxesX,
+    newDragEndAxesX
   ) {
-    const {
-      chartRange,
-      exceptAxesYChartWidth,
-      exceptAxesXChartHeight,
-    } = dragSelectionInfo;
+    const { chartRange, exceptAxesYChartWidth, exceptAxesXChartHeight } =
+      dragSelectionInfo;
 
     let leftDx = 0;
     let centerDx = newDragStartAxesX;
@@ -418,14 +426,20 @@ export default class EvChartZoom {
 
     const zoomSpeed = 50;
     const leftSpeed = Math.ceil(
-      zoomSpeed * (newDragStartAxesX / exceptAxesYChartWidth),
+      zoomSpeed * (newDragStartAxesX / exceptAxesYChartWidth)
     );
     const rightSpeed = Math.ceil(
-      zoomSpeed * ((exceptAxesYChartWidth - newDragEndAxesX) / exceptAxesYChartWidth),
+      zoomSpeed *
+        ((exceptAxesYChartWidth - newDragEndAxesX) / exceptAxesYChartWidth)
     );
 
     const animate = (responseFinishStatus) => {
-      animationCtx.clearRect(0, 0, exceptAxesYChartWidth, exceptAxesXChartHeight);
+      animationCtx.clearRect(
+        0,
+        0,
+        exceptAxesYChartWidth,
+        exceptAxesXChartHeight
+      );
 
       if (centerDx <= 0 && centerDWidth >= exceptAxesYChartWidth) {
         displayCanvas.style.opacity = 'initial';
@@ -449,7 +463,7 @@ export default class EvChartZoom {
         leftDx,
         0,
         newDragStartAxesX,
-        exceptAxesXChartHeight,
+        exceptAxesXChartHeight
       );
 
       // 줌 영역
@@ -462,7 +476,7 @@ export default class EvChartZoom {
         centerDx,
         0,
         centerDWidth,
-        exceptAxesXChartHeight,
+        exceptAxesXChartHeight
       );
 
       // 줌 영역 오른쪽
@@ -475,19 +489,19 @@ export default class EvChartZoom {
         rightDx,
         0,
         exceptAxesYChartWidth,
-        exceptAxesXChartHeight,
+        exceptAxesXChartHeight
       );
 
       globalAlpha -= globalAlphaSensitivity;
       leftDx -= leftSpeed;
       centerDx -= leftSpeed;
-      centerDWidth += (leftSpeed + rightSpeed);
+      centerDWidth += leftSpeed + rightSpeed;
       rightDx += rightSpeed;
 
       return requestAnimationFrame(() => animate(responseFinishStatus));
     };
 
-    return new Promise(response => animate(response));
+    return new Promise((response) => animate(response));
   }
 
   setIconStyle(isUseZoomMode) {
@@ -517,7 +531,8 @@ export default class EvChartZoom {
       return;
     }
 
-    const [opacity, pointerEvents] = mode === 'enable' ? [1, 'initial'] : [0.5, 'none'];
+    const [opacity, pointerEvents] =
+      mode === 'enable' ? [1, 'initial'] : [0.5, 'none'];
 
     icon.style.opacity = opacity;
     icon.style.pointerEvents = pointerEvents;
@@ -528,7 +543,8 @@ export default class EvChartZoom {
       return;
     }
 
-    const [currentZoomStartIdx, currentZoomEndIdx] = this.zoomAreaMemory.current[0];
+    const [currentZoomStartIdx, currentZoomEndIdx] =
+      this.zoomAreaMemory.current[0];
     const cloneLabelsLastIdx = this.cloneLabelsLastIdx;
 
     if (currentZoomStartIdx !== 0 || currentZoomEndIdx !== cloneLabelsLastIdx) {

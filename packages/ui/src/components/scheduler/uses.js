@@ -1,17 +1,17 @@
-import {
-  getCurrentInstance, computed, reactive,
-} from 'vue';
+import { getCurrentInstance, computed, reactive } from 'vue';
 
-const getMatrixArr = (row, col) => Array.from(Array(row), () => Array(col).fill(false));
+const getMatrixArr = (row, col) =>
+  Array.from(Array(row), () => Array(col).fill(false));
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
 
   const mv = computed({
     get: () => {
-      if (props.modelValue.length !== props.rowLabels.length
-        || !props.modelValue[0]
-        || props.modelValue[0].length !== props.colLabels.length
+      if (
+        props.modelValue.length !== props.rowLabels.length ||
+        !props.modelValue[0] ||
+        props.modelValue[0].length !== props.colLabels.length
       ) {
         return getMatrixArr(props.rowLabels.length, props.colLabels.length);
       }
@@ -27,11 +27,14 @@ export const useModel = () => {
    * 초기값 배열의 length와 options의 count가 안맞는 경우 valid체크하는 로직
    */
   const validateValue = () => {
-    if (props.modelValue.length !== props.rowLabels.length
-      || !props.modelValue[0]
-      || props.modelValue[0].length !== props.colLabels.length
+    if (
+      props.modelValue.length !== props.rowLabels.length ||
+      !props.modelValue[0] ||
+      props.modelValue[0].length !== props.colLabels.length
     ) {
-      mv.value = [...getMatrixArr(props.rowLabels.length, props.colLabels.length)];
+      mv.value = [
+        ...getMatrixArr(props.rowLabels.length, props.colLabels.length),
+      ];
     }
   };
 
@@ -62,10 +65,22 @@ export const useEvent = (param) => {
     if (mousePos.dragCol === null || mousePos.dragRow === null) {
       return {};
     }
-    const minRow = mousePos.startRow < mousePos.dragRow ? mousePos.startRow : mousePos.dragRow;
-    const maxRow = mousePos.startRow > mousePos.dragRow ? mousePos.startRow : mousePos.dragRow;
-    const minCol = mousePos.startCol < mousePos.dragCol ? mousePos.startCol : mousePos.dragCol;
-    const maxCol = mousePos.startCol > mousePos.dragCol ? mousePos.startCol : mousePos.dragCol;
+    const minRow =
+      mousePos.startRow < mousePos.dragRow
+        ? mousePos.startRow
+        : mousePos.dragRow;
+    const maxRow =
+      mousePos.startRow > mousePos.dragRow
+        ? mousePos.startRow
+        : mousePos.dragRow;
+    const minCol =
+      mousePos.startCol < mousePos.dragCol
+        ? mousePos.startCol
+        : mousePos.dragCol;
+    const maxCol =
+      mousePos.startCol > mousePos.dragCol
+        ? mousePos.startCol
+        : mousePos.dragCol;
     if (minRow > rows || maxRow < rows || minCol > cols || maxCol < cols) {
       return {};
     }
@@ -112,10 +127,14 @@ export const useEvent = (param) => {
     mousePos.endCol = cols;
     mousePos.dragEventName = null;
     const tempArr = [...mv.value];
-    const minRow = mousePos.startRow < mousePos.endRow ? mousePos.startRow : mousePos.endRow;
-    const maxRow = mousePos.startRow > mousePos.endRow ? mousePos.startRow : mousePos.endRow;
-    const minCol = mousePos.startCol < mousePos.endCol ? mousePos.startCol : mousePos.endCol;
-    const maxCol = mousePos.startCol > mousePos.endCol ? mousePos.startCol : mousePos.endCol;
+    const minRow =
+      mousePos.startRow < mousePos.endRow ? mousePos.startRow : mousePos.endRow;
+    const maxRow =
+      mousePos.startRow > mousePos.endRow ? mousePos.startRow : mousePos.endRow;
+    const minCol =
+      mousePos.startCol < mousePos.endCol ? mousePos.startCol : mousePos.endCol;
+    const maxCol =
+      mousePos.startCol > mousePos.endCol ? mousePos.startCol : mousePos.endCol;
     for (let i = minRow; i <= maxRow; i++) {
       for (let j = minCol; j <= maxCol; j++) {
         tempArr[i][j] = !tempArr[i][j];

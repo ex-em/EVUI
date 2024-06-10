@@ -18,7 +18,8 @@ export const commonFunctions = () => {
    */
   const isRenderer = (column = {}) => !!column?.render?.use;
   const getComponentName = (type = '') => {
-    const setUpperCaseFirstStr = str => str.charAt(0).toUpperCase() + str.slice(1);
+    const setUpperCaseFirstStr = (str) =>
+      str.charAt(0).toUpperCase() + str.slice(1);
     const rendererStr = 'Renderer';
     let typeStr = '';
     if (type.indexOf('_') !== -1) {
@@ -39,7 +40,10 @@ export const commonFunctions = () => {
    * @returns {number|string} 변환된 데이터
    */
   const getConvertValue = (column, value) => {
-    let convertValue = column.type === 'number' || column.type === 'float' ? Number(value) : value;
+    let convertValue =
+      column.type === 'number' || column.type === 'float'
+        ? Number(value)
+        : value;
 
     if (column.type === 'number') {
       convertValue = numberWithComma(value);
@@ -57,7 +61,8 @@ export const commonFunctions = () => {
    * @param {string} field - 컬럼 필드명
    * @returns {number} 일치한다면 컬럼 인덱스, 일치하지 않는다면 -1
    */
-  const getColumnIndex = field => props.columns.findIndex(column => column.field === field);
+  const getColumnIndex = (field) =>
+    props.columns.findIndex((column) => column.field === field);
   const setPixelUnit = (value) => {
     let size = value;
     const hasPx = size.toString().indexOf('px') >= 0;
@@ -100,8 +105,10 @@ export const scrollEvent = (params) => {
       if (pageInfo.isClientPaging) {
         store = getPagingData();
       }
-      const rowCount = bodyEl.clientHeight > rowHeight
-        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const rowCount =
+        bodyEl.clientHeight > rowHeight
+          ? Math.ceil(bodyEl.clientHeight / rowHeight)
+          : store.length;
       const totalScrollHeight = store.length * rowHeight;
       let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
       if (firstVisibleIndex > store.length - 1) {
@@ -114,12 +121,18 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length
-        || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar =
+        rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
-        - scrollInfo.vScrollTopHeight;
-      if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
+      scrollInfo.vScrollBottomHeight =
+        totalScrollHeight -
+        stores.viewStore.length * rowHeight -
+        scrollInfo.vScrollTopHeight;
+      if (
+        isScroll &&
+        pageInfo.isInfinite &&
+        scrollInfo.vScrollBottomHeight === 0
+      ) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
         pageInfo.startIndex = lastIndex;
@@ -154,7 +167,8 @@ export const scrollEvent = (params) => {
 
     headerEl.scrollLeft = bodyEl.scrollLeft;
     summaryScroll.value = bodyEl.scrollLeft;
-    scrollInfo.hasHorizontalScrollBar = bodyEl.clientWidth < tableEl.clientWidth;
+    scrollInfo.hasHorizontalScrollBar =
+      bodyEl.clientWidth < tableEl.clientWidth;
   };
   /**
    * scroll 이벤트를 처리한다.
@@ -205,21 +219,28 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
-      const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
+      const rowHeight =
+        bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
       const scrollWidth = elWidth - bodyEl.clientWidth;
 
-      const result = stores.orderedColumns.reduce((acc, cur) => {
-        if (cur.hide || cur.hiddenDisplay) {
-          return acc;
-        }
-        if (cur.width) {
-          acc.totalWidth += cur.width;
-        } else {
-          acc.emptyCount++;
-        }
+      const result = stores.orderedColumns.reduce(
+        (acc, cur) => {
+          if (cur.hide || cur.hiddenDisplay) {
+            return acc;
+          }
+          if (cur.width) {
+            acc.totalWidth += cur.width;
+          } else {
+            acc.emptyCount++;
+          }
 
-        return acc;
-      }, { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 });
+          return acc;
+        },
+        {
+          totalWidth: contextInfo.customContextMenu.length ? 30 : 0,
+          emptyCount: 0,
+        }
+      );
 
       if (rowHeight * props.rows.length > elHeight) {
         elWidth -= scrollWidth;
@@ -235,20 +256,24 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        remainWidth = columnWidth
-          - (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
+        remainWidth =
+          columnWidth -
+          Math.floor(columnWidth / result.emptyCount) * result.emptyCount;
         columnWidth = Math.floor(columnWidth / result.emptyCount);
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
 
-      columnWidth = columnWidth < resizeInfo.minWidth ? resizeInfo.minWidth : columnWidth;
+      columnWidth =
+        columnWidth < resizeInfo.minWidth ? resizeInfo.minWidth : columnWidth;
       resizeInfo.columnWidth = columnWidth;
     }
 
     stores.orderedColumns.forEach((column) => {
       const item = column;
-      const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      const minWidth = isRenderer(column)
+        ? resizeInfo.rendererMinWidth
+        : resizeInfo.minWidth;
       if (item.width && item.width < minWidth) {
         item.width = minWidth;
       }
@@ -314,7 +339,8 @@ export const resizeEvent = (params) => {
     const headerLeft = headerEl.getBoundingClientRect().left;
     const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
     const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      ? resizeInfo.rendererMinWidth
+      : resizeInfo.minWidth;
     const columnRect = columnEl.getBoundingClientRect();
     const resizeLineEl = elementInfo.resizeLine;
     const minLeft = columnRect.left - headerLeft + minWidth;
@@ -391,7 +417,9 @@ export const clickEvent = (params) => {
     if (event.target.parentElement.classList?.contains('row-checkbox-input')) {
       return false;
     }
-    const isContextmenu = !!event.target.closest('td')?.classList?.contains('row-contextmenu');
+    const isContextmenu = !!event.target
+      .closest('td')
+      ?.classList?.contains('row-contextmenu');
     const onMultiSelectByKey = (keyType, selected, selectedRow) => {
       if (keyType === 'shift') {
         const rowIndex = row[ROW_INDEX];
@@ -404,12 +432,15 @@ export const clickEvent = (params) => {
             if (!selected) {
               stores.originStore[i][ROW_SELECT_INDEX] = true;
               if (lastIndex !== i) {
-                selectInfo.selectedRow.push(stores.originStore[i][ROW_DATA_INDEX]);
+                selectInfo.selectedRow.push(
+                  stores.originStore[i][ROW_DATA_INDEX]
+                );
               }
             } else {
               stores.originStore[i][ROW_SELECT_INDEX] = false;
-              const deselectedIndex = selectInfo.selectedRow
-                .indexOf(stores.originStore[i][ROW_DATA_INDEX]);
+              const deselectedIndex = selectInfo.selectedRow.indexOf(
+                stores.originStore[i][ROW_DATA_INDEX]
+              );
               if (deselectedIndex > -1) {
                 selectInfo.selectedRow.splice(deselectedIndex, 1);
               }
@@ -420,7 +451,10 @@ export const clickEvent = (params) => {
         if (!selected) {
           selectInfo.selectedRow.push(selectedRow);
         } else {
-          selectInfo.selectedRow.splice(selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]), 1);
+          selectInfo.selectedRow.splice(
+            selectInfo.selectedRow.indexOf(row[ROW_DATA_INDEX]),
+            1
+          );
         }
       }
     };
@@ -440,14 +474,16 @@ export const clickEvent = (params) => {
           keyType = 'ctrl';
         }
 
-        if (selectInfo.multiple && keyType) { // multi select
+        if (selectInfo.multiple && keyType) {
+          // multi select
           onMultiSelectByKey(keyType, selected, rowData);
         } else if (isRight || isContextmenu) {
           selectInfo.selectedRow = [...selectInfo.selectedRow];
           if (!selectInfo.selectedRow.includes(rowData)) {
             selectInfo.selectedRow = [rowData];
           }
-        } else if (selected) { // single select
+        } else if (selected) {
+          // single select
           selectInfo.selectedRow = [];
         } else {
           selectInfo.selectedRow = [rowData];
@@ -484,7 +520,8 @@ export const checkEvent = (params) => {
    */
   const unCheckedRow = (row) => {
     const index = stores.originStore.findIndex(
-      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
+      (item) => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]
+    );
 
     if (index !== -1) {
       stores.originStore[index][ROW_CHECK_INDEX] = row[ROW_CHECK_INDEX];
@@ -497,7 +534,10 @@ export const checkEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onCheck = (event, row) => {
-    if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow.length) {
+    if (
+      checkInfo.useCheckbox.mode === 'single' &&
+      checkInfo.prevCheckedRow.length
+    ) {
       checkInfo.prevCheckedRow[ROW_CHECK_INDEX] = false;
       unCheckedRow(checkInfo.prevCheckedRow);
     }
@@ -514,9 +554,13 @@ export const checkEvent = (params) => {
       }
 
       const isAllChecked = store
-        .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
-        .filter(rowData => !props.disabledRows.includes(rowData[ROW_DATA_INDEX]))
-        .every(d => d[ROW_CHECK_INDEX]);
+        .filter(
+          (rowData) => !props.uncheckable.includes(rowData[ROW_DATA_INDEX])
+        )
+        .filter(
+          (rowData) => !props.disabledRows.includes(rowData[ROW_DATA_INDEX])
+        )
+        .every((d) => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
       }
@@ -525,10 +569,15 @@ export const checkEvent = (params) => {
       if (checkInfo.useCheckbox.mode === 'single') {
         checkInfo.checkedRows = [];
       } else {
-        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+        checkInfo.checkedRows.splice(
+          checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]),
+          1
+        );
       }
       checkInfo.isHeaderChecked = false;
-      checkInfo.isHeaderIndeterminate = !!(stores.store.length && checkInfo.checkedRows.length);
+      checkInfo.isHeaderIndeterminate = !!(
+        stores.store.length && checkInfo.checkedRows.length
+      );
     }
     checkInfo.prevCheckedRow = row.slice();
     emit('update:checked', checkInfo.checkedRows);
@@ -546,14 +595,21 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX])
-        || props.disabledRows.includes(row[ROW_DATA_INDEX]);
+      const uncheckable =
+        props.uncheckable.includes(row[ROW_DATA_INDEX]) ||
+        props.disabledRows.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
-        if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !uncheckable) {
+        if (
+          !checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) &&
+          !uncheckable
+        ) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
         }
       } else {
-        checkInfo.checkedRows.splice(checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]), 1);
+        checkInfo.checkedRows.splice(
+          checkInfo.checkedRows.indexOf(row[ROW_DATA_INDEX]),
+          1
+        );
       }
 
       if (!uncheckable) {
@@ -587,7 +643,13 @@ export const expandEvent = (params) => {
     }
     row[ROW_EXPAND_INDEX] = !row[ROW_EXPAND_INDEX];
     emit('update:expanded', expandedInfo.expandedRows);
-    emit('expand-row', event, row[ROW_DATA_INDEX], row[ROW_EXPAND_INDEX], row[ROW_INDEX]);
+    emit(
+      'expand-row',
+      event,
+      row[ROW_DATA_INDEX],
+      row[ROW_EXPAND_INDEX],
+      row[ROW_INDEX]
+    );
   };
 
   return {
@@ -601,7 +663,7 @@ export const sortEvent = (params) => {
   function OrderQueue() {
     this.orders = ['asc', 'desc', 'init'];
     this.dequeue = () => this.orders.shift();
-    this.enqueue = o => this.orders.push(o);
+    this.enqueue = (o) => this.orders.push(o);
   }
   const order = new OrderQueue();
   /**
@@ -645,9 +707,14 @@ export const sortEvent = (params) => {
     const customSetAsc = sortInfo.sortFunction?.[field] ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
-    const numberSetDesc = (a, b) => ((a === null) - (b === null) || Number(b) - Number(a));
-    const numberSetAsc = (a, b) => ((a === null) - (b === null) || Number(a) - Number(b));
-    if (sortInfo.sortOrder === 'init' || (!sortInfo.sortField && !sortInfo.isSorting)) {
+    const numberSetDesc = (a, b) =>
+      (a === null) - (b === null) || Number(b) - Number(a);
+    const numberSetAsc = (a, b) =>
+      (a === null) - (b === null) || Number(a) - Number(b);
+    if (
+      sortInfo.sortOrder === 'init' ||
+      (!sortInfo.sortField && !sortInfo.isSorting)
+    ) {
       stores.store.sort((a, b) => {
         if (typeof a[ROW_INDEX] === 'number') {
           return setAsc(a[ROW_INDEX], b[ROW_INDEX]);
@@ -658,11 +725,15 @@ export const sortEvent = (params) => {
     }
     const type = sortInfo.sortColumn.type || 'string';
     const sortFn = sortInfo.sortOrder === 'desc' ? setDesc : setAsc;
-    const numberSortFn = sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
+    const numberSortFn =
+      sortInfo.sortOrder === 'desc' ? numberSetDesc : numberSetAsc;
     const getColumnValue = (a, b) => {
       let aCol = a[ROW_DATA_INDEX][index];
       let bCol = b[ROW_DATA_INDEX][index];
-      if (a[ROW_DATA_INDEX][index] && typeof a[ROW_DATA_INDEX][index] === 'object') {
+      if (
+        a[ROW_DATA_INDEX][index] &&
+        typeof a[ROW_DATA_INDEX][index] === 'object'
+      ) {
         aCol = a[ROW_DATA_INDEX][index][stores.originColumns[index]?.field];
         bCol = b[ROW_DATA_INDEX][index][stores.originColumns[index]?.field];
       }
@@ -673,7 +744,9 @@ export const sortEvent = (params) => {
       stores.store.sort((a, b) => {
         const { aCol, bCol } = getColumnValue(a, b);
         const compareAscReturn = customSetAsc(aCol, bCol);
-        return sortInfo.sortOrder === 'desc' ? -compareAscReturn : compareAscReturn;
+        return sortInfo.sortOrder === 'desc'
+          ? -compareAscReturn
+          : compareAscReturn;
       });
       return;
     }
@@ -681,7 +754,10 @@ export const sortEvent = (params) => {
       case 'string':
         stores.store.sort((a, b) => {
           let { aCol, bCol } = getColumnValue(a, b);
-          if ((!aCol || typeof aCol === 'string') && (!bCol || typeof bCol === 'string')) {
+          if (
+            (!aCol || typeof aCol === 'string') &&
+            (!bCol || typeof bCol === 'string')
+          ) {
             aCol = aCol || '';
             bCol = bCol || '';
             return sortFn(aCol?.toLowerCase(), bCol?.toLowerCase());
@@ -742,10 +818,13 @@ export const filterEvent = (params) => {
     });
     if (rowData.length) {
       checkInfo.isHeaderChecked = rowData.length === checkedCount;
-      checkInfo.isHeaderIndeterminate = (rowData.length !== checkedCount) && checkedCount > 0;
-      checkInfo.isHeaderUncheckable = rowData
-        .every(row => props.uncheckable.includes(row[ROW_DATA_INDEX])
-          || props.disabledRows.includes(row[ROW_DATA_INDEX]));
+      checkInfo.isHeaderIndeterminate =
+        rowData.length !== checkedCount && checkedCount > 0;
+      checkInfo.isHeaderUncheckable = rowData.every(
+        (row) =>
+          props.uncheckable.includes(row[ROW_DATA_INDEX]) ||
+          props.disabledRows.includes(row[ROW_DATA_INDEX])
+      );
     }
   };
   /**
@@ -865,12 +944,14 @@ export const filterEvent = (params) => {
    * @returns {boolean} 확인 결과
    */
   const getFilteringData = (data, columnType, condition) => {
-    let filterFn = columnType === 'string' || columnType === 'stringNumber'
-      ? stringFilter : numberFilter;
+    let filterFn =
+      columnType === 'string' || columnType === 'stringNumber'
+        ? stringFilter
+        : numberFilter;
     if (columnType === 'boolean') {
       filterFn = booleanFilter;
     }
-    return data.filter(row => filterFn(row, condition, columnType)) || [];
+    return data.filter((row) => filterFn(row, condition, columnType)) || [];
   };
   /**
    * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore 에 저장한다.
@@ -898,21 +979,26 @@ export const filterEvent = (params) => {
           });
         } else if (AND && item.operator === 'or') {
           if (ix > 0) {
-            filterStore.push(...getFilteringData(prevStore, columnType, {
-              ...item,
-              index,
-            }));
-          } else { // ix === 0
+            filterStore.push(
+              ...getFilteringData(prevStore, columnType, {
+                ...item,
+                index,
+              })
+            );
+          } else {
+            // ix === 0
             filterStore = getFilteringData(prevStore, columnType, {
               ...item,
               index,
             });
           }
         } else if ((ix === 0 && OR) || (ix !== 0 && item.operator === 'or')) {
-          filterStore.push(...getFilteringData(originStore, columnType, {
-            ...item,
-            index,
-          }));
+          filterStore.push(
+            ...getFilteringData(originStore, columnType, {
+              ...item,
+              index,
+            })
+          );
         } else {
           filterStore = getFilteringData(filterStore, columnType, {
             ...item,
@@ -942,9 +1028,11 @@ export const filterEvent = (params) => {
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
-          const rowData = columnSettingInfo.isFilteringColumn ? row[ROW_DATA_INDEX]
-            .filter((data, idx) => columnSettingInfo.visibleColumnIdx
-              .includes(idx)) : row[ROW_DATA_INDEX];
+          const rowData = columnSettingInfo.isFilteringColumn
+            ? row[ROW_DATA_INDEX].filter((data, idx) =>
+                columnSettingInfo.visibleColumnIdx.includes(idx)
+              )
+            : row[ROW_DATA_INDEX];
 
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
@@ -954,9 +1042,14 @@ export const filterEvent = (params) => {
               if (typeof columnValue === 'object') {
                 columnValue = columnValue[column.field];
               }
-              if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
+              if (
+                !column.hide &&
+                (column?.searchable === undefined || column?.searchable)
+              ) {
                 columnValue = getConvertValue(column, columnValue).toString();
-                isShow = columnValue.toLowerCase().includes(searchWord.toString().toLowerCase());
+                isShow = columnValue
+                  .toLowerCase()
+                  .includes(searchWord.toString().toLowerCase());
                 if (isShow) {
                   break;
                 }
@@ -1005,18 +1098,20 @@ export const contextMenuEvent = (params) => {
     const menuItems = [];
     contextmenuTimer = setTimeout(() => {
       if (contextInfo.customContextMenu.length) {
-        const customItems = contextInfo.customContextMenu.map(
-          (item) => {
-            const menuItem = item;
-            if (menuItem.validate) {
-              menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
-            }
+        const customItems = contextInfo.customContextMenu.map((item) => {
+          const menuItem = item;
+          if (menuItem.validate) {
+            menuItem.disabled = !menuItem.validate(
+              menuItem.itemId,
+              selectInfo.selectedRow
+            );
+          }
 
-            menuItem.selectedRow = selectInfo.selectedRow ?? [];
-            menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
+          menuItem.selectedRow = selectInfo.selectedRow ?? [];
+          menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
 
-            return menuItem;
-          });
+          return menuItem;
+        });
 
         menuItems.push(...customItems);
       }
@@ -1036,7 +1131,9 @@ export const contextMenuEvent = (params) => {
     const rowIndex = target.closest('.row')?.dataset?.index;
     let clickedRow = null;
     if (rowIndex) {
-      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
+      clickedRow = stores.viewStore.find(
+        (row) => row[ROW_INDEX] === +rowIndex
+      )?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
       selectInfo.contextmenuInfo = [clickedRow];
@@ -1052,8 +1149,10 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
-      const filterable = filterInfo.isFiltering
-        && column.filterable === undefined ? true : column.filterable;
+      const filterable =
+        filterInfo.isFiltering && column.filterable === undefined
+          ? true
+          : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1108,7 +1207,9 @@ export const contextMenuEvent = (params) => {
       if (!sortable && !filterable) {
         return;
       }
-      contextInfo.columnMenuItems = columnMenuItems.filter(item => !item.hidden);
+      contextInfo.columnMenuItems = columnMenuItems.filter(
+        (item) => !item.hidden
+      );
     }
   };
   /**
@@ -1117,7 +1218,8 @@ export const contextMenuEvent = (params) => {
    * @param {object} e - 이벤트 객체
    */
   const onGridSettingContextMenu = (e) => {
-    const { useDefaultColumnSetting, columnSettingTextInfo } = columnSettingInfo;
+    const { useDefaultColumnSetting, columnSettingTextInfo } =
+      columnSettingInfo;
     const columnListMenu = {
       text: columnSettingTextInfo?.title ?? 'Column List',
       isShowMenu: true,
@@ -1173,7 +1275,8 @@ export const storeEvent = (params) => {
       let hasUnChecked = false;
       rows.forEach((row, idx) => {
         const checked = props.checked.includes(row);
-        const uncheckable = props.uncheckable.includes(row) || props.disabledRows.includes(row);
+        const uncheckable =
+          props.uncheckable.includes(row) || props.disabledRows.includes(row);
         let selected = false;
         if (selectInfo.useSelect) {
           selected = props.selected.includes(row);
@@ -1186,12 +1289,23 @@ export const storeEvent = (params) => {
           expanded = props.expanded.includes(row);
         }
         const disabled = props.disabledRows.includes(row);
-        store.push([idx, checked, row, selected, expanded, uncheckable, disabled]);
+        store.push([
+          idx,
+          checked,
+          row,
+          selected,
+          expanded,
+          uncheckable,
+          disabled,
+        ]);
       });
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
-      checkInfo.isHeaderIndeterminate = hasUnChecked && !!checkInfo.checkedRows.length;
-      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row)
-        || props.disabledRows.includes(row));
+      checkInfo.isHeaderIndeterminate =
+        hasUnChecked && !!checkInfo.checkedRows.length;
+      checkInfo.isHeaderUncheckable = rows.every(
+        (row) =>
+          props.uncheckable.includes(row) || props.disabledRows.includes(row)
+      );
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {
@@ -1239,8 +1353,10 @@ export const pagingEvent = (params) => {
       searchInfo: {
         searchWord: filterInfo.searchWord,
         searchColumns: stores.orderedColumns
-          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
-          .map(d => d.field),
+          .filter(
+            (c) => !c.hide && (c?.searchable === undefined || c?.searchable)
+          )
+          .map((d) => d.field),
       },
     });
     if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
@@ -1269,13 +1385,7 @@ export const pagingEvent = (params) => {
 
 export const columnSettingEvent = (params) => {
   const { props, emit } = getCurrentInstance();
-  const {
-    stores,
-    columnSettingInfo,
-    contextInfo,
-    onSearch,
-    onResize,
-  } = params;
+  const { stores, columnSettingInfo, contextInfo, onSearch, onResize } = params;
 
   const setPositionColumnSetting = (toolbarRef) => {
     if (!columnSettingInfo.isShowColumnSetting) {
@@ -1286,10 +1396,13 @@ export const columnSettingEvent = (params) => {
     if (contextInfo.gridSettingContextMenuItems.length) {
       // 컨텍스트 메뉴 형태인 경우
       const columnListMenu = contextInfo.gridSettingContextMenuItems.length - 1;
-      const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0]
-        .children[columnListMenu].getBoundingClientRect();
+      const columnListMenuRect =
+        contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0].children[
+          columnListMenu
+        ].getBoundingClientRect();
 
-      columnSettingInfo.columnSettingPosition.columnListMenuWidth = columnListMenuRect.width;
+      columnSettingInfo.columnSettingPosition.columnListMenuWidth =
+        columnListMenuRect.width;
       columnSettingInfo.columnSettingPosition.top = columnListMenuRect.top;
       columnSettingInfo.columnSettingPosition.left = columnListMenuRect.right;
     } else {
@@ -1297,7 +1410,8 @@ export const columnSettingEvent = (params) => {
       const toolbarRefDivRect = toolbarRef?.getBoundingClientRect();
       const toolbarHeight = toolbarRefDivRect?.height;
 
-      columnSettingInfo.columnSettingPosition.top = toolbarRefDivRect?.top + toolbarHeight;
+      columnSettingInfo.columnSettingPosition.top =
+        toolbarRefDivRect?.top + toolbarHeight;
       columnSettingInfo.columnSettingPosition.left = toolbarRefDivRect?.right;
     }
   };
@@ -1310,13 +1424,17 @@ export const columnSettingEvent = (params) => {
     columnSettingInfo.hiddenColumn = '';
   };
   const setFilteringColumn = () => {
-    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
+    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(
+      (col) => col.index
+    );
 
-    const originColumnIdx = stores.originColumns.filter(col => (!col.hide || col.hiddenDisplay))
-      .map(col => col.index);
+    const originColumnIdx = stores.originColumns
+      .filter((col) => !col.hide || col.hiddenDisplay)
+      .map((col) => col.index);
     const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
 
-    columnSettingInfo.isFilteringColumn = (visibleColumnIdx.length !== originColumnIdx.length);
+    columnSettingInfo.isFilteringColumn =
+      visibleColumnIdx.length !== originColumnIdx.length;
 
     // 컬럼을 필터링했을 때, 검색어가 있는 경우 재검색
     if (props.option.searchValue) {
@@ -1325,26 +1443,28 @@ export const columnSettingEvent = (params) => {
     onResize();
   };
   const onApplyColumn = (columnNames) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
-    const isSameColumn = columnNames.length === columns.length
-      && columns.every(col => columnNames.includes(col.field));
+    const columns = stores.orderedColumns.filter(
+      (col) => !col.hide && !col.hiddenDisplay
+    );
+    const isSameColumn =
+      columnNames.length === columns.length &&
+      columns.every((col) => columnNames.includes(col.field));
 
     if (isSameColumn) {
       return;
     }
 
-    stores.filteredColumns = stores.originColumns
-      .filter((col) => {
-        if (columnNames.includes(col.field) || !col.caption) {
-          // 보여줄 컬럼들은 hiddenDisplay 속성을 false로 전부 적용
-          col.hiddenDisplay = false;
-          return true;
-        }
+    stores.filteredColumns = stores.originColumns.filter((col) => {
+      if (columnNames.includes(col.field) || !col.caption) {
+        // 보여줄 컬럼들은 hiddenDisplay 속성을 false로 전부 적용
+        col.hiddenDisplay = false;
+        return true;
+      }
 
-        // 보여주지 않을 컬럼들은 hiddenDisplay 속성을 전부 ture로 적용
-        col.hiddenDisplay = true;
-        return false;
-      });
+      // 보여주지 않을 컬럼들은 hiddenDisplay 속성을 전부 ture로 적용
+      col.hiddenDisplay = true;
+      return false;
+    });
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
     emit('change-column-status', {
@@ -1352,20 +1472,21 @@ export const columnSettingEvent = (params) => {
     });
   };
   const setColumnHidden = (val) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
+    const columns = stores.orderedColumns.filter(
+      (col) => !col.hide && !col.hiddenDisplay
+    );
 
     if (columns.length === 1) {
       return;
     }
-    stores.filteredColumns = columns
-      .filter((col) => {
-        if (col.field !== val) {
-          col.hiddenDisplay = false;
-          return true;
-        }
-        col.hiddenDisplay = true;
-        return false;
-      });
+    stores.filteredColumns = columns.filter((col) => {
+      if (col.field !== val) {
+        col.hiddenDisplay = false;
+        return true;
+      }
+      col.hiddenDisplay = true;
+      return false;
+    });
     columnSettingInfo.hiddenColumn = val;
     setFilteringColumn();
   };

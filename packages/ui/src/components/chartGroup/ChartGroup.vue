@@ -1,12 +1,18 @@
 <template>
-  <div v-if="zoomOptions.toolbar.show" ref="evChartToolbarRef">
+  <div
+    v-if="zoomOptions.toolbar.show"
+    ref="evChartToolbarRef"
+  >
     <ev-chart-toolbar
       :toolbar="zoomOptions.toolbar"
       @on-click-toolbar="onClickToolbar"
     />
   </div>
 
-  <div ref="evChartGroupRef" class="ev-chart-group__wrapper">
+  <div
+    ref="evChartGroupRef"
+    class="ev-chart-group__wrapper"
+  >
     <slot />
   </div>
 </template>

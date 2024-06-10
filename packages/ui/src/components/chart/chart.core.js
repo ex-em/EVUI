@@ -22,9 +22,9 @@ class EvChart {
     listeners,
     defaultSelectItemInfo,
     defaultSelectInfo,
-    brushSeries,
+    brushSeries
   ) {
-    Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
+    Object.keys(Model).forEach((key) => Object.assign(this, Model[key]));
 
     if (!options.brush) {
       Object.assign(this, Tooltip);
@@ -48,9 +48,13 @@ class EvChart {
     this.listeners = listeners;
 
     this.wrapperDOM = document.createElement('div');
-    this.wrapperDOM.className = options.brush ? 'ev-chart-brush-wrapper' : 'ev-chart-wrapper';
+    this.wrapperDOM.className = options.brush
+      ? 'ev-chart-brush-wrapper'
+      : 'ev-chart-wrapper';
     this.chartDOM = document.createElement('div');
-    this.chartDOM.className = options.brush ? 'ev-chart-brush-container' : 'ev-chart-container';
+    this.chartDOM.className = options.brush
+      ? 'ev-chart-brush-container'
+      : 'ev-chart-container';
     this.wrapperDOM.appendChild(this.chartDOM);
     this.target.appendChild(this.wrapperDOM);
 
@@ -79,7 +83,6 @@ class EvChart {
       this.overlayCanvas.style.left = '0px';
     }
 
-
     this.isInitLegend = false;
     this.isInitTitle = false;
     this.isInit = false;
@@ -105,7 +108,8 @@ class EvChart {
    */
   init() {
     const { series, data, labels, groups } = this.data;
-    const { type, axesX, axesY, tooltip, horizontal, realTimeScatter } = this.options;
+    const { type, axesX, axesY, tooltip, horizontal, realTimeScatter } =
+      this.options;
 
     this.createSeriesSet(series, type, horizontal, groups);
     if (groups.length) {
@@ -191,9 +195,9 @@ class EvChart {
     this.drawTip();
 
     if (
-      this.bufferCanvas
-      && this.bufferCanvas?.width > 1
-      && this.bufferCanvas?.height > 1
+      this.bufferCanvas &&
+      this.bufferCanvas?.width > 1 &&
+      this.bufferCanvas?.height > 1
     ) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
@@ -287,7 +291,9 @@ class EvChart {
             break;
           }
           case 'pie': {
-            const selectInfo = this.lastHitInfo ?? { sId: this.defaultSelectItemInfo?.seriesID };
+            const selectInfo = this.lastHitInfo ?? {
+              sId: this.defaultSelectItemInfo?.seriesID,
+            };
             const legendHitInfo = hitInfo?.legend;
 
             if (this.options.sunburst) {
@@ -320,7 +326,10 @@ class EvChart {
                   seriesID: lastHitInfo.sId,
                   dataIndex: lastHitInfo.maxIndex,
                 };
-              } else if (defaultSelectInfo?.dataIndex || defaultSelectInfo?.dataIndex === 0) {
+              } else if (
+                defaultSelectInfo?.dataIndex ||
+                defaultSelectInfo?.dataIndex === 0
+              ) {
                 selectInfo = { ...defaultSelectInfo };
               } else {
                 selectInfo = null;
@@ -376,7 +385,7 @@ class EvChart {
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
 
-    const isHeatMapType = (this.options.type === 'heatMap');
+    const isHeatMapType = this.options.type === 'heatMap';
     const labels = isHeatMapType ? this.data.labels[dir] : this.data.labels;
 
     const options = this.options;
@@ -406,8 +415,20 @@ class EvChart {
    */
   getAxesRange() {
     /* eslint-disable max-len */
-    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.scrollbar.x, this.chartRect));
-    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.scrollbar.y, this.chartRect));
+    const axesXMinMax = this.axesX.map((axis, index) =>
+      axis.calculateScaleRange(
+        this.minMax.x[index],
+        this.scrollbar.x,
+        this.chartRect
+      )
+    );
+    const axesYMinMax = this.axesY.map((axis, index) =>
+      axis.calculateScaleRange(
+        this.minMax.y[index],
+        this.scrollbar.y,
+        this.chartRect
+      )
+    );
     /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
@@ -426,7 +447,8 @@ class EvChart {
         this.axesSteps.x[index],
         hitInfo,
         this.defaultSelectInfo,
-        this.data.labels);
+        this.data.labels
+      );
     });
 
     this.axesY.forEach((axis, index) => {
@@ -435,7 +457,8 @@ class EvChart {
         this.labelOffset,
         this.axesSteps.y[index],
         hitInfo,
-        this.defaultSelectInfo);
+        this.defaultSelectInfo
+      );
     });
   }
 
@@ -480,12 +503,22 @@ class EvChart {
   getAxesLabelRange() {
     const axesXSteps = this.axesX.map((axis, index) => {
       const size = this.axesRange.x[index].size;
-      return axis.calculateLabelRange('x', this.chartRect, this.labelOffset, size.width);
+      return axis.calculateLabelRange(
+        'x',
+        this.chartRect,
+        this.labelOffset,
+        size.width
+      );
     });
 
     const axesYSteps = this.axesY.map((axis, index) => {
       const size = this.axesRange.y[index].size;
-      return axis.calculateLabelRange('y', this.chartRect, this.labelOffset, size.height);
+      return axis.calculateLabelRange(
+        'y',
+        this.chartRect,
+        this.labelOffset,
+        size.height
+      );
     });
 
     return { x: axesXSteps, y: axesYSteps };
@@ -498,12 +531,13 @@ class EvChart {
    */
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const backingStoreRatio = this.displayCtx.webkitBackingStorePixelRatio
-      || this.displayCtx.mozBackingStorePixelRatio
-      || this.displayCtx.msBackingStorePixelRatio
-      || this.displayCtx.oBackingStorePixelRatio
-      || this.displayCtx.backingStorePixelRatio
-      || 1;
+    const backingStoreRatio =
+      this.displayCtx.webkitBackingStorePixelRatio ||
+      this.displayCtx.mozBackingStorePixelRatio ||
+      this.displayCtx.msBackingStorePixelRatio ||
+      this.displayCtx.oBackingStorePixelRatio ||
+      this.displayCtx.backingStorePixelRatio ||
+      1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
 
@@ -549,13 +583,17 @@ class EvChart {
 
     let xAxisTitleHeight = 0;
     if (xAxisTitleOpt?.use && xAxisTitleOpt?.text) {
-      const fontSize = isNaN(xAxisTitleOpt?.fontSize) ? 12 : xAxisTitleOpt?.fontSize;
+      const fontSize = isNaN(xAxisTitleOpt?.fontSize)
+        ? 12
+        : xAxisTitleOpt?.fontSize;
       xAxisTitleHeight = fontSize + titleMargin;
     }
 
     let yAxisTitleHeight = 0;
     if (yAxisTitleOpt?.use && yAxisTitleOpt?.text) {
-      const fontSize = isNaN(yAxisTitleOpt?.fontSize) ? 12 : yAxisTitleOpt?.fontSize;
+      const fontSize = isNaN(yAxisTitleOpt?.fontSize)
+        ? 12
+        : yAxisTitleOpt?.fontSize;
       yAxisTitleHeight = fontSize + titleMargin;
     }
 
@@ -573,15 +611,24 @@ class EvChart {
     }
 
     const horizontalPadding = padding.left + padding.right + yAxisScrollWidth;
-    const verticalPadding = padding.top + padding.bottom
-        + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
-    const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
-    const chartHeight = height > verticalPadding ? height - verticalPadding : height;
+    const verticalPadding =
+      padding.top +
+      padding.bottom +
+      xAxisTitleHeight +
+      yAxisTitleHeight +
+      xAxisScrollHeight;
+    const chartWidth =
+      width > horizontalPadding ? width - horizontalPadding : width;
+    const chartHeight =
+      height > verticalPadding ? height - verticalPadding : height;
 
     const x1 = padding.left;
     const x2 = Math.max(width - padding.right - yAxisScrollWidth, x1 + 2);
     const y1 = padding.top + yAxisTitleHeight;
-    const y2 = Math.max(height - padding.bottom - xAxisTitleHeight - xAxisScrollHeight, y1 + 2);
+    const y2 = Math.max(
+      height - padding.bottom - xAxisTitleHeight - xAxisScrollHeight,
+      y1 + 2
+    );
 
     return {
       x1,
@@ -678,14 +725,19 @@ class EvChart {
           }
         }
 
-        labelOffset.left = (lw / 2) > labelOffset.left ? (lw / 2) : labelOffset.left;
-        labelOffset.right = (lw / 2) > labelOffset.right ? (lw / 2) : labelOffset.right;
+        labelOffset.left =
+          lw / 2 > labelOffset.left ? lw / 2 : labelOffset.left;
+        labelOffset.right =
+          lw / 2 > labelOffset.right ? lw / 2 : labelOffset.right;
       }
     });
 
     axesY.forEach((axis, index) => {
       if (axis.labelStyle?.show) {
-        lw = Math.max(range.y[index].size.width + labelBuffer.width, 42 + labelBuffer.width);
+        lw = Math.max(
+          range.y[index].size.width + labelBuffer.width,
+          42 + labelBuffer.width
+        );
 
         if (axis.position === 'left') {
           if (lw > labelOffset.left) {
@@ -697,8 +749,9 @@ class EvChart {
           }
         }
 
-        labelOffset.top = (lh / 2) > labelOffset.top ? (lh / 2) : labelOffset.top;
-        labelOffset.bottom = (lh / 2) > labelOffset.bottom ? (lh / 2) : labelOffset.bottom;
+        labelOffset.top = lh / 2 > labelOffset.top ? lh / 2 : labelOffset.top;
+        labelOffset.bottom =
+          lh / 2 > labelOffset.bottom ? lh / 2 : labelOffset.bottom;
       }
     });
 
@@ -797,9 +850,10 @@ class EvChart {
 
     // legend Update
     if (options.legend.show) {
-      const useTable = !!options.legend?.table?.use
-        && options.type !== 'heatMap'
-        && options.type !== 'scatter';
+      const useTable =
+        !!options.legend?.table?.use &&
+        options.type !== 'heatMap' &&
+        options.type !== 'scatter';
 
       if (!this.isInitLegend) {
         this.initLegend();
@@ -867,10 +921,14 @@ class EvChart {
    * @returns {undefined}
    */
   overlayClear() {
-    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+    this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
 
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-      this.overlayCanvas.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(
+      0,
+      0,
+      this.overlayCanvas.width / this.clearRectRatio,
+      this.overlayCanvas.height / this.clearRectRatio
+    );
   }
 
   /**
@@ -879,18 +937,30 @@ class EvChart {
    * @returns {undefined}
    */
   clear() {
-    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+    this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
     if (this.displayCanvas) {
-      this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
-        this.displayCanvas.height / this.clearRectRatio);
+      this.displayCtx.clearRect(
+        0,
+        0,
+        this.displayCanvas.width / this.clearRectRatio,
+        this.displayCanvas.height / this.clearRectRatio
+      );
     }
     if (this.bufferCanvas) {
-      this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
-        this.bufferCanvas.height / this.clearRectRatio);
+      this.bufferCtx.clearRect(
+        0,
+        0,
+        this.bufferCanvas.width / this.clearRectRatio,
+        this.bufferCanvas.height / this.clearRectRatio
+      );
     }
     if (this.overlayCanvas) {
-      this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-        this.overlayCanvas.height / this.clearRectRatio);
+      this.overlayCtx.clearRect(
+        0,
+        0,
+        this.overlayCanvas.width / this.clearRectRatio,
+        this.overlayCanvas.height / this.clearRectRatio
+      );
     }
   }
 
@@ -948,10 +1018,19 @@ class EvChart {
     if (this.options.legend.show) {
       if (this.legendBoxDOM) {
         this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick);
-        this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver);
-        this.legendBoxDOM.removeEventListener('mouseleave', this.onLegendBoxLeave);
+        this.legendBoxDOM.removeEventListener(
+          'mouseover',
+          this.onLegendBoxOver
+        );
+        this.legendBoxDOM.removeEventListener(
+          'mouseleave',
+          this.onLegendBoxLeave
+        );
         if (this.options.legend.type === 'gradient') {
-          this.legendBoxDOM.removeEventListener('mousedown', this.onLegendMouseDown);
+          this.legendBoxDOM.removeEventListener(
+            'mousedown',
+            this.onLegendMouseDown
+          );
         }
       }
 
@@ -1008,11 +1087,7 @@ class EvChart {
    * init defaultSelectInfo (for selectLabel, selectSeries options)
    */
   initDefaultSelectInfo() {
-    const {
-      type: chartType,
-      selectLabel,
-      selectSeries,
-    } = this.options;
+    const { type: chartType, selectLabel, selectSeries } = this.options;
 
     if (selectLabel.use) {
       let targetAxis = null;
@@ -1022,7 +1097,10 @@ class EvChart {
 
       this.defaultSelectInfo = !this.defaultSelectInfo?.dataIndex
         ? { dataIndex: [], label: [], data: [] }
-        : this.getSelectedLabelInfoWithLabelData(this.defaultSelectInfo.dataIndex, targetAxis);
+        : this.getSelectedLabelInfoWithLabelData(
+            this.defaultSelectInfo.dataIndex,
+            targetAxis
+          );
     }
 
     if (selectSeries.use && !this.defaultSelectInfo) {

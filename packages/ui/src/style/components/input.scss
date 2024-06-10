@@ -60,7 +60,8 @@
   &.ev-input-number,
   &.ev-text-field,
   &.ev-select {
-    &, * {
+    &,
+    * {
       cursor: not-allowed !important;
     }
     &:hover {

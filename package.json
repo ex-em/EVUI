@@ -13,15 +13,23 @@
     "apps/*"
   ],
   "devDependencies": {
+    "@evui/eslint-config": "workspace:*",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
     "nx": "19.0.4",
-    "prettier": "^3.2.5",
-    "@evui/eslint-config": "workspace:*"
+    "prettier": "^3.2.5"
   },
   "scripts": {
     "build": "nx run-many --target=build --projects=@evui/*",
     "types-check": "nx run-many --target=type-check --projects=@evui/*",
     "storybook": "nx run @evui/storybook:storybook",
     "graph": "nx graph",
-    "reset": "nx reset"
+    "reset": "nx reset",
+    "lint-staged": "lint-staged",
+    "prepare": "husky",
+    "prettier-fix": "prettier --write .",
+    "prettier-check": "prettier --check .",
+    "eslint-fix": "eslint --fix .",
+    "eslint-check": "eslint ."
   }
 }

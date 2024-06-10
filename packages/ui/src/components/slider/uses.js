@@ -1,4 +1,11 @@
-import { ref, reactive, watch, computed, onMounted, getCurrentInstance } from 'vue';
+import {
+  ref,
+  reactive,
+  watch,
+  computed,
+  onMounted,
+  getCurrentInstance,
+} from 'vue';
 import { isEqual } from 'lodash-es';
 import { convertToPercent } from '@/common/utils';
 import { getValueCloseToStep } from '@/components/inputNumber/uses';
@@ -30,7 +37,10 @@ export const useModel = () => {
       if (!obj) {
         return [];
       }
-      const style = props.mark.style && (typeof props.mark.style === 'object') ? props.mark.style : {};
+      const style =
+        props.mark.style && typeof props.mark.style === 'object'
+          ? props.mark.style
+          : {};
       const keyList = Object.keys(obj);
       const resultList = [];
       let markVal;
@@ -38,7 +48,10 @@ export const useModel = () => {
         markVal = +keyList[ix];
         if (!isNaN(markVal)) {
           resultList.push({
-            posX: type === 'value' ? convertToPercent(markVal, props.max - props.min) : markVal,
+            posX:
+              type === 'value'
+                ? convertToPercent(markVal, props.max - props.min)
+                : markVal,
             label: obj[markVal],
             style,
           });
@@ -95,8 +108,10 @@ export const useModel = () => {
     let leftVal;
     let rightVal;
     if (props.range && Array.isArray(val)) {
-      leftVal = typeof val[0] === 'number' && !isNaN(val[0]) ? val[0] : props.min;
-      rightVal = typeof val[1] === 'number' && !isNaN(val[1]) ? val[1] : props.min;
+      leftVal =
+        typeof val[0] === 'number' && !isNaN(val[0]) ? val[0] : props.min;
+      rightVal =
+        typeof val[1] === 'number' && !isNaN(val[1]) ? val[1] : props.min;
 
       state.leftValue = getValueCloseToStep(leftVal, optionObj);
       state.rightValue = getValueCloseToStep(rightVal, optionObj);
@@ -137,18 +152,21 @@ export const useModel = () => {
     slider.valueRange = props.max - props.min;
   };
 
-  watch(() => props.modelValue, (curr, prev) => {
-    if (curr
-      && !isEqual(curr, prev)
-      && !state.dragging
-    ) {
-      setHandleValue(curr);
-      currentValue.value = curr;
+  watch(
+    () => props.modelValue,
+    (curr, prev) => {
+      if (curr && !isEqual(curr, prev) && !state.dragging) {
+        setHandleValue(curr);
+        currentValue.value = curr;
+      }
     }
-  });
-  watch(() => props.step, () => {
-    setSliderValue(currentValue.value);
-  });
+  );
+  watch(
+    () => props.step,
+    () => {
+      setSliderValue(currentValue.value);
+    }
+  );
 
   return {
     currentValue,
@@ -167,19 +185,28 @@ export const useStyle = (params) => {
   const colorDefault = 'transparent';
 
   const leftHandleStyle = computed(() => ({
-    left: slider.valueRange > 0 ? `${convertToPercent(state.leftValue - props.min, slider.valueRange)}%` : 0,
+    left:
+      slider.valueRange > 0
+        ? `${convertToPercent(state.leftValue - props.min, slider.valueRange)}%`
+        : 0,
   }));
   const rightHandleStyle = computed(() => ({
-    left: slider.valueRange > 0 ? `${convertToPercent(state.rightValue - props.min, slider.valueRange)}%` : 0,
+    left:
+      slider.valueRange > 0
+        ? `${convertToPercent(state.rightValue - props.min, slider.valueRange)}%`
+        : 0,
   }));
   const handleBtnStyle = computed(() => {
-    if (!props.color
-      || (Array.isArray(props.color) && props.color.length !== 1)
+    if (
+      !props.color ||
+      (Array.isArray(props.color) && props.color.length !== 1)
     ) {
       return {};
     }
     return {
-      borderColor: (typeof props.color === 'string' ? props.color : props.color[0]) || colorDefault,
+      borderColor:
+        (typeof props.color === 'string' ? props.color : props.color[0]) ||
+        colorDefault,
     };
   });
 
@@ -187,25 +214,33 @@ export const useStyle = (params) => {
    * Slider 색 칠하기 : props.color 갖고 있을 때
    * color 로 받은 값에 따라 왼쪽 부터 채워짐. 없을 경우 기본 색 = transparent
    * */
-  const isColorArray = computed(() => props.color && Array.isArray(props.color));
+  const isColorArray = computed(
+    () => props.color && Array.isArray(props.color)
+  );
 
   const rangeThumbStyle = computed(() => {
     const minVal = Math.min(state.leftValue, state.rightValue);
     const maxVal = Math.max(state.leftValue, state.rightValue);
     const mvRange = +(maxVal - minVal).toFixed(2);
-    const leftPosX = (slider.valueRange > 0 && props.range)
-      ? convertToPercent(+(minVal - props.min).toFixed(2), slider.valueRange) : 0;
-    const thumbWidth = (mvRange > 0) ? convertToPercent(mvRange, slider.valueRange) : 0;
+    const leftPosX =
+      slider.valueRange > 0 && props.range
+        ? convertToPercent(+(minVal - props.min).toFixed(2), slider.valueRange)
+        : 0;
+    const thumbWidth =
+      mvRange > 0 ? convertToPercent(mvRange, slider.valueRange) : 0;
 
     const thumbColor = {};
     if (props.color) {
-      if (typeof props.color === 'string'
-        || (Array.isArray(props.color) && props.color.length === 1)
+      if (
+        typeof props.color === 'string' ||
+        (Array.isArray(props.color) && props.color.length === 1)
       ) {
-        thumbColor.backgroundColor = (typeof props.color === 'string' ? props.color : props.color[0]) || colorDefault;
+        thumbColor.backgroundColor =
+          (typeof props.color === 'string' ? props.color : props.color[0]) ||
+          colorDefault;
       } else if (Array.isArray(props.color) && props.color.length > 1) {
-        thumbColor.backgroundColor = (props.range ? props.color[1] : props.color[0])
-          || colorDefault;
+        thumbColor.backgroundColor =
+          (props.range ? props.color[1] : props.color[0]) || colorDefault;
       }
     }
     return {
@@ -216,15 +251,14 @@ export const useStyle = (params) => {
   });
 
   const leftThumbStyle = computed(() => {
-    if (
-      !isColorArray.value
-      || props.color.length < 2
-      || !props.range
-    ) {
+    if (!isColorArray.value || props.color.length < 2 || !props.range) {
       return {};
     }
     const minVal = Math.min(state.leftValue, state.rightValue);
-    const thumbWidth = convertToPercent(Math.abs(minVal - props.min), slider.valueRange);
+    const thumbWidth = convertToPercent(
+      Math.abs(minVal - props.min),
+      slider.valueRange
+    );
     return {
       width: `${thumbWidth}%`,
       backgroundColor: props.color[0] || colorDefault,
@@ -236,8 +270,14 @@ export const useStyle = (params) => {
       return {};
     }
     const maxVal = Math.max(state.leftValue, state.rightValue);
-    const leftPosX = convertToPercent(+(maxVal - props.min).toFixed(2), slider.valueRange);
-    const thumbWidth = convertToPercent(+(props.max - maxVal).toFixed(2), slider.valueRange);
+    const leftPosX = convertToPercent(
+      +(maxVal - props.min).toFixed(2),
+      slider.valueRange
+    );
+    const thumbWidth = convertToPercent(
+      +(props.max - maxVal).toFixed(2),
+      slider.valueRange
+    );
 
     const lastIdx = !props.range ? props.color.length - 1 : 2;
     return {
@@ -260,16 +300,19 @@ export const useStyle = (params) => {
 
 export const useEvent = (params) => {
   const { props } = getCurrentInstance();
-  const { currentValue, state, slider, updateSliderInfo, setSliderValue } = params;
+  const { currentValue, state, slider, updateSliderInfo, setSliderValue } =
+    params;
 
   const getSelectedValue = (e) => {
     if (!state.dragging) {
       updateSliderInfo();
     }
 
-    const currentOffsetX = e.type.indexOf('touch') !== -1 ? e.touches[0].clientX : e.clientX;
+    const currentOffsetX =
+      e.type.indexOf('touch') !== -1 ? e.touches[0].clientX : e.clientX;
     const { valueRange, offset } = slider;
-    let clickedValue = props.min + ((currentOffsetX - offset.left) * valueRange) / offset.width;
+    let clickedValue =
+      props.min + ((currentOffsetX - offset.left) * valueRange) / offset.width;
 
     if (clickedValue < props.min) {
       clickedValue = props.min;
@@ -289,7 +332,8 @@ export const useEvent = (params) => {
     let convertValue;
     if (props.range) {
       const minValue = Math.min(state.leftValue, state.rightValue);
-      const rangeHalfValue = minValue + Math.abs((state.rightValue - state.leftValue) / 2);
+      const rangeHalfValue =
+        minValue + Math.abs((state.rightValue - state.leftValue) / 2);
       const isReverse = state.leftValue > state.rightValue;
 
       if (selectedValue < rangeHalfValue) {
@@ -297,7 +341,10 @@ export const useEvent = (params) => {
       } else {
         state.handleType = isReverse ? 'left' : 'right';
       }
-      convertValue = state.handleType === 'left' ? [selectedValue, state.rightValue] : [state.leftValue, selectedValue];
+      convertValue =
+        state.handleType === 'left'
+          ? [selectedValue, state.rightValue]
+          : [state.leftValue, selectedValue];
     } else {
       state.handleType = 'right';
       convertValue = selectedValue;
@@ -312,7 +359,10 @@ export const useEvent = (params) => {
 
     let convertValue;
     if (props.range) {
-      convertValue = state.handleType === 'left' ? [selectedValue, state.rightValue] : [state.leftValue, selectedValue];
+      convertValue =
+        state.handleType === 'left'
+          ? [selectedValue, state.rightValue]
+          : [state.leftValue, selectedValue];
     } else {
       convertValue = selectedValue;
     }
@@ -345,7 +395,10 @@ export const useEvent = (params) => {
   const changeInput = (val, type) => {
     if (props.showInput && !state.dragging && state.isInit) {
       if (props.range && Array.isArray(currentValue.value)) {
-        const result = type === 'left' ? [val, currentValue.value[1]] : [currentValue.value[0], val];
+        const result =
+          type === 'left'
+            ? [val, currentValue.value[1]]
+            : [currentValue.value[0], val];
         setSliderValue(result);
       } else if (!props.range) {
         setSliderValue(val);
@@ -361,14 +414,17 @@ export const useEvent = (params) => {
 
 export const useInit = (params) => {
   const { props, emit } = getCurrentInstance();
-  const { currentValue, state, slider, updateSliderInfo, setSliderValue } = params;
+  const { currentValue, state, slider, updateSliderInfo, setSliderValue } =
+    params;
 
   const validateProps = () => {
     const hasMaxProps = props.max || props.max === 0;
     const hasMinProps = props.min || props.min === 0;
     if (hasMaxProps && hasMinProps) {
       if (props.max <= props.min) {
-        console.warn('[EVUI][Slider] Max value must be greater than min value.');
+        console.warn(
+          '[EVUI][Slider] Max value must be greater than min value.'
+        );
       }
     }
   };

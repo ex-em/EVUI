@@ -1,5 +1,8 @@
 import { defaultsDeep } from 'lodash-es';
-import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import {
+  PLOT_BAND_OPTION,
+  PLOT_LINE_OPTION,
+} from '@/components/chart/helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 import { truthyNumber } from '../../../common/utils';
@@ -20,7 +23,8 @@ class StepScale extends Scale {
    */
   calculateScaleRange(minMax, scrollbarOpt, chartRect) {
     const stepMinMax = this.labelStyle.alignToGridLine
-      ? minMax : Util.getStringMinMax(this.labels);
+      ? minMax
+      : Util.getStringMinMax(this.labels);
     let maxValue = stepMinMax.max;
     let minValue = stepMinMax.min;
 
@@ -51,7 +55,7 @@ class StepScale extends Scale {
       maxLabel: this.getLabelFormat(maxValue, maxWidth),
       size: Util.calcTextSize(
         this.getLabelFormat(maxValue, maxWidth),
-        Util.getLabelStyle(this.labelStyle),
+        Util.getLabelStyle(this.labelStyle)
       ),
     };
   }
@@ -63,19 +67,13 @@ class StepScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const {
-      minValue,
-      maxValue,
-      minIndex,
-      maxIndex,
-      maxSteps,
-    } = range;
+    const { minValue, maxValue, minIndex, maxIndex, maxSteps } = range;
 
-    let numberOfSteps = (maxIndex - minIndex) + 1;
+    let numberOfSteps = maxIndex - minIndex + 1;
     let interval = 1;
 
     const oriSteps = numberOfSteps;
-    const isNumbersArray = this.labels.every(label => !isNaN(label));
+    const isNumbersArray = this.labels.every((label) => !isNaN(label));
     if (this.labelStyle.alignToGridLine && isNumbersArray) {
       if (maxSteps > 2) {
         while (numberOfSteps > maxSteps * 2) {
@@ -125,7 +123,8 @@ class StepScale extends Scale {
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
-    const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+    const offsetCounterPoint =
+      aPos[this.units.rectOffsetCounter(this.position)];
     const maxWidth = chartRect.chartWidth / (steps + 2);
 
     this.drawAxisTitle(chartRect, labelOffset);
@@ -176,7 +175,7 @@ class StepScale extends Scale {
       for (index = 0; index < steps; index += count) {
         const labelIndex = startIndex + index;
         const item = this.labels[labelIndex];
-        labelCenter = Math.round(startPoint + (labelGap * index));
+        labelCenter = Math.round(startPoint + labelGap * index);
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
 
@@ -193,11 +192,12 @@ class StepScale extends Scale {
           targetAxis = horizontal ? 'y' : 'x';
         }
 
-        const isBlurredLabel = selectLabelOpt?.use
-          && selectLabelOpt?.useLabelOpacity
-          && targetAxis === this.type
-          && selectedLabelInfo?.dataIndex?.length
-          && !selectedLabelInfo?.dataIndex?.includes(labelIndex);
+        const isBlurredLabel =
+          selectLabelOpt?.use &&
+          selectLabelOpt?.useLabelOpacity &&
+          targetAxis === this.type &&
+          selectedLabelInfo?.dataIndex?.length &&
+          !selectedLabelInfo?.dataIndex?.includes(labelIndex);
 
         const labelColor = this.labelStyle.color;
         let defaultOpacity = 1;
@@ -206,25 +206,35 @@ class StepScale extends Scale {
           defaultOpacity = Util.getOpacity(labelColor);
         }
 
-        ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+        ctx.fillStyle = Util.colorStringToRgba(
+          labelColor,
+          isBlurredLabel ? 0.1 : defaultOpacity
+        );
 
         if (this.type === 'x') {
-          labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          const xPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
+          labelPoint =
+            this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          const xPoint = alignToGridLine
+            ? labelCenter
+            : labelCenter + labelGap / 2;
           ctx.fillText(labelText, xPoint, labelPoint);
 
-          if (!isBlurredLabel
-            && selectItemOpt?.showLabelTip
-            && hitInfo?.label
-            && !horizontal) {
+          if (
+            !isBlurredLabel &&
+            selectItemOpt?.showLabelTip &&
+            hitInfo?.label &&
+            !horizontal
+          ) {
             const selectedLabel = hitInfo.label;
             if (selectedLabel === labelText) {
-              const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+              const height = Math.round(
+                ctx.measureText(this.labelStyle?.fontSize).width
+              );
               Util.showLabelTip({
                 ctx: this.ctx,
                 width: Math.round(ctx.measureText(selectedLabel).width) + 10,
                 height,
-                x: labelCenter + (labelGap / 2),
+                x: labelCenter + labelGap / 2,
                 y: labelPoint + (height - 2),
                 borderRadius: 2,
                 arrowSize: 3,
@@ -240,8 +250,11 @@ class StepScale extends Scale {
             ctx.lineTo(linePosition, offsetCounterPoint);
           }
         } else {
-          labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          const yPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
+          labelPoint =
+            this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          const yPoint = alignToGridLine
+            ? labelCenter
+            : labelCenter + labelGap / 2;
           ctx.fillText(labelText, labelPoint, yPoint);
 
           if (index > 0 && this.showGrid) {
@@ -252,12 +265,13 @@ class StepScale extends Scale {
         ctx.stroke();
       }
 
-      if (alignToGridLine && (index === this.labels.length)) {
-        let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
+      if (alignToGridLine && index === this.labels.length) {
+        let labelLastText =
+          +labels[labels.length - 1] + (+labels[1] - +labels[0]);
         if (isNaN(labelLastText)) {
           labelLastText = 'Max';
         }
-        labelCenter = Math.round(startPoint + (labelGap * labels.length));
+        labelCenter = Math.round(startPoint + labelGap * labels.length);
         linePosition = labelCenter + aliasPixel;
 
         if (this.type === 'x') {
@@ -286,7 +300,8 @@ class StepScale extends Scale {
       const maxX = aPos.x2;
       const minY = aPos.y1 + padding;
       const maxY = aPos.y2;
-      const labelGap = (endPoint - startPoint) / (this.labelStyle.show ? labels.length : 1);
+      const labelGap =
+        (endPoint - startPoint) / (this.labelStyle.show ? labels.length : 1);
 
       this.plotBands?.forEach((plotBand) => {
         if (!plotBand.from && !plotBand.to) {
@@ -294,9 +309,13 @@ class StepScale extends Scale {
         }
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
-        const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
-        const fromPos = Math.round(startPoint + (labelGap * from));
-        const toPos = Math.round(startPoint + (labelGap * to));
+        const {
+          from = 0,
+          to = labels.length,
+          label: labelOpt,
+        } = mergedPlotBandOpt;
+        const fromPos = Math.round(startPoint + labelGap * from);
+        const toPos = Math.round(startPoint + labelGap * to);
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
@@ -307,8 +326,17 @@ class StepScale extends Scale {
         }
 
         if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotBandLabelPosition(fromPos, toPos, labelOptions, maxX, minY);
+          const labelOptions = this.getNormalizedLabelOptions(
+            chartRect,
+            labelOpt
+          );
+          const textXY = this.getPlotBandLabelPosition(
+            fromPos,
+            toPos,
+            labelOptions,
+            maxX,
+            minY
+          );
           this.drawPlotLabel(labelOptions, textXY);
         }
 
@@ -322,7 +350,8 @@ class StepScale extends Scale {
 
         const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
         const { value, label: labelOpt } = mergedPlotLineOpt;
-        const dataPos = Math.round(startPoint + (labelGap * value)) + (labelGap / 2);
+        const dataPos =
+          Math.round(startPoint + labelGap * value) + labelGap / 2;
 
         this.setPlotLineStyle(mergedPlotLineOpt);
 
@@ -333,8 +362,16 @@ class StepScale extends Scale {
         }
 
         if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotLineLabelPosition(dataPos, labelOptions, maxX, minY);
+          const labelOptions = this.getNormalizedLabelOptions(
+            chartRect,
+            labelOpt
+          );
+          const textXY = this.getPlotLineLabelPosition(
+            dataPos,
+            labelOptions,
+            maxX,
+            minY
+          );
           this.drawPlotLabel(labelOptions, textXY);
         }
 
@@ -359,7 +396,9 @@ class StepScale extends Scale {
       }
     }
 
-    return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
+    return this.labelStyle.fitWidth
+      ? this.fittingString(value, maxWidth)
+      : value;
   }
 
   /**

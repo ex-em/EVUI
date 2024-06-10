@@ -59,7 +59,12 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
+      if (
+        indicator.use &&
+        type !== 'pie' &&
+        type !== 'scatter' &&
+        type !== 'heatMap'
+      ) {
         this.drawIndicator(offset, indicator.color);
       }
 
@@ -105,14 +110,21 @@ const modules = {
 
       if (selectItem.use) {
         const offset = this.getMousePosition(e);
-        const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
-
+        const hitInfo = this.getItemByPosition(
+          offset,
+          selectItem.useApproximateValue
+        );
 
         if (hitInfo.label !== null) {
           this.render(hitInfo);
         }
 
-        ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
+        ({
+          label: args.label,
+          value: args.value,
+          sId: args.seriesId,
+          acc: args.acc,
+        } = hitInfo);
       }
 
       if (typeof this.listeners['dbl-click'] === 'function') {
@@ -166,18 +178,25 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const {
-          labelIndex: clickedLabelIndex,
-        } = this.getLabelInfoByPosition(offset, targetAxis);
+        const { labelIndex: clickedLabelIndex } = this.getLabelInfoByPosition(
+          offset,
+          targetAxis
+        );
 
-        const {
-          dataIndex: dataIndexList,
-        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
+        const { dataIndex: dataIndexList } = this.regulateSelectedLabelInfo(
+          clickedLabelIndex,
+          targetAxis
+        );
 
-        this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
+        this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(
+          dataIndexList,
+          targetAxis
+        );
 
         if (targetAxis) {
-          this.defaultSelectInfo.targetAxis = dataIndexList?.length ? targetAxis : null;
+          this.defaultSelectInfo.targetAxis = dataIndexList?.length
+            ? targetAxis
+            : null;
         }
 
         args.selected = {
@@ -250,7 +269,10 @@ const modules = {
             const { useBothAxis } = selectLabelOpt;
             const location = this.getCurMouseLocation(offset);
 
-            if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
+            if (
+              (location === 'yAxis' || location === 'xAxis') &&
+              !useBothAxis
+            ) {
               const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
               if (location !== selectLabelAxis) {
                 return;
@@ -282,11 +304,13 @@ const modules = {
             let touchInfo = this.setTouchInfo(e);
             this.overlayClear();
 
-            if (this.options.dragSelection.keepDisplay
-              && (e.layerX < touchInfo.range.x1
-              || e.layerY < touchInfo.range.y1
-              || e.layerX > touchInfo.range.x2
-              || e.layerY > touchInfo.range.y2)) {
+            if (
+              this.options.dragSelection.keepDisplay &&
+              (e.layerX < touchInfo.range.x1 ||
+                e.layerY < touchInfo.range.y1 ||
+                e.layerX > touchInfo.range.x2 ||
+                e.layerY > touchInfo.range.y2)
+            ) {
               this.isTouchOverlay = false;
             } else {
               touchInfo = this.setTouchBoxDimensions(touchInfo);
@@ -330,7 +354,10 @@ const modules = {
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
-      if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
+      if (
+        dragSelection.use &&
+        (type === 'scatter' || type === 'line' || type === 'heatMap')
+      ) {
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -346,7 +373,9 @@ const modules = {
     };
 
     if (this.options?.tooltip?.useScrollbar) {
-      this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
+      this.overlayCanvas.addEventListener('wheel', this.onWheel, {
+        passive: false,
+      });
     }
     if (this.options?.tooltip?.throttledMove) {
       this.onMouseMove = throttle(this.onMouseMove, 30);
@@ -358,7 +387,7 @@ const modules = {
     this.overlayCanvas.addEventListener('click', this.onClick);
     this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
 
-    this.dragTouchSelectionEvent = e => this.dragTouchSelectionDestroy(e);
+    this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
   },
 
@@ -435,7 +464,8 @@ const modules = {
 
       if (type === 'heatMap') {
         const rangeInfo = { xcp, xep, ycp, yep, range: aRange };
-        const { xsp, ysp, width, height } = this.getDragInfoForHeatMap(rangeInfo);
+        const { xsp, ysp, width, height } =
+          this.getDragInfoForHeatMap(rangeInfo);
         dragInfo.xsp = xsp;
         dragInfo.ysp = ysp;
         dragInfo.width = width;
@@ -444,9 +474,10 @@ const modules = {
         dragInfo.xsp = Math.min(xcp, xep);
         dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
         dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-        dragInfo.height = type === 'scatter'
-          ? Math.ceil(Math.abs(yep - ycp))
-          : aRange.y2 - aRange.y1;
+        dragInfo.height =
+          type === 'scatter'
+            ? Math.ceil(Math.abs(yep - ycp))
+            : aRange.y2 - aRange.y1;
       }
 
       this.overlayClear();
@@ -465,21 +496,21 @@ const modules = {
         const args = {
           e,
           data: this.findSelectedItems(dragInfo),
-          range: type === 'heatMap'
-            ? this.getSelectionRangeForHeatMap(dragInfo)
-            : this.getSelectionRange(dragInfo),
+          range:
+            type === 'heatMap'
+              ? this.getSelectionRangeForHeatMap(dragInfo)
+              : this.getSelectionRange(dragInfo),
         };
 
         this.dragInfoBackup = defaultsDeep({}, dragInfo);
 
-        if (typeof this.listeners['drag-select'] === 'function' && !this.options?.zoom?.use) {
+        if (
+          typeof this.listeners['drag-select'] === 'function' &&
+          !this.options?.zoom?.use
+        ) {
           this.listeners['drag-select'](args);
         } else {
-          const {
-            xsp,
-            range: chartRange,
-            width: dragWidth,
-          } = dragInfo;
+          const { xsp, range: chartRange, width: dragWidth } = dragInfo;
           const dragXsp = xsp - chartRange.x1;
 
           args.range.dragSelectionInfo = {
@@ -509,7 +540,7 @@ const modules = {
     window.addEventListener('mouseup', dragEnd);
   },
 
-/**
+  /**
    * Draw selection-area
    *
    * @returns {undefined}
@@ -533,10 +564,10 @@ const modules = {
     if (isEqual(newRange, range)) {
       ctx.fillRect(xsp, ysp, width, height);
     } else {
-      const rectWidth = (range.x2 - range.x1);
-      const rectHeight = (range.y2 - range.y1);
-      const newRectWidth = (newRange.x2 - newRange.x1);
-      const newRectHeight = (newRange.y2 - newRange.y1);
+      const rectWidth = range.x2 - range.x1;
+      const rectHeight = range.y2 - range.y1;
+      const newRectWidth = newRange.x2 - newRange.x1;
+      const newRectHeight = newRange.y2 - newRange.y1;
 
       const ratioX = (xsp - range.x1) / rectWidth;
       const ratioY = (ysp - range.y1) / rectHeight;
@@ -570,7 +601,12 @@ const modules = {
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
     const rect = this.overlayCanvas.getBoundingClientRect();
-    return [e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height];
+    return [
+      e.clientX - rect.left,
+      e.clientY - rect.top,
+      rect.width,
+      rect.height,
+    ];
   },
 
   /**
@@ -608,15 +644,21 @@ const modules = {
 
       const setCurMouseLabelVal = (axes, labelIdx, labelVal) => {
         curMouseTargetVal.labelIdx = labelIdx;
-        curMouseTargetVal.labelVal = axes[0].type === 'time' ? dayjs(labelVal).format(axes[0].timeFormat) : labelVal;
-        curMouseTargetVal.originVal = axes[0].type === 'time' ? dayjs(labelVal) : labelVal;
+        curMouseTargetVal.labelVal =
+          axes[0].type === 'time'
+            ? dayjs(labelVal).format(axes[0].timeFormat)
+            : labelVal;
+        curMouseTargetVal.originVal =
+          axes[0].type === 'time' ? dayjs(labelVal) : labelVal;
       };
 
       const setAxisLabelInfo = (targetAxis) => {
-        const {
-          labelIndex,
-        } = this.getLabelInfoByPosition(offset, location);
-        const { labelVal, labelIdx } = this.getCurMouseLabelVal(targetAxis, offset, labelIndex);
+        const { labelIndex } = this.getLabelInfoByPosition(offset, location);
+        const { labelVal, labelIdx } = this.getCurMouseLabelVal(
+          targetAxis,
+          offset,
+          labelIndex
+        );
         const axesOpt = targetAxis === 'xAxis' ? axesX : axesY;
 
         setCurMouseLabelVal(axesOpt, labelIdx, labelVal);
@@ -712,9 +754,9 @@ const modules = {
    */
   dragTouchSelectionDestroy(e) {
     if (
-      this.options.dragSelection?.use
-      && e.target !== this.overlayCanvas
-      && this.isTouchOverlay
+      this.options.dragSelection?.use &&
+      e.target !== this.overlayCanvas &&
+      this.isTouchOverlay
     ) {
       this.isTouchOverlay = false;
       this.overlayClear();
@@ -815,9 +857,10 @@ const modules = {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
-    const tooltipValueFormatter = typeof tooltipOpt?.formatter === 'function'
-      ? tooltipOpt?.formatter
-      : tooltipOpt?.formatter?.value;
+    const tooltipValueFormatter =
+      typeof tooltipOpt?.formatter === 'function'
+        ? tooltipOpt?.formatter
+        : tooltipOpt?.formatter?.value;
 
     let formattedTxt = value;
     if (tooltipValueFormatter) {
@@ -865,7 +908,8 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const hitItemId = Object.keys(hitInfo.items)[0];
     const hitItemData = isHorizontal
-      ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
+      ? hitInfo.items?.[hitItemId]?.data?.y
+      : hitInfo.items?.[hitItemId]?.data?.x;
     let maxSeriesName = '';
     let maxValueTxt = '';
 
@@ -875,11 +919,8 @@ const modules = {
       const series = this.seriesList[sId];
 
       if (series?.show) {
-        const hasData = series.data.find(data => (
-            isHorizontal
-              ? data?.y === hitItemData
-              : data?.x === hitItemData
-          ),
+        const hasData = series.data.find((data) =>
+          isHorizontal ? data?.y === hitItemData : data?.x === hitItemData
         );
 
         const formattedValue = this.getFormattedTooltipValue({
@@ -902,7 +943,9 @@ const modules = {
           hitInfo.items[sId] = item;
         }
 
-        const maxSeriesNameWidth = ctx ? ctx.measureText(maxSeriesName).width : 1;
+        const maxSeriesNameWidth = ctx
+          ? ctx.measureText(maxSeriesName).width
+          : 1;
         const seriesNameWidth = ctx ? ctx.measureText(series.name).width : 1;
         if (maxSeriesNameWidth < seriesNameWidth) {
           maxSeriesName = series.name;
@@ -937,7 +980,9 @@ const modules = {
         sId: targetInfo.seriesID,
       };
     } else {
-      foundInfo = isNaN(targetInfo?.dataIndex) ? null : this.getItem(targetInfo, false);
+      foundInfo = isNaN(targetInfo?.dataIndex)
+        ? null
+        : this.getItem(targetInfo, false);
     }
 
     this.render(foundInfo);
@@ -952,7 +997,10 @@ const modules = {
    * @returns {boolean}
    */
   selectLabelByData(labelIndexList, targetAxis) {
-    this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(labelIndexList, targetAxis);
+    this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(
+      labelIndexList,
+      targetAxis
+    );
     this.render();
   },
 
@@ -975,7 +1023,11 @@ const modules = {
    * @returns {object[]}
    */
   getSelectedLabelInfoWithLabelData(labelIndexList, targetAxis) {
-    const { selectLabel: selectLabelOpt, type: chartType, horizontal } = this.options;
+    const {
+      selectLabel: selectLabelOpt,
+      type: chartType,
+      horizontal,
+    } = this.options;
     const result = cloneDeep(this.defaultSelectInfo);
     result.dataIndex = labelIndexList;
 
@@ -985,11 +1037,14 @@ const modules = {
       case 'line': {
         result.dataIndex.splice(selectLabelOpt.limit);
 
-        result.label = result.dataIndex.map(i => this.data.labels[i]);
+        result.label = result.dataIndex.map((i) => this.data.labels[i]);
 
         const dataEntries = Object.entries(this.data.data);
-        result.data = result.dataIndex.map(labelIdx => Object.fromEntries(
-          dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
+        result.data = result.dataIndex.map((labelIdx) =>
+          Object.fromEntries(
+            dataEntries.map(([sId, data]) => [sId, data[labelIdx]])
+          )
+        );
         break;
       }
 
@@ -1005,11 +1060,13 @@ const modules = {
           targetAxisDirection = horizontal ? 'y' : 'x';
         }
 
-        result.label = result.dataIndex.map(i => this.data.labels[targetAxisDirection][i]);
+        result.label = result.dataIndex.map(
+          (i) => this.data.labels[targetAxisDirection][i]
+        );
 
         const dataValues = Object.values(this.data.data)[0];
         result.data = dataValues.filter(({ x, y }) =>
-          (result.label.includes(targetAxisDirection === 'y' ? y : x)),
+          result.label.includes(targetAxisDirection === 'y' ? y : x)
         );
         break;
       }
@@ -1026,9 +1083,10 @@ const modules = {
    */
   regulateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
-    const before = targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
-      ? { ...this.defaultSelectInfo, targetAxis }
-      : { dataIndex: [], targetAxis };
+    const before =
+      targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
+        ? { ...this.defaultSelectInfo, targetAxis }
+        : { dataIndex: [], targetAxis };
 
     const after = cloneDeep(before);
 
@@ -1128,18 +1186,34 @@ const modules = {
     const yMinRatio = this.getRatioInRange(range.y1, range.y2, yep);
     const yMaxRatio = this.getRatioInRange(range.y1, range.y2, ysp);
 
-    const xMin = this.isMobile && this.boxOverflow?.x1
-      ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
-      : Math.max(dataRangeX.graphMin + graphWidth * xMinRatio, dataRangeX.graphMin);
-    const xMax = this.isMobile && this.boxOverflow?.x2
-      ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
-      : Math.min(dataRangeX.graphMin + graphWidth * xMaxRatio, dataRangeX.graphMax);
-    const yMin = this.isMobile && this.boxOverflow?.y2
-      ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
-      : Math.max(dataRangeY.graphMin + graphHeight * (1 - yMinRatio), dataRangeY.graphMin);
-    const yMax = this.isMobile && this.boxOverflow?.y1
-      ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
-      : Math.min(dataRangeY.graphMin + graphHeight * (1 - yMaxRatio), dataRangeY.graphMax);
+    const xMin =
+      this.isMobile && this.boxOverflow?.x1
+        ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
+        : Math.max(
+            dataRangeX.graphMin + graphWidth * xMinRatio,
+            dataRangeX.graphMin
+          );
+    const xMax =
+      this.isMobile && this.boxOverflow?.x2
+        ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
+        : Math.min(
+            dataRangeX.graphMin + graphWidth * xMaxRatio,
+            dataRangeX.graphMax
+          );
+    const yMin =
+      this.isMobile && this.boxOverflow?.y2
+        ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
+        : Math.max(
+            dataRangeY.graphMin + graphHeight * (1 - yMinRatio),
+            dataRangeY.graphMin
+          );
+    const yMax =
+      this.isMobile && this.boxOverflow?.y1
+        ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
+        : Math.min(
+            dataRangeY.graphMin + graphHeight * (1 - yMaxRatio),
+            dataRangeY.graphMax
+          );
 
     return {
       xMin: +xMin.toFixed(3),
@@ -1178,7 +1252,8 @@ const modules = {
     }
 
     const sId = Object.keys(this.seriesList)[0];
-    const { xMin, xMax, yMin, yMax } = this.seriesList[sId].findSelectionRange(range) ?? {};
+    const { xMin, xMax, yMin, yMax } =
+      this.seriesList[sId].findSelectionRange(range) ?? {};
 
     return {
       xMin: xMin ?? dataRangeX.graphMin,
@@ -1194,10 +1269,12 @@ const modules = {
    * @returns {boolean}
    */
   isDeselectItem(hitInfo) {
-    return this.options.selectItem.useDeselectItem
-      && hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex
-      && hitInfo?.sId === this.defaultSelectItemInfo?.seriesID
-      && !isNaN(hitInfo?.maxIndex);
+    return (
+      this.options.selectItem.useDeselectItem &&
+      hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex &&
+      hitInfo?.sId === this.defaultSelectItemInfo?.seriesID &&
+      !isNaN(hitInfo?.maxIndex)
+    );
   },
 
   /**
@@ -1220,17 +1297,19 @@ const modules = {
     const yAxisEndPoint = aPos[this.axesY[0].units.rectEnd];
 
     if (
-      inRange(offsetX, this.chartRect.x1, aPos.x1)
-      && inRange(offsetY, yAxisStartPoint, yAxisEndPoint)
+      inRange(offsetX, this.chartRect.x1, aPos.x1) &&
+      inRange(offsetY, yAxisStartPoint, yAxisEndPoint)
     ) {
       return 'yAxis';
     } else if (
-      inRange(offsetX, xAxisStartPoint, xAxisEndPoint)
-      && inRange(offsetY, aPos.y2, this.chartRect.y2)) {
+      inRange(offsetX, xAxisStartPoint, xAxisEndPoint) &&
+      inRange(offsetY, aPos.y2, this.chartRect.y2)
+    ) {
       return 'xAxis';
     } else if (
-      inRange(offsetX, aPos.x1, aPos.x2)
-      && inRange(offsetY, aPos.y1, aPos.y2)) {
+      inRange(offsetX, aPos.x1, aPos.x2) &&
+      inRange(offsetY, aPos.y1, aPos.y2)
+    ) {
       return 'chartBackground';
     }
 

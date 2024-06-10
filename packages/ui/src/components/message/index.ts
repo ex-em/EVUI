@@ -15,11 +15,11 @@ const message = (options: Props | string) => {
 
   const container = document.createElement('div');
   const unmount = () => render(null, container);
-  const msgOption = (typeof options === 'string') ? { message: options, unmount } : { ...options, unmount };
-  const instance = h(
-    EvMessage,
-    msgOption,
-  );
+  const msgOption =
+    typeof options === 'string'
+      ? { message: options, unmount }
+      : { ...options, unmount };
+  const instance = h(EvMessage, msgOption);
 
   render(instance, container);
 

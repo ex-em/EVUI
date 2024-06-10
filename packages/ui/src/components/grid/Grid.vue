@@ -9,7 +9,10 @@
     <toolbar>
       <template #toolbarWrapper>
         <!-- Filtering Items -->
-        <div class="filtering" :style="{ width: `${filteringItemsWidth}px` }">
+        <div
+          class="filtering"
+          :style="{ width: `${filteringItemsWidth}px` }"
+        >
           <div
             v-if="isFiltering && !Object.keys(filteringItemsByColumn).length"
             class="filtering-items filtering-items--used"
@@ -77,7 +80,10 @@
                 >
                   {{ getFilteringItemByField(field)?.value }}
                 </span>
-                <span v-else class="filtering-items__item--value">
+                <span
+                  v-else
+                  class="filtering-items__item--value"
+                >
                   + {{ filteringItemsByColumn[field].length }}
                 </span>
                 <ev-icon
@@ -141,7 +147,10 @@
                 >
                   {{ getFilteringItemByField(field)?.value }}
                 </span>
-                <span v-else class="filtering-items__item--value">
+                <span
+                  v-else
+                  class="filtering-items__item--value"
+                >
                   + {{ hiddenFilteringItemsByColumn[field].length }}
                 </span>
                 <ev-icon
@@ -158,7 +167,10 @@
           class="grid-setting__icon"
           @click="setGridSetting($event)"
         />
-        <slot name="toolbar" :item="{ onSearch: onSearch }" />
+        <slot
+          name="toolbar"
+          :item="{ onSearch: onSearch }"
+        />
       </template>
     </toolbar>
   </div>
@@ -232,7 +244,10 @@
             }"
           />
           <!-- Column List -->
-          <template v-for="(column, index) in orderedColumns" :key="index">
+          <template
+            v-for="(column, index) in orderedColumns"
+            :key="index"
+          >
             <!-- Header -->
             <li
               v-if="!column.hide && !column.hiddenDisplay"
@@ -370,11 +385,17 @@
         @contextmenu="onContextMenu($event)"
       >
         <!-- vScroll Top -->
-        <div :style="`height: ${vScrollTopHeight}px;`" class="vscroll-spacer" />
+        <div
+          :style="`height: ${vScrollTopHeight}px;`"
+          class="vscroll-spacer"
+        />
         <table ref="table">
           <tbody>
             <!-- Row List -->
-            <template v-for="(row, rowIndex) in viewStore" :key="rowIndex">
+            <template
+              v-for="(row, rowIndex) in viewStore"
+              :key="rowIndex"
+            >
               <tr
                 :data-index="row[0]"
                 :class="{
@@ -515,7 +536,10 @@
                 </td>
               </tr>
               <tr v-if="useRowDetail && $slots?.rowDetail && row[4]">
-                <slot name="rowDetail" :item="{ row }" />
+                <slot
+                  name="rowDetail"
+                  :item="{ row }"
+                />
               </tr>
             </template>
             <tr v-if="!viewStore.length">
@@ -529,8 +553,14 @@
           class="vscroll-spacer"
         />
         <!-- Context Menu -->
-        <ev-context-menu ref="menu" :items="contextMenuItems" />
-        <ev-context-menu ref="columnMenu" :items="columnMenuItems" />
+        <ev-context-menu
+          ref="menu"
+          :items="contextMenuItems"
+        />
+        <ev-context-menu
+          ref="columnMenu"
+          :items="columnMenuItems"
+        />
         <ev-context-menu
           ref="gridSettingMenu"
           :items="gridSettingContextMenuItems"
@@ -538,7 +568,11 @@
         />
       </div>
       <!-- Resize Line -->
-      <div v-show="showResizeLine" ref="resizeLine" class="table-resize-line" />
+      <div
+        v-show="showResizeLine"
+        ref="resizeLine"
+        class="table-resize-line"
+      />
     </div>
   </div>
   <!-- Summary -->

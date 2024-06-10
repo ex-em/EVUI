@@ -71,11 +71,12 @@ class Bar {
     }
 
     if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
-      totalCount = (maxIndex - minIndex) + 1;
+      totalCount = maxIndex - minIndex + 1;
     }
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const yArea =
+      chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
@@ -83,7 +84,8 @@ class Bar {
     const cArea = dArea / (totalCount || 1);
 
     let cPad;
-    const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
+    const isUnableToDrawCategoryPadding =
+      param.cPadRatio >= 1 || param.cPadRatio <= 0;
     if (isUnableToDrawCategoryPadding) {
       cPad = 2;
     } else {
@@ -94,7 +96,7 @@ class Bar {
     let w;
     let h;
 
-    bArea = cArea > (cPad * 2) ? (cArea - (cPad * 2)) : cArea;
+    bArea = cArea > cPad * 2 ? cArea - cPad * 2 : cArea;
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
     const size = Math.ceil(bArea * thickness);
@@ -131,31 +133,65 @@ class Bar {
       }
 
       if (isHorizontal) {
-        categoryPoint = ysp - (cArea * (index - (minIndex || 0))) - cPad;
+        categoryPoint = ysp - cArea * (index - (minIndex || 0)) - cPad;
       } else {
-        categoryPoint = xsp + (cArea * (index - (minIndex || 0))) + cPad;
+        categoryPoint = xsp + cArea * (index - (minIndex || 0)) + cPad;
       }
 
       if (isHorizontal) {
         x = xsp;
-        y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
+        y = Math.round(categoryPoint - (bArea * barSeriesX - (h + bPad)));
       } else {
-        x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
+        x = Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
         y = ysp;
       }
 
       if (isHorizontal) {
         if (item.b) {
-          w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-          x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+          w = Canvas.calculateX(
+            item.x - item.b,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea
+          );
+          x = Canvas.calculateX(
+            item.b,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea,
+            xsp
+          );
         } else {
-          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+          w = Canvas.calculateX(
+            item.x,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea
+          );
         }
-      } else if (item.b) { // vertical stack bar chart
-        h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-        y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-      } else { // vertical bar chart
-        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+      } else if (item.b) {
+        // vertical stack bar chart
+        h = Canvas.calculateY(
+          item.y - item.b,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea
+        );
+        y = Canvas.calculateY(
+          item.b,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea,
+          ysp
+        );
+      } else {
+        // vertical bar chart
+        h = Canvas.calculateY(
+          item.y,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea
+        );
       }
 
       const barColor = item.dataColor || this.color;
@@ -173,13 +209,22 @@ class Bar {
 
       if (legendHitInfo) {
         isDownplay = legendHitInfo?.sId !== this.sId;
-      } else if (selectLabelOption?.use && selectLabelOption?.useSeriesOpacity) {
-        isDownplay = selectedLabelList.length && !selectedLabelList.includes(index);
-      } else if (truthy(selectedItemDataIndex) && selectItemOption?.useSeriesOpacity) {
+      } else if (
+        selectLabelOption?.use &&
+        selectLabelOption?.useSeriesOpacity
+      ) {
+        isDownplay =
+          selectedLabelList.length && !selectedLabelList.includes(index);
+      } else if (
+        truthy(selectedItemDataIndex) &&
+        selectItemOption?.useSeriesOpacity
+      ) {
         if (this.isExistGrp) {
           isDownplay = selectedItemDataIndex !== index;
         } else {
-          isDownplay = selectedItemDataIndex !== index || selectedItemSeriesId !== this.sId;
+          isDownplay =
+            selectedItemDataIndex !== index ||
+            selectedItemSeriesId !== this.sId;
         }
       }
 
@@ -189,10 +234,12 @@ class Bar {
           isHorizontal,
           { x, y, w, h },
           barColor,
-          isDownplay,
+          isDownplay
         );
       } else {
-        const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
+        const noneDownplayOpacity = barColor.includes('rgba')
+          ? Util.getOpacity(barColor)
+          : 1;
         const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
 
         ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
@@ -250,7 +297,12 @@ class Bar {
 
     const color = item.data.dataColor || this.color;
     if (typeof color !== 'string') {
-      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color);
+      const grd = Canvas.createGradient(
+        ctx,
+        this.isHorizontal,
+        { x, y, w, h },
+        color
+      );
       ctx.fillStyle = grd;
       ctx.shadowColor = color[color.length - 1][1];
     } else {
@@ -291,7 +343,9 @@ class Bar {
    * @returns {object} graph item
    */
   findGraphData(offset, isHorizontal) {
-    return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
+    return isHorizontal
+      ? this.findGraphRangeCount(offset)
+      : this.findGraphRange(offset);
   }
 
   /**
@@ -318,11 +372,11 @@ class Bar {
       const ex = sx + gdata[m].w;
       const ey = sy + gdata[m].h;
 
-      if ((sx <= xp) && (xp <= ex)) {
+      if (sx <= xp && xp <= ex) {
         item.data = gdata[m];
         item.index = m;
 
-        if ((ey <= yp) && (yp <= sy)) {
+        if (ey <= yp && yp <= sy) {
           item.hit = true;
         }
         return item;
@@ -360,11 +414,11 @@ class Bar {
       const ex = sx + gdata[m].w;
       const ey = sy + gdata[m].h;
 
-      if ((ey <= yp) && (yp <= sy)) {
+      if (ey <= yp && yp <= sy) {
         item.data = gdata[m];
         item.index = m;
 
-        if ((sx <= xp) && (xp <= ex)) {
+        if (sx <= xp && xp <= ex) {
           item.hit = true;
         }
         return item;
@@ -389,7 +443,13 @@ class Bar {
    */
   drawValueLabels({ context, data, positions, isHighlight, textColor }) {
     const isHorizontal = this.isHorizontal;
-    const { fontSize, textColor: seriesTextColor, align, formatter, decimalPoint } = this.showValue;
+    const {
+      fontSize,
+      textColor: seriesTextColor,
+      align,
+      formatter,
+      decimalPoint,
+    } = this.showValue;
     const { x, y, w, h } = positions;
     const ctx = context;
 
@@ -425,9 +485,9 @@ class Bar {
     const minYPos = y - 10;
     const widthFreeSpaceToDraw = w - 10;
     const heightFreeSpaceToDraw = Math.abs(h + 10);
-    const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
-    const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
-    const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
+    const centerX = x + w / 2 <= minXPos ? minXPos : x + w / 2;
+    const centerY = y + h / 2 >= minYPos ? minYPos : y + h / 2;
+    const centerYHorizontal = isHighlight ? y + h / 2 : y - h / 2;
 
     switch (align) {
       case 'start': {
@@ -456,14 +516,16 @@ class Bar {
 
       case 'out': {
         if (isStacked) {
-          console.warn('[EVUI][Bar Chart] In case of Stack Bar Chart, \'out\' of \'showValue\'\'s align is not supported.');
+          console.warn(
+            "[EVUI][Bar Chart] In case of Stack Bar Chart, 'out' of 'showValue''s align is not supported."
+          );
           return;
         }
 
         if (isHorizontal) {
           ctx.fillText(formattedTxt, minXPos + w, centerYHorizontal);
         } else {
-          ctx.fillText(formattedTxt, centerX, y + h - (textHeight / 2));
+          ctx.fillText(formattedTxt, centerX, y + h - textHeight / 2);
         }
 
         break;
@@ -473,8 +535,12 @@ class Bar {
       case 'end': {
         if (isHorizontal) {
           if (textWidth < widthFreeSpaceToDraw) {
-            const xPos = x + w - (textWidth * 2);
-            ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+            const xPos = x + w - textWidth * 2;
+            ctx.fillText(
+              formattedTxt,
+              xPos <= minXPos ? minXPos : xPos,
+              centerYHorizontal
+            );
           }
         } else if (textHeight < heightFreeSpaceToDraw) {
           const yPos = y + h + textHeight;
@@ -524,7 +590,7 @@ class Bar {
       chartRect.x1 + labelOffset.left,
       chartRect.y1,
       chartRect.chartWidth - labelOffset.right,
-      chartRect.chartHeight - labelOffset.bottom,
+      chartRect.chartHeight - labelOffset.bottom
     );
 
     ctx.clip(squarePath);

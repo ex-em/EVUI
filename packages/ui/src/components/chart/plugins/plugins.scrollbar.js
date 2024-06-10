@@ -24,14 +24,20 @@ const module = {
    */
   initScrollbarInfo(axisOpt, dir) {
     const scrollbarOpt = this.scrollbar[dir];
-    const merged = defaultsDeep({}, axisOpt?.[0]?.scrollbar, AXIS_OPTION.scrollbar);
+    const merged = defaultsDeep(
+      {},
+      axisOpt?.[0]?.scrollbar,
+      AXIS_OPTION.scrollbar
+    );
     Object.keys(merged).forEach((key) => {
       scrollbarOpt[key] = merged[key];
     });
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
-      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
+      scrollbarOpt.range = axisOpt?.[0]?.range?.length
+        ? [...axisOpt?.[0]?.range]
+        : null;
 
       this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
@@ -44,14 +50,17 @@ const module = {
   initScrollbarRange(dir) {
     const scrollbarOpt = this.scrollbar[dir];
     const axesType = scrollbarOpt.type;
-    const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
+    const labels =
+      this.options.type === 'heatMap'
+        ? this.data.labels[dir]
+        : this.data.labels;
 
     if (scrollbarOpt.range?.length && labels.length) {
       const [min, max] = scrollbarOpt.range;
       let limitMin;
       let limitMax;
 
-      if ((truthyNumber(min) && truthyNumber(max))) {
+      if (truthyNumber(min) && truthyNumber(max)) {
         if (axesType === 'step') {
           limitMin = 0;
           limitMax = labels.length - 1;
@@ -82,10 +91,17 @@ const module = {
   updateScrollbarInfo(dir, updateData) {
     const { axesX, axesY } = this.options;
     const newOpt = dir === 'x' ? axesX : axesY;
-    if (!this.scrollbar[dir].isInit && newOpt?.[0]?.scrollbar?.use && newOpt?.[0]?.range) {
+    if (
+      !this.scrollbar[dir].isInit &&
+      newOpt?.[0]?.scrollbar?.use &&
+      newOpt?.[0]?.range
+    ) {
       this.initScrollbarInfo(newOpt, dir);
       return;
-    } else if (!newOpt?.[0].scrollbar?.use || checkNullAndUndefined(newOpt?.[0]?.range)) {
+    } else if (
+      !newOpt?.[0].scrollbar?.use ||
+      checkNullAndUndefined(newOpt?.[0]?.range)
+    ) {
       this.destroyScrollbar(dir);
       return;
     }
@@ -93,7 +109,9 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+      this.scrollbar[dir].range = newOpt?.[0]?.range?.length
+        ? [...newOpt?.[0]?.range]
+        : null;
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
@@ -173,18 +191,22 @@ const module = {
    */
   createScrollbarButton(containerDOM) {
     const upBtnDOM = document.createElement('div');
-    upBtnDOM.className = 'ev-chart-scrollbar-button ev-chart-scrollbar-button-up';
+    upBtnDOM.className =
+      'ev-chart-scrollbar-button ev-chart-scrollbar-button-up';
     upBtnDOM.dataset.type = 'button';
     const iconUpBtn = document.createElement('i');
-    iconUpBtn.className = 'ev-icon ev-icon-triangle-up ev-chart-scrollbar-button-icon';
+    iconUpBtn.className =
+      'ev-icon ev-icon-triangle-up ev-chart-scrollbar-button-icon';
     iconUpBtn.dataset.type = 'button-icon';
     upBtnDOM.appendChild(iconUpBtn);
 
     const downBtnDOM = document.createElement('div');
-    downBtnDOM.className = 'ev-chart-scrollbar-button ev-chart-scrollbar-button-down';
+    downBtnDOM.className =
+      'ev-chart-scrollbar-button ev-chart-scrollbar-button-down';
     downBtnDOM.dataset.type = 'button';
     const iconDownBtn = document.createElement('i');
-    iconDownBtn.className = 'ev-icon ev-icon-triangle-down ev-chart-scrollbar-button-icon';
+    iconDownBtn.className =
+      'ev-icon ev-icon-triangle-down ev-chart-scrollbar-button-icon';
     iconDownBtn.dataset.type = 'button-icon';
     downBtnDOM.appendChild(iconDownBtn);
 
@@ -212,12 +234,14 @@ const module = {
       y2: chartRect.y2 - labelOffset.bottom,
     };
 
-    const titleHeight = this.options.title?.show ? this.options.title?.height : 0;
+    const titleHeight = this.options.title?.show
+      ? this.options.title?.height
+      : 0;
     const isXScroll = dir === 'x';
     const scrollHeight = isXScroll ? scrollbarOpt.height : scrollbarOpt.width;
-    const fullSize = isXScroll ? (aPos.x2 - aPos.x1) : (aPos.y2 - aPos.y1);
+    const fullSize = isXScroll ? aPos.x2 - aPos.x1 : aPos.y2 - aPos.y1;
     const buttonSize = scrollbarOpt.showButton ? scrollHeight : 0;
-    const trackSize = fullSize - (buttonSize * 2);
+    const trackSize = fullSize - buttonSize * 2;
     const thumbSize = this.getScrollbarThumbSize(dir, trackSize);
 
     let scrollbarStyle = 'display: block;';
@@ -266,25 +290,36 @@ const module = {
     }
     scrollbarDOM.style.cssText = scrollbarStyle;
 
-    const scrollbarTrackDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-track');
+    const scrollbarTrackDOM = scrollbarDOM.getElementsByClassName(
+      'ev-chart-scrollbar-track'
+    );
     scrollbarTrackDOM[0].style.cssText = scrollbarTrackStyle;
     scrollbarTrackDOM[0].style.backgroundColor = scrollbarOpt.background;
 
-    const scrollbarThumbDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-thumb');
+    const scrollbarThumbDOM = scrollbarDOM.getElementsByClassName(
+      'ev-chart-scrollbar-thumb'
+    );
     scrollbarThumbDOM[0].style.cssText = scrollbarThumbStyle;
-    scrollbarThumbDOM[0].style.backgroundColor = scrollbarOpt.thumbStyle.background;
+    scrollbarThumbDOM[0].style.backgroundColor =
+      scrollbarOpt.thumbStyle.background;
     scrollbarThumbDOM[0].style.borderRadius = `${scrollbarOpt.thumbStyle.radius}px`;
 
     if (scrollbarOpt.showButton) {
-      const upBtnDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-button-up');
+      const upBtnDOM = scrollbarDOM.getElementsByClassName(
+        'ev-chart-scrollbar-button-up'
+      );
       const endPosition = Math.floor(trackSize - thumbSize.size);
-      const upBtnOpacity = Math.floor(thumbSize.position) > endPosition ? 0.5 : 1;
+      const upBtnOpacity =
+        Math.floor(thumbSize.position) > endPosition ? 0.5 : 1;
       upBtnDOM[0].style.cssText = `background-color: ${scrollbarOpt.background};${upBtnStyle}`;
       upBtnDOM[0].style.opacity = upBtnOpacity;
       upBtnDOM[0].children[0].style.display = 'block';
-      const downBtnDOM = scrollbarDOM.getElementsByClassName('ev-chart-scrollbar-button-down');
+      const downBtnDOM = scrollbarDOM.getElementsByClassName(
+        'ev-chart-scrollbar-button-down'
+      );
       downBtnDOM[0].style.cssText = `background-color: ${scrollbarOpt.background};${downBtnStyle}`;
-      downBtnDOM[0].style.opacity = Math.floor(thumbSize.position) < 0 ? 0.5 : 1;
+      downBtnDOM[0].style.opacity =
+        Math.floor(thumbSize.position) < 0 ? 0.5 : 1;
       downBtnDOM[0].children[0].style.display = 'block';
     }
   },
@@ -305,8 +340,11 @@ const module = {
     let startValue = 0;
     let thumbPosition = 0;
     if (axesType === 'step') {
-      const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
-      const range = (max - min) + 1;
+      const labels =
+        this.options.type === 'heatMap'
+          ? this.data.labels[dir]
+          : this.data.labels;
+      const range = max - min + 1;
       steps = labels.length;
 
       const intervalSize = trackSize / steps;
@@ -315,8 +353,8 @@ const module = {
     } else {
       const axisOpt = dir === 'x' ? this.axesX : this.axesY;
       const minMax = this.minMax[dir]?.[0];
-      const graphRange = (+minMax.max) - (+minMax.min);
-      const range = (+max) - (+min);
+      const graphRange = +minMax.max - +minMax.min;
+      const range = +max - +min;
       if (axesType === 'time') {
         interval = axisOpt?.[0]?.getInterval({
           minValue: minMax.min,
@@ -328,8 +366,8 @@ const module = {
       startValue = +minMax.min;
 
       const intervalSize = trackSize / steps;
-      const count = (range / interval) + 1;
-      const point = (+min - startValue);
+      const count = range / interval + 1;
+      const point = +min - startValue;
       thumbSize = intervalSize * count;
       thumbPosition = intervalSize * (point / interval);
     }
@@ -358,7 +396,9 @@ const module = {
     } else if (type === 'button-icon') {
       return targetDOM.parentElement.parentElement;
     } else if (type === 'scrollbar') {
-      return targetDOM.getElementsByClassName('ev-chart-scrollbar-container')[0];
+      return targetDOM.getElementsByClassName(
+        'ev-chart-scrollbar-container'
+      )[0];
     }
 
     return targetDOM;
@@ -372,7 +412,7 @@ const module = {
   updateScrollbarRange(dir, isUp) {
     const scrollbarOpt = this.scrollbar[dir];
     const { startValue, range, interval, steps } = scrollbarOpt;
-    const endValue = startValue + (interval * steps);
+    const endValue = startValue + interval * steps;
     const axisOpt = dir === 'x' ? this.axesX[0] : this.axesY[0];
     const [min, max] = range ?? [];
 
@@ -425,12 +465,14 @@ const module = {
         }
         isUp = buttonDOM.className.includes('up');
       } else if (type === 'track') {
-        const thumbDOM = containerDOM.getElementsByClassName('ev-chart-scrollbar-thumb');
+        const thumbDOM = containerDOM.getElementsByClassName(
+          'ev-chart-scrollbar-thumb'
+        );
         const { x, y } = thumbDOM[0].getBoundingClientRect();
         const isXScroll = dir === 'x';
         const clickPoint = isXScroll ? e.clientX : -e.clientY;
         const thumbPosition = isXScroll ? x : -y;
-        isUp = (clickPoint > thumbPosition);
+        isUp = clickPoint > thumbPosition;
       } else {
         return;
       }
@@ -446,7 +488,9 @@ const module = {
 
       const containerDOM = this.getScrollbarContainerDOM(e.target);
       const dir = containerDOM.dataset.type;
-      const thumbDOM = containerDOM.getElementsByClassName('ev-chart-scrollbar-thumb');
+      const thumbDOM = containerDOM.getElementsByClassName(
+        'ev-chart-scrollbar-thumb'
+      );
       const { x, y, height } = thumbDOM[0].getBoundingClientRect();
       const scrollbarOpt = this.scrollbar[dir];
       scrollbarOpt.scrolling = true;
@@ -498,7 +542,9 @@ const module = {
       scrollbarYDOM.addEventListener('click', this.onScrollbarClick);
       scrollbarYDOM.addEventListener('mousedown', this.onScrollbarDown);
       scrollbarYDOM.addEventListener('mouseleave', this.onScrollbarLeave);
-      this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel, { passive: false });
+      this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel, {
+        passive: false,
+      });
     }
   },
 
@@ -513,19 +559,19 @@ const module = {
       return;
     }
 
-    const {
-      steps, range, pointInThumb,
-      startValue, interval,
-    } = this.scrollbar[dir];
+    const { steps, range, pointInThumb, startValue, interval } =
+      this.scrollbar[dir];
 
-    const trackDOM = containerDOM.getElementsByClassName('ev-chart-scrollbar-track');
+    const trackDOM = containerDOM.getElementsByClassName(
+      'ev-chart-scrollbar-track'
+    );
     const { x, y, width, height } = trackDOM[0].getBoundingClientRect();
 
     const isXScroll = dir === 'x';
     const sp = isXScroll ? x : y;
     const trackSize = isXScroll ? width : height;
     const intervalSize = trackSize / steps;
-    const endValue = (startValue + ((steps - 1) * interval));
+    const endValue = startValue + (steps - 1) * interval;
 
     let movePoint = isXScroll ? e.clientX : e.clientY;
     if (movePoint < sp) {
@@ -538,7 +584,7 @@ const module = {
     if (isXScroll) {
       move = movePoint - sp - pointInThumb;
     } else {
-      move = (sp + trackSize) - movePoint - pointInThumb;
+      move = sp + trackSize - movePoint - pointInThumb;
     }
 
     if (move <= 0) {
@@ -547,7 +593,7 @@ const module = {
 
     let movedMin;
     let movedMax;
-    const currValue = (Math.round(Math.abs(move) / intervalSize) * interval);
+    const currValue = Math.round(Math.abs(move) / intervalSize) * interval;
     const [min, max] = range;
     if (move > 0) {
       const incrementValue = startValue + (currValue - +min);
@@ -579,7 +625,11 @@ const module = {
       scrollbarOpt.scrolling = false;
 
       const scrollbarDOM = scrollbarOpt.dom;
-      scrollbarDOM.removeEventListener('mousemove', this.onScrollbarMove, false);
+      scrollbarDOM.removeEventListener(
+        'mousemove',
+        this.onScrollbarMove,
+        false
+      );
       scrollbarDOM.removeEventListener('mouseup', this.onScrollbarUp, false);
     }
   },
@@ -613,7 +663,11 @@ const module = {
       this.scrollbar[dir] = { isInit: false };
 
       if (dir === 'y') {
-        this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, { passive: false });
+        this.overlayCanvas?.removeEventListener(
+          'wheel',
+          this.onScrollbarWheel,
+          { passive: false }
+        );
       }
     }
   },

@@ -29,7 +29,7 @@
     }
 
     &.non-border {
-      border-bottom: 2px solid #7F7F7F !important;
+      border-bottom: 2px solid #7f7f7f !important;
     }
   }
   .row-contextmenu__btn {
@@ -151,7 +151,7 @@
     color: inherit;
     white-space: nowrap;
 
-    &[disabled=true] {
+    &[disabled='true'] {
       cursor: not-allowed;
     }
 
@@ -166,11 +166,11 @@
       }
     }
     &.highlight {
-      background: #5AB7FF;
-      color: #FFFFFF;
+      background: #5ab7ff;
+      color: #ffffff;
     }
     &:hover {
-      .row-contextmenu__btn:not([disabled=true]) {
+      .row-contextmenu__btn:not([disabled='true']) {
         display: grid;
         &:hover {
           cursor: pointer;
@@ -326,7 +326,7 @@
   &-expand {
     &:hover {
       cursor: pointer;
-      color: #0077FF;
+      color: #0077ff;
     }
   }
   &--count {
@@ -335,11 +335,11 @@
     right: 0;
     padding: 4px;
     border-radius: 4px;
-    background: #EAF2FA;
+    background: #eaf2fa;
     &:hover {
       cursor: pointer;
       padding: 3.5px;
-      border: 1px solid #198FFF !important;
+      border: 1px solid #198fff !important;
       box-sizing: border-box;
     }
   }
@@ -347,19 +347,19 @@
     height: 26px;
     line-height: 26px;
     padding: 0 10px;
-    border: 1px solid #CED4DA;
+    border: 1px solid #ced4da;
     border-radius: 4px;
-    background: #EAF2FA;
+    background: #eaf2fa;
     font-size: 13px;
     text-align: center;
     &:hover {
       cursor: pointer;
-      border: 1px solid #198FFF;
+      border: 1px solid #198fff;
     }
     &--filter {
       font-weight: bold;
-      border: 1px solid #198FFF;
-      color: #198FFF;
+      border: 1px solid #198fff;
+      color: #198fff;
       i {
         &:not(.filtering-items-expand) {
           vertical-align: middle;
@@ -373,7 +373,7 @@
     &--value {
       display: inline-block;
       max-width: 80px;
-      color: #198FFF;
+      color: #198fff;
       text-overflow: ellipsis;
       overflow: hidden;
       vertical-align: middle;
@@ -405,11 +405,10 @@
   position: relative;
   padding: 10px;
   align-items: center;
-  border: 1px solid #CED4DA;
-  background: #FFFFFF;
+  border: 1px solid #ced4da;
+  background: #ffffff;
   border-radius: 4px;
   overflow: auto;
   max-width: 500px;
   max-height: 100px;
 }
-

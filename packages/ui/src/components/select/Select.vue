@@ -8,7 +8,10 @@
       disabled,
     }"
   >
-    <div ref="selectWrapper" class="ev-select__wrapper">
+    <div
+      ref="selectWrapper"
+      class="ev-select__wrapper"
+    >
       <template v-if="!multiple">
         <span
           v-if="!clearable || !isClearableIcon"
@@ -72,7 +75,10 @@
             </div>
           </template>
           <template v-else>
-            <div v-if="selectedModel.length" class="ev-select-tag">
+            <div
+              v-if="selectedModel.length"
+              class="ev-select-tag"
+            >
               <span class="ev-tag-name">
                 {{ selectedModel[0].name }}
               </span>
@@ -85,7 +91,10 @@
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
-            <div v-if="selectedModel.length > 1" class="ev-select-tag num">
+            <div
+              v-if="selectedModel.length > 1"
+              class="ev-select-tag num"
+            >
               <span class="ev-tag-name">
                 + {{ selectedModel.length - 1 }}
               </span>
@@ -134,10 +143,16 @@
                 @change="[changeAllCheck(true), changeDropboxPosition()]"
               />
             </div>
-            <div ref="itemWrapper" class="ev-select-dropbox-list">
+            <div
+              ref="itemWrapper"
+              class="ev-select-dropbox-list"
+            >
               <template v-if="multiple">
                 <ev-checkbox-group v-model="mv">
-                  <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
+                  <ul
+                    v-if="filteredItems.length"
+                    class="ev-select-dropbox-ul"
+                  >
                     <li
                       v-for="(item, idx) in filteredItems"
                       :key="`${item.value}_${idx}`"
@@ -157,7 +172,10 @@
                         :label="item.value"
                         :disabled="item.disabled"
                       >
-                        <i v-if="item.iconClass" :class="item.iconClass" />
+                        <i
+                          v-if="item.iconClass"
+                          :class="item.iconClass"
+                        />
                         {{ item.name }}
                       </ev-checkbox>
                     </li>
@@ -170,7 +188,10 @@
                 </ev-checkbox-group>
               </template>
               <template v-else>
-                <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
+                <ul
+                  v-if="filteredItems.length"
+                  class="ev-select-dropbox-ul"
+                >
                   <li
                     v-for="(item, idx) in filteredItems"
                     :key="`${item.value}_${idx}`"
@@ -190,7 +211,10 @@
                       :model-value="mv === item.value"
                       :disabled="item.disabled"
                     >
-                      <i v-if="item.iconClass" :class="item.iconClass" />
+                      <i
+                        v-if="item.iconClass"
+                        :class="item.iconClass"
+                      />
                       {{ item.name }}
                     </ev-checkbox>
                   </li>
@@ -199,8 +223,14 @@
             </div>
           </template>
           <template v-else>
-            <div ref="itemWrapper" class="ev-select-dropbox-list">
-              <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
+            <div
+              ref="itemWrapper"
+              class="ev-select-dropbox-list"
+            >
+              <ul
+                v-if="filteredItems.length"
+                class="ev-select-dropbox-ul"
+              >
                 <li
                   v-for="(item, idx) in filteredItems"
                   :key="`${item.value}_${idx}`"
@@ -216,7 +246,10 @@
                       : [clickItem(item.value), changeDropboxPosition()]
                   "
                 >
-                  <i v-if="item.iconClass" :class="item.iconClass" />
+                  <i
+                    v-if="item.iconClass"
+                    :class="item.iconClass"
+                  />
                   {{ item.name }}
                 </li>
               </ul>

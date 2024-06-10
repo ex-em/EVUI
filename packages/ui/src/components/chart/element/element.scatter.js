@@ -14,11 +14,13 @@ class Scatter {
       this.name = `series-${sIdx}`;
     }
 
-    ['color', 'pointFill', 'fillColor', 'overflowColor'].forEach((colorProp) => {
-      if (this[colorProp] === undefined) {
-        this[colorProp] = COLOR[sIdx];
+    ['color', 'pointFill', 'fillColor', 'overflowColor'].forEach(
+      (colorProp) => {
+        if (this[colorProp] === undefined) {
+          this[colorProp] = COLOR[sIdx];
+        }
       }
-    });
+    );
 
     this.sId = sId;
     this.data = [];
@@ -53,14 +55,18 @@ class Scatter {
    * @returns {number} - The calculated opacity level for the item.
    */
   getOpacity(param, colorStr, dataIndex) {
-    const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
+    const noneDownplayOpacity = colorStr.includes('rgba')
+      ? Util.getOpacity(colorStr)
+      : 1;
     let isDownplay = false;
 
     const { selectInfo, legendHitInfo } = param;
     if (legendHitInfo) {
       isDownplay = legendHitInfo.sId !== this.sId;
     } else if (selectInfo) {
-      isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
+      isDownplay =
+        selectInfo?.seriesID !== this.sId ||
+        selectInfo?.dataIndex !== dataIndex;
     }
 
     return isDownplay ? 0.1 : noneDownplayOpacity;
@@ -81,19 +87,24 @@ class Scatter {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const yArea =
+      chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    let x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    let x = Canvas.calculateX(
+      item.x,
+      minmaxX.graphMin,
+      minmaxX.graphMax,
+      xArea,
+      xsp
+    );
     const y = Canvas.calculateY(
-      displayOverflow && item.y > minmaxY.graphMax
-        ? minmaxY.graphMax
-        : item.y,
+      displayOverflow && item.y > minmaxY.graphMax ? minmaxY.graphMax : item.y,
       minmaxY.graphMin,
       minmaxY.graphMax,
       yArea,
-      ysp,
+      ysp
     );
 
     if (x !== null) {
@@ -119,15 +130,24 @@ class Scatter {
 
       if (item.xp !== null && item.yp !== null) {
         const color = item.dataColor || this.color;
-        ctx.strokeStyle = Util.colorStringToRgba(color, this.getOpacity(param, color, idx));
+        ctx.strokeStyle = Util.colorStringToRgba(
+          color,
+          this.getOpacity(param, color, idx)
+        );
 
         const pointFillColor = item.dataColor || this.pointFill;
         ctx.fillStyle = Util.colorStringToRgba(
           pointFillColor,
-          this.getOpacity(param, pointFillColor, idx),
+          this.getOpacity(param, pointFillColor, idx)
         );
 
-        Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+        Canvas.drawPoint(
+          ctx,
+          this.pointStyle,
+          this.pointSize,
+          item.xp,
+          item.yp
+        );
       }
     });
   }
@@ -141,8 +161,14 @@ class Scatter {
   realTimeScatterDraw(param) {
     const { ctx, axesSteps, duple } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
-    const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
-    const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
+    const pointStyle =
+      typeof this.pointStyle === 'string'
+        ? this.pointStyle
+        : this.pointStyle.value;
+    const pointSize =
+      typeof this.pointSize === 'number'
+        ? this.pointSize
+        : this.pointSize.value;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
@@ -154,12 +180,14 @@ class Scatter {
           this.calcItem(item, param);
 
           if (item.xp !== null && item.yp !== null) {
-            const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
+            const overflowColor =
+              item.y > minmaxY.graphMax && this.overflowColor;
             const color = overflowColor || item.color || this.color;
 
             ctx.strokeStyle = color;
 
-            const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
+            const pointFillColor =
+              overflowColor || this.pointFill || item.color || this.color;
             ctx.fillStyle = pointFillColor;
 
             Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
@@ -180,9 +208,13 @@ class Scatter {
    * @returns {Array} Filtered data items
    */
   findItemsInRange(data, xsp, ysp, xep, yep) {
-    return data.filter(seriesData =>
-      (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
-      && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+    return data.filter(
+      (seriesData) =>
+        xsp - 1 <= seriesData.xp &&
+        seriesData.xp <= xep + 1 &&
+        ysp - 1 <= seriesData.yp &&
+        seriesData.yp <= yep + 1
+    );
   }
 
   defaultScatterFindItems(gdata, xsp, ysp, xep, yep) {
@@ -242,8 +274,17 @@ class Scatter {
 
       ctx.strokeStyle = Util.colorStringToRgba(color, 0);
 
-      ctx.fillStyle = Util.colorStringToRgba(pointFillColor, this.highlight.maxShadowOpacity);
-      Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, x, y);
+      ctx.fillStyle = Util.colorStringToRgba(
+        pointFillColor,
+        this.highlight.maxShadowOpacity
+      );
+      Canvas.drawPoint(
+        ctx,
+        this.pointStyle,
+        this.highlight.maxShadowSize,
+        x,
+        y
+      );
 
       ctx.fillStyle = color;
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxSize, x, y);
@@ -274,10 +315,12 @@ class Scatter {
       const x = data.xp;
       const y = data.yp;
 
-      return (x - pointSize <= xp)
-        && (xp <= x + pointSize)
-        && (y - pointSize <= yp)
-        && (yp <= y + pointSize);
+      return (
+        x - pointSize <= xp &&
+        xp <= x + pointSize &&
+        y - pointSize <= yp &&
+        yp <= y + pointSize
+      );
     });
 
     if (targetIndex > -1) {

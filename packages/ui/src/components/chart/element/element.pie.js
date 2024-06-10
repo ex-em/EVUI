@@ -46,12 +46,20 @@ class Pie {
     const radius = this.isSelect ? this.radius + 5 : this.radius;
 
     const color = this.color;
-    const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
+    const noneDownplayOpacity = color.includes('rgba')
+      ? Util.getOpacity(color)
+      : 1;
     const opacity = this.isDownplay ? 0.1 : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);
-    slice.arc(this.centerX, this.centerY, radius, this.startAngle, this.endAngle);
+    slice.arc(
+      this.centerX,
+      this.centerY,
+      radius,
+      this.startAngle,
+      this.endAngle
+    );
     slice.lineTo(this.centerX, this.centerY);
     ctx.fillStyle = Util.colorStringToRgba(color, opacity);
     ctx.fill(slice);
@@ -79,17 +87,15 @@ class Pie {
    */
   findGraphData([offsetX, offsetY]) {
     const item = { data: null, hit: false, color: null, index: -1 };
-    const {
-      radius,
-      startAngle,
-      endAngle,
-      centerX,
-      centerY,
-    } = this;
+    const { radius, startAngle, endAngle, centerX, centerY } = this;
 
-    const distance = Math.sqrt((offsetX - centerX) ** 2 + (offsetY - centerY) ** 2);
-    const radian = (2.5 * Math.PI) - Math.atan2((offsetX - centerX), (offsetY - centerY));
-    const isPointInPath = radius > distance && radian >= startAngle && radian <= endAngle;
+    const distance = Math.sqrt(
+      (offsetX - centerX) ** 2 + (offsetY - centerY) ** 2
+    );
+    const radian =
+      2.5 * Math.PI - Math.atan2(offsetX - centerX, offsetY - centerY);
+    const isPointInPath =
+      radius > distance && radian >= startAngle && radian <= endAngle;
 
     if (this.show && isPointInPath) {
       item.type = this.type;
@@ -165,15 +171,18 @@ class Pie {
     const valueHeight = fontSize + 4;
     const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
 
-    if (innerAngle >= valueWidth * ratio
-      && innerAngle >= valueHeight * ratio
-      && radius >= valueWidth * ratio
-      && radius >= valueHeight * ratio
+    if (
+      innerAngle >= valueWidth * ratio &&
+      innerAngle >= valueHeight * ratio &&
+      radius >= valueWidth * ratio &&
+      radius >= valueHeight * ratio
     ) {
       ctx.save();
       ctx.beginPath();
 
-      const noneDownplayOpacity = textColor.includes('rgba') ? Util.getOpacity(textColor) : 1;
+      const noneDownplayOpacity = textColor.includes('rgba')
+        ? Util.getOpacity(textColor)
+        : 1;
       const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
       ctx.font = `normal normal normal ${fontSize}px Roboto`;
@@ -182,8 +191,9 @@ class Pie {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const halfRadius = (radius / 2) + this.doughnutHoleSize;
-      const centerAngle = ((this.endAngle - this.startAngle) / 2) + this.startAngle;
+      const halfRadius = radius / 2 + this.doughnutHoleSize;
+      const centerAngle =
+        (this.endAngle - this.startAngle) / 2 + this.startAngle;
       const xPos = halfRadius * Math.cos(centerAngle) + this.centerX;
       const yPos = halfRadius * Math.sin(centerAngle) + this.centerY;
 

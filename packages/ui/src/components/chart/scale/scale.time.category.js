@@ -87,10 +87,9 @@ class TimeCategoryScale extends Scale {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
-    if (graphMax - graphMin > (numberOfSteps * interval)) {
+    if (graphMax - graphMin > numberOfSteps * interval) {
       interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
     }
-
 
     return {
       steps: numberOfSteps,
@@ -130,7 +129,8 @@ class TimeCategoryScale extends Scale {
     let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
-    const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+    const offsetCounterPoint =
+      aPos[this.units.rectOffsetCounter(this.position)];
 
     this.drawAxisTitle(chartRect, labelOffset);
 
@@ -182,18 +182,20 @@ class TimeCategoryScale extends Scale {
     let labelPoint;
     let ix;
     for (ix = 0; ix < oriSteps; ix += count) {
-      ticks[ix] = axisMin + (ix * stepValue);
+      ticks[ix] = axisMin + ix * stepValue;
 
-      labelCenter = Math.round(startPoint + (graphGap * ix));
+      labelCenter = Math.round(startPoint + graphGap * ix);
       linePosition = labelCenter + aliasPixel;
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
-      const isBlurredLabel = this.options?.selectLabel?.use
-        && this.options?.selectLabel?.useLabelOpacity
-        && (this.options.horizontal === (this.type === 'y'))
-        && selectLabelInfo?.dataIndex?.length
-        && !selectLabelInfo?.label
-          .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
+      const isBlurredLabel =
+        this.options?.selectLabel?.use &&
+        this.options?.selectLabel?.useLabelOpacity &&
+        this.options.horizontal === (this.type === 'y') &&
+        selectLabelInfo?.dataIndex?.length &&
+        !selectLabelInfo?.label
+          .map((t) => this.getLabelFormat(Math.min(axisMax, t)))
+          .includes(labelText);
 
       const labelColor = this.labelStyle.color;
       let defaultOpacity = 1;
@@ -202,20 +204,28 @@ class TimeCategoryScale extends Scale {
         defaultOpacity = Util.getOpacity(labelColor);
       }
 
-      ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+      ctx.fillStyle = Util.colorStringToRgba(
+        labelColor,
+        isBlurredLabel ? 0.1 : defaultOpacity
+      );
 
       if (this.type === 'x') {
-        labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+        labelPoint =
+          this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelCenter, labelPoint);
-        if (!isBlurredLabel
-            && this.options?.selectItem?.showLabelTip
-            && hitInfo?.label
-            && !this.options?.horizontal) {
+        if (
+          !isBlurredLabel &&
+          this.options?.selectItem?.showLabelTip &&
+          hitInfo?.label &&
+          !this.options?.horizontal
+        ) {
           const selectedLabel = this.getLabelFormat(
-            Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+            Math.min(axisMax, hitInfo.label + 0 * stepValue)
           );
           if (selectedLabel === labelText) {
-            const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+            const height = Math.round(
+              ctx.measureText(this.labelStyle?.fontSize).width
+            );
             Util.showLabelTip({
               ctx: this.ctx,
               width: Math.round(ctx.measureText(selectedLabel).width) + 10,
@@ -225,20 +235,22 @@ class TimeCategoryScale extends Scale {
               borderRadius: 2,
               arrowSize: 3,
               text: labelText,
-              backgroundColor: this.options?.selectItem?.labelTipStyle?.backgroundColor,
+              backgroundColor:
+                this.options?.selectItem?.labelTipStyle?.backgroundColor,
               textColor: this.options?.selectItem?.labelTipStyle?.textColor,
             });
           }
         }
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if (ix !== 0 && ix < oriSteps && this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
-        labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+        labelPoint =
+          this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if (ix !== 0 && ix < oriSteps && this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
@@ -247,13 +259,13 @@ class TimeCategoryScale extends Scale {
       ctx.stroke();
     }
 
-    if (this.categoryMode && alignToGridLine && (ix * count) === oriSteps) {
+    if (this.categoryMode && alignToGridLine && ix * count === oriSteps) {
       const diffTime = dayjs(labels[1]).diff(dayjs(labels[0]));
       const labelLastText = this.getLabelFormat(
-        dayjs(ticks[oriSteps - 1] + diffTime),
+        dayjs(ticks[oriSteps - 1] + diffTime)
       );
 
-      labelCenter = Math.round(startPoint + (graphGap * oriSteps));
+      labelCenter = Math.round(startPoint + graphGap * oriSteps);
       linePosition = labelCenter + aliasPixel;
 
       if (this.type === 'x') {

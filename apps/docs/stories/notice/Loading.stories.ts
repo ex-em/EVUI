@@ -19,8 +19,8 @@ const meta: Meta<typeof EvLoading> = {
         type: 'boolean',
       },
     },
-  }
-}
+  },
+};
 
 export default meta;
 type Story = StoryObj<typeof EvLoading>;
@@ -37,7 +37,6 @@ const StoryTemplate: Story = {
               `,
   }),
 };
-
 
 export const Default: Story = {
   ...StoryTemplate,

@@ -47,7 +47,7 @@ class Scale {
     } else {
       chartSize = chartRect.chartHeight;
       axisOffset = [labelOffset.top, labelOffset.bottom];
-      bufferedTickSize = tickSize + (Math.floor(chartSize * 0.1));
+      bufferedTickSize = tickSize + Math.floor(chartSize * 0.1);
     }
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
@@ -108,7 +108,7 @@ class Scale {
       size: Util.calcTextSize(
         maxLabel,
         Util.getLabelStyle(this.labelStyle),
-        this.labelStyle?.padding,
+        this.labelStyle?.padding
       ),
     };
   }
@@ -159,7 +159,7 @@ class Scale {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
-    if (graphMax - graphMin > (numberOfSteps * interval)) {
+    if (graphMax - graphMin > numberOfSteps * interval) {
       interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
     }
 
@@ -246,7 +246,8 @@ class Scale {
     const startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
-    const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+    const offsetCounterPoint =
+      aPos[this.units.rectOffsetCounter(this.position)];
 
     let aliasPixel;
 
@@ -296,11 +297,16 @@ class Scale {
       let offsetStartPoint = startPoint;
       let axisMinForLabel = axisMin;
 
-      if (this.type === 'x' && options?.axesX[0].flow && dataLabels.length !== steps + 1) {
+      if (
+        this.type === 'x' &&
+        options?.axesX[0].flow &&
+        dataLabels.length !== steps + 1
+      ) {
         const axisMinByMinutes = Math.floor(axisMin / size) * size;
         if (axisMinByMinutes !== +axisMin) {
           axisMinForLabel = axisMinByMinutes + size;
-          offsetStartPoint += (distance / (axisMax - axisMin)) * (axisMinForLabel - axisMin);
+          offsetStartPoint +=
+            (distance / (axisMax - axisMin)) * (axisMinForLabel - axisMin);
         }
       }
 
@@ -310,21 +316,28 @@ class Scale {
 
       let labelText;
       for (let ix = 0; ix <= steps; ix++) {
-        labelCenter = Math.round(offsetStartPoint + (labelGap * ix));
+        labelCenter = Math.round(offsetStartPoint + labelGap * ix);
 
-        if (labelCenter <= endPoint || this.type !== 'x' || !options?.axesX[0].flow || dataLabels.length === steps + 1) {
+        if (
+          labelCenter <= endPoint ||
+          this.type !== 'x' ||
+          !options?.axesX[0].flow ||
+          dataLabels.length === steps + 1
+        ) {
           ctx.beginPath();
-          ticks[ix] = axisMinForLabel + (ix * stepValue);
+          ticks[ix] = axisMinForLabel + ix * stepValue;
 
           linePosition = labelCenter + aliasPixel;
           labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
 
-          const isBlurredLabel = this.options?.selectLabel?.use
-            && this.options?.selectLabel?.useLabelOpacity
-            && (this.options.horizontal === (this.type === 'y'))
-            && selectLabelInfo?.dataIndex?.length
-            && !selectLabelInfo?.label
-              .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
+          const isBlurredLabel =
+            this.options?.selectLabel?.use &&
+            this.options?.selectLabel?.useLabelOpacity &&
+            this.options.horizontal === (this.type === 'y') &&
+            selectLabelInfo?.dataIndex?.length &&
+            !selectLabelInfo?.label
+              .map((t) => this.getLabelFormat(Math.min(axisMax, t)))
+              .includes(labelText);
 
           const labelColor = this.labelStyle.color;
           let defaultOpacity = 1;
@@ -333,25 +346,33 @@ class Scale {
             defaultOpacity = Util.getOpacity(labelColor);
           }
 
-          ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+          ctx.fillStyle = Util.colorStringToRgba(
+            labelColor,
+            isBlurredLabel ? 0.1 : defaultOpacity
+          );
 
           let labelPoint;
 
           if (this.type === 'x') {
-            labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+            labelPoint =
+              this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
               ctx.fillText(labelText, labelCenter, labelPoint);
             }
 
-            if (!isBlurredLabel
-              && options?.selectItem?.showLabelTip
-              && hitInfo?.label
-              && !this.options?.horizontal) {
+            if (
+              !isBlurredLabel &&
+              options?.selectItem?.showLabelTip &&
+              hitInfo?.label &&
+              !this.options?.horizontal
+            ) {
               const selectedLabel = this.getLabelFormat(
-                Math.min(axisMax, hitInfo.label + (0 * stepValue)),
+                Math.min(axisMax, hitInfo.label + 0 * stepValue)
               );
               if (selectedLabel === labelText) {
-                const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+                const height = Math.round(
+                  ctx.measureText(this.labelStyle?.fontSize).width
+                );
                 Util.showLabelTip({
                   ctx: this.ctx,
                   width: Math.round(ctx.measureText(selectedLabel).width) + 10,
@@ -361,7 +382,8 @@ class Scale {
                   borderRadius: 2,
                   arrowSize: 3,
                   text: labelText,
-                  backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
+                  backgroundColor:
+                    options?.selectItem?.labelTipStyle?.backgroundColor,
                   textColor: options?.selectItem?.labelTipStyle?.textColor,
                 });
               }
@@ -371,7 +393,8 @@ class Scale {
               ctx.lineTo(linePosition, offsetCounterPoint);
             }
           } else {
-            labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+            labelPoint =
+              this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
               ctx.fillText(labelText, labelPoint, labelCenter);
             }
@@ -394,8 +417,10 @@ class Scale {
 
     // Draw plot lines and plot bands
     if (this.plotBands?.length || this.plotLines?.length) {
-      const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const xArea =
+        chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+      const yArea =
+        chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
       const padding = aliasPixel + 1;
       const minX = aPos.x1;
       const maxX = aPos.x2 + padding;
@@ -415,7 +440,13 @@ class Scale {
         let fromPos;
         let toPos;
         if (this.type === 'x') {
-          fromPos = Canvas.calculateX(from ?? minX, axisMin, axisMax, xArea, minX);
+          fromPos = Canvas.calculateX(
+            from ?? minX,
+            axisMin,
+            axisMax,
+            xArea,
+            minX
+          );
           toPos = Canvas.calculateX(to ?? maxX, axisMin, axisMax, xArea, minX);
 
           if (fromPos === null || toPos === null) {
@@ -424,8 +455,20 @@ class Scale {
 
           this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         } else {
-          fromPos = Canvas.calculateY(from ?? axisMin, axisMin, axisMax, yArea, maxY);
-          toPos = Canvas.calculateY(to ?? axisMax, axisMin, axisMax, yArea, maxY);
+          fromPos = Canvas.calculateY(
+            from ?? axisMin,
+            axisMin,
+            axisMax,
+            yArea,
+            maxY
+          );
+          toPos = Canvas.calculateY(
+            to ?? axisMax,
+            axisMin,
+            axisMax,
+            yArea,
+            maxY
+          );
 
           if (fromPos === null || toPos === null) {
             return;
@@ -435,8 +478,17 @@ class Scale {
         }
 
         if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotBandLabelPosition(fromPos, toPos, labelOptions, maxX, minY);
+          const labelOptions = this.getNormalizedLabelOptions(
+            chartRect,
+            labelOpt
+          );
+          const textXY = this.getPlotBandLabelPosition(
+            fromPos,
+            toPos,
+            labelOptions,
+            maxX,
+            minY
+          );
           this.drawPlotLabel(labelOptions, textXY);
         }
 
@@ -473,8 +525,16 @@ class Scale {
         }
 
         if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotLineLabelPosition(dataPos, labelOptions, maxX, minY);
+          const labelOptions = this.getNormalizedLabelOptions(
+            chartRect,
+            labelOpt
+          );
+          const textXY = this.getPlotLineLabelPosition(
+            dataPos,
+            labelOptions,
+            maxX,
+            minY
+          );
           this.drawPlotLabel(labelOptions, textXY);
         }
 
@@ -532,7 +592,7 @@ class Scale {
   drawXPlotBand(fromDataX, toDataX, minX, maxX, minY, maxY) {
     const ctx = this.ctx;
 
-    const checkValidPosition = x => x || x > minX || x < maxX;
+    const checkValidPosition = (x) => x || x > minX || x < maxX;
 
     if (!checkValidPosition(fromDataX) || !checkValidPosition(toDataX)) {
       ctx.closePath();
@@ -626,7 +686,7 @@ class Scale {
   drawYPlotBand(fromDataY, toDataY, minX, maxX, minY, maxY) {
     const ctx = this.ctx;
 
-    const checkValidPosition = y => y || y > minY || y < maxY;
+    const checkValidPosition = (y) => y || y > minY || y < maxY;
 
     if (!checkValidPosition(fromDataY) || !checkValidPosition(toDataY)) {
       ctx.closePath();
@@ -657,16 +717,25 @@ class Scale {
 
     const ctx = this.ctx;
     const { maxWidth } = mergedLabelOpt;
-    const fontSize = mergedLabelOpt.fontSize > 20 ? 20 : mergedLabelOpt.fontSize;
+    const fontSize =
+      mergedLabelOpt.fontSize > 20 ? 20 : mergedLabelOpt.fontSize;
     let label = mergedLabelOpt.text;
     let labelWidth = maxWidth ?? ctx.measureText(label).width;
 
-    const plotLabelAreaWidth = this.type === 'y'
-      ? chartRect.width - chartRect.chartWidth
-      : maxWidth ?? chartRect.width;
+    const plotLabelAreaWidth =
+      this.type === 'y'
+        ? chartRect.width - chartRect.chartWidth
+        : maxWidth ?? chartRect.width;
 
-    if (plotLabelAreaWidth < ctx.measureText(label).width && mergedLabelOpt.textOverflow === 'ellipsis') {
-      label = Util.truncateLabelWithEllipsis(mergedLabelOpt.text, plotLabelAreaWidth, ctx);
+    if (
+      plotLabelAreaWidth < ctx.measureText(label).width &&
+      mergedLabelOpt.textOverflow === 'ellipsis'
+    ) {
+      label = Util.truncateLabelWithEllipsis(
+        mergedLabelOpt.text,
+        plotLabelAreaWidth,
+        ctx
+      );
       labelWidth = ctx.measureText(label).width;
     }
 
@@ -723,7 +792,7 @@ class Scale {
 
         case 'center':
         default:
-          textX = ((toPos - fromPos) / 2) + fromPos;
+          textX = (toPos - fromPos) / 2 + fromPos;
           break;
       }
     } else {
@@ -740,7 +809,7 @@ class Scale {
 
         case 'middle':
         default:
-          textY = ((fromPos - toPos) / 2) + toPos;
+          textY = (fromPos - toPos) / 2 + toPos;
           break;
       }
     }

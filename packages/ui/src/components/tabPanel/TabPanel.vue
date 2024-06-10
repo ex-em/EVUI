@@ -27,8 +27,7 @@ export default {
       default: false,
     },
   },
-  emits: {
-  },
+  emits: {},
   setup(props) {
     const evTabs = inject('evTabs', null);
     const isSelected = computed(() => props.value === evTabs.value);
@@ -44,7 +43,8 @@ export default {
 @import '../../style/index.scss';
 
 .ev-tab {
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 

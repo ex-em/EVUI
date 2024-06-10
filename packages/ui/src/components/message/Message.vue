@@ -1,6 +1,9 @@
 <template>
   <teleport to="#ev-message-modal">
-    <transition name="ev-message-fade" appear>
+    <transition
+      name="ev-message-fade"
+      appear
+    >
       <div
         v-show="state.isShow"
         ref="msgRef"
@@ -13,14 +16,28 @@
         @mouseenter="clearTimer"
         @mouseleave="startTimer"
       >
-        <span v-if="iconClass" class="ev-message-icon">
+        <span
+          v-if="iconClass"
+          class="ev-message-icon"
+        >
           <i :class="iconClass" />
         </span>
-        <div v-if="useHTML" class="ev-message-content" v-html="message" />
-        <div v-else class="ev-message-content">
+        <div
+          v-if="useHTML"
+          class="ev-message-content"
+          v-html="message"
+        />
+        <div
+          v-else
+          class="ev-message-content"
+        >
           {{ message }}
         </div>
-        <span v-if="showClose" class="ev-message-close" @click="closeMsg">
+        <span
+          v-if="showClose"
+          class="ev-message-close"
+          @click="closeMsg"
+        >
           <i class="ev-icon-close" />
         </span>
       </div>

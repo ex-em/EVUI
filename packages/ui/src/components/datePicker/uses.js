@@ -1,16 +1,29 @@
 import {
-  ref, reactive, computed, watch,
-  nextTick, getCurrentInstance,
+  ref,
+  reactive,
+  computed,
+  watch,
+  nextTick,
+  getCurrentInstance,
 } from 'vue';
-import { getChangedValueByTimeFormat, getLastDateOfMonth } from '../calendar/uses';
+import {
+  getChangedValueByTimeFormat,
+  getLastDateOfMonth,
+} from '../calendar/uses';
 
-const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
+const dateReg = new RegExp(
+  /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/
+);
+const dateTimeReg = new RegExp(
+  /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/
+);
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
   const timeFormat = props.options?.timeFormat;
-  const isRangeMode = ['dateTimeRange', 'dateRange', 'dateMulti'].includes(props.mode);
+  const isRangeMode = ['dateTimeRange', 'dateRange', 'dateMulti'].includes(
+    props.mode
+  );
 
   /**
    * time 이 포함된 mode 인 경우 timeFormat 에 따라 값 변경
@@ -34,7 +47,7 @@ export const useModel = () => {
   const mv = computed({
     get: () => {
       if (!props.modelValue) {
-        return (props.mode === 'date' || props.mode === 'dateTime') ? '' : [];
+        return props.mode === 'date' || props.mode === 'dateTime' ? '' : [];
       }
 
       if (['dateTime', 'dateTimeRange'].includes(props.mode) && timeFormat) {
@@ -45,8 +58,8 @@ export const useModel = () => {
     },
     set: (value) => {
       if (['dateTime', 'dateTimeRange'].includes(props.mode) && timeFormat) {
-         emit('update:modelValue', getDateTimeValue(value));
-         return;
+        emit('update:modelValue', getDateTimeValue(value));
+        return;
       }
       emit('update:modelValue', value);
     },
@@ -55,7 +68,11 @@ export const useModel = () => {
   // mode: 'date' or 'dateTime'시 input box의 입력된 텍스트값
   let currentValue;
   if (['dateTimeRange', 'dateTime'].includes(props.mode) && timeFormat) {
-    if (props.mode === 'dateTimeRange' && Array.isArray(props.modelValue) && props.modelValue.length === 2) {
+    if (
+      props.mode === 'dateTimeRange' &&
+      Array.isArray(props.modelValue) &&
+      props.modelValue.length === 2
+    ) {
       const [fromDate, toDate] = props.modelValue;
       const [fromTimeFormat, toTimeFormat] = timeFormat;
 
@@ -65,7 +82,9 @@ export const useModel = () => {
       ];
       currentValue = ref([...props.modelValue]);
     } else if (props.mode === 'dateTime' && props.modelValue) {
-      currentValue = ref(getChangedValueByTimeFormat(timeFormat, props.modelValue));
+      currentValue = ref(
+        getChangedValueByTimeFormat(timeFormat, props.modelValue)
+      );
     } else {
       currentValue = ref(props.modelValue);
     }
@@ -78,8 +97,10 @@ export const useModel = () => {
    * @param curr
    */
   const validateValue = (curr) => {
-    const dateRule = targetDate => !!(targetDate.length === 10 && dateReg.exec(targetDate));
-    const dateTimeRule = targetDate => !!(targetDate.length === 19 && dateTimeReg.exec(targetDate));
+    const dateRule = (targetDate) =>
+      !!(targetDate.length === 10 && dateReg.exec(targetDate));
+    const dateTimeRule = (targetDate) =>
+      !!(targetDate.length === 19 && dateTimeReg.exec(targetDate));
     const checkValidDate = (targetDate) => {
       const dateValue = targetDate.split(' ')[0];
       const year = +dateValue.split('-')[0];
@@ -95,9 +116,11 @@ export const useModel = () => {
     } else if (props.mode === 'dateTime') {
       isValid = dateTimeRule(curr) && checkValidDate(curr);
     } else if (props.mode === 'dateRange') {
-      isValid = curr.every(value => dateRule(value) && checkValidDate(value));
+      isValid = curr.every((value) => dateRule(value) && checkValidDate(value));
     } else if (props.mode === 'dateTimeRange') {
-      isValid = curr.every(value => dateTimeRule(value) && checkValidDate(value));
+      isValid = curr.every(
+        (value) => dateTimeRule(value) && checkValidDate(value)
+      );
     }
 
     if (isValid) {
@@ -263,7 +286,7 @@ export const useShortcuts = (param) => {
    * active 되어있는 shortcut 제거
    */
   const clearShortcuts = () => {
-    const targetShortcut = usedShortcuts.find(shortcut => shortcut.isActive);
+    const targetShortcut = usedShortcuts.find((shortcut) => shortcut.isActive);
     if (targetShortcut) {
       targetShortcut.isActive = false;
     }
@@ -274,7 +297,9 @@ export const useShortcuts = (param) => {
    * @param targetKey
    */
   const activeShortcut = (targetKey) => {
-    const targetShortcut = usedShortcuts.find(shortcut => shortcut.key === targetKey);
+    const targetShortcut = usedShortcuts.find(
+      (shortcut) => shortcut.key === targetKey
+    );
     if (targetShortcut) {
       targetShortcut.isActive = true;
     }
@@ -313,7 +338,9 @@ export const useShortcuts = (param) => {
    * @returns string
    */
   const formatDateTime = (targetDateTime) => {
-    const dateTimeValue = targetDateTime ? new Date(targetDateTime) : new Date();
+    const dateTimeValue = targetDateTime
+      ? new Date(targetDateTime)
+      : new Date();
     const hour = dateTimeValue.getHours();
     const min = dateTimeValue.getMinutes();
     const sec = dateTimeValue.getSeconds();
@@ -329,10 +356,11 @@ export const useShortcuts = (param) => {
 
     const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
 
-    if (!usedShortcuts.length
-       || (props.mode === 'dateMulti' && props.options?.multiType !== 'date')
-       || (isRange && !mv.value.length)
-       || (!isRange && !mv.value)
+    if (
+      !usedShortcuts.length ||
+      (props.mode === 'dateMulti' && props.options?.multiType !== 'date') ||
+      (isRange && !mv.value.length) ||
+      (!isRange && !mv.value)
     ) {
       return;
     }
@@ -348,11 +376,11 @@ export const useShortcuts = (param) => {
           const [fromTimeFormat, toTimeFormat] = timeFormat;
           const formatFromDate = getChangedValueByTimeFormat(
             fromTimeFormat,
-            formatDateTime(sFromDate),
+            formatDateTime(sFromDate)
           );
           const formatToDate = getChangedValueByTimeFormat(
             toTimeFormat,
-            formatDateTime(sToDate),
+            formatDateTime(sToDate)
           );
           const isCorrectFromDate = formatFromDate === formatDateTime(fromDate);
           const isCorrectToDate = formatToDate === formatDateTime(toDate);
@@ -361,15 +389,18 @@ export const useShortcuts = (param) => {
       } else {
         targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
           const [sFromDate, sToDate] = shortcutDate();
-          const formatFunc = props.mode === 'dateTimeRange' ? formatDateTime : formatDate;
-          const isCorrectFromDate = formatFunc(sFromDate) === formatFunc(fromDate);
+          const formatFunc =
+            props.mode === 'dateTimeRange' ? formatDateTime : formatDate;
+          const isCorrectFromDate =
+            formatFunc(sFromDate) === formatFunc(fromDate);
           const isCorrectToDate = formatFunc(sToDate) === formatFunc(toDate);
           return isCorrectFromDate && isCorrectToDate;
         });
       }
       targetKey = targetShortcut?.key;
     } else {
-      const formatFunc = props.mode === 'dateTime' ? formatDateTime : formatDate;
+      const formatFunc =
+        props.mode === 'dateTime' ? formatDateTime : formatDate;
       const date = formatFunc(mv.value);
       const targetShortcut = usedShortcuts.find(({ shortcutDate }) => {
         const sDate = formatFunc(shortcutDate());
@@ -405,7 +436,10 @@ export const useShortcuts = (param) => {
           const [fromTimeFormat, toTimeFormat] = timeFormat;
 
           mv.value = [
-            getChangedValueByTimeFormat(fromTimeFormat, formatDateTime(fromDate)),
+            getChangedValueByTimeFormat(
+              fromTimeFormat,
+              formatDateTime(fromDate)
+            ),
             getChangedValueByTimeFormat(toTimeFormat, formatDateTime(toDate)),
           ];
         } else {
@@ -416,10 +450,9 @@ export const useShortcuts = (param) => {
       }
     } else {
       const sDate = shortcutDate();
-      mv.value = props.mode === 'dateTime'
-          ? getChangedValueByTimeFormat(
-              timeFormat,
-              formatDateTime(sDate))
+      mv.value =
+        props.mode === 'dateTime'
+          ? getChangedValueByTimeFormat(timeFormat, formatDateTime(sDate))
           : formatDate(sDate);
     }
 
@@ -428,28 +461,26 @@ export const useShortcuts = (param) => {
   };
 
   watch(
-      () => props.modelValue,
-      (curr) => {
-        setActiveShortcut();
-        if (props.mode === 'dateMulti'
-            && props?.options?.multiType === 'date'
-            && props?.options?.multiDayLimit > curr.length
-        ) {
-          return;
-        } else if (
-          props.mode === 'dateRange'
-          || props.mode === 'dateTimeRange'
-        ) {
-          currentValue.value = [...curr];
-          return;
-        } else if (props.mode === 'dateTime') {
-          currentValue.value = curr;
-          return;
-        }
-
+    () => props.modelValue,
+    (curr) => {
+      setActiveShortcut();
+      if (
+        props.mode === 'dateMulti' &&
+        props?.options?.multiType === 'date' &&
+        props?.options?.multiDayLimit > curr.length
+      ) {
+        return;
+      } else if (props.mode === 'dateRange' || props.mode === 'dateTimeRange') {
+        currentValue.value = [...curr];
+        return;
+      } else if (props.mode === 'dateTime') {
         currentValue.value = curr;
-        clickOutsideDropbox();
-      },
+        return;
+      }
+
+      currentValue.value = curr;
+      clickOutsideDropbox();
+    }
   );
 
   return {

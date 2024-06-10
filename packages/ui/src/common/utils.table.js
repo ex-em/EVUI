@@ -3,8 +3,10 @@ export default {
     let output;
 
     if (typeof input === 'string' || typeof input === 'number') {
-      const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
-      output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
+      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
+      output = match
+        ? { value: +match[2], unit: match[3] || undefined }
+        : undefined;
     } else {
       output = undefined;
     }
@@ -21,8 +23,10 @@ export default {
     let result;
 
     if (typeof input === 'string' || typeof input === 'number') {
-      const match = (/^(normal|(\d+(?:\.\d+)?)(px|%)?)$/).exec(input);
-      output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
+      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
+      output = match
+        ? { value: +match[2], unit: match[3] || undefined }
+        : undefined;
     } else {
       output = undefined;
     }
@@ -46,7 +50,7 @@ export default {
     let result;
     if (typeof val !== 'string') {
       result = false;
-    } else if (val.indexOf('%') === (val.length - 1)) {
+    } else if (val.indexOf('%') === val.length - 1) {
       result = true;
     } else {
       result = false;

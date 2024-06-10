@@ -2,7 +2,11 @@
   <template v-if="isShowFilterSetting">
     <teleport to="#ev-grid-filter-setting-modal">
       <section
-        v-clickoutside="() => { isShowFilterSetting = false }"
+        v-clickoutside="
+          () => {
+            isShowFilterSetting = false;
+          }
+        "
         class="ev-grid-filter-setting"
         :style="{
           top: $props.position.top,
@@ -11,13 +15,16 @@
       >
         <div class="ev-grid-filter-setting__header">
           <ev-icon icon="ev-icon-filter-list"></ev-icon>
-          <span class="header-title"> Filter ({{$props.column.caption}}) </span>
+          <span class="header-title">
+            Filter ({{ $props.column.caption }})
+          </span>
         </div>
         <div class="ev-grid-filter-setting__content">
           <div
             v-for="(item, idx) in filteringItems"
             :key="idx"
-            class="ev-grid-filter-setting__row">
+            class="ev-grid-filter-setting__row"
+          >
             <ev-select
               v-model="item.operator"
               class="ev-grid-filter-setting__row--operator"
@@ -46,12 +53,13 @@
               v-else
               v-model="item.value"
               class="ev-grid-filter-setting__row--value"
-              :disabled="item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'"
+              :disabled="
+                item.comparison === 'isEmpty' ||
+                item.comparison === 'isNotEmpty'
+              "
               @input="validateValue($props.column.type, item)"
             />
-            <div
-              class="ev-grid-filter-setting__row--button"
-            >
+            <div class="ev-grid-filter-setting__row--button">
               <ev-icon
                 icon="ev-icon-trash2"
                 @click="removeRow(idx)"
@@ -148,19 +156,20 @@ export default {
       } else if (columnType === 'number' || columnType === 'float') {
         return [...numberItems, ...commonItems];
       } else if (columnType === 'boolean') {
-        return [
-          { name: '=', value: '=' },
-        ];
+        return [{ name: '=', value: '=' }];
       }
       return [];
     };
     const items2 = computed(() => getComparisonItems(props.column.type));
     const isShowFilterSetting = computed({
       get: () => props.isShow,
-      set: val => emit('update:isShow', val),
+      set: (val) => emit('update:isShow', val),
     });
     const addRow = () => {
-      const operator = filteringItems.value.length >= 2 ? filteringItems.value[1].operator : 'and';
+      const operator =
+        filteringItems.value.length >= 2
+          ? filteringItems.value[1].operator
+          : 'and';
       filteringItems.value.push({
         comparison: '=',
         operator,
@@ -182,14 +191,21 @@ export default {
       }
     };
     const changeOperator = (val) => {
-      filteringItems.value = filteringItems.value.map(item => ({ ...item, operator: val }));
+      filteringItems.value = filteringItems.value.map((item) => ({
+        ...item,
+        operator: val,
+      }));
     };
     const applyFiltering = () => {
       emit(
         'apply-filtering',
         filteringColumn.value.field,
-        filteringItems.value.filter(item => item.value
-          || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'),
+        filteringItems.value.filter(
+          (item) =>
+            item.value ||
+            item.comparison === 'isEmpty' ||
+            item.comparison === 'isNotEmpty'
+        )
       );
     };
     watch(
@@ -212,10 +228,11 @@ export default {
           }
           filteringItems.value = rowList;
         }
-      },
+      }
     );
 
-    const getSelectTitle = (items, title) => items.find(item => item.value === title)?.name || '';
+    const getSelectTitle = (items, title) =>
+      items.find((item) => item.value === title)?.name || '';
 
     const initWrapperDiv = () => {
       const root = document.createElement('div');
@@ -259,8 +276,8 @@ export default {
 .ev-grid-filter-setting {
   position: absolute;
   width: auto;
-  border: 1px solid #D0D0D0;
-  background: #FFFFFF;
+  border: 1px solid #d0d0d0;
+  background: #ffffff;
   font-size: 12px;
   z-index: 1;
   &__header {
@@ -307,8 +324,8 @@ export default {
   }
   &__content {
     padding: 0 10px;
-    border-top: 1px solid #CED4DA;
-    border-bottom: 1px solid #CED4DA;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
   }
 
   &__footer {

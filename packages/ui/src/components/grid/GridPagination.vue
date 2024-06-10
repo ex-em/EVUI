@@ -42,7 +42,7 @@ export default {
     order: {
       type: String,
       default: 'left',
-      validator: val => ['left', 'right', 'center'].includes(val),
+      validator: (val) => ['left', 'right', 'center'].includes(val),
     },
   },
   emits: {
@@ -58,7 +58,7 @@ export default {
       () => props.modelValue,
       (value) => {
         currentValue.value = value;
-      },
+      }
     );
     return {
       currentValue,

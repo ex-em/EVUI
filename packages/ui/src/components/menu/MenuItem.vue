@@ -3,18 +3,19 @@
     v-if="!item.hidden"
     :class="[
       'ev-menu-item',
-       `depth${depth}`,
+      `depth${depth}`,
       { active: !item.disabled && item.value === selectedItem },
-    ]">
+    ]"
+  >
     <div
       :class="[
         'ev-menu-title',
         {
-          'expandable': hasChild && expandable,
-          'disabled': item.disabled,
+          expandable: hasChild && expandable,
+          disabled: item.disabled,
         },
       ]"
-      @click="clickMenu({item, depth, disabled: item.disabled})"
+      @click="clickMenu({ item, depth, disabled: item.disabled })"
     >
       <i
         v-if="!!item.iconClass"
@@ -25,10 +26,7 @@
       </span>
       <span
         v-if="expandable && hasChild"
-        :class="[
-          'list-expend-icon',
-          { 'expend': expandable && isExpand }
-        ]"
+        :class="['list-expend-icon', { expend: expandable && isExpand }]"
       >
         <i class="ev-icon-s-arrow-up" />
       </span>
@@ -73,16 +71,27 @@ export default {
           console.warn('[EVUI][Menu] value attribute is required.');
           return false;
         } else if (obj.children !== undefined && !Array.isArray(obj.children)) {
-          console.warn('[EVUI][Menu] children attribute must be \'Array\' type.');
+          console.warn("[EVUI][Menu] children attribute must be 'Array' type.");
           return false;
-        } else if (obj.expand !== undefined && typeof obj.expand !== 'boolean') {
-          console.warn('[EVUI][Menu] expand attribute must be \'Boolean\' type.');
+        } else if (
+          obj.expand !== undefined &&
+          typeof obj.expand !== 'boolean'
+        ) {
+          console.warn("[EVUI][Menu] expand attribute must be 'Boolean' type.");
           return false;
-        } else if (obj.hidden !== undefined && typeof obj.hidden !== 'boolean') {
-          console.warn('[EVUI][Menu] hidden attribute must be \'Boolean\' type.');
+        } else if (
+          obj.hidden !== undefined &&
+          typeof obj.hidden !== 'boolean'
+        ) {
+          console.warn("[EVUI][Menu] hidden attribute must be 'Boolean' type.");
           return false;
-        } else if (obj.disabled !== undefined && typeof obj.disabled !== 'boolean') {
-          console.warn('[EVUI][Menu] disabled attribute must be \'Boolean\' type.');
+        } else if (
+          obj.disabled !== undefined &&
+          typeof obj.disabled !== 'boolean'
+        ) {
+          console.warn(
+            "[EVUI][Menu] disabled attribute must be 'Boolean' type."
+          );
           return false;
         }
         return true;
@@ -107,9 +116,16 @@ export default {
   },
   emits: ['click'],
   setup(props, { emit }) {
-    const defaultExpand = (props.expandable && props.item.expand !== undefined && typeof props.item.expand === 'boolean') ? props.item.expand : true;
+    const defaultExpand =
+      props.expandable &&
+      props.item.expand !== undefined &&
+      typeof props.item.expand === 'boolean'
+        ? props.item.expand
+        : true;
     const isExpand = ref(defaultExpand);
-    const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
+    const hasChild = computed(
+      () => !!props.item.children && !!props.item.children.length
+    );
 
     const clickMenu = (params) => {
       if (hasChild.value && params.depth === props.depth) {
@@ -183,5 +199,4 @@ export default {
     flex: 1;
   }
 }
-
 </style>

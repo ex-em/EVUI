@@ -16,7 +16,7 @@
       :value="label"
       :disabled="disabled"
       @change.stop="changeMv"
-    >
+    />
     <span class="ev-radio-label">
       <template v-if="$slots.default">
         <slot />
@@ -60,17 +60,14 @@ export default {
       'EvRadioGroupMv',
       computed({
         get: () => props.modelValue,
-        set: val => emit('update:modelValue', val),
-      }),
+        set: (val) => emit('update:modelValue', val),
+      })
     );
 
-    const changeMv = inject(
-      'EvRadioGroupChange',
-      async (e) => {
-        await nextTick();
-        emit('change', mv.value, e);
-      },
-    );
+    const changeMv = inject('EvRadioGroupChange', async (e) => {
+      await nextTick();
+      emit('change', mv.value, e);
+    });
 
     const checked = computed(() => mv.value === props.label);
 

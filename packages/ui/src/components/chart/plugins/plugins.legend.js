@@ -74,7 +74,10 @@ const modules = {
    */
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
-    this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+    this.useTable =
+      !!this.options.legend?.table?.use &&
+      this.options.type !== 'heatmap' &&
+      this.options.type !== 'scatter';
 
     if (!this.isInitLegend) {
       this.createLegendLayout();
@@ -106,17 +109,20 @@ const modules = {
     const seriesList = this.seriesList;
 
     groups.forEach((group) => {
-      group.slice().reverse().forEach((sId) => {
-        const series = seriesList[sId];
+      group
+        .slice()
+        .reverse()
+        .forEach((sId) => {
+          const series = seriesList[sId];
 
-        if (series && series.showLegend) {
-          if (this.useTable) {
-            this.addLegendWithValues(series);
-          } else {
-            this.addLegend(series);
+          if (series && series.showLegend) {
+            if (this.useTable) {
+              this.addLegendWithValues(series);
+            } else {
+              this.addLegend(series);
+            }
           }
-        }
-      });
+        });
     });
 
     Object.values(seriesList).forEach((series) => {
@@ -150,12 +156,12 @@ const modules = {
 
         for (let index = 0; index < length; index++) {
           const { id, color, label = '' } = colorState[index];
-          const minValue = min + (interval * index);
+          const minValue = min + interval * index;
           let maxValue = minValue + interval;
           if (index < endIndex) {
-            maxValue -= (0.1 ** decimalPoint);
+            maxValue -= 0.1 ** decimalPoint;
           } else {
-            maxValue = max + (0.1 ** decimalPoint);
+            maxValue = max + 0.1 ** decimalPoint;
           }
 
           let name = label;
@@ -382,11 +388,17 @@ const modules = {
         return;
       }
 
-      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
-      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
+      const colorDOM = targetDOM?.getElementsByClassName(
+        'ev-chart-legend-color'
+      )[0];
+      const nameDOM = targetDOM?.getElementsByClassName(
+        'ev-chart-legend-name'
+      )[0];
       const targetId = targetDOM?.series?.cId;
       const isActive = !colorDOM?.className.includes('inactive');
-      const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
+      const activeCount = series.colorState.filter(
+        (colorItem) => colorItem.show
+      ).length;
 
       if (isActive && activeCount === 1) {
         return;
@@ -405,7 +417,9 @@ const modules = {
         nameDOM.style.color = opt.color;
       }
 
-      const targetIndex = series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = series.colorState.findIndex(
+        (colorItem) => colorItem.id === targetId
+      );
       if (targetIndex > -1) {
         series.colorState[targetIndex].show = !isActive;
       }
@@ -543,10 +557,14 @@ const modules = {
   updateLegendTableValues() {
     const columns = this.options?.legend?.table?.columns;
     const aggregations = this.getAggregations();
-    const rowDOMList = this.legendBoxDOM?.getElementsByClassName('ev-chart-legend--table__row');
+    const rowDOMList = this.legendBoxDOM?.getElementsByClassName(
+      'ev-chart-legend--table__row'
+    );
 
     rowDOMList.forEach((row) => {
-      const valueDOMList = row?.getElementsByClassName('ev-chart-legend--table__value');
+      const valueDOMList = row?.getElementsByClassName(
+        'ev-chart-legend--table__value'
+      );
 
       valueDOMList.forEach((dom) => {
         const key = dom.dataset.type;
@@ -645,7 +663,9 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
+      colorDOM.style.backgroundColor = series.show
+        ? `${seriesColor}80`
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -746,7 +766,9 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
+      colorDOM.style.backgroundColor = series.show
+        ? `${seriesColor}80`
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -778,7 +800,10 @@ const modules = {
       }
 
       if (columns[key].use) {
-        const formattedTxt = this.getFormattedValue(columns[key], aggregations[key]);
+        const formattedTxt = this.getFormattedValue(
+          columns[key],
+          aggregations[key]
+        );
         const valueDOM = document.createElement('td');
         valueDOM.className = 'ev-chart-legend--table__value';
         valueDOM.style.color = series.show ? opt.color : opt.inactive;
@@ -817,7 +842,12 @@ const modules = {
     let legendPad;
     const title = opt?.title?.show ? opt?.title?.height : 0;
     const positionTop = title + opt?.legend?.height;
-    const { top = 0, bottom = 0, left = 0, right = 0 } = opt?.legend?.padding ?? {};
+    const {
+      top = 0,
+      bottom = 0,
+      left = 0,
+      right = 0,
+    } = opt?.legend?.padding ?? {};
 
     if (!wrapperStyle || !legendStyle) {
       return;
@@ -829,7 +859,9 @@ const modules = {
       case 'top':
         wrapperStyle.padding = `${positionTop}px 0 0 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
-        legendPad = parseInt(legendStyle.paddingTop) + parseInt(legendStyle.paddingBottom);
+        legendPad =
+          parseInt(legendStyle.paddingTop) +
+          parseInt(legendStyle.paddingBottom);
 
         boxStyle.width = '100%';
         boxStyle.height = `${opt.legend.height - legendPad}px`;
@@ -883,7 +915,9 @@ const modules = {
       case 'bottom':
         wrapperStyle.padding = `${title}px 0 ${opt.legend.height}px 0`;
         chartRect = this.chartDOM.getBoundingClientRect();
-        legendPad = parseInt(legendStyle.paddingTop) + parseInt(legendStyle.paddingBottom);
+        legendPad =
+          parseInt(legendStyle.paddingTop) +
+          parseInt(legendStyle.paddingBottom);
 
         boxStyle.width = '100%';
         boxStyle.height = `${opt.legend.height - legendPad}px`;
@@ -951,7 +985,9 @@ const modules = {
     }
 
     const opt = this.options?.legend;
-    const container = this.legendBoxDOM.getElementsByClassName('ev-chart-legend-container');
+    const container = this.legendBoxDOM.getElementsByClassName(
+      'ev-chart-legend-container'
+    );
 
     if (!container) {
       return;
@@ -1071,14 +1107,16 @@ const modules = {
         case 'right':
           resizeDOMStyle.left = ghostDOMStyle.left;
           move = +ghostDOMStyle.left.replace('px', '');
-          legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-          boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
+          legendDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4}px`;
+          boxDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4 - padding}px`;
           opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
           wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
           break;
         case 'bottom':
           resizeDOMStyle.bottom = ghostDOMStyle.bottom;
-          move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
+          move =
+            this.wrapperDOM.offsetHeight -
+            +ghostDOMStyle.bottom.replace('px', '');
           legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
           boxDOMStyle.height = `${move - title - 4}px`;
           opt.legend.height = this.wrapperDOM.offsetHeight - move;
@@ -1171,7 +1209,6 @@ const modules = {
 
     return formattedTxt;
   },
-
 };
 
 export default modules;

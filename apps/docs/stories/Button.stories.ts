@@ -3,7 +3,7 @@ import { EvButton } from '@evui/ui';
 
 const meta: Meta<typeof EvButton> = {
   component: EvButton,
-}
+};
 
 export default meta;
 type Story = StoryObj<typeof EvButton>;
@@ -21,7 +21,6 @@ const StoryTemplate: Story = {
               `,
   }),
 };
-
 
 export const Default: Story = {
   ...StoryTemplate,

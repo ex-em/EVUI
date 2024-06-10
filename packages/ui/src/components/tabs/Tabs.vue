@@ -19,15 +19,28 @@
         }"
       >
         <template v-if="hasScroll">
-          <span class="ev-tabs-arrow prev" @click="scrollTab('prev')">
+          <span
+            class="ev-tabs-arrow prev"
+            @click="scrollTab('prev')"
+          >
             <i class="ev-icon-s-arrow-left" />
           </span>
-          <span class="ev-tabs-arrow next" @click="scrollTab('next')">
+          <span
+            class="ev-tabs-arrow next"
+            @click="scrollTab('next')"
+          >
             <i class="ev-icon-s-arrow-right" />
           </span>
         </template>
-        <div ref="listWrapperRef" class="ev-tabs-list-wrapper">
-          <ul ref="listRef" class="ev-tabs-list" :style="listRefStyle">
+        <div
+          ref="listWrapperRef"
+          class="ev-tabs-list-wrapper"
+        >
+          <ul
+            ref="listRef"
+            class="ev-tabs-list"
+            :style="listRefStyle"
+          >
             <li
               v-for="(item, idx) in computedTabList"
               :key="`${item.value}_${idx}`"
@@ -49,7 +62,10 @@
                 class="ev-tabs-icon"
                 :class="item.iconClass"
               />
-              <span class="text" :title="item.text">
+              <span
+                class="text"
+                :title="item.text"
+              >
                 {{ item.text }}
               </span>
               <span

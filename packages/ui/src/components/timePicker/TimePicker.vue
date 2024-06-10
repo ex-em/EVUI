@@ -1,7 +1,7 @@
 <template>
   <div class="ev-time-picker">
     <div
-      v-if="type==='range'"
+      v-if="type === 'range'"
       class="ev-time-picker-range"
     >
       <div
@@ -115,7 +115,10 @@ export default {
       default: '',
       validator: (time) => {
         const timeRegexExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-        if (Array.isArray(time) && (!timeRegexExp.test(time[0]) || !timeRegexExp.test(time[1]))) {
+        if (
+          Array.isArray(time) &&
+          (!timeRegexExp.test(time[0]) || !timeRegexExp.test(time[1]))
+        ) {
           // range mode
           console.warn('Please check the time format in the Timepicker.');
           return false;
@@ -157,8 +160,8 @@ export default {
       set: (value) => {
         if (props.type === 'range') {
           if (Array.isArray(value)) {
-            const startTime = (value[0] > value[1] ? '00:00' : value[0]);
-            const endTime = (startTime.value > value[1] ? '23:59' : value[1]);
+            const startTime = value[0] > value[1] ? '00:00' : value[0];
+            const endTime = startTime.value > value[1] ? '23:59' : value[1];
 
             emit('update:modelValue', [startTime, endTime]);
           }
@@ -169,7 +172,9 @@ export default {
     }); // <string | string[]>
 
     const previousValue = ref(
-      Array.isArray(time.value) ? [`${time.value[0]}`, `${time.value[1]}`] : `${time.value}`,
+      Array.isArray(time.value)
+        ? [`${time.value[0]}`, `${time.value[1]}`]
+        : `${time.value}`
     ); // <string | string[]>
 
     const isWrongType = reactive({
@@ -188,7 +193,7 @@ export default {
       if (!validTimeExp(time.value[0])) {
         time.value[0] = previousValue.value[0];
       }
-      if (time.value[1] && (time.value[0] > time.value[1])) {
+      if (time.value[1] && time.value[0] > time.value[1]) {
         time.value[0] = time.value[1];
       }
       previousValue.value[0] = time.value[0];
@@ -199,7 +204,7 @@ export default {
       if (!validTimeExp(time.value[1])) {
         time.value[1] = previousValue.value[1];
       }
-      if (time.value[0] && (time.value[0] > time.value[1])) {
+      if (time.value[0] && time.value[0] > time.value[1]) {
         time.value[1] = previousValue.value[1];
         if (time.value[0] > previousValue.value[1]) {
           time.value[1] = time.value[0];

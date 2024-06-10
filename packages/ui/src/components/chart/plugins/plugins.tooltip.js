@@ -125,7 +125,9 @@ const modules = {
     }
 
     if (opt.textOverflow) {
-      this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
+      this.tooltipHeaderDOM.classList.add(
+        `ev-chart-tooltip-header--${opt.textOverflow}`
+      );
     }
 
     this.tooltipHeaderDOM.style.visibility = 'hidden';
@@ -134,26 +136,40 @@ const modules = {
     ctx.save();
     ctx.font = this.getFontStyle('contents');
     const isHorizontal = !!this.options.horizontal;
-    const label = isHorizontal ? items[hitInfo.hitId]?.data?.y : items[hitInfo.hitId]?.data?.x;
+    const label = isHorizontal
+      ? items[hitInfo.hitId]?.data?.y
+      : items[hitInfo.hitId]?.data?.x;
     const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
     const nw = Math.round(ctx.measureText(tooltipValue).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
-    const expectedContentsWidth = nw + vw + boxPadding.l + boxPadding.r
-      + seriesColorMarginRight + VALUE_MARGIN + SCROLL_WIDTH;
-    const contentsWidth = expectedContentsWidth > opt.maxWidth
-      ? opt.maxWidth
-      : expectedContentsWidth;
-
+    const expectedContentsWidth =
+      nw +
+      vw +
+      boxPadding.l +
+      boxPadding.r +
+      seriesColorMarginRight +
+      VALUE_MARGIN +
+      SCROLL_WIDTH;
+    const contentsWidth =
+      expectedContentsWidth > opt.maxWidth
+        ? opt.maxWidth
+        : expectedContentsWidth;
 
     // Calculate height of canvas El(tooltip body El) with wrapped line count
     let textLineCnt = opt.textOverflow === 'wrap' ? 0 : seriesLen;
 
     if (opt.textOverflow === 'wrap') {
-      const seriesNameSpaceWidth = opt.maxWidth - (Math.round(ctx.measureText(maxValue).width)
-        + boxPadding.l + boxPadding.r + seriesColorMarginRight + VALUE_MARGIN + SCROLL_WIDTH);
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        (Math.round(ctx.measureText(maxValue).width) +
+          boxPadding.l +
+          boxPadding.r +
+          seriesColorMarginRight +
+          VALUE_MARGIN +
+          SCROLL_WIDTH);
 
       // count wrap line
-      const seriesNames = Object.values(items).map(s => s.name);
+      const seriesNames = Object.values(items).map((s) => s.name);
       seriesNames.forEach((name) => {
         if (ctx.measureText(name).width > seriesNameSpaceWidth) {
           let line = '';
@@ -173,12 +189,12 @@ const modules = {
       ctx.restore();
     }
 
-
     // Calculate height of canvas El(tooltip body El) with useScrollbar, maxHeight option
-    const expectedContentsHeight = boxPadding.t
-      + (textLineCnt * this.getTextHeight())
-      + (seriesLen * LINE_SPACING)
-      + boxPadding.b;
+    const expectedContentsHeight =
+      boxPadding.t +
+      textLineCnt * this.getTextHeight() +
+      seriesLen * LINE_SPACING +
+      boxPadding.b;
 
     let contentsHeight;
     if (opt.useScrollbar && expectedContentsHeight > opt.maxHeight) {
@@ -204,20 +220,19 @@ const modules = {
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
     const distanceMouseAndTooltip = 20;
-    const tooltipDOMHeight = this.tooltipDOM?.offsetHeight
-      || this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
+    const tooltipDOMHeight =
+      this.tooltipDOM?.offsetHeight ||
+      this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
     const maximumPosY = bodyHeight - tooltipDOMHeight - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left = expectedPosX > maximumPosX
-      ? `${reversedPosX}px`
-      : `${expectedPosX}px`;
-    this.tooltipDOM.style.top = expectedPosY > maximumPosY
-      ? `${reversedPosY}px`
-      : `${expectedPosY}px`;
+    this.tooltipDOM.style.left =
+      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
+    this.tooltipDOM.style.top =
+      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
   },
 
   /**
@@ -233,11 +248,16 @@ const modules = {
     if (shape === 'circle') {
       context.beginPath();
       const circleSize = fontSize / 2;
-      context.arc(x, y - (circleSize / 2), circleSize, 0, 2 * Math.PI);
+      context.arc(x, y - circleSize / 2, circleSize, 0, 2 * Math.PI);
       context.fill();
     } else {
       const rectSize = fontSize;
-      context.fillRect(x - (rectSize / 3), y - (rectSize / 1.2), rectSize, rectSize);
+      context.fillRect(
+        x - rectSize / 3,
+        y - rectSize / 1.2,
+        rectSize,
+        rectSize
+      );
     }
   },
 
@@ -320,7 +340,7 @@ const modules = {
       const valueText = gdata.formatted;
 
       let itemX = x + 4;
-      let itemY = y + (textLineCnt * textHeight);
+      let itemY = y + textLineCnt * textHeight;
       itemX += Util.aliasPixel(itemX);
       itemY += Util.aliasPixel(itemY);
 
@@ -331,7 +351,7 @@ const modules = {
           ctx,
           isHorizontal,
           { x: itemX - 4, y: itemY, w: 12, h: -12 },
-          color,
+          color
         );
       } else {
         ctx.fillStyle = color;
@@ -343,14 +363,21 @@ const modules = {
       // 2. Draw series name
       ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
-      const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
-        - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        Math.round(ctx.measureText(maxValue).width) -
+        boxPadding.l -
+        boxPadding.r -
+        seriesColorMarginRight -
+        VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
       const yPos = itemY;
 
-      if (seriesNameSpaceWidth > ctx.measureText(name).width) { // draw normally
+      if (seriesNameSpaceWidth > ctx.measureText(name).width) {
+        // draw normally
         ctx.fillText(name, xPos, yPos);
-      } else if (opt.textOverflow === 'wrap') { // draw with wrap
+      } else if (opt.textOverflow === 'wrap') {
+        // draw with wrap
         let line = '';
         let yPosWithWrap = yPos;
 
@@ -368,8 +395,13 @@ const modules = {
           }
         }
         ctx.fillText(line, xPos, yPosWithWrap);
-      } else { // draw with ellipsis
-        const shortSeriesName = Util.truncateLabelWithEllipsis(name, seriesNameSpaceWidth, ctx);
+      } else {
+        // draw with ellipsis
+        const shortSeriesName = Util.truncateLabelWithEllipsis(
+          name,
+          seriesNameSpaceWidth,
+          ctx
+        );
         ctx.fillText(shortSeriesName, xPos, yPos);
       }
 
@@ -378,7 +410,11 @@ const modules = {
       // 3. Draw value
       ctx.fillStyle = opt.fontColor?.value ?? opt.fontColor;
       ctx.textAlign = 'right';
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(
+        valueText,
+        this.tooltipDOM.offsetWidth - boxPadding.r,
+        itemY
+      );
       ctx.restore();
       ctx.closePath();
 
@@ -459,7 +495,7 @@ const modules = {
         ctx,
         isHorizontal,
         { x: itemX, y: itemY, w: 12, h: -12 },
-        hitColor,
+        hitColor
       );
     } else {
       ctx.fillStyle = hitColor;
@@ -474,7 +510,8 @@ const modules = {
     if (this.axesY.length) {
       ctx.fillText(
         this.axesY[hitAxis.y].getLabelFormat(hitItem.y),
-        itemX + seriesColorMarginRight, itemY,
+        itemX + seriesColorMarginRight,
+        itemY
       );
     }
 
@@ -560,7 +597,7 @@ const modules = {
       const valueText = gdata.formatted;
 
       let itemX = x + 4;
-      let itemY = y + (textLineCnt * textHeight);
+      let itemY = y + textLineCnt * textHeight;
       itemX += Util.aliasPixel(itemX);
       itemY += Util.aliasPixel(itemY);
 
@@ -571,7 +608,7 @@ const modules = {
           ctx,
           false,
           { x: itemX - 4, y: itemY, w: 12, h: -12 },
-          color,
+          color
         );
       } else {
         ctx.fillStyle = color;
@@ -583,14 +620,21 @@ const modules = {
       // 2. Draw series name
       ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
-      const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
-        - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        Math.round(ctx.measureText(maxValue).width) -
+        boxPadding.l -
+        boxPadding.r -
+        seriesColorMarginRight -
+        VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
       const yPos = itemY;
 
-      if (seriesNameSpaceWidth > ctx.measureText(name).width) { // draw normally
+      if (seriesNameSpaceWidth > ctx.measureText(name).width) {
+        // draw normally
         ctx.fillText(name, xPos, yPos);
-      } else if (opt.textOverflow === 'wrap') { // draw with wrap
+      } else if (opt.textOverflow === 'wrap') {
+        // draw with wrap
         let line = '';
         let yPosWithWrap = yPos;
 
@@ -608,8 +652,13 @@ const modules = {
           }
         }
         ctx.fillText(line, xPos, yPosWithWrap);
-      } else { // draw with ellipsis
-        const shortSeriesName = Util.truncateLabelWithEllipsis(name, seriesNameSpaceWidth, ctx);
+      } else {
+        // draw with ellipsis
+        const shortSeriesName = Util.truncateLabelWithEllipsis(
+          name,
+          seriesNameSpaceWidth,
+          ctx
+        );
         ctx.fillText(shortSeriesName, xPos, yPos);
       }
 
@@ -617,7 +666,11 @@ const modules = {
 
       // 3. Draw value
       ctx.textAlign = 'right';
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(
+        valueText,
+        this.tooltipDOM.offsetWidth - boxPadding.r,
+        itemY
+      );
       ctx.restore();
       ctx.closePath();
 
@@ -633,7 +686,9 @@ const modules = {
     const mouseX = e.pageX;
     const mouseY = e.pageY;
 
-    const customTooltipEl = this.tooltipDOM.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
+    const customTooltipEl = this.tooltipDOM.getElementsByClassName(
+      'ev-chart-tooltip-custom'
+    )?.[0];
     if (!customTooltipEl && !this.tooltipDOM) {
       return;
     }
@@ -650,17 +705,17 @@ const modules = {
     const tooltipDOMSize = this.tooltipDOM?.getBoundingClientRect();
     const distanceMouseAndTooltip = 20;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
-    const maximumPosY = bodyHeight - tooltipDOMSize?.height - distanceMouseAndTooltip;
+    const maximumPosY =
+      bodyHeight - tooltipDOMSize?.height - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
-    const reversedPosY = mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left = expectedPosX > maximumPosX
-      ? `${reversedPosX}px`
-      : `${expectedPosX}px`;
-    this.tooltipDOM.style.top = expectedPosY > maximumPosY
-      ? `${reversedPosY}px`
-      : `${expectedPosY}px`;
+    const reversedPosY =
+      mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
+    this.tooltipDOM.style.left =
+      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
+    this.tooltipDOM.style.top =
+      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
   },
 
   /**
@@ -683,7 +738,9 @@ const modules = {
         });
       });
 
-      const userCustomTooltipBody = Util.htmlToElement(opt?.formatter?.html((seriesList)));
+      const userCustomTooltipBody = Util.htmlToElement(
+        opt?.formatter?.html(seriesList)
+      );
       if (userCustomTooltipBody) {
         this.tooltipDOM.appendChild(userCustomTooltipBody);
       }
@@ -703,7 +760,8 @@ const modules = {
     this.tooltipDOM.style.overflowY = 'hidden';
     this.tooltipDOM.style.backgroundColor = tooltipOptions.backgroundColor;
     this.tooltipDOM.style.border = `1px solid ${tooltipOptions.borderColor}`;
-    this.tooltipDOM.style.color = tooltipOptions.fontColor?.title ?? tooltipOptions.fontColor;
+    this.tooltipDOM.style.color =
+      tooltipOptions.fontColor?.title ?? tooltipOptions.fontColor;
 
     this.tooltipHeaderDOM.style.fontSize = `${tooltipOptions.fontSize.title}px`;
     this.tooltipHeaderDOM.style.fontFamily = this.getFontStyle('title');
@@ -754,8 +812,12 @@ const modules = {
     const mouseYIp = 10;
     const options = this.options;
 
-    if (offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp)
-      && offsetY >= (graphPos.y1 - mouseYIp) && offsetY <= (graphPos.y2 + mouseYIp)) {
+    if (
+      offsetX >= graphPos.x1 - mouseXIp &&
+      offsetX <= graphPos.x2 + mouseXIp &&
+      offsetY >= graphPos.y1 - mouseYIp &&
+      offsetY <= graphPos.y2 + mouseYIp
+    ) {
       ctx.beginPath();
       ctx.save();
       ctx.strokeStyle = color;
@@ -785,10 +847,14 @@ const modules = {
    * @returns {undefined}
    */
   tooltipClear() {
-    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+    this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
 
-    this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width / this.clearRectRatio,
-      this.tooltipCanvas.height / this.clearRectRatio);
+    this.tooltipCtx.clearRect(
+      0,
+      0,
+      this.tooltipCanvas.width / this.clearRectRatio,
+      this.tooltipCanvas.height / this.clearRectRatio
+    );
 
     this.tooltipDOM.style.display = 'none';
   },
@@ -805,13 +871,16 @@ const modules = {
     const result = [];
 
     groups.forEach((group) => {
-      group.slice().reverse().forEach((sId) => {
-        const series = seriesList[sId];
+      group
+        .slice()
+        .reverse()
+        .forEach((sId) => {
+          const series = seriesList[sId];
 
-        if (series && series.showLegend && sKeys.includes(sId)) {
-          result.push(sId);
-        }
-      });
+          if (series && series.showLegend && sKeys.includes(sId)) {
+            result.push(sId);
+          }
+        });
     });
 
     Object.keys(seriesList).forEach((sId) => {

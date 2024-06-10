@@ -31,7 +31,8 @@ class TimeBar extends Bar {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const yArea =
+      chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
     const xep = chartRect.x2 - labelOffset.right;
@@ -42,9 +43,9 @@ class TimeBar extends Bar {
 
     let bArea;
     if (this.isExistGrp) {
-      bArea = (cArea - (cPad * 2));
+      bArea = cArea - cPad * 2;
     } else {
-      bArea = (cArea - (cPad * 2)) / showSeriesCount;
+      bArea = (cArea - cPad * 2) / showSeriesCount;
     }
 
     const size = Math.ceil(bArea * thickness);
@@ -71,12 +72,24 @@ class TimeBar extends Bar {
 
       if (isHorizontal) {
         x = xsp;
-        y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+        y = Canvas.calculateY(
+          item.y,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea,
+          ysp
+        );
       } else {
-        x = Canvas.calculateSubX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+        x = Canvas.calculateSubX(
+          item.x,
+          minmaxX.graphMin,
+          minmaxX.graphMax,
+          xArea,
+          xsp
+        );
         if (x < xsp) {
           subW -= xsp - x;
-          x = (x + w < xsp) ? null : xsp;
+          x = x + w < xsp ? null : xsp;
         } else if (x + w > xep) {
           subW -= subW - (xep - x);
         }
@@ -93,21 +106,57 @@ class TimeBar extends Bar {
 
       if (isHorizontal) {
         if (item.b) {
-          w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-          x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+          w = Canvas.calculateX(
+            item.x - item.b,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea
+          );
+          x = Canvas.calculateX(
+            item.b,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea,
+            xsp
+          );
         } else {
-          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+          w = Canvas.calculateX(
+            item.x,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea
+          );
         }
-      } else if (item.b) { // vertical stack bar chart
-        h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-        y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-      } else { // vertical bar chart
-        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+      } else if (item.b) {
+        // vertical stack bar chart
+        h = Canvas.calculateY(
+          item.y - item.b,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea
+        );
+        y = Canvas.calculateY(
+          item.b,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea,
+          ysp
+        );
+      } else {
+        // vertical bar chart
+        h = Canvas.calculateY(
+          item.y,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea
+        );
       }
 
       if (x !== null && y !== null) {
         const barColor = item.dataColor || this.color;
-        const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
+        const noneDownplayOpacity = barColor.includes('rgba')
+          ? Util.getOpacity(barColor)
+          : 1;
         const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
 
         if (typeof barColor !== 'string') {
@@ -118,7 +167,7 @@ class TimeBar extends Bar {
             isHorizontal,
             { x, y, w, h },
             barColor,
-            opacity === 0.1,
+            opacity === 0.1
           );
         } else {
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);

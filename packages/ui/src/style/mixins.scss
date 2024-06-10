@@ -8,7 +8,12 @@
 
         @each $key, $submap in $map {
           $value: map-get(map-get($ev-themes, $theme), '#{$key}');
-          $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+          $ev-theme-map: map-merge(
+            $ev-theme-map,
+            (
+              $key: $value,
+            )
+          ) !global;
         }
 
         /* stylelint-disable */
@@ -16,14 +21,17 @@
         $ev-theme-map: null !global;
         /* stylelint-enable */
       }
-    }
-
-    @else {
+    } @else {
       $ev-theme-map: () !global;
 
       @each $key, $submap in $map {
         $value: map-get(map-get($ev-themes, $theme), '#{$key}');
-        $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+        $ev-theme-map: map-merge(
+          $ev-theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
       }
 
       /* stylelint-disable */
@@ -58,9 +66,7 @@
   @if $line == 1 {
     display: $display;
     white-space: nowrap;
-  }
-
-  @else {
+  } @else {
     display: -webkit-box;
     height: auto;
     text-align: left;
