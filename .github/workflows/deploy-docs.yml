@@ -2,9 +2,9 @@ name: Deploy Docs
 
 on:
   push:
-    branches: [ "3.0" ]
+    branches: ['3.0']
     paths:
-      - "docs/**"
+      - 'docs/**'
 
 jobs:
   deploy:

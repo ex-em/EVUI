@@ -1,66 +1,35 @@
 {
-  "name": "evui",
-  "version": "3.4.46",
+  "name": "exem-evui-library",
   "description": "A EXEM Library project",
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
+  "type": "module",
   "engines": {
-    "node": "<=12.0.0"
+    "node": ">=18",
+    "pnpm": ">=8"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@evui/eslint-config": "workspace:*",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
+    "nx": "19.0.4",
+    "prettier": "^3.2.5"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "build:lib": "vue-cli-service build --target lib --name evui src/main.js && rimraf ./dist/demo.html",
-    "build:lib_min": "vue-cli-service build --formats umd-min --target lib --name evui src/main.js && rimraf ./dist/demo.html",
-    "test:unit": "vue-cli-service test:unit",
-    "lint": "eslint src test docs",
-    "docs": "vue-cli-service serve --port 9999 docs/main.js",
-    "docs_build": "vue-cli-service build --mode production docs/main.js"
-  },
-  "files": [
-    "dist",
-    "src"
-  ],
-  "main": "dist/evui.umd.js",
-  "dependencies": {
-    "core-js": "^3.6.5",
-    "dayjs": "^1.10.4",
-    "korean-regexp": "^1.0.10",
-    "vue": "^3.0.0",
-    "vue-resize-observer": "^2.0.15",
-    "vue3-observe-visibility": "^0.1.2",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0",
-    "bignumber.js": "^9.1.2"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-unit-jest": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0-0",
-    "@vue/test-utils": "^2.0.0-0",
-    "axios": "^0.20.0",
-    "babel-eslint": "^10.1.0",
-    "codesandbox": "^2.2.0",
-    "eslint": "^7.2.0",
-    "eslint-config-exem": "^3.0.3",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-vue": "^7.0.0-0",
-    "gh-pages": "^4.0.0",
-    "highlight.js": "^10.2.0",
-    "lodash-es": "^4.17.15",
-    "marked": "^1.1.1",
-    "node-sass": "^4.12.0",
-    "raw-loader": "^4.0.1",
-    "sass-loader": "^8.0.2",
-    "stylelint": "^13.7.0",
-    "stylelint-order": "^4.1.0",
-    "stylelint-webpack-plugin": "^2.1.0",
-    "typescript": "~3.9.3",
-    "vue-jest": "^5.0.0-0",
-    "vue-template-compiler": "^2.6.12"
+    "build": "nx run-many --target=build --projects=@evui/*",
+    "types-check": "nx run-many --target=type-check --projects=@evui/*",
+    "storybook": "nx run @evui/storybook:storybook",
+    "graph": "nx graph",
+    "reset": "nx reset",
+    "lint-staged": "lint-staged",
+    "prepare": "husky",
+    "prettier-fix": "prettier --write .",
+    "prettier-check": "prettier --check .",
+    "eslint-fix": "eslint --fix .",
+    "eslint-check": "eslint ."
   }
 }

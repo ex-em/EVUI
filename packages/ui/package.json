@@ -1,0 +1,67 @@
+{
+  "name": "@evui/ui",
+  "version": "4.0.0-10",
+  "author": "exem <dev_client@ex-em.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "pnpm run clean && pnpm run type-check && pnpm run build:global-type && pnpm run build:icon && vite build",
+    "build:type": "vue-tsc --declaration --emitDeclarationOnly",
+    "build:global-type": "tsx ./scripts/buildGlobalType.ts",
+    "build:icon": "tsx ./scripts/buildIcon.ts",
+    "type-check": "vue-tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "global.d.ts"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./style": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    },
+    "./global": {
+      "types": "./global.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.5.1",
+    "glob": "^10.3.15",
+    "sass": "^1.77.2",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.4.27",
+    "vue-tsc": "^2.0.6"
+  },
+  "peerDependencies": {
+    "vue": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "bignumber.js": "^9.1.2",
+    "dayjs": "^1.11.11",
+    "korean-regexp": "^1.0.12",
+    "lodash-es": "^4.17.21",
+    "vue-resize-observer": "^2.0.15",
+    "vue3-observe-visibility": "^1.0.1"
+  }
+}

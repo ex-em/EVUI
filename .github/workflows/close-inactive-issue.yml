@@ -1,10 +1,10 @@
 name: Close Inactive Issues
-# inactive 면서 일동안 활동이 없는 이슈를 닫음
+# inactive 면서 3일동안 활동이 없는 이슈를 닫음
 
 on:
   schedule:
-    - cron: "0 15 * * *"
-# 한국시간 매일 자정에 실행
+    - cron: '0 15 */3 * *'
+# 한국시간 매일 자정에 3일마다 실행
 
 jobs:
   check-need-info:

@@ -1,0 +1,113 @@
+@use '../variables.scss' as *;
+@use '../mixins.scss' as *;
+@use '../functions.scss' as *;
+
+.ev-input,
+.ev-textarea {
+  width: 100%;
+  outline: 0;
+  background-color: transparent;
+  border-radius: $default-radius;
+  transition: border $animate-base;
+
+  @include evThemify() {
+    border: 1px solid evThemed('border-base');
+    color: evThemed('font-base');
+  }
+  &:focus,
+  &:hover {
+    @include evThemify() {
+      border: 1px solid evThemed('primary');
+    }
+  }
+}
+.ev-input {
+  height: $input-default-height;
+  padding: 0 $input-default-padding;
+}
+.ev-textarea {
+  height: $textarea-default-height;
+  padding: 5px;
+  resize: none;
+}
+
+@include state('readonly') {
+  .ev-input,
+  .ev-textarea,
+  .ev-select {
+    @include evThemify() {
+      background-color: evThemed('background-lighten');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('border-base'), 0.5);
+      }
+    }
+  }
+  &.ev-text-field:hover,
+  &.ev-input-number:hover,
+  &.ev-select:hover {
+    .ev-input,
+    .ev-textarea {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('border-base'), 0.5);
+      }
+    }
+  }
+}
+@include state('disabled') {
+  &.ev-input-number,
+  &.ev-text-field,
+  &.ev-select {
+    &,
+    * {
+      cursor: not-allowed !important;
+    }
+    &:hover {
+      .ev-input,
+      .ev-textarea {
+        @include evThemify() {
+          border: 1px solid evThemed('error');
+        }
+      }
+    }
+  }
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      border: 1px solid evThemed('disabled');
+      background-color: evThemed('background-lighten');
+      color: evThemed('disabled');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid evThemed('error');
+      }
+    }
+  }
+}
+@include state('error') {
+  .ev-input,
+  .ev-textarea {
+    @include evThemify() {
+      border: 1px solid evThemed('error');
+    }
+    &:focus,
+    &:hover {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('error'), 0.5);
+      }
+    }
+  }
+  &.ev-text-field:hover,
+  &.ev-input-number:hover {
+    .ev-input,
+    .ev-textarea {
+      @include evThemify() {
+        border: 1px solid rgba(evThemed('error'), 0.5);
+      }
+    }
+  }
+}

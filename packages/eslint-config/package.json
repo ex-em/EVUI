@@ -1,0 +1,23 @@
+{
+  "name": "@evui/eslint-config",
+  "version": "0.0.1",
+  "description": "EXEM EVUI Library ESLint Config",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "type": "module",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": "^8.56.0",
+    "typescript": "*",
+    "vue": "*"
+  },
+  "dependencies": {
+    "@eslint/js": "^8.56.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "typescript-eslint": "^7.12.0",
+    "eslint-plugin-vue": "^9.26.0"
+  }
+}

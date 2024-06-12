@@ -1,0 +1,7 @@
+pnpm lint-staged
+
+if [ $? -ne 0 ]; then
+  echo "fix the errors before committing"
+  echo "if you want to skip the pre-commit hook, use git commit --no-verify"
+  exit 1
+fi
