@@ -11,6 +11,7 @@ class LogarithmicScale extends Scale {
   calculateScaleRange(minMax) {
     let maxValue;
     let minValue;
+    let isDefaultMaxSameAsMin = false;
     if (this.range && this.range.length === 2) {
       maxValue = this.range[1];
       minValue = this.range[0];
@@ -29,10 +30,11 @@ class LogarithmicScale extends Scale {
 
     if (maxValue === minValue) {
       maxValue += 1;
+      isDefaultMaxSameAsMin = true;
     }
 
     const minLabel = this.getLabelFormat(minValue);
-    const maxLabel = this.getLabelFormat(maxValue);
+    const maxLabel = this.getLabelFormat(maxValue, isDefaultMaxSameAsMin);
 
     return {
       min: minValue,
@@ -100,13 +102,14 @@ class LogarithmicScale extends Scale {
 
   /**
    * Transforming label by designated format
-   * @param {any} value    label value
+   * @param {number} value                   label value
+   * @param {boolean} isMaxValueSameAsMin    is default max value same as min value
    *
    * @returns {string} formatted label
    */
-  getLabelFormat(value) {
+  getLabelFormat(value, isMaxValueSameAsMin) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value);
+      const formattedLabel = this.formatter(value, isMaxValueSameAsMin);
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;

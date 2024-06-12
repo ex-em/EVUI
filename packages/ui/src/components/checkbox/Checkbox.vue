@@ -127,9 +127,10 @@ watch(
   () => props.indeterminate,
   (val) => {
     nextTick(() => {
-      if (checkbox.value) {
-        checkbox.value.indeterminate = val;
+      if (!checkbox.value) {
+        return;
       }
+      checkbox.value.indeterminate = val;
     });
   },
   { immediate: true }

@@ -4,13 +4,14 @@ import Util from '../helpers/helpers.util';
 class LinearScale extends Scale {
   /**
    * Transforming label by designated format
-   * @param {number} value    label value
+   * @param {number} value                   label value
+   * @param {boolean} isMaxValueSameAsMin    is default max value same as min value
    *
    * @returns {string} formatted label
    */
-  getLabelFormat(value) {
+  getLabelFormat(value, isMaxValueSameAsMin) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value);
+      const formattedLabel = this.formatter(value, isMaxValueSameAsMin);
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;
