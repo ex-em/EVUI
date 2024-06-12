@@ -70,6 +70,7 @@ class Scale {
   calculateScaleRange(minMax, scrollbarOpt) {
     let maxValue;
     let minValue;
+    let isDefaultMaxSameAsMin = false;
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (range?.length === 2) {
@@ -95,10 +96,11 @@ class Scale {
 
     if (maxValue === minValue) {
       maxValue += 1;
+      isDefaultMaxSameAsMin = true;
     }
 
     const minLabel = this.getLabelFormat(minValue);
-    const maxLabel = this.getLabelFormat(maxValue);
+    const maxLabel = this.getLabelFormat(maxValue, isDefaultMaxSameAsMin);
 
     return {
       min: minValue,
