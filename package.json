@@ -14,10 +14,12 @@
   ],
   "devDependencies": {
     "@evui/eslint-config": "workspace:*",
+    "@evui/stylelint-config": "workspace:*",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
     "nx": "19.0.4",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "stylelint": "^16.6.1"
   },
   "scripts": {
     "build": "nx run-many --target=build --projects=@evui/*",
@@ -30,6 +32,8 @@
     "prettier-fix": "prettier --write .",
     "prettier-check": "prettier --check .",
     "eslint-fix": "eslint --fix .",
-    "eslint-check": "eslint ."
+    "eslint-check": "eslint .",
+    "stylelint-fix": "stylelint --fix **/*.{css,scss,sass,vue,html}",
+    "stylelint-check": "stylelint **/*.{css,scss,sass,vue,html}"
   }
 }

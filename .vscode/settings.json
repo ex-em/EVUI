@@ -1,5 +1,9 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "stylelint.vscode-stylelint",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
   "editor.formatOnSave": true,
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -16,5 +20,7 @@
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.format.enable": true
+  "eslint.format.enable": true,
+  "cSpell.words": ["evui", "stylelint", "stylelintrc"],
+  "stylelint.validate": ["css", "postcss", "vue", "scss", "html", "sass"]
 }

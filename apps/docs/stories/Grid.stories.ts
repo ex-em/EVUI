@@ -18,7 +18,6 @@ const StoryTemplate: Story = {
         const roles = ['Common', 'Admin'];
         const booleans = [true, false];
         for (let ix = startIndex; ix < startIndex + count; ix++) {
-          // @ts-ignore
           temp.push([
             `user_${ix + 1}`,
             roles[ix % 2],

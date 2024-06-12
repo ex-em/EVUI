@@ -75,7 +75,7 @@ const StoryTemplate: Story = {
         },
       ]);
       const openContextMenu = (e) => {
-        // @ts-ignore
+        // @ts-expect-error TODO
         menu.value?.show(e);
       };
 
