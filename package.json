@@ -21,15 +21,11 @@
     "build": "nx run-many --target=build --all --parallel",
     "types-check": "nx run-many --target=type-check --all",
     "storybook": "nx storybook @evui/storybook",
+    "prettier": "nx run-many --target=prettier --all",
+    "lint": "nx run-many --target=lint --all",
+    "lint:style": "nx run-many --target=lint:style --all",
     "graph": "nx graph",
     "reset": "nx reset",
-    "lint-staged": "lint-staged",
-    "prepare": "husky",
-    "prettier-fix": "prettier --write .",
-    "prettier-check": "prettier --check .",
-    "eslint-fix": "eslint --fix .",
-    "eslint-check": "eslint .",
-    "stylelint-fix": "stylelint --fix **/*.{css,scss,sass,vue,html}",
-    "stylelint-check": "stylelint **/*.{css,scss,sass,vue,html}"
+    "prepare": "husky"
   }
 }

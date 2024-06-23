@@ -1,11 +1,13 @@
 {
-  "name": "@evui/storybook",
+  "name": "docs",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
-    "build": "storybook build"
+    "build": "storybook build",
+    "prettier": "prettier --write .",
+    "lint": "eslint --fix"
   },
   "dependencies": {
     "vue": "^3.4.27",

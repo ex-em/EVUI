@@ -12,6 +12,9 @@
     "build:global-type": "tsx ./scripts/buildGlobalType.ts",
     "build:icon": "tsx ./scripts/buildIcon.ts",
     "type-check": "vue-tsc --noEmit",
+    "lint": "eslint . --fix",
+    "lint:style": "stylelint --fix **/*.{css,scss,sass,vue,html}",
+    "prettier": "prettier --write .",
     "clean": "rm -rf dist"
   },
   "type": "module",
