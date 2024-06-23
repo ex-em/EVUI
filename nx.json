@@ -1,39 +1,17 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "noMarkdown": ["!{projectRoot}/**/*.md"]
+  },
   "targetDefaults": {
-    "test": {
-      "dependsOn": [
-        "^test"
-      ],
-      "cache": true
-    },
     "storybook": {
-      "dependsOn": [
-        "^storybook"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
-      "cache": true
-    },
-    "build-storybook": {
-      "dependsOn": [
-        "^build-storybook"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["noMarkdown","^noMarkdown"],
       "cache": true
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["noMarkdown","^noMarkdown"],
       "cache": true
     }
-  },
-  "defaultBase": "main"
+  }
 }

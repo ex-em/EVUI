@@ -8,10 +8,6 @@
     "node": ">=18",
     "pnpm": ">=8"
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "devDependencies": {
     "@evui/eslint-config": "workspace:*",
     "@evui/stylelint-config": "workspace:*",
@@ -22,9 +18,9 @@
     "stylelint": "^16.6.1"
   },
   "scripts": {
-    "build": "nx run-many --target=build --projects=@evui/*",
-    "types-check": "nx run-many --target=type-check --projects=@evui/*",
-    "storybook": "nx run @evui/storybook:storybook",
+    "build": "nx run-many --target=build --all --parallel",
+    "types-check": "nx run-many --target=type-check --all",
+    "storybook": "nx storybook @evui/storybook",
     "graph": "nx graph",
     "reset": "nx reset",
     "lint-staged": "lint-staged",
