@@ -671,7 +671,12 @@ export const sortEvent = (params) => {
 
     if (customSetAsc) {
       stores.store.sort((a, b) => {
-        const { aCol, bCol } = getColumnValue(a, b);
+        /*
+          배열 및 객체일 경우 customAscFunc 사용자에게 데이터 전처리를 맡길 수 있게끔
+          getColumnValue 사용 안함
+        */
+        const aCol = a[ROW_DATA_INDEX][index];
+        const bCol = b[ROW_DATA_INDEX][index];
         const compareAscReturn = customSetAsc(aCol, bCol);
         return sortInfo.sortOrder === 'desc' ? -compareAscReturn : compareAscReturn;
       });
