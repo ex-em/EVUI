@@ -216,7 +216,7 @@ export const resizeEvent = (params) => {
     }
     columnWidth = resizeInfo.columnWidth;
     let remainWidth = 0;
-    if (resizeInfo.adjust) {
+    if (resizeInfo.adjust && elementInfo.body) {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
