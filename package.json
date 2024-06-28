@@ -20,7 +20,7 @@
   "scripts": {
     "build": "nx run-many --target=build --all --parallel",
     "types-check": "nx run-many --target=type-check --all",
-    "storybook": "nx storybook @evui/storybook",
+    "storybook": "nx storybook docs",
     "prettier": "nx run-many --target=prettier --all",
     "lint": "nx run-many --target=lint --all",
     "lint:style": "nx run-many --target=lint:style --all",

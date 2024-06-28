@@ -30,7 +30,13 @@ import EvScheduler from './components/scheduler';
 import EvSlider from './components/slider';
 import EvTimePicker from './components/timePicker';
 import EvTree from './components/tree';
+import EvChartBrush from './components/chartBrush/';
+import EvChartGroup from './components/chartGroup/';
+import EvDatePicker from './components/datePicker/';
+import EvTreeNode from './components/tree/';
+
 import pkg from '../package.json' with { type: 'json' };
+
 // @ts-expect-error ts 지원하지 않습니다.
 import VueResizeObserver from 'vue-resize-observer';
 import ObserveVisibility from 'vue3-observe-visibility';
@@ -67,6 +73,10 @@ export {
   EvSlider,
   EvTimePicker,
   EvTree,
+  EvChartBrush,
+  EvChartGroup,
+  EvDatePicker,
+  EvTreeNode,
 };
 
 const components = [
@@ -100,6 +110,10 @@ const components = [
   EvSlider,
   EvTimePicker,
   EvTree,
+  EvChartBrush,
+  EvChartGroup,
+  EvDatePicker,
+  EvTreeNode,
 ];
 
 export default {

@@ -146,8 +146,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import '../../style/index.scss';
-
+@import '../../style/index';
 .ev-menu-item {
   line-height: 1.3em;
   &:not(.depth1) {
@@ -155,22 +154,22 @@ export default {
   }
   &.active > .ev-menu-title {
     @include evThemify() {
-      color: evThemed('primary') !important;
+      color: evthemed('primary') !important;
     }
   }
 }
 .ev-menu-title {
   display: flex;
   position: relative;
+  align-items: center;
   padding: 3px 7px;
   margin-bottom: 6px;
   cursor: pointer;
-  align-items: center;
   line-height: 1.5em;
   word-break: break-all;
   &:hover:not(.expandable) {
     @include evThemify() {
-      color: evThemed('primary') !important;
+      color: evthemed('primary') !important;
     }
   }
   &.expandable {
@@ -187,16 +186,16 @@ export default {
     position: absolute;
     top: 50%;
     right: 7px;
-    transform: translateY(-50%);
     transition: transform $animate-fast;
+    transform: translateY(-50%);
     &.expend {
       transform: translateY(-50%) rotate(180deg);
     }
   }
   .text {
     display: inline-block;
-    margin-left: 4px;
     flex: 1;
+    margin-left: 4px;
   }
 }
 </style>
