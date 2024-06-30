@@ -9,15 +9,15 @@
 1. Install the package
 
 ```bash
-npm install @evui/ui
+npm install evui
 ```
 
 2. Apply Plugin
 
 ```typescript
 // main.ts
-import EVUI, { EvMessageBox, EvMessage, EvNotification } from '@evui/ui';
-import '@evui/ui/style';
+import EVUI, { EvMessageBox, EvMessage, EvNotification } from 'evui';
+import 'evui/style';
 
 const app = createApp(App);
 app.use(EVUI);
@@ -30,7 +30,7 @@ app.use(EVUI);
 {
   ...
   "compilerOptions": {
-    "types": ["@evui/ui/global"]
+    "types": ["evui/global"]
   }
   ...
 }
