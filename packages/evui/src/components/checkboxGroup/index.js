@@ -1,4 +1,4 @@
-import EvCheckboxGroup from './CheckboxGroup';
+import EvCheckboxGroup from './CheckboxGroup.vue';
 
 EvCheckboxGroup.install = (app) => {
   app.component(EvCheckboxGroup.name, EvCheckboxGroup);

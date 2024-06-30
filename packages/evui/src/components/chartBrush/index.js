@@ -1,5 +1,5 @@
 import VueResizeObserver from 'vue-resize-observer';
-import EvChartBrush from './ChartBrush';
+import EvChartBrush from './ChartBrush.vue';
 
 EvChartBrush.install = (app) => {
   app.component(EvChartBrush.name, EvChartBrush);

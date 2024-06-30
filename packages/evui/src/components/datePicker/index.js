@@ -1,4 +1,4 @@
-import EvDatePicker from './DatePicker';
+import EvDatePicker from './DatePicker.vue';
 
 EvDatePicker.install = (app) => {
   app.component(EvDatePicker.name, EvDatePicker);

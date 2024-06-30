@@ -1,4 +1,4 @@
-import EvCalendar from './Calendar';
+import EvCalendar from './Calendar.vue';
 
 EvCalendar.install = (app) => {
   app.component(EvCalendar.name, EvCalendar);

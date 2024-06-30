@@ -1,5 +1,5 @@
 import VueResizeObserver from 'vue-resize-observer';
-import EvChartGroup from './ChartGroup';
+import EvChartGroup from './ChartGroup.vue';
 
 EvChartGroup.install = (app) => {
   app.component(EvChartGroup.name, EvChartGroup);

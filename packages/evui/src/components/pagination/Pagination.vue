@@ -48,8 +48,8 @@
 
 <script>
 import { computed, nextTick, watch } from 'vue';
-import EvIcon from '@/components/icon/Icon';
-import pageButton from './pageButton';
+import EvIcon from '@/components/icon/Icon.vue';
+import pageButton from './pageButton.vue';
 
 export default {
   name: 'EvPagination',

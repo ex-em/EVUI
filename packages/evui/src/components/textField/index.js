@@ -1,4 +1,4 @@
-import EvTextField from './TextField';
+import EvTextField from './TextField.vue';
 
 EvTextField.install = (app) => {
   app.component(EvTextField.name, EvTextField);

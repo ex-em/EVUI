@@ -1,63 +1,37 @@
-# evui 3.0
+# evui/ui
 
-### Project setup
-```
-npm i -D evui
-```
+## TODO
 
-### Compiles library for product
-```
-npm run build:lib
-```
+- [ ] Add Type
 
-### Compiles and hot-reloads for development document project
-- Node 12 is required to run the official documentation locally.
-- We will upload the node version later.
-- DOCUMENT : https://ex-em.github.io/EVUI
-```
-npm run docs
+## How to use
+
+1. Install the package
+
+```bash
+npm install @evui/ui
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+2. Apply Plugin
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Use Vue3 Project
-```
+```typescript
 // main.ts
-import App from '@/App.vue';
-import EVUI from 'evui';
+import EVUI, { EvMessageBox, EvMessage, EvNotification } from '@evui/ui';
+import '@evui/ui/style';
 
 const app = createApp(App);
-
 app.use(EVUI);
-
-app.mount('#app');
 ```
 
-### Using Message Component
-```
-// main.ts
-import App from '@/App.vue';
-import { EvMessageBox, EvMessage, EvNotification } from 'evui';
+3. Add global type
 
-const app = createApp(App);
-
-app.use(EVUI);
-app.config.globalProperties.$messagebox = EvMessageBox;
-app.config.globalProperties.$messagex = EvMessage;
-app.config.globalProperties.$notify = EvNotification;
-
-app.mount('#app');
+```typescript
+// tsconfig.json
+{
+  ...
+  "compilerOptions": {
+    "types": ["@evui/ui/global"]
+  }
+  ...
+}
 ```

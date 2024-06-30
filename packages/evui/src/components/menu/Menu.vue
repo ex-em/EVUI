@@ -15,7 +15,7 @@
 
 <script>
 import { ref } from 'vue';
-import MenuItem from './MenuItem';
+import MenuItem from './MenuItem.vue';
 
 export default {
   name: 'EvMenu',

@@ -1,4 +1,4 @@
-import EvButtonGroup from './ButtonGroup';
+import EvButtonGroup from './ButtonGroup.vue';
 
 EvButtonGroup.install = (app) => {
   app.component(EvButtonGroup.name, EvButtonGroup);

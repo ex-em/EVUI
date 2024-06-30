@@ -594,12 +594,12 @@ import {
 } from 'vue';
 import { clickoutside } from '@/directives/clickoutside';
 import { cloneDeep } from 'lodash-es';
-import Toolbar from './GridToolbar';
-import GridPagination from './GridPagination';
-import GridSummary from './GridSummary';
+import Toolbar from './GridToolbar.vue';
+import GridPagination from './GridPagination.vue';
+import GridSummary from './GridSummary.vue';
 import ColumnSetting from './GridColumnSetting.vue';
 import FilterSetting from './GridFilterSetting.vue';
-import GridSortButton from './icon/icon-sort-button';
+import GridSortButton from './icon/icon-sort-button.vue';
 import GridOptionButton from './icon/icon-option-button.vue';
 import {
   commonFunctions,

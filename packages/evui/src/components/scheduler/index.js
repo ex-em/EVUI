@@ -1,4 +1,4 @@
-import EvScheduler from './Scheduler';
+import EvScheduler from './Scheduler.vue';
 
 EvScheduler.install = (app) => {
   app.component(EvScheduler.name, EvScheduler);

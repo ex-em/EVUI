@@ -19,7 +19,7 @@
 
 <script>
 import { onMounted, watch, provide, toRef, computed } from 'vue';
-import evChartToolbar from '../chart/ChartToolbar';
+import evChartToolbar from '../chart/ChartToolbar.vue';
 import { useGroupModel } from './uses';
 import { useZoomModel } from '../chart/uses';
 

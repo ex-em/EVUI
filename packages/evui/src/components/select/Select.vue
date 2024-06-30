@@ -257,8 +257,8 @@
 
 <script>
 import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
-import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
-import EvCheckbox from '@/components/checkbox/Checkbox';
+import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup.vue';
+import EvCheckbox from '@/components/checkbox/Checkbox.vue';
 import { useModel, useDropdown } from './uses';
 
 export default {

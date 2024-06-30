@@ -1,0 +1,17 @@
+{
+  "namedInputs": {
+    "noMarkdown": ["!{projectRoot}/**/*.md"]
+  },
+  "targetDefaults": {
+    "storybook": {
+      "dependsOn": ["^build"],
+      "inputs": ["noMarkdown","^noMarkdown"],
+      "cache": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["noMarkdown","^noMarkdown"],
+      "cache": true
+    }
+  }
+}

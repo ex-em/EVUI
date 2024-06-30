@@ -585,8 +585,8 @@ export const useZoomModel = (
 
   const controlZoomIdx = (zoomStartIdx, zoomEndIdx) => {
     if (evChartZoom.isUseToolbar) {
-        evChartZoom.isUseToolbar = false;
-        return;
+      evChartZoom.isUseToolbar = false;
+      return;
     }
 
     if (isUseZoomMode.value) {

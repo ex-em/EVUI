@@ -259,10 +259,10 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
-import TreeGridNode from './TreeGridNode';
-import Toolbar from './TreeGridToolbar';
-import GridPagination from '../grid/GridPagination';
-import GridSummary from '../grid/GridSummary';
+import TreeGridNode from './TreeGridNode.vue';
+import Toolbar from './TreeGridToolbar.vue';
+import GridPagination from '../grid/GridPagination.vue';
+import GridSummary from '../grid/GridSummary.vue';
 import ColumnSetting from '../grid/GridColumnSetting.vue';
 import GridOptionButton from '../grid/icon/icon-option-button.vue';
 import {

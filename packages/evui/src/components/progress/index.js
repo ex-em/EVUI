@@ -1,4 +1,4 @@
-import EvProgress from './Progress';
+import EvProgress from './Progress.vue';
 
 EvProgress.install = (app) => {
   app.component(EvProgress.name, EvProgress);

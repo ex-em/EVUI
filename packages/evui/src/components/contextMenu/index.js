@@ -1,4 +1,4 @@
-import EvContextMenu from './ContextMenu';
+import EvContextMenu from './ContextMenu.vue';
 
 EvContextMenu.install = (app) => {
   app.component(EvContextMenu.name, EvContextMenu);

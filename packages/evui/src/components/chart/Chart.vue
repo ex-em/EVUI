@@ -31,7 +31,7 @@
   } from 'vue';
   import { cloneDeep, isEqual, debounce } from 'lodash-es';
   import EvChart from './chart.core';
-  import EvChartToolbar from './ChartToolbar';
+  import EvChartToolbar from './ChartToolbar.vue';
   import { useModel, useWrapper, useZoomModel } from './uses';
 
   export default {

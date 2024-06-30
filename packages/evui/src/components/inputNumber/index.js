@@ -1,4 +1,4 @@
-import EvInputNumber from './InputNumber';
+import EvInputNumber from './InputNumber.vue';
 
 EvInputNumber.install = (app) => {
   app.component(EvInputNumber.name, EvInputNumber);

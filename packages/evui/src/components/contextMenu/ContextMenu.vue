@@ -17,7 +17,7 @@
 <script>
 import { onBeforeMount } from 'vue';
 import { clickoutside } from '@/directives/clickoutside';
-import MenuList from './MenuList';
+import MenuList from './MenuList.vue';
 import { useModel, usePosition } from './uses';
 
 export default {

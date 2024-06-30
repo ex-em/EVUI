@@ -25,7 +25,7 @@
 
 <script>
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
-import TreeNode from './TreeNode';
+import TreeNode from './TreeNode.vue';
 
 export default {
   name: 'EvTree',

@@ -1,0 +1,21 @@
+{
+  "extends": ["@vue/tsconfig/tsconfig.json", "../../tsconfig.json"],
+  "include": ["./src/**/*.ts", "./src/**/*.vue", "src/index.js"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "lib": ["esnext", "dom"],
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "target": "esnext",
+    "declaration": true,
+    "module": "esnext",
+    "outDir": "dist",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noEmit": false
+  }
+}

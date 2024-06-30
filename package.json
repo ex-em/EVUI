@@ -1,0 +1,31 @@
+{
+  "name": "exem-evui-library",
+  "description": "A EXEM Library project",
+  "author": "exem <dev_client@ex-em.com>",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8"
+  },
+  "devDependencies": {
+    "@evui/eslint-config": "workspace:*",
+    "@evui/stylelint-config": "workspace:*",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
+    "nx": "19.0.4",
+    "prettier": "^3.2.5",
+    "stylelint": "^16.6.1"
+  },
+  "scripts": {
+    "build": "nx run-many --target=build --all --parallel",
+    "types-check": "nx run-many --target=type-check --all",
+    "storybook": "nx storybook docs",
+    "prettier": "nx run-many --target=prettier --all",
+    "lint": "nx run-many --target=lint --all",
+    "lint:style": "nx run-many --target=lint:style --all",
+    "graph": "nx graph",
+    "reset": "nx reset",
+    "prepare": "husky"
+  }
+}

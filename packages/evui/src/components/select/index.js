@@ -1,4 +1,4 @@
-import EvSelect from './Select';
+import EvSelect from './Select.vue';
 
 EvSelect.install = (app) => {
   app.component(EvSelect.name, EvSelect);

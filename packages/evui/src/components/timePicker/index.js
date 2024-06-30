@@ -1,4 +1,4 @@
-import EvTimePicker from './TimePicker';
+import EvTimePicker from './TimePicker.vue';
 
 EvTimePicker.install = (app) => {
     app.component(EvTimePicker.name, EvTimePicker);

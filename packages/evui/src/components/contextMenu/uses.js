@@ -2,7 +2,7 @@ import {
   ref, reactive, computed, nextTick,
   getCurrentInstance, defineComponent,
 } from 'vue';
-import MenuList from './MenuList';
+import MenuList from './MenuList.vue';
 
 export const useModel = () => {
   const comp = defineComponent(MenuList);

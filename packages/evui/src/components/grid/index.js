@@ -1,6 +1,6 @@
 import VueResizeObserver from 'vue-resize-observer';
 import ObserveVisibility from 'vue3-observe-visibility';
-import EvGrid from './Grid';
+import EvGrid from './Grid.vue';
 
 EvGrid.install = (app) => {
   app.component(EvGrid.name, EvGrid);
