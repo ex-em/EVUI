@@ -17,6 +17,7 @@
           use: useGridSettingMV,
           useDefaultColumnSetting: useGridDefaultSettingMV,
           customContextMenu: gridSettingMenuItems,
+          disabledColumnInContextMenu: ['userName'],
         },
         useFilter: useFilterMV,
         customContextMenu: menuItems,

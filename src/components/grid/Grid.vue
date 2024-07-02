@@ -573,6 +573,7 @@
     v-model:is-show-menu-on-click="isShowMenuOnClick"
     :columns="$props.columns"
     :hidden-column="hiddenColumn"
+    :disabled-column="disabledColumn"
     :position="columnSettingPosition"
     :text-info="columnSettingTextInfo"
     @apply-column="onApplyColumn"
@@ -737,6 +738,9 @@ export default {
       isFilteringColumn: false, // hide된 컬럼이 있는지
       visibleColumnIdx: [], // 보여지는 컬럼의 인덱스 목록
       hiddenColumn: '',
+      disabledColumn: cloneDeep(
+        props.option?.useGridSetting?.disabledColumnInContextMenu,
+      ),
       columnSettingPosition: {
         top: 0,
         left: 0,
