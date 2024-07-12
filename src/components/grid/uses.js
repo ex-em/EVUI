@@ -354,6 +354,7 @@ export const resizeEvent = (params) => {
       });
 
       emit('change-column-info', {
+        type: 'resize',
         columns: stores.updatedColumns,
       });
     };
@@ -642,6 +643,7 @@ export const sortEvent = (params) => {
       });
 
       emit('change-column-info', {
+        type: 'sort',
         columns: stores.updatedColumns,
       });
     }
@@ -1098,6 +1100,7 @@ export const contextMenuEvent = (params) => {
             filterInfo.filteringColumn = column;
 
             emit('change-column-info', {
+              type: 'filter',
               columns: stores.updatedColumns,
             });
           },
@@ -1116,6 +1119,7 @@ export const contextMenuEvent = (params) => {
             });
 
             emit('change-column-info', {
+              type: 'display',
               columns: stores.updatedColumns,
             });
           },
@@ -1369,6 +1373,7 @@ export const columnSettingEvent = (params) => {
     });
 
     emit('change-column-info', {
+      type: 'display',
       columns: stores.updatedColumns,
     });
   };
@@ -1438,6 +1443,7 @@ export const dragEvent = ({ stores }) => {
     });
 
     emit('change-column-info', {
+      type: 'order',
       columns: stores.updatedColumns,
     });
   };
