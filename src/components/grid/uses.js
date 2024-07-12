@@ -352,6 +352,11 @@ export const resizeEvent = (params) => {
         column: stores.orderedColumns[columnIndex],
         columns: stores.updatedColumns,
       });
+
+      emit('change-column-info', {
+        type: 'resize',
+        columns: stores.updatedColumns,
+      });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -630,10 +635,16 @@ export const sortEvent = (params) => {
 
       sortInfo.isSorting = true;
       updatePagingInfo({ onSort: true });
+
       emit('sort-column', {
         field: sortInfo.sortField,
         order: sortInfo.sortOrder,
         column: sortInfo.sortColumn,
+      });
+
+      emit('change-column-info', {
+        type: 'sort',
+        columns: stores.updatedColumns,
       });
     }
   };
@@ -1087,6 +1098,11 @@ export const contextMenuEvent = (params) => {
             };
             filterInfo.isShowFilterSetting = true;
             filterInfo.filteringColumn = column;
+
+            emit('change-column-info', {
+              type: 'filter',
+              columns: stores.updatedColumns,
+            });
           },
           disabled: !filterable,
           hidden: contextInfo.hiddenColumnMenuItem?.filter,
@@ -1099,6 +1115,11 @@ export const contextMenuEvent = (params) => {
           click: () => {
             setColumnHidden(column.field);
             emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+
+            emit('change-column-info', {
+              type: 'display',
               columns: stores.updatedColumns,
             });
           },
@@ -1350,6 +1371,11 @@ export const columnSettingEvent = (params) => {
     emit('change-column-status', {
       columns: stores.updatedColumns,
     });
+
+    emit('change-column-info', {
+      type: 'display',
+      columns: stores.updatedColumns,
+    });
   };
   const setColumnHidden = (val) => {
     const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
@@ -1413,6 +1439,11 @@ export const dragEvent = ({ stores }) => {
     setColumnMoving(currentIndex, droppedIndex);
     emit('change-column-order', {
       column: stores.orderedColumns[droppedIndex],
+      columns: stores.updatedColumns,
+    });
+
+    emit('change-column-info', {
+      type: 'order',
       columns: stores.updatedColumns,
     });
   };

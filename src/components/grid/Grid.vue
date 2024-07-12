@@ -687,6 +687,7 @@ export default {
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-order': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
+    'change-column-info': ({ type, columns }) => ({ type, columns }),
   },
   setup(props) {
     // const ROW_INDEX = 0;
