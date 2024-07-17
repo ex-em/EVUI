@@ -179,7 +179,6 @@ export default {
           .filter(col => col.originChecked)
           .map(col => col.text);
       }
-      console.log('ㅇㅇㅇ init value : ', isShowColumnSetting.value, cloneDeep(checkColumnGroup.value));
       initSearchValue();
     };
     const onApplyColumn = () => {
@@ -202,22 +201,20 @@ export default {
 
     const setColumns = (prevColumns) => {
       const prevCheckColumnGroup = cloneDeep(checkColumnGroup.value);
-      console.log('1. prevCheckColumnGroup : ', prevCheckColumnGroup);
       originColumnList.value = props.columns
         .filter(col => !col.hide && col.caption)
         .map((col) => {
-          const isMaintained = !!prevColumns?.find(c => c.field === col.field);
-          console.log(
-              'map', col.field,
-              prevCheckColumnGroup.includes(col.field),
-              isMaintained,
-              (isMaintained && prevCheckColumnGroup.includes(col.field))
-              || !col.hiddenDisplay,
-              col.hiddenDisplay,
-          );
-          const isChecked = isMaintained
-            ? prevCheckColumnGroup.includes(col.field)
-            : !col.hiddenDisplay;
+          const prevColumn = prevColumns?.find(c => c.field === col.field);
+          let isChecked = false;
+
+          if (prevColumn) {
+            const isHiddenChanged = prevColumn?.hiddenDisplay !== col?.hiddenDisplay;
+            isChecked = isHiddenChanged
+              ? !col?.hiddenDisplay
+              : prevCheckColumnGroup.includes(col.field);
+          } else {
+            isChecked = !col.hiddenDisplay;
+          }
           return {
             label: col.caption,
             text: col.field,
@@ -228,7 +225,6 @@ export default {
       checkColumnGroup.value = originColumnList.value
         .filter(col => col.checked)
         .map(col => col.text);
-      console.log('2. prevCheckColumnGroup : ', cloneDeep(checkColumnGroup.value));
       applyColumnList.value.length = 0;
     };
 
