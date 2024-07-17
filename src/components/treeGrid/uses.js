@@ -346,6 +346,10 @@ export const resizeEvent = (params) => {
         column: stores.orderedColumns[columnIndex],
         columns: stores.updatedColumns,
       });
+      emit('change-column-info', {
+        type: 'resize',
+        columns: stores.updatedColumns,
+      });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -630,6 +634,10 @@ export const contextMenuEvent = (params) => {
           click: () => {
             setColumnHidden(column.field);
             emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+            emit('change-column-info', {
+              type: 'display',
               columns: stores.updatedColumns,
             });
           },
