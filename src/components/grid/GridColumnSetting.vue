@@ -26,6 +26,7 @@
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
                 :label="column?.label"
+                :disabled="$props.disabledColumn.includes(column?.text)"
                 :tooltip-title="column?.label ?? ''"
               />
             </ev-checkbox-group>
@@ -76,6 +77,10 @@ export default {
     hiddenColumn: {
       type: String,
       default: '',
+    },
+    disabledColumn: {
+      type: [Array],
+      default: () => [],
     },
     position: {
       type: Object,
