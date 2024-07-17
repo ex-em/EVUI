@@ -1325,7 +1325,7 @@ export const columnSettingEvent = (params) => {
 
   const initColumnSettingInfo = () => {
     stores.filteredColumns.length = 0;
-    columnSettingInfo.isShowColumnSetting = false;
+    // columnSettingInfo.isShowColumnSetting = false;
     columnSettingInfo.isFilteringColumn = false;
     columnSettingInfo.visibleColumnIdx = [];
     columnSettingInfo.hiddenColumn = '';

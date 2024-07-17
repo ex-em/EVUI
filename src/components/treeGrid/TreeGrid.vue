@@ -259,6 +259,7 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
+import { isEqual } from 'lodash-es';
 import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
@@ -655,7 +656,7 @@ export default {
           // Column의 field로 동일한 컬럼인지 확인
           const newColumnsFields = newColumns.map(column => column.field);
           const prevColumnsFields = prevColumns.map(column => column.field);
-          return prevColumnsFields.every(field => newColumnsFields.includes(field));
+          return isEqual(newColumnsFields, prevColumnsFields);
         };
 
         if (newColumns.length !== prevColumns.length || !isSameColumns()) {
