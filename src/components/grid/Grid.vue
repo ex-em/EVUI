@@ -1077,7 +1077,6 @@ export default {
           // Column의 field로 동일한 컬럼인지 확인
           const newColumnsFields = newColumns.map(column => column.field);
           const prevColumnsFields = prevColumns.map(column => column.field);
-          // return prevColumnsFields.every(field => newColumnsFields.includes(field));
           return isEqual(newColumnsFields, prevColumnsFields);
         };
 
@@ -1091,7 +1090,6 @@ export default {
           setStore([], false);
           initColumnSettingInfo();
           stores.movedColumns.length = 0;
-          console.log(stores.originColumns);
         } else if (stores.filteredColumns.length) {
           // 새로운 컬럼 기준으로 filteredColumns 를 업데이트 한다.
           stores.filteredColumns = newColumns.filter(
