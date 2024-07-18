@@ -339,6 +339,7 @@ export default {
     'page-change': null,
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
+    'change-column-info': ({ type, columns }) => ({ type, columns }),
   },
   setup(props) {
     const toolbarRef = ref(null);
