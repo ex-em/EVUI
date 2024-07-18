@@ -571,7 +571,7 @@
   <column-setting
     v-model:is-show="isShowColumnSetting"
     v-model:is-show-menu-on-click="isShowMenuOnClick"
-    :columns="$props.columns"
+    :columns="updatedColumns"
     :hidden-column="hiddenColumn"
     :position="columnSettingPosition"
     :text-info="columnSettingTextInfo"
@@ -593,7 +593,7 @@ import {
   onBeforeMount, onUnmounted,
 } from 'vue';
 import { clickoutside } from '@/directives/clickoutside';
-import { cloneDeep, isEqual } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import Toolbar from './GridToolbar';
 import GridPagination from './GridPagination';
 import GridSummary from './GridSummary';
@@ -765,19 +765,33 @@ export default {
       }),
       filteredColumns: [],
       movedColumns: [],
-      originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
+      originColumns: computed(() => props.columns.map((column, index) => ({
+        index,
+        hiddenDisplay: false,
+        ...column,
+      }))),
       orderedColumns: computed(() => {
         const columns = stores.movedColumns.length
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
       updatedColumns: computed(() => {
-        const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
-        const extraColumns = stores.originColumns?.filter(
-          column => !orderedColumnsIndexes.includes(column.index),
-        );
-        const copyOrderedColumns = stores.orderedColumns;
-        return [...copyOrderedColumns, ...extraColumns];
+        if (stores.movedColumns?.length) {
+          const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
+          const extraColumns = stores.originColumns?.filter(
+              column => !orderedColumnsIndexes.includes(column.index),
+          );
+          const copyOrderedColumns = stores.orderedColumns;
+          return [...copyOrderedColumns, ...extraColumns];
+        }
+        const { originColumns, filteredColumns } = stores;
+        return originColumns.map((col) => {
+          const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+          return {
+            ...col,
+            ...changedCol,
+          };
+        });
       }),
     });
     const pageInfo = reactive({
@@ -1072,30 +1086,15 @@ export default {
 
     watch(
       () => props.columns,
-      (newColumns, prevColumns) => {
-        const isSameColumns = () => {
-          // Column의 field로 동일한 컬럼인지 확인
-          const newColumnsFields = newColumns.map(column => column.field);
-          const prevColumnsFields = prevColumns.map(column => column.field);
-          return isEqual(newColumnsFields, prevColumnsFields);
-        };
-
-        if (newColumns.length !== prevColumns.length || !isSameColumns()) {
-          // 동일하지 않은 컬럼으로 변경된 경우 initialize
-          sortInfo.isSorting = false;
-          sortInfo.sortField = '';
-          filterInfo.filteringColumn = null;
-          filterInfo.filteringItemsByColumn = {};
-          stores.filterStore = [];
-          setStore([], false);
-          initColumnSettingInfo();
-          stores.movedColumns.length = 0;
-        } else if (stores.filteredColumns.length) {
-          // 새로운 컬럼 기준으로 filteredColumns 를 업데이트 한다.
-          stores.filteredColumns = newColumns.filter(
-            column => !column.hidden && !column.hiddenDisplay,
-          );
-        }
+      () => {
+        sortInfo.isSorting = false;
+        sortInfo.sortField = '';
+        filterInfo.filteringColumn = null;
+        filterInfo.filteringItemsByColumn = {};
+        stores.filterStore = [];
+        setStore([], false);
+        initColumnSettingInfo();
+        stores.movedColumns.length = 0;
       }, { deep: true },
     );
     watch(
@@ -1115,7 +1114,7 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(cloneDeep(value));
+        setStore(value);
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
