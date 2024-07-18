@@ -199,19 +199,20 @@ export default {
       computedIsShowMenuOnClick.value = false;
     };
 
-    const setColumns = (prevColumns) => {
-      const prevCheckColumnGroup = cloneDeep(checkColumnGroup.value);
+    const prevColumns = ref();
+    const prevCheckColumnGroup = ref();
+    const setColumns = () => {
       originColumnList.value = props.columns
         .filter(col => !col.hide && col.caption)
         .map((col) => {
-          const prevColumn = prevColumns?.find(c => c.field === col.field);
+          const prevColumn = prevColumns.value?.find(c => c.field === col.field);
           let isChecked = false;
 
           if (prevColumn) {
             const isHiddenChanged = prevColumn?.hiddenDisplay !== col?.hiddenDisplay;
-            isChecked = isHiddenChanged
+            isChecked = isHiddenChanged || !prevCheckColumnGroup.value?.length
               ? !col?.hiddenDisplay
-              : prevCheckColumnGroup.includes(col.field);
+              : prevCheckColumnGroup.value.includes(col.field);
           } else {
             isChecked = !col.hiddenDisplay;
           }
@@ -222,10 +223,13 @@ export default {
             checked: isChecked,
           };
         });
+
       checkColumnGroup.value = originColumnList.value
         .filter(col => col.checked)
         .map(col => col.text);
       applyColumnList.value.length = 0;
+      prevColumns.value = cloneDeep(props.columns);
+      prevCheckColumnGroup.value = cloneDeep(checkColumnGroup.value);
     };
 
     const hideColumnSetting = () => {
@@ -271,8 +275,8 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    watch(() => props.columns, (curr, prev) => {
-      setColumns(prev);
+    watch(() => props.columns, () => {
+      setColumns();
     }, { immediate: true, deep: true });
 
     watch(() => isShowColumnSetting.value, async () => {
