@@ -183,15 +183,7 @@ export default {
     };
     const onApplyColumn = () => {
       applyColumnList.value = originColumnList.value
-        .filter((col) => {
-          if (checkColumnGroup.value.includes(col.text)) {
-            if (col?.checked) {
-              col.checked = false;
-            }
-            return true;
-          }
-          return false;
-        });
+        .filter(col => checkColumnGroup.value.includes(col.text));
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
@@ -290,7 +282,7 @@ export default {
     watch(() => props.hiddenColumn, (value) => {
       const filterColumns = applyColumnList.value.length
         ? applyColumnList.value.filter(col => col.text !== value)
-        : originColumnList.value.filter(col => (col.text !== value && !col.checked));
+        : originColumnList.value.filter(col => (col.text !== value && col.checked));
 
       applyColumnList.value = filterColumns;
       checkColumnGroup.value = filterColumns.map(col => col.text);
