@@ -1400,7 +1400,6 @@ export const columnSettingEvent = (params) => {
     const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
 
     if (columns.length === 1) {
-      stores.filteredColumns = columns;
       return;
     }
     stores.filteredColumns = columns
