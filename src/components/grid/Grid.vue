@@ -615,6 +615,7 @@ import {
   pagingEvent,
   columnSettingEvent,
   dragEvent,
+  getUpdatedColumns,
 } from './uses';
 
 export default {
@@ -775,24 +776,7 @@ export default {
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
-      updatedColumns: computed(() => {
-        if (stores.movedColumns?.length) {
-          const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
-          const extraColumns = stores.originColumns?.filter(
-              column => !orderedColumnsIndexes.includes(column.index),
-          );
-          const copyOrderedColumns = stores.orderedColumns;
-          return [...copyOrderedColumns, ...extraColumns];
-        }
-        const { originColumns, filteredColumns } = stores;
-        return originColumns.map((col) => {
-          const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
-          return {
-            ...col,
-            ...changedCol,
-          };
-        });
-      }),
+      updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
