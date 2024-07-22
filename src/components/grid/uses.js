@@ -77,6 +77,25 @@ export const commonFunctions = () => {
   };
 };
 
+export const getUpdatedColumns = (stores) => {
+  if (stores.movedColumns?.length) {
+    const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
+    const extraColumns = stores.originColumns?.filter(
+      column => !orderedColumnsIndexes.includes(column.index),
+    );
+    const copyOrderedColumns = stores.orderedColumns;
+    return [...copyOrderedColumns, ...extraColumns];
+  }
+  const { originColumns, filteredColumns } = stores;
+  return originColumns.map((col) => {
+    const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+    return {
+      ...col,
+      ...changedCol,
+    };
+  });
+};
+
 export const scrollEvent = (params) => {
   const {
     scrollInfo,
@@ -348,14 +367,14 @@ export const resizeEvent = (params) => {
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
 
+      const updatedColumns = getUpdatedColumns(stores);
       emit('resize-column', {
         column: stores.orderedColumns[columnIndex],
-        columns: stores.updatedColumns,
+        columns: updatedColumns,
       });
-
       emit('change-column-info', {
         type: 'resize',
-        columns: stores.updatedColumns,
+        columns: updatedColumns,
       });
     };
 

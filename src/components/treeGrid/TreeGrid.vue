@@ -275,6 +275,7 @@ import {
   treeEvent,
   filterEvent,
   pagingEvent,
+  getUpdatedColumns,
 } from './uses';
 import {
   columnSettingEvent,
@@ -393,16 +394,7 @@ export default {
       }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
         ? stores.filteredColumns : stores.originColumns)),
-      updatedColumns: computed(() => {
-        const { originColumns, filteredColumns } = stores;
-        return originColumns.map((col) => {
-          const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
-          return {
-            ...col,
-            ...changedCol,
-          };
-        });
-      }),
+      updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
