@@ -268,6 +268,9 @@ export default {
     onBeforeMount(() => initWrapperDiv());
 
     watch(() => props.columns, () => {
+      if (isShowColumnSetting.value) {
+        return;
+      }
       setColumns();
     }, { immediate: true, deep: true });
 
