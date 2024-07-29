@@ -170,15 +170,11 @@ export default {
 
     const initValue = () => {
       const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
-      if (isShowColumnSetting.value) {
-        checkColumnGroup.value = columns
-          .filter(col => col.checked)
-          .map(col => col.text);
-      } else {
-        checkColumnGroup.value = columns
-          .filter(col => col.originChecked)
-          .map(col => col.text);
-      }
+      
+      checkColumnGroup.value = columns
+        .filter(col => col.originChecked)
+        .map(col => col.text);
+      
       initSearchValue();
     };
     const onApplyColumn = () => {
@@ -194,6 +190,7 @@ export default {
     const prevColumns = ref();
     const prevCheckColumnGroup = ref();
     const setColumns = () => {
+      prevCheckColumnGroup.value = cloneDeep(checkColumnGroup.value);
       originColumnList.value = props.columns
         .filter(col => !col.hide && col.caption)
         .map((col) => {
@@ -221,7 +218,6 @@ export default {
         .map(col => col.text);
       applyColumnList.value.length = 0;
       prevColumns.value = cloneDeep(props.columns);
-      prevCheckColumnGroup.value = cloneDeep(checkColumnGroup.value);
     };
 
     const hideColumnSetting = () => {
