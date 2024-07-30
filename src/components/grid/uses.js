@@ -622,12 +622,49 @@ export const expandEvent = (params) => {
 export const sortEvent = (params) => {
   const { sortInfo, stores, updatePagingInfo } = params;
   const { emit } = getCurrentInstance();
+
+  const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
   function OrderQueue() {
-    this.orders = ['asc', 'desc', 'init'];
+    this.orders = getDefaultSortType();
     this.dequeue = () => this.orders.shift();
     this.enqueue = o => this.orders.push(o);
   }
+
+  const setSortOptionToOrderedColumns = (column, sortType = 'init') => {
+    stores.orderedColumns.forEach((orderedColumn) => {
+      if (orderedColumn.index === column?.index && sortType) {
+        orderedColumn.sortOption = { sortType };
+      } else {
+        orderedColumn.sortOption = { sortType: 'init' };
+      }
+    });
+  };
+
+  const initializeHiddenColumnsSortType = () => {
+    const hiddenColumns = stores.originColumns.filter(col => col.hiddenDisplay || col.hide);
+    if (hiddenColumns.length) {
+      hiddenColumns.forEach((col) => {
+        col.sortOption = { sortType: 'init' };
+      });
+    }
+  };
+
   const order = new OrderQueue();
+  const setSortInfo = (column) => {
+    const { sortType } = column?.sortOption || {};
+    sortInfo.sortColumn = column;
+    sortInfo.sortField = column?.field;
+    sortInfo.sortOrder = sortType;
+    sortInfo.isSorting = !!(sortType);
+
+    setSortOptionToOrderedColumns(column, sortType);
+
+    emit('change-column-info', {
+      type: 'sort',
+      columns: getUpdatedColumns(stores),
+    });
+  };
+
   /**
    * sort 이벤트를 처리한다.
    *
@@ -639,11 +676,11 @@ export const sortEvent = (params) => {
     if (sortable) {
       sortInfo.sortColumn = column;
       if (sortInfo.sortField !== column?.field) {
-        order.orders = ['asc', 'desc', 'init'];
+        order.orders = getDefaultSortType();
         sortInfo.sortField = column?.field;
       }
       if (sortOrder) {
-        order.orders = ['asc', 'desc', 'init'];
+        order.orders = getDefaultSortType();
         if (sortOrder === 'desc') {
           sortInfo.sortOrder = order.dequeue();
           order.enqueue(sortInfo.sortOrder);
@@ -655,15 +692,20 @@ export const sortEvent = (params) => {
       sortInfo.isSorting = true;
       updatePagingInfo({ onSort: true });
 
+      initializeHiddenColumnsSortType();
+      setSortOptionToOrderedColumns(column, sortInfo.sortOrder);
+
+      const updatedColumInfo = getUpdatedColumns(stores);
       emit('sort-column', {
         field: sortInfo.sortField,
         order: sortInfo.sortOrder,
         column: sortInfo.sortColumn,
+        columns: updatedColumInfo,
       });
 
       emit('change-column-info', {
         type: 'sort',
-        columns: stores.updatedColumns,
+        columns: updatedColumInfo,
       });
     }
   };
@@ -671,7 +713,7 @@ export const sortEvent = (params) => {
    * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
    */
   const setSort = () => {
-    const { field, index } = sortInfo.sortColumn;
+    const { field, index } = sortInfo.sortColumn || {};
     const customSetAsc = sortInfo.sortFunction?.[field] ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
@@ -746,7 +788,13 @@ export const sortEvent = (params) => {
         break;
     }
   };
-  return { onSort, setSort };
+
+  const getSortTarget = () => stores.orderedColumns?.find(
+    column => column?.sortOption && getDefaultSortType(false).includes(column.sortOption.sortType),
+  );
+  const hasSortTarget = () => !!getSortTarget();
+
+  return { onSort, getSortTarget, setSort, setSortInfo, hasSortTarget };
 };
 
 export const filterEvent = (params) => {
@@ -1088,7 +1136,7 @@ export const contextMenuEvent = (params) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
-        && column.filterable === undefined ? true : column.filterable;
+      && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1203,6 +1251,7 @@ export const storeEvent = (params) => {
     filterInfo,
     expandedInfo,
     setSort,
+    setSortInfo,
     updateVScroll,
     setFilter,
   } = params;
@@ -1211,8 +1260,13 @@ export const storeEvent = (params) => {
    *
    * @param {array} rows - row 데이터
    * @param {boolean} isMakeIndex - 인덱스 생성 유무
+   * @param {boolean} isInit - 초기 setStore 여부
    */
-  const setStore = (rows, isMakeIndex = true) => {
+  const setStore = ({ rows, isMakeIndex = true, isInit = false }) => {
+    const sortingColumns = stores.orderedColumns.find(
+      column => column?.sortOption && ['asc', 'desc'].includes(column.sortOption.sortType),
+    );
+
     if (isMakeIndex) {
       const store = [];
       let hasUnChecked = false;
@@ -1242,6 +1296,11 @@ export const storeEvent = (params) => {
     if (filterInfo.isFiltering) {
       setFilter();
     }
+
+    if (sortingColumns && isInit) {
+      setSortInfo(sortingColumns);
+    }
+
     if (sortInfo.sortField) {
       setSort();
     }

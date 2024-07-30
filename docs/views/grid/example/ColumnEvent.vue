@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <ev-grid
-      :columns="columns"
+      :columns="gridColumns"
       :rows="tableData"
       :width="widthMV"
       :height="heightMV"
@@ -18,6 +18,14 @@
     />
     <!-- description -->
     <div class="description column-event-description">
+      <div class="form-row column-event-description__sort-type">
+        <span class="badge yellow">Initial Sorting Type of Column B</span>
+        <ev-text-field
+          model-value="desc"
+          class="component"
+          readonly
+        />
+      </div>
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
@@ -78,9 +86,9 @@ export default {
     const tableData = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
-    const columns = ref([
+    const gridColumns = ref([
       { caption: 'A Column', field: 'aColumn', type: 'string' },
-      { caption: 'B Column', field: 'bColumn', type: 'string' },
+      { caption: 'B Column', field: 'bColumn', type: 'string', sortOption: { sortType: 'desc' } },
       { caption: 'C Column', field: 'cColumn', type: 'string' },
       { caption: 'D Column', field: 'dColumn', type: 'string', hiddenDisplay: true },
       { caption: 'E Column', field: 'eColumn', type: 'string' },
@@ -121,7 +129,7 @@ export default {
     };
 
     return {
-      columns,
+      gridColumns,
       tableData,
       widthMV,
       heightMV,
@@ -163,6 +171,10 @@ export default {
 
   .ev-textarea {
     height: 200px !important;
+  }
+
+  &__sort-type {
+    margin-bottom: 5px;
   }
 }
 </style>
