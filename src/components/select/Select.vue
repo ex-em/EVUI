@@ -116,14 +116,25 @@
           class="ev-select-dropbox"
           :style="dropboxPosition"
         >
-          <input
-            v-if="filterable"
-            type="text"
-            class="ev-input-query"
-            :placeholder="searchPlaceholder"
-            :value="filterTextRef"
-            @input="changeFilterText"
-          />
+          <template v-if="filterable">
+            <slot
+              name="search-filter"
+              :item="{
+                value: filterTextRef,
+                onInput: changeFilterText,
+                class: 'ev-input-query',
+                placeholder: searchPlaceholder,
+              }"
+            >
+              <input
+                type="text"
+                class="ev-input-query"
+                :placeholder="searchPlaceholder"
+                :value="filterTextRef"
+                @input="changeFilterText"
+              />
+            </slot>
+          </template>
           <template v-if="checkable">
             <div
               v-if="multiple"
