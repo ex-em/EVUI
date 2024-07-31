@@ -650,19 +650,21 @@ export const sortEvent = (params) => {
   };
 
   const order = new OrderQueue();
-  const setSortInfo = (column) => {
+  const setSortInfo = (column, emitTriggered = true) => {
     const { sortType } = column?.sortOption || {};
     sortInfo.sortColumn = column;
     sortInfo.sortField = column?.field;
     sortInfo.sortOrder = sortType;
     sortInfo.isSorting = !!(sortType);
 
-    setSortOptionToOrderedColumns(column, sortType);
+    if (emitTriggered) {
+      setSortOptionToOrderedColumns(column, sortType);
 
-    emit('change-column-info', {
-      type: 'sort',
-      columns: getUpdatedColumns(stores),
-    });
+      emit('change-column-info', {
+        type: 'sort',
+        columns: getUpdatedColumns(stores),
+      });
+    }
   };
 
   /**
@@ -1298,7 +1300,7 @@ export const storeEvent = (params) => {
     }
 
     if (sortingColumns && isInit) {
-      setSortInfo(sortingColumns);
+      setSortInfo(sortingColumns, false);
     }
 
     if (sortInfo.sortField) {
