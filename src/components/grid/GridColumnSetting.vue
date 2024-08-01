@@ -170,11 +170,11 @@ export default {
 
     const initValue = () => {
       const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
-      
+
       checkColumnGroup.value = columns
         .filter(col => col.originChecked)
         .map(col => col.text);
-      
+
       initSearchValue();
     };
     const onApplyColumn = () => {
