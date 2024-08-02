@@ -158,7 +158,9 @@ export const useMenuList = () => {
 
     const targetUlRect = e.target.parentElement?.getBoundingClientRect();
     const targetUlX = targetUlRect.x;
+    const targetUIY = targetUlRect.y;
     const targetUlWidth = targetUlRect.width;
+    const targetUlHeight = targetUlRect.height;
 
     const childMenuRect = childMenu.value?.$el?.children[0].getBoundingClientRect();
     const menuListHeight = childMenuRect.height;
@@ -168,13 +170,13 @@ export const useMenuList = () => {
     const docWidth = document.documentElement.clientWidth;
     const RIGHT_BUFFER_PX = 20;
 
-    if (docHeight < e.target.offsetTop + menuListHeight) {
+    if (docHeight < targetUIY + e.target.offsetTop + menuListHeight) {
       // dropTop
-      menuStyle.top = `${e.target.offsetTop - menuListHeight}px`;
+      menuStyle.top = `${-menuListHeight + targetUlHeight}px`;
       if (docWidth < targetUlX + targetUlWidth + menuListWidth + RIGHT_BUFFER_PX) {
-        menuStyle.left = `${e.offsetX - menuListWidth}px`;
+        menuStyle.left = `${0 - menuListWidth}px`;
       } else {
-        menuStyle.left = `${e.offsetX}px`;
+        menuStyle.left = `${targetUlWidth}px`;
       }
     } else {
       // dropDown
