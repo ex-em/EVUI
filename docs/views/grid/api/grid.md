@@ -57,6 +57,7 @@
 |  |  | stripe                  | row의 배경색을 Stripe 스타일로 설정한다.                                                               | Boolean |
 |  |  | border                  | 그리드의 Border 여부를 설정한다.                                                                     | 'none', 'rows' |
 |  |  | highlight               | 지정한 row에 Highlight 효과를 설정한다.                                                              | `rowIndex` |
+|  | customContextMenuClass |                       | 우클릭시 보여지는 컨텍스트 메뉴의 클래스를 설정한다.                                                                  | String |
 |  | customContextMenu | []                      | 우클릭시 보여지는 컨텍스트 메뉴를 설정한다.                                                                  |  |
 |  |  | menuItems               | 컨텍스트 메뉴                                                                                   |  |
 |  | hiddenColumnMenuItem | {}                      | 그리드 헤더 클릭시 보여지는 컨텍스트 메뉴 각 아이템의 표시 여부를 설정한다. (`true`: 숨김 / `false`: 노출 / Default: `false`) |  |
