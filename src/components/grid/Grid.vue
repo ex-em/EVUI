@@ -770,6 +770,9 @@ export default {
         index,
         hiddenDisplay: false,
         ...column,
+        sortOption: {
+          sortType: column?.sortOption?.sortType || 'init',
+        },
       }))),
       orderedColumns: computed(() => {
         const columns = stores.movedColumns.length
@@ -922,7 +925,10 @@ export default {
 
     const {
       onSort,
+      getSortTarget,
       setSort,
+      setSortInfo,
+      hasSortTarget,
     } = sortEvent({ sortInfo, stores, updatePagingInfo });
 
     const {
@@ -953,6 +959,7 @@ export default {
       filterInfo,
       expandedInfo,
       setSort,
+      setSortInfo,
       updateVScroll,
       setFilter,
     });
@@ -1042,7 +1049,7 @@ export default {
 
     onMounted(() => {
       calculatedColumn();
-      setStore(props.rows);
+      setStore({ rows: props.rows, isInit: true });
       document.addEventListener('wheel', onMouseWheel, { capture: false });
       document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
@@ -1071,12 +1078,16 @@ export default {
     watch(
       () => props.columns,
       () => {
-        sortInfo.isSorting = false;
-        sortInfo.sortField = '';
+        if (!hasSortTarget()) {
+          setSortInfo(getSortTarget());
+          setSort();
+        } else {
+          setSortInfo(getSortTarget());
+        }
         filterInfo.filteringColumn = null;
         filterInfo.filteringItemsByColumn = {};
         stores.filterStore = [];
-        setStore([], false);
+        setStore({ rows: [], isMakeIndex: false });
         initColumnSettingInfo();
         stores.movedColumns.length = 0;
       }, { deep: true },
@@ -1085,7 +1096,7 @@ export default {
       () => sortInfo.isSorting,
       (value) => {
         if (value) {
-          setStore(stores.originStore, false);
+          setStore({ rows: stores.originStore, isMakeIndex: false });
           sortInfo.isSorting = !value;
           if (pageInfo.isClientPaging) {
             pageInfo.currentPage = 1;
@@ -1098,7 +1109,7 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(value);
+        setStore({ rows: value });
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
@@ -1107,7 +1118,7 @@ export default {
     );
     watch(() => props.uncheckable,
       () => {
-      setStore(props.rows);
+      setStore({ rows: props.rows });
       }, { deep: true });
     watch(
       () => props.checked,
@@ -1302,7 +1313,7 @@ export default {
 
     const onChangeOperator = () => {
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
     };
 
     const setColumnFilteringItems = async (isInit) => {
@@ -1352,7 +1363,7 @@ export default {
       setColumnFilteringItems(true);
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
 
       setHeaderCheckboxByFilter(stores.filterStore);
     };
@@ -1373,7 +1384,7 @@ export default {
       filterInfo.filteringItemsByColumn = {};
       hiddenFilteringItemsByColumn.value = {};
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
     };
 
     const filteringItemsStyle = computed(() => ({
