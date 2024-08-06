@@ -191,6 +191,7 @@
         <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
+          :custom-class="contextMenuClass"
           :items="contextMenuItems"
         />
         <ev-context-menu
@@ -452,6 +453,7 @@ export default {
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
+      contextMenuClass: props.option.customContextMenuClass || '',
       columnMenu: null,
       columnMenuItems: [],
       columnMenuTextInfo: props.option.columnMenuText || {},
