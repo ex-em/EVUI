@@ -54,28 +54,24 @@ export const usePosition = () => {
     if (menuListRect) {
       const menuListHeight = menuListRect.height;
       const menuListWidth = menuListRect.width;
-      const docHeight = document.documentElement.clientHeight;
-      const docWidth = document.documentElement.clientWidth;
+      const browserHeight = document.documentElement.clientHeight;
+      const browserWidth = document.documentElement.clientWidth;
       const RIGHT_BUFFER_PX = 20;
       menuStyle.pageX = e.pageX;
       menuStyle.pageY = e.pageY;
       menuStyle.clientX = e.clientX;
-      if (docHeight < e.clientY + menuListHeight) {
+      if (browserHeight < e.clientY + menuListHeight) {
         // dropTop
         menuStyle.top = `${e.pageY - menuListHeight}px`;
-        if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
-          menuStyle.left = `${e.pageX - menuListWidth}px`;
-        } else {
-          menuStyle.left = `${e.pageX}px`;
-        }
       } else {
         // dropDown
         menuStyle.top = `${e.pageY}px`;
-        if (docWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
-          menuStyle.left = `${e.pageX - menuListWidth}px`;
-        } else {
-          menuStyle.left = `${e.pageX}px`;
-        }
+      }
+
+      if (browserWidth < e.clientX + menuListWidth + RIGHT_BUFFER_PX) {
+        menuStyle.left = `${e.pageX - menuListWidth}px`;
+      } else {
+        menuStyle.left = `${e.pageX}px`;
       }
     }
   };
@@ -134,75 +130,75 @@ export const useMenuList = () => {
     }
     computedIsShow.value = false;
   };
+
   /**
-   * 자식 항목 숨기기 메소드
-   * 다른 항목에 마우스오버 시 자식이 존재하는 항목의 자식 컴포넌트를 숨긴다.
-   */
-  const hideChild = () => {
-    isShowChild.value = false;
-  };
-  /**
-   * 자식 컴포넌트 보여주기 (nested구조에서 2depth 컴포넌트부터 사용한다.)
-   * mouseenter된 항목의 좌표를 잡아서 offset 등 여러 조건에 따라 좌우로 드랍업/다운을 실행
+   * 자식 메뉴의 위치를 지정하는 함수
    * @param e - 마우스 이벤트
-   * @param children - 자식 리스트
-   * @returns null
    */
-  const showChild = async (e, children) => {
-    isShowChild.value = true;
-    childrenItems.value = children;
-    await nextTick();
-    if (!childMenu.value?.$el?.children[0]) {
-      return;
-    }
-
-    const targetUlRect = e.target.parentElement?.getBoundingClientRect();
-    const targetUlX = targetUlRect.x;
-    const targetUIY = targetUlRect.y;
-    const targetUlWidth = targetUlRect.width;
-    const targetUlHeight = targetUlRect.height;
-
-    const childMenuRect = childMenu.value?.$el?.children[0].getBoundingClientRect();
-    const menuListHeight = childMenuRect.height;
-    const menuListWidth = childMenuRect.width;
-
-    const docHeight = document.documentElement.clientHeight;
-    const docWidth = document.documentElement.clientWidth;
+  const useChildPosition = (e) => {
+    const browserWidth = document.documentElement.clientWidth;
+    const browserHeight = document.documentElement.clientHeight;
     const RIGHT_BUFFER_PX = 20;
 
-    if (docHeight < targetUIY + e.target.offsetTop + menuListHeight) {
-      // dropTop
-      menuStyle.top = `${-menuListHeight + targetUlHeight}px`;
-      if (docWidth < targetUlX + targetUlWidth + menuListWidth + RIGHT_BUFFER_PX) {
-        menuStyle.left = `${0 - menuListWidth}px`;
-      } else {
-        menuStyle.left = `${targetUlWidth}px`;
-      }
-    } else {
+    const parentMenuRect = e.target.parentElement?.getBoundingClientRect();
+    const {
+      x: parentMenuX,
+      y: parentMenuY,
+      width: parentMenuWidth,
+      height: parentMenuHeight,
+    } = parentMenuRect;
+
+    const childMenuRect = childMenu.value?.$el?.children[0].getBoundingClientRect();
+    const { width: childMenuWidth, height: childMenuHeight } = childMenuRect;
+
+    // 자식 요소가 부모 요소로부터 얼마나 떨어져 있는 지 (Top)
+    const elementOffsetTop = e.target.offsetTop;
+
+    const isOverflowHeight = browserHeight < parentMenuY + elementOffsetTop + childMenuHeight;
+    const isOverflowWidth = browserWidth < parentMenuX + parentMenuWidth
+                                            + childMenuWidth + RIGHT_BUFFER_PX;
+
+    if (!isOverflowHeight) {
       // dropDown
-      menuStyle.top = `${e.target.offsetTop}px`;
-      if (docWidth < targetUlX + targetUlWidth + menuListWidth + RIGHT_BUFFER_PX) {
-        menuStyle.left = `${0 - menuListWidth}px`;
-      } else {
-        menuStyle.left = `${targetUlWidth}px`;
-      }
+      menuStyle.top = `${elementOffsetTop}px`;
+    } else {
+      // dropTop
+      menuStyle.top = `${parentMenuHeight - childMenuHeight}px`;
+    }
+
+    if (!isOverflowWidth) {
+      menuStyle.left = `${parentMenuWidth}px`;
+    } else {
+      menuStyle.left = `${0 - childMenuWidth}px`;
     }
   };
 
   /**
-   * 항목에 마우스엔터 시 발생하는 이벤트
-   * @param e - 마우스 이벤트 (showChild에 넘김)
-   * @param item - 마우스오버된 메뉴
+   * 항목에 마우스 엔터 시 호출되는 함수
+   * @param e - 마우스 이벤트
+   * @param item - ContextMenu > Mouse Enter 된 요소의 값
+   * - 자식 요소 없을 때: {click: Function, iconClass: String, text: String}
+   * - 자식 요소 있을 때: {children: Array, text: String}
    * @returns null
    */
-  const mouseenterLi = async (e, item) => {
+  const handleMouseEnter = async (e, item) => {
     if (!item.children || !Array.isArray(item.children) || item.disabled) {
-      hideChild();
+      isShowChild.value = false;
     } else {
-      await showChild(e, item.children);
+      isShowChild.value = true;
+      childrenItems.value = item.children;
+      await nextTick();
+      useChildPosition(e);
     }
   };
 
+  /**
+   * 항목에 마우스 클릭 시 호출되는 함수
+   * @param item - ContextMenu > 클릭된 요소의 값
+   * - 자식 요소 없을 때: {click, iconClass, text}
+   * - 자식 요소 있을 때: {children(Array), text}
+   * @returns null
+   */
   const handleItemClick = (item) => {
     if (item.click && !item.disabled) {
       item.click(item);
@@ -221,7 +217,7 @@ export const useMenuList = () => {
     menuStyle,
     childrenItems,
     handleItemClick,
-    mouseenterLi,
+    handleMouseEnter,
     hideAll,
   };
 };

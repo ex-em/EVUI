@@ -7,7 +7,7 @@
         class="ev-menu-li"
         :class="{ disabled: item.disabled }"
         @click="handleItemClick(item)"
-        @mouseenter="mouseenterLi($event, item)"
+        @mouseenter="handleMouseEnter($event, item)"
       >
         <i
           v-if="!!item.iconClass"
@@ -77,7 +77,7 @@ export default {
       childrenItems,
 
       handleItemClick,
-      mouseenterLi,
+      handleMouseEnter,
       hideAll,
     } = useMenuList();
 
@@ -90,7 +90,7 @@ export default {
       childrenItems,
 
       handleItemClick,
-      mouseenterLi,
+      handleMouseEnter,
       hideAll,
     };
   },
