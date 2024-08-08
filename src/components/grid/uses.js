@@ -293,11 +293,11 @@ export const resizeEvent = (params) => {
   const onResize = () => {
     nextTick(() => {
       if (resizeInfo.adjust) {
-        stores.orderedColumns.forEach((column) => {
+        stores.orderedColumns.forEach((column, index) => {
           const item = column;
 
           if (!item.resized) {
-            item.width = props.columns[column.index].width ?? 0;
+            item.width = props.columns[index].width ?? 0;
           }
 
           return item;
