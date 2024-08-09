@@ -298,7 +298,7 @@ export const resizeEvent = (params) => {
           const item = column;
 
           if (!item.resized) {
-            item.width = propColumnsMap.get(item.field)?.width ?? 0;
+            item.width = propColumnsMap.get(item.field) ?? 0;
           }
 
           return item;
