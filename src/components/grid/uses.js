@@ -291,13 +291,14 @@ export const resizeEvent = (params) => {
    * grid resize 이벤트를 처리한다.
    */
   const onResize = () => {
+    const propColumnsMap = new Map(props.columns.map(col => [col.field, col.width]));
     nextTick(() => {
       if (resizeInfo.adjust) {
         stores.orderedColumns.forEach((column) => {
           const item = column;
 
           if (!item.resized) {
-            item.width = props.columns[column.index].width ?? 0;
+            item.width = propColumnsMap.get(item.field) ?? 0;
           }
 
           return item;
