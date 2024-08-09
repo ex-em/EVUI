@@ -487,7 +487,15 @@ const useMouseEvent = (param) => {
       || (!props.draggable && pressedSpot === 'header')
       || (!props.resizable && pressedSpot === 'border')
     ) {
-      emit('mousedown', { ref: windowRef.value });
+      clickedInfo.state = '';
+      clickedInfo.pressedSpot = '';
+      clickedInfo.top = windowRef.value.offsetTop;
+      clickedInfo.left = windowRef.value.offsetLeft;
+      clickedInfo.width = windowRef.value.offsetWidth;
+      clickedInfo.height = windowRef.value.offsetHeight;
+      clickedInfo.clientX = e.clientX;
+      clickedInfo.clientY = e.clientY;
+      emit('mousedown', { ...clickedInfo, ref: windowRef.value });
       return;
     }
 
