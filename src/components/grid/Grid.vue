@@ -356,8 +356,8 @@
           <tbody>
             <!-- Row List -->
             <template
-              v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
+              v-for="(row) in viewStore"
+              :key="Object.values(row).map(String).join('')"
             >
               <tr
                 :data-index="row[0]"
