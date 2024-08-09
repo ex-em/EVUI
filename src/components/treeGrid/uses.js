@@ -279,7 +279,7 @@ export const resizeEvent = (params) => {
         stores.orderedColumns.forEach((column) => {
           const item = column;
 
-          if (!props.columns[column.index].width && !item.resized) {
+          if (!props.columns[column.index]?.width && !item.resized) {
             item.width = 0;
           }
 
