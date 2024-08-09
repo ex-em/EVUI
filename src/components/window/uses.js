@@ -487,6 +487,7 @@ const useMouseEvent = (param) => {
       || (!props.draggable && pressedSpot === 'header')
       || (!props.resizable && pressedSpot === 'border')
     ) {
+      emit('mousedown', { ref: windowRef.value });
       return;
     }
 
@@ -499,7 +500,7 @@ const useMouseEvent = (param) => {
     clickedInfo.clientX = e.clientX;
     clickedInfo.clientY = e.clientY;
 
-    emit('mousedown', { ...clickedInfo });
+    emit('mousedown', { ...clickedInfo, ref: windowRef.value });
 
     window.addEventListener('mousemove', dragging);
     window.addEventListener('mouseup', endDrag);
