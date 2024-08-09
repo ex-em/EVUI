@@ -1034,7 +1034,7 @@ export const filterEvent = (params) => {
 
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = rowData[ix] ?? null;
+            let columnValue = rowData[column.index] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
               if (typeof columnValue === 'object') {
