@@ -487,7 +487,7 @@ const useMouseEvent = (param) => {
       || (!props.draggable && pressedSpot === 'header')
       || (!props.resizable && pressedSpot === 'border')
     ) {
-      clickedInfo.state = '';
+      clickedInfo.state = 'mousedown';
       clickedInfo.pressedSpot = '';
       clickedInfo.top = windowRef.value.offsetTop;
       clickedInfo.left = windowRef.value.offsetLeft;
