@@ -61,6 +61,11 @@ const modules = {
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         this.drawIndicator(offset, indicator.color);
+        const label = this.getTimeLabel(offset);
+        args.hoveredLabel = {
+          horizontal: this.options.horizontal,
+          label: label,
+        }
       }
 
       if (typeof this.listeners['mouse-move'] === 'function') {
@@ -92,6 +97,7 @@ const modules = {
       if (tooltip.use) {
         this.tooltipClear();
       }
+      this.listeners['mouse-leave']();
     };
 
     /**

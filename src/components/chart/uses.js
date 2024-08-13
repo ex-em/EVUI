@@ -253,7 +253,7 @@ const DEFAULT_DATA = {
   data: {},
 };
 
-export const useModel = (injectGroupSelectedLabel) => {
+export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
   const { props, emit } = getCurrentInstance();
 
   const getNormalizedOptions = (options) => {
@@ -338,9 +338,17 @@ export const useModel = (injectGroupSelectedLabel) => {
       emit('drag-select', e);
     },
     'mouse-move': async (e) => {
+      if (injectGroupHoveredLabel?.value) {
+        injectGroupHoveredLabel.value = e.hoveredLabel;
+      }
       await nextTick();
       emit('mouse-move', e);
     },
+    'mouse-leave': () => {
+      if (injectGroupHoveredLabel?.value) {
+        injectGroupHoveredLabel.value.label = null;
+      }
+    }
   };
 
   return {
