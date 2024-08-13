@@ -820,6 +820,46 @@ const modules = {
       return Math.round(hoverTime);
     }
   },
+  /**
+   * Draw chart indicator with other grouped chart's mousemove
+   * @param {object} hoveredLabel   chart direction and hovered axis label
+   *
+   * @returns {undefined}
+   */
+  drawSyncedIndicator({ horizontal, label }) {
+    if (!!horizontal !== !!this.options.horizontal) {
+      return;
+    }
+    if (
+      this.options.syncHover === false || 
+      (!horizontal && !this.options.axesX.every(({ type }) => type === 'time') || 
+      horizontal && !this.options.axesY.every(({ type }) => type === 'time'))) {
+      return ;
+    }
+    this.overlayClear();
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    const fromTime = +this.data.labels?.[0];
+    const toTime = +this.data.labels?.[this.data.labels.length - 1];
+    if (fromTime == null || toTime == null) {
+      return null;
+    }
+
+    if (horizontal) {
+      const chartHeight = graphPos.y2 - graphPos.y1;
+      const offsetY = (chartHeight) * (label - fromTime) / (toTime - fromTime) + graphPos.y1;
+      this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
+    } else {
+      const chartWidth = graphPos.x2 - graphPos.x1;
+      const offsetX = (chartWidth) * (label - fromTime) / (toTime - fromTime) + graphPos.x1;
+      this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
+    }
+  },
 
   /**
    * Clear tooltip canvas
