@@ -28,6 +28,23 @@
     <div class="description">
       <ev-toggle v-model="syncHover" />
       <span>그룹 호버 동기화</span>
+      <br>
+      <br>
+      <span>차트별 호버 동기화</span>
+      <br>
+      <br>
+      <div class="hover-options">
+        <span>첫번째 차트</span>
+        <ev-toggle v-model="syncHoverChart1" />
+        <span>두번째 차트</span>
+        <ev-toggle v-model="syncHoverChart2" />
+        <span>세번째 차트</span>
+        <ev-toggle v-model="syncHoverChart3" />
+        <span>네번째 차트</span>
+        <ev-toggle v-model="syncHoverChart4" />
+      </div>
+      <br>
+      <br>
       <ev-toggle v-model="isLive" />
       <span>데이터 자동 업데이트</span>
       <br>
@@ -141,7 +158,10 @@ export default {
 
     const isFixedPosTop = ref(false);
 
+    const syncHoverChart1 = ref(true);
+
     const chartOptions1 = ref({
+      syncHover: syncHoverChart1.value,
       type: 'bar',
       thickness: 0.8,
       width: '100%',
@@ -190,7 +210,15 @@ export default {
         segments: [4, 2],
       }
     });
+
+    watch(syncHoverChart1, (newSyncHover) => {
+      chartOptions1.value.syncHover = newSyncHover;
+    });
+
+    const syncHoverChart2 = ref(true);
+
     const chartOptions2 = ref({
+      syncHover: syncHoverChart2.value,
       type: 'bar',
       thickness: 0.8,
       width: '100%',
@@ -239,7 +267,15 @@ export default {
         segments: [4, 2],
       }
     });
+
+    watch(syncHoverChart2, (newSyncHover) => {
+      chartOptions2.value.syncHover = newSyncHover;
+    });
+
+    const syncHoverChart3 = ref(true);
+
     const chartOptions3 = ref({
+      syncHover: syncHoverChart3.value,
       type: 'bar',
       thickness: 0.8,
       width: '100%',
@@ -288,7 +324,16 @@ export default {
         segments: [4, 2],
       }
     });
+
+    watch(syncHoverChart3, (newSyncHover) => {
+      chartOptions3.value.syncHover = newSyncHover;
+    });
+
+
+    const syncHoverChart4 = ref(true);
+
     const chartOptions4 = ref({
+      syncHover: syncHoverChart4.value,
       type: 'bar',
       thickness: 0.8,
       width: '100%',
@@ -336,6 +381,10 @@ export default {
         color: '#626872',
         segments: [4, 2],
       }
+    });
+
+    watch(syncHoverChart4, (newSyncHover) => {
+      chartOptions4.value.syncHover = newSyncHover;
     });
 
     const clickedLabel = ref();
@@ -447,6 +496,10 @@ export default {
 
     return {
       syncHover,
+      syncHoverChart1,
+      syncHoverChart2,
+      syncHoverChart3,
+      syncHoverChart4,
       isLive,
       groupHoveredLabel,
       chart,
@@ -479,5 +532,9 @@ export default {
     position: absolute;
     left: 160px;
     padding-top: 10px;
+  }
+  .hover-options {
+    display: flex;
+    align-items: center;
   }
 </style>
