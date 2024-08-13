@@ -778,6 +778,48 @@ const modules = {
       ctx.closePath();
     }
   },
+  /**
+   * Get hovered axis label with mousemove
+   * @param {object} offset   mousemove callback
+   *
+   * @returns {number | null} hovered axis label
+   */
+  getTimeLabel(offset) {
+    const [offsetX, offsetY] = offset;
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    const options = this.options;
+
+    if (
+      options.syncHover === false || 
+      (!options.horizontal && !options.axesX.every(({ type }) => type === 'time') || 
+      options.horizontal && !options.axesY.every(({ type }) => type === 'time'))) {
+      return null;
+    }
+
+    const fromTime = +this.data.labels?.[0];
+    const toTime = +this.data.labels?.[this.data.labels.length - 1];
+    if (fromTime == null || toTime == null) {
+      return null;
+    }
+
+    if (options.horizontal) {
+      const chartHeight = graphPos.y2 - graphPos.y1;
+      const hoverYAxis = offsetY - graphPos.y1;
+      const hoverTime = (hoverYAxis * (toTime - fromTime) / chartHeight) + fromTime;
+      return Math.round(hoverTime);
+    } else {
+      const chartWidth = graphPos.x2 - graphPos.x1;
+      const hoverXAxis = offsetX - graphPos.x1;
+      const hoverTime = (hoverXAxis * (toTime - fromTime) / chartWidth) + fromTime;
+      return Math.round(hoverTime);
+    }
+  },
 
   /**
    * Clear tooltip canvas
