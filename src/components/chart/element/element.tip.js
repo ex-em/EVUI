@@ -1,5 +1,5 @@
-import { numberWithComma } from '@/common/utils';
 import dayjs from 'dayjs';
+import { numberWithComma } from '@/common/utils';
 import Canvas from '../helpers/helpers.canvas';
 import { truthyNumber } from '../../../common/utils';
 
@@ -12,6 +12,9 @@ const modules = {
    */
   drawTips(tipLocationInfo) {
     const opt = this.options;
+    const tooltipValueFormatter = typeof opt.tooltip?.formatter === 'function'
+      ? opt.tooltip?.formatter
+      : opt.tooltip?.formatter?.value;
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
     const selTipOpt = opt.selectItem;
@@ -84,7 +87,13 @@ const modules = {
       maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
 
       if (maxTipOpt.use && maxArgs) {
-        maxArgs.text = numberWithComma(maxArgs.value);
+        if (tooltipValueFormatter) {
+          maxArgs.text = isHorizontal
+            ? tooltipValueFormatter({ x: maxArgs.value })
+            : tooltipValueFormatter({ y: maxArgs.value });
+        } else {
+          maxArgs.text = numberWithComma(maxArgs.value);
+        }
         this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
 
         if (maxTipOpt.showIndicator) {
