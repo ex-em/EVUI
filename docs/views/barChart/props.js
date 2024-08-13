@@ -20,6 +20,8 @@ import PlotLine from './example/PlotLine';
 import PlotLineRaw from '!!raw-loader!./example/PlotLine';
 import Overlapping from './example/Overlapping';
 import OverlappingRaw from '!!raw-loader!./example/Overlapping';
+import HoverWithGroup from './example/HoverWithGroup';
+import HoverWithGroupRaw from '!!raw-loader!./example/HoverWithGroup';
 
 export default {
   mdText,
@@ -75,6 +77,11 @@ export default {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
       component: PlotLine,
       parsedData: parseComponent(PlotLineRaw),
+    },
+    HoverWithGroup: {
+      description: '',
+      component: HoverWithGroup,
+      parsedData: parseComponent(HoverWithGroupRaw),
     },
   },
 };
