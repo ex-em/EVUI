@@ -64,8 +64,8 @@ const modules = {
         const label = this.getTimeLabel(offset);
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
-          label: label,
-        }
+          label,
+        };
       }
 
       if (typeof this.listeners['mouse-move'] === 'function') {

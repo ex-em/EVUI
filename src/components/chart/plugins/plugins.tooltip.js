@@ -796,9 +796,9 @@ const modules = {
     const options = this.options;
 
     if (
-      options.syncHover === false || 
-      (!options.horizontal && !options.axesX.every(({ type }) => type === 'time') || 
-      options.horizontal && !options.axesY.every(({ type }) => type === 'time'))) {
+      options.syncHover === false
+      || (!options.horizontal && !options.axesX.every(({ type }) => type === 'time'))
+      || (options.horizontal && !options.axesY.every(({ type }) => type === 'time'))) {
       return null;
     }
 
@@ -811,14 +811,13 @@ const modules = {
     if (options.horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       const hoverYAxis = offsetY - graphPos.y1;
-      const hoverTime = (hoverYAxis * (toTime - fromTime) / chartHeight) + fromTime;
-      return Math.round(hoverTime);
-    } else {
-      const chartWidth = graphPos.x2 - graphPos.x1;
-      const hoverXAxis = offsetX - graphPos.x1;
-      const hoverTime = (hoverXAxis * (toTime - fromTime) / chartWidth) + fromTime;
+      const hoverTime = ((hoverYAxis * (toTime - fromTime)) / chartHeight) + fromTime;
       return Math.round(hoverTime);
     }
+      const chartWidth = graphPos.x2 - graphPos.x1;
+      const hoverXAxis = offsetX - graphPos.x1;
+      const hoverTime = ((hoverXAxis * (toTime - fromTime)) / chartWidth) + fromTime;
+      return Math.round(hoverTime);
   },
   /**
    * Draw chart indicator with other grouped chart's mousemove
@@ -831,10 +830,10 @@ const modules = {
       return;
     }
     if (
-      this.options.syncHover === false || 
-      (!horizontal && !this.options.axesX.every(({ type }) => type === 'time') || 
-      horizontal && !this.options.axesY.every(({ type }) => type === 'time'))) {
-      return ;
+      this.options.syncHover === false
+      || (!horizontal && !this.options.axesX.every(({ type }) => type === 'time'))
+      || (horizontal && !this.options.axesY.every(({ type }) => type === 'time'))) {
+      return;
     }
     this.overlayClear();
     const graphPos = {
@@ -847,16 +846,16 @@ const modules = {
     const fromTime = +this.data.labels?.[0];
     const toTime = +this.data.labels?.[this.data.labels.length - 1];
     if (fromTime == null || toTime == null) {
-      return null;
+      return;
     }
 
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
-      const offsetY = (chartHeight) * (label - fromTime) / (toTime - fromTime) + graphPos.y1;
+      const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
       this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
     } else {
       const chartWidth = graphPos.x2 - graphPos.x1;
-      const offsetX = (chartWidth) * (label - fromTime) / (toTime - fromTime) + graphPos.x1;
+      const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
       this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
     }
   },

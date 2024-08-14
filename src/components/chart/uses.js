@@ -348,7 +348,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
       if (injectGroupHoveredLabel?.value) {
         injectGroupHoveredLabel.value.label = null;
       }
-    }
+    },
   };
 
   return {
