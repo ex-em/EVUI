@@ -785,14 +785,6 @@ const modules = {
    * @returns {number | null} hovered axis label
    */
   getTimeLabel(offset) {
-    const [offsetX, offsetY] = offset;
-    const graphPos = {
-      x1: this.chartRect.x1 + this.labelOffset.left,
-      x2: this.chartRect.x2 - this.labelOffset.right,
-      y1: this.chartRect.y1 + this.labelOffset.top,
-      y2: this.chartRect.y2 - this.labelOffset.bottom,
-    };
-
     const options = this.options;
 
     if (
@@ -807,6 +799,14 @@ const modules = {
     if (fromTime == null || toTime == null) {
       return null;
     }
+
+    const [offsetX, offsetY] = offset;
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
 
     if (options.horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
