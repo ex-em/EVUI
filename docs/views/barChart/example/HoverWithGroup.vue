@@ -208,7 +208,7 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart1, (newSyncHover) => {
@@ -265,7 +265,7 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart2, (newSyncHover) => {
@@ -322,13 +322,12 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart3, (newSyncHover) => {
       chartOptions3.value.syncHover = newSyncHover;
     });
-
 
     const syncHoverChart4 = ref(true);
 
@@ -380,7 +379,7 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart4, (newSyncHover) => {

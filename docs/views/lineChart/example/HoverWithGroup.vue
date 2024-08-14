@@ -145,7 +145,7 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart1, (newSyncHoverChart1) => {
@@ -185,7 +185,7 @@ export default {
       indicator: {
         color: '#626872',
         segments: [4, 2],
-      }
+      },
     });
 
     watch(syncHoverChart2, (newSyncHoverChart2) => {
