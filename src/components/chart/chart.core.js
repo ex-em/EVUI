@@ -170,6 +170,10 @@ class EvChart {
     this.chartRect = this.getChartRect();
   }
 
+  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+    this.drawSyncedIndicator({ horizontal, label, mousePosition });
+  }
+
   /**
    * To draw canvas chart, it processes several sequential jobs
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)

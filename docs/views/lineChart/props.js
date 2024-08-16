@@ -24,6 +24,8 @@ import AxisTitle from './example/AxisTitle';
 import AxisTitleRaw from '!!raw-loader!./example/AxisTitle';
 import PassingValue from './example/PassingValue';
 import PassingValueRaw from '!!raw-loader!./example/PassingValue';
+import HoverWithGroup from './example/HoverWithGroup';
+import HoverWithGroupRaw from '!!raw-loader!./example/HoverWithGroup';
 
 export default {
   mdText,
@@ -87,6 +89,11 @@ export default {
       description: 'passingValue를 설정하여 특정 시점에 line을 끊지 않고 자연스럽게 이을 수 있습니다.',
       component: PassingValue,
       parsedData: parseComponent(PassingValueRaw),
+    },
+    HoverWithGroup: {
+      description: '',
+      component: HoverWithGroup,
+      parsedData: parseComponent(HoverWithGroupRaw),
     },
   },
 };
