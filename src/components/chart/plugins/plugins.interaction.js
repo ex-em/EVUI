@@ -65,6 +65,7 @@ const modules = {
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
+          mousePosition: [e.clientX, e.clientY],
         };
       }
 

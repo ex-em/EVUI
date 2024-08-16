@@ -170,8 +170,8 @@ class EvChart {
     this.chartRect = this.getChartRect();
   }
 
-  drawSyncedIndicator({ horizontal, label }) {
-    this.drawSyncedIndicator({ horizontal, label });
+  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+    this.drawSyncedIndicator({ horizontal, label, mousePosition });
   }
 
   /**

@@ -1,5 +1,6 @@
 import { convertToPercent } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
+import { inRange } from 'lodash-es';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
@@ -825,7 +826,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition }) {
     if (!!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -835,6 +836,19 @@ const modules = {
       || (horizontal && !this.options.axesY.every(({ type }) => type === 'time'))) {
       return;
     }
+    const fromTime = +this.data.labels?.[0];
+    const toTime = +this.data.labels?.[this.data.labels.length - 1];
+    if (fromTime == null || toTime == null) {
+      return;
+    }
+    const [clientX, clientY] = mousePosition;
+    const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
+
+    const isHoveredChart = inRange(clientX, left, right) && inRange(clientY, bottom, top);
+    if (isHoveredChart) {
+      return;
+    }
+
     this.overlayClear();
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
@@ -842,12 +856,6 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-
-    const fromTime = +this.data.labels?.[0];
-    const toTime = +this.data.labels?.[this.data.labels.length - 1];
-    if (fromTime == null || toTime == null) {
-      return;
-    }
 
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;

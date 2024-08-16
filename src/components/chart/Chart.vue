@@ -284,7 +284,7 @@
           return;
         }
         if (props.options.syncHover !== false) {
-          if (evChart.overlayClear()) {
+          if (newHoveredLabel.label == null) {
             evChart.overlayClear();
           } else {
             evChart.drawSyncedIndicator(newHoveredLabel);
