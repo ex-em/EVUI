@@ -827,7 +827,7 @@ const modules = {
    * @returns {undefined}
    */
   drawSyncedIndicator({ horizontal, label, mousePosition }) {
-    if (!!horizontal !== !!this.options.horizontal) {
+    if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
     if (
