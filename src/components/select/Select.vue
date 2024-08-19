@@ -8,10 +8,7 @@
       disabled,
     }"
   >
-    <div
-      ref="selectWrapper"
-      class="ev-select__wrapper"
-    >
+    <div ref="selectWrapper" class="ev-select__wrapper">
       <template v-if="!multiple">
         <span
           v-if="!clearable || !isClearableIcon"
@@ -75,24 +72,20 @@
             </div>
           </template>
           <template v-else>
-            <div
-              v-if="selectedModel.length"
-              class="ev-select-tag"
-            >
+            <div v-if="selectedModel.length" class="ev-select-tag">
               <span class="ev-tag-name">
                 {{ selectedModel[0].name }}
               </span>
               <span
                 class="ev-tag-suffix"
-                @click.stop="[removeMv(selectedModel[0].value), changeDropboxPosition()]"
+                @click.stop="
+                  [removeMv(selectedModel[0].value), changeDropboxPosition()]
+                "
               >
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
-            <div
-              v-if="selectedModel.length > 1"
-              class="ev-select-tag num"
-            >
+            <div v-if="selectedModel.length > 1" class="ev-select-tag num">
               <span class="ev-tag-name">
                 + {{ selectedModel.length - 1 }}
               </span>
@@ -114,7 +107,7 @@
           v-if="isDropbox"
           ref="dropbox"
           class="ev-select-dropbox"
-          :style="dropboxPosition"
+          :style="[dropboxPosition, { width: dropboxWidth }]"
         >
           <template v-if="filterable">
             <slot
@@ -140,9 +133,11 @@
               v-if="multiple"
               class="ev-select-dropbox-item all-check"
               :class="{
-                selected: allCheck
-            }"
-              @click.self.prevent="[changeAllCheck(false), changeDropboxPosition()]"
+                selected: allCheck,
+              }"
+              @click.self.prevent="
+                [changeAllCheck(false), changeDropboxPosition()]
+              "
             >
               <ev-checkbox
                 v-model="allCheck"
@@ -150,38 +145,30 @@
                 @change="[changeAllCheck(true), changeDropboxPosition()]"
               />
             </div>
-            <div
-              ref="itemWrapper"
-              class="ev-select-dropbox-list"
-            >
+            <div ref="itemWrapper" class="ev-select-dropbox-list">
               <template v-if="multiple">
-                <ev-checkbox-group
-                  v-model="mv"
-                >
-                  <ul
-                    v-if="filteredItems.length"
-                    class="ev-select-dropbox-ul"
-                  >
+                <ev-checkbox-group v-model="mv">
+                  <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
                     <li
                       v-for="(item, idx) in filteredItems"
                       :key="`${item.value}_${idx}`"
                       class="ev-select-dropbox-item"
                       :class="{
                         selected: selectedItemClass(item.value),
-                        disabled: item.disabled
-                    }"
+                        disabled: item.disabled,
+                      }"
                       :title="item.name"
-                      @click.self.prevent="item.disabled
-                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
+                      @click.self.prevent="
+                        item.disabled
+                          ? []
+                          : [clickItem(item.value), changeDropboxPosition()]
+                      "
                     >
                       <ev-checkbox
                         :label="item.value"
                         :disabled="item.disabled"
                       >
-                        <i
-                          v-if="item.iconClass"
-                          :class="item.iconClass"
-                        />
+                        <i v-if="item.iconClass" :class="item.iconClass" />
                         {{ item.name }}
                       </ev-checkbox>
                     </li>
@@ -194,30 +181,27 @@
                 </ev-checkbox-group>
               </template>
               <template v-else>
-                <ul
-                  v-if="filteredItems.length"
-                  class="ev-select-dropbox-ul"
-                >
+                <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
                   <li
                     v-for="(item, idx) in filteredItems"
                     :key="`${item.value}_${idx}`"
                     class="ev-select-dropbox-item"
                     :class="{
-                    selected: selectedItemClass(item.value),
-                    disabled: item.disabled
-                  }"
+                      selected: selectedItemClass(item.value),
+                      disabled: item.disabled,
+                    }"
                     :title="item.name"
-                    @click.stop.prevent="item.disabled
-                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
+                    @click.stop.prevent="
+                      item.disabled
+                        ? []
+                        : [clickItem(item.value), changeDropboxPosition()]
+                    "
                   >
                     <ev-checkbox
                       :model-value="mv === item.value"
                       :disabled="item.disabled"
                     >
-                      <i
-                        v-if="item.iconClass"
-                        :class="item.iconClass"
-                      />
+                      <i v-if="item.iconClass" :class="item.iconClass" />
                       {{ item.name }}
                     </ev-checkbox>
                   </li>
@@ -226,30 +210,24 @@
             </div>
           </template>
           <template v-else>
-            <div
-              ref="itemWrapper"
-              class="ev-select-dropbox-list"
-            >
-              <ul
-                v-if="filteredItems.length"
-                class="ev-select-dropbox-ul"
-              >
+            <div ref="itemWrapper" class="ev-select-dropbox-list">
+              <ul v-if="filteredItems.length" class="ev-select-dropbox-ul">
                 <li
                   v-for="(item, idx) in filteredItems"
                   :key="`${item.value}_${idx}`"
                   class="ev-select-dropbox-item"
                   :class="{
                     selected: selectedItemClass(item.value),
-                    disabled: item.disabled
+                    disabled: item.disabled,
                   }"
                   :title="item.name"
-                  @click.stop.prevent="item.disabled
-                        ? [] : [clickItem(item.value), changeDropboxPosition()]"
+                  @click.stop.prevent="
+                    item.disabled
+                      ? []
+                      : [clickItem(item.value), changeDropboxPosition()]
+                  "
                 >
-                  <i
-                    v-if="item.iconClass"
-                    :class="item.iconClass"
-                  />
+                  <i v-if="item.iconClass" :class="item.iconClass" />
                   {{ item.name }}
                 </li>
               </ul>
@@ -367,6 +345,7 @@ export default {
       selectedItemClass,
       allCheck,
       changeAllCheck,
+      dropboxWidth,
     } = useDropdown({ mv, changeMv });
 
     return {
@@ -394,6 +373,7 @@ export default {
       selectedItemClass,
       allCheck,
       changeAllCheck,
+      dropboxWidth,
     };
   },
 };
@@ -417,7 +397,7 @@ export default {
   }
   .ev-input {
     padding: 0 30px 0 15px;
-    border: 1px solid #B2B2B2;
+    border: 1px solid #b2b2b2;
     cursor: pointer;
 
     &.multiple {
@@ -435,7 +415,7 @@ export default {
     align-items: center;
 
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 
@@ -452,7 +432,7 @@ export default {
     display: flex;
     width: 100%;
     height: 100%;
-    padding: 3px 0;
+    padding: 3px 30px 3px 0;
     min-height: $select-height;
     flex-wrap: wrap;
     align-items: center;
@@ -463,12 +443,13 @@ export default {
 .ev-select-tag {
   display: flex;
   position: relative;
+  max-width: 100%;
   height: 24px;
   padding: 0 19px 0 8px;
   margin: 2px 0 2px 6px;
-  background-color: #F4F4F5;
+  background-color: #f4f4f5;
   align-items: center;
-  border: 1px solid #E9E9EB;
+  border: 1px solid #e9e9eb;
   border-radius: 4px;
   color: #909399;
   font-size: $font-size-base;
@@ -478,6 +459,12 @@ export default {
     padding-right: 8px;
   }
 
+  .ev-tag-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .ev-tag-suffix {
     display: flex;
     position: absolute;
@@ -485,11 +472,11 @@ export default {
     right: 3px;
     height: 100%;
     align-items: center;
-    color: #0D0D0D;
+    color: #0d0d0d;
     cursor: pointer;
 
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 }
@@ -503,10 +490,10 @@ export default {
   position: absolute;
   width: 100%;
   max-height: $select-height * 5;
-  background-color: #FCFCFC;
-  border: 1px solid #E4E7ED;
+  background-color: #fcfcfc;
+  border: 1px solid #e4e7ed;
   color: #606266;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   z-index: 100;
   cursor: pointer;
@@ -525,7 +512,7 @@ export default {
     min-height: $select-height;
     padding: 0 30px 0 15px;
     border: 0;
-    border-bottom: 1px solid #B2B2B2;
+    border-bottom: 1px solid #b2b2b2;
     outline: 0;
     font-size: $font-size-medium;
     background-color: transparent;
@@ -543,7 +530,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 15px;
-  color: #0D0D0D;
+  color: #0d0d0d;
   white-space: nowrap;
   cursor: pointer;
 
@@ -551,12 +538,12 @@ export default {
     opacity: 0.85;
   }
   &.selected {
-    color: #EBEBEB;
-    background-color: #730EF4;
+    color: #ebebeb;
+    background-color: #730ef4;
   }
   &.disabled {
     opacity: 1;
-    color: #C0C4CC;
+    color: #c0c4cc;
     cursor: not-allowed;
   }
 }
