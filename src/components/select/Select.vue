@@ -397,7 +397,7 @@ export default {
   }
   .ev-input {
     padding: 0 30px 0 15px;
-    border: 1px solid #b2b2b2;
+    border: 1px solid #B2B2B2;
     cursor: pointer;
 
     &.multiple {
@@ -415,7 +415,7 @@ export default {
     align-items: center;
 
     &:hover {
-      color: #409eff;
+      color: #409EFF;
     }
   }
 
@@ -447,9 +447,9 @@ export default {
   height: 24px;
   padding: 0 19px 0 8px;
   margin: 2px 0 2px 6px;
-  background-color: #f4f4f5;
+  background-color: #F4F4F5;
   align-items: center;
-  border: 1px solid #e9e9eb;
+  border: 1px solid #E9E9EB;
   border-radius: 4px;
   color: #909399;
   font-size: $font-size-base;
@@ -472,11 +472,11 @@ export default {
     right: 3px;
     height: 100%;
     align-items: center;
-    color: #0d0d0d;
+    color: #0D0D0D;
     cursor: pointer;
 
     &:hover {
-      color: #409eff;
+      color: #409EFF;
     }
   }
 }
@@ -490,8 +490,8 @@ export default {
   position: absolute;
   width: 100%;
   max-height: $select-height * 5;
-  background-color: #fcfcfc;
-  border: 1px solid #e4e7ed;
+  background-color: #FCFCFC;
+  border: 1px solid #E4E7ED;
   color: #606266;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
@@ -512,7 +512,7 @@ export default {
     min-height: $select-height;
     padding: 0 30px 0 15px;
     border: 0;
-    border-bottom: 1px solid #b2b2b2;
+    border-bottom: 1px solid #B2B2B2;
     outline: 0;
     font-size: $font-size-medium;
     background-color: transparent;
@@ -530,7 +530,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 15px;
-  color: #0d0d0d;
+  color: #0D0D0D;
   white-space: nowrap;
   cursor: pointer;
 
@@ -538,12 +538,12 @@ export default {
     opacity: 0.85;
   }
   &.selected {
-    color: #ebebeb;
-    background-color: #730ef4;
+    color: #EBEBEB;
+    background-color: #730EF4;
   }
   &.disabled {
     opacity: 1;
-    color: #c0c4cc;
+    color: #C0C4CC;
     cursor: not-allowed;
   }
 }
