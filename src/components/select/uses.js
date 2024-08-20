@@ -198,29 +198,28 @@ export const useDropdown = (param) => {
 
       const items = itemWrapper.value.querySelectorAll('.ev-select-dropbox-item');
       let maxWidth = 0;
-      let itemPadding = 0;
 
       items.forEach((item) => {
         const itemWidth = item.scrollWidth;
         if (itemWidth > maxWidth) {
-          maxWidth = itemWidth;
-        }
-        if (itemPadding === 0) {
-          const style = window.getComputedStyle(item);
-          itemPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+          maxWidth = itemWidth + 2;
         }
       });
+
+      const scrollbarWidth = itemWrapper.value.offsetWidth - itemWrapper.value.clientWidth;
+      maxWidth += scrollbarWidth;
 
       const windowWidth = window.innerWidth;
       const dropboxRect = dropbox.value.getBoundingClientRect();
       const dropboxLeft = dropboxRect.left;
-      const maxAllowedWidth = windowWidth - dropboxLeft - itemPadding - 10;
+      const maxAllowedWidth = windowWidth - dropboxLeft - 20;
 
-      const finalWidth = Math.max(Math.min(maxWidth, maxAllowedWidth), initialDropboxWidth.value);
+      const finalWidth = Math.max(
+        Math.min((maxWidth), maxAllowedWidth),
+        initialDropboxWidth.value,
+      );
 
-      if (initialDropboxWidth.value < maxWidth) {
-        dropboxWidth.value = `${Math.max(finalWidth + itemPadding - 10, 100)}px`;
-      }
+      dropboxWidth.value = `${finalWidth}px`;
     } else {
       dropboxWidth.value = '100%';
     }
@@ -241,7 +240,6 @@ export const useDropdown = (param) => {
     () => filteredItems.value,
     async () => {
       await changeDropboxPosition();
-      await calculateDropboxWidth();
     },
   );
 
