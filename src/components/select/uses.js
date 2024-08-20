@@ -191,28 +191,36 @@ export const useDropdown = (param) => {
     if (itemWrapper.value && dropbox.value) {
       await nextTick();
 
-      if (initialDropboxWidth.value === null) {
-        initialDropboxWidth.value = dropbox.value.offsetWidth;
+      if (initialDropboxWidth.value === null
+        || initialDropboxWidth.value !== selectWrapper.value.offsetWidth) {
+        initialDropboxWidth.value = selectWrapper.value.offsetWidth;
       }
 
       const items = itemWrapper.value.querySelectorAll('.ev-select-dropbox-item');
       let maxWidth = 0;
+      let itemPadding = 0;
+
       items.forEach((item) => {
         const itemWidth = item.scrollWidth;
         if (itemWidth > maxWidth) {
           maxWidth = itemWidth;
+        }
+        if (itemPadding === 0) {
+          const style = window.getComputedStyle(item);
+          itemPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
         }
       });
 
       const windowWidth = window.innerWidth;
       const dropboxRect = dropbox.value.getBoundingClientRect();
       const dropboxLeft = dropboxRect.left;
-      const rightMargin = Math.max(windowWidth - (dropboxLeft + maxWidth), 10);
-      const maxAllowedWidth = windowWidth - dropboxLeft - rightMargin - 10;
+      const maxAllowedWidth = windowWidth - dropboxLeft - itemPadding - 10;
 
       const finalWidth = Math.max(Math.min(maxWidth, maxAllowedWidth), initialDropboxWidth.value);
 
-      dropboxWidth.value = `${Math.max(finalWidth, 100)}px`;
+      if (initialDropboxWidth.value < maxWidth) {
+        dropboxWidth.value = `${Math.max(finalWidth + itemPadding - 10, 100)}px`;
+      }
     } else {
       dropboxWidth.value = '100%';
     }
@@ -330,12 +338,19 @@ export const useDropdown = (param) => {
     }
   });
 
+  const handleResize = () => {
+    if (isDropbox.value) {
+      calculateDropboxWidth();
+      changeDropboxPosition();
+    }
+  };
+
   onMounted(() => {
-    window.addEventListener('resize', calculateDropboxWidth);
+    window.addEventListener('resize', handleResize);
   });
 
   onUnmounted(() => {
-    window.removeEventListener('resize', calculateDropboxWidth);
+    window.removeEventListener('resize', handleResize);
   });
 
   return {
