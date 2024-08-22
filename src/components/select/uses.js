@@ -202,12 +202,15 @@ export const useDropdown = (param) => {
       items.forEach((item) => {
         const itemWidth = item.scrollWidth;
         if (itemWidth > maxWidth) {
-          maxWidth = itemWidth + 2;
+          maxWidth = itemWidth;
         }
       });
 
+      const { borderLeftWidth, borderRightWidth } = window.getComputedStyle(dropbox.value);
+      const borderXWidth = parseInt(borderLeftWidth) + parseInt(borderRightWidth);
+
       const scrollbarWidth = itemWrapper.value.offsetWidth - itemWrapper.value.clientWidth;
-      maxWidth += scrollbarWidth;
+      maxWidth += (scrollbarWidth + borderXWidth);
 
       const windowWidth = window.innerWidth;
       const dropboxRect = dropbox.value.getBoundingClientRect();
