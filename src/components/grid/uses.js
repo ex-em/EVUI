@@ -77,6 +77,25 @@ export const commonFunctions = () => {
   };
 };
 
+export const getUpdatedColumns = (stores) => {
+  if (stores.movedColumns?.length) {
+    const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
+    const extraColumns = stores.originColumns?.filter(
+      column => !orderedColumnsIndexes.includes(column.index),
+    );
+    const copyOrderedColumns = stores.orderedColumns;
+    return [...copyOrderedColumns, ...extraColumns];
+  }
+  const { originColumns, filteredColumns } = stores;
+  return originColumns.map((col) => {
+    const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+    return {
+      ...col,
+      ...changedCol,
+    };
+  });
+};
+
 export const scrollEvent = (params) => {
   const {
     scrollInfo,
@@ -272,13 +291,14 @@ export const resizeEvent = (params) => {
    * grid resize 이벤트를 처리한다.
    */
   const onResize = () => {
+    const propColumnsMap = new Map(props.columns.map(col => [col.field, col.width]));
     nextTick(() => {
       if (resizeInfo.adjust) {
         stores.orderedColumns.forEach((column) => {
           const item = column;
 
           if (!item.resized) {
-            item.width = props.columns[column.index].width ?? 0;
+            item.width = propColumnsMap.get(item.field) ?? 0;
           }
 
           return item;
@@ -348,9 +368,14 @@ export const resizeEvent = (params) => {
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
 
+      const updatedColumns = getUpdatedColumns(stores);
       emit('resize-column', {
         column: stores.orderedColumns[columnIndex],
-        columns: stores.updatedColumns,
+        columns: updatedColumns,
+      });
+      emit('change-column-info', {
+        type: 'resize',
+        columns: updatedColumns,
       });
     };
 
@@ -598,12 +623,51 @@ export const expandEvent = (params) => {
 export const sortEvent = (params) => {
   const { sortInfo, stores, updatePagingInfo } = params;
   const { emit } = getCurrentInstance();
+
+  const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
   function OrderQueue() {
-    this.orders = ['asc', 'desc', 'init'];
+    this.orders = getDefaultSortType();
     this.dequeue = () => this.orders.shift();
     this.enqueue = o => this.orders.push(o);
   }
+
+  const setSortOptionToOrderedColumns = (column, sortType = 'init') => {
+    stores.orderedColumns.forEach((orderedColumn) => {
+      if (orderedColumn.index === column?.index && sortType) {
+        orderedColumn.sortOption = { sortType };
+      } else {
+        orderedColumn.sortOption = { sortType: 'init' };
+      }
+    });
+  };
+
+  const initializeHiddenColumnsSortType = () => {
+    const hiddenColumns = stores.originColumns.filter(col => col.hiddenDisplay || col.hide);
+    if (hiddenColumns.length) {
+      hiddenColumns.forEach((col) => {
+        col.sortOption = { sortType: 'init' };
+      });
+    }
+  };
+
   const order = new OrderQueue();
+  const setSortInfo = (column, emitTriggered = true) => {
+    const { sortType } = column?.sortOption || {};
+    sortInfo.sortColumn = column;
+    sortInfo.sortField = column?.field;
+    sortInfo.sortOrder = sortType;
+    sortInfo.isSorting = !!(sortType);
+
+    if (emitTriggered) {
+      setSortOptionToOrderedColumns(column, sortType);
+
+      emit('change-column-info', {
+        type: 'sort',
+        columns: getUpdatedColumns(stores),
+      });
+    }
+  };
+
   /**
    * sort 이벤트를 처리한다.
    *
@@ -615,11 +679,11 @@ export const sortEvent = (params) => {
     if (sortable) {
       sortInfo.sortColumn = column;
       if (sortInfo.sortField !== column?.field) {
-        order.orders = ['asc', 'desc', 'init'];
+        order.orders = getDefaultSortType();
         sortInfo.sortField = column?.field;
       }
       if (sortOrder) {
-        order.orders = ['asc', 'desc', 'init'];
+        order.orders = getDefaultSortType();
         if (sortOrder === 'desc') {
           sortInfo.sortOrder = order.dequeue();
           order.enqueue(sortInfo.sortOrder);
@@ -630,10 +694,21 @@ export const sortEvent = (params) => {
 
       sortInfo.isSorting = true;
       updatePagingInfo({ onSort: true });
+
+      initializeHiddenColumnsSortType();
+      setSortOptionToOrderedColumns(column, sortInfo.sortOrder);
+
+      const updatedColumInfo = getUpdatedColumns(stores);
       emit('sort-column', {
         field: sortInfo.sortField,
         order: sortInfo.sortOrder,
         column: sortInfo.sortColumn,
+        columns: updatedColumInfo,
+      });
+
+      emit('change-column-info', {
+        type: 'sort',
+        columns: updatedColumInfo,
       });
     }
   };
@@ -641,7 +716,7 @@ export const sortEvent = (params) => {
    * 설정값에 따라 해당 컬럼 데이터에 대해 정렬한다.
    */
   const setSort = () => {
-    const { field, index } = sortInfo.sortColumn;
+    const { field, index } = sortInfo.sortColumn || {};
     const customSetAsc = sortInfo.sortFunction?.[field] ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
@@ -671,7 +746,12 @@ export const sortEvent = (params) => {
 
     if (customSetAsc) {
       stores.store.sort((a, b) => {
-        const { aCol, bCol } = getColumnValue(a, b);
+        /*
+          배열 및 객체일 경우 customAscFunc 사용자에게 데이터 전처리를 맡길 수 있게끔
+          getColumnValue 사용 안함
+        */
+        const aCol = a[ROW_DATA_INDEX][index];
+        const bCol = b[ROW_DATA_INDEX][index];
         const compareAscReturn = customSetAsc(aCol, bCol);
         return sortInfo.sortOrder === 'desc' ? -compareAscReturn : compareAscReturn;
       });
@@ -711,7 +791,13 @@ export const sortEvent = (params) => {
         break;
     }
   };
-  return { onSort, setSort };
+
+  const getSortTarget = () => stores.orderedColumns?.find(
+    column => column?.sortOption && getDefaultSortType(false).includes(column.sortOption.sortType),
+  );
+  const hasSortTarget = () => !!getSortTarget();
+
+  return { onSort, getSortTarget, setSort, setSortInfo, hasSortTarget };
 };
 
 export const filterEvent = (params) => {
@@ -948,7 +1034,7 @@ export const filterEvent = (params) => {
 
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
-            let columnValue = rowData[ix] ?? null;
+            let columnValue = rowData[column.index] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
               if (typeof columnValue === 'object') {
@@ -1053,7 +1139,7 @@ export const contextMenuEvent = (params) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
       const filterable = filterInfo.isFiltering
-        && column.filterable === undefined ? true : column.filterable;
+      && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1087,6 +1173,11 @@ export const contextMenuEvent = (params) => {
             };
             filterInfo.isShowFilterSetting = true;
             filterInfo.filteringColumn = column;
+
+            emit('change-column-info', {
+              type: 'filter',
+              columns: stores.updatedColumns,
+            });
           },
           disabled: !filterable,
           hidden: contextInfo.hiddenColumnMenuItem?.filter,
@@ -1099,6 +1190,11 @@ export const contextMenuEvent = (params) => {
           click: () => {
             setColumnHidden(column.field);
             emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+
+            emit('change-column-info', {
+              type: 'display',
               columns: stores.updatedColumns,
             });
           },
@@ -1158,6 +1254,7 @@ export const storeEvent = (params) => {
     filterInfo,
     expandedInfo,
     setSort,
+    setSortInfo,
     updateVScroll,
     setFilter,
   } = params;
@@ -1166,8 +1263,13 @@ export const storeEvent = (params) => {
    *
    * @param {array} rows - row 데이터
    * @param {boolean} isMakeIndex - 인덱스 생성 유무
+   * @param {boolean} isInit - 초기 setStore 여부
    */
-  const setStore = (rows, isMakeIndex = true) => {
+  const setStore = ({ rows, isMakeIndex = true, isInit = false }) => {
+    const sortingColumns = stores.orderedColumns.find(
+      column => column?.sortOption && ['asc', 'desc'].includes(column.sortOption.sortType),
+    );
+
     if (isMakeIndex) {
       const store = [];
       let hasUnChecked = false;
@@ -1197,6 +1299,11 @@ export const storeEvent = (params) => {
     if (filterInfo.isFiltering) {
       setFilter();
     }
+
+    if (sortingColumns && isInit) {
+      setSortInfo(sortingColumns, false);
+    }
+
     if (sortInfo.sortField) {
       setSort();
     }
@@ -1304,7 +1411,7 @@ export const columnSettingEvent = (params) => {
 
   const initColumnSettingInfo = () => {
     stores.filteredColumns.length = 0;
-    columnSettingInfo.isShowColumnSetting = false;
+    // columnSettingInfo.isShowColumnSetting = false;
     columnSettingInfo.isFilteringColumn = false;
     columnSettingInfo.visibleColumnIdx = [];
     columnSettingInfo.hiddenColumn = '';
@@ -1348,6 +1455,11 @@ export const columnSettingEvent = (params) => {
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
     emit('change-column-status', {
+      columns: stores.updatedColumns,
+    });
+
+    emit('change-column-info', {
+      type: 'display',
       columns: stores.updatedColumns,
     });
   };
@@ -1413,6 +1525,11 @@ export const dragEvent = ({ stores }) => {
     setColumnMoving(currentIndex, droppedIndex);
     emit('change-column-order', {
       column: stores.orderedColumns[droppedIndex],
+      columns: stores.updatedColumns,
+    });
+
+    emit('change-column-info', {
+      type: 'order',
       columns: stores.updatedColumns,
     });
   };

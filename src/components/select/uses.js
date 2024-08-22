@@ -1,6 +1,6 @@
 import {
   ref, reactive, computed, watch,
-  nextTick, getCurrentInstance,
+  nextTick, getCurrentInstance, onMounted, onUnmounted,
 } from 'vue';
 import {
   getRegExp,
@@ -115,6 +115,8 @@ export const useDropdown = (param) => {
   const selectWrapper = ref(null);
   const dropbox = ref(null);
   const itemWrapper = ref(null);
+  const dropboxWidth = ref('100%');
+  const initialDropboxWidth = ref(null);
   const dropboxPosition = reactive({
     top: 0,
   });
@@ -185,14 +187,64 @@ export const useDropdown = (param) => {
     }
   };
 
+  const calculateDropboxWidth = async () => {
+    if (itemWrapper.value && dropbox.value) {
+      await nextTick();
+
+      if (initialDropboxWidth.value === null
+        || initialDropboxWidth.value !== selectWrapper.value.offsetWidth) {
+        initialDropboxWidth.value = selectWrapper.value.offsetWidth;
+      }
+
+      const items = itemWrapper.value.querySelectorAll('.ev-select-dropbox-item');
+      let maxWidth = 0;
+      let itemPadding = 0;
+
+      items.forEach((item) => {
+        const itemWidth = item.scrollWidth;
+        if (itemWidth > maxWidth) {
+          maxWidth = itemWidth;
+        }
+        if (itemPadding === 0) {
+          const style = window.getComputedStyle(item);
+          itemPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+        }
+      });
+
+      const windowWidth = window.innerWidth;
+      const dropboxRect = dropbox.value.getBoundingClientRect();
+      const dropboxLeft = dropboxRect.left;
+      const maxAllowedWidth = windowWidth - dropboxLeft - itemPadding - 10;
+
+      const finalWidth = Math.max(Math.min(maxWidth, maxAllowedWidth), initialDropboxWidth.value);
+
+      if (initialDropboxWidth.value < maxWidth) {
+        dropboxWidth.value = `${Math.max(finalWidth + itemPadding - 10, 100)}px`;
+      }
+    } else {
+      dropboxWidth.value = '100%';
+    }
+  };
+
+
   watch(
     () => isDropbox.value,
-    (cur) => {
+    async (cur) => {
       if (cur) {
-        scrollToSelectedItem();
+        await scrollToSelectedItem();
+        await calculateDropboxWidth();
       }
     },
   );
+
+  watch(
+    () => filteredItems.value,
+    async () => {
+      await changeDropboxPosition();
+      await calculateDropboxWidth();
+    },
+  );
+
 
   if (props.filterable) {
     watch(
@@ -286,6 +338,21 @@ export const useDropdown = (param) => {
     }
   });
 
+  const handleResize = () => {
+    if (isDropbox.value) {
+      calculateDropboxWidth();
+      changeDropboxPosition();
+    }
+  };
+
+  onMounted(() => {
+    window.addEventListener('resize', handleResize);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+  });
+
   return {
     select,
     selectWrapper,
@@ -303,5 +370,6 @@ export const useDropdown = (param) => {
     selectedItemClass,
     allCheck,
     changeAllCheck,
+    dropboxWidth,
   };
 };

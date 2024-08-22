@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { onMounted, watch, provide, toRef, computed } from 'vue';
+import { onMounted, ref, watch, provide, toRef, computed } from 'vue';
 import evChartToolbar from '../chart/ChartToolbar';
 import { useGroupModel } from './uses';
 import { useZoomModel } from '../chart/uses';
@@ -50,6 +50,7 @@ export default {
     'update:groupSelectedLabel',
     'update:zoomStartIdx',
     'update:zoomEndIdx',
+    'update:groupHoveredLabel',
   ],
   setup(props, { emit }) {
     const {
@@ -70,6 +71,18 @@ export default {
       set: val => emit('update:groupSelectedLabel', val),
     });
     provide('groupSelectedLabel', groupSelectedLabel);
+    const groupHoveredLabel = ref(null);
+    provide('groupHoveredLabel', groupHoveredLabel);
+
+    watch(() => props.options.syncHover, (newSyncHover) => {
+      if (newSyncHover) {
+        groupHoveredLabel.value = { label: '', horizontal: false };
+      } else {
+        groupHoveredLabel.value = null;
+      }
+    }, {
+      immediate: true,
+    });
 
     const {
       evChartZoomOptions,

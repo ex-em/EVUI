@@ -25,10 +25,12 @@
               <ev-checkbox
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
-                :label="column?.label"
+                :label="column?.text"
                 :disabled="$props.disabledColumn.includes(column?.text)"
                 :tooltip-title="column?.label ?? ''"
-              />
+              >
+                {{ column?.label }}
+              </ev-checkbox>
             </ev-checkbox-group>
           </template>
           <template v-else>
@@ -59,6 +61,7 @@ import {
   ref,
   watch,
 } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: 'EVGridColumnSetting',
@@ -172,22 +175,16 @@ export default {
 
     const initValue = () => {
       const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
+
       checkColumnGroup.value = columns
-        .filter(col => !col.checked)
-        .map(col => col.label);
+        .filter(col => col.originChecked)
+        .map(col => col.text);
+
       initSearchValue();
     };
     const onApplyColumn = () => {
       applyColumnList.value = originColumnList.value
-        .filter((col) => {
-          if (checkColumnGroup.value.includes(col.label)) {
-            if (col?.checked) {
-              col.checked = false;
-            }
-            return true;
-          }
-          return false;
-        });
+        .filter(col => checkColumnGroup.value.includes(col.text));
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
@@ -195,18 +192,37 @@ export default {
       computedIsShowMenuOnClick.value = false;
     };
 
+    const prevColumns = ref();
+    const prevCheckColumnGroup = ref();
     const setColumns = () => {
+      prevCheckColumnGroup.value = cloneDeep(checkColumnGroup.value);
       originColumnList.value = props.columns
         .filter(col => !col.hide && col.caption)
-        .map(col => ({
-          label: col.caption,
-          text: col.field,
-          checked: col.hiddenDisplay,
-        }));
+        .map((col) => {
+          const prevColumn = prevColumns.value?.find(c => c.field === col.field);
+          let isChecked = false;
+
+          if (prevColumn) {
+            const isHiddenChanged = prevColumn?.hiddenDisplay !== col?.hiddenDisplay;
+            isChecked = isHiddenChanged || !prevCheckColumnGroup.value?.length
+              ? !col?.hiddenDisplay
+              : prevCheckColumnGroup.value.includes(col.field);
+          } else {
+            isChecked = !col.hiddenDisplay;
+          }
+          return {
+            label: col.caption,
+            text: col.field,
+            originChecked: !col.hiddenDisplay,
+            checked: isChecked,
+          };
+        });
+
       checkColumnGroup.value = originColumnList.value
-        .filter(col => !col.checked)
-        .map(col => col.label);
+        .filter(col => col.checked)
+        .map(col => col.text);
       applyColumnList.value.length = 0;
+      prevColumns.value = cloneDeep(props.columns);
     };
 
     const hideColumnSetting = () => {
@@ -267,10 +283,10 @@ export default {
     watch(() => props.hiddenColumn, (value) => {
       const filterColumns = applyColumnList.value.length
         ? applyColumnList.value.filter(col => col.text !== value)
-        : originColumnList.value.filter(col => (col.text !== value && !col.checked));
+        : originColumnList.value.filter(col => (col.text !== value && col.checked));
 
       applyColumnList.value = filterColumns;
-      checkColumnGroup.value = filterColumns.map(col => col.label);
+      checkColumnGroup.value = filterColumns.map(col => col.text);
     });
 
     return {

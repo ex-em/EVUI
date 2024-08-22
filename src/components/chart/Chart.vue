@@ -95,6 +95,7 @@
       const injectIsChartGroup = inject('isChartGroup', false);
       const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
       const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
+      const injectGroupHoveredLabel = inject('groupHoveredLabel', null);
       const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
       const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
 
@@ -105,7 +106,7 @@
         selectSeriesInfo,
         getNormalizedData,
         getNormalizedOptions,
-      } = useModel(injectGroupSelectedLabel);
+      } = useModel(injectGroupSelectedLabel, injectGroupHoveredLabel);
 
       const normalizedData = getNormalizedData(props.data);
       const normalizedOptions = getNormalizedOptions(props.options);
@@ -277,6 +278,19 @@
           updateData: false,
         });
       });
+
+      watch(() => injectGroupHoveredLabel?.value, (newHoveredLabel) => {
+        if (!newHoveredLabel) {
+          return;
+        }
+        if (props.options.syncHover !== false) {
+          if (newHoveredLabel.label == null) {
+            evChart.overlayClear();
+          } else {
+            evChart.drawSyncedIndicator(newHoveredLabel);
+          }
+        }
+      }, { deep: true, flush: 'post' });
 
       onMounted(async () => {
         if (injectEvChartPropsInGroup?.value) {

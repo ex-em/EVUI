@@ -516,6 +516,7 @@
         <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
+          :custom-class="contextMenuClass"
           :items="contextMenuItems"
         />
         <ev-context-menu
@@ -571,7 +572,7 @@
   <column-setting
     v-model:is-show="isShowColumnSetting"
     v-model:is-show-menu-on-click="isShowMenuOnClick"
-    :columns="$props.columns"
+    :columns="updatedColumns"
     :hidden-column="hiddenColumn"
     :disabled-column="disabledColumn"
     :position="columnSettingPosition"
@@ -616,6 +617,7 @@ import {
   pagingEvent,
   columnSettingEvent,
   dragEvent,
+  getUpdatedColumns,
 } from './uses';
 
 export default {
@@ -688,6 +690,7 @@ export default {
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-order': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
+    'change-column-info': ({ type, columns }) => ({ type, columns }),
   },
   setup(props) {
     // const ROW_INDEX = 0;
@@ -768,20 +771,20 @@ export default {
       }),
       filteredColumns: [],
       movedColumns: [],
-      originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
+      originColumns: computed(() => props.columns.map((column, index) => ({
+        index,
+        hiddenDisplay: false,
+        ...column,
+        sortOption: {
+          sortType: column?.sortOption?.sortType || 'init',
+        },
+      }))),
       orderedColumns: computed(() => {
         const columns = stores.movedColumns.length
           ? stores.movedColumns : stores.originColumns;
         return stores.filteredColumns.length ? stores.filteredColumns : columns;
       }),
-      updatedColumns: computed(() => {
-        const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
-        const extraColumns = stores.originColumns?.filter(
-          column => !orderedColumnsIndexes.includes(column.index),
-        );
-        const copyOrderedColumns = stores.orderedColumns;
-        return [...copyOrderedColumns, ...extraColumns];
-      }),
+      updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
@@ -839,6 +842,7 @@ export default {
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
+      contextMenuClass: props.option.customContextMenuClass || '',
       columnMenu: null,
       columnMenuItems: [],
       columnMenuTextInfo: props.option.columnMenuText || {},
@@ -927,7 +931,10 @@ export default {
 
     const {
       onSort,
+      getSortTarget,
       setSort,
+      setSortInfo,
+      hasSortTarget,
     } = sortEvent({ sortInfo, stores, updatePagingInfo });
 
     const {
@@ -958,6 +965,7 @@ export default {
       filterInfo,
       expandedInfo,
       setSort,
+      setSortInfo,
       updateVScroll,
       setFilter,
     });
@@ -1047,7 +1055,7 @@ export default {
 
     onMounted(() => {
       calculatedColumn();
-      setStore(props.rows);
+      setStore({ rows: props.rows, isInit: true });
       document.addEventListener('wheel', onMouseWheel, { capture: false });
       document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
@@ -1075,36 +1083,26 @@ export default {
 
     watch(
       () => props.columns,
-      (newColumns, prevColumns) => {
-        const isSameColumns = () => {
-          // Column의 field로 동일한 컬럼인지 확인
-          const newColumnsFields = newColumns.map(column => column.field);
-          const prevColumnsFields = prevColumns.map(column => column.field);
-          return prevColumnsFields.every(field => newColumnsFields.includes(field));
-        };
-
-        if (newColumns.length !== prevColumns.length || !isSameColumns()) {
-          // 동일하지 않은 컬럼으로 변경된 경우 initialize
-          sortInfo.isSorting = false;
-          sortInfo.sortField = '';
-          filterInfo.filteringColumn = null;
-          filterInfo.filteringItemsByColumn = {};
-          stores.filterStore = [];
-          setStore([], false);
-          initColumnSettingInfo();
-        } else if (stores.filteredColumns.length) {
-          // 새로운 컬럼 기준으로 filteredColumns 를 업데이트 한다.
-          stores.filteredColumns = newColumns.filter(
-            column => !column.hidden && !column.hiddenDisplay,
-          );
+      () => {
+        if (!hasSortTarget()) {
+          setSortInfo(getSortTarget());
+          setSort();
+        } else {
+          setSortInfo(getSortTarget());
         }
+        filterInfo.filteringColumn = null;
+        filterInfo.filteringItemsByColumn = {};
+        stores.filterStore = [];
+        setStore({ rows: [], isMakeIndex: false });
+        initColumnSettingInfo();
+        stores.movedColumns.length = 0;
       }, { deep: true },
     );
     watch(
       () => sortInfo.isSorting,
       (value) => {
         if (value) {
-          setStore(stores.originStore, false);
+          setStore({ rows: stores.originStore, isMakeIndex: false });
           sortInfo.isSorting = !value;
           if (pageInfo.isClientPaging) {
             pageInfo.currentPage = 1;
@@ -1117,7 +1115,7 @@ export default {
     watch(
       () => props.rows,
       (value) => {
-        setStore(value);
+        setStore({ rows: value });
         if (filterInfo.isSearch) {
           onSearch(filterInfo.searchWord);
         }
@@ -1126,7 +1124,7 @@ export default {
     );
     watch(() => props.uncheckable,
       () => {
-      setStore(props.rows);
+      setStore({ rows: props.rows });
       }, { deep: true });
     watch(
       () => props.checked,
@@ -1240,7 +1238,7 @@ export default {
         stores.orderedColumns.map((column) => {
           const item = column;
 
-          if (!props.columns[column.index].width && !item.resized) {
+          if (!props.columns[column.index]?.width && !item.resized) {
             item.width = 0;
           }
 
@@ -1321,7 +1319,7 @@ export default {
 
     const onChangeOperator = () => {
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
     };
 
     const setColumnFilteringItems = async (isInit) => {
@@ -1371,7 +1369,7 @@ export default {
       setColumnFilteringItems(true);
       filterInfo.isShowFilterSetting = false; // filter setting close
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
 
       setHeaderCheckboxByFilter(stores.filterStore);
     };
@@ -1392,7 +1390,7 @@ export default {
       filterInfo.filteringItemsByColumn = {};
       hiddenFilteringItemsByColumn.value = {};
       stores.filterStore = [];
-      setStore([], false);
+      setStore({ rows: [], isMakeIndex: false });
     };
 
     const filteringItemsStyle = computed(() => ({

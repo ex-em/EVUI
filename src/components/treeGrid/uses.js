@@ -86,6 +86,17 @@ export const commonFunctions = (params) => {
   };
 };
 
+export const getUpdatedColumns = (stores) => {
+  const { originColumns, filteredColumns } = stores;
+  return originColumns.map((col) => {
+    const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+    return {
+      ...col,
+      ...changedCol,
+    };
+  });
+};
+
 export const scrollEvent = (params) => {
   const {
     scrollInfo,
@@ -268,7 +279,7 @@ export const resizeEvent = (params) => {
         stores.orderedColumns.forEach((column) => {
           const item = column;
 
-          if (!props.columns[column.index].width && !item.resized) {
+          if (!props.columns[column.index]?.width && !item.resized) {
             item.width = 0;
           }
 
@@ -332,19 +343,21 @@ export const resizeEvent = (params) => {
 
       if (stores.orderedColumns[columnIndex]) {
         stores.orderedColumns[columnIndex].width = changedWidth;
-        stores.orderedColumns.forEach((column) => {
-          const item = column;
-          item.resized = true;
-          return item;
-        });
+        stores.orderedColumns[columnIndex].resized = true;
       }
 
       resizeInfo.showResizeLine = false;
       document.removeEventListener('mousemove', handleMouseMove);
       onResize();
+
+      const updatedColumns = getUpdatedColumns(stores);
       emit('resize-column', {
         column: stores.orderedColumns[columnIndex],
-        columns: stores.updatedColumns,
+        columns: updatedColumns,
+      });
+      emit('change-column-info', {
+        type: 'resize',
+        columns: updatedColumns,
       });
     };
 
@@ -630,6 +643,10 @@ export const contextMenuEvent = (params) => {
           click: () => {
             setColumnHidden(column.field);
             emit('change-column-status', {
+              columns: stores.updatedColumns,
+            });
+            emit('change-column-info', {
+              type: 'display',
               columns: stores.updatedColumns,
             });
           },

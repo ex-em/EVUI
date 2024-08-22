@@ -3,11 +3,12 @@
     <ul class="ev-menu-ul">
       <li
         v-for="(item, idx) in items"
+        v-show="!item.hidden"
         :key="`${item.value}_${idx}`"
         class="ev-menu-li"
-        :class="{ disabled: item.disabled }"
+        :class="{ disabled: item.disabled, [item.itemClass]: item.itemClass }"
         @click="handleItemClick(item)"
-        @mouseenter="mouseenterLi($event, item)"
+        @mouseenter="handleMouseEnter($event, item)"
       >
         <i
           v-if="!!item.iconClass"
@@ -77,7 +78,7 @@ export default {
       childrenItems,
 
       handleItemClick,
-      mouseenterLi,
+      handleMouseEnter,
       hideAll,
     } = useMenuList();
 
@@ -90,7 +91,7 @@ export default {
       childrenItems,
 
       handleItemClick,
-      mouseenterLi,
+      handleMouseEnter,
       hideAll,
     };
   },

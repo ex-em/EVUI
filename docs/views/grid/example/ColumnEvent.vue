@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <ev-grid
-      :columns="columns"
+      :columns="gridColumns"
       :rows="tableData"
       :width="widthMV"
       :height="heightMV"
@@ -14,10 +14,30 @@
       @resize-column="onResizeColumn"
       @change-column-order="onChangeColumnOrder"
       @change-column-status="onChangeColumnStatus"
+      @change-column-info="onChangeColumnInfo"
     />
     <!-- description -->
     <div class="description column-event-description">
+      <div class="form-row column-event-description__sort-type">
+        <span class="badge yellow">Initial Sorting Type of Column B</span>
+        <ev-text-field
+          model-value="desc"
+          class="component"
+          readonly
+        />
+      </div>
       <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
+            Change Grid Column Event
+          </span>
+          <ev-text-field
+            v-model="columnEventsInfo.info"
+            class="custom-text-area"
+            type="textarea"
+            readonly
+          />
+        </div>
         <div class="form-row">
           <span class="badge yellow">
             Resize Column Width
@@ -29,6 +49,8 @@
             readonly
           />
         </div>
+      </div>
+      <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
             Change Column Position
@@ -40,8 +62,6 @@
             readonly
           />
         </div>
-      </div>
-      <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
             Grid Column Setting(Column Show/Hide Status)
@@ -66,9 +86,9 @@ export default {
     const tableData = ref([]);
     const widthMV = ref('100%');
     const heightMV = ref(300);
-    const columns = ref([
+    const gridColumns = ref([
       { caption: 'A Column', field: 'aColumn', type: 'string' },
-      { caption: 'B Column', field: 'bColumn', type: 'string' },
+      { caption: 'B Column', field: 'bColumn', type: 'string', sortOption: { sortType: 'desc' } },
       { caption: 'C Column', field: 'cColumn', type: 'string' },
       { caption: 'D Column', field: 'dColumn', type: 'string', hiddenDisplay: true },
       { caption: 'E Column', field: 'eColumn', type: 'string' },
@@ -77,6 +97,7 @@ export default {
       resize: '',
       order: '',
       status: '',
+      info: '',
     });
     const getData = (count, startIndex) => {
       const temp = [];
@@ -94,6 +115,9 @@ export default {
 
     tableData.value = getData(10, 0);
 
+    const onChangeColumnInfo = (columnInfo) => {
+      columnEventsInfo.value.info = JSON.stringify(columnInfo, null, 2);
+    };
     const onResizeColumn = (columnInfo) => {
       columnEventsInfo.value.resize = JSON.stringify(columnInfo, null, 2);
     };
@@ -105,7 +129,7 @@ export default {
     };
 
     return {
-      columns,
+      gridColumns,
       tableData,
       widthMV,
       heightMV,
@@ -113,6 +137,7 @@ export default {
       onResizeColumn,
       onChangeColumnOrder,
       onChangeColumnStatus,
+      onChangeColumnInfo,
     };
   },
 };
@@ -146,6 +171,10 @@ export default {
 
   .ev-textarea {
     height: 200px !important;
+  }
+
+  &__sort-type {
+    margin-bottom: 5px;
   }
 }
 </style>

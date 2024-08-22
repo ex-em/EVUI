@@ -191,6 +191,7 @@
         <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
+          :custom-class="contextMenuClass"
           :items="contextMenuItems"
         />
         <ev-context-menu
@@ -239,7 +240,7 @@
   <column-setting
     v-model:is-show="isShowColumnSetting"
     v-model:is-show-menu-on-click="isShowMenuOnClick"
-    :columns="$props.columns"
+    :columns="updatedColumns"
     :hidden-column="hiddenColumn"
     :position="columnSettingPosition"
     :text-info="columnSettingTextInfo"
@@ -275,6 +276,7 @@ import {
   treeEvent,
   filterEvent,
   pagingEvent,
+  getUpdatedColumns,
 } from './uses';
 import {
   columnSettingEvent,
@@ -338,6 +340,7 @@ export default {
     'page-change': null,
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
+    'change-column-info': ({ type, columns }) => ({ type, columns }),
   },
   setup(props) {
     const toolbarRef = ref(null);
@@ -385,17 +388,14 @@ export default {
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
       treeRows: props.rows,
       filteredColumns: [],
-      originColumns: computed(() => props.columns.map((column, index) => ({ index, ...column }))),
+      originColumns: computed(() => props.columns.map((column, index) => ({
+        index,
+        hiddenDisplay: false,
+        ...column,
+      }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
         ? stores.filteredColumns : stores.originColumns)),
-      updatedColumns: computed(() => {
-        const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
-        const extraColumns = stores.originColumns?.filter(
-          column => !orderedColumnsIndexes.includes(column.index),
-        );
-        const copyOrderedColumns = stores.orderedColumns;
-        return [...copyOrderedColumns, ...extraColumns];
-      }),
+      updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
     const pageInfo = reactive({
       usePage: computed(() => (props.option.page?.use || false)),
@@ -453,6 +453,7 @@ export default {
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
+      contextMenuClass: props.option.customContextMenuClass || '',
       columnMenu: null,
       columnMenuItems: [],
       columnMenuTextInfo: props.option.columnMenuText || {},
@@ -650,22 +651,8 @@ export default {
 
     watch(
       () => props.columns,
-      (newColumns, prevColumns) => {
-        const isSameColumns = () => {
-          // Column의 field로 동일한 컬럼인지 확인
-          const newColumnsFields = newColumns.map(column => column.field);
-          const prevColumnsFields = prevColumns.map(column => column.field);
-          return prevColumnsFields.every(field => newColumnsFields.includes(field));
-        };
-
-        if (newColumns.length !== prevColumns.length || !isSameColumns()) {
-          initColumnSettingInfo();
-        } else if (stores.filteredColumns.length) {
-          // 새로운 컬럼 기준으로 filteredColumns 를 업데이트 한다.
-          stores.filteredColumns = newColumns.filter(
-            column => !column.hidden && !column.hiddenDisplay,
-          );
-        }
+      () => {
+        initColumnSettingInfo();
       }, { deep: true },
     );
     watch(
@@ -811,7 +798,7 @@ export default {
         stores.orderedColumns.map((column) => {
           const item = column;
 
-          if (!props.columns[column.index].width && !item.resized) {
+          if (!props.columns[column.index]?.width && !item.resized) {
             item.width = 0;
           }
 

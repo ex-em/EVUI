@@ -65,6 +65,25 @@
     </div>
   </div>
   <div class="case">
+    <p class="case-title">Custom Filterable Select</p>
+    <ev-select
+      v-model="selectVal1"
+      :items="items1"
+      multiple
+      filterable
+    >
+      <template #search-filter="{ item }">
+        <div :class="item.class">
+          <span>Custom : </span>
+          <input :value="item.value" @input="item.onInput"/>
+        </div>
+      </template>
+    </ev-select>
+    <div class="description">
+      first selectbox value : {{ selectVal1 }}
+    </div>
+  </div>
+  <div class="case">
     <p class="case-title">Multiple Checkable Select</p>
     <ev-select
       v-model="selectVal1"
