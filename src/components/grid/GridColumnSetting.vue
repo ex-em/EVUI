@@ -26,7 +26,7 @@
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
                 :label="column?.text"
-                :disabled="$props.disabledColumn.includes(column?.text)"
+                :disabled="!!column?.fixed"
                 :tooltip-title="column?.label ?? ''"
               >
                 {{ column?.label }}
@@ -80,10 +80,6 @@ export default {
     hiddenColumn: {
       type: String,
       default: '',
-    },
-    disabledColumn: {
-      type: [Array],
-      default: () => [],
     },
     position: {
       type: Object,
@@ -215,6 +211,7 @@ export default {
             text: col.field,
             originChecked: !col.hiddenDisplay,
             checked: isChecked,
+            fixed: col.fixed,
           };
         });
 
