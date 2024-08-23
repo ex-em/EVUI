@@ -1,5 +1,5 @@
-import { numberWithComma } from '@/common/utils';
 import dayjs from 'dayjs';
+import { numberWithComma } from '@/common/utils';
 import Canvas from '../helpers/helpers.canvas';
 import { truthyNumber } from '../../../common/utils';
 
@@ -12,12 +12,19 @@ const modules = {
    */
   drawTips(tipLocationInfo) {
     const opt = this.options;
+    let tooltipValueFormatter = null;
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
     const selTipOpt = opt.selectItem;
     const labelTipOpt = opt.selectLabel;
     let maxArgs;
     let isExistSelectedLabel;
+
+    if (typeof opt.tooltip?.formatter === 'function') {
+      tooltipValueFormatter = opt.tooltip?.formatter;
+    } else if (typeof opt.tooltip?.formatter?.value === 'function') {
+      tooltipValueFormatter = opt.tooltip?.formatter?.value;
+    }
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
       const isHeatMap = opt.type === 'heatMap';
@@ -84,7 +91,13 @@ const modules = {
       maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
 
       if (maxTipOpt.use && maxArgs) {
-        maxArgs.text = numberWithComma(maxArgs.value);
+        if (tooltipValueFormatter) {
+          maxArgs.text = isHorizontal
+            ? tooltipValueFormatter({ x: maxArgs.value })
+            : tooltipValueFormatter({ y: maxArgs.value });
+        } else {
+          maxArgs.text = numberWithComma(maxArgs.value);
+        }
         this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
 
         if (maxTipOpt.showIndicator) {
