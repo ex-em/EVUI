@@ -67,6 +67,10 @@ const modules = {
           label,
           mousePosition: [e.clientX, e.clientY],
         };
+      } else {
+        args.hoveredLabel = {
+          label: '',
+        };
       }
 
       if (typeof this.listeners['mouse-move'] === 'function') {
