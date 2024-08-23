@@ -26,6 +26,7 @@
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
                 :label="column?.text"
+                :disabled="!!column?.fixed"
                 :tooltip-title="column?.label ?? ''"
               >
                 {{ column?.label }}
@@ -210,6 +211,7 @@ export default {
             text: col.field,
             originChecked: !col.hiddenDisplay,
             checked: isChecked,
+            fixed: col.fixed,
           };
         });
 

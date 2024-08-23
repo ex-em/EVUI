@@ -278,7 +278,7 @@ export default {
       },
     ]);
     const columns = ref([
-      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
+      { caption: 'Name', field: 'userName', type: 'string', width: 80, fixed: true },
       { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
       { caption: 'number', field: 'number', type: 'number', width: 80 },
       { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
