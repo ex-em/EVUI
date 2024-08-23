@@ -12,15 +12,19 @@ const modules = {
    */
   drawTips(tipLocationInfo) {
     const opt = this.options;
-    const tooltipValueFormatter = typeof opt.tooltip?.formatter === 'function'
-      ? opt.tooltip?.formatter
-      : opt.tooltip?.formatter?.value;
+    let tooltipValueFormatter = null;
     const isHorizontal = !!opt.horizontal;
     const maxTipOpt = opt.maxTip;
     const selTipOpt = opt.selectItem;
     const labelTipOpt = opt.selectLabel;
     let maxArgs;
     let isExistSelectedLabel;
+
+    if (typeof opt.tooltip?.formatter === 'function') {
+      tooltipValueFormatter = opt.tooltip?.formatter;
+    } else if (typeof opt.tooltip?.formatter?.value === 'function') {
+      tooltipValueFormatter = opt.tooltip?.formatter?.value;
+    }
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
       const isHeatMap = opt.type === 'heatMap';
