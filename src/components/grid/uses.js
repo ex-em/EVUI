@@ -1180,13 +1180,13 @@ export const contextMenuEvent = (params) => {
             });
           },
           disabled: !filterable,
-          hidden: contextInfo.hiddenColumnMenuItem?.filter,
+          hidden: contextInfo.hiddenColumnMenuItem?.filter || !filterInfo.isFiltering,
         },
         {
           text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
           iconClass: 'ev-icon-visibility-off',
-          disabled: (!useGridSetting.value || stores.orderedColumns.length === 1) || column.fixed,
-          hidden: contextInfo.hiddenColumnMenuItem?.hide,
+          disabled: !useGridSetting.value || stores.orderedColumns.length === 1 || column.fixed,
+          hidden: contextInfo.hiddenColumnMenuItem?.hide || !useGridSetting.value,
           click: () => {
             setColumnHidden(column.field);
             emit('change-column-status', {
@@ -1201,7 +1201,7 @@ export const contextMenuEvent = (params) => {
         },
       ];
       contextInfo.columnMenuItems = [];
-      if (!sortable && !filterable) {
+      if (!sortable && !filterable && !useGridSetting.value) {
         return;
       }
       contextInfo.columnMenuItems = columnMenuItems.filter(item => !item.hidden);
