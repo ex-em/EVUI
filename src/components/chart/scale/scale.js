@@ -355,6 +355,7 @@ class Scale {
               && options?.selectItem?.showLabelTip
               && hitInfo?.label
               && !this.options?.horizontal) {
+              debugger;
               const selectedLabel = this.getLabelFormat(
                 Math.min(axisMax, hitInfo.label + (0 * stepValue)),
               );
