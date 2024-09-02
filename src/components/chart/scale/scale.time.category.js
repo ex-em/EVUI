@@ -13,13 +13,13 @@ class TimeCategoryScale extends Scale {
   /**
    * Transforming label by designated format
    * @param {number} value                   label value
-   * @param {boolean} isMaxValueSameAsMin    is default max value same as min value
+   * @param {object} data                    data for formatting
    *
    * @returns {string} formatted label
    */
-  getLabelFormat(value, isMaxValueSameAsMin) {
+  getLabelFormat(value, data = {}) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value, isMaxValueSameAsMin);
+      const formattedLabel = this.formatter(value, data);
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;
@@ -187,14 +187,24 @@ class TimeCategoryScale extends Scale {
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
       linePosition = labelCenter + aliasPixel;
-      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+
+      let prev;
+      for (let jx = 0; jx < ticks.length; jx++) {
+        if (ticks[jx] !== undefined && jx !== ix) {
+          prev = ticks[jx];
+        }
+      }
+
+      labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), { prev });
 
       const isBlurredLabel = this.options?.selectLabel?.use
         && this.options?.selectLabel?.useLabelOpacity
         && (this.options.horizontal === (this.type === 'y'))
         && selectLabelInfo?.dataIndex?.length
         && !selectLabelInfo?.label
-          .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
+          .map((t, index) => this.getLabelFormat(Math.min(axisMax, t), {
+            prev: selectLabelInfo?.label[index - 1] ?? '',
+          })).includes(labelText);
 
       const labelColor = this.labelStyle.color;
       let defaultOpacity = 1;

@@ -21,11 +21,11 @@
     setup() {
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-          series3: { name: 'series#3' },
-          series4: { name: 'series#4' },
-          series5: { name: 'series#5' },
+          series1: { name: 'series#1', point: false },
+          series2: { name: 'series#2', point: false },
+          series3: { name: 'series#3', point: false },
+          series4: { name: 'series#4', point: false },
+          series5: { name: 'series#5', point: false },
         },
         labels: [],
         data: {
@@ -54,8 +54,21 @@
         },
         axesX: [{
           type: 'time',
-          timeFormat: 'HH:mm:ss',
-          interval: 'second',
+          timeFormat: 'DD HH:mm',
+          interval: 'hour',
+          formatter: (value, data) => {
+            if (data?.prev) {
+              const curr = dayjs(value).format('yy-MM-DD');
+              const prev = dayjs(data?.prev).format('yy-MM-DD');
+              if (curr === prev) {
+                return dayjs(value)
+                    .format('HH:mm');
+              }
+            }
+
+            return dayjs(value)
+                .format('DD HH:mm');
+          },
         }],
         axesY: [{
           type: 'linear',
@@ -74,7 +87,7 @@
           chartData.labels.shift();
         }
 
-        timeValue = dayjs(timeValue).add(1, 'second');
+        timeValue = dayjs(timeValue).add(1, 'hour');
         chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {

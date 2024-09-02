@@ -347,12 +347,13 @@ class StepScale extends Scale {
    * Transforming label by designated format
    * @param {string} value       label value
    * @param {number} maxWidth    max width for each label
+   * @param {object} data        data for formatting
    *
    * @returns {string} formatted label
    */
-  getLabelFormat(value, maxWidth) {
+  getLabelFormat(value, maxWidth, data = {}) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value);
+      const formattedLabel = this.formatter(value, data);
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;

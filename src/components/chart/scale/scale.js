@@ -100,7 +100,9 @@ class Scale {
     }
 
     const minLabel = this.getLabelFormat(minValue);
-    const maxLabel = this.getLabelFormat(maxValue, isDefaultMaxSameAsMin);
+    const maxLabel = this.getLabelFormat(maxValue, {
+      isMaxValueSameAsMin: isDefaultMaxSameAsMin,
+    });
 
     return {
       min: minValue,
@@ -319,14 +321,18 @@ class Scale {
           ticks[ix] = axisMinForLabel + (ix * stepValue);
 
           linePosition = labelCenter + aliasPixel;
-          labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]));
+          labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
+            prev: ticks[ix - 1] ?? '',
+          });
 
           const isBlurredLabel = this.options?.selectLabel?.use
             && this.options?.selectLabel?.useLabelOpacity
             && (this.options.horizontal === (this.type === 'y'))
             && selectLabelInfo?.dataIndex?.length
             && !selectLabelInfo?.label
-              .map(t => this.getLabelFormat(Math.min(axisMax, t))).includes(labelText);
+              .map((t, index) => this.getLabelFormat(Math.min(axisMax, t), {
+                prev: selectLabelInfo?.label[index - 1] ?? '',
+              })).includes(labelText);
 
           const labelColor = this.labelStyle.color;
           let defaultOpacity = 1;
@@ -349,6 +355,7 @@ class Scale {
               && options?.selectItem?.showLabelTip
               && hitInfo?.label
               && !this.options?.horizontal) {
+              debugger;
               const selectedLabel = this.getLabelFormat(
                 Math.min(axisMax, hitInfo.label + (0 * stepValue)),
               );
