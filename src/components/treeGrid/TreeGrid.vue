@@ -83,6 +83,52 @@
                 @click.prevent="columnMenu.show"
               >
                 {{ column.caption }}
+                <!-- Sort Icon -->
+                <span @click.stop="onSort(column)">
+                  <template v-if="!!$slots.sortIcon">
+                    <span
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      class="column-sort__icon column-sort__icon--basic"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    >
+                      <slot name="sortIcon" />
+                    </span>
+                    <span
+                      v-if="isSortedColumn(column)"
+                      :class="sortIconClass(column)"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    >
+                      <slot :name="`sortIcon_${sortOrder}`" />
+                    </span>
+                  </template>
+                  <template v-else>
+                    <grid-sort-button
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      class="column-sort__icon column-sort__icon--basic"
+                      :icon="'basic'"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
+                    />
+                    <grid-sort-button
+                      v-if="isSortedColumn(column)"
+                      :class="sortIconClass(column)"
+                      :icon="sortOrder"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                        visibility: !!sortOrder ? column.hidden : true,
+                      }"
+                    />
+                  </template>
+                </span>
               </span>
               <!-- Column Resize -->
               <span
@@ -265,6 +311,7 @@ import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
 import GridSummary from '../grid/GridSummary';
 import ColumnSetting from '../grid/GridColumnSetting.vue';
+import GridSortButton from '../grid/icon/icon-sort-button';
 import GridOptionButton from '../grid/icon/icon-option-button.vue';
 import {
   commonFunctions,
@@ -277,6 +324,7 @@ import {
   filterEvent,
   pagingEvent,
   getUpdatedColumns,
+  sortEvent,
 } from './uses';
 import {
   columnSettingEvent,
@@ -290,6 +338,7 @@ export default {
     GridPagination,
     GridSummary,
     ColumnSetting,
+    GridSortButton,
     GridOptionButton,
   },
   props: {
@@ -392,6 +441,9 @@ export default {
         index,
         hiddenDisplay: false,
         ...column,
+        sortOption: {
+           sortType: column?.sortOption?.sortType || 'init',
+        },
       }))),
       orderedColumns: computed(() => (stores.filteredColumns.length
         ? stores.filteredColumns : stores.originColumns)),
@@ -450,6 +502,13 @@ export default {
       }),
       multiple: computed(() => props.option?.useSelection?.multiple ?? false),
     });
+    const sortInfo = reactive({
+      isSorting: false,
+      sortField: '',
+      sortOrder: '',
+      sortColumn: {},
+      sortFunction: props.option.customAscFunction ?? {},
+    });
     const contextInfo = reactive({
       menu: null,
       contextMenuItems: [],
@@ -506,6 +565,7 @@ export default {
     } = pagingEvent({
       stores,
       pageInfo,
+      sortInfo,
       filterInfo,
       elementInfo,
       clearCheckInfo,
@@ -563,6 +623,8 @@ export default {
       setTreeNodeStore,
       handleExpand,
     } = treeEvent({ stores, onResize });
+
+    const { onSort } = sortEvent({ sortInfo, stores, updatePagingInfo });
 
     const {
       onSearch,
@@ -848,6 +910,15 @@ export default {
         });
       },
     );
+
+    const isSortedColumn = column => sortInfo.sortField === column.field;
+
+    const sortIconClass = () => ({
+      'column-sort__icon': true,
+      'column-sort__icon--asc': sortInfo.sortOrder === 'asc',
+      'column-sort__icon--desc': sortInfo.sortOrder === 'desc',
+    });
+
     const gridStyle = computed(() => ({
       width: resizeInfo.gridWidth,
       height: resizeInfo.gridHeight,
@@ -922,6 +993,7 @@ export default {
       ...toRefs(resizeInfo),
       ...toRefs(selectInfo),
       ...toRefs(checkInfo),
+      ...toRefs(sortInfo),
       ...toRefs(contextInfo),
       ...toRefs(pageInfo),
       ...toRefs(columnSettingInfo),
@@ -951,6 +1023,9 @@ export default {
       setGridSetting,
       onApplyColumn,
       onColumnContextMenu,
+      onSort,
+      isSortedColumn,
+      sortIconClass,
     };
   },
 };

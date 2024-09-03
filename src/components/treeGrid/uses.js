@@ -606,6 +606,7 @@ export const contextMenuEvent = (params) => {
     useGridSetting,
     columnSettingInfo,
     setColumnHidden,
+    onSort,
   } = params;
   /**
    * 컨텍스트 메뉴를 설정한다.
@@ -635,6 +636,7 @@ export const contextMenuEvent = (params) => {
   };
   const onColumnContextMenu = (event, column) => {
     if (event.target.className.includes('column-name--click')) {
+      const sortable = column.sortable === undefined ? true : column.sortable;
       contextInfo.columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
@@ -650,6 +652,20 @@ export const contextMenuEvent = (params) => {
               columns: stores.updatedColumns,
             });
           },
+        },
+        {
+          text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
+          iconClass: 'ev-icon-allow2-up',
+          disabled: !sortable,
+          hidden: contextInfo.hiddenColumnMenuItem?.ascending,
+          click: () => onSort(column, 'asc'),
+        },
+        {
+          text: contextInfo.columnMenuTextInfo?.descending ?? 'Descending',
+          iconClass: 'ev-icon-allow2-down',
+          disabled: !sortable,
+          hidden: contextInfo.hiddenColumnMenuItem?.descending,
+          click: () => onSort(column, 'desc'),
         },
       ];
     } else {
@@ -922,6 +938,7 @@ export const pagingEvent = (params) => {
   const {
     stores,
     pageInfo,
+    sortInfo,
     filterInfo,
     elementInfo,
     clearCheckInfo,
@@ -940,6 +957,10 @@ export const pagingEvent = (params) => {
         startIndex: pageInfo.startIndex,
         total: pageInfo.pageTotal,
         perPage: pageInfo.perPage,
+      },
+      sortInfo: {
+        field: sortInfo.sortField,
+        order: sortInfo.sortOrder,
       },
       searchInfo: {
         searchWord: filterInfo.searchWord,
@@ -970,4 +991,138 @@ export const pagingEvent = (params) => {
     updatePagingInfo({ onChangePage: true });
   };
   return { getPagingData, updatePagingInfo, changePage };
+};
+
+export const sortEvent = (params) => {
+  const { sortInfo, stores, updatePagingInfo } = params;
+  const { emit } = getCurrentInstance();
+
+  const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
+
+  function OrderQueue() {
+    this.orders = getDefaultSortType();
+    this.dequeue = () => this.orders.shift();
+    this.enqueue = o => this.orders.push(o);
+  }
+
+  const setSortOptionToOrderedColumns = (column, sortType = 'init') => {
+    stores.orderedColumns.forEach((orderedColumn) => {
+      if (orderedColumn.index === column?.index && sortType) {
+        orderedColumn.sortOption = { sortType };
+      } else {
+        orderedColumn.sortOption = { sortType: 'init' };
+      }
+    });
+  };
+
+  const initializeHiddenColumnsSortType = () => {
+    const hiddenColumns = stores.originColumns.filter(col => col.hiddenDisplay || col.hide);
+    if (hiddenColumns.length) {
+      hiddenColumns.forEach((col) => {
+        col.sortOption = { sortType: 'init' };
+      });
+    }
+  };
+
+  const order = new OrderQueue();
+
+  const setSortInfo = (column, emitTriggered = true) => {
+    const { sortType } = column?.sortOption || {};
+    sortInfo.sortColumn = column;
+    sortInfo.sortField = column?.field;
+    sortInfo.sortOrder = sortType;
+    sortInfo.isSorting = !!(sortType);
+
+    if (emitTriggered) {
+      setSortOptionToOrderedColumns(column, sortType);
+
+      emit('change-column-info', {
+        type: 'sort',
+        columns: getUpdatedColumns(stores),
+      });
+    }
+  };
+
+  const onSort = (column, sortOrder) => {
+    const sortable = column.sortable === undefined ? true : column.sortable;
+    if (sortable) {
+      sortInfo.sortColumn = column;
+      if (sortInfo.sortField !== column?.field) {
+        order.orders = getDefaultSortType();
+        sortInfo.sortField = column?.field;
+      }
+      if (sortOrder) {
+        order.orders = getDefaultSortType();
+        if (sortOrder === 'desc') {
+          sortInfo.sortOrder = order.dequeue();
+          order.enqueue(sortInfo.sortOrder);
+        }
+      }
+      sortInfo.sortOrder = order.dequeue();
+      order.enqueue(sortInfo.sortOrder);
+
+      sortInfo.isSorting = true;
+      updatePagingInfo({ onSort: true });
+
+      initializeHiddenColumnsSortType();
+      setSortOptionToOrderedColumns(column, sortInfo.sortOrder);
+
+      const updatedColumInfo = getUpdatedColumns(stores);
+      emit('sort-column', {
+        field: sortInfo.sortField,
+        order: sortInfo.sortOrder,
+        column: sortInfo.sortColumn,
+        columns: updatedColumInfo,
+      });
+
+      emit('change-column-info', {
+        type: 'sort',
+        columns: updatedColumInfo,
+      });
+
+      const compareValues = (nodeA, nodeB) => {
+        const valueA = nodeA.data[sortInfo.sortField];
+        const valueB = nodeB.data[sortInfo.sortField];
+
+        if (valueA === valueB) return 0;
+
+        const isAscending = sortInfo.sortOrder === 'asc';
+
+        if (isAscending) return valueA > valueB ? 1 : -1;
+
+        return valueA < valueB ? 1 : -1;
+      };
+
+
+      const sortTree = (nodes, depth = 0) => {
+        const groupedNodes = {};
+
+        nodes.forEach((node) => {
+          const nodeDepth = node.level || depth;
+          if (!groupedNodes[nodeDepth]) {
+            groupedNodes[nodeDepth] = [];
+          }
+          groupedNodes[nodeDepth].push(node);
+        });
+
+        Object.keys(groupedNodes).forEach((key) => {
+          groupedNodes[key].sort(compareValues);
+        });
+
+        nodes.length = 0;
+        Object.values(groupedNodes).forEach((group) => {
+          group.forEach((node) => {
+            nodes.push(node);
+            if (node.hasChild) {
+              sortTree(node.children, node.level + 1);
+            }
+          });
+        });
+      };
+      sortTree(stores.treeRows);
+      stores.treeStore = stores.treeRows;
+    }
+  };
+
+  return { onSort, setSortInfo };
 };
