@@ -338,11 +338,40 @@ const modules = {
      *
      * @returns {undefined}
      */
+    this.onMouseDownHeatMap = (e) => {
+      const { selectLabel: selectLabelOpt, dragSelection: dragSelectionOpt } = this.options;
+
+      const offset = this.getMousePosition(e);
+      const location = this.getCurMouseLocation(offset);
+
+      const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+      const useKeepDisplay = dragSelectionOpt?.keepDisplay;
+
+      if (location === 'xAxis' || location === 'yAxis') {
+        if (useSelectLabel) {
+          this.removeSelectionArea();
+        }
+      } else if (useKeepDisplay) {
+        if (location !== 'canvas') {
+          this.removeSelectionArea();
+        }
+      } else {
+        this.removeSelectionArea();
+      }
+    };
+
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
-        this.removeSelectionArea();
+        switch (type) {
+          case 'heatMap':
+            this.onMouseDownHeatMap(e);
+            break;
+          default:
+            this.removeSelectionArea();
+        }
+
         this.dragStart(e, type);
       }
     };
@@ -445,6 +474,22 @@ const modules = {
       }
 
       if (type === 'heatMap') {
+        const { selectLabel: selectLabelOpt, dragSelection: dragSelectionOpt } = this.options;
+
+        const offset = this.getMousePosition(e);
+        const location = this.getCurMouseLocation(offset);
+
+        const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+        const useKeepDisplay = dragSelectionOpt?.keepDisplay;
+
+        if (useKeepDisplay && location === 'canvas') {
+          return;
+        }
+
+        if (!useSelectLabel && (location === 'xAxis' || location === 'yAxis')) {
+          return;
+        }
+
         const rangeInfo = { xcp, xep, ycp, yep, range: aRange };
         const { xsp, ysp, width, height } = this.getDragInfoForHeatMap(rangeInfo);
         dragInfo.xsp = xsp;
