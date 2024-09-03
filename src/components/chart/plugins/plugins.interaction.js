@@ -475,6 +475,7 @@ const modules = {
 
       if (type === 'heatMap') {
         const { selectLabel: selectLabelOpt, dragSelection: dragSelectionOpt } = this.options;
+        const { targetAxis } = this.defaultSelectInfo;
 
         const offset = this.getMousePosition(e);
         const location = this.getCurMouseLocation(offset);
@@ -488,6 +489,11 @@ const modules = {
 
         if (!useSelectLabel && (location === 'xAxis' || location === 'yAxis')) {
           return;
+        }
+
+        if (targetAxis) {
+          this.clearSelectedLabelInfo();
+          this.render();
         }
 
         const rangeInfo = { xcp, xep, ycp, yep, range: aRange };
