@@ -5,13 +5,13 @@ class LinearScale extends Scale {
   /**
    * Transforming label by designated format
    * @param {number} value                   label value
-   * @param {boolean} isMaxValueSameAsMin    is default max value same as min value
+   * @param {object} data                   data for formatting
    *
    * @returns {string} formatted label
    */
-  getLabelFormat(value, isMaxValueSameAsMin) {
+  getLabelFormat(value, data = {}) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value, isMaxValueSameAsMin);
+      const formattedLabel = this.formatter(value, data);
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;

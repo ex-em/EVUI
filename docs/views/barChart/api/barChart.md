@@ -150,7 +150,7 @@ const chartData = {
 | labelStyle     | Object   | ([상세](#labelstyle))  | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
 | plotLines      | Array    | ([상세](#plotline))    | plot line(임계선 표시 용도) 설정                                                                   |                                                                                          |
 | plotBands      | Array    | ([상세](#plotband))    | plot band(임계영역 표시 용도) 설정                                                                 |                                                                                          |
-| formatter      | function | null                   | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                            | (value) => value + '%'                                                                   |
+| formatter      | function | null                | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                   | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
 | title          | Object   | ([상세](#title))       | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
 
 ##### axesX
