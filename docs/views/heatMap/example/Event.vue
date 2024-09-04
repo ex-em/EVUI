@@ -144,6 +144,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
       const selectionRange = ref({});
       const clickedSelectLabel = ref({
         dataIndex: [],
+        targetAxis: 'xAxis',
       });
 
       const onDragSelect = ({ data, range }) => {

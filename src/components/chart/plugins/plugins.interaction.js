@@ -2,6 +2,7 @@ import { numberWithComma } from '@/common/utils';
 import throttle from '@/common/utils.throttle';
 import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
 import dayjs from 'dayjs';
+import { target } from 'vue-router/dist/vue-router.cjs.prod';
 
 const modules = {
   /**
@@ -346,10 +347,19 @@ const modules = {
 
       const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
       const useKeepDisplay = dragSelectionOpt?.keepDisplay;
+      const useBothAxis = selectLabelOpt?.useBothAxis;
 
       if (location === 'xAxis' || location === 'yAxis') {
         if (useSelectLabel) {
-          this.removeSelectionArea();
+          if (useBothAxis) {
+            this.removeSelectionArea();
+          } else {
+            const { targetAxis } = this.defaultSelectInfo;
+
+            if (targetAxis) {
+              this.removeSelectionArea();
+            }
+          }
         }
       } else if (useKeepDisplay) {
         if (location !== 'canvas') {
@@ -474,22 +484,14 @@ const modules = {
       }
 
       if (type === 'heatMap') {
-        const { selectLabel: selectLabelOpt, dragSelection: dragSelectionOpt } = this.options;
-        const { targetAxis } = this.defaultSelectInfo;
-
         const offset = this.getMousePosition(e);
         const location = this.getCurMouseLocation(offset);
 
-        const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
-        const useKeepDisplay = dragSelectionOpt?.keepDisplay;
-
-        if (useKeepDisplay && location === 'canvas') {
+        if (location !== 'chartBackground') {
           return;
         }
 
-        if (!useSelectLabel && (location === 'xAxis' || location === 'yAxis')) {
-          return;
-        }
+        const { targetAxis } = this.defaultSelectInfo;
 
         if (targetAxis) {
           this.clearSelectedLabelInfo();
