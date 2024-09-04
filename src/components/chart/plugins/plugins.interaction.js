@@ -247,13 +247,29 @@ const modules = {
               this.clearSelectedItemInfo();
               args.deselected = { eventTarget: 'item' };
 
-              if (!useBothAxis) {
-                const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
-                if (location !== selectLabelAxis) {
-                  return;
+              if (useSelectLabel) {
+                if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
+                  const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+                  if (location !== selectLabelAxis) {
+                    return;
+                  }
                 }
+
+                this.removeSelectionArea();
+
+                if (location !== 'canvas') {
+                  setSelectedLabelInfo(location);
+                }
+              } else {
+                if (!useBothAxis) {
+                  const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+                  if (location !== selectLabelAxis) {
+                    return;
+                  }
+                }
+
+                setSelectedLabelInfo(location);
               }
-              setSelectedLabelInfo(location);
             }
           } else if (useSelectItem) {
             setSelectedItemInfo();
