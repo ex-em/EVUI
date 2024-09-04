@@ -83,22 +83,22 @@ const chartData =
   
 #### axesX axesY
 ##### type 공통
-  | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-  |------------ |-----------|---------|-------------------------|---------------------------------------------------|
+  | 이름 | 타입 | 디폴트 | 설명 | 종류(예시)                                               |
+  |------------ |-----------|---------|-------------------------|------------------------------------------------------|
   | type | String | | 축의 유형 | [time](#time-type)(categoryMode), [step](#step-type) |
-  | showAxis | Boolean | true | 축 표시 여부 | true / false | 
-  | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
-  | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
-  | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
-  | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
-  | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
-  | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
-  | range | Array | null | 축에 표시할 값의 min, max  (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [time](#time-type), [step](#step-type) |
-  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) | |
-  | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 | |
-  | formatter | function | null | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용   | (value) => value + '%' |
-  | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 | |  
-  | scrollbar | Object | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.) | |
+  | showAxis | Boolean | true | 축 표시 여부 | true / false                                         | 
+  | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false                                         |
+  | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9                                            |
+  | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false                                         |
+  | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~                                                  |
+  | axisLineColor | String | '#C9CFDC' | 축의 색상 |                                                      | 
+  | gridLineColor | String | '#C9CFDC' | 그리드의 색상 |                                                      | 
+  | range | Array | null | 축에 표시할 값의 min, max  (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [time](#time-type), [step](#step-type)               |
+  | interval | String/number | | 축에 표시되는 값의 간격 단위 ( time: string / linear: number) |                                                      |
+  | labelStyle | Object | ([상세](#label-style)) | 라벨의 폰트 스타일을 설정 |                                                      |
+  | formatter      | function | null                | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                   | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
+  | title | Object | ([상세](#axes-title)) | 라벨의 폰트 스타일을 설정 |                                                      |  
+  | scrollbar | Object | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.) |                                                      |
 
 ##### time type
    - interval (Axis Label 표기를 위한 interval)

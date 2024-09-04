@@ -37,8 +37,21 @@
           type: 'time',
           showGrid: false,
           categoryMode: true,
-          timeFormat: 'mm:ss',
-          interval: 'second',
+          timeFormat: 'DD HH:mm',
+          interval: 'hour',
+          formatter: (value, data) => {
+            if (data?.prev) {
+              const curr = dayjs(value).format('yy-MM-DD');
+              const prev = dayjs(data?.prev).format('yy-MM-DD');
+              if (curr === prev) {
+                return dayjs(value)
+                    .format('HH:mm');
+              }
+            }
+
+            return dayjs(value)
+                .format('DD HH:mm');
+          },
         }],
         axesY: [{
           type: 'linear',
@@ -76,7 +89,7 @@
           chartData.labels.shift();
         }
 
-        timeValue = dayjs(timeValue).add(1, 'second');
+        timeValue = dayjs(timeValue).add(1, 'hour');
         chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {
@@ -89,7 +102,7 @@
       };
 
       onMounted(() => {
-        for (let ix = 0; ix < 10; ix++) {
+        for (let ix = 0; ix < 60; ix++) {
           addRandomChartData();
         }
       });
