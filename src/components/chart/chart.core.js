@@ -825,7 +825,10 @@ class EvChart {
     // Tooltip Update
     if (updateTooltipFormatter) {
       this.tooltipDOM.innerHTML = '';
-      this.createTooltipDOM();
+
+      if (!options.tooltip?.formatter?.html) {
+        this.setDefaultTooltipLayout();
+      }
     }
 
     this.chartRect = this.getChartRect();
