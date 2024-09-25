@@ -336,6 +336,7 @@ import {
 import {
   columnSettingEvent,
 } from '../grid/uses';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
 
 export default {
   name: 'EvTreeGrid',
@@ -347,6 +348,9 @@ export default {
     ColumnSetting,
     GridSortButton,
     GridOptionButton,
+  },
+  directives: {
+    observeVisibility: vObserveVisibility,
   },
   props: {
     columns: {

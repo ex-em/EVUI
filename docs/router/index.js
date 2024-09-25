@@ -351,12 +351,12 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
-    component: () => import(/* webpackChunkName: "pageNotFound" */ '../views/PageNotFound'),
+    component: () => import( '../views/PageNotFound'),
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to) {
     // hash 가 존재하는 경우 hash 위치로 스크롤 하되, header 높이만큼 더 올려야 한다.

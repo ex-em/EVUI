@@ -33,7 +33,7 @@
 }
 @mixin state($state) {
   @at-root {
-    &.#{$state} {
+    .#{$state} {
       @content;
     }
   }
