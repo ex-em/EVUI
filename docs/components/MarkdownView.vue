@@ -11,7 +11,7 @@
 
 <script>
 import { computed } from 'vue';
-import marked from 'marked';
+import { marked } from 'marked';
 import highlight from 'docs/directives/highlight';
 
 export default {

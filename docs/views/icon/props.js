@@ -1,7 +1,7 @@
-import { parseComponent } from 'vue-template-compiler';
-import mdText from '!!raw-loader!./api/icon.md';
+import { parse } from '@vue/compiler-sfc';
+import mdText from './api/icon.md?raw';
 import Default from './example/Default';
-import DefaultRaw from '!!raw-loader!./example/Default';
+import DefaultRaw from './example/Default?raw';
 
 export default {
   mdText,
@@ -9,7 +9,7 @@ export default {
     Default: {
       description: 'EVUI에서 제공하는 아이콘입니다.',
       component: Default,
-      parsedData: parseComponent(DefaultRaw),
+      parsedData: parse(DefaultRaw).descriptor,
     },
   },
 };

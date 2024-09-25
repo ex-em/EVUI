@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    es2022: true,
   },
   extends: [
     'plugin:vue/vue3-essential',
@@ -9,9 +10,6 @@ module.exports = {
     'eslint:recommended',
     'exem',
   ],
-  parserOptions: {
-    parser: 'babel-eslint',
-  },
   rules: {
     'import/no-extraneous-dependencies': [
       'warn',
@@ -623,9 +621,6 @@ module.exports = {
         '**/__tests__/*.{j,t}s?(x)',
         '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
-      env: {
-        jest: true,
-      },
     },
   ],
 };

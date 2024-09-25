@@ -92,9 +92,13 @@ import {
   provide, triggerRef,
   onBeforeUpdate, nextTick,
 } from 'vue';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
 
 export default {
   name: 'EvTabs',
+  directives: {
+    observeVisibility: vObserveVisibility,
+  },
   props: {
     modelValue: {
       type: [String, Number],

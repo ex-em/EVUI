@@ -17,14 +17,14 @@
 </template>
 <script>
 import { defineAsyncComponent } from 'vue';
-import { parseComponent } from 'vue-template-compiler';
+import { parse } from '@vue/compiler-sfc';
 import Example from 'docs/components/Example';
 import MarkdownView from 'docs/components/MarkdownView';
 import Default from './example/Default';
-import DefaultRaw from '!!raw-loader!./example/Default';
+import DefaultRaw from './example/Default?raw';
 import RadioGroup from './example/RadioGroup';
-import RadioGroupRaw from '!!raw-loader!./example/RadioGroup';
-import RadioMd from '!!raw-loader!./api/radio.md';
+import RadioGroupRaw from './example/RadioGroup?raw';
+import RadioMd from './api/radio.md?raw';
 
 export default {
   name: 'Radio',
@@ -42,8 +42,8 @@ export default {
         component: defineAsyncComponent(() => Promise.resolve(Default)),
         url: './docs/views/radio/example/Default.vue',
         codeText: {
-          template: parseComponent(DefaultRaw)?.template?.content,
-          script: parseComponent(DefaultRaw)?.script?.content,
+          template: parse(DefaultRaw).descriptor?.template?.content,
+          script: parse(DefaultRaw).descriptor?.script?.content,
         },
       },
       {
@@ -52,8 +52,8 @@ export default {
         component: defineAsyncComponent(() => Promise.resolve(RadioGroup)),
         url: './docs/views/radio/example/RadioGroup.vue',
         codeText: {
-          template: parseComponent(RadioGroupRaw)?.template?.content,
-          script: parseComponent(RadioGroupRaw)?.script?.content,
+          template: parse(RadioGroupRaw).descriptor?.template?.content,
+          script: parse(RadioGroupRaw).descriptor?.script?.content,
         },
       },
     ];

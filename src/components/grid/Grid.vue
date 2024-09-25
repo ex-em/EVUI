@@ -634,11 +634,13 @@ import {
   dragEvent,
   getUpdatedColumns,
 } from './uses';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
 
 export default {
   name: 'EvGrid',
   directives: {
     clickoutside,
+    observeVisibility: vObserveVisibility,
   },
   components: {
     Toolbar,
