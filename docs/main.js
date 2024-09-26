@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import EVUI, { EvMessageBox, EvMessage, EvNotification } from '@/main';
+import EVUI, { EvMessageBox, EvMessage, EvNotification } from '../dist';
 import Example from './components/Example.vue';
 
 import App from './App.vue';

@@ -9,7 +9,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/main.js'),
       name: 'evui',
-      fileName: 'evui',
+      fileName: 'index',
     },
     rollupOptions: {
       external: ['vue'],
