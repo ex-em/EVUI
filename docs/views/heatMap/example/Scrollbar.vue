@@ -203,8 +203,8 @@ export default {
       dataIndex: [],
     });
 
-    onMounted(() => {
-      nextTick();
+    onMounted(async () => {
+      await nextTick();
       createChartLegend();
       createChartData();
     });
