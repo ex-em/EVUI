@@ -102,7 +102,7 @@ import { ref, getCurrentInstance } from 'vue';
 
 export default {
   setup() {
-    const { ctx } = getCurrentInstance();
+    const ctx = getCurrentInstance().appContext.config.globalProperties;
     const showInfo = () => {
       ctx.$messagebox({
         message: 'Success! This is an Success type message.',
