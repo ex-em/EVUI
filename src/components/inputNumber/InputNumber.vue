@@ -143,7 +143,7 @@ export default {
   }
   .ev-input {
     $number-arrow-btn-width: 30px;
-    padding: 0 #{$number-arrow-btn-width + $input-default-padding} 0 $input-default-padding;
+    padding: 0 calc($number-arrow-btn-width + $input-default-padding) 0 $input-default-padding;
     text-align: center;
   }
   .ev-input-number-icon {
@@ -151,7 +151,7 @@ export default {
     position: absolute;
     right: 0;
     width: 30px;
-    height: $input-default-height / 2;
+    height: calc($input-default-height / 2);
     justify-content: center;
     align-items: center;
     font-size: 12px;

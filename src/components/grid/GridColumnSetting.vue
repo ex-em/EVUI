@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import { clickoutside } from '@/directives/clickoutside';
 import {
   computed,
   nextTick,
@@ -62,6 +61,7 @@ import {
   watch,
 } from 'vue';
 import { cloneDeep } from 'lodash-es';
+import { clickoutside } from '@/directives/clickoutside';
 
 export default {
   name: 'EVGridColumnSetting',

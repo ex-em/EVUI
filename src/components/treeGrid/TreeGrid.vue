@@ -313,6 +313,7 @@ import {
   onUnmounted,
 } from 'vue';
 import { cloneDeep } from 'lodash-es';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
@@ -336,7 +337,6 @@ import {
 import {
   columnSettingEvent,
 } from '../grid/uses';
-import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
 
 export default {
   name: 'EvTreeGrid',

@@ -92,7 +92,7 @@ import {
   provide, triggerRef,
   onBeforeUpdate, nextTick,
 } from 'vue';
-import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 
 export default {
   name: 'EvTabs',
