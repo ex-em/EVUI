@@ -609,8 +609,9 @@ import {
   ref,
   onBeforeMount, onUnmounted,
 } from 'vue';
-import { clickoutside } from '@/directives/clickoutside';
 import { cloneDeep } from 'lodash-es';
+import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
+import { clickoutside } from '@/directives/clickoutside';
 import Toolbar from './GridToolbar';
 import GridPagination from './GridPagination';
 import GridSummary from './GridSummary';
@@ -634,7 +635,6 @@ import {
   dragEvent,
   getUpdatedColumns,
 } from './uses';
-import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility'
 
 export default {
   name: 'EvGrid',

@@ -1,5 +1,5 @@
-import Canvas from '@/components/chart/helpers/helpers.canvas';
 import { defaultsDeep } from 'lodash-es';
+import Canvas from '@/components/chart/helpers/helpers.canvas';
 import {
   AXIS_OPTION,
   AXIS_UNITS,

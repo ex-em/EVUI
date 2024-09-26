@@ -351,7 +351,7 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
-    component: () => import( '../views/PageNotFound'),
+    component: () => import('../views/PageNotFound'),
   },
 ];
 
