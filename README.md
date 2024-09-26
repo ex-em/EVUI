@@ -60,6 +60,7 @@ app.mount('#app');
 // main.ts
 import App from '@/App.vue';
 import { EvMessageBox, EvMessage, EvNotification } from 'evui';
+import 'evui/style';
 
 const app = createApp(App);
 
