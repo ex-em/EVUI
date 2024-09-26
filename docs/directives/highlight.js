@@ -4,7 +4,7 @@ const highlight = {
   mounted(el) {
     const blocks = el.querySelectorAll('pre');
     blocks.forEach((block) => {
-      hljs.highlightBlock(block);
+      hljs.highlightElement(block);
     });
   },
 };
