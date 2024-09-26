@@ -4,6 +4,9 @@ module.exports = {
     node: true,
     es2022: true,
   },
+  parserOptions: {
+    ecmaVersion: 2022,
+  },
   extends: [
     'plugin:vue/vue3-essential',
     'plugin:vue/vue3-strongly-recommended',
