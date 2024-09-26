@@ -1,4 +1,5 @@
 import { merge } from 'lodash-es';
+import { getCurrentInstance } from 'vue';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
@@ -112,7 +113,7 @@ class Scatter {
    * @returns {undefined}
    */
   defaultScatterDraw(param) {
-    const { ctx } = param;
+    const ctx = getCurrentInstance().appContext.config.globalProperties;
 
     this.data.forEach((item, idx) => {
       this.calcItem(item, param);
