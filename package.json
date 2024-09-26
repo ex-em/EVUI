@@ -7,20 +7,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
     "serve": "vite preview",
-    "build:lib": "vite build --target lib --name evui src/main.js && rimraf ./dist/demo.html",
-    "build:lib_min": "vite build --formats umd-min --target lib --name evui src/main.js && rimraf ./dist/demo.html",
-    "test:unit": "vite test:unit",
+    "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src docs",
-    "docs": "vite serve --port 9999",
-    "docs_build": "vite build --mode production"
+    "docs": "vite serve --config vite.config.js --port 9999",
+    "build:docs": "vite build --config vite.config.js --mode production"
   },
   "files": [
     "dist",
     "src"
   ],
-  "main": "dist/evui.umd.js",
+  "main": "dist/evui.js",
+  "module": "dist/evui.js",
+  "exports": {
+    ".": {
+      "import": "./dist/evui.js",
+      "require": "./dist/evui.umd.cjs"
+    }
+  },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
     "bignumber.js": "^9.1.2",
