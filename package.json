@@ -5,9 +5,12 @@
   "author": "exem <dev_client@ex-em.com>",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src docs",
-    "docs": "npm run build:lib && vite serve --config vite.config.js --port 9999",
+    "docs": "vite serve --config vite.config.js --port 9999",
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production"
   },
@@ -57,5 +60,8 @@
     "stylelint": "^16.9.0",
     "stylelint-order": "^6.0.4",
     "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "vue": "*"
   }
 }
