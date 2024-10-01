@@ -65,7 +65,7 @@ export default {
   top: $header-height;
   left: 0;
   width: $nav-width;
-  height: calc(100% - $header-height);
+  height: calc(100% - #{$header-height});
   padding-bottom: 17px;
   box-sizing: border-box;
   overflow-y: auto;
