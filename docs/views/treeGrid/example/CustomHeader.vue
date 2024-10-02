@@ -230,7 +230,7 @@ export default {
         summaryRenderer: 'Sum: {0} 모든 row summary',
         decimal: 1,
       },
-      { caption: 't', field: 'customCell', type: 'string', width: 300, customHeader: true },
+      { caption: '', field: 'customCell', type: 'string', width: 300, customHeader: true },
     ]);
 
     getData();
