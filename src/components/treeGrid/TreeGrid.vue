@@ -81,9 +81,9 @@
                 <span
                   :title="column.caption"
                   :class="[
-                  'column-name',
-                  { 'column-name--click' : useGridSetting }
-                ]"
+                    'column-name',
+                    { 'column-name--click' : useGridSetting }
+                  ]"
                   @click="onColumnContextMenu($event, column)"
                   @click.prevent="columnMenu.show"
                 >
