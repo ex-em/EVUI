@@ -72,18 +72,24 @@
               :class="getColumnClass(column)"
               :style="getColumnStyle(column, index)"
             >
-              <!-- Column Name -->
-              <span
-                :title="column.caption"
-                :class="[
+              <!-- Custom Header -->
+              <template v-if="column.customHeader && !!$slots.customHeader">
+                <slot name="customHeader" />
+              </template>
+              <template v-else>
+                <!-- Column Name -->
+                <span
+                  :title="column.caption"
+                  :class="[
                   'column-name',
                   { 'column-name--click' : useGridSetting }
                 ]"
-                @click="onColumnContextMenu($event, column)"
-                @click.prevent="columnMenu.show"
-              >
-                {{ column.caption }}
-              </span>
+                  @click="onColumnContextMenu($event, column)"
+                  @click.prevent="columnMenu.show"
+                >
+                  {{ column.caption }}
+                </span>
+              </template>
               <!-- Column Resize -->
               <span
                 class="column-resize"
@@ -886,6 +892,7 @@ export default {
         column: true,
         render,
         'non-border': !!styleInfo.borderStyle,
+        [column.field]: column.field,
       };
     };
     const getColumnStyle = (column, index) => {
