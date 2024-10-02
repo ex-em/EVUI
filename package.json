@@ -14,10 +14,7 @@
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
+  "files": ["dist"],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
