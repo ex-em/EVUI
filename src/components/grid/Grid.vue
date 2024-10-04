@@ -357,7 +357,7 @@
             <!-- Row List -->
             <template
               v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
+              :key="idColIndex !== -1 ? row[2][idColIndex] : rowIndex"
             >
               <tr
                 :data-index="row[0]"
@@ -418,7 +418,7 @@
                 <!-- Cell -->
                 <template
                   v-for="(column, cellIndex) in orderedColumns"
-                  :key="cellIndex"
+                  :key="`${idColIndex !== -1 ? row[2][idColIndex] : rowIndex}-${cellIndex}`"
                 >
                   <td
                     v-if="!column.hide && !column.hiddenDisplay"
@@ -1411,7 +1411,10 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
+    const idColIndex = computed(() => stores.orderedColumns.findIndex(c => c.field === 'id'));
+
     return {
+      idColIndex,
       summaryScroll,
       showHeader,
       stripeStyle,
