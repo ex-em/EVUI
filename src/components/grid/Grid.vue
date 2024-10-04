@@ -418,7 +418,7 @@
                 <!-- Cell -->
                 <template
                   v-for="(column, cellIndex) in orderedColumns"
-                  :key="cellIndex"
+                  :key="`${idColIndex !== -1 ? row[2][idColIndex] : rowIndex}-${cellIndex}`"
                 >
                   <td
                     v-if="!column.hide && !column.hiddenDisplay"
@@ -1411,7 +1411,7 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    const idColIndex = computed(() => stores.orderedColumns.findIndex((c) => c.field === 'id'));
+    const idColIndex = computed(() => stores.orderedColumns.findIndex(c => c.field === 'id'));
 
     return {
       idColIndex,
