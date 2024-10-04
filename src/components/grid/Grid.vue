@@ -357,7 +357,7 @@
             <!-- Row List -->
             <template
               v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
+              :key="idColIndex !== -1 ? row[2][idColIndex] : rowIndex"
             >
               <tr
                 :data-index="row[0]"
@@ -1411,7 +1411,10 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
+    const idColIndex = computed(() => stores.orderedColumns.findIdx((c) => c.field === 'id'));
+
     return {
+      idColIndex,
       summaryScroll,
       showHeader,
       stripeStyle,

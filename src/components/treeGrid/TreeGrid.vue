@@ -125,7 +125,7 @@
           <tbody>
             <tree-grid-node
               v-for="(node, idx) in viewStore"
-              :key="idx"
+              :key="node['id'] || idx"
               :selected-data="selectedRow"
               :node-data="node"
               :use-checkbox="useCheckbox"
