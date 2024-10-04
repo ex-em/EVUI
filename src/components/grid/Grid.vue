@@ -1411,7 +1411,7 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    const idColIndex = computed(() => stores.orderedColumns.findIdx((c) => c.field === 'id'));
+    const idColIndex = computed(() => stores.orderedColumns.findIndex((c) => c.field === 'id'));
 
     return {
       idColIndex,
