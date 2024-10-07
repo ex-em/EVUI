@@ -114,17 +114,54 @@ export const scrollEvent = (params) => {
   const updateVScrollBase = (isScroll) => {
     const bodyEl = elementInfo.body;
     const rowHeight = resizeInfo.rowHeight;
+    const expandedRowHeight = expandedInfo.detailRowHeight ?? 0;
+
     if (bodyEl) {
       let store = stores.store;
       if (pageInfo.isClientPaging) {
         store = getPagingData();
       }
-      const rowCount = bodyEl.clientHeight > rowHeight
-        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
-      const totalScrollHeight = store.length * rowHeight;
-      let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
+
+      const expandedRowCount = expandedInfo.expandedRows?.length ?? 0;
+      const expandedRowIndexes = expandedInfo.expandedRows?.map(
+        row => store.findIndex(data => data[ROW_DATA_INDEX] === row),
+      ) ?? [];
+      const totalScrollHeight = store.length * rowHeight + expandedRowCount * expandedRowHeight;
+
+      let firstVisibleIndex = 0;
+      let scrollTop = 0;
+
+      if (expandedRowCount) {
+        for (firstVisibleIndex = 0; scrollTop + rowHeight < bodyEl.scrollTop; firstVisibleIndex++) {
+          if (expandedRowIndexes.includes(firstVisibleIndex)) {
+            scrollTop += expandedRowHeight;
+          }
+          scrollTop += rowHeight;
+        }
+      } else {
+        firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
+        scrollTop = Math.max(firstVisibleIndex, 0) * rowHeight;
+      }
+
       if (firstVisibleIndex > store.length - 1) {
         firstVisibleIndex = 0;
+      }
+
+      let rowCount = 0;
+      let renderRowHeight = 0;
+
+      if (expandedRowCount) {
+        for (let i = firstVisibleIndex; renderRowHeight <= bodyEl.clientHeight; i++) {
+          if (expandedRowIndexes.includes(i)) {
+            renderRowHeight += expandedRowHeight;
+          }
+          renderRowHeight += rowHeight;
+          rowCount += 1;
+        }
+      } else {
+        rowCount = bodyEl.clientHeight > rowHeight
+          ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+          renderRowHeight = rowCount * rowHeight;
       }
 
       const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
@@ -135,8 +172,8 @@ export const scrollEvent = (params) => {
       stores.viewStore = store.slice(firstIndex, lastIndex);
       scrollInfo.hasVerticalScrollBar = rowCount < store.length
         || bodyEl.clientHeight < tableEl.clientHeight;
-      scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
+      scrollInfo.vScrollTopHeight = scrollTop;
+      scrollInfo.vScrollBottomHeight = totalScrollHeight - renderRowHeight
         - scrollInfo.vScrollTopHeight;
       if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
@@ -148,10 +185,10 @@ export const scrollEvent = (params) => {
   };
 
   /**
-   *  rowDetail slot 시에는 가상 스크롤을 적용하지 않는다.
+   *  고정 높이를 지정하지 않은 rowDetail slot 시에는 가상 스크롤을 적용하지 않는다.
    */
   const updateVScroll = (isScroll) => {
-    if (expandedInfo.useRowDetail) {
+    if (expandedInfo.useRowDetail && !expandedInfo.detailRowHeight) {
       let store = stores.store;
       if (pageInfo.isClientPaging) {
         store = getPagingData();
