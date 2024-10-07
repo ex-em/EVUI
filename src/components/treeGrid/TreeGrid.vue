@@ -664,6 +664,7 @@ export default {
       useGridSetting,
       columnSettingInfo,
       setColumnHidden,
+      onSort,
     });
 
     const setGridSetting = (e) => {

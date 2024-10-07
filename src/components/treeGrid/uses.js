@@ -635,7 +635,7 @@ export const contextMenuEvent = (params) => {
     contextInfo.contextMenuItems = menuItems;
   };
   const onColumnContextMenu = (event, column) => {
-    if (event.target.className.includes('column-name--click')) {
+    if (event.target.className.includes('column-name')) {
       const sortable = column.sortable === undefined ? true : column.sortable;
       contextInfo.columnMenuItems = [
         {
@@ -993,8 +993,7 @@ export const pagingEvent = (params) => {
   return { getPagingData, updatePagingInfo, changePage };
 };
 
-export const sortEvent = (params) => {
-  const { sortInfo, stores, updatePagingInfo } = params;
+export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
   const { emit } = getCurrentInstance();
 
   const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
@@ -1080,20 +1079,6 @@ export const sortEvent = (params) => {
         columns: updatedColumInfo,
       });
 
-      const compareValues = (nodeA, nodeB) => {
-        const valueA = nodeA.data[sortInfo.sortField];
-        const valueB = nodeB.data[sortInfo.sortField];
-
-        if (valueA === valueB) return 0;
-
-        const isAscending = sortInfo.sortOrder === 'asc';
-
-        if (isAscending) return valueA > valueB ? 1 : -1;
-
-        return valueA < valueB ? 1 : -1;
-      };
-
-
       const sortTree = (nodes, depth = 0) => {
         const groupedNodes = {};
 
@@ -1122,6 +1107,19 @@ export const sortEvent = (params) => {
       sortTree(stores.treeRows);
       stores.treeStore = stores.treeRows;
     }
+  };
+
+  const compareValues = (nodeA, nodeB) => {
+    const valueA = nodeA.data[sortInfo.sortField];
+    const valueB = nodeB.data[sortInfo.sortField];
+
+    if (valueA === valueB) return 0;
+
+    const isAscending = sortInfo.sortOrder === 'asc';
+
+    if (isAscending) return valueA > valueB ? 1 : -1;
+
+    return valueA < valueB ? 1 : -1;
   };
 
   return { onSort, setSortInfo };
