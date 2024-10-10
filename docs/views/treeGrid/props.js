@@ -10,6 +10,8 @@ import ColumnEvent from './example/ColumnEvent.vue';
 import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
 import ColumnSetting from './example/ColumnSetting.vue';
 import ColumnSettingRaw from '!!raw-loader!./example/ColumnSetting.vue';
+import CustomHeader from './example/CustomHeader.vue';
+import CustomHeaderRaw from '!!raw-loader!./example/CustomHeader.vue';
 
 export default {
   mdText,
@@ -34,6 +36,10 @@ export default {
     'Custom Column List': {
       component: ColumnSetting,
       parsedData: parseComponent(ColumnSettingRaw),
+    },
+    'Custom Table Header': {
+      component: CustomHeader,
+      parsedData: parseComponent(CustomHeaderRaw),
     },
   },
 };

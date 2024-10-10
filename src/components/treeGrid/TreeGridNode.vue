@@ -256,6 +256,7 @@ export default {
       'tree-td': cellIndex === 0,
       [column.type]: column.type,
       [column.align]: column.align,
+      [column.field]: column.field,
       'non-border': !!props.borderStyle,
     });
     const getColumnStyle = (column, cellIndex) => ({
