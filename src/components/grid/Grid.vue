@@ -358,6 +358,7 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
+
         <table ref="table">
           <tbody>
             <!-- Row List -->
@@ -503,10 +504,18 @@
               <tr
                 v-if="useRowDetail && $slots?.rowDetail && row[4]"
               >
+              <div
+                :style="{
+                  height: `${detailRowHeight}px`,
+                  'min-height': `${detailRowHeight}px`,
+                  'max-height': `${detailRowHeight}px`
+                }">
+
                 <slot
                   name="rowDetail"
                   :item="{ row }"
                 />
+              </div>
               </tr>
             </template>
             <tr v-if="!viewStore.length">
@@ -519,6 +528,7 @@
           :style="`height: ${vScrollBottomHeight}px;`"
           class="vscroll-spacer"
         />
+
         <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
@@ -817,6 +827,7 @@ export default {
     const expandedInfo = reactive({
       expandedRows: props.expanded,
       useRowDetail: computed(() => props.option?.rowDetail?.use ?? false),
+      detailRowHeight: computed(() => (props.option?.rowDetail?.detailRowHeight)),
     });
     const scrollInfo = reactive({
       lastScroll: {
@@ -1227,6 +1238,7 @@ export default {
         if (!expendedSize) {
           clearExpandedInfo();
         }
+        updateVScroll();
       },
     );
     watch(
