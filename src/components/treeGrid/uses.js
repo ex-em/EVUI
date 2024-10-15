@@ -1042,6 +1042,45 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
     }
   };
 
+  const compareValues = (nodeA, nodeB) => {
+    const valueA = nodeA.data[sortInfo.sortField];
+    const valueB = nodeB.data[sortInfo.sortField];
+
+    if (valueA === valueB) return 0;
+
+    const isAscending = sortInfo.sortOrder === 'asc';
+
+    if (isAscending) return valueA > valueB ? 1 : -1;
+
+    return valueA < valueB ? 1 : -1;
+  };
+
+  const sortTree = (nodes, depth = 0) => {
+    const groupedNodes = {};
+
+    nodes.forEach((node) => {
+      const nodeDepth = node.level || depth;
+      if (!groupedNodes[nodeDepth]) {
+        groupedNodes[nodeDepth] = [];
+      }
+      groupedNodes[nodeDepth].push(node);
+    });
+
+    Object.keys(groupedNodes).forEach((key) => {
+      groupedNodes[key].sort(compareValues);
+    });
+
+    nodes.length = 0;
+    Object.values(groupedNodes).forEach((group) => {
+      group.forEach((node) => {
+        nodes.push(node);
+        if (node.hasChild) {
+          sortTree(node.children, node.level + 1);
+        }
+      });
+    });
+  };
+
   const onSort = (column, sortOrder) => {
     const sortable = column.sortable === undefined ? true : column.sortable;
     if (sortable) {
@@ -1079,48 +1118,9 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
         columns: updatedColumInfo,
       });
 
-      const sortTree = (nodes, depth = 0) => {
-        const groupedNodes = {};
-
-        nodes.forEach((node) => {
-          const nodeDepth = node.level || depth;
-          if (!groupedNodes[nodeDepth]) {
-            groupedNodes[nodeDepth] = [];
-          }
-          groupedNodes[nodeDepth].push(node);
-        });
-
-        Object.keys(groupedNodes).forEach((key) => {
-          groupedNodes[key].sort(compareValues);
-        });
-
-        nodes.length = 0;
-        Object.values(groupedNodes).forEach((group) => {
-          group.forEach((node) => {
-            nodes.push(node);
-            if (node.hasChild) {
-              sortTree(node.children, node.level + 1);
-            }
-          });
-        });
-      };
       sortTree(stores.treeRows);
       stores.treeStore = stores.treeRows;
     }
   };
-
-  const compareValues = (nodeA, nodeB) => {
-    const valueA = nodeA.data[sortInfo.sortField];
-    const valueB = nodeB.data[sortInfo.sortField];
-
-    if (valueA === valueB) return 0;
-
-    const isAscending = sortInfo.sortOrder === 'asc';
-
-    if (isAscending) return valueA > valueB ? 1 : -1;
-
-    return valueA < valueB ? 1 : -1;
-  };
-
   return { onSort, setSortInfo };
 };
