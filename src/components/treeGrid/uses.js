@@ -1,5 +1,6 @@
 import { getCurrentInstance, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
+import { cloneDeep } from 'lodash-es';
 
 export const commonFunctions = (params) => {
   const { props } = getCurrentInstance();
@@ -993,7 +994,7 @@ export const pagingEvent = (params) => {
   return { getPagingData, updatePagingInfo, changePage };
 };
 
-export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
+export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
   const { emit } = getCurrentInstance();
 
   const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
@@ -1099,9 +1100,6 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
       sortInfo.sortOrder = order.dequeue();
       order.enqueue(sortInfo.sortOrder);
 
-      sortInfo.isSorting = true;
-      updatePagingInfo({ onSort: true });
-
       initializeHiddenColumnsSortType();
       setSortOptionToOrderedColumns(column, sortInfo.sortOrder);
 
@@ -1118,8 +1116,17 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo }) => {
         columns: updatedColumInfo,
       });
 
-      sortTree(stores.treeRows);
-      stores.treeStore = stores.treeRows;
+      if (sortInfo.sortOrder === 'init') {
+        stores.treeStore = cloneDeep(stores.originStore);
+        stores.viewStore = stores.treeStore;
+        onResize();
+        sortInfo.isSorting = false;
+      } else {
+        sortTree(stores.treeRows);
+        sortInfo.isSorting = true;
+      }
+
+      updatePagingInfo({ onSort: true });
     }
   };
   return { onSort, setSortInfo };

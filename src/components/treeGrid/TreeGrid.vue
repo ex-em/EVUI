@@ -306,6 +306,7 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
+import { cloneDeep } from 'lodash-es';
 import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
@@ -433,6 +434,7 @@ export default {
       viewStore: [],
       filterStore: [],
       pagingStore: [],
+      originStore: [],
       showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
       searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
@@ -625,7 +627,9 @@ export default {
       handleExpand,
     } = treeEvent({ stores, onResize });
 
-    const { onSort } = sortEvent({ sortInfo, stores, updatePagingInfo });
+    const {
+        onSort,
+    } = sortEvent({ sortInfo, stores, updatePagingInfo, setTreeNodeStore, onResize });
 
     const {
       onSearch,
@@ -692,6 +696,7 @@ export default {
 
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
+      stores.originStore = cloneDeep(stores.treeStore);
       document.addEventListener('wheel', onMouseWheel, { capture: false });
       document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
