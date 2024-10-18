@@ -247,13 +247,29 @@ const modules = {
               this.clearSelectedItemInfo();
               args.deselected = { eventTarget: 'item' };
 
-              if (!useBothAxis) {
-                const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
-                if (location !== selectLabelAxis) {
-                  return;
+              if (useSelectLabel) {
+                if ((location === 'yAxis' || location === 'xAxis') && !useBothAxis) {
+                  const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+                  if (location !== selectLabelAxis) {
+                    return;
+                  }
                 }
+
+                this.removeSelectionArea();
+
+                if (location !== 'canvas') {
+                  setSelectedLabelInfo(location);
+                }
+              } else {
+                if (!useBothAxis) {
+                  const selectLabelAxis = isHorizontal ? 'yAxis' : 'xAxis';
+                  if (location !== selectLabelAxis) {
+                    return;
+                  }
+                }
+
+                setSelectedLabelInfo(location);
               }
-              setSelectedLabelInfo(location);
             }
           } else if (useSelectItem) {
             setSelectedItemInfo();
@@ -338,11 +354,49 @@ const modules = {
      *
      * @returns {undefined}
      */
+    this.onMouseDownHeatMap = (e) => {
+      const { selectLabel: selectLabelOpt, dragSelection: dragSelectionOpt } = this.options;
+
+      const offset = this.getMousePosition(e);
+      const location = this.getCurMouseLocation(offset);
+
+      const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+      const useKeepDisplay = dragSelectionOpt?.keepDisplay;
+      const useBothAxis = selectLabelOpt?.useBothAxis;
+
+      if (location === 'xAxis' || location === 'yAxis') {
+        if (useSelectLabel) {
+          if (useBothAxis) {
+            this.removeSelectionArea();
+          } else {
+            const { targetAxis } = this.defaultSelectInfo;
+
+            if (targetAxis) {
+              this.removeSelectionArea();
+            }
+          }
+        }
+      } else if (useKeepDisplay) {
+        if (location !== 'canvas') {
+          this.removeSelectionArea();
+        }
+      } else {
+        this.removeSelectionArea();
+      }
+    };
+
     this.onMouseDown = (e) => {
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
-        this.removeSelectionArea();
+        switch (type) {
+          case 'heatMap':
+            this.onMouseDownHeatMap(e);
+            break;
+          default:
+            this.removeSelectionArea();
+        }
+
         this.dragStart(e, type);
       }
     };
@@ -445,6 +499,20 @@ const modules = {
       }
 
       if (type === 'heatMap') {
+        const offset = this.getMousePosition(e);
+        const location = this.getCurMouseLocation(offset);
+
+        if (location !== 'chartBackground') {
+          return;
+        }
+
+        const { targetAxis } = this.defaultSelectInfo;
+
+        if (targetAxis) {
+          this.clearSelectedLabelInfo();
+          this.render();
+        }
+
         const rangeInfo = { xcp, xep, ycp, yep, range: aRange };
         const { xsp, ysp, width, height } = this.getDragInfoForHeatMap(rangeInfo);
         dragInfo.xsp = xsp;
