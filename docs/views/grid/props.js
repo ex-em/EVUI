@@ -18,6 +18,8 @@ import ColumnEvent from './example/ColumnEvent.vue';
 import ColumnEventRaw from '!!raw-loader!./example/ColumnEvent.vue';
 import Disabled from './example/Disabled.vue';
 import DisabledRaw from '!!raw-loader!./example/Disabled.vue';
+import CustomHeader from './example/CustomHeader.vue';
+import CustomHeaderRaw from '!!raw-loader!./example/CustomHeader.vue';
 
 export default {
   mdText,
@@ -58,6 +60,10 @@ export default {
     Disabled: {
       component: Disabled,
       parsedData: parseComponent(DisabledRaw),
+    },
+    'Custom Table Header': {
+      component: CustomHeader,
+      parsedData: parseComponent(CustomHeaderRaw),
     },
   },
 };

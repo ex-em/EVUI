@@ -114,6 +114,7 @@
 | summaryRenderer | String  | Summary 에 표시할 텍스트 또는 계산 값                          | ex) 'Sum: {0}'                                   | N |
 | summaryData     | Array   | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용          | ex) '{0}({1}%)'                                  | N |
 | expandColumn    | Boolean | 트리그리드를 확장하는데 사용하는 컬럼을 의미, 설정하지 않으면 자동으로 첫번째 컬럼에 적용 | ex) 'expandColumn: true'                         | N |
+| customHeader    | Boolean | 커스텀 헤더 사용 여부 | Boolean                         | N |
 
 ### Event
 | 이름 | 파라미터 | 설명 |

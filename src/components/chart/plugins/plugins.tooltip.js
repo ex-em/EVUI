@@ -32,9 +32,7 @@ const modules = {
     this.tooltipDOM.style.display = 'none';
 
     if (!this.options.tooltip?.formatter?.html) {
-      this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
-      this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
-      this.tooltipDOM.appendChild(this.tooltipBodyDOM);
+      this.setDefaultTooltipLayout();
     }
 
     document.body.appendChild(this.tooltipDOM);
@@ -48,6 +46,12 @@ const modules = {
         this.tooltipDOM.style.display = 'none';
       };
     }
+  },
+
+  setDefaultTooltipLayout() {
+    this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
+    this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
+    this.tooltipDOM.appendChild(this.tooltipBodyDOM);
   },
 
   /**

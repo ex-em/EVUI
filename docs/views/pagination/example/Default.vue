@@ -7,6 +7,7 @@
       :visible-page="visiblePage"
       :show-page-info="isPageInfo"
       :order="order"
+      :page-per-jump="pagePerJump"
     >
     </ev-pagination>
     <div class="description">
@@ -46,6 +47,10 @@
           <span class="badge yellow">Page Info</span>
           <ev-toggle v-model="isPageInfo"/>
         </div>
+        <div class="form-row">
+          <span class="badge yellow">Page Per Jump</span>
+          <ev-input-number v-model="pagePerJump"/>
+        </div>
       </div>
     </div>
   </div>
@@ -73,6 +78,7 @@ export default {
       { name: 'right', value: 'right' },
       { name: 'center', value: 'center' },
     ]);
+    const pagePerJump = ref(10);
 
     return {
       total,
@@ -82,6 +88,7 @@ export default {
       isPageInfo,
       visiblePage,
       orderItems,
+      pagePerJump,
     };
   },
 };

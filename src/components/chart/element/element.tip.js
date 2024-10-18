@@ -92,9 +92,11 @@ const modules = {
 
       if (maxTipOpt.use && maxArgs) {
         if (tooltipValueFormatter) {
-          maxArgs.text = isHorizontal
-            ? tooltipValueFormatter({ x: maxArgs.value })
-            : tooltipValueFormatter({ y: maxArgs.value });
+          maxArgs.text = tooltipValueFormatter({
+            seriesId: seriesInfo.sId,
+            x: isHorizontal ? maxArgs.value : undefined,
+            y: !isHorizontal ? maxArgs.value : undefined,
+          });
         } else {
           maxArgs.text = numberWithComma(maxArgs.value);
         }

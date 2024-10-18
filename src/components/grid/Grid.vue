@@ -248,69 +248,75 @@
               @dragover="onDragOver"
               @drop="onDrop"
             >
-              <!-- Column Name -->
-              <span
-                :title="column.caption"
-                class="column-name"
-                @click="onColumnContextMenu($event, column)"
-                @click.prevent="columnMenu.show"
-              >
-                {{ column.caption }}
-                <!-- Sort Icon -->
-                <span @click.stop="onSort(column)">
-                  <template v-if="!!$slots.sortIcon">
-                    <span
-                      v-if="column.sortable === undefined ? true : column.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    >
-                      <slot name="sortIcon" />
-                    </span>
-                    <span
-                      v-if="sortField === column.field"
-                      :class="[{
-                        'column-sort__icon': true,
-                        'column-sort__icon--asc': sortOrder === 'asc',
-                        'column-sort__icon--desc': sortOrder === 'desc',
-                      }]"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    >
-                      <slot :name="`sortIcon_${sortOrder}`" />
-                    </span>
-                  </template>
-                  <template v-else>
-                    <grid-sort-button
-                      v-if="column.sortable === undefined ? true : column.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :icon="'basic'"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    />
-                    <grid-sort-button
-                      v-if="sortField === column.field"
-                      :class="[{
-                        'column-sort__icon': true,
-                        'column-sort__icon--asc': sortOrder === 'asc',
-                        'column-sort__icon--desc': sortOrder === 'desc',
-                      }]"
-                      :icon="sortOrder"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                        visibility: !!sortOrder ? column.hidden : true,
-                      }"
-                    />
-                  </template>
+              <!-- Custom Header -->
+              <template v-if="column.customHeader && !!$slots.customHeader">
+                <slot name="customHeader" />
+              </template>
+              <template v-else>
+                <!-- Column Name -->
+                <span
+                  :title="column.caption"
+                  class="column-name"
+                  @click="onColumnContextMenu($event, column)"
+                  @click.prevent="columnMenu.show"
+                >
+                  {{ column.caption }}
+                  <!-- Sort Icon -->
+                  <span @click.stop="onSort(column)">
+                    <template v-if="!!$slots.sortIcon">
+                      <span
+                        v-if="column.sortable === undefined ? true : column.sortable"
+                        class="column-sort__icon column-sort__icon--basic"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      >
+                        <slot name="sortIcon" />
+                      </span>
+                      <span
+                        v-if="sortField === column.field"
+                        :class="[{
+                          'column-sort__icon': true,
+                          'column-sort__icon--asc': sortOrder === 'asc',
+                          'column-sort__icon--desc': sortOrder === 'desc',
+                        }]"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      >
+                        <slot :name="`sortIcon_${sortOrder}`" />
+                      </span>
+                    </template>
+                    <template v-else>
+                      <grid-sort-button
+                        v-if="column.sortable === undefined ? true : column.sortable"
+                        class="column-sort__icon column-sort__icon--basic"
+                        :icon="'basic'"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      />
+                      <grid-sort-button
+                        v-if="sortField === column.field"
+                        :class="[{
+                          'column-sort__icon': true,
+                          'column-sort__icon--asc': sortOrder === 'asc',
+                          'column-sort__icon--desc': sortOrder === 'desc',
+                        }]"
+                        :icon="sortOrder"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                          visibility: !!sortOrder ? column.hidden : true,
+                        }"
+                      />
+                    </template>
+                  </span>
                 </span>
-              </span>
+              </template>
               <!-- Column Resize -->
               <span
                 class="column-resize"
@@ -352,12 +358,13 @@
           :style="`height: ${vScrollTopHeight}px;`"
           class="vscroll-spacer"
         />
+
         <table ref="table">
           <tbody>
             <!-- Row List -->
             <template
               v-for="(row, rowIndex) in viewStore"
-              :key="rowIndex"
+              :key="idColIndex !== -1 ? row[2][idColIndex] : rowIndex"
             >
               <tr
                 :data-index="row[0]"
@@ -418,7 +425,7 @@
                 <!-- Cell -->
                 <template
                   v-for="(column, cellIndex) in orderedColumns"
-                  :key="cellIndex"
+                  :key="`${idColIndex !== -1 ? row[2][idColIndex] : rowIndex}-${cellIndex}`"
                 >
                   <td
                     v-if="!column.hide && !column.hiddenDisplay"
@@ -497,10 +504,18 @@
               <tr
                 v-if="useRowDetail && $slots?.rowDetail && row[4]"
               >
+              <div
+                :style="{
+                  height: `${detailRowHeight}px`,
+                  'min-height': `${detailRowHeight}px`,
+                  'max-height': `${detailRowHeight}px`
+                }">
+
                 <slot
                   name="rowDetail"
                   :item="{ row }"
                 />
+              </div>
               </tr>
             </template>
             <tr v-if="!viewStore.length">
@@ -513,6 +528,7 @@
           :style="`height: ${vScrollBottomHeight}px;`"
           class="vscroll-spacer"
         />
+
         <!-- Context Menu -->
         <ev-context-menu
           ref="menu"
@@ -811,6 +827,7 @@ export default {
     const expandedInfo = reactive({
       expandedRows: props.expanded,
       useRowDetail: computed(() => props.option?.rowDetail?.use ?? false),
+      detailRowHeight: computed(() => (props.option?.rowDetail?.detailRowHeight)),
     });
     const scrollInfo = reactive({
       lastScroll: {
@@ -1221,6 +1238,7 @@ export default {
         if (!expendedSize) {
           clearExpandedInfo();
         }
+        updateVScroll();
       },
     );
     watch(
@@ -1411,7 +1429,10 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
+    const idColIndex = computed(() => stores.orderedColumns.findIndex(c => c.field === 'id'));
+
     return {
+      idColIndex,
       summaryScroll,
       showHeader,
       stripeStyle,

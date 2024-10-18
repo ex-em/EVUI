@@ -72,24 +72,29 @@
               :class="getColumnClass(column)"
               :style="getColumnStyle(column, index)"
             >
-              <!-- Column Name -->
-              <span
-                :title="column.caption"
-                :class="[
-                  'column-name',
-                  { 'column-name--click' : useGridSetting }
-                ]"
-                @click="onColumnContextMenu($event, column)"
-                @click.prevent="columnMenu.show"
-              >
-                {{ column.caption }}
-                <!-- Sort Icon -->
+              <!-- Custom Header -->
+              <template v-if="column.customHeader && !!$slots.customHeader">
+                <slot name="customHeader" />
+              </template>
+              <template v-else>
+                <!-- Column Name -->
+                <span
+                  :title="column.caption"
+                  :class="[
+                    'column-name',
+                    { 'column-name--click' : useGridSetting }
+                  ]"
+                  @click="onColumnContextMenu($event, column)"
+                  @click.prevent="columnMenu.show"
+                >
+                  {{ column.caption }}
+                    <!-- Sort Icon -->
                 <span @click.stop="onSort(column)">
                   <template v-if="!!$slots.sortIcon">
                     <span
-                      v-if="column.sortable === undefined ? true : column.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :style="{
+                            v-if="column.sortable === undefined ? true : column.sortable"
+                            class="column-sort__icon column-sort__icon--basic"
+                            :style="{
                         height: `${rowHeight}px`,
                         'line-height': `${rowHeight}px`,
                       }"
@@ -97,9 +102,9 @@
                       <slot name="sortIcon" />
                     </span>
                     <span
-                      v-if="isSortedColumn(column)"
-                      :class="sortIconClass(column)"
-                      :style="{
+                            v-if="isSortedColumn(column)"
+                            :class="sortIconClass(column)"
+                            :style="{
                         height: `${rowHeight}px`,
                         'line-height': `${rowHeight}px`,
                       }"
@@ -109,19 +114,19 @@
                   </template>
                   <template v-else>
                     <grid-sort-button
-                      v-if="column.sortable === undefined ? true : column.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :icon="'basic'"
-                      :style="{
+                            v-if="column.sortable === undefined ? true : column.sortable"
+                            class="column-sort__icon column-sort__icon--basic"
+                            :icon="'basic'"
+                            :style="{
                         height: `${rowHeight}px`,
                         'line-height': `${rowHeight}px`,
                       }"
                     />
                     <grid-sort-button
-                      v-if="isSortedColumn(column)"
-                      :class="sortIconClass(column)"
-                      :icon="sortOrder"
-                      :style="{
+                            v-if="isSortedColumn(column)"
+                            :class="sortIconClass(column)"
+                            :icon="sortOrder"
+                            :style="{
                         height: `${rowHeight}px`,
                         'line-height': `${rowHeight}px`,
                         visibility: !!sortOrder ? column.hidden : true,
@@ -129,7 +134,8 @@
                     />
                   </template>
                 </span>
-              </span>
+                </span>
+              </template>
               <!-- Column Resize -->
               <span
                 class="column-resize"
@@ -171,7 +177,7 @@
           <tbody>
             <tree-grid-node
               v-for="(node, idx) in viewStore"
-              :key="idx"
+              :key="node['id'] || idx"
               :selected-data="selectedRow"
               :node-data="node"
               :use-checkbox="useCheckbox"
@@ -964,6 +970,7 @@ export default {
         column: true,
         render,
         'non-border': !!styleInfo.borderStyle,
+        [column.field]: column.field,
       };
     };
     const getColumnStyle = (column, index) => {

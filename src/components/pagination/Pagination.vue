@@ -10,9 +10,25 @@
         / {{ total }}
       </template>
     </small>
+
     <ul class="pagination-list" :style="listClasses">
+      <!-- Jump -->
+      <li v-if="$props.pagePerJump"
+        class="step-button"
+        :class="{'is-disabled': !hasPrev}">
+        <page-button
+          class="pagination-previous"
+          :disabled="!hasPrev"
+          :page="getPage(prevJumpPage, {isCurrent: false})"
+        >
+          <ev-icon icon="ev-icon-s-double-left"/>
+        </page-button>
+      </li>
+
       <!-- Previous -->
-      <li :class="{'is-disabled': !hasPrev}">
+      <li
+        class="step-button"
+      :class="{'is-disabled': !hasPrev}">
         <page-button
           class="pagination-previous"
           :disabled="!hasPrev"
@@ -33,7 +49,9 @@
       </template>
 
       <!-- Next -->
-      <li :class="{'is-disabled': !hasNext}">
+      <li
+      class="step-button"
+      :class="{'is-disabled': !hasNext}">
         <page-button
           class="pagination-next"
           :disabled="!hasNext"
@@ -42,6 +60,20 @@
           <ev-icon icon="ev-icon-s-arrow-right"/>
         </page-button>
       </li>
+
+      <!-- Jump -->
+      <li v-if="$props.pagePerJump"
+      class="step-button"
+      :class="{'is-disabled': !hasNext}">
+        <page-button
+          class="pagination-previous"
+          :disabled="!hasNext"
+          :page="getPage(nextJumpPage, {isCurrent: false})"
+        >
+          <ev-icon icon="ev-icon-s-double-right"/>
+        </page-button>
+      </li>
+
     </ul>
   </nav>
 </template>
@@ -83,6 +115,10 @@ export default {
       default: 'left',
       validator: val => ['left', 'right', 'center'].includes(val),
     },
+    pagePerJump: {
+      type: [Number, undefined],
+      default: undefined,
+    },
   },
   emits: {
     'update:modelValue': null,
@@ -95,6 +131,14 @@ export default {
       ? 1 : Math.ceil(props.total / props.perPage)));
     const hasPrev = computed(() => current.value > 1);
     const hasNext = computed(() => current.value < pageCount.value);
+
+    const prevJumpPage = computed(
+      () => Math.max(current.value - props.pagePerJump, 1),
+    );
+    const nextJumpPage = computed(
+      () => Math.min(current.value + props.pagePerJump, pageCount.value),
+    );
+
     const firstData = computed(() => {
       const item = current.value * props.perPage - props.perPage + 1;
       return item >= 0 ? item : 0;
@@ -109,7 +153,7 @@ export default {
     };
     const getPage = (num, options = {}) => ({
       number: num,
-      isCurrent: current.value === num,
+      isCurrent: options.isCurrent ?? current.value === num,
       click: event => changePage(num, event),
       input: (event, inputNum) => changePage(+inputNum, event),
       disabled: options.disabled || false,
@@ -198,6 +242,8 @@ export default {
       current,
       changePage,
       getPage,
+      prevJumpPage,
+      nextJumpPage,
     };
   },
 };
