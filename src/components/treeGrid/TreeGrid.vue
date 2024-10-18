@@ -92,44 +92,44 @@
                 <span @click.stop="onSort(column)">
                   <template v-if="!!$slots.sortIcon">
                     <span
-                            v-if="column.sortable === undefined ? true : column.sortable"
-                            class="column-sort__icon column-sort__icon--basic"
-                            :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
+                        v-if="column.sortable === undefined ? true : column.sortable"
+                        class="column-sort__icon column-sort__icon--basic"
+                        :style="{
+                            height: `${rowHeight}px`,
+                            'line-height': `${rowHeight}px`,
+                            }"
                     >
-                      <slot name="sortIcon" />
+                        <slot name="sortIcon" />
                     </span>
                     <span
-                            v-if="isSortedColumn(column)"
-                            :class="sortIconClass(column)"
-                            :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
+                      v-if="isSortedColumn(column)"
+                      :class="sortIconClass(column)"
+                      :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                          }"
                     >
                       <slot :name="`sortIcon_${sortOrder}`" />
                     </span>
                   </template>
                   <template v-else>
                     <grid-sort-button
-                            v-if="column.sortable === undefined ? true : column.sortable"
-                            class="column-sort__icon column-sort__icon--basic"
-                            :icon="'basic'"
-                            :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      lass="column-sort__icon column-sort__icon--basic"
+                      :icon="'basic'"
+                      :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
                       }"
                     />
                     <grid-sort-button
-                            v-if="isSortedColumn(column)"
-                            :class="sortIconClass(column)"
-                            :icon="sortOrder"
-                            :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                        visibility: !!sortOrder ? column.hidden : true,
+                      v-if="isSortedColumn(column)"
+                      :class="sortIconClass(column)"
+                      :icon="sortOrder"
+                      :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                          visibility: !!sortOrder ? column.hidden : true,
                       }"
                     />
                   </template>
@@ -177,7 +177,7 @@
           <tbody>
             <tree-grid-node
               v-for="(node, idx) in viewStore"
-              :key="node['id'] || idx"
+              :key="idx"
               :selected-data="selectedRow"
               :node-data="node"
               :use-checkbox="useCheckbox"
