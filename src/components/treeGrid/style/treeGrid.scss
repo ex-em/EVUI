@@ -79,6 +79,26 @@
       align-items: center;
     }
   }
+  .column-sort__icon {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    transform: translateY(-50%);
+    &:hover {
+      cursor: pointer;
+    }
+    &--basic {
+      visibility: hidden;
+    }
+  }
+  :hover {
+    .column-sort__icon--basic {
+      visibility: visible;
+    }
+  }
 }
 
 .column-name {
