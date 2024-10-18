@@ -88,26 +88,26 @@
                   @click.prevent="columnMenu.show"
                 >
                   {{ column.caption }}
-                    <!-- Sort Icon -->
+                <!-- Sort Icon -->
                 <span @click.stop="onSort(column)">
                   <template v-if="!!$slots.sortIcon">
                     <span
-                        v-if="column.sortable === undefined ? true : column.sortable"
-                        class="column-sort__icon column-sort__icon--basic"
-                        :style="{
-                            height: `${rowHeight}px`,
-                            'line-height': `${rowHeight}px`,
-                            }"
+                      v-if="column.sortable === undefined ? true : column.sortable"
+                      class="column-sort__icon column-sort__icon--basic"
+                      :style="{
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
                     >
-                        <slot name="sortIcon" />
+                     <slot name="sortIcon" />
                     </span>
                     <span
                       v-if="isSortedColumn(column)"
                       :class="sortIconClass(column)"
                       :style="{
-                          height: `${rowHeight}px`,
-                          'line-height': `${rowHeight}px`,
-                          }"
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                      }"
                     >
                       <slot :name="`sortIcon_${sortOrder}`" />
                     </span>
@@ -115,11 +115,11 @@
                   <template v-else>
                     <grid-sort-button
                       v-if="column.sortable === undefined ? true : column.sortable"
-                      lass="column-sort__icon column-sort__icon--basic"
+                      class="column-sort__icon column-sort__icon--basic"
                       :icon="'basic'"
                       :style="{
-                          height: `${rowHeight}px`,
-                          'line-height': `${rowHeight}px`,
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
                       }"
                     />
                     <grid-sort-button
@@ -127,9 +127,9 @@
                       :class="sortIconClass(column)"
                       :icon="sortOrder"
                       :style="{
-                          height: `${rowHeight}px`,
-                          'line-height': `${rowHeight}px`,
-                          visibility: !!sortOrder ? column.hidden : true,
+                        height: `${rowHeight}px`,
+                        'line-height': `${rowHeight}px`,
+                        visibility: !!sortOrder ? column.hidden : true,
                       }"
                     />
                   </template>
