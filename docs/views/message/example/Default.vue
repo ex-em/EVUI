@@ -84,7 +84,7 @@ import { ref, getCurrentInstance } from 'vue';
 
 export default {
   setup() {
-    const { ctx } = getCurrentInstance();
+    const ctx = getCurrentInstance().appContext.config.globalProperties;
 
     const showInfo = () => {
       ctx.$message('Infomation. This is an Info type message.');

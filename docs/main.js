@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import EVUI from '@/main';
+import EVUI, { EvMessageBox, EvMessage, EvNotification } from '@/main';
 import Example from './components/Example.vue';
 
 import App from './App.vue';
@@ -10,7 +10,11 @@ const app = createApp(App);
 
 app.component('Example', Example);
 
+app.config.globalProperties.$messagebox = EvMessageBox;
+app.config.globalProperties.$messagex = EvMessage;
+app.config.globalProperties.$notify = EvNotification;
+
 app.use(store)
-  .use(router)
-  .use(EVUI)
-  .mount('#app');
+.use(router)
+.use(EVUI)
+.mount('#app');

@@ -251,6 +251,7 @@ export default {
 </script>
 
 <style lang="scss">
+@use 'sass:color';
 @import '../../style/index.scss';
 
 .ev-slider {
@@ -264,8 +265,8 @@ export default {
   &-wrapper {
     position: relative;
     height: $line-height + $handle-height;
-    padding: #{$handle-height / 2} 0;
-    margin: 0 #{$handle-height / 2};
+    padding: calc($handle-height / 2) 0;
+    margin: 0 calc($handle-height / 2);
   }
   &-line-layer {
     position: absolute;
@@ -279,7 +280,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: #{$line-height / 2};
+    border-radius: calc($line-height / 2);
 
     @include evThemify() {
       background-color: evThemed('border-light');
@@ -291,7 +292,7 @@ export default {
     left: 0;
     width: 0;
     height: $line-height;
-    border-radius: #{$line-height / 2};
+    border-radius: calc($line-height / 2);
 
     @include evThemify() {
       background-color: evThemed('primary');
@@ -306,9 +307,9 @@ export default {
     z-index: 9;
     width: $handle-size;
     height: $handle-size;
-    padding: $handle-padding / 2;
-    margin-top: ($handle-size / 2) * -1;
-    margin-left: ($handle-size / 2) * -1;
+    padding: calc($handle-padding / 2);
+    margin-top: calc(($handle-size / 2) * -1);
+    margin-left: calc(($handle-size / 2) * -1);
     cursor: grab;
 
     &.dragging {
@@ -385,7 +386,7 @@ export default {
     top: 0;
     width: $line-height;
     height: $line-height;
-    border-radius: #{$line-height / 2};
+    border-radius: calc($line-height / 2);
     transform: translateX(-50%);
 
     @include evThemify() {
@@ -411,7 +412,7 @@ export default {
       left: 50%;
       width: $line-height;
       height: $line-height;
-      border-radius: #{$line-height / 2};
+      border-radius: calc($line-height / 2);
       transform: translateX(-50%);
       content: '';
 
@@ -474,7 +475,7 @@ export default {
       &.left,
       &.right {
         @include evThemify() {
-          background-color: lighten(evThemed('disabled'), 5%);
+          background-color: color.scale(evThemed('disabled'), $lightness: 5%);
         }
       }
     }

@@ -32,8 +32,10 @@
   }
 }
 @mixin state($state) {
+  $s: #{if(&, '&', '')};
+
   @at-root {
-    &.#{$state} {
+    #{$s}.#{$state} {
       @content;
     }
   }

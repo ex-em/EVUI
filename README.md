@@ -1,41 +1,28 @@
-# evui 3.0
+# evui 4.0
 
-### Project setup
-```
-npm i -D evui
+## Project setup
+
+```sh
+npm i evui
 ```
 
-### Compiles library for product
-```
+## Compiles library for product
+
+```sh
 npm run build:lib
 ```
 
-### Compiles and hot-reloads for development document project
-- Node 12 is required to run the official documentation locally.
-- We will upload the node version later.
-- DOCUMENT : https://ex-em.github.io/EVUI
-```
+## Compiles and hot-reloads for development document project
+
+- DOCUMENT : <https://ex-em.github.io/EVUI>
+
+```sh
 npm run docs
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Use Vue3 Project
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Use Vue3 Project
-```
-// main.ts
+```ts
 import App from '@/App.vue';
 import EVUI from 'evui';
 
@@ -46,11 +33,13 @@ app.use(EVUI);
 app.mount('#app');
 ```
 
-### Using Message Component
-```
+## Using Message Component
+
+```ts
 // main.ts
 import App from '@/App.vue';
 import { EvMessageBox, EvMessage, EvNotification } from 'evui';
+import 'evui/style';
 
 const app = createApp(App);
 
