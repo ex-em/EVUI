@@ -480,17 +480,14 @@
                   }"
                   :disabled="row[ROW_DISABLED_INDEX]"
                 >
-                  <div
-                    class="row-contextmenu__btn-wrapper"
-                    :style="{
-                      position: 'absolute',
-                      right: 0,
-                    }"
-                  >
                     <template v-if="$slots.contextmenuIcon">
                       <span
                         class="row-contextmenu__btn"
                         :disabled="row[ROW_DISABLED_INDEX]"
+                        :style="{
+                          position: 'absolute',
+                          right: 0,
+                        }"
                         @click="onContextMenu($event)"
                       >
                         <slot name="contextmenuIcon"></slot>
@@ -501,10 +498,13 @@
                         icon="ev-icon-warning2"
                         class="row-contextmenu__btn"
                         :disabled="row[ROW_DISABLED_INDEX]"
+                        :style="{
+                          position: 'absolute',
+                          right: 0,
+                        }"
                         @click="onContextMenu($event)"
                       />
                     </template>
-                  </div>
                 </td>
               </tr>
               <tr
