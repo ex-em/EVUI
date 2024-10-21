@@ -473,8 +473,6 @@
                     'non-border': !!borderStyle,
                   }"
                   :style="{
-                    position: 'sticky',
-                    right: 0,
                     width: '30px',
                     height: `${rowHeight}px`,
                     'min-width': '30px',
@@ -482,23 +480,31 @@
                   }"
                   :disabled="row[ROW_DISABLED_INDEX]"
                 >
-                  <template v-if="$slots.contextmenuIcon">
-                    <span
-                      class="row-contextmenu__btn"
-                      :disabled="row[ROW_DISABLED_INDEX]"
-                      @click="onContextMenu($event)"
-                    >
-                      <slot name="contextmenuIcon"></slot>
-                    </span>
-                  </template>
-                  <template v-else>
-                    <grid-option-button
-                      icon="ev-icon-warning2"
-                      class="row-contextmenu__btn"
-                      :disabled="row[ROW_DISABLED_INDEX]"
-                      @click="onContextMenu($event)"
-                    />
-                  </template>
+                  <div
+                    class="row-contextmenu__btn-wrapper"
+                    :style="{
+                      position: 'absolute',
+                      right: 0,
+                    }"
+                  >
+                    <template v-if="$slots.contextmenuIcon">
+                      <span
+                        class="row-contextmenu__btn"
+                        :disabled="row[ROW_DISABLED_INDEX]"
+                        @click="onContextMenu($event)"
+                      >
+                        <slot name="contextmenuIcon"></slot>
+                      </span>
+                    </template>
+                    <template v-else>
+                      <grid-option-button
+                        icon="ev-icon-warning2"
+                        class="row-contextmenu__btn"
+                        :disabled="row[ROW_DISABLED_INDEX]"
+                        @click="onContextMenu($event)"
+                      />
+                    </template>
+                  </div>
                 </td>
               </tr>
               <tr
