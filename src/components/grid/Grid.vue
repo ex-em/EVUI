@@ -473,8 +473,6 @@
                     'non-border': !!borderStyle,
                   }"
                   :style="{
-                    position: 'sticky',
-                    right: 0,
                     width: '30px',
                     height: `${rowHeight}px`,
                     'min-width': '30px',
@@ -486,6 +484,10 @@
                     <span
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
+                      :style="{
+                        position: 'absolute',
+                        right: 0,
+                      }"
                       @click="onContextMenu($event)"
                     >
                       <slot name="contextmenuIcon"></slot>
@@ -496,6 +498,10 @@
                       icon="ev-icon-warning2"
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
+                      :style="{
+                        position: 'absolute',
+                        right: 0,
+                      }"
                       @click="onContextMenu($event)"
                     />
                   </template>

@@ -27,7 +27,8 @@
           <div
             class="grid-custom-cell__content"
             :style="{
-              width: `${(item.data.customCell.toTime - item.data.customCell.fromTime) / totalRenderSec * 100}%`,
+              width: `${(item.data.customCell.toTime - item.data.customCell.fromTime)
+                / totalRenderSec * 100}%`,
               left: `${item.data.customCell.fromTime / totalRenderSec * 100}%`,
             }"
           />
