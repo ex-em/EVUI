@@ -475,6 +475,10 @@
                   :style="{
                     position: 'sticky',
                     right: 0,
+                    width: '30px',
+                    height: `${rowHeight}px`,
+                    'min-width': '30px',
+                    'line-height': `${rowHeight}px`,
                   }"
                   :disabled="row[ROW_DISABLED_INDEX]"
                 >
@@ -483,10 +487,6 @@
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
                       :style="{
-                        width: '30px',
-                        height: `${rowHeight}px`,
-                        'min-width': '30px',
-                        'line-height': `${rowHeight}px`,
                       }"
                       @click="onContextMenu($event)"
                     >
@@ -499,10 +499,6 @@
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
                       :style="{
-                        width: '30px',
-                        height: `${rowHeight}px`,
-                        'min-width': '30px',
-                        'line-height': `${rowHeight}px`,
                       }"
                       @click="onContextMenu($event)"
                     />
@@ -512,18 +508,21 @@
               <tr
                 v-if="useRowDetail && $slots?.rowDetail && row[4]"
               >
-              <div
-                :style="{
-                  height: `${detailRowHeight}px`,
-                  'min-height': `${detailRowHeight}px`,
-                  'max-height': `${detailRowHeight}px`
-                }">
-
-                <slot
-                  name="rowDetail"
-                  :item="{ row }"
-                />
-              </div>
+                <td :colspan="row.length">
+                  <div
+                    :style="{
+                      width: '100%',
+                      height: `${detailRowHeight}px`,
+                      'min-height': `${detailRowHeight}px`,
+                      'max-height': `${detailRowHeight}px`
+                    }"
+                  >
+                    <slot
+                      name="rowDetail"
+                      :item="{ row }"
+                    />
+                  </div>
+                </td>
               </tr>
             </template>
             <tr v-if="!viewStore.length">
