@@ -588,6 +588,7 @@ const modules = {
       while (legendTableDOM.hasChildNodes()) {
         legendTableDOM.removeChild(legendTableDOM.firstChild);
       }
+      this.setLegendColumnHeader();
     } else {
       while (legendBoxDOM.hasChildNodes()) {
         legendBoxDOM.removeChild(legendBoxDOM.firstChild);
