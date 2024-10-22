@@ -486,8 +486,6 @@
                     <span
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
-                      :style="{
-                      }"
                       @click="onContextMenu($event)"
                     >
                       <slot name="contextmenuIcon"></slot>
@@ -498,8 +496,6 @@
                       icon="ev-icon-warning2"
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
-                      :style="{
-                      }"
                       @click="onContextMenu($event)"
                     />
                   </template>
