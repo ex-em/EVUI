@@ -583,8 +583,16 @@ const modules = {
       return;
     }
 
-    while (legendBoxDOM.hasChildNodes()) {
-      legendBoxDOM.removeChild(legendBoxDOM.firstChild);
+    if (this.useTable) {
+      const legendTableDOM = this.legendTableDOM;
+      while (legendTableDOM.hasChildNodes()) {
+        legendTableDOM.removeChild(legendTableDOM.firstChild);
+      }
+      this.setLegendColumnHeader();
+    } else {
+      while (legendBoxDOM.hasChildNodes()) {
+        legendBoxDOM.removeChild(legendBoxDOM.firstChild);
+      }
     }
 
     this.seriesInfo.count = 0;
