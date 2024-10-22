@@ -1,6 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
+      v-model:selectedLabel="clickedSelectLabel"
       :data="chartData"
       :options="chartOptions"
       @drag-select="onDragSelect"
@@ -8,6 +9,15 @@
       @dbl-click="onDblClick"
     />
     <div class="description">
+      <div class="one-row">
+        <p class="badge yellow">label 클릭 여부</p>
+        <ev-toggle
+          v-model="useSelectLabel"
+        />
+        <div v-if="useSelectLabel">
+          {{ clickedSelectLabel }}
+        </div>
+      </div>
       <div class="one-row">
         <p class="badge yellow">
           선택 영역 내 데이터
@@ -60,11 +70,13 @@
 </div></template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
     setup() {
+      const useSelectLabel = ref(false);
+
       const chartData = reactive({
         series: {
           series1: {
@@ -81,7 +93,7 @@ import { onMounted, reactive, ref } from 'vue';
       });
 
 
-      const chartOptions = {
+      const chartOptions = reactive({
         type: 'heatMap',
         width: '100%',
         title: {
@@ -109,6 +121,11 @@ import { onMounted, reactive, ref } from 'vue';
         selectItem: {
           use: true,
         },
+        selectLabel: {
+          use: true,
+          useClick: useSelectLabel.value,
+          useApproximateValue: true,
+        },
         heatMapColor: {
           min: '#A1CDF9',
           max: '#336fe9',
@@ -121,10 +138,14 @@ import { onMounted, reactive, ref } from 'vue';
         tooltip: {
           use: true,
         },
-      };
+      });
 
       const selectionItems = ref([]);
       const selectionRange = ref({});
+      const clickedSelectLabel = ref({
+        dataIndex: [],
+        targetAxis: 'xAxis',
+      });
 
       const onDragSelect = ({ data, range }) => {
         selectionItems.value = data;
@@ -162,6 +183,7 @@ import { onMounted, reactive, ref } from 'vue';
           if (randomValue > 4500) {
             randomValue = -1;
           }
+
           const item = {
             x: timeValue,
             y: yValue,
@@ -186,11 +208,18 @@ import { onMounted, reactive, ref } from 'vue';
         }
       });
 
+      watch(useSelectLabel, (newValue) => {
+        clickedSelectLabel.value.dataIndex = [];
+        chartOptions.selectLabel.useClick = newValue;
+      });
+
       return {
+        useSelectLabel,
         chartData,
         chartOptions,
         selectionItems,
         selectionRange,
+        clickedSelectLabel,
         dblClickedInfo,
         clickedInfo,
         onDragSelect,
