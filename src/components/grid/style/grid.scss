@@ -34,7 +34,10 @@
   }
   .row-contextmenu__btn {
     display: none;
+    position: absolute;
+    right: 10px;
     vertical-align: middle;
+    transform: translate(0, -50%);
   }
 }
 
@@ -180,11 +183,6 @@
       }
     }
   }
-  .row-contextmenu {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-  }
 
   .cell {
     display: inline-block;
@@ -203,7 +201,10 @@
       text-overflow: ellipsis;
     }
     &.row-checkbox {
+      display: inline-flex;
       padding: 0;
+      justify-content: center;
+      align-items: center;
       .ev-checkbox {
         display: inline-flex;
         width: 100%;
