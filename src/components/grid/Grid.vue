@@ -480,31 +480,31 @@
                   }"
                   :disabled="row[ROW_DISABLED_INDEX]"
                 >
-                    <template v-if="$slots.contextmenuIcon">
-                      <span
-                        class="row-contextmenu__btn"
-                        :disabled="row[ROW_DISABLED_INDEX]"
-                        :style="{
-                          position: 'absolute',
-                          right: 0,
-                        }"
-                        @click="onContextMenu($event)"
-                      >
-                        <slot name="contextmenuIcon"></slot>
-                      </span>
-                    </template>
-                    <template v-else>
-                      <grid-option-button
-                        icon="ev-icon-warning2"
-                        class="row-contextmenu__btn"
-                        :disabled="row[ROW_DISABLED_INDEX]"
-                        :style="{
-                          position: 'absolute',
-                          right: 0,
-                        }"
-                        @click="onContextMenu($event)"
-                      />
-                    </template>
+                  <template v-if="$slots.contextmenuIcon">
+                    <span
+                      class="row-contextmenu__btn"
+                      :disabled="row[ROW_DISABLED_INDEX]"
+                      :style="{
+                        position: 'absolute',
+                        right: 0,
+                      }"
+                      @click="onContextMenu($event)"
+                    >
+                      <slot name="contextmenuIcon"></slot>
+                    </span>
+                  </template>
+                  <template v-else>
+                    <grid-option-button
+                      icon="ev-icon-warning2"
+                      class="row-contextmenu__btn"
+                      :disabled="row[ROW_DISABLED_INDEX]"
+                      :style="{
+                        position: 'absolute',
+                        right: 0,
+                      }"
+                      @click="onContextMenu($event)"
+                    />
+                  </template>
                 </td>
               </tr>
               <tr
