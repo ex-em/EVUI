@@ -473,10 +473,8 @@
                     'non-border': !!borderStyle,
                   }"
                   :style="{
-                    width: '30px',
-                    height: `${rowHeight}px`,
-                    'min-width': '30px',
-                    'line-height': `${rowHeight}px`,
+                    position: 'sticky',
+                    right: 0,
                   }"
                   :disabled="row[ROW_DISABLED_INDEX]"
                 >
@@ -485,8 +483,10 @@
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
                       :style="{
-                        position: 'absolute',
-                        right: 0,
+                        width: '30px',
+                        height: `${rowHeight}px`,
+                        'min-width': '30px',
+                        'line-height': `${rowHeight}px`,
                       }"
                       @click="onContextMenu($event)"
                     >
@@ -499,8 +499,10 @@
                       class="row-contextmenu__btn"
                       :disabled="row[ROW_DISABLED_INDEX]"
                       :style="{
-                        position: 'absolute',
-                        right: 0,
+                        width: '30px',
+                        height: `${rowHeight}px`,
+                        'min-width': '30px',
+                        'line-height': `${rowHeight}px`,
                       }"
                       @click="onContextMenu($event)"
                     />

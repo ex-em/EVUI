@@ -34,6 +34,8 @@
   }
   .row-contextmenu__btn {
     display: none;
+    position: absolute;
+    right: 0;
     vertical-align: middle;
   }
 }
@@ -148,7 +150,6 @@
     }
   }
   .row {
-    position: relative;
     color: inherit;
     white-space: nowrap;
 
@@ -180,12 +181,6 @@
       }
     }
   }
-  .row-contextmenu {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-  }
-
   .cell {
     display: inline-block;
     padding: 0 10px;
@@ -203,7 +198,10 @@
       text-overflow: ellipsis;
     }
     &.row-checkbox {
+      display: inline-flex;
       padding: 0;
+      justify-content: center;
+      align-items: center;
       .ev-checkbox {
         display: inline-flex;
         width: 100%;
