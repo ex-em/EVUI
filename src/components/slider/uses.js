@@ -1,5 +1,5 @@
 import { ref, reactive, watch, computed, onMounted, getCurrentInstance } from 'vue';
-import { isEqual } from 'lodash-es';
+import { isEqual, isNumber } from 'lodash-es';
 import { convertToPercent } from '@/common/utils';
 import { getValueCloseToStep } from '@/components/inputNumber/uses';
 
@@ -138,7 +138,8 @@ export const useModel = () => {
   };
 
   watch(() => props.modelValue, (curr, prev) => {
-    if (curr
+    if (isNumber(curr)
+      && curr >= 0
       && !isEqual(curr, prev)
       && !state.dragging
     ) {
