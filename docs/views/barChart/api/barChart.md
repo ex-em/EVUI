@@ -212,15 +212,16 @@ const chartData = {
 
 ##### labelStyle
 
-| 이름       | 타입                        | 디폴트    | 설명                                               | 종류(예시)                             |
-| ---------- | --------------------------- | --------- | -------------------------------------------------- | -------------------------------------- |
-| show       | Boolean                     | true      | label 표시 여부                                    | true / false                           |
-| fontSize   | Number                      | 12        | 글자 크기                                          |                                        |
-| color      | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상                                          |                                        |
-| fontFamily | String                      | 'Roboto'  | 폰트                                               |                                        |
-| fitWidth   | Boolean                     | false     | Label Text Ellipsis 처리                           |                                        |
-| fitDir     | String                      | 'right'   | Ellipsis 방향                                      | ( right => 'aaa...', left => '...aaa') |
-| padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백 | 0                                      |
+| 이름         | 타입                          | 디폴트       | 설명                                                       | 종류(예시)                             |
+|------------|-----------------------------|-----------|----------------------------------------------------------| -------------------------------------- |
+| show       | Boolean                     | true      | label 표시 여부                                              | true / false                           |
+| fontSize   | Number                      | 12        | 글자 크기                                                    |                                        |
+| color      | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상                                                    |                                        |
+| fontFamily | String                      | 'Roboto'  | 폰트                                                       |                                        |
+| fitWidth   | Boolean                     | false     | Label Text Ellipsis 처리                                   |                                        |
+| maxWidth   | Number                      | undefined | fitWidth이 true일 때, maxWidth까지 영역을 확장하고 그 이후로 Ellipsis 처리 |                                        |
+| fitDir     | String                      | 'right'   | Ellipsis 방향                                              | ( right => 'aaa...', left => '...aaa') |
+| padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                   | 0                                      |
 
 ##### title
 
