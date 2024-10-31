@@ -525,6 +525,7 @@ export default {
       columnMenu: null,
       columnMenuItems: [],
       columnMenuTextInfo: props.option.columnMenuText || {},
+      hiddenColumnMenuItem: props.option.hiddenColumnMenuItem || {},
       customContextMenu: props.option.customContextMenu || [],
       gridSettingMenu: null,
       gridSettingContextMenuItems: [],
