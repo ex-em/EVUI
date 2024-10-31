@@ -281,7 +281,7 @@ const modules = {
 
         if (series.type === 'line' && series.fill) {
           colorDOM.style.height = '8px';
-          colorDOM.style.backgroundColor = `${seriesColor}80`;
+          colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
           colorDOM.style.border = `1px solid ${seriesColor}`;
         } else {
           colorDOM.style.backgroundColor = seriesColor;
@@ -653,7 +653,8 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
+      colorDOM.style.backgroundColor = series.show
+        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -730,7 +731,7 @@ const modules = {
     switch (series.type) {
       case 'line': {
         if (series.fill) {
-          colorDOM.style.backgroundColor = `${seriesColor}80`;
+          colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
           colorDOM.style.border = `1px solid ${seriesColor}`;
         } else {
           if (series.point) {
@@ -754,7 +755,8 @@ const modules = {
 
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
-      colorDOM.style.backgroundColor = series.show ? `${seriesColor}80` : opt.inactive;
+      colorDOM.style.backgroundColor = series.show
+        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;

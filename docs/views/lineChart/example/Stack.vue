@@ -13,7 +13,7 @@
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
       const chartData = {
         series: {
-          series1: { name: 'series#1', fill: true, point: true },
+          series1: { name: 'series#1', fill: true, point: true, color: 'rgba(239, 58, 58, 0.5)' },
           series2: { name: 'series#2', fill: true, point: true },
           series3: { name: 'series#3', fill: true, point: true },
         },
