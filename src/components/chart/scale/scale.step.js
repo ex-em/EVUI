@@ -40,7 +40,7 @@ class StepScale extends Scale {
       }
     }
 
-    const maxWidth = chartRect.chartWidth / (labelCount + 2);
+    const maxWidth = this.labelStyle?.maxWidth ?? chartRect.chartWidth / (labelCount + 2);
 
     return {
       min: minValue,
@@ -126,7 +126,7 @@ class StepScale extends Scale {
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
-    const maxWidth = chartRect.chartWidth / (steps + 2);
+    const maxWidth = this.labelStyle?.maxWidth ?? chartRect.chartWidth / (steps + 2);
 
     this.drawAxisTitle(chartRect, labelOffset);
 

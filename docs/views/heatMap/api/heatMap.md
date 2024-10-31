@@ -116,15 +116,16 @@ const chartData =
       - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
 
 ##### label style
-| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
-|-----|------|-------|-----|-----|
-| show | Boolean | true | label 표시 여부 | true / false |
-| fontSize | Number | 12 | 글자 크기 | |
-| color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
-| fontFamily | String | 'Roboto' | 폰트 | |
-| fitWidth | Boolean | false | Label Text Ellipsis 처리 | |
-| fitDir | String | 'right' | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
-| alignToGridLine | Boolean | false | 축 line에 표시할지의 여부 | |
+| 이름              | 타입                          | 디폴트       | 설명 | 종류(예시) |
+|-----------------|-----------------------------|-----------|-----|-----|
+| show            | Boolean                     | true      | label 표시 여부 | true / false |
+| fontSize        | Number                      | 12        | 글자 크기 | |
+| color           | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
+| fontFamily      | String                      | 'Roboto'  | 폰트 | |
+| fitWidth        | Boolean                     | false     | Label Text Ellipsis 처리 | |
+| maxWidth        | Number                      | undefined | fitWidth이 true일 때, maxWidth까지 영역을 확장하고 그 이후로 Ellipsis 처리 | |
+| fitDir          | String                      | 'right'   | Ellipsis 방향 | ( right => 'aaa...', left => '...aaa') |
+| alignToGridLine | Boolean                     | false     | 축 line에 표시할지의 여부 | |
 
 ##### axes title
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
