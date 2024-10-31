@@ -367,4 +367,26 @@ export default {
   isNullOrUndefined(value) {
     return value === null || value === undefined;
   },
+
+  rgbaAdjustHalfOpacity(color) {
+    const rgbRegex = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/;
+    const rgbaRegex = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/;
+
+    if (rgbRegex.test(color)) {
+      const [, r, g, b] = color.match(rgbRegex);
+      return `rgba(${r}, ${g}, ${b}, 0.5)`;
+    }
+
+    if (rgbaRegex.test(color)) {
+      const [, r, g, b, a] = color.match(rgbaRegex);
+      const newOpacity = (parseFloat(a) / 2).toFixed(2);
+      return `rgba(${r}, ${g}, ${b}, ${newOpacity})`;
+    }
+
+    if (color.startsWith('#') && color.length > 7) {
+      return color;
+    }
+
+    return `${color}80`;
+  },
 };
