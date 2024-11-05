@@ -18,7 +18,13 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="start time"
+          :placeholder="
+            placeholder != undefined
+              ? typeof placeholder != 'string'
+                ? placeholder[0]
+                : placeholder
+              : 'start time'
+          "
           @focus="focusInputStartTime"
           @blur="blurInputStartTime"
           @change="changeStartTime"
@@ -49,7 +55,13 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="end time"
+          :placeholder="
+            placeholder != undefined
+              ? typeof placeholder != 'string'
+                ? placeholder[1]
+                : placeholder
+              : 'end time'
+          "
           @focus="focusInputEndTime"
           @blur="blurInputEndTime"
           @change="changeEndTime"
@@ -84,7 +96,9 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="Enter time"
+          :placeholder="
+            placeholder != undefined && typeof placeholder === 'string' ? placeholder : 'Enter time'
+          "
           @focus="focusInputTime"
           @blur="blurInputTime"
           @change="changeTime"
@@ -143,6 +157,11 @@ export default {
     readonly: {
       type: Boolean,
       default: false,
+    },
+    placeholder: {
+      type: [String, Array],
+      required: false,
+      default: undefined,
     },
   },
   emits: {

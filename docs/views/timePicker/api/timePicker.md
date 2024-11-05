@@ -24,6 +24,7 @@ height: 35px;
 | clearable | Boolean | false | 시간 삭제가 가능한 [x]모양 버튼 사용 유무 | true, false|
 | disabled | Boolean | false | 시간 입력이 비활성화 여부 | true, false|
 | readonly | Boolean | false | 읽기 전용 사용 유무 | true, false|
+| placeholder | Array, String | undefined | placeholder 문구. 'range' 모드일 경우 시작시간과 종료시간의 placeholder 문구가 동일할 경우 String 타입으로 입력. 각 문구가 다를 경우 Array(['시작시간','끝시간']) 입력. 'single' 모드의 경우 String 타입으로 입력 |   |
 
 ### Event
 
