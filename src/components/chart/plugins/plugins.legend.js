@@ -12,6 +12,17 @@ const modules = {
     this.legendBoxDOM = document.createElement('div');
     this.legendBoxDOM.className = 'ev-chart-legend-box';
 
+    this.legendTopSpacer = document.createElement('div');
+    this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
+    this.legendTopSpacer.style.clear = 'both';
+    this.legendTopSpacer.style.opacity = 0;
+
+    this.legendBottomSpacer = document.createElement('div');
+    this.legendBottomSpacer.className = 'ev-chart-legend--bottom-spacer';
+    this.legendBottomSpacer.style.clear = 'both';
+    this.legendBottomSpacer.style.opacity = 0;
+
+
     if (this.options?.legend?.allowResize) {
       this.resizeDOM = document.createElement('div');
       this.resizeDOM.className = 'ev-chart-resize-bar';
@@ -29,10 +40,20 @@ const modules = {
     } else {
       this.legendBoxDOM.style.overflowX = 'hidden';
       this.legendBoxDOM.style.overflowY = 'auto';
+      this.legendBoxDOM.style.height = '100%';
+      // this.legendBoxDOM.style.position = 'relative';
     }
 
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
+
+    requestAnimationFrame(() => {
+      if (!this.useTable) {
+        this.legendBoxDOM.appendChild(this.legendTopSpacer);
+        this.legendBoxDOM.appendChild(this.legendBottomSpacer);
+        this.updateVisibleRowCount();
+      }
+    });
   },
 
   /**
@@ -75,6 +96,7 @@ const modules = {
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
     this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+    this.legendItemHeight = 18;
 
     if (!this.isInitLegend) {
       this.createLegendLayout();
@@ -94,6 +116,54 @@ const modules = {
     this.isLegendMove = false;
   },
 
+  updateVisibleRowCount() {
+    const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
+    const legendBoxHeight = this.legendBoxDOM.clientHeight;
+    const legendBoxWidth = this.legendBoxDOM.clientWidth;
+
+    const itemWidth = Math.max(this.options.legend.width - 8, 1);
+    const useLegendSeriesCount = Object.values(this.seriesList)
+      .filter(series => series.showLegend !== false)
+      .length;
+
+    this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
+    this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
+    this.visibleRowCount = legendBoxHeight > this.legendItemHeight
+      ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
+  },
+
+  updateStartEndRowIndex() {
+    const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
+    this.startRowIndex = index > this.totalRowCount - 1 ? 0 : index;
+    this.endRowIndex = this.startRowIndex + this.visibleRowCount;
+  },
+
+  renderVisibleLegends() {
+    this.updateStartEndRowIndex();
+
+    const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
+    elementsToRemove.forEach(element => element.remove());
+
+    const totalScrollHeight = this.totalRowCount * this.legendItemHeight;
+    const top = this.startRowIndex * this.legendItemHeight;
+    const bottom = Math.max(
+      totalScrollHeight - this.visibleRowCount * this.legendItemHeight - top,
+      0,
+    );
+    this.legendTopSpacer.style.height = `${top}px`;
+    this.legendBottomSpacer.style.height = `${bottom}px`;
+
+
+    const useLegendSeries = Object.values(this.seriesList)
+      .filter(series => series.showLegend);
+    const startIndex = this.startRowIndex * this.itemsPerRow;
+    const endIndex = this.endRowIndex * this.itemsPerRow;
+
+    useLegendSeries.slice(startIndex, endIndex).forEach((series) => {
+      this.addLegend(series);
+    });
+  },
+
   /**
    * Add legend with group information to align each series properly.
    * Especially if a chart is stacked,
@@ -105,31 +175,30 @@ const modules = {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
 
-    groups.forEach((group) => {
-      group.slice().reverse().forEach((sId) => {
-        const series = seriesList[sId];
+    if (this.useTable) {
+      groups.forEach((group) => {
+        group.slice().reverse().forEach((sId) => {
+          const series = seriesList[sId];
 
-        if (series && series.showLegend) {
-          if (this.useTable) {
+          if (series && series.showLegend) {
             this.addLegendWithValues(series);
-          } else {
-            this.addLegend(series);
           }
+        });
+      });
+
+      Object.values(seriesList).forEach((series) => {
+        if (series.isExistGrp || !series.showLegend) {
+          return;
+        }
+        if (this.useTable) {
+          this.addLegendWithValues(series);
         }
       });
-    });
-
-    Object.values(seriesList).forEach((series) => {
-      if (series.isExistGrp || !series.showLegend) {
-        return;
-      }
-
-      if (this.useTable) {
-        this.addLegendWithValues(series);
-      } else {
-        this.addLegend(series);
-      }
-    });
+    } else {
+      requestAnimationFrame(() => {
+        this.renderVisibleLegends();
+      });
+    }
   },
 
   /**
@@ -352,6 +421,13 @@ const modules = {
     this.legendBoxDOM.addEventListener('click', this.onLegendBoxClick);
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
+
+    if (!this.useTable) {
+      this.legendBoxDOM.addEventListener('resize', this.updateVisibleRowCount);
+      this.legendBoxDOM.addEventListener('scroll', () => {
+        this.renderVisibleLegends();
+      });
+    }
 
     this.initResizeEvent();
   },
@@ -666,8 +742,6 @@ const modules = {
     nameDOM.setAttribute('title', series.name);
     nameDOM.dataset.type = 'name';
 
-    this.legendDOM.style.padding = '5px 0 0 0';
-
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
 
@@ -677,12 +751,13 @@ const modules = {
     } else {
       containerDOM.style.width = '100%';
     }
-    containerDOM.style.height = '18px';
+    containerDOM.style.height = `${this.legendItemHeight}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
-    this.legendBoxDOM.appendChild(containerDOM);
+    // this.legendBoxDOM.appendChild(containerDOM);
+    this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
     if (series.show) {
       this.seriesInfo.count++;
     }
