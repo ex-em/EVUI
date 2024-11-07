@@ -182,60 +182,73 @@ const modules = {
    * @returns {undefined}
    */
   addLegendList() {
-    const groups = this.data.groups;
-    const seriesList = this.seriesList;
+    const { groups } = this.data;
+    const { seriesList } = this;
 
     if (this.options.legend.virtualScroll) {
       if (this.useTable) {
-        groups.forEach((group) => {
-          group.slice().reverse().forEach((sId) => {
-            const series = seriesList[sId];
-
-            if (series && series.showLegend) {
-              this.addLegendWithValues(series);
-            }
-          });
-        });
-
-        Object.values(seriesList).forEach((series) => {
-          if (series.isExistGrp || !series.showLegend) {
-            return;
-          }
-          if (this.useTable) {
-            this.addLegendWithValues(series);
-          }
-        });
+        this.addLegendForGroups(groups, seriesList, true);
+        this.addStandaloneLegends(seriesList, true);
       } else {
         requestAnimationFrame(() => {
           this.renderVisibleLegends();
         });
       }
     } else {
-      groups.forEach((group) => {
-        group.slice().reverse().forEach((sId) => {
-          const series = seriesList[sId];
-
-          if (series && series.showLegend) {
-            if (this.useTable) {
-              this.addLegendWithValues(series);
-            } else {
-              this.addLegend(series);
-            }
-          }
-        });
-      });
-
-      Object.values(seriesList).forEach((series) => {
-        if (series.isExistGrp || !series.showLegend) {
-          return;
-        }
-
-        if (this.useTable) {
-          this.addLegendWithValues(series);
-        } else {
-          this.addLegend(series);
+      this.addLegendForGroups(groups, seriesList, this.useTable);
+      this.addStandaloneLegends(seriesList, this.useTable);
+    }
+  },
+  /**
+   * Adds legends for each group in `groups` array, iterating through each series
+   * within the group in reverse order. This ensures the legends align with the series
+   * order as displayed in the chart. Only adds series with `showLegend` set to `true`.
+   *
+   * @param {Array} groups - Array of groups containing series identifiers.
+   * @param {Object} seriesList - Object containing all series, keyed by series ID.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addLegendForGroups(groups, seriesList, useTable) {
+    groups.forEach((group) => {
+      group.slice().reverse().forEach((sId) => {
+        const series = seriesList[sId];
+        if (series && series.showLegend) {
+          this.addLegendBasedOnType(series, useTable);
         }
       });
+    });
+  },
+  /**
+   * Adds legends for series that are not part of any group. Iterates through each series
+   * in `seriesList` and only adds those that are not assigned to any group (based on `isExistGrp`)
+   * and have `showLegend` set to `true`.
+   *
+   * @param {Object} seriesList - Object containing all series, keyed by series ID.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addStandaloneLegends(seriesList, useTable) {
+    Object.values(seriesList).forEach((series) => {
+      if (!series.isExistGrp && series.showLegend) {
+        this.addLegendBasedOnType(series, useTable);
+      }
+    });
+  },
+  /**
+   * Adds a legend item for a specific series, determining whether to include additional
+   * values based on the `useTable` parameter. Calls `addLegendWithValues` if `useTable` is true,
+   * otherwise calls `addLegend`.
+   *
+   * @param {Object} series - Series object containing data to display in the legend.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addLegendBasedOnType(series, useTable) {
+    if (useTable) {
+      this.addLegendWithValues(series);
+    } else {
+      this.addLegend(series);
     }
   },
 
