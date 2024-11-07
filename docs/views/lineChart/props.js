@@ -32,11 +32,6 @@ import LegendVirtualScrollRaw from '!!raw-loader!./example/LegendVirtualScroll';
 export default {
   mdText,
   components: {
-    LegendVirtualScroll: {
-      description: 'Legend Virtual Scroll',
-      component: LegendVirtualScroll,
-      parsedData: parseComponent(LegendVirtualScrollRaw),
-    },
     Default: {
       description: 'Line Chart는 각각의 데이터를 선으로 연결하여 추이를 시각적으로 인지하는 차트입니다.',
       component: Default,
@@ -101,6 +96,11 @@ export default {
       description: '',
       component: HoverWithGroup,
       parsedData: parseComponent(HoverWithGroupRaw),
+    },
+    LegendVirtualScroll: {
+      description: 'Legend Virtual Scroll',
+      component: LegendVirtualScroll,
+      parsedData: parseComponent(LegendVirtualScrollRaw),
     },
   },
 };

@@ -13,7 +13,7 @@
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
       const chartData = {
         series: Array(1000).fill(0).reduce((acc, _, idx) => {
-          acc[`series${idx + 1}`] = { name: `series#${idx + 1}`, fill: true, point: true, color: 'rgba(58, 58, 239, 0.5)' };
+          acc[`series${idx + 1}`] = { name: `series#${idx + 1}`, fill: true, point: true };
           return acc;
         }, {}),
         groups: [Array(1000).fill(0).map((_, idx) => `series${idx + 1}`)],
@@ -23,7 +23,6 @@
           return acc;
         }, {}),
       };
-      console.log(chartData);
 
       const chartOptions = {
         type: 'line',
@@ -35,6 +34,7 @@
         legend: {
           show: true,
           position: 'right',
+          virtualScroll: true,
         },
         tooltip: {
           use: true,
