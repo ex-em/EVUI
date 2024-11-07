@@ -153,13 +153,21 @@ const modules = {
     this.legendTopSpacer.style.height = `${top}px`;
     this.legendBottomSpacer.style.height = `${bottom}px`;
 
-
-    const useLegendSeries = Object.values(this.seriesList)
-      .filter(series => series.showLegend);
     const startIndex = this.startRowIndex * this.itemsPerRow;
     const endIndex = this.endRowIndex * this.itemsPerRow;
 
-    useLegendSeries.slice(startIndex, endIndex).forEach((series) => {
+    const groups = this.data.groups.at(0);
+
+    let useLegendSeries = [];
+    if (groups) {
+      useLegendSeries = groups.slice().reverse()
+        .filter(sId => this.seriesList[sId].showLegend)
+        .map(sId => [sId, this.seriesList[sId]]);
+    } else {
+      useLegendSeries = Object.entries(this.seriesList)
+      .filter(([, series]) => series.showLegend);
+    }
+    useLegendSeries.slice(startIndex, endIndex).forEach(([, series]) => {
       this.addLegend(series);
     });
   },
