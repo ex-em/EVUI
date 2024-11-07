@@ -118,6 +118,15 @@ const modules = {
     this.isLegendMove = false;
   },
 
+  /**
+   * Calculate and update the number of rows and items per row that are visible
+   * within the legend container based on its dimensions and the layout of the legend.
+   * If the legend is positioned on the right or left, only one item per row is shown.
+   * Otherwise, the number of items per row is determined by dividing the container width
+   * by the item width.
+   *
+   * @returns {undefined}
+   */
   updateVisibleRowCount() {
     const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
     const legendBoxHeight = this.legendBoxDOM.clientHeight;
@@ -134,12 +143,27 @@ const modules = {
       ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
   },
 
+  /**
+   * Calculate and set the start and end row indexes for visible items within the
+   * scrollable legend area. Determines the row range that should be displayed based
+   * on the current scroll position and the height of each legend item.
+   *
+   * @returns {undefined}
+   */
   updateStartEndRowIndex() {
     const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
     this.startRowIndex = index > this.totalRowCount - 1 ? 0 : index;
     this.endRowIndex = this.startRowIndex + this.visibleRowCount;
   },
 
+  /**
+   * Render only the visible legend items in the legend container based on the
+   * calculated start and end row indexes. Removes existing legend items,
+   * adjusts spacer heights to enable smooth scrolling, and adds only the items
+   * within the visible range.
+   *
+   * @returns {undefined}
+   */
   renderVisibleLegends() {
     this.updateStartEndRowIndex();
 
