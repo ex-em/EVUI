@@ -38,6 +38,7 @@ const DEFAULT_OPTIONS = {
     width: 140,
     height: 24,
     allowResize: false,
+    virtualScroll: false,
     table: {
       use: false,
       columns: {

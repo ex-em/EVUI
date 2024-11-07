@@ -960,6 +960,10 @@ class EvChart {
         if (this.options.legend.type === 'gradient') {
           this.legendBoxDOM.removeEventListener('mousedown', this.onLegendMouseDown);
         }
+        if (this.options.legend.virtualScroll && !this.useTable) {
+          this.legendBoxDOM.removeEventListener('resize', this.updateVisibleRowCount);
+          this.legendBoxDOM.removeEventListener('scroll', this.renderVisibleLegends);
+        }
       }
 
       if (this.resizeDOM) {
@@ -982,6 +986,15 @@ class EvChart {
       this.tooltipCanvas = null;
       this.tooltipDOM.remove();
       this.tooltipDOM = null;
+    }
+
+    if (this.renderVisibleLegendsFrameId != null) {
+      cancelAnimationFrame(this.renderVisibleLegendsFrameId);
+      this.renderVisibleLegendsFrameId = null;
+    }
+    if (this.updateVisibleRowCountFrameId != null) {
+      cancelAnimationFrame(this.updateVisibleRowCountFrameId);
+      this.updateVisibleRowCountFrameId = null;
     }
 
     this.wrapperDOM = null;

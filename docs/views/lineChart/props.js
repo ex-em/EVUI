@@ -26,6 +26,8 @@ import PassingValue from './example/PassingValue';
 import PassingValueRaw from '!!raw-loader!./example/PassingValue';
 import HoverWithGroup from './example/HoverWithGroup';
 import HoverWithGroupRaw from '!!raw-loader!./example/HoverWithGroup';
+import LegendVirtualScroll from './example/LegendVirtualScroll';
+import LegendVirtualScrollRaw from '!!raw-loader!./example/LegendVirtualScroll';
 
 export default {
   mdText,
@@ -94,6 +96,11 @@ export default {
       description: '',
       component: HoverWithGroup,
       parsedData: parseComponent(HoverWithGroupRaw),
+    },
+    LegendVirtualScroll: {
+      description: 'Legend Virtual Scroll',
+      component: LegendVirtualScroll,
+      parsedData: parseComponent(LegendVirtualScrollRaw),
     },
   },
 };

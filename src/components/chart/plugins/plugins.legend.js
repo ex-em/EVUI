@@ -29,10 +29,30 @@ const modules = {
     } else {
       this.legendBoxDOM.style.overflowX = 'hidden';
       this.legendBoxDOM.style.overflowY = 'auto';
+      this.legendBoxDOM.style.height = '100%';
     }
 
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
+
+
+    if (this.options.legend.virtualScroll && !this.useTable) {
+      this.legendTopSpacer = document.createElement('div');
+      this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
+      this.legendTopSpacer.style.clear = 'both';
+      this.legendTopSpacer.style.opacity = 0;
+
+      this.legendBottomSpacer = document.createElement('div');
+      this.legendBottomSpacer.className = 'ev-chart-legend--bottom-spacer';
+      this.legendBottomSpacer.style.clear = 'both';
+      this.legendBottomSpacer.style.opacity = 0;
+
+      this.legendBoxDOM.appendChild(this.legendTopSpacer);
+      this.legendBoxDOM.appendChild(this.legendBottomSpacer);
+      this.updateVisibleRowCountFrameId = requestAnimationFrame(() => {
+        this.updateVisibleRowCount();
+      });
+    }
   },
 
   /**
@@ -75,6 +95,7 @@ const modules = {
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
     this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+    this.legendItemHeight = 18;
 
     if (!this.isInitLegend) {
       this.createLegendLayout();
@@ -95,6 +116,86 @@ const modules = {
   },
 
   /**
+   * Calculate and update the number of rows and items per row that are visible
+   * within the legend container based on its dimensions and the layout of the legend.
+   * If the legend is positioned on the right or left, only one item per row is shown.
+   * Otherwise, the number of items per row is determined by dividing the container width
+   * by the item width.
+   *
+   * @returns {undefined}
+   */
+  updateVisibleRowCount() {
+    const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
+    const legendBoxHeight = this.legendBoxDOM.clientHeight;
+    const legendBoxWidth = this.legendBoxDOM.clientWidth;
+
+    const itemWidth = Math.max(this.options.legend.width - 8, 1);
+    const useLegendSeriesCount = Object.values(this.seriesList)
+      .filter(series => series.showLegend !== false)
+      .length;
+
+    this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
+    this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
+    this.visibleRowCount = legendBoxHeight > this.legendItemHeight
+      ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
+  },
+
+  /**
+   * Calculate and set the start and end row indexes for visible items within the
+   * scrollable legend area. Determines the row range that should be displayed based
+   * on the current scroll position and the height of each legend item.
+   *
+   * @returns {undefined}
+   */
+  updateStartEndRowIndex() {
+    const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
+    this.startRowIndex = index > this.totalRowCount - 1 ? 0 : index;
+    this.endRowIndex = this.startRowIndex + this.visibleRowCount;
+  },
+
+  /**
+   * Render only the visible legend items in the legend container based on the
+   * calculated start and end row indexes. Removes existing legend items,
+   * adjusts spacer heights to enable smooth scrolling, and adds only the items
+   * within the visible range.
+   *
+   * @returns {undefined}
+   */
+  renderVisibleLegends() {
+    this.updateStartEndRowIndex();
+
+    const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
+    elementsToRemove.forEach(element => element.remove());
+
+    const totalScrollHeight = this.totalRowCount * this.legendItemHeight;
+    const top = this.startRowIndex * this.legendItemHeight;
+    const bottom = Math.max(
+      totalScrollHeight - this.visibleRowCount * this.legendItemHeight - top,
+      0,
+    );
+    this.legendTopSpacer.style.height = `${top}px`;
+    this.legendBottomSpacer.style.height = `${bottom}px`;
+
+    const startIndex = this.startRowIndex * this.itemsPerRow;
+    const endIndex = this.endRowIndex * this.itemsPerRow;
+
+    const groups = this.data.groups.at(0);
+
+    let useLegendSeries = [];
+    if (groups) {
+      useLegendSeries = groups.slice().reverse()
+        .filter(sId => this.seriesList[sId].showLegend)
+        .map(sId => [sId, this.seriesList[sId]]);
+    } else {
+      useLegendSeries = Object.entries(this.seriesList)
+      .filter(([, series]) => series.showLegend);
+    }
+    useLegendSeries.slice(startIndex, endIndex).forEach(([, series]) => {
+      this.addLegend(series);
+    });
+  },
+
+  /**
    * Add legend with group information to align each series properly.
    * Especially if a chart is stacked,
    * legends have to align with series ordering as we can see in chart.
@@ -102,34 +203,74 @@ const modules = {
    * @returns {undefined}
    */
   addLegendList() {
-    const groups = this.data.groups;
-    const seriesList = this.seriesList;
+    const { groups } = this.data;
+    const { seriesList } = this;
 
+    if (this.options.legend.virtualScroll) {
+      if (this.useTable) {
+        this.addLegendForGroups(groups, seriesList, true);
+        this.addStandaloneLegends(seriesList, true);
+      } else {
+        this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
+          this.renderVisibleLegends();
+        });
+      }
+    } else {
+      this.addLegendForGroups(groups, seriesList, this.useTable);
+      this.addStandaloneLegends(seriesList, this.useTable);
+    }
+  },
+  /**
+   * Adds legends for each group in `groups` array, iterating through each series
+   * within the group in reverse order. This ensures the legends align with the series
+   * order as displayed in the chart. Only adds series with `showLegend` set to `true`.
+   *
+   * @param {Array} groups - Array of groups containing series identifiers.
+   * @param {Object} seriesList - Object containing all series, keyed by series ID.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addLegendForGroups(groups, seriesList, useTable) {
     groups.forEach((group) => {
       group.slice().reverse().forEach((sId) => {
         const series = seriesList[sId];
-
         if (series && series.showLegend) {
-          if (this.useTable) {
-            this.addLegendWithValues(series);
-          } else {
-            this.addLegend(series);
-          }
+          this.addLegendBasedOnType(series, useTable);
         }
       });
     });
-
+  },
+  /**
+   * Adds legends for series that are not part of any group. Iterates through each series
+   * in `seriesList` and only adds those that are not assigned to any group (based on `isExistGrp`)
+   * and have `showLegend` set to `true`.
+   *
+   * @param {Object} seriesList - Object containing all series, keyed by series ID.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addStandaloneLegends(seriesList, useTable) {
     Object.values(seriesList).forEach((series) => {
-      if (series.isExistGrp || !series.showLegend) {
-        return;
-      }
-
-      if (this.useTable) {
-        this.addLegendWithValues(series);
-      } else {
-        this.addLegend(series);
+      if (!series.isExistGrp && series.showLegend) {
+        this.addLegendBasedOnType(series, useTable);
       }
     });
+  },
+  /**
+   * Adds a legend item for a specific series, determining whether to include additional
+   * values based on the `useTable` parameter. Calls `addLegendWithValues` if `useTable` is true,
+   * otherwise calls `addLegend`.
+   *
+   * @param {Object} series - Series object containing data to display in the legend.
+   * @param {boolean} useTable - Determines whether to add legends with additional values.
+   * @returns {undefined}
+   */
+  addLegendBasedOnType(series, useTable) {
+    if (useTable) {
+      this.addLegendWithValues(series);
+    } else {
+      this.addLegend(series);
+    }
   },
 
   /**
@@ -353,6 +494,11 @@ const modules = {
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
 
+    if (this.options.legend.virtualScroll && !this.useTable) {
+      this.legendBoxDOM.addEventListener('resize', this.updateVisibleRowCount);
+      this.legendBoxDOM.addEventListener('scroll', this.renderVisibleLegends.bind(this));
+    }
+
     this.initResizeEvent();
   },
 
@@ -573,6 +719,7 @@ const modules = {
 
   /**
    * To update legend, remove all of legendBoxDOM's children
+   * (except spacers when virtualScroll is enabled)
    *
    * @returns {undefined}
    */
@@ -589,12 +736,14 @@ const modules = {
         legendTableDOM.removeChild(legendTableDOM.firstChild);
       }
       this.setLegendColumnHeader();
+    } else if (this.options.legend.virtualScroll) {
+      const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
+      elementsToRemove.forEach(element => element.remove());
     } else {
       while (legendBoxDOM.hasChildNodes()) {
         legendBoxDOM.removeChild(legendBoxDOM.firstChild);
       }
     }
-
     this.seriesInfo.count = 0;
   },
 
@@ -606,10 +755,18 @@ const modules = {
   destroyLegend() {
     const legendDOM = this.legendDOM;
 
+    if (this.renderVisibleLegendsFrameId != null) {
+      cancelAnimationFrame(this.renderVisibleLegendsFrameId);
+      this.renderVisibleLegendsFrameId = null;
+    }
+    if (this.updateVisibleRowCountFrameId != null) {
+      cancelAnimationFrame(this.updateVisibleRowCountFrameId);
+      this.updateVisibleRowCountFrameId = null;
+    }
+
     if (!legendDOM) {
       return;
     }
-
     legendDOM.remove();
 
     this.legendDOM = null;
@@ -666,8 +823,6 @@ const modules = {
     nameDOM.setAttribute('title', series.name);
     nameDOM.dataset.type = 'name';
 
-    this.legendDOM.style.padding = '5px 0 0 0';
-
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
 
@@ -677,12 +832,12 @@ const modules = {
     } else {
       containerDOM.style.width = '100%';
     }
-    containerDOM.style.height = '18px';
+    containerDOM.style.height = `${this.legendItemHeight}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
-    this.legendBoxDOM.appendChild(containerDOM);
+    this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
     if (series.show) {
       this.seriesInfo.count++;
     }
