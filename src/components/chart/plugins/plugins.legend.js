@@ -47,10 +47,11 @@ const modules = {
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
 
+    this.legendBoxDOM.appendChild(this.legendTopSpacer);
+    this.legendBoxDOM.appendChild(this.legendBottomSpacer);
+
     requestAnimationFrame(() => {
       if (!this.useTable) {
-        this.legendBoxDOM.appendChild(this.legendTopSpacer);
-        this.legendBoxDOM.appendChild(this.legendBottomSpacer);
         this.updateVisibleRowCount();
       }
     });
@@ -764,7 +765,6 @@ const modules = {
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
-    // this.legendBoxDOM.appendChild(containerDOM);
     this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
     if (series.show) {
       this.seriesInfo.count++;
