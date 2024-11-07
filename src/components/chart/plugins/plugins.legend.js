@@ -737,8 +737,8 @@ const modules = {
       }
       this.setLegendColumnHeader();
     } else if (this.options.legend.virtualScroll) {
-      const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
-      elementsToRemove.forEach(element => element.remove());
+      this.updateVisibleRowCount();
+      this.renderVisibleLegends();
     } else {
       while (legendBoxDOM.hasChildNodes()) {
         legendBoxDOM.removeChild(legendBoxDOM.firstChild);
