@@ -960,6 +960,10 @@ class EvChart {
         if (this.options.legend.type === 'gradient') {
           this.legendBoxDOM.removeEventListener('mousedown', this.onLegendMouseDown);
         }
+        if (this.options.legend.virtualScroll && !this.useTable) {
+          this.legendBoxDOM.removeEventListener('resize', this.updateVisibleRowCount);
+          this.legendBoxDOM.removeEventListener('scroll', this.renderVisibleLegends);
+        }
       }
 
       if (this.resizeDOM) {
