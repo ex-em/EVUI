@@ -188,6 +188,7 @@ const chartData =
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
 | allowResize | Boolean | false | Legend 영역 리사이즈 가능 여부 | |
 | stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
+| virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부  | true /false |
     
 #### dragSelection
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |

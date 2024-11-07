@@ -150,7 +150,7 @@ const chartData = {
 | labelStyle     | Object   | ([상세](#labelstyle))  | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
 | plotLines      | Array    | ([상세](#plotline))    | plot line(임계선 표시 용도) 설정                                                                   |                                                                                          |
 | plotBands      | Array    | ([상세](#plotband))    | plot band(임계영역 표시 용도) 설정                                                                 |                                                                                          |
-| formatter      | function | null                | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                   | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
+| formatter      | function | null                   | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                            | (value, { prev, isDefaultMaxSameAsMin }) => value + '%'                                  |
 | title          | Object   | ([상세](#title))       | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
 
 ##### axesX
@@ -212,16 +212,16 @@ const chartData = {
 
 ##### labelStyle
 
-| 이름         | 타입                          | 디폴트       | 설명                                                       | 종류(예시)                             |
-|------------|-----------------------------|-----------|----------------------------------------------------------| -------------------------------------- |
-| show       | Boolean                     | true      | label 표시 여부                                              | true / false                           |
-| fontSize   | Number                      | 12        | 글자 크기                                                    |                                        |
-| color      | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상                                                    |                                        |
-| fontFamily | String                      | 'Roboto'  | 폰트                                                       |                                        |
-| fitWidth   | Boolean                     | false     | Label Text Ellipsis 처리                                   |                                        |
+| 이름       | 타입                        | 디폴트    | 설명                                                                       | 종류(예시)                             |
+| ---------- | --------------------------- | --------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| show       | Boolean                     | true      | label 표시 여부                                                            | true / false                           |
+| fontSize   | Number                      | 12        | 글자 크기                                                                  |                                        |
+| color      | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상                                                                  |                                        |
+| fontFamily | String                      | 'Roboto'  | 폰트                                                                       |                                        |
+| fitWidth   | Boolean                     | false     | Label Text Ellipsis 처리                                                   |                                        |
 | maxWidth   | Number                      | undefined | fitWidth이 true일 때, maxWidth까지 영역을 확장하고 그 이후로 Ellipsis 처리 |                                        |
-| fitDir     | String                      | 'right'   | Ellipsis 방향                                              | ( right => 'aaa...', left => '...aaa') |
-| padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                   | 0                                      |
+| fitDir     | String                      | 'right'   | Ellipsis 방향                                                              | ( right => 'aaa...', left => '...aaa') |
+| padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                         | 0                                      |
 
 ##### title
 
@@ -286,18 +286,19 @@ const chartData = {
 
 #### legend
 
-| 이름         | 타입                        | 디폴트                                   | 설명                                                  | 종류(예시)                       |
-| ------------ | --------------------------- | ---------------------------------------- | ----------------------------------------------------- | -------------------------------- |
-| show         | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
-| position     | String                      | 'right'                                  | Legend 위치                                           | 'top', 'right', 'bottom', 'left' |
-| color        | Hex, RGB, RGBA Code(String) | '#353740'                                | 폰트 색상                                             |                                  |
-| inactive     | Hex, RGB, RGBA Code(String) | '#aaa'                                   | 비활성화 상태의 폰트 색상                             |                                  |
-| width        | Number                      | 140                                      | Legend의 넓이 _('left', 'right'의 경우 조절)_         |                                  |
-| height       | Number                      | 24                                       | Legend의 높이 _('top', 'bottom'의 경우 조절)_         |                                  |
-| padding      | Object                      | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값                                |                                  |
-| allowResize  | Boolean                     | false                                    | Legend 영역 리사이즈 가능 여부                        |                                  |
-| table        | Object                      | ([상세](#legendtable))                   | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 |                                  |
-| stopClickEvt | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
+| 이름          | 타입                        | 디폴트                                   | 설명                                                  | 종류(예시)                       |
+| ------------- | --------------------------- | ---------------------------------------- | ----------------------------------------------------- | -------------------------------- |
+| show          | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
+| position      | String                      | 'right'                                  | Legend 위치                                           | 'top', 'right', 'bottom', 'left' |
+| color         | Hex, RGB, RGBA Code(String) | '#353740'                                | 폰트 색상                                             |                                  |
+| inactive      | Hex, RGB, RGBA Code(String) | '#aaa'                                   | 비활성화 상태의 폰트 색상                             |                                  |
+| width         | Number                      | 140                                      | Legend의 넓이 _('left', 'right'의 경우 조절)_         |                                  |
+| height        | Number                      | 24                                       | Legend의 높이 _('top', 'bottom'의 경우 조절)_         |                                  |
+| padding       | Object                      | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값                                |                                  |
+| allowResize   | Boolean                     | false                                    | Legend 영역 리사이즈 가능 여부                        |                                  |
+| table         | Object                      | ([상세](#legendtable))                   | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 |                                  |
+| stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
+| virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
 
 ##### legendTable
 
