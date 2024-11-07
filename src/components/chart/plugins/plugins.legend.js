@@ -12,17 +12,6 @@ const modules = {
     this.legendBoxDOM = document.createElement('div');
     this.legendBoxDOM.className = 'ev-chart-legend-box';
 
-    this.legendTopSpacer = document.createElement('div');
-    this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
-    this.legendTopSpacer.style.clear = 'both';
-    this.legendTopSpacer.style.opacity = 0;
-
-    this.legendBottomSpacer = document.createElement('div');
-    this.legendBottomSpacer.className = 'ev-chart-legend--bottom-spacer';
-    this.legendBottomSpacer.style.clear = 'both';
-    this.legendBottomSpacer.style.opacity = 0;
-
-
     if (this.options?.legend?.allowResize) {
       this.resizeDOM = document.createElement('div');
       this.resizeDOM.className = 'ev-chart-resize-bar';
@@ -47,14 +36,26 @@ const modules = {
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
 
-    this.legendBoxDOM.appendChild(this.legendTopSpacer);
-    this.legendBoxDOM.appendChild(this.legendBottomSpacer);
 
-    requestAnimationFrame(() => {
-      if (!this.useTable) {
-        this.updateVisibleRowCount();
-      }
-    });
+    if (this.options.legend.virtualScroll) {
+      this.legendTopSpacer = document.createElement('div');
+      this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
+      this.legendTopSpacer.style.clear = 'both';
+      this.legendTopSpacer.style.opacity = 0;
+
+      this.legendBottomSpacer = document.createElement('div');
+      this.legendBottomSpacer.className = 'ev-chart-legend--bottom-spacer';
+      this.legendBottomSpacer.style.clear = 'both';
+      this.legendBottomSpacer.style.opacity = 0;
+
+      this.legendBoxDOM.appendChild(this.legendTopSpacer);
+      this.legendBoxDOM.appendChild(this.legendBottomSpacer);
+      requestAnimationFrame(() => {
+        if (!this.useTable) {
+          this.updateVisibleRowCount();
+        }
+      });
+    }
   },
 
   /**
@@ -184,13 +185,42 @@ const modules = {
     const groups = this.data.groups;
     const seriesList = this.seriesList;
 
-    if (this.useTable) {
+    if (this.options.legend.virtualScroll) {
+      if (this.useTable) {
+        groups.forEach((group) => {
+          group.slice().reverse().forEach((sId) => {
+            const series = seriesList[sId];
+
+            if (series && series.showLegend) {
+              this.addLegendWithValues(series);
+            }
+          });
+        });
+
+        Object.values(seriesList).forEach((series) => {
+          if (series.isExistGrp || !series.showLegend) {
+            return;
+          }
+          if (this.useTable) {
+            this.addLegendWithValues(series);
+          }
+        });
+      } else {
+        requestAnimationFrame(() => {
+          this.renderVisibleLegends();
+        });
+      }
+    } else {
       groups.forEach((group) => {
         group.slice().reverse().forEach((sId) => {
           const series = seriesList[sId];
 
           if (series && series.showLegend) {
-            this.addLegendWithValues(series);
+            if (this.useTable) {
+              this.addLegendWithValues(series);
+            } else {
+              this.addLegend(series);
+            }
           }
         });
       });
@@ -199,13 +229,12 @@ const modules = {
         if (series.isExistGrp || !series.showLegend) {
           return;
         }
+
         if (this.useTable) {
           this.addLegendWithValues(series);
+        } else {
+          this.addLegend(series);
         }
-      });
-    } else {
-      requestAnimationFrame(() => {
-        this.renderVisibleLegends();
       });
     }
   },
@@ -431,11 +460,9 @@ const modules = {
     this.legendBoxDOM.addEventListener('mouseover', this.onLegendBoxOver);
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
 
-    if (!this.useTable) {
+    if (this.options.legend.virtualScroll && !this.useTable) {
       this.legendBoxDOM.addEventListener('resize', this.updateVisibleRowCount);
-      this.legendBoxDOM.addEventListener('scroll', () => {
-        this.renderVisibleLegends();
-      });
+      this.legendBoxDOM.addEventListener('scroll', this.renderVisibleLegends);
     }
 
     this.initResizeEvent();
