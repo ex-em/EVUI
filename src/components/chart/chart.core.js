@@ -988,6 +988,15 @@ class EvChart {
       this.tooltipDOM = null;
     }
 
+    if (this.renderVisibleLegendsFrameId != null) {
+      cancelAnimationFrame(this.renderVisibleLegendsFrameId);
+      this.renderVisibleLegendsFrameId = null;
+    }
+    if (this.updateVisibleRowCountFrameId != null) {
+      cancelAnimationFrame(this.updateVisibleRowCountFrameId);
+      this.updateVisibleRowCountFrameId = null;
+    }
+
     this.wrapperDOM = null;
     this.chartDOM = null;
     this.legendDOM = null;

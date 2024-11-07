@@ -50,7 +50,7 @@ const modules = {
 
       this.legendBoxDOM.appendChild(this.legendTopSpacer);
       this.legendBoxDOM.appendChild(this.legendBottomSpacer);
-      requestAnimationFrame(() => {
+      this.updateVisibleRowCountFrameId = requestAnimationFrame(() => {
         this.updateVisibleRowCount();
       });
     }
@@ -212,7 +212,7 @@ const modules = {
         this.addLegendForGroups(groups, seriesList, true);
         this.addStandaloneLegends(seriesList, true);
       } else {
-        requestAnimationFrame(() => {
+        this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
           this.renderVisibleLegends();
         });
       }
@@ -756,10 +756,18 @@ const modules = {
   destroyLegend() {
     const legendDOM = this.legendDOM;
 
+    if (this.renderVisibleLegendsFrameId != null) {
+      cancelAnimationFrame(this.renderVisibleLegendsFrameId);
+      this.renderVisibleLegendsFrameId = null;
+    }
+    if (this.updateVisibleRowCountFrameId != null) {
+      cancelAnimationFrame(this.updateVisibleRowCountFrameId);
+      this.updateVisibleRowCountFrameId = null;
+    }
+
     if (!legendDOM) {
       return;
     }
-
     legendDOM.remove();
 
     this.legendDOM = null;
