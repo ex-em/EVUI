@@ -30,7 +30,6 @@ const modules = {
       this.legendBoxDOM.style.overflowX = 'hidden';
       this.legendBoxDOM.style.overflowY = 'auto';
       this.legendBoxDOM.style.height = '100%';
-      // this.legendBoxDOM.style.position = 'relative';
     }
 
     this.legendDOM.appendChild(this.legendBoxDOM);
