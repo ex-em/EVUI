@@ -20,7 +20,7 @@
           :readonly="readonly"
           :placeholder="
             placeholder != undefined
-              ? typeof placeholder != 'string'
+              ? typeof placeholder !== 'string'
                 ? placeholder[0]
                 : placeholder
               : 'start time'
@@ -57,7 +57,7 @@
           :readonly="readonly"
           :placeholder="
             placeholder != undefined
-              ? typeof placeholder != 'string'
+              ? typeof placeholder !== 'string'
                 ? placeholder[1]
                 : placeholder
               : 'end time'
