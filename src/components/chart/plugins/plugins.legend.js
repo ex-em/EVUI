@@ -124,7 +124,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  updateVisibleRowCount() {
+  updateVisibleRowCount(forceUpdate = false) {
     const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
     const legendBoxHeight = this.legendBoxDOM.clientHeight;
     const legendBoxWidth = this.legendBoxDOM.clientWidth;
@@ -136,8 +136,12 @@ const modules = {
 
     this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
     this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
-    this.visibleRowCount = legendBoxHeight > this.legendItemHeight
+    const newVisibleRowCount = legendBoxHeight > this.legendItemHeight
       ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
+    if (forceUpdate || newVisibleRowCount !== this.visibleRowCount) {
+      this.visibleRowCount = newVisibleRowCount;
+      this.renderVisibleLegends();
+    }
   },
 
   /**
@@ -161,8 +165,13 @@ const modules = {
    *
    * @returns {undefined}
    */
-  renderVisibleLegends() {
+  renderVisibleLegends(forceUpdate = false) {
     this.updateStartEndRowIndex();
+    if (!forceUpdate && this.prevStartRowIndex === this.startRowIndex && this.prevEndRowIndex === this.endRowIndex) {
+      return;
+    }
+    this.prevStartRowIndex = this.startRowIndex;
+    this.prevEndRowIndex = this.endRowIndex;
 
     const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
     elementsToRemove.forEach(element => element.remove());
@@ -495,8 +504,10 @@ const modules = {
     this.legendBoxDOM.addEventListener('mouseleave', this.onLegendBoxLeave);
 
     if (this.options.legend.virtualScroll && !this.useTable) {
-      this.legendBoxDOM.addEventListener('resize', this.updateVisibleRowCount);
-      this.legendBoxDOM.addEventListener('scroll', this.renderVisibleLegends.bind(this));
+      this.legendBoxDOM.addEventListener('resize', () => this.updateVisibleRowCount(true));
+      this.legendBoxDOM.addEventListener('scroll', () => {
+        requestAnimationFrame(() => this.renderVisibleLegends(true));
+      });
     }
 
     this.initResizeEvent();
