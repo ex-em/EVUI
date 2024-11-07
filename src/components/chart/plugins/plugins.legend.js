@@ -722,6 +722,7 @@ const modules = {
 
   /**
    * To update legend, remove all of legendBoxDOM's children
+   * (except spacers when virtualScroll is enabled)
    *
    * @returns {undefined}
    */
@@ -738,12 +739,14 @@ const modules = {
         legendTableDOM.removeChild(legendTableDOM.firstChild);
       }
       this.setLegendColumnHeader();
+    } else if (this.options.legend.virtualScroll) {
+      const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
+      elementsToRemove.forEach(element => element.remove());
     } else {
       while (legendBoxDOM.hasChildNodes()) {
         legendBoxDOM.removeChild(legendBoxDOM.firstChild);
       }
     }
-
     this.seriesInfo.count = 0;
   },
 
