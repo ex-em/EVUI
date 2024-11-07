@@ -37,7 +37,7 @@ const modules = {
     this.wrapperDOM.appendChild(this.legendDOM);
 
 
-    if (this.options.legend.virtualScroll) {
+    if (this.options.legend.virtualScroll && !this.useTable) {
       this.legendTopSpacer = document.createElement('div');
       this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
       this.legendTopSpacer.style.clear = 'both';
@@ -51,9 +51,7 @@ const modules = {
       this.legendBoxDOM.appendChild(this.legendTopSpacer);
       this.legendBoxDOM.appendChild(this.legendBottomSpacer);
       requestAnimationFrame(() => {
-        if (!this.useTable) {
-          this.updateVisibleRowCount();
-        }
+        this.updateVisibleRowCount();
       });
     }
   },
