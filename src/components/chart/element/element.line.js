@@ -16,7 +16,7 @@ class Line {
 
     ['color', 'pointFill', 'fillColor'].forEach((colorProp) => {
       if (this[colorProp] === undefined) {
-        this[colorProp] = colorProp === 'pointFill' ? this.color : COLOR[sIdx];
+        this[colorProp] = colorProp === 'pointFill' ? this.color : COLOR[(sIdx) % COLOR.length];
       }
     });
     this.type = 'line';
@@ -72,7 +72,7 @@ class Line {
       extent = this.extent.normal;
     }
 
-    const getOpacity = colorStr => (colorStr.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
+    const getOpacity = colorStr => (colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
