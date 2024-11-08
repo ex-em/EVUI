@@ -149,8 +149,8 @@ const modules = {
    */
   updateStartEndRowIndex() {
     const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
-    this.startRowIndex = index > this.totalRowCount - 1 ? 0 : index;
-    this.endRowIndex = this.startRowIndex + this.visibleRowCount;
+    this.startRowIndex = Math.min(index, Math.max(this.totalRowCount - this.visibleRowCount, 0));
+    this.endRowIndex = this.startRowIndex + this.visibleRowCount + 1;
   },
 
   /**
