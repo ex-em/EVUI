@@ -19,7 +19,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :placeholder="
-            placeholder != undefined
+            !isNil(placeholder)
               ? typeof placeholder !== 'string'
                 ? placeholder[0]
                 : placeholder
@@ -55,8 +55,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="
-            placeholder != undefined
+          :placeholder="!isNil(placeholder)
               ? typeof placeholder !== 'string'
                 ? placeholder[1]
                 : placeholder
@@ -97,7 +96,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :placeholder="
-            placeholder != undefined && typeof placeholder === 'string' ? placeholder : 'Enter time'
+            !isNil(placeholder) && typeof placeholder === 'string' ? placeholder : 'Enter time'
           "
           @focus="focusInputTime"
           @blur="blurInputTime"
