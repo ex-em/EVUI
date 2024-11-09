@@ -1028,7 +1028,11 @@ export const sortEvent = ({ sortInfo, stores }) => {
 
 
   const setSortInfo = (columns, emitTriggered = true) => {
-    const sortByColumn = columns?.find(col => col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
+    const sortByColumnIndex = columns?.findIndex(col => col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
+    const sortByColumn = columns[sortByColumnIndex];
+    if (sortByColumnIndex > -1) {
+      sortByColumn.index = sortByColumnIndex;
+    }
     const { sortType } = sortByColumn?.sortOption || {};
 
     sortInfo.sortColumn = sortByColumn;
