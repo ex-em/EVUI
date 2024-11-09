@@ -1,6 +1,5 @@
 import { getCurrentInstance, nextTick } from 'vue';
 import { numberWithComma } from '@/common/utils';
-import { cloneDeep } from 'lodash-es';
 
 export const commonFunctions = (params) => {
   const { props } = getCurrentInstance();
@@ -995,7 +994,7 @@ export const pagingEvent = (params) => {
   return { getPagingData, updatePagingInfo, changePage };
 };
 
-export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
+export const sortEvent = ({ sortInfo, stores }) => {
   const { emit } = getCurrentInstance();
 
   const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
@@ -1027,70 +1026,73 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
 
   const order = new OrderQueue();
 
-  const setSortInfo = (column, emitTriggered = true) => {
-    const { sortType } = column?.sortOption || {};
-    sortInfo.sortColumn = column;
-    sortInfo.sortField = column?.field;
-    sortInfo.sortOrder = sortType;
-    sortInfo.isSorting = !!(sortType);
+  /* 24.11.09 Tree Grid Sort 로직 임시 제거 */
+  // const setSortInfo = (column, emitTriggered = true) => {
+  //   const { sortType } = column?.sortOption || {};
+  //   sortInfo.sortColumn = column;
+  //   sortInfo.sortField = column?.field;
+  //   sortInfo.sortOrder = sortType;
+  //   sortInfo.isSorting = !!(sortType);
+  //
+  //   if (emitTriggered) {
+  //     setSortOptionToOrderedColumns(column, sortType);
+  //
+  //     emit('change-column-info', {
+  //       type: 'sort',
+  //       columns: getUpdatedColumns(stores),
+  //     });
+  //   }
+  // };
 
-    if (emitTriggered) {
-      setSortOptionToOrderedColumns(column, sortType);
-
-      emit('change-column-info', {
-        type: 'sort',
-        columns: getUpdatedColumns(stores),
-      });
-    }
-  };
-
-  const compareValues = (nodeA, nodeB) => {
-    const valueA = nodeA.data[sortInfo.sortField];
-    const valueB = nodeB.data[sortInfo.sortField];
-
-    if (valueA === valueB) return 0;
-
-    const isAscending = sortInfo.sortOrder === 'asc';
-
-    if (isAscending) return valueA > valueB ? 1 : -1;
-
-    return valueA < valueB ? 1 : -1;
-  };
-
-  const sortTree = (nodes, depth = 0) => {
-    const groupedNodes = {};
-
-    nodes.forEach((node) => {
-      const nodeDepth = node.level || depth;
-      if (!groupedNodes[nodeDepth]) {
-        groupedNodes[nodeDepth] = [];
-      }
-      groupedNodes[nodeDepth].push(node);
-    });
-
-    Object.keys(groupedNodes).forEach((key) => {
-      groupedNodes[key].sort(compareValues);
-    });
-
-    nodes.length = 0;
-    Object.values(groupedNodes).forEach((group) => {
-      group.forEach((node) => {
-        nodes.push(node);
-        if (node.hasChild) {
-          sortTree(node.children, node.level + 1);
-        }
-      });
-    });
-  };
+  // const compareValues = (nodeA, nodeB) => {
+  //   const valueA = nodeA.data[sortInfo.sortField];
+  //   const valueB = nodeB.data[sortInfo.sortField];
+  //
+  //   if (valueA === valueB) return 0;
+  //
+  //   const isAscending = sortInfo.sortOrder === 'asc';
+  //
+  //   if (isAscending) return valueA > valueB ? 1 : -1;
+  //
+  //   return valueA < valueB ? 1 : -1;
+  // };
+  //
+  // const sortTree = (nodes, depth = 0) => {
+  //   const groupedNodes = {};
+  //
+  //   nodes.forEach((node) => {
+  //     const nodeDepth = node.level || depth;
+  //     if (!groupedNodes[nodeDepth]) {
+  //       groupedNodes[nodeDepth] = [];
+  //     }
+  //     groupedNodes[nodeDepth].push(node);
+  //   });
+  //
+  //   Object.keys(groupedNodes).forEach((key) => {
+  //     groupedNodes[key].sort(compareValues);
+  //   });
+  //
+  //   nodes.length = 0;
+  //   Object.values(groupedNodes).forEach((group) => {
+  //     group.forEach((node) => {
+  //       nodes.push(node);
+  //       if (node.hasChild) {
+  //         sortTree(node.children, node.level + 1);
+  //       }
+  //     });
+  //   });
+  // };
 
   const onSort = (column, sortOrder) => {
-    const sortable = column.sortable === undefined ? true : column.sortable;
-    if (sortable) {
+    const isSortableColumn = column.sortable === undefined ? true : column.sortable;
+    if (isSortableColumn) {
       sortInfo.sortColumn = column;
+
       if (sortInfo.sortField !== column?.field) {
         order.orders = getDefaultSortType();
         sortInfo.sortField = column?.field;
       }
+
       if (sortOrder) {
         order.orders = getDefaultSortType();
         if (sortOrder === 'desc') {
@@ -1098,6 +1100,7 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
           order.enqueue(sortInfo.sortOrder);
         }
       }
+
       sortInfo.sortOrder = order.dequeue();
       order.enqueue(sortInfo.sortOrder);
 
@@ -1105,6 +1108,7 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
       setSortOptionToOrderedColumns(column, sortInfo.sortOrder);
 
       const updatedColumInfo = getUpdatedColumns(stores);
+
       emit('sort-column', {
         field: sortInfo.sortField,
         order: sortInfo.sortOrder,
@@ -1117,18 +1121,21 @@ export const sortEvent = ({ sortInfo, stores, updatePagingInfo, onResize }) => {
         columns: updatedColumInfo,
       });
 
-      if (sortInfo.sortOrder === 'init') {
-        stores.treeStore = cloneDeep(stores.originStore);
-        stores.viewStore = stores.treeStore;
-        onResize();
-        sortInfo.isSorting = false;
-      } else {
-        sortTree(stores.treeRows);
-        sortInfo.isSorting = true;
-      }
-
-      updatePagingInfo({ onSort: true });
+      /* 24.11.09 Tree Grid Sort 로직 임시 제거 */
+      // if (sortInfo.sortOrder === 'init') {
+      //   stores.treeStore = cloneDeep(stores.originStore);
+      //   stores.viewStore = stores.treeStore;
+      //   onResize();
+      //   sortInfo.isSorting = false;
+      // } else {
+      //   sortTree(stores.treeRows);
+      //   sortInfo.isSorting = true;
+      // }
+      //
+      // updatePagingInfo({ onSort: true });
     }
   };
-  return { onSort, setSortInfo };
+
+  // return { onSort, setSortInfo };
+  return { onSort };
 };
