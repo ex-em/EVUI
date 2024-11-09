@@ -705,6 +705,7 @@ export default {
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
       stores.originStore = cloneDeep(stores.treeStore);
+      setSortInfo(props.columns, false);
       document.addEventListener('wheel', onMouseWheel, { capture: false });
       document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
@@ -728,9 +729,8 @@ export default {
 
     watch(
       () => props.columns,
-      (newColumns) => {
+      () => {
         initColumnSettingInfo();
-        setSortInfo(newColumns, false);
       }, { deep: true, immediate: true },
     );
     watch(
