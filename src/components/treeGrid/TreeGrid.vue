@@ -114,7 +114,7 @@
                   </template>
                   <template v-else>
                     <grid-sort-button
-                      v-if="column.sortable === undefined ? true : column.sortable"
+                      v-if="column.sortable === undefined ? false : column.sortable"
                       class="column-sort__icon column-sort__icon--basic"
                       :icon="'basic'"
                       :style="{
