@@ -1026,24 +1026,27 @@ export const sortEvent = ({ sortInfo, stores }) => {
 
   const order = new OrderQueue();
 
-  /* 24.11.09 Tree Grid Sort 로직 임시 제거 */
-  // const setSortInfo = (column, emitTriggered = true) => {
-  //   const { sortType } = column?.sortOption || {};
-  //   sortInfo.sortColumn = column;
-  //   sortInfo.sortField = column?.field;
-  //   sortInfo.sortOrder = sortType;
-  //   sortInfo.isSorting = !!(sortType);
-  //
-  //   if (emitTriggered) {
-  //     setSortOptionToOrderedColumns(column, sortType);
-  //
-  //     emit('change-column-info', {
-  //       type: 'sort',
-  //       columns: getUpdatedColumns(stores),
-  //     });
-  //   }
-  // };
 
+  const setSortInfo = (columns, emitTriggered = true) => {
+    const sortByColumn = columns?.find(col => col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
+    const { sortType } = sortByColumn?.sortOption || {};
+
+    sortInfo.sortColumn = sortByColumn;
+    sortInfo.sortField = sortByColumn?.field;
+    sortInfo.isSorting = !!(sortType);
+    sortInfo.sortOrder = sortType;
+
+    setSortOptionToOrderedColumns(sortByColumn, sortType);
+
+    if (emitTriggered) {
+      emit('change-column-info', {
+        type: 'sort',
+        columns: getUpdatedColumns(stores),
+      });
+    }
+  };
+
+  /* 24.11.09 Tree Grid Sort 로직 임시 제거 */
   // const compareValues = (nodeA, nodeB) => {
   //   const valueA = nodeA.data[sortInfo.sortField];
   //   const valueB = nodeB.data[sortInfo.sortField];
@@ -1136,6 +1139,5 @@ export const sortEvent = ({ sortInfo, stores }) => {
     }
   };
 
-  // return { onSort, setSortInfo };
-  return { onSort };
+  return { onSort, setSortInfo };
 };

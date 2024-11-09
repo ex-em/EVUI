@@ -102,7 +102,7 @@
                      <slot name="sortIcon" />
                     </span>
                     <span
-                      v-if="isSortedColumn(column)"
+                      v-if="sortField === column.field"
                       :class="sortIconClass(column)"
                       :style="{
                         height: `${rowHeight}px`,
@@ -123,7 +123,7 @@
                       }"
                     />
                     <grid-sort-button
-                      v-if="isSortedColumn(column)"
+                      v-if="sortField === column.field"
                       :class="sortIconClass(column)"
                       :icon="sortOrder"
                       :style="{
@@ -636,6 +636,7 @@ export default {
 
     const {
         onSort,
+        setSortInfo,
     } = sortEvent({ sortInfo, stores, updatePagingInfo, setTreeNodeStore, onResize });
 
     const {
@@ -727,9 +728,10 @@ export default {
 
     watch(
       () => props.columns,
-      () => {
+      (newColumns) => {
         initColumnSettingInfo();
-      }, { deep: true },
+        setSortInfo(newColumns, false);
+      }, { deep: true, immediate: true },
     );
     watch(
       () => props.checked,
@@ -925,8 +927,6 @@ export default {
       },
     );
 
-    const isSortedColumn = column => sortInfo.sortField === column.field;
-
     const sortIconClass = () => ({
       'column-sort__icon': true,
       'column-sort__icon--asc': sortInfo.sortOrder === 'asc',
@@ -1039,7 +1039,6 @@ export default {
       onApplyColumn,
       onColumnContextMenu,
       onSort,
-      isSortedColumn,
       sortIconClass,
     };
   },
