@@ -58,7 +58,7 @@
               <button
                 v-else
                 class="tree-expand-icon"
-                @click="onExpand(node)"
+                @click.stop="onExpand(node)"
               >
                 <i></i>
               </button>
