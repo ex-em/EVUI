@@ -92,7 +92,7 @@
                 <span @click.stop="onSort(column)">
                   <template v-if="!!$slots.sortIcon">
                     <span
-                      v-if="column.sortable === undefined ? true : column.sortable"
+                      v-if="$props.option?.useSort && !!column?.sortable"
                       class="column-sort__icon column-sort__icon--basic"
                       :style="{
                         height: `${rowHeight}px`,
@@ -114,7 +114,7 @@
                   </template>
                   <template v-else>
                     <grid-sort-button
-                      v-if="column.sortable === undefined ? false : column.sortable"
+                      v-if="$props.option?.useSort && !!column?.sortable"
                       class="column-sort__icon column-sort__icon--basic"
                       :icon="'basic'"
                       :style="{
@@ -636,6 +636,7 @@ export default {
 
     const {
         onSort,
+        initSortInfo,
         setSortInfo,
     } = sortEvent({ sortInfo, stores, updatePagingInfo, setTreeNodeStore, onResize });
 
@@ -705,7 +706,13 @@ export default {
     onMounted(() => {
       stores.treeStore = setTreeNodeStore();
       stores.originStore = cloneDeep(stores.treeStore);
-      setSortInfo(props.columns, false);
+      if (props.option?.useSort) {
+        setSortInfo(props.columns, false);
+      } else {
+        const contextInfoHiddenColumnMenuItems = contextInfo.hiddenColumnMenuItem;
+        contextInfoHiddenColumnMenuItems.ascending = true;
+        contextInfoHiddenColumnMenuItems.descending = true;
+      }
       document.addEventListener('wheel', onMouseWheel, { capture: false });
       document.addEventListener('scroll', onMouseWheel, { capture: true });
     });
@@ -717,6 +724,21 @@ export default {
 
     onActivated(() => {
       onResize();
+    });
+
+    watch(() => props.option?.useSort, (use) => {
+      const propsHiddenMenuItems = props.option.hiddenColumnMenuItem;
+      const contextInfoHiddenMenuItems = contextInfo.hiddenColumnMenuItem;
+
+      if (use) {
+        contextInfoHiddenMenuItems.ascending = propsHiddenMenuItems?.ascending ?? false;
+        contextInfoHiddenMenuItems.descending = propsHiddenMenuItems?.descending ?? false;
+        setSortInfo(props.columns, false);
+      } else {
+        contextInfoHiddenMenuItems.ascending = true;
+        contextInfoHiddenMenuItems.descending = true;
+        initSortInfo(props.columns);
+      }
     });
 
     watch(() => columnSettingInfo.isShowColumnSetting, (isShowColumnSetting) => {
