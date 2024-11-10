@@ -636,7 +636,7 @@ export const contextMenuEvent = (params) => {
   };
   const onColumnContextMenu = (event, column) => {
     if (event.target.className.includes('column-name')) {
-      const sortable = column.sortable === undefined ? true : column.sortable;
+      const sortable = !!column.sortable;
       contextInfo.columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
@@ -1026,9 +1026,18 @@ export const sortEvent = ({ sortInfo, stores }) => {
 
   const order = new OrderQueue();
 
+  const initSortInfo = (columns) => {
+    sortInfo.isSorting = false;
+    sortInfo.sortOrder = 'init';
+    columns.forEach((col) => {
+      if (col?.sortOption?.sortType && col.sortOption.sortType !== 'init') {
+        col.sortOption.sortType = 'init';
+      }
+    });
+  };
 
   const setSortInfo = (columns, emitTriggered = true) => {
-    const sortByColumnIndex = columns?.findIndex(col => col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
+    const sortByColumnIndex = columns?.findIndex(col => col?.sortable && col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
     const sortByColumn = columns[sortByColumnIndex];
     if (sortByColumnIndex > -1) {
       sortByColumn.index = sortByColumnIndex;
@@ -1143,5 +1152,5 @@ export const sortEvent = ({ sortInfo, stores }) => {
     }
   };
 
-  return { onSort, setSortInfo };
+  return { onSort, setSortInfo, initSortInfo };
 };
