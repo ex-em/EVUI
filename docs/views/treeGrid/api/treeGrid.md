@@ -100,24 +100,23 @@
 |  | emptyText              | 'No records' | 데이터가 없는 경우 표시되는 텍스트를 설정한다.                                                                         | String                    |
 
 ### Columns
-| 이름                   | 타입      | 설명                                                                                                                                                                      | 종류                                               | 필수 |
-|----------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------| --- |
-| caption              | String  | 컬럼명                                                                                                                                                                     | ex) '인스턴스명'                                      | Y |
-| field                | String  | 필드명 <br> ('index', 'level', 'parent', 'children', 'checked', 'selected', 'expand', 'show', 'isFilter', 'uncheckable'와 같은 필드명은  Tree Option과 관련된 속성 명칭으로 중복 사용을 피하도록 권고함) | ex) 'instance_name'  | Y |
-| type                 | String  | 데이터 타입                                                                                                                                                                  | 'string', 'number', 'stringNumber', 'float', 'boolean' | Y |
-| hide                 | Boolean | 컬럼 숨김 여부                                                                                                                                                                | Boolean                                          | N |
-| hiddenDisplay        | Boolean | 컬럼 목록 체크 여부                                                                                                                                                             | Boolean | N |
-| width                | Number  | 컬럼 넓이                                                                                                                                                                   | ex) 150                                          | N |
-| searchable           | Boolean | 검색 대상 여부                                                                                                                                                                | Boolean                                          | N |
-| align                | String  | 사용자 지정 정렬                                                                                                                                                               | 'center', 'left', 'right'                        | N |
-| decimal              | Number  | 데이터 타입이 float 일 때 소수점 자리 표시 수                                                                                                                                           | ex) 0~20 (디폴트: 3 )                               | N |
-| summaryType          | String  | 계산 타입                                                                                                                                                                   | 'sum', 'average', 'max', 'min', 'count'          | N |
-| summaryOnlyTopParent | Boolean | 최상위 부모만 summary 계산을 할지 선택                                                                                                                                               | Boolean                                                | N |
-| summaryRenderer      | String  | Summary 에 표시할 텍스트 또는 계산 값                                                                                                                                               | ex) 'Sum: {0}'                                   | N |
-| summaryData          | Array   | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용                                                                                                                               | ex) '{0}({1}%)'                                  | N |
-| expandColumn         | Boolean | 트리그리드를 확장하는데 사용하는 컬럼을 의미, 설정하지 않으면 자동으로 첫번째 컬럼에 적용                                                                                                                      | ex) 'expandColumn: true'                         | N |
-| customHeader         | Boolean | 커스텀 헤더 사용 여부                                                                                                                                                            | Boolean                         | N |
-| disableHide          | Boolean | 칼럼 숨김 기능 사용 여부                                                                                                                                                          | Boolean                         | N |
+| 이름              | 타입      | 설명                                                 | 종류                                               | 필수 |
+|-----------------|---------|----------------------------------------------------|--------------------------------------------------| --- |
+| caption         | String  | 컬럼명                                                | ex) '인스턴스명'                                      | Y |
+| field  | String  | 필드명 <br> ('index', 'level', 'parent', 'children', 'checked', 'selected', 'expand', 'show', 'isFilter', 'uncheckable'와 같은 필드명은  Tree Option과 관련된 속성 명칭으로 중복 사용을 피하도록 권고함) | ex) 'instance_name'  | Y |
+| type            | String  | 데이터 타입                                             | 'string', 'number', 'stringNumber', 'float', 'boolean' | Y |
+| hide            | Boolean | 컬럼 숨김 여부                                           | Boolean                                          | N |
+| hiddenDisplay | Boolean | 컬럼 목록 체크 여부 | Boolean | N |
+| width           | Number  | 컬럼 넓이                                              | ex) 150                                          | N |
+| searchable      | Boolean | 검색 대상 여부                                           | Boolean                                          | N |
+| align           | String  | 사용자 지정 정렬                                          | 'center', 'left', 'right'                        | N |
+| decimal         | Number  | 데이터 타입이 float 일 때 소수점 자리 표시 수                      | ex) 0~20 (디폴트: 3 )                               | N |
+| summaryType     | String  | 계산 타입                                              | 'sum', 'average', 'max', 'min', 'count'          | N |
+| summaryOnlyTopParent | Boolean | 최상위 부모만 summary 계산을 할지 선택                          | Boolean                                                | N |
+| summaryRenderer | String  | Summary 에 표시할 텍스트 또는 계산 값                          | ex) 'Sum: {0}'                                   | N |
+| summaryData     | Array   | Summary 할 대상 추가 시 summaryRenderer 와 함께 사용          | ex) '{0}({1}%)'                                  | N |
+| expandColumn    | Boolean | 트리그리드를 확장하는데 사용하는 컬럼을 의미, 설정하지 않으면 자동으로 첫번째 컬럼에 적용 | ex) 'expandColumn: true'                         | N |
+| customHeader    | Boolean | 커스텀 헤더 사용 여부 | Boolean                         | N |
 
 ### Event
 | 이름 | 파라미터 | 설명 |

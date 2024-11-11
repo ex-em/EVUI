@@ -488,7 +488,7 @@ export default {
       ];
     };
     const columns = ref([
-      { caption: 'ID', field: 'id', type: 'number', disableHide: true },
+      { caption: 'ID', field: 'id', type: 'number' },
       { caption: 'Date', field: 'date', type: 'string' },
       {
         caption: 'Name',
