@@ -641,7 +641,8 @@ export const contextMenuEvent = (params) => {
         {
           text: contextInfo.columnMenuTextInfo?.hide ?? 'Hide',
           iconClass: 'ev-icon-visibility-off',
-          disabled: !useGridSetting.value || stores.orderedColumns.length === 1,
+          disabled: !useGridSetting.value || stores.orderedColumns.length === 1
+            || column.disableHide,
           hidden: contextInfo.hiddenColumnMenuItem?.hide || !useGridSetting.value,
           click: () => {
             setColumnHidden(column.field);

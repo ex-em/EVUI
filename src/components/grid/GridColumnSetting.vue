@@ -26,7 +26,7 @@
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
                 :label="column?.text"
-                :disabled="!!column?.fixed"
+                :disabled="!!column?.fixed || column?.disableHide"
                 :tooltip-title="column?.label ?? ''"
               >
                 {{ column?.label }}
@@ -212,6 +212,7 @@ export default {
             originChecked: !col.hiddenDisplay,
             checked: isChecked,
             fixed: col.fixed,
+            disableHide: col.disableHide,
           };
         });
 
