@@ -18,13 +18,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="
-            !isNil(placeholder)
-              ? typeof placeholder !== 'string'
-                ? placeholder[0]
-                : placeholder
-              : 'start time'
-          "
+          :placeholder="getPlaceholder(placeholder, 0, 'start time')"
           @focus="focusInputStartTime"
           @blur="blurInputStartTime"
           @change="changeStartTime"
@@ -55,12 +49,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="!isNil(placeholder)
-              ? typeof placeholder !== 'string'
-                ? placeholder[1]
-                : placeholder
-              : 'end time'
-          "
+          :placeholder="getPlaceholder(placeholder, 1, 'end time')"
           @focus="focusInputEndTime"
           @blur="blurInputEndTime"
           @change="changeEndTime"
@@ -95,9 +84,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="
-            !isNil(placeholder) && typeof placeholder === 'string' ? placeholder : 'Enter time'
-          "
+          :placeholder="typeof placeholder === 'string' ? placeholder : 'Enter time'"
           @focus="focusInputTime"
           @blur="blurInputTime"
           @change="changeTime"
@@ -292,6 +279,13 @@ export default {
       isWrongType.single = true;
     };
 
+    const getPlaceholder = (placeholder, index, defaultText) => {
+      if (Array.isArray(placeholder)) {
+        return typeof placeholder[index] === 'string' ? placeholder[index] : defaultText;
+      }
+      return typeof placeholder === 'string' ? placeholder : defaultText;
+    };
+
     return {
       time,
       isWrongType,
@@ -308,6 +302,7 @@ export default {
       focusInputEndTime,
       blurInputEndTime,
       changeEndTime,
+      getPlaceholder,
     };
   },
 };
