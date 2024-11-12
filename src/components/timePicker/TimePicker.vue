@@ -18,7 +18,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="getPlaceholder(placeholder, 0, 'start time')"
+          :placeholder="placeholders[0]"
           @focus="focusInputStartTime"
           @blur="blurInputStartTime"
           @change="changeStartTime"
@@ -49,7 +49,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          :placeholder="getPlaceholder(placeholder, 1, 'end time')"
+          :placeholder="placeholders[1]"
           @focus="focusInputEndTime"
           @blur="blurInputEndTime"
           @change="changeEndTime"
@@ -173,6 +173,18 @@ export default {
       },
     }); // <string | string[]>
 
+    const placeholders = computed(() => {
+      const defaultValue = ['start time', 'end time'];
+      if (Array.isArray(props.placeholder)) {
+        return [
+          typeof props.placeholder[0] === 'string' ? props.placeholder[0] : defaultValue[0],
+          typeof props.placeholder[1] === 'string' ? props.placeholder[1] : defaultValue[1],
+        ];
+      }
+      if (typeof props.placeholder === 'string') return [props.placeholder, props.placeholder];
+      return defaultValue;
+    });
+
     const previousValue = ref(
       Array.isArray(time.value) ? [`${time.value[0]}`, `${time.value[1]}`] : `${time.value}`,
     ); // <string | string[]>
@@ -279,13 +291,6 @@ export default {
       isWrongType.single = true;
     };
 
-    const getPlaceholder = (placeholder, index, defaultText) => {
-      if (Array.isArray(placeholder)) {
-        return typeof placeholder[index] === 'string' ? placeholder[index] : defaultText;
-      }
-      return typeof placeholder === 'string' ? placeholder : defaultText;
-    };
-
     return {
       time,
       isWrongType,
@@ -302,7 +307,7 @@ export default {
       focusInputEndTime,
       blurInputEndTime,
       changeEndTime,
-      getPlaceholder,
+      placeholders,
     };
   },
 };
