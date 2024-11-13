@@ -3,6 +3,7 @@
     <p class="case-title">Range</p>
     <ev-time-picker
       v-model="rangeTime"
+      :placeholder="['시작시간', '끝시간']"
       @change="changeTime"
     />
     <div class="description">
@@ -15,6 +16,7 @@
     <ev-time-picker
       v-model="commonTime"
       type="single"
+      placeholder="시간 입력"
     />
     <div class="description">
       <span class="badge">Time</span>

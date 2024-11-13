@@ -18,7 +18,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="start time"
+          :placeholder="placeholders[0]"
           @focus="focusInputStartTime"
           @blur="blurInputStartTime"
           @change="changeStartTime"
@@ -49,7 +49,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="end time"
+          :placeholder="placeholders[1]"
           @focus="focusInputEndTime"
           @blur="blurInputEndTime"
           @change="changeEndTime"
@@ -84,7 +84,7 @@
           class="ev-input"
           :disabled="disabled"
           :readonly="readonly"
-          placeholder="Enter time"
+          :placeholder="typeof placeholder === 'string' ? placeholder : 'Enter time'"
           @focus="focusInputTime"
           @blur="blurInputTime"
           @change="changeTime"
@@ -144,6 +144,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    placeholder: {
+      type: [String, Array],
+      required: false,
+      default: undefined,
+    },
   },
   emits: {
     'update:modelValue': null,
@@ -167,6 +172,18 @@ export default {
         }
       },
     }); // <string | string[]>
+
+    const placeholders = computed(() => {
+      const defaultValue = ['start time', 'end time'];
+      if (Array.isArray(props.placeholder)) {
+        return [
+          typeof props.placeholder[0] === 'string' ? props.placeholder[0] : defaultValue[0],
+          typeof props.placeholder[1] === 'string' ? props.placeholder[1] : defaultValue[1],
+        ];
+      }
+      if (typeof props.placeholder === 'string') return [props.placeholder, props.placeholder];
+      return defaultValue;
+    });
 
     const previousValue = ref(
       Array.isArray(time.value) ? [`${time.value[0]}`, `${time.value[1]}`] : `${time.value}`,
@@ -290,6 +307,7 @@ export default {
       focusInputEndTime,
       blurInputEndTime,
       changeEndTime,
+      placeholders,
     };
   },
 };
