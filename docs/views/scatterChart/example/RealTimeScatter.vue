@@ -48,14 +48,14 @@ export default {
     const series = {
       series1: {
         name: 'series1',
-        pointSize: 4,
+        pointSize: 0.5,
         color: '#DF6264',
         pointFill: '#DF6264',
         overflowColor: '#FF00FF',
       },
       series2: {
         name: 'series2',
-        pointSize: 4,
+        pointSize: 0.5,
         color: '#3CA0FF',
         pointFill: '#3CA0FF',
         overflowColor: '#A3D3FF',
@@ -158,10 +158,10 @@ export default {
       series2 = [];
 
       if (isInit) {
-        data = generateData(100);
+        data = generateData(10000);
         isInit = false;
       } else {
-        data = generateData(10);
+        data = generateData(100);
       }
 
       for (let i = 0; i < data.length; i++) {
@@ -173,13 +173,11 @@ export default {
           series1.push({
             x: dataX,
             y: dataY / 1000,
-            color: '#FF0000',
           });
         } else {
           series2.push({
             x: dataX,
             y: dataY / 1000,
-            color: '#0000FF',
           });
         }
       }
