@@ -159,7 +159,7 @@ class Scatter {
 
             ctx.strokeStyle = color;
 
-            const pointFillColor = overflowColor || this.pointFill || item.color || this.color;
+            const pointFillColor = overflowColor || item.color || this.pointFill || this.color;
             ctx.fillStyle = pointFillColor;
 
             Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
