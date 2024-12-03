@@ -1074,7 +1074,9 @@ export const filterEvent = (params) => {
             let columnValue = rowData[column.index] ?? null;
             column.type = column.type || 'string';
             if (columnValue !== null) {
-              if (typeof columnValue === 'object') {
+              if (columnValue instanceof Array) {
+                columnValue = JSON.stringify(columnValue);
+              } else if (typeof columnValue === 'object') {
                 columnValue = columnValue[column.field];
               }
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
