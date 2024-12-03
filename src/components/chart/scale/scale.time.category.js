@@ -183,7 +183,7 @@ class TimeCategoryScale extends Scale {
     let labelPoint;
     let ix;
     for (ix = 0; ix < oriSteps; ix += count) {
-      ticks[ix] = axisMin + (ix * stepValue);
+      ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
       linePosition = labelCenter + aliasPixel;

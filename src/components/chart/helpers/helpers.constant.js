@@ -206,7 +206,7 @@ export const TIME_INTERVALS = {
   },
   month: {
     common: true,
-    size: 2.628e9,
+    size: 2.6784e9,
     steps: [1, 2, 3],
   },
   quarter: {
