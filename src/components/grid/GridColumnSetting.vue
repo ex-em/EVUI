@@ -140,7 +140,7 @@ export default {
         lastCheckedColumn = columns[0];
       } else if (columns?.length < 1) { // 최소 한개 컬럼은 선택되도록
         if (lastCheckedColumn == null) {
-          lastCheckedColumn = originColumnList.value?.[0]?.text;
+          lastCheckedColumn = originColumnList.value[0]?.text;
         }
         checkColumnGroup.value.push(lastCheckedColumn);
       }
