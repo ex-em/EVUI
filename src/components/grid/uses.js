@@ -559,8 +559,8 @@ export const checkEvent = (params) => {
    * @param {array} row - row 데이터
    */
   const onCheck = (event, row) => {
-    if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow[ROW_CHECK_INDEX]) {
-      checkInfo.prevCheckedRow[ROW_CHECK_INDEX] = false;
+    if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow.length) {
+      checkInfo.prevCheckedRow = [];
       unCheckedRow(checkInfo.prevCheckedRow);
     }
 
