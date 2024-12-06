@@ -138,7 +138,10 @@ export default {
     const onCheckColumn = (columns) => {
       if (columns?.length === 1) {
         lastCheckedColumn = columns[0];
-      } else if (columns?.length < 1 && lastCheckedColumn !== null) { // 최소 한개 컬럼은 선택되도록
+      } else if (columns?.length < 1) { // 최소 한개 컬럼은 선택되도록
+        if (lastCheckedColumn == null) {
+          lastCheckedColumn = originColumnList.value?.[0]?.text;
+        }
         checkColumnGroup.value.push(lastCheckedColumn);
       }
     };
