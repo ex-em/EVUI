@@ -277,15 +277,14 @@ export default {
         value: 'rows',
       },
     ]);
-    // TODO: 머지 직전 삭제할 예정입니다.
     const columns = ref([
-      { caption: 'Name', field: 'userName', type: 'string', width: 80 },
-      // { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
-      // { caption: 'number', field: 'number', type: 'number', width: 80 },
-      // { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
-      // { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      // { caption: 'Email', field: 'email', type: 'string', width: 80 },
-      // { caption: 'Last Login', field: 'lastLogin', type: 'string' },
+      { caption: 'Name', field: 'userName', type: 'string', width: 80, fixed: true },
+      { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
+      { caption: 'number', field: 'number', type: 'number', width: 80 },
+      { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
+      { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
+      { caption: 'Email', field: 'email', type: 'string', width: 80 },
+      { caption: 'Last Login', field: 'lastLogin', type: 'string' },
     ]);
     const resetBorderStyle = () => {
       borderMV.value = '';
