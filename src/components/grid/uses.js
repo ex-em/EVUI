@@ -560,7 +560,7 @@ export const checkEvent = (params) => {
    */
   const onCheck = (event, row) => {
     if (checkInfo.useCheckbox.mode === 'single' && checkInfo.prevCheckedRow.length) {
-      checkInfo.prevCheckedRow[ROW_CHECK_INDEX] = false;
+      checkInfo.prevCheckedRow = [];
       unCheckedRow(checkInfo.prevCheckedRow);
     }
 
