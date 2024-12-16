@@ -1330,7 +1330,9 @@ export const storeEvent = (params) => {
         store.push([idx, checked, row, selected, expanded, uncheckable, disabled]);
       });
 
-      if (rows.length === props.uncheckable?.length || rows.length === props.disabledRows?.length) {
+      if (rows.length !== props.checked.length
+        && (rows.length === props.uncheckable?.length || rows.length === props.disabledRows?.length)
+      ) {
         hasUnChecked = true;
       }
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
