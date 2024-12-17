@@ -201,7 +201,10 @@ export default {
       emit('blur', e);
     };
     const inputMv = (e) => {
-      const inputValue = e.target.value;
+      let inputValue = e.target.value;
+      if (props.type === 'password') {
+        inputValue = inputValue.replace(/\s/g, '');
+      }
       if (mv.value !== inputValue) {
         mv.value = inputValue;
       }
