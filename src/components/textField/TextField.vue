@@ -27,6 +27,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :maxlength="maxLength"
+          :autocomplete="autocomplete"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -42,6 +43,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :maxlength="maxLength"
+          :autocomplete="autocomplete"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -145,6 +147,10 @@ export default {
     errorMsg: {
       type: String,
       default: '',
+    },
+    autocomplete: {
+      type: String,
+      default: 'off',
     },
   },
   emits: [
