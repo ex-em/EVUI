@@ -22,6 +22,8 @@ import Overlapping from './example/Overlapping';
 import OverlappingRaw from '!!raw-loader!./example/Overlapping';
 import HoverWithGroup from './example/HoverWithGroup';
 import HoverWithGroupRaw from '!!raw-loader!./example/HoverWithGroup';
+import AxisControl from './example/AxisControl';
+import AxisControlRaw from '!!raw-loader!./example/AxisControl';
 
 export default {
   mdText,
@@ -82,6 +84,11 @@ export default {
       description: '',
       component: HoverWithGroup,
       parsedData: parseComponent(HoverWithGroupRaw),
+    },
+    AxisControl: {
+      description: 'axis control',
+      component: AxisControl,
+      parsedData: parseComponent(AxisControlRaw),
     },
   },
 };
