@@ -27,16 +27,17 @@ height: 100px;
 
 ### Props
 
-| 이름 | 타입 | 디폴트 | 설명 | 종류 |
-| --- | ---- | ----- | ---- | --- |
-| v-model | String, Number | null | 컴포넌트 입력 값 | |
-| type | String | 'text' | 타입 설정 | 'text', 'password', 'search', 'textarea' |
-| disabled | Boolean | false | 비활성화 여부 | true, false |
-| readonly | Boolean | false | 읽기 전용 여부 | true, false |
-| placeholder | String | | Input / Textarea의 placeholder 값 | |
-| maxLength | Number | Infinity | value 의 최대길이 제한 길이 | |
-| showMaxLength | Boolean | false | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false |
-| errorMsg | String | | Error 표현을 위한 메시지 |  |
+| 이름            | 타입             | 디폴트      | 설명 | 종류                                                           |
+|---------------|----------------|----------| ---- |--------------------------------------------------------------|
+| v-model       | String, Number | null     | 컴포넌트 입력 값 |                                                              |
+| type          | String         | 'text'   | 타입 설정 | 'text', 'password', 'search', 'textarea'                     |
+| disabled      | Boolean        | false    | 비활성화 여부 | true, false                                                  |
+| readonly      | Boolean        | false    | 읽기 전용 여부 | true, false                                                  |
+| placeholder   | String         |          | Input / Textarea의 placeholder 값 |                                                              |
+| maxLength     | Number         | Infinity | value 의 최대길이 제한 길이 |                                                              |
+| showMaxLength | Boolean        | false    | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false                                                  |
+| autocomplete  | String         | off      | 자동완성을 허용할 양식 입력 필드를 지정 | on, name, email, username, new-password, current-password 등  |
+| errorMsg      | String         |          | Error 표현을 위한 메시지 |                                                              |
 
 ### Event
 
