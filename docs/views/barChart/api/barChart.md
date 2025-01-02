@@ -113,7 +113,7 @@ const chartData = {
 | type         | String          | ''                                        | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입                                                                                                                        | 'bar', 'pie', 'line', 'scatter' |
 | width        | String / Number | '100%'                                    | 차트의 너비                                                                                                                                                                            | '100%', '150px', 150            |
 | height       | String / Number | '100%'                                    | 차트의 높이                                                                                                                                                                            | '100%', '150px', 150            |
-| thickness    | Number          | 1                                         | 차트 막대의 너비                                                                                                                                                                       | 0.1 ~ 1                         |
+| thickness    | Number \| `'${number}px'` | 1                                         | 차트 막대의 너비, 최대치를 넘지 않음                                                                                                                                                                      | 0.1 ~ 1 \| '10px'               |
 | cPadRatio    | Number          | 0                                         | 카테고리(각 라벨간)내부 padding 영역의 비율                                                                                                                                            | 0 ~ 0.99 (1 미만)               |
 | borderRadius | Number          | 0                                         | 막대 가장자리 부분의 border-radius 값.                                                                                                                                                 | 0 ~                             |
 | horizontal   | Boolean         | false                                     | 차트 막대의 방향 - 수평 전환 여부                                                                                                                                                      | true, false                     |
@@ -135,7 +135,7 @@ const chartData = {
 
 | 이름           | 타입     | 디폴트                 | 설명                                                                                               | 종류(예시)                                                                               |
 | -------------- | -------- | ---------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| type           | String   |                        | 축의 유형                                                                                          | [linear](#linear-type), [time](#time-type), [log](#Logarithmic-type), [step](#step-type) |
+| type           | String   |                        | 축의 유형                                                                                          | [linear](#linear-type), [time](#time-type), [log](#logarithmic-type), [step](#step-type) |
 | showAxis       | Boolean  | true                   | 축 표시 여부                                                                                       | true / false                                                                             |
 | startToZero    | Boolean  | false                  | 축의 시작을 0 부터 시작할지의 여부                                                                 | true / false                                                                             |
 | autoScaleRatio | Number   | null                   | Axis의 Max Buffer를 위한 속성                                                                      | 0.1 ~ 0.9                                                                                |
@@ -383,7 +383,7 @@ const chartOptions = {
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                |            |
 | tipStyle       | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정             |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
@@ -407,7 +407,7 @@ const chartOptions = {
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                                                             |                 |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                          |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
