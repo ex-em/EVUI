@@ -135,7 +135,7 @@ const chartData = {
 
 | 이름           | 타입     | 디폴트                 | 설명                                                                                               | 종류(예시)                                                                               |
 | -------------- | -------- | ---------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| type           | String   |                        | 축의 유형                                                                                          | [linear](#linear-type), [time](#time-type), [log](#Logarithmic-type), [step](#step-type) |
+| type           | String   |                        | 축의 유형                                                                                          | [linear](#linear-type), [time](#time-type), [log](#logarithmic-type), [step](#step-type) |
 | showAxis       | Boolean  | true                   | 축 표시 여부                                                                                       | true / false                                                                             |
 | startToZero    | Boolean  | false                  | 축의 시작을 0 부터 시작할지의 여부                                                                 | true / false                                                                             |
 | autoScaleRatio | Number   | null                   | Axis의 Max Buffer를 위한 속성                                                                      | 0.1 ~ 0.9                                                                                |
@@ -143,7 +143,7 @@ const chartData = {
 | axisLineWidth  | Number   | 1                      | 축의 선 굵기                                                                                       | 1 ~                                                                                      |
 | axisLineColor  | String   | '#C9CFDC'              | 축의 색상                                                                                          |                                                                                          |
 | gridLineColor  | String   | '#C9CFDC'              | 그리드의 색상                                                                                      |                                                                                          |
-| range          | Array    | null                   | 축에 표시할 값의 min, max (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.)     | [0, 100]                                                                                 |
+| range          | Array \| (minValue, maxValue) => [min, max]   | null                   | 축에 표시할 값의 min, max (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다)   | [0, 100]                                                                                 |
 | horizontal     | Boolean  | null                   | horizontal Bar 차트 표시를 위한 속성                                                               | true / false                                                                             |
 | overlapping    | Object   | ([상세](#overlapping)) | Overlapping Bar 차트 표시를 위한 속성<br/>data 속성의 groups 값을 같이 지정하여야 정상 표현됩니다. |                                                                                          |
 | interval       | String   | null                   | 축에 표시되는 값의 간격 단위 (축의 타입에 따라 달라짐)                                             |
@@ -383,7 +383,7 @@ const chartOptions = {
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                |            |
 | tipStyle       | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정             |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
@@ -407,7 +407,7 @@ const chartOptions = {
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                                                             |                 |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                          |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
