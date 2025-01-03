@@ -98,8 +98,8 @@ class Bar {
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
     const getSize = () => {
-      if (typeof thickness === 'string' && thickness?.endsWith('px')) {
-        return Math.min(bArea, parseInt(thickness, 10));
+      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
+        return Math.min(bArea, Number(thickness.replace('px', '')));
       }
       if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
         return Math.ceil(bArea * thickness);
