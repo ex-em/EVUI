@@ -14,7 +14,7 @@
         },
         labels: ['가나다라', '마바사', '아자차', '카타', '파하'],
         data: {
-          series1: [100, 150, 51, 150, 450],
+          series1: [100, 150, 51, 150, 350],
         },
       };
 
@@ -28,7 +28,7 @@
           showAxis: true,
           type: 'linear',
           startToZero: true,
-          range: (min, max) => (max > 300 ? [0, max] : [0, 300]),
+          autoScaleRatio: 0.1,
         }],
       };
 
