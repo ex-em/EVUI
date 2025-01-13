@@ -421,7 +421,7 @@ class Bar {
 
     let formattedTxt;
     if (formatter) {
-      formattedTxt = formatter(value);
+      formattedTxt = formatter(value, data);
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {
