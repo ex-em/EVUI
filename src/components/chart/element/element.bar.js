@@ -421,7 +421,9 @@ class Bar {
 
     let formattedTxt;
     if (formatter) {
-      formattedTxt = formatter(value, data);
+      formattedTxt = formatter(value, {
+        label: isHorizontal ? data.y : data.x,
+      });
     }
 
     if (!formatter || typeof formattedTxt !== 'string') {
