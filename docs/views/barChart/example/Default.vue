@@ -21,6 +21,7 @@
       const chartOptions = {
         type: 'bar',
         cPadRatio: 0.1,
+        thickness: 1,
         axesX: [{
           type: 'step',
         }],

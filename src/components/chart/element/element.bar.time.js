@@ -47,7 +47,16 @@ class TimeBar extends Bar {
       bArea = (cArea - (cPad * 2)) / showSeriesCount;
     }
 
-    const size = Math.ceil(bArea * thickness);
+    const getSize = () => {
+      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
+        return Math.min(bArea, Number(thickness.replace('px', '')));
+      }
+      if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
+        return Math.ceil(bArea * thickness);
+      }
+      return bArea;
+    };
+    const size = getSize();
 
     let w = isHorizontal ? null : size;
     let subW = isHorizontal ? null : size;

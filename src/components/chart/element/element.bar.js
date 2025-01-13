@@ -97,7 +97,16 @@ class Bar {
     bArea = cArea > (cPad * 2) ? (cArea - (cPad * 2)) : cArea;
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
-    const size = Math.ceil(bArea * thickness);
+    const getSize = () => {
+      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
+        return Math.min(bArea, Number(thickness.replace('px', '')));
+      }
+      if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
+        return Math.ceil(bArea * thickness);
+      }
+      return bArea;
+    };
+    const size = getSize();
 
     w = isHorizontal ? null : size;
     h = isHorizontal ? size : null;

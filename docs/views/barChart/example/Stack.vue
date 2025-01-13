@@ -31,7 +31,7 @@
         type: 'bar',
         width: '100%',
         height: '100%',
-        thickness: 1,
+        thickness: '20px',
         title: {
           text: 'Title Test',
           show: true,
