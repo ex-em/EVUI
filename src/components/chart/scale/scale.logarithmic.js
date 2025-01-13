@@ -12,9 +12,11 @@ class LogarithmicScale extends Scale {
     let maxValue;
     let minValue;
     let isDefaultMaxSameAsMin = false;
-    if (this.range && this.range.length === 2) {
+    if (Array.isArray(this.range) && this.range.length === 2) {
       maxValue = this.range[1];
       minValue = this.range[0];
+    } else if (typeof range === 'function') {
+      [minValue, maxValue] = this.range(minMax.min, minMax.max);
     } else {
       maxValue = minMax.max;
       minValue = minMax.min;

@@ -52,7 +52,7 @@
         axesY: [{
           type: 'linear',
           startToZero: true,
-          autoScaleRatio: 0.1,
+          range: (min, max) => (max > 300 ? [0, max] : [0, 300]),
           showGrid: false,
         }],
       };

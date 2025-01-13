@@ -29,7 +29,7 @@ class StepScale extends Scale {
     let labelCount = this.labels.length;
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
-    if (range?.length) {
+    if (Array.isArray(range) && range?.length) {
       const [min, max] = range;
       if (truthyNumber(min) && truthyNumber(max)) {
         minIndex = min < minIndex ? minIndex : min;
@@ -38,6 +38,13 @@ class StepScale extends Scale {
         minValue = this.labels[minIndex];
         labelCount = maxIndex - minIndex + 1;
       }
+    } else if (typeof range === 'function') {
+      const [min, max] = range(minValue, maxValue);
+      minIndex = min < minIndex ? minIndex : min;
+      maxIndex = max > maxIndex ? maxIndex : max;
+      maxValue = this.labels[maxIndex];
+      minValue = this.labels[minIndex];
+      labelCount = maxIndex - minIndex + 1;
     }
 
     const maxWidth = this.labelStyle?.maxWidth ?? chartRect.chartWidth / (labelCount + 2);
