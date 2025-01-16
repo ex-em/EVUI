@@ -1,4 +1,4 @@
-# evui 4.0
+# evui 3.5.0-rc.1
 
 ## Project setup
 
@@ -38,15 +38,11 @@ app.mount('#app');
 ```ts
 // main.ts
 import App from '@/App.vue';
-import { EvMessageBox, EvMessage, EvNotification } from 'evui';
 import 'evui/style';
 
 const app = createApp(App);
 
 app.use(EVUI);
-app.config.globalProperties.$messagebox = EvMessageBox;
-app.config.globalProperties.$messagex = EvMessage;
-app.config.globalProperties.$notify = EvNotification;
 
 app.mount('#app');
 ```
