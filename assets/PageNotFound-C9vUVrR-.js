@@ -1,1 +1,0 @@
-import{_ as o,c as e,o as t}from"./index-D39u0xbo.js";const n={name:"PageNotFound",components:{},setup(){}};function a(c,s,r,p,u,_){return t(),e("div",null," PageNotFound ")}const f=o(n,[["render",a]]);export{f as default};
