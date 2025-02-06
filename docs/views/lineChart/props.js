@@ -100,7 +100,7 @@ export default {
     LegendVirtualScroll: {
       description: 'Legend Virtual Scroll',
       component: LegendVirtualScroll,
-      parsedData: parseComponent(LegendVirtualScrollRaw),
+      parsedData: parse(LegendVirtualScrollRaw).descriptor,
     },
   },
 };

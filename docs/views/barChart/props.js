@@ -88,7 +88,7 @@ export default {
     AxisControl: {
       description: 'axis control',
       component: AxisControl,
-      parsedData: parseComponent(AxisControlRaw),
+      parsedData: parse(AxisControlRaw).descriptor,
     },
   },
 };
