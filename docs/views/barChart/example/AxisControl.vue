@@ -31,7 +31,7 @@ import { computed, ref } from 'vue';
         series: {
           series1: { name: '시리즈 이름' },
         },
-        labels: ['가나다라', '마바사', '아자차', '카타', '파하하'],
+        labels: ['가나다라', '마바사', '아자차', '카타', '파하'],
         data: {
           series1: [100, 150, 51, 150, 350],
         },
