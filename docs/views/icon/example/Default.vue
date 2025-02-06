@@ -33,7 +33,7 @@
       <ev-icon
         icon="ev-icon-save"
         @click="clickIcon"
-        @dblClick="dblClickIcon"
+        @dblclick="dblClickIcon"
         @contextmenu="contextMenuIcon"
       />
     </div>

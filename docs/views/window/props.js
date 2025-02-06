@@ -1,7 +1,7 @@
-import { parseComponent } from 'vue-template-compiler';
-import mdText from 'raw-loader!./api/window.md';
+import { parse } from '@vue/compiler-sfc';
+import mdText from './api/window.md?raw';
 import Default from './example/Default';
-import DefaultRaw from '!!raw-loader!./example/Default';
+import DefaultRaw from './example/Default?raw';
 
 export default {
   mdText,
@@ -9,7 +9,7 @@ export default {
     Default: {
       description: '트리거 시 나타나는 윈도우 모달창 기능입니다.',
       component: Default,
-      parsedData: parseComponent(DefaultRaw),
+      parsedData: parse(DefaultRaw).descriptor,
     },
   },
 };

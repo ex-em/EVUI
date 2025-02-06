@@ -17,7 +17,8 @@
           :key="rowIndex"
         >
           <i>{{ row.seriesName }}</i>
-          <p v-for="(item, itemIdx) in row.items"
+          <p
+v-for="(item, itemIdx) in row.items"
              :key="itemIdx"
           >
             <b>x</b>: {{ getDateString(item.x) }} <b>y</b>: {{ item.y }}

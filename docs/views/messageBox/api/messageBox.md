@@ -1,4 +1,5 @@
 ### Desc
+
 $messagebox 는 Global Method / Local Import 두 가지 방법으로 사용할 수 있으며, 단순 메시지 문구만 입력하거나, 옵션과 함께 사용할 수 있음
 
 ```js
@@ -12,8 +13,9 @@ ctx.$messagebox({
 });
 ```
 
-**1. Global Method**  
-`app.config.globalProperties`에 등록하여, 각 컴포넌트에서 아래처럼 사용 가능 
+**1. Global Method**
+`app.config.globalProperties`에 등록하여, 각 컴포넌트에서 아래처럼 사용 가능
+
 ```vue
 <template>
     <ev-button
@@ -27,7 +29,7 @@ ctx.$messagebox({
 
   export default {
     setup() {
-      const { ctx } = getCurrentInstance();
+    const ctx = getCurrentInstance().appContext.config.globalProperties;
       const showMsg = () => {
         ctx.$messagebox({
           message: 'message',
@@ -42,7 +44,7 @@ ctx.$messagebox({
 </script>
 ```
 
-**2. Local Import**  
+**2. Local Import**
 
 ```vue
 <template>
@@ -54,7 +56,7 @@ ctx.$messagebox({
 </template>
 <script>
   import { EvMessageBox } from 'evui';
-  
+
   export default {
     setup() {
       const showMsg = () => {

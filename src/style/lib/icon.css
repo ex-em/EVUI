@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'EVUI';
-  src: url('~@/style/lib/fonts/EVUI.eot');
-  src: url('~@/style/lib/fonts/EVUI.eot#iefix') format('embedded-opentype'),
-    url('~@/style/lib/fonts/EVUI.ttf') format('truetype'),
-    url('~@/style/lib/fonts/EVUI.woff') format('woff'),
-    url('~@/style/lib/fonts/EVUI.svg') format('svg');
+  src: url('@/style/lib/fonts/EVUI.eot');
+  src: url('@/style/lib/fonts/EVUI.eot#iefix') format('embedded-opentype'),
+    url('@/style/lib/fonts/EVUI.ttf') format('truetype'),
+    url('@/style/lib/fonts/EVUI.woff') format('woff'),
+    url('@/style/lib/fonts/EVUI.svg') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;

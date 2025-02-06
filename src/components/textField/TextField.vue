@@ -239,6 +239,7 @@ export default {
 <style lang="scss">
 $icon-width: 14px !default;
 
+@use 'sass:color';
 @import '../../style/index.scss';
 
 .ev-text-field {
@@ -263,7 +264,7 @@ $icon-width: 14px !default;
     display: flex;
     position: absolute;
     top: 50%;
-    right: #{$icon-width / 2};
+    right: calc($icon-width / 2);
     width: $icon-width;
     height: $icon-width;
     cursor: pointer;
@@ -281,7 +282,7 @@ $icon-width: 14px !default;
 
 @include state('clearable') {
   .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+    padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
   .ev-text-field-icon {
     font-size: 15px;
@@ -294,7 +295,7 @@ $icon-width: 14px !default;
 }
 @include state('show-password') {
   .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+    padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
   .ev-text-field-icon {
     font-size: 15px;
@@ -308,7 +309,7 @@ $icon-width: 14px !default;
 }
 @include state('type-search') {
   .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+    padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
   .ev-text-field-icon {
     font-size: 15px;
@@ -331,7 +332,7 @@ $icon-width: 14px !default;
     }
     .curr-length {
       @include evThemify() {
-        color: darken(evThemed('border-base'), 10%);
+        color: color.scale(evThemed('border-base'), $lightness: -10%);
       }
     }
     &.max,
@@ -356,7 +357,7 @@ $icon-width: 14px !default;
 }
 @include state('ev-text-field-suffix') {
   .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width} 0 $input-default-padding;
+    padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
   .icon-suffix {
     font-size: 15px;
@@ -365,7 +366,7 @@ $icon-width: 14px !default;
 }
 @include state('ev-text-field-prefix') {
   .ev-input {
-    padding: 0 $input-default-padding 0 #{$input-default-padding + $icon-width};
+    padding: 0 $input-default-padding 0 calc($input-default-padding + $icon-width);
   }
   .icon-prefix {
     left: 7px;
@@ -375,7 +376,7 @@ $icon-width: 14px !default;
 }
 @include state('ev-text-field-prefix-suffix') {
   .ev-input {
-    padding: 0 #{$input-default-padding + $icon-width};
+    padding: 0 calc($input-default-padding + $icon-width);
   }
 }
 </style>
