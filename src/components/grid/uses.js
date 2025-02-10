@@ -781,6 +781,33 @@ export const sortEvent = (params) => {
       return { aCol, bCol };
     };
 
+    const getSeparators = (str) => {
+      // 비숫자 문자(구분 기호)를 모두 찾기
+      const separators = str.match(/[^0-9]/g) || [];
+
+      // 구분 기호가 두 개 이상인 경우: 천 단위 구분자와 소수점 구분자 존재
+      const thousandSeparator = separators.length > 1 ? separators[0] : '';
+      const decimalSeparator = separators.length > 0 ? separators[separators.length - 1] : '.';
+
+      return { thousandSeparator, decimalSeparator };
+    };
+
+    const getNumberFromFormattedString = (str) => {
+      const { thousandSeparator, decimalSeparator } = getSeparators(str);
+
+      // 천 단위 구분 기호가 존재하는 경우 제거
+      let normalizedStr = thousandSeparator
+        ? str.replace(new RegExp(`\\${thousandSeparator}`, 'g'), '')
+        : str;
+
+      // 소수점 구분 기호를 점(.)으로 변환
+      if (decimalSeparator !== '.') {
+        normalizedStr = normalizedStr.replace(decimalSeparator, '.');
+      }
+
+      return parseFloat(normalizedStr);
+    };
+
     if (customSetAsc) {
       stores.store.sort((a, b) => {
         /*
@@ -810,8 +837,13 @@ export const sortEvent = (params) => {
         stores.store.sort((a, b) => {
           let { aCol, bCol } = getColumnValue(a, b);
           if (!aCol || typeof aCol === 'string' || typeof aCol === 'number') {
-            aCol = aCol === '' ? null : aCol;
-            bCol = bCol === '' ? null : bCol;
+            if (typeof aCol === 'string') {
+              aCol = aCol === '' ? null : getNumberFromFormattedString(aCol);
+              bCol = bCol === '' ? null : getNumberFromFormattedString(bCol);
+            } else {
+              aCol = aCol === '' ? null : aCol;
+              bCol = bCol === '' ? null : bCol;
+            }
             return numberSortFn(aCol ?? null, bCol ?? null);
           }
           return 0;

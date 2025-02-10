@@ -281,6 +281,7 @@ export default {
       { caption: 'Name', field: 'userName', type: 'string', width: 80, fixed: true },
       { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
       { caption: 'number', field: 'number', type: 'number', width: 80 },
+      { caption: 'string number', field: 'stringNumber', type: 'stringNumber', width: 80 },
       { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string', width: 80 },
@@ -310,6 +311,15 @@ export default {
       });
       clickedRowMV.value = clickedRow;
     };
+
+    const generateFormattedNumber = () => {
+      const randomValue = (Math.random() * 10000 + 1).toFixed(2);
+
+      return Number(randomValue).toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      });
+    };
+
     const getData = (count, startIndex) => {
       const temp = [];
       const roles = ['Common', 'Admin'];
@@ -319,6 +329,7 @@ export default {
           `user_${ix + 1}`,
           roles[ix % 2],
           ix,
+          generateFormattedNumber(),
           booleans[ix % 2],
           '010-0000-0000',
           'kmn0827@ex-em.com',
