@@ -165,7 +165,7 @@ const modules = {
     this.updateStartEndRowIndex();
 
     const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
-    elementsToRemove.forEach(element => element.remove());
+    [...elementsToRemove]?.forEach?.(element => element.remove());
 
     const totalScrollHeight = this.totalRowCount * this.legendItemHeight;
     const top = this.startRowIndex * this.legendItemHeight;
@@ -190,7 +190,7 @@ const modules = {
       useLegendSeries = Object.entries(this.seriesList)
       .filter(([, series]) => series.showLegend);
     }
-    useLegendSeries.slice(startIndex, endIndex).forEach(([, series]) => {
+    useLegendSeries?.slice(startIndex, endIndex)?.forEach(([, series]) => {
       this.addLegend(series);
     });
   },
@@ -231,8 +231,8 @@ const modules = {
    * @returns {undefined}
    */
   addLegendForGroups(groups, seriesList, useTable) {
-    groups.forEach((group) => {
-      group.slice().reverse().forEach((sId) => {
+    groups?.forEach?.((group) => {
+      group?.slice()?.reverse()?.forEach((sId) => {
         const series = seriesList[sId];
         if (series && series.showLegend) {
           this.addLegendBasedOnType(series, useTable);
@@ -407,7 +407,7 @@ const modules = {
         colorDOM.style.backgroundColor = inactiveColor;
         colorDOM.style.borderColor = inactiveColor;
         nameDOM.style.color = inactiveColor;
-        valueDOMList?.forEach((dom) => {
+        [...valueDOMList]?.forEach?.((dom) => {
           dom.style.color = inactiveColor;
         });
       } else {
@@ -429,7 +429,7 @@ const modules = {
         }
 
         nameDOM.style.color = opt.color;
-        valueDOMList?.forEach((dom) => {
+        [...valueDOMList]?.forEach?.((dom) => {
           const style = opt.table?.columns[dom.dataset.type]?.style;
           dom.style.color = style?.color ? style.color : opt.color;
         });
@@ -691,10 +691,10 @@ const modules = {
     const aggregations = this.getAggregations();
     const rowDOMList = this.legendBoxDOM?.getElementsByClassName('ev-chart-legend--table__row');
 
-    rowDOMList.forEach((row) => {
+    [...rowDOMList]?.forEach?.((row) => {
       const valueDOMList = row?.getElementsByClassName('ev-chart-legend--table__value');
 
-      valueDOMList.forEach((dom) => {
+      [...valueDOMList]?.forEach?.((dom) => {
         const key = dom.dataset.type;
         if (key === 'name') {
           return;
