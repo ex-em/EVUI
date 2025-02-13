@@ -11,9 +11,11 @@
     "docs": "vite serve --config vite.config.js --port 9999",
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production",
-    "preview" : "vite preview --port 9999"
+    "preview": "vite preview --port 9999"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
@@ -53,6 +55,7 @@
     "highlight.js": "^10.2.0",
     "lodash-es": "^4.17.15",
     "marked": "^14.1.2",
+    "marked-gfm-heading-id": "^4.1.1",
     "stylelint": "^16.9.0",
     "stylelint-order": "^6.0.4",
     "typescript": "^5.0.0"
