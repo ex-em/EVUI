@@ -315,6 +315,7 @@ export const useDropdown = (param) => {
       mv.value.splice(idx, 1);
     }
     allCheck.value = mv.value.length === filteredItems.value.filter(item => !item.disabled).length;
+    mv.value = [...mv.value];
     changeMv();
   };
   const clickItem = !props.multiple ? singleClickItem : multipleClickItem;
