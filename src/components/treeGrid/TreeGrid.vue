@@ -718,8 +718,8 @@ export default {
     });
 
     onUnmounted(() => {
-      document.removeEventListener('wheel', onMouseWheel);
-      document.removeEventListener('scroll', onMouseWheel);
+      document.removeEventListener('wheel', onMouseWheel, { capture: false });
+      document.removeEventListener('scroll', onMouseWheel, { capture: true });
     });
 
     onActivated(() => {
