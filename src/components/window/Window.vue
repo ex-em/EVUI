@@ -172,6 +172,7 @@ export default {
     'mousedown-mousemove',
     'resize',
     'expand',
+    'keydown-esc',
   ],
   setup() {
     const {

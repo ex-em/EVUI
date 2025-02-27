@@ -703,7 +703,7 @@ const getActiveWindowsOrderByZIndexAsc = () => {
 };
 
 const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
-  const { props } = getCurrentInstance();
+  const { props, emit } = getCurrentInstance();
 
   let sequence = null;
   let timer = null;
@@ -735,6 +735,8 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
     // 예시 상황) Nested에서 외부 Window의 escClose는 true이고, 내부 Window의 escClose는 false인 경우,
     // esc 눌러도 외부 Window는 닫히지 않고, 가장 상단에 있는 내부 Window가 수동으로 닫힌 후에 닫히도록 하기 위해
     if (!topActiveWindow.escClose) return;
+
+    emit('keydown-esc');
 
     topActiveWindow.closeWin();
   };
