@@ -12,6 +12,8 @@ import Time from './example/Time';
 import TimeRaw from '!!raw-loader!./example/Time';
 import Event from './example/Event';
 import EventRaw from '!!raw-loader!./example/Event';
+import SelectItem from './example/SelectItem';
+import SelectItemRaw from '!!raw-loader!./example/SelectItem';
 import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from '!!raw-loader!./example/SelectLabel';
 import Gradient from './example/Gradient';
@@ -64,6 +66,11 @@ export default {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
       component: Event,
       parsedData: parseComponent(EventRaw),
+    },
+    'Select Item': {
+      description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
+      component: SelectItem,
+      parsedData: parse(SelectItemRaw).descriptor,
     },
     'Select Label': {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
