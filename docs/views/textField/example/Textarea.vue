@@ -53,6 +53,27 @@
       />
     </div>
   </div>
+
+    <div class="case">
+    <p class="case-title">Max Length  & maxUnit</p>
+    <div style="display: flex;">
+      <ev-text-field
+        v-model="modelValue5"
+        placeholder="Please enter the content"
+        type="textarea"
+        :max-length="10"
+        max-unit="byte"
+      />
+      <ev-text-field
+        v-model="modelValue5"
+        placeholder="Please enter the content"
+        type="textarea"
+        :max-length="10"
+        show-max-length
+        max-unit="byte"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -64,12 +85,14 @@ export default {
     const modelValue2 = ref('Read Only Content');
     const modelValue3 = ref('Disabled Content');
     const modelValue4 = ref();
+    const modelValue5 = ref();
 
     return {
       modelValue1,
       modelValue2,
       modelValue3,
       modelValue4,
+      modelValue5,
     };
   },
 };

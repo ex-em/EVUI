@@ -26,7 +26,6 @@
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="readonly"
-          :maxlength="maxLength"
           :autocomplete="autocomplete"
           @focus="focusInput"
           @blur="blurInput"
@@ -42,7 +41,6 @@
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="readonly"
-          :maxlength="maxLength"
           :autocomplete="autocomplete"
           @focus="focusInput"
           @blur="blurInput"
@@ -95,15 +93,15 @@
     <div
       v-if="maxLength && showMaxLength"
       class="ev-text-field-maxlength"
-      :class="{ max: mv?.length > maxLength }"
+      :class="{ max: currentLength > maxLength }"
     >
-      <span class="curr-length">{{ mv ? mv.length : 0 }}</span> / {{ maxLength }}
+      <span class="curr-length">{{ currentLength }}</span> / {{ maxLength }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 
 export default {
   name: 'EvTextField',
@@ -139,6 +137,10 @@ export default {
     maxLength: {
       type: Number,
       default: null,
+    },
+    maxUnit: {
+      type: String,
+      default: 'count',
     },
     showMaxLength: {
       type: Boolean,
@@ -206,18 +208,36 @@ export default {
     const blurInput = (e) => {
       emit('blur', e);
     };
+
+    const getByteLength = (text) => new TextEncoder().encode(text).length;
+
+    const currentLength = computed(() => 
+      props.maxUnit === 'byte'
+        ? getByteLength(mv.value || '')
+        : (mv.value || '').length
+    );
+
     const inputMv = (e) => {
-      const inputValue = e.target.value;
-      if (mv.value !== inputValue) {
-        mv.value = inputValue;
-      }
-      nextTick(() => {
-        emit('input', mv.value, e);
-      });
-    };
-    const changeMv = (e) => {
-      emit('change', mv.value, e);
-    };
+        let value = e.target.value;
+
+        if (props.maxLength) {
+            if (props.maxUnit === 'byte') {
+                while (getByteLength(value) > props.maxLength) {
+                    value = value.slice(0, -1);
+                }
+            } else {
+                if (value.length > props.maxLength) {
+                    value = value.slice(0, props.maxLength);
+                }
+            }
+        }
+
+        e.target.value = value;  
+        mv.value = value;      
+        emit('input', value, e);  
+    }
+
+    const changeMv = (e) => emit('change', mv.value, e);
 
     return {
       mv,
@@ -231,6 +251,7 @@ export default {
       blurInput,
       inputMv,
       changeMv,
+      currentLength,
     };
   },
 };
@@ -342,7 +363,7 @@ $icon-width: 14px !default;
       }
     }
   }
-}
+  }
 @include state('error') {
   .ev-text-field-error {
     float: left;
@@ -352,7 +373,7 @@ $icon-width: 14px !default;
 
     @include evThemify() {
       color: evThemed('error');
-    }
+  }
   }
 }
 @include state('ev-text-field-suffix') {
@@ -363,7 +384,7 @@ $icon-width: 14px !default;
     font-size: 15px;
     cursor: default;
   }
-}
+  }
 @include state('ev-text-field-prefix') {
   .ev-input {
     padding: 0 $input-default-padding 0 calc($input-default-padding + $icon-width);
