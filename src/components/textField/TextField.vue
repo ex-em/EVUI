@@ -27,6 +27,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :autocomplete="autocomplete"
+          :maxlength="maxUnit === 'byte' ? null : maxLength"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -42,6 +43,7 @@
           :disabled="disabled"
           :readonly="readonly"
           :autocomplete="autocomplete"
+          :maxlength="maxUnit === 'byte' ? null : maxLength"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -95,7 +97,8 @@
       class="ev-text-field-maxlength"
       :class="{ max: currentLength > maxLength }"
     >
-      <span class="curr-length">{{ currentLength }}</span> / {{ maxLength }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
+      <span class="curr-length">{{ currentLength }}</span> / {{ maxLength
+       }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
     </div>
   </div>
 </template>
@@ -209,35 +212,29 @@ export default {
       emit('blur', e);
     };
 
-    const getByteLength = (text) => new TextEncoder().encode(text).length;
+    const getByteLength = text => new TextEncoder().encode(text).length;
 
-    const currentLength = computed(() => 
-      props.maxUnit === 'byte'
+    const currentLength = computed(() =>
+      (props.maxUnit === 'byte'
         ? getByteLength(mv.value || '')
-        : (mv.value || '').length
+        : (mv.value || '').length),
     );
 
     const inputMv = (e) => {
-        let value = e.target.value;
+      let value = e.target.value;
 
-        if (props.maxLength) {
-            if (props.maxUnit === 'byte') {
-                while (getByteLength(value) > props.maxLength) {
-                    value = value.slice(0, -1);
-                }
-            } else {
-                if (value.length > props.maxLength) {
-                    value = value.slice(0, props.maxLength);
-                }
-            }
+      if (props.maxLength && props.maxUnit === 'byte') {
+        while (getByteLength(value) > props.maxLength) {
+          value = value.slice(0, -1);
         }
+        e.target.value = value;
+      }
 
-        e.target.value = value;  
-        mv.value = value;      
-        emit('input', value, e);  
-    }
+      mv.value = value;
+      emit('input', value, e);
+    };
 
-    const changeMv = (e) => emit('change', mv.value, e);
+    const changeMv = e => emit('change', mv.value, e);
 
     return {
       mv,
@@ -363,7 +360,7 @@ $icon-width: 14px !default;
       }
     }
   }
-  }
+}
 @include state('error') {
   .ev-text-field-error {
     float: left;
@@ -373,7 +370,7 @@ $icon-width: 14px !default;
 
     @include evThemify() {
       color: evThemed('error');
-  }
+    }
   }
 }
 @include state('ev-text-field-suffix') {
@@ -384,7 +381,7 @@ $icon-width: 14px !default;
     font-size: 15px;
     cursor: default;
   }
-  }
+}
 @include state('ev-text-field-prefix') {
   .ev-input {
     padding: 0 $input-default-padding 0 calc($input-default-padding + $icon-width);
