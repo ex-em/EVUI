@@ -64,10 +64,31 @@
     </div>
   </div>
 
+    <div class="case">
+    <p class="case-title">Max Length  & maxUnit</p>
+    <div style="display: flex;">
+      <ev-text-field
+        v-model="modelValue6"
+        placeholder="Please enter the content"
+        type="text"
+        :max-length="3"
+        max-unit="byte"
+      />
+      <ev-text-field
+        v-model="modelValue6"
+        placeholder="Please enter the content"
+        type="text"
+        :max-length="3"
+        show-max-length
+        max-unit="byte"
+      />
+    </div>
+  </div>
+
   <div class="case">
     <p class="case-title">Error Message</p>
     <ev-text-field
-      v-model="modelValue6"
+      v-model="modelValue7"
       placeholder="Please enter the content"
       type="text"
       :error-msg="errMsg"
@@ -86,11 +107,12 @@ export default {
     const modelValue3 = ref('Disabled Content');
     const modelValue4 = ref();
     const modelValue5 = ref();
-    const modelValue6 = ref('1234가나다');
+    const modelValue6 = ref();
+    const modelValue7 = ref('1234가나다');
     const errMsg = ref();
     const checkValid = () => {
       const regexp = /^[0-9]*$/;
-      if (!regexp.test(modelValue6.value)) {
+      if (!regexp.test(modelValue7.value)) {
         errMsg.value = '숫자만 입력 가능!';
       } else {
         errMsg.value = '';
@@ -104,6 +126,7 @@ export default {
       modelValue4,
       modelValue5,
       modelValue6,
+      modelValue7,
       checkValid,
       errMsg,
     };
