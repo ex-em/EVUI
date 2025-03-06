@@ -26,8 +26,8 @@
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="readonly"
-          :maxlength="maxLength"
           :autocomplete="autocomplete"
+          :maxlength="maxUnit === 'byte' ? null : maxLength"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -42,8 +42,8 @@
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="readonly"
-          :maxlength="maxLength"
           :autocomplete="autocomplete"
+          :maxlength="maxUnit === 'byte' ? null : maxLength"
           @focus="focusInput"
           @blur="blurInput"
           @input="inputMv"
@@ -95,15 +95,16 @@
     <div
       v-if="maxLength && showMaxLength"
       class="ev-text-field-maxlength"
-      :class="{ max: mv?.length > maxLength }"
+      :class="{ max: currentLength > maxLength }"
     >
-      <span class="curr-length">{{ mv ? mv.length : 0 }}</span> / {{ maxLength }}
+      <span class="curr-length">{{ currentLength }}</span> / {{ maxLength
+       }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 
 export default {
   name: 'EvTextField',
@@ -139,6 +140,10 @@ export default {
     maxLength: {
       type: Number,
       default: null,
+    },
+    maxUnit: {
+      type: String,
+      default: 'count',
     },
     showMaxLength: {
       type: Boolean,
@@ -206,18 +211,30 @@ export default {
     const blurInput = (e) => {
       emit('blur', e);
     };
+
+    const getByteLength = text => new TextEncoder().encode(text).length;
+
+    const currentLength = computed(() =>
+      (props.maxUnit === 'byte'
+        ? getByteLength(mv.value || '')
+        : (mv.value || '').length),
+    );
+
     const inputMv = (e) => {
-      const inputValue = e.target.value;
-      if (mv.value !== inputValue) {
-        mv.value = inputValue;
+      let value = e.target.value;
+
+      if (props.maxLength && props.maxUnit === 'byte') {
+        while (getByteLength(value) > props.maxLength) {
+          value = value.slice(0, -1);
+        }
+        e.target.value = value;
       }
-      nextTick(() => {
-        emit('input', mv.value, e);
-      });
+
+      mv.value = value;
+      emit('input', value, e);
     };
-    const changeMv = (e) => {
-      emit('change', mv.value, e);
-    };
+
+    const changeMv = e => emit('change', mv.value, e);
 
     return {
       mv,
@@ -231,6 +248,7 @@ export default {
       blurInput,
       inputMv,
       changeMv,
+      currentLength,
     };
   },
 };

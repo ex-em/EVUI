@@ -35,6 +35,7 @@ height: 100px;
 | readonly      | Boolean        | false    | 읽기 전용 여부 | true, false                                                  |
 | placeholder   | String         |          | Input / Textarea의 placeholder 값 |                                                              |
 | maxLength     | Number         | Infinity | value 의 최대길이 제한 길이 |                                                              |
+| maxUnit       | String         | 'count'  | maxLength unit을 설정 | 'count', 'byte', 
 | showMaxLength | Boolean        | false    | maxLength 및 입력 value의 길이값 표현 여부. maxLength 설정되어 있어야 표현 가능 | true, false                                                  |
 | autocomplete  | String         | off      | 자동완성을 허용할 양식 입력 필드를 지정 | on, name, email, username, new-password, current-password 등  |
 | errorMsg      | String         |          | Error 표현을 위한 메시지 |                                                              |
