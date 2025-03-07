@@ -307,7 +307,6 @@ export default {
       chartOptions4,
       clickedLabel,
       defaultSelectItem,
-      defaultSelectItem,
       onClick,
       updateData,
     };
