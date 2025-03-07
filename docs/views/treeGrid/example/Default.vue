@@ -163,13 +163,14 @@
           >
             <ev-radio label="single" />
             <ev-radio label="multi" />
+            <ev-radio label="each" />
           </ev-radio-group>
-          <span class="badge">
-            Mode
-          </span>{{ checkboxModeMV }}
-          <span class="badge">
-            Count
-          </span>{{ checked.length }}
+          <span>Header Check</span>
+          <ev-toggle
+            v-model="headerCheckMV"
+          />
+          <span class="badge">Count</span>
+          <span>{{ checked.length }}</span>
         </div>
         <div class="form-row">
           <span class="badge yellow">
