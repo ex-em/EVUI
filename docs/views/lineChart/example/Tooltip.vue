@@ -340,13 +340,30 @@
           textOverflow,
           formatter: {
             title: ({ x }) => dayjs(x).format('YYYY-MM-DD HH:mm:ss'),
+            label: ({ seriesName }) => {
+              if (seriesName === 'series#1') {
+                 return `ⓒ ${seriesName}`;
+              }
+
+              return seriesName;
+            },
             value: ({ y }) => `${y.toFixed(2)}`,
           },
           colorShape,
           fontColor: {
             title: titleFontColor,
-            label: labelFontColor,
-            value: valueFontColor,
+            label: ({ id }) => {
+              if (id === 'series1') {
+                return '#FF0000';
+              }
+              return labelFontColor.value;
+            },
+            value: ({ value }) => {
+              if (+value > 0.9) {
+                return '#FF0000';
+              }
+              return valueFontColor.value;
+            },
           },
           fontSize: {
             title: titleFontSize,

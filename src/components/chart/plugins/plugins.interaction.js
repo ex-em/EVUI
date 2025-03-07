@@ -770,16 +770,20 @@ const modules = {
           }
 
           if (gdata !== null && gdata !== undefined) {
-            const sName = series.name;
-            const sw = ctx ? ctx.measureText(sName).width : 1;
+            const formattedSeriesName = this.getFormattedTooltipLabel({
+              seriesId: sId,
+              seriesName: series.name,
+              itemData: item.data,
+             });
+            const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
 
-            item.name = sName;
+            item.name = formattedSeriesName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
               seriesId: sId,
-              seriesName: sName,
+              seriesName: formattedSeriesName,
               value: gdata,
               itemData: item.data,
             });
@@ -787,7 +791,7 @@ const modules = {
             item.data.formatted = formattedTxt;
 
             if (maxsw < sw) {
-              maxs = sName;
+              maxs = formattedSeriesName;
               maxsw = sw;
             }
 
@@ -812,6 +816,30 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+
+  /**
+   * get formatted label for tooltip
+   * @param seriesId
+   * @param seriesName
+   * @param itemData
+   * @returns {string}
+   */
+  getFormattedTooltipLabel({ seriesId, seriesName, itemData }) {
+    const opt = this.options;
+    const tooltipOpt = opt.tooltip;
+    const tooltipLabelFormatter = tooltipOpt?.formatter?.label;
+
+    let formattedLabel = seriesName;
+    if (tooltipLabelFormatter) {
+      formattedLabel = tooltipLabelFormatter({
+        seriesId,
+        seriesName,
+        itemData,
+      });
+    }
+
+    return formattedLabel;
   },
 
   /**
@@ -893,9 +921,16 @@ const modules = {
           ),
         );
 
-        const formattedValue = this.getFormattedTooltipValue({
+      
+        const formattedSeriesName = this.getFormattedTooltipLabel({
           seriesId: sId,
           seriesName: series.name,
+          itemData: hasData,
+         });
+
+        const formattedValue = this.getFormattedTooltipValue({
+          seriesId: sId,
+          seriesName: formattedSeriesName,
           value: hasData?.o,
           itemData: hasData,
         });
@@ -904,7 +939,7 @@ const modules = {
           const item = {};
           item.color = series.color;
           item.hit = false;
-          item.name = series.name;
+          item.name = formattedSeriesName;
           item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
           item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
           item.data = hasData;
@@ -914,9 +949,9 @@ const modules = {
         }
 
         const maxSeriesNameWidth = ctx ? ctx.measureText(maxSeriesName).width : 1;
-        const seriesNameWidth = ctx ? ctx.measureText(series.name).width : 1;
+        const seriesNameWidth = ctx ? ctx.measureText(formattedSeriesName).width : 1;
         if (maxSeriesNameWidth < seriesNameWidth) {
-          maxSeriesName = series.name;
+          maxSeriesName = formattedSeriesName;
         }
 
         const maxValueWidth = ctx ? ctx.measureText(maxValueTxt).width : 1;

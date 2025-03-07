@@ -293,6 +293,7 @@ const modules = {
     const seriesList = [];
     seriesKeys.forEach((seriesName) => {
       seriesList.push({
+        id: seriesName,
         data: items[seriesName].data,
         color: items[seriesName].color,
         name: items[seriesName].name,
@@ -342,11 +343,17 @@ const modules = {
         ctx.fillStyle = color;
       }
 
+      const curTooltipInfo = {
+        id: seriesList[ix].id,
+        name: seriesList[ix].name,
+        value: valueText,
+      };
+
       // 1. Draw series color
       this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
-      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
+      ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
@@ -381,7 +388,7 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
-      ctx.fillStyle = opt.fontColor?.value ?? opt.fontColor;
+      ctx.fillStyle = typeof opt.fontColor.value === 'function' ? opt.fontColor.value(curTooltipInfo) : opt.fontColor.value ?? opt.fontColor;
       ctx.textAlign = 'right';
       ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
@@ -470,11 +477,17 @@ const modules = {
       ctx.fillStyle = hitColor;
     }
 
+    const curTooltipInfo = {
+      id: hitInfo.hitId,
+      name: hitItem.y,
+      value: valueText,
+    };
+
     // 1. Draw value color
     this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
     // 2. Draw value y names
-    ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
+    ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
     ctx.textBaseline = 'Bottom';
     if (this.axesY.length) {
       ctx.fillText(
@@ -485,6 +498,7 @@ const modules = {
 
     // 3. Draw value
     ctx.textAlign = 'right';
+    ctx.fillStyle = typeof opt.fontColor.value === 'function' ? opt.fontColor.value(curTooltipInfo) : opt.fontColor.value ?? opt.fontColor;
     ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
     ctx.closePath();
   },
@@ -582,11 +596,17 @@ const modules = {
         ctx.fillStyle = color;
       }
 
+      const curTooltipInfo = {
+        id: hitInfo.hitId,
+        name: seriesList[ix].name,
+        value: valueText,
+      };
+
       // 1. Draw series color
       this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
-      ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
+      ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
       ctx.textBaseline = 'Bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
@@ -622,6 +642,7 @@ const modules = {
 
       // 3. Draw value
       ctx.textAlign = 'right';
+      ctx.fillStyle = typeof opt.fontColor.value === 'function' ? opt.fontColor.value(curTooltipInfo) : opt.fontColor.value ?? opt.fontColor;
       ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
