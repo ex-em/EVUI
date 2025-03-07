@@ -921,7 +921,6 @@ const modules = {
           ),
         );
 
-      
         const formattedSeriesName = this.getFormattedTooltipLabel({
           seriesId: sId,
           seriesName: series.name,
