@@ -31,7 +31,7 @@ export default {
     Default: {
       description: 'Bar Chart(막대그래프)는 표현 값에 비례 하여 높이와 길이를 가진 직사각형 막대로 데이터를 표현하는 차트입니다.',
       component: Default,
-      parsedData: parse(DefaultRaw).descriptor.descriptor,
+      parsedData: parse(DefaultRaw).descriptor,
     },
     Column: {
       description: '세로 형태로 사용할 수 있으며 각 Series별, data별로 색상을 직접 지정할 수 있습니다.',
