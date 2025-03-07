@@ -76,6 +76,7 @@ const selectedSeries = ref({
 | fillOpacity  | Number                      | 0.4              | fill 영역의 투명도                                                                                                              |                                                                                   |
 | fillColor    | Hex, RGB, RGBA Code(String) | COLOR[index]     | Fill 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                      |                                                                                   |
 | point        | Boolean                     | true             | 선(line) 위에 값 위치 마다 점을 표시할지의 여부, 앞/뒤 값이 null인 경우 point 표시 여부에 상관없이 표시됨                       |                                                                                   |
+| pointHighlight        | Boolean                     | true             | hover시 선(line) 위에 값 위치 마다 점을 표시할지의 여부                       |                                                                                   |
 | pointSize    | Number                      | 3                | 점(Point)의 크기                                                                                                                |                                                                                   |
 | pointFill    | Hex, RGB, RGBA Code(String) | COLOR[index]     | 점(Point) 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                 |                                                                                   |
 | pointStyle   | String                      | 'circle'         | 점(Point) 모양                                                                                                                  | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
@@ -334,7 +335,7 @@ const chartOptions = {
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                |            |
 | tipStyle       | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정             |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
@@ -358,7 +359,7 @@ const chartOptions = {
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                                                             |                 |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                          |
 
-##### etc.
+##### etc
 
 | 이름          | 타입                        | 디폴트    | 설명             | 종류(예시) |
 | ------------- | --------------------------- | --------- | ---------------- | ---------- |
