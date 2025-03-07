@@ -453,11 +453,14 @@ export const checkEvent = (params) => {
     getPagingData,
   } = params;
   const { emit } = getCurrentInstance();
+
   /**
    * row에 대한 체크 상태를 해제한다.
    *
    * @param {array} row - row 데이터
    */
+  const isEachMode = () => checkInfo.useCheckbox.mode === 'each';
+
   const unCheckedRow = (row) => {
     const index = stores.treeStore.findIndex(
       item => item.index === row.index);
@@ -467,6 +470,10 @@ export const checkEvent = (params) => {
     }
   };
   const onCheckChildren = (node) => {
+    if (isEachMode()) {
+      return;
+    }
+
     if (node.hasChild) {
       node.children.forEach((children) => {
         const childNode = children;
@@ -486,6 +493,10 @@ export const checkEvent = (params) => {
     }
   };
   const onCheckParent = (node) => {
+    if (isEachMode()) {
+      return;
+    }
+
     const parentNode = node.parent;
     if (parentNode) {
       const isCheck = parentNode.children.every(n => n.checked);
@@ -574,7 +585,7 @@ export const checkEvent = (params) => {
    */
   const onCheckAll = (event) => {
     const status = checkInfo.isHeaderChecked;
-    let store = stores.store;
+    let store = stores.store?.filter(row => row.isFilter);
     if (pageInfo.isClientPaging) {
       store = getPagingData();
     }
