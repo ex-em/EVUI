@@ -57,7 +57,7 @@
 |  | columnWidth            | 40                 | 기본 컬럼 너비를 설정 한다.                                                                                   | `min-width: 40px`         |
 |  | useCheckbox            | {}                 | 각 Row별 체크박스 사용 여부 및 단일 선택이나 다중 선택을 설정한다.                                                           |                           |
 |  |                        | use                | 체크박스 사용 여부                                                                                         | boolean                   |
-|  |                        | mode               | 단일 및 다중 선택 설정                                                                                      | 'multi', 'single'         |
+|  |                        | mode               | 체크 모드 설정 (단일, 다중, 개별(부모 자식 간 체크 연관 없음)                                                             | 'multi', 'single', 'each'  |
 |  |                        | headerCheck        | 헤더 체크박스 사용 여부                                                                                      | boolean                   |
 |  | useSelection           | {}                 | 각 row별 선택 여부 및 단일 선택이나 다중 선택을 설정한다.                                                                |                           |
 |  |                        | use                | Selection 사용 여부                                                                                    | Boolean                   |
