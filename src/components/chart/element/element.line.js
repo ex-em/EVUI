@@ -77,7 +77,7 @@ class Line {
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
     const pointFillColorOpacity = getOpacity(pointFillColor);
-    const fillOpacity = getOpacity(mainColor) * this.fillOpacity;
+    const fillOpacity = this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();
@@ -163,7 +163,7 @@ class Line {
     if (this.fill && this.data.length) {
       ctx.beginPath();
 
-      const fillColor = Util.colorStringToRgba(mainColor, fillOpacity);
+      const fillColor = Util.colorStringToRgba(this.fillColor || mainColor, fillOpacity);
       if (this.fill?.gradient) {
         let maxValueYPos = this.data[0].yp;
         let minValueYBottomPos = this.data[0].y;
