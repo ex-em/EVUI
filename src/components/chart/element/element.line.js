@@ -283,7 +283,7 @@ class Line {
     const { xp, yp, o } = gdata;
 
     ctx.save();
-    if (xp !== null && yp !== null && o !== this.passingValue) {
+    if (xp !== null && yp !== null && o !== this.passingValue && this.pointHighlight) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
       ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);

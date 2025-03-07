@@ -37,6 +37,7 @@ export const LINE_OPTION = {
   xAxisIndex: 0,
   yAxisIndex: 0,
   point: true,
+  pointHighlight: true,
   pointSize: 3,
   pointStyle: '',
   lineWidth: 2,
