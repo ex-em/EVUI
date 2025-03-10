@@ -770,16 +770,23 @@ const modules = {
           }
 
           if (gdata !== null && gdata !== undefined) {
-            const sName = series.name;
-            const sw = ctx ? ctx.measureText(sName).width : 1;
+            const formattedSeriesName = this.getFormattedTooltipLabel({
+              dataId: series.id,
+              seriesId: sId,
+              seriesName: series.name,
+              itemData: item.data,
+             });
+            const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
 
-            item.name = sName;
+            item.id = series.id;
+            item.name = formattedSeriesName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
+              dataId: series.id,
               seriesId: sId,
-              seriesName: sName,
+              seriesName: formattedSeriesName,
               value: gdata,
               itemData: item.data,
             });
@@ -787,7 +794,7 @@ const modules = {
             item.data.formatted = formattedTxt;
 
             if (maxsw < sw) {
-              maxs = sName;
+              maxs = formattedSeriesName;
               maxsw = sw;
             }
 
@@ -815,14 +822,41 @@ const modules = {
   },
 
   /**
+   * get formatted label for tooltip
+   * @param dataId
+   * @param seriesId
+   * @param seriesName
+   * @param itemData
+   * @returns {string}
+   */
+  getFormattedTooltipLabel({ dataId, seriesId, seriesName, itemData }) {
+    const opt = this.options;
+    const tooltipOpt = opt.tooltip;
+    const tooltipLabelFormatter = tooltipOpt?.formatter?.label;
+
+    let formattedLabel = seriesName;
+    if (tooltipLabelFormatter) {
+      formattedLabel = tooltipLabelFormatter({
+        dataId,
+        seriesId,
+        seriesName,
+        itemData,
+      });
+    }
+
+    return formattedLabel;
+  },
+
+  /**
    * get formatted value for tooltip
+   * @param dataId
    * @param seriesId
    * @param seriesName
    * @param value
    * @param itemData
    * @returns {string}
    */
-  getFormattedTooltipValue({ seriesId, seriesName, value, itemData }) {
+  getFormattedTooltipValue({ dataId, seriesId, seriesName, value, itemData }) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
@@ -838,6 +872,7 @@ const modules = {
           name: seriesName,
           percentage: itemData?.percentage,
           seriesId,
+          dataId,
         });
       } else if (opt.type === 'heatMap') {
         formattedTxt = tooltipValueFormatter({
@@ -845,6 +880,7 @@ const modules = {
           y: itemData?.y,
           value: value > -1 ? value : 'error',
           seriesId,
+          dataId,
         });
       } else {
         formattedTxt = tooltipValueFormatter({
@@ -852,6 +888,7 @@ const modules = {
           y: isHorizontal ? itemData?.y : value,
           name: seriesName,
           seriesId,
+          dataId,
         });
       }
     }
@@ -893,9 +930,17 @@ const modules = {
           ),
         );
 
-        const formattedValue = this.getFormattedTooltipValue({
+        const formattedSeriesName = this.getFormattedTooltipLabel({
+          dataId: series.id,
           seriesId: sId,
           seriesName: series.name,
+          itemData: hasData,
+         });
+
+        const formattedValue = this.getFormattedTooltipValue({
+          dataId: series.id,
+          seriesId: sId,
+          seriesName: formattedSeriesName,
           value: hasData?.o,
           itemData: hasData,
         });
@@ -904,7 +949,7 @@ const modules = {
           const item = {};
           item.color = series.color;
           item.hit = false;
-          item.name = series.name;
+          item.name = formattedSeriesName;
           item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
           item.index = isHorizontal ? series.yAxisIndex : series.xAxisIndex;
           item.data = hasData;
@@ -914,9 +959,9 @@ const modules = {
         }
 
         const maxSeriesNameWidth = ctx ? ctx.measureText(maxSeriesName).width : 1;
-        const seriesNameWidth = ctx ? ctx.measureText(series.name).width : 1;
+        const seriesNameWidth = ctx ? ctx.measureText(formattedSeriesName).width : 1;
         if (maxSeriesNameWidth < seriesNameWidth) {
-          maxSeriesName = series.name;
+          maxSeriesName = formattedSeriesName;
         }
 
         const maxValueWidth = ctx ? ctx.measureText(maxValueTxt).width : 1;
