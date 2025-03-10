@@ -114,17 +114,15 @@ const modules = {
       const selectItem = this.options.selectItem;
       const args = { e };
 
-      if (selectItem.use) {
-        const offset = this.getMousePosition(e);
-        const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
+      const offset = this.getMousePosition(e);
+      const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
 
 
-        if (hitInfo.label !== null) {
-          this.render(hitInfo);
-        }
-
-        ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
+      if (hitInfo.label !== null) {
+        this.render(hitInfo);
       }
+
+      ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
 
       if (typeof this.listeners['dbl-click'] === 'function') {
         this.listeners['dbl-click'](args);
