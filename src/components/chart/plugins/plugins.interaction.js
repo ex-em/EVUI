@@ -114,17 +114,15 @@ const modules = {
       const selectItem = this.options.selectItem;
       const args = { e };
 
-      if (selectItem.use) {
-        const offset = this.getMousePosition(e);
-        const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
+      const offset = this.getMousePosition(e);
+      const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
 
 
-        if (hitInfo.label !== null) {
-          this.render(hitInfo);
-        }
-
-        ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
+      if (hitInfo.label !== null) {
+        this.render(hitInfo);
       }
+
+      ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
 
       if (typeof this.listeners['dbl-click'] === 'function') {
         this.listeners['dbl-click'](args);
@@ -177,6 +175,7 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
         const {
           labelIndex: clickedLabelIndex,
         } = this.getLabelInfoByPosition(offset, targetAxis);
@@ -195,10 +194,14 @@ const modules = {
           eventTarget: 'label',
           ...cloneDeep(this.defaultSelectInfo),
         };
+        args.label = itemHitInfo.label;
+        args.dataIndex = itemHitInfo.maxIndex;
       };
 
       const setSelectedSeriesInfo = () => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
         const hitInfo = this.getSeriesInfoByPosition(offset);
+
         if (hitInfo.sId !== null) {
           const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
@@ -207,6 +210,8 @@ const modules = {
             eventTarget: 'series',
             ...cloneDeep(this.defaultSelectInfo),
           };
+          args.label = itemHitInfo.label;
+          args.dataIndex = itemHitInfo.maxIndex;
         }
       };
 
