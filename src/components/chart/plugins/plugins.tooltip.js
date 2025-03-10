@@ -297,6 +297,7 @@ const modules = {
         data: items[seriesName].data,
         color: items[seriesName].color,
         name: items[seriesName].name,
+        dataId: items[seriesName].id,
       });
     });
 
@@ -347,6 +348,7 @@ const modules = {
         id: seriesList[ix].id,
         name: seriesList[ix].name,
         value: valueText,
+        dataId: seriesList[ix].dataId,
       };
 
       // 1. Draw series color
@@ -481,6 +483,7 @@ const modules = {
       id: hitInfo.hitId,
       name: hitItem.y,
       value: valueText,
+      dataId: items[sId].id,
     };
 
     // 1. Draw value color
@@ -600,6 +603,7 @@ const modules = {
         id: hitInfo.hitId,
         name: seriesList[ix].name,
         value: valueText,
+        dataId: seriesList[ix].dataId,
       };
 
       // 1. Draw series color

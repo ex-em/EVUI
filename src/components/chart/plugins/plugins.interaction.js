@@ -771,17 +771,20 @@ const modules = {
 
           if (gdata !== null && gdata !== undefined) {
             const formattedSeriesName = this.getFormattedTooltipLabel({
+              dataId: series.id,
               seriesId: sId,
               seriesName: series.name,
               itemData: item.data,
              });
             const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
 
+            item.id = series.id;
             item.name = formattedSeriesName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
+              dataId: series.id,
               seriesId: sId,
               seriesName: formattedSeriesName,
               value: gdata,
@@ -820,12 +823,13 @@ const modules = {
 
   /**
    * get formatted label for tooltip
+   * @param dataId
    * @param seriesId
    * @param seriesName
    * @param itemData
    * @returns {string}
    */
-  getFormattedTooltipLabel({ seriesId, seriesName, itemData }) {
+  getFormattedTooltipLabel({ dataId, seriesId, seriesName, itemData }) {
     const opt = this.options;
     const tooltipOpt = opt.tooltip;
     const tooltipLabelFormatter = tooltipOpt?.formatter?.label;
@@ -833,6 +837,7 @@ const modules = {
     let formattedLabel = seriesName;
     if (tooltipLabelFormatter) {
       formattedLabel = tooltipLabelFormatter({
+        dataId,
         seriesId,
         seriesName,
         itemData,
@@ -844,13 +849,14 @@ const modules = {
 
   /**
    * get formatted value for tooltip
+   * @param dataId
    * @param seriesId
    * @param seriesName
    * @param value
    * @param itemData
    * @returns {string}
    */
-  getFormattedTooltipValue({ seriesId, seriesName, value, itemData }) {
+  getFormattedTooltipValue({ dataId, seriesId, seriesName, value, itemData }) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
@@ -866,6 +872,7 @@ const modules = {
           name: seriesName,
           percentage: itemData?.percentage,
           seriesId,
+          dataId,
         });
       } else if (opt.type === 'heatMap') {
         formattedTxt = tooltipValueFormatter({
@@ -873,6 +880,7 @@ const modules = {
           y: itemData?.y,
           value: value > -1 ? value : 'error',
           seriesId,
+          dataId,
         });
       } else {
         formattedTxt = tooltipValueFormatter({
@@ -880,6 +888,7 @@ const modules = {
           y: isHorizontal ? itemData?.y : value,
           name: seriesName,
           seriesId,
+          dataId,
         });
       }
     }
@@ -922,12 +931,14 @@ const modules = {
         );
 
         const formattedSeriesName = this.getFormattedTooltipLabel({
+          dataId: series.id,
           seriesId: sId,
           seriesName: series.name,
           itemData: hasData,
          });
 
         const formattedValue = this.getFormattedTooltipValue({
+          dataId: series.id,
           seriesId: sId,
           seriesName: formattedSeriesName,
           value: hasData?.o,
