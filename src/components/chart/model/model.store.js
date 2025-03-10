@@ -855,14 +855,23 @@ const modules = {
             if (ldata !== null && ldata !== undefined) {
               const g = isHorizontal ? data.o || data.x : data.o || data.y;
 
-              if (series.stackIndex) {
+              if (series.stackIndex != null) {
                 acc += !isNaN(data.o) ? data.o : 0;
                 useStack = true;
               } else {
                 acc += data.y;
               }
 
-              if (maxValue === null || maxValue <= g) {
+              if (maxType === 'bar' && useStack) {
+                if (item.hit) {
+                  maxValue = g;
+                  maxSeriesID = seriesID;
+                  maxIndex = index;
+                  maxLabel = ldata;
+                  maxValuePos = lp;
+                  maxType = series.type;
+                }
+              } else if (maxValue === null || maxValue <= g) {
                 maxValue = g;
                 maxSeriesID = seriesID;
                 maxLabel = ldata;
