@@ -172,7 +172,7 @@
       watch(() => props.options, (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
-        const isUpdateTooltipFormatter = !isEqual(
+        const isUpdateTooltipFormatter = newOpt.tooltip.use === true && !isEqual(
             newOpt.tooltip.formatter,
             evChart.options.tooltip.formatter,
         );
