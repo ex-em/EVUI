@@ -52,7 +52,7 @@ const modules = {
           }
         }
       } else if (tooltip.use) {
-        this.hideTooltipDOM();
+        this.hideTooltipDOM?.();
       }
 
       if (this.dragInfoBackup) {
