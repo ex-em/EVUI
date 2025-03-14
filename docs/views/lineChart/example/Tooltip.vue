@@ -217,6 +217,15 @@
           <ev-toggle v-model="showHeader"/>
         </div>
       </div>
+
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            Use Tooltip 여부
+          </span>
+          <ev-toggle v-model="showTooltip"/>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -254,6 +263,7 @@
       const topPadding = ref(0);
       const bottomPadding = ref(8);
       const showHeader = ref(true);
+      const showTooltip = ref(false);
 
       const chartData = reactive({
         series: {
@@ -329,7 +339,7 @@
           autoScaleRatio: 0.1,
         }],
         tooltip: {
-          use: true,
+          use: showTooltip,
           sortByValue,
           backgroundColor,
           shadowOpacity,
@@ -403,6 +413,7 @@
         topPadding,
         bottomPadding,
         showHeader,
+        showTooltip,
       };
     },
   };
