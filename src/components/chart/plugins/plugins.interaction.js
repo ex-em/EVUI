@@ -353,7 +353,7 @@ const modules = {
     };
 
     this.onWheel = (e) => {
-      const isTooltipVisible = this.tooltipDOM.style.display === 'block';
+      const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
 
       if (isTooltipVisible) {
         e.preventDefault();
