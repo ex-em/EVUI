@@ -172,9 +172,9 @@
       watch(() => props.options, (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
-        const isUpdateTooltipFormatter = !isEqual(
-            newOpt.tooltip.formatter,
-            evChart.options.tooltip.formatter,
+        const isUpdateTooltip = newOpt.tooltip.use && !isEqual(
+            newOpt.tooltip,
+            evChart.options.tooltip,
         );
 
         evChart.options = cloneDeep(newOpt);
@@ -183,7 +183,7 @@
           updateSeries: false,
           updateSelTip: { update: false, keepDomain: false },
           updateLegend: isUpdateLegendType,
-          updateTooltipFormatter: isUpdateTooltipFormatter,
+          updateTooltip: isUpdateTooltip,
         });
 
         if (!injectIsChartGroup) {

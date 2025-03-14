@@ -46,6 +46,7 @@ const modules = {
         this.tooltipDOM.style.display = 'none';
       };
     }
+    this.isInitTooltip = true;
   },
 
   setDefaultTooltipLayout() {
@@ -916,6 +917,13 @@ const modules = {
     });
 
     return result;
+  },
+
+  tooltipDestroy() {
+    if (this.tooltipDOM) {
+      this.tooltipDOM.remove();
+      this.tooltipDOM = null;
+    }
   },
 };
 

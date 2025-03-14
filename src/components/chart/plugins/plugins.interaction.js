@@ -34,7 +34,7 @@ const modules = {
       this.overlayClear();
 
       if (Object.keys(hitInfo.items).length) {
-        if (tooltip.use) {
+        if (tooltip.use && this.isInitTooltip) {
           this.drawItemsHighlight(hitInfo, ctx);
 
           if (tooltip?.formatter?.html) {
@@ -51,8 +51,8 @@ const modules = {
             }
           }
         }
-      } else if (tooltip.use) {
-        this.hideTooltipDOM?.();
+      } else if (tooltip.use && this.isInitTooltip) {
+        this.hideTooltipDOM();
       }
 
       if (this.dragInfoBackup) {
@@ -99,7 +99,7 @@ const modules = {
         this.overlayClear();
       }
 
-      if (tooltip.use) {
+      if (tooltip.use && this.isInitTooltip) {
         this.tooltipClear();
       }
       this.listeners['mouse-leave']();
