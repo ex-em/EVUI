@@ -132,7 +132,7 @@ class EvChart {
 
     this.drawChart();
 
-    if (tooltip.use) {
+    if (tooltip.use && !this.isInitTooltip) {
       this.createTooltipDOM();
     }
 
@@ -722,13 +722,7 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const {
-      updateSeries,
-      updateSelTip,
-      updateLegend,
-      updateData,
-      updateTooltipFormatter,
-    } = updateInfo;
+    const { updateSeries, updateSelTip, updateLegend, updateData, updateTooltip } = updateInfo;
 
     if (!this.isInit) {
       return;
@@ -823,8 +817,8 @@ class EvChart {
     }
 
     // Tooltip Update
-    if (updateTooltipFormatter) {
-      if (!this.tooltipDOM) {
+    if (updateTooltip) {
+      if (!this.isInitTooltip) {
         this.createTooltipDOM();
       }
 
@@ -985,11 +979,8 @@ class EvChart {
       window.removeEventListener('click', this.dragTouchSelectionEvent);
     }
 
-    if (this.options.tooltip.use) {
-      this.tooltipCanvas.remove();
-      this.tooltipCanvas = null;
-      this.tooltipDOM.remove();
-      this.tooltipDOM = null;
+    if (this.isInitTooltip) {
+      this.tooltipDestroy();
     }
 
     if (this.renderVisibleLegendsFrameId != null) {
