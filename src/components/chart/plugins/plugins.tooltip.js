@@ -924,6 +924,7 @@ const modules = {
       this.tooltipDOM.remove();
       this.tooltipDOM = null;
     }
+    this.isInitTooltip = false;
   },
 };
 
