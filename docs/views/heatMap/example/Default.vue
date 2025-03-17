@@ -31,9 +31,9 @@ import { reactive } from 'vue';
             { x: '12:00', y: '1w', value: 150 },
             { x: '12:00', y: '2w', value: 80 },
             { x: '12:00', y: '3w', value: 120 },
-            { x: '18:00', y: '1w', value: 0 },
-            { x: '18:00', y: '2w', value: 150 },
-            { x: '18:00', y: '3w', value: 90, color: '#D3D3D3' },
+            { x: '18:00', y: '1w', value: 0, color: 'rgb(255, 255, 0)' },
+            { x: '18:00', y: '2w', value: 150, color: '#D3D3D3' },
+            { x: '18:00', y: '3w', value: 90, color: 'rgba(0,0,0,0.5)' },
           ],
         },
       });
