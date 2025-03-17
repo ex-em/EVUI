@@ -305,7 +305,10 @@ class HeatMap {
 
         const itemOpacity = getOpacity(item, opacity, index);
 
-        item.dataColor = dataColor;
+        if (!item.dataColor) {
+          item.dataColor = dataColor;
+        }
+
         item.cId = id;
         ctx.save();
 

@@ -1,12 +1,12 @@
 <template>
   <ev-chart
-      :data="chartData"
-      :options="chartOptions"
+    :data="chartData"
+    :options="chartOptions"
   />
 </template>
 
 <script>
-import { onMounted, reactive } from 'vue';
+import { reactive } from 'vue';
 
   export default {
     setup() {
@@ -17,33 +17,35 @@ import { onMounted, reactive } from 'vue';
           },
         },
         labels: {
-          x: ['12a', '1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a',
-              '12p', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '10p', '11p'],
-          y: ['SUN', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'SAT'],
+          x: ['00:00', '06:00', '12:00', '18:00'],
+          y: ['1w', '2w', '3w'],
         },
         data: {
-          series1: [],
+          series1: [
+            { x: '00:00', y: '1w', value: 100 },
+            { x: '00:00', y: '2w', value: 80 },
+            { x: '00:00', y: '3w', value: 130 },
+            { x: '06:00', y: '1w', value: 20 },
+            { x: '06:00', y: '2w', value: 150 },
+            { x: '06:00', y: '3w', value: 115 },
+            { x: '12:00', y: '1w', value: 150 },
+            { x: '12:00', y: '2w', value: 80 },
+            { x: '12:00', y: '3w', value: 120 },
+            { x: '18:00', y: '1w', value: 0 },
+            { x: '18:00', y: '2w', value: 150 },
+            { x: '18:00', y: '3w', value: 90, color: '#D3D3D3' },
+          ],
         },
       });
 
 
       const chartOptions = {
         type: 'heatMap',
-        width: '100%',
-        title: {
-          text: 'Chart Title',
-          show: true,
-        },
-        indicator: {
-          use: true,
-        },
         axesX: [{
           type: 'step',
-          showGrid: false,
         }],
         axesY: [{
           type: 'step',
-          showGrid: false,
         }],
         heatMapColor: {
           min: '#FFC19E',
@@ -54,25 +56,6 @@ import { onMounted, reactive } from 'vue';
           use: true,
         },
       };
-
-      const createChartData = () => {
-        const labelX = chartData.labels.x;
-        const labelY = chartData.labels.y;
-        for (let ix = 0; ix < labelX.length; ix++) {
-          for (let iy = 0; iy < labelY.length; iy++) {
-            const randomCount = Math.floor(Math.random() * 500) + 1;
-            chartData.data.series1.push({
-              x: labelX[ix],
-              y: labelY[iy],
-              value: randomCount,
-            });
-          }
-        }
-      };
-
-      onMounted(() => {
-        createChartData();
-      });
 
       return {
         chartData,
