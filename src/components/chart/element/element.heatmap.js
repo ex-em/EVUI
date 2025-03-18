@@ -6,8 +6,9 @@ import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 class HeatMap {
   constructor(sId, opt, colorOpt, isHorizontal, isGradient) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
-      Object.keys(merged).forEach((key) => {
-        this[key] = merged[key];
+
+    Object.keys(merged).forEach((key) => {
+      this[key] = merged[key];
     });
 
     this.isHorizontal = isHorizontal;
@@ -279,8 +280,10 @@ class HeatMap {
             ? !selectedLabel?.label?.includes(this.getItemLabel(selectLabel, item))
             : false;
         }
-        return isDownplay ? 0.1 : 1;
+
+        return isDownplay ? 0.1 : opacity;
       }
+
       return opacity;
     };
 
@@ -303,9 +306,17 @@ class HeatMap {
           isHighlight,
         } = this.getItemInfo(value);
 
-        const itemOpacity = getOpacity(item, opacity, index);
+        let originalOpacity = opacity;
+        if (opacity === 1 && Util.getColorStringType(item.dataColor) === 'RGBA') {
+          originalOpacity = Util.getOpacity(item.dataColor);
+        }
 
-        item.dataColor = dataColor;
+        const itemOpacity = getOpacity(item, originalOpacity, index);
+
+        if (!item.dataColor) {
+          item.dataColor = dataColor;
+        }
+
         item.cId = id;
         ctx.save();
 
@@ -468,6 +479,7 @@ class HeatMap {
   itemHighlight(item, context) {
     const gdata = item.data;
     const ctx = context;
+    const { stroke: strokeOpt, shadow: shadowOpt } = this.highlight;
 
     const x = gdata.xp;
     const y = gdata.yp;
@@ -484,27 +496,60 @@ class HeatMap {
     } else {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
+
+    if (x === null || y === null || !isShow) {
+      return;
+    }
+
     ctx.save();
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    let highlightOpacity = 1;
+    if (Util.getColorStringType(gdata.dataColor) === 'RGBA') {
+      highlightOpacity = Util.getOpacity(item.dataColor);
+    }
 
-    if (x !== null && y !== null && isShow) {
-      const color = Util.colorStringToRgba(gdata.dataColor);
-      ctx.shadowColor = Util.colorStringToRgba('#959494');
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
+    const dataColor = Util.colorStringToRgba(gdata.dataColor, highlightOpacity);
+    ctx.fillStyle = dataColor;
 
-      this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
+    if (shadowOpt.use) {
+      ctx.shadowOffsetX = shadowOpt.offsetX;
+      ctx.shadowOffsetY = shadowOpt.offsetY;
+      ctx.shadowBlur = shadowOpt.blur;
+      ctx.shadowColor = shadowOpt.color;
+    }
 
-      ctx.restore();
+    const borderOpt = {
+      color: '',
+      lineWidth: 1,
+      opacity: 1,
+      radius: 0,
+      show: true,
+    };
 
-      if (this.showValue.use) {
-        this.drawValueLabels({
-          context: ctx,
-          data: gdata,
-        });
-      }
+    if (strokeOpt.use) {
+      const { color, width, radius } = strokeOpt;
+      borderOpt.show = true;
+      borderOpt.radius = radius;
+
+      ctx.lineWidth = width;
+      borderOpt.lineWidth = width;
+
+      ctx.strokeStyle = color || dataColor;
+      borderOpt.color = color || dataColor;
+    } else {
+      borderOpt.show = false;
+      ctx.strokeStyle = dataColor;
+      borderOpt.color = dataColor;
+    }
+
+    this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, borderOpt);
+
+    ctx.restore();
+
+    if (this.showValue.use) {
+      this.drawValueLabels({
+        context: ctx,
+        data: gdata,
+      });
     }
   }
 
