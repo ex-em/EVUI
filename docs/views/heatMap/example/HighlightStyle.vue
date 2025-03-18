@@ -23,8 +23,8 @@ import { onMounted, reactive } from 'vue';
               },
               shadow: {
                 use: false,
-              }
-            }
+              },
+            },
           },
         },
         labels: {
