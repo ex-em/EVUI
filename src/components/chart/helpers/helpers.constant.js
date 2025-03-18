@@ -180,8 +180,8 @@ export const HEAT_MAP_OPTION = {
       offsetY: 0,
       blur: 4,
       color: '#959494',
-    }
-  }
+    },
+  },
 };
 
 
