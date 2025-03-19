@@ -63,6 +63,14 @@ class StepScale extends Scale {
     };
   }
 
+  getInterval(range) {
+    const max = range.maxValue;
+    const min = range.minValue;
+    const step = range.maxSteps;
+
+    return this.interval ? this.interval : Math.ceil((max - min) / step);
+  }
+
   /**
    * With range information, calculate how many labels in axis
    * @param {object}  range          min/max information
@@ -75,28 +83,19 @@ class StepScale extends Scale {
       maxValue,
       minIndex,
       maxIndex,
-      maxSteps,
     } = range;
 
-    let numberOfSteps = (maxIndex - minIndex) + 1;
+    const oriSteps = (maxIndex - minIndex) + 1;
     let interval = 1;
 
-    const oriSteps = numberOfSteps;
     const isNumbersArray = this.labels.every(label => !isNaN(label));
     if (this.labelStyle.alignToGridLine && isNumbersArray) {
-      if (maxSteps > 2) {
-        while (numberOfSteps > maxSteps * 2) {
-          interval *= 2;
-          numberOfSteps = Math.round(numberOfSteps / interval);
-        }
-      } else {
-        interval = oriSteps;
-      }
+      interval = this.getInterval(range);
     }
 
     return {
       oriSteps,
-      steps: numberOfSteps,
+      steps: oriSteps,
       interval,
       graphMin: minValue,
       graphMax: maxValue,
@@ -179,6 +178,7 @@ class StepScale extends Scale {
       let labelText;
       let labelPoint;
       let index;
+      const drawnLabels = [];
 
       for (index = 0; index < steps; index += count) {
         const labelIndex = startIndex + index;
@@ -250,6 +250,7 @@ class StepScale extends Scale {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
           const yPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
           ctx.fillText(labelText, labelPoint, yPoint);
+          drawnLabels.push(labelText);
 
           if (index > 0 && this.showGrid) {
             ctx.moveTo(offsetPoint, linePosition);
@@ -259,8 +260,12 @@ class StepScale extends Scale {
         ctx.stroke();
       }
 
-      if (alignToGridLine && (index === this.labels.length)) {
+      if (alignToGridLine && index >= this.labels.length) {
         let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
+        if (count !== 1 && labelLastText - drawnLabels[drawnLabels.length - 1] <= 1) {
+          return;
+        }
+
         if (isNaN(labelLastText)) {
           labelLastText = 'Max';
         }
