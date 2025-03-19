@@ -157,10 +157,6 @@ export const PLOT_BAND_OPTION = {
 
 export const HEAT_MAP_OPTION = {
   show: true,
-  highlight: {
-    maxShadowOpacity: 0.4,
-    brightness: 150,
-  },
   xAxisIndex: 0,
   yAxisIndex: 0,
   showLegend: true,
@@ -170,6 +166,21 @@ export const HEAT_MAP_OPTION = {
     textColor: '#000000',
     formatter: null,
     decimalPoint: 0,
+  },
+  highlight: {
+    stroke: {
+      use: false,
+      color: null,
+      width: 1,
+      radius: 0,
+    },
+    shadow: {
+      use: true,
+      offsetX: 0,
+      offsetY: 0,
+      blur: 4,
+      color: '#959494',
+    },
   },
 };
 

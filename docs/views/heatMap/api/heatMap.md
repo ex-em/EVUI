@@ -23,10 +23,11 @@
 
 #### series
 
-| 이름      | 타입   | 디폴트               | 설명                           | 종류(예시) |
-| --------- | ------ | -------------------- | ------------------------------ | ---------- |
-| name      | String | series-\${index}     | 특정 데이터에 대한 시리즈 옵션 |            |
-| showValue | Object | ([상세](#showvalue)) | 막대 위에 값 표시 여부 및 속성 |            |
+| 이름        | 타입   | 디폴트                | 설명                          | 종류(예시) |
+|-----------| ------ |--------------------|-----------------------------| ---------- |
+| name      | String | series-\${index}   | 특정 데이터에 대한 시리즈 옵션           |            |
+| showValue | Object | ([상세](#showvalue)) | 셀 위에 값 표시 여부 및 속성           |            |
+| highlight | Object | ([상세](#highlight)) | 셀 위에 마우스 오버시 나타나는 효과 설정 |            |
 
 #### showValue
 
@@ -40,6 +41,23 @@
 | decimalPoint | Number                      | 0         | 소수점 자릿수                                           |                                  |
 
 - 글자 크기가 heatMap의 item의 크기를 벗어나게되면 그려지지 않습니다.
+
+#### highlight
+
+| 이름        | 타입           | 디폴트     | 설명          | 종류(예시)                       |
+|-----------|--------------|---------|-------------| -------------------------------- |
+| stroke    | object       |         | 외곽선 스타일     |                   |
+| ㄴ use     | boolean      | false   | 외곽선 사용여부    |                   |
+| ㄴ color   | string, null | null    | 외곽선 색상      |                   |
+| ㄴ width   | number       | 1       | 외곽선 두께      |                   |
+| ㄴ radius  | number       | 0       | 외곽선 반경      |                   |
+| shadow    | object       |         | 그림자 스타일     |                                  |
+| ㄴ use     | boolean      | true    | 그림자 사용여부    |                                  |
+| ㄴ offsetX | number       | 0       | 그림자 offsetX |                                  |
+| ㄴ offsetY | number       | 0       | 그림자 offsetY |                                  |
+| ㄴ blur    | number       | 4       | 그림자 흐림정도    |                                  |
+| ㄴ color   | string       | '#959494' | 그림자 색상      |                                  |
+
 
 #### data example
 

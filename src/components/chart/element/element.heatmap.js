@@ -6,8 +6,9 @@ import { HEAT_MAP_OPTION } from '../helpers/helpers.constant';
 class HeatMap {
   constructor(sId, opt, colorOpt, isHorizontal, isGradient) {
     const merged = merge({}, HEAT_MAP_OPTION, opt);
-      Object.keys(merged).forEach((key) => {
-        this[key] = merged[key];
+
+    Object.keys(merged).forEach((key) => {
+      this[key] = merged[key];
     });
 
     this.isHorizontal = isHorizontal;
@@ -478,6 +479,7 @@ class HeatMap {
   itemHighlight(item, context) {
     const gdata = item.data;
     const ctx = context;
+    const { stroke: strokeOpt, shadow: shadowOpt } = this.highlight;
 
     const x = gdata.xp;
     const y = gdata.yp;
@@ -495,32 +497,59 @@ class HeatMap {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
 
+    if (x === null || y === null || !isShow) {
+      return;
+    }
+
     ctx.save();
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 4;
+    let highlightOpacity = 1;
+    if (Util.getColorStringType(gdata.dataColor) === 'RGBA') {
+      highlightOpacity = Util.getOpacity(item.dataColor);
+    }
 
-    if (x !== null && y !== null && isShow) {
-      let highlightOpacity = 1;
-      if (Util.getColorStringType(gdata.dataColor) === 'RGBA') {
-        highlightOpacity = Util.getOpacity(item.dataColor);
-      }
+    const dataColor = Util.colorStringToRgba(gdata.dataColor, highlightOpacity);
+    ctx.fillStyle = dataColor;
 
-      const color = Util.colorStringToRgba(gdata.dataColor, highlightOpacity);
-      ctx.shadowColor = Util.colorStringToRgba('#959494');
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
+    if (shadowOpt.use) {
+      ctx.shadowOffsetX = shadowOpt.offsetX;
+      ctx.shadowOffsetY = shadowOpt.offsetY;
+      ctx.shadowBlur = shadowOpt.blur;
+      ctx.shadowColor = shadowOpt.color;
+    }
 
-      this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, this.stroke);
+    const borderOpt = {
+      color: '',
+      lineWidth: 1,
+      opacity: 1,
+      radius: 0,
+      show: true,
+    };
 
-      ctx.restore();
+    if (strokeOpt.use) {
+      const { color, width, radius } = strokeOpt;
+      borderOpt.show = true;
+      borderOpt.radius = radius;
 
-      if (this.showValue.use) {
-        this.drawValueLabels({
-          context: ctx,
-          data: gdata,
-        });
-      }
+      ctx.lineWidth = width;
+      borderOpt.lineWidth = width;
+
+      ctx.strokeStyle = color || dataColor;
+      borderOpt.color = color || dataColor;
+    } else {
+      borderOpt.show = false;
+      ctx.strokeStyle = dataColor;
+      borderOpt.color = dataColor;
+    }
+
+    this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, borderOpt);
+
+    ctx.restore();
+
+    if (this.showValue.use) {
+      this.drawValueLabels({
+        context: ctx,
+        data: gdata,
+      });
     }
   }
 
