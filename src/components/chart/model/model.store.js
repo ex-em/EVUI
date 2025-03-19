@@ -496,7 +496,7 @@ const modules = {
    * @returns {array} data info added position and etc
    */
   addSeriesDSForHeatMap(data) {
-    return data.map(({ x, y, value }) => ({
+    return data.map(({ x, y, value, color = null }) => ({
       x,
       y,
       o: value,
@@ -504,7 +504,7 @@ const modules = {
       yp: null,
       w: null,
       h: null,
-      dataColor: null,
+      dataColor: color,
       cId: null,
     }));
   },
