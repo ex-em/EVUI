@@ -18,6 +18,8 @@ import SelectBoth from './example/SelectBoth';
 import SelectBothRaw from '!!raw-loader!./example/SelectBoth';
 import Scrollbar from './example/Scrollbar';
 import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
+import HighlightStyle from './example/HighlightStyle';
+import HighlightStyleRaw from '!!raw-loader!./example/HighlightStyle';
 import StepAxis from './example/StepAxis';
 import StepAxisRaw from '!!raw-loader!./example/StepAxis';
 
@@ -33,6 +35,11 @@ export default {
       description: 'step axis이지만, alignToLine 옵션을 사용하여 line에 맞춰 표현할 수 있습니다.',
       component: StepAxis,
       parsedData: parseComponent(StepAxisRaw),
+    },
+    HighlightStyle: {
+      description: '마우스 hover 시 나타나는 하이라이트 스타일을 변경할 수 있습니다.',
+      component: HighlightStyle,
+      parsedData: parseComponent(HighlightStyleRaw),
     },
     Time: {
       description: '실시간으로 데이터를 받아 표현할 수 있습니다. (label line 표시)',
