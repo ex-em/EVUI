@@ -279,8 +279,10 @@ class HeatMap {
             ? !selectedLabel?.label?.includes(this.getItemLabel(selectLabel, item))
             : false;
         }
-        return isDownplay ? 0.1 : 1;
+
+        return isDownplay ? 0.1 : opacity;
       }
+
       return opacity;
     };
 
@@ -303,9 +305,17 @@ class HeatMap {
           isHighlight,
         } = this.getItemInfo(value);
 
-        const itemOpacity = getOpacity(item, opacity, index);
+        let originalOpacity = opacity;
+        if (opacity === 1 && Util.getColorStringType(item.dataColor) === 'RGBA') {
+          originalOpacity = Util.getOpacity(item.dataColor);
+        }
 
-        item.dataColor = dataColor;
+        const itemOpacity = getOpacity(item, originalOpacity, index);
+
+        if (!item.dataColor) {
+          item.dataColor = dataColor;
+        }
+
         item.cId = id;
         ctx.save();
 
@@ -484,13 +494,19 @@ class HeatMap {
     } else {
       isShow = this.colorState.find(({ id }) => id === cId)?.show;
     }
+
     ctx.save();
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     ctx.shadowBlur = 4;
 
     if (x !== null && y !== null && isShow) {
-      const color = Util.colorStringToRgba(gdata.dataColor);
+      let highlightOpacity = 1;
+      if (Util.getColorStringType(gdata.dataColor) === 'RGBA') {
+        highlightOpacity = Util.getOpacity(item.dataColor);
+      }
+
+      const color = Util.colorStringToRgba(gdata.dataColor, highlightOpacity);
       ctx.shadowColor = Util.colorStringToRgba('#959494');
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
