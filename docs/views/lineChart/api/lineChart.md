@@ -82,7 +82,7 @@ const selectedSeries = ref({
 | pointStyle   | String                      | 'circle'         | 점(Point) 모양                                                                                                                  | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
 | showLegend   | Boolean                     | true             | legend 표시 여부                                                                                                                |                                                                                   |
 | passingValue | number                      | null             | data가 passingValue와 같을 경우 (data: null/undefined 제외 ) 다음값으로 선을 이어가며 point도 그리지 않고 tooltip에 나오지 않음 | -1                                                                                |
-| segments | Array<number>                      | []             | dash 간격  | [6,2]                                                                                |
+| segments | Array<number>                      | null             | dash 간격  | [6,2]                                                                                |
 
 #### data example
 
