@@ -82,6 +82,7 @@ const selectedSeries = ref({
 | pointStyle   | String                      | 'circle'         | 점(Point) 모양                                                                                                                  | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
 | showLegend   | Boolean                     | true             | legend 표시 여부                                                                                                                |                                                                                   |
 | passingValue | number                      | null             | data가 passingValue와 같을 경우 (data: null/undefined 제외 ) 다음값으로 선을 이어가며 point도 그리지 않고 tooltip에 나오지 않음 | -1                                                                                |
+| segments | Array<number>                      | []             | dash 간격  | [6,2]                                                                                |
 
 #### data example
 
@@ -194,7 +195,7 @@ const chartData =
 | --------- | ---------------------------------- | --------- | ------------------------------ | -------------------------------------------------------------------- |
 | value     | Number(value), Date, Number(Index) | null      | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
 | color     | Hex, RGB, RGBA Code(String)        | '#FF0000' | 선 색상                        |                                                                      |
-| segments  | Array                              | null      | dash 간격                      | [6, 2]                                                               |
+| segments  | Array<number>                              | null      | dash 간격                      | [6, 2]                                                               |
 | lineWidth | Number                             | 1         | 선 굵기                        |                                                                      |
 | label     | Object                             | null      | 표시할 label의 스타일을 정의   | ([상세](#plotlabel))                                                 |
 
