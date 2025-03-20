@@ -79,14 +79,15 @@ class Line {
     const pointFillColorOpacity = getOpacity(pointFillColor);
     const fillOpacity = getOpacity(mainColor) * this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
-    const segments = this.segments ?? [];
 
     ctx.beginPath();
     ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
-    ctx.setLineDash(segments);
+    if (this.segments)  {
+      ctx.setLineDash(this.segments);
+    }
 
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
