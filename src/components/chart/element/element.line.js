@@ -85,6 +85,9 @@ class Line {
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
+    if (this.segments) {
+      ctx.setLineDash(this.segments);
+    }
 
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
@@ -158,6 +161,10 @@ class Line {
     }, this.data[0]);
 
     ctx.stroke();
+    if (this.segments) {
+      ctx.setLineDash([]);
+    }
+
 
     // draw fill
     if (this.fill && this.data.length) {
