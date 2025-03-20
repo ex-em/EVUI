@@ -28,6 +28,8 @@ import HoverWithGroup from './example/HoverWithGroup';
 import HoverWithGroupRaw from './example/HoverWithGroup?raw';
 import LegendVirtualScroll from './example/LegendVirtualScroll';
 import LegendVirtualScrollRaw from './example/LegendVirtualScroll?raw';
+import Segments from './example/Segments';
+import SegmentsRaw from './example/Segments?raw';
 
 export default {
   mdText,
@@ -101,6 +103,11 @@ export default {
       description: 'Legend Virtual Scroll',
       component: LegendVirtualScroll,
       parsedData: parse(LegendVirtualScrollRaw).descriptor,
+    },
+    Segments: {
+      description: 'Segments',
+      component: Segments,
+      parsedData: parse(SegmentsRaw).descriptor,
     },
   },
 };
