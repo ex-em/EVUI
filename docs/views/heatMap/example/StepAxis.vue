@@ -5,12 +5,22 @@
       :options="chartOptions"
     />
     <div class="description">
-      <span>Y축 라벨 개수</span>
-      <ev-input-number
-        v-model="yLabelCount"
-        :min="1"
-        :max="100"
-      />
+      <div class="row">
+        <span>Y축 라벨 개수</span>
+        <ev-input-number
+          v-model="yLabelCount"
+          :min="1"
+          :max="100"
+        />
+      </div>
+      <div class="row">
+        <span>소수점 자릿수</span>
+        <ev-input-number
+          v-model="decimalPoint"
+          :min="0"
+          :max="10"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -66,7 +76,8 @@ import { reactive, ref, watch } from 'vue';
         },
       };
 
-      const yLabelCount = ref(2);
+      const yLabelCount = ref(20);
+      const decimalPoint = ref(0);
       const yLabels = [];
 
       const currentTime = dayjs();
@@ -115,12 +126,12 @@ import { reactive, ref, watch } from 'vue';
         }
       };
 
-      watch(yLabelCount, (newValue) => {
+      watch([yLabelCount, decimalPoint], () => {
         yLabels.splice(0, yLabels.length);
         yLabels.push(0);
 
-        for (let i = 1; i <= newValue; i++) {
-          yLabels.push(i);
+        for (let i = 1; i <= yLabelCount.value; i++) {
+          yLabels.push(i / 10 ** decimalPoint.value);
         }
 
         setChartRandomData();
@@ -132,6 +143,7 @@ import { reactive, ref, watch } from 'vue';
         chartData,
         chartOptions,
         yLabelCount,
+        decimalPoint,
       };
     },
   };
@@ -145,6 +157,19 @@ import { reactive, ref, watch } from 'vue';
 
   :deep(.ev-chart) {
     flex: auto;
+  }
+
+  .description {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
   }
 }
 </style>
