@@ -1,8 +1,9 @@
 import { defaultsDeep } from 'lodash-es';
 import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import { bnMinus, bnPlus } from '@/common/utils.bignumber';
+import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
-import { truthyNumber } from '../../../common/utils';
 
 class StepScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
@@ -63,12 +64,14 @@ class StepScale extends Scale {
     };
   }
 
-  getInterval(range) {
-    const max = range.maxValue;
-    const min = range.minValue;
+  getIndexInterval(range) {
     const step = range.maxSteps;
 
-    return this.interval ? this.interval : Math.ceil((max - min) / step);
+    if (this.interval) {
+      return this.interval;
+    }
+
+    return Math.ceil(this.labels.length / step);
   }
 
   /**
@@ -86,17 +89,17 @@ class StepScale extends Scale {
     } = range;
 
     const oriSteps = (maxIndex - minIndex) + 1;
-    let interval = 1;
+    let indexInterval = 1;
 
     const isNumbersArray = this.labels.every(label => !isNaN(label));
     if (this.labelStyle.alignToGridLine && isNumbersArray) {
-      interval = this.getInterval(range);
+      indexInterval = this.getIndexInterval(range);
     }
 
     return {
       oriSteps,
       steps: oriSteps,
-      interval,
+      indexInterval,
       graphMin: minValue,
       graphMax: maxValue,
       minIndex,
@@ -125,7 +128,7 @@ class StepScale extends Scale {
     };
 
     const steps = stepInfo.steps;
-    const count = stepInfo.interval;
+    const indexInterval = stepInfo.indexInterval;
     const startIndex = stepInfo.minIndex;
 
     const startPoint = aPos[this.units.rectStart];
@@ -180,7 +183,7 @@ class StepScale extends Scale {
       let index;
       const drawnLabels = [];
 
-      for (index = 0; index < steps; index += count) {
+      for (index = 0; index < steps; index += indexInterval) {
         const labelIndex = startIndex + index;
         const item = this.labels[labelIndex];
         labelCenter = Math.round(startPoint + (labelGap * index));
@@ -261,8 +264,12 @@ class StepScale extends Scale {
       }
 
       if (alignToGridLine && index >= this.labels.length) {
-        let labelLastText = +labels[labels.length - 1] + (+labels[1] - +labels[0]);
-        if (count !== 1 && labelLastText - drawnLabels[drawnLabels.length - 1] <= 1) {
+        const cellInterval = bnMinus(+labels[1], +labels[0]);
+        let labelLastText = bnPlus(+labels[labels.length - 1], cellInterval);
+        if (
+            indexInterval !== 1
+            && bnMinus(labelLastText, drawnLabels[drawnLabels.length - 1]) <= cellInterval
+        ) {
           return;
         }
 
