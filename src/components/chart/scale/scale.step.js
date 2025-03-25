@@ -265,28 +265,27 @@ class StepScale extends Scale {
 
       if (alignToGridLine && index >= this.labels.length) {
         const cellInterval = bnMinus(+labels[1], +labels[0]);
-        let labelLastText = bnPlus(+labels[labels.length - 1], cellInterval);
+        const lastLabelValue = bnPlus(+labels[labels.length - 1], cellInterval);
         if (
-            indexInterval !== 1
-            && bnMinus(labelLastText, drawnLabels[drawnLabels.length - 1]) <= cellInterval
+            isNaN(lastLabelValue)
+            || (indexInterval !== 1
+            && bnMinus(lastLabelValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)
         ) {
           return;
         }
 
-        if (isNaN(labelLastText)) {
-          labelLastText = 'Max';
-        }
         labelCenter = Math.round(startPoint + (labelGap * labels.length));
         linePosition = labelCenter + aliasPixel;
 
+        const lastLabelText = this.getLabelFormat(`${lastLabelValue}`, maxWidth);
         if (this.type === 'x') {
-          ctx.fillText(labelLastText, labelCenter, labelPoint);
+          ctx.fillText(lastLabelText, labelCenter, labelPoint);
           if (this.showGrid) {
             ctx.moveTo(linePosition, offsetPoint);
             ctx.lineTo(linePosition, offsetCounterPoint);
           }
         } else {
-          ctx.fillText(labelLastText, labelPoint, labelCenter);
+          ctx.fillText(lastLabelText, labelPoint, labelCenter);
           if (this.showGrid) {
             ctx.moveTo(offsetPoint, linePosition);
             ctx.lineTo(offsetCounterPoint, linePosition);
