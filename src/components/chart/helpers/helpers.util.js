@@ -94,7 +94,7 @@ export default {
    * @returns {string} opacity
    */
   getOpacity(rgbaColorString) {
-    const noneWhiteSpaceColorStr = rgbaColorString.replace(/ /g, '');
+    const noneWhiteSpaceColorStr = rgbaColorString?.replace(/ /g, '');
     const colorType = this.getColorStringType(noneWhiteSpaceColorStr);
 
     if (colorType === 'RGBA') {

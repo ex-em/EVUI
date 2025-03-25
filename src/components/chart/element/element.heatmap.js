@@ -502,12 +502,11 @@ class HeatMap {
     }
 
     ctx.save();
-    let highlightOpacity = 1;
-    if (Util.getColorStringType(gdata.dataColor) === 'RGBA') {
-      highlightOpacity = Util.getOpacity(item.dataColor);
-    }
 
-    const dataColor = Util.colorStringToRgba(gdata.dataColor, highlightOpacity);
+    const dataColor = Util.getColorStringType(gdata.dataColor) === 'RGBA'
+        ? item.dataColor
+        : Util.colorStringToRgba(gdata.dataColor, 1);
+
     ctx.fillStyle = dataColor;
 
     if (shadowOpt.use) {
@@ -566,6 +565,7 @@ class HeatMap {
       data: null,
       hit: false,
       color: null,
+      dataColor: null,
       name: null,
     };
     const gdata = this.data;
@@ -583,6 +583,7 @@ class HeatMap {
       const foundItem = gdata[itemIndex];
       item.data = foundItem;
       item.color = foundItem.dataColor;
+      item.dataColor = foundItem.dataColor;
       item.index = itemIndex;
       item.hit = true;
     }
