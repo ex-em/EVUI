@@ -369,14 +369,16 @@
 
         return foundItem || {};
       },
-      getFilteredListBoxItems(value) {
+      getFilteredListBoxItems(originValue) {
+        const value = originValue.toLowerCase();
         let filteredItems;
         let listBoxItems = [];
 
         if (value && value.length) {
           if (this.isGroup) {
             this.items.reduce((preArr, groupItem) => {
-              filteredItems = groupItem.items.filter(item => item && item.name.includes(value));
+              filteredItems = groupItem.items.filter(item => item
+              && item.name.toLowerCase().includes(value));
 
               if (filteredItems.length > 0) {
                 preArr.push({
@@ -388,7 +390,7 @@
               return preArr;
             }, listBoxItems);
           } else {
-            listBoxItems = this.items.filter(obj => obj && obj.name.includes(value));
+            listBoxItems = this.items.filter(obj => obj && obj.name.toLowerCase().includes(value));
           }
         } else {
           listBoxItems = this.items;
