@@ -1,6 +1,8 @@
 import { numberWithComma } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
+import moment from 'moment';
 import Util from '../helpers/helpers.util';
+import TimeScale from '../scale/scale.time';
 
 const TITLE_HEIGHT = 30;
 const TEXT_HEIGHT = 14;
@@ -175,9 +177,12 @@ const modules = {
     const opt = this.options.tooltip;
 
     // draw tooltip Title(axis label) and add style class for wrap line about too much long label.
-    this.tooltipHeaderDOM.textContent = this.options.horizontal
-      ? this.axesY[hitAxis.y].getLabelFormat(hitItem.y)
-      : this.axesX[hitAxis.x].getLabelFormat(hitItem.x);
+    const targetAxes = isHorizontal ? this.axesY[hitAxis.y] : this.axesX[hitAxis.x];
+    const targetData = isHorizontal ? hitItem.y : hitItem.x;
+    this.tooltipHeaderDOM.textContent = (targetAxes instanceof TimeScale && targetAxes.timeFormat.includes(':'))
+      ? moment(targetData).format('MM-DD HH:mm:ss')
+      : targetAxes.getLabelFormat(targetData);
+
 
     if (opt.textOverflow) {
       this.tooltipHeaderDOM.classList.add(`ev-chart-tooltip-header--${opt.textOverflow}`);
