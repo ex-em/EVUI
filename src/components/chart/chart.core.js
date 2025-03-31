@@ -336,6 +336,12 @@ class EvChart {
    */
   getChartDOMRect() {
     const rect = this.chartDOM.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      return {
+        width: this.displayCanvas.width,
+        height: this.displayCanvas.height,
+      };
+    }
     const width = rect.width || 10;
     const height = rect.height || 10;
 
@@ -623,7 +629,7 @@ class EvChart {
     this.bufferCtx.restore();
     this.bufferCtx.save();
 
-    this.getChartDOMRect();
+    this.chartRect = this.getChartRect();
     this.initScale();
     this.drawChart();
   }
