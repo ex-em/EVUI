@@ -357,7 +357,7 @@ const modules = {
 
       // 2. Draw series name
       ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
-      ctx.textBaseline = 'Bottom';
+
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
@@ -492,7 +492,7 @@ const modules = {
 
     // 2. Draw value y names
     ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
-    ctx.textBaseline = 'Bottom';
+
     if (this.axesY.length) {
       ctx.fillText(
         this.axesY[hitAxis.y].getLabelFormat(hitItem.y),
@@ -612,7 +612,7 @@ const modules = {
 
       // 2. Draw series name
       ctx.fillStyle = typeof opt.fontColor.label === 'function' ? opt.fontColor.label(curTooltipInfo) : opt.fontColor.label ?? opt.fontColor;
-      ctx.textBaseline = 'Bottom';
+
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
