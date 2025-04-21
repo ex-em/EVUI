@@ -425,7 +425,6 @@ export default {
       clickedRowMV.value = JSON.stringify(rowData);
     };
     const onToggledRow = ({ row, isExpand }) => {
-      console.log('=> here!');
       toggledRowMV.value = `Expand : ${isExpand}\nrow : ${JSON.stringify(row.data)}`;
     };
     const getData = () => {
