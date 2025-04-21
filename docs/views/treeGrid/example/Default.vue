@@ -40,6 +40,7 @@
       @check-all="onCheckedRow"
       @click-row="onClickRow"
       @dblclick-row="onDoubleClickRow"
+      @toggle-row="onToggledRow"
     >
     </ev-tree-grid>
     <div class="description">
@@ -208,6 +209,18 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">
+            Toggled Row
+          </span>
+          <ev-text-field
+            v-model="toggledRowMV"
+            type="textarea"
+            readonly
+          />
+        </div>
+      </div>
+      <div class="form-rows">
+        <div class="form-row">
+          <span class="badge yellow">
             Highlight
           </span>
           <ev-input-number
@@ -299,6 +312,7 @@ export default {
     const headerCheckMV = ref(true);
     const checkedRowsMV = ref();
     const clickedRowMV = ref();
+    const toggledRowMV = ref();
     const DbClickedRowsMV = ref();
     const expandColumnMV = ref(0);
     const useGridSettingMV = ref(true);
@@ -410,6 +424,10 @@ export default {
       const rowData = e.rowData.data;
       clickedRowMV.value = JSON.stringify(rowData);
     };
+    const onToggledRow = ({ row, isExpand }) => {
+      console.log('=> here!');
+      toggledRowMV.value = `Expand : ${isExpand}\nrow : ${JSON.stringify(row.data)}`;
+    };
     const getData = () => {
       tableData.value = [
         {
@@ -489,7 +507,7 @@ export default {
       ];
     };
     const columns = ref([
-      { caption: 'ID', field: 'id', type: 'number', fixed: true },
+      { caption: 'ID', field: 'id', type: 'number' },
       { caption: 'Date', field: 'date', type: 'string' },
       {
         caption: 'Name',
@@ -558,6 +576,7 @@ export default {
       checkedRowsMV,
       clickedRowMV,
       DbClickedRowsMV,
+      toggledRowMV,
       menuItems,
       highlightMV,
       borderMV,
@@ -581,6 +600,7 @@ export default {
       onCheckedRow,
       onDoubleClickRow,
       onClickRow,
+      onToggledRow,
       resetBorderStyle,
       resetTreeIcon,
       resetDataIcon,
