@@ -172,7 +172,12 @@ class EvChart {
   }
 
   adjustYAxisWidth() {
-    if (!this.axesY?.length || !this.axesRange?.y || !this.axesSteps?.y?.length) {
+    if (
+        !this.axesY?.length
+        || !this.axesRange?.y
+        || !this.axesSteps?.y?.length
+        || this.axesY?.some(axisY => axisY?.labelStyle?.fitWidth && axisY?.labelStyle?.maxWidth)
+    ) {
       return;
     }
 
