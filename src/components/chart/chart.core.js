@@ -125,9 +125,6 @@ class EvChart {
     this.axesX = this.createAxes('x', axesX);
     this.axesY = this.createAxes('y', axesY);
 
-    this.axesRange = this.getAxesRange();
-    this.labelOffset = this.getLabelOffset();
-
     this.initDefaultSelectInfo();
 
     this.drawChart();
@@ -174,6 +171,37 @@ class EvChart {
     this.drawSyncedIndicator({ horizontal, label, mousePosition });
   }
 
+  adjustYAxisWidth() {
+    if (!this.axesY?.length || !this.axesRange?.y || !this.axesSteps?.y?.length) {
+      return;
+    }
+
+    const notFormattedLabels = [];
+    const { interval, graphMin, graphMax, steps = 0 } = this.axesSteps?.y[0] ?? {};
+    for (let i = 0; i < steps; i++) {
+      notFormattedLabels.push(graphMin + (i * interval));
+    }
+    notFormattedLabels.push(graphMax);
+
+    const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedLabels);
+    if (yMaxWidth > 0) {
+      const adjustedRange = {
+        x: this.axesRange.x,
+        y: this.axesRange.y.map(value => ({
+          ...value,
+          size: {
+            width: yMaxWidth,
+            height: value.size.height,
+          },
+        })),
+      };
+
+      this.labelOffset = this.getLabelOffset(adjustedRange);
+      this.labelRange = this.getAxesLabelRange();
+      this.axesSteps = this.calculateSteps();
+    }
+  }
+
   /**
    * To draw canvas chart, it processes several sequential jobs
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
@@ -182,8 +210,14 @@ class EvChart {
    */
   drawChart(hitInfo) {
     this.initScale();
+
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
+
+    this.adjustYAxisWidth();
+
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
 
@@ -655,12 +689,18 @@ class EvChart {
    * 0 ----------------------
    * hh:mm                 hh:mm
    *
+   * @param {object} adjustedRange
+   * {
+   *  min: number, max: number, minLabel: string, maxLabel: string,
+   *  size: {width: number, height: number}
+   *  }
+   * minLabel and maxLabel is formatted label
    * @returns {object} label offset for edge
    */
-  getLabelOffset() {
+  getLabelOffset(adjustedRange = null) {
     const axesX = this.axesX;
     const axesY = this.axesY;
-    const range = this.axesRange;
+    const range = adjustedRange ?? this.axesRange;
     const labelOffset = { top: 2, left: 2, right: 2, bottom: 2 };
     const labelBuffer = { width: 14, height: 4 };
 
@@ -689,7 +729,7 @@ class EvChart {
 
     axesY.forEach((axis, index) => {
       if (axis.labelStyle?.show) {
-        lw = Math.max(range.y[index].size.width + labelBuffer.width, 42 + labelBuffer.width);
+        lw = range.y[index].size.width + labelBuffer.width;
 
         if (axis.position === 'left') {
           if (lw > labelOffset.left) {
@@ -834,8 +874,6 @@ class EvChart {
     this.minMax = this.getStoreMinMax();
     this.axesX = this.createAxes('x', options.axesX);
     this.axesY = this.createAxes('y', options.axesY);
-    this.axesRange = this.getAxesRange();
-    this.labelOffset = this.getLabelOffset();
 
     this.initDefaultSelectInfo();
 

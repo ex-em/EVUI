@@ -42,7 +42,10 @@
         width: '100%',
         height: '80%',
         padding: {
-          right: 40,
+          top: 20,
+          right: 2,
+          left: 2,
+          bottom: 4,
         },
         title: {
           text: 'Chart Title',
@@ -95,7 +98,7 @@
             seriesData.shift();
           }
 
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+          seriesData.push(Math.floor(Math.random() * ((999999 - 5) + 1)) + 5);
         });
       };
 
