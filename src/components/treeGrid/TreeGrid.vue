@@ -395,6 +395,7 @@ export default {
     'check-all': null,
     'page-change': null,
     'sort-column': null,
+    'toggle-row': null,
     'resize-column': ({ column, columns }) => ({ column, columns }),
     'change-column-status': ({ columns }) => ({ columns }),
     'change-column-info': ({ type, columns }) => ({ type, columns }),

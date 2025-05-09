@@ -741,6 +741,7 @@ export const contextMenuEvent = (params) => {
 };
 
 export const treeEvent = (params) => {
+  const { emit } = getCurrentInstance();
   const { stores, onResize } = params;
   const setTreeNodeStore = () => {
     let nodeIndex = 0;
@@ -834,9 +835,11 @@ export const treeEvent = (params) => {
     });
   };
   const handleExpand = (node) => {
+    const isExpand = !node.expand;
     const data = node;
     data.expand = !data.expand;
     setExpandNode(data.children, data.expand, data.isFilter);
+    emit('toggle-row', { row: data, isExpand });
     onResize();
   };
   return { setTreeNodeStore, handleExpand };
