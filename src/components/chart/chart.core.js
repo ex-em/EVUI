@@ -192,7 +192,7 @@ class EvChart {
       }
       notFormattedLabels.push(graphMax);
     } else {
-      notFormattedLabels = this.data.labels ?? [];
+      notFormattedLabels = this.data.labels?.y ?? this.data.labels ?? [];
     }
 
     const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedLabels);
