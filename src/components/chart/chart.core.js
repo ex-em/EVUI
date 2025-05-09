@@ -172,21 +172,28 @@ class EvChart {
   }
 
   adjustYAxisWidth() {
+    // fitWidth(maxWidth에 넘을 시 말줄임표 들어가는 기능)을 사용중인 step Axis인 경우에는 적용 제외
+    const isStepAxisUseFitWidth = this.options.axesY?.some(axisY => axisY.type === 'step' && axisY.labelStyle?.fitWidth);
+
     if (
         !this.axesY?.length
         || !this.axesRange?.y
         || !this.axesSteps?.y?.length
-        || this.axesY?.some(axisY => axisY?.labelStyle?.fitWidth && axisY?.labelStyle?.maxWidth)
+        || isStepAxisUseFitWidth
     ) {
       return;
     }
 
-    const notFormattedLabels = [];
+    let notFormattedLabels = [];
     const { interval, graphMin, graphMax, steps = 0 } = this.axesSteps?.y[0] ?? {};
-    for (let i = 0; i < steps; i++) {
-      notFormattedLabels.push(graphMin + (i * interval));
+    if (interval) {
+      for (let i = 0; i < steps; i++) {
+        notFormattedLabels.push(graphMin + (i * interval));
+      }
+      notFormattedLabels.push(graphMax);
+    } else {
+      notFormattedLabels = this.data.labels ?? [];
     }
-    notFormattedLabels.push(graphMax);
 
     const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedLabels);
     if (yMaxWidth > 0) {
