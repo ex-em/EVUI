@@ -347,7 +347,7 @@ const modules = {
 
       // 2. Draw series name
       ctx.fillStyle = opt.fontColor?.label ?? opt.fontColor;
-      ctx.textBaseline = 'Bottom';
+      ctx.textBaseline = 'bottom';
       const seriesNameSpaceWidth = opt.maxWidth - Math.round(ctx.measureText(maxValue).width)
         - boxPadding.l - boxPadding.r - seriesColorMarginRight - VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;

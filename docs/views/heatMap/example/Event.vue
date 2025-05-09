@@ -61,7 +61,7 @@ v-for="(item, itemIdx) in row.items"
 </div></template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
   import dayjs from 'dayjs';
 
   export default {
@@ -81,8 +81,13 @@ import { onMounted, reactive, ref } from 'vue';
         },
       });
 
+      const xRange = computed(() => (chartData.labels.x.length
+        ? [chartData.labels.x[0], chartData.labels.x[7]] : null));
+      const yRange = computed(() => (chartData.labels.y.length
+        ? [0, 3] : null));
 
-      const chartOptions = {
+
+      const chartOptions = reactive({
         type: 'heatMap',
         width: '100%',
         title: {
@@ -102,10 +107,30 @@ import { onMounted, reactive, ref } from 'vue';
           interval: 'second',
           categoryMode: true,
           showGrid: false,
+          range: xRange,
+          scrollbar: {
+            use: true,
+            showButton: true,
+            background: '#E0E1DD',
+            thumbStyle: {
+              background: '#415A77',
+              radius: 2,
+            },
+          },
         }],
         axesY: [{
           type: 'step',
           showGrid: false,
+          range: yRange,
+          scrollbar: {
+            use: true,
+            showButton: true,
+            background: '#E0E1DD',
+            thumbStyle: {
+              background: '#415A77',
+              radius: 2,
+            },
+          },
         }],
         selectItem: {
           use: true,
@@ -122,7 +147,7 @@ import { onMounted, reactive, ref } from 'vue';
         tooltip: {
           use: true,
         },
-      };
+      });
 
       const selectionItems = ref([]);
       const selectionRange = ref({});
