@@ -120,6 +120,23 @@ class Scale {
   }
 
   /**
+   * return width what has max length
+   * @param {string[]} notFormattedLabels
+   * @reutrn number maxWidth
+   */
+  getLabelWidthHasMaxLength(notFormattedLabels) {
+    return (notFormattedLabels ?? []).reduce((max, label) => {
+      const formattedLabel = this.getLabelFormat(label);
+      const width = Util.calcTextSize(
+          formattedLabel,
+          Util.getLabelStyle(this.labelStyle),
+      )?.width ?? 0;
+
+      return Math.max(max, width);
+    }, 0);
+  }
+
+  /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
    *
