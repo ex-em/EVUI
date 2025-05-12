@@ -251,9 +251,17 @@ class HeatMap {
     this.size.w = xArea / minmaxX.oriSteps;
     this.size.h = yArea / minmaxY.oriSteps;
 
-    this.filterdCount = {
-      x: minmaxX.oriSteps,
-      y: minmaxY.oriSteps,
+    this.filteredRange = {
+      x: {
+        steps: minmaxX.oriSteps,
+        min: minmaxX.graphMin,
+        max: minmaxX.graphMax,
+      },
+      y: {
+        steps: minmaxY.oriSteps,
+        min: minmaxY.graphMin,
+        max: minmaxY.graphMax,
+      },
     };
 
     const getOpacity = (item, opacity, index) => {
@@ -603,8 +611,8 @@ class HeatMap {
     };
 
     if (labels.x.length && labels.y.length) {
-      const labelXCount = this.filterdCount?.x ?? labels.x.length;
-      const labelYCount = this.filterdCount?.y ?? labels.y.length;
+      const labelXCount = this.filteredRange?.x?.steps ?? labels.x.length;
+      const labelYCount = this.filteredRange?.y?.steps ?? labels.y.length;
 
       const { x1, x2, y1, y2 } = range;
       const gapX = (x2 - x1) / labelXCount;
@@ -655,7 +663,7 @@ class HeatMap {
   }
 
   findSelectionRange(rangeInfo) {
-    const { xcp, ycp, width, height, range } = rangeInfo;
+    const { xsp, ycp, width, height, range } = rangeInfo;
 
     let selectionRange = null;
 
@@ -663,30 +671,41 @@ class HeatMap {
     const { x: labelX, y: labelY } = this.labels;
 
     if (labelX.length && labelY.length) {
-      const gapX = (x2 - x1) / labelX.length;
-      const gapY = (y2 - y1) / labelY.length;
+      const labelXCount = this.filteredRange?.x?.steps ?? labelX.length;
+      const labelYCount = this.filteredRange?.y?.steps ?? labelY.length;
+      const gapX = (x2 - x1) / labelXCount;
+      const gapY = (y2 - y1) / labelYCount;
 
-      const xsp = xcp;
-      const xep = xcp + width;
+      const xep = xsp + width;
       const ysp = ycp;
-      const yep = ycp + height;
+      const yep = ysp + height;
 
       const xIndex = {
         min: Math.floor((xsp - x1) / gapX),
         max: Math.floor((xep - x1 - gapX) / gapX),
       };
 
-      const lastIndexY = labelY.length - 1;
+      const lastIndexY = labelYCount - 1;
       const yIndex = {
         min: lastIndexY - Math.floor((yep - y1 - gapY) / gapY),
         max: lastIndexY - Math.floor((ysp - y1) / gapY),
       };
 
+      const { min: xMin, max: xMax } = this.filteredRange.x;
+      const { min: yMin, max: yMax } = this.filteredRange.y;
+
+      const filteredLabelX = labelXCount !== labelX.length
+        ? labelX.filter(item => xMin <= item && item <= xMax)
+        : labelX;
+      const filteredLabelY = labelYCount !== labelY.length
+        ? labelY.filter(item => yMin <= item && item <= yMax)
+        : labelY;
+
       selectionRange = {
-        xMin: labelX[xIndex.min],
-        xMax: labelX[xIndex.max],
-        yMin: labelY[yIndex.min],
-        yMax: labelY[yIndex.max],
+        xMin: filteredLabelX[xIndex.min],
+        xMax: filteredLabelX[xIndex.max],
+        yMin: filteredLabelY[yIndex.min],
+        yMax: filteredLabelY[yIndex.max],
       };
     }
 
