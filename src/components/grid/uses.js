@@ -801,7 +801,14 @@ export const sortEvent = (params) => {
           if ((!aCol || typeof aCol === 'string') && (!bCol || typeof bCol === 'string')) {
             aCol = aCol || '';
             bCol = bCol || '';
-            return sortFn(aCol?.toLowerCase(), bCol?.toLowerCase());
+            lowerA = aCol.toLowerCase();
+            lowerB = bCol.toLowerCase();
+            if(aCol !== bCol && lowerA === lowerB) {
+              const diffIndex = Array.from(aCol).findIndex((char, index) => char !== bCol[index]);
+              return sortFn(aCol[diffIndex], bCol[diffIndex]);
+            } else {
+              return sortFn(lowerA, lowerB);
+            }
           }
           return 0;
         });
