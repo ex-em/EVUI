@@ -675,6 +675,12 @@ class HeatMap {
     return blockRange;
   }
 
+  getFilteredLabel(labels, count, min, max) {
+    return labels.length !== count
+      ? labels.filter(label => min <= label && label <= max)
+      : labels;
+  }
+
   findSelectionRange(rangeInfo) {
     const { xsp, ycp, width, height, range } = rangeInfo;
 
@@ -684,8 +690,13 @@ class HeatMap {
     const { x: labelX, y: labelY } = this.labels;
 
     if (labelX.length && labelY.length) {
-      const labelXCount = this.currentLabelInfo.x.steps || labelX.x.length;
-      const labelYCount = this.currentLabelInfo.y.steps || labelY.y.length;
+      const {
+        x: { steps: xCurrentCount, min: xMin, max: xMax },
+        y: { steps: yCurrentCount, min: yMin, max: yMax },
+      } = this.currentLabelInfo;
+
+      const labelXCount = xCurrentCount || labelX.x.length;
+      const labelYCount = yCurrentCount || labelY.y.length;
       const gapX = (x2 - x1) / labelXCount;
       const gapY = (y2 - y1) / labelYCount;
 
@@ -704,17 +715,8 @@ class HeatMap {
         max: lastIndexY - Math.floor((ysp - y1) / gapY),
       };
 
-      const getFilteredLabel = (dir) => {
-        const list = dir === 'x' ? labelX : labelY;
-        const count = dir === 'x' ? labelXCount : labelYCount;
-        const { min, max } = this.currentLabelInfo[dir];
-        return list.length === count
-          ? list.filter(label => min <= label && label <= max)
-          : list;
-      };
-
-      const filteredLabelX = getFilteredLabel('x');
-      const filteredLabelY = getFilteredLabel('y');
+      const filteredLabelX = this.getFilteredLabel(labelX, labelXCount, xMin, xMax);
+      const filteredLabelY = this.getFilteredLabel(labelY, labelYCount, yMin, yMax);
 
       selectionRange = {
         xMin: filteredLabelX[xIndex.min],
