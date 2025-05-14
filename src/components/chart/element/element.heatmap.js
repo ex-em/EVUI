@@ -27,7 +27,7 @@ class HeatMap {
     };
     this.type = 'heatMap';
 
-    this.filteredRange = {
+    this.currentLabelInfo = {
       x: {
         steps: 0,
         min: 0,
