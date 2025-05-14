@@ -26,6 +26,19 @@ class HeatMap {
       h: 0,
     };
     this.type = 'heatMap';
+
+    this.filteredRange = {
+      x: {
+        steps: 0,
+        min: 0,
+        max: 0,
+      },
+      y: {
+        steps: 0,
+        min: 0,
+        max: 0,
+      },
+    };
   }
 
   /**
@@ -250,7 +263,7 @@ class HeatMap {
     this.size.w = xArea / minmaxX.oriSteps;
     this.size.h = yArea / minmaxY.oriSteps;
 
-    this.filteredRange = {
+    this.currentLabelInfo = {
       x: {
         steps: minmaxX.oriSteps,
         min: minmaxX.graphMin,
@@ -565,8 +578,8 @@ class HeatMap {
     };
 
     if (labels.x.length && labels.y.length) {
-      const labelXCount = this.filteredRange?.x?.steps ?? labels.x.length;
-      const labelYCount = this.filteredRange?.y?.steps ?? labels.y.length;
+      const labelXCount = this.currentLabelInfo.x.steps || labels.x.length;
+      const labelYCount = this.currentLabelInfo.y.steps || labels.y.length;
 
       const { x1, x2, y1, y2 } = range;
       const gapX = (x2 - x1) / labelXCount;
@@ -625,8 +638,8 @@ class HeatMap {
     const { x: labelX, y: labelY } = this.labels;
 
     if (labelX.length && labelY.length) {
-      const labelXCount = this.filteredRange?.x?.steps ?? labelX.length;
-      const labelYCount = this.filteredRange?.y?.steps ?? labelY.length;
+      const labelXCount = this.currentLabelInfo.x.steps || labelX.x.length;
+      const labelYCount = this.currentLabelInfo.y.steps || labelY.y.length;
       const gapX = (x2 - x1) / labelXCount;
       const gapY = (y2 - y1) / labelYCount;
 
@@ -645,15 +658,17 @@ class HeatMap {
         max: lastIndexY - Math.floor((ysp - y1) / gapY),
       };
 
-      const { min: xMin, max: xMax } = this.filteredRange.x;
-      const { min: yMin, max: yMax } = this.filteredRange.y;
+      const getFilteredLabel = (dir) => {
+        const list = dir === 'x' ? labelX : labelY;
+        const count = dir === 'x' ? labelXCount : labelYCount;
+        const { min, max } = this.currentLabelInfo[dir];
+        return list.length === count
+          ? list.filter(label => min <= label && label <= max)
+          : list;
+      };
 
-      const filteredLabelX = labelXCount !== labelX.length
-        ? labelX.filter(item => xMin <= item && item <= xMax)
-        : labelX;
-      const filteredLabelY = labelYCount !== labelY.length
-        ? labelY.filter(item => yMin <= item && item <= yMax)
-        : labelY;
+      const filteredLabelX = getFilteredLabel('x');
+      const filteredLabelY = getFilteredLabel('y');
 
       selectionRange = {
         xMin: filteredLabelX[xIndex.min],
