@@ -13,7 +13,8 @@ ctx.$notify({
 });
 ```
 
-**1. Global Method**
+#### 1. Global Method
+
 `app.config.globalProperties`에 등록하여, 각 컴포넌트에서 아래처럼 사용 가능
 
 ```vue
@@ -44,7 +45,7 @@ ctx.$notify({
 </script>
 ```
 
-**2. Local Import**
+#### 2. Local Import
 
 ```vue
 <template>
