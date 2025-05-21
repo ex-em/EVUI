@@ -354,10 +354,18 @@ const modules = {
 
     this.onWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
+      const customTooltip = document.querySelector(this.options.tooltip.htmlScrollTarget);
 
-      if (isTooltipVisible) {
+      if (isTooltipVisible
+        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)) {
         e.preventDefault();
-        this.tooltipBodyDOM.scrollTop += e.deltaY;
+
+        if (isTooltipVisible) {
+          this.tooltipBodyDOM.scrollTop += e.deltaY;
+        }
+        if (customTooltip) {
+          customTooltip.scrollTop += e.deltaY;
+        }
       }
     };
 
