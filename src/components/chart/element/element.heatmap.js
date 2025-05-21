@@ -27,6 +27,19 @@ class HeatMap {
       h: 0,
     };
     this.type = 'heatMap';
+
+    this.currentLabelInfo = {
+      x: {
+        steps: 0,
+        min: 0,
+        max: 0,
+      },
+      y: {
+        steps: 0,
+        min: 0,
+        max: 0,
+      },
+    };
   }
 
   /**
@@ -251,9 +264,17 @@ class HeatMap {
     this.size.w = xArea / minmaxX.oriSteps;
     this.size.h = yArea / minmaxY.oriSteps;
 
-    this.filterdCount = {
-      x: minmaxX.oriSteps,
-      y: minmaxY.oriSteps,
+    this.currentLabelInfo = {
+      x: {
+        steps: minmaxX.oriSteps,
+        min: minmaxX.graphMin,
+        max: minmaxX.graphMax,
+      },
+      y: {
+        steps: minmaxY.oriSteps,
+        min: minmaxY.graphMin,
+        max: minmaxY.graphMax,
+      },
     };
 
     const getOpacity = (item, opacity, index) => {
@@ -603,8 +624,8 @@ class HeatMap {
     };
 
     if (labels.x.length && labels.y.length) {
-      const labelXCount = this.filterdCount?.x ?? labels.x.length;
-      const labelYCount = this.filterdCount?.y ?? labels.y.length;
+      const labelXCount = this.currentLabelInfo.x.steps || labels.x.length;
+      const labelYCount = this.currentLabelInfo.y.steps || labels.y.length;
 
       const { x1, x2, y1, y2 } = range;
       const gapX = (x2 - x1) / labelXCount;
@@ -654,8 +675,14 @@ class HeatMap {
     return blockRange;
   }
 
+  getFilteredLabel(labels, count, min, max) {
+    return labels.length !== count
+      ? labels.filter(label => min <= label && label <= max)
+      : labels;
+  }
+
   findSelectionRange(rangeInfo) {
-    const { xcp, ycp, width, height, range } = rangeInfo;
+    const { xsp, ycp, width, height, range } = rangeInfo;
 
     let selectionRange = null;
 
@@ -663,30 +690,39 @@ class HeatMap {
     const { x: labelX, y: labelY } = this.labels;
 
     if (labelX.length && labelY.length) {
-      const gapX = (x2 - x1) / labelX.length;
-      const gapY = (y2 - y1) / labelY.length;
+      const {
+        x: { steps: xCurrentCount, min: xMin, max: xMax },
+        y: { steps: yCurrentCount, min: yMin, max: yMax },
+      } = this.currentLabelInfo;
 
-      const xsp = xcp;
-      const xep = xcp + width;
+      const labelXCount = xCurrentCount || labelX.x.length;
+      const labelYCount = yCurrentCount || labelY.y.length;
+      const gapX = (x2 - x1) / labelXCount;
+      const gapY = (y2 - y1) / labelYCount;
+
+      const xep = xsp + width;
       const ysp = ycp;
-      const yep = ycp + height;
+      const yep = ysp + height;
 
       const xIndex = {
         min: Math.floor((xsp - x1) / gapX),
         max: Math.floor((xep - x1 - gapX) / gapX),
       };
 
-      const lastIndexY = labelY.length - 1;
+      const lastIndexY = labelYCount - 1;
       const yIndex = {
         min: lastIndexY - Math.floor((yep - y1 - gapY) / gapY),
         max: lastIndexY - Math.floor((ysp - y1) / gapY),
       };
 
+      const filteredLabelX = this.getFilteredLabel(labelX, labelXCount, xMin, xMax);
+      const filteredLabelY = this.getFilteredLabel(labelY, labelYCount, yMin, yMax);
+
       selectionRange = {
-        xMin: labelX[xIndex.min],
-        xMax: labelX[xIndex.max],
-        yMin: labelY[yIndex.min],
-        yMax: labelY[yIndex.max],
+        xMin: filteredLabelX[xIndex.min],
+        xMax: filteredLabelX[xIndex.max],
+        yMin: filteredLabelY[yIndex.min],
+        yMax: filteredLabelY[yIndex.max],
       };
     }
 
