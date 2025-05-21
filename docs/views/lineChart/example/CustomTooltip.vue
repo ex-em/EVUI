@@ -21,17 +21,19 @@ import dayjs from 'dayjs';
 export default {
   setup() {
     const chartData = reactive({
-      series: {
-        series1: { name: 'series#1', point: false },
-        series2: { name: 'series#2', point: false },
-        series3: { name: 'series#3', point: false },
-      },
+      series: Object.fromEntries(
+        Array.from({ length: 100 }, (_, i) => {
+          const seriesId = `series${i + 1}`;
+          return [seriesId, { name: `series#${i + 1}`, point: false }];
+        }),
+      ),
       labels: [],
-      data: {
-        series1: [],
-        series2: [],
-        series3: [],
-      },
+      data: Object.fromEntries(
+        Array.from({ length: 100 }, (_, i) => {
+          const seriesId = `series${i + 1}`;
+          return [seriesId, []];
+        }),
+      ),
     });
 
     const useHtml = ref(true);
@@ -83,6 +85,8 @@ export default {
       }],
       tooltip: {
         use: true,
+        useScrollbar: true,
+        htmlScrollTarget: '.ev-chart-tooltip-custom__body',
       },
     });
 
@@ -120,3 +124,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.ev-chart-tooltip-custom__body {
+  max-height: 400px;
+  overflow-y: auto !important;
+}
+</style>
