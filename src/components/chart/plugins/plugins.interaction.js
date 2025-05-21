@@ -354,7 +354,7 @@ const modules = {
 
     this.onWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      const customTooltip = document.querySelector(this.options.tooltip.htmlScrollTarget);
+      const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
       if (isTooltipVisible
         || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)) {
