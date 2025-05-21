@@ -711,6 +711,7 @@ const modules = {
           data: hitInfoItems[sId].data,
           color: hitInfoItems[sId].color,
           name: hitInfoItems[sId].name,
+          dataId: hitInfoItems[sId].id,
         });
       });
 
