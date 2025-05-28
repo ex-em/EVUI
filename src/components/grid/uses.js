@@ -291,9 +291,14 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        remainWidth = columnWidth
-          - (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
-        columnWidth = Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount = result.emptyCount === 0
+            ? 0
+            : Math.floor(columnWidth / result.emptyCount);
+
+        remainWidth = columnWidth - (sharePerEmptyCount * result.emptyCount);
+        columnWidth = result.emptyCount !== 0
+          ? sharePerEmptyCount
+          : columnWidth;
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
@@ -302,22 +307,20 @@ export const resizeEvent = (params) => {
       resizeInfo.columnWidth = columnWidth;
     }
 
-    stores.orderedColumns.forEach((column) => {
-      const item = column;
-      const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
-      if (item.width && item.width < minWidth) {
-        item.width = minWidth;
+    stores.orderedColumns.forEach((col) => {
+      const minWidth = isRenderer(col) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      if (col.width && col.width < minWidth) {
+        col.width = minWidth;
       }
-      if (!item.width && !item.hide) {
-        item.width = columnWidth;
+      if (!col.width && !col.hide) {
+        col.width = columnWidth;
       }
-      return item;
     });
 
     if (remainWidth) {
       let index = stores.orderedColumns.length - 1;
       let lastColumn = stores.orderedColumns[index];
-      while (lastColumn.hide) {
+      while (lastColumn.hide || lastColumn.hiddenDisplay) {
         index -= 1;
         lastColumn = stores.orderedColumns[index];
       }
