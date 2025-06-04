@@ -291,9 +291,14 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        remainWidth = columnWidth
-          - (Math.floor(columnWidth / result.emptyCount) * result.emptyCount);
-        columnWidth = Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount = result.emptyCount === 0
+            ? 0
+            : Math.floor(columnWidth / result.emptyCount);
+
+        remainWidth = columnWidth - (sharePerEmptyCount * result.emptyCount);
+        columnWidth = result.emptyCount !== 0
+          ? sharePerEmptyCount
+          : columnWidth;
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
@@ -302,22 +307,23 @@ export const resizeEvent = (params) => {
       resizeInfo.columnWidth = columnWidth;
     }
 
-    stores.orderedColumns.forEach((column) => {
-      const item = column;
-      const minWidth = isRenderer(column) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
-      if (item.width && item.width < minWidth) {
-        item.width = minWidth;
+    stores.orderedColumns.forEach((col) => {
+      const minWidth = isRenderer(col) ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      if (col.width && col.width < minWidth) {
+        col.width = minWidth;
       }
-      if (!item.width && !item.hide) {
-        item.width = columnWidth;
+      if (!col.width && !col.hide) {
+        col.width = columnWidth;
       }
-      return item;
     });
 
     if (remainWidth) {
       let index = stores.orderedColumns.length - 1;
       let lastColumn = stores.orderedColumns[index];
-      while (lastColumn.hide) {
+
+      // orderedColumns에 hiddenDisplay === true 컬럼은 포함되어 있지 않다.
+      // 하지만 hide === true 컬럼은 포함되어 있다. 그래서 hiddenDisplay 조건은 필요없지만 조건을 추가해서 코드 가독성과 안정성을 높였다.
+      while (lastColumn.hide || lastColumn.hiddenDisplay) {
         index -= 1;
         lastColumn = stores.orderedColumns[index];
       }
