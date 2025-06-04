@@ -689,6 +689,20 @@ export default {
       type: [Array],
       default: () => [],
     },
+    /**
+     * @type {Object}
+     * @property {number} columnWidth 컬럼 너비 minWidth
+     * @property {number} scrollWidth 스크롤 너비
+     * @property {number} rowHeight 행 높이
+     * @property {number} gridWidth 그리드 너비 width
+     * @property {number} gridHeight 그리드 높이
+     * @property {boolean} adjust 컬럼 너비 조정 여부
+     * @property {boolean} useGridSetting 그리드 설정 사용 여부
+     * @property {number} gridWidth 그리드 너비 width
+     * @property {number} gridHeight 그리드 높이
+     * @property {boolean} adjust 컬럼 너비 조정 여부
+     * @property {boolean} useGridSetting 그리드 설정 사용 여부
+     */
     option: {
       type: Object,
       default: () => ({}),

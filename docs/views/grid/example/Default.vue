@@ -284,7 +284,7 @@ export default {
       { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
       { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
       { caption: 'Email', field: 'email', type: 'string', width: 80 },
-      { caption: 'Last Login', field: 'lastLogin', type: 'string' },
+      { caption: 'Last Login', field: 'lastLogin', type: 'string', hide: true },
     ]);
     const resetBorderStyle = () => {
       borderMV.value = '';
