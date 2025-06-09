@@ -126,7 +126,9 @@ class TimeCategoryScale extends Scale {
     const axisMax = stepInfo.graphMax;
     const stepValue = stepInfo.rawInterval;
     const oriSteps = stepInfo.oriSteps;
-    const count = Math.round(oriSteps / steps);
+
+    // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
+    const count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
 
     let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
@@ -182,7 +184,7 @@ class TimeCategoryScale extends Scale {
     let labelText;
     let labelPoint;
     let ix;
-    for (ix = 0; ix < oriSteps; ix += count) {
+    for (ix = 0; oriSteps === count ? ix <= oriSteps : ix < oriSteps; ix += count) {
       ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
