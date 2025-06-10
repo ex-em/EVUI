@@ -185,7 +185,7 @@ class TimeCategoryScale extends Scale {
     let labelPoint;
     let ix;
     const maxIndex = oriSteps === count ? oriSteps : oriSteps - 1;
-    for (ix = 0; maxIndex; ix += count) {
+    for (ix = 0; ix <= maxIndex; ix += count) {
       ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
 
       labelCenter = Math.round(startPoint + (graphGap * ix));
