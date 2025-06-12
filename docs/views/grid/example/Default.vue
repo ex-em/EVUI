@@ -225,7 +225,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 
 export default {
   setup() {
@@ -277,15 +277,18 @@ export default {
         value: 'rows',
       },
     ]);
-    const columns = ref([
-      { caption: 'Name', field: 'userName', type: 'string', width: 80, fixed: true },
-      { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
-      { caption: 'number', field: 'number', type: 'number', width: 80 },
-      { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
-      { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
-      { caption: 'Email', field: 'email', type: 'string', width: 80 },
-      { caption: 'Last Login', field: 'lastLogin', type: 'string', hide: true },
-    ]);
+    const columns = ref([]);
+    onMounted(() => {
+      columns.value = [
+        { caption: 'Name', field: 'userName', type: 'string', width: 80, fixed: true },
+        { caption: 'Role', field: 'role', type: 'string', width: 80, hiddenDisplay: true },
+        { caption: 'number', field: 'number', type: 'number', width: 80 },
+        { caption: 'boolean', field: 'boolean', type: 'boolean', width: 80 },
+        { caption: 'Phone', field: 'phone', type: 'string', sortable: false },
+        { caption: 'Email', field: 'email', type: 'string', width: 80 },
+        { caption: 'Last Login', field: 'lastLogin', type: 'string', hide: true },
+      ];
+    });
     const resetBorderStyle = () => {
       borderMV.value = '';
     };
@@ -392,20 +395,27 @@ export default {
 .description {
   min-width: 200px;
 }
+
 .form-rows {
   display: flex;
   margin-bottom: 5px;
 }
+
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 80%;
 }
+
 .badge {
   margin-bottom: 2px;
   margin-right: 5px !important;
 }
+
 .ev-toggle {
   margin-right: 10px;
 }

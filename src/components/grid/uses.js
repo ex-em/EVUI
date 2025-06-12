@@ -317,17 +317,19 @@ export const resizeEvent = (params) => {
       }
     });
 
-    if (remainWidth) {
+    if (remainWidth && stores.orderedColumns.length) {
       let index = stores.orderedColumns.length - 1;
       let lastColumn = stores.orderedColumns[index];
 
       // orderedColumns에 hiddenDisplay === true 컬럼은 포함되어 있지 않다.
       // 하지만 hide === true 컬럼은 포함되어 있다. 그래서 hiddenDisplay 조건은 필요없지만 조건을 추가해서 코드 가독성과 안정성을 높였다.
-      while (lastColumn.hide || lastColumn.hiddenDisplay) {
+      while (index > 0 && lastColumn && (lastColumn.hide || lastColumn.hiddenDisplay)) {
         index -= 1;
         lastColumn = stores.orderedColumns[index];
       }
-      lastColumn.width += remainWidth;
+      if (lastColumn) {
+        lastColumn.width += remainWidth;
+      }
     }
   };
   /**
