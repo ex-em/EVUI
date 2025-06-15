@@ -165,7 +165,7 @@ const modules = {
         const itemHitInfo = this.getItemByPosition(offset, false);
         const hitInfo = this.getSeriesInfoByPosition(offset);
         if (hitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, true);
 
           args.label = itemHitInfo.label;
           args.value = itemHitInfo.value;
@@ -279,7 +279,7 @@ const modules = {
         const hitInfo = this.getSeriesInfoByPosition(offset);
 
         if (hitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, false);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
 
           args.selected = {
@@ -1197,9 +1197,10 @@ const modules = {
   /**
    * Add or delete selected series Index,according to policy and option
    * @param seriesId {number}
+   * @param keepSelection {boolean}
    * @returns after {number[]}  '[0, 1 ...]' result series Id List
    */
-  updateSelectedSeriesInfo(seriesId) {
+  updateSelectedSeriesInfo(seriesId, keepSelection) {
     const option = this.options?.selectSeries ?? {};
     const before = this.defaultSelectInfo ?? { seriesId: [] };
 
@@ -1210,8 +1211,10 @@ const modules = {
     const after = cloneDeep(before);
 
     if (before.seriesId.includes(seriesId)) {
-      const idx = before.seriesId.indexOf(seriesId);
-      after.seriesId.splice(idx, 1);
+      if (!keepSelection) {
+        const idx = before.seriesId.indexOf(seriesId);
+        after.seriesId.splice(idx, 1);
+      }
     } else if (seriesId) {
       after.seriesId.push(seriesId);
       if (option.limit > 0 && option.limit < after.seriesId.length) {

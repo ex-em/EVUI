@@ -254,6 +254,40 @@ const DEFAULT_DATA = {
   data: {},
 };
 
+const useWidgetClickEvent = () => {
+  let timer = null;
+  let clickCount = 0;
+  const Delay = 200;
+
+  const clickEventCallback = (callback) => {
+    clickCount++;
+
+    if (clickCount === 1) {
+      timer = setTimeout(() => {
+        if (clickCount === 1) {
+          callback();
+        }
+        clickCount = 0;
+      }, Delay);
+    }
+  };
+
+  const dblClickEventCallback = (callback) => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    callback();
+    clickCount = 0;
+  };
+
+  return {
+    clickEventCallback,
+    dblClickEventCallback,
+  };
+};
+
+
 export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
   const { props, emit } = getCurrentInstance();
 
@@ -281,67 +315,73 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
   const selectLabelInfo = cloneDeep(props.selectedLabel ?? injectGroupSelectedLabel?.value);
   const selectSeriesInfo = cloneDeep(props.selectedSeries);
 
+  const { clickEventCallback, dblClickEventCallback } = useWidgetClickEvent();
+
   const eventListeners = {
     click: async (e) => {
       await nextTick();
-      const { seriesId, dataIndex, eventTarget, targetAxis } = e?.selected ?? {};
-      const { eventTarget: deselectedEventTarget } = e?.deselected ?? {};
+      clickEventCallback(() => {
+        const { seriesId, dataIndex, eventTarget, targetAxis } = e?.selected ?? {};
+        const { eventTarget: deselectedEventTarget } = e?.deselected ?? {};
 
-      switch (eventTarget) {
-        case 'item': {
-          if (seriesId !== null) {
-            emit('update:selectedItem', {
-              seriesID: seriesId,
-              dataIndex,
-            });
-            if (deselectedEventTarget === 'label') {
-              emit('update:selectedLabel', { dataIndex: [] });
-            }
-          } else {
-            emit('update:selectedItem', null);
-          }
-          break;
-        }
-
-        case 'label': {
-          if (injectGroupSelectedLabel?.value) {
-            injectGroupSelectedLabel.value.dataIndex = dataIndex;
-          } else {
-            emit('update:selectedLabel', {
-              dataIndex,
-              targetAxis,
-            });
-
-            if (deselectedEventTarget === 'item') {
+        switch (eventTarget) {
+          case 'item': {
+            if (seriesId !== null) {
+              emit('update:selectedItem', {
+                seriesID: seriesId,
+                dataIndex,
+              });
+              if (deselectedEventTarget === 'label') {
+                emit('update:selectedLabel', { dataIndex: [] });
+              }
+            } else {
               emit('update:selectedItem', null);
             }
+            break;
           }
-          break;
+
+          case 'label': {
+            if (injectGroupSelectedLabel?.value) {
+              injectGroupSelectedLabel.value.dataIndex = dataIndex;
+            } else {
+              emit('update:selectedLabel', {
+                dataIndex,
+                targetAxis,
+              });
+
+              if (deselectedEventTarget === 'item') {
+                emit('update:selectedItem', null);
+              }
+            }
+            break;
+          }
+
+          case 'series': {
+            emit('update:selectedSeries', { seriesId });
+            break;
+          }
+
+          default:
+            break;
         }
 
-        case 'series': {
-          emit('update:selectedSeries', { seriesId });
-          break;
-        }
-
-        default:
-          break;
-      }
-
-      emit('click', e);
+        emit('click', e);
+      });
     },
     'dbl-click': async (e) => {
       await nextTick();
-      emit('dbl-click', e);
-      const { eventTarget } = e;
-      switch (eventTarget) {
-        case 'series': {
-          emit('update:selectedSeries', { seriesId: e.seriesId });
-          break;
+      dblClickEventCallback(() => {
+        const { eventTarget } = e;
+        switch (eventTarget) {
+          case 'series': {
+            emit('update:selectedSeries', { seriesId: e.seriesId });
+            break;
+          }
+          default:
+            break;
         }
-        default:
-          break;
-      }
+        emit('dbl-click', e);
+      });
     },
     'drag-select': async (e) => {
       await nextTick();
