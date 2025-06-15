@@ -150,7 +150,6 @@ const modules = {
 
         args.label = itemHitInfo.label;
         args.value = itemHitInfo.value;
-        args.seriesId = this.defaultSelectInfo.seriesId;
         args.acc = itemHitInfo.acc;
       };
 
@@ -159,10 +158,10 @@ const modules = {
         const hitInfo = this.getSeriesInfoByPosition(offset);
         if (hitInfo.sId !== null) {
           const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
-          
+
           args.label = itemHitInfo.label;
           args.value = itemHitInfo.value;
-          args.seriesId = allSelectedList.seriesId;
+          args.seriesId = allSelectedList.seriesId?.at(0);
           args.acc = itemHitInfo.acc;
         }
       };
@@ -857,7 +856,7 @@ const modules = {
               seriesId: sId,
               seriesName: series.name,
               itemData: item.data,
-             });
+            });
             const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
 
             item.id = series.id;
