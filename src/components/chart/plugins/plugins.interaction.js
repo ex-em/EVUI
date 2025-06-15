@@ -111,15 +111,87 @@ const modules = {
      * @returns {undefined}
      */
     this.onDblClick = (e) => {
-      const selectItem = this.options.selectItem;
       const args = { e };
-
       const offset = this.getMousePosition(e);
-      const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
 
+      const {
+        type: chartType,
+        selectItem: selectItemOpt,
+        selectLabel: selectLabelOpt,
+        selectSeries: selectSeriesOpt,
+      } = this.options;
 
-      if (hitInfo.label !== null) {
-        this.render(hitInfo);
+      const useSelectItem = selectItemOpt?.use && selectItemOpt?.useClick;
+      const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+      const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
+
+      const setSelectedItemInfo = () => {
+        const hitInfo = this.getItemByPosition(offset, false);
+
+        ({
+          label: args.label,
+          value: args.value,
+          sId: args.seriesId,
+          maxIndex: args.dataIndex,
+          acc: args.acc,
+        } = hitInfo);
+      };
+
+      const setSelectedLabelInfo = (targetAxis) => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
+        const {
+          labelIndex: clickedLabelIndex,
+        } = this.getLabelInfoByPosition(offset, targetAxis);
+
+        const {
+          dataIndex: dataIndexList,
+        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
+
+        this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
+
+        args.label = itemHitInfo.label;
+        args.dataIndex = itemHitInfo.maxIndex;
+        args.acc = itemHitInfo.acc;
+        args.sId = this.defaultSelectInfo.seriesId;
+      };
+
+      const setSelectedSeriesInfo = () => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
+        const hitInfo = this.getSeriesInfoByPosition(offset);
+        if (hitInfo.sId !== null) {
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
+
+          args.label = itemHitInfo.label;
+          args.dataIndex = itemHitInfo.maxIndex;
+          args.sId = allSelectedList.seriesId;
+          args.acc = itemHitInfo.acc;
+        }
+      };
+
+      switch (chartType) {
+        case 'bar': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo(this.options.horizontal ? 'yAxis' : 'xAxis');
+          }
+          break;
+        }
+
+        case 'line': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          } else if (useSelectSeries) {
+            setSelectedSeriesInfo();
+          }
+          break;
+        }
+        default: {
+          setSelectedItemInfo();
+          break;
+        }
       }
 
       ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
