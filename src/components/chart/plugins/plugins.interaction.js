@@ -193,8 +193,6 @@ const modules = {
         }
       }
 
-      ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
-
       if (typeof this.listeners['dbl-click'] === 'function') {
         this.listeners['dbl-click'](args);
       }
