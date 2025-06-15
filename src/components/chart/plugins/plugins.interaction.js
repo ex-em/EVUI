@@ -1202,6 +1202,11 @@ const modules = {
   updateSelectedSeriesInfo(seriesId) {
     const option = this.options?.selectSeries ?? {};
     const before = this.defaultSelectInfo ?? { seriesId: [] };
+
+    if (typeof before.seriesId === 'string') {
+      before.seriesId = [before.seriesId];
+    }
+
     const after = cloneDeep(before);
 
     if (before.seriesId.includes(seriesId)) {
