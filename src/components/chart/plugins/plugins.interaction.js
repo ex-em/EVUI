@@ -157,6 +157,7 @@ const modules = {
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
         args.label = itemHitInfo.label;
+        args.seriesId = itemHitInfo.sId;
         args.value = itemHitInfo.value;
         args.acc = itemHitInfo.acc;
       };
