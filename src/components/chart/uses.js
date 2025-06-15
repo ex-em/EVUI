@@ -374,7 +374,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
         const { eventTarget } = e;
         switch (eventTarget) {
           case 'series': {
-            emit('update:selectedSeries', { seriesId: e.seriesId });
+            emit('update:selectedSeries', { seriesId: e.seriesId ? [e.seriesId] : [] });
             break;
           }
           default:
