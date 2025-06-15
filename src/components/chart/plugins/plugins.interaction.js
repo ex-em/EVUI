@@ -132,7 +132,6 @@ const modules = {
           label: args.label,
           value: args.value,
           sId: args.seriesId,
-          maxIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
       };
@@ -150,9 +149,9 @@ const modules = {
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
         args.label = itemHitInfo.label;
-        args.dataIndex = itemHitInfo.maxIndex;
+        args.value = itemHitInfo.value;
+        args.seriesId = this.defaultSelectInfo.seriesId;
         args.acc = itemHitInfo.acc;
-        args.sId = this.defaultSelectInfo.seriesId;
       };
 
       const setSelectedSeriesInfo = () => {
@@ -160,10 +159,10 @@ const modules = {
         const hitInfo = this.getSeriesInfoByPosition(offset);
         if (hitInfo.sId !== null) {
           const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
-
+          
           args.label = itemHitInfo.label;
-          args.dataIndex = itemHitInfo.maxIndex;
-          args.sId = allSelectedList.seriesId;
+          args.value = itemHitInfo.value;
+          args.seriesId = allSelectedList.seriesId;
           args.acc = itemHitInfo.acc;
         }
       };

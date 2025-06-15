@@ -170,8 +170,8 @@ export default {
 
     const dblclickedSeries = ref();
     const onDblClick = (e) => {
-      clickedSeries.value = { eventTarget: 'series', seriesId: e.sId };
-      dblclickedSeries.value = e.sId;
+      clickedSeries.value = { eventTarget: 'series', seriesId: e.seriesId };
+      dblclickedSeries.value = e.seriesId;
     };
 
     const defaultSelectSeries = ref({
