@@ -125,6 +125,14 @@ const modules = {
       const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
       const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
 
+      if (useSelectItem) {
+        args.eventTarget = 'item';
+      } else if (useSelectLabel) {
+        args.eventTarget = 'label';
+      } else if (useSelectSeries) {
+        args.eventTarget = 'series';
+      }
+
       const setSelectedItemInfo = () => {
         const hitInfo = this.getItemByPosition(offset, false);
 

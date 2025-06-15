@@ -333,7 +333,15 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
     'dbl-click': async (e) => {
       await nextTick();
       emit('dbl-click', e);
-      emit('update:selectedSeries', { seriesId: e.seriesId });
+      const { eventTarget } = e;
+      switch (eventTarget) {
+        case 'series': {
+          emit('update:selectedSeries', { seriesId: e.seriesId });
+          break;
+        }
+        default:
+          break;
+      }
     },
     'drag-select': async (e) => {
       await nextTick();
