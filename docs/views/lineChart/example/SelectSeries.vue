@@ -5,12 +5,14 @@
       :data="chartData1"
       :options="chartOptions1"
       @click="onClick"
+      @dbl-click="onDblClick"
     />
     <ev-chart
       v-model:selectedSeries="defaultSelectSeries"
       :data="chartData2"
       :options="chartOptions2"
       @click="onClick"
+      @dbl-click="onDblClick"
     />
     <div class="description">
       <ev-toggle v-model="isLive" />
@@ -49,6 +51,12 @@
           클릭 이벤트 데이터 (selected)
         </div>
         {{ clickedSeries }}
+        <br>
+        <br>
+        <div class="badge yellow">
+          더블클릭 이벤트 데이터 (selected)
+        </div>
+        {{ dblclickedSeries }}
         <br>
         <br>
       </div>
@@ -122,7 +130,7 @@ export default {
       }],
       selectSeries: {
         use: true,
-        limit: 2,
+        limit: 1,
         useDeselectOverflow: true,
       },
     });
@@ -150,7 +158,7 @@ export default {
       }],
       selectSeries: {
         use: true,
-        limit: 2,
+        limit: 1,
         useDeselectOverflow: true,
       },
     });
@@ -158,6 +166,11 @@ export default {
     const clickedSeries = ref();
     const onClick = (e) => {
       clickedSeries.value = e.selected;
+    };
+
+    const dblclickedSeries = ref();
+    const onDblClick = (e) => {
+      dblclickedSeries.value = e.seriesId;
     };
 
     const defaultSelectSeries = ref({
@@ -232,9 +245,11 @@ export default {
       chartOptions1,
       chartOptions2,
       clickedSeries,
+      dblclickedSeries,
       defaultSelectSeries,
       isLive,
       onClick,
+      onDblClick,
       changeSelectedSeries,
     };
   },

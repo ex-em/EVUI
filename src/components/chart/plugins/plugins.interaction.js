@@ -111,18 +111,98 @@ const modules = {
      * @returns {undefined}
      */
     this.onDblClick = (e) => {
-      const selectItem = this.options.selectItem;
       const args = { e };
-
       const offset = this.getMousePosition(e);
-      const hitInfo = this.getItemByPosition(offset, selectItem.useApproximateValue);
 
+      const {
+        type: chartType,
+        selectItem: selectItemOpt,
+        selectLabel: selectLabelOpt,
+        selectSeries: selectSeriesOpt,
+      } = this.options;
 
-      if (hitInfo.label !== null) {
-        this.render(hitInfo);
+      const useSelectItem = selectItemOpt?.use && selectItemOpt?.useClick;
+      const useSelectLabel = selectLabelOpt?.use && selectLabelOpt?.useClick;
+      const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
+
+      if (useSelectItem) {
+        args.eventTarget = 'item';
+      } else if (useSelectLabel) {
+        args.eventTarget = 'label';
+      } else if (useSelectSeries) {
+        args.eventTarget = 'series';
       }
 
-      ({ label: args.label, value: args.value, sId: args.seriesId, acc: args.acc } = hitInfo);
+      const setSelectedItemInfo = () => {
+        const hitInfo = this.getItemByPosition(offset, false);
+
+        ({
+          label: args.label,
+          value: args.value,
+          sId: args.seriesId,
+          maxIndex: args.dataIndex,
+          acc: args.acc,
+        } = hitInfo);
+      };
+
+      const setSelectedLabelInfo = (targetAxis) => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
+        const {
+          labelIndex: clickedLabelIndex,
+        } = this.getLabelInfoByPosition(offset, targetAxis);
+
+        const {
+          dataIndex: dataIndexList,
+        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
+
+        this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
+
+        args.label = itemHitInfo.label;
+        args.seriesId = itemHitInfo.sId;
+        args.value = itemHitInfo.value;
+        args.acc = itemHitInfo.acc;
+        args.dataIndex = itemHitInfo.maxIndex;
+      };
+
+      const setSelectedSeriesInfo = () => {
+        const itemHitInfo = this.getItemByPosition(offset, false);
+        const hitInfo = this.getSeriesInfoByPosition(offset);
+        if (hitInfo.sId !== null) {
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, true);
+
+          args.label = itemHitInfo.label;
+          args.value = itemHitInfo.value;
+          args.seriesId = allSelectedList.seriesId?.at(0);
+          args.acc = itemHitInfo.acc;
+          args.dataIndex = itemHitInfo.maxIndex;
+        }
+      };
+
+      switch (chartType) {
+        case 'bar': {
+          if (useSelectLabel) {
+            setSelectedLabelInfo(this.options.horizontal ? 'yAxis' : 'xAxis');
+          } else {
+            setSelectedItemInfo();
+          }
+          break;
+        }
+
+        case 'line': {
+          if (useSelectItem) {
+            setSelectedItemInfo();
+          } else if (useSelectLabel) {
+            setSelectedLabelInfo();
+          } else if (useSelectSeries) {
+            setSelectedSeriesInfo();
+          }
+          break;
+        }
+        default: {
+          setSelectedItemInfo();
+          break;
+        }
+      }
 
       if (typeof this.listeners['dbl-click'] === 'function') {
         this.listeners['dbl-click'](args);
@@ -203,7 +283,7 @@ const modules = {
         const hitInfo = this.getSeriesInfoByPosition(offset);
 
         if (hitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId);
+          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, false);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
 
           args.selected = {
@@ -788,7 +868,7 @@ const modules = {
               seriesId: sId,
               seriesName: series.name,
               itemData: item.data,
-             });
+            });
             const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
 
             item.id = series.id;
@@ -1121,16 +1201,24 @@ const modules = {
   /**
    * Add or delete selected series Index,according to policy and option
    * @param seriesId {number}
+   * @param keepSelection {boolean}
    * @returns after {number[]}  '[0, 1 ...]' result series Id List
    */
-  updateSelectedSeriesInfo(seriesId) {
+  updateSelectedSeriesInfo(seriesId, keepSelection) {
     const option = this.options?.selectSeries ?? {};
     const before = this.defaultSelectInfo ?? { seriesId: [] };
+
+    if (typeof before.seriesId === 'string') {
+      before.seriesId = [before.seriesId];
+    }
+
     const after = cloneDeep(before);
 
     if (before.seriesId.includes(seriesId)) {
-      const idx = before.seriesId.indexOf(seriesId);
-      after.seriesId.splice(idx, 1);
+      if (!keepSelection) {
+        const idx = before.seriesId.indexOf(seriesId);
+        after.seriesId.splice(idx, 1);
+      }
     } else if (seriesId) {
       after.seriesId.push(seriesId);
       if (option.limit > 0 && option.limit < after.seriesId.length) {
