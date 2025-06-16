@@ -140,6 +140,7 @@ const modules = {
           label: args.label,
           value: args.value,
           sId: args.seriesId,
+          maxIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
       };
@@ -160,6 +161,7 @@ const modules = {
         args.seriesId = itemHitInfo.sId;
         args.value = itemHitInfo.value;
         args.acc = itemHitInfo.acc;
+        args.dataIndex = itemHitInfo.maxIndex;
       };
 
       const setSelectedSeriesInfo = () => {
@@ -172,6 +174,7 @@ const modules = {
           args.value = itemHitInfo.value;
           args.seriesId = allSelectedList.seriesId?.at(0);
           args.acc = itemHitInfo.acc;
+          args.dataIndex = itemHitInfo.maxIndex;
         }
       };
 
