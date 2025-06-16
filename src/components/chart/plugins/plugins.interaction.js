@@ -177,10 +177,10 @@ const modules = {
 
       switch (chartType) {
         case 'bar': {
-          if (useSelectItem) {
-            setSelectedItemInfo();
-          } else if (useSelectLabel) {
+          if (useSelectLabel) {
             setSelectedLabelInfo(this.options.horizontal ? 'yAxis' : 'xAxis');
+          } else {
+            setSelectedItemInfo();
           }
           break;
         }
