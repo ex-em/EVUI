@@ -54,9 +54,15 @@
         <br>
         <br>
         <div class="badge yellow">
-          더블클릭 이벤트 데이터 (selected)
+          더블클릭 이벤트 데이터 (seriesId)
         </div>
         {{ dblclickedSeries }}
+        <br>
+        <br>
+        <div class="badge yellow">
+          더블클릭 이벤트 데이터 (value)
+        </div>
+        {{ dblclickedValue }}
         <br>
         <br>
       </div>
@@ -169,8 +175,10 @@ export default {
     };
 
     const dblclickedSeries = ref();
+    const dblclickedValue = ref();
     const onDblClick = (e) => {
       dblclickedSeries.value = e.seriesId;
+      dblclickedValue.value = e.value;
     };
 
     const defaultSelectSeries = ref({
@@ -246,6 +254,7 @@ export default {
       chartOptions2,
       clickedSeries,
       dblclickedSeries,
+      dblclickedValue,
       defaultSelectSeries,
       isLive,
       onClick,
