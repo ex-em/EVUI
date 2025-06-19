@@ -134,19 +134,26 @@ const modules = {
       }
 
       const setSelectedItemInfo = () => {
-        const hitInfo = this.getItemByPosition(offset, false);
+        const hitInfo = this.findHitItem(offset);
 
-        ({
-          label: args.label,
-          value: args.value,
-          sId: args.seriesId,
-          maxIndex: args.dataIndex,
-          acc: args.acc,
-        } = hitInfo);
+        // 실제 클릭된 아이템의 정보 추출 (hitId가 있으면 해당 아이템, 없으면 첫 번째 아이템)
+        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItem = hitInfo.items[hitItemId];
+
+        if (hitItem) {
+          args.label = hitItem.data?.x || hitItem.data?.y;
+          args.value = hitItem.data?.o;
+          args.seriesId = hitItemId;
+          args.dataIndex = hitItem.index;
+          args.acc = hitItem.data?.acc;
+        }
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const itemHitInfo = this.getItemByPosition(offset, false);
+        const hitInfo = this.findHitItem(offset);
+        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItem = hitInfo.items[hitItemId];
+
         const {
           labelIndex: clickedLabelIndex,
         } = this.getLabelInfoByPosition(offset, targetAxis);
@@ -157,24 +164,31 @@ const modules = {
 
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
-        args.label = itemHitInfo.label;
-        args.seriesId = itemHitInfo.sId;
-        args.value = itemHitInfo.value;
-        args.acc = itemHitInfo.acc;
-        args.dataIndex = itemHitInfo.maxIndex;
+        if (hitItem) {
+          args.label = hitItem.data?.x || hitItem.data?.y;
+          args.seriesId = hitItemId;
+          args.value = hitItem.data?.o;
+          args.acc = hitItem.data?.acc;
+          args.dataIndex = hitItem.index;
+        }
       };
 
       const setSelectedSeriesInfo = () => {
-        const itemHitInfo = this.getItemByPosition(offset, false);
-        const hitInfo = this.getSeriesInfoByPosition(offset);
-        if (hitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, true);
+        const hitInfo = this.findHitItem(offset);
+        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItem = hitInfo.items[hitItemId];
 
-          args.label = itemHitInfo.label;
-          args.value = itemHitInfo.value;
-          args.seriesId = allSelectedList.seriesId?.at(0);
-          args.acc = itemHitInfo.acc;
-          args.dataIndex = itemHitInfo.maxIndex;
+        const seriesHitInfo = this.getSeriesInfoByPosition(offset);
+        if (seriesHitInfo.sId !== null) {
+          const allSelectedList = this.updateSelectedSeriesInfo(seriesHitInfo.sId, true);
+
+          if (hitItem) {
+            args.label = hitItem.data?.x || hitItem.data?.y;
+            args.value = hitItem.data?.o;
+            args.seriesId = allSelectedList.seriesId?.at(0);
+            args.acc = hitItem.data?.acc;
+            args.dataIndex = hitItem.index;
+          }
         }
       };
 
