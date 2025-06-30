@@ -257,7 +257,9 @@ const modules = {
       ctx.fillStyle = color;
 
       // 1. Draw series color
-      ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
+      // ctx.fillRect(itemX - 4, itemY - 12, 12, 12);
+      ctx.arc(itemX, itemY - 8, 4, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = opt.fontColor;
 
       // 2. Draw series name
