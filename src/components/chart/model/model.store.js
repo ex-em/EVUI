@@ -101,9 +101,6 @@ const modules = {
       }
 
       this.dataSet[key].length = this.options.realTimeScatter.range || 300;
-      this.dataSet[key].toTime = Math.floor(Date.now() / 1000) * 1000;
-      this.dataSet[key].fromTime = this.dataSet[key].toTime - this.dataSet[key].length * 1000;
-      this.dataSet[key].endIndex = this.dataSet[key].length - 1;
 
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
@@ -114,6 +111,14 @@ const modules = {
       }
 
       lastTime = Math.floor(lastTime / 1000) * 1000;
+
+      const dataGroupLastTime = this.dataSet[key].dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();
+
+      this.dataSet[key].toTime = lastTime
+        || (dataGroupLastTime ? Math.floor(dataGroupLastTime / 1000) * 1000 : 0);
+      this.dataSet[key].fromTime = this.dataSet[key].toTime - this.dataSet[key].length * 1000;
+      this.dataSet[key].endIndex = this.dataSet[key].length - 1;
+
       if (
         (this.dataSet[key].toTime - lastTime) / 1000
         > this.dataSet[key].length && key === ''
