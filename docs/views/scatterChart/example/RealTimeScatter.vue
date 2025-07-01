@@ -135,7 +135,7 @@ export default {
         let randomX = 0;
         let randomY = 0;
         if (!isInit) {
-          randomX = floor(Date.now() + getRandomInt(-3000, 0)); // -3초 ~ 현재
+          randomX = floor(Date.now() + getRandomInt(+1000, 0)); // -3초 ~ 현재
           randomY = floor(getRandomInt(3000, 95000));
         } else {
           randomX = floor(Date.now() + getRandomInt(-300000, 0)); // -5분 ~ 현재
@@ -195,12 +195,12 @@ export default {
 
     const tick = () => {
       setDataHandler();
-      timeoutId = setTimeout(tick, 3000);
+      timeoutId = setTimeout(tick, 100);
     };
 
     watch(() => isRealTime.value, () => {
       if (isRealTime.value) {
-        timeoutId = setTimeout(tick, 3000);
+        timeoutId = setTimeout(tick, 100);
       } else {
         clearTimeout(timeoutId);
       }
