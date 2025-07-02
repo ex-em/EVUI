@@ -11,7 +11,9 @@
     "docs": "vite serve --config vite.config.js --port 9999",
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production",
-    "preview": "vite preview --port 9999"
+    "preview": "vite preview --port 9999",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "files": ["dist"],
   "main": "dist/index.js",
