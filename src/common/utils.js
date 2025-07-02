@@ -1,25 +1,3 @@
-const windowConsole = window.console;
-export const Console = {
-  log(...data) {
-    windowConsole.log(...data);
-  },
-  warn(...data) {
-    windowConsole.warn(...data);
-  },
-  info(...data) {
-    windowConsole.info(...data);
-  },
-  error(...data) {
-    windowConsole.error(...data);
-  },
-  debug(...data) {
-    windowConsole.debug(...data);
-  },
-  dir(item, options) {
-    windowConsole.dir(item, options);
-  },
-};
-
 export function getQuantity(input) {
   let output = null;
   if (typeof input === 'string' || typeof input === 'number') {
@@ -39,38 +17,6 @@ export function getSize(size) {
   return sizeValue;
 }
 
-export function getMatchedComponentsDownward(context, componentName) {
-  const children = context.$children;
-  const result = [];
-  if (!children) {
-    return result;
-  }
-  for (let i = 0; i < children.length; i++) {
-    const v = children[i];
-    const name = v.$options.name;
-    if (name === componentName) {
-      result.push(v);
-    } else {
-      result.concat(getMatchedComponentsDownward(v, componentName));
-    }
-  }
-  return result;
-}
-
-export function getMatchedComponentUpward(context, componentName) {
-  let parent = context.$parent;
-  let name = parent.$options.name;
-
-  while (parent && (!name || componentName !== name)) {
-    parent = parent.$parent;
-    if (parent) {
-      name = parent.$options.name;
-    }
-  }
-
-  return parent;
-}
-
 export function truthyNumber(v) {
   return typeof v === 'number' && !Number.isNaN(v);
 }
@@ -81,15 +27,6 @@ export function truthy(...args) {
 
 export function convertToPercent(value, totalValue) {
   const res = (value / totalValue) * 100;
-  if (!truthy(value, totalValue, res) || value === 0 || totalValue === 0) {
-    return 0;
-  }
-
-  return res.toFixed(2);
-}
-
-export function convertToValue(value, totalValue) {
-  const res = (value / 100) * totalValue;
   if (!truthy(value, totalValue, res) || value === 0 || totalValue === 0) {
     return 0;
   }
