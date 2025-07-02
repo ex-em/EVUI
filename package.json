@@ -11,7 +11,7 @@
     "docs": "vite serve --config vite.config.js --port 9999",
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production",
-    "preview" : "vite preview --port 9999"
+    "preview": "vite preview --port 9999"
   },
   "files": ["dist"],
   "main": "dist/index.js",
@@ -55,7 +55,8 @@
     "marked": "^14.1.2",
     "stylelint": "^16.9.0",
     "stylelint-order": "^6.0.4",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "vue": "*"
