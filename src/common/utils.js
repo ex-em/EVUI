@@ -1,11 +1,53 @@
+/**
+ * 크기 값 문자열을 파싱하여 숫자와 단위로 분리합니다.
+ * @param {string|number} input - 파싱할 크기 값 ('100px', '50%', 'normal' 등)
+ * @returns {Object|null} { value: number, unit: string } 또는 null
+ * @example
+ * getQuantity('100px') // { value: 100, unit: 'px' }
+ * getQuantity('normal') // null (자동 크기 계산)
+ */
 export function getQuantity(input) {
-  let output = null;
-  if (typeof input === 'string' || typeof input === 'number') {
-    const match = /^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
-    output = match ? { value: +match[2], unit: match[3] || undefined } : null;
+  // 타입 체크: string 또는 number만 처리
+  if (typeof input !== 'string' && typeof input !== 'number') {
+    return null;
   }
 
-  return output;
+  // NaN 체크
+  if (Number.isNaN(input)) {
+    return null;
+  }
+
+  // Infinity 처리 (숫자와 문자열 모두)
+  if (input === Infinity || input === -Infinity || input === 'Infinity' || input === '-Infinity') {
+    return { value: +input, unit: undefined };
+  }
+
+  // 정규식으로 패턴 매치 시도
+  const match = /^(normal|(-*\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
+  if (!match) {
+    return null;
+  }
+
+  // 'normal' 키워드는 null 반환 (자동 크기 계산)
+  if (match[1] === 'normal') {
+    return null;
+  }
+
+  // 숫자 부분과 단위 부분 추출
+  const numberPart = match[2];
+  const unitPart = match[3];
+
+  // 다중 음수 부호 처리 (--10, ---5 등)
+  if (/^-{2,}/.test(numberPart)) {
+    const cleanedValue = numberPart.replace(/^-+/, '');
+    return { value: +cleanedValue, unit: null };
+  }
+
+  // 일반적인 숫자 파싱
+  return {
+    value: +numberPart,
+    unit: unitPart || undefined,
+  };
 }
 
 export function truthyNumber(v) {
