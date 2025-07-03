@@ -1,6 +1,5 @@
 import { convertToPercent } from '@/common/utils';
-import debounce from '@/common/utils.debounce';
-import { inRange } from 'lodash-es';
+import { inRange, debounce } from 'lodash-es';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 

@@ -1,6 +1,5 @@
 import { numberWithComma } from '@/common/utils';
-import throttle from '@/common/utils.throttle';
-import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
+import { cloneDeep, defaultsDeep, inRange, isEqual, throttle } from 'lodash-es';
 import dayjs from 'dayjs';
 
 const modules = {
