@@ -173,10 +173,34 @@ export function numberWithComma(v) {
  * getPrecision(3.14159) // 5
  * getPrecision(10) // 0
  * getPrecision(10.5) // 1
+ * getPrecision(0.00000001) // 8
  */
 export function getPrecision(v) {
-  const decimal = v?.toString().split('.')[1] || 0;
-  return decimal ? decimal.length : 0;
+  // null, undefined 체크
+  if (v == null) {
+    return 0;
+  }
+
+  const str = v.toString();
+
+  // 과학적 표기법 체크 (예: 1e-8, 2.5e-10)
+  if (str.includes('e')) {
+    const [mantissa, exponent] = str.split('e');
+    const exp = parseInt(exponent, 10);
+
+    // 지수가 음수인 경우 (소수)
+    if (exp < 0) {
+      const mantissaDecimals = mantissa.includes('.') ? mantissa.split('.')[1].length : 0;
+      return Math.abs(exp) + mantissaDecimals;
+    }
+
+    // 지수가 양수인 경우 (정수)
+    return 0;
+  }
+
+  // 일반 표기법의 경우 기존 로직 사용
+  const decimal = str.split('.')[1] || '';
+  return decimal.length;
 }
 
 /**
