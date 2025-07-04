@@ -1,5 +1,5 @@
 {
-  "name": "evui-test-env",
+  "name": "evui-test-workspace",
   "version": "1.0.0",
   "description": "독립적인 EVUI 테스트 환경",
   "type": "module",
