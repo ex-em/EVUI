@@ -23,8 +23,8 @@
     "types": ["vitest/globals"]
   },
   "include": [
-    "tests/**/*.ts",
-    "tests/**/*.vue",
+    "packages/**/*.ts",
+    "packages/**/*.vue",
     "vite.config.ts",
     "test-setup.ts",
     "../src/**/*.js",
