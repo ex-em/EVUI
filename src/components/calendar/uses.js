@@ -2,140 +2,41 @@ import {
   ref, reactive, computed, getCurrentInstance, unref, onBeforeMount, watch,
 } from 'vue';
 import { throttle } from 'lodash-es';
-
-const CALENDAR_ROWS = 6;
-const CALENDAR_COLS = 7;
-const CALENDAR_MONTH_ROWS = 4;
-const CALENDAR_MONTH_COLS = 3;
-const CALENDAR_YEAR_ROWS = 5;
-const CALENDAR_YEAR_COLS = 4;
-const MONTH_CNT = 12;
-const HOUR_CNT = 24;
-const MIN_CNT = 60;
-const SEC_CNT = 60;
-const CELL_CNT_IN_ONE_PAGE = 12;
-const CELL_CNT_IN_ONE_ROW = 4;
-const YEAR_CNT_IN_ONE_PAGE = 20;
-const MONTH_NAME_LIST = {
-  fullName: ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'],
-  numberName: ['1', '2', '3', '4', '5', '6',
-    '7', '8', '9', '10', '11', '12'],
-  abbrName: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
-  korName: ['1월', '2월', '3월', '4월', '5월', '6월',
-    '7월', '8월', '9월', '10월', '11월', '12월'],
-};
-const DAY_OF_THE_WEEK_NAME_LIST = {
-  abbrUpperName: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
-  abbrLowerName: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-  abbrPascalName: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-  abbrKorName: ['일', '월', '화', '수', '목', '금', '토'],
-};
-
-const LIST_TYPE = {
-  DATE: 'date',
-  MONTH: 'month',
-  YEAR: 'year',
-};
-
-const ONE_DAY_MS = 86400000;
-const MIN_DATE_MS = +new Date('1970-01-01 00:00:00'); // javascript 객체 최소 시간
-const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
-
-/**
- * 배열 내 여러 날짜(eg. 'YYYY-MM-DD' || 'YYYY-MM-DD HH:MI:SS') 중 가장 끝의 날짜 텍스트 구하기
- * @param arr
- * @param sideDirection - 끝의 방향 (first: 가장 멀리 오래된 날짜, last: 가장 최근의 날짜)
- * @returns {String} - 날짜 텍스트
- */
-const getSideDateStr = (arr, sideDirection) => {
-  if (!arr.length) return '';
-  if (sideDirection === 'last') {
-    return arr
-      .reduce((prev, cur) => (new Date(prev).getTime() > new Date(cur).getTime() ? prev : cur));
-  }
-  return arr
-    .reduce((prev, cur) => (new Date(prev).getTime() < new Date(cur).getTime() ? prev : cur));
-};
-
-/**
- * 월, 일을 두자리 숫자로 보정
- * @param num
- * @returns {string|*}
- */
-export const lpadToTwoDigits = (num) => {
-  if (num === null) {
-    return '00';
-  } else if (+num < 10) {
-    return `0${num}`;
-  }
-  return num;
-};
-
-/**
- * 이차원 배열 만들기
- * @param row
- * @param col
- * @returns {Array} - [row][col]
- */
-const getMatrixArr = (row, col) => Array.from(Array(row), () => Array(col).fill(false));
-
-/**
- * y년 m월 1일의 요일 구하기
- * @param y - 년
- * @param m - 월
- * @returns {number} - 해당 y년 m월 1일의 요일 (e.g. 0: SUN, ..., 6: SAT)
- *                   - 1주차에서 일요일부터 1일까지의 공백 개수
- */
-const getDayOfWeekOnThe1stOfMonth = (y, m) => new Date(`${y}-${m}-1`).getDay();
-
-/**
- * y년 m월 마지막 일자 구하기
- * @param y
- * @param m
- * @returns {number} - 해당 년, 월의 마지막 일자
- */
-export const getLastDateOfMonth = (y, m) => {
-  let day;
-  switch (m) {
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-      day = 30;
-      break;
-    case 2:
-      if (((y % 4 === 0) && (y % 100 !== 0)) || (y % 400 === 0)) {
-        day = 29;
-      } else {
-        day = 28;
-      }
-      break;
-    default:
-      day = 31;
-      break;
-  }
-  return day;
-};
-
-/**
- * date또는 time 형태로 format string으로 조합
- * @param year
- * @param month
- * @param date
- * @param hour
- * @param min
- * @param sec
- * @returns {string}
- */
-const formatDateTime = ({ year, month, date, hour, min, sec }) => {
-  if (hour !== undefined && min !== undefined && sec !== undefined) {
-    return `${year}-${lpadToTwoDigits(month)}-${lpadToTwoDigits(date)} ${lpadToTwoDigits(hour)}:${lpadToTwoDigits(min)}:${lpadToTwoDigits(sec)}`;
-  }
-  return `${year}-${lpadToTwoDigits(month)}-${lpadToTwoDigits(date)}`;
-};
+import {
+  CALENDAR_ROWS,
+  CALENDAR_COLS,
+  CALENDAR_MONTH_ROWS,
+  CALENDAR_MONTH_COLS,
+  CALENDAR_YEAR_ROWS,
+  CALENDAR_YEAR_COLS,
+  MONTH_CNT,
+  HOUR_CNT,
+  MIN_CNT,
+  SEC_CNT,
+  CELL_CNT_IN_ONE_PAGE,
+  CELL_CNT_IN_ONE_ROW,
+  MONTH_NAME_LIST,
+  DAY_OF_THE_WEEK_NAME_LIST,
+  LIST_TYPE,
+  ONE_DAY_MS,
+  MIN_DATE_MS,
+  dateReg,
+  dateTimeReg,
+} from './constants';
+import {
+  lpadToTwoDigits,
+  getMatrixArr,
+  getDayOfWeekOnThe1stOfMonth,
+  getLastDateOfMonth,
+  formatDateTime,
+  getDateTimeInfoByType,
+  getSideMonthCalendarInfo,
+  getTimeInfoByTimeFormat,
+  getChangedValueByTimeFormat,
+  compareFromAndToDateTime,
+  getDateMs,
+  getYearRange,
+} from './utils';
 
 /**
  * 첫번째 인자로 받은 날짜 형식 String ('YYYY-MM-DD' || 'YYYY-MM-DD HH:MI:SS')이나
@@ -146,148 +47,8 @@ const formatDateTime = ({ year, month, date, hour, min, sec }) => {
  * @param typeToImport
  * @returns {object|number}
  */
-const getDateTimeInfoByType = (param, typeToImport) => {
-  let str = unref(param);
-  if (Array.isArray(str)) {
-    str = getSideDateStr(param, 'last');
-  }
-  const result = {
-    year: +(str?.split(' ')[0]?.split('-')[0]) || null,
-    month: +(str?.split(' ')[0]?.split('-')[1]) || null,
-    date: +(str?.split(' ')[0]?.split('-')[2]) || null,
-    hour: +(str?.split(' ')[1]?.split(':')[0]) || 0,
-    min: +(str?.split(' ')[1]?.split(':')[1]) || 0,
-    sec: +(str?.split(' ')[1]?.split(':')[2]) || 0,
-  };
-  if (typeToImport === 'year') return result.year;
-  if (typeToImport === 'month') return result.month;
-  if (typeToImport === 'date') return result.date;
-  if (typeToImport === 'hour') return result.hour;
-  if (typeToImport === 'min') return result.min;
-  if (typeToImport === 'sec') return result.sec;
-  return result;
-};
-/**
- * 이전달, 다음달의 달력 상 연도, 월 정보 구하기
- * @param prevNext - 이전, 다음 여부 ('prev'|'next')
- * @param year
- * @param month
- * @returns {{month: number, year: *}}
- */
-const getSideMonthCalendarInfo = (prevNext, year, month) => {
-  if (prevNext === 'next') {
-    return {
-      year: month === 12 ? year + 1 : year,
-      month: ((month + 1) % 12) || 12,
-    };
-  }
-  return {
-    year: month === 1 ? year - 1 : year,
-    month: ((month - 1) % 12) || 12,
-  };
-};
-
-/**
- * timeFormat을 체크하여 timeFormat이 있으면 format에 맞는 형식으로 반환
- * @param timeFormat -- props.option?.timeFormat
- * @param dateTimeValue
- * @param typeToImport
- * @returns {Object|number}
- */
-const getTimeInfoByTimeFormat = (timeFormat, dateTimeValue, typeToImport) => {
-  const value = getDateTimeInfoByType(dateTimeValue, typeToImport);
-  if (timeFormat) {
-    const hour = timeFormat?.split(':')[0];
-    const min = timeFormat?.split(':')[1];
-    const sec = timeFormat?.split(':')[2];
-    if (typeToImport === 'hour') {
-      return hour === 'HH' ? value : +hour;
-    } else if (typeToImport === 'min') {
-      return min === 'mm' ? value : +min;
-    } else if (typeToImport === 'sec') {
-      return sec === 'ss' ? value : +sec;
-    }
-  }
-  return value;
-};
-
-/**
- * 초기 timeFormat에 따른 modelValue update 함수
- * @param timeFormat - props.options.timeFormat
- * @param modelValue
- * @returns string
- */
-export const getChangedValueByTimeFormat = (timeFormat, modelValue) => {
-  if (!modelValue) {
-    return '';
-  }
-
-  const hourByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'hour'));
-  const minByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'min'));
-  const secByTimeFormat = lpadToTwoDigits(getTimeInfoByTimeFormat(timeFormat, modelValue, 'sec'));
-
-  return `${modelValue.split(' ')[0]} ${hourByTimeFormat}:${minByTimeFormat}:${secByTimeFormat}`;
-};
-
-/**
- * 현재 달력의 날짜와 다음 달력의 날짜 비교 (disabledDate 옵션이 없는 경우만 적용)
- * @param mode - calendar mode
- * @param calendarType - 달력 종류 {main | expanded}
- * @param targetDate - 기준 날짜
- * @param modelValue - model value
- * @returns {*|boolean}
- */
-const compareFromAndToDateTime = (mode, calendarType, targetDate, modelValue) => {
-  if (!modelValue.length) {
-    return false;
-  }
-  let fromDate = calendarType === 'main' ? targetDate : modelValue[0];
-  let toDate = calendarType === 'expanded' ? targetDate : modelValue[1];
-
-  let fromDateTime = fromDate;
-  let toDateTime = toDate;
-  if (!targetDate.split(' ')[1]) {
-    if (mode === 'dateTimeRange') {
-      fromDate = fromDate.split(' ')[0];
-      toDate = toDate.split(' ')[0];
-      const fromTime = modelValue[0].split(' ')[1];
-      const toTime = modelValue[1].split(' ')[1];
-      fromDateTime = `${fromDate} ${fromTime}`;
-      toDateTime = `${toDate} ${toTime}`;
-    } else {
-      fromDateTime = `${fromDate} 00:00:00`;
-      toDateTime = `${toDate} 23:59:59`;
-    }
-  }
-
-  return (fromDateTime && toDateTime)
-    && new Date(fromDateTime).getTime() > +new Date(toDateTime).getTime();
-};
-
-/**
- * date string 값의 MS 값 구하기
- * @param dateStr
- * @returns {number}
- */
-const getDateMs = dateStr => new Date(`${dateStr}`).getTime();
-
-/**
- * Calendar 년도 범위 구하기
- * @param currentYear - 현재 Calendar 페이지 정보의 년도
- * @returns {{start: number, end: number}} - start: 시작년도, end: 마지막 년도
- */
-const getYearRange = (currentYear) => {
-  const multipleOf10 = 10 ** (currentYear.toString().length - 1);
-  const quotient = Math.floor(currentYear / multipleOf10);
-  const remainder = Math.floor(currentYear % (multipleOf10 * quotient));
-  const startYear = (quotient * multipleOf10)
-    + (Math.floor(remainder / YEAR_CNT_IN_ONE_PAGE) * YEAR_CNT_IN_ONE_PAGE);
-  const endYear = startYear + YEAR_CNT_IN_ONE_PAGE - 1;
-  return {
-    start: startYear,
-    end: endYear,
-  };
-};
+const getDateTimeInfoByTypeWithUnref = (param, typeToImport) =>
+  getDateTimeInfoByType(unref(param), typeToImport);
 
 export const useModel = () => {
   const { props } = getCurrentInstance();
@@ -368,11 +129,11 @@ export const useModel = () => {
   const mainValue = !['dateRange', 'dateTimeRange'].includes(props.mode) ? selectedValue.value : selectedValue.value[0];
   if (mainValue?.length) {
     mainCalendarPageInfo = {
-      year: getDateTimeInfoByType(mainValue, 'year'),
-      month: getDateTimeInfoByType(mainValue, 'month'),
-      hour: Math.floor(getDateTimeInfoByType(mainValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
-      min: Math.floor(getDateTimeInfoByType(mainValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
-      sec: Math.floor(getDateTimeInfoByType(mainValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
+      year: getDateTimeInfoByTypeWithUnref(mainValue, 'year'),
+      month: getDateTimeInfoByTypeWithUnref(mainValue, 'month'),
+      hour: Math.floor(getDateTimeInfoByTypeWithUnref(mainValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
+      min: Math.floor(getDateTimeInfoByTypeWithUnref(mainValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
+      sec: Math.floor(getDateTimeInfoByTypeWithUnref(mainValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1,
     };
   } else {
     mainCalendarPageInfo = {
@@ -392,14 +153,14 @@ export const useModel = () => {
   ) {
     const expandedValue = selectedValue.value[1];
     expandedCalendarPageInfo = {
-      year: getDateTimeInfoByType(expandedValue, 'year'),
-      month: getDateTimeInfoByType(expandedValue, 'month'),
+      year: getDateTimeInfoByTypeWithUnref(expandedValue, 'year'),
+      month: getDateTimeInfoByTypeWithUnref(expandedValue, 'month'),
     };
 
     if (props.mode === 'dateTimeRange') {
-      expandedCalendarPageInfo.hour = Math.floor(getDateTimeInfoByType(expandedValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
-      expandedCalendarPageInfo.min = Math.floor(getDateTimeInfoByType(expandedValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
-      expandedCalendarPageInfo.sec = Math.floor(getDateTimeInfoByType(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.hour = Math.floor(getDateTimeInfoByTypeWithUnref(expandedValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.min = Math.floor(getDateTimeInfoByTypeWithUnref(expandedValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.sec = Math.floor(getDateTimeInfoByTypeWithUnref(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
     }
   } else {
     expandedCalendarPageInfo = {
@@ -467,6 +228,8 @@ export const useModel = () => {
     // isContinuousMonths,
   };
 };
+
+export { lpadToTwoDigits, getLastDateOfMonth, getChangedValueByTimeFormat };
 
 export const useCalendarDate = (param) => {
   const { props } = getCurrentInstance();
