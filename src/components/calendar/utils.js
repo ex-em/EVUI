@@ -1,3 +1,5 @@
+import { padStart } from 'lodash-es';
+import dayjs from 'dayjs';
 import {
   YEAR_CNT_IN_ONE_PAGE,
 } from './constants';
@@ -10,11 +12,12 @@ import {
  */
 export const getSideDateStr = (arr, sideDirection) => {
   if (!arr.length) return '';
+  const validDates = arr.filter(date => dayjs(date).isValid());
   if (sideDirection === 'last') {
-    return arr
+    return validDates
       .reduce((prev, cur) => (new Date(prev).getTime() > new Date(cur).getTime() ? prev : cur));
   }
-  return arr
+  return validDates
     .reduce((prev, cur) => (new Date(prev).getTime() < new Date(cur).getTime() ? prev : cur));
 };
 
@@ -24,12 +27,22 @@ export const getSideDateStr = (arr, sideDirection) => {
  * @returns {string|*}
  */
 export const lpadToTwoDigits = (num) => {
-  if (num === null) {
+  if (num == null) {
     return '00';
-  } else if (+num < 10) {
-    return `0${num}`;
   }
-  return num;
+
+  const numeric = Number(num);
+
+  // NaN 방지: 숫자로 변환되지 않으면 0으로 취급
+  if (isNaN(numeric)) {
+    return '00';
+  }
+
+  if (numeric < 10 && numeric >= 0) {
+    return padStart(String(numeric), 2, '0');
+  }
+
+  return String(numeric);
 };
 
 /**
