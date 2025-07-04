@@ -11,7 +11,7 @@ import {
   getPrecision,
   checkNullAndUndefined,
   mobileCheck,
-} from '../../src/common/utils';
+} from '../../../src/common/utils';
 
 describe('getQuantity 함수', () => {
   describe('문자열 파싱', () => {
