@@ -288,6 +288,7 @@ export default {
       return {
         table: true,
         adjust: this.adjust,
+        'ev-grid': true,
         'v-scroll': this.hasVerticalScrollBar,
         'non-header': !this.showHeader,
       };
