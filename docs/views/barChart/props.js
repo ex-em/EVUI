@@ -26,6 +26,8 @@ import HoverWithGroup from './example/HoverWithGroup';
 import HoverWithGroupRaw from '!!raw-loader!./example/HoverWithGroup';
 import AxisControl from './example/AxisControl';
 import AxisControlRaw from '!!raw-loader!./example/AxisControl';
+import Scrollbar from './example/Scrollbar';
+import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
 
 export default {
   mdText,
@@ -96,6 +98,11 @@ export default {
       description: 'axis control',
       component: AxisControl,
       parsedData: parseComponent(AxisControlRaw),
+    },
+    Scrollbar: {
+      description: '차트에 스크롤바를 추가할 수 있습니다.',
+      component: Scrollbar,
+      parsedData: parseComponent(ScrollbarRaw),
     },
   },
 };
