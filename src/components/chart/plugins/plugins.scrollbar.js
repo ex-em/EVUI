@@ -70,8 +70,12 @@ const module = {
    * update scrollbar information
    */
   updateScrollbar(updateData) {
+    if (this.options.axesX[0]?.scrollbar?.resetPosition) {
     this.updateScrollbarInfo('x', updateData);
+    }
+    if (this.options.axesY[0]?.scrollbar?.resetPosition) {
     this.updateScrollbarInfo('y', updateData);
+    }
   },
 
   /**
