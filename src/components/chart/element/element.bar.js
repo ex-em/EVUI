@@ -46,7 +46,6 @@ class Bar {
     }
 
     const { isHorizontal, showValue } = this;
-
     const ctx = param.ctx;
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
@@ -70,6 +69,7 @@ class Bar {
       [minIndex, maxIndex] = [minmaxX.minIndex, minmaxX.maxIndex];
     }
 
+    // minIndex, maxIndex가 유효하면 실제 그릴 데이터 개수로 보정
     if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
       totalCount = (maxIndex - minIndex) + 1;
     }
@@ -126,112 +126,110 @@ class Bar {
     this.borderRadius = param.borderRadius;
     this.filteredCount = totalCount;
 
-    let categoryPoint = null;
+    // 스크롤 범위 내에서만 루프 돌림
+    for (let i = minIndex; i <= maxIndex; i++) {
+      const screenIndex = i - minIndex; // 화면에 그릴 data 배열의 인덱스
+      const item = this.data[screenIndex];
+      if (item) {
+        // 스크롤 offset(minIndex)만큼 보정해서 그리기
 
-    this.data.forEach((dataItem, index) => {
-      ctx.beginPath();
-
-      const item = dataItem;
-
-      if (truthyNumber(minIndex) && index < minIndex) {
-        return;
-      } else if (truthyNumber(minIndex) && index > maxIndex) {
-        return;
-      }
-
-      if (isHorizontal) {
-        categoryPoint = ysp - (cArea * (index - (minIndex || 0))) - cPad;
-      } else {
-        categoryPoint = xsp + (cArea * (index - (minIndex || 0))) + cPad;
-      }
-
-      if (isHorizontal) {
-        x = xsp;
-        y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
-      } else {
-        x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
-        y = ysp;
-      }
-
-      if (isHorizontal) {
-        if (item.b) {
-          w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-          x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+        let categoryPoint;
+        if (isHorizontal) {
+          categoryPoint = ysp - (cArea * (screenIndex)) - cPad;
         } else {
-          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+          categoryPoint = xsp + (cArea * (screenIndex)) + cPad;
         }
-      } else if (item.b) { // vertical stack bar chart
-        h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-        y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-      } else { // vertical bar chart
-        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
-      }
 
-      const barColor = item.dataColor || this.color;
-
-      const legendHitInfo = param?.legendHitInfo;
-      const selectLabelOption = param?.selectLabel?.option;
-      const selectItemOption = param?.selectItem?.option;
-      const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
-      const {
-        dataIndex: selectedItemDataIndex,
-        seriesID: selectedItemSeriesId,
-      } = param?.selectItem?.selected ?? {};
-
-      let isDownplay = false;
-
-      if (legendHitInfo) {
-        isDownplay = legendHitInfo?.sId !== this.sId;
-      } else if (selectLabelOption?.use && selectLabelOption?.useSeriesOpacity) {
-        isDownplay = selectedLabelList.length && !selectedLabelList.includes(index);
-      } else if (truthy(selectedItemDataIndex) && selectItemOption?.useSeriesOpacity) {
-        if (this.isExistGrp) {
-          isDownplay = selectedItemDataIndex !== index;
+        if (isHorizontal) {
+          x = xsp;
+          y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
         } else {
-          isDownplay = selectedItemDataIndex !== index || selectedItemSeriesId !== this.sId;
+          x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
+          y = ysp;
         }
-      }
 
-      if (typeof barColor !== 'string') {
-        ctx.fillStyle = Canvas.createGradient(
+        if (isHorizontal) {
+          if (item.b) {
+            w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
+            x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+          } else {
+            w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+          }
+        } else if (item.b) { // vertical stack bar chart
+          h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
+          y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+        } else { // vertical bar chart
+          h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+        }
+
+        const barColor = item.dataColor || this.color;
+
+        const legendHitInfo = param?.legendHitInfo;
+        const selectLabelOption = param?.selectLabel?.option;
+        const selectItemOption = param?.selectItem?.option;
+        const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
+        const {
+          dataIndex: selectedItemDataIndex,
+          seriesID: selectedItemSeriesId,
+        } = param?.selectItem?.selected ?? {};
+
+        let isDownplay = false;
+
+        if (legendHitInfo) {
+          isDownplay = legendHitInfo?.sId !== this.sId;
+        } else if (selectLabelOption?.use && selectLabelOption?.useSeriesOpacity) {
+          isDownplay = selectedLabelList.length && !selectedLabelList.includes(i);
+        } else if (truthy(selectedItemDataIndex) && selectItemOption?.useSeriesOpacity) {
+          if (this.isExistGrp) {
+            isDownplay = selectedItemDataIndex !== i;
+          } else {
+            isDownplay = selectedItemDataIndex !== i || selectedItemSeriesId !== this.sId;
+          }
+        }
+
+        if (typeof barColor !== 'string') {
+          ctx.fillStyle = Canvas.createGradient(
+            ctx,
+            isHorizontal,
+            { x, y, w, h },
+            barColor,
+            isDownplay,
+          );
+        } else {
+          const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
+          const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
+
+          ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
+        }
+
+        this.drawBar({
           ctx,
-          isHorizontal,
-          { x, y, w, h },
-          barColor,
-          isDownplay,
-        );
-      } else {
-        const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
-        const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
-
-        ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
-      }
-
-      this.drawBar({
-        ctx,
-        positions: { x, y, w, h },
-      });
-
-      if (showValue.use) {
-        this.drawValueLabels({
-          context: ctx,
-          data: item,
-          positions: {
-            x,
-            y,
-            h,
-            w,
-          },
-          isHighlight: false,
-          textColor: item.dataTextColor,
+          positions: { x, y, w, h },
         });
-      }
 
-      item.xp = x; // eslint-disable-line
-      item.yp = y; // eslint-disable-line
-      item.w = w; // eslint-disable-line
-      item.h = isHorizontal ? -h : h; // eslint-disable-line
-    });
+        if (showValue.use) {
+          this.drawValueLabels({
+            context: ctx,
+            data: item,
+            positions: {
+              x,
+              y,
+              h,
+              w,
+            },
+            isHighlight: false,
+            textColor: item.dataTextColor,
+          });
+        }
+
+        // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
+        item.xp = x; // eslint-disable-line
+        item.yp = y; // eslint-disable-line
+        item.w = w; // eslint-disable-line
+        item.h = isHorizontal ? -h : h; // eslint-disable-line
+        item.index = i; // 실제 데이터 인덱스
+      }
+    }
   }
 
   /**
