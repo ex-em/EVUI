@@ -2,23 +2,46 @@
   <div class="case">
     <ev-chart
       ref="chart"
+      v-model:selectedLabel="defaultSelectLabel"
       :data="chartData1"
       :options="chartOptions1"
       @click="onClick"
     />
-    <ev-chart :data="chartData2" :options="chartOptions2" @click="onClick" />
+    <ev-chart
+      v-model:selectedLabel="defaultSelectLabel"
+      :data="chartData2"
+      :options="chartOptions2"
+      @click="onClick"
+    />
     <div class="options description">
-      <div class="option-item">
-        <ev-toggle v-model="isResetPosition" />
-        <span>
-          스크롤위치 초기화여부
-        </span>
+      <ev-toggle v-model="isResetPosition" />
+      <span>
+        스크롤위치 초기화여부
+      </span>
+
+      <ev-toggle v-model="isFixedPosTop" />
+      <span class="left">
+        tip 위치를 최상단에 고정
+      </span>
+
+      <ev-button @click="toggleSelectData">
+        <span>select by v-model</span>
+      </ev-button>
+      <span class="left">
+        차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을
+        변경해서 라벨 선택
+      </span>
+
+      <ev-button @click="updateData">
+        Update Data
+      </ev-button>
+
+      <div />
+
+      <div class="badge yellow">
+        v-model:selectedLabel
       </div>
-      <div class="option-item">
-        <ev-button @click="updateData">
-          Update Data
-        </ev-button>
-      </div>
+      <div>{{ defaultSelectLabel }}</div>
     </div>
   </div>
 </template>
@@ -31,6 +54,25 @@ export default {
 
   setup() {
     const chart = ref(null);
+
+    const clickedLabel = ref();
+    const onClick = ({ selected }) => {
+      clickedLabel.value = selected;
+    };
+
+    const defaultSelectLabel = ref({
+      dataIndex: [0],
+    });
+
+    const toggleSelectData = () => {
+      const arr = defaultSelectLabel.value.dataIndex;
+      const newIndex = (arr.pop() + 1) % 9;
+      if (!arr.includes(newIndex)) {
+        arr.push(newIndex);
+      }
+    };
+
+    const isFixedPosTop = ref(false);
 
     const isResetPosition = ref(false);
 
@@ -111,7 +153,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -168,7 +210,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: false,
+        fixedPosTop: isFixedPosTop,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -202,10 +244,14 @@ export default {
       chart,
       chartData1,
       chartData2,
+      isFixedPosTop,
       isResetPosition,
       chartOptions1,
       chartOptions2,
+      defaultSelectLabel,
       updateData,
+      onClick,
+      toggleSelectData,
     };
   },
 };
@@ -213,13 +259,8 @@ export default {
 
 <style lang="scss" scoped>
 .options {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   gap: 10px;
-}
-.option-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 </style>
