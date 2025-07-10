@@ -2,18 +2,18 @@
   <div class="case">
     <ev-chart
       ref="chart"
-      v-model:selectedLabel="defaultSelectLabel"
       :data="chartData1"
       :options="chartOptions1"
       @click="onClick"
     />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData3"
-      :options="chartOptions3"
-      @click="onClick"
-    />
+    <ev-chart :data="chartData2" :options="chartOptions2" @click="onClick" />
     <div class="description">
+      <br />
+      <ev-toggle v-model="isResetPosition" />
+      <span class="left">
+        스크롤위치 초기화여부
+      </span>
+      <br />
       <ev-button @click="updateData">
         Update Data
       </ev-button>
@@ -29,6 +29,8 @@ export default {
 
   setup() {
     const chart = ref(null);
+
+    const isResetPosition = ref(false);
 
     const chartData1 = ref({
       series: {
@@ -53,7 +55,7 @@ export default {
       },
     });
 
-    const chartData3 = ref({
+    const chartData2 = ref({
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
@@ -64,8 +66,6 @@ export default {
         series2: [100, 150, 51, 150, 450],
       },
     });
-
-    const isFixedPosTop = ref(false);
 
     const chartOptions1 = ref({
       type: 'bar',
@@ -91,6 +91,7 @@ export default {
           scrollbar: {
             use: true,
             showButton: true,
+            resetPosition: isResetPosition,
           },
         },
       ],
@@ -108,7 +109,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: isFixedPosTop,
+        fixedPosTop: false,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -123,7 +124,7 @@ export default {
       },
     });
 
-    const chartOptions3 = ref({
+    const chartOptions2 = ref({
       type: 'bar',
       thickness: 0.8,
       width: '100%',
@@ -147,6 +148,7 @@ export default {
           scrollbar: {
             use: true,
             showButton: true,
+            resetPosition: isResetPosition,
           },
         },
       ],
@@ -164,7 +166,7 @@ export default {
         limit: 2,
         useDeselectOverflow: true,
         showTip: true,
-        fixedPosTop: isFixedPosTop,
+        fixedPosTop: false,
         useApproximateValue: true,
         tipBackground: '#FF0000',
         useSeriesOpacity: true,
@@ -179,40 +181,13 @@ export default {
       },
     });
 
-    const clickedLabel = ref();
-    const onClick = ({ selected }) => {
-      clickedLabel.value = selected;
-    };
-
-    const defaultSelectItem = ref({
-      seriesID: 'series1',
-      dataIndex: 1,
-    });
-    const defaultSelectLabel = ref({
-      dataIndex: [0],
-    });
-
-    const toggleSelectData = () => {
-      const arr = defaultSelectLabel.value.dataIndex;
-      const newIndex = (arr.pop() + 1) % 9;
-      if (!arr.includes(newIndex)) {
-        arr.push(newIndex);
-      }
-    };
-
-    const toggleOverflow = () => {
-      const b = chartOptions1.value.selectLabel.useDeselectOverflow;
-      chartOptions1.value.selectLabel.useDeselectOverflow = !b;
-      chartOptions3.value.selectLabel.useDeselectOverflow = !b;
-    };
-
     const updateData = () => {
       const getRandArr = (count) =>
         Array(count)
           .fill(0)
           .map(() => Math.ceil(Math.random() * 100));
 
-      const chartList = [chartData1, chartData3];
+      const chartList = [chartData1, chartData2];
       chartList.forEach((c) => {
         const seriesList = ['series1', 'series2'];
         seriesList.forEach((sId) => {
@@ -224,16 +199,10 @@ export default {
     return {
       chart,
       chartData1,
-      chartData3,
-      isFixedPosTop,
+      chartData2,
+      isResetPosition,
       chartOptions1,
-      chartOptions3,
-      clickedLabel,
-      defaultSelectItem,
-      defaultSelectLabel,
-      onClick,
-      toggleSelectData,
-      toggleOverflow,
+      chartOptions2,
       updateData,
     };
   },
