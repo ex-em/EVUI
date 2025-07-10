@@ -26,6 +26,7 @@ class Line {
       normal: { opacity: 1, lineWidth: 1 },
       highlight: { opacity: 1, lineWidth: 2 },
     };
+    /** @type {import('../model/index').ChartSeriesDataPoint[]} */
     this.data = [];
     this.beforeMouseXp = 0;
     this.beforeMouseYp = 0;
@@ -33,12 +34,23 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = !!this.passingValue;
+    this.usePassingValue = !isUndefined(this.passingValue);
   }
 
   /**
+   * @typedef {Object} LineDrawParam
+   * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
+   * @property {object} chartRect - 차트 영역 정보
+   * @property {object} labelOffset - 라벨 오프셋 정보
+   * @property {object} axesSteps - 축 스텝 정보
+   * @property {object} [selectLabel] - 선택된 라벨 정보
+   * @property {object} [selectSeries] - 선택된 시리즈 정보
+   * @property {object} [legendHitInfo] - 범례 히트 정보
+   * @property {boolean} [isBrush] - 브러시 사용 여부
+   */
+  /**
    * Draw series data
-   * @param {object} param     object for drawing series data
+   * @param {LineDrawParam} param     object for drawing series data
    *
    * @returns {undefined}
    */

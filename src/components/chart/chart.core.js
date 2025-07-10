@@ -570,8 +570,9 @@ class EvChart {
 
   /**
    * Get chart DOM size and set canvas size
+   * @typedef {import('./model/index').ChartDOMSize} ChartDOMSize
    *
-   * @returns {object} chart size information
+   * @returns {ChartDOMSize} chart size information
    */
   getChartDOMRect() {
     const rect = this.chartDOM?.getBoundingClientRect();
@@ -586,8 +587,9 @@ class EvChart {
 
   /**
    * Calculate chart size
+   * @typedef {import('./model/index').ChartRect} ChartRect
    *
-   * @returns {object} chart size information
+   * @returns {ChartRect} chart size information
    */
   getChartRect() {
     const { width, height } = this.getChartDOMRect();
