@@ -7,16 +7,18 @@
       @click="onClick"
     />
     <ev-chart :data="chartData2" :options="chartOptions2" @click="onClick" />
-    <div class="description">
-      <br />
-      <ev-toggle v-model="isResetPosition" />
-      <span class="left">
-        스크롤위치 초기화여부
-      </span>
-      <br />
-      <ev-button @click="updateData">
-        Update Data
-      </ev-button>
+    <div class="options description">
+      <div class="option-item">
+        <ev-toggle v-model="isResetPosition" />
+        <span>
+          스크롤위치 초기화여부
+        </span>
+      </div>
+      <div class="option-item">
+        <ev-button @click="updateData">
+          Update Data
+        </ev-button>
+      </div>
     </div>
   </div>
 </template>
@@ -210,12 +212,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.description {
-  position: relative;
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.left {
-  position: absolute;
-  left: 160px;
-  padding-top: 10px;
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>
