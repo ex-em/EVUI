@@ -507,7 +507,38 @@ const module = {
     this.onScrollbarWheel = (e) => {
       e.preventDefault();
 
-      this.updateScrollbarRange('y', e.deltaY < 0);
+      const threshold = 1; // 최소 스크롤 임계값
+
+      // Shift + 휠: 가로 스크롤 (일반 마우스 휠 지원)
+      if (this.scrollbar.x?.use && e.shiftKey && Math.abs(e.deltaY) > threshold) {
+        this.updateScrollbarRange('x', e.deltaY > 0);
+        return;
+      }
+
+      // 대각선 스크롤 처리: 더 큰 방향을 우선으로 처리
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+
+      if (absX > threshold && absY > threshold) {
+        // 두 방향 모두 임계값 이상일 때: 더 큰 방향을 우선 처리
+        if (absX > absY && this.scrollbar.x?.use) {
+          this.updateScrollbarRange('x', e.deltaX > 0);
+        } else if (absY > absX && this.scrollbar.y?.use) {
+          this.updateScrollbarRange('y', e.deltaY < 0);
+        }
+        return;
+      }
+
+      // 가로 스크롤 처리 (deltaX - 트랙패드 좌우 스크롤)
+      if (this.scrollbar.x?.use && absX > threshold) {
+        this.updateScrollbarRange('x', e.deltaX > 0);
+        return;
+      }
+
+      // 세로 스크롤 처리 (deltaY)
+      if (this.scrollbar.y?.use && absY > threshold) {
+        this.updateScrollbarRange('y', e.deltaY < 0);
+      }
     };
 
     if (this.scrollbar.x.use && !this.scrollbar.x.isInit) {
@@ -522,6 +553,10 @@ const module = {
       scrollbarYDOM.addEventListener('click', this.onScrollbarClick);
       scrollbarYDOM.addEventListener('mousedown', this.onScrollbarDown);
       scrollbarYDOM.addEventListener('mouseleave', this.onScrollbarLeave);
+    }
+
+    // 가로 또는 세로 스크롤바가 있으면 휠 이벤트 등록
+    if (this.scrollbar.x?.use || this.scrollbar.y?.use) {
       this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel, { passive: false });
     }
   },
@@ -634,13 +669,14 @@ const module = {
    * @param dir axis direction ('x' | 'y')
    */
   destroyScrollbar(dir) {
-    const scrollbarXDOM = this.scrollbar[dir].dom;
+    const scrollbarDOM = this.scrollbar[dir].dom;
 
-    if (scrollbarXDOM) {
-      scrollbarXDOM.remove();
+    if (scrollbarDOM) {
+      scrollbarDOM.remove();
       this.scrollbar[dir] = { isInit: false };
 
-      if (dir === 'y') {
+      // 가로, 세로 스크롤바 모두 없어지면 휠 이벤트 제거
+      if (!this.scrollbar.x?.use && !this.scrollbar.y?.use) {
         this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, { passive: false });
       }
     }
