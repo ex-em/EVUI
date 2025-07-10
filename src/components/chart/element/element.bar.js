@@ -126,9 +126,12 @@ class Bar {
     this.borderRadius = param.borderRadius;
     this.filteredCount = totalCount;
 
+    const startIndex = truthyNumber(minIndex) ? minIndex : 0;
+    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
+
     // 스크롤 범위 내에서만 루프 돌림
-    for (let i = minIndex; i <= maxIndex; i++) {
-      const screenIndex = i - minIndex; // 화면에 그릴 data 배열의 인덱스
+    for (let i = startIndex; i <= endIndex; i++) {
+      const screenIndex = i - startIndex; // 화면에 그릴 data 배열의 인덱스
       const item = this.data[screenIndex];
       if (item) {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
