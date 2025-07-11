@@ -31,9 +31,15 @@
         차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을
         변경해서 라벨 선택
       </span>
-
       <ev-button @click="updateData">
         Update Data
+      </ev-button>
+      <span>
+        데이터 업데이트
+      </span>
+
+      <ev-button @click="updateDataWithDynamicRange">
+        Update Data With Dynamic Range
       </ev-button>
       <span>
         데이터 업데이트
@@ -138,10 +144,21 @@ export default {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
       },
-      labels: ['value1', 'value2', 'value3', 'value4', 'value5'],
+      labels: [
+        'value1',
+        'value2',
+        'value3',
+        'value4',
+        'value5',
+        'value6',
+        'value7',
+        'value8',
+        'value9',
+        'value10',
+      ],
       data: {
-        series1: [100, 150, 51, 150, 350],
-        series2: [100, 150, 51, 150, 450],
+        series1: [100, 150, 51, 150, 350, 100, 150, 51, 150, 350],
+        series2: [100, 150, 51, 150, 450, 100, 150, 51, 150, 450],
       },
     });
 
@@ -261,14 +278,30 @@ export default {
       },
     });
 
+    const getRandArr = (count) =>
+      Array(count)
+        .fill(0)
+        .map(() => Math.ceil(Math.random() * 100));
+
     const updateData = () => {
+      // chartData1: 10개로 설정
+      chartData1.value.labels = Array(10)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData1.value.data.series1 = getRandArr(10);
+      chartData1.value.data.series2 = getRandArr(10);
+
+      // chartData2: 10개로 설정
+      chartData2.value.labels = Array(10)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData2.value.data.series1 = getRandArr(10);
+      chartData2.value.data.series2 = getRandArr(10);
+    };
+
+    const updateDataWithDynamicRange = () => {
       // 5~10개 사이의 랜덤 길이로 라벨/데이터 생성
       const getRandLength = () => Math.floor(Math.random() * 6) + 5; // 5~10
-      const getRandArr = (count) =>
-        Array(count)
-          .fill(0)
-          .map(() => Math.ceil(Math.random() * 100));
-
       // 랜덤 길이
       const len = getRandLength();
       const labels = Array(len)
@@ -288,11 +321,6 @@ export default {
 
     // 구체적인 테스트: 10개 → 7개로 줄이기
     const testTenToSeven = () => {
-      const getRandArr = (count) =>
-        Array(count)
-          .fill(0)
-          .map(() => Math.ceil(Math.random() * 100));
-
       // chartData1: 10개로 설정
       chartData1.value.labels = Array(10)
         .fill(0)
@@ -310,11 +338,6 @@ export default {
 
     // 7개로 줄이기
     const reduceToSeven = () => {
-      const getRandArr = (count) =>
-        Array(count)
-          .fill(0)
-          .map(() => Math.ceil(Math.random() * 100));
-
       // chartData1: 7개로 줄이기
       chartData1.value.labels = Array(7)
         .fill(0)
@@ -357,6 +380,7 @@ export default {
       chartOptions2,
       defaultSelectLabel,
       updateData,
+      updateDataWithDynamicRange,
       onClick,
       toggleSelectData,
       // range 테스트용 함수 추가
