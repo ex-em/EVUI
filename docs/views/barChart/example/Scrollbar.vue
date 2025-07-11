@@ -35,6 +35,40 @@
       <ev-button @click="updateData">
         Update Data
       </ev-button>
+      <span>
+        데이터 업데이트
+      </span>
+
+      <!-- options의 range를 직접 바꿔서 스크롤/데이터 동기화 테스트용 버튼 -->
+      <ev-button @click="setRangeToFirstHalf">
+        <span>range: 앞 절반</span>
+      </ev-button>
+      <span>
+        데이터 업데이트
+      </span>
+      <ev-button @click="setRangeToLastHalf">
+        <span>range: 뒤 절반</span>
+      </ev-button>
+      <span>
+        데이터 업데이트
+      </span>
+      <span class="left">
+        options의 range를 직접 바꿔서 스크롤/데이터 동기화 테스트
+      </span>
+
+      <!-- 10개 → 7개 테스트 버튼들 -->
+      <ev-button @click="testTenToSeven">
+        <span>데이터 10개로 설정</span>
+      </ev-button>
+      <span>
+        테스트용 데이터 10개 생성
+      </span>
+      <ev-button @click="reduceToSeven">
+        <span>데이터 7개로 줄이기</span>
+      </ev-button>
+      <span>
+        데이터를 7개로 줄여서 스크롤바 나가는 문제 재현
+      </span>
 
       <div />
 
@@ -111,6 +145,8 @@ export default {
       },
     });
 
+    const RANGE = [0, 2];
+
     const chartOptions1 = ref({
       type: 'bar',
       thickness: 0.8,
@@ -131,7 +167,7 @@ export default {
             fitWidth: true,
             fitDir: 'left',
           },
-          range: [0, 1],
+          range: RANGE,
           scrollbar: {
             use: true,
             showButton: true,
@@ -188,7 +224,7 @@ export default {
             fitWidth: true,
             fitDir: 'left',
           },
-          range: [0, 1],
+          range: RANGE,
           scrollbar: {
             use: true,
             showButton: true,
@@ -226,18 +262,89 @@ export default {
     });
 
     const updateData = () => {
+      // 5~10개 사이의 랜덤 길이로 라벨/데이터 생성
+      const getRandLength = () => Math.floor(Math.random() * 6) + 5; // 5~10
       const getRandArr = (count) =>
         Array(count)
           .fill(0)
           .map(() => Math.ceil(Math.random() * 100));
 
-      const chartList = [chartData1, chartData2];
-      chartList.forEach((c) => {
-        const seriesList = ['series1', 'series2'];
-        seriesList.forEach((sId) => {
-          c.value.data[sId] = getRandArr(5);
-        });
-      });
+      // 랜덤 길이
+      const len = getRandLength();
+      const labels = Array(len)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      const series1 = getRandArr(len);
+      const series2 = getRandArr(len);
+
+      chartData1.value.labels = labels;
+      chartData1.value.data.series1 = series1;
+      chartData1.value.data.series2 = series2;
+
+      chartData2.value.labels = labels;
+      chartData2.value.data.series1 = series1;
+      chartData2.value.data.series2 = series2;
+    };
+
+    // 구체적인 테스트: 10개 → 7개로 줄이기
+    const testTenToSeven = () => {
+      const getRandArr = (count) =>
+        Array(count)
+          .fill(0)
+          .map(() => Math.ceil(Math.random() * 100));
+
+      // chartData1: 10개로 설정
+      chartData1.value.labels = Array(10)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData1.value.data.series1 = getRandArr(10);
+      chartData1.value.data.series2 = getRandArr(10);
+
+      // chartData2: 10개로 설정
+      chartData2.value.labels = Array(10)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData2.value.data.series1 = getRandArr(10);
+      chartData2.value.data.series2 = getRandArr(10);
+    };
+
+    // 7개로 줄이기
+    const reduceToSeven = () => {
+      const getRandArr = (count) =>
+        Array(count)
+          .fill(0)
+          .map(() => Math.ceil(Math.random() * 100));
+
+      // chartData1: 7개로 줄이기
+      chartData1.value.labels = Array(7)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData1.value.data.series1 = getRandArr(7);
+      chartData1.value.data.series2 = getRandArr(7);
+
+      // chartData2: 7개로 줄이기
+      chartData2.value.labels = Array(7)
+        .fill(0)
+        .map((_, i) => `value${i + 1}`);
+      chartData2.value.data.series1 = getRandArr(7);
+      chartData2.value.data.series2 = getRandArr(7);
+    };
+
+    // options의 range를 앞 절반으로 설정하는 함수
+    const setRangeToFirstHalf = () => {
+      // chartData1: X축 range
+      const len1 = chartData1.value.labels.length;
+      chartOptions1.value.axesX[0].range = [0, Math.floor(len1 / 2)];
+      // chartData2: Y축 range
+      const len2 = chartData2.value.labels.length;
+      chartOptions2.value.axesY[0].range = [0, Math.floor(len2 / 2)];
+    };
+    // options의 range를 뒤 절반으로 설정하는 함수
+    const setRangeToLastHalf = () => {
+      const len1 = chartData1.value.labels.length;
+      chartOptions1.value.axesX[0].range = [Math.floor(len1 / 2), len1 - 1];
+      const len2 = chartData2.value.labels.length;
+      chartOptions2.value.axesY[0].range = [Math.floor(len2 / 2), len2 - 1];
     };
 
     return {
@@ -252,6 +359,11 @@ export default {
       updateData,
       onClick,
       toggleSelectData,
+      // range 테스트용 함수 추가
+      setRangeToFirstHalf,
+      setRangeToLastHalf,
+      testTenToSeven,
+      reduceToSeven,
     };
   },
 };
