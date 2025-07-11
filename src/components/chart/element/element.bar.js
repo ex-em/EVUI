@@ -131,8 +131,8 @@ class Bar {
 
     // 스크롤 범위 내에서만 루프 돌림
     for (let i = startIndex; i <= endIndex; i++) {
-      const screenIndex = i - startIndex; // 화면에 그릴 data 배열의 인덱스
-      const item = this.data[screenIndex];
+      const screenIndex = i - startIndex; // 현재 화면상의 위치 인덱스
+      const item = this.data[i]; // 실제 데이터 인덱스에 해당하는 항목
       if (item) {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
 
