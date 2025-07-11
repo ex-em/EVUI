@@ -60,8 +60,25 @@ const module = {
           limitMin = +minMax.min;
           limitMax = +minMax.max;
         }
-        scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
-        scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
+
+        const originalWidth = max - min;
+        const availableWidth = limitMax - limitMin;
+
+        if (originalWidth >= availableWidth) {
+          scrollbarOpt.range[0] = limitMin;
+          scrollbarOpt.range[1] = limitMax;
+        } else {
+          scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
+          scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
+
+          if (scrollbarOpt.range[1] - scrollbarOpt.range[0] < originalWidth) {
+            scrollbarOpt.range[0] = scrollbarOpt.range[1] - originalWidth;
+
+            if (scrollbarOpt.range[0] < limitMin) {
+              scrollbarOpt.range[0] = limitMin;
+            }
+          }
+        }
       }
     }
   },
@@ -93,9 +110,14 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      if (isUpdateAxesRange) {
+      const isResetPosition = dir === 'x' ? this.options.axesX?.[0]?.scrollbar?.resetPosition : this.options.axesY?.[0]?.scrollbar?.resetPosition;
+      if (isUpdateAxesRange || isResetPosition) {
         this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
         // range가 업데이트되면 저장된 스크롤 위치를 초기화
+        delete this.scrollbar[dir].savedPosition;
+      } else if (updateData) {
+        // 데이터가 업데이트되면 저장된 픽셀 위치는 더 이상 유효하지 않으므로 삭제하여
+        // 논리적 범위에 따라 다시 계산하도록 합니다.
         delete this.scrollbar[dir].savedPosition;
       }
       this.initScrollbarRange(dir);
