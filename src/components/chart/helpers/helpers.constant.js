@@ -45,6 +45,7 @@ export const LINE_OPTION = {
   fillOpacity: 0.4,
   showLegend: true,
   passingValue: null,
+  interpolation: 'linear',
 };
 
 export const BAR_OPTION = {

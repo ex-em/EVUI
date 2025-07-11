@@ -431,8 +431,7 @@ const modules = {
           if (oData != null) {
             gdata = bdata + oData;
           } else {
-            gdata = null;
-            bdata = 0;
+            gdata = odata;
           }
         } else {
           bdata = 0;

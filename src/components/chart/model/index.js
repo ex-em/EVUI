@@ -4,7 +4,6 @@ import Series from './model.series';
 export default { Store, Series };
 
 
-
   /**
    * @typedef {Object} ChartDOMSize
    * @property {number} width - 차트 DOM의 너비
