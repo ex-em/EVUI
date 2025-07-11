@@ -230,7 +230,11 @@ class Bar {
         item.yp = y; // eslint-disable-line
         item.w = w; // eslint-disable-line
         item.h = isHorizontal ? -h : h; // eslint-disable-line
-        item.index = i; // 실제 데이터 인덱스
+        item.index = i; // 실제 데이터 인덱스 (스크롤 offset 포함)
+
+        // 검색(hitInfo) 로직은 this.data[0..filteredCount-1] 범위만 검사하므로,
+        // 현재 화면에 그린 항목을 배열 앞쪽으로 매핑해준다.
+        this.data[screenIndex] = item;
       }
     }
   }
