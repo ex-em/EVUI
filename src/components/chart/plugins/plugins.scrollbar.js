@@ -93,7 +93,11 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+      if (isUpdateAxesRange) {
+        this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+        // range가 업데이트되면 저장된 스크롤 위치를 초기화
+        delete this.scrollbar[dir].savedPosition;
+      }
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
