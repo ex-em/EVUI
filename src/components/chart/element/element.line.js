@@ -1,4 +1,4 @@
-import { defaultsDeep, isNil } from 'lodash-es';
+import { defaultsDeep, isNil, isUndefined } from 'lodash-es';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
@@ -145,8 +145,8 @@ class Line {
       }
 
 
-      if (isNil(prevValid?.y) || (isNil(curr.o) && this.passingValue !== curr.o)
-        || (this.usePassingValue && curr.o === this.passingValue)) {
+      if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
+        || (isNil(curr.o) && this.passingValue !== curr.o)) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -193,7 +193,8 @@ class Line {
       const valueArray = this.data.map(item => item?.o);
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if (isNil(valueArray[i])) {
+        if (!this.usePassingValue || (this.usePassingValue && this.passingValue != null)
+          ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
