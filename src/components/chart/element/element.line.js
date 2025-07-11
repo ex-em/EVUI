@@ -145,7 +145,8 @@ class Line {
       }
 
 
-      if (isNil(prevValid?.y) || (isNil(curr.o) && this.passingValue !== curr.o)) {
+      if (isNil(prevValid?.y) || (isNil(curr.o) && this.passingValue !== curr.o)
+        || (this.usePassingValue && curr.o === this.passingValue)) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
