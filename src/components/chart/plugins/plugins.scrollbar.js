@@ -532,7 +532,7 @@ const module = {
 
     this.onScrollbarWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      const tooltipBodyDOM = this.tooltipDOM?.querySelector('.ev-chart-tooltip-body')
+      const tooltipBodyDOM = this.tooltipBodyDOM
       || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
       if (isTooltipVisible && tooltipBodyDOM) {

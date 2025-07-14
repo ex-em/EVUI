@@ -278,6 +278,7 @@ export default {
       tooltip: {
         use: true,
         useScrollbar: true,
+        maxHeight: 200,
       },
       selectLabel: {
         use: true,
@@ -330,6 +331,7 @@ export default {
       tooltip: {
         use: true,
         useScrollbar: true,
+        maxHeight: 200,
       },
       axesX: [
         {
