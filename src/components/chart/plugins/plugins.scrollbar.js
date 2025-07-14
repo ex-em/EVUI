@@ -531,6 +531,12 @@ const module = {
     };
 
     this.onScrollbarWheel = (e) => {
+      const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
+      const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+      if (isTooltipVisible
+        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)) {
+        return;
+      }
       e.preventDefault();
 
       const threshold = 1; // 최소 스크롤 임계값
