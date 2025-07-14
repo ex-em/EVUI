@@ -516,6 +516,8 @@ class Bar {
       return;
     }
 
+    ctx.save();
+
     if (isBorderRadius && !isStackBar) {
       try {
         this.drawRoundedRect(ctx, positions);
@@ -525,6 +527,8 @@ class Bar {
     } else {
       ctx.fillRect(x, y, w, h);
     }
+
+    ctx.restore();
   }
 
   drawRoundedRect(ctx, positions) {
@@ -545,6 +549,7 @@ class Bar {
 
     ctx.clip(squarePath);
 
+    ctx.beginPath();
     ctx.moveTo(x, y);
 
     if (isHorizontal) {
