@@ -224,6 +224,7 @@ class Bar {
           },
           isHighlight: false,
           textColor: item.dataTextColor,
+          index,
         });
       }
 
@@ -238,10 +239,11 @@ class Bar {
    * Draw item highlight
    * @param {object}  item       object for drawing series data
    * @param {CanvasRenderingContext2D}  context    canvas context
+   * @param {number}  index      label index
    *
    * @returns {undefined}
    */
-  itemHighlight(item, context) {
+  itemHighlight(item, context, index) {
     const showValue = this.showValue;
 
     const gdata = item.data;
@@ -286,6 +288,7 @@ class Bar {
         },
         isHighlight: true,
         textColor: item.data.dataTextColor || item.dataTextColor,
+        index,
       });
     }
 
@@ -395,8 +398,9 @@ class Bar {
    * @param positions         series value positions
    * @param isHighlight       draw label with highlight effect
    * @param textColor         data text color
+   * @param index             label index
    */
-  drawValueLabels({ context, data, positions, isHighlight, textColor }) {
+  drawValueLabels({ context, data, positions, isHighlight, textColor, index }) {
     const isHorizontal = this.isHorizontal;
     const { fontSize, textColor: seriesTextColor, align, formatter, decimalPoint } = this.showValue;
     const { x, y, w, h } = positions;
@@ -423,6 +427,7 @@ class Bar {
     if (formatter) {
       formattedTxt = formatter(value, {
         label: isHorizontal ? data.y : data.x,
+        index,
       });
     }
 
