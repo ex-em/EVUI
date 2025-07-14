@@ -63,13 +63,13 @@
       </span>
 
       <!-- 10개 → 7개 테스트 버튼들 -->
-      <ev-button @click="testTenToSeven">
+      <ev-button @click="setDataToTen">
         <span>데이터 10개로 설정</span>
       </ev-button>
       <span>
         테스트용 데이터 10개 생성
       </span>
-      <ev-button @click="reduceToSeven">
+      <ev-button @click="setDataToSeven">
         <span>데이터 7개로 줄이기</span>
       </ev-button>
       <span>
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 
 export default {
   components: {},
@@ -116,7 +116,7 @@ export default {
 
     const isResetPosition = ref(false);
 
-    const chartData1 = ref({
+    const chartData1 = shallowRef({
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
@@ -139,7 +139,7 @@ export default {
       },
     });
 
-    const chartData2 = ref({
+    const chartData2 = shallowRef({
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
@@ -285,18 +285,28 @@ export default {
 
     const updateData = () => {
       // chartData1: 10개로 설정
-      chartData1.value.labels = Array(10)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData1.value.data.series1 = getRandArr(10);
-      chartData1.value.data.series2 = getRandArr(10);
+      chartData1.value = {
+        ...chartData1.value,
+        labels: Array(10)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(10),
+          series2: getRandArr(10),
+        },
+      };
 
       // chartData2: 10개로 설정
-      chartData2.value.labels = Array(10)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData2.value.data.series1 = getRandArr(10);
-      chartData2.value.data.series2 = getRandArr(10);
+      chartData2.value = {
+        ...chartData2.value,
+        labels: Array(10)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(10),
+          series2: getRandArr(10),
+        },
+      };
     };
 
     const updateDataWithDynamicRange = () => {
@@ -310,47 +320,73 @@ export default {
       const series1 = getRandArr(len);
       const series2 = getRandArr(len);
 
-      chartData1.value.labels = labels;
-      chartData1.value.data.series1 = series1;
-      chartData1.value.data.series2 = series2;
+      chartData1.value = {
+        ...chartData1.value,
+        labels,
+        data: {
+          series1,
+          series2,
+        },
+      };
 
-      chartData2.value.labels = labels;
-      chartData2.value.data.series1 = series1;
-      chartData2.value.data.series2 = series2;
+      chartData2.value = {
+        ...chartData2.value,
+        labels,
+        data: {
+          series1,
+          series2,
+        },
+      };
     };
 
-    // 구체적인 테스트: 10개 → 7개로 줄이기
-    const testTenToSeven = () => {
-      // chartData1: 10개로 설정
-      chartData1.value.labels = Array(10)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData1.value.data.series1 = getRandArr(10);
-      chartData1.value.data.series2 = getRandArr(10);
+    // 10개로 설정
+    const setDataToTen = () => {
+      chartData1.value = {
+        ...chartData1.value,
+        labels: Array(10)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(10),
+          series2: getRandArr(10),
+        },
+      };
 
-      // chartData2: 10개로 설정
-      chartData2.value.labels = Array(10)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData2.value.data.series1 = getRandArr(10);
-      chartData2.value.data.series2 = getRandArr(10);
+      chartData2.value = {
+        ...chartData2.value,
+        labels: Array(10)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(10),
+          series2: getRandArr(10),
+        },
+      };
     };
 
-    // 7개로 줄이기
-    const reduceToSeven = () => {
-      // chartData1: 7개로 줄이기
-      chartData1.value.labels = Array(7)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData1.value.data.series1 = getRandArr(7);
-      chartData1.value.data.series2 = getRandArr(7);
+    // 7개로 설정
+    const setDataToSeven = () => {
+      chartData1.value = {
+        ...chartData1.value,
+        labels: Array(7)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(7),
+          series2: getRandArr(7),
+        },
+      };
 
-      // chartData2: 7개로 줄이기
-      chartData2.value.labels = Array(7)
-        .fill(0)
-        .map((_, i) => `value${i + 1}`);
-      chartData2.value.data.series1 = getRandArr(7);
-      chartData2.value.data.series2 = getRandArr(7);
+      chartData2.value = {
+        ...chartData2.value,
+        labels: Array(7)
+          .fill(0)
+          .map((_, i) => `value${i + 1}`),
+        data: {
+          series1: getRandArr(7),
+          series2: getRandArr(7),
+        },
+      };
     };
 
     // options의 range를 앞 절반으로 설정하는 함수
@@ -386,8 +422,8 @@ export default {
       // range 테스트용 함수 추가
       setRangeToFirstHalf,
       setRangeToLastHalf,
-      testTenToSeven,
-      reduceToSeven,
+      setDataToTen,
+      setDataToSeven,
     };
   },
 };
