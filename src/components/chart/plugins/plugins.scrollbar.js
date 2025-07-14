@@ -532,11 +532,25 @@ const module = {
 
     this.onScrollbarWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
-      if (isTooltipVisible
-        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)) {
-        return;
+      const tooltipBodyDOM = this.tooltipDOM?.querySelector('.ev-chart-tooltip-body')
+      || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+
+      if (isTooltipVisible && tooltipBodyDOM) {
+        const { scrollTop, scrollHeight, clientHeight } = tooltipBodyDOM;
+        const isAtTop = scrollTop <= 0;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+
+        const isScrollingUp = e.deltaY < 0;
+        const isScrollingDown = e.deltaY > 0;
+
+        if ((isAtTop && isScrollingUp) || (isAtBottom && isScrollingDown)) {
+          // 툴팁의 스크롤이 맨 위나 맨 아래에 닿았는데 스크롤 하면 차트 스크롤 허용
+        } else {
+          // 툴팁 내부 스크롤만 수행
+          return;
+        }
       }
+
       e.preventDefault();
 
       const threshold = 1; // 최소 스크롤 임계값
