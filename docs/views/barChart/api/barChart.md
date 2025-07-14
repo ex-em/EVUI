@@ -87,6 +87,7 @@ const chartData = {
 
 - Stack Bar Chart의 경우 'out' 은 지원하지 않습니다.
 - 막대 영역이 좁을 경우 값이 표시되지 않을 수 있습니다.
+- formatter는 `(value: string, {label, index}: {label: string; index: number}) => string; 시그니처를 갖습니다. (index는 label의 인덱스)
 
 #### data example
 

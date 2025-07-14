@@ -75,7 +75,7 @@ class TimeBar extends Bar {
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
 
-    this.data.forEach((item) => {
+    this.data.forEach((item, index) => {
       ctx.beginPath();
 
       if (isHorizontal) {
@@ -149,6 +149,7 @@ class TimeBar extends Bar {
               w,
             },
             isHighlight: false,
+            index,
           });
         }
       }
