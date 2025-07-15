@@ -57,9 +57,8 @@
         }],
         tooltip: {
           use: true,
-          htmlScrollTarget: '.ev-chart-tooltip-custom__body',
           formatter: {
-            html: seriesList => `<div class="ev-chart-tooltip-custom">${seriesList.map(series => `<div>${series.name}: ${series.data.o}</div>`).join('')}</div>`,
+            html: seriesList => `<div class="ev-chart-tooltip-custom">${seriesList.map(series => `<div>${series.name}-${series.index}: ${series.data.o}</div>`).join('')}</div>`,
           },
         },
       };
