@@ -957,6 +957,15 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
+    // 차트 크기가 변경될 때 저장된 스크롤 픽셀 위치를 초기화하여
+    // 새로운 크기에 맞춰 스크롤바 크기/위치를 재계산하도록 함
+    if (this.scrollbar?.x) {
+      delete this.scrollbar.x.savedPosition;
+    }
+    if (this.scrollbar?.y) {
+      delete this.scrollbar.y.savedPosition;
+    }
+
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();

@@ -60,8 +60,25 @@ const module = {
           limitMin = +minMax.min;
           limitMax = +minMax.max;
         }
-        scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
-        scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
+
+        const originalWidth = max - min;
+        const availableWidth = limitMax - limitMin;
+
+        if (originalWidth >= availableWidth) {
+          scrollbarOpt.range[0] = limitMin;
+          scrollbarOpt.range[1] = limitMax;
+        } else {
+          scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
+          scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
+
+          if (scrollbarOpt.range[1] - scrollbarOpt.range[0] < originalWidth) {
+            scrollbarOpt.range[0] = scrollbarOpt.range[1] - originalWidth;
+
+            if (scrollbarOpt.range[0] < limitMin) {
+              scrollbarOpt.range[0] = limitMin;
+            }
+          }
+        }
       }
     }
   },
@@ -93,7 +110,16 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+      const isResetPosition = dir === 'x' ? this.options.axesX?.[0]?.scrollbar?.resetPosition : this.options.axesY?.[0]?.scrollbar?.resetPosition;
+      if (isUpdateAxesRange || isResetPosition) {
+        this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+        // range가 업데이트되면 저장된 스크롤 위치를 초기화
+        delete this.scrollbar[dir].savedPosition;
+      } else if (updateData) {
+        // 데이터가 업데이트되면 저장된 픽셀 위치는 더 이상 유효하지 않으므로 삭제하여
+        // 논리적 범위에 따라 다시 계산하도록 합니다.
+        delete this.scrollbar[dir].savedPosition;
+      }
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
@@ -104,11 +130,15 @@ const module = {
    */
   updateScrollbarPosition() {
     if (this.scrollbar.x?.use && this.scrollbar.x?.isInit) {
-      this.setScrollbarPosition('x');
+      // resetPosition 옵션에 따라 preservePosition 결정
+      const preservePosition = !this.options.axesX?.[0]?.scrollbar?.resetPosition;
+      this.setScrollbarPosition('x', preservePosition);
     }
 
     if (this.scrollbar.y?.use && this.scrollbar.y?.isInit) {
-      this.setScrollbarPosition('y');
+      // resetPosition 옵션에 따라 preservePosition 결정
+      const preservePosition = !this.options.axesY?.[0]?.scrollbar?.resetPosition;
+      this.setScrollbarPosition('y', preservePosition);
     }
   },
 
@@ -195,8 +225,9 @@ const module = {
   /**
    * set scrollbar position
    * @param dir axis direction ('x' | 'y')
+   * @param preservePosition 기존 위치를 유지할지 여부
    */
-  setScrollbarPosition(dir) {
+  setScrollbarPosition(dir, preservePosition = false) {
     const scrollbarOpt = this.scrollbar[dir];
     if (!scrollbarOpt.use || !scrollbarOpt.range) {
       return;
@@ -218,7 +249,17 @@ const module = {
     const fullSize = isXScroll ? (aPos.x2 - aPos.x1) : (aPos.y2 - aPos.y1);
     const buttonSize = scrollbarOpt.showButton ? scrollHeight : 0;
     const trackSize = fullSize - (buttonSize * 2);
-    const thumbSize = this.getScrollbarThumbSize(dir, trackSize);
+
+    // 현재 위치를 보존해야 하는 경우 기존 위치를 저장
+    let savedThumbPosition = null;
+    if (preservePosition && scrollbarOpt.savedPosition !== undefined) {
+      savedThumbPosition = scrollbarOpt.savedPosition;
+    }
+
+    const thumbSize = this.getScrollbarThumbSize(dir, trackSize, savedThumbPosition);
+
+    // 새로 계산된 위치를 저장
+    scrollbarOpt.savedPosition = thumbSize.position;
 
     let scrollbarStyle = 'display: block;';
     let scrollbarTrackStyle;
@@ -293,8 +334,9 @@ const module = {
    * get scrollbar thumb size
    * @param dir axis direction ('x' | 'y')
    * @param trackSize scrollbar track size
+   * @param savedThumbPosition 기존 위치를 보존해야 하는 경우 저장된 위치
    */
-  getScrollbarThumbSize(dir, trackSize) {
+  getScrollbarThumbSize(dir, trackSize, savedThumbPosition) {
     const scrollbarOpt = this.scrollbar[dir];
     const [min, max] = scrollbarOpt.range;
     const axesType = scrollbarOpt.type;
@@ -337,6 +379,11 @@ const module = {
     scrollbarOpt.startValue = startValue;
     scrollbarOpt.steps = steps;
     scrollbarOpt.interval = interval;
+
+    // 기존 위치를 보존해야 하는 경우 저장된 위치를 사용
+    if (savedThumbPosition !== null) {
+      thumbPosition = savedThumbPosition;
+    }
 
     return {
       size: thumbSize,
@@ -395,6 +442,9 @@ const module = {
 
     if (!isOutOfRange) {
       scrollbarOpt.range = [minValue, maxValue];
+
+      // 사용자가 스크롤할 때는 저장된 위치를 초기화
+      delete scrollbarOpt.savedPosition;
 
       this.update({
         updateSeries: false,
@@ -481,9 +531,60 @@ const module = {
     };
 
     this.onScrollbarWheel = (e) => {
+      const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
+      const tooltipBodyDOM = this.tooltipBodyDOM
+      || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+
+      if (isTooltipVisible && tooltipBodyDOM) {
+        const { scrollTop, scrollHeight, clientHeight } = tooltipBodyDOM;
+        const isAtTop = scrollTop <= 0;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+
+        const isScrollingUp = e.deltaY < 0;
+        const isScrollingDown = e.deltaY > 0;
+
+        if ((isAtTop && isScrollingUp) || (isAtBottom && isScrollingDown)) {
+          // 툴팁의 스크롤이 맨 위나 맨 아래에 닿았는데 스크롤 하면 차트 스크롤 허용
+        } else {
+          // 툴팁 내부 스크롤만 수행
+          return;
+        }
+      }
+
       e.preventDefault();
 
-      this.updateScrollbarRange('y', e.deltaY < 0);
+      const threshold = 1; // 최소 스크롤 임계값
+
+      // Shift + 휠: 가로 스크롤 (일반 마우스 휠 지원)
+      if (this.scrollbar.x?.use && e.shiftKey && Math.abs(e.deltaY) > threshold) {
+        this.updateScrollbarRange('x', e.deltaY > 0);
+        return;
+      }
+
+      // 대각선 스크롤 처리: 더 큰 방향을 우선으로 처리
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+
+      if (absX > threshold && absY > threshold) {
+        // 두 방향 모두 임계값 이상일 때: 더 큰 방향을 우선 처리
+        if (absX > absY && this.scrollbar.x?.use) {
+          this.updateScrollbarRange('x', e.deltaX > 0);
+        } else if (absY > absX && this.scrollbar.y?.use) {
+          this.updateScrollbarRange('y', e.deltaY < 0);
+        }
+        return;
+      }
+
+      // 가로 스크롤 처리 (deltaX - 트랙패드 좌우 스크롤)
+      if (this.scrollbar.x?.use && absX > threshold) {
+        this.updateScrollbarRange('x', e.deltaX > 0);
+        return;
+      }
+
+      // 세로 스크롤 처리 (deltaY)
+      if (this.scrollbar.y?.use && absY > threshold) {
+        this.updateScrollbarRange('y', e.deltaY < 0);
+      }
     };
 
     if (this.scrollbar.x.use && !this.scrollbar.x.isInit) {
@@ -498,6 +599,10 @@ const module = {
       scrollbarYDOM.addEventListener('click', this.onScrollbarClick);
       scrollbarYDOM.addEventListener('mousedown', this.onScrollbarDown);
       scrollbarYDOM.addEventListener('mouseleave', this.onScrollbarLeave);
+    }
+
+    // 가로 또는 세로 스크롤바가 있으면 휠 이벤트 등록
+    if (this.scrollbar.x?.use || this.scrollbar.y?.use) {
       this.overlayCanvas?.addEventListener('wheel', this.onScrollbarWheel, { passive: false });
     }
   },
@@ -560,6 +665,10 @@ const module = {
     }
 
     this.scrollbar[dir].range = [movedMin, movedMax];
+
+    // 사용자가 드래그로 스크롤할 때는 저장된 위치를 초기화
+    delete this.scrollbar[dir].savedPosition;
+
     this.update({
       updateSeries: false,
       updateSelTip: { update: false, keepDomain: false },
@@ -606,13 +715,14 @@ const module = {
    * @param dir axis direction ('x' | 'y')
    */
   destroyScrollbar(dir) {
-    const scrollbarXDOM = this.scrollbar[dir].dom;
+    const scrollbarDOM = this.scrollbar[dir].dom;
 
-    if (scrollbarXDOM) {
-      scrollbarXDOM.remove();
+    if (scrollbarDOM) {
+      scrollbarDOM.remove();
       this.scrollbar[dir] = { isInit: false };
 
-      if (dir === 'y') {
+      // 가로, 세로 스크롤바 모두 없어지면 휠 이벤트 제거
+      if (!this.scrollbar.x?.use && !this.scrollbar.y?.use) {
         this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, { passive: false });
       }
     }
