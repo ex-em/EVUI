@@ -712,6 +712,7 @@ const modules = {
           color: hitInfoItems[sId].color,
           name: hitInfoItems[sId].name,
           dataId: hitInfoItems[sId].id,
+          index: hitInfoItems[sId].index,
         });
       });
 
@@ -758,7 +759,7 @@ const modules = {
   drawItemsHighlight(hitInfo, ctx) {
     Object.keys(hitInfo.items).forEach((sId) => {
       const series = this.seriesList[sId];
-      series.itemHighlight(hitInfo.items[sId], ctx);
+      series.itemHighlight(hitInfo.items[sId], ctx, hitInfo.items[sId].index);
 
       if (Util.isDoughnutHole(series.type)) {
         this.drawDoughnutHole(ctx);
