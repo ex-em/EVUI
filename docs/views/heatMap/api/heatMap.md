@@ -23,10 +23,10 @@
 
 #### series
 
-| 이름        | 타입   | 디폴트                | 설명                          | 종류(예시) |
-|-----------| ------ |--------------------|-----------------------------| ---------- |
-| name      | String | series-\${index}   | 특정 데이터에 대한 시리즈 옵션           |            |
-| showValue | Object | ([상세](#showvalue)) | 셀 위에 값 표시 여부 및 속성           |            |
+| 이름      | 타입   | 디폴트               | 설명                                     | 종류(예시) |
+| --------- | ------ | -------------------- | ---------------------------------------- | ---------- |
+| name      | String | series-\${index}     | 특정 데이터에 대한 시리즈 옵션           |            |
+| showValue | Object | ([상세](#showvalue)) | 셀 위에 값 표시 여부 및 속성             |            |
 | highlight | Object | ([상세](#highlight)) | 셀 위에 마우스 오버시 나타나는 효과 설정 |            |
 
 #### showValue
@@ -44,20 +44,19 @@
 
 #### highlight
 
-| 이름        | 타입           | 디폴트     | 설명          | 종류(예시)                       |
-|-----------|--------------|---------|-------------| -------------------------------- |
-| stroke    | object       |         | 외곽선 스타일     |                   |
-| ㄴ use     | boolean      | false   | 외곽선 사용여부    |                   |
-| ㄴ color   | string, null | null    | 외곽선 색상      |                   |
-| ㄴ width   | number       | 1       | 외곽선 두께      |                   |
-| ㄴ radius  | number       | 0       | 외곽선 반경      |                   |
-| shadow    | object       |         | 그림자 스타일     |                                  |
-| ㄴ use     | boolean      | true    | 그림자 사용여부    |                                  |
-| ㄴ offsetX | number       | 0       | 그림자 offsetX |                                  |
-| ㄴ offsetY | number       | 0       | 그림자 offsetY |                                  |
-| ㄴ blur    | number       | 4       | 그림자 흐림정도    |                                  |
-| ㄴ color   | string       | '#959494' | 그림자 색상      |                                  |
-
+| 이름       | 타입         | 디폴트    | 설명            | 종류(예시) |
+| ---------- | ------------ | --------- | --------------- | ---------- |
+| stroke     | object       |           | 외곽선 스타일   |            |
+| ㄴ use     | boolean      | false     | 외곽선 사용여부 |            |
+| ㄴ color   | string, null | null      | 외곽선 색상     |            |
+| ㄴ width   | number       | 1         | 외곽선 두께     |            |
+| ㄴ radius  | number       | 0         | 외곽선 반경     |            |
+| shadow     | object       |           | 그림자 스타일   |            |
+| ㄴ use     | boolean      | true      | 그림자 사용여부 |            |
+| ㄴ offsetX | number       | 0         | 그림자 offsetX  |            |
+| ㄴ offsetY | number       | 0         | 그림자 offsetY  |            |
+| ㄴ blur    | number       | 4         | 그림자 흐림정도 |            |
+| ㄴ color   | string       | '#959494' | 그림자 색상     |            |
 
 #### data example
 
@@ -172,14 +171,15 @@ const chartData =
 
 ##### axes scrollbar
 
-| 이름       | 타입                        | 디폴트    | 설명                        | 종류(예시)                                    |
-| ---------- | --------------------------- | --------- | --------------------------- | --------------------------------------------- |
-| use        | Boolean                     | false     | 스크롤 사용 여부            | true / false                                  |
-| width      | Number                      | 14        | 스크롤 넓이 (y축일 때 적용) |                                               |
-| height     | Number                      | 14        | 스크롤 높이 (x축일 때 적용) |                                               |
-| background | Hex, RGB, RGBA Code(String) | '#F2F2F2' | 스크롤 track 배경 색상      |                                               |
-| showButton | Boolean                     | false     | 스크롤 버튼 표시 여부       | true / false                                  |
-| thumbStyle | Object                      |           | 스크롤 thumb 스타일 설정    | { <br> background: '#929292', radius: 0 <br>} |
+| 이름          | 타입                        | 디폴트    | 설명                        | 종류(예시)                                    |
+| ------------- | --------------------------- | --------- | --------------------------- | --------------------------------------------- |
+| use           | Boolean                     | false     | 스크롤 사용 여부            | true / false                                  |
+| width         | Number                      | 14        | 스크롤 넓이 (y축일 때 적용) |                                               |
+| height        | Number                      | 14        | 스크롤 높이 (x축일 때 적용) |                                               |
+| background    | Hex, RGB, RGBA Code(String) | '#F2F2F2' | 스크롤 track 배경 색상      |                                               |
+| showButton    | Boolean                     | false     | 스크롤 버튼 표시 여부       | true / false                                  |
+| thumbStyle    | Object                      |           | 스크롤 thumb 스타일 설정    | { <br> background: '#929292', radius: 0 <br>} |
+| resetPosition | Boolean                     | false     | 스크롤 초기화 여부          | true / false                                  |
 
 #### title
 
@@ -220,27 +220,27 @@ const chartData =
 
 #### tooltip
 
-| 이름                | 타입                        | 디폴트                                     | 설명                                                    | 종류(예시)                                                          |
-| ------------------- | --------------------------- | ------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------- |
-| use                 | Boolean                     | false                                      | tooltip 표시 여부                                       | true /false                                                         |
-| backgroundColor     | Hex, RGB, RGBA Code(String) | '#4C4C4C'                                  | tooltip 배경 색상                                       |                                                                     |
-| borderColor         | Hex, RGB, RGBA Code(String) | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
-| useShadow           | Boolean                     | false                                      | 그림자 사용 여부                                        |                                                                     |
-| shadowOpacity       | Number                      | 0.25                                       | 그림자 투명도                                           |                                                                     |
-| throttledMove       | Boolean                     | false                                      | 데이터 조회 Throttling 처리 유무                        |                                                                     |
-| debouncedHide       | Boolean                     | false                                      | 좌표 이동 시 tooltip hide 여부                          |                                                                     |
-| sortByValue         | Boolean                     | true                                       | 값을 기준으로 정렬할지의 여부                           |                                                                     |
-| useScrollbar        | Boolean                     | false                                      | 스크롤바 사용 여부                                      |                                                                     |
-| maxHeight           | Number                      |                                            | 툴팁의 최대 높이                                        |                                                                     |
-| maxWidth            | Number                      |                                            | 툴팁의 최대 너비                                        |                                                                     |
-| textOverflow        | String                      | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
-| fontFamily          | String                      | 'Roboto'                                   | 툴팁에 표시될 폰트                                      | 'Roboto', 'serif                                                    |
-| fontColor           | Hex code (string), Object, Function   | '#000000'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
-| fontSize            | Object                      | { title: 16, contents: 14 }                | 툴팁에 표시될 폰트 사이즈                               |                                                                     |
-| colorShape          | String                      | 'rect'                                     | 툴팁에 표시될 series color의 모양                       | 'rect', 'circle'                                                    |
-| rowPadding          | Object                      | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
-| showAllValueInRange | Boolean                     | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
-| formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
+| 이름                | 타입                                | 디폴트                                     | 설명                                                    | 종류(예시)                                                          |
+| ------------------- | ----------------------------------- | ------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------- |
+| use                 | Boolean                             | false                                      | tooltip 표시 여부                                       | true /false                                                         |
+| backgroundColor     | Hex, RGB, RGBA Code(String)         | '#4C4C4C'                                  | tooltip 배경 색상                                       |                                                                     |
+| borderColor         | Hex, RGB, RGBA Code(String)         | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
+| useShadow           | Boolean                             | false                                      | 그림자 사용 여부                                        |                                                                     |
+| shadowOpacity       | Number                              | 0.25                                       | 그림자 투명도                                           |                                                                     |
+| throttledMove       | Boolean                             | false                                      | 데이터 조회 Throttling 처리 유무                        |                                                                     |
+| debouncedHide       | Boolean                             | false                                      | 좌표 이동 시 tooltip hide 여부                          |                                                                     |
+| sortByValue         | Boolean                             | true                                       | 값을 기준으로 정렬할지의 여부                           |                                                                     |
+| useScrollbar        | Boolean                             | false                                      | 스크롤바 사용 여부                                      |                                                                     |
+| maxHeight           | Number                              |                                            | 툴팁의 최대 높이                                        |                                                                     |
+| maxWidth            | Number                              |                                            | 툴팁의 최대 너비                                        |                                                                     |
+| textOverflow        | String                              | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
+| fontFamily          | String                              | 'Roboto'                                   | 툴팁에 표시될 폰트                                      | 'Roboto', 'serif                                                    |
+| fontColor           | Hex code (string), Object, Function | '#000000'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
+| fontSize            | Object                              | { title: 16, contents: 14 }                | 툴팁에 표시될 폰트 사이즈                               |                                                                     |
+| colorShape          | String                              | 'rect'                                     | 툴팁에 표시될 series color의 모양                       | 'rect', 'circle'                                                    |
+| rowPadding          | Object                              | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
+| showAllValueInRange | Boolean                             | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
+| formatter           | function / Object                   | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 
 ```
 const chartOptions = {
