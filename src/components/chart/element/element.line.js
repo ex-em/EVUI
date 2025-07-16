@@ -140,15 +140,17 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if ((!this.isExistGrp && this.usePassingValue && curr.o === this.passingValue)
-        || (this.isExistGrp && this.usePassingValue
-          && curr.o === this.passingValue && !arr[idx - 1]?.o)
-      ) {
-        return;
+      if (this.usePassingValue && curr.o === this.passingValue) {
+        if (this.isExistGrp && !arr[idx - 1]?.o && idx !== 0) {
+          return;
+        } else if (!this.isExistGrp) {
+          return;
+        }
       }
 
-
       if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
+        || (!this.usePassingValue && isNil(curr.o) && this.interpolation !== 'zero')
+        || (!this.usePassingValue && isNil(prevValid?.y))
         || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
         ctx.moveTo(x, y);
       } else {
