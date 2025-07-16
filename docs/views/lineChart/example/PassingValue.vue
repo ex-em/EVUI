@@ -104,8 +104,8 @@ import EvInputNumber from '../../../../src/components/inputNumber/InputNumber';
 
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1', passingValue: -1, fill: false },
-          series2: { name: 'series#1', passingValue: -1, show: false, fill: false, interpolation: 'zero' },
+          series1: { name: 'series#1', interpolation: 'linear', passingValue: -1, fill: false },
+          series2: { name: 'series#1', interpolation: 'linear', passingValue: -1, show: false, fill: false },
         },
         labels: [
           dayjs(time),
