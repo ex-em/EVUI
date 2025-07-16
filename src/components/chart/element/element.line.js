@@ -34,7 +34,7 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = this.interpolation && this.interpolation !== 'none';
+    this.usePassingValue = !isUndefined(this.passingValue) && this.interpolation === 'linear';
   }
 
   /**
@@ -129,8 +129,8 @@ class Line {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
-      if (this.usePassingValue && this.isExistGrp && curr.o === this.passingValue) {
-          y = getYPos(curr.b ?? 0);
+      if (this.isExistGrp && this.usePassingValue && curr.o === this.passingValue) {
+        y = getYPos(curr.b ?? 0);
       }
 
       if (x !== null) {
@@ -140,8 +140,8 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if ((this.usePassingValue && curr.o === this.passingValue && !this.isExistGrp)
-        || (this.usePassingValue && this.isExistGrp
+      if ((!this.isExistGrp && this.usePassingValue && curr.o === this.passingValue)
+        || (this.isExistGrp && this.usePassingValue
           && curr.o === this.passingValue && !arr[idx - 1]?.o)
       ) {
         return;
@@ -149,7 +149,7 @@ class Line {
 
 
       if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
-        || (isNil(curr.o) && this.passingValue !== curr.o)) {
+        || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -193,10 +193,10 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => item?.o);
+      const valueArray = this.data.map(item => (!item?.o && this.interpolation === 'zero' ? 0 : item?.o));
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if (!this.usePassingValue || (this.usePassingValue && this.passingValue != null)
+        if ((!this.usePassingValue || (this.usePassingValue && this.passingValue != null))
           ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);

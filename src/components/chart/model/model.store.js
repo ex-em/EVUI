@@ -50,9 +50,13 @@ const modules = {
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
+                series.data = this.addSeriesStackDS(
+                  sData, label, series.bsIds, series.stackIndex, series.interpolation,
+                );
               } else {
-                series.data = this.addSeriesDS(sData, label, series.isExistGrp);
+                series.data = this.addSeriesDS(
+                  sData, label, series.isExistGrp, series.interpolation,
+                );
               }
               series.minMax = this.getSeriesMinMax(series.data);
             }
@@ -390,7 +394,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
+  addSeriesStackDS(data, label, bsIds, sIdx = 0, interpolation = 'linear') {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
@@ -438,7 +442,7 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata));
+        sdata.push(this.addData(gdata, ldata, odata, bdata, interpolation));
       }
     });
 
@@ -455,7 +459,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase) {
+  addSeriesDS(data, label, isBase, interpolation = 'linear') {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const passingValue = this.seriesList[Object.keys(this.seriesList)[0]]?.passingValue;
@@ -473,7 +477,13 @@ const modules = {
         const isPassingValueWithStack = isBase
           && !Util.isNullOrUndefined(passingValue)
           && gdata === passingValue;
-        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata));
+        sdata.push(this.addData(
+          isPassingValueWithStack ? 0 : gdata,
+          ldata,
+          gdata,
+          null,
+          interpolation,
+        ));
       }
     });
 
@@ -528,7 +538,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null) {
+  addData(gdata, ldata, odata = null, bdata = null, interpolation = 'linear') {
     let data;
     let gdataValue = null;
     let odataValue = null;
@@ -541,7 +551,7 @@ const modules = {
       gdataColor = gdata.color;
       dataTextColor = gdata.textColor;
     } else {
-      gdataValue = gdata ?? null;
+      gdataValue = interpolation === 'zero' && !gdata ? bdata ?? 0 : gdata ?? null;
     }
 
     if (odata !== null && typeof odata === 'object') {
