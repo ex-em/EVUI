@@ -125,12 +125,12 @@ class Line {
 
     // draw line
     let prevValid;
-    this.data.forEach((curr) => {
+    this.data.forEach((curr, idx, arr) => {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
       if (this.usePassingValue && this.isExistGrp && curr.o === this.passingValue) {
-        y = getYPos(curr.b ?? 0);
+          y = getYPos(curr.b ?? 0);
       }
 
       if (x !== null) {
@@ -140,7 +140,10 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if (this.usePassingValue && curr.o === this.passingValue && !this.isExistGrp) {
+      if ((this.usePassingValue && curr.o === this.passingValue && !this.isExistGrp)
+        || (this.usePassingValue && this.isExistGrp
+          && curr.o === this.passingValue && !arr[idx - 1]?.o)
+      ) {
         return;
       }
 
