@@ -199,8 +199,9 @@ class Line {
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if ((this.interpolation !== 'zero' || (this.usePassingValue && this.passingValue != null))
-          ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
+        const isNoneInterpolation = this.interpolation === 'none';
+
+        if (isNoneInterpolation ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
