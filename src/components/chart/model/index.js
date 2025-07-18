@@ -43,3 +43,8 @@ export default { Store, Series };
    * @property {string|null} dataColor - 데이터 색상
    * @property {string|null} dataTextColor - 텍스트 색상
    */
+
+
+   /**
+    * @typedef {'none' | 'linear' | 'zero'} InterpolationType
+    */

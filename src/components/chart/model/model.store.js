@@ -389,12 +389,13 @@ const modules = {
    * @param {object}  label   chart label
    * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
+   * @param {import('./index').InterpolationType}  interpolation   interpolation type
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0, interpolation = 'linear') {
+  addSeriesStackDS(data, label, bsIds, sIdx = 0, interpolation = 'none') {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
@@ -454,12 +455,13 @@ const modules = {
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
    * @param {boolean}  isBase   is Base(bottommost) series at stack chart
+   * @param {import('./index').InterpolationType}  interpolation   interpolation type
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase, interpolation = 'linear') {
+  addSeriesDS(data, label, isBase, interpolation = 'none') {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const passingValue = this.seriesList[Object.keys(this.seriesList)[0]]?.passingValue;
@@ -533,12 +535,13 @@ const modules = {
    * @param {object}  ldata    label data (x-axis value for vertical chart)
    * @param {object}  odata    original data (without stacked value)
    * @param {object}  bdata    base data (stacked value)
-
+   * @param {import('./index').InterpolationType}  interpolation   interpolation type
+   *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null, interpolation = 'linear') {
+  addData(gdata, ldata, odata = null, bdata = null, interpolation = 'none') {
     let data;
     let gdataValue = null;
     let odataValue = null;
