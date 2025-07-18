@@ -195,10 +195,11 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => (!item?.o && this.interpolation === 'zero' ? 0 : item?.o));
+      const valueArray = this.data.map(item => (item?.o));
+      /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if ((!this.usePassingValue || (this.usePassingValue && this.passingValue != null))
+        if ((this.interpolation !== 'zero' || (this.usePassingValue && this.passingValue != null))
           ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
@@ -208,7 +209,7 @@ class Line {
             start = null;
             end = null;
           }
-        } else if (valueArray[i] === this.passingValue) {
+        } else if (this.usePassingValue && valueArray[i] === this.passingValue) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -232,7 +233,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o) {
+          } else if (this.isExistGrp || this.passingValue !== currData.o || (this.interpolation === 'zero' && isNil(currData.o))) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
