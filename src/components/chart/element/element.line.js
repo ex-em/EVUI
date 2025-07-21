@@ -125,7 +125,7 @@ class Line {
 
     // draw line
     let prevValid;
-    this.data.forEach((curr, idx, arr) => {
+    this.data.forEach((curr) => {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
@@ -141,9 +141,7 @@ class Line {
       curr.yp = y;
 
       if (this.usePassingValue && curr.o === this.passingValue) {
-        if (this.isExistGrp && !arr[idx - 1]?.o && idx !== 0) {
-          return;
-        } else if (!this.isExistGrp) {
+        if (!this.isExistGrp) {
           return;
         }
       }
@@ -199,7 +197,7 @@ class Line {
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        const isNoneInterpolation = this.interpolation === 'none';
+        const isNoneInterpolation = this.interpolation === 'none' || (this.usePassingValue && this.passingValue !== null);
 
         if (isNoneInterpolation ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
