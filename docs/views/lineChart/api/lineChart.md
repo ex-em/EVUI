@@ -83,7 +83,7 @@ const selectedSeries = ref({
 | showLegend   | Boolean                     | true             | legend 표시 여부                                                                                                                |                                                                                   |
 | passingValue | number \| null               | null             | data가 passingValue와 같을 경우 다음값으로 선을 이어가며 point도 그리지 않고 tooltip에 나오지 않음 |                                                                  |
 | segments | Array<number>                      | null             | dash 간격  | [6,2]                                                                                |
-| interpolation | 'linear' \| 'none' \| 'zero' | 'linear' | 보간 사용유무 | |
+| interpolation | 'linear' \| 'none' \| 'zero' | 'none' | 보간 사용유무 | |
 
 #### data example
 
