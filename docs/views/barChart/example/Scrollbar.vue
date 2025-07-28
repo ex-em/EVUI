@@ -416,6 +416,7 @@ export default {
       },
     });
 
+    // eslint-disable-next-line arrow-parens
     const getRandArr = (count) =>
       Array(count)
         .fill(0)
