@@ -82,6 +82,11 @@
         v-model:selectedLabel
       </div>
       <div>{{ defaultSelectLabel }}</div>
+
+      <div class="badge yellow">
+        clicked dataIndex
+      </div>
+      <div>{{ clickedArgs?.dataIndex }}</div>
     </div>
   </div>
 </template>
@@ -96,8 +101,11 @@ export default {
     const chart = ref(null);
 
     const clickedLabel = ref();
-    const onClick = ({ selected }) => {
-      clickedLabel.value = selected;
+    const clickedArgs = ref();
+
+    const onClick = (args) => {
+      clickedLabel.value = args.selected;
+      clickedArgs.value = args;
     };
 
     const defaultSelectLabel = ref({
@@ -151,7 +159,30 @@ export default {
         'value9',
         'value10',
       ],
-      groups: [['series1', 'series2', 'series3', 'series4', 'series5', 'series6', 'series7', 'series8', 'series9', 'series10', 'series11', 'series12', 'series13', 'series14', 'series15', 'series16', 'series17', 'series18', 'series19', 'series20']],
+      groups: [
+        [
+          'series1',
+          'series2',
+          'series3',
+          'series4',
+          'series5',
+          'series6',
+          'series7',
+          'series8',
+          'series9',
+          'series10',
+          'series11',
+          'series12',
+          'series13',
+          'series14',
+          'series15',
+          'series16',
+          'series17',
+          'series18',
+          'series19',
+          'series20',
+        ],
+      ],
       data: {
         series1: [100, 150, 51, 150, 350, 100, 150, 51, 150, 350],
         series2: [100, 150, 51, 150, 450, 100, 150, 51, 150, 450],
@@ -211,7 +242,30 @@ export default {
         'value9',
         'value10',
       ],
-      groups: [['series1', 'series2', 'series3', 'series4', 'series5', 'series6', 'series7', 'series8', 'series9', 'series10', 'series11', 'series12', 'series13', 'series14', 'series15', 'series16', 'series17', 'series18', 'series19', 'series20']],
+      groups: [
+        [
+          'series1',
+          'series2',
+          'series3',
+          'series4',
+          'series5',
+          'series6',
+          'series7',
+          'series8',
+          'series9',
+          'series10',
+          'series11',
+          'series12',
+          'series13',
+          'series14',
+          'series15',
+          'series16',
+          'series17',
+          'series18',
+          'series19',
+          'series20',
+        ],
+      ],
       data: {
         series1: [100, 150, 51, 150, 350, 100, 150, 51, 150, 350],
         series2: [100, 150, 51, 150, 450, 100, 150, 51, 150, 450],
@@ -362,7 +416,7 @@ export default {
       },
     });
 
-    const getRandArr = count =>
+    const getRandArr = (count) =>
       Array(count)
         .fill(0)
         .map(() => Math.ceil(Math.random() * 100));
@@ -499,6 +553,8 @@ export default {
       chartOptions1,
       chartOptions2,
       defaultSelectLabel,
+      clickedLabel,
+      clickedArgs,
       updateData,
       updateDataWithDynamicRange,
       onClick,

@@ -337,7 +337,7 @@ class Bar {
 
       if ((sx <= xp) && (xp <= ex)) {
         item.data = gdata[m];
-        item.index = m;
+        item.index = gdata[m].index; // 원본 데이터 인덱스 사용
 
         if ((ey <= yp) && (yp <= sy)) {
           item.hit = true;
@@ -379,7 +379,7 @@ class Bar {
 
       if ((ey <= yp) && (yp <= sy)) {
         item.data = gdata[m];
-        item.index = m;
+        item.index = gdata[m].index; // 원본 데이터 인덱스 사용
 
         if ((sx <= xp) && (xp <= ex)) {
           item.hit = true;
