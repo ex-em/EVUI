@@ -76,8 +76,14 @@ class Bar {
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
-    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    const xAxisPosition = chartRect.x1 + labelOffset.left;
+    const yAxisPosition = chartRect.y2 - labelOffset.bottom;
+    const xZeroPosition = Canvas.calculateX(0, minmaxX.graphMin, minmaxX.graphMax, xArea);
+    const yZeroPosition = Canvas.calculateY(0, minmaxY.graphMin, minmaxY.graphMax, yArea);
+
+    const xsp = isHorizontal ? xAxisPosition + xZeroPosition : xAxisPosition;
+    const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
 
     const dArea = isHorizontal ? yArea : xArea;
     const cArea = dArea / (totalCount || 1);
@@ -151,19 +157,23 @@ class Bar {
           y = ysp;
         }
 
-        if (isHorizontal) {
-          if (item.b) {
-            w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-            x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-          } else {
-            w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
-          }
-        } else if (item.b) { // vertical stack bar chart
-          h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-          y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-        } else { // vertical bar chart
-          h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+      if (isHorizontal) {
+        if (item.b) {
+          w = Canvas.calculateX(item.o, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition);
+          x = Canvas.calculateX(
+            item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp - xZeroPosition,
+          );
+        } else {
+          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition);
         }
+      } else if (item.b) { // vertical stack bar chart
+        h = Canvas.calculateY(item.o, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition);
+        y = Canvas.calculateY(
+          item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition,
+        );
+      } else { // vertical bar chart
+        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition);
+      }
 
         const barColor = item.dataColor || this.color;
 
@@ -562,23 +572,23 @@ class Bar {
         r = h / 2;
       }
 
-      w -= r;
-      ctx.lineTo(x + w, y);
-      ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
-      ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
-      ctx.lineTo(x, y - h);
-      ctx.lineTo(x, y);
+        w -= r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
+        ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
     } else {
       if (w < r * 2) {
         r = w / 2;
       }
 
-      h += r;
-      ctx.lineTo(x + w, y);
-      ctx.lineTo(x + w, y + h);
-      ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
-      ctx.arcTo(x, y + h - r, x, y + h, r);
-      ctx.lineTo(x, y);
+        h += r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
+        ctx.arcTo(x, y + h - r, x, y + h, r);
+        ctx.lineTo(x, y);
     }
 
     ctx.fill();
