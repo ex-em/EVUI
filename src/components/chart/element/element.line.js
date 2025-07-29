@@ -101,8 +101,6 @@ class Line {
       ctx.setLineDash(this.segments);
     }
 
-    const endPoint = chartRect.y2 - labelOffset.bottom;
-
     let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
@@ -122,6 +120,8 @@ class Line {
 
     const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const includeNegativeValue = this.data.some(data => data.o < 0);
+    const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
     // draw line
     let prevValid;
@@ -240,7 +240,7 @@ class Line {
             for (let jx = endIndex; jx >= startIndex; jx--) {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
-              const bp = getYPos(nextData.b) ?? endPoint;
+              const bp = getYPos(nextData.b) ?? getYPos(0);
               ctx.lineTo(xp, bp);
             }
 
