@@ -450,21 +450,23 @@ class Bar {
       formattedTxt = Util.labelSignFormat(value, decimalPoint) ?? '';
     }
 
+    const isNegativeValue = value < 0;
     const textWidth = Math.round(ctx.measureText(formattedTxt).width);
     const textHeight = fontSize + 4;
-    const minXPos = x + 10;
-    const minYPos = y - 10;
-    const widthFreeSpaceToDraw = w - 10;
+    const minXPos = isNegativeValue ? x - 10 : x + 10;
+    const minYPos = isNegativeValue ? y + 10 : y - 10;
+    const widthFreeSpaceToDraw = Math.abs(w) - 10;
     const heightFreeSpaceToDraw = Math.abs(h + 10);
-    const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
-    const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
+    const centerX = x + (w / 2);
+    const centerY = y + (h / 2);
     const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
 
     switch (align) {
       case 'start': {
         if (isHorizontal) {
           if (textWidth < widthFreeSpaceToDraw) {
-            ctx.fillText(formattedTxt, minXPos, centerYHorizontal);
+            const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
+            ctx.fillText(formattedTxt, xPos, centerYHorizontal);
           }
         } else if (textHeight < heightFreeSpaceToDraw) {
           ctx.fillText(formattedTxt, centerX, minYPos);
@@ -492,7 +494,8 @@ class Bar {
         }
 
         if (isHorizontal) {
-          ctx.fillText(formattedTxt, minXPos + w, centerYHorizontal);
+          const xPos = isNegativeValue ? minXPos + w + textWidth : minXPos + w;
+          ctx.fillText(formattedTxt, xPos, centerYHorizontal);
         } else {
           ctx.fillText(formattedTxt, centerX, y + h - (textHeight / 2));
         }
@@ -504,8 +507,8 @@ class Bar {
       case 'end': {
         if (isHorizontal) {
           if (textWidth < widthFreeSpaceToDraw) {
-            const xPos = x + w - (textWidth * 2);
-            ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+            const xPos = isNegativeValue ? x + w + textWidth : x + w - (textWidth * 2);
+            ctx.fillText(formattedTxt, xPos, centerYHorizontal);
           }
         } else if (textHeight < heightFreeSpaceToDraw) {
           const yPos = y + h + textHeight;
