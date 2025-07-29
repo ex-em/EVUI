@@ -171,47 +171,53 @@ class EvChart {
     this.drawSyncedIndicator({ horizontal, label, mousePosition });
   }
 
-  adjustYAxisWidth() {
+  adjustXAndYAxisWidth() {
     // fitWidth(maxWidth에 넘을 시 말줄임표 들어가는 기능)을 사용중인 step Axis인 경우에는 적용 제외
-    const isStepAxisUseFitWidth = this.options.axesY?.some(axisY => axisY.type === 'step' && axisY.labelStyle?.fitWidth);
+    const isStepXAxisUseFitWidth = this.options.axesX?.some(axisX => axisX.type === 'step' && axisX.labelStyle?.fitWidth);
+    const isStepYAxisUseFitWidth = this.options.axesY?.some(axisY => axisY.type === 'step' && axisY.labelStyle?.fitWidth);
 
-    if (
-        !this.axesY?.length
-        || !this.axesRange?.y
-        || !this.axesSteps?.y?.length
-        || isStepAxisUseFitWidth
-    ) {
-      return;
-    }
+    const getNotFormattedLabels = (axesSteps) => {
+      const { interval, graphMin, graphMax, steps = 0 } = axesSteps ?? {};
+      let result = [];
 
-    let notFormattedLabels = [];
-    const { interval, graphMin, graphMax, steps = 0 } = this.axesSteps?.y[0] ?? {};
-    if (interval) {
-      for (let i = 0; i < steps; i++) {
-        notFormattedLabels.push(graphMin + (i * interval));
+      if (interval) {
+        result = Array.from({ length: steps }, (_, i) => graphMin + i * interval);
+        result.push(graphMax);
+      } else {
+        const { labels } = this.data;
+        result = labels?.y ?? labels ?? [];
       }
-      notFormattedLabels.push(graphMax);
-    } else {
-      notFormattedLabels = this.data.labels?.y ?? this.data.labels ?? [];
-    }
 
-    const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedLabels);
-    if (yMaxWidth > 0) {
-      const adjustedRange = {
-        x: this.axesRange.x,
-        y: this.axesRange.y.map(value => ({
-          ...value,
-          size: {
-            width: yMaxWidth,
-            height: value.size.height,
-          },
-        })),
-      };
+      return result;
+    };
 
-      this.labelOffset = this.getLabelOffset(adjustedRange);
-      this.labelRange = this.getAxesLabelRange();
-      this.axesSteps = this.calculateSteps();
-    }
+    const notFormattedXLabels = getNotFormattedLabels(this.axesSteps?.x[0]);
+    const notFormattedYLabels = getNotFormattedLabels(this.axesSteps?.y[0]);
+
+    const xMaxWidth = this.axesX[0]?.getLabelWidthHasMaxLength(notFormattedXLabels);
+    const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedYLabels);
+
+    const adjustedRange = {
+      x: !isStepXAxisUseFitWidth ? this.axesRange?.x?.map(value => ({
+        ...value,
+        size: {
+          width: Math.max(xMaxWidth, value.size.width),
+          height: value.size.height,
+        },
+      })) : this.axesRange?.x,
+      y: !isStepYAxisUseFitWidth ? this.axesRange?.y?.map(value => ({
+        ...value,
+        size: {
+          width: Math.max(yMaxWidth, value.size.width),
+          height: value.size.height,
+        },
+      })) : this.axesRange?.y,
+    };
+
+    this.axesRange = adjustedRange;
+    this.labelOffset = this.getLabelOffset(adjustedRange);
+    this.labelRange = this.getAxesLabelRange();
+    this.axesSteps = this.calculateSteps();
   }
 
   /**
@@ -228,7 +234,7 @@ class EvChart {
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
 
-    this.adjustYAxisWidth();
+    this.adjustXAndYAxisWidth();
 
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);

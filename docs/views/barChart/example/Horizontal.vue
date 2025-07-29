@@ -49,7 +49,7 @@
         horizontal: true,
         borderRadius: 15,
         axesX: [{
-          type: 'log',
+          type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
           showGrid: true,
