@@ -93,8 +93,8 @@ class Scale {
     }
 
     if (this.startToZero) {
-      minValue = 0;
-    }
+        minValue = 0;
+      }
 
     if (maxValue === minValue) {
       maxValue += 1;
@@ -138,6 +138,7 @@ class Scale {
 
   /**
    * With range information, calculate how many labels in axis
+   * linear type은 scale.linear.js에서 처리
    * @param {object} range    min/max information
    *
    * @returns {object} steps, interval, min/max graph value
@@ -338,6 +339,13 @@ class Scale {
         if (labelCenter <= endPoint || this.type !== 'x' || !options?.axesX[0].flow || dataLabels.length === steps + 1) {
           ctx.beginPath();
           ticks[ix] = axisMinForLabel + (ix * stepValue);
+
+          const isZeroLine = ticks[ix] === 0;
+          if (isZeroLine && this.zeroLineColor) {
+            ctx.strokeStyle = this.zeroLineColor;
+          } else {
+            ctx.strokeStyle = this.gridLineColor;
+          }
 
           linePosition = labelCenter + aliasPixel;
           labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
