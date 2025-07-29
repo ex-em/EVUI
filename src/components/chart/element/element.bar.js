@@ -569,29 +569,48 @@ class Bar {
 
     ctx.beginPath();
     ctx.moveTo(x, y);
+    if (Math.abs(w) < r * 2) {
+      r = Math.abs(w) / 2;
+    }
+
+    if (Math.abs(h) < r * 2) {
+      r = Math.abs(h) / 2;
+    }
 
     if (isHorizontal) {
-      if (h < r * 2) {
-        r = h / 2;
-      }
-
+      const isNegativeValue = w < 0;
+      if (isNegativeValue) {
+        w += r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w - r, y, x + w - r, y - r, r);
+        ctx.arcTo(x + w - r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
+      } else {
         w -= r;
         ctx.lineTo(x + w, y);
         ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
         ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
         ctx.lineTo(x, y - h);
         ctx.lineTo(x, y);
-    } else {
-      if (w < r * 2) {
-        r = w / 2;
       }
-
+    } else {
+      const isNegativeValue = h > 0;
+      if (isNegativeValue) {
+        h -= r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h + r, x - w + r, y + h + r, r);
+        ctx.arcTo(x, y + h + r, x, y + h, r);
+        ctx.lineTo(x, y);
+      } else {
         h += r;
         ctx.lineTo(x + w, y);
         ctx.lineTo(x + w, y + h);
         ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
         ctx.arcTo(x, y + h - r, x, y + h, r);
         ctx.lineTo(x, y);
+      }
     }
 
     ctx.fill();
