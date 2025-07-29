@@ -25,21 +25,23 @@ const modules = {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
             const sData = data[seriesID];
+            const passingValue = series?.passingValue;
 
             if (series && sData) {
               series.data = this.addSeriesDSforScatter(sData);
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, passingValue);
             }
           });
         } else if (typeKey === 'heatMap') {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
+            const passingValue = series?.passingValue;
             const sData = data[seriesID];
 
             if (series && sData) {
               series.labels = label;
               series.data = this.addSeriesDSForHeatMap(sData);
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, passingValue);
               series.valueOpt = this.getSeriesValueOptForHeatMap(series);
             }
           });
@@ -47,6 +49,7 @@ const modules = {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
             const sData = data[seriesID];
+            const passingValue = series?.passingValue;
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
@@ -58,7 +61,7 @@ const modules = {
                   sData, label, series.isExistGrp, series.interpolation,
                 );
               }
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, passingValue);
             }
           });
         }
@@ -580,14 +583,13 @@ const modules = {
     return data;
   },
 
-
   /**
    * Take series data to create min/max info for each series
    * @param {object}  data    series data
    *
    * @returns {object} min/max info for series
    */
-  getSeriesMinMax(data) {
+  getSeriesMinMax(data, passingValue) {
     const def = { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
     const isHorizontal = this.options.horizontal;
 
@@ -596,14 +598,17 @@ const modules = {
         const minmax = acc;
         const px = p.x?.value || p.x;
         const py = p.y?.value || p.y;
+        const po = p.o?.value || p.o;
 
-        if (px <= minmax.minX) {
+        if (po !== passingValue && px <= minmax.minX) {
           minmax.minX = (px === null) ? 0 : px;
         }
-        if (py <= minmax.minY) {
+
+        if (po !== passingValue && py <= minmax.minY) {
           minmax.minY = (py === null) ? 0 : py;
         }
-        if (px >= minmax.maxX) {
+
+        if (po !== passingValue && px >= minmax.maxX) {
           minmax.maxX = (px === null) ? 0 : px;
 
           if (isHorizontal && px !== null) {
@@ -611,7 +616,8 @@ const modules = {
             minmax.maxDomainIndex = index;
           }
         }
-        if (py >= minmax.maxY) {
+
+        if (po !== passingValue && py >= minmax.maxY) {
           minmax.maxY = (py === null) ? 0 : py;
 
           if (!isHorizontal && py !== null) {
