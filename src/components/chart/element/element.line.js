@@ -180,9 +180,10 @@ class Line {
           }
         });
         const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
-        gradient.addColorStop(0, fillColor);
+        const mainGradientColor = extent.opacity < 1 ? fillColor : mainColor;
+        gradient.addColorStop(0, includeNegativeValue ? mainGradientColor : fillColor);
         gradient.addColorStop(0.5, fillColor);
-        gradient.addColorStop(1, (extent.opacity < 1 ? fillColor : mainColor));
+        gradient.addColorStop(1, mainGradientColor);
 
         ctx.fillStyle = gradient;
       } else {
