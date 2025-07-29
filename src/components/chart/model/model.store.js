@@ -402,17 +402,20 @@ const modules = {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
-    const getBaseDataPosition = (baseIndex, dataIndex) => {
+    const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
       const nextBaseSeriesIndex = baseIndex - 1;
       const baseSeries = this.seriesList[bsIds[baseIndex]];
       const baseDataList = baseSeries.data;
       const baseData = baseDataList[dataIndex];
       const position = isHorizontal ? baseData?.x : baseData?.y;
-      const isPassingValue = baseSeries.passingValue === baseData?.o;
 
-      if (isPassingValue || position == null || !baseSeries.show) {
+      const baseValue = baseData?.o;
+      const isPassingValue = baseSeries.passingValue === baseValue;
+      const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
+
+      if (isPassingValue || position == null || !isSameSign || !baseSeries.show) {
         if (nextBaseSeriesIndex > -1) {
-          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex);
+          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex, curr);
         }
 
         return 0;
@@ -423,7 +426,7 @@ const modules = {
 
     data.forEach((curr, index) => {
       const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
-      let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
+      let bdata = getBaseDataPosition(baseIndex, index, curr); // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
@@ -1260,13 +1263,25 @@ const modules = {
               minmax.y[axisY].min = smm.minY;
             }
           }
-          if (smm.maxX >= minmax.x[axisX].max) {
+
+          const isExistGrp = this.seriesList[key].isExistGrp;
+          const maxXisNegative = minmax.x[axisX].max < 0;
+
+          if (isExistGrp && maxXisNegative) {
+            minmax.x[axisX].max = smm.maxX;
+            minmax.x[axisX].maxSID = key;
+          } else if (!minmax.x[axisX].max || smm.maxX >= minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
             minmax.x[axisX].maxSID = key;
           }
-          if (smm.maxY >= minmax.y[axisY].max) {
+
+          const maxYisNegative = minmax.y[axisY].max < 0;
+          if (isExistGrp && maxYisNegative) {
             minmax.y[axisY].max = smm.maxY;
-            minmax.y[axisX].maxSID = key;
+            minmax.y[axisY].maxSID = key;
+          } else if (!minmax.y[axisY].max || smm.maxY >= minmax.y[axisY].max) {
+            minmax.y[axisY].max = smm.maxY;
+            minmax.y[axisY].maxSID = key;
           }
         }
 
