@@ -363,16 +363,16 @@ const modules = {
 
         if (!labelTipOpt.fixedPosTop) {
           if (isExistGrp) {
-            const positiveSum = visibleSeries.reduce((ac, sId) => (
+            const positiveSum = visibleSeries?.reduce((ac, sId) => (
               groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
                 ? ac + (selectedData[sId]?.value ?? selectedData[sId])
                 : ac), 0);
 
             const nonGroupValues = visibleSeries
-              .filter(sId => !groups.includes(sId))
-              .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+              ?.filter(sId => !groups.includes(sId))
+              ?.map(sId => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
 
-            const maxNonGroupValue = nonGroupValues.length > 0
+            const maxNonGroupValue = nonGroupValues?.length > 0
               ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
               : -Infinity;
 
