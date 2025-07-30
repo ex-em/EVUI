@@ -372,14 +372,21 @@ const modules = {
               .filter(sId => !groups.includes(sId))
               .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
 
+            const maxNonGroupValue = nonGroupValues.length > 0
+              ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+              : -Infinity;
+
             value = positiveSum > 0
-              ? Math.max(Math.max(...nonGroupValues), positiveSum)
-              : Math.max(Math.max(...nonGroupValues), 0);
+              ? Math.max(maxNonGroupValue, positiveSum)
+              : Math.max(maxNonGroupValue, 0);
           } else if (visibleSeries.length) {
             const visibleValue = visibleSeries
               .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
 
-            const maxValue = Math.max(...visibleValue);
+            const maxValue = visibleValue.length > 0
+              ? visibleValue.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+              : -Infinity;
+
             value = maxValue > 0 || this.options.type !== 'bar'
               ? maxValue
               : 0;
