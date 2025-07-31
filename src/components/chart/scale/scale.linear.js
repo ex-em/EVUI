@@ -76,7 +76,8 @@ class LinearScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const { maxValue, minValue, maxSteps } = range;
+    const { maxValue, minValue } = range;
+    let { maxSteps = 1 } = range;
 
     let interval = this.getInterval(range);
     let graphMin = 0;
@@ -97,32 +98,34 @@ class LinearScale extends Scale {
       graphMin = Math.floor(minValue / interval) * interval;
     }
 
-    let graphRange = graphMax - graphMin;
+    const graphRange = graphMax - graphMin;
     let numberOfSteps = Math.round(graphRange / interval);
-    let adjustedMaxSteps = maxSteps;
 
     // 특수 케이스: 양수 최소값, 최대값이 1일 경우
     if (minValue > 0 && maxValue === 1) {
       if (!this.decimalPoint) {
         interval = 1;
-        adjustedMaxSteps = 1;
         numberOfSteps = 1;
+        maxSteps = 1;
       } else if (maxSteps > 2) {
         interval = 0.2;
-        adjustedMaxSteps = 5;
         numberOfSteps = 5;
+        maxSteps = 5;
       } else {
         interval = 0.5;
-        adjustedMaxSteps = 2;
         numberOfSteps = 2;
+        maxSteps = 2;
       }
-      graphMax = minValue + interval * numberOfSteps;
-      graphRange = graphMax - graphMin;
     }
 
     // 최대 스텝 수 조정
-    while (numberOfSteps > adjustedMaxSteps) {
-      numberOfSteps = adjustedMaxSteps;
+    while (numberOfSteps > maxSteps) {
+      interval *= 2;
+      numberOfSteps = Math.round(graphRange / interval);
+      interval = Math.ceil(graphRange / numberOfSteps);
+    }
+
+    if (graphRange > (numberOfSteps * interval)) {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
