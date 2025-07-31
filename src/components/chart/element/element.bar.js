@@ -418,7 +418,7 @@ class Bar {
   drawValueLabels({ context, data, positions, isHighlight, textColor, index }) {
     const isHorizontal = this.isHorizontal;
     const { fontSize, textColor: seriesTextColor, align, formatter, decimalPoint } = this.showValue;
-    const { x, y, w, h } = positions;
+    const { x: barX, y: barY, w: barWidth, h: barHeight } = positions;
     const ctx = context;
 
     ctx.save();
@@ -452,36 +452,38 @@ class Bar {
 
     const isNegativeValue = value < 0;
     const textWidth = Math.round(ctx.measureText(formattedTxt).width);
-    const textHeight = fontSize + 4;
-    const minXPos = isNegativeValue ? x - 10 : x + 10;
-    const minYPos = isNegativeValue ? y + 10 : y - 10;
-    const widthFreeSpaceToDraw = Math.abs(w) - 10;
-    const heightFreeSpaceToDraw = Math.abs(h + 10);
-    const centerX = x + (w / 2);
-    const centerY = y + (h / 2);
-    const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
+    const textHeight = fontSize; // fontSize와 textHeight는 같을 수 없지만, 정확히 구할 필요 없음
+
+    const GAP = 10;
+    const minXPos = isNegativeValue ? barX - GAP : barX + GAP;
+    const minYPos = isNegativeValue ? barY + GAP : barY - GAP;
+
+    const centerXOnBar = barX + (barWidth / 2);
+    const centerYOnBar = isHighlight ? barY + (barHeight / 2) : barY - (barHeight / 2);
+
+    const drawableBarWidth = Math.abs(barWidth) - GAP;
+    const drawableBarHeight = Math.abs(barHeight) - GAP;
 
     switch (align) {
       case 'start': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
-            ctx.fillText(formattedTxt, xPos, centerYHorizontal);
-          }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          ctx.fillText(formattedTxt, centerX, minYPos);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
+          ctx.fillText(formattedTxt, xPos, centerYOnBar);
+        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+          const yPos = isNegativeValue
+            ? barY + GAP
+            : barY - GAP;
+          ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
         break;
       }
 
       case 'center': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            ctx.fillText(formattedTxt, centerX, centerYHorizontal);
-          }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          ctx.fillText(formattedTxt, centerX, centerY);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
+        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+          ctx.fillText(formattedTxt, centerXOnBar, barY + (barHeight / 2));
         }
 
         break;
@@ -494,10 +496,25 @@ class Bar {
         }
 
         if (isHorizontal) {
-          const xPos = isNegativeValue ? minXPos + w + textWidth : minXPos + w;
-          ctx.fillText(formattedTxt, xPos, centerYHorizontal);
+          const minXOnChart = this.chartRect.x1 + this.labelOffset.left;
+          const maxXOnChart = this.chartRect.x2 - this.labelOffset.right;
+
+          if (isNegativeValue) {
+            const xPos = barX - GAP + barWidth - textWidth;
+            if (xPos > minXOnChart) {
+              ctx.fillText(formattedTxt, xPos, centerYOnBar);
+            }
+          } else {
+            const xPos = barX + GAP + barWidth;
+            if (xPos + textWidth < maxXOnChart) {
+              ctx.fillText(formattedTxt, xPos, centerYOnBar);
+            }
+          }
         } else {
-          ctx.fillText(formattedTxt, centerX, y + h - (textHeight / 2));
+          const yPos = isNegativeValue
+            ? barY + barHeight + GAP
+            : barY + barHeight - GAP;
+          ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
         break;
@@ -505,14 +522,21 @@ class Bar {
 
       default:
       case 'end': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            const xPos = isNegativeValue ? x + w + textWidth : x + w - (textWidth * 2);
-            ctx.fillText(formattedTxt, xPos, centerYHorizontal);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          const xPos = isNegativeValue
+            ? barX + barWidth + GAP
+            : barX + barWidth - textWidth - GAP;
+          ctx.fillText(formattedTxt, xPos, centerYOnBar);
+        } else if (!isHorizontal) {
+          if (isNegativeValue) {
+            const yPos = barY + barHeight - GAP;
+            if (yPos > minYPos) {
+              ctx.fillText(formattedTxt, centerXOnBar, yPos);
+            }
+          } else if (textHeight < drawableBarHeight) {
+            const yPos = barY + barHeight + GAP;
+            ctx.fillText(formattedTxt, centerXOnBar, yPos);
           }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          const yPos = y + h + textHeight;
-          ctx.fillText(formattedTxt, centerX, yPos >= minYPos ? minYPos : yPos);
         }
 
         break;
