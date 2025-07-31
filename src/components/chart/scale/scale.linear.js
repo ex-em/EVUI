@@ -66,7 +66,6 @@ class LinearScale extends Scale {
         ),
       );
     }
-
     return Math.ceil((max - min) / steps);
   }
 
@@ -114,7 +113,7 @@ class LinearScale extends Scale {
         numberOfSteps = 5;
       } else {
         interval = 0.5;
-        numberOfSteps = 2;
+        adjustedMaxSteps = 2;
         numberOfSteps = 2;
       }
       graphMax = minValue + interval * numberOfSteps;
