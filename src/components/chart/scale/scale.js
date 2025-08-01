@@ -443,15 +443,17 @@ class Scale {
         }
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
-        const { from, to, label: labelOpt } = mergedPlotBandOpt;
+        const { from: userDefinedFrom, to: userDefinedTo, label: labelOpt } = mergedPlotBandOpt;
+        const from = userDefinedFrom ? Math.max(userDefinedFrom, axisMin) : axisMin;
+        const to = userDefinedTo ? Math.min(userDefinedTo, axisMax) : axisMax;
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
         let fromPos;
         let toPos;
         if (this.type === 'x') {
-          fromPos = Canvas.calculateX(from ?? minX, axisMin, axisMax, xArea, minX);
-          toPos = Canvas.calculateX(to ?? maxX, axisMin, axisMax, xArea, minX);
+          fromPos = Canvas.calculateX(from, axisMin, axisMax, xArea, minX);
+          toPos = Canvas.calculateX(to, axisMin, axisMax, xArea, minX);
 
           if (fromPos === null || toPos === null) {
             return;
@@ -459,8 +461,8 @@ class Scale {
 
           this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         } else {
-          fromPos = Canvas.calculateY(from ?? axisMin, axisMin, axisMax, yArea, maxY);
-          toPos = Canvas.calculateY(to ?? axisMax, axisMin, axisMax, yArea, maxY);
+          fromPos = Canvas.calculateY(from, axisMin, axisMax, yArea, maxY);
+          toPos = Canvas.calculateY(to, axisMin, axisMax, yArea, maxY);
 
           if (fromPos === null || toPos === null) {
             return;
@@ -517,6 +519,19 @@ class Scale {
       });
     }
   }
+
+  /**
+   * Adjust plot band range
+   * @param {object} param
+   * @returns {object}
+   */
+  adjustPlotBandRange({ from, to, axisMin, axisMax }) {
+    return {
+      from: Math.max(from ?? 0, axisMin),
+      to: Math.max(to ?? 0, axisMax),
+    };
+  }
+
 
   /**
    * Set plot line style
