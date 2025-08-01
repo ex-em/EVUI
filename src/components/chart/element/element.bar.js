@@ -141,7 +141,6 @@ class Bar {
       const item = this.data[i]; // 실제 데이터 인덱스에 해당하는 항목
       if (item) {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
-
         let categoryPoint;
         if (isHorizontal) {
           categoryPoint = ysp - (cArea * (screenIndex)) - cPad;
@@ -149,6 +148,7 @@ class Bar {
           categoryPoint = xsp + (cArea * (screenIndex)) + cPad;
         }
 
+        // 기본 위치 설정
         if (isHorizontal) {
           x = xsp;
           y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
@@ -157,26 +157,40 @@ class Bar {
           y = ysp;
         }
 
-      if (isHorizontal) {
-        if (item.b) {
-          w = Canvas.calculateX(item.o, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition);
-          x = Canvas.calculateX(
-            item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp - xZeroPosition,
+        // 너비 / 높이 계산, 스택의 경우 위치 값 재계산
+        if (isHorizontal) {
+          const barValue = item.b ? item.o : item.x;
+
+          w = Canvas.calculateX(
+            barValue, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition,
           );
+
+          if (item.b) {
+            x = Canvas.calculateX(
+              item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp - xZeroPosition,
+            );
+          }
+
+          const minimumBarWidth = barValue > 0 ? -1 : 1;
+          w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
         } else {
-          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition);
+          const barValue = item.b ? item.o : item.y;
+
+          h = Canvas.calculateY(
+            barValue, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition,
+          );
+
+          if (item.b) {
+            y = Canvas.calculateY(
+              item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition,
+            );
+          }
+
+          const minimumBarHeight = barValue > 0 ? -1 : 1;
+          h = barValue && Math.abs(h) === 0 ? minimumBarHeight : h;
         }
-      } else if (item.b) { // vertical stack bar chart
-        h = Canvas.calculateY(item.o, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition);
-        y = Canvas.calculateY(
-          item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition,
-        );
-      } else { // vertical bar chart
-        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition);
-      }
 
         const barColor = item.dataColor || this.color;
-
         const legendHitInfo = param?.legendHitInfo;
         const selectLabelOption = param?.selectLabel?.option;
         const selectItemOption = param?.selectItem?.option;
