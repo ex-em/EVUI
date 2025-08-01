@@ -521,19 +521,6 @@ class Scale {
   }
 
   /**
-   * Adjust plot band range
-   * @param {object} param
-   * @returns {object}
-   */
-  adjustPlotBandRange({ from, to, axisMin, axisMax }) {
-    return {
-      from: Math.max(from ?? 0, axisMin),
-      to: Math.max(to ?? 0, axisMax),
-    };
-  }
-
-
-  /**
    * Set plot line style
    * @param {object} plotLine      plotLine Options
    *
