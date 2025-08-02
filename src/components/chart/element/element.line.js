@@ -263,8 +263,14 @@ class Line {
           return;
         }
 
-        const isSingle = this.interpolation === 'none' && Util.isNullOrUndefined(this.data[ix - 1]?.o)
-          && Util.isNullOrUndefined(this.data[ix + 1]?.o);
+        const prevData = this.data[ix - 1]?.o;
+        const nextData = this.data[ix + 1]?.o;
+
+        const isSingle = (this.interpolation === 'none' && Util.isNullOrUndefined(prevData)
+          && Util.isNullOrUndefined(nextData))
+          || (this.usePassingValue
+            && ((this.passingValue !== prevData && isNil(prevData))
+              && (this.passingValue !== nextData && isNil(nextData))));
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
