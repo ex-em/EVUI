@@ -1,4 +1,4 @@
-import { defaultsDeep, isNil, isUndefined } from 'lodash-es';
+import { defaultsDeep } from 'lodash-es';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
@@ -26,7 +26,6 @@ class Line {
       normal: { opacity: 1, lineWidth: 1 },
       highlight: { opacity: 1, lineWidth: 2 },
     };
-    /** @type {import('../model/index').ChartSeriesDataPoint[]} */
     this.data = [];
     this.beforeMouseXp = 0;
     this.beforeMouseYp = 0;
@@ -34,23 +33,12 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = !isUndefined(this.passingValue) && this.interpolation === 'linear';
+    this.usePassingValue = !!this.passingValue;
   }
 
   /**
-   * @typedef {Object} LineDrawParam
-   * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
-   * @property {object} chartRect - 차트 영역 정보
-   * @property {object} labelOffset - 라벨 오프셋 정보
-   * @property {object} axesSteps - 축 스텝 정보
-   * @property {object} [selectLabel] - 선택된 라벨 정보
-   * @property {object} [selectSeries] - 선택된 시리즈 정보
-   * @property {object} [legendHitInfo] - 범례 히트 정보
-   * @property {boolean} [isBrush] - 브러시 사용 여부
-   */
-  /**
    * Draw series data
-   * @param {LineDrawParam} param     object for drawing series data
+   * @param {object} param     object for drawing series data
    *
    * @returns {undefined}
    */
@@ -103,6 +91,8 @@ class Line {
 
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
+    let x;
+    let y;
     let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
@@ -124,39 +114,51 @@ class Line {
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
     // draw line
-    let prevValid;
-    this.data.forEach((curr) => {
-      let x = getXPos(curr.x);
-      let y = getYPos(curr.y);
-
-      if (this.isExistGrp && this.usePassingValue && curr.o === this.passingValue) {
-        y = getYPos(curr.b ?? 0);
-      }
+    let needCutoff = false;
+    this.data.reduce((prev, curr) => {
+      x = getXPos(curr.x);
+      y = getYPos(curr.y);
 
       if (x !== null) {
         x += Util.aliasPixel(x);
       }
 
-      curr.xp = x;
-      curr.yp = y;
+      if (this.usePassingValue) {
+        if (curr.o === this.passingValue) {
+          y = getYPos(prev.y);
 
-      if (this.usePassingValue && curr.o === this.passingValue) {
-        if (!this.isExistGrp) {
-          return;
+          if (prev.o === null) {
+            needCutoff = true;
+          }
+
+          if (this.isExistGrp && !needCutoff) {
+            y = getYPos(curr.b ?? 0);
+            ctx.lineTo(x, y);
+          }
+
+          curr.xp = x;
+          curr.yp = y;
+
+          return curr;
         }
       }
 
-      if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
-        || (!this.usePassingValue && isNil(curr.o) && this.interpolation !== 'zero')
-        || (!this.usePassingValue && isNil(prevValid?.y))
-        || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
+      const isNullValue = Util.isNullOrUndefined(prev.o)
+        || Util.isNullOrUndefined(curr.o)
+        || Util.isNullOrUndefined(curr.x)
+        || Util.isNullOrUndefined(curr.y);
+      if (isNullValue || needCutoff) {
         ctx.moveTo(x, y);
+        needCutoff = false;
       } else {
         ctx.lineTo(x, y);
       }
 
-      prevValid = curr;
-    });
+      curr.xp = x; // eslint-disable-line
+      curr.yp = y; // eslint-disable-line
+
+      return curr;
+    }, this.data[0]);
 
     ctx.stroke();
     if (this.segments) {
@@ -193,22 +195,19 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => (item?.o));
-      /** @type {Array<[number, number]>} */
+      const valueArray = this.data.map(item => item?.o);
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        const isNoneInterpolation = this.interpolation === 'none' || (this.usePassingValue && this.passingValue !== null);
-
-        if (isNoneInterpolation ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
+        if (Util.isNullOrUndefined(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => !isNil(item) && item !== this.passingValue);
+              item => item !== Util.isNullOrUndefined(item) && item !== this.passingValue);
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
           }
-        } else if (this.usePassingValue && valueArray[i] === this.passingValue) {
+        } else if (valueArray[i] === this.passingValue) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -232,7 +231,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o || (this.interpolation === 'zero' && isNil(currData.o))) {
+          } else if (this.isExistGrp || this.passingValue !== currData.o) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
