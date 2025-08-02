@@ -46,17 +46,17 @@ const modules = {
         } else {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
-            const sData = data[seriesID];
-
+            const sData = data[seriesID].map((item) => {
+              if (series.interpolation === 'zero' && !item) {
+                return 0;
+              }
+              return item;
+            });
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
-                series.data = this.addSeriesStackDS(
-                  sData, label, series.bsIds, series.stackIndex, series.interpolation,
-                );
+                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
-                series.data = this.addSeriesDS(
-                  sData, label, series.isExistGrp, series.interpolation,
-                );
+                series.data = this.addSeriesDS(sData, label, series.isExistGrp);
               }
               series.minMax = this.getSeriesMinMax(series.data);
             }
@@ -389,13 +389,12 @@ const modules = {
    * @param {object}  label   chart label
    * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
-   * @param {import('./index').InterpolationType}  interpolation   interpolation type
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0, interpolation = 'none') {
+  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
@@ -443,7 +442,7 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata, interpolation));
+        sdata.push(this.addData(gdata, ldata, odata, bdata));
       }
     });
 
@@ -455,13 +454,12 @@ const modules = {
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
    * @param {boolean}  isBase   is Base(bottommost) series at stack chart
-   * @param {import('./index').InterpolationType}  interpolation   interpolation type
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase, interpolation = 'none') {
+  addSeriesDS(data, label, isBase) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const passingValue = this.seriesList[Object.keys(this.seriesList)[0]]?.passingValue;
@@ -479,12 +477,7 @@ const modules = {
         const isPassingValueWithStack = isBase
           && !Util.isNullOrUndefined(passingValue)
           && gdata === passingValue;
-        sdata.push(this.addData(
-          isPassingValueWithStack ? 0 : gdata,
-          ldata,
-          gdata,
-          null,
-          interpolation,
+        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata,
         ));
       }
     });
@@ -535,13 +528,12 @@ const modules = {
    * @param {object}  ldata    label data (x-axis value for vertical chart)
    * @param {object}  odata    original data (without stacked value)
    * @param {object}  bdata    base data (stacked value)
-   * @param {import('./index').InterpolationType}  interpolation   interpolation type
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null, interpolation = 'none') {
+  addData(gdata, ldata, odata = null, bdata = null) {
     let data;
     let gdataValue = null;
     let odataValue = null;
@@ -554,7 +546,7 @@ const modules = {
       gdataColor = gdata.color;
       dataTextColor = gdata.textColor;
     } else {
-      gdataValue = interpolation === 'zero' && !gdata ? bdata ?? 0 : gdata ?? null;
+      gdataValue = gdata ?? null;
     }
 
     if (odata !== null && typeof odata === 'object') {

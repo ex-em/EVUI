@@ -147,7 +147,7 @@ class Line {
       }
 
       if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
-        || (!this.usePassingValue && isNil(curr.o) && this.interpolation !== 'zero')
+        || (!this.usePassingValue && isNil(curr.o))
         || (!this.usePassingValue && isNil(prevValid?.y))
         || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
         ctx.moveTo(x, y);
@@ -232,7 +232,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o || (this.interpolation === 'zero' && isNil(currData.o))) {
+          } else if (this.isExistGrp || this.passingValue !== currData.o) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
