@@ -50,6 +50,9 @@ const modules = {
               if (series.interpolation === 'zero' && !item) {
                 return 0;
               }
+              if (item === series.passingValue) {
+                return null;
+              }
               return item;
             });
             if (series && sData) {

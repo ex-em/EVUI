@@ -129,7 +129,7 @@ class Line {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
-      if (this.isExistGrp && this.usePassingValue && curr.o === this.passingValue) {
+      if (this.isExistGrp && this.usePassingValue && curr.o === null) {
         y = getYPos(curr.b ?? 0);
       }
 
@@ -140,16 +140,14 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if (this.usePassingValue && curr.o === this.passingValue) {
+      if (this.usePassingValue && curr.o === null) {
         if (!this.isExistGrp) {
           return;
         }
       }
 
-      if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
-        || (!this.usePassingValue && isNil(curr.o))
-        || (!this.usePassingValue && isNil(prevValid?.y))
-        || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
+      if ((isNil(prevValid?.y) && !this.isExistGrp)
+        || (!this.usePassingValue && (isNil(prevValid?.y) || isNil(curr.o)))) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -197,18 +195,18 @@ class Line {
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        const isNoneInterpolation = this.interpolation === 'none' || (this.usePassingValue && this.passingValue !== null);
+        // const isNoneInterpolation = this.interpolation === 'none';
 
-        if (isNoneInterpolation ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
+        if ((this.usePassingValue && isUndefined(valueArray[i])) || isNil(valueArray[i])) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => !isNil(item) && item !== this.passingValue);
+              item => !isNil(item) && item !== null);
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
           }
-        } else if (this.usePassingValue && valueArray[i] === this.passingValue) {
+        } else if (this.usePassingValue && valueArray[i] === null) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -232,7 +230,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o) {
+          } else if (this.isExistGrp || currData.o !== null) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
@@ -257,9 +255,10 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      const isLinearSingle = this.interpolation === 'linear' && this.data.filter(item => item.o !== null).length === 1;
 
       this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === this.passingValue) {
+        if (curr.xp === null || curr.yp === null || curr.o === null) {
           return;
         }
 
@@ -267,10 +266,7 @@ class Line {
         const nextData = this.data[ix + 1]?.o;
 
         const isSingle = (this.interpolation === 'none' && Util.isNullOrUndefined(prevData)
-          && Util.isNullOrUndefined(nextData))
-          || (this.usePassingValue
-            && ((this.passingValue !== prevData && isNil(prevData))
-              && (this.passingValue !== nextData && isNil(nextData))));
+          && Util.isNullOrUndefined(nextData)) || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -297,7 +293,7 @@ class Line {
     const { xp, yp, o } = gdata;
 
     ctx.save();
-    if (xp !== null && yp !== null && o !== this.passingValue && this.pointHighlight) {
+    if (xp !== null && yp !== null && o !== null && this.pointHighlight) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
       ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);
@@ -409,7 +405,7 @@ class Line {
       }
     }
 
-    if (this.usePassingValue && item?.data?.o === this.passingValue) {
+    if (this.usePassingValue && item?.data?.o === null) {
       item.data = null;
     }
 
