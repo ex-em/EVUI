@@ -34,7 +34,7 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = !isUndefined(this.passingValue) && this.interpolation === 'linear';
+    this.useLinearInterpolation = this.interpolation === 'linear' || (this.interpolation === 'none' && !!this.passingValue);
   }
 
   /**
@@ -129,7 +129,7 @@ class Line {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
-      if (this.isExistGrp && this.usePassingValue && curr.o === null) {
+      if (this.isExistGrp && this.useLinearInterpolation && curr.o === null) {
         y = getYPos(curr.b ?? 0);
       }
 
@@ -140,14 +140,14 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if (this.usePassingValue && curr.o === null) {
+      if (this.useLinearInterpolation && curr.o === null) {
         if (!this.isExistGrp) {
           return;
         }
       }
 
       if ((isNil(prevValid?.y) && !this.isExistGrp)
-        || (!this.usePassingValue && (isNil(prevValid?.y) || isNil(curr.o)))) {
+        || (!this.useLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -195,9 +195,8 @@ class Line {
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        // const isNoneInterpolation = this.interpolation === 'none';
-
-        if ((this.usePassingValue && isUndefined(valueArray[i])) || isNil(valueArray[i])) {
+        if ((this.useLinearInterpolation && isUndefined(valueArray[i]))
+          || (!this.useLinearInterpolation && isNil(valueArray[i]))) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
@@ -206,7 +205,7 @@ class Line {
             start = null;
             end = null;
           }
-        } else if (this.usePassingValue && valueArray[i] === null) {
+        } else if (this.useLinearInterpolation && valueArray[i] === null) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -265,8 +264,8 @@ class Line {
         const prevData = this.data[ix - 1]?.o;
         const nextData = this.data[ix + 1]?.o;
 
-        const isSingle = (this.interpolation === 'none' && Util.isNullOrUndefined(prevData)
-          && Util.isNullOrUndefined(nextData)) || isLinearSingle;
+        const isSingle = (!this.useLinearInterpolation && isNil(prevData) && isNil(nextData))
+          || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -405,7 +404,7 @@ class Line {
       }
     }
 
-    if (this.usePassingValue && item?.data?.o === null) {
+    if (this.useLinearInterpolation && item?.data?.o === null) {
       item.data = null;
     }
 
