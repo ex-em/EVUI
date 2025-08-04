@@ -868,7 +868,7 @@ const modules = {
         if (item?.data) {
           let gdata;
 
-          if (item.data.o === null && series.interpolation !== 'zero') {
+          if (item.data.o === null) {
             if (!series.isExistGrp) {
               gdata = isHorizontal ? item.data.x : item.data.y;
             }
