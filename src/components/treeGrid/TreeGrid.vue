@@ -455,6 +455,7 @@ export default {
         index,
         hiddenDisplay: false,
         ...column,
+        width: isFinite(column.width) ? column.width : undefined,
         sortOption: {
            sortType: column?.sortOption?.sortType || 'init',
         },
