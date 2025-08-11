@@ -46,15 +46,8 @@ const modules = {
         } else {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
-            const sData = data[seriesID].map((item) => {
-              if (series.interpolation === 'zero' && !item) {
-                return 0;
-              }
-              if (item === series.passingValue) {
-                return null;
-              }
-              return item;
-            });
+            const sData = data[seriesID];
+
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
                 series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
@@ -393,9 +386,7 @@ const modules = {
    * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
    *
-   * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
-   *
-   * @returns {ChartSeriesDataPoint[]} data for each series
+   * @returns {array} data for each series
    */
   addSeriesStackDS(data, label, bsIds, sIdx = 0) {
     const isHorizontal = this.options.horizontal;
@@ -438,7 +429,8 @@ const modules = {
           if (oData != null) {
             gdata = bdata + oData;
           } else {
-            gdata = odata;
+            gdata = null;
+            bdata = 0;
           }
         } else {
           bdata = 0;
@@ -458,9 +450,7 @@ const modules = {
    * @param {object}  label   chart label
    * @param {boolean}  isBase   is Base(bottommost) series at stack chart
    *
-   * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
-   *
-   * @returns {ChartSeriesDataPoint[]} data for each series
+   * @returns {array} data for each series
    */
   addSeriesDS(data, label, isBase) {
     const isHorizontal = this.options.horizontal;
@@ -480,8 +470,7 @@ const modules = {
         const isPassingValueWithStack = isBase
           && !Util.isNullOrUndefined(passingValue)
           && gdata === passingValue;
-        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata,
-        ));
+        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata));
       }
     });
 
@@ -531,10 +520,8 @@ const modules = {
    * @param {object}  ldata    label data (x-axis value for vertical chart)
    * @param {object}  odata    original data (without stacked value)
    * @param {object}  bdata    base data (stacked value)
-   *
-   * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
-   *
-   * @returns {ChartSeriesDataPoint} data for each graph point
+
+   * @returns {object} data for each graph point
    */
   addData(gdata, ldata, odata = null, bdata = null) {
     let data;
@@ -1022,16 +1009,11 @@ const modules = {
     return result;
   },
   /**
-   * @typedef {Object} LabelInfoResult
-   * @property {number} labelIndex - 선택된 라벨의 인덱스
-   * @property {object} hitInfo - 해당 위치에서의 히트 정보 (getItemByPosition 반환값)
-   */
-  /**
    * Find label info by position x and y
    * @param {array}   offset          position x and y
    * @param {string | null}  targetAxis    target Axis Location ('xAxis', 'yAxis' , null)
    *
-   * @returns {LabelInfoResult} clicked label information
+   * @returns {object} clicked label information
    */
   getLabelInfoByPosition(offset, targetAxis) {
     const [x, y] = offset;
@@ -1115,14 +1097,11 @@ const modules = {
 
   /**
    * Get current mouse target label value in label array or calculated using mouse position
-   *
-   * @typedef {import('./index').MouseLabelValue} MouseLabelValue
-   *
    * @param {string}   targetAxis          target Axis Location ('xAxis', 'yAxis')
    * @param {array}  offset    return value from getMousePosition()
    * @param {number}  labelIndex
    *
-   * @returns {MouseLabelValue} current mouse target label value
+   * @returns {object} current mouse target label value
    */
   getCurMouseLabelVal(targetAxis, offset, labelIndex) {
     const { type: chartType, horizontal } = this.options;
