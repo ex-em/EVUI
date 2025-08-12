@@ -46,6 +46,11 @@ const modules = {
         } else {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
+
+            const hasPassingValueInData = data[seriesID].some(item => item === series.passingValue);
+            series.hasPassingValueInData = hasPassingValueInData;
+            debugger;
+
             const sData = data[seriesID].map((item) => {
               if (series.interpolation === 'zero' && !item) {
                 return 0;
@@ -55,6 +60,7 @@ const modules = {
               }
               return item;
             });
+
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
                 series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
