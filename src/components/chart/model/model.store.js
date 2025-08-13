@@ -49,7 +49,6 @@ const modules = {
 
             const hasPassingValueInData = data[seriesID].some(item => item === series.passingValue);
             series.hasPassingValueInData = hasPassingValueInData;
-            debugger;
 
             const sData = data[seriesID].map((item) => {
               if (series.interpolation === 'zero' && !item) {
