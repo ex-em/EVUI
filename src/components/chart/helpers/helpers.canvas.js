@@ -3,13 +3,13 @@ import Util from './helpers.util';
 export default {
   /**
    * Calculate X position
-   * @param {any}    value         graph value
+   * @param {number|null|undefined}    value         graph value
    * @param {number} min           min value
    * @param {number} max           max value
    * @param {number} area          height for axis
    * @param {number} startPoint    startPoint
    *
-   * @returns {any} position
+   * @returns {number|null} position
    */
   calculateX(value, min, max, area, startPoint = 0) {
     if (value === null || value === undefined) {
@@ -45,13 +45,13 @@ export default {
 
   /**
    * Calculate Y position
-   * @param {any}    value         graph value
+   * @param {number|null|undefined}    value         graph value
    * @param {number} min           min value
    * @param {number} max           max value
    * @param {number} area          height for axis
    * @param {number} startPoint    startPoint
    *
-   * @returns {any} position
+   * @returns {number|null} position
    */
   calculateY(value, min, max, area, startPoint = 0) {
     let calcY;

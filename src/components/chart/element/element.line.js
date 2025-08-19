@@ -1,4 +1,4 @@
-import { defaultsDeep } from 'lodash-es';
+import { defaultsDeep, isNil, isUndefined } from 'lodash-es';
 import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
@@ -26,6 +26,7 @@ class Line {
       normal: { opacity: 1, lineWidth: 1 },
       highlight: { opacity: 1, lineWidth: 2 },
     };
+    /** @type {import('../model/index').ChartSeriesDataPoint[]} */
     this.data = [];
     this.beforeMouseXp = 0;
     this.beforeMouseYp = 0;
@@ -33,12 +34,26 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = !!this.passingValue;
+  }
+
+  useLinearInterpolation() {
+    return this.interpolation === 'linear' || (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData);
   }
 
   /**
+   * @typedef {Object} LineDrawParam
+   * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
+   * @property {object} chartRect - 차트 영역 정보
+   * @property {object} labelOffset - 라벨 오프셋 정보
+   * @property {object} axesSteps - 축 스텝 정보
+   * @property {object} [selectLabel] - 선택된 라벨 정보
+   * @property {object} [selectSeries] - 선택된 시리즈 정보
+   * @property {object} [legendHitInfo] - 범례 히트 정보
+   * @property {boolean} [isBrush] - 브러시 사용 여부
+   */
+  /**
    * Draw series data
-   * @param {object} param     object for drawing series data
+   * @param {LineDrawParam} param     object for drawing series data
    *
    * @returns {undefined}
    */
@@ -91,8 +106,8 @@ class Line {
 
     const endPoint = chartRect.y2 - labelOffset.bottom;
 
-    let x;
-    let y;
+    const isLinearInterpolation = this.useLinearInterpolation();
+
     let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
@@ -114,51 +129,37 @@ class Line {
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
 
     // draw line
-    let needCutoff = false;
-    this.data.reduce((prev, curr) => {
-      x = getXPos(curr.x);
-      y = getYPos(curr.y);
+    let prevValid;
+    this.data.forEach((curr) => {
+      let x = getXPos(curr.x);
+      let y = getYPos(curr.y);
+
+      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
+        y = getYPos(curr.b ?? 0);
+      }
 
       if (x !== null) {
         x += Util.aliasPixel(x);
       }
 
-      if (this.usePassingValue) {
-        if (curr.o === this.passingValue) {
-          y = getYPos(prev.y);
+      curr.xp = x;
+      curr.yp = y;
 
-          if (prev.o === null) {
-            needCutoff = true;
-          }
-
-          if (this.isExistGrp && !needCutoff) {
-            y = getYPos(curr.b ?? 0);
-            ctx.lineTo(x, y);
-          }
-
-          curr.xp = x;
-          curr.yp = y;
-
-          return curr;
+      if (isLinearInterpolation && curr.o === null) {
+        if (!this.isExistGrp) {
+          return;
         }
       }
 
-      const isNullValue = Util.isNullOrUndefined(prev.o)
-        || Util.isNullOrUndefined(curr.o)
-        || Util.isNullOrUndefined(curr.x)
-        || Util.isNullOrUndefined(curr.y);
-      if (isNullValue || needCutoff) {
+      if ((isNil(prevValid?.y) && !this.isExistGrp)
+        || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))) {
         ctx.moveTo(x, y);
-        needCutoff = false;
       } else {
         ctx.lineTo(x, y);
       }
 
-      curr.xp = x; // eslint-disable-line
-      curr.yp = y; // eslint-disable-line
-
-      return curr;
-    }, this.data[0]);
+      prevValid = curr;
+    });
 
     ctx.stroke();
     if (this.segments) {
@@ -195,19 +196,21 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => item?.o);
+      const valueArray = this.data.map(item => (item?.o));
+      /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if (Util.isNullOrUndefined(valueArray[i])) {
+        if ((isLinearInterpolation && isUndefined(valueArray[i]))
+          || (!isLinearInterpolation && isNil(valueArray[i]))) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => item !== Util.isNullOrUndefined(item) && item !== this.passingValue);
+              item => !isNil(item) && item !== null);
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
           }
-        } else if (valueArray[i] === this.passingValue) {
+        } else if (isLinearInterpolation && valueArray[i] === null) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -231,7 +234,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o) {
+          } else if (this.isExistGrp || currData.o !== null) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
@@ -256,14 +259,18 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      const isLinearSingle = this.interpolation === 'linear' && this.data.filter(item => item.o !== null).length === 1;
 
       this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === this.passingValue) {
+        if (curr.xp === null || curr.yp === null || curr.o === null) {
           return;
         }
 
-        const isSingle = Util.isNullOrUndefined(this.data[ix - 1]?.o)
-          && Util.isNullOrUndefined(this.data[ix + 1]?.o);
+        const prevData = this.data[ix - 1]?.o;
+        const nextData = this.data[ix + 1]?.o;
+
+        const isSingle = (!isLinearInterpolation && isNil(prevData) && isNil(nextData))
+          || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -290,7 +297,7 @@ class Line {
     const { xp, yp, o } = gdata;
 
     ctx.save();
-    if (xp !== null && yp !== null && o !== this.passingValue && this.pointHighlight) {
+    if (xp !== null && yp !== null && o !== null && this.pointHighlight) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
       ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);
@@ -320,6 +327,7 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
     const SPARE_XP = 0.5;
+    const isLinearInterpolation = this.useLinearInterpolation();
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
@@ -402,7 +410,7 @@ class Line {
       }
     }
 
-    if (this.usePassingValue && item?.data?.o === this.passingValue) {
+    if (isLinearInterpolation && item?.data?.o === null) {
       item.data = null;
     }
 
