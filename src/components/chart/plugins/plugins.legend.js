@@ -460,6 +460,15 @@ const modules = {
     this.onLegendBoxOver = (e) => {
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
+        this.legendHover = null;
+
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: false, keepDomain: false },
+          hitInfo: {
+            legend: null,
+          },
+        });
         return;
       }
 
@@ -579,6 +588,15 @@ const modules = {
 
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
+        this.legendHover = null;
+
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: false, keepDomain: false },
+          hitInfo: {
+            legend: null,
+          },
+        });
         return;
       }
 
