@@ -148,7 +148,7 @@ const modules = {
    * @returns {undefined}
    */
   updateStartEndRowIndex() {
-    const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
+    const index = Math.max(Math.floor(this.legendBoxDOM?.scrollTop / this.legendItemHeight), 0);
     this.startRowIndex = Math.min(index, Math.max(this.totalRowCount - this.visibleRowCount, 0));
     this.endRowIndex = this.startRowIndex + this.visibleRowCount + 1;
   },
@@ -466,6 +466,8 @@ const modules = {
       const targetId = targetDOM?.series?.sId;
       const legendHitInfo = { sId: targetId, type: this.options.type };
 
+      this.legendHover = legendHitInfo;
+
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
@@ -481,6 +483,8 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxLeave = () => {
+      this.legendHover = null;
+
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
@@ -581,6 +585,8 @@ const modules = {
       const targetId = targetDOM?.series?.cId;
       const legendHitInfo = { sId: targetId, type: this.options.type };
 
+      this.legendHover = legendHitInfo;
+
       series.colorState.forEach((colorItem) => {
         colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
       });
@@ -600,6 +606,8 @@ const modules = {
      * @returns {undefined}
      */
     this.onLegendBoxLeave = () => {
+      this.legendHover = null;
+
       const series = Object.values(this.seriesList)[0];
       series.colorState.forEach((item) => {
         item.state = 'normal';
