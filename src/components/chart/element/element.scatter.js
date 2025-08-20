@@ -155,12 +155,14 @@ class Scatter {
 
           if (item.xp !== null && item.yp !== null) {
             const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
-            const color = overflowColor || item.color || this.color;
+            const baseStrokeColor = overflowColor || item.color || this.color;
+            const baseFillColor = overflowColor || item.color || this.pointFill || this.color;
 
-            ctx.strokeStyle = color;
+            const strokeOpacity = this.getOpacity(param, baseStrokeColor, j);
+            const fillOpacity = this.getOpacity(param, baseFillColor, j);
 
-            const pointFillColor = overflowColor || item.color || this.pointFill || this.color;
-            ctx.fillStyle = pointFillColor;
+            ctx.strokeStyle = Util.colorStringToRgba(baseStrokeColor, strokeOpacity);
+            ctx.fillStyle = Util.colorStringToRgba(baseFillColor, fillOpacity);
 
             Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
           }
