@@ -112,22 +112,32 @@ class Scatter {
    * @returns {undefined}
    */
   defaultScatterDraw(param) {
-    const { ctx } = param;
+    const { ctx, axesSteps, duple, legendHitInfo } = param;
+    const minmaxY = axesSteps.y[this.yAxisIndex];
 
     this.data.forEach((item, idx) => {
-      this.calcItem(item, param);
+      const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : !duple.has(`${item.x}${item.y}`);
 
-      if (item.xp !== null && item.yp !== null) {
-        const color = item.dataColor || this.color;
-        ctx.strokeStyle = Util.colorStringToRgba(color, this.getOpacity(param, color, idx));
+      if (shouldDraw) {
+        if (!duple.has(`${item.x}${item.y}`)) {
+          duple.add(`${item.x}${item.y}`);
+        }
 
-        const pointFillColor = item.dataColor || this.pointFill;
-        ctx.fillStyle = Util.colorStringToRgba(
-          pointFillColor,
-          this.getOpacity(param, pointFillColor, idx),
-        );
+        this.calcItem(item, param);
 
-        Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+        if (item.xp !== null && item.yp !== null) {
+          const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
+          const color = overflowColor || item.dataColor || this.color;
+          ctx.strokeStyle = Util.colorStringToRgba(color, this.getOpacity(param, color, idx));
+
+          const pointFillColor = item.dataColor || this.pointFill;
+          ctx.fillStyle = Util.colorStringToRgba(
+            pointFillColor,
+            this.getOpacity(param, pointFillColor, idx),
+          );
+
+          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+        }
       }
     });
   }
@@ -139,7 +149,7 @@ class Scatter {
    * @returns {undefined}
    */
   realTimeScatterDraw(param) {
-    const { ctx, axesSteps, duple } = param;
+    const { ctx, axesSteps, duple, legendHitInfo } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
     const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
@@ -148,8 +158,12 @@ class Scatter {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
 
-        if (!duple.has(`${item.x}${item.y}`)) {
-          duple.add(`${item.x}${item.y}`);
+        const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : !duple.has(`${item.x}${item.y}`);
+
+        if (shouldDraw) {
+          if (!duple.has(`${item.x}${item.y}`)) {
+            duple.add(`${item.x}${item.y}`);
+          }
 
           this.calcItem(item, param);
 
