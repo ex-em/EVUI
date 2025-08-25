@@ -48,14 +48,14 @@ export default {
     const series = {
       series1: {
         name: 'series1',
-        pointSize: 0.5,
+        pointSize: 1,
         color: '#DF6264',
         pointFill: '#DF6264',
         overflowColor: '#FF00FF',
       },
       series2: {
         name: 'series2',
-        pointSize: 0.5,
+        pointSize: 1,
         color: '#3CA0FF',
         pointFill: '#3CA0FF',
         overflowColor: '#A3D3FF',
@@ -112,7 +112,11 @@ export default {
         },
       }],
       legend: {
-        show: false,
+        show: true,
+        position: 'bottom',
+        padding: { top: 0, left: 0 },
+        height: 32,
+        virtualScroll: true,
       },
       displayOverflow: true,
       realTimeScatter: {
