@@ -148,7 +148,7 @@ const modules = {
    * @returns {undefined}
    */
   updateStartEndRowIndex() {
-    const index = Math.max(Math.floor(this.legendBoxDOM.scrollTop / this.legendItemHeight), 0);
+    const index = Math.max(Math.floor(this.legendBoxDOM?.scrollTop / this.legendItemHeight), 0);
     this.startRowIndex = Math.min(index, Math.max(this.totalRowCount - this.visibleRowCount, 0));
     this.endRowIndex = this.startRowIndex + this.visibleRowCount + 1;
   },
@@ -453,6 +453,23 @@ const modules = {
     };
 
     /**
+     * callback for mouseleave event on legendBoxDOM
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxLeave = () => {
+      this.legendHover = null;
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+        hitInfo: {
+          legend: null,
+        },
+      });
+    };
+
+    /**
      * callback for legendBoxDOM hovering
      *
      * @returns {undefined}
@@ -460,32 +477,20 @@ const modules = {
     this.onLegendBoxOver = (e) => {
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
+        this.onLegendBoxLeave();
         return;
       }
 
       const targetId = targetDOM?.series?.sId;
       const legendHitInfo = { sId: targetId, type: this.options.type };
 
+      this.legendHover = legendHitInfo;
+
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
         hitInfo: {
           legend: legendHitInfo,
-        },
-      });
-    };
-
-    /**
-     * callback for mouseleave event on legendBoxDOM
-     *
-     * @returns {undefined}
-     */
-    this.onLegendBoxLeave = () => {
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: false, keepDomain: false },
-        hitInfo: {
-          legend: null,
         },
       });
     };
@@ -566,6 +571,25 @@ const modules = {
     };
 
     /**
+     * callback for mouseleave event on legendBoxDOM
+     *
+     * @returns {undefined}
+     */
+    this.onLegendBoxLeave = () => {
+      this.legendHover = null;
+
+      const series = Object.values(this.seriesList)[0];
+      series.colorState.forEach((item) => {
+        item.state = 'normal';
+      });
+
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+      });
+    };
+
+    /**
      * callback for legendBoxDOM hovering
      *
      * @returns {undefined}
@@ -575,11 +599,14 @@ const modules = {
 
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
+        this.onLegendBoxLeave();
         return;
       }
 
       const targetId = targetDOM?.series?.cId;
       const legendHitInfo = { sId: targetId, type: this.options.type };
+
+      this.legendHover = legendHitInfo;
 
       series.colorState.forEach((colorItem) => {
         colorItem.state = colorItem.id === targetId ? 'highlight' : 'downplay';
@@ -591,23 +618,6 @@ const modules = {
         hitInfo: {
           legend: legendHitInfo,
         },
-      });
-    };
-
-    /**
-     * callback for mouseleave event on legendBoxDOM
-     *
-     * @returns {undefined}
-     */
-    this.onLegendBoxLeave = () => {
-      const series = Object.values(this.seriesList)[0];
-      series.colorState.forEach((item) => {
-        item.state = 'normal';
-      });
-
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: false, keepDomain: false },
       });
     };
 

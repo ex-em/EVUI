@@ -169,6 +169,8 @@ const modules = {
         return;
       }
 
+      this.legendHover = { sId: 'gradient', type: this.options.type };
+
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
@@ -182,6 +184,8 @@ const modules = {
      */
     this.onLegendBoxLeave = () => {
       this.legendDragInfo.dragging = false;
+
+      this.legendHover = null;
 
       this.clearOverlay();
 
