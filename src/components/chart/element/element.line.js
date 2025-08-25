@@ -340,7 +340,8 @@ class Line {
       } else {
         let s = 0;
         let e = gdata.length - 1;
-        const xpInterval = Math.floor(Math.abs(gdata[1]?.xp - gdata[0].xp) / 2) || 6;
+        const gap = Math.floor(Math.abs(gdata[1]?.xp - gdata[0].xp));
+        const xpInterval = gap / 2 > 6 ? gap / 2 : 6;
 
         while (s <= e) {
           const m = Math.floor((s + e) / 2);
