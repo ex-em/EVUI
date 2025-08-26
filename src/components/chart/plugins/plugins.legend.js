@@ -379,7 +379,6 @@ const modules = {
      */
     this.onLegendBoxClick = (e) => {
       const { legend: opt } = this.options;
-      // const { onClick } = opt;
 
       // 클릭 이벤트 차단 옵션이 설정된 경우 함수 종료
       if (opt?.stopClickEvt) {
@@ -404,7 +403,7 @@ const modules = {
       const valueDOMList = targetDOM?.getElementsByClassName(classList.value);
 
       // 현재 시리즈가 활성 상태인지 확인 (inactive 클래스가 없으면 활성)
-      const isActive = targetDOM?.dataset.inactive === 'false';
+      let isActive = targetDOM?.dataset.inactive === 'false';
 
       // 마지막 하나의 시리즈가 남은 경우 비활성화 방지
       // (모든 시리즈가 숨겨지면 차트가 빈 상태가 되므로)
@@ -417,22 +416,37 @@ const modules = {
         return;
       }
 
-      // 현재 활성 상태인 경우 -> 비활성화 처리
-      if (isActive) {
-        // 활성 시리즈 개수 감소
-        this.seriesInfo.count--;
-
-        // 비활성 색상으로 변경
+      const legendContainerDOMs = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
+      const isActiveAll = Array.from(legendContainerDOMs).every(dom => dom.dataset.inactive === 'false');
+      const inactiveDom = (_targetDOM) => {
+        const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+        const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+        const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
+        const _series = _targetDOM?.series;
         const inactiveColor = opt.inactive;
-        colorDOM.style.backgroundColor = inactiveColor;
-        colorDOM.style.borderColor = inactiveColor;
-        nameDOM.style.color = inactiveColor;
 
-        // 값 표시 부분도 비활성 색상으로 변경
-        valueDOMList?.forEach((dom) => {
+        _colorDOM.style.backgroundColor = inactiveColor;
+        _colorDOM.style.borderColor = inactiveColor;
+        _nameDOM.style.color = inactiveColor;
+        _valueDOMList?.forEach((dom) => {
           dom.style.color = inactiveColor;
         });
-      } else {
+        _series.show = !_series.show;
+        _targetDOM.dataset.inactive = !_series.show;
+      };
+
+      if (opt.onClick === 'active' && isActiveAll) {
+        this.seriesInfo.count = 0;
+        this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container').forEach((dom) => {
+          inactiveDom(dom);
+        });
+      } else if (isActive) {
+        this.seriesInfo.count--;
+        inactiveDom(targetDOM);
+      }
+
+      isActive = targetDOM?.dataset.inactive === 'false';
+      if (!isActive) {
         // 현재 비활성 상태인 경우 -> 활성화 처리
         // 활성 시리즈 개수 증가
         this.seriesInfo.count++;
