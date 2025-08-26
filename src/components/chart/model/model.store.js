@@ -47,10 +47,12 @@ const modules = {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
 
-            const hasPassingValueInData = data[seriesID].some(item => item === series.passingValue);
+            const hasPassingValueInData = data?.[seriesID]
+            ?.some(item => item === series.passingValue);
+
             series.hasPassingValueInData = hasPassingValueInData;
 
-            const sData = data[seriesID].map((item) => {
+            const sData = data?.[seriesID]?.map((item) => {
               if (series.interpolation === 'zero' && !item) {
                 return 0;
               }
