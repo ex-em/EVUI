@@ -449,7 +449,6 @@ const modules = {
       // 범례 내부의 색상, 이름, 값 DOM 요소들 추출
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
-
       const isActive = targetDOM?.dataset.inactive === 'false';
 
       if (opt.onClick !== 'active' && isActive && this.seriesInfo.count === 1) {
@@ -482,7 +481,7 @@ const modules = {
         legendContainerDOMs.forEach((dom) => {
           activeDom(dom, opt.color);
         });
-      } else if (!isActive || (isActiveAll && isActive)) {
+      } else if (!isActive || (opt.onClick === 'active' && isActiveAll && isActive)) {
         this.seriesInfo.count++;
         activeDom(targetDOM, opt.color);
       }
