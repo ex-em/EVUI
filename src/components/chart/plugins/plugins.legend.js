@@ -368,6 +368,60 @@ const modules = {
       value: `ev-chart-legend${this.useTable ? '--table__value' : '-value'}`,
     };
 
+    const inactiveDom = (_targetDOM, _inactiveColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
+      const _series = _targetDOM?.series;
+
+      _colorDOM.style.backgroundColor = _inactiveColor;
+      _colorDOM.style.borderColor = _inactiveColor;
+      _nameDOM.style.color = _inactiveColor;
+      _valueDOMList?.forEach((dom) => {
+        dom.style.color = _inactiveColor;
+      });
+      _series.show = !_series.show;
+      _targetDOM.dataset.inactive = !_series.show;
+    };
+
+    const activeDom = (_targetDOM, _activeColor) => {
+      let seriesColor;
+
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
+      const _series = _targetDOM?.series;
+
+      if (typeof _series.color !== 'string') {
+        // 그라데이션 색상인 경우 마지막 색상 사용
+        seriesColor = _series.color[_series.color.length - 1][1];
+      } else {
+        // 단색인 경우 그대로 사용
+        seriesColor = _series.color;
+      }
+
+      // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
+      if (_series.type === 'line' && _series.fill) {
+        _colorDOM.style.height = '8px';
+        _colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
+        _colorDOM.style.border = `1px solid ${seriesColor}`;
+      } else {
+        // 일반적인 경우 배경색만 설정
+        _colorDOM.style.backgroundColor = seriesColor;
+      }
+
+      // 이름과 값 부분의 색상도 원래대로 복원
+      _nameDOM.style.color = _activeColor;
+      _valueDOMList?.forEach((dom) => {
+        const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
+        dom.style.color = style?.color ? style.color : _activeColor;
+      });
+
+      _series.show = !_series.show;
+      _targetDOM.dataset.inactive = !_series.show;
+    };
+
+
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
@@ -392,97 +446,46 @@ const modules = {
         return;
       }
 
-      // 클릭된 범례에 해당하는 시리즈 정보
-      const series = targetDOM?.series;
-
       // 범례 내부의 색상, 이름, 값 DOM 요소들 추출
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
 
-      // 아마 table일 경우에만
-      const valueDOMList = targetDOM?.getElementsByClassName(classList.value);
+      const isActive = targetDOM?.dataset.inactive === 'false';
 
-      // 현재 시리즈가 활성 상태인지 확인 (inactive 클래스가 없으면 활성)
-      let isActive = targetDOM?.dataset.inactive === 'false';
-
-      // 마지막 하나의 시리즈가 남은 경우 비활성화 방지
-      // (모든 시리즈가 숨겨지면 차트가 빈 상태가 되므로)
-      if (isActive && this.seriesInfo.count === 1) {
+      if (opt.onClick !== 'active' && isActive && this.seriesInfo.count === 1) {
         return;
       }
 
-      // 필수 DOM 요소가 없으면 함수 종료
       if (!colorDOM || !nameDOM) {
         return;
       }
 
-      const legendContainerDOMs = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
-      const isActiveAll = Array.from(legendContainerDOMs).every(dom => dom.dataset.inactive === 'false');
-      const inactiveDom = (_targetDOM) => {
-        const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
-        const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
-        const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
-        const _series = _targetDOM?.series;
-        const inactiveColor = opt.inactive;
+      const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+      const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
-        _colorDOM.style.backgroundColor = inactiveColor;
-        _colorDOM.style.borderColor = inactiveColor;
-        _nameDOM.style.color = inactiveColor;
-        _valueDOMList?.forEach((dom) => {
-          dom.style.color = inactiveColor;
-        });
-        _series.show = !_series.show;
-        _targetDOM.dataset.inactive = !_series.show;
-      };
-
+      // inactive
       if (opt.onClick === 'active' && isActiveAll) {
         this.seriesInfo.count = 0;
-        this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container').forEach((dom) => {
-          inactiveDom(dom);
+        legendContainerDOMs.forEach((dom) => {
+          inactiveDom(dom, opt.inactive);
         });
       } else if (isActive) {
         this.seriesInfo.count--;
-        inactiveDom(targetDOM);
+        inactiveDom(targetDOM, opt.inactive);
       }
 
-      isActive = targetDOM?.dataset.inactive === 'false';
-      if (!isActive) {
-        // 현재 비활성 상태인 경우 -> 활성화 처리
-        // 활성 시리즈 개수 증가
-        this.seriesInfo.count++;
+      const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
 
-        // 원래 시리즈 색상 복원
-        let seriesColor;
-        if (typeof series.color !== 'string') {
-          // 그라데이션 색상인 경우 마지막 색상 사용
-          seriesColor = series.color[series.color.length - 1][1];
-        } else {
-          // 단색인 경우 그대로 사용
-          seriesColor = series.color;
-        }
-
-        // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
-        if (series.type === 'line' && series.fill) {
-          colorDOM.style.height = '8px';
-          colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
-          colorDOM.style.border = `1px solid ${seriesColor}`;
-        } else {
-          // 일반적인 경우 배경색만 설정
-          colorDOM.style.backgroundColor = seriesColor;
-        }
-
-        // 이름과 값 부분의 색상도 원래대로 복원
-        nameDOM.style.color = opt.color;
-        valueDOMList?.forEach((dom) => {
-          const style = opt.table?.columns[dom.dataset.type]?.style;
-          dom.style.color = style?.color ? style.color : opt.color;
+      // active
+      if (opt.onClick === 'active' && isInactiveAll && !isActiveAll) {
+        this.seriesInfo.count = legendContainerDOMs.length;
+        legendContainerDOMs.forEach((dom) => {
+          activeDom(dom, opt.color);
         });
+      } else if (!isActive || (isActiveAll && isActive)) {
+        this.seriesInfo.count++;
+        activeDom(targetDOM, opt.color);
       }
-
-      // 시리즈의 표시/숨김 상태 토글
-      series.show = !series.show;
-      // DOM 요소의 inactive 클래스 토글
-      targetDOM.dataset.inactive = !series.show;
 
       // Brush 차트와 연동된 경우 동기화 처리
       if (this.brushSeries) {
