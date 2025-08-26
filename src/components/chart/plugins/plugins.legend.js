@@ -373,61 +373,91 @@ const modules = {
      *
      * @returns {undefined}
      */
+    /**
+     * 범례 박스 클릭 이벤트 핸들러
+     * 시리즈의 표시/숨김을 토글하고 범례의 시각적 상태를 변경
+     */
     this.onLegendBoxClick = (e) => {
       const { legend: opt } = this.options;
+      // const { onClick } = opt;
+
+      // 클릭 이벤트 차단 옵션이 설정된 경우 함수 종료
       if (opt?.stopClickEvt) {
         return;
       }
       const { chartIdx } = this.data;
 
+      // 클릭된 범례 DOM 요소 가져오기
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
         return;
       }
 
+      // 클릭된 범례에 해당하는 시리즈 정보
       const series = targetDOM?.series;
 
+      // 범례 내부의 색상, 이름, 값 DOM 요소들 추출
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
+
+      // 아마 table일 경우에만
       const valueDOMList = targetDOM?.getElementsByClassName(classList.value);
 
-      const isActive = !targetDOM?.className.includes('inactive');
+      // 현재 시리즈가 활성 상태인지 확인 (inactive 클래스가 없으면 활성)
+      const isActive = targetDOM?.dataset.inactive === 'false';
+
+      // 마지막 하나의 시리즈가 남은 경우 비활성화 방지
+      // (모든 시리즈가 숨겨지면 차트가 빈 상태가 되므로)
       if (isActive && this.seriesInfo.count === 1) {
         return;
       }
 
+      // 필수 DOM 요소가 없으면 함수 종료
       if (!colorDOM || !nameDOM) {
         return;
       }
 
+      // 현재 활성 상태인 경우 -> 비활성화 처리
       if (isActive) {
+        // 활성 시리즈 개수 감소
         this.seriesInfo.count--;
 
+        // 비활성 색상으로 변경
         const inactiveColor = opt.inactive;
         colorDOM.style.backgroundColor = inactiveColor;
         colorDOM.style.borderColor = inactiveColor;
         nameDOM.style.color = inactiveColor;
+
+        // 값 표시 부분도 비활성 색상으로 변경
         valueDOMList?.forEach((dom) => {
           dom.style.color = inactiveColor;
         });
       } else {
+        // 현재 비활성 상태인 경우 -> 활성화 처리
+        // 활성 시리즈 개수 증가
         this.seriesInfo.count++;
 
+        // 원래 시리즈 색상 복원
         let seriesColor;
         if (typeof series.color !== 'string') {
+          // 그라데이션 색상인 경우 마지막 색상 사용
           seriesColor = series.color[series.color.length - 1][1];
         } else {
+          // 단색인 경우 그대로 사용
           seriesColor = series.color;
         }
 
+        // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
         if (series.type === 'line' && series.fill) {
           colorDOM.style.height = '8px';
           colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
           colorDOM.style.border = `1px solid ${seriesColor}`;
         } else {
+          // 일반적인 경우 배경색만 설정
           colorDOM.style.backgroundColor = seriesColor;
         }
 
+        // 이름과 값 부분의 색상도 원래대로 복원
         nameDOM.style.color = opt.color;
         valueDOMList?.forEach((dom) => {
           const style = opt.table?.columns[dom.dataset.type]?.style;
@@ -435,9 +465,12 @@ const modules = {
         });
       }
 
+      // 시리즈의 표시/숨김 상태 토글
       series.show = !series.show;
-      targetDOM.classList.toggle('inactive');
+      // DOM 요소의 inactive 클래스 토글
+      targetDOM.dataset.inactive = !series.show;
 
+      // Brush 차트와 연동된 경우 동기화 처리
       if (this.brushSeries) {
         const seriesList = [...this.brushSeries.list];
         seriesList[chartIdx] = this.seriesList;
@@ -446,6 +479,9 @@ const modules = {
         this.brushSeries.chartIdx = chartIdx;
       }
 
+      // 차트 업데이트 실행
+      // updateSeries: false - 시리즈 데이터 재계산 없이
+      // updateSelTip: 선택 팁 업데이트, 도메인 유지
       this.update({
         updateSeries: false,
         updateSelTip: { update: true, keepDomain: true },
@@ -536,7 +572,7 @@ const modules = {
       const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
       const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
       const targetId = targetDOM?.series?.cId;
-      const isActive = !colorDOM?.className.includes('inactive');
+      const isActive = colorDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
       if (isActive && activeCount === 1) {
@@ -561,8 +597,8 @@ const modules = {
         series.colorState[targetIndex].show = !isActive;
       }
 
-      colorDOM.classList.toggle('inactive');
-      nameDOM.classList.toggle('inactive');
+      colorDOM.dataset.inactive = !colorDOM.dataset.inactive;
+      nameDOM.dataset.inactive = !nameDOM.dataset.inactive;
 
       this.update({
         updateSeries: false,
@@ -791,63 +827,94 @@ const modules = {
    *
    * @returns {undefined}
    */
+  /**
+   * 새로운 범례 아이템을 생성하고 범례 영역에 추가
+   * @param {Object} series - 시리즈 정보 객체
+   */
   addLegend(series) {
     const opt = this.options.legend;
-    const containerDOM = document.createElement('div');
-    const colorDOM = document.createElement('span');
-    const nameDOM = document.createElement('div');
 
-    containerDOM.className = `ev-chart-legend-container ${!series.show ? ' inactive' : ''}`;
+    // 범례 아이템을 구성하는 DOM 요소들 생성
+    const containerDOM = document.createElement('div'); // 범례 아이템 컨테이너
+    const colorDOM = document.createElement('span'); // 색상 인디케이터
+    const nameDOM = document.createElement('div'); // 시리즈 이름 표시
+
+    // 컨테이너에 기본 클래스와 활성/비활성 상태 클래스 설정
+    containerDOM.className = 'ev-chart-legend-container';
+    containerDOM.dataset.inactive = !series.show;
+    // 컨테이너에 시리즈 참조 저장 (클릭 이벤트에서 사용)
     containerDOM.series = series;
 
+    // 색상 인디케이터 기본 클래스 설정
     colorDOM.className = 'ev-chart-legend-color';
 
+    // 라인 차트이면서 포인트가 있고 fill이 없는 경우 특별한 스타일 적용
     if (series.type === 'line' && series.point && !series.fill) {
       colorDOM.className += ' ev-chart-legend-color--point-line';
     }
 
+    // 시리즈 이름 표시 영역 클래스 설정
     nameDOM.className = 'ev-chart-legend-name';
 
-    // set series color
+    // 시리즈 색상 결정 로직
     let seriesColor;
     if (!series.show) {
+      // 시리즈가 숨겨진 상태면 비활성 색상 사용
       seriesColor = opt.inactive;
     } else if (typeof series.color !== 'string') {
+      // 그라데이션 색상인 경우 배열의 마지막 색상 값 사용
       seriesColor = series.color[series.color.length - 1][1];
     } else {
+      // 단색인 경우 그대로 사용
       seriesColor = series.color;
     }
 
+    // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
     if (series.type === 'line' && series.fill) {
-      colorDOM.style.height = '8px';
+      colorDOM.style.height = '8px'; // 높이를 8px로 설정
+      // 활성 상태면 반투명 배경색, 비활성이면 inactive 색상
       colorDOM.style.backgroundColor = series.show
         ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
+      // 테두리는 원래 시리즈 색상으로 설정
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
+      // 일반적인 경우 배경색만 설정
       colorDOM.style.backgroundColor = seriesColor;
     }
 
+    // 데이터 속성 설정 (이벤트 처리 시 요소 식별용)
     colorDOM.dataset.type = 'color';
+
+    // 시리즈 이름 설정 및 스타일 적용
     nameDOM.style.color = opt.color;
     nameDOM.textContent = series.name;
-    nameDOM.setAttribute('title', series.name);
+    nameDOM.setAttribute('title', series.name); // 툴팁용 title 속성
     nameDOM.dataset.type = 'name';
 
+    // DOM 구조 구성: 컨테이너에 색상과 이름 요소 추가
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
 
+    // 범례 위치에 따른 레이아웃 조정
     if (opt.position === 'top' || opt.position === 'bottom') {
+      // 상단/하단 위치: 고정 너비와 좌우 여백 설정
       containerDOM.style.width = `${opt.width - 8}px`;
       containerDOM.style.margin = '0 4px';
     } else {
+      // 좌측/우측 위치: 전체 너비 사용
       containerDOM.style.width = '100%';
     }
+
+    // 공통 스타일 설정
     containerDOM.style.height = `${this.legendItemHeight}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
+    // 범례 박스에 새 아이템 삽입 (하단 스페이서 앞에 추가)
     this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
+
+    // 활성 시리즈인 경우 카운트 증가
     if (series.show) {
       this.seriesInfo.count++;
     }
@@ -869,7 +936,8 @@ const modules = {
 
     // create row
     const rowDOM = document.createElement('tr');
-    rowDOM.className = `ev-chart-legend--table__row ${!series.show ? ' inactive' : ''}`;
+    rowDOM.className = 'ev-chart-legend--table__row';
+    rowDOM.dataset.inactive = !series.show;
     Util.setDOMStyle(rowDOM, opt.table?.style?.row);
     rowDOM.series = series;
     rowDOM.dataset.type = 'container';
