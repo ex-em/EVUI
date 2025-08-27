@@ -472,19 +472,16 @@ const modules = {
     this.onLegendBoxClick = (e) => {
       const { legend: opt } = this.options;
 
-      // 클릭 이벤트 차단 옵션이 설정된 경우 함수 종료
       if (opt?.stopClickEvt) {
         return;
       }
       const { chartIdx } = this.data;
 
-      // 클릭된 범례 DOM 요소 가져오기
       const targetDOM = this.getContainerDOM(e);
       if (!targetDOM) {
         return;
       }
 
-      // 범례 내부의 색상, 이름, 값 DOM 요소들 추출
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
       const isActive = targetDOM?.dataset.inactive === 'false';
@@ -527,7 +524,6 @@ const modules = {
         }
       }
 
-      // onClick inactive - 클릭시 비활성화
       if (opt.onClick !== 'active') {
         if (isActive && this.seriesInfo.count === 1) {
           return;
@@ -542,7 +538,6 @@ const modules = {
         }
       }
 
-      // Brush 차트와 연동된 경우 동기화 처리
       if (this.brushSeries) {
         const seriesList = [...this.brushSeries.list];
         seriesList[chartIdx] = this.seriesList;
@@ -551,9 +546,6 @@ const modules = {
         this.brushSeries.chartIdx = chartIdx;
       }
 
-      // 차트 업데이트 실행
-      // updateSeries: false - 시리즈 데이터 재계산 없이
-      // updateSelTip: 선택 팁 업데이트, 도메인 유지
       this.update({
         updateSeries: false,
         updateSelTip: { update: true, keepDomain: true },
@@ -994,87 +986,64 @@ const modules = {
   addLegend(series) {
     const opt = this.options.legend;
 
-    // 범례 아이템을 구성하는 DOM 요소들 생성
     const containerDOM = document.createElement('div'); // 범례 아이템 컨테이너
     const colorDOM = document.createElement('span'); // 색상 인디케이터
     const nameDOM = document.createElement('div'); // 시리즈 이름 표시
 
-    // 컨테이너에 기본 클래스와 활성/비활성 상태 클래스 설정
     containerDOM.className = 'ev-chart-legend-container';
     containerDOM.dataset.inactive = !series.show;
-    // 컨테이너에 시리즈 참조 저장 (클릭 이벤트에서 사용)
     containerDOM.series = series;
 
-    // 색상 인디케이터 기본 클래스 설정
     colorDOM.className = 'ev-chart-legend-color';
 
-    // 라인 차트이면서 포인트가 있고 fill이 없는 경우 특별한 스타일 적용
     if (series.type === 'line' && series.point && !series.fill) {
       colorDOM.className += ' ev-chart-legend-color--point-line';
     }
 
-    // 시리즈 이름 표시 영역 클래스 설정
     nameDOM.className = 'ev-chart-legend-name';
 
-    // 시리즈 색상 결정 로직
     let seriesColor;
     if (!series.show) {
-      // 시리즈가 숨겨진 상태면 비활성 색상 사용
       seriesColor = opt.inactive;
     } else if (typeof series.color !== 'string') {
-      // 그라데이션 색상인 경우 배열의 마지막 색상 값 사용
       seriesColor = series.color[series.color.length - 1][1];
     } else {
-      // 단색인 경우 그대로 사용
       seriesColor = series.color;
     }
 
-    // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
     if (series.type === 'line' && series.fill) {
-      colorDOM.style.height = '8px'; // 높이를 8px로 설정
-      // 활성 상태면 반투명 배경색, 비활성이면 inactive 색상
+      colorDOM.style.height = '8px';
       colorDOM.style.backgroundColor = series.show
         ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
-      // 테두리는 원래 시리즈 색상으로 설정
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
-      // 일반적인 경우 배경색만 설정
       colorDOM.style.backgroundColor = seriesColor;
     }
 
-    // 데이터 속성 설정 (이벤트 처리 시 요소 식별용)
     colorDOM.dataset.type = 'color';
 
-    // 시리즈 이름 설정 및 스타일 적용
     nameDOM.style.color = opt.color;
     nameDOM.textContent = series.name;
-    nameDOM.setAttribute('title', series.name); // 툴팁용 title 속성
+    nameDOM.setAttribute('title', series.name);
     nameDOM.dataset.type = 'name';
 
-    // DOM 구조 구성: 컨테이너에 색상과 이름 요소 추가
     containerDOM.appendChild(colorDOM);
     containerDOM.appendChild(nameDOM);
 
-    // 범례 위치에 따른 레이아웃 조정
     if (opt.position === 'top' || opt.position === 'bottom') {
-      // 상단/하단 위치: 고정 너비와 좌우 여백 설정
       containerDOM.style.width = `${opt.width - 8}px`;
       containerDOM.style.margin = '0 4px';
     } else {
-      // 좌측/우측 위치: 전체 너비 사용
       containerDOM.style.width = '100%';
     }
 
-    // 공통 스타일 설정
     containerDOM.style.height = `${this.legendItemHeight}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
-    // 범례 박스에 새 아이템 삽입 (하단 스페이서 앞에 추가)
     this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
 
-    // 활성 시리즈인 경우 카운트 증가
     if (series.show) {
       this.seriesInfo.count++;
     }
