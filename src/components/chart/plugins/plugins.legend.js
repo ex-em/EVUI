@@ -403,24 +403,19 @@ const modules = {
       const _series = _targetDOM?.series;
 
       if (typeof _series.color !== 'string') {
-        // 그라데이션 색상인 경우 마지막 색상 사용
         seriesColor = _series.color[_series.color.length - 1][1];
       } else {
-        // 단색인 경우 그대로 사용
         seriesColor = _series.color;
       }
 
-      // 라인 차트이면서 fill 옵션이 있는 경우 특별한 스타일 적용
       if (_series.type === 'line' && _series.fill) {
         _colorDOM.style.height = '8px';
         _colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
         _colorDOM.style.border = `1px solid ${seriesColor}`;
       } else {
-        // 일반적인 경우 배경색만 설정
         _colorDOM.style.backgroundColor = seriesColor;
       }
 
-      // 이름과 값 부분의 색상도 원래대로 복원
       _nameDOM.style.color = _activeColor;
       _valueDOMList?.forEach((dom) => {
         const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
@@ -524,6 +519,7 @@ const modules = {
         }
       }
 
+      // onClick inactive - 클릭시 비활성화
       if (opt.onClick !== 'active') {
         if (isActive && this.seriesInfo.count === 1) {
           return;
@@ -986,9 +982,9 @@ const modules = {
   addLegend(series) {
     const opt = this.options.legend;
 
-    const containerDOM = document.createElement('div'); // 범례 아이템 컨테이너
-    const colorDOM = document.createElement('span'); // 색상 인디케이터
-    const nameDOM = document.createElement('div'); // 시리즈 이름 표시
+    const containerDOM = document.createElement('div');
+    const colorDOM = document.createElement('span');
+    const nameDOM = document.createElement('div');
 
     containerDOM.className = 'ev-chart-legend-container';
     containerDOM.dataset.inactive = !series.show;
