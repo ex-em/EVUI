@@ -160,25 +160,29 @@ export default {
       return value;
     }
 
+    const isNegative = value < 0;
+    const absValue = Math.abs(value);
+
     const assignLabelWith = (v, target, lb) => {
-      if (v % target === 0) {
-        return `${(v / target).toFixed(decimalPoint)}${lb}`;
-      }
-      return `${(v / target).toFixed(1)}${lb}`;
+      const result = v % target === 0
+        ? `${(v / target).toFixed(decimalPoint)}${lb}`
+        : `${(v / target).toFixed(1)}${lb}`;
+
+      return isNegative ? `-${result}` : result;
     };
 
-    if (value >= quad) {
-      label = assignLabelWith(value, quad, 'P');
-    } else if (value >= trill) {
-      label = assignLabelWith(value, trill, 'T');
-    } else if (value >= billi) {
-      label = assignLabelWith(value, billi, 'G');
-    } else if (value >= milli) {
-      label = assignLabelWith(value, milli, 'M');
-    } else if (value >= killo) {
-      label = assignLabelWith(value, 1000, 'K');
+    if (absValue >= quad) {
+      label = assignLabelWith(absValue, quad, 'P');
+    } else if (absValue >= trill) {
+      label = assignLabelWith(absValue, trill, 'T');
+    } else if (absValue >= billi) {
+      label = assignLabelWith(absValue, billi, 'G');
+    } else if (absValue >= milli) {
+      label = assignLabelWith(absValue, milli, 'M');
+    } else if (absValue >= killo) {
+      label = assignLabelWith(absValue, 1000, 'K');
     } else {
-      label = value.toFixed(decimalPoint);
+      label = isNegative ? `-${absValue.toFixed(decimalPoint)}` : value.toFixed(decimalPoint);
     }
 
     return label;

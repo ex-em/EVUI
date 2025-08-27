@@ -93,8 +93,8 @@ class Scale {
     }
 
     if (this.startToZero) {
-      minValue = 0;
-    }
+        minValue = 0;
+      }
 
     if (maxValue === minValue) {
       maxValue += 1;
@@ -138,6 +138,7 @@ class Scale {
 
   /**
    * With range information, calculate how many labels in axis
+   * linear type은 scale.linear.js에서 처리
    * @param {object} range    min/max information
    *
    * @returns {object} steps, interval, min/max graph value
@@ -339,6 +340,13 @@ class Scale {
           ctx.beginPath();
           ticks[ix] = axisMinForLabel + (ix * stepValue);
 
+          const isZeroLine = ticks[ix] === 0;
+          if (isZeroLine && this.zeroLineColor) {
+            ctx.strokeStyle = this.zeroLineColor;
+          } else {
+            ctx.strokeStyle = this.gridLineColor;
+          }
+
           linePosition = labelCenter + aliasPixel;
           labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
             prev: ticks[ix - 1] ?? '',
@@ -435,15 +443,17 @@ class Scale {
         }
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
-        const { from, to, label: labelOpt } = mergedPlotBandOpt;
+        const { from: userDefinedFrom, to: userDefinedTo, label: labelOpt } = mergedPlotBandOpt;
+        const from = userDefinedFrom ? Math.max(userDefinedFrom, axisMin) : axisMin;
+        const to = userDefinedTo ? Math.min(userDefinedTo, axisMax) : axisMax;
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
         let fromPos;
         let toPos;
         if (this.type === 'x') {
-          fromPos = Canvas.calculateX(from ?? minX, axisMin, axisMax, xArea, minX);
-          toPos = Canvas.calculateX(to ?? maxX, axisMin, axisMax, xArea, minX);
+          fromPos = Canvas.calculateX(from, axisMin, axisMax, xArea, minX);
+          toPos = Canvas.calculateX(to, axisMin, axisMax, xArea, minX);
 
           if (fromPos === null || toPos === null) {
             return;
@@ -451,8 +461,8 @@ class Scale {
 
           this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
         } else {
-          fromPos = Canvas.calculateY(from ?? axisMin, axisMin, axisMax, yArea, maxY);
-          toPos = Canvas.calculateY(to ?? axisMax, axisMin, axisMax, yArea, maxY);
+          fromPos = Canvas.calculateY(from, axisMin, axisMax, yArea, maxY);
+          toPos = Canvas.calculateY(to, axisMin, axisMax, yArea, maxY);
 
           if (fromPos === null || toPos === null) {
             return;

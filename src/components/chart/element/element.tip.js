@@ -27,8 +27,9 @@ const modules = {
     }
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
-      const isHeatMap = opt.type === 'heatMap';
-      isExistSelectedLabel = isHeatMap ? this.drawLabelTipForHeatMap() : this.drawLabelTip();
+      isExistSelectedLabel = opt.type === 'heatMap'
+      ? this.drawLabelTipForHeatMap()
+      : this.drawTipForSelectedLabel();
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -283,9 +284,10 @@ const modules = {
 
   /**
    * Draw Selected Label Tip
+   * none Text
    * @returns {boolean} Whether drew at least one tip
    */
-  drawLabelTip() {
+  drawTipForSelectedLabel() {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
@@ -305,7 +307,7 @@ const modules = {
       };
       const labelAxes = isHorizontal ? this.axesY[0] : this.axesX[0];
       const valueAxes = isHorizontal ? this.axesX[0] : this.axesY[0];
-      const valueAxesRange = isHorizontal ? this.axesRange.x[0] : this.axesRange.y[0];
+      const valueAxesSteps = isHorizontal ? this.axesSteps.x[0] : this.axesSteps.y[0];
       const valuePositionCalcFunction = isHorizontal ? Canvas.calculateX : Canvas.calculateY;
       const labelPositionCalcFunction = isHorizontal ? Canvas.calculateY : Canvas.calculateX;
       const scrollbarOpt = isHorizontal ? this.scrollbar.y : this.scrollbar.x;
@@ -323,8 +325,8 @@ const modules = {
           .some(sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping);
       const groups = this.data.groups?.[0] ?? [];
 
-      let gp;
-      let dp;
+      let labelPos;
+      let dataPos;
       let value;
       let labelStartPoint;
       let labelEndPoint;
@@ -357,21 +359,38 @@ const modules = {
       }
 
       data.forEach((selectedData, i) => {
-        if (labelTipOpt.fixedPosTop) {
-          value = valueAxesRange.max;
-        } else if (isExistGrp) {
-          const sumValue = visibleSeries.reduce((ac, sId) => (
-            groups.includes(sId) ? ac + (selectedData[sId]?.value ?? selectedData[sId]) : ac), 0);
-          const nonGroupValues = visibleSeries
-            .filter(sId => !groups.includes(sId))
-            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
-          value = Math.max(...nonGroupValues, sumValue);
-        } else if (visibleSeries.length) {
-          const visibleValue = visibleSeries
-            .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
-          value = Math.max(...visibleValue);
-        } else {
-          value = valueAxesRange.max;
+        value = valueAxesSteps.graphMax;
+
+        if (!labelTipOpt.fixedPosTop) {
+          if (isExistGrp) {
+            const positiveSum = visibleSeries?.reduce((ac, sId) => (
+              groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
+                ? ac + (selectedData[sId]?.value ?? selectedData[sId])
+                : ac), 0);
+
+            const nonGroupValues = visibleSeries
+              ?.filter(sId => !groups.includes(sId))
+              ?.map(sId => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
+
+            const maxNonGroupValue = nonGroupValues?.length > 0
+              ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+              : -Infinity;
+
+            value = positiveSum > 0
+              ? Math.max(maxNonGroupValue, positiveSum)
+              : Math.max(maxNonGroupValue, 0);
+          } else if (visibleSeries.length) {
+            const visibleValue = visibleSeries
+              .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+
+            const maxValue = visibleValue.length > 0
+              ? visibleValue.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+              : -Infinity;
+
+            value = maxValue > 0 || this.options.type !== 'bar'
+              ? maxValue
+              : 0;
+          }
         }
 
         if (labelAxes.labels) {
@@ -381,9 +400,9 @@ const modules = {
 
           const labelIndex = dataIndex[i] - startIndex;
           const labelCenter = Math.round(labelStartPoint + (labelGap * labelIndex));
-          dp = labelCenter + (labelGap / 2);
+          labelPos = labelCenter + (labelGap / 2);
         } else {
-          dp = labelPositionCalcFunction(
+          labelPos = labelPositionCalcFunction(
             label[i],
             graphX.graphMin,
             graphX.graphMax,
@@ -391,18 +410,19 @@ const modules = {
             aPos.x1 + (sizeObj.comboOffset / 2),
           );
         }
-        gp = valuePositionCalcFunction(
+
+        dataPos = valuePositionCalcFunction(
           value,
-          valueAxesRange.min,
-          valueAxesRange.max,
+          valueAxesSteps.graphMin,
+          valueAxesSteps.graphMax,
           valueSpace,
-          valueStartPoint);
-        gp += offset;
+          valueStartPoint,
+        ) + offset;
 
         this.showTip({
           context: this.bufferCtx,
-          x: isHorizontal ? gp : dp,
-          y: isHorizontal ? dp : gp,
+          x: isHorizontal ? dataPos : labelPos,
+          y: isHorizontal ? labelPos : dataPos,
           opt: labelTipOpt,
           isSamePos: false,
         });
@@ -504,10 +524,11 @@ const modules = {
       }
     } else if (isHorizontal) {
       gp = Canvas.calculateX(value, graphX.graphMin, graphX.graphMax, xArea, xsp);
-      gp += offset;
+      gp = value < 0 ? gp - offset : gp + offset;
     } else {
-      gp = Canvas.calculateY(value, graphY.graphMin, graphY.graphMax, yArea, ysp);
-      gp -= offset;
+      const adjustedValue = type === 'bar' && value < 0 ? 0 : value;
+      gp = Canvas.calculateY(adjustedValue, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      gp = adjustedValue < 0 ? gp + offset : gp - offset;
     }
 
     let maxTipType = 'center';
@@ -541,6 +562,7 @@ const modules = {
         borderRadius,
         text,
         textStyle,
+        isNegative: value < 0,
       });
     }
 
@@ -563,14 +585,23 @@ const modules = {
    */
   showTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle } = param;
+    const {
+      type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle, isNegative,
+    } = param;
 
     const ctx = param.context;
 
-    const sx = x - (width / 2);
-    const ex = x + (width / 2);
+    let sx = x - (width / 2);
+    let ex = x + (width / 2);
     const sy = y - height;
     const ey = y;
+
+    if (isNegative) {
+      if (isHorizontal) {
+        sx = x - (width / 2) - width;
+        ex = x - (width / 2);
+      }
+    }
 
     ctx.save();
     ctx.font = textStyle;
@@ -581,30 +612,8 @@ const modules = {
     ctx.beginPath();
     ctx.moveTo(sx + borderRadius, sy);
     ctx.quadraticCurveTo(sx, sy, sx, sy + borderRadius);
-
-    if (isHorizontal) {
-      ctx.lineTo(sx, sy + borderRadius + (arrowSize / 2));
-      ctx.lineTo(sx - arrowSize, ey - (height / 2));
-      ctx.lineTo(sx, ey - borderRadius - (arrowSize / 2));
-    }
-
     ctx.lineTo(sx, ey - borderRadius);
     ctx.quadraticCurveTo(sx, ey, sx + borderRadius, ey);
-
-    if (!isHorizontal) {
-      if (type === 'left') {
-        ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
-        ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
-      } else if (type === 'right') {
-        ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
-        ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
-      } else {
-        ctx.lineTo(x - arrowSize, ey);
-        ctx.lineTo(x, ey + arrowSize);
-        ctx.lineTo(x + arrowSize, ey);
-      }
-    }
-
     ctx.lineTo(ex - borderRadius, ey);
     ctx.quadraticCurveTo(ex, ey, ex, ey - borderRadius);
     ctx.lineTo(ex, sy + borderRadius);
@@ -612,13 +621,64 @@ const modules = {
     ctx.lineTo(sx + borderRadius, sy);
     ctx.closePath();
     ctx.fill();
+
+    // draw arrow
+    ctx.beginPath();
+    if (isHorizontal) {
+      if (isNegative) {
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex, sy + borderRadius + (arrowSize / 2));
+        ctx.lineTo(ex + arrowSize, ey - (height / 2));
+        ctx.lineTo(ex, ey - borderRadius - (arrowSize / 2));
+      } else {
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx, sy + borderRadius + (arrowSize / 2));
+        ctx.lineTo(sx - arrowSize, ey - (height / 2));
+        ctx.lineTo(sx, ey - borderRadius - (arrowSize / 2));
+      }
+
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      if (isNegative) {
+        if (type === 'left') {
+          ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
+          ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+        } else if (type === 'right') {
+          ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+          ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
+        } else {
+          ctx.lineTo(x - arrowSize, ey);
+          ctx.lineTo(x, ey + arrowSize);
+          ctx.lineTo(x + arrowSize, ey);
+        }
+      } else if (!isNegative) {
+        if (type === 'left') {
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
+          ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+        } else if (type === 'right') {
+          ctx.moveTo(ex, sy);
+          ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+          ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
+        } else {
+          ctx.lineTo(x - arrowSize, ey);
+          ctx.lineTo(x, ey + arrowSize);
+          ctx.lineTo(x + arrowSize, ey);
+        }
+      }
+
+      ctx.closePath();
+      ctx.fill();
+    }
+
     ctx.restore();
     ctx.save();
     ctx.font = textStyle;
     ctx.fillStyle = opt.tipTextColor ?? opt.tipStyle.textColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.fillText(`${text}`, sx + (width / 2), sy + (height / 2));
     ctx.restore();
   },
 
@@ -640,7 +700,7 @@ const modules = {
     ctx.beginPath();
     ctx.moveTo(x, cy);
     if (isHorizontal) {
-      ctx.lineTo(x + 6, cy - 6);
+        ctx.lineTo(x + 6, cy - 6);
       ctx.lineTo(x + 6, cy + 6);
     } else {
       ctx.lineTo(x + 6, cy - 6);

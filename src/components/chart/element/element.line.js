@@ -104,8 +104,6 @@ class Line {
       ctx.setLineDash(this.segments);
     }
 
-    const endPoint = chartRect.y2 - labelOffset.bottom;
-
     const isLinearInterpolation = this.useLinearInterpolation();
 
     let barAreaByCombo = 0;
@@ -127,6 +125,8 @@ class Line {
 
     const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
     const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const includeNegativeValue = this.data.some(data => data.o < 0);
+    const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
     // draw line
     let prevValid;
@@ -183,9 +183,10 @@ class Line {
           }
         });
         const gradient = ctx.createLinearGradient(0, chartRect.y2, 0, maxValueYPos);
-        gradient.addColorStop(0, fillColor);
+        const mainGradientColor = extent.opacity < 1 ? fillColor : mainColor;
+        gradient.addColorStop(0, includeNegativeValue ? mainGradientColor : fillColor);
         gradient.addColorStop(0.5, fillColor);
-        gradient.addColorStop(1, (extent.opacity < 1 ? fillColor : mainColor));
+        gradient.addColorStop(1, mainGradientColor);
 
         ctx.fillStyle = gradient;
       } else {
@@ -242,7 +243,7 @@ class Line {
             for (let jx = endIndex; jx >= startIndex; jx--) {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
-              const bp = getYPos(nextData.b) ?? endPoint;
+              const bp = getYPos(nextData.b) ?? getYPos(0);
               ctx.lineTo(xp, bp);
             }
 

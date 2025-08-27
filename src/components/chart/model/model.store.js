@@ -25,21 +25,23 @@ const modules = {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
             const sData = data[seriesID];
+            const passingValue = series?.passingValue;
 
             if (series && sData) {
               series.data = this.addSeriesDSforScatter(sData);
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, passingValue);
             }
           });
         } else if (typeKey === 'heatMap') {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
+            const passingValue = series?.passingValue;
             const sData = data[seriesID];
 
             if (series && sData) {
               series.labels = label;
               series.data = this.addSeriesDSForHeatMap(sData);
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, passingValue);
               series.valueOpt = this.getSeriesValueOptForHeatMap(series);
             }
           });
@@ -68,7 +70,7 @@ const modules = {
               } else {
                 series.data = this.addSeriesDS(sData, label, series.isExistGrp);
               }
-              series.minMax = this.getSeriesMinMax(series.data);
+              series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
             }
           });
         }
@@ -408,17 +410,20 @@ const modules = {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
 
-    const getBaseDataPosition = (baseIndex, dataIndex) => {
+    const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
       const nextBaseSeriesIndex = baseIndex - 1;
       const baseSeries = this.seriesList[bsIds[baseIndex]];
       const baseDataList = baseSeries.data;
       const baseData = baseDataList[dataIndex];
       const position = isHorizontal ? baseData?.x : baseData?.y;
-      const isPassingValue = baseSeries.passingValue === baseData?.o;
 
-      if (isPassingValue || position == null || !baseSeries.show) {
+      const baseValue = baseData?.o;
+      const isPassingValue = baseSeries.passingValue === baseValue;
+      const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
+
+      if (isPassingValue || position == null || !isSameSign || !baseSeries.show) {
         if (nextBaseSeriesIndex > -1) {
-          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex);
+          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex, curr);
         }
 
         return 0;
@@ -429,7 +434,7 @@ const modules = {
 
     data.forEach((curr, index) => {
       const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
-      let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
+      let bdata = getBaseDataPosition(baseIndex, index, curr); // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
@@ -582,14 +587,13 @@ const modules = {
     return data;
   },
 
-
   /**
    * Take series data to create min/max info for each series
    * @param {object}  data    series data
    *
    * @returns {object} min/max info for series
    */
-  getSeriesMinMax(data) {
+  getSeriesMinMax(data, passingValue) {
     const def = { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
     const isHorizontal = this.options.horizontal;
 
@@ -598,14 +602,17 @@ const modules = {
         const minmax = acc;
         const px = p.x?.value || p.x;
         const py = p.y?.value || p.y;
+        const po = p.o?.value || p.o;
 
-        if (px <= minmax.minX) {
+        if (po !== passingValue && px <= minmax.minX) {
           minmax.minX = (px === null) ? 0 : px;
         }
-        if (py <= minmax.minY) {
+
+        if (po !== passingValue && py <= minmax.minY) {
           minmax.minY = (py === null) ? 0 : py;
         }
-        if (px >= minmax.maxX) {
+
+        if (po !== passingValue && px >= minmax.maxX) {
           minmax.maxX = (px === null) ? 0 : px;
 
           if (isHorizontal && px !== null) {
@@ -613,7 +620,8 @@ const modules = {
             minmax.maxDomainIndex = index;
           }
         }
-        if (py >= minmax.maxY) {
+
+        if (po !== passingValue && py >= minmax.maxY) {
           minmax.maxY = (py === null) ? 0 : py;
 
           if (!isHorizontal && py !== null) {
@@ -1256,13 +1264,25 @@ const modules = {
               minmax.y[axisY].min = smm.minY;
             }
           }
-          if (smm.maxX >= minmax.x[axisX].max) {
+
+          const isExistGrp = this.seriesList[key].isExistGrp;
+          const maxXisNegative = minmax.x[axisX].max < 0;
+
+          if (isExistGrp && maxXisNegative) {
+            minmax.x[axisX].max = smm.maxX;
+            minmax.x[axisX].maxSID = key;
+          } else if (!minmax.x[axisX].max || smm.maxX >= minmax.x[axisX].max) {
             minmax.x[axisX].max = smm.maxX;
             minmax.x[axisX].maxSID = key;
           }
-          if (smm.maxY >= minmax.y[axisY].max) {
+
+          const maxYisNegative = minmax.y[axisY].max < 0;
+          if (isExistGrp && maxYisNegative) {
             minmax.y[axisY].max = smm.maxY;
-            minmax.y[axisX].maxSID = key;
+            minmax.y[axisY].maxSID = key;
+          } else if (!minmax.y[axisY].max || smm.maxY >= minmax.y[axisY].max) {
+            minmax.y[axisY].max = smm.maxY;
+            minmax.y[axisY].maxSID = key;
           }
         }
 
