@@ -22,6 +22,8 @@ import HighlightStyle from './example/HighlightStyle';
 import HighlightStyleRaw from '!!raw-loader!./example/HighlightStyle';
 import StepAxis from './example/StepAxis';
 import StepAxisRaw from '!!raw-loader!./example/StepAxis';
+import LegendOnClick from './example/LegendOnClick';
+import LegendOnClickRaw from '!!raw-loader!./example/LegendOnClick';
 
 export default {
   mdText,
@@ -80,6 +82,11 @@ export default {
       description: '차트 축의 range 설정하여 scrollbar를 이용하여 차트 축을 이동할 수 있습니다.',
       component: Scrollbar,
       parsedData: parseComponent(ScrollbarRaw),
+    },
+    LegendOnClick: {
+      description: 'Legend On Click',
+      component: LegendOnClick,
+      parsedData: parseComponent(LegendOnClickRaw),
     },
   },
 };

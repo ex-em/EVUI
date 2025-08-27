@@ -32,6 +32,8 @@ import LegendVirtualScroll from './example/LegendVirtualScroll';
 import LegendVirtualScrollRaw from '!!raw-loader!./example/LegendVirtualScroll';
 import Segments from './example/Segments';
 import SegmentsRaw from '!!raw-loader!./example/Segments';
+import LegendOnClick from './example/LegendOnClick';
+import LegendOnClickRaw from '!!raw-loader!./example/LegendOnClick';
 
 export default {
   mdText,
@@ -115,6 +117,11 @@ export default {
       description: 'Segments',
       component: Segments,
       parsedData: parseComponent(SegmentsRaw),
+    },
+    LegendOnClick: {
+      description: 'Legend On Click',
+      component: LegendOnClick,
+      parsedData: parseComponent(LegendOnClickRaw),
     },
   },
 };

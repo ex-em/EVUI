@@ -368,6 +368,13 @@ const modules = {
       value: `ev-chart-legend${this.useTable ? '--table__value' : '-value'}`,
     };
 
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _inactiveColor - inactive color
+     * @returns {void}
+     */
     const inactiveDom = (_targetDOM, _inactiveColor) => {
       const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
       const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
@@ -384,6 +391,13 @@ const modules = {
       _targetDOM.dataset.inactive = !_series.show;
     };
 
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _activeColor - active color
+     * @returns {void}
+     */
     const activeDom = (_targetDOM, _activeColor) => {
       let seriesColor;
 
