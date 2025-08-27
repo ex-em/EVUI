@@ -98,7 +98,7 @@ export default {
 .example-controls {
   margin-bottom: 20px;
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: #F5F5F5;
   border-radius: 4px;
 
   label {

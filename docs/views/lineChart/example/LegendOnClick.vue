@@ -3,19 +3,11 @@
     <h3>Legend onClick Option Test</h3>
     <div class="example-controls">
       <label>
-        <input
-          v-model="legendClickMode"
-          type="radio"
-          value="active"
-        >
+        <input v-model="legendClickMode" type="radio" value="active">
         active (default) - 클릭시 활성화
       </label>
       <label>
-        <input
-          v-model="legendClickMode"
-          type="radio"
-          value="inactive"
-        >
+        <input v-model="legendClickMode" type="radio" value="inactive">
         inactive - 클릭시 비활성화
       </label>
 
@@ -25,11 +17,7 @@
         inactive, 처음 클릭시 해당 시리즈만 감춤, 마지막 남은 범례 클릭시 무시
       </p>
     </div>
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-
-    />
+    <ev-chart :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
@@ -88,15 +76,15 @@ export default {
       },
       axesX: [{
         type: 'time',
-          showGrid: false,
-          timeFormat: 'MM/DD',
-          interval: 'day',
-          labelStyle: {
-            color: '#A4A4A4',
-            fontSize: '11px',
-            fontFamily: 'Roboto',
-          },
-        }],
+        showGrid: false,
+        timeFormat: 'MM/DD',
+        interval: 'day',
+        labelStyle: {
+          color: '#A4A4A4',
+          fontSize: '11px',
+          fontFamily: 'Roboto',
+        },
+      }],
       axesY: [{
         type: 'linear',
         startToZero: true,
@@ -122,7 +110,7 @@ export default {
 .example-controls {
   margin-bottom: 20px;
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: #F5F5F5;
   border-radius: 4px;
 
   label {
