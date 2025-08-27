@@ -357,8 +357,8 @@ class Scale {
             && (this.options.horizontal === (this.type === 'y'))
             && selectLabelInfo?.dataIndex?.length
             && !selectLabelInfo?.label
-              .map((t, index) => this.getLabelFormat(Math.min(axisMax, t), {
-                prev: selectLabelInfo?.label[index - 1] ?? '',
+              .map(t => this.getLabelFormat(Math.min(axisMax, t), {
+                prev: ticks[ix - 1] ?? '',
               })).includes(labelText);
 
           const labelColor = this.labelStyle.color;

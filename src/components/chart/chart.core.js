@@ -96,6 +96,8 @@ class EvChart {
 
     this.defaultSelectItemInfo = defaultSelectItemInfo;
     this.defaultSelectInfo = defaultSelectInfo;
+
+    this.legendHover = null;
   }
 
   /**
@@ -897,7 +899,13 @@ class EvChart {
 
     this.initDefaultSelectInfo();
 
-    this.render(updateInfo?.hitInfo);
+
+    let renderHitInfo = updateInfo?.hitInfo;
+    if (!renderHitInfo?.legend && this.legendHover?.sId) {
+      renderHitInfo = { ...(renderHitInfo || {}), legend: this.legendHover };
+    }
+
+    this.render(renderHitInfo);
 
     const isDragMove = this.dragInfo && this.drawSelectionArea;
     if (isDragMove) {

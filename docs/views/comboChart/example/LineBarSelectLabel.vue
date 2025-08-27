@@ -53,9 +53,18 @@
         },
         axesX: [{
           type: 'time',
-          timeFormat: 'mm:ss',
-          interval: 'second',
+          timeFormat: 'HH:mm',
+          interval: 'hour',
           categoryMode: true,
+          formatter: (value, data) => {
+            const curr = dayjs(value).format('YY-MM-DD');
+            const prev = data?.prev ? dayjs(data.prev).format('YY-MM-DD') : '';
+            if (curr !== prev) {
+              return dayjs(value).format('DD HH:mm');
+            }
+
+            return dayjs(value).format('HH:mm');
+          },
         }],
         axesY: [{
           type: 'linear',
@@ -88,7 +97,7 @@
       let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
       const addRandomChartData = () => {
-        timeValue = dayjs(timeValue).add(1, 'second');
+        timeValue = dayjs(timeValue).add(1, 'hour');
         chartData.labels.push(dayjs(timeValue));
 
         Object.values(chartData.data).forEach((seriesData) => {

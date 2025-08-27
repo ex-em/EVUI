@@ -34,7 +34,10 @@ class Line {
     this.size = {
       comboOffset: 0,
     };
-    this.usePassingValue = !isUndefined(this.passingValue) && this.interpolation === 'linear';
+  }
+
+  useLinearInterpolation() {
+    return this.interpolation === 'linear' || (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData);
   }
 
   /**
@@ -101,6 +104,8 @@ class Line {
       ctx.setLineDash(this.segments);
     }
 
+    const isLinearInterpolation = this.useLinearInterpolation();
+
     let barAreaByCombo = 0;
 
     const minmaxX = axesSteps.x[this.xAxisIndex];
@@ -129,7 +134,7 @@ class Line {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
-      if (this.isExistGrp && this.usePassingValue && curr.o === this.passingValue) {
+      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
         y = getYPos(curr.b ?? 0);
       }
 
@@ -140,16 +145,14 @@ class Line {
       curr.xp = x;
       curr.yp = y;
 
-      if (this.usePassingValue && curr.o === this.passingValue) {
+      if (isLinearInterpolation && curr.o === null) {
         if (!this.isExistGrp) {
           return;
         }
       }
 
-      if ((isNil(prevValid?.y) && this.usePassingValue && this.passingValue !== prevValid?.o)
-        || (!this.usePassingValue && isNil(curr.o) && this.interpolation !== 'zero')
-        || (!this.usePassingValue && isNil(prevValid?.y))
-        || (isNil(curr.o) && curr.y == null && this.passingValue !== curr.o)) {
+      if ((isNil(prevValid?.y) && !this.isExistGrp)
+        || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -198,18 +201,17 @@ class Line {
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        const isNoneInterpolation = this.interpolation === 'none' || (this.usePassingValue && this.passingValue !== null);
-
-        if (isNoneInterpolation ? isNil(valueArray[i]) : isUndefined(valueArray[i])) {
+        if ((isLinearInterpolation && isUndefined(valueArray[i]))
+          || (!isLinearInterpolation && isNil(valueArray[i]))) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => !isNil(item) && item !== this.passingValue);
+              item => !isNil(item) && item !== null);
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
           }
-        } else if (this.usePassingValue && valueArray[i] === this.passingValue) {
+        } else if (isLinearInterpolation && valueArray[i] === null) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -233,7 +235,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || this.passingValue !== currData.o || (this.interpolation === 'zero' && isNil(currData.o))) {
+          } else if (this.isExistGrp || currData.o !== null) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
@@ -258,14 +260,18 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      const isLinearSingle = this.interpolation === 'linear' && this.data.filter(item => item.o !== null).length === 1;
 
       this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === this.passingValue) {
+        if (curr.xp === null || curr.yp === null || curr.o === null) {
           return;
         }
 
-        const isSingle = this.interpolation === 'none' && Util.isNullOrUndefined(this.data[ix - 1]?.o)
-          && Util.isNullOrUndefined(this.data[ix + 1]?.o);
+        const prevData = this.data[ix - 1]?.o;
+        const nextData = this.data[ix + 1]?.o;
+
+        const isSingle = (!isLinearInterpolation && isNil(prevData) && isNil(nextData))
+          || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -292,7 +298,7 @@ class Line {
     const { xp, yp, o } = gdata;
 
     ctx.save();
-    if (xp !== null && yp !== null && o !== this.passingValue && this.pointHighlight) {
+    if (xp !== null && yp !== null && o !== null && this.pointHighlight) {
       ctx.strokeStyle = Util.colorStringToRgba(this.color, 0);
       ctx.fillStyle = Util.colorStringToRgba(this.color, this.highlight.maxShadowOpacity);
       Canvas.drawPoint(ctx, this.pointStyle, this.highlight.maxShadowSize, xp, yp);
@@ -322,6 +328,7 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
     const SPARE_XP = 0.5;
+    const isLinearInterpolation = this.useLinearInterpolation();
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
@@ -404,7 +411,7 @@ class Line {
       }
     }
 
-    if (this.usePassingValue && item?.data?.o === this.passingValue) {
+    if (isLinearInterpolation && item?.data?.o === null) {
       item.data = null;
     }
 
