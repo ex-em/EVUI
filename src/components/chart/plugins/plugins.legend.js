@@ -206,15 +206,10 @@ const modules = {
     const { groups } = this.data;
     const { seriesList } = this;
 
-    if (this.options.legend.virtualScroll) {
-      if (this.useTable) {
-        this.addLegendForGroups(groups, seriesList, true);
-        this.addStandaloneLegends(seriesList, true);
-      } else {
-        this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
-          this.renderVisibleLegends();
-        });
-      }
+    if (this.options.legend.virtualScroll && !this.useTable) {
+      this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
+        this.renderVisibleLegends();
+      });
     } else {
       this.addLegendForGroups(groups, seriesList, this.useTable);
       this.addStandaloneLegends(seriesList, this.useTable);
