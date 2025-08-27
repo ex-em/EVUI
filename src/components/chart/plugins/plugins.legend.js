@@ -362,7 +362,7 @@ const modules = {
     }
 
     const classList = {
-      container: `ev-chart-legend${this.useTable ? '--table__container' : '-container'}`,
+      container: `ev-chart-legend${this.useTable ? '--table__row' : '-container'}`,
       color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
       name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
       value: `ev-chart-legend${this.useTable ? '--table__value' : '-value'}`,
@@ -471,7 +471,9 @@ const modules = {
 
       // onClick active - 클릭시 활성화
       if (opt.onClick === 'active') {
-        const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+        const legendContainerDOMs = Array.from(
+          this.legendBoxDOM.getElementsByClassName(classList.container),
+        );
         const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
@@ -480,9 +482,12 @@ const modules = {
           });
           activeDom(targetDOM, opt.color);
           this.seriesInfo.count = 1;
-        } else {
+        } else if (isActive) {
           inactiveDom(targetDOM, opt.inactive);
           this.seriesInfo.count--;
+        } else if (!isActive) {
+          activeDom(targetDOM, opt.color);
+          this.seriesInfo.count++;
         }
 
         const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
@@ -592,6 +597,7 @@ const modules = {
       return;
     }
     const classList = {
+      container: `ev-chart-legend${this.useTable ? '--table__row' : '-container'}`,
       color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
       name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
     };
@@ -662,8 +668,8 @@ const modules = {
         return;
       }
 
-      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
-      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
+      const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
+      const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
       const isActive = targetDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
@@ -673,7 +679,9 @@ const modules = {
 
       // onClick active - 클릭시 활성화
       if (opt.onClick === 'active') {
-        const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+        const legendContainerDOMs = Array.from(
+          this.legendBoxDOM.getElementsByClassName(classList.container),
+        );
         const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
@@ -681,8 +689,10 @@ const modules = {
             inactiveDom(dom, opt.inactive);
           });
           activeDom(targetDOM, opt.color);
-        } else {
+        } else if (isActive) {
           inactiveDom(targetDOM, opt.inactive);
+        } else if (!isActive) {
+          activeDom(targetDOM, opt.color);
         }
 
         const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
