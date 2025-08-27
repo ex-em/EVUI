@@ -465,39 +465,49 @@ const modules = {
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
       const isActive = targetDOM?.dataset.inactive === 'false';
 
-      if (opt.onClick !== 'active' && isActive && this.seriesInfo.count === 1) {
-        return;
-      }
-
       if (!colorDOM || !nameDOM) {
         return;
       }
 
-      const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
-      const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+      // onClick active - 클릭시 활성화
+      if (opt.onClick === 'active') {
+        const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
-      // inactive
-      if (opt.onClick === 'active' && isActiveAll) {
-        this.seriesInfo.count = 0;
-        legendContainerDOMs.forEach((dom) => {
-          inactiveDom(dom, opt.inactive);
-        });
-      } else if (isActive) {
-        this.seriesInfo.count--;
-        inactiveDom(targetDOM, opt.inactive);
+        if (isActiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            inactiveDom(dom, opt.inactive);
+          });
+          activeDom(targetDOM, opt.color);
+          this.seriesInfo.count = 1;
+        } else {
+          inactiveDom(targetDOM, opt.inactive);
+          this.seriesInfo.count--;
+        }
+
+        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+
+        if (isInactiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            activeDom(dom, opt.color);
+          });
+          this.seriesInfo.count = legendContainerDOMs.length;
+        }
       }
 
-      const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+      // onClick inactive - 클릭시 비활성화
+      if (opt.onClick !== 'active') {
+        if (isActive && this.seriesInfo.count === 1) {
+          return;
+        }
 
-      // active
-      if (opt.onClick === 'active' && isInactiveAll && !isActiveAll) {
-        this.seriesInfo.count = legendContainerDOMs.length;
-        legendContainerDOMs.forEach((dom) => {
-          activeDom(dom, opt.color);
-        });
-      } else if (!isActive || (opt.onClick === 'active' && isActiveAll && isActive)) {
-        this.seriesInfo.count++;
-        activeDom(targetDOM, opt.color);
+        if (isActive) {
+          inactiveDom(targetDOM, opt.inactive);
+          this.seriesInfo.count--;
+        } else {
+          activeDom(targetDOM, opt.color);
+          this.seriesInfo.count++;
+        }
       }
 
       // Brush 차트와 연동된 경우 동기화 처리
@@ -657,33 +667,44 @@ const modules = {
       const isActive = targetDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
-      if (isActive && activeCount === 1 && opt.onClick !== 'active') {
-        return;
-      }
-
       if (!colorDOM || !nameDOM) {
         return;
       }
 
-      const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
-      const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+      // onClick active - 클릭시 활성화
+      if (opt.onClick === 'active') {
+        const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
-      if (opt.onClick === 'active' && isActiveAll) {
-        legendContainerDOMs.forEach((dom) => {
-          inactiveDom(dom, opt.inactive);
-        });
-      } else if (isActive) {
-        inactiveDom(targetDOM, opt.inactive);
+        if (isActiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            inactiveDom(dom, opt.inactive);
+          });
+          activeDom(targetDOM, opt.color);
+        } else {
+          inactiveDom(targetDOM, opt.inactive);
+        }
+
+        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+
+        if (isInactiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            activeDom(dom, opt.color);
+          });
+        }
       }
 
-      const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+      // onClick inactive - 클릭시 비활성화
+      if (opt.onClick !== 'active') {
+        if (isActive && activeCount === 1) {
+          return;
+        }
 
-      if (opt.onClick === 'active' && isInactiveAll && !isActiveAll) {
-        legendContainerDOMs.forEach((dom) => {
-          activeDom(dom, opt.color);
-        });
-      } else if (!isActive || (opt.onClick === 'active' && isActiveAll && isActive)) {
-        activeDom(targetDOM, opt.color);
+        if (isActive) {
+          inactiveDom(targetDOM, opt.inactive);
+        } else {
+          activeDom(targetDOM, opt.color);
+        }
       }
 
       this.update({
