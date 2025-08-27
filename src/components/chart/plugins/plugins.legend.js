@@ -370,7 +370,7 @@ const modules = {
      * @param {string} _inactiveColor - inactive color
      * @returns {void}
      */
-    const inactiveDom = (_targetDOM, _inactiveColor) => {
+    const inactiveDomAndSeries = (_targetDOM, _inactiveColor) => {
       const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
       const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
       const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
@@ -382,8 +382,9 @@ const modules = {
       _valueDOMList?.forEach((dom) => {
         dom.style.color = _inactiveColor;
       });
-      _series.show = !_series.show;
-      _targetDOM.dataset.inactive = !_series.show;
+
+      _series.show = false;
+      _targetDOM.dataset.inactive = true;
     };
 
     /**
@@ -393,7 +394,7 @@ const modules = {
      * @param {string} _activeColor - active color
      * @returns {void}
      */
-    const activeDom = (_targetDOM, _activeColor) => {
+    const activeDomAndSeries = (_targetDOM, _activeColor) => {
       let seriesColor;
 
       const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
@@ -426,10 +427,38 @@ const modules = {
         dom.style.color = style?.color ? style.color : _activeColor;
       });
 
-      _series.show = !_series.show;
-      _targetDOM.dataset.inactive = !_series.show;
+      _series.show = true;
+      _targetDOM.dataset.inactive = false;
     };
 
+    const hideAllSeries = () => {
+      const legendSeries = (() => {
+        if (this.data.groups.at(0)) {
+          return this.data.groups.at(0).slice().reverse()
+            .filter(sId => this.seriesList[sId].showLegend)
+            .map(sId => [sId, this.seriesList[sId]]);
+        }
+        return Object.entries(this.seriesList)
+          .filter(([, series]) => series.showLegend);
+      })();
+      legendSeries.forEach(([, s]) => {
+        s.show = false;
+      });
+    };
+    const showAllSeries = () => {
+      const legendSeries = (() => {
+        if (this.data.groups.at(0)) {
+          return this.data.groups.at(0).slice().reverse()
+            .filter(sId => this.seriesList[sId].showLegend)
+            .map(sId => [sId, this.seriesList[sId]]);
+        }
+        return Object.entries(this.seriesList)
+          .filter(([, series]) => series.showLegend);
+      })();
+      legendSeries.forEach(([, s]) => {
+        s.show = true;
+      });
+    };
 
     /**
      * callback for legendBoxDOM to show/hide clicked series
@@ -473,15 +502,17 @@ const modules = {
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
-            inactiveDom(dom, opt.inactive);
+            inactiveDomAndSeries(dom, opt.inactive);
           });
-          activeDom(targetDOM, opt.color);
+          hideAllSeries();
+
+          activeDomAndSeries(targetDOM, opt.color);
           this.seriesInfo.count = 1;
         } else if (isActive) {
-          inactiveDom(targetDOM, opt.inactive);
+          inactiveDomAndSeries(targetDOM, opt.inactive);
           this.seriesInfo.count--;
         } else if (!isActive) {
-          activeDom(targetDOM, opt.color);
+          activeDomAndSeries(targetDOM, opt.color);
           this.seriesInfo.count++;
         }
 
@@ -489,8 +520,9 @@ const modules = {
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
-            activeDom(dom, opt.color);
+            activeDomAndSeries(dom, opt.color);
           });
+          showAllSeries();
           this.seriesInfo.count = legendContainerDOMs.length;
         }
       }
@@ -502,10 +534,10 @@ const modules = {
         }
 
         if (isActive) {
-          inactiveDom(targetDOM, opt.inactive);
+          inactiveDomAndSeries(targetDOM, opt.inactive);
           this.seriesInfo.count--;
         } else {
-          activeDom(targetDOM, opt.color);
+          activeDomAndSeries(targetDOM, opt.color);
           this.seriesInfo.count++;
         }
       }
@@ -604,7 +636,7 @@ const modules = {
      * @param {string} _inactiveColor - inactive color
      * @returns {void}
      */
-    const inactiveDom = (_targetDOM, _inactiveColor) => {
+    const inactiveDomAndSeries = (_targetDOM, _inactiveColor) => {
       const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
       const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
       const _series = Object.values(this.seriesList)[0];
@@ -629,7 +661,7 @@ const modules = {
      * @param {string} _activeColor - active color
      * @returns {void}
      */
-    const activeDom = (_targetDOM, _activeColor) => {
+    const activeDomAndSeries = (_targetDOM, _activeColor) => {
       const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
       const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
       const _series = Object.values(this.seriesList)[0];
@@ -644,6 +676,19 @@ const modules = {
       }
 
       _targetDOM.dataset.inactive = false;
+    };
+
+    const hideAllSeries = () => {
+      const series = Object.values(this.seriesList)[0];
+      series.colorState.forEach((colorItem) => {
+        colorItem.show = false;
+      });
+    };
+    const showAllSeries = () => {
+      const series = Object.values(this.seriesList)[0];
+      series.colorState.forEach((colorItem) => {
+        colorItem.show = true;
+      });
     };
 
     /**
@@ -681,21 +726,24 @@ const modules = {
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
-            inactiveDom(dom, opt.inactive);
+            inactiveDomAndSeries(dom, opt.inactive);
           });
-          activeDom(targetDOM, opt.color);
+          hideAllSeries();
+
+          activeDomAndSeries(targetDOM, opt.color);
         } else if (isActive) {
-          inactiveDom(targetDOM, opt.inactive);
+          inactiveDomAndSeries(targetDOM, opt.inactive);
         } else if (!isActive) {
-          activeDom(targetDOM, opt.color);
+          activeDomAndSeries(targetDOM, opt.color);
         }
 
         const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
-            activeDom(dom, opt.color);
+            activeDomAndSeries(dom, opt.color);
           });
+          showAllSeries();
         }
       }
 
@@ -706,9 +754,9 @@ const modules = {
         }
 
         if (isActive) {
-          inactiveDom(targetDOM, opt.inactive);
+          inactiveDomAndSeries(targetDOM, opt.inactive);
         } else {
-          activeDom(targetDOM, opt.color);
+          activeDomAndSeries(targetDOM, opt.color);
         }
       }
 
