@@ -588,7 +588,7 @@ const modules = {
       const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
       const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
       const targetId = targetDOM?.series?.cId;
-      const isActive = colorDOM?.dataset.inactive === 'false';
+      const isActive = targetDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
       if (isActive && activeCount === 1) {
@@ -613,8 +613,7 @@ const modules = {
         series.colorState[targetIndex].show = !isActive;
       }
 
-      colorDOM.dataset.inactive = !colorDOM.dataset.inactive;
-      nameDOM.dataset.inactive = !nameDOM.dataset.inactive;
+      targetDOM.dataset.inactive = isActive;
 
       this.update({
         updateSeries: false,
