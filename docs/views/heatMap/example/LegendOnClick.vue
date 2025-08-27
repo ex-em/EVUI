@@ -28,7 +28,6 @@
     <ev-chart
       :data="chartData"
       :options="chartOptions"
-      style="width: 100%; height: 400px;"
     />
   </div>
 </template>
