@@ -567,6 +567,59 @@ const modules = {
     if (this.isInitLegend) {
       return;
     }
+    const classList = {
+      color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
+      name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _inactiveColor - inactive color
+     * @returns {void}
+     */
+    const inactiveDom = (_targetDOM, _inactiveColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _series = Object.values(this.seriesList)[0];
+      const targetId = _targetDOM?.series?.cId;
+
+      _colorDOM.style.backgroundColor = _inactiveColor;
+      _colorDOM.style.borderColor = _inactiveColor;
+      _nameDOM.style.color = _inactiveColor;
+
+      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      if (targetIndex > -1) {
+        _series.colorState[targetIndex].show = false;
+      }
+
+      _targetDOM.dataset.inactive = true;
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _activeColor - active color
+     * @returns {void}
+     */
+    const activeDom = (_targetDOM, _activeColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _series = Object.values(this.seriesList)[0];
+      const targetId = _targetDOM?.series?.cId;
+
+      _colorDOM.style.backgroundColor = _targetDOM?.series?.color;
+      _nameDOM.style.color = _activeColor;
+
+      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      if (targetIndex > -1) {
+        _series.colorState[targetIndex].show = true;
+      }
+
+      _targetDOM.dataset.inactive = false;
+    };
 
     /**
      * callback for legendBoxDOM to show/hide clicked series
@@ -587,11 +640,10 @@ const modules = {
 
       const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
       const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
-      const targetId = targetDOM?.series?.cId;
       const isActive = targetDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
 
-      if (isActive && activeCount === 1) {
+      if (isActive && activeCount === 1 && opt.onClick !== 'active') {
         return;
       }
 
@@ -599,21 +651,26 @@ const modules = {
         return;
       }
 
-      if (isActive) {
-        colorDOM.style.backgroundColor = opt.inactive;
-        colorDOM.style.borderColor = opt.inactive;
-        nameDOM.style.color = opt.inactive;
-      } else {
-        colorDOM.style.backgroundColor = targetDOM?.series?.color;
-        nameDOM.style.color = opt.color;
+      const legendContainerDOMs = Array.from(this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container'));
+      const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+
+      if (opt.onClick === 'active' && isActiveAll) {
+        legendContainerDOMs.forEach((dom) => {
+          inactiveDom(dom, opt.inactive);
+        });
+      } else if (isActive) {
+        inactiveDom(targetDOM, opt.inactive);
       }
 
-      const targetIndex = series.colorState.findIndex(colorItem => colorItem.id === targetId);
-      if (targetIndex > -1) {
-        series.colorState[targetIndex].show = !isActive;
-      }
+      const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
 
-      targetDOM.dataset.inactive = isActive;
+      if (opt.onClick === 'active' && isInactiveAll && !isActiveAll) {
+        legendContainerDOMs.forEach((dom) => {
+          activeDom(dom, opt.color);
+        });
+      } else if (!isActive || (opt.onClick === 'active' && isActiveAll && isActive)) {
+        activeDom(targetDOM, opt.color);
+      }
 
       this.update({
         updateSeries: false,
