@@ -76,8 +76,14 @@ class Bar {
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
-    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    const xAxisPosition = chartRect.x1 + labelOffset.left;
+    const yAxisPosition = chartRect.y2 - labelOffset.bottom;
+    const xZeroPosition = Canvas.calculateX(0, minmaxX.graphMin, minmaxX.graphMax, xArea);
+    const yZeroPosition = Canvas.calculateY(0, minmaxY.graphMin, minmaxY.graphMax, yArea);
+
+    const xsp = isHorizontal ? xAxisPosition + xZeroPosition : xAxisPosition;
+    const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
 
     const dArea = isHorizontal ? yArea : xArea;
     const cArea = dArea / (totalCount || 1);
@@ -135,7 +141,6 @@ class Bar {
       const item = this.data[i]; // 실제 데이터 인덱스에 해당하는 항목
       if (item) {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
-
         let categoryPoint;
         if (isHorizontal) {
           categoryPoint = ysp - (cArea * (screenIndex)) - cPad;
@@ -143,6 +148,7 @@ class Bar {
           categoryPoint = xsp + (cArea * (screenIndex)) + cPad;
         }
 
+        // 기본 위치 설정
         if (isHorizontal) {
           x = xsp;
           y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
@@ -151,22 +157,40 @@ class Bar {
           y = ysp;
         }
 
+        // 너비 / 높이 계산, 스택의 경우 위치 값 재계산
         if (isHorizontal) {
+          const barValue = item.b ? item.o : item.x;
+
+          w = Canvas.calculateX(
+            barValue, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition,
+          );
+
           if (item.b) {
-            w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-            x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-          } else {
-            w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+            x = Canvas.calculateX(
+              item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp - xZeroPosition,
+            );
           }
-        } else if (item.b) { // vertical stack bar chart
-          h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-          y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-        } else { // vertical bar chart
-          h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+
+          const minimumBarWidth = barValue > 0 ? -1 : 1;
+          w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
+        } else {
+          const barValue = item.b ? item.o : item.y;
+
+          h = Canvas.calculateY(
+            barValue, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition,
+          );
+
+          if (item.b) {
+            y = Canvas.calculateY(
+              item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition,
+            );
+          }
+
+          const minimumBarHeight = barValue > 0 ? -1 : 1;
+          h = barValue && Math.abs(h) === 0 ? minimumBarHeight : h;
         }
 
         const barColor = item.dataColor || this.color;
-
         const legendHitInfo = param?.legendHitInfo;
         const selectLabelOption = param?.selectLabel?.option;
         const selectItemOption = param?.selectItem?.option;
@@ -408,7 +432,7 @@ class Bar {
   drawValueLabels({ context, data, positions, isHighlight, textColor, index }) {
     const isHorizontal = this.isHorizontal;
     const { fontSize, textColor: seriesTextColor, align, formatter, decimalPoint } = this.showValue;
-    const { x, y, w, h } = positions;
+    const { x: barX, y: barY, w: barWidth, h: barHeight } = positions;
     const ctx = context;
 
     ctx.save();
@@ -440,36 +464,40 @@ class Bar {
       formattedTxt = Util.labelSignFormat(value, decimalPoint) ?? '';
     }
 
+    const isNegativeValue = value < 0;
     const textWidth = Math.round(ctx.measureText(formattedTxt).width);
-    const textHeight = fontSize + 4;
-    const minXPos = x + 10;
-    const minYPos = y - 10;
-    const widthFreeSpaceToDraw = w - 10;
-    const heightFreeSpaceToDraw = Math.abs(h + 10);
-    const centerX = x + (w / 2) <= minXPos ? minXPos : x + (w / 2);
-    const centerY = y + (h / 2) >= minYPos ? minYPos : y + (h / 2);
-    const centerYHorizontal = isHighlight ? y + (h / 2) : y - (h / 2);
+    const textHeight = fontSize; // fontSize와 textHeight는 같을 수 없지만, 정확히 구할 필요 없음
+
+    const GAP = 10;
+    const minXPos = isNegativeValue ? barX - GAP : barX + GAP;
+    const minYPos = isNegativeValue ? barY + GAP : barY - GAP;
+
+    const centerXOnBar = barX + (barWidth / 2);
+    const centerYOnBar = isHighlight ? barY + (barHeight / 2) : barY - (barHeight / 2);
+
+    const drawableBarWidth = Math.abs(barWidth) - GAP;
+    const drawableBarHeight = Math.abs(barHeight) - GAP;
 
     switch (align) {
       case 'start': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            ctx.fillText(formattedTxt, minXPos, centerYHorizontal);
-          }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          ctx.fillText(formattedTxt, centerX, minYPos);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
+          ctx.fillText(formattedTxt, xPos, centerYOnBar);
+        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+          const yPos = isNegativeValue
+            ? barY + GAP
+            : barY - GAP;
+          ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
         break;
       }
 
       case 'center': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            ctx.fillText(formattedTxt, centerX, centerYHorizontal);
-          }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          ctx.fillText(formattedTxt, centerX, centerY);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
+        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+          ctx.fillText(formattedTxt, centerXOnBar, barY + (barHeight / 2));
         }
 
         break;
@@ -482,9 +510,25 @@ class Bar {
         }
 
         if (isHorizontal) {
-          ctx.fillText(formattedTxt, minXPos + w, centerYHorizontal);
+          const minXOnChart = this.chartRect.x1 + this.labelOffset.left;
+          const maxXOnChart = this.chartRect.x2 - this.labelOffset.right;
+
+          if (isNegativeValue) {
+            const xPos = barX - GAP + barWidth - textWidth;
+            if (xPos > minXOnChart) {
+              ctx.fillText(formattedTxt, xPos, centerYOnBar);
+            }
+          } else {
+            const xPos = barX + GAP + barWidth;
+            if (xPos + textWidth < maxXOnChart) {
+              ctx.fillText(formattedTxt, xPos, centerYOnBar);
+            }
+          }
         } else {
-          ctx.fillText(formattedTxt, centerX, y + h - (textHeight / 2));
+          const yPos = isNegativeValue
+            ? barY + barHeight + GAP
+            : barY + barHeight - GAP;
+          ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
         break;
@@ -492,14 +536,21 @@ class Bar {
 
       default:
       case 'end': {
-        if (isHorizontal) {
-          if (textWidth < widthFreeSpaceToDraw) {
-            const xPos = x + w - (textWidth * 2);
-            ctx.fillText(formattedTxt, xPos <= minXPos ? minXPos : xPos, centerYHorizontal);
+        if (isHorizontal && textWidth < drawableBarWidth) {
+          const xPos = isNegativeValue
+            ? barX + barWidth + GAP
+            : barX + barWidth - textWidth - GAP;
+          ctx.fillText(formattedTxt, xPos, centerYOnBar);
+        } else if (!isHorizontal) {
+          if (isNegativeValue) {
+            const yPos = barY + barHeight - GAP;
+            if (yPos > minYPos) {
+              ctx.fillText(formattedTxt, centerXOnBar, yPos);
+            }
+          } else if (textHeight < drawableBarHeight) {
+            const yPos = barY + barHeight + GAP;
+            ctx.fillText(formattedTxt, centerXOnBar, yPos);
           }
-        } else if (textHeight < heightFreeSpaceToDraw) {
-          const yPos = y + h + textHeight;
-          ctx.fillText(formattedTxt, centerX, yPos >= minYPos ? minYPos : yPos);
         }
 
         break;
@@ -556,29 +607,48 @@ class Bar {
 
     ctx.beginPath();
     ctx.moveTo(x, y);
+    if (Math.abs(w) < r * 2) {
+      r = Math.abs(w) / 2;
+    }
+
+    if (Math.abs(h) < r * 2) {
+      r = Math.abs(h) / 2;
+    }
 
     if (isHorizontal) {
-      if (h < r * 2) {
-        r = h / 2;
+      const isNegativeValue = w < 0;
+      if (isNegativeValue) {
+        w += r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w - r, y, x + w - r, y - r, r);
+        ctx.arcTo(x + w - r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
+      } else {
+        w -= r;
+        ctx.lineTo(x + w, y);
+        ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
+        ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
+        ctx.lineTo(x, y - h);
+        ctx.lineTo(x, y);
       }
-
-      w -= r;
-      ctx.lineTo(x + w, y);
-      ctx.arcTo(x + w + r, y, x + w + r, y - r, r);
-      ctx.arcTo(x + w + r, y - h, x + w, y - h, r);
-      ctx.lineTo(x, y - h);
-      ctx.lineTo(x, y);
     } else {
-      if (w < r * 2) {
-        r = w / 2;
+      const isNegativeValue = h > 0;
+      if (isNegativeValue) {
+        h -= r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h + r, x - w + r, y + h + r, r);
+        ctx.arcTo(x, y + h + r, x, y + h, r);
+        ctx.lineTo(x, y);
+      } else {
+        h += r;
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
+        ctx.arcTo(x, y + h - r, x, y + h, r);
+        ctx.lineTo(x, y);
       }
-
-      h += r;
-      ctx.lineTo(x + w, y);
-      ctx.lineTo(x + w, y + h);
-      ctx.arcTo(x + w, y + h - r, x + w - r, y + h - r, r);
-      ctx.arcTo(x, y + h - r, x, y + h, r);
-      ctx.lineTo(x, y);
     }
 
     ctx.fill();

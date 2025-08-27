@@ -183,8 +183,7 @@ const modules = {
 
     let useLegendSeries = [];
     if (groups) {
-      useLegendSeries = groups.slice().reverse()
-        .filter(sId => this.seriesList[sId].showLegend)
+      useLegendSeries = groups.filter(sId => this.seriesList[sId].showLegend)
         .map(sId => [sId, this.seriesList[sId]]);
     } else {
       useLegendSeries = Object.entries(this.seriesList)
@@ -221,9 +220,8 @@ const modules = {
     }
   },
   /**
-   * Adds legends for each group in `groups` array, iterating through each series
-   * within the group in reverse order. This ensures the legends align with the series
-   * order as displayed in the chart. Only adds series with `showLegend` set to `true`.
+   * Adds legends for each group in `groups` array, iterating through each series within the group.
+   * Only adds series with `showLegend` set to `true`.
    *
    * @param {Array} groups - Array of groups containing series identifiers.
    * @param {Object} seriesList - Object containing all series, keyed by series ID.
@@ -232,7 +230,7 @@ const modules = {
    */
   addLegendForGroups(groups, seriesList, useTable) {
     groups.forEach((group) => {
-      group.slice().reverse().forEach((sId) => {
+      group.forEach((sId) => {
         const series = seriesList[sId];
         if (series && series.showLegend) {
           this.addLegendBasedOnType(series, useTable);
