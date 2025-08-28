@@ -478,8 +478,6 @@ class Scale {
         const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
         const { value, label: labelOpt } = mergedPlotLineOpt;
 
-        this.setPlotLineStyle(mergedPlotLineOpt);
-
         let dataPos;
         if (this.type === 'x') {
           dataPos = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
@@ -488,6 +486,7 @@ class Scale {
             return;
           }
 
+          this.setPlotLineStyle(mergedPlotLineOpt);
           this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
         } else {
           dataPos = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
@@ -496,6 +495,7 @@ class Scale {
             return;
           }
 
+          this.setPlotLineStyle(mergedPlotLineOpt);
           this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
         }
 
