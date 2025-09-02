@@ -79,9 +79,9 @@ const modules = {
       }
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
-        // Use data point position instead of mouse position for indicator
+        // Use data point position instead of mouse position for indicator when tooltip is enabled
         let indicatorOffset = offset;
-        if (Object.keys(hitInfo.items).length) {
+        if (tooltip.use && Object.keys(hitInfo.items).length) {
           const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
           const hitItem = hitInfo.items[hitId];
           if (hitItem && hitItem.data && hitItem.data.xp !== undefined
