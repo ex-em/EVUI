@@ -501,7 +501,7 @@ const modules = {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
     }
     if (this.options?.tooltip?.throttledMove) {
-      this.onMouseMove = throttle(this.onMouseMove, 30);
+      this.onMouseMove = throttle(this.onMouseMove, 16); // ~60fps for smooth interaction
     }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
@@ -885,6 +885,16 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
 
+    // Cache for measureText to avoid repeated calculations
+    if (!this._measureTextCache) {
+      this._measureTextCache = new Map();
+    }
+    
+    // Clear cache if it gets too large (prevent memory leaks)
+    if (this._measureTextCache.size > 1000) {
+      this._measureTextCache.clear();
+    }
+
     let hitId = null;
     let maxs = '';
     let maxsw = 0;
@@ -896,10 +906,14 @@ const modules = {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      if (series.findGraphData) {
-        const item = series.findGraphData(offset, isHorizontal);
+      // Skip hidden series for performance
+      if (!series.show || !series.findGraphData) {
+        continue;
+      }
 
-        if (item?.data) {
+      const item = series.findGraphData(offset, isHorizontal);
+
+      if (item?.data) {
           let gdata;
 
           if (item.data.o === null && series.interpolation !== 'zero') {
@@ -917,7 +931,17 @@ const modules = {
               seriesName: series.name,
               itemData: item.data,
             });
-            const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
+            // Use cached measureText for better performance
+            let sw = 1;
+            if (ctx) {
+              const cacheKey = `${formattedSeriesName}-${ctx.font}`;
+              if (this._measureTextCache.has(cacheKey)) {
+                sw = this._measureTextCache.get(cacheKey);
+              } else {
+                sw = ctx.measureText(formattedSeriesName).width;
+                this._measureTextCache.set(cacheKey, sw);
+              }
+            }
 
             item.id = series.id;
             item.name = formattedSeriesName;

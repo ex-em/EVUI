@@ -96,7 +96,7 @@ const DEFAULT_OPTIONS = {
     borderColor: '#666666',
     shadowOpacity: 0.25,
     useShadow: false,
-    throttledMove: false,
+    throttledMove: true,
     debouncedHide: false,
     useScrollbar: false,
     textOverflow: 'wrap',
