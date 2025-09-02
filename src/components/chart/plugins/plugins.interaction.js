@@ -92,10 +92,23 @@ const modules = {
 
         this.drawIndicator(indicatorOffset, indicator.color);
         const label = this.getTimeLabel(offset);
+        
+        // Include data point position for synced indicators
+        let dataPointPosition = null;
+        if (tooltip.use && Object.keys(hitInfo.items).length) {
+          const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+          const hitItem = hitInfo.items[hitId];
+          if (hitItem && hitItem.data && hitItem.data.xp !== undefined
+            && hitItem.data.yp !== undefined) {
+            dataPointPosition = [hitItem.data.xp, hitItem.data.yp];
+          }
+        }
+        
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
+          dataPointPosition,
         };
       } else {
         args.hoveredLabel = {
@@ -893,14 +906,14 @@ const modules = {
     // Use sliding window cache based on text length to maintain frequently used entries
     if (this._measureTextCache.size > 1000) {
       const entries = Array.from(this._measureTextCache.entries());
-      
+
       // Sort by text length (shorter texts are likely more frequently used)
       entries.sort(([keyA], [keyB]) => {
         const textA = keyA.split('-')[0];
         const textB = keyB.split('-')[0];
         return textA.length - textB.length;
       });
-      
+
       // Keep the first 500 entries (shorter texts)
       this._measureTextCache.clear();
       entries.slice(0, 500).forEach(([key, value]) => {
