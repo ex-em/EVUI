@@ -97,6 +97,7 @@ const modules = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
+          indicatorPosition: indicatorOffset,
         };
       } else {
         args.hoveredLabel = {

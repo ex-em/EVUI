@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, indicatorPosition }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -882,6 +882,13 @@ const modules = {
     }
 
     this.overlayClear();
+
+    // Use the indicator position from the hovered chart if available
+    if (indicatorPosition) {
+      this.drawIndicator(indicatorPosition, this.options.indicator.color);
+      return;
+    }
+
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
       x2: this.chartRect.x2 - this.labelOffset.right,
