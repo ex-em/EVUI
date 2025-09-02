@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition, indicatorPosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, indicatorPosition, indicatorRatio }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -883,18 +883,28 @@ const modules = {
 
     this.overlayClear();
 
-    // Use the indicator position from the hovered chart if available
-    if (indicatorPosition) {
-      this.drawIndicator(indicatorPosition, this.options.indicator.color);
-      return;
-    }
-
+    // Calculate current chart's graph area
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
       x2: this.chartRect.x2 - this.labelOffset.right,
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
+
+    // Use ratio-based position if available for accurate cross-chart synchronization
+    if (indicatorRatio && Array.isArray(indicatorRatio)) {
+      const [ratioX, ratioY] = indicatorRatio;
+      const syncedX = graphPos.x1 + (ratioX * (graphPos.x2 - graphPos.x1));
+      const syncedY = graphPos.y1 + (ratioY * (graphPos.y2 - graphPos.y1));
+      this.drawIndicator([syncedX, syncedY], this.options.indicator.color);
+      return;
+    }
+
+    // Fallback to original indicator position if ratio not available
+    if (indicatorPosition) {
+      this.drawIndicator(indicatorPosition, this.options.indicator.color);
+      return;
+    }
 
     // Fallback to calculated position based on time ratio
     if (horizontal) {

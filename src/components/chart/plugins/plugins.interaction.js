@@ -93,11 +93,23 @@ const modules = {
         this.drawIndicator(indicatorOffset, indicator.color);
         const label = this.getTimeLabel(offset);
 
+        // Calculate relative position ratio for synced charts
+        const graphPos = {
+          x1: this.chartRect.x1 + this.labelOffset.left,
+          x2: this.chartRect.x2 - this.labelOffset.right,
+          y1: this.chartRect.y1 + this.labelOffset.top,
+          y2: this.chartRect.y2 - this.labelOffset.bottom,
+        };
+
+        const ratioX = (indicatorOffset[0] - graphPos.x1) / (graphPos.x2 - graphPos.x1);
+        const ratioY = (indicatorOffset[1] - graphPos.y1) / (graphPos.y2 - graphPos.y1);
+
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
           indicatorPosition: indicatorOffset,
+          indicatorRatio: [ratioX, ratioY],
         };
       } else {
         args.hoveredLabel = {
