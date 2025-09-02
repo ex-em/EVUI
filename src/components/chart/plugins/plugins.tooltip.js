@@ -905,17 +905,18 @@ const modules = {
       if (closestIndex >= 0) {
         // Find first visible series with data at this label index
         let foundDataPoint = false;
-        for (const sId of Object.keys(this.seriesList)) {
+        Object.keys(this.seriesList).some((sId) => {
           const series = this.seriesList[sId];
           if (series.show && series.data && series.data[closestIndex]) {
             const dataPoint = series.data[closestIndex];
             if (dataPoint.xp !== undefined && dataPoint.yp !== undefined) {
               this.drawIndicator([dataPoint.xp, dataPoint.yp], this.options.indicator.color);
               foundDataPoint = true;
-              break;
+              return true;
             }
           }
-        }
+          return false;
+        });
 
         // Fallback to calculated position if no data point found
         if (!foundDataPoint) {
