@@ -503,7 +503,7 @@ const modules = {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
     }
     if (this.options?.tooltip?.throttledMove) {
-      this.onMouseMove = throttle(this.onMouseMove, 16); // ~60fps for smooth interaction
+      this.onMouseMove = throttle(this.onMouseMove, 30);
     }
 
     this.overlayCanvas.addEventListener('mousemove', this.onMouseMove);
