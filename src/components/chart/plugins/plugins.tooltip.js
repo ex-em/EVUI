@@ -896,58 +896,7 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    // Use data point position if tooltip is enabled and data exists
-    if (this.options.tooltip?.use && label) {
-      // Find the closest data point at this label
-      let closestIndex = -1;
-      let closestDiff = Infinity;
-
-      this.data.labels?.forEach((l, index) => {
-        const diff = Math.abs(+l - label);
-        if (diff < closestDiff) {
-          closestDiff = diff;
-          closestIndex = index;
-        }
-      });
-      if (closestIndex >= 0) {
-        // Find first visible series with data at this label index
-        let foundDataPoint = false;
-        Object.keys(this.seriesList).some((sId) => {
-          const series = this.seriesList[sId];
-          if (series.show && series.data && series.data[closestIndex]) {
-            const dataPoint = series.data[closestIndex];
-            if (dataPoint.xp !== undefined && dataPoint.yp !== undefined) {
-              this.drawIndicator([dataPoint.xp, dataPoint.yp], this.options.indicator.color);
-              foundDataPoint = true;
-              return true;
-            }
-          }
-          return false;
-        });
-
-        // Fallback to calculated position if no data point found
-        if (!foundDataPoint) {
-          this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
-        }
-      } else {
-        // No labels available, use calculated position
-        this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
-      }
-    } else {
-      // Original behavior when tooltip is disabled
-      this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
-    }
-  },
-
-  /**
-   * Draw indicator at calculated position based on time ratio
-   * @param {boolean} horizontal
-   * @param {object} graphPos
-   * @param {number} label
-   * @param {number} fromTime
-   * @param {number} toTime
-   */
-  drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime) {
+    // Fallback to calculated position based on time ratio
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
