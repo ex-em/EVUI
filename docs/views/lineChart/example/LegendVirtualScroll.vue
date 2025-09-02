@@ -11,14 +11,15 @@
   export default {
     setup() {
       const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      const count = 999;
       const chartData = {
-        series: Array(1000).fill(0).reduce((acc, _, idx) => {
+        series: Array(count).fill(0).reduce((acc, _, idx) => {
           acc[`series${idx + 1}`] = { name: `series#${idx + 1}`, fill: true, point: true };
           return acc;
         }, {}),
-        groups: [Array(1000).fill(0).map((_, idx) => `series${idx + 1}`)],
+        groups: [Array(count).fill(0).map((_, idx) => `series${idx + 1}`)],
         labels: Array(10).fill(0).map((_, index) => dayjs(time).add(index, 'day')),
-        data: Array(1000).fill(0).reduce((acc, _, idx) => {
+        data: Array(count).fill(0).reduce((acc, _, idx) => {
           acc[`series${idx + 1}`] = Array(10).fill(0).map(() => Math.floor(Math.random() * 100));
           return acc;
         }, {}),

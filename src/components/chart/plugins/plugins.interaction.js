@@ -889,10 +889,23 @@ const modules = {
     if (!this._measureTextCache) {
       this._measureTextCache = new Map();
     }
-    
-    // Clear cache if it gets too large (prevent memory leaks)
+
+    // Use sliding window cache based on text length to maintain frequently used entries
     if (this._measureTextCache.size > 1000) {
+      const entries = Array.from(this._measureTextCache.entries());
+      
+      // Sort by text length (shorter texts are likely more frequently used)
+      entries.sort(([keyA], [keyB]) => {
+        const textA = keyA.split('-')[0];
+        const textB = keyB.split('-')[0];
+        return textA.length - textB.length;
+      });
+      
+      // Keep the first 500 entries (shorter texts)
       this._measureTextCache.clear();
+      entries.slice(0, 500).forEach(([key, value]) => {
+        this._measureTextCache.set(key, value);
+      });
     }
 
     let hitId = null;
@@ -908,6 +921,7 @@ const modules = {
 
       // Skip hidden series for performance
       if (!series.show || !series.findGraphData) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -978,7 +992,6 @@ const modules = {
           }
         }
       }
-    }
 
     hitId = hitId === null ? Object.keys(items)[0] : hitId;
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
