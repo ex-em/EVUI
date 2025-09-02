@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, useAxisTrigger }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -892,7 +892,7 @@ const modules = {
     };
 
     // Use data point position if tooltip is enabled and data exists
-    if (this.options.tooltip?.use && label) {
+    if (useAxisTrigger && label) {
       // Find the closest data point at this label
       let closestIndex = -1;
       let closestDiff = Infinity;
