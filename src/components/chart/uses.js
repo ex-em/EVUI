@@ -90,6 +90,7 @@ const DEFAULT_OPTIONS = {
   combo: false,
   tooltip: {
     use: true,
+    trigger: 'axis',
     sortByValue: true,
     backgroundColor: '#4C4C4C',
     fontColor: '#FFFFFF',

@@ -146,9 +146,6 @@ export default {
         color: '#626872',
         segments: [4, 2],
       },
-      tooltip: {
-        use: false,
-      },
     });
 
     watch(syncHoverChart1, (newSyncHoverChart1) => {
