@@ -79,7 +79,18 @@ const modules = {
       }
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
-        this.drawIndicator(offset, indicator.color);
+        // Use data point position instead of mouse position for indicator
+        let indicatorOffset = offset;
+        if (Object.keys(hitInfo.items).length) {
+          const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+          const hitItem = hitInfo.items[hitId];
+          if (hitItem && hitItem.data && hitItem.data.xp !== undefined
+            && hitItem.data.yp !== undefined) {
+            indicatorOffset = [hitItem.data.xp, hitItem.data.yp];
+          }
+        }
+
+        this.drawIndicator(indicatorOffset, indicator.color);
         const label = this.getTimeLabel(offset);
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
