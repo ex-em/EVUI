@@ -927,41 +927,35 @@ const modules = {
 
         // Fallback to calculated position if no data point found
         if (!foundDataPoint) {
-          if (horizontal) {
-            const chartHeight = graphPos.y2 - graphPos.y1;
-            const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
-            this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
-          } else {
-            const chartWidth = graphPos.x2 - graphPos.x1;
-            const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
-            this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
-          }
+          this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
         }
       } else {
         // No labels available, use calculated position
-        // eslint-disable-next-line no-lonely-if
-        if (horizontal) {
-          const chartHeight = graphPos.y2 - graphPos.y1;
-          const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
-          this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
-        } else {
-          const chartWidth = graphPos.x2 - graphPos.x1;
-          const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
-          this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
-        }
+        this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
       }
     } else {
       // Original behavior when tooltip is disabled
-      // eslint-disable-next-line no-lonely-if
-      if (horizontal) {
-        const chartHeight = graphPos.y2 - graphPos.y1;
-        const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
-        this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
-      } else {
-        const chartWidth = graphPos.x2 - graphPos.x1;
-        const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
-        this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
-      }
+      this.drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime);
+    }
+  },
+
+  /**
+   * Draw indicator at calculated position based on time ratio
+   * @param {boolean} horizontal
+   * @param {object} graphPos
+   * @param {number} label
+   * @param {number} fromTime
+   * @param {number} toTime
+   */
+  drawCalculatedIndicatorPosition(horizontal, graphPos, label, fromTime, toTime) {
+    if (horizontal) {
+      const chartHeight = graphPos.y2 - graphPos.y1;
+      const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
+      this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
+    } else {
+      const chartWidth = graphPos.x2 - graphPos.x1;
+      const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
+      this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
     }
   },
 
