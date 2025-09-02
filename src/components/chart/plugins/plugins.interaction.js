@@ -108,7 +108,6 @@ const modules = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
-          indicatorPosition: indicatorOffset,
           indicatorRatio: [ratioX, ratioY],
         };
       } else {

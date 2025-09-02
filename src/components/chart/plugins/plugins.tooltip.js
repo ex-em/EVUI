@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition, indicatorPosition, indicatorRatio }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, indicatorRatio }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -897,12 +897,6 @@ const modules = {
       const syncedX = graphPos.x1 + (ratioX * (graphPos.x2 - graphPos.x1));
       const syncedY = graphPos.y1 + (ratioY * (graphPos.y2 - graphPos.y1));
       this.drawIndicator([syncedX, syncedY], this.options.indicator.color);
-      return;
-    }
-
-    // Fallback to original indicator position if ratio not available
-    if (indicatorPosition) {
-      this.drawIndicator(indicatorPosition, this.options.indicator.color);
       return;
     }
 
