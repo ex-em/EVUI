@@ -931,6 +931,7 @@ const modules = {
         }
       } else {
         // No labels available, use calculated position
+        // eslint-disable-next-line no-lonely-if
         if (horizontal) {
           const chartHeight = graphPos.y2 - graphPos.y1;
           const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
@@ -943,6 +944,7 @@ const modules = {
       }
     } else {
       // Original behavior when tooltip is disabled
+      // eslint-disable-next-line no-lonely-if
       if (horizontal) {
         const chartHeight = graphPos.y2 - graphPos.y1;
         const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;

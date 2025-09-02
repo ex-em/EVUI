@@ -93,22 +93,10 @@ const modules = {
         this.drawIndicator(indicatorOffset, indicator.color);
         const label = this.getTimeLabel(offset);
 
-        // Include data point position for synced indicators
-        let dataPointPosition = null;
-        if (tooltip.use && Object.keys(hitInfo.items).length) {
-          const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
-          const hitItem = hitInfo.items[hitId];
-          if (hitItem && hitItem.data && hitItem.data.xp !== undefined
-            && hitItem.data.yp !== undefined) {
-            dataPointPosition = [hitItem.data.xp, hitItem.data.yp];
-          }
-        }
-
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
-          dataPointPosition,
         };
       } else {
         args.hoveredLabel = {
