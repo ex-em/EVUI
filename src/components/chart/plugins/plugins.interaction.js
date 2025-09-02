@@ -92,7 +92,7 @@ const modules = {
 
         this.drawIndicator(indicatorOffset, indicator.color);
         const label = this.getTimeLabel(offset);
-        
+
         // Include data point position for synced indicators
         let dataPointPosition = null;
         if (tooltip.use && Object.keys(hitInfo.items).length) {
@@ -103,7 +103,7 @@ const modules = {
             dataPointPosition = [hitItem.data.xp, hitItem.data.yp];
           }
         }
-        
+
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,

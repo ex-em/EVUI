@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition, dataPointPosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -890,16 +890,25 @@ const modules = {
     };
 
     // Use data point position if tooltip is enabled and data exists
-    if (this.options.tooltip?.use && dataPointPosition && label) {
+    if (this.options.tooltip?.use && label) {
       // Find the closest data point at this label
-      const labelIndex = this.data.labels?.findIndex(l => Math.abs(+l - label) < 1000);
-      if (labelIndex >= 0) {
+      let closestIndex = -1;
+      let closestDiff = Infinity;
+
+      this.data.labels?.forEach((l, index) => {
+        const diff = Math.abs(+l - label);
+        if (diff < closestDiff) {
+          closestDiff = diff;
+          closestIndex = index;
+        }
+      });
+      if (closestIndex >= 0) {
         // Find first visible series with data at this label index
         let foundDataPoint = false;
         for (const sId of Object.keys(this.seriesList)) {
           const series = this.seriesList[sId];
-          if (series.show && series.data && series.data[labelIndex]) {
-            const dataPoint = series.data[labelIndex];
+          if (series.show && series.data && series.data[closestIndex]) {
+            const dataPoint = series.data[closestIndex];
             if (dataPoint.xp !== undefined && dataPoint.yp !== undefined) {
               this.drawIndicator([dataPoint.xp, dataPoint.yp], this.options.indicator.color);
               foundDataPoint = true;
@@ -907,7 +916,7 @@ const modules = {
             }
           }
         }
-        
+
         // Fallback to calculated position if no data point found
         if (!foundDataPoint) {
           if (horizontal) {
@@ -919,6 +928,17 @@ const modules = {
             const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
             this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
           }
+        }
+      } else {
+        // No labels available, use calculated position
+        if (horizontal) {
+          const chartHeight = graphPos.y2 - graphPos.y1;
+          const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
+          this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);
+        } else {
+          const chartWidth = graphPos.x2 - graphPos.x1;
+          const offsetX = (chartWidth * (label - fromTime)) / (toTime - fromTime) + graphPos.x1;
+          this.drawIndicator([offsetX, graphPos.y2], this.options.indicator.color);
         }
       }
     } else {
