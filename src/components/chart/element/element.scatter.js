@@ -116,7 +116,7 @@ class Scatter {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     // Adjusted because Real Time Scatter is drawn from the back.
-    for (let i = this.data.length - 1; i >= 0; i--) {
+    for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
       const idx = i;
       const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : duple.get(`${item.x}${item.y}`) === this.sId;

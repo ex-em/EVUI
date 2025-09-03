@@ -265,10 +265,15 @@ class EvChart {
    * @returns {undefined}
    */
   collectDuplicatePoints(duple, chartTypeSet) {
-    for (let jx = chartTypeSet.length - 1; jx >= 0; jx--) {
+    const isReverseOrder = !!this.options.reverse;
+    for (
+      let jx = isReverseOrder ? chartTypeSet.length - 1 : 0;
+      isReverseOrder ? jx >= 0 : jx < chartTypeSet.length;
+      isReverseOrder ? jx-- : jx++
+    ) {
       const series = this.seriesList[chartTypeSet[jx]];
       if (this.options.realTimeScatter?.use) {
-        const seriesDatas = series.data[series.sId].dataGroup;
+        const seriesDatas = series.data[series.sId]?.dataGroup;
         for (let i = 0; i < seriesDatas.length; i++) {
           const dataItems = seriesDatas[i]?.data || [];
           for (let j = 0; j < dataItems.length; j++) {
@@ -277,7 +282,7 @@ class EvChart {
           }
         }
       } else {
-        const seriesDatas = this.data.data[chartTypeSet[jx]];
+        const seriesDatas = this.data.data[chartTypeSet[jx]] ?? [];
         for (let i = 0; i < seriesDatas.length; i++) {
           const item = seriesDatas[i];
           duple.set(`${item.x}${item.y}`, series.sId);
@@ -422,7 +427,9 @@ class EvChart {
               }
             }
 
-            series = this.seriesList[chartTypeSet.at(-1 - jx)];
+            if (this.options.seriesReverse) {
+              series = this.seriesList[chartTypeSet.at(-1 - jx)];
+            }
 
             series.draw({
               legendHitInfo,
