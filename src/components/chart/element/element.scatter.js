@@ -115,14 +115,13 @@ class Scatter {
     const { ctx, axesSteps, duple, legendHitInfo } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    this.data.forEach((item, idx) => {
-      const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : !duple.has(`${item.x}${item.y}`);
+    // Adjusted because Real Time Scatter is drawn from the back.
+    for (let i = this.data.length - 1; i >= 0; i--) {
+      const item = this.data[i];
+      const idx = i;
+      const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : duple.get(`${item.x}${item.y}`) === this.sId;
 
       if (shouldDraw) {
-        if (!duple.has(`${item.x}${item.y}`)) {
-          duple.add(`${item.x}${item.y}`);
-        }
-
         this.calcItem(item, param);
 
         if (item.xp !== null && item.yp !== null) {
@@ -139,7 +138,7 @@ class Scatter {
           Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
         }
       }
-    });
+    }
   }
 
   /**
@@ -158,13 +157,9 @@ class Scatter {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
 
-        const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : !duple.has(`${item.x}${item.y}`);
+        const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : duple.get(`${item.x}${item.y}`) === this.sId;
 
         if (shouldDraw) {
-          if (!duple.has(`${item.x}${item.y}`)) {
-            duple.add(`${item.x}${item.y}`);
-          }
-
           this.calcItem(item, param);
 
           if (item.xp !== null && item.yp !== null) {
