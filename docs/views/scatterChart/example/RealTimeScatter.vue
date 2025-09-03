@@ -123,6 +123,7 @@ export default {
         use: true,
         range: realTimeScatterRange.value, // 총 5분, 초 단위
       },
+      seriesReverse: true,
     });
 
     let timeoutId;
