@@ -265,7 +265,7 @@ class EvChart {
    * @returns {undefined}
    */
   collectDuplicatePoints(duple, chartTypeSet) {
-    const isReverseOrder = !!this.options.reverse;
+    const isReverseOrder = !!this.options.seriesReverse;
     for (
       let jx = isReverseOrder ? chartTypeSet.length - 1 : 0;
       isReverseOrder ? jx >= 0 : jx < chartTypeSet.length;
