@@ -483,10 +483,7 @@ class HeatMap {
       const y1 = yp;
       const y2 = yp + h;
 
-      return ((x1 >= xsp && x1 < xep) && (y1 >= ysp && y1 < yep))
-        || ((x1 >= xsp && x1 < xep) && (y2 > ysp && y2 <= yep))
-        || ((x2 > xsp && x2 <= xep) && (y1 >= ysp && y1 < yep))
-        || ((x2 > xsp && x2 <= xep) && (y2 > ysp && y2 <= yep));
+      return ((x1 >= xsp && x2 <= xep) && (y1 >= ysp && y2 <= yep));
     });
   }
 
