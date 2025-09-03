@@ -258,6 +258,40 @@ class EvChart {
   }
 
   /**
+   * Collect duplicate point keys for scatter overlap detection
+   * @param {Map<string, string>} duple
+   * @param {string[]} chartTypeSet
+   *
+   * @returns {undefined}
+   */
+  collectDuplicatePoints(duple, chartTypeSet) {
+    const isReverseOrder = !!this.options.reverse;
+    for (
+      let jx = isReverseOrder ? chartTypeSet.length - 1 : 0;
+      isReverseOrder ? jx >= 0 : jx < chartTypeSet.length;
+      isReverseOrder ? jx-- : jx++
+    ) {
+      const series = this.seriesList[chartTypeSet[jx]];
+      if (this.options.realTimeScatter?.use) {
+        const seriesDatas = series.data[series.sId]?.dataGroup;
+        for (let i = 0; i < seriesDatas.length; i++) {
+          const dataItems = seriesDatas[i]?.data || [];
+          for (let j = 0; j < dataItems.length; j++) {
+            const item = dataItems[j];
+            duple.set(`${item.x}${item.y}`, series.sId);
+          }
+        }
+      } else {
+        const seriesDatas = this.data.data[chartTypeSet[jx]] ?? [];
+        for (let i = 0; i < seriesDatas.length; i++) {
+          const item = seriesDatas[i];
+          duple.set(`${item.x}${item.y}`, series.sId);
+        }
+      }
+    }
+  }
+
+  /**
    * Draw each series
    * @param {any} [hitInfo=undefined]   legend mouseover callback (object or undefined)
    *
@@ -296,12 +330,20 @@ class EvChart {
       }
     });
 
-    const duple = new Set();
+    /**
+     * new Map<`${x}${y}`, seriesID>
+     */
+    const duple = new Map();
 
     const chartKeys = Object.keys(this.seriesInfo.charts);
+
     for (let ix = 0; ix < chartKeys.length; ix++) {
       const chartType = chartKeys[ix];
       const chartTypeSet = this.seriesInfo.charts[chartType];
+
+      if (chartType === 'scatter') {
+        this.collectDuplicatePoints(duple, chartTypeSet);
+      }
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
         let series = this.seriesList[chartTypeSet[jx]];
@@ -385,7 +427,7 @@ class EvChart {
               }
             }
 
-            if (this.options.realTimeScatter?.use) {
+            if (this.options.seriesReverse) {
               series = this.seriesList[chartTypeSet.at(-1 - jx)];
             }
 

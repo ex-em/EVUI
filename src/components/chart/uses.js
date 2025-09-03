@@ -245,6 +245,7 @@ const DEFAULT_OPTIONS = {
     error: '#FF0000',
     decimalPoint: 0,
   },
+  seriesReverse: false,
 };
 
 const DEFAULT_DATA = {
