@@ -418,7 +418,8 @@ const modules = {
       const position = isHorizontal ? baseData?.x : baseData?.y;
 
       const baseValue = baseData?.o;
-      const isPassingValue = baseSeries.passingValue === baseValue;
+      const isPassingValue = Util.isNullOrUndefined(baseSeries.passingValue)
+      && baseSeries.passingValue === baseValue;
       const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
 
       if (isPassingValue || position == null || !isSameSign || !baseSeries.show) {
@@ -598,21 +599,23 @@ const modules = {
     const isHorizontal = this.options.horizontal;
 
     if (data.length) {
+      const usePassingValue = !Util.isNullOrUndefined(passingValue);
+
       return data.reduce((acc, p, index) => {
         const minmax = acc;
         const px = p.x?.value || p.x;
         const py = p.y?.value || p.y;
         const po = p.o?.value || p.o;
 
-        if (po !== passingValue && px <= minmax.minX) {
+        if ((usePassingValue ? (po !== passingValue && px <= minmax.minX) : px <= minmax.minX)) {
           minmax.minX = (px === null) ? 0 : px;
         }
 
-        if (po !== passingValue && py <= minmax.minY) {
+        if ((usePassingValue ? (po !== passingValue && py <= minmax.minY) : py <= minmax.minY)) {
           minmax.minY = (py === null) ? 0 : py;
         }
 
-        if (po !== passingValue && px >= minmax.maxX) {
+        if ((usePassingValue ? (po !== passingValue && px >= minmax.maxX) : px >= minmax.maxX)) {
           minmax.maxX = (px === null) ? 0 : px;
 
           if (isHorizontal && px !== null) {
@@ -621,7 +624,7 @@ const modules = {
           }
         }
 
-        if (po !== passingValue && py >= minmax.maxY) {
+        if ((usePassingValue ? (po !== passingValue && py >= minmax.maxY) : py >= minmax.maxY)) {
           minmax.maxY = (py === null) ? 0 : py;
 
           if (!isHorizontal && py !== null) {
