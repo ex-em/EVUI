@@ -418,7 +418,7 @@ const modules = {
       const position = isHorizontal ? baseData?.x : baseData?.y;
 
       const baseValue = baseData?.o;
-      const isPassingValue = Util.isNullOrUndefined(baseSeries.passingValue)
+      const isPassingValue = !Util.isNullOrUndefined(baseSeries.passingValue)
       && baseSeries.passingValue === baseValue;
       const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
 
