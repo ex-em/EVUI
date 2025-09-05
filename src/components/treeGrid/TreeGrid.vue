@@ -895,8 +895,8 @@ export default {
     );
     watch(
       () => [props.width, props.height, props.option.columnWidth],
-      (value) => {
-        resizeInfo.columnWidth = value[3];
+      () => {
+        if (props.option.columnWidth != null) resizeInfo.columnWidth = props.option.columnWidth;
         stores.orderedColumns.map((column) => {
           const item = column;
 
