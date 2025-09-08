@@ -182,10 +182,15 @@ class TimeCategoryScale extends Scale {
     let labelPoint;
     let ix;
 
-    const gap = Math.round(oriSteps / steps);
-    const count = gap === oriSteps ? 1 : gap;
+    // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
+    let count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
 
-    const maxIndex = gap === oriSteps ? oriSteps : oriSteps - 1;
+    // 첫번째 라벨이 축 시작점보다 오른쪽에 있을 경우, count를 1로 설정
+    if (this.type === 'x' && startPoint > Math.ceil(aPos[this.units.rectStart]) && count === oriSteps) {
+      count = 1;
+    }
+
+    const maxIndex = count === oriSteps ? oriSteps : oriSteps - 1;
 
     for (ix = 0; ix <= maxIndex; ix += count) {
       ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
