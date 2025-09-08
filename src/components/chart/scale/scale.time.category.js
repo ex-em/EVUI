@@ -127,9 +127,6 @@ class TimeCategoryScale extends Scale {
     const stepValue = stepInfo.rawInterval;
     const oriSteps = stepInfo.oriSteps;
 
-    // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
-    const count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
-
     let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
@@ -184,7 +181,19 @@ class TimeCategoryScale extends Scale {
     let labelText;
     let labelPoint;
     let ix;
-    const maxIndex = oriSteps === count ? oriSteps : oriSteps - 1;
+
+    // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
+    let count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
+
+    // 첫번째 라벨이 축 시작점보다 오른쪽에 있을 경우, count를 1로 설정
+    // 추후 개선 필요: 근본적 문제는 라벨이 2개인 경우 oriSteps가 1로 와야하는데 2로 옴. horizontal일 때 예외처리 필요.
+    const isStartPointRightOfRectStart = startPoint > Math.ceil(aPos[this.units.rectStart]);
+    if (this.type === 'x' && isStartPointRightOfRectStart && count === oriSteps) {
+      count = 1;
+    }
+
+    const maxIndex = count === oriSteps ? oriSteps : oriSteps - 1;
+
     for (ix = 0; ix <= maxIndex; ix += count) {
       ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
 
@@ -244,7 +253,11 @@ class TimeCategoryScale extends Scale {
             });
           }
         }
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if (
+          ix < oriSteps && this.showGrid && (
+            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
+          )
+        ) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -252,7 +265,10 @@ class TimeCategoryScale extends Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if (
+          ix < oriSteps && this.showGrid && (
+            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
+          )) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
