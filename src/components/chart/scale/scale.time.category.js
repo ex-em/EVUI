@@ -185,9 +185,9 @@ class TimeCategoryScale extends Scale {
     // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
     let count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
 
-    const isStartPointRightOfRectStart = startPoint > Math.ceil(aPos[this.units.rectStart]);
-
     // 첫번째 라벨이 축 시작점보다 오른쪽에 있을 경우, count를 1로 설정
+    // 추후 개선 필요: 근본적 문제는 라벨이 2개인 경우 oriSteps가 1로 와야하는데 2로 옴. horizontal일 때 예외처리 필요.
+    const isStartPointRightOfRectStart = startPoint > Math.ceil(aPos[this.units.rectStart]);
     if (this.type === 'x' && isStartPointRightOfRectStart && count === oriSteps) {
       count = 1;
     }
