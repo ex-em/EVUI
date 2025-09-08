@@ -483,10 +483,7 @@ class HeatMap {
       const y1 = yp;
       const y2 = yp + h;
 
-      return ((x1 >= xsp && x1 <= xep) && (y1 >= ysp && y1 <= yep))
-         || ((x1 >= xsp && x1 <= xep) && (y2 >= ysp && y2 <= yep))
-         || ((x2 >= xsp && x2 <= xep) && (y1 >= ysp && y1 <= yep))
-        || ((x2 >= xsp && x2 <= xep) && (y2 >= ysp && y2 <= yep));
+      return ((x1 >= xsp && x2 <= xep) && (y1 >= ysp && y2 <= yep));
     });
   }
 
@@ -695,8 +692,8 @@ class HeatMap {
         y: { steps: yCurrentCount, min: yMin, max: yMax },
       } = this.currentLabelInfo;
 
-      const labelXCount = xCurrentCount || labelX.x.length;
-      const labelYCount = yCurrentCount || labelY.y.length;
+      const labelXCount = xCurrentCount || labelX.length;
+      const labelYCount = yCurrentCount || labelY.length;
       const gapX = (x2 - x1) / labelXCount;
       const gapY = (y2 - y1) / labelYCount;
 
