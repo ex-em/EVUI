@@ -127,9 +127,6 @@ class TimeCategoryScale extends Scale {
     const stepValue = stepInfo.rawInterval;
     const oriSteps = stepInfo.oriSteps;
 
-    // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
-    const count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
-
     let startPoint = aPos[this.units.rectStart];
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
@@ -184,7 +181,12 @@ class TimeCategoryScale extends Scale {
     let labelText;
     let labelPoint;
     let ix;
-    const maxIndex = oriSteps === count ? oriSteps : oriSteps - 1;
+
+    const gap = Math.round(oriSteps / steps);
+    const count = gap === oriSteps ? 1 : gap;
+
+    const maxIndex = gap === oriSteps ? oriSteps : oriSteps - 1;
+
     for (ix = 0; ix <= maxIndex; ix += count) {
       ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
 
@@ -244,7 +246,7 @@ class TimeCategoryScale extends Scale {
             });
           }
         }
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if ((ix < oriSteps && this.showGrid)) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -252,7 +254,7 @@ class TimeCategoryScale extends Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if ((ix !== 0 && ix < oriSteps && this.showGrid)) {
+        if ((ix < oriSteps && this.showGrid)) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
