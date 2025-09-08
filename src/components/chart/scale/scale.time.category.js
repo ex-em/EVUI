@@ -185,8 +185,10 @@ class TimeCategoryScale extends Scale {
     // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
     let count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
 
+    const isStartPointRightOfRectStart = startPoint > Math.ceil(aPos[this.units.rectStart]);
+
     // 첫번째 라벨이 축 시작점보다 오른쪽에 있을 경우, count를 1로 설정
-    if (this.type === 'x' && startPoint > Math.ceil(aPos[this.units.rectStart]) && count === oriSteps) {
+    if (this.type === 'x' && isStartPointRightOfRectStart && count === oriSteps) {
       count = 1;
     }
 
@@ -251,7 +253,11 @@ class TimeCategoryScale extends Scale {
             });
           }
         }
-        if ((ix < oriSteps && this.showGrid)) {
+        if (
+          ix < oriSteps && this.showGrid && (
+            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
+          )
+        ) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
@@ -259,7 +265,10 @@ class TimeCategoryScale extends Scale {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
-        if ((ix < oriSteps && this.showGrid)) {
+        if (
+          ix < oriSteps && this.showGrid && (
+            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
+          )) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);
         }
