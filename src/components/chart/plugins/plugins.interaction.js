@@ -37,7 +37,22 @@ const modules = {
         if (tooltip.use && this.isInitTooltip) {
           this.drawItemsHighlight(hitInfo, ctx);
 
-          if (tooltip?.formatter?.html) {
+          if (typeof tooltip?.returnValue === 'function') {
+            const seriesList = [];
+            Object.keys(hitInfo.items).forEach((sId) => {
+              seriesList.push({
+                sId,
+                data: hitInfo.items[sId].data,
+                color: hitInfo.items[sId].color,
+                name: hitInfo.items[sId].name,
+                dataId: hitInfo.items[sId].id,
+                index: hitInfo.items[sId].index,
+              });
+            });
+
+            this.hideTooltipDOM();
+            tooltip.returnValue(seriesList, e);
+          } else if (tooltip?.formatter?.html) {
             this.drawCustomTooltip(hitInfo?.items);
             this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
@@ -52,6 +67,10 @@ const modules = {
           }
         }
       } else if (tooltip.use && this.isInitTooltip) {
+        if (typeof tooltip?.returnValue === 'function') {
+          tooltip.returnValue([], e);
+        }
+
         this.hideTooltipDOM();
       }
 
@@ -88,7 +107,7 @@ const modules = {
      * @returns {undefined}
      */
 
-    this.onMouseLeave = () => {
+    this.onMouseLeave = (e) => {
       const { tooltip, dragSelection } = this.options;
 
       if (tooltip.throttledMove) {
@@ -100,6 +119,10 @@ const modules = {
       }
 
       if (tooltip.use && this.isInitTooltip) {
+        if (typeof tooltip?.returnValue === 'function') {
+          tooltip.returnValue([], e);
+        }
+
         this.tooltipClear();
       }
       this.listeners['mouse-leave']();
