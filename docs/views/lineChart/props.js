@@ -86,6 +86,11 @@ export default {
       component: ExternalTooltip,
       parsedData: parseComponent(ExternalTooltipRaw),
     },
+    'External Tooltip': {
+      description: 'Tooltip의 내용을 외부에서 제어할 수 있습니다.',
+      component: ExternalTooltip,
+      parsedData: parseComponent(ExternalTooltipRaw),
+    },
     'Plot line & Plot band': {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
       component: PlotLine,
