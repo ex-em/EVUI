@@ -14,6 +14,8 @@ import Tooltip from './example/Tooltip';
 import TooltipRaw from './example/Tooltip?raw';
 import CustomTooltip from './example/CustomTooltip';
 import CustomTooltipRaw from './example/CustomTooltip?raw';
+import ExternalTooltip from './example/ExternalTooltip';
+import ExternalTooltipRaw from './example/ExternalTooltip?raw';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from './example/PlotLine?raw';
 import SelectLabel from './example/SelectLabel';
@@ -78,6 +80,11 @@ export default {
       description: 'Tooltip의 내용을 HTML로 가공하여 구성할 수 있습니다.',
       component: CustomTooltip,
       parsedData: parse(CustomTooltipRaw).descriptor,
+    },
+    'External Tooltip': {
+      description: 'Tooltip의 내용을 외부에서 제어할 수 있습니다.',
+      component: ExternalTooltip,
+      parsedData: parseComponent(ExternalTooltipRaw),
     },
     'Plot line & Plot band': {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',

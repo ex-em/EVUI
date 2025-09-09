@@ -241,6 +241,7 @@ const chartData =
 | rowPadding          | Object                              | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
 | showAllValueInRange | Boolean                             | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
 | formatter           | function / Object                   | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
+| returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
 
 ```
 const chartOptions = {
@@ -262,9 +263,34 @@ const chartOptions = {
         formatter: {
             html: ([item]) =>  `<div class="customClass">${item.name} : ${item.data.y}</div>`
         }
+
+        // returnValue function
+        // return type : void
+        // 커스텀 툴팁을 구현할 때 사용하는 함수
+        returnValue: (seriesList, event) => {
+            // seriesList: Array<SeriesItem>
+            // event: MouseEvent
+        }
     },
 }
 ```
+
+#### returnValue
+
+| 이름 | 타입 | 설명 | 종류(예시) |
+| --- | --- | --- | --- |
+| seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
+| event | MouseEvent | 마우스 이벤트 객체 | |
+
+  - SeriesItem  
+    | 이름 | 타입 | 설명 | 종류(예시) |
+    | --- | --- | --- | --- |
+    | sId | String | 시리즈 ID | 'series1' |
+    | data | Object | 시리즈 데이터 | { x: Date, y: Number, xp: Number, yp: Number, o: Number } |
+    | color | String | 시리즈 색상 | '#2b99f0' |
+    | name | String | 시리즈 이름 | 'Series 1' |
+    | dataId | String | 데이터 ID | 'data_1' |
+    | index | Number | 데이터 인덱스 | 0 |
 
 #### heatmap color
 
