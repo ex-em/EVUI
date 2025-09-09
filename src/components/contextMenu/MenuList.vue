@@ -16,6 +16,13 @@
           :class="item.iconClass"
         />
         {{ item.text }}
+        <template v-if="item.slotName && $slots[item.slotName]">
+          <slot
+            :name="item.slotName"
+            :item="item"
+            :index="idx"
+          />
+        </template>
         <i
           v-if="item.children || item.isShowMenu"
           class="ev-menu-li-suffix ev-icon-arrow-right2"

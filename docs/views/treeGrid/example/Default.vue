@@ -42,6 +42,12 @@
       @dblclick-row="onDoubleClickRow"
       @toggle-row="onToggledRow"
     >
+      <!-- 특정 그리드 설정 메뉴 아이템에 슬롯 추가 -->
+      <template #gridSettingMenu-menu1>
+        <span style="color: #FF6B35; font-weight: bold; margin-left: 10px;">
+          🔥 Test
+        </span>
+      </template>
     </ev-tree-grid>
     <div class="description">
       <div class="form-rows">
@@ -319,6 +325,7 @@ export default {
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
+        slotName: 'gridSettingMenu-menu1',
         click: param => console.log(`[Menu1]: ${param}`),
       },
     ]);

@@ -254,7 +254,20 @@
           ref="gridSettingMenu"
           :items="gridSettingContextMenuItems"
           :is-show-menu-on-click="isShowMenuOnClick"
-        />
+        >
+          <template
+            v-for="(_, slotName) in $slots"
+            :key="slotName"
+            #[slotName]="slotData"
+          >
+            <template v-if="slotName.startsWith('gridSettingMenu-')">
+              <slot
+                :name="slotName"
+                v-bind="slotData"
+              />
+            </template>
+          </template>
+        </ev-context-menu>
       </div>
       <!-- Resize Line -->
       <div

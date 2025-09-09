@@ -9,7 +9,18 @@
         :items="items"
         :style="menuStyle"
         :comp="comp"
-      />
+      >
+        <template
+          v-for="(_, slotName) in $slots"
+          :key="slotName"
+          #[slotName]="slotData"
+        >
+          <slot
+            :name="slotName"
+            v-bind="slotData"
+          />
+        </template>
+      </menu-list>
     </teleport>
   </template>
 </template>
