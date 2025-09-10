@@ -81,18 +81,21 @@ const modules = {
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         // Use data point position instead of mouse position for indicator when tooltip is enabled
         let indicatorOffset = offset;
-        const useAxisTrigger = tooltip.use && tooltip.trigger === 'axis';
+        let label = this.getTimeLabel(offset);
+        const useAxisTrigger = tooltip.use && tooltip.trigger === 'axis' && type === 'line';
+
         if (useAxisTrigger && Object.keys(hitInfo.items).length) {
           const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
           const hitItem = hitInfo.items[hitId];
+
           if (hitItem && hitItem.data && hitItem.data.xp !== undefined
             && hitItem.data.yp !== undefined) {
             indicatorOffset = [hitItem.data.xp, hitItem.data.yp];
+            label = this.data.labels[hitItem.index];
           }
         }
 
         this.drawIndicator(indicatorOffset, indicator.color);
-        const label = this.getTimeLabel(offset);
 
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
@@ -877,10 +880,17 @@ const modules = {
   },
 
   /**
+   * @typedef {object} HitInfo
+   * @property {object} items
+   * @property {string} hitId
+   * @property {object} maxTip
+   * @property {object} maxHighlight
+   */
+  /**
    * Find graph item on mouse position
    * @param {array} offset    return value from getMousePosition()
    *
-   * @returns {object} hit item information
+   * @returns {HitInfo} hit item information
    */
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
