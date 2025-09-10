@@ -340,21 +340,21 @@ class Line {
       } else {
         let s = 0;
         let e = gdata.length - 1;
-        const gap = Math.floor(Math.abs(gdata[1]?.xp - gdata[0].xp) / 2) || 0;
-        const xpInterval = gap > 6 ? gap : 6;
+        const gap = Math.ceil(Math.abs(gdata[1]?.xp - gdata[0].xp) / 2) || 0;
+        const xpInterval = Math.max(gap, 6);
 
         while (s <= e) {
           const m = Math.floor((s + e) / 2);
           const x = gdata[m].xp;
           const y = gdata[m].yp;
 
-          if (x - xpInterval < xp && xp < x + xpInterval) {
+          if (x - xpInterval <= xp && xp <= x + xpInterval) {
             const curXpInterval = gdata[m]?.xp - (gdata[m - 1]?.xp ?? 0);
 
             if (gdata[m - 1]?.xp && gdata[m + 1]?.xp && curXpInterval > 0) {
-              const leftXp = xp - gdata[m - 1].xp;
+              const leftXp = Math.abs(xp - gdata[m - 1].xp);
               const midXp = Math.abs(xp - gdata[m].xp);
-              const rightXp = gdata[m + 1].xp - xp;
+              const rightXp = Math.abs(gdata[m + 1].xp - xp);
 
               if (
                 Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP
