@@ -272,20 +272,23 @@ class EvChart {
       isReverseOrder ? jx-- : jx++
     ) {
       const series = this.seriesList[chartTypeSet[jx]];
-      if (this.options.realTimeScatter?.use) {
-        const seriesDatas = series.data[series.sId]?.dataGroup;
-        for (let i = 0; i < seriesDatas.length; i++) {
-          const dataItems = seriesDatas[i]?.data || [];
-          for (let j = 0; j < dataItems.length; j++) {
-            const item = dataItems[j];
+      const shouldInclude = !!series?.show;
+      if (shouldInclude) {
+        if (this.options.realTimeScatter?.use) {
+          const seriesDatas = series.data[series.sId]?.dataGroup;
+          for (let i = 0; i < seriesDatas.length; i++) {
+            const dataItems = seriesDatas[i]?.data || [];
+            for (let j = 0; j < dataItems.length; j++) {
+              const item = dataItems[j];
+              duple.set(`${item.x}${item.y}`, series.sId);
+            }
+          }
+        } else {
+          const seriesDatas = this.data.data[chartTypeSet[jx]] ?? [];
+          for (let i = 0; i < seriesDatas.length; i++) {
+            const item = seriesDatas[i];
             duple.set(`${item.x}${item.y}`, series.sId);
           }
-        }
-      } else {
-        const seriesDatas = this.data.data[chartTypeSet[jx]] ?? [];
-        for (let i = 0; i < seriesDatas.length; i++) {
-          const item = seriesDatas[i];
-          duple.set(`${item.x}${item.y}`, series.sId);
         }
       }
     }
