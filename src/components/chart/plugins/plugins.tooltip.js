@@ -1,6 +1,6 @@
 import { convertToPercent } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
-import { inRange } from 'lodash-es';
+import { inRange, isNil } from 'lodash-es';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
@@ -895,8 +895,9 @@ const modules = {
       if (matchIndex >= 0) {
         const seriesId = Object.keys(this.seriesList)?.[0];
         const dataPoint = this.seriesList?.[seriesId]?.data?.[matchIndex];
-        if (dataPoint?.xp !== undefined && dataPoint?.yp !== undefined) {
-          this.drawIndicator([dataPoint.xp, dataPoint.yp], this.options.indicator.color);
+        if (dataPoint?.xp !== undefined && dataPoint?.xp !== null) {
+          const yPosition = !isNil(dataPoint.yp) ? dataPoint.yp : (graphPos.y1 + graphPos.y2) / 2;
+          this.drawIndicator([dataPoint.xp, yPosition], this.options.indicator.color);
         }
       }
     } else if (horizontal) {
