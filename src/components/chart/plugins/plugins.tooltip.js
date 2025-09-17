@@ -783,7 +783,7 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-    const mouseXIp = 1; // mouseInterpolation
+    const mouseXIp = 5; // mouseInterpolation - increased for better edge detection
     const mouseYIp = 10;
     const options = this.options;
 
