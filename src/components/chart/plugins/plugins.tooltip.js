@@ -1,6 +1,6 @@
 import { convertToPercent } from '@/common/utils';
 import debounce from '@/common/utils.debounce';
-import { inRange } from 'lodash-es';
+import { inRange, isNil } from 'lodash-es';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
@@ -783,7 +783,7 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-    const mouseXIp = 1; // mouseInterpolation
+    const mouseXIp = 5; // mouseInterpolation - increased for better edge detection
     const mouseYIp = 10;
     const options = this.options;
 
@@ -858,7 +858,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, useAxisTrigger }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
@@ -882,6 +882,7 @@ const modules = {
     }
 
     this.overlayClear();
+
     const graphPos = {
       x1: this.chartRect.x1 + this.labelOffset.left,
       x2: this.chartRect.x2 - this.labelOffset.right,
@@ -889,7 +890,17 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    if (horizontal) {
+    if (useAxisTrigger && label) {
+      const matchIndex = this.data.labels?.findIndex(l => l?.valueOf() === label?.valueOf());
+      if (matchIndex >= 0) {
+        const seriesId = Object.keys(this.seriesList)?.[0];
+        const dataPoint = this.seriesList?.[seriesId]?.data?.[matchIndex];
+        if (dataPoint?.xp !== undefined && dataPoint?.xp !== null) {
+          const yPosition = !isNil(dataPoint.yp) ? dataPoint.yp : (graphPos.y1 + graphPos.y2) / 2;
+          this.drawIndicator([dataPoint.xp, yPosition], this.options.indicator.color);
+        }
+      }
+    } else if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       const offsetY = (chartHeight * (label - fromTime)) / (toTime - fromTime) + graphPos.y1;
       this.drawIndicator([graphPos.x2, offsetY], this.options.indicator.color);

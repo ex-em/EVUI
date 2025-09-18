@@ -169,8 +169,8 @@ class EvChart {
     this.chartRect = this.getChartRect();
   }
 
-  drawSyncedIndicator({ horizontal, label, mousePosition }) {
-    this.drawSyncedIndicator({ horizontal, label, mousePosition });
+  drawSyncedIndicator({ horizontal, label, mousePosition, useAxisTrigger }) {
+    this.drawSyncedIndicator({ horizontal, label, mousePosition, useAxisTrigger });
   }
 
   adjustXAndYAxisWidth() {

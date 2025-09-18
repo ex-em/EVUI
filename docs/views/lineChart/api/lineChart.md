@@ -275,6 +275,7 @@ const chartData =
 | 이름                | 타입                        | 디폴트                                     | 설명                                                    | 종류(예시)                                                          |
 | ------------------- | --------------------------- | ------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------- |
 | use                 | Boolean                     | true                                       | tooltip 표시 여부                                       | true /false                                                         |
+| trigger             | 'axis'                      | 'axis'                                     | tooltip 트리거                                        | 'axis'                                                      |
 | backgroundColor     | Hex, RGB, RGBA Code(String) | '#4C4C4C'                                  | tooltip 배경 색상                                       |                                                                     |
 | borderColor         | Hex, RGB, RGBA Code(String) | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
 | useShadow           | Boolean                     | false                                      | 그림자 사용 여부                                        |                                                                     |

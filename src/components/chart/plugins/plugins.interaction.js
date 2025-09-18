@@ -79,12 +79,29 @@ const modules = {
       }
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
-        this.drawIndicator(offset, indicator.color);
-        const label = this.getTimeLabel(offset);
+        // Use data point position instead of mouse position for indicator when tooltip is enabled
+        let indicatorOffset = offset;
+        let label = this.getTimeLabel(offset);
+        const useAxisTrigger = tooltip.use && tooltip.trigger === 'axis' && type === 'line';
+
+        if (useAxisTrigger && Object.keys(hitInfo.items).length) {
+          const hitId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+          const hitItem = hitInfo.items[hitId];
+
+          if (hitItem && hitItem.data && hitItem.data.xp !== undefined
+            && hitItem.data.yp !== undefined) {
+            indicatorOffset = [hitItem.data.xp, hitItem.data.yp];
+            label = this.data.labels[hitItem.index];
+          }
+        }
+
+        this.drawIndicator(indicatorOffset, indicator.color);
+
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
+          useAxisTrigger,
         };
       } else {
         args.hoveredLabel = {
@@ -863,16 +880,46 @@ const modules = {
   },
 
   /**
+   * @typedef {object} HitInfo
+   * @property {object} items
+   * @property {string} hitId
+   * @property {object} maxTip
+   * @property {object} maxHighlight
+   */
+  /**
    * Find graph item on mouse position
    * @param {array} offset    return value from getMousePosition()
    *
-   * @returns {object} hit item information
+   * @returns {HitInfo} hit item information
    */
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
+
+    // Cache for measureText to avoid repeated calculations
+    if (!this._measureTextCache) {
+      this._measureTextCache = new Map();
+    }
+
+    // Use sliding window cache based on text length to maintain frequently used entries
+    if (this._measureTextCache.size > 1000) {
+      const entries = Array.from(this._measureTextCache.entries());
+
+      // Sort by text length (shorter texts are likely more frequently used)
+      entries.sort(([keyA], [keyB]) => {
+        const textA = keyA.split('-')[0];
+        const textB = keyB.split('-')[0];
+        return textA.length - textB.length;
+      });
+
+      // Keep the first 500 entries (shorter texts)
+      this._measureTextCache.clear();
+      entries.slice(0, 500).forEach(([key, value]) => {
+        this._measureTextCache.set(key, value);
+      });
+    }
 
     let hitId = null;
     let maxs = '';
@@ -885,10 +932,15 @@ const modules = {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      if (series.findGraphData) {
-        const item = series.findGraphData(offset, isHorizontal);
+      // Skip hidden series for performance
+      if (!series.show || !series.findGraphData) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
-        if (item?.data) {
+      const item = series.findGraphData(offset, isHorizontal);
+
+      if (item?.data) {
           let gdata;
 
           if (item.data.o === null && series.interpolation !== 'zero') {
@@ -906,7 +958,17 @@ const modules = {
               seriesName: series.name,
               itemData: item.data,
             });
-            const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
+            // Use cached measureText for better performance
+            let sw = 1;
+            if (ctx) {
+              const cacheKey = `${formattedSeriesName}-${ctx.font}`;
+              if (this._measureTextCache.has(cacheKey)) {
+                sw = this._measureTextCache.get(cacheKey);
+              } else {
+                sw = ctx.measureText(formattedSeriesName).width;
+                this._measureTextCache.set(cacheKey, sw);
+              }
+            }
 
             item.id = series.id;
             item.name = formattedSeriesName;
@@ -943,7 +1005,6 @@ const modules = {
           }
         }
       }
-    }
 
     hitId = hitId === null ? Object.keys(items)[0] : hitId;
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
