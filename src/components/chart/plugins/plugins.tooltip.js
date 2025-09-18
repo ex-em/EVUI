@@ -783,8 +783,8 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-    const mouseXIp = 1; // mouseInterpolation
-    const mouseYIp = 10;
+    const mouseXIp = 15; // mouseInterpolation - 더 넓은 범위에서 감지
+    const mouseYIp = 15; // Y축도 동일하게 증가
     const options = this.options;
 
     if (offsetX >= (graphPos.x1 - mouseXIp) && offsetX <= (graphPos.x2 + mouseXIp)
