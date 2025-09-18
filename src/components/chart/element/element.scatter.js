@@ -112,14 +112,22 @@ class Scatter {
    * @returns {undefined}
    */
   defaultScatterDraw(param) {
-    const { ctx, axesSteps, duple, legendHitInfo } = param;
+    const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     // Adjusted because Real Time Scatter is drawn from the back.
     for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
       const idx = i;
-      const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : duple.get(`${item.x}${item.y}`) === this.sId;
+      const isDedupeOn = coordinateDedupe !== false;
+      let shouldDraw;
+      if (legendHitInfo) {
+        shouldDraw = (legendHitInfo.sId === this.sId);
+      } else if (isDedupeOn) {
+        shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
+      } else {
+        shouldDraw = true;
+      }
 
       if (shouldDraw) {
         this.calcItem(item, param);
@@ -148,7 +156,7 @@ class Scatter {
    * @returns {undefined}
    */
   realTimeScatterDraw(param) {
-    const { ctx, axesSteps, duple, legendHitInfo } = param;
+    const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
     const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
@@ -157,7 +165,15 @@ class Scatter {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
 
-        const shouldDraw = legendHitInfo ? (legendHitInfo.sId === this.sId) : duple.get(`${item.x}${item.y}`) === this.sId;
+        const isDedupeOnRT = coordinateDedupe !== false;
+        let shouldDraw;
+        if (legendHitInfo) {
+          shouldDraw = (legendHitInfo.sId === this.sId);
+        } else if (isDedupeOnRT) {
+          shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
+        } else {
+          shouldDraw = true;
+        }
 
         if (shouldDraw) {
           this.calcItem(item, param);

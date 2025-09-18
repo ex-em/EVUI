@@ -344,7 +344,7 @@ class EvChart {
       const chartType = chartKeys[ix];
       const chartTypeSet = this.seriesInfo.charts[chartType];
 
-      if (chartType === 'scatter') {
+      if (chartType === 'scatter' && this.options.coordinateDedupe) {
         this.collectDuplicatePoints(duple, chartTypeSet);
       }
 
@@ -438,6 +438,7 @@ class EvChart {
               legendHitInfo,
               selectInfo,
               duple,
+              coordinateDedupe: this.options.coordinateDedupe,
               ...opt,
             });
             break;

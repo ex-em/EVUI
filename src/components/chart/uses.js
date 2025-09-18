@@ -246,6 +246,7 @@ const DEFAULT_OPTIONS = {
     decimalPoint: 0,
   },
   seriesReverse: false,
+  coordinateDedupe: true,
 };
 
 const DEFAULT_DATA = {
