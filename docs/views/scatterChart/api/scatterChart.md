@@ -70,6 +70,9 @@ const chartData =
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
   | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | |
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
+  | seriesReverse | Boolean | false | 시리즈 순서 반대로 표시 여부 | |
+  | coordinateDedupe | Boolean | true | 좌표 중복 제거 여부 | |
+
 #### axesX axesY
 ##### type 공통
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
