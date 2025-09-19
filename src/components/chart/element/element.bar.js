@@ -304,10 +304,50 @@ class Bar {
    * Find graph item
    * @param {array}    offset          mouse position
    * @param {boolean}  isHorizontal    determines if a horizontal option's value
+   * @param {number}   dataIndex       selected label data index
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal) {
+  findGraphData(offset, isHorizontal, dataIndex) {
+    // If specific dataIndex is provided, use it directly
+    if (typeof dataIndex === 'number' && this.show) {
+      const gdata = this.data;
+      const item = { data: null, hit: false, color: this.color };
+
+      if (gdata[dataIndex]) {
+        item.data = gdata[dataIndex];
+        item.index = dataIndex;
+
+        // Check if mouse is within the bar bounds for hit detection
+        const xp = offset[0];
+        const yp = offset[1];
+        const barData = gdata[dataIndex];
+
+        if (isHorizontal) {
+          const sx = barData.xp;
+          const sy = barData.yp;
+          const ex = sx + barData.w;
+          const ey = sy + barData.h;
+
+          if ((sx <= xp) && (xp <= ex) && (sy <= yp) && (yp <= ey)) {
+            item.hit = true;
+          }
+        } else {
+          const sx = barData.xp;
+          const sy = barData.yp;
+          const ex = sx + barData.w;
+          const ey = sy + barData.h;
+
+          if ((sx <= xp) && (xp <= ex) && (sy <= yp) && (yp <= ey)) {
+            item.hit = true;
+          }
+        }
+      }
+
+      return item;
+    }
+
+    // Fallback to original behavior
     return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
   }
 

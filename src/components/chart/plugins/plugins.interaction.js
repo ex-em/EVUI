@@ -1027,47 +1027,46 @@ const modules = {
    * @returns {number} closest data index
    */
   findClosestDataIndex(offset, sIds) {
-    const [xp] = offset;
+    const [xp, yp] = offset;
+    const isHorizontal = !!this.options.horizontal;
+    const mousePos = isHorizontal ? yp : xp;
     let closestDistance = Infinity;
     let closestIndex = -1;
 
-    // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 확인
-    const firstSeries = this.seriesList[sIds[0]];
-    if (!firstSeries?.data) {
+    // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
+    const referenceSeries = sIds.find(sId => this.seriesList[sId]?.show);
+    if (!referenceSeries || !this.seriesList[referenceSeries]?.data) {
       return -1;
     }
 
-    // 1. 먼저 정확한 위치(5px 이내)에 라벨이 있는지 확인
-    for (let i = 0; i < firstSeries.data.length; i++) {
-      const point = firstSeries.data[i];
-      if (point.xp !== null && Math.abs(point.xp - xp) < 5) {
-        // 정확한 위치에 하나 이상의 시리즈에 유효한 데이터가 있는지 확인 (show가 true인 시리즈만)
-        const hasValidData = sIds.some((sId) => {
-          const series = this.seriesList[sId];
-          return series.show && series.data[i]?.o !== null && series.data[i]?.o !== undefined;
-        });
+    const referenceData = this.seriesList[referenceSeries].data;
 
-        if (hasValidData) {
-          return i; // 유효한 데이터가 있는 라벨만 선택
-        }
-      }
-    }
+    // 각 라벨에서 가장 가까운 것 찾기
+    for (let i = 0; i < referenceData.length; i++) {
+      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인
+      const hasValidData = sIds.some((sId) => {
+        const series = this.seriesList[sId];
+        return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
+      });
 
-    // 2. 정확한 위치에 유효한 데이터가 없으면 가장 가까운 유효한 데이터가 있는 라벨 찾기
-    for (let i = 0; i < firstSeries.data.length; i++) {
-      const point = firstSeries.data[i];
-      if (point.xp !== null) {
-        const distance = Math.abs(xp - point.xp);
+      if (hasValidData) {
+        const point = referenceData[i];
+        if (point) {
+          // 라벨 위치 계산
+          let labelPos;
+          if (isHorizontal) {
+            labelPos = point.h ? point.yp + (point.h / 2) : point.yp;
+          } else {
+            labelPos = point.w ? point.xp + (point.w / 2) : point.xp;
+          }
 
-        // 이 라벨에 하나 이상의 시리즈에 유효한 데이터가 있는지 확인 (show가 true인 시리즈만)
-        const hasValidData = sIds.some((sId) => {
-          const series = this.seriesList[sId];
-          return series.show && series.data[i]?.o !== null && series.data[i]?.o !== undefined;
-        });
-
-        if (hasValidData && distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = i;
+          if (labelPos !== null) {
+            const distance = Math.abs(mousePos - labelPos);
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestIndex = i;
+            }
+          }
         }
       }
     }
