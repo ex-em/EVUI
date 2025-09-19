@@ -974,13 +974,14 @@ const modules = {
     }
 
     // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
+    const allSeriesIsBar = sIds.every(sId => this.seriesList[sId].type === 'bar');
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
       if (series.findGraphData && series.show) {
         // 특정 데이터 인덱스로 데이터 요청
-        const item = series.findGraphData(offset, isHorizontal, targetDataIndex);
+        const item = series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar);
 
         if (item?.data) {
           let gdata;

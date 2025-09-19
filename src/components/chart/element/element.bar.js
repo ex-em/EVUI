@@ -288,12 +288,12 @@ class Bar {
    * @param {array}    offset          mouse position
    * @param {boolean}  isHorizontal    determines if a horizontal option's value
    * @param {number}   dataIndex       selected label data index
+   * @param {boolean}  useIndicatorOnLabel
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex) {
-    // If specific dataIndex is provided, use it directly
-    if (typeof dataIndex === 'number' && this.show) {
+  findGraphData(offset, isHorizontal, dataIndex, useIndicatorOnLabel) {
+    if (typeof dataIndex === 'number' && this.show && useIndicatorOnLabel) {
       const gdata = this.data;
       const item = { data: null, hit: false, color: this.color };
 
@@ -306,7 +306,6 @@ class Bar {
       return item;
     }
 
-    // Fallback to original behavior
     return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
   }
 
