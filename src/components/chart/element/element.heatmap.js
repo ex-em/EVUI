@@ -679,7 +679,7 @@ class HeatMap {
   }
 
   findSelectionRange(rangeInfo) {
-    const { xsp, ycp, width, height, range } = rangeInfo;
+    const { xsp, ysp, width, height, range } = rangeInfo;
 
     let selectionRange = null;
 
@@ -698,7 +698,6 @@ class HeatMap {
       const gapY = (y2 - y1) / labelYCount;
 
       const xep = xsp + width;
-      const ysp = ycp;
       const yep = ysp + height;
 
       const xIndex = {
@@ -708,8 +707,8 @@ class HeatMap {
 
       const lastIndexY = labelYCount - 1;
       const yIndex = {
-        min: lastIndexY - Math.floor((yep - y1 - gapY) / gapY),
-        max: lastIndexY - Math.floor((ysp - y1) / gapY),
+        min: lastIndexY - Math.round((yep - y1 - gapY) / gapY),
+        max: lastIndexY - Math.round((ysp - y1) / gapY),
       };
 
       const filteredLabelX = this.getFilteredLabel(labelX, labelXCount, xMin, xMax);
