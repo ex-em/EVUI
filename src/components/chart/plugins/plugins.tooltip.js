@@ -900,6 +900,7 @@ const modules = {
     }
   },
 
+
   /**
    * Clear tooltip canvas
    *
