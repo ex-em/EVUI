@@ -881,6 +881,66 @@ const modules = {
     let maxg = null;
     let maxSID = null;
 
+    // 파이 차트는 특별한 처리가 필요
+    if (this.options.type === 'pie') {
+      for (let ix = 0; ix < sIds.length; ix++) {
+        const sId = sIds[ix];
+        const series = this.seriesList[sId];
+
+        if (series.findGraphData && series.show) {
+          const item = series.findGraphData(offset);
+
+          if (item?.data && item.hit) {
+            const gdata = item.data.o;
+
+            if (gdata !== null && gdata !== undefined) {
+              const formattedSeriesName = this.getFormattedTooltipLabel({
+                dataId: series.id,
+                seriesId: sId,
+                seriesName: series.name,
+                itemData: item.data,
+              });
+              const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
+
+              item.id = series.id;
+              item.name = formattedSeriesName;
+              item.axis = { x: 0, y: 0 };
+              items[sId] = item;
+
+              const formattedTxt = this.getFormattedTooltipValue({
+                dataId: series.id,
+                seriesId: sId,
+                seriesName: formattedSeriesName,
+                value: gdata,
+                itemData: item.data,
+              });
+
+              item.data.formatted = formattedTxt;
+
+              if (maxsw < sw) {
+                maxs = formattedSeriesName;
+                maxsw = sw;
+              }
+
+              if (maxv.length <= `${formattedTxt}`.length) {
+                maxv = `${formattedTxt}`;
+              }
+
+              if (maxg === null || maxg <= gdata) {
+                maxg = gdata;
+                maxSID = sId;
+              }
+
+              hitId = sId;
+            }
+          }
+        }
+      }
+
+      const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
+      return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+    }
+
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
 
