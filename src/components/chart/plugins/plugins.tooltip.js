@@ -858,10 +858,18 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, dataLabel, isTooltipBased }) {
     if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
       return;
     }
+
+    // tooltip 기반 동기화인 경우
+    if (isTooltipBased) {
+      this.drawSyncedIndicatorForTooltip({ dataLabel, mousePosition });
+      return;
+    }
+
+    // 기존 시간 기반 동기화
     if (
       this.options.syncHover === false
       || (!horizontal && !this.options.axesX.every(({ type }) => type === 'time'))
@@ -900,6 +908,58 @@ const modules = {
     }
   },
 
+
+  /**
+   * 제공된 dataLabel과 일치하는 Label이 있다면 indicator를 그림
+   * @param {object} dataLabel   data label
+   * @param {object} mousePosition   mouse position
+   *
+   * @returns {undefined}
+   */
+  drawSyncedIndicatorForTooltip({ dataLabel, mousePosition }) {
+    if (!this.data?.labels || !dataLabel) {
+      return;
+    }
+
+    const matchingLabelIndex = this.data.labels.findIndex(
+      label => label?.valueOf() === dataLabel?.valueOf(),
+    );
+    if (matchingLabelIndex === -1) {
+      return;
+    }
+
+    const { horizontal } = this.options;
+    const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
+    const isHoveredChart = inRange(mousePosition[0], left, right)
+      && inRange(mousePosition[1], bottom, top);
+    if (isHoveredChart) {
+      return;
+    }
+
+    this.overlayClear();
+
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    const labelsCount = this.data.labels.length;
+    let indicatorPosition;
+
+    if (horizontal) {
+      const chartHeight = graphPos.y2 - graphPos.y1;
+      const positionY = graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
+      indicatorPosition = [graphPos.x2, positionY];
+    } else {
+      const chartWidth = graphPos.x2 - graphPos.x1;
+      const positionX = graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);
+      indicatorPosition = [positionX, graphPos.y2];
+    }
+
+    this.drawIndicator(indicatorPosition, this.options.indicator.color);
+  },
 
   /**
    * Clear tooltip canvas

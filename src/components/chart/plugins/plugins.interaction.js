@@ -69,13 +69,20 @@ const modules = {
 
         // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
         const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
-        if (indicator.use && tooltip.use && (type === 'line' || hasLineSeries)) {
-          this.drawIndicatorForTooltip(hitInfo, indicator.color);
+        if (tooltip.use && (type === 'line' || hasLineSeries)) {
+          // indicator를 그리고 실제 위치한 라벨 정보를 받음
+          const indicatorInfo = this.drawIndicatorForTooltip(hitInfo, indicator.color);
+
+          // 실제 indicator가 위치한 라벨 값을 동기화에 사용
+          const actualLabelValue = indicatorInfo?.labelValue;
           const label = this.getTimeLabel(offset);
+
           args.hoveredLabel = {
             horizontal: this.options.horizontal,
             label,
             mousePosition: [e.clientX, e.clientY],
+            dataLabel: actualLabelValue,
+            isTooltipBased: true,
           };
         }
       } else if (tooltip.use && this.isInitTooltip) {
@@ -90,7 +97,8 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
+      // tooltip 기반 indicator가 아직 설정되지 않은 경우에만 일반 indicator 처리
+      if (!args.hoveredLabel && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
         // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
         const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
         if ((type !== 'line' && !hasLineSeries) || !tooltip.use || !Object.keys(hitInfo.items).length) {
@@ -101,8 +109,9 @@ const modules = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
+          isTooltipBased: false,
         };
-      } else {
+      } else if (!args.hoveredLabel) {
         args.hoveredLabel = {
           label: '',
         };
@@ -1414,11 +1423,11 @@ const modules = {
    * Draw indicator at the label position when tooltip is displayed
    * @param {object} hitInfo hit item information from findHitItem
    * @param {string} color indicator color
-   * @returns {undefined}
+   * @returns {object|null} indicator position info with actual label value
    */
   drawIndicatorForTooltip(hitInfo, color) {
     if (!hitInfo?.items || !Object.keys(hitInfo.items).length) {
-      return;
+      return null;
     }
 
     const ctx = this.overlayCtx;
@@ -1435,8 +1444,11 @@ const modules = {
     const firstItem = hitInfo.items[firstSeriesId];
 
     if (!firstItem?.data) {
-      return;
+      return null;
     }
+
+    // 실제 indicator가 위치하는 라벨 값 추출
+    const actualLabelValue = horizontal ? firstItem.data.y : firstItem.data.x;
 
     let indicatorPosition;
 
@@ -1470,6 +1482,12 @@ const modules = {
     ctx.stroke();
     ctx.restore();
     ctx.closePath();
+
+    // 실제 indicator가 위치한 라벨 정보 반환
+    return {
+      labelValue: actualLabelValue,
+      position: indicatorPosition,
+    };
   },
 
   /**
