@@ -67,8 +67,9 @@ const modules = {
           }
         }
 
-        // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트에서만)
-        if (indicator.use && tooltip.use && type === 'line') {
+        // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
+        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
+        if (indicator.use && tooltip.use && (type === 'line' || hasLineSeries)) {
           this.drawIndicatorForTooltip(hitInfo, indicator.color);
           const label = this.getTimeLabel(offset);
           args.hoveredLabel = {
@@ -90,8 +91,9 @@ const modules = {
       }
 
       if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
-        // line 차트가 아니거나 tooltip이 없을 때는 일반 indicator 표시
-        if (type !== 'line' || !tooltip.use || !Object.keys(hitInfo.items).length) {
+        // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
+        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
+        if ((type !== 'line' && !hasLineSeries) || !tooltip.use || !Object.keys(hitInfo.items).length) {
           this.drawIndicator(offset, indicator.color);
         }
         const label = this.getTimeLabel(offset);
