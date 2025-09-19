@@ -881,12 +881,21 @@ const modules = {
     let maxg = null;
     let maxSID = null;
 
+    // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
+    const targetDataIndex = this.findClosestDataIndex(offset, sIds);
+
+    if (targetDataIndex === -1) {
+      return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
+    }
+
+    // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      if (series.findGraphData) {
-        const item = series.findGraphData(offset, isHorizontal);
+      if (series.findGraphData && series.show) {
+        // 특정 데이터 인덱스로 데이터 요청
+        const item = series.findGraphData(offset, isHorizontal, targetDataIndex);
 
         if (item?.data) {
           let gdata;
@@ -949,6 +958,61 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+
+  /**
+   * Find the closest data index (label) based on mouse position
+   * @param {array} offset mouse position
+   * @param {array} sIds series IDs
+   * @returns {number} closest data index
+   */
+  findClosestDataIndex(offset, sIds) {
+    const [xp] = offset;
+    let closestDistance = Infinity;
+    let closestIndex = -1;
+
+    // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 확인
+    const firstSeries = this.seriesList[sIds[0]];
+    if (!firstSeries?.data) {
+      return -1;
+    }
+
+    // 1. 먼저 정확한 위치(5px 이내)에 라벨이 있는지 확인
+    for (let i = 0; i < firstSeries.data.length; i++) {
+      const point = firstSeries.data[i];
+      if (point.xp !== null && Math.abs(point.xp - xp) < 5) {
+        // 정확한 위치에 하나 이상의 시리즈에 유효한 데이터가 있는지 확인 (show가 true인 시리즈만)
+        const hasValidData = sIds.some((sId) => {
+          const series = this.seriesList[sId];
+          return series.show && series.data[i]?.o !== null && series.data[i]?.o !== undefined;
+        });
+
+        if (hasValidData) {
+          return i; // 유효한 데이터가 있는 라벨만 선택
+        }
+      }
+    }
+
+    // 2. 정확한 위치에 유효한 데이터가 없으면 가장 가까운 유효한 데이터가 있는 라벨 찾기
+    for (let i = 0; i < firstSeries.data.length; i++) {
+      const point = firstSeries.data[i];
+      if (point.xp !== null) {
+        const distance = Math.abs(xp - point.xp);
+
+        // 이 라벨에 하나 이상의 시리즈에 유효한 데이터가 있는지 확인 (show가 true인 시리즈만)
+        const hasValidData = sIds.some((sId) => {
+          const series = this.seriesList[sId];
+          return series.show && series.data[i]?.o !== null && series.data[i]?.o !== undefined;
+        });
+
+        if (hasValidData && distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      }
+    }
+
+    return closestIndex;
   },
 
   /**
@@ -1075,7 +1139,8 @@ const modules = {
           itemData: hasData,
         });
 
-        if (hasData && !hitInfo.items[sId]) {
+        // Only add data if there's a valid value for this exact label
+        if (hasData && hasData.o !== null && hasData.o !== undefined && !hitInfo.items[sId]) {
           const item = {};
           item.color = series.color;
           item.hit = false;
