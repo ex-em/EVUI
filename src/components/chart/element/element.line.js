@@ -352,72 +352,58 @@ class Line {
           return item;
         }
 
-        // 데이터가 적은 경우 선형 탐색, 많은 경우 이진 탐색
-        if (validData.length <= 10) {
-          // 선형 탐색 - sparse 데이터에 효과적
-          for (let i = 0; i < validData.length; i++) {
+        // 이진 탐색으로 가장 가까운 포인트 찾기
+        let left = 0;
+        let right = validData.length - 1;
+
+        while (left <= right) {
+          const mid = Math.floor((left + right) / 2);
+          const point = validData[mid];
+          const xDistance = Math.abs(xp - point.xp);
+
+          if (xDistance < closestXDistance) {
+            closestXDistance = xDistance;
+            closestIndex = point.originalIndex;
+          }
+
+          if (point.xp < xp) {
+            left = mid + 1;
+            // 다음 포인트도 확인
+            if (left < validData.length) {
+              const nextDistance = Math.abs(xp - validData[left].xp);
+              if (nextDistance < closestXDistance) {
+                closestXDistance = nextDistance;
+                closestIndex = validData[left].originalIndex;
+              }
+            }
+          } else if (point.xp > xp) {
+            right = mid - 1;
+            // 이전 포인트도 확인
+            if (right >= 0) {
+              const prevDistance = Math.abs(xp - validData[right].xp);
+              if (prevDistance < closestXDistance) {
+                closestXDistance = prevDistance;
+                closestIndex = validData[right].originalIndex;
+              }
+            }
+          } else {
+            // 정확히 일치하는 경우
+            break;
+          }
+        }
+
+        // 이진 탐색 후 주변 포인트 추가 확인 (정확도 향상)
+        const foundIdx = validData.findIndex(p => p.originalIndex === closestIndex);
+        if (foundIdx !== -1) {
+          // 앞뒤 2개씩 추가 확인
+          for (let i = Math.max(0, foundIdx - 2);
+            i <= Math.min(validData.length - 1, foundIdx + 2);
+            i++) {
             const point = validData[i];
             const xDistance = Math.abs(xp - point.xp);
-
             if (xDistance < closestXDistance) {
               closestXDistance = xDistance;
               closestIndex = point.originalIndex;
-            }
-          }
-        } else {
-          // 이진 탐색 - 데이터가 많을 때 효율적
-          let left = 0;
-          let right = validData.length - 1;
-
-          while (left <= right) {
-            const mid = Math.floor((left + right) / 2);
-            const point = validData[mid];
-            const xDistance = Math.abs(xp - point.xp);
-
-            if (xDistance < closestXDistance) {
-              closestXDistance = xDistance;
-              closestIndex = point.originalIndex;
-            }
-
-            if (point.xp < xp) {
-              left = mid + 1;
-              // 다음 포인트도 확인
-              if (left < validData.length) {
-                const nextDistance = Math.abs(xp - validData[left].xp);
-                if (nextDistance < closestXDistance) {
-                  closestXDistance = nextDistance;
-                  closestIndex = validData[left].originalIndex;
-                }
-              }
-            } else if (point.xp > xp) {
-              right = mid - 1;
-              // 이전 포인트도 확인
-              if (right >= 0) {
-                const prevDistance = Math.abs(xp - validData[right].xp);
-                if (prevDistance < closestXDistance) {
-                  closestXDistance = prevDistance;
-                  closestIndex = validData[right].originalIndex;
-                }
-              }
-            } else {
-              // 정확히 일치하는 경우
-              break;
-            }
-          }
-
-          // 이진 탐색 후 주변 포인트 추가 확인 (정확도 향상)
-          const foundIdx = validData.findIndex(p => p.originalIndex === closestIndex);
-          if (foundIdx !== -1) {
-            // 앞뒤 2개씩 추가 확인
-            for (let i = Math.max(0, foundIdx - 2);
-              i <= Math.min(validData.length - 1, foundIdx + 2);
-              i++) {
-              const point = validData[i];
-              const xDistance = Math.abs(xp - point.xp);
-              if (xDistance < closestXDistance) {
-                closestXDistance = xDistance;
-                closestIndex = point.originalIndex;
-              }
             }
           }
         }
