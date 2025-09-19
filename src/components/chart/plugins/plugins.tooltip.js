@@ -950,11 +950,19 @@ const modules = {
 
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
-      const positionY = graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
+      // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
+      const isCategoryMode = this.options.axesY?.some(axis => axis.categoryMode);
+      const positionY = isCategoryMode
+        ? graphPos.y1 + (chartHeight * (matchingLabelIndex + 0.5)) / labelsCount
+        : graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
       indicatorPosition = [graphPos.x2, positionY];
     } else {
       const chartWidth = graphPos.x2 - graphPos.x1;
-      const positionX = graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);
+      // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
+      const isCategoryMode = this.options.axesX?.some(axis => axis.categoryMode);
+      const positionX = isCategoryMode
+        ? graphPos.x1 + (chartWidth * (matchingLabelIndex + 0.5)) / labelsCount
+        : graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);
       indicatorPosition = [positionX, graphPos.y2];
     }
 
