@@ -547,7 +547,7 @@ class Bar {
     const ex = sx + w;
     const ey = sy + h;
 
-    return (sx <= xp) && (xp <= ex) && (sy <= yp) && (yp <= ey);
+    return (sx <= xp) && (xp <= ex) && (ey <= yp) && (yp <= sy);
   }
 
   drawRoundedRect(ctx, positions) {
