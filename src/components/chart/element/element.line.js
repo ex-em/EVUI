@@ -332,6 +332,15 @@ class Line {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
+        if (item.data) {
+          const point = gdata[dataIndex];
+          const yDist = Math.abs(yp - point.yp);
+          const directHitThreshold = 15; // 직접 히트 임계값
+
+          if (yDist <= directHitThreshold) {
+            item.hit = true;
+          }
+        }
       } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
