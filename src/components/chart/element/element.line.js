@@ -327,76 +327,149 @@ class Line {
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
-    const SPARE_XP = 0.5;
     const isLinearInterpolation = this.useLinearInterpolation();
 
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
         item.index = dataIndex;
+        if (item.data) {
+          const point = gdata[dataIndex];
+          const yDist = Math.abs(yp - point.yp);
+          const directHitThreshold = 15; // 직접 히트 임계값
+
+          if (yDist <= directHitThreshold) {
+            item.hit = true;
+          }
+        }
       } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
-        let s = 0;
-        let e = gdata.length - 1;
-        const xpInterval = gdata[1]?.xp - gdata[0].xp < 6 ? 1.5 : 6;
+        // Axis 트리거 방식: X축 위치에서 가장 가까운 데이터 포인트 찾기
+        let closestXDistance = Infinity;
+        let closestIndex = -1;
 
-        while (s <= e) {
-          const m = Math.floor((s + e) / 2);
-          const x = gdata[m].xp;
-          const y = gdata[m].yp;
+        // null이 아닌 유효한 데이터만 필터링
+        const validData = [];
+        gdata.forEach((point, idx) => {
+          if (point.xp !== null && point.yp !== null && point.o !== null) {
+            validData.push({ ...point, originalIndex: idx });
+          }
+        });
 
-          if (x - xpInterval < xp && xp < x + xpInterval) {
-            const curXpInterval = gdata[m]?.xp - (gdata[m - 1]?.xp ?? 0);
+        if (validData.length === 0) {
+          return item;
+        }
 
-            if (gdata[m - 1]?.xp && gdata[m + 1]?.xp && curXpInterval > 0) {
-              const leftXp = xp - gdata[m - 1].xp;
-              const midXp = Math.abs(xp - gdata[m].xp);
-              const rightXp = gdata[m + 1].xp - xp;
+        // 이진 탐색으로 가장 가까운 포인트 찾기
+        let left = 0;
+        let right = validData.length - 1;
 
-              if (
-                Math.abs(this.beforeMouseXp - xp) >= curXpInterval - SPARE_XP
-                && (this.beforeFindItemIndex === m || midXp === rightXp || midXp === leftXp)
-              ) {
-                if (this.beforeMouseXp - xp > 0) {
-                  item.data = gdata[this.beforeFindItemIndex - 1];
-                  item.index = this.beforeFindItemIndex - 1;
-                } else if (this.beforeMouseXp - xp < 0) {
-                  item.data = gdata[this.beforeFindItemIndex + 1];
-                  item.index = this.beforeFindItemIndex + 1;
-                } else if (this.beforeMouseYp !== yp) {
-                  item.data = gdata[this.beforeFindItemIndex];
-                  item.index = this.beforeFindItemIndex;
-                }
-              } else {
-                const closeXp = Math.min(leftXp, midXp, rightXp);
+        while (left <= right) {
+          const mid = Math.floor((left + right) / 2);
+          const point = validData[mid];
+          const xDistance = Math.abs(xp - point.xp);
 
-                if (closeXp === leftXp) {
-                  item.data = gdata[m - 1];
-                  item.index = m - 1;
-                } else if (closeXp === rightXp) {
-                  item.data = gdata[m + 1];
-                  item.index = m + 1;
-                } else {
-                  item.data = gdata[m];
-                  item.index = m;
-                }
+          if (xDistance < closestXDistance) {
+            closestXDistance = xDistance;
+            closestIndex = point.originalIndex;
+          }
+
+          if (point.xp < xp) {
+            left = mid + 1;
+            // 다음 포인트도 확인
+            if (left < validData.length) {
+              const nextDistance = Math.abs(xp - validData[left].xp);
+              if (nextDistance < closestXDistance) {
+                closestXDistance = nextDistance;
+                closestIndex = validData[left].originalIndex;
               }
-            } else {
-              item.data = gdata[m];
-              item.index = m;
+            }
+          } else if (point.xp > xp) {
+            right = mid - 1;
+            // 이전 포인트도 확인
+            if (right >= 0) {
+              const prevDistance = Math.abs(xp - validData[right].xp);
+              if (prevDistance < closestXDistance) {
+                closestXDistance = prevDistance;
+                closestIndex = validData[right].originalIndex;
+              }
+            }
+          } else {
+            // 정확히 일치하는 경우
+            break;
+          }
+        }
+
+        // 이진 탐색 후 주변 포인트 추가 확인 (정확도 향상)
+        const foundIdx = validData.findIndex(p => p.originalIndex === closestIndex);
+        if (foundIdx !== -1) {
+          // 앞뒤 2개씩 추가 확인
+          for (let i = Math.max(0, foundIdx - 2);
+            i <= Math.min(validData.length - 1, foundIdx + 2);
+            i++) {
+            const point = validData[i];
+            const xDistance = Math.abs(xp - point.xp);
+            if (xDistance < closestXDistance) {
+              closestXDistance = xDistance;
+              closestIndex = point.originalIndex;
+            }
+          }
+        }
+
+        // 가장 가까운 포인트 설정
+        if (closestIndex !== -1) {
+          // 데이터 간격 계산 - 모든 데이터(null 포함)의 평균 간격 사용
+          let avgInterval = 50;
+          if (gdata.length > 1) {
+            const intervals = [];
+            for (let i = 1; i < gdata.length; i++) {
+              if (gdata[i].xp !== null && gdata[i - 1].xp !== null) {
+                intervals.push(Math.abs(gdata[i].xp - gdata[i - 1].xp));
+              }
+            }
+            if (intervals.length > 0) {
+              avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+            }
+          }
+
+          // 두 가지 임계값 설정
+          const strictThreshold = avgInterval * 0.3; // 엄격한 임계값: 데이터 간격의 30%
+          const relaxedThreshold = avgInterval; // 느슨한 임계값: 데이터 간격 전체
+
+          // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
+          if (closestXDistance <= strictThreshold) {
+            // 정확히 일치하거나 매우 가까운 데이터가 있음
+            item.data = gdata[closestIndex];
+            item.index = closestIndex;
+          } else {
+            // 2. 정확한 매치가 없을 때, 현재 X 위치 근처에 다른 유효 데이터가 있는지 확인
+            let hasNearbyValidData = false;
+            for (let i = 0; i < validData.length; i++) {
+              const xDist = Math.abs(xp - validData[i].xp);
+              if (xDist <= strictThreshold) {
+                hasNearbyValidData = true;
+                break;
+              }
             }
 
-            if ((y - 6 <= yp) && (yp <= y + 6)) {
+            // 3. 근처에 다른 유효 데이터가 없을 때만 느슨한 임계값 적용
+            if (!hasNearbyValidData && closestXDistance <= relaxedThreshold) {
+              item.data = gdata[closestIndex];
+              item.index = closestIndex;
+            }
+          }
+
+          // Y축 거리를 확인하여 직접 히트 판정
+          if (item.data) {
+            const point = gdata[closestIndex];
+            const yDist = Math.abs(yp - point.yp);
+            const directHitThreshold = 15; // 직접 히트 임계값
+
+            if (yDist <= directHitThreshold) {
               item.hit = true;
             }
-
-            break;
-          } else if (x + xpInterval > xp) {
-            e = m - 1;
-          } else {
-            s = m + 1;
           }
         }
       }
@@ -430,40 +503,90 @@ class Line {
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
 
+    if (!gdata.length) {
+      return item;
+    }
+
+    // 동적 감지 범위 계산
+    const gap = gdata.length > 1 ? Math.abs(gdata[1]?.xp - gdata[0]?.xp) : 50;
+    const xpInterval = Math.max(gap * 0.4, 10); // 데이터 간격의 40% 또는 최소 10px
+
     let s = 0;
     let e = gdata.length - 1;
+    let closestIndex = -1;
+    let closestDistance = Infinity;
 
+    // 이진 탐색으로 근처 데이터 찾기
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
       const x = gdata[m].xp;
-      const y = gdata[m].yp;
 
-      if ((x - 2 <= xp) && (xp <= x + 2)) {
-        item.data = gdata[m];
-        item.index = m;
+      // X 좌표가 감지 범위 내에 있는 경우
+      if ((x - xpInterval <= xp) && (xp <= x + xpInterval)) {
+        // 중간점 주변 데이터들과 거리 비교
+        const checkStart = Math.max(0, m - 2);
+        const checkEnd = Math.min(gdata.length - 1, m + 2);
 
-        if ((y - 2 <= yp) && (yp <= y + 2)) {
-          item.hit = true;
+        for (let i = checkStart; i <= checkEnd; i++) {
+          if (gdata[i].xp !== null && gdata[i].yp !== null) {
+            const distance = Math.sqrt(
+              ((xp - gdata[i].xp) ** 2)
+              + ((yp - gdata[i].yp) ** 2),
+            );
+
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestIndex = i;
+            }
+          }
+        }
+
+        if (closestIndex !== -1) {
+          item.data = gdata[closestIndex];
+          item.index = closestIndex;
+
+          // 매우 가까운 경우 hit으로 표시
+          if (closestDistance < 5) {
+            item.hit = true;
+          }
         }
 
         return item;
-      } else if (x + 2 < xp) {
+      } else if (x + xpInterval < xp) {
+        // 마우스가 오른쪽에 있는 경우
         if (m < e && xp < gdata[m + 1].xp) {
           const curr = Math.abs(gdata[m].xp - xp);
           const next = Math.abs(gdata[m + 1].xp - xp);
 
           item.data = curr > next ? gdata[m + 1] : gdata[m];
           item.index = curr > next ? m + 1 : m;
+
+          // Y 거리도 확인하여 hit 판정
+          const selectedPoint = item.data;
+          const yDist = Math.abs(yp - selectedPoint.yp);
+          if (yDist < 10) {
+            item.hit = true;
+          }
+
           return item;
         }
         s = m + 1;
       } else {
+        // 마우스가 왼쪽에 있는 경우
         if (m > 0 && xp > gdata[m - 1].xp) {
           const prev = Math.abs(gdata[m - 1].xp - xp);
           const curr = Math.abs(gdata[m].xp - xp);
 
           item.data = prev > curr ? gdata[m] : gdata[m - 1];
           item.index = prev > curr ? m : m - 1;
+
+          // Y 거리도 확인하여 hit 판정
+          const selectedPoint = item.data;
+          const yDist = Math.abs(yp - selectedPoint.yp);
+          if (yDist < 10) {
+            item.hit = true;
+          }
+
           return item;
         }
         e = m - 1;
