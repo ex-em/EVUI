@@ -66,6 +66,25 @@ const modules = {
             }
           }
         }
+
+        // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
+        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
+        if (tooltip.use && (type === 'line' || hasLineSeries)) {
+          // indicator를 그리고 실제 위치한 라벨 정보를 받음
+          const indicatorInfo = this.drawIndicatorForTooltip(hitInfo, indicator.color);
+
+          // 실제 indicator가 위치한 라벨 값을 동기화에 사용
+          const actualLabelValue = indicatorInfo?.labelValue;
+          const label = this.getTimeLabel(offset);
+
+          args.hoveredLabel = {
+            horizontal: this.options.horizontal,
+            label,
+            mousePosition: [e.clientX, e.clientY],
+            dataLabel: actualLabelValue,
+            isTooltipBased: true,
+          };
+        }
       } else if (tooltip.use && this.isInitTooltip) {
         if (typeof tooltip?.returnValue === 'function') {
           tooltip.returnValue([], e);
@@ -78,15 +97,21 @@ const modules = {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
-      if (indicator.use && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
-        this.drawIndicator(offset, indicator.color);
+      // tooltip 기반 indicator가 아직 설정되지 않은 경우에만 일반 indicator 처리
+      if (!args.hoveredLabel && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
+        // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
+        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
+        if ((type !== 'line' && !hasLineSeries) || !tooltip.use || !Object.keys(hitInfo.items).length) {
+          this.drawIndicator(offset, indicator.color);
+        }
         const label = this.getTimeLabel(offset);
         args.hoveredLabel = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
+          isTooltipBased: false,
         };
-      } else {
+      } else if (!args.hoveredLabel) {
         args.hoveredLabel = {
           label: '',
         };
@@ -881,12 +906,82 @@ const modules = {
     let maxg = null;
     let maxSID = null;
 
+    // 파이 차트는 특별한 처리가 필요
+    if (this.options.type === 'pie') {
+      for (let ix = 0; ix < sIds.length; ix++) {
+        const sId = sIds[ix];
+        const series = this.seriesList[sId];
+
+        if (series.findGraphData && series.show) {
+          const item = series.findGraphData(offset);
+
+          if (item?.data && item.hit) {
+            const gdata = item.data.o;
+
+            if (gdata !== null && gdata !== undefined) {
+              const formattedSeriesName = this.getFormattedTooltipLabel({
+                dataId: series.id,
+                seriesId: sId,
+                seriesName: series.name,
+                itemData: item.data,
+              });
+              const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
+
+              item.id = series.id;
+              item.name = formattedSeriesName;
+              item.axis = { x: 0, y: 0 };
+              items[sId] = item;
+
+              const formattedTxt = this.getFormattedTooltipValue({
+                dataId: series.id,
+                seriesId: sId,
+                seriesName: formattedSeriesName,
+                value: gdata,
+                itemData: item.data,
+              });
+
+              item.data.formatted = formattedTxt;
+
+              if (maxsw < sw) {
+                maxs = formattedSeriesName;
+                maxsw = sw;
+              }
+
+              if (maxv.length <= `${formattedTxt}`.length) {
+                maxv = `${formattedTxt}`;
+              }
+
+              if (maxg === null || maxg <= gdata) {
+                maxg = gdata;
+                maxSID = sId;
+              }
+
+              hitId = sId;
+            }
+          }
+        }
+      }
+
+      const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
+      return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+    }
+
+    // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
+    const targetDataIndex = this.findClosestDataIndex(offset, sIds);
+
+    if (targetDataIndex === -1) {
+      return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
+    }
+
+    // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
+    const allSeriesIsBar = sIds.every(sId => this.seriesList[sId].type === 'bar');
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
-      if (series.findGraphData) {
-        const item = series.findGraphData(offset, isHorizontal);
+      if (series.findGraphData && series.show) {
+        // 특정 데이터 인덱스로 데이터 요청
+        const item = series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar);
 
         if (item?.data) {
           let gdata;
@@ -949,6 +1044,60 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+
+  /**
+   * Find the closest data index (label) based on mouse position
+   * @param {array} offset mouse position
+   * @param {array} sIds series IDs
+   * @returns {number} closest data index
+   */
+  findClosestDataIndex(offset, sIds) {
+    const [xp, yp] = offset;
+    const isHorizontal = !!this.options.horizontal;
+    const mousePos = isHorizontal ? yp : xp;
+    let closestDistance = Infinity;
+    let closestIndex = -1;
+
+    // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
+    const referenceSeries = sIds.find(sId => this.seriesList[sId]?.show);
+    if (!referenceSeries || !this.seriesList[referenceSeries]?.data) {
+      return -1;
+    }
+
+    const referenceData = this.seriesList[referenceSeries].data;
+
+    // 각 라벨에서 가장 가까운 것 찾기
+    for (let i = 0; i < referenceData.length; i++) {
+      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인
+      const hasValidData = sIds.some((sId) => {
+        const series = this.seriesList[sId];
+        return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
+      });
+
+      if (hasValidData) {
+        const point = referenceData[i];
+        if (point) {
+          // 라벨 위치 계산
+          let labelPos;
+          if (isHorizontal) {
+            labelPos = point.h ? point.yp + (point.h / 2) : point.yp;
+          } else {
+            labelPos = point.w ? point.xp + (point.w / 2) : point.xp;
+          }
+
+          if (labelPos !== null) {
+            const distance = Math.abs(mousePos - labelPos);
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestIndex = i;
+            }
+          }
+        }
+      }
+    }
+
+    return closestIndex;
   },
 
   /**
@@ -1075,7 +1224,8 @@ const modules = {
           itemData: hasData,
         });
 
-        if (hasData && !hitInfo.items[sId]) {
+        // Only add data if there's a valid value for this exact label
+        if (hasData && hasData.o !== null && hasData.o !== undefined && !hitInfo.items[sId]) {
           const item = {};
           item.color = series.color;
           item.hit = false;
@@ -1268,6 +1418,77 @@ const modules = {
     }
 
     return after;
+  },
+
+  /**
+   * Draw indicator at the label position when tooltip is displayed
+   * @param {object} hitInfo hit item information from findHitItem
+   * @param {string} color indicator color
+   * @returns {object|null} indicator position info with actual label value
+   */
+  drawIndicatorForTooltip(hitInfo, color) {
+    if (!hitInfo?.items || !Object.keys(hitInfo.items).length) {
+      return null;
+    }
+
+    const ctx = this.overlayCtx;
+    const { horizontal } = this.options;
+    const graphPos = {
+      x1: this.chartRect.x1 + this.labelOffset.left,
+      x2: this.chartRect.x2 - this.labelOffset.right,
+      y1: this.chartRect.y1 + this.labelOffset.top,
+      y2: this.chartRect.y2 - this.labelOffset.bottom,
+    };
+
+    // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 계산
+    const firstSeriesId = Object.keys(hitInfo.items)[0];
+    const firstItem = hitInfo.items[firstSeriesId];
+
+    if (!firstItem?.data) {
+      return null;
+    }
+
+    // 실제 indicator가 위치하는 라벨 값 추출
+    const actualLabelValue = horizontal ? firstItem.data.y : firstItem.data.x;
+
+    let indicatorPosition;
+
+    if (horizontal) {
+      // 수평 차트에서는 Y축 라벨 위치에 수평선
+      const yPosition = firstItem.data.yp + (firstItem.data.h ? firstItem.data.h / 2 : 0);
+      indicatorPosition = [graphPos.x1, yPosition];
+    } else {
+      // 수직 차트에서는 X축 라벨 위치에 수직선
+      const xPosition = firstItem.data.xp + (firstItem.data.w ? firstItem.data.w / 2 : 0);
+      indicatorPosition = [xPosition, graphPos.y1];
+    }
+
+    ctx.beginPath();
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+
+    if (this.options.indicator?.segments) {
+      ctx.setLineDash(this.options.indicator.segments);
+    }
+
+    if (horizontal) {
+      ctx.moveTo(graphPos.x1, indicatorPosition[1] + 0.5);
+      ctx.lineTo(graphPos.x2, indicatorPosition[1] + 0.5);
+    } else {
+      ctx.moveTo(indicatorPosition[0] + 0.5, graphPos.y1);
+      ctx.lineTo(indicatorPosition[0] + 0.5, graphPos.y2);
+    }
+
+    ctx.stroke();
+    ctx.restore();
+    ctx.closePath();
+
+    // 실제 indicator가 위치한 라벨 정보 반환
+    return {
+      labelValue: actualLabelValue,
+      position: indicatorPosition,
+    };
   },
 
   /**
