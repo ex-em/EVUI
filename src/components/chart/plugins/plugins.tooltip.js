@@ -925,6 +925,7 @@ const modules = {
       label => label?.valueOf() === dataLabel?.valueOf(),
     );
     if (matchingLabelIndex === -1) {
+      this.overlayClear();
       return;
     }
 
