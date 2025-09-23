@@ -26,7 +26,7 @@ export default {
         dayjs(time).add(6, 'day'),
       ],
       data: {
-        series1: [100, 25, 36, 47, 0, 50, 80],
+        series1: [-50, 25, 36, 47, 0, 50, 80],
         series2: [80, 36, 25, 47, 15, 100, 0],
       },
     };
@@ -79,7 +79,7 @@ export default {
         autoScaleRatio: 0.1,
         plotLines: [{
           color: '#FF0000',
-          value: 50,
+          value: -50,
           segments: [6, 2],
           lineWidth: 1,
           label: {
@@ -89,7 +89,7 @@ export default {
         }],
         plotBands: [{
           color: 'rgba(250, 222, 76, 0.8)',
-          from: 20,
+          from: 0,
           to: 40,
           label: {
             show: true,

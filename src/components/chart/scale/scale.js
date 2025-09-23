@@ -444,8 +444,12 @@ class Scale {
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
         const { from: userDefinedFrom, to: userDefinedTo, label: labelOpt } = mergedPlotBandOpt;
-        const from = userDefinedFrom ? Math.max(userDefinedFrom, axisMin) : axisMin;
-        const to = userDefinedTo ? Math.min(userDefinedTo, axisMax) : axisMax;
+        const from = !Util.isNullOrUndefined(userDefinedFrom)
+         ? Math.max(userDefinedFrom, axisMin)
+         : axisMin;
+        const to = !Util.isNullOrUndefined(userDefinedTo)
+          ? Math.min(userDefinedTo, axisMax)
+          : axisMax;
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
