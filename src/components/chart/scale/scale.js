@@ -438,10 +438,6 @@ class Scale {
       const maxY = aPos.y2; // bottom
 
       this.plotBands?.forEach((plotBand) => {
-        if (!plotBand.from && !plotBand.to) {
-          return;
-        }
-
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
         const { from: userDefinedFrom, to: userDefinedTo, label: labelOpt } = mergedPlotBandOpt;
         const from = !Util.isNullOrUndefined(userDefinedFrom)
