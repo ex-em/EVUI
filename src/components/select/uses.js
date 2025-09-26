@@ -300,9 +300,11 @@ export const useDropdown = (param) => {
     if (props.filterable) {
       filterTextRef.value = '';
     }
-    mv.value = val;
     isDropbox.value = false;
-    changeMv();
+    if (mv.value !== val) {
+      mv.value = val;
+      changeMv();
+    }
   };
   const multipleClickItem = (val) => {
     if (props.filterable) {
