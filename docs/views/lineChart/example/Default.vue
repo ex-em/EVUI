@@ -72,12 +72,16 @@
             return dayjs(value)
                 .format('DD HH:mm');
           },
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
         axesY: [{
           type: 'linear',
           showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
       });
 

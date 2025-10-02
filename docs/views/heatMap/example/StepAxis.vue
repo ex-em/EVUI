@@ -53,6 +53,8 @@ import { reactive, ref, watch } from 'vue';
           labelStyle: {
             alignToGridLine: true,
           },
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
         axesY: [{
           type: 'step',
@@ -60,6 +62,8 @@ import { reactive, ref, watch } from 'vue';
           labelStyle: {
             alignToGridLine: true,
           },
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
         heatMapColor: {
           min: '#CAF0F8',
