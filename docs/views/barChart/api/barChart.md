@@ -153,7 +153,7 @@ const chartData = {
 | plotBands      | Array                                       | ([상세](#plotband))       | plot band(임계영역 표시 용도) 설정                                                                 |                                                                                          |
 | formatter      | function                                    | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                            | (value, { prev, isDefaultMaxSameAsMin }) => value + '%'                                  |
 | title          | Object                                      | ([상세](#title))          | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
-| scrollbar      | Object                                      | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                                   |                                                                                          |
+| scrollbar      | Object                                      | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                                   |                           
 
 ##### axesX
 
@@ -168,7 +168,9 @@ const chartData = {
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
   - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
 - decimalPoint
+  - Number / 'auto'
   - 소수점 자릿수 표시 (default: 0)
+  - 'auto' 일 경우, 축의 min~max 값을 보고 적절한 자릿수 산출
 - range
   - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
 
@@ -186,7 +188,7 @@ const chartData = {
   - 시간에 따라 x축 label이 움직일지의 여부
   - categoryMode일 때는 작동하지 않음.
 
-##### Logarithmic type
+##### Logarithmic type (Deprecated)
 
 - logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌

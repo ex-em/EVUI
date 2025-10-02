@@ -126,6 +126,19 @@ const chartData =
 | title          | Object        | ([상세](#axes-title))     | 라벨의 폰트 스타일을 설정                                                                      |                                                         |
 | scrollbar      | Object        | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                               |                                                         |
 
+##### linear type
+
+- interval (Axis Label 표기를 위한 interval)
+  - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
+- Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
+  - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+- decimalPoint
+  - Number / 'auto'
+  - 소수점 자릿수 표시 (default: 0)
+  - 'auto' 일 경우, 축의 min~max 값을 보고 적절한 자릿수 산출
+- range
+  - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
+
 ##### time type
 
 - interval (Axis Label 표기를 위한 interval)

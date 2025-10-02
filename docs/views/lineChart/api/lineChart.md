@@ -152,6 +152,19 @@ const chartData =
 | ---- | ------- | ------ | ------------------------------------------------------------------------------------------------------------- | ---------- |
 | flow | boolean | false  | 시간에 따라 x축 label이 움직일지의 여부, time type에서만 사용하길 권장.<br>categoryMode일 때는 작동하지 않음. |            |
 
+##### linear type
+
+- interval (Axis Label 표기를 위한 interval)
+  - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
+- Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
+  - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+- decimalPoint
+  - Number / 'auto'
+  - 소수점 자릿수 표시 (default: 0)
+  - 'auto' 일 경우, 축의 min~max 값을 보고 적절한 자릿수 산출
+- range
+  - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
+
 ##### time type
 
 - interval (Axis Label 표기를 위한 interval)
@@ -163,6 +176,26 @@ const chartData =
 - flow
   - 시간에 따라 x축 label이 움직일지의 여부
   - categoryMode일 때는 작동하지 않음.
+
+##### Logarithmic type (Deprecated)
+
+- logarithmic Type Axis는 Axis의 min max를 로그로 계산하여 자동으로 추가 buffer값을 제공
+- Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
+  - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표
+- decimalPoint
+  - 소수점 자릿수 표시 (default: 0)
+- range
+  - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
+
+##### step type
+
+- timeMode
+  - Step Axis를 Time 기반으로 변경, default: false
+- timeFormat
+  - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format/)
+- range
+  - 축의 label의 minIndex, maxIndex 값을 array로 넘겨줌 ([0, 5])
+
 
 ##### labelStyle
 
