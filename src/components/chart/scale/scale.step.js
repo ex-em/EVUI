@@ -137,6 +137,8 @@ class StepScale extends Scale {
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
     const maxWidth = this.labelStyle?.maxWidth ?? chartRect.chartWidth / (steps + 2);
 
+    const AXIS_TICK_LENGTH = 5;
+
     this.drawAxisTitle(chartRect, labelOffset);
 
     if (this.labelStyle?.show) {
@@ -245,9 +247,22 @@ class StepScale extends Scale {
             }
           }
 
+          if (this.showAxisTick) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.axisLineColor;
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetPoint + AXIS_TICK_LENGTH);
+            ctx.stroke();
+            ctx.closePath();
+          }
+
           if (index > 0 && this.showGrid) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.gridLineColor;
             ctx.moveTo(linePosition, offsetPoint);
             ctx.lineTo(linePosition, offsetCounterPoint);
+            ctx.stroke();
+            ctx.closePath();
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
@@ -255,9 +270,22 @@ class StepScale extends Scale {
           ctx.fillText(labelText, labelPoint, yPoint);
           drawnLabels.push(labelText);
 
+          if (this.showAxisTick) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.axisLineColor;
+            ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), linePosition);
+            ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, linePosition);
+            ctx.stroke();
+            ctx.closePath();
+          }
+
           if (index > 0 && this.showGrid) {
-            ctx.moveTo(offsetPoint, linePosition);
-            ctx.lineTo(offsetCounterPoint, linePosition);
+              ctx.beginPath();
+              ctx.strokeStyle = this.gridLineColor;
+              ctx.moveTo(offsetPoint, linePosition);
+              ctx.lineTo(offsetCounterPoint, linePosition);
+              ctx.stroke();
+              ctx.closePath();
           }
         }
         ctx.stroke();

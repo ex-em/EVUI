@@ -132,6 +132,8 @@ class TimeCategoryScale extends Scale {
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
 
+    const AXIS_TICK_LENGTH = 5;
+
     this.drawAxisTitle(chartRect, labelOffset);
 
     // label font 설정
@@ -253,24 +255,51 @@ class TimeCategoryScale extends Scale {
             });
           }
         }
+
+        if (this.showAxisTick) {
+          ctx.beginPath();
+          ctx.strokeStyle = this.axisLineColor;
+          ctx.moveTo(linePosition, offsetPoint);
+          ctx.lineTo(linePosition, offsetPoint + AXIS_TICK_LENGTH);
+          ctx.stroke();
+          ctx.closePath();
+        }
+
         if (
           ix < oriSteps && this.showGrid && (
             isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
           )
         ) {
-          ctx.moveTo(linePosition, offsetPoint);
-          ctx.lineTo(linePosition, offsetCounterPoint);
+            ctx.beginPath();
+            ctx.strokeStyle = this.gridLineColor;
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetCounterPoint);
+            ctx.stroke();
+            ctx.closePath();
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(labelText, labelPoint, labelCenter);
 
+        if (this.showAxisTick) {
+          ctx.beginPath();
+          ctx.strokeStyle = this.axisLineColor;
+          ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), linePosition);
+          ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, linePosition);
+          ctx.stroke();
+          ctx.closePath();
+        }
+
         if (
           ix < oriSteps && this.showGrid && (
             isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
           )) {
-          ctx.moveTo(offsetPoint, linePosition);
-          ctx.lineTo(offsetCounterPoint, linePosition);
+              ctx.beginPath();
+              ctx.strokeStyle = this.gridLineColor;
+              ctx.moveTo(offsetPoint, linePosition);
+              ctx.lineTo(offsetCounterPoint, linePosition);
+              ctx.stroke();
+              ctx.closePath();
         }
       }
 

@@ -282,6 +282,8 @@ class Scale {
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
 
+    const AXIS_TICK_LENGTH = 5;
+
     let aliasPixel;
 
     this.drawAxisTitle(chartRect, labelOffset);
@@ -309,8 +311,8 @@ class Scale {
         ctx.moveTo(startPoint, offsetPoint + aliasPixel);
         ctx.lineTo(endPoint, offsetPoint + aliasPixel);
       } else {
-        ctx.moveTo(offsetPoint + aliasPixel + 1, startPoint);
-        ctx.lineTo(offsetPoint + aliasPixel + 1, endPoint);
+        ctx.moveTo(offsetPoint + aliasPixel, startPoint);
+        ctx.lineTo(offsetPoint + aliasPixel, endPoint);
       }
       ctx.stroke();
       ctx.closePath();
@@ -404,9 +406,23 @@ class Scale {
                 });
               }
             }
+
+            if (this.showAxisTick) {
+              ctx.beginPath();
+              ctx.strokeStyle = this.axisLineColor;
+              ctx.moveTo(linePosition, offsetPoint);
+              ctx.lineTo(linePosition, offsetPoint + AXIS_TICK_LENGTH);
+              ctx.stroke();
+              ctx.closePath();
+            }
+
             if ((ix !== 0 || options?.axesX[0].flow) && this.showGrid) {
+              ctx.beginPath();
+              ctx.strokeStyle = this.gridLineColor;
               ctx.moveTo(linePosition, offsetPoint);
               ctx.lineTo(linePosition, offsetCounterPoint);
+              ctx.stroke();
+              ctx.closePath();
             }
           } else {
             labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
@@ -418,14 +434,24 @@ class Scale {
               linePosition -= 1;
             }
 
+            if (this.showAxisTick) {
+              ctx.beginPath();
+              ctx.strokeStyle = this.axisLineColor;
+              ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), linePosition);
+              ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, linePosition);
+              ctx.stroke();
+              ctx.closePath();
+            }
+
             if (ix !== 0 && this.showGrid) {
+              ctx.beginPath();
+              ctx.strokeStyle = this.gridLineColor;
               ctx.moveTo(offsetPoint, linePosition);
               ctx.lineTo(offsetCounterPoint, linePosition);
+              ctx.stroke();
+              ctx.closePath();
             }
           }
-
-          ctx.stroke();
-          ctx.closePath();
         }
       }
     }
