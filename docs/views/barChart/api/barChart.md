@@ -153,7 +153,8 @@ const chartData = {
 | plotBands      | Array                                       | ([상세](#plotband))       | plot band(임계영역 표시 용도) 설정                                                                 |                                                                                          |
 | formatter      | function                                    | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                            | (value, { prev, isDefaultMaxSameAsMin }) => value + '%'                                  |
 | title          | Object                                      | ([상세](#title))          | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
-| scrollbar      | Object                                      | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                                   |                           
+| scrollbar      | Object                                      | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                                   |                                                                                          |
+| showAxisTick   | Boolean   | false    | 보조 눈금 표시 여부                                     |                                                         |
 
 ##### axesX
 
