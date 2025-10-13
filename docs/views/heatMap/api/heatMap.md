@@ -209,6 +209,7 @@ const chartData =
 | allowResize   | Boolean                     | false                                    | Legend 영역 리사이즈 가능 여부                |                                  |
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                              | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                | true /false                      |
+| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
 
 #### dragSelection
 

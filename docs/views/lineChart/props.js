@@ -34,6 +34,8 @@ import Segments from './example/Segments';
 import SegmentsRaw from './example/Segments?raw';
 import Interpolation from './example/Interpolation';
 import InterpolationRaw from './example/Interpolation?raw';
+import LegendClickMode from './example/LegendClickMode';
+import LegendClickModeRaw from './example/LegendClickMode?raw';
 
 export default {
   mdText,
@@ -127,6 +129,11 @@ export default {
       description: 'Segments',
       component: Segments,
       parsedData: parseComponent(SegmentsRaw),
+    },
+    LegendClickMode: {
+      description: 'Legend Click Mode',
+      component: LegendClickMode,
+      parsedData: parseComponent(LegendClickModeRaw),
     },
   },
 };
