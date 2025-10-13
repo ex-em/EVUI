@@ -28,8 +28,8 @@ import AxisControl from './example/AxisControl';
 import AxisControlRaw from '!!raw-loader!./example/AxisControl';
 import Scrollbar from './example/Scrollbar';
 import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
-import LegendOnClick from './example/LegendOnClick';
-import LegendOnClickRaw from '!!raw-loader!./example/LegendOnClick';
+import LegendClickMode from './example/LegendClickMode';
+import LegendClickModeRaw from '!!raw-loader!./example/LegendClickMode';
 
 export default {
   mdText,
@@ -106,10 +106,10 @@ export default {
       component: Scrollbar,
       parsedData: parseComponent(ScrollbarRaw),
     },
-    LegendOnClick: {
-      description: 'Legend On Click',
-      component: LegendOnClick,
-      parsedData: parseComponent(LegendOnClickRaw),
+    LegendClickMode: {
+      description: 'Legend Click Mode',
+      component: LegendClickMode,
+      parsedData: parseComponent(LegendClickModeRaw),
     },
   },
 };

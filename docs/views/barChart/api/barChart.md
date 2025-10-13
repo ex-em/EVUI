@@ -313,7 +313,7 @@ const chartData = {
 | table         | Object                      | ([상세](#legendtable))                   | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 |                                  |
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
-| onClick       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
 
 ##### legendTable
 

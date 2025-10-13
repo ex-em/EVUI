@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <h3>Legend onClick Option Test</h3>
+    <h3>Legend clickMode Option Test</h3>
     <div class="example-controls">
       <label>
         <input
@@ -87,7 +87,7 @@ import { reactive, ref, computed } from 'vue';
         legend: {
           show: true,
           position: 'right',
-          onClick: legendClickMode.value,
+          clickMode: legendClickMode.value,
         },
       }));
 

@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <h3>Legend onClick Option Test</h3>
+    <h3>Legend Click Mode Option Test</h3>
     <div class="example-controls">
       <label>
         <input v-model="legendClickMode" type="radio" value="active">
@@ -26,7 +26,7 @@ import { ref, computed } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
-  name: 'LegendOnClick',
+  name: 'LegendClickMode',
   setup() {
     const legendClickMode = ref('active');
     const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
@@ -72,7 +72,7 @@ export default {
       legend: {
         show: true,
         position: 'right',
-        onClick: legendClickMode.value,
+        clickMode: legendClickMode.value,
       },
       axesX: [{
         type: 'time',

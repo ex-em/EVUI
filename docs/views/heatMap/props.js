@@ -22,8 +22,8 @@ import HighlightStyle from './example/HighlightStyle';
 import HighlightStyleRaw from '!!raw-loader!./example/HighlightStyle';
 import StepAxis from './example/StepAxis';
 import StepAxisRaw from '!!raw-loader!./example/StepAxis';
-import LegendOnClick from './example/LegendOnClick';
-import LegendOnClickRaw from '!!raw-loader!./example/LegendOnClick';
+import LegendClickMode from './example/LegendClickMode';
+import LegendClickModeRaw from '!!raw-loader!./example/LegendClickMode';
 
 export default {
   mdText,
@@ -83,10 +83,10 @@ export default {
       component: Scrollbar,
       parsedData: parseComponent(ScrollbarRaw),
     },
-    LegendOnClick: {
-      description: 'Legend On Click',
-      component: LegendOnClick,
-      parsedData: parseComponent(LegendOnClickRaw),
+    LegendClickMode: {
+      description: 'Legend Click Mode',
+      component: LegendClickMode,
+      parsedData: parseComponent(LegendClickModeRaw),
     },
   },
 };

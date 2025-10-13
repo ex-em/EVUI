@@ -485,8 +485,8 @@ const modules = {
         return;
       }
 
-      // onClick active - 클릭시 활성화
-      if (opt.onClick === 'active') {
+      // clickMode active - 클릭시 활성화
+      if (opt.clickMode === 'active') {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
@@ -519,8 +519,8 @@ const modules = {
         }
       }
 
-      // onClick inactive - 클릭시 비활성화
-      if (opt.onClick !== 'active') {
+      // clickMode inactive - 클릭시 비활성화
+      if (opt.clickMode !== 'active') {
         if (isActive && this.seriesInfo.count === 1) {
           return;
         }
@@ -705,8 +705,8 @@ const modules = {
         return;
       }
 
-      // onClick active - 클릭시 활성화
-      if (opt.onClick === 'active') {
+      // clickMode active - 클릭시 활성화
+      if (opt.clickMode === 'active') {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
@@ -735,8 +735,8 @@ const modules = {
         }
       }
 
-      // onClick inactive - 클릭시 비활성화
-      if (opt.onClick !== 'active') {
+      // clickMode inactive - 클릭시 비활성화
+      if (opt.clickMode !== 'active') {
         if (isActive && activeCount === 1) {
           return;
         }

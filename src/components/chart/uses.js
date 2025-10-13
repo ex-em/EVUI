@@ -39,7 +39,7 @@ const DEFAULT_OPTIONS = {
     height: 24,
     allowResize: false,
     virtualScroll: false,
-    onClick: 'active',
+    clickMode: 'active',
     table: {
       use: false,
       columns: {
