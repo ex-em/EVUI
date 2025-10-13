@@ -28,6 +28,8 @@ import AxisControl from './example/AxisControl';
 import AxisControlRaw from '!!raw-loader!./example/AxisControl';
 import Scrollbar from './example/Scrollbar';
 import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
+import LegendClickMode from './example/LegendClickMode';
+import LegendClickModeRaw from '!!raw-loader!./example/LegendClickMode';
 
 export default {
   mdText,
@@ -103,6 +105,11 @@ export default {
       description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: Scrollbar,
       parsedData: parseComponent(ScrollbarRaw),
+    },
+    LegendClickMode: {
+      description: 'Legend Click Mode',
+      component: LegendClickMode,
+      parsedData: parseComponent(LegendClickModeRaw),
     },
   },
 };
