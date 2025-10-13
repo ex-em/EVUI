@@ -206,15 +206,10 @@ const modules = {
     const { groups } = this.data;
     const { seriesList } = this;
 
-    if (this.options.legend.virtualScroll) {
-      if (this.useTable) {
-        this.addLegendForGroups(groups, seriesList, true);
-        this.addStandaloneLegends(seriesList, true);
-      } else {
-        this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
-          this.renderVisibleLegends();
-        });
-      }
+    if (this.options.legend.virtualScroll && !this.useTable) {
+      this.renderVisibleLegendsFrameId = requestAnimationFrame(() => {
+        this.renderVisibleLegends();
+      });
     } else {
       this.addLegendForGroups(groups, seriesList, this.useTable);
       this.addStandaloneLegends(seriesList, this.useTable);
@@ -362,7 +357,7 @@ const modules = {
     }
 
     const classList = {
-      container: `ev-chart-legend${this.useTable ? '--table__container' : '-container'}`,
+      container: `ev-chart-legend${this.useTable ? '--table__row' : '-container'}`,
       color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
       name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
       value: `ev-chart-legend${this.useTable ? '--table__value' : '-value'}`,
@@ -371,10 +366,107 @@ const modules = {
     /**
      * callback for legendBoxDOM to show/hide clicked series
      *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _inactiveColor - inactive color
+     * @returns {void}
+     */
+    const inactiveDomAndSeries = (_targetDOM, _inactiveColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
+      const _series = _targetDOM?.series;
+
+      _colorDOM.style.backgroundColor = _inactiveColor;
+      _colorDOM.style.borderColor = _inactiveColor;
+      _nameDOM.style.color = _inactiveColor;
+      _valueDOMList?.forEach((dom) => {
+        dom.style.color = _inactiveColor;
+      });
+
+      _series.show = false;
+      _targetDOM.dataset.inactive = true;
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _activeColor - active color
+     * @returns {void}
+     */
+    const activeDomAndSeries = (_targetDOM, _activeColor) => {
+      let seriesColor;
+
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _valueDOMList = _targetDOM?.getElementsByClassName(classList.value);
+      const _series = _targetDOM?.series;
+
+      if (typeof _series.color !== 'string') {
+        seriesColor = _series.color[_series.color.length - 1][1];
+      } else {
+        seriesColor = _series.color;
+      }
+
+      if (_series.type === 'line' && _series.fill) {
+        _colorDOM.style.height = '8px';
+        _colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
+        _colorDOM.style.border = `1px solid ${seriesColor}`;
+      } else {
+        _colorDOM.style.backgroundColor = seriesColor;
+      }
+
+      _nameDOM.style.color = _activeColor;
+      _valueDOMList?.forEach((dom) => {
+        const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
+        dom.style.color = style?.color ? style.color : _activeColor;
+      });
+
+      _series.show = true;
+      _targetDOM.dataset.inactive = false;
+    };
+
+    const hideAllSeries = () => {
+      const legendSeries = (() => {
+        if (this.data.groups.at(0)) {
+          return this.data.groups.at(0).slice().reverse()
+            .filter(sId => this.seriesList[sId].showLegend)
+            .map(sId => [sId, this.seriesList[sId]]);
+        }
+        return Object.entries(this.seriesList)
+          .filter(([, series]) => series.showLegend);
+      })();
+      legendSeries.forEach(([, s]) => {
+        s.show = false;
+      });
+    };
+    const showAllSeries = () => {
+      const legendSeries = (() => {
+        if (this.data.groups.at(0)) {
+          return this.data.groups.at(0).slice().reverse()
+            .filter(sId => this.seriesList[sId].showLegend)
+            .map(sId => [sId, this.seriesList[sId]]);
+        }
+        return Object.entries(this.seriesList)
+          .filter(([, series]) => series.showLegend);
+      })();
+      legendSeries.forEach(([, s]) => {
+        s.show = true;
+      });
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
      * @returns {undefined}
+     */
+    /**
+     * 범례 박스 클릭 이벤트 핸들러
+     * 시리즈의 표시/숨김을 토글하고 범례의 시각적 상태를 변경
      */
     this.onLegendBoxClick = (e) => {
       const { legend: opt } = this.options;
+
       if (opt?.stopClickEvt) {
         return;
       }
@@ -385,58 +477,62 @@ const modules = {
         return;
       }
 
-      const series = targetDOM?.series;
-
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
-      const valueDOMList = targetDOM?.getElementsByClassName(classList.value);
-
-      const isActive = !targetDOM?.className.includes('inactive');
-      if (isActive && this.seriesInfo.count === 1) {
-        return;
-      }
+      const isActive = targetDOM?.dataset.inactive === 'false';
 
       if (!colorDOM || !nameDOM) {
         return;
       }
 
-      if (isActive) {
-        this.seriesInfo.count--;
+      // clickMode active - 클릭시 활성화
+      if (opt.clickMode === 'active') {
+        const legendContainerDOMs = Array.from(
+          this.legendBoxDOM.getElementsByClassName(classList.container),
+        );
+        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
 
-        const inactiveColor = opt.inactive;
-        colorDOM.style.backgroundColor = inactiveColor;
-        colorDOM.style.borderColor = inactiveColor;
-        nameDOM.style.color = inactiveColor;
-        valueDOMList?.forEach((dom) => {
-          dom.style.color = inactiveColor;
-        });
-      } else {
-        this.seriesInfo.count++;
+        if (isActiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            inactiveDomAndSeries(dom, opt.inactive);
+          });
+          hideAllSeries();
 
-        let seriesColor;
-        if (typeof series.color !== 'string') {
-          seriesColor = series.color[series.color.length - 1][1];
-        } else {
-          seriesColor = series.color;
+          activeDomAndSeries(targetDOM, opt.color);
+          this.seriesInfo.count = 1;
+        } else if (isActive) {
+          inactiveDomAndSeries(targetDOM, opt.inactive);
+          this.seriesInfo.count--;
+        } else if (!isActive) {
+          activeDomAndSeries(targetDOM, opt.color);
+          this.seriesInfo.count++;
         }
 
-        if (series.type === 'line' && series.fill) {
-          colorDOM.style.height = '8px';
-          colorDOM.style.backgroundColor = Util.rgbaAdjustHalfOpacity(seriesColor);
-          colorDOM.style.border = `1px solid ${seriesColor}`;
-        } else {
-          colorDOM.style.backgroundColor = seriesColor;
-        }
+        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
 
-        nameDOM.style.color = opt.color;
-        valueDOMList?.forEach((dom) => {
-          const style = opt.table?.columns[dom.dataset.type]?.style;
-          dom.style.color = style?.color ? style.color : opt.color;
-        });
+        if (isInactiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            activeDomAndSeries(dom, opt.color);
+          });
+          showAllSeries();
+          this.seriesInfo.count = legendContainerDOMs.length;
+        }
       }
 
-      series.show = !series.show;
-      targetDOM.classList.toggle('inactive');
+      // clickMode inactive - 클릭시 비활성화
+      if (opt.clickMode !== 'active') {
+        if (isActive && this.seriesInfo.count === 1) {
+          return;
+        }
+
+        if (isActive) {
+          inactiveDomAndSeries(targetDOM, opt.inactive);
+          this.seriesInfo.count--;
+        } else {
+          activeDomAndSeries(targetDOM, opt.color);
+          this.seriesInfo.count++;
+        }
+      }
 
       if (this.brushSeries) {
         const seriesList = [...this.brushSeries.list];
@@ -515,6 +611,73 @@ const modules = {
     if (this.isInitLegend) {
       return;
     }
+    const classList = {
+      container: `ev-chart-legend${this.useTable ? '--table__row' : '-container'}`,
+      color: `ev-chart-legend${this.useTable ? '--table__color' : '-color'}`,
+      name: `ev-chart-legend${this.useTable ? '--table__name' : '-name'}`,
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _inactiveColor - inactive color
+     * @returns {void}
+     */
+    const inactiveDomAndSeries = (_targetDOM, _inactiveColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _series = Object.values(this.seriesList)[0];
+      const targetId = _targetDOM?.series?.cId;
+
+      _colorDOM.style.backgroundColor = _inactiveColor;
+      _colorDOM.style.borderColor = _inactiveColor;
+      _nameDOM.style.color = _inactiveColor;
+
+      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      if (targetIndex > -1) {
+        _series.colorState[targetIndex].show = false;
+      }
+
+      _targetDOM.dataset.inactive = true;
+    };
+
+    /**
+     * callback for legendBoxDOM to show/hide clicked series
+     *
+     * @param {Element} _targetDOM - target DOM
+     * @param {string} _activeColor - active color
+     * @returns {void}
+     */
+    const activeDomAndSeries = (_targetDOM, _activeColor) => {
+      const _colorDOM = _targetDOM?.getElementsByClassName(classList.color)[0];
+      const _nameDOM = _targetDOM?.getElementsByClassName(classList.name)[0];
+      const _series = Object.values(this.seriesList)[0];
+      const targetId = _targetDOM?.series?.cId;
+
+      _colorDOM.style.backgroundColor = _targetDOM?.series?.color;
+      _nameDOM.style.color = _activeColor;
+
+      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      if (targetIndex > -1) {
+        _series.colorState[targetIndex].show = true;
+      }
+
+      _targetDOM.dataset.inactive = false;
+    };
+
+    const hideAllSeries = () => {
+      const series = Object.values(this.seriesList)[0];
+      series.colorState.forEach((colorItem) => {
+        colorItem.show = false;
+      });
+    };
+    const showAllSeries = () => {
+      const series = Object.values(this.seriesList)[0];
+      series.colorState.forEach((colorItem) => {
+        colorItem.show = true;
+      });
+    };
 
     /**
      * callback for legendBoxDOM to show/hide clicked series
@@ -533,36 +696,57 @@ const modules = {
         return;
       }
 
-      const colorDOM = targetDOM?.getElementsByClassName('ev-chart-legend-color')[0];
-      const nameDOM = targetDOM?.getElementsByClassName('ev-chart-legend-name')[0];
-      const targetId = targetDOM?.series?.cId;
-      const isActive = !colorDOM?.className.includes('inactive');
+      const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
+      const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
+      const isActive = targetDOM?.dataset.inactive === 'false';
       const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
-
-      if (isActive && activeCount === 1) {
-        return;
-      }
 
       if (!colorDOM || !nameDOM) {
         return;
       }
 
-      if (isActive) {
-        colorDOM.style.backgroundColor = opt.inactive;
-        colorDOM.style.borderColor = opt.inactive;
-        nameDOM.style.color = opt.inactive;
-      } else {
-        colorDOM.style.backgroundColor = targetDOM?.series?.color;
-        nameDOM.style.color = opt.color;
+      // clickMode active - 클릭시 활성화
+      if (opt.clickMode === 'active') {
+        const legendContainerDOMs = Array.from(
+          this.legendBoxDOM.getElementsByClassName(classList.container),
+        );
+        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+
+        if (isActiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            inactiveDomAndSeries(dom, opt.inactive);
+          });
+          hideAllSeries();
+
+          activeDomAndSeries(targetDOM, opt.color);
+        } else if (isActive) {
+          inactiveDomAndSeries(targetDOM, opt.inactive);
+        } else if (!isActive) {
+          activeDomAndSeries(targetDOM, opt.color);
+        }
+
+        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+
+        if (isInactiveAll) {
+          legendContainerDOMs.forEach((dom) => {
+            activeDomAndSeries(dom, opt.color);
+          });
+          showAllSeries();
+        }
       }
 
-      const targetIndex = series.colorState.findIndex(colorItem => colorItem.id === targetId);
-      if (targetIndex > -1) {
-        series.colorState[targetIndex].show = !isActive;
-      }
+      // clickMode inactive - 클릭시 비활성화
+      if (opt.clickMode !== 'active') {
+        if (isActive && activeCount === 1) {
+          return;
+        }
 
-      colorDOM.classList.toggle('inactive');
-      nameDOM.classList.toggle('inactive');
+        if (isActive) {
+          inactiveDomAndSeries(targetDOM, opt.inactive);
+        } else {
+          activeDomAndSeries(targetDOM, opt.color);
+        }
+      }
 
       this.update({
         updateSeries: false,
@@ -791,13 +975,19 @@ const modules = {
    *
    * @returns {undefined}
    */
+  /**
+   * 새로운 범례 아이템을 생성하고 범례 영역에 추가
+   * @param {Object} series - 시리즈 정보 객체
+   */
   addLegend(series) {
     const opt = this.options.legend;
+
     const containerDOM = document.createElement('div');
     const colorDOM = document.createElement('span');
     const nameDOM = document.createElement('div');
 
-    containerDOM.className = `ev-chart-legend-container ${!series.show ? ' inactive' : ''}`;
+    containerDOM.className = 'ev-chart-legend-container';
+    containerDOM.dataset.inactive = !series.show;
     containerDOM.series = series;
 
     colorDOM.className = 'ev-chart-legend-color';
@@ -808,7 +998,6 @@ const modules = {
 
     nameDOM.className = 'ev-chart-legend-name';
 
-    // set series color
     let seriesColor;
     if (!series.show) {
       seriesColor = opt.inactive;
@@ -828,6 +1017,7 @@ const modules = {
     }
 
     colorDOM.dataset.type = 'color';
+
     nameDOM.style.color = opt.color;
     nameDOM.textContent = series.name;
     nameDOM.setAttribute('title', series.name);
@@ -842,12 +1032,14 @@ const modules = {
     } else {
       containerDOM.style.width = '100%';
     }
+
     containerDOM.style.height = `${this.legendItemHeight}px`;
     containerDOM.style.display = 'inline-block';
     containerDOM.style.overflow = 'hidden';
     containerDOM.dataset.type = 'container';
 
     this.legendBoxDOM.insertBefore(containerDOM, this.legendBottomSpacer);
+
     if (series.show) {
       this.seriesInfo.count++;
     }
@@ -869,7 +1061,8 @@ const modules = {
 
     // create row
     const rowDOM = document.createElement('tr');
-    rowDOM.className = `ev-chart-legend--table__row ${!series.show ? ' inactive' : ''}`;
+    rowDOM.className = 'ev-chart-legend--table__row';
+    rowDOM.dataset.inactive = !series.show;
     Util.setDOMStyle(rowDOM, opt.table?.style?.row);
     rowDOM.series = series;
     rowDOM.dataset.type = 'container';

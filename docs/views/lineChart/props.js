@@ -32,6 +32,8 @@ import LegendVirtualScroll from './example/LegendVirtualScroll';
 import LegendVirtualScrollRaw from '!!raw-loader!./example/LegendVirtualScroll';
 import Segments from './example/Segments';
 import SegmentsRaw from '!!raw-loader!./example/Segments';
+import LegendClickMode from './example/LegendClickMode';
+import LegendClickModeRaw from '!!raw-loader!./example/LegendClickMode';
 
 export default {
   mdText,
@@ -115,6 +117,11 @@ export default {
       description: 'Segments',
       component: Segments,
       parsedData: parseComponent(SegmentsRaw),
+    },
+    LegendClickMode: {
+      description: 'Legend Click Mode',
+      component: LegendClickMode,
+      parsedData: parseComponent(LegendClickModeRaw),
     },
   },
 };

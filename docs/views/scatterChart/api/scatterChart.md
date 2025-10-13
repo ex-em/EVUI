@@ -1,5 +1,6 @@
 >## Desc
- - 태그는 &lt;ev-chart&gt;(이하 <차트>)으로 정의
+
+- 태그는 &lt;ev-chart&gt;(이하 <차트>)으로 정의
 
 ```
 <ev-chart
@@ -11,10 +12,14 @@
 ```
 
 >## Props
+>
 ### 1. v-model:selectedItem
+
 - option에서 [selectItem](#selectitem) 옵션을 사용할 경우 유효한 바인딩
 - 현재 선택된 Item에 대한 정보 (seriesID, dataIndex)
+
 #### Example
+
 ```
 const selectedItem = ref({
     seriesID: 'series1', // Series ID (key)
@@ -22,14 +27,15 @@ const selectedItem = ref({
 });
 ```
 
+### 2. data
 
-### 2. data  
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | series | Object | {} | 특정 데이터에 대한 시리즈 옵션 |  |
   | data   | Object | {} | 차트에 표시할 시리즈 별 데이터 |  |
 
 #### series
+
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | name | String | series-${index} | 특정 데이터에 대한 시리즈 옵션 |  |
@@ -38,11 +44,12 @@ const selectedItem = ref({
   | pointFill | Hex, RGB, RGBA Code(String) | COLOR[index] | 점(Point) 안쪽 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |  |
   | pointSize | Number | 3 | 차트에 표시될 점의 사이즈 |  |
   | pointStyle | String | 'circle' | 차트에 표시될 점의 모양 | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
-  
+
 #### data example
+
 ```
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
-const chartData = 
+const chartData =
   series: {
     series1: { name: 'series1', pointSize: 5, pointStyle: 'circle' },
     series2: { name: 'series2', pointSize: 6, pointStyle: 'rect' },
@@ -53,12 +60,13 @@ const chartData =
   },
 };
 ```
-  
-### 3. options 
+
+### 3. options
+
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | '' | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
-  | width | String / Number | '100%' | 차트의 너비 | '100%', '150px', 150 | 
+  | width | String / Number | '100%' | 차트의 너비 | '100%', '150px', 150 |
   | height | String / Number | '100%' | 차트의 높이 | '100%', '150px', 150 |
   | axesX | Object | 없음 | X축에 대한 속성 | [상세](#axesx-axesy) |
   | axesY | Object | 없음 | Y축에 대한 속성 | [상세](#axesx-axesy) |
@@ -67,52 +75,59 @@ const chartData =
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
-  | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | | 
+  | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | |
   | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | |
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
   | seriesReverse | Boolean | false | 시리즈 순서 반대로 표시 여부 | |
   | coordinateDedupe | Boolean | true | 좌표 중복 제거 여부 | |
 
 #### axesX axesY
+
 ##### type 공통
+
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
   | type | String | | 축의 유형 | [time](#time-type), [linear](#linear-type) |
-  | showAxis | Boolean | true | 축 표시 여부 | true / false | 
+  | showAxis | Boolean | true | 축 표시 여부 | true / false |
   | startToZero | Boolean | false | 축의 시작을 0 부터 시작할지의 여부 | true / false |
   | autoScaleRatio | Number | null | Axis의 Max Buffer를 위한 속성 | 0.1 ~ 0.9 |
   | showGrid | Boolean | true | 차트 내부 그리드 표시 여부 | true / false |
   | axisLineWidth  | Number | 1 | 축의 선 굵기 | 1 ~ |
-  | axisLineColor | String | '#C9CFDC' | 축의 색상 | | 
-  | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | | 
+  | axisLineColor | String | '#C9CFDC' | 축의 색상 | |
+  | gridLineColor | String | '#C9CFDC' | 그리드의 색상 | |
   | interval | String | null | 축에 표시되는 값의 간격 단위 (ex. 'day', 'hour', 'minute'...)
   | labelStyle | Object | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정 | |
   | plotLines | Array | ([상세](#plotline)) | plot line(임계선 표시 용도) 설정 | |
   | plotBands | Array | ([상세](#plotband)) | plot band(임계영역 표시 용도) 설정 | |
   | formatter      | function | null                | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                   | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
-  | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |  
+  | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |
 
 ##### axesX
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | flow | boolean | false | 시간에 따라 x축 label이 움직일지의 여부, time type에서만 사용하길 권장.<br>categoryMode일 때는 작동하지 않음. | |
 
 ##### time type
-   - interval (Axis Label 표기를 위한 interval)
-      - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
-   - timeFormat
-      - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
-   - flow
-      - 시간에 따라 x축 label이 움직일지의 여부
-      - categoryMode일 때는 작동하지 않음.
+
+- interval (Axis Label 표기를 위한 interval)
+  - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
+- timeFormat
+  - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
+- flow
+  - 시간에 따라 x축 label이 움직일지의 여부
+  - categoryMode일 때는 작동하지 않음.
 
 ##### linear type
+
 - interval (Axis Label 표기를 위한 interval)
-    - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
+  - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
-    - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
-    - 
+  - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
+  -
+
 ##### labelStyle
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | show | Boolean | true | label 표시 여부 | true / false |
@@ -124,6 +139,7 @@ const chartData =
 | padding |  Number | 0 | (X축, linear, time타입에만 해당) label의 좌우 여백 | 0 |
 
 ##### title
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | use | Boolean | false | Chart 축(Axis) Title 표시 여부 | true / false |
@@ -136,6 +152,7 @@ const chartData =
 | color | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상 | |
 
 ##### plotLine
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | value | Number(value), Date, Number(Index) | null | 선을 표시할 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
@@ -145,6 +162,7 @@ const chartData =
 | label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
 
 ##### plotBand
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | from | Number(value), Date, Number(Index) | null | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
@@ -153,6 +171,7 @@ const chartData =
 | label | Object | null | 표시할 label의 스타일을 정의 | ([상세](#plotlabel)) |
 
 ##### plotLabel
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 |-----|------|-------|-----|-----|
 | show | Boolean | false | label 표시 여부 | true / false |
@@ -169,31 +188,35 @@ const chartData =
 | maxWidth | Number | null | 라벨의 최대 너비  |  |
 
 #### title
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | show | Boolean | false | 타이틀 표시 여부 | true /false |
 | height | Number | 40 | 타이틀 영역이 높이 | |
-| text | String | '' | 타이틀 | | 
-| style | Object | | 타이틀 폰트 스타일 | | 
-| style.fontSize | Number | 15 | 글자 크기 | | 
-| style.color | Hex, RGB, RGBA Code(String) | '#000' | 글자 색상 | | 
-| style.fontFamily | String | 'Roboto' | 글자체 | |  
-  
+| text | String | '' | 타이틀 | |
+| style | Object | | 타이틀 폰트 스타일 | |
+| style.fontSize | Number | 15 | 글자 크기 | |
+| style.color | Hex, RGB, RGBA Code(String) | '#000' | 글자 색상 | |
+| style.fontFamily | String | 'Roboto' | 글자체 | |
+
 #### legend
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | show | Boolean | false | Legend 표시 여부 | true /false |
 | position | String | 'right' | Legend 위치 | 'top', 'right', 'bottom', 'left' |
-| color | Hex, RGB, RGBA Code(String) | '#353740' | 폰트 색상 | | 
-| inactive | Hex, RGB, RGBA Code(String) | '#aaa' | 비활성화 상태의 폰트 색상 | | 
-| width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | | 
-| height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | | 
+| color | Hex, RGB, RGBA Code(String) | '#353740' | 폰트 색상 | |
+| inactive | Hex, RGB, RGBA Code(String) | '#aaa' | 비활성화 상태의 폰트 색상 | |
+| width | Number | 140 | Legend의 넓이 *('left', 'right'의 경우 조절)* | |
+| height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | |
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
 | allowResize | Boolean | false | Legend 영역 리사이즈 가능 여부 | |
 | stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
 | virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부  | true /false |
-    
+| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+
 #### dragSelection
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | drag-select 사용 여부 | true / false |
@@ -201,9 +224,11 @@ const chartData =
 | size | number | 50 | 모바일에서 선택 영역 크기 | only mobile |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
-* PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
+
+- PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 
 #### tooltip
+
 | 이름                  | 타입                          | 디폴트       | 설명                                   | 종류(예시)                                                              |
 |---------------------|-----------------------------|-----------|--------------------------------------|---------------------------------------------------------------------|
 | use                 | Boolean                     | false     | tooltip 표시 여부                        | true /false                                                         |
@@ -232,13 +257,13 @@ const chartOptions = {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
         // return type : string
         formatter: ({ x, y, name, seriesId }) => ... ,
-        
+
         // 새로운 버전
         // return type : string
         formatter: {
             value: ({ x, y, name, seriesId }) => ...,
         }
-        
+
         // custom formatter (html)
         // return type : string
         // 주의: 사용하시는 방법에 따라 차트의 성능이 저하될 수 있습니다.
@@ -264,7 +289,7 @@ const chartOptions = {
 | seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
 | event | MouseEvent | 마우스 이벤트 객체 | |
 
-  - SeriesItem  
+  - SeriesItem
     | 이름 | 타입 | 설명 | 종류(예시) |
     | --- | --- | --- | --- |
     | sId | String | 시리즈 ID | 'series1' |
@@ -275,6 +300,7 @@ const chartOptions = {
     | index | Number | 데이터 인덱스 | 0 |
 
 #### selectItem
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | 차트 아이템 선택 기능  | |
@@ -289,21 +315,27 @@ const chartOptions = {
 | useSeriesOpacity | Boolean | false | 선택한 항목을 제외한 나머지 항목들에 반투명 효과 적용 여부  | |
 
 #### realTimeScatter
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | 실시간 데이터 처리 여부  | |
 | range | Number | 300 | 현재 시간을 기점으로 초단위로 범위 설정 | 300일 경우: -5분 ~ 현재 |
-* [axesX](#axesx-axesy)의 type(축의 유형)이 'time'이여야 합니다.
-* 페이지단에서 chartData를 shallowRef / shallowReactive로 선언해야 합니다.
 
-##### etc.
+- [axesX](#axesx-axesy)의 type(축의 유형)이 'time'이여야 합니다.
+
+- 페이지단에서 chartData를 shallowRef / shallowReactive로 선언해야 합니다.
+
+##### etc
+
 | 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
 | ------ | ------ | ---- | -----| --------- |
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
-* 3.4 버전부터 없어지는 옵션입니다.
+
+- 3.4 버전부터 없어지는 옵션입니다.
 
 ##### tipStyle
+
 | 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |
 | ------ | ------ | ---- | -----| --------- |
 | height | Number | 20 | tip 높이 | |
@@ -314,19 +346,21 @@ const chartOptions = {
 | fontWeight | Number | 400 | tip 폰트 굵기 | 100, 200, 300, ... 900 |
 
 ### 4. resize-timeout
+
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
 
-
 ### 5. Event
+
 | 이름 | 파라미터 | 설명 |
  |------|----------|------|
  | mouse-move |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                 |
  | drag-select | data, range | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
- 
- * drag-select는  `dragSelection` 옵션의 `use`값이 `true` 일 때 이벤트를 발생 시킬 수 있다. 
+
+- drag-select는  `dragSelection` 옵션의 `use`값이 `true` 일 때 이벤트를 발생 시킬 수 있다.
  그리고 선택영역은 그래프에 표시된 데이터의 중앙이 포함 되어야 선택영역 내 데이터로 인식 한다.
 
 ### 6. v-model:realTimeScatterReset
+
 - realTimeScatter 옵션을 사용할 때, 내부 데이터를 모두 초기화하고 싶을 때 사용.
 - realTimeScatterReset이 true가 되면 데이터를 모두 초기화하고 자동으로 false로 바뀜. 초기화하고 싶을 때마다 true로 바꿔주면 됩니다.
