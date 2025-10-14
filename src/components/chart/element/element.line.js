@@ -438,7 +438,6 @@ class Line {
 
           // 두 가지 임계값 설정
           const strictThreshold = avgInterval * 0.3; // 엄격한 임계값: 데이터 간격의 30%
-          const relaxedThreshold = avgInterval; // 느슨한 임계값: 데이터 간격 전체
 
           // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
           if (closestXDistance <= strictThreshold) {
@@ -460,7 +459,6 @@ class Line {
             if (
               !hasNearbyValidData
               && !findLabelByPosition
-              && closestXDistance <= relaxedThreshold
             ) {
               item.data = gdata[closestIndex];
               item.index = closestIndex;
