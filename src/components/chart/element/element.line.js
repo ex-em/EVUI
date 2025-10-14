@@ -318,11 +318,10 @@ class Line {
    * @param {boolean}  isHorizontal
    * @param {number}   dataIndex       selected label data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
-   * @param {boolean}  findLabelByPosition   if it's true. it'll look for label by position
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem, findLabelByPosition) {
+  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem) {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
@@ -353,9 +352,7 @@ class Line {
         // null이 아닌 유효한 데이터만 필터링
         const validData = [];
         gdata.forEach((point, idx) => {
-          if (findLabelByPosition) {
-            validData.push({ ...point, originalIndex: idx });
-          } else if (point.xp !== null && point.yp !== null && point.o !== null) {
+          if (point.xp !== null && point.yp !== null && point.o !== null) {
             validData.push({ ...point, originalIndex: idx });
           }
         });
@@ -438,7 +435,6 @@ class Line {
 
           // 두 가지 임계값 설정
           const strictThreshold = Math.max(avgInterval, 1); // 엄격한 임계값: 데이터 간격의 30%
-          const relaxThreshold = avgInterval; // 느슨한 임계값: 데이터 간격의 2배
 
           // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
           if (closestXDistance <= strictThreshold) {
@@ -451,7 +447,6 @@ class Line {
             let closestDistance = strictThreshold;
             for (let i = 0; i < gdata.length; i++) {
               const xDist = Math.abs(xp - gdata[i].xp);
-              console.log('xDist', xDist, 'strictThreshold', strictThreshold);
               if (xDist <= closestDistance) {
                 hasNearbyValidData = true;
                 closestDistance = xDist;
@@ -462,10 +457,7 @@ class Line {
             // 3. 근처에 다른 유효 데이터가 없을 때만 느슨한 임계값 적용
             if (
               hasNearbyValidData
-              // && !findLabelByPosition
-              // && closestXDistance <= relaxThreshold
             ) {
-              console.log('relaxThreshold', relaxThreshold);
               item.data = gdata[closestIndex];
               item.index = closestIndex;
             }

@@ -895,9 +895,7 @@ const modules = {
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
-    // const { tooltip } = this.options;
     const isHorizontal = !!this.options.horizontal;
-    // const isUseNearestDataTooltip = tooltip.use && tooltip.nearest !== 'none';
     const ctx = this.tooltipCtx;
 
     let hitId = null;
@@ -923,8 +921,7 @@ const modules = {
 
       if (series.findGraphData && series.show) {
         // 특정 데이터 인덱스로 데이터 요청
-        const item = series.findGraphData(offset, isHorizontal, targetDataIndex,
-          !allSeriesIsBar, false);
+        const item = series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar);
 
         if (item?.data) {
           let gdata;
