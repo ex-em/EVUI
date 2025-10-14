@@ -1034,7 +1034,8 @@ const modules = {
       }
     }
 
-    let closestDistance = avgInterval;
+    let closestDistance = this.seriesList?.[referenceSeries]?.useLinearInterpolation?.()
+      ? Infinity : avgInterval;
     let closestIndex = -1;
 
     // 각 라벨에서 가장 가까운 것 찾기
