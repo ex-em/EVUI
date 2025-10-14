@@ -895,9 +895,9 @@ const modules = {
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
-    const { tooltip } = this.options;
+    // const { tooltip } = this.options;
     const isHorizontal = !!this.options.horizontal;
-    const isUseNearestDataTooltip = tooltip.use && tooltip.nearest !== 'none';
+    // const isUseNearestDataTooltip = tooltip.use && tooltip.nearest !== 'none';
     const ctx = this.tooltipCtx;
 
     let hitId = null;
@@ -923,9 +923,8 @@ const modules = {
 
       if (series.findGraphData && series.show) {
         // 특정 데이터 인덱스로 데이터 요청
-        const item = isUseNearestDataTooltip
-          ? series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar, false)
-          : series.findGraphData(offset, isHorizontal, null, false, true);
+        const item = series.findGraphData(offset, isHorizontal, targetDataIndex,
+          !allSeriesIsBar, false);
 
         if (item?.data) {
           let gdata;
@@ -1000,8 +999,6 @@ const modules = {
     const [xp, yp] = offset;
     const isHorizontal = !!this.options.horizontal;
     const mousePos = isHorizontal ? yp : xp;
-    let closestDistance = Infinity;
-    let closestIndex = -1;
 
     // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
     const referenceSeries = sIds.find(sId => this.seriesList[sId]?.show);
@@ -1010,6 +1007,38 @@ const modules = {
     }
 
     const referenceData = this.seriesList[referenceSeries].data;
+
+    // 데이터 간격 계산 - 모든 데이터(null 포함)의 평균 간격 사용
+    let avgInterval = 50;
+    if (referenceData.length > 1) {
+      const intervals = [];
+      for (let i = 1; i < referenceData.length; i++) {
+        const prevPoint = referenceData[i - 1];
+        const currPoint = referenceData[i];
+        if (prevPoint && currPoint) {
+          let prevPos;
+          let currPos;
+
+          if (isHorizontal) {
+            prevPos = prevPoint.h ? prevPoint.yp + (prevPoint.h / 2) : prevPoint.yp;
+            currPos = currPoint.h ? currPoint.yp + (currPoint.h / 2) : currPoint.yp;
+          } else {
+            prevPos = prevPoint.w ? prevPoint.xp + (prevPoint.w / 2) : prevPoint.xp;
+            currPos = currPoint.w ? currPoint.xp + (currPoint.w / 2) : currPoint.xp;
+          }
+
+          if (prevPos !== null && currPos !== null) {
+            intervals.push(Math.abs(currPos - prevPos));
+          }
+        }
+      }
+      if (intervals.length > 0) {
+        avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      }
+    }
+
+    let closestDistance = avgInterval;
+    let closestIndex = -1;
 
     // 각 라벨에서 가장 가까운 것 찾기
     for (let i = 0; i < referenceData.length; i++) {

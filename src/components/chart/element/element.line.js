@@ -437,7 +437,8 @@ class Line {
           }
 
           // 두 가지 임계값 설정
-          const strictThreshold = Math.max(avgInterval * 0.3, 1); // 엄격한 임계값: 데이터 간격의 30%
+          const strictThreshold = Math.max(avgInterval, 1); // 엄격한 임계값: 데이터 간격의 30%
+          const relaxThreshold = avgInterval; // 느슨한 임계값: 데이터 간격의 2배
 
           // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
           if (closestXDistance <= strictThreshold) {
@@ -447,19 +448,24 @@ class Line {
           } else {
             // 2. 정확한 매치가 없을 때, 현재 X 위치 근처에 다른 유효 데이터가 있는지 확인
             let hasNearbyValidData = false;
-            for (let i = 0; i < validData.length; i++) {
-              const xDist = Math.abs(xp - validData[i].xp);
-              if (xDist <= strictThreshold) {
+            let closestDistance = strictThreshold;
+            for (let i = 0; i < gdata.length; i++) {
+              const xDist = Math.abs(xp - gdata[i].xp);
+              console.log('xDist', xDist, 'strictThreshold', strictThreshold);
+              if (xDist <= closestDistance) {
                 hasNearbyValidData = true;
-                break;
+                closestDistance = xDist;
+                closestIndex = i;
               }
             }
 
             // 3. 근처에 다른 유효 데이터가 없을 때만 느슨한 임계값 적용
             if (
-              !hasNearbyValidData
-              && !findLabelByPosition
+              hasNearbyValidData
+              // && !findLabelByPosition
+              // && closestXDistance <= relaxThreshold
             ) {
+              console.log('relaxThreshold', relaxThreshold);
               item.data = gdata[closestIndex];
               item.index = closestIndex;
             }

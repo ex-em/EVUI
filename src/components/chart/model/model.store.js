@@ -839,8 +839,9 @@ const modules = {
   ) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
-    const { tooltip } = this.options;
-    const isNotUseNearestDataTooltip = !tooltip.use || (tooltip.use && tooltip.nearest === 'none');
+    // const { tooltip } = this.options;
+    // const isNotUseNearestDataTooltip = !tooltip.use ||
+    //  (tooltip.use && tooltip.nearest === 'none');
 
     let maxType = null;
     let maxLabel = null;
@@ -863,7 +864,7 @@ const modules = {
           isHorizontal,
           dataIndex,
           useSelectLabelOrItem,
-          isNotUseNearestDataTooltip,
+          // isNotUseNearestDataTooltip,
         );
         const data = item.data;
         const index = item.index;
