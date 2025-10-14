@@ -342,7 +342,7 @@ class Line {
             item.hit = true;
           }
         }
-      } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
+      } else if (typeof this.beforeFindItemIndex === 'number' && this.beforeFindItemIndex !== -1 && this.show && useSelectLabelOrItem) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
@@ -437,7 +437,7 @@ class Line {
           }
 
           // 두 가지 임계값 설정
-          const strictThreshold = avgInterval * 0.3; // 엄격한 임계값: 데이터 간격의 30%
+          const strictThreshold = Math.max(avgInterval * 0.3, 1); // 엄격한 임계값: 데이터 간격의 30%
 
           // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
           if (closestXDistance <= strictThreshold) {
