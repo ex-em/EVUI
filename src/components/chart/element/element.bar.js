@@ -61,9 +61,13 @@ class Bar {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     let totalCount = this.data.length;
-    const [minIndex, maxIndex] = isHorizontal
-      ? [minmaxY.minIndex, minmaxY.maxIndex]
-      : [minmaxX.minIndex, minmaxX.maxIndex];
+    let minIndex;
+    let maxIndex;
+    if (isHorizontal) {
+      [minIndex, maxIndex] = [minmaxY.minIndex, minmaxY.maxIndex];
+    } else {
+      [minIndex, maxIndex] = [minmaxX.minIndex, minmaxX.maxIndex];
+    }
 
     // minIndex, maxIndex가 유효하면 실제 그릴 데이터 개수로 보정
     if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
@@ -99,7 +103,17 @@ class Bar {
     bArea = cArea > (cPad * 2) ? (cArea - (cPad * 2)) : cArea;
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
-    const size = this.calculateBarSize(thickness, bArea);
+    const getSize = () => {
+      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
+        return Math.min(bArea, Number(thickness.replace('px', '')));
+      }
+      if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
+        return Math.ceil(bArea * thickness);
+      }
+      return bArea;
+    };
+    const size = getSize();
+
     w = isHorizontal ? null : size;
     h = isHorizontal ? size : null;
 
@@ -127,10 +141,12 @@ class Bar {
       const item = this.data[i]; // 실제 데이터 인덱스에 해당하는 항목
       if (item) {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
-
-        const categoryPoint = isHorizontal
-          ? ysp - (cArea * screenIndex) - cPad
-          : xsp + (cArea * screenIndex) + cPad;
+        let categoryPoint;
+        if (isHorizontal) {
+          categoryPoint = ysp - (cArea * (screenIndex)) - cPad;
+        } else {
+          categoryPoint = xsp + (cArea * (screenIndex)) + cPad;
+        }
 
         // 기본 위치 설정
         if (isHorizontal) {
@@ -312,25 +328,10 @@ class Bar {
    * Find graph item
    * @param {array}    offset          mouse position
    * @param {boolean}  isHorizontal    determines if a horizontal option's value
-   * @param {number}   dataIndex       selected label data index
-   * @param {boolean}  useIndicatorOnLabel
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex, useIndicatorOnLabel) {
-    if (typeof dataIndex === 'number' && this.show && useIndicatorOnLabel) {
-      const gdata = this.data;
-      const item = { data: null, hit: false, color: this.color };
-
-      if (gdata[dataIndex]) {
-        item.data = gdata[dataIndex];
-        item.index = dataIndex;
-        item.hit = this.isPointInBar(offset, gdata[dataIndex]);
-      }
-
-      return item;
-    }
-
+  findGraphData(offset, isHorizontal) {
     return isHorizontal ? this.findGraphRangeCount(offset) : this.findGraphRange(offset);
   }
 
@@ -340,17 +341,12 @@ class Bar {
    *
    * @returns {object} graph item
    */
-  /**
-   * Binary search for finding graph item
-   * @private
-   * @param {array} offset - mouse position
-   * @param {boolean} isHorizontal - search orientation
-   * @returns {object} graph item
-   */
-  binarySearchBar(offset, isHorizontal) {
-    const [xp, yp] = offset;
+  findGraphRange(offset) {
+    const xp = offset[0];
+    const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
+
     const totalCount = this.filteredCount ?? gdata.length;
 
     let s = 0;
@@ -358,27 +354,20 @@ class Bar {
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
-      const barData = gdata[m];
-      const { xp: sx, yp: sy, w, h } = barData;
-      const ex = sx + w;
-      const ey = sy + h;
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
 
-      const inRange = isHorizontal
-        ? ((ey <= yp) && (yp <= sy))
-        : ((sx <= xp) && (xp <= ex));
+      if ((sx <= xp) && (xp <= ex)) {
+        item.data = gdata[m];
+        item.index = gdata[m].index; // 원본 데이터 인덱스 사용
 
-      if (inRange) {
-        item.data = barData;
-        item.index = barData.index;
-        item.hit = this.isPointInBar(offset, barData);
+        if ((ey <= yp) && (yp <= sy)) {
+          item.hit = true;
+        }
         return item;
-      }
-
-      const shouldGoRight = isHorizontal
-        ? (!(ey < yp))
-        : (sx + 4 < xp);
-
-      if (shouldGoRight) {
+      } else if (sx + 4 < xp) {
         s = m + 1;
       } else {
         e = m - 1;
@@ -388,10 +377,6 @@ class Bar {
     return item;
   }
 
-  findGraphRange(offset) {
-    return this.binarySearchBar(offset, false);
-  }
-
   /**
    * Find graph item (horizontal)
    * @param {array}    offset          mouse position
@@ -399,7 +384,39 @@ class Bar {
    * @returns {object} graph item
    */
   findGraphRangeCount(offset) {
-    return this.binarySearchBar(offset, true);
+    const xp = offset[0];
+    const yp = offset[1];
+    const item = { data: null, hit: false, color: this.color };
+    const gdata = this.data;
+
+    const totalCount = this.filteredCount ?? gdata.length;
+
+    let s = 0;
+    let e = totalCount - 1;
+
+    while (s <= e) {
+      const m = Math.floor((s + e) / 2);
+      const sx = gdata[m].xp;
+      const sy = gdata[m].yp;
+      const ex = sx + gdata[m].w;
+      const ey = sy + gdata[m].h;
+
+      if ((ey <= yp) && (yp <= sy)) {
+        item.data = gdata[m];
+        item.index = gdata[m].index; // 원본 데이터 인덱스 사용
+
+        if ((sx <= xp) && (xp <= ex)) {
+          item.hit = true;
+        }
+        return item;
+      } else if (ey < yp) {
+        e = m - 1;
+      } else {
+        s = m + 1;
+      }
+    }
+
+    return item;
   }
 
   /**
@@ -543,27 +560,10 @@ class Bar {
     ctx.restore();
   }
 
-  /**
-   * Calculate bar size based on thickness
-   * @private
-   * @param {string|number} thickness - thickness value
-   * @param {number} bArea - available bar area
-   * @returns {number} calculated size
-   */
-  calculateBarSize(thickness, bArea) {
-    if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
-      return Math.min(bArea, Number(thickness.replace('px', '')));
-    }
-    if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
-      return Math.ceil(bArea * thickness);
-    }
-    return bArea;
-  }
-
   drawBar({ ctx, positions }) {
-    const { isHorizontal, borderRadius } = this;
+    const isHorizontal = this.isHorizontal;
     const isStackBar = 'stackIndex' in this;
-    const isBorderRadius = borderRadius && borderRadius > 0;
+    const isBorderRadius = this.borderRadius && this.borderRadius > 0;
     const { x, y, w } = positions;
     const h = isHorizontal ? -positions.h : positions.h;
 
@@ -587,26 +587,13 @@ class Bar {
     ctx.restore();
   }
 
-  /**
-   * Check if point is within bar boundaries
-   * @param {array} offset - [x, y] mouse position
-   * @param {object} barData - bar data object with xp, yp, w, h properties
-   * @returns {boolean} true if point is within bar
-   */
-  isPointInBar(offset, barData) {
-    const [xp, yp] = offset;
-    const { xp: sx, yp: sy, w, h } = barData;
-    const ex = sx + w;
-    const ey = sy + h;
-
-    return (sx <= xp) && (xp <= ex) && (ey <= yp) && (yp <= sy);
-  }
-
   drawRoundedRect(ctx, positions) {
-    const { chartRect, labelOffset, isHorizontal, borderRadius } = this;
+    const chartRect = this.chartRect;
+    const labelOffset = this.labelOffset;
+    const isHorizontal = this.isHorizontal;
     const { x, y } = positions;
     let { w, h } = positions;
-    let r = borderRadius;
+    let r = this.borderRadius;
 
     const squarePath = new Path2D();
     squarePath.rect(
