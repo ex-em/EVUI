@@ -318,10 +318,11 @@ class Line {
    * @param {boolean}  isHorizontal
    * @param {number}   dataIndex       selected label data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
+   * @param {boolean}  findLabelByPosition   if it's true. it'll look for label by position
    *
    * @returns {object} graph item
    */
-  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem) {
+  findGraphData(offset, isHorizontal, dataIndex, useSelectLabelOrItem, findLabelByPosition) {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
@@ -352,7 +353,9 @@ class Line {
         // null이 아닌 유효한 데이터만 필터링
         const validData = [];
         gdata.forEach((point, idx) => {
-          if (point.xp !== null && point.yp !== null && point.o !== null) {
+          if (findLabelByPosition) {
+            validData.push({ ...point, originalIndex: idx });
+          } else if (point.xp !== null && point.yp !== null && point.o !== null) {
             validData.push({ ...point, originalIndex: idx });
           }
         });
@@ -454,7 +457,11 @@ class Line {
             }
 
             // 3. 근처에 다른 유효 데이터가 없을 때만 느슨한 임계값 적용
-            if (!hasNearbyValidData && closestXDistance <= relaxedThreshold) {
+            if (
+              !hasNearbyValidData
+              && !findLabelByPosition
+              && closestXDistance <= relaxedThreshold
+            ) {
               item.data = gdata[closestIndex];
               item.index = closestIndex;
             }

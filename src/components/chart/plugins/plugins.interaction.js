@@ -317,7 +317,6 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const itemHitInfo = this.getItemByPosition(offset, false);
         const {
           labelIndex: clickedLabelIndex,
         } = this.getLabelInfoByPosition(offset, targetAxis);
@@ -336,8 +335,8 @@ const modules = {
           eventTarget: 'label',
           ...cloneDeep(this.defaultSelectInfo),
         };
-        args.label = itemHitInfo.label;
-        args.dataIndex = itemHitInfo.maxIndex;
+        args.label = this.defaultSelectInfo?.label?.at(0);
+        args.dataIndex = this.defaultSelectInfo?.dataIndex?.at(0);
       };
 
       const setSelectedSeriesInfo = () => {
@@ -896,7 +895,9 @@ const modules = {
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
+    const { tooltip } = this.options;
     const isHorizontal = !!this.options.horizontal;
+    const isUseNearestDataTooltip = tooltip.use && tooltip.nearest !== 'none';
     const ctx = this.tooltipCtx;
 
     let hitId = null;
@@ -915,13 +916,16 @@ const modules = {
 
     // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
     const allSeriesIsBar = sIds.every(sId => this.seriesList[sId].type === 'bar');
+
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
 
       if (series.findGraphData && series.show) {
         // 특정 데이터 인덱스로 데이터 요청
-        const item = series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar);
+        const item = isUseNearestDataTooltip
+          ? series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar, false)
+          : series.findGraphData(offset, isHorizontal, null, false, true);
 
         if (item?.data) {
           let gdata;

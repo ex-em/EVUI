@@ -296,6 +296,7 @@ const chartData =
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| trigger | 'axis' \| 'none' | 'axis' | 툴팁 트리거 방식 | 'axis', 'none' |
 
 ```ts
 const chartOptions = {
@@ -336,7 +337,7 @@ const chartOptions = {
 | seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
 | event | MouseEvent | 마우스 이벤트 객체 | |
 
-  - SeriesItem  
+  - SeriesItem
     | 이름 | 타입 | 설명 | 종류(예시) |
     | --- | --- | --- | --- |
     | sId | String | 시리즈 ID | 'series1' |

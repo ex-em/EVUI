@@ -91,6 +91,7 @@ const DEFAULT_OPTIONS = {
   combo: false,
   tooltip: {
     use: true,
+    nearest: 'axis',
     sortByValue: true,
     backgroundColor: '#4C4C4C',
     fontColor: '#FFFFFF',
