@@ -82,7 +82,6 @@ const modules = {
             label,
             mousePosition: [e.clientX, e.clientY],
             dataLabel: actualLabelValue,
-            isTooltipBased: true,
           };
         }
       } else if (tooltip.use && this.isInitTooltip) {
@@ -109,7 +108,6 @@ const modules = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
-          isTooltipBased: false,
         };
       } else if (!args.hoveredLabel) {
         args.hoveredLabel = {
@@ -317,7 +315,6 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const itemHitInfo = this.getItemByPosition(offset, false);
         const {
           labelIndex: clickedLabelIndex,
         } = this.getLabelInfoByPosition(offset, targetAxis);
@@ -336,8 +333,8 @@ const modules = {
           eventTarget: 'label',
           ...cloneDeep(this.defaultSelectInfo),
         };
-        args.label = itemHitInfo.label;
-        args.dataIndex = itemHitInfo.maxIndex;
+        args.label = this.defaultSelectInfo?.label?.at(0);
+        args.dataIndex = this.defaultSelectInfo?.dataIndex?.at(0);
       };
 
       const setSelectedSeriesInfo = () => {
@@ -906,75 +903,16 @@ const modules = {
     let maxg = null;
     let maxSID = null;
 
-    // 파이 차트는 특별한 처리가 필요
-    if (this.options.type === 'pie') {
-      for (let ix = 0; ix < sIds.length; ix++) {
-        const sId = sIds[ix];
-        const series = this.seriesList[sId];
-
-        if (series.findGraphData && series.show) {
-          const item = series.findGraphData(offset);
-
-          if (item?.data && item.hit) {
-            const gdata = item.data.o;
-
-            if (gdata !== null && gdata !== undefined) {
-              const formattedSeriesName = this.getFormattedTooltipLabel({
-                dataId: series.id,
-                seriesId: sId,
-                seriesName: series.name,
-                itemData: item.data,
-              });
-              const sw = ctx ? ctx.measureText(formattedSeriesName).width : 1;
-
-              item.id = series.id;
-              item.name = formattedSeriesName;
-              item.axis = { x: 0, y: 0 };
-              items[sId] = item;
-
-              const formattedTxt = this.getFormattedTooltipValue({
-                dataId: series.id,
-                seriesId: sId,
-                seriesName: formattedSeriesName,
-                value: gdata,
-                itemData: item.data,
-              });
-
-              item.data.formatted = formattedTxt;
-
-              if (maxsw < sw) {
-                maxs = formattedSeriesName;
-                maxsw = sw;
-              }
-
-              if (maxv.length <= `${formattedTxt}`.length) {
-                maxv = `${formattedTxt}`;
-              }
-
-              if (maxg === null || maxg <= gdata) {
-                maxg = gdata;
-                maxSID = sId;
-              }
-
-              hitId = sId;
-            }
-          }
-        }
-      }
-
-      const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
-      return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
-    }
-
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
 
-    if (targetDataIndex === -1) {
+    if (targetDataIndex === -1 && this.options.type !== 'pie') {
       return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
     }
 
     // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
     const allSeriesIsBar = sIds.every(sId => this.seriesList[sId].type === 'bar');
+
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
@@ -1056,8 +994,6 @@ const modules = {
     const [xp, yp] = offset;
     const isHorizontal = !!this.options.horizontal;
     const mousePos = isHorizontal ? yp : xp;
-    let closestDistance = Infinity;
-    let closestIndex = -1;
 
     // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
     const referenceSeries = sIds.find(sId => this.seriesList[sId]?.show);
@@ -1066,6 +1002,38 @@ const modules = {
     }
 
     const referenceData = this.seriesList[referenceSeries].data;
+
+    // 데이터 간격 계산 - 모든 데이터(null 포함)의 평균 간격 사용
+    let avgInterval = 50;
+    if (referenceData.length > 1) {
+      const intervals = [];
+      for (let i = 1; i < referenceData.length; i++) {
+        const prevPoint = referenceData[i - 1];
+        const currPoint = referenceData[i];
+        if (prevPoint && currPoint) {
+          let prevPos;
+          let currPos;
+
+          if (isHorizontal) {
+            prevPos = prevPoint.h ? prevPoint.yp + (prevPoint.h / 2) : prevPoint.yp;
+            currPos = currPoint.h ? currPoint.yp + (currPoint.h / 2) : currPoint.yp;
+          } else {
+            prevPos = prevPoint.w ? prevPoint.xp + (prevPoint.w / 2) : prevPoint.xp;
+            currPos = currPoint.w ? currPoint.xp + (currPoint.w / 2) : currPoint.xp;
+          }
+
+          if (prevPos !== null && currPos !== null) {
+            intervals.push(Math.abs(currPos - prevPos));
+          }
+        }
+      }
+      if (intervals.length > 0) {
+        avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      }
+    }
+
+    let closestDistance = Infinity;
+    let closestIndex = -1;
 
     // 각 라벨에서 가장 가까운 것 찾기
     for (let i = 0; i < referenceData.length; i++) {
@@ -1095,6 +1063,23 @@ const modules = {
           }
         }
       }
+    }
+
+    if (closestDistance >= avgInterval) {
+      const useLinearInterpolation = sIds.some((sId) => {
+        const series = this.seriesList[sId];
+
+        if (series?.show) {
+          const passingValue = series.passingValue;
+          const interpolation = series.interpolation;
+          const hasPassingValueInData = series.hasPassingValueInData;
+
+          return interpolation === 'linear' || (interpolation === 'none' && !!passingValue && hasPassingValueInData);
+        }
+
+        return false;
+      });
+      return useLinearInterpolation ? closestIndex : -1;
     }
 
     return closestIndex;
