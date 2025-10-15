@@ -1034,8 +1034,7 @@ const modules = {
       }
     }
 
-    let closestDistance = this.seriesList?.[referenceSeries]?.useLinearInterpolation?.()
-      ? Infinity : avgInterval;
+    let closestDistance = Infinity;
     let closestIndex = -1;
 
     // 각 라벨에서 가장 가까운 것 찾기
@@ -1066,6 +1065,23 @@ const modules = {
           }
         }
       }
+    }
+
+    if (closestDistance >= avgInterval) {
+      const useLinearInterpolation = sIds.some((sId) => {
+        const series = this.seriesList[sId];
+
+        if (series?.show) {
+          const passingValue = series.passingValue;
+          const interpolation = series.interpolation;
+          const hasPassingValueInData = series.hasPassingValueInData;
+
+          return interpolation === 'linear' || (interpolation === 'none' && !!passingValue && hasPassingValueInData);
+        }
+
+        return false;
+      });
+      return useLinearInterpolation ? closestIndex : -1;
     }
 
     return closestIndex;
