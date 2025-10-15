@@ -48,7 +48,7 @@
           dayjs(time).add(6, 'day'),
         ],
         data: {
-          series1: [100, 25, null, null, 0, null, null],
+          series1: [null, null, null, null, null, null, null],
           series2: [80, 36, null, null, 15, null, null],
         },
       });
@@ -87,6 +87,8 @@
           fixedPosTop: true,
           showIndicator: true,
           useDeselectOverflow: true,
+          useLabelOpacity: false,
+          useSeriesOpacity: false,
           limit: 1,
         },
         maxTip: {
