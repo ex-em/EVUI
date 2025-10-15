@@ -358,7 +358,9 @@ class Line {
         });
 
         if (validData.length === 0) {
-          return item;
+          gdata.forEach((point, idx) => {
+            validData.push({ ...point, originalIndex: idx });
+          });
         }
 
         // 이진 탐색으로 가장 가까운 포인트 찾기
