@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <ev-chart
-      v-model:selectedItem="defaultSelectItem"
+      v-model:selectedLabel="defaultSelectLabel"
       :data="chartData"
       :options="chartOptions"
       @click="onClick"
@@ -11,7 +11,7 @@
       <div class="badge yellow">
         기본 선택값 v-model
       </div>
-      {{ defaultSelectItem }}
+      {{ defaultSelectLabel }}
       <br><br>
       <div class="badge yellow">
         클릭된 라벨
@@ -48,14 +48,18 @@
           dayjs(time).add(6, 'day'),
         ],
         data: {
-          series1: [100, 25, 36, 47, 0, 50, 80],
-          series2: [80, 36, 25, 47, 15, 100, 0],
+          series1: [100, 25, null, null, 0, null, null],
+          series2: [80, 36, null, null, 15, null, null],
         },
       });
 
       const chartOptions = reactive({
         type: 'line',
         width: '100%',
+        tooltip: {
+          use: true,
+          // nearest: 'none',
+        },
         title: {
           text: 'Chart Title',
           show: true,
@@ -76,12 +80,14 @@
           startToZero: true,
           autoScaleRatio: 0.3,
         }],
-        selectItem: {
+        selectLabel: {
           use: true,
           showTextTip: true,
           tipText: 'label',
           fixedPosTop: true,
           showIndicator: true,
+          useDeselectOverflow: true,
+          limit: 1,
         },
         maxTip: {
           use: true,
@@ -101,9 +107,8 @@
         dblClickedLabel.value = dayjs(target.label).format('YYYY-MM-DD');
       };
 
-      const defaultSelectItem = ref({
-        seriesID: 'series1',
-        dataIndex: 3,
+      const defaultSelectLabel = ref({
+        dataIndex: [3],
       });
 
       return {
@@ -111,7 +116,7 @@
         chartOptions,
         clickedLabel,
         dblClickedLabel,
-        defaultSelectItem,
+        defaultSelectLabel,
         onClick,
         onDblClick,
       };

@@ -341,7 +341,7 @@ class Line {
             item.hit = true;
           }
         }
-      } else if (typeof this.beforeFindItemIndex === 'number' && this.show && useSelectLabelOrItem) {
+      } else if (typeof this.beforeFindItemIndex === 'number' && this.beforeFindItemIndex !== -1 && this.show && useSelectLabelOrItem) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
@@ -434,27 +434,28 @@ class Line {
           }
 
           // 두 가지 임계값 설정
-          const strictThreshold = avgInterval * 0.3; // 엄격한 임계값: 데이터 간격의 30%
-          const relaxedThreshold = avgInterval; // 느슨한 임계값: 데이터 간격 전체
+          const threshold = Math.max(avgInterval, 1);
 
           // 1. 먼저 엄격한 임계값으로 정확한 매치 확인
-          if (closestXDistance <= strictThreshold) {
+          if (closestXDistance <= threshold) {
             // 정확히 일치하거나 매우 가까운 데이터가 있음
             item.data = gdata[closestIndex];
             item.index = closestIndex;
           } else {
-            // 2. 정확한 매치가 없을 때, 현재 X 위치 근처에 다른 유효 데이터가 있는지 확인
-            let hasNearbyValidData = false;
-            for (let i = 0; i < validData.length; i++) {
-              const xDist = Math.abs(xp - validData[i].xp);
-              if (xDist <= strictThreshold) {
-                hasNearbyValidData = true;
-                break;
+            // 2. 정확한 매치가 없을 때, 현재 X 위치 근처에 다른 데이터가 있는지 확인
+            let hasNearbyAnyData = false;
+            let closestDistance = isLinearInterpolation ? Infinity : threshold;
+            const dataSet = isLinearInterpolation ? validData : gdata;
+            for (let i = 0; i < dataSet.length; i++) {
+              const xDist = Math.abs(xp - dataSet[i].xp);
+              if (xDist <= closestDistance) {
+                hasNearbyAnyData = true;
+                closestDistance = xDist;
+                closestIndex = isLinearInterpolation ? dataSet[i].originalIndex : i;
               }
             }
 
-            // 3. 근처에 다른 유효 데이터가 없을 때만 느슨한 임계값 적용
-            if (!hasNearbyValidData && closestXDistance <= relaxedThreshold) {
+            if (hasNearbyAnyData) {
               item.data = gdata[closestIndex];
               item.index = closestIndex;
             }

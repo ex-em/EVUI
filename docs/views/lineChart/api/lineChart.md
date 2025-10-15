@@ -336,7 +336,7 @@ const chartOptions = {
 | seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
 | event | MouseEvent | 마우스 이벤트 객체 | |
 
-  - SeriesItem  
+  - SeriesItem
     | 이름 | 타입 | 설명 | 종류(예시) |
     | --- | --- | --- | --- |
     | sId | String | 시리즈 ID | 'series1' |
