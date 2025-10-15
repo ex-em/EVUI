@@ -296,7 +296,6 @@ const chartData =
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
-| trigger | 'axis' \| 'none' | 'axis' | 툴팁 트리거 방식 | 'axis', 'none' |
 
 ```ts
 const chartOptions = {
