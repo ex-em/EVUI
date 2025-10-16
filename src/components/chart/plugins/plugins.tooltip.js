@@ -858,12 +858,12 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSyncedIndicator({ horizontal, label, mousePosition, dataLabel, isTooltipBased }) {
+  drawSyncedIndicator({ horizontal, label, mousePosition, dataLabel }) {
     if (!this._canDrawSyncedIndicator(horizontal, mousePosition)) {
       return;
     }
 
-    if (isTooltipBased) {
+    if (dataLabel) {
       this.drawSyncedIndicatorForTooltip({ dataLabel, mousePosition });
       return;
     }

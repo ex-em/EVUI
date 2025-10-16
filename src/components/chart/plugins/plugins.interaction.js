@@ -82,7 +82,6 @@ const modules = {
             label,
             mousePosition: [e.clientX, e.clientY],
             dataLabel: actualLabelValue,
-            isTooltipBased: true,
           };
         }
       } else if (tooltip.use && this.isInitTooltip) {
@@ -109,7 +108,6 @@ const modules = {
           horizontal: this.options.horizontal,
           label,
           mousePosition: [e.clientX, e.clientY],
-          isTooltipBased: false,
         };
       } else if (!args.hoveredLabel) {
         args.hoveredLabel = {
