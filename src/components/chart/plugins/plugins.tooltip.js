@@ -859,28 +859,17 @@ const modules = {
    * @returns {undefined}
    */
   drawSyncedIndicator({ horizontal, label, mousePosition, dataLabel, isTooltipBased }) {
-    if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
+    if (!this._canDrawSyncedIndicator(horizontal, mousePosition)) {
       return;
     }
 
-    // tooltip 기반 동기화인 경우
     if (isTooltipBased) {
       this.drawSyncedIndicatorForTooltip({ dataLabel, mousePosition });
       return;
     }
 
-    // 기존 시간 기반 동기화
-    if (
-      this.options.syncHover === false
-      || (!horizontal && !this.options.axesX.every(({ type }) => type === 'time'))
-      || (horizontal && !this.options.axesY.every(({ type }) => type === 'time'))) {
-      return;
-    }
     const fromTime = +this.data.labels?.[0];
     const toTime = +this.data.labels?.[this.data.labels.length - 1];
-    if (fromTime == null || toTime == null) {
-      return;
-    }
     const [clientX, clientY] = mousePosition;
     const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
 
@@ -908,6 +897,30 @@ const modules = {
     }
   },
 
+  _canDrawSyncedIndicator(horizontal, mousePosition) {
+    if (!mousePosition || !!horizontal !== !!this.options.horizontal) {
+      return false;
+    }
+
+    return this._isTimeBasedSyncEnabled(horizontal) && this._hasValidTimeRange();
+  },
+
+  _isTimeBasedSyncEnabled(horizontal) {
+    if (this.options.syncHover === false) return false;
+    if (!this.data?.labels?.length) return false;
+
+    const timeAxes = horizontal
+      ? this.options.axesY.every(({ type }) => type === 'time')
+      : this.options.axesX.every(({ type }) => type === 'time');
+
+    return timeAxes;
+  },
+
+  _hasValidTimeRange() {
+    const fromTime = +this.data.labels?.[0];
+    const toTime = +this.data.labels?.[this.data.labels.length - 1];
+    return fromTime != null && toTime != null;
+  },
 
   /**
    * 제공된 dataLabel과 일치하는 Label이 있다면 indicator를 그림
