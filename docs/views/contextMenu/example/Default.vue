@@ -52,6 +52,21 @@
         <template #customText="{ item }">
           <span>{{ item.text }} - CUSTOM TEXT</span>
         </template>
+        <template #customText1="{ item }">
+          <span>{{ item.text }} - CUSTOM TEXT1</span>
+        </template>
+        <template #customText2="{ item }">
+          <span>{{ item.text }} - CUSTOM TEXT2</span>
+        </template>
+        <template #customText2-1="{ item }">
+          <span>{{ item.text }} - CUSTOM TEXT2-1</span>
+        </template>
+        <template #customText2-2="{ item }">
+          <span>{{ item.text }} - CUSTOM TEXT2-2</span>
+        </template>
+        <template #customText3="{ item }">
+          <span>{{ item.text }} - CUSTOM TEXT3</span>
+        </template>
       </ev-context-menu>
       컨텍스트 메뉴 우클릭 영역
     </div>
@@ -169,8 +184,34 @@ export default {
     const menuItems3 = ref([
       {
         text: 'TEXT1',
+        slotKey: 'customText1',
         iconClass: 'ev-icon-s-panel-out',
-        slotKey: 'customText',
+        disabled: true,
+        click: () => console.log('CLICK text1'),
+      },
+      {
+        text: 'TEXT2',
+        iconClass: 'ev-icon-s-pause',
+        slotKey: 'customText2',
+        children: [
+          {
+            text: 'TEXT2-1',
+            slotKey: 'customText2-1',
+            iconClass: 'ev-icon-server2',
+            click: () => console.log('CLICK text2-1'),
+          },
+          {
+            text: 'TEXT2-2',
+            slotKey: 'customText2-2',
+            disabled: true,
+            iconClass: 'ev-icon-server',
+          },
+        ],
+      },
+      {
+        text: 'TEXT3',
+        disabled: true,
+        slotKey: 'customText3',
       },
     ]);
 
