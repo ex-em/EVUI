@@ -21,7 +21,18 @@
         :class="['front-icon', item.iconClass]"
       />
       <span class="text">
-        {{ item.text || item.value }}
+        <slot
+          v-if="item.slotKey"
+          :name="item.slotKey"
+          :item="item"
+          :depth="depth"
+          :selected-item="selectedItem"
+        >
+          {{ item.text || item.value }}
+        </slot>
+        <template v-else>
+          {{ item.text || item.value }}
+        </template>
       </span>
       <span
         v-if="expandable && hasChild"
@@ -83,6 +94,9 @@ export default {
           return false;
         } else if (obj.disabled !== undefined && typeof obj.disabled !== 'boolean') {
           console.warn('[EVUI][Menu] disabled attribute must be \'Boolean\' type.');
+          return false;
+        } else if (obj.slotKey !== undefined && typeof obj.slotKey !== 'string') {
+          console.warn('[EVUI][Menu] slotKey attribute must be \'String\' type.');
           return false;
         }
         return true;

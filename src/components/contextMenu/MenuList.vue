@@ -15,7 +15,18 @@
           class="ev-menu-li-prefix"
           :class="item.iconClass"
         />
-        {{ item.text }}
+        <span class="ev-menu-li-text">
+          <slot
+            v-if="item.slotKey"
+            :name="item.slotKey"
+            :item="item"
+          >
+            {{ item.text }}
+          </slot>
+          <template v-else>
+            {{ item.text }}
+          </template>
+        </span>
         <i
           v-if="item.children || item.isShowMenu"
           class="ev-menu-li-suffix ev-icon-arrow-right2"
@@ -31,7 +42,18 @@
         :comp="comp"
         :items="childrenItems"
         :style="menuStyle"
-      />
+      >
+        <template
+          v-for="(_, slotName) in $slots"
+          :key="slotName"
+          #[slotName]="slotProps"
+        >
+          <slot
+            :name="slotName"
+            v-bind="slotProps"
+          />
+        </template>
+      </component>
     </template>
   </div>
 </template>
@@ -151,5 +173,10 @@ export default {
 .ev-menu-li-prefix {
   position: absolute;
   left: 3px;
+}
+
+.ev-menu-li-text {
+  display: inline-block;
+  padding-left: 20px;
 }
 </style>

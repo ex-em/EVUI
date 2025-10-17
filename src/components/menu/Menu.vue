@@ -9,7 +9,18 @@
       :disabled="disabled"
       :comp="component"
       @click="clickMenu"
-    />
+    >
+      <template
+        v-for="(_, slotName) in $slots"
+        :key="slotName"
+        #[slotName]="slotProps"
+      >
+        <slot
+          :name="slotName"
+          v-bind="slotProps"
+        />
+      </template>
+    </menu-item>
   </ul>
 </template>
 
