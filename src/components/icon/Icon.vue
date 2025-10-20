@@ -4,6 +4,7 @@
       icon,
       { [`ev-icon-${size}`]: !!size },
     ]"
+    :style="{ color }"
     @click="onClick"
     @dblClick="onDblClick"
     @contextmenu="onContextMenu"
@@ -19,6 +20,10 @@ export default {
       default: '',
     },
     size: {
+      type: String,
+      default: '',
+    },
+    color: {
       type: String,
       default: '',
     },
