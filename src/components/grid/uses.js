@@ -78,20 +78,17 @@ export const commonFunctions = () => {
 };
 
 export const getUpdatedColumns = (stores) => {
-  if (stores.movedColumns?.length) {
-    const orderedColumnsIndexes = stores.orderedColumns?.map(column => column.index);
-    const extraColumns = stores.originColumns?.filter(
-      column => !orderedColumnsIndexes.includes(column.index),
-    );
-    const copyOrderedColumns = stores.orderedColumns;
-    return [...copyOrderedColumns, ...extraColumns];
-  }
-  const { originColumns, filteredColumns } = stores;
-  return originColumns.map((col) => {
-    const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+  const baseColumns = (
+    stores.movedColumns?.length ? stores.movedColumns : stores.originColumns
+  ) ?? [];
+  const filteredColumnsMap = new Map(
+    (stores.filteredColumns ?? []).map(filtered => [filtered.index, filtered]),
+  );
+  return baseColumns.map((column) => {
+    const filteredColumn = filteredColumnsMap.get(column.index) ?? {};
     return {
-      ...col,
-      ...changedCol,
+      ...column,
+      ...filteredColumn,
     };
   });
 };
@@ -1475,6 +1472,28 @@ export const columnSettingEvent = (params) => {
     columnSettingInfo.visibleColumnIdx = [];
     columnSettingInfo.hiddenColumn = '';
   };
+  const getBaseColumns = () => {
+    if (Array.isArray(stores.movedColumns) && stores.movedColumns.length) {
+      return stores.movedColumns;
+    }
+    return stores.originColumns || [];
+  };
+  const syncHiddenState = (column, hidden) => {
+    if (!column) {
+      return;
+    }
+    column.hiddenDisplay = hidden;
+    const originColumn = stores.originColumns?.find(col => col.index === column.index);
+    if (originColumn && originColumn !== column) {
+      originColumn.hiddenDisplay = hidden;
+    }
+    if (Array.isArray(stores.movedColumns)) {
+      const movedColumn = stores.movedColumns.find(col => col.index === column.index);
+      if (movedColumn && movedColumn !== column) {
+        movedColumn.hiddenDisplay = hidden;
+      }
+    }
+  };
   const setFilteringColumn = () => {
     columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
 
@@ -1499,18 +1518,13 @@ export const columnSettingEvent = (params) => {
       return;
     }
 
-    stores.filteredColumns = stores.originColumns
-      .filter((col) => {
-        if (columnNames.includes(col.field) || !col.caption) {
-          // 보여줄 컬럼들은 hiddenDisplay 속성을 false로 전부 적용
-          col.hiddenDisplay = false;
-          return true;
-        }
-
-        // 보여주지 않을 컬럼들은 hiddenDisplay 속성을 전부 ture로 적용
-        col.hiddenDisplay = true;
-        return false;
-      });
+    const baseColumns = getBaseColumns();
+    const columnNameSet = new Set(columnNames);
+    stores.filteredColumns = baseColumns.filter((col) => {
+      const shouldShow = columnNameSet.has(col.field) || !col.caption;
+      syncHiddenState(col, !shouldShow);
+      return shouldShow;
+    });
     columnSettingInfo.hiddenColumn = '';
     setFilteringColumn();
     emit('change-column-status', {
@@ -1530,13 +1544,16 @@ export const columnSettingEvent = (params) => {
     }
     stores.filteredColumns = columns
       .filter((col) => {
-        if (col.field !== val) {
-          col.hiddenDisplay = false;
-          return true;
-        }
-        col.hiddenDisplay = true;
-        return false;
+        const shouldHide = col.field === val;
+        syncHiddenState(col, shouldHide);
+        return !shouldHide;
       });
+    const baseColumns = getBaseColumns();
+    baseColumns.forEach((col) => {
+      if (col.field === val) {
+        syncHiddenState(col, true);
+      }
+    });
     columnSettingInfo.hiddenColumn = val;
     setFilteringColumn();
   };
