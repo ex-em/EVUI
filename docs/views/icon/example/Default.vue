@@ -15,11 +15,11 @@
     <p class="case-title">Color</p>
     <div style="font-size: 40px;">
       <ev-icon icon="ev-icon-user2" color="red" />
-      <ev-icon icon="ev-icon-user2" color="blue" />
+      <ev-icon icon="ev-icon-user2" color="#0000ff" />
       <ev-icon icon="ev-icon-user2" color="green" />
     </div>
     <div class="description" style="margin-bottom: 20px;">
-      color 변수(red, blue, green, yellow, purple, orange, brown, gray, black, white) 바인딩
+      color 변수(red, #ffffff, ...) 바인딩
     </div>
   </div>
 
