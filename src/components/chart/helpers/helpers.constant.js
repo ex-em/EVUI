@@ -92,6 +92,7 @@ export const AXIS_OPTION = {
   axisLineWidth: 1,
   showGrid: true,
   gridLineColor: '#C9CFDC',
+  showAxisTick: true,
   showIndicator: false,
   timeFormat: 'mm:ss',
   range: null,
