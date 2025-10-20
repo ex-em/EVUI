@@ -30,6 +30,8 @@ class LinearScale extends Scale {
   getInterval(range) {
     if (this.interval) return this.interval;
 
+    let _interval = 0;
+
     const max = range.maxValue;
     const min = range.minValue;
     const steps = range.maxSteps;
@@ -59,15 +61,53 @@ class LinearScale extends Scale {
         }
       }
 
-      return Math.ceil(
-        Math.max(
+      _interval = Math.max(
           Math.abs(min) / (negativeSteps || 1),
           Math.abs(max) / (positiveSteps || 1),
-        ),
-      );
+        );
+    } else {
+      _interval = (max - min) / steps;
     }
-    return Math.ceil((max - min) / steps);
+
+    return this.decimalPoint ? _interval : Math.ceil(_interval);
   }
+
+      /**
+   * Get decimal point from range
+   * @param {object} {
+   *  graphRange: number,
+   *  numberOfSteps: number,
+   *  interval: number,
+   * }
+   * @returns {number} decimal point
+   */
+    getDecimalPointFromRange({
+      graphRange,
+      numberOfSteps,
+    }) {
+      if (numberOfSteps <= 0 || graphRange === 0) {
+        return 0;
+      }
+
+      const interval = graphRange / numberOfSteps;
+      if (interval === 0) {
+        return 0;
+      }
+
+      let decimals = 0;
+      let temp = interval;
+
+      while (temp < 1) {
+        temp *= 10;
+        decimals++;
+
+        if (decimals > 10) {
+          break;
+        }
+      }
+
+      return decimals;
+    }
 
     /**
    * With range information, calculate how many labels in axis
@@ -129,6 +169,13 @@ class LinearScale extends Scale {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
+    if (this.decimalPoint === 'auto') {
+      this.decimalPoint = this?.getDecimalPointFromRange?.({
+        graphRange,
+        numberOfSteps,
+      });
+    }
+
     return {
       steps: numberOfSteps,
       interval,
@@ -169,7 +216,8 @@ class LinearScale extends Scale {
       if (this.autoScaleRatio) {
         const temp = maxValue;
         // 양수 방향에만 autoScaleRatio 적용
-        maxValue = Math.ceil(maxValue * (this.autoScaleRatio + 1));
+        const _maxValue = maxValue * (this.autoScaleRatio + 1);
+        maxValue = this.decimalPoint ? _maxValue : Math.ceil(_maxValue);
 
         if (maxValue > 0 && minValue < 0) {
           // 양수/음수 혼합 케이스 -- 음수 방향에도 maxValue 증가분만큼 더하기
@@ -177,7 +225,8 @@ class LinearScale extends Scale {
           minValue += diff;
         } else if (maxValue < 0 && minValue < 0) {
           // 전부 음수 케이스 -- 음수 방향에도 autoScaleRatio 적용
-          minValue = Math.ceil(minValue * (this.autoScaleRatio + 1));
+          const _minValue = minValue * (this.autoScaleRatio + 1);
+          minValue = this.decimalPoint ? _minValue : Math.ceil(_minValue);
         }
       }
 
