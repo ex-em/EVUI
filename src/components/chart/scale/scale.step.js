@@ -250,8 +250,8 @@ class StepScale extends Scale {
           if (this.showAxisTick) {
             ctx.beginPath();
             ctx.strokeStyle = this.axisLineColor;
-            ctx.moveTo(linePosition, offsetPoint);
-            ctx.lineTo(linePosition, offsetPoint + AXIS_TICK_LENGTH);
+            ctx.moveTo(labelCenter + (labelGap / 2), offsetPoint);
+            ctx.lineTo(labelCenter + (labelGap / 2), offsetPoint + AXIS_TICK_LENGTH);
             ctx.stroke();
             ctx.closePath();
           }
@@ -273,8 +273,8 @@ class StepScale extends Scale {
           if (this.showAxisTick) {
             ctx.beginPath();
             ctx.strokeStyle = this.axisLineColor;
-            ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), linePosition);
-            ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, linePosition);
+            ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), yPoint);
+            ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, yPoint);
             ctx.stroke();
             ctx.closePath();
           }
