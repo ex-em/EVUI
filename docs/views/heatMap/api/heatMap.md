@@ -132,7 +132,7 @@ const chartData =
   - 미지정 시 Chart 내부에서 해당 Axis 데이터의 max/min value를 기반으로 interval을 구함
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
   - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표기
-- decimalPoint
+- decimalPoint (default: 'auto')
   - Number / 'auto'
   - 소수점 자릿수 표시 (default: 0)
   - 'auto' 일 경우, 축의 min~max 값을 보고 적절한 자릿수 산출

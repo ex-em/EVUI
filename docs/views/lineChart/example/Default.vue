@@ -77,7 +77,6 @@
           type: 'linear',
           showGrid: true,
           startToZero: true,
-          decimalPoint: 'auto',
           autoScaleRatio: 0.1,
         }],
       });
