@@ -1568,6 +1568,19 @@ export const columnSettingEvent = (params) => {
 
 export const dragEvent = ({ stores }) => {
   const { emit } = getCurrentInstance();
+  const buildMovedColumns = (visibleColumns) => {
+    const baseColumns = (stores.movedColumns?.length
+      ? [...stores.movedColumns]
+      : [...stores.originColumns]);
+    const queue = [...visibleColumns];
+    const visibleIndexSet = new Set(queue.map(column => column.index));
+    stores.movedColumns = baseColumns.map((column) => {
+      if (visibleIndexSet.has(column.index)) {
+        return queue.shift();
+      }
+      return column;
+    });
+  };
   const setColumnMoving = (currentIndex, droppedIndex) => {
     const oldIndex = parseInt(currentIndex, 10);
     const newPositionIndex = parseInt(droppedIndex, 10);
@@ -1584,9 +1597,8 @@ export const dragEvent = ({ stores }) => {
 
     if (stores.filteredColumns.length) {
       stores.filteredColumns = columns;
-    } else {
-      stores.movedColumns = columns;
     }
+    buildMovedColumns(columns);
   };
   const onDragStart = (e) => {
     e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index);
