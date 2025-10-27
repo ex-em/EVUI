@@ -235,8 +235,14 @@ export default {
     const isDataIcon = computed(() => ((parentIconMV.value !== 'none' || childIconMV.value !== 'none')));
 
     const expandColumnIdx = computed(() => {
-      const expandColumnIndex = props.orderedColumns.findIndex(v => v.expandColumn);
-      return expandColumnIndex > 0 ? expandColumnIndex : 0;
+      const columns = props.orderedColumns || [];
+      const visibleExpandIdx = columns.findIndex(column =>
+        column.expandColumn && !column.hide && !column.hiddenDisplay);
+      if (visibleExpandIdx !== -1) {
+        return visibleExpandIdx;
+      }
+      const firstVisibleIdx = columns.findIndex(column => !column.hide && !column.hiddenDisplay);
+      return firstVisibleIdx !== -1 ? firstVisibleIdx : 0;
     });
     const getRowClass = nodeInfo => ({
       row: true,
