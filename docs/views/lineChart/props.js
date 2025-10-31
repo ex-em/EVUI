@@ -32,6 +32,8 @@ import LegendVirtualScroll from './example/LegendVirtualScroll';
 import LegendVirtualScrollRaw from '!!raw-loader!./example/LegendVirtualScroll';
 import Segments from './example/Segments';
 import SegmentsRaw from '!!raw-loader!./example/Segments';
+import Interpolation from './example/Interpolation';
+import InterpolationRaw from '!!raw-loader!./example/Interpolation';
 
 export default {
   mdText,
@@ -100,6 +102,11 @@ export default {
       description: 'passingValue를 설정하여 특정 시점에 line을 끊지 않고 자연스럽게 이을 수 있습니다.',
       component: PassingValue,
       parsedData: parseComponent(PassingValueRaw),
+    },
+    Interpolation: {
+      description: 'Interpolation 옵션을 설정하여 null Data를 보간하여 선을 그릴 수 있습니다.',
+      component: Interpolation,
+      parsedData: parseComponent(InterpolationRaw),
     },
     HoverWithGroup: {
       description: '',

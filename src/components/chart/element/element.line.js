@@ -146,12 +146,8 @@ class Line {
       curr.yp = y;
 
       if (isLinearInterpolation && curr.o === null) {
-        if (!this.isExistGrp) {
-          return;
-        }
-      }
-
-      if ((isNil(prevValid?.y) && !this.isExistGrp)
+        return;
+      } else if ((isNil(prevValid?.y) && !this.isExistGrp)
         || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))) {
         ctx.moveTo(x, y);
       } else {
@@ -235,7 +231,7 @@ class Line {
 
           if (ix === startIndex) {
             ctx.moveTo(currData.xp, currData.yp);
-          } else if (this.isExistGrp || currData.o !== null) {
+          } else if (currData.o !== null) {
             ctx.lineTo(currData.xp, currData.yp);
           }
 
@@ -243,7 +239,7 @@ class Line {
             for (let jx = endIndex; jx >= startIndex; jx--) {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
-              const bp = getYPos(nextData.b) ?? getYPos(0);
+              const bp = nextData.o === null ? getYPos(0) : getYPos(nextData.b) ?? getYPos(0);
               ctx.lineTo(xp, bp);
             }
 
