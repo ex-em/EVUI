@@ -89,7 +89,11 @@ class Scale {
     }
 
     if (this.autoScaleRatio) {
-      maxValue = Math.ceil(maxValue * (this.autoScaleRatio + 1));
+      if (this.decimalPoint) {
+        maxValue *= (this.autoScaleRatio + 1);
+      } else {
+        maxValue = Math.ceil(maxValue * (this.autoScaleRatio + 1));
+      }
     }
 
     if (this.startToZero) {
@@ -184,6 +188,13 @@ class Scale {
 
     if (graphMax - graphMin > (numberOfSteps * interval)) {
       interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
+    }
+
+    if (this.decimalPoint === 'auto') {
+      this.decimalPoint = this?.getDecimalPointFromRange?.({
+        graphRange,
+        numberOfSteps,
+      });
     }
 
     return {

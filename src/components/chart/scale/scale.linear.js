@@ -32,7 +32,52 @@ class LinearScale extends Scale {
     const min = range.minValue;
     const step = range.maxSteps;
 
-    return this.interval ? this.interval : Math.ceil((max - min) / step);
+    if (this.interval) {
+      return this.interval;
+    }
+
+    if (this.decimalPoint) {
+      return (max - min) / step;
+    }
+
+    return Math.ceil((max - min) / step);
+  }
+
+    /**
+   * Get decimal point from range
+   * @param {object} {
+   *  graphRange: number,
+   *  numberOfSteps: number,
+   *  interval: number,
+   * }
+   * @returns {number} decimal point
+   */
+  getDecimalPointFromRange({
+    graphRange,
+    numberOfSteps,
+  }) {
+    if (numberOfSteps <= 0 || graphRange === 0) {
+      return 0;
+    }
+
+    const interval = graphRange / numberOfSteps;
+    if (interval === 0) {
+      return 0;
+    }
+
+    let decimals = 0;
+    let temp = interval;
+
+    while (temp < 1) {
+      temp *= 10;
+      decimals++;
+
+      if (decimals > 10) {
+        break;
+      }
+    }
+
+    return decimals;
   }
 }
 
