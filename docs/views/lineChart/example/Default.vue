@@ -97,6 +97,8 @@
           if (isLive.value) {
             seriesData.shift();
           }
+
+          seriesData.push(Math.floor(Math.random() * ((999999 - 5) + 1)) + 5);
         });
       };
 
