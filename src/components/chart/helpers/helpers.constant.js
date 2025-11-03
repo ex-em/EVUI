@@ -96,7 +96,7 @@ export const AXIS_OPTION = {
   timeFormat: 'mm:ss',
   range: null,
   interval: null,
-  decimalPoint: null,
+  decimalPoint: 'auto',
   labelStyle: {
     show: true,
     fontSize: 12,
