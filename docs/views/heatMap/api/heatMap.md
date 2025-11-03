@@ -125,6 +125,7 @@ const chartData =
 | formatter      | function      | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                        | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
 | title          | Object        | ([상세](#axes-title))     | 라벨의 폰트 스타일을 설정                                                                      |                                                         |
 | scrollbar      | Object        | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                               |                                                         |
+| showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
 
 ##### linear type
 
