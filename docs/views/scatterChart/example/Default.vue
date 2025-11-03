@@ -147,6 +147,7 @@ export default {
         plotLines: [],
         plotBands: [],
         formatter: null,
+        showAxisTick: true,
       }],
       title: {
         text: '',

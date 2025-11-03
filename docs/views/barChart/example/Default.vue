@@ -24,12 +24,16 @@
         thickness: 1,
         axesX: [{
           type: 'step',
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
         axesY: [{
           showAxis: true,
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
+          showAxisTick: true,
+          axisLineColor: '#25262E',
         }],
       };
 
