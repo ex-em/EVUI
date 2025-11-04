@@ -97,7 +97,7 @@ const modules = {
       }
 
       // tooltip 기반 indicator가 아직 설정되지 않은 경우에만 일반 indicator 처리
-      if (!args.hoveredLabel && type !== 'pie' && type !== 'scatter' && type !== 'heatMap') {
+      if (!args.hoveredLabel && this.isNotUseIndicator()) {
         // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
         const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
         if ((type !== 'line' && !hasLineSeries) || !tooltip.use || !Object.keys(hitInfo.items).length) {
@@ -906,7 +906,7 @@ const modules = {
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
 
-    if (targetDataIndex === -1 && this.options.type !== 'pie') {
+    if (targetDataIndex === -1 && this.isNotUseIndicator()) {
       return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
     }
 
@@ -1635,6 +1635,10 @@ const modules = {
     }
 
     return 'canvas';
+  },
+
+  isNotUseIndicator() {
+    return this.options.type !== 'pie' && this.options.type !== 'scatter' && this.options.type !== 'heatMap';
   },
 
   /**
